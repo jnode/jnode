@@ -125,7 +125,7 @@ public interface RTL8139Constants {
 
     public static final int RX_DMA_BURST = 0x4;
 
-    public static final int RX_RBLEN = 3; // 32k ring buffer
+    public static final int RX_RBLEN = 2; // 32k ring buffer
 
     public static final int RX_WRAP = 0x80;
 
