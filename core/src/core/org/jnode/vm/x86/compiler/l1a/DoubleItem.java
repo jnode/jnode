@@ -23,6 +23,7 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 
@@ -85,7 +86,7 @@ final class DoubleItem extends DoubleWordItem {
 	 * @param msb
 	 */
 	protected final void loadToConstant(EmitterContext ec,
-			X86Assembler os, X86Register lsb, X86Register msb) {
+			X86Assembler os, GPR lsb, GPR msb) {
 		final long lvalue = Double.doubleToLongBits(value);
 		final int lsbv = (int) (lvalue & 0xFFFFFFFFL);
 		final int msbv = (int) ((lvalue >>> 32) & 0xFFFFFFFFL);
@@ -101,7 +102,7 @@ final class DoubleItem extends DoubleWordItem {
 	 * @param reg
 	 * @param disp
 	 */
-	protected void popFromFPU(X86Assembler os, X86Register reg, int disp) {
+	protected void popFromFPU(X86Assembler os, GPR reg, int disp) {
 		os.writeFSTP64(reg, disp);
 	}
 
@@ -125,7 +126,7 @@ final class DoubleItem extends DoubleWordItem {
 	 * @param reg
 	 * @param disp
 	 */
-	protected void pushToFPU(X86Assembler os, X86Register reg, int disp) {
+	protected void pushToFPU(X86Assembler os, GPR reg, int disp) {
 		os.writeFLD64(reg, disp);
 	}
 }

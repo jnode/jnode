@@ -18,11 +18,12 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 
@@ -37,15 +38,16 @@ final class FloatItem extends WordItem {
 	 * Initialize a blank item.
 	 */
 	FloatItem(ItemFactory factory) {
-	    super(factory);
+		super(factory);
 	}
-	
+
 	/**
 	 * @param kind
 	 * @param offsetToFP
 	 * @param value
 	 */
-	final void initialize(int kind, int offsetToFP, X86Register.GPR reg, float value) {
+	final void initialize(int kind, int offsetToFP, X86Register.GPR reg,
+			float value) {
 		super.initialize(kind, reg, offsetToFP);
 		this.value = value;
 	}
@@ -72,7 +74,8 @@ final class FloatItem extends WordItem {
 	 * @return
 	 */
 	float getValue() {
-	    if (Vm.VerifyAssertions) Vm._assert(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
+		if (Vm.VerifyAssertions)
+			Vm._assert(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
 		return value;
 	}
 
@@ -82,8 +85,7 @@ final class FloatItem extends WordItem {
 	 * @param os
 	 * @param reg
 	 */
-	protected void loadToConstant(EmitterContext ec, X86Assembler os,
-			X86Register reg) {
+	protected void loadToConstant(EmitterContext ec, X86Assembler os, GPR reg) {
 		os.writeMOV_Const(reg, Float.floatToIntBits(value));
 	}
 
@@ -94,7 +96,7 @@ final class FloatItem extends WordItem {
 	 * @param reg
 	 * @param disp
 	 */
-	protected void popFromFPU(X86Assembler os, X86Register reg, int disp) {
+	protected void popFromFPU(X86Assembler os, GPR reg, int disp) {
 		os.writeFSTP32(reg, disp);
 	}
 
@@ -114,7 +116,7 @@ final class FloatItem extends WordItem {
 	 * @param reg
 	 * @param disp
 	 */
-	protected void pushToFPU(X86Assembler os, X86Register reg, int disp) {
+	protected void pushToFPU(X86Assembler os, GPR reg, int disp) {
 		os.writeFLD32(reg, disp);
 	}
 }

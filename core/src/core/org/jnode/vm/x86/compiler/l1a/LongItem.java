@@ -23,6 +23,7 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
@@ -65,7 +66,7 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
      * @param msb
      */
     protected final void loadToConstant(EmitterContext ec,
-            X86Assembler os, X86Register lsb, X86Register msb) {
+            X86Assembler os, GPR lsb, GPR msb) {
         
         if (value != 0) {
             final int lsbv = (int) (value & 0xFFFFFFFFL);
@@ -86,7 +87,7 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
      * @param reg
      * @param disp
      */
-    protected void popFromFPU(X86Assembler os, X86Register reg, int disp) {
+    protected void popFromFPU(X86Assembler os, GPR reg, int disp) {
         os.writeFISTP64(reg, disp);
     }
 
@@ -107,7 +108,7 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
      * @param reg
      * @param disp
      */
-    protected void pushToFPU(X86Assembler os, X86Register reg, int disp) {
+    protected void pushToFPU(X86Assembler os, GPR reg, int disp) {
         os.writeFILD64(reg, disp);
     }
 

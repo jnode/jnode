@@ -24,9 +24,10 @@ package org.jnode.vm.x86.compiler.l1a;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream.ObjectRef;
 import org.jnode.assembler.x86.X86Assembler;
-import org.jnode.assembler.x86.X86Register;
-import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86BinaryAssembler;
+import org.jnode.assembler.x86.X86Constants;
+import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmInterpretedExceptionHandler;
 import org.jnode.vm.classmgr.VmMethod;
@@ -162,7 +163,7 @@ class X86StackFrame implements X86CompilerConstants {
         os.writeJCC(stackOverflowLabel, X86Constants.JLE);
 		
 		// Create class initialization code (if needed)
-		helper.writeClassInitialize(method, X86Register.EAX, X86Register.ECX);
+		helper.writeClassInitialize(method, X86Register.EAX);
 
 		// Increment the invocation count
 		helper.writeIncInvocationCount(X86Register.EAX);
@@ -320,7 +321,7 @@ class X86StackFrame implements X86CompilerConstants {
 	/**
 	 * Write code to copy the method reference into the dst register.
 	 */
-	public final void writeGetMethodRef(X86Register dst) {
+	public final void writeGetMethodRef(GPR dst) {
 		os.writeMOV(INTSIZE, dst, X86Register.EBP, EbpMethodRefOffset);
 	}
 

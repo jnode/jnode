@@ -24,6 +24,7 @@ package org.jnode.vm.x86.compiler.l1a;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.classmgr.VmConstString;
@@ -86,7 +87,7 @@ final class RefItem extends WordItem implements X86CompilerConstants {
 	 * @param reg
 	 */
 	protected void loadToConstant(EmitterContext ec, X86Assembler os,
-			X86Register reg) {
+			GPR reg) {
 		if (value == null) {
 			os.writeXOR(reg, reg);
 		} else {
@@ -103,7 +104,7 @@ final class RefItem extends WordItem implements X86CompilerConstants {
 	 * @param reg
 	 * @param disp
 	 */
-	protected void popFromFPU(X86Assembler os, X86Register reg, int disp) {
+	protected void popFromFPU(X86Assembler os, GPR reg, int disp) {
 		notImplemented();
 	}
 
@@ -129,7 +130,7 @@ final class RefItem extends WordItem implements X86CompilerConstants {
 	 * @param reg
 	 * @param disp
 	 */
-	protected void pushToFPU(X86Assembler os, X86Register reg, int disp) {
+	protected void pushToFPU(X86Assembler os, GPR reg, int disp) {
 		notImplemented();
 	}
 
