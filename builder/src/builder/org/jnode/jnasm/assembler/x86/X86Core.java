@@ -29,7 +29,7 @@ public class X86Core extends AssemblerModule {
     private static final int ABS_ARG = 4;
     private static final int SCL_ARG = 5;
     private static final int DISP = 3;
-    private static final int DISP_MASK = (2 << (DISP - 1) - 1);
+    private static final int DISP_MASK = ((2 << (DISP - 1)) - 1);
 
     private static final int N_ADDR = NUL_ARG;
     private static final int C_ADDR = CON_ARG;
@@ -73,10 +73,10 @@ public class X86Core extends AssemblerModule {
                     } else if(ind.reg == null && ind.sreg == null){
                         ret |= ABS_ARG << DISP * i;
                     } else {
-                        System.out.println("unkown indirect: " + ind);
+                        throw new IllegalArgumentException("Unknown indirect: " + ind);
                     }
                 } else {
-                    System.out.println("unkown operand: " + o);
+                    throw new IllegalArgumentException("Unknown operand: " + o);
                 }
 
                 args[i] = o;
@@ -412,10 +412,10 @@ public class X86Core extends AssemblerModule {
                 lab = (lab == null) ? new Label(t1.image) : lab;
                 stream.writeJMP(lab);
             } else {
-                System.out.println("unkown operand: " + t1.image);
+                throw new IllegalArgumentException("Unknown operand: " + t1.image);
             }
         } else {
-            System.out.println("unkown operand: " + o1);
+            throw new IllegalArgumentException("Unknown operand: " + o1);
         }
     }
 
@@ -428,10 +428,10 @@ public class X86Core extends AssemblerModule {
                 lab = (lab == null) ? new Label(t1.image) : lab;
                 stream.writeJCC(lab, jumpCode);
             } else {
-                System.out.println("unkown operand: " + t1.image);
+                throw new IllegalArgumentException("Unknown operand: " + t1.image);
             }
         } else {
-            System.out.println("unkown operand: " + o1);
+            throw new IllegalArgumentException("Unknown operand: " + o1);
         }
     }
 
@@ -460,10 +460,10 @@ public class X86Core extends AssemblerModule {
                     x.printStackTrace();
                 }
             } else {
-                System.out.println("unkown operand: " + t1.image);
+                throw new IllegalArgumentException("Unknown operand: " + t1.image);
             }
         } else {
-            System.out.println("unkown operand: " + o1);
+            throw new IllegalArgumentException("Unknown operand: " + o1);
         }
     }
 
@@ -716,17 +716,10 @@ public class X86Core extends AssemblerModule {
             ad >>= DISP;
         } while(ad != 0);
 
-        String msg  = "Unkown addressing mode (" + err + " ) for " + MNEMONICS[instruction];
-        //System.out.println(msg);
-        throw new IllegalArgumentException(msg);
+        throw new IllegalArgumentException("Unknown addressing mode " + addressing + " (" + err + " ) for " + MNEMONICS[instruction]);
     }
 
     static final X86Register.GPR getRegister(Token t) {
-        try {
-            return X86Register.getGPR(t.image);
-        } catch (IllegalArgumentException x) {
-            System.err.println(x.getMessage());
-            return X86Register.EAX;
-        }
+        return X86Register.getGPR(t.image);
     }
 }

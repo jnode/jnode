@@ -62,7 +62,11 @@ public class X86Support extends HardwareSupport {
                 try{
                     emmit(ins.getMnemonic(), ins.getOperands());
                 }catch(IllegalArgumentException x){
-                    System.out.println(x.getMessage() + " at line " + ins.getLineNumber());
+                    if(Assembler.THROW){
+                        throw x;
+                    } else {
+                        System.out.println(x.getMessage() + " at line " + ins.getLineNumber());
+                    }
                 }
             }
         }
@@ -93,11 +97,6 @@ public class X86Support extends HardwareSupport {
                 return;
             }
         }
-
-        if (Assembler.THROW) {
-            throw new RuntimeException("Unknown instruction: " + mnemonic);
-        } else {
-            System.err.println("Unknown instruction: " + mnemonic);
-        }
+        throw new IllegalArgumentException("Unknown instruction: " + mnemonic);
     }
 }
