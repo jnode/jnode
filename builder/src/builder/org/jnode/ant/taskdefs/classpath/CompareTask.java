@@ -39,10 +39,13 @@ public class CompareTask extends Task {
     private String vmSpecificTag = "@vm-specific";
     private String classpathBugfixTag = "@classpath-bugfix";
     
-    private static final int NO_CHANGE = 1;
-    private static final int NEEDS_MERGE = 2;
-    private static final int VM_SPECIFIC = 3;
-    private static final int CLASSPATH_BUGFIX = 4;
+    private static final int NO_CHANGE = 0x01;
+    private static final int NEEDS_MERGE = 0x02;
+    private static final int VM_SPECIFIC = 0x03;
+    private static final int CLASSPATH_BUGFIX = 0x04;
+
+    private static final int FLAGS_MASK = 0xFF00;
+    private static final int FLAGS_NATIVE = 0x0100;
     
     
     public void execute() {
@@ -81,19 +84,18 @@ public class CompareTask extends Task {
                 } else {                    
                     final String diffFileName = vmFile.getClassName() + ".diff";
                     int rc = runDiff(vmFile, cpFile, diffFileName, packageDiffs);
-                    switch (rc) {
+                    switch (rc & ~FLAGS_MASK) {
                     case NO_CHANGE: break;
                     case NEEDS_MERGE:
-                        reportNeedsMerge(out, vmFile.getClassName(), diffFileName);
+                        reportNeedsMerge(out, vmFile.getClassName(), diffFileName, rc & FLAGS_MASK);
                         needsMerge++;
-                        //diffPackages.put(vmFile.getPackageName(), )
                         break;
                     case VM_SPECIFIC:
-                        reportDiffVmSpecific(out, vmFile.getClassName(), diffFileName);
+                        reportDiffVmSpecific(out, vmFile.getClassName(), diffFileName, rc & FLAGS_MASK);
                         diffVmSpecific++;
                         break;
                     case CLASSPATH_BUGFIX:
-                        reportDiffClasspathBugfix(out, vmFile.getClassName(), diffFileName);
+                        reportDiffClasspathBugfix(out, vmFile.getClassName(), diffFileName, rc & FLAGS_MASK);
                         diffClasspathBugfix++;
                         break;
                     default:
@@ -110,7 +112,7 @@ public class CompareTask extends Task {
                 final String diff = (String)entry.getValue();
                 final String diffFileName = pkg + ".diff";
                 processPackageDiff(diffFileName, pkg, diff);
-                reportPackageDiff(out, pkg, diffFileName);
+                reportPackageDiff(out, pkg, diffFileName, getFlags(diff));
             }
             
             out.println("</table><p/>");
@@ -183,12 +185,13 @@ public class CompareTask extends Task {
                 }
                 packageDiffs.put(pkg, pkgDiff);
                 
+                final int flags = getFlags(diffStr);
                 if (diffStr.indexOf(vmSpecificTag) >= 0) {
-                    return VM_SPECIFIC;
+                    return flags | VM_SPECIFIC;
                 } else if (diffStr.indexOf(classpathBugfixTag) >= 0) {
-                    return CLASSPATH_BUGFIX;
+                    return flags | CLASSPATH_BUGFIX;
                 } else {
-                    return NEEDS_MERGE;
+                    return flags | NEEDS_MERGE;
                 }
             } finally {
                 os.close();
@@ -232,35 +235,44 @@ public class CompareTask extends Task {
     protected void reportMissing(PrintWriter out, String fname, String existsIn) {
         out.println("<tr class='" + existsIn + "-only'>");
         out.println("<td>" + fname + "</td>");
-        out.println("<td>Exists only in " + existsIn + "</td>");
+        out.println("<td>Exists only in " + existsIn);
+        out.println("</td>");
         out.println("</tr>");
     }
     
-    protected void reportNeedsMerge(PrintWriter out, String fname, String diffFileName) {
+    protected void reportNeedsMerge(PrintWriter out, String fname, String diffFileName, int flags) {
         out.println("<tr class='needsmerge'>");
         out.println("<td>" + fname + "</td>");
-        out.println("<td><a href='" + diffFileName + "'>Diff</a></td>");
+        out.println("<td><a href='" + diffFileName + "'>Diff</a>");
+        reportFlags(out, flags);
+        out.println("</td>");
         out.println("</tr>");
     }
     
-    protected void reportDiffVmSpecific(PrintWriter out, String fname, String diffFileName) {
+    protected void reportDiffVmSpecific(PrintWriter out, String fname, String diffFileName, int flags) {
         out.println("<tr class='vm-specific'>");
         out.println("<td>" + fname + "</td>");
-        out.println("<td>VM specific change. (<a href='" + diffFileName + "'>diff</a>)</td>");
+        out.println("<td>VM specific change. (<a href='" + diffFileName + "'>diff</a>)");
+        reportFlags(out, flags);
+        out.println("</td>");
         out.println("</tr>");
     }
     
-    protected void reportDiffClasspathBugfix(PrintWriter out, String fname, String diffFileName) {
+    protected void reportDiffClasspathBugfix(PrintWriter out, String fname, String diffFileName, int flags) {
         out.println("<tr class='classpath-bugfix'>");
         out.println("<td>" + fname + "</td>");
-        out.println("<td>Local classpath bugfix. (<a href='" + diffFileName + "'>diff</a>)</td>");
+        out.println("<td>Local classpath bugfix. (<a href='" + diffFileName + "'>diff</a>)");
+        reportFlags(out, flags);
+        out.println("</td>");
         out.println("</tr>");
     }
     
-    protected void reportPackageDiff(PrintWriter out, String pkg, String diffFileName) {
+    protected void reportPackageDiff(PrintWriter out, String pkg, String diffFileName, int flags) {
         out.println("<tr class='needsmerge'>");
         out.println("<td>" + pkg + "</td>");
-        out.println("<td><a href='" + diffFileName + "'>diff</a></td>");
+        out.println("<td><a href='" + diffFileName + "'>diff</a>");
+        reportFlags(out, flags);
+        out.println("</td>");
         out.println("</tr>");
     }
     
@@ -268,6 +280,19 @@ public class CompareTask extends Task {
         out.println("</body></html>");
     }
     
+    protected void reportFlags(PrintWriter out, int flags) {
+        if ((flags & FLAGS_NATIVE) != 0) {
+            out.println(" *NATIVE*");
+        }
+    }
+
+    protected int getFlags(String code) {
+        int flags = 0;
+        if (code.indexOf("native") >= 0) {
+            flags |= FLAGS_NATIVE;
+        }
+        return flags;
+    }
     
     public BaseDirs createVmsources() {
         if (vmDirs == null) {
