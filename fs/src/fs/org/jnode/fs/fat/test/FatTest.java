@@ -49,7 +49,7 @@ public class FatTest {
 	public static void printInfo(File file, PrintWriter out)
 		throws IOException, FileSystemException {
 		FileDevice fd = new FileDevice(file, "r");
-		FatFileSystem fs = new FatFileSystem(fd);
+		FatFileSystem fs = new FatFileSystem(fd, false);
 		try {
 			BootSector bs = fs.getBootSector();
 			bs.read(fd);
@@ -100,7 +100,7 @@ public class FatTest {
 		ff.format(newFd);
 
 		//newFd.start();
-		FatFileSystem fs = new FatFileSystem(newFd);
+		FatFileSystem fs = new FatFileSystem(newFd, false);
 
 		FSDirectory dir = fs.getRootEntry().getDirectory();
 		FSDirectory bDir = dir.addDirectory("boot").getDirectory();
