@@ -13,34 +13,20 @@ import java.util.Date;
  */
 public class NTFSUTIL {
 
-	public static int makeWORDfrom2Bytes(byte[] values)
-	{
-		int word = values[1];
-		word = (word << 8) | (values[0] & 0xff);
-		return word;
-	}
-
-	public static int makeWORDfrom2Bytes(byte up, byte low)
+	public static int READ16_INT(byte up, byte low)
 	{
 		int word = low;
 		word = (word << 8) | (up & 0xff);
 		return word;
 	}
-	public static char makeCHARfrom2Bytes(byte up, byte low)
+	public static char READ16_CHAR(byte up, byte low)
 	{
 		char word = (char) low;
 		word = (char) ((word << 8) | (up & 0xff));
 		return word;
 	}
-	public static long get32(byte[] data, int offset) {
-		int b1 = data[offset] & 0xFF;
-		int b2 = data[offset+1] & 0xFF;
-		int b3 = data[offset+2] & 0xFF;
-		int b4 = data[offset+3] & 0xFF;
-		return (b4 << 24) | (b3 << 16) | (b2 << 8) | b1;
-	}
 	
-	public static long ARRAY2LONG (byte[] abArray, int offset)
+	public static long READ64_LONG (byte[] abArray, int offset)
 	{
 		int b1 = abArray[offset + 7] & 0xFF;
 		int b2 = abArray[offset + 6] & 0xFF;
@@ -51,7 +37,7 @@ public class NTFSUTIL {
 		int b7 = abArray[offset + 1] & 0xFF;
 		int b8 = abArray[offset + 0] & 0xFF;
 		
-		return (
+		return Math.abs(
 				(b1 << 56) | 
 				(b2 << 48) | 
 				(b3 << 40) | 
@@ -69,7 +55,7 @@ public class NTFSUTIL {
 		return temp;
 	}
 
-	public static int ARRAY2INT (byte[] abArray, int offset)
+	public static int READ32_INT (byte[] abArray, int offset)
 	{
 		int b1 = abArray[offset + 3] & 0x000000FF;
 		int b2 = abArray[offset + 2] & 0x000000FF;
@@ -82,12 +68,29 @@ public class NTFSUTIL {
 				(b3 << 8) | 
 				b4) & 0xFFFFFFFF;
 	}
+	public static int READ24_INT (byte[] abArray, int offset)
+	{
+		int b1 = abArray[offset + 2] & 0x000000FF;
+		int b2 = abArray[offset + 1] & 0x000000FF;
+		int b3 = abArray[offset + 0] & 0x000000FF;
+		
+		return (
+				(b1 << 16) | 
+				(b2 << 8) | 
+				 b3) & 0xFFFFFFFF;
+	}
 	public static Date getDateForNTFSTimes(long _100ns)
 	{
-		Date date = new Date((_100ns /  (10 * 1000)) - ((1000 * 60 * 60 *24) * 134774));
-		/*System.out.println(date);
-		System.out.println(_100ns);
-		System.out.println(((1000 * 60 * 60 *24) * 134774));*/
+		long timeoffset = Math.abs((369*365 + 89) * 24 * 3600 * 10000000);
+		long time = (Math.abs(_100ns) - timeoffset);
+		
+		System.out.println("hours" + ((Math.abs(time) / 1000)  / 60)/60);
+		Date date = new Date(time);
+		System.out.println(date.toLocaleString());
 		return date;
+	}
+	public static void printOutHexLong(String name,long value)
+	{
+		System.out.println(name + " = 0x"  + Long.toHexString(value));
 	}
 }

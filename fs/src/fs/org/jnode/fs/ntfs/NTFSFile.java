@@ -1,3 +1,6 @@
+/*
+ * $Id$
+ */
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;

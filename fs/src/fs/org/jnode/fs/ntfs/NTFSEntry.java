@@ -1,3 +1,6 @@
+/*
+ * $Id$
+ */
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
@@ -7,6 +10,8 @@ import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
+import org.jnode.fs.ntfs.attributes.NTFSFileNameAttribute;
+import org.jnode.fs.ntfs.attributes.NTFSIndexEntry;
 
 /**
  * @author vali
@@ -16,18 +21,30 @@ import org.jnode.fs.FileSystem;
  */
 public class NTFSEntry implements FSEntry {
 
-	private NTFSFileRecord fileRecord = null;
+	private NTFSIndexEntry indexEntry = null;
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FSEntry#getName()
 	 */
 	public NTFSEntry(NTFSFileRecord fileRecord)
 	{
-		this.fileRecord = fileRecord;
+		this.indexEntry = new NTFSIndexEntry();
+		
+		NTFSFileNameAttribute att = (NTFSFileNameAttribute) fileRecord.getAttributeMap().get(new Integer(NTFSFileRecord.$FILE_NAME));
+		
+		indexEntry.setFileName(att.getFileName());
+		indexEntry.setFileNameFlags(att.getFileNameFlags());
+		indexEntry.setFileRecords(fileRecord);
+	}
+	
+	public NTFSEntry(NTFSIndexEntry indexEntry)
+	{
+		this.indexEntry = indexEntry;
 	}
 	public String getName() {
-		// TODO Auto-generated method stub
-		return fileRecord.getFileName();
-	}
+		if(indexEntry != null)
+			return indexEntry.getFileName();
+		return null;
+	}			
 
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FSEntry#getParent()
@@ -58,7 +75,7 @@ public class NTFSEntry implements FSEntry {
 	 */
 	public boolean isDirectory() {
 		// TODO Auto-generated method stub
-		return fileRecord.isDirectory();
+		return indexEntry.isDirectory();
 	}
 
 	/* (non-Javadoc)
@@ -89,8 +106,10 @@ public class NTFSEntry implements FSEntry {
 	 * @see org.jnode.fs.FSEntry#getDirectory()
 	 */
 	public FSDirectory getDirectory() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		if(this.isDirectory())
+			return new NTFSDirectory(this.indexEntry.getFileRecord());
+		else
+			return null;
 	}
 
 	/* (non-Javadoc)
@@ -116,5 +135,13 @@ public class NTFSEntry implements FSEntry {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	/**
+	 * @return Returns the fileRecord.
+	 */
+	public NTFSFileRecord getFileRecord() {
+		return this.indexEntry.getFileRecord();
+	}
+
 
 }

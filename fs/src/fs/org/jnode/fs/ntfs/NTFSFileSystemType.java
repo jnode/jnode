@@ -16,7 +16,7 @@ import org.jnode.fs.partitions.*;
 public class NTFSFileSystemType implements FileSystemType
 {
 
-	public static final String NAME = "EXT2";
+	public static final String NAME = "NTFS";
 	
 	
 	public String getName() {
@@ -28,8 +28,7 @@ public class NTFSFileSystemType implements FileSystemType
 	 */
 	public boolean supports(PartitionTableEntry pte, byte[] firstSector)
 	{
-		// TODO Auto-generated method stub
-		return false;
+		return new String(firstSector,0x03,8).startsWith("NTFS");
 	}
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FileSystemType#create(org.jnode.driver.Device)
