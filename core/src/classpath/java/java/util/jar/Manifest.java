@@ -1,5 +1,5 @@
-/* Attributes.java -- Reads, writes and manipulaties jar manifest files
-   Copyright (C) 2000 Free Software Foundation, Inc.
+/* Manifest.java -- Reads, writes and manipulaties jar manifest files
+   Copyright (C) 2000, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -56,7 +56,8 @@ import java.util.Map;
  * @since 1.2
  * @author Mark Wielaard (mark@klomp.org)
  */
-public class Manifest implements Cloneable {
+public class Manifest implements Cloneable
+{
 	// Fields
 
 	/** The main attributes of the manifest (jar file). */
@@ -70,7 +71,8 @@ public class Manifest implements Cloneable {
 	/**
 	 * Creates a new empty Manifest.
 	 */
-	public Manifest() {
+  public Manifest()
+  {
 		mainAttr = new Attributes();
 		entries = new Hashtable();
 	}
@@ -85,7 +87,8 @@ public class Manifest implements Cloneable {
 	 * @exception IOException when an i/o exception occurs or the input stream
 	 * does not describe a valid manifest
 	 */
-	public Manifest(InputStream in) throws IOException {
+  public Manifest(InputStream in) throws IOException
+  {
 		this();
 		read(in);
 	}
@@ -102,7 +105,8 @@ public class Manifest implements Cloneable {
 	 * @see clone()
 	 * @param man the Manifest to copy from
 	 */
-	public Manifest(Manifest man) {
+  public Manifest(Manifest man)
+  {
 		mainAttr = new Attributes(man.getMainAttributes());
 		entries = new Hashtable(man.getEntries());
 	}
@@ -112,7 +116,8 @@ public class Manifest implements Cloneable {
 	/**
 	 * Gets the main attributes of this Manifest.
 	 */
-	public Attributes getMainAttributes() {
+  public Attributes getMainAttributes()
+  {
 		return mainAttr;
 	}
 
@@ -121,7 +126,8 @@ public class Manifest implements Cloneable {
 	 * in this manifest. Adding, changing or removing from this entries map
 	 * changes the entries of this manifest.
 	 */
-	public Map getEntries() {
+  public Map getEntries()
+  {
 		return entries;
 	}
 
@@ -134,7 +140,8 @@ public class Manifest implements Cloneable {
 	 * @param entryName the name of the entry to look up
 	 * @return the attributes associated with the entry or null when none
 	 */
-	public Attributes getAttributes(String entryName) {
+  public Attributes getAttributes(String entryName)
+  {
 		return (Attributes) getEntries().get(entryName);
 	}
 
@@ -142,7 +149,8 @@ public class Manifest implements Cloneable {
 	 * Clears the main attributes and removes all the entries from the
 	 * manifest.
 	 */
-	public void clear() {
+  public void clear()
+  {
 		mainAttr.clear();
 		entries.clear();
 	}
@@ -150,15 +158,19 @@ public class Manifest implements Cloneable {
 	/**
 	 * XXX
 	 */
-	public void read(InputStream in) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(in, "8859_1"));
+  public void read(InputStream in) throws IOException
+  {
+    BufferedReader br =
+      new BufferedReader(new InputStreamReader(in, "8859_1"));
 		read_main_section(getMainAttributes(), br);
 		read_individual_sections(getEntries(), br);
 	}
 
 	// Private Static methods for reading the Manifest file from BufferedReader
 
-	private static void read_main_section(Attributes attr, BufferedReader br) throws IOException {
+  private static void read_main_section(Attributes attr,
+					BufferedReader br) throws IOException
+  {
 		// According to the spec we should actually call read_version_info() here.
 		read_attributes(attr, br);
 		// Explicitly set Manifest-Version attribute if not set in Main
@@ -172,45 +184,66 @@ public class Manifest implements Cloneable {
 	 * the "Manifest-Version". This follows the Manifest spec closely but
 	 * reject some jar Manifest files out in the wild.
 	 */
-	private static void read_version_info(Attributes attr, BufferedReader br) throws IOException {
+  private static void read_version_info(Attributes attr,
+					BufferedReader br) throws IOException
+  {
 		String version_header = Attributes.Name.MANIFEST_VERSION.toString();
-		try {
+    try
+      {
 			String value = expect_header(version_header, br);
 			attr.putValue(Attributes.Name.MANIFEST_VERSION, value);
-		} catch (IOException ioe) {
-			throw new JarException("Manifest should start with a " + version_header + ": " + ioe.getMessage());
+      }
+    catch (IOException ioe)
+      {
+	throw new JarException("Manifest should start with a " +
+			       version_header + ": " + ioe.getMessage());
 		}
 	}
 
-	private static String expect_header(String header, BufferedReader br) throws IOException {
+  private static String expect_header(String header, BufferedReader br)
+    throws IOException
+  {
 		String s = br.readLine();
-		if (s == null) {
+    if (s == null)
+      {
 			throw new JarException("unexpected end of file");
 		}
 		return expect_header(header, br, s);
 	}
 
-	private static String expect_header(String header, BufferedReader br, String s) throws IOException {
-		try {
+  private static String expect_header(String header, BufferedReader br,
+				      String s) throws IOException
+  {
+    try
+      {
 			String name = s.substring(0, header.length() + 1);
-			if (name.equalsIgnoreCase(header + ":")) {
+	if (name.equalsIgnoreCase(header + ":"))
+	  {
 				String value_start = s.substring(header.length() + 2);
 				return read_header_value(value_start, br);
 			}
-		} catch (IndexOutOfBoundsException iobe) {
+      }
+    catch (IndexOutOfBoundsException iobe)
+      {
 		}
 		// If we arrive here, something went wrong
 		throw new JarException("unexpected '" + s + "'");
 	}
 
-	private static String read_header_value(String s, BufferedReader br) throws IOException {
+  private static String read_header_value(String s, BufferedReader br)
+    throws IOException
+  {
 		boolean try_next = true;
-		while (try_next) {
+    while (try_next)
+      {
 			// Lets see if there is something on the next line
 			br.mark(1);
-			if (br.read() == ' ') {
+	if (br.read() == ' ')
+	  {
 				s += br.readLine();
-			} else {
+	  }
+	else
+	  {
 				br.reset();
 				try_next = false;
 			}
@@ -218,124 +251,171 @@ public class Manifest implements Cloneable {
 		return s;
 	}
 
-	private static void read_attributes(Attributes attr, BufferedReader br) throws IOException {
+  private static void read_attributes(Attributes attr,
+				      BufferedReader br) throws IOException
+  {
 		String s = br.readLine();
-		while (s != null && (!s.equals(""))) {
+    while (s != null && (!s.equals("")))
+      {
 			read_attribute(attr, s, br);
 			s = br.readLine();
 		}
 	}
 
-	private static void read_attribute(Attributes attr, String s, BufferedReader br) throws IOException {
-		try {
+  private static void read_attribute(Attributes attr, String s,
+				     BufferedReader br) throws IOException
+  {
+    try
+      {
 			int colon = s.indexOf(": ");
 			String name = s.substring(0, colon);
 			String value_start = s.substring(colon + 2);
 			String value = read_header_value(value_start, br);
 			attr.putValue(name, value);
-		} catch (IndexOutOfBoundsException iobe) {
+      }
+    catch (IndexOutOfBoundsException iobe)
+      {
 			throw new JarException("Manifest contains a bad header: " + s);
 		}
 	}
 
-	private static void read_individual_sections(Map entries, BufferedReader br) throws IOException {
+  private static void read_individual_sections(Map entries,
+					       BufferedReader br) throws
+    IOException
+  {
 		String s = br.readLine();
-		while (s != null && (!s.equals(""))) {
+    while (s != null && (!s.equals("")))
+      {
 			Attributes attr = read_section_name(s, br, entries);
 			read_attributes(attr, br);
 			s = br.readLine();
 		}
 	}
 
-	private static Attributes read_section_name(String s, BufferedReader br, Map entries) throws JarException {
-		try {
+  private static Attributes read_section_name(String s, BufferedReader br,
+					      Map entries) throws JarException
+  {
+    try
+      {
 			String name = expect_header("Name", br, s);
 			Attributes attr = new Attributes();
 			entries.put(name, attr);
 			return attr;
-		} catch (IOException ioe) {
-			throw new JarException("Section should start with a Name header: " + ioe.getMessage());
+      }
+    catch (IOException ioe)
+      {
+	throw new JarException
+	  ("Section should start with a Name header: " + ioe.getMessage());
 		}
 	}
 
 	/**
 	 * XXX
 	 */
-	public void write(OutputStream out) throws IOException {
-		PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(out, "8859_1")));
+  public void write(OutputStream out) throws IOException
+  {
+    PrintWriter pw =
+      new PrintWriter(new
+		      BufferedWriter(new OutputStreamWriter(out, "8859_1")));
 		write_main_section(getMainAttributes(), pw);
 		pw.println();
 		write_individual_sections(getEntries(), pw);
-		if (pw.checkError()) {
+    if (pw.checkError())
+      {
 			throw new JarException("Error while writing manifest");
 		}
 	}
 
 	// Private Static functions for writing the Manifest file to a PrintWriter
 
-	private static void write_main_section(Attributes attr, PrintWriter pw) throws JarException {
+  private static void write_main_section(Attributes attr,
+					 PrintWriter pw) throws JarException
+  {
 		write_version_info(attr, pw);
 		write_main_attributes(attr, pw);
 	}
 
-	private static void write_version_info(Attributes attr, PrintWriter pw) {
+  private static void write_version_info(Attributes attr, PrintWriter pw)
+  {
 		// First check if there is already a version attribute set
 		String version = attr.getValue(Attributes.Name.MANIFEST_VERSION);
-		if (version == null) {
+    if (version == null)
+      {
 			version = "1.0";
 		}
 		write_header(Attributes.Name.MANIFEST_VERSION.toString(), version, pw);
 	}
 
-	private static void write_header(String name, String value, PrintWriter pw) {
+  private static void write_header(String name, String value, PrintWriter pw)
+  {
 		pw.print(name + ": ");
 
 		int last = 68 - name.length();
-		if (last > value.length()) {
+    if (last > value.length())
+      {
 			pw.println(value);
-		} else {
+      }
+    else
+      {
 			pw.println(value.substring(0, last));
 		}
-		while (last < value.length()) {
+    while (last < value.length())
+      {
 			pw.print(" ");
 			int end = (last + 69);
-			if (end > value.length()) {
+	if (end > value.length())
+	  {
 				pw.println(value.substring(last));
-			} else {
+	  }
+	else
+	  {
 				pw.println(value.substring(last, end));
 			}
 			last = end;
 		}
 	}
 
-	private static void write_main_attributes(Attributes attr, PrintWriter pw) throws JarException {
+  private static void write_main_attributes(Attributes attr, PrintWriter pw) 
+    throws JarException
+  {
 		Iterator it = attr.entrySet().iterator();
-		while (it.hasNext()) {
+    while (it.hasNext())
+      {
 			Map.Entry entry = (Map.Entry) it.next();
 			// Don't print the manifest version again
-			if (!Attributes.Name.MANIFEST_VERSION.equals(entry.getKey())) {
+	if (!Attributes.Name.MANIFEST_VERSION.equals(entry.getKey()))
+	  {
 				write_attribute_entry(entry, pw);
 			}
 		}
 	}
 
-	private static void write_attribute_entry(Map.Entry entry, PrintWriter pw) throws JarException {
+  private static void write_attribute_entry(Map.Entry entry, PrintWriter pw) 
+    throws JarException
+  {
 		String name = entry.getKey().toString();
 		String value = entry.getValue().toString();
 
-		if (name.equalsIgnoreCase("Name")) {
+    if (name.equalsIgnoreCase("Name"))
+      {
 			throw new JarException("Attributes cannot be called 'Name'");
 		}
-		if (name.startsWith("From")) {
-			throw new JarException("Header cannot start with the four letters 'From'" + name);
+    if (name.startsWith("From"))
+      {
+	throw new
+	  JarException("Header cannot start with the four letters 'From'" +
+		       name);
 		}
 		write_header(name, value, pw);
 	}
 
-	private static void write_individual_sections(Map entries, PrintWriter pw) throws JarException {
+  private static void write_individual_sections(Map entries, PrintWriter pw)
+    throws JarException
+  {
 
 		Iterator it = entries.entrySet().iterator();
-		while (it.hasNext()) {
+    while (it.hasNext())
+      {
 			Map.Entry entry = (Map.Entry) it.next();
 			write_header("Name", entry.getKey().toString(), pw);
 			write_entry_attributes((Attributes) entry.getValue(), pw);
@@ -343,9 +423,12 @@ public class Manifest implements Cloneable {
 		}
 	}
 
-	private static void write_entry_attributes(Attributes attr, PrintWriter pw) throws JarException {
+  private static void write_entry_attributes(Attributes attr, PrintWriter pw) 
+    throws JarException
+  {
 		Iterator it = attr.entrySet().iterator();
-		while (it.hasNext()) {
+    while (it.hasNext())
+      {
 			Map.Entry entry = (Map.Entry) it.next();
 			write_attribute_entry(entry, pw);
 		}
@@ -359,7 +442,8 @@ public class Manifest implements Cloneable {
 	 * a particular entry also changes the attributes of that entry in the
 	 * original manifest. Calls <CODE>new Manifest(this)</CODE>.
 	 */
-	public Object clone() {
+  public Object clone()
+  {
 		return new Manifest(this);
 	}
 
@@ -369,15 +453,19 @@ public class Manifest implements Cloneable {
 	 * Manifest and the main attributes and the entries of the other manifest
 	 * are equal to this one.
 	 */
-	public boolean equals(Object o) {
-		return (o instanceof Manifest) && (mainAttr.equals(((Manifest) o).mainAttr)) && (entries.equals(((Manifest) o).entries));
+  public boolean equals(Object o)
+  {
+    return (o instanceof Manifest) &&
+      (mainAttr.equals(((Manifest) o).mainAttr)) &&
+      (entries.equals(((Manifest) o).entries));
 	}
 
 	/**
 	 * Calculates the hash code of the manifest. Implemented by a xor of the
 	 * hash code of the main attributes with the hash code of the entries map.
 	 */
-	public int hashCode() {
+  public int hashCode()
+  {
 		return mainAttr.hashCode() ^ entries.hashCode();
 	}
 

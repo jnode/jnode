@@ -1,5 +1,5 @@
 /* FileNameMap.java -- Maps filenames to MIME types
-   Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,15 +35,14 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package java.net;
+
 
 /**
  * Written using on-line Java Platform 1.2 API Specification, as well
  * as "The Java Class Libraries", 2nd edition (Addison-Wesley, 1998).
  * Status:  Believed complete and correct.
  */
-
 /**
   * This interface has one method which, when passed a filename, returns
   * the MIME type associated with that filename.
@@ -54,7 +53,7 @@ package java.net;
   */
 public interface FileNameMap
 {
-/**
+  /**
   * This method is passed a filename and is responsible for determining
   * the appropriate MIME type for that file.
   *
@@ -62,8 +61,5 @@ public interface FileNameMap
   *
   * @return The MIME type for the filename passed in.
   */
-String
-getContentTypeFor(String filename);
-
+  String getContentTypeFor(String filename);
 } // interface FileNameMap
-

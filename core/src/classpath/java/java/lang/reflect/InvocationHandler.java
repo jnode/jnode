@@ -49,12 +49,13 @@ package java.lang.reflect;
  * interface.  But in order for the proxy instance to do any good, it
  * needs to know what to do when interface methods are invoked!  So,
  * this interface is basically a cool wrapper that provides runtime
- * code generation needed by proxy instances.<p>
+ * code generation needed by proxy instances.
  *
- * While this interface was designed for use by Proxy, it will also
- * work on any object in general.<p>
+ * <p>While this interface was designed for use by Proxy, it will also
+ * work on any object in general.</p>
  *
- * Hints for implementing this class:<br>
+ * <p>Hints for implementing this class:</p>
+ *
  * <ul>
  *  <li>Don't forget that Object.equals, Object.hashCode, and
  *      Object.toString will call this handler.  In particular,
@@ -74,12 +75,12 @@ package java.lang.reflect;
  * </ul>
  *
  * <p><small>For a fun time, create an InvocationHandler that handles the
- * methods of a proxy instance of the InvocationHandler interface!</small>
+ * methods of a proxy instance of the InvocationHandler interface!</small></p>
  *
  * @see Proxy
  * @see UndeclaredThrowableException
  *
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
  * @since 1.3
  * @status updated to 1.4
  */

@@ -1,5 +1,5 @@
-/* BindException.java -- An exception occurred while binding to a socket
-   Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+/* NIOConstants.java --
+   Copyright (C) 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,40 +35,13 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.net;
 
+package gnu.java.nio;
 
 /**
- * This exception indicates that an error occurred while attempting to bind
- * socket to a particular port.
- *
- * @author Aaron M. Renn <arenn@urbanophile.com>
- * @author Warren Levy <warrenl@cygnus.com>
- * @since 1.1
- * @status updated to 1.4
+ * @author Michael Koch
  */
-public class BindException extends SocketException
+public final class NIOConstants
 {
-  /**
-   * Compatible with JDK 1.1+.
-   */
-  private static final long serialVersionUID = -5945005768251722951L;
-
-  /**
-   * Create a new instance without a descriptive error message.
-   */
-  public BindException()
-  {
-  }
-
-  /**
-   * Create a new instance with a descriptive error message, such as the
-   * text from strerror(3).
-   *
-   * @param message a message describing the error that occurred
-   */
-  public BindException(String message)
-  {
-    super(message);
-  }
-} // class BindException
+  public static final int DEFAULT_TIMEOUT = 50;
+}

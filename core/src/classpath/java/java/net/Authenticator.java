@@ -1,5 +1,5 @@
 /* Authenticator.java -- Abstract class for obtaining authentication info
-   Copyright (C) 1998,2000 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2000, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,18 +37,20 @@ exception statement from your version. */
 
 package java.net;
 
+
 /**
   * This abstract class provides a model for obtaining authentication
   * information (in the form of a username and password) required by
   * some network operations (such as hitting a password protected
   * web site).
   * <p>
-  * To make use of this feature, a programmer must create a subclass of
-  * Authenticator that knows how to obtain the necessary info.  An example
+  * To make use of this feature, a programmer must create a subclass
+  * that knows how to obtain the necessary info.  An example
   * would be a class that popped up a dialog box to prompt the user.  
-  * After creating an instance of that subclass, the static setDefault
-  * method of this class is called to set up that instance as the object
-  * to use on subsequent calls to obtain authorization.
+  * After creating an instance of that subclass, the static
+  * <code>setDefault</code> method of this class is called to set up
+  * that instance as the object to use on subsequent calls to obtain
+  * authorization.
   *
   * @since 1.2
   *
@@ -57,86 +59,76 @@ package java.net;
   */
 public abstract class Authenticator
 {
-
-/*************************************************************************/
-
-/*
+  /*
  * Class Variables
  */
 
-/**
+  /**
   * This is the default Authenticator object to use for password requests
   */
-private static Authenticator default_authenticator;
+  private static Authenticator defaultAuthenticator;
 
-/*************************************************************************/
-
-/*
+  /*
  * Instance Variables
  */
 
-/**
+  /**
   * The hostname of the site requesting authentication
   */
-private String host;
+  private String host;
 
-/**
+  /**
   * InternetAddress of the site requesting authentication
   */
-private InetAddress addr;
+  private InetAddress addr;
 
-/**
+  /**
   * The port number of the site requesting authentication
   */
-private int port;
+  private int port;
 
-/**
+  /**
   * The protocol name of the site requesting authentication
   */
-private String protocol;
+  private String protocol;
 
-/**
+  /**
   * The prompt to display to the user when requesting authentication info
   */
-private String prompt;
+  private String prompt;
 
-/**
+  /**
   * The authentication scheme in use
   */
-private String scheme;
+  private String scheme;
 
-/*************************************************************************/
-
-/*
+  /*
  * Class Methods
  */
 
-/**
+  /**
   * This method sets the default <code>Authenticator</code> object (an 
-  * instance of a
-  * subclass of <code>Authenticator</code>) to use when prompting the user for
+    * instance of a subclass of <code>Authenticator</code>) to use when
+    * prompting the user for
   * information.  Note that this method checks to see if the caller is
   * allowed to set this value (the "setDefaultAuthenticator" permission)
   * and throws a <code>SecurityException</code> if it is not.
   *
-  * @param def_auth The new default <code>Authenticator</code> object to use
+    * @param defAuth The new default <code>Authenticator</code> object to use
   *
   * @exception SecurityException If the caller does not have permission 
   * to perform this operation
   */ 
-public static void
-setDefault(Authenticator def_auth)
-{
+  public static void setDefault(Authenticator defAuth)
+  {
   SecurityManager sm = System.getSecurityManager();
   if (sm != null)
     sm.checkPermission(new NetPermission("setDefaultAuthenticator"));
 
-  default_authenticator = def_auth;
-} 
+    defaultAuthenticator = defAuth;
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * This method is called whenever a username and password for a given
   * network operation is required.  First, a security check is made to see
   * if the caller has the "requestPasswordAuthentication"
@@ -159,16 +151,18 @@ setDefault(Authenticator def_auth)
   * @exception SecurityException If the caller does not have permission to 
   *         perform this operation
   */ 
-public static PasswordAuthentication
-requestPasswordAuthentication(InetAddress addr, int port, String protocol,
-                              String prompt, String scheme) 
+  public static PasswordAuthentication requestPasswordAuthentication(InetAddress addr,
+                                                                     int port,
+                                                                     String protocol,
+                                                                     String prompt,
+                                                                     String scheme)
   throws SecurityException
-{
-  return(requestPasswordAuthentication (null, addr, port, protocol,
-					prompt, scheme));
-}
+  {
+    return requestPasswordAuthentication(null, addr, port, protocol, prompt,
+                                         scheme);
+  }
 
-/**
+  /**
   * This method is called whenever a username and password for a given
   * network operation is required.  First, a security check is made to see
   * if the caller has the "requestPasswordAuthentication"
@@ -196,141 +190,124 @@ requestPasswordAuthentication(InetAddress addr, int port, String protocol,
   *
   * @since 1.4
   */
-public static PasswordAuthentication
-requestPasswordAuthentication(String host, InetAddress addr, int port,
-		              String protocol, String prompt, String scheme)
+  public static PasswordAuthentication requestPasswordAuthentication(String host,
+                                                                     InetAddress addr,
+                                                                     int port,
+                                                                     String protocol,
+                                                                     String prompt,
+                                                                     String scheme)
   throws SecurityException
-{
+  {
   SecurityManager sm = System.getSecurityManager();
   if (sm != null)
     sm.checkPermission(new NetPermission("requestPasswordAuthentication"));
 
-  if (default_authenticator == null)
-    return(null);
+    if (defaultAuthenticator == null)
+      return null;
 
-  default_authenticator.host = host;
-  default_authenticator.addr = addr;
-  default_authenticator.port = port;
-  default_authenticator.protocol = protocol;
-  default_authenticator.prompt = prompt;
-  default_authenticator.scheme = scheme;
+    defaultAuthenticator.host = host;
+    defaultAuthenticator.addr = addr;
+    defaultAuthenticator.port = port;
+    defaultAuthenticator.protocol = protocol;
+    defaultAuthenticator.prompt = prompt;
+    defaultAuthenticator.scheme = scheme;
 
-  return(default_authenticator.getPasswordAuthentication());
-}
+    return defaultAuthenticator.getPasswordAuthentication();
+  }
 
-/**
- *  Returns the hostname of the host or proxy requesting authorization,
- *  or null if not available.
- *
- *  @since 1.4
- */
-protected final String getRequestingHost()
-{
-  return(host);
-}
-
-/*************************************************************************/
-
-/*
+  /*
  * Constructors
  */
 
-/**
+  /**
   * Default, no-argument constructor for subclasses to call.
   */
-public
-Authenticator()
-{
-}
+  public Authenticator()
+  {
+  }
 
-/*************************************************************************/
-
-/*
+  /*
  * Instance Methods
  */
 
-/**
+  /**
   * This method returns the address of the site that is requesting
   * authentication.
   *
-  * @return The requesting site
+    * @return The requesting site's address
   */
-protected final InetAddress
-getRequestingSite()
-{
-  return(addr);
-}
+  protected final InetAddress getRequestingSite()
+  {
+    return addr;
+  }
 
-/*************************************************************************/
+  /**
+   * Returns the hostname of the host or proxy requesting authorization,
+   * or <code>null</code> if not available.
+   *
+   * @return The name of the host requesting authentication, or
+   * <code>null</code> if it is not available.
+   *
+   * @since 1.4
+   */
+  protected final String getRequestingHost()
+  {
+    return host;
+  }
 
-/**
+  /**
   * This method returns the port of the site that is requesting 
   * authentication.
   *
   * @return The requesting port
   */
-protected final int
-getRequestingPort()
-{
-  return(port);
-}
+  protected final int getRequestingPort()
+  {
+    return port;
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * This method returns the requesting protocol of the operation that is
   * requesting authentication
   *
   * @return The requesting protocol
   */
-protected final String
-getRequestingProtocol()
-{
-  return(protocol);
-}
+  protected final String getRequestingProtocol()
+  {
+    return protocol;
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns the prompt that should be used when requesting authentication 
   * information from the user
   * 
   * @return The user prompt
   */
-protected final String
-getRequestingPrompt()
-{
-  return(prompt);
-}
+  protected final String getRequestingPrompt()
+  {
+    return prompt;
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * This method returns the authentication scheme in use
   *
   * @return The authentication scheme
   */
-protected final String
-getRequestingScheme()
-{
-  return(scheme);
-}
+  protected final String getRequestingScheme()
+  {
+    return scheme;
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * This method is called whenever a request for authentication is made.  It
   * can call the other getXXX methods to determine the information relevant
   * to this request.  Subclasses should override this method, which returns
   * <code>null</code> by default.
   *
-  * @return The PasswordAuthentication information
+    * @return The <code>PasswordAuthentication</code> information
   */
-protected PasswordAuthentication
-getPasswordAuthentication()
-{
-  return(null);
-}
-
+  protected PasswordAuthentication getPasswordAuthentication()
+  {
+    return null;
+  }
 } // class Authenticator
-
