@@ -35,49 +35,51 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package javax.swing.colorchooser;
 
 import javax.swing.JComponent;
 
+
 /**
  * ColorChooserComponentFactory
+ *
  * @author	Andrew Selkirk
  * @version	1.0
  */
-public class ColorChooserComponentFactory {
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
+public class ColorChooserComponentFactory
+{
 	/**
 	 * Constructor ColorChooserComponentFactory
 	 */
-	private ColorChooserComponentFactory() {
-		// TODO
+  private ColorChooserComponentFactory()
+  {
 	} // ColorChooserComponentFactory()
 
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+	/**
+   * This method returns the three default chooser panels to be used in
+   * JColorChooser.
+   *
+   * @return The default chooser panels.
+	 */
+  public static AbstractColorChooserPanel[] getDefaultChooserPanels()
+  {
+    AbstractColorChooserPanel[] values = 
+                                         {
+                                           new DefaultSwatchChooserPanel(),
+                                           new DefaultHSBChooserPanel(),
+                                           new DefaultRGBChooserPanel()
+                                         };
+    return values;
+  }
 
 	/**
-	 * getDefaultChooserPanels
-	 * @returns AbstractColorChooserPanel[]
+   * This method returns the default preview panel to be used with
+   * JColorChoosers.
+   *
+   * @return The default preview panel.
 	 */
-	public static AbstractColorChooserPanel[] getDefaultChooserPanels() {
-		return null; // TODO
-	} // getDefaultChooserPanels()
-
-	/**
-	 * getPreviewPanel
-	 * @returns JComponent
-	 */
-	public static JComponent getPreviewPanel() {
-		return null; // TODO
+  public static JComponent getPreviewPanel()
+  {
+    return new DefaultPreviewPanel();
 	} // getPreviewPanel()
-
-
 } // ColorChooserComponentFactory

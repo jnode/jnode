@@ -431,6 +431,9 @@ public class RepaintManager
         if (damaged.width == 0 || damaged.height == 0)
           continue;
         JRootPane root = comp.getRootPane();
+        // If the component has no root, no repainting will occur.
+        if (root == null)
+          continue;
         Rectangle rootDamage = SwingUtilities.convertRectangle(comp, damaged, root);
         if (! roots.containsKey(root))
           {

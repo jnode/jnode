@@ -1,5 +1,5 @@
 /* Printable.java -- Renders a page to the print device
-   Copyright (C) 1999 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,10 +35,10 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package java.awt.print;
 
 import java.awt.Graphics;
+
 
 /**
   * This interface provides a mechanism for the actual printing of pages to the
@@ -49,26 +49,19 @@ import java.awt.Graphics;
   */
 public interface Printable
 {
-
-/*
- * Static Variables
- */
-
-/**
+  /**
   * This value is returned by the <code>print()</code> method to indicate
-  * that the requested page number does not exist.
+   * that the requested page exists and has been printed.
   */
-int NO_SUCH_PAGE = 0;
+  int PAGE_EXISTS = 0;
 
-/**
+  /**
   * This value is returned by the <code>print()</code> method to indicate
-  * that the requested page exists and has been printed.
+   * that the requested page number does not exist.
   */
-int PAGE_EXISTS = 1;
+  int NO_SUCH_PAGE = 1;
 
-/*************************************************************************/
-
-/**
+  /**
   * This method prints the specified page to the specified graphics
   * context in the specified format.  The pages are numbered starting
   * from zero.
@@ -82,9 +75,6 @@ int PAGE_EXISTS = 1;
   *
   * @exception PrinterException If an error occurs during printing.
   */
-int
-print(Graphics graphics, PageFormat format, int page_number) 
+  int print(Graphics graphics, PageFormat format, int page_number)
       throws PrinterException;
-
-} // interface Printable
-
+}

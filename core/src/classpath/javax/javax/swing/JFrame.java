@@ -35,7 +35,6 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package javax.swing;
 
 import java.awt.AWTEvent;
@@ -48,8 +47,8 @@ import java.awt.Graphics;
 import java.awt.LayoutManager;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
-
 import javax.accessibility.AccessibleContext;
+
 
 /**
  * Unlike JComponent derivatives, JFrame inherits from
@@ -57,33 +56,15 @@ import javax.accessibility.AccessibleContext;
  *
  * @author Ronald Veldema (rveldema@cs.vu.nl)
  */
-public class JFrame extends Frame implements WindowConstants, RootPaneContainer
+public class JFrame extends Frame
+  implements WindowConstants, RootPaneContainer
 {
   private static final long serialVersionUID = -3362141868504252139L;
-  
-    protected  AccessibleContext accessibleContext;
-
-    private int close_action = HIDE_ON_CLOSE;    
-    
   private static boolean defaultLookAndFeelDecorated = false;    
-
-  public static void setDefaultLookAndFeelDecorated(boolean d)
-  {
-    defaultLookAndFeelDecorated = d;
-  }
-
-  public static boolean isDefaultLookAndFeelDecorated()
-  {
-    return defaultLookAndFeelDecorated;
-  }
-
-    /***************************************************
-     *
-     *  initia
-     *
-     *
-     *************/
-    
+  private int close_action = HIDE_ON_CLOSE;
+  protected AccessibleContext accessibleContext;
+  protected JRootPane rootPane;
+  protected boolean rootPaneCheckingEnabled;
 
     public JFrame()
     {
@@ -97,20 +78,6 @@ public class JFrame extends Frame implements WindowConstants, RootPaneContainer
 	frameInit();
     }
   
-
-    /***************************************************
-     *
-     *
-     *  methods, this part is shared with JDialog, JFrame
-     *
-     *
-     *************/
-
-  
-    private boolean checking;
-    protected  JRootPane         rootPane;
-
-
     protected  void frameInit()
     {
       super.setLayout(new BorderLayout(1, 1));
@@ -120,25 +87,33 @@ public class JFrame extends Frame implements WindowConstants, RootPaneContainer
   
   public Dimension getPreferredSize()
   {
-    Dimension d = super.getPreferredSize();
-    return d;
+    return super.getPreferredSize();
   }
 
   public JMenuBar getJMenuBar()
-    {    return getRootPane().getJMenuBar();   }
+  {
+    return getRootPane().getJMenuBar();
+  }
     
   public void setJMenuBar(JMenuBar menubar)
-    {    getRootPane().setJMenuBar(menubar); }
-    
+  {
+    getRootPane().setJMenuBar(menubar);
+  }
 
   public  void setLayout(LayoutManager manager)
-  {    super.setLayout(manager);  }
+  {
+    super.setLayout(manager);
+  }
 
   public void setLayeredPane(JLayeredPane layeredPane) 
-    {   getRootPane().setLayeredPane(layeredPane);   }
+  {
+    getRootPane().setLayeredPane(layeredPane);
+  }
   
   public JLayeredPane getLayeredPane()
-    {   return getRootPane().getLayeredPane();     }
+  {
+    return getRootPane().getLayeredPane();
+  }
   
   public JRootPane getRootPane()
     {
@@ -157,43 +132,69 @@ public class JFrame extends Frame implements WindowConstants, RootPaneContainer
     }
 
   public JRootPane createRootPane()
-    {   return new JRootPane();    }
+  {
+    return new JRootPane();
+  }
 
     public Container getContentPane()
-    {    return getRootPane().getContentPane();     }
+  {
+    return getRootPane().getContentPane();
+  }
 
     public void setContentPane(Container contentPane)
-    {    getRootPane().setContentPane(contentPane);    }
+  {
+    getRootPane().setContentPane(contentPane);
+  }
   
   public Component getGlassPane()
-    {    return getRootPane().getGlassPane();   }
+  {
+    return getRootPane().getGlassPane();
+  }
   
   public void setGlassPane(Component glassPane)
-    {   getRootPane().setGlassPane(glassPane);   }
-
+  {
+    getRootPane().setGlassPane(glassPane);
+  }
     
     protected  void addImpl(Component comp, Object constraints, int index)
-    {	super.addImpl(comp, constraints, index);    }
-
+  {
+    super.addImpl(comp, constraints, index);
+  }
 
     public void remove(Component comp)
-    {   getContentPane().remove(comp);  }
+  {
+    getContentPane().remove(comp);
+  }
   
     protected  boolean isRootPaneCheckingEnabled()
-    {    return checking;        }
-
+  {
+    return rootPaneCheckingEnabled;
+  }
 
     protected  void setRootPaneCheckingEnabled(boolean enabled)
-    { checking = enabled;  }
-
+  {
+    rootPaneCheckingEnabled = enabled;
+  }
 
     public void update(Graphics g)
-    {   paint(g);  }
+  {
+    paint(g);
+  }
 
     protected  void processKeyEvent(KeyEvent e)
-    {	super.processKeyEvent(e);    }
+  {
+    super.processKeyEvent(e);
+  }
 
-    /////////////////////////////////////////////////////////////////////////////////
+  public static void setDefaultLookAndFeelDecorated(boolean decorated)
+  {
+    defaultLookAndFeelDecorated = decorated;
+  }
+
+  public static boolean isDefaultLookAndFeelDecorated()
+  {
+    return defaultLookAndFeelDecorated;
+  }
   
   public AccessibleContext getAccessibleContext()
   {
@@ -201,13 +202,14 @@ public class JFrame extends Frame implements WindowConstants, RootPaneContainer
   }
   
     public int getDefaultCloseOperation()
-    {    return close_action;   }
-
-    
+  {
+    return close_action;
+  }
     
     protected  String paramString()
-    {   return "JFrame";     }
-
+  {
+    return "JFrame";
+  }
 
     protected  void processWindowEvent(WindowEvent e)
     {
@@ -216,7 +218,7 @@ public class JFrame extends Frame implements WindowConstants, RootPaneContainer
 	    {
 	    case WindowEvent.WINDOW_CLOSING:
 		{
-		    switch(close_action)
+	  switch (close_action)
 			{
 			case EXIT_ON_CLOSE:
 			    {
@@ -238,7 +240,6 @@ public class JFrame extends Frame implements WindowConstants, RootPaneContainer
 			}
 		    break;
 		}
-		
 	    case WindowEvent.WINDOW_CLOSED:
 	    case WindowEvent.WINDOW_OPENED:
 	    case WindowEvent.WINDOW_ICONIFIED:
@@ -274,5 +275,4 @@ public class JFrame extends Frame implements WindowConstants, RootPaneContainer
 	  
       close_action = operation;
     }
-
 }
