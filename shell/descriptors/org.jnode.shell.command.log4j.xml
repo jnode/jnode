@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.shell.command.log4j"
+        name="JNode Log4j commands"
+        version="@VERSION@"
+        provider-name="JNode.org">
+
+  <requires>
+    <import plugin="org.jnode.log4j"/>
+    <import plugin="org.jnode.shell.help"/>
+  </requires>
+
+  <runtime>
+    <library name="jnode-shell.jar">
+      <export name="org.jnode.shell.command.log4j.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.shell.aliases">
+    <alias name="log4j" class="org.jnode.shell.command.log4j.Log4jCommand"/>
+  </extension>
+
+</plugin>

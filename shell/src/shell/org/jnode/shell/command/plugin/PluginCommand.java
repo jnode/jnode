@@ -1,0 +1,171 @@
+/*
+ * $Id$
+ */
+package org.jnode.shell.command.plugin;
+
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedExceptionAction;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+
+import org.jnode.naming.InitialNaming;
+import org.jnode.plugin.PluginDescriptor;
+import org.jnode.plugin.PluginException;
+import org.jnode.plugin.PluginManager;
+import org.jnode.plugin.URLPluginLoader;
+import org.jnode.shell.help.Argument;
+import org.jnode.shell.help.Help;
+import org.jnode.shell.help.OptionArgument;
+import org.jnode.shell.help.Parameter;
+import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.PluginArgument;
+import org.jnode.shell.help.Syntax;
+import org.jnode.shell.help.URLArgument;
+import org.jnode.vm.Vm;
+
+/**
+ * @author epr
+ */
+public class PluginCommand {
+
+    static final OptionArgument ARG_LOADER = new OptionArgument("loader",
+            "Loader management", 
+            new OptionArgument.Option("addloader", "Add plugin loader"));
+
+    static final OptionArgument ARG_ACTION = new OptionArgument("action",
+            "action to do on the plugin", 
+            new OptionArgument.Option("load", "Load the plugin")); 
+
+    static final URLArgument ARG_URL = new URLArgument("url", "plugin location");
+
+    static final PluginArgument ARG_ACTION_ID = new PluginArgument("plugin",
+            "plugin identifier");
+
+    static final PluginArgument ARG_LIST_ID = new PluginArgument("plugin",
+            "plugin identifier");
+    
+    static final Argument ARG_VERSION = new Argument("version", "plugin version");
+
+    static final Parameter PARAM_LOADER = new Parameter(ARG_LOADER);
+
+    static final Parameter PARAM_ACTION = new Parameter(ARG_ACTION);
+
+    static final Parameter PARAM_ACTION_ID = new Parameter(ARG_ACTION_ID);
+
+    static final Parameter PARAM_LIST_ID = new Parameter(ARG_LIST_ID);
+
+    static final Parameter PARAM_URL = new Parameter(ARG_URL);
+    static final Parameter PARAM_VERSION = new Parameter(ARG_VERSION, Parameter.OPTIONAL);
+
+    public static Help.Info HELP_INFO = new Help.Info(
+            "plugin",
+            new Syntax[] {
+                    new Syntax("Print name and state of all loaded plugins"),
+                    new Syntax("Plugin loader management", PARAM_LOADER, PARAM_URL),
+                    new Syntax("Load/Start/Stop the plugin", PARAM_ACTION,
+                            PARAM_ACTION_ID, PARAM_VERSION),
+                    new Syntax("Print name and state of plugin", PARAM_LIST_ID)});
+
+    public static void main(final String[] args) throws Exception {
+        AccessController.doPrivileged(new PrivilegedExceptionAction() {
+            public Object run() throws Exception {
+                new PluginCommand().execute(args, System.in, System.out, System.err);
+                return null;
+                }});
+    }
+
+    /**
+     * Execute this command
+     */
+    public void execute(String[] args, InputStream in, PrintStream out,
+            PrintStream err) throws Exception {
+
+        final ParsedArguments cmdLine = HELP_INFO.parse(args);
+        final PluginManager mgr = (PluginManager) InitialNaming
+                .lookup(PluginManager.NAME);
+
+        if (PARAM_LOADER.isSet(cmdLine)) {
+            final String action = ARG_LOADER.getValue(cmdLine);
+            if (action.equals("addloader")) {
+                addPluginLoader(out, mgr, ARG_URL.getURL(cmdLine));
+            } else {
+                out.println("Unknown load action " + action);
+            }
+        } else if (PARAM_ACTION.isSet(cmdLine)) {
+            final String action = ARG_ACTION.getValue(cmdLine);
+            if (action.equals("load")) {
+                final String version;
+                if (PARAM_VERSION.isSet(cmdLine)) {
+                    version = ARG_VERSION.getValue(cmdLine);
+                } else {
+                    version = Vm.getVm().getVersion();
+                }
+                loadPlugin(out, mgr, ARG_ACTION_ID.getValue(cmdLine), version);
+            } else {
+                out.println("Unknown action " + action);
+            }
+        } else if (PARAM_LIST_ID.isSet(cmdLine)) {
+            listPlugin(out, mgr, ARG_LIST_ID.getValue(cmdLine));
+        } else {
+            listPlugins(out, mgr);
+        }
+    }
+
+    private void addPluginLoader(PrintStream out, PluginManager mgr, URL url)
+            throws PluginException, MalformedURLException {
+        final String ext = url.toExternalForm();
+        if (!ext.endsWith("/")) {
+            url = new URL(ext + "/");
+        }
+        out.println("Adding loader for " + url);
+        mgr.getLoaderManager().addPluginLoader(new URLPluginLoader(url));
+    }
+
+    private void loadPlugin(PrintStream out, PluginManager mgr, String id, String version)
+            throws PluginException {
+        out.println("Loading " + id);
+        mgr.getRegistry().loadPlugin(mgr.getLoaderManager(), id, version);
+    }
+
+    private void listPlugins(PrintStream out, PluginManager mgr)
+            throws PluginException {
+        final ArrayList rows = new ArrayList();
+        for (Iterator i = mgr.getRegistry().getDescriptorIterator(); i
+                .hasNext();) {
+            PluginDescriptor descr = (PluginDescriptor) i.next();
+
+            StringBuffer sb = new StringBuffer();
+            sb.append(descr.getId());
+            sb.append("; state ");
+            if (descr.getPlugin().isActive()) {
+                sb.append("active");
+            } else {
+                sb.append("inactive");
+            }
+            rows.add(sb.toString());
+        }
+        Collections.sort(rows);
+        for (Iterator i = rows.iterator(); i.hasNext(); ) {
+            out.println((String)i.next());
+        }
+    }
+
+    private void listPlugin(PrintStream out, PluginManager mgr, String id)
+            throws PluginException {
+        final PluginDescriptor descr = mgr.getRegistry()
+                .getPluginDescriptor(id);
+
+        out.print(descr.getId());
+        out.print("; state ");
+        if (descr.getPlugin().isActive()) {
+            out.println("active");
+        } else {
+            out.println("inactive");
+        }
+    }
+}
