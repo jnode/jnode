@@ -44,7 +44,7 @@ public abstract class Plugin {
 	 * 
 	 * @throws PluginException
 	 */
-	public final void start() throws PluginException {
+	final void start() throws PluginException {
 		if (!started) {
 			startPlugin();
 			started = true;
@@ -54,11 +54,11 @@ public abstract class Plugin {
 	}
 
 	/**
-	 * Stop this plugin
+	 * Stop this plugin.
 	 * 
 	 * @throws PluginException
 	 */
-	public final void stop() throws PluginException {
+	final void stop() throws PluginException {
 		if (started) {
 			stopPlugin();
 			started = false;

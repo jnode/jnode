@@ -20,6 +20,8 @@ import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.Runtime;
 
 /**
+ * Implementation of {@link org.jnode.plugin.PluginDescriptor}.
+ * 
  * @author epr
  */
 public class PluginDescriptorModel extends AbstractModelObject implements PluginDescriptor {
@@ -254,6 +256,24 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	 */
 	public boolean isSystemPlugin() {
 		return system;
+	}
+	
+	/**
+	 * Does the plugin described by this descriptor directly depends on the 
+	 * given plugin id.
+	 * 
+	 * @param id
+	 * @return True if id is in the list of required plugins of this descriptor, false otherwise.
+	 */
+	public boolean depends(String id) {
+		final PluginPrerequisite[] req = this.requires;
+		final int max = req.length;
+		for (int i = 0; i <max; i++) {
+			if (req[i].getPluginId().equals(id)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

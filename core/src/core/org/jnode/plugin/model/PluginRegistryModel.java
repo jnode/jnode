@@ -130,7 +130,7 @@ public class PluginRegistryModel extends VmSystemObject implements PluginRegistr
 	}
 
 	/**
-	 * Remove the plugin with the given id from this registry. This will deactivate the plugin if needed.
+	 * Remove the plugin with the given id from this registry.
 	 * 
 	 * @param pluginId
 	 * @throws PluginException
@@ -141,7 +141,9 @@ public class PluginRegistryModel extends VmSystemObject implements PluginRegistr
 			if (descr.isSystemPlugin()) {
 				throw new PluginException("Cannot unload a system plugin");
 			}
-			descr.getPlugin().stop();
+			if (descr.getPlugin().isActive()) {
+				throw new PluginException("Cannot unload an active plugin");
+			}
 			descriptorMap.remove(descr.getId());
 		}
 

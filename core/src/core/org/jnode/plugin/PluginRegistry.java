@@ -45,7 +45,6 @@ public interface PluginRegistry {
 
 	/**
 	 * Remove the plugin with the given id from this registry.
-	 * This will deactivate the plugin if needed.
 	 * 
 	 * @param pluginId
 	 * @throws PluginException

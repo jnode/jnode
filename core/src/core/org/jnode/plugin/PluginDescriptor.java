@@ -41,6 +41,15 @@ public interface PluginDescriptor {
 	public abstract PluginPrerequisite[] getPrerequisites();
 	
 	/**
+	 * Does the plugin described by this descriptor directly depends on the 
+	 * given plugin id.
+	 * 
+	 * @param id
+	 * @return True if id is in the list of required plugins of this descriptor, false otherwise.
+	 */
+	public abstract boolean depends(String id);
+
+	/**
 	 * Gets all extension-points provided by this plugin
 	 * @return The provided extension-points
 	 */

@@ -24,7 +24,7 @@ import org.jnode.system.BootLog;
  * @author epr
  * @author Matt Paine.
  */
-public class DefaultPluginManager implements PluginManager {
+public class DefaultPluginManager extends PluginManager {
 
 	/** The registry of plugins */
 	private final PluginRegistry registry;
@@ -106,7 +106,7 @@ public class DefaultPluginManager implements PluginManager {
 		try {
 			if (canStart(d)) {
 				BootLog.debug("Starting " + d.getId());
-				d.getPlugin().start();
+				startSinglePlugin(d.getPlugin());
 			} else {
 				BootLog.warn("Skipping start of " + d.getId() + " due to to depencies.");
 			}
@@ -140,7 +140,7 @@ public class DefaultPluginManager implements PluginManager {
 	}
 
 	/**
-	 * Stops a single plugin.
+	 * Stops a single plugin and all plugins that depend on it.
 	 * 
 	 * @param d
 	 *            The descriptor to stop.
@@ -148,7 +148,14 @@ public class DefaultPluginManager implements PluginManager {
 	 *             if the plugin fails to stop.
 	 */
 	public void stopPlugin(PluginDescriptor d) throws PluginException {
-		d.getPlugin().stop();
+		final String id = d.getId();
+		for (Iterator i = registry.getDescriptorIterator(); i.hasNext();) {
+			final PluginDescriptor descr = (PluginDescriptor) i.next();
+			if (descr.depends(id)) {
+				stopPlugin(descr);
+			}
+		}
+		stopSinglePlugin(d.getPlugin());
 	}
 
 	/**
