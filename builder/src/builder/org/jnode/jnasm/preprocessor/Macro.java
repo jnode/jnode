@@ -48,13 +48,7 @@ public class Macro {
     }
 
     public void fillBody(Token start, Token end){
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        for(Token t = start.next; t != end; t=t.next){
-            print(t, pw);
-        }
-        pw.flush();
-        body = sw.toString();
+        body = Preprocessor.extractImage(start, end);
     }
 
     public String expand(String[] params){
@@ -85,18 +79,6 @@ public class Macro {
         }
 
         return exp;
-    }
-
-    protected void print(Token t, PrintWriter ostr) {
-        Token tt = t.specialToken;
-        if (tt != null) {
-          while (tt.specialToken != null) tt = tt.specialToken;
-          while (tt != null) {
-            ostr.print(tt.image);
-            tt = tt.next;
-          }
-        }
-        ostr.print(t.image);
     }
 
     public String toString() {

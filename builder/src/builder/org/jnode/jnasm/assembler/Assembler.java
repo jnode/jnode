@@ -7,6 +7,7 @@ import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.Label;
+import org.jnode.assembler.NativeStream;
 import org.jnode.vm.x86.X86CpuID;
 import org.jnode.jnasm.assembler.x86.Core;
 
@@ -20,19 +21,40 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
 
 /**
  * @author Levente S\u00e1ntha
  */
 public abstract class Assembler {
     private static final boolean THROW = false;
+    private static final Object UNDEFINED = new String("UNDEFIEND");
     final List instructions = new ArrayList();
     private final Map constants = new HashMap();
     private final Map labels = new HashMap();
     private final List modules = new ArrayList();
+    private int pass = 0;
 
     public static void main(String[] argv) throws Exception {
-        Assembler jnasm = newInstance(System.in);
+        int av = System.in.available();
+        System.out.println("available: " + av);
+        byte[] buff = new byte[av];
+        System.in.read(buff);
+        String data = new String(buff);
+        System.out.println("data:");
+        //System.out.println(data);
+        Assembler jnasm = newInstance(new StringReader(data));
+        //1st pass
+        System.out.println("1st pass:");
+        jnasm.pass = 1;
+        jnasm.jnasmInput();
+        jnasm.assemble();
+
+        //2nd pass
+        System.out.println("2nd pass:");
+        jnasm.pass = 2;
+        jnasm.instructions.clear();
+        jnasm.ReInit(new StringReader(data));
         jnasm.jnasmInput();
         FileOutputStream out = new FileOutputStream("out");
         jnasm.emmit(out);
@@ -46,6 +68,8 @@ public abstract class Assembler {
 
     public abstract void jnasmInput() throws ParseException;
 
+    public abstract void ReInit(Reader stream);
+
     public static Assembler newInstance(InputStream in) {
         return new JNAsm(in);
     }
@@ -55,30 +79,40 @@ public abstract class Assembler {
     }
 
     public void emmit(OutputStream out) {
+        X86Assembler asm = assemble();
+        try {
+            asm.writeTo(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private X86Assembler assemble() {
         X86CpuID cpuId = X86CpuID.createID("pentium");
         X86Assembler asm = new X86BinaryAssembler(cpuId, X86Constants.Mode.CODE32, 0);
         for (Iterator it = instructions.iterator(); it.hasNext();) {
             Instruction ins = (Instruction) it.next();
             String label = ins.getLabel();
             if (label != null) {
-                if (labels.get(label) != null)
+                if (labels.get(label) != null && pass == 1)
                     throw new IllegalArgumentException("Label already defined: " + label);
-
-                try {
-                    Label lab = new Label(label);
-                    labels.put(label, lab);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                defineLabel(label, asm);
             }
             String mnemo = ins.getMnemonic();
             if (mnemo != null) {
                 emmit(ins.getMnemonic(), ins.getOperands(), asm);
             }
         }
+        return asm;
+    }
+
+    private void defineLabel(String label, X86Assembler asm) {
         try {
-            asm.writeTo(out);
-        } catch (IOException e) {
+            Label lab = new Label(label);
+            labels.put(label, lab);
+            NativeStream.ObjectRef ref = asm.setObjectRef(lab);
+            putConstant(label, ref.getOffset());
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -90,7 +124,11 @@ public abstract class Assembler {
             }
         }
 
-        throw new RuntimeException("Unknown instruction: " + mnemonic);
+        if (THROW) {
+            throw new RuntimeException("Unknown instruction: " + mnemonic);
+        } else {
+            //System.err.println("Unknown instruction: " + mnemonic);
+        }
     }
 
     public static final boolean isIdent(Token t) {
@@ -123,7 +161,6 @@ public abstract class Assembler {
                     break;
 
                 case JNAsmConstants.HEXNUMBER:
-                    System.out.println("hextoken: " + s);
                     if (s.endsWith("h") || s.endsWith("H")) {
                         ret = Integer.parseInt(s.substring(0, s.length() - 1), 16);
                     } else {
@@ -139,7 +176,8 @@ public abstract class Assembler {
             if (THROW) {
                 throw x;
             } else {
-                x.printStackTrace();
+                //x.printStackTrace();
+                System.err.println("Invaid int: " + x.getMessage());
                 return 0;
             }
         }
@@ -147,7 +185,7 @@ public abstract class Assembler {
     }
 
     void putConstant(String name, int value) {
-        if (constants.get(name) != null)
+        if (constants.get(name) != null && pass == 1)
             throw new IllegalArgumentException("Constant already defined: " + name);
 
         constants.put(name, new Integer(value));
@@ -162,7 +200,8 @@ public abstract class Assembler {
             if (THROW) {
                 throw x;
             } else {
-                x.printStackTrace();
+                //x.printStackTrace();
+                if(pass == 2) System.err.println(x.getMessage());
                 return 0;
             }
         }

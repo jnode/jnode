@@ -32,6 +32,7 @@ public abstract class Preprocessor {
     }
 
     public static Preprocessor newInstance(InputStream in){
+        singleMacros.put("BITS32", "");
         return new JNAsmPP(in);
     }
 
@@ -41,11 +42,13 @@ public abstract class Preprocessor {
 
     String processFile(String file){
         StringWriter sw = new StringWriter();
+        sw.write(";start include " + file + "\n");
         try{
             newInstance(new FileInputStream(file)).print(sw);
         }catch(FileNotFoundException e){
             System.err.println(e.getMessage());
         }
+        sw.write(";end include " + file + "\n");
         sw.flush();
         return sw.toString();
     }
@@ -71,18 +74,6 @@ public abstract class Preprocessor {
             pe.printStackTrace();
             System.exit(-1);
         }
-    }
-
-    void print(Token t, PrintWriter ostr) {
-        Token tt = t.specialToken;
-        if (tt != null) {
-          while (tt.specialToken != null) tt = tt.specialToken;
-          while (tt != null) {
-            ostr.print(tt.image);
-            tt = tt.next;
-          }
-        }
-        ostr.print(t.image);
     }
 
     void clearTokens(Token start, Token end){
@@ -128,4 +119,26 @@ public abstract class Preprocessor {
     }
 
     abstract Token jnasmppInput() throws ParseException ;
+
+    static String extractImage(Token start, Token end) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        for(Token t = start.next; t != end; t=t.next){
+            print(t, pw);
+        }
+        pw.flush();
+        return sw.toString();
+    }
+
+    static void print(Token t, PrintWriter ostr) {
+        Token tt = t.specialToken;
+        if (tt != null) {
+          while (tt.specialToken != null) tt = tt.specialToken;
+          while (tt != null) {
+            ostr.print(tt.image);
+            tt = tt.next;
+          }
+        }
+        ostr.print(t.image);
+    }        
 }
