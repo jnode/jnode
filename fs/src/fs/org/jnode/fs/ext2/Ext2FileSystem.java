@@ -32,8 +32,8 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	private INodeCache inodeCache;
 	private final Logger log = Logger.getLogger(getClass());
 	
-	private Object groupDescriptorLock;
-	private Object superblockLock;
+	//private Object groupDescriptorLock;
+	//private Object superblockLock;
 	
 	//private final boolean DEBUG=true;
 	
@@ -51,8 +51,8 @@ public class Ext2FileSystem extends AbstractFileSystem {
 		blockCache = new BlockCache(50,(float)0.75);
 		inodeCache = new INodeCache(50,(float)0.75);
 
-		groupDescriptorLock = new Object();
-		superblockLock = new Object();
+		//groupDescriptorLock = new Object();
+		//superblockLock = new Object();
 	}
 	
 	public void read() throws FileSystemException {
@@ -182,7 +182,6 @@ public class Ext2FileSystem extends AbstractFileSystem {
 			
 			log.info("superblock.getBlockSize(): "+superblock.getBlockSize());
 
-			//TODO: create the root inode
 			createRootEntry();
 			
 			//write everything to disk
@@ -233,7 +232,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	protected void updateFS() throws IOException {
 		//updating one group descriptor updates all its copies
 		for(int i=0; i<groupCount; i++)
-			groupDescriptors[i].updateGroupDescriptors();
+			groupDescriptors[i].updateGroupDescriptor();
 		superblock.update();
 	}
 
@@ -287,20 +286,40 @@ public class Ext2FileSystem extends AbstractFileSystem {
 		Block result;
 		
 		Integer key=new Integer((int)(nr));
-		synchronized(blockCache) {
-			//check if the block has already been retrieved
-			if(blockCache.containsKey(key)) 
-				result=(Block)blockCache.get(key);
-			else{
-				byte[] data = new byte[blockSize];
-				getApi().read( nr*blockSize, data, 0, blockSize );
-				//timedRead(nr, data);
-				result=new Block(this, nr, data);
-				blockCache.put(key, result);
-			}
-		}
-			
-		return result.getData();
+        synchronized(blockCache) {
+            //check if the block has already been retrieved
+            if(blockCache.containsKey(key)) {
+                    result=(Block)blockCache.get(key);
+                    return result.getData();
+            }
+        }
+
+        //perform the time-consuming disk read outside of the synchronized block
+	    //advantage:
+	    //      -the lock is held for a shorter time, so other blocks that are
+	    //       already in the cache can be returned immediately and
+	    //       do not have to wait for a long disk read 
+	    //disadvantage:
+	    //      -a single block can be retrieved more than once. However, 
+        //		 the block will be put in the cache only once in the second 
+        //		 synchronized block
+	    byte[] data = new byte[blockSize];
+	    getApi().read( nr*blockSize, data, 0, blockSize );
+	
+	    //synchronize again
+	    synchronized(blockCache) {
+	            //check if the block has already been retrieved
+	            if(!blockCache.containsKey(key)) {
+	                    result=new Block(this, nr, data);
+	                    blockCache.put(key, result);
+	                    return result.getData();
+	            } else {
+		            //it is important to ALWAYS return the block that is in 
+		            //the cache (it is used in synchronization)
+	            	result=(Block)blockCache.get(key);
+                    return result.getData();
+	            }
+	    }
 	}
 	
 	/**
@@ -509,7 +528,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 		int uid, int gid) 
 	throws FileSystemException, IOException {
 		if(preferredBlockBroup >= superblock.getBlocksCount())
-			throw new FileSystemException("Block group "+preferredBlockBroup+"does not exist");
+			throw new FileSystemException("Block group "+preferredBlockBroup+" does not exist");
 			
 		int groupNr = preferredBlockBroup;
 		//first check the preferred block group, if it has any free inodes
@@ -594,13 +613,9 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	 */
 	protected void modifyFreeBlocksCount(int group, int diff) {
 		GroupDescriptor gdesc = groupDescriptors[group];
-		synchronized(gdesc) {
-			gdesc.setFreeBlocksCount( gdesc.getFreeBlocksCount()+diff );
-		}
+		gdesc.setFreeBlocksCount( gdesc.getFreeBlocksCount()+diff );
 		
-		synchronized(superblock) {
-			superblock.setFreeBlocksCount( superblock.getFreeBlocksCount()+diff );
-		}
+		superblock.setFreeBlocksCount( superblock.getFreeBlocksCount()+diff );
 	}
 	
 	/**
@@ -610,13 +625,9 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	 */
 	protected void modifyFreeInodesCount(int group, int diff) {
 		GroupDescriptor gdesc = groupDescriptors[group];
-		synchronized(gdesc) {
-			gdesc.setFreeInodesCount( gdesc.getFreeInodesCount()+diff );
-		}
-		
-		synchronized(superblock) {
-			superblock.setFreeInodesCount( superblock.getFreeInodesCount()+diff );
-		}
+		gdesc.setFreeInodesCount( gdesc.getFreeInodesCount()+diff );
+
+		superblock.setFreeInodesCount( superblock.getFreeInodesCount()+diff );
 	}
 	
 	/**
@@ -626,9 +637,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	 */
 	protected void modifyUsedDirsCount(int group, int diff) {
 		GroupDescriptor gdesc = groupDescriptors[group];
-		synchronized(gdesc) {
-			gdesc.setUsedDirsCount( gdesc.getUsedDirsCount()+diff );
-		}
+		gdesc.setUsedDirsCount( gdesc.getUsedDirsCount()+diff );
 	}
 	
 	/**
@@ -739,19 +748,15 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	protected int getGroupCount() {
 		return groupCount;
 	}
-	/**
-	 * @return
-	 */
+
+	/*
 	protected Object getGroupDescriptorLock() {
 		return groupDescriptorLock;
 	}
-
-	/**
-	 * @return
-	 */
 	protected Object getSuperblockLock() {
 		return superblockLock;
 	}
+	*/
 	
 	/**
 	 * Check whether the filesystem uses the given RO feature (S_FEATURE_RO_COMPAT)
