@@ -63,10 +63,10 @@ public class VGASurface extends AbstractSurface implements Surface, VgaConstants
 	 * @param color
 	 * @param mode
 	 */
-	public synchronized void draw(Shape shape, AffineTransform tx, Color color, int mode) {
+	public synchronized void draw(Shape shape, Shape clip, AffineTransform tx, Color color, int mode) {
 		vgaIO.setGRAF(0, convertColor(color));
 		vgaIO.setGRAF(3, (mode == PAINT_MODE) ? LOGOP_NONE : LOGOP_XOR);
-		draw(shape, tx, 0, mode);
+		draw(shape, clip, tx, 0, mode);
 	}
 
 	/**

@@ -24,19 +24,23 @@ public interface Surface {
 
 	/**
 	 * Draw the given shape
-	 * @param shape
+	 * @param shape The shape to draw
+	 * @param clip The clipping area, can be null
+	 * @param tx The transformation to be applied to shape &amp; clip.
 	 * @param color
 	 * @param mode
 	 */
-	public void draw(Shape shape, AffineTransform tx, Color color, int mode);
+	public void draw(Shape shape, Shape clip, AffineTransform tx, Color color, int mode);
 
 	/**
 	 * Fill the given shape with the given color
-	 * @param shape
+	 * @param shape The shape to fill
+	 * @param clip The clipping area, can be null
+	 * @param tx The transformation to be applied to shape &amp; clip.
 	 * @param color
 	 * @param mode
 	 */
-	public void fill(Shape shape, AffineTransform tx, Color color, int mode);
+	public void fill(Shape shape, Shape clip, AffineTransform tx, Color color, int mode);
 
 	/**
 	 * Draw an raster to this surface.

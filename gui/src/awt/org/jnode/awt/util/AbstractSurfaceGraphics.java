@@ -70,7 +70,7 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 	 * @see java.awt.Graphics2D#draw(java.awt.Shape)
 	 */
 	public final void draw(Shape shape) {
-		surface.draw(shape, transform, getColor(), mode);
+		surface.draw(shape, clip, transform, getColor(), mode);
 	}
 
 	/**
@@ -82,7 +82,7 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, java.awt.Color, java.awt.image.ImageObserver)
 	 * @return boolean
 	 */
-	public boolean drawImage(Image image, int x, int y, Color bgcolor, ImageObserver observer) {
+	public final boolean drawImage(Image image, int x, int y, Color bgcolor, ImageObserver observer) {
 		try {
 			final Raster raster = getCompatibleRaster(image);
 			surface.drawCompatibleRaster(raster, 0, 0, x, y, raster.getWidth(), raster.getHeight(), bgcolor);
@@ -100,7 +100,7 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, java.awt.image.ImageObserver)
 	 * @return boolean
 	 */
-	public boolean drawImage(Image image, int x, int y, ImageObserver observer) {
+	public final boolean drawImage(Image image, int x, int y, ImageObserver observer) {
 		try {
 			final Raster raster = getCompatibleRaster(image);
 			surface.drawCompatibleRaster(raster, 0, 0, x, y, raster.getWidth(), raster.getHeight(), null);
@@ -121,7 +121,7 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int, java.awt.Color, java.awt.image.ImageObserver)
 	 * @return boolean
 	 */
-	public boolean drawImage(Image image, int x, int y, int width, int height, Color bgcolor, ImageObserver observer) {
+	public final boolean drawImage(Image image, int x, int y, int width, int height, Color bgcolor, ImageObserver observer) {
 		return drawImage(new JNodeImage(new FilteredImageSource(image.getSource(), new AreaAveragingScaleFilter(width, height))), x, y, bgcolor, observer);
 	}
 
@@ -135,7 +135,7 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int, java.awt.image.ImageObserver)
 	 * @return boolean
 	 */
-	public boolean drawImage(Image image, int x, int y, int width, int height, ImageObserver observer) {
+	public final boolean drawImage(Image image, int x, int y, int width, int height, ImageObserver observer) {
 		return drawImage(new JNodeImage(new FilteredImageSource(image.getSource(), new AreaAveragingScaleFilter(width, height))), x, y, observer);
 	}
 
@@ -154,7 +154,7 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int, int, int, int, int, java.awt.Color, java.awt.image.ImageObserver)
 	 * @return boolean
 	 */
-	public boolean drawImage(Image image, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, Color bgColor, ImageObserver observer) {
+	public final boolean drawImage(Image image, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, Color bgColor, ImageObserver observer) {
 		if (dx1 == dx2 || dy1 == dy2) {
 			return true;
 		}
@@ -225,7 +225,7 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int, int, int, int, int, java.awt.image.ImageObserver)
 	 * @return boolean
 	 */
-	public boolean drawImage(Image image, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, ImageObserver observer) {
+	public final boolean drawImage(Image image, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, ImageObserver observer) {
 		return drawImage(image, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null, observer);
 	}
 
@@ -236,7 +236,7 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 	 * @param y
 	 * @see java.awt.Graphics2D#drawImage(java.awt.image.BufferedImage, java.awt.image.BufferedImageOp, int, int)
 	 */
-	public void drawImage(BufferedImage image, BufferedImageOp op, int x, int y) {
+	public final void drawImage(BufferedImage image, BufferedImageOp op, int x, int y) {
 		final BufferedImage dstImage = op.createCompatibleDestImage(image, surface.getColorModel());
 		drawImage(op.filter(image, dstImage), x, y, null);
 	}
@@ -248,7 +248,7 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 	 * @see java.awt.Graphics2D#drawImage(java.awt.Image, java.awt.geom.AffineTransform, java.awt.image.ImageObserver)
 	 * @return boolean
 	 */
-	public boolean drawImage(Image image, AffineTransform xform, ImageObserver obs) {
+	public final boolean drawImage(Image image, AffineTransform xform, ImageObserver obs) {
 		log.debug("JnodeGraphics: drawImage");
 		// TODO Auto-generated method stub
 		return false;
@@ -259,7 +259,7 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 	 * @param xform
 	 * @see java.awt.Graphics2D#drawRenderableImage(java.awt.image.renderable.RenderableImage, java.awt.geom.AffineTransform)
 	 */
-	public void drawRenderableImage(RenderableImage image, AffineTransform xform) {
+	public final void drawRenderableImage(RenderableImage image, AffineTransform xform) {
 		drawRenderedImage(image.createDefaultRendering(), xform);
 	}
 
@@ -268,7 +268,7 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 	 * @param xform
 	 * @see java.awt.Graphics2D#drawRenderedImage(java.awt.image.RenderedImage, java.awt.geom.AffineTransform)
 	 */
-	public void drawRenderedImage(RenderedImage image, AffineTransform xform) {
+	public final void drawRenderedImage(RenderedImage image, AffineTransform xform) {
 		// TODO Auto-generated method stub
 
 	}
@@ -278,7 +278,7 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 	 * @see java.awt.Graphics2D#fill(java.awt.Shape)
 	 */
 	public final void fill(Shape shape) {
-		surface.fill(shape, transform, getColor(), mode);
+		surface.fill(shape, clip, transform, getColor(), mode);
 	}
 
 	/**

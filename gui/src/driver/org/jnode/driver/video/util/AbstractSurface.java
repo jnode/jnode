@@ -36,56 +36,79 @@ public abstract class AbstractSurface implements Surface {
 	}
 
 	/**
-	 * @see org.jnode.driver.video.Surface#draw(Shape, AffineTransform, Color, int)
+	 * @see org.jnode.driver.video.Surface#draw(Shape, Shape, AffineTransform, Color, int)
 	 */
-	public void draw(Shape shape, AffineTransform tx, Color color, int mode) {
-		draw(shape, tx, convertColor(color), mode);
+	public void draw(Shape shape, Shape clip, AffineTransform tx, Color color, int mode) {
+		draw(shape, clip, tx, convertColor(color), mode);
 	}
 
 	/**
 	 * Fill the given shape with the given color
 	 * 
 	 * @param shape
+	 *            The shape to fill
+	 * @param clip
+	 *            The clipping area, can be null
+	 * @param trans
+	 *            The transformation to be applied to shape &amp; clip.
 	 * @param color
 	 * @param mode
 	 */
-	public void fill(Shape shape, AffineTransform trans, Color color, int mode) {
+	public void fill(Shape shape, Shape clip, AffineTransform trans, Color color, int mode) {
 		final int c = convertColor(color);
 
 		final double tx;
 		final double ty;
 
 		final Shape txShape;
+		final Shape txClip;
 		if (trans == null) {
 			tx = 0.0;
 			ty = 0.0;
 			txShape = shape;
+			txClip = clip;
 		} else if (trans.getType() == AffineTransform.TYPE_IDENTITY) {
 			tx = 0.0;
 			ty = 0.0;
 			txShape = shape;
+			txClip = clip;
 		} else if (trans.getType() == AffineTransform.TYPE_TRANSLATION) {
 			tx = trans.getTranslateX();
 			ty = trans.getTranslateY();
 			txShape = shape;
+			txClip = clip;
 		} else {
 			tx = 0.0;
 			ty = 0.0;
 			final GeneralPath gp = new GeneralPath();
 			gp.append(shape.getPathIterator(trans), false);
 			txShape = gp;
+			if (clip != null) {
+				final GeneralPath gpClip = new GeneralPath();
+				gp.append(clip.getPathIterator(trans), false);
+				txClip = gpClip;
+			} else {
+				txClip = null;
+			}
 		}
 
-		final Rectangle bounds = txShape.getBounds();
+		Rectangle bounds = txShape.getBounds();
 		if (txShape instanceof RectangularShape) {
-			fillRect((int)(tx + bounds.x), (int)(ty + bounds.y), bounds.width, bounds.height, c, mode);
+			if (txClip != null) {
+				bounds = bounds.createIntersection(txClip.getBounds2D()).getBounds();
+				System.out.println("Clipped bounds " + bounds);
+			}
+			if ((bounds.width > 0) && (bounds.height > 0)) {
+				bounds.translate((int) tx, (int) ty);
+				fillRect(bounds.x, bounds.y, bounds.width, bounds.height, c, mode);
+			}
 		} else {
 			//log.debug("Fill " + shape + ", bounds " + bounds);
 			for (int row = 0; row < bounds.height; row++) {
 				final int y = (int) (ty + bounds.y + row);
 				for (int col = 0; col < bounds.width; col++) {
 					final int x = (int) (tx + bounds.x + col);
-					if (txShape.contains(x, y)) {
+					if (txShape.contains(x, y) && ((txClip == null) || txClip.contains(x, y))) {
 						drawPixel(x, y, c, mode);
 					}
 				}
@@ -93,12 +116,22 @@ public abstract class AbstractSurface implements Surface {
 		}
 	}
 
+	/**
+	 * Fill a rectangle with the given color.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param w
+	 * @param h
+	 * @param color
+	 * @param mode
+	 */
 	protected void fillRect(int x, int y, int w, int h, int color, int mode) {
 		for (int row = 0; row < h; row++) {
 			drawLine(x, y + row, x + w, y + row, color, mode);
 		}
 	}
-	
+
 	/**
 	 * Set a pixel at the given location
 	 * 
@@ -214,10 +247,11 @@ public abstract class AbstractSurface implements Surface {
 	 * Draw the given shape
 	 * 
 	 * @param shape
+	 * @param clip
 	 * @param color
 	 * @param mode
 	 */
-	protected final void draw(Shape shape, AffineTransform trans, int color, int mode) {
+	protected final void draw(Shape shape, Shape clip, AffineTransform trans, int color, int mode) {
 
 		//log.debug("Draw " + shape + ", " + trans);
 
@@ -229,6 +263,14 @@ public abstract class AbstractSurface implements Surface {
 
 		final double tx;
 		final double ty;
+
+		if (clip != null) {
+			// Very rough for now, but let's see
+			if (!clip.contains(shape.getBounds2D())) {
+				// TODO fix clipping
+				//return;
+			}
+		}
 
 		final PathIterator i;
 		if (trans == null) {
