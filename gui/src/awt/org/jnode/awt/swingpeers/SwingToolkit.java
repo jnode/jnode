@@ -97,7 +97,7 @@ public class SwingToolkit extends AbstractJNodeToolkit {
     }
 
     protected LightweightPeer createComponent(Component target) {
-        return super.createComponent(target);
+        return new SwingLightweightPeer(target);
     }
 
     protected DialogPeer createDialog(Dialog target) {
@@ -114,14 +114,14 @@ public class SwingToolkit extends AbstractJNodeToolkit {
     }
 
     protected FramePeer createFrame(Frame target) {
-        log.debug("createFrame");
+        log.debug("createFrame", new Exception("Stacktrace"));
         final int rc = incRefCount();
         log.debug("createFrame refCount=" + rc);
         if (!initialized) {
             log.debug("createFrame:desktopFramePeer(" + target + ")");
             // Only desktop is real frame
             initialized = true;
-            decRefCount();
+            decRefCount(false);
             return new DesktopFramePeer(this, target);
         } else {
             log.debug("createFrame:normal(" + target + ")");
@@ -182,7 +182,7 @@ public class SwingToolkit extends AbstractJNodeToolkit {
     // Private
 
     final void onDisposeFrame() {
-        decRefCount();
+        decRefCount(false);
     }
     
     /**
@@ -200,7 +200,7 @@ public class SwingToolkit extends AbstractJNodeToolkit {
      * @see org.jnode.awt.AbstractJNodeToolkit#onInitialize()
      */
     protected void onInitialize() {
-        log.debug("onInitialize");
+        log.debug("onInitialize", new Exception("Stacktrace"));
         desktopFrame = new JFrame("");
         log.debug("onInitialize.1");
         desktopFrame.setSize(getScreenSize().width, getScreenSize().height);

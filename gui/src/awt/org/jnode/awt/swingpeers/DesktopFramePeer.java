@@ -36,11 +36,12 @@ import org.jnode.awt.image.JNodeImage;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
+final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
 
     private final SwingToolkit toolkit;
     private final Logger log = Logger.getLogger(getClass());
     private static final Point TOP_LEFT = new Point(0, 0);
+    private Insets insets;
 
     /**
      * Initialize 
@@ -157,8 +158,10 @@ public class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
      * @see java.awt.peer.ContainerPeer#getInsets()
      */
     public Insets getInsets() {
-        // TODO Auto-generated method stub
-        return null;
+    	if (insets == null) {
+    		insets = new Insets(0, 0, 0, 0);
+    	}
+        return insets;
     }
 
     /**
@@ -365,7 +368,7 @@ public class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
      * @see java.awt.peer.ComponentPeer#minimumSize()
      */
     public Dimension minimumSize() {
-        return toolkit.getScreenSize();
+        return getMinimumSize();
     }
 
     /**
@@ -381,7 +384,7 @@ public class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
      * @see java.awt.peer.ComponentPeer#preferredSize()
      */
     public Dimension preferredSize() {
-        return toolkit.getScreenSize();
+        return getPreferredSize();
     }
 
     /**
