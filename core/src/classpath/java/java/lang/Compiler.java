@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.lang;
 
 /**
@@ -56,65 +57,72 @@ package java.lang;
  * @since JDK 1.0
  * @status updated to 1.4
  */
-public final class Compiler {
-	/**
-	 * Don't allow new `Compiler's to be made.
-	 */
-	private Compiler() {
-	}
+public final class Compiler
+{
+  /**
+   * Don't allow new `Compiler's to be made.
+   */
+  private Compiler()
+  {
+  }
 
-	/**
-	 * Compile the class named by <code>oneClass</code>.
-	 *
-	 * @param oneClass the class to compile
-	 * @return <code>false</code> if no compiler is available or
-	 *         compilation failed, <code>true</code> if compilation succeeded
-	 * @throws NullPointerException if oneClass is null
-	 */
-	public static boolean compileClass(Class oneClass) {
-		// Never succeed.
-		return false;
-	}
+  /**
+   * Compile the class named by <code>oneClass</code>.
+   *
+   * @param oneClass the class to compile
+   * @return <code>false</code> if no compiler is available or
+   *         compilation failed, <code>true</code> if compilation succeeded
+   * @throws NullPointerException if oneClass is null
+   */
+  public static boolean compileClass(Class oneClass)
+  {
+    // Never succeed.
+    return false;
+  }
 
-	/**
-	 * Compile the classes whose name matches <code>classNames/code>.
-	 *
-	 * @param classNames the name of classes to compile
-	 * @return <code>false</code> if no compiler is available or
-	 *         compilation failed, <code>true</code> if compilation succeeded
-	 * @throws NullPointerException if classNames is null
-	 */
-	public static boolean compileClasses(String classNames) {
-		// Note the incredibly lame interface.  Always fail.
-		return false;
-	}
+  /**
+   * Compile the classes whose name matches <code>classNames</code>.
+   *
+   * @param classNames the name of classes to compile
+   * @return <code>false</code> if no compiler is available or
+   *         compilation failed, <code>true</code> if compilation succeeded
+   * @throws NullPointerException if classNames is null
+   */
+  public static boolean compileClasses(String classNames)
+  {
+    // Note the incredibly lame interface.  Always fail.
+    return false;
+  }
 
-	/**
-	 * This method examines the argument and performs an operation
-	 * according to the compilers documentation.  No specific operation
-	 * is required.
-	 *
-	 * @param arg a compiler-specific argument
-	 * @return a compiler-specific value, including null
-	 * @throws NullPointerException if the compiler doesn't like a null arg
-	 */
-	public static Object command(Object arg) {
-		// Our implementation defines this to a no-op.
-		return null;
-	}
+  /**
+   * This method examines the argument and performs an operation
+   * according to the compilers documentation.  No specific operation
+   * is required.
+   *
+   * @param arg a compiler-specific argument
+   * @return a compiler-specific value, including null
+   * @throws NullPointerException if the compiler doesn't like a null arg
+   */
+  public static Object command(Object arg)
+  {
+    // Our implementation defines this to a no-op.
+    return null;
+  }
 
-	/**
-	 * Calling <code>Compiler.enable()</code> will cause the compiler
-	 * to resume operation if it was previously disabled; provided that a
-	 * compiler even exists.
-	 */
-	public static void enable() {
-	}
+  /**
+   * Calling <code>Compiler.enable()</code> will cause the compiler
+   * to resume operation if it was previously disabled; provided that a
+   * compiler even exists.
+   */
+  public static void enable()
+  {
+  }
 
-	/**
-	 * Calling <code>Compiler.disable()</code> will cause the compiler
-	 * to be suspended; provided that a compiler even exists.
-	 */
-	public static void disable() {
-	}
+  /**
+   * Calling <code>Compiler.disable()</code> will cause the compiler
+   * to be suspended; provided that a compiler even exists.
+   */
+  public static void disable()
+  {
+  }
 }
