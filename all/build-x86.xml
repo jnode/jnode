@@ -183,22 +183,26 @@
     <gzip src="${build.bootimage.dir}/bootimage.bin" zipfile="${jnode.kernel}"/>
   </target>
 
-<!-- Build the boot floppy & disk -->
+<!-- Build the boot disk -->
   <target name="boot-disk" depends="java-image">
-  <!-- target name="boot-floppy" -->
-    <taskdef name="bootfloppy"
-             classname="org.jnode.build.BootFloppyBuilder"
-             classpathref="cp-x86"/>
     <taskdef name="bootdisk"
              classname="org.jnode.build.BootDiskBuilder"
              classpathref="cp-x86"/>
+             
+    <mkdir dir="${my-build.dir}/bootdisk"/>
+    <mkdir dir="${my-build.dir}/bootdisk/boot/grub"/>
+    <copy file="${jnode.kernel}" todir="${my-build.dir}/bootdisk"/>
+    <copy file="${grub.menu}" todir="${my-build.dir}/bootdisk/boot/grub"/>
+    <copy todir="${my-build.dir}/bootdisk">
+      <fileset dir="${initjars.dir}"/>
+    </copy>
+             
     <bootdisk destfile="${jnode.disk}"
-		        kernelfile="${jnode.kernel}"
-		        stage1ResourceName="${grub.stage1.name}"
-		        stage2ResourceName="${grub.stage2.name}"
-      			menufile="${grub.menu}"
-      			plnfile="${jnode.disk.pln}"
-      			initJarFile="${initjars.dir}/full.jgz"/>
+              stage1ResourceName="${grub.stage1.name}"
+              stage2ResourceName="${grub.stage2.name}"
+              plnfile="${jnode.disk.pln}">
+      <fileset dir="${my-build.dir}/bootdisk"/>
+    </bootdisk>
   </target>
 
 <!-- Create a full distributable bootable CDROM image -->
