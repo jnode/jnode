@@ -23,6 +23,7 @@ import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginLoader;
 import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.PluginRegistry;
+import org.jnode.plugin.PluginSecurityConstants;
 import org.jnode.util.BootableHashMap;
 import org.jnode.vm.VmSystemObject;
 import org.xml.sax.EntityResolver;
@@ -164,6 +165,17 @@ public class PluginRegistryModel extends VmSystemObject implements
     }
 
     /**
+     * Register a plugin descriptor.
+     * 
+     * @param descr
+     */
+    protected synchronized void unregisterPlugin(PluginDescriptorModel descr)
+            throws PluginException {
+        final String id = descr.getId();
+        descriptorMap.remove(id);
+    }
+
+    /**
      * Register a known extension point.
      * 
      * @param ep
@@ -231,6 +243,10 @@ public class PluginRegistryModel extends VmSystemObject implements
 	 * @throws PluginException
 	 */
 	public PluginDescriptor loadPlugin(final PluginLoader loader, final String pluginId, final String pluginVersion) throws PluginException {
+	    final SecurityManager sm = System.getSecurityManager();
+	    if (sm != null) {
+	        sm.checkPermission(PluginSecurityConstants.LOAD_PERM);
+	    }
 		// Load the requested plugin
 		final HashMap descriptors = new HashMap();
 		final PluginDescriptor descr = loadPlugin(loader, pluginId, pluginVersion, false);
@@ -285,6 +301,10 @@ public class PluginRegistryModel extends VmSystemObject implements
 	 * @throws PluginException
 	 */
 	public PluginDescriptor loadPlugin(final PluginLoader loader, final String pluginId, final String pluginVersion, boolean resolve) throws PluginException {
+	    final SecurityManager sm = System.getSecurityManager();
+	    if (sm != null) {
+	        sm.checkPermission(PluginSecurityConstants.LOAD_PERM);
+	    }
         final PluginRegistryModel registry = this;
         final PluginJar pluginJar;
         try {
@@ -322,15 +342,26 @@ public class PluginRegistryModel extends VmSystemObject implements
      */
     public synchronized void unloadPlugin(String pluginId)
             throws PluginException {
-        final PluginDescriptor descr = getPluginDescriptor(pluginId);
+	    final SecurityManager sm = System.getSecurityManager();
+	    if (sm != null) {
+	        sm.checkPermission(PluginSecurityConstants.UNLOAD_PERM);
+	    }
+        final PluginDescriptorModel descr = (PluginDescriptorModel)getPluginDescriptor(pluginId);
         if (descr != null) {
             if (descr.isSystemPlugin()) { throw new PluginException(
                     "Cannot unload a system plugin"); }
-            if (descr.getPlugin().isActive()) { throw new PluginException(
-                    "Cannot unload an active plugin"); }
-            descriptorMap.remove(descr.getId());
-        }
+            
+            // Unload all plugins that depend on this plugin
+            for (Iterator i = descriptorMap.values().iterator(); i.hasNext();) {
+                final PluginDescriptor dep = (PluginDescriptor) i.next();
+                if (dep.depends(pluginId)) {
+                	unloadPlugin(dep.getId());
+                }
+            }
 
+            // Now remove it
+            descr.unresolve(this);
+        }
     }
 
     /**

@@ -39,7 +39,9 @@ public class PluginCommand {
 
     static final OptionArgument ARG_ACTION = new OptionArgument("action",
             "action to do on the plugin", 
-            new OptionArgument.Option("load", "Load the plugin")); 
+            new OptionArgument.Option("load", "Load the plugin"),
+            new OptionArgument.Option("reload", "Reload the plugin"),
+			new OptionArgument.Option("unload", "Unload the plugin")); 
 
     static final URLArgument ARG_URL = new URLArgument("url", "plugin location");
 
@@ -67,7 +69,7 @@ public class PluginCommand {
             new Syntax[] {
                     new Syntax("Print name and state of all loaded plugins"),
                     new Syntax("Plugin loader management", PARAM_LOADER, PARAM_URL),
-                    new Syntax("Load/Start/Stop the plugin", PARAM_ACTION,
+                    new Syntax("Load/Unload the plugin", PARAM_ACTION,
                             PARAM_ACTION_ID, PARAM_VERSION),
                     new Syntax("Print name and state of plugin", PARAM_LIST_ID)});
 
@@ -106,6 +108,18 @@ public class PluginCommand {
                     version = Vm.getVm().getVersion();
                 }
                 loadPlugin(out, mgr, ARG_ACTION_ID.getValue(cmdLine), version);
+            } else if (action.equals("reload")) {
+                    final String version;
+                    if (PARAM_VERSION.isSet(cmdLine)) {
+                        version = ARG_VERSION.getValue(cmdLine);
+                    } else {
+                        version = Vm.getVm().getVersion();
+                    }
+                    final String id = ARG_ACTION_ID.getValue(cmdLine);
+                    unloadPlugin(out, mgr, id);
+                    loadPlugin(out, mgr, id, version);
+            } else if (action.equals("unload")) {
+            	unloadPlugin(out, mgr, ARG_ACTION_ID.getValue(cmdLine));
             } else {
                 out.println("Unknown action " + action);
             }
@@ -132,6 +146,12 @@ public class PluginCommand {
         mgr.getRegistry().loadPlugin(mgr.getLoaderManager(), id, version);
     }
 
+    private void unloadPlugin(PrintStream out, PluginManager mgr, String id)
+    throws PluginException {
+    	mgr.getRegistry().unloadPlugin(id);
+    	out.println("Unloaded " + id);
+    }
+    
     private void listPlugins(PrintStream out, PluginManager mgr)
             throws PluginException {
         final ArrayList rows = new ArrayList();

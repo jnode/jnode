@@ -12,4 +12,8 @@
     </library>
   </runtime>
         
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="user.home" actions="read"/>
+  </extension>
+
 </plugin>

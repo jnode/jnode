@@ -189,7 +189,7 @@ public final class DefaultPluginManager extends PluginManager {
      * @throws PluginException
      *             if the plugin fails to stop.
      */
-    private final void stopPlugin(PluginDescriptor d) throws PluginException {
+    public final void stopPlugin(PluginDescriptor d) throws PluginException {
         final String id = d.getId();
         for (Iterator i = registry.getDescriptorIterator(); i.hasNext();) {
             final PluginDescriptor descr = (PluginDescriptor) i.next();
