@@ -454,12 +454,8 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 			if ((vmClass instanceof VmClassType) && (((VmClassType) vmClass).getInstanceCount() > 0)) {
 				VmMethod clInit = vmClass.getMethod("<clinit>", "()V");
 				if (clInit != null) {
-					os.setObjectRef(clInitCaller + "$$" + vmClass.getName());
+					//os.setObjectRef(clInitCaller + "$$" + vmClass.getName());
 					log("Missing static initializer in class " + vmClass.getName(), Project.MSG_WARN);
-					/*
-					 * os.writeMOV(X86Constants.rEAX, clInit);
-					 */
-
 				}
 			}
 		}
