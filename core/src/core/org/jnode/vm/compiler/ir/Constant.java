@@ -7,7 +7,7 @@ package org.jnode.vm.compiler.ir;
 
 /**
  * @author Madhu Siddalingaiah
- *
+ * @author Levente Sántha
  */
 public abstract class Constant extends Operand {
 	public Constant(int type) {
@@ -19,15 +19,15 @@ public abstract class Constant extends Operand {
 	}
 	
 	public static Constant getInstance(long value) {
-		throw new IllegalArgumentException("constant not yet defined");
+		return new LongConstant(value);
 	}
 	
 	public static Constant getInstance(float value) {
-		throw new IllegalArgumentException("constant not yet defined");
+		return new FloatConstant(value);
 	}
 	
 	public static Constant getInstance(double value) {
-		throw new IllegalArgumentException("constant not yet defined");
+		return new DoubleConstant(value);
 	}
 	
 	public static Constant getInstance(Object value) {
@@ -69,6 +69,314 @@ public abstract class Constant extends Operand {
 		int i2 = ((IntConstant) c2).getValue();
 		return new IntConstant(i1 / i2);
 	}
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant iRem(Constant c2) {
+        int i1 = ((IntConstant) this).getValue();
+		int i2 = ((IntConstant) c2).getValue();
+		return new IntConstant(i1 % i2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant iAnd(Constant c2) {
+        int i1 = ((IntConstant) this).getValue();
+		int i2 = ((IntConstant) c2).getValue();
+		return new IntConstant(i1 & i2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant iOr(Constant c2) {
+        int i1 = ((IntConstant) this).getValue();
+		int i2 = ((IntConstant) c2).getValue();
+		return new IntConstant(i1 | i2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant iXor(Constant c2) {
+        int i1 = ((IntConstant) this).getValue();
+		int i2 = ((IntConstant) c2).getValue();
+		return new IntConstant(i1 ^ i2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant iShl(Constant c2) {
+        int i1 = ((IntConstant) this).getValue();
+		int i2 = ((IntConstant) c2).getValue();
+		return new IntConstant(i1 << i2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant iShr(Constant c2) {
+        int i1 = ((IntConstant) this).getValue();
+		int i2 = ((IntConstant) c2).getValue();
+		return new IntConstant(i1 >> i2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant iUshr(Constant c2) {
+        int i1 = ((IntConstant) this).getValue();
+		int i2 = ((IntConstant) c2).getValue();
+		return new IntConstant(i1 >>> i2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant lAdd(Constant c2) {
+        long l1 = ((LongConstant) this).getValue();
+		long l2 = ((LongConstant) c2).getValue();
+		return new LongConstant(l1 + l2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant lSub(Constant c2) {
+        long l1 = ((LongConstant) this).getValue();
+		long l2 = ((LongConstant) c2).getValue();
+		return new LongConstant(l1 - l2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant lMul(Constant c2) {
+        long l1 = ((LongConstant) this).getValue();
+		long l2 = ((LongConstant) c2).getValue();
+		return new LongConstant(l1 * l2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant lDiv(Constant c2) {
+        long l1 = ((LongConstant) this).getValue();
+		long l2 = ((LongConstant) c2).getValue();
+		return new LongConstant(l1 / l2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant lRem(Constant c2) {
+        long l1 = ((LongConstant) this).getValue();
+		long l2 = ((LongConstant) c2).getValue();
+		return new LongConstant(l1 % l2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant lAnd(Constant c2) {
+        long l1 = ((LongConstant) this).getValue();
+		long l2 = ((LongConstant) c2).getValue();
+		return new LongConstant(l1 & l2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant lOr(Constant c2) {
+        long l1 = ((LongConstant) this).getValue();
+		long l2 = ((LongConstant) c2).getValue();
+		return new LongConstant(l1 | l2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant lXor(Constant c2) {
+        long l1 = ((LongConstant) this).getValue();
+		long l2 = ((LongConstant) c2).getValue();
+		return new LongConstant(l1 ^ l2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant lShl(Constant c2) {
+        long l1 = ((LongConstant) this).getValue();
+		long l2 = ((LongConstant) c2).getValue();
+		return new LongConstant(l1 << l2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant lShr(Constant c2) {
+        long l1 = ((LongConstant) this).getValue();
+		long l2 = ((LongConstant) c2).getValue();
+		return new LongConstant(l1 >> l2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant lUshr(Constant c2) {
+        long l1 = ((LongConstant) this).getValue();
+		long l2 = ((LongConstant) c2).getValue();
+		return new LongConstant(l1 >>> l2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant fAdd(Constant c2) {
+        float f1 = ((FloatConstant) this).getValue();
+		float f2 = ((FloatConstant) c2).getValue();
+		return new FloatConstant(f1 + f2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant fSub(Constant c2) {
+        float f1 = ((FloatConstant) this).getValue();
+		float f2 = ((FloatConstant) c2).getValue();
+		return new FloatConstant(f1 - f2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant fMul(Constant c2) {
+        float f1 = ((FloatConstant) this).getValue();
+		float f2 = ((FloatConstant) c2).getValue();
+		return new FloatConstant(f1 * f2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant fDiv(Constant c2) {
+        float f1 = ((FloatConstant) this).getValue();
+		float f2 = ((FloatConstant) c2).getValue();
+		return new FloatConstant(f1 / f2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant fRem(Constant c2) {
+        float f1 = ((FloatConstant) this).getValue();
+		float f2 = ((FloatConstant) c2).getValue();
+		return new FloatConstant(f1 / f2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant dAdd(Constant c2) {
+        double d1 = ((DoubleConstant) this).getValue();
+		double d2 = ((DoubleConstant) c2).getValue();
+		return new DoubleConstant(d1 + d2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant dSub(Constant c2) {
+        double d1 = ((DoubleConstant) this).getValue();
+		double d2 = ((DoubleConstant) c2).getValue();
+		return new DoubleConstant(d1 - d2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant dMul(Constant c2) {
+        double d1 = ((DoubleConstant) this).getValue();
+		double d2 = ((DoubleConstant) c2).getValue();
+		return new DoubleConstant(d1 * d2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant dDiv(Constant c2) {
+        double d1 = ((DoubleConstant) this).getValue();
+		double d2 = ((DoubleConstant) c2).getValue();
+		return new DoubleConstant(d1 / d2);
+    }
+
+    /**
+     *
+     * @param c2
+     * @return
+     */
+    public Constant dRem(Constant c2) {
+        double d1 = ((DoubleConstant) this).getValue();
+		double d2 = ((DoubleConstant) c2).getValue();
+		return new DoubleConstant(d1 % d2);
+    }
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.compiler.ir.Operand#simplify()
