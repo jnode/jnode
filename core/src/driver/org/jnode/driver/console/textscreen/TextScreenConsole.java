@@ -193,6 +193,16 @@ class TextScreenConsole extends AbstractConsole implements TextConsole {
         syncScreen();
     }
 
+    public void setChar(int x, int y, char[] ch, int color) {
+        screen.set(screen.getOffset(x, y), ch, 0, ch.length, color);
+        syncScreen();
+    }
+
+    public void setChar(int x, int y, char[] ch, int cOfset, int cLength, int color) {
+        screen.set(screen.getOffset(x, y), ch, cOfset, cLength, color);
+        syncScreen();
+    }
+
     /**
      * @see org.jnode.driver.console.TextConsole#setCursor(int, int)
      */

@@ -43,8 +43,29 @@ public interface TextConsole extends Console {
     public void setChar(int x, int y, char ch, int color);
 
     /**
+     * Set the characters at the given location.
+     *
+     * @param x
+     * @param y
+     * @param ch
+     * @param color
+     */
+    public void setChar(int x, int y, char[] ch, int color);
+
+    /**
+     * Set the characters at the given location.
+     * @param x
+     * @param y
+     * @param ch
+     * @param cOfset
+     * @param cLength
+     * @param color
+     */
+    public void setChar(int x, int y, char[] ch, int cOfset, int cLength, int color);
+
+    /**
      * Get the character at a given location.
-     * 
+     *
      * @param x
      * @param y
      */
