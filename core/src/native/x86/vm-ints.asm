@@ -306,7 +306,8 @@ int_stack_overflow:
 	jne doFatal_stack_overflow
 	mov AAX,CURRENTTHREAD
 	mov ecx,[AAX+VmThread_STACKOVERFLOW_OFS]
-	jecxz int_stack_first_overflow
+	test ecx,ecx
+	jz int_stack_first_overflow
 	jmp doFatal_stack_overflow
 		
 int_stack_first_overflow:
@@ -322,7 +323,7 @@ int_stack_first_overflow:
 	
 doFatal_stack_overflow:
 	PRINT_STR fatal_so_msg
-	;call vmint_print_stack
+	call vmint_print_stack
 	jmp int_die
 	cli
 	hlt
