@@ -8,8 +8,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.StringTokenizer;
 
-import org.jnode.vm.HeapManager;
 import org.jnode.vm.VmProcess;
+import org.jnode.vm.VmSystem;
 
 /**
  * Runtime
@@ -119,19 +119,19 @@ public class Runtime {
 	}
 
 	public long freeMemory() {
-		return HeapManager.freeMemory();
+		return VmSystem.freeMemory();
 	}
 
 	public long totalMemory() {
-		return HeapManager.totalMemory();
+		return VmSystem.totalMemory();
 	}
 
 	public void gc() {
-		HeapManager.gc();
+		VmSystem.gc();
 	}
 
 	public void runFinalization() {
-		HeapManager.gc();
+		VmSystem.gc();
 	}
 
 	/**

@@ -20,13 +20,11 @@ import org.jnode.build.BuildException;
 import org.jnode.linker.Elf;
 import org.jnode.linker.ElfLinker;
 import org.jnode.plugin.PluginRegistry;
-import org.jnode.vm.HeapManager;
 import org.jnode.vm.MathSupport;
 import org.jnode.vm.MonitorManager;
 import org.jnode.vm.SoftByteCodes;
+import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
-import org.jnode.vm.VmBootHeap;
-import org.jnode.vm.VmDefaultHeap;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmSystemObject;
@@ -141,7 +139,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	 * @param pluginRegistry
 	 * @throws BuildException
 	 */
-	protected void initImageHeader(NativeStream os, Label clInitCaller, PluginRegistry pluginRegistry) throws BuildException {
+	protected void initImageHeader(NativeStream os, Label clInitCaller, Vm vm, PluginRegistry pluginRegistry) throws BuildException {
 		try {
 			int startLength = os.getLength();
 
@@ -160,11 +158,11 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 
 			// The loading of class can emit object in between, so first load
 			// all required classes here.
-			loadClass(HeapManager.class);
 			loadClass(Main.class);
 			loadClass(MathSupport.class);
 			loadClass(MonitorManager.class);
 			loadClass(SoftByteCodes.class);
+			loadClass(Vm.class);
 			loadClass(VmMethod.class);
 			loadClass(VmProcessor.class);
 			loadClass(VmThread.class);
@@ -175,7 +173,8 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 			final X86Stream.ObjectInfo initCodeObject = os.startObject(vmCodeClass);
 			os86.setObjectRef(introCode);
 			initMain(os86, pluginRegistry);
-			initHeapManager(os86);
+			initVm(os86, vm);
+			//initHeapManager(os86, vm);
 			initVmThread(os86);
 
 			os.setObjectRef(new Label("$$Initial call to clInitCaller"));
@@ -386,36 +385,24 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	}
 
 	/**
-	 * Emit code to initialize VmHeap.
+	 * Emit code to initialize Vm.
 	 * 
 	 * @param os
 	 * @throws BuildException
 	 * @throws ClassNotFoundException
 	 */
-	protected void initHeapManager(X86Stream os) throws BuildException, ClassNotFoundException {
-		os.setObjectRef(new Label("$$Initialize VmHeap"));
-		VmType heapManagerClass = loadClass(HeapManager.class);
-		loadClass(VmBootHeap.class);
-		VmStaticField bootHeapField = (VmStaticField) heapManagerClass.getField(HeapManager.BOOT_HEAP_FIELD_NAME);
-		VmStaticField firstHeapField = (VmStaticField) heapManagerClass.getField(HeapManager.FIRST_HEAP_FIELD_NAME);
-
-		VmBootHeap bootHeap = new VmBootHeap();
-		VmDefaultHeap firstHeap = new VmDefaultHeap();
-
+	protected void initVm(X86Stream os, Vm vm) throws BuildException, ClassNotFoundException {
+		os.setObjectRef(new Label("$$Initialize Vm"));
+		VmType vmClass = loadClass(Vm.class);
+		VmStaticField vmField = (VmStaticField) vmClass.getField("instance");
+		
 		// Setup STATICS register (EDI)
 		os.writeMOV_Const(Register.EDI, statics.getTable());
 
-		/* Set VmHeap.bootHeap */
-		os.writeMOV_Const(Register.EBX, bootHeap);
-		final int bhOffset = (VmArray.DATA_OFFSET + bootHeapField.getStaticsIndex()) << 2;
-		os.writeMOV(INTSIZE, Register.EDI, bhOffset, Register.EBX);
-		//asm.assemble(os, "mov [eax],ebx");
-
-		/* Set VmHeap.firstHeap */
-		os.writeMOV_Const(Register.EBX, firstHeap);
-		final int fhOffset = (VmArray.DATA_OFFSET + firstHeapField.getStaticsIndex()) << 2;
-		os.writeMOV(INTSIZE, Register.EDI, fhOffset, Register.EBX);
-		//asm.assemble(os, "mov [eax],ebx");
+		/* Set Vm.instance */
+		os.writeMOV_Const(Register.EBX, vm);
+		final int vmOffset = (VmArray.DATA_OFFSET + vmField.getStaticsIndex()) << 2;
+		os.writeMOV(INTSIZE, Register.EDI, vmOffset, Register.EBX);
 	}
 
 	/**

@@ -29,9 +29,14 @@ import org.jnode.assembler.x86.X86Stream;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.model.PluginRegistryModel;
+import org.jnode.vm.DefaultHeapManager;
 import org.jnode.vm.Unsafe;
+import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.VmBootHeap;
 import org.jnode.vm.VmClassLoader;
+import org.jnode.vm.VmDefaultHeap;
+import org.jnode.vm.VmHeapManager;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.ObjectLayout;
@@ -117,11 +122,15 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			blockedObjects.add(clsMgr.getStatics());
 			blockedObjects.add(clsMgr.getStatics().getTable());
 			
-			final VmProcessor proc = createProcessor(clsMgr.getStatics());
-			log("Building for " + proc.getCPUID());
-			
 			final NativeStream os = createNativeStream();
 			clsMgr.setResolver(new BuildObjectResolver(os, this));
+			
+			// Create the VM
+			final Vm vm = new Vm(arch, new DefaultHeapManager(clsMgr));
+			blockedObjects.add(vm);
+			
+			final VmProcessor proc = createProcessor(clsMgr.getStatics());
+			log("Building for " + proc.getCPUID());
 			
 			final Label clInitCaller = new Label("$$clInitCaller");
 			VmType systemClasses[] = VmType.initializeForBootImage(clsMgr);
@@ -134,7 +143,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			os.setObjectRef(bootHeapStart);
 
 			// Setup a call to our first java method
-			initImageHeader(os, clInitCaller, piRegistry);
+			initImageHeader(os, clInitCaller, vm, piRegistry);
 
 			// Create the initial stack
 			createInitialStack(os, initialStack, initialStackPtr);
@@ -144,7 +153,12 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			loadClass(Unsafe.class);
 			loadClass(VmClassLoader.class);
 			loadClass(VmType[].class);
-
+			loadClass(Vm.class);
+			loadClass(VmBootHeap.class);
+			loadClass(VmDefaultHeap.class);
+			loadClass(VmHeapManager.class);
+			loadClass(vm.getHeapManager().getClass());
+			
 			/* Now emit the processor */
 			os.getObjectRef(proc);
 
@@ -291,10 +305,11 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 	 * 
 	 * @param os
 	 * @param clInitCaller
+	 * @param vm
 	 * @param pluginRegistry
 	 * @throws BuildException
 	 */
-	protected abstract void initImageHeader(NativeStream os, Label clInitCaller, PluginRegistry pluginRegistry) throws BuildException;
+	protected abstract void initImageHeader(NativeStream os, Label clInitCaller, Vm vm, PluginRegistry pluginRegistry) throws BuildException;
 
 	/**
 	 * Create the initial stack space.
