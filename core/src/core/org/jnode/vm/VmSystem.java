@@ -232,7 +232,7 @@ public final class VmSystem {
 	 */
 	public static Class[] getClassContext() {
 		final VmStackReader reader = Unsafe.getCurrentProcessor().getArchitecture().getStackReader();
-		final VmStackFrame[] stack = reader.getVmStackTrace(Unsafe.getCurrentFrame(), STACKTRACE_LIMIT);
+		final VmStackFrame[] stack = reader.getVmStackTrace(Unsafe.getCurrentFrame(), null, STACKTRACE_LIMIT);
 		final int count = stack.length;
 		final Class[] result = new Class[count];
 
@@ -279,14 +279,15 @@ public final class VmSystem {
 		final VmProcessor proc = Unsafe.getCurrentProcessor();
 		final VmStackReader reader = proc.getArchitecture().getStackReader();
 		final VmStackFrame[] mt;
-		Address lastIP = null;
+		//Address lastIP = null;
 		if (current == proc.getCurrentThread()) {
-			mt = reader.getVmStackTrace(reader.getPrevious(Unsafe.getCurrentFrame()), STACKTRACE_LIMIT);
+			final Address curFrame = Unsafe.getCurrentFrame();
+			mt = reader.getVmStackTrace(reader.getPrevious(curFrame), reader.getReturnAddress(curFrame), STACKTRACE_LIMIT);
 		} else {
 			proc.disableReschedule();
 			try {
-				mt = reader.getVmStackTrace(current.getStackFrame(), STACKTRACE_LIMIT);
-				lastIP = current.getInstructionPointer();
+				mt = reader.getVmStackTrace(current.getStackFrame(), current.getInstructionPointer(), STACKTRACE_LIMIT);
+				//lastIP = current.getInstructionPointer();
 			} finally {
 				proc.enableReschedule();
 			}
@@ -325,43 +326,10 @@ public final class VmSystem {
 			i++;
 		}
 
-		final String[] st = new String[cnt - i];
+		final VmStackFrame[] st = new VmStackFrame[cnt - i];
 		int j = 0;
-		if (i > 0) {
-			lastIP = mt[i-1].getReturnAddress();
-		}
-		//Screen.debug("st cnt["); Screen.debug(cnt); Screen.debug("] ");
 		for (; i < cnt; i++) {
-			//Screen.debug("st["); Screen.debug(i); Screen.debug("] ");
-
-			final VmStackFrame f = mt[i];
-			if (f == null) {
-				st[j++] = "<unknown:null>";
-			} else {
-				final VmMethod method = f.getMethod();
-				VmType vmClass = (method == null) ? null : method.getDeclaringClass();
-				final String cname = (vmClass == null) ? "<unknown class>" : vmClass.getName();
-				final String mname = (method == null) ? "<unknown method>" : method.getName();
-				final String line;
-				if (f.isInterpreted()) {
-					final VmByteCode bc = method.getBytecode();
-					if (bc != null) {
-						line = String.valueOf(bc.getLineNr(f.getPc() - 1));
-					} else {
-						line = "?";
-					}
-				} else {
-					final VmCompiledCode cc = method.getCompiledCode();
-					if ((cc != null) && (lastIP != null)) {
-						line = "*" + String.valueOf(cc.getLineNr(lastIP));
-					} else {
-						line = "comp.";
-					}
-				}
-
-				st[j++] = cname + "!" + mname + " (" + line + ")";
-			}
-			lastIP = f.getReturnAddress();
+			st[j++] = mt[i];
 		}
 
 		current.inException = false;

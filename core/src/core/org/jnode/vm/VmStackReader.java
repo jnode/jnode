@@ -107,10 +107,11 @@ public abstract class VmStackReader extends VmSystemObject {
 	/**
 	 * Gets the stacktrace for a given current frame.
 	 * @param argFrame
+	 * @param ip The instruction pointer of the given frame
 	 * @param limit Maximum length of returned array.
 	 * @return VmStackFrame[]
 	 */
-	final VmStackFrame[] getVmStackTrace(Address argFrame, int limit) {
+	final VmStackFrame[] getVmStackTrace(Address argFrame, Address ip, int limit) {
 
 		final Address frame = argFrame;
 		Address f = frame;
@@ -130,7 +131,8 @@ public abstract class VmStackReader extends VmSystemObject {
 		final VmStackFrame[] stack = new VmStackFrame[count];
 		f = frame;
 		for (int i = 0; i < count; i++) {
-			stack[i] = new VmStackFrame(f, this);
+			stack[i] = new VmStackFrame(f, this, ip);
+			ip = stack[i].getReturnAddress();
 			f = getPrevious(f);
 		}
 
