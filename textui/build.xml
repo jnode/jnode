@@ -1,15 +1,13 @@
-<project name="JNode-Distr" default="all" basedir=".">
+<project name="JNode-TextUI" default="all" basedir=".">
 
   <property name="my-build.dir"   value="${basedir}/build"/>
   <property name="my-classes.dir" value="${my-build.dir}/classes"/>
   <property name="my-src.dir"     value="${basedir}/src"/>
-  <property name="my.jar"         value="${jnode-distr.jar}"/>
+  <property name="my.jar"         value="${jnode-textui.jar}"/>
 
 <!-- Subproject specific classpath -->
   <path id="my-cp">
     <pathelement location="${jnode-core.jar}"/>
-    <pathelement location="${jnode-gui.jar}"/>
-    <pathelement location="${jnode-textui.jar}"/>
     <pathelement location="${jnode-shell.jar}"/>
     <path refid="cp"/>
   </path>
@@ -31,10 +29,9 @@
            compiler="modern"
 	       includeJavaRuntime="false"
     	target="${java.target}" source="${java.source}">
-	  <bootclasspath path="${jnode-core.jar}"/>
-	  <src path="${my-src.dir}/apps"/>
-	  <src path="${my-src.dir}/install"/>
-      <classpath refid="my-cp"/>
+	<bootclasspath path="${jnode-core.jar}"/>
+	<src path="${my-src.dir}/textui"/>
+	<classpath refid="my-cp"/>
     </javac>
   </target>
 

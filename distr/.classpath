@@ -6,5 +6,6 @@
 	<classpathentry kind="src" path="/JNode-GUI"/>
 	<classpathentry kind="lib" path="/JNode-Shell/lib/bsh-2.0b1.jar"/>
 	<classpathentry kind="src" path="/JNode-Shell"/>
+	<classpathentry kind="src" path="/JNode-TextUI"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
