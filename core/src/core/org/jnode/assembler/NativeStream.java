@@ -13,6 +13,11 @@ import org.jnode.vm.classmgr.VmType;
 
 public abstract class NativeStream {
 
+    /**
+     * Remove all data and references.
+     */
+    public abstract void clear();
+    
 	/**
 	 * Returns the base address.
 	 * @return long

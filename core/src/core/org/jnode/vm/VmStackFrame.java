@@ -52,7 +52,7 @@ public final class VmStackFrame extends VmSystemObject {
 	 * @return boolean
 	 */
 	protected final boolean isInterpreted() {
-		return (sfMagic == MAGIC_INTERPRETED);
+		return ((sfMagic & MAGIC_MASK) == MAGIC_INTERPRETED);
 	}
 
 	/**
@@ -96,7 +96,7 @@ public final class VmStackFrame extends VmSystemObject {
 				return -1;
 			}
 		} else {
-			final VmCompiledCode cc = sfMethod.getCompiledCode();
+			final VmCompiledCode cc = sfMethod.getCompiledCode(getMagic());
 			if ((cc != null) && (sfInstructionPointer != null)) {
 				return cc.getLineNr(sfInstructionPointer);
 			} else {

@@ -28,6 +28,10 @@ public final class VmCompiledCode extends AbstractCode {
 	private final VmAddressMap addressTable;
 	/** The compiler used to generate this code */
 	private final NativeCodeCompiler compiler;
+	/** Next in linked list */
+	private VmCompiledCode next;
+	/** Magic of compiler */
+	private final int magic;
 
 	/**
 	 * Create a new instance
@@ -50,6 +54,7 @@ public final class VmCompiledCode extends AbstractCode {
 		Address defaultExceptionHandler,
 		VmAddressMap addressTable) {
 	    this.compiler = compiler;
+	    this.magic = compiler.getMagic();
 		this.bytecode = bytecode;
 		this.nativeCode = nativeCode;
 		this.compiledCode1 = compiledCode;
@@ -161,5 +166,38 @@ public final class VmCompiledCode extends AbstractCode {
      */
     public final NativeCodeCompiler getCompiler() {
         return this.compiler;
+    }
+    
+    /**
+     * @return Returns the next.
+     */
+    final VmCompiledCode getNext() {
+        return this.next;
+    }
+    
+    /**
+     * @param next The next to set.
+     */
+    final void setNext(VmCompiledCode next) {
+        if (this.next != null) {
+            throw new SecurityException("Cannot set next twice");
+        }
+        this.next = next;
+    }
+    
+    /**
+     * Do a lookup of the compiled code that has the given magic value.
+     * @param magic
+     * @return The compiled code found in the list, or null if not found.
+     */
+    final VmCompiledCode lookup(int magic) {
+        VmCompiledCode c = this;
+        while (c != null) {
+            if (c.magic == magic) {
+                return c;
+            }
+            c = c.next;
+        }
+        return null;
     }
 }

@@ -5,6 +5,7 @@ package org.jnode.vm.x86.compiler;
 
 import org.jnode.assembler.x86.Register;
 import org.jnode.assembler.x86.X86Constants;
+import org.jnode.vm.VmStackFrame;
 
 /**
  * @author epr
@@ -71,4 +72,13 @@ public interface X86CompilerConstants {
 	
 	/** Interrupt number for yieldpoints */
 	public static final int YIELDPOINT_INTNO = 0x30;
+
+	/** Magic value for stub compiler */
+	public static final int STUB_COMPILER_MAGIC = VmStackFrame.MAGIC_COMPILED | 0x1A;
+
+	/** Magic value for L1 compiler */
+	public static final int L1_COMPILER_MAGIC =  VmStackFrame.MAGIC_COMPILED  | 0x2b;
+
+	/** Magic value for l2 compiler */
+	public static final int L2_COMPILER_MAGIC = VmStackFrame.MAGIC_COMPILED | 0x8e;
 }

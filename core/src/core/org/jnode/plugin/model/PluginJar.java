@@ -34,6 +34,7 @@ public class PluginJar implements BootableObject {
 	private final byte[] pluginJarData;
 	/** The cached JarFile instance */
 	private transient JarFile pluginJar;
+	private transient File pluginTmpFile;
 
 	/**
 	 * Initialize this instance
@@ -181,14 +182,29 @@ public class PluginJar implements BootableObject {
 			} else if (OsUtils.isJNode()) {
 				pluginJar = new JarFile(pluginJarData);
 			} else {
-				final File tmp = File.createTempFile("jnode", "jartmp");
-				final FileOutputStream fos = new FileOutputStream(tmp);
+				pluginTmpFile = File.createTempFile("jnode", "jartmp");
+				final FileOutputStream fos = new FileOutputStream(pluginTmpFile);
 				fos.write(pluginJarData);
 				fos.close();
-				pluginJar = new JarFile(tmp);
-				tmp.deleteOnExit();
+				pluginJar = new JarFile(pluginTmpFile);
+				pluginTmpFile.deleteOnExit();
 			}
 		}
 		return pluginJar;
+	}
+	
+	public void finalize() {
+	    if (pluginJar != null) {
+	        try {
+                pluginJar.close();
+            } catch (IOException ex) {
+                // Ignore
+            }
+            pluginJar = null;
+	    }
+	    if (pluginTmpFile != null) {
+	        pluginTmpFile.delete();
+	        pluginTmpFile = null;
+	    }
 	}
 }

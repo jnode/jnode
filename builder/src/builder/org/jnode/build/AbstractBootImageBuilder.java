@@ -117,6 +117,16 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     }
 
     public final void execute() throws BuildException {
+        // Create the image
+        doExecute();
+        // Remove all garbage objects
+        cleanup();
+        System.gc();
+        // Make sure that all finalizers are called, in order to remove tmp files.
+        Runtime.getRuntime().runFinalization();
+    }
+    
+    private final void doExecute() throws BuildException {
         debug = (getProject().getProperty("jnode.debug") != null);
 
         final long lmJar = jarFile.lastModified();
@@ -316,10 +326,13 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                     + totalLowMethodSize);
             
             log("Done.");
+            
+            os.clear();
         } catch (Throwable ex) {
             ex.printStackTrace();
             throw new BuildException(ex);
         }
+        
     }
 
     /**
@@ -1067,5 +1080,10 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             }
         }
 
+    }
+    
+    protected void cleanup() {
+        clsMgr = null;
+        blockedObjects.clear();
     }
 }

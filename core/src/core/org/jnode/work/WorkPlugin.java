@@ -24,6 +24,9 @@ import org.jnode.util.QueueProcessorThread;
  */
 public class WorkPlugin extends Plugin implements WorkManager {
 
+    /** My logger */
+    private final Logger log = Logger.getLogger(getClass());
+    
     /** Queue of work items */
     private final Queue queue = new Queue();
 
@@ -88,6 +91,7 @@ public class WorkPlugin extends Plugin implements WorkManager {
      * @see org.jnode.work.WorkManager#add(org.jnode.work.Work)
      */
     public final synchronized void add(Work work) {
+        log.debug("#free workers: " + getFreeProcessors());
         workCounter++;
         queue.add(work);
     }
@@ -133,6 +137,10 @@ public class WorkPlugin extends Plugin implements WorkManager {
      */
     final synchronized void incWorkEndCounter() {
         workEndCounter++;
+    }
+    
+    private int getFreeProcessors() {
+        return workStartCounter - workEndCounter;
     }
 
     class WorkProcessor implements QueueProcessor {

@@ -91,7 +91,7 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
             bc = null;
         }
 
-        method.setCompiledCode(new VmCompiledCode(this, bc, nativeCode, null,
+        method.addCompiledCode(new VmCompiledCode(this, bc, nativeCode, null,
                 end - start, eTable, defExHandler, aTable), level);
     }
 
@@ -171,7 +171,7 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
                 eTable = null;
             }
 
-            method.setCompiledCode(new VmCompiledCode(this, bc, codePtr, code,
+            method.addCompiledCode(new VmCompiledCode(this, bc, codePtr, code,
                     size, eTable, defExHandler, aTable), level);
 
             // For debugging only
@@ -276,4 +276,13 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
      * Dump compiler statistics to System.out
      */
     public abstract void dumpStatistics();
+    
+    /**
+     * Gets the magic value of this compiler.
+     * @see org.jnode.vm.VmStackFrame#MAGIC_COMPILED
+     * @see org.jnode.vm.VmStackFrame#MAGIC_INTERPRETED
+     * @see org.jnode.vm.VmStackFrame#MAGIC_MASK
+     * @return
+     */
+    public abstract int getMagic();
 }
