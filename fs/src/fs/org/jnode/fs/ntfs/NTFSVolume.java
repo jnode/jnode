@@ -115,6 +115,17 @@ public class NTFSVolume
 		
 		};
 	}
+	public NTFSFileRecord getRootDirectory()
+	{
+		NTFSFileRecord  fileRecord = null;
+		for(Iterator itr = this.getNTFSIterator();itr.hasNext();)
+		{
+			fileRecord = (NTFSFileRecord) itr.next();	
+			if(fileRecord.getFileName().equals("."))
+				return fileRecord; 
+		}	
+		return null;
+	}
 	public NTFSFileRecord getFileRecord(int MFTClusterOffset)
 	{
 		byte[] buf;
