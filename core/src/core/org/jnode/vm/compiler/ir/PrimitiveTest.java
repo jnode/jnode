@@ -9,6 +9,28 @@ package org.jnode.vm.compiler.ir;
 public class PrimitiveTest {
 
     /********* INT *******************************/
+    
+    public static int appel() {
+    	int i, j, k;
+    	i = 1;
+    	j = 1;
+    	k = 0;
+    	while (k < 100) {
+    		if (j < 20) {
+    			j = i;
+    			k = k + 1;
+    		} else {
+    			j = k;
+    			k = k + 2;
+    		}
+    	}
+    	return j;
+    }
+
+	public static int trivial() {
+		return 35 + 17;
+	}
+    
     public static int arithOptLoop(int a0, int a1, int a2) {
         int l3 = 1;
         int l4 = 3*a1;
@@ -56,7 +78,7 @@ public class PrimitiveTest {
 	public static int simpleWhile(int a0) {
 		int l0 = 1;
 		while (l0 < 10) {
-			l0 += 5;
+			l0 += 1;
 		}
 		return l0;
 	}
