@@ -23,8 +23,9 @@ package org.jnode.vm.x86.compiler;
 
 import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.X86Assembler;
-import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Constants;
+import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
@@ -258,7 +259,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
      * @return true if code was written, false otherwise
      */
     public final boolean writeClassInitialize(VmMethod method,
-            X86Register methodReg, X86Register scratch) {
+    		GPR methodReg) {
         // Only for static methods (non <clinit>)
         if (method.isStatic() && !method.isInitializer()) {
             // Only when class is not initialize
@@ -288,7 +289,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
         return false;
     }
     
-    public final void writeClassInitialize(Label curInstrLabel, X86Register classReg, VmType cls) {
+    public final void writeClassInitialize(Label curInstrLabel, GPR classReg, VmType cls) {
         if (!cls.isInitialized()) {
             // Test declaringClass.modifiers
             os.writeTEST(classReg, context.getVmTypeState().getOffset(),
@@ -313,7 +314,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
      *            Register that holds the method reference before this method is
      *            called.
      */
-    public final void writeIncInvocationCount(X86Register methodReg) {
+    public final void writeIncInvocationCount(GPR methodReg) {
         final int offset = context.getVmMethodInvocationCountField()
                 .getOffset();
         os.writeINC(methodReg, offset);
@@ -398,8 +399,8 @@ public class X86CompilerHelper implements X86CompilerConstants {
      * @param indexReg
      * @param valueReg
      */
-    public final void writeArrayStoreWriteBarrier(X86Register refReg,
-            X86Register indexReg, X86Register valueReg, X86Register scratchReg) {
+    public final void writeArrayStoreWriteBarrier(GPR refReg,
+    		GPR indexReg, GPR valueReg, GPR scratchReg) {
         final VmWriteBarrier wb = context.getWriteBarrier();
         if (wb != null) {
             os.writeMOV_Const(scratchReg, wb);
@@ -419,7 +420,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
      * @param valueReg
      */
     public final void writePutfieldWriteBarrier(VmInstanceField field,
-            X86Register refReg, X86Register valueReg, X86Register scratchReg) {
+    		GPR refReg, GPR valueReg, GPR scratchReg) {
         if (field.isObjectRef()) {
             final VmWriteBarrier wb = context.getWriteBarrier();
             if (wb != null) {
@@ -440,7 +441,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
      * @param valueReg
      */
     public final void writePutstaticWriteBarrier(VmStaticField field,
-            X86Register valueReg, X86Register scratchReg) {
+    		GPR valueReg, GPR scratchReg) {
         if (field.isObjectRef()) {
             final VmWriteBarrier wb = context.getWriteBarrier();
             if (wb != null) {
@@ -469,7 +470,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
      * @param dst
      * @param entry
      */
-    public final void writeGetStaticsEntry(Label curInstrLabel, X86Register dst,
+    public final void writeGetStaticsEntry(Label curInstrLabel, GPR dst,
             VmStaticsEntry entry) {
         writeLoadSTATICS(curInstrLabel, "gs", true);
         final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
@@ -519,7 +520,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
      * @param entry
      */
     public final void writeGetStaticsEntry64(Label curInstrLabel,
-            X86Register lsbDst, X86Register msbReg, VmStaticsEntry entry) {
+    		GPR lsbDst, GPR msbReg, VmStaticsEntry entry) {
         writeLoadSTATICS(curInstrLabel, "gs64", true);
         final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
         os.writeMOV(INTSIZE, msbReg, STATICS, staticsIdx + 4); // MSB
@@ -534,7 +535,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
      * @param src
      * @param entry
      */
-    public final void writePutStaticsEntry(Label curInstrLabel, X86Register src,
+    public final void writePutStaticsEntry(Label curInstrLabel, GPR src,
             VmStaticsEntry entry) {
         writeLoadSTATICS(curInstrLabel, "ps", true);
         final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
@@ -551,7 +552,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
      * @param entry
      */
     public final void writePutStaticsEntry64(Label curInstrLabel,
-            X86Register lsbSrc, X86Register msbSrc, VmStaticsEntry entry) {
+    		GPR lsbSrc, GPR msbSrc, VmStaticsEntry entry) {
         writeLoadSTATICS(curInstrLabel, "ps64", true);
         final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
         os.writeMOV(INTSIZE, STATICS, staticsIdx + 4, msbSrc); // MSB

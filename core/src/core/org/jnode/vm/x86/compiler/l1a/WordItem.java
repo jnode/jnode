@@ -23,6 +23,7 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
@@ -39,7 +40,9 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	}
 
 	protected final void initialize(int kind, X86Register reg, int local) {
-		super.initialize(kind, local, ((reg instanceof X86Register.XMM) ? (X86Register.XMM)reg : null));
+		super.initialize(kind, local,
+				((reg instanceof X86Register.XMM) ? (X86Register.XMM) reg
+						: null));
 		this.gpr = (reg instanceof X86Register.GPR) ? (X86Register.GPR) reg
 				: null;
 		if (Vm.VerifyAssertions) {
@@ -62,7 +65,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 		switch (getKind()) {
 		case Kind.GPR:
 			res = L1AHelper.requestWordRegister(ec, getType(), false);
-			final X86Register r = res.getRegister();
+			final GPR r = res.getRegister();
 			os.writeMOV(INTSIZE, r, gpr);
 			break;
 
@@ -198,7 +201,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	 * @param reg
 	 */
 	protected abstract void loadToConstant(EmitterContext ec, X86Assembler os,
-			X86Register reg);
+			GPR reg);
 
 	/**
 	 * Load this item to a general purpose register.
@@ -265,8 +268,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	 * @param reg
 	 * @param disp
 	 */
-	protected abstract void popFromFPU(X86Assembler os, X86Register reg,
-			int disp);
+	protected abstract void popFromFPU(X86Assembler os, GPR reg, int disp);
 
 	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#push(EmitterContext)
@@ -333,7 +335,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	 * @param reg
 	 * @param disp
 	 */
-	protected abstract void pushToFPU(X86Assembler os, X86Register reg, int disp);
+	protected abstract void pushToFPU(X86Assembler os, GPR reg, int disp);
 
 	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#pushToFPU(EmitterContext)

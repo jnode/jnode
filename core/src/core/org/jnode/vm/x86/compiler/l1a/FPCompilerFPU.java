@@ -7,6 +7,7 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.system.BootLog;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
@@ -83,7 +84,7 @@ final class FPCompilerFPU extends FPCompiler {
 		pool.request(X86Register.EAX);
 		final IntItem result = (IntItem) L1AHelper.requestWordRegister(ec,
 				JvmType.INT, false);
-		final X86Register resr = result.getRegister();
+		final GPR resr = result.getRegister();
 
 		// Clear resultr
 		os.writeXOR(resr, resr);
@@ -460,7 +461,7 @@ final class FPCompilerFPU extends FPCompiler {
 
 		idx.loadIf(ec, ~Item.Kind.CONSTANT);
 		ref.load(ec);
-		final X86Register refr = ref.getRegister();
+		final GPR refr = ref.getRegister();
 
 		bcv.checkBounds(ref, idx);
 		ensureStackCapacity(os, ec, vstack, 1);
@@ -470,7 +471,7 @@ final class FPCompilerFPU extends FPCompiler {
 				final int offset = idx.getValue() * 4;
 				os.writeFLD32(refr, offset + arrayDataOffset);
 			} else {
-				final X86Register idxr = idx.getRegister();
+				final GPR idxr = idx.getRegister();
 				os.writeFLD32(refr, idxr, 4, arrayDataOffset);
 			}
 		} else {
@@ -478,7 +479,7 @@ final class FPCompilerFPU extends FPCompiler {
 				final int offset = idx.getValue() * 8;
 				os.writeFLD64(refr, offset + arrayDataOffset);
 			} else {
-				final X86Register idxr = idx.getRegister();
+				final GPR idxr = idx.getRegister();
 				os.writeFLD64(refr, idxr, 8, arrayDataOffset);
 			}
 		}

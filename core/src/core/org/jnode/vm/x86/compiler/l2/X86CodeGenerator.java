@@ -21,10 +21,11 @@
  
 package org.jnode.vm.x86.compiler.l2;
 
-import org.jnode.assembler.x86.X86Assembler;
-import org.jnode.assembler.x86.X86Register;
-import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.Label;
+import org.jnode.assembler.x86.X86Assembler;
+import org.jnode.assembler.x86.X86Constants;
+import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.Constant;
 import org.jnode.vm.compiler.ir.IntConstant;
@@ -48,7 +49,7 @@ import org.jnode.vm.compiler.ir.quad.VoidReturnQuad;
  * @author Levente S\u00e1ntha
  */
 public class X86CodeGenerator extends CodeGenerator {
-    private static final X86Register SR1 = X86Register.EAX;
+    private static final GPR SR1 = X86Register.EAX;
 //    private static final Register SR2 = Register.EBX;
 //    private static final Register SR3 = Register.ECX;
 //    private static final Register SR4 = Register.EDX;
@@ -201,10 +202,10 @@ public class X86CodeGenerator extends CodeGenerator {
                 throw new IllegalArgumentException("Unknown operation");
             } else if (mode == Operand.MODE_REGISTER) {
                 Object reg2 = ((RegisterLocation) ((Variable) rhs).getLocation()).getRegister();
-                os.writeMOV(X86Constants.BITS32, (X86Register)reg1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, (GPR)reg1, (GPR) reg2);
             } else if (mode == Operand.MODE_STACK) {
                 int disp2 = ((StackLocation) ((Variable) rhs).getLocation()).getDisplacement();
-                os.writeMOV(X86Constants.BITS32, (X86Register)reg1, X86Register.EBP, disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR)reg1, X86Register.EBP, disp2);
             }
         } else if (lhs.getAddressingMode() == Operand.MODE_STACK) {
             int disp1 = ((StackLocation)lhs.getLocation()).getDisplacement();
@@ -214,7 +215,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 throw new IllegalArgumentException("Unknown operation");
             } else if (mode == Operand.MODE_REGISTER) {
                 Object reg2 = ((RegisterLocation) ((Variable) rhs).getLocation()).getRegister();
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
             } else if (mode == Operand.MODE_STACK) {
                 //int disp2 = ((StackLocation) ((Variable) rhs).getLocation()).getDisplacement();
                 throw new IllegalArgumentException("Unknown operation");
@@ -238,7 +239,7 @@ public class X86CodeGenerator extends CodeGenerator {
             Location loc = var.getLocation();
             if (loc instanceof RegisterLocation) {
                 RegisterLocation regLoc = (RegisterLocation) loc;
-                X86Register src = (X86Register) regLoc.getRegister();
+                GPR src = (GPR) regLoc.getRegister();
                 if (!src.equals(X86Register.EAX)) {
                     os.writeMOV(X86Constants.BITS32, X86Register.EAX, src);
                 }
@@ -289,10 +290,10 @@ public class X86CodeGenerator extends CodeGenerator {
                 throw new IllegalArgumentException("Unknown operation");
 
             case UnaryQuad.I2F:
-                os.writePUSH((X86Register) rhsReg);
+                os.writePUSH((GPR) rhsReg);
                 os.writeFILD32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) lhsReg);
+                os.writePOP((GPR) lhsReg);
                 break;
 
             case UnaryQuad.I2D:
@@ -302,10 +303,10 @@ public class X86CodeGenerator extends CodeGenerator {
                 throw new IllegalArgumentException("Unknown operation");
 
             case UnaryQuad.F2I:
-                os.writePUSH((X86Register) rhsReg);
+                os.writePUSH((GPR) rhsReg);
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeFISTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) lhsReg);
+                os.writePOP((GPR) lhsReg);
                 break;
 
             case UnaryQuad.F2L:
@@ -316,33 +317,33 @@ public class X86CodeGenerator extends CodeGenerator {
                 throw new IllegalArgumentException("Unknown operation");
 
             case UnaryQuad.I2B:
-                os.writeMOVSX((X86Register)lhsReg, (X86Register)rhsReg, BYTESIZE);
+                os.writeMOVSX((GPR)lhsReg, (GPR)rhsReg, BYTESIZE);
                 break;
 
             case UnaryQuad.I2C:
-                os.writeMOVZX((X86Register)lhsReg, (X86Register)rhsReg, WORDSIZE);
+                os.writeMOVZX((GPR)lhsReg, (GPR)rhsReg, WORDSIZE);
                 break;
 
             case UnaryQuad.I2S:
-                os.writeMOVSX((X86Register)lhsReg, (X86Register)rhsReg, WORDSIZE);
+                os.writeMOVSX((GPR)lhsReg, (GPR)rhsReg, WORDSIZE);
                 break;
 
             case UnaryQuad.INEG:
                 if (lhsReg != rhsReg) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) lhsReg, (X86Register) rhsReg);
+                    os.writeMOV(X86Constants.BITS32, (GPR) lhsReg, (GPR) rhsReg);
                 }
-                os.writeNEG((X86Register) lhsReg);
+                os.writeNEG((GPR) lhsReg);
                 break;
 
             case UnaryQuad.LNEG:
                 throw new IllegalArgumentException("Unknown operation");
 
             case UnaryQuad.FNEG:
-                os.writePUSH((X86Register) rhsReg);
+                os.writePUSH((GPR) rhsReg);
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeFCHS();
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) lhsReg);
+                os.writePOP((GPR) lhsReg);
                 break;
 
             case UnaryQuad.DNEG:
@@ -365,7 +366,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writePUSH(X86Register.EBP, rhsDisp);
                 os.writeFILD32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) lhsReg);
+                os.writePOP((GPR) lhsReg);
                 break;
 
             case UnaryQuad.I2D:
@@ -378,7 +379,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writePUSH(X86Register.EBP, rhsDisp);
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeFISTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) lhsReg);
+                os.writePOP((GPR) lhsReg);
                 break;
 
             case UnaryQuad.F2L:
@@ -389,20 +390,20 @@ public class X86CodeGenerator extends CodeGenerator {
                 throw new IllegalArgumentException("Unknown operation");
 
             case UnaryQuad.I2B:
-                os.writeMOVSX((X86Register)lhsReg, X86Register.EBP, rhsDisp, BYTESIZE);
+                os.writeMOVSX((GPR)lhsReg, X86Register.EBP, rhsDisp, BYTESIZE);
                 break;
 
             case UnaryQuad.I2C:
-                os.writeMOVZX((X86Register)lhsReg, X86Register.EBP, rhsDisp, WORDSIZE);
+                os.writeMOVZX((GPR)lhsReg, X86Register.EBP, rhsDisp, WORDSIZE);
                 break;
 
             case UnaryQuad.I2S:
-                os.writeMOVSX((X86Register)lhsReg, X86Register.EBP, rhsDisp, WORDSIZE);
+                os.writeMOVSX((GPR)lhsReg, X86Register.EBP, rhsDisp, WORDSIZE);
                 break;
 
             case UnaryQuad.INEG:
-                os.writeMOV(X86Constants.BITS32, (X86Register) lhsReg, X86Register.EBP,rhsDisp);
-                os.writeNEG((X86Register) lhsReg);
+                os.writeMOV(X86Constants.BITS32, (GPR) lhsReg, X86Register.EBP,rhsDisp);
+                os.writeNEG((GPR) lhsReg);
                 break;
 
             case UnaryQuad.LNEG:
@@ -413,7 +414,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeFCHS();
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) lhsReg);
+                os.writePOP((GPR) lhsReg);
                 break;
 
             case UnaryQuad.DNEG:
@@ -433,7 +434,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 throw new IllegalArgumentException("Unknown operation");
 
             case UnaryQuad.I2F:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp, (X86Register) rhsReg);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp, (GPR) rhsReg);
                 os.writeFILD32(X86Register.EBP, lhsDisp);
                 os.writeFSTP32(X86Register.EBP, lhsDisp);
                 break;
@@ -443,7 +444,7 @@ public class X86CodeGenerator extends CodeGenerator {
             case UnaryQuad.L2F:
             case UnaryQuad.L2D:
             case UnaryQuad.F2I:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp, (X86Register) rhsReg);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp, (GPR) rhsReg);
                 os.writeFLD32(X86Register.EBP, lhsDisp);
                 os.writeFISTP32(X86Register.EBP, lhsDisp);
                 break;
@@ -457,27 +458,27 @@ public class X86CodeGenerator extends CodeGenerator {
 
             case UnaryQuad.I2B:
                 os.writePUSH(SR1);
-                os.writeMOVSX(SR1, (X86Register) rhsReg, BYTESIZE);
+                os.writeMOVSX(SR1, (GPR) rhsReg, BYTESIZE);
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp, SR1);
                 os.writePOP(SR1);
                 break;
 
             case UnaryQuad.I2C:
                 os.writePUSH(SR1);
-                os.writeMOVZX(SR1, (X86Register) rhsReg, WORDSIZE);
+                os.writeMOVZX(SR1, (GPR) rhsReg, WORDSIZE);
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp, SR1);
                 os.writePOP(SR1);
                 break;
 
             case UnaryQuad.I2S:
                 os.writePUSH(SR1);
-                os.writeMOVSX(SR1, (X86Register) rhsReg, WORDSIZE);
+                os.writeMOVSX(SR1, (GPR) rhsReg, WORDSIZE);
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp, SR1);
                 os.writePOP(SR1);
                 break;
 
             case UnaryQuad.INEG:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp, (X86Register) rhsReg);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp, (GPR) rhsReg);
                 os.writeNEG(X86Register.EBP, lhsDisp);
                 break;
 
@@ -485,7 +486,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 throw new IllegalArgumentException("Unknown operation");
 
             case UnaryQuad.FNEG:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp, (X86Register) rhsReg);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, lhsDisp, (GPR) rhsReg);
                 os.writeFLD32(X86Register.EBP, lhsDisp);
                 os.writeFCHS();
                 os.writeFSTP32(X86Register.EBP, lhsDisp);
@@ -595,13 +596,13 @@ public class X86CodeGenerator extends CodeGenerator {
         IntConstant iconst2 = (IntConstant) c2;
         switch (operation) {
             case BinaryQuad.IADD:
-                os.writeMOV_Const((X86Register) reg1, iconst2.getValue());
-                os.writeADD((X86Register) reg1, (X86Register) reg3);
+                os.writeMOV_Const((GPR) reg1, iconst2.getValue());
+                os.writeADD((GPR) reg1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IAND:
-                os.writeMOV_Const((X86Register) reg1, iconst2.getValue());
-                os.writeAND((X86Register) reg1, (X86Register) reg3);
+                os.writeMOV_Const((GPR) reg1, iconst2.getValue());
+                os.writeAND((GPR) reg1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IDIV:   //needs EAX
@@ -614,7 +615,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 }else if(reg3 == X86Register.EDX){
                     os.writeIDIV_EAX(X86Register.ESP, 4);
                 }else{
-                    os.writeIDIV_EAX((X86Register)reg3);
+                    os.writeIDIV_EAX((GPR)reg3);
                 }
                 if(reg1 == X86Register.EAX){
                     os.writePOP(X86Register.EDX);
@@ -624,19 +625,19 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 }else{
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EAX);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EAX);
                     os.writePOP(X86Register.EAX);
                     os.writePOP(X86Register.EDX);
                 }
                 break;
 
             case BinaryQuad.IMUL:
-                os.writeIMUL_3((X86Register) reg1, (X86Register) reg3, iconst2.getValue());
+                os.writeIMUL_3((GPR) reg1, (GPR) reg3, iconst2.getValue());
                 break;
 
             case BinaryQuad.IOR:
-                os.writeMOV_Const((X86Register) reg1, iconst2.getValue());
-                os.writeOR((X86Register) reg1, (X86Register) reg3);
+                os.writeMOV_Const((GPR) reg1, iconst2.getValue());
+                os.writeOR((GPR) reg1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IREM:   //needs EAX
@@ -649,7 +650,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 }else if(reg3 == X86Register.EDX){
                     os.writeIDIV_EAX(X86Register.ESP, 4);
                 }else{
-                    os.writeIDIV_EAX((X86Register)reg3);
+                    os.writeIDIV_EAX((GPR)reg3);
                 }
                 if(reg1 == X86Register.EDX){
                     os.writePOP(X86Register.EAX);
@@ -659,56 +660,56 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 }else{
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EDX);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EDX);
                     os.writePOP(X86Register.EAX);
                     os.writePOP(X86Register.EDX);
                 }
                 break;
 
             case BinaryQuad.ISHL:   //needs CL
-                os.writeMOV_Const((X86Register) reg1, iconst2.getValue());
+                os.writeMOV_Const((GPR) reg1, iconst2.getValue());
                 if (reg3 != X86Register.ECX){
                     os.writePUSH(X86Register.ECX);
-                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (X86Register) reg3);
-                    os.writeSAL_CL((X86Register) reg1);
+                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
+                    os.writeSAL_CL((GPR) reg1);
                     os.writePOP(X86Register.ECX);
                 }else{
-                    os.writeSAL_CL((X86Register) reg1);
+                    os.writeSAL_CL((GPR) reg1);
                 }
                 break;
 
             case BinaryQuad.ISHR:   //needs CL
-                os.writeMOV_Const((X86Register) reg1, iconst2.getValue());
+                os.writeMOV_Const((GPR) reg1, iconst2.getValue());
                 if (reg3 != X86Register.ECX){
                     os.writePUSH(X86Register.ECX);
-                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (X86Register) reg3);
-                    os.writeSAL_CL((X86Register) reg1);
+                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
+                    os.writeSAL_CL((GPR) reg1);
                     os.writePOP(X86Register.ECX);
                 }else{
-                    os.writeSAR_CL((X86Register) reg1);
+                    os.writeSAR_CL((GPR) reg1);
                 }
                 break;
 
             case BinaryQuad.ISUB:
-                os.writeMOV_Const((X86Register) reg1, iconst2.getValue());
-                os.writeSUB((X86Register) reg1, (X86Register) reg3);
+                os.writeMOV_Const((GPR) reg1, iconst2.getValue());
+                os.writeSUB((GPR) reg1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IUSHR:
-                os.writeMOV_Const((X86Register) reg1, iconst2.getValue());
+                os.writeMOV_Const((GPR) reg1, iconst2.getValue());
                 if (reg3 != X86Register.ECX){
                     os.writePUSH(X86Register.ECX);
-                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (X86Register) reg3);
-                    os.writeSAL_CL((X86Register) reg1);
+                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
+                    os.writeSAL_CL((GPR) reg1);
                     os.writePOP(X86Register.ECX);
                 }else{
-                    os.writeSHR_CL((X86Register) reg1);
+                    os.writeSHR_CL((GPR) reg1);
                 }
                 break;
 
             case BinaryQuad.IXOR:
-                os.writeMOV_Const((X86Register) reg1, iconst2.getValue());
-                os.writeXOR((X86Register) reg1, (X86Register) reg3);
+                os.writeMOV_Const((GPR) reg1, iconst2.getValue());
+                os.writeXOR((GPR) reg1, (GPR) reg3);
                 break;
 
             case BinaryQuad.DADD:
@@ -721,48 +722,48 @@ public class X86CodeGenerator extends CodeGenerator {
             case BinaryQuad.FADD:
                 os.writePUSH(iconst2.getValue());
                 os.writeFLD32(X86Register.ESP, 0);
-                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (GPR) reg3);
                 os.writeFADD32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FDIV:
                 os.writePUSH(iconst2.getValue());
                 os.writeFLD32(X86Register.ESP, 0);
-                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (GPR) reg3);
                 os.writeFDIV32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FMUL:
                 os.writePUSH(iconst2.getValue());
                 os.writeFLD32(X86Register.ESP, 0);
-                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (GPR) reg3);
                 os.writeFMUL32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FREM:
-                os.writePUSH((X86Register)reg3);
+                os.writePUSH((GPR)reg3);
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeMOV_Const(X86Register.ESP, 0, iconst2.getValue());
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeFPREM();
                 os.writeFSTP32(X86Register.ESP, 0);
                 os.writeFFREE(X86Register.ST0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FSUB:
                 os.writePUSH(iconst2.getValue());
                 os.writeFLD32(X86Register.ESP, 0);
-                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (GPR) reg3);
                 os.writeFSUB32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.LADD:
@@ -789,13 +790,13 @@ public class X86CodeGenerator extends CodeGenerator {
         switch (operation) {
 
             case BinaryQuad.IADD:
-                os.writeMOV_Const((X86Register) reg1, iconst2.getValue());
-                os.writeADD((X86Register) reg1, X86Register.EBP, disp3);
+                os.writeMOV_Const((GPR) reg1, iconst2.getValue());
+                os.writeADD((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case BinaryQuad.IAND:
-                os.writeMOV_Const((X86Register) reg1, iconst2.getValue());
-                os.writeAND((X86Register) reg1, X86Register.EBP, disp3);
+                os.writeMOV_Const((GPR) reg1, iconst2.getValue());
+                os.writeAND((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case BinaryQuad.IDIV:   //not supported
@@ -812,7 +813,7 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 }else{
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EAX);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EAX);
                     os.writePOP(X86Register.EAX);
                     os.writePOP(X86Register.EDX);
                 }
@@ -820,12 +821,12 @@ public class X86CodeGenerator extends CodeGenerator {
 
 
             case BinaryQuad.IMUL:
-                os.writeIMUL_3((X86Register) reg1, X86Register.EBP, disp3, iconst2.getValue());
+                os.writeIMUL_3((GPR) reg1, X86Register.EBP, disp3, iconst2.getValue());
                 break;
 
             case BinaryQuad.IOR:
-                os.writeMOV_Const((X86Register) reg1, iconst2.getValue());
-                os.writeOR((X86Register) reg1, X86Register.EBP, disp3);
+                os.writeMOV_Const((GPR) reg1, iconst2.getValue());
+                os.writeOR((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case BinaryQuad.IREM:
@@ -842,44 +843,44 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 }else{
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EDX);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EDX);
                     os.writePOP(X86Register.EAX);
                     os.writePOP(X86Register.EDX);
                 }
                 break;
 
             case BinaryQuad.ISHL:   //not supported
-                os.writeMOV_Const((X86Register) reg1, iconst2.getValue());
+                os.writeMOV_Const((GPR) reg1, iconst2.getValue());
                 os.writePUSH(X86Register.ECX);
                 os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
-                os.writeSAL_CL((X86Register) reg1);
+                os.writeSAL_CL((GPR) reg1);
                 os.writePOP(X86Register.ECX);
                 break;
 
             case BinaryQuad.ISHR:   //not supported
-                os.writeMOV_Const((X86Register) reg1, iconst2.getValue());
+                os.writeMOV_Const((GPR) reg1, iconst2.getValue());
                 os.writePUSH(X86Register.ECX);
                 os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
-                os.writeSAR_CL((X86Register) reg1);
+                os.writeSAR_CL((GPR) reg1);
                 os.writePOP(X86Register.ECX);
                 break;
 
             case BinaryQuad.ISUB:
-                os.writeMOV_Const((X86Register) reg1, iconst2.getValue());
-                os.writeSUB((X86Register) reg1, X86Register.EBP, disp3);
+                os.writeMOV_Const((GPR) reg1, iconst2.getValue());
+                os.writeSUB((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case BinaryQuad.IUSHR:  //not supported
-                os.writeMOV_Const((X86Register) reg1, iconst2.getValue());
+                os.writeMOV_Const((GPR) reg1, iconst2.getValue());
                 os.writePUSH(X86Register.ECX);
                 os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
-                os.writeSHR_CL((X86Register) reg1);
+                os.writeSHR_CL((GPR) reg1);
                 os.writePOP(X86Register.ECX);
                 break;
 
             case BinaryQuad.IXOR:
-                os.writeMOV_Const((X86Register) reg1, iconst2.getValue());
-                os.writeXOR((X86Register) reg1, X86Register.EBP, disp3);
+                os.writeMOV_Const((GPR) reg1, iconst2.getValue());
+                os.writeXOR((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case BinaryQuad.DADD:
@@ -894,7 +895,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeFADD32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FDIV:
@@ -902,7 +903,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeFDIV32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FMUL:
@@ -910,7 +911,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeFMUL32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FREM:
@@ -920,7 +921,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writeFPREM();
                 os.writeFSTP32(X86Register.ESP, 0);
                 os.writeFFREE(X86Register.ST0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FSUB:
@@ -928,7 +929,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeFSUB32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.LADD:
@@ -956,16 +957,16 @@ public class X86CodeGenerator extends CodeGenerator {
 
             case BinaryQuad.IADD:
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeADD((X86Register) reg1, iconst3.getValue());
+                os.writeADD((GPR) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IAND:
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeAND((X86Register) reg1, iconst3.getValue());
+                os.writeAND((GPR) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IDIV:   //needs EAX
@@ -973,7 +974,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writePUSH(X86Register.EAX);
                 os.writePUSH(iconst3.getValue());
                 if(reg2 != X86Register.EAX){
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (X86Register)reg2);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
                 os.writeCDQ();
                 os.writeIDIV_EAX(X86Register.ESP, 0);
@@ -986,21 +987,21 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 }else{
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EAX);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EAX);
                     os.writePOP(X86Register.EAX);
                     os.writePOP(X86Register.EDX);
                 }
                 break;
 
             case BinaryQuad.IMUL:
-                os.writeIMUL_3((X86Register) reg1, (X86Register) reg2, iconst3.getValue());
+                os.writeIMUL_3((GPR) reg1, (GPR) reg2, iconst3.getValue());
                 break;
 
             case BinaryQuad.IOR:
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeOR((X86Register) reg1, iconst3.getValue());
+                os.writeOR((GPR) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IREM:   //needs EAX
@@ -1008,7 +1009,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writePUSH(X86Register.EAX);
                 os.writePUSH(iconst3.getValue());
                 if(reg2 != X86Register.EAX){
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (X86Register)reg2);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
                 os.writeCDQ();
                 os.writeIDIV_EAX(X86Register.ESP, 0);
@@ -1021,7 +1022,7 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 }else{
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EDX);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EDX);
                     os.writePOP(X86Register.EAX);
                     os.writePOP(X86Register.EDX);
                 }
@@ -1029,37 +1030,37 @@ public class X86CodeGenerator extends CodeGenerator {
 
             case BinaryQuad.ISHL:   //needs CL
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeSAL((X86Register) reg1, iconst3.getValue());
+                os.writeSAL((GPR) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.ISHR:   //needs CL
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeSAR((X86Register) reg1, iconst3.getValue());
+                os.writeSAR((GPR) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.ISUB:
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeSUB((X86Register) reg1, iconst3.getValue());
+                os.writeSUB((GPR) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeSHR((X86Register) reg1, iconst3.getValue());
+                os.writeSHR((GPR) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IXOR:
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeXOR((X86Register) reg1, iconst3.getValue());
+                os.writeXOR((GPR) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.DADD:
@@ -1070,50 +1071,50 @@ public class X86CodeGenerator extends CodeGenerator {
                 throw new IllegalArgumentException("Unknown operation");
 
             case BinaryQuad.FADD:
-                os.writePUSH((X86Register) reg2);
+                os.writePUSH((GPR) reg2);
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeMOV_Const(X86Register.ESP, 0, iconst3.getValue());
                 os.writeFADD32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FDIV:
-                os.writePUSH((X86Register)reg2);
+                os.writePUSH((GPR)reg2);
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeMOV_Const(X86Register.ESP, 0, iconst3.getValue());
                 os.writeFDIV32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FMUL:
-                os.writePUSH((X86Register)reg2);
+                os.writePUSH((GPR)reg2);
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeMOV_Const(X86Register.ESP, 0, iconst3.getValue());
                 os.writeFMUL32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FREM:
                 os.writePUSH(iconst3.getValue());
                 os.writeFLD32(X86Register.ESP, 0);
-                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (GPR) reg2);
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeFPREM();
                 os.writeFSTP32(X86Register.ESP, 0);
                 os.writeFFREE(X86Register.ST0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FSUB:
-                os.writePUSH((X86Register)reg2);
+                os.writePUSH((GPR)reg2);
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeMOV_Const(X86Register.ESP, 0, iconst3.getValue());
                 os.writeFSUB32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.LADD:
@@ -1141,23 +1142,23 @@ public class X86CodeGenerator extends CodeGenerator {
 
             case BinaryQuad.IADD:
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeADD((X86Register) reg1, (X86Register) reg3);
+                os.writeADD((GPR) reg1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IAND:
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeAND((X86Register) reg1, (X86Register) reg3);
+                os.writeAND((GPR) reg1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IDIV:
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 if(reg2 != X86Register.EAX){
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (X86Register)reg2);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
                 os.writeCDQ();
                 if(reg3 == X86Register.EAX){
@@ -1165,7 +1166,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 }else if(reg3 == X86Register.EDX){
                     os.writeIDIV_EAX(X86Register.ESP, 4);
                 }else{
-                    os.writeIDIV_EAX((X86Register)reg3);
+                    os.writeIDIV_EAX((GPR)reg3);
                 }
                 if(reg1 == X86Register.EAX){
                     os.writePOP(X86Register.EDX);
@@ -1175,7 +1176,7 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 }else{
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EAX);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EAX);
                     os.writePOP(X86Register.EAX);
                     os.writePOP(X86Register.EDX);
                 }
@@ -1183,23 +1184,23 @@ public class X86CodeGenerator extends CodeGenerator {
 
             case BinaryQuad.IMUL:
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeIMUL((X86Register) reg1, (X86Register) reg3);
+                os.writeIMUL((GPR) reg1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IOR:
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeOR((X86Register) reg1, (X86Register) reg3);
+                os.writeOR((GPR) reg1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IREM:   //needs EAX, EDX  //TODO verify
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 if(reg2 != X86Register.EAX){
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (X86Register)reg2);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
                 os.writeCDQ();
                 if(reg3 == X86Register.EAX){
@@ -1207,7 +1208,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 }else if(reg3 == X86Register.EDX){
                     os.writeIDIV_EAX(X86Register.ESP, 4);
                 }else{
-                    os.writeIDIV_EAX((X86Register)reg3);
+                    os.writeIDIV_EAX((GPR)reg3);
                 }
                 if(reg1 == X86Register.EDX){
                     os.writePOP(X86Register.EAX);
@@ -1217,7 +1218,7 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 }else{
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EDX);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EDX);
                     os.writePOP(X86Register.EAX);
                     os.writePOP(X86Register.EDX);
                 }
@@ -1225,58 +1226,58 @@ public class X86CodeGenerator extends CodeGenerator {
 
             case BinaryQuad.ISHL:   //needs CL
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
                 if (reg3 != X86Register.ECX){
                     os.writePUSH(X86Register.ECX);
-                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (X86Register) reg3);
-                    os.writeSAL_CL((X86Register) reg1);
+                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
+                    os.writeSAL_CL((GPR) reg1);
                     os.writePOP(X86Register.ECX);
                 }else{
-                    os.writeSAL_CL((X86Register) reg1);
+                    os.writeSAL_CL((GPR) reg1);
                 }
                 break;
 
             case BinaryQuad.ISHR:   //needs CL
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
                 if (reg3 != X86Register.ECX){
                     os.writePUSH(X86Register.ECX);
-                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (X86Register) reg3);
-                    os.writeSAR_CL((X86Register) reg1);
+                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
+                    os.writeSAR_CL((GPR) reg1);
                     os.writePOP(X86Register.ECX);
                 }else{
-                    os.writeSAL_CL((X86Register) reg1);
+                    os.writeSAL_CL((GPR) reg1);
                 }
                 break;
 
             case BinaryQuad.ISUB:
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeSUB((X86Register) reg1, (X86Register) reg3);
+                os.writeSUB((GPR) reg1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
                 if (reg3 != X86Register.ECX){
                     os.writePUSH(X86Register.ECX);
-                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (X86Register) reg3);
-                    os.writeSHR_CL((X86Register) reg1);
+                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
+                    os.writeSHR_CL((GPR) reg1);
                     os.writePOP(X86Register.ECX);
                 }else{
-                    os.writeSAL_CL((X86Register) reg1);
+                    os.writeSAL_CL((GPR) reg1);
                 }
                 break;
 
             case BinaryQuad.IXOR:
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeXOR((X86Register) reg1, (X86Register) reg3);
+                os.writeXOR((GPR) reg1, (GPR) reg3);
                 break;
 
             case BinaryQuad.DADD:
@@ -1287,50 +1288,50 @@ public class X86CodeGenerator extends CodeGenerator {
                 throw new IllegalArgumentException("Unknown operation");
 
             case BinaryQuad.FADD:
-                os.writePUSH((X86Register) reg2);
+                os.writePUSH((GPR) reg2);
                 os.writeFLD32(X86Register.ESP, 0);
-                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (GPR) reg3);
                 os.writeFADD32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FDIV:
-                os.writePUSH((X86Register)reg2);
+                os.writePUSH((GPR)reg2);
                 os.writeFLD32(X86Register.ESP, 0);
-                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (GPR) reg3);
                 os.writeFDIV32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FMUL:
-                os.writePUSH((X86Register)reg2);
+                os.writePUSH((GPR)reg2);
                 os.writeFLD32(X86Register.ESP, 0);
-                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (GPR) reg3);
                 os.writeFMUL32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FREM:
-                os.writePUSH((X86Register)reg3);
+                os.writePUSH((GPR)reg3);
                 os.writeFLD32(X86Register.ESP, 0);
-                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (GPR) reg2);
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeFPREM();
                 os.writeFSTP32(X86Register.ESP, 0);
                 os.writeFFREE(X86Register.ST0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FSUB:
-                os.writePUSH((X86Register)reg2);
+                os.writePUSH((GPR)reg2);
                 os.writeFLD32(X86Register.ESP, 0);
-                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.ESP, 0, (GPR) reg3);
                 os.writeFSUB32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.LADD:
@@ -1357,23 +1358,23 @@ public class X86CodeGenerator extends CodeGenerator {
 
             case BinaryQuad.IADD:
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeADD((X86Register) reg1, X86Register.EBP, disp3);
+                os.writeADD((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case BinaryQuad.IAND:
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeAND((X86Register) reg1, X86Register.EBP, disp3);
+                os.writeAND((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case BinaryQuad.IDIV:   //needs EAX
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 if(reg2 != X86Register.EAX){
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (X86Register)reg2);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
                 os.writeCDQ();
                 os.writeIDIV_EAX(X86Register.EBP, disp3);
@@ -1385,7 +1386,7 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 }else{
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EAX);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EAX);
                     os.writePOP(X86Register.EAX);
                     os.writePOP(X86Register.EDX);
                 }
@@ -1394,23 +1395,23 @@ public class X86CodeGenerator extends CodeGenerator {
 
             case BinaryQuad.IMUL:
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeIMUL((X86Register) reg1, X86Register.EBP, disp3);
+                os.writeIMUL((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case BinaryQuad.IOR:
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeOR((X86Register) reg1, X86Register.EBP, disp3);
+                os.writeOR((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case BinaryQuad.IREM:   //needs EAX
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 if(reg2 != X86Register.EAX){
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (X86Register)reg2);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
                 os.writeCDQ();
                 os.writeIDIV_EAX(X86Register.EBP, disp3);
@@ -1422,7 +1423,7 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 }else{
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EDX);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EDX);
                     os.writePOP(X86Register.EAX);
                     os.writePOP(X86Register.EDX);
                 }
@@ -1430,46 +1431,46 @@ public class X86CodeGenerator extends CodeGenerator {
 
             case BinaryQuad.ISHL:   //needs CL
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
                 os.writePUSH(X86Register.ECX);
                 os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
-                os.writeSAL_CL((X86Register) reg1);
+                os.writeSAL_CL((GPR) reg1);
                 os.writePOP(X86Register.ECX);
                 break;
 
             case BinaryQuad.ISHR:   //needs CL
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
                 os.writePUSH(X86Register.ECX);
                 os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
-                os.writeSAR_CL((X86Register) reg1);
+                os.writeSAR_CL((GPR) reg1);
                 os.writePOP(X86Register.ECX);
                 break;
 
             case BinaryQuad.ISUB:
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeSUB((X86Register) reg1, X86Register.EBP, disp3);
+                os.writeSUB((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
                 os.writePUSH(X86Register.ECX);
                 os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
-                os.writeSHR_CL((X86Register) reg1);
+                os.writeSHR_CL((GPR) reg1);
                 os.writePOP(X86Register.ECX);
                 break;
 
             case BinaryQuad.IXOR:
                 if (reg1 != reg2) {
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, (X86Register) reg2);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, (GPR) reg2);
                 }
-                os.writeXOR((X86Register) reg1, X86Register.EBP, disp3);
+                os.writeXOR((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case BinaryQuad.DADD:
@@ -1480,45 +1481,45 @@ public class X86CodeGenerator extends CodeGenerator {
                 throw new IllegalArgumentException("Unknown operation");
 
             case BinaryQuad.FADD:
-                os.writePUSH((X86Register) reg2);
+                os.writePUSH((GPR) reg2);
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeFADD32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FDIV:
-                os.writePUSH((X86Register)reg2);
+                os.writePUSH((GPR)reg2);
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeFDIV32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FMUL:
-                os.writePUSH((X86Register)reg2);
+                os.writePUSH((GPR)reg2);
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeFMUL32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FREM:
-                os.writePUSH((X86Register)reg2);
+                os.writePUSH((GPR)reg2);
                 os.writeFLD32(X86Register.EBP, disp3);
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeFPREM();
                 os.writeFSTP32(X86Register.ESP, 0);
                 os.writeFFREE(X86Register.ST0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FSUB:
-                os.writePUSH((X86Register)reg2);
+                os.writePUSH((GPR)reg2);
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeFSUB32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.LADD:
@@ -1545,13 +1546,13 @@ public class X86CodeGenerator extends CodeGenerator {
         switch (operation) {
 
             case BinaryQuad.IADD:
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeADD((X86Register) reg1, iconst3.getValue());
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeADD((GPR) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IAND:
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeAND((X86Register) reg1, iconst3.getValue());
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeAND((GPR) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IDIV:   //needs EAX
@@ -1570,19 +1571,19 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 }else{
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EAX);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EAX);
                     os.writePOP(X86Register.EAX);
                     os.writePOP(X86Register.EDX);
                 }
                 break;
 
             case BinaryQuad.IMUL:
-                os.writeIMUL_3((X86Register) reg1, X86Register.EBP, disp2, iconst3.getValue());
+                os.writeIMUL_3((GPR) reg1, X86Register.EBP, disp2, iconst3.getValue());
                 break;
 
             case BinaryQuad.IOR:
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeOR((X86Register) reg1, iconst3.getValue());
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeOR((GPR) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IREM:   //needs EAX
@@ -1601,35 +1602,35 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 }else{
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EDX);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EDX);
                     os.writePOP(X86Register.EAX);
                     os.writePOP(X86Register.EDX);
                 }
                 break;
 
             case BinaryQuad.ISHL:   //needs CL
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeSAL((X86Register) reg1, iconst3.getValue());
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeSAL((GPR) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.ISHR:   //needs CL
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeSAR((X86Register) reg1, iconst3.getValue());
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeSAR((GPR) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.ISUB:
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeSUB((X86Register) reg1, iconst3.getValue());
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeSUB((GPR) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeSHR((X86Register) reg1, iconst3.getValue());
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeSHR((GPR) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IXOR:
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeXOR((X86Register) reg1, iconst3.getValue());
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeXOR((GPR) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.DADD:
@@ -1644,7 +1645,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFADD32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FDIV:
@@ -1652,7 +1653,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFDIV32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FMUL:
@@ -1660,7 +1661,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFMUL32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FREM:
@@ -1670,7 +1671,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writeFPREM();
                 os.writeFSTP32(X86Register.ESP, 0);
                 os.writeFFREE(X86Register.ST0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FSUB:
@@ -1678,7 +1679,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFSUB32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.LADD:
@@ -1703,13 +1704,13 @@ public class X86CodeGenerator extends CodeGenerator {
     public void generateBinaryOP(Object reg1, int disp2, int operation, Object reg3) {
         switch (operation) {
             case BinaryQuad.IADD:
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeADD((X86Register) reg1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeADD((GPR) reg1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IAND:
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeAND((X86Register) reg1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeAND((GPR) reg1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IDIV:   //needs EAX
@@ -1722,7 +1723,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 }else if(reg3 == X86Register.EDX){
                     os.writeIDIV_EAX(X86Register.ESP, 4);
                 }else{
-                    os.writeIDIV_EAX((X86Register)reg3);
+                    os.writeIDIV_EAX((GPR)reg3);
                 }
                 if(reg1 == X86Register.EAX){
                     os.writePOP(X86Register.EDX);
@@ -1732,20 +1733,20 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 }else{
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EAX);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EAX);
                     os.writePOP(X86Register.EAX);
                     os.writePOP(X86Register.EDX);
                 }
                 break;
 
             case BinaryQuad.IMUL:
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeIMUL((X86Register) reg1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeIMUL((GPR) reg1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IOR:
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeOR((X86Register) reg1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeOR((GPR) reg1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IREM:   //needs EAX
@@ -1758,7 +1759,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 }else if(reg3 == X86Register.EDX){
                     os.writeIDIV_EAX(X86Register.ESP, 4);
                 }else{
-                    os.writeIDIV_EAX((X86Register)reg3);
+                    os.writeIDIV_EAX((GPR)reg3);
                 }
                 if(reg1 == X86Register.EDX){
                     os.writePOP(X86Register.EAX);
@@ -1768,56 +1769,56 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 }else{
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EDX);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EDX);
                     os.writePOP(X86Register.EAX);
                     os.writePOP(X86Register.EDX);
                 }
                 break;
 
             case BinaryQuad.ISHL:   //needs CL
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 if (reg3 != X86Register.ECX){
                     os.writePUSH(X86Register.ECX);
-                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (X86Register) reg3);
-                    os.writeSHR_CL((X86Register) reg1);
+                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
+                    os.writeSHR_CL((GPR) reg1);
                     os.writePOP(X86Register.ECX);
                 }else{
-                    os.writeSAL_CL((X86Register) reg1);
+                    os.writeSAL_CL((GPR) reg1);
                 }
                 break;
 
             case BinaryQuad.ISHR:   //needs CL
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 if (reg3 != X86Register.ECX){
                     os.writePUSH(X86Register.ECX);
-                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (X86Register) reg3);
-                    os.writeSHR_CL((X86Register) reg1);
+                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
+                    os.writeSHR_CL((GPR) reg1);
                     os.writePOP(X86Register.ECX);
                 }else{
-                    os.writeSAR_CL((X86Register) reg1);
+                    os.writeSAR_CL((GPR) reg1);
                 }
                 break;
 
             case BinaryQuad.ISUB:
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeSUB((X86Register) reg1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeSUB((GPR) reg1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 if (reg3 != X86Register.ECX){
                     os.writePUSH(X86Register.ECX);
-                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (X86Register) reg3);
-                    os.writeSHR_CL((X86Register) reg1);
+                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
+                    os.writeSHR_CL((GPR) reg1);
                     os.writePOP(X86Register.ECX);
                 }else{
-                    os.writeSHR_CL((X86Register) reg1);
+                    os.writeSHR_CL((GPR) reg1);
                 }
                 break;
 
             case BinaryQuad.IXOR:
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeXOR((X86Register) reg1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeXOR((GPR) reg1, (GPR) reg3);
                 break;
 
             case BinaryQuad.DADD:
@@ -1828,45 +1829,45 @@ public class X86CodeGenerator extends CodeGenerator {
                 throw new IllegalArgumentException("Unknown operation");
 
             case BinaryQuad.FADD:
-                os.writePUSH((X86Register)reg3);
+                os.writePUSH((GPR)reg3);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFADD32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FDIV:
-                os.writePUSH((X86Register)reg3);
+                os.writePUSH((GPR)reg3);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFDIV32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FMUL:
-                os.writePUSH((X86Register)reg3);
+                os.writePUSH((GPR)reg3);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFMUL32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FREM:
-                os.writePUSH((X86Register)reg3);
+                os.writePUSH((GPR)reg3);
                 os.writeFLD32(X86Register.ESP, 0);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFPREM();
                 os.writeFSTP32(X86Register.ESP, 0);
                 os.writeFFREE(X86Register.ST0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FSUB:
-                os.writePUSH((X86Register)reg3);
+                os.writePUSH((GPR)reg3);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFSUB32(X86Register.ESP, 0);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.LADD:
@@ -1891,13 +1892,13 @@ public class X86CodeGenerator extends CodeGenerator {
     public void generateBinaryOP(Object reg1, int disp2, int operation, int disp3) {
         switch (operation) {
             case BinaryQuad.IADD:
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeADD((X86Register) reg1, X86Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeADD((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case BinaryQuad.IAND:
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeAND((X86Register) reg1, X86Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeAND((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case BinaryQuad.IDIV:   //needs EAX
@@ -1914,20 +1915,20 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePOP(X86Register.EAX);
                     os.writeADD(X86Register.ESP, 4);
                 }else{
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EAX);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EAX);
                     os.writePOP(X86Register.EAX);
                     os.writePOP(X86Register.EDX);
                 }
                 break;
 
             case BinaryQuad.IMUL:
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeIMUL((X86Register) reg1, X86Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeIMUL((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case BinaryQuad.IOR:    //not supported
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeOR((X86Register) reg1, X86Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeOR((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case BinaryQuad.IREM:   //needs EAX
@@ -1944,44 +1945,44 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePOP(X86Register.EDX);
                     os.writePOP(X86Register.EDX);
                 }else{
-                    os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EDX);
+                    os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EDX);
                     os.writePOP(X86Register.EAX);
                     os.writePOP(X86Register.EDX);
                 }
                 break;
 
             case BinaryQuad.ISHL:   //needs CL
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writePUSH(X86Register.ECX);
                 os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
-                os.writeSAL_CL((X86Register) reg1);
+                os.writeSAL_CL((GPR) reg1);
                 os.writePOP(X86Register.ECX);
                 break;
 
             case BinaryQuad.ISHR:   //needs CL
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writePUSH(X86Register.ECX);
                 os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
-                os.writeSAR_CL((X86Register) reg1);
+                os.writeSAR_CL((GPR) reg1);
                 os.writePOP(X86Register.ECX);
                 break;
 
             case BinaryQuad.ISUB:
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeSUB((X86Register) reg1, X86Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeSUB((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
                 os.writePUSH(X86Register.ECX);
                 os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
-                os.writeSHR_CL((X86Register) reg1);
+                os.writeSHR_CL((GPR) reg1);
                 os.writePOP(X86Register.ECX);
                 break;
 
             case BinaryQuad.IXOR:
-                os.writeMOV(X86Constants.BITS32, (X86Register) reg1, X86Register.EBP, disp2);
-                os.writeXOR((X86Register) reg1, X86Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, (GPR) reg1, X86Register.EBP, disp2);
+                os.writeXOR((GPR) reg1, X86Register.EBP, disp3);
                 break;
 
             case BinaryQuad.DADD:
@@ -1994,43 +1995,43 @@ public class X86CodeGenerator extends CodeGenerator {
             case BinaryQuad.FADD:
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFADD32(X86Register.EBP, disp3);
-                os.writePUSH((X86Register) reg1);
+                os.writePUSH((GPR) reg1);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FDIV:
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFDIV32(X86Register.EBP, disp3);
-                os.writePUSH((X86Register) reg1);
+                os.writePUSH((GPR) reg1);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FMUL:
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFMUL32(X86Register.EBP, disp3);
-                os.writePUSH((X86Register) reg1);
+                os.writePUSH((GPR) reg1);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.FREM:
                 os.writeFLD32(X86Register.EBP, disp3);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFPREM();
-                os.writePUSH((X86Register) reg1);
+                os.writePUSH((GPR) reg1);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 os.writeFFREE(X86Register.ST0);
                 break;
 
             case BinaryQuad.FSUB:
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFSUB32(X86Register.EBP, disp3);
-                os.writePUSH((X86Register) reg1);
+                os.writePUSH((GPR) reg1);
                 os.writeFSTP32(X86Register.ESP, 0);
-                os.writePOP((X86Register) reg1);
+                os.writePOP((GPR) reg1);
                 break;
 
             case BinaryQuad.LADD:
@@ -2066,12 +2067,12 @@ public class X86CodeGenerator extends CodeGenerator {
         switch (operation) {
             case BinaryQuad.IADD:
                 os.writeMOV_Const(X86Register.EBP, disp1, iconst2.getValue());
-                os.writeADD(X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeADD(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IAND:
                 os.writeMOV_Const(X86Register.EBP, disp1, iconst2.getValue());
-                os.writeAND(X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeAND(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IDIV:   //needs EAX
@@ -2084,7 +2085,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 }else if(reg3 == X86Register.EDX){
                     os.writeIDIV_EAX(X86Register.ESP, 4);
                 }else{
-                    os.writeIDIV_EAX((X86Register)reg3);
+                    os.writeIDIV_EAX((GPR)reg3);
                 }
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EAX);
                 os.writePOP(X86Register.EAX);
@@ -2092,15 +2093,15 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IMUL:
-                os.writePUSH((X86Register) reg3);
-                os.writeIMUL_3((X86Register) reg3, (X86Register)reg3, iconst2.getValue());
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register)reg3);
-                os.writePOP((X86Register) reg3);
+                os.writePUSH((GPR) reg3);
+                os.writeIMUL_3((GPR) reg3, (GPR)reg3, iconst2.getValue());
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR)reg3);
+                os.writePOP((GPR) reg3);
                 break;
 
             case BinaryQuad.IOR:
                 os.writeMOV_Const(X86Register.EBP, disp1, iconst2.getValue());
-                os.writeOR(X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeOR(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IREM:   //needs EAX
@@ -2113,7 +2114,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 }else if(reg3 == X86Register.EDX){
                     os.writeIDIV_EAX(X86Register.ESP, 4);
                 }else{
-                    os.writeIDIV_EAX((X86Register)reg3);
+                    os.writeIDIV_EAX((GPR)reg3);
                 }
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EDX);
                 os.writePOP(X86Register.EAX);
@@ -2124,7 +2125,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writeMOV_Const(X86Register.EBP, disp1, iconst2.getValue());
                 if(reg3 != X86Register.ECX){
                     os.writePUSH(X86Register.ECX);
-                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (X86Register) reg3);
+                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
                     os.writeSAL_CL(X86Register.EBP, disp1);
                     os.writePOP(X86Register.ECX);
                 }else{
@@ -2136,7 +2137,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writeMOV_Const(X86Register.EBP, disp1, iconst2.getValue());
                 if(reg3 != X86Register.ECX){
                     os.writePUSH(X86Register.ECX);
-                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (X86Register) reg3);
+                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
                     os.writeSAR_CL(X86Register.EBP, disp1);
                     os.writePOP(X86Register.ECX);
                 }else{
@@ -2146,14 +2147,14 @@ public class X86CodeGenerator extends CodeGenerator {
 
             case BinaryQuad.ISUB:
                 os.writeMOV_Const(X86Register.EBP, disp1, iconst2.getValue());
-                os.writeSUB(X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeSUB(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
                 os.writeMOV_Const(X86Register.EBP, disp1, iconst2.getValue());
                 if(reg3 != X86Register.ECX){
                     os.writePUSH(X86Register.ECX);
-                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (X86Register) reg3);
+                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
                     os.writeSHR_CL(X86Register.EBP, disp1);
                     os.writePOP(X86Register.ECX);
                 }else{
@@ -2163,7 +2164,7 @@ public class X86CodeGenerator extends CodeGenerator {
 
             case BinaryQuad.IXOR:   //not supported
                 os.writeMOV_Const(X86Register.EBP, disp1, iconst2.getValue());
-                os.writeXOR(X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeXOR(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
             case BinaryQuad.DADD:
@@ -2176,7 +2177,7 @@ public class X86CodeGenerator extends CodeGenerator {
             case BinaryQuad.FADD:
                 os.writeMOV_Const(X86Register.EBP, disp1, iconst2.getValue());
                 os.writeFLD32(X86Register.EBP, disp1);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFADD32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
@@ -2184,7 +2185,7 @@ public class X86CodeGenerator extends CodeGenerator {
             case BinaryQuad.FDIV:
                 os.writeMOV_Const(X86Register.EBP, disp1, iconst2.getValue());
                 os.writeFLD32(X86Register.EBP, disp1);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFDIV32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
@@ -2192,13 +2193,13 @@ public class X86CodeGenerator extends CodeGenerator {
             case BinaryQuad.FMUL:
                 os.writeMOV_Const(X86Register.EBP, disp1, iconst2.getValue());
                 os.writeFLD32(X86Register.EBP, disp1);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFMUL32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case BinaryQuad.FREM:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeMOV_Const(X86Register.EBP, disp1, iconst2.getValue());
                 os.writeFLD32(X86Register.EBP, disp1);
@@ -2210,7 +2211,7 @@ public class X86CodeGenerator extends CodeGenerator {
             case BinaryQuad.FSUB:
                 os.writeMOV_Const(X86Register.EBP, disp1, iconst2.getValue());
                 os.writeFLD32(X86Register.EBP, disp1);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFSUB32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
@@ -2398,12 +2399,12 @@ public class X86CodeGenerator extends CodeGenerator {
         switch (operation) {
 
             case BinaryQuad.IADD:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeADD(X86Register.EBP, disp1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IAND:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeAND(X86Register.EBP, disp1, iconst3.getValue());
                 break;
 
@@ -2412,7 +2413,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writePUSH(X86Register.EAX);
                 os.writePUSH(iconst3.getValue());
                 if(reg2 != X86Register.EAX){
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (X86Register)reg2);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
                 os.writeCDQ();
                 os.writeIDIV_EAX(X86Register.ESP, 0);
@@ -2423,14 +2424,14 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IMUL:
-                os.writePUSH((X86Register) reg2);
-                os.writeIMUL_3((X86Register) reg2, (X86Register)reg2, iconst3.getValue());
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register)reg2);
-                os.writePOP((X86Register) reg2);
+                os.writePUSH((GPR) reg2);
+                os.writeIMUL_3((GPR) reg2, (GPR)reg2, iconst3.getValue());
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR)reg2);
+                os.writePOP((GPR) reg2);
                 break;
 
             case BinaryQuad.IOR:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeOR(X86Register.EBP, disp1, iconst3.getValue());
                 break;
 
@@ -2439,7 +2440,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writePUSH(X86Register.EAX);
                 os.writePUSH(iconst3.getValue());
                 if(reg2 != X86Register.EAX){
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (X86Register)reg2);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
                 os.writeCDQ();
                 os.writeIDIV_EAX(X86Register.ESP, 0);
@@ -2450,27 +2451,27 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.ISHL:   //needs CL
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeSAL(X86Register.EBP, disp1, iconst3.getValue());
                 break;
 
             case BinaryQuad.ISHR:   //needs CL
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeSAR(X86Register.EBP, disp1, iconst3.getValue());
                 break;
 
             case BinaryQuad.ISUB:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeSUB(X86Register.EBP, disp1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeSHR(X86Register.EBP, disp1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IXOR:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeXOR(X86Register.EBP, disp1, iconst3.getValue());
                 break;
 
@@ -2482,7 +2483,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 throw new IllegalArgumentException("Unknown operation");
 
             case BinaryQuad.FADD:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeMOV_Const(X86Register.EBP, disp1, iconst3.getValue());
                 os.writeFADD32(X86Register.EBP, disp1);
@@ -2490,7 +2491,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.FDIV:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeMOV_Const(X86Register.EBP, disp1, iconst3.getValue());
                 os.writeFDIV32(X86Register.EBP, disp1);
@@ -2498,7 +2499,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.FMUL:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeMOV_Const(X86Register.EBP, disp1, iconst3.getValue());
                 os.writeFMUL32(X86Register.EBP, disp1);
@@ -2508,7 +2509,7 @@ public class X86CodeGenerator extends CodeGenerator {
             case BinaryQuad.FREM:
                 os.writeMOV_Const(X86Register.EBP, disp1, iconst3.getValue());
                 os.writeFLD32(X86Register.EBP, disp1);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFPREM();
                 os.writeFSTP32(X86Register.EBP, disp1);
@@ -2516,7 +2517,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.FSUB:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeMOV_Const(X86Register.EBP, disp1, iconst3.getValue());
                 os.writeFSUB32(X86Register.EBP, disp1);
@@ -2545,20 +2546,20 @@ public class X86CodeGenerator extends CodeGenerator {
     public void generateBinaryOP(int disp1, Object reg2, int operation, Object reg3) {
         switch (operation) {
             case BinaryQuad.IADD:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
-                os.writeADD(X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
+                os.writeADD(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IAND:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
-                os.writeAND(X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
+                os.writeAND(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IDIV:   //needs EAX
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 if(reg2 != X86Register.EAX){
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (X86Register)reg2);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
                 os.writeCDQ();
                 if(reg3 == X86Register.EAX){
@@ -2566,7 +2567,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 }else if(reg3 == X86Register.EDX){
                     os.writeIDIV_EAX(X86Register.ESP, 4);
                 }else{
-                    os.writeIDIV_EAX((X86Register)reg3);
+                    os.writeIDIV_EAX((GPR)reg3);
                 }
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EAX);
                 os.writePOP(X86Register.EAX);
@@ -2574,22 +2575,22 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IMUL:
-                os.writePUSH((X86Register) reg2);
-                os.writeIMUL((X86Register) reg2, (X86Register)reg3);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register)reg2);
-                os.writePOP((X86Register) reg2);
+                os.writePUSH((GPR) reg2);
+                os.writeIMUL((GPR) reg2, (GPR)reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR)reg2);
+                os.writePOP((GPR) reg2);
                 break;
 
             case BinaryQuad.IOR:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
-                os.writeOR(X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
+                os.writeOR(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IREM:   //needs EAX
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 if(reg2 != X86Register.EAX){
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (X86Register)reg2);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
                 os.writeCDQ();
                 if(reg3 == X86Register.EAX){
@@ -2597,7 +2598,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 }else if(reg3 == X86Register.EDX){
                     os.writeIDIV_EAX(X86Register.ESP, 4);
                 }else{
-                    os.writeIDIV_EAX((X86Register)reg3);
+                    os.writeIDIV_EAX((GPR)reg3);
                 }
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EDX);
                 os.writePOP(X86Register.EAX);
@@ -2605,10 +2606,10 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.ISHL:   //needs CL
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 if(reg3 != X86Register.ECX){
                     os.writePUSH(X86Register.ECX);
-                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (X86Register) reg3);
+                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
                     os.writeSAL_CL(X86Register.EBP, disp1);
                     os.writePOP(X86Register.ECX);
                 }else{
@@ -2617,10 +2618,10 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.ISHR:   //needs CL
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 if(reg3 != X86Register.ECX){
                     os.writePUSH(X86Register.ECX);
-                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (X86Register) reg3);
+                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
                     os.writeSAR_CL(X86Register.EBP, disp1);
                     os.writePOP(X86Register.ECX);
                 }else{
@@ -2629,15 +2630,15 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.ISUB:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
-                os.writeSUB(X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
+                os.writeSUB(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 if(reg3 != X86Register.ECX){
                     os.writePUSH(X86Register.ECX);
-                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (X86Register) reg3);
+                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
                     os.writeSHR_CL(X86Register.EBP, disp1);
                     os.writePOP(X86Register.ECX);
                 }else{
@@ -2646,8 +2647,8 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IXOR:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
-                os.writeXOR(X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
+                os.writeXOR(X86Register.EBP, disp1, (GPR) reg3);
                 break;
 
             case BinaryQuad.DADD:
@@ -2658,33 +2659,33 @@ public class X86CodeGenerator extends CodeGenerator {
                 throw new IllegalArgumentException("Unknown operation");
 
             case BinaryQuad.FADD:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFADD32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case BinaryQuad.FDIV:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFDIV32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case BinaryQuad.FMUL:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFMUL32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case BinaryQuad.FREM:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFLD32(X86Register.EBP, disp1);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFPREM();
                 os.writeFSTP32(X86Register.EBP, disp1);
@@ -2692,9 +2693,9 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.FSUB:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFSUB32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
@@ -2721,25 +2722,25 @@ public class X86CodeGenerator extends CodeGenerator {
     public void generateBinaryOP(int disp1, Object reg2, int operation, int disp3) {
         switch (operation) {
             case BinaryQuad.IADD:
-                os.writePUSH((X86Register) reg2);
-                os.writeADD((X86Register) reg2, X86Register.EBP, disp3);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
-                os.writePOP((X86Register) reg2);
+                os.writePUSH((GPR) reg2);
+                os.writeADD((GPR) reg2, X86Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
+                os.writePOP((GPR) reg2);
                 break;
 
 
             case BinaryQuad.IAND:
-                os.writePUSH((X86Register) reg2);
-                os.writeAND((X86Register) reg2, X86Register.EBP, disp3);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
-                os.writePOP((X86Register) reg2);
+                os.writePUSH((GPR) reg2);
+                os.writeAND((GPR) reg2, X86Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
+                os.writePOP((GPR) reg2);
                 break;
 
             case BinaryQuad.IDIV:   //needs EAX
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 if(reg2 != X86Register.EAX){
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (X86Register)reg2);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
                 os.writeCDQ();
                 os.writeIDIV_EAX(X86Register.EBP, disp3);
@@ -2749,25 +2750,25 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IMUL:
-                os.writePUSH((X86Register) reg2);
-                os.writeIMUL((X86Register) reg2, X86Register.EBP, disp3);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
-                os.writePOP((X86Register) reg2);
+                os.writePUSH((GPR) reg2);
+                os.writeIMUL((GPR) reg2, X86Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
+                os.writePOP((GPR) reg2);
                 break;
 
 
             case BinaryQuad.IOR:
-                os.writePUSH((X86Register) reg2);
-                os.writeOR((X86Register) reg2, X86Register.EBP, disp3);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
-                os.writePOP((X86Register) reg2);
+                os.writePUSH((GPR) reg2);
+                os.writeOR((GPR) reg2, X86Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
+                os.writePOP((GPR) reg2);
                 break;
 
             case BinaryQuad.IREM:   //needs EAX
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 if(reg2 != X86Register.EAX){
-                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (X86Register)reg2);
+                    os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
                 os.writeCDQ();
                 os.writeIDIV_EAX(X86Register.EBP, disp3);
@@ -2777,7 +2778,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.ISHL:   //needs CL
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writePUSH(X86Register.ECX);
                 os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSAL_CL(X86Register.EBP, disp1);
@@ -2785,7 +2786,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.ISHR:   //needs CL
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writePUSH(X86Register.ECX);
                 os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSAR_CL(X86Register.EBP, disp1);
@@ -2793,14 +2794,14 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.ISUB:
-                os.writePUSH((X86Register) reg2);
-                os.writeSUB((X86Register) reg2, X86Register.EBP, disp3);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
-                os.writePOP((X86Register) reg2);
+                os.writePUSH((GPR) reg2);
+                os.writeSUB((GPR) reg2, X86Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
+                os.writePOP((GPR) reg2);
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writePUSH(X86Register.ECX);
                 os.writeMOV(X86Constants.BITS32, X86Register.ECX, X86Register.EBP, disp3);
                 os.writeSHR_CL(X86Register.EBP, disp1);
@@ -2808,10 +2809,10 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IXOR:
-                os.writePUSH((X86Register) reg2);
-                os.writeXOR((X86Register) reg2, X86Register.EBP, disp3);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
-                os.writePOP((X86Register) reg2);
+                os.writePUSH((GPR) reg2);
+                os.writeXOR((GPR) reg2, X86Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
+                os.writePOP((GPR) reg2);
                 break;
 
             case BinaryQuad.DADD:
@@ -2822,28 +2823,28 @@ public class X86CodeGenerator extends CodeGenerator {
                 throw new IllegalArgumentException("Unknown operation");
 
             case BinaryQuad.FADD:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFADD32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case BinaryQuad.FDIV:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFDIV32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case BinaryQuad.FMUL:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFMUL32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case BinaryQuad.FREM:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp3);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFPREM();
@@ -2852,7 +2853,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.FSUB:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFSUB32(X86Register.EBP, disp3);
                 os.writeFSTP32(X86Register.EBP, disp1);
@@ -3047,7 +3048,7 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePUSH(X86Register.EBP,disp2);
                     os.writePOP(X86Register.EBP, disp1);
                 }
-                os.writeADD(X86Register.EBP, disp1, (X86Register)reg3);
+                os.writeADD(X86Register.EBP, disp1, (GPR)reg3);
                 break;
 
 
@@ -3056,7 +3057,7 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePUSH(X86Register.EBP,disp2);
                     os.writePOP(X86Register.EBP, disp1);
                 }
-                os.writeAND(X86Register.EBP, disp1, (X86Register)reg3);
+                os.writeAND(X86Register.EBP, disp1, (GPR)reg3);
                 break;
 
             case BinaryQuad.IDIV:   //needs EAX
@@ -3069,7 +3070,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 }else if(reg3 == X86Register.EDX){
                     os.writeIDIV_EAX(X86Register.ESP, 4);
                 }else{
-                    os.writeIDIV_EAX((X86Register)reg3);
+                    os.writeIDIV_EAX((GPR)reg3);
                 }
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EAX);
                 os.writePOP(X86Register.EAX);
@@ -3077,10 +3078,10 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IMUL:
-                os.writePUSH((X86Register) reg3);
-                os.writeIMUL((X86Register) reg3, X86Register.EBP, disp2);
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register)reg3);
-                os.writePOP((X86Register) reg3);
+                os.writePUSH((GPR) reg3);
+                os.writeIMUL((GPR) reg3, X86Register.EBP, disp2);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR)reg3);
+                os.writePOP((GPR) reg3);
                 break;
 
             case BinaryQuad.IOR:
@@ -3088,7 +3089,7 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePUSH(X86Register.EBP,disp2);
                     os.writePOP(X86Register.EBP, disp1);
                 }
-                os.writeOR(X86Register.EBP, disp1, (X86Register)reg3);
+                os.writeOR(X86Register.EBP, disp1, (GPR)reg3);
                 break;
 
             case BinaryQuad.IREM:   //needs EAX
@@ -3101,7 +3102,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 }else if(reg3 == X86Register.EDX){
                     os.writeIDIV_EAX(X86Register.ESP, 4);
                 }else{
-                    os.writeIDIV_EAX((X86Register)reg3);
+                    os.writeIDIV_EAX((GPR)reg3);
                 }
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EDX);
                 os.writePOP(X86Register.EAX);
@@ -3115,7 +3116,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 }
                 if(reg3 != X86Register.ECX){
                     os.writePUSH(X86Register.ECX);
-                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (X86Register) reg3);
+                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
                     os.writeSAL_CL(X86Register.EBP, disp1);
                     os.writePOP(X86Register.ECX);
                 }else{
@@ -3130,7 +3131,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 }
                 if(reg3 != X86Register.ECX){
                     os.writePUSH(X86Register.ECX);
-                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (X86Register) reg3);
+                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
                     os.writeSAR_CL(X86Register.EBP, disp1);
                     os.writePOP(X86Register.ECX);
                 }else{
@@ -3143,7 +3144,7 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePUSH(X86Register.EBP,disp2);
                     os.writePOP(X86Register.EBP, disp1);
                 }
-                os.writeSUB(X86Register.EBP, disp1, (X86Register)reg3);
+                os.writeSUB(X86Register.EBP, disp1, (GPR)reg3);
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
@@ -3153,7 +3154,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 }
                 if(reg3 != X86Register.ECX){
                     os.writePUSH(X86Register.ECX);
-                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (X86Register) reg3);
+                    os.writeMOV(X86Constants.BITS32, X86Register.ECX, (GPR) reg3);
                     os.writeSHR_CL(X86Register.EBP, disp1);
                     os.writePOP(X86Register.ECX);
                 }else{
@@ -3166,7 +3167,7 @@ public class X86CodeGenerator extends CodeGenerator {
                     os.writePUSH(X86Register.EBP,disp2);
                     os.writePOP(X86Register.EBP, disp1);
                 }
-                os.writeXOR(X86Register.EBP, disp1, (X86Register)reg3);
+                os.writeXOR(GPR.EBP, disp1, (GPR)reg3);
                 break;
 
             case BinaryQuad.DADD:
@@ -3177,28 +3178,28 @@ public class X86CodeGenerator extends CodeGenerator {
                 throw new IllegalArgumentException("Unknown operation");
 
             case BinaryQuad.FADD:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFADD32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case BinaryQuad.FDIV:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFDIV32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case BinaryQuad.FMUL:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFMUL32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
                 break;
 
             case BinaryQuad.FREM:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFLD32(X86Register.EBP, disp1);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFPREM();
@@ -3207,7 +3208,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.FSUB:
-                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (X86Register) reg3);
+                os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg3);
                 os.writeFLD32(X86Register.EBP, disp2);
                 os.writeFSUB32(X86Register.EBP, disp1);
                 os.writeFSTP32(X86Register.EBP, disp1);
@@ -3426,7 +3427,7 @@ public class X86CodeGenerator extends CodeGenerator {
      */
     public void generateCodeFor(ConditionalBranchQuad quad, int condition, Object reg) {
         checkLabel(quad.getAddress());
-        os.writeTEST((X86Register) reg, (X86Register) reg);
+        os.writeTEST((GPR) reg, (GPR) reg);
         generateJumpForUnaryCondition(quad, condition);
     }
 
@@ -3604,7 +3605,7 @@ public class X86CodeGenerator extends CodeGenerator {
      */
     public void generateCodeFor(ConditionalBranchQuad quad, int disp1, int condition, Object reg2) {
         checkLabel(quad.getAddress());
-        os.writeCMP(X86Register.EBP, disp1, (X86Register) reg2);
+        os.writeCMP(X86Register.EBP, disp1, (GPR) reg2);
         generateJumpForBinaryCondition(quad, condition);
     }
 
@@ -3616,7 +3617,7 @@ public class X86CodeGenerator extends CodeGenerator {
      */
     public void generateCodeFor(ConditionalBranchQuad quad, Object reg1, int condition, Constant c2) {
         checkLabel(quad.getAddress());
-        os.writeCMP_Const((X86Register) reg1, ((IntConstant) c2).getValue());
+        os.writeCMP_Const((GPR) reg1, ((IntConstant) c2).getValue());
         generateJumpForBinaryCondition(quad, condition);
     }
 
@@ -3628,7 +3629,7 @@ public class X86CodeGenerator extends CodeGenerator {
      */
     public void generateCodeFor(ConditionalBranchQuad quad, Object reg1, int condition, int disp2) {
         checkLabel(quad.getAddress());
-        os.writeCMP((X86Register) reg1, X86Register.EBP, disp2);
+        os.writeCMP((GPR) reg1, X86Register.EBP, disp2);
         generateJumpForBinaryCondition(quad, condition);
     }
 
@@ -3640,7 +3641,7 @@ public class X86CodeGenerator extends CodeGenerator {
      */
     public void generateCodeFor(ConditionalBranchQuad quad, Object reg1, int condition, Object reg2) {
         checkLabel(quad.getAddress());
-        os.writeCMP((X86Register) reg1, (X86Register) reg2);
+        os.writeCMP((GPR) reg1, (GPR) reg2);
         generateJumpForBinaryCondition(quad, condition);
     }
 
