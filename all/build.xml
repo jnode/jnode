@@ -282,6 +282,35 @@
          usetimestamp="true"
          verbose="true"/>  
   </target>
+	
+<!-- Compare classpath version of jnode with real classpath version -->
+  <target name="classpath-compare" depends="assemble">
+    <taskdef name="cp-compare" classname="org.jnode.ant.taskdefs.classpath.CompareTask" classpathref="cp-jnode"/>
+  	
+  	<delete dir="${build.dir}/classpath-compare"/>
+  	<cp-compare destdir="${build.dir}/classpath-compare">
+  		<vmsources>
+  			<fileset dir="${root.dir}/core/src/classpath/gnu" includes="**/*.java"/>
+  			<fileset dir="${root.dir}/core/src/classpath/java" includes="**/*.java"/>
+  			<fileset dir="${root.dir}/core/src/classpath/javax" includes="**/*.java"/>
+	  		<fileset dir="${root.dir}/core/src/classpath/org" includes="**/*.java"/>
+        </vmsources>
+  		<classpathsources>
+	 		<fileset dir="${root.dir}/../classpath" includes="**/*.java">
+	 		  <exclude name="compat/**/*"/>
+	 		  <exclude name="external/**/*"/>
+	 		  <exclude name="gnu/java/awt/peer/**/*"/>
+	 		  <exclude name="test/**/*"/>
+	 		  <exclude name="testsuite/**/*"/>
+	 		  <exclude name="vm/reference/**/*"/>
+	 		</fileset>
+	 		<fileset dir="${root.dir}/../classpath/external/jaxp/source" includes="**/*.java">
+	 		</fileset>
+  		</classpathsources>
+  	</cp-compare>
+  	
+  	
+  </target>
   
  </project>
 
