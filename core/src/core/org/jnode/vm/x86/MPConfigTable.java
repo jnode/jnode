@@ -23,15 +23,39 @@ public class MPConfigTable {
     private static final byte[] ENTRY_LENGTH = { 20, 8, 8, 8, 8 };
     private final List entries;
     
+    private static final byte[] SIGNATURE = { 'P', 'C', 'M', 'P' };
+    
     /**
      * Initialize this instance.
      * @param mem
      */
     MPConfigTable(MemoryResource mem) {
         this.mem = mem;
-        this.entries = parse();
+        if (isValid()) {
+            this.entries = parse();
+        } else {
+            this.entries = null;
+        }
     }
        
+    /**
+     * Does the table in the given memory resource have a valid signature?
+     */
+    boolean isValid() {
+        for (int i = 0; i < SIGNATURE.length; i++) {
+            if (mem.getByte(i) != SIGNATURE[i]) {
+                // Invalid signature
+                return false;
+            }
+        }
+        final int specRev = mem.getByte(6);
+        if ((specRev != 0x01) && (specRev != 0x04)) {
+            // Invalid specification revision
+            return false;
+        }
+        return true;
+    }
+    
     /**
      * Gets the number of entries
      */
