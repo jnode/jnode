@@ -251,7 +251,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 				if (commandMode) {
 					switch (c) {
 						case 'P' :
-							result.append(new File(".").getAbsolutePath());
+							result.append(new File(System.getProperty("user.dir")));
 							break;
 						case 'G' :
 							result.append("> ");
