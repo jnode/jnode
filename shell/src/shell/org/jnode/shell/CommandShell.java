@@ -7,8 +7,6 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.PrintStream;
 import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.StringTokenizer;
@@ -27,7 +25,6 @@ import org.jnode.shell.help.AliasArgument;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.help.Help;
-import org.jnode.shell.help.SyntaxError;
 
 /**
  * @author epr
@@ -71,7 +68,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 
 	private static String DEFAULT_PROMPT = "JNode $P$G";
 
-	private static final Class[] MAIN_ARG_TYPES = new Class[] { String[].class };
+	//private static final Class[] MAIN_ARG_TYPES = new Class[] { String[].class };
 
     private CommandInvoker commandInvoker;
     private ThreadCommandInvoker threadCommandInvoker;
