@@ -23,6 +23,17 @@ public interface Surface {
 	public static final int XOR_MODE = 0x01;
 
 	/**
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @param dx
+	 * @param dy
+	 * @see java.awt.Graphics#copyArea(int, int, int, int, int, int)
+	 */
+	public void copyArea(int x, int y, int width, int height, int dx, int dy);
+
+	/**
 	 * Draw the given shape
 	 * @param shape The shape to draw
 	 * @param clip The clipping area, can be null

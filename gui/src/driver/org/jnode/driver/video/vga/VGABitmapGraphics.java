@@ -22,22 +22,35 @@ public class VGABitmapGraphics extends BitmapGraphics {
 	 * @param offset
 	 * @param bytesPerLine
 	 */
-	public VGABitmapGraphics(StandardVGA vga, StandardVGAIO vgaIO, int width, int height, int offset, int bytesPerLine) {
+	public VGABitmapGraphics(StandardVGA vga, StandardVGAIO vgaIO, int width,
+			int height, int offset, int bytesPerLine) {
 		super(vga.getVgaMem(), width, height, offset, bytesPerLine);
 		this.vgaIO = vgaIO;
 	}
 
-	/**
-	 * @see org.jnode.awt.util.BitmapGraphics#doDrawImage(java.awt.image.Raster, int, int, int, int, int, int, int)
-	 */
-	protected void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width, int height, int bgColor) {
-		doDrawImage(src, srcX, srcY, dstX, dstY, width, height);
+	private int divroundup(int num, int div) {
+		if (num % div == 0) {
+			return num / div;
+		} else {
+			return (num / div) + 1;
+		}
 	}
 
 	/**
-	 * @see org.jnode.awt.util.BitmapGraphics#doDrawImage(java.awt.image.Raster, int, int, int, int, int, int)
+	 * @see org.jnode.awt.util.BitmapGraphics#doCopyArea(int, int, int, int,
+	 *      int, int)
 	 */
-	protected void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width, int height) {
+	protected void doCopyArea(int x, int y, int width, int height, int dx,
+			int dy) {
+		// TODO Implement me
+	}
+
+	/**
+	 * @see org.jnode.awt.util.BitmapGraphics#doDrawImage(java.awt.image.Raster,
+	 *      int, int, int, int, int, int)
+	 */
+	protected void doDrawImage(Raster src, int srcX, int srcY, int dstX,
+			int dstY, int width, int height) {
 		vgaIO.setGRAF(1, 0);
 		vgaIO.setGRAF(8, 0xFF);
 
@@ -98,7 +111,17 @@ public class VGABitmapGraphics extends BitmapGraphics {
 	}
 
 	/**
-	 * @see org.jnode.awt.util.BitmapGraphics#doDrawLine(int, int, int, int, int)
+	 * @see org.jnode.awt.util.BitmapGraphics#doDrawImage(java.awt.image.Raster,
+	 *      int, int, int, int, int, int, int)
+	 */
+	protected void doDrawImage(Raster src, int srcX, int srcY, int dstX,
+			int dstY, int width, int height, int bgColor) {
+		doDrawImage(src, srcX, srcY, dstX, dstY, width, height);
+	}
+
+	/**
+	 * @see org.jnode.awt.util.BitmapGraphics#doDrawLine(int, int, int, int,
+	 *      int)
 	 */
 	protected void doDrawLine(int x, int y, int lineWidth, int color, int mode) {
 		final int ofsY = y * 80;
@@ -124,7 +147,8 @@ public class VGABitmapGraphics extends BitmapGraphics {
 	}
 
 	/**
-	 * @see org.jnode.awt.util.BitmapGraphics#doDrawPixels(int, int, int, int, int)
+	 * @see org.jnode.awt.util.BitmapGraphics#doDrawPixels(int, int, int, int,
+	 *      int)
 	 */
 	protected void doDrawPixels(int x, int y, int count, int color, int mode) {
 		for (int i = 0; i < count; i++) {
@@ -133,14 +157,6 @@ public class VGABitmapGraphics extends BitmapGraphics {
 			vgaIO.setGRAF(8, bit);
 			mem.orByte(offset, (byte) 0xFF, 1);
 			x++;
-		}
-	}
-
-	private int divroundup(int num, int div) {
-		if (num % div == 0) {
-			return num / div;
-		} else {
-			return (num / div) + 1;
 		}
 	}
 }

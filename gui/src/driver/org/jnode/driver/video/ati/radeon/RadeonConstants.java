@@ -647,6 +647,8 @@ public interface RadeonConstants {
 
     public static final int CP_IB_BUFSZ = 0x073C;
 
+    public static final int CP_CSQ_CNTL = 0x0740;
+
     public static final int SCRATCH_REG0 = 0x15E0;
 
     public static final int GUI_SCRATCH_REG0 = 0x15E0;

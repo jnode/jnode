@@ -115,6 +115,13 @@ public class JNodeBufferedImageGraphics extends AbstractSurfaceGraphics {
 		}
 
 		/**
+		 * @see org.jnode.driver.video.Surface#copyArea(int, int, int, int, int, int)
+		 */
+		public void copyArea(int x, int y, int width, int height, int dx, int dy) {
+			bitmapGraphics.copyArea(x, y, width, height, dx, dy);
+		}
+
+		/**
 		 * Draw an image to this surface
 		 * @param src
 		 * @param srcX

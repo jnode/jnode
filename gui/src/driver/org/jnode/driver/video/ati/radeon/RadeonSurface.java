@@ -22,16 +22,18 @@ public class RadeonSurface extends AbstractSurface {
     private final ColorModel colorModel;
     private final RadeonCore kernel;
     private final MemoryResource screen;
+    private final RadeonAcceleration accel;
     
     /**
      * Initialize this instance.
      */
-    public RadeonSurface(RadeonCore kernel, RadeonConfiguration config, BitmapGraphics bitmapGraphics, MemoryResource screen) {
+    public RadeonSurface(RadeonCore kernel, RadeonConfiguration config, BitmapGraphics bitmapGraphics, MemoryResource screen, RadeonAcceleration accel) {
         super(config.getScreenWidth(), config.getScreenHeight());
         this.kernel = kernel;
         this.bitmapGraphics = bitmapGraphics;
         this.colorModel = config.getColorModel();
         this.screen = screen;
+        this.accel = accel;
     }
     
     /**
@@ -50,12 +52,12 @@ public class RadeonSurface extends AbstractSurface {
         return color.getRGB();
     }
     
-    /**
-     * @see org.jnode.driver.video.util.AbstractSurface#drawPixel(int, int, int, int)
-     */
-    protected void drawPixel(int x, int y, int color, int mode) {
-		bitmapGraphics.drawPixels(x, y, 1, color, mode);
-    }
+	/**
+	 * @see org.jnode.driver.video.Surface#copyArea(int, int, int, int, int, int)
+	 */
+	public void copyArea(int x, int y, int width, int height, int dx, int dy) {
+		bitmapGraphics.copyArea(x, y, width, height, dx, dy);
+	}
     
     /**
      * @see org.jnode.driver.video.Surface#drawCompatibleRaster(java.awt.image.Raster, int, int, int, int, int, int, java.awt.Color)
@@ -67,6 +69,13 @@ public class RadeonSurface extends AbstractSurface {
 		} else {
 			bitmapGraphics.drawImage(raster, srcX, srcY, dstX, dstY, width, height, convertColor(bgColor));
 		}
+    }
+    
+    /**
+     * @see org.jnode.driver.video.util.AbstractSurface#drawPixel(int, int, int, int)
+     */
+    protected void drawPixel(int x, int y, int color, int mode) {
+		bitmapGraphics.drawPixels(x, y, 1, color, mode);
     }
     
     /**

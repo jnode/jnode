@@ -31,30 +31,29 @@ import org.jnode.vm.Address;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class NVidiaCore extends AbstractSurface implements NVidiaConstants, DisplayDataChannelAPI {
-
-	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
-	private final NVidiaDriver driver;
-	private FrameBufferConfiguration config;
-	private final MemoryResource mmio;
-	private final MemoryResource videoRam;
-	private int bitsPerPixel = 32;
-	private int bytesPerLine;
-	private BitmapGraphics bitmapGraphics;
-	private final NVidiaVgaIO vgaIO;
-	private final NVidiaVgaState oldVgaState = new NVidiaVgaState();
-	private final int architecture;
-	/** Size of card memory in MB */
-	private final int memSize;
-	private final int DDCBase = 0x3e;
-	private final int CrystalFreqKHz;
-	private final int MaxVClockFreqKHz;
-	/** Hardware cursor implementation */
-	private final NVidiaHardwareCursor hwCursor;
 	/** Acceleration functions */
 	private final NVidiaAcceleration acc;
+	private final int architecture;
+	private BitmapGraphics bitmapGraphics;
+	private int bitsPerPixel = 32;
+	private int bytesPerLine;
+	private FrameBufferConfiguration config;
+	private final int CrystalFreqKHz;
+	private final int DDCBase = 0x3e;
+	private final NVidiaDriver driver;
+	/** Hardware cursor implementation */
+	private final NVidiaHardwareCursor hwCursor;
+	/** My logger */
+	private final Logger log = Logger.getLogger(getClass());
+	private final int MaxVClockFreqKHz;
+	/** Size of card memory in MB */
+	private final int memSize;
+	private final MemoryResource mmio;
+	private final NVidiaVgaState oldVgaState = new NVidiaVgaState();
 	/** Should acceleration be used */
 	private final boolean useAcc = true;
+	private final NVidiaVgaIO vgaIO;
+	private final MemoryResource videoRam;
 
 	/**
 	 * @param driver
@@ -111,6 +110,296 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 		log.debug("Memory size     =" + memSize + "MB");
 		log.debug("CrystalFreqKHz  =" + CrystalFreqKHz);
 		log.debug("MaxVClockFreqKHz=" + MaxVClockFreqKHz);
+	}
+
+	/**
+	 * Calculate the best VClock settings
+	 * 
+	 * @param clockIn
+	 * @return The best values in the form of { M, N, P, clock }
+	 */
+	private int[] calcVCLock(int clockIn) {
+		int DeltaOld = Integer.MAX_VALUE;
+		final int VClk = clockIn;
+		final int lowM;
+		final int highM;
+		final boolean isNV3 = (architecture < NV04A);
+		if (CrystalFreqKHz == 14318) {
+			lowM = 8;
+			highM = 14 - (isNV3 ? 1 : 0);
+		} else {
+			lowM = 7;
+			highM = 13 - (isNV3 ? 1 : 0);
+		}
+		final int highP = 4 - (isNV3 ? 1 : 0);
+		final int best[] = new int[4];
+		for (int P = 0; P <= highP; P++) {
+			int Freq = VClk << P;
+			if ((Freq >= 128000) && (Freq <= MaxVClockFreqKHz)) {
+				for (int M = lowM; M <= highM; M++) {
+					final int N = (VClk * M / CrystalFreqKHz) << P;
+					final int DeltaNew;
+					Freq = (CrystalFreqKHz * N / M) >> P;
+					if (Freq > VClk) {
+						DeltaNew = Freq - VClk;
+					} else {
+						DeltaNew = VClk - Freq;
+					}
+					if (DeltaNew < DeltaOld) {
+						best[0] = M;
+						best[1] = N;
+						best[2] = P;
+						best[3] = Freq;
+						DeltaOld = DeltaNew;
+					}
+				}
+			}
+		}
+		if (DeltaOld == Integer.MAX_VALUE) {
+			throw new RuntimeException("Cannot find a suitable VClock");
+		} else {
+			return best;
+		}
+	}
+
+	/**
+	 * Close the SVGA screen
+	 * 
+	 * @see org.jnode.driver.video.Surface#close()
+	 */
+	public synchronized void close() {
+	    log.debug("close");
+		hwCursor.closeCursor();
+		final DpmsState dpmsState = getDpms();
+		log.debug("Old DPMS state: " + dpmsState);
+		setDpms(DpmsState.OFF);
+		vgaIO.unlock();
+	    log.debug("restore old VGA state");
+		oldVgaState.restoreToVGA(vgaIO);
+	    log.debug("restore DPMS state");
+		setDpms(dpmsState);
+
+		// For debugging purposes
+		//final NVidiaVgaState debugState = new NVidiaVgaState();
+		//debugState.saveFromVGA(vgaIO);
+		//log.debug("Restored state: " + debugState);
+		// End of debugging purposes
+
+		driver.close(this);
+		super.close();
+		log.debug("End of close");
+	}
+
+	/**
+	 * Terminate a DDC1 readout
+	 */
+	public void closeDDC1() {
+		// Disable access to extended registers
+		//vgaIO.lock();
+	}
+
+	/**
+	 * @see org.jnode.driver.video.util.AbstractSurface#convertColor(java.awt.Color)
+	 */
+	protected int convertColor(Color color) {
+		return color.getRGB();
+	}
+
+	/**
+	 * @see org.jnode.driver.video.Surface#copyArea(int, int, int, int, int, int)
+	 */
+	public void copyArea(int x, int y, int width, int height, int dx, int dy) {
+		bitmapGraphics.copyArea(x, y, width, height, dx, dy);
+	}
+
+	/**
+	 * @see org.jnode.driver.video.Surface#drawCompatibleRaster(java.awt.image.Raster, int, int, int, int, int, int, java.awt.Color)
+	 */
+	public final void drawCompatibleRaster(Raster raster, int srcX, int srcY, int dstX, int dstY, int width, int height, Color bgColor) {
+		if (bgColor == null) {
+			bitmapGraphics.drawImage(raster, srcX, srcY, dstX, dstY, width, height);
+		} else {
+			bitmapGraphics.drawImage(raster, srcX, srcY, dstX, dstY, width, height, convertColor(bgColor));
+		}
+	}
+
+	/**
+	 * @see org.jnode.driver.video.util.AbstractSurface#drawPixel(int, int, int, int)
+	 */
+	protected final void drawPixel(int x, int y, int color, int mode) {
+		bitmapGraphics.drawPixels(x, y, 1, color, mode);
+	}
+	/**
+	 * @see org.jnode.driver.video.util.AbstractSurface#fillRect(int, int, int, int, int, int)
+	 */
+	protected void fillRect(int x, int y, int w, int h, int color, int mode) {
+		final int screenWidth = config.getScreenWidth();
+		if (x + w >= screenWidth) {
+			w = screenWidth - x;				
+		}
+		if (useAcc && (mode == PAINT_MODE)) {
+			acc.setupRectangle(color);
+			acc.fillRectangle(x, y, w, h);
+		} else {
+			if ((x == 0) && (w == screenWidth)) {
+				bitmapGraphics.drawPixels(0, y, screenWidth * height, color, mode);
+			} else {
+				super.fillRect(x, y, w, h, color, mode);
+			}
+		}
+	}
+
+	/**
+	 * @see org.jnode.driver.video.Surface#getColorModel()
+	 */
+	public ColorModel getColorModel() {
+		return config.getColorModel();
+	}
+
+	/**
+	 * @see org.jnode.driver.video.ddc.DisplayDataChannelAPI#getDDC1Bit()
+	 */
+	public boolean getDDC1Bit() {
+		/* wait for Vsync */
+		while ((vgaIO.getSTAT() & 0x08) != 0) { /* wait */
+		}
+		while ((vgaIO.getSTAT() & 0x08) == 0) { /* wait */
+		}
+
+		/* Get the result */
+		final int val = vgaIO.getCRT(DDCBase);
+		//log.debug("getDDC1Bit: val=0x" + NumberUtils.hex(val, 2));
+		return ((val & DDC_SDA_READ_MASK) != 0);
+	}
+
+	/**
+	 * Gets the current DPMS state
+	 * 
+	 * @return
+	 */
+	private DpmsState getDpms() {
+		final boolean display = ((vgaIO.getSEQ(NVSEQX_CLKMODE) & 0x20) == 0);
+		final int repaint1 = vgaIO.getCRT(NVCRTCX_REPAINT1);
+		final boolean hsync = ((repaint1 & 0x80) == 0);
+		final boolean vsync = ((repaint1 & 0x40) == 0);
+		return new DpmsState(display, hsync, vsync);
+	}
+
+	/**
+	 * Gets the hardware cursor implementation
+	 */
+	public NVidiaHardwareCursor getHardwareCursor() {
+		return hwCursor;
+	}
+
+	/**
+	 * Detect the size of installed memory.
+	 * 
+	 * @return Size in MB.
+	 */
+	private final int getMemorySize() {
+		final int size;
+		if (architecture == NV04A) {
+			final int strapinfo = vgaIO.getReg32(NV32_NV4STRAPINFO);
+
+			if ((strapinfo & 0x00000100) != 0) {
+				/* Unified memory architecture used */
+				log.info("INFO: NV4 architecture chip with UMA detected");
+				size = ((((strapinfo & 0x0000f000) >> 12) * 2) + 2);
+
+			} else {
+				/* private memory architecture used */
+				switch (strapinfo & 0x00000003) {
+					case 0 :
+						size = 32;
+						break;
+					case 1 :
+						size = 4;
+						break;
+					case 2 :
+						size = 8;
+						break;
+					case 3 :
+						size = 16;
+						break;
+					default :
+						// Cannot get here, but just to keep the compiler silent.
+						size = 8;
+				}
+			}
+		} else {
+			// NV10, NV20
+			//final int dev_manID = CFGR(DEVID);
+			final int strapinfo = vgaIO.getReg32(NV32_NV10STRAPINFO);
+
+			//case 0x01a010de: /* Nvidia GeForce2 Integrated GPU */
+			//	size = (((CFGR(GF2IGPU) & 0x000007c0) >> 6) + 1);
+			//	break;
+			//case 0x01f010de: /* Nvidia GeForce4 MX Integrated GPU */
+			//	size = (((CFGR(GF4MXIGPU) & 0x000007f0) >> 4) + 1);
+			//remove this line if det. is OK: int amt = pciReadLong(pciTag(0, 0, 1), 0x84);
+			//	break;
+			switch ((strapinfo & 0x0ff00000) >> 20) {
+				case 2 :
+					size = 2;
+					break;
+				case 4 :
+					size = 4;
+					break;
+				case 8 :
+					size = 8;
+					break;
+				case 16 :
+					size = 16;
+					break;
+				case 32 :
+					size = 32;
+					break;
+				case 64 :
+					size = 64;
+					break;
+				case 128 :
+					size = 128;
+					break;
+				default :
+					size = 16;
+					log.info("NV10/20 architecture chip with unknown RAM amount detected, setting 16Mb");
+					break;
+			}
+		}
+		return size;
+	}
+
+	/**
+	 * Gets the start address of the video memory
+	 */
+	final int getVideoStartAddress() {
+		int startadd = 0;
+		if (architecture < NV10A) {
+			/* upto 32Mb RAM adressing: must be used this way on pre-NV10! */
+
+			/* set standard registers */
+			/* (NVidia: startadress in 32bit words (b2 - b17) */
+			startadd |= ((vgaIO.getCRT(NVCRTCX_FBSTADDL) & 0xFF) << 2);
+			startadd |= ((vgaIO.getCRT(NVCRTCX_FBSTADDH) & 0xFF) << 10);
+
+			/* set extended registers */
+			/* NV4 extended bits: (b18-22) */
+			int temp = vgaIO.getCRT(NVCRTCX_REPAINT0) & 0x1f;
+			startadd |= (temp << 18);
+			/* NV4 extended bits: (b23-24) */
+			temp = vgaIO.getCRT(NVCRTCX_HEB) & 0x60;
+			startadd |= (temp << 18);
+		} else {
+			/* upto 4Gb RAM adressing: must be used on NV10 and later! */
+			/*
+			 * NOTE: While this register also exists on pre-NV10 cards, it will wrap-around at 16Mb boundaries!!
+			 */
+
+			/* 30bit adress in 32bit words */
+			startadd = vgaIO.getReg32(NV32_NV10FBSTADD32) & 0xfffffffc;
+		}
+		return startadd;
 	}
 
 	/**
@@ -193,150 +482,11 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 	}
 
 	/**
-	 * Close the SVGA screen
-	 * 
-	 * @see org.jnode.driver.video.Surface#close()
-	 */
-	public synchronized void close() {
-	    log.debug("close");
-		hwCursor.closeCursor();
-		final DpmsState dpmsState = getDpms();
-		log.debug("Old DPMS state: " + dpmsState);
-		setDpms(DpmsState.OFF);
-		vgaIO.unlock();
-	    log.debug("restore old VGA state");
-		oldVgaState.restoreToVGA(vgaIO);
-	    log.debug("restore DPMS state");
-		setDpms(dpmsState);
-
-		// For debugging purposes
-		//final NVidiaVgaState debugState = new NVidiaVgaState();
-		//debugState.saveFromVGA(vgaIO);
-		//log.debug("Restored state: " + debugState);
-		// End of debugging purposes
-
-		driver.close(this);
-		super.close();
-		log.debug("End of close");
-	}
-
-	/**
 	 * Release all resources
 	 */
 	final void release() {
 		mmio.release();
 		videoRam.release();
-	}
-
-	/**
-	 * @see org.jnode.driver.video.util.AbstractSurface#convertColor(java.awt.Color)
-	 */
-	protected int convertColor(Color color) {
-		return color.getRGB();
-	}
-
-	/**
-	 * @see org.jnode.driver.video.util.AbstractSurface#drawPixel(int, int, int, int)
-	 */
-	protected final void drawPixel(int x, int y, int color, int mode) {
-		bitmapGraphics.drawPixels(x, y, 1, color, mode);
-	}
-
-	/**
-	 * @see org.jnode.driver.video.Surface#drawCompatibleRaster(java.awt.image.Raster, int, int, int, int, int, int, java.awt.Color)
-	 */
-	public final void drawCompatibleRaster(Raster raster, int srcX, int srcY, int dstX, int dstY, int width, int height, Color bgColor) {
-		if (bgColor == null) {
-			bitmapGraphics.drawImage(raster, srcX, srcY, dstX, dstY, width, height);
-		} else {
-			bitmapGraphics.drawImage(raster, srcX, srcY, dstX, dstY, width, height, convertColor(bgColor));
-		}
-	}
-
-	/**
-	 * @see org.jnode.driver.video.Surface#getColorModel()
-	 */
-	public ColorModel getColorModel() {
-		return config.getColorModel();
-	}
-
-	private void setPitch(int bytesPerLine) {
-		final int offset = bytesPerLine / 8;
-		//log.info("setPitch: offset 0x" + NumberUtils.hex(offset) + "
-		// bytesPerLine 0x" + NumberUtils.hex(bytesPerLine));
-		//program the card!
-		vgaIO.setCRT(NVCRTCX_PITCHL, offset & 0x00ff);
-		final int temp = vgaIO.getCRT(NVCRTCX_REPAINT0);
-		vgaIO.setCRT(NVCRTCX_REPAINT0, (temp & 0x1f) | ((offset & 0x0700) >> 3));
-	}
-
-	/**
-	 * Sets the start address of the video memory
-	 * 
-	 * @param startadd
-	 */
-	private void setVideoStartAddress(int startadd) {
-		if (architecture < NV10A) {
-			/* upto 32Mb RAM adressing: must be used this way on pre-NV10! */
-
-			/* set standard registers */
-			/* (NVidia: startadress in 32bit words (b2 - b17) */
-			vgaIO.setCRT(NVCRTCX_FBSTADDL, (startadd >> 2) & 0xFF);
-			vgaIO.setCRT(NVCRTCX_FBSTADDH, (startadd >> 10) & 0xFF);
-
-			/* set extended registers */
-			/* NV4 extended bits: (b18-22) */
-			int temp = vgaIO.getCRT(NVCRTCX_REPAINT0) & 0xE0;
-			vgaIO.setCRT(NVCRTCX_REPAINT0, temp | ((startadd >> 18) & 0x1f));
-			/* NV4 extended bits: (b23-24) */
-			temp = vgaIO.getCRT(NVCRTCX_HEB) & 0xdf;
-			vgaIO.setCRT(NVCRTCX_HEB, temp | ((startadd >> 18) & 0x20));
-			//temp = (CRTCR(HEB) & 0x9f);
-			//CRTCW(HEB, (temp | ((startadd & 0x01800000) >> 18)));
-		} else {
-			/* upto 4Gb RAM adressing: must be used on NV10 and later! */
-			/*
-			 * NOTE: While this register also exists on pre-NV10 cards, it will wrap-around at 16Mb boundaries!!
-			 */
-
-			/* 30bit adress in 32bit words */
-			vgaIO.setReg32(NV32_NV10FBSTADD32, startadd & 0xfffffffc);
-		}
-
-		int temp = vgaIO.getATT(NVATBX_HORPIXPAN) & 0xf9;
-		vgaIO.setATT(NVATBX_HORPIXPAN, temp | ((startadd & 3) << 1));
-	}
-
-	/**
-	 * Gets the start address of the video memory
-	 */
-	final int getVideoStartAddress() {
-		int startadd = 0;
-		if (architecture < NV10A) {
-			/* upto 32Mb RAM adressing: must be used this way on pre-NV10! */
-
-			/* set standard registers */
-			/* (NVidia: startadress in 32bit words (b2 - b17) */
-			startadd |= ((vgaIO.getCRT(NVCRTCX_FBSTADDL) & 0xFF) << 2);
-			startadd |= ((vgaIO.getCRT(NVCRTCX_FBSTADDH) & 0xFF) << 10);
-
-			/* set extended registers */
-			/* NV4 extended bits: (b18-22) */
-			int temp = vgaIO.getCRT(NVCRTCX_REPAINT0) & 0x1f;
-			startadd |= (temp << 18);
-			/* NV4 extended bits: (b23-24) */
-			temp = vgaIO.getCRT(NVCRTCX_HEB) & 0x60;
-			startadd |= (temp << 18);
-		} else {
-			/* upto 4Gb RAM adressing: must be used on NV10 and later! */
-			/*
-			 * NOTE: While this register also exists on pre-NV10 cards, it will wrap-around at 16Mb boundaries!!
-			 */
-
-			/* 30bit adress in 32bit words */
-			startadd = vgaIO.getReg32(NV32_NV10FBSTADD32) & 0xfffffffc;
-		}
-		return startadd;
 	}
 
 	private void setDpms(DpmsState state) {
@@ -368,50 +518,28 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 		vgaIO.setCRT(NVCRTCX_REPAINT1, repaint1);
 	}
 
-	/**
-	 * Gets the current DPMS state
-	 * 
-	 * @return
-	 */
-	private DpmsState getDpms() {
-		final boolean display = ((vgaIO.getSEQ(NVSEQX_CLKMODE) & 0x20) == 0);
-		final int repaint1 = vgaIO.getCRT(NVCRTCX_REPAINT1);
-		final boolean hsync = ((repaint1 & 0x80) == 0);
-		final boolean vsync = ((repaint1 & 0x40) == 0);
-		return new DpmsState(display, hsync, vsync);
-	}
-
-	/**
-	 * Start a DDC1 readout
-	 */
-	public void setupDDC1() {
-		// Enable access to extended registers
-		//vgaIO.unlock();
-		vgaIO.setCRT(NVCRTCX_LOCK, 0x57);
-	}
-
-	/**
-	 * Terminate a DDC1 readout
-	 */
-	public void closeDDC1() {
-		// Disable access to extended registers
-		//vgaIO.lock();
-	}
-
-	/**
-	 * @see org.jnode.driver.video.ddc.DisplayDataChannelAPI#getDDC1Bit()
-	 */
-	public boolean getDDC1Bit() {
-		/* wait for Vsync */
-		while ((vgaIO.getSTAT() & 0x08) != 0) { /* wait */
+	private final void setPalette(float brightness) {
+		vgaIO.setReg8(NV8_PALMASK, 0xff);
+		for (int i = 0; i < 256; i++) {
+			int v = (int) (i * brightness);
+			if (v > 255) {
+				v = 255;
+			}
+			vgaIO.setDACWriteIndex(i);
+			vgaIO.setDACData(v); // r
+			vgaIO.setDACData(v); // g
+			vgaIO.setDACData(v); // b
 		}
-		while ((vgaIO.getSTAT() & 0x08) == 0) { /* wait */
-		}
+	}
 
-		/* Get the result */
-		final int val = vgaIO.getCRT(DDCBase);
-		//log.debug("getDDC1Bit: val=0x" + NumberUtils.hex(val, 2));
-		return ((val & DDC_SDA_READ_MASK) != 0);
+	private void setPitch(int bytesPerLine) {
+		final int offset = bytesPerLine / 8;
+		//log.info("setPitch: offset 0x" + NumberUtils.hex(offset) + "
+		// bytesPerLine 0x" + NumberUtils.hex(bytesPerLine));
+		//program the card!
+		vgaIO.setCRT(NVCRTCX_PITCHL, offset & 0x00ff);
+		final int temp = vgaIO.getCRT(NVCRTCX_REPAINT0);
+		vgaIO.setCRT(NVCRTCX_REPAINT0, (temp & 0x1f) | ((offset & 0x0700) >> 3));
 	}
 
 	private void setPLL(DisplayMode mode) {
@@ -427,56 +555,6 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 
 		// program new frequency
 		vgaIO.setReg32(NVDAC_PIXPLLC, ((p << 16) | (n << 8) | m));
-	}
-
-	/**
-	 * Calculate the best VClock settings
-	 * 
-	 * @param clockIn
-	 * @return The best values in the form of { M, N, P, clock }
-	 */
-	private int[] calcVCLock(int clockIn) {
-		int DeltaOld = Integer.MAX_VALUE;
-		final int VClk = clockIn;
-		final int lowM;
-		final int highM;
-		final boolean isNV3 = (architecture < NV04A);
-		if (CrystalFreqKHz == 14318) {
-			lowM = 8;
-			highM = 14 - (isNV3 ? 1 : 0);
-		} else {
-			lowM = 7;
-			highM = 13 - (isNV3 ? 1 : 0);
-		}
-		final int highP = 4 - (isNV3 ? 1 : 0);
-		final int best[] = new int[4];
-		for (int P = 0; P <= highP; P++) {
-			int Freq = VClk << P;
-			if ((Freq >= 128000) && (Freq <= MaxVClockFreqKHz)) {
-				for (int M = lowM; M <= highM; M++) {
-					final int N = (VClk * M / CrystalFreqKHz) << P;
-					final int DeltaNew;
-					Freq = (CrystalFreqKHz * N / M) >> P;
-					if (Freq > VClk) {
-						DeltaNew = Freq - VClk;
-					} else {
-						DeltaNew = VClk - Freq;
-					}
-					if (DeltaNew < DeltaOld) {
-						best[0] = M;
-						best[1] = N;
-						best[2] = P;
-						best[3] = Freq;
-						DeltaOld = DeltaNew;
-					}
-				}
-			}
-		}
-		if (DeltaOld == Integer.MAX_VALUE) {
-			throw new RuntimeException("Cannot find a suitable VClock");
-		} else {
-			return best;
-		}
 	}
 
 	private void setTiming(DisplayMode mode) {
@@ -585,122 +663,50 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 		}
 	}
 
-	private final void setPalette(float brightness) {
-		vgaIO.setReg8(NV8_PALMASK, 0xff);
-		for (int i = 0; i < 256; i++) {
-			int v = (int) (i * brightness);
-			if (v > 255) {
-				v = 255;
-			}
-			vgaIO.setDACWriteIndex(i);
-			vgaIO.setDACData(v); // r
-			vgaIO.setDACData(v); // g
-			vgaIO.setDACData(v); // b
-		}
+	/**
+	 * Start a DDC1 readout
+	 */
+	public void setupDDC1() {
+		// Enable access to extended registers
+		//vgaIO.unlock();
+		vgaIO.setCRT(NVCRTCX_LOCK, 0x57);
 	}
 
 	/**
-	 * Gets the hardware cursor implementation
-	 */
-	public NVidiaHardwareCursor getHardwareCursor() {
-		return hwCursor;
-	}
-	/**
-	 * @see org.jnode.driver.video.util.AbstractSurface#fillRect(int, int, int, int, int, int)
-	 */
-	protected void fillRect(int x, int y, int w, int h, int color, int mode) {
-		final int screenWidth = config.getScreenWidth();
-		if (x + w >= screenWidth) {
-			w = screenWidth - x;				
-		}
-		if (useAcc && (mode == PAINT_MODE)) {
-			acc.setupRectangle(color);
-			acc.fillRectangle(x, y, w, h);
-		} else {
-			if ((x == 0) && (w == screenWidth)) {
-				bitmapGraphics.drawPixels(0, y, screenWidth * height, color, mode);
-			} else {
-				super.fillRect(x, y, w, h, color, mode);
-			}
-		}
-	}
-
-	/**
-	 * Detect the size of installed memory.
+	 * Sets the start address of the video memory
 	 * 
-	 * @return Size in MB.
+	 * @param startadd
 	 */
-	private final int getMemorySize() {
-		final int size;
-		if (architecture == NV04A) {
-			final int strapinfo = vgaIO.getReg32(NV32_NV4STRAPINFO);
+	private void setVideoStartAddress(int startadd) {
+		if (architecture < NV10A) {
+			/* upto 32Mb RAM adressing: must be used this way on pre-NV10! */
 
-			if ((strapinfo & 0x00000100) != 0) {
-				/* Unified memory architecture used */
-				log.info("INFO: NV4 architecture chip with UMA detected");
-				size = ((((strapinfo & 0x0000f000) >> 12) * 2) + 2);
+			/* set standard registers */
+			/* (NVidia: startadress in 32bit words (b2 - b17) */
+			vgaIO.setCRT(NVCRTCX_FBSTADDL, (startadd >> 2) & 0xFF);
+			vgaIO.setCRT(NVCRTCX_FBSTADDH, (startadd >> 10) & 0xFF);
 
-			} else {
-				/* private memory architecture used */
-				switch (strapinfo & 0x00000003) {
-					case 0 :
-						size = 32;
-						break;
-					case 1 :
-						size = 4;
-						break;
-					case 2 :
-						size = 8;
-						break;
-					case 3 :
-						size = 16;
-						break;
-					default :
-						// Cannot get here, but just to keep the compiler silent.
-						size = 8;
-				}
-			}
+			/* set extended registers */
+			/* NV4 extended bits: (b18-22) */
+			int temp = vgaIO.getCRT(NVCRTCX_REPAINT0) & 0xE0;
+			vgaIO.setCRT(NVCRTCX_REPAINT0, temp | ((startadd >> 18) & 0x1f));
+			/* NV4 extended bits: (b23-24) */
+			temp = vgaIO.getCRT(NVCRTCX_HEB) & 0xdf;
+			vgaIO.setCRT(NVCRTCX_HEB, temp | ((startadd >> 18) & 0x20));
+			//temp = (CRTCR(HEB) & 0x9f);
+			//CRTCW(HEB, (temp | ((startadd & 0x01800000) >> 18)));
 		} else {
-			// NV10, NV20
-			//final int dev_manID = CFGR(DEVID);
-			final int strapinfo = vgaIO.getReg32(NV32_NV10STRAPINFO);
+			/* upto 4Gb RAM adressing: must be used on NV10 and later! */
+			/*
+			 * NOTE: While this register also exists on pre-NV10 cards, it will wrap-around at 16Mb boundaries!!
+			 */
 
-			//case 0x01a010de: /* Nvidia GeForce2 Integrated GPU */
-			//	size = (((CFGR(GF2IGPU) & 0x000007c0) >> 6) + 1);
-			//	break;
-			//case 0x01f010de: /* Nvidia GeForce4 MX Integrated GPU */
-			//	size = (((CFGR(GF4MXIGPU) & 0x000007f0) >> 4) + 1);
-			//remove this line if det. is OK: int amt = pciReadLong(pciTag(0, 0, 1), 0x84);
-			//	break;
-			switch ((strapinfo & 0x0ff00000) >> 20) {
-				case 2 :
-					size = 2;
-					break;
-				case 4 :
-					size = 4;
-					break;
-				case 8 :
-					size = 8;
-					break;
-				case 16 :
-					size = 16;
-					break;
-				case 32 :
-					size = 32;
-					break;
-				case 64 :
-					size = 64;
-					break;
-				case 128 :
-					size = 128;
-					break;
-				default :
-					size = 16;
-					log.info("NV10/20 architecture chip with unknown RAM amount detected, setting 16Mb");
-					break;
-			}
+			/* 30bit adress in 32bit words */
+			vgaIO.setReg32(NV32_NV10FBSTADD32, startadd & 0xfffffffc);
 		}
-		return size;
+
+		int temp = vgaIO.getATT(NVATBX_HORPIXPAN) & 0xf9;
+		vgaIO.setATT(NVATBX_HORPIXPAN, temp | ((startadd & 3) << 1));
 	}
 
 }
