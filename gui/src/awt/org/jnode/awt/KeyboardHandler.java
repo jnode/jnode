@@ -40,7 +40,14 @@ public class KeyboardHandler implements KeyboardListener {
      * @param event
      */
     public void keyPressed(KeyboardEvent event) {
-        postEvent(KeyEvent.KEY_PRESSED, event.getTime(), event.getModifiers(), event.getKeyCode(), event.getKeyChar());
+        final int key_code = event.getKeyCode();
+        if(event.isAltDown() &&  key_code == KeyEvent.VK_F12){
+            event.consume();
+            JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
+            tk.decRefCount(true);
+        }else{
+            postEvent(KeyEvent.KEY_PRESSED, event.getTime(), event.getModifiers(), key_code, event.getKeyChar());
+        }
     }
 
     /**

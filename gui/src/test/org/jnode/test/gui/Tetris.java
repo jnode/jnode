@@ -1,0 +1,396 @@
+/**
+ * $Id$  
+ */
+package org.jnode.test.gui;
+
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
+import java.awt.Color;
+import java.awt.Image;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.BorderLayout;
+import java.awt.Panel;
+import java.util.Random;
+
+/**
+ * @author Levente Sántha
+ */
+public class Tetris extends Panel implements KeyListener {
+    private static final int[][][][] BLOCKS = {
+        {{{0, 0}, {1, 0}, {2, 0}, {1, 1}}, // * * *
+         {{1, 0}, {0, 1}, {1, 1}, {1, 2}}, //   *
+         {{1, 0}, {0, 1}, {1, 1}, {2, 1}},
+         {{0, 0}, {0, 1}, {1, 1}, {0, 2}}
+        },
+        {{{0, 0}, {1, 0}, {2, 0}, {3, 0}}, // * * * *
+         {{0, 0}, {0, 1}, {0, 2}, {0, 3}},
+         {{0, 0}, {1, 0}, {2, 0}, {3, 0}},
+         {{0, 0}, {0, 1}, {0, 2}, {0, 3}}
+        },
+        {{{0, 0}, {1, 0}, {2, 0}, {0, 1}}, // * * *
+         {{0, 0}, {1, 0}, {1, 1}, {1, 2}}, // *
+         {{2, 0}, {0, 1}, {1, 1}, {2, 1}},
+         {{0, 0}, {0, 1}, {0, 2}, {1, 2}}
+        },
+        {{{0, 0}, {1, 0}, {2, 0}, {2, 1}}, // * * *
+         {{1, 0}, {1, 1}, {0, 2}, {1, 2}}, //     *
+         {{0, 0}, {0, 1}, {1, 1}, {2, 1}},
+         {{0, 0}, {1, 0}, {0, 1}, {0, 2}}
+        },
+        {{{1, 0}, {2, 0}, {0, 1}, {1, 1}}, //   * *
+         {{0, 0}, {0, 1}, {1, 1}, {1, 2}}, // * *
+         {{1, 0}, {2, 0}, {0, 1}, {1, 1}},
+         {{0, 0}, {0, 1}, {1, 1}, {1, 2}}
+        },
+        {{{0, 0}, {1, 0}, {1, 1}, {2, 1}}, // * *
+         {{1, 0}, {0, 1}, {1, 1}, {0, 2}}, //   * *
+         {{0, 0}, {1, 0}, {1, 1}, {2, 1}},
+         {{1, 0}, {0, 1}, {1, 1}, {0, 2}}
+        },
+        {{{0, 0}, {1, 0}, {0, 1}, {1, 1}}, // * *
+         {{0, 0}, {1, 0}, {0, 1}, {1, 1}}, // * *
+         {{0, 0}, {1, 0}, {0, 1}, {1, 1}},
+         {{0, 0}, {1, 0}, {0, 1}, {1, 1}}
+        }
+    };
+    private static final int[][] DIMS = {
+        {3, 2}, {2, 3}, {3, 2}, {2, 3},
+        {4, 1}, {1, 4}, {4, 1}, {1, 4},
+        {3, 2}, {2, 3}, {3, 2}, {2, 3},
+        {3, 2}, {2, 3}, {3, 2}, {2, 3},
+        {3, 2}, {2, 3}, {3, 2}, {2, 3},
+        {3, 2}, {2, 3}, {3, 2}, {2, 3},
+        {2, 2}, {2, 2}, {2, 2}, {2, 2},
+    };
+    private static final int CELL = 20;
+    private static final int WIDTH_C = 10;
+    private static final int HEIGHT_C = 20;
+    private final static Color[] COLORS = {
+        Color.BLACK, Color.YELLOW, Color.RED, Color.CYAN, Color.BLUE, Color.MAGENTA, Color.ORANGE, Color.LIGHT_GRAY, Color.DARK_GRAY
+    };
+    private int[][] WORLD = new int[WIDTH_C + 2][HEIGHT_C + 2];
+    private int next_si = 0;
+    private int si = 0;
+    private int next_bi = 0;
+    private int bi = 0;
+    private int x = 1;
+    private int y = 1;
+    private boolean pause = false;
+    private boolean up;
+    private Thread thread;
+    private int score;
+    private boolean end = false;
+
+    private Image img;
+    private static final Dimension DIM = new Dimension((WIDTH_C + 2) * CELL, (HEIGHT_C + 5 + 2) * CELL);
+    private Random si_rnd = new Random();
+    private Random bi_rnd = new Random();
+
+    public Tetris(){
+        for (int i = 0; i < WIDTH_C + 2; i++) {
+            for (int j = 0; j < HEIGHT_C + 2; j++) {
+                if (i == 0 || j == 0 || i == WIDTH_C + 1 || j == HEIGHT_C + 1)
+                    WORLD[i][j] = COLORS.length - 1;
+                else
+                    WORLD[i][j] = 0;
+            }
+        }
+        addKeyListener(this);
+    }
+
+    private int darken(int i) {
+        int r = i - 64;
+        return r < 0 ? 0 : r;
+    }
+
+    private int lighten(int i) {
+        int r = i + 64;
+        return r > 255 ? 255 : r;
+    }
+
+    public void paintBox(Graphics g, int i, int j, Color c) {
+        Color dc = new Color(darken(c.getRed()), darken(c.getGreen()), darken(c.getBlue()));
+        Color lc = new Color(lighten(c.getRed()), lighten(c.getGreen()), lighten(c.getBlue()));
+        g.setColor(c);
+        g.fillRect(i * CELL, j * CELL, CELL - 1, CELL - 1);
+        g.setColor(dc);
+        g.drawLine(i * CELL, (j + 1) * CELL - 1, (i + 1) * CELL - 1, (j + 1) * CELL - 1);
+        g.drawLine((i + 1) * CELL - 1, (j + 1) * CELL - 1, (i + 1) * CELL - 1, j * CELL);
+        g.setColor(lc);
+        g.drawLine(i * CELL, (j + 1) * CELL - 1, i * CELL, j * CELL);
+        g.drawLine(i * CELL, j * CELL, (i + 1) * CELL - 1, j * CELL);
+    }
+
+    public void update(Graphics g) {
+        paint(g);
+    }
+
+    public void paint(Graphics g) {
+        if (img == null) {
+            img = createImage(DIM.width, DIM.height);
+        }
+        Graphics g2 = img.getGraphics();
+        g2.setColor(COLORS[0]);
+        g2.fillRect(0, 0, DIM.width, DIM.height);
+        for (int i = 0; i < WIDTH_C + 2; i++) {
+            for (int j = 0; j < HEIGHT_C + 2; j++) {
+                int ci = WORLD[i][j];
+                if (ci > 0)
+                    paintBox(g2, i, j, COLORS[ci]);
+            }
+        }
+        {
+            Color c = COLORS[COLORS.length - 1];
+            for (int i = 0; i < WIDTH_C + 2; i++) {
+                paintBox(g2, i, HEIGHT_C + 6, c);
+            }
+            for (int j = 0; j < 4; j++) {
+                paintBox(g2, 0, HEIGHT_C + 2 + j, c);
+                paintBox(g2, 5, HEIGHT_C + 2 + j, c);
+                //paintBox(g2, 6, HEIGHT_C + 2 +j, c );
+                paintBox(g2, WIDTH_C + 1, HEIGHT_C + 2 + j, c);
+            }
+        }
+        if (up) {
+            int[][] b = BLOCKS[si][bi];
+            for (int i = 0; i < b.length; i++) {
+                paintBox(g2, x + b[i][0], y + b[i][1], COLORS[si + 1]);
+            }
+            {
+                g2.setColor(Color.WHITE);
+                g2.drawString("SCORE:", CELL + 2, (HEIGHT_C + 4) * CELL - 4);
+                g2.drawString(String.valueOf(score), 2 * CELL, (HEIGHT_C + 5) * CELL - 4);
+                b = BLOCKS[next_si][next_bi];
+                for (int i = 0; i < b.length; i++) {
+                    paintBox(g2, 7 + b[i][0], HEIGHT_C + 2 + b[i][1], COLORS[next_si + 1]);
+                }
+            }
+        } else if (end) {
+            g2.setColor(Color.BLACK);
+            g2.fillRect(2 * CELL, 9 * CELL, 8 * CELL, 4 * CELL);
+            g2.setColor(Color.WHITE);
+            g2.drawRect(2 * CELL, 9 * CELL, 8 * CELL, 4 * CELL);
+            g2.drawString("GAME OVER! SCORE: " + score, (WIDTH_C - 6) * CELL / 2 + 2, (HEIGHT_C + 2) * CELL / 2);
+        }
+        g2.dispose();
+        g.drawImage(img, 0, 0, this);
+    }
+
+    private void rot(int i) {
+        int t = (bi + i) % 4;
+        if (hasRoom(t, x, y)) {
+            bi = t;
+        }//bi = (x + DIMS[4*si + t][0]) > WIDTH_C + 1 ? bi : t;
+    }
+
+    private void trans(int i) {
+        int t = x + i;
+        if (hasRoom(bi, t, y)) {
+            x = t;
+        }//x = t < 1 ? 1 : (t + DIMS[4*si + bi][0]) > WIDTH_C + 1? WIDTH_C + 1 - DIMS[4*si + bi][0] : t;
+    }
+
+    private void fall() {
+        while (hasRoom(bi, x, y + 1)) y++;
+        thread.interrupt();
+    }
+
+    public void keyPressed(KeyEvent e) {
+        int kc = e.getKeyCode();
+        if(kc == KeyEvent.VK_N){
+            newGame();
+            return;
+        }
+        if(kc == KeyEvent.VK_P){
+            flipPause();
+            return;
+        }
+        if (!up || pause) return;
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_UP:
+                rot(1);
+                break;
+            case KeyEvent.VK_LEFT:
+                trans(-1);
+                break;
+            case KeyEvent.VK_DOWN:
+                rot(3);
+                break;
+            case KeyEvent.VK_RIGHT:
+                trans(1);
+                break;
+            case KeyEvent.VK_SPACE:
+                fall();
+                break;
+            case KeyEvent.VK_N:
+                newGame();
+                break;
+            case KeyEvent.VK_P:
+                flipPause();
+                break;
+            default:
+                return;
+        }
+        repaint();
+    }
+
+    public void newGame() {
+        if (thread != null) {
+            up = false;
+            if (pause) {
+                flipPause();
+            }
+            try {
+                thread.join();
+            } catch (InterruptedException ignore) {
+            }
+        }
+        for (int i = 0; i < WIDTH_C + 2; i++) {
+            for (int j = 0; j < HEIGHT_C + 2; j++) {
+                if (i == 0 || j == 0 || i == WIDTH_C + 1 || j == HEIGHT_C + 1)
+                    WORLD[i][j] = COLORS.length - 1;
+                else
+                    WORLD[i][j] = 0;
+            }
+        }
+        requestFocus();
+        end = false;
+        score = 0;
+        si = si_rnd.nextInt(7);
+        next_si = si_rnd.nextInt(7);
+        bi = bi_rnd.nextInt(4);
+        next_bi = bi_rnd.nextInt(4);
+        x = 1 + bi_rnd.nextInt((WIDTH_C - DIMS[si * 4 + bi][0]));
+        y = 0;
+        final long delay = 50;
+        thread = new Thread(new Runnable() {
+            public void run() {
+                up = true;
+                long before, after, sleep;
+                stop:
+                while (up) {
+                    before = System.currentTimeMillis();
+                    synchronized (Tetris.class) {
+                        while (pause) {
+                            try {
+                                Tetris.class.wait();
+                            } catch (InterruptedException ignore) {
+                            }
+                            if (!up) break stop;
+                        }
+                    }
+                    if (hasRoom(bi, x, y + 1)) {
+                        y++;
+                        repaint();
+                    } else {
+                        newBlock();
+                        if (!hasRoom(bi, x, y)) {
+                            up = false;
+                            end = true;
+                            repaint();
+                        }
+                    }
+                    after = System.currentTimeMillis();
+                    sleep = delay - (after - before);
+                    sleep = sleep < 0 ? delay : sleep;
+                    try {
+                        Thread.sleep(sleep);
+                    } catch (InterruptedException ignore) {
+
+                    }
+                }
+            }
+        });
+        thread.start();
+    }
+
+    private void flipPause() {
+        synchronized (Tetris.class) {
+            pause = !pause;
+            if (!pause)
+                Tetris.class.notifyAll();
+        }
+    }
+
+    private void newBlock() {
+        int[][] b = BLOCKS[si][bi];
+        for (int i = 0; i < b.length; i++) {
+            WORLD[x + b[i][0]][y + b[i][1]] = si + 1;
+        }
+        for (int i = 1; i < HEIGHT_C + 1; i++) {
+            boolean full = true;
+            for (int j = 1; j < WIDTH_C + 1; j++) {
+                if (WORLD[j][i] == 0) {
+                    full = false;
+                    break;
+                }
+            }
+            if (full) {
+                int s = WIDTH_C;
+                for (int j = 2; j < WIDTH_C + 1; j++) {
+                    if (WORLD[j - 1][i] != WORLD[j][i]) {
+                        --s;
+                    }
+                }
+                score += s;
+            }
+            if (full && i > 1) {
+                for (int k = 0; k < i - 1; k++) {
+                    for (int j = 1; j < WIDTH_C + 1; j++) {
+                        WORLD[j][i - k] = WORLD[j][i - k - 1];
+                    }
+                }
+            }
+        }
+        si = next_si;
+        next_si = si_rnd.nextInt(7);
+        bi = next_bi;
+        next_bi = bi_rnd.nextInt(4);
+        x = 1 + bi_rnd.nextInt((WIDTH_C - DIMS[si * 4 + bi][0]));
+        y = 1;
+    }
+
+    private boolean hasRoom(int bi, int x, int y) {
+        boolean hasRoom = true;
+        int[][] b = BLOCKS[si][bi];
+        for (int i = 0; i < b.length; i++) {
+            if (WORLD[x + b[i][0]][y + b[i][1]] != 0) {
+                hasRoom = false;
+                break;
+            }
+        }
+        return hasRoom;
+    }
+
+    public Dimension getPreferredSize() {return DIM;}
+    public Dimension getMinimumSize() {return DIM;}
+    public Dimension getMaximumSize() {return DIM;}
+    public void keyReleased(KeyEvent e) {}
+    public void keyTyped(KeyEvent e) {}
+
+    public static void main(String[] argv) throws InterruptedException{
+        int sleep = 5;
+        try{
+            sleep = Integer.parseInt(argv[0]);
+        }catch(Exception e){
+            //ignore
+        }
+        Frame wnd = new Frame();
+        try {
+
+            Tetris tetris = new Tetris();
+            wnd.add(tetris, BorderLayout.CENTER);
+            wnd.setSize(DIM.width, DIM.height + 3*CELL);
+            wnd.show();
+            tetris.requestFocus();
+            tetris.newGame();
+            Thread.sleep(sleep * 1000);
+
+			wnd.hide();
+        } finally {
+            wnd.dispose();
+        }
+    }
+}
