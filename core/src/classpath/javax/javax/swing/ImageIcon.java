@@ -116,6 +116,11 @@ public class ImageIcon
     return image;
   }
 
+  public void setImage(Image image)
+  {
+    this.image = Toolkit.getDefaultToolkit().createImage(image.getSource());
+  }
+
     public String getDescription() 
   {
     return description;

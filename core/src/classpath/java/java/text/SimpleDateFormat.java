@@ -1,6 +1,6 @@
 /* SimpleDateFormat.java -- A class for parsing/formating simple 
    date constructs
-   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2004
+   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2004, 2005
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -45,8 +45,8 @@ import gnu.java.text.FormatBuffer;
 import gnu.java.text.FormatCharacterIterator;
 import gnu.java.text.StringFormatBuffer;
 
-import java.io.InvalidObjectException;
 import java.io.IOException;
+import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -54,7 +54,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.Locale;
-import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -97,7 +96,8 @@ public class SimpleDateFormat extends DateFormat
      * @param s the size of the field.
      * @param c the character used.
      */
-    public CompiledField(int f, int s, char c) {
+    public CompiledField(int f, int s, char c)
+    {
       field = f;
       size = s;
       character = c;
@@ -137,9 +137,9 @@ public class SimpleDateFormat extends DateFormat
      */
     public String toString()
     {
-      StringBuilder builder;
+      StringBuffer builder;
 
-      builder = new StringBuilder(getClass().getName());
+      builder = new StringBuffer(getClass().getName());
       builder.append("[field=");
       builder.append(field);
       builder.append(", size=");
@@ -169,7 +169,7 @@ public class SimpleDateFormat extends DateFormat
    * @see DateFormatSymbols
    * @serial The localisation data.  May not be null.
    */
-  private DateFormatSymbols formatData;  // formatData
+  private DateFormatSymbols formatData;
 
   /**
    * The date representing the start of the century
@@ -341,7 +341,7 @@ public class SimpleDateFormat extends DateFormat
    */
   public String toString() 
   {
-    StringBuilder output = new StringBuilder(getClass().getName());
+    StringBuffer output = new StringBuffer(getClass().getName());
     output.append("[tokens=");
     output.append(tokens);
     output.append(", formatData=");
@@ -430,7 +430,7 @@ public class SimpleDateFormat extends DateFormat
    *
    * @param pattern the non-localized pattern to use.
    * @param formatData the formatting symbols to use.
-   * @throws NullPointerException if the pattern is null.
+   * @throws NullPointerException if the pattern or formatData is null.
    * @throws IllegalArgumentException if the pattern is invalid.
    */
   public SimpleDateFormat(String pattern, DateFormatSymbols formatData)
@@ -439,6 +439,8 @@ public class SimpleDateFormat extends DateFormat
     calendar = new GregorianCalendar();
     computeCenturyStart ();
     tokens = new ArrayList();
+    if (formatData == null)
+      throw new NullPointerException("formatData");
     this.formatData = formatData;
     compileFormat(pattern);
     this.pattern = pattern;
@@ -1017,7 +1019,11 @@ public class SimpleDateFormat extends DateFormat
 		    found_zone = true;
 		    saw_timezone = true;
 		    TimeZone tz = TimeZone.getTimeZone (strings[0]);
+			    // Check if it's a DST zone or ordinary 
+			    if(k == 3 || k == 4)
 			    calendar.set (Calendar.DST_OFFSET, tz.getDSTSavings());
+			    else
+			      calendar.set (Calendar.DST_OFFSET, 0);
                             offset = tz.getRawOffset ();
 		    pos.setIndex(index + strings[k].length());
 		    break;

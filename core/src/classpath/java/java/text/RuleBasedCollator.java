@@ -1,5 +1,5 @@
 /* RuleBasedCollator.java -- Concrete Collator Class
-   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2004  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -435,10 +435,11 @@ main_parse_loop:
           continue;
         }
 
-	switch (c) {
+	switch (c)
+	  {
 	case '!':
 	  throw new ParseException
-	    ("Modifier '!' is not yet supported by Classpath", i+base_offset);
+	      ("Modifier '!' is not yet supported by Classpath", i + base_offset);
 	case '<':
 	  type = CollationSorter.GREATERP;
 	  break;
@@ -459,7 +460,7 @@ main_parse_loop:
 	  if (ignoreChars)
 	    throw new ParseException
 	      ("comparison list has not yet been started. You may only use"
-	       + "(<,;=&)", i+base_offset);
+		 + "(<,;=&)", i + base_offset);
 	  // Inverse the order of secondaries from now on.
 	  nextIsModifier = true;
 	  type = CollationSorter.INVERSE_SECONDARY;
@@ -472,14 +473,14 @@ main_parse_loop:
 	default:
 	  if (operator < 0)
 	    throw new ParseException
-	      ("operator missing at " + (i+base_offset), i+base_offset);
-	  if (!eatingChars &&
-	      ((c >= 0x21 && c <= 0x2F) 
+		("operator missing at " + (i + base_offset), i + base_offset);
+	    if (! eatingChars
+		&& ((c >= 0x21 && c <= 0x2F) 
 	       || (c >= 0x3A && c <= 0x40)
 	       || (c >= 0x5B && c <= 0x60)
 	       || (c >= 0x7B && c <= 0x7E)))
 	    throw new ParseException
-	      ("unquoted punctuation character '"+c+"'", i+base_offset);
+		("unquoted punctuation character '" + c + "'", i + base_offset);
 
 	  //type = ignoreChars ? CollationSorter.IGNORE : -1;
       sb.append(c);
