@@ -1484,6 +1484,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_goto(int)
      */
     public final void visit_goto(int address) {
+	vstack.push(eContext);
         os.writeJMP(helper.getInstrLabel(address));
     }
 
