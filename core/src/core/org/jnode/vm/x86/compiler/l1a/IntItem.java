@@ -5,6 +5,7 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
+import org.jnode.vm.x86.compiler.*;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
@@ -68,7 +69,7 @@ final class IntItem extends WordItem implements X86CompilerConstants {
         case Kind.REGISTER:
             final X86RegisterPool pool = ec.getPool();
             final Register r = pool.request(JvmType.INT);
-            res = createRegister(r);
+            res = createReg(r);
             pool.transferOwnerTo(r, res);
             break;
 
@@ -80,7 +81,7 @@ final class IntItem extends WordItem implements X86CompilerConstants {
             res = createConst(value);
             break;
 
-        case Kind.FREGISTER:
+        case Kind.FPUSTACK:
             //TODO
             notImplemented();
             break;
@@ -91,14 +92,14 @@ final class IntItem extends WordItem implements X86CompilerConstants {
             res = createStack();
             if (VirtualStack.checkOperandStack) {
                 final VirtualStack stack = ec.getVStack();
-                stack.pushOnOperandStack(res);
+                stack.operandStack.push(res);
             }
             break;
         }
         return res;
     }
 
-    static IntItem createRegister(Register reg) {
+    static IntItem createReg(Register reg) {
         return new IntItem(Kind.REGISTER, reg, 0, 0);
     }
 

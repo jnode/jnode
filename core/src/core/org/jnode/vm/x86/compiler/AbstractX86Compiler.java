@@ -18,6 +18,7 @@ import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.compiler.CompiledMethod;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.x86.X86CpuID;
+import org.jnode.vm.x86.compiler.l1.X86StackManager;
 
 /**
  * Abstract native code compiler for the Intel X86 architecture.
@@ -57,7 +58,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements 
 			final CompiledMethod cm = new CompiledMethod(level);
 			final AbstractX86Stream os = (AbstractX86Stream) nos;
 			// Create the helper
-			final X86CompilerHelper helper = new X86CompilerHelper(os, context, isBootstrap);
+			final X86CompilerHelper helper = new X86CompilerHelper(os, null, context, isBootstrap);
 			// Start an "object"
 			final NativeStream.ObjectInfo objectInfo = os.startObject(context.getVmMethodCodeClass());
 			// Start the code creation

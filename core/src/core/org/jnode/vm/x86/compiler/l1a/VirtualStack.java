@@ -5,6 +5,8 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
+import org.jnode.vm.x86.compiler.AbstractX86StackManager;
+import org.jnode.vm.x86.compiler.JvmType;
 
 /**
  * @author Patrik Reali
@@ -20,24 +22,22 @@ final class VirtualStack {
     static final boolean checkOperandStack = true;
 
     // the virtual stack
-    Item[] stack;
+    private Item[] stack;
 
     // top of stack; stack[tos] is not part of the stack!
-    int tos;
+    private int tos;
 
-    // the real stack (only if checkStackOrder == true)
-    private Item[] operandStack;
-
-    private int operandTos;
-
-    private AbstractX86Stream os;
+    final ItemStack operandStack;
+    
+    final ItemStack fpuStack = new ItemStack(Item.Kind.FPUSTACK);
 
     /**
      * 
      * Constructor; create and initialize stack with default size
      */
     VirtualStack(AbstractX86Stream os) {
-        this.os = os;
+        this.operandStack = checkOperandStack ? new ItemStack(Item.Kind.STACK)
+                : null;
         reset();
     }
 
@@ -45,8 +45,7 @@ final class VirtualStack {
         stack = new Item[ 8];
         tos = 0;
         if (checkOperandStack) {
-            operandStack = new Item[ 8];
-            operandTos = 0;
+            operandStack.reset();
         }
     }
 
@@ -99,22 +98,22 @@ final class VirtualStack {
      *                if the type does not correspond
      */
     Item pop(int type) {
-        if (tos == 0) {
-            // the item requested in not on the virtual stack
-            // but already on the operand stack (it was pushed
-            // outside the current basic block)
-            // thus create a new stack item
-            Item it = createStack(type);
-            if (checkOperandStack) {
-                // insert at the begin of stack
-                // even if the vstack is empty, there
-                // may still be items popped from vstack
-                // that are not popped from operand stack
-                prependToOperandStack(it);
-            }
-            return it;
-            // pushStack(type);
-        }
+        //        if (tos == 0) {
+        //            // the item requested in not on the virtual stack
+        //            // but already on the operand stack (it was pushed
+        //            // outside the current basic block)
+        //            // thus create a new stack item
+        //            Item it = createStack(type);
+        //            if (checkOperandStack) {
+        //                // insert at the begin of stack
+        //                // even if the vstack is empty, there
+        //                // may still be items popped from vstack
+        //                // that are not popped from operand stack
+        //                prependToOperandStack(it);
+        //            }
+        //            return it;
+        //            // pushStack(type);
+        //        }
         tos--;
         Item i = stack[ tos];
         stack[ tos] = null;
@@ -124,14 +123,59 @@ final class VirtualStack {
         return i;
     }
 
-    IntItem popInt() {
+    /**
+     * Pop an item of the stack. If the type is different from INT, an exception
+     * is thrown.
+     * 
+     * @return
+     */
+    final IntItem popInt() {
         // testing in pop and casting here: test is just redundant
-        return (IntItem) pop(Item.JvmType.INT);
+        return (IntItem) pop(JvmType.INT);
     }
 
-    RefItem popRef() {
+    /**
+     * Pop an item of the stack. If the type is different from LONG, an
+     * exception is thrown.
+     * 
+     * @return
+     */
+    final LongItem popLong() {
         // testing in pop and casting here: test is just redundant
-        return (RefItem) pop(Item.JvmType.REFERENCE);
+        return (LongItem) pop(JvmType.LONG);
+    }
+
+    /**
+     * Pop an item of the stack. If the type is different from REFERENCE, an
+     * exception is thrown.
+     * 
+     * @return
+     */
+    final RefItem popRef() {
+        // testing in pop and casting here: test is just redundant
+        return (RefItem) pop(JvmType.REFERENCE);
+    }
+
+    /**
+     * Pop an item of the stack. If the type is different from FLOAT, an
+     * exception is thrown.
+     * 
+     * @return
+     */
+    final FloatItem popFloat() {
+        // testing in pop and casting here: test is just redundant
+        return (FloatItem) pop(JvmType.FLOAT);
+    }
+
+    /**
+     * Pop an item of the stack. If the type is different from REFERENCE, an
+     * exception is thrown.
+     * 
+     * @return
+     */
+    final DoubleItem popDouble() {
+        // testing in pop and casting here: test is just redundant
+        return (DoubleItem) pop(JvmType.DOUBLE);
     }
 
     /**
@@ -153,7 +197,7 @@ final class VirtualStack {
     void push1(Item item) {
         push(item);
         if (checkOperandStack && (item.getKind() == Item.Kind.STACK)) {
-            pushOnOperandStack(item);
+            operandStack.push(item);
         }
     }
 
@@ -161,19 +205,19 @@ final class VirtualStack {
     Item createStack(int type) {
         Item res = null;
         switch (type) {
-        case Item.JvmType.INT:
+        case JvmType.INT:
             res = IntItem.createStack();
             break;
-        case Item.JvmType.REFERENCE:
+        case JvmType.REFERENCE:
             res = RefItem.createStack();
             break;
-        case Item.JvmType.LONG:
+        case JvmType.LONG:
             res = LongItem.createStack();
             break;
-        case Item.JvmType.FLOAT:
+        case JvmType.FLOAT:
             res = FloatItem.createStack();
             break;
-        case Item.JvmType.DOUBLE:
+        case JvmType.DOUBLE:
             res = DoubleItem.createStack();
             break;
         default:
@@ -218,56 +262,70 @@ final class VirtualStack {
         return cnt;
     }
 
-    // operations on the operand stack
-    // used to check sanity
-    private final void growOperandStack() {
-        final Item[] tmp = new Item[ operandStack.length * 2];
-        System.arraycopy(operandStack, 0, tmp, 0, operandStack.length);
-        operandStack = tmp;
-    }
+    //    private void prependToOperandStack(Item item) {
+    //        os.log("prepend");
+    //        Item.myAssert(item.getKind() == Item.Kind.STACK);
+    //
+    //        if (operandTos == operandStack.length) growOperandStack();
+    //
+    //        for (int i = operandTos; i > 0; i--)
+    //            operandStack[ i] = operandStack[ i - 1];
+    //
+    //        operandTos++;
+    //        operandStack[ 0] = item;
+    //    }
+    //
 
-    private void prependToOperandStack(Item item) {
-        os.log("prepend");
-        Item.myAssert(item.getKind() == Item.Kind.STACK);
-
-        if (operandTos == operandStack.length) growOperandStack();
-
-        for (int i = operandTos; i > 0; i--)
-            operandStack[ i] = operandStack[ i - 1];
-
-        operandTos++;
-        operandStack[ 0] = item;
-    }
-
-    void pushOnOperandStack(Item item) {
-        Item.myAssert(item.getKind() == Item.Kind.STACK);
-
-        if (operandTos == operandStack.length) growOperandStack();
-
-        os.log("push " + Integer.toString(item.getType()));
-        operandStack[ operandTos++] = item;
-    }
-
-    void popFromOperandStack(Item item) {
-        if (operandTos <= 0) { throw new Error("OperandStack is empty"); }
-        if (operandStack[ --operandTos] != item) {
-            int i = operandTos - 1;
-            while ((i >= 0) && (operandStack[ i] != item))
-                i--;
-
-            throw new Error("OperandStack[" + operandTos
-                    + "] is not the expected element (found at " + i + ")");
-        }
-        os.log("pop");
-        operandStack[ operandTos] = null;
-    }
-    
     boolean uses(Register reg) {
         for (int i = 0; i < tos; i++) {
-            if (stack[i].uses(reg)) {
-                return true;
-            }
+            if (stack[ i].uses(reg)) { return true; }
         }
         return false;
+    }
+
+    final AbstractX86StackManager createStackMgr() {
+        return new StackManagerImpl();
+    }
+
+    final class StackManagerImpl implements AbstractX86StackManager {
+
+        /**
+         * @see org.jnode.vm.x86.compiler.AbstractX86StackManager#writePUSH(int,
+         *      org.jnode.assembler.x86.Register)
+         */
+        public void writePUSH(int jvmType, Register reg) {
+            final Item item;
+            switch (jvmType) {
+            case JvmType.INT:
+                item = IntItem.createReg(reg);
+                break;
+            case JvmType.REFERENCE:
+                item = RefItem.createRegister(reg);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown JvmType " + jvmType);
+            }
+            push(item);
+        }
+
+        /**
+         * @see org.jnode.vm.x86.compiler.AbstractX86StackManager#writePUSH64(int,
+         *      org.jnode.assembler.x86.Register,
+         *      org.jnode.assembler.x86.Register)
+         */
+        public void writePUSH64(int jvmType, Register lsbReg, Register msbReg) {
+            final Item item;
+            switch (jvmType) {
+            case JvmType.LONG:
+                item = LongItem.createReg(lsbReg, msbReg);
+                break;
+            case JvmType.DOUBLE:
+                item = DoubleItem.createReg(lsbReg, msbReg);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown JvmType " + jvmType);
+            }
+            push(item);
+        }
     }
 }

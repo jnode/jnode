@@ -5,6 +5,7 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
+import org.jnode.vm.x86.compiler.JvmType;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
@@ -21,6 +22,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 
     /**
      * Gets the register the is used by this item.
+     * 
      * @return
      */
     final Register getRegister() {
@@ -58,7 +60,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
             loadToConstant(ec, os, reg);
             break;
 
-        case Kind.FREGISTER:
+        case Kind.FPUSTACK:
             //TODO
             notImplemented();
             break;
@@ -67,7 +69,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
             //TODO: make sure this is on top os stack
             if (VirtualStack.checkOperandStack) {
                 final VirtualStack stack = ec.getVStack();
-                stack.popFromOperandStack(this);
+                stack.operandStack.pop(this);
             }
             os.writePOP(reg);
         }
@@ -77,10 +79,12 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 
     /**
      * Load my constant to the given os.
+     * 
      * @param os
      * @param reg
      */
-    protected abstract void loadToConstant(EmitterContext ec, AbstractX86Stream os, Register reg);
+    protected abstract void loadToConstant(EmitterContext ec,
+            AbstractX86Stream os, Register reg);
 
     /**
      * @see org.jnode.vm.x86.compiler.l1a.Item#load(EmitterContext)
@@ -93,6 +97,23 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
                 final VirtualStack vstack = ec.getVStack();
                 vstack.push(ec);
                 r = pool.request(getType(), this);
+            }
+            myAssert(r != null);
+            loadTo(ec, r);
+        }
+    }
+
+    /**
+     * Load this item to a general purpose register.
+     * 
+     * @param ec
+     */
+    final void loadToGPR(EmitterContext ec) {
+        if (kind != Kind.REGISTER) {
+            Register r = ec.getPool().request(JvmType.INT);
+            if (r == null) {
+                ec.getVStack().push(ec);
+                r = ec.getPool().request(JvmType.INT);
             }
             myAssert(r != null);
             loadTo(ec, r);
@@ -129,7 +150,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
             pushConstant(ec, os);
             break;
 
-        case Kind.FREGISTER:
+        case Kind.FPUSTACK:
             //TODO
             notImplemented();
             break;
@@ -143,7 +164,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
                     // the item is not really pushed and popped
                     // but this checks that it is really the top
                     // element
-                    stack.popFromOperandStack(this);
+                    stack.operandStack.pop(this);
                 }
             }
             break;
@@ -154,12 +175,56 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 
         if (VirtualStack.checkOperandStack) {
             final VirtualStack stack = ec.getVStack();
-            stack.pushOnOperandStack(this);
+            stack.operandStack.push(this);
         }
     }
 
     /**
+     * @see org.jnode.vm.x86.compiler.l1a.Item#pushToFPU(EmitterContext)
+     */
+    final void pushToFPU(EmitterContext ec) {
+        final AbstractX86Stream os = ec.getStream();
+        final VirtualStack stack = ec.getVStack();
+
+        switch (getKind()) {
+        case Kind.REGISTER:
+            os.writePUSH(reg);
+            os.writeFLD32(SP, 0);
+            os.writeLEA(SP, SP, 4);
+            break;
+
+        case Kind.LOCAL:
+            os.writeFLD32(FP, offsetToFP);
+            break;
+
+        case Kind.CONSTANT:
+            pushConstant(ec, os);
+            os.writeFLD32(SP, 0);
+            os.writeLEA(SP, SP, 4);
+            break;
+
+        case Kind.FPUSTACK:
+            //TODO
+            notImplemented();
+            break;
+
+        case Kind.STACK:
+            if (VirtualStack.checkOperandStack) {
+                stack.operandStack.pop(this);
+            }
+            os.writeFLD32(SP, 0);
+            os.writeLEA(SP, SP, 4);
+            break;
+        }
+
+        release(ec);
+        kind = Kind.FPUSTACK;
+        stack.fpuStack.push(this);
+    }
+
+    /**
      * Push my constant on the stack using the given os.
+     * 
      * @param os
      */
     protected abstract void pushConstant(EmitterContext ec, AbstractX86Stream os);
@@ -184,7 +249,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
             // nothing to do
             break;
 
-        case Kind.FREGISTER:
+        case Kind.FPUSTACK:
             notImplemented();
             break;
 
@@ -194,7 +259,6 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
         }
 
         this.reg = null;
-        this.kind = Kind.RELEASED;
     }
 
     /**
@@ -221,5 +285,24 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      */
     final boolean uses(Register reg) {
         return ((kind == Kind.REGISTER) && this.reg.equals(reg));
+    }
+
+    /**
+     * Create a WordItem in a register.
+     * @param jvmType INT, REFERENCE, FLOAT
+     * @param reg
+     * @return
+     */
+    static final WordItem createReg(int jvmType, Register reg) {
+        switch (jvmType) {
+        case JvmType.INT:
+            return IntItem.createReg(reg);
+        case JvmType.REFERENCE:
+            return RefItem.createRegister(reg);
+        case JvmType.FLOAT:
+            return FloatItem.createReg(reg);
+        default:
+            throw new IllegalArgumentException("Invalid type " + jvmType);
+        }
     }
 }
