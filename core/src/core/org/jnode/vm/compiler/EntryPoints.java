@@ -53,8 +53,6 @@ public class EntryPoints extends VmSystemObject {
 
     private final VmInstanceField vmMethodSelectorField;
 
-    private final VmInstanceField vmMethodInvocationCountField;
-
     private final VmInstanceField vmMethodNativeCodeField;
 
     private final VmInstanceField vmConstIMethodRefSelectorField;
@@ -237,8 +235,6 @@ public class EntryPoints extends VmSystemObject {
                     "org.jnode.vm.classmgr.VmMethodCode", true);
             vmMethodSelectorField = (VmInstanceField) testField(vmInstanceMethodClass
                     .getField("selector"));
-            vmMethodInvocationCountField = (VmInstanceField) testField(vmInstanceMethodClass
-                    .getField("invocationCount"));
             vmMethodNativeCodeField = (VmInstanceField) testField(vmInstanceMethodClass
                     .getField("nativeCode"));
 
@@ -542,13 +538,6 @@ public class EntryPoints extends VmSystemObject {
      */
     public final VmInstanceField getVmMemberDeclaringClassField() {
         return this.vmMemberDeclaringClassField;
-    }
-
-    /**
-     * @return Returns the vmMethodInvocationCountField.
-     */
-    public final VmInstanceField getVmMethodInvocationCountField() {
-        return this.vmMethodInvocationCountField;
     }
 
     /**

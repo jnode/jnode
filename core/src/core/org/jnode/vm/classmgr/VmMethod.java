@@ -38,9 +38,6 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
     /** #Slots taken by arguments of this method (including this pointer) */
     private final int argSlotCount;
 
-    /** #Invocations of this method */
-    private int invocationCount;
-
     /** Resolved types for each argument of this method */
     private VmType[] paramTypes;
 
@@ -52,9 +49,6 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
 
     /** The bytecode (if any) */
     private VmByteCode bytecode;
-
-    /** The original bytecode (as loaded byte the classdecoder), (if any) */
-    private VmByteCode originalBytecode;
 
     /** The compiled code (if any) */
     private VmCompiledCode compiledCode;
@@ -128,19 +122,8 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      * 
      * @return The declaring class
      */
-    public VmType getDeclaringClass() {
+    public final VmType getDeclaringClass() {
         return declaringClass;
-    }
-
-    /**
-     * Get the byte-code information for this method as loaded by the
-     * classdecoder. This may return null if this is a native or abstract
-     * method.
-     * 
-     * @return The original bytecode
-     */
-    public VmByteCode getOriginalBytecode() {
-        return originalBytecode;
     }
 
     /**
@@ -150,7 +133,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      * 
      * @return The current bytecode
      */
-    public VmByteCode getBytecode() {
+    public final VmByteCode getBytecode() {
         return bytecode;
     }
 
@@ -160,9 +143,6 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      * @param bc
      */
     final void setBytecode(VmByteCode bc) {
-        if (this.originalBytecode == null) {
-            this.originalBytecode = bc;
-        }
         this.bytecode = bc;
         bc.lock();
     }
@@ -172,7 +152,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      * 
      * @return Length of bytecode
      */
-    public int getBytecodeSize() {
+    public final int getBytecodeSize() {
         return (bytecode == null) ? 0 : bytecode.getLength();
     }
 
@@ -182,7 +162,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      * 
      * @return Method
      */
-    public Member asMember() {
+    public final Member asMember() {
         if (javaMember == null) {
             if (isConstructor()) {
                 javaMember = new Constructor(this);
@@ -221,7 +201,6 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      */
     public final synchronized void recompile() {
         doCompile(nativeCodeOptLevel + 1);
-        invocationCount = 0;
     }
 
     /**
@@ -245,7 +224,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      * @param optLevel
      *            The optimization level
      */
-    private synchronized void doCompile(int optLevel) {
+    private synchronized final void doCompile(int optLevel) {
         if (!declaringClass.isPrepared()) {
             throw new IllegalStateException(
                     "Declaring class must have been prepared");
@@ -292,7 +271,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
         resolveTypes();
     }
 
-    private void resolveTypes() {
+    private final void resolveTypes() {
         if (paramTypes == null) {
             try {
                 Signature sig = new Signature(getSignature(), declaringClass
@@ -310,12 +289,12 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
         }
     }
 
-    public int getNoArguments() {
+    public final int getNoArguments() {
         resolveTypes();
         return paramTypes.length;
     }
 
-    public VmType getArgumentType(int index) {
+    public final VmType getArgumentType(int index) {
         resolveTypes();
         return paramTypes[index];
     }
@@ -326,7 +305,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      * @param argTypes
      * @return boolean
      */
-    protected boolean matchArgumentTypes(VmType[] argTypes) {
+    protected final boolean matchArgumentTypes(VmType[] argTypes) {
         resolveTypes();
         int argTypesLength = (argTypes == null) ? 0 : argTypes.length;
         if (paramTypes.length != argTypesLength) {
@@ -343,7 +322,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
     /**
      * @return VmClass
      */
-    public VmType getReturnType() {
+    public final VmType getReturnType() {
         resolveTypes();
         return returnType;
     }
@@ -380,7 +359,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      * 
      * @return The exceptions this method has declared to throw, never null.
      */
-    public VmExceptions getExceptions() {
+    public final VmExceptions getExceptions() {
         if (exceptions == null) {
             exceptions = new VmExceptions();
         }
@@ -468,7 +447,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      * 
      * @return The selector
      */
-    public int getSelector() {
+    public final int getSelector() {
         return selector;
     }
 
@@ -480,15 +459,6 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      */
     public final int getArgSlotCount() {
         return this.argSlotCount;
-    }
-
-    /**
-     * Gets the number of invocations of this method.
-     * 
-     * @return int
-     */
-    public final int getInvocationCount() {
-        return this.invocationCount;
     }
 
     /**
