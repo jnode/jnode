@@ -18,6 +18,7 @@
         
   <extension point="org.jnode.shell.aliases">
     <alias name="AWTTest"      class="org.jnode.test.gui.AWTTest"/>
+    <alias name="WTTest"       class="org.jnode.test.gui.JNodeWTTest"/>
   </extension>
 
 </plugin>
