@@ -2,6 +2,7 @@
 
   <property name="root.dir"            value="${basedir}/.."/>
   <property name="build.dir"           value="${basedir}/build"/>
+  <property name="cdroms.dir"          value="${build.dir}/cdroms"/>
   <property name="descriptors.dir"     value="${build.dir}/descriptors"/>
   <property name="plugins.dir"         value="${build.dir}/plugins"/>
   <property name="initjars.dir"        value="${build.dir}/initjars"/>
@@ -32,8 +33,9 @@
   <property name="system-plugin-list"  value="${basedir}/conf/system-plugin-list.xml"/>
   <property name="jnode-ver"           value="0.1.6"/>
   <property name="sources.dist.tar.gz" value="${build.dir}/jnodesources-${jnode-ver}.tar.gz"/>
-  <property name="jnode.iso"           value="${build.dir}/jnode.iso"/>
-
+  <property name="jnode-x86.iso"       value="${cdroms.dir}/jnode-x86.iso"/>
+  <property name="jnode-x86-lite.iso"  value="${cdroms.dir}/jnode-x86-lite.iso"/>
+	
   <path id="cp">
     <pathelement location="${ant.jar}"/>
     <pathelement location="${junit.jar}"/>
@@ -160,10 +162,11 @@
 
   <!-- Upload a distribution -->
   <target name="upload" depends="cdrom">
-    <mkdir dir="${build.dir}/upload"/>
-    <gzip src="${jnode.iso}"
-          destfile="${build.dir}/upload/jnode-${jnode-ver}.iso.gz"/>
-    <copy todir="${build.dir}/upload" file="${sources.dist.tar.gz}"/>
+  	<property name="upload.dir" value="${build.dir}/upload"/>
+    <mkdir dir="${upload.dir}"/>
+    <gzip src="${jnode-x86.iso}"
+          destfile="${upload.dir}/jnode-x86-${jnode-ver}.iso.gz"/>
+    <copy todir="${upload.dir}" file="${sources.dist.tar.gz}"/>
     <ftp server="upload.sourceforge.net"
          remotedir="incoming"
          passive="yes"
@@ -171,7 +174,7 @@
          verbose="yes"
          userid="ftp"
          password="ftp">
-      <fileset dir="${build.dir}/upload"/>
+      <fileset dir="${upload.dir}"/>
     </ftp>
   </target>
   
