@@ -3,6 +3,7 @@
  */
 package org.jnode.test;
 
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
@@ -26,4 +27,8 @@ public class InlineTestClass {
 	public final int getX() {
 		return x;
 	}
+	
+	/*public void newTest() {
+		IMTBuilder b = new IMTBuilder();
+	}*/
 }

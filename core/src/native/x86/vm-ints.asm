@@ -182,6 +182,21 @@ int_system_exception:
 	test THREADSWITCHINDICATOR,VmProcessor_TSI_SYSTEM_READY
 	jz near int_die
 	;jmp int_die
+	; Save the exception state
+	mov edi,CURRENTTHREAD
+	SAVEREG VmX86Thread_EXEAX_OFFSET, OLD_EAX
+	SAVEREG VmX86Thread_EXEBX_OFFSET, OLD_EBX
+	SAVEREG VmX86Thread_EXECX_OFFSET, OLD_ECX
+	SAVEREG VmX86Thread_EXEDX_OFFSET, OLD_EDX
+	SAVEREG VmX86Thread_EXEDI_OFFSET, OLD_EDI
+	SAVEREG VmX86Thread_EXESI_OFFSET, OLD_ESI
+	SAVEREG VmX86Thread_EXEBP_OFFSET, OLD_EBP
+	SAVEREG VmX86Thread_EXESP_OFFSET, OLD_ESP
+	SAVEREG VmX86Thread_EXEIP_OFFSET, OLD_EIP
+	SAVEREG VmX86Thread_EXEFLAGS_OFFSET, OLD_EFLAGS
+	mov ecx,cr2
+	mov [edi+VmX86Thread_EXCR2_OFFSET*4],ecx
+	
 	; Setup the user stack to add a return address to the current EIP
 	; and change the current EIP to doSystemException, which will 
 	; save the registers and call SoftByteCodes.systemException
