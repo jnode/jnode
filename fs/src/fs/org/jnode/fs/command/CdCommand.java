@@ -22,7 +22,11 @@ public class CdCommand {
 		ParsedArguments cmdLine = HELP_INFO.parse(args);
 
 		final File dir = ARG_DIR.getFile(cmdLine);
-		System.getProperties().setProperty("user.dir", dir.getAbsolutePath());
+		if (dir.exists() && dir.isDirectory()) {
+			System.getProperties().setProperty("user.dir", dir.getAbsolutePath());
+		} else {
+			System.err.println(dir + " is not a valid directory");
+		}
 	}
 
 }

@@ -27,9 +27,7 @@ import org.jnode.util.QueueProcessor;
 import org.jnode.util.QueueProcessorThread;
 
 /**
- * A FileSystemMounter listens to the DeviceManager and once a Device that
- * implements the BlockDeviceAPI is started, it tries to mount a FileSystem on
- * that device.
+ * A FileSystemMounter listens to the DeviceManager and once a Device that implements the BlockDeviceAPI is started, it tries to mount a FileSystem on that device.
  * 
  * @author epr
  */
@@ -54,11 +52,10 @@ public class FileSystemMounter implements DeviceListener, QueueProcessor {
 	 */
 	public void start() throws PluginException {
 		try {
-			devMan = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);
+			devMan = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
 			devMan.addListener(this);
-			fss = (FileSystemService)InitialNaming.lookup(FileSystemService.NAME);
-			asynchronousMounterThread =
-				new QueueProcessorThread("Asynchronous FS Mounter", devicesWaitingToBeMounted, this);
+			fss = (FileSystemService) InitialNaming.lookup(FileSystemService.NAME);
+			asynchronousMounterThread = new QueueProcessorThread("Asynchronous-FS-Mounter", devicesWaitingToBeMounted, this);
 			asynchronousMounterThread.start();
 		} catch (NameNotFoundException ex) {
 			throw new PluginException("Cannot find DeviceManager", ex);
@@ -81,18 +78,20 @@ public class FileSystemMounter implements DeviceListener, QueueProcessor {
 	public synchronized void deviceStarted(Device device) {
 		// add it to the queue of devices to be mounted only if the action is not
 		// already pending
-		if (!devicesWaitingToBeMounted.contains(device))
+		if (!devicesWaitingToBeMounted.contains(device)) {
 			devicesWaitingToBeMounted.add(device);
+		}
 	}
 
 	/**
 	 * @see org.jnode.driver.DeviceListener#deviceStop(org.jnode.driver.Device)
 	 */
 	public synchronized void deviceStop(Device device) {
-		if (devicesWaitingToBeMounted.contains(device))
+		if (devicesWaitingToBeMounted.contains(device)) {
 			devicesWaitingToBeMounted.remove(device);
+		}
 
-		final FileSystem fs = (FileSystem)devices2FS.get(device);
+		final FileSystem fs = (FileSystem) devices2FS.get(device);
 		if (fs != null) {
 			try {
 				fs.close();
@@ -128,7 +127,7 @@ public class FileSystemMounter implements DeviceListener, QueueProcessor {
 			final byte[] bs = new byte[api.getSectorSize()];
 			api.read(0, bs, 0, bs.length);
 			for (Iterator i = fss.fileSystemTypes().iterator(); i.hasNext();) {
-				final FileSystemType fst = (FileSystemType)i.next();
+				final FileSystemType fst = (FileSystemType) i.next();
 				// 
 				if (fst.supports(api.getPartitionTableEntry(), bs)) {
 					try {
@@ -151,9 +150,9 @@ public class FileSystemMounter implements DeviceListener, QueueProcessor {
 	 * @see org.jnode.util.QueueProcessor#process(java.lang.Object)
 	 */
 	public void process(Object queuedObject) throws Exception {
-		Device device = (Device)queuedObject;
+		Device device = (Device) queuedObject;
 		try {
-			FSBlockDeviceAPI api = (FSBlockDeviceAPI)device.getAPI(FSBlockDeviceAPI.class);
+			FSBlockDeviceAPI api = (FSBlockDeviceAPI) device.getAPI(FSBlockDeviceAPI.class);
 			if (device.implementsAPI(RemovableDeviceAPI.class)) {
 				tryToMount(device, api, true);
 			} else {
