@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.jnode.driver.block.BlockDeviceAPI;
-import org.jnode.fs.FileSystemException;
 
 
 /**
