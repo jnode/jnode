@@ -35,6 +35,9 @@ public class ISO9660FileSystemType implements FileSystemType {
         } else {
             try {
                 final int blockSize = devApi.getSectorSize();
+                if (blockSize < 2048) {
+                    return false;
+                }
                 final int offset = blockSize * 16;
                 final byte[] data = new byte[ blockSize];
                 devApi.read(offset, data, 0, data.length);
