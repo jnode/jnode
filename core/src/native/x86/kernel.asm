@@ -33,7 +33,7 @@ mb_header:
 real_start:
 	mov esp,Lkernel_esp
 	cld
-	call sys_clrscr
+	CLEAR_SCREEN
 
 	cmp eax,0x2BADB002
 	je multiboot_ok
@@ -98,6 +98,7 @@ check_a20:
 
 	; Test for a valid cpu
 	call test_cpuid
+	PRINT_STR cpu_ok_msg
 
 	; Initialize memory manager
 %ifdef BITS32	
@@ -167,7 +168,7 @@ go_user_cs:
 		popf
 	%endif
 
-	call sys_clrscr
+	CLEAR_SCREEN
 
 	; Now start the virtual machine
 	xor ABP,ABP	; Clear the frame ptr
@@ -213,6 +214,7 @@ _kbcmd_accept:
 no_multiboot_loader_msg: db 'No multiboot loader. halt...',0;
 before_start_vm_msg:     db 'Before start_vm',0xd,0xa,0
 after_vm_msg:  			 db 'VM returned with EAX ',0
+cpu_ok_msg:			     db 'CPU tested ok',0xd,0xa,0
 
 multiboot_info:
 	times MBI_SIZE db  0

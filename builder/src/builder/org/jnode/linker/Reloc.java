@@ -270,7 +270,7 @@ public class Reloc {
 		System.out.println("  r_type        : " + getTypeName());
 		System.out.println("  r_info        : " + NumberUtils.hex(r_info));
 		if (hasAddEnd()) {
-			System.out.println("  r_addend      : " + getAddEnd());
+			System.out.println("  r_addend      : " + NumberUtils.hex(getAddEnd()));
 		}
 	}
 

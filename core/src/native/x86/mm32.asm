@@ -38,11 +38,9 @@ Lsetup_mm:
 
 	; Print config
 	PRINT_STR mem_start_str
-	mov eax,[mem_start]
-	call sys_print_eax
+	PRINT_WORD [mem_start]
 	PRINT_STR mem_size_str
-	mov eax,[mem_size]
-	call sys_print_eax
+	PRINT_WORD [mem_size]
 
 ;
 ; Fixup the TSS entry in the GDT
