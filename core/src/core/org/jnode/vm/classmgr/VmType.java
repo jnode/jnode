@@ -11,13 +11,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.jnode.assembler.NativeStream;
+import org.jnode.vm.PragmaLoadStatics;
 import org.jnode.vm.Uninterruptible;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmReflection;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 
-public abstract class VmType extends VmSystemObject implements Uninterruptible {
+public abstract class VmType extends VmSystemObject implements VmStaticsEntry, Uninterruptible {
 
     /**
      * The parent of this class. Normally VmClass instance, during loading
@@ -272,7 +273,8 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
      * 
      * @param bootClasses
      */
-    protected static void loadFromBootClassArray(VmType[] bootClasses) {
+    protected static void loadFromBootClassArray(VmType[] bootClasses)
+    throws PragmaLoadStatics {
         Unsafe.debug("loadFromBootClassArray");
         int count = bootClasses.length;
         for (int i = 0; i < count; i++) {

@@ -115,7 +115,7 @@ public class Device implements ResourceOwner {
 	 * 
 	 * @throws DriverException
 	 */
-	public final void start() throws DriverException {
+	final void start() throws DriverException {
 		if (driver == null) {
 			throw new DriverException("Cannot start without a driver");
 		} else if (manager == null) {

@@ -196,12 +196,18 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	throws PragmaUninterruptible;
 	
 	/**
-	 * Let all objects in this heap make a visit to the given visitor.
+	 * Let a selected set of objects in this heap make a visit to the given visitor.
+	 * The selection is made based on the objectflags. The objectflags are masked
+	 * by flagsMask and the result is compared with flagsValue, if they are equal
+	 * the object is visited.
+	 * 
 	 * @param visitor
-	 * @param locking If true, use lock/unlock while proceeding to the next object. 	 
+	 * @param locking If true, use lock/unlock while proceeding to the next object.
+	 * @param flagsMask 
+	 * @param flagsValue 	 
 	 * @throws PragmaUninterruptible
 	 */
-	protected abstract void walk(ObjectVisitor visitor, boolean locking)
+	protected abstract void walk(ObjectVisitor visitor, boolean locking, int flagsMask, int flagsValue)
 	throws PragmaUninterruptible;
 	
 	/**

@@ -53,6 +53,12 @@ public class X86StreamTest {
 		os.write32(0x1234ABCD);
 		os.write32(0xFFEEDDCC);
 		
+		
+		os.writeJMP(Register.EDX, 15);
+		os.writeADD(Register.EDX, Register.EBX, 5);
+		os.writeSUB(Register.EDX, 3);
+		
+		
 		FileOutputStream fos = new FileOutputStream("test.bin");
 		os.writeTo(fos);
 		fos.close();

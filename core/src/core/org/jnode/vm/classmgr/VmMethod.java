@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
 import org.jnode.vm.Address;
 import org.jnode.vm.PragmaUninterruptible;
 
-public abstract class VmMethod extends VmMember {
+public abstract class VmMethod extends VmMember implements VmStaticsEntry {
 
     /** Address of native code of this method */
     private Address nativeCode;
@@ -366,6 +366,20 @@ public abstract class VmMethod extends VmMember {
         }
     }
 
+    /**
+     * Can this method throw the given exception type.
+     * @param exceptionClass
+     * @return
+     */
+    public final boolean canThrow(Class exceptionClass) {
+        if (exceptions == null) {
+            return false;
+        } else {
+            return exceptions.contains(exceptionClass);
+        }
+    }
+    
+    
     /**
      * Gets the compiled code information of this method (if any)
      * 

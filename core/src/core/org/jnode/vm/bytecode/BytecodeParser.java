@@ -72,6 +72,8 @@ public class BytecodeParser {
 
     private int endPC;
 
+    //private static int[] counters = new int[ 256];
+
     /**
      * @return The padded address
      */
@@ -162,6 +164,7 @@ public class BytecodeParser {
             this.opcode = getu1();
             final int cpIdx;
 
+            //counters[ opcode]++;
             switch (opcode) {
             // -- 0 --
             case 0x00:
@@ -214,10 +217,10 @@ public class BytecodeParser {
                 handler.visit_dconst(1.0);
                 break;
             case 0x10:
-                handler.visit_bipush(gets1());
+                handler.visit_iconst(gets1()); // bipush
                 break;
             case 0x11:
-                handler.visit_sipush(gets2());
+                handler.visit_iconst(gets2()); // sipush
                 break;
             case 0x12:
                 {
@@ -228,7 +231,7 @@ public class BytecodeParser {
                     } else if (o instanceof Float) {
                         handler.visit_fconst(((Float) o).floatValue());
                     } else {
-                        handler.visit_ldc((VmConstString)o);
+                        handler.visit_ldc((VmConstString) o);
                     }
                 }
                 break;
@@ -241,7 +244,7 @@ public class BytecodeParser {
                     } else if (o instanceof Float) {
                         handler.visit_fconst(((Float) o).floatValue());
                     } else {
-                        handler.visit_ldc((VmConstString)o);
+                        handler.visit_ldc((VmConstString) o);
                     }
                 }
                 break;
@@ -1101,5 +1104,13 @@ public class BytecodeParser {
      */
     protected void fireEndMethod() {
         handler.endMethod();
+    }
+
+    public static void dumpStatistics() {
+        /*for (int i = 0; i < 256; i++) {
+            if (counters[ i] != 0) {
+                System.out.println("0x" + Integer.toHexString(i) + "\t" + counters[ i]);
+            }
+        }*/       
     }
 }

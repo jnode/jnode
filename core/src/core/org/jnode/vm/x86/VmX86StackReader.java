@@ -36,9 +36,9 @@ public class VmX86StackReader extends VmStackReader {
 	public static final int MAGIC_OFFSET = 8;
 	public static final int PREVIOUS_OFFSET = 12;
 	public static final int ESI_OFFSET = 16;
-	public static final int EDI_OFFSET = 20;
-	public static final int EBX_OFFSET = 24;
-	public static final int RETURNADDRESS_OFFSET = 28;
+	//public static final int EDI_OFFSET = 20;
+	public static final int EBX_OFFSET = 20;
+	public static final int RETURNADDRESS_OFFSET = 24;
 	// Stack follows here
 	// ...
 

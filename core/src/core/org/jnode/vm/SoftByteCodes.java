@@ -305,7 +305,7 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @return Throwable
 	 * @throws PragmaUninterruptible
 	 */
-	public static Throwable systemException(int nr, int address) throws PragmaUninterruptible {
+	public static Throwable systemException(int nr, int address) throws PragmaUninterruptible, PragmaLoadStatics {
 		//Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
 		//Unsafe.die();
 	    Unsafe.debug(nr); Unsafe.debug(address);
@@ -331,7 +331,7 @@ public class SoftByteCodes implements Uninterruptible {
 		}
 	}
 
-	public static void unknownOpcode(int opcode, int pc) throws PragmaUninterruptible {
+	public static void unknownOpcode(int opcode, int pc) throws PragmaUninterruptible, PragmaLoadStatics {
 		throw new Error("Unknown opcode " + opcode + " at pc " + pc);
 	}
 }

@@ -75,7 +75,7 @@ public class X86StubCompiler extends AbstractX86Compiler {
 			// Start the code creation
 			cm.setCodeStart(os.setObjectRef(new Label(method.getMangledName() + "$$start")));
 			// Initialize the class
-			ih.writeClassInitialize(method, EAX, ECX, context);
+			ih.writeClassInitialize(method, EAX, ECX);
 			// Call the interpreter
 			ih.emitInvokeMethodAtferRecompile();
 			// Close the "object"

@@ -8,6 +8,7 @@ import javax.naming.NameNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
+import org.jnode.driver.DeviceStarter;
 import org.jnode.driver.DriverException;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
@@ -21,6 +22,7 @@ import org.jnode.shell.help.OptionArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
+import org.jnode.util.TimeoutException;
 
 /**
  * @author gbin
@@ -87,7 +89,7 @@ public class FormatCommand {
 	
          // restart the device
 			dev.stop();
-			dev.start();
+			new DeviceStarter(dev).start(dm.getDefaultStartTimeout());
 
 		} catch (NameNotFoundException e) {
 			e.printStackTrace();
@@ -98,8 +100,9 @@ public class FormatCommand {
 		} catch (FileSystemException e) {
 			// 
 			e.printStackTrace();
-		}
-
+		} catch (TimeoutException ex) {
+            ex.printStackTrace();
+        }
 	}
 
 }

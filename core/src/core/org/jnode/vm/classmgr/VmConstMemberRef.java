@@ -15,8 +15,8 @@ public abstract class VmConstMemberRef extends VmConstObject {
 	private int nameTypeIndex;
 	private int cachedHashCode;
 	
-	public VmConstMemberRef(VmCP cp, int cpIdx, int classIndex, int nameTypeIndex) {
-		super(cp, cpIdx);
+	public VmConstMemberRef(VmCP cp, int classIndex, int nameTypeIndex) {
+		super(cp);
 		this.classIndex = classIndex;
 		this.nameTypeIndex = nameTypeIndex;
 	}
@@ -25,7 +25,7 @@ public abstract class VmConstMemberRef extends VmConstObject {
 	 * Gets the ConstClass this member constants refers to.
 	 * @return VmConstClass
 	 */
-	public VmConstClass getConstClass() {
+	public final VmConstClass getConstClass() {
 		return cp.getConstClass(classIndex);
 	}
 	
@@ -33,7 +33,7 @@ public abstract class VmConstMemberRef extends VmConstObject {
 	 * Gets the ConstNameType this member constants refers to.
 	 * @return VmConstNameAndType
 	 */
-	private VmConstNameAndType getNameAndType() {
+	private final VmConstNameAndType getNameAndType() {
 		return cp.getConstNameAndType(nameTypeIndex);
 	}
 	
@@ -41,7 +41,7 @@ public abstract class VmConstMemberRef extends VmConstObject {
 	 * Gets the name of the class of the members this constants refers to.
 	 * @return String
 	 */
-	public String getClassName() {
+	public final String getClassName() {
 		return getConstClass().getClassName();
 	}
 	
@@ -49,7 +49,7 @@ public abstract class VmConstMemberRef extends VmConstObject {
 	 * Gets the name of the members this constants refers to.
 	 * @return String
 	 */
-	public String getName() {
+	public final String getName() {
 		return getNameAndType().getName();
 	}
 	
@@ -57,7 +57,7 @@ public abstract class VmConstMemberRef extends VmConstObject {
 	 * Gets the type descriptor of the members this constants refers to.
 	 * @return String
 	 */
-	public String getSignature() {
+	public final String getSignature() {
 		return getNameAndType().getDescriptor();
 	}
 	
@@ -65,7 +65,7 @@ public abstract class VmConstMemberRef extends VmConstObject {
 	 * Resolve the references of this constant to loaded VmXxx objects.
 	 * @param clc
 	 */
-	protected void doResolve(VmClassLoader clc) {
+	protected final void doResolve(VmClassLoader clc) {
 		getConstClass().resolve(clc);
 		doResolveMember(clc);
 		cachedHashCode = VmMember.calcHashCode(getName(), getSignature());
@@ -82,7 +82,7 @@ public abstract class VmConstMemberRef extends VmConstObject {
 	 * @see java.lang.Object#toString()
 	 * @return String
 	 */
-	public String toString() {
+	public final String toString() {
 		String type = getClass().getName();
 		type = type.substring(type.lastIndexOf('.') + 1 + 2);
 		return type + ": " + getClassName() + "." + getName() + " [" + getSignature() + "]";
@@ -92,7 +92,7 @@ public abstract class VmConstMemberRef extends VmConstObject {
 	 * @see java.lang.Object#hashCode()
 	 * @return int
 	 */
-	public int getMemberHashCode() {
+	public final int getMemberHashCode() {
 		if (cachedHashCode == 0) {
 			cachedHashCode = VmMember.calcHashCode(getName(), getSignature());
 		}

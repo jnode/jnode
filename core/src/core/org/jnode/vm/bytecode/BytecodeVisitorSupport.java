@@ -132,14 +132,6 @@ public abstract class BytecodeVisitorSupport extends BytecodeVisitor {
 	}
 
 	/**
-	 * @param value
-	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_bipush(byte)
-	 */
-	public void visit_bipush(byte value) {
-
-	}
-
-	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_caload()
 	 */
 	public void visit_caload() {
@@ -1105,14 +1097,6 @@ public abstract class BytecodeVisitorSupport extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_sastore()
 	 */
 	public void visit_sastore() {
-
-	}
-
-	/**
-	 * @param value
-	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_sipush(short)
-	 */
-	public void visit_sipush(short value) {
 
 	}
 

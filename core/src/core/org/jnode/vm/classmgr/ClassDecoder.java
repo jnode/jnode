@@ -95,7 +95,7 @@ public final class ClassDecoder {
         final int cpcount = reader.readu2();
         // allocate enough space for the CP
         final byte[] tags = new byte[ cpcount];
-        final VmCP cp = new VmCP(cpcount, tags);
+        final VmCP cp = new VmCP(cpcount);
         for (int i = 1; i < cpcount; i++) {
             final int tag = reader.readu1();
             tags[ i] = (byte) tag;
@@ -124,7 +124,7 @@ public final class ClassDecoder {
                 break;
             case 7:
                 // class
-                cp.setConstClass(i, new VmConstClass(cp, i, reader.readu2()));
+                cp.setConstClass(i, new VmConstClass(cp, reader.readu2()));
                 break;
             case 8:
                 // String
@@ -135,7 +135,7 @@ public final class ClassDecoder {
                 {
                     final int clsIdx = reader.readu2();
                     final int ntIdx = reader.readu2();
-                    cp.setConstFieldRef(i, new VmConstFieldRef(cp, i, clsIdx,
+                    cp.setConstFieldRef(i, new VmConstFieldRef(cp, clsIdx,
                             ntIdx));
                 }
                 break;
@@ -144,7 +144,7 @@ public final class ClassDecoder {
                 {
                     final int clsIdx = reader.readu2();
                     final int ntIdx = reader.readu2();
-                    cp.setConstMethodRef(i, new VmConstMethodRef(cp, i, clsIdx,
+                    cp.setConstMethodRef(i, new VmConstMethodRef(cp, clsIdx,
                             ntIdx));
                 }
                 break;
@@ -153,8 +153,8 @@ public final class ClassDecoder {
                 {
                     final int clsIdx = reader.readu2();
                     final int ntIdx = reader.readu2();
-                    cp.setConstIMethodRef(i, new VmConstIMethodRef(cp, i,
-                            clsIdx, ntIdx));
+                    cp.setConstIMethodRef(i, new VmConstIMethodRef(cp, clsIdx,
+                            ntIdx));
                 }
                 break;
             case 12:
@@ -180,7 +180,7 @@ public final class ClassDecoder {
                 final int idx = cp.getInt(i);
                 final int staticsIdx = statics.allocConstantStringField(cp
                         .getUTF8(idx));
-                cp.setString(i, new VmConstString(cp, i, staticsIdx));
+                cp.setString(i, new VmConstString(staticsIdx));
                 break;
             }
         }

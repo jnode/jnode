@@ -6,6 +6,7 @@ package org.jnode.driver.chipset.i440BX;
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
+import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.pci.PCIDevice;
 import org.jnode.driver.smbus.DIMM;
 import org.jnode.driver.smbus.DIMMDriver;
@@ -245,7 +246,7 @@ public class i82371AB_ACPI_SMBusControler extends SMBusControler {
 				bus.addDevice(dimmDevice);
 				DIMMDriver dimmDriver = new DIMMDriver(bus, (byte) (0xa0 | (i << 1)));
 				dimmDevice.setDriver(dimmDriver);
-				dimmDevice.start();
+				DeviceUtils.getDeviceManager().register(dimmDevice);
 				log.info(dimmDevice.toString());
 			} catch (Exception ex) {
 				// log.debug("DIMM " + i + " not present" );
