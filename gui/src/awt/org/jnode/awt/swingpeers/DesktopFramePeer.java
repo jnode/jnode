@@ -348,9 +348,26 @@ final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
     /**
      * @see java.awt.peer.ComponentPeer#handleEvent(java.awt.AWTEvent)
      */
-    public void handleEvent(AWTEvent e) {
-        Unsafe.debug("handleEvent(" + e + ")");
-        // log.debug("handleEvent(" + e + ")");
+    public void handleEvent(AWTEvent event) {
+        Unsafe.debug("handleEvent(" + event + ")");
+        final int id = event.getID();
+        switch (id) {
+            case PaintEvent.PAINT: 
+            case PaintEvent.UPDATE: {
+                final Graphics g = getGraphics();
+                if (g != null) {
+                    //Point p = component.getLocationOnScreen();
+                    //g.translate(p.x, p.y);
+                    if (id == PaintEvent.PAINT) {
+                        ((Component)component).paint(g);
+                    } else {
+                        ((Component)component).update(g);                        
+                    }
+                    //g.translate(-p.x, -p.y);
+                    g.dispose();
+                }
+            } break;
+        }
     }
 
     /**
@@ -531,6 +548,7 @@ final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
      * @see java.awt.peer.ComponentPeer#setVisible(boolean)
      */
     public void setVisible(boolean visible) {
+        Unsafe.debug("setVisible(" + visible + ")");
         if (visible) {
             paintAWTComponent();
         }

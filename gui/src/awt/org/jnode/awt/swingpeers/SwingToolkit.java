@@ -21,12 +21,7 @@
 
 package org.jnode.awt.swingpeers;
 
-import org.jnode.awt.JNodeAwtContext;
-import org.jnode.awt.JNodeToolkit;
-
-import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
-
+import java.awt.AWTError;
 import java.awt.AWTException;
 import java.awt.Button;
 import java.awt.Canvas;
@@ -42,21 +37,20 @@ import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.GraphicsDevice;
+import java.awt.Insets;
 import java.awt.Label;
 import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
 import java.awt.Panel;
 import java.awt.PopupMenu;
+import java.awt.Rectangle;
 import java.awt.ScrollPane;
 import java.awt.Scrollbar;
 import java.awt.Shape;
 import java.awt.TextArea;
 import java.awt.TextField;
 import java.awt.Window;
-import java.awt.Rectangle;
-import java.awt.Insets;
-import java.awt.AWTError;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.peer.DragSourceContextPeer;
 import java.awt.peer.ButtonPeer;
@@ -82,6 +76,13 @@ import java.awt.peer.ScrollbarPeer;
 import java.awt.peer.TextAreaPeer;
 import java.awt.peer.TextFieldPeer;
 import java.awt.peer.WindowPeer;
+
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
+
+import org.jnode.awt.JNodeAwtContext;
+import org.jnode.awt.JNodeToolkit;
+import org.jnode.vm.Unsafe;
 
 /**
  * AWT toolkit implemented entirely with JFC peers, thus allowing a lightweight
@@ -338,7 +339,10 @@ public final class SwingToolkit extends JNodeToolkit {
 	 */
 	protected void onInitialize() {
 		log.debug("onInitialize");
+        Unsafe.debug("onInitialize\n");
 		desktopFrame = new DesktopFrame(getScreenSize());
+        Unsafe.debug("desktop-frame created\n");
 		desktopFrame.show();
+        Unsafe.debug("desktop-frame shown\n");
 	}
 }

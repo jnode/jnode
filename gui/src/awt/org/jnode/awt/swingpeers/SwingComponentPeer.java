@@ -204,23 +204,21 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
 
     // Events
     public void handleEvent(AWTEvent event) {
-        switch (event.getID()) {
-            case PaintEvent.PAINT: {
-                final Graphics g = jComponent.getGraphics();
-                if (g != null) {
-                	//Point p = component.getLocationOnScreen();
-                	//g.translate(p.x, p.y);
-                	((Component)component).paint(g);
-                	//g.translate(-p.x, -p.y);
-                }
-            } break;
+        final int id = event.getID();
+        switch (id) {
+            case PaintEvent.PAINT: 
             case PaintEvent.UPDATE: {
                 final Graphics g = jComponent.getGraphics();
                 if (g != null) {
                 	//Point p = component.getLocationOnScreen();
                 	//g.translate(p.x, p.y);
-                	((Component)component).update(g);
+                    if (id == PaintEvent.PAINT) {
+                        ((Component)component).paint(g);
+                    } else {
+                        ((Component)component).update(g);                        
+                    }
                 	//g.translate(-p.x, -p.y);
+                    g.dispose();
                 }
             } break;
             case MouseEvent.MOUSE_MOVED:
