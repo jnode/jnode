@@ -4,17 +4,17 @@
 package org.jnode.vm.compiler.ir;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.FileOutputStream;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.TextX86Stream;
 import org.jnode.assembler.x86.X86Stream;
-import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.util.BootableArrayList;
 import org.jnode.util.BootableHashMap;
 import org.jnode.vm.VmSystemClassLoader;
@@ -114,6 +114,7 @@ public class IRTest {
 
         IRGenerator irg = new IRGenerator(cfg);
         BytecodeParser.parse(code, irg);
+
         BootableArrayList quads = irg.getQuadList();
         int n = quads.size();
         BootableHashMap liveVariables = new BootableHashMap();
@@ -202,6 +203,17 @@ public class IRTest {
 		return -l0;
 	}
 
+
+	public static int const0(int a0, int a1) {
+		int l0 = 0;
+		if (a0 < 0) {
+			l0 = -1;
+		}
+		if (a0 > 0) {
+			l0 = 1;
+		}
+		return l0;
+	}
 
     public static int const1(int a0, int a1) {
         int l0 = 1;
