@@ -1,5 +1,5 @@
 /* ListCellRenderer.java -- 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,11 +37,11 @@ exception statement from your version. */
 
 package javax.swing;
 
-import java.awt.*;
+import java.awt.Component;
 
 public interface ListCellRenderer
 {
-    public Component getListCellRendererComponent(JList list,
+    Component getListCellRendererComponent(JList list,
 						  Object value,
 						  int index,
 						  boolean isSelected,

@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing;
 
 import javax.accessibility.AccessibleContext;
@@ -44,38 +45,50 @@ import javax.accessibility.AccessibleContext;
  *
  * @author Ronald Veldema (rveldema@cs.vu.nl)
  */
-public class JCheckBox extends JToggleButton {
-	public JCheckBox() {
-		this(null, null);
-	}
-	public JCheckBox(Action a) {
-		this();
-		setAction(a);
-	}
+public class JCheckBox extends JToggleButton
+{
+    public JCheckBox()
+    {
+	this(null, null);
+    }
+    public JCheckBox(Action a)
+    {
+	this();
+	setAction(a);
+    }
 
-	public JCheckBox(Icon icon) {
-		this(null, icon);
-	}
+    public JCheckBox(Icon icon)
+    { 
+	this(null, icon);
+    }    
+  
+    public JCheckBox(String text)
+    {
+	this(text, null);
+    }
+      
+    public JCheckBox(String text, Icon icon)
+    {
+	super(text, icon);
+        paint_border = false;
+        content_area_filled = false;
+    }
 
-	public JCheckBox(String text) {
-		this(text, null);
-	}
-
-	public JCheckBox(String text, Icon icon) {
-		super(text, icon);
-	}
-
-	public AccessibleContext getAccessibleContext() {
-		//Gets the AccessibleContext associated with this JCheckBox. 
-		return null;
-	}
-
-	public String getUIClassID() {
-		//Returns a string that specifies the name of the L&F class that renders this component.  
-		return "JCheckBox";
-	}
-
-	protected String paramString() {
-		return "JCheckBox";
-	}
+    
+    public AccessibleContext getAccessibleContext()
+    {
+	//Gets the AccessibleContext associated with this JCheckBox. 
+	return null;
+    }
+  
+    public String getUIClassID()
+    {
+	//Returns a string that specifies the name of the L&F class that renders this component.  
+	return "CheckBoxUI";
+    }
+  
+    protected  String paramString()
+    {
+	return "JCheckBox";
+    }
 }

@@ -1,5 +1,5 @@
 /* CellRendererPane.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,17 +37,24 @@ exception statement from your version. */
 
 package javax.swing;
 
-// Imports
-import java.awt.*;
-import java.io.*;
-import javax.accessibility.*;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import javax.accessibility.Accessible;
+import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleRole;
 
 /**
  * CellRendererPane
  * @author	Andrew Selkirk
  * @version	1.0
  */
-public class CellRendererPane extends Container implements Accessible {
+public class CellRendererPane extends Container implements Accessible
+{
+  private static final long serialVersionUID = -7642183829532984273L;
 
 	//-------------------------------------------------------------
 	// Classes ----------------------------------------------------
@@ -57,6 +64,8 @@ public class CellRendererPane extends Container implements Accessible {
 	 * AccessibleCellRendererPane
 	 */
 	protected class AccessibleCellRendererPane extends AccessibleAWTContainer {
+
+          private static final long serialVersionUID = 7300340301783504481L;
 
 		//-------------------------------------------------------------
 		// Initialization ---------------------------------------------

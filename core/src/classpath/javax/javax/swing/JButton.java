@@ -1,5 +1,5 @@
 /* JButton.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -46,72 +46,89 @@ import javax.swing.plaf.ButtonUI;
  *
  * @author Ronald Veldema (rveldema@cs.vu.nl)
  */
-public class JButton extends AbstractButton implements Accessible {
-	boolean def, is_def;
+public class JButton extends AbstractButton implements Accessible 
+{
+  private static final long serialVersionUID = -1907255238954382202L;
 
-	public JButton() {
-		this(null, null);
-	}
+    boolean def, is_def;
 
-	public JButton(Action a) {
-		this();
-		setAction(a);
-	}
+    
+    public JButton()
+    {
+	this(null, null);
+    }
 
-	public JButton(Icon icon) {
-		this(null, icon);
-	}
+    public JButton(Action a)
+    {
+	this();
+	setAction(a);
+    }
 
-	public JButton(String text) {
-		this(text, null);
-	}
+    public JButton(Icon icon)
+    { 
+	this(null, icon);
+    }    
+  
+    public JButton(String text)
+    {
+	this(text, null);
+    }
+      
+    public JButton(String text, Icon icon)
+    {
+	super(text, icon);
+    }
 
-	public JButton(String text, Icon icon) {
-		super(text, icon);
-	}
+    public Object[] getSelectedObjects()
+    {
+	return null;
+    }
+  
+    protected  void configurePropertiesFromAction(Action a)
+    {
+	//Factory method which sets the AbstractButton's properties according to values from the Action instance. 
+    }
+    
+    public AccessibleContext getAccessibleContext()
+    {
+	//Gets the AccessibleContext associated with this JButton. 
+	return null;
+    }
+  
+    public String getUIClassID()
+    {
+	//Returns a string that specifies the name of the L&F class that renders this component.  
+	return "ButtonUI";
+    }
+  
+    public boolean isDefaultButton()
+    {
+	//Returns whether or not this button is the default button on the RootPane.  
+	return is_def;
+    }
+  
+    public boolean isDefaultCapable()
+    {
+	//Returns whether or not this button is capable of being the default button on the RootPane. 
+	return def;
+    }
 
-	public Object[] getSelectedObjects() {
-		return null;
-	}
-
-	protected void configurePropertiesFromAction(Action a) {
-		//Factory method which sets the AbstractButton's properties according to values from the Action instance. 
-	}
-
-	public AccessibleContext getAccessibleContext() {
-		//Gets the AccessibleContext associated with this JButton. 
-		return null;
-	}
-
-	public String getUIClassID() {
-		//Returns a string that specifies the name of the L&F class that renders this component.  
-		return "JButton";
-	}
-
-	public boolean isDefaultButton() {
-		//Returns whether or not this button is the default button on the RootPane.  
-		return is_def;
-	}
-
-	public boolean isDefaultCapable() {
-		//Returns whether or not this button is capable of being the default button on the RootPane. 
-		return def;
-	}
-
-	protected String paramString() {
-		return "JButton";
-	}
-
-	public void removeNotify() {
-		//Overrides JComponent.removeNotify to check if this button is currently set as the default button on the RootPane, and if so, sets the RootPane's default button to null to ensure the RootPane doesn't hold onto an invalid button reference.  
-	}
-
-	public void setDefaultCapable(boolean defaultCapable) {
-		def = defaultCapable;
-	}
-
-	public void updateUI() {
-		ButtonUI b = (ButtonUI) UIManager.getUI(this);
-		setUI(b);
-	}
+    protected  String paramString()
+    {
+	return "JButton";
+    }
+    
+    public void removeNotify()
+    {
+	//Overrides JComponent.removeNotify to check if this button is currently set as the default button on the RootPane, and if so, sets the RootPane's default button to null to ensure the RootPane doesn't hold onto an invalid button reference.  
+    }
+    
+    public void setDefaultCapable(boolean defaultCapable)
+    {	def = defaultCapable;    }
+    
+    public void updateUI()
+    {
+	ButtonUI b = (ButtonUI)UIManager.getUI(this);
+	setUI(b);
+    }
 }

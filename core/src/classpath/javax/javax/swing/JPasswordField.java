@@ -1,5 +1,5 @@
 /* JPasswordField.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,10 +37,12 @@ exception statement from your version. */
 
 package javax.swing;
 
-// Imports
-import java.io.*;
-import javax.accessibility.*;
-import javax.swing.text.*;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleRole;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 /**
  * JPasswordField
@@ -100,7 +102,7 @@ public class JPasswordField extends JTextField {
 	/**
 	 * uiClassID
 	 */
-	private static final String uiClassID = "PasswordFIeldUI";
+	private static final String uiClassID = "PasswordFieldUI";
 
 	/**
 	 * echoChar.  Default is 0
@@ -218,6 +220,7 @@ public class JPasswordField extends JTextField {
 	/**
 	 * getText
 	 * @returns String
+         * @deprecated
 	 */
 	public String getText() {
 		return null; // TODO
@@ -229,6 +232,7 @@ public class JPasswordField extends JTextField {
 	 * @param length TODO
 	 * @exception BadLocationException TODO
 	 * @returns String
+         * @deprecated
 	 */
 	public String getText(int offset, int length) throws BadLocationException {
 		return null; // TODO

@@ -1,5 +1,5 @@
-/* JInternalFrame.java -- 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+/* JTableHeader.java
+   Copyright (C) 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -36,26 +36,47 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package javax.swing;
+package javax.swing.table;
 
-import java.awt.Component;
-import java.awt.Container;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.FocusListener;
+import java.util.Locale;
 import javax.accessibility.Accessible;
+import javax.accessibility.AccessibleComponent;
+import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleRole;
+import javax.accessibility.AccessibleStateSet;
+import javax.swing.JComponent;
+import javax.swing.JTable;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
+import javax.swing.plaf.TableHeaderUI;
 
-public class JInternalFrame extends JComponent
-/*implements Accessible, WindowConstants, RootPaneContainer*/
+public class JTableHeader extends JComponent
 {
-  private static final long serialVersionUID = -5425177187760785402L;
+  protected class AccessibleJTableHeader
+  {
+    protected class AccessibleJTableHeaderEntry
+    {
+    }
+  }
 
-  public static final String CONTENT_PANE_PROPERTY = "contentPane";
-  public static final String MENU_BAR_PROPERTY = "JMenuBar";
-  public static final String TITLE_PROPERTY = "title";
-  public static final String LAYERED_PANE_PROPERTY = "layeredPane";
-  public static final String ROOT_PANE_PROPERTY = "rootPane";
-  public static final String GLASS_PANE_PROPERTY = "glassPane";
-  public static final String FRAME_ICON_PROPERTY = "frameIcon";
-  public static final String IS_SELECTED_PROPERTY = "selected";
-  public static final String IS_CLOSED_PROPERTY = "closed";
-  public static final String IS_MAXIMUM_PROPERTY = "maximum";
-  public static final String IS_ICON_PROPERTY = "icon";
-} // class JInternalFrame
+  private static final long serialVersionUID = 5144633983372967710L;
+
+  protected TableColumnModel columnModel;
+  protected TableColumn draggedColumn;
+  protected int draggedDistance;
+  protected boolean reorderingAllowed;
+  protected boolean resizingAllowed;
+  protected TableColumn resizingColumn;
+  protected JTable table;
+  protected boolean updateTableInRealTime;
+}

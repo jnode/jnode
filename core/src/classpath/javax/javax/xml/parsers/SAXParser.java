@@ -29,18 +29,11 @@
 package javax.xml.parsers;
 
 // Imports
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.xml.sax.HandlerBase;
-import org.xml.sax.InputSource;
-import org.xml.sax.Parser;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
+import java.io.*;
+import java.net.*;
+import org.w3c.dom.*;
+import org.xml.sax.*;
+import org.xml.sax.helpers.*;
 
 /**
  * Wraps a SAX2 (or SAX1) parser.

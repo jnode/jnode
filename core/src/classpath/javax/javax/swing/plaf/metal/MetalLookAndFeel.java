@@ -35,39 +35,34 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
+
 package javax.swing.plaf.metal;
 
-import javax.swing.LookAndFeel;
 import javax.swing.UIDefaults;
-import javax.swing.plaf.basic.BasicDefaults;
+import javax.swing.plaf.basic.BasicLookAndFeel;
 
-public class MetalLookAndFeel extends LookAndFeel {
-	public boolean isNativeLookAndFeel() {
-		return true;
-	}
-	public boolean isSupportedLookAndFeel() {
-		return true;
-	}
-	public String getDescription() {
-		return "Metal look and feel";
-	}
-	public String getID() {
-		return "MetalLookAndFeel";
-	}
-	public String getName() {
-		return "MetalLookAndFeel";
-	}
+public class MetalLookAndFeel extends BasicLookAndFeel
+ {	   
+     public boolean isNativeLookAndFeel()        { return true; }
+     public boolean isSupportedLookAndFeel()     { return true; }
+     public String getDescription()              { return "Metal look and feel"; }
+     public String getID()                       { return "MetalLookAndFeel"; }
+     public String getName()                     { return "MetalLookAndFeel"; }
+     
+     
+     UIDefaults LAF_defaults;
+     
+     public MetalLookAndFeel()
+     {
+     }
 
-	UIDefaults LAF_defaults;
-
-	public MetalLookAndFeel() {
-	}
-
-	public UIDefaults getDefaults() {
-		if (LAF_defaults == null)
-			LAF_defaults = new BasicDefaults();
-
-		//      Returns the default values for this look and feel. 
-		return LAF_defaults;
-	}
-}
+     public UIDefaults getDefaults()
+	 {
+	   if (LAF_defaults == null)
+	     LAF_defaults = super.getDefaults();
+	     
+	     //      Returns the default values for this look and feel. 
+	     return LAF_defaults;
+	 }
+ }

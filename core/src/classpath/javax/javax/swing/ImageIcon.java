@@ -35,57 +35,67 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing;
 
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.MediaTracker;
 import java.awt.Toolkit;
+import java.io.Serializable;
+import java.net.URL;
+import javax.accessibility.Accessible;
+import javax.accessibility.AccessibleContext;
 
-public class ImageIcon implements Icon {
-	Image image;
-	String file, descr;
-	Component observer;
+public class ImageIcon implements Icon
+{
+    Image image;
+    String file, descr;
+    Component observer;
 
-	public ImageIcon(String s) {
-		this(s, "");
-	}
+  public ImageIcon(String s)
+    {
+	this(s, "");
+    }
 
-	public ImageIcon(String file, String descr) {
-		this.file = file;
-		this.descr = descr;
+  public ImageIcon(String file,
+	      String descr)
+    {
+        this.file = file;
+        this.descr = descr;
 
-		image = Toolkit.getDefaultToolkit().getImage(file);
-		if (image == null) {
-			return;
-		}
-		//loadImage(image);
-	}
+        image = Toolkit.getDefaultToolkit().getImage(file);
+        if (image == null) {
+            return;
+        }
+        //loadImage(image);
+    }
 
-	// not in SUN's spec !!!
-	public void setParent(Component p) {
-		observer = p;
-	}
+    // not in SUN's spec !!!
+    public void setParent(Component p)
+    {
+	observer = p;
+    }
 
-	public Image getImage() {
-		return image;
-	}
+    public Image getImage() 
+    {  return image;    }
 
-	public String getDescription() {
-		return descr;
-	}
-	public void setDescription(String description) {
-		this.descr = description;
-	}
+    public String getDescription() 
+    {  return descr;    }
+    public void setDescription(String description) 
+    {  this.descr = description;    }
 
-	public int getIconHeight() {
-		return image.getHeight(observer);
-	}
-	public int getIconWidth() {
-		return image.getWidth(observer);
-	}
+    public int getIconHeight()
+    {	return image.getHeight(observer);    }
+    public int getIconWidth()
+    {	return image.getWidth(observer);    }
 
-	public void paintIcon(Component c, Graphics g, int x, int y) {
-		g.drawImage(image, x, y, observer);
-	}
+    public void paintIcon(Component c, 
+			  Graphics g,
+			  int x, 
+			  int y)
+    {
+	g.drawImage(image, x, y, observer);
+    }
 }

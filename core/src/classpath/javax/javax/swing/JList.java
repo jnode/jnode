@@ -1,5 +1,5 @@
 /* JList.java -- 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,190 +35,219 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.util.Vector;
-
+import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.ListUI;
 
-public class JList extends JComponent implements Scrollable {
-	Color select_back, select_fore;
-	ListCellRenderer render;
-	int visibles = 8;
+public class JList extends JComponent implements Accessible, Scrollable
+{
+  private static final long serialVersionUID = 4406629526391098046L;
 
-	ListModel model;
-	ListSelectionModel sel_model;
+    Color select_back, select_fore;
+    ListCellRenderer render;
+    int visibles = 8;
+    
+    ListModel          model;
+    ListSelectionModel sel_model;
 
-	public JList() {
-		init();
-	}
+    public JList()
+    {	
+	init();
+    }
 
-	public JList(Object[] listData) {
-		init();
-		setListData(listData);
-	}
+    public JList(Object[] listData)
+    {
+	init();
+	setListData(listData);
+    }
 
-	public JList(Vector listData) {
-		init();
-		setListData(listData);
-	}
 
-	public JList(ListModel listData) {
-		init();
-		setModel(listData);
-	}
-	void init() {
-		render = new DefaultCellRenderer();
+    public JList(Vector listData)
+    {
+	init();
+	setListData(listData);
+    }
 
-		sel_model = new DefaultListSelectionModel();
-		setModel(new DefaultListModel());
 
-		select_back = new Color(0, 0, 255);
-		select_fore = new Color(255, 255, 255);
+    public JList(ListModel listData)
+    {
+	init();
+	setModel(listData);
+    }
+    void init()
+    {
+	render = new DefaultCellRenderer();
+	
+	sel_model = new DefaultListSelectionModel();
+	setModel(new DefaultListModel());
 
-		updateUI();
-	}
+	select_back = new Color(0,0,255);
+	select_fore = new Color(255,255,255);
 
-	public int getVisibleRowCount() {
-		return visibles;
-	}
-	public void setVisibleRowCount(int visibleRowCount) {
-		visibles = visibleRowCount;
-		invalidate();
-		repaint();
-	}
+	updateUI();
+    }
 
-	void addListSelectionListener(ListSelectionListener listener) {
-		sel_model.addListSelectionListener(listener);
-	}
-	void removeListSelectionListener(ListSelectionListener listener) {
-		sel_model.removeListSelectionListener(listener);
-	}
+    
+    public int getVisibleRowCount()
+    { return visibles; }
+    public void setVisibleRowCount(int visibleRowCount)
+    {
+	visibles =  visibleRowCount;
+	invalidate();
+	repaint();
+    }
 
-	void setSelectionMode(int a) {
-		sel_model.setSelectionMode(a);
-	}
-	void setSelectedIndex(int a) {
-		sel_model.setSelectionInterval(a, a);
-	}
-	int getSelectedIndex() {
-		return sel_model.getMinSelectionIndex();
-	}
-	Object getSelectedValue() {
-		int index = getSelectedIndex();
-		if (index == -1)
-			return null;
-		return getModel().getElementAt(index);
-	}
+  public void addListSelectionListener (ListSelectionListener listener)
+  {
+    sel_model.addListSelectionListener (listener);
+  }
+  
+  public void removeListSelectionListener (ListSelectionListener listener)
+  {
+    sel_model.removeListSelectionListener (listener);
+  }
 
-	Color getSelectionBackground() {
-		return select_back;
-	}
-	Color getSelectionForeground() {
-		return select_fore;
-	}
+  /**
+   * @since 1.4
+   */
+  public ListSelectionListener[] getListSelectionListeners()
+  {
+    throw new Error ("not implemented");
+  }
 
-	public void setListData(final Object[] listData) {
-		class AL extends AbstractListModel {
-			public int getSize() {
-				return listData.length;
-			}
-			public Object getElementAt(int i) {
-				return listData[i];
-			}
+    void setSelectionMode(int a)
+    {  sel_model.setSelectionMode(a);   }
+    void setSelectedIndex(int a)
+    {  sel_model.setSelectionInterval(a,a); }
+    int getSelectedIndex()
+    {	return sel_model.getMinSelectionIndex();    }
+    Object getSelectedValue()
+    {  
+	int index = getSelectedIndex();
+	if (index == -1)
+	    return null;
+	return getModel().getElementAt(index);
+    }
+
+    Color getSelectionBackground()
+    { return select_back;    }    
+    Color getSelectionForeground()
+    { return select_fore;    }
+
+
+    public void setListData(final Object[] listData)
+    {
+	class AL extends AbstractListModel
+	{
+	    public int getSize()              { return listData.length; }
+	    public Object getElementAt(int i) { return listData[i];     }
+	};
+	
+	setModel (new AL());
+    }
+    
+    public void setListData(final Vector listData)
+    {
+	class AL extends AbstractListModel 
+	{
+	    public int getSize()              { return listData.size(); }
+	    public Object getElementAt(int i) { return listData.elementAt(i); }
+	};
+	
+        setModel (new AL());
+    }
+    
+    
+    public ListCellRenderer getCellRenderer()
+    {    return  render; }
+    public void setCellRenderer(ListCellRenderer cellRenderer)
+    {
+	render = cellRenderer;
+	invalidate();
+	repaint();
+    }
+    
+    public void setModel(ListModel model)
+    {
+	ListDataListener l = new ListDataListener()
+	    {
+		public void intervalAdded(ListDataEvent e) {
+		    repaint();
 		}
-
-		setModel(new AL());
-	}
-
-	public void setListData(final Vector listData) {
-		// XXX - FIXME Don't also name this AL, workaround for gcj 3.1.
-		class ALData extends AbstractListModel {
-			public int getSize() {
-				return listData.size();
-			}
-			public Object getElementAt(int i) {
-				return listData.elementAt(i);
-			}
+		public void intervalRemoved(ListDataEvent e) {
+		    repaint();
 		}
+		public void contentsChanged(ListDataEvent e) {
+		    repaint();
+		}
+	    };
+	
+	this.model = model;  
+	model.addListDataListener(l);	
+    }
 
-		setModel(new ALData());
-	}
+    public ListModel getModel() 
+    {  return model;        }
+    
+    
+    public ListUI getUI()
+    {  return (ListUI) ui;    }
+    public void setUI(ListUI ui)
+    {   super.setUI(ui);      }
 
-	public ListCellRenderer getCellRenderer() {
-		return render;
-	}
-	public void setCellRenderer(ListCellRenderer cellRenderer) {
-		render = cellRenderer;
-		invalidate();
-		repaint();
-	}
+    public void updateUI()
+    {
+        setUI((ListUI)UIManager.getUI(this));
+    }
 
-	public void setModel(ListModel model) {
-		ListDataListener l = new ListDataListener() {
-			public void intervalAdded(ListDataEvent e) {
-				repaint();
-			}
-			public void intervalRemoved(ListDataEvent e) {
-				repaint();
-			}
-			public void contentsChanged(ListDataEvent e) {
-				repaint();
-			}
-		};
+    public String getUIClassID()
+    {
+	return "ListUI";
+    }
 
-		this.model = model;
-		model.addListDataListener(l);
-	}
 
-	public ListModel getModel() {
-		return model;
-	}
+    public AccessibleContext getAccessibleContext()
+    {
+      return null;
+    }
 
-	public ListUI getUI() {
-		return (ListUI) ui;
-	}
-	public void setUI(ListUI ui) {
-		super.setUI(ui);
-	}
+    public Dimension getPreferredScrollableViewportSize()
+    {
+	return null;
+    }
 
-	public void updateUI() {
-		setUI((ListUI) UIManager.getUI(this));
-	}
+    public int getScrollableUnitIncrement(Rectangle visibleRect,
+					  int orientation,
+					  int direction)
+    {
+	return 1;
+    }
 
-	public String getUIClassID() {
-		return "JList";
-	}
+    public int getScrollableBlockIncrement(Rectangle visibleRect,
+					   int orientation,
+					   int direction)
+    {
+	return 1;
+    }
 
-	public AccessibleContext getAccessibleContext() {
-		return null;
-	}
+    public boolean getScrollableTracksViewportWidth()
+    {
+	return false;
+    }
 
-	public Dimension getPreferredScrollableViewportSize() {
-		return null;
-	}
-
-	public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-		return 1;
-	}
-
-	public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-		return 1;
-	}
-
-	public boolean getScrollableTracksViewportWidth() {
-		return false;
-	}
-
-	public boolean getScrollableTracksViewportHeight() {
-		return false;
-	}
-
+    public boolean getScrollableTracksViewportHeight()
+    {
+	return false;
+    }
+    
 }

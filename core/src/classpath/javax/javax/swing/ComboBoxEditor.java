@@ -1,5 +1,5 @@
 /* ComboBoxEditor.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,9 +37,8 @@ exception statement from your version. */
 
 package javax.swing;
 
-// Imports
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Component;
+import java.awt.event.ActionListener;
 
 /**
  * ComboBoxEditor
@@ -56,36 +55,36 @@ public interface ComboBoxEditor {
 	 * getEditorComponent
 	 * @returns Component
 	 */
-	public Component getEditorComponent();
+	Component getEditorComponent();
 
 	/**
 	 * setItem
 	 * @param item TODO
 	 */
-	public void setItem(Object item);
+	void setItem(Object item);
 
 	/**
 	 * getItem
 	 * @returns Object
 	 */
-	public Object getItem();
+	Object getItem();
 
 	/**
 	 * selectAll
 	 */
-	public void selectAll();
+	void selectAll();
 
 	/**
 	 * addActionListener
 	 * @param listener TODO
 	 */
-	public void addActionListener(ActionListener listener);
+	void addActionListener(ActionListener listener);
 
 	/**
 	 * removeActionListener
 	 * @param listener TODO
 	 */
-	public void removeActionListener(ActionListener listener);
+	void removeActionListener(ActionListener listener);
 
 
 } // ComboBoxEditor

@@ -1,5 +1,5 @@
 /* ComponentView.java -- 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,7 +37,9 @@ exception statement from your version. */
 
 package javax.swing.text;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Shape;
 
 public class ComponentView extends View
 {
@@ -46,7 +48,6 @@ public class ComponentView extends View
 	super(elem);
     }
  
-
     protected  Component createComponent()
     {
 	return null;
@@ -57,7 +58,7 @@ public class ComponentView extends View
 	return 0;
     }
 
-    public Component getComponent()
+    public final Component getComponent()
     {
 	return null;
     }
