@@ -308,15 +308,16 @@ public abstract class DomNode
   {
     if (readonly && !owner.building)
       {
-        throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR,
+        throw new DomDOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
                         null, this, 0);
       }
     for (DomNode ctx = this; ctx != null; ctx = ctx.parent)
       {
         if (child == ctx)
           {
-            throw new DomEx(DomEx.HIERARCHY_REQUEST_ERR,
-                            "can't make ancestor into a child", this, 0);
+            throw new DomDOMException(DOMException.HIERARCHY_REQUEST_ERR,
+                                      "can't make ancestor into a child",
+                                      this, 0);
           }
       }
 
@@ -330,7 +331,7 @@ public abstract class DomNode
         // new in DOM L2, this case -- patch it up later, in reparent()
         if (!(childNodeType == DOCUMENT_TYPE_NODE && childOwner == null))
           {
-            throw new DomEx(DomEx.WRONG_DOCUMENT_ERR,
+            throw new DomDOMException(DOMException.WRONG_DOCUMENT_ERR,
                             null, child, 0);
           }
       }
@@ -376,9 +377,11 @@ public abstract class DomNode
       }
     if (owner.checkingWellformedness)
       {
-        throw new DomEx(DomEx.HIERARCHY_REQUEST_ERR,
-                        "can't append " + nodeTypeToString(childNodeType) +
-                        " to node of type " + nodeTypeToString(nodeType),
+        throw new DomDOMException(DOMException.HIERARCHY_REQUEST_ERR,
+                                  "can't append " +
+                                  nodeTypeToString(childNodeType) +
+                                  " to node of type " +
+                                  nodeTypeToString(nodeType),
                         this, 0);
       }
   }
@@ -578,7 +581,7 @@ public abstract class DomNode
       }
     catch (ClassCastException e)
       {
-        throw new DomEx(DomEx.WRONG_DOCUMENT_ERR,
+        throw new DomDOMException(DOMException.WRONG_DOCUMENT_ERR,
                         null, newChild, 0);
     }
   }
@@ -630,12 +633,14 @@ public abstract class DomNode
             checkMisc(child);
             if (ref == null || ref.parent != this)
               {
-                throw new DomEx(DomEx.NOT_FOUND_ERR, null, ref, 0);
+                throw new DomDOMException(DOMException.NOT_FOUND_ERR,
+                                          null, ref, 0);
               }
             if (ref == child)
               {
-                throw new DomEx(DomEx.HIERARCHY_REQUEST_ERR,
-                                "can't insert node before itself", ref, 0);
+                throw new DomDOMException(DOMException.HIERARCHY_REQUEST_ERR,
+                                          "can't insert node before itself",
+                                          ref, 0);
               }
         
             if (child.parent != null)
@@ -672,7 +677,7 @@ public abstract class DomNode
       }
     catch (ClassCastException e)
       {
-        throw new DomEx(DomEx.WRONG_DOCUMENT_ERR,
+        throw new DomDOMException(DOMException.WRONG_DOCUMENT_ERR,
                         null, newChild, 0);
       }
   }
@@ -721,7 +726,8 @@ public abstract class DomNode
               }
             if (ref == null || ref.parent != this)
               {
-                throw new DomEx(DomEx.NOT_FOUND_ERR, null, ref, 0);
+                throw new DomDOMException(DOMException.NOT_FOUND_ERR,
+                                          null, ref, 0);
               }
             
             if (reportMutations)
@@ -784,7 +790,8 @@ public abstract class DomNode
             checkMisc(child);
             if (ref == null || ref.parent != this)
               {
-                throw new DomEx(DomEx.NOT_FOUND_ERR, null, ref, 0);
+                throw new DomDOMException(DOMException.NOT_FOUND_ERR,
+                                          null, ref, 0);
               }
         
             if (reportMutations)
@@ -837,7 +844,7 @@ public abstract class DomNode
       }
     catch (ClassCastException e)
       {
-        throw new DomEx(DomEx.WRONG_DOCUMENT_ERR,
+        throw new DomDOMException(DOMException.WRONG_DOCUMENT_ERR,
                         null, newChild, 0);
       }
   }
@@ -860,11 +867,12 @@ public abstract class DomNode
 
         if (ref == null || ref.parent != this)
           {
-            throw new DomEx(DomEx.NOT_FOUND_ERR, null, ref, 0);
+            throw new DomDOMException(DOMException.NOT_FOUND_ERR,
+                                      null, ref, 0);
           }
         if (readonly && !owner.building)
           {
-            throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR,
+            throw new DomDOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
                             null, this, 0);
           }
         
@@ -909,12 +917,12 @@ public abstract class DomNode
                 return ref;
               }
           }
-        throw new DomEx(DomEx.NOT_FOUND_ERR,
+        throw new DomDOMException(DOMException.NOT_FOUND_ERR,
                         "that's no child of mine", refChild, 0);
       }
     catch (ClassCastException e)
       {
-        throw new DomEx(DomEx.WRONG_DOCUMENT_ERR,
+        throw new DomDOMException(DOMException.WRONG_DOCUMENT_ERR,
                         null, refChild, 0);
       }
   }
@@ -1347,13 +1355,17 @@ public abstract class DomNode
           current.previousNode ();
           lastIndex--;
         }
-        return current.previousNode ();
+        Node ret = current.previousNode ();
+        current = null;
+        return ret;
       } 
       
       // somewhere after last node
       while (++lastIndex != index)
         current.nextNode ();
-        return current.nextNode ();
+        Node ret = current.nextNode ();
+        current = null;
+        return ret;
     }
     
     public int getLength()
@@ -1365,6 +1377,7 @@ public abstract class DomNode
         {
           retval++;
         }
+      current = null;
       return retval;
     }
     
@@ -1441,7 +1454,7 @@ public abstract class DomNode
 
     // mouse events 
     
-    throw new DomEx(DomEx.NOT_SUPPORTED_ERR,
+    throw new DomDOMException(DOMException.NOT_SUPPORTED_ERR,
                     eventType, null, 0);
   }
 

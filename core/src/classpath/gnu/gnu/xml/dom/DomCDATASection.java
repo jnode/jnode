@@ -1,5 +1,5 @@
-/* EventDispatchThread.java -
-   Copyright (C) 2000, 2002, 2004  Free Software Foundation
+/* DomCDATASection.java -- 
+   Copyright (C) 1999,2000,2001,2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,60 +35,57 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.awt;
+package gnu.xml.dom;
+
+import org.w3c.dom.CDATASection;
 
 /**
- * @author Bryce McKinlay
- * @status believed complete, but untested.
+ * <p> "CDATASection" implementation.
+ * This is a non-core DOM class, supporting the "XML" feature.
+ * CDATA sections are just ways to represent text using different
+ * delimeters. </p>
+ *
+ * <p> <em>You are strongly advised not to use CDATASection nodes.</em>
+ * The advantage of having slightly prettier ways to print text that may
+ * have lots of embedded XML delimiters, such as "&amp;" and "&lt;",
+ * can be dwarfed by the cost of dealing with multiple kinds of text
+ * nodes in all your algorithms. </p>
+ *
+ * @author David Brownell
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class EventDispatchThread extends Thread
+public class DomCDATASection
+  extends DomText
+  implements CDATASection
 {
-  private static int dispatchThreadNum;
-
-	private EventQueue queue;
-
-  EventDispatchThread(EventQueue queue)
+  
+  /**
+   * Constructs a CDATA section node associated with the specified
+   * document and holding the specified data.
+   *
+   * <p>This constructor should only be invoked by a Document as part of
+   * its createCDATASection functionality, or through a subclass which is
+   * similarly used in a "Sub-DOM" style layer.
+   *
+   */
+  protected DomCDATASection(DomDocument owner, String value)
   {
-		super();
-    setName("AWT-EventQueue-" + ++dispatchThreadNum);
-		this.queue = queue;
-//		setPriority(NORM_PRIORITY + 1);
-	}
+    super(CDATA_SECTION_NODE, owner, value);
+  }
 
-  public void run()
+  protected DomCDATASection(DomDocument owner, char buf [], int off, int len)
   {
-    while (true)
-      {
-        try
-	{
-                AWTEvent evt = queue.getNextEvent();
+    super(CDATA_SECTION_NODE, owner, buf, off, len);
+  }
 
-                KeyboardFocusManager manager;
-          manager = KeyboardFocusManager.getCurrentKeyboardFocusManager ();
-
-                // Try to dispatch this event to the current keyboard focus
-                // manager. It will dispatch all FocusEvents, all
-                // WindowEvents related to focus, and all KeyEvents,
-                // returning true. Otherwise, it returns false and we
-                // dispatch the event normally.
-          if (!manager.dispatchEvent (evt))
-                    queue.dispatchEvent(evt);
-                }
-        catch (ThreadDeath death)
-        {
-                // If someone wants to kill us, let them.
-                return;
-        }
-	catch (InterruptedException ie)
-	{
-                // We are interrupted when we should finish executing
-                return;
-	}
-	catch (Throwable x)
-	{
-                System.err.println("Exception during event dispatch:");
-                x.printStackTrace(System.err);
-            }
-        }
-    }
+  /**
+   * <b>DOM L1</b>
+   * Returns the string "#cdata-section".
+   */
+  final public String getNodeName()
+  {
+    return "#cdata-section";
+  }
+  
 }
+
