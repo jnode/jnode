@@ -25,15 +25,13 @@ public abstract class AbstractKeyboardDriver extends Driver implements KeyboardA
 	private KeyboardDaemon daemon;
 	private InputStream kis;
 	private final ArrayList listeners = new ArrayList();
-	private final ArrayList listenersToAdd = new ArrayList();
-	private final ArrayList listenersToRemove = new ArrayList();
 
 	/**
 	 * Add a keyboard listener
 	 * @param l
 	 */
 	public synchronized void addKeyboardListener(KeyboardListener l) {
-		listenersToAdd.add(l);
+		listeners.add(l);
 	}
 
 	/**
@@ -41,7 +39,7 @@ public abstract class AbstractKeyboardDriver extends Driver implements KeyboardA
 	 * @param l
 	 */
 	public synchronized void removeKeyboardListener(KeyboardListener l) {
-		listenersToRemove.remove(l);
+		listeners.remove(l);
 	}
 
 	/**
@@ -113,16 +111,6 @@ public abstract class AbstractKeyboardDriver extends Driver implements KeyboardA
 	 * @param event
 	 */
 	protected void dispatchEvent(KeyboardEvent event) {
-		if(!listenersToAdd.isEmpty())
-		{
-			listeners.addAll(listenersToAdd);
-			listenersToAdd.clear();
-		}
-		if(!listenersToRemove.isEmpty())
-		{
-			listeners.removeAll(listenersToRemove);
-			listenersToRemove.clear();
-		}
 		//Syslog.debug("Dispatching event to " + listeners.size());
 		for (Iterator i = listeners.iterator(); i.hasNext();) {
 			KeyboardListener l = (KeyboardListener) i.next();

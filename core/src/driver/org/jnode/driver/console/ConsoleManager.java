@@ -3,11 +3,14 @@
  */
 package org.jnode.driver.console;
 
+import org.jnode.driver.input.KeyboardListener;
+import org.jnode.driver.input.PointerListener;
+
 
 /**
  * @author epr
  */
-public interface ConsoleManager {
+public interface ConsoleManager extends KeyboardListener, PointerListener {
 	
 	public static final Class NAME = ConsoleManager.class;//"ConsoleManager";
 	public static final String ShellConsoleName = "ShellConsole";

@@ -4,12 +4,13 @@
 package org.jnode.driver.console;
 
 import org.jnode.driver.input.KeyboardListener;
+import org.jnode.driver.input.PointerListener;
 import org.jnode.system.event.FocusListener;
 
 /**
  * @author epr
  */
-public interface Console extends FocusListener {
+public interface Console extends FocusListener , KeyboardListener, PointerListener {
 
 	public static char MOUSE_CURSOR_CHAR = 'X'; 
 	
