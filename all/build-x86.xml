@@ -208,22 +208,20 @@
 
 <!-- Create a full distributable bootable CDROM image -->
   <target name="cdrom" depends="boot-disk">
-    <property name="${cdrom.dir}" value="${my-build.dir}/cdrom-full"/>
-    <mkdir dir="${cdrom.dir}"/>
-    <copy file="${jnode.disk}" todir="${cdrom.dir}"/>
-    <copy file="${sources.dist.tar.gz}" todir="${cdrom.dir}"/>
+    <mkdir dir="${my-build.dir}/cdrom-full"/>
+    <copy file="${jnode.disk}" todir="${my-build.dir}/cdrom-full"/>
+    <copy file="${sources.dist.tar.gz}" todir="${my-build.dir}/cdrom-full"/>
     <exec executable="mkisofs">
-      <arg line="-o ${jnode-x86.iso} -r -hard-disk-boot -b jnodedisk.dat ${cdrom.dir}"/>
+      <arg line="-o ${jnode-x86.iso} -r -hard-disk-boot -b jnodedisk.dat ${my-build.dir}/cdrom-full"/>
     </exec>
   </target>
 
 <!-- Create a bootable CDROM image -->
   <target name="cdrom-lite" depends="boot-disk">
-    <property name="${cdrom.dir}" value="${my-build.dir}/cdrom-lite"/>
-    <mkdir dir="${cdrom.dir}"/>
-    <copy file="${jnode.disk}" todir="${cdrom.dir}"/>
+    <mkdir dir="${my-build.dir}/cdrom-lite"/>
+    <copy file="${jnode.disk}" todir="${my-build.dir}/cdrom-lite"/>
     <exec executable="mkisofs">
-      <arg line="-o ${jnode-x86-lite.iso} -r -hard-disk-boot -b jnodedisk.dat ${cdrom.dir}"/>
+      <arg line="-o ${jnode-x86-lite.iso} -r -hard-disk-boot -b jnodedisk.dat ${my-build.dir}/cdrom-lite"/>
     </exec>
   </target>
 
