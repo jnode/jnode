@@ -101,7 +101,7 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	public synchronized final void handleInterrupt(int irq) {
 		processQueues();
 	}
-	
+
 	/**
 	 * Read the queue until it is empty and process the read data.
 	 */
@@ -124,7 +124,7 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 				// let the driver handle the scancode
 				channel.handleScancode(data);
 			}
-		}		
+		}
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	 * 
 	 * @return the status byte
 	 */
-	private int readStatus() {
+	final int readStatus() {
 		return ioResCtrl.inPortByte(PS2_STAT_PORT) & 0xff;
 	}
 
@@ -142,6 +142,7 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	 * @param b
 	 */
 	private void writeController(int b) {
+		waitWrite();
 		ioResCtrl.outPortByte(PS2_CTRL_PORT, b);
 	}
 
@@ -151,7 +152,19 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	 * @param b
 	 */
 	private final void writeData(int b) {
+		waitWrite();
 		ioResData.outPortByte(PS2_DATA_PORT, b);
+	}
+
+	/**
+	 * Wait for a non-ready inputbuffer.
+	 */
+	private final void waitWrite() {
+		int count = 0;
+		while (((readStatus() & STAT_IBF) != 0) && (count < 1000)) {
+			count++;
+			Thread.yield();
+		}
 	}
 
 	/**
@@ -161,6 +174,24 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	 */
 	private final int readData() {
 		return ioResData.inPortByte(PS2_DATA_PORT) & 0xff;
+	}
+
+	/**
+	 * Gets the mode register
+	 * 
+	 * @return int
+	 */
+	final int getMode() {
+		writeController(CCMD_READ_MODE);
+		return readData();
+	}
+
+	/**
+	 * Sets the mode register
+	 */
+	final void setMode(int mode) {
+		writeController(CCMD_WRITE_MODE);
+		writeData(mode);
 	}
 
 	/**
