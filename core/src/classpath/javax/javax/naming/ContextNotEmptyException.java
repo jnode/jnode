@@ -35,14 +35,20 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.naming;
 
-public class ContextNotEmptyException extends NamingException {
-	public ContextNotEmptyException() {
-		super();
-	}
+import java.lang.Exception;
+ 
+public class ContextNotEmptyException extends NamingException
+{
+  public ContextNotEmptyException ()
+  {
+    super ();
+  }
 
-	public ContextNotEmptyException(String msg) {
-		super(msg);
-	}
+  public ContextNotEmptyException (String msg)
+  {
+    super (msg);
+  }
 }

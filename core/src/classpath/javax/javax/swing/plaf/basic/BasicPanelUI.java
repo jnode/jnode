@@ -1,5 +1,5 @@
 /* BasicPanelUI.java
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,20 +35,22 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing.plaf.basic;
 
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.PanelUI;
 
-public class BasicPanelUI extends PanelUI {
-	int gap = 3;
+public class BasicPanelUI extends PanelUI
+{
+    public static ComponentUI createUI(JComponent x) 
+    {
+        return new BasicPanelUI();
+    }
 
-	public static ComponentUI createUI(JComponent x) {
-		return new BasicPanelUI();
-	}
-
-	public void installUI(JComponent c) {
-		super.installUI(c);
-	}
+    public void installUI(JComponent c)
+    {
+      super.installUI(c);
+    }
 }

@@ -35,71 +35,92 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package javax.naming.spi;
-import java.io.Serializable;
 
+package javax.naming.spi;
+
+import java.io.Serializable;
+import java.util.EventObject;
+import javax.naming.Name;
 import javax.naming.CompositeName;
 import javax.naming.InvalidNameException;
-import javax.naming.Name;
-
+ 
 /**
  * @author Warren Levy <warrenl@redhat.com>
  * @date June 5, 2001
  */
 
-public class ResolveResult implements Serializable {
-	// Serialized fields.
-	protected Object resolvedObj;
-	protected Name remainingName;
+public class ResolveResult implements Serializable
+{
+  // Serialized fields.
+  protected Object resolvedObj;
+  protected Name remainingName;
 
-	protected ResolveResult() {
-		resolvedObj = null;
-		remainingName = null;
-	}
+  protected ResolveResult()
+  {
+    resolvedObj = null;
+    remainingName = null;
+  }
 
-	public ResolveResult(Object robj, String rcomp) {
-		if (robj == null || rcomp == null)
-			throw new IllegalArgumentException();
-		resolvedObj = robj;
-		remainingName = new CompositeName();
-		try {
-			remainingName.add(rcomp);
-		} catch (InvalidNameException _) {
-		}
-	}
+  public ResolveResult(Object robj, String rcomp)
+  {
+    if (robj == null || rcomp == null)
+      throw new IllegalArgumentException ();
+    resolvedObj = robj;
+    remainingName = new CompositeName ();
+    try
+      {
+	remainingName.add (rcomp);
+      }
+    catch (InvalidNameException _)
+      {
+      }
+  }
 
-	public ResolveResult(Object robj, Name rname) {
-		resolvedObj = robj;
-		remainingName = rname;
-	}
+  public ResolveResult(Object robj, Name rname)
+  {
+    resolvedObj = robj;
+    remainingName = rname;
+  }
 
-	public Name getRemainingName() {
-		return remainingName;
-	}
+  public Name getRemainingName()
+  {
+    return remainingName;
+  }
 
-	public Object getResolvedObj() {
-		return resolvedObj;
-	}
+  public Object getResolvedObj()
+  {
+    return resolvedObj;
+  }
 
-	public void setRemainingName(Name name) {
-		remainingName = (Name) name.clone();
-	}
+  public void setRemainingName(Name name)
+  {
+    remainingName = (Name) name.clone();
+  }
 
-	public void appendRemainingName(Name name) {
-		try {
-			remainingName.addAll(name);
-		} catch (InvalidNameException _) {
-		}
-	}
+  public void appendRemainingName(Name name)
+  {
+    try
+      {
+	remainingName.addAll(name);
+      }
+    catch (InvalidNameException _)
+      {
+      }
+  }
 
-	public void appendRemainingComponent(String name) {
-		try {
-			remainingName.add(name);
-		} catch (InvalidNameException _) {
-		}
-	}
+  public void appendRemainingComponent(String name)
+  {
+    try
+      {
+	remainingName.add(name);
+      }
+    catch (InvalidNameException _)
+      {
+      }
+  }
 
-	public void setResolvedObj(Object obj) {
-		resolvedObj = obj;
-	}
+  public void setResolvedObj(Object obj)
+  {
+    resolvedObj = obj;
+  }
 }

@@ -35,14 +35,22 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.naming;
 
-public class NamingSecurityException extends NamingException {
-	public NamingSecurityException() {
-		super();
-	}
+import java.lang.Exception;
+ 
+public abstract class NamingSecurityException extends NamingException
+{
+  private static final long serialVersionUID = 5855287647294685775L;
+  
+  public NamingSecurityException ()
+  {
+    super ();
+  }
 
-	public NamingSecurityException(String msg) {
-		super(msg);
-	}
+  public NamingSecurityException (String msg)
+  {
+    super (msg);
+  }
 }

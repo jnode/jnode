@@ -37,8 +37,11 @@ exception statement from your version. */
 
 
 package javax.naming.spi;
-import javax.naming.*;
+
 import java.util.Hashtable;
+import javax.naming.Context;
+import javax.naming.Name;
+import javax.naming.NamingException;
  
 /**
  * @author Warren Levy <warrenl@redhat.com>
@@ -47,6 +50,6 @@ import java.util.Hashtable;
 
 public interface StateFactory
 {
-  public Object getStateToBind(Object obj, Name name, Context nameCtx,
+  Object getStateToBind(Object obj, Name name, Context nameCtx,
   			       Hashtable environment) throws NamingException;
 }

@@ -35,14 +35,20 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+ 
 package javax.naming;
 
-public class LimitExceededException extends NamingException {
-	public LimitExceededException() {
-		super();
-	}
+import java.lang.Exception;
+ 
+public class LimitExceededException extends NamingException
+{
+  public LimitExceededException ()
+  {
+    super ();
+  }
 
-	public LimitExceededException(String msg) {
-		super(msg);
-	}
+  public LimitExceededException (String msg)
+  {
+    super (msg);
+  }
 }

@@ -37,7 +37,8 @@ exception statement from your version. */
 
 
 package javax.naming.ldap;
-import javax.naming.event.*;
+
+import javax.naming.event.NamingListener;
  
 /**
  * @author Warren Levy <warrenl@redhat.com>
@@ -46,5 +47,5 @@ import javax.naming.event.*;
 
 public interface UnsolicitedNotificationListener extends NamingListener
 {
-  public void notificationReceived(UnsolicitedNotificationEvent evt);
+  void notificationReceived(UnsolicitedNotificationEvent evt);
 }

@@ -20,6 +20,7 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.RenderingHints.Key;
+import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
@@ -788,4 +789,9 @@ public abstract class AbstractGraphics extends Graphics2D {
 	protected final void transform(float[] srcPts, int srcOff, double[] dstPts, int dstOff, int num) {
 		transform.transform(srcPts, srcOff, dstPts, dstOff, num);
 	}
+
+	public FontRenderContext getFontRenderContext() {
+	    throw new RuntimeException("Not implemented yet");
+	}
+	  
 }

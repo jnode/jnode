@@ -35,14 +35,20 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.naming;
 
-public class NoInitialContextException extends NamingException {
-	public NoInitialContextException() {
-		super();
-	}
+import java.lang.Exception;
+ 
+public class NoInitialContextException extends NamingException
+{
+  public NoInitialContextException()
+  {
+    super();
+  }
 
-	public NoInitialContextException(String msg) {
-		super(msg);
-	}
+  public NoInitialContextException(String msg)
+  {
+    super(msg);
+  }
 }

@@ -1,5 +1,5 @@
 /* BasicOptionPaneUI.java
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing.plaf.basic;
 
 import java.awt.Component;
@@ -42,7 +43,6 @@ import java.awt.Dimension;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -50,81 +50,109 @@ import javax.swing.JOptionPane;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.OptionPaneUI;
 
-public class BasicOptionPaneUI extends OptionPaneUI {
-	JOptionPane pane;
+public class BasicOptionPaneUI extends OptionPaneUI
+{
+    JOptionPane pane;
 
-	BasicOptionPaneUI() {
-	}
+    BasicOptionPaneUI()
+    {
+    }
 
-	public static ComponentUI createUI(JComponent x) {
-		return new BasicOptionPaneUI();
-	}
+    public static ComponentUI createUI(JComponent x) 
+    {
+        return new BasicOptionPaneUI();
+    }
 
-	public void installUI(JComponent c) {
-		super.installUI(c);
-		pane = (JOptionPane) c;
+    public void installUI(JComponent c)
+    {
+	super.installUI(c);
+	pane = (JOptionPane)c;
 
-		System.out.println("     -------------: " + pane);
+	System.out.println("     -------------: " + pane);
 
-		JLabel message = pane.msg != null ? new JLabel((String) pane.msg) : null;
-		JButton ok_button = new JButton("Ok");
+	JLabel  message   = null;
+	JButton ok_button = new JButton("Ok");	
 
-		ok_button.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent a) {
-				System.out.println("ACTION ---> " + a);
-				//		    pane.dialog.dispose();
+	ok_button.addActionListener(new ActionListener()
+	    {
+		public void actionPerformed(ActionEvent a)
+		{
+		    System.out.println("ACTION ---> " + a);
+		    //		    pane.dialog.dispose();
 
-				if (pane.dialog.isModal()) {
-					System.out.println("modal dialog !!");
-					pane.dialog.setModal(false);
-				}
-				pane.dialog.setVisible(false);
+		    if (pane.dialog.isModal())
+			{
+			    System.out.println("modal dialog !!");
+			    pane.dialog.setModal(false);
 			}
-		});
-
-		if (pane.args != null) {
-			for (int i = 0; i < pane.args.length; i++) {
-				Object o = pane.args[i];
-				if (o != null) {
-					if (o instanceof String) {
-						String s = (String) o;
-						JLabel m = new JLabel(s);
-						pane.add(m);
-					} else if (o instanceof Component) {
-						Component com = (Component) o;
-						pane.add(com);
-					} else {
-						System.out.println("UNRECOGNIZED ARG: " + o);
-					}
-				}
-			}
+		    pane.dialog.setVisible(false);
 		}
+	    });
 
-		pane.add(message);
-		pane.add(ok_button);
-	}
+	Object[] options = null;
+	if (options != null)
+	    {
+		for (int i=0; i<options.length; i++)
+		    {
+			Object o = options[i];
+			if (o != null)
+			    {
+				if (o instanceof String)
+				    {
+					String s = (String) o;
+					JLabel m = new JLabel(s);
+					pane.add(m);
+				    }
+				else if (o instanceof Component)
+				    {
+					Component com = (Component) o;
+					pane.add(com);
+				    }
+				else
+				    {
+					System.out.println("UNRECOGNIZED ARG: " + o);
+				    }
+			    }
+		    }
+	    }
 
-	Dimension getMinimumOptionPaneSize() {
-		return new Dimension(300, 100);
-	}
+	pane.add(message);
+	pane.add(ok_button);
+    }
 
-	public Dimension getPreferredSize(JComponent c) {
-		if (c == null)
-			return getMinimumOptionPaneSize();
+    Dimension getMinimumOptionPaneSize()
+    {
+	return new Dimension(300,100);
+    }
 
-		if (c != pane)
-			return null;
+    public Dimension getPreferredSize(JComponent c)
+    {
+	if (c == null)
+	    return getMinimumOptionPaneSize();
 
-		LayoutManager l = c.getLayout();
-		if (l == null)
-			return getMinimumOptionPaneSize();
+	if (c != pane)
+	    return null;
 
-		Dimension d1 = l.preferredLayoutSize(c);
-		Dimension d2 = getMinimumOptionPaneSize();
+	LayoutManager l  = c.getLayout();
+	if (l == null)
+	    return getMinimumOptionPaneSize();
 
-		d1.width = Math.max(d1.width, d2.width);
-		d1.height = Math.max(d1.height, d2.height);
+	Dimension d1 = l.preferredLayoutSize(c);
+	Dimension d2 = getMinimumOptionPaneSize();
+	
+	d1.width = Math.max(d1.width, d2.width);
+	d1.height = Math.max(d1.height, d2.height);
 
-		return d2;
-	}
+	return d2;
+    }
+
+  public void selectInitialValue(JOptionPane op)
+  {
+     throw new Error ("Not implemented");
+  }
+
+  public boolean containsCustomComponents(JOptionPane op)
+  {
+     throw new Error ("Not implemented");
+  }
 }

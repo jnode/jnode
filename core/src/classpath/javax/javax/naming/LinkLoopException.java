@@ -35,14 +35,20 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+ 
 package javax.naming;
 
-public class LinkLoopException extends LinkException {
-	public LinkLoopException() {
-		super();
-	}
+import java.lang.Exception;
+ 
+public class LinkLoopException extends LinkException
+{
+  public LinkLoopException ()
+  {
+    super ();
+  }
 
-	public LinkLoopException(String msg) {
-		super(msg);
-	}
+  public LinkLoopException (String msg)
+  {
+    super (msg);
+  }
 }

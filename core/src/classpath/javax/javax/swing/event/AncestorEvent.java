@@ -35,106 +35,65 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing.event;
 
-// Imports
-import javax.swing.*;
-import java.awt.*;
+import java.awt.AWTEvent;
+import java.awt.Container;
+import javax.swing.JComponent;
 
 /**
- * Ancestor Event
  * @author Andrew Selkirk
  * @author Ronald Veldema
  */
-public class AncestorEvent extends AWTEvent {
+public class AncestorEvent extends AWTEvent
+{
+  private static final long serialVersionUID = -8079801679695605002L;
+  
+  public static final int ANCESTOR_ADDED = 1;
+  public static final int ANCESTOR_REMOVED = 2;
+  public static final int ANCESTOR_MOVED = 3;
 
-	//-------------------------------------------------------------
-	// Constants --------------------------------------------------
-	//-------------------------------------------------------------
+  private JComponent sourceComponent;
+  private Container ancestor;
+  private Container ancestorParent;
 
-	/**
-	 * ANCESTOR_ADDED constant
-	 */
-	public static int ANCESTOR_ADDED	= 0;
-	
-	/**
-	 * ANCESTOR_MOVED constant
-	 */
-	public static int ANCESTOR_MOVED	= 1;
+  /**
+   * @param source Source component
+   * @param id ID
+   * @param ancestor ancestor
+   * @param ancestorParent parent ancestor
+   */
+  public AncestorEvent(JComponent source, int id, Container ancestor,
+		       Container ancestorParent)
+  {
+    super(source, id);
+    this.sourceComponent = source;
+    this.ancestor = ancestor;
+    this.ancestorParent = ancestorParent;
+  }
 
-	/**
-	 * ANCESTOR_REMOVED constant
-	 */
-	public static int ANCESTOR_REMOVED	= 2;
+  /**
+   * Returns the ancestor of this event.
+   */
+  public Container getAncestor()
+  {
+    return ancestor;
+  }
 
+  /**
+   * Returns the ancester parent of this event.
+   */
+  public Container getAncestorParent()
+  {
+    return ancestorParent;
+  }
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Source component
-	 */
-	private JComponent	sourceComponent	= null;
-
-	/**
-	 * Ancestor
-	 */
-	private Container	ancestor		= null;
-	
-	/**
-	 * Ancestor Parent
-	 */
-	private Container	ancestorParent	= null;
-
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Constructor AncestorEvent
-	 * @param source Source component
-	 * @param id ID
-	 * @param ancestor ancestor
-	 * @param ancestorParent parent ancestor
-	 */
-	public AncestorEvent(JComponent source, int id, Container ancestor, 
-						Container ancestorParent) {
-		super(source, id);
-		this.sourceComponent = source;
-		this.ancestor 		= ancestor;
-		this.ancestorParent	= ancestorParent;
-	} // AncestorEvent()
-
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Get ancestor
-	 * @return ancestor
-	 */
-	public Container getAncestor() {
-		return ancestor;
-	} // getAncestor()
-
-	/**
-	 * Get ancestor parent
-	 * @return ancestor parent
-	 */
-	public Container getAncestorParent() {
-		return ancestorParent;
-	} // getAncestorParent()
-
-	/**
-	 * Get component
-	 * @return component
-	 */
-	public JComponent getComponent() {
-		return sourceComponent;
-	} // getComponent()
-
-
-} // AncestorEvent
+  /**
+   * Returns the source of this event.
+   */
+  public JComponent getComponent()
+  {
+    return sourceComponent;
+  }
+}

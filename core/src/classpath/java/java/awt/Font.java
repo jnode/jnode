@@ -37,6 +37,8 @@ exception statement from your version. */
 
 package java.awt;
 
+import java.awt.font.FontRenderContext;
+import java.awt.font.LineMetrics;
 import java.awt.peer.FontPeer;
 import java.util.Locale;
 import java.util.StringTokenizer;
@@ -276,7 +278,10 @@ public class Font implements java.io.Serializable {
 	/*
 	 * Instance Methods
 	 */
-
+	public LineMetrics getLineMetrics(String str,
+            FontRenderContext frc) {
+	    throw new RuntimeException("Not implemented yet");
+	}
 	/**
 	  * Returns the name of the font.
 	  *
