@@ -20,13 +20,18 @@ final class FileSystemManager {
 	/** All registed filesystems (device, fs) */
 	private final HashMap filesystems = new HashMap();
 
+	protected String getMountPoint(Device device) {
+		return device.getId();
+	}
+	
 	/**
 	 * Register a mounted filesystem
 	 * 
 	 * @param fs
 	 */
 	public synchronized void registerFileSystem(FileSystem fs) {
-		String idToMount = fs.getDevice().getId();
+		//String idToMount = fs.getDevice().getId();
+		String idToMount = getMountPoint(fs.getDevice());
 		filesystems.put(idToMount, fs);
 	}
 
@@ -36,7 +41,9 @@ final class FileSystemManager {
 	 * @param device
 	 */
 	public synchronized FileSystem unregisterFileSystem(Device device) {
-		return (FileSystem)filesystems.remove(device.getId());
+		//return (FileSystem)filesystems.remove(device.getId());
+		return (FileSystem)filesystems.remove(getMountPoint(device));
+
 	}
 
 	/**
@@ -46,7 +53,8 @@ final class FileSystemManager {
 	 * @return null if no filesystem was found.
 	 */
 	public synchronized FileSystem getFileSystem(Device device) {
-		return (FileSystem)filesystems.get(device.getId());
+		//return (FileSystem)filesystems.get(device.getId());
+		return (FileSystem)filesystems.get(getMountPoint(device));
 	}
 
 	/**
