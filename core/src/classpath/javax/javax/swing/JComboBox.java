@@ -69,39 +69,21 @@ public class JComboBox extends JComponent
 {
   private static final long serialVersionUID = 5654585963292734470L;
 
-
-	//-------------------------------------------------------------
-	// Classes ----------------------------------------------------
-	//-------------------------------------------------------------
-
 	/**
 	 * AccessibleJComboBox
 	 */
 	protected class AccessibleJComboBox extends AccessibleJComponent 
-			implements AccessibleAction, AccessibleSelection {
-
-		//-------------------------------------------------------------
-		// Variables --------------------------------------------------
-		//-------------------------------------------------------------
-
-
-		//-------------------------------------------------------------
-		// Initialization ---------------------------------------------
-		//-------------------------------------------------------------
+    implements AccessibleAction, AccessibleSelection
+  {
+    private static final long serialVersionUID = 8217828307256675666L;
 
 		/**
 		 * Constructor AccessibleJComboBox
 		 * @param component TODO
 		 */
-		protected AccessibleJComboBox(JComboBox component) {
-			super(component);
-			// TODO
-		} // AccessibleJComboBox()
-
-
-		//-------------------------------------------------------------
-		// Methods ----------------------------------------------------
-		//-------------------------------------------------------------
+    protected AccessibleJComboBox()
+    {
+    }
 
 		/**
 		 * getAccessibleChildrenCount
@@ -808,12 +790,14 @@ public class JComboBox extends JComponent
 	 * getAccessibleContext
 	 * @returns AccessibleContext
 	 */
-	public AccessibleContext getAccessibleContext() {
-		if (accessibleContext == null) {
-			accessibleContext = new AccessibleJComboBox(this);
-		} // if
+  public AccessibleContext getAccessibleContext()
+  {
+    if (accessibleContext == null)
+      accessibleContext = new AccessibleJComboBox();
+
 		return accessibleContext;
-	} // getAccessibleContext()
+  }
+  
   /**
    * addActionListener
    * @param listener TODO

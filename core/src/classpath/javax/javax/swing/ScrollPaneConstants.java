@@ -1,5 +1,5 @@
 /* ScrollPaneConstants.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -42,12 +42,8 @@ package javax.swing;
  * @author	Andrew Selkirk
  * @version	1.0
  */
-public interface ScrollPaneConstants {
-
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
-
+public interface ScrollPaneConstants
+{
 	/**
 	 * VIEWPORT
 	 */
@@ -152,6 +148,4 @@ public interface ScrollPaneConstants {
 	 * HORIZONTAL_SCROLLBAR_ALWAYS
 	 */
 	int HORIZONTAL_SCROLLBAR_ALWAYS = 32;
-
-
-} // ScrollPaneConstants
+}

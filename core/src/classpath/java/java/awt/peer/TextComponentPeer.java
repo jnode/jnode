@@ -38,17 +38,20 @@ exception statement from your version. */
 
 package java.awt.peer;
 
+import java.awt.Rectangle;
+
 public interface TextComponentPeer extends ComponentPeer
 {
-
-public abstract int getSelectionEnd();
-public abstract int getSelectionStart();
-public abstract String getText();
-public abstract void setText(String text);
-public abstract void select(int start_pos, int end_pos);
-public abstract void setEditable(boolean editable);
-public abstract int getCaretPosition();
-public abstract void setCaretPosition(int pos);
-
+  int getSelectionEnd();
+  int getSelectionStart();
+  String getText();
+  void setText(String text);
+  void select(int start_pos, int end_pos);
+  void setEditable(boolean editable);
+  int getCaretPosition();
+  void setCaretPosition(int pos);
+  int getIndexAtPoint(int x, int y);
+  Rectangle getCharacterBounds(int pos);
+  long filterEvents(long filter);
 } // interface TextComponentPeer 
 

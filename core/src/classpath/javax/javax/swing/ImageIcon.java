@@ -35,38 +35,50 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package javax.swing;
 
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.io.Serializable;
+import java.net.URL;
 
-public class ImageIcon implements Icon
+
+public class ImageIcon
+  implements Icon, Serializable
 {
+  private static final long serialVersionUID = 532615968316031794L;
     Image image;
-    String file, descr;
+  String file;
+  String descr;
     Component observer;
 
   public ImageIcon(String s)
     {
     	// if description is not specified, then file name becomes
 	// desciption for this icon
-	
 	this(s, s);
     }
 
-  public ImageIcon(String file,
-	      String descr)
+  public ImageIcon(Image image)
+  {
+  }
+
+  public ImageIcon(URL url)
+  {
+    image = Toolkit.getDefaultToolkit().getImage(url);
+  }
+
+  public ImageIcon(String file, String descr)
     {
         this.file = file;
         this.descr = descr;
 
         image = Toolkit.getDefaultToolkit().getImage(file);
-        if (image == null) {
+    if (image == null)
             return;
-        }
+
         //loadImage(image);
     }
 
@@ -77,22 +89,31 @@ public class ImageIcon implements Icon
     }
 
     public Image getImage() 
-    {  return image;    }
+  {
+    return image;
+  }
 
     public String getDescription() 
-    {  return descr;    }
+  {
+    return descr;
+  }
+
     public void setDescription(String description) 
-    {  this.descr = description;    }
+  {
+    this.descr = description;
+  }
 
     public int getIconHeight()
-    {	return image.getHeight(observer);    }
-    public int getIconWidth()
-    {	return image.getWidth(observer);    }
+  {
+    return image.getHeight(observer);
+  }
 
-    public void paintIcon(Component c, 
-			  Graphics g,
-			  int x, 
-			  int y)
+    public int getIconWidth()
+  {
+    return image.getWidth(observer);
+  }
+
+  public void paintIcon(Component c, Graphics g, int x, int y)
     {
 	g.drawImage(image, x, y, observer);
     }

@@ -1,5 +1,5 @@
 /* JTextComponent.java -- 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -42,8 +42,10 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Insets;
-import java.awt.Rectangle;
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.InputMethodListener;
+
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
@@ -51,6 +53,7 @@ import javax.accessibility.AccessibleStateSet;
 import javax.accessibility.AccessibleText;
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.Scrollable;
 import javax.swing.UIManager;
@@ -60,6 +63,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.plaf.TextUI;
 
+
 public abstract class JTextComponent extends JComponent
   implements Scrollable, Accessible
 {
@@ -67,259 +71,233 @@ public abstract class JTextComponent extends JComponent
 //      implements AccessibleText, CaretListener, DocumentListener,
 //                 AccessibleAction, AccessibleEditableText
 //    {
-//    } // class AccessibleJTextComponent
+//    }
 
 	/**
 	 * AccessibleJTextComponent
 	 */
 	public class AccessibleJTextComponent extends AccessibleJComponent
-		implements AccessibleText, CaretListener, DocumentListener {
-
-		//-------------------------------------------------------------
-		// Variables --------------------------------------------------
-		//-------------------------------------------------------------
+    implements AccessibleText, CaretListener, DocumentListener
+  {
+    private static final long serialVersionUID = 7664188944091413696L;
 
 		/**
 		 * caretPos
 		 */
 		int caretPos;
 
-
-		//-------------------------------------------------------------
-		// Initialization ---------------------------------------------
-		//-------------------------------------------------------------
-
 		/**
 		 * Constructor AccessibleJTextComponent
 		 * @param component TODO
 		 */
-		public AccessibleJTextComponent(JTextComponent component) {
-			super(component);
-			// TODO
-		} // AccessibleJTextComponent()
-
-
-		//-------------------------------------------------------------
-		// Methods ----------------------------------------------------
-		//-------------------------------------------------------------
+    public AccessibleJTextComponent()
+    {
+    }
 
 		/**
 		 * getCaretPosition
-		 * @returns int
+     * @return int
 		 */
-		public int getCaretPosition() {
+    public int getCaretPosition()
+    {
 			return 0; // TODO
-		} // getCaretPosition()
+    }
 
 		/**
 		 * getSelectedText
-		 * @returns String
+     * @return String
 		 */
-		public String getSelectedText() {
+    public String getSelectedText()
+    {
 			return null; // TODO
-		} // getSelectedText()
+    }
 
 		/**
 		 * getSelectionStart
-		 * @returns int
+     * @return int
 		 */
-		public int getSelectionStart() {
+    public int getSelectionStart()
+    {
 			return 0; // TODO
-		} // getSelectionStart()
+    }
 
 		/**
 		 * getSelectionEnd
-		 * @returns int
+     * @return int
 		 */
-		public int getSelectionEnd() {
+    public int getSelectionEnd()
+    {
 			return 0; // TODO
-		} // getSelectionEnd()
+    }
 
 		/**
 		 * caretUpdate
 		 * @param value0 TODO
 		 */
-		public void caretUpdate(CaretEvent value0) {
+    public void caretUpdate(CaretEvent value0)
+    {
 			// TODO
-		} // caretUpdate()
+    }
 
 		/**
 		 * getAccessibleStateSet
-		 * @returns AccessibleStateSet
+     * @return AccessibleStateSet
 		 */
-		public AccessibleStateSet getAccessibleStateSet() {
+    public AccessibleStateSet getAccessibleStateSet()
+    {
 			return null; // TODO
-		} // getAccessibleStateSet()
+    }
 
 		/**
 		 * getAccessibleRole
-		 * @returns AccessibleRole
+     * @return AccessibleRole
 		 */
-		public AccessibleRole getAccessibleRole() {
+    public AccessibleRole getAccessibleRole()
+    {
 			return null; // TODO
-		} // getAccessibleRole()
+    }
 
 		/**
 		 * getAccessibleText
-		 * @returns AccessibleText
+     * @return AccessibleText
 		 */
-		public AccessibleText getAccessibleText() {
+    public AccessibleText getAccessibleText()
+    {
 			return null; // TODO
-		} // getAccessibleText()
+    }
 
 		/**
 		 * insertUpdate
 		 * @param value0 TODO
 		 */
-		public void insertUpdate(DocumentEvent value0) {
+    public void insertUpdate(DocumentEvent value0)
+    {
 			// TODO
-		} // insertUpdate()
+    }
 
 		/**
 		 * removeUpdate
 		 * @param value0 TODO
 		 */
-		public void removeUpdate(DocumentEvent value0) {
+    public void removeUpdate(DocumentEvent value0)
+    {
 			// TODO
-		} // removeUpdate()
+    }
 
 		/**
 		 * changedUpdate
 		 * @param value0 TODO
 		 */
-		public void changedUpdate(DocumentEvent value0) {
+    public void changedUpdate(DocumentEvent value0)
+    {
 			// TODO
-		} // changedUpdate()
+    }
 
 		/**
 		 * getIndexAtPoint
 		 * @param value0 TODO
-		 * @returns int
+     * @return int
 		 */
-		public int getIndexAtPoint(Point value0) {
+    public int getIndexAtPoint(Point value0)
+    {
 			return 0; // TODO
-		} // getIndexAtPoint()
+    }
 
 		/**
 		 * getRootEditorRect
-		 * @returns Rectangle
+     * @return Rectangle
 		 */
-		Rectangle getRootEditorRect() {
-			return null; // TODO
-		} // getRootEditorRect()
+    Rectangle getRootEditorRect()
+    {
+      return null;
+    }
 
 		/**
 		 * getCharacterBounds
 		 * @param value0 TODO
-		 * @returns Rectangle
+     * @return Rectangle
 		 */
-		public Rectangle getCharacterBounds(int value0) {
+    public Rectangle getCharacterBounds(int value0)
+    {
 			return null; // TODO
-		} // getCharacterBounds()
+    }
 
 		/**
 		 * getCharCount
-		 * @returns int
+     * @return int
 		 */
-		public int getCharCount() {
+    public int getCharCount()
+    {
 			return 0; // TODO
-		} // getCharCount()
+    }
 
 		/**
 		 * getCharacterAttribute
 		 * @param value0 TODO
-		 * @returns AttributeSet
+     * @return AttributeSet
 		 */
-		public AttributeSet getCharacterAttribute(int value0) {
+    public AttributeSet getCharacterAttribute(int value0)
+    {
 			return null; // TODO
-		} // getCharacterAttribute()
+    }
 
 		/**
 		 * getAtIndex
 		 * @param value0 TODO
 		 * @param value1 TODO
-		 * @returns String
+     * @return String
 		 */
-		public String getAtIndex(int value0, int value1) {
+    public String getAtIndex(int value0, int value1)
+    {
 			return null; // TODO
-		} // getAtIndex()
+    }
 
 		/**
 		 * getAfterIndex
 		 * @param value0 TODO
 		 * @param value1 TODO
-		 * @returns String
+     * @return String
 		 */
-		public String getAfterIndex(int value0, int value1) {
+    public String getAfterIndex(int value0, int value1)
+    {
 			return null; // TODO
-		} // getAfterIndex()
+    }
 
 		/**
 		 * getBeforeIndex
 		 * @param value0 TODO
 		 * @param value1 TODO
-		 * @returns String
+     * @return String
 		 */
-		public String getBeforeIndex(int value0, int value1) {
+    public String getBeforeIndex(int value0, int value1)
+    {
 			return null; // TODO
-		} // getBeforeIndex()
-
-
-	} // AccessibleJTextComponent
-
-
+    }
+  }
 
   public static class KeyBinding
   {
     public KeyStroke key;
     public String actionName;
+
     public KeyBinding(KeyStroke key, String actionName)
     {
       this.key = key;
       this.actionName = actionName;
     }
-  } // class KeyBinding
-
-  int icon_gap;
-    Icon icon;
-    int align;
-    Document doc;
-
-    public JTextComponent()
-    {
-	this("", null, 0);
     }
 
-    public JTextComponent(Icon image)
-    {
-	this("", image, 0);
-    }
+  private static final long serialVersionUID = -8796518220218978795L;
 
-    public JTextComponent(Icon image, int horizontalAlignment)
-    {
-	this("", image, horizontalAlignment);
-    }
+  public static final String DEFAULT_KEYMAP = "default";
+  public static final String FOCUS_ACCELERATOR_KEY = "focusAcceleratorKey";
 
-    public JTextComponent(String text)
-    {
-	this(text, null, 0);
-    }
+  private Document doc;
+  private Caret caret;
+  private boolean editable;
 
-    public JTextComponent(String text, int horizontalAlignment)
+  public JTextComponent()
     {
-	this(text, null, horizontalAlignment);
-    }
-
-    public JTextComponent(String text, Icon icon, int horizontalAlignment)
-    {
-	setDocument(new PlainDocument());
-
-	// do the work.....
-	setText(text);
-	this.icon  = icon;
-	this.align     = horizontalAlignment;
-	
-        // its an editor, so:
         enableEvents(AWTEvent.KEY_EVENT_MASK);
         updateUI();
     }
@@ -338,174 +316,333 @@ public abstract class JTextComponent extends JComponent
 	return doc;
     }
 
-    protected  int checkHorizontalKey(int key, String message)
-    {
-	//    Verify that key is a legal value for the horizontalAlignment properties. 
-	return 0;
-    }
-    protected  int checkVerticalKey(int key, String message)
-    {
-	//      Verify that key is a legal value for the verticalAlignment or verticalTextPosition properties.  
-	return 0;
-    }
+  /**
+   * Get the AccessibleContext of this object
+   */
     public AccessibleContext getAccessibleContext()
     {
-	//          Get the AccessibleContext of this object 
-	return null;
-    }
-    public Icon getDisabledIcon()
-    {
-	return null;
-    }
-    public int getDisplayedMnemonic()
-    {
-	//          Return the keycode that indicates a mnemonic key.   
-	return 0;
-    }
-    public int getHorizontalAlignment()
-    {
-	//          Returns the alignment of the label's contents along the X axis.   
-	return 0;
-    }
-    public int getHorizontalTextPosition()
-    {
-	//          Returns the horizontal position of the label's text, relative to its image.    
-	return 0;
-    }
-
-    public Icon getIcon()
-    {	return icon;    }
-    public int getIconTextGap()
-    {	return icon_gap;    }
-
-
-    Component getLabelFor()
-    {
-	//          Get the component this is labelling.  
 	return null;
     }
 
-    public Insets getMargin()
+  public Insets getMargin()
     {
-        // FIXME: Not implemented.
-        return null;
+    // FIXME: Not implemented.
+	return null;
     }
 
-    public void setText(String text)
+  public void setText(String text)
     {
-	getDocument().remove(0,doc.getLength());
+    try
+    {
+	getDocument().remove(0, doc.getLength());
 	getDocument().insertString(0, text, null);
     }
-  
-    public String getText()
+    catch (BadLocationException e)
     {
-	return getDocument().getText(0, 
-				     getDocument().getLength());
+      }
     }
 
-    public String getUIClassID()
-    {
-	//          Returns a string that specifies the name of the l&f class that renders this component.  
-	return "TextComponentUI";
-    }
-    public int getVerticalAlignment()
-    {
-	//          Returns the alignment of the label's contents along the Y axis. 
-	return 0;
-    }
-    public int getVerticalTextPosition()
-    {
-	//          Returns the vertical position of the label's text, relative to its image. 
-	return 0;
-    }
-
-    public boolean imageUpdate(Image img, int infoflags, int x, int y, int w, int h)
-    {
-	//          This is overriden to return false if the current Icon's Image is not equal to the passed in Image img. 
-	return (img == icon);
-    }
-    protected  String paramString()
-    {
-	//          Returns a string representation of this JTextComponent.  
-	return "JTextComponent";
-    }
-    void setDisabledIcon(Icon disabledIcon)
-    {
-	//          Set the icon to be displayed if this JTextComponent is "disabled" (JTextComponent.setEnabled(false)).  
-    }
-    void setDisplayedMnemonic(char aChar)
-    {
-	//          Specifies the displayedMnemonic as a char value.  
-    }
-    void setDisplayedMnemonic(int key)
-    {
-	//          Specify a keycode that indicates a mnemonic key.  
-    }
-    void setHorizontalAlignment(int alignment)
-    {
-	//          Sets the alignment of the label's contents along the X axis.  
-    }
-    void setHorizontalTextPosition(int textPosition)
-    {
-	//          Sets the horizontal position of the label's text, relative to its image.  
-    }
-    void setIcon(Icon icon)
-    {
-	//          Defines the icon this component will display.  
-    }
-    public void setIconTextGap(int iconTextGap)
-    {
-	//          If both the icon and text properties are set, this property defines the space between them.  
-    }
-  
-    public void setLabelFor(Component c)
-    {
-	//          Set the component this is labelling.  
-    }
-    
-    public void setVerticalAlignment(int alignment)
-    {
-	//          Sets the alignment of the label's contents along the Y axis.  
-    }
-    public void setVerticalTextPosition(int textPosition)
-    {
-	//          Sets the vertical position of the label's text, relative to its image.  
-    }
-
-    public TextUI getUI()
+  /**
+   * Retrieves the current text in this text document.
+   *
+   * @return the text
+   *
+   * @exception NullPointerException if the underlaying document is null
+   */
+  public String getText()
   {
+    return getDocument().getText(0, getDocument().getLength());
+  }
+
+  /**
+   * Retrieves a part of the current text in this document.
+   *
+   * @param offset the postion of the first character
+   * @param length the length of the text to retrieve
+   *
+   * @return the text
+   *
+   * @exception BadLocationException if arguments do not hold pre-conditions
+   */
+  public String getText(int offset, int length)
+    throws BadLocationException
+  {
+    return getDocument().getText(offset, length);
+  }
+
+  /**
+   * Returns a string that specifies the name of the l&amp;f class
+   * that renders this component.
+   *
+   * @return the string "TextComponentUI"
+   */
+  public String getUIClassID()
+    {
+    return "TextComponentUI";
+    }
+
+  /**
+   * Returns a string representation of this JTextComponent.
+   */
+  protected String paramString()
+    {
+    return "JTextComponent";
+    }
+
+  public TextUI getUI()
+    {
     return (TextUI) UIManager.getUI(this);
     }
-
-    public void updateUI()
+  
+  public void updateUI()
     {
     setUI(getUI());
     }
 
   public Dimension getPreferredScrollableViewportSize()
-  {
+    {
     return null;
-  }
+    }
+
   public int getScrollableUnitIncrement(Rectangle visible, int orientation,
                                         int direction)
-  {
-    return 0;
-  }
+    {
+	return 0;
+    }
+
   public int getScrollableBlockIncrement(Rectangle visible, int orientation,
                                          int direction)
+    {
+	return 0;
+    }
+
+  /**
+   * Checks whether this text component it editable.
+   *
+   * @return true if editable, false otherwise
+   */
+  public boolean isEditable()
+    {
+    return editable;
+    }
+
+  /**
+   * Enables/disabled this text component's editability.
+   *
+   * @param editable true to make it editable, false otherwise.
+   */
+  public void setEditable(boolean editable)
+    {
+    firePropertyChange("editable", this.editable, editable);
+    this.editable = editable;
+    }
+
+  /**
+   * The <code>Caret</code> object used in this text component.
+   *
+   * @return the caret object
+   */
+  public Caret getCaret()
+    {
+    return caret;
+    }
+
+  /**
+   * Retrisves the current caret position.
+   *
+   * @return the current position
+   */
+  public int getCaretPosition()
+    {
+    return caret.getDot();
+    }
+
+  /**
+   * Sets the caret to a new position.
+   *
+   * @param position the new position
+   */
+  public void setCaretPosition(int position)
+    {
+    if (doc == null)
+      return;
+
+    if (position < 0 || position > doc.getLength())
+      throw new IllegalArgumentException();
+
+    caret.setDot(position);
+    }
+
+  /**
+   * Moves the caret to a given position. This selects the text between
+   * the old and the new position of the caret.
+   */
+  public void moveCaretPosition(int position)
+    {
+    if (doc == null)
+      return;
+
+    if (position < 0 || position > doc.getLength())
+      throw new IllegalArgumentException();
+
+    caret.moveDot(position);
+    }
+
+  /**
+   * Returns the start postion of the currently selected text.
+   *
+   * @return the start postion
+   */
+  public int getSelectionStart()
+    {
+    return Math.min(caret.getDot(), caret.getMark());
+    }
+
+  /**
+   * Selects the text from the given postion to the selection end position.
+   *
+   * @param end the start positon of the selected text.
+   */
+  public void setSelectionStart(int start)
+    {
+    select(start, getSelectionEnd());
+    }
+
+  /**
+   * Returns the end postion of the currently selected text.
+   *
+   * @return the end postion
+   */
+  public int getSelectionEnd()
+    {
+    return Math.max(caret.getDot(), caret.getMark());
+    }
+  
+  /**
+   * Selects the text from the selection start postion to the given position.
+   *
+   * @param end the end positon of the selected text.
+   */
+  public void setSelectionEnd(int end)
+    {
+    select(getSelectionStart(), end);
+    }
+    
+  /**
+   * Selects a part of the content of the text component.
+   *
+   * @param start the start position of the selected text
+   * @param ent the end position of the selected text
+   */
+  public void select(int start, int end)
+    {
+    int length = doc.getLength();
+    
+    start = Math.max(start, 0);
+    start = Math.min(start, length);
+
+    end = Math.max(end, 0);
+    end = Math.min(end, length);
+
+    setCaretPosition(start);
+    moveCaretPosition(end);
+    }
+
+  /**
+   * Selects the whole content of the text component.
+   */
+  public void selectAll()
+    {
+    select(0, doc.getLength());
+    }
+
+  public boolean getScrollableTracksViewportHeight()
   {
-    return 0;
+    if (getParent() instanceof JViewport)
+      return ((JViewport) getParent()).getHeight() > getPreferredSize().height;
+
+    return false;
+    }
+
+  public boolean getScrollableTracksViewportWidth()
+    {
+    if (getParent() instanceof JViewport)
+      return ((JViewport) getParent()).getWidth() > getPreferredSize().width;
+
+    return false;
+    }
+
+  /**
+   * Adds a <code>CaretListener</code> object to this text component.
+   *
+   * @param listener the listener to add
+   */
+  public void addCaretListener(CaretListener listener)
+  {
+    listenerList.add(CaretListener.class, listener);
   }
-} // class JTextComponent
 
+  /**
+   * Removed a <code>CaretListener</code> object from this text component.
+   *
+   * @param listener the listener to remove
+   */
+  public void removeCaretListener(CaretListener listener)
+  {
+    listenerList.remove(CaretListener.class, listener);
+  }
 
+  /**
+   * Returns all added <code>CaretListener</code> objects.
+   *
+   * @return an array of listeners
+   */
+  public CaretListener[] getCaretListeners()
+  {
+    return (CaretListener[]) getListeners(CaretListener.class);
+  }
 
+  /**
+   * Notifies all registered <code>CaretListener</code> objects that the caret
+   * was updated.
+   *
+   * @param event the event to send
+   */
+  protected void fireCaretUpdate(CaretEvent event)
+  {
+    CaretListener[] listeners = getCaretListeners();
 
+    for (int index = 0; index < listeners.length; ++index)
+      listeners[index].caretUpdate(event);
+  }
 
+  /**
+   * Adds an <code>InputListener</code> object to this text component.
+   *
+   * @param listener the listener to add
+   */
+  public void addInputMethodListener(InputMethodListener listener)
+  {
+    listenerList.add(InputMethodListener.class, listener);
+  }
 
+  /**
+   * Removes an <code>InputListener</code> object from this text component.
+   *
+   * @param listener the listener to remove
+   */
+  public void removeInputMethodListener(InputMethodListener listener)
+  {
+    listenerList.remove(InputMethodListener.class, listener);
+  }
 
-
-
-
-
-
+  /**
+   * Returns all added <code>InputMethodListener</code> objects.
+   *
+   * @return an array of listeners
+   */
+  public InputMethodListener[] getInputMethodListeners()
+  {
+    return (InputMethodListener[]) getListeners(InputMethodListener.class);
+  }
+}

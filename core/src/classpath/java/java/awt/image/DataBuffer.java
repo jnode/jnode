@@ -43,7 +43,8 @@ package java.awt.image;
  *
  * @author Rolf W. Rasmussen <rolfwr@ii.uib.no>
  */
-public abstract class DataBuffer {
+public abstract class DataBuffer
+{
 	public static final int TYPE_BYTE = 0;
 	public static final int TYPE_USHORT = 1;
 	public static final int TYPE_SHORT = 2;
@@ -67,7 +68,8 @@ public abstract class DataBuffer {
 	/** Offset into each bank.  */
 	protected int[] offsets;
 
-	protected DataBuffer(int dataType, int size) {
+  protected DataBuffer(int dataType, int size)
+  {
 		this.dataType = dataType;
 		this.size = size;
 	}
@@ -99,36 +101,42 @@ public abstract class DataBuffer {
 
 	public static int getDataTypeSize(int dataType) {
 		// Maybe this should be a lookup table instead.
-		switch (dataType) {
-			case TYPE_BYTE :
+    switch (dataType)
+      {
+      case TYPE_BYTE:
 				return 8;
-			case TYPE_USHORT :
-			case TYPE_SHORT :
+      case TYPE_USHORT:
+      case TYPE_SHORT:
 				return 16;
-			case TYPE_INT :
-			case TYPE_FLOAT :
+      case TYPE_INT:
+      case TYPE_FLOAT:
 				return 32;
-			case TYPE_DOUBLE :
+      case TYPE_DOUBLE:
 				return 64;
-			default :
+      default:
 				throw new IllegalArgumentException();
 		}
 	}
 
-	public int getDataType() {
+  public int getDataType()
+  {
 		return dataType;
 	}
 
-	public int getSize() {
+  public int getSize()
+  {
 		return size;
 	}
 
-	public int getOffset() {
+  public int getOffset()
+  {
 		return offset;
 	}
 
-	public int[] getOffsets() {
-		if (offsets == null) {
+  public int[] getOffsets()
+  {
+    if (offsets == null)
+    {
 			// is this necessary?
 			offsets = new int[1];
 			offsets[0] = offset;
@@ -136,51 +144,62 @@ public abstract class DataBuffer {
 		return offsets;
 	}
 
-	public int getNumBanks() {
+  public int getNumBanks()
+  {
 		return banks;
 	}
 
-	public int getElem(int i) {
+  public int getElem(int i)
+  {
 		return getElem(0, i);
 	}
 
 	public abstract int getElem(int bank, int i);
 
-	public void setElem(int i, int val) {
+  public void setElem(int i, int val)
+  {
 		setElem(0, i, val);
 	}
 
 	public abstract void setElem(int bank, int i, int val);
 
-	public float getElemFloat(int i) {
+  public float getElemFloat(int i)
+  {
 		return getElem(i);
 	}
 
-	public float getElemFloat(int bank, int i) {
+  public float getElemFloat(int bank, int i)
+  {
 		return getElem(bank, i);
 	}
 
-	public void setElemFloat(int i, float val) {
+  public void setElemFloat(int i, float val)
+  {
 		setElem(i, (int) val);
 	}
 
-	public void setElemFloat(int bank, int i, float val) {
+  public void setElemFloat(int bank, int i, float val)
+  {
 		setElem(bank, i, (int) val);
 	}
 
-	public double getElemDouble(int i) {
+  public double getElemDouble(int i)
+  {
 		return getElem(i);
 	}
 
-	public double getElemDouble(int bank, int i) {
+  public double getElemDouble(int bank, int i)
+  {
 		return getElem(bank, i);
 	}
 
-	public void setElemDouble(int i, double val) {
+  public void setElemDouble(int i, double val)
+  {
 		setElem(i, (int) val);
 	}
 
-	public void setElemDouble(int bank, int i, double val) {
+  public void setElemDouble(int bank, int i, double val)
+  {
 		setElem(bank, i, (int) val);
 	}
 }

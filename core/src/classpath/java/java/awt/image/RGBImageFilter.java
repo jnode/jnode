@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt.image;
 
 /**
@@ -43,8 +44,9 @@ package java.awt.image;
  *
  * @author Mark Benvenuto <mcb54@columbia.edu>
  */
-public abstract class RGBImageFilter extends ImageFilter {
-	protected ColorModel origmodel = ColorModel.getRGBdefault();
+public abstract class RGBImageFilter extends ImageFilter
+{
+    protected ColorModel origmodel;
 
 	protected ColorModel newmodel;
 
@@ -58,7 +60,8 @@ public abstract class RGBImageFilter extends ImageFilter {
 	/**
 	   Construct new RGBImageFilter.
 	 */
-	public RGBImageFilter() {
+    public RGBImageFilter() 
+    {
 	}
 
 	/**
@@ -69,12 +72,13 @@ public abstract class RGBImageFilter extends ImageFilter {
 	 *
 	 * @param model the color model to be used most often by setPixels
 	 * @see ColorModel */
-	public void setColorModel(ColorModel model) {
+    public void setColorModel(ColorModel model) 
+    {
 		origmodel = model;
 		newmodel = model;
 
-		if ((model instanceof IndexColorModel) && canFilterIndexColorModel) {
-			newmodel = filterIndexColorModel((IndexColorModel) model);
+	if( ( model instanceof IndexColorModel) && canFilterIndexColorModel  ) {
+		newmodel = filterIndexColorModel( (IndexColorModel) model );
 		}
 	}
 
@@ -86,7 +90,9 @@ public abstract class RGBImageFilter extends ImageFilter {
 	   @param oldcm the old ColorModel
 	   @param newcm the new ColorModel
 	 */
-	public void substituteColorModel(ColorModel oldcm, ColorModel newcm) {
+    public void substituteColorModel(ColorModel oldcm,
+				     ColorModel newcm)
+    {
 		origmodel = oldcm;
 		newmodel = newcm;
 	}
@@ -97,27 +103,30 @@ public abstract class RGBImageFilter extends ImageFilter {
 	
 	   @param icm an IndexColorModel to filter
 	 */
-	public IndexColorModel filterIndexColorModel(IndexColorModel icm) {
+    public IndexColorModel filterIndexColorModel(IndexColorModel icm) 
+    {
 		int len = icm.getMapSize(), rgb;
 		byte reds[] = new byte[len], greens[] = new byte[len], blues[] = new byte[len], alphas[] = new byte[len];
 
-		icm.getAlphas(alphas);
-		icm.getReds(reds);
-		icm.getGreens(greens);
-		icm.getBlues(blues);
+	icm.getAlphas( alphas );
+	icm.getReds( reds );
+	icm.getGreens( greens );
+	icm.getBlues( blues );
 
-		for (int i = 0; i < len; i++) {
-			rgb = filterRGB(-1, -1, makeColor(alphas[i], reds[i], greens[i], blues[i]));
-			alphas[i] = (byte) ((0xff000000 & rgb) >> 24);
-			reds[i] = (byte) ((0xff0000 & rgb) >> 16);
-			greens[i] = (byte) ((0xff00 & rgb) >> 8);
-			blues[i] = (byte) (0xff & rgb);
-		}
-		return new IndexColorModel(icm.getPixelSize(), len, reds, greens, blues, alphas);
-	}
+	for( int i = 0; i < len; i++ )
+	    {
+		rgb = filterRGB( -1, -1, makeColor ( alphas[i], reds[i], greens[i], blues[i] ) );
+		alphas[i] = (byte)(( 0xff000000 & rgb ) >> 24);
+		reds[i] = (byte)(( 0xff0000 & rgb ) >> 16);
+		greens[i] = (byte)(( 0xff00 & rgb ) >> 8);
+		blues[i] = (byte)(0xff & rgb);
+	    }
+	return new IndexColorModel( icm.getPixelSize(), len, reds, greens, blues, alphas );
+    }
 
-	private int makeColor(byte a, byte r, byte g, byte b) {
-		return (0xff000000 & (a << 24) | 0xff0000 & (r << 16) | 0xff00 & (b << 8) | 0xff & g);
+    private int makeColor( byte a, byte r, byte g, byte b )
+    {
+	return ( 0xff000000 & (a << 24) | 0xff0000 & (r << 16) | 0xff00 & (g << 8) | 0xff & b ); 
 	}
 
 	/**
@@ -132,15 +141,25 @@ public abstract class RGBImageFilter extends ImageFilter {
 	   @param offset the index of the first pixels in the <code>pixels</code> array
 	   @param scansize the width to use in extracting pixels from the <code>pixels</code> array
 	*/
-	public void filterRGBPixels(int x, int y, int w, int h, int[] pixels, int off, int scansize) {
-		int xp, yp;
+    public void filterRGBPixels(int x,
+				int y,
+				int w,
+				int h,
+				int[] pixels,
+				int off,
+				int scansize)
+    {
+	int xp, yp, i;
 
-		for (xp = x; xp < (x + w); xp++) {
-			for (yp = y; yp < (y + h); yp++) {
-				pixels[off + yp * scansize + xp] = filterRGB(xp, yp, pixels[off + yp * scansize + xp]);
-			}
+	i = 0;
+	for( xp = x; xp < ( x + w); xp++ )
+	    for( yp = y; yp < (y + h); yp++ )
+	    {
+		pixels[i] = filterRGB( xp, yp, pixels[i] );
+		i++;
 		}
 	}
+
 
 	/**
 	 * If the ColorModel is the same ColorModel which as already converted 
@@ -156,14 +175,20 @@ public abstract class RGBImageFilter extends ImageFilter {
 	 * @param offset the index of the first pixels in the <code>pixels</code> array
 	 * @param scansize the width to use in extracting pixels from the <code>pixels</code> array
 	 */
-	public void setPixels(int x, int y, int w, int h, ColorModel model, byte[] pixels, int offset, int scansize) {
-		if (model == origmodel) {
+    public void setPixels(int x, int y, int w, int h, 
+                          ColorModel model, byte[] pixels,
+                          int offset, int scansize)
+    {
+	if(model == origmodel && (model instanceof IndexColorModel) && canFilterIndexColorModel)
+	{
 			consumer.setPixels(x, y, w, h, newmodel, pixels, offset, scansize);
-		} else {
-			//FIXME
-			//convert to proper CM
-			int pixelsi[] = new int[pixels.length / 4];
-			filterRGBPixels(x, y, w, h, pixelsi, offset, scansize);
+	}
+	else
+	{
+	    int intPixels[] =
+		convertColorModelToDefault( x, y, w, h, model, pixels, offset, scansize );
+	    filterRGBPixels( x, y, w, h, intPixels, offset, scansize );
+	    consumer.setPixels(x, y, w, h, ColorModel.getRGBdefault(), intPixels, offset, scansize);
 		}
 	}
 
@@ -181,31 +206,56 @@ public abstract class RGBImageFilter extends ImageFilter {
 	 * @param offset the index of the first pixels in the <code>pixels</code> array
 	 * @param scansize the width to use in extracting pixels from the <code>pixels</code> array
 	 */
-	public void setPixels(int x, int y, int w, int h, ColorModel model, int[] pixels, int offset, int scansize) {
-		if (model == origmodel) {
+    public void setPixels(int x, int y, int w, int h, 
+                          ColorModel model, int[] pixels,
+                          int offset, int scansize)
+    {
+	if(model == origmodel && (model instanceof IndexColorModel) && canFilterIndexColorModel)
+	{
 			consumer.setPixels(x, y, w, h, newmodel, pixels, offset, scansize);
-		} else {
-			convertColorModelToDefault(x, y, w, h, model, pixels, offset, scansize);
-			filterRGBPixels(x, y, w, h, pixels, offset, scansize);
+	}
+	else
+	{
+	    //FIXME: Store the filtered pixels in a separate temporary buffer?
+	    convertColorModelToDefault( x, y, w, h, model, pixels, offset, scansize );
+	    filterRGBPixels( x, y, w, h, pixels, offset, scansize );
+	    consumer.setPixels(x, y, w, h, ColorModel.getRGBdefault(), pixels, offset, scansize);
 		}
 	}
 
-	private void convertColorModelToDefault(int x, int y, int w, int h, ColorModel model, int pixels[], int offset, int scansize) {
-		int xp, yp;
-
-		for (xp = x; xp < (x + w); xp++) {
-			for (yp = y; yp < (y + h); yp++) {
-				pixels[offset + yp * scansize + xp] = makeColorbyDefaultCM(pixels[offset + yp * scansize + xp]);
+    private int[] convertColorModelToDefault(int x, int y, int w, int h, 
+                                            ColorModel model, byte pixels[],
+                                            int offset, int scansize)
+    {
+	int intPixels[] = new int[pixels.length];
+	for (int i = 0; i < pixels.length; i++)
+	    intPixels[i] = makeColorbyDefaultCM(model, pixels[i]);
+	return intPixels;
 			}
+
+    private void convertColorModelToDefault(int x, int y, int w, int h, 
+                                            ColorModel model, int pixels[],
+                                            int offset, int scansize)
+    {
+	for (int i = 0; i < pixels.length; i++)
+	    pixels[i] = makeColorbyDefaultCM(model, pixels[i]);
 		}
-	}
-	private int makeColorbyDefaultCM(int rgb) {
-		return makeColor(origmodel.getRed(rgb), origmodel.getGreen(rgb), origmodel.getGreen(rgb), origmodel.getBlue(rgb));
+
+    private int makeColorbyDefaultCM(ColorModel model, byte rgb) 
+    {
+	return makeColor( model.getAlpha( rgb ) * 4, model.getRed( rgb ) * 4, model.getGreen( rgb ) * 4, model.getBlue( rgb ) * 4 );
 	}
 
-	private int makeColor(int a, int r, int g, int b) {
-		return (0xff000000 & (a << 24) | 0xff0000 & (r << 16) | 0xff00 & (b << 8) | 0xff & g);
+    private int makeColorbyDefaultCM(ColorModel model, int rgb) 
+    {
+	return makeColor( model.getAlpha( rgb ), model.getRed( rgb ), model.getGreen( rgb ), model.getBlue( rgb ) );
 	}
+
+    private int makeColor( int a, int r, int g, int b )
+    {
+	return (int)( 0xff000000 & (a << 24) | 0xff0000 & (r << 16) | 0xff00 & (g << 8) | 0xff & b ); 
+	}
+
 
 	/**
 	   Filters a single pixel from the default ColorModel.
@@ -214,5 +264,7 @@ public abstract class RGBImageFilter extends ImageFilter {
 	   @param y y-coordinate
 	   @param rgb color
 	 */
-	public abstract int filterRGB(int x, int y, int rgb);
+    public abstract int filterRGB(int x,
+				  int y,
+				  int rgb);
 }

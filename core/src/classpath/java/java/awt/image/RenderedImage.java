@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt.image;
 
 import java.awt.Rectangle;
@@ -43,7 +44,8 @@ import java.util.Vector;
 /**
  * NEEDS DOCUMENTATION
  */
-public interface RenderedImage {
+public interface RenderedImage
+{
 	Vector getSources();
 	Object getProperty(String name);
 	String[] getPropertyNames();

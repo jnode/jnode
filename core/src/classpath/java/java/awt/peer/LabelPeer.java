@@ -40,9 +40,7 @@ package java.awt.peer;
 
 public interface LabelPeer extends ComponentPeer
 {
-
-public abstract void setAlignment(int alignment);
-public abstract void setText(String text);
-
+  void setAlignment(int alignment);
+  void setText(String text);
 } // interface LabelPeer 
 

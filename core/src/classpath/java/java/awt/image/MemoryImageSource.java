@@ -35,12 +35,15 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt.image;
 
+import java.awt.Image;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-public class MemoryImageSource implements ImageProducer {
+public class MemoryImageSource implements ImageProducer 
+{
 	private boolean animated = false;
 	private boolean fullbuffers = false;
 	private int pixeli[], width, height, offset, scansize;
@@ -51,56 +54,71 @@ public class MemoryImageSource implements ImageProducer {
 	/**
 	   Constructs an ImageProducer from memory
 	*/
-	public MemoryImageSource(int w, int h, ColorModel cm, byte pix[], int off, int scan) {
-		this(w, h, cm, pix, off, scan, null);
+    public MemoryImageSource(int w, int h, ColorModel cm,
+			     byte pix[], int off, int scan)
+    {
+	this ( w, h, cm, pix, off, scan, null );
 	}
 	/**
 	   Constructs an ImageProducer from memory
 	*/
-	public MemoryImageSource(int w, int h, ColorModel cm, byte pix[], int off, int scan, Hashtable props) {
+    public MemoryImageSource( int w, int h, ColorModel cm,
+			      byte pix[], int off, int scan,
+			      Hashtable props)
+    {
 		width = w;
 		height = h;
 		this.cm = cm;
 		offset = off;
 		scansize = scan;
 		this.props = props;
-		int max = ((scansize > width) ? scansize : width);
-		pixelb = new byte[max * height];
-		System.arraycopy(pix, 0, pixelb, 0, max);
+	int max = (( scansize > width ) ? scansize : width );
+	pixelb = new byte[ max  * height ];
+	System.arraycopy( pix, 0, pixelb, 0, max * height );
 	}
 	/**
 	   Constructs an ImageProducer from memory
 	*/
-	public MemoryImageSource(int w, int h, ColorModel cm, int pix[], int off, int scan) {
-		this(w, h, cm, pix, off, scan, null);
+    public MemoryImageSource(int w, int h, ColorModel cm,
+			     int pix[], int off, int scan)
+    {
+	this ( w, h, cm, pix, off, scan, null );
 	}
 
 	/**
 	   Constructs an ImageProducer from memory
 	*/
-	public MemoryImageSource(int w, int h, ColorModel cm, int pix[], int off, int scan, Hashtable props) {
+    public MemoryImageSource(int w, int h, ColorModel cm,
+			     int pix[], int off, int scan,
+			     Hashtable props)
+    {
 		width = w;
 		height = h;
 		this.cm = cm;
 		offset = off;
 		scansize = scan;
 		this.props = props;
-		int max = ((scansize > width) ? scansize : width);
-		pixeli = new int[max * height];
-		System.arraycopy(pix, 0, pixeli, 0, max);
+	int max = (( scansize > width ) ? scansize : width );
+	pixeli = new int[ max  * height ];
+	System.arraycopy( pix, 0, pixeli, 0, max * height );
 	}
 	/**
 	   Constructs an ImageProducer from memory using the default RGB ColorModel
 	*/
-	public MemoryImageSource(int w, int h, int pix[], int off, int scan, Hashtable props) {
-		this(w, h, ColorModel.getRGBdefault(), pix, off, scan, props);
+    public MemoryImageSource(int w, int h,
+			     int pix[], int off, int scan,
+			     Hashtable props)
+    {
+	this ( w, h, ColorModel.getRGBdefault(), pix, off, scan, props);
 	}
 
 	/**
 	   Constructs an ImageProducer from memory using the default RGB ColorModel
 	*/
-	public MemoryImageSource(int w, int h, int pix[], int off, int scan) {
-		this(w, h, ColorModel.getRGBdefault(), pix, off, scan, null);
+    public MemoryImageSource(int w, int h,
+			     int pix[], int off, int scan)
+    {
+	this ( w, h, ColorModel.getRGBdefault(), pix, off, scan, null);
 	}
 
 	/**
@@ -143,10 +161,10 @@ public class MemoryImageSource implements ImageProducer {
 			consumers.put(ic, ic);
 		}
 		Enumeration e = consumers.elements();
-		for (; e.hasMoreElements();) {
-			ic = (ImageConsumer) e.nextElement();
-			sendPicture(ic);
-			ic.imageComplete(ImageConsumer.SINGLEFRAME);
+	for( ; e.hasMoreElements(); ) {
+		ic = (ImageConsumer)e.nextElement();
+		sendPicture( ic );
+		ic.imageComplete( ImageConsumer.SINGLEFRAME );
 		}
 
 	}
@@ -157,8 +175,9 @@ public class MemoryImageSource implements ImageProducer {
 	 * resend the image data in the order top-down, left-right.  
 	 */
 	public void requestTopDownLeftRightResend(ImageConsumer ic) {
-		startProduction(ic);
+	startProduction ( ic );
 	}
+
 
 	/**
 	   Changes a flag to indicate whether this MemoryImageSource supports
@@ -166,9 +185,11 @@ public class MemoryImageSource implements ImageProducer {
 	
 	   @param animated A flag indicating whether this class supports animations
 	 */
-	public synchronized void setAnimated(boolean animated) {
+    public synchronized void setAnimated(boolean animated)
+    {
 		this.animated = animated;
 	}
+
 
 	/**
 	   A flag to indicate whether or not to send full buffer updates when
@@ -177,34 +198,39 @@ public class MemoryImageSource implements ImageProducer {
 	
 	   @param fullbuffers - a flag indicating whether to send the full buffers 
 	 */
-	public synchronized void setFullBufferUpdates(boolean fullbuffers) {
+    public synchronized void setFullBufferUpdates(boolean fullbuffers)
+    {
 		this.fullbuffers = fullbuffers;
 	}
 
 	/**
 	   Send an animation frame to the image consumers.
 	 */
-	public void newPixels() {
-		if (animated == true) {
+    public void newPixels()
+    {
+	if( animated == true ) {
 			ImageConsumer ic;
 			Enumeration e = consumers.elements();
-			for (; e.hasMoreElements();) {
-				ic = (ImageConsumer) e.nextElement();
-				sendPicture(ic);
-				ic.imageComplete(ImageConsumer.SINGLEFRAME);
+		for( ; e.hasMoreElements(); ) {
+			ic = (ImageConsumer)e.nextElement();
+			sendPicture( ic );
+			ic.imageComplete( ImageConsumer.SINGLEFRAME );
 			}
 		}
 	}
 
-	private void sendPicture(ImageConsumer ic) {
-		ic.setHints(ImageConsumer.TOPDOWNLEFTRIGHT);
-		if (props != null) {
-			ic.setProperties(props);
+    
+    private void sendPicture ( ImageConsumer ic )
+    {
+	ic.setHints( ImageConsumer.TOPDOWNLEFTRIGHT );
+	if( props != null ) {
+	    ic.setProperties( props );
 		}
-		if (pixeli != null) {
-			ic.setPixels(0, 0, width, height, cm, pixeli, offset, scansize);
+	ic.setDimensions(width, height);
+	if( pixeli != null ) {
+	    ic.setPixels( 0, 0, width, height, cm, pixeli, offset, scansize );
 		} else {
-			ic.setPixels(0, 0, width, height, cm, pixelb, offset, scansize);
+	    ic.setPixels( 0, 0, width, height, cm, pixelb, offset, scansize );
 		}
 	}
 
@@ -212,29 +238,42 @@ public class MemoryImageSource implements ImageProducer {
 	   Send an animation frame to the image consumers containing the specified
 	   pixels unless setFullBufferUpdates is set.
 	 */
-	public synchronized void newPixels(int x, int y, int w, int h) {
-		if (animated == true) {
-			if (fullbuffers) {
+    public synchronized void newPixels(int x,
+				       int y,
+				       int w,
+				       int h)
+    {
+	if( animated == true )
+	    {
+		if( fullbuffers ) {
 				newPixels();
 			} else {
 				ImageConsumer ic;
 				Enumeration e = consumers.elements();
-				for (; e.hasMoreElements();) {
-					ic = (ImageConsumer) e.nextElement();
-					ic.setHints(ImageConsumer.TOPDOWNLEFTRIGHT);
-					if (props != null) {
-						ic.setProperties(props);
-					}
-					if (pixeli != null) {
-						ic.setPixels(0, 0, width, height, cm, pixeli, offset, scansize);
+		    for( ; e.hasMoreElements(); ) {
+			    ic = (ImageConsumer)e.nextElement();
+			    ic.setHints( ImageConsumer.TOPDOWNLEFTRIGHT );
+			    if( props != null ) {
+				ic.setProperties( props );
+			    }
+			    if( pixeli != null ) {
+				int[] pixelbuf = new int[w * h];
+				for (int row = y; row < h; row++)
+				    System.arraycopy(pixeli, row * scansize + x + offset, pixelbuf, row * w, w);
+				ic.setPixels( x, y, w, h, cm, pixelbuf, 0, w );
 					} else {
-						ic.setPixels(0, 0, width, height, cm, pixelb, offset, scansize);
+				byte[] pixelbuf = new byte[w * h];
+				for (int row = y; row < h; row++)
+				    System.arraycopy(pixelb, row * scansize + x + offset, pixelbuf, row * w, w);
+				ic.setPixels( x, y, w, h, cm, pixelbuf, 0, w );
 					}
-					ic.imageComplete(ImageConsumer.SINGLEFRAME);
+			    ic.imageComplete( ImageConsumer.SINGLEFRAME );
 				}
 			}
 		}
 	}
+
+
 
 	/**
 	   Send an animation frame to the image consumers containing the specified
@@ -243,40 +282,74 @@ public class MemoryImageSource implements ImageProducer {
 	   If framenotify is set then a notification is sent when the frame 
 	   is sent otherwise no status is sent.
 	 */
-	public synchronized void newPixels(int x, int y, int w, int h, boolean framenotify) {
-		if (animated == true) {
-			if (fullbuffers) {
+    public synchronized void newPixels(int x,
+				       int y,
+				       int w,
+				       int h,
+				       boolean framenotify)
+    {
+	if( animated == true )
+	    {
+		if( fullbuffers ) {
 				newPixels();
 			} else {
 				ImageConsumer ic;
 				Enumeration e = consumers.elements();
-				for (; e.hasMoreElements();) {
-					ic = (ImageConsumer) e.nextElement();
-					ic.setHints(ImageConsumer.TOPDOWNLEFTRIGHT);
-					if (props != null) {
-						ic.setProperties(props);
-					}
-					if (pixeli != null) {
-						ic.setPixels(0, 0, width, height, cm, pixeli, offset, scansize);
+		    for( ; e.hasMoreElements(); ) {
+			    ic = (ImageConsumer)e.nextElement();
+			    ic.setHints( ImageConsumer.TOPDOWNLEFTRIGHT );
+			    if( props != null ) {
+				ic.setProperties( props );
+			    }
+			    if( pixeli != null ) {
+				int[] pixelbuf = new int[w * h];
+				for (int row = y; row < h; row++)
+				    System.arraycopy(pixeli, row * scansize + x + offset, pixelbuf, row * w, w);
+				ic.setPixels( x, y, w, h, cm, pixelbuf, 0, w );
 					} else {
-						ic.setPixels(0, 0, width, height, cm, pixelb, offset, scansize);
+				byte[] pixelbuf = new byte[w * h];
+				for (int row = y; row < h; row++)
+				    System.arraycopy(pixelb, row * scansize + x + offset, pixelbuf, row * w, w);
+				ic.setPixels( x, y, w, h, cm, pixelbuf, 0, w );
 					}
-					if (framenotify == true)
-						ic.imageComplete(ImageConsumer.SINGLEFRAME);
+			    if( framenotify == true )
+				ic.imageComplete( ImageConsumer.SINGLEFRAME );
 				}
 			}
 		}
 	}
 
-	public synchronized void newPixels(byte newpix[], ColorModel newmodel, int offset, int scansize) {
-		if (animated == true) {
-			//FIXME
+    public synchronized void newPixels(byte newpix[],
+				       ColorModel newmodel,
+				       int offset,
+				       int scansize)
+
+    {
+	pixeli = null;
+	pixelb = newpix;
+	cm = newmodel;
+	this.offset = offset;
+	this.scansize = scansize;
+	if( animated == true )
+	    {
+		newPixels();
 		}
 	}
 
-	public synchronized void newPixels(int newpix[], ColorModel newmodel, int offset, int scansize) {
-		if (animated == true) {
-			//FIXME
+    public synchronized void newPixels(int newpix[],
+				       ColorModel newmodel,
+				       int offset,
+				       int scansize)
+
+    {
+	pixelb = null;
+	pixeli = newpix;
+	cm = newmodel;
+	this.offset = offset;
+	this.scansize = scansize;
+	if( animated == true )
+	    {
+		newPixels();
 		}
 	}
 

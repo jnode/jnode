@@ -35,70 +35,182 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package javax.swing;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
-
 import javax.accessibility.AccessibleStateSet;
+import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.PlainDocument;
 
-public class JTextField extends JEditorPane
+
+public class JTextField extends JTextComponent
+  implements SwingConstants
 {
-
 	/**
 	 * AccessibleJTextField
 	 */
-	protected class AccessibleJTextField extends AccessibleJTextComponent {
-
-		//-------------------------------------------------------------
-		// Initialization ---------------------------------------------
-		//-------------------------------------------------------------
+  protected class AccessibleJTextField extends AccessibleJTextComponent
+  {
+    private static final long serialVersionUID = 8255147276740453036L;
 
 		/**
 		 * Constructor AccessibleJTextField
-		 * @param component TODO
 		 */
-		protected AccessibleJTextField(JTextField component) {
-			super(component);
-			// TODO
-		} // AccessibleJTextField()
+    protected AccessibleJTextField()
+    {
+    }
 
-
-		//-------------------------------------------------------------
-		// Methods ----------------------------------------------------
-		//-------------------------------------------------------------
-
-		/**
-		 * getAccessibleStateSet
-		 * @returns AccessibleStateSet
-		 */
-		public AccessibleStateSet getAccessibleStateSet() {
-			return null; // TODO
-		} // getAccessibleStateSet()
-
-
-	} // AccessibleJTextField
-
-
-    Vector actions = new Vector();
-
-  public JTextField()
-  {
+    /**
+     * getAccessibleStateSet
+     * @return AccessibleStateSet
+     */
+    public AccessibleStateSet getAccessibleStateSet()
+    {
+      return null;
+    }
   }
 
-    public JTextField(int a)
+  private static final long serialVersionUID = 353853209832607592L;
+
+  public static final String notifyAction = "notify-field-accept";
+
+  private int columns;
+
+		/**
+   * Creates a new instance of <code>JTextField</code>.
+		 */
+  public JTextField()
+  {
+    this(null, null, 0);
+  }
+
+  /**
+   * Creates a new instance of <code>JTextField</code>.
+   *
+   * @param text the initial text
+   */
+  public JTextField(String text)
+  {
+    this(null, text, 0);
+  }
+
+  /**
+   * Creates a new instance of <code>JTextField</code>.
+   *
+   * @param columns the number of columns
+   *
+   * @exception IllegalArgumentException if columns %lt; 0
+   */
+  public JTextField(int columns)
+  {
+    this(null, null, columns);
+  }
+
+  /**
+   * Creates a new instance of <code>JTextField</code>.
+   *
+   * @param text the initial text
+   * @param columns the number of columns
+   *
+   * @exception IllegalArgumentException if columns %lt; 0
+   */
+  public JTextField(String text, int columns)
+  {
+    this(null, text, columns);
+  }
+
+  /**
+   * Creates a new instance of <code>JTextField</code>.
+   *
+   * @param doc the document to use
+   * @param text the initial text
+   * @param columns the number of columns
+   *
+   * @exception IllegalArgumentException if columns %lt; 0
+   */
+  public JTextField(Document doc, String text, int columns)
+  {
+    if (doc == null)
+      doc = createDefaultModel();
+
+    setDocument(doc);
+    setText(text);
+    setColumns(columns);
+  }
+
+  /**
+   * Creates the default model for this text field.
+   * This implementation returns an instance of <code>PlainDocument</code>.
+   *
+   * @return a new instance of the default model
+   */
+  protected Document createDefaultModel()
+  {
+    return new PlainDocument();
+  }
+
+  /**
+   * Adds a new listener object to this text field.
+   *
+   * @param listener the listener to add
+   */
+  public void addActionListener(ActionListener listener)
+  {
+    listenerList.add(ActionListener.class, listener);
+  }
+
+  /**
+   * Removes a listener object from this text field.
+   *
+   * @param listener the listener to remove
+   */
+  public void removeActionListener(ActionListener listener)
+  {
+    listenerList.remove(ActionListener.class, listener);
+  }
+
+  /**
+   * Returns all registered <code>ActionListener</code> objects.
+   *
+   * @return an array of listeners
+   */
+  public ActionListener[] getActionListeners()
     {
+    return (ActionListener[]) getListeners(ActionListener.class);
     }
 
-    public void addActionListener(ActionListener l)
+  /**
+   * Sends an action event to all registered
+   * <code>ActionListener</code> objects.
+   */
+  protected void fireActionPerformed()
     {
-	actions.addElement(l);
+    ActionEvent event = new ActionEvent(this, 0, notifyAction);
+    ActionListener[] listeners = getActionListeners();
+
+    for (int index = 0; index < listeners.length; ++index)
+      listeners[index].actionPerformed(event);
     }
 
-    public void removeActionListener(ActionListener l)
+  /**
+   * Returns the number of columns of this text field.
+   *
+   * @return the number of columns
+   */
+  public int getColumns()
     {
-	actions.removeElement(l);
+    return columns;
+  }
+
+  public void setColumns(int columns)
+  {
+    if (columns < 0)
+      throw new IllegalArgumentException();
+
+    this.columns = columns;
+    // FIXME: Invalidate layout.
     }
 
     public void selectAll()

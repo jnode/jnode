@@ -35,20 +35,18 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt.image;
 
 /**
- *
  * @author C. Brian Jones (cbj@gnu.org) 
  */
-public class IndexColorModel extends ColorModel {
-	
+public class IndexColorModel extends ColorModel
+{
 	private int map_size;
-	//private boolean opaque;
+  private boolean opaque;
 	private int trans = -1;
 	private int[] rgb;
-	private static final int LOOKUP_CACHE_SIZE = 32;
-	private final int[] lookupCache = new int[LOOKUP_CACHE_SIZE*2];
 
 	/**
 	 * Each array much contain <code>size</code> elements.  For each 
@@ -62,8 +60,10 @@ public class IndexColorModel extends ColorModel {
 	 * @param greens the green component of all colors
 	 * @param blues the blue component of all colors
 	 */
-	public IndexColorModel(int bits, int size, byte[] reds, byte[] greens, byte[] blues) {
-		this(bits, size, reds, greens, blues, null);
+  public IndexColorModel(int bits, int size, byte[] reds, byte[] greens,
+                         byte[] blues)
+  {
+    this (bits, size, reds, greens, blues, (byte[]) null);
 	}
 
 	/**
@@ -79,8 +79,10 @@ public class IndexColorModel extends ColorModel {
 	 * @param blues the blue component of all colors
 	 * @param trans the index of the transparent color
 	 */
-	public IndexColorModel(int bits, int size, byte[] reds, byte[] greens, byte[] blues, int trans) {
-		this(bits, size, reds, greens, blues, null);
+  public IndexColorModel(int bits, int size, byte[] reds, byte[] greens,
+                         byte[] blues, int trans)
+  {
+    this (bits, size, reds, greens, blues, (byte[]) null);
 		this.trans = trans;
 	}
 
@@ -97,18 +99,32 @@ public class IndexColorModel extends ColorModel {
 	 * @param blues the blue component of all colors
 	 * @param alphas the alpha component of all colors
 	 */
-	public IndexColorModel(int bits, int size, byte[] reds, byte[] greens, byte[] blues, byte[] alphas) {
-		super(bits);
+  public IndexColorModel(int bits, int size, byte[] reds, byte[] greens,
+                         byte[] blues, byte[] alphas)
+  {
+    super (bits);
 		map_size = size;
+    opaque = (alphas == null);
 
 		rgb = new int[size];
-		if (alphas == null) {
-			for (int i = 0; i < size; i++) {
-				rgb[i] = 0xff000000 | ((reds[i] & 0xff) << 16) | ((greens[i] & 0xff) << 8) | (blues[i] & 0xff);
-			}
-		} else {
-			for (int i = 0; i < size; i++) {
-				rgb[i] = ((alphas[i] & 0xff) << 24 | ((reds[i] & 0xff) << 16) | ((greens[i] & 0xff) << 8) | (blues[i] & 0xff));
+    if (alphas == null)
+      {
+        for (int i = 0; i < size; i++)
+          {
+            rgb[i] = (0xff000000
+                      | ((reds[i] & 0xff) << 16)
+                      | ((greens[i] & 0xff) << 8)
+                      | (blues[i] & 0xff));
+          }
+      }
+    else
+      {
+        for (int i = 0; i < size; i++)
+          {
+            rgb[i] = ((alphas[i] & 0xff) << 24
+                      | ((reds[i] & 0xff) << 16)
+                      | ((greens[i] & 0xff) << 8)
+                      | (blues[i] & 0xff));
 			}
 		}
 	}
@@ -125,8 +141,10 @@ public class IndexColorModel extends ColorModel {
 	 * @param start the offset of the first color component in <code>cmap</code>
 	 * @param hasAlpha <code>cmap</code> has alpha values
 	 */
-	public IndexColorModel(int bits, int size, byte[] cmap, int start, boolean hasAlpha) {
-		this(bits, size, cmap, start, hasAlpha, -1);
+  public IndexColorModel (int bits, int size, byte[] cmap, int start, 
+                          boolean hasAlpha)
+  {
+    this (bits, size, cmap, start, hasAlpha, -1);
 	}
 
 	/**
@@ -142,247 +160,130 @@ public class IndexColorModel extends ColorModel {
 	 * @param hasAlpha <code>cmap</code> has alpha values
 	 * @param trans the index of the transparent color
 	 */
-	public IndexColorModel(int bits, int size, byte[] cmap, int start, boolean hasAlpha, int trans) {
-		super(bits);
+  public IndexColorModel (int bits, int size, byte[] cmap, int start, 
+                          boolean hasAlpha, int trans)
+  {
+    super (bits);
 		map_size = size;
+    opaque = !hasAlpha;
 		this.trans = trans;
 	}
 
-	public final int getMapSize() {
+  public final int getMapSize ()
+  {
 		return map_size;
 	}
 
 	/**
 	 * Get the index of the transparent color in this color model
 	 */
-	public final int getTransparentPixel() {
+  public final int getTransparentPixel ()
+  {
 		return trans;
 	}
 
 	/**
 	 * <br>
 	 */
-	public final void getReds(byte[] r) {
-		getComponents(r, 2);
+  public final void getReds (byte[] r)
+  {
+    getComponents (r, 2);
 	}
 
 	/**
 	 * <br>
 	 */
-	public final void getGreens(byte[] g) {
-		getComponents(g, 1);
+  public final void getGreens (byte[] g)
+  {
+    getComponents (g, 1);
 	}
 
 	/**
 	 * <br>
 	 */
-	public final void getBlues(byte[] b) {
-		getComponents(b, 0);
+  public final void getBlues (byte[] b)
+  {
+    getComponents (b, 0);
 	}
 
 	/**
 	 * <br>
 	 */
-	public final void getAlphas(byte[] a) {
-		getComponents(a, 3);
+  public final void getAlphas (byte[] a)
+  {
+    getComponents (a, 3);
 	}
 
-	private void getComponents(byte[] c, int ci) {
+  private void getComponents (byte[] c, int ci)
+  {
 		int i, max = (map_size < c.length) ? map_size : c.length;
-		for (i = 0; i < max; i++) {
-			c[i] = (byte) (rgb[i] >> (ci * 8));
-		}
+    for (i = 0; i < max; i++)
+	    c[i] = (byte) ((generateMask (ci)  & rgb[i]) >> (ci * pixel_bits));
 	}
 
 	/**
 	 * Get the red component of the given pixel.
-	 * <br>
 	 */
-	public final int getRed(int pixel) {
-		if (pixel < map_size) {
-			return ((rgb[pixel] >> 16) & 0xFF);
-		} else {
+  public final int getRed (int pixel)
+  {
+    if (pixel < map_size)
+	    return (int) ((generateMask (2) & rgb[pixel]) >> (2 * pixel_bits));
+    
 			return 0;
 		}
-	}
 
 	/**
 	 * Get the green component of the given pixel.
-	 * <br>
 	 */
-	public final int getGreen(int pixel) {
-		if (pixel < map_size) {
-			return ((rgb[pixel] >> 8) & 0xFF);
-		} else {
+  public final int getGreen (int pixel)
+  {
+    if (pixel < map_size)
+	    return (int) ((generateMask (1) & rgb[pixel]) >> (1 * pixel_bits));
+    
 			return 0;
 		}
-	}
 
 	/**
 	 * Get the blue component of the given pixel.
-	 * <br>
 	 */
-	public final int getBlue(int pixel) {
-		if (pixel < map_size) {
-			return (rgb[pixel] & 0xFF);
-		} else {
+  public final int getBlue (int pixel)
+  {
+    if (pixel < map_size) 
+	    return (int) (generateMask (0) & rgb[pixel]);
+    
 			return 0;
 		}
-	}
 
 	/**
 	 * Get the alpha component of the given pixel.
-	 * <br>
 	 */
-	public final int getAlpha(int pixel) {
-		if (pixel < map_size) {
-			return ((rgb[pixel] >> 24) & 0xFF);
-		} else {
+  public final int getAlpha (int pixel)
+  {
+    if (pixel < map_size)
+	    return (int) ((generateMask (3) & rgb[pixel]) >> (3 * pixel_bits));
+    
 			return 0;
 		}
-	}
 
 	/**
 	 * Get the RGB color value of the given pixel using the default
 	 * RGB color model. 
-	 * <br>
 	 *
 	 * @param pixel a pixel value
 	 */
-	public final int getRGB(int pixel) {
+  public final int getRGB (int pixel)
+  {
 		if (pixel < map_size)
 			return rgb[pixel];
-		return 0;
+
+    return 0;
 	}
 
-	/**
-	 * @see java.awt.image.ColorModel#createCompatibleSampleModel(int, int)
-	 */
-	public SampleModel createCompatibleSampleModel(int w, int h) {
-		final int[] off = new int[1];
-		off[0] = 0;
-		if (pixel_bits == 1 || pixel_bits == 2 || pixel_bits == 4) {
-			return new MultiPixelPackedSampleModel(transferType, w, h, pixel_bits);
-		} else {
-			return new ComponentSampleModel(transferType, w, h, 1, w, off);
-		}
-	}
-
-	/**
-	 * @see java.awt.image.ColorModel#getDataElements(int, java.lang.Object)
-	 */
-	public Object getDataElements(int rgb, Object pixel) {
-		int index = findInCache(rgb);
-		if (index < 0) {
-			index = getClosestColorIndex(rgb);
-			putInCache(rgb, index);
-		}
-		return indexToArray(pixel, index);
-	}
-	
-	/**
-	 * Find the index of a given RGB value in the lookup cache.
-	 * @param rgb
-	 * @return -1 if not found, the index otherwise
-	 */
-	private final synchronized int findInCache(int rgb) {
-		for (int i = 0; i < LOOKUP_CACHE_SIZE; i +=2) {
-			if (lookupCache[i] == rgb) {
-				return lookupCache[i+1];
-			}
-		}
-		return -1;
-	}
-	
-	/**
-	 * Put a reverse lookup into the lookup cache
-	 * @param rgb
-	 * @param index
-	 */
-	private final synchronized void putInCache(int rgb, int index) {
-		System.arraycopy(lookupCache, 0, lookupCache, 2, LOOKUP_CACHE_SIZE-2);
-		lookupCache[0] = rgb;
-		lookupCache[1] = index;
-	}
-
-	/**
-	 * Returns the index of the closest color of <code>ARGB</code> 
-	 * in the indexed color model <code>colorModel</code>.
-	 *
-	 * @param  colorModel an indexed color model.
-	 * @param  ARGB       a color coded in the default color model.
-	 * @return if alpha chanel == 0, returns the index returned by <code>getTransparentPixel ()</code>
-	 *         on <code>colorModel</code>. If this index is -1, 0 is returned.
-	 *         The returned color index is the index of the color with the smallest distance between the 
-	 *         given ARGB color and the colors of the color model.
-	 * @since  PJA2.3
-	 */
-	private final int getClosestColorIndex(int ARGB) {
-		final int a = (ARGB >> 24) & 0xFF;
-		if (a == 0) {
-			final int transPixel = getTransparentPixel();
-			return transPixel != -1 ? transPixel : 0;
-		}
-
-		final int r = (ARGB >> 16) & 0xFF;
-		final int g = (ARGB >> 8) & 0xFF;
-		final int b = ARGB & 0xFF;
-		final int colorsCount = getMapSize();
-		int colorIndex = 0;
-		int minDistance = Integer.MAX_VALUE;
-		for (int i = 0; i < colorsCount; i++) {
-			final int aDif = a - getAlpha(i);
-			final int rDif = r - getRed(i);
-			final int gDif = g - getGreen(i);
-			final int bDif = b - getBlue(i);
-			final int distance = aDif * aDif + rDif * rDif + gDif * gDif + bDif * bDif;
-			if (distance < minDistance) {
-				minDistance = distance;
-				colorIndex = i;
-			}
-		}
-
-		return colorIndex;
-	}
-
-	/**
-	 * Set an index into an byte, short or int array.
-	 * @param array
-	 * @param index
-	 */
-	private Object indexToArray(Object array, int index) {
-		switch (transferType) {
-			case DataBuffer.TYPE_INT :
-				int[] intObj;
-				if (array == null) {
-					array = intObj = new int[1];
-				} else {
-					intObj = (int[]) array;
-				}
-				intObj[0] = index;
-				break;
-			case DataBuffer.TYPE_BYTE :
-				byte[] byteObj;
-				if (array == null) {
-					array = byteObj = new byte[1];
-				} else {
-					byteObj = (byte[]) array;
-				}
-				byteObj[0] = (byte) index;
-				break;
-			case DataBuffer.TYPE_USHORT :
-				short[] shortObj;
-				if (array == null) {
-					array = shortObj = new short[1];
-				} else {
-					shortObj = (short[]) array;
-				}
-				shortObj[0] = (short) index;
-				break;
-			default :
-				throw new UnsupportedOperationException("This method has not been " + "implemented for transferType " + transferType);
-		}
-		return array;
+  //pixel_bits is number of bits to be in generated mask
+  private int generateMask (int offset)
+  {
+    return (((2 << pixel_bits ) - 1) << (pixel_bits * offset));
 	}
 
 }
+

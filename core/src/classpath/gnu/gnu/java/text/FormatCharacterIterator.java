@@ -37,6 +37,8 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package gnu.java.text;
 
+import gnu.classpath.Configuration;
+
 import java.text.AttributedCharacterIterator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -494,37 +496,39 @@ public class FormatCharacterIterator implements AttributedCharacterIterator
 
   final private void debug(String s)
   {
+    if (Configuration.DEBUG)
+      System.out.println(s);
   }
 
   final private void dumpTable()
   {
-//    int start_range = 0;
-//    
-//    if (!Configuration.DEBUG)
-//      return;
-//
-//    System.out.println("Dumping internal table:");
-//    for (int i = 0; i < ranges.length; i++)
-//      {
-//	System.out.print("\t" + start_range + " => " + ranges[i] + ":");
-//	if (attributes[i] == null)
-//	  System.out.println("null");
-//	else
-//	  {
-//	    Set keyset = attributes[i].keySet();
-//	    if (keyset != null)
-//	      {
-//		Iterator keys = keyset.iterator();
-//		
-//		while (keys.hasNext())
-//		  System.out.print(" " + keys.next());
-//	      }
-//	    else
-//	      System.out.println("keySet null");
-//	    System.out.println();
-//	  }
-//      }
-//    System.out.println();
-//    System.out.flush();
+    int start_range = 0;
+    
+    if (!Configuration.DEBUG)
+      return;
+
+    System.out.println("Dumping internal table:");
+    for (int i = 0; i < ranges.length; i++)
+      {
+	System.out.print("\t" + start_range + " => " + ranges[i] + ":");
+	if (attributes[i] == null)
+	  System.out.println("null");
+	else
+	  {
+	    Set keyset = attributes[i].keySet();
+	    if (keyset != null)
+	      {
+		Iterator keys = keyset.iterator();
+		
+		while (keys.hasNext())
+		  System.out.print(" " + keys.next());
+	      }
+	    else
+	      System.out.println("keySet null");
+	    System.out.println();
+	  }
+      }
+    System.out.println();
+    System.out.flush();
   }
 }

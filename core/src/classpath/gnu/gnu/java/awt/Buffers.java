@@ -1,4 +1,4 @@
-/* Copyright (C) 2000, 2002  Free Software Foundation
+/* Copyright (C) 2000, 2002, 2004  Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -42,7 +42,8 @@ import java.awt.image.*;
  * Utility class for creating and accessing data buffers of arbitrary
  * data types.
  */
-public final class Buffers {
+public final class Buffers
+{
 	/**
 	 * Create a data buffer of a particular type.
 	 *
@@ -50,12 +51,14 @@ public final class Buffers {
 	 * @param data an array containing data, or null
 	 * @param size the size of the data buffer bank
 	 */
-	public static DataBuffer createBuffer(int dataType, Object data, int size) {
-		if (data == null)
-			return createBuffer(dataType, size, 1);
+  public static DataBuffer createBuffer(int dataType, Object data,
+					int size)
+  {
+    if (data == null) return createBuffer(dataType, size, 1);
 
 		return createBufferFromData(dataType, data, size);
 	}
+
 
 	/**
 	 * Create a data buffer of a particular type.
@@ -74,15 +77,23 @@ public final class Buffers {
 	 * @param size the size of the data buffer bank
 	 * @param numBanks the number of banks the buffer should have
 	 */
-	public static DataBuffer createBuffer(int dataType, int size, int numBanks) {
-		switch (dataType) {
-			case DataBuffer.TYPE_BYTE :
+  public static DataBuffer createBuffer(int dataType, int size, int numBanks)
+  {
+    switch (dataType)
+      {
+      case DataBuffer.TYPE_BYTE:
 				return new DataBufferByte(size, numBanks);
-			case DataBuffer.TYPE_USHORT :
+      case DataBuffer.TYPE_SHORT:
+	return new DataBufferShort(size, numBanks);
+      case DataBuffer.TYPE_USHORT:
 				return new DataBufferUShort(size, numBanks);
-			case DataBuffer.TYPE_INT :
+      case DataBuffer.TYPE_INT:
 				return new DataBufferInt(size, numBanks);
-			default :
+      case DataBuffer.TYPE_FLOAT:
+	return new DataBufferFloat(size, numBanks);
+      case DataBuffer.TYPE_DOUBLE:
+	return new DataBufferDouble(size, numBanks);
+      default:
 				throw new UnsupportedOperationException();
 		}
 	}
@@ -94,15 +105,24 @@ public final class Buffers {
 	 * @param data an array containing the data
 	 * @param size the size of the data buffer bank
 	 */
-	public static DataBuffer createBufferFromData(int dataType, Object data, int size) {
-		switch (dataType) {
-			case DataBuffer.TYPE_BYTE :
+  public static DataBuffer createBufferFromData(int dataType, Object data,
+						int size)
+  {
+    switch (dataType)
+      {
+      case DataBuffer.TYPE_BYTE:
 				return new DataBufferByte((byte[]) data, size);
-			case DataBuffer.TYPE_USHORT :
+      case DataBuffer.TYPE_SHORT:
+	return new DataBufferShort((short[]) data, size);
+      case DataBuffer.TYPE_USHORT:
 				return new DataBufferUShort((short[]) data, size);
-			case DataBuffer.TYPE_INT :
+      case DataBuffer.TYPE_INT:
 				return new DataBufferInt((int[]) data, size);
-			default :
+      case DataBuffer.TYPE_FLOAT:
+	return new DataBufferFloat((float[]) data, size);
+      case DataBuffer.TYPE_DOUBLE:
+	return new DataBufferDouble((double[]) data, size);
+      default:
 				throw new UnsupportedOperationException();
 		}
 	}
@@ -114,39 +134,72 @@ public final class Buffers {
 	 * @return an array of primitive values. The actual array type
 	 * depends on the data type of the buffer.
 	 */
-	public static Object getData(DataBuffer buffer) {
+  public static Object getData(DataBuffer buffer)
+  {
 		if (buffer instanceof DataBufferByte)
 			return ((DataBufferByte) buffer).getData();
+
+    if (buffer instanceof DataBufferShort)
+      return ((DataBufferShort) buffer).getData();
+
 		if (buffer instanceof DataBufferUShort)
 			return ((DataBufferUShort) buffer).getData();
+
 		if (buffer instanceof DataBufferInt)
 			return ((DataBufferInt) buffer).getData();
+
+    if (buffer instanceof DataBufferFloat)
+      return ((DataBufferFloat) buffer).getData();
+
+    if (buffer instanceof DataBufferDouble)
+      return ((DataBufferDouble) buffer).getData();
+
 		throw new ClassCastException("Unknown data buffer type");
 	}
 
+    
 	/**
 	 * Copy data from array contained in data buffer, much like
 	 * System.arraycopy. Create a suitable destination array if the
 	 * given destination array is null.
 	 */
-	public static Object getData(DataBuffer src, int srcOffset, Object dest, int destOffset, int length) {
+  public static Object getData(DataBuffer src, int srcOffset,
+			       Object dest,  int destOffset,
+			       int length)
+  {
 		Object from;
-		if (src instanceof DataBufferByte) {
+    if (src instanceof DataBufferByte)
+      {
 			from = ((DataBufferByte) src).getData();
-			if (dest == null) {
-				dest = new byte[length + destOffset];
+	if (dest == null) dest = new byte[length+destOffset];
 			}
-		} else if (src instanceof DataBufferUShort) {
+    else if (src instanceof DataBufferShort)
+      {
+	from = ((DataBufferShort) src).getData();
+	if (dest == null) dest = new short[length+destOffset];
+      }
+    else if (src instanceof DataBufferUShort)
+      {
 			from = ((DataBufferUShort) src).getData();
-			if (dest == null) {
-				dest = new short[length + destOffset];
+	if (dest == null) dest = new short[length+destOffset];
 			}
-		} else if (src instanceof DataBufferInt) {
+    else if (src instanceof DataBufferInt)
+      {
 			from = ((DataBufferInt) src).getData();
-			if (dest == null) {
-				dest = new int[length + destOffset];
+	if (dest == null) dest = new int[length+destOffset];
+      }
+    else if (src instanceof DataBufferFloat)
+      {
+	from = ((DataBufferFloat) src).getData();
+	if (dest == null) dest = new float[length+destOffset];
+      }
+    else if (src instanceof DataBufferDouble)
+      {
+	from = ((DataBufferDouble) src).getData();
+	if (dest == null) dest = new double[length+destOffset];
 			}
-		} else {
+    else
+      {
 			throw new ClassCastException("Unknown data buffer type");
 		}
 
@@ -160,14 +213,22 @@ public final class Buffers {
 	 * @return the smallest data type that can store data elements of
 	 * the given number of bits, without any truncation.
 	 */
-	public static int smallestAppropriateTransferType(int bits) {
-		if (bits <= 8) {
+  public static int smallestAppropriateTransferType(int bits)
+  {
+    if (bits <= 8)
+      {
 			return DataBuffer.TYPE_BYTE;
-		} else if (bits <= 16) {
+      }
+    else if (bits <= 16)
+      {
 			return DataBuffer.TYPE_USHORT;
-		} else if (bits <= 32) {
+      } 
+    else if (bits <= 32)
+      {
 			return DataBuffer.TYPE_INT;
-		} else {
+      }
+    else
+      {
 			return DataBuffer.TYPE_UNDEFINED;
 		}
 	}

@@ -33,6 +33,8 @@ package javax.xml.transform;
  */
 public class TransformerConfigurationException extends TransformerException {
 
+  protected SourceLocator locator = null;
+  
 	//-------------------------------------------------------------
 	// Initialization ---------------------------------------------
 	//-------------------------------------------------------------
@@ -53,6 +55,15 @@ public class TransformerConfigurationException extends TransformerException {
 		super(msg, ex);
 	} // TransformerConfigurationException()
 
+  public TransformerConfigurationException(String msg, SourceLocator locator) {
+    super(msg);
+    this.locator = locator;
+  }
+
+  public TransformerConfigurationException(String msg, SourceLocator locator, Throwable ex) {
+    super(msg, ex);
+    this.locator = locator;
+  }  
 
 } // TranformerConfigurationException
 

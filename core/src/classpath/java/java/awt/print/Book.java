@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt.print;
 
 import java.util.Vector;
@@ -45,45 +46,50 @@ import java.util.Vector;
   *
   * @author Aaron M. Renn (arenn@urbanophile.com)
   */
-public class Book implements Pageable {
+public class Book implements Pageable
+{
 
-	/*
+/*
 	 * Instance Variables
 	 */
 
-	// Painter objects for the book
-	Vector printables = new Vector();
+// Painter objects for the book
+Vector printables = new Vector();
 
-	// Page formats for the book
-	Vector page_formats = new Vector();
+// Page formats for the book
+Vector page_formats = new Vector();
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/*
+/*
 	 * Constructors
 	 */
 
-	/** 
+/** 
 	  * Initializes a new instance of <code>Book</code> that is empty.
 	  */
-	public Book() {
+public
+Book()
+{
+  ;
+}
 
-	}
+/*************************************************************************/
 
-	/*************************************************************************/
-
-	/**
+/**
 	  * Returns the number of pages in this book.
 	  *
 	  * @return The number of pages in this book.
 	  */
-	public int getNumberOfPages() {
-		return (printables.size());
-	}
+public int
+getNumberOfPages()
+{
+  return(printables.size());
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * This method returns the <code>PageFormat</code> object for the
 	  * specified page.
 	  *
@@ -94,13 +100,15 @@ public class Book implements Pageable {
 	  *
 	  * @exception IndexOutOfBoundsException If the page number is not valid.
 	  */
-	public PageFormat getPageFormat(int page_number) {
-		return ((PageFormat) page_formats.elementAt(page_number));
-	}
+public PageFormat
+getPageFormat(int page_number)
+{
+  return((PageFormat)page_formats.elementAt(page_number));
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * This method returns the <code>Printable</code> object for the
 	  * specified page.
 	  *
@@ -111,13 +119,15 @@ public class Book implements Pageable {
 	  *
 	  * @exception IndexOutOfBoundsException If the page number is not valid.
 	  */
-	public Printable getPrintable(int page_number) {
-		return ((Printable) printables.elementAt(page_number));
-	}
+public Printable
+getPrintable(int page_number)
+{
+  return((Printable)printables.elementAt(page_number));
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * This method appends a page to the end of the book.
 	  *
 	  * @param printable The <code>Printable</code> for this page.
@@ -125,13 +135,15 @@ public class Book implements Pageable {
 	  *
 	  * @exception NullPointerException If either argument is <code>null</code>.
 	  */
-	public void append(Printable printable, PageFormat page_format) {
+public void
+append(Printable printable, PageFormat page_format)
+{
 		append(printable, page_format, 1);
-	}
+} 
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * This method appends the specified number of pages to the end of the book.
 	  * Each one will be associated with the specified <code>Printable</code>
 	  * and <code>PageFormat</code>.
@@ -142,16 +154,19 @@ public class Book implements Pageable {
 	  *
 	  * @exception NullPointerException If any argument is <code>null</code>.
 	  */
-	public void append(Printable painter, PageFormat page_format, int num_pages) {
-		for (int i = 0; i < num_pages; i++) {
+public void
+append(Printable painter, PageFormat page_format, int num_pages)
+{
+  for (int i = 0; i < num_pages; i++)
+    {
 			printables.addElement(painter);
 			page_formats.addElement(page_format);
 		}
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * This method changes the <code>Printable</code> and <code>PageFormat</code>
 	  * for the specified page.  The page must already exist or an exception
 	  * will be thrown.
@@ -162,9 +177,12 @@ public class Book implements Pageable {
 	  *
 	  * @param IndexOutOfBoundsException If the specified page does not exist.
 	  */
-	public void setPage(int page_num, Printable printable, PageFormat page_format) {
+public void
+setPage(int page_num, Printable printable, PageFormat page_format)
+{
 		printables.setElementAt(printable, page_num);
 		page_formats.setElementAt(page_format, page_num);
-	}
+}
 
 } // class Book
+

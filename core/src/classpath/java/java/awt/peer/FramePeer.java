@@ -40,14 +40,16 @@ package java.awt.peer;
 
 import java.awt.Image;
 import java.awt.MenuBar;
+import java.awt.Rectangle;
 
 public interface FramePeer extends WindowPeer
 {
-
-public abstract void setIconImage(Image image);
-public abstract void setMenuBar(MenuBar mb);
-public abstract void setResizable(boolean resizable);
-public abstract void setTitle(String title);
-
+  void setIconImage(Image image);
+  void setMenuBar(MenuBar mb);
+  void setResizable(boolean resizable);
+  void setTitle(String title);
+  int getState();
+  void setState(int state);
+  void setMaximizedBounds(Rectangle r);
 } // interface FramePeer
 

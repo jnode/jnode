@@ -35,7 +35,6 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package javax.swing;
 
 import java.awt.BorderLayout;
@@ -44,6 +43,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
 import java.awt.LayoutManager2;
+import java.io.Serializable;
+import javax.accessibility.AccessibleRole;
 import javax.swing.plaf.RootPaneUI;
 
 /**
@@ -63,14 +64,30 @@ import javax.swing.plaf.RootPaneUI;
 public class JRootPane extends JComponent
 {
     //  The class used to obtain the accessible role for this object.
-    static protected class AccessibleJRootPane
+  protected static class AccessibleJRootPane
+  {
+    private static final long serialVersionUID = 1082432482784468088L;
+
+    protected AccessibleJRootPane()
     {
     }
   
+    public AccessibleRole getAccessibleRole()
+    {
+      return AccessibleRole.ROOT_PANE;
+    }
+  }
+
     // Custom Layout Manager for JRootPane. It positions contentPane and 
     // menuBar withing its layeredPane.
-    protected class RootLayout extends Object implements LayoutManager2
+  protected class RootLayout implements LayoutManager2, Serializable
+  {
+    private static final long serialVersionUID = -4100116998559815027L;
+
+    protected RootLayout()
     {
+    }
+    
       public void addLayoutComponent(Component comp, Object constraints)
 	{	    
 	}        
@@ -187,9 +204,9 @@ public class JRootPane extends JComponent
 	        int maxWidth;
 	        menuBarSize = menuBar.getPreferredSize();
 	        maxWidth = Math.max(menuBarSize.width, contentPaneSize.width);
-	        prefSize = new Dimension(maxWidth,
-	                               contentPaneSize.height
-	                               + menuBarSize.height);
+	      prefSize =
+		new Dimension(maxWidth,
+		              contentPaneSize.height + menuBarSize.height);
 	      }
 	    else
 	      prefSize = contentPaneSize;
@@ -210,28 +227,26 @@ public class JRootPane extends JComponent
     protected  JMenuBar menuBar;  
     protected Container contentPane;
 
-    
-    void setJMenuBar(JMenuBar m)
+  public void setJMenuBar(JMenuBar m)
     {  
       menuBar = m; 
       getLayeredPane().add(menuBar, JLayeredPane.FRAME_CONTENT_LAYER);
     }
 
-    JMenuBar getJMenuBar()
-    {  return menuBar; }
+  public JMenuBar getJMenuBar()
+  {
+    return menuBar;
+  }
     
   public boolean isValidateRoot()
   {
     return true;
   }
     
-
     public Container getContentPane()
     {
 	if (contentPane == null)
-	    {
 		setContentPane(createContentPane());
-	    }
 	return contentPane;
     }
 
@@ -241,9 +256,7 @@ public class JRootPane extends JComponent
 	getLayeredPane().add(contentPane, JLayeredPane.FRAME_CONTENT_LAYER);
     }
 
-    protected void addImpl(Component comp,
-			  Object constraints,
-			  int index)
+  protected void addImpl(Component comp, Object constraints, int index)
     {
 	super.addImpl(comp, constraints, index);
     } 
@@ -272,6 +285,7 @@ public class JRootPane extends JComponent
 	    setLayeredPane(createLayeredPane());
 	return layeredPane;    
     }
+
     public void setLayeredPane(JLayeredPane f)
     {
 	if (layeredPane != null)
@@ -281,8 +295,7 @@ public class JRootPane extends JComponent
 	add(f, -1);
     }
     
-
-    JRootPane()
+  public JRootPane()
     {
 	setLayout(createRootLayout());
 	getGlassPane();
@@ -292,34 +305,34 @@ public class JRootPane extends JComponent
 	updateUI();
     }
 
-    protected LayoutManager createRootLayout() {
+  protected LayoutManager createRootLayout()
+  {
         return new RootLayout();
     } 
 
-    JComponent createContentPane()
+  protected JComponent createContentPane()
     {
 	JPanel p = new JPanel();
-	p.setName(this.getName()+".contentPane");
+    p.setName(this.getName() + ".contentPane");
 	p.setLayout(new BorderLayout());
 	return p;
     }
 
-    Component createGlassPane()
+  protected Component createGlassPane()
     {
 	JPanel p = new JPanel();
-	p.setName(this.getName()+".glassPane");
+    p.setName(this.getName() + ".glassPane");
 	p.setLayout(new BorderLayout());
 	p.setVisible(false);
 	return p;
     }
 
-    JLayeredPane createLayeredPane()
+  protected JLayeredPane createLayeredPane()
     {
 	JLayeredPane l = new JLayeredPane();
 	l.setLayout(null);
 	return l;
     }    
-
 
   public RootPaneUI getUI()
   {

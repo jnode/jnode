@@ -1,4 +1,4 @@
-/* Copyright (C) 2000, 2002  Free Software Foundation
+/* Copyright (C) 2000, 2002, 2003  Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -34,6 +34,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt.image;
 
 import java.awt.Point;
@@ -42,8 +43,8 @@ import java.awt.Rectangle;
 /**
  * @author Rolf W. Rasmussen <rolfwr@ii.uib.no>
  */
-public class Raster {
-	
+public class Raster
+{
 	protected SampleModel sampleModel;
 	protected DataBuffer dataBuffer;
 	protected int minX;
@@ -56,126 +57,221 @@ public class Raster {
 	protected int numDataElements;
 	protected Raster parent;
 
-	protected Raster(SampleModel sampleModel, Point origin) {
+  protected Raster(SampleModel sampleModel, Point origin)
+  {
 		this(sampleModel, sampleModel.createDataBuffer(), origin);
 	}
 
-	protected Raster(SampleModel sampleModel, DataBuffer dataBuffer, Point origin) {
-		this(sampleModel, dataBuffer, new Rectangle(origin.x, origin.y, sampleModel.getWidth(), sampleModel.getHeight()), origin, null);
+  protected Raster(SampleModel sampleModel, DataBuffer dataBuffer,
+		   Point origin)
+  {
+    this(sampleModel, dataBuffer,
+	 new Rectangle(origin.x, origin.y,
+		       sampleModel.getWidth(), sampleModel.getHeight()),
+	 origin, null);
 	}
 
-	protected Raster(SampleModel sampleModel, DataBuffer dataBuffer, Rectangle aRegion, Point sampleModelTranslate, Raster parent) {
+  protected Raster(SampleModel sampleModel, DataBuffer dataBuffer,
+		   Rectangle aRegion,
+		   Point sampleModelTranslate, Raster parent)
+  {
 		this.sampleModel = sampleModel;
 		this.dataBuffer = dataBuffer;
 		this.minX = aRegion.x;
 		this.minY = aRegion.y;
 		this.width = aRegion.width;
 		this.height = aRegion.height;
+    
+    // If sampleModelTranslate is null, use (0,0).  Methods such as
+    // Raster.createRaster are specified to allow for a null argument.
+    if (sampleModelTranslate != null)
+    {
 		this.sampleModelTranslateX = sampleModelTranslate.x;
 		this.sampleModelTranslateY = sampleModelTranslate.y;
+    }
+
 		this.numBands = sampleModel.getNumBands();
 		this.numDataElements = sampleModel.getNumDataElements();
 		this.parent = parent;
 	}
 
-	public static WritableRaster createInterleavedRaster(int dataType, int w, int h, int bands, Point location) {
+  public static WritableRaster createInterleavedRaster(int dataType,
+						       int w, int h,
+						       int bands, 
+						       Point location)
+  {
 		int[] bandOffsets = new int[bands];
 		// TODO: Maybe not generate this every time.
-		for (int b = 0; b < bands; b++)
-			bandOffsets[b] = b;
+    for (int b=0; b<bands; b++) bandOffsets[b] = b;
 
-		int scanlineStride = bands * w;
-		return createInterleavedRaster(dataType, w, h, scanlineStride, bands, bandOffsets, location);
-	}
+    int scanlineStride = bands*w;
+    return createInterleavedRaster(dataType, w, h, scanlineStride, bands,
+				   bandOffsets, location);
+  }
 
-	public static WritableRaster createInterleavedRaster(int dataType, int w, int h, int scanlineStride, int pixelStride, int[] bandOffsets, Point location) {
-		SampleModel sm = new ComponentSampleModel(dataType, w, h, pixelStride, scanlineStride, bandOffsets);
+  public static WritableRaster createInterleavedRaster(int dataType,
+						       int w, int h,
+						       int scanlineStride,
+						       int pixelStride,
+						       int[] bandOffsets,
+						       Point location)
+  {
+    SampleModel sm = new ComponentSampleModel(dataType,
+					      w, h,
+					      pixelStride,
+					      scanlineStride,
+					      bandOffsets);
 		return createWritableRaster(sm, location);
 	}
 
-	public static WritableRaster createBandedRaster(int dataType, int w, int h, int bands, Point location) {
+  public static WritableRaster createBandedRaster(int dataType, 
+						  int w, int h, int bands,
+						  Point location)
+  {
 		// FIXME: Implement;
 		throw new UnsupportedOperationException("not implemented yet");
 	}
 
-	public static WritableRaster createBandedRaster(int dataType, int w, int h, int scanlineStride, int[] bankIndices, int[] bandOffsets, Point location) {
+  public static WritableRaster createBandedRaster(int dataType,
+						  int w, int h,
+						  int scanlineStride,
+						  int[] bankIndices,
+						  int[] bandOffsets,
+						  Point location)
+  {
 		// FIXME: Implement;
 		throw new UnsupportedOperationException("not implemented yet");
 	}
 
-	public static WritableRaster createPackedRaster(int dataType, int w, int h, int[] bandMasks, Point location) {
-		SampleModel sm = new SinglePixelPackedSampleModel(dataType, w, h, bandMasks);
+  public static WritableRaster createPackedRaster(int dataType,
+						  int w, int h,
+						  int[] bandMasks,
+						  Point location)
+  {
+    SampleModel sm = new SinglePixelPackedSampleModel(dataType,
+						      w, h,
+						      bandMasks);
 		return createWritableRaster(sm, location);
 	}
 
-	public static WritableRaster createInterleavedRaster(DataBuffer dataBuffer, int w, int h, int scanlineStride, int pixelStride, int[] bandOffsets, Point location) {
-		SampleModel sm = new ComponentSampleModel(dataBuffer.getDataType(), w, h, scanlineStride, pixelStride, bandOffsets);
+  public static WritableRaster
+  createInterleavedRaster(DataBuffer dataBuffer, int w, int h,
+			  int scanlineStride, int pixelStride,
+			  int[] bandOffsets, Point location)
+  {
+    SampleModel sm = new ComponentSampleModel(dataBuffer.getDataType(),
+					      w, h,
+					      scanlineStride,
+					      pixelStride,
+					      bandOffsets);
 		return createWritableRaster(sm, dataBuffer, location);
 	}
 
-	public static WritableRaster createBandedRaster(DataBuffer dataBuffer, int w, int h, int scanlineStride, int[] bankIndices, int[] bandOffsets, Point location) {
+  public static
+  WritableRaster createBandedRaster(DataBuffer dataBuffer,
+				    int w, int h,
+				    int scanlineStride,
+				    int[] bankIndices,
+				    int[] bandOffsets,
+				    Point location)
+  {
 		// FIXME: Implement;
 		throw new UnsupportedOperationException("not implemented yet");
 	}
 
-	public static WritableRaster createPackedRaster(DataBuffer dataBuffer, int w, int h, int scanlineStride, int[] bandMasks, Point location) {
-		SampleModel sm = new SinglePixelPackedSampleModel(dataBuffer.getDataType(), w, h, scanlineStride, bandMasks);
+  public static WritableRaster
+  createPackedRaster(DataBuffer dataBuffer,
+		     int w, int h,
+		     int scanlineStride,
+		     int[] bandMasks,
+		     Point location) {
+    SampleModel sm =
+      new SinglePixelPackedSampleModel(dataBuffer.getDataType(),
+				       w, h,
+				       scanlineStride,
+				       bandMasks);
 		return createWritableRaster(sm, dataBuffer, location);
 	}
 
-	public static Raster createRaster(SampleModel sm, DataBuffer db, Point location) {
+  public static Raster createRaster(SampleModel sm, DataBuffer db,
+				    Point location)
+  {
 		return new Raster(sm, db, location);
 	}
 
-	public static WritableRaster createWritableRaster(SampleModel sm, Point location) {
+  public static WritableRaster createWritableRaster(SampleModel sm,
+						    Point location)
+  {
 		return new WritableRaster(sm, location);
 	}
 
-	public static WritableRaster createWritableRaster(SampleModel sm, DataBuffer db, Point location) {
+  public static WritableRaster createWritableRaster(SampleModel sm,
+						    DataBuffer db,
+						    Point location)
+  {
 		return new WritableRaster(sm, db, location);
 	}
 
-	public Raster getParent() {
+  public Raster getParent()
+  {
 		return parent;
 	}
 
-	public final int getSampleModelTranslateX() {
+  public final int getSampleModelTranslateX()
+  {
 		return sampleModelTranslateX;
 	}
 
-	public final int getSampleModelTranslateY() {
+  public final int getSampleModelTranslateY()
+  {
 		return sampleModelTranslateY;
 	}
 
-	public WritableRaster createCompatibleWritableRaster() {
+  public WritableRaster createCompatibleWritableRaster()
+  {
 		return new WritableRaster(getSampleModel(), new Point(minX, minY));
 	}
 
-	public WritableRaster createCompatibleWritableRaster(int w, int h) {
+  public WritableRaster createCompatibleWritableRaster(int w, int h)
+  {
 		return createCompatibleWritableRaster(minX, minY, w, h);
 	}
 
-	public WritableRaster createCompatibleWritableRaster(Rectangle rect) {
-		return createCompatibleWritableRaster(rect.x, rect.y, rect.width, rect.height);
+  public WritableRaster createCompatibleWritableRaster(Rectangle rect)
+  {
+    return createCompatibleWritableRaster(rect.x, rect.y,
+					  rect.width, rect.height);
 	}
 
-	public WritableRaster createCompatibleWritableRaster(int x, int y, int w, int h) {
+  public WritableRaster createCompatibleWritableRaster(int x, int y,
+						       int w, int h)
+  {
 		SampleModel sm = getSampleModel().createCompatibleSampleModel(w, h);
-		return new WritableRaster(sm, sm.createDataBuffer(), new Point(x, y));
+    return new WritableRaster(sm, sm.createDataBuffer(),
+			      new Point(x, y));
 	}
 
 	public Raster createTranslatedChild(int childMinX, int childMinY) {
 		int tcx = sampleModelTranslateX - minX + childMinX;
 		int tcy = sampleModelTranslateY - minY + childMinY;
 
-		return new Raster(sampleModel, dataBuffer, new Rectangle(childMinX, childMinY, width, height), new Point(tcx, tcy), this);
+    return new Raster(sampleModel, dataBuffer,
+		      new Rectangle(childMinX, childMinY,
+				    width, height),
+		      new Point(tcx, tcy),
+		      this);
 	}
 
-	public Raster createChild(int parentX, int parentY, int width, int height, int childMinX, int childMinY, int[] bandList) {
+  public Raster createChild(int parentX, int parentY, int width,
+			    int height, int childMinX, int childMinY,
+			    int[] bandList)
+  {
 		/* FIXME: Throw RasterFormatException if child bounds extends
 		   beyond the bounds of this raster. */
 
-		SampleModel sm = (bandList == null) ? sampleModel : sampleModel.createSubsetSampleModel(bandList);
+    SampleModel sm = (bandList == null) ?
+      sampleModel :
+      sampleModel.createSubsetSampleModel(bandList);
 
 		/*
 		    data origin
@@ -200,103 +296,181 @@ public class Raster {
 		  child_trans = parent_trans + child_xy - parent_xy
 		*/
 
-		return new Raster(
-			sm,
-			dataBuffer,
-			new Rectangle(childMinX, childMinY, width, height),
-			new Point(sampleModelTranslateX + childMinX - parentX, sampleModelTranslateY + childMinY - parentY),
+    return new Raster(sm, dataBuffer,
+		      new Rectangle(childMinX, childMinY,
+				    width, height),
+		      new Point(sampleModelTranslateX+childMinX-parentX,
+				sampleModelTranslateY+childMinY-parentY),
 			this);
 	}
 
-	public Rectangle getBounds() {
+  public Rectangle getBounds()
+  {
 		return new Rectangle(minX, minY, width, height);
 	}
 
-	public final int getMinX() {
+  public final int getMinX()
+  {
 		return minX;
 	}
 
-	public final int getMinY() {
+  public final int getMinY()
+  {
 		return minY;
 	}
 
-	public final int getWidth() {
+  public final int getWidth()
+  {
 		return width;
 	}
 
-	public final int getHeight() {
+  public final int getHeight()
+  {
 		return height;
 	}
 
-	public final int getNumDataElements() {
+  public final int getNumDataElements()
+  {
 		return numDataElements;
 	}
 
-	public final int getTransferType() {
+  public final int getTransferType()
+  {
 		return sampleModel.getTransferType();
 	}
 
-	public DataBuffer getDataBuffer() {
+  public DataBuffer getDataBuffer()
+  {
 		return dataBuffer;
 	}
 
-	public SampleModel getSampleModel() {
+  public SampleModel getSampleModel()
+  {
 		return sampleModel;
 	}
 
-	public Object getDataElements(int x, int y, Object outData) {
-		return sampleModel.getDataElements(x - sampleModelTranslateX, y - sampleModelTranslateY, outData, dataBuffer);
+  public Object getDataElements(int x, int y, Object outData)
+  {
+    return sampleModel.getDataElements(x-sampleModelTranslateX,
+				       y-sampleModelTranslateY,
+				       outData, dataBuffer);
+  }
+
+  public Object getDataElements(int x, int y, int w, int h,
+				Object outData)
+  {
+    return sampleModel.getDataElements(x-sampleModelTranslateX,
+				       y-sampleModelTranslateY,
+				       w, h, outData, dataBuffer);
 	}
 
-	public Object getDataElements(int x, int y, int w, int h, Object outData) {
-		return sampleModel.getDataElements(x - sampleModelTranslateX, y - sampleModelTranslateY, w, h, outData, dataBuffer);
+  public int[] getPixel(int x, int y, int[] iArray)
+  {
+    return sampleModel.getPixel(x-sampleModelTranslateX,
+				y-sampleModelTranslateY,
+				iArray, dataBuffer);
 	}
 
-	public int[] getPixel(int x, int y, int[] iArray) {
-		return sampleModel.getPixel(x - sampleModelTranslateX, y - sampleModelTranslateY, iArray, dataBuffer);
+  public float[] getPixel(int x, int y, float[] fArray)
+  {
+    return sampleModel.getPixel(x-sampleModelTranslateX,
+				y-sampleModelTranslateY,
+				fArray, dataBuffer);
 	}
 
-	public float[] getPixel(int x, int y, float[] fArray) {
-		return sampleModel.getPixel(x - sampleModelTranslateX, y - sampleModelTranslateY, fArray, dataBuffer);
+  public double[] getPixel(int x, int y, double[] dArray)
+  {
+    return sampleModel.getPixel(x-sampleModelTranslateX,
+				y-sampleModelTranslateY,
+				dArray, dataBuffer);
 	}
 
-	public double[] getPixel(int x, int y, double[] dArray) {
-		return sampleModel.getPixel(x - sampleModelTranslateX, y - sampleModelTranslateY, dArray, dataBuffer);
+  public int[] getPixels(int x, int y, int w, int h, int[] iArray)
+  {
+    return sampleModel.getPixels(x-sampleModelTranslateX,
+				 y-sampleModelTranslateY,
+				 w, h, iArray, dataBuffer);
 	}
 
-	public int[] getPixels(int x, int y, int w, int h, int[] iArray) {
-		return sampleModel.getPixels(x - sampleModelTranslateX, y - sampleModelTranslateY, w, h, iArray, dataBuffer);
+  public float[] getPixels(int x, int y, int w, int h,
+			   float[] fArray)
+  {
+    return sampleModel.getPixels(x-sampleModelTranslateX,
+				 y-sampleModelTranslateY,
+				 w, h, fArray, dataBuffer);
 	}
 
-	public float[] getPixels(int x, int y, int w, int h, float[] fArray) {
-		return sampleModel.getPixels(x - sampleModelTranslateX, y - sampleModelTranslateY, w, h, fArray, dataBuffer);
+  public double[] getPixels(int x, int y, int w, int h,
+			    double[] dArray)
+  {
+    return sampleModel.getPixels(x-sampleModelTranslateX,
+				 y-sampleModelTranslateY,
+				 w, h, dArray, dataBuffer);
 	}
 
-	public double[] getPixels(int x, int y, int w, int h, double[] dArray) {
-		return sampleModel.getPixels(x - sampleModelTranslateX, y - sampleModelTranslateY, w, h, dArray, dataBuffer);
+  public int getSample(int x, int y, int b)
+  {
+    return sampleModel.getSample(x-sampleModelTranslateX,
+				 y-sampleModelTranslateY,
+				 b, dataBuffer);
 	}
 
-	public int getSample(int x, int y, int b) {
-		return sampleModel.getSample(x - sampleModelTranslateX, y - sampleModelTranslateY, b, dataBuffer);
+  public float getSampleFloat(int x, int y, int b)
+  {
+    return sampleModel.getSampleFloat(x-sampleModelTranslateX,
+				      y-sampleModelTranslateY,
+				      b, dataBuffer);
 	}
 
-	public float getSampleFloat(int x, int y, int b) {
-		return sampleModel.getSampleFloat(x - sampleModelTranslateX, y - sampleModelTranslateY, b, dataBuffer);
+  public double getSampleDouble(int x, int y, int b)
+  {
+    return sampleModel.getSampleDouble(x-sampleModelTranslateX,
+				       y-sampleModelTranslateY,
+				       b, dataBuffer);
 	}
 
-	public double getSampleDouble(int x, int y, int b) {
-		return sampleModel.getSampleDouble(x - sampleModelTranslateX, y - sampleModelTranslateY, b, dataBuffer);
+  public int[] getSamples(int x, int y, int w, int h, int b,
+			  int[] iArray)
+  {
+    return sampleModel.getSamples(x-sampleModelTranslateX,
+				  y-sampleModelTranslateY,
+				  w, h, b, iArray, dataBuffer);
 	}
 
-	public int[] getSamples(int x, int y, int w, int h, int b, int[] iArray) {
-		return sampleModel.getSamples(x - sampleModelTranslateX, y - sampleModelTranslateY, w, h, b, iArray, dataBuffer);
+  public float[] getSamples(int x, int y, int w, int h, int b,
+			    float[] fArray)
+  {
+    return sampleModel.getSamples(x-sampleModelTranslateX,
+				  y-sampleModelTranslateY,
+				  w, h, b, fArray, dataBuffer);
 	}
 
-	public float[] getSamples(int x, int y, int w, int h, int b, float[] fArray) {
-		return sampleModel.getSamples(x - sampleModelTranslateX, y - sampleModelTranslateY, w, h, b, fArray, dataBuffer);
+  public double[] getSamples(int x, int y, int w, int h, int b,
+			     double[] dArray)
+  {
+    return sampleModel.getSamples(x-sampleModelTranslateX,
+				  y-sampleModelTranslateY,
+				  w, h, b, dArray, dataBuffer);
 	}
 
-	public double[] getSamples(int x, int y, int w, int h, int b, double[] dArray) {
-		return sampleModel.getSamples(x - sampleModelTranslateX, y - sampleModelTranslateY, w, h, b, dArray, dataBuffer);
+  /**
+   * Create a String representing the stat of this Raster.
+   * @return A String representing the stat of this Raster.
+   * @see java.lang.Object#toString()
+   */
+  public String toString()
+  {
+    StringBuffer result = new StringBuffer();
+    
+    result.append(getClass().getName());
+    result.append("[(");
+    result.append(minX).append(",").append(minY).append("), ");
+    result.append(width).append(" x ").append(height).append(",");
+    result.append(sampleModel).append(",");
+    result.append(dataBuffer);
+    result.append("]");
+    
+    return result.toString();
 	}
+  
 }

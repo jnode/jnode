@@ -61,55 +61,30 @@ public class JFileChooser extends JComponent implements Accessible {
 
   private static final long serialVersionUID = 3162921138695327837L;
 
-	//-------------------------------------------------------------
-	// Classes ----------------------------------------------------
-	//-------------------------------------------------------------
-
 	/**
 	 * AccessibleJFileChooser
 	 */
-	protected class AccessibleJFileChooser extends AccessibleJComponent {
-
-          private static final long serialVersionUID = 3318922050345221200L;
-
-		//-------------------------------------------------------------
-		// Variables --------------------------------------------------
-		//-------------------------------------------------------------
-
-
-		//-------------------------------------------------------------
-		// Initialization ---------------------------------------------
-		//-------------------------------------------------------------
+  protected class AccessibleJFileChooser extends AccessibleJComponent
+  {
+    private static final long serialVersionUID = 8205148454060169244L;
 
 		/**
 		 * Constructor AccessibleJFileChooser
 		 * @param component TODO
 		 */
-		protected AccessibleJFileChooser(JFileChooser component) {
-			super(component);
-			// TODO
-		} // AccessibleJFileChooser()
-
-
-		//-------------------------------------------------------------
-		// Methods ----------------------------------------------------
-		//-------------------------------------------------------------
+    protected AccessibleJFileChooser()
+    {
+    }
 
 		/**
 		 * getAccessibleRole
-		 * @returns AccessibleRole
+     * @return AccessibleRole
 		 */
-		public AccessibleRole getAccessibleRole() {
+    public AccessibleRole getAccessibleRole()
+    {
 			return AccessibleRole.FILE_CHOOSER;
-		} // getAccessibleRole()
-
-
-	} // AccessibleJFileChooser
-
-
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+    }
+  }
 
 	/**
 	 * uiClassID
@@ -973,12 +948,11 @@ public class JFileChooser extends JComponent implements Accessible {
 	 * getAccessibleContext
 	 * @returns AccessibleContext
 	 */
-	public AccessibleContext getAccessibleContext() {
-		if (accessibleContext == null) {
-			accessibleContext = new AccessibleJFileChooser(this);
-		} // if
-		return accessibleContext;
-	} // getAccessibleContext()
+  public AccessibleContext getAccessibleContext()
+  {
+    if (accessibleContext == null)
+      accessibleContext = new AccessibleJFileChooser();
 
-
-} // JFileChooser
+    return accessibleContext;
+  }
+}

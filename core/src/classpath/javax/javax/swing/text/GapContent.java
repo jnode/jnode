@@ -37,13 +37,17 @@ exception statement from your version. */
 
 package javax.swing.text; 
 
+import java.io.Serializable;
+
 // too lazy to make a real gapcontent.
 // lets just use a stringbuffer instead.
-
 import javax.swing.undo.UndoableEdit;
 
-public class GapContent implements AbstractDocument.Content
+public class GapContent
+  implements AbstractDocument.Content, Serializable
 {
+  private static final long serialVersionUID = 8374645204155842629L;
+    
     StringBuffer buf = new StringBuffer();
 
     public GapContent()
@@ -60,6 +64,7 @@ public class GapContent implements AbstractDocument.Content
 	return new Position()
 	    {
 		int off = offset;
+
 		public int getOffset()
 		{
 		    return off;
@@ -72,13 +77,15 @@ public class GapContent implements AbstractDocument.Content
 	return buf.length();
     }
 
-    public UndoableEdit insertString(int where, String str) throws BadLocationException
+  public UndoableEdit insertString(int where, String str)
+    throws BadLocationException
     {
 	buf.insert(where, str);
 	return null;
     }
 
-    public UndoableEdit remove(int where, int nitems) throws BadLocationException
+  public UndoableEdit remove(int where, int nitems)
+    throws BadLocationException
     {
 	buf.delete(where, where + nitems);
 	return null;
@@ -89,13 +96,12 @@ public class GapContent implements AbstractDocument.Content
 	return buf.toString();
     }
 
-    public void getChars(int where, int len, Segment txt) throws BadLocationException
+  public void getChars(int where, int len, Segment txt)
+    throws BadLocationException
     {
 	txt.array = new char[len];
 		
-	System.arraycopy(buf.toString().toCharArray(), where, 
-			 txt.array, 0,
-			 len);
+    System.arraycopy(buf.toString().toCharArray(), where, txt.array, 0, len);
 	
 	txt.count  = len;
 	txt.offset = 0;
