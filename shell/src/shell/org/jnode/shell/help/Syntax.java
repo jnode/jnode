@@ -24,6 +24,26 @@ public class Syntax {
 		this(description, new Parameter[0]);
 	}
 
+	public Syntax(String description, Parameter p1) {
+		this(description, new Parameter[] { p1 });
+	}
+
+	public Syntax(String description, Parameter p1, Parameter p2) {
+		this(description, new Parameter[] { p1, p2 });
+	}
+
+	public Syntax(String description, Parameter p1, Parameter p2, Parameter p3) {
+		this(description, new Parameter[] { p1, p2, p3 });
+	}
+
+	public Syntax(String description, Parameter p1, Parameter p2, Parameter p3, Parameter p4) {
+		this(description, new Parameter[] { p1, p2, p3, p4 });
+	}
+
+	public Syntax(String description, Parameter p1, Parameter p2, Parameter p3, Parameter p4, Parameter p5) {
+		this(description, new Parameter[] { p1, p2, p3, p4, p5 });
+	}
+
 	/**
 	 * Gets the description of this syntax
 	 */
