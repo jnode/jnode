@@ -25,6 +25,7 @@ import org.jnode.vm.x86.X86CpuID;
  * Helpers class used by the X86 compilers.
  * 
  * @author epr
+ * @author patrik_reali
  */
 public class X86CompilerHelper extends X86StackManager implements
         X86CompilerConstants {
@@ -399,6 +400,20 @@ public class X86CompilerHelper extends X86StackManager implements
         writeLoadSTATICS(curInstrLabel, "gs", true);
         final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
         os.writeMOV(INTSIZE, dst, STATICS, staticsIdx);
+    }
+
+    /**
+     * Write code to push the given statics table entry to the stack
+     * 
+     * @param curInstrLabel
+     * @param entry
+     */
+    /* Patrik, added to push without requiring allocation of a register */
+    public final void writePushStaticsEntry(Label curInstrLabel, 
+		    VmStaticsEntry entry) {
+        writeLoadSTATICS(curInstrLabel, "gs", true);
+        final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
+        os.writePUSH(STATICS, staticsIdx);
     }
 
     /**
