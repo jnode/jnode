@@ -230,8 +230,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	}
 
 	/**
-	 * Load the system classes from an array of system classes. This method is called during the
-	 * boot of the system.
+	 * Load the system classes from an array of system classes. This method is called during the boot of the system.
 	 * 
 	 * @param bootClasses
 	 */
@@ -485,8 +484,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	}
 
 	/**
-	 * Return the corresponding java.lang.Class for this VmClass. During build environment the
-	 * Class will be loaded by Class.forName
+	 * Return the corresponding java.lang.Class for this VmClass. During build environment the Class will be loaded by Class.forName
 	 * 
 	 * @return The class
 	 */
@@ -495,8 +493,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	}
 
 	/**
-	 * Return the corresponding java.lang.Class for this VmClass. During build environment the
-	 * Class will be loaded by Class.forName
+	 * Return the corresponding java.lang.Class for this VmClass. During build environment the Class will be loaded by Class.forName
 	 * 
 	 * @return The class
 	 */
@@ -505,8 +502,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	}
 
 	/**
-	 * Return the corresponding java.lang.Class for this VmClass. During build environment the
-	 * Class will be loaded by Class.forName
+	 * Return the corresponding java.lang.Class for this VmClass. During build environment the Class will be loaded by Class.forName
 	 * 
 	 * @param isBuildEnv
 	 * @return The class
@@ -613,14 +609,10 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	}
 
 	/**
-	 * Determines if the class or interface represented by this Class object is either the same as,
-	 * or is a superclass or superinterface of, the class or interface represented by the specified
-	 * Class parameter. It returns true if so; otherwise it returns false. If this Class object
-	 * represents a primitive type, this method returns true if the specified Class parameter is
-	 * exactly this Class object; otherwise it returns false. Specifically, this method tests
-	 * whether the type represented by the specified Class parameter can be converted to the type
-	 * represented by this Class object via an identity conversion or via a widening reference
-	 * conversion. See The Java Language Specification, sections 5.1.1 and 5.1.4, for details.
+	 * Determines if the class or interface represented by this Class object is either the same as, or is a superclass or superinterface of, the class or interface represented by the specified Class
+	 * parameter. It returns true if so; otherwise it returns false. If this Class object represents a primitive type, this method returns true if the specified Class parameter is exactly this Class
+	 * object; otherwise it returns false. Specifically, this method tests whether the type represented by the specified Class parameter can be converted to the type represented by this Class object
+	 * via an identity conversion or via a widening reference conversion. See The Java Language Specification, sections 5.1.1 and 5.1.4, for details.
 	 * 
 	 * @param S
 	 * @return boolean
@@ -809,8 +801,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	}
 
 	/**
-	 * Find the field within the given class (or super-classes) that has the given name and
-	 * signature.
+	 * Find the field within the given class (or super-classes) that has the given name and signature.
 	 * 
 	 * @param name
 	 * @param signature
@@ -848,8 +839,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	}
 
 	/**
-	 * Find the method within the given class (or super-classes) that has the given name and
-	 * signature.
+	 * Find the method within the given class (or super-classes) that has the given name and signature.
 	 * 
 	 * @param name
 	 * @param signature
@@ -914,8 +904,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	}
 
 	/**
-	 * Search for an synthetic abstract class, that is not in this class, but is a method of one of
-	 * the implemented interfaces. Synthetic abstract methods are added when the VMT is created.
+	 * Search for an synthetic abstract class, that is not in this class, but is a method of one of the implemented interfaces. Synthetic abstract methods are added when the VMT is created.
 	 * 
 	 * @param name
 	 * @param signature
@@ -925,8 +914,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	protected abstract VmMethod getSyntheticAbstractMethod(String name, String signature, int hashCode);
 
 	/**
-	 * Find the method within the given class (or super-classes) that has the given name and list
-	 * of argument types.
+	 * Find the method within the given class (or super-classes) that has the given name and list of argument types.
 	 * 
 	 * @param name
 	 * @param argTypes
@@ -985,8 +973,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	}
 
 	/**
-	 * Find the method within the given class and its super-classes that has the given name and
-	 * list of argument types.
+	 * Find the method within the given class and its super-classes that has the given name and list of argument types.
 	 * 
 	 * @param name
 	 * @param argTypes
@@ -997,8 +984,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	}
 
 	/**
-	 * Find the method within the given class (or super-classes) that has the given name and
-	 * signature.
+	 * Find the method within the given class (or super-classes) that has the given name and signature.
 	 * 
 	 * @param name
 	 * @param signature
@@ -1022,8 +1008,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	}
 
 	/**
-	 * Find the method within the given class (or super-classes) that has the given name and
-	 * signature.
+	 * Find the method within the given class (or super-classes) that has the given name and signature.
 	 * 
 	 * @param name
 	 * @param signature
@@ -1053,9 +1038,8 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	}
 
 	/**
-	 * Prepare this class. This method is not synchronized since it is called frequently. A simple
-	 * test is done to see if the class has already been prepared, if not a synchronized helper
-	 * method is called to do the actual prepare.
+	 * Prepare this class. This method is not synchronized since it is called frequently. A simple test is done to see if the class has already been prepared, if not a synchronized helper method is
+	 * called to do the actual prepare.
 	 * 
 	 * @return The type
 	 */
@@ -1237,7 +1221,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	 */
 	private void getAllInterfaces(HashSet all, VmType C) {
 		while (C != null) {
-			VmImplementedInterface[] it = C.interfaceTable;
+			final VmImplementedInterface[] it = C.interfaceTable;
 			if (it != null) {
 				int count = it.length;
 				for (int i = 0; i < count; i++) {
@@ -1456,9 +1440,8 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	}
 
 	/**
-	 * Invoke the static initializer of this class. This method is not synchronized since it is
-	 * called frequently. A simple test is done to see if the class has already been initialized,
-	 * if not a synchronized helper method is called to do the actual initialization.
+	 * Invoke the static initializer of this class. This method is not synchronized since it is called frequently. A simple test is done to see if the class has already been initialized, if not a
+	 * synchronized helper method is called to do the actual initialization.
 	 */
 	public void initialize() {
 		if (!Modifier.isInitialized(modifiers)) {
@@ -1562,8 +1545,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	}
 
 	/**
-	 * Gets the number of super classes until (and including) Object. E.g. this is 0 for Object and
-	 * 1 for an interface.
+	 * Gets the number of super classes until (and including) Object. E.g. this is 0 for Object and 1 for an interface.
 	 * 
 	 * @return int
 	 */

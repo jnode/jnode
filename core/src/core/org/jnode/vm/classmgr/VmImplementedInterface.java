@@ -50,7 +50,11 @@ public final class VmImplementedInterface extends VmSystemObject {
 	 * Gets the resolved interface class.
 	 * @return The resolved class
 	 */
-	public VmInterfaceClass getResolvedVmClass() {
+	public VmInterfaceClass getResolvedVmClass() 
+	throws NotResolvedYetException {
+		if (resolvedClass == null) {
+			throw new NotResolvedYetException(className);
+		}
 		return resolvedClass;
 	}
 

@@ -42,7 +42,7 @@ public class VmConstFieldRef extends VmConstMemberRef  {
 	 */
 	public VmField getResolvedVmField() {
 		if (vmResolvedField == null) {
-			throw new RuntimeException("vmField is not yet resolved");
+			throw new NotResolvedYetException("vmField is not yet resolved");
 		} else {
 			return vmResolvedField;
 		}
