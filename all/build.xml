@@ -151,6 +151,20 @@
     </javadoc>
   </target>
 
+<!-- website -->
+  <target name="website" depends="javadoc-small">
+    <ant antfile="build-x86.xml"
+         inheritall="true"
+         inheritrefs="true"
+         target="shell-usage"/>
+    <ant dir="${root.dir}/docs" inheritall="on" inheritrefs="on"/>
+  </target>
+
+<!-- Upload website -->
+  <target name="wsupload" depends="website">
+    <ant target="wsupload" dir="${root.dir}/docs" inheritall="on" inheritrefs="on"/>
+  </target>
+
 </project>
 
 

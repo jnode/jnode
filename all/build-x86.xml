@@ -24,10 +24,14 @@
     <pathelement location="${jnode-builder.jar}"/>
     <pathelement location="${jnode-core.jar}"/>
     <pathelement location="${jnode-fs.jar}"/>
+    <pathelement location="${jnode-shell.jar}"/>
+    <pathelement location="${jnode-net.jar}"/>
+    <pathelement location="${jnode-gui.jar}"/>
     <path refid="cp"/>
     <pathelement location="${my-conf.dir}"/>
     <pathelement location="${grub.dir}"/>
     <pathelement location="${descriptors.dir}"/>
+    <pathelement location="${dom4j.jar}"/>
   </path>
   
   <target name="test-properties">
@@ -153,8 +157,9 @@
   </target>
 
   <target name="shell-usage" depends="plugins">
+    <mkdir dir="${root.dir}/docs/build/website-xml"/>
     <taskdef name="exportusage" classname="org.jnode.shell.help.ant.ExportUsageTask" classpathref="cp-x86"/>
-    <exportusage destfile="${build.dir}/website-xml/shell-commands.xml"
+    <exportusage destfile="${root.dir}/docs/build/website-xml/shell-commands.xml"
              pluginList="${plugin-list}"
              pluginDir="${my-build.dir}/plugins"
              targetArch="x86">
