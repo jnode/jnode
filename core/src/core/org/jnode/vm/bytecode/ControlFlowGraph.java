@@ -57,6 +57,14 @@ public class ControlFlowGraph {
 	}
 	
 	/**
+	 * Gets the number of basic blocks in this graph
+	 * @return count of basic blocks
+	 */
+	public int getBasicBlockCount() {
+		return bblocks.length;
+	}
+	
+	/**
 	 * Gets the basic block that contains the given address.
 	 * @param pc
 	 * @return
