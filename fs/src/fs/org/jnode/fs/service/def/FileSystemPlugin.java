@@ -129,11 +129,4 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
 		}
 		return result;
 	}
-
-    /**
-     * @see org.jnode.plugin.Plugin#isStartFinished()
-     */
-    public boolean isStartFinished() {
-        return mounter.isReady();
-    }
 }

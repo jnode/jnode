@@ -20,6 +20,7 @@
   </runtime>
         
   <extension point="org.jnode.shell.aliases">
+    <alias name="BlockDeviceStressTest"      class="org.jnode.test.fs.BlockDeviceStressTest"/>
     <alias name="FileTest"      class="org.jnode.test.fs.FileTest"/>
     <alias name="LfnTest"      class="org.jnode.test.fs.LfnTest"/>
     <alias name="SCSITest"      class="org.jnode.test.fs.SCSITest"/>
