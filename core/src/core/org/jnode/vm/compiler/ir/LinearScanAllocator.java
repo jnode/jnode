@@ -70,7 +70,8 @@ public class LinearScanAllocator {
 				return;
 			}
 			active.remove(l);
-			registerPool.release(l.getLocation());
+			RegisterLocation regLoc = (RegisterLocation) l.getLocation();
+			registerPool.release(regLoc.getRegister());
 		}
 	}
 

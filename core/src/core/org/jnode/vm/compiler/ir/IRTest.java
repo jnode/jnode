@@ -64,15 +64,6 @@ public class IRTest {
 		x86cg.setSpilledVariables(lsa.getSpilledVariables());
 		x86cg.emitHeader();
 
-		n = quads.size();
-		for (int i=0; i<n; i+=1) {
-			Quad quad = (Quad) quads.get(i);
-			if (!quad.isDeadCode()) {
-				quad.generateCode(x86cg);
-			}
-		}
-		os.flush();
-
 /*
 		BytecodeViewer bv = new BytecodeViewer();
 		BytecodeParser.parse(code, bv);
@@ -111,6 +102,15 @@ public class IRTest {
 			System.out.println(liveRanges[i]);
 		}
 */
+
+		n = quads.size();
+		for (int i=0; i<n; i+=1) {
+			Quad quad = (Quad) quads.get(i);
+			if (!quad.isDeadCode()) {
+				quad.generateCode(x86cg);
+			}
+		}
+		os.flush();
 	}
 
 	private static VmByteCode loadByteCode(String[] args)
@@ -168,6 +168,7 @@ public class IRTest {
 	}
 
 	public static int simple(int a0, int a1) {
-		return -10;
+		int l0 = a1;
+		return -l0;
 	}
 }
