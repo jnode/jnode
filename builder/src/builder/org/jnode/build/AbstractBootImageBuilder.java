@@ -1138,6 +1138,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
         addCompileHighOptLevel("javax.naming");
 
+        addCompileHighOptLevel("gnu.classpath");
         addCompileHighOptLevel("gnu.java.io");
         addCompileHighOptLevel("gnu.java.io.decode");
         addCompileHighOptLevel("gnu.java.io.encode");
@@ -1233,30 +1234,34 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             final String name = type.getName();
             final int cnt = type.getNoDeclaredFields();
             if ((cnt > 0) && !name.startsWith("java.")){
-                final Class javaType = Class.forName(type.getName());
-                final FieldInfo fieldInfo = emitter.getFieldInfo(javaType);
-                final Field[] jdkFields = fieldInfo.getJdkStaticFields();
-                final int max = jdkFields.length;
-                
-                for (int k = 0; k < max; k++) {
-                    final Field jdkField = jdkFields[k];               
-                    if (jdkField != null) {
-                        final VmField f = fieldInfo.getJNodeStaticField(k);
-                        if (!f.isTransient()) {
-                            try {
-                                copyStaticField(type, f, jdkField, statics, os, emitter);
-                            } catch (IllegalAccessException ex) {
-                                throw new BuildException(ex);
-                            }
-                        }
-                    }
+            	final Class javaType = Class.forName(type.getName());
+            	try {
+            		final FieldInfo fieldInfo = emitter.getFieldInfo(javaType);
+            		final Field[] jdkFields = fieldInfo.getJdkStaticFields();
+            		final int max = jdkFields.length;
+            		
+            		for (int k = 0; k < max; k++) {
+            			final Field jdkField = jdkFields[k];               
+            			if (jdkField != null) {
+            				final VmField f = fieldInfo.getJNodeStaticField(k);
+            				if (!f.isTransient()) {
+            					try {
+            						copyStaticField(type, f, jdkField, statics, os, emitter);
+            					} catch (IllegalAccessException ex) {
+            						throw new BuildException(ex);
+            					}
+            				}
+            			}
+            		}
+            	} catch (JNodeClassNotFoundException ex) {
+            		log("JNode class not found" + ex.getMessage());
                 }
             }
         }
     }
 
     private void copyStaticField(VmType type, VmField f, Field jf, VmStatics statics, NativeStream os, ObjectEmitter emitter)
-            throws IllegalAccessException {
+            throws IllegalAccessException, JNodeClassNotFoundException {
         jf.setAccessible(true);
         final Object val = jf.get(null);
         final int fType = JvmType.SignatureToType(f.getSignature());

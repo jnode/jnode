@@ -60,7 +60,11 @@ public class ObjectEmitter {
 		}
 
 		final Class cls = obj.getClass();
-		testForValidEmit(obj, cls.getName());
+		try {
+			testForValidEmit(obj, cls.getName());
+		} catch (JNodeClassNotFoundException ex) {
+			throw new BuildException(ex);
+		}
 
 		if (debugWriter != null) {
 			debugWriter.println("$" + Integer.toHexString(os.getLength()));
@@ -113,7 +117,11 @@ public class ObjectEmitter {
 		} else if (cls.isArray()) {
 		    emitArray(cls, obj, (VmArrayClass)vmClass);
 		} else {
-			emitObject(cls, obj);
+			try {
+				emitObject(cls, obj);
+			} catch (JNodeClassNotFoundException ex) {
+				throw new BuildException(ex);
+			}
 		}
 		oInfo.markEnd();
 		
@@ -129,7 +137,7 @@ public class ObjectEmitter {
 	 * @throws BuildException
 	 *             Is if not valid to emit the given object into the boot image.
 	 */
-	public final void testForValidEmit(Object object, String location) throws BuildException {
+	public final void testForValidEmit(Object object, String location) throws BuildException, JNodeClassNotFoundException {
 		if (object == null) {
 			return;
 		} else if (object instanceof BootableObject) {
@@ -275,7 +283,7 @@ public class ObjectEmitter {
 		}
 	}
 
-	private void emitObject(Class cls, Object obj) throws BuildException, ClassNotFoundException {
+	void emitObject(Class cls, Object obj) throws BuildException, ClassNotFoundException, JNodeClassNotFoundException {
 		final Class sCls = cls.getSuperclass();
 		if (sCls != null) {
 			emitObject(sCls, obj);
@@ -329,11 +337,14 @@ public class ObjectEmitter {
 						throw new BuildException("Unknown primitive class " + fType.getName());
 					}
 				} else {
-					final Object value = jdkField.get(obj);
+					Object value = jdkField.get(obj);
 					try {
 						testForValidEmit(value, cls.getName());
 					} catch (BuildException ex) {
 						throw new BuildException("Cannot emit field " + jdkField.getName() + " of class " + cls.getName(), ex);
+					} catch (JNodeClassNotFoundException ex) {
+						BootLog.warn("JNode class not found " + ex.getMessage());
+						value = null;
 					}
 					bis.writeObjectRef(value);
 				}
@@ -350,11 +361,16 @@ public class ObjectEmitter {
 	 * @param jdkType
 	 * @throws ClassNotFoundException
 	 */
-	public FieldInfo getFieldInfo(Class jdkType) throws ClassNotFoundException {
+	public FieldInfo getFieldInfo(Class jdkType) throws ClassNotFoundException, JNodeClassNotFoundException {
 	    final String cname = jdkType.getName();
 	    FieldInfo info = (FieldInfo)fieldInfos.get(cname);
 	    if (info == null) {
-		    final VmType jnodeType = loaderContext.loadClass(cname, true);
+		    VmType jnodeType = null;
+		    try {
+		    	jnodeType = loaderContext.loadClass(cname, true);
+		    } catch (ClassNotFoundException ex) {
+		    	throw new JNodeClassNotFoundException(cname);
+		    }
 		    info = new FieldInfo(jdkType, jnodeType);
 		    fieldInfos.put(cname, info);
 	    }

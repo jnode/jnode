@@ -126,15 +126,19 @@ public final class FieldInfo {
      * @param jnodeType
      */
     private static List getStaticFields(VmType jnodeType) {
-        final int all = jnodeType.getNoDeclaredFields();
-        final ArrayList list = new ArrayList(all);
-        for (int i = 0; i < all; i++) {
-            final VmField f = jnodeType.getDeclaredField(i);
-            if (f.isStatic()) {
-                list.add(f);
-            }
-        }
-        return list;
+    	if (jnodeType != null) {
+    		final int all = jnodeType.getNoDeclaredFields();
+    		final ArrayList list = new ArrayList(all);
+    		for (int i = 0; i < all; i++) {
+    			final VmField f = jnodeType.getDeclaredField(i);
+    			if (f.isStatic()) {
+    				list.add(f);
+    			}
+    		}
+    		return list;
+    	} else {
+    		return new ArrayList(0);
+    	}
     }
 
     /**
@@ -142,14 +146,18 @@ public final class FieldInfo {
      * @param jnodeType
      */
     private static List getInstanceFields(VmType jnodeType) {
-        final int all = jnodeType.getNoDeclaredFields();
-        final ArrayList list = new ArrayList(all);
-        for (int i = 0; i < all; i++) {
-            final VmField f = jnodeType.getDeclaredField(i);
-            if (!f.isStatic()) {
-                list.add(f);
-            }
-        }
-        return list;
+    	if (jnodeType != null) {
+    		final int all = jnodeType.getNoDeclaredFields();
+    		final ArrayList list = new ArrayList(all);
+    		for (int i = 0; i < all; i++) {
+    			final VmField f = jnodeType.getDeclaredField(i);
+    			if (!f.isStatic()) {
+    				list.add(f);
+    			}
+    		}
+    		return list;
+    	} else {
+    		return new ArrayList(0);
+    	}
     }
 }
