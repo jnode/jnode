@@ -29,7 +29,7 @@ public class NTFSEntry implements FSEntry {
 	{
 		this.indexEntry = new NTFSIndexEntry();
 		
-		NTFSFileNameAttribute att = (NTFSFileNameAttribute) fileRecord.getAttributeMap().get(new Integer(NTFSFileRecord.$FILE_NAME));
+		NTFSFileNameAttribute att = (NTFSFileNameAttribute) fileRecord.getAttribute(NTFSFileRecord.$FILE_NAME);
 		
 		indexEntry.setFileName(att.getFileName());
 		indexEntry.setFileNameFlags(att.getFileNameFlags());
