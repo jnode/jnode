@@ -3,13 +3,8 @@
  */
 
 package org.jnode.driver.input;
-import java.net.URL;
-import java.util.ResourceBundle;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.MissingResourceException;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 
 
@@ -91,4 +86,5 @@ public class KeyboardInterpreterFactory {
 		return interpreter;
 	}
 }
+
 
