@@ -14,7 +14,7 @@ public class KeyboardAPIAdapter implements KeyboardAPI {
 	/** All listeners */
 	private final ArrayList listeners = new ArrayList();
 	/** The interpreter */
-	private KeyboardInterpreter interpreter = new KeyboardInterpreter();
+	private KeyboardInterpreter interpreter = null/*new KeyboardInterpreter()*/;
 
 	/**
 	 * @see org.jnode.driver.input.KeyboardAPI#addKeyboardListener(org.jnode.driver.input.KeyboardListener)
@@ -56,7 +56,7 @@ public class KeyboardAPIAdapter implements KeyboardAPI {
 
 	/**
 	 * Fire a given pointer event to all known listeners.
-	 * 
+	 *
 	 * @param event
 	 */
 	public synchronized void fireEvent(KeyboardEvent event) {

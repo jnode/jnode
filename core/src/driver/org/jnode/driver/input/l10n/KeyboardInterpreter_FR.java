@@ -6,6 +6,8 @@
 package org.jnode.driver.input.l10n;
 import org.jnode.driver.input.KeyboardInterpreter;
 import java.awt.event.KeyEvent;
+import org.jnode.driver.input.UnsupportedKeyException;
+import org.jnode.driver.input.DeadKeyException;
 
 
 /**
@@ -16,6 +18,27 @@ import java.awt.event.KeyEvent;
  */
 public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 	
+	public KeyboardInterpreter_FR() {
+		super();
+		
+	}
+	
+	/**
+	 * Method interpretExtendedScanCode this method sould be used to handle the dead keys and other special keys
+	 *
+	 * @return   the char to use or throws an Exception
+	 * @exception   UnsupportedKeyException is thrown if the current key is not handled by this method
+	 * @exception   DeadKeyException is thrown if the current key is a dead key
+	 *
+	 * @author 	Marc DENTY
+	 * @version  2/8/2004
+	 * @since 0.15
+	 */
+	protected char interpretExtendedScanCode() throws UnsupportedKeyException, DeadKeyException {
+		// TODO
+		throw new UnsupportedKeyException();
+	}
+	
 	/**
 	 * Initialize the mapping between scancode and virtual key code.
 	 * <p> To implement new variants of a KeyboardInterpreter simply
@@ -24,12 +47,8 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 	 * <p>I do not know how other keyborards are made, I think Kanji,
 	 * Japanese variants can be implemented this way. You'll need to add some arrays.</p>
 	 *
-	 * @param vkMap 	virtual bindings array
-	 * @param lcharMap 	lowercase chars
-	 * @param ucharMap 	uppercase chars
-	 * @param altGrCharMap 	chars obtained with AltGr combination
 	 */
-	protected void initVkMap(int[] vkMap, char[] lcharMap, char[] ucharMap, char[] altGrCharMap) {
+	protected void initVkMap() {
 		vkMap[0] = KeyEvent.VK_UNDEFINED;
 		vkMap[1] = KeyEvent.VK_ESCAPE;
 		vkMap[2] = KeyEvent.VK_AMPERSAND;
