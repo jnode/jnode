@@ -19,8 +19,11 @@ final class VirtualStack {
 
     // explicitely check that elements on the operant stack
     // are popped in the appropriate order
-    //
     static final boolean checkOperandStack = true;
+
+    // explicitely check that elements on the FPU stack
+    // are popped in the appropriate order
+    static final boolean checkFpuStack = true;
 
     // the virtual stack
     private Item[] stack;
@@ -30,14 +33,14 @@ final class VirtualStack {
 
     final ItemStack operandStack;
 
-    final ItemStack fpuStack = new ItemStack(Item.Kind.FPUSTACK);
+    final FPUStack fpuStack = new FPUStack();
 
     /**
      * 
      * Constructor; create and initialize stack with default size
      */
     VirtualStack(AbstractX86Stream os) {
-        this.operandStack = checkOperandStack ? new ItemStack(Item.Kind.STACK)
+        this.operandStack = checkOperandStack ? new ItemStack(Item.Kind.STACK, Integer.MAX_VALUE)
                 : null;
         reset();
     }
@@ -181,6 +184,7 @@ final class VirtualStack {
 
     /**
      * Push item on stack.
+     * If the item is on the FPU stack, it is also pushed on fpuStack.
      */
     void push(Item item) {
         if ((item.getKind() == Item.Kind.STACK) && (tos > 0)) {

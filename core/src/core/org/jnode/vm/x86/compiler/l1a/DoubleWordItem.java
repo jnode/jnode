@@ -14,6 +14,27 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 public abstract class DoubleWordItem extends Item implements
         X86CompilerConstants {
 
+    /**
+     * Create a WordItem in a register.
+     * 
+     * @param jvmType
+     *            LONG, DOUBLE
+     * @param lsb
+     * @param msb
+     * @return
+     */
+    static final DoubleWordItem createReg(int jvmType, Register lsb,
+            Register msb) {
+        switch (jvmType) {
+        case JvmType.LONG:
+            return LongItem.createReg(lsb, msb);
+        case JvmType.DOUBLE:
+            return DoubleItem.createReg(lsb, msb);
+        default:
+            throw new IllegalArgumentException("Invalid type " + jvmType);
+        }
+    }
+
     private Register lsb;
 
     private Register msb;
@@ -32,6 +53,43 @@ public abstract class DoubleWordItem extends Item implements
     }
 
     /**
+     * Load my constant to the given os.
+     * 
+     * @param os
+     * @param lsb
+     * @param msb
+     */
+    protected abstract void loadToConstant(EmitterContext ec,
+            AbstractX86Stream os, Register lsb, Register msb);
+
+    /**
+     * Pop the top of the FPU stack into the given memory location.
+     * 
+     * @param os
+     * @param reg
+     * @param disp
+     */
+    protected abstract void popFromFPU(AbstractX86Stream os, Register reg,
+            int disp);
+
+    /**
+     * Push my constant on the stack using the given os.
+     * 
+     * @param os
+     */
+    protected abstract void pushConstant(EmitterContext ec, AbstractX86Stream os);
+
+    /**
+     * Push the value at the given memory location on the FPU stack.
+     * 
+     * @param os
+     * @param reg
+     * @param disp
+     */
+    protected abstract void pushToFPU(AbstractX86Stream os, Register reg,
+            int disp);
+
+    /**
      * Return the current item's computational type category (JVM Spec, p. 83).
      * In practice, this is the number of double words needed by the item (1 or
      * 2)
@@ -43,6 +101,16 @@ public abstract class DoubleWordItem extends Item implements
     }
 
     /**
+     * Gets the offset from the LSB part of this item to the FramePointer
+     * register. This is only valid if this item has a LOCAL kind.
+     * 
+     * @return
+     */
+    final int getLsbOffsetToFP() {
+        return super.getOffsetToFP();
+    }
+
+    /**
      * Gets the register holding the LSB part of this item
      * 
      * @return
@@ -50,6 +118,16 @@ public abstract class DoubleWordItem extends Item implements
     final Register getLsbRegister() {
         assertCondition(kind == Kind.REGISTER, "kind == Kind.REGISTER");
         return lsb;
+    }
+
+    /**
+     * Gets the offset from the MSB part of this item to the FramePointer
+     * register. This is only valid if this item has a LOCAL kind.
+     * 
+     * @return
+     */
+    final int getMsbOffsetToFP() {
+        return super.getOffsetToFP() + 4;
     }
 
     /**
@@ -74,23 +152,28 @@ public abstract class DoubleWordItem extends Item implements
     }
 
     /**
-     * Gets the offset from the LSB part of this item to the FramePointer
-     * register. This is only valid if this item has a LOCAL kind.
-     * 
-     * @return
+     * @see org.jnode.vm.x86.compiler.l1a.Item#load(EmitterContext)
      */
-    final int getLsbOffsetToFP() {
-        return super.getOffsetToFP();
-    }
+    final void load(EmitterContext ec) {
+        if (kind != Kind.REGISTER) {
+            X86RegisterPool pool = ec.getPool();
 
-    /**
-     * Gets the offset from the MSB part of this item to the FramePointer
-     * register. This is only valid if this item has a LOCAL kind.
-     * 
-     * @return
-     */
-    final int getMsbOffsetToFP() {
-        return super.getOffsetToFP() + 4;
+            Register l = pool.request(JvmType.INT, this);
+            if (l == null) {
+                final VirtualStack vstack = ec.getVStack();
+                vstack.push(ec);
+                l = pool.request(getType(), this);
+            }
+            Register r = pool.request(JvmType.INT, this);
+            if (r == null) {
+                final VirtualStack vstack = ec.getVStack();
+                vstack.push(ec);
+                r = pool.request(getType(), this);
+            }
+            assertCondition(r != null, "r != null");
+            assertCondition(l != null, "l != null");
+            loadTo(ec, l, r);
+        }
     }
 
     /**
@@ -191,16 +274,6 @@ public abstract class DoubleWordItem extends Item implements
     }
 
     /**
-     * Load my constant to the given os.
-     * 
-     * @param os
-     * @param lsb
-     * @param msb
-     */
-    protected abstract void loadToConstant(EmitterContext ec,
-            AbstractX86Stream os, Register lsb, Register msb);
-
-    /**
      * Load this item to a general purpose register tuple.
      * 
      * @param ec
@@ -220,31 +293,6 @@ public abstract class DoubleWordItem extends Item implements
             }
             assertCondition(msb != null, "msb != null");
             loadTo(ec, lsb, msb);
-        }
-    }
-
-    /**
-     * @see org.jnode.vm.x86.compiler.l1a.Item#load(EmitterContext)
-     */
-    final void load(EmitterContext ec) {
-        if (kind != Kind.REGISTER) {
-            X86RegisterPool pool = ec.getPool();
-
-            Register l = pool.request(JvmType.INT, this);
-            if (l == null) {
-                final VirtualStack vstack = ec.getVStack();
-                vstack.push(ec);
-                l = pool.request(getType(), this);
-            }
-            Register r = pool.request(JvmType.INT, this);
-            if (r == null) {
-                final VirtualStack vstack = ec.getVStack();
-                vstack.push(ec);
-                r = pool.request(getType(), this);
-            }
-            assertCondition(r != null, "r != null");
-            assertCondition(l != null, "l != null");
-            loadTo(ec, l, r);
         }
     }
 
@@ -328,8 +376,9 @@ public abstract class DoubleWordItem extends Item implements
             break;
 
         case Kind.FPUSTACK:
-            //TODO
-            notImplemented();
+            // Assert this item is at the top of the stack
+            stack.fpuStack.pop(this);
+        	stack.fpuStack.push(this);
             break;
 
         case Kind.STACK:
@@ -337,7 +386,7 @@ public abstract class DoubleWordItem extends Item implements
                 stack.operandStack.pop(this);
             }
             os.writeFLD64(SP, 0);
-            os.writeLEA(SP, SP, 8);            
+            os.writeLEA(SP, SP, 8);
             break;
         }
 
@@ -345,13 +394,6 @@ public abstract class DoubleWordItem extends Item implements
         kind = Kind.FPUSTACK;
         stack.fpuStack.push(this);
     }
-
-    /**
-     * Push my constant on the stack using the given os.
-     * 
-     * @param os
-     */
-    protected abstract void pushConstant(EmitterContext ec, AbstractX86Stream os);
 
     /**
      * @see org.jnode.vm.x86.compiler.l1a.Item#release(EmitterContext)
@@ -396,24 +438,5 @@ public abstract class DoubleWordItem extends Item implements
      */
     final boolean uses(Register reg) {
         return ((kind == Kind.REGISTER) && (msb.equals(reg) || lsb.equals(reg)));
-    }
-    
-
-    /**
-     * Create a WordItem in a register.
-     * @param jvmType LONG, DOUBLE
-     * @param lsb
-     * @param msb
-     * @return
-     */
-    static final DoubleWordItem createReg(int jvmType, Register lsb, Register msb) {
-        switch (jvmType) {
-        case JvmType.LONG:
-            return LongItem.createReg(lsb, msb);
-        case JvmType.DOUBLE:
-            return DoubleItem.createReg(lsb, msb);
-        default:
-            throw new IllegalArgumentException("Invalid type " + jvmType);
-        }
     }
 }

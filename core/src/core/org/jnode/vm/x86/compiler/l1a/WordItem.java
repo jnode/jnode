@@ -40,8 +40,9 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      */
     final void loadTo(EmitterContext ec, Register reg) {
         assertCondition(reg != null, "Reg != null");
-        AbstractX86Stream os = ec.getStream();
-        X86RegisterPool pool = ec.getPool();
+        final AbstractX86Stream os = ec.getStream();
+        final X86RegisterPool pool = ec.getPool();
+        final VirtualStack stack = ec.getVStack();
         assertCondition(!pool.isFree(reg), "reg not free");
 
         switch (kind) {
@@ -61,14 +62,17 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
             break;
 
         case Kind.FPUSTACK:
-            //TODO
-            notImplemented();
+            // Make sure this item is on top of the FPU stack
+            stack.fpuStack.pop(this);
+            // Convert & move to new space on normal stack
+            os.writeLEA(SP, SP, 4);
+            popFromFPU(os, SP, 0);
+            os.writePOP(reg);
             break;
 
         case Kind.STACK:
             //TODO: make sure this is on top os stack
             if (VirtualStack.checkOperandStack) {
-                final VirtualStack stack = ec.getVStack();
                 stack.operandStack.pop(this);
             }
             os.writePOP(reg);
@@ -136,6 +140,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      */
     final void push(EmitterContext ec) {
         final AbstractX86Stream os = ec.getStream();
+        final VirtualStack stack = ec.getVStack();
 
         switch (getKind()) {
         case Kind.REGISTER:
@@ -151,21 +156,20 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
             break;
 
         case Kind.FPUSTACK:
-            //TODO
-            notImplemented();
+            // Make sure this item is on top of the FPU stack
+            stack.fpuStack.pop(this);
+            // Convert & move to new space on normal stack
+            os.writeLEA(SP, SP, 4);
+            popFromFPU(os, SP, 0);
             break;
 
         case Kind.STACK:
             //nothing to do
             if (VirtualStack.checkOperandStack) {
-                final VirtualStack stack = ec.getVStack();
-
-                if (kind == Kind.STACK) {
-                    // the item is not really pushed and popped
-                    // but this checks that it is really the top
-                    // element
-                    stack.operandStack.pop(this);
-                }
+                // the item is not really pushed and popped
+                // but this checks that it is really the top
+                // element
+                stack.operandStack.pop(this);
             }
             break;
 
@@ -174,7 +178,6 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
         kind = Kind.STACK;
 
         if (VirtualStack.checkOperandStack) {
-            final VirtualStack stack = ec.getVStack();
             stack.operandStack.push(this);
         }
     }
@@ -189,30 +192,31 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
         switch (getKind()) {
         case Kind.REGISTER:
             os.writePUSH(reg);
-            os.writeFLD32(SP, 0);
+        	pushToFPU(os, SP, 0);
             os.writeLEA(SP, SP, 4);
             break;
 
         case Kind.LOCAL:
-            os.writeFLD32(FP, offsetToFP);
+            pushToFPU(os, FP, offsetToFP);
             break;
 
         case Kind.CONSTANT:
             pushConstant(ec, os);
-            os.writeFLD32(SP, 0);
+            pushToFPU(os, SP, 0);
             os.writeLEA(SP, SP, 4);
             break;
 
         case Kind.FPUSTACK:
-            //TODO
-            notImplemented();
+            // Assert this item is at the top of the stack
+            stack.fpuStack.pop(this);
+        	stack.fpuStack.push(this);
             break;
 
         case Kind.STACK:
             if (VirtualStack.checkOperandStack) {
                 stack.operandStack.pop(this);
             }
-            os.writeFLD32(SP, 0);
+            pushToFPU(os, SP, 0);
             os.writeLEA(SP, SP, 4);
             break;
         }
@@ -228,6 +232,24 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      * @param os
      */
     protected abstract void pushConstant(EmitterContext ec, AbstractX86Stream os);
+
+    /**
+     * Push the value at the given memory location on the FPU stack.
+     * 
+     * @param os
+     * @param reg
+     * @param disp
+     */
+    protected abstract void pushToFPU(AbstractX86Stream os, Register reg, int disp);
+
+    /**
+     * Pop the top of the FPU stack into the given memory location.
+     * 
+     * @param os
+     * @param reg
+     * @param disp
+     */
+    protected abstract void popFromFPU(AbstractX86Stream os, Register reg, int disp);
 
     /**
      * @see org.jnode.vm.x86.compiler.l1a.Item#release(EmitterContext)
@@ -250,7 +272,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
             break;
 
         case Kind.FPUSTACK:
-            notImplemented();
+            // nothing to do
             break;
 
         case Kind.STACK:
