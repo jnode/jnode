@@ -10,9 +10,7 @@ import java.io.StringReader;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.StringTokenizer;
-
 import javax.naming.NameNotFoundException;
-
 import org.apache.log4j.Logger;
 import org.jnode.driver.console.Console;
 import org.jnode.driver.console.ConsoleManager;
@@ -30,48 +28,55 @@ import org.jnode.shell.help.Help;
  * @author epr
  */
 public class CommandShell implements Runnable, Shell, KeyboardListener {
-
+	
 	public static final String PROMPT_PROPERTY_NAME = "jnode.prompt";
-
+	
 	/** My logger */
 	private final Logger log = Logger.getLogger(getClass());
 	private PrintStream out;
 	private PrintStream err;
 	private AliasManager aliasMgr;
-
+	
 	/** Keeps a reference to the console this CommandShell is using * */
 	private Console console = null;
-
+	
 	/** Contains the archive of commands. * */
 	private CommandHistory history = new CommandHistory();
-
+	
 	/**
 	 * Contains an index to the current history line. 0 = first historical command. 2 = next historical command. -1 = the current command line.
 	 */
 	private int historyIndex = -1;
-
+	
+	/**
+	 * Contains the current position of the cursor on the currentLine
+	 */
+	private int posOnCurrentLine = 0;
+	
 	/** Contains the current line * */
 	private String currentLine = "";
-
+	
 	/** Contains the newest command being typed in * */
 	private String newestLine = "";
-
+	
 	/** Flag to know if the shell is active to take the keystrokes * */
 	private boolean isActive = false;
-
+	
+	private String currentPrompt = null;
+	
 	/**
 	 * Flag to know when to wait (while input is happening). This is (hopefully) a thread safe implementation. *
 	 */
 	private volatile boolean threadSuspended = false;
-
+	
 	private static String DEFAULT_PROMPT = "JNode $P$G";
-
+	
 	//private static final Class[] MAIN_ARG_TYPES = new Class[] { String[].class };
-
+	
 	private CommandInvoker commandInvoker;
 	private ThreadCommandInvoker threadCommandInvoker;
 	private DefaultCommandInvoker defaultCommandInvoker;
-
+	
 	public Console getConsole() {
 		return console;
 	}
@@ -81,10 +86,10 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 	public void setDefaultCommandInvoker() {
 		this.commandInvoker = defaultCommandInvoker;
 	}
-
+	
 	/**
 	 * Create a new instance
-	 * 
+	 *
 	 * @see java.lang.Object
 	 */
 	public CommandShell() throws ShellException {
@@ -94,7 +99,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 				console = cm.getFocus();
 				this.out = console.getOut();
 				this.err = console.getErr();
-
+				
 				//  listen to the keyboard
 				console.addKeyboardListener(this);
 				defaultCommandInvoker = new DefaultCommandInvoker(this);
@@ -111,10 +116,10 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 			throw new ShellException("Cannot find required resource", ex);
 		}
 	}
-
+	
 	/**
 	 * Run this shell until exit.
-	 * 
+	 *
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
@@ -126,14 +131,15 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 			try {
 				if (e.startsWith("cmd=")) {
 					final String cmd = e.substring("cmd=".length());
-					out.println(prompt() + cmd);
+					currentPrompt = prompt();
+					out.println(currentPrompt + cmd);
 					processCommand(cmd);
 				}
 			} catch (Throwable ex) {
 				ex.printStackTrace(err);
 			}
 		}
-
+		
 		// Now become interactive
 		boolean halt = false;
 		while (!halt) {
@@ -141,7 +147,8 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 				synchronized (this) {
 					//  Catch keyboard events
 					isActive = true;
-					out.print(prompt());
+					currentPrompt = prompt();
+					out.print(currentPrompt);
 					//  wait until enter is hit
 					threadSuspended = true;
 					while (threadSuspended)
@@ -153,13 +160,13 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 					currentLine = "";
 					historyIndex = -1;
 				}
-
+				
 			} catch (Throwable ex) {
 				ex.printStackTrace(err);
 			}
 		}
 	}
-
+	
 	protected void processCommand(String cmdLineStr) {
 		commandInvoker.invoke(cmdLineStr);
 	}
@@ -210,7 +217,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 	//			err.println("I FOUND AN ERROR: " + ex);
 	//		}
 	//	}
-
+	
 	protected Class getCommandClass(String cmd) throws ClassNotFoundException {
 		try {
 			return aliasMgr.getAliasClass(cmd);
@@ -219,21 +226,21 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 			return cl.loadClass(cmd);
 		}
 	}
-
+	
 	/**
 	 * Gets the alias manager of this shell
 	 */
 	public AliasManager getAliasManager() {
 		return aliasMgr;
 	}
-
+	
 	/**
 	 * Gets the CommandHistory object associated with this shell.
 	 */
 	public CommandHistory getCommandHistory() {
 		return history;
 	}
-
+	
 	/**
 	 * Gets the expanded prompt
 	 */
@@ -278,88 +285,164 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 		}
 		return result.toString();
 	}
-
+	
 	//********** KeyboardListener implementation **********//
+	/**
+	 * Method keyPressed
+	 *
+	 * @param    ke                  a  KeyboardEvent
+	 *
+	 * @version  2/5/2004
+	 */
 	public void keyPressed(KeyboardEvent ke) {
 		//  make sure we are ready to intercept the keyboard
 		if (!isActive)
 			return;
-
-		//  intercept the up and down arrow keys
-		if (ke.getKeyCode() == KeyEvent.VK_UP) {
-			ke.consume();
-			if (historyIndex == -1) {
-				newestLine = currentLine;
-				historyIndex = history.size();
-			}
-			historyIndex--;
-			redisplay();
-		} else if (ke.getKeyCode() == KeyEvent.VK_DOWN) {
-			ke.consume();
-			if (historyIndex == history.size() - 1)
-				historyIndex = -2;
-			else if (historyIndex == -1)
-				newestLine = currentLine;
-			historyIndex++;
-			redisplay();
-		}
-
-		//  if its a useful key we want to add it to our current line
-		else if (!Character.isISOControl(ke.getKeyChar())) {
-			out.print(ke.getKeyChar());
-			ke.consume();
-			currentLine += ke.getKeyChar();
-		}
-
-		//  if its a backspace we want to remove one from the end of our current line
-		else if (ke.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-			ke.consume();
-			if (currentLine.length() != 0) {
+		
+		switch(ke.getKeyCode()) {
+			//  intercept the up and down arrow keys
+			case KeyEvent.VK_UP:
+				ke.consume();
+				if (historyIndex == -1) {
+					newestLine = currentLine;
+					historyIndex = history.size();
+				}
+				historyIndex--;
+				redisplay();
+				break;
+			case KeyEvent.VK_DOWN:
+				ke.consume();
+				if (historyIndex == history.size() - 1)
+					historyIndex = -2;
+				else if (historyIndex == -1)
+					newestLine = currentLine;
+				historyIndex++;
+				redisplay();
+				break;
+			case KeyEvent.VK_LEFT: //Left the cursor goes left
+				ke.consume();
+				if(posOnCurrentLine > 0) {
+					posOnCurrentLine--;
+					refreshCurrentLine();
+				}
+				break;
+			case KeyEvent.VK_RIGHT: // Right the cursor goes right
+				ke.consume();
+				if(posOnCurrentLine < currentLine.length()) {
+					posOnCurrentLine++;
+					refreshCurrentLine();
+				}
+				break;
+			case KeyEvent.VK_HOME: // The cursor goes at the start
+				ke.consume();
+				posOnCurrentLine = 0;
+				refreshCurrentLine();
+				break;
+			case KeyEvent.VK_END: // the cursor goes at the end of line
+				ke.consume();
+				posOnCurrentLine = currentLine.length();
+				refreshCurrentLine();
+				break;
+				//  if its a backspace we want to remove one from the end of our current line
+			case KeyEvent.VK_BACK_SPACE:
+				ke.consume();
+				if (currentLine.length() != 0 && posOnCurrentLine > 0) {
+					posOnCurrentLine --;
+					currentLine = currentLine.substring(0, posOnCurrentLine)+ currentLine.substring(posOnCurrentLine+1, currentLine.length());
+					
+					refreshCurrentLine();
+				}
+				break;
+				
+				//  if its a delete we want to remove one under the cursor
+			case KeyEvent.VK_DELETE:
+				ke.consume();
+				if(posOnCurrentLine == 0 && currentLine.length() > 0) {
+					currentLine = currentLine.substring(1);
+				} else if(posOnCurrentLine < currentLine.length()) {
+					currentLine = currentLine.substring(0, posOnCurrentLine)+ currentLine.substring(posOnCurrentLine+1, currentLine.length());
+				}
+				refreshCurrentLine();
+				break;
+				
+				//  if its an enter key we want to process the command, and then resume the thread
+			case KeyEvent.VK_ENTER:
 				out.print(ke.getKeyChar());
-				currentLine = currentLine.substring(0, currentLine.length() - 1);
-			}
+				ke.consume();
+				posOnCurrentLine = 0;
+				synchronized (this) {
+					isActive = false;
+					threadSuspended = false;
+					notifyAll();
+				}
+				break;
+				
+				// if it's the tab key, we want to trigger command line completion
+			case KeyEvent.VK_TAB:
+				ke.consume();
+				if(posOnCurrentLine != currentLine.length()) {
+					String ending = currentLine.substring(posOnCurrentLine);
+					currentLine = complete(currentLine.substring(0, posOnCurrentLine))+ending;
+					posOnCurrentLine = currentLine.length() - ending.length();
+				} else {
+					currentLine = complete(currentLine);
+					posOnCurrentLine = currentLine.length();
+				}
+				break;
+				
+			default:
+				//  if its a useful key we want to add it to our current line
+				if (!Character.isISOControl(ke.getKeyChar())) {
+					ke.consume();
+					if(posOnCurrentLine == currentLine.length()) {
+						currentLine += ke.getKeyChar();
+					} else {
+						currentLine = currentLine.substring(0, posOnCurrentLine) +
+							ke.getKeyChar() + currentLine.substring(posOnCurrentLine);
+					}
+					posOnCurrentLine++;
+					refreshCurrentLine();
+				}
 		}
-
-		//  if its an enter key we want to process the command, and then resume the thread
-		else if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
-			out.print(ke.getKeyChar());
-			ke.consume();
-			synchronized (this) {
-				isActive = false;
-				threadSuspended = false;
-				notifyAll();
-			}
-		}
-
-		// if it's the tab key, we want to trigger command line completion
-		else if (ke.getKeyCode() == KeyEvent.VK_TAB) {
-			ke.consume();
-			currentLine = complete(currentLine);
-		}
-
 	}
-
+	
+	private void refreshCurrentLine() {
+		try {
+			int y = console.getCursorY();
+			console.clearLine(y);
+			console.clearLine(y-1);
+			console.setCursor(0, y-1);
+			err.print("Cursor pos : x = "+currentPrompt.length() + posOnCurrentLine+", y = "+y);
+			console.setCursor(0, y);
+			out.print(currentPrompt + currentLine + " ");
+			console.setCursor(currentPrompt.length() + posOnCurrentLine, console.getCursorY());
+		}
+		catch (Exception e) {
+		}
+	}
+	
 	public void keyReleased(KeyboardEvent ke) {
 		// do nothing
 	}
-
+	
 	private void redisplay() {
 		//  clear the line
 		if (console != null) {
 			console.clearLine(console.getCursorY());
 		}
 		//  display the prompt
-		out.print(prompt());
+		out.print(currentPrompt);
 		//  display the required history/current line
 		if (historyIndex == -1)
 			currentLine = newestLine;
 		else
 			currentLine = history.getCommand(historyIndex);
 		out.print(currentLine);
+		posOnCurrentLine = currentLine.length();
 	}
-
+	
 	// Command line completion
-
+	
 	private final Argument defaultArg = new AliasArgument("command", "the command to be called");
 	private boolean dirty = false;
 	private String complete(String partial) {
@@ -368,7 +451,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 			ShellUtils.getShellManager().registerShell(this);
 		} catch (NameNotFoundException ex) {
 		}
-
+		
 		dirty = false;
 		String result = null;
 		try {
@@ -381,20 +464,20 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 						// get command's help info
 						Class cmdClass = getCommandClass(cmd);
 						Help.Info info = Help.getInfo(cmdClass);
-
+						
 						// perform completion
 						result = cmd + " " + info.complete(cl); // prepend command name and space
 						// again
 					} catch (ClassNotFoundException ex) {
-						throw new CompletionException("Command class not found");
-					}
+					throw new CompletionException("Command class not found");
+				}
 			}
 			if (result == null) // assume this is the alias to be called
 				result = defaultArg.complete(cmd);
-
+			
 			if (!partial.equals(result) && !dirty) { // performed direct completion without listing
 				dirty = true; // indicate we want to have a new prompt
-				for (int i = 0; i < partial.length() + prompt().length(); i++)
+				for (int i = 0; i < partial.length() + currentPrompt.length(); i++)
 					System.out.print("\b"); // clear line (cheap approach)
 			}
 		} catch (CompletionException ex) {
@@ -405,28 +488,28 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 			result = partial; // restore old value
 			dirty = true; // we need a new prompt
 		}
-
+		
 		if (dirty) {
 			dirty = false;
-			System.out.print(prompt() + result); // print the prompt and go on with normal
+			System.out.print(currentPrompt + result); // print the prompt and go on with normal
 			// operation
 		}
 		return result;
 	}
-
+	
 	public void list(String[] items) {
 		System.out.println();
 		for (int i = 0; i < items.length; i++)
 			System.out.println(items[i]);
 		dirty = true;
 	}
-
+	
 	public void addCommandToHistory(String cmdLineStr) {
 		//  Add this command to the history.
 		if (!cmdLineStr.equals(newestLine))
 			history.addCommand(cmdLineStr);
 	}
-
+	
 	public PrintStream getErrorStream() {
 		return err;
 	}
