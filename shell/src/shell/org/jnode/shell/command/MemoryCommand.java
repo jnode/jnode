@@ -26,6 +26,7 @@ public class MemoryCommand {
 	public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
 		final Runtime rt = Runtime.getRuntime();
 		out.println("Total memory " + rt.totalMemory());
+		out.println("Used memory  " + (rt.totalMemory() - rt.freeMemory()));
 		out.println("Free memory  " + rt.freeMemory());
 	}
 }
