@@ -1,0 +1,50 @@
+# GRUB Configuration
+default 0
+timeout 5
+
+
+# ---------------------------
+title JNode (default)
+kernel /jnodesys.gz
+module /default.jgz
+
+# ---------------------------
+
+title JNode (default without MP)
+kernel /jnodesys.gz mp=no
+module /default.jgz
+
+# ---------------------------
+title JNode (all plugins)
+kernel /jnodesys.gz
+module /full.jgz
+
+# ---------------------------
+title JNode GUI (all plugins)
+kernel /jnodesys.gz
+module /fullgui.jgz
+
+# ---------------------------
+title JNode via dhcp (default)
+dhcp
+kernel (nd)/jnodesys.gz
+module (nd)/default.jgz
+
+# ---------------------------
+title JNode via dhcp (all plugins)
+dhcp
+kernel (nd)/jnodesys.gz
+module (nd)/full.jgz
+
+# ---------------------------
+title JNode GUI via dhcp (all plugins)
+dhcp
+kernel (nd)/jnodesys.gz
+module (nd)/fullgui.jgz
+
+# ---------------------------
+title JNode Install
+kernel /jnodesys.gz
+module /install.jgz
+
+
