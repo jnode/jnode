@@ -496,6 +496,10 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 */
 	public final void writePutstaticWriteBarrier(VmStaticField field,
 			GPR valueReg, GPR scratchReg) {
+        if (Vm.VerifyAssertions) {
+            Vm._assert(scratchReg.getSize() == context.ADDRSIZE, "scratchReg wrong size");
+            Vm._assert(valueReg.getSize() == context.ADDRSIZE, "valueReg wrong size");
+        }
 		if (field.isObjectRef()) {
 			final VmWriteBarrier wb = context.getWriteBarrier();
 			if (wb != null) {
@@ -518,7 +522,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	}
 
 	/**
-	 * Write code to load the given statics table entry into the given register.
+	 * Write code to load the given 32-bit statics table entry into the given register.
 	 * 
 	 * @param curInstrLabel
 	 * @param dst
@@ -526,6 +530,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 */
 	public final void writeGetStaticsEntry(Label curInstrLabel, GPR dst,
 			VmStaticsEntry entry) {
+        if (Vm.VerifyAssertions) {
+            Vm._assert(dst.getSize() == BITS32, "dst wrong size");
+        }
 		writeLoadSTATICS(curInstrLabel, "gs", true);
 		os.writeMOV(INTSIZE, dst, context.STATICS, getStaticsOffset(entry));
 	}

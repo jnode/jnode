@@ -1724,7 +1724,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			final WordItem result = L1AHelper.requestWordRegister(eContext,
 					type, false);
 			final GPR resultr = result.getRegister();
-			helper.writeGetStaticsEntry(curInstrLabel, resultr, sf);
+            if (os.isCode32() || (type != JvmType.REFERENCE)) {
+                helper.writeGetStaticsEntry(curInstrLabel, resultr, sf);
+            } else {
+                helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)resultr, sf);                
+            }
 			vstack.push(result);
 		} else {
 			final DoubleWordItem result = L1AHelper.requestDoubleWordRegisters(
@@ -2426,7 +2430,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			dropParameters(sm, true);
 
 			// Get method from statics table
-			helper.writeGetStaticsEntry(curInstrLabel, context.AAX, sm);
+            if (os.isCode32()) {
+                helper.writeGetStaticsEntry(curInstrLabel, context.AAX, sm);
+            } else {
+                helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)context.AAX, sm);                
+            }
 			invokeJavaMethod(methodRef.getSignature());
 			// Result is already on the stack.
 		} catch (ClassCastException ex) {
@@ -2454,7 +2462,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			dropParameters(method, false);
 
 			// Get static field object
-			helper.writeGetStaticsEntry(curInstrLabel, context.AAX, method);
+            if (os.isCode32()) {
+                helper.writeGetStaticsEntry(curInstrLabel, context.AAX, method);
+            } else {
+                helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)context.AAX, method);                
+            }
 			invokeJavaMethod(methodRef.getSignature());
 			// Result is already on the stack.
 		}
@@ -3761,7 +3773,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		final VmType type = classRef.getResolvedVmClass();
 
 		// Load the class from the statics table
-		helper.writeGetStaticsEntry(curInstrLabel, dst, type);
+        if (os.isCode32()) {
+            helper.writeGetStaticsEntry(curInstrLabel, dst, type);
+        } else {
+            helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)dst, type);            
+        }
 	}
 
 	/**

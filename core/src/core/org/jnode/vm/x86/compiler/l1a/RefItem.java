@@ -25,6 +25,7 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
+import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.classmgr.VmConstString;
@@ -92,8 +93,12 @@ final class RefItem extends WordItem implements X86CompilerConstants {
 			os.writeXOR(reg, reg);
 		} else {
 			X86CompilerHelper helper = ec.getHelper();
-			Label l = new Label(Long.toString(labelCounter++));
-			helper.writeGetStaticsEntry(l, reg, value);
+			final Label l = new Label(Long.toString(labelCounter++));
+            if (os.isCode32()) {
+                helper.writeGetStaticsEntry(l, reg, value);
+            } else {
+                helper.writeGetStaticsEntry64(l, (GPR64)reg, value);                
+            }
 		}
 	}
 
