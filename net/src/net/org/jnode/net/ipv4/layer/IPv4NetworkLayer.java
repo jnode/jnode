@@ -155,17 +155,13 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
         // Should I process this packet, or is it for somebody else?
         final IPv4Address dstAddr = hdr.getDestination();
         final boolean shouldProcess;
-        if (dstAddr.isBroadcast()) {
-            shouldProcess = true;
+        if (myAddrInfo != null) {
+            shouldProcess = myAddrInfo.contains(dstAddr);
         } else {
-            if (myAddrInfo != null) {
-                shouldProcess = myAddrInfo.contains(dstAddr);
-            } else {
-                // I don't have an IP address yet, if the linklayer says
-                // it is for me, we'll process it, otherwise we'll drop it.
-                shouldProcess = !skbuf.getLinkLayerHeader()
-                        .getDestinationAddress().isBroadcast();
-            }
+            // I don't have an IP address yet, if the linklayer says
+            // it is for me, we'll process it, otherwise we'll drop it.
+            shouldProcess = !skbuf.getLinkLayerHeader()
+                    .getDestinationAddress().isBroadcast();
         }
         if (!shouldProcess) {
         //log.debug("IPPacket not for me, ignoring (dst=" + dstAddr + ")");

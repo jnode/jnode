@@ -166,6 +166,15 @@ public class IPv4Address implements ProtocolAddress, Serializable {
 	}
 	
 	/**
+	 * Gets an array with the bytes of this address
+	 */
+	public final byte[] getBytes(){
+		byte[] b = new byte[4];
+		System.arraycopy(address, 0, b, 0, 4);
+		return b;
+	}
+	
+	/**
 	 * Write this address to a given offset in the given buffer
 	 * @param skbuf
 	 * @param skbufOffset
