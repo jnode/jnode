@@ -43,8 +43,8 @@ public class Macro {
         this.localLabels = localLabels;
     }
 
-    public void fillBody(Token start, Token end){
-        body = Preprocessor.extractImage(start, end);
+    public void setBody(String body) {
+        this.body = body;
     }
 
     public String expand(String[] params){

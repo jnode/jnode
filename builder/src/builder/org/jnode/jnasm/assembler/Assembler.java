@@ -17,20 +17,42 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.InputStreamReader;
+import java.lang.reflect.Constructor;
 
 /**
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public abstract class Assembler {
+    private static final String PARSER_CLASS = "org.jnode.jnasm.assembler.gen.JNAsm";
     public static final boolean THROW = false;
     protected static final Object UNDEFINED = new String("UNDEFIEND");
-    final List instructions = new ArrayList();
+    protected final List instructions = new ArrayList();
     private final Map constants = new HashMap();
     private final Map labels = new HashMap();
     private int pass = 0;
-    private final HardwareSupport hwSupport;
+    protected final HardwareSupport hwSupport;
     private final PseudoInstructions pseudo;
     protected Instruction crtIns;
+    
+    public static Assembler newInstance(InputStream in){
+        try{
+            Class clazz = Class.forName(PARSER_CLASS);
+            Constructor cons = clazz.getConstructor(new Class[]{InputStream.class});
+            return (Assembler) cons.newInstance(new Object[]{in});
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Assembler newInstance(Reader reader){
+        try{
+            Class clazz = Class.forName("org.jnode.jnasm.assembler.gen.JNAsm");
+            Constructor cons = clazz.getConstructor(new Class[]{Reader.class});
+            return (Assembler) cons.newInstance(new Object[]{reader});
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
+    }
 
     public static void main(String[] argv) throws Exception {
         Assembler jnasm = newInstance(System.in);
@@ -80,87 +102,13 @@ public abstract class Assembler {
         hwSupport.setPass(pass);
     }
 
-    public abstract void jnasmInput() throws ParseException;
+    public abstract void jnasmInput() throws Exception;
 
     public abstract void ReInit(Reader stream);
-
-    public static Assembler newInstance(InputStream in) {
-        return new JNAsm(in);
-    }
-
-    public static Assembler newInstance(Reader reader) {
-        return new JNAsm(reader);
-    }
 
     public void emmit(OutputStream out) throws IOException{
         assemble();
         hwSupport.writeTo(out);
-    }
-
-    public static final boolean isIdent(Token t) {
-        return t.kind == JNAsmConstants.IDENT;
-    }
-
-    static final boolean isNumber(Token t) {
-        int k = t.kind;
-        return k == JNAsmConstants.DECNUMBER ||
-                k == JNAsmConstants.BINNUMBER ||
-                k == JNAsmConstants.OCTNUMBER ||
-                k == JNAsmConstants.HEXNUMBER;
-    }
-
-    protected final boolean isRegister(Token t) {
-        return (t.kind == JNAsmConstants.IDENT) && hwSupport.isRegister(t.image);
-    }
-
-    static final int getNumber(Token t) {
-        int ret;
-        String s = t.image;
-        try {
-            switch (t.kind) {
-                case JNAsmConstants.DECNUMBER:
-                    ret = (int) Long.parseLong(s);
-                    break;
-
-                case JNAsmConstants.BINNUMBER:
-                    ret = (int) Long.parseLong(s.substring(0, s.length() - 1), 2);
-                    break;
-
-                case JNAsmConstants.OCTNUMBER:
-                    ret = (int) Long.parseLong(s.substring(0, s.length() - 1), 8);
-                    break;
-
-                case JNAsmConstants.HEXNUMBER:
-                    if (s.endsWith("h") || s.endsWith("H")) {
-                        ret = (int) Long.parseLong(s.substring(0, s.length() - 1), 16);
-                    } else {
-                        ret = (int) Long.parseLong(s.substring(2), 16);
-                    }
-                    break;
-
-                case JNAsmConstants.STRING:
-                    s = s.substring(1, s.length() - 1);
-                    byte[] buf = s.getBytes();
-                    ret = 0;
-                    int ln = Math.min(buf.length, 4);
-                    for(int i = 0; i < ln; i++){
-                        ret |= buf[i] << (i << 3);
-                    }
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unkown number type: " + t.kind);
-
-            }
-        } catch (RuntimeException x) {
-            if (THROW) {
-                throw x;
-            } else {
-                x.printStackTrace();
-                System.err.println("Invaid int: " + x.getMessage());
-                return 0;
-            }
-        }
-        return ret;
     }
 
     public void putConstant(String name, int value) {
@@ -170,11 +118,11 @@ public abstract class Assembler {
         constants.put(name, new Integer(value));
     }
 
-    int getConstant(Token t) {
-        Integer i = (Integer) constants.get(t.image);
+    protected int getConstant(String name, int line) {
+        Integer i = (Integer) constants.get(name);
         try {
             if (i == null)
-                throw new IllegalArgumentException("Undefined constant at line " + t.beginLine + ": " + t.image);
+                throw new IllegalArgumentException("Undefined constant at line " + line + ": " + name);
         } catch (RuntimeException x) {
             if (THROW) {
                 throw x;

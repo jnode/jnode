@@ -1,0 +1,361 @@
+options{
+    STATIC = false;
+    DEBUG_PARSER = false;
+    DEBUG_TOKEN_MANAGER = false;
+}
+
+PARSER_BEGIN(JNAsm)
+
+package org.jnode.jnasm.assembler.gen;
+
+import java.util.*;
+import org.jnode.jnasm.assembler.Assembler;
+import org.jnode.jnasm.assembler.Instruction;
+import org.jnode.jnasm.assembler.Address;
+import org.jnode.jnasm.assembler.Register;
+import org.jnode.jnasm.assembler.Identifier;
+
+/**
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
+ */
+public class JNAsm extends Assembler{
+
+    protected final boolean isRegister(Token t) {
+        return (t.kind == JNAsmConstants.IDENT) && hwSupport.isRegister(t.image);
+    }
+
+    protected static final int getNumber(Token t) {
+        int ret;
+        String s = t.image;
+        try {
+            switch (t.kind) {
+                case JNAsmConstants.DECNUMBER:
+                    ret = (int) Long.parseLong(s);
+                    break;
+
+                case JNAsmConstants.BINNUMBER:
+                    ret = (int) Long.parseLong(s.substring(0, s.length() - 1), 2);
+                    break;
+
+                case JNAsmConstants.OCTNUMBER:
+                    ret = (int) Long.parseLong(s.substring(0, s.length() - 1), 8);
+                    break;
+
+                case JNAsmConstants.HEXNUMBER:
+                    if (s.endsWith("h") || s.endsWith("H")) {
+                        ret = (int) Long.parseLong(s.substring(0, s.length() - 1), 16);
+                    } else {
+                        ret = (int) Long.parseLong(s.substring(2), 16);
+                    }
+                    break;
+
+                case JNAsmConstants.STRING:
+                    s = s.substring(1, s.length() - 1);
+                    byte[] buf = s.getBytes();
+                    ret = 0;
+                    int ln = Math.min(buf.length, 4);
+                    for(int i = 0; i < ln; i++){
+                        ret |= buf[i] << (i << 3);
+                    }
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unkown number type: " + t.kind);
+
+            }
+        } catch (RuntimeException x) {
+            if (THROW) {
+                throw x;
+            } else {
+                x.printStackTrace();
+                System.err.println("Invaid int: " + x.getMessage());
+                return 0;
+            }
+        }
+        return ret;
+    }
+}
+
+PARSER_END(JNAsm)
+
+SPECIAL_TOKEN :
+{
+    <WHITE:   ([" ", "\t", "\f"]) + >
+}
+
+TOKEN :
+{
+    <LINE_END: "\r" | "\n" | "\r\n">
+|   <COMMENT: ";" (~["\n","\r"]) * | "%line" (~["\n","\r"]) *>
+}
+TOKEN :
+{
+    <EQU: "equ">
+|   <SECTION: "section">
+|   <EXTERN: "extern">
+|   <GLOBAL: "global">
+|   <NEAR: "near">
+|   <LOCK: "lock">
+|   <REP:  "rep">
+|   <TIMES: "times">
+|   <RES: "resb" | "resd">
+|   <DX: "dw" | "dq" | "dd" | "db">
+|   <DWORD: "byte" |  (["d","q"])? "word" | "stub">
+}
+
+TOKEN :
+{
+    <#LETTER: ["a"-"z","A"-"Z","_"] >
+|   <#DIGIT: ["0"-"9"] >
+|   <#HEXDIGIT: ["0"-"9","A"-"F","a"-"f"] >
+|    <LABEL: ( <LETTER> | <DIGIT> ) + <COLON> >
+    {
+        String s = matchedToken.image;
+        matchedToken.image = s.substring(0, s.length() - 1);
+    }
+|   <IDENT: <LETTER> ( <LETTER> | <DIGIT> ) * >
+|   <DECNUMBER: ["1"-"9"] (<DIGIT>) * | "0">
+|   <HEXNUMBER: ( "0x" (<HEXDIGIT>) + ) | <DIGIT> (<HEXDIGIT>) * ("h" | "H") >
+|   <BINNUMBER: ( ["0","1"] ) + ("b" | "B") >
+|   <OCTNUMBER: ( ["0"-"7"] ) + ("o" | "q" | "Q") >
+|   <COMA: ",">
+|   <FILENAME: "\"" ( <LETTER> | <DIGIT> | "." ) + "\"">
+|   <COLON: ":">
+|   <STRING: "'" (~["\n","\r","'"]) * "'">
+}
+
+void jnasmInput() :
+{}
+{
+    ( line() ) *
+}
+
+void line() :
+{ Token t = null; int prefix = 0; int i = -1; Instruction ins = null; List operands; Token mnemo;}
+{
+
+
+    ["times" arithmeticExpression() ]
+    (
+    LOOKAHEAD(2)
+    [ t=<LABEL> ]
+    [ <LOCK> { prefix |= Instruction.LOCK_PREFIX; } ]
+    [ <REP> { prefix |= Instruction.REP_PREFIX; } ]
+    [ ins=instruction() ] [ <COMMENT> ] <LINE_END>
+    {
+        if(t != null){
+            if(ins == null){
+                crtIns = ins = new Instruction(t.image);
+                ins.setLineNumber(t.beginLine);
+                instructions.add(ins);
+            } else {
+                ins.setLabel(t.image);
+            }
+        }
+        if(ins != null){
+            ins.setPrefix(prefix);
+        }
+    }
+|   LOOKAHEAD(2) t=<IDENT> "equ" i=arithmeticExpression() [ <COMMENT> ] <LINE_END> { putConstant(t.image, i); }
+|   [ t=<IDENT> | t=<LABEL> ]
+        (mnemo=<DX> | mnemo=<RES>) operands=dxList()
+        {
+            crtIns = ins = new Instruction(mnemo.image, operands);
+            ins.setLineNumber(mnemo.beginLine);
+            instructions.add(ins);
+            if(t != null) ins.setLabel(t.image);
+        }
+        [ <COMMENT> ] <LINE_END>
+|   <SECTION> (".text" | ".data") <LINE_END>
+|   <EXTERN> <IDENT> <LINE_END>
+|   <GLOBAL> <IDENT> <LINE_END>
+    )
+
+}
+
+List dxList() :
+{
+    List operands = new ArrayList();
+    Object o;
+}
+{
+    o=dxOperand() {operands.add(o);}
+    ( <COMA> o=dxOperand() {operands.add(o);} ) *
+    {return operands;}
+
+}
+
+Object dxOperand() :
+{ Object o; Token t; int i;}
+{
+(
+    LOOKAHEAD(2)
+    i=arithmeticExpression() { o = new Integer(i);}
+|   t=<STRING> {o=t.image.substring(1, t.image.length() - 1);}
+)   {return o;}
+}
+
+Instruction instruction() :
+{ Token id; List operands = null; }
+{
+    id=<IDENT>
+    {
+        Instruction instr = new Instruction(id.image, operands);
+        crtIns = instr;
+        instr.setLineNumber(id.beginLine);
+        instructions.add(instr);
+    }
+    [ operands=operandList() ]
+    {
+        instr.setOperands(operands);
+        return instr;
+    }
+}
+
+List operandList() :
+{
+    List operands = new ArrayList();
+    Object o;
+    Token t;
+}
+{
+(
+    (
+    LOOKAHEAD(2)
+    t=<IDENT>
+    {
+        if(isRegister(t)){
+            operands.add(new Register(t.image));
+        }else{
+            operands.add(new Identifier(t.image));
+        }
+    }
+|   o=operand() { operands.add(o); }
+    )
+    ( <COMA> o=operand() { operands.add(o); } ) *
+) { return operands;}
+}
+
+Object operand() :
+{ Object o = UNDEFINED; Token t, dw; int disp; Address addr; int i;}
+{
+    [ <NEAR> ] [ dw=<DWORD> { setSizeInfo(dw.image); }]
+    (
+    LOOKAHEAD( {isRegister(getToken(1))} )
+    t=<IDENT>  { o = new Register(t.image);}
+|   <LABEL> arithmeticExpression()
+|   i=arithmeticExpression() { o = new Integer(i); } [ <COLON> arithmeticExpression() ]
+|   "["
+    (
+        LOOKAHEAD( {isRegister(getToken(1))} )
+        t=<IDENT> { addr = new Address(); addr.reg = t.image; o = addr; }
+        [
+            "+" (
+                    LOOKAHEAD( {isRegister(getToken(1))} )
+                    t=<IDENT> { addr.sreg = t.image; }
+                    (
+                        "*" disp=arithmeticExpression() {addr.scale = disp;}
+                    |   "-" disp=arithmeticExpression() {addr.scale = 1; addr.disp = disp;}
+                    )
+                |   disp=arithmeticExpression()     { addr.disp = disp; }
+                )
+        |   "-" disp=arithmeticExpression() { addr.disp = -disp; }
+        |   "*" disp=arithmeticExpression() { addr.sreg = addr.reg; addr.reg = null; addr.scale = disp;}
+        ]
+    |   disp=arithmeticExpression()     { addr = new Address(); addr.disp = disp; o = addr; }
+    |   <LABEL> disp=arithmeticExpression()  { addr = new Address(); addr.disp = disp; o = addr; }
+    )
+    "]"
+)
+        { return o;}
+}
+
+int arithmeticExpression() :
+{ int i1, i2; }
+{
+    i1=xorExpression()
+    ( "|" i2=xorExpression()        { i1 |= i2; } ) *
+                                    { return i1; }
+}
+
+
+int xorExpression() :
+{ int i1, i2; }
+{
+    i1=andExpression()
+    ( "^" i2=andExpression()        { i1 ^= i2; } ) *
+                                    { return i1; }
+}
+
+int andExpression() :
+{ int i1, i2; }
+{
+    i1=shiftExpression()
+    ( "&" i2=shiftExpression()      { i1 &= i2; } ) *
+                                    { return i1; }
+}
+
+int shiftExpression() :
+{ int i1, i2; }
+{
+    i1=addExpression()
+    (
+        "<<" i2=addExpression()     { i1 <<= i2; }
+    |   ">>" i2=addExpression()     { i1 >>>= i2; }
+    )*
+                                    { return i1; }
+}
+
+int addExpression() :
+{ int i1, i2; }
+{
+    i1=mulExpression()
+    (
+        "+" i2=mulExpression()      { i1 += i2; }
+    |   "-" i2=mulExpression()      { i1 -= i2; }
+    ) *
+
+                                    { return i1; }
+}
+
+int mulExpression() :
+{ int i1, i2; }
+{
+    i1=unaryExpression()
+    (
+        "*" i2=unaryExpression()    { i1 *= i2; }
+    |   "/" i2=unaryExpression()    { i1 /= i2; }
+    |   "%" i2=unaryExpression()    { i1 %= i2; }
+    ) *
+
+                                    { return i1; }
+}
+
+int unaryExpression () :
+{ int i; Token t;}
+{
+    (
+                i=arithmeticOperand()
+    |   "+"     i=arithmeticOperand()
+    |   "-"     i=arithmeticOperand()          { i = -i; }
+    |   "~"     i=arithmeticOperand()          { i = ~i; }
+    )
+    { return i; }
+}
+
+int arithmeticOperand() :
+{ int i = -1; Token t;}
+{
+    (
+        t=number()      { i = getNumber(t);}
+    |   t=<IDENT>       { i = getConstant(t.image, t.beginLine);}
+    |   t=<STRING>      { i = getNumber(t);}
+    |   "("     i=arithmeticExpression()   ")"
+    )
+    { return i; }
+}
+
+Token number() :
+{ Token t; }
+{
+    ( t=<DECNUMBER> | t=<BINNUMBER> | t=<OCTNUMBER> | t=<HEXNUMBER> ) {return t;}
+}
