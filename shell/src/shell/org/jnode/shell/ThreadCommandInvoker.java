@@ -140,7 +140,16 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
           if (nextInputStream != null)
             inputStream = nextInputStream;
 
-          cr = new CommandRunner(cmdInfo.getCommandClass(), method, new Object[]{cmdLine.getRemainder(), inputStream, outputStream, errStream});
+          CommandLine commandLine = null;
+
+          if (inputStream.available()>0)
+          {
+            commandLine = new CommandLine(inputStream);
+          }
+          else
+            commandLine = cmdLine.getRemainder();
+
+          cr = new CommandRunner(cmdInfo.getCommandClass(), method, new Object[]{commandLine, inputStream, outputStream, errStream});
         }
         catch (Exception e)
         {
