@@ -28,8 +28,10 @@ public class TFTPClient extends org.apache.commons.net.tftp.TFTPClient {
 	public final static String HELP_CMD = "help";
 	public final static String QUIT_CMD = "quit";
 	
+	// BufferedReader does not currently function correctly (GNU classpath bug 5558)
 	//private final BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-    private final DataInputStream in = new DataInputStream(System.in);
+	// use DataInputStream instead
+	private final DataInputStream in = new DataInputStream(System.in);
 	private InetAddress serverAddress;
 	private int mode = BINARY_MODE;
 	private boolean quit;
