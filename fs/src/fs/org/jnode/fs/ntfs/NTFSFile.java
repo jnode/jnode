@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
+import org.jnode.fs.ntfs.attributes.NTFSIndexEntry;
 
 /**
  * @author vali
@@ -19,11 +20,28 @@ public class NTFSFile implements FSFile {
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FSFile#getLength()
 	 */
+	private NTFSIndexEntry indexEntry = null;
+	private NTFSFileRecord fileRecord = null;
+	public NTFSFile(NTFSIndexEntry indexEntry)
+	{
+		this.indexEntry = indexEntry;
+	}
 	public long getLength() {
 		// TODO Auto-generated method stub
+		if(indexEntry != null)
+			return indexEntry.getRealFileSize();
+		if(fileRecord == null)
+				fillRecordSet();
+		if(fileRecord!= null)
+			return fileRecord.getRealSize();
 		return 0;
 	}
 
+	private void fillRecordSet()
+	{
+		if (indexEntry!= null)
+			this.fileRecord = indexEntry.getIndexedNTFSFileRecord();
+	}
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FSFile#setLength(long)
 	 */
