@@ -43,6 +43,12 @@
 	    <exclude name="**/*.img.WORK"/>
 	  </fileset>	    
     </copy>  
+	<!-- copy properties files -->
+    <copy todir="${my-classes.dir}/org/jnode/test/">
+	  <fileset dir="${my-src.dir}/test/org/jnode/test/">
+	    <include name="**/*.properties" />
+	  </fileset>	    
+    </copy>    	
 	<!-- copy test config files -->
     <copy todir="${my-classes.dir}/org/jnode/test/fs/">
 	  <fileset dir="${my-src.dir}/test/org/jnode/test/fs/">
