@@ -352,7 +352,8 @@ public class PluginRegistryModel extends VmSystemObject implements
                     "Cannot unload a system plugin"); }
             
             // Unload all plugins that depend on this plugin
-            for (Iterator i = descriptorMap.values().iterator(); i.hasNext();) {
+            final ArrayList descriptors = new ArrayList(descriptorMap.values());
+            for (Iterator i = descriptors.iterator(); i.hasNext();) {
                 final PluginDescriptor dep = (PluginDescriptor) i.next();
                 if (dep.depends(pluginId)) {
                 	unloadPlugin(dep.getId());

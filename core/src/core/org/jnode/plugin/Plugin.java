@@ -3,6 +3,7 @@
  */
 package org.jnode.plugin;
 
+import org.jnode.plugin.model.PluginDescriptorModel;
 import org.jnode.system.BootLog;
 
 
@@ -55,6 +56,7 @@ public abstract class Plugin {
 		        BootLog.debug("__Starting " + descriptor.getId());
 		    }
 		    startPlugin();
+		    ((PluginDescriptorModel)descriptor).firePluginStarted();
 		    started = true;
 		}
 	}
@@ -71,6 +73,7 @@ public abstract class Plugin {
 	        sm.checkPermission(PluginSecurityConstants.STOP_PERM);
 	    }
 		if (started) {
+		    ((PluginDescriptorModel)descriptor).firePluginStop();
 			stopPlugin();
 			started = false;
 		}

@@ -26,7 +26,7 @@ public class PluginsClassLoader extends ClassLoader {
 		for (Iterator i = registry.getDescriptorIterator(); i.hasNext();) {
 			final PluginDescriptor descr = (PluginDescriptor) i.next();
 			if (!descr.isSystemPlugin()) {
-				final PluginClassLoader cl = (PluginClassLoader) descr.getPluginClassLoader();
+				final PluginClassLoaderImpl cl = (PluginClassLoaderImpl) descr.getPluginClassLoader();
 				if (cl.containsClass(name)) {
 					return cl.loadClass(name);
 				}
@@ -42,7 +42,7 @@ public class PluginsClassLoader extends ClassLoader {
 		for (Iterator i = registry.getDescriptorIterator(); i.hasNext();) {
 			final PluginDescriptor descr = (PluginDescriptor) i.next();
 			if (!descr.isSystemPlugin()) {
-				final PluginClassLoader cl = (PluginClassLoader) descr.getPluginClassLoader();
+				final PluginClassLoaderImpl cl = (PluginClassLoaderImpl) descr.getPluginClassLoader();
 				final URL url = cl.getResource(name);
 				if (url != null) {
 					return url;

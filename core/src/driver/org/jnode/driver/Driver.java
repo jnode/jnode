@@ -3,6 +3,11 @@
  */
 package org.jnode.driver;
 
+import org.jnode.plugin.PluginClassLoader;
+import org.jnode.plugin.PluginDescriptor;
+import org.jnode.plugin.PluginDescriptorListener;
+import org.jnode.system.BootLog;
+
 
 /**
  * Abstract driver of a Device.
@@ -24,6 +29,11 @@ public abstract class Driver {
 	 * Default constructor
 	 */
 	public Driver() {
+	    final ClassLoader loader = getClass().getClassLoader();
+	    if (loader instanceof PluginClassLoader) {
+	        final PluginDescriptor descr = ((PluginClassLoader)loader).getDeclaringPluginDescriptor();
+	        descr.addListener(new PluginListener());
+	    }
 	}
 
 	/**
@@ -84,4 +94,30 @@ public abstract class Driver {
 	 */
 	protected abstract void stopDevice() 
 	throws DriverException;
+	
+	final class PluginListener implements PluginDescriptorListener {
+	    
+	    /**
+         * @see org.jnode.plugin.PluginDescriptorListener#pluginStarted(org.jnode.plugin.PluginDescriptor)
+         */
+        public void pluginStarted(PluginDescriptor descriptor) {
+            // Ignore
+        }
+        
+        /**
+         * @see org.jnode.plugin.PluginDescriptorListener#pluginStop(org.jnode.plugin.PluginDescriptor)
+         */
+        public void pluginStop(PluginDescriptor descriptor) {
+            final Device dev = Driver.this.device;
+            if (dev != null) {
+                try {
+                    BootLog.debug("Stopping device " + dev.getId() + " due to plugin stop");
+                    dev.stop(true);
+                } catch (DriverException ex) {
+                    BootLog.error("Cannot stop device " + dev.getId(), ex);
+                }
+            }
+            descriptor.removeListener(this);
+        }
+}
 }

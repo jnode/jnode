@@ -113,4 +113,16 @@ public interface PluginDescriptor {
 	 * @return ClassLoader
 	 */
 	public ClassLoader getPluginClassLoader();
+	
+	/**
+	 * Add a listener to this descriptor.
+	 * @param listener
+	 */
+	public void addListener(PluginDescriptorListener listener);
+
+	/**
+	 * Remove a listener from this descriptor.
+	 * @param listener
+	 */
+	public void removeListener(PluginDescriptorListener listener);
 }

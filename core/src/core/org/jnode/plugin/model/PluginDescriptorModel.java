@@ -11,6 +11,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import nanoxml.XMLElement;
 
@@ -18,6 +19,7 @@ import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
+import org.jnode.plugin.PluginDescriptorListener;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.Runtime;
@@ -48,6 +50,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	private boolean resolved;
 	private boolean started = false;
 	private boolean starting = false;
+	private List listeners;
 
 	/**
 	 * Load a plugin-descriptor without a registry.
@@ -149,9 +152,6 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 			for (int i = 0; i < extensionPoints.length; i++) {
 				extensionPoints[i].resolve(registry);
 			}
-			for (int i = 0; i < extensions.length; i++) {
-				extensions[i].resolve(registry);
-			}
 			for (int i = 0; i < requires.length; i++) {
 				requires[i].resolve(registry);
 			}
@@ -159,6 +159,9 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 				runtime.resolve(registry);
 			}
 			resolved = true;
+			for (int i = 0; i < extensions.length; i++) {
+				extensions[i].resolve(registry);
+			}
 		}
 	}
 
@@ -386,21 +389,21 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 					throw new RuntimeException("Cannot create classloader without a jarfile");
 				}
 				final int reqMax = requires.length;
-				final PluginClassLoader[] preLoaders = new PluginClassLoader[reqMax];
+				final PluginClassLoaderImpl[] preLoaders = new PluginClassLoaderImpl[reqMax];
 				for (int i = 0; i < reqMax; i++) {
 					final String reqId = requires[i].getPluginId();
 					final PluginDescriptor reqDescr = registry.getPluginDescriptor(reqId);
 					final ClassLoader cl = reqDescr.getPluginClassLoader();
-					if (cl instanceof PluginClassLoader) {
-						preLoaders[i] = (PluginClassLoader) cl;
+					if (cl instanceof PluginClassLoaderImpl) {
+						preLoaders[i] = (PluginClassLoaderImpl) cl;
 					}
 				}
 				final PrivilegedAction a = new PrivilegedAction() {
 				    public Object run() {
-						return new PluginClassLoader(registry, PluginDescriptorModel.this, jarFile, preLoaders);				        
+						return new PluginClassLoaderImpl(registry, PluginDescriptorModel.this, jarFile, preLoaders);				        
 				    }
 				};
-				classLoader = (PluginClassLoader)AccessController.doPrivileged(a);
+				classLoader = (PluginClassLoaderImpl)AccessController.doPrivileged(a);
 				//new PluginClassLoader(jarFile, preLoaders);
 			}
 		}
@@ -448,6 +451,63 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 		    } finally {
 		        started = true;
 		    }
+	    }
+	}
+	
+	/**
+	 * Add a listener to this descriptor.
+	 * @param listener
+	 */
+	public synchronized void addListener(PluginDescriptorListener listener) {
+	    if (listeners == null) {
+	        listeners = new ArrayList();
+	    }
+	    listeners.add(listener);
+	}
+
+	/**
+	 * Remove a listener from this descriptor.
+	 * @param listener
+	 */
+	public synchronized void removeListener(PluginDescriptorListener listener) {
+	    if (listeners != null) {
+	        listeners.remove(listener);
+	    }
+	}
+
+	/**
+	 * Fire the pluginStarted event to my listeners.
+	 */
+	public final void firePluginStarted() {
+	    final List listeners;
+	    synchronized (this) {
+		    if (this.listeners != null) {
+		        listeners = new ArrayList(this.listeners);
+		    } else {
+		        return;
+		    }	        
+	    }
+	    for (Iterator i = listeners.iterator(); i.hasNext(); ) {
+	        final PluginDescriptorListener l = (PluginDescriptorListener)i.next();
+	        l.pluginStarted(this);
+	    }
+	}
+	
+	/**
+	 * Fire the pluginStop event to my listeners.
+	 */
+	public final void firePluginStop() {
+	    final List listeners;
+	    synchronized (this) {
+		    if (this.listeners != null) {
+		        listeners = new ArrayList(this.listeners);
+		    } else {
+		        return;
+		    }	        
+	    }
+	    for (Iterator i = listeners.iterator(); i.hasNext(); ) {
+	        final PluginDescriptorListener l = (PluginDescriptorListener)i.next();
+	        l.pluginStop(this);
 	    }
 	}
 }

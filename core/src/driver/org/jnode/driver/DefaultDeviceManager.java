@@ -295,7 +295,7 @@ public class DefaultDeviceManager implements DeviceManager,
         // Stop it
         if (device.isStarted()) {
             BootLog.debug("Starting " + device.getId());
-            device.stop();
+            device.stop(false);
             BootLog.debug("Stopped " + device.getId());
         }
     }
