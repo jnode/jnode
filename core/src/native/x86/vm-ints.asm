@@ -10,7 +10,10 @@
 	extern SoftByteCodes_systemException
 	extern VmProcessor_reschedule
 	
-%define DEADLOCKCOUNTER	dword[fs:VmX86Processor_DEADLOCKCOUNTER_OFFSET*4]
+%define DEADLOCKCOUNTER		dword[fs:VmX86Processor_DEADLOCKCOUNTER_OFFSET*4]
+%define DEVICENACOUNTER		dword[fs:VmX86Processor_DEVICENACOUNTER_OFFSET*4]
+%define FXSAVECOUNTER		dword[fs:VmX86Processor_FXSAVECOUNTER_OFFSET*4]
+%define FXRESTORECOUNTER	dword[fs:VmX86Processor_FXRESTORECOUNTER_OFFSET*4]
 
 ;deadLockCounter				dd 0
 currentTimeMillisStaticsIdx	dd -1
@@ -92,6 +95,8 @@ yieldPointHandler_fxSave:
 	; Is the FX used since the last thread switch?
 	test dword [edi+VmX86Thread_FXFLAGS_OFFSET*4],VmX86Thread_FXF_USED
 	jz yieldPointHandler_restore	; No... do not save anything
+	; Increment counter
+	inc FXSAVECOUNTER
 	; Clear FXF_USED flag
 	and dword [edi+VmX86Thread_FXFLAGS_OFFSET*4],~VmX86Thread_FXF_USED
 	; Load fxStatePtr	
@@ -178,6 +183,8 @@ fixFxStatePtr:
 ; and clear CR0.TS
 ; -----------------------------------------------
 int_dev_na:
+	; Increment counter
+	inc DEVICENACOUNTER
 	mov edi,CURRENTTHREAD
 	; Mark FX as being used since last thread switch
 	or dword [edi+VmX86Thread_FXFLAGS_OFFSET*4],VmX86Thread_FXF_USED;
@@ -187,6 +194,8 @@ int_dev_na:
 	mov ebx, [edi+VmX86Thread_FXSTATEPTR_OFFSET*4]
 	test ebx,ebx
 	jz int_dev_na_ret		; No valid fxStatePtr yet, do not restore
+	; Increment counter
+	inc FXRESTORECOUNTER
 	test dword [cpu_features],FEAT_FXSR
 	jz int_dev_na_fpuRestore
 	fxrstor [ebx]

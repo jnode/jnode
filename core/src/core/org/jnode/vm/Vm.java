@@ -23,6 +23,7 @@ package org.jnode.vm;
 
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.jnode.system.ResourceManager;
@@ -185,6 +186,11 @@ public class Vm extends VmSystemObject implements Statistics {
 			vm.heapManager.dumpStatistics(out);
 			final SecurityManager sm = System.getSecurityManager();
 			out.println("Security manager: " + sm);
+			for (Iterator i = vm.processors.iterator(); i.hasNext(); ) {
+				final VmProcessor cpu = (VmProcessor)i.next();
+				out.println("Processor " + vm.processors.indexOf(cpu));
+				cpu.dumpStatistics(out);
+			}
 		}
 	}
 	
