@@ -20,6 +20,7 @@ import org.jnode.vm.VmReflection;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.compiler.CompileError;
+import org.jnode.vm.compiler.CompiledIMT;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 
 public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
@@ -1391,6 +1392,9 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
                 tib[ TIBLayout.IMT_INDEX] = imtBuilder.getImt();
                 tib[ TIBLayout.IMTCOLLISIONS_INDEX] = imtBuilder
                         .getImtCollisions();
+                
+                final CompiledIMT cimt = loader.compileIMT(imtBuilder);
+                tib[TIBLayout.COMPILED_IMT_INDEX] = cimt.getIMTAddress();
             }
 
             // Look for Uninterruptible

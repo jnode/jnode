@@ -170,7 +170,15 @@ public class X86CompilerHelper implements X86CompilerConstants {
     public final void invokeJavaMethod(String signature) {
         os.writeCALL(Register.EAX, context.getVmMethodNativeCodeField()
                 .getOffset());
-        //writeJumpTableCALL(X86JumpTable.VM_INVOKE_OFS);
+        pushReturnValue(signature);
+    }
+
+    /**
+     * Emit code to push the returncode of the given method signature.
+     * 
+     * @param signature
+     */
+    public final void pushReturnValue(String signature) {
         final int returnType = JvmType.getReturnType(signature);
         assertCondition(signature.endsWith("V") == (returnType == JvmType.VOID), "Return type");
         //System.out.println("Return type: " + returnType + "\t" + signature);

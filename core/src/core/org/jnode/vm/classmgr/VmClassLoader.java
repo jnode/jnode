@@ -8,6 +8,7 @@ import java.security.ProtectionDomain;
 
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.compiler.CompiledIMT;
 
 /**
  * Interface for the delegation of loading classes with a given name
@@ -59,6 +60,11 @@ public abstract class VmClassLoader extends VmSystemObject {
 	 */
 	public abstract void compileRuntime(VmMethod vmMethod, int optLevel);
 	
+    /**
+     * Compile the given IMT.
+     */
+    public abstract CompiledIMT compileIMT(IMTBuilder builder);
+    
 	/**
 	 * Gets the architecture used by this loader.
 	 * @return The architecture

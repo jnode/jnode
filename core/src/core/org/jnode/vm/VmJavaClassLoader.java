@@ -5,10 +5,12 @@ package org.jnode.vm;
 
 import java.util.HashMap;
 
+import org.jnode.vm.classmgr.IMTBuilder;
 import org.jnode.vm.classmgr.SelectorMap;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.compiler.CompiledIMT;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -49,6 +51,13 @@ public final class VmJavaClassLoader extends VmAbstractClassLoader {
         systemLoader.compileRuntime(vmMethod, optLevel);
     }
 
+    /**
+     * Compile the given IMT.
+     */
+    public CompiledIMT compileIMT(IMTBuilder builder) {
+    	return systemLoader.compileIMT(builder);    	
+    }
+    
     /**
      * @see org.jnode.vm.classmgr.VmClassLoader#findLoadedClass(java.lang.String)
      */

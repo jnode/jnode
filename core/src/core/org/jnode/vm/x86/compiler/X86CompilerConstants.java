@@ -79,6 +79,9 @@ public interface X86CompilerConstants {
 	/** Interrupt number for yieldpoints */
 	public static final int YIELDPOINT_INTNO = 0x30;
 
+	/** Interrupt number for abstract method */
+	public static final int ABSTRACT_METHOD_INTNO = 0x33;
+
 	/** Magic value for stub compiler */
 	public static final int STUB_COMPILER_MAGIC = VmStackFrame.MAGIC_COMPILED | 0x1A;
 

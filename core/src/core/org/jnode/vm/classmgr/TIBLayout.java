@@ -30,16 +30,22 @@ public interface TIBLayout {
 	 */
 	public static final int IMTCOLLISIONS_INDEX	= 2;
 	
+	/** 
+	 * Index of compiled IMT table.
+	 * Type: Object (architecture dependent)
+	 */
+	public static final int COMPILED_IMT_INDEX	= 3;
+	
 	/**
 	 * Index of the Superclasses array entry.
 	 * Type: VmType[]
 	 */
-	public static final int SUPERCLASSES_INDEX = 3;
+	public static final int SUPERCLASSES_INDEX = 4;
 	
 	// Other constants
 	
 	/** Minimum length (in elements) of a TIB */
-	public static final int MIN_TIB_LENGTH = 4;
+	public static final int MIN_TIB_LENGTH = 5;
 	
 	/** Index of the first virtual method in the TIB */
 	public static final int FIRST_METHOD_INDEX = MIN_TIB_LENGTH;
