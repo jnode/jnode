@@ -4,7 +4,7 @@
 <plugin id="org.jnode.fs.jifs.command" 
         name="jifs command"
         version="@VERSION@"
-        provider-name="Andreas Hänel (jifs.org)">
+        provider-name="Andreas Haenel (jifs.org)">
         
   <requires>
     <import plugin="org.jnode.fs.jifs"/>
