@@ -324,7 +324,7 @@ final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
      * @see java.awt.peer.ComponentPeer#handleEvent(java.awt.AWTEvent)
      */
     public void handleEvent(AWTEvent e) {
-        log.info("handleEvent(" + e + ")");
+        log.debug("handleEvent(" + e + ")");
         // TODO Auto-generated method stub
 
     }

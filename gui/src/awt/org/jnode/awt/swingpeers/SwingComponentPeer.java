@@ -130,13 +130,14 @@ class SwingComponentPeer implements ComponentPeer {
     }
 
     public Graphics getGraphics() {
-        Component parent = component.getParent();
+        final Component parent = component.getParent();
         if (parent != null) {
-            System.err.println("creating graphics");
+            System.out.println("creating graphics");
             return parent.getGraphics().create(location.x, location.y,
                     size.width, size.height);
-        } else
+        } else {
             throw new Error();
+        }
     }
 
     public GraphicsConfiguration getGraphicsConfiguration() {
@@ -145,13 +146,12 @@ class SwingComponentPeer implements ComponentPeer {
     }
 
     public Point getLocationOnScreen() {
-        Point screen = new Point(location);
-        Component parent = component.getParent();
+        final Point screen = new Point(location);
+        final Component parent = component.getParent();
         if (parent != null) {
-            Point parentScreen = parent.getLocationOnScreen();
+            final Point parentScreen = parent.getLocationOnScreen();
             screen.translate(parentScreen.x, parentScreen.y);
         }
-
         return screen;
     }
 
