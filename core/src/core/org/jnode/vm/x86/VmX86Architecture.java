@@ -80,7 +80,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
         this.stackReader = new VmX86StackReader(getReferenceSize());
         this.compilers = new NativeCodeCompiler[2];
         this.compilers[0] = new X86StubCompiler();
-        this.compilers[1] = new X86Level1ACompiler(getReferenceSize());
+        this.compilers[1] = new X86Level1ACompiler();
         this.testCompilers = null;
     }
 

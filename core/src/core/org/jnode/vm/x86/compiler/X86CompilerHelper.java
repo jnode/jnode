@@ -75,6 +75,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
     /** The size of an address (BITS32/BITS64) */
     public final int ADDRSIZE;
     
+    /** The size of stack slot in bytes (4/8) */
+    public final int SLOTSIZE;
+    
 	private final X86CompilerContext context;
 
 	private VmMethod method;
@@ -117,6 +120,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
             this.BP = X86Register.EBP;
             this.STATICS = X86CompilerConstants.STATICS32;
             this.ADDRSIZE = X86Constants.BITS32;
+            this.SLOTSIZE = 4;
         } else {
             this.AAX = X86Register.RAX;
             this.ABX = X86Register.RBX;
@@ -126,6 +130,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
             this.BP = X86Register.RBP;
             this.STATICS = X86CompilerConstants.STATICS64;              
             this.ADDRSIZE = X86Constants.BITS64;
+            this.SLOTSIZE = 8;
         }
 		this.context = context;
 		this.stackMgr = stackMgr;

@@ -183,7 +183,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			FPUHelper.fxch(os, stack.fpuStack, this);
 			stack.fpuStack.pop(this);
 			// Convert & move to new space on normal stack
-			os.writeLEA(helper.SP, helper.SP, -4);
+			os.writeLEA(helper.SP, helper.SP, -helper.SLOTSIZE);
 			popFromFPU(os, helper.SP, 0);
 			os.writePOP(reg);
 			break;
@@ -306,7 +306,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			FPUHelper.fxch(os, fpuStack, this);
 			stack.fpuStack.pop(this);
 			// Convert & move to new space on normal stack
-			os.writeLEA(helper.SP, helper.SP, -4);
+			os.writeLEA(helper.SP, helper.SP, -helper.SLOTSIZE);
 			popFromFPU(os, helper.SP, 0);
 			break;
 
@@ -359,7 +359,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 		case Kind.GPR:
 			os.writePUSH(gpr);
 			pushToFPU(os, helper.SP, 0);
-			os.writeLEA(helper.SP, helper.SP, 4);
+			os.writeLEA(helper.SP, helper.SP, helper.SLOTSIZE);
 			break;
 
 		case Kind.LOCAL:
@@ -369,7 +369,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 		case Kind.CONSTANT:
 			pushConstant(ec, os);
 			pushToFPU(os, helper.SP, 0);
-			os.writeLEA(helper.SP, helper.SP, 4);
+			os.writeLEA(helper.SP, helper.SP, helper.SLOTSIZE);
 			break;
 
 		case Kind.FPUSTACK:
@@ -384,7 +384,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 				stack.operandStack.pop(this);
 			}
 			pushToFPU(os, helper.SP, 0);
-			os.writeLEA(helper.SP, helper.SP, 4);
+			os.writeLEA(helper.SP, helper.SP, helper.SLOTSIZE);
 			break;
 
 		default:
