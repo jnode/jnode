@@ -68,6 +68,7 @@ public interface RadeonConstants {
     public static final int BM_STATUS = 0x0160;
 
     public static final int CAP0_TRIG_CNTL = 0x0950;
+    public static final int CAP1_TRIG_CNTL = 0x09c0; /* ? */
 
     public static final int VIPH_CONTROL = 0x0C40;
 
@@ -851,8 +852,10 @@ public interface RadeonConstants {
     public static final int P2PLL_CNTL = 0x002a;
 
     public static final int P2PLL_REF_DIV = 0x002b;
+    public static final int P2PLL_DIV_0 = 0x002c;
 
     public static final int PIXCLKS_CNTL = 0x002d;
+    public static final int HTOTAL2_CNTL = 0x002e;
 
     /* MCLK_CNTL bit constants */
     public static final int FORCEON_MCLKA = (1 << 16);
@@ -916,6 +919,11 @@ public interface RadeonConstants {
 
     /* CLOCK_CNTL_INDEX bit constants */
     public static final int PLL_WR_EN = 0x00000080;
+    public static final int PLL_DIV_SEL_MASK   =   (3 << 8);
+    public static final int PLL_DIV_SEL_DIV0   =   (0 << 8);
+    public static final int PLL_DIV_SEL_DIV1   =   (1 << 8);
+    public static final int PLL_DIV_SEL_DIV2   =   (2 << 8);
+    public static final int PLL_DIV_SEL_DIV3   =   (3 << 8);
 
     /* CONFIG_CNTL bit constants */
     public static final int CFG_VGA_RAM_EN = 0x00000100;
@@ -1475,6 +1483,15 @@ public interface RadeonConstants {
     public static final int PIXCLK_ALWAYS_ONb = 0x00000040;
 
     public static final int PIXCLK_DAC_ALWAYS_ONb = 0x00000080;
+    public static final int VCLK_SRC_SEL_MASK    = (3 << 0);
+    public static final int VCLK_SRC_CPU_CLK     = (0 << 0);
+    public static final int VCLK_SRC_PSCAN_CLK   = (1 << 0);
+    public static final int VCLK_SRC_BYTE_CLK    = (2 << 0);
+    public static final int VCLK_SRC_PPLL_CLK    = (3 << 0);
+    public static final int ECP_DIV_SHIFT        = 8;
+    public static final int ECP_DIV_MASK         = (3 << 8);
+    public static final int ECP_DIV_VCLK         = (0 << 8);
+    public static final int ECP_DIV_VCLK_2       = (1 << 8);
 
     /* BUS_CNTL1 constants */
     public static final int BUS_CNTL1_MOBILE_PLATFORM_SEL_MASK = 0x0c000000;
@@ -1583,7 +1600,8 @@ public interface RadeonConstants {
 
     public static final int PPLL_DIV_SEL_MASK = 0x00000300;
 
-    public static final int PPLL_RESET = 0x00000001;
+    public static final int PPLL_RESET = (1 << 0);
+    public static final int PPLL_SLEEP = (1 << 1);
 
     public static final int PPLL_ATOMIC_UPDATE_EN = 0x00010000;
 
