@@ -60,6 +60,32 @@ skip_multiboot_cmdline:
 	shl ebx,10			; Convert KB -> bytes
 	add ebx,0x100000	; MB upper mem starts at 1Mb
 
+	; Initialize initial jarfile
+	mov esi,[multiboot_info+MBI_MODSCOUNT]
+	test esi,esi
+	jz no_initJar
+	mov esi,[multiboot_info+MBI_MODSADDR]
+	mov eax,[esi+MBMOD_START]
+	mov [initJar_start],eax
+	mov eax,[esi+MBMOD_END]
+	mov [initJar_end],eax
+	; Round to 4K
+	add eax,0x1000
+	and eax,~0xfff
+	mov [free_mem_start],eax
+	jmp initJar_done
+	
+no_initJar:
+	; No boot module
+	mov eax,freeMemoryStart
+	mov [initJar_start],eax
+	mov [initJar_end],eax
+	mov [free_mem_start],eax
+
+initJar_done:
+	; Done initializing initial jarfile
+	
+
     ; Check that A20 is really enabled
     xor eax,eax
 check_a20:
@@ -156,6 +182,7 @@ go_user_cs:
 	call sys_print_eax
 	mov eax,esp
 	call sys_print_eax
+	inc dword [jnodeFinished]
 	jmp _halt
 
 _halt:

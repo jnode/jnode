@@ -29,8 +29,7 @@ public class Main {
 	 * 
 	 * @return int
 	 */
-	public static int vmMain() 
-	throws PragmaUninterruptible {
+	public static int vmMain() throws PragmaUninterruptible {
 		//return 15;
 		try {
 			Unsafe.debug("Starting JNode\n");
@@ -38,6 +37,11 @@ public class Main {
 
 			//Unsafe.debug("VmSystem.initialize\n");
 			VmSystem.initialize();
+
+			// Load the plugins from the initjar
+			BootLog.info("Loading initjar plugins");
+			final InitJarProcessor proc = new InitJarProcessor(VmSystem.getInitJar());
+			proc.loadPlugins(pluginRegistry);
 
 			//Unsafe.debug("Starting PluginManager");
 			final PluginManager piMgr = new DefaultPluginManager(pluginRegistry);
@@ -47,9 +51,14 @@ public class Main {
 			System.out.println("JNode initialization finished in " + (end - start) + "ms.");
 
 			final ClassLoader loader = pluginRegistry.getPluginsClassLoader();
-			Class shellClass = loader.loadClass("org.jnode.shell.CommandShell");
-			Runnable shell = (Runnable) shellClass.newInstance();
-			shell.run();
+			final String mainClassName = proc.getMainClassName();
+			if (mainClassName != null) {
+				final Class mainClass = loader.loadClass(mainClassName);
+				final Runnable main = (Runnable) mainClass.newInstance();
+				main.run();
+			} else {
+				BootLog.warn("No Main-Class found");
+			}
 
 		} catch (Throwable ex) {
 			BootLog.error("Error in bootstrap", ex);

@@ -4,6 +4,7 @@
 package org.jnode.plugin.model;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Iterator;
 
@@ -30,7 +31,8 @@ public class PluginRegistryModel extends VmSystemObject implements PluginRegistr
 
 	/**
 	 * Initialize this instance.
-	 * @param pluginFiles 
+	 * 
+	 * @param pluginFiles
 	 */
 	public PluginRegistryModel(URL[] pluginFiles) throws PluginException {
 		this.extensionPoints = new BootableHashMap();
@@ -84,9 +86,9 @@ public class PluginRegistryModel extends VmSystemObject implements PluginRegistr
 	/**
 	 * Resolve all plugin descriptors.
 	 */
-	private void resolveDescriptors() throws PluginException {
-		for (Iterator i = descriptorMap.values().iterator(); i.hasNext(); ) {
-			final PluginDescriptorModel descr = (PluginDescriptorModel)i.next();
+	public void resolveDescriptors() throws PluginException {
+		for (Iterator i = descriptorMap.values().iterator(); i.hasNext();) {
+			final PluginDescriptorModel descr = (PluginDescriptorModel) i.next();
 			descr.resolve();
 		}
 	}
@@ -125,7 +127,23 @@ public class PluginRegistryModel extends VmSystemObject implements PluginRegistr
 	 * @throws PluginException
 	 */
 	public PluginDescriptor loadPlugin(URL pluginUrl) throws PluginException {
-		final PluginJar pluginJar = new PluginJar(this, pluginUrl);
+		try {
+			final PluginJar pluginJar = new PluginJar(this, pluginUrl);
+			return pluginJar.getDescriptor();
+		} catch (IOException ex) {
+			throw new PluginException(ex);
+		}
+	}
+
+	/**
+	 * Load a plugin from a given InputStream. This will not activate the plugin.
+	 * 
+	 * @param is
+	 * @return The descriptor of the loaded plugin.
+	 * @throws PluginException
+	 */
+	public PluginDescriptor loadPlugin(InputStream is) throws PluginException {
+		final PluginJar pluginJar = new PluginJar(this, is, null);
 		return pluginJar.getDescriptor();
 	}
 
@@ -149,9 +167,9 @@ public class PluginRegistryModel extends VmSystemObject implements PluginRegistr
 
 	}
 
-	
 	/**
 	 * Gets the classloader that loads classes from all loaded plugins.
+	 * 
 	 * @return ClassLoader
 	 */
 	public ClassLoader getPluginsClassLoader() {
@@ -160,7 +178,7 @@ public class PluginRegistryModel extends VmSystemObject implements PluginRegistr
 		}
 		return classLoader;
 	}
-	
+
 	static class DTDResolver implements EntityResolver {
 
 		/**

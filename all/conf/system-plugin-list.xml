@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin-list>
+
+ 	<plugin id="org.apache.jakarta.log4j"/>
+    <plugin id="nanoxml"/>
+    <plugin id="org.classpath.core"/>
+ 
+    <plugin id="org.jnode.runtime"/>
+    <plugin id="org.jnode.runtime.core"/>
+    <plugin id="org.jnode.util"/>
+    <plugin id="org.jnode.vm"/>
+    <plugin id="org.jnode.vm.core"/>
+
+</plugin-list>

@@ -80,7 +80,8 @@ Luser_esp:
 
 extern Luser_esp
 
-scr_ofs:	dd 0
+scr_ofs:		dd 0
+jnodeFinished:	dd 0
 
 		align 4096
 	global vm_start

@@ -9,10 +9,16 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Properties;
 
+import org.jnode.system.BootLog;
+import org.jnode.system.MemoryResource;
+import org.jnode.system.ResourceManager;
+import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.ResourceOwner;
+import org.jnode.system.SimpleResourceOwner;
 import org.jnode.vm.classmgr.AbstractExceptionHandler;
-import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmByteCode;
+import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmCompiledExceptionHandler;
 import org.jnode.vm.classmgr.VmConstClass;
@@ -39,6 +45,7 @@ public final class VmSystem {
 	private static long rtcIncrement;
 	private static RTCService rtcService;
 	private static SystemOutputStream bootOut;
+	private static MemoryResource initJar;
 
 	/**
 	 * Initialize the Virtual Machine
@@ -47,7 +54,7 @@ public final class VmSystem {
 		if (!inited) {
 			// Initialize resource manager
 			Unsafe.debug("1");
-			ResourceManagerImpl.initialize();
+			final ResourceManager rm = ResourceManagerImpl.initialize();
 			Unsafe.debug("2");
 
 			/* Set System.err, System.out */
@@ -79,11 +86,40 @@ public final class VmSystem {
 			inited = true;
 			Unsafe.getCurrentProcessor().systemReadyForThreadSwitch();
 
-			// Start the compilation manager
-			vm.startHotMethodManager();
-
 			// Load the command line
 			System.getProperties().setProperty("jnode.cmdline", getCmdLine());
+
+			// Load the initial jarfile
+			initJar = loadInitJar(rm);
+
+			// Start the compilation manager
+			vm.startHotMethodManager();
+		}
+	}
+
+	/**
+	 * Load the initial jarfile.
+	 * 
+	 * @param rm
+	 * @return The initial jarfile resource, or null if no initial jarfile is available.
+	 */
+	private static MemoryResource loadInitJar(ResourceManager rm) {
+		final Address start = Unsafe.getInitJarStart();
+		final Address end = Unsafe.getInitJarEnd();
+		final long size = Address.distance(end, start);
+		if (size == 0L) {
+			// No initial jarfile
+			BootLog.info("No initial jarfile found");
+			return null;
+		} else {
+			BootLog.info("Found initial jarfile of " + size + "b");
+			try {
+				final ResourceOwner owner = new SimpleResourceOwner("System");
+				return rm.claimMemoryResource(owner, start, size, ResourceManager.MEMMODE_NORMAL);
+			} catch (ResourceNotFreeException ex) {
+				BootLog.error("Cannot claim initjar resource", ex);
+				return null;
+			}
 		}
 	}
 
@@ -671,4 +707,12 @@ public final class VmSystem {
 			VmSystem.rtcService = null;
 		}
 	}
+
+	/**
+	 * @return Returns the initJar.
+	 */
+	public static final MemoryResource getInitJar() {
+		return initJar;
+	}
+
 }

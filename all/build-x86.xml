@@ -10,7 +10,7 @@
   <property name="build.netboot.dir" value="${my-build.dir}/netboot"/>
   <property name="jnode.disk"     value="${build.dir}/jnodedisk.dat"/>
   <property name="jnode.disk.pln" value="${build.dir}/jnodedisk.pln"/>
-  <property name="jnode.floppy"   value="${build.dir}/jnodefloppy.img"/>
+  <!-- property name="jnode.floppy"   value="${build.dir}/jnodefloppy.img"/ -->
 
   <property name="grub-ver"     value="grub-0.93-i386-pc"/>
   <property name="grub.dir"     value="${my-build.dir}/${grub-ver}/boot/grub"/>
@@ -44,12 +44,11 @@
   </target>
   <target name="default-properties" unless="x86-properties.exists">
     <property name="jnodedrive.dir" value="${my-build.dir}"/>
-	<property name="plugin-list" value="${src.dir}/descriptors/plugin-list.xml"/>
-	<property name="plugin.dir" value="${src.dir}/descriptors"/>
   </target>
 
   <target name="prepare-props" depends="test-properties,load-properties,default-properties">
     <property name="jnode.kernel"   value="${jnodedrive.dir}/jnodesys.gz"/>
+    <property name="jnode.initjar"  value="${jnodedrive.dir}/jnodeinit.jar"/>
   </target>
 
 <!-- Initialize all project directories -->
@@ -71,16 +70,6 @@
 
 <!-- Initialize all project properties -->
   <target name="prepare" depends="grub">
-    <copy todir="${build.netboot.dir}">
-      <fileset dir="${my-lib.dir}">
-        <include name="nbgrub-*"/>
-        <include name="pxegrub-*"/>
-     </fileset>
-      <fileset dir="${my-conf.dir}">
-        <include name="menu-nb.lst"/>
-        <include name="menu-pxe.lst*"/>
-      </fileset>
-    </copy>
     <copy todir="${grub.dir}">
       <fileset dir="${my-lib.dir}">
         <include name="nbgrub-*"/>
@@ -103,7 +92,6 @@
 
     <genconst destfile="${build.native.dir}/src/java.inc"
               classesURL="file:///${jnode-core.jar}/">
-      <!-- class classname="org.jnode.arch.x86.SoftByteCodes"/ -->
       <class classname="org.jnode.boot.Main" static="on"/>
       <class classname="org.jnode.vm.classmgr.TIBLayout" static="on"/>
       <class classname="org.jnode.vm.classmgr.VmByteCode"/>
@@ -157,49 +145,25 @@
     </asm>
   </target>
 
-  <target name="shell-usage" depends="plugins">
+  <target name="shell-usage" depends="prepare">
     <mkdir dir="${root.dir}/docs/build/website-xml"/>
     <taskdef name="exportusage" classname="org.jnode.shell.help.ant.ExportUsageTask" classpathref="cp-x86"/>
     <exportusage destfile="${root.dir}/docs/build/website-xml/shell-commands.xml"
-             pluginList="${plugin-list}"
-             pluginDir="${my-build.dir}/plugins"
+             pluginList="${system-plugin-list}"
+             pluginDir="${plugins.dir}"
              targetArch="x86">
       <classpath refid="cp-x86"/>
     </exportusage>
   </target>
 
-  <target name="plugins" depends="asm-native">
-    <taskdef name="plugin" classname="org.jnode.build.PluginTask" classpathref="cp-x86"/>
-    <plugin todir="${my-build.dir}/plugins"
-            tmpdir="${my-build.dir}/tmp/plugins"
-            pluginDir="${descriptors.dir}">
-      <libalias name="jnode-core.jar" alias="${jnode-core.jar}"/>
-      <libalias name="jnode-fs.jar" alias="${jnode-fs.jar}"/>
-      <libalias name="jnode-gui.jar" alias="${jnode-gui.jar}"/>
-      <libalias name="jnode-net.jar" alias="${jnode-net.jar}"/>
-      <libalias name="jnode-shell.jar" alias="${jnode-shell.jar}"/>
-
-      <libalias name="commons-net-1.1.0.jar" alias="${commons-net.jar}"/>
-      <libalias name="dnsjava-1.5.0.jar" alias="${dnsjava.jar}"/>
-      <libalias name="nanoxml.jar" alias="${nanoxml.jar}"/>
-      <libalias name="log4j.jar" alias="${log4j.jar}"/>
-       <libalias name="beanshell.jar" alias="${beanshell.jar}"/>
-      <libalias name="lw.jar" alias="${lw.jar}"/>
-      <libalias name="junit.jar" alias="${junit.jar}"/>
-      <descriptors dir="${descriptors.dir}/">
-        <include name="*.xml"/>
-        <exclude name="plugin-list.xml"/>
-      </descriptors>
-    </plugin>
-  </target>
-
 <!-- Build the java object file  -->
-  <target name="java-image" depends="plugins">
+  <target name="java-image" depends="asm-native">
     <taskdef name="bootimage" classname="org.jnode.build.x86.BootImageBuilder" classpathref="cp-x86"/>
     <taskdef name="bootjar" classname="org.jnode.build.BootJarBuilder" classpathref="cp-x86"/>
+    
     <bootjar destfile="${build.bootimage.dir}/jnode-boot.jar"
-             pluginList="${plugin-list}"
-             pluginDir="${my-build.dir}/plugins"
+             pluginList="${system-plugin-list}"
+             pluginDir="${plugins.dir}"
              targetArch="x86">
     </bootjar>
 
@@ -209,25 +173,13 @@
                kernelfile="${build.native.dir}/output/jnode.o"
                jarfile="${build.bootimage.dir}/jnode-boot.jar"
                classesURL="jar:file:///${build.bootimage.dir}/jnode-boot.jar!/"
-               pluginList="${plugin-list}"
-               pluginDir="${my-build.dir}/plugins"
+               pluginList="${system-plugin-list}"
+               pluginDir="${plugins.dir}"
 	           targetArch="x86"
 	           cpu="${cpu}"
                />
-    <!-- classesURL="file:///${classes.dir}/" -->
 
     <gzip src="${build.bootimage.dir}/bootimage.bin" zipfile="${jnode.kernel}"/>
-    <copy file="${jnode.kernel}" todir="${build.netboot.dir}"/>
-  </target>
-
-  <target name="disasm">
-    <exec executable="ndisasm" dir="${basedir}"
-          output="${build.bootimage.dir}/bootimage.asm">
-      <arg value="-u"/>
-      <arg value="-o"/>
-      <arg value="0x100000"/>
-      <arg value="${build.bootimage.dir}/bootimage.bin"/>
-    </exec>
   </target>
 
 <!-- Build the boot floppy & disk -->
@@ -244,11 +196,8 @@
 		        stage1ResourceName="${grub.stage1.name}"
 		        stage2ResourceName="${grub.stage2.name}"
       			menufile="${grub.menu}"
-      			plnfile="${jnode.disk.pln}"/>
-    <bootfloppy destfile="${jnode.floppy}"
-		        stage1ResourceName="${grub.stage1.name}"
-		        stage2ResourceName="${grub.stage2.name}"
-      			menufile="${grub.menu}"/>
+      			plnfile="${jnode.disk.pln}"
+      			initJarFile="${initjars.dir}/full.jgz"/>
   </target>
 
 <!-- Create a bootable CDROM image -->
@@ -270,8 +219,36 @@
     </exec>
   </target>
 
+<!-- Prepare for netboot -->
+  <target name="netboot" depends="java-image">
+    <copy file="${jnode.kernel}" todir="${build.netboot.dir}"/>
+    <copy todir="${build.netboot.dir}">
+      <fileset dir="${initjars.dir}"/>
+    </copy>
+    <copy todir="${build.netboot.dir}">
+      <fileset dir="${my-lib.dir}">
+        <include name="nbgrub-*"/>
+        <include name="pxegrub-*"/>
+     </fileset>
+      <fileset dir="${my-conf.dir}">
+        <include name="menu-nb.lst"/>
+        <include name="menu-pxe.lst*"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="disasm">
+    <exec executable="ndisasm" dir="${basedir}"
+          output="${build.bootimage.dir}/bootimage.asm">
+      <arg value="-u"/>
+      <arg value="-o"/>
+      <arg value="0x100000"/>
+      <arg value="${build.bootimage.dir}/bootimage.bin"/>
+    </exec>
+  </target>
+
 <!-- Run all required targets -->
-  <target name="all" depends="boot-disk">
+  <target name="all" depends="boot-disk,netboot">
   </target>
 
 </project>

@@ -41,14 +41,24 @@ public class PluginJar implements BootableObject {
 	 * @param registry
 	 * @param pluginUrl
 	 */
-	public PluginJar(PluginRegistryModel registry, URL pluginUrl) throws PluginException {
+	public PluginJar(PluginRegistryModel registry, URL pluginUrl) throws PluginException, IOException {
+		this(registry, pluginUrl.openStream(), null);
+	}
+
+	/**
+	 * Initialize this instance
+	 * 
+	 * @param registry
+	 * @param pluginIs
+	 */
+	public PluginJar(PluginRegistryModel registry, InputStream pluginIs, URL pluginUrl) throws PluginException {
 
 		// Load the plugin into memory
 		final byte[] pluginJarData;
 		try {
 			final byte[] buf = new byte[4096];
 			final ByteArrayOutputStream pluginOs = new ByteArrayOutputStream();
-			FileUtils.copy(pluginUrl.openStream(), pluginOs, buf, true);
+			FileUtils.copy(pluginIs, pluginOs, buf, true);
 			pluginJarData = pluginOs.toByteArray();
 		} catch (IOException ex) {
 			throw new PluginException("Error loading jarfile", ex);
@@ -57,7 +67,7 @@ public class PluginJar implements BootableObject {
 		final XMLElement root;
 		try {
 			// Not find the plugin.xml
-			final JarFile jarFile = getJar(pluginUrl);
+			final JarFile jarFile = getJar(pluginUrl, pluginJarData);
 			JarEntry entry = jarFile.getJarEntry("plugin.xml");
 			if (entry == null) {
 				throw new PluginException("plugin.xml not found in jar file");
@@ -93,7 +103,7 @@ public class PluginJar implements BootableObject {
 	 */
 	public final InputStream getResourceAsStream(String resourceName) {
 		try {
-			final JarFile jarFile = getJar(null);
+			final JarFile jarFile = getJar(null, pluginJarData);
 			final JarEntry entry = jarFile.getJarEntry(resourceName);
 			if (entry == null) {
 				return null;
@@ -113,7 +123,7 @@ public class PluginJar implements BootableObject {
 	 */
 	public final boolean containsResource(String resourceName) {
 		try {
-			final JarFile jarFile = getJar(null);
+			final JarFile jarFile = getJar(null, pluginJarData);
 			final JarEntry entry = jarFile.getJarEntry(resourceName);
 			return (entry != null);
 		} catch (IOException ex) {
@@ -132,7 +142,7 @@ public class PluginJar implements BootableObject {
 			resourceName = resourceName.substring(1);
 		}
 		try {
-			final JarFile jarFile = getJar(null);
+			final JarFile jarFile = getJar(null, pluginJarData);
 			final JarEntry entry = jarFile.getJarEntry(resourceName);
 			if (entry == null) {
 				return null;
@@ -163,7 +173,7 @@ public class PluginJar implements BootableObject {
 	 * @return The plugin jarfile.
 	 * @throws IOException
 	 */
-	private JarFile getJar(URL pluginUrl) throws IOException {
+	private JarFile getJar(URL pluginUrl, byte[] pluginJarData) throws IOException {
 		if (pluginJar == null) {
 			final String protocol = (pluginUrl != null) ? pluginUrl.getProtocol() : "";
 			if (protocol.equals("file")) {

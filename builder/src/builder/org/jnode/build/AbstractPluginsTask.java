@@ -7,6 +7,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Iterator;
 
+import org.apache.tools.ant.Project;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginPrerequisite;
@@ -71,6 +72,9 @@ public abstract class AbstractPluginsTask extends AbstractPluginTask {
 		
 		for (Iterator i = registry.getDescriptorIterator(); i.hasNext(); ) {
 			final PluginDescriptor descr = (PluginDescriptor)i.next();
+			if (!descr.isSystemPlugin()) {
+				log(descr.getId() +" is not a system plugin", Project.MSG_WARN);
+			}
 			final PluginPrerequisite[] prereqs = descr.getPrerequisites();
 			for (int j = 0; j < prereqs.length; j++) {
 				if (registry.getPluginDescriptor(prereqs[j].getPluginId()) == null) {

@@ -3,6 +3,8 @@
   <property name="root.dir"            value="${basedir}/.."/>
   <property name="build.dir"           value="${basedir}/build"/>
   <property name="descriptors.dir"     value="${build.dir}/descriptors"/>
+  <property name="plugins.dir"         value="${build.dir}/plugins"/>
+  <property name="initjars.dir"        value="${build.dir}/initjars"/>
   <property	name="backup.dir"          value="${build.dir}/backup"/>
      
   <property name="jnode-builder.jar"   value="${build.dir}/descriptors/jnode-builder.jar"/>
@@ -22,7 +24,7 @@
   <property name="nanoxml.jar"         value="${root.dir}/core/lib/nanoxml-lite-2.2.3.jar"/>
   <property name="beanshell.jar"         value="${root.dir}/shell/lib/bsh-2.0b1.jar"/>
 
-  <property name="plugin-list"         value="${basedir}/conf/plugin-list.xml"/>
+  <property name="system-plugin-list"  value="${basedir}/conf/system-plugin-list.xml"/>
   <property name="jnode-ver"           value="0.1.5"/>
 
   <path id="cp">
@@ -33,6 +35,17 @@
     <pathelement location="${basedir}/conf"/>
     <pathelement location="${beanshell.jar}"/>
   </path>
+  
+  <path id="cp-jnode">
+    <pathelement location="${jnode-builder.jar}"/>
+    <pathelement location="${jnode-core.jar}"/>
+    <pathelement location="${jnode-fs.jar}"/>
+    <pathelement location="${jnode-shell.jar}"/>
+    <pathelement location="${jnode-net.jar}"/>
+    <pathelement location="${jnode-gui.jar}"/>
+    <path refid="cp"/>
+  </path>
+  
   
   <filterset id="descriptors-filter">
     <filter token="PROVIDER" value="JNode.org"/>
@@ -51,6 +64,8 @@
     <tstamp/>
     <mkdir dir="${build.dir}"/>
     <mkdir dir="${descriptors.dir}"/>
+    <mkdir dir="${plugins.dir}"/>
+    <mkdir dir="${initjars.dir}"/>
   </target>
 
 <!-- Assemble all subproject jar files -->
@@ -61,6 +76,37 @@
     <ant target="assemble" dir="${root.dir}/gui" inheritall="on" inheritrefs="on"/>
     <ant target="assemble" dir="${root.dir}/net" inheritall="on" inheritrefs="on"/>
     <ant target="assemble" dir="${root.dir}/builder" inheritall="on" inheritrefs="on"/>
+
+    <!-- Now assemble all plugins -->
+    <taskdef name="plugin" classname="org.jnode.build.PluginTask" classpathref="cp-jnode"/>
+    <plugin todir="${plugins.dir}"
+            tmpdir="${build.dir}/tmp/plugins"
+            pluginDir="${descriptors.dir}">
+      <libalias name="jnode-core.jar" alias="${jnode-core.jar}"/>
+      <libalias name="jnode-fs.jar" alias="${jnode-fs.jar}"/>
+      <libalias name="jnode-gui.jar" alias="${jnode-gui.jar}"/>
+      <libalias name="jnode-net.jar" alias="${jnode-net.jar}"/>
+      <libalias name="jnode-shell.jar" alias="${jnode-shell.jar}"/>
+
+      <libalias name="commons-net-1.1.0.jar" alias="${commons-net.jar}"/>
+      <libalias name="dnsjava-1.5.0.jar" alias="${dnsjava.jar}"/>
+      <libalias name="nanoxml.jar" alias="${nanoxml.jar}"/>
+      <libalias name="log4j.jar" alias="${log4j.jar}"/>
+       <libalias name="beanshell.jar" alias="${beanshell.jar}"/>
+      <libalias name="lw.jar" alias="${lw.jar}"/>
+      <libalias name="junit.jar" alias="${junit.jar}"/>
+      <descriptors dir="${descriptors.dir}/">
+        <include name="*.xml"/>
+        <exclude name="*plugin-list.xml"/>
+      </descriptors>
+    </plugin>
+
+    <!-- Build all initjar's -->
+    <taskdef name="initjar" classname="org.jnode.build.InitJarBuilder" classpathref="cp-jnode"/>    
+    <initjar destfile="${initjars.dir}/full.jgz"
+             pluginList="${basedir}/conf/full-plugin-list.xml"
+             pluginDir="${plugins.dir}">
+    </initjar>
   </target>
 
 <!-- Create the X86 boot image-->

@@ -88,9 +88,19 @@ public class ZipFile implements ZipConstants {
 	 * @exception ZipException if the file doesn't contain a valid zip
 	 * archive.  
 	 */
-	public ZipFile(String name) throws ZipException, IOException {
-		this.raf = new RandomAccessFileBuffer(new RandomAccessFile(name, "r"));
+	public ZipFile(RandomAccessBuffer raf, String name) throws ZipException, IOException {
+		this.raf = raf;
 		this.name = name;
+	}
+
+	/**
+	 * Opens a Zip file with the given name for reading.
+	 * @exception IOException if a i/o error occured.
+	 * @exception ZipException if the file doesn't contain a valid zip
+	 * archive.  
+	 */
+	public ZipFile(String name) throws ZipException, IOException {
+		this(new RandomAccessFileBuffer(new RandomAccessFile(name, "r")), name);
 	}
 
 	/**
@@ -100,8 +110,7 @@ public class ZipFile implements ZipConstants {
 	 * archive.  
 	 */
 	public ZipFile(File file) throws ZipException, IOException {
-		this.raf = new RandomAccessFileBuffer(new RandomAccessFile(file, "r"));
-		this.name = file.getName();
+		this(new RandomAccessFileBuffer(new RandomAccessFile(file, "r")), file.getName());
 	}
 
 	/**
@@ -111,8 +120,7 @@ public class ZipFile implements ZipConstants {
 	 * archive.  
 	 */
 	public ZipFile(byte[] data) throws ZipException, IOException {
-		this.raf = new RandomAccessByteArrayBuffer(data);
-		this.name = "byte array";
+		this(new RandomAccessByteArrayBuffer(data), "byte array");
 	}
 
 	/**
@@ -487,34 +495,6 @@ public class ZipFile implements ZipConstants {
 		}
 	}
 	
-	private static abstract class RandomAccessBuffer {
-		
-		public abstract void seek(long offset)
-		throws IOException;
-		
-		public abstract long length()
-		throws IOException;
-		
-		public abstract int read() 
-		throws IOException;
-		
-		public abstract int read(byte[] data, int offset, int length)
-		throws IOException;
-		
-		public abstract void readFully(byte[] data)
-		throws IOException;
-		
-		public abstract void readFully(byte[] data, int offset, int length)
-		throws IOException;
-		
-		public abstract int skipBytes(int count)
-		throws EOFException, IOException;
-		
-		public abstract void close()
-		throws IOException;
-		
-	}
-	
 	private static class RandomAccessFileBuffer extends RandomAccessBuffer {
 		
 		private final RandomAccessFile raf;
@@ -524,13 +504,13 @@ public class ZipFile implements ZipConstants {
 		}
 		
 		/**
-		 * @see java.util.zip.ZipFile.RandomAccessBuffer#seek(long)
+		 * @see RandomAccessBuffer#seek(long)
 		 */
 		public void seek(long offset) throws IOException {
 			raf.seek(offset);
 		}
 		/**
-		 * @see java.util.zip.ZipFile.RandomAccessBuffer#length()
+		 * @see RandomAccessBuffer#length()
 		 */
 		public long length() 
 		throws IOException {
@@ -538,7 +518,7 @@ public class ZipFile implements ZipConstants {
 		}
 
 		/**
-		 * @see java.util.zip.ZipFile.RandomAccessBuffer#readFully(byte[], int, int)
+		 * @see RandomAccessBuffer#readFully(byte[], int, int)
 		 */
 		public void readFully(byte[] data, int offset, int length)
 		throws IOException {
@@ -546,21 +526,21 @@ public class ZipFile implements ZipConstants {
 		}
 
 		/**
-		 * @see java.util.zip.ZipFile.RandomAccessBuffer#skipBytes(int)
+		 * @see RandomAccessBuffer#skipBytes(int)
 		 */
 		public int skipBytes(int count) throws EOFException, IOException {
 			return raf.skipBytes(count);
 		}
 
 		/**
-		 * @see java.util.zip.ZipFile.RandomAccessBuffer#readFully(byte[])
+		 * @see RandomAccessBuffer#readFully(byte[])
 		 */
 		public void readFully(byte[] data) throws IOException {
 			raf.readFully(data);
 		}
 
 		/**
-		 * @see java.util.zip.ZipFile.RandomAccessBuffer#close()
+		 * @see RandomAccessBuffer#close()
 		 */
 		public void close() 
 		throws IOException {
@@ -568,14 +548,14 @@ public class ZipFile implements ZipConstants {
 		}
 
 		/**
-		 * @see java.util.zip.ZipFile.RandomAccessBuffer#read()
+		 * @see RandomAccessBuffer#read()
 		 */
 		public int read() throws IOException {
 			return raf.read();
 		}
 
 		/**
-		 * @see java.util.zip.ZipFile.RandomAccessBuffer#read(byte[], int, int)
+		 * @see RandomAccessBuffer#read(byte[], int, int)
 		 */
 		public int read(byte[] data, int offset, int length)
 			throws IOException {
@@ -597,13 +577,14 @@ public class ZipFile implements ZipConstants {
 		}
 		
 		/**
-		 * @see java.util.zip.ZipFile.RandomAccessBuffer#seek(long)
+		 * @see RandomAccessBuffer#seek(long)
 		 */
 		public void seek(long offset) throws IOException {
 			pos = (int)offset;
 		}
+		
 		/**
-		 * @see java.util.zip.ZipFile.RandomAccessBuffer#length()
+		 * @see RandomAccessBuffer#length()
 		 */
 		public long length() 
 		throws IOException {
@@ -611,14 +592,14 @@ public class ZipFile implements ZipConstants {
 		}
 
 		/**
-		 * @see java.util.zip.ZipFile.RandomAccessBuffer#readFully(byte[])
+		 * @see RandomAccessBuffer#readFully(byte[])
 		 */
 		public void readFully(byte[] data) throws IOException {
 			readFully(data, 0, data.length);
 		}
 
 		/**
-		 * @see java.util.zip.ZipFile.RandomAccessBuffer#readFully(byte[], int, int)
+		 * @see RandomAccessBuffer#readFully(byte[], int, int)
 		 */
 		public void readFully(byte[] data, int offset, int len)
 		throws IOException {
@@ -631,7 +612,7 @@ public class ZipFile implements ZipConstants {
 		}
 
 		/**
-		 * @see java.util.zip.ZipFile.RandomAccessBuffer#skipBytes(int)
+		 * @see RandomAccessBuffer#skipBytes(int)
 		 */
 		public int skipBytes(int count) throws EOFException, IOException {
 			if (count > 0) {
@@ -644,14 +625,14 @@ public class ZipFile implements ZipConstants {
 		}
 
 		/**
-		 * @see java.util.zip.ZipFile.RandomAccessBuffer#close()
+		 * @see RandomAccessBuffer#close()
 		 */
 		public void close() 
 		throws IOException {
 		}
 
 		/**
-		 * @see java.util.zip.ZipFile.RandomAccessBuffer#read()
+		 * @see RandomAccessBuffer#read()
 		 */
 		public int read() throws IOException {
 			if (pos < length) {
@@ -662,7 +643,7 @@ public class ZipFile implements ZipConstants {
 		}
 
 		/**
-		 * @see java.util.zip.ZipFile.RandomAccessBuffer#read(byte[], int, int)
+		 * @see RandomAccessBuffer#read(byte[], int, int)
 		 */
 		public int read(byte[] data, int offset, int len)
 		throws IOException {

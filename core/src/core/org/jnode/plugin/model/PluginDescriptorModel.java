@@ -40,6 +40,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	private Plugin plugin;
 	private final PluginJar jarFile;
 	private transient ClassLoader classLoader;
+	private boolean resolved;
 
 	/**
 	 * Load a plugin-descriptor without a registry.
@@ -131,17 +132,20 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	 * @throws PluginException
 	 */
 	protected void resolve() throws PluginException {
-		for (int i = 0; i < extensions.length; i++) {
-			extensions[i].resolve();
-		}
-		for (int i = 0; i < extensionPoints.length; i++) {
-			extensionPoints[i].resolve();
-		}
-		for (int i = 0; i < requires.length; i++) {
-			requires[i].resolve();
-		}
-		if (runtime != null) {
-			runtime.resolve();
+		if (!resolved) {
+			for (int i = 0; i < extensions.length; i++) {
+				extensions[i].resolve();
+			}
+			for (int i = 0; i < extensionPoints.length; i++) {
+				extensionPoints[i].resolve();
+			}
+			for (int i = 0; i < requires.length; i++) {
+				requires[i].resolve();
+			}
+			if (runtime != null) {
+				runtime.resolve();
+			}
+			resolved = true;
 		}
 	}
 
@@ -257,10 +261,9 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	public boolean isSystemPlugin() {
 		return system;
 	}
-	
+
 	/**
-	 * Does the plugin described by this descriptor directly depends on the 
-	 * given plugin id.
+	 * Does the plugin described by this descriptor directly depends on the given plugin id.
 	 * 
 	 * @param id
 	 * @return True if id is in the list of required plugins of this descriptor, false otherwise.
@@ -268,7 +271,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	public boolean depends(String id) {
 		final PluginPrerequisite[] req = this.requires;
 		final int max = req.length;
-		for (int i = 0; i <max; i++) {
+		for (int i = 0; i < max; i++) {
 			if (req[i].getPluginId().equals(id)) {
 				return true;
 			}
