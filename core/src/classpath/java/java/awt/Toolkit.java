@@ -468,7 +468,9 @@ public abstract class Toolkit {
 	public static Toolkit getDefaultToolkit() {
 		if (toolkit != null)
 			return toolkit;
-		final String toolkit_name = (String)AccessController.doPrivileged(new GetPropertyAction("awt.toolkit", default_toolkit_name));
+		//final String toolkit_name = (String)AccessController.doPrivileged(new GetPropertyAction("awt.toolkit", default_toolkit_name));
+        final String toolkit_name = "org.jnode.awt.peer.JNodeToolkit";
+        //final String toolkit_name = "org.jnode.awt.swingpeers.SwingToolkit";
 		try {
 			final ClassLoader cl = Thread.currentThread().getContextClassLoader();
 			final Class cls = cl.loadClass(toolkit_name);

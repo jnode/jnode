@@ -20,11 +20,11 @@ public class AWTTest2 {
             wnd.add(bw, BorderLayout.CENTER);
             wnd.show();
 
-//			Thread.sleep(60000);
+			Thread.sleep(5000);
 
-//			wnd.hide();
+			wnd.hide();
         } finally {
-            //wnd.dispose();
+            wnd.dispose();
         }
     }
 }
