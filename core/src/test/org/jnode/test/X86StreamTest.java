@@ -137,6 +137,14 @@ public class X86StreamTest {
 		os.writeArithSSESOp(X86Operation.SSE_DIV, X86Register.XMM3, X86Register.XMM4);
 		os.writeArithSSESOp(X86Operation.SSE_DIV, X86Register.XMM3, X86Register.EBX, 5);
 
+		os.writeMOVSD(X86Register.XMM0, X86Register.XMM1);
+		os.writeMOVSD(X86Register.XMM0, X86Register.ESP, 0);
+		os.writeMOVSD(X86Register.ESP, 0, X86Register.XMM1);
+
+		os.writeMOVSS(X86Register.XMM0, X86Register.XMM1);
+		os.writeMOVSS(X86Register.XMM0, X86Register.ESP, 0);
+		os.writeMOVSS(X86Register.ESP, 0, X86Register.XMM1);
+				
 		FileOutputStream fos = new FileOutputStream("test.bin");
 		os.writeTo(fos);
 		fos.close();

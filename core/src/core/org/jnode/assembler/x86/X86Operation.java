@@ -47,5 +47,4 @@ public interface X86Operation {
 	static final int SSE_SUB = 2;
 	static final int SSE_MUL = 3;
 	static final int SSE_DIV = 4;
-	static final int SSE_REM = 5;
 }

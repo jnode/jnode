@@ -1163,6 +1163,48 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 			X86Register dstIdxReg, int scale, int dstDisp, int imm32);
 
 	/**
+	 * Create a movsd dst,src
+	 * @param dst
+	 * @param src
+	 */
+	public abstract void writeMOVSD(X86Register.XMM dst, X86Register.XMM src);
+	
+	/**
+	 * Create a movsd dst,[src+srcDisp]
+	 * @param dst
+	 * @param src
+	 */
+	public abstract void writeMOVSD(X86Register.XMM dst, X86Register.GPR src, int srcDisp);
+	
+	/**
+	 * Create a movsd [dst+dstDisp],src
+	 * @param dst
+	 * @param src
+	 */
+	public abstract void writeMOVSD(X86Register.GPR dst, int dstDisp, X86Register.XMM src);
+	
+	/**
+	 * Create a movss dst,src
+	 * @param dst
+	 * @param src
+	 */
+	public abstract void writeMOVSS(X86Register.XMM dst, X86Register.XMM src);
+	
+	/**
+	 * Create a movss dst,[src+srcDisp]
+	 * @param dst
+	 * @param src
+	 */
+	public abstract void writeMOVSS(X86Register.XMM dst, X86Register.GPR src, int srcDisp);
+	
+	/**
+	 * Create a movss [dst+dstDisp],src
+	 * @param dst
+	 * @param src
+	 */
+	public abstract void writeMOVSS(X86Register.GPR dst, int dstDisp, X86Register.XMM src);
+	
+	/**
 	 * Create a movsx <dstReg>, <srcReg>
 	 * 
 	 * @param dstReg
@@ -1859,5 +1901,4 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeXOR(X86Register dstReg, X86Register srcReg,
 			int srcDisp);
-
 }
