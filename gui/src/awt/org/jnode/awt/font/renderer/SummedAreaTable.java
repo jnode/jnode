@@ -3,7 +3,7 @@
  */
 package org.jnode.awt.font.renderer;
 
-import java.awt.image.Raster;
+import java.util.BitSet;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -12,7 +12,7 @@ public class SummedAreaTable {
 
 	private final int height;
 
-	private final float[] table;
+	private final int[] table;
 
 	private final int width;
 
@@ -20,15 +20,12 @@ public class SummedAreaTable {
 	 * Initialize this instance from a given 1 banded raster.
 	 * @param src
 	 */
-	public SummedAreaTable(Raster src) {
-		if (src.getNumBands() != 1) {
-			throw new IllegalArgumentException("src.bands != 1");
-		}
-		this.width = src.getWidth();
-		this.height = src.getHeight();
-		this.table = new float[width * height];
+	public SummedAreaTable(BitSet master, int width, int height) {
+		this.width = width;
+		this.height = height;
+		this.table = new int[width * height];
 
-		createTable(src);
+		createTable(master);
 	}
 
 	/**
@@ -51,7 +48,7 @@ public class SummedAreaTable {
 	 * @param y
 	 * @return
 	 */
-	public final float getSum(int x, int y) {
+	public final int getSum(int x, int y) {
 		if ((x < 0) || (x >= width)) {
 			throw new IllegalArgumentException("x");
 		}
@@ -92,12 +89,12 @@ public class SummedAreaTable {
 		final int x2 = x + w;
 		final int y2 = y + h;
 		
-		final float sum_xy = getSum(x, y);
-		final float sum_x2y2 = getSum(x2, y2);
-		final float sum_xy2 = getSum(x, y2);
-		final float sum_x2y = getSum(x2, y);
+		final int sum_xy = getSum(x, y);
+		final int sum_x2y2 = getSum(x2, y2);
+		final int sum_xy2 = getSum(x, y2);
+		final int sum_x2y = getSum(x2, y);
 		
-		return (sum_x2y2 + sum_xy - (sum_xy2 + sum_x2y)) / (w * h);		
+		return ((float)(sum_x2y2 + sum_xy - (sum_xy2 + sum_x2y))) / ((float)(w * h));		
 	}
 
 	/**
@@ -105,20 +102,22 @@ public class SummedAreaTable {
 	 * 
 	 * @param src
 	 */
-	private final void createTable(Raster src) {
+	private final void createTable(BitSet master) {
 		for (int y = 0; y < height; y++) {
 			final int yOfs = y * width;
 			for (int x = 0; x < width; x++) {
-				float sum;
+				int sum;
 				// Start with the sum directly above me
 				if (y > 0) {
 					sum = table[(y - 1) * width + x];
 				} else {
-					sum = 0.0f;
+					sum = 0;
 				}
 				// Add the sum of the values left of me
-				for (int i = 0; i < x; i++) {
-					sum += src.getSampleFloat(i, y, 0);
+				for (int i = 0; i <= x; i++) {
+				    if (master.get(y * width + i)) {
+				        sum += 1;
+				    }
 				}
 				table[yOfs + x] = sum;
 			}

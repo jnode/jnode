@@ -78,4 +78,13 @@ public class JNodeImageGraphics extends AbstractGraphics {
 		return null;
 	}
 
+    /**
+     * @param text
+     * @param x
+     * @param y
+     * @see java.awt.Graphics#drawString(java.lang.String,int,int)
+     */
+    public void drawString(String text, int x, int y) {
+        // Not implemented
+    }
 }

@@ -32,6 +32,8 @@ public class TTFontProvider implements FontProvider {
 	private boolean fontsLoaded = false;
 	/** All system fonts */
 	private static final String SYSTEM_FONTS[] = { "bhm.ttf", "bhmbd.ttf", "bhmbi.ttf", "bhmi.ttf", "luxisr.ttf", "roman.ttf", "times.ttf", "velehrad.ttf" };
+	/** The render cache */
+	private final RenderCache renderCache = new RenderCache();
 
 	/**
 	 * Does this provides provide the given font?
@@ -72,7 +74,7 @@ public class TTFontProvider implements FontProvider {
 	public TextRenderer getTextRenderer(Font font) {
 		TextRenderer r = (TextRenderer) renderers.get(font);
 		if (r == null) {
-			r = new TTFTextRenderer(getFontData(font), font.getSize());
+			r = new TTFTextRenderer(renderCache, getFontData(font), font.getSize());
 			renderers.put(font, r);
 		}
 		return r;

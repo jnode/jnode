@@ -4,10 +4,12 @@
 package org.jnode.awt.util;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Image;
-import java.awt.Shape;
-import java.awt.Rectangle;
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AreaAveragingScaleFilter;
 import java.awt.image.BufferedImage;
@@ -23,6 +25,7 @@ import java.awt.image.WritableRaster;
 import java.awt.image.renderable.RenderableImage;
 
 import org.apache.log4j.Logger;
+import org.jnode.awt.JNodeToolkit;
 import org.jnode.awt.image.JNodeImage;
 import org.jnode.driver.video.Surface;
 
@@ -378,4 +381,18 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 		log.warn("Unimplemented raster conversion in AbstractSurfaceGraphics");
 		return raster;
 	}
+
+    /**
+     * @param text
+     * @param x
+     * @param y
+     * @see java.awt.Graphics#drawString(java.lang.String,int,int)
+     */
+    public void drawString(String text, int x, int y) {
+    	//		System.out.println("drawText():" + text);
+        final Font font = getFont();
+    	if (font != null)
+    		((JNodeToolkit) Toolkit.getDefaultToolkit()).getFontManager()
+    				.drawText(surface, this.transform, text, font, x, y, getColor());
+    }
 }

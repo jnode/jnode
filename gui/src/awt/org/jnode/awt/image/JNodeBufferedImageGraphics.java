@@ -3,9 +3,11 @@
  */
 package org.jnode.awt.image;
 
+import java.awt.AWTError;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
@@ -171,5 +173,17 @@ public class JNodeBufferedImageGraphics extends AbstractSurfaceGraphics {
 		public ColorModel getColorModel() {
 			return model;
 		}
+		
+        /**
+         * @see org.jnode.driver.video.Surface#drawAlphaRaster(java.awt.image.Raster, int, int, int, int, int, int, java.awt.Color)
+         */
+        public void drawAlphaRaster(Raster raster, AffineTransform tx, int srcX, int srcY,
+                int dstX, int dstY, int width, int height, Color color) {
+            if (bitmapGraphics != null) {
+                bitmapGraphics.drawAlphaRaster(raster, tx, srcX, srcY, dstX, dstY, width, height, convertColor(color));
+            } else {
+                throw new AWTError("Not implemented");
+            }
+        }
 	}
 }

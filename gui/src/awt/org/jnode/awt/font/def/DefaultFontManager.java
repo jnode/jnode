@@ -3,9 +3,10 @@
  */
 package org.jnode.awt.font.def;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
-import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -17,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.jnode.awt.font.FontManager;
 import org.jnode.awt.font.FontProvider;
 import org.jnode.awt.font.TextRenderer;
+import org.jnode.driver.video.Surface;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.Extension;
@@ -120,7 +122,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      * @param x
      * @param y
      */
-    public void drawText(Graphics2D g, String text, Font font, int x, int y) {
+    public void drawText(Surface g, AffineTransform tx, String text, Font font, int x, int y, Color color) {
         FontProvider prv = getProvider(font);
         Font txFont = font;
         if (prv == null) {
@@ -129,7 +131,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
         }
         if (prv != null) {
         	final TextRenderer renderer = prv.getTextRenderer(txFont);
-        	renderer.render(g, text, x, y);
+        	renderer.render(g, tx, text, x, y, color);
         } else {
         	log.error("No provider found for font " + txFont);
         }

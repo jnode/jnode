@@ -3,6 +3,8 @@
  */
 package org.jnode.awt.util;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
@@ -23,524 +25,714 @@ import org.jnode.system.ResourceManager;
  */
 public abstract class BitmapGraphics {
 
-	static final class BitmapGraphics16bpp extends BitmapGraphics {
+    static final class BitmapGraphics16bpp extends BitmapGraphics {
 
-		/**
-		 * @param mem
-		 * @param width
-		 * @param height
-		 * @param offset
-		 * @param bytesPerLine
-		 */
-		public BitmapGraphics16bpp(MemoryResource mem, int width, int height, int offset, int bytesPerLine) {
-			super(mem, width, height, offset, bytesPerLine);
-		}
+        /**
+         * @param mem
+         * @param width
+         * @param height
+         * @param offset
+         * @param bytesPerLine
+         */
+        public BitmapGraphics16bpp(MemoryResource mem, int width, int height,
+                int offset, int bytesPerLine) {
+            super(mem, width, height, offset, bytesPerLine);
+        }
 
-		/**
-		 * @see org.jnode.awt.util.BitmapGraphics#doCopyArea(int, int, int, int, int, int)
-		 */
-		protected void doCopyArea(int x, int y, int width, int height, int dx,
-				int dy) {
-			log.error("Not implemented");
-		}
+        /**
+         * @see org.jnode.awt.util.BitmapGraphics#doCopyArea(int, int, int, int,
+         *      int, int)
+         */
+        protected void doCopyArea(int x, int y, int width, int height, int dx,
+                int dy) {
+            log.error("Not implemented");
+        }
 
-		protected final void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width, int height) {
-			// TODO Implement me
-			log.error("Not implemented");
-		}
+        protected final void doDrawImage(Raster src, int srcX, int srcY,
+                int dstX, int dstY, int width, int height) {
+            // TODO Implement me
+            log.error("Not implemented");
+        }
 
-		protected final void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width, int height, int bgColor) {
-			// TODO Implement me
-			log.error("Not implemented");
-		}
+        /**
+         * @see org.jnode.awt.util.BitmapGraphics#doDrawAlphaRaster(java.awt.image.Raster,
+         *      int, int, int, int, int, int, int)
+         */
+        protected void doDrawAlphaRaster(Raster raster, int srcX, int srcY,
+                int dstX, int dstY, int width, int height, int color) {
+            // TODO Implement me
+            log.error("Not implemented");
+        }
 
-		protected final void doDrawLine(int x, int y, int w, int color, int mode) {
-			final int ofs = offset + (y * bytesPerLine) + (x << 1);
-			if (mode == Surface.PAINT_MODE) {
-				mem.setShort(ofs, (short) color, w);
-			} else {
-				mem.xorShort(ofs, (short) color, w);
-			}
-		}
+        protected final void doDrawImage(Raster src, int srcX, int srcY,
+                int dstX, int dstY, int width, int height, int bgColor) {
+            // TODO Implement me
+            log.error("Not implemented");
+        }
 
-		protected final void doDrawPixels(int x, int y, int count, int color, int mode) {
-			final int ofs = offset + (y * bytesPerLine) + (x << 1);
-			if (mode == Surface.PAINT_MODE) {
-				mem.setShort(ofs, (short) color, count);
-			} else {
-				mem.xorShort(ofs, (short) color, count);
-			}
-		}
-	}
+        protected final void doDrawLine(int x, int y, int w, int color, int mode) {
+            final int ofs = offset + (y * bytesPerLine) + (x << 1);
+            if (mode == Surface.PAINT_MODE) {
+                mem.setShort(ofs, (short) color, w);
+            } else {
+                mem.xorShort(ofs, (short) color, w);
+            }
+        }
 
-	static final class BitmapGraphics24bpp extends BitmapGraphics {
+        protected final void doDrawPixels(int x, int y, int count, int color,
+                int mode) {
+            final int ofs = offset + (y * bytesPerLine) + (x << 1);
+            if (mode == Surface.PAINT_MODE) {
+                mem.setShort(ofs, (short) color, count);
+            } else {
+                mem.xorShort(ofs, (short) color, count);
+            }
+        }
+    }
 
-		/**
-		 * @param mem
-		 * @param width
-		 * @param height
-		 * @param offset
-		 * @param bytesPerLine
-		 */
-		public BitmapGraphics24bpp(MemoryResource mem, int width, int height, int offset, int bytesPerLine) {
-			super(mem, width, height, offset, bytesPerLine);
-		}
+    static final class BitmapGraphics24bpp extends BitmapGraphics {
 
-		/**
-		 * @see org.jnode.awt.util.BitmapGraphics#doCopyArea(int, int, int, int, int, int)
-		 */
-		protected void doCopyArea(int x, int y, int width, int height, int dx,
-				int dy) {
-			log.error("Not implemented");
-		}
+        /**
+         * @param mem
+         * @param width
+         * @param height
+         * @param offset
+         * @param bytesPerLine
+         */
+        public BitmapGraphics24bpp(MemoryResource mem, int width, int height,
+                int offset, int bytesPerLine) {
+            super(mem, width, height, offset, bytesPerLine);
+        }
 
-		protected void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width, int height) {
-			// TODO Implement me
-			log.error("Not implemented");
-		}
+        /**
+         * @see org.jnode.awt.util.BitmapGraphics#doCopyArea(int, int, int, int,
+         *      int, int)
+         */
+        protected void doCopyArea(int x, int y, int width, int height, int dx,
+                int dy) {
+            log.error("Not implemented");
+        }
 
-		protected void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width, int height, int bgColor) {
-			// TODO Implement me
-			log.error("Not implemented");
-		}
+        protected void doDrawImage(Raster src, int srcX, int srcY, int dstX,
+                int dstY, int width, int height) {
+            // TODO Implement me
+            log.error("Not implemented");
+        }
 
-		protected void doDrawLine(int x, int y, int w, int color, int mode) {
-			final int ofs = offset + (y * bytesPerLine) + (x * 3);
-			if (mode == Surface.PAINT_MODE) {
-				mem.setInt24(ofs, color, w);
-			} else {
-				mem.xorInt24(ofs, color, w);
-			}
-		}
+        protected void doDrawImage(Raster src, int srcX, int srcY, int dstX,
+                int dstY, int width, int height, int bgColor) {
+            // TODO Implement me
+            log.error("Not implemented");
+        }
 
-		protected void doDrawPixels(int x, int y, int count, int color, int mode) {
-			final int ofs = offset + (y * bytesPerLine) + (x * 3);
-			if (mode == Surface.PAINT_MODE) {
-				mem.setInt24(ofs, color, count);
-			} else {
-				mem.xorInt24(ofs, color, count);
-			}
-		}
-	}
+        /**
+         * @see org.jnode.awt.util.BitmapGraphics#doDrawAlphaRaster(java.awt.image.Raster,
+         *      int, int, int, int, int, int, int)
+         */
+        protected void doDrawAlphaRaster(Raster raster, int srcX, int srcY,
+                int dstX, int dstY, int width, int height, int color) {
+            // TODO Implement me
+            log.error("Not implemented");
+        }
 
-	static final class BitmapGraphics32bpp extends BitmapGraphics {
+        protected void doDrawLine(int x, int y, int w, int color, int mode) {
+            final int ofs = offset + (y * bytesPerLine) + (x * 3);
+            if (mode == Surface.PAINT_MODE) {
+                mem.setInt24(ofs, color, w);
+            } else {
+                mem.xorInt24(ofs, color, w);
+            }
+        }
 
-		/**
-		 * @param mem
-		 * @param width
-		 * @param height
-		 * @param offset
-		 * @param bytesPerLine
-		 */
-		public BitmapGraphics32bpp(MemoryResource mem, int width, int height, int offset, int bytesPerLine) {
-			super(mem, width, height, offset, bytesPerLine);
-		}
+        protected void doDrawPixels(int x, int y, int count, int color, int mode) {
+            final int ofs = offset + (y * bytesPerLine) + (x * 3);
+            if (mode == Surface.PAINT_MODE) {
+                mem.setInt24(ofs, color, count);
+            } else {
+                mem.xorInt24(ofs, color, count);
+            }
+        }
+    }
 
-		/**
-		 * @see org.jnode.awt.util.BitmapGraphics#doCopyArea(int, int, int, int, int, int)
-		 */
-		protected void doCopyArea(int srcX, int srcY, int width, int height, int dstX,
-				int dstY) {
-			for (int row = 0; row < height; row++) {
-				final int srcOfs = offset + ((srcY + row) * bytesPerLine) + (srcX << 2);
-				final int dstOfs = offset + ((dstY + row) * bytesPerLine) + (dstX << 2);
-				mem.copy(srcOfs, dstOfs, width << 2);
-			}
-		}
+    static final class BitmapGraphics32bpp extends BitmapGraphics {
 
-		protected void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width, int height) {
-			final int[] buf = new int[width];
-			for (int row = 0; row < height; row++) {
-				final int ofs = offset + ((dstY + row) * bytesPerLine) + (dstX << 2);
-				src.getDataElements(srcX, srcY + row, width, 1, buf);
-				mem.setInts(buf, 0, ofs, width);
-			}
-		}
+        /**
+         * @param mem
+         * @param width
+         * @param height
+         * @param offset
+         * @param bytesPerLine
+         */
+        public BitmapGraphics32bpp(MemoryResource mem, int width, int height,
+                int offset, int bytesPerLine) {
+            super(mem, width, height, offset, bytesPerLine);
+        }
 
-		protected void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width, int height, int bgColor) {
-			final int[] buf = new int[width];
-			for (int row = 0; row < height; row++) {
-				final int ofs = offset + ((dstY + row) * bytesPerLine) + (dstX << 2);
-				src.getDataElements(srcX, srcY + row, width, 1, buf);
-				mem.setInts(buf, 0, ofs, width);
-			}
-		}
+        /**
+         * @see org.jnode.awt.util.BitmapGraphics#doCopyArea(int, int, int, int,
+         *      int, int)
+         */
+        protected void doCopyArea(int srcX, int srcY, int width, int height,
+                int dstX, int dstY) {
+            for (int row = 0; row < height; row++) {
+                final int srcOfs = offset + ((srcY + row) * bytesPerLine)
+                        + (srcX << 2);
+                final int dstOfs = offset + ((dstY + row) * bytesPerLine)
+                        + (dstX << 2);
+                mem.copy(srcOfs, dstOfs, width << 2);
+            }
+        }
 
-		protected void doDrawLine(int x, int y, int w, int color, int mode) {
-			//System.out.println("doDrawLine" + x + "," + y + "," + w + "," + color + "," + mode);
-			final int ofs = offset + (y * bytesPerLine) + (x << 2);
-			if (mode == Surface.PAINT_MODE) {
-				mem.setInt(ofs, color, w);
-			} else {
-				mem.xorInt(ofs, color, w);
-			}
-		}
+        protected void doDrawImage(Raster src, int srcX, int srcY, int dstX,
+                int dstY, int width, int height) {
+            final int[] buf = new int[width];
+            for (int row = 0; row < height; row++) {
+                final int ofs = offset + ((dstY + row) * bytesPerLine)
+                        + (dstX << 2);
+                src.getDataElements(srcX, srcY + row, width, 1, buf);
+                mem.setInts(buf, 0, ofs, width);
+            }
+        }
 
-		protected final void doDrawPixels(int x, int y, int count, int color, int mode) {
-			final int ofs = offset + (y * bytesPerLine) + (x << 2);
-			//System.out.println("ofs=" + ofs);
-			if (mode == Surface.PAINT_MODE) {
-				mem.setInt(ofs, color, count);
-			} else {
-				mem.xorInt(ofs, color, count);
-			}
-		}
-	}
-	
-	static final class BitmapGraphics8bpp extends BitmapGraphics {
+        protected void doDrawImage(Raster src, int srcX, int srcY, int dstX,
+                int dstY, int width, int height, int bgColor) {
+            final int[] buf = new int[width];
+            for (int row = 0; row < height; row++) {
+                final int ofs = offset + ((dstY + row) * bytesPerLine)
+                        + (dstX << 2);
+                src.getDataElements(srcX, srcY + row, width, 1, buf);
+                mem.setInts(buf, 0, ofs, width);
+            }
+        }
 
-		/**
-		 * @param mem
-		 * @param width
-		 * @param height
-		 * @param offset
-		 * @param bytesPerLine
-		 */
-		public BitmapGraphics8bpp(MemoryResource mem, int width, int height, int offset, int bytesPerLine) {
-			super(mem, width, height, offset, bytesPerLine);
-		}
+        /**
+         * @see org.jnode.awt.util.BitmapGraphics#doDrawAlphaRaster(java.awt.image.Raster,
+         *      int, int, int, int, int, int, int)
+         */
+        protected void doDrawAlphaRaster(Raster raster, int srcX, int srcY,
+                int dstX, int dstY, int width, int height, int color) {
+            final byte[] buf = new byte[width];
+            final int[] pixels = new int[width];
+            
+            final int c1 = color & 0xFF;
+            final int c2 = (color >> 8) & 0xFF;
+            final int c3 = (color >> 16) & 0xFF;
+            
+            for (int row = 0; row < height; row++) {
+                final int ofs = offset + ((dstY + row) * bytesPerLine)
+                        + (dstX << 2);
+                raster.getDataElements(srcX, srcY + row, width, 1, buf);
+                mem.getInts(ofs, pixels, 0, width);
+                for (int i = 0; i < width; i++) {
+                    final int dst = pixels[i];
+                    final int alpha = buf[i] & 0xFF;
+                    final int d1 = (dst & 0xFF);
+                    final int d2 = (dst >> 8) & 0xFF;
+                    final int d3 = (dst >> 16) & 0xFF;
+                    
+                    final int r1 = ((alpha * (c1 - d1)) / 256) + d1;
+                    final int r2 = ((alpha * (c2 - d2)) / 256) + d2;
+                    final int r3 = ((alpha * (c3 - d3)) / 256) + d3;
+                    
+                    pixels[i] = (r1 & 0xFF) + ((r2 & 0xFF) << 8) + ((r3 & 0xFF) << 16); 
+                }
+                mem.setInts(pixels, 0, ofs, width);
+            }
+        }
 
-		/**
-		 * @see org.jnode.awt.util.BitmapGraphics#doCopyArea(int, int, int, int, int, int)
-		 */
-		protected void doCopyArea(int x, int y, int width, int height, int dx,
-				int dy) {
-			log.error("Not implemented");
+        protected void doDrawLine(int x, int y, int w, int color, int mode) {
+            //System.out.println("doDrawLine" + x + "," + y + "," + w + "," +
+            // color + "," + mode);
+            final int ofs = offset + (y * bytesPerLine) + (x << 2);
+            if (mode == Surface.PAINT_MODE) {
+                mem.setInt(ofs, color, w);
+            } else {
+                mem.xorInt(ofs, color, w);
+            }
+        }
 
-		}
+        protected final void doDrawPixels(int x, int y, int count, int color,
+                int mode) {
+            final int ofs = offset + (y * bytesPerLine) + (x << 2);
+            //System.out.println("ofs=" + ofs);
+            if (mode == Surface.PAINT_MODE) {
+                mem.setInt(ofs, color, count);
+            } else {
+                mem.xorInt(ofs, color, count);
+            }
+        }
+    }
 
-		protected void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width, int height) {
-			// TODO Implement me
-			log.error("Not implemented");
-		}
+    static final class BitmapGraphics8bpp extends BitmapGraphics {
 
-		protected void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width, int height, int bgColor) {
-			// TODO Implement me
-			log.error("Not implemented");
-		}
+        /**
+         * @param mem
+         * @param width
+         * @param height
+         * @param offset
+         * @param bytesPerLine
+         */
+        public BitmapGraphics8bpp(MemoryResource mem, int width, int height,
+                int offset, int bytesPerLine) {
+            super(mem, width, height, offset, bytesPerLine);
+        }
 
-		protected void doDrawLine(int x, int y, int w, int color, int mode) {
-			final int ofs = offset + (y * bytesPerLine) + x;
-			if (mode == Surface.PAINT_MODE) {
-				mem.setByte(ofs, (byte) color, w);
-			} else {
-				mem.xorByte(ofs, (byte) color, w);
-			}
-		}
-		protected void doDrawPixels(int x, int y, int count, int color, int mode) {
-			final int ofs = offset + (y * bytesPerLine) + x;
-			if (mode == Surface.PAINT_MODE) {
-				mem.setByte(ofs, (byte) color, count);
-			} else {
-				mem.xorByte(ofs, (byte) color, count);
-			}
-		}
-	}
+        /**
+         * @see org.jnode.awt.util.BitmapGraphics#doCopyArea(int, int, int, int,
+         *      int, int)
+         */
+        protected void doCopyArea(int x, int y, int width, int height, int dx,
+                int dy) {
+            log.error("Not implemented");
 
-	/**
-	 * Create a new instance for 16 bits/pixel layout
-	 * @param mem
-	 * @param width
-	 * @param height
-	 * @param bytesPerLine
-	 * @param offset
-	 * @return The created instance
-	 */
-	public static BitmapGraphics create16bppInstance(MemoryResource mem, int width, int height, int bytesPerLine, int offset) {
-		return new BitmapGraphics16bpp(mem, width, height, offset, bytesPerLine);
-	}
+        }
 
-	/**
-	 * Create a new instance for 24 bits/pixel layout
-	 * @param mem
-	 * @param width
-	 * @param height
-	 * @param bytesPerLine
-	 * @param offset
-	 * @return The created instance
-	 */
-	public static BitmapGraphics create24bppInstance(MemoryResource mem, int width, int height, int bytesPerLine, int offset) {
-		return new BitmapGraphics24bpp(mem, width, height, offset, bytesPerLine);
-	}
+        protected void doDrawImage(Raster src, int srcX, int srcY, int dstX,
+                int dstY, int width, int height) {
+            // TODO Implement me
+            log.error("Not implemented");
+        }
 
-	/**
-	 * Create a new instance for 32 bits/pixel layout
-	 * @param mem
-	 * @param width
-	 * @param height
-	 * @param bytesPerLine
-	 * @param offset
-	 * @return The created instance
-	 */
-	public static BitmapGraphics create32bppInstance(MemoryResource mem, int width, int height, int bytesPerLine, int offset) {
-		return new BitmapGraphics32bpp(mem, width, height, offset, bytesPerLine);
-	}
+        protected void doDrawImage(Raster src, int srcX, int srcY, int dstX,
+                int dstY, int width, int height, int bgColor) {
+            // TODO Implement me
+            log.error("Not implemented");
+        }
 
-	/**
-	 * Create a new instance for 8 bits/pixel layout
-	 * @param mem
-	 * @param width
-	 * @param height
-	 * @param bytesPerLine
-	 * @param offset
-	 * @return The created instance
-	 */
-	public static BitmapGraphics create8bppInstance(MemoryResource mem, int width, int height, int bytesPerLine, int offset) {
-		return new BitmapGraphics8bpp(mem, width, height, offset, bytesPerLine);
-	}
+        /**
+         * @see org.jnode.awt.util.BitmapGraphics#doDrawAlphaRaster(java.awt.image.Raster,
+         *      int, int, int, int, int, int, int)
+         */
+        protected void doDrawAlphaRaster(Raster raster, int srcX, int srcY,
+                int dstX, int dstY, int width, int height, int color) {
+            // TODO Implement me
+            log.error("Not implemented");
+        }
 
-	/**
-	 * Create a new instance for a given DataBuffer
-	 * @param dataBuffer
-	 * @param width
-	 * @param height
-	 * @param bytesPerLine
-	 * @return The created instance
-	 */
-	public static BitmapGraphics createInstance(DataBuffer dataBuffer, int width, int height, int bytesPerLine) {
-		final ResourceManager rm;
-		try {
-			rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
-		} catch (NamingException ex) {
-			throw new RuntimeException("Cannot find ResourceManager", ex);
-		}
-		final int dbOffset = dataBuffer.getOffset();
-		switch (dataBuffer.getDataType()) {
-			case DataBuffer.TYPE_BYTE :
-				{
-					final byte[] data = ((DataBufferByte) dataBuffer).getData();
-					return new BitmapGraphics8bpp(rm.asMemoryResource(data), width, height, dbOffset, bytesPerLine);
-				}
-			case DataBuffer.TYPE_SHORT :
-				{
-					final short[] data = ((DataBufferShort) dataBuffer).getData();
-					return new BitmapGraphics16bpp(rm.asMemoryResource(data), width, height, dbOffset * 2, bytesPerLine);
-				}
-			case DataBuffer.TYPE_USHORT :
-				{
-					final short[] data = ((DataBufferUShort) dataBuffer).getData();
-					return new BitmapGraphics16bpp(rm.asMemoryResource(data), width, height, dbOffset * 2, bytesPerLine);
-				}
-			case DataBuffer.TYPE_INT :
-				{
-					final int[] data = ((DataBufferInt) dataBuffer).getData();
-					return new BitmapGraphics32bpp(rm.asMemoryResource(data), width, height, dbOffset * 4, bytesPerLine);
-				}
-			default :
-				{
-					throw new RuntimeException("Unimplemented databuffer type " + dataBuffer.getDataType());
-				}
-		}
-	}
-	protected final int bytesPerLine;
-	protected final int height;
+        protected void doDrawLine(int x, int y, int w, int color, int mode) {
+            final int ofs = offset + (y * bytesPerLine) + x;
+            if (mode == Surface.PAINT_MODE) {
+                mem.setByte(ofs, (byte) color, w);
+            } else {
+                mem.xorByte(ofs, (byte) color, w);
+            }
+        }
 
-	/** My logger */
-	protected final Logger log = Logger.getLogger(getClass());
-	protected final MemoryResource mem;
-	/** Offset of first pixel in mem (in bytes) */
-	protected final int offset;
-	protected final int width;
+        protected void doDrawPixels(int x, int y, int count, int color, int mode) {
+            final int ofs = offset + (y * bytesPerLine) + x;
+            if (mode == Surface.PAINT_MODE) {
+                mem.setByte(ofs, (byte) color, count);
+            } else {
+                mem.xorByte(ofs, (byte) color, count);
+            }
+        }
+    }
 
-	/**
-	 * Create a new instance
-	 * @param mem
-	 * @param width
-	 * @param height
-	 * @param offset
-	 * @param bytesPerLine
-	 */
-	protected BitmapGraphics(MemoryResource mem, int width, int height, int offset, int bytesPerLine) {
-		this.mem = mem;
-		this.offset = offset;
-		this.bytesPerLine = bytesPerLine;
-		this.width = width;
-		this.height = height;
-	}
+    /**
+     * Create a new instance for 16 bits/pixel layout
+     * 
+     * @param mem
+     * @param width
+     * @param height
+     * @param bytesPerLine
+     * @param offset
+     * @return The created instance
+     */
+    public static BitmapGraphics create16bppInstance(MemoryResource mem,
+            int width, int height, int bytesPerLine, int offset) {
+        return new BitmapGraphics16bpp(mem, width, height, offset, bytesPerLine);
+    }
 
-	/**
-	 * @see org.jnode.driver.video.Surface#copyArea(int, int, int, int, int, int)
-	 */
-	public final void copyArea(int srcX, int srcY, int w, int h, int dstX, int dstY) {
-		if ((dstY < this.height) && (dstX < this.width)) {
-			if (dstX < 0) {
-				srcX -= dstX;
-				w += dstX;
-				dstX = 0;
-			}
-			if (dstY < 0) {
-				srcY -= dstY;
-				h += dstY;
-				dstY = 0;
-			}
-			w = Math.min(w, width - dstX);
-			h = Math.min(h, height - dstY);
-			if ((w > 0) && (h > 0)) {
-				doCopyArea(srcX, srcY, w, h, dstX, dstY);
-			}			
-		}
-		// TODO Auto-generated method stub
+    /**
+     * Create a new instance for 24 bits/pixel layout
+     * 
+     * @param mem
+     * @param width
+     * @param height
+     * @param bytesPerLine
+     * @param offset
+     * @return The created instance
+     */
+    public static BitmapGraphics create24bppInstance(MemoryResource mem,
+            int width, int height, int bytesPerLine, int offset) {
+        return new BitmapGraphics24bpp(mem, width, height, offset, bytesPerLine);
+    }
 
-	}
+    /**
+     * Create a new instance for 32 bits/pixel layout
+     * 
+     * @param mem
+     * @param width
+     * @param height
+     * @param bytesPerLine
+     * @param offset
+     * @return The created instance
+     */
+    public static BitmapGraphics create32bppInstance(MemoryResource mem,
+            int width, int height, int bytesPerLine, int offset) {
+        return new BitmapGraphics32bpp(mem, width, height, offset, bytesPerLine);
+    }
 
-	/**
-	 * @see org.jnode.driver.video.Surface#copyArea(int, int, int, int, int, int)
-	 */
-	protected abstract void doCopyArea(int x, int y, int width, int height, int dx, int dy);   	
+    /**
+     * Create a new instance for 8 bits/pixel layout
+     * 
+     * @param mem
+     * @param width
+     * @param height
+     * @param bytesPerLine
+     * @param offset
+     * @return The created instance
+     */
+    public static BitmapGraphics create8bppInstance(MemoryResource mem,
+            int width, int height, int bytesPerLine, int offset) {
+        return new BitmapGraphics8bpp(mem, width, height, offset, bytesPerLine);
+    }
 
-	/**
-	 * Draw an image to this surface
-	 * @param src
-	 * @param srcX The upper left x coordinate of the source
-	 * @param srcY The upper left y coordinate of the source
-	 * @param dstX The upper left x coordinate of the destination
-	 * @param dstY The upper left y coordinate of the destination
-	 * @param width
-	 * @param height
-	 */
-	protected abstract void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width, int height);
+    /**
+     * Create a new instance for a given DataBuffer
+     * 
+     * @param dataBuffer
+     * @param width
+     * @param height
+     * @param bytesPerLine
+     * @return The created instance
+     */
+    public static BitmapGraphics createInstance(DataBuffer dataBuffer,
+            int width, int height, int bytesPerLine) {
+        final ResourceManager rm;
+        try {
+            rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+        } catch (NamingException ex) {
+            throw new RuntimeException("Cannot find ResourceManager", ex);
+        }
+        final int dbOffset = dataBuffer.getOffset();
+        switch (dataBuffer.getDataType()) {
+        case DataBuffer.TYPE_BYTE: {
+            final byte[] data = ((DataBufferByte) dataBuffer).getData();
+            return new BitmapGraphics8bpp(rm.asMemoryResource(data), width,
+                    height, dbOffset, bytesPerLine);
+        }
+        case DataBuffer.TYPE_SHORT: {
+            final short[] data = ((DataBufferShort) dataBuffer).getData();
+            return new BitmapGraphics16bpp(rm.asMemoryResource(data), width,
+                    height, dbOffset * 2, bytesPerLine);
+        }
+        case DataBuffer.TYPE_USHORT: {
+            final short[] data = ((DataBufferUShort) dataBuffer).getData();
+            return new BitmapGraphics16bpp(rm.asMemoryResource(data), width,
+                    height, dbOffset * 2, bytesPerLine);
+        }
+        case DataBuffer.TYPE_INT: {
+            final int[] data = ((DataBufferInt) dataBuffer).getData();
+            return new BitmapGraphics32bpp(rm.asMemoryResource(data), width,
+                    height, dbOffset * 4, bytesPerLine);
+        }
+        default: {
+            throw new RuntimeException("Unimplemented databuffer type "
+                    + dataBuffer.getDataType());
+        }
+        }
+    }
 
-	/**
-	 * Draw an image to this surface
-	 * @param src
-	 * @param srcX The upper left x coordinate of the source
-	 * @param srcY The upper left y coordinate of the source
-	 * @param dstX The upper left x coordinate of the destination
-	 * @param dstY The upper left y coordinate of the destination
-	 * @param width
-	 * @param height
-	 * @param bgColor The color to use for transparent pixels
-	 */
-	protected abstract void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width, int height, int bgColor);
+    protected final int bytesPerLine;
 
-	/**
-	 * Draw a line at location x,y that is w long using the given color.
-	 * @param x
-	 * @param y
-	 * @param w
-	 * @param color
-	 * @param mode
-	 * @see Surface#PAINT_MODE
-	 * @see Surface#XOR_MODE
-	 */
-	protected abstract void doDrawLine(int x, int y, int w, int color, int mode);
-    	
-	/**
-	 * Draw a number of pixels at location x,y using the given color.
-	 * @param x
-	 * @param y
-	 * @param count
-	 * @param color
-	 * @param mode
-	 * @see Surface#PAINT_MODE
-	 * @see Surface#XOR_MODE
-	 */
-	protected abstract void doDrawPixels(int x, int y, int count, int color, int mode);
+    protected final int height;
 
-	/**
-	 * Draw an image to this surface
-	 * @param src
-	 * @param srcX The upper left x coordinate of the source
-	 * @param srcY The upper left y coordinate of the source
-	 * @param dstX The upper left x coordinate of the destination
-	 * @param dstY The upper left y coordinate of the destination
-	 * @param w
-	 * @param h
-	 */
-	public final void drawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int w, int h) {
-		if ((dstY < this.height) && (dstX < this.width)) {
-			if (dstX < 0) {
-				srcX -= dstX;
-				w += dstX;
-				dstX = 0;
-			}
-			if (dstY < 0) {
-				srcY -= dstY;
-				h += dstY;
-				dstY = 0;
-			}
-			w = Math.min(w, width - dstX);
-			h = Math.min(h, height - dstY);
-			if ((w > 0) && (h > 0)) {
-				doDrawImage(src, srcX, srcY, dstX, dstY, w, h);
-			}
-		}
-	}
+    /** My logger */
+    protected final Logger log = Logger.getLogger(getClass());
 
-	/**
-	 * Draw an image to this surface
-	 * @param src
-	 * @param srcX The upper left x coordinate of the source
-	 * @param srcY The upper left y coordinate of the source
-	 * @param dstX The upper left x coordinate of the destination
-	 * @param dstY The upper left y coordinate of the destination
-	 * @param w
-	 * @param h
-	 * @param bgColor The color to use for transparent pixels
-	 */
-	public final void drawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int w, int h, int bgColor) {
-		if ((dstY < this.height) && (dstX < this.width)) {
-			if (dstX < 0) {
-				srcX -= dstX;
-				w += dstX;
-				dstX = 0;
-			}
-			if (dstY < 0) {
-				srcY -= dstY;
-				h += dstY;
-				dstY = 0;
-			}
-			w = Math.min(w, width - dstX);
-			h = Math.min(h, height - dstY);
-			if ((w > 0) && (h > 0)) {
-				doDrawImage(src, srcX, srcY, dstX, dstY, w, h, bgColor);
-			}
-		}
-	}
+    protected final MemoryResource mem;
 
-	/**
-	 * Draw a line at location x,y that is w long using the given color.
-	 * @param x
-	 * @param y
-	 * @param w
-	 * @param color
-	 * @param mode
-	 * @see Surface#PAINT_MODE
-	 * @see Surface#XOR_MODE
-	 */
-	public final void drawLine(int x, int y, int w, int color, int mode) {
-		try {
-			if ((y >= 0) && (y < height) && (x < width)) {
-				if (x < 0) {
-					w += x;
-					x = 0;
-				}
-				w = Math.min(w, width - x);
-				if (w > 0) {
-					doDrawLine(x, y, w, color, mode);
-				}
-			}
-		} catch (IndexOutOfBoundsException ex) {
-			log.error("Index out of bounds: x=" + x + ", y=" + y + ", w=" + w + ", width=" + width + ", height=" + height);
-		}
-	}
+    /** Offset of first pixel in mem (in bytes) */
+    protected final int offset;
 
-	/**
-	 * Draw a pixel at location x,y using the given color.
-	 * @param x
-	 * @param y
-	 * @param color
-	 * @param mode
-	 * @see Surface#PAINT_MODE
-	 * @see Surface#XOR_MODE
-	 */
-	public final void drawPixels(int x, int y, int count, int color, int mode) {
-		try {
-			if ((x >= 0) && (x < width) && (y >= 0) && (y < height)) {
-				doDrawPixels(x, y, count, color, mode);
-			}
-		} catch (IndexOutOfBoundsException ex) {
-			log.error("Index out of bounds: x=" + x + ", y=" + y + ", width=" + width + ", height=" + height);
-		}
-	}
+    protected final int width;
+
+    /**
+     * Create a new instance
+     * 
+     * @param mem
+     * @param width
+     * @param height
+     * @param offset
+     * @param bytesPerLine
+     */
+    protected BitmapGraphics(MemoryResource mem, int width, int height,
+            int offset, int bytesPerLine) {
+        this.mem = mem;
+        this.offset = offset;
+        this.bytesPerLine = bytesPerLine;
+        this.width = width;
+        this.height = height;
+    }
+
+    /**
+     * @see org.jnode.driver.video.Surface#copyArea(int, int, int, int, int,
+     *      int)
+     */
+    public final void copyArea(int srcX, int srcY, int w, int h, int dstX,
+            int dstY) {
+        if ((dstY < this.height) && (dstX < this.width)) {
+            if (dstX < 0) {
+                srcX -= dstX;
+                w += dstX;
+                dstX = 0;
+            }
+            if (dstY < 0) {
+                srcY -= dstY;
+                h += dstY;
+                dstY = 0;
+            }
+            w = Math.min(w, width - dstX);
+            h = Math.min(h, height - dstY);
+            if ((w > 0) && (h > 0)) {
+                doCopyArea(srcX, srcY, w, h, dstX, dstY);
+            }
+        }
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     * @see org.jnode.driver.video.Surface#copyArea(int, int, int, int, int,
+     *      int)
+     */
+    protected abstract void doCopyArea(int x, int y, int width, int height,
+            int dx, int dy);
+
+    /**
+     * Draw an image to this surface
+     * 
+     * @param src
+     * @param srcX
+     *            The upper left x coordinate of the source
+     * @param srcY
+     *            The upper left y coordinate of the source
+     * @param dstX
+     *            The upper left x coordinate of the destination
+     * @param dstY
+     *            The upper left y coordinate of the destination
+     * @param width
+     * @param height
+     */
+    protected abstract void doDrawImage(Raster src, int srcX, int srcY,
+            int dstX, int dstY, int width, int height);
+
+    /**
+     * Draw an image to this surface
+     * 
+     * @param src
+     * @param srcX
+     *            The upper left x coordinate of the source
+     * @param srcY
+     *            The upper left y coordinate of the source
+     * @param dstX
+     *            The upper left x coordinate of the destination
+     * @param dstY
+     *            The upper left y coordinate of the destination
+     * @param width
+     * @param height
+     * @param bgColor
+     *            The color to use for transparent pixels
+     */
+    protected abstract void doDrawImage(Raster src, int srcX, int srcY,
+            int dstX, int dstY, int width, int height, int bgColor);
+
+    /**
+     * Draw a line at location x,y that is w long using the given color.
+     * 
+     * @param x
+     * @param y
+     * @param w
+     * @param color
+     * @param mode
+     * @see Surface#PAINT_MODE
+     * @see Surface#XOR_MODE
+     */
+    protected abstract void doDrawLine(int x, int y, int w, int color, int mode);
+
+    /**
+     * Draw a number of pixels at location x,y using the given color.
+     * 
+     * @param x
+     * @param y
+     * @param count
+     * @param color
+     * @param mode
+     * @see Surface#PAINT_MODE
+     * @see Surface#XOR_MODE
+     */
+    protected abstract void doDrawPixels(int x, int y, int count, int color,
+            int mode);
+
+    /**
+     * Draw an image to this surface
+     * 
+     * @param src
+     * @param srcX
+     *            The upper left x coordinate of the source
+     * @param srcY
+     *            The upper left y coordinate of the source
+     * @param dstX
+     *            The upper left x coordinate of the destination
+     * @param dstY
+     *            The upper left y coordinate of the destination
+     * @param w
+     * @param h
+     */
+    public final void drawImage(Raster src, int srcX, int srcY, int dstX,
+            int dstY, int w, int h) {
+        if ((dstY < this.height) && (dstX < this.width)) {
+            if (dstX < 0) {
+                srcX -= dstX;
+                w += dstX;
+                dstX = 0;
+            }
+            if (dstY < 0) {
+                srcY -= dstY;
+                h += dstY;
+                dstY = 0;
+            }
+            w = Math.min(w, width - dstX);
+            h = Math.min(h, height - dstY);
+            if ((w > 0) && (h > 0)) {
+                doDrawImage(src, srcX, srcY, dstX, dstY, w, h);
+            }
+        }
+    }
+
+    /**
+     * Draw an image to this surface
+     * 
+     * @param src
+     * @param srcX
+     *            The upper left x coordinate of the source
+     * @param srcY
+     *            The upper left y coordinate of the source
+     * @param dstX
+     *            The upper left x coordinate of the destination
+     * @param dstY
+     *            The upper left y coordinate of the destination
+     * @param w
+     * @param h
+     * @param bgColor
+     *            The color to use for transparent pixels
+     */
+    public final void drawImage(Raster src, int srcX, int srcY, int dstX,
+            int dstY, int w, int h, int bgColor) {
+        if ((dstY < this.height) && (dstX < this.width)) {
+            if (dstX < 0) {
+                srcX -= dstX;
+                w += dstX;
+                dstX = 0;
+            }
+            if (dstY < 0) {
+                srcY -= dstY;
+                h += dstY;
+                dstY = 0;
+            }
+            w = Math.min(w, width - dstX);
+            h = Math.min(h, height - dstY);
+            if ((w > 0) && (h > 0)) {
+                doDrawImage(src, srcX, srcY, dstX, dstY, w, h, bgColor);
+            }
+        }
+    }
+
+    /**
+     * Draw an raster of alpha values using a given color onto to this surface.
+     * The given raster is a 1 band gray type raster.
+     * 
+     * @param raster
+     * @param srcX
+     *            The upper left x coordinate within the raster
+     * @param srcY
+     *            The upper left y coordinate within the raster
+     * @param dstX
+     *            The upper left destination x coordinate
+     * @param dstY
+     *            The upper left destination y coordinate
+     * @param w
+     * @param h
+     * @param color
+     *            The color to use.
+     */
+    public void drawAlphaRaster(Raster raster, AffineTransform tx, int srcX, int srcY, int dstX,
+            int dstY, int w, int h, int color) {
+        if (tx != null) {
+            Point2D dst = tx.transform(new Point2D.Float(dstX, dstY), null); 
+            dstX = (int)dst.getX();
+            dstY = (int)dst.getY();
+        }
+        if ((dstY < this.height) && (dstX < this.width)) {
+            if (dstX < 0) {
+                srcX -= dstX;
+                w += dstX;
+                dstX = 0;
+            }
+            if (dstY < 0) {
+                srcY -= dstY;
+                h += dstY;
+                dstY = 0;
+            }
+            w = Math.min(w, width - dstX);
+            h = Math.min(h, height - dstY);
+            if ((w > 0) && (h > 0)) {
+                doDrawAlphaRaster(raster, srcX, srcY, dstX, dstY, w, h, color);
+            }
+        }
+    }
+
+    protected abstract void doDrawAlphaRaster(Raster raster, int srcX,
+            int srcY, int dstX, int dstY, int width, int height, int color);
+
+    /**
+     * Draw a line at location x,y that is w long using the given color.
+     * 
+     * @param x
+     * @param y
+     * @param w
+     * @param color
+     * @param mode
+     * @see Surface#PAINT_MODE
+     * @see Surface#XOR_MODE
+     */
+    public final void drawLine(int x, int y, int w, int color, int mode) {
+        try {
+            if ((y >= 0) && (y < height) && (x < width)) {
+                if (x < 0) {
+                    w += x;
+                    x = 0;
+                }
+                w = Math.min(w, width - x);
+                if (w > 0) {
+                    doDrawLine(x, y, w, color, mode);
+                }
+            }
+        } catch (IndexOutOfBoundsException ex) {
+            log.error("Index out of bounds: x=" + x + ", y=" + y + ", w=" + w
+                    + ", width=" + width + ", height=" + height);
+        }
+    }
+
+    /**
+     * Draw a pixel at location x,y using the given color.
+     * 
+     * @param x
+     * @param y
+     * @param color
+     * @param mode
+     * @see Surface#PAINT_MODE
+     * @see Surface#XOR_MODE
+     */
+    public final void drawPixels(int x, int y, int count, int color, int mode) {
+        try {
+            if ((x >= 0) && (x < width) && (y >= 0) && (y < height)) {
+                doDrawPixels(x, y, count, color, mode);
+            }
+        } catch (IndexOutOfBoundsException ex) {
+            log.error("Index out of bounds: x=" + x + ", y=" + y + ", width="
+                    + width + ", height=" + height);
+        }
+    }
 }
