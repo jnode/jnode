@@ -24,7 +24,7 @@ package org.jnode.linker;
 import java.io.IOException;
 
 import org.jnode.assembler.Label;
-import org.jnode.assembler.x86.X86Stream;
+import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.build.BuildException;
 
 /**
@@ -32,10 +32,10 @@ import org.jnode.build.BuildException;
 * combined with the precompiled Java classes.
 **/
 public class ElfLinker {
-	private X86Stream os;
+	private X86BinaryAssembler os;
 	private int baseAddr;
 
-	public ElfLinker(X86Stream os) {
+	public ElfLinker(X86BinaryAssembler os) {
 		this.os = os;
 		baseAddr = (int)os.getBaseAddr();
 	}
@@ -80,7 +80,7 @@ public class ElfLinker {
 			Symbol sym = elf.getSymbol(i);
 			Section sec = sym.getSection();
 			if (sec == text) {
-				X86Stream.X86ObjectRef ref = (X86Stream.X86ObjectRef)os.getObjectRef(new Label(sym.getName()));
+				X86BinaryAssembler.X86ObjectRef ref = (X86BinaryAssembler.X86ObjectRef)os.getObjectRef(new Label(sym.getName()));
 				ref.setPublic();
 				if (!sym.isUndef()) {
 					//System.out.println("Defined symbol at " + sym.getValue() + " [" + sym.getName() + "]");
@@ -108,7 +108,7 @@ public class ElfLinker {
 					os.set32(addr, os.get32(addr) + start + baseAddr);
 					//System.out.println(" base=" + baseAddr + " start=" + start);
 				} else {
-					X86Stream.X86ObjectRef ref = (X86Stream.X86ObjectRef)os.getObjectRef(new Label(r.getSymbol().getName()));
+					X86BinaryAssembler.X86ObjectRef ref = (X86BinaryAssembler.X86ObjectRef)os.getObjectRef(new Label(r.getSymbol().getName()));
 					if (ref.isResolved()) {
 						//System.out.println("Resolved reloc " + ref.getObject());
 						if (r.isPcRel()) {

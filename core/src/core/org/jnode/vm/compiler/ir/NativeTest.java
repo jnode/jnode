@@ -31,9 +31,9 @@ import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.bytecode.BytecodeViewer;
 import org.jnode.vm.compiler.ir.quad.Quad;
 import org.jnode.vm.VmSystemClassLoader;
-import org.jnode.assembler.x86.X86Stream;
-import org.jnode.assembler.x86.TextX86Stream;
-import org.jnode.assembler.x86.AbstractX86Stream;
+import org.jnode.assembler.x86.X86BinaryAssembler;
+import org.jnode.assembler.x86.X86TextAssembler;
+import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.util.BootableArrayList;
 import org.jnode.util.BootableHashMap;
 
@@ -77,7 +77,7 @@ public class NativeTest {
             }
 
             if(binary){
-                X86Stream os = new X86Stream(cpuId, 0);
+                X86BinaryAssembler os = new X86BinaryAssembler(cpuId, 0);
                 generateCode(os, className);
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -104,7 +104,7 @@ public class NativeTest {
 //                System.out.println("result: " + execFloatFloatFloat(5, 3, b, b.length) + " " + PrimitiveTest.terniary(5, 3));
 
             }else{
-                TextX86Stream tos = new TextX86Stream(new OutputStreamWriter(System.out), cpuId);
+                X86TextAssembler tos = new X86TextAssembler(new OutputStreamWriter(System.out), cpuId);
                 generateCode(tos, className);
                 tos.flush();
             }
@@ -151,7 +151,7 @@ public class NativeTest {
 */
         }
 
-        private static void generateCode(AbstractX86Stream os, String className) throws MalformedURLException, ClassNotFoundException {
+        private static void generateCode(X86Assembler os, String className) throws MalformedURLException, ClassNotFoundException {
 
 
             VmByteCode code = loadByteCode(className);

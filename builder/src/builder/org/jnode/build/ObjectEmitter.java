@@ -30,7 +30,7 @@ import java.util.Set;
 
 import org.jnode.assembler.BootImageNativeStream;
 import org.jnode.assembler.NativeStream;
-import org.jnode.assembler.x86.X86Stream;
+import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.system.BootLog;
 import org.jnode.vm.BootableObject;
 import org.jnode.vm.VmSystemObject;
@@ -109,7 +109,7 @@ public class ObjectEmitter {
 		// Writeout the header
 		final VmClassType vmClass = (VmClassType) loaderContext.loadClass(cls.getName(), true);
 		vmClass.incInstanceCount();
-		final X86Stream.ObjectInfo oInfo = os.startObject(vmClass);
+		final X86BinaryAssembler.ObjectInfo oInfo = os.startObject(vmClass);
 		os.setObjectRef(obj);
 
 		// If the object is a VmClass, force the loading of the

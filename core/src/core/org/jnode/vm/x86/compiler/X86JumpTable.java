@@ -31,26 +31,17 @@ package org.jnode.vm.x86.compiler;
  */
 public class X86JumpTable {
 
-    /** Jumptable offset of vm_patch_MOV_EAX_IMM32 */
-    public static final int VM_PATCH_MOV_EAX_IMM32_OFS = 0;
-
-    /** Jumptable offset of vm_patch_NOP */
-    public static final int VM_PATCH_NOP_OFS = 4;
-
     /** Jumptable offset of vm_athrow */
-    public static final int VM_ATHROW_OFS = 8;
+    public static final int VM_ATHROW_OFS = 0;
 
     /** Jumptable offset of vm_athrow_notrace */
-    public static final int VM_ATHROW_NOTRACE_OFS = 12;
-
-    /** Jumptable offset of vm_interpreter */
-    public static final int VM_INTERPRETER_OFS = 16;
+    public static final int VM_ATHROW_NOTRACE_OFS = 4;
 
     /** Jumptable offset of vm_invoke_abstract */
-    public static final int VM_INVOKE_ABSTRACT_OFS = 20;
+    public static final int VM_INVOKE_ABSTRACT_OFS = 8;
 
     /** Jumptable offset of vm_invoke_method_after_recompile */
-    public static final int VM_INVOKE_METHOD_AFTER_RECOMPILE_OFS = 24;
+    public static final int VM_INVOKE_METHOD_AFTER_RECOMPILE_OFS = 12;
 
     /** Label name of the jumptable */
     public static final String JUMPTABLE_NAME = "vm_jumpTable";

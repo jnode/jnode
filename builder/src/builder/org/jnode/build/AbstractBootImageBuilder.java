@@ -48,7 +48,7 @@ import org.apache.tools.ant.Project;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.UnresolvedObjectRefException;
-import org.jnode.assembler.x86.X86Stream;
+import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.model.PluginRegistryModel;
@@ -468,7 +468,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             emitStaticInitializerCalls(os, bootClasses, clInitCaller);
 
             // This is the end of the image
-            X86Stream.ObjectInfo dummyObjectAtEnd = os
+            X86BinaryAssembler.ObjectInfo dummyObjectAtEnd = os
                     .startObject(loadClass(VmMethodCode.class));
             pageAlign(os);
             dummyObjectAtEnd.markEnd();
@@ -557,7 +557,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 int emitted = 0; // Number of emitted objects in the following
                 // loop
                 for (Iterator i = objectRefs.iterator(); i.hasNext();) {
-                    X86Stream.ObjectRef ref = (X86Stream.ObjectRef) i.next();
+                    X86BinaryAssembler.ObjectRef ref = (X86BinaryAssembler.ObjectRef) i.next();
                     if (!ref.isResolved()) {
                         final Object obj = ref.getObject();
                         if (!(obj instanceof Label)) {
@@ -594,7 +594,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                                 //if (obj != skipMe) {
                                 emitter.emitObject(obj);
                                 emitted++;
-                                X86Stream.ObjectRef newRef = os
+                                X86BinaryAssembler.ObjectRef newRef = os
                                         .getObjectRef(obj);
                                 if (ref != newRef) {
                                     throw new RuntimeException(

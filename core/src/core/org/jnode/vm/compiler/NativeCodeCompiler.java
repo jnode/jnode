@@ -28,7 +28,7 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.UnresolvedObjectRefException;
-import org.jnode.assembler.x86.TextX86Stream;
+import org.jnode.assembler.x86.X86TextAssembler;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmMagic;
@@ -222,7 +222,7 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
             return;
         }
 
-        TextX86Stream tos = new TextX86Stream(writer, (X86CpuID) Unsafe.getCurrentProcessor().getCPUID());
+        X86TextAssembler tos = new X86TextAssembler(writer, (X86CpuID) Unsafe.getCurrentProcessor().getCPUID());
 
         doCompile(method, tos, level, false);
         try{

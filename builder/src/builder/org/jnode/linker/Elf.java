@@ -48,8 +48,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
 
-import org.jnode.assembler.x86.X86Stream;
-import org.jnode.assembler.x86.X86Stream.X86ObjectRef;
+import org.jnode.assembler.x86.X86BinaryAssembler;
+import org.jnode.assembler.x86.X86BinaryAssembler.X86ObjectRef;
 
 
 public class Elf {
@@ -180,7 +180,7 @@ public class Elf {
 	 * Wrap my contents into an elf object file.
 	 * @return Elf
 	 */
-	public static Elf toElf(X86Stream stream) {
+	public static Elf toElf(X86BinaryAssembler stream) {
 		final Elf elf = Elf.newRelInstance();
 		// Store the emitted objects in the text section		
 		final Section textSection = elf.getSectionByName(".text");

@@ -21,7 +21,7 @@
  
 package org.jnode.vm.x86.compiler.l1a;
 
-import org.jnode.assembler.x86.AbstractX86Stream;
+import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
@@ -62,7 +62,7 @@ public abstract class DoubleWordItem extends Item implements
      */
     protected final Item clone(EmitterContext ec) {
         final DoubleWordItem res;
-        final AbstractX86Stream os = ec.getStream();
+        final X86Assembler os = ec.getStream();
 
         switch (getKind()) {
         case Kind.REGISTER:
@@ -202,7 +202,7 @@ public abstract class DoubleWordItem extends Item implements
      * @param msb
      */
     final void loadTo(EmitterContext ec, X86Register lsb, X86Register msb) {
-        final AbstractX86Stream os = ec.getStream();
+        final X86Assembler os = ec.getStream();
         final X86RegisterPool pool = ec.getPool();
         final VirtualStack stack = ec.getVStack();
 
@@ -303,7 +303,7 @@ public abstract class DoubleWordItem extends Item implements
      * @param msb
      */
     protected abstract void loadToConstant(EmitterContext ec,
-            AbstractX86Stream os, X86Register lsb, X86Register msb);
+            X86Assembler os, X86Register lsb, X86Register msb);
 
     /**
      * Load this item to a general purpose register tuple.
@@ -335,14 +335,14 @@ public abstract class DoubleWordItem extends Item implements
      * @param reg
      * @param disp
      */
-    protected abstract void popFromFPU(AbstractX86Stream os, X86Register reg,
+    protected abstract void popFromFPU(X86Assembler os, X86Register reg,
             int disp);
 
     /**
      * @see org.jnode.vm.x86.compiler.l1a.Item#push(EmitterContext)
      */
     final void push(EmitterContext ec) {
-        final AbstractX86Stream os = ec.getStream();
+        final X86Assembler os = ec.getStream();
         final VirtualStack stack = ec.getVStack();
         //os.log("LongItem.push "+Integer.toString(getKind()));
 
@@ -397,7 +397,7 @@ public abstract class DoubleWordItem extends Item implements
      * 
      * @param os
      */
-    protected abstract void pushConstant(EmitterContext ec, AbstractX86Stream os);
+    protected abstract void pushConstant(EmitterContext ec, X86Assembler os);
 
     /**
      * Push the value at the given memory location on the FPU stack.
@@ -406,14 +406,14 @@ public abstract class DoubleWordItem extends Item implements
      * @param reg
      * @param disp
      */
-    protected abstract void pushToFPU(AbstractX86Stream os, X86Register reg,
+    protected abstract void pushToFPU(X86Assembler os, X86Register reg,
             int disp);
 
     /**
      * @see org.jnode.vm.x86.compiler.l1a.Item#pushToFPU(EmitterContext)
      */
     final void pushToFPU(EmitterContext ec) {
-        final AbstractX86Stream os = ec.getStream();
+        final X86Assembler os = ec.getStream();
         final VirtualStack stack = ec.getVStack();
 
         //os.log("LongItem.push "+Integer.toString(getKind()));

@@ -21,7 +21,7 @@
  
 package org.jnode.vm.x86.compiler.l1a;
 
-import org.jnode.assembler.x86.AbstractX86Stream;
+import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.vm.JvmType;
@@ -50,7 +50,7 @@ final class MagicHelper extends BaseX86MagicHelper {
         //final int type = getClass(method);
         final int mcode = getMethodCode(method);
         final VirtualStack vstack = ec.getVStack();
-        final AbstractX86Stream os = ec.getStream();
+        final X86Assembler os = ec.getStream();
         final ItemFactory ifac = ec.getItemFactory();
         final X86RegisterPool pool = ec.getPool();
 
