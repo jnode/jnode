@@ -26,7 +26,6 @@ import org.jnode.shell.help.Syntax;
  * @author JPG
  */
 public class PingCommand implements ICMPListener{
-	private Timer timer = new Timer();
 	private Statistics stat = new Statistics();
 	private boolean wait = true;
 	
@@ -34,9 +33,9 @@ public class PingCommand implements ICMPListener{
 	private boolean dontFragment = false;
 	private IPv4Address dst = new IPv4Address("127.0.0.1");
 	private boolean flood = false;
-	private int interval = 20000;
+	private int interval = 6000;
 	private int size = 64;
-	private long timeout = 15000;
+	private long timeout = 5000;
 	private int ttl = 255;
 
 	static final HostArgument DST = new HostArgument("host", "the target host");
@@ -78,10 +77,9 @@ public class PingCommand implements ICMPListener{
 			ICMPEchoHeader transportHeader = new ICMPEchoHeader(8, id_count, seq_count);
 			transportHeader.prefixTo(packet);
 			
-			Request r = new Request(tthis.stat, System.currentTimeMillis(), id_count, seq_count);
+			Request r = new Request(tthis.stat, tthis.timeout, System.currentTimeMillis(), id_count, seq_count);
 			Request.registerRequest(r);
 			netLayer.transmit(netHeader, packet);
-			tthis.timer.schedule(r, tthis.timeout);
 			
 			while(tthis.wait){
 				long time = System.currentTimeMillis() - r.getTimestamp();
@@ -115,8 +113,8 @@ public class PingCommand implements ICMPListener{
 		ICMPEchoHeader hdr2 = (ICMPEchoHeader)skbuf.getTransportLayerHeader();
 		
 		int seq = hdr2.getSeqNumber();
-		Request r = Request.getRequest(seq);
-		if ((r==null) && (r.Obsolete()))
+		Request r = Request.removeRequest(seq);
+		if ((r==null) || (r.Obsolete()))
 		return;
 		
 		long timestamp = match(hdr2.getIdentifier() ,seq ,r);
@@ -127,27 +125,28 @@ public class PingCommand implements ICMPListener{
 			System.out.print(hdr1.getDataLength()-8 +"bytes of data ");
 			System.out.print("ttl="+ hdr1.getTtl()+" ");
 			System.out.print("seq="+ hdr2.getSeqNumber()+" ");
-			System.out.print("time=" + (roundtrip) + "ms");
-			System.out.println();
+			System.out.println("time=" + (roundtrip) + "ms");
 		}
 		wait = false;
 		this.stat.recordPacket(roundtrip);
-		Request.removeRequest(seq);
 	}
 }
 
 class Request extends TimerTask{
 	private static Hashtable requests = new Hashtable();
+	private Timer timer = new Timer();
 	private boolean obsolete = false;
 	private Statistics stat;
 	private long timestamp;
 	private int id, seq;
 	
-	Request(Statistics stat, long timestamp, int id, int seq){
+	Request(Statistics stat, long timeout, long timestamp, int id, int seq){
 		this.stat = stat;
 		this.timestamp = timestamp;
 		this.id = id;
 		this.seq = seq;
+		
+		timer.schedule(this, timeout);
 	}
 	
 	static void registerRequest(Request r){
@@ -164,7 +163,7 @@ class Request extends TimerTask{
 	}
 	
 	public void run() {
-		if (this.Obsolete()){
+		if (!this.Obsolete()){
 			stat.recordLost();
 			Request.removeRequest(this.seq);
 		}
@@ -173,6 +172,7 @@ class Request extends TimerTask{
 	synchronized boolean Obsolete(){
 		if (!obsolete){
 			this.obsolete = true;
+			this.timer.cancel();
 			return false;
 		}else
 		return true;
@@ -190,7 +190,7 @@ class Request extends TimerTask{
 }
 
 class Statistics{
-	private long  received=0, lost=0;
+	private int received=0, lost=0;
 	private long min=Integer.MAX_VALUE, max=0;
 	private long sum;
 	
@@ -209,16 +209,16 @@ class Statistics{
 	}
 	
 	String getStatistics(){
-		long packets = received+lost;
-		long percent = 0;
-		if (packets != 0){
-			percent = (lost/packets)*100;
-		}
-		long avg = sum/packets;
+		int packets = received+lost;
+		float percent = 0;
+//		if (packets != 0){
+//			percent = lost/packets;
+//			percent *= 100;
+//		}
+		float avg = sum/packets;
 		return new String(
-			packets +" packets transmitted, "+ 
-			received +" packets received, "+ 
-			percent +"% packet loss\n"+
+			packets +" packets transmitted, "+ received +" packets received\n"+ 
+//			percent +"% packet loss\n"+
 			"round-trip min/avg/max = "+ min +"/"+ avg +"/"+ max +" ms"
 		);
 	}
