@@ -38,6 +38,22 @@ kernel_begin:
 %include "lock.h"
 %include "java.inc"
 
+; ----------------------
+; JNode specifics
+; ----------------------
+
+; Default Page flags
+PF_DEFAULT	equ iPF_PRESENT|iPF_WRITE|iPF_USER
+PF_DEFAULT_RO	equ iPF_PRESENT|iPF_USER
+
+; Segment selectors
+KERNEL_CS   equ 0x08
+KERNEL_DS   equ 0x10
+USER_CS     equ 0x1B
+USER_DS     equ 0x23
+TSS_DS      equ 0x28
+CURPROC_FS  equ 0x33
+
 %macro LOOPDIE 0
 %%l:
 	jmp %%l
@@ -64,7 +80,7 @@ kernel_begin:
 %define CURRENTTHREAD			dword[fs:VmProcessor_CURRENTTHREAD_OFFSET*4]
 %define NEXTTHREAD				dword[fs:VmProcessor_NEXTTHREAD_OFFSET*4]
 %define STACKEND 				dword[fs:VmProcessor_STACKEND_OFFSET*4]
-%define VMI_SAVED_REGISTERSPACE	12
+; %define VMI_SAVED_REGISTERSPACE	12
 
 ; UnConditional yieldpoint from an interpreted method
 ; Register EBX and ECX are used and are not saved here!

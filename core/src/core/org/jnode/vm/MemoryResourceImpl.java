@@ -121,7 +121,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			// Find a range
 			Address ptr;
 			if (mode == ResourceManager.MEMMODE_ALLOC_DMA) {
-				ptr = Address.fromAddress(Unsafe.getMinAddress());
+				ptr = Unsafe.getMinAddress();
 			} else {
 				ptr = Unsafe.getMemoryEnd();
 			}
