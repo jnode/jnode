@@ -91,9 +91,7 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @see java.awt.Graphics2D#clip(java.awt.Shape)
 	 */
 	public void clip(Shape s) {
-		//clip = clip.
-		// TODO Auto-generated method stub
-
+		this.clip = s;
 	}
 
 	/**
