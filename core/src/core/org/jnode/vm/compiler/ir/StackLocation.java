@@ -30,6 +30,7 @@ public class StackLocation extends Location {
 	 * 
 	 */
 	public int getDisplacement() {
-		return displacement;
+        //TODO: remove the 8 here, hack for C compatibility while testing
+		return displacement + 8;
 	}
 }

@@ -33,10 +33,11 @@ import org.jnode.vm.x86.compiler.l2.X86CodeGenerator;
  */
 public class IRTest {
 	public static void main(String args[]) throws SecurityException, IOException, ClassNotFoundException {
+//        System.in.read();
         X86CpuID cpuId = X86CpuID.createID("p5");
         boolean binary = false;
 
-        String className = "org.jnode.vm.compiler.ir.IRTest";
+        String className = "org.jnode.vm.compiler.ir.PrimitiveTest";
         if (args.length > 0) {
             String arg0 = args[0];
             if("-b".equals(arg0)){
@@ -118,6 +119,7 @@ public class IRTest {
 		//System.out.println(cfg.toString());
 		//System.out.println();
 
+        System.out.println(cfg);
         IRGenerator irg = new IRGenerator(cfg);
         BytecodeParser.parse(code, irg);
 
@@ -126,8 +128,9 @@ public class IRTest {
         BootableHashMap liveVariables = new BootableHashMap();
         for (int i=0; i<n; i+=1) {
             Quad quad = (Quad) quads.get(i);
-            //System.out.println(quad);
+//            System.out.println(quad);
             quad.doPass2(liveVariables);
+            System.out.println(quad);
         }
 
         Collection lv = liveVariables.values();
@@ -140,6 +143,7 @@ public class IRTest {
             // System.out.println("Live range: " + liveRanges[i]);
         }
         Arrays.sort(liveRanges);
+        System.out.println(Arrays.asList(liveRanges));
         LinearScanAllocator lsa = new LinearScanAllocator(liveRanges);
         lsa.allocate();
 
@@ -186,125 +190,5 @@ public class IRTest {
 		if (quad.isDeadCode()) {
 			System.out.print("(dead) ");
 		}
-	}
-
-	public static int arithOptLoop(int a0, int a1, int a2) {
-		int l3 = 1;
-		int l4 = 3*a1;
-		for (int l5=10; l5 > 0; l5-=1) {
-			l3 += 2*a0 + l4;
-			l4 += 1;
-		}
-		return l3;
-	}
-
-	public static int arithOptIntx(int a0, int a1, int a2) {
-		return a0 + a1;
-	}
-
-	public static int discriminant(int a0, int a1, int a2) {
-		return a1*a1 - 4*a0*a2;
-	}
-
-	public static int simple(int a0, int a1) {
-		int l0 = a1;
-		return -l0;
-	}
-
-	public static int terniary(int a0, int a1) {
-		return a0 < 0 ? a0 : a1;
-	}
-
-    public static int const0(int a0, int a1) {
-        int l0 = 0;
-        if (a0 == 0) {
-            l0 = -1;
-        }
-        if (a0 > 0) {
-            l0 = 1;
-        }
-        return l0;
-    }
-
-
-    public static int const1(int a0, int a1) {
-        int l0 = 1;
-        for(;;){
-            l0 = a0 + a1 + l0;
-            if(l0 > 10)
-                break;
-        }
-        return l0;
-	}
-
-    public static int ifTest(int a0, int a1) {
-        int l0;
-        if(a0 > a1)
-            l0 = a0;
-        else
-            l0 = a1;
-        return l0;        
-    }
-
-    public static int const12(int a0, int a1) {
-        int l0 = 10, l1 = 0;
-        while(l0 > 0){
-            l1 = a1 * l1 + a0;
-            l0 = l0 - 1;
-        }
-        return l1;
-    }
-
-    //compile it with no optimisation (see kjc -O0 - the kopi compiler)
-    public static int unconditionalJump(int a0, int a1) {
-        int l0 = 1;
-        for(;;){
-            l0 = a0 + a1 + l0;
-            for(;;){
-                l0 = a0 + a1 + l0;
-                for(;;){
-                    l0 = a0 + a1 + l0;
-                    break;
-                }
-                break;
-            }
-            break;
-        }
-        return l0;
-	}
-
-    public static int const6(int a0, int a1) {
-        int l1 = a1 | a0;
-        int l2 = a0 & a1;
-        return l1 ^ l1 + l2 ^ l2 - 2  * l1 * l2;
-	}
-
-    void const5() {
-        int l1 = 0, l2 = 1, l3 = 3;
-        l3 = l1 + l2;
-    }
-
-    public static int const4(int a0, int a1) {
-        int l1 = a1 + a0;
-        int l2 = a0 * a1;
-        return l1 * l1 + l2 * l2 + 2  * l1 * l2;
-	}
-
-    public static int const3(int a0, int a1) {
-        int l1 = -134;
-        int l2 = 2;
-        int l3 = 3;
-		//return (int)(1 + 2 * 3.5 + 1) % 6  ;
-        //return  - ((l1 + l2 + l3 + l1* l2* l3) / l2);
-        return a1 + a1 + a0;
-	}
-
-    public static int const2(int a0, int a1) {
-        int l1 = -134;
-        int l2 = 2;
-        int l3 = 3;
-		//return (int)(1 + 2 * 3.5 + 1) % 6  ;
-        //return  - ((l1 + l2 + l3 + l1* l2* l3) / l2);
-        return (byte) 2 + a1;
 	}
 }
