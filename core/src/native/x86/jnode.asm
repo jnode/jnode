@@ -12,12 +12,7 @@
 %define TRACE_UNHANDLED_EXCEPTION	0
 %define TRACE_INTERRUPTS			0
     
-; PARANOIA					equ 1	; Be very paranoia 
-; QUICK_INVOKE_OPCODES		equ 1	; Use quick opcodes for invoke opcodes
-; QUICK_FIELD_OPCODES			equ 1	; Use quick opcodes for field opcodes
-; TEST_STACK_OVERFLOW			equ 1	; Test for stack overflow
 %define FAIL_ON_ABSTRACT			1	; Should the VM stop on abstract methods (1), or throw an AbstractMethodError (0)
-; RECORD_INVOKE				equ 1	; Should recordInvoke() be called on method that have ACC_PROFILE set? (default 1)
 
 MAX_STACK_TRACE_LENGTH		equ 30	; Maximum methods shown in a low-level stacktrace
 
@@ -72,29 +67,11 @@ CURPROC_FS  equ 0x33
 %include "version.asm"
 %include "syscall.asm" 
 
-;%define VMI_METHOD		dword [ebp+VmX86StackReader_METHOD_OFFSET]
-;%define VMI_MAGIC		dword [ebp+VmX86StackReader_MAGIC_OFFSET]
-;%define VMI_PREV_FRAME	 [ebp+VmX86StackReader_PREVIOUS_OFFSET]
 %define THREADSWITCHINDICATOR	dword[fs:VmProcessor_THREADSWITCHINDICATOR_OFFSET*4]
 %define CURRENTPROCESSOR		dword[fs:VmProcessor_ME_OFFSET*4]
 %define CURRENTTHREAD			dword[fs:VmProcessor_CURRENTTHREAD_OFFSET*4]
 %define NEXTTHREAD				dword[fs:VmProcessor_NEXTTHREAD_OFFSET*4]
 %define STACKEND 				dword[fs:VmProcessor_STACKEND_OFFSET*4]
-
-	extern SoftByteCodes_allocArray
-	extern SoftByteCodes_allocMultiArray
-	extern SoftByteCodes_allocObject
-	extern SoftByteCodes_allocPrimitiveArray
-	extern SoftByteCodes_anewarray
-	extern SoftByteCodes_arrayStoreWriteBarrier
-	extern SoftByteCodes_resolveField
-	extern SoftByteCodes_putfieldWriteBarrier
-	extern SoftByteCodes_putstaticWriteBarrier
-	extern SoftByteCodes_resolveClass
-	extern SoftByteCodes_resolveMethod
-	extern SoftByteCodes_unknownOpcode
-	extern MathSupport_ldiv
-	extern MathSupport_lrem
 
 ; Invoke the method in EAX
 %macro INVOKE_JAVA_METHOD 0
