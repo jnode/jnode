@@ -4,6 +4,7 @@ package org.jnode.apps.charvabsh;
 import bsh.ConsoleInterface;
 import bsh.EvalError;
 import bsh.Interpreter;
+import bsh.TargetError;
 import charva.awt.BorderLayout;
 import charva.awt.Color;
 import charva.awt.Container;
@@ -45,6 +46,7 @@ public class CharvaBsh {
         private JTextArea editor;
         private JTextArea output;
         private Interpreter interpreter;
+        private static final int NUM_TRACE = 5;
 
         void showSaveDialog() {
             String s = JOptionPane.showInputDialog( this, "Enter a filename to save", "Save what file", JOptionPane.QUESTION_MESSAGE );
@@ -163,6 +165,8 @@ public class CharvaBsh {
             scrollEditor.setViewportBorder( new TitledBorder( "Beanshell Editor" ) );
 
             output = new JTextArea( "BSH output", 7, 75 );
+            output.setLineWrap( true );
+
             JScrollPane scrollOutput = new JScrollPane( output );
             scrollOutput.setViewportBorder( new TitledBorder( "Beanshell Output" ) );
 
@@ -270,13 +274,28 @@ public class CharvaBsh {
 
         private void writeError( EvalError evalError ) {
 
-            StringWriter wr = new StringWriter();
-            evalError.printStackTrace( new PrintWriter( wr ) );
+//            StringWriter wr = new StringWriter();
+//            evalError.printStackTrace( new PrintWriter( wr ) );
 //                String errorStr = wr.toString();
-            output.append( "Evaluation Error: " + evalError.getMessage() + "\n" );
-            output.append( "in line number: " + evalError.getErrorLineNumber() + "\n" );
-            output.append( evalError.getScriptStackTrace() + "\n" );
-            output.append( evalError.getErrorText() );
+            output.append( "<Evaluation Error>\n" + evalError );
+            if( evalError instanceof TargetError ) {
+                TargetError te = (TargetError)evalError;
+//                Throwable target = te.getTarget();
+//                StackTraceElement[] elm = target.getStackTrace();
+//                for( int i = 0; i < elm.length && i < NUM_TRACE; i++ ) {
+//                    output.append( "\n" + elm[i].toString() );
+//                }
+                StringWriter wr = new StringWriter();
+                Throwable target = te.getTarget();
+                target.printStackTrace( new PrintWriter( wr ) );
+                String text = wr.toString();
+                output.append( "\n" + text );
+            }
+//            output.append( "Evaluation Error: " + evalError.getMessage() + "\n" );
+//            output.append( "in line number: " + evalError.getErrorLineNumber() + "\n" );
+//            output.append( evalError.getScriptStackTrace() + "\n" );
+//            output.append( evalError.getErrorText() );
+//            output.append( evalError.);
 //                output.append( errorStr );
         }
     }
