@@ -73,10 +73,25 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 
 	private static final Class[] MAIN_ARG_TYPES = new Class[] { String[].class };
 
+    private CommandInvoker commandInvoker;
+    private ThreadCommandInvoker threadCommandInvoker;
+    private DefaultCommandInvoker defaultCommandInvoker;
+
+    public Console getConsole()
+    {
+        return console;
+    }
+    public void setThreadCommandInvoker(){
+        this.commandInvoker=threadCommandInvoker;
+    }
+    public void setDefaultCommandInvoker(){
+        this.commandInvoker=defaultCommandInvoker;
+    }
+
 	/**
 	 * Create a new instance
 	 * 
-	 * @see java.lang.Object#Object()
+	 * @see java.lang.Object
 	 */
 	public CommandShell() throws ShellException {
 		try {
@@ -88,7 +103,9 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 
 				//  listen to the keyboard
 				console.addKeyboardListener(this);
-
+                defaultCommandInvoker=new DefaultCommandInvoker(this);
+                threadCommandInvoker=new ThreadCommandInvoker(this);
+                this.commandInvoker=threadCommandInvoker;//default to separate threads for commands.
 			} else {
 				this.out = System.out;
 				this.err = System.err;
@@ -149,53 +166,56 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 		}
 	}
 
-	/**
-	 * Execute a single command line.
-	 * 
-	 * @param cmdLineStr
-	 */
-	protected void processCommand(String cmdLineStr) {
-
-		final CommandLine cmdLine = new CommandLine(cmdLineStr);
-		if (!cmdLine.hasNext())
-			return;
-		String cmdName = cmdLine.next();
-
-		//  Add this command to the history.
-		if (!cmdLineStr.equals(newestLine))
-			history.addCommand(cmdLineStr);
-
-		try {
-			Class cmdClass = getCommandClass(cmdName);
-			final Method main = cmdClass.getMethod("main", MAIN_ARG_TYPES);
-			try {
-				main.invoke(null, new Object[] { cmdLine.getRemainder().toStringArray()});
-			} catch (InvocationTargetException ex) {
-				Throwable tex = ex.getTargetException();
-				if (tex instanceof SyntaxError) {
-					Help.getInfo(cmdClass).usage();
-					err.println(tex.getMessage());
-				} else {
-					err.println("Exception in command");
-					tex.printStackTrace(err);
-				}
-			} catch (Exception ex) {
-				err.println("Exception in command");
-				ex.printStackTrace(err);
-			} catch (Error ex) {
-				err.println("Fatal error in command");
-				ex.printStackTrace(err);
-			}
-		} catch (NoSuchMethodException ex) {
-			err.println("Alias class has no main method " + cmdName);
-		} catch (ClassNotFoundException ex) {
-			err.println("Unknown alias class " + ex.getMessage());
-		} catch (ClassCastException ex) {
-			err.println("Invalid command " + cmdName);
-		} catch (Exception ex) {
-			err.println("I FOUND AN ERROR: " + ex);
-		}
-	}
+        protected void processCommand(String cmdLineStr) {
+        commandInvoker.invoke(cmdLineStr);
+        }
+//	/**
+//	 * Execute a single command line.
+//	 *
+//	 * @param cmdLineStr
+//	 */
+//	protected void processCommand(String cmdLineStr) {
+//
+//		final CommandLine cmdLine = new CommandLine(cmdLineStr);
+//		if (!cmdLine.hasNext())
+//			return;
+//		String cmdName = cmdLine.next();
+//
+//		//  Add this command to the history.
+//		if (!cmdLineStr.equals(newestLine))
+//			history.addCommand(cmdLineStr);
+//
+//		try {
+//			Class cmdClass = getCommandClass(cmdName);
+//			final Method main = cmdClass.getMethod("main", MAIN_ARG_TYPES);
+//			try {
+//				main.invoke(null, new Object[] { cmdLine.getRemainder().toStringArray()});
+//			} catch (InvocationTargetException ex) {
+//				Throwable tex = ex.getTargetException();
+//				if (tex instanceof SyntaxError) {
+//					Help.getInfo(cmdClass).usage();
+//					err.println(tex.getMessage());
+//				} else {
+//					err.println("Exception in command");
+//					tex.printStackTrace(err);
+//				}
+//			} catch (Exception ex) {
+//				err.println("Exception in command");
+//				ex.printStackTrace(err);
+//			} catch (Error ex) {
+//				err.println("Fatal error in command");
+//				ex.printStackTrace(err);
+//			}
+//		} catch (NoSuchMethodException ex) {
+//			err.println("Alias class has no main method " + cmdName);
+//		} catch (ClassNotFoundException ex) {
+//			err.println("Unknown alias class " + ex.getMessage());
+//		} catch (ClassCastException ex) {
+//			err.println("Invalid command " + cmdName);
+//		} catch (Exception ex) {
+//			err.println("I FOUND AN ERROR: " + ex);
+//		}
+//	}
 
 	protected Class getCommandClass(String cmd) throws ClassNotFoundException {
 		try {
@@ -398,10 +418,20 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 		return result;
 	}
 
-	public void list(String[] items) {
-		System.out.println();
-		for (int i = 0; i < items.length; i++)
-			System.out.println(items[i]);
-		dirty = true;
-	}
+    public void list(String[] items) {
+        System.out.println();
+        for (int i = 0; i < items.length; i++)
+            System.out.println(items[i]);
+        dirty = true;
+    }
+
+    public void addCommandToHistory(String cmdLineStr) {
+        //  Add this command to the history.
+        if (!cmdLineStr.equals(newestLine))
+            history.addCommand(cmdLineStr);
+    }
+
+    public PrintStream getErrorStream() {
+        return err;
+    }
 }
