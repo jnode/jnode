@@ -19,11 +19,6 @@ import gnu.java.io.NullOutputStream;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
-
-//import org.apache.commons.net.tftp.TFTP;
-//import org.apache.commons.net.tftp.TFTPClient;
-//import org.apache.tools.ant.filters.StringInputStream;
 
 /**
  * User: Sam Reid
@@ -32,58 +27,24 @@ import java.util.Arrays;
  * Copyright (c) Mar 19, 2004 by Sam Reid
  */
 public class CharvaBsh {
-    static String example = "int i=0;\nfor (i=0;i<3;i++)\nprint(i+\".\");\n return i;\n";
+    static String example = "int i=0;\nfor (i=0;i<2;i++)\nprint(i+\".\");\n return i;\n";
 
     public static void main( String[] args ) {
-
-        System.out.println( "args = " + Arrays.asList( args ) );
-        if( args.length == 1 && args[0].toLowerCase().equals( "debug1" ) ) {
-            debug1();
-        }
-        else {
-            Toolkit.getDefaultToolkit().register();
-            System.err.println( "Starting Charva Shell" );
-            CharvaShell testwin = new CharvaShell();
-            testwin.show();
-        }
-//        Toolkit.getDefaultToolkit().waitTillFinished();
-//        System.err.println( "Finished Charva Shell" );
-    }
-
-    public static void pause() {
-        try {
-            Thread.sleep( 500 );
-        }
-        catch( InterruptedException e ) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void debug1() {
-        System.err.println( "Debug1, about to create a JFrame." );
-//        pause();
-        JFrame jf = new JFrame();
-        System.err.println( "Adding a text area:" );
-//        pause();
-        JTextArea area = new JTextArea( "inittext" );
-        jf.add( area );
-
-        System.err.println( "Debug1, created a JFrame, skipping showing it." );
-//        pause();
-//        jf.show();
-        System.err.println( "Closing default toolkit." );
-        Toolkit.getDefaultToolkit().close();
+        Toolkit.getDefaultToolkit().register();
+        System.err.println( "Starting Charva Shell" );
+        CharvaShell testwin = new CharvaShell();
+        testwin.show();
     }
 
     static class CharvaShell extends JFrame {
-        JPanel bshPanel = new JPanel();
-        JPanel messagePanel = new JPanel();
+        private JPanel bshPanel = new JPanel();
+        private JPanel messagePanel = new JPanel();
 
         private JLabel topLabel;
         private JLabel bottomLabel;
         private JTextArea editor;
         private JTextArea output;
-        Interpreter interpreter;
+        private Interpreter interpreter;
 
         void showSaveDialog() {
             String s = JOptionPane.showInputDialog( this, "Enter a filename to save", "Save what file", JOptionPane.QUESTION_MESSAGE );
@@ -128,14 +89,12 @@ public class CharvaBsh {
         void loadText( String filename ) throws IOException {
             final URL url = new URL( filename );
             final InputStream is = url.openConnection().getInputStream();
-//            editor.setText( "");
             try {
                 int ch;
                 final StringBuffer buf = new StringBuffer();
                 while( ( ch = is.read() ) >= 0 ) {
                     buf.append( (char)ch );
                 }
-                System.out.println( "Result:\n" + buf );
                 editor.setText( buf.toString() );
                 repaint();
             }
@@ -146,36 +105,17 @@ public class CharvaBsh {
 
         }
 
-//        TFTPClient client=new TFTPClient();
-
         void saveText( String filename ) throws IOException {
             final URL url = new URL( filename );
             final OutputStream os = url.openConnection().getOutputStream();
-//            editor.setText( "");
             String text = editor.getText();
 
-//            int mode=TFTP.BINARY_MODE;
-//            InputStream instream;
-//            StringReader sr=new StringReader( text );
-            //InputStream instream=new ByteArrayInputStream( text.getBytes( ));
-//            InputStream instream=new BufferedInputStream( sr);
-//            StringBufferInputStream instream=new StringInputStream( text);
-            //String serverAddress="192.168.2.100";//wow, hard coded.
-//            client.sendFile( filename,mode,instream,serverAddress);
             try {
                 for( int i = 0; i < text.length(); i++ ) {
                     char ch = text.charAt( i );
                     os.write( ch );
                 }
                 os.flush();
-
-//                int ch;
-//                final StringBuffer buf = new StringBuffer();
-//                while( ( ch = text.charAt(i++) ) >= 0 ) {
-//                    buf.append( (char)ch );
-//                }
-//                System.out.println( "Result:\n" + buf );
-//                editor.setText( buf.toString() );
             }
             finally {
                 os.close();
@@ -185,12 +125,6 @@ public class CharvaBsh {
         void debug( String text ) {
             output.setText( text );
             repaint();
-//            try {
-//                Thread.sleep( 1000 );
-//            }
-//            catch( InterruptedException e ) {
-//                e.printStackTrace();
-//            }
         }
 
         void done() {
@@ -198,9 +132,7 @@ public class CharvaBsh {
             hide();
             debug( "Calling close" );
             Toolkit.getDefaultToolkit().close();
-//            Toolkit.getDefaultToolkit().unregister();
             System.err.println( "Finished with Done" );
-//            pause();
         }
 
         void requestShell() {
@@ -219,18 +151,18 @@ public class CharvaBsh {
             addMenuBar();
 
             messagePanel.setLayout( new BoxLayout( messagePanel, BoxLayout.Y_AXIS ) );
-            topLabel = new JLabel( "F12 To evaluate." );
+            topLabel = new JLabel( "F12[evaluate], F1[clear-output], F5[clear-editor]" );
             messagePanel.add( topLabel );
             bottomLabel = new JLabel( "" );
             messagePanel.add( bottomLabel );
 
             cp.add( messagePanel, BorderLayout.SOUTH );
 
-            editor = new JTextArea( example, 8, 60 );
+            editor = new JTextArea( example, 8, 75 );
             JScrollPane scrollEditor = new JScrollPane( editor );
             scrollEditor.setViewportBorder( new TitledBorder( "Beanshell Editor" ) );
 
-            output = new JTextArea( "BSH output", 5, 60 );
+            output = new JTextArea( "BSH output", 7, 75 );
             JScrollPane scrollOutput = new JScrollPane( output );
             scrollOutput.setViewportBorder( new TitledBorder( "Beanshell Output" ) );
 
@@ -245,6 +177,14 @@ public class CharvaBsh {
                         evaluateText();
                         repaint();
                     }
+                    if( ke.getKeyCode() == KeyEvent.VK_F1 ) {
+                        output.setText( "" );
+                        output.repaint();
+                    }
+                    if( ke.getKeyCode() == KeyEvent.VK_F5 ) {
+                        editor.setText( "" );
+                        editor.repaint();
+                    }
                 }
             } );
             editor.requestFocus();
@@ -252,16 +192,19 @@ public class CharvaBsh {
 //            BSHOutputAdapter out = new BSHOutputAdapter(output);
             ConsoleInterface bshConsole = new BSHConsole( output );
             interpreter = new Interpreter( bshConsole );
-//            interpreter.setOut(out);
-//            interpreter.setErr(out);
-
+            interpreter.setClassLoader( Thread.currentThread().getContextClassLoader() );
+            try {
+                interpreter.set( "interpreter", interpreter );
+            }
+            catch( EvalError evalError ) {
+                writeError( evalError );
+            }
             setLocation( 0, 0 );
             setSize( 80, 24 );
             validate();
         }
 
         private void addMenuBar() {
-
             JMenuBar menubar = new JMenuBar();
             JMenu jMenuFile = new JMenu( "File" );
             jMenuFile.setMnemonic( 'F' );
@@ -269,12 +212,6 @@ public class CharvaBsh {
             JMenuItem exit = new JMenuItem( "Exit" );
             exit.addActionListener( new ActionListener() {
                 public void actionPerformed( ActionEvent ae_ ) {
-                    /*Thread t = new Thread( new Runnable() {
-                        public void run() {
-                            done();
-                        }
-                    } );*/
-//                    t.start();
                     done();
                 }
             } );
@@ -301,10 +238,7 @@ public class CharvaBsh {
             } );
             menubar.add( jMenuFile );
             jMenuFile.add( eval );
-//            jMenuFile.add( exitTest );
             jMenuFile.add( exit );
-//            jMenuFile.add( exitNoHide );
-//            jMenuFile.add( exitReRegister );
             jMenuFile.add( saveItem );
             jMenuFile.add( loadItem );
 
@@ -312,8 +246,9 @@ public class CharvaBsh {
         }
 
         private void evaluateText() {
+            interpreter.setClassLoader( Thread.currentThread().getContextClassLoader() );
             String sourcecode = editor.getText();
-            System.out.println( "Evaluating source string=" + sourcecode );
+//            System.out.println( "Evaluating source string=" + sourcecode );
             topLabel.setText( "Evaluating..." );
             repaint();
 //            Interpreter interpreter = new Interpreter();
@@ -329,19 +264,29 @@ public class CharvaBsh {
                 repaint();
             }
             catch( EvalError evalError ) {
-                evalError.printStackTrace();  //To change body of catch statement use Options | File Templates.
+                writeError( evalError );
             }
+        }
+
+        private void writeError( EvalError evalError ) {
+
+            StringWriter wr = new StringWriter();
+            evalError.printStackTrace( new PrintWriter( wr ) );
+//                String errorStr = wr.toString();
+            output.append( "Evaluation Error: " + evalError.getMessage() + "\n" );
+            output.append( "in line number: " + evalError.getErrorLineNumber() + "\n" );
+            output.append( evalError.getScriptStackTrace() + "\n" );
+            output.append( evalError.getErrorText() );
+//                output.append( errorStr );
         }
     }
 
     static class BSHConsole implements ConsoleInterface {
         BSHOutputAdapter out;
-        //private final JTextArea output;
         Reader reader = new StringReader( "456" );
 
         public BSHConsole( JTextArea output ) {
             this.out = new BSHOutputAdapter( output );
-            //this.output=output;
         }
 
         public Reader getIn() {
