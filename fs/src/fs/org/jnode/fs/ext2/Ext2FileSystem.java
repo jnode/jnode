@@ -10,13 +10,13 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
-import org.jnode.fs.AbstractFileSystem;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.ReadOnlyFileSystemException;
 import org.jnode.fs.ext2.cache.Block;
 import org.jnode.fs.ext2.cache.BlockCache;
 import org.jnode.fs.ext2.cache.INodeCache;
+import org.jnode.fs.spi.AbstractFileSystem;
 
 /**
  * @author Andras Nagy

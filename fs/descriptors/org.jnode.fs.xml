@@ -18,6 +18,7 @@
       <export name="org.jnode.fs.*"/>
       <export name="org.jnode.fs.partitions.*"/>
       <export name="org.jnode.fs.service.def.*"/>
+      <export name="org.jnode.fs.spi.*"/>
       <export name="org.jnode.fs.util.*"/>
     </library>
   </runtime>

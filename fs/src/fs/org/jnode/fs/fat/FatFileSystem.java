@@ -9,9 +9,9 @@ import java.util.Iterator;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.block.BlockDeviceAPI;
-import org.jnode.fs.AbstractFileSystem;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystemException;
+import org.jnode.fs.spi.AbstractFileSystem;
 
 /**
  * @author epr
