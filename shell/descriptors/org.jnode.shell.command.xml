@@ -31,6 +31,7 @@
     <alias name="help" class="org.jnode.shell.command.HelpCommand"/>
     <alias name="history" class="org.jnode.shell.command.HistoryCommand"/>
     <alias name="java" class="org.jnode.shell.command.JavaCommand"/>
+    <alias name="kill" class="org.jnode.shell.command.KillCommand"/>
     <alias name="memory" class="org.jnode.shell.command.MemoryCommand"/>
     <alias name="namespace" class="org.jnode.shell.command.NamespaceCommand"/>
     <alias name="thread" class="org.jnode.shell.command.ThreadCommand"/>

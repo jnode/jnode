@@ -31,7 +31,7 @@ import org.jnode.shell.help.Help;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class MemoryCommand implements Command
+public class MemoryCommand implements Command 
 {
 
 	public static Help.Info HELP_INFO = new Help.Info("memory", "View the current memory status");
@@ -45,8 +45,8 @@ public class MemoryCommand implements Command
 	 */
 	public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
 		final Runtime rt = Runtime.getRuntime();
-		out.println("Total memory " + rt.totalMemory());
-		out.println("Used memory  " + (rt.totalMemory() - rt.freeMemory()));
-		out.println("Free memory  " + rt.freeMemory());
+		out.println("Total memory " + (rt.totalMemory()/1048576) + "Mb");
+		out.println("Used memory  " + ((rt.totalMemory() - rt.freeMemory())/1048576) + "Mb");
+		out.println("Free memory  " + (rt.freeMemory()/1048576) + "Mb");
 	}
 }
