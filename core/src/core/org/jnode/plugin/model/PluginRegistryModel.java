@@ -11,8 +11,10 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
@@ -221,7 +223,60 @@ public class PluginRegistryModel extends VmSystemObject implements
 
 	/**
 	 * Load a plugin from a given loader.
-	 * This will not activate the plugin.
+	 * 
+	 * @param loader
+	 * @param pluginId
+	 * @param pluginVersion 
+	 * @return The descriptor of the loaded plugin.
+	 * @throws PluginException
+	 */
+	public PluginDescriptor loadPlugin(final PluginLoader loader, final String pluginId, final String pluginVersion) throws PluginException {
+		// Load the requested plugin
+		final HashMap descriptors = new HashMap();
+		final PluginDescriptor descr = loadPlugin(loader, pluginId, pluginVersion, false);
+		descriptors.put(descr.getId(), descr);
+		// Load the dependent plugins
+		loadDependencies(loader, descr, descriptors);
+		
+		// Resolve the loaded descriptors.
+		resolveDescriptors(descriptors.values());
+		return descr;
+	}
+	
+	private final void loadDependencies(PluginLoader loader, PluginDescriptor descr, Map descriptors) throws PluginException {
+		// Prerequisites
+		final PluginPrerequisite reqs[] = descr.getPrerequisites();
+		final int reqLength = reqs.length;
+		for (int i = 0; i < reqLength; i++) {
+			final PluginPrerequisite req = reqs[i];
+			final String id = req.getPluginId();
+			final String version = req.getPluginVersion();
+			loadDependency(loader, id, version, descriptors);
+		}
+		// Extensions
+		final Extension[] exts = descr.getExtensions();
+		final int extLength = exts.length;
+		for (int i = 0; i < extLength; i++) {
+			final Extension ext = exts[i];
+			final String id = ext.getExtensionPointPluginId();
+			loadDependency(loader, id, descr.getVersion(), descriptors);
+		}
+	}
+	
+	private final void loadDependency(PluginLoader loader, String id, String version, Map descriptors) throws PluginException {
+		if (getPluginDescriptor(id) != null) {
+			return;
+		}
+		if (descriptors.containsKey(id)) {
+			return;
+		}
+		final PluginDescriptor descr = loadPlugin(loader, id, version, false);
+		descriptors.put(descr.getId(), descr);
+		loadDependencies(loader, descr, descriptors);
+	}
+	
+	/**
+	 * Load a plugin from a given loader.
 	 * 
 	 * @param loader
 	 * @param pluginId

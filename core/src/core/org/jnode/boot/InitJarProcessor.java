@@ -14,7 +14,7 @@ import java.util.jar.JarFile;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginLoader;
-import org.jnode.plugin.PluginRegistry;
+import org.jnode.plugin.model.PluginRegistryModel;
 import org.jnode.system.BootLog;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.util.MemoryResourceRandomAccessBuffer;
@@ -48,7 +48,7 @@ public class InitJarProcessor {
 	 * 
 	 * @param piRegistry
 	 */
-	public List loadPlugins(PluginRegistry piRegistry) {
+	public List loadPlugins(PluginRegistryModel piRegistry) {
 		if (jarFile == null) {
 			return null;
 		}
