@@ -6,3 +6,4 @@ lib
 .classpath
 .project
 src.jpx
+*.patch
