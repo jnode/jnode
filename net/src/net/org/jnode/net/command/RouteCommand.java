@@ -6,7 +6,7 @@ package org.jnode.net.command;
 import org.jnode.driver.Device;
 import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.net.ipv4.IPv4Address;
-import org.jnode.net.ipv4.IPv4NetworkLayer;
+import org.jnode.net.ipv4.layer.IPv4NetworkLayer;
 import org.jnode.net.ipv4.util.Route;
 import org.jnode.net.util.NetUtils;
 import org.jnode.shell.help.DeviceArgument;

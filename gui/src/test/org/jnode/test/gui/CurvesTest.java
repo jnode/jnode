@@ -3,7 +3,7 @@
  */
 package org.jnode.test.gui;
 
-import org.jnode.awt.geom.Curves;
+import org.jnode.driver.video.util.Curves;
 
 /**
  * @author epr

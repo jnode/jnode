@@ -9,13 +9,14 @@
   <requires>
     <import plugin="org.jnode.net"/>
     <import plugin="org.jnode.net.arp"/>
+    <import plugin="org.jnode.net.ipv4.core"/>
   </requires>
         
   <runtime>
     <library name="jnode-net.jar">
-      <export name="org.jnode.net.ipv4.*"/>
       <export name="org.jnode.net.ipv4.bootp.*"/>
       <export name="org.jnode.net.ipv4.icmp.*"/>
+      <export name="org.jnode.net.ipv4.layer.*"/>
       <export name="org.jnode.net.ipv4.raw.*"/>
       <export name="org.jnode.net.ipv4.tcp.*"/>
       <export name="org.jnode.net.ipv4.udp.*"/>
@@ -24,7 +25,7 @@
   </runtime>
   
   <extension point="org.jnode.net.networkLayers">
-    <layer class="org.jnode.net.ipv4.IPv4NetworkLayer"/>
+    <layer class="org.jnode.net.ipv4.layer.IPv4NetworkLayer"/>
   </extension>
   
 </plugin>

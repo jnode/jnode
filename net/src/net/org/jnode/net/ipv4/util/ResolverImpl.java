@@ -1,3 +1,6 @@
+/*
+ * $Id$
+ */
 package org.jnode.net.ipv4.util;
 
 import java.net.UnknownHostException;
