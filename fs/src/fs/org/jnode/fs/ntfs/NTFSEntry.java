@@ -127,7 +127,7 @@ public class NTFSEntry implements FSEntry {
 	 */
 	public boolean isValid() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	/* (non-Javadoc)
