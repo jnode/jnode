@@ -1,6 +1,6 @@
+/* $Id$
+ */
 package org.jnode.fs.ext2;
-
-import java.io.IOException;
 
 /**
  * @author Andras Nagy
@@ -14,7 +14,7 @@ public class INodeBitmap extends FSBitmap {
 	 * Ext2FileSystem.createINode() is synchronized to the bitmap block
 	 * it operates on.
 	 */
-	protected static boolean testAndSetINode(byte[] data, int index) throws IOException{
+	protected static boolean testAndSetINode(byte[] data, int index) {
 		if( isFree(data, index) ) {
 			setBit(data, index);
 			return true;	

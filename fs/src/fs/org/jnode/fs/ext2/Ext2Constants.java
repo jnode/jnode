@@ -65,6 +65,13 @@ public class Ext2Constants {
 	public static final int EXT2_VALID_FS		=	0x0001;  // cleanly unmounted 
 	public static final int EXT2_ERROR_FS		=	0x0002; 
 	
+	//what to do when errors are detected
+	public static final int EXT2_ERRORS_CONTINUE=	0x0001;
+	public static final int EXT2_ERRORS_RO		=	0x0002;
+	public static final int EXT2_ERRORS_PANIC	=	0x0003;
+	public static final int EXT2_ERRORS_DEFAULT	=	EXT2_ERRORS_CONTINUE;
+	
+	
 	//S_FEATURE_RO_COMPAT constants
 	public static final long EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER	= 0x0001;
 	public static final long EXT2_FEATURE_RO_COMPAT_LARGE_FILE     	= 0x0002;

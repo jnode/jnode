@@ -33,15 +33,12 @@ public class INodeDescriptor {
 	//block bitmap.
 	private long preallocBlock;
 	private int preallocCount;
-	public synchronized Long usePreallocBlock() throws FileSystemException {
+	public synchronized long usePreallocBlock() throws FileSystemException {
 		if(preallocCount <= 0)
 			throw new FileSystemException("No preallocated blocks");
 		--preallocCount;
 		
-		//VERY ugly hack: when a long is returned, it is received corrupted: (a very large
-		//random number instead of the returned number). So wrap it into a Long.
-		//VM BUG?? 
-		return new Long(preallocBlock++);
+		return preallocBlock++;
 	}
 	
 	public INodeDescriptor(INodeTable iNodeTable, int iNodeNr, int group, int index) {

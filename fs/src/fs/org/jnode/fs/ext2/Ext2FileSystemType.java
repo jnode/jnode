@@ -23,7 +23,9 @@ public class Ext2FileSystemType implements FileSystemType {
 	 * @see org.jnode.fs.FileSystemType#create(Device, boolean)
 	 */
 	public FileSystem create(Device device, boolean readOnly) throws FileSystemException {
-		return new Ext2FileSystem(device, readOnly);
+		Ext2FileSystem fs = new Ext2FileSystem(device, readOnly);
+		fs.read();
+		return fs;
 	}
 
 	/**
@@ -47,6 +49,13 @@ public class Ext2FileSystemType implements FileSystemType {
 	 * @see org.jnode.fs.FileSystemType#format(org.jnode.driver.Device, java.lang.Object)
 	 */
 	public FileSystem format(Device device, Object specificOptions) throws FileSystemException {
-        throw new FileSystemException("Not ye implemented");
+        //throw new FileSystemException("Not ye implemented");
+		
+		//currently the only option is the block size
+		int blockSize = 1024*((Integer)specificOptions).intValue();
+		
+		Ext2FileSystem fs = new Ext2FileSystem(device, false);
+		fs.create(blockSize);
+		return fs;
 	}
 }

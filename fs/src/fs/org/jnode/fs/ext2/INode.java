@@ -37,27 +37,23 @@ public class INode {
 	 * Create an INode object from an existing inode on the disk.
 	 * @param fs
 	 * @param desc
-	 * @param data
 	 */
-	public INode(Ext2FileSystem fs, INodeDescriptor desc, byte[] data) {
+	public INode(Ext2FileSystem fs, INodeDescriptor desc) {
 		this.fs = fs;
 		this.desc = desc;
 		this.data = new byte[INODE_LENGTH];
+		log.setLevel(Level.DEBUG);
+	}
+	
+	public void read(byte[] data){
 		System.arraycopy(data, 0, this.data, 0, INODE_LENGTH);
 		setDirty(false);
-		log.setLevel(Level.DEBUG);
 	}
 	
 	/**
 	 * Create a new INode object from scratch
-	 * @param fs
-	 * @param desc
 	 */
-	public INode(Ext2FileSystem fs, INodeDescriptor desc, int fileFormat, int accessRights, int uid, int gid){
-		this.fs = fs;
-		this.desc = desc;
-		this.data = new byte[INODE_LENGTH];
-		
+	public void create(int fileFormat, int accessRights, int uid, int gid){
 		long time = System.currentTimeMillis()/1000;
 		log.debug("TIME:                "+time);
 		
@@ -69,7 +65,7 @@ public class INode {
 		setCtime(time);
 		setMtime(time);
 		setDtime(0);
-		setLinksCount(1);
+		setLinksCount(0);
 		//TODO: set other pesistent parameters?
 		
 		setDirty(true);
@@ -99,9 +95,8 @@ public class INode {
 	/**
 	 * write an inode back to disk
 	 * @throws IOException
-	 * @throws FileSystemException
 	 */
-	protected void update() throws IOException, FileSystemException{
+	protected void update() throws IOException{
 		try{
 			if(dirty) {
 				log.debug("  ** updating inode **");
@@ -405,7 +400,7 @@ public class INode {
 		setBlocks( getBlocks()-prealloc512 );
 		
 		while(desc.getPreallocCount()>0) {
-			fs.freeBlock( desc.usePreallocBlock().longValue() );
+			fs.freeBlock( desc.usePreallocBlock() );
 		}
 	}
 	
@@ -559,7 +554,7 @@ public class INode {
 		
 		//first, see if preallocated blocks exist
 		if( desc.getPreallocCount() > 0 ) {
-			return desc.usePreallocBlock().longValue();
+			return desc.usePreallocBlock();
 		}
 		
 		//no preallocated blocks:

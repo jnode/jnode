@@ -65,6 +65,9 @@ public class Ext2Directory implements FSDirectory {
 			dr = new Ext2DirectoryRecord(fs, newINode.getINodeNr(), Ext2Constants.EXT2_FT_DIR, name);
 
 			addDirectoryRecord(dr);
+			
+			//TODO: add synchronization
+			newINode.setLinksCount( newINode.getLinksCount()+1 );
 
 			newEntry = new Ext2Entry(newINode, name, Ext2Constants.EXT2_FT_DIR, fs, this.entry);
 			
@@ -121,6 +124,9 @@ public class Ext2Directory implements FSDirectory {
 
 			addDirectoryRecord(dr);
 			
+			//TODO: add synchronization
+			newINode.setLinksCount( newINode.getLinksCount()+1 );
+
 			// update the directory inode
 			iNode.update();
 		}catch(FileSystemException fse) {
@@ -128,6 +134,37 @@ public class Ext2Directory implements FSDirectory {
 		}
 		
 		return new Ext2Entry(newINode, name, Ext2Constants.EXT2_FT_REG_FILE, fs, this.entry); 
+	}
+	
+	/**
+	 * Attach an inode to a file.
+	 * @param iNodeNr
+	 * @return
+	 * @throws IOException
+	 */
+	protected FSEntry addINode(int iNodeNr, String linkName, int fileType) throws IOException {
+		if(isReadOnly())
+			throw new IOException("Filesystem or directory is mounted read-only!");
+			
+		//TODO: access rights, file type, UID and GID should be passed through the FSDirectory interface
+		Ext2DirectoryRecord dr;
+		try{
+			dr = new Ext2DirectoryRecord(fs, iNodeNr, fileType, linkName);
+			addDirectoryRecord(dr);
+
+			// update the directory inode
+			iNode.update();		
+			
+			INode linkedINode = fs.getINode(iNodeNr);
+			
+			//TODO: add synchronization
+			linkedINode.setLinksCount( linkedINode.getLinksCount()+1 );
+			
+			return new Ext2Entry(linkedINode, linkName, fileType, fs, this.entry); 
+		
+		}catch(FileSystemException fse) {
+			throw new IOException(fse);
+		}
 	}
 	
 	private void addDirectoryRecord(Ext2DirectoryRecord dr) throws IOException, FileSystemException{

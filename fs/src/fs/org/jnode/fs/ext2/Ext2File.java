@@ -209,11 +209,7 @@ public class Ext2File implements FSFile {
 	 */
 	public void flush() throws IOException {
 		log.debug("Ext2File.flush()");
-		try{
-			iNode.update();
-		}catch(FileSystemException fse) {
-			throw new IOException(fse);
-		}
+		iNode.update();
 		//update the group descriptors and superblock: needed if blocks have been 
 		//allocated or deallocated
 		iNode.getExt2FileSystem().updateFS();

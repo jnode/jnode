@@ -1,6 +1,5 @@
+/* $Id$ */
 package org.jnode.fs.ext2;
-
-import java.io.IOException;
 
 /**
  * @author Andras Nagy
@@ -16,7 +15,7 @@ public class BlockBitmap extends FSBitmap {
 	 * Ext2FileSystem.testAndSetBlock() is synchronized to the bitmap block
 	 * it operates on.
 	 */
-	protected static BlockReservation testAndSetBlock(byte[] data, int index) throws IOException{
+	protected static BlockReservation testAndSetBlock(byte[] data, int index) {
 		if( isFree(data, index) ) {
 			setBit(data, index);
 			//do preallocation
@@ -44,7 +43,7 @@ public class BlockBitmap extends FSBitmap {
 	 * Ext2FileSystem.findFreeBlocks() is synchronized to the bitmap block
 	 * it operates on.
 	 */
-	protected static BlockReservation findFreeBlocks(byte[] data, int metadataLength ) throws IOException{
+	protected static BlockReservation findFreeBlocks(byte[] data, int metadataLength ) {
 		//BlockReservation result;
 		int nonfullBitmap=-1;	//points to a nonfull byte in the bitmap
 		
