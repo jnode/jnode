@@ -491,8 +491,7 @@ final class FPUHelper implements X86CompilerConstants {
 
 			// Calculate
 			os.writeFPREM();
-			os.writeFXCH(Register.ST1);
-			os.writeFFREEP(Register.ST0);
+			os.writeFSTP(Register.ST1);
 
 			// Push result
 			vstack.push(fpuStack.tos());

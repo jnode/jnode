@@ -89,10 +89,13 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	 */
 	protected Item clone(EmitterContext ec) {
 		final Item res;
+		final AbstractX86Stream os = ec.getStream();
+
 		switch (getKind()) {
 		case Kind.REGISTER:
 			final X86RegisterPool pool = ec.getPool();
 			final Register r = pool.request(JvmType.INT);
+			os.writeMOV(INTSIZE, r, reg);
 			res = createReg(getType(), r);
 			pool.transferOwnerTo(r, res);
 			break;
@@ -112,7 +115,6 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			break;
 
 		case Kind.STACK:
-			AbstractX86Stream os = ec.getStream();
 			os.writePUSH(Register.SP, 0);
 			res = createStack(getType());
 			if (VirtualStack.checkOperandStack) {

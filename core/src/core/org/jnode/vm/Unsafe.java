@@ -1089,4 +1089,8 @@ public final class Unsafe {
 	 */
 	static native int getCPUID(int[] id);
 
+	/**
+	 * Force a breakpoint
+	 */
+	public static native void breakPoint();
 }

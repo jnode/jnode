@@ -41,6 +41,7 @@ import org.jnode.vm.x86.VmX86Architecture;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 import org.jnode.vm.x86.compiler.X86CompilerContext;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
+import org.jnode.vm.x86.compiler.X86IMTCompiler;
 import org.jnode.vm.x86.compiler.X86JumpTable;
 
 /**
@@ -294,7 +295,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 	 * @param index
 	 */
 	private final void dwstore(int jvmType, int index) {
-		final int disp = stackFrame.getEbpOffset(index);
+		final int disp = stackFrame.getWideEbpOffset(index);
 
 		// Pin down (load) other references to this local
 		vstack.loadLocal(eContext, disp);
@@ -484,11 +485,15 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 	 * 
 	 * @param objectr
 	 *            Register containing the object reference
+	 * @param typer
+	 *            Register containing the type reference
 	 * @param trueLabel
 	 *            Where to jump for a true result. A false result will continue
-	 *            directly after this method
+	 *            directly after this method Register ECX must be free and it
+	 *            destroyed.
 	 */
-	private final void instanceOf(Register objectr, Label trueLabel) {
+	private final void instanceOf(Register objectr, Register typer,
+			Register tmpr, Label trueLabel) {
 		//TODO: port to orp-style
 		final Label loopLabel = new Label(this.curInstrLabel + "loop");
 		final Label notInstanceOfLabel = new Label(this.curInstrLabel
@@ -497,24 +502,23 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		/* Is objectref null? */
 		os.writeTEST(objectr, objectr);
 		os.writeJCC(notInstanceOfLabel, X86Constants.JZ);
-		/* vmType -> edx */
-		os.writeMOV(INTSIZE, EDX, EAX);
-		/* TIB -> ESI */
-		os.writeMOV(INTSIZE, Register.ESI, objectr, tibOffset);
-		/* SuperClassesArray -> ESI */
-		os.writeMOV(INTSIZE, Register.ESI, Register.ESI, arrayDataOffset
+		/* TIB -> tmp */
+		os.writeMOV(INTSIZE, tmpr, objectr, tibOffset);
+		/* SuperClassesArray -> tmp */
+		os.writeMOV(INTSIZE, tmpr, tmpr, arrayDataOffset
 				+ (TIBLayout.SUPERCLASSES_INDEX * slotSize));
 		/* SuperClassesArray.length -> ECX */
-		os.writeMOV(INTSIZE, ECX, Register.ESI, arrayLengthOffset);
+		os.writeMOV(INTSIZE, ECX, tmpr, arrayLengthOffset);
 		/* &superClassesArray[0] -> esi */
-		os.writeLEA(Register.ESI, Register.ESI, arrayDataOffset);
+		os.writeLEA(tmpr, tmpr, arrayDataOffset);
 
 		os.setObjectRef(loopLabel);
-		/* superClassesArray[index++] -> eax */
-		os.writeLODSD();
+		/* cmp superClassesArray[index++],type */
+		os.writeCMP(tmpr, 0, typer);
 		/* Is equal? */
-		os.writeCMP(EAX, EDX);
 		os.writeJCC(trueLabel, X86Constants.JE);
+		// index++
+		os.writeLEA(tmpr, tmpr, slotSize);
 		try {
 			os.writeLOOP(loopLabel);
 		} catch (UnresolvedObjectRefException ex) {
@@ -888,6 +892,9 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		if (debug) {
 			BootLog.debug("#" + address + "\t" + vstack);
 		}
+		if (log) {
+			os.log("#" + address);
+		}
 		this.curAddress = address;
 		this.curInstrLabel = helper.getInstrLabel(address);
 		if (startOfBB || setCurInstrLabel) {
@@ -1075,7 +1082,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_checkcast(org.jnode.vm.classmgr.VmConstClass)
 	 */
 	public final void visit_checkcast(VmConstClass classRef) {
-		// Pre-claim EAX
+		// Pre-claim ECX
+		requestRegister(ECX);
 		requestRegister(EAX);
 
 		// check that top item is a reference
@@ -1084,7 +1092,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		// Load the ref
 		ref.load(eContext);
 		final Register refr = ref.getRegister();
-		final Register classr = requestRegister(JvmType.INT);
+		final Register classr = EAX;
+		final Register tmpr = requestRegister(JvmType.INT);
 
 		// Resolve the class
 		writeResolveAndLoadClassToReg(classRef, classr);
@@ -1095,11 +1104,13 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		os.writeTEST(refr, refr);
 		os.writeJCC(okLabel, X86Constants.JZ);
 		/* Is instanceof? */
-		instanceOf(refr, okLabel);
+		instanceOf(refr, classr, tmpr, okLabel);
 		/* Not instanceof */
 
-		// Release EAX here, so invokeJavaMethod can use it
-		releaseRegister(EAX);
+		// Release temp registers here, so invokeJavaMethod can use it
+		releaseRegister(ECX);
+		releaseRegister(classr);
+		releaseRegister(tmpr);
 
 		// Call SoftByteCodes.systemException
 		os.writePUSH(SoftByteCodes.EX_CLASSCAST);
@@ -1117,9 +1128,6 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 
 		// Leave ref on stack
 		vstack.push(ref);
-
-		// Release
-		releaseRegister(classr);
 	}
 
 	/**
@@ -2151,13 +2159,17 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		// Prepare
 		final X86RegisterPool pool = eContext.getPool();
 
+		// Pre-claim ECX
+		requestRegister(ECX);
+
 		// Load reference
 		final RefItem ref = vstack.popRef();
 		ref.load(eContext);
 		final Register refr = ref.getRegister();
 
-		// Allocate tmp register
+		// Allocate tmp registers
 		final Register classr = requestRegister(JvmType.INT);
+		final Register tmpr = requestRegister(JvmType.INT);
 
 		/* Objectref is already on the stack */
 		writeResolveAndLoadClassToReg(classRef, classr);
@@ -2166,7 +2178,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		final Label endLabel = new Label(this.curInstrLabel + "io-end");
 
 		/* Is instanceof? */
-		instanceOf(refr, trueLabel);
+		instanceOf(refr, classr, tmpr, trueLabel);
 		/* Not instanceof */
 		//TODO: use setcc instead of jumps
 		os.writeXOR(refr, refr);
@@ -2183,6 +2195,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 
 		// Release
 		pool.release(classr);
+		pool.release(tmpr);
+		pool.release(ECX);
 	}
 
 	/**
@@ -2209,88 +2223,102 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		 */
 
 		final VmMethod method = methodRef.getResolvedVmMethod();
-		final int selector = method.getSelector();
-		final int imtIndex = selector % ObjectLayout.IMT_LENGTH;
 		final int argSlotCount = count - 1;
-		final Label noCollLabel = new Label(this.curInstrLabel + "NoCollision");
-		final Label findSelectorLabel = new Label(this.curInstrLabel
-				+ "FindSelector");
-		final Label endLabel = new Label(this.curInstrLabel + "End");
 
-		// remove parameters from vstack
-		dropParameters(method, true);
+		if (false) {
+			final int selector = method.getSelector();
+			final int imtIndex = selector % ObjectLayout.IMT_LENGTH;
+			final Label noCollLabel = new Label(this.curInstrLabel
+					+ "NoCollision");
+			final Label findSelectorLabel = new Label(this.curInstrLabel
+					+ "FindSelector");
+			final Label endLabel = new Label(this.curInstrLabel + "End");
 
-		// Get objectref -> EBX
-		os.writeMOV(INTSIZE, Register.EBX, SP, argSlotCount * slotSize);
+			// remove parameters from vstack
+			dropParameters(method, true);
 
-		/*
-		 * // methodRef -> EDX os.writeMOV_Const(Register.EDX, methodRef); //
-		 * methodRef.selector -> ecx os.writeMOV(INTSIZE, Register.ECX,
-		 * Register.EDX,
-		 * context.getVmConstIMethodRefSelectorField().getOffset()); //
-		 * methodRef.selector -> eax os.writeMOV(INTSIZE, Register.EAX,
-		 * Register.ECX); // Clear edx os.writeXOR(Register.EDX, Register.EDX); //
-		 * IMT_LENGTH -> ESI os.writeMOV_Const(Register.ESI,
-		 * ObjectLayout.IMT_LENGTH); // selector % IMT_LENGTH -> edx
-		 */
-		os.writeMOV_Const(ECX, selector);
-		os.writeMOV_Const(EDX, imtIndex);
-		// Output: EBX=objectref, ECX=selector, EDX=imtIndex
+			// Get objectref -> EBX
+			os.writeMOV(INTSIZE, Register.EBX, SP, argSlotCount * slotSize);
 
-		/* objectref.TIB -> ebx */
-		os.writeMOV(INTSIZE, Register.EBX, Register.EBX, tibOffset);
-		/* boolean[] imtCollisions -> esi */
-		os.writeMOV(INTSIZE, Register.ESI, Register.EBX, arrayDataOffset
-				+ (TIBLayout.IMTCOLLISIONS_INDEX * slotSize));
-		/* Has collision at imt[index] ? */
-		os.writeMOV(INTSIZE, Register.EAX, Register.ESI, Register.EDX, 1,
-				arrayDataOffset);
-		os.writeTEST_AL(0xFF);
-		/* Object[] imt -> esi */
-		os.writeMOV(INTSIZE, Register.ESI, Register.EBX, arrayDataOffset
-				+ (TIBLayout.IMT_INDEX * slotSize));
-		/* selector -> ebx */
-		os.writeMOV(INTSIZE, Register.EBX, Register.ECX);
+			/*
+			 * // methodRef -> EDX os.writeMOV_Const(Register.EDX, methodRef); //
+			 * methodRef.selector -> ecx os.writeMOV(INTSIZE, Register.ECX,
+			 * Register.EDX,
+			 * context.getVmConstIMethodRefSelectorField().getOffset()); //
+			 * methodRef.selector -> eax os.writeMOV(INTSIZE, Register.EAX,
+			 * Register.ECX); // Clear edx os.writeXOR(Register.EDX,
+			 * Register.EDX); // IMT_LENGTH -> ESI
+			 * os.writeMOV_Const(Register.ESI, ObjectLayout.IMT_LENGTH); //
+			 * selector % IMT_LENGTH -> edx
+			 */
+			os.writeMOV_Const(ECX, selector);
+			os.writeMOV_Const(EDX, imtIndex);
+			// Output: EBX=objectref, ECX=selector, EDX=imtIndex
 
-		os.writeJCC(noCollLabel, X86Constants.JZ);
+			/* objectref.TIB -> ebx */
+			os.writeMOV(INTSIZE, Register.EBX, Register.EBX, tibOffset);
+			/* boolean[] imtCollisions -> esi */
+			os.writeMOV(INTSIZE, Register.ESI, Register.EBX, arrayDataOffset
+					+ (TIBLayout.IMTCOLLISIONS_INDEX * slotSize));
+			/* Has collision at imt[index] ? */
+			os.writeMOV(INTSIZE, Register.EAX, Register.ESI, Register.EDX, 1,
+					arrayDataOffset);
+			os.writeTEST_AL(0xFF);
+			/* Object[] imt -> esi */
+			os.writeMOV(INTSIZE, Register.ESI, Register.EBX, arrayDataOffset
+					+ (TIBLayout.IMT_INDEX * slotSize));
+			/* selector -> ebx */
+			os.writeMOV(INTSIZE, Register.EBX, Register.ECX);
 
-		// We have a collision
-		/* imt[index] (=collisionList) -> esi */
-		os.writeMOV(INTSIZE, Register.ESI, Register.ESI, Register.EDX, 4,
-				arrayDataOffset);
-		/* collisionList.length -> ecx */
-		os.writeMOV(INTSIZE, Register.ECX, Register.ESI, arrayLengthOffset);
-		/* &collisionList[0] -> esi */
-		os.writeLEA(Register.ESI, Register.ESI, arrayDataOffset);
+			os.writeJCC(noCollLabel, X86Constants.JZ);
 
-		os.setObjectRef(findSelectorLabel);
+			// We have a collision
+			/* imt[index] (=collisionList) -> esi */
+			os.writeMOV(INTSIZE, Register.ESI, Register.ESI, Register.EDX, 4,
+					arrayDataOffset);
+			/* collisionList.length -> ecx */
+			os.writeMOV(INTSIZE, Register.ECX, Register.ESI, arrayLengthOffset);
+			/* &collisionList[0] -> esi */
+			os.writeLEA(Register.ESI, Register.ESI, arrayDataOffset);
 
-		/* collisionList[index] -> eax */
-		os.writeLODSD();
-		/* collisionList[index].selector == selector? */
-		os.writeMOV(INTSIZE, Register.EDX, Register.EAX, context
-				.getVmMethodSelectorField().getOffset());
-		os.writeCMP(Register.EBX, Register.EDX);
-		os.writeJCC(endLabel, X86Constants.JE);
-		try {
-			os.writeLOOP(findSelectorLabel);
-		} catch (UnresolvedObjectRefException ex) {
-			throw new CompileError(ex);
+			os.setObjectRef(findSelectorLabel);
+
+			/* collisionList[index] -> eax */
+			os.writeLODSD();
+			/* collisionList[index].selector == selector? */
+			os.writeMOV(INTSIZE, Register.EDX, Register.EAX, context
+					.getVmMethodSelectorField().getOffset());
+			os.writeCMP(Register.EBX, Register.EDX);
+			os.writeJCC(endLabel, X86Constants.JE);
+			try {
+				os.writeLOOP(findSelectorLabel);
+			} catch (UnresolvedObjectRefException ex) {
+				throw new CompileError(ex);
+			}
+			/* Force a NPE further on */
+			os.writeXOR(Register.EAX, Register.EAX);
+			os.writeJMP(endLabel);
+
+			os.setObjectRef(noCollLabel);
+			/* imt[index] -> eax */
+			os.writeMOV(INTSIZE, Register.EAX, Register.ESI, Register.EDX, 4,
+					arrayDataOffset);
+
+			os.setObjectRef(endLabel);
+
+			/** Now invoke the method */
+			invokeJavaMethod(methodRef.getSignature());
+			// Result is already on the stack.
+		} else {
+			// remove parameters from vstack
+			dropParameters(method, true);
+			// Get objectref -> EAX
+			os.writeMOV(INTSIZE, EAX, SP, argSlotCount * slotSize);
+			// Write the actual invokeinterface
+			X86IMTCompiler.emitInvokeInterface(os, method);
+			// Write the push result
+			helper.pushReturnValue(method.getSignature());
 		}
-		/* Force a NPE further on */
-		os.writeXOR(Register.EAX, Register.EAX);
-		os.writeJMP(endLabel);
-
-		os.setObjectRef(noCollLabel);
-		/* imt[index] -> eax */
-		os.writeMOV(INTSIZE, Register.EAX, Register.ESI, Register.EDX, 4,
-				arrayDataOffset);
-
-		os.setObjectRef(endLabel);
-
-		/** Now invoke the method */
-		invokeJavaMethod(methodRef.getSignature());
-		// Result is already on the stack.
 	}
 
 	/**
@@ -2959,6 +2987,9 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		// Resolve the array class
 		writeResolveAndLoadClassToReg(clazz, classr);
 
+		// Release dims, because invokeJavaMethod needs EAX
+		dims.release(eContext);
+
 		// Now call the multianewarrayhelper
 		os.writePUSH(classr); // array-class
 		os.writePUSH(dimsr); // dimensions[]
@@ -2966,7 +2997,6 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		// Result is now on the vstack
 
 		// Release
-		dims.release(eContext);
 		releaseRegister(classr);
 	}
 
@@ -3236,12 +3266,12 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 			resultType = JvmType.INT;
 			break;
 		case JvmType.CHAR:
-			valSize = BYTESIZE;
+			valSize = WORDSIZE;
 			scale = 2;
 			resultType = JvmType.INT;
 			break;
 		case JvmType.SHORT:
-			valSize = BYTESIZE;
+			valSize = WORDSIZE;
 			scale = 2;
 			resultType = JvmType.INT;
 			break;
@@ -3308,10 +3338,13 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		switch (jvmType) {
 		case JvmType.BYTE:
 			os.writeMOVSX(resultr, resultr, BYTESIZE);
+			break;
 		case JvmType.CHAR:
 			os.writeMOVZX(resultr, resultr, WORDSIZE);
+			break;
 		case JvmType.SHORT:
 			os.writeMOVSX(resultr, resultr, WORDSIZE);
+			break;
 		}
 
 		// Release
@@ -3344,12 +3377,12 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 			valType = JvmType.INT;
 			break;
 		case JvmType.CHAR:
-			valSize = BYTESIZE;
+			valSize = WORDSIZE;
 			scale = 2;
 			valType = JvmType.INT;
 			break;
 		case JvmType.SHORT:
-			valSize = BYTESIZE;
+			valSize = WORDSIZE;
 			scale = 2;
 			valType = JvmType.INT;
 			break;

@@ -371,7 +371,7 @@ Lsetup_idt:
 	intport 0, int_div		; Division by 0
 	intport 1, int_debug    ; Debug exception
 	intport 2, int_nmi		; NMI
-	intport 3, int_bp		; Breakpoint
+	intport 3, int_bp, 3	; Breakpoint
 	intport 4, int_of		; Overflow
 	intport 5, int_bc, 3	; Bounds check
 	intport 6, int_inv_oc	; Invalid opcode
@@ -521,6 +521,7 @@ int_bp:
 	call sys_print_eax
     mov eax,bp_msg2
     call sys_print_str
+    call sys_print_intregs
 	ret
 
 bp_msg1: db 'breakpoint eip,eax=',0

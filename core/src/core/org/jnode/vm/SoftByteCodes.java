@@ -22,11 +22,17 @@ import org.jnode.vm.memmgr.VmHeapManager;
 public class SoftByteCodes implements Uninterruptible {
 
 	public static final int EX_NULLPOINTER = 0;
+
 	public static final int EX_PAGEFAULT = 1;
+
 	public static final int EX_INDEXOUTOFBOUNDS = 2;
+
 	public static final int EX_DIV0 = 3;
+
 	public static final int EX_ABSTRACTMETHOD = 4;
+
 	public static final int EX_STACKOVERFLOW = 5;
+
 	public static final int EX_CLASSCAST = 6;
 
 	private static VmHeapManager heapManager;
@@ -39,7 +45,8 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @return boolean
 	 * @throws PragmaUninterruptible
 	 */
-	public static boolean isInstanceof(Object object, VmType T) throws PragmaUninterruptible {
+	public static boolean isInstanceof(Object object, VmType T)
+			throws PragmaUninterruptible {
 		if (object == null) {
 			return false;
 		} else {
@@ -55,7 +62,8 @@ public class SoftByteCodes implements Uninterruptible {
 	}
 
 	/**
-	 * Resolve a const reference to a field to the actual field, in the context of the given current method.
+	 * Resolve a const reference to a field to the actual field, in the context
+	 * of the given current method.
 	 * 
 	 * @param currentMethod
 	 * @param fieldRef
@@ -63,7 +71,9 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @return VmField
 	 * @throws PragmaUninterruptible
 	 */
-	public static VmField resolveField(VmMethod currentMethod, VmConstFieldRef fieldRef, boolean isStatic) throws PragmaUninterruptible {
+	public static VmField resolveField(VmMethod currentMethod,
+			VmConstFieldRef fieldRef, boolean isStatic)
+			throws PragmaUninterruptible {
 		if (!fieldRef.getConstClass().isResolved()) {
 			resolveClass(fieldRef.getConstClass());
 		}
@@ -91,14 +101,16 @@ public class SoftByteCodes implements Uninterruptible {
 	}
 
 	/**
-	 * Resolve a const reference to a method to the actual method, in the context of the given current method.
+	 * Resolve a const reference to a method to the actual method, in the
+	 * context of the given current method.
 	 * 
 	 * @param currentMethod
 	 * @param methodRef
 	 * @return VmMethod
 	 * @throws PragmaUninterruptible
 	 */
-	public static VmMethod resolveMethod(VmMethod currentMethod, VmConstMethodRef methodRef) throws PragmaUninterruptible {
+	public static VmMethod resolveMethod(VmMethod currentMethod,
+			VmConstMethodRef methodRef) throws PragmaUninterruptible {
 		if (!methodRef.getConstClass().isResolved()) {
 			resolveClass(methodRef.getConstClass());
 		}
@@ -109,13 +121,17 @@ public class SoftByteCodes implements Uninterruptible {
 			vmClass.link();
 
 			// NEW
-			VmClassLoader curLoader = currentMethod.getDeclaringClass().getLoader();
+			VmClassLoader curLoader = currentMethod.getDeclaringClass()
+					.getLoader();
 			methodRef.resolve(curLoader);
 			return methodRef.getResolvedVmMethod();
 			// END NEW
 			/*
-			 * VmMethod method = vmClass.getMethod(methodRef); if (method == null) { String mname = methodRef.getName(); String cname = methodRef.getClassName(); Screen.debug("method not found ");
-			 * Screen.debug(mname); Screen.debug(" in "); Screen.debug(cname); throw new NoSuchMethodError(cname); }
+			 * VmMethod method = vmClass.getMethod(methodRef); if (method ==
+			 * null) { String mname = methodRef.getName(); String cname =
+			 * methodRef.getClassName(); Screen.debug("method not found ");
+			 * Screen.debug(mname); Screen.debug(" in "); Screen.debug(cname);
+			 * throw new NoSuchMethodError(cname); }
 			 * 
 			 * methodRef.setResolvedVmMethod(method);
 			 */
@@ -123,13 +139,15 @@ public class SoftByteCodes implements Uninterruptible {
 	}
 
 	/**
-	 * Resolve a const reference to a class to the actual class, in the context of the given current method.
+	 * Resolve a const reference to a class to the actual class, in the context
+	 * of the given current method.
 	 * 
 	 * @param classRef
 	 * @return VmClass
 	 * @throws PragmaUninterruptible
 	 */
-	public static VmType resolveClass(VmConstClass classRef) throws PragmaUninterruptible, PragmaPrivilegedAction {
+	public static VmType resolveClass(VmConstClass classRef)
+			throws PragmaUninterruptible, PragmaPrivilegedAction {
 		if (classRef.isResolved()) {
 			return classRef.getResolvedVmClass();
 		} else {
@@ -140,7 +158,9 @@ public class SoftByteCodes implements Uninterruptible {
 				VmType vmClass = cls.getVmClass();
 
 				/*
-				 * VmClass vmClass = curLoader.loadClass(cname, true); //VmClass vmClass = Main.getBootClass(classRef); if (vmClass == null) { throw new NoClassDefFoundError(cname);
+				 * VmClass vmClass = curLoader.loadClass(cname, true); //VmClass
+				 * vmClass = Main.getBootClass(classRef); if (vmClass == null) {
+				 * throw new NoClassDefFoundError(cname);
 				 */
 				classRef.setResolvedVmClass(vmClass);
 				return vmClass;
@@ -153,15 +173,17 @@ public class SoftByteCodes implements Uninterruptible {
 	}
 
 	/**
-	 * Allocate a new object with a given class and a given size in bytes. If size &lt; 0, the objectsize from the given class is used. The given size does not include the length of the object
-	 * header.
+	 * Allocate a new object with a given class and a given size in bytes. If
+	 * size &lt; 0, the objectsize from the given class is used. The given size
+	 * does not include the length of the object header.
 	 * 
 	 * @param vmClass
 	 * @param size
 	 * @return Object The new object
 	 * @throws PragmaUninterruptible
 	 */
-	public static Object allocObject(VmType vmClass, int size) throws PragmaUninterruptible {
+	public static Object allocObject(VmType vmClass, int size)
+			throws PragmaUninterruptible {
 		vmClass.link();
 
 		//Screen.debug("ao cls{");
@@ -190,13 +212,17 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @return The allocated array
 	 * @throws PragmaUninterruptible
 	 */
-	public static Object allocMultiArray(VmType vmClass, int[] dimensions) throws PragmaUninterruptible {
+	public static Object allocMultiArray(VmType vmClass, int[] dimensions)
+			throws PragmaUninterruptible {
 		//Syslog.debug("allocMultiArray "); // + vmClass);
-		return multinewarray_helper(dimensions, dimensions.length - 1, (VmArrayClass) vmClass);
+		return multinewarray_helper(dimensions, dimensions.length - 1,
+				(VmArrayClass) vmClass);
 	}
 
 	/**
-	 * Allocates a multidimensional array of type a, with dimensions given in dims[ind] to dims[dims.length-1]. a must be of dimensionality at least dims.length-ind.
+	 * Allocates a multidimensional array of type a, with dimensions given in
+	 * dims[ind] to dims[dims.length-1]. a must be of dimensionality at least
+	 * dims.length-ind.
 	 * 
 	 * @return allocated array object
 	 * @param dims
@@ -211,7 +237,9 @@ public class SoftByteCodes implements Uninterruptible {
 	 *             if there is not enough memory to perform operation
 	 * @throws PragmaUninterruptible
 	 */
-	public static Object multinewarray_helper(int[] dims, int ind, VmArrayClass a) throws OutOfMemoryError, NegativeArraySizeException, PragmaUninterruptible {
+	public static Object multinewarray_helper(int[] dims, int ind,
+			VmArrayClass a) throws OutOfMemoryError,
+			NegativeArraySizeException, PragmaUninterruptible {
 		//Syslog.debug("multinewarray_helper "); //+ " cls=" + a);
 		a.initialize();
 		final int length = dims[ind];
@@ -229,7 +257,8 @@ public class SoftByteCodes implements Uninterruptible {
 	}
 
 	/**
-	 * Allocate a new array with a given class as component type and a given number of elements.
+	 * Allocate a new array with a given class as component type and a given
+	 * number of elements.
 	 * 
 	 * @param currentMethod
 	 * @param vmClass
@@ -237,12 +266,14 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @return Object The new array
 	 * @throws PragmaUninterruptible
 	 */
-	public static Object anewarray(VmMethod currentMethod, VmType vmClass, int elements) throws PragmaUninterruptible {
+	public static Object anewarray(VmMethod currentMethod, VmType vmClass,
+			int elements) throws PragmaUninterruptible {
 
 		final String arrClsName = vmClass.getArrayClassName();
 		final VmType arrCls;
 		try {
-			final VmClassLoader curLoader = currentMethod.getDeclaringClass().getLoader();
+			final VmClassLoader curLoader = currentMethod.getDeclaringClass()
+					.getLoader();
 			arrCls = curLoader.loadClass(arrClsName, true);
 			//Screen.debug("an cls{");
 			//Screen.debug(vmClass.getName());
@@ -264,19 +295,22 @@ public class SoftByteCodes implements Uninterruptible {
 	}
 
 	/**
-	 * Allocate a new primivite array with a given arraytype and a given number of elements.
+	 * Allocate a new primivite array with a given arraytype and a given number
+	 * of elements.
 	 * 
 	 * @param atype
 	 * @param elements
 	 * @return Object The new array
 	 * @throws PragmaUninterruptible
 	 */
-	public static Object allocPrimitiveArray(int atype, int elements) throws PragmaUninterruptible {
+	public static Object allocPrimitiveArray(int atype, int elements)
+			throws PragmaUninterruptible {
 		VmHeapManager hm = heapManager;
 		if (hm == null) {
 			heapManager = hm = Vm.getVm().getHeapManager();
 		}
-		final Object result = hm.newArray(VmType.getPrimitiveArrayClass(atype), elements);
+		final Object result = hm.newArray(VmType.getPrimitiveArrayClass(atype),
+				elements);
 		return result;
 	}
 
@@ -288,7 +322,8 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @return Object The new array
 	 * @throws PragmaUninterruptible
 	 */
-	public static Object allocArray(VmType vmClass, int elements) throws PragmaUninterruptible {
+	public static Object allocArray(VmType vmClass, int elements)
+			throws PragmaUninterruptible {
 		VmHeapManager hm = heapManager;
 		if (hm == null) {
 			heapManager = hm = Vm.getVm().getHeapManager();
@@ -305,38 +340,52 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @return Throwable
 	 * @throws PragmaUninterruptible
 	 */
-	public static Throwable systemException(int nr, int address) throws PragmaUninterruptible, PragmaLoadStatics, PragmaPrivilegedAction {
+	public static Throwable systemException(int nr, int address)
+			throws PragmaUninterruptible, PragmaLoadStatics,
+			PragmaPrivilegedAction {
 		//Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
-		//Unsafe.die();
-	    //Unsafe.debug(nr); Unsafe.debug(address);
+		if (false) {
+			Unsafe.debug(nr);
+			Unsafe.debug(address);
+			Unsafe.die("System exception");
+		}
+		//Unsafe.debug(nr); Unsafe.debug(address);
 		final String hexAddress = NumberUtils.hex(address, 8);
-		final VmThread current = Unsafe.getCurrentProcessor().getCurrentThread();
+		final VmThread current = Unsafe.getCurrentProcessor()
+				.getCurrentThread();
 		//final String state = " (" + current.getReadableErrorState() + ")";
 		final String state = "";
 		// Mark a system exception, so the stacktrace uses the exception frame
 		// instead of the current frame.
 		current.setInSystemException();
 		switch (nr) {
-			case EX_NULLPOINTER :
-				return new NullPointerException("NPE at address " + hexAddress + state);
-			case EX_PAGEFAULT :
-				return new InternalError("Page fault at " + hexAddress + state);
-			case EX_INDEXOUTOFBOUNDS :
-				return new ArrayIndexOutOfBoundsException("Out of bounds at index " + address + state);
-			case EX_DIV0 :
-				return new ArithmeticException("Division by zero at address " + hexAddress + state);
-			case EX_ABSTRACTMETHOD :
-				return new AbstractMethodError("Abstract method at " + hexAddress + state);
-			case EX_STACKOVERFLOW :
-				return new StackOverflowError();
-			case EX_CLASSCAST :
-				return new ClassCastException();
-			default :
-				return new UnknownError("Unknown system-exception at " + hexAddress + state);
+		case EX_NULLPOINTER:
+			return new NullPointerException("NPE at address " + hexAddress
+					+ state);
+		case EX_PAGEFAULT:
+			return new InternalError("Page fault at " + hexAddress + state);
+		case EX_INDEXOUTOFBOUNDS:
+			return new ArrayIndexOutOfBoundsException("Out of bounds at index "
+					+ address + state);
+		case EX_DIV0:
+			return new ArithmeticException("Division by zero at address "
+					+ hexAddress + state);
+		case EX_ABSTRACTMETHOD:
+			return new AbstractMethodError("Abstract method at " + hexAddress
+					+ state);
+		case EX_STACKOVERFLOW:
+			return new StackOverflowError();
+		case EX_CLASSCAST:
+			return new ClassCastException();
+		default:
+			return new UnknownError("Unknown system-exception at " + hexAddress
+					+ state);
 		}
 	}
 
-	public static void unknownOpcode(int opcode, int pc) throws PragmaUninterruptible, PragmaLoadStatics, PragmaPrivilegedAction {
+	public static void unknownOpcode(int opcode, int pc)
+			throws PragmaUninterruptible, PragmaLoadStatics,
+			PragmaPrivilegedAction {
 		throw new Error("Unknown opcode " + opcode + " at pc " + pc);
 	}
 }

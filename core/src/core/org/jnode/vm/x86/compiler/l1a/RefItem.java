@@ -36,7 +36,7 @@ final class RefItem extends WordItem implements X86CompilerConstants {
 	// generate unique labels for writeStatics (should use current label)
 	private long labelCounter;
 
-	private VmConstString value;
+	private final VmConstString value;
 
 	/**
 	 * @param kind
@@ -84,7 +84,7 @@ final class RefItem extends WordItem implements X86CompilerConstants {
 	protected void loadToConstant(EmitterContext ec, AbstractX86Stream os,
 			Register reg) {
 		if (value == null) {
-			os.writeMOV_Const(reg, value);
+			os.writeXOR(reg, reg);
 		} else {
 			X86CompilerHelper helper = ec.getHelper();
 			Label l = new Label(Long.toString(labelCounter++));
