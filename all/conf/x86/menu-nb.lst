@@ -7,6 +7,11 @@ title JNode (all plugins)
 kernel (nd)/jnodesys.gz
 module (nd)/full.jgz
 
+# JNode Install
+title JNode Install
+kernel (nd)/jnodesys.gz
+module (nd)/install.jgz
+
 
 
 

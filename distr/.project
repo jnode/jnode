@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>JNode-All</name>
+	<name>JNode-Distr</name>
 	<comment></comment>
 	<projects>
-		<project>JNode-Builder</project>
 		<project>JNode-Core</project>
-		<project>JNode-Distr</project>
-		<project>JNode-FS</project>
-		<project>JNode-GUI</project>
-		<project>JNode-Net</project>
-		<project>JNode-Shell</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

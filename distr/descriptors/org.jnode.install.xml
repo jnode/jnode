@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.install" 
+        name="JNode Installation Program"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.fs"/>
+    <import plugin="org.jnode.log4j"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-distr.jar">
+      <export name="org.jnode.install.*"/>
+    </library>
+  </runtime>
+        
+</plugin>

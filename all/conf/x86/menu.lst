@@ -13,5 +13,9 @@ dhcp
 kernel (nd)/jnodesys.gz
 module (nd)/full.jgz
 
+# JNode Install
+title JNode Install
+kernel (hd0,0)/jnodesys.gz
+module (hd0,0)/install.jgz
 
 
