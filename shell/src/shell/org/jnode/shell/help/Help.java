@@ -125,10 +125,12 @@ public abstract class Help {
         public String complete(CommandLine partial) throws CompletionException {
             //System.out.println("completing \"" + partial + "\"");
             String max = "";
+            boolean foundCompletion = false;
             for (int i = 0; i < syntaxes.length; i++) {
                 try {
                     final String s = syntaxes[ i].complete(partial
                             .getRemainder());
+                    foundCompletion = true;
                     if (s.length() > max.length()) {
                         max = s;
                     }
@@ -141,7 +143,7 @@ public abstract class Help {
                     // + ex.toString());
                 }
             }
-            if (max.length() > 0) {
+            if ((max.length() > 0) || foundCompletion) {
                 return max;
             } else {
                 System.out.println();
