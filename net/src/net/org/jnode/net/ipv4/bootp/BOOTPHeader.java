@@ -14,11 +14,21 @@ import org.jnode.net.ipv4.IPv4Address;
  * @author epr
  */
 public class BOOTPHeader {
-	
+
+	/** Size of the BOOTP header (236 bytes) */
+	public static final int SIZE = 236;
+
+	/** Client to server message */
+	public static final int BOOTREQUEST = 1;
+	/** Server to client message */
+	public static final int BOOTREPLY = 2;
+
 	private final int opcode;
 	private final int hwType;
 	private final int hopCount;
 	private final int transactionID;
+	private final int secondsElapsed;
+	private final int flags;
 	private final HardwareAddress clientHwAddress;
 	private final IPv4Address clientIPAddress;
 	private final IPv4Address yourIPAddress;
@@ -34,6 +44,8 @@ public class BOOTPHeader {
 		this.hwType = skbuf.get(1);
 		this.hopCount = skbuf.get(3);
 		this.transactionID = skbuf.get32(4);
+		this.secondsElapsed = skbuf.get16(8);
+		this.flags = skbuf.get16(10);
 		this.clientIPAddress = new IPv4Address(skbuf, 12);
 		this.yourIPAddress = new IPv4Address(skbuf, 16);
 		this.serverIPAddress = new IPv4Address(skbuf, 20);
@@ -65,6 +77,8 @@ public class BOOTPHeader {
 		this.hwType = clientHwAddress.getType();
 		this.hopCount = 0;
 		this.transactionID = transactionID;
+		this.secondsElapsed = 0;
+		this.flags = 0;
 		this.clientIPAddress = clientIPAddress;
 		this.yourIPAddress = null;
 		this.serverIPAddress = null;
@@ -77,12 +91,14 @@ public class BOOTPHeader {
 	 * @param skbuf
 	 */
 	public void prefixTo(SocketBuffer skbuf) {
-		skbuf.insert(300);
+		skbuf.insert(SIZE);
 		skbuf.set(0, opcode);
 		skbuf.set(1, hwType);
 		skbuf.set(2, clientHwAddress.getLength());
 		skbuf.set(3, hopCount);
 		skbuf.set32(4, transactionID);
+		skbuf.set16(8, secondsElapsed);
+		skbuf.set16(10, flags);
 		if (clientIPAddress != null) {
 			clientIPAddress.writeTo(skbuf, 12);
 		}
@@ -99,15 +115,16 @@ public class BOOTPHeader {
 			clientHwAddress.writeTo(skbuf, 28);
 		}
 	}
-	
-	/**
-	 * Gets this header as DatagramPacket
-	 */
-	public DatagramPacket asDatagramPacket() {
-		final SocketBuffer skbuf = new SocketBuffer();
-		prefixTo(skbuf);
-		final byte[] data = skbuf.toByteArray();
-		return new DatagramPacket(data, data.length);
+
+	private void setServerHostName(String sname) {
+		final int len = sname.length();
+		if(sname != null && len > 63)
+			throw new IllegalArgumentException("Server host name is too long, "+len+" > 127.");
+	}
+	private void setBootFileName(String file) {
+		final int len = file.length();
+		if(file != null && len > 127)
+			throw new IllegalArgumentException("Boot file name is too long, "+len+" > 127.");
 	}
 
 	/**
