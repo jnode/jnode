@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.apps.edit"
+        name="A simple editor for JNode OS"
+        version="@VERSION@"
+        provider-name="Levente Santha">
+	
+  <runtime>
+    <library name="jnode-distr.jar">
+      <export name="org.jnode.apps.edit.*"/>
+    </library>
+  </runtime>
+  
+  <requires>
+     <import plugin="charva"/>
+     <import plugin="org.jnode.shell.help"/>
+  </requires>
+		 
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.security.AllPermission"/>
+  </extension>
+  
+  <extension point="org.jnode.shell.aliases">
+      <alias name="edit"  class="org.jnode.apps.edit.EditCommand"/>
+  </extension>
+</plugin>
