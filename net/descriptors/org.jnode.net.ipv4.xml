@@ -10,6 +10,7 @@
     <import plugin="org.jnode.net"/>
     <import plugin="org.jnode.net.arp"/>
     <import plugin="org.jnode.net.ipv4.core"/>
+    <import plugin="org.apache.jakarta.commons.net"/>
   </requires>
         
   <runtime>
@@ -19,6 +20,7 @@
       <export name="org.jnode.net.ipv4.layer.*"/>
       <export name="org.jnode.net.ipv4.raw.*"/>
       <export name="org.jnode.net.ipv4.tcp.*"/>
+      <export name="org.jnode.net.ipv4.tftp.*"/>
       <export name="org.jnode.net.ipv4.udp.*"/>
       <export name="org.jnode.net.ipv4.util.*"/>
     </library>
