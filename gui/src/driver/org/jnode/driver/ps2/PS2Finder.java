@@ -9,6 +9,7 @@ import org.jnode.driver.DeviceException;
 import org.jnode.driver.DeviceFinder;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DriverException;
+import org.jnode.util.NumberUtils;
 
 /**
  * PS2 device finder.
@@ -35,9 +36,12 @@ public class PS2Finder implements DeviceFinder, PS2Constants {
 			devMan.register(kbDev);
 
 			// register the keyboard device
-			PS2Device pDev = new PS2Device(ps2, PS2_POINTER_DEV);
-			pDev.setDriver(new PS2PointerDriver(ps2));
-			devMan.register(pDev);
+			if (ps2.testMouse()) {
+				PS2Device pDev = new PS2Device(ps2, PS2_POINTER_DEV);
+				pDev.setDriver(new PS2PointerDriver(ps2));
+				devMan.register(pDev);
+			}
+			log.debug("ps2stat 0x" + NumberUtils.hex(ps2.readStatus(), 2));
 		} catch (DriverException ex) {
 			log.debug("Error searching for PS2 devices: " + ex);
 			throw new DeviceException(ex);
