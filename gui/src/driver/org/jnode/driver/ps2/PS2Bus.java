@@ -256,7 +256,7 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 
 		int data;
 		try {
-			data = mouseChannel.read(50);
+			data = mouseChannel.read(COMMAND_TIMEOUT);
 		} catch (IOException ex) {
 			log.debug("IOException in readMouse", ex);
 			return false;
