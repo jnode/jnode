@@ -74,9 +74,10 @@ public class FatFileSystemType implements FileSystemType {
 	 * Create a filesystem for a given device.
 	 * 
 	 * @param device
+	 * @param readOnly
 	 */
-	public FileSystem create(Device device) throws FileSystemException {
-		return new FatFileSystem(device);
+	public FileSystem create(Device device, boolean readOnly) throws FileSystemException {
+		return new FatFileSystem(device, readOnly);
 	}
 
 	/**
@@ -118,7 +119,8 @@ public class FatFileSystemType implements FileSystemType {
 					1,
 					FAT_STANDARD_BS);
 			ff.format(api);
-			return new FatFileSystem(device);
+			
+			return new FatFileSystem(device, false); // not readOnly !
 		} catch (IOException ioe) {
 			throw new FileSystemException("Formating problem", ioe);
 		} catch (ApiNotFoundException e) {
