@@ -25,7 +25,7 @@ public class DisassembleCommand {
 	static final Parameter PARAM_LEVEL = new Parameter(ARG_LEVEL, Parameter.OPTIONAL);
 	static final Parameter PARAM_TEST = new Parameter(ARG_TEST, Parameter.OPTIONAL);
 	
-	public static Help.Info HELP_INFO = new Help.Info("compile", "Compile a Java class",
+	public static Help.Info HELP_INFO = new Help.Info("disasm", "Disasm a Java class",
             new Parameter[] {
                 new Parameter(ARG_CLASS, Parameter.MANDATORY),
                 new Parameter(ARG_METHOD, Parameter.OPTIONAL),
