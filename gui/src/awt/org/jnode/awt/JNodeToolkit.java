@@ -195,6 +195,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 */
 	protected final synchronized int decRefCount(boolean forceClose) {
 		refCount--;
+		log.debug("refCount.dec=" + refCount);
 		if ((refCount == 0) || forceClose) {
 			onClose();
 			if (keyboardHandler != null) {
@@ -210,6 +211,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 			this.graphics = null;
 			this.keyboardHandler = null;
 			this.mouseHandler = null;
+			this.refCount = 0;
 		}
 		return refCount;
 	}
@@ -473,6 +475,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 			rc = refCount;
 			initialize = (refCount == 1);
 		}
+		log.debug("refCount.inc=" + rc);
 		if (initialize) {
 			final JNodeFrameBufferDevice dev = (JNodeFrameBufferDevice) GraphicsEnvironment
 					.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -488,6 +491,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 						screenSize);
 
 				onInitialize();
+				this.refCount = rc;
 			} catch (DeviceException ex) {
 				decRefCount(true);
 				throw (AWTError) new AWTError(ex.getMessage()).initCause(ex);

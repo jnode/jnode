@@ -120,7 +120,7 @@ public class SwingToolkit extends JNodeToolkit {
             log.debug("createFrame:desktopFramePeer(" + target + ")");
             // Only desktop is real frame
             initialized = true;
-            decRefCount(false);
+            //decRefCount(false);
             return new DesktopFramePeer(this, target);
         } else {
             log.debug("createFrame:normal(" + target + ")");
