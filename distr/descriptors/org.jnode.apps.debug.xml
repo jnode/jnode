@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.apps.debug"
+        name="JNode Test Client"
+        version="@VERSION@"
+        provider-name="Andras Nagy">
+	
+  <runtime>
+    <library name="jnode-distr.jar">
+      <export name="org.jnode.apps.debug.*"/>
+    </library>
+  </runtime>
+  
+  <requires>
+     <import plugin="charva"/>
+     <import plugin="org.jnode.shell.help"/>
+  </requires>
+		 
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.security.AllPermission"/>
+  </extension>
+  
+  <extension point="org.jnode.shell.aliases">
+      <alias name="tc"  class="org.jnode.apps.debug.TC"/>
+  </extension>
+</plugin>
