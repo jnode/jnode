@@ -1,5 +1,5 @@
 /* GeneralPath.java -- represents a shape built from subpaths
-   Copyright (C) 2002 Free Software Foundation
+   Copyright (C) 2002, 2003 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt.geom;
 
 import java.awt.Rectangle;
@@ -45,8 +46,8 @@ import java.awt.Shape;
  * XXX Implement and document. Note that Sun's implementation only expects
  * float precision, not double.
  */
-public final class GeneralPath implements Shape, Cloneable {
-
+public final class GeneralPath implements Shape, Cloneable
+{
 	public static final int WIND_EVEN_ODD = PathIterator.WIND_EVEN_ODD;
 	public static final int WIND_NON_ZERO = PathIterator.WIND_NON_ZERO;
 
@@ -54,382 +55,423 @@ public final class GeneralPath implements Shape, Cloneable {
 	private static final int INIT_SIZE = 20;
 
 	/** The winding rule. */
-	int rule;
-
-	private Segment firstSeg;
-	private Segment curSeg;
-	private float[] minMax = new float[] { Float.MAX_VALUE, Float.MAX_VALUE, Float.MIN_VALUE, Float.MIN_VALUE };
-
+  private int rule;
+  /**
+   * The path type in points. Note that points[index] maps to
+   * types[index >> 1]; the control points of quad and cubic paths map as
+   * well but are ignored.
+   */
+  private byte[] types;
+  /**
+   * The list of all points seen. Since you can only append floats, it makes
+   * sense for this to be a float[]. I have no idea why Sun didn't choose to
+   * allow a general path of double precision points.
+   */
+  private float[] points;
 	/** The index of the most recent moveto point, or null. */
-	private Point2D subpath = null;
+  private int subpath = -1;
+  /** The next available index into points. */
+  private int index;
 
-	static final int nrPoints[] = { 2, 2, 4, 6, 2 };
-
-	public GeneralPath() {
+  public GeneralPath()
+  {
 		this(WIND_NON_ZERO, INIT_SIZE);
 	}
-	public GeneralPath(int rule) {
+  public GeneralPath(int rule)
+  {
 		this(rule, INIT_SIZE);
 	}
-	public GeneralPath(int rule, int capacity) {
-		if (rule != WIND_EVEN_ODD && rule != WIND_NON_ZERO) {
+  public GeneralPath(int rule, int capacity)
+  {
+    if (rule != WIND_EVEN_ODD && rule != WIND_NON_ZERO)
 			throw new IllegalArgumentException();
-		}
 		this.rule = rule;
-		if (capacity < INIT_SIZE) {
+    if (capacity < INIT_SIZE)
 			capacity = INIT_SIZE;
+    types = new byte[capacity >> 1];
+    points = new float[capacity];
 		}
-		firstSeg = new Segment(capacity);
-		curSeg = firstSeg;
-	}
-
-	public GeneralPath(Shape s) {
-		if (s instanceof GeneralPath) {
-			final GeneralPath src = (GeneralPath)s;
-			this.rule = src.rule;
-			this.firstSeg = new Segment(src.firstSeg);
-			this.curSeg = firstSeg;
-			Segment srcP = src.firstSeg;
-			Segment thisP = this.firstSeg;
-			while (srcP.getNext() != null) {
-				thisP.append(new Segment(srcP.getNext()));
-				thisP = thisP.getNext();
-				srcP = srcP.getNext();
-				curSeg = thisP;
-			} 
-			this.minMax = new float[4];
-			System.arraycopy(src.minMax, 0, this.minMax, 0, 4);
-		} else {
-			firstSeg = new Segment();
-			curSeg = firstSeg;
-			final PathIterator pi = s.getPathIterator(null);
+  public GeneralPath(Shape s)
+  {
+    types = new byte[INIT_SIZE >> 1];
+    points = new float[INIT_SIZE];
+    PathIterator pi = s.getPathIterator(null);
 			setWindingRule(pi.getWindingRule());
 			append(pi, false);
 		}
+
+  public void moveTo(float x, float y)
+  {
+    subpath = index;
+    ensureSize(index + 2);
+    types[index >> 1] = PathIterator.SEG_MOVETO;
+    points[index++] = x;
+    points[index++] = y;
+	}
+  public void lineTo(float x, float y)
+  {
+    ensureSize(index + 2);
+    types[index >> 1] = PathIterator.SEG_LINETO;
+    points[index++] = x;
+    points[index++] = y;
+	}
+  public void quadTo(float x1, float y1, float x2, float y2)
+  {
+    ensureSize(index + 4);
+    types[index >> 1] = PathIterator.SEG_QUADTO;
+    points[index++] = x1;
+    points[index++] = y1;
+    points[index++] = x2;
+    points[index++] = y2;
+  }
+  public void curveTo(float x1, float y1, float x2, float y2,
+                      float x3, float y3)
+  {
+    ensureSize(index + 6);
+    types[index >> 1] = PathIterator.SEG_CUBICTO;
+    points[index++] = x1;
+    points[index++] = y1;
+    points[index++] = x2;
+    points[index++] = y2;
+    points[index++] = x3;
+    points[index++] = y3;
+  }
+  public void closePath()
+  {
+    ensureSize(index + 2);
+    types[index >> 1] = PathIterator.SEG_CLOSE;
+    points[index++] = points[subpath];
+    points[index++] = points[subpath + 1];
 	}
 
-	public void moveTo(float x, float y) {
-		subpath = new Point2D.Float(x, y);
-		add(PathIterator.SEG_MOVETO, x, y);
-	}
-
-	public void lineTo(float x, float y) {
-		add(PathIterator.SEG_LINETO, x, y);
-	}
-
-	public void quadTo(float x1, float y1, float x2, float y2) {
-		add(PathIterator.SEG_QUADTO, x1, y1);
-		add(0, x2, y2);
-	}
-
-	public void curveTo(float x1, float y1, float x2, float y2, float x3, float y3) {
-		add(PathIterator.SEG_CUBICTO, x1, y1);
-		add(0, x2, y2);
-		add(0, x3, y3);
-	}
-
-	public void closePath() {
-		add(PathIterator.SEG_CLOSE, (float) subpath.getX(), (float) subpath.getY());
-	}
-
-	public void append(Shape s, boolean connect) {
+  public void append(Shape s, boolean connect)
+  {
 		append(s.getPathIterator(null), connect);
 	}
 
-	public void append(PathIterator pi, boolean connect) {
-		final float[] f = new float[6];
-		while (!pi.isDone()) {
-			final int result = pi.currentSegment(f);
-			pi.next();
-			switch (result) {
-				case PathIterator.SEG_MOVETO :
-					if (!connect) {
+
+  /**
+   * Appends the segments of a PathIterator to this GeneralPath.
+   * Optionally, the initial {@link PathIterator#SEG_MOVETO} segment
+   * of the appended path is changed into a {@link
+   * PathIterator#SEG_LINETO} segment.
+   *
+   * @param iter the PathIterator specifying which segments shall be
+   * appended.
+   * 
+   * @param connect <code>true</code> for substituting the initial
+   * {@link PathIterator#SEG_MOVETO} segment by a {@link
+   * PathIterator#SEG_LINETO}, or <code>false</code> for not
+   * performing any substitution. If this GeneralPath is currently
+   * empty, <code>connect</code> is assumed to be <code>false</code>,
+   * thus leaving the initial {@link PathIterator#SEG_MOVETO}
+   * unchanged.
+   */
+  public void append(PathIterator iter, boolean connect)
+  {
+    // A bad implementation of this method had caused Classpath bug #6076.
+    float[] f = new float[6];
+    while (!iter.isDone())
+    {
+      switch (iter.currentSegment(f))
+      {
+      case PathIterator.SEG_MOVETO:
+        if (!connect || (index == 0))
+        {
 						moveTo(f[0], f[1]);
 						break;
 					}
-					if ((subpath != null) && (f[0] == subpath.getX()) && (f[1] == subpath.getY())) {
+
+        if ((index >= 2) && (types[(index - 2) >> 2] == PathIterator.SEG_CLOSE)
+            && (f[0] == points[index - 2]) && (f[1] == points[index - 1]))
 						break;
-					}
-					// Fallthrough.
-				case PathIterator.SEG_LINETO :
+        
+        // Fall through.
+
+      case PathIterator.SEG_LINETO:
 					lineTo(f[0], f[1]);
 					break;
-				case PathIterator.SEG_QUADTO :
+
+      case PathIterator.SEG_QUADTO:
 					quadTo(f[0], f[1], f[2], f[3]);
 					break;
-				case PathIterator.SEG_CUBICTO :
+
+      case PathIterator.SEG_CUBICTO:
 					curveTo(f[0], f[1], f[2], f[3], f[4], f[5]);
 					break;
-				default :
+
+      case PathIterator.SEG_CLOSE:
 					closePath();
+        break;
 			}
+
 			connect = false;
+      iter.next();
 		}
 	}
 
-	public int getWindingRule() {
+
+  public int getWindingRule()
+  {
 		return rule;
 	}
-	public void setWindingRule(int rule) {
+  public void setWindingRule(int rule)
+  {
 		if (rule != WIND_EVEN_ODD && rule != WIND_NON_ZERO)
 			throw new IllegalArgumentException();
 		this.rule = rule;
 	}
 
-	public Point2D getCurrentPoint() {
-		return subpath;
+  public Point2D getCurrentPoint()
+  {
+    if (subpath < 0)
+      return null;
+    return new Point2D.Float(points[index - 2], points[index - 1]);
+  }
+  public void reset()
+  {
+    subpath = -1;
+    index = 0;
 	}
 
-	public void reset() {
-		subpath = null;
-		firstSeg = new Segment();
-		curSeg = firstSeg;
+  public void transform(AffineTransform xform)
+  {
+    xform.transform(points, 0, points, 0, index >> 1);
 	}
-
-	public void transform(AffineTransform xform) {
-		Segment p = firstSeg;
-		while (p != null) {
-			p.transform(xform);
-			p = p.getNext();
-		}
-		xform.transform(minMax, 0, minMax, 0, 2);
-	}
-
-	public Shape createTransformedShape(AffineTransform xform) {
+  public Shape createTransformedShape(AffineTransform xform)
+  {
 		GeneralPath p = new GeneralPath(this);
 		p.transform(xform);
 		return p;
 	}
 
-	public Rectangle getBounds() {
+  public Rectangle getBounds()
+  {
 		return getBounds2D().getBounds();
 	}
-	
-	public Rectangle2D getBounds2D() {
-		final float w = (minMax[2] - minMax[0]) + 1;
-		final float h = (minMax[3] - minMax[1]) + 1;
-		return new Rectangle2D.Float(minMax[0], minMax[1], w, h);
+  public Rectangle2D getBounds2D()
+  {
+    // XXX Implement.
+    throw new Error("not implemented");
 	}
 
-	public boolean contains(double x, double y) {
+  public boolean contains(double x, double y)
+  {
 		// XXX Implement.
 		throw new Error("not implemented");
 	}
-	
-	public boolean contains(Point2D p) {
+  public boolean contains(Point2D p)
+  {
 		return contains(p.getX(), p.getY());
 	}
-	
-	public boolean contains(double x, double y, double w, double h) {
+  public boolean contains(double x, double y, double w, double h)
+  {
 		// XXX Implement.
 		throw new Error("not implemented");
 	}
-	
-	public boolean contains(Rectangle2D r) {
+  public boolean contains(Rectangle2D r)
+  {
 		return contains(r.getX(), r.getY(), r.getWidth(), r.getHeight());
 	}
 
-	public boolean intersects(double x, double y, double w, double h) {
+  public boolean intersects(double x, double y, double w, double h)
+  {
 		// XXX Implement.
 		throw new Error("not implemented");
 	}
-
-	public boolean intersects(Rectangle2D r) {
+  public boolean intersects(Rectangle2D r)
+  {
 		return intersects(r.getX(), r.getY(), r.getWidth(), r.getHeight());
 	}
 
-	public PathIterator getPathIterator(final AffineTransform at) {
-		final Segment firstSeg = this.firstSeg;
-		return new PathIterator() {
-			private int current = 0;
-			private Segment seg = firstSeg;
 
-			public int getWindingRule() {
-				return rule;
-			}
+  /**
+   * A PathIterator that iterates over the segments of a GeneralPath.
+   *
+   * @author Sascha Brawer (brawer@dandelis.ch)
+   */
+  private static class GeneralPathIterator
+    implements PathIterator
+  {
+    /**
+     * The number of coordinate values for each segment type.
+     */
+    private static final int[] NUM_COORDS =
+    {
+      /* 0: SEG_MOVETO */ 2,
+      /* 1: SEG_LINETO */ 2,
+      /* 2: SEG_QUADTO */ 4,
+      /* 3: SEG_CUBICTO */ 6,
+      /* 4: SEG_CLOSE */ 0
+    };
 
-			public boolean isDone() {
-				return seg.isDone(current);
-			}
 
-			public void next() {
-				if (!isDone()) {
-					final int type = seg.getType(current);
-					final int count = nrPoints[type];
-					current += count;
-					if ((current >= seg.size()) && (seg.getNext() != null)) {
-						current -= seg.size();
-						seg = seg.getNext();
-					}
-				}
-			}
+    /**
+     * The GeneralPath whose segments are being iterated.
+     */
+    private final GeneralPath path;
 
-			public int currentSegment(float[] coords) {
-				if (isDone()) {
-					return SEG_CLOSE;
-				}
-				final int type = seg.getType(current);
-				final int count = nrPoints[type];
-				for (int i = 0; i < count; i++) {
-					coords[i] = seg.get(current + i);
-				}
-				if (at != null) {
-					at.transform(coords, 0, coords, 0, count / 2);
-				}
-				return type;
-			}
 
-			public int currentSegment(double[] coords) {
-				if (isDone()) {
-					return SEG_CLOSE;
-				}
-				final int type = seg.getType(current);
-				final int count = nrPoints[type];
-				for (int i = 0; i < count; i++) {
-					coords[i] = seg.get(current + i);
-				}
-				if (at != null) {
-					at.transform(coords, 0, coords, 0, count / 2);
-				}
-				return type;
-			}
-		};
-	}
+    /**
+     * The affine transformation used to transform coordinates.
+     */
+    private final AffineTransform transform;
 
-	public PathIterator getPathIterator(AffineTransform at, double flatness) {
-		return new FlatteningPathIterator(getPathIterator(at), flatness);
-	}
 
 	/**
-	 * Create a new shape of the same run-time type with the same contents as
-	 * this one.
+     * The current position of the iterator.
+     */
+    private int pos;
+
+
+    /**
+     * Constructs a new iterator for enumerating the segments of a
+     * GeneralPath.
 	 *
-	 * @return the clone
-	 *
-	 * @exception OutOfMemoryError If there is not enough memory available.
-	 *
-	 * @since 1.2
+     * @param at an affine transformation for projecting the returned
+     * points, or <code>null</code> to return the original points
+     * without any mapping.
 	 */
-	public Object clone() {
-		// This class is final; no need to use super.clone().
-		return new GeneralPath(this);
+    GeneralPathIterator(GeneralPath path, AffineTransform transform)
+    {
+      this.path = path;
+      this.transform = transform;
 	}
 
-	private void add(int type, float x, float y) {
-		if (!curSeg.add(type, x, y)) {
-			final Segment newSeg = new Segment();
-			curSeg.append(newSeg);
-			curSeg = newSeg;
-			newSeg.add(type, x, y);
+
+    /**
+     * Returns the current winding rule of the GeneralPath.
+     */
+    public int getWindingRule()
+    {
+      return path.rule;
 		}
-		minMax[0] = Math.min(minMax[0], x);
-		minMax[1] = Math.min(minMax[1], y);
-		minMax[2] = Math.max(minMax[2], x);
-		minMax[3] = Math.max(minMax[3], y);
+
+
+		/**
+     * Determines whether the iterator has reached the last segment in
+     * the path.
+		 */
+    public boolean isDone()
+    {
+      return pos >= path.index;
+		}
+
+
+		/**
+     * Advances the iterator position by one segment.
+		 */
+    public void next()
+    {
+      int seg;
+
+      /* Increment pos by the number of coordinate values. Note that
+       * we store two values even for a SEG_CLOSE segment, which is
+       * why we increment pos at least by 2. 
+       */
+      seg = path.types[pos >> 1];
+      if (seg == SEG_CLOSE)
+        pos += 2;
+      else
+        pos += NUM_COORDS[seg];
+		}
+
+
+    /**
+     * Returns the current segment in float coordinates.
+     */
+    public int currentSegment(float[] coords)
+    {
+      int seg, numCoords;
+
+      seg = path.types[pos >> 1];
+      numCoords = NUM_COORDS[seg];
+      if (numCoords > 0)
+      {
+        if (transform == null)
+          System.arraycopy(path.points, pos, coords, 0, numCoords);
+        else
+          transform.transform(/* src */ path.points, /* srcOffset */ pos,
+                              /* dest */ coords, /* destOffset */ 0,
+                              /* numPoints */ numCoords >> 1);
+			}
+      return seg;
+		}
+
+
+		/**
+     * Returns the current segment in double coordinates.
+		 */
+    public int currentSegment(double[] coords)
+    {
+      int seg, numCoords;
+
+      seg = path.types[pos >> 1];
+      numCoords = NUM_COORDS[seg];
+      if (numCoords > 0)
+      {
+        if (transform == null)
+        {
+          // System.arraycopy throws an exception if the source and destination
+          // array are not of the same primitive type.
+          for (int i = 0; i < numCoords; i++)
+            coords[i] = (double) path.points[pos + i];
+        }
+        else
+          transform.transform(/* src */ path.points, /* srcOffset */ pos,
+                              /* dest */ coords, /* destOffset */ 0,
+                              /* numPoints */ numCoords >> 1);
+      }
+      return seg;
+    }
+		}
+
+
+		/**
+   * Creates a PathIterator for iterating along the segments of this path.
+   *
+   * @param at an affine transformation for projecting the returned
+   * points, or <code>null</code> to let the created iterator return
+   * the original points without any mapping.
+		 */
+  public PathIterator getPathIterator(AffineTransform at)
+  {
+    return new GeneralPathIterator(this, at);
+		}
+
+
+  public PathIterator getPathIterator(AffineTransform at, double flatness)
+  {
+    return new FlatteningPathIterator(getPathIterator(at), flatness);
+		}
+
+		/**
+   * Create a new shape of the same run-time type with the same contents as
+   * this one.
+   *
+   * @return the clone
+   *
+   * @exception OutOfMemoryError If there is not enough memory available.
+   *
+   * @since 1.2
+		 */
+  public Object clone()
+  {
+    // This class is final; no need to use super.clone().
+    return new GeneralPath(this);
+		}
+
+  private void ensureSize(int size)
+  {
+    if (subpath < 0)
+      throw new IllegalPathStateException("need initial moveto");
+    if (size <= points.length)
+      return;
+    byte[] b = new byte[points.length];
+    System.arraycopy(types, 0, b, 0, index >> 1);
+    types = b;
+    float[] f = new float[points.length << 1];
+    System.arraycopy(points, 0, f, 0, index);
+    points = f;
 	}
-
-	private static final class Segment {
-
-		static final int DEFAULT_SIZE = 1024;
-
-		private final byte[] types;
-		private final float[] points;
-		private final int size;
-		private Segment next;
-		private int index;
-
-		public Segment() {
-			this(DEFAULT_SIZE);
-		}
-
-		public Segment(int nrPoints) {
-			this.types = new byte[nrPoints >> 1];
-			this.points = new float[nrPoints];
-			this.size = nrPoints;
-		}
-
-		/**
-		 * Create a copy of the given segment.
-		 * The next segment is not copied, next is set to null.
-		 * @param src
-		 */
-		public Segment(Segment src) {
-			this.types = new byte[src.types.length];
-			this.points = new float[src.points.length];
-			this.size = src.size;
-			this.index = src.index;
-			this.next = null;
-			System.arraycopy(src.types, 0, this.types, 0, src.types.length);
-			System.arraycopy(src.points, 0, this.points, 0, src.points.length);
-		}
-
-		/**
-		 * Add a point
-		 * @param index
-		 * @param type
-		 * @param x
-		 * @param y
-		 * @return true if added, false if index >= size
-		 */
-		public boolean add(int type, float x, float y) {
-			if (index < size) {
-				types[index >> 1] = (byte) type;
-				points[index++] = x;
-				points[index++] = y;
-				return true;
-			} else {
-				return false;
-			}
-		}
-
-		public int size() {
-			return size;
-		}
-
-		public float get(int index) {
-			if (index < size) {
-				return points[index];
-			} else {
-				return next.get(index - size);
-			}
-		}
-
-		public int getType(int index) {
-			return types[index >> 1];
-		}
-
-		/**
-		 * @return
-		 */
-		public Segment getNext() {
-			return this.next;
-		}
-
-		/**
-		 * Append the given segment to the end of the list
-		 * @param s
-		 */
-		public void append(Segment s) {
-			Segment p = this;
-			while (p.next != null) {
-				p = p.next;
-			}
-			p.next = s;
-		}
-
-		public void transform(AffineTransform xform) {
-			xform.transform(points, 0, points, 0, index >> 1);
-		}
-
-		/**
-		 * @return
-		 */
-		final int getIndex() {
-			return this.index;
-		}
-
-		public boolean isDone(int current) {
-			return (current >= index) && (next == null);
-		}
-	}
-}
+} // class GeneralPath

@@ -3,7 +3,7 @@
  */
 package org.jnode.awt;
 
-import gnu.java.security.actions.SetPropertyAction;
+import gnu.java.security.action.SetPropertyAction;
 
 import java.awt.GraphicsEnvironment;
 import java.awt.image.VMImageUtils;

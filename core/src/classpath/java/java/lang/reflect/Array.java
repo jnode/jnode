@@ -42,7 +42,8 @@ import org.jnode.vm.memmgr.VmHeapManager;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmArrayClass;
-import gnu.java.security.actions.InvokeAction;
+
+import gnu.java.security.action.InvokeAction;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;

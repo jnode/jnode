@@ -33,7 +33,7 @@
       <export name="gnu.java.util.*"/>
       <export name="gnu.java.util.prefs.*"/>
       <export name="gnu.java.security.*"/>
-      <export name="gnu.java.security.actions.*"/>
+      <export name="gnu.java.security.action.*"/>
       <export name="gnu.java.security.der.*"/>
       <export name="gnu.java.security.provider.*"/>
       <export name="gnu.java.security.util.*"/>

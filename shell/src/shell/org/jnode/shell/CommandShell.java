@@ -3,8 +3,8 @@
  */
 package org.jnode.shell;
 
-import gnu.java.security.actions.GetPropertyAction;
-import gnu.java.security.actions.SetPropertyAction;
+import gnu.java.security.action.GetPropertyAction;
+import gnu.java.security.action.SetPropertyAction;
 
 import java.awt.event.KeyEvent;
 import java.io.File;

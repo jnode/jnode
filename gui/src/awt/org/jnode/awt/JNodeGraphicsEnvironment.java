@@ -3,7 +3,7 @@
  */
 package org.jnode.awt;
 
-import gnu.java.security.actions.GetPropertyAction;
+import gnu.java.security.action.GetPropertyAction;
 
 import java.awt.Font;
 import java.awt.Graphics2D;

@@ -153,7 +153,7 @@ public abstract class VmHeapManager extends VmSystemObject {
 	 * @param object
 	 * @return Object
 	 */
-	public final Object clone(Object object) {
+	public final Object clone(Cloneable object) {
 		testInited();
 		final VmClassType objectClass = helper.getVmClass(object);
 		final Address objectAddr = helper.addressOf(object);

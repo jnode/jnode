@@ -37,7 +37,7 @@ exception statement from your version. */
 
 package java.util;
 
-import gnu.java.security.actions.GetPropertyAction;
+import gnu.java.security.action.GetPropertyAction;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

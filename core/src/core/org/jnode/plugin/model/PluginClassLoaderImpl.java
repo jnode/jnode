@@ -3,7 +3,7 @@
  */
 package org.jnode.plugin.model;
 
-import gnu.java.security.actions.GetPolicyAction;
+import gnu.java.security.action.GetPolicyAction;
 
 import java.io.IOException;
 import java.io.InputStream;
