@@ -20,7 +20,7 @@ public class TTFTextRenderer implements TextRenderer {
 	/** My logger */
 	private final Logger log = Logger.getLogger(getClass());
 	private final TTFFontData fontData;
-	private final int fontSize;
+	private final double fontSize;
 
 	/**
 	 * Create a new instance
@@ -56,19 +56,18 @@ public class TTFTextRenderer implements TextRenderer {
 			if (encTable.getTableFormat() == null) {
 				throw new RuntimeException("The table is NUll!!");
 			}
-			final int ascent = hheadTable.getAscent();
+			final double ascent = hheadTable.getAscent();
 
 			final AffineTransform tx = new AffineTransform();
 			final double scale = fontSize / ascent;
 
 			tx.translate(x, y + fontSize);
-			//System.out.println("Scale=" + scale);
 			tx.scale(scale, -scale);
 			tx.translate(0, ascent);
 
 			for (int i = 0; i < text.length(); i++) {
 				// get the index for the needed glyph
-				int index = encTable.getTableFormat().getGlyphIndex(text.charAt(i));
+				final int index = encTable.getTableFormat().getGlyphIndex(text.charAt(i));
 				Shape shape = glyphTable.getGlyph(index).getShape();
 				gp.append(shape.getPathIterator(tx), false);
 				tx.translate(hmTable.getAdvanceWidth(index), 0);
