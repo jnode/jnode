@@ -182,6 +182,8 @@ public final class VmSystem {
         
         // GNU properties
         res.put("gnu.java.io.encoding_scheme_alias.US-ASCII", "ISO8859-1"); 
+        res.put("gnu.java.io.encoding_scheme_alias.UTF-16LE", "UTF16LE"); 
+        res.put("gnu.java.io.encoding_scheme_alias.UTF-16BE", "UTF16BE"); 
 
         return res;
     }
