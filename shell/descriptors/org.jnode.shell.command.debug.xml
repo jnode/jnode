@@ -21,4 +21,8 @@
     <alias name="udpout" class="org.jnode.shell.command.debug.UDPOutputCommand"/>
   </extension>
 
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.lang.RuntimePermission" name="setIO"/>
+  </extension>       
+        
 </plugin>
