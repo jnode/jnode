@@ -7,6 +7,8 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Panel;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.peer.PanelPeer;
 
 import javax.swing.JComponent;
@@ -26,6 +28,7 @@ final class SwingPanelPeer extends SwingComponentPeer implements PanelPeer,
 	public SwingPanelPeer(SwingToolkit toolkit, Panel panel) {
 		super(toolkit, panel, new SwingPanel(panel));
 		final SwingPanel jPanel = (SwingPanel) jComponent;
+        jPanel.swingPeer = this;
 		SwingToolkit.add(panel, jPanel);
 		SwingToolkit.copyAwtProperties(panel, jPanel);
 	}
@@ -68,6 +71,7 @@ final class SwingPanelPeer extends SwingComponentPeer implements PanelPeer,
 
 	private static class SwingPanel extends JPanel implements ISwingPeer {
 		private final Panel awtComponent;
+        private SwingPanelPeer swingPeer;
 
 		public SwingPanel(Panel awtComponent) {
 			this.awtComponent = awtComponent;
@@ -79,7 +83,12 @@ final class SwingPanelPeer extends SwingComponentPeer implements PanelPeer,
 		public Component getAWTComponent() {
 			return awtComponent;
 		}
-			
+
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            awtComponent.update(g);
+        }
+
 		/**
 		 * @see javax.swing.JComponent#paintChildren(java.awt.Graphics)
 		 */

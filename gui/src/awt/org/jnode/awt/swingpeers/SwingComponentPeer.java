@@ -29,6 +29,10 @@ import java.awt.peer.ComponentPeer;
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeToolkit;
 import org.jnode.awt.JNodeGenericPeer;
+import org.jnode.awt.swingpeers.event.MouseListenerDelegate;
+import org.jnode.awt.swingpeers.event.MouseMotionListenerDelegate;
+import org.jnode.awt.swingpeers.event.KeyListenerDelegate;
+import org.jnode.awt.swingpeers.event.ComponentListenerDelegate;
 
 import javax.swing.JComponent;
 
@@ -65,6 +69,10 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
         this.component = component;
         setBounds(component.getX(), component.getY(), component.getWidth(),
                 component.getHeight());
+        jComponent.addMouseListener(new MouseListenerDelegate(component));
+		jComponent.addMouseMotionListener(new MouseMotionListenerDelegate(component));
+        jComponent.addKeyListener(new KeyListenerDelegate(component));
+        jComponent.addComponentListener(new ComponentListenerDelegate(component));
 
         // Disable double-buffering for Swing components
         //javax.swing.RepaintManager.currentManager( component
@@ -186,23 +194,23 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
     public void handleEvent(AWTEvent event) {
         switch (event.getID()) {
             case PaintEvent.PAINT: {
-                Graphics g = getGraphics();
-                Point p = component.getLocationOnScreen();
-                g.translate(p.x, p.y);
+                Graphics g = jComponent.getGraphics();
+                //Point p = component.getLocationOnScreen();
+                //g.translate(p.x, p.y);
                 component.paint(g);
-                g.translate(-p.x, -p.y);
+                //g.translate(-p.x, -p.y);
             } break;
             case PaintEvent.UPDATE: {
-                Graphics g = getGraphics();
-                Point p = component.getLocationOnScreen();
-                g.translate(p.x, p.y);
+                Graphics g = jComponent.getGraphics();
+                //Point p = component.getLocationOnScreen();
+                //g.translate(p.x, p.y);
                 component.update(getGraphics());
-                g.translate(-p.x, -p.y);
+                //g.translate(-p.x, -p.y);
             } break;
         }
     }
 
-    private void paintAWTComponent(){
+    protected final void paintAWTComponent(){
         if(component != null)
         q.postEvent(new PaintEvent(component, PaintEvent.PAINT, component.getBounds()));
     }
@@ -290,9 +298,9 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
     	final int oldHeight = jComponent.getHeight();
         jComponent.setBounds(x, y, width, height);
         if ((oldWidth != width) || (oldHeight != height)) {
-            sendComponentEvent(ComponentEvent.COMPONENT_RESIZED);
+            fireComponentEvent(ComponentEvent.COMPONENT_RESIZED);
         } else {
-            sendComponentEvent(ComponentEvent.COMPONENT_MOVED);
+            fireComponentEvent(ComponentEvent.COMPONENT_MOVED);
         }
     }
 
@@ -331,6 +339,11 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
     public final void setVisible(boolean b) {
         jComponent.setVisible(b);
         paintAWTComponent();
+        if(b){
+            fireComponentEvent(ComponentEvent.COMPONENT_SHOWN);
+        }else{
+            fireComponentEvent(ComponentEvent.COMPONENT_HIDDEN);
+        }
     }
 
     public final void show() {
@@ -346,7 +359,7 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
      * Posts a component event to the AWT event queue.
      * @param what
      */
-    protected final void sendComponentEvent(int what) {
+    protected final void fireComponentEvent(int what) {
         final EventQueue queue = toolkit.getSystemEventQueue();
         queue.postEvent(new ComponentEvent(component, what));
     }

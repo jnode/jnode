@@ -37,6 +37,10 @@ import javax.swing.JInternalFrame;
 import javax.swing.JRootPane;
 
 import org.apache.log4j.Logger;
+import org.jnode.awt.swingpeers.event.MouseListenerDelegate;
+import org.jnode.awt.swingpeers.event.MouseMotionListenerDelegate;
+import org.jnode.awt.swingpeers.event.KeyListenerDelegate;
+import org.jnode.awt.swingpeers.event.ComponentListenerDelegate;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -75,6 +79,11 @@ final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
 		frame.setTitle(awtFrame.getTitle());
 		//frame.setIconImage(awtFrame.getIconImage());
 		setMenuBar(awtFrame.getMenuBar());
+
+        frame.addMouseListener(new MouseListenerDelegate(awtFrame));
+		frame.addMouseMotionListener(new MouseMotionListenerDelegate(awtFrame));
+        frame.addKeyListener(new KeyListenerDelegate(awtFrame));
+        frame.addComponentListener(new ComponentListenerDelegate(awtFrame));
 	}
 
 	/**
@@ -317,7 +326,10 @@ final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
 	 * @see java.awt.peer.ComponentPeer#getGraphics()
 	 */
 	public Graphics getGraphics() {
-		return frame.getGraphics();
+        Insets ins = frame.getInsets();
+        Graphics g = frame.getGraphics();
+        g.translate(ins.left, ins.top);
+		return g;
 	}
 
 	/**
