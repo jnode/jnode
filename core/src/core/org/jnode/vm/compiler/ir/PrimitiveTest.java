@@ -27,10 +27,20 @@ public class PrimitiveTest {
     	return j;
     }
 
-	public static int trivial() {
+	public static int trivial1() {
 		return 35 + 17;
 	}
-    
+
+    public static int trivial2() {
+		return 1 == 1 ? 3 : 7 ;
+	}
+
+    public static int trivial() {
+        int a = 0;
+        while (a < 10) a++;
+		return a;
+	}
+
     public static int arithOptLoop(int a0, int a1, int a2) {
         int l3 = 1;
         int l4 = 3*a1;

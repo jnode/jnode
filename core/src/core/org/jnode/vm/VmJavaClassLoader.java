@@ -21,6 +21,7 @@
 package org.jnode.vm;
 
 import java.util.HashMap;
+import java.io.Writer;
 
 import org.jnode.vm.classmgr.IMTBuilder;
 import org.jnode.vm.classmgr.SelectorMap;
@@ -67,6 +68,10 @@ public final class VmJavaClassLoader extends VmAbstractClassLoader {
      */
     public final void compileRuntime(VmMethod vmMethod, int optLevel, boolean enableTestCompilers) {
         systemLoader.compileRuntime(vmMethod, optLevel, enableTestCompilers);
+    }
+
+    public void disassemble(VmMethod vmMethod, int optLevel, boolean enableTestCompilers, Writer writer) {
+        systemLoader.disassemble(vmMethod, optLevel, enableTestCompilers, writer);
     }
 
     /**

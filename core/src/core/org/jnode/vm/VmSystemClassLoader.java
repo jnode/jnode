@@ -24,6 +24,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -524,6 +526,30 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         if (vmMethod.getNativeCodeOptLevel() < optLevel) {
             cmp = cmps[ index];
             cmp.compileRuntime(vmMethod, getResolver(), optLevel, null);
+        }
+    }
+
+    public void disassemble(VmMethod vmMethod, int optLevel, boolean enableTestCompilers, Writer writer) {
+        final NativeCodeCompiler cmps[];
+        int index;
+        if (enableTestCompilers) {
+        	index = optLevel;
+        	optLevel += arch.getCompilers().length;
+        	cmps = arch.getTestCompilers();
+        } else {
+        	index = optLevel;
+        	cmps = arch.getCompilers();
+        }
+
+        final NativeCodeCompiler cmp;
+        if (index < 0) {
+            index = 0;
+        } else if (index >= cmps.length) {
+            index = cmps.length - 1;
+        }
+        if (vmMethod.getNativeCodeOptLevel() < optLevel) {
+            cmp = cmps[ index];
+            cmp.disassemble(vmMethod, getResolver(), optLevel, writer);
         }
     }
 
