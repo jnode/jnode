@@ -87,7 +87,7 @@ public class BOOTPClient
             final Inet4Address myIP = null; // any address
             final int transactionID = (int) (System
                 .currentTimeMillis() & 0xFFFFFFFF);
-            BOOTPHeader hdr = new BOOTPHeader(BOOTPHeader.BOOTREQUEST, transactionID, myIP,
+            BOOTPHeader hdr = new BOOTPHeader(BOOTPHeader.BOOTREQUEST, transactionID, 0, myIP,
                 api.getAddress());
 
             // Send the packet

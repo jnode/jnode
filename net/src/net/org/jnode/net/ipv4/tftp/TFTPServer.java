@@ -3,6 +3,7 @@
  */
 package org.jnode.net.ipv4.tftp;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
@@ -72,13 +73,16 @@ public class TFTPServer extends TFTP {
 	}
 
 	private void processRequest(TFTPPacket packet) throws IOException {
-		log.debug("Received packet: "+packet.getAddress()+":"+packet.getPort()+" "+packet.toString());
+		if(log.isDebugEnabled())
+			log.debug("Received packet: "+packet.getAddress()+":"+packet.getPort());
 		final int type = packet.getType();
 		switch(type) {
 			case TFTPPacket.WRITE_REQUEST:
 				if(clientAddress == null) {
 					TFTPWriteRequestPacket wreqPacket = (TFTPWriteRequestPacket) packet;
-					fileOut = new FileOutputStream(wreqPacket.getFilename());
+					File file = new File(".", wreqPacket.getFilename());
+					log.info("Request to write file "+wreqPacket.getFilename()+" ("+file.getAbsolutePath()+") received from "+packet.getAddress()+":"+packet.getPort());
+					fileOut = new FileOutputStream(file);
 					blockNumber = 0;
 					bufferedSend(new TFTPAckPacket(packet.getAddress(), packet.getPort(), blockNumber));
 					clientAddress = packet.getAddress();
@@ -96,9 +100,9 @@ public class TFTPServer extends TFTP {
 						blockNumber++;
 						// if last block then end of transfer
 						if(dataPacket.getDataLength() < TFTPDataPacket.MAX_DATA_LENGTH) {
-							fileOut.close();
 							clientAddress = null;
 							clientPort = 0;
+							fileOut.close();
 						}
 					}
 				}
@@ -107,7 +111,9 @@ public class TFTPServer extends TFTP {
 				if(clientAddress == null) {
 					TFTPReadRequestPacket rreqPacket = (TFTPReadRequestPacket) packet;
 					try {
-						fileIn = new FileInputStream(rreqPacket.getFilename());
+						File file = new File(".", rreqPacket.getFilename());
+						log.info("Request to read file "+rreqPacket.getFilename()+" ("+file.getAbsolutePath()+") received from "+packet.getAddress()+":"+packet.getPort());
+						fileIn = new FileInputStream(file);
 						blockNumber = 1;
 						byte[] data = new byte[TFTPDataPacket.MAX_DATA_LENGTH];
 						final int bytesRead = fileIn.read(data);
@@ -136,9 +142,9 @@ public class TFTPServer extends TFTP {
 						bufferedSend(new TFTPDataPacket(packet.getAddress(), packet.getPort(), blockNumber, data, 0, bytesRead));
 						// if last block then end of transfer
 						if(bytesRead < TFTPDataPacket.MAX_DATA_LENGTH) {
-							fileIn.close();
 							clientAddress = null;
 							clientPort = 0;
+							fileIn.close();
 						}
 					}
 				}

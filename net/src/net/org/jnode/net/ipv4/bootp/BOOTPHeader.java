@@ -14,6 +14,7 @@ import java.net.Inet4Address;
 
 /**
  * @author epr
+ * @author markhale
  */
 
 public class BOOTPHeader
@@ -47,6 +48,29 @@ public class BOOTPHeader
   private String serverHostName;
   private String bootFileName;
 
+  private static String asciiBytesToString(byte[] asciiBytes)
+  {
+    try
+    {
+      return new String(asciiBytes, "US-ASCII");
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      throw new RuntimeException(ex);
+    }
+  }
+  private static byte[] stringToAsciiBytes(String str)
+  {
+    try
+    {
+      return str.getBytes("US-ASCII");
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      throw new RuntimeException(ex);
+    }
+  }
+
   /**
    * Create a new header and read it from the given buffer
    *
@@ -74,23 +98,9 @@ public class BOOTPHeader
     }
     byte[] tmp = new byte[128];
     skbuf.get(tmp, 0, 32, 64);
-    try
-    {
-      serverHostName = new String(tmp, "US-ASCII").trim();
-    }
-    catch (UnsupportedEncodingException ex)
-    {
-      throw new RuntimeException(ex);
-    }
+    serverHostName = asciiBytesToString(tmp).trim();
     skbuf.get(tmp, 0, 96, 128);
-    try
-    {
-      bootFileName = new String(tmp, "US-ASCII").trim();
-    }
-    catch (UnsupportedEncodingException ex)
-    {
-      throw new RuntimeException(ex);
-    }
+    bootFileName = asciiBytesToString(tmp).trim();
   }
 
   /**
@@ -108,16 +118,17 @@ public class BOOTPHeader
    *
    * @param opcode
    * @param transactionID
+   * @param secsElapsed
    * @param clientIPAddress
    * @param clientHwAddress
    */
-  public BOOTPHeader(int opcode, int transactionID, Inet4Address clientIPAddress, HardwareAddress clientHwAddress)
+  public BOOTPHeader(int opcode, int transactionID, int secsElapsed, Inet4Address clientIPAddress, HardwareAddress clientHwAddress)
   {
     this.opcode = opcode;
     this.hwType = clientHwAddress.getType();
     this.hopCount = 0;
     this.transactionID = transactionID;
-    this.secondsElapsed = 0;
+    this.secondsElapsed = secsElapsed;
     this.flags = 0;
     this.clientIPAddress = clientIPAddress;
     this.yourIPAddress = null;
@@ -131,18 +142,19 @@ public class BOOTPHeader
    *
    * @param opcode
    * @param transactionID
+   * @param secsElapsed
    * @param clientIPAddress
    * @param yourIPAddress
    * @param serverIPAddress
    * @param clientHwAddress
    */
-  public BOOTPHeader(int opcode, int transactionID, Inet4Address clientIPAddress, Inet4Address yourIPAddress, Inet4Address serverIPAddress, HardwareAddress clientHwAddress)
+  public BOOTPHeader(int opcode, int transactionID, int secsElapsed, Inet4Address clientIPAddress, Inet4Address yourIPAddress, Inet4Address serverIPAddress, HardwareAddress clientHwAddress)
   {
     this.opcode = opcode;
     this.hwType = clientHwAddress.getType();
     this.hopCount = 0;
     this.transactionID = transactionID;
-    this.secondsElapsed = 0;
+    this.secondsElapsed = secsElapsed;
     this.flags = 0;
     this.clientIPAddress = clientIPAddress;
     this.yourIPAddress = yourIPAddress;
@@ -188,25 +200,11 @@ public class BOOTPHeader
     }
     if (serverHostName != null)
     {
-      try
-      {
-        skbuf.set(32, serverHostName.getBytes("US-ASCII"), 0, serverHostName.length());
-      }
-      catch (UnsupportedEncodingException ex)
-      {
-        throw new RuntimeException(ex);
-      }
+        skbuf.set(32, stringToAsciiBytes(serverHostName), 0, serverHostName.length());
     }
     if (bootFileName != null)
     {
-      try
-      {
-        skbuf.set(96, bootFileName.getBytes("US-ASCII"), 0, bootFileName.length());
-      }
-      catch (UnsupportedEncodingException ex)
-      {
-        throw new RuntimeException(ex);
-      }
+        skbuf.set(96, stringToAsciiBytes(bootFileName), 0, bootFileName.length());
     }
   }
 
@@ -305,7 +303,15 @@ public class BOOTPHeader
   }
 
   /**
-   * Gets your IP address
+   * Gets the seconds elapsed since the client began the address acquisition or renewal process
+   */
+  public int getTimeElapsedSecs()
+  {
+    return secondsElapsed;
+  }
+
+  /**
+   * Gets <em>your</em> IP address
    */
   public Inet4Address getYourIPAddress()
   {
