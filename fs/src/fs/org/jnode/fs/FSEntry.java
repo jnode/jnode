@@ -79,4 +79,11 @@ public interface FSEntry extends FSObject {
 	 */
 	public FSAccessRights getAccessRights()
 	throws IOException;
+	
+	/**
+	 * Indicate if the entry has been modified in memory (ie need to be saved)
+	 * @return true if the entry need to be saved
+	 * @throws IOException
+	 */
+	public boolean isDirty() throws IOException;	
 }
