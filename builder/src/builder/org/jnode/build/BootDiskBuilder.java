@@ -14,7 +14,7 @@ import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.block.BlockDeviceAPI;
-import org.jnode.driver.block.MappedBlockDeviceSupport;
+import org.jnode.driver.block.MappedFSBlockDeviceSupport;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.fat.Fat;
 import org.jnode.fs.fat.GrubBootSector;
@@ -36,7 +36,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
 
     private Geometry geom = new Geometry(64, 16, 32);
 
-    private MappedBlockDeviceSupport part0;
+    private MappedFSBlockDeviceSupport part0;
 
     public BootDiskBuilder() {
     }
@@ -99,7 +99,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
          */
 
         /* Format partition 0 */
-        part0 = new MappedBlockDeviceSupport(device, pte.getStartLba()
+        part0 = new MappedFSBlockDeviceSupport(device, pte.getStartLba()
                 * bytesPerSector, pte.getNrSectors() * bytesPerSector);
         GrubFatFormatter ff = createFormatter();
         ff.setInstallPartition(0x0000FFFF);

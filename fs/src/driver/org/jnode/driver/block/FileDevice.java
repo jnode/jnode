@@ -9,20 +9,22 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import org.jnode.driver.Device;
+import org.jnode.fs.partitions.PartitionTableEntry;
 
 /**
  * <description>
  * 
  * @author epr
  */
-public class FileDevice extends Device implements BlockDeviceAPI {
+public class FileDevice extends Device implements FSBlockDeviceAPI {
 
 	private RandomAccessFile raf;
 
 	public FileDevice(File file, String mode) throws FileNotFoundException, IOException {
 		super(null, "file" + System.currentTimeMillis());
 		raf = new RandomAccessFile(file, mode);
-		registerAPI(BlockDeviceAPI.class, this);
+		//registerAPI(BlockDeviceAPI.class, this);
+		registerAPI(FSBlockDeviceAPI.class, this);
 	}
 
 	/**
@@ -74,4 +76,17 @@ public class FileDevice extends Device implements BlockDeviceAPI {
 	public void close() throws IOException {
 		raf.close();
 	}
+    /**
+     * @see org.jnode.driver.block.FSBlockDeviceAPI#getPartitionTableEntry()
+     */
+    public PartitionTableEntry getPartitionTableEntry() {
+        return null;
+    }
+    
+    /**
+     * @see org.jnode.driver.block.FSBlockDeviceAPI#getSectorSize()
+     */
+    public int getSectorSize() throws IOException {
+        return 512;
+    }
 }

@@ -19,7 +19,7 @@ import org.jnode.driver.scsi.cdb.mmc.CDBReadCapacity;
 import org.jnode.driver.scsi.cdb.mmc.CapacityData;
 import org.jnode.driver.scsi.cdb.spc.CDBReportLuns;
 import org.jnode.driver.scsi.cdb.spc.CDBRequestSense;
-import org.jnode.driver.scsi.cdb.spc.RequestSenseData;
+import org.jnode.driver.scsi.cdb.spc.SenseData;
 import org.jnode.naming.InitialNaming;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
@@ -92,12 +92,12 @@ public class SCSITest {
         api.executeCommand(cdb, null, 0, 5000);
     }
 
-    public RequestSenseData requestSense() throws SCSIException,
+    public SenseData requestSense() throws SCSIException,
             TimeoutException, InterruptedException {
         final byte[] data = new byte[ 256];
         final CDB cdb = new CDBRequestSense(data.length);
         api.executeCommand(cdb, data, 0, 5000);
-        return new RequestSenseData(data);
+        return new SenseData(data);
     }
 
     private CapacityData readCapacity() throws SCSIException, TimeoutException,
