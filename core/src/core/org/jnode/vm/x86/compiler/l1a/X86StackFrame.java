@@ -193,6 +193,9 @@ class X86StackFrame implements X86CompilerConstants {
         }
         os.writeJCC(stackOverflowLabel, X86Constants.JLE);
         
+        // Test stack alignment
+        writeStackAlignmentTest(helper.genLabel("$$stackAlignment"));
+        
         // Create class initialization code (if needed)
 		helper.writeClassInitialize(method, aax);
 
