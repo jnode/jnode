@@ -6,6 +6,7 @@ package org.jnode.vm.compiler.ir;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 
 import org.jnode.vm.bytecode.BytecodeFlags;
 import org.jnode.vm.bytecode.BytecodeVisitorSupport;
@@ -23,10 +24,12 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	private IRBasicBlock currentBlock;
 
 	private byte[] opcodeFlags;
+	private byte[] branchFlags;
 
-	private boolean nextIsSuccessor;
 	private final ArrayList blocks = new ArrayList();
 	private VmByteCode byteCode;
+	private static final byte CONDITIONAL_BRANCH = 1;
+	private static final byte UNCONDITIONAL_BRANCH = 2;
 
 	/**
 	 * Create all determined basic blocks
@@ -40,18 +43,29 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 		final IRBasicBlock[] list = (IRBasicBlock[])blocks.toArray(new IRBasicBlock[blocks.size()]);
 		// Set the EndPC's and flags
 		final byte[] opcodeFlags = this.opcodeFlags;
+		final byte[] branchFlags = this.branchFlags;
 		final int len = opcodeFlags.length;
 		int bbIndex = 0;
 		for (int i = 0; i < len; i++) {
 			if (isStartOfBB(i)) {
 				final int start = i;
 				// Find the end of the BB
+				boolean nextIsSuccessor = true;
+				if ((branchFlags[i] & UNCONDITIONAL_BRANCH) != 0) {
+					nextIsSuccessor = false;
+				}
 				i++;
 				while ((i < len) && (!isStartOfBB(i))) {
+					if ((branchFlags[i] & UNCONDITIONAL_BRANCH) != 0) {
+						nextIsSuccessor = false;
+					}
 					i++;
 				}
 				// the BB
 				final IRBasicBlock bb = list[bbIndex++];
+				if (nextIsSuccessor && bbIndex < list.length) {
+					bb.addSuccessor(list[bbIndex]);
+				}
 				if (bb.getStartPC() != start) {
 					throw new AssertionError("bb.getStartPC() != start");
 				}
@@ -75,6 +89,8 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 		byteCode = bc;
 		final int length = bc.getLength();
 		opcodeFlags = new byte[length];
+		branchFlags = new byte[length];
+
 		// The first instruction is always the start of a BB.
 		this.currentBlock = startBB(0);
 		currentBlock.setStackOffset(bc.getNoLocals());
@@ -103,7 +119,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifeq(int)
 	 */
 	public void visit_ifeq(int address) {
-		addBranch(address, true);
+		addBranch(address, CONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -111,7 +127,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifne(int)
 	 */
 	public void visit_ifne(int address) {
-		addBranch(address, true);
+		addBranch(address, CONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -119,7 +135,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iflt(int)
 	 */
 	public void visit_iflt(int address) {
-		addBranch(address, true);
+		addBranch(address, CONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -127,7 +143,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifge(int)
 	 */
 	public void visit_ifge(int address) {
-		addBranch(address, true);
+		addBranch(address, CONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -135,7 +151,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifgt(int)
 	 */
 	public void visit_ifgt(int address) {
-		addBranch(address, true);
+		addBranch(address, CONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -143,7 +159,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifle(int)
 	 */
 	public void visit_ifle(int address) {
-		addBranch(address, true);
+		addBranch(address, CONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -151,7 +167,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpeq(int)
 	 */
 	public void visit_if_icmpeq(int address) {
-		addBranch(address, true);
+		addBranch(address, CONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -159,7 +175,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpne(int)
 	 */
 	public void visit_if_icmpne(int address) {
-		addBranch(address, true);
+		addBranch(address, CONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -167,7 +183,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmplt(int)
 	 */
 	public void visit_if_icmplt(int address) {
-		addBranch(address, true);
+		addBranch(address, CONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -175,7 +191,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpge(int)
 	 */
 	public void visit_if_icmpge(int address) {
-		addBranch(address, true);
+		addBranch(address, CONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -183,7 +199,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpgt(int)
 	 */
 	public void visit_if_icmpgt(int address) {
-		addBranch(address, true);
+		addBranch(address, CONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -191,7 +207,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmple(int)
 	 */
 	public void visit_if_icmple(int address) {
-		addBranch(address, true);
+		addBranch(address, CONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -199,7 +215,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_acmpeq(int)
 	 */
 	public void visit_if_acmpeq(int address) {
-		addBranch(address, true);
+		addBranch(address, CONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -207,7 +223,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_acmpne(int)
 	 */
 	public void visit_if_acmpne(int address) {
-		addBranch(address, true);
+		addBranch(address, CONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -215,7 +231,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_goto(int)
 	 */
 	public void visit_goto(int address) {
-		addBranch(address, false);
+		addBranch(address, UNCONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -223,9 +239,9 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_jsr(int)
 	 */
 	public void visit_jsr(int address) {
-		// Not sure about this, the next block I believe it NOT a
+		// TODO Not sure about this, the next block I believe it NOT a
 		// direct successor. This will have to be tested.
-		addBranch(address, false);
+		//addBranch(address);
 	}
 
 	/**
@@ -238,10 +254,10 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	public void visit_tableswitch(int defValue, int lowValue, int highValue, int[] addresses) {
 		for (int i = 0; i < addresses.length; i++) {
 			// Next block could be successor, e.g. switch could fall through
-			addBranch(addresses[i], true);
+			addBranch(addresses[i], CONDITIONAL_BRANCH);
 		}
 		// Same for default case
-		addBranch(defValue, true);
+		addBranch(defValue, CONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -253,10 +269,10 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	public void visit_lookupswitch(int defValue, int[] matchValues, int[] addresses) {
 		for (int i = 0; i < addresses.length; i++) {
 			// Next block could be successor, e.g. switch could fall through
-			addBranch(addresses[i], true);
+			addBranch(addresses[i], CONDITIONAL_BRANCH);
 		}
 		// Same for default case
-		addBranch(defValue, true);
+		addBranch(defValue, CONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -264,7 +280,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifnull(int)
 	 */
 	public void visit_ifnull(int address) {
-		addBranch(address, true);
+		addBranch(address, CONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -272,49 +288,49 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifnonnull(int)
 	 */
 	public void visit_ifnonnull(int address) {
-		addBranch(address, true);
+		addBranch(address, CONDITIONAL_BRANCH);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_athrow()
 	 */
 	public void visit_athrow() {
-		endBB(false);
+		endBB(UNCONDITIONAL_BRANCH);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_areturn()
 	 */
 	public void visit_areturn() {
-		endBB(false);
+		endBB(UNCONDITIONAL_BRANCH);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dreturn()
 	 */
 	public void visit_dreturn() {
-		endBB(false);
+		endBB(UNCONDITIONAL_BRANCH);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_freturn()
 	 */
 	public void visit_freturn() {
-		endBB(false);
+		endBB(UNCONDITIONAL_BRANCH);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ireturn()
 	 */
 	public void visit_ireturn() {
-		endBB(false);
+		endBB(UNCONDITIONAL_BRANCH);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lreturn()
 	 */
 	public void visit_lreturn() {
-		endBB(false);
+		endBB(UNCONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -323,14 +339,14 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 */
 	public void visit_ret(int index) {
 		// Not sure about this either, this needs testing
-		endBB(false);
+		endBB(UNCONDITIONAL_BRANCH);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_return()
 	 */
 	public void visit_return() {
-		endBB(false);
+		endBB(UNCONDITIONAL_BRANCH);
 	}
 
 	/**
@@ -338,11 +354,11 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * 
 	 * @param target
 	 */
-	private final void addBranch(int target, boolean nextIsSuccessor) {
+	private final void addBranch(int target, byte flags) {
 		IRBasicBlock pred = this.currentBlock;
 		IRBasicBlock succ = startBB(target);
 		pred.addSuccessor(succ);
-		endBB(nextIsSuccessor);
+		endBB(flags);
 	}
 
 	/**
@@ -372,9 +388,10 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	/**
 	 * Mark the end of a basic block
 	 */
-	private final void endBB(boolean nextIsSuccessor) {
+	private final void endBB(byte flags) {
 		nextIsStartOfBB = true;
-		this.nextIsSuccessor = nextIsSuccessor;
+		int address = getInstructionAddress();
+		branchFlags[address] |= flags;
 	}
 
 	/**
@@ -385,13 +402,8 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 		super.startInstruction(address);
 		opcodeFlags[address] |= BytecodeFlags.F_START_OF_INSTRUCTION;
 		if (nextIsStartOfBB || isStartOfBB(address)) {
-			IRBasicBlock pred = this.currentBlock;
 			this.currentBlock = startBB(address);
-			if (nextIsSuccessor) {
-				pred.addSuccessor(this.currentBlock);
-			}
 			nextIsStartOfBB = false;
-			nextIsSuccessor = true;
 		}
 	}
 
