@@ -82,6 +82,12 @@ public interface VMFileSystemAPI {
 	 * This method returns an array of filesystem roots.
 	 */
 	public File[] getRoots();
+	
+	/**
+	 * This method is called when the filesystem is unregistered
+	 * @param root
+	 */
+	public void rootRemoved(File root);
 
 	/**
 	 * Gets an array of names of all entries of the given directory. All names are relative to the
