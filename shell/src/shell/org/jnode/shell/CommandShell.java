@@ -410,10 +410,12 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 		try {
 			int y = console.getCursorY();
 			console.clearLine(y);
-			console.clearLine(y-1);
+			/* Uncomment this to display cursor position
+			console.clearLine(y-25);
 			console.setCursor(0, y-1);
 			err.print("Cursor pos : x = "+currentPrompt.length() + posOnCurrentLine+", y = "+y);
 			console.setCursor(0, y);
+			 */
 			out.print(currentPrompt + currentLine + " ");
 			console.setCursor(currentPrompt.length() + posOnCurrentLine, console.getCursorY());
 		}
