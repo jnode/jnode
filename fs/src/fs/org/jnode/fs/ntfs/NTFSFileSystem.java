@@ -13,76 +13,76 @@ import org.jnode.fs.FileSystemException;
 import org.jnode.fs.spi.AbstractFileSystem;
 
 /**
+ * NTFS filesystem implementation.
+ * 
  * @author Chira
- *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class NTFSFileSystem extends AbstractFileSystem
-{
-	
-	private NTFSVolume volume = null;
-	/* (non-Javadoc)
-	 * @see org.jnode.fs.FileSystem#getDevice()
-	 */
-	public NTFSFileSystem(Device device, boolean readOnly) throws FileSystemException 
-	{
-		super(device, readOnly);
-		
-		try {
-			// initialize the NTFE volume
-			volume = new NTFSVolume(getApi());
-		} catch (IOException e) {
-			throw new FileSystemException(e);
-		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.jnode.fs.FileSystem#getRootEntry()
-	 */
-	public FSEntry getRootEntry() throws IOException
-	{
-		return new NTFSDirectory(
-				volume.getRootDirectory()
-		).getEntry(".");
-		
-	}
-	
-	/**
-	 * @return Returns the volume.
-	 */
-	public NTFSVolume getNTFSVolume() {
-		return this.volume;
-	}
+public class NTFSFileSystem extends AbstractFileSystem {
 
-	/* (non-Javadoc)
-	 * @see org.jnode.fs.AbstractFileSystem#flush()
-	 */
-	public void flush() throws IOException {
-		// TODO Auto-generated method stub						
-	}
+    private final NTFSVolume volume;
+    private FSEntry root;
 
-	/**
-	 * 
-	 */
-	protected FSFile createFile(FSEntry entry) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @see org.jnode.fs.FileSystem#getDevice()
+     */
+    public NTFSFileSystem(Device device, boolean readOnly)
+            throws FileSystemException {
+        super(device, readOnly);
 
-	/**
-	 * 
-	 */
-	protected FSDirectory createDirectory(FSEntry entry) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        try {
+            // initialize the NTFE volume
+            volume = new NTFSVolume(getApi());
+        } catch (IOException e) {
+            throw new FileSystemException(e);
+        }
+    }
 
-	/**
-	 * 
-	 */
-	protected FSEntry createRootEntry() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @see org.jnode.fs.FileSystem#getRootEntry()
+     */
+    public FSEntry getRootEntry() throws IOException {
+        if (root == null) {
+            root = new NTFSDirectory(this, volume.getRootDirectory()).getEntry(".");
+        } 
+        return root;
+    }
+
+    /**
+     * @return Returns the volume.
+     */
+    public NTFSVolume getNTFSVolume() {
+        return this.volume;
+    }
+
+    /**
+     * Flush all data.
+     */
+    public void flush() throws IOException {
+        // TODO Auto-generated method stub
+    }
+
+    /**
+     *  
+     */
+    protected FSFile createFile(FSEntry entry) throws IOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     *  
+     */
+    protected FSDirectory createDirectory(FSEntry entry) throws IOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     *  
+     */
+    protected FSEntry createRootEntry() throws IOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

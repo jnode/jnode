@@ -5,225 +5,145 @@ package org.jnode.fs.ntfs;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.jnode.driver.block.BlockDeviceAPI;
-import org.jnode.fs.ntfs.attributes.NTFSIndexEntry;
-import org.jnode.fs.ntfs.attributes.NTFSNonResidentAttribute;
-
 
 /**
  * @author Chira
- *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
  */
-public class NTFSVolume
-{
+public class NTFSVolume {
 
-	public static byte LONG_FILE_NAMES = 0x01;
-	public static byte DOS_8_3 = 0x02;
-	
-	private byte currentNameSpace = LONG_FILE_NAMES;
-	
-	private BlockDeviceAPI api = null;
-	
-	// local chache for faster access 
-	private int clusterSize = -1;
-	private NTFSBootRecord bootRecord = null;
-	NTFSFileRecord  mftFileRecord = null;
-	NTFSFileRecord  rootDirectory = null;
-	
-	/**
-	 * 
-	 */
-	public NTFSVolume(BlockDeviceAPI api) throws IOException
-	{
-		super();
-		if(bootRecord == null)
-			bootRecord = new NTFSBootRecord();
-		// I hope this is enaugh..should be
-		byte[] buffer = new byte[512];
-		this.api = api;
-		
-		api.read(0,buffer,0,512);
-		bootRecord.initBootRecordData(buffer);
-	}
-	
-	/**
-	 * @return Returns the bootRecord.
-	 */
-	public NTFSBootRecord getBootRecord()
-	{
-		return bootRecord;
-	}
-	/**
-	 * @param cluster 
-	 */
-	public byte[] readCluster(long cluster) throws IOException
-	{
-		byte[] buff = new byte[getClusterSize() ];
-		long clusterOffset = cluster * getClusterSize();
-		
-		api.read(clusterOffset,buff,0,	getClusterSize());
-		return buff;
-	}
-	
-	public byte[] readDataFromCluster(long cluster, int howManyBytes, int offset) throws IOException
-	{
-		return NTFSUTIL.extractSubBuffer(readCluster(cluster),offset,howManyBytes);
-	}
-	
-	public byte[] readClusters(long firstCluster, long howMany) throws IOException
-	{
-		byte[] buff = new byte[(int) (howMany * getClusterSize())];
+    private static final Logger log = Logger.getLogger(NTFSVolume.class);
 
-		long clusterOffset = firstCluster * getClusterSize();
-		for(int i = 0 ; i< howMany;i++)
-		{	
-			api.read(clusterOffset + (i * getClusterSize()),buff,i * getClusterSize(),	getClusterSize());
-		}
-		return buff;
-	}
-	
-	public int getClusterSize()
-	{
-		if(clusterSize < 0 )
-			clusterSize =  this.getBootRecord().getSectorPerCluster() * this.getBootRecord().getBytesPerSector();
-		return clusterSize;
-	}
-	public void setBootRecord(NTFSBootRecord bootRecord)
-	{
-		this.bootRecord = bootRecord;
-	}
-	/**
-	 * @return Returns the mTFRecord.
-	 */
-	public NTFSFileRecord getMFTRecord() throws IOException
-	{
-		if(mftFileRecord == null)
-		{	
-			if(this.getBootRecord().getBytesPerFileRecord() < this.getClusterSize())
-			{
-				mftFileRecord = new NTFSFileRecord(
-						this,
-						this.readDataFromCluster(
-								this.getBootRecord().getMFTPointer(),
-								this.getBootRecord().getBytesPerFileRecord(),
-								0
-						));
-						
-			}
-			else
-				mftFileRecord = new NTFSFileRecord(
-							this,
-							this.readClusters(
-									this.getBootRecord().getMFTPointer(),
-									this.getBootRecord().getBytesPerFileRecord() / this.getClusterSize()
-							)
-			);
-		}
-		return mftFileRecord;
-		
-	}
-	
-	public NTFSFileRecord getIndexedFileRecord(NTFSIndexEntry indexEntry) throws IOException
-	{
-		// read the MFTdatathis
-		NTFSNonResidentAttribute dataAttribute = (NTFSNonResidentAttribute) this.getMFTRecord().getAttribute(NTFSFileRecord.$DATA);
-		// find out the VCN
-		
-		long offset = this.getBootRecord().getBytesPerFileRecord() * (indexEntry.getFileReferenceNumber());
-		
-		// read the buffer
-		byte [] buffer = null;
-		
-		buffer = dataAttribute.readVCN(
-				offset / this.getClusterSize(),
-				this.getBootRecord().getBytesPerFileRecord() < this.getClusterSize() ? 1 :  this.getBootRecord().getBytesPerFileRecord() / this.getClusterSize() 
-		);
-		return 
-			new NTFSFileRecord(
-					this,
-					NTFSUTIL.extractSubBuffer(
-								buffer,
-								(int)(offset % this.getClusterSize()),
-								this.getBootRecord().getBytesPerFileRecord())
-			); 
-		
-	}
-	public NTFSFileRecord getRootDirectory() throws IOException
-	{
-		if(rootDirectory == null)
-		{	
-			// first find the filerecord for root 
-			NTFSNonResidentAttribute dataAttribute = ((NTFSNonResidentAttribute)getMFTRecord().getAttribute(NTFSFileRecord.$DATA));
-			
-			int howmanyToRead = 1;
-			
-			if( this.getBootRecord().getBytesPerFileRecord() > getClusterSize())
-			{
-				howmanyToRead = this.getBootRecord().getBytesPerFileRecord() / getClusterSize(); 
-			}
-			int vcn = 0;
-			
-			byte[] data = dataAttribute.readVCN(
-						vcn,
-						howmanyToRead
-				);
-			
-			int offset = 0;
-			
-			while(true)
-			{
-				NTFSFileRecord record = new NTFSFileRecord(
-						this,
-						NTFSUTIL.extractSubBuffer(
-							data,
-							offset,
-							this.getBootRecord().getBytesPerFileRecord()
-						)
-					);
-				if(record.isDirectory() && record.getFileName().equals("."))
-				{
-					rootDirectory = record;
-					break;
-				}
-				if(this.getBootRecord().getBytesPerFileRecord() < getClusterSize())
-				{	
-					offset += this.getBootRecord().getBytesPerFileRecord();
-					if(offset == getClusterSize())
-					{
-						vcn += howmanyToRead;
-						data = dataAttribute.readVCN(
-								vcn,
-								howmanyToRead
-						);
-						offset=0;
-					}
-				}
-				else
-				{
-					vcn += howmanyToRead;
-					data = dataAttribute.readVCN(
-							vcn,
-							howmanyToRead
-					);
-				}
-			}
-		}
-		return rootDirectory;
-	}
-	/**
-	 * @return Returns the currentNameSpace.
-	 */
-	public byte getCurrentNameSpace()
-	{
-		return currentNameSpace;
-	}
-	/**
-	 * @param currentNameSpace The currentNameSpace to set.
-	 */
-	public void setCurrentNameSpace(byte currentNameSpace)
-	{
-		this.currentNameSpace = currentNameSpace;
-	}
+    public static final byte LONG_FILE_NAMES = 0x01;
+
+    public static final byte DOS_8_3 = 0x02;
+
+    private byte currentNameSpace = LONG_FILE_NAMES;
+
+    private final BlockDeviceAPI api;
+
+    // local chache for faster access
+    private final int clusterSize;
+
+    private final BootRecord bootRecord;
+
+    private MasterFileTable mftFileRecord;
+
+    private FileRecord rootDirectory;
+
+    /**
+     * Initialize this instance.  
+     */
+    public NTFSVolume(BlockDeviceAPI api) throws IOException {
+        // I hope this is enaugh..should be
+        this.api = api;
+
+        // Read the boot sector
+        final byte[] buffer = new byte[ 512];
+        api.read(0, buffer, 0, 512);
+        this.bootRecord = new BootRecord(buffer);
+        this.clusterSize = bootRecord.getClusterSize();
+    }
+
+    /**
+     * @return Returns the bootRecord.
+     */
+    final BootRecord getBootRecord() {
+        return bootRecord;
+    }
+
+    /**
+     * Read a single cluster.
+     * 
+     * @param cluster
+     */
+    public void readCluster(long cluster, byte[] dst, int dstOffset)
+            throws IOException {
+        final int clusterSize = getClusterSize();
+        final long clusterOffset = cluster * clusterSize;
+
+        log.debug("readCluster(" + cluster + ") " + (readClusterCount++));
+        api.read(clusterOffset, dst, dstOffset, clusterSize);
+    }
+
+    private int readClusterCount;
+    private int readClustersCount;
+    
+    /**
+     * Read a number of clusters.
+     * 
+     * @param firstCluster
+     * @param nrClusters
+     *            The number of clusters to read.
+     * @param dst
+     *            Must have space for (nrClusters * getClusterSize())
+     * @param dstOffset
+     * @throws IOException
+     */
+    public void readClusters(long firstCluster, byte[] dst, int dstOffset,
+            int nrClusters) throws IOException {
+        log.debug("readClusters(" + firstCluster + ", " + nrClusters + ") " + (readClustersCount++));
+
+        final int clusterSize = getClusterSize();
+
+        final long clusterOffset = firstCluster * clusterSize;
+        api.read(clusterOffset, dst, dstOffset, nrClusters * clusterSize);
+    }
+
+    /**
+     * Gets the size of a cluster.
+     * 
+     * @return
+     */
+    public int getClusterSize() {
+        return clusterSize;
+    }
+
+    /**
+     * Gets the MFT.
+     * @return Returns the mTFRecord.
+     */
+    public MasterFileTable getMFT() throws IOException {
+        if (mftFileRecord == null) {
+            final BootRecord bootRecord = getBootRecord();
+            final int bytesPerFileRecord = bootRecord.getFileRecordSize();
+            final int clusterSize = getClusterSize();
+
+            final int nrClusters;
+            if (bytesPerFileRecord < clusterSize) {
+                nrClusters = 1;
+            } else {
+                nrClusters = bytesPerFileRecord / clusterSize;
+            }
+            final byte[] data = new byte[ nrClusters * clusterSize];
+            readClusters(bootRecord.getMftLcn(), data, 0, nrClusters);
+            mftFileRecord = new MasterFileTable(this, data, 0);
+        }
+        return mftFileRecord;
+
+    }
+
+    /**
+     * Gets the root directory on this volume.
+     * @return
+     * @throws IOException
+     */
+    public FileRecord getRootDirectory() throws IOException {
+        if (rootDirectory == null) {
+            // Read the root directory
+            final MasterFileTable mft = getMFT();
+            
+            rootDirectory = mft.getRecord(MasterFileTable.SystemFiles.ROOT);
+            log.info("getRootDirectory: " + rootDirectory.getFileName());
+        }
+        return rootDirectory;
+    }
+
+    /**
+     * @return Returns the currentNameSpace.
+     */
+    public byte getCurrentNameSpace() {
+        return currentNameSpace;
+    }
 }

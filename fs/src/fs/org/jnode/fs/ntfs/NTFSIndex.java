@@ -4,205 +4,151 @@
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-import org.jnode.fs.ntfs.attributes.NTFSIndexEntry;
-import org.jnode.fs.ntfs.attributes.NTFSNonResidentAttribute;
-import org.jnode.fs.ntfs.attributes.NTFSResidentAttribute;
-import org.jnode.util.LittleEndian;
+import org.apache.log4j.Logger;
+import org.jnode.util.Queue;
 
 /**
  * @author Chira
- * 
- * To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Generation - Code and Comments
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class NTFSIndex {
+final class NTFSIndex {
 
-    public static int NTFS_INDXMAGIC = 0x58444E49;
+    private final FileRecord fileRecord;
 
-    NTFSFileRecord fileRecord = null;
+    private IndexRootAttribute indexRootAttribute;
 
-    private NTFSResidentAttribute indexRootAttribute = null;
+    private IndexAllocationAttribute indexAllocationAttribute;
 
-    private NTFSNonResidentAttribute indexAllocationAttribute = null;
+    final static Logger log = Logger.getLogger(NTFSIndex.class);
 
-    public NTFSIndex(NTFSFileRecord fileRecord) {
+    /**
+     * Initialize this instance.
+     * 
+     * @param fileRecord
+     */
+    public NTFSIndex(FileRecord fileRecord) throws IOException {
         this.fileRecord = fileRecord;
+        if (!fileRecord.isDirectory()) { throw new IOException(
+                "fileRecord is not a directory"); }
     }
 
-    public NTFSResidentAttribute getIndexRootAttribute() {
-        if (indexRootAttribute == null)
-                indexRootAttribute = (NTFSResidentAttribute) fileRecord
-                        .getAttribute(NTFSFileRecord.$INDEX_ROOT);
+    /**
+     * Gets the index root attribute.
+     * 
+     * @return
+     */
+    public IndexRootAttribute getIndexRootAttribute() {
+        if (indexRootAttribute == null) {
+            indexRootAttribute = (IndexRootAttribute) fileRecord
+                    .getAttribute(NTFSAttribute.Types.INDEX_ROOT);
+            log.debug("getIndexRootAttribute: " + indexRootAttribute);
+        }
         return indexRootAttribute;
     }
 
-    public NTFSNonResidentAttribute getIndexAllocationAttribute() {
-        if (indexAllocationAttribute == null)
-                indexAllocationAttribute = (NTFSNonResidentAttribute) fileRecord
-                        .getAttribute(NTFSFileRecord.$INDEX_ALLOCATION);
-        //System.out.println(indexAllocationAttribute.getFlags());
+    /**
+     * Gets the index allocation attribute, if any.
+     * 
+     * @return
+     */
+    public IndexAllocationAttribute getIndexAllocationAttribute() {
+        if (indexAllocationAttribute == null) {
+            indexAllocationAttribute = (IndexAllocationAttribute) fileRecord
+                    .getAttribute(NTFSAttribute.Types.INDEX_ALLOCATION);
+        }
         return indexAllocationAttribute;
     }
 
-    public int getAttributeType() {
-        return (int) LittleEndian.getUInt32(this.getIndexRootAttribute()
-                .getBuffer(),
-                this.getIndexRootAttribute().getAttributeOffset() + 0x00);
-    }
-
-    public int getCollationRule() {
-        return (int) LittleEndian.getUInt32(this.getIndexRootAttribute()
-                .getBuffer(),
-                this.getIndexRootAttribute().getAttributeOffset() + 0x04);
-    }
-
-    // this is the size of a NODE in the tree
-    public int getSizeOfIndexAllocationEntry() {
-        return (int) LittleEndian.getUInt32(this.getIndexRootAttribute()
-                .getBuffer(),
-                this.getIndexRootAttribute().getAttributeOffset() + 0x08);
-    }
-
-    // this returns the numer of clusters that we need to read ro a indexrecord
-    public byte getClusterPerIndex() {
-        byte clusterPerindex = this.getIndexRootAttribute().getBuffer()[ this
-                .getIndexRootAttribute().getAttributeOffset() + 0x0C];
-        if (clusterPerindex < 0)
-            return 1;
-        else
-            return clusterPerindex;
-    }
-
-    public int getIndexEntrySizeInBytes() {
-        int clusterPerindex = this.getIndexRootAttribute().getBuffer()[ this
-                .getIndexRootAttribute().getAttributeOffset() + 0x0C];
-        if (clusterPerindex > 0)
-            return clusterPerindex
-                    * this.fileRecord.getVolume().getClusterSize();
-        else if (clusterPerindex < 0) return 1 << -(clusterPerindex);
-        return 0;
-    }
-
     public Iterator iterator() {
-        return new Iterator() {
-
-            // start with root
-            byte[] node = NTFSIndex.this.getIndexRootAttribute().getBuffer();
-
-            ArrayList subnodesList = new ArrayList();
-
-            // offset inside root attribute
-            int offset = NTFSIndex.this.getIndexRootAttribute()
-                    .getAttributeOffset()
-                    + 0x10
-                    + LittleEndian.getInt32(node,
-                            NTFSIndex.this.getIndexRootAttribute()
-                                    .getAttributeOffset() + 0x10);
-
-            int lastVCN = (int) NTFSIndex.this.getIndexAllocationAttribute()
-                    .getLastVCN();
-
-            NTFSIndexEntry indexEntry = null;
-
-            public boolean hasNext() {
-                // if it is the first time but it is the last entry without
-                // subnodes
-                if (indexEntry == null && (node[ offset + 0x0C] & 0x02) != 0)
-                        return (node[ offset + 0x0C] & 0x01) != 0;
-                return (node[ offset + 0x0C] & 0x02) == 0 ? true
-                        : !subnodesList.isEmpty();
-
-            }
-
-            private void endOfNodeReached() {
-                // take the first subnode from the list
-                if (!subnodesList.isEmpty()) {
-                    Integer intSubNodeVCN = (Integer) subnodesList.iterator()
-                            .next();
-                    int subnodeVCN = intSubNodeVCN.intValue();
-                    subnodesList.remove(intSubNodeVCN);
-                    //System.out.println("read subnode at vcn:" + subnodeVCN);
-                    if (subnodeVCN > NTFSIndex.this
-                            .getIndexAllocationAttribute().getLastVCN()) {
-                        System.out
-                                .println("Something is wrong. You try to read VCN="
-                                        + subnodeVCN
-                                        + " but my last VCN="
-                                        + NTFSIndex.this
-                                                .getIndexAllocationAttribute()
-                                                .getLastVCN());
-
-                    }
-                    //System.out.println(NTFSIndex.this.getIndexAllocationAttribute().getFlags());
-                    try {
-                        // ok now set the node buffer to an indexrecord
-                        node = NTFSIndex.this.getIndexAllocationAttribute()
-                                .readVCN(subnodeVCN,
-                                        NTFSIndex.this.getClusterPerIndex());
-                        if ((int)LittleEndian.getUInt32(node, 0) != NTFSIndex.NTFS_INDXMAGIC)
-                                throw new RuntimeException(
-                                        "ERROR: The Index record is not signed!! panic! I have more subnodes to process!");
-
-                        // reset the offset
-                        offset = (int)LittleEndian.getUInt32(node, 0x18) + 0x18;
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            public Object next() {
-                //setup the offset and the junmp to subnodes
-                int entrysize = LittleEndian.getUInt16(node, offset + 0x08);
-                indexEntry = new NTFSIndexEntry(NTFSIndex.this.fileRecord,
-                        NTFSUTIL.extractSubBuffer(node, offset, entrysize));
-
-                /*
-                 * ---------------
-                 */
-
-                /*
-                 * if(indexEntry.hasSubNodes()) System.out.println("has subnode
-                 * VCN = " + NTFSUTIL.LE_READ_U32_INT( node, offset + (entrysize -
-                 * 8))); if(!indexEntry.isLastIndexEntryInSubnode()) {
-                 * System.out.println(indexEntry.getFileName()); } else
-                 * System.out.println("last index entry");
-                 */
-
-                /*
-                 * ----------------
-                 */
-
-                if (indexEntry.hasSubNodes()) {
-                    // add the vcn to the subnodes list
-                    int vcn = (int) indexEntry.getSubnodeVCN();
-                    //if(vcn <= lastVCN)
-                    subnodesList.add(new Integer(vcn));
-                }
-                // move the offset to next IndexEntry
-                offset += entrysize;
-                // if it is the last one than go to next one
-                if (indexEntry.isLastIndexEntryInSubnode()
-                        && !subnodesList.isEmpty()) {
-                    this.endOfNodeReached();
-                    if (this.hasNext()) this.next();
-                }
-                if (indexEntry.getFileName().startsWith("$")
-                        || (indexEntry.getNameSpace() & 0x01) == 0) {
-                    if (this.hasNext()) this.next();
-                }
-                return indexEntry;
-            }
-
-            public void remove() {
-                throw new UnsupportedOperationException(
-                        "Not yet implemented: this is the read only version");
-            }
-        };
+        log.debug("iterator");
+        return new FullIndexEntryIterator();
     }
 
+    class FullIndexEntryIterator implements Iterator {
+
+        /**
+         * List of those IndexEntry's that have a subnode and the subnode has
+         * not been visited.
+         */
+        private final Queue subNodeEntries = new Queue();
+
+        /** Iterator of current part of the index */
+        private Iterator currentIterator;
+
+        private IndexEntry nextEntry;
+
+        /**
+         * Initialize this instance.
+         */
+        public FullIndexEntryIterator() {
+            log.debug("FullIndexEntryIterator");
+            currentIterator = getIndexRootAttribute().iterator();
+            log.debug("currentIterator=" + currentIterator);
+            readNextEntry();
+        }
+
+        /**
+         * @see java.util.Iterator#hasNext()
+         */
+        public boolean hasNext() {
+            return (nextEntry != null);
+        }
+
+        /**
+         * @see java.util.Iterator#next()
+         */
+        public Object next() {
+            final IndexEntry result = nextEntry;
+            if (result == null) {
+                throw new NoSuchElementException();
+            }
+            readNextEntry();
+            return result;
+        }
+
+        /**
+         * @see java.util.Iterator#remove()
+         */
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        private void readNextEntry() {
+            while (true) {
+                if (currentIterator.hasNext()) {
+                    // Read it
+                    nextEntry = (IndexEntry) currentIterator.next();
+                    if (nextEntry.hasSubNodes()) {
+                        log.debug("next has subnode");
+                        subNodeEntries.add(nextEntry);
+                    }
+                    if (!nextEntry.isLastIndexEntryInSubnode()) { return; }
+                }
+                nextEntry = null;
+
+                // Do we have subnodes to iterate over?
+                if (subNodeEntries.isEmpty()) {
+                    // No, we're done
+                    log.debug("end of list");
+                    return;
+                }
+
+                log.debug("hasNext: read next indexblock");
+                final IndexEntry entry = (IndexEntry) subNodeEntries.get();
+                final IndexRoot indexRoot = getIndexRootAttribute().getRoot();
+                final IndexBlock indexBlock;
+                try {
+                    indexBlock = getIndexAllocationAttribute().getIndexBlock(
+                            indexRoot, entry.getSubnodeVCN());
+                } catch (IOException ex) {
+                    log.error("Cannot read next index block", ex);
+                    return;
+                }
+                currentIterator = indexBlock.iterator();
+            }
+        }
+    }
 }

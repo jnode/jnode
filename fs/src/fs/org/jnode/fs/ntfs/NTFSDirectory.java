@@ -4,111 +4,99 @@
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
-import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSEntryIterator;
 import org.jnode.fs.FileSystem;
-import org.jnode.fs.ntfs.attributes.NTFSIndexEntry;
 
 /**
  * @author vali
- * 
- * To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Generation - Code and Comments
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class NTFSDirectory implements FSDirectory {
 
-	/**
-	 * 
-	 */
-	NTFSIndex index = null;
+    private final Logger log = Logger.getLogger(getClass());
 
-	/**
-	 * 
-	 * @param record
-	 */
-	public NTFSDirectory(NTFSFileRecord record) {
-		this.index = new NTFSIndex(record);
-	}
+    private final NTFSIndex index;
 
-	/**
-	 * 
-	 */
-	public FSEntryIterator iterator() {
-		return new FSEntryIterator() {
+    private final NTFSFileSystem fs;
 
-			Iterator it = index.iterator();
+    /**
+     * Initialize this instance.
+     * 
+     * @param record
+     */
+    public NTFSDirectory(NTFSFileSystem fs, FileRecord record)
+            throws IOException {
+        this.fs = fs;
+        this.index = new NTFSIndex(record);
+    }
 
-			public boolean hasNext() {
-				return it.hasNext();
-			}
+    /**
+     * Gets an iterator to iterate over all entries of this directory.
+     */
+    public FSEntryIterator iterator() {
+        return new DirectoryEntryIterator(fs, index);
+    }
 
-			public FSEntry next() {
-				return new NTFSEntry((NTFSIndexEntry)it.next());
-			}
-		};
-	}
+    /**
+     * Gets an entry with a given name.
+     */
+    public FSEntry getEntry(String name) {
+        log.debug("getEntry(" + name + ")");
+        for (FSEntryIterator it = this.iterator(); it.hasNext();) {
+            final NTFSEntry entry = (NTFSEntry) it.next();
+            if (entry.getName().equals(name)) { return entry; }
+        }
+        return null;
+    }
 
-	/**
-	 * 
-	 */
-	public FSEntry getEntry(String name) {
-		for (FSEntryIterator it = this.iterator(); it.hasNext();) {
-			NTFSEntry entry = (NTFSEntry)it.next();
-			if (entry.getName().equals(name))
-				return entry;
-		}
+    /**
+     *  
+     */
+    public FSEntry addFile(String name) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-		return null;
-	}
+    /**
+     *  
+     */
+    public FSEntry addDirectory(String name) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	/**
-	 * 
-	 */
-	public FSEntry addFile(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * Remove the entry with the given name from this directory.
+     */
+    public void remove(String name) {
+        // TODO Auto-generated method stub
 
-	/**
-	 * 
-	 */
-	public FSEntry addDirectory(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    }
 
-	/**
-	 * 
-	 */
-	public void remove(String name) {
-		// TODO Auto-generated method stub
+    /**
+     * Is this entry valid.
+     */
+    public boolean isValid() {
+        return true;
+    }
 
-	}
+    /**
+     *  
+     */
+    public FileSystem getFileSystem() {
+        return fs;
+    }
 
-	/**
-	 * 
-	 */
-	public boolean isValid() {
-		return true;
-	}
-
-	/**
-	 * 
-	 */
-	public FileSystem getFileSystem() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * Save all dirty (unsaved) data to the device 
-	 * @throws IOException
-	 */
-	public void flush() throws IOException
-	{
-		//TODO
-	}
+    /**
+     * Save all dirty (unsaved) data to the device
+     * 
+     * @throws IOException
+     */
+    public void flush() throws IOException {
+        //TODO
+    }
 }
