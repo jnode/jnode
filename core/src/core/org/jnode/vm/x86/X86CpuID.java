@@ -175,6 +175,21 @@ public class X86CpuID extends CpuID {
 	}
 
 	/**
+	 * Gets the number of logical processors. 
+	 * This method will only return more then 1 of this processor
+	 * has the Hyper Threading feature.
+	 * @return
+	 */
+	public final int getLogicalProcessors() {
+	    if (hasFeature(FEAT_HTT)) {
+	        // EBX bits 16-23 when EAX == 1
+	        return (data[5] >> 16) & 0xFF;
+	    } else {
+	        return 1;
+	    }
+	}
+	
+	/**
 	 * Has this CPU a given feature.
 	 * 
 	 * @param feature
@@ -251,18 +266,17 @@ public class X86CpuID extends CpuID {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return "CPU:"
-			+ " name:"
-			+ getName()
-			+ " family:"
-			+ getFamily()
-			+ " model:"
-			+ getModel()
-			+ " step:"
-			+ getSteppingID()
-			+ " features:"
-			+ getFeatureString()
-			+ " raw:"
-			+ NumberUtils.hex(data, 8);
+	    final StringBuffer sb = new StringBuffer();
+	    sb.append("CPU:");
+	    sb.append(" name:"); sb.append(getName());
+	    sb.append(" family:"); sb.append(getFamily());
+	    sb.append(" model:"); sb.append(getModel());
+	    sb.append(" step:"); sb.append(getSteppingID());
+	    if (hasFeature(FEAT_HTT)) {
+	        sb.append(" #log.proc:"); sb.append(getLogicalProcessors());
+	    }
+	    sb.append(" features:"); sb.append(getFeatureString());
+	    sb.append(" raw:"); sb.append(NumberUtils.hex(data, 8));
+	    return sb.toString();
 	}
 }
