@@ -82,6 +82,12 @@ check_a20:
 
 	; Initialized the FPU
 	fninit
+	; Setup rounding mode
+	lea esp,[esp-4]
+	fstcw [esp]
+	or word [esp], 0x0C00
+	fldcw [esp]
+	lea esp,[esp+4]
 
 	;sti
 
