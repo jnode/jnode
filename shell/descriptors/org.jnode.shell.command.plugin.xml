@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.shell.command.plugin" 
+        name="JNode Plugin related commands"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.shell.help"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-shell.jar">
+      <export name="org.jnode.shell.command.plugin.*"/>
+    </library>
+  </runtime>
+        
+  <extension point="org.jnode.shell.aliases">
+    <alias name="plugin"  class="org.jnode.shell.command.plugin.PluginCommand"/>
+  </extension>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.security.JNodePermission" name="createPluginLoader"/>
+  </extension>
+        
+</plugin>

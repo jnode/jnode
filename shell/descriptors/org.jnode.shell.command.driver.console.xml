@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.shell.command.driver.console"
+        name="JNode console driver commands"
+        version="@VERSION@"
+        provider-name="JNode.org">
+
+  <requires>
+    <import plugin="org.jnode.driver.console.core"/>
+    <import plugin="org.jnode.shell.help"/>
+  </requires>
+
+  <runtime>
+    <library name="jnode-shell.jar">
+      <export name="org.jnode.shell.command.driver.console.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.shell.aliases">
+    <alias name="console" class="org.jnode.shell.command.driver.console.ConsoleCommand"/>
+  </extension>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="jnode.prompt" actions="read"/>
+  </extension>
+</plugin>
