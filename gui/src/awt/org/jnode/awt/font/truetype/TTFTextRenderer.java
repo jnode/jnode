@@ -3,10 +3,12 @@
  */
 package org.jnode.awt.font.truetype;
 
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.PathIterator;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
@@ -43,7 +45,7 @@ public class TTFTextRenderer implements TextRenderer {
 		try {
 			final GeneralPath gp = new GeneralPath();
 			gp.moveTo(x, y);
-
+			
 			final TTFGlyphTable glyphTable = fontData.getGlyphTable();
 			final TTFCMapTable cmapTable = fontData.getCMapTable();
 			final TTFHorizontalHeaderTable hheadTable = fontData.getHorizontalHeaderTable();
@@ -64,17 +66,17 @@ public class TTFTextRenderer implements TextRenderer {
 			tx.translate(x, y + fontSize);
 			tx.scale(scale, -scale);
 			tx.translate(0, ascent);
-
+			
 			for (int i = 0; i < text.length(); i++) {
 				// get the index for the needed glyph
 				final int index = encTable.getTableFormat().getGlyphIndex(text.charAt(i));
 				Shape shape = glyphTable.getGlyph(index).getShape();
-				gp.append(shape.getPathIterator(tx), false);
+				if(text.charAt(i) != ' ')
+					gp.append(shape.getPathIterator(tx), false);
 				tx.translate(hmTable.getAdvanceWidth(index), 0);
 			}
-			//System.out.println("Drawing string..." + gp + ", bounds " + gp.getBounds());
-
 			g.draw(gp);
+			g.fill(gp);
 		} catch (IOException ex) {
 			log.error("Error drawing text", ex);
 		}
