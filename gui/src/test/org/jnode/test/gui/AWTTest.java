@@ -3,6 +3,8 @@
  */
 package org.jnode.test.gui;
 
+import javax.swing.JButton;
+import javax.swing.JList;
 import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.Color;
@@ -170,6 +172,8 @@ public class AWTTest {
             Thread.sleep(5000);
 
             wnd.hide();
+        }catch(Throwable t){
+            t.printStackTrace();
         } finally {
             wnd.dispose();
         }
