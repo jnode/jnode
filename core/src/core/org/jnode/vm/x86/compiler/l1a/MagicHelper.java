@@ -217,8 +217,10 @@ final class MagicHelper extends BaseX86MagicHelper {
             other.load(ec);
             addr.load(ec);
             final IntItem result = (IntItem)L1AHelper.requestWordRegister(ec, JvmType.INT, true);
+            final Register resultr = result.getRegister();
+            os.writeXOR(resultr, resultr);
             os.writeCMP(addr.getRegister(), other.getRegister());
-            os.writeSETCC(result.getRegister(), methodToCC(mcode));
+            os.writeSETCC(resultr, methodToCC(mcode));
             other.release(ec);
             addr.release(ec);
             vstack.push(result);
