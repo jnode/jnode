@@ -12,7 +12,7 @@ public class ExecTest {
 		// Change System.out. If the process works correctly,
 		// the console should not have problem with it.
 		
-		System.out = System.err;
+		System.setOut(System.err);
 		System.out.println("Message on new System.out");
 		System.exit(0);
 		

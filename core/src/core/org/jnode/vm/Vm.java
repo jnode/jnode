@@ -93,6 +93,17 @@ public class Vm extends VmSystemObject {
 		}
 	}
 
+    /**
+     * Returns the number of available processors currently available to the
+     * virtual machine. This number may change over time; so a multi-processor
+     * program want to poll this to determine maximal resource usage.
+     *
+     * @return the number of processors available, at least 1
+     */
+    public final int availableProcessors() {
+        return processors.size();
+    }
+    
 	/**
 	 * Show VM info.
 	 * 
