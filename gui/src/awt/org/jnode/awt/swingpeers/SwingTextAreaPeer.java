@@ -33,22 +33,22 @@ class SwingTextAreaPeer extends JTextArea implements TextAreaPeer {
 
 		switch (textArea.getScrollbarVisibility()) {
 		case TextArea.SCROLLBARS_BOTH:
-			SwingFramePeer.add(textArea, new JScrollPane(this,
+			SwingToolkit.add(textArea, new JScrollPane(this,
 					ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS));
 			break;
 		case TextArea.SCROLLBARS_HORIZONTAL_ONLY:
-			SwingFramePeer.add(textArea, new JScrollPane(this,
+			SwingToolkit.add(textArea, new JScrollPane(this,
 					ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS));
 			break;
 		case TextArea.SCROLLBARS_VERTICAL_ONLY:
-			SwingFramePeer.add(textArea, new JScrollPane(this,
+			SwingToolkit.add(textArea, new JScrollPane(this,
 					ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER));
 			break;
 		case TextArea.SCROLLBARS_NONE:
-			SwingFramePeer.add(textArea, this);
+			SwingToolkit.add(textArea, this);
 			break;
 		}
 

@@ -24,7 +24,7 @@ class SwingCheckboxPeer extends JCheckBox implements CheckboxPeer {
 	//
 
 	public SwingCheckboxPeer(Checkbox checkBox) {
-		SwingFramePeer.add(checkBox, this);
+		SwingToolkit.add(checkBox, this);
 		SwingToolkit.copyAwtProperties(checkBox, this);
 		setText(checkBox.getLabel());
 		setState(checkBox.getState());

@@ -32,6 +32,7 @@ import java.awt.peer.CanvasPeer;
 import java.awt.peer.CheckboxMenuItemPeer;
 import java.awt.peer.CheckboxPeer;
 import java.awt.peer.ChoicePeer;
+import java.awt.peer.ComponentPeer;
 import java.awt.peer.DialogPeer;
 import java.awt.peer.FileDialogPeer;
 import java.awt.peer.FramePeer;
@@ -215,4 +216,26 @@ public class SwingToolkit extends JNodeToolkit {
     		peer.setFont(f);
     	}
     }
+
+	public static void add(Component component, JComponent peer) {
+		final SwingContainerPeer containerPeer = getContainerPeer(component);
+		if (containerPeer != null) {
+			containerPeer.addAWTComponent(component, peer);
+		}
+	}
+
+	private static SwingContainerPeer getContainerPeer(Component component) {
+		final Component parent = component.getParent();
+		if (parent == null) {
+			return null;
+		} else {
+			final ComponentPeer parentPeer = parent.getPeer();
+			if (parentPeer instanceof SwingContainerPeer) {
+				return (SwingContainerPeer) parentPeer;
+			} else {
+				return getContainerPeer(parent);
+			}
+		}
+	}
+
 }

@@ -24,7 +24,7 @@ class SwingScrollbarPeer extends JScrollBar implements ScrollbarPeer {
     //
 
     public SwingScrollbarPeer(Scrollbar sb) {
-        SwingFramePeer.add(sb, this);
+        SwingToolkit.add(sb, this);
         SwingToolkit.copyAwtProperties(sb, this);
         setOrientation(sb.getOrientation());
         setBlockIncrement(sb.getBlockIncrement());

@@ -12,118 +12,129 @@ import java.awt.event.KeyEvent;
 import java.awt.event.PaintEvent;
 import java.awt.peer.DialogPeer;
 
+import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 
 /**
  * AWT dialog peer implemented as a {@link javax.swing.JInternalFrame}.
  */
 
-class SwingDialogPeer extends JInternalFrame implements DialogPeer {
+class SwingDialogPeer extends JInternalFrame implements DialogPeer,
+		SwingContainerPeer {
 
-    //
-    // Construction
-    //
+	//
+	// Construction
+	//
 
-    public SwingDialogPeer(Dialog dialog) {
-        SwingToolkit.copyAwtProperties(dialog, this);
-        setTitle(dialog.getTitle());
-    }
+	public SwingDialogPeer(Dialog dialog) {
+		SwingToolkit.copyAwtProperties(dialog, this);
+		setTitle(dialog.getTitle());
+		getContentPane().setLayout(null);
+	}
 
-    //
-    // WindowPeer
-    //
+	/**
+	 * @see org.jnode.awt.swingpeers.SwingContainerPeer#addAWTComponent(java.awt.Component,
+	 *      javax.swing.JComponent)
+	 */
+	public void addAWTComponent(Component awtComponent, JComponent peer) {
+		getContentPane().add(peer);
+	}
 
-    public int handleFocusTraversalEvent(KeyEvent e) {
-        return -1;
-    }
+	public void beginLayout() {
+	}
 
-    //
-    // ContainerPeer
-    //
+	//
+	// ContainerPeer
+	//
 
-    public void beginValidate() {
-    }
+	public void beginValidate() {
+	}
 
-    public void endValidate() {
-    }
+	public boolean canDetermineObscurity() {
+		return false;
+	}
 
-    public void beginLayout() {
-    }
+	public void coalescePaintEvent(PaintEvent e) {
+		System.err.println(e);
+	}
 
-    public void endLayout() {
-    }
+	// Buffer
 
-    public boolean isPaintPending() {
-        return false;
-    }
+	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
+	}
 
-    //
-    // ComponentPeer
-    //
+	public void destroyBuffers() {
+	}
 
-    // Events
+	// Misc
 
-    public void handleEvent(AWTEvent e) {
-        //System.err.println(e);
-    }
+	public void dispose() {
+	}
 
-    public void coalescePaintEvent(PaintEvent e) {
-        System.err.println(e);
-    }
+	public void endLayout() {
+	}
 
-    public boolean handlesWheelScrolling() {
-        return false;
-    }
+	public void endValidate() {
+	}
 
-    // Obscurity
+	public void flip(BufferCapabilities.FlipContents flipContents) {
+	}
 
-    public boolean isObscured() {
-        return false;
-    }
+	public Image getBackBuffer() {
+		return null;
+	}
 
-    public boolean canDetermineObscurity() {
-        return false;
-    }
+	//
+	// ComponentPeer
+	//
 
-    // Focus
+	// Events
 
-    public boolean requestFocus(Component lightweightChild, boolean temporary,
-            boolean focusedWindowChangeAllowed, long time) {
-        return true;
-    }
+	public void handleEvent(AWTEvent e) {
+		//System.err.println(e);
+	}
 
-    // Buffer
+	//
+	// WindowPeer
+	//
 
-    public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-    }
+	public int handleFocusTraversalEvent(KeyEvent e) {
+		return -1;
+	}
 
-    public void destroyBuffers() {
-    }
+	public boolean handlesWheelScrolling() {
+		return false;
+	}
 
-    public void flip(BufferCapabilities.FlipContents flipContents) {
-    }
+	// Obscurity
 
-    public Image getBackBuffer() {
-        return null;
-    }
+	public boolean isObscured() {
+		return false;
+	}
 
-    // Cursor
+	public boolean isPaintPending() {
+		return false;
+	}
 
-    public void updateCursorImmediately() {
-    }
+	// Focus
 
-    // Misc
+	public boolean requestFocus(Component lightweightChild, boolean temporary,
+			boolean focusedWindowChangeAllowed, long time) {
+		return true;
+	}
 
-    public void dispose() {
-    }
+	///////////////////////////////////////////////////////////////////////////////////////
+	// Private
+	/**
+	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
+	 */
+	public void setEventMask(long mask) {
+		// TODO Auto-generated method stub
 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // Private
-    /**
-     * @see java.awt.peer.ComponentPeer#setEventMask(long)
-     */
-    public void setEventMask(long mask) {
-        // TODO Auto-generated method stub
+	}
 
-    }
+	// Cursor
+
+	public void updateCursorImmediately() {
+	}
 }

@@ -11,111 +11,120 @@ import java.awt.Panel;
 import java.awt.event.PaintEvent;
 import java.awt.peer.PanelPeer;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 /**
  * AWT panel peer implemented as a {@link javax.swing.JPanel}.
  */
 
-class SwingPanelPeer extends JPanel implements PanelPeer {
+class SwingPanelPeer extends JPanel implements PanelPeer, SwingContainerPeer {
+	//
+	// Construction
+	//
 
-    //
-    // Construction
-    //
+	public SwingPanelPeer(Panel panel) {
+		super();
+		SwingToolkit.add(panel, this);
+		SwingToolkit.copyAwtProperties(panel, this);
+		setLayout(null);
+	}
 
-    public SwingPanelPeer(Panel panel) {
-        super();
-        SwingFramePeer.add(panel, this);
-        SwingToolkit.copyAwtProperties(panel, this);
-    }
+	/**
+	 * @see org.jnode.awt.swingpeers.SwingContainerPeer#addAWTComponent(java.awt.Component,
+	 *      javax.swing.JComponent)
+	 */
+	public void addAWTComponent(Component awtComponent, JComponent peer) {
+		add(peer);
+	}
 
-    //
-    // ContainerPeer
-    //
+	public void beginLayout() {
+	}
 
-    public void beginValidate() {
-    }
+	//
+	// ContainerPeer
+	//
 
-    public void endValidate() {
-    }
+	public void beginValidate() {
+	}
 
-    public void beginLayout() {
-    }
+	public boolean canDetermineObscurity() {
+		return false;
+	}
 
-    public void endLayout() {
-    }
+	public void coalescePaintEvent(PaintEvent e) {
+		System.err.println(e);
+	}
 
-    public boolean isPaintPending() {
-        return false;
-    }
+	// Buffer
 
-    //
-    // ComponentPeer
-    //
+	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
+	}
 
-    // Events
+	public void destroyBuffers() {
+	}
 
-    public void handleEvent(AWTEvent e) {
-        //System.err.println(e);
-    }
+	// Misc
 
-    public void coalescePaintEvent(PaintEvent e) {
-        System.err.println(e);
-    }
+	public void dispose() {
+	}
 
-    public boolean handlesWheelScrolling() {
-        return false;
-    }
+	public void endLayout() {
+	}
 
-    // Obscurity
+	public void endValidate() {
+	}
 
-    public boolean isObscured() {
-        return false;
-    }
+	public void flip(BufferCapabilities.FlipContents flipContents) {
+	}
 
-    public boolean canDetermineObscurity() {
-        return false;
-    }
+	public Image getBackBuffer() {
+		return null;
+	}
 
-    // Focus
+	//
+	// ComponentPeer
+	//
 
-    public boolean requestFocus(Component lightweightChild, boolean temporary,
-            boolean focusedWindowChangeAllowed, long time) {
-        return true;
-    }
+	// Events
 
-    // Buffer
+	public void handleEvent(AWTEvent e) {
+		//System.err.println(e);
+	}
 
-    public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-    }
+	public boolean handlesWheelScrolling() {
+		return false;
+	}
 
-    public void destroyBuffers() {
-    }
+	// Obscurity
 
-    public void flip(BufferCapabilities.FlipContents flipContents) {
-    }
+	public boolean isObscured() {
+		return false;
+	}
 
-    public Image getBackBuffer() {
-        return null;
-    }
+	public boolean isPaintPending() {
+		return false;
+	}
 
-    // Cursor
+	// Focus
 
-    public void updateCursorImmediately() {
-    }
+	public boolean requestFocus(Component lightweightChild, boolean temporary,
+			boolean focusedWindowChangeAllowed, long time) {
+		return true;
+	}
 
-    // Misc
+	///////////////////////////////////////////////////////////////////////////////////////
+	// Private
+	/**
+	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
+	 */
+	public void setEventMask(long mask) {
+		// TODO Auto-generated method stub
 
-    public void dispose() {
-    }
+	}
 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // Private
-    /**
-     * @see java.awt.peer.ComponentPeer#setEventMask(long)
-     */
-    public void setEventMask(long mask) {
-        // TODO Auto-generated method stub
+	// Cursor
 
-    }
+	public void updateCursorImmediately() {
+	}
 }

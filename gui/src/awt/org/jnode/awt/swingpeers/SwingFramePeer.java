@@ -11,10 +11,10 @@ import java.awt.Image;
 import java.awt.MenuBar;
 import java.awt.event.KeyEvent;
 import java.awt.event.PaintEvent;
-import java.awt.peer.ComponentPeer;
 import java.awt.peer.FramePeer;
 import java.beans.PropertyVetoException;
 
+import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 
@@ -22,33 +22,11 @@ import javax.swing.JInternalFrame;
  * AWT frame peer implemented as a {@link javax.swing.JInternalFrame}.
  */
 
-class SwingFramePeer extends JInternalFrame implements FramePeer {
-
-	//
-	// Static operations
-	//
-
-	public static void add(Component component, Component peer) {
-		SwingFramePeer framePeer = getFramePeer(component);
-		if (framePeer != null)
-			framePeer.getContentPane().add(peer);
-	}
+class SwingFramePeer extends JInternalFrame implements FramePeer,
+		SwingContainerPeer {
 
 	///////////////////////////////////////////////////////////////////////////////////////
 	// Private
-
-	private static SwingFramePeer getFramePeer(Component component) {
-		Component parent = component.getParent();
-		if (parent == null) {
-			return null;
-		} else {
-			ComponentPeer parentPeer = parent.getPeer();
-			if (parentPeer instanceof SwingFramePeer)
-				return (SwingFramePeer) parentPeer;
-			else
-				return getFramePeer(parent);
-		}
-	}
 
 	private final SwingToolkit toolkit;
 
@@ -63,6 +41,7 @@ class SwingFramePeer extends JInternalFrame implements FramePeer {
 		desktopPane.add(this);
 
 		SwingToolkit.copyAwtProperties(frame, this);
+		getContentPane().setLayout(null);
 		setLocation(frame.getLocation());
 		setSize(frame.getSize());
 		setResizable(frame.isResizable());
@@ -77,6 +56,14 @@ class SwingFramePeer extends JInternalFrame implements FramePeer {
 		setTitle(frame.getTitle());
 		setIconImage(frame.getIconImage());
 		setMenuBar(frame.getMenuBar());
+	}
+
+	//
+	// Static operations
+	//
+
+	public void addAWTComponent(Component awtComponent, JComponent peer) {
+		getContentPane().add(peer);
 	}
 
 	public void beginLayout() {
