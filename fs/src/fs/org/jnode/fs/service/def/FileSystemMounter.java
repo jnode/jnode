@@ -22,9 +22,8 @@ import org.jnode.fs.partitions.PartitionTableEntry;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginException;
-import org.jnode.util.Queue;
-import org.jnode.util.QueueProcessor;
-import org.jnode.util.QueueProcessorThread;
+import org.jnode.work.Work;
+import org.jnode.work.WorkUtils;
 
 /**
  * A FileSystemMounter listens to the DeviceManager and once a Device that
@@ -33,7 +32,7 @@ import org.jnode.util.QueueProcessorThread;
  * 
  * @author epr
  */
-final class FileSystemMounter implements DeviceListener, QueueProcessor {
+final class FileSystemMounter implements DeviceListener {
 
     /** My logger */
     private static final Logger log = Logger.getLogger(FileSystemMounter.class);
@@ -43,16 +42,6 @@ final class FileSystemMounter implements DeviceListener, QueueProcessor {
 
     /** The FileSystemService i'm using */
     private FileSystemService fileSystemService;
-
-    private QueueProcessorThread asynchronousMounterThread;
-
-    private final Queue devicesWaitingToBeMounted = new Queue();
-
-    /** Number of devices added to the mount queue */
-    private int devicesAdded;
-
-    /** Number of devices actually processed by the mount processor */
-    private int devicesProcessed;
 
     /**
      * Start the FS mounter.
@@ -65,9 +54,6 @@ final class FileSystemMounter implements DeviceListener, QueueProcessor {
             devMan.addListener(this);
             fileSystemService = (FileSystemService) InitialNaming
                     .lookup(FileSystemService.NAME);
-            asynchronousMounterThread = new QueueProcessorThread(
-                    "Asynchronous-FS-Mounter", devicesWaitingToBeMounted, this);
-            asynchronousMounterThread.start();
         } catch (NameNotFoundException ex) {
             throw new PluginException("Cannot find DeviceManager", ex);
         }
@@ -79,20 +65,21 @@ final class FileSystemMounter implements DeviceListener, QueueProcessor {
      */
     public void stop() {
         devMan.removeListener(this);
-        asynchronousMounterThread.stopProcessor();
-        asynchronousMounterThread = null;
     }
 
     /**
      * @see org.jnode.driver.DeviceListener#deviceStarted(org.jnode.driver.Device)
      */
-    public final void deviceStarted(Device device) {
+    public final void deviceStarted(final Device device) {
         if (device.implementsAPI(FSBlockDeviceAPI.class)) {
             // add it to the queue of devices to be mounted only if the action
             // is not already pending
-            devicesAdded++;
-            devicesWaitingToBeMounted.add(device);
-            //log.info("Started " + device.getId());
+            WorkUtils.add(new Work("Mounting " + device.getId()) {
+
+                public void execute() {
+                    asyncDeviceStarted(device);
+                }
+            });
         }
     }
 
@@ -101,7 +88,8 @@ final class FileSystemMounter implements DeviceListener, QueueProcessor {
      */
     public final void deviceStop(Device device) {
         if (device.implementsAPI(FSBlockDeviceAPI.class)) {
-            final FileSystem fs = fileSystemService.unregisterFileSystem(device);
+            final FileSystem fs = fileSystemService
+                    .unregisterFileSystem(device);
             if (fs != null) {
                 try {
                     fs.close();
@@ -161,32 +149,22 @@ final class FileSystemMounter implements DeviceListener, QueueProcessor {
     }
 
     /**
-     * @see org.jnode.util.QueueProcessor#process(java.lang.Object)
+     * Mount the filesystem on the given device.
      */
-    public void process(Object queuedObject) throws Exception {
-        final Device device = (Device) queuedObject;
+    final void asyncDeviceStarted(Device device) {
         try {
-            final FSBlockDeviceAPI api = (FSBlockDeviceAPI) device
-                    .getAPI(FSBlockDeviceAPI.class);
-            final boolean readOnly = false; //TODO: read from config
-            if (device.implementsAPI(RemovableDeviceAPI.class)) {
-                tryToMount(device, api, true, readOnly);
-            } else {
-                tryToMount(device, api, false, readOnly);
+            if (device.isStarted()) {
+                final FSBlockDeviceAPI api = (FSBlockDeviceAPI) device
+                        .getAPI(FSBlockDeviceAPI.class);
+                final boolean readOnly = false; //TODO: read from config
+                if (device.implementsAPI(RemovableDeviceAPI.class)) {
+                    tryToMount(device, api, true, readOnly);
+                } else {
+                    tryToMount(device, api, false, readOnly);
+                }
             }
         } catch (ApiNotFoundException ex) {
             // Just ignore this device.
-        } finally {
-            devicesProcessed++;
         }
-    }
-
-    /**
-     * Is the mounter ready.
-     * 
-     * @return
-     */
-    public boolean isReady() {
-        return (devicesAdded == devicesProcessed);
     }
 }
