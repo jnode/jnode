@@ -8,7 +8,7 @@
 ; -----------------------------------------------
 
 ; void setBytes(Address memPtr, byte value, int count);
-Q43org5jnode2vm6Unsafe23setBytes2e28Lorg2fvmmagic2funboxed2fAddress3bBI29V:
+GLABEL Q43org5jnode2vm6Unsafe23setBytes2e28Lorg2fvmmagic2funboxed2fAddress3bBI29V
 	push ADI
 	mov ADI,[ASP+(4*SLOT_SIZE)]		; memPtr
 	mov eax,[ASP+(3*SLOT_SIZE)] 	; value
@@ -19,8 +19,8 @@ Q43org5jnode2vm6Unsafe23setBytes2e28Lorg2fvmmagic2funboxed2fAddress3bBI29V:
 
 ; void setShorts(Address memPtr, short value, int count);
 ; void setChars(Address memPtr, char value, int count);
-Q43org5jnode2vm6Unsafe23setShorts2e28Lorg2fvmmagic2funboxed2fAddress3bSI29V:
-Q43org5jnode2vm6Unsafe23setChars2e28Lorg2fvmmagic2funboxed2fAddress3bCI29V:
+GLABEL Q43org5jnode2vm6Unsafe23setShorts2e28Lorg2fvmmagic2funboxed2fAddress3bSI29V
+GLABEL Q43org5jnode2vm6Unsafe23setChars2e28Lorg2fvmmagic2funboxed2fAddress3bCI29V
 	push ADI
 	mov ADI,[ASP+(4*SLOT_SIZE)]		; memPtr
 	mov eax,[ASP+(3*SLOT_SIZE)] 	; value
@@ -31,8 +31,8 @@ Q43org5jnode2vm6Unsafe23setChars2e28Lorg2fvmmagic2funboxed2fAddress3bCI29V:
 
 ; void setInts(Address memPtr, int value, int count);
 ; void setFloats(Address memPtr, float value, int count);
-Q43org5jnode2vm6Unsafe23setInts2e28Lorg2fvmmagic2funboxed2fAddress3bII29V:
-Q43org5jnode2vm6Unsafe23setFloats2e28Lorg2fvmmagic2funboxed2fAddress3bFI29V:
+GLABEL Q43org5jnode2vm6Unsafe23setInts2e28Lorg2fvmmagic2funboxed2fAddress3bII29V
+GLABEL Q43org5jnode2vm6Unsafe23setFloats2e28Lorg2fvmmagic2funboxed2fAddress3bFI29V
 	push ADI
 	mov ADI,[ASP+(4*SLOT_SIZE)]		; memPtr
 	mov eax,[ASP+(3*SLOT_SIZE)] 	; value
@@ -42,7 +42,7 @@ Q43org5jnode2vm6Unsafe23setFloats2e28Lorg2fvmmagic2funboxed2fAddress3bFI29V:
 	ret SLOT_SIZE*3
 
 ; void setObjects(Address memPtr, Object value, int count);
-Q43org5jnode2vm6Unsafe23setObjects2e28Lorg2fvmmagic2funboxed2fAddress3bLjava2flang2fObject3bI29V:
+GLABEL Q43org5jnode2vm6Unsafe23setObjects2e28Lorg2fvmmagic2funboxed2fAddress3bLjava2flang2fObject3bI29V
 	push ADI
 	mov ADI,[ASP+(4*SLOT_SIZE)]		; memPtr
 	mov AAX,[ASP+(3*SLOT_SIZE)]	 	; value
@@ -56,7 +56,7 @@ Q43org5jnode2vm6Unsafe23setObjects2e28Lorg2fvmmagic2funboxed2fAddress3bLjava2fla
 	ret SLOT_SIZE*3
 
 ; void setInts24(Address memPtr, int value, int count);
-Q43org5jnode2vm6Unsafe23setInts242e28Lorg2fvmmagic2funboxed2fAddress3bII29V:
+GLABEL Q43org5jnode2vm6Unsafe23setInts242e28Lorg2fvmmagic2funboxed2fAddress3bII29V
 	push ADI
 	mov ADI,[ASP+(4*SLOT_SIZE)]		; memPtr
 	mov eax,[ASP+(3*SLOT_SIZE)] 	; value
@@ -74,8 +74,8 @@ set24_loop:
 
 ; void setLongs(Address memPtr, long value, int count);
 ; void setDoubles(Address memPtr, double value, int count);
-Q43org5jnode2vm6Unsafe23setLongs2e28Lorg2fvmmagic2funboxed2fAddress3bJI29V:
-Q43org5jnode2vm6Unsafe23setDoubles2e28Lorg2fvmmagic2funboxed2fAddress3bDI29V:
+GLABEL Q43org5jnode2vm6Unsafe23setLongs2e28Lorg2fvmmagic2funboxed2fAddress3bJI29V
+GLABEL Q43org5jnode2vm6Unsafe23setDoubles2e28Lorg2fvmmagic2funboxed2fAddress3bDI29V
 %ifdef BITS32
 	push edi
 	mov edi,[esp+20]	; memPtr

@@ -75,6 +75,11 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 			return true;
 		}
 
+		public void addUnresolvedLink(int offset, int patchSize) {
+			// TODO Auto-generated method stub
+
+		}
+
 		/**
 		 * @see org.jnode.assembler.NativeStream.ObjectRef#link(org.jnode.assembler.NativeStream.ObjectRef)
 		 */
@@ -163,7 +168,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * 
 	 * @param out
 	 */
-	public X86TextAssembler(Writer out, X86CpuID cpuId, Mode mode, String stripPrefix) {
+	public X86TextAssembler(Writer out, X86CpuID cpuId, Mode mode,
+			String stripPrefix) {
 		super(cpuId, mode);
 		this.out = new PrintWriter(out);
 		this.stripPrefix = stripPrefix;

@@ -7,7 +7,7 @@
 ; -----------------------------------------------
 
 ; int getGDT(int[])
-Q53org5jnode2vm3x869UnsafeX8623getGDT2e285bI29I:
+GLABEL Q53org5jnode2vm3x869UnsafeX8623getGDT2e285bI29I
 	mov AAX,[ASP+SLOT_SIZE]		; Get gdt
 	test AAX,AAX
 	jz getGDT_ret
@@ -33,7 +33,7 @@ getGDT_ret:
 	ret SLOT_SIZE
 
 ; int getTSS(int[])
-Q53org5jnode2vm3x869UnsafeX8623getTSS2e285bI29I:
+GLABEL Q53org5jnode2vm3x869UnsafeX8623getTSS2e285bI29I
 	mov AAX,[ASP+SLOT_SIZE]		; Get tss
 	test AAX,AAX		
 	jz getTSS_ret
@@ -59,12 +59,12 @@ getTSS_ret:
 	ret SLOT_SIZE
 	
 ; int getAPBootCodeSize();
-Q53org5jnode2vm3x869UnsafeX8623getAPBootCodeSize2e2829I:
+GLABEL Q53org5jnode2vm3x869UnsafeX8623getAPBootCodeSize2e2829I
 	mov eax,ap_boot_end-ap_boot
 	ret
 
 ; void setupBootCode(Address memory, int[] gdtBase, int[] tss);
-Q53org5jnode2vm3x869UnsafeX8623setupBootCode2e28Lorg2fvmmagic2funboxed2fAddress3b5bI5bI29V:
+GLABEL Q53org5jnode2vm3x869UnsafeX8623setupBootCode2e28Lorg2fvmmagic2funboxed2fAddress3b5bI5bI29V
 	push ABX
 	
 	mov AAX,[ASP+(4*SLOT_SIZE)]		; memory

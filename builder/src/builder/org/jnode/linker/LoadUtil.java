@@ -124,14 +124,14 @@ public class LoadUtil {
 			System.out.println("File read error");
 			return (0);
 		}
-		final int v0 = buf8[0];
-		final int v1 = buf8[1];
-		final int v2 = buf8[2];
-		final int v3 = buf8[3];
-		final int v4 = buf8[4];
-		final int v5 = buf8[5];
-		final int v6 = buf8[6];
-		final int v7 = buf8[7];
+		final long v0 = buf8[0];
+		final long v1 = buf8[1];
+		final long v2 = buf8[2];
+		final long v3 = buf8[3];
+		final long v4 = buf8[4];
+		final long v5 = buf8[5];
+		final long v6 = buf8[6];
+		final long v7 = buf8[7];
 		intval |= (v0 & 0xFF) << (8 * 0);
 		intval |= (v1 & 0xFF) << (8 * 1);
 		intval |= (v2 & 0xFF) << (8 * 2);
@@ -152,14 +152,14 @@ public class LoadUtil {
 			System.out.println("File read error");
 			return (0);
 		}
-		final int v0 = buf8[0];
-		final int v1 = buf8[1];
-		final int v2 = buf8[2];
-		final int v3 = buf8[3];
-		final int v4 = buf8[4];
-		final int v5 = buf8[5];
-		final int v6 = buf8[6];
-		final int v7 = buf8[7];
+		final long v0 = buf8[0];
+		final long v1 = buf8[1];
+		final long v2 = buf8[2];
+		final long v3 = buf8[3];
+		final long v4 = buf8[4];
+		final long v5 = buf8[5];
+		final long v6 = buf8[6];
+		final long v7 = buf8[7];
 		intval |= (v0 & 0xFF) << (8 * 0);
 		intval |= (v1 & 0xFF) << (8 * 1);
 		intval |= (v2 & 0xFF) << (8 * 2);

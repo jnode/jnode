@@ -37,10 +37,19 @@ public abstract class VmArchitecture extends VmSystemObject {
 
 	/**
 	 * Gets the name of this architecture.
+	 * This name is the programmers name used to identify packages,
+	 * class name extensions etc.
 	 * 
 	 * @return Name
 	 */
 	public abstract String getName();
+
+	/**
+	 * Gets the full name of this architecture, including operating mode.
+	 * 
+	 * @return Name
+	 */
+	public abstract String getFullName();
 
 	/**
 	 * Gets the byte ordering of this architecture.

@@ -13,7 +13,7 @@
 
 	align SLOT_SIZE
 	
-vm_jumpTable:
+GLABEL vm_jumpTable
 	DA vm_athrow
 	DA vm_athrow_notrace
 	DA vm_invoke_abstract

@@ -9,6 +9,7 @@
 	extern VmSystem_initialized
 	extern SoftByteCodes_systemException
 	extern VmProcessor_reschedule
+	global currentTimeMillisStaticsIdx
 	
 %define DEADLOCKCOUNTER		dword[fs:VmX86Processor_DEADLOCKCOUNTER_OFS]
 %define DEVICENACOUNTER		dword[fs:VmX86Processor_DEVICENACOUNTER_OFS]

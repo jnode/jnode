@@ -49,6 +49,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86BinaryAssembler.X86ObjectRef;
 
@@ -243,8 +244,12 @@ public class Elf {
 			final Object obj = ref.getObject();
 			final Symbol sym;
 			if (ref.isResolved()) {
-				sym = new Symbol(elf, obj.toString(), ref.getOffset(),
-						textSection);
+				try {
+					sym = new Symbol(elf, obj.toString(), ref.getOffset(),
+							textSection);
+				} catch (UnresolvedObjectRefException ex) {
+					throw new RuntimeException(ex);
+				}
 			} else {
 				final int[] offsets = ref.getUnresolvedOffsets();
 				sym = new Symbol(elf, obj.toString(), 0, null);
@@ -563,7 +568,7 @@ public class Elf {
 		System.out.println("e_shstrndx    : "
 				+ Integer.toString(e_shstrndx, 16));
 		System.out.println(" ----- BRK ----- ");
-		//System.out.println(" strtab = [" + strtab + "]");
+		// System.out.println(" strtab = [" + strtab + "]");
 		for (int i = 1; i < getNoSections(); i++) {
 			final Section s = getSection(i);
 			s.print();

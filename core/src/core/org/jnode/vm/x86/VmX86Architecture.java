@@ -85,6 +85,28 @@ public abstract class VmX86Architecture extends VmArchitecture {
     }
 
     /**
+     * Gets the name of this architecture.
+     * 
+     * @return name
+     */
+    public final String getName() {
+        return "x86";
+    }
+
+	/**
+	 * Gets the full name of this architecture, including operating mode.
+	 * 
+	 * @return Name
+	 */
+	public String getFullName() {
+    	if (getReferenceSize() == 4) {
+    		return getName() + "-32";
+    	} else {
+    		return getName() + "-64";    		
+    	}
+	}
+
+    /**
      * Gets the byte ordering of this architecture.
      * 
      * @return ByteOrder
