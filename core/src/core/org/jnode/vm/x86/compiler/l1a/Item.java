@@ -57,19 +57,13 @@ abstract class Item {
 	 */
 	protected int kind;			// entry kind
 	private int type;			// entry type
-//	Register reg;	// kind == REGISTER only
 	
-	//
 	int	offsetToFP;		// kind == local only
-//	Constant con;	// kind == CONSTANT only
 	
-//	Item(int kind, int type, Register reg, int local, Constant con) {
 	Item(int kind, int type, int offsetToFP) {
 		this.kind = kind;
 		this.type = type;
-//		this.reg = reg;
 		this.offsetToFP = offsetToFP;
-//		this.con = con;
 	}
 	
 	static void notImplemented() {
@@ -111,16 +105,6 @@ abstract class Item {
 		else
 			return 1;
 	}
-	
-//	Register getRegister() {
-//		myAssert (kind == REGISTER);
-//		return reg;
-//	}
-//	
-//	Constant getConstant() {
-//		myAssert (kind == CONSTANT);
-//		return con;
-//	}
 	
 	int getOffsetToFP() {
 		myAssert(kind == LOCAL);
@@ -202,32 +186,12 @@ abstract class Item {
 //	}
 	
 	/**
-	 * return the register containing a 32 bit value
-	 * (Register kind only, Int and Reference types only)
-	 * 
-	 * @return Register
-	 */
-//	abstract Register getRegister();
-	
-	/**
-	 * Return the register containing the LSB of a 64 bit value
+	 * Clone item 
 	 *
-	 * @return Register with LSB value
+	 * @param ec the EmitterContext
+	 * @return a clone of the item
 	 */
-//	abstract Register getLSBRegister();
-	
-	/**
-	 * Return the register containing the MSB of a 64 bit value
-	 *
-	 * @return Register with MSB value
-	 */
-//	abstract Register getMSBRegister();
-	
-//	abstract int getIntValue();
-//	abstract long getLongValue();
-//	abstract float getFloatValue();
-//	abstract double getDoubleValue();
-//	abstract Object getObjectValue();
+	abstract Item clone(EmitterContext ec);
 	
 	/**
 	 * Push item onto the stack
@@ -255,26 +219,33 @@ abstract class Item {
 	 * @return the internal type value
 	 */
 	 static int SignatureToType(char type) {
+		int res;
 		switch (type) {
 			case 'Z' : // Boolean
 			case 'B' : // Byte
 			case 'C' : // Character
 			case 'S' : // Short
 			case 'I' : // Integer
-				return INT;
+				res = INT;
+				break;
 			case 'F' : // Float
-				return FLOAT;
+				res = FLOAT;
+				break;
 			case 'L' : // Object
 			case ';' : // Object
 			case '[' : // Array
-				return REFERENCE;
+				res = REFERENCE;
+				break;
 			case 'J' : // Long
-				return LONG;
+				res = LONG;
+				break;
 			case 'D' : // Double
-				return DOUBLE;
+				res = DOUBLE;
+				break;
 			default :
 				throw new IllegalArgumentException("Unknown type"+type);
 		}
+		return res;
 	}
 
 }

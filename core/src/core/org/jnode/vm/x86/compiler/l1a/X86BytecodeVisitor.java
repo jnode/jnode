@@ -173,7 +173,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * The started basic block has finished.
      */
     public void endBasicBlock() {
-    	// flush vstack: at end/begin of basic block are all items on the stack
+        // flush vstack: at end/begin of basic block are all items on the stack
         vstack.push(eContext);
         if (log) {
             os.log("End of basic block");
@@ -199,9 +199,9 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         if (!cond) throw new Error("assert failed");
     }
 
-	private void notImplemented() {
-		throw new Error("NotImplemented");
-	}
+    private void notImplemented() {
+        throw new Error("NotImplemented");
+    }
 
     private void OpcodeNotImplemented(String name) {
         System.out.println(name + " not implemented");
@@ -215,17 +215,17 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @param it the item requiring the register
      */
     private void requestRegister(Register reg, Item it) {
-    	X86RegisterPool pool = eContext.getPool();
-    	
-    	// check item doesn't already use register
-    	if (!it.uses(reg)) {
-    		if (!pool.isFree(reg)) {
-    			notImplemented();
-    			//TODO: spill register; make sure that the stack items 
-    			// and floating items are handled correctly
-    		}
-    		pool.request(reg, it);
-    	}
+        X86RegisterPool pool = eContext.getPool();
+        
+        // check item doesn't already use register
+        if (!it.uses(reg)) {
+            if (!pool.isFree(reg)) {
+                notImplemented();
+                //TODO: spill register; make sure that the stack items 
+                // and floating items are handled correctly
+            }
+            pool.request(reg, it);
+        }
     }
     
     private void prepareForOperation(Item destAndSource, Item source) {
@@ -250,8 +250,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      *      int)
      */
     public void startInlinedMethod(VmMethod inlinedMethod, int newMaxLocals) {
-    	//TODO: check whether this is really needed
-    	vstack.push(eContext);
+        //TODO: check whether this is really needed
+        vstack.push(eContext);
         maxLocals = newMaxLocals;
         endOfInlineLabel = new Label(curInstrLabel + "_end_of_inline");
         helper.startInlinedMethod(inlinedMethod, curInstrLabel);
@@ -261,7 +261,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.compiler.InlineBytecodeVisitor#visit_inlinedReturn()
      */
     public void visit_inlinedReturn() {
-    	vstack.push(eContext);
+        vstack.push(eContext);
         os.writeJMP(endOfInlineLabel);
     }
 
@@ -292,8 +292,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_aastore()
      */
     public final void visit_aastore() {
-    	final boolean useBarrier = (context.getWriteBarrier() != null);
-    	
+        final boolean useBarrier = (context.getWriteBarrier() != null);
+        
         RefItem val = vstack.popRef();
         IntItem idx = vstack.popInt();
         RefItem ref = vstack.popRef();
@@ -307,18 +307,18 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         final Register v = val.getRegister();
         checkBounds(ref, idx);
         if (idx.getKind() == Item.CONSTANT) {
-        	final int i = idx.getValue();
+            final int i = idx.getValue();
             os.writeMOV(INTSIZE, r, i + VmArray.DATA_OFFSET * 4, v);
         } else {
-        	final Register i = idx.getRegister();
+            final Register i = idx.getRegister();
             os.writeMOV(INTSIZE, r, i, 4, VmArray.DATA_OFFSET * 4, v);
         }
         if (useBarrier) {
-        	// the write barrier could easily be modified to avoid using a scratch register
-        	final X86RegisterPool pool = eContext.getPool();
-        	final Register scratch = (Register)pool.request(Item.INT);
-        	helper.writeArrayStoreWriteBarrier(r, idx.getRegister(), v, scratch);
-        	pool.release(scratch);
+            // the write barrier could easily be modified to avoid using a scratch register
+            final X86RegisterPool pool = eContext.getPool();
+            final Register scratch = (Register)pool.request(Item.INT);
+            helper.writeArrayStoreWriteBarrier(r, idx.getRegister(), v, scratch);
+            pool.release(scratch);
         }
         
         val.release(eContext);
@@ -364,12 +364,12 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_areturn()
      */
     public final void visit_areturn() {
-    	RefItem i = vstack.popRef();
-    	requestRegister(EAX, i);
-    	i.loadTo(eContext, EAX);
-    	
-    	visit_return();
-    	i.release(eContext);
+        RefItem i = vstack.popRef();
+        requestRegister(EAX, i);
+        i.loadTo(eContext, EAX);
+        
+        visit_return();
+        i.release(eContext);
     }
 
     /**
@@ -411,7 +411,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      */
     public final void visit_athrow() {
         RefItem ref = vstack.popRef();
-		requestRegister(EAX, ref);
+        requestRegister(EAX, ref);
         ref.loadTo(eContext, EAX);
 
         helper.writeJumpTableCALL(X86JumpTable.VM_ATHROW_OFS);
@@ -433,7 +433,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             final int offset = idx.getValue();
             os.writeMOV(BYTESIZE, r, r, offset + VmArray.DATA_OFFSET * 4);
         } else {
-        	final Register i = idx.getRegister();
+            final Register i = idx.getRegister();
             os.writeMOV(BYTESIZE, r, r, i, 1, VmArray.DATA_OFFSET * 4);
             idx.release(eContext);
         }
@@ -457,14 +457,14 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         idx.loadIf(eContext, ~Item.CONSTANT);
         ref.load(eContext);
         final Register r = ref.getRegister();
-		final Register v = val.getRegister();
+        final Register v = val.getRegister();
 
         checkBounds(ref, idx);
         if (idx.getKind() == Item.CONSTANT) {
             final int i = idx.getValue();
             os.writeMOV(BYTESIZE, r, i + VmArray.DATA_OFFSET * 4, v);
         } else {
-        	final Register i = idx.getRegister();
+            final Register i = idx.getRegister();
             os.writeMOV(BYTESIZE, r, i, 4, VmArray.DATA_OFFSET * 4, v);
         }
         val.release(eContext);
@@ -488,7 +488,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             final int offset = idx.getValue();
             os.writeMOV(WORDSIZE, r, r, offset + VmArray.DATA_OFFSET * 4);
         } else {
-			final Register offset = idx.getRegister();
+            final Register offset = idx.getRegister();
             os.writeMOV(WORDSIZE, r, r,offset, 2,VmArray.DATA_OFFSET * 4);
             idx.release(eContext);
         }
@@ -519,7 +519,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             final int i = idx.getValue();
             os.writeMOV(WORDSIZE, r, i + VmArray.DATA_OFFSET * 4, v);
         } else {
-			final Register i = idx.getRegister();
+            final Register i = idx.getRegister();
             os.writeMOV(WORDSIZE, r, i, 2, VmArray.DATA_OFFSET * 4, v);
         }
         val.release(eContext);
@@ -775,7 +775,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         os.writeFPREM();
         os.writeLEA(SP, SP, 8);
         os.writeFSTP64(SP, 0);
-        //		|os.writeFFREE(Register.ST0);
+        //        |os.writeFFREE(Register.ST0);
     }
 
     /**
@@ -872,9 +872,9 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 //            vstack.pushItem(v1);
 //        }
 
-		// trash vstack
-		vstack.push(eContext);
-		vstack = new VirtualStack();
+        // trash vstack
+        vstack.push(eContext);
+        vstack = new VirtualStack();
 
         helper.writePOP(T0); // Value1
         helper.writePOP(T1); // Value2
@@ -889,15 +889,12 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup()
      */
     public final void visit_dup() {
-        //TODO: port to orp-style
-        os.log("dup");
-        vstack.push(eContext);
         Item v1 = vstack.popItem();
-        vstack.pushItem(v1);
+        vstack.pushItem(v1.clone(eContext));
         vstack.pushItem(v1);
 
-        os.writeMOV(INTSIZE, T0, SP, 0); // Value1, leave on stack
-        helper.writePUSH(T0);
+//        os.writeMOV(INTSIZE, T0, SP, 0); // Value1, leave on stack
+//        helper.writePUSH(T0);
     }
 
     /**
@@ -923,9 +920,9 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 //            vstack.pushItem(v1);
 //        }
 
-		// trash vstack
-		vstack.push(eContext);
-		vstack = new VirtualStack();
+        // trash vstack
+        vstack.push(eContext);
+        vstack = new VirtualStack();
 
         helper.writePOP(T0); // Value1
         helper.writePOP(T1); // Value2
@@ -986,9 +983,9 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 //            }
 //        }
 
-		// trash vstack
-		vstack.push(eContext);
-		vstack = new VirtualStack();
+        // trash vstack
+        vstack.push(eContext);
+        vstack = new VirtualStack();
 
         helper.writePOP(Register.EAX); // Value1
         helper.writePOP(Register.EBX); // Value2
@@ -1024,9 +1021,9 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 //            vstack.pushItem(v1);
 //        }
 
-		// trash vstack
-		vstack.push(eContext);
-		vstack = new VirtualStack();
+        // trash vstack
+        vstack.push(eContext);
+        vstack = new VirtualStack();
 
         os.writeMOV(INTSIZE, T0, SP, 0); // value1
         os.writeMOV(INTSIZE, S0, SP, 4); // value2
@@ -1363,6 +1360,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         final int offset = inf.getOffset();
 
         int type = Item.SignatureToType(fieldRef.getSignature().charAt(0));
+
         vstack.push(eContext);
         RefItem ref = vstack.popRef();
         ref.release(eContext);
@@ -1420,7 +1418,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_i2b()
      */
     public final void visit_i2b() {
-    	//TODO: improve const case
+        //TODO: improve const case
         IntItem v = vstack.popInt();
         v.load(eContext);
         final Register r = v.getRegister();
@@ -1537,7 +1535,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             final int i = idx.getValue();
             os.writeMOV(INTSIZE, r, r, i + VmArray.DATA_OFFSET * 4);
         } else {
-        	final Register i = idx.getRegister();
+            final Register i = idx.getRegister();
             os.writeMOV(INTSIZE, r, r, i, 4, VmArray.DATA_OFFSET * 4);
             idx.release(eContext);
         }
@@ -1594,11 +1592,11 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
                 final int vc = val.getValue();
                 os.writeMOV_Const(r, i + VmArray.DATA_OFFSET * 4, vc);
             } else {
-            	final Register v = val.getRegister();
+                final Register v = val.getRegister();
                 os.writeMOV(INTSIZE, r, i + VmArray.DATA_OFFSET * 4, v);
             }
         } else {
-        	final Register i = idx.getRegister();
+            final Register i = idx.getRegister();
             val.load(eContext); //tmp
             if (val.getKind() == Item.CONSTANT) {
                 // int vc = val.getValue();
@@ -1606,7 +1604,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
                 //os.writeMOV_Const(r, idx.getRegister(), 4,
                 // VmArray.DATA_OFFSET * 4, vc);
             } else {
-				final Register v = val.getRegister();            	
+                final Register v = val.getRegister();
                 os.writeMOV(INTSIZE, r, i, 4, VmArray.DATA_OFFSET * 4, v);
             }
         }
@@ -1658,7 +1656,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     private final void visit_if_xcmp(int address, int jccOpcode) {
         IntItem v2 = vstack.popInt();
         IntItem v1 = vstack.popInt();
-	//TODO: can be less restrictive: v1 must not be register
+        //TODO: can be less restrictive: v1 must not be register
         prepareForOperation(v1, v2);
 
         Register r1 = v1.getRegister();
@@ -1745,15 +1743,25 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         visit_if_xcmp(address, X86Constants.JNE); // JNE
     }
 
-    private void visit_ifxx(int address, int jccOpcode) {
+    private void visit_ifxx(int type, int address, int jccOpcode) {
         //IMPROVE: Constant case / Local case
-        RefItem v = vstack.popRef();
-        v.load(eContext);
-        Register r = v.getRegister();
+        Item v;
+        Register r;
+        if (type == Item.REFERENCE) {
+            RefItem vr = vstack.popRef();
+            vr.load(eContext);
+            r = vr.getRegister();
+            v = vr;
+        } else {
+            IntItem vi = vstack.popInt();
+            vi.load(eContext);
+            r = vi.getRegister();
+            v = vi;
+        }
+        v.release(eContext);
         os.writeTEST(r, r);
         //TODO: shall I flush the stack before a jump?
         os.writeJCC(helper.getInstrLabel(address), jccOpcode);
-        v.release(eContext);
     }
 
     /**
@@ -1761,7 +1769,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifeq(int)
      */
     public final void visit_ifeq(int address) {
-        visit_ifxx(address, X86Constants.JE); // JE
+        visit_ifxx(Item.INT, address, X86Constants.JE); // JE
     }
 
     /**
@@ -1769,7 +1777,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifge(int)
      */
     public final void visit_ifge(int address) {
-        visit_ifxx(address, X86Constants.JGE); // JGE
+        visit_ifxx(Item.INT, address, X86Constants.JGE); // JGE
     }
 
     /**
@@ -1777,7 +1785,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifgt(int)
      */
     public final void visit_ifgt(int address) {
-        visit_ifxx(address, X86Constants.JG); // JG
+        visit_ifxx(Item.INT, address, X86Constants.JG); // JG
     }
 
     /**
@@ -1785,7 +1793,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifle(int)
      */
     public final void visit_ifle(int address) {
-        visit_ifxx(address, X86Constants.JLE); // JLE
+        visit_ifxx(Item.INT, address, X86Constants.JLE); // JLE
     }
 
     /**
@@ -1793,7 +1801,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iflt(int)
      */
     public final void visit_iflt(int address) {
-        visit_ifxx(address, X86Constants.JL); // JL
+        visit_ifxx(Item.INT, address, X86Constants.JL); // JL
     }
 
     /**
@@ -1801,7 +1809,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifne(int)
      */
     public final void visit_ifne(int address) {
-        visit_ifxx(address, X86Constants.JNE); // JNE
+        visit_ifxx(Item.INT, address, X86Constants.JNE); // JNE
     }
 
     /**
@@ -1809,7 +1817,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifnonnull(int)
      */
     public final void visit_ifnonnull(int address) {
-        visit_ifxx(address, X86Constants.JNE);
+        visit_ifxx(Item.REFERENCE, address, X86Constants.JNE);
     }
 
     /**
@@ -1817,7 +1825,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifnull(int)
      */
     public final void visit_ifnull(int address) {
-        visit_ifxx(address, X86Constants.JE);
+        visit_ifxx(Item.REFERENCE, address, X86Constants.JE);
     }
 
     /**
@@ -2189,7 +2197,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      */
     public final void visit_ireturn() {
         IntItem v = vstack.popInt();
-		requestRegister(EAX, v);
+        requestRegister(EAX, v);
         v.loadTo(eContext, EAX);
 
         visit_return();
@@ -2201,10 +2209,13 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      */
     public final void visit_ishl() {
         IntItem shift = vstack.popInt();
-		requestRegister(ECX, shift);
+        if (shift.getKind() != Item.CONSTANT) {
+            requestRegister(ECX, shift);
+            shift.loadTo(eContext, ECX);
+        }
+
         IntItem value = vstack.popInt();
 
-        shift.loadToIf(eContext, ~Item.CONSTANT, ECX);
         value.load(eContext);
 
         Register v = value.getRegister();
@@ -2224,10 +2235,12 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      */
     public final void visit_ishr() {
         IntItem shift = vstack.popInt();
-		requestRegister(ECX, shift);
+        if (shift.getKind() != Item.CONSTANT) {
+            requestRegister(ECX, shift);
+            shift.loadTo(eContext, ECX);
+        }
         IntItem value = vstack.popInt();
 
-        shift.loadToIf(eContext, ~Item.CONSTANT, ECX);
         value.load(eContext);
 
         Register v = value.getRegister();
@@ -2238,8 +2251,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         } else {
             os.writeSAR_CL(v);
         }
-		shift.release(eContext);
-       vstack.pushItem(value);
+        shift.release(eContext);
+        vstack.pushItem(value);
     }
 
     /**
@@ -2291,7 +2304,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      */
     public final void visit_iushr() {
         IntItem shift = vstack.popInt();
-		requestRegister(ECX, shift);
+        requestRegister(ECX, shift);
         IntItem value = vstack.popInt();
 
         shift.loadToIf(eContext, ~Item.CONSTANT, ECX);
@@ -2305,7 +2318,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         } else {
             os.writeSHR_CL(v);
         }
-		shift.release(eContext);
+        shift.release(eContext);
         vstack.pushItem(value);
     }
 
@@ -2320,7 +2333,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         IntItem v1 = vstack.popInt();
         prepareForOperation(v1, v2);
 
-	final Register r1 = v1.getRegister();
+        final Register r1 = v1.getRegister();
         switch (v2.getKind()) {
         case Item.REGISTER:
             os.writeXOR(r1, v2.getRegister());
@@ -2514,24 +2527,24 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(VmConstString)
      */
     public final void visit_ldc(VmConstString value) {
-    	vstack.pushItem(RefItem.createConst(value));
-        //		//REFACTOR: use Constant instead of Object!
-        //		if (value instanceof Integer) {
-        //			visit_iconst(((Integer) value).intValue());
+        vstack.pushItem(RefItem.createConst(value));
+        //        //REFACTOR: use Constant instead of Object!
+        //        if (value instanceof Integer) {
+        //            visit_iconst(((Integer) value).intValue());
         //// os.writeMOV_Const(Register.EAX, ((Integer) value).intValue());
-        //		} else if (value instanceof Float) {
-        //			visit_fconst(((Float) value).floatValue());
+        //        } else if (value instanceof Float) {
+        //            visit_fconst(((Float) value).floatValue());
         //// os.writeMOV_Const(Register.EAX, Float.floatToRawIntBits(((Float)
         // value).floatValue()));
-        //		} else if (value instanceof String) {
-        //			//REFACTOR: useCreateStackstant
-        //			vstack.pushItem(RefItem.createStack());
-        //			helper.writeGetStaticsEntry(curInstrLabel, T0, value);
-        //			helper.writePUSH(T0);
-        //		} else {
-        //			throw new ClassFormatError("ldc with unknown type " +
+        //        } else if (value instanceof String) {
+        //            //REFACTOR: useCreateStackstant
+        //            vstack.pushItem(RefItem.createStack());
+        //            helper.writeGetStaticsEntry(curInstrLabel, T0, value);
+        //            helper.writePUSH(T0);
+        //        } else {
+        //            throw new ClassFormatError("ldc with unknown type " +
         // value.getClass().getName());
-        //		}
+        //        }
         //// helper.writePUSH(Register.EAX);
     }
 
@@ -2873,33 +2886,33 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      */
     public final void visit_multianewarray(VmConstClass clazz, int dimensions) {
         // flush all vstack items to the stack
-    	// all registers are freed
-    	vstack.push(eContext);
+        // all registers are freed
+        vstack.push(eContext);
 
-		// Create the dimensions array
-		helper.writePUSH(10); /* type=int */
-		helper.writePUSH(dimensions); /* elements */
-		helper.invokeJavaMethod(context.getAllocPrimitiveArrayMethod());
-		helper.writePOP(S1);
-		// Dimension array is now in S1
+        // Create the dimensions array
+        helper.writePUSH(10); /* type=int */
+        helper.writePUSH(dimensions); /* elements */
+        helper.invokeJavaMethod(context.getAllocPrimitiveArrayMethod());
+        helper.writePOP(S1);
+        // Dimension array is now in S1
         
-		// Pop all dimensions (note the reverse order that allocMultiArray expects)
-		for (int i = 0; i < dimensions; i++) {
-			final int ofs = (VmArray.DATA_OFFSET + i) * slotSize;
-			IntItem v = vstack.popInt();
-			v.release(eContext);
-			helper.writePOP(S1, ofs);
-		}
+        // Pop all dimensions (note the reverse order that allocMultiArray expects)
+        for (int i = 0; i < dimensions; i++) {
+            final int ofs = (VmArray.DATA_OFFSET + i) * slotSize;
+            IntItem v = vstack.popInt();
+            v.release(eContext);
+            helper.writePOP(S1, ofs);
+        }
         
-		// Resolve the array class
-		writeResolveAndLoadClassToEAX(clazz, S0);
+        // Resolve the array class
+        writeResolveAndLoadClassToEAX(clazz, S0);
         
-		// Now call the multianewarrayhelper
-		helper.writePUSH(EAX); // array-class
-		helper.writePUSH(S1); // dimensions[]
-		helper.invokeJavaMethod(context.getAllocMultiArrayMethod());
-		// Result is now on the stack
-		vstack.pushItem(RefItem.createStack());
+        // Now call the multianewarrayhelper
+        helper.writePUSH(EAX); // array-class
+        helper.writePUSH(S1); // dimensions[]
+        helper.invokeJavaMethod(context.getAllocMultiArrayMethod());
+        // Result is now on the stack
+        vstack.pushItem(RefItem.createStack());
     }
 
     /**
@@ -2925,11 +2938,11 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     public final void visit_newarray(int type) {
         IntItem count = vstack.popInt();
         count.loadIf(eContext, Item.STACK);
-        //		helper.writePOP(S0); /* Elements */
+        //        helper.writePOP(S0); /* Elements */
 
         /* Setup a call to SoftByteCodes.allocArray */
         helper.writePUSH(type); /* type */
-        //		helper.writePUSH(S0); /* elements */
+        //        helper.writePUSH(S0); /* elements */
         count.push(eContext);
 
         helper.invokeJavaMethod(context.getAllocPrimitiveArrayMethod());
@@ -2976,7 +2989,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_putfield(org.jnode.vm.classmgr.VmConstFieldRef)
      */
     public final void visit_putfield(VmConstFieldRef fieldRef) {
-    	//TODO: port to orp-style
+        //TODO: port to orp-style
         fieldRef.resolve(loader);
         final VmField field = fieldRef.getResolvedVmField();
         if (field.isStatic()) { throw new IncompatibleClassChangeError(
@@ -2995,24 +3008,24 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             // Decide whether to use a big switch on the type of to
             // implement this in the item (putStatic and putField)
 
-            //			val.loadIf(eContext, ~Item.CONSTANT);
-            //			ref.load(eContext);
-            //			Register r = ref.getRegister();
-            //			if (val.getKind() == Item.CONSTANT) {
-            //				int c = ((IntConstant)val.getConstant()).getValue();
-            //				os.writeMOV_Const(r, offset, c);
+            //            val.loadIf(eContext, ~Item.CONSTANT);
+            //            ref.load(eContext);
+            //            Register r = ref.getRegister();
+            //            if (val.getKind() == Item.CONSTANT) {
+            //                int c = ((IntConstant)val.getConstant()).getValue();
+            //                os.writeMOV_Const(r, offset, c);
             //
-            //			} else {
-            //				os.writeMOV(INTSIZE, r, offset, val.getRegister());
-            //				val.release();
-            //			}
+            //            } else {
+            //                os.writeMOV(INTSIZE, r, offset, val.getRegister());
+            //                val.release();
+            //            }
             /* Value -> T0 */
             helper.writePOP(T0);
             /* Objectref -> S0 */
             helper.writePOP(S0); // Objectref
             os.writeMOV(INTSIZE, S0, offset, T0);
             helper.writePutfieldWriteBarrier(inf, S0, T0, S1);
-            //			ref.release();
+            //            ref.release();
 
         } else {
             //IMPROVE: 64bit operations
@@ -3098,8 +3111,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             idx.release(eContext);
         }
         os.writeMOVSX(r, r, WORDSIZE);
-	final IntItem result = IntItem.createRegister(r);
-	eContext.getPool().transferOwnerTo(r, result);
+        final IntItem result = IntItem.createRegister(r);
+        eContext.getPool().transferOwnerTo(r, result);
         vstack.pushItem(result);
     }
 
@@ -3138,8 +3151,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         Item v1 = vstack.popItem();
         Item v2 = vstack.popItem();
         assertCondition((v1.getCategory() == 1) && (v2.getCategory() == 1));
-	//TODO: handle floats
-	assertCondition((v1.getType() != Item.FLOAT));
+        //TODO: handle floats
+        assertCondition((v1.getType() != Item.FLOAT));
         final boolean v1IsBool = (v1.getKind() == Item.STACK);
         final boolean v2IsBool = (v2.getKind() == Item.STACK);
         if (v1IsBool && v2IsBool) {

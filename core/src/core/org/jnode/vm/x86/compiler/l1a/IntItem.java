@@ -111,6 +111,41 @@ final class IntItem extends Item implements X86CompilerConstants {
 			loadTo(ec, t0);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#clone()
+	 */
+	Item clone(EmitterContext ec) {
+		Item res = null;
+		switch (getKind()) {
+			case REGISTER:
+				final X86RegisterPool pool = ec.getPool();
+				final Register r = (Register)pool.request(INT);
+				res = createRegister(r);
+				pool.transferOwnerTo(r, res);
+				break;
+				
+			case LOCAL:
+				res = createLocal(getOffsetToFP());
+				break;
+				
+			case CONSTANT:
+				res = createConst(value);
+				break;
+				
+			case FREGISTER:
+				//TODO
+				notImplemented();
+				break;
+			
+			case STACK:
+				AbstractX86Stream os = ec.getStream();
+				os.writePUSH(Register.SP, 0);
+				res = createStack();
+				break;
+		}
+		return res;
+	}
+
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#push()
