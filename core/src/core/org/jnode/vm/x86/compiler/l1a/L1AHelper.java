@@ -37,9 +37,10 @@ final class L1AHelper {
 	static final DoubleWordItem requestDoubleWordRegisters(
 			EmitterContext eContext, int jvmType) {
 		final X86RegisterPool pool = eContext.getPool();
+		final ItemFactory ifac = eContext.getItemFactory();
 		final Register lsb = requestRegister(eContext, JvmType.INT, false);
 		final Register msb = requestRegister(eContext, JvmType.INT, false);
-		final DoubleWordItem result = DoubleWordItem.createReg(jvmType, lsb,
+		final DoubleWordItem result = ifac.createReg(jvmType, lsb,
 				msb);
 		pool.transferOwnerTo(lsb, result);
 		pool.transferOwnerTo(msb, result);
@@ -52,9 +53,10 @@ final class L1AHelper {
 	static final DoubleWordItem requestDoubleWordRegisters(
 			EmitterContext eContext, int jvmType, Register lsb, Register msb) {
 		final X86RegisterPool pool = eContext.getPool();
+		final ItemFactory ifac = eContext.getItemFactory();
 		requestRegister(eContext, lsb);
 		requestRegister(eContext, msb);
-		final DoubleWordItem result = DoubleWordItem.createReg(jvmType, lsb,
+		final DoubleWordItem result = ifac.createReg(jvmType, lsb,
 				msb);
 		pool.transferOwnerTo(lsb, result);
 		pool.transferOwnerTo(msb, result);
@@ -127,9 +129,10 @@ final class L1AHelper {
 	static final WordItem requestWordRegister(EmitterContext eContext,
 			int jvmType, boolean supportsBits8) {
 		final X86RegisterPool pool = eContext.getPool();
+		final ItemFactory ifac = eContext.getItemFactory();
 		final Register reg = requestRegister(eContext, JvmType.INT,
 				supportsBits8);
-		final WordItem result = WordItem.createReg(jvmType, reg);
+		final WordItem result = ifac.createReg(jvmType, reg);
 		pool.transferOwnerTo(reg, result);
 		return result;
 	}

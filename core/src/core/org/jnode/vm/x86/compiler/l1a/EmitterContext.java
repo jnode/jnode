@@ -25,15 +25,19 @@ final class EmitterContext {
     /** Virtual Stack */
     private final VirtualStack vstack;
 
+    /** Item factory */
+    private final ItemFactory itemfac;
+
     /**
      * Create a new context
      */
     EmitterContext(AbstractX86Stream os, X86CompilerHelper helper,
-            VirtualStack vstack, X86RegisterPool pool) {
+            VirtualStack vstack, X86RegisterPool pool, ItemFactory ifac) {
         this.os = os;
         this.helper = helper;
         this.vstack = vstack;
         this.pool = pool;
+        this.itemfac = ifac;
     }
 
     /**
@@ -41,7 +45,7 @@ final class EmitterContext {
      * 
      * @return the current emitter's stream
      */
-    AbstractX86Stream getStream() {
+    final AbstractX86Stream getStream() {
         return os;
     }
 
@@ -50,7 +54,7 @@ final class EmitterContext {
      * 
      * @return the current compiler helper object
      */
-    X86CompilerHelper getHelper() {
+    final X86CompilerHelper getHelper() {
         return helper;
     }
 
@@ -59,7 +63,7 @@ final class EmitterContext {
      * 
      * @return the current emitter's register pool
      */
-    X86RegisterPool getPool() {
+    final X86RegisterPool getPool() {
         return pool;
     }
 
@@ -68,7 +72,14 @@ final class EmitterContext {
      * 
      * @return the current emitter's virtual stack
      */
-    VirtualStack getVStack() {
+    final VirtualStack getVStack() {
         return vstack;
+    }
+
+    /**
+     * @return Returns the itemfac.
+     */
+    final ItemFactory getItemFactory() {
+        return this.itemfac;
     }
 }

@@ -26,13 +26,14 @@ final class FPUHelper implements X86CompilerConstants {
 	 */
 	final static void add(AbstractX86Stream os, EmitterContext ec,
 			VirtualStack vstack, int type) {
+	    final ItemFactory ifac = ec.getItemFactory();
 		final Item v2 = vstack.pop(type);
 		final Item v1 = vstack.pop(type);
 
 		if (v1.isConstant() && v2.isConstant()) {
 			final double fpv1 = getFPValue(v1);
 			final double fpv2 = getFPValue(v2);
-			vstack.push(createConst(type, fpv1 + fpv2));
+			vstack.push(createConst(ifac, type, fpv1 + fpv2));
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
@@ -114,7 +115,8 @@ final class FPUHelper implements X86CompilerConstants {
 		os.setObjectRef(endLabel);
 
 		// Push result
-		final IntItem res = IntItem.createReg(resr);
+		final ItemFactory ifac = ec.getItemFactory();
+		final IntItem res = (IntItem)ifac.createReg(JvmType.INT, resr);
 		pool.transferOwnerTo(resr, res);
 		vstack.push(res);
 
@@ -130,13 +132,14 @@ final class FPUHelper implements X86CompilerConstants {
 	 */
 	final static void convert(EmitterContext ec, VirtualStack vstack,
 			int fromType, int toType) {
+	    final ItemFactory ifac = ec.getItemFactory();
 		final Item v = vstack.pop(fromType);
 		if (v.isConstant()) {
-			vstack.push(createConst(toType, getFPValue(v)));
+			vstack.push(createConst(ifac, toType, getFPValue(v)));
 		} else {
 			v.pushToFPU(ec);
 			vstack.fpuStack.pop(v);
-			final Item result = createFPUStack(toType);
+			final Item result = ifac.createFPUStack(toType);
 			vstack.push(result);
 			vstack.fpuStack.push(result);
 		}
@@ -148,39 +151,18 @@ final class FPUHelper implements X86CompilerConstants {
 	 * 
 	 * @param type
 	 * @param value
-	 * @return
+	 * @return The new constant item 
 	 */
-	private final static Item createConst(int type, double value) {
+	private final static Item createConst(ItemFactory ifac, int type, double value) {
 		switch (type) {
 		case JvmType.DOUBLE:
-			return DoubleItem.createConst(value);
+			return ifac.createDConst(value);
 		case JvmType.FLOAT:
-			return FloatItem.createConst((float) value);
+			return ifac.createFConst((float) value);
 		case JvmType.INT:
-			return IntItem.createConst((int) value);
+			return ifac.createIConst((int) value);
 		case JvmType.LONG:
-			return LongItem.createConst((long) value);
-		default:
-			throw new IllegalArgumentException("Invalid type " + type);
-		}
-	}
-
-	/**
-	 * Create an item on the top of the FPU stack.
-	 * 
-	 * @param type
-	 * @return
-	 */
-	final static Item createFPUStack(int type) {
-		switch (type) {
-		case JvmType.DOUBLE:
-			return DoubleItem.createFPUStack();
-		case JvmType.FLOAT:
-			return FloatItem.createFPUStack();
-		case JvmType.INT:
-			return IntItem.createFPUStack();
-		case JvmType.LONG:
-			return LongItem.createFPUStack();
+			return ifac.createLConst((long) value);
 		default:
 			throw new IllegalArgumentException("Invalid type " + type);
 		}
@@ -195,13 +177,14 @@ final class FPUHelper implements X86CompilerConstants {
 	 */
 	final static void div(AbstractX86Stream os, EmitterContext ec,
 			VirtualStack vstack, int type) {
+	    final ItemFactory ifac = ec.getItemFactory();
 		final Item v2 = vstack.pop(type);
 		final Item v1 = vstack.pop(type);
 
 		if (v1.isConstant() && v2.isConstant()) {
 			final double fpv1 = getFPValue(v1);
 			final double fpv2 = getFPValue(v2);
-			vstack.push(createConst(type, fpv1 / fpv2));
+			vstack.push(createConst(ifac, type, fpv1 / fpv2));
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
@@ -313,13 +296,14 @@ final class FPUHelper implements X86CompilerConstants {
 	 */
 	final static void mul(AbstractX86Stream os, EmitterContext ec,
 			VirtualStack vstack, int type) {
+	    final ItemFactory ifac = ec.getItemFactory();
 		final Item v2 = vstack.pop(type);
 		final Item v1 = vstack.pop(type);
 
 		if (v1.isConstant() && v2.isConstant()) {
 			final double fpv1 = getFPValue(v1);
 			final double fpv2 = getFPValue(v2);
-			vstack.push(createConst(type, fpv1 * fpv2));
+			vstack.push(createConst(ifac, type, fpv1 * fpv2));
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
@@ -345,10 +329,11 @@ final class FPUHelper implements X86CompilerConstants {
 	 */
 	final static void neg(AbstractX86Stream os, EmitterContext ec,
 			VirtualStack vstack, int type) {
+	    final ItemFactory ifac = ec.getItemFactory();
 		final Item v = vstack.pop(type);
 		if (v.isConstant()) {
 			final double fpv = getFPValue(v);
-			vstack.push(createConst(type, -fpv));
+			vstack.push(createConst(ifac, type, -fpv));
 		} else {
 			// Prepare
 			final FPUStack fpuStack = vstack.fpuStack;
@@ -471,13 +456,14 @@ final class FPUHelper implements X86CompilerConstants {
 	 */
 	final static void rem(AbstractX86Stream os, EmitterContext ec,
 			VirtualStack vstack, int type) {
+	    final ItemFactory ifac = ec.getItemFactory();
 		final Item v2 = vstack.pop(type);
 		final Item v1 = vstack.pop(type);
 
 		if (v1.isConstant() && v2.isConstant()) {
 			final double fpv1 = getFPValue(v1);
 			final double fpv2 = getFPValue(v2);
-			vstack.push(createConst(type, fpv1 % fpv2));
+			vstack.push(createConst(ifac, type, fpv1 % fpv2));
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
@@ -508,13 +494,14 @@ final class FPUHelper implements X86CompilerConstants {
 	 */
 	final static void sub(AbstractX86Stream os, EmitterContext ec,
 			VirtualStack vstack, int type) {
+	    final ItemFactory ifac = ec.getItemFactory();
 		final Item v2 = vstack.pop(type);
 		final Item v1 = vstack.pop(type);
 
 		if (v1.isConstant() && v2.isConstant()) {
 			final double fpv1 = getFPValue(v1);
 			final double fpv2 = getFPValue(v2);
-			vstack.push(createConst(type, fpv1 - fpv2));
+			vstack.push(createConst(ifac, type, fpv1 - fpv2));
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;

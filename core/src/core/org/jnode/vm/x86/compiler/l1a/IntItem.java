@@ -16,66 +16,22 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 final class IntItem extends WordItem implements X86CompilerConstants {
 
-	/**
-	 * Create a constant item
-	 * 
-	 * @param value
-	 * @return
-	 */
-	static IntItem createConst(int value) {
-		return new IntItem(Kind.CONSTANT, null, value, 0);
-	}
+	private int value;
 
-	/**
-	 * Create an item that is on the FPU stack.
-	 * 
-	 * @return
-	 */
-	static IntItem createFPUStack() {
-		return new IntItem(Kind.FPUSTACK, null, 0, 0);
-	}
-
-	/**
-	 * Create a local variable item
-	 * 
-	 * @param offsetToFP
-	 * @return
-	 */
-	static IntItem createLocal(int offsetToFP) {
-		return new IntItem(Kind.LOCAL, null, 0, offsetToFP);
-	}
-
-	/**
-	 * Create a register item
-	 * 
-	 * @param reg
-	 * @return
-	 */
-	static IntItem createReg(Register reg) {
-		return new IntItem(Kind.REGISTER, reg, 0, 0);
-	}
-
-	/**
-	 * Create an item that is on the stack
-	 * 
-	 * @return
-	 */
-	static IntItem createStack() {
-		return new IntItem(Kind.STACK, null, 0, 0);
-	}
-
-	private final int value;
-
-	private IntItem(int kind, Register reg, int value, int local) {
-		super(kind, reg, local);
+	final void initialize(int kind, int offsetToFP, Register reg, int value) {
+		super.initialize(kind, reg, offsetToFP);
 		this.value = value;
+	}
+
+	IntItem(ItemFactory factory) {
+	    super(factory);
 	}
 
 	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.WordItem#cloneConstant()
 	 */
 	protected WordItem cloneConstant() {
-		return createConst(getValue());
+		return factory.createIConst(getValue());
 	}
 
 	/**
