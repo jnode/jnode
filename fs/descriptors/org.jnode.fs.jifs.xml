@@ -1,0 +1,33 @@
+<?xml version="0.1" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.fs.jifs" 
+        name="Jnode Information FileSystem"
+        version="@VERSION@"
+        provider-name="Andreas Haenel (http://jifs.org)">
+        
+  <requires>
+	<import plugin="org.jnode.fs.service"/>
+	<import plugin="org.jnode.fs"/>
+    <import plugin="org.jnode.log4j"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.fs.jifs.*"/>
+      <export name="org.jnode.fs.jifs.files.*"/>
+      <export name="org.jnode.fs.jifs.directories.*"/>
+    </library>
+  </runtime>
+        
+  <extension point="org.jnode.fs.types">
+    <type class="org.jnode.fs.jifs.JIFileSystemType"/>
+  </extension>
+  
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
+    <permission class="java.lang.RuntimePermission" name="getProtectionDomain"/>
+    <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
+  </extension> 
+        
+</plugin>
