@@ -263,8 +263,8 @@ public abstract class DoubleWordItem extends Item implements
             break;
 
         case Kind.LOCAL:
-            os.writeMOV(INTSIZE, lsb, FP, offsetToFP);
-            os.writeMOV(INTSIZE, msb, FP, offsetToFP + 4);
+            os.writeMOV(INTSIZE, lsb, X86Register.EBP, offsetToFP);
+            os.writeMOV(INTSIZE, msb, X86Register.EBP, offsetToFP + 4);
             break;
 
         case Kind.CONSTANT:
@@ -275,8 +275,8 @@ public abstract class DoubleWordItem extends Item implements
             // Make sure this item is on top of the FPU stack
             stack.fpuStack.pop(this);
             // Convert & move to new space on normal stack
-            os.writeLEA(SP, SP, -8);
-            popFromFPU(os, SP, 0);
+            os.writeLEA(X86Register.ESP, X86Register.ESP, -8);
+            popFromFPU(os, X86Register.ESP, 0);
             os.writePOP(lsb);
             os.writePOP(msb);
             break;
@@ -353,8 +353,8 @@ public abstract class DoubleWordItem extends Item implements
             break;
 
         case Kind.LOCAL:
-            os.writePUSH(FP, getMsbOffsetToFP());
-            os.writePUSH(FP, getLsbOffsetToFP());
+            os.writePUSH(X86Register.EBP, getMsbOffsetToFP());
+            os.writePUSH(X86Register.EBP, getLsbOffsetToFP());
             break;
 
         case Kind.CONSTANT:
@@ -369,8 +369,8 @@ public abstract class DoubleWordItem extends Item implements
             }
             stack.fpuStack.pop(this);
             // Convert & move to new space on normal stack
-            os.writeLEA(SP, SP, -8);
-            popFromFPU(os, SP, 0);
+            os.writeLEA(X86Register.ESP, X86Register.ESP, -8);
+            popFromFPU(os, X86Register.ESP, 0);
             break;
 
         case Kind.STACK:
@@ -421,18 +421,18 @@ public abstract class DoubleWordItem extends Item implements
         case Kind.REGISTER:
             os.writePUSH(msb);
             os.writePUSH(lsb);
-            pushToFPU(os, SP, 0);
-            os.writeLEA(SP, SP, 8);
+            pushToFPU(os, X86Register.ESP, 0);
+            os.writeLEA(X86Register.ESP, X86Register.ESP, 8);
             break;
 
         case Kind.LOCAL:
-            pushToFPU(os, FP, getLsbOffsetToFP());
+            pushToFPU(os, X86Register.EBP, getLsbOffsetToFP());
             break;
 
         case Kind.CONSTANT:
             pushConstant(ec, os);
-            pushToFPU(os, SP, 0);
-            os.writeLEA(SP, SP, 8);
+            pushToFPU(os, X86Register.ESP, 0);
+            os.writeLEA(X86Register.ESP, X86Register.ESP, 8);
             break;
 
         case Kind.FPUSTACK:
@@ -446,8 +446,8 @@ public abstract class DoubleWordItem extends Item implements
             if (VirtualStack.checkOperandStack) {
                 stack.operandStack.pop(this);
             }
-            pushToFPU(os, SP, 0);
-            os.writeLEA(SP, SP, 8);
+            pushToFPU(os, X86Register.ESP, 0);
+            os.writeLEA(X86Register.ESP, X86Register.ESP, 8);
             break;
         }
 

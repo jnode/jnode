@@ -565,24 +565,24 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 		println("\tand " + dstReg + ",[" + srcReg + disp(srcDisp) + "]");
 	}
 
-	public void writeArithSSEDOp(int operation, X86Register dst, X86Register src) {
+	public void writeArithSSEDOp(int operation, X86Register.XMM dst, X86Register.XMM src) {
 		final String op = getSSEOperationName(operation);
 		println("\t" + op + "D" + dst + ", " + src);
 	}
 
-	public void writeArithSSEDOp(int operation, X86Register dst,
-			X86Register src, int srcDisp) {
+	public void writeArithSSEDOp(int operation, X86Register.XMM dst,
+			X86Register.GPR src, int srcDisp) {
 		final String op = getSSEOperationName(operation);
 		println("\t" + op + "D" + dst + ", qword [" + src + disp(srcDisp) + "]");
 	}
 
-	public void writeArithSSESOp(int operation, X86Register dst, X86Register src) {
+	public void writeArithSSESOp(int operation, X86Register.XMM dst, X86Register.XMM src) {
 		final String op = getSSEOperationName(operation);
 		println("\t" + op + "S" + dst + ", " + src);
 	}
 
-	public void writeArithSSESOp(int operation, X86Register dst,
-			X86Register src, int srcDisp) {
+	public void writeArithSSESOp(int operation, X86Register.XMM dst,
+			X86Register.GPR src, int srcDisp) {
 		final String op = getSSEOperationName(operation);
 		println("\t" + op + "S" + dst + ", dword [" + src + disp(srcDisp) + "]");
 	}
@@ -592,7 +592,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 *      int)
 	 */
 	public void writeBOUND(X86Register lReg, X86Register rReg, int rDisp) {
-
 		println("\tbound " + lReg + ",[" + rReg + disp(rDisp) + "]");
 	}
 

@@ -340,7 +340,7 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param dstReg
 	 * @param imm32
 	 */
-	public final void writeArithOp(int operation, X86Register dstReg, int imm32) {
+	public final void writeArithOp(int operation, X86Register.GPR dstReg, int imm32) {
 		switch (operation) {
 		case X86Operation.ADD:
 			writeADD(dstReg, imm32);
@@ -375,7 +375,7 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param dstDisp
 	 * @param imm32
 	 */
-	public final void writeArithOp(int operation, X86Register dstReg,
+	public final void writeArithOp(int operation, X86Register.GPR dstReg,
 			int dstDisp, int imm32) {
 		switch (operation) {
 		case X86Operation.ADD:
@@ -411,8 +411,8 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param dstDisp
 	 * @param srcReg
 	 */
-	public final void writeArithOp(int operation, X86Register dstReg,
-			int dstDisp, X86Register srcReg) {
+	public final void writeArithOp(int operation, X86Register.GPR dstReg,
+			int dstDisp, X86Register.GPR srcReg) {
 		switch (operation) {
 		case X86Operation.ADD:
 			writeADD(dstReg, dstDisp, srcReg);
@@ -446,8 +446,8 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param dstReg
 	 * @param srcReg
 	 */
-	public final void writeArithOp(int operation, X86Register dstReg,
-			X86Register srcReg) {
+	public final void writeArithOp(int operation, X86Register.GPR dstReg,
+			X86Register.GPR srcReg) {
 		switch (operation) {
 		case X86Operation.ADD:
 			writeADD(dstReg, srcReg);
@@ -482,8 +482,8 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param srcReg
 	 * @param srcDisp
 	 */
-	public final void writeArithOp(int operation, X86Register dstReg,
-			X86Register srcReg, int srcDisp) {
+	public final void writeArithOp(int operation, X86Register.GPR dstReg,
+			X86Register.GPR srcReg, int srcDisp) {
 		switch (operation) {
 		case X86Operation.ADD:
 			writeADD(dstReg, srcReg, srcDisp);
@@ -1673,8 +1673,8 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param src
 	 *            Must be an xmm register
 	 */
-	public abstract void writeArithSSEDOp(int operation, X86Register dst,
-			X86Register src);
+	public abstract void writeArithSSEDOp(int operation, X86Register.XMM dst,
+			X86Register.XMM src);
 
 	/**
 	 * Write an sseSD dst, [src+srcDisp] operation for 64-bit fp operations.
@@ -1685,8 +1685,8 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 *            Must be an gpr register
 	 * @param srcDisp
 	 */
-	public abstract void writeArithSSEDOp(int operation, X86Register dst,
-			X86Register src, int srcDisp);
+	public abstract void writeArithSSEDOp(int operation, X86Register.XMM dst,
+			X86Register.GPR src, int srcDisp);
 
 	/**
 	 * Write an sseSD dst, src operation for 32-bit fp operations.
@@ -1696,8 +1696,8 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param src
 	 *            Must be an xmm register
 	 */
-	public abstract void writeArithSSESOp(int operation, X86Register dst,
-			X86Register src);
+	public abstract void writeArithSSESOp(int operation, X86Register.XMM dst,
+			X86Register.XMM src);
 
 	/**
 	 * Write an sseSS dst, [src+srcDisp] operation for 32-bit fp operations.
@@ -1708,8 +1708,8 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 *            Must be an gpr register
 	 * @param srcDisp
 	 */
-	public abstract void writeArithSSESOp(int operation, X86Register dst,
-			X86Register src, int srcDisp);
+	public abstract void writeArithSSESOp(int operation, X86Register.XMM dst,
+			X86Register.GPR src, int srcDisp);
 
 	/**
 	 * Create a SUB reg, imm32

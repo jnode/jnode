@@ -26,6 +26,7 @@ import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86BinaryAssembler;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
@@ -94,7 +95,7 @@ public class X86StubCompiler extends AbstractX86Compiler {
 			// Start the code creation
 			cm.setCodeStart(os.setObjectRef(new Label(method.getMangledName() + "$$start")));
 			// Initialize the class
-			ih.writeClassInitialize(method, EAX, ECX);
+			ih.writeClassInitialize(method, X86Register.EAX, X86Register.ECX);
 			// Call the interpreter
 			ih.emitInvokeMethodAtferRecompile();
 			// Close the "object"

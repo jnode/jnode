@@ -18,141 +18,167 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.assembler.x86;
 
 import org.jnode.vm.VmSystemObject;
 
 /**
- * <description>
+ * Registers of the x86 architecture.
  * 
  * @author epr
  */
-public class X86Register extends VmSystemObject
-implements X86Constants {
+public class X86Register extends VmSystemObject implements X86Constants {
 
-	public static final X86Register AL = new X86Register("al", REG_AL, REG8, 0);
-	public static final X86Register AH = new X86Register("ah", REG8, REG8, 4);
-	public static final X86Register AX = new X86Register("ax", REG_AX, REG16, 0);
-	public static final X86Register EAX = new X86Register("eax", REG_EAX, REG32, 0, true);
+	public static final X86Register.GPR AL = new X86Register.GPR("al", REG_AL,
+			REG8, 0);
 
-	public static final X86Register BL = new X86Register("bl", REG8, REG8, 3);
-	public static final X86Register BH = new X86Register("bh", REG8, REG8, 7);
-	public static final X86Register BX = new X86Register("bx", REG16, REG16, 3);
-	public static final X86Register EBX = new X86Register("ebx", REG32, REG32, 3, true);
+	public static final X86Register.GPR AH = new X86Register.GPR("ah", REG8,
+			REG8, 4);
 
-	public static final X86Register CL = new X86Register("cl", REG_CL, REG8, 1);
-	public static final X86Register CH = new X86Register("ch", REG8, REG8, 5);
-	public static final X86Register CX = new X86Register("cx", REG_CX, REG16, 1);
-	public static final X86Register ECX = new X86Register("ecx", REG_ECX, REG32, 1, true);
+	public static final X86Register.GPR AX = new X86Register.GPR("ax", REG_AX,
+			REG16, 0);
 
-	public static final X86Register DL = new X86Register("dl", REG8, REG8, 2);
-	public static final X86Register DH = new X86Register("dh", REG8, REG8, 6);
-	public static final X86Register DX = new X86Register("dx", REG_DX, REG16, 2);
-	public static final X86Register EDX = new X86Register("edx", REG32, REG32, 2, true);
+	public static final X86Register.GPR EAX = new X86Register.GPR("eax",
+			REG_EAX, REG32, 0, true);
 
-	public static final X86Register SP = new X86Register("sp", REG16, REG16, 4);
-	public static final X86Register ESP = new X86Register("esp", REG32, REG32, 4);
+	public static final X86Register.GPR BL = new X86Register.GPR("bl", REG8,
+			REG8, 3);
 
-	public static final X86Register BP = new X86Register("bp", REG16, REG16, 5);
-	public static final X86Register EBP = new X86Register("ebp", REG32, REG32, 5);
+	public static final X86Register.GPR BH = new X86Register.GPR("bh", REG8,
+			REG8, 7);
 
-	public static final X86Register SI = new X86Register("si", REG16, REG16, 6);
-	public static final X86Register ESI = new X86Register("esi", REG32, REG32, 6);
+	public static final X86Register.GPR BX = new X86Register.GPR("bx", REG16,
+			REG16, 3);
 
-	public static final X86Register DI = new X86Register("di", REG16, REG16, 7);
-	public static final X86Register EDI = new X86Register("edi", REG32, REG32, 7);
-		
-	/* Segment registers */
-	public static final X86Register CS = new X86Register("cs", REG_CS, REG_SREG, 1);
-	public static final X86Register DS = new X86Register("ds", REG_DESS, REG_SREG, 3);
-	public static final X86Register ES = new X86Register("es", REG_DESS, REG_SREG, 0);
-	public static final X86Register SS = new X86Register("ss", REG_DESS, REG_SREG, 2);
-	public static final X86Register FS = new X86Register("fs", REG_FSGS, REG_SREG, 4);
-	public static final X86Register GS = new X86Register("gs", REG_FSGS, REG_SREG, 5);
-	public static final X86Register SEGR6 = new X86Register("segr6", REG_SEG67, REG_SREG, 6);
-	public static final X86Register SEGR7 = new X86Register("segr7", REG_SEG67, REG_SREG, 7);
+	public static final X86Register.GPR EBX = new X86Register.GPR("ebx", REG32,
+			REG32, 3, true);
 
-	/* Control registers */
-	public static final X86Register CR0 = new X86Register("cr0", REG_CREG, REG_CREG, 0);
-	public static final X86Register CR1 = new X86Register("cr1", REG_CREG, REG_CREG, 1);
-	public static final X86Register CR2 = new X86Register("cr2", REG_CREG, REG_CREG, 2);
-	public static final X86Register CR3 = new X86Register("cr3", REG_CREG, REG_CREG, 3);
-	public static final X86Register CR4 = new X86Register("cr4", REG_CREG, REG_CREG, 4);
-	public static final X86Register CR5 = new X86Register("cr5", REG_CREG, REG_CREG, 5);
-	public static final X86Register CR6 = new X86Register("cr6", REG_CREG, REG_CREG, 6);
-	public static final X86Register CR7 = new X86Register("cr7", REG_CREG, REG_CREG, 7);
+	public static final X86Register.GPR CL = new X86Register.GPR("cl", REG_CL,
+			REG8, 1);
 
-	/* Debug registers */
-	public static final X86Register DR0 = new X86Register("dr0", REG_DREG, REG_DREG, 0);
-	public static final X86Register DR1 = new X86Register("dr1", REG_DREG, REG_DREG, 1);
-	public static final X86Register DR2 = new X86Register("dr2", REG_DREG, REG_DREG, 2);
-	public static final X86Register DR3 = new X86Register("dr3", REG_DREG, REG_DREG, 3);
-	public static final X86Register DR4 = new X86Register("dr4", REG_DREG, REG_DREG, 4);
-	public static final X86Register DR5 = new X86Register("dr5", REG_DREG, REG_DREG, 5);
-	public static final X86Register DR6 = new X86Register("dr6", REG_DREG, REG_DREG, 6);
-	public static final X86Register DR7 = new X86Register("dr7", REG_DREG, REG_DREG, 7);
+	public static final X86Register.GPR CH = new X86Register.GPR("ch", REG8,
+			REG8, 5);
 
-	/* Test registers */
-	public static final X86Register TR0 = new X86Register("tr0", REG_TREG, REG_TREG, 0);
-	public static final X86Register TR1 = new X86Register("tr1", REG_TREG, REG_TREG, 1);
-	public static final X86Register TR2 = new X86Register("tr2", REG_TREG, REG_TREG, 2);
-	public static final X86Register TR3 = new X86Register("tr3", REG_TREG, REG_TREG, 3);
-	public static final X86Register TR4 = new X86Register("tr4", REG_TREG, REG_TREG, 4);
-	public static final X86Register TR5 = new X86Register("tr5", REG_TREG, REG_TREG, 5);
-	public static final X86Register TR6 = new X86Register("tr6", REG_TREG, REG_TREG, 6);
-	public static final X86Register TR7 = new X86Register("tr7", REG_TREG, REG_TREG, 7);
+	public static final X86Register.GPR CX = new X86Register.GPR("cx", REG_CX,
+			REG16, 1);
+
+	public static final X86Register.GPR ECX = new X86Register.GPR("ecx",
+			REG_ECX, REG32, 1, true);
+
+	public static final X86Register.GPR DL = new X86Register.GPR("dl", REG8,
+			REG8, 2);
+
+	public static final X86Register.GPR DH = new X86Register.GPR("dh", REG8,
+			REG8, 6);
+
+	public static final X86Register.GPR DX = new X86Register.GPR("dx", REG_DX,
+			REG16, 2);
+
+	public static final X86Register.GPR EDX = new X86Register.GPR("edx", REG32,
+			REG32, 2, true);
+
+	public static final X86Register.GPR SP = new X86Register.GPR("sp", REG16,
+			REG16, 4);
+
+	public static final X86Register.GPR ESP = new X86Register.GPR("esp", REG32,
+			REG32, 4);
+
+	public static final X86Register.GPR BP = new X86Register.GPR("bp", REG16,
+			REG16, 5);
+
+	public static final X86Register.GPR EBP = new X86Register.GPR("ebp", REG32,
+			REG32, 5);
+
+	public static final X86Register.GPR SI = new X86Register.GPR("si", REG16,
+			REG16, 6);
+
+	public static final X86Register.GPR ESI = new X86Register.GPR("esi", REG32,
+			REG32, 6);
+
+	public static final X86Register.GPR DI = new X86Register.GPR("di", REG16,
+			REG16, 7);
+
+	public static final X86Register.GPR EDI = new X86Register.GPR("edi", REG32,
+			REG32, 7);
 
 	/* Floating-point registers */
-	public static final X86Register ST0 = new X86Register("st0", FPU0, FPUREG, 0);
-	public static final X86Register ST1 = new X86Register("st1", FPUREG, FPUREG, 1);
-	public static final X86Register ST2 = new X86Register("st2", FPUREG, FPUREG, 2);
-	public static final X86Register ST3 = new X86Register("st3", FPUREG, FPUREG, 3);
-	public static final X86Register ST4 = new X86Register("st4", FPUREG, FPUREG, 4);
-	public static final X86Register ST5 = new X86Register("st5", FPUREG, FPUREG, 5);
-	public static final X86Register ST6 = new X86Register("st6", FPUREG, FPUREG, 6);
-	public static final X86Register ST7 = new X86Register("st7", FPUREG, FPUREG, 7);
-		
+	public static final X86Register.FPU ST0 = new X86Register.FPU("st0", 0);
+
+	public static final X86Register.FPU ST1 = new X86Register.FPU("st1", 1);
+
+	public static final X86Register.FPU ST2 = new X86Register.FPU("st2", 2);
+
+	public static final X86Register.FPU ST3 = new X86Register.FPU("st3", 3);
+
+	public static final X86Register.FPU ST4 = new X86Register.FPU("st4", 4);
+
+	public static final X86Register.FPU ST5 = new X86Register.FPU("st5", 5);
+
+	public static final X86Register.FPU ST6 = new X86Register.FPU("st6", 6);
+
+	public static final X86Register.FPU ST7 = new X86Register.FPU("st7", 7);
+
 	/* MMX registers */
-	public static final X86Register MM0 = new X86Register("mm0", MMXREG, MMXREG, 0);
-	public static final X86Register MM1 = new X86Register("mm1", MMXREG, MMXREG, 1);
-	public static final X86Register MM2 = new X86Register("mm2", MMXREG, MMXREG, 2);
-	public static final X86Register MM3 = new X86Register("mm3", MMXREG, MMXREG, 3);
-	public static final X86Register MM4 = new X86Register("mm4", MMXREG, MMXREG, 4);
-	public static final X86Register MM5 = new X86Register("mm5", MMXREG, MMXREG, 5);
-	public static final X86Register MM6 = new X86Register("mm6", MMXREG, MMXREG, 6);
-	public static final X86Register MM7 = new X86Register("mm7", MMXREG, MMXREG, 7);
+	public static final X86Register.MMX MM0 = new X86Register.MMX("mm0", 0);
+
+	public static final X86Register.MMX MM1 = new X86Register.MMX("mm1", 1);
+
+	public static final X86Register.MMX MM2 = new X86Register.MMX("mm2", 2);
+
+	public static final X86Register.MMX MM3 = new X86Register.MMX("mm3", 3);
+
+	public static final X86Register.MMX MM4 = new X86Register.MMX("mm4", 4);
+
+	public static final X86Register.MMX MM5 = new X86Register.MMX("mm5", 5);
+
+	public static final X86Register.MMX MM6 = new X86Register.MMX("mm6", 6);
+
+	public static final X86Register.MMX MM7 = new X86Register.MMX("mm7", 7);
 
 	/* SSE registers */
-	public static final X86Register XMM0 = new X86Register("xmm0", XMMREG, XMMREG, 0);
-	public static final X86Register XMM1 = new X86Register("xmm1", XMMREG, XMMREG, 1);
-	public static final X86Register XMM2 = new X86Register("xmm2", XMMREG, XMMREG, 2);
-	public static final X86Register XMM3 = new X86Register("xmm3", XMMREG, XMMREG, 3);
-	public static final X86Register XMM4 = new X86Register("xmm4", XMMREG, XMMREG, 4);
-	public static final X86Register XMM5 = new X86Register("xmm5", XMMREG, XMMREG, 5);
-	public static final X86Register XMM6 = new X86Register("xmm6", XMMREG, XMMREG, 6);
-	public static final X86Register XMM7 = new X86Register("xmm7", XMMREG, XMMREG, 7);
+	public static final X86Register.XMM XMM0 = new X86Register.XMM("xmm0", 0);
+
+	public static final X86Register.XMM XMM1 = new X86Register.XMM("xmm1", 1);
+
+	public static final X86Register.XMM XMM2 = new X86Register.XMM("xmm2", 2);
+
+	public static final X86Register.XMM XMM3 = new X86Register.XMM("xmm3", 3);
+
+	public static final X86Register.XMM XMM4 = new X86Register.XMM("xmm4", 4);
+
+	public static final X86Register.XMM XMM5 = new X86Register.XMM("xmm5", 5);
+
+	public static final X86Register.XMM XMM6 = new X86Register.XMM("xmm6", 6);
+
+	public static final X86Register.XMM XMM7 = new X86Register.XMM("xmm7", 7);
 
 	private final String name;
+
 	private final int type;
+
 	private final int nr;
+
 	private final int size;
+
 	private final boolean suitableFor8Bit;
-		
+
 	public X86Register(String name, int type, int type2, int nr) {
 		this(name, type, type2, nr, false);
 	}
 
-	public X86Register(String name, int type, int type2, int nr, boolean suitableFor8Bit) {
+	public X86Register(String name, int type, int type2, int nr,
+			boolean suitableFor8Bit) {
 		this.name = name;
 		this.type = type;
 		this.nr = nr;
 		this.size = type & X86Constants.SIZE_MASK;
 		this.suitableFor8Bit = suitableFor8Bit;
 	}
-	
+
 	/**
 	 * Returns the name.
+	 * 
 	 * @return String
 	 */
 	public String getName() {
@@ -161,6 +187,7 @@ implements X86Constants {
 
 	/**
 	 * Returns the type.
+	 * 
 	 * @return int
 	 */
 	public int getType() {
@@ -169,14 +196,16 @@ implements X86Constants {
 
 	/**
 	 * Returns the nr.
+	 * 
 	 * @return int
 	 */
 	public int getNr() {
 		return nr;
 	}
-	
+
 	/**
-	 * Returns the size of this register 
+	 * Returns the size of this register
+	 * 
 	 * @return int
 	 * @see X86Constants#BITS8
 	 * @see X86Constants#BITS16
@@ -187,16 +216,81 @@ implements X86Constants {
 	public int getSize() {
 		return size;
 	}
-	
+
 	public String toString() {
 		return name;
 	}
-	
+
 	/**
 	 * Does this register have an 8-bit part.
+	 * 
 	 * @return True for EAX, EBX, ECX, EDX, false otherwise.
 	 */
 	public boolean isSuitableForBits8() {
 		return suitableFor8Bit;
+	}
+
+	public static final class GPR extends X86Register {
+
+		/**
+		 * @param name
+		 * @param type
+		 * @param type2
+		 * @param nr
+		 */
+		public GPR(String name, int type, int type2, int nr) {
+			super(name, type, type2, nr);
+		}
+
+		/**
+		 * @param name
+		 * @param type
+		 * @param type2
+		 * @param nr
+		 * @param suitableFor8Bit
+		 */
+		public GPR(String name, int type, int type2, int nr,
+				boolean suitableFor8Bit) {
+			super(name, type, type2, nr, suitableFor8Bit);
+		}
+	}
+
+	public static final class FPU extends X86Register {
+
+		/**
+		 * @param name
+		 * @param type
+		 * @param type2
+		 * @param nr
+		 */
+		public FPU(String name, int nr) {
+			super(name, (nr == 0) ? FPU0 : FPUREG, FPUREG, nr);
+		}
+	}
+
+	public static final class MMX extends X86Register {
+
+		/**
+		 * @param name
+		 * @param type
+		 * @param type2
+		 * @param nr
+		 */
+		public MMX(String name, int nr) {
+			super(name, MMXREG, MMXREG, nr);
+		}
+	}
+
+	public static final class XMM extends X86Register {
+
+		/**
+		 * @param name
+		 * @param type
+		 * @param type2
+		 * @param nr
+		 */
+		public XMM(String name, int nr) {
+			super(name, XMMREG, XMMREG, nr);
+		}
 	}
 }

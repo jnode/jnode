@@ -650,8 +650,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem addr = vstack.popRef();
             value.load(ec);
             addr.load(ec);
-            final X86Register valuer = value.getRegister();
-            final X86Register r = addr.getRegister();
+            final X86Register.GPR valuer = (X86Register.GPR)value.getRegister();
+            final X86Register.GPR r = (X86Register.GPR)addr.getRegister();
             os.writePrefix(X86Constants.LOCK_PREFIX);
             os.writeArithOp(methodCodeToOperation(mcode), r, 0, valuer);
             value.release(ec);

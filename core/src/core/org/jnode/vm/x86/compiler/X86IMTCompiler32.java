@@ -71,13 +71,13 @@ public class X86IMTCompiler32 extends IMTCompiler implements X86CompilerConstant
 		//os.writeMOV_Const(Register.ESI, offset);
 		
 		// Get tib into EAX
-		os.writeMOV(INTSIZE, EAX, EAX, ObjectLayout.TIB_SLOT * 4);
+		os.writeMOV(INTSIZE, X86Register.EAX, X86Register.EAX, ObjectLayout.TIB_SLOT * 4);
 		// Get selector into EDX
-		os.writeMOV_Const(EDX, selector);
+		os.writeMOV_Const(X86Register.EDX, selector);
 		// Get compiled IMT into EAX
-		os.writeMOV(INTSIZE, EAX, EAX, (TIBLayout.COMPILED_IMT_INDEX + VmArray.DATA_OFFSET) * 4);
+		os.writeMOV(INTSIZE, X86Register.EAX, X86Register.EAX, (TIBLayout.COMPILED_IMT_INDEX + VmArray.DATA_OFFSET) * 4);
 		// Call to offset within compiled IMT
-		os.writeLEA(X86Register.EAX, EAX, offset);
+		os.writeLEA(X86Register.EAX, X86Register.EAX, offset);
 		os.writeCALL(X86Register.EAX);
 	}
 	

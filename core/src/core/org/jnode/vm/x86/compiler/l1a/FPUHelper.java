@@ -92,7 +92,7 @@ final class FPUHelper implements X86CompilerConstants {
 		fxchST1(os, fpuStack, reg);
 
 		final X86RegisterPool pool = ec.getPool();
-		pool.request(EAX);
+		pool.request(X86Register.EAX);
 		final IntItem result = (IntItem)L1AHelper.requestWordRegister(ec, JvmType.INT, false);
 		final X86Register resr = result.getRegister();
 		
@@ -139,7 +139,7 @@ final class FPUHelper implements X86CompilerConstants {
 		vstack.push(result);
 
 		// Release
-		pool.release(EAX);
+		pool.release(X86Register.EAX);
 	}
 
 	/**
