@@ -25,6 +25,7 @@
   <property name="commons-net.jar"     value="${root.dir}/net/lib/commons-net-1.1.0.jar"/>
   <property name="dnsjava.jar"         value="${root.dir}/net/lib/dnsjava-1.5.0.jar"/>
   <property name="junit.jar"           value="${root.dir}/core/lib/junit.jar"/>
+  <property name="june.jar"            value="${root.dir}/core/lib/june.jar"/>  
   <property name="dom4j.jar"           value="${root.dir}/builder/lib/dom4j.jar"/>
   <property name="log4j.jar"           value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
   <property name="nanoxml.jar"         value="${root.dir}/core/lib/nanoxml-lite-2.2.3.jar"/>
@@ -41,6 +42,7 @@
   <path id="cp">
     <pathelement location="${ant.jar}"/>
     <pathelement location="${junit.jar}"/>
+    <pathelement location="${june.jar}"/>    
     <pathelement location="${log4j.jar}"/>
     <pathelement location="${nanoxml.jar}"/>
     <pathelement location="${basedir}/conf"/>
@@ -114,6 +116,11 @@
        <libalias name="beanshell.jar" alias="${beanshell.jar}"/>
       <libalias name="lw.jar" alias="${lw.jar}"/>
       <libalias name="junit.jar" alias="${junit.jar}"/>
+      <libalias name="june.jar" alias="${june.jar}"/>    	
+      <libalias name="ant.jar" alias="${ant.jar}"/>
+      <libalias name="ant-commons-net.jar" alias="${ant-commons-net.jar}"/>
+      <libalias name="ant-launcher.jar" alias="${ant-launcher.jar}"/>
+      <libalias name="ant-trax.jar" alias="${ant-trax.jar}"/>      	    	    	
       <descriptors dir="${descriptors.dir}/">
         <include name="*.xml"/>
         <exclude name="*plugin-list.xml"/>
@@ -329,7 +336,11 @@
   	
   	
   </target>
-  
+
+<!-- Run all tests -->
+  <target name="tests" depends="assemble">
+    <ant target="tests" dir="${root.dir}/fs" inheritall="on" inheritrefs="on"/>
+  </target>
  </project>
 
 
