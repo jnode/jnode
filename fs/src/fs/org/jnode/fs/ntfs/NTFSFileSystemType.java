@@ -9,12 +9,11 @@ import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
 import org.jnode.fs.partitions.PartitionTableEntry;
+import org.jnode.fs.partitions.ibm.IBMPartitionTableEntry;
+import org.jnode.fs.partitions.ibm.IBMPartitionTypes;
 
 /**
  * @author Chira
- * 
- * To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Generation - Code and Comments
  */
 public class NTFSFileSystemType implements FileSystemType {
 
@@ -25,18 +24,20 @@ public class NTFSFileSystemType implements FileSystemType {
 		return NAME;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.jnode.fs.FileSystemType#supports(org.jnode.fs.partitions.PartitionTableEntry,
-	 *      byte[])
+	/**
+	 * @see org.jnode.fs.FileSystemType#supports(PartitionTableEntry, byte[], FSBlockDeviceAPI)
 	 */
 	public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
-		return new String(firstSector, 0x03, 8).startsWith(TAG);
+	    if (pte instanceof IBMPartitionTableEntry) {
+	        IBMPartitionTableEntry iPte = (IBMPartitionTableEntry)pte;
+	        if (iPte.getSystemIndicator() == IBMPartitionTypes.PARTTYPE_NTFS) {
+	    		return new String(firstSector, 0x03, 8).startsWith(TAG);	            
+	        }
+	    }
+        return false;
 	}
-	/*
-	 * (non-Javadoc)
-	 * 
+	
+	/**
 	 * @see org.jnode.fs.FileSystemType#create(org.jnode.driver.Device)
 	 */
 	public FileSystem create(Device device) throws FileSystemException {

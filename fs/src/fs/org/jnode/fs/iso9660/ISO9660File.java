@@ -27,7 +27,7 @@ public class ISO9660File implements FSFile
 		this.entry = entry;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.fs.FSFile#getLength()
 	 */
 	public long getLength()
@@ -35,7 +35,7 @@ public class ISO9660File implements FSFile
 		return entry.getCDFSentry().getDataLength();
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.fs.FSFile#setLength(long)
 	 */
 	public void setLength(long length) throws IOException
@@ -43,7 +43,7 @@ public class ISO9660File implements FSFile
 		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.fs.FSFile#read(long, byte[], int, int)
 	 */
 	public void read(long fileOffset, byte[] dest, int off, int len)
@@ -52,7 +52,7 @@ public class ISO9660File implements FSFile
 		this.entry.getCDFSentry().readFileData(fileOffset,dest,off,len);
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.fs.FSFile#write(long, byte[], int, int)
 	 */
 	public void write(long fileOffset, byte[] src, int off, int len)
@@ -61,7 +61,7 @@ public class ISO9660File implements FSFile
 		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.fs.FSFile#flush()
 	 */
 	public void flush() throws IOException
@@ -69,7 +69,7 @@ public class ISO9660File implements FSFile
 		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.fs.FSObject#isValid()
 	 */
 	public boolean isValid()
@@ -77,7 +77,7 @@ public class ISO9660File implements FSFile
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.fs.FSObject#getFileSystem()
 	 */
 	public FileSystem getFileSystem()

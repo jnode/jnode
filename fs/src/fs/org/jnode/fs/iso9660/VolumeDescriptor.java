@@ -5,7 +5,8 @@ package org.jnode.fs.iso9660;
 
 import java.io.IOException;
 
-import org.jnode.fs.ntfs.NTFSUTIL;
+import org.jnode.util.BigEndian;
+import org.jnode.util.LittleEndian;
 
 /**
  * @author vali
@@ -63,25 +64,25 @@ public class VolumeDescriptor
 		System.out.println("		- Data Length: " + this.getRootDirectoryEntry().getDataLength());
 		System.out.println("		- File unit size: " + this.getRootDirectoryEntry().getFileUnitSize());
 		
-	};
+	}
 	
 	public void init(byte[] buff)
 	{
-		this.setType(Util.unsignedByteToInt(buff[0]));
+		this.setType(LittleEndian.getUInt8(buff, 0));
 		this.setStandardIdentifier(new String(buff,1,5));
 		this.setSystemIdentifier(new String(buff,8,31));
 		this.setVolumeIdentifier(new String(buff,40,31));
 		this.setVolumeSetIdentifier(new String(buff,190,127));
-		this.setNumberOfLB(NTFSUTIL.LE_READ_U32_INT(buff,80));
-		this.setVolumeSetSize(NTFSUTIL.LE_READ_U16_INT(buff[120],buff[121]));
+		this.setNumberOfLB((int)LittleEndian.getUInt32(buff,80));
+		this.setVolumeSetSize(LittleEndian.getUInt16(buff, 120));
 		
-		this.setLBSize(NTFSUTIL.LE_READ_U16_INT(buff[128],buff[129]));
+		this.setLBSize(LittleEndian.getUInt16(buff, 128));
 		// path table info
-		this.setPathTableSize(NTFSUTIL.LE_READ_U32_INT(buff,132));
-		this.setLocationOfTyp_L_PathTable(NTFSUTIL.LE_READ_U32_INT(buff,140));
-		this.setLocationOfOptionalTyp_L_PathTable(NTFSUTIL.LE_READ_U32_INT(buff,144));
-		this.setLocationOfTyp_M_PathTable(Util.BE_READ_U32_INT(buff,148));
-		this.setLocationOfOptionalTyp_M_PathTable(Util.BE_READ_U32_INT(buff,152));
+		this.setPathTableSize((int)LittleEndian.getUInt32(buff,132));
+		this.setLocationOfTyp_L_PathTable((int)LittleEndian.getUInt32(buff,140));
+		this.setLocationOfOptionalTyp_L_PathTable((int)LittleEndian.getUInt32(buff,144));
+		this.setLocationOfTyp_M_PathTable((int)BigEndian.getUInt32(buff,148));
+		this.setLocationOfOptionalTyp_M_PathTable((int)BigEndian.getUInt32(buff,152));
 		
 		this.setRootDirectoryEntry(new EntryRecord(this.getVolume(),buff,156));
 		

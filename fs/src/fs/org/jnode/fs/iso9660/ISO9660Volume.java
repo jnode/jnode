@@ -59,7 +59,7 @@ public class ISO9660Volume
 		return volumeDescriptor;
 	}
 	/**
-	 * @param volumeDescriptor The volumeDescriptor to set.
+	 * @param pvd The volumeDescriptor to set.
 	 */
 	public void setVolumeDescriptor(VolumeDescriptor pvd) {
 		this.volumeDescriptor = pvd;

@@ -15,9 +15,6 @@ import org.jnode.fs.FileSystemException;
 
 /**
  * @author Chira
- *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
  */
 public class ISO9660FileSystem implements FileSystem
 {
@@ -27,7 +24,8 @@ public class ISO9660FileSystem implements FileSystem
 	private Device device = null;
 	private final BlockDeviceAPI api;
 	private ISO9660Volume volume = null;
-	/* (non-Javadoc)
+
+	/**
 	 * @see org.jnode.fs.FileSystem#getDevice()
 	 */
 	public ISO9660FileSystem(Device device) throws FileSystemException 
@@ -41,7 +39,7 @@ public class ISO9660FileSystem implements FileSystem
 		} catch (ApiNotFoundException ex) {
 			throw new FileSystemException(ex);
 		}
-		byte[] buff = new byte[ISO9660FileSystem.DefaultLBNSize];
+		//byte[] buff = new byte[ISO9660FileSystem.DefaultLBNSize];
 		try
 		{
 			volume = new ISO9660Volume(api);
@@ -55,7 +53,7 @@ public class ISO9660FileSystem implements FileSystem
 	{
 		return device;
 	}
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.fs.FileSystem#getRootEntry()
 	 */
 	public FSEntry getRootEntry() throws IOException
@@ -63,7 +61,7 @@ public class ISO9660FileSystem implements FileSystem
 		return new ISO9660Entry(volume.getVolumeDescriptor().getRootDirectoryEntry());
 		
 	}
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.fs.FileSystem#close()
 	 */
 	public void close()
