@@ -57,8 +57,9 @@ public class BootFloppyBuilder {
 		long lmDest = destFile.lastModified();
 		long lmKernel = (kernelFile == null) ? 0 : kernelFile.lastModified();
 		long lmMenu = (menuFile == null) ? 0 : menuFile.lastModified();
-
-		return (lmKernel > lmDest) || (lmMenu > lmDest);
+		long lmInitJar = (initJarFile == null) ? 0 : initJarFile.lastModified();
+		
+		return (lmKernel > lmDest) || (lmMenu > lmDest) || (lmInitJar > lmDest);
 	}
 
 	/**
