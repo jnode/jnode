@@ -153,10 +153,10 @@ public abstract class BitmapGraphics {
 	 * @see Surface#PAINT_MODE
 	 * @see Surface#XOR_MODE
 	 */
-	public final void drawPixel(int x, int y, int color, int mode) {
+	public final void drawPixels(int x, int y, int count, int color, int mode) {
 		try {
 			if ((x >= 0) && (x < width) && (y >= 0) && (y < height)) {
-				doDrawPixel(x, y, color, mode);
+				doDrawPixels(x, y, count, color, mode);
 			}
 		} catch (IndexOutOfBoundsException ex) {
 			log.error("Index out of bounds: x=" + x + ", y=" + y + ", width=" + width + ", height=" + height);
@@ -252,15 +252,16 @@ public abstract class BitmapGraphics {
 	}
 
 	/**
-	 * Draw a pixel at location x,y using the given color.
+	 * Draw a number of pixels at location x,y using the given color.
 	 * @param x
 	 * @param y
+	 * @param count
 	 * @param color
 	 * @param mode
 	 * @see Surface#PAINT_MODE
 	 * @see Surface#XOR_MODE
 	 */
-	protected abstract void doDrawPixel(int x, int y, int color, int mode);
+	protected abstract void doDrawPixels(int x, int y, int count, int color, int mode);
 
 	/**
 	 * Draw a line at location x,y that is w long using the given color.
@@ -312,12 +313,12 @@ public abstract class BitmapGraphics {
 			super(mem, width, height, offset, bytesPerLine);
 		}
 
-		protected void doDrawPixel(int x, int y, int color, int mode) {
+		protected void doDrawPixels(int x, int y, int count, int color, int mode) {
 			final int ofs = offset + (y * bytesPerLine) + x;
 			if (mode == Surface.PAINT_MODE) {
-				mem.setByte(ofs, (byte) color);
+				mem.setByte(ofs, (byte) color, count);
 			} else {
-				mem.xorByte(ofs, (byte) color, 1);
+				mem.xorByte(ofs, (byte) color, count);
 			}
 		}
 
@@ -354,12 +355,12 @@ public abstract class BitmapGraphics {
 			super(mem, width, height, offset, bytesPerLine);
 		}
 
-		protected final void doDrawPixel(int x, int y, int color, int mode) {
+		protected final void doDrawPixels(int x, int y, int count, int color, int mode) {
 			final int ofs = offset + (y * bytesPerLine) + (x << 1);
 			if (mode == Surface.PAINT_MODE) {
-				mem.setShort(ofs, (short) color);
+				mem.setShort(ofs, (short) color, count);
 			} else {
-				mem.xorShort(ofs, (short) color, 1);
+				mem.xorShort(ofs, (short) color, count);
 			}
 		}
 
@@ -396,12 +397,12 @@ public abstract class BitmapGraphics {
 			super(mem, width, height, offset, bytesPerLine);
 		}
 
-		protected void doDrawPixel(int x, int y, int color, int mode) {
+		protected void doDrawPixels(int x, int y, int count, int color, int mode) {
 			final int ofs = offset + (y * bytesPerLine) + (x * 3);
 			if (mode == Surface.PAINT_MODE) {
-				mem.setInt24(ofs, color, 1);
+				mem.setInt24(ofs, color, count);
 			} else {
-				mem.xorInt24(ofs, color, 1);
+				mem.xorInt24(ofs, color, count);
 			}
 		}
 
@@ -438,13 +439,13 @@ public abstract class BitmapGraphics {
 			super(mem, width, height, offset, bytesPerLine);
 		}
 
-		protected final void doDrawPixel(int x, int y, int color, int mode) {
+		protected final void doDrawPixels(int x, int y, int count, int color, int mode) {
 			final int ofs = offset + (y * bytesPerLine) + (x << 2);
 			//System.out.println("ofs=" + ofs);
 			if (mode == Surface.PAINT_MODE) {
-				mem.setInt(ofs, color);
+				mem.setInt(ofs, color, count);
 			} else {
-				mem.xorInt(ofs, color, 1);
+				mem.xorInt(ofs, color, count);
 			}
 		}
 

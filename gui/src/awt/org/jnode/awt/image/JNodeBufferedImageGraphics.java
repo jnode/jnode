@@ -104,7 +104,7 @@ public class JNodeBufferedImageGraphics extends AbstractSurfaceGraphics {
 		 */
 		protected void drawPixel(int x, int y, int color, int mode) {
 			if (bitmapGraphics != null) {
-				bitmapGraphics.drawPixel(x, y, color, mode);
+				bitmapGraphics.drawPixels(x, y, 1, color, mode);
 			} else {
 				if (mode == Surface.PAINT_MODE) {
 					sImage.setRGB(x, y, color);

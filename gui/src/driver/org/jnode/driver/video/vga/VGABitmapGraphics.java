@@ -28,14 +28,16 @@ public class VGABitmapGraphics extends BitmapGraphics {
 	}
 
 	/**
-	 * @see org.jnode.awt.util.BitmapGraphics#doDrawImage(java.awt.image.Raster, int, int, int, int, int, int, int)
+	 * @see org.jnode.awt.util.BitmapGraphics#doDrawImage(java.awt.image.Raster, int, int, int,
+	 *      int, int, int, int)
 	 */
 	protected void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width, int height, int bgColor) {
 		doDrawImage(src, srcX, srcY, dstX, dstY, width, height);
 	}
 
 	/**
-	 * @see org.jnode.awt.util.BitmapGraphics#doDrawImage(java.awt.image.Raster, int, int, int, int, int, int)
+	 * @see org.jnode.awt.util.BitmapGraphics#doDrawImage(java.awt.image.Raster, int, int, int,
+	 *      int, int, int)
 	 */
 	protected void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width, int height) {
 		vgaIO.setGRAF(1, 0);
@@ -67,13 +69,13 @@ public class VGABitmapGraphics extends BitmapGraphics {
 					plane3[i] |= bit;
 				}
 			}
-			
+
 			final int dstOfs = y * 80 + (dstX >> 3);
 
 			vgaIO.setSEQ(2, 1); //plane 0
 			vgaIO.setGRAF(4, 0);
 			mem.setBytes(plane0, 0, dstOfs, pWidth);
-			
+
 			vgaIO.setSEQ(2, 2); //plane 1
 			vgaIO.setGRAF(4, 1);
 			mem.setBytes(plane1, 0, dstOfs, pWidth);
@@ -87,10 +89,10 @@ public class VGABitmapGraphics extends BitmapGraphics {
 			mem.setBytes(plane3, 0, dstOfs, pWidth);
 
 			for (int col = 0; col < pWidth; col++) {
-				plane0[col] = 0; 
-				plane1[col] = 0; 
-				plane2[col] = 0; 
-				plane3[col] = 0; 
+				plane0[col] = 0;
+				plane1[col] = 0;
+				plane2[col] = 0;
+				plane3[col] = 0;
 			}
 		}
 		vgaIO.setSEQ(2, 0x0F); //restore
@@ -126,11 +128,14 @@ public class VGABitmapGraphics extends BitmapGraphics {
 	/**
 	 * @see org.jnode.awt.util.BitmapGraphics#doDrawPixel(int, int, int, int)
 	 */
-	protected void doDrawPixel(int x, int y, int color, int mode) {
-		final int bit = 0x80 >> (x & 7);
-		final int offset = y * 80 + (x >> 3);
-		vgaIO.setGRAF(8, bit);
-		mem.orByte(offset, (byte) 0xFF, 1);
+	protected void doDrawPixels(int x, int y, int count, int color, int mode) {
+		for (int i = 0; i < count; i++) {
+			final int bit = 0x80 >> (x & 7);
+			final int offset = y * 80 + (x >> 3);
+			vgaIO.setGRAF(8, bit);
+			mem.orByte(offset, (byte) 0xFF, 1);
+			x++;
+		}
 	}
 
 	private int divroundup(int num, int div) {

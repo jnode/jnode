@@ -322,7 +322,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	 * @param color
 	 * @param mode
 	 */
-	private final void fillRect(int x, int y, int width, int height, int color, int mode) {
+	protected final void fillRect(int x, int y, int width, int height, int color, int mode) {
 		if (x < 0) {
 			width = Math.max(0, x + width);
 			x = 0;
@@ -375,7 +375,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	 * @param color
 	 */
 	protected final void drawPixel(int x, int y, int color, int mode) {
-		bitmapGraphics.drawPixel(x, y, color, mode);
+		bitmapGraphics.drawPixels(x, y, 1, color, mode);
 		/*
 		 * if ((x >= 0) && (x < width) && (y > = 0) && (y < height)) { y; final int ofs; if (mode ==
 		 * Surface.XOR_MODE) { switch (bitsPerPixel) { case 8 : ofs = ofsY + x;
