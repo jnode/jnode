@@ -4,6 +4,14 @@
  */
 package org.jnode.vm.compiler.ir;
 
+import org.jnode.vm.compiler.ir.quad.*;
+import org.jnode.vm.compiler.ir.quad.ConditionalBranchQuad;
+import org.jnode.vm.compiler.ir.quad.ConstantRefAssignQuad;
+import org.jnode.vm.compiler.ir.quad.UnconditionalBranchQuad;
+import org.jnode.vm.compiler.ir.quad.VarReturnQuad;
+import org.jnode.vm.compiler.ir.quad.VariableRefAssignQuad;
+import org.jnode.vm.compiler.ir.quad.VoidReturnQuad;
+
 /**
  * @author Madhu Siddalingaiah
  * 
@@ -30,11 +38,6 @@ public abstract class CodeGenerator {
 	 * @return
 	 */
 	public abstract boolean supports3AddrOps();
-
-	/**
-	 * @param quad
-	 */
-	public abstract void generateCodeFor(BinaryQuad quad);
 
 	/**
 	 * @param quad
@@ -70,4 +73,9 @@ public abstract class CodeGenerator {
 	 * @param quad
 	 */
 	public abstract void generateCodeFor(VoidReturnQuad quad);
+
+	/**
+	 * @param quad
+	 */
+	public abstract void generateCodeFor(BinaryQuad quad);
 }

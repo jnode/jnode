@@ -4,16 +4,16 @@
 package org.jnode.vm.x86.compiler.l2;
 
 import org.jnode.util.BootableHashMap;
-import org.jnode.vm.compiler.ir.BinaryQuad;
 import org.jnode.vm.compiler.ir.CodeGenerator;
-import org.jnode.vm.compiler.ir.ConditionalBranchQuad;
-import org.jnode.vm.compiler.ir.ConstantRefAssignQuad;
 import org.jnode.vm.compiler.ir.RegisterPool;
-import org.jnode.vm.compiler.ir.UnaryQuad;
-import org.jnode.vm.compiler.ir.UnconditionalBranchQuad;
-import org.jnode.vm.compiler.ir.VarReturnQuad;
-import org.jnode.vm.compiler.ir.VariableRefAssignQuad;
-import org.jnode.vm.compiler.ir.VoidReturnQuad;
+import org.jnode.vm.compiler.ir.quad.BinaryQuad;
+import org.jnode.vm.compiler.ir.quad.ConditionalBranchQuad;
+import org.jnode.vm.compiler.ir.quad.ConstantRefAssignQuad;
+import org.jnode.vm.compiler.ir.quad.UnaryQuad;
+import org.jnode.vm.compiler.ir.quad.UnconditionalBranchQuad;
+import org.jnode.vm.compiler.ir.quad.VarReturnQuad;
+import org.jnode.vm.compiler.ir.quad.VariableRefAssignQuad;
+import org.jnode.vm.compiler.ir.quad.VoidReturnQuad;
 
 /**
  * @author Madhu Siddalingaiah
@@ -47,14 +47,6 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public boolean supports3AddrOps() {
 		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.BinaryQuad)
-	 */
-	public void generateCodeFor(BinaryQuad quad) {
-		// TODO Auto-generated method stub
-
 	}
 
 	/* (non-Javadoc)
@@ -111,5 +103,13 @@ public class X86CodeGenerator extends CodeGenerator {
 	public void generateCodeFor(VoidReturnQuad quad) {
 		// TODO Auto-generated method stub
 
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.BinaryQuad)
+	 */
+	public void generateCodeFor(BinaryQuad quad) {
+		// TODO Auto-generated method stub
+		
 	}
 }
