@@ -11,7 +11,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Paint;
 import java.awt.Polygon;
@@ -36,7 +35,6 @@ import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.Map;
 
-import org.jnode.awt.JNodeGraphicsEnvironment;
 import org.jnode.awt.peer.JNodeToolkit;
 
 /**
