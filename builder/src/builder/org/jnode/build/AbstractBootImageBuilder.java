@@ -414,6 +414,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             }
             log("Compiling using " + cmps[0].getName() + " and "
                     + cmps[cmps.length - 1].getName() + " compilers");
+            // Initialize the IMT compiler.
+            arch.getIMTCompiler().initialize(clsMgr);
 
             // Load the jarfile as byte-array
             copyJarFile(blockedObjects);
