@@ -45,7 +45,7 @@
 	<!-- Compile all subproject java files -->
 	<target name="compile" depends="prepare">
 		<javac destdir="${my-classes.dir}" debug="on" optimize="on" compiler="modern" includeJavaRuntime="false"
-			target="${java.target}" source="${java.source}">
+			target="${java.target}" source="${java.source}" encoding="${java.encoding}">
 			<bootclasspath>
 				<pathelement location="${my-src.dir}/classpath/gnu" />
 				<pathelement location="${my-src.dir}/classpath/java" />
