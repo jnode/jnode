@@ -18,6 +18,7 @@ import org.jnode.awt.util.BitmapGraphics;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.pci.PCIDevice;
 import org.jnode.driver.pci.PCI_IDs;
+import org.jnode.driver.video.CursorImage;
 import org.jnode.driver.video.FrameBufferConfiguration;
 import org.jnode.driver.video.HardwareCursorAPI;
 import org.jnode.driver.video.Surface;
@@ -560,9 +561,15 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	 * @param color
 	 */
 	protected final int convertColor(Color color) {
-		final int r = color.getRed();
-		final int g = color.getGreen();
-		final int b = color.getBlue();
+		return convertColor(color.getRed(), color.getGreen(), color.getBlue());
+	}
+
+	/**
+	 * Convert the given color to a value suitable for VMWare
+	 * 
+	 * @param color
+	 */
+	protected final int convertColor(int r, int g, int b) {
 		return ((r << redMaskShift) & redMask) | ((g << greenMaskShift) & greenMask) | ((b << blueMaskShift) & blueMask);
 	}
 
@@ -707,6 +714,109 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 		setCursor(curVisible, curX, curY);
 	}
 
+	
+	/**
+	 * Sets the cursor image.
+	 * @param width The width of the cursor image, this also is the height.
+	 * @param arbg The image a matrix of ARGB pixels.
+	 */
+	public void setCursorImage(CursorImage cursor) {
+		if (hasCapability(SVGA_CAP_ALPHA_CURSOR)) {
+			defineARGBCursor(cursor);
+		} else {
+			defineCursor(cursor);
+		}
+	}
+	
+	/**
+	 * Sets the cursor image.
+	 */
+	private void defineCursor(CursorImage cursor) {
+		
+		final int[] argb = cursor.getImage();
+		final int size = argb.length;
+		final int[] andMask = new int[size];
+		final int[] xorMask = new int[size];
+		
+		for (int i = 0; i < size; i++) {
+			final int v = argb[i];
+			final int a = (v >>> 24) & 0xFF;
+			final int r = (v >> 16) & 0xFF;
+			final int g = (v >> 8) & 0xFF;
+			final int b = v & 0xFF;
+			if (a != 0) {
+				// opaque
+				andMask[i] = 0;
+				xorMask[i] = v & convertColor(r, g, b);
+			} else {
+				// transparent
+				andMask[i] = 0xFFFFFFFF;
+				xorMask[i] = 0;
+			}
+		}
+		
+		// Wait for the FIFO
+		syncFIFO();
+
+		// Command
+		writeWordToFIFO(SVGA_CMD_DEFINE_CURSOR);
+		// Mouse id
+		writeWordToFIFO(MOUSE_ID);
+		// Hotspot X
+		writeWordToFIFO(cursor.getHotSpotX());
+		// Hotspot Y
+		writeWordToFIFO(cursor.getHotSpotY());
+		// Width
+		writeWordToFIFO(cursor.getWidth());
+		// Height
+		writeWordToFIFO(cursor.getHeight());
+		// Depth for AND mask
+		writeWordToFIFO(1);
+		// Depth for XOR mask
+		writeWordToFIFO(getBitsPerPixel());
+		// Scanlines for AND mask
+		for (int i = 0; i < size; i++) {
+			writeWordToFIFO(andMask[i]);
+		}
+		// Scanlines for XOR mask
+		for (int i = 0; i < size; i++) {
+			writeWordToFIFO(xorMask[i]);
+		}
+	}
+	
+	/**
+	 * Sets the cursor image.
+	 */
+	private void defineARGBCursor(CursorImage cursor) {
+		
+		final int[] argb = cursor.getImage();
+		final int size = argb.length;
+		
+		// Wait for the FIFO
+		syncFIFO();
+
+		// Command
+		writeWordToFIFO(SVGA_CMD_DEFINE_ALPHA_CURSOR);
+		// Mouse id
+		writeWordToFIFO(MOUSE_ID);
+		// Hotspot X
+		writeWordToFIFO(cursor.getHotSpotX());
+		// Hotspot Y
+		writeWordToFIFO(cursor.getHotSpotY());
+		// Width
+		writeWordToFIFO(cursor.getWidth());
+		// Height
+		writeWordToFIFO(cursor.getHeight());
+		// Depth for AND mask
+		writeWordToFIFO(1);
+		// Depth for XOR mask
+		writeWordToFIFO(getBitsPerPixel());
+		// Scanlines 
+		for (int i = 0; i < size; i++) {
+			writeWordToFIFO(argb[i]);
+		}
+	}
+	
 	private void defineCursor() {
 		// Wait for the FIFO
 		syncFIFO();

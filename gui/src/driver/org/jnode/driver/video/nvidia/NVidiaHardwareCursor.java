@@ -3,6 +3,7 @@
  */
 package org.jnode.driver.video.nvidia;
 
+import org.jnode.driver.video.CursorImage;
 import org.jnode.driver.video.HardwareCursorAPI;
 
 /**
@@ -70,4 +71,13 @@ public class NVidiaHardwareCursor implements NVidiaConstants, HardwareCursorAPI 
 		vgaIO.setReg32(NVDAC_CURPOS, ((x & 0x0fff) | ((y & 0x0fff) << 16)));
 	}
 
+	
+	/**
+	 * Sets the cursor image.
+	 */
+	public void setCursorImage(CursorImage cursor) {
+		
+		// TODO implement me
+		
+	}
 }
