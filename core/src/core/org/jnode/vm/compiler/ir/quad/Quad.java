@@ -1,7 +1,5 @@
 /*
  * $Id$
- *
- * mailto:madhu@madhu.com
  */
 package org.jnode.vm.compiler.ir.quad;
 
