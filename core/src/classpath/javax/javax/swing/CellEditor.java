@@ -1,5 +1,5 @@
 /* CellEditor.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,63 +37,57 @@ exception statement from your version. */
 
 package javax.swing;
 
-// Imports
-import java.util.*;
-import javax.swing.event.*;
+import java.util.EventObject;
+import javax.swing.event.CellEditorListener;
 
 /**
  * CellEditor
  * @author	Andrew Selkirk
  * @version	1.0
  */
-public interface CellEditor {
+public interface CellEditor
+{
+  /**
+   * getCellEditorValue
+   * @returns Object
+   */
+  Object getCellEditorValue();
 
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * isCellEditable
+   * @param event TODO
+   * @returns boolean
+   */
+  boolean isCellEditable(EventObject event);
 
-	/**
-	 * getCellEditorValue
-	 * @returns Object
-	 */
-	public Object getCellEditorValue();
+  /**
+   * shouldSelectCell
+   * @param event TODO
+   * @returns boolean
+   */
+  boolean shouldSelectCell(EventObject event);
 
-	/**
-	 * isCellEditable
-	 * @param event TODO
-	 * @returns boolean
-	 */
-	public boolean isCellEditable(EventObject event);
+  /**
+   * stopCellEditing
+   * @returns boolean
+   */
+  boolean stopCellEditing();
 
-	/**
-	 * shouldSelectCell
-	 * @param event TODO
-	 * @returns boolean
-	 */
-	public boolean shouldSelectCell(EventObject event);
+  /**
+   * cancelCellEditing
+   */
+  void cancelCellEditing();
 
-	/**
-	 * stopCellEditing
-	 * @returns boolean
-	 */
-	public boolean stopCellEditing();
+  /**
+   * addCellEditorListener
+   * @param value0 TODO
+   */
+  void addCellEditorListener(CellEditorListener listener);
 
-	/**
-	 * cancelCellEditing
-	 */
-	public void cancelCellEditing();
-
-	/**
-	 * addCellEditorListener
-	 * @param value0 TODO
-	 */
-	public void addCellEditorListener(CellEditorListener listener);
-
-	/**
-	 * removeCellEditorListener
-	 * @param listener TODO
-	 */
-	public void removeCellEditorListener(CellEditorListener listener);
-
+  /**
+   * removeCellEditorListener
+   * @param listener TODO
+   */
+  void removeCellEditorListener(CellEditorListener listener);
 
 } // CellEditor

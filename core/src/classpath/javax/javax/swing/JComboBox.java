@@ -1,5 +1,5 @@
 /* JComboBox.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,25 +35,41 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing;
 
-// Imports
-import java.awt.*;
-import java.awt.event.*;
-import java.beans.*;
-import java.io.*;
-import java.util.*;
-import javax.accessibility.*;
-import javax.swing.event.*;
-import javax.swing.plaf.*;
+import java.awt.ItemSelectable;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Vector;
+import javax.accessibility.Accessible;
+import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleAction;
+import javax.accessibility.AccessibleRole;
+import javax.accessibility.AccessibleSelection;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.plaf.ComboBoxUI;
 
 /**
  * JComboBox
  * @author	Andrew Selkirk
  * @version	1.0
  */
-public class JComboBox extends JComponent implements ItemSelectable, 
-		ListDataListener, ActionListener, Accessible {
+public class JComboBox extends JComponent
+  implements ItemSelectable, ListDataListener, ActionListener, Accessible
+{
+  private static final long serialVersionUID = 5654585963292734470L;
+
 
 	//-------------------------------------------------------------
 	// Classes ----------------------------------------------------
@@ -229,7 +245,7 @@ public class JComboBox extends JComponent implements ItemSelectable,
 		 * @param value1 TODO
 		 * @returns int
 		 */
-		public abstract int selectionForKey(char value0, ComboBoxModel value1);
+		int selectionForKey(char value0, ComboBoxModel value1);
 
 
 	} // KeySelectionManager
@@ -577,38 +593,6 @@ public class JComboBox extends JComponent implements ItemSelectable,
 	} // isPopupVisible()
 
 	/**
-	 * addItemListener
-	 * @param value0 TODO
-	 */
-	public void addItemListener(ItemListener value0) {
-		// TODO
-	} // addItemListener()
-
-	/**
-	 * removeItemListener
-	 * @param value0 TODO
-	 */
-	public void removeItemListener(ItemListener value0) {
-		// TODO
-	} // removeItemListener()
-
-	/**
-	 * addActionListener
-	 * @param value0 TODO
-	 */
-	public void addActionListener(ActionListener value0) {
-		// TODO
-	} // addActionListener()
-
-	/**
-	 * removeActionListener
-	 * @param value0 TODO
-	 */
-	public void removeActionListener(ActionListener value0) {
-		// TODO
-	} // removeActionListener()
-
-	/**
 	 * setActionCommand
 	 * @param value0 TODO
 	 */
@@ -766,6 +750,7 @@ public class JComboBox extends JComponent implements ItemSelectable,
 	/**
 	 * isFocusTraversable
 	 * @returns boolean
+         * @deprecated
 	 */
 	public boolean isFocusTraversable() {
 		return false; // TODO
@@ -830,6 +815,73 @@ public class JComboBox extends JComponent implements ItemSelectable,
 		} // if
 		return accessibleContext;
 	} // getAccessibleContext()
+  /**
+   * addActionListener
+   * @param listener TODO
+   */
+  public void addActionListener (ActionListener listener)
+  {
+    listenerList.add (ActionListener.class, listener);
+  }
 
+  /**
+   * removeActionListener
+   * @param listener TODO
+   */
+  public void removeActionListener (ActionListener listener)
+  {
+    listenerList.remove (ActionListener.class, listener);
+  }
 
-} // JComboBox
+  /**
+   * @since 1.4
+   */
+  public ActionListener[] getActionListeners()
+  {
+    return (ActionListener[]) getListeners (ActionListener.class);
+  }
+
+  /**
+   * addItemListener
+   * @param listener TODO
+   */
+  public void addItemListener(ItemListener listener)
+  {
+    listenerList.add (ItemListener.class, listener);
+  }
+
+  /**
+   * removeItemListener
+   * @param listener TODO
+   */
+  public void removeItemListener(ItemListener listener)
+  {
+    listenerList.remove (ItemListener.class, listener);
+  }
+
+  /**
+   * @since 1.4
+   */
+  public ItemListener[] getItemListeners()
+  {
+    return (ItemListener[]) getListeners (ItemListener.class);
+  }
+
+  public void addPopupMenuListener (PopupMenuListener listener)
+  {
+    listenerList.add (PopupMenuListener.class, listener);
+  }
+
+  public void removePopupMenuListener (PopupMenuListener listener)
+  {
+    listenerList.remove (PopupMenuListener.class, listener);
+  }
+
+  /**
+   * @since 1.4
+   */
+  public PopupMenuListener[] getPopupMenuListeners()
+  {
+    return (PopupMenuListener[]) getListeners (PopupMenuListener.class);
+  }
+}

@@ -1,5 +1,5 @@
 /* Action.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,7 +37,6 @@ exception statement from your version. */
 
 package javax.swing;
 
-// Imports
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
 
@@ -55,27 +54,43 @@ public interface Action extends ActionListener {
 	/**
 	 * DEFAULT
 	 */
-	public static final String DEFAULT = "Default";
+	String	DEFAULT				= "Default";
 
 	/**
 	 * LONG_DESCRIPTION
 	 */
-	public static final String LONG_DESCRIPTION = "LongDescription";
+	String	LONG_DESCRIPTION	= "LongDescription";
 
 	/**
 	 * NAME
 	 */
-	public static final String NAME = "Name";
+	String	NAME				= "Name";
 
 	/**
 	 * SHORT_DESCRIPTION
 	 */
-	public static final String SHORT_DESCRIPTION = "ShortDescription";
+	String	SHORT_DESCRIPTION	= "ShortDescription";
 
 	/**
 	 * SMALL_ICON
 	 */
-	public static final String SMALL_ICON = "SmallIcon";
+	String	SMALL_ICON			= "SmallIcon";
+
+	/**
+	 * ACCELERATOR_KEY
+	 */
+	String ACCELERATOR_KEY = "AcceleratorKey";
+
+	/**
+	 * ACTION_COMMAND_KEY
+	 */
+	String ACTION_COMMAND_KEY = "ActionCommandKey";
+
+	/**
+	 * MNEMONIC_KEY
+	 */
+	String MNEMONIC_KEY = "MnemonicKey";
+
 
 	//-------------------------------------------------------------
 	// Interface: Action ------------------------------------------
@@ -86,37 +101,38 @@ public interface Action extends ActionListener {
 	 * @param key TODO
 	 * @returns TODO
 	 */
-	public Object getValue(String key);
+	Object getValue(String key);
 
 	/**
 	 * setValue
 	 * @param key TODO
 	 * @param value TODO
 	 */
-	public void putValue(String key, Object value);
+	void putValue(String key, Object value);
 
 	/**
 	 * isEnabled
 	 * @returns TODO
 	 */
-	public boolean isEnabled();
+	boolean isEnabled();
 
 	/**
 	 * setEnabled
 	 * @param b TODO
 	 */
-	public void setEnabled(boolean b);
+	void setEnabled(boolean b);
 
 	/**
 	 * addPropertyChangeListener
 	 * @param listener TODO
 	 */
-	public void addPropertyChangeListener(PropertyChangeListener listener);
+	void addPropertyChangeListener(PropertyChangeListener listener);
 
 	/**
 	 * removePropertyChangeListener
 	 * @param listener TODO
 	 */
-	public void removePropertyChangeListener(PropertyChangeListener listener);
+	void removePropertyChangeListener(PropertyChangeListener listener);
+
 
 } // Action

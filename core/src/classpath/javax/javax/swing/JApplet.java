@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing;
 
 import java.applet.Applet;
@@ -46,171 +47,168 @@ import java.awt.Graphics;
 import java.awt.LayoutManager;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
-
 import javax.accessibility.AccessibleContext;
 
-public class JApplet extends Applet {
+public class JApplet extends Applet
+{
 
-	public final static int HIDE_ON_CLOSE = 0;
-	public final static int EXIT_ON_CLOSE = 1;
-	public final static int DISPOSE_ON_CLOSE = 2;
-	public final static int DO_NOTHING_ON_CLOSE = 3;
+    public final static int HIDE_ON_CLOSE        = 0;
+    public final static int EXIT_ON_CLOSE        = 1;
+    public final static int DISPOSE_ON_CLOSE     = 2;
+    public final static int DO_NOTHING_ON_CLOSE  = 3;
 
-	private int close_action = EXIT_ON_CLOSE;
-	private boolean checking;
-	protected JRootPane rootPane;
+    private int close_action = EXIT_ON_CLOSE;
+    private boolean checking;  
+    protected  JRootPane         rootPane;
 
-	public JApplet() {
-		frameInit();
-	}
+    public JApplet()
+    {
+	frameInit();
+    }
+  
+    public JApplet(String title)
+    {
+	frameInit();
+    }
 
-	public JApplet(String title) {
-		frameInit();
-	}
+    protected  void frameInit()
+    {
+      super.setLayout(new BorderLayout(1, 1));
+      getRootPane(); // will do set/create
+    }
 
-	protected void frameInit() {
-		super.setLayout(new BorderLayout(1, 1));
-		getRootPane(); // will do set/create
-	}
+  public Dimension getPreferredSize()
+  {
+    Dimension d = super.getPreferredSize();
+    System.out.println("JFrame.getPrefSize(): " + d + " , comp="+ getComponentCount () + ", layout=" + getLayout());
+    return d;
+  }
 
-	public Dimension getPreferredSize() {
-		Dimension d = super.getPreferredSize();
-		System.out.println("JFrame.getPrefSize(): " + d + " , comp=" + countComponents() + ", layout=" + getLayout());
-		return d;
-	}
+  public  void setLayout(LayoutManager manager)
+  {    super.setLayout(manager);  }
 
-	public void setLayout(LayoutManager manager) {
-		super.setLayout(manager);
-	}
+    void setLayeredPane(JLayeredPane layeredPane) 
+    {   getRootPane().setLayeredPane(layeredPane);   }
+  
+    JLayeredPane getLayeredPane()
+    {   return getRootPane().getLayeredPane();     }
+  
+    JRootPane getRootPane()
+    {
+        if (rootPane == null)
+            setRootPane(createRootPane());
+        return rootPane;          
+    }
 
-	void setLayeredPane(JLayeredPane layeredPane) {
-		getRootPane().setLayeredPane(layeredPane);
-	}
+    void setRootPane(JRootPane root)
+    {
+        if (rootPane != null)
+            remove(rootPane);
+            
+        rootPane = root; 
+        add(rootPane, BorderLayout.CENTER);
+    }
 
-	JLayeredPane getLayeredPane() {
-		return getRootPane().getLayeredPane();
-	}
+    JRootPane createRootPane()
+    {   return new JRootPane();    }
 
-	JRootPane getRootPane() {
-		if (rootPane == null)
-			setRootPane(createRootPane());
-		return rootPane;
-	}
+    Container getContentPane()
+    {    return getRootPane().getContentPane();     }
 
-	void setRootPane(JRootPane root) {
-		if (rootPane != null)
-			remove(rootPane);
+    void setContentPane(Container contentPane)
+    {    getRootPane().setContentPane(contentPane);    }
+  
+    Component getGlassPane()
+    {    return getRootPane().getGlassPane();   }
+  
+    void setGlassPane(Component glassPane)
+    {   getRootPane().setGlassPane(glassPane);   }
 
-		rootPane = root;
-		add(rootPane, BorderLayout.CENTER);
-	}
 
-	JRootPane createRootPane() {
-		return new JRootPane();
-	}
+    /////////////////////////////////////////////////////////////////////////////////
+    protected  void addImpl(Component comp, Object constraints, int index)
+    {   super.addImpl(comp, constraints, index);    }
+  
+    public AccessibleContext getAccessibleContext()
+    {    return null;  }
+  
+    int getDefaultCloseOperation()
+    {    return close_action;   }
 
-	Container getContentPane() {
-		return getRootPane().getContentPane();
-	}
+    
+    JMenuBar getJMenuBar()
+    {    return getRootPane().getJMenuBar();   }
+    
+    void setJMenuBar(JMenuBar menubar)
+    {    getRootPane().setJMenuBar(menubar); }
+    
+    
+    protected  String paramString()
+    {   return "JFrame";     }
 
-	void setContentPane(Container contentPane) {
-		getRootPane().setContentPane(contentPane);
-	}
+    protected  void processKeyEvent(KeyEvent e)
+    {   super.processKeyEvent(e);    }
 
-	Component getGlassPane() {
-		return getRootPane().getGlassPane();
-	}
+    protected  void processWindowEvent(WindowEvent e)
+    {
+        //      System.out.println("PROCESS_WIN_EV-1: " + e);
 
-	void setGlassPane(Component glassPane) {
-		getRootPane().setGlassPane(glassPane);
-	}
+	//        super.processWindowEvent(e); 
 
-	/////////////////////////////////////////////////////////////////////////////////
-	protected void addImpl(Component comp, Object constraints, int index) {
-		super.addImpl(comp, constraints, index);
-	}
+        //      System.out.println("PROCESS_WIN_EV-2: " + e);
+        switch (e.getID())
+            {
+            case WindowEvent.WINDOW_CLOSING:
+                {
+                    switch(close_action)
+                        {
+                        case EXIT_ON_CLOSE:
+                            {
+                                System.out.println("user requested exit on close");
+                                System.exit(1);
+                                break;
+                            }
+                        case DISPOSE_ON_CLOSE:
+                            {
+                                System.out.println("user requested dispose on close");
+                                //dispose();
+                                break;
+                            }
+                        case HIDE_ON_CLOSE:
 
-	public AccessibleContext getAccessibleContext() {
-		return null;
-	}
+                        case DO_NOTHING_ON_CLOSE:
+                            break;
+                        }
+                    break;
+                }
+                
+            case WindowEvent.WINDOW_CLOSED:
+            case WindowEvent.WINDOW_OPENED:
+            case WindowEvent.WINDOW_ICONIFIED:
+            case WindowEvent.WINDOW_DEICONIFIED:
+            case WindowEvent.WINDOW_ACTIVATED:
+            case WindowEvent.WINDOW_DEACTIVATED:
+                break;
+            }
+    }
+    
 
-	int getDefaultCloseOperation() {
-		return close_action;
-	}
+    public void remove(Component comp)
+    {   getContentPane().remove(comp);  }
+  
 
-	JMenuBar getJMenuBar() {
-		return getRootPane().getJMenuBar();
-	}
+    void setDefaultCloseOperation(int operation)
+    {  close_action = operation;   }
 
-	void setJMenuBar(JMenuBar menubar) {
-		getRootPane().setJMenuBar(menubar);
-	}
 
-	protected String paramString() {
-		return "JFrame";
-	}
 
-	protected void processKeyEvent(KeyEvent e) {
-		super.processKeyEvent(e);
-	}
+    protected  boolean isRootPaneCheckingEnabled()
+    {    return checking;        }
 
-	protected void processWindowEvent(WindowEvent e) {
-		//      System.out.println("PROCESS_WIN_EV-1: " + e);
 
-		//        super.processWindowEvent(e); 
+    protected  void setRootPaneCheckingEnabled(boolean enabled)
+    { checking = enabled;  }
 
-		//      System.out.println("PROCESS_WIN_EV-2: " + e);
-		switch (e.getID()) {
-			case WindowEvent.WINDOW_CLOSING :
-				{
-					switch (close_action) {
-						case EXIT_ON_CLOSE :
-							{
-								System.out.println("user requested exit on close");
-								System.exit(1);
-								break;
-							}
-						case DISPOSE_ON_CLOSE :
-							{
-								System.out.println("user requested dispose on close");
-								//dispose();
-								break;
-							}
-						case HIDE_ON_CLOSE :
-
-						case DO_NOTHING_ON_CLOSE :
-							break;
-					}
-					break;
-				}
-
-			case WindowEvent.WINDOW_CLOSED :
-			case WindowEvent.WINDOW_OPENED :
-			case WindowEvent.WINDOW_ICONIFIED :
-			case WindowEvent.WINDOW_DEICONIFIED :
-			case WindowEvent.WINDOW_ACTIVATED :
-			case WindowEvent.WINDOW_DEACTIVATED :
-				break;
-		}
-	}
-
-	public void remove(Component comp) {
-		getContentPane().remove(comp);
-	}
-
-	void setDefaultCloseOperation(int operation) {
-		close_action = operation;
-	}
-
-	protected boolean isRootPaneCheckingEnabled() {
-		return checking;
-	}
-
-	protected void setRootPaneCheckingEnabled(boolean enabled) {
-		checking = enabled;
-	}
-
-	public void update(Graphics g) {
-		paint(g);
-	}
+    public void update(Graphics g)
+    {   paint(g);  }
 }

@@ -35,11 +35,11 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing.colorchooser;
 
-// Imports
-import java.awt.*;
-import javax.swing.event.*;
+import java.awt.Color;
+import javax.swing.event.ChangeListener;
 
 /**
  * ColorSelectionModel
@@ -56,25 +56,25 @@ public interface ColorSelectionModel {
 	 * getSelectedColor
 	 * @returns Color
 	 */
-	public abstract Color getSelectedColor();
+	Color getSelectedColor();
 
 	/**
 	 * setSelectedColor
 	 * @param color TODO
 	 */
-	public abstract void setSelectedColor(Color color);
+	void setSelectedColor(Color color);
 
 	/**
 	 * addChangeListener
 	 * @param listener TODO
 	 */
-	public abstract void addChangeListener(ChangeListener listener);
+	void addChangeListener(ChangeListener listener);
 
 	/**
 	 * removeChangeListener
 	 * @param listener TODO
 	 */
-	public abstract void removeChangeListener(ChangeListener listener);
+	void removeChangeListener(ChangeListener listener);
 
 
 } // ColorSelectionModel

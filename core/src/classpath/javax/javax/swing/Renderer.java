@@ -1,5 +1,5 @@
 /* Renderer.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,8 +37,7 @@ exception statement from your version. */
 
 package javax.swing;
 
-// Imports
-import java.awt.*;
+import java.awt.Component;
 
 /**
  * Renderer
@@ -56,13 +55,13 @@ public interface Renderer {
 	 * @param value TODO
 	 * @param selected TODO
 	 */
-	public void setValue(Object value, boolean selected);
+	void setValue(Object value, boolean selected);
 
 	/**
 	 * getComponent
 	 * @returns Component
 	 */
-	public Component getComponent();
+	Component getComponent();
 
 
 } // Renderer

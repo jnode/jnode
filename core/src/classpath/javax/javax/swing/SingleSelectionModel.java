@@ -1,5 +1,5 @@
 /* SingleSelectionModel.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,8 +37,7 @@ exception statement from your version. */
 
 package javax.swing;
 
-// Imports
-import javax.swing.event.*;
+import javax.swing.event.ChangeListener;
 
 /**
  * SingleSelectionModel
@@ -55,36 +54,36 @@ public interface SingleSelectionModel {
 	 * getSelectedIndex
 	 * @returns int
 	 */
-	public int getSelectedIndex();
+	int getSelectedIndex();
 
 	/**
 	 * setSelectedIndex
 	 * @param index TODO
 	 */
-	public void setSelectedIndex(int index);
+	void setSelectedIndex(int index);
 
 	/**
 	 * clearSelection
 	 */
-	public void clearSelection();
+	void clearSelection();
 
 	/**
 	 * isSelected
 	 * @returns boolean
 	 */
-	public boolean isSelected();
+	boolean isSelected();
 
 	/**
 	 * addChangeListener
 	 * @param listener TODO
 	 */
-	public  void addChangeListener(ChangeListener listener);
+	void addChangeListener(ChangeListener listener);
 
 	/**
 	 * removeChangeListener
 	 * @param listener TODO
 	 */
-	public void removeChangeListener(ChangeListener listener);
+	void removeChangeListener(ChangeListener listener);
 
 
 } // SingleSelectionModel

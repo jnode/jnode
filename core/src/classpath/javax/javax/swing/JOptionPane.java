@@ -35,206 +35,365 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Frame;
-
+import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
 import javax.swing.plaf.OptionPaneUI;
 
-public class JOptionPane extends JComponent {
-	public static final int DEFAULT_OPTION = 0;
-	public static final int YES_NO_OPTION = 1;
-	public static final int YES_NO_CANCEL_OPTION = 2;
-	public static final int OK_CANCEL_OPTION = 3;
-	public static final int YES_OPTION = 4;
-	public static final int NO_OPTION = 5;
-	public static final int CANCEL_OPTION = 6;
-	public static final int OK_OPTION = 7;
-	public static final int CLOSED_OPTION = 8;
+public class JOptionPane extends JComponent 
+{
+    public static final int DEFAULT_OPTION        = 0;
+    public static final int YES_NO_OPTION         = 1;
+    public static final int YES_NO_CANCEL_OPTION  = 2;
+    public static final int OK_CANCEL_OPTION      = 3;
+    public static final int YES_OPTION            = 4;
+    public static final int NO_OPTION             = 5;
+    public static final int CANCEL_OPTION         = 6;
+    public static final int OK_OPTION             = 7;
+    public static final int CLOSED_OPTION         = 8;
 
-	public static final int ERROR_MESSAGE = 0;
-	public static final int INFORMATION_MESSAGE = 1;
-	public static final int WARNING_MESSAGE = 2;
-	public static final int QUESTION_MESSAGE = 3;
-	public static final int PLAIN_MESSAGE = 4;
+    public static final int ERROR_MESSAGE         = 0;
+    public static final int INFORMATION_MESSAGE   = 1;
+    public static final int WARNING_MESSAGE       = 2;
+    public static final int QUESTION_MESSAGE      = 3;
+    public static final int PLAIN_MESSAGE         = 4;
 
-	final static String VALUE_PROPERTY = "value_prop";
-	final static String INPUT_VALUE_PROPERTY = "input_value_prop";
+    final static String VALUE_PROPERTY = "value_prop";
+    final static String INPUT_VALUE_PROPERTY = "input_value_prop";
+    
+    final static String UNINITIALIZED_VALUE = "uninit";
 
-	final static String UNINITIALIZED_VALUE = "uninit";
+    // Ronald: shouldnt by public ?
+    public Object msg;
+    public int mtype;
+    public int otype;
+    public Icon icon;
+    public Object []args;
+    public Object init;
 
-	// Ronald: shouldnt by public ?
-	public Object msg;
-	public int mtype;
-	public int otype;
-	public Icon icon;
-	public Object[] args;
-	public Object init;
+    public JDialog dialog;
 
-	public JDialog dialog;
+    /*****************************************************************************
+     *
+     *
+     *  joptionpanels
+     *
+     *
+     ***********************************/
 
-	/*****************************************************************************
-	 *
-	 *
-	 *  joptionpanels
-	 *
-	 *
-	 ***********************************/
+    JOptionPane()
+    {
+	this("mess");
+    }
+    
+    JOptionPane(Object m)
+    {
+	this(m, PLAIN_MESSAGE);
+    }
+    
+    JOptionPane(Object m,
+		 int mtype)
+    {
+	this(m, mtype, DEFAULT_OPTION);
+    }
 
-	JOptionPane() {
-		this("mess");
-	}
+    JOptionPane(Object m,
+		int mtype,
+		int otype)
+    {
+	this(m, mtype, otype, null);
+    }
+ 
+    JOptionPane(Object m,
+		 int mtype,
+		 int otype,
+		 Icon icon)
+    {
+	this(m, mtype, otype, icon, null);
+    }
 
-	JOptionPane(Object m) {
-		this(m, PLAIN_MESSAGE);
-	}
+    JOptionPane(Object m,
+		 int mtype,
+		 int otype,
+		 Icon icon,
+		 Object []args)
+    {
+	this(m, mtype, otype, icon, args, null);
+    }
 
-	JOptionPane(Object m, int mtype) {
-		this(m, mtype, DEFAULT_OPTION);
-	}
+    JOptionPane(Object msg,
+		int mtype,
+		int otype,
+		Icon icon,
+		Object []args,
+		Object init)
+    {
+	//	this(m, mtype, otype, icon, args, init);
+	this.msg   = msg;
+	this.mtype = mtype;
+	this.otype = otype;
+	this.icon  = icon;
+	this.args  = args;
+	this.init  = init;
+	
+	updateUI();
+    }
 
-	JOptionPane(Object m, int mtype, int otype) {
-		this(m, mtype, otype, null);
-	}
 
-	JOptionPane(Object m, int mtype, int otype, Icon icon) {
-		this(m, mtype, otype, icon, null);
-	}
+    /*****************************************************************************
+     *
+     *
+     *
+     *
+     *
+     ***********************************/
 
-	JOptionPane(Object m, int mtype, int otype, Icon icon, Object[] args) {
-		this(m, mtype, otype, icon, args, null);
-	}
+    Object val;
+    public void setValue(Object v)  
+    {   val = v;       }
+    public Object getValue()
+    {	return val;    }
 
-	JOptionPane(Object msg, int mtype, int otype, Icon icon, Object[] args, Object init) {
-		//	this(m, mtype, otype, icon, args, init);
-		this.msg = msg;
-		this.mtype = mtype;
-		this.otype = otype;
-		this.icon = icon;
-		this.args = args;
-		this.init = init;
+    public String getUIClassID()
+    {	return "OptionPaneUI";    }
 
-		updateUI();
-	}
 
-	/*****************************************************************************
-	 *
-	 *
-	 *
-	 *
-	 *
-	 ***********************************/
+    public void setUI(OptionPaneUI ui) {
+        super.setUI(ui);
+    }
+    
+    public OptionPaneUI getUI() {
+        return (OptionPaneUI)ui;
+    }
+    
+    public void updateUI() {
+	setUI((OptionPaneUI)UIManager.getUI(this));
+    }
 
-	Object val;
-	public void setValue(Object v) {
-		val = v;
-	}
-	public Object getValue() {
-		return val;
-	}
 
-	public String getUIClassID() {
-		return "JOptionPane";
-	}
+    public AccessibleContext getAccessibleContext()
+    {
+	return null;
+    }
+    
+    protected  String paramString()
+    {
+	return "JOptionPane";
+    }
+    
+    public static void showMessageDialog(Component frame,
+				  String msg,
+				  String title,
+				  int bla)
+    {
+	DoShowOptionDialog(frame,
+			  msg,
+			  title,
+			  bla,
+			  0,
+			  null,
+			  null,
+			  null);
+    }
 
-	public void setUI(OptionPaneUI ui) {
-		super.setUI(ui);
-	}
+    public static void showMessageDialog(Component frame,
+				 String msg,
+				 String title,
+				 int bla,
+				 Icon icon)
+    {
+	DoShowOptionDialog(frame,
+				 msg,
+				 title,
+				 bla,
+				 0,
+				 icon,
+				 null,
+				 null);
+    }
 
-	public OptionPaneUI getUI() {
-		return (OptionPaneUI) ui;
-	}
+    public static void showMessageDialog(Component frame,
+				  String msg)
+    {
+	showMessageDialog(frame,
+			  msg,
+			  null);
+    }
+    
 
-	public void updateUI() {
-		setUI((OptionPaneUI) UIManager.getUI(this));
-	}
+    public static void showMessageDialog(Component frame,
+				  String msg,
+				  Icon icon)
+    {	
+	//System.out.println("++++++++++++++++++creating message dialog:"+msg + ", frame="+frame);
+         DoShowOptionDialog(frame, 
+				msg, 
+				"Message",				
+				DEFAULT_OPTION, 
+				PLAIN_MESSAGE,
+				icon,
+				null,
+				null);
+    }
 
-	public AccessibleContext getAccessibleContext() {
-		return null;
-	}
+    public static int showConfirmDialog(JFrame frame,
+				 String yes,
+				 String no, 
+				 int bla)
+    {
+	return 0;
+    }
 
-	protected String paramString() {
-		return "JOptionPane";
-	}
+    public static String showInputDialog(JFrame frame,
+			     String msg, 
+			     String title, 
+			     int opt_type, 
+			     int msg_type,
+			     Icon icon, 
+			     Object[] opts, 
+			     Object init)
+    {
+	return (String) DoShowOptionDialog(frame,
+				msg, 
+				title, 
+				opt_type, 
+				msg_type,
+				icon, 
+				opts, 
+				init);
+    }
 
-	public static void showMessageDialog(Component frame, String msg, String title, int bla) {
-		DoShowOptionDialog(frame, msg, title, bla, 0, null, null, null);
-	}
+    public static Object showInputDialog(JFrame frame,
+			     String msg, 
+			     String title, 
+			     int opt_type, 
+			     Icon icon, 
+			     Object[] opts, 
+			     Object init)
+    {
+	return DoShowOptionDialog(frame,
+				msg, 
+				title, 
+				opt_type, 
+				0, //msg_type,
+				icon, 
+				opts, 
+				init);
+    }
 
-	public static void showMessageDialog(Component frame, String msg, String title, int bla, Icon icon) {
-		DoShowOptionDialog(frame, msg, title, bla, 0, icon, null, null);
-	}
 
-	public static void showMessageDialog(Component frame, String msg) {
-		showMessageDialog(frame, msg, null);
-	}
+    // everybody comes here eventually
+    public static int showOptionDialog(Component frame,
+				String msg, 
+				String title, 
+				int opt_type, 
+				int msg_type,
+				Icon icon, 
+				Object[] opts, 
+				Object init)
+    {
+	Integer a = (Integer) DoShowOptionDialog(frame,
+						 msg, 
+						 title, 
+						 opt_type, 
+						 msg_type,
+						 icon, 
+						 opts, 
+						 init);
+	if (a == null)
+	    return -1;
+	return a.intValue();
+    }
+    
+    public static Object DoShowOptionDialog(Component frame,
+				   String msg, 
+				   String title, 
+				   int opt_type, 
+				   int msg_type,
+				   Icon icon, 
+				   Object[] opts, 
+				   Object init)
+    {
+	
+	JOptionPane p = new JOptionPane(msg,
+					msg_type,
+					opt_type,
+					icon,
+					opts,
+					init);
+	System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ " + p.msg);
 
-	public static void showMessageDialog(Component frame, String msg, Icon icon) {
-		//System.out.println("++++++++++++++++++creating message dialog:"+msg + ", frame="+frame);
-		DoShowOptionDialog(frame, msg, "Message", DEFAULT_OPTION, PLAIN_MESSAGE, icon, null, null);
-	}
+	
+	JDialog a;
 
-	public static int showConfirmDialog(JFrame frame, String yes, String no, int bla) {
-		return 0;
-	}
+	if (frame == null)
+	    {
+		a = new JDialog((Frame)frame,
+				title,
+				true);
+	    }
+	else if (frame instanceof Dialog)
+	    {
+		a = new JDialog((Dialog) frame,
+				title,
+				true);
+	    }
+	else if (frame instanceof Frame)
+	    {
+		a = new JDialog((Frame) frame,
+				title,
+				true);
+	    }
+	else
+	    {
+		System.out.println("HUUUUHHH, not a frame or dialog !");
+		
+		a = new JDialog((Frame)null,
+				title,
+				true);
+	    }
 
-	public static String showInputDialog(JFrame frame, String msg, String title, int opt_type, int msg_type, Icon icon, Object[] opts, Object init) {
-		return (String) DoShowOptionDialog(frame, msg, title, opt_type, msg_type, icon, opts, init);
-	}
+	p.dialog = a;
+	
+	a.getContentPane().setLayout(new BorderLayout());
+	a.getContentPane().add(p,
+			       BorderLayout.CENTER);
+	// package the deal
+	a.pack();
+	
+	a.setVisible(true);
+	
+	Object s = p.getValue();
 
-	public static Object showInputDialog(JFrame frame, String msg, String title, int opt_type, Icon icon, Object[] opts, Object init) {
-		return DoShowOptionDialog(frame, msg, title, opt_type, 0, //msg_type,
-		icon, opts, init);
-	}
+	System.out.println("RESULT FROM DIALOG = " + s);
 
-	// everybody comes here eventually
-	public static int showOptionDialog(Component frame, String msg, String title, int opt_type, int msg_type, Icon icon, Object[] opts, Object init) {
-		Integer a = (Integer) DoShowOptionDialog(frame, msg, title, opt_type, msg_type, icon, opts, init);
-		if (a == null)
-			return -1;
-		return a.intValue();
-	}
-
-	public static Object DoShowOptionDialog(Component frame, String msg, String title, int opt_type, int msg_type, Icon icon, Object[] opts, Object init) {
-
-		JOptionPane p = new JOptionPane(msg, msg_type, opt_type, icon, opts, init);
-		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ " + p.msg);
-
-		JDialog a;
-
-		if (frame == null) {
-			a = new JDialog((Frame) frame, title, true);
-		} else if (frame instanceof Dialog) {
-			a = new JDialog((Dialog) frame, title, true);
-		} else if (frame instanceof Frame) {
-			a = new JDialog((Frame) frame, title, true);
-		} else {
-			System.out.println("HUUUUHHH, not a frame or dialog !");
-
-			a = new JDialog((Frame) null, title, true);
-		}
-
-		p.dialog = a;
-
-		a.getContentPane().setLayout(new BorderLayout());
-		a.getContentPane().add(p, BorderLayout.CENTER);
-		// package the deal
-		a.pack();
-
-		a.setVisible(true);
-
-		Object s = p.getValue();
-
-		System.out.println("RESULT FROM DIALOG = " + s);
-
-		if (s == null)
-			return null;
-
-		return s;
-	}
+	if (s == null)
+	    return null;
+	
+	return s;
+    }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

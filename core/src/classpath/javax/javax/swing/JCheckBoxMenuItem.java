@@ -1,5 +1,5 @@
 /* JCheckBoxMenuItem.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,16 +37,19 @@ exception statement from your version. */
 
 package javax.swing;
 
-// Imports
-import java.io.*;
-import javax.accessibility.*;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import javax.accessibility.Accessible;
+import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleRole;
 
 /**
  * JCheckBoxMenuItem
  * @author	Andrew Selkirk
  * @version	1.0
  */
-public class JCheckBoxMenuItem extends JMenuItem implements SwingConstants, Accessible {
+public class JCheckBoxMenuItem extends JMenuItem implements SwingConstants, Accessible
+{
 
 	//-------------------------------------------------------------
 	// Classes ----------------------------------------------------

@@ -35,12 +35,176 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing;
-/**
- * STUBBED
- */
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.util.Hashtable;
+import java.util.Vector;
+import javax.accessibility.Accessible;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableColumnModel;
+
 public class JTable extends JComponent
-/*implements TableModelListener, Scrollable, TableColumnModelListener,
-             ListSelectionListener, CellEditorListener, Accessible*/
+  implements TableModelListener, Scrollable, TableColumnModelListener,
+             ListSelectionListener, CellEditorListener, Accessible
 {
+  public static final int AUTO_RESIZE_ALL_COLUMNS = 4;
+  public static final int AUTO_RESIZE_LAST_COLUMN = 3;
+  public static final int AUTO_RESIZE_NEXT_COLUMN = 1;
+  public static final int AUTO_RESIZE_OFF = 0;
+  public static final int AUTO_RESIZE_SUBSEQUENT_COLUMNS = 2;
+  
+  public JTable ()
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public JTable (int numRows, int numColumns)
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public JTable (Object[][] rowData, Object[] columnNames)
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public JTable (TableModel dm)
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public JTable (TableModel dm, TableColumnModel cm)
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public JTable (TableModel dm, TableColumnModel cm, ListSelectionModel sm)
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public JTable (Vector rowData, Vector columnNames)
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public void columnAdded (TableColumnModelEvent event)
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public void columnMarginChanged (ChangeEvent event)
+  {
+    throw new Error ("Not implemented");
+  }
+  
+  public void columnMoved (TableColumnModelEvent event)
+  {
+    throw new Error ("Not implemented");
+  }
+  
+  public void columnRemoved (TableColumnModelEvent event)
+  {
+    throw new Error ("Not implemented");
+  }
+  
+  public void columnSelectionChanged (ListSelectionEvent event)
+  {
+    throw new Error ("Not implemented");
+  }
+ 
+  public void editingCanceled (ChangeEvent event)
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public void editingStopped (ChangeEvent event)
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public TableColumnModel getColumnModel ()
+  {
+    throw new Error ("Not implemented");
+  }
+  
+  public Dimension getPreferredScrollableViewportSize ()
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public int getScrollableBlockIncrement (Rectangle visibleRect, int orientation, int direction)
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public boolean getScrollableTracksViewportHeight ()
+  {
+    throw new Error ("Not implemented");
+  }
+  
+  public boolean getScrollableTracksViewportWidth ()
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public int getScrollableUnitIncrement (Rectangle visibleRect, int orientation, int direction)
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public int getSelectedRow ()
+  {
+    throw new Error ("Not implemented");
+  }
+  
+  public ListSelectionModel getSelectionModel ()
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public void tableChanged (TableModelEvent event)
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public void setModel (TableModel model)
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public void setSelectionMode (int selectionMode)
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public void setSelectionModel (ListSelectionModel model)
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public void setShowGrid (boolean showGrid)
+  {
+    throw new Error ("Not implemented");
+  }
+
+  public void valueChanged (ListSelectionEvent event)
+  {
+    throw new Error ("Not implemented");
+  }
 } // class JTable

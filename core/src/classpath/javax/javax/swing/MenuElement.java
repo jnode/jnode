@@ -1,5 +1,5 @@
 /* MenuElement.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,9 +37,9 @@ exception statement from your version. */
 
 package javax.swing;
 
-// Imports
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Component;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 
 /**
  * MenuElement
@@ -58,7 +58,7 @@ public interface MenuElement {
 	 * @param path TODO
 	 * @param manager TODO
 	 */
-	public void processMouseEvent(MouseEvent event,
+	void processMouseEvent(MouseEvent event,
 			MenuElement[] path, MenuSelectionManager manager);
 
 	/**
@@ -67,26 +67,26 @@ public interface MenuElement {
 	 * @param path TODO
 	 * @param manager TODO
 	 */
-	public abstract void processKeyEvent(KeyEvent event, 
+	void processKeyEvent(KeyEvent event, 
 			MenuElement[] path, MenuSelectionManager manager);
 
 	/**
 	 * menuSelectionChanged
 	 * @param included TODO
 	 */
-	public abstract void menuSelectionChanged(boolean included);
+	void menuSelectionChanged(boolean included);
 
 	/**
 	 * getSubElements
 	 * @returns MenuElement[]
 	 */
-	public abstract MenuElement[] getSubElements();
+	MenuElement[] getSubElements();
 
 	/**
 	 * getComponent
 	 * @returns Component
 	 */
-	public abstract Component getComponent();
+	Component getComponent();
 
 
 } // MenuElement

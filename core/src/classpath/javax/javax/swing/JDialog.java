@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing;
 
 import java.awt.BorderLayout;
@@ -47,7 +48,6 @@ import java.awt.Graphics;
 import java.awt.LayoutManager;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
-
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
 
@@ -57,200 +57,215 @@ import javax.accessibility.AccessibleContext;
  *
  * @author Ronald Veldema (rveldema@cs.vu.nl)
  */
-public class JDialog extends Dialog implements Accessible {
-	public final static int HIDE_ON_CLOSE = 0;
-	public final static int DISPOSE_ON_CLOSE = 1;
-	public final static int DO_NOTHING_ON_CLOSE = 2;
+public class JDialog extends Dialog implements Accessible
+{
+    public final static int HIDE_ON_CLOSE        = 0;
+    public final static int DISPOSE_ON_CLOSE     = 1;
+    public final static int DO_NOTHING_ON_CLOSE  = 2;
 
-	protected AccessibleContext accessibleContext;
+    protected  AccessibleContext accessibleContext;
 
-	private int close_action = HIDE_ON_CLOSE;
+    private int close_action = HIDE_ON_CLOSE;    
 
-	/***************************************************
-	 *
-	 *
-	 *  constructors
-	 *
-	 *
-	 *************/
+    /***************************************************
+     *
+     *
+     *  constructors
+     *
+     *
+     *************/
 
-	JDialog(Frame owner) {
-		this(owner, "dialog");
-	}
+    JDialog(Frame owner)
+    {
+	this(owner, "dialog");
+    }
+    
+    JDialog(Frame owner,
+	    String s)
+    {
+	this(owner, s, true);
+    }
+    
+  JDialog(Frame owner,
+	  String s,
+	  boolean modeld)
+    {
+	super(owner, s, modeld);
+    }
 
-	JDialog(Frame owner, String s) {
-		this(owner, s, true);
-	}
+  JDialog(Frame owner,
+	  //  String s,
+	  boolean modeld)
+    {
+	super(owner, "JDialog", modeld);
+    }
+  JDialog(Dialog owner)
+  {
+      this(owner, "dialog");
+  }
+    
+    JDialog(Dialog owner,
+	    String s)
+    {
+	this(owner, s, true);
+    }
+    
+  JDialog(Dialog owner,
+	  String s,
+	  boolean modeld)
+    {
+	super(owner, s, modeld);
+    }
 
-	JDialog(Frame owner, String s, boolean modeld) {
-		super(owner, s, modeld);
-	}
 
-	JDialog(Frame owner,
-	//  String s,
-	boolean modeld) {
-		super(owner, "JDialog", modeld);
-	}
-	JDialog(Dialog owner) {
-		this(owner, "dialog");
-	}
+    /***************************************************
+     *
+     *
+     *  methods, this part is shared with JDialog, JFrame
+     *
+     *
+     *************/
 
-	JDialog(Dialog owner, String s) {
-		this(owner, s, true);
-	}
+  
+    private boolean checking;
+    protected  JRootPane         rootPane;
 
-	JDialog(Dialog owner, String s, boolean modeld) {
-		super(owner, s, modeld);
-	}
+    void setLocationRelativeTo(Component c)
+    {
+    }
 
-	/***************************************************
-	 *
-	 *
-	 *  methods, this part is shared with JDialog, JFrame
-	 *
-	 *
-	 *************/
 
-	private boolean checking;
-	protected JRootPane rootPane;
+    protected  void frameInit()
+    {
+      super.setLayout(new BorderLayout(1, 1));
+      getRootPane(); // will do set/create
+    }
+  
+  public Dimension getPreferredSize()
+  {
+    Dimension d = super.getPreferredSize();
+    return d;
+  }
 
-	void setLocationRelativeTo(Component c) {
-	}
+    JMenuBar getJMenuBar()
+    {    return getRootPane().getJMenuBar();   }
+    
+    void setJMenuBar(JMenuBar menubar)
+    {    getRootPane().setJMenuBar(menubar); }
+    
 
-	protected void frameInit() {
-		super.setLayout(new BorderLayout(1, 1));
-		getRootPane(); // will do set/create
-	}
+  public  void setLayout(LayoutManager manager)
+  {    super.setLayout(manager);  }
 
-	public Dimension getPreferredSize() {
-		Dimension d = super.getPreferredSize();
-		return d;
-	}
+    void setLayeredPane(JLayeredPane layeredPane) 
+    {   getRootPane().setLayeredPane(layeredPane);   }
+  
+    JLayeredPane getLayeredPane()
+    {   return getRootPane().getLayeredPane();     }
+  
+    JRootPane getRootPane()
+    {
+	if (rootPane == null)
+	    setRootPane(createRootPane());
+	return rootPane;          
+    }
 
-	JMenuBar getJMenuBar() {
-		return getRootPane().getJMenuBar();
-	}
+    void setRootPane(JRootPane root)
+    {
+	if (rootPane != null)
+	    remove(rootPane);
+	    
+	rootPane = root; 
+	add(rootPane, BorderLayout.CENTER);
+    }
 
-	void setJMenuBar(JMenuBar menubar) {
-		getRootPane().setJMenuBar(menubar);
-	}
+    JRootPane createRootPane()
+    {   return new JRootPane();    }
 
-	public void setLayout(LayoutManager manager) {
-		super.setLayout(manager);
-	}
+    Container getContentPane()
+    {    return getRootPane().getContentPane();     }
 
-	void setLayeredPane(JLayeredPane layeredPane) {
-		getRootPane().setLayeredPane(layeredPane);
-	}
+    void setContentPane(Container contentPane)
+    {    getRootPane().setContentPane(contentPane);    }
+  
+    Component getGlassPane()
+    {    return getRootPane().getGlassPane();   }
+  
+    void setGlassPane(Component glassPane)
+    {   getRootPane().setGlassPane(glassPane);   }
 
-	JLayeredPane getLayeredPane() {
-		return getRootPane().getLayeredPane();
-	}
+    
+    protected  void addImpl(Component comp, Object constraints, int index)
+    {	super.addImpl(comp, constraints, index);    }
 
-	JRootPane getRootPane() {
-		if (rootPane == null)
-			setRootPane(createRootPane());
-		return rootPane;
-	}
 
-	void setRootPane(JRootPane root) {
-		if (rootPane != null)
-			remove(rootPane);
+    public void remove(Component comp)
+    {   getContentPane().remove(comp);  }
+  
+    protected  boolean isRootPaneCheckingEnabled()
+    {    return checking;        }
 
-		rootPane = root;
-		add(rootPane, BorderLayout.CENTER);
-	}
 
-	JRootPane createRootPane() {
-		return new JRootPane();
-	}
+    protected  void setRootPaneCheckingEnabled(boolean enabled)
+    { checking = enabled;  }
 
-	Container getContentPane() {
-		return getRootPane().getContentPane();
-	}
 
-	void setContentPane(Container contentPane) {
-		getRootPane().setContentPane(contentPane);
-	}
+    public void update(Graphics g)
+    {   paint(g);  }
 
-	Component getGlassPane() {
-		return getRootPane().getGlassPane();
-	}
+    protected  void processKeyEvent(KeyEvent e)
+    {	super.processKeyEvent(e);    }
 
-	void setGlassPane(Component glassPane) {
-		getRootPane().setGlassPane(glassPane);
-	}
+    /////////////////////////////////////////////////////////////////////////////////
+  
 
-	protected void addImpl(Component comp, Object constraints, int index) {
-		super.addImpl(comp, constraints, index);
-	}
-
-	public void remove(Component comp) {
-		getContentPane().remove(comp);
-	}
-
-	protected boolean isRootPaneCheckingEnabled() {
-		return checking;
-	}
-
-	protected void setRootPaneCheckingEnabled(boolean enabled) {
-		checking = enabled;
-	}
-
-	public void update(Graphics g) {
-		paint(g);
-	}
-
-	protected void processKeyEvent(KeyEvent e) {
-		super.processKeyEvent(e);
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////
-
-	protected void processWindowEvent(WindowEvent e) {
-		//	System.out.println("PROCESS_WIN_EV-1: " + e);
-		super.processWindowEvent(e);
-		//	System.out.println("PROCESS_WIN_EV-2: " + e);
-		switch (e.getID()) {
-			case WindowEvent.WINDOW_CLOSING :
-				{
-					switch (close_action) {
-						case DISPOSE_ON_CLOSE :
-							{
-								System.out.println("user requested dispose on close");
-								dispose();
-								break;
-							}
-						case HIDE_ON_CLOSE :
-							{
-								setVisible(false);
-								break;
-							}
-						case DO_NOTHING_ON_CLOSE :
-							break;
-					}
-					break;
-				}
-
-			case WindowEvent.WINDOW_CLOSED :
-			case WindowEvent.WINDOW_OPENED :
-			case WindowEvent.WINDOW_ICONIFIED :
-			case WindowEvent.WINDOW_DEICONIFIED :
-			case WindowEvent.WINDOW_ACTIVATED :
-			case WindowEvent.WINDOW_DEACTIVATED :
+    protected  void processWindowEvent(WindowEvent e)
+    {
+	//	System.out.println("PROCESS_WIN_EV-1: " + e);
+	super.processWindowEvent(e); 
+	//	System.out.println("PROCESS_WIN_EV-2: " + e);
+	switch (e.getID())
+	    {
+	    case WindowEvent.WINDOW_CLOSING:
+		{
+		    switch(close_action)
+			{
+			case DISPOSE_ON_CLOSE:
+			    {
+				System.out.println("user requested dispose on close");
+				dispose();
 				break;
+			    }
+			case HIDE_ON_CLOSE:
+			    {
+				setVisible(false);
+				break;
+			    }
+			case DO_NOTHING_ON_CLOSE:
+			    break;
+			}
+		    break;
 		}
-	}
+		
+	    case WindowEvent.WINDOW_CLOSED:
+	    case WindowEvent.WINDOW_OPENED:
+	    case WindowEvent.WINDOW_ICONIFIED:
+	    case WindowEvent.WINDOW_DEICONIFIED:
+	    case WindowEvent.WINDOW_ACTIVATED:
+	    case WindowEvent.WINDOW_DEACTIVATED:
+		break;
+	    }
+    }   
+ 
 
-	void setDefaultCloseOperation(int operation) {
-		close_action = operation;
-	}
+    void setDefaultCloseOperation(int operation)
+    {  close_action = operation;   }
 
-	protected String paramString() {
-		return "JDialog";
-	}
+    protected  String paramString()
+    {   return "JDialog";     }
 
-	public AccessibleContext getAccessibleContext() {
-		return null;
-	}
+    public AccessibleContext getAccessibleContext()
+    {
+	return null;
+    }  
 }

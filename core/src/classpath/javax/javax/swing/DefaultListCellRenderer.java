@@ -1,5 +1,5 @@
 /* DefaultListCellRenderer.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,11 +37,9 @@ exception statement from your version. */
 
 package javax.swing;
 
-// Imports
 import java.awt.Component;
 import java.awt.Rectangle;
 import java.io.Serializable;
-
 import javax.swing.border.Border;
 
 /**
@@ -49,8 +47,10 @@ import javax.swing.border.Border;
  * @author	Andrew Selkirk
  * @version	1.0
  */
-public class DefaultListCellRenderer extends JLabel implements ListCellRenderer, Serializable {
-	static final long serialVersionUID = 7708947179685189462L;
+public class DefaultListCellRenderer extends JLabel 
+		implements ListCellRenderer, Serializable
+{
+  static final long serialVersionUID = 7708947179685189462L;
 
 	//-------------------------------------------------------------
 	// Classes ----------------------------------------------------
@@ -59,7 +59,8 @@ public class DefaultListCellRenderer extends JLabel implements ListCellRenderer,
 	/**
 	 * UIResource
 	 */
-	public static class UIResource extends DefaultListCellRenderer implements javax.swing.plaf.UIResource {
+	public static class UIResource extends DefaultListCellRenderer 
+			implements javax.swing.plaf.UIResource {
 
 		//-------------------------------------------------------------
 		// Initialization ---------------------------------------------
@@ -72,7 +73,9 @@ public class DefaultListCellRenderer extends JLabel implements ListCellRenderer,
 			// TODO
 		} // UIResource()
 
+
 	} // UIResource
+
 
 	//-------------------------------------------------------------
 	// Variables --------------------------------------------------
@@ -82,6 +85,7 @@ public class DefaultListCellRenderer extends JLabel implements ListCellRenderer,
 	 * noFocusBorder
 	 */
 	protected static Border noFocusBorder = null; // TODO
+
 
 	//-------------------------------------------------------------
 	// Initialization ---------------------------------------------
@@ -93,6 +97,7 @@ public class DefaultListCellRenderer extends JLabel implements ListCellRenderer,
 	public DefaultListCellRenderer() {
 		// TODO
 	} // DefaultListCellRenderer()
+
 
 	//-------------------------------------------------------------
 	// Methods ----------------------------------------------------
@@ -107,7 +112,8 @@ public class DefaultListCellRenderer extends JLabel implements ListCellRenderer,
 	 * @param cellHasFocus TODO
 	 * @returns Component
 	 */
-	public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+	public Component getListCellRendererComponent(JList list,
+			Object value, int index, boolean isSelected, boolean cellHasFocus) {
 		return null; // TODO
 	} // getListCellRendererComponent()
 
@@ -151,7 +157,8 @@ public class DefaultListCellRenderer extends JLabel implements ListCellRenderer,
 	 * @param oldValue TODO
 	 * @param newValue TODO
 	 */
-	protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+	protected void firePropertyChange(String propertyName,
+			Object oldValue, Object newValue) {
 		// TODO
 	} // firePropertyChange()
 
@@ -161,7 +168,8 @@ public class DefaultListCellRenderer extends JLabel implements ListCellRenderer,
 	 * @param oldValue TODO
 	 * @param newValue TODO
 	 */
-	public void firePropertyChange(String propertyName, byte oldValue, byte newValue) {
+	public void firePropertyChange(String propertyName, 
+			byte oldValue, byte newValue) {
 		// TODO
 	} // firePropertyChange()
 
@@ -171,7 +179,8 @@ public class DefaultListCellRenderer extends JLabel implements ListCellRenderer,
 	 * @param oldValue TODO
 	 * @param newValue TODO
 	 */
-	public void firePropertyChange(String propertyName, char oldValue, char newValue) {
+	public void firePropertyChange(String propertyName, 
+			char oldValue, char newValue) {
 		// TODO
 	} // firePropertyChange()
 
@@ -181,7 +190,8 @@ public class DefaultListCellRenderer extends JLabel implements ListCellRenderer,
 	 * @param oldValue TODO
 	 * @param newValue TODO
 	 */
-	public void firePropertyChange(String propertyName, short oldValue, short newValue) {
+	public void firePropertyChange(String propertyName, 
+			short oldValue, short newValue) {
 		// TODO
 	} // firePropertyChange()
 
@@ -191,7 +201,8 @@ public class DefaultListCellRenderer extends JLabel implements ListCellRenderer,
 	 * @param oldValue TODO
 	 * @param newValue TODO
 	 */
-	public void firePropertyChange(String propertyName, int oldValue, int newValue) {
+	public void firePropertyChange(String propertyName, 
+			int oldValue, int newValue) {
 		// TODO
 	} // firePropertyChange()
 
@@ -201,7 +212,8 @@ public class DefaultListCellRenderer extends JLabel implements ListCellRenderer,
 	 * @param oldValue TODO
 	 * @param newValue TODO
 	 */
-	public void firePropertyChange(String propertyName, long oldValue, long newValue) {
+	public void firePropertyChange(String propertyName, 
+			long oldValue, long newValue) {
 		// TODO
 	} // firePropertyChange()
 
@@ -211,7 +223,8 @@ public class DefaultListCellRenderer extends JLabel implements ListCellRenderer,
 	 * @param oldValue TODO
 	 * @param newValue TODO
 	 */
-	public void firePropertyChange(String propertyName, float oldValue, float newValue) {
+	public void firePropertyChange(String propertyName, 
+			float oldValue, float newValue) {
 		// TODO
 	} // firePropertyChange()
 
@@ -221,7 +234,8 @@ public class DefaultListCellRenderer extends JLabel implements ListCellRenderer,
 	 * @param oldValue TODO
 	 * @param newValue TODO
 	 */
-	public void firePropertyChange(String propertyName, double oldValue, double newValue) {
+	public void firePropertyChange(String propertyName, 
+			double oldValue, double newValue) {
 		// TODO
 	} // firePropertyChange()
 
@@ -231,8 +245,10 @@ public class DefaultListCellRenderer extends JLabel implements ListCellRenderer,
 	 * @param oldValue TODO
 	 * @param newValue TODO
 	 */
-	public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+	public void firePropertyChange(String propertyName, 
+			boolean oldValue, boolean newValue) {
 		// TODO
 	} // firePropertyChange()
+
 
 } // DefaultListCellRenderer

@@ -1,5 +1,5 @@
 /* DefaultButtonModel.java -- 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,142 +37,435 @@ exception statement from your version. */
 
 package javax.swing;
 
+import java.awt.AWTEvent;
+import java.awt.AWTEventMulticaster;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.Serializable;
+import java.util.EventListener;
 import java.util.Vector;
-
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.EventListenerList;
 
-public class DefaultButtonModel implements ButtonModel, java.io.Serializable {
-	static final long serialVersionUID = -5342609566534980231L;
+/**
+ * The purpose of this class is to model the dynamic state of an abstract
+ * button. The concrete button type holding this state may be a a "toggle"
+ * button (checkbox, radio button) or a "push" button (menu button, button).
+ * 
+ * If the model is disabled, only the "selected" property can be changed.
+ * An attempt to change the "armed", "rollover" or "pressed" properties 
+ * while the model is disabled will be blocked.
+ *
+ * Any successful (non-blocked) change to the model's properties will
+ * trigger the firing of a ChangeEvent.
+ *
+ * Any change to the "selected" property will trigger the firing of an
+ * ItemEvent in addition to ChangeEvent. This is true whether the model is
+ * enabled or not.
+ *
+ * One other state change is special: the transition from "enabled, armed
+ * and pressd" to "enabled, armed and not-pressed". This is considered the
+ * "trailing edge" of a successful mouse click, and therefore fires an 
+ * ActionEvent in addition to a ChangeEvent.
+ *
+ * In all other respects this class is just a container of boolean flags.
+ *
+ * @author Graydon Hoare (graydon&064;redhat.com)
+ */
+public class DefaultButtonModel implements ButtonModel, Serializable
+{
+  static final long serialVersionUID = -5342609566534980231L;
 
-	Vector actions = new Vector();
+  /** Indicates that the button is <em>partially</em> committed to being
+   pressed, but not entirely. This usually happens when a user has pressed
+   but not yet released the mouse button. */
+  static int ARMED = 1;
 
-	Vector items = new Vector();
-	Vector changes = new Vector();
-	ButtonGroup group;
-	JComponent comp;
+  /** State constant indicating that the button is enabled. Buttons cannot
+   be pressed or selected unless they are enabled. */
+  static int ENABLED = 2;
 
-	DefaultButtonModel(JComponent a) {
-		comp = a;
-	}
+  /** State constant indicating that the user is holding down the button.
+   When this transitions from true to false, an ActionEvent may be fired,
+   depending on the value of the "armed" property.*/
+  static int PRESSED = 4;
 
-	public Object[] getSelectedObjects() {
-		return null;
-	}
+  /** State constant indicating that the mouse is currently positioned over
+      the button. */
+  static int ROLLOVER = 8;
 
-	public void fireItemStateChanged(ItemEvent event) {
-		for (int i = 0; i < items.size(); i++) {
-			ItemListener a = (ItemListener) items.get(i);
-			a.itemStateChanged(event);
-		}
-	}
-	public void fireStateChanged(ChangeEvent event) {
-		for (int i = 0; i < changes.size(); i++) {
-			ChangeListener a = (ChangeListener) changes.get(i);
-			a.stateChanged(event);
-		}
-	}
-	public void fireActionPerformed(ActionEvent event) {
-		for (int i = 0; i < actions.size(); i++) {
-			ActionListener a = (ActionListener) actions.get(i);
-			a.actionPerformed(event);
-		}
-	}
+  /** State constant indicating that the button is selected. This constant
+      is only meaningful for toggle-type buttons (radio buttons,
+      checkboxes). */
+  static int SELECTED = 16;
 
-	boolean arm;
-	public boolean isArmed() {
-		return arm;
-	}
-	public void setArmed(boolean b) {
-		arm = b;
-	}
+  /** Represents the "state properties" (armed, enabled, pressed, rollover
+      and selected) by a bitwise combination of integer constants. */
+  int stateMask;
 
-	boolean enabled = true;
-	public boolean isEnabled() {
-		return enabled;
-	}
-	public void setEnabled(boolean b) {
-		enabled = b;
-	}
+  /** List of ItemListeners, ChangeListeners, and ActionListeners
+      registered on this model. */
+  EventListenerList listenerList;
 
-	boolean pressed;
-	public void setPressed(boolean b) {
-		pressed = b;
-	}
-	public boolean isPressed() {
-		return pressed;
-	}
+  /** The single ChangeEvent this model (re)uses to call its
+      ChangeListeners. */
+  ChangeEvent changeEvent;
 
-	public void removeActionListener(ActionListener l) {
-		actions.removeElement(l);
-	}
-	public void addActionListener(ActionListener l) {
-		//	comp.enableEvents( AWTEvent.ACTION_EVENT_MASK );
-		actions.addElement(l);
-	}
+  /** The group this model belongs to. Only one button in a group may be
+      selected at any given time. */
+  ButtonGroup group;
+  
+  /** The key code (one of {@link java.awt.event.KeyEvent} VK_*) used to
+      press this button via a keyboard interface. */
+  int mnemonic;
 
-	public void addItemListener(ItemListener l) {
-		items.addElement(l);
-	}
-	public void removeItemListener(ItemListener l) {
-		items.removeElement(l);
-	}
+  /** The string used as the "command" property of any ActionEvent this
+      model sends. */
+  String actionCommand;
 
-	public void addChangeListener(ChangeListener l) {
-		changes.addElement(l);
-	}
-	public void removeChangeListener(ChangeListener l) {
-		changes.removeElement(l);
-	}
+  public DefaultButtonModel()
+  {
+    stateMask = ENABLED;
+    mnemonic = java.awt.event.KeyEvent.VK_UNDEFINED;
+    listenerList = new EventListenerList();    
+    changeEvent = new ChangeEvent(this);
+  }
 
-	boolean roll;
-	public void setRollover(boolean b) {
-		roll = b;
-	}
-	public boolean isRollover() {
-		return roll;
-	}
+  /**
+   * Return <code>null</code>. Use {@link AbstractButton} if you wish to
+   * interface with a button via an {@link ItemSelectable} interface.
+   *
+   * @return <code>null</code>
+   */
+    public Object[] getSelectedObjects()
+    {
+	return null;
+    }
 
-	int mne;
-	public int getMnemonic() {
-		return mne;
-	}
-	public void setMnemonic(int key) {
-		mne = key;
-	}
+  /**
+   * Add an ActionListener to the model. Usually only called to subscribe
+   * an AbstractButton's listener to the model.
+   *
+   * @param l The listener to add
+   */
+  public void addActionListener(ActionListener l)
+  {
+    listenerList.add(ActionListener.class, l);
+  }
+  
+  /**
+   * Remove an ActionListener to the model. Usually only called to
+   * unsubscribe an AbstractButton's listener to the model.
+   *
+   * @param l The listener to remove
+   */
+  public void removeActionListener(ActionListener l)
+  {
+    listenerList.remove(ActionListener.class, l);
+  }
 
-	String com;
-	public void setActionCommand(String s) {
-		com = s;
-	}
-	public String getActionCommand() {
-		return com;
-	}
+  /**
+   * Add an ItemListener to the model. Usually only called to subscribe
+   * an AbstractButton's listener to the model.
+   *
+   * @param l The listener to add
+   */
+  public void addItemListener(ItemListener l)
+  {
+    listenerList.add(ItemListener.class, l);
+  }
 
-	public void setGroup(ButtonGroup group) {
-		this.group = group;
-	}
+  /**
+   * Remove an ItemListener to the model. Usually only called to
+   * unsubscribe an AbstractButton's listener to the model.
+   *
+   * @param l The listener to remove
+   */
+  public void removeItemListener(ItemListener l)
+  {
+    listenerList.remove(ItemListener.class, l);
+  }
 
-	boolean sel;
-	public void setSelected(boolean b) {
-		if (group != null) {
-			if (b == true) {
-				System.out.println("selected button in group:" + this);
-				group.setSelected(this, b);
-				sel = true;
-			} else {
-				System.out.println("deselected button in group: " + this);
-				sel = false;
-			}
-		} else {
-			sel = b;
-		}
-	}
-	public boolean isSelected() {
-		return sel;
-	}
+  /**
+   * Add a ChangeListener to the model. Usually only called to subscribe
+   * an AbstractButton's listener to the model.
+   *
+   * @param l The listener to add
+   */
+  public void addChangeListener(ChangeListener l)
+  {
+    listenerList.add(ChangeListener.class, l);
+  }
+
+  /**
+   * Remove a ChangeListener to the model. Usually only called to
+   * unsubscribe an AbstractButton's listener to the model.
+   *
+   * @param l The listener to remove
+   */
+  public void removeChangeListener(ChangeListener l)
+  {
+    listenerList.remove(ChangeListener.class, l);
+  }
+
+  /**
+   * Inform each ItemListener in the {@link listenerList} that an ItemEvent
+   * has occurred. This happens in response to any change to the {@link
+   * stateMask} field.
+   *
+   * @param e The ItemEvent to fire
+   */
+  public void fireItemStateChanged(ItemEvent e)
+  {
+    EventListener[] ll = listenerList.getListeners(ItemListener.class);
+    for (int i = 0; i < ll.length; i++)
+      ((ItemListener)ll[i]).itemStateChanged(e);
+  }
+
+  /**
+   * Inform each ActionListener in the {@link listenerList} that an
+   * ActionEvent has occurred. This happens in response to the any change
+   * to the {@link stateMask} field which makes the enabled, armed and
+   * pressed properties all simultaneously <code>true</code>.
+   *
+   * @param e The ActionEvent to fire
+   */
+  public void fireActionPerformed(ActionEvent e)
+  {
+    EventListener[] ll = listenerList.getListeners(ActionListener.class);
+    for (int i = 0; i < ll.length; i++)
+      ((ActionListener)ll[i]).actionPerformed(e);
+  }
+
+  /**
+   * Inform each ChangeListener in the {@link listenerList} that a
+   * ChangeEvent has occurred. This happens in response to the any change
+   * to a property of the model.
+   *
+   * @param event The ChangeEvent to fire
+   */
+  public void fireStateChanged(ChangeEvent e)
+  {
+    EventListener[] ll = listenerList.getListeners(ChangeListener.class);
+    for (int i = 0; i < ll.length; i++)
+      ((ChangeListener)ll[i]).stateChanged(e);
+  }
+
+  /**
+   * Helper method to fire a ChangeEvent with the model as the event's
+   * source.
+   */
+  protected void changeState(int stateflag, boolean b)
+    {
+    int oldstate = stateMask;
+    int newstate;
+
+    if (b)
+      newstate = oldstate | stateflag;
+    else
+      newstate = oldstate & ~stateflag;
+
+    if (oldstate == newstate)
+      return;
+
+    if ((stateflag != SELECTED) 
+        && (stateflag != ENABLED)
+        && (stateMask & ENABLED) == 0)
+      return;
+
+    stateMask = newstate;
+
+    fireStateChanged(changeEvent);
+
+    if ((oldstate & SELECTED) == 0
+        && (newstate & SELECTED) == SELECTED)
+      fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED, 
+                                         null, ItemEvent.SELECTED));
+
+    else if ((oldstate & SELECTED) == SELECTED
+             && (newstate & SELECTED) == 0)
+      fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED, 
+                                         null, ItemEvent.DESELECTED));
+    
+    else if (((oldstate & ARMED) == ARMED && (oldstate & PRESSED) == PRESSED)
+             &&
+             ((newstate & ARMED) == ARMED && (newstate & PRESSED) == 0))
+      {
+        fireActionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED,
+                                            actionCommand));
+      }
+    }
+  
+  /**
+   * Get the value of the model's "armed" property.
+   * 
+   * @return The current "armed" property 
+   */
+  public boolean isArmed()
+  {
+    return (stateMask & ARMED) == ARMED;
+  }
+  
+  /**
+   * Set the value of the model's "armed" property.
+   *
+   * @param a The new "armed" property
+   */
+  public void setArmed(boolean a)
+  {
+    changeState(ARMED, a);
+  }
+
+  /**
+   * Get the value of the model's "enabled" property.
+   *
+   * @return The current "enabled" property.
+   */
+  public boolean isEnabled()
+    {
+    return (stateMask & ENABLED) == ENABLED;
+    }
+
+  /**
+   * Set the value of the model's "enabled" property.
+   *
+   * @param e The new "enabled" property
+   */
+  public void setEnabled(boolean e)
+  {
+    changeState(ENABLED, e);
+  }
+
+  /**
+   * Set the value of the model's "pressed" property.
+   *
+   * @param p The new "pressed" property
+   */
+  public void setPressed(boolean p)
+    {	
+    changeState(PRESSED, p);
+    }
+
+  /**
+   * Get the value of the model's "pressed" property.
+   *
+   * @return The current "pressed" property
+   */
+  public boolean isPressed()
+  {
+    return (stateMask & PRESSED) == PRESSED;
+  }
+
+  /**
+   * Set the value of the model's "rollover" property.
+   *
+   * @param r The new "rollover" property
+   */
+  public void setRollover(boolean r)
+  {
+    changeState(ROLLOVER, r);
+  }
+
+
+  /**
+   * Set the value of the model's "selected" property.
+   *
+   * @param s The new "selected" property
+   */
+  public void setSelected(boolean s)
+  {
+    changeState(SELECTED, s);
+  }
+
+  /**
+   * Get the value of the model's "selected" property.
+   *
+   * @return The current "selected" property
+   */
+  public boolean isSelected()
+  {
+    return (stateMask & SELECTED) == SELECTED;
+  }
+
+  /**
+   * Get the value of the model's "rollover" property.
+   *
+   * @return The current "rollover" property
+   */
+  public boolean isRollover()
+    {
+    return (stateMask & ROLLOVER) == ROLLOVER;
+    }
+
+  /**
+   * Get the value of the model's "mnemonic" property.
+   *
+   * @return The current "mnemonic" property
+   */
+  public int getMnemonic()
+  { 
+    return mnemonic;
+  }
+
+  /**
+   * Set the value of the model's "mnemonic" property.
+   *
+   * @param key The new "mnemonic" property
+   */
+  public void setMnemonic(int key)
+  {
+    if (mnemonic != key)
+      {
+        mnemonic = key;
+        fireStateChanged(changeEvent);
+      }
+  }
+  
+  /**
+   * Set the value of the model's "actionCommand" property. This property
+   * is used as the "command" property of the {@link ActionEvent} fired
+   * from the model.
+   *
+   * @param s The new "actionCommand" property.
+   */
+  public void setActionCommand(String s)
+  {
+    if (actionCommand != s)
+      {
+        actionCommand = s;
+        fireStateChanged(changeEvent);
+      }
+  } 
+  
+  /**
+   * Set the value of the model's "actionCommand" property. This property
+   * is used as the "command" property of the {@link ActionEvent} fired
+   * from the model.
+   *
+   * @return The current "actionCommand" property
+   */
+  public String getActionCommand()
+  {
+    return actionCommand;
+  }
+
+  /**
+   * Set the value of the model's "group" property. The model is said to be
+   * a member of the {@link ButtonGroup} held in its "group" property, and
+   * only one models in a given group can have their "selected" property be
+   * <code>true</code> at a time.
+   *
+   * @param g The new "group" property
+   */
+  public void setGroup(ButtonGroup g)
+  {
+    if (group != g)
+      {
+        group = g;
+        fireStateChanged(changeEvent);
+      }
+  }
 }

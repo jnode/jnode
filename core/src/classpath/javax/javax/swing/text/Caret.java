@@ -1,5 +1,5 @@
 /* Caret.java -- 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,26 +37,43 @@ exception statement from your version. */
 
 package javax.swing.text;
 
-import java.awt.*;
-import javax.swing.event.*;
+import java.awt.Graphics;
+import java.awt.Point;
+import javax.swing.event.ChangeListener;
 
 public interface Caret
 {
-    void addChangeListener(ChangeListener l);
-    void deinstall(JTextComponent c);
-    int getBlinkRate();
-    int getDot();
-    Point getMagicaretPosition();
-    int getMark();
-    void install(JTextComponent c);
-    boolean isSelectionVisible();
-    boolean isVisible();
-    void moveDot(int dot);
-    void paint(Graphics g);
-    void removeChangeListener(ChangeListener l);
-    void setBlinkRate(int rate);
-    void setDot(int dot);
-    void setMagicCaretPosition(Point p);
-    void setSelectionVisible(boolean v);
-    void setVisible(boolean v);
+  void addChangeListener(ChangeListener l);
+  
+  void deinstall(JTextComponent c);
+  
+  int getBlinkRate();
+  
+  int getDot();
+  
+  Point getMagicCaretPosition();
+  
+  int getMark();
+  
+  void install(JTextComponent c);
+  
+  boolean isSelectionVisible();
+  
+  boolean isVisible();
+  
+  void moveDot(int dot);
+  
+  void paint(Graphics g);
+  
+  void removeChangeListener(ChangeListener l);
+  
+  void setBlinkRate(int rate);
+  
+  void setDot(int dot);
+  
+  void setMagicCaretPosition(Point p);
+  
+  void setSelectionVisible(boolean v);
+  
+  void setVisible(boolean v);
 }

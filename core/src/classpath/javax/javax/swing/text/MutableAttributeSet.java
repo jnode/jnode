@@ -1,5 +1,5 @@
 /* MutableAttributeSet.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,8 +37,7 @@ exception statement from your version. */
 
 package javax.swing.text;
 
-// Imports
-import java.util.*;
+import java.util.Enumeration;
 
 /**
  * MutableAttributeSet
@@ -56,37 +55,37 @@ public interface MutableAttributeSet extends AttributeSet {
 	 * @param name TODO
 	 * @param value TODO
 	 */
-	public void addAttribute(Object name, Object value);
+	void addAttribute(Object name, Object value);
 
 	/**
 	 * addAttributes
 	 * @param attributes TODO
 	 */
-	public void addAttributes(AttributeSet attributes);
+	void addAttributes(AttributeSet attributes);
 
 	/**
 	 * removeAttribute
 	 * @param name TODO
 	 */
-	public void removeAttribute(Object name);
+	void removeAttribute(Object name);
 
 	/**
 	 * removeAttributes
 	 * @param names TODO
 	 */
-	public void removeAttributes(Enumeration names);
+	void removeAttributes(Enumeration names);
 
 	/**
 	 * removeAttributes
 	 * @param attributes TODO
 	 */
-	public void removeAttributes(AttributeSet attributes);
+	void removeAttributes(AttributeSet attributes);
 
 	/**
 	 * setResolveParent
 	 * @param parent TODO
 	 */
-	public void setResolveParent(AttributeSet parent);
+	void setResolveParent(AttributeSet parent);
 
 
 } // MutableAttributeSet

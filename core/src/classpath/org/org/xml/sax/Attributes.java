@@ -56,6 +56,8 @@ package org.xml.sax;
  * @since SAX 2.0
  * @author David Megginson
  * @version 2.0.1 (sax2r2)
+ * @see org.xml.sax.helpers.AttributesImpl
+ * @see org.xml.sax.ext.DeclHandler#attributeDecl
  */
 public interface Attributes
 {
@@ -89,6 +91,7 @@ public interface Attributes
      * @return The Namespace URI, or the empty string if none
      *         is available, or null if the index is out of
      *         range.
+     * @see #getLength
      */
     public abstract String getURI (int index);
 
@@ -100,6 +103,7 @@ public interface Attributes
      * @return The local name, or the empty string if Namespace
      *         processing is not being performed, or null
      *         if the index is out of range.
+     * @see #getLength
      */
     public abstract String getLocalName (int index);
 
@@ -111,6 +115,7 @@ public interface Attributes
      * @return The XML 1.0 qualified name, or the empty string
      *         if none is available, or null if the index
      *         is out of range.
+     * @see #getLength
      */
     public abstract String getQName (int index);
 
@@ -133,7 +138,7 @@ public interface Attributes
      * @param index The attribute index (zero-based).
      * @return The attribute's type as a string, or null if the
      *         index is out of range.
-     * @see #getLength()
+     * @see #getLength
      */
     public abstract String getType (int index);
 
@@ -149,7 +154,7 @@ public interface Attributes
      * @param index The attribute index (zero-based).
      * @return The attribute's value as a string, or null if the
      *         index is out of range.
-     * @see #getLength()
+     * @see #getLength
      */
     public abstract String getValue (int index);
 

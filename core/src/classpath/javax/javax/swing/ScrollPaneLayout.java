@@ -35,9 +35,9 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing;
 
-// Imports
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -50,8 +50,10 @@ import java.io.Serializable;
  * @author	Andrew Selkirk
  * @version	1.0
  */
-public class ScrollPaneLayout implements LayoutManager, ScrollPaneConstants, Serializable {
-	static final long serialVersionUID = -4480022884523193743L;
+public class ScrollPaneLayout
+  implements LayoutManager, ScrollPaneConstants, Serializable
+{
+  static final long serialVersionUID = -4480022884523193743L;
 
 	//-------------------------------------------------------------
 	// Classes ----------------------------------------------------
@@ -60,7 +62,8 @@ public class ScrollPaneLayout implements LayoutManager, ScrollPaneConstants, Ser
 	/**
 	 * UIResource
 	 */
-	public static class UIResource extends ScrollPaneLayout implements javax.swing.plaf.UIResource {
+	public static class UIResource extends ScrollPaneLayout 
+			implements javax.swing.plaf.UIResource {
 
 		//-------------------------------------------------------------
 		// Initialization ---------------------------------------------
@@ -73,7 +76,9 @@ public class ScrollPaneLayout implements LayoutManager, ScrollPaneConstants, Ser
 			// TODO
 		} // UIResource()
 
+
 	} // UIResource
+
 
 	//-------------------------------------------------------------
 	// Variables --------------------------------------------------
@@ -134,6 +139,7 @@ public class ScrollPaneLayout implements LayoutManager, ScrollPaneConstants, Ser
 	 */
 	protected int hsbPolicy;
 
+
 	//-------------------------------------------------------------
 	// Initialization ---------------------------------------------
 	//-------------------------------------------------------------
@@ -144,6 +150,7 @@ public class ScrollPaneLayout implements LayoutManager, ScrollPaneConstants, Ser
 	public ScrollPaneLayout() {
 		// TODO
 	} // ScrollPaneLayout()
+
 
 	//-------------------------------------------------------------
 	// Methods ----------------------------------------------------
@@ -163,7 +170,8 @@ public class ScrollPaneLayout implements LayoutManager, ScrollPaneConstants, Ser
 	 * @param newComponent TODO
 	 * @returns Component
 	 */
-	protected Component addSingletonComponent(Component oldComponent, Component newComponent) {
+	protected Component addSingletonComponent(Component oldComponent,
+			Component newComponent) {
 		return null; // TODO
 	} // addSingletonComponent()
 
@@ -299,5 +307,6 @@ public class ScrollPaneLayout implements LayoutManager, ScrollPaneConstants, Ser
 	public Rectangle getViewportBorderBounds(JScrollPane scrollPane) {
 		return null; // TODO
 	} // getViewportBorderBounds()
+
 
 } // ScrollPaneLayout

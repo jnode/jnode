@@ -1,5 +1,5 @@
 /* ToolTipManager.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,7 +37,7 @@ exception statement from your version. */
 
 package javax.swing;
 
-// Imports
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -64,6 +64,7 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener 
 		// Variables --------------------------------------------------
 		//-------------------------------------------------------------
 
+
 		//-------------------------------------------------------------
 		// Initialization ---------------------------------------------
 		//-------------------------------------------------------------
@@ -75,6 +76,7 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener 
 		protected stillInsideTimerAction(ToolTipManager manager) {
 			// TODO
 		} // stillInsideTimerAction()
+
 
 		//-------------------------------------------------------------
 		// Methods ----------------------------------------------------
@@ -88,6 +90,7 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener 
 			// TODO
 		} // actionPerformed()
 
+
 	} // stillInsideTimerAction
 
 	/**
@@ -98,6 +101,7 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener 
 		//-------------------------------------------------------------
 		// Variables --------------------------------------------------
 		//-------------------------------------------------------------
+
 
 		//-------------------------------------------------------------
 		// Initialization ---------------------------------------------
@@ -111,6 +115,7 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener 
 			// TODO
 		} // outsideTimerAction()
 
+
 		//-------------------------------------------------------------
 		// Methods ----------------------------------------------------
 		//-------------------------------------------------------------
@@ -123,6 +128,7 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener 
 			// TODO
 		} // actionPerformed()
 
+
 	} // outsideTimerAction
 
 	/**
@@ -133,6 +139,7 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener 
 		//-------------------------------------------------------------
 		// Variables --------------------------------------------------
 		//-------------------------------------------------------------
+
 
 		//-------------------------------------------------------------
 		// Initialization ---------------------------------------------
@@ -146,6 +153,7 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener 
 			// TODO
 		} // insideTimerAction()
 
+
 		//-------------------------------------------------------------
 		// Methods ----------------------------------------------------
 		//-------------------------------------------------------------
@@ -158,7 +166,9 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener 
 			// TODO
 		} // actionPerformed()
 
+
 	} // insideTimerAction
+
 
 	//-------------------------------------------------------------
 	// Variables --------------------------------------------------
@@ -219,6 +229,7 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener 
 	 */
 	protected boolean heavyWeightPopupEnabled;
 
+
 	//-------------------------------------------------------------
 	// Initialization ---------------------------------------------
 	//-------------------------------------------------------------
@@ -229,6 +240,7 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener 
 	ToolTipManager() {
 		// TODO
 	} // ToolTipManager()
+
 
 	//-------------------------------------------------------------
 	// Methods ----------------------------------------------------
@@ -377,5 +389,6 @@ public class ToolTipManager extends MouseAdapter implements MouseMotionListener 
 	public void mouseMoved(MouseEvent event) {
 		// TODO
 	} // mouseMoved()
+
 
 } // ToolTipManager

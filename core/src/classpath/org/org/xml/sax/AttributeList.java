@@ -66,6 +66,8 @@ package org.xml.sax;
  * @since SAX 1.0
  * @author David Megginson
  * @version 2.0.1 (sax2r2)
+ * @see org.xml.sax.DocumentHandler#startElement startElement
+ * @see org.xml.sax.helpers.AttributeListImpl AttributeListImpl
  */
 public interface AttributeList {
 
@@ -102,6 +104,7 @@ public interface AttributeList {
      * @param i The index of the attribute in the list (starting at 0).
      * @return The name of the indexed attribute, or null
      *         if the index is out of range.
+     * @see #getLength 
      */
     public abstract String getName (int i);
     
@@ -124,6 +127,7 @@ public interface AttributeList {
      * @param i The index of the attribute in the list (starting at 0).
      * @return The attribute type as a string, or
      *         null if the index is out of range.
+     * @see #getLength 
      * @see #getType(java.lang.String)
      */
     public abstract String getType (int i);
@@ -139,10 +143,13 @@ public interface AttributeList {
      * @param i The index of the attribute in the list (starting at 0).
      * @return The attribute value as a string, or
      *         null if the index is out of range.
+     * @see #getLength
      * @see #getValue(java.lang.String)
      */
     public abstract String getValue (int i);
 
+
+
     ////////////////////////////////////////////////////////////////////
     // Lookup methods.
     ////////////////////////////////////////////////////////////////////
@@ -174,6 +181,7 @@ public interface AttributeList {
      * <p>If the attribute name has a namespace prefix in the document,
      * the application must include the prefix here.</p>
      *
+     * @param i The index of the attribute in the list.
      * @return The attribute value as a string, or null if
      *         no such attribute exists.
      * @see #getValue(int)

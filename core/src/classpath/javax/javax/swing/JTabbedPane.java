@@ -35,72 +35,98 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing;
 
 import java.awt.Component;
 import java.util.Vector;
-
+import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.plaf.TabbedPaneUI;
 
-public class JTabbedPane extends JComponent {
-	class Tab {
-		Icon icon;
-		String name, descr;
-		Component tab;
+public class JTabbedPane extends JComponent implements Accessible, SwingConstants
+{
+    class Tab
+    {
+	Icon icon;
+	String name, descr;
+	Component tab;
 
-		Tab(String name, Icon icon, Component tab, String descr) {
-			this.name = name;
-			this.icon = icon;
-			this.tab = tab;
-			this.descr = descr;
-		}
+	Tab(String name,
+	    Icon icon,
+	    Component tab,
+	    String descr)
+	{
+	    this.name = name;
+	    this.icon = icon;
+	    this.tab  = tab;
+	    this.descr = descr;
 	}
+    }
 
-	private Vector tabs = new Vector();
+  private static final long serialVersionUID = 1614381073220130939L;
+    
+    private Vector tabs = new Vector();
 
-	public JTabbedPane() {
-	}
+    public JTabbedPane()
+    {
+    }
 
-	public void addTab(String name, Component panel) {
-		addTab(name, null, panel, null);
-	}
-	public void addTab(String name, Icon icon, Component panel) {
-		addTab(name, icon, panel, null);
-	}
-	public void addTab(String name, Icon icon, Component panel, String descr) {
-		tabs.addElement(new Tab(name, icon, panel, descr));
-	}
+    public void addTab(String name,
+		Component panel)		
+    {
+	addTab(name, null, panel, null);
+    }
+    public void addTab(String name,
+		Icon icon,
+		Component panel)		
+    {
+	addTab(name, icon, panel, null);
+    }
+    public void addTab(String name,
+		Icon icon,
+		Component panel,
+		String descr)
+    {
+	tabs.addElement(new Tab(name, icon, panel, descr));
+    }
 
-	public int getTabCount() {
-		return tabs.size();
-	}
-	public Component getComponentAt(int i) {
-		Tab t = (Tab) tabs.elementAt(i);
-		return t.tab;
-	}
+    public int getTabCount()
+    {
+	return tabs.size();
+    }
+    public Component getComponentAt(int i)
+    {
+	Tab t = (Tab) tabs.elementAt(i);
+	return t.tab;
+    }
+    
+    public String getUIClassID()
+    {	return "TabbedPaneUI";    }
 
-	public String getUIClassID() {
-		return "JTabbedPane";
-	}
 
-	public void setUI(TabbedPaneUI ui) {
-		super.setUI(ui);
-	}
-
-	public TabbedPaneUI getUI() {
-		return (TabbedPaneUI) ui;
-	}
-
-	public void updateUI() {
-		setUI((TabbedPaneUI) UIManager.getUI(this));
-	}
-
-	public AccessibleContext getAccessibleContext() {
-		return null;
-	}
-
-	protected String paramString() {
-		return "JTabbedPane";
-	}
+    public void setUI(TabbedPaneUI ui) {
+        super.setUI(ui);
+    }
+    
+    public TabbedPaneUI getUI() {
+        return (TabbedPaneUI)ui;
+    }
+    
+    public void updateUI()
+    {
+        setUI((TabbedPaneUI)UIManager.getUI(this));
+    }
+    
+    public AccessibleContext getAccessibleContext()
+    {
+	return null;
+    }
+    
+   protected  String paramString()
+    {
+	return "JTabbedPane";
+    }
 }

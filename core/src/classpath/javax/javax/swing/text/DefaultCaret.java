@@ -1,5 +1,5 @@
 /* DefaultCaret.java -- 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,10 +37,20 @@ exception statement from your version. */
 
 package javax.swing.text;
 
-import java.awt.*;
-import java.util.*;
-import java.awt.event.*;
-import javax.swing.event.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.util.EventListener;
+import java.util.Vector;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.EventListenerList;
 
 
 public class DefaultCaret extends Rectangle implements Caret, FocusListener, MouseListener, MouseMotionListener
@@ -104,7 +114,7 @@ public class DefaultCaret extends Rectangle implements Caret, FocusListener, Mou
     Point magic = null;
     public void setMagicCaretPosition(Point p)
     {	magic = p;    }
-    public Point getMagicaretPosition()
+    public Point getMagicCaretPosition()
     {	return magic;    }
 
     
@@ -167,6 +177,3 @@ public class DefaultCaret extends Rectangle implements Caret, FocusListener, Mou
 	repaint();
     }
 }
-
-
-

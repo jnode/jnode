@@ -41,94 +41,272 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Method;
+import java.lang.reflect.Constructor;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.LinkedList;
 import java.util.Locale;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 import javax.swing.border.Border;
 import javax.swing.plaf.ComponentUI;
 
 /**
  * UIDefaults is a database where all settings and interface bindings are
  * stored into. An PLAF implementation fills one of these (see for example
- * plaf/basic/BasicDefaults.java) with "JButton" -> new BasicButtonUI().
+ * plaf/basic/BasicLookAndFeel.java) with "ButtonUI" -> new BasicButtonUI().
  *
  * @author Ronald Veldema (rveldema@cs.vu.nl)
  */
 public class UIDefaults extends Hashtable
 {
-  public interface ActiveValue
+
+  LinkedList bundles;
+  Set listeners;
+  Locale defaultLocale;
+
+  interface ActiveValue
   {
     Object createValue(UIDefaults table);
   } // interface ActiveValue
 
   public static class LazyInputMap implements LazyValue
   {
+    Object[] bind;
     public LazyInputMap(Object[] bindings)
     {
+      bind = bindings;
     }
     public Object createValue(UIDefaults table)
     {
-      throw new Error("not implemented");
+      InputMap im = new InputMap ();
+      for (int i = 0; 2*i+1 < bind.length; ++i)
+        {
+          im.put (KeyStroke.getKeyStroke ((String) bind[2*i]),
+                  bind[2*i+1]);
+        }
+      return im;
     }
   } // class LazyInputMap
 
-  public interface LazyValue
+  interface LazyValue
   {
     Object createValue(UIDefaults table);
   } // interface LazyValue
 
-  public static class ProxyLazyValue
+  public static class ProxyLazyValue implements LazyValue
   {
+    LazyValue inner;
     public ProxyLazyValue(String s)
     {
-      throw new Error("not implemented");
+      final String className = s;
+      inner = new LazyValue ()
+        { 
+          public Object createValue (UIDefaults table) 
+          {
+            try
+              {
+                return Class
+                  .forName (className)
+                  .getConstructor (new Class[] {})
+                  .newInstance (new Object[] {});
+              }
+            catch (Exception e)
+              {
+                return null;
+              }
+          }
+        };
     }
+
     public ProxyLazyValue(String c, String m)
     {
-      throw new Error("not implemented");
+      final String className = c;
+      final String methodName = m;
+      inner = new LazyValue ()
+        { 
+          public Object createValue (UIDefaults table) 
+          {
+            try 
+              {                
+                return Class
+                  .forName (className)
+                  .getMethod (methodName, new Class[] {})
+                  .invoke (null, new Object[] {});
+              }
+            catch (Exception e)
+              {
+                return null;
+              }
+          }
+        };
     }
-    public ProxyLazyValue(String c, Object[] o)
+    
+    public ProxyLazyValue (String c, Object[] os)
     {
-      throw new Error("not implemented");
+      final String className = c;
+      final Object[] objs = os;
+      final Class[] clss = new Class[objs.length];
+      for (int i = 0; i < objs.length; ++i)
+        {
+          clss[i] = objs[i].getClass ();
+        }      
+      inner = new LazyValue ()
+        { 
+          public Object createValue (UIDefaults table) 
+          {            
+            try
+              {
+                return Class
+                  .forName (className)
+                  .getConstructor (clss)
+                  .newInstance (objs);
     }
-    public ProxyLazyValue(String c, String m, Object[] o)
+            catch (Exception e)
     {
-      throw new Error("not implemented");
+                return null;
+              }
+          }
+        };
     }
+
+    public ProxyLazyValue (String c, String m, Object[] os)
+    {
+      final String className = c;
+      final String methodName = m;
+      final Object[] objs = os;
+      final Class[] clss = new Class[objs.length];
+      for (int i = 0; i < objs.length; ++i)
+    {
+          clss[i] = objs[i].getClass ();
+    }
+      inner = new LazyValue ()
+        { 
     public Object createValue(UIDefaults table)
     {
-      throw new Error("not implemented");
+            try 
+              {
+                return Class
+                  .forName (className)
+                  .getMethod (methodName, clss)
+                  .invoke (null, objs);
+              }
+            catch (Exception e)
+              {
+                return null;
+              }
+          }
+        };
+    }
+    
+    public Object createValue (UIDefaults table)
+    {
+      return inner.createValue (table);
     }
   } // class ProxyLazyValue
 
+  private static final long serialVersionUID = 7341222528856548117L;
+
   public UIDefaults()
   {
+    bundles = new LinkedList ();
+    listeners = new HashSet ();
+    defaultLocale = Locale.getDefault ();
   }
 
   public UIDefaults(Object[] entries)
   {
-    // XXX
+    bundles = new LinkedList ();
+    listeners = new HashSet ();
+    defaultLocale = Locale.getDefault ();
+
+    for (int i = 0; (2*i+1) < entries.length; ++i)
+      {
+        put (entries[2*i], entries[2*i+1]);
+      }
   }
 
   public Object get(Object key)
   {
-    // XXX Obey 1.4 specs
-    return super.get(key);
+    return this.get (key, getDefaultLocale ());
   }
 
-  public Object get(Object key, Locale l)
+  public Object get (Object key, Locale loc)
   {
-    throw new Error("not implemented");
+    Object obj = null;
+
+    if (super.containsKey (key))
+      {
+        obj = super.get (key);
+      }
+    else if (key instanceof String)
+      {
+        String keyString = (String) key;
+        ListIterator i = bundles.listIterator (0);
+        while (i.hasNext ())
+  {
+            String bundle_name = (String) i.next ();
+            ResourceBundle res =
+              ResourceBundle.getBundle (bundle_name, loc);
+            if (res != null)
+              {
+                try 
+                  {                    
+                    obj = res.getObject (keyString);
+                    break;
+                  }
+                catch (MissingResourceException me)
+                  {
+                    // continue, this bundle has no such key
+                  }
+              }
+          }
+      }
+
+    // now we've found the object, resolve it.
+    // nb: LazyValues aren't supported in resource bundles, so it's correct
+    // to insert their results in the locale-less hashtable.
+
+    if (obj == null)
+      return null;
+
+    if (obj instanceof LazyValue)
+      {
+        Object resolved = ((LazyValue)obj).createValue (this);
+        super.remove (key);
+        super.put (key, resolved);
+        return resolved;
+      }
+    else if (obj instanceof ActiveValue)
+      {
+        return ((ActiveValue)obj).createValue (this);
+      }    
+
+    return obj;
   }
 
   public Object put(Object key, Object value)
   {
-    throw new Error("not implemented");
+    Object old = super.put (key, value);
+    if (key instanceof String && old != value)
+      firePropertyChange ((String) key, old, value);
+    return old;
   }
 
-  public void putDefaults(Object[] list)
+  public void putDefaults(Object[] entries)
   {
-    throw new Error("not implemented");
+    for (int i = 0; (2*i+1) < entries.length; ++i)
+  {
+        super.put (entries[2*i], entries[2*i+1]);
+      }
+    firePropertyChange ("UIDefaults", null, null);
   }
 
   public Font getFont(Object key)
@@ -191,13 +369,13 @@ public class UIDefaults extends Hashtable
     return o instanceof String ? (String) o : null;
   }
 
-  public int getInt(Object key)
+  int getInt(Object key)
   {
     Object o = get(key);
     return o instanceof Integer ? ((Integer) o).intValue() : 0;
   }
 
-  public int getInt(Object key, Locale l)
+  int getInt(Object key, Locale l)
   {
     Object o = get(key, l);
     return o instanceof Integer ? ((Integer) o).intValue() : 0;
@@ -239,65 +417,114 @@ public class UIDefaults extends Hashtable
 
   public Class getUIClass(String id, ClassLoader loader)
   {
-    throw new Error("not implemented");
+    String className = (String) get (id);
+    if (className == null)
+      return null;
+    try 
+      {
+        if (loader != null)
+          return loader.loadClass (className);    
+        return Class.forName (className);
+      }
+    catch (Exception e)
+      {
+        return null;
+      }
   }
 
   public Class getUIClass(String id)
   {
-    throw new Error("not implemented");
+    return getUIClass (id, null);
   }
 
   protected void getUIError(String msg)
   {
-    // Does nothing unless overridden.
+    System.err.println ("UIDefaults.getUIError: " + msg);
   }
 
-  public ComponentUI getUI(JComponent a)
+  public ComponentUI getUI(JComponent target)
   {
-    String pp = a.getUIClassID();
-    ComponentUI p = (ComponentUI) get(pp);
-    if (p == null)
-      getUIError("failed to locate UI:" + pp);
-    return p;
+    String classId = target.getUIClassID ();
+    Class cls = getUIClass (classId);
+    if (cls == null)
+      {
+        getUIError ("failed to locate UI class:" + classId);
+        return null;
+      }
+
+    Method factory;
+
+    try 
+      {
+        factory = cls.getMethod ("createUI", new Class[] { JComponent.class } );
+      }
+    catch (NoSuchMethodException nme)
+      {
+        getUIError ("failed to locate createUI method on " + cls.toString ());
+        return null;
   }
 
-  public void addPropertyChangeListener(PropertyChangeListener l)
+    try
   {
-    throw new Error("not implemented");
+        return (ComponentUI) factory.invoke (null, new Object[] { target });
+  }
+    catch (java.lang.reflect.InvocationTargetException ite)
+	{
+        getUIError ("InvocationTargetException ("+ ite.getTargetException() 
+		    +") calling createUI(...) on " + cls.toString ());
+        return null;        
+
+	}
+    catch (Exception e)
+  {
+        getUIError ("exception calling createUI(...) on " + cls.toString ());
+        return null;        
+      }
   }
 
-  public void removePropertyChangeListener(PropertyChangeListener l)
+  void addPropertyChangeListener(PropertyChangeListener listener)
   {
-    throw new Error("not implemented");
+    listeners.add (listener);
+  }
+
+  void removePropertyChangeListener(PropertyChangeListener listener)
+  {
+    listeners.remove (listener);
   }
 
   public PropertyChangeListener[] getPropertyChangeListeners()
   {
-    throw new Error("not implemented");
+    return (PropertyChangeListener[]) listeners.toArray ();
   }
 
   protected void firePropertyChange(String property, Object o, Object n)
   {
-    throw new Error("not implemented");
+    Iterator i = listeners.iterator ();
+    PropertyChangeEvent pce = new PropertyChangeEvent (this, property, o, n);
+    while (i.hasNext ())
+      {
+        PropertyChangeListener pcl = (PropertyChangeListener) i.next ();
+        pcl.propertyChange (pce);
+      }
   }
 
-  public void addResourceBundle(String name)
+  void addResourceBundle(String name)
   {
-    throw new Error("not implemented");
+    bundles.addFirst (name);
   }
 
-  public void removeResourceBundle(String name)
+  void removeResourceBundle(String name)
   {
-    throw new Error("not implemented");
+    bundles.remove (name);
   }
 
-  public void setDefaultLocale(Locale l)
+  void setDefaultLocale(Locale loc)
   {
-    throw new Error("not implemented");
+    defaultLocale = loc;
   }
 
   public Locale getDefaultLocale()
   {
-    throw new Error("not implemented");
+    return defaultLocale;
   }
 } // class UIDefaults

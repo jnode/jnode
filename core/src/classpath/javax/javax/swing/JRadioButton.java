@@ -35,42 +35,58 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing;
 
 import javax.accessibility.AccessibleContext;
 
-public class JRadioButton extends JToggleButton {
-	public JRadioButton() {
-		this(null, null);
-	}
-	public JRadioButton(Action a) {
-		this();
-		setAction(a);
-	}
+public class JRadioButton extends JToggleButton
+{
+    public JRadioButton()
+    {
+	this(null, null);
+    }
+    public JRadioButton(Action a)
+    {
+	this();
+	setAction(a);
+    }
 
-	public JRadioButton(Icon icon) {
-		this(null, icon);
-	}
+    public JRadioButton(Icon icon)
+    { 
+	this(null, icon);
+    }    
+  
+    public JRadioButton(String text)
+    {
+	this(text, null);
+    }
+      
+    public JRadioButton(String text, Icon icon)
+    {
+	super(text, icon);
+        paint_border = false;
+        content_area_filled = false;
+    }
 
-	public JRadioButton(String text) {
-		this(text, null);
-	}
-
-	public JRadioButton(String text, Icon icon) {
-		super(text, icon);
-	}
-
-	public AccessibleContext getAccessibleContext() {
-		//Gets the AccessibleContext associated with this JRadioButton. 
-		return null;
-	}
-
-	public String getUIClassID() {
-		//Returns a string that specifies the name of the L&F class that renders this component.  
-		return "JRadioButton";
-	}
-
-	protected String paramString() {
-		return "JRadioButton";
-	}
+    
+    public AccessibleContext getAccessibleContext()
+    {
+	//Gets the AccessibleContext associated with this JRadioButton. 
+	return null;
+    }
+  
+    public String getUIClassID()
+    {
+	//Returns a string that specifies the name of the L&F class that renders this component.  
+	return "RadioButtonUI";
+    }
+  
+    protected  String paramString()
+    {
+	return "JRadioButton";
+    }
 }
+
+
+

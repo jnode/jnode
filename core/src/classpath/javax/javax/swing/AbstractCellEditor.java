@@ -1,5 +1,5 @@
 /* AbstractCellEditor.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,12 +35,14 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing;
 
-// Imports
-import java.io.*;
-import java.util.*;
-import javax.swing.event.*;
+import java.io.Serializable;
+import java.util.EventObject;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.EventListenerList;
 
 /**
  * AbstractCellEditor
@@ -52,24 +54,15 @@ public abstract class AbstractCellEditor
 {
   static final long serialVersionUID = -1048006551406220959L;
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * listenerList
+   */
+  protected EventListenerList listenerList;
 
-	/**
-	 * listenerList
-	 */
-	protected EventListenerList listenerList;
-
-	/**
-	 * changeEvent
-	 */
-	protected transient ChangeEvent changeEvent;
-
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * changeEvent
+   */
+  protected transient ChangeEvent changeEvent;
 
 	/**
 	 * Constructor AbstractCellEditor
@@ -77,11 +70,6 @@ public abstract class AbstractCellEditor
 	public AbstractCellEditor() {
 		// TODO
 	} // AbstractCellEditor()
-
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
 
 	/**
 	 * isCellEditable
@@ -116,41 +104,59 @@ public abstract class AbstractCellEditor
 		// TODO
 	} // cancelCellEditing()
 
-	/**
-	 * addCellEditorListener
-	 * @param listener TODO
-	 */
-	public void addCellEditorListener(CellEditorListener listener) {
-		// TODO
-	} // addCellEditorListener()
+  /**
+   * addCellEditorListener
+   *
+   * @param listener The listener to add
+   */
+  public void addCellEditorListener (CellEditorListener listener)
+  {
+    listenerList.add (CellEditorListener.class, listener);
+  }
 
-	/**
-	 * removeCellEditorListener
-	 * @param listener TODO
-	 */
-	public void removeCellEditorListener(CellEditorListener listener) {
-		// TODO
-	} // removeCellEditorListener()
+  /**
+   * removeCellEditorListener
+   *
+   * @param listener The listener to remove
+   */
+  public void removeCellEditorListener (CellEditorListener listener)
+  {
+    listenerList.remove (CellEditorListener.class, listener);
+  }
+	
+  /**
+   * getCellEditorListeners
+   *
+   * @since 1.4
+   */
+  public CellEditorListener[] getCellEditorListeners()
+  {
+    return (CellEditorListener[]) listenerList.getListeners (CellEditorListener.class);
+  }
 
-	/**
-	 * fireEditingStopped
-	 */
-	protected void fireEditingStopped() {
-		// TODO
-	} // fireEditingStopped()
+  /**
+   * fireEditingStopped
+   */
+  protected void fireEditingStopped()
+  {
+    CellEditorListener[] listeners = getCellEditorListeners();
 
-	/**
-	 * fireEditingCanceled
-	 */
-	protected void fireEditingCanceled() {
-		// TODO
-	} // fireEditingCanceled()
+    for (int index = 0; index < listeners.length; index++)
+      {
+	listeners [index].editingStopped (changeEvent);
+      }
+  }
 
-	/**
-	 * getCellEditorValue
-	 * @returns Object
-	 */
-	public abstract Object getCellEditorValue();
+  /**
+   * fireEditingCanceled
+   */
+  protected void fireEditingCanceled()
+  {
+    CellEditorListener[] listeners = getCellEditorListeners();
 
-
-} // AbstractCellEditor
+    for (int index = 0; index < listeners.length; index++)
+      {
+	listeners [index].editingCanceled (changeEvent);
+      }
+  }
+}
