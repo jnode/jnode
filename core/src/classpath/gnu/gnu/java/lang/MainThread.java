@@ -57,7 +57,8 @@ public class MainThread
   public MainThread(String classname, String[] args)
     throws ClassNotFoundException, NoSuchMethodException
   {
-		Class found = Class.forName(classname);
+    Class found = Class.forName(classname, true,
+				ClassLoader.getSystemClassLoader());
 		Class[] argTypes = new Class[1];
 		argTypes[0] = args.getClass();
 		mainMethod = found.getMethod("main", argTypes);
