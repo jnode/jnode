@@ -14,7 +14,7 @@ import javax.naming.NameNotFoundException;
 import org.apache.log4j.Logger;
 import org.jnode.driver.console.Console;
 import org.jnode.driver.console.ConsoleManager;
-import org.jnode.driver.console.x86.TextConsole;
+import org.jnode.driver.console.x86.ScrollableShellConsole;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardListener;
 import org.jnode.naming.InitialNaming;
@@ -39,7 +39,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 	private AliasManager aliasMgr;
 	
 	/** Keeps a reference to the console this CommandShell is using * */
-	private TextConsole console = null;
+	private ScrollableShellConsole console = null;
 	
 	/** Contains the archive of commands. * */
 	private CommandHistory history = new CommandHistory();
@@ -95,9 +95,9 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 	 */
 	public CommandShell() throws NameNotFoundException, ShellException 
 	{
-		this((TextConsole) ((ConsoleManager) InitialNaming.lookup(ConsoleManager.NAME)).getFocus());
+		this((ScrollableShellConsole) ((ConsoleManager) InitialNaming.lookup(ConsoleManager.NAME)).getFocus());
 	}
-	public CommandShell(TextConsole cons) throws ShellException {
+	public CommandShell(ScrollableShellConsole cons) throws ShellException {
 		try {
 			this.console = cons;
 			this.out = this.console.getOut();
