@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt;
 
 import java.awt.geom.Rectangle2D;
@@ -62,7 +63,8 @@ import java.io.Serializable;
  * @since 1.0
  * @status updated to 1.4
  */
-public class Rectangle extends Rectangle2D implements Shape, Serializable {
+public class Rectangle extends Rectangle2D implements Shape, Serializable
+{
 	/**
 	 * Compatible with JDK 1.0+.
 	 */
@@ -108,7 +110,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * Initializes a new instance of <code>Rectangle</code> with a top
 	 * left corner at (0,0) and a width and height of 0.
 	 */
-	public Rectangle() {
+  public Rectangle()
+  {
 	}
 
 	/**
@@ -119,7 +122,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @throws NullPointerException if r is null
 	 * @since 1.1
 	 */
-	public Rectangle(Rectangle r) {
+  public Rectangle(Rectangle r)
+  {
 		x = r.x;
 		y = r.y;
 		width = r.width;
@@ -135,7 +139,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @param width the width of the rectangle
 	 * @param height the height of the rectangle
 	 */
-	public Rectangle(int x, int y, int width, int height) {
+  public Rectangle(int x, int y, int width, int height)
+  {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -150,7 +155,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @param width the width of the rectangle
 	 * @param height the height of the rectange
 	 */
-	public Rectangle(int width, int height) {
+  public Rectangle(int width, int height)
+  {
 		this.width = width;
 		this.height = height;
 	}
@@ -164,7 +170,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @param d the width and height of the rectangle
 	 * @throws NullPointerException if p or d is null
 	 */
-	public Rectangle(Point p, Dimension d) {
+  public Rectangle(Point p, Dimension d)
+  {
 		x = p.x;
 		y = p.y;
 		width = d.width;
@@ -177,7 +184,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 *
 	 * @param p the upper left corner of the rectangle
 	 */
-	public Rectangle(Point p) {
+  public Rectangle(Point p)
+  {
 		x = p.x;
 		y = p.y;
 	}
@@ -189,7 +197,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 *
 	 * @param d the width and height of the rectangle
 	 */
-	public Rectangle(Dimension d) {
+  public Rectangle(Dimension d)
+  {
 		width = d.width;
 		height = d.height;
 	}
@@ -199,7 +208,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 *
 	 * @return the value of x, as a double
 	 */
-	public double getX() {
+  public double getX()
+  {
 		return x;
 	}
 
@@ -208,7 +218,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 *
 	 * @return the value of y, as a double
 	 */
-	public double getY() {
+  public double getY()
+  {
 		return y;
 	}
 
@@ -217,7 +228,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 *
 	 * @return the value of width, as a double
 	 */
-	public double getWidth() {
+  public double getWidth()
+  {
 		return width;
 	}
 
@@ -226,7 +238,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 *
 	 * @return the value of height, as a double
 	 */
-	public double getHeight() {
+  public double getHeight()
+  {
 		return height;
 	}
 
@@ -239,7 +252,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @see #setBounds(Rectangle)
 	 * @since 1.1
 	 */
-	public Rectangle getBounds() {
+  public Rectangle getBounds()
+  {
 		return new Rectangle(this);
 	}
 
@@ -251,7 +265,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @see #setBounds(Rectangle)
 	 * @since 1.2
 	 */
-	public Rectangle2D getBounds2D() {
+  public Rectangle2D getBounds2D()
+  {
 		return new Rectangle(x, y, width, height);
 	}
 
@@ -264,11 +279,9 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @see #setBounds(int, int, int, int)
 	 * @since 1.1
 	 */
-	public void setBounds(Rectangle r) {
-		x = r.x;
-		y = r.y;
-		width = r.width;
-		height = r.height;
+  public void setBounds(Rectangle r)
+  {
+    setBounds (r.x, r.y, r.width, r.height);
 	}
 
 	/**
@@ -280,11 +293,9 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @param height the new height of this rectangle
 	 * @since 1.1
 	 */
-	public void setBounds(int x, int y, int width, int height) {
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
+  public void setBounds(int x, int y, int width, int height)
+  {
+    reshape (x, y, width, height);
 	}
 
 	/**
@@ -297,7 +308,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @param height the new height of this rectangle
 	 * @since 1.2
 	 */
-	public void setRect(double x, double y, double width, double height) {
+  public void setRect(double x, double y, double width, double height)
+  {
 		this.x = (int) x;
 		this.y = (int) y;
 		this.width = (int) width;
@@ -313,8 +325,12 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @param height the new height of this rectangle
 	 * @deprecated use {@link #setBounds(int, int, int, int)} instead
 	 */
-	public void reshape(int x, int y, int width, int height) {
-		setBounds(x, y, width, height);
+  public void reshape(int x, int y, int width, int height)
+  {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
 	}
 
 	/**
@@ -322,11 +338,12 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * its upper left corner.
 	 *
 	 * @return the point where this rectangle is located
-	 * @see #setLocation(Point)
+   * @see setLocation(Point)
 	 * @since 1.1
 	 */
-	public Point getLocation() {
-		return new Point(x, y);
+  public Point getLocation()
+  {
+    return new Point(x,y);
 	}
 
 	/**
@@ -338,9 +355,9 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @see #getLocation()
 	 * @since 1.1
 	 */
-	public void setLocation(Point p) {
-		this.x = p.x;
-		this.y = p.y;
+  public void setLocation(Point p)
+  {
+    setLocation (p.x, p.y);
 	}
 
 	/**
@@ -351,9 +368,9 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @param y the new Y coordinate for this rectangle
 	 * @since 1.1
 	 */
-	public void setLocation(int x, int y) {
-		this.x = x;
-		this.y = y;
+  public void setLocation(int x, int y)
+  {
+    move (x, y);
 	}
 
 	/**
@@ -364,8 +381,10 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @param y the new Y coordinate for this rectangle
 	 * @deprecated use {@link #setLocation(int, int)} instead
 	 */
-	public void move(int x, int y) {
-		setLocation(x, y);
+  public void move(int x, int y)
+  {
+    this.x = x;
+    this.y = y;
 	}
 
 	/**
@@ -375,7 +394,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @param dy the y distance to move by
 	 * @see #setLocation(int, int)
 	 */
-	public void translate(int dx, int dy) {
+  public void translate(int dx, int dy)
+  {
 		x += dx;
 		y += dy;
 	}
@@ -387,7 +407,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @see #setSize(Dimension)
 	 * @since 1.1
 	 */
-	public Dimension getSize() {
+  public Dimension getSize()
+  {
 		return new Dimension(width, height);
 	}
 
@@ -399,9 +420,9 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @see #getSize()
 	 * @since 1.1
 	 */
-	public void setSize(Dimension d) {
-		width = d.width;
-		height = d.height;
+  public void setSize(Dimension d)
+  {
+    setSize (d.width, d.height);
 	}
 
 	/**
@@ -411,9 +432,9 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @param height the new height of the rectangle
 	 * @since 1.1
 	 */
-	public void setSize(int width, int height) {
-		this.width = width;
-		this.height = height;
+  public void setSize(int width, int height)
+  {
+    resize (width, height);
 	}
 
 	/**
@@ -423,8 +444,10 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @param height the new height of the rectangle
 	 * @deprecated use {@link #setSize(int, int)} instead
 	 */
-	public void resize(int width, int height) {
-		setSize(width, height);
+  public void resize(int width, int height)
+  {
+    this.width = width;
+    this.height = height;
 	}
 
 	/**
@@ -439,8 +462,9 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @see #contains(int, int)
 	 * @since 1.1
 	 */
-	public boolean contains(Point p) {
-		return width > 0 && height > 0 && p.x >= x && p.x < x + width && p.y >= y && p.y < y + height;
+  public boolean contains(Point p)
+  {
+    return contains (p.x, p.y);
 	}
 
 	/**
@@ -454,8 +478,9 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @return true if the point is inside the rectangle
 	 * @since 1.1
 	 */
-	public boolean contains(int x, int y) {
-		return width > 0 && height > 0 && x >= this.x && x < this.x + width && y >= this.y && y < this.y + height;
+  public boolean contains(int x, int y)
+  {
+    return inside (x, y);
 	}
 
 	/**
@@ -468,8 +493,9 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @see #contains(int, int, int, int)
 	 * @since 1.1
 	 */
-	public boolean contains(Rectangle r) {
-		return width > 0 && height > 0 && r.width > 0 && r.height > 0 && r.x >= x && r.x + r.width <= x + width && r.y >= y && r.y + r.height <= y + height;
+  public boolean contains(Rectangle r)
+  {
+    return contains (r.x, r.y, r.width, r.height);
 	}
 
 	/**
@@ -483,8 +509,11 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @return true if the parameters are contained in this rectangle
 	 * @since 1.1
 	 */
-	public boolean contains(int x, int y, int w, int h) {
-		return width > 0 && height > 0 && w > 0 && h > 0 && x >= this.x && x + w <= this.x + this.width && y >= this.y && y + h <= this.y + this.height;
+  public boolean contains(int x, int y, int w, int h)
+  {
+    return width > 0 && height > 0 && w > 0 && h > 0
+      && x >= this.x && x + w <= this.x + this.width
+      && y >= this.y && y + h <= this.y + this.height;
 	}
 
 	/**
@@ -495,8 +524,11 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @return true if the point is inside the rectangle
 	 * @deprecated use {@link #contains(int, int)} instead
 	 */
-	public boolean inside(int x, int y) {
-		return contains(x, y);
+  public boolean inside(int x, int y)
+  {
+    return width > 0 && height > 0
+      && x >= this.x && x < this.x + width
+      && y >= this.y && y < this.y + height;
 	}
 
 	/**
@@ -508,8 +540,11 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @throws NullPointerException if r is null
 	 * @since 1.2
 	 */
-	public boolean intersects(Rectangle r) {
-		return width > 0 && height > 0 && r.width > 0 && r.height > 0 && r.x < x + width && r.x + r.width > x && r.y < y + height && r.y + r.height > y;
+  public boolean intersects(Rectangle r)
+  {
+    return width > 0 && height > 0 && r.width > 0 && r.height > 0
+      && r.x < x + width && r.x + r.width > x
+      && r.y < y + height && r.y + r.height > y;
 	}
 
 	/**
@@ -522,7 +557,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @return a new rectangle bounding the intersection
 	 * @throws NullPointerException if r is null
 	 */
-	public Rectangle intersection(Rectangle r) {
+  public Rectangle intersection(Rectangle r)
+  {
 		Rectangle res = new Rectangle();
 		intersect(this, r, res);
 		return res;
@@ -536,7 +572,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @return the smallest rectangle containing both rectangles
 	 * @throws NullPointerException if r is null
 	 */
-	public Rectangle union(Rectangle r) {
+  public Rectangle union(Rectangle r)
+  {
 		Rectangle res = new Rectangle();
 		union(this, r, res);
 		return res;
@@ -552,7 +589,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @param x the X coordinate of the point to add to this rectangle
 	 * @param y the Y coordinate of the point to add to this rectangle
 	 */
-	public void add(int x, int y) {
+  public void add(int x, int y)
+  {
 		add((double) x, (double) y);
 	}
 
@@ -566,7 +604,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @param p the point to add to this rectangle
 	 * @throws NullPointerException if p is null
 	 */
-	public void add(Point p) {
+  public void add(Point p)
+  {
 		add((double) p.x, (double) p.y);
 	}
 
@@ -578,7 +617,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @throws NullPointerException if r is null
 	 * @see #union(Rectangle)
 	 */
-	public void add(Rectangle r) {
+  public void add(Rectangle r)
+  {
 		union(this, r, this);
 	}
 
@@ -591,7 +631,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @param h the horizontal expansion value
 	 * @param v the vertical expansion value
 	 */
-	public void grow(int h, int v) {
+  public void grow(int h, int v)
+  {
 		x -= h;
 		y -= v;
 		width += h + h;
@@ -604,7 +645,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 *
 	 * @return true if the rectangle is empty
 	 */
-	public boolean isEmpty() {
+  public boolean isEmpty()
+  {
 		return width <= 0 || height <= 0;
 	}
 
@@ -621,7 +663,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @see #OUT_BOTTOM
 	 * @since 1.2
 	 */
-	public int outcode(double x, double y) {
+  public int outcode(double x, double y)
+  {
 		int result = 0;
 		if (width <= 0)
 			result |= OUT_LEFT | OUT_RIGHT;
@@ -649,7 +692,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @throws NullPointerException if r is null
 	 * @since 1.2
 	 */
-	public Rectangle2D createIntersection(Rectangle2D r) {
+  public Rectangle2D createIntersection(Rectangle2D r)
+  {
 		// Favor runtime type of other rectangle.
 		Rectangle2D res = r.getBounds2D();
 		intersect(this, r, res);
@@ -665,7 +709,8 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @throws NullPointerException if r is null
 	 * @since 1.2
 	 */
-	public Rectangle2D createUnion(Rectangle2D r) {
+  public Rectangle2D createUnion(Rectangle2D r)
+  {
 		// Favor runtime type of other rectangle.
 		Rectangle2D res = r.getBounds2D();
 		union(this, r, res);
@@ -680,11 +725,13 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 * @param obj the object to test against for equality
 	 * @return true if the specified object is equal to this one
 	 */
-	public boolean equals(Object obj) {
-		if (!(obj instanceof Rectangle2D))
+  public boolean equals(Object obj)
+  {
+    if (! (obj instanceof Rectangle2D))
 			return false;
 		Rectangle2D r = (Rectangle2D) obj;
-		return r.getX() == x && r.getY() == y && r.getWidth() == width && r.getHeight() == height;
+    return r.getX() == x && r.getY() == y
+      && r.getWidth() == width && r.getHeight() == height;
 	}
 
 	/**
@@ -694,7 +741,9 @@ public class Rectangle extends Rectangle2D implements Shape, Serializable {
 	 *
 	 * @return a string representation of this rectangle
 	 */
-	public String toString() {
-		return getClass().getName() + "[x=" + x + ",y=" + y + ",width=" + width + ",height=" + height + ']';
+  public String toString()
+  {
+    return getClass().getName() + "[x=" + x + ",y=" + y + ",width=" + width
+      + ",height=" + height + ']';
 	}
 } // class Rectangle

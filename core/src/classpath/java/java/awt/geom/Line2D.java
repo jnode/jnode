@@ -1,25 +1,39 @@
-/*
- * Line2D.java -- represents a line in 2-D space, plus operations on a line Copyright (C) 2000, 2001, 2002 Free Software Foundation
- * 
- * This file is part of GNU Classpath.
- * 
- * GNU Classpath is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2, or (at
- * your option) any later version.
- * 
- * GNU Classpath is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with GNU Classpath; see the file COPYING. If not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA.
- * 
- * Linking this library statically or dynamically with other modules is making a combined work based on this library. Thus, the terms and conditions of the GNU General Public License cover the whole
- * combination.
- * 
- * As a special exception, the copyright holders of this library give you permission to link this library with independent modules to produce an executable, regardless of the license terms of these
- * independent modules, and to copy and distribute the resulting executable under terms of your choice, provided that you also meet, for each linked independent module, the terms and conditions of
- * the license of that module. An independent module is a module which is not derived from or based on this library. If you modify this library, you may extend this exception to your version of the
- * library, but you are not obligated to do so. If you do not wish to do so, delete this
- */
+/* Line2D.java -- represents a line in 2-D space, plus operations on a line
+   Copyright (C) 2000, 2001, 2002 Free Software Foundation
+
+This file is part of GNU Classpath.
+
+GNU Classpath is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+GNU Classpath is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GNU Classpath; see the file COPYING.  If not, write to the
+Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+02111-1307 USA.
+
+Linking this library statically or dynamically with other modules is
+making a combined work based on this library.  Thus, the terms and
+conditions of the GNU General Public License cover the whole
+combination.
+
+As a special exception, the copyright holders of this library give you
+permission to link this library with independent modules to produce an
+executable, regardless of the license terms of these independent
+modules, and to copy and distribute the resulting executable under
+terms of your choice, provided that you also meet, for each linked
+independent module, the terms and conditions of the license of that
+module.  An independent module is a module which is not derived from
+or based on this library.  If you modify this library, you may extend
+this exception to your version of the library, but you are not
+obligated to do so.  If you do not wish to do so, delete this
+exception statement from your version. */
 
 package java.awt.geom;
 
@@ -28,19 +42,22 @@ import java.awt.Shape;
 import java.util.NoSuchElementException;
 
 /**
- * Represents a directed line bewteen two points in (x,y) Cartesian space. Remember, on-screen graphics have increasing x from left-to-right, and increasing y from top-to-bottom. The storage is left
- * to subclasses.
+ * Represents a directed line bewteen two points in (x,y) Cartesian space.
+ * Remember, on-screen graphics have increasing x from left-to-right, and
+ * increasing y from top-to-bottom. The storage is left to subclasses.
  * 
- * @author Tom Tromey
- *         <tromey@cygnus.com>
+ * @author Tom Tromey <tromey@cygnus.com>
  * @author Eric Blake <ebb9@email.byu.edu>
- * @since 1.2 @status updated to 1.4
+ * @since 1.2
+ * @status updated to 1.4
  */
-public abstract class Line2D implements Shape, Cloneable {
+public abstract class Line2D implements Shape, Cloneable
+{
 	/**
 	 * The default constructor.
 	 */
-	protected Line2D() {
+  protected Line2D()
+  {
 	}
 
 	/**
@@ -86,67 +103,64 @@ public abstract class Line2D implements Shape, Cloneable {
 	public abstract Point2D getP2();
 
 	/**
-	 * Set the coordinates of the line to the given coordinates. Loss of precision may occur due to rounding issues.
+   * Set the coordinates of the line to the given coordinates. Loss of
+   * precision may occur due to rounding issues.
 	 * 
-	 * @param x1
-	 *            the first x coordinate
-	 * @param y1
-	 *            the first y coordinate
-	 * @param x2
-	 *            the second x coordinate
-	 * @param y2
-	 *            the second y coordinate
+   * @param x1 the first x coordinate
+   * @param y1 the first y coordinate
+   * @param x2 the second x coordinate
+   * @param y2 the second y coordinate
 	 */
 	public abstract void setLine(double x1, double y1, double x2, double y2);
 
 	/**
 	 * Set the coordinates to the given points.
 	 * 
-	 * @param p1
-	 *            the first point
-	 * @param p2
-	 *            the second point
-	 * @throws NullPointerException
-	 *             if either point is null
+   * @param p1 the first point
+   * @param p2 the second point
+   * @throws NullPointerException if either point is null
 	 */
-	public void setLine(Point2D p1, Point2D p2) {
+  public void setLine(Point2D p1, Point2D p2)
+  {
 		setLine(p1.getX(), p1.getY(), p2.getX(), p2.getY());
 	}
 
 	/**
 	 * Set the coordinates to those of the given line.
 	 * 
-	 * @param l
-	 *            the line to copy
-	 * @throws NullPointerException
-	 *             if l is null
+   * @param l the line to copy
+   * @throws NullPointerException if l is null
 	 */
-	public void setLine(Line2D l) {
+  public void setLine(Line2D l)
+  {
 		setLine(l.getX1(), l.getY1(), l.getX2(), l.getY2());
 	}
 
 	/**
-	 * Computes the relative rotation direction needed to pivot the line about the first point in order to have the second point colinear with point p. Because of floating point rounding, don't
-	 * expect this to be a perfect measure of colinearity. The answer is 1 if the line has a shorter rotation in the direction of the positive X axis to the negative Y axis (counter-clockwise in the
-	 * default Java coordinate system), or -1 if the shortest rotation is in the opposite direction (clockwise). If p is already colinear, the return value is -1 if it lies beyond the first point, 0
-	 * if it lies in the segment, or 1 if it lies beyond the second point. If the first and second point are coincident, this returns 0.
-	 * 
-	 * @param x1
-	 *            the first x coordinate
-	 * @param y1
-	 *            the first y coordinate
-	 * @param x2
-	 *            the second x coordinate
-	 * @param y2
-	 *            the second y coordinate
-	 * @param px
-	 *            the reference x coordinate
-	 * @param py
-	 *            the reference y coordinate
+   * Computes the relative rotation direction needed to pivot the line about
+   * the first point in order to have the second point colinear with point p.
+   * Because of floating point rounding, don't expect this to be a perfect
+   * measure of colinearity. The answer is 1 if the line has a shorter rotation
+   * in the direction of the positive X axis to the negative Y axis
+   * (counter-clockwise in the default Java coordinate system), or -1 if the
+   * shortest rotation is in the opposite direction (clockwise). If p
+   * is already colinear, the return value is -1 if it lies beyond the first
+   * point, 0 if it lies in the segment, or 1 if it lies beyond the second
+   * point. If the first and second point are coincident, this returns 0.
+   *
+   * @param x1 the first x coordinate
+   * @param y1 the first y coordinate
+   * @param x2 the second x coordinate
+   * @param y2 the second y coordinate
+   * @param px the reference x coordinate
+   * @param py the reference y coordinate
 	 * @return the relative rotation direction
 	 */
-	public static int relativeCCW(double x1, double y1, double x2, double y2, double px, double py) {
-		if ((x1 == x2 && y1 == y2) || (x1 == px && y1 == py))
+  public static int relativeCCW(double x1, double y1, double x2, double y2,
+                                double px, double py)
+  {
+    if ((x1 == x2 && y1 == y2)
+        || (x1 == px && y1 == py))
 			return 0; // Coincident points.
 		// Translate to the origin.
 		x2 -= x1;
@@ -157,77 +171,90 @@ public abstract class Line2D implements Shape, Cloneable {
 		double slopep = py / px;
 		if (slope2 == slopep || (x2 == 0 && px == 0))
 			return y2 > 0 // Colinear.
-			? (py < 0 ? -1 : py > y2 ? 1 : 0) : (py > 0 ? -1 : py < y2 ? 1 : 0);
+        ? (py < 0 ? -1 : py > y2 ? 1 : 0)
+        : (py > 0 ? -1 : py < y2 ? 1 : 0);
 		if (x2 >= 0 && slope2 >= 0)
 			return px >= 0 // Quadrant 1.
-			? (slope2 > slopep ? 1 : -1) : (slope2 < slopep ? 1 : -1);
+        ? (slope2 > slopep ? 1 : -1)
+        : (slope2 < slopep ? 1 : -1);
 		if (y2 > 0)
 			return px < 0 // Quadrant 2.
-			? (slope2 > slopep ? 1 : -1) : (slope2 < slopep ? 1 : -1);
+        ? (slope2 > slopep ? 1 : -1)
+        : (slope2 < slopep ? 1 : -1);
 		if (slope2 >= 0.0)
 			return px >= 0 // Quadrant 3.
-			? (slope2 < slopep ? 1 : -1) : (slope2 > slopep ? 1 : -1);
+        ? (slope2 < slopep ? 1 : -1)
+        : (slope2 > slopep ? 1 : -1);
 		return px < 0 // Quadrant 4.
-		? (slope2 < slopep ? 1 : -1) : (slope2 > slopep ? 1 : -1);
+      ? (slope2 < slopep ? 1 : -1)
+      : (slope2 > slopep ? 1 : -1);
 	}
 
 	/**
-	 * Computes the relative rotation direction needed to pivot this line about the first point in order to have the second point colinear with point p. Because of floating point rounding, don't
-	 * expect this to be a perfect measure of colinearity. The answer is 1 if the line has a shorter rotation in the direction of the positive X axis to the negative Y axis (counter-clockwise in the
-	 * default Java coordinate system), or -1 if the shortest rotation is in the opposite direction (clockwise). If p is already colinear, the return value is -1 if it lies beyond the first point, 0
-	 * if it lies in the segment, or 1 if it lies beyond the second point. If the first and second point are coincident, this returns 0.
+   * Computes the relative rotation direction needed to pivot this line about
+   * the first point in order to have the second point colinear with point p.
+   * Because of floating point rounding, don't expect this to be a perfect
+   * measure of colinearity. The answer is 1 if the line has a shorter rotation
+   * in the direction of the positive X axis to the negative Y axis
+   * (counter-clockwise in the default Java coordinate system), or -1 if the
+   * shortest rotation is in the opposite direction (clockwise). If p
+   * is already colinear, the return value is -1 if it lies beyond the first
+   * point, 0 if it lies in the segment, or 1 if it lies beyond the second
+   * point. If the first and second point are coincident, this returns 0.
 	 * 
-	 * @param px
-	 *            the reference x coordinate
-	 * @param py
-	 *            the reference y coordinate
+   * @param px the reference x coordinate
+   * @param py the reference y coordinate
 	 * @return the relative rotation direction
 	 * @see #relativeCCW(double, double, double, double, double, double)
 	 */
-	public int relativeCCW(double px, double py) {
+  public int relativeCCW(double px, double py)
+  {
 		return relativeCCW(getX1(), getY1(), getX2(), getY2(), px, py);
 	}
 
 	/**
-	 * Computes the relative rotation direction needed to pivot this line about the first point in order to have the second point colinear with point p. Because of floating point rounding, don't
-	 * expect this to be a perfect measure of colinearity. The answer is 1 if the line has a shorter rotation in the direction of the positive X axis to the negative Y axis (counter-clockwise in the
-	 * default Java coordinate system), or -1 if the shortest rotation is in the opposite direction (clockwise). If p is already colinear, the return value is -1 if it lies beyond the first point, 0
-	 * if it lies in the segment, or 1 if it lies beyond the second point. If the first and second point are coincident, this returns 0.
+   * Computes the relative rotation direction needed to pivot this line about
+   * the first point in order to have the second point colinear with point p.
+   * Because of floating point rounding, don't expect this to be a perfect
+   * measure of colinearity. The answer is 1 if the line has a shorter rotation
+   * in the direction of the positive X axis to the negative Y axis
+   * (counter-clockwise in the default Java coordinate system), or -1 if the
+   * shortest rotation is in the opposite direction (clockwise). If p
+   * is already colinear, the return value is -1 if it lies beyond the first
+   * point, 0 if it lies in the segment, or 1 if it lies beyond the second
+   * point. If the first and second point are coincident, this returns 0.
 	 * 
-	 * @param p
-	 *            the reference point
+   * @param p the reference point
 	 * @return the relative rotation direction
-	 * @throws NullPointerException
-	 *             if p is null
+   * @throws NullPointerException if p is null
 	 * @see #relativeCCW(double, double, double, double, double, double)
 	 */
-	public int relativeCCW(Point2D p) {
+  public int relativeCCW(Point2D p)
+  {
 		return relativeCCW(getX1(), getY1(), getX2(), getY2(), p.getX(), p.getY());
 	}
 
 	/**
-	 * Test if the line segment (x1,y1)-&gt;(x2,y2) intersects the line segment (x3,y3)-&gt;(x4,y4).
+   * Test if the line segment (x1,y1)-&gt;(x2,y2) intersects the line segment
+   * (x3,y3)-&gt;(x4,y4).
 	 * 
-	 * @param x1
-	 *            the first x coordinate of the first segment
-	 * @param y1
-	 *            the first y coordinate of the first segment
-	 * @param x2
-	 *            the second x coordinate of the first segment
-	 * @param y2
-	 *            the second y coordinate of the first segment
-	 * @param x3
-	 *            the first x coordinate of the second segment
-	 * @param y3
-	 *            the first y coordinate of the second segment
-	 * @param x4
-	 *            the second x coordinate of the second segment
-	 * @param y4
-	 *            the second y coordinate of the second segment
+   * @param x1 the first x coordinate of the first segment
+   * @param y1 the first y coordinate of the first segment
+   * @param x2 the second x coordinate of the first segment
+   * @param y2 the second y coordinate of the first segment
+   * @param x3 the first x coordinate of the second segment
+   * @param y3 the first y coordinate of the second segment
+   * @param x4 the second x coordinate of the second segment
+   * @param y4 the second y coordinate of the second segment
 	 * @return true if the segments intersect
 	 */
-	public static boolean linesIntersect(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
-		double beta = (((y1 - y3) * (x4 - x3) + (x1 - x3) * (y4 - y3)) / ((y2 - y1) * (x4 - x3) + (x2 - x1) * (y4 - y3)));
+  public static boolean linesIntersect(double x1, double y1,
+                                       double x2, double y2,
+                                       double x3, double y3,
+                                       double x4, double y4)
+  {
+    double beta = (((y1 - y3) * (x4 - x3) + (x1 - x3) * (y4 - y3))
+                   / ((y2 - y1) * (x4 - x3) + (x2 - x1) * (y4 - y3)));
 		if (beta < 0.0 || beta > 1.0)
 			return false;
 		double alpha = (x1 + beta * (x2 - x1) - x3) / (x4 - x3);
@@ -237,73 +264,79 @@ public abstract class Line2D implements Shape, Cloneable {
 	/**
 	 * Test if this line intersects the line given by (x1,y1)-&gt;(x2,y2).
 	 * 
-	 * @param x1
-	 *            the first x coordinate of the other segment
-	 * @param y1
-	 *            the first y coordinate of the other segment
-	 * @param x2
-	 *            the second x coordinate of the other segment
-	 * @param y2
-	 *            the second y coordinate of the other segment
+   * @param x1 the first x coordinate of the other segment
+   * @param y1 the first y coordinate of the other segment
+   * @param x2 the second x coordinate of the other segment
+   * @param y2 the second y coordinate of the other segment
 	 * @return true if the segments intersect
-	 * @see #linesIntersect(double, double, double, double, double, double, double, double)
+   * @see #linesIntersect(double, double, double, double,
+   *                      double, double, double, double)
 	 */
-	public boolean intersectsLine(double x1, double y1, double x2, double y2) {
-		return linesIntersect(getX1(), getY1(), getX2(), getY2(), x1, y1, x2, y2);
+  public boolean intersectsLine(double x1, double y1, double x2, double y2)
+  {
+    return linesIntersect(getX1(), getY1(), getX2(), getY2(),
+                          x1, y1, x2, y2);
 	}
 
 	/**
 	 * Test if this line intersects the given line.
 	 * 
-	 * @param l
-	 *            the other segment
+   * @param l the other segment
 	 * @return true if the segments intersect
-	 * @throws NullPointerException
-	 *             if l is null
-	 * @see #linesIntersect(double, double, double, double, double, double, double, double)
-	 */
-	public boolean intersectsLine(Line2D l) {
-		return linesIntersect(getX1(), getY1(), getX2(), getY2(), l.getX1(), l.getY1(), l.getX2(), l.getY2());
+   * @throws NullPointerException if l is null
+   * @see #linesIntersect(double, double, double, double,
+   *                      double, double, double, double)
+   */
+  public boolean intersectsLine(Line2D l)
+  {
+    return linesIntersect(getX1(), getY1(), getX2(), getY2(),
+                          l.getX1(), l.getY1(), l.getX2(), l.getY2());
 	}
 
 	/**
-	 * Measures the square of the shortest distance from the reference point to a point on the line segment. If the point is on the segment, the result will be 0.
-	 * 
-	 * @param x1
-	 *            the first x coordinate of the segment
-	 * @param y1
-	 *            the first y coordinate of the segment
-	 * @param x2
-	 *            the second x coordinate of the segment
-	 * @param y2
-	 *            the second y coordinate of the segment
-	 * @param px
-	 *            the x coordinate of the point
-	 * @param py
-	 *            the y coordinate of the point
+   * Measures the square of the shortest distance from the reference point
+   * to a point on the line segment. If the point is on the segment, the
+   * result will be 0.
+   *
+   * @param x1 the first x coordinate of the segment
+   * @param y1 the first y coordinate of the segment
+   * @param x2 the second x coordinate of the segment
+   * @param y2 the second y coordinate of the segment
+   * @param px the x coordinate of the point
+   * @param py the y coordinate of the point
 	 * @return the square of the distance from the point to the segment
 	 * @see #ptSegDist(double, double, double, double, double, double)
 	 * @see #ptLineDistSq(double, double, double, double, double, double)
 	 */
-	public static double ptSegDistSq(double x1, double y1, double x2, double y2, double px, double py) {
+  public static double ptSegDistSq(double x1, double y1, double x2, double y2,
+                                   double px, double py)
+  {
 		double pd2 = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
 
 		double x, y;
-		if (pd2 == 0) {
+    if (pd2 == 0)
+      {
 			// Points are coincident.
 			x = x1;
 			y = y2;
-		} else {
+      }
+    else
+      {
 			double u = ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / pd2;
 
-			if (u < 0) {
+        if (u < 0)
+          {
 				// "Off the end"
 				x = x1;
 				y = y1;
-			} else if (u > 1.0) {
+          }
+        else if (u > 1.0)
+          {
 				x = x2;
 				y = y2;
-			} else {
+          }
+        else
+          {
 				x = x1 + u * (x2 - x1);
 				y = y1 + u * (y2 - y1);
 			}
@@ -313,113 +346,113 @@ public abstract class Line2D implements Shape, Cloneable {
 	}
 
 	/**
-	 * Measures the shortest distance from the reference point to a point on the line segment. If the point is on the segment, the result will be 0.
+   * Measures the shortest distance from the reference point to a point on
+   * the line segment. If the point is on the segment, the result will be 0.
 	 * 
-	 * @param x1
-	 *            the first x coordinate of the segment
-	 * @param y1
-	 *            the first y coordinate of the segment
-	 * @param x2
-	 *            the second x coordinate of the segment
-	 * @param y2
-	 *            the second y coordinate of the segment
-	 * @param px
-	 *            the x coordinate of the point
-	 * @param py
-	 *            the y coordinate of the point
+   * @param x1 the first x coordinate of the segment
+   * @param y1 the first y coordinate of the segment
+   * @param x2 the second x coordinate of the segment
+   * @param y2 the second y coordinate of the segment
+   * @param px the x coordinate of the point
+   * @param py the y coordinate of the point
 	 * @return the distance from the point to the segment
 	 * @see #ptSegDistSq(double, double, double, double, double, double)
 	 * @see #ptLineDist(double, double, double, double, double, double)
 	 */
-	public static double ptSegDist(double x1, double y1, double x2, double y2, double px, double py) {
+  public static double ptSegDist(double x1, double y1, double x2, double y2,
+                                 double px, double py)
+  {
 		return Math.sqrt(ptSegDistSq(x1, y1, x2, y2, px, py));
 	}
 
 	/**
-	 * Measures the square of the shortest distance from the reference point to a point on this line segment. If the point is on the segment, the result will be 0.
+   * Measures the square of the shortest distance from the reference point
+   * to a point on this line segment. If the point is on the segment, the
+   * result will be 0.
 	 * 
-	 * @param px
-	 *            the x coordinate of the point
-	 * @param py
-	 *            the y coordinate of the point
+   * @param px the x coordinate of the point
+   * @param py the y coordinate of the point
 	 * @return the square of the distance from the point to the segment
 	 * @see #ptSegDistSq(double, double, double, double, double, double)
 	 */
-	public double ptSegDistSq(double px, double py) {
+  public double ptSegDistSq(double px, double py)
+  {
 		return ptSegDistSq(getX1(), getY1(), getX2(), getY2(), px, py);
 	}
 
 	/**
-	 * Measures the square of the shortest distance from the reference point to a point on this line segment. If the point is on the segment, the result will be 0.
+   * Measures the square of the shortest distance from the reference point
+   * to a point on this line segment. If the point is on the segment, the
+   * result will be 0.
 	 * 
-	 * @param p
-	 *            the point
+   * @param p the point
 	 * @return the square of the distance from the point to the segment
-	 * @throws NullPointerException
-	 *             if p is null
+   * @throws NullPointerException if p is null
 	 * @see #ptSegDistSq(double, double, double, double, double, double)
 	 */
-	public double ptSegDistSq(Point2D p) {
+  public double ptSegDistSq(Point2D p)
+  {
 		return ptSegDistSq(getX1(), getY1(), getX2(), getY2(), p.getX(), p.getY());
 	}
 
 	/**
-	 * Measures the shortest distance from the reference point to a point on this line segment. If the point is on the segment, the result will be 0.
+   * Measures the shortest distance from the reference point to a point on
+   * this line segment. If the point is on the segment, the result will be 0.
 	 * 
-	 * @param px
-	 *            the x coordinate of the point
-	 * @param py
-	 *            the y coordinate of the point
+   * @param px the x coordinate of the point
+   * @param py the y coordinate of the point
 	 * @return the distance from the point to the segment
 	 * @see #ptSegDist(double, double, double, double, double, double)
 	 */
-	public double ptSegDist(double px, double py) {
+  public double ptSegDist(double px, double py)
+  {
 		return ptSegDist(getX1(), getY1(), getX2(), getY2(), px, py);
 	}
 
 	/**
-	 * Measures the shortest distance from the reference point to a point on this line segment. If the point is on the segment, the result will be 0.
+   * Measures the shortest distance from the reference point to a point on
+   * this line segment. If the point is on the segment, the result will be 0.
 	 * 
-	 * @param p
-	 *            the point
+   * @param p the point
 	 * @return the distance from the point to the segment
-	 * @throws NullPointerException
-	 *             if p is null
+   * @throws NullPointerException if p is null
 	 * @see #ptSegDist(double, double, double, double, double, double)
 	 */
-	public double ptSegDist(Point2D p) {
+  public double ptSegDist(Point2D p)
+  {
 		return ptSegDist(getX1(), getY1(), getX2(), getY2(), p.getX(), p.getY());
 	}
 
 	/**
-	 * Measures the square of the shortest distance from the reference point to a point on the infinite line extended from the segment. If the point is on the segment, the result will be 0. If the
-	 * segment is length 0, the distance is to the common endpoint.
-	 * 
-	 * @param x1
-	 *            the first x coordinate of the segment
-	 * @param y1
-	 *            the first y coordinate of the segment
-	 * @param x2
-	 *            the second x coordinate of the segment
-	 * @param y2
-	 *            the second y coordinate of the segment
-	 * @param px
-	 *            the x coordinate of the point
-	 * @param py
-	 *            the y coordinate of the point
+   * Measures the square of the shortest distance from the reference point
+   * to a point on the infinite line extended from the segment. If the point
+   * is on the segment, the result will be 0. If the segment is length 0,
+   * the distance is to the common endpoint.
+   *
+   * @param x1 the first x coordinate of the segment
+   * @param y1 the first y coordinate of the segment
+   * @param x2 the second x coordinate of the segment
+   * @param y2 the second y coordinate of the segment
+   * @param px the x coordinate of the point
+   * @param py the y coordinate of the point
 	 * @return the square of the distance from the point to the extended line
 	 * @see #ptLineDist(double, double, double, double, double, double)
 	 * @see #ptSegDistSq(double, double, double, double, double, double)
 	 */
-	public static double ptLineDistSq(double x1, double y1, double x2, double y2, double px, double py) {
+  public static double ptLineDistSq(double x1, double y1, double x2, double y2,
+                                    double px, double py)
+  {
 		double pd2 = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
 
 		double x, y;
-		if (pd2 == 0) {
+    if (pd2 == 0)
+      {
 			// Points are coincident.
 			x = x1;
 			y = y2;
-		} else {
+      }
+    else
+      {
 			double u = ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / pd2;
 			x = x1 + u * (x2 - x1);
 			y = y1 + u * (y2 - y1);
@@ -429,127 +462,129 @@ public abstract class Line2D implements Shape, Cloneable {
 	}
 
 	/**
-	 * Measures the shortest distance from the reference point to a point on the infinite line extended from the segment. If the point is on the segment, the result will be 0. If the segment is
-	 * length 0, the distance is to the common endpoint.
-	 * 
-	 * @param x1
-	 *            the first x coordinate of the segment
-	 * @param y1
-	 *            the first y coordinate of the segment
-	 * @param x2
-	 *            the second x coordinate of the segment
-	 * @param y2
-	 *            the second y coordinate of the segment
-	 * @param px
-	 *            the x coordinate of the point
-	 * @param py
-	 *            the y coordinate of the point
+   * Measures the shortest distance from the reference point to a point on
+   * the infinite line extended from the segment. If the point is on the
+   * segment, the result will be 0. If the segment is length 0, the distance
+   * is to the common endpoint.
+   *
+   * @param x1 the first x coordinate of the segment
+   * @param y1 the first y coordinate of the segment
+   * @param x2 the second x coordinate of the segment
+   * @param y2 the second y coordinate of the segment
+   * @param px the x coordinate of the point
+   * @param py the y coordinate of the point
 	 * @return the distance from the point to the extended line
 	 * @see #ptLineDistSq(double, double, double, double, double, double)
 	 * @see #ptSegDist(double, double, double, double, double, double)
 	 */
-	public static double ptLineDist(double x1, double y1, double x2, double y2, double px, double py) {
+  public static double ptLineDist(double x1, double y1,
+                                   double x2, double y2,
+                                   double px, double py)
+  {
 		return Math.sqrt(ptLineDistSq(x1, y1, x2, y2, px, py));
 	}
 
 	/**
-	 * Measures the square of the shortest distance from the reference point to a point on the infinite line extended from this segment. If the point is on the segment, the result will be 0. If the
-	 * segment is length 0, the distance is to the common endpoint.
+   * Measures the square of the shortest distance from the reference point
+   * to a point on the infinite line extended from this segment. If the point
+   * is on the segment, the result will be 0. If the segment is length 0,
+   * the distance is to the common endpoint.
 	 * 
-	 * @param px
-	 *            the x coordinate of the point
-	 * @param py
-	 *            the y coordinate of the point
+   * @param px the x coordinate of the point
+   * @param py the y coordinate of the point
 	 * @return the square of the distance from the point to the extended line
 	 * @see #ptLineDistSq(double, double, double, double, double, double)
 	 */
-	public double ptLineDistSq(double px, double py) {
+  public double ptLineDistSq(double px, double py)
+  {
 		return ptLineDistSq(getX1(), getY1(), getX2(), getY2(), px, py);
 	}
 
 	/**
-	 * Measures the square of the shortest distance from the reference point to a point on the infinite line extended from this segment. If the point is on the segment, the result will be 0. If the
-	 * segment is length 0, the distance is to the common endpoint.
+   * Measures the square of the shortest distance from the reference point
+   * to a point on the infinite line extended from this segment. If the point
+   * is on the segment, the result will be 0. If the segment is length 0,
+   * the distance is to the common endpoint.
 	 * 
-	 * @param p
-	 *            the point
+   * @param p the point
 	 * @return the square of the distance from the point to the extended line
-	 * @throws NullPointerException
-	 *             if p is null
+   * @throws NullPointerException if p is null
 	 * @see #ptLineDistSq(double, double, double, double, double, double)
 	 */
-	public double ptLineDistSq(Point2D p) {
-		return ptLineDistSq(getX1(), getY1(), getX2(), getY2(), p.getX(), p.getY());
+  public double ptLineDistSq(Point2D p)
+  {
+    return ptLineDistSq(getX1(), getY1(), getX2(), getY2(),
+                        p.getX(), p.getY());
 	}
 
 	/**
-	 * Measures the shortest distance from the reference point to a point on the infinite line extended from this segment. If the point is on the segment, the result will be 0. If the segment is
-	 * length 0, the distance is to the common endpoint.
+   * Measures the shortest distance from the reference point to a point on
+   * the infinite line extended from this segment. If the point is on the
+   * segment, the result will be 0. If the segment is length 0, the distance
+   * is to the common endpoint.
 	 * 
-	 * @param px
-	 *            the x coordinate of the point
-	 * @param py
-	 *            the y coordinate of the point
+   * @param px the x coordinate of the point
+   * @param py the y coordinate of the point
 	 * @return the distance from the point to the extended line
 	 * @see #ptLineDist(double, double, double, double, double, double)
 	 */
-	public double ptLineDist(double px, double py) {
+  public double ptLineDist(double px, double py)
+  {
 		return ptLineDist(getX1(), getY1(), getX2(), getY2(), px, py);
 	}
 
 	/**
-	 * Measures the shortest distance from the reference point to a point on the infinite line extended from this segment. If the point is on the segment, the result will be 0. If the segment is
-	 * length 0, the distance is to the common endpoint.
+   * Measures the shortest distance from the reference point to a point on
+   * the infinite line extended from this segment. If the point is on the
+   * segment, the result will be 0. If the segment is length 0, the distance
+   * is to the common endpoint.
 	 * 
-	 * @param p
-	 *            the point
+   * @param p the point
 	 * @return the distance from the point to the extended line
-	 * @throws NullPointerException
-	 *             if p is null
+   * @throws NullPointerException if p is null
 	 * @see #ptLineDist(double, double, double, double, double, double)
 	 */
-	public double ptLineDist(Point2D p) {
+  public double ptLineDist(Point2D p)
+  {
 		return ptLineDist(getX1(), getY1(), getX2(), getY2(), p.getX(), p.getY());
 	}
 
 	/**
-	 * Test if a point is contained inside the line. Since a line has no area, this returns false.
+   * Test if a point is contained inside the line. Since a line has no area,
+   * this returns false.
 	 * 
-	 * @param x
-	 *            the x coordinate
-	 * @param y
-	 *            the y coordinate
+   * @param x the x coordinate
+   * @param y the y coordinate
 	 * @return false; the line does not contain points
 	 */
-	public boolean contains(double x, double y) {
+  public boolean contains(double x, double y)
+  {
 		return false;
 	}
 
 	/**
-	 * Test if a point is contained inside the line. Since a line has no area, this returns false.
+   * Test if a point is contained inside the line. Since a line has no area,
+   * this returns false.
 	 * 
-	 * @param p
-	 *            the point
+   * @param p the point
 	 * @return false; the line does not contain points
 	 */
-	public boolean contains(Point2D p) {
+  public boolean contains(Point2D p)
+  {
 		return false;
 	}
 
 	/**
 	 * Tests if this line intersects the interior of the specified rectangle.
 	 * 
-	 * @param x
-	 *            the x coordinate of the rectangle
-	 * @param y
-	 *            the y coordinate of the rectangle
-	 * @param w
-	 *            the width of the rectangle
-	 * @param h
-	 *            the height of the rectangle
+   * @param x the x coordinate of the rectangle
+   * @param y the y coordinate of the rectangle
+   * @param w the width of the rectangle
+   * @param h the height of the rectangle
 	 * @return true if the line intersects the rectangle
 	 */
-	public boolean intersects(double x, double y, double w, double h) {
+  public boolean intersects(double x, double y, double w, double h)
+  {
 		if (w <= 0 || h <= 0)
 			return false;
 		double x1 = getX1();
@@ -565,8 +600,7 @@ public abstract class Line2D implements Shape, Cloneable {
 		double x3 = x + w;
 		double y3 = y + h;
 
-		return (
-			linesIntersect(x1, y1, x2, y2, x, y, x, y3)
+    return (linesIntersect(x1, y1, x2, y2, x, y, x, y3)
 				|| linesIntersect(x1, y1, x2, y2, x, y3, x3, y3)
 				|| linesIntersect(x1, y1, x2, y2, x3, y3, x3, y)
 				|| linesIntersect(x1, y1, x2, y2, x3, y, x, y));
@@ -575,41 +609,39 @@ public abstract class Line2D implements Shape, Cloneable {
 	/**
 	 * Tests if this line intersects the interior of the specified rectangle.
 	 * 
-	 * @param r
-	 *            the rectangle
+   * @param r the rectangle
 	 * @return true if the line intersects the rectangle
-	 * @throws NullPointerException
-	 *             if r is null
+   * @throws NullPointerException if r is null
 	 */
-	public boolean intersects(Rectangle2D r) {
+  public boolean intersects(Rectangle2D r)
+  {
 		return intersects(r.getX(), r.getY(), r.getWidth(), r.getHeight());
 	}
 
 	/**
-	 * Tests if the line contains a rectangle. Since lines have no area, this always returns false.
+   * Tests if the line contains a rectangle. Since lines have no area, this
+   * always returns false.
 	 * 
-	 * @param x
-	 *            the x coordinate of the rectangle
-	 * @param y
-	 *            the y coordinate of the rectangle
-	 * @param w
-	 *            the width of the rectangle
-	 * @param h
-	 *            the height of the rectangle
+   * @param x the x coordinate of the rectangle
+   * @param y the y coordinate of the rectangle
+   * @param w the width of the rectangle
+   * @param h the height of the rectangle
 	 * @return false; the line does not contain points
 	 */
-	public boolean contains(double x, double y, double w, double h) {
+  public boolean contains(double x, double y, double w, double h)
+  {
 		return false;
 	}
 
 	/**
-	 * Tests if the line contains a rectangle. Since lines have no area, this always returns false.
+   * Tests if the line contains a rectangle. Since lines have no area, this
+   * always returns false.
 	 * 
-	 * @param r
-	 *            the rectangle
+   * @param r the rectangle
 	 * @return false; the line does not contain points
 	 */
-	public boolean contains(Rectangle2D r) {
+  public boolean contains(Rectangle2D r)
+  {
 		return false;
 	}
 
@@ -619,48 +651,56 @@ public abstract class Line2D implements Shape, Cloneable {
 	 * @return the integer bounding box
 	 * @see #getBounds2D()
 	 */
-	public Rectangle getBounds() {
+  public Rectangle getBounds()
+  {
 		return getBounds2D().getBounds();
 	}
 
 	/**
-	 * Return a path iterator, possibly applying a transform on the result. This iterator is not threadsafe.
+   * Return a path iterator, possibly applying a transform on the result. This
+   * iterator is not threadsafe.
 	 * 
-	 * @param at
-	 *            the transform, or null
+   * @param at the transform, or null
 	 * @return a new path iterator
 	 */
-	public PathIterator getPathIterator(final AffineTransform at) {
-		return new PathIterator() {
+  public PathIterator getPathIterator(final AffineTransform at)
+  {
+    return new PathIterator()
+    {
 			/** Current coordinate. */
-			private int current;
+      private int current = 0;
 
-			public int getWindingRule() {
+      public int getWindingRule()
+      {
 				return WIND_NON_ZERO;
 			}
 
-			public boolean isDone() {
+      public boolean isDone()
+      {
 				return current >= 2;
 			}
 
-			public void next() {
+      public void next()
+      {
 				current++;
 			}
 
-			public int currentSegment(float[] coords) {
+      public int currentSegment(float[] coords)
+      {
 				int result;
-				switch (current) {
-					case 0 :
+        switch (current)
+          {
+          case 0:
 						coords[0] = (float) getX1();
 						coords[1] = (float) getY1();
 						result = SEG_MOVETO;
 						break;
-					case 1 :
+          case 1:
 						coords[0] = (float) getX2();
 						coords[1] = (float) getY2();
 						result = SEG_LINETO;
 						break;
-					default :
+          default:
 						throw new NoSuchElementException("line iterator out of bounds");
 				}
 				if (at != null)
@@ -668,20 +708,22 @@ public abstract class Line2D implements Shape, Cloneable {
 				return result;
 			}
 
-			public int currentSegment(double[] coords) {
+      public int currentSegment(double[] coords)
+      {
 				int result;
-				switch (current) {
-					case 0 :
+        switch (current)
+          {
+          case 0:
 						coords[0] = getX1();
 						coords[1] = getY1();
 						result = SEG_MOVETO;
 						break;
-					case 1 :
+          case 1:
 						coords[0] = getX2();
 						coords[1] = getY2();
 						result = SEG_LINETO;
 						break;
-					default :
+          default:
 						throw new NoSuchElementException("line iterator out of bounds");
 				}
 				if (at != null)
@@ -692,33 +734,37 @@ public abstract class Line2D implements Shape, Cloneable {
 	}
 
 	/**
-	 * Return a flat path iterator, possibly applying a transform on the result. This iterator is not threadsafe.
+   * Return a flat path iterator, possibly applying a transform on the result.
+   * This iterator is not threadsafe.
 	 * 
-	 * @param at
-	 *            the transform, or null
-	 * @param flatness
-	 *            ignored, since lines are already flat
+   * @param at the transform, or null
+   * @param flatness ignored, since lines are already flat
 	 * @return a new path iterator
 	 * @see #getPathIterator(AffineTransform)
 	 */
-	public PathIterator getPathIterator(AffineTransform at, double flatness) {
+  public PathIterator getPathIterator(AffineTransform at, double flatness)
+  {
 		return getPathIterator(at);
 	}
 
 	/**
-	 * Create a new line of the same run-time type with the same contents as this one.
+   * Create a new line of the same run-time type with the same contents as
+   * this one.
 	 * 
 	 * @return the clone
 	 * 
-	 * @exception OutOfMemoryError
-	 *                If there is not enough memory available.
+   * @exception OutOfMemoryError If there is not enough memory available.
 	 * 
 	 * @since 1.2
 	 */
-	public Object clone() {
-		try {
+  public Object clone()
+  {
+    try
+      {
 			return super.clone();
-		} catch (CloneNotSupportedException e) {
+      }
+    catch (CloneNotSupportedException e)
+      {
 			throw (Error) new InternalError().initCause(e); // Impossible
 		}
 	}
@@ -727,9 +773,11 @@ public abstract class Line2D implements Shape, Cloneable {
 	 * This class defines a point in <code>double</code> precision.
 	 * 
 	 * @author Eric Blake <ebb9@email.byu.edu>
-	 * @since 1.2 @status updated to 1.4
+   * @since 1.2
+   * @status updated to 1.4
 	 */
-	public static class Double extends Line2D {
+  public static class Double extends Line2D
+  {
 		/** The x coordinate of the first point. */
 		public double x1;
 
@@ -745,22 +793,20 @@ public abstract class Line2D implements Shape, Cloneable {
 		/**
 		 * Construct the line segment (0,0)-&gt;(0,0).
 		 */
-		public Double() {
+    public Double()
+    {
 		}
 
 		/**
 		 * Construct the line segment with the specified points.
 		 * 
-		 * @param x1
-		 *            the x coordinate of the first point
-		 * @param y1
-		 *            the y coordinate of the first point
-		 * @param x2
-		 *            the x coordinate of the second point
-		 * @param y2
-		 *            the y coordinate of the second point
+     * @param x1 the x coordinate of the first point
+     * @param y1 the y coordinate of the first point
+     * @param x2 the x coordinate of the second point
+     * @param y2 the y coordinate of the second point
 		 */
-		public Double(double x1, double y1, double x2, double y2) {
+    public Double(double x1, double y1, double x2, double y2)
+    {
 			this.x1 = x1;
 			this.y1 = y1;
 			this.x2 = x2;
@@ -770,14 +816,12 @@ public abstract class Line2D implements Shape, Cloneable {
 		/**
 		 * Construct the line segment with the specified points.
 		 * 
-		 * @param p1
-		 *            the first point
-		 * @param p2
-		 *            the second point
-		 * @throws NullPointerException
-		 *             if either point is null
+     * @param p1 the first point
+     * @param p2 the second point
+     * @throws NullPointerException if either point is null
 		 */
-		public Double(Point2D p1, Point2D p2) {
+    public Double(Point2D p1, Point2D p2)
+    {
 			x1 = p1.getX();
 			y1 = p1.getY();
 			x2 = p2.getX();
@@ -789,7 +833,8 @@ public abstract class Line2D implements Shape, Cloneable {
 		 * 
 		 * @return the value of x1
 		 */
-		public double getX1() {
+    public double getX1()
+    {
 			return x1;
 		}
 
@@ -798,7 +843,8 @@ public abstract class Line2D implements Shape, Cloneable {
 		 * 
 		 * @return the value of y1
 		 */
-		public double getY1() {
+    public double getY1()
+    {
 			return y1;
 		}
 
@@ -807,7 +853,8 @@ public abstract class Line2D implements Shape, Cloneable {
 		 * 
 		 * @return the point (x1,y1)
 		 */
-		public Point2D getP1() {
+    public Point2D getP1()
+    {
 			return new Point2D.Double(x1, y1);
 		}
 
@@ -816,7 +863,8 @@ public abstract class Line2D implements Shape, Cloneable {
 		 * 
 		 * @return the value of x2
 		 */
-		public double getX2() {
+    public double getX2()
+    {
 			return x2;
 		}
 
@@ -825,7 +873,8 @@ public abstract class Line2D implements Shape, Cloneable {
 		 * 
 		 * @return the value of y2
 		 */
-		public double getY2() {
+    public double getY2()
+    {
 			return y2;
 		}
 
@@ -834,23 +883,21 @@ public abstract class Line2D implements Shape, Cloneable {
 		 * 
 		 * @return the point (x2,y2)
 		 */
-		public Point2D getP2() {
+    public Point2D getP2()
+    {
 			return new Point2D.Double(x2, y2);
 		}
 
 		/**
 		 * Set this line to the given points.
 		 * 
-		 * @param x1
-		 *            the new x coordinate of the first point
-		 * @param y1
-		 *            the new y coordinate of the first point
-		 * @param x2
-		 *            the new x coordinate of the second point
-		 * @param y2
-		 *            the new y coordinate of the second point
+     * @param x1 the new x coordinate of the first point
+     * @param y1 the new y coordinate of the first point
+     * @param x2 the new x coordinate of the second point
+     * @param y2 the new y coordinate of the second point
 		 */
-		public void setLine(double x1, double y1, double x2, double y2) {
+    public void setLine(double x1, double y1, double x2, double y2)
+    {
 			this.x1 = x1;
 			this.y1 = y1;
 			this.x2 = x2;
@@ -862,7 +909,8 @@ public abstract class Line2D implements Shape, Cloneable {
 		 * 
 		 * @return the bounding box
 		 */
-		public Rectangle2D getBounds2D() {
+    public Rectangle2D getBounds2D()
+    {
 			double x = Math.min(x1, x2);
 			double y = Math.min(y1, y2);
 			double w = Math.abs(x1 - x2);
@@ -875,9 +923,11 @@ public abstract class Line2D implements Shape, Cloneable {
 	 * This class defines a point in <code>float</code> precision.
 	 * 
 	 * @author Eric Blake <ebb9@email.byu.edu>
-	 * @since 1.2 @status updated to 1.4
+   * @since 1.2
+   * @status updated to 1.4
 	 */
-	public static class Float extends Line2D {
+  public static class Float extends Line2D
+  {
 		/** The x coordinate of the first point. */
 		public float x1;
 
@@ -893,22 +943,20 @@ public abstract class Line2D implements Shape, Cloneable {
 		/**
 		 * Construct the line segment (0,0)-&gt;(0,0).
 		 */
-		public Float() {
+    public Float()
+    {
 		}
 
 		/**
 		 * Construct the line segment with the specified points.
 		 * 
-		 * @param x1
-		 *            the x coordinate of the first point
-		 * @param y1
-		 *            the y coordinate of the first point
-		 * @param x2
-		 *            the x coordinate of the second point
-		 * @param y2
-		 *            the y coordinate of the second point
+     * @param x1 the x coordinate of the first point
+     * @param y1 the y coordinate of the first point
+     * @param x2 the x coordinate of the second point
+     * @param y2 the y coordinate of the second point
 		 */
-		public Float(float x1, float y1, float x2, float y2) {
+    public Float(float x1, float y1, float x2, float y2)
+    {
 			this.x1 = x1;
 			this.y1 = y1;
 			this.x2 = x2;
@@ -918,14 +966,12 @@ public abstract class Line2D implements Shape, Cloneable {
 		/**
 		 * Construct the line segment with the specified points.
 		 * 
-		 * @param p1
-		 *            the first point
-		 * @param p2
-		 *            the second point
-		 * @throws NullPointerException
-		 *             if either point is null
+     * @param p1 the first point
+     * @param p2 the second point
+     * @throws NullPointerException if either point is null
 		 */
-		public Float(Point2D p1, Point2D p2) {
+    public Float(Point2D p1, Point2D p2)
+    {
 			x1 = (float) p1.getX();
 			y1 = (float) p1.getY();
 			x2 = (float) p2.getX();
@@ -937,7 +983,8 @@ public abstract class Line2D implements Shape, Cloneable {
 		 * 
 		 * @return the value of x1
 		 */
-		public double getX1() {
+    public double getX1()
+    {
 			return x1;
 		}
 
@@ -946,7 +993,8 @@ public abstract class Line2D implements Shape, Cloneable {
 		 * 
 		 * @return the value of y1
 		 */
-		public double getY1() {
+    public double getY1()
+    {
 			return y1;
 		}
 
@@ -955,7 +1003,8 @@ public abstract class Line2D implements Shape, Cloneable {
 		 * 
 		 * @return the point (x1,y1)
 		 */
-		public Point2D getP1() {
+    public Point2D getP1()
+    {
 			return new Point2D.Float(x1, y1);
 		}
 
@@ -964,7 +1013,8 @@ public abstract class Line2D implements Shape, Cloneable {
 		 * 
 		 * @return the value of x2
 		 */
-		public double getX2() {
+    public double getX2()
+    {
 			return x2;
 		}
 
@@ -973,7 +1023,8 @@ public abstract class Line2D implements Shape, Cloneable {
 		 * 
 		 * @return the value of y2
 		 */
-		public double getY2() {
+    public double getY2()
+    {
 			return y2;
 		}
 
@@ -982,23 +1033,21 @@ public abstract class Line2D implements Shape, Cloneable {
 		 * 
 		 * @return the point (x2,y2)
 		 */
-		public Point2D getP2() {
+    public Point2D getP2()
+    {
 			return new Point2D.Float(x2, y2);
 		}
 
 		/**
 		 * Set this line to the given points.
 		 * 
-		 * @param x1
-		 *            the new x coordinate of the first point
-		 * @param y1
-		 *            the new y coordinate of the first point
-		 * @param x2
-		 *            the new x coordinate of the second point
-		 * @param y2
-		 *            the new y coordinate of the second point
+     * @param x1 the new x coordinate of the first point
+     * @param y1 the new y coordinate of the first point
+     * @param x2 the new x coordinate of the second point
+     * @param y2 the new y coordinate of the second point
 		 */
-		public void setLine(double x1, double y1, double x2, double y2) {
+    public void setLine(double x1, double y1, double x2, double y2)
+    {
 			this.x1 = (float) x1;
 			this.y1 = (float) y1;
 			this.x2 = (float) x2;
@@ -1008,16 +1057,13 @@ public abstract class Line2D implements Shape, Cloneable {
 		/**
 		 * Set this line to the given points.
 		 * 
-		 * @param x1
-		 *            the new x coordinate of the first point
-		 * @param y1
-		 *            the new y coordinate of the first point
-		 * @param x2
-		 *            the new x coordinate of the second point
-		 * @param y2
-		 *            the new y coordinate of the second point
+     * @param x1 the new x coordinate of the first point
+     * @param y1 the new y coordinate of the first point
+     * @param x2 the new x coordinate of the second point
+     * @param y2 the new y coordinate of the second point
 		 */
-		public void setLine(float x1, float y1, float x2, float y2) {
+    public void setLine(float x1, float y1, float x2, float y2)
+    {
 			this.x1 = x1;
 			this.y1 = y1;
 			this.x2 = x2;
@@ -1029,7 +1075,8 @@ public abstract class Line2D implements Shape, Cloneable {
 		 * 
 		 * @return the bounding box
 		 */
-		public Rectangle2D getBounds2D() {
+    public Rectangle2D getBounds2D()
+    {
 			float x = Math.min(x1, x2);
 			float y = Math.min(y1, y2);
 			float w = Math.abs(x1 - x2);

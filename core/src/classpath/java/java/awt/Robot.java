@@ -40,71 +40,108 @@ package java.awt;
 
 import java.awt.image.BufferedImage;
 
+/**
+ * @since 1.3
+ */
 /** STUB CLASS ONLY */
 public class Robot
 {
+  private GraphicsDevice screen;
   private boolean waitForIdle;
   private int autoDelay;
+  
+  /**
+   * Creates a <code>Robot</code> object.
+   * 
+   * @exception AWTException If GraphicsEnvironment.isHeadless() returns true.
+   * @exception SecurityException If createRobot permission is not granted.
+   */
   public Robot() throws AWTException
   {
     throw new Error("not implemented");
   }
+
+  /**
+   * Creates a <code>Robot</code> object.
+   * 
+   * @exception AWTException If GraphicsEnvironment.isHeadless() returns true.
+   * @exception IllegalArgumentException If <code>screen</code> is not a screen
+   * GraphicsDevice.
+   * @exception SecurityException If createRobot permission is not granted.
+   */
   public Robot(GraphicsDevice screen) throws AWTException
   {
     this();
+    this.screen = screen;
   }
+
   public void mouseMove(int x, int y)
   {
   }
+
   public void mousePress(int buttons)
   {
   }
+
   public void mouseRelease(int buttons)
   {
   }
+
   public void mouseWheel(int wheelAmt)
   {
   }
+
   public void keyPress(int keycode)
   {
   }
+
   public void keyRelease(int keycode)
   {
   }
+  
   public Color getPixelColor(int x, int y)
   {
     return null;
   }
+
   public BufferedImage createScreenCapture(Rectangle screen)
   {
     return null;
   }
+  
   public boolean isAutoWaitForIdle()
   {
     return waitForIdle;
   }
+  
   public void setAutoWaitForIdle(boolean value)
   {
     waitForIdle = value;
   }
+  
   public int getAutoDelay()
   {
     return autoDelay;
   }
+  
   public void setAutoDelay(int ms)
   {
     if (ms < 0 || ms > 60000)
       throw new IllegalArgumentException();
+    
     autoDelay = ms;
   }
+
   public void delay(int ms)
   {
     if (ms < 0 || ms > 60000)
       throw new IllegalArgumentException();
   }
+
   public void waitForIdle()
   {
   }
+
   public String toString()
   {
     return "unimplemented";

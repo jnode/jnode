@@ -1,5 +1,5 @@
 /* Menu.java -- A Java AWT Menu
-   Copyright (C) 1999, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,70 +35,75 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt;
 
 import java.awt.peer.MenuPeer;
 import java.io.Serializable;
 import java.util.Vector;
+import java.util.Enumeration;
 
 /**
   * This class represents a pull down or tear off menu in Java's AWT.
   *
   * @author Aaron M. Renn (arenn@urbanophile.com)
   */
-public class Menu extends MenuItem implements MenuContainer, Serializable {
+public class Menu extends MenuItem implements MenuContainer, Serializable
+{
 
-	/*
+/*
 	 * Static Variables
 	 */
 
-	// Serialization Constant
-	private static final long serialVersionUID = -8809584163345499784L;
+// Serialization Constant
+private static final long serialVersionUID = -8809584163345499784L;
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/*
+/*
 	 * Instance Variables
 	 */
 
-	/**
+/**
 	  * @serial The actual items in the menu
 	  */
-	private Vector items = new Vector();
+private Vector items = new Vector();
 
-	/**
+/**
 	  * @serial Flag indicating whether or not this menu is a tear off
 	  */
-	private boolean isTearOff;
+private boolean isTearOff;
 
-	/**
+/**
 	  * @serial Indicates whether or not this is a help menu.
 	  */
-	private boolean isHelpMenu;
+private boolean isHelpMenu;
 
-	// From the serialization spec.  FIXME: what should it be?
-	private int menuSerializedDataVersion;
+// From the serialization spec.  FIXME: what should it be?
+private int menuSerializedDataVersion;
 
-	static final MenuItem separator = new MenuItem("-");
+static final String separatorLabel = "-";
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/*
+/*
 	 * Constructors
 	 */
 
-	/**
+/**
 	  * Initializes a new instance of <code>Menu</code> with no label and that
 	  * is not a tearoff;
 	  *
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless() is true.
 	  */
-	public Menu() {
-	}
+public
+Menu()
+{
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Initializes a new instance of <code>Menu</code> that is not a tearoff and
 	  * that has the specified label.
 	  *
@@ -106,13 +111,15 @@ public class Menu extends MenuItem implements MenuContainer, Serializable {
 	  *
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless() is true.
 	  */
-	public Menu(String label) {
+public
+Menu(String label)
+{
 		this(label, false);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Initializes a new instance of <code>Menu</code> with the specified
 	  * label and tearoff status.
 	  *
@@ -122,7 +129,9 @@ public class Menu extends MenuItem implements MenuContainer, Serializable {
 	  *
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless() is true.
 	  */
-	public Menu(String label, boolean isTearOff) {
+public
+Menu(String label, boolean isTearOff)
+{
 		super(label);
 
 		this.isTearOff = isTearOff;
@@ -131,65 +140,70 @@ public class Menu extends MenuItem implements MenuContainer, Serializable {
 			isHelpMenu = true;
 
 		if (GraphicsEnvironment.isHeadless())
-			throw new HeadlessException();
-	}
+    throw new HeadlessException ();
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/*
+/*
 	 * Instance Methods
 	 */
 
-	/**
+/**
 	  * Tests whether or not this menu is a tearoff.
 	  *
 	  * @return <code>true</code> if this menu is a tearoff, <code>false</code>
 	  * otherwise.
 	  */
-	public boolean isTearOff() {
-		return (isTearOff);
-	}
+public boolean
+isTearOff()
+{
+  return(isTearOff);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the number of items in this menu.
 	  *
 	  * @return The number of items in this menu.
 	  */
-	public int getItemCount() {
-		return (items.size());
-	}
+public int
+getItemCount()
+{
+  return countItems ();
+}
 
-	/*************************************************************************/
-
-	/**
+/**
 	  * Returns the number of items in this menu.
 	  *
 	  * @return The number of items in this menu.
 	  *
-	  * @deprecated This method is deprecated in favor of <code>getItemCount()</code>.
+ * @deprecated As of JDK 1.1, replaced by getItemCount().
 	  */
-	public int count() {
-		return (items.size());
-	}
+public int countItems ()
+{
+  return items.size ();
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the item at the specified index.
 	  *
 	  * @return The item at the specified index.
 	  *
 	  * @exception ArrayIndexOutOfBoundsException If the index value is not valid.
 	  */
-	public MenuItem getItem(int index) {
-		return ((MenuItem) items.elementAt(index));
-	}
+public MenuItem
+getItem(int index)
+{
+  return((MenuItem)items.elementAt(index));
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Adds the specified item to this menu.  If it was previously part of
 	  * another menu, it is first removed from that menu.
 	  *
@@ -197,35 +211,41 @@ public class Menu extends MenuItem implements MenuContainer, Serializable {
 	  *
 	  * @return The item that was added.
 	  */
-	public MenuItem add(MenuItem item) {
+public MenuItem
+add(MenuItem item)
+{
 		items.addElement(item);
-		if (item.parent != null) {
+  if (item.parent != null)
+    {
 			item.parent.remove(item);
 		}
 		item.parent = this;
 
-		if (peer != null) {
+  if (peer != null)
+    {
 			MenuPeer mp = (MenuPeer) peer;
 			mp.addItem(item);
 		}
 
 		return item;
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Add an item with the specified label to this menu.
 	  *
 	  * @param label The label of the menu item to add.
 	  */
-	public void add(String label) {
+public void
+add(String label)
+{
 		add(new MenuItem(label));
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Inserts the specified menu item into this menu at the specified index.
 	  *
 	  * @param item The menu item to add.
@@ -236,21 +256,23 @@ public class Menu extends MenuItem implements MenuContainer, Serializable {
 	  * @exception IllegalArgumentException If the index is less than zero.
 	  * @exception ArrayIndexOutOfBoundsException If the index is otherwise invalid.
 	  */
-	public void insert(MenuItem item, int index) {
+public void
+insert(MenuItem item, int index)
+{
 		if (index < 0)
 			throw new IllegalArgumentException("Index is less than zero");
 
 		items.insertElementAt(item, index);
 
-		MenuPeer mp = (MenuPeer) getPeer();
+  MenuPeer mp = (MenuPeer)getPeer();
 		// FIXME: Need to add a peer method here.
-		//    if (mp != null)
-		//      mp.insertItem(item, index);
-	}
+//    if (mp != null)
+//      mp.insertItem(item, index);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Inserts an item with the specified label into this menu at the specified index.
 	  *
 	  * @param label The label of the item to add.
@@ -259,22 +281,26 @@ public class Menu extends MenuItem implements MenuContainer, Serializable {
 	  * @exception IllegalArgumentException If the index is less than zero.
 	  * @exception ArrayIndexOutOfBoundsException If the index is otherwise invalid.
 	  */
-	public void insert(String label, int index) {
+public void
+insert(String label, int index)
+{
 		insert(new MenuItem(label), index);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Adds a separator bar at the current menu location.
 	  */
-	public void addSeparator() {
-		add(separator);
-	}
+public void
+addSeparator()
+{
+  add(new MenuItem(separatorLabel));
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Inserts a separator bar at the specified index value.
 	  *
 	  * @param index The index at which to insert a separator bar.
@@ -284,88 +310,116 @@ public class Menu extends MenuItem implements MenuContainer, Serializable {
 	  * @exception IllegalArgumentException If the index is less than zero.
 	  * @exception ArrayIndexOutOfBoundsException If the index is otherwise invalid.
 	  */
-	public void insertSeparator(int index) {
-		insert(separator, index);
-	}
+public void
+insertSeparator(int index)
+{
+  insert(new MenuItem(separatorLabel), index);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Deletes the item at the specified index from this menu.
 	  *
 	  * @param index The index of the item to remove.
 	  * 
 	  * @exception ArrayIndexOutOfBoundsException If the index is otherwise invalid.
 	  */
-	public synchronized void remove(int index) {
+public synchronized void
+remove(int index)
+{
 		items.removeElementAt(index);
 
-		MenuPeer mp = (MenuPeer) getPeer();
+  MenuPeer mp = (MenuPeer)getPeer();
 		if (mp != null)
 			mp.delItem(index);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Removes the specifed item from the menu.  If the specified component
 	  * does not exist, this method does nothing. // FIXME: Right?
 	  *
 	  * @param item The component to remove.
 	  */
-	public void remove(MenuComponent item) {
+public void
+remove(MenuComponent item)
+{
 		int index = items.indexOf(item);
 		if (index == -1)
 			return;
 
 		remove(index);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Removes all the elements from this menu.
 	  */
-	public synchronized void removeAll() {
+public synchronized void
+removeAll()
+{
 		int count = getItemCount();
-		for (int i = 0; i < count; i++) {
+  for(int i = 0; i < count; i++)
+    {
 			// We must always remove item 0.
 			remove(0);
 		}
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Creates the native peer for this object.
 	  */
-	public void addNotify() {
-		if (peer != null)
+public void
+addNotify()
+{
+  if (peer == null)
 			peer = getToolkit().createMenu(this);
-		super.addNotify();
+  Enumeration e = items.elements();
+  while (e.hasMoreElements())
+  {
+    MenuItem mi = (MenuItem)e.nextElement();
+    mi.addNotify();
 	}
+  super.addNotify ();
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Destroys the native peer for this object.
 	  */
-	public void removeNotify() {
-		super.removeNotify();
+public void
+removeNotify()
+{
+  Enumeration e = items.elements();
+  while (e.hasMoreElements())
+  {
+    MenuItem mi = (MenuItem) e.nextElement();
+    mi.removeNotify();
 	}
+  super.removeNotify();
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns a debugging string for this menu.
 	  *
 	  * @return A debugging string for this menu.
 	  */
-	public String paramString() {
-		return (",isTearOff=" + isTearOff + ",isHelpMenu=" + isHelpMenu + super.paramString());
-	}
+public String
+paramString()
+{
+  return (",isTearOff=" + isTearOff + ",isHelpMenu=" + isHelpMenu
+	  + super.paramString());
+}
 
-	// Accessibility API not yet implemented.
-	// public AccessibleContext getAccessibleContext()
+// Accessibility API not yet implemented.
+// public AccessibleContext getAccessibleContext()
 
 } // class Menu

@@ -35,10 +35,14 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt;
 
+import java.awt.image.AreaAveragingScaleFilter;
+import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
+import java.awt.image.ReplicateScaleFilter;
 
 /**
  * This is the abstract superclass of all image objects in Java.
@@ -47,13 +51,15 @@ import java.awt.image.ImageProducer;
  * @since 1.0
  * @status updated to 1.4
  */
-public abstract class Image {
+public abstract class Image
+{
 	/**
 	 * This variable is returned whenever a property that is not defined
 	 * is requested.
 	 */
 	// For debug purposes, this might as well be a unique string.
-	public static final Object UndefinedProperty = new String("undefined property");
+  public static final Object UndefinedProperty
+    = new String("undefined property");
 
 	/**
 	 * Constant indicating that the default scaling algorithm should be used.
@@ -97,7 +103,8 @@ public abstract class Image {
 	/**
 	 * A default constructor for subclasses.
 	 */
-	public Image() {
+  public Image()
+  {
 	}
 
 	/**
@@ -171,9 +178,23 @@ public abstract class Image {
 	 * @see #SCALE_AREA_AVERAGING
 	 * @since 1.1
 	 */
-	public Image getScaledInstance(int width, int height, int flags) {
+  public Image getScaledInstance(int width, int height, int flags)
+  {
+    switch (flags)
+    {
+      case SCALE_DEFAULT:
+      case SCALE_FAST:
+      case SCALE_REPLICATE:
+        ImageProducer producer =
+          new FilteredImageSource(this.getSource(),
+                                  new ReplicateScaleFilter(width, height));
+        return Toolkit.getDefaultToolkit().createImage(producer);
+      case SCALE_SMOOTH:
+      case SCALE_AREA_AVERAGING:
+      default:
 		throw new Error("not implemented");
 	}
+  }
 
 	/**
 	 * Flushes (that is, destroys) any resources used for this image.  This
