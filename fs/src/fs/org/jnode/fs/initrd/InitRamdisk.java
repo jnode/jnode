@@ -46,7 +46,7 @@ public class InitRamdisk extends Plugin {
 			dm = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);
 			RamDiskDevice dev = new RamDiskDevice(null, "dummy", 100000);
 			dev.setDriver(new RamDiskDriver("jnode"));
-			dm.register(dev);
+         dm.register(dev);
 
 			log.info("Format initrd ramdisk");
 
@@ -54,15 +54,12 @@ public class InitRamdisk extends Plugin {
 			FileSystemType type = fileSystemService.getFileSystemTypeForNameSystemTypes(FatFileSystemType.NAME);
 			type.format(dev, new Integer(Fat.FAT16));
 
-			// restart the device
+         
+         // restart the device
 			dev.stop();
 			dev.start();
 
 			log.info("/jnode ready.");
-
-			// restart the device
-			dev.stop();
-			dev.start();
 		} catch (NameNotFoundException e) {
 			throw new PluginException(e);
 		} catch (DriverException e) {
