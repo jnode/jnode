@@ -6,44 +6,6 @@
 ; Author       : E. Prangsma
 ; -----------------------------------------------
 
-cpu_features:	dd 0
-
-; Test if the cpu is at least a pentium
-test_cpuid:
-	push AAX
-	push ABX
-	push ACX
-	push ADX
-	
-	; Test for presence of cpuid instruction
-	pushf			; Get current eflags
-	pop AAX
-	mov ecx,eax
-	xor eax,F_ID	; Try to toggle ID flag
-	push AAX
-	popf 
-	pushf
-	pop AAX			; Get new eflags back
-	xor eax,ecx		; Should be different, so != 0
-	jz near no_cpuid
-	; Now execute cpuid
-	mov AAX,1
-	cpuid
-	; Save cpu features
-	mov [cpu_features],edx
-	; Test for FPU, PSE
-	test edx,FEAT_FPU
-	jz near no_fpu_feat
-	test edx,FEAT_PSE
-	jz near no_pse_feat
-	; Done
-	
-	pop ADX
-	pop ACX
-	pop ABX
-	pop AAX
-	ret
-
 ; Initialize the FPU
 init_fpu:
 	fninit
@@ -89,19 +51,4 @@ init_sse:
 no_sse:
 	ret	
 
-no_cpuid:
-	PRINT_STR no_cpuid_msg
-    jmp _halt
-	
-no_fpu_feat:	
-	PRINT_STR no_fpu_feat_msg
-    jmp _halt
-	
-no_pse_feat:	
-	PRINT_STR no_pse_feat_msg
-    jmp _halt
-	
-no_cpuid_msg:		db 'Processor has no CPUID. halt...',0;
-no_pse_feat_msg:	db 'Processor has PSE support. halt...',0;
-no_fpu_feat_msg:	db 'Processor has FPU support. halt...',0;
 	

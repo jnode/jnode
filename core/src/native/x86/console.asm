@@ -20,12 +20,12 @@ video_prt_reg	equ 0x3d4
 video_prt_val	equ 0x3d5
 video_mode_reg	equ 0x3d8
 
-%macro digit 1
+%macro digit 2
 	mov AAX,ABX
 	shr AAX,%1
 	and AAX,0x0f
 	mov al,[hexchars+eax]
-	call sys_print_char
+	call sys_print_char%2
 %endmacro
 
 %macro CONSOLE_FUNCTIONS 0-1
@@ -147,14 +147,14 @@ sys_print_eax%1:
 	push AAX
 	push ABX
 	mov ebx,eax
-	digit 28
-	digit 24
-	digit 20
-	digit 16
-	digit 12
-	digit 8
-	digit 4
-	digit 0
+	digit 28, %1
+	digit 24, %1
+	digit 20, %1
+	digit 16, %1
+	digit 12, %1
+	digit 8, %1
+	digit 4, %1
+	digit 0, %1
 	mov al,' '
 	call sys_print_char%1
 	pop ABX
@@ -163,26 +163,26 @@ sys_print_eax%1:
 
 %ifdef BITS64
 ; Print a value in RAX (in hex format)
-sys_print_rax:
+sys_print_rax%1:
 	push AAX
 	push ABX
 	mov ABX,AAX
-	digit 60
-	digit 56
-	digit 52
-	digit 48
-	digit 44
-	digit 40
-	digit 36
-	digit 32
-	digit 28
-	digit 24
-	digit 20
-	digit 16
-	digit 12
-	digit 8
-	digit 4
-	digit 0
+	digit 60, 64
+	digit 56, 64
+	digit 52, 64
+	digit 48, 64
+	digit 44, 64
+	digit 40, 64
+	digit 36, 64
+	digit 32, 64
+	digit 28, 64
+	digit 24, 64
+	digit 20, 64
+	digit 16, 64
+	digit 12, 64
+	digit 8, 64
+	digit 4, 64
+	digit 0, 64
 	mov al,' '
 	call sys_print_char%1
 	pop ABX
@@ -195,8 +195,8 @@ sys_print_al%1:
 	push AAX
 	push ABX
 	mov ebx,eax
-	digit 4
-	digit 0
+	digit 4, %1
+	digit 0, %1
 	mov al,' '
 	call sys_print_char%1
 	pop ABX
@@ -220,7 +220,7 @@ sys_print_str%1:
 %endmacro
 
 %ifdef BITS32
-	CONSOLE_FUNCTIONS 
+	CONSOLE_FUNCTIONS 32
 %else
 	%undef BITS64
 	%define BITS32
@@ -231,6 +231,6 @@ sys_print_str%1:
 	%define BITS64
 	bits 64
 	%include "i386_bits.h"
-	CONSOLE_FUNCTIONS
+	CONSOLE_FUNCTIONS 64
 %endif
 	

@@ -293,25 +293,33 @@ GLABEL Q43org5jnode2vm6Unsafe23debug2e28Ljava2flang2fString3b29V
 ; public static native void debug(char value);
 GLABEL Q43org5jnode2vm6Unsafe23debug2e28C29V
 	mov eax,[ASP+SLOT_SIZE]
-	call sys_print_char
+%ifdef BITS32	
+	call sys_print_char32
+%else
+	call sys_print_char64
+%endif	
 	ret 4
 
 ; public static native void debug(int value);
 GLABEL Q43org5jnode2vm6Unsafe23debug2e28I29V
 	mov eax,[ASP+SLOT_SIZE]
-	call sys_print_eax
+%ifdef BITS32	
+	call sys_print_eax32
+%else
+	call sys_print_eax64
+%endif	
 	ret 4
 
 ; public static native void debug(long value);
 GLABEL Q43org5jnode2vm6Unsafe23debug2e28J29V
 %ifdef BITS32
 	mov eax,[esp+8]		; MSB
-	call sys_print_eax
+	call sys_print_eax32
 	mov eax,[esp+4]		; LSB
-	call sys_print_eax
+	call sys_print_eax32
 %else
 	mov rax,[rsp+SLOT_SIZE]
-	call sys_print_rax
+	call sys_print_rax64
 %endif	
 	ret 8
 		

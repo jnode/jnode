@@ -126,14 +126,13 @@ int_die_halt_msg: db 'Real panic: int_die_halt!',0
 
 %macro idm_print_reg 2
 	PRINT_STR idm_%1
-	mov eax,%2
-	call sys_print_eax
+	PRINT_WORD %2
 %endmacro
 
 %macro idm_print_byte 2
 	PRINT_STR idm_%1
 	movzx eax,byte %2
-	call sys_print_al
+	call sys_print_al32
 %endmacro
 
 sys_print_intregs:

@@ -120,7 +120,11 @@ vm_print_chararray_loop:
 	test ecx,ecx
 	jz vm_print_chararray_ret
 	lodsw
-	call sys_print_char
+%ifdef BITS32	
+	call sys_print_char32
+%else
+	call sys_print_char64
+%endif	
 	dec ecx
 	jmp vm_print_chararray_loop	
 	

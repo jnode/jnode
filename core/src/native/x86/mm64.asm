@@ -21,13 +21,13 @@ pt0_addr		equ 0x00007000	; Physical address of first page table (for 0-2Mb)
 
 free_paddr		equ 0x00008000	; First free memory
 
-mem_start		dd 0	; Start of physical memory
-mem_size		dd 0	; The total size of memory from address 0 (in bytes)
+mem_start		DA 0	; Start of physical memory
+mem_size		DA 0	; The total size of memory from address 0 (in bytes)
 
-initJar_start	dd 0	; Start address of initial jarfile
-initJar_end		dd 0	; End address of initial jarfile
+initJar_start	DA 0	; Start address of initial jarfile
+initJar_end		DA 0	; End address of initial jarfile
 
-free_mem_start	dd 0	; Start address of free memory heap
+free_mem_start	DA 0	; Start address of free memory heap
 
 CONST_2MB		equ 2*1024*1024
 CONST_4KB		equ 4*1024
@@ -111,13 +111,12 @@ Lsetup_mm:
 	and eax,~0xfff
 	mov [mem_start],eax
 
+	
 	; Print config
 	PRINT_STR mem_start_str
-	mov eax,[mem_start]
-	call sys_print_eax
+	PRINT_WORD [mem_start]
 	PRINT_STR mem_size_str
-	mov eax,[mem_size]
-	call sys_print_eax
+	PRINT_WORD [mem_size]
 
 ;
 ; Setup the paging structures
@@ -170,6 +169,7 @@ Lsetup_mm:
 	mov edi,pt0_addr
 	SET_PT_ENTRY 0, 0, 0
 	
+	LOOPDIE
 ;
 ; Fixup the TSS entry in the GDT
 ;
@@ -275,9 +275,7 @@ disable_pg_flush:
 
 
 mem_start_str:	db 'mem-start ',0
-mem_size_str:	db 0xd,0xa,'mem-size ',0
-init_pd_msg:    db 'init page-dir table',0xd,0xa,0
-init_pg0_msg:   db 'init page 0 table',0xd,0xa,0
+mem_size_str:	db 0xd,0xa,'mem-size  ',0
 enable_pg_msg:  db 'enable paging',0xd,0xa,0
 done_pg_msg:    db 'paging setup finished',0xd,0xa,0
 
