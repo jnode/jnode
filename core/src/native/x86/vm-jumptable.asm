@@ -11,11 +11,18 @@
 ; Author       : E. Prangsma
 ; -----------------------------------------------
 
+%ifdef BITS32
 	align 4
+%endif
+%ifdef BITS64
+	align 8
+%endif
+	
 vm_jumpTable:
-	dd vm_athrow
-	dd vm_athrow_notrace
-	dd vm_invoke_abstract
-	dd vm_invoke_method_after_recompile
+	DA vm_athrow
+	DA vm_athrow_notrace
+	DA vm_invoke_abstract
+	DA vm_invoke_method_after_recompile
+	
 	
 	

@@ -155,4 +155,16 @@ MBMOD_END		equ 0x04
 MBMOD_CMDLINE	equ 0x08
 MBMOD_PAD		equ 0x10
 
+; ----------------------
+; Define address macro
+; ----------------------
+%ifdef BITS32
+	%define DA			dd
+	%define SLOT_SIZE	4
+%endif
+%ifdef BITS64
+	%define DA	dq
+	%define SLOT_SIZE	8
+%endif
+	
 
