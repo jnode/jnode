@@ -226,7 +226,7 @@ public class BinaryQuad extends AssignQuad {
 	 * simplify will combine phi references and propagate copies
 	 * This method will also update liveness of operands by setting last use addr
 	 * 
-	 * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
+	 * @see org.jnode.vm.compiler.ir.quad.Quad#doPass2(org.jnode.util.BootableHashMap)
 	 */
 	public void doPass2(BootableHashMap liveVariables) {
 		operand1 = operand1.simplify();
@@ -247,7 +247,7 @@ public class BinaryQuad extends AssignQuad {
 	 * Code generation is complicated by the permutations of addressing modes.
 	 * This is not as nice as it could be, but it could be worse!
 	 * 
-	 * @see org.jnode.vm.compiler.ir.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
+	 * @see org.jnode.vm.compiler.ir.quad.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
 	 */
 	public void generateCode(CodeGenerator cg) {
 		Variable lhs = getLHS();

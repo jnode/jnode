@@ -14,7 +14,7 @@ package org.jnode.vm.compiler.ir;
 public abstract class Operand {
 	/**
 	 * NOTE: these values *must* be less than 16!!
-	 * @see getAddressingMode() below
+	 * @see #getAddressingMode() below
 	 */
 	public static final int UNKNOWN = 0;
 	public static final int BYTE = 1;
