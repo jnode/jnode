@@ -1,231 +1,146 @@
 /*
- * (C) Copyright IBM Corp. 2001
+ * (C) Copyright Australian National University, 2004.
  */
 //$Id$
 package org.vmmagic.unboxed; 
-
-import org.jnode.vm.Vm;
-import org.vmmagic.pragma.Uninterruptible;
-import org.vmmagic.pragma.UninterruptibleNoWarnPragma;
  
 /**
- * The word type is used by the runtime system and collector to denote machine 
- * word-sized quantities.
- * We use a separate type instead of the Java int type for coding clarity.
- * machine-portability (it can map to 32 bit and 64 bit integral types), 
- * and access to unsigned operations (Java does not have unsigned int types).
- * <p>
- * For efficiency and to avoid meta-circularity, the Word class is intercepted like
- * magic and converted into the base type so no Word object is created run-time.
+ * To be commented.
  *
- * @author Perry Cheng
- * @modified Daniel Frampton
+ * @author Daniel Frampton
  * @see Address
  */
-public final class Word implements Uninterruptible {
-
-  // Do not try to create a static field containing special values.
-  //   Suboptimal code will be generated.
-
-  //-#if RVM_FOR_32_ADDR
-  //private int value;  
-  //-#elif RVM_FOR_64_ADDR
-  private long value;  
-  //-#endif
-
-  //-#if RVM_FOR_32_ADDR
-  Word (int val) { 
-    value = val; 
-  }
-  //-#elif RVM_FOR_64_ADDR
-  Word (long val) { 
-    value = val; 
-  }
-  //-#endif
-
-  public boolean equals(Object o) {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED); 
-    return (o instanceof Word) && ((Word) o).value == value;
-  }
+public final class Word {
 
   /**
    * @deprecated
    */
-  public static Word fromInt (int val) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Word(val);
+  public static Word fromInt (int val) {
+    return null;
   }
 
-  public static Word fromIntSignExtend (int val) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Word(val);
+  public static Word fromIntSignExtend (int val) {
+    return null;
   }
   
-  public static Word fromIntZeroExtend (int val) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    //-#if RVM_FOR_32_ADDR
-    //return new Word(val);
-    //-#elif RVM_FOR_64_ADDR
-    long ans = ((long)val) & 0x00000000ffffffffL;
-    return new Word(ans);
-    //-#endif
-  }
-     
-  //-#if RVM_FOR_64_ADDR
-  public static Word fromLong (long val) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Word(val);
-  }
-  //-#endif
-
-  public static Word zero () throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Word(0);
+  public static Word fromIntZeroExtend (int val) {
+    return null;
   }
 
-  public static Word one () throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Word(1);
+  public static Word zero () {
+    return null;
+  }
+
+  public static Word one () {
+    return null;
   }
 
   public static Word max() {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return fromIntSignExtend(-1);
+    return null;
   }
 
   public int toInt () {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return (int) value;
+    return 0;
   }
 
-  public long toLong () throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-//    if (Vm.BuildFor64Addr) {
-      return value;
-//    } else {
-//      return 0x00000000ffffffffL & ((long) value);
-//    }
+  public long toLong () {
+    return 0L;
   }
 
-  public Address toAddress() throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Address(value);
+  public Address toAddress() {
+    return null;
   }
 
-  public Offset toOffset () throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Offset(value);
+  public Offset toOffset () {
+    return null;
   }
 
-  public Extent toExtent () throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Extent(value);
+  public Extent toExtent () {
+    return null;
   }
 
-  public Word add (Word w2) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Word(value + w2.value);
+  public Word add (Word w2) {
+    return null;
   }
 
-  public Word add (Offset w2) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Word(value + w2.toWord().value);
+  public Word add (Offset w2) {
+    return null;
   }
 
-  public Word add (Extent w2) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Word(value + w2.toWord().value);
+  public Word add (Extent w2) {
+    return null;
   }
 
-  public Word sub (Word w2) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Word(value - w2.value);
+  public Word sub (Word w2) {
+    return null;
   }
-  public Word sub (Offset w2) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Word(value - w2.toWord().value);
+
+  public Word sub (Offset w2) {
+    return null;
   }
-  public Word sub (Extent w2) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Word(value - w2.toWord().value);
+
+  public Word sub (Extent w2) {
+    return null;
   }
 
   public boolean isZero() {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return EQ(zero());
+    return false;
   }
 
   public boolean isMax() {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return EQ(max());
+    return false;
   }
 
   public boolean LT (Word addr2) {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    if (value >= 0 && addr2.value >= 0) return value < addr2.value;
-    if (value < 0 && addr2.value < 0) return value < addr2.value;
-    if (value < 0) return true;
     return false;
   }
 
   public boolean LE (Word w2) {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return (value == w2.value) || LT(w2);
+    return false;
   }
 
   public boolean GT (Word w2) {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return w2.LT(this);
+    return false;
   }
 
   public boolean GE (Word w2) {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return w2.LE(this);
+    return false;
   }
 
   public boolean EQ (Word w2) {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return value == w2.value;
+    return false;
   }
 
   public boolean NE (Word w2) {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return !EQ(w2);
+    return false;
   }
 
-  public Word and(Word w2) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Word(value & w2.value);
+  public Word and(Word w2) {
+    return null;
   }
 
-  public Word or(Word w2) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Word(value | w2.value);
+  public Word or(Word w2) {
+    return null;
   }
 
-  public Word not() throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Word(~value);
+  public Word not() {
+    return null;
   }
 
-  public Word xor(Word w2) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Word(value ^ w2.value);
+  public Word xor(Word w2) {
+    return null;
   }
 
-  public Word lsh (int amt) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Word(value << amt);
+  public Word lsh (int amt) {
+    return null;
   }
 
-  public Word rshl (int amt) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Word(value >>> amt);
+  public Word rshl (int amt) {
+    return null;
   }
 
-  public Word rsha (int amt) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Word(value >> amt);
+  public Word rsha (int amt) {
+    return null;
   }
 
 }
