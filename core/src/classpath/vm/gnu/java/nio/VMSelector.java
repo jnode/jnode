@@ -1,5 +1,5 @@
-/* BaseBreakIterator.java -- Base class for default BreakIterators
-   Copyright (C) 1999, 2001, 2004 Free Software Foundation, Inc.
+/* VMSelector.java -- 
+   Copyright (C) 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -7,7 +7,7 @@ GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
- 
+
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -35,87 +35,25 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+package gnu.java.nio;
 
-package gnu.java.text;
+import gnu.classpath.Configuration;
+import java.io.IOException;
 
-import java.text.BreakIterator;
-import java.text.CharacterIterator;
-import java.text.StringCharacterIterator;
-
-/**
- * @author Tom Tromey <tromey@cygnus.com>
- * @date March 22, 1999
- */
-
-public abstract class BaseBreakIterator extends BreakIterator
+public final class VMSelector
 {
-  public BaseBreakIterator ()
+  static
   {
-    // It isn't documented, but break iterators are created in a
-    // working state; their methods won't throw exceptions before
-    // setText().
-    iter = new StringCharacterIterator("");
-  }
-
-  public int current ()
-  {
-    return iter.getIndex();
-  }
-
-  public int first ()
-  {
-    iter.first();
-    return iter.getBeginIndex();
-  }
-
-  public int following (int pos)
-  {
-    int save = iter.getIndex();
-    iter.setIndex(pos);
-    int r = next ();
-    iter.setIndex(save);
-    return r;
-  }
-
-  public CharacterIterator getText ()
-  {
-    return iter;
-  }
-
-  public int last ()
-  {
-    iter.last();
-    // Go past the last character.
-    iter.next();
-    return iter.getEndIndex();
-  }
-
-  public int next (int n)
-  {
-    int r = iter.getIndex ();
-    if (n > 0)
+    // load the shared library needed for native methods.
+    if (Configuration.INIT_LOAD_LIBRARY)
       {
-	while (n > 0 && r != DONE)
-	  {
-	    r = next ();
-	    --n;
-	  }
+        System.loadLibrary ("javanio");
       }
-    else if (n < 0)
-      {
-	while (n < 0 && r != DONE)
-	  {
-	    r = previous ();
-	    ++n;
-	  }
-      }
-    return r;
   }
+  
+  // A timeout value of 0 means block forever.
+  static native int select (int[] read, int[] write,
+                                        int[] except, long timeout)
+    throws IOException;
 
-  public void setText (CharacterIterator newText)
-  {
-    iter = newText;
-  }
-
-  protected CharacterIterator iter;
 }
