@@ -16,7 +16,7 @@ public abstract class Variable extends Operand implements Cloneable {
 	/*
 	 * The operation where this variable is assigned
 	 */
-	private AssignOP assignOP;
+	private AssignQuad assignQuad;
 
 	/*
 	 * The address where this variable is last used
@@ -68,12 +68,12 @@ public abstract class Variable extends Operand implements Cloneable {
 	public abstract Object clone();
 
 	/**
-	 * Returns the AssignOP where this variable was last assigned.
+	 * Returns the AssignQuad where this variable was last assigned.
 	 * 
 	 * @return
 	 */
-	public AssignOP getAssignOP() {
-		return assignOP;
+	public AssignQuad getAssignQuad() {
+		return assignQuad;
 	}
 
 	/**
@@ -84,19 +84,19 @@ public abstract class Variable extends Operand implements Cloneable {
 	}
 
 	/**
-	 * @param assignOP
+	 * @param assignQuad
 	 */
-	public void setAssignOP(AssignOP assignOP) {
-		this.assignOP = assignOP;
+	public void setAssignQuad(AssignQuad assignQuad) {
+		this.assignQuad = assignQuad;
 	}
 
 	public int getAssignAddress() {
-		if (assignOP == null) {
+		if (assignQuad == null) {
 			return 0;
 		}
 		// Add one so this live range starts just after this operation.
 		// This way live range interference computation is simplified.
-		return this.assignOP.getAddress() + 1;
+		return this.assignQuad.getAddress() + 1;
 	}
 
 	/**
@@ -109,18 +109,18 @@ public abstract class Variable extends Operand implements Cloneable {
 	}
 
 	public Operand simplify() {
-		return assignOP.propagate(this);
+		return assignQuad.propagate(this);
 	}
 	
 	public Variable simplifyCopy() {
-		if (assignOP instanceof VariableRefAssignOP) {
-			VariableRefAssignOP va = (VariableRefAssignOP) assignOP;
+		if (assignQuad instanceof VariableRefAssignQuad) {
+			VariableRefAssignQuad va = (VariableRefAssignQuad) assignQuad;
 			Operand rhs = va.getRHS();
 			if (rhs instanceof Variable) {
 				return (Variable) rhs;
 			}
 		}
-		assignOP.setDeadCode(false);
+		assignQuad.setDeadCode(false);
 		return this;
 	}
 }
