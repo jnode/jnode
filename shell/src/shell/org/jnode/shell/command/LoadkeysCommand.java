@@ -34,7 +34,7 @@ public class LoadkeysCommand {
 
     static final Parameter PARAM_COUNTRY = new Parameter(COUNTRY);
 
-    static final Parameter PARAM_REGION = new Parameter(LANGUAGE, Parameter.OPTIONAL);
+    static final Parameter PARAM_LANGUAGE = new Parameter(LANGUAGE, Parameter.OPTIONAL);
 
     static final Parameter PARAM_VARIANT = new Parameter(VARIANT, Parameter.OPTIONAL);
 
@@ -43,7 +43,7 @@ public class LoadkeysCommand {
             new Syntax[] { 
             	new Syntax("Display the current keyboard layout"),
             	new Syntax("change the current keyboard layout\n\tExample : loadkeys FR fr",
-                    PARAM_COUNTRY, PARAM_REGION, PARAM_VARIANT)
+                    PARAM_COUNTRY, PARAM_LANGUAGE, PARAM_VARIANT)
 				});
 
     public static void main(String[] args) throws Exception {
