@@ -43,6 +43,8 @@ public class Vm extends VmSystemObject implements Statistics {
 	private final List processors;
 	/** All statistics */
 	private transient HashMap statistics;
+	/** Should assertions be verified? */
+	public static final boolean VerifyAssertions = true;
 
 	/**
 	 * Initialize a new instance
@@ -226,5 +228,51 @@ public class Vm extends VmSystemObject implements Statistics {
                 out.println(stats[i]);
             }        
         }
+    }
+
+    /**
+     * Assert the given value to be true.
+     * @param value
+     */
+    public static void _assert(boolean value) {
+        if (!value) {
+            assertionFailed(null, null);
+        }
+    }
+    
+    /**
+     * Assert the given value to be true.
+     * @param value
+     */
+    public static void _assert(boolean value, String msg) {
+        if (!value) {
+            assertionFailed(msg, null);
+        }
+    }
+    
+    /**
+     * Assert the given value to be true.
+     * @param value
+     */
+    public static void _assert(boolean value, String msg, String msg2) {
+        if (!value) {
+            assertionFailed(msg, msg2);
+        }
+    }
+    
+    /**
+     * Throw an AssertionError with the given messages.
+     * @param msg
+     * @param msg2
+     * @throws PragmaNoInline
+     */
+    private static void assertionFailed(String msg, String msg2) 
+    throws PragmaNoInline {
+        if ((msg == null) && (msg2 == null)) {
+            msg = "Assertion failed";
+        } else if (msg2 != null) {
+            msg = msg + ": " + msg2;
+        }
+        throw new AssertionError(msg);
     }
 }

@@ -16,7 +16,7 @@ import org.jnode.vm.classmgr.VmConstString;
  */
 final class ItemFactory {
 
-//    private static ThreadLocal itemFactory = new ThreadLocal();
+    private static ThreadLocal itemFactory = new ThreadLocal();
 
     private final ArrayList intItems = new ArrayList();
 
@@ -28,55 +28,62 @@ final class ItemFactory {
 
     private final ArrayList refItems = new ArrayList();
 
-    /**
-     * Create a constant item
-     * @param val
-     */
-	final IntItem createIConst(int val) {
-        final IntItem item = (IntItem)getOrCreate(JvmType.INT);
-        item.initialize(Item.Kind.CONSTANT, 0, null, val);
-        return item;
-	}
+    private int createCount = 0;
 
     /**
      * Create a constant item
+     * 
      * @param val
      */
-	final FloatItem createFConst(float val) {
-        final FloatItem item = (FloatItem)getOrCreate(JvmType.FLOAT);
+    final IntItem createIConst(int val) {
+        final IntItem item = (IntItem) getOrCreate(JvmType.INT);
         item.initialize(Item.Kind.CONSTANT, 0, null, val);
         return item;
-	}
+    }
 
     /**
      * Create a constant item
+     * 
      * @param val
      */
-	final RefItem createAConst(VmConstString val) {
-        final RefItem item = (RefItem)getOrCreate(JvmType.REFERENCE);
+    final FloatItem createFConst(float val) {
+        final FloatItem item = (FloatItem) getOrCreate(JvmType.FLOAT);
         item.initialize(Item.Kind.CONSTANT, 0, null, val);
         return item;
-	}
+    }
 
     /**
      * Create a constant item
+     * 
      * @param val
      */
-	final LongItem createLConst(long val) {
-        final LongItem item = (LongItem)getOrCreate(JvmType.LONG);
+    final RefItem createAConst(VmConstString val) {
+        final RefItem item = (RefItem) getOrCreate(JvmType.REFERENCE);
+        item.initialize(Item.Kind.CONSTANT, 0, null, val);
+        return item;
+    }
+
+    /**
+     * Create a constant item
+     * 
+     * @param val
+     */
+    final LongItem createLConst(long val) {
+        final LongItem item = (LongItem) getOrCreate(JvmType.LONG);
         item.initialize(Item.Kind.CONSTANT, 0, null, null, val);
         return item;
-	}
+    }
 
     /**
      * Create a constant item
+     * 
      * @param val
      */
-	final DoubleItem createDConst(double val) {
-        final DoubleItem item = (DoubleItem)getOrCreate(JvmType.DOUBLE);
+    final DoubleItem createDConst(double val) {
+        final DoubleItem item = (DoubleItem) getOrCreate(JvmType.DOUBLE);
         item.initialize(Item.Kind.CONSTANT, 0, null, null, val);
         return item;
-	}
+    }
 
     /**
      * Create a stack item.
@@ -135,21 +142,24 @@ final class ItemFactory {
         item.initialize(Item.Kind.REGISTER, 0, lsb, msb);
         return item;
     }
-    
+
     /**
      * Add the given item to the free list of this factory.
+     * 
      * @param item
      */
     final void release(Item item) {
-        Item.assertCondition(item.kind == 0, "Item is not yet released");
+        if (Vm.VerifyAssertions)
+            Vm._assert(item.kind == 0, "Item is not yet released");
         final ArrayList list = getList(item.getType());
-        Item.assertCondition(!list.contains(item), "Item already released");
+        if (Vm.VerifyAssertions)
+            Vm._assert(!list.contains(item), "Item already released");
         list.add(item);
-        
+
         final String name = getClass().getName();
         final Counter cnt = Vm.getVm().getCounter(name);
         cnt.inc();
-        
+
     }
 
     /**
@@ -163,8 +173,9 @@ final class ItemFactory {
         if (list.isEmpty()) {
             item = createNew(jvmType);
         } else {
-            item = (Item) list.remove(list.size()-1);
-            Item.assertCondition(item.kind == 0, "kind == 0, but " + item.kind);
+            item = (Item) list.remove(list.size() - 1);
+            if (Vm.VerifyAssertions)
+                Vm._assert(item.kind == 0, "kind == 0, but " + item.kind);
         }
         return item;
     }
@@ -197,6 +208,7 @@ final class ItemFactory {
      * @param jvmType
      */
     private final Item createNew(int jvmType) {
+        createCount++;
         switch (jvmType) {
         case JvmType.INT:
             return new IntItem(this);
@@ -223,12 +235,11 @@ final class ItemFactory {
      * Gets the item factory. This item factory is singleton per thread.
      */
     static final ItemFactory getFactory() {
-//        ItemFactory fac = (ItemFactory) itemFactory.get();
-//        if (fac == null) {
-//            fac = new ItemFactory();
-//            itemFactory.set(fac);
-//        }
-        ItemFactory fac = new ItemFactory();
+        ItemFactory fac = (ItemFactory) itemFactory.get();
+        if (fac == null) {
+            fac = new ItemFactory();
+            itemFactory.set(fac);
+        }
         return fac;
     }
 }

@@ -9,6 +9,7 @@ import org.jnode.assembler.x86.Register;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.system.BootLog;
 import org.jnode.vm.JvmType;
+import org.jnode.vm.Vm;
 import org.jnode.vm.bytecode.StackException;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
@@ -217,7 +218,7 @@ final class FPUHelper implements X86CompilerConstants {
 			BootLog.debug("Flush FPU stack;\n  fpuStack=" + fpuStack
 					+ ",\n  vstack  =" + vstack);
 			vstack.push(ec);
-			Item.assertCondition(fpuStack.hasCapacity(items),
+			if (Vm.VerifyAssertions) Vm._assert(fpuStack.hasCapacity(items),
 					"Out of FPU stack");
 		}
 	}

@@ -6,6 +6,7 @@ package org.jnode.vm.x86.compiler.l1a;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
 import org.jnode.vm.JvmType;
+import org.jnode.vm.Vm;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
@@ -114,7 +115,7 @@ public abstract class DoubleWordItem extends Item implements
      * @return
      */
     final Register getLsbRegister() {
-        assertCondition(kind == Kind.REGISTER, "kind == Kind.REGISTER");
+        if (Vm.VerifyAssertions) Vm._assert(kind == Kind.REGISTER, "kind == Kind.REGISTER");
         return lsb;
     }
 
@@ -134,7 +135,7 @@ public abstract class DoubleWordItem extends Item implements
      * @return
      */
     final Register getMsbRegister() {
-        assertCondition(kind == Kind.REGISTER, "kind == Kind.REGISTER");
+        if (Vm.VerifyAssertions) Vm._assert(kind == Kind.REGISTER, "kind == Kind.REGISTER");
         return msb;
     }
 
@@ -169,8 +170,8 @@ public abstract class DoubleWordItem extends Item implements
                 vstack.push(ec);
                 r = pool.request(JvmType.INT, this);
             }
-            assertCondition(r != null, "r != null");
-            assertCondition(l != null, "l != null");
+            if (Vm.VerifyAssertions) Vm._assert(r != null, "r != null");
+            if (Vm.VerifyAssertions) Vm._assert(l != null, "l != null");
             loadTo(ec, l, r);
         }
     }
@@ -188,9 +189,11 @@ public abstract class DoubleWordItem extends Item implements
         final VirtualStack stack = ec.getVStack();
 
         //os.log("LongItem.log called "+Integer.toString(kind));
-        assertCondition(lsb != msb, "lsb != msb");
-        assertCondition(lsb != null, "lsb != null");
-        assertCondition(msb != null, "msb != null");
+        if (Vm.VerifyAssertions) { 
+            Vm._assert(lsb != msb, "lsb != msb");
+            Vm._assert(lsb != null, "lsb != null");
+            Vm._assert(msb != null, "msb != null");
+        }
 
         switch (kind) {
         case Kind.REGISTER:
@@ -296,13 +299,13 @@ public abstract class DoubleWordItem extends Item implements
                 ec.getVStack().push(ec);
                 lsb = ec.getPool().request(JvmType.INT);
             }
-            assertCondition(lsb != null, "lsb != null");
+            if (Vm.VerifyAssertions) Vm._assert(lsb != null, "lsb != null");
             Register msb = ec.getPool().request(JvmType.INT);
             if (msb == null) {
                 ec.getVStack().push(ec);
                 msb = ec.getPool().request(JvmType.INT);
             }
-            assertCondition(msb != null, "msb != null");
+            if (Vm.VerifyAssertions) Vm._assert(msb != null, "msb != null");
             loadTo(ec, lsb, msb);
         }
     }
@@ -481,7 +484,7 @@ public abstract class DoubleWordItem extends Item implements
 
     private final Register request(EmitterContext ec, X86RegisterPool pool) {
         final Register r = pool.request(JvmType.INT);
-        assertCondition(r != null, "r != null");
+        if (Vm.VerifyAssertions) Vm._assert(r != null, "r != null");
         return r;
     }
 
@@ -489,7 +492,7 @@ public abstract class DoubleWordItem extends Item implements
      * @see org.jnode.vm.x86.compiler.l1a.Item#spill(EmitterContext, Register)
      */
     final void spill(EmitterContext ec, Register reg) {
-        assertCondition((getKind() == Kind.REGISTER)
+        if (Vm.VerifyAssertions) Vm._assert((getKind() == Kind.REGISTER)
                 && ((this.lsb == reg) || (this.msb == reg)), "spill1");
         ec.getVStack().push(ec);
         if (isStack()) {
