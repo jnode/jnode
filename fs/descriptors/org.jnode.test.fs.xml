@@ -22,7 +22,7 @@
   <extension point="org.jnode.shell.aliases">
     <alias name="FileTest"      class="org.jnode.test.fs.FileTest"/>
     <alias name="LfnTest"      class="org.jnode.test.fs.LfnTest"/>
-    <alias name="ATAPITest"      class="org.jnode.test.fs.ATAPITest"/>
+    <alias name="SCSITest"      class="org.jnode.test.fs.SCSITest"/>
   </extension>
 
 </plugin>
