@@ -180,6 +180,7 @@
       <libalias name="jnode-shell.jar" alias="${jnode-shell.jar}"/>
 
       <libalias name="commons-net-1.1.0.jar" alias="${commons-net.jar}"/>
+      <libalias name="dnsjava-1.5.0.jar" alias="${dnsjava.jar}"/>
       <libalias name="nanoxml.jar" alias="${nanoxml.jar}"/>
       <libalias name="log4j.jar" alias="${log4j.jar}"/>
       <libalias name="lw.jar" alias="${lw.jar}"/>

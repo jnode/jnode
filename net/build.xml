@@ -10,6 +10,7 @@
     <pathelement location="${jnode-core.jar}"/>
     <pathelement location="${jnode-shell.jar}"/>
     <pathelement location="${commons-net.jar}"/>
+    <pathelement location="${dnsjava.jar}"/>
     <path refid="cp"/>
   </path>
 

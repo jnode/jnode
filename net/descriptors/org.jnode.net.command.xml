@@ -24,6 +24,7 @@
     <alias name="ifconfig" class="org.jnode.net.command.IfconfigCommand"/>
     <alias name="netstat" class="org.jnode.net.command.NetstatCommand"/>
     <alias name="route" class="org.jnode.net.command.RouteCommand"/>
+    <alias name="resolver" class="org.jnode.net.command.ResolverCommand"/>
   </extension>
 
 </plugin>
