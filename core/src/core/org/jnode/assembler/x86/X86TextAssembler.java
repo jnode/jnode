@@ -1475,6 +1475,9 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         case FS_PREFIX:
             str = "fs";
             break;
+        case LOCK_PREFIX:
+            str = "lock";
+            break;
         default:
             throw new IllegalArgumentException("Unknown prefix " + prefix);
         }
