@@ -44,10 +44,10 @@ import gnu.java.awt.Buffers;
  * per data element.
  *
  * @author Jerry Quinn <jlquinn@optonline.net>
-	 */
+ */
 public class MultiPixelPackedSampleModel extends SampleModel
 {
-	private int scanlineStride;
+  private int scanlineStride;
   private int[] bitMasks;
   private int[] bitOffsets;
   private int[] sampleSize;
@@ -59,30 +59,30 @@ public class MultiPixelPackedSampleModel extends SampleModel
   public MultiPixelPackedSampleModel(int dataType, int w, int h,
 				     int numberOfBits)
   {
-    this(dataType, w, h, 0, numberOfBits, 0);
-	}
+    this(dataType, w, h, numberOfBits, 0, 0);
+  }
 
   public MultiPixelPackedSampleModel(int dataType, int w, int h,
 				     int numberOfBits, int scanlineStride,
 				     int dataBitOffset)
   {
-		super(dataType, w, h, 1);
+    super(dataType, w, h, 1);
 
     switch (dataType)
       {
       case DataBuffer.TYPE_BYTE:
 	elemBits = 8;
-				break;
+	break;
       case DataBuffer.TYPE_USHORT:
 	elemBits = 16;
-				break;
+	break;
       case DataBuffer.TYPE_INT:
 	elemBits = 32;
-				break;
+	break;
       default:
 	throw new IllegalArgumentException("MultiPixelPackedSampleModel"
 					   + " unsupported dataType");
-	}
+      }
 
     this.dataBitOffset = dataBitOffset;
 
@@ -101,10 +101,10 @@ public class MultiPixelPackedSampleModel extends SampleModel
 
     // Compute scan line large enough for w pixels.
     if (scanlineStride == 0)
-      scanlineStride = ((dataBitOffset + w * numberOfBits) / elemBits) + 1;
+      scanlineStride = ((dataBitOffset + w * numberOfBits) / elemBits);
     this.scanlineStride = scanlineStride;
 
-
+    
     sampleSize = new int[1];
     sampleSize[0] = numberOfBits;
 
@@ -112,10 +112,11 @@ public class MultiPixelPackedSampleModel extends SampleModel
     bitOffsets = new int[numElems];
     for (int i=0; i < numElems; i++)
       {
-	bitOffsets[i] = numberOfBits * i;
-	bitMasks[i] = ((1 << numberOfBits) - 1) << bitOffsets[i];
-	}
-	}
+	bitOffsets[numElems - i- 1] = numberOfBits * i;
+	bitMasks[numElems - i - 1] = ((1 << numberOfBits) - 1) << 
+	    bitOffsets[numElems - i - 1];
+      }
+  }
 
   public SampleModel createCompatibleSampleModel(int w, int h)
   {
@@ -123,14 +124,14 @@ public class MultiPixelPackedSampleModel extends SampleModel
        sizes here by passing these from the current instance to a
        special private constructor. */
     return new MultiPixelPackedSampleModel(dataType, w, h, numberOfBits);
-	}
+  }
 
 
-	/** 
+  /**
    * Creates a DataBuffer for holding pixel data in the format and
    * layout described by this SampleModel. The returned buffer will
    * consist of one single bank.
-	 */
+   */
   public DataBuffer createDataBuffer()
   {
     int size;
@@ -143,33 +144,33 @@ public class MultiPixelPackedSampleModel extends SampleModel
     size = scanlineStride * height;
 
     return Buffers.createBuffer(getDataType(), size);
-	}
+  }
 
 
   public int getNumDataElements()
   {
     return 1;
-		}
+  }
 
   public int[] getSampleSize()
   {
     return sampleSize;
-		}
-
+  }
+  
   public int getSampleSize(int band)
   {
     return sampleSize[0];
-	}
+  }
 
   public int getOffset(int x, int y)
   {
     return scanlineStride * y + ((dataBitOffset + x*numberOfBits) / elemBits);
-	}
+  }
 
   public int getBitOffset(int x)
   {
     return (dataBitOffset + x*numberOfBits) % elemBits;
-		}
+  }
 
   public int getDataBitOffset()
   {
@@ -197,9 +198,9 @@ public class MultiPixelPackedSampleModel extends SampleModel
     return new MultiPixelPackedSampleModel(dataType, width, height,
 					   numberOfBits, scanlineStride,
 					   dataBitOffset);
-	}
+  }
 
-	/**
+  /**
    * Extract one pixel and return in an array of transfer type.
    *
    * Extracts the pixel at x, y from data and stores into the 0th index of the
@@ -383,5 +384,5 @@ public class MultiPixelPackedSampleModel extends SampleModel
     
     result.append("]");
     return result.toString();
-	}
+  }
 }
