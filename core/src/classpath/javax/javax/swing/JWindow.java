@@ -1,5 +1,5 @@
 /* JWindow.java --
-   Copyright (C) 2002, 2003, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -62,9 +62,8 @@ public class JWindow extends Window implements Accessible, RootPaneContainer
 {
   private static final long serialVersionUID = 5420698392125238833L;
   
-  private boolean checking;
-
   protected JRootPane rootPane;
+  protected boolean rootPaneCheckingEnabled;
     protected  AccessibleContext accessibleContext;
 
     public JWindow()
@@ -130,7 +129,7 @@ public class JWindow extends Window implements Accessible, RootPaneContainer
 	return rootPane;          
     }
 
-    public void setRootPane(JRootPane root)
+  protected void setRootPane(JRootPane root)
     {
 	if (rootPane != null)
 	    remove(rootPane);
@@ -139,7 +138,7 @@ public class JWindow extends Window implements Accessible, RootPaneContainer
 	add(rootPane, BorderLayout.CENTER);
     }
 
-    public JRootPane createRootPane()
+  protected JRootPane createRootPane()
   {
     return new JRootPane();
   }
@@ -176,12 +175,12 @@ public class JWindow extends Window implements Accessible, RootPaneContainer
   
     protected  boolean isRootPaneCheckingEnabled()
   {
-    return checking;
+    return rootPaneCheckingEnabled;
   }
 
     protected  void setRootPaneCheckingEnabled(boolean enabled)
   {
-    checking = enabled;
+    rootPaneCheckingEnabled = enabled;
   }
 
     public void update(Graphics g)

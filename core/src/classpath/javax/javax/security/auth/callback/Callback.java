@@ -59,7 +59,6 @@ package javax.security.auth.callback;
  * @see PasswordCallback
  * @see TextInputCallback
  * @see TextOutputCallback
- * @version $Revision$
  */
 public interface Callback {
 }

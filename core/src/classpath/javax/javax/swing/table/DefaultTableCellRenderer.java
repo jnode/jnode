@@ -1,5 +1,5 @@
 /* DefaultTableCellRenderer.java --
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -199,7 +199,7 @@ public class DefaultTableCellRenderer extends JLabel
    * <p>This method needs to be overridden in a subclass to actually
    * do something.</p>
    */
-  public void firePropertyChange(String propertyName, Object oldValue,
+  protected void firePropertyChange(String propertyName, Object oldValue,
                                  Object newValue)
   {
     // Does nothing.

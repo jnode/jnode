@@ -1,5 +1,5 @@
 /* JComponent.java -- Every component in swing inherits from this class.
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -50,6 +50,7 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
@@ -395,6 +396,7 @@ public abstract class JComponent extends Container implements Serializable
 	{
 		super();
 		super.setLayout(new FlowLayout());
+    setDropTarget(new DropTarget());
     defaultLocale = Locale.getDefault();
     debugGraphicsOptions = DebugGraphics.NONE_OPTION;
 	}
@@ -427,7 +429,7 @@ public abstract class JComponent extends Container implements Serializable
    * @see #getClientProperties
    * @see #putClientProperty
    */
-  public Object getClientProperty(Object key)
+  public final Object getClientProperty(Object key)
 	{
     return getClientProperties().get(key);
 	}
@@ -444,7 +446,7 @@ public abstract class JComponent extends Container implements Serializable
    * @see #getClientProperties
    * @see #getClientProperty
    */
-  public void putClientProperty(Object key, Object value)
+  public final void putClientProperty(Object key, Object value)
 	{
     getClientProperties().put(key, value);
 	}
@@ -1539,7 +1541,23 @@ public abstract class JComponent extends Container implements Serializable
    */
 	protected  String paramString()
 	{
-		return "JComponent";
+    StringBuffer sb = new StringBuffer();
+    sb.append(super.paramString());
+    sb.append(",alignmentX=").append(getAlignmentX());
+    sb.append(",alignmentY=").append(getAlignmentY());
+    sb.append(",border=");
+    if (getBorder() != null)
+      sb.append(getBorder());
+    sb.append(",maximumSize=");
+    if (getMaximumSize() != null)
+      sb.append(getMaximumSize());
+    sb.append(",minimumSize=");
+    if (getMinimumSize() != null)
+      sb.append(getMinimumSize());
+    sb.append(",preferredSize=");
+    if (getPreferredSize() != null)
+      sb.append(getPreferredSize());
+    return sb.toString();
 	}
 
   /**

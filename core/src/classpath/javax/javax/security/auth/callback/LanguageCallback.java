@@ -47,7 +47,6 @@ import java.util.Locale;
  * the {@link Locale} used for localizing text.
  *
  * @see CallbackHandler
- * @version $Revision$
  */
 public class LanguageCallback implements Callback, Serializable
 {

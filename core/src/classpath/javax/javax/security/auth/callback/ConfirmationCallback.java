@@ -47,7 +47,6 @@ import java.io.Serializable;
  * similar confirmations.
  *
  * @see CallbackHandler
- * @version $Revision$
  */
 public class ConfirmationCallback implements Callback, Serializable
 {
