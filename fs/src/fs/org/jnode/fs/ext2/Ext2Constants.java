@@ -87,12 +87,12 @@ public class Ext2Constants {
 	//constants specific to this (JNode) implementation
 	/**
 	 * When searching for free blocks, block groups that have at least 
-	 * EXT2_BLOCK_THRESHOLD_RATIO * BlocksPerGroup free blocks are considered first
+	 * EXT2_BLOCK_THRESHOLD_RATIO/100 * BlocksPerGroup free blocks are considered first
 	 *  	- if this constant is too high, it will lead to higher disk fragmentation
 	 *  	- if it is too low, then files might be scattered among multiple block groups
 	 * 		  on very full partitions (higher file fragmentation)
-	 * intervall: [0; 1)
+	 * intervall: [0; 100)
 	 */
-	public static final double EXT2_BLOCK_THRESHOLD_RATIO = 0.05;
+	public static final int EXT2_BLOCK_THRESHOLD_PERCENT = 5;
 
 }

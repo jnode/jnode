@@ -191,6 +191,9 @@ public class Ext2File extends AbstractFSFile {
                     long copyLength = Math.min(len - bytesRead, blockSize
                             - blockOffset);
 
+                    log.debug("blockNr: "+blockNr+", blockOffset: "+blockOffset+
+                    		  ", copyLength: "+copyLength+", bytesRead: "+bytesRead);
+                    
                     System.arraycopy(iNode.getDataBlock(blockNr),
                             (int) blockOffset, dest, off + (int) bytesRead,
                             (int) copyLength);

@@ -9,6 +9,16 @@ package org.jnode.fs.ext2;
  */
 public class Ext2Utils {
 	/**
+	 * ceil(a/b) if a>=0 
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static long ceilDiv(long a, long b){
+		return (int)((a+b-1)/b);
+	}
+	
+	/**
 	 * Gets an unsigned 8-bit byte from a given offset
 	 * @param offset
 	 * @return int
