@@ -28,6 +28,7 @@
   <extension-point id="aliases" name="System shell aliases"/>
 
   <extension point="org.jnode.security.permissions">
+    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read"/>
     <permission class="java.util.PropertyPermission" name="jnode.cmdline" actions="read"/>
     <permission class="java.util.PropertyPermission" name="jnode.prompt" actions="read,write"/>
     <permission class="java.util.PropertyPermission" name="user.dir" actions="read"/>
