@@ -22,8 +22,8 @@ public class Ext2FileSystemType implements FileSystemType {
 	/**
 	 * @see org.jnode.fs.FileSystemType#create(Device)
 	 */
-	public FileSystem create(Device device) throws FileSystemException {
-		return new Ext2FileSystem(device);
+	public FileSystem create(Device device, boolean readOnly) throws FileSystemException {
+		return new Ext2FileSystem(device, readOnly);
 	}
 
 	/**
