@@ -12,6 +12,7 @@ import org.jnode.assembler.x86.X86Operation;
 import org.jnode.system.BootLog;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.SoftByteCodes;
+import org.jnode.vm.Vm;
 import org.jnode.vm.bytecode.BasicBlock;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.bytecode.TypeStack;
@@ -2093,6 +2094,22 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     }
 
     /**
+     * Convert the given multiplier to a shift number.
+     * @param val
+     * @return -1 if not shiftable.
+     */
+    private final int getShiftForMultiplier(int val) {
+    	int mul = 2;
+    	for (int i = 1; i <= 31; i++) {
+    		if (val == mul) {
+    			return i;
+    		}
+    		mul <<= 1;
+    	}
+    	return -1;
+    }
+    
+    /**
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_imul()
      */
     public final void visit_imul() {
@@ -2111,7 +2128,25 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             os.writeIMUL(r1, v2.getRegister());
             break;
         case Item.Kind.CONSTANT:
-            os.writeIMUL_3(r1, r1, v2.getValue());
+        	final int val = v2.getValue();
+        	if (val == 0) {
+        		os.writeXOR(r1, r1); // * 0
+        	} else if (val == 1) {
+        		// Do nothing 
+        	} else if (val == -1) {
+    			os.writeNEG(r1); // * -1
+        	} else {
+        		final int shift = getShiftForMultiplier(Math.abs(val));
+        		if (shift > 0) {
+        			// abs(val) is multiple of 2 && val=2^shift where shift <= 31
+        			os.writeSAL(r1, shift);
+        			if (val < 0) {
+        				os.writeNEG(r1);
+        			}
+        		} else {
+        			os.writeIMUL_3(r1, r1, val);
+        		}
+        	}
             break;
         case Item.Kind.LOCAL:
             os.writeIMUL(r1, FP, v2.getOffsetToFP());

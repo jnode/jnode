@@ -280,7 +280,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
     public final void writeIncInvocationCount(Register methodReg) {
         final int offset = context.getVmMethodInvocationCountField()
                 .getOffset();
-        os.writeADD(methodReg, offset, 1);
+        os.writeINC(methodReg, offset);
     }
 
     /**
