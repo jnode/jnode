@@ -10,6 +10,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Inet4Address;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Vector;
@@ -32,24 +33,42 @@ public class BOOTPServer {
 	private final Map table = new HashMap();
 
 	public static void main(String[] args) {
+		String filename = "bootptab.xml";
+		if(args.length > 0)
+			filename = args[0];
 		BOOTPServer server = new BOOTPServer();
 		try {
-			server.loadTable();
+			server.loadTable(filename);
 			server.run();
 		} catch(IOException ex) {
 			Logger.getLogger(BOOTPServer.class).debug("I/O exception", ex);
 		}
 	}
+	private static class TableEntry {
+		final Inet4Address address;
+		final String bootFileName;
 
-	private void loadTable() throws IOException {
-		FileReader reader = new FileReader("bootp.xml");
+		public TableEntry(XMLElement xml) {
+			try {
+				address = (Inet4Address) InetAddress.getByName(xml.getStringAttribute("ipAddress"));
+			} catch(UnknownHostException ex) {
+				throw new IllegalArgumentException(ex.getMessage());
+			}
+			bootFileName = xml.getStringAttribute("bootFileName");
+		}
+	}
+
+	private void loadTable(String filename) throws IOException {
+		FileReader reader = new FileReader(filename);
 		try {
 			XMLElement xml = new XMLElement();
 			xml.parseFromReader(reader);
 			Vector children = xml.getChildren();
 			for(int i=0; i<children.size(); i++) {
 				XMLElement child = (XMLElement) children.get(i);
-				table.put(child.getAttribute("ethernetAddress"), child.getAttribute("ipAddress"));
+				try {
+					table.put(child.getStringAttribute("ethernetAddress"), new TableEntry(child));
+				} catch(IllegalArgumentException ex) {}
 			}
 		} finally {
 			reader.close();
@@ -91,13 +110,14 @@ public class BOOTPServer {
 		log.debug("Got Server IP address  : " + hdr.getServerIPAddress());
 		log.debug("Got Gateway IP address : " + hdr.getGatewayIPAddress());
 
-		String hostIP = (String) table.get(hdr.getClientHwAddress().toString());
-		if(hostIP == null) {
-			// no host entry in table
+		TableEntry entry = (TableEntry) table.get(hdr.getClientHwAddress().toString());
+		if(entry == null) {
+			// no entry in table
 			return;
 		}
-		Inet4Address yourIP = (Inet4Address) InetAddress.getByName(hostIP);
+		Inet4Address yourIP = entry.address;
 		hdr = new BOOTPHeader(BOOTPHeader.BOOTREPLY, hdr.getTransactionID(), hdr.getClientIPAddress(), yourIP, (Inet4Address) InetAddress.getLocalHost(), hdr.getClientHwAddress());
+		hdr.setBootFileName(entry.bootFileName);
 		BOOTPMessage msg = new BOOTPMessage(hdr);
 		packet = msg.toDatagramPacket();
 		packet.setAddress(IPv4Address.BROADCAST_ADDRESS);

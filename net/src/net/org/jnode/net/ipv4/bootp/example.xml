@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bootp>
-   <host ethernetAddress="00:00:00:00:00:00" ipAddress="192.168.0.1"/>
-</bootp>
+<bootptab>
+   <host ethernetAddress="00:00:00:00:00:01" ipAddress="192.168.0.1"/>
+   <host ethernetAddress="00:00:00:00:00:02" ipAddress="192.168.0.2" bootFileName="loader.img"/>
+</bootptab>
