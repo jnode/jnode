@@ -124,7 +124,11 @@ public class RE extends REToken {
   private static final String VERSION = "1.1.5-dev";
 
   // The localized strings are kept in a separate file
-  private static ResourceBundle messages = PropertyResourceBundle.getBundle("gnu/regexp/MessagesBundle", Locale.getDefault());
+  // 17/03/2005 Martin Husted Hartvig (hagar@jnode.org) bug fixed: '/' is not a correct character, changed to '.'
+
+  private static ResourceBundle messages = PropertyResourceBundle.getBundle("gnu.regexp.MessagesBundle", Locale.getDefault());
+//  private static ResourceBundle messages = PropertyResourceBundle.getBundle("gnu/regexp/MessagesBundle", Locale.getDefault());
+
 
   // These are, respectively, the first and last tokens in our linked list
   // If there is only one token, firstToken == lastToken
