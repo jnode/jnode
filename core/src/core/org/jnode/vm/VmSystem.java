@@ -69,15 +69,17 @@ public final class VmSystem {
 			/* Initialize the monitor system */
 			MonitorManager.initialize();
 
+			final Vm vm = Vm.getVm();
+			
 			// Initialize the monitors for the heap manager
-			Vm.getVm().getHeapManager().start();
-
+			vm.getHeapManager().start();
+			
 			/* We're done initializing */
 			inited = true;
 			Unsafe.getCurrentProcessor().systemReadyForThreadSwitch();
 
 			// Start the compilation manager
-			VmCompilationManager.initialize();
+			vm.startHotMethodManager();
 
 			// Load the command line
 			System.getProperties().setProperty("jnode.cmdline", getCmdLine());

@@ -201,18 +201,34 @@ public final class VmStatics extends VmSystemObject {
 	 * @param visitor
 	 */
 	public void walk(ObjectVisitor visitor, ObjectResolver resolver) {
+		walk(TYPE_OBJECT, visitor, resolver);
+	}
+
+	/**
+	 * Let all methods in this statics-table make a visit to the given visitor.
+	 * 
+	 * @param visitor
+	 */
+	public void walkMethods(ObjectVisitor visitor) {
+		walk(TYPE_METHOD, visitor, getResolver());
+	}
+
+	/**
+	 * Let all objects in this statics-table make a visit to the given visitor.
+	 * 
+	 * @param visitor
+	 */
+	private void walk(int visitType, ObjectVisitor visitor, ObjectResolver resolver) {
 		final int[] table;
 		final byte[] types;
 		final int length;
-		synchronized (this) {
-			table = this.statics;
-			types = this.types;
-			length = this.next;
-		}
+		table = this.statics;
+		types = this.types;
+		length = this.next;
 		if (slotLength == 1) {
 			for (int i = 0; i < length; i++) {
 				final byte type = types[i];
-				if (type == TYPE_OBJECT) {
+				if (type == visitType) {
 					final Object object;
 					object = resolver.objectAt32(table[i]);
 					if (object != null) {

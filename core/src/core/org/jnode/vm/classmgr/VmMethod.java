@@ -10,7 +10,6 @@ import java.lang.reflect.Method;
 
 import org.jnode.vm.Address;
 import org.jnode.vm.PragmaUninterruptible;
-import org.jnode.vm.VmCompilationManager;
 
 public abstract class VmMethod extends VmMember {
 
@@ -40,8 +39,6 @@ public abstract class VmMethod extends VmMember {
 	private VmCompiledCode compiledCode;
 	/** The exceptions we can throw */
 	private VmExceptions exceptions;
-	/** Profiler used in recordInvoke */
-	private HotMethodDetector detector;
 	/** The selector of this method name&type */
 	private int selector;
 	/** This field will be used to mask the thread switch indicator */
@@ -50,6 +47,7 @@ public abstract class VmMethod extends VmMember {
 	private int nativeCodeOptLevel = -1;
 	/** The index in the statics table */
 	private final int staticsIndex;
+	private int lastInvocationCount;
 	
 	/**
 	 * Constructor for VmMethod.
@@ -84,7 +82,6 @@ public abstract class VmMethod extends VmMember {
 		this.returnObject = (firstReturnSignatureChar == '[' || firstReturnSignatureChar == 'L');
 		this.selector = selector;
 		this.staticsIndex = staticsIdx;
-		setProfile(!(isAbstract() | isNative()));
 		VmStatics.methodCount++;
 	}
 
@@ -184,34 +181,12 @@ public abstract class VmMethod extends VmMember {
 	}
 
 	/**
-	 * Record an invocation of this method. This method is called by vm_invoke in vm-invoke.asm
-	 * when this method is invocated AND ACC_PROFILE is set.
-	 * 
-	 * @see Modifier#ACC_PROFILE
-	 * @throws PragmaUninterruptible
-	 */
-	protected final void recordInvoke() throws PragmaUninterruptible {
-		final HotMethodDetector detector = this.detector;
-		if (detector != null) {
-			if (!detector.isHot()) {
-				detector.recordInvoke();
-				if (detector.isHot()) {
-					if (VmCompilationManager.recordHotMethod(this)) {
-						setProfile(false);
-					} else {
-						detector.reset();
-					}
-				}
-			}
-		}
-	}
-
-	/**
 	 * Compile this method with n optimization level 1 higher then the
 	 * current optimization level.
 	 */
 	public final void recompile() {
 		doCompile(nativeCodeOptLevel + 1);
+		invocationCount = 0;
 	}
 
 	/**
@@ -226,7 +201,6 @@ public abstract class VmMethod extends VmMember {
 		}
 		declaringClass.getLoader().compileRuntime(this, optLevel);
 		setModifier(true, Modifier.ACC_COMPILED);
-		setProfile(false);
 	}
 
 	public final boolean isAbstract() {
@@ -393,22 +367,6 @@ public abstract class VmMethod extends VmMember {
 	}
 
 	/**
-	 * Should profiling be enabled on this method?
-	 * 
-	 * @param on
-	 */
-	protected final void setProfile(boolean on) {
-		if (on) {
-			if (detector == null) {
-				detector = new HotMethodDetector();
-			}
-		} else {
-			detector = null;
-		}
-		setModifier(on, Modifier.ACC_PROFILE);
-	}
-
-	/**
 	 * Gets the global unique selector if this method name&amp;type.
 	 * 
 	 * @return The selector
@@ -431,7 +389,7 @@ public abstract class VmMethod extends VmMember {
 	 * 
 	 * @return int
 	 */
-	int getInvocationCount() {
+	public final int getInvocationCount() {
 		return this.invocationCount;
 	}
 
@@ -465,5 +423,19 @@ public abstract class VmMethod extends VmMember {
 	 */
 	public final int getStaticsIndex() {
 		return this.staticsIndex;
+	}
+	
+	/**
+	 * @return Returns the lastInvocationCount.
+	 */
+	public final int getLastInvocationCount() {
+		return this.lastInvocationCount;
+	}
+
+	/**
+	 * Set the last invocation count to the current invocation count.
+	 */
+	public final void setLastInvocationCount() {
+		this.lastInvocationCount = invocationCount;
 	}
 }

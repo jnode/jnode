@@ -6,7 +6,6 @@
 ; Author       : E. Prangsma
 ; -----------------------------------------------
 
-	extern VmMethod_recordInvoke
 	extern vm_findThrowableHandler
 	extern VmMethod_Class
 

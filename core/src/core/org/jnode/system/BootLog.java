@@ -20,12 +20,15 @@ public class BootLog {
 	public static final int ERROR = 4;
 	public static final int FATAL = 5;
 	
+	private static PrintStream debugOut;
+	
 	/**
 	 * Log a debug message
 	 * @param msg
 	 */
 	public static void debug(String msg) {
-		log(DEBUG, System.out, msg, null);
+		final PrintStream out = (debugOut != null) ? debugOut : System.out;		
+		log(DEBUG, out, msg, null);
 	}
 
 	/**
@@ -34,7 +37,8 @@ public class BootLog {
 	 * @param ex
 	 */
 	public static void debug(String msg, Throwable ex) {
-		log(DEBUG, System.out, msg, ex);
+		final PrintStream out = (debugOut != null) ? debugOut : System.out;		
+		log(DEBUG, out, msg, ex);
 	}
 
 	/**
@@ -106,13 +110,21 @@ public class BootLog {
 	}
 
 	/**
+	 * Set the stream to use for debug logs.
+	 * @param out
+	 */
+	public static void setDebugOut(PrintStream out) {
+		debugOut = out;
+	}
+
+	/**
 	 * Log an error message
 	 * @param level
 	 * @param ps
 	 * @param msg
 	 * @param ex
 	 */
-	public static void log(int level, PrintStream ps, String msg, Throwable ex) {
+	private static void log(int level, PrintStream ps, String msg, Throwable ex) {
 		if (ps != null) {
 			if (msg != null) {
 				ps.println(msg);
