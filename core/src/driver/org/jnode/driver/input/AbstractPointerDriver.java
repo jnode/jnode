@@ -32,7 +32,7 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 	 * 
 	 * @param l
 	 */
-	public void addPointerListener(PointerListener l) {
+	public synchronized void addPointerListener(PointerListener l) {
 		listeners.add(l);
 	}
 
@@ -41,7 +41,7 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 	 * 
 	 * @param l
 	 */
-	public void removePointerListener(PointerListener l) {
+	public synchronized void removePointerListener(PointerListener l) {
 		listeners.remove(l);
 	}
 
