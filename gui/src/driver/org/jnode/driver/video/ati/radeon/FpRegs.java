@@ -59,11 +59,11 @@ final class FpRegs implements RadeonConstants {
 		io.setReg32(FP_CRTC_V_TOTAL_DISP, fp_crtc_v_total_disp);
 		io.setRegP32(FP_GEN_CNTL, fp_gen_cntl, FP_SEL_CRTC2);
 		io.setReg32(FP_H_SYNC_STRT_WID, fp_h_sync_strt_wid);
-		io.setReg32(FP_HORZ_STRETCH, fp_horz_stretch);
+//		io.setReg32(FP_HORZ_STRETCH, fp_horz_stretch);
 		io.setReg32(FP_V_SYNC_STRT_WID, fp_v_sync_strt_wid);
-		io.setReg32(FP_VERT_STRETCH, fp_vert_stretch);
-		io.setReg32(LVDS_GEN_CNTL, lvds_gen_cntl);
-		io.setReg32(LVDS_PLL_CNTL, lvds_pll_cntl);
+//		io.setReg32(FP_VERT_STRETCH, fp_vert_stretch);
+		io.setRegP32(LVDS_GEN_CNTL, lvds_gen_cntl, LVDS_ON | LVDS_BLON);
+		//io.setReg32(LVDS_PLL_CNTL, lvds_pll_cntl);
 		io.setReg32(TMDS_CRC, tmds_crc);
 		io.setReg32(TMDS_TRANSMITTER_CNTL, tmds_transmitter_cntl);
 	}
