@@ -17,6 +17,7 @@ import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmStatics;
+import org.jnode.vm.memmgr.GCStatistics;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.jnode.vm.memmgr.VmWriteBarrier;
@@ -72,6 +73,8 @@ public final class DefaultHeapManager extends VmHeapManager {
     private int triggerSize = Integer.MAX_VALUE;
 
     private boolean gcActive;
+    
+    private GCManager gcManager;
 
     /**
      * Make this private, so we cannot be instantiated
@@ -205,7 +208,7 @@ public final class DefaultHeapManager extends VmHeapManager {
         heapMonitor = new Monitor();
         final VmArchitecture arch = Unsafe.getCurrentProcessor()
                 .getArchitecture();
-        final GCManager gcManager = new GCManager(this, arch, statics);
+        this.gcManager = new GCManager(this, arch, statics);
         this.gcThread = new GCThread(gcManager, heapMonitor);
         this.finalizerThread = new FinalizerThread(this);
         gcThread.start();
@@ -389,5 +392,9 @@ public final class DefaultHeapManager extends VmHeapManager {
      */
     final void triggerFinalization() {
         finalizerThread.trigger(false);
+    }
+    
+    public GCStatistics getStatistics() {
+        return gcManager.getStatistics();
     }
 }

@@ -217,6 +217,8 @@ public class BaseMagicHelper {
     protected static final int mGETTIB = 99;
     protected static final int mGETOBJECTFLAGS = 100;
     protected static final int mSETOBJECTFLAGS = 101;
+    protected static final int mTOOBJECT = 102;
+
 
     private static final int mLOAD_MIN = mLOADBYTE;
 
@@ -243,6 +245,7 @@ public class BaseMagicHelper {
         addMethod("toWord", mTOWORD);
         addMethod("toAddress", mTOADDRESS);
         addMethod("toOffset", mTOOFFSET);
+        addMethod("toObject", mTOOBJECT);
         addMethod("toObjectReference", mTOOBJECTREFERENCE);
         addMethod("toExtent", mTOEXTENT);
         addMethod("equals", mEQUALS);

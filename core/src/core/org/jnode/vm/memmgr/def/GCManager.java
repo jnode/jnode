@@ -10,6 +10,7 @@ import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.VmStatics;
+import org.jnode.vm.memmgr.GCStatistics;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.pragma.Uninterruptible;
 
@@ -37,7 +38,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
     private final GCVerifyVisitor verifyVisitor;
 
     /** My statistics */
-    private final GCStatistics stats;
+    private final DefGCStatistics stats;
 
     /** The object resolver */
     private final ObjectResolver resolver;
@@ -59,7 +60,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
      */
     public GCManager(DefaultHeapManager heapManager, VmArchitecture arch,
             VmStatics statics) {
-        this.debug = Vm.getVm().isDebugMode();
+        this.debug = true || Vm.getVm().isDebugMode();
         this.heapManager = heapManager;
         this.writeBarrier = (DefaultWriteBarrier) heapManager.getWriteBarrier();
         this.helper = heapManager.getHelper();
@@ -68,7 +69,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
         this.setWhiteVisitor = new GCSetWhiteVisitor(heapManager);
         this.verifyVisitor = new GCVerifyVisitor(heapManager, arch);
         this.sweepVisitor = new GCSweepVisitor(heapManager);
-        this.stats = new GCStatistics();
+        this.stats = new DefGCStatistics();
         this.statics = statics;
         this.resolver = new Unsafe.UnsafeObjectResolver();
     }
@@ -127,15 +128,6 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
 
         // Start the finalization process
         heapManager.triggerFinalization();
-
-        if (verbose) {
-            Unsafe.debug("</gc free=");
-            Unsafe.debug(heapManager.getFreeMemory());
-            Unsafe.debug("/>");
-            if (debug) {
-                System.out.println(stats);
-            }
-        }
     }
 
     /**
@@ -205,6 +197,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
      * @param firstHeap
      */
     private void sweep(VmAbstractHeap firstHeap) {
+        final long startTime = VmSystem.currentKernelMillis();
         VmAbstractHeap heap = firstHeap;
         while (heap != null) {
             //freedBytes += heap.collect();
@@ -212,6 +205,8 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
             heap.walk(sweepVisitor, true, 0, 0);
             heap = heap.getNext();
         }
+        final long endTime = VmSystem.currentKernelMillis();
+        stats.lastSweepDuration = endTime - startTime;
     }
 
     /**
@@ -221,6 +216,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
      * @param firstHeap
      */
     private void cleanup(VmBootHeap bootHeap, VmAbstractHeap firstHeap) {
+        final long startTime = VmSystem.currentKernelMillis();
         bootHeap.walk(setWhiteVisitor, true, 0, 0);
         VmAbstractHeap heap = firstHeap;
         while (heap != null) {
@@ -228,6 +224,8 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
             //heap.walk(setWhiteVisitor, locking);
             heap = heap.getNext();
         }
+        final long endTime = VmSystem.currentKernelMillis();
+        stats.lastCleanupDuration = endTime - startTime;
     }
 
     /**
@@ -250,5 +248,9 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
             Unsafe.debug(" verify errors. ");
             helper.die("Corrupted heap");
         }
+    }
+
+    public GCStatistics getStatistics() {
+        return stats;
     }
 }

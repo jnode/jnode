@@ -13,6 +13,9 @@ import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.pragma.UninterruptiblePragma;
+import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.ObjectReference;
+import org.vmmagic.unboxed.Offset;
 
 /**
  * @author epr
@@ -20,7 +23,7 @@ import org.vmmagic.pragma.UninterruptiblePragma;
 public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 
     /** Offset within this heap of the next free memory block */
-    private VmAddress nextFreePtr;
+    private Address nextFreePtr;
 
     /** The allocation bitmap as object, so we won't throw it away in a GC cycle */
     private Object allocationBitmap;
@@ -93,7 +96,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         final int mySize = helper.getInt(this, sizeOffset);
         final VmAddress myAddr = helper.addressOf(this);
         VmAddress firstObject;
-        if (inHeap(myAddr)) {
+        if (inHeap(Address.fromAddress(myAddr))) {
             firstObject = VmAddress.add(myAddr, mySize + headerSize);
         } else {
             firstObject = VmAddress.add(start, headerSize);
@@ -121,7 +124,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 
         // Initialize the remaining space as free object.
         final int remainingSize = (int) VmAddress.distance(end, firstObject);
-        final VmAddress ptr = firstObject;
+        final Address ptr = Address.fromAddress(firstObject);
         helper.setInt(ptr, sizeOffset, remainingSize);
         helper.setObject(ptr, tibOffset, FREE);
         this.nextFreePtr = ptr;
@@ -147,19 +150,21 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
             throw new IllegalArgumentException("vmClass.TIB is null");
         }
         //final int size = getSize();
-        final int tibOffset = this.tibOffset;
+        final Offset tibOffset = Offset.fromIntZeroExtend(this.tibOffset);
         final int headerSize = this.headerSize;
+        final Offset flagsOffset = Offset.fromIntZeroExtend(this.flagsOffset);
+        final Offset sizeOffset = Offset.fromIntZeroExtend(this.sizeOffset);
 
-        VmAddress objectPtr = null;
+        Address objectPtr = null;
         lock();
         try {
             // Search for the first free block that is large enough
             //Screen.debug("a");
             while (objectPtr == null) {
-                final VmAddress ptr = nextFreePtr;
-                final int objSize = helper.getInt(ptr, sizeOffset);
-                final Object objVmt = helper.getObject(ptr, tibOffset);
-                final VmAddress nextPtr = VmAddress.add(ptr, objSize + headerSize);
+                final Address ptr = nextFreePtr;
+                final int objSize = ptr.loadInt(sizeOffset);
+                final Object objVmt = ptr.loadObjectReference(tibOffset);
+                final Address nextPtr = ptr.add(objSize + headerSize);
                 if ((objVmt == FREE) && (alignedSize <= objSize)) {
                     objectPtr = ptr;
                 } else {
@@ -177,7 +182,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
             }
             //Screen.debug("A");
 
-            final int curFreeSize = helper.getInt(objectPtr, sizeOffset);
+            final int curFreeSize = objectPtr.loadInt(sizeOffset);
             if (curFreeSize > totalSize) {
                 // Block is larger then we need, split it up.
                 final int newFreeSize = curFreeSize - totalSize;
@@ -189,11 +194,11 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
                     Unsafe.debug("\nheaderSize  "); Unsafe.debug(headerSize);
                     throw new Error("Block splitup failed");
                 }*/
-                final VmAddress newFreePtr = VmAddress.add(objectPtr, totalSize);
+                final Address newFreePtr = objectPtr.add(totalSize);
                 // Set the header for the remaining free block
-                helper.setInt(newFreePtr, sizeOffset, newFreeSize);
-                helper.setInt(newFreePtr, flagsOffset, 0);
-                helper.setObject(newFreePtr, tibOffset, FREE);
+                newFreePtr.store(newFreeSize, sizeOffset);
+                newFreePtr.store(0, flagsOffset);
+                newFreePtr.store(ObjectReference.fromObject(FREE), tibOffset);
                 // Set the next free offset
                 nextFreePtr = newFreePtr;
             } else {
@@ -203,9 +208,9 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
             }
 
             // Create the object header
-            helper.setInt(objectPtr, sizeOffset, alignedSize);
-            helper.setInt(objectPtr, flagsOffset, 0);
-            helper.setObject(objectPtr, tibOffset, tib);
+            objectPtr.store(alignedSize, sizeOffset);
+            objectPtr.store(0, flagsOffset);
+            objectPtr.store(ObjectReference.fromObject(tib), tibOffset);
             // Mark the object in the allocation bitmap
             setAllocationBit(objectPtr, true);
 
@@ -216,9 +221,9 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         }
 
         // Clear the contents of the object.
-        helper.clear(objectPtr, alignedSize);
+        helper.clear(objectPtr.toAddress(), alignedSize);
 
-        return helper.objectAt(objectPtr);
+        return objectPtr.toObjectReference().toObject();
     }
 
     /**
@@ -236,7 +241,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         } finally {
             unlock();
         }
-    }
+    } 
 
     /**
      * @see VmAbstractHeap#getFreeSize()
@@ -254,30 +259,29 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
     protected final void defragment() throws UninterruptiblePragma {
         final int size = getSize();
         int offset = headerSize;
+        final Offset sizeOffset = Offset.fromIntZeroExtend(this.sizeOffset);
+        final Offset tibOffset = Offset.fromIntZeroExtend(this.tibOffset);
 
         lock();
         try {
-            VmAddress firstFreePtr = null;
+            Address firstFreePtr = null;
             while (offset < size) {
-                final VmAddress ptr = VmAddress.add(start, offset);
-                final Object object = helper.objectAt(ptr);
-                final int objSize = helper.getInt(object, sizeOffset);
+                final Address ptr = Address.fromAddress(start).add(offset);
+                final int objSize = ptr.loadInt(sizeOffset);
                 final int nextOffset = offset + objSize + headerSize;
-                final Object vmt = helper.getObject(object, tibOffset);
+                final Object vmt = ptr.loadObjectReference(tibOffset);
                 if ((firstFreePtr == null) && (vmt == FREE)) {
                     firstFreePtr = ptr;
                 }
                 if ((vmt == FREE) && (nextOffset < size)) {
-                    final Object nextObject;
                     final Object nextVmt;
-                    nextObject = helper
-                            .objectAt(VmAddress.add(start, nextOffset));
-                    nextVmt = helper.getObject(nextObject, tibOffset);
+                    final Address nextObjectPtr = Address.fromAddress(start).add(nextOffset);
+                    nextVmt = nextObjectPtr.loadObjectReference(tibOffset);
                     if (nextVmt == FREE) {
                         // Combine two free spaces
-                        int nextObjSize = helper.getInt(nextObject, sizeOffset);
+                        int nextObjSize = nextObjectPtr.loadInt(sizeOffset);
                         int newObjSize = objSize + headerSize + nextObjSize;
-                        helper.setInt(object, sizeOffset, newObjSize);
+                        ptr.store(newObjSize, sizeOffset);
                         // Do not increment offset here, because there may be
                         // another next free object, which we will combine
                         // in the next loop.
@@ -306,7 +310,8 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
             int flagsMask, int flagsValue) {
         // Go through the heap and call visit on each object
         final int headerSize = this.headerSize;
-        final int sizeOffset = this.sizeOffset;
+        final Offset sizeOffset = Offset.fromIntZeroExtend(this.sizeOffset);
+        final Offset tibOffset = Offset.fromIntZeroExtend(this.tibOffset);
         final Object FREE = this.FREE;
         int offset = headerSize;
         final int size = getSize();
@@ -320,10 +325,10 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 
                 lock();
                 try {
-                    final VmAddress ptr = VmAddress.add(start, offset);
-                    object = helper.objectAt(ptr);
-                    tib = helper.getObject(object, tibOffset);
-                    objSize = helper.getInt(object, sizeOffset);
+                    final Address ptr = Address.fromAddress(start).add(offset);
+                    object = ptr.toObjectReference().toObject();
+                    tib = ptr.loadObjectReference(tibOffset);
+                    objSize = ptr.loadInt(sizeOffset);
                     flags = (flagsMask == 0) ? 0 : (VmMagic.getObjectFlags(object) & flagsMask);
                 } finally {
                     unlock();
@@ -340,10 +345,10 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
             }
         } else {
             while (offset < size) {
-                final VmAddress ptr = VmAddress.add(start, offset);
-                final Object object = helper.objectAt(ptr);
-                final Object tib = helper.getObject(object, tibOffset);
-                final int objSize = helper.getInt(object, sizeOffset);
+                final Address ptr = Address.fromAddress(start).add(offset);
+                final Object object = ptr.toObjectReference().toObject();
+                final Object tib = ptr.loadObjectReference(tibOffset);
+                final int objSize = ptr.loadInt(sizeOffset);
                 final int flags = (flagsMask == 0) ? 0 : (VmMagic.getObjectFlags(object) & flagsMask);
                 if (tib != FREE) {
                     if (flags == flagsValue) {

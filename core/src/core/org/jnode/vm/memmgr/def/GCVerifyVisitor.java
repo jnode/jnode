@@ -8,6 +8,7 @@ import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMagic;
+import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
@@ -40,6 +41,11 @@ final class GCVerifyVisitor extends ObjectVisitor {
      */
     public boolean visit(Object object) {
         final VmType vmClass = VmMagic.getObjectType(object);
+        final int color = helper.getObjectColor(object);
+        if (color == ObjectFlags.GC_YELLOW) {
+            // Ignore objects that need to be finalized.
+            return true;
+        }
         if (vmClass == null) {
             helper.die("GCVerifyError: vmClass");
         } else if (vmClass.isArray()) {
@@ -54,7 +60,7 @@ final class GCVerifyVisitor extends ObjectVisitor {
         if (monitor != null) {
             verifyChild(monitor, object, "monitor");
         }
-        return true;
+        return (errorCount == 0);
     }
     
     private void verifyArray(Object object) {
@@ -96,7 +102,11 @@ final class GCVerifyVisitor extends ObjectVisitor {
                 Unsafe.debug(where);
                 Unsafe.debug(", parent type ");
                 Unsafe.debug(VmMagic.getObjectType(parent).getName());
-                Unsafe.debug("; child is not an object. ");
+                Unsafe.debug(helper.getObjectColor(parent));
+                Unsafe.debug("; child (");
+                Unsafe.debug(childRef.toAddress().toInt());
+                Unsafe.debug(") is not an object ");
+                Unsafe.debug(helper.getObjectColor(childRef));
                 errorCount++;
             }
         }
