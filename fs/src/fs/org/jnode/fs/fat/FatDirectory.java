@@ -90,7 +90,7 @@ public class FatDirectory extends AbstractDirectory {
 			final FatFileSystem fs = (FatFileSystem)getFileSystem();
 			if (fs != null) {
 				long offset = FatUtils.getRootDirOffset(fs.getBootSector());
-				write(fs.getBlockDeviceAPI(), offset);
+				write(fs.getApi(), offset);
 			}
 		} else {
 			write();
