@@ -1,7 +1,5 @@
 package org.jnode.fs.ext2;
 
-import org.apache.log4j.Logger;
-
 /**
  * A single directory record, i.e. the inode number and name of
  * an entry in a directory
@@ -9,14 +7,11 @@ import org.apache.log4j.Logger;
  * @author Andras Nagy
  */
 public class Ext2DirectoryRecord {
-    
-   private static final Logger log = Logger.getLogger(Ext2DirectoryRecord.class);
-	
-   int iNodeNr;
-	int recLen;
-	short nameLen;
-	short fileType;
-	StringBuffer name;
+	private int iNodeNr;
+	private int recLen;
+	private short nameLen;
+	private short type;
+	private StringBuffer name;
 	
 	/**
 	 * @param data:	the data that makes up the directory block
@@ -26,19 +21,14 @@ public class Ext2DirectoryRecord {
 		iNodeNr = (int)Ext2Utils.get32(data, offset);
 		recLen	= Ext2Utils.get16(data, offset+4);
 		nameLen	= Ext2Utils.get8(data, offset+6);
-		fileType= Ext2Utils.get8(data, offset+7);
+		type	= Ext2Utils.get8(data, offset+7);
 		
 		name 	= new StringBuffer();
 		if(iNodeNr!=0) {
-		//XXX character conversion
+			//XXX character conversion
 			for(int i=0; i<nameLen; i++) 
 				name.append( (char)Ext2Utils.get8(data, offset+8+i) );
-				log.debug("Ext2DirectoryRecord(): iNode="+iNodeNr+
-//												", recLen="+recLen+
-//												", nameLen= "+nameLen+
-//												", offset="+offset+
-												", namee="+name);
-
+			Ext2Debugger.debug("Ext2DirectoryRecord(): iNode="+iNodeNr+", name="+name,3);
 		}
 
 	}
@@ -47,8 +37,8 @@ public class Ext2DirectoryRecord {
 	 * Returns the fileType.
 	 * @return short
 	 */
-	public short getFileType() {
-		return fileType;
+	public short getType() {
+		return type;
 	}
 
 	/**
@@ -66,15 +56,6 @@ public class Ext2DirectoryRecord {
 	public String getName() {
 		return name.toString();
 	}
-
-	/**
-	 * Returns the nameLen.
-	 * @return short
-	 */
-	public short getNameLen() {
-		return nameLen;
-	}
-
 	/**
 	 * Returns the recLen.
 	 * @return int

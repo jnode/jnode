@@ -4,61 +4,60 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
+import org.jnode.fs.FileSystemException;
 
 /**
  * @author Andras Nagy
  */
 public class Ext2Directory implements FSDirectory {
-
-	protected static final Logger log = Logger.getLogger(Ext2Directory.class);
-
+	
 	INode iNode;
-
+	boolean valid;
+		
 	public Ext2Directory(INode iNode) {
-		this.iNode = iNode;
-		//XXX
+		this.iNode=iNode;
+		valid=true;
 	}
 	/**
 	 * @see org.jnode.fs.FSDirectory#addDirectory(String)
 	 */
-	public FSEntry addDirectory(String name) {
-		return null;
+	public FSEntry addDirectory(String name) throws IOException {
+		throw new IOException("EXT2 implementation is currently readonly");
 	}
 
 	/**
 	 * @see org.jnode.fs.FSDirectory#addFile(String)
 	 */
-	public FSEntry addFile(String name) {
-		return null;
+	public FSEntry addFile(String name) throws IOException {
+		throw new IOException("EXT2 implementation is currently readonly");
 	}
 
-	/**
+	/** 
 	 * Return the number of the block that contains the given byte
 	 */
-	protected int translateToBlock(long index) {
-		return (int) (index / iNode.getExt2FileSystem().getBlockSize());
+	private int translateToBlock(long index) {
+		return (int)(index / iNode.getExt2FileSystem().getBlockSize());
 	}
-
+	
 	/**
 	 * Return the offset inside the block that contains the given byte
 	 */
-	protected int translateToOffset(long index) {
-		return (int) (index % iNode.getExt2FileSystem().getBlockSize());
+	private int translateToOffset(long index) {
+		return (int)(index % iNode.getExt2FileSystem().getBlockSize());
 	}
 
 	/**
 	 * @see org.jnode.fs.FSDirectory#getEntry(String)
 	 */
-	public FSEntry getEntry(String name) {
+	public FSEntry getEntry(String name) throws IOException {
 		//parse the directory and search for the file
-		Iterator iterator = iterator();
-		while (iterator.hasNext()) {
+		Iterator iterator=iterator();
+		while(iterator.hasNext()) {
 			FSEntry entry = (FSEntry)iterator.next();
-			if (entry.getName().equals(name))
+			if(entry.getName().equals(name))
 				return entry;
 		}
 		return null;
@@ -72,82 +71,88 @@ public class Ext2Directory implements FSDirectory {
 		int index;
 		Ext2DirectoryRecord current;
 		boolean noMoreEntries = false;
-
-		INode iteratedNode;
-
+		
+		INode iNode;
+		
 		public FSEntryIterator(INode iNode) {
-			this.iteratedNode = iNode;
-
+			this.iNode = iNode;
+			
 			lastBlockIndex = -1;
 			blockIndex = 0;
-			blockData = null;
-			index = 0;
+			//the byte index where the directory parsing has reached
+			index=0;
+			//the Ext2DirectoryRecord that has been read last
 			current = null;
-
-			log.debug("FSEntryIterator()");
+			
+			Ext2Debugger.debug("FSEntryIterator()",2);
 		}
-
+		
 		/**
-		 * @see java.util.Iterator#hasNext() hasNext() has to actually read the
-		 *      next entry to see if it is a real entry or a not
+		 * @see java.util.Iterator#hasNext()
+		 * hasNext() has to actually read the next entry to see if
+		 * it is a real entry or a not
 		 */
 		public boolean hasNext() {
-			log.debug("FSEntryIterator.hasNext()");
-			if (noMoreEntries)
+			Ext2Debugger.debug("FSEntryIterator.hasNext()",3);
+			if(noMoreEntries)
 				return false;
-
-			if (index >= iteratedNode.getISize())
+			
+			if(index>=iNode.getSize())
 				return false;
-
+				
 			//read the inode number of the next entry:
-			blockIndex = translateToBlock(index);
-			blockOffset = translateToOffset(index);
-
-			try {
+			blockIndex = Ext2Directory.this.translateToBlock( index );
+			blockOffset= Ext2Directory.this.translateToOffset( index );
+			
+			try{
 				//read a new block if needed
-				if (blockIndex != lastBlockIndex)
-					blockData = iteratedNode.getDataBlock(blockIndex);
-				lastBlockIndex = blockIndex;
-
+				if(blockIndex != lastBlockIndex) {
+					blockData = iNode.getDataBlock(blockIndex);
+					lastBlockIndex = blockIndex;
+				}
+			
 				//get the next directory record
 				Ext2DirectoryRecord dr = new Ext2DirectoryRecord(blockData, blockOffset);
-				index += dr.getRecLen();
-
+				index+=dr.getRecLen();
+								
 				//inode nr=0 means the end of the directory
-				if (dr.getINodeNr() != 0) {
+				if(dr.getINodeNr()!=0) {
 					current = dr;
 					return true;
-				} else {
-					log.debug("FSEntryIterator.hasNext(): null inode");
+				}
+				else {
+					Ext2Debugger.debug("FSEntryIterator.hasNext(): null inode",2);
 					current = null;
-					noMoreEntries = true;
+					noMoreEntries=true;
 					return false;
 				}
-			} catch (IOException e) {
+			}catch(IOException e) {
 				return false;
 			}
-
 		}
 
 		/**
 		 * @see java.util.Iterator#next()
 		 */
 		public Object next() {
-			log.debug("FSEntryIterator.next()");
-
-			if (current == null) {
-				//hasNext reads the next element
-				if (!hasNext())
+			Ext2Debugger.debug("FSEntryIterator.next()",2);
+			
+			if(current == null) {
+				//hasNext actually reads the next element
+				if(!hasNext())
 					throw new NoSuchElementException();
 			}
-
+			
 			Ext2DirectoryRecord dr = current;
 			current = null;
-			try {
-				return new Ext2Entry(((Ext2FileSystem)getFileSystem()).getINode(dr.getINodeNr()), dr.getName());
-			} catch (IOException e) {
+			try{
+				return new Ext2Entry( ((Ext2FileSystem)getFileSystem()).getINode(dr.getINodeNr()),
+										dr.getName(), dr.getType() );
+			}catch(IOException e) {
 				throw new NoSuchElementException();
-			}
+			}catch(FileSystemException e) {
+				throw new NoSuchElementException();
+			}	
 		}
 
 		/**
@@ -158,19 +163,20 @@ public class Ext2Directory implements FSDirectory {
 		}
 	}
 
+
 	/**
 	 * @see org.jnode.fs.FSDirectory#iterator()
 	 */
-	public Iterator iterator() {
-		log.debug("Ext2Directory.Iterator()");
-		return new FSEntryIterator(iNode);
+	public Iterator iterator() throws IOException {
+		Ext2Debugger.debug("Ext2Directory.Iterator()",2);
+		return new FSEntryIterator(iNode);				
 	}
 
 	/**
 	 * @see org.jnode.fs.FSDirectory#remove(String)
 	 */
-	public void remove(String name) {
-		// empty
+	public void remove(String name) throws IOException {
+		throw new IOException("EXT2 implementation is currently readonly");
 	}
 
 	/**
@@ -184,7 +190,6 @@ public class Ext2Directory implements FSDirectory {
 	 * @see org.jnode.fs.FSObject#isValid()
 	 */
 	public boolean isValid() {
-		return false;
+		return valid;
 	}
-
 }

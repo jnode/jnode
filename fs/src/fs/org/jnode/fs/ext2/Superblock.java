@@ -5,24 +5,18 @@ import org.jnode.fs.FileSystemException;
 /**
  * Ext2fs superblock
  * 
- * XXX implementation uncomplete
- * 
  * @author Andras Nagy
  */
 public class Superblock {
 	public static final int SUPERBLOCK_LENGTH = 1024;
-	
-	//revision level values
-	public static final int EXT2_GOOD_OLD_REV = 0;
-	public static final int EXT2_DYNAMIC_REV  = 1;
-	
+		
 	private byte data[];
 	
 	public Superblock(byte src[]) throws FileSystemException {
 		data = new byte[src.length];
 		System.arraycopy(src, 0, data, 0, src.length);
 			
-		//check the magic number
+		//check the magic :)
 		if(getMagic() != 0xEF53)
 			throw new FileSystemException("Not ext2 superblock ("+getMagic()+": bad magic)");
 	}
@@ -139,27 +133,112 @@ public class Superblock {
 	}
 
 	public long getFirstInode() {
-		if(getRevLevel()==EXT2_DYNAMIC_REV)
+		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
 			return Ext2Utils.get32(data, 84);
 		else 
 			return 11;
 	}
 			
 	public long getINodeSize() {
-		if(getRevLevel()==EXT2_DYNAMIC_REV)
-			return Ext2Utils.get32(data, 88);
+		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
+			return Ext2Utils.get16(data, 88);
 		else 
 			return 128;
 	}
 
 	//XXX what to return for old versions?
 	public long getBlockGroupNr() {
-		if(getRevLevel()==EXT2_DYNAMIC_REV)
-			return Ext2Utils.get32(data, 90);
+		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
+			return Ext2Utils.get16(data, 90);
+		else 
+			return 0;
+	}
+	
+	public long getFeatureCompat() {
+		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
+			return Ext2Utils.get32(data, 92);
 		else 
 			return 0;
 	}
 
-	//XXX other values come...
+	public long getFeatureIncompat() {
+		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
+			return Ext2Utils.get32(data, 96);
+		else 
+			return 0;
+	}
+	
+	public long getFeatureROCompat() {
+		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
+			return Ext2Utils.get32(data, 100);
+		else 
+			return 0;
+	}
 
+	public byte[] getUUID() {
+		byte[] result=new byte[16];	
+		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
+			System.arraycopy(data, 104, result, 0, 16);
+		return result;
+	}
+	
+	public String getVolumeName() {
+		StringBuffer result=new StringBuffer();
+		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
+			for(int i=0; i<16; i++) {
+				char c=(char)data[120+i];
+				if(c!=0)
+					result.append(c);
+				else
+					break;
+			}	
+		return result.toString();
+	}
+	
+	public String getLastMounted() {
+		StringBuffer result=new StringBuffer();
+		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
+			for(int i=0; i<64; i++) {
+				char c=(char)data[136+i];
+				if(c!=0)
+					result.append(c);
+				else
+					break;
+			}	
+		return result.toString();
+	}
+
+	//not sure this is the correct byte-order for this field
+	public long getAlgoBitmap() {
+		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
+			return Ext2Utils.get32(data, 200);
+		else 
+			return 11;
+	}
+	
+	public int getPreallocBlocks() {
+		return Ext2Utils.get8(data, 204);
+	}
+
+	public int getPreallocDirBlocks() {
+		return Ext2Utils.get8(data, 205);
+	}
+
+	public byte[] getJournalUUID() {
+		byte[] result=new byte[16];	
+		System.arraycopy(data, 208, result, 0, 16);
+		return result;
+	}
+	
+	public long getJournalINum() {
+		return Ext2Utils.get32(data, 224);
+	}
+
+	public long getJournalDev() {
+		return Ext2Utils.get32(data, 228);
+	}
+
+	public long getLastOrphan() {
+		return Ext2Utils.get8(data, 232);
+	}
 }
