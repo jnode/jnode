@@ -262,7 +262,7 @@ def_irq_handler:
 	; Increment the appropriate IRQ counter and set threadSwitch indicator.
 	mov AAX,[ABP+INTNO]
 	mov ADI,IRQCOUNT
-	inc dword [ADI+(VmArray_DATA_OFFSET*SLOT_SIZE)+AAX*4]
+	inc dword [ADI+AAX*4+(VmArray_DATA_OFFSET*SLOT_SIZE)]
 	; Set thread switch indicator
 	or THREADSWITCHINDICATOR, VmProcessor_TSI_SWITCH_NEEDED
 	; Done
