@@ -11,6 +11,7 @@ import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.memmgr.def.*;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -22,6 +23,7 @@ public abstract class VmHeapManager extends VmSystemObject {
 	/** Has this manager been initialized yet */
 	private boolean inited = false;
 	protected OutOfMemoryError OOME;
+	/** The memory access helper */
 	protected final HeapHelper helper;
 	
 	/**
@@ -221,4 +223,12 @@ public abstract class VmHeapManager extends VmSystemObject {
 			//Unsafe.debug("eo-testInitid.initialize");
 		}
 	}
+	
+	/**
+	 * @return Returns the helper.
+	 */
+	public final HeapHelper getHelper() {
+		return this.helper;
+	}
+
 }
