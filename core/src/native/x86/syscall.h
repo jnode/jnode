@@ -9,10 +9,10 @@
 SYSCALL_INT		equ 0x32
 
 %macro SYSCALL 1
-	push eax
-	mov eax,%1
+	push AAX
+	mov AAX,%1
 	int SYSCALL_INT
-	pop eax
+	pop AAX
 %endmacro
 
 ; System call commands

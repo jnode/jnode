@@ -39,30 +39,30 @@ Q43org5jnode2vm6Unsafe23clear2e28Lorg2fvmmagic2funboxed2fAddress3bLorg2fvmmagic2
 	ret SLOT_SIZE*2
 
 Q43org5jnode2vm6Unsafe23copy2e28Lorg2fvmmagic2funboxed2fAddress3bLorg2fvmmagic2funboxed2fAddress3bI29V:
-	push ebx
-	mov ebx,esp
-	push edi
-	push esi
-	push ecx
+	push ABX
+	mov ABX,ASP
+	push ADI
+	push ASI
+	push ACX
 	
-	mov esi,[ebx+16] ; srcMemPtr
-	mov edi,[ebx+12] ; destMemPtr
-	mov ecx,[ebx+8]  ; size
+	mov ASI,[ABX+(4*SLOT_SIZE)]		; srcMemPtr
+	mov ADI,[ABX+(3*SLOT_SIZE)]		; destMemPtr
+	mov ecx,[ABX+(2*SLOT_SIZE)]		; size
 	
 	; Test the direction for copying
-	cmp esi,edi
+	cmp ASI,ADI
 	jl copy_reverse
 	
 	; Copy from left to right
 	cld
 copy_bytes:
-	test ecx,3			; Test for size multiple of 4-byte 
+	test ACX,3			; Test for size multiple of 4-byte 
 	jz copy_dwords
-	dec ecx
+	dec ACX
 	movsb				; Not yet multiple of 4, copy a single byte and test again
 	jmp copy_bytes	
 copy_dwords:
-	shr ecx,2
+	shr ACX,2
 	rep movsd
 	jmp copy_done
 	
@@ -71,18 +71,18 @@ copy_reverse:
 	pushf
 	cli
 	std
-	lea esi,[esi+ecx-1]
-	lea edi,[edi+ecx-1]
+	lea ASI,[ASI+ACX-1]
+	lea ADI,[ADI+ACX-1]
 	rep movsb
 	popf	
 	
 copy_done:
-	pop ecx
-	pop esi
-	pop edi
-	mov esp,ebx
-	pop ebx
-	ret 12
+	pop ACX
+	pop ASI
+	pop ADI
+	mov ASP,ABX
+	pop ABX
+	ret SLOT_SIZE*3
 	
 Q43org5jnode2vm6Unsafe23inPortByte2e28I29I:
 	mov edx,[ASP+SLOT_SIZE] ; portNr

@@ -8,11 +8,11 @@
 
 ; CMOS_WRITE address, value
 %macro CMOS_WRITE 2
-	push eax
+	push AAX
 	mov eax,%1
 	out 0x70,al
 	mov eax,%2
 	out 0x71,al
-	pop eax
+	pop AAX
 %endmacro
 
