@@ -10,24 +10,24 @@ cpu_features:	dd 0
 
 ; Test if the cpu is at least a pentium
 test_cpuid:
-	push eax
-	push ebx
-	push ecx
-	push edx
+	push AAX
+	push ABX
+	push ACX
+	push ADX
 	
 	; Test for presence of cpuid instruction
 	pushf			; Get current eflags
-	pop eax
+	pop AAX
 	mov ecx,eax
 	xor eax,F_ID	; Try to toggle ID flag
-	push eax
+	push AAX
 	popf 
 	pushf
-	pop eax			; Get new eflags back
+	pop AAX			; Get new eflags back
 	xor eax,ecx		; Should be different, so != 0
 	jz near no_cpuid
 	; Now execute cpuid
-	mov eax,1
+	mov AAX,1
 	cpuid
 	; Save cpu features
 	mov [cpu_features],edx
@@ -38,24 +38,24 @@ test_cpuid:
 	jz near no_pse_feat
 	; Done
 	
-	pop edx
-	pop ecx
-	pop ebx
-	pop eax
+	pop ADX
+	pop ACX
+	pop ABX
+	pop AAX
 	ret
 
 ; Initialize the FPU
 init_fpu:
 	fninit
 	; Setup rounding mode
-	lea esp,[esp-4]
-	fstcw [esp]
-	or word [esp], 0x0C00
-	fldcw [esp]
-	lea esp,[esp+4]
-	mov eax,cr0
+	lea ASP,[ASP-SLOT_SIZE]
+	fstcw [ASP]
+	or word [ASP], 0x0C00
+	fldcw [ASP]
+	lea ASP,[ASP+SLOT_SIZE]
+	mov AAX,cr0
 	or eax,CR0_MP			; Enable monitoring FPU 
-	mov eax,cr0
+	mov AAX,cr0
 	ret
 	
 ; Initialize SSE (if any)
@@ -63,27 +63,27 @@ init_sse:
 	; Test for SSE feature
 	test dword [cpu_features], FEAT_SSE
 	jz no_sse
-	mov eax,cr4
+	mov AAX,cr4
 	or eax,CR4_OSFXSR		; Enable SSE instructions
 	or eax,CR4_OSXMMEXCPT	; We support the XMM exception
-	mov cr4,eax
-	mov eax,cr0
-	and eax,~CR0_EM			; Disable fpu emulation (we don't need it anyway)
+	mov cr4,AAX
+	mov AAX,cr0
+	and AAX,~CR0_EM			; Disable fpu emulation (we don't need it anyway)
 	or eax,CR0_MP			; Enable monitoring FPU 
-	mov eax,cr0
-	; Setup MXCSR
-	lea esp,[esp-4]
-	stmxcsr [esp]
-	pop eax
+	mov AAX,cr0
+	; Setup MXCSR	
+	lea ASP,[ASP-SLOT_SIZE]
+	stmxcsr [ASP]
+	pop AAX
 	or eax,MXCSR_IM			; Disable invalid operation exception
 	or eax,MXCSR_DM			; Disable denormalized operand exception
-	and eax,~MXCSR_ZM		; Enable zero-divide exception
+	and AAX,~MXCSR_ZM		; Enable zero-divide exception
 	or eax,MXCSR_OM			; Disable overflow exception
 	or eax,MXCSR_UM			; Disable underflow exception
 	or eax,MXCSR_PM			; Disable precision exception
-	push eax
-	ldmxcsr [esp]					
-	lea esp,[esp+4]
+	push AAX
+	ldmxcsr [ASP]					
+	lea ASP,[ASP+SLOT_SIZE]
 	ret
 	
 no_sse:

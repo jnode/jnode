@@ -100,7 +100,13 @@ check_a20:
 	call test_cpuid
 
 	; Initialize memory manager
+%ifdef BITS32	
 	call Lsetup_mm
+%else
+	jmp Lsetup_mm
+	bits 64
+start64:		
+%endif	
 	; Initialize interrupt handling
 	call Lsetup_idt
 
