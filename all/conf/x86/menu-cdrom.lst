@@ -52,4 +52,14 @@ title JNode Install
 kernel /jnode32.gz
 module /install.jgz
 
+# ---------------------------
+title JNode for AMD64 (development) (all plugins)
+kernel /jnode64.gz
+module /full.jgz
+
+# ---------------------------
+title JNode for AMD64 (development) (all plugins without MP)
+kernel /jnode64.gz mp=no
+module /full.jgz
+
 
