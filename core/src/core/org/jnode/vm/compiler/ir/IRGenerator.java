@@ -11,11 +11,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.jnode.vm.VmClassLoader;
-import org.jnode.vm.bytecode.BasicBlock;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.bytecode.BytecodeViewer;
 import org.jnode.vm.bytecode.BytecodeVisitor;
-import org.jnode.vm.bytecode.ControlFlowGraph;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmConstFieldRef;
@@ -40,14 +38,14 @@ public class IRGenerator extends BytecodeVisitor {
 	private int address;
 	private ArrayList iopList;
 	private Iterator basicBlockIterator;
-	private BasicBlock currentBlock;
+	private IRBasicBlock currentBlock;
 
 	/**
 	 * 
 	 */
-	public IRGenerator(ControlFlowGraph cfg) {
+	public IRGenerator(IRControlFlowGraph cfg) {
 		basicBlockIterator = cfg.basicBlockIterator();
-		currentBlock = (BasicBlock) basicBlockIterator.next();
+		currentBlock = (IRBasicBlock) basicBlockIterator.next();
 	}
 
 	public ArrayList getIOPList() {
@@ -100,7 +98,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void startInstruction(int address) {
 		this.address = address;
 		if (address >= currentBlock.getEndPC()) {
-			currentBlock = (BasicBlock) basicBlockIterator.next();
+			currentBlock = (IRBasicBlock) basicBlockIterator.next();
 			Variable[] prevVars = variables;
 			int n = variables.length;
 			variables = new Variable[n];
@@ -1461,7 +1459,7 @@ public class IRGenerator extends BytecodeVisitor {
 		BytecodeParser.parse(code, bv);
 
 		System.out.println();
-		ControlFlowGraph cfg = new ControlFlowGraph(code);
+		IRControlFlowGraph cfg = new IRControlFlowGraph(code);
 		System.out.println(cfg.toString());
 
 		System.out.println();		
