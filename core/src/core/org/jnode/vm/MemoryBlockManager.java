@@ -49,10 +49,10 @@ public final class MemoryBlockManager extends VmSystemObject implements Uninterr
 			// Find a large enough series of blocks
 			final long nr = findFreeBlocks(reqBlockCount);
 			if (nr == -1L) {
-				Unsafe.debug("ret null."); Unsafe.debug(blockSize);
-				Unsafe.debug("allocated blocks"); Unsafe.debug(allocatedBlocks);
-				Unsafe.debug("total blocks"); Unsafe.debug(blockCount);
-				Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
+				//Unsafe.debug("ret null."); Unsafe.debug(blockSize);
+				//Unsafe.debug("allocated blocks"); Unsafe.debug(allocatedBlocks);
+				//Unsafe.debug("total blocks"); Unsafe.debug(blockCount);
+				//Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
 				//Unsafe.die("allocateBlock");
 				return null;
 			}

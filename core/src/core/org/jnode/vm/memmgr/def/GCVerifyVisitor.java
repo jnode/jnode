@@ -92,7 +92,7 @@ public class GCVerifyVisitor extends ObjectVisitor {
                 Unsafe.debug("GCVerifyError: in ");
                 Unsafe.debug(where);
                 Unsafe.debug(", parent type ");
-                Unsafe.debug(parent.getClass().getName());
+                Unsafe.debug(helper.getVmClass(parent).getName());
                 Unsafe.debug("; child is not an object. ");
                 errorCount++;
             }

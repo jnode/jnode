@@ -26,14 +26,18 @@ public class Vm extends VmSystemObject {
 	private HotMethodManager hotMethodManager;
 	/** Set this boolean to turn the hot method manager on/off */
 	private final boolean runHotMethodManager = false;
+	/** Should this VM run in debug mode? */
+	private final boolean debugMode;
+	
 
 	/**
 	 * Initialize a new instance
 	 * 
 	 * @param arch
 	 */
-	public Vm(VmArchitecture arch, VmHeapManager heapManager) {
+	public Vm(VmArchitecture arch, VmHeapManager heapManager, boolean debugMode) {
 		instance = this;
+		this.debugMode = debugMode;
 		this.bootstrap = true;
 		this.arch = arch;
 		this.heapManager = heapManager;
@@ -95,4 +99,12 @@ public class Vm extends VmSystemObject {
 			vm.heapManager.dumpStatistics(out);
 		}
 	}
+	
+    /**
+     * Does this VM run in debug mode.
+     * @return Returns the debugMode.
+     */
+    public final boolean isDebugMode() {
+        return this.debugMode;
+    }
 }

@@ -6,6 +6,7 @@ package org.jnode.vm.memmgr.def;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.vm.Uninterruptible;
 import org.jnode.vm.Unsafe;
+import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmSystemObject;
@@ -31,26 +32,31 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
 
     /** The object visitor that verifies the correctness of the object tree */
     private final GCVerifyVisitor verifyVisitor;
-    
+
     /** My statistics */
     private final GCStatistics stats;
 
-    /** Should I show GC messages? */
-    private boolean verbose = true;
-
+    /** The object resolver */
     private final ObjectResolver resolver;
 
+    /** The statics table */
     private final VmStatics statics;
 
+    /** The low level helper */
     private final HeapHelper helper;
 
+    /** The write barrier */
     private final DefaultWriteBarrier wb;
+
+    /** Debug mode? */
+    private final boolean debug;
 
     /**
      * Create a new instance
      */
     public GCManager(DefaultHeapManager heapManager, VmArchitecture arch,
             VmStatics statics) {
+        this.debug = Vm.getVm().isDebugMode();
         this.heapManager = heapManager;
         this.wb = (DefaultWriteBarrier) heapManager.getWriteBarrier();
         this.helper = heapManager.getHelper();
@@ -73,27 +79,40 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
         stats.lastGCTime = System.currentTimeMillis();
 
         // Mark
-        Unsafe.debug("<mark/>");
-        wb.setActive(true);
-        markHeap(bootHeap, firstHeap);
-        wb.setActive(false);
+        helper.disableReschedule();
+        heapManager.setGcActive(true);
+        try {
+            Unsafe.debug("<mark/>");
+            wb.setActive(true);
+            markHeap(bootHeap, firstHeap);
+            wb.setActive(false);
 
-        // Sweep
-        Unsafe.debug("<sweep/>");
-        sweep(firstHeap);
+            // Sweep
+            Unsafe.debug("<sweep/>");
+            sweep(firstHeap);
 
-        // Cleanup
-        Unsafe.debug("<cleanup/>");
-        cleanup(bootHeap, firstHeap);
+            // Cleanup
+            Unsafe.debug("<cleanup/>");
+            cleanup(bootHeap, firstHeap);
 
-        // Verification
-        Unsafe.debug("<verify/>");
-        verify(bootHeap, firstHeap);
-
-        Unsafe.debug("</gc>");
-        if (verbose) {
-            System.out.println(stats);
+            // Verification
+            if (debug) {
+                Unsafe.debug("<verify/>");
+                verify(bootHeap, firstHeap);
+            }
+        } finally {
+            heapManager.setGcActive(false);
+            heapManager.resetCurrentHeap();
+            helper.enableReschedule();
         }
+
+        Unsafe.debug("</gc free=");
+        Unsafe.debug(heapManager.getFreeMemory());
+        Unsafe.debug("/>");
+        
+        if (debug) { 
+            System.out.println(stats);
+        }         
     }
 
     /**

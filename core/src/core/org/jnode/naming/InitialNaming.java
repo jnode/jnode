@@ -38,6 +38,9 @@ public class InitialNaming {
 	 */
 	public static void bind(Class name, Object service) 
 	throws NamingException, NameAlreadyBoundException {
+	    if (name == null) {
+	        throw new IllegalArgumentException("name == null");
+	    }
 		synchronized (namespace) {
 			if (namespace.containsKey(name)) {
 				throw new NameAlreadyBoundException(name.getName());

@@ -11,7 +11,7 @@ public class RegisterLocation extends Location {
 	private Object register;
 	
 	/**
-	 * @param name
+	 * @param register
 	 */
 	public RegisterLocation(Object register) {
 		super(register.toString());

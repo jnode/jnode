@@ -35,7 +35,7 @@ public class Main {
 			Unsafe.debug("Starting JNode\n");
 			final long start = VmSystem.currentKernelMillis();
 
-			//Unsafe.debug("VmSystem.initialize\n");
+			Unsafe.debug("VmSystem.initialize\n");
 			VmSystem.initialize();
 
 			// Load the plugins from the initjar
@@ -43,7 +43,7 @@ public class Main {
 			final InitJarProcessor proc = new InitJarProcessor(VmSystem.getInitJar());
 			proc.loadPlugins(pluginRegistry);
 
-			//Unsafe.debug("Starting PluginManager");
+			BootLog.info("Starting PluginManager");
 			final PluginManager piMgr = new DefaultPluginManager(pluginRegistry);
 			piMgr.startPlugins();
 

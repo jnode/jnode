@@ -80,4 +80,14 @@ public abstract class HeapHelper extends ObjectResolver {
 	 *         inflated monitor.
 	 */
 	public abstract Monitor getInflatedMonitor(Object object, VmArchitecture arch);
+	
+	/**
+	 * Block any yieldpoints on this processor.
+	 */
+	public abstract void disableReschedule(); 
+	
+	/**
+	 * Unblock any yieldpoints on this processor.
+	 */
+	public abstract void enableReschedule(); 
 }

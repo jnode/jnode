@@ -71,4 +71,11 @@ public interface NetworkLayer {
 	 */
 	public TransportLayer getTransportLayer(int protocolID)
 	throws NoSuchProtocolException;
+
+	/**
+	 * Gets the protocol addresses for a given name, or null if not found.
+	 * @param hostname
+	 * @return
+	 */
+    public ProtocolAddress[] getHostByName(String hostname);
 }

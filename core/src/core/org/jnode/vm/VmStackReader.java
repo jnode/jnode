@@ -160,7 +160,8 @@ public abstract class VmStackReader extends VmSystemObject {
 		Address f = Unsafe.getCurrentFrame();
 		Unsafe.debug("Debug stacktrace: ");
 		boolean first = true;
-		while (isValid(f)) {
+		int max = 10;
+		while (isValid(f) && (max > 0)) {
 			if (first) {
 				first = false;
 			} else {
@@ -172,6 +173,10 @@ public abstract class VmStackReader extends VmSystemObject {
 			Unsafe.debug("::");
 			Unsafe.debug(method.getName()); 
 			f = getPrevious(f);
+			max--;
+		}
+		if (isValid(f)) {
+		    Unsafe.debug("...");
 		}
 	}
 	

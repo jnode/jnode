@@ -12,7 +12,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.jnode.driver.console.Console;
 import org.jnode.driver.console.ConsoleException;
 import org.jnode.driver.console.ConsoleManager;
 import org.jnode.driver.console.x86.TextConsole;

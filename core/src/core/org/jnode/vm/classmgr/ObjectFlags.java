@@ -39,7 +39,9 @@ public interface ObjectFlags {
 	 * GC flag: This object has not been visited by the GC. All objects
 	 * with this colour are garbage at the end of a mark phase.
 	 */
-	public static final int GC_WHITE = 0x00;
+	public static final int GC_WHITE = 0x03;
+	
+	public static final int GC_DEFAULT_COLOR = GC_WHITE;
 	
 	/**
 	 * Mask for status flags.

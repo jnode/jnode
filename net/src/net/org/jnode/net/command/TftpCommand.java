@@ -4,12 +4,11 @@
 package org.jnode.net.command;
 
 import org.jnode.net.ipv4.tftp.TFTPClient;
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.OptionArgument;
 import org.jnode.shell.help.Argument;
+import org.jnode.shell.help.Help;
+import org.jnode.shell.help.OptionArgument;
 import org.jnode.shell.help.Parameter;
-import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.Syntax;
 
 /**
  * @author markhale
@@ -45,7 +44,7 @@ public class TftpCommand {
 	);
 	
 	public static void main(String[] args) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(args);
+		//ParsedArguments cmdLine = HELP_INFO.parse(args);
 		TFTPClient.main(args);
 		System.out.println();
 	}

@@ -14,9 +14,10 @@ public abstract class VmSystemObject implements BootableObject {
 	 */
 	public static String mangle(String s) {
 		final StringBuffer res = new StringBuffer();
+		final char[] src = s.toCharArray();
 		final int cnt = s.length();
 		for (int i = 0; i < cnt; i++) {
-			char ch = s.charAt(i);
+			final char ch = src[i];
 			if (((ch >= 'a') && (ch <= 'z'))
 				|| ((ch >= 'A') && (ch <= 'Z'))
 				|| ((ch >= '0') && (ch <= '9'))) {
@@ -34,7 +35,7 @@ public abstract class VmSystemObject implements BootableObject {
 	 * @return String
 	 */
 	public static String mangleClassName(String s) {
-		s = s.replace('/', '.');
+		s = s.replace('/', '.'); 
 		final StringTokenizer tok = new StringTokenizer(s, ".");
 		final StringBuffer res = new StringBuffer();
 		int q = tok.countTokens();

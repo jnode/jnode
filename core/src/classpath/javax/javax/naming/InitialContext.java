@@ -37,7 +37,6 @@ exception statement from your version. */
 
 package javax.naming;
 
-import java.applet.Applet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -83,7 +82,7 @@ public class InitialContext implements Context {
 		else
 			myProps = new Hashtable();
 
-		Applet napplet = (Applet)myProps.get(Context.APPLET);
+		/*Applet napplet = (Applet)myProps.get(Context.APPLET);
 
 		for (int i = properties.length - 1; i >= 0; i--) {
 			Object o = myProps.get(properties[i]);
@@ -96,7 +95,7 @@ public class InitialContext implements Context {
 				if (o != null)
 					myProps.put(properties[i], o);
 			}
-		}
+		}*/
 
 		try {
 			Enumeration ep =

@@ -11,7 +11,7 @@ public class StackLocation extends Location {
 	private int displacement;
 
 	/**
-	 * @param name
+	 * @param displacement
 	 */
 	public StackLocation(int displacement) {
 		super("local" + displacement);

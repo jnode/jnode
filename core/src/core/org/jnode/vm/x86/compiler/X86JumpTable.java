@@ -28,6 +28,8 @@ public class X86JumpTable {
 	public static final int VM_INTERPRETER_OFS = 16;
 	/** Jumptable offset of vm_invoke_abstract */
 	public static final int VM_INVOKE_ABSTRACT_OFS = 20;
+	/** Jumptable offset of vm_invoke_method_after_recompile */
+	public static final int VM_INVOKE_METHOD_AFTER_RECOMPILE_OFS = 24;
 	
 	/** Label name of the jumptable */
 	public static final String JUMPTABLE_NAME = "vm_jumpTable";

@@ -101,11 +101,26 @@ public final class VmArrayClass extends VmClassType {
 
 	/**
 	 * @see org.jnode.vm.classmgr.VmType#prepare()
-	 * @return The type
 	 */
-	public VmType prepare() {
+	void prepare() {
 		componentType.prepare();
-		return super.prepare();
+		super.prepare();
+	}
+
+	/**
+	 * @see org.jnode.vm.classmgr.VmType#compile()
+	 */
+	void compile() {
+		componentType.compile();
+		super.compile();
+	}
+
+	/**
+	 * @see org.jnode.vm.classmgr.VmType#verify()
+	 */
+	void verify() {
+		componentType.verify();
+		super.verify();
 	}
 
 	public final boolean isArray() {

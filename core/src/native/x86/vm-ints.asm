@@ -139,7 +139,7 @@ timer_handler:
 	; Set a thread switch needed indicator
 	or THREADSWITCHINDICATOR, VmProcessor_TSI_SWITCH_NEEDED
 	inc dword [deadLockCounter]
-	test dword [deadLockCounter], 0x400
+	test dword [deadLockCounter], 0x4000
 	jnz timer_deadlock
 timer_ret:
 	mov al,0x60 ; EOI IRQ0

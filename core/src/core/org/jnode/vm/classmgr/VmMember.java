@@ -181,4 +181,13 @@ public abstract class VmMember extends VmSystemObject implements Uninterruptible
 		return "Modifiers: " + Modifier.toString(modifiers);
 	}
 
+    /**
+     * @see org.jnode.vm.VmSystemObject#verifyBeforeEmit()
+     */
+    public void verifyBeforeEmit() {
+        super.verifyBeforeEmit();
+        if (!declaringClass.isCompiled()) {
+            throw new RuntimeException("emit before compile in " + this);
+        }
+    }
 }

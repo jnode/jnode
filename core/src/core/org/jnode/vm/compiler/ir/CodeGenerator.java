@@ -86,7 +86,7 @@ public abstract class CodeGenerator {
 
 	/**
 	 * @param quad
-	 * @param object
+	 * @param lhsReg
 	 * @param operation
 	 * @param con
 	 */
@@ -95,18 +95,18 @@ public abstract class CodeGenerator {
 
 	/**
 	 * @param quad
-	 * @param object
+	 * @param lhsReg
 	 * @param operation
-	 * @param object2
+	 * @param rhsReg
 	 */
 	public abstract void generateCodeFor(UnaryQuad quad, Object lhsReg,
 		int operation, Object rhsReg);
 
 	/**
 	 * @param quad
-	 * @param object
+	 * @param lhsReg
 	 * @param operation
-	 * @param i
+	 * @param rhsDisp
 	 */
 	public abstract void generateCodeFor(UnaryQuad quad, Object lhsReg,
 		int operation, int rhsDisp);
@@ -115,7 +115,7 @@ public abstract class CodeGenerator {
 	 * @param quad
 	 * @param lhsDisp
 	 * @param operation
-	 * @param object
+	 * @param rhsReg
 	 */
 	public abstract void generateCodeFor(UnaryQuad quad, int lhsDisp,
 		int operation, Object rhsReg);
@@ -124,7 +124,7 @@ public abstract class CodeGenerator {
 	 * @param quad
 	 * @param lhsDisp
 	 * @param operation
-	 * @param i
+	 * @param rhsDisp
 	 */
 	public abstract void generateCodeFor(UnaryQuad quad, int lhsDisp,
 		int operation, int rhsDisp);

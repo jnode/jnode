@@ -3,6 +3,8 @@
  */
 package org.jnode.net;
 
+import java.net.InetAddress;
+
 /**
  * Interface for network protocol addresses, such as an IP address.
  * @author epr
@@ -38,4 +40,11 @@ public interface ProtocolAddress {
 	 * This type is used by (e.g.) ARP.
 	 */
 	public int getType();
+
+	/**
+	 * Convert to a java.net.InetAddress
+	 * @see java.net.InetAddress
+	 * @return This address as java.net.InetAddress
+	 */	
+	public InetAddress toInetAddress();
 }

@@ -15,7 +15,6 @@ import org.jnode.assembler.x86.Register;
 import org.jnode.assembler.x86.X86Stream;
 import org.jnode.boot.Main;
 import org.jnode.build.AbstractBootImageBuilder;
-import org.jnode.build.BootClassInfo;
 import org.jnode.build.BuildException;
 import org.jnode.linker.Elf;
 import org.jnode.linker.ElfLinker;
@@ -50,8 +49,8 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 public class BootImageBuilder extends AbstractBootImageBuilder implements X86CompilerConstants {
 
 	public static final int LOAD_ADDR = 1024 * 1024;
-	public static final int INITIAL_OBJREFS_CAPACITY = 200000;
-	public static final int INITIAL_SIZE = 17*1024*1024;
+	public static final int INITIAL_OBJREFS_CAPACITY = 750000;
+	public static final int INITIAL_SIZE = 40*1024*1024;
 	
 	private VmX86Processor processor;
 	private String processorId;
@@ -82,7 +81,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	 * @return The native stream
 	 */
 	protected NativeStream createNativeStream() {
-		return new X86Stream(getCPUID(), LOAD_ADDR, INITIAL_OBJREFS_CAPACITY, INITIAL_SIZE);
+		return new X86Stream(getCPUID(), LOAD_ADDR, INITIAL_OBJREFS_CAPACITY, INITIAL_SIZE, INITIAL_SIZE);
 	}
 
 	/**
@@ -205,6 +204,8 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 
 		/* Link VmMethod_compile */
 		VmType vmMethodClass = loadClass(VmMethod.class);
+		refJava = os.getObjectRef(vmMethodClass.getMethod("recompile", "()V"));
+		os.getObjectRef(new Label("VmMethod_recompile")).link(refJava);
 
 		/* Link VmMethod_Class */
 		refJava = os.getObjectRef(vmMethodClass);
@@ -542,20 +543,6 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	}
 
 	/**
-	 * Setup the boot classes
-	 */
-	protected void setupBootClasses() {
-		super.setupBootClasses();
-		final int core = BootClassInfo.F_ALL;
-		add(new BootClassInfo("org.jnode.assembler.x86", true, core));
-		add(new BootClassInfo("org.jnode.assembler.x86.X86Stream", core));
-		add(new BootClassInfo("org.jnode.vm.x86.compiler", true, core));
-		add(new BootClassInfo("org.jnode.vm.x86.compiler.l0", true, core));
-		add(new BootClassInfo("org.jnode.vm.x86.compiler.l1", true, core));
-		add(new BootClassInfo("org.jnode.vm.x86", true, core));
-	}
-
-	/**
 	 * @return Returns the processorId.
 	 */
 	public final String getCpu() {
@@ -585,4 +572,17 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 			log("Increase BootImageBuilder.INITIAL_SIZE to " + size + " for faster build.", Project.MSG_WARN);
 		}
 	}
+    /**
+     * @see org.jnode.build.AbstractBootImageBuilder#setupCompileHighOptLevelPackages()
+     */
+    protected void setupCompileHighOptLevelPackages() {
+        super.setupCompileHighOptLevelPackages();
+        addCompileHighOptLevel("org.jnode.assembler.x86");
+        addCompileHighOptLevel("org.jnode.system.x86");
+        addCompileHighOptLevel("org.jnode.vm.x86");
+        addCompileHighOptLevel("org.jnode.vm.x86.compiler");
+        addCompileHighOptLevel("org.jnode.vm.x86.compiler.l0c");
+        addCompileHighOptLevel("org.jnode.vm.x86.compiler.l1");
+        addCompileHighOptLevel("org.jnode.vm.x86.compiler.l2");
+    }
 }

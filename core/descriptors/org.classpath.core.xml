@@ -9,9 +9,15 @@
 
   <runtime>
     <library name="jnode-core.jar">
+      <export name="gnu.java.awt.*"/>
+      <export name="gnu.java.awt.image.*"/>
+      <export name="gnu.java.beans.*"/>
+      <export name="gnu.java.beans.editors.*"/>
+      <export name="gnu.java.beans.info.*"/>
       <export name="gnu.java.io.*"/>
       <export name="gnu.java.io.decode.*"/>
       <export name="gnu.java.io.encode.*"/>
+      <export name="gnu.java.math.*"/>
       <export name="gnu.java.net.*"/>
       <export name="gnu.java.net.protocol.*"/>
       <export name="gnu.java.net.protocol.file.*"/>
@@ -23,13 +29,35 @@
       <export name="gnu.java.lang.*"/>
       <export name="gnu.java.lang.reflect.*"/>
       <export name="gnu.java.locale.*"/>
+      <export name="gnu.java.text.*"/>
       <export name="gnu.java.util.*"/>
+      <export name="gnu.java.util.prefs.*"/>
+      <export name="gnu.java.security.der.*"/>
       <export name="gnu.java.security.provider.*"/>
+      <export name="gnu.java.security.util.*"/>
 
+      <export name="java.applet.*"/>
+      <export name="java.awt.*"/>
+      <export name="java.awt.color.*"/>
+      <export name="java.awt.datatransfer.*"/>
+      <export name="java.awt.dnd.*"/>
+      <export name="java.awt.dnd.peer.*"/>
+      <export name="java.awt.event.*"/>
+      <export name="java.awt.font.*"/>
+      <export name="java.awt.geom.*"/>
+      <export name="java.awt.im.*"/>
+      <export name="java.awt.im.spi.*"/>
+      <export name="java.awt.image.*"/>
+      <export name="java.awt.image.renderable.*"/>
+      <export name="java.awt.peer.*"/>
+      <export name="java.awt.print.*"/>
+      <export name="java.beans.*"/>
+      <export name="java.beans.beancontext.*"/>
       <export name="java.io.*"/>
       <export name="java.lang.*"/>
       <export name="java.lang.ref.*"/>
       <export name="java.lang.reflect.*"/>
+      <export name="java.math.*"/>
       <export name="java.net.*"/>
       <export name="java.nio.*"/>
       <export name="java.nio.channels.*"/>
@@ -37,16 +65,29 @@
       <export name="java.nio.charset.*"/>
       <export name="java.nio.charset.spi.*"/>
       <export name="java.security.*"/>
+      <export name="java.security.acl.*"/>
       <export name="java.security.cert.*"/>
+      <export name="java.security.interfaces.*"/>
+      <export name="java.security.spec.*"/>
       <export name="java.text.*"/>
       <export name="java.util.*"/>
       <export name="java.util.jar.*"/>
+      <export name="java.util.prefs.*"/>
       <export name="java.util.regex.*"/>
       <export name="java.util.zip.*"/>
 
+      <export name="javax.accessibility.*"/>
       <export name="javax.naming.*"/>
+      <export name="javax.naming.directory.*"/>
+      <export name="javax.naming.event.*"/>
+      <export name="javax.naming.ldap.*"/>
+      <export name="javax.naming.spi.*"/>
+      <export name="javax.xml.parsers.*"/>
 
+      <export name="org.w3c.dom.*"/>
       <export name="org.xml.sax.*"/>
+      <export name="org.xml.sax.ext.*"/>
+      <export name="org.xml.sax.helpers.*"/>
     </library>
   </runtime>
         

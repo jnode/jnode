@@ -21,25 +21,17 @@ public class Modifier {
 													 // FP-strict
 
 	/** Is a member wide (long, double) */
-	public static final int ACC_WIDE = 0x00010000;
+	public static final int ACC_WIDE        = 0x00010000;
 	/** Is a field an object reference */
-	public static final int ACC_OBJECTREF = 0x00020000;
-	public static final int ACC_COMPILED = 0x00040000;
-	public static final int ACC_INITIALIZER = 0x00080000;
-	public static final int ACC_CONSTRUCTOR = 0x00100000;
+	public static final int ACC_OBJECTREF   = 0x00020000;
+	public static final int ACC_INITIALIZER = 0x00040000;
+	public static final int ACC_CONSTRUCTOR = 0x00080000;
+	/** Class has a finalizer other then java.lang.Object#finalizer */
+	public static final int ACC_FINALIZER   = 0x00100000;
 
-	public static final int ACC_LOADED = 0x00200000;
-	public static final int ACC_DEFINED = 0x00400000;
-	public static final int ACC_VERIFYING = 0x00800000;
-	public static final int ACC_VERIFIED = 0x01000000;
-	public static final int ACC_PREPARING = 0x02000000;
-	public static final int ACC_PREPARED = 0x04000000;
-	public static final int ACC_INITIALIZED = 0x08000000;
-	public static final int ACC_INITIALIZING = 0x10000000;
-	public static final int ACC_INVALID = 0x20000000;
 	/** gather profile information for this method */
-	public static final int ACC_PROFILE = 0x40000000; // M
-	public static final int ACC_SPECIAL = 0x80000000;
+	public static final int ACC_PROFILE     = 0x40000000; // M
+	public static final int ACC_SPECIAL     = 0x80000000;
 	
 	public static boolean isPublic(int modifier) {
 		int mask = ACC_PUBLIC;
@@ -116,10 +108,10 @@ public class Modifier {
 		return ((modifier & mask) == mask);
 	}
 
-	public static boolean isCompiled(int modifier) {
+	/*public static boolean isCompiled(int modifier) {
 		int mask = ACC_COMPILED;
 		return ((modifier & mask) == mask);
-	}
+	}*/
 
 	public static boolean isInitializer(int modifier) {
 		int mask = ACC_INITIALIZER;
@@ -131,7 +123,7 @@ public class Modifier {
 		return ((modifier & mask) == mask);
 	}
 
-	public static boolean isLoaded(int modifier) {
+/*	public static boolean isLoaded(int modifier) {
 		int mask = ACC_LOADED;
 		return ((modifier & mask) == mask);
 	}
@@ -169,7 +161,7 @@ public class Modifier {
 	public static boolean isInitializing(int modifier) {
 		int mask = ACC_INITIALIZING;
 		return ((modifier & mask) == mask);
-	}
+	}*/
 
 	/**
 	 * Should profile information be gathered?
@@ -182,10 +174,10 @@ public class Modifier {
 		return ((modifier & mask) == mask);
 	}
 
-	public static boolean isInvalid(int modifier) {
+	/*public static boolean isInvalid(int modifier) {
 		int mask = ACC_INVALID;
 		return ((modifier & mask) == mask);
-	}
+	}*/
 
 	public static boolean isWide(String signature) {
 		final int len = signature.length();
@@ -302,9 +294,9 @@ public class Modifier {
 		if ((modifiers & ACC_OBJECTREF) != 0) {
 			b.append("objectref ");
 		}
-		if ((modifiers & ACC_COMPILED) != 0) {
+		/*if ((modifiers & ACC_COMPILED) != 0) {
 			b.append("compiled ");
-		}
+		}*/
 		if ((modifiers & ACC_INITIALIZER) != 0) {
 			b.append("initializer ");
 		}
@@ -312,7 +304,7 @@ public class Modifier {
 			b.append("constructor ");
 		}
 
-		if ((modifiers & ACC_LOADED) != 0) {
+		/*if ((modifiers & ACC_LOADED) != 0) {
 			b.append("loaded ");
 		}
 		if ((modifiers & ACC_DEFINED) != 0) {
@@ -335,10 +327,10 @@ public class Modifier {
 		}
 		if ((modifiers & ACC_INITIALIZING) != 0) {
 			b.append("initializing ");
-		}
-		if ((modifiers & ACC_INVALID) != 0) {
+		}*/
+		/*if ((modifiers & ACC_INVALID) != 0) {
 			b.append("invalid ");
-		}
+		}*/
 		if ((modifiers & ACC_PROFILE) != 0) {
 			b.append("profile ");
 		}

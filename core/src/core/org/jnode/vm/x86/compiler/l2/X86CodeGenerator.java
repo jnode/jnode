@@ -59,7 +59,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	}
 
 	/**
-	 * @param allVars
+	 * @param vars
 	 * @param nArgs
 	 */
 	public void setArgumentVariables(Variable[] vars, int nArgs) {

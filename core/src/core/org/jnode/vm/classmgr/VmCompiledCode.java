@@ -3,6 +3,7 @@
  */
 package org.jnode.vm.classmgr;
 
+import org.jnode.util.NumberUtils;
 import org.jnode.vm.Address;
 
 /**
@@ -139,5 +140,13 @@ public final class VmCompiledCode extends AbstractCode {
 		final int cmpStart = Address.compare(codePtr, nativeCode);
 		final int cmpEnd = Address.compare(codePtr, Address.add(nativeCode, nativeCodeSize1));
 		return ((cmpStart >= 0) && (cmpEnd < 0));
+	}
+	
+	public String toString() {
+	    if (compiledCode1 instanceof byte[]) {
+	        return NumberUtils.hex((byte[])compiledCode1);
+	    } else {
+	        return super.toString();
+	    }
 	}
 }

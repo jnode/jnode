@@ -10,7 +10,7 @@ import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmStackReader;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.compiler.NativeCodeCompiler;
-import org.jnode.vm.x86.compiler.l0.X86Level0Compiler;
+import org.jnode.vm.x86.compiler.l0c.X86Level0CCompiler;
 import org.jnode.vm.x86.compiler.l1.X86Level1Compiler;
 
 /**
@@ -26,7 +26,7 @@ public final class VmX86Architecture extends VmArchitecture {
 	private final VmX86StackReader stackReader = new VmX86StackReader();
 
 	/** The compilers */
-	private final NativeCodeCompiler[] compilers = { new X86Level0Compiler(), new X86Level1Compiler()};
+	private final NativeCodeCompiler[] compilers = { /*new X86Level0Compiler(), */new X86Level0CCompiler(), new X86Level1Compiler()};
 
 	/**
 	 * Gets the name of this architecture.

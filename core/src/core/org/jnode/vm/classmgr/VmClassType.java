@@ -105,15 +105,14 @@ public abstract class VmClassType extends VmType {
 		final VmNormalClass superClass = getSuperClass();
 		final TIBBuilder vmt;
 		
+		final int tc_mtable_length = getNoDeclaredMethods();
 		if (superClass != null) {
 			// Initialize from 
-			vmt = new TIBBuilder(this, superClass.getTIB());
+			vmt = new TIBBuilder(this, superClass.getTIB(), tc_mtable_length);
 		} else {
-			vmt = new TIBBuilder(this);
+			vmt = new TIBBuilder(this, tc_mtable_length);
 		}
 		
-		final int tc_mtable_length = getNoDeclaredMethods();
-
 		// Loop through the method table of this class
 		// searching for virtual methods which are not in the method table
 		// of the super class.

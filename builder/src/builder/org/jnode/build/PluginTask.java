@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import nanoxml.XMLElement;
+import nanoxml.XMLParseException;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
@@ -83,11 +84,13 @@ public class PluginTask extends AbstractPluginTask {
 					r.close();
 				}
 			} catch (IOException ex) {
-				throw new BuildException(ex);
+				throw new BuildException("Building " + descriptor + " failed", ex);
+			} catch (XMLParseException ex) {
+				throw new BuildException("Building " + descriptor + " failed", ex);
 			}
 			descr = new PluginDescriptorModel(root);
 		} catch (PluginException ex) {
-			throw new BuildException(ex);
+			throw new BuildException("Building " + descriptor + " failed", ex);
 		}
 
 		final String fullId = descr.getId() + "_" + descr.getVersion();

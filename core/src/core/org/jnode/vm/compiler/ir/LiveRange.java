@@ -71,7 +71,7 @@ public class LiveRange implements Comparable {
 	}
 
 	/**
-	 * @param string
+	 * @param loc
 	 */
 	public void setLocation(Location loc) {
 		variable.setLocation(loc);

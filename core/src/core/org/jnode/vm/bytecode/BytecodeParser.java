@@ -676,7 +676,7 @@ public class BytecodeParser {
 						int lowValue = gets4();
 						int highValue = gets4();
 						if (highValue < lowValue) {
-							throw new ClassFormatError("tableSwitch high < low!");
+							throw new ClassFormatError("tableSwitch high < low! (high=" + highValue + ", low=" + lowValue + ")");
 						}
 						int cnt = highValue - lowValue + 1;
 						int addresses[] = new int[cnt];
@@ -944,7 +944,7 @@ public class BytecodeParser {
 		int v2 = bytecode[offset++] & 0xFF;
 		int v3 = bytecode[offset++] & 0xFF;
 		int v4 = bytecode[offset++] & 0xFF;
-		return (v1 << 16) | (v2 << 16) | (v3 << 8) | v4;
+		return (v1 << 24) | (v2 << 16) | (v3 << 8) | v4;
 	}
 
 	private final void skipPadding() {
