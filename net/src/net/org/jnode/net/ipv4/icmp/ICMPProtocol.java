@@ -6,6 +6,8 @@ package org.jnode.net.ipv4.icmp;
 import java.net.DatagramSocketImplFactory;
 import java.net.SocketException;
 import java.net.SocketImplFactory;
+import java.util.Enumeration;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.jnode.net.SocketBuffer;
@@ -34,6 +36,9 @@ public class ICMPProtocol implements IPv4Protocol, IPv4Constants, ICMPConstants,
 	/** Queue<SocketBuffer> for requests that need a reply */
 	private final Queue replyRequestQueue = new Queue();
 	private final QueueProcessorThread replyRequestsThread;
+	
+	/** ICMP packet listeners */
+	private final Vector listeners = new Vector();
 	
 	/**
 	 * Create a new instance
@@ -81,7 +86,10 @@ public class ICMPProtocol implements IPv4Protocol, IPv4Constants, ICMPConstants,
 		switch (hdr.getType()) {
 			case ICMP_ECHO: 
 				postReplyRequest(skbuf);
-				break;		 
+				break;
+			case ICMP_ECHOREPLY:
+				notifyListeners(skbuf);
+				break;
 
 			default:
 				log.debug("GOT ICMP type " + hdr.getType() + ", code " + hdr.getCode());			
@@ -226,5 +234,21 @@ public class ICMPProtocol implements IPv4Protocol, IPv4Constants, ICMPConstants,
 	public void process(Object object) throws Exception {
 		processReplyRequest((SocketBuffer)object);
 	}
-
+	
+	/**
+	 * ICMP packet listeners methods
+	 */
+	private void notifyListeners(SocketBuffer skbuf){
+		Enumeration e = listeners.elements();
+		while(e.hasMoreElements()){
+			ICMPListener l = (ICMPListener)e.nextElement();
+			l.packetReceived(skbuf);
+		}
+	}
+	public void addListener(ICMPListener listener){
+		listeners.add(listener);
+	}
+	public void removeListener(ICMPListener listener){
+		listeners.remove(listener);
+	}
 }

@@ -25,6 +25,7 @@
     <alias name="dhcp" class="org.jnode.net.command.DhcpCommand"/>
     <alias name="ifconfig" class="org.jnode.net.command.IfconfigCommand"/>
     <alias name="netstat" class="org.jnode.net.command.NetstatCommand"/>
+    <alias name="ping" class="org.jnode.net.command.PingCommand"/>
     <alias name="route" class="org.jnode.net.command.RouteCommand"/>
     <alias name="resolver" class="org.jnode.net.command.ResolverCommand"/>
     <alias name="tftp" class="org.jnode.net.command.TftpCommand"/>
