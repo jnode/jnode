@@ -12,6 +12,7 @@
     <import plugin="org.jnode.driver.console"/>
     <import plugin="org.jnode.driver.input"/>
     <import plugin="org.jnode.runtime"/>
+    <import plugin="org.beanshell"/>
   </requires>
         
   <runtime>
