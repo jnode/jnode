@@ -166,13 +166,13 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 final VmType vmClass = (VmType) i.next();
                 vmClass.link();
                 final boolean compHigh = isCompileHighOptLevel(vmClass);
-                if (!vmClass.isCpRefsResolved() && compHigh) {
-                    //log("Resolving CP of " + vmClass.getName(),
-                    //Project.MSG_VERBOSE);
-                    vmClass.resolveCpRefs(clsMgr);
-                    again = true;
-                }
                 try {
+                    if (!vmClass.isCpRefsResolved() && compHigh) {
+                        //log("Resolving CP of " + vmClass.getName(),
+                        //Project.MSG_VERBOSE);
+                        vmClass.resolveCpRefs(clsMgr);
+                        again = true;
+                    }
                     final int mcnt;
                     final int startLength = os.getLength();
                     if (compHigh) {

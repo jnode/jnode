@@ -17,7 +17,6 @@ import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.compiler.CompiledMethod;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.x86.X86CpuID;
-import org.jnode.vm.x86.compiler.l1.X86StackManager;
 import org.vmmagic.pragma.PrivilegedActionPragma;
 
 /**
@@ -90,7 +89,6 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements 
 	/**
 	 * @see org.jnode.vm.compiler.NativeCodeCompiler#dumpStatistics()
 	 */
-	public final void dumpStatistics() {
-		X86StackManager.dumpStatistics();
+	public void dumpStatistics() {
 	}
 }
