@@ -51,6 +51,12 @@ public class FileSystemMounter implements DeviceListener, QueueProcessor {
 
     private final Queue devicesWaitingToBeMounted = new Queue();
 
+    /** Number of devices added to the mount queue */
+    private int devicesAdded;
+
+    /** Number of devices actually processed by the mount processor */
+    private int devicesProcessed;
+
     /**
      * Start the FS mounter.
      * 
@@ -87,7 +93,10 @@ public class FileSystemMounter implements DeviceListener, QueueProcessor {
         // add it to the queue of devices to be mounted only if the action is
         // not
         // already pending
-        devicesWaitingToBeMounted.add(device);
+        synchronized (devicesWaitingToBeMounted) {
+            devicesWaitingToBeMounted.add(device);
+            devicesAdded++;
+        }
     }
 
     /**
@@ -174,6 +183,16 @@ public class FileSystemMounter implements DeviceListener, QueueProcessor {
             }
         } catch (ApiNotFoundException ex) {
             // Just ignore this device.
+        } finally {
+            devicesProcessed++;
         }
+    }
+    
+    /**
+     * Is the mounter ready.
+     * @return
+     */
+    public boolean isReady() {
+        return (devicesAdded == devicesProcessed);
     }
 }
