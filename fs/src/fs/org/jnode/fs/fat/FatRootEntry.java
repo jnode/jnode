@@ -99,4 +99,13 @@ public class FatRootEntry extends FatObject implements FSEntry {
 	public FSAccessRights getAccessRights() throws IOException {
 		throw new IOException("Not implemented yet");
 	}
+	
+	/**
+	 * Indicate if the entry has been modified in memory (ie need to be saved)
+	 * @return true if the entry need to be saved
+	 * @throws IOException
+	 */
+	public boolean isDirty() throws IOException {
+		return true;
+	}	
 }

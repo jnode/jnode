@@ -164,5 +164,13 @@ public class Ext2Entry implements FSEntry{
 	public void setValid(boolean valid) {
 		this.valid = valid;
 	}
-
+	
+	/**
+	 * Indicate if the entry has been modified in memory (ie need to be saved)
+	 * @return true if the entry need to be saved
+	 * @throws IOException
+	 */
+	public boolean isDirty() throws IOException {
+		return true;
+	}
 }
