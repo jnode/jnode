@@ -70,9 +70,12 @@ class X86StackFrame implements X86CompilerConstants {
 
 	private X86BinaryAssembler.ObjectInfo codeObject;
 
-	private static final int EbpFrameRefOffset = 8;
+	private final int EbpFrameRefOffset;
 
 	private static final int EbpMethodRefOffset = 0;
+	
+	/** Size of an address */
+	private final int slotSize;
 
 	/**
 	 * Number of byte on the stack occupied by saved registers. See
@@ -99,6 +102,8 @@ class X86StackFrame implements X86CompilerConstants {
 		this.initLabel = helper.genLabel("$$init");
 		this.startCodeLabel = helper.genLabel("$$code");
 		this.footerLabel = helper.genLabel("$$footer");
+		this.slotSize = os.isCode32() ? 4 : 8;
+		this.EbpFrameRefOffset = 2 * slotSize;
 	}
 
 	/**
@@ -134,6 +139,10 @@ class X86StackFrame implements X86CompilerConstants {
 	public void emitTrailer(int maxLocals) {
 		final int argSlotCount = method.getArgSlotCount();
 		final Label stackOverflowLabel = helper.genLabel("$$stack-overflow");
+		final GPR asp = context.SP;
+		final GPR abp = context.BP;
+		final GPR aax = os.isCode32() ? (GPR)X86Register.EAX : X86Register.RAX;
+		final int size = os.getMode().getSize();
 
 		// Begin footer
 		// Now start the actual footer
@@ -141,8 +150,8 @@ class X86StackFrame implements X86CompilerConstants {
 
 		/* Go restore the previous current frame */
 		emitSynchronizationCode(context.getMonitorExitMethod());
-		os.writeLEA(X86Register.ESP, X86Register.EBP, EbpFrameRefOffset);
-		os.writePOP(X86Register.EBP);
+		os.writeLEA(asp, abp, EbpFrameRefOffset);
+		os.writePOP(abp);
 		restoreRegisters();
 		// Return
 		if (argSlotCount > 0) {
@@ -167,27 +176,27 @@ class X86StackFrame implements X86CompilerConstants {
         os.writeJCC(stackOverflowLabel, X86Constants.JLE);
 		
 		// Create class initialization code (if needed)
-		helper.writeClassInitialize(method, X86Register.EAX);
+		helper.writeClassInitialize(method, aax);
 
 		// Increment the invocation count
-		helper.writeIncInvocationCount(X86Register.EAX);
+		helper.writeIncInvocationCount(aax);
 
 		// Fixed framelayout
 		saveRegisters();
-		os.writePUSH(X86Register.EBP);
+		os.writePUSH(abp);
 		os.writePUSH(context.getMagic());
 		//os.writePUSH(0); // PC, which is only used in interpreted methods
 		/** EAX MUST contain the VmMethod structure upon entry of the method */
-		os.writePUSH(X86Register.EAX);
-		os.writeMOV(INTSIZE, X86Register.EBP, X86Register.ESP);
+		os.writePUSH(aax);
+		os.writeMOV(size, abp, asp);
 
 		// Emit the code to create the locals
 		final int noLocalVars = maxLocals - argSlotCount;
 		// Create and clear all local variables
 		if (noLocalVars > 0) {
-			os.writeXOR(X86Register.EAX, X86Register.EAX);
+			os.writeXOR(aax, aax);
 			for (int i = 0; i < noLocalVars; i++) {
-				os.writePUSH(X86Register.EAX);
+				os.writePUSH(aax);
 			}
 		}
 
@@ -222,10 +231,10 @@ class X86StackFrame implements X86CompilerConstants {
 			if (noLocalVars < 0) {
 				System.out.println("@#@#@#@# noLocalVars = " + noLocalVars);
 			}
-			final int ofs = Math.max(0, noLocalVars) * 4;
-			os.writeLEA(X86Register.ESP, X86Register.EBP, -ofs);
+			final int ofs = Math.max(0, noLocalVars) * slotSize;
+			os.writeLEA(asp, abp, -ofs);
 			/** Push the exception in EAX */
-			os.writePUSH(X86Register.EAX);
+			os.writePUSH(aax);
 			/** Goto the real handler */
 			os.writeJMP(helper.getInstrLabel(eh.getHandlerPC()));
 
@@ -243,8 +252,8 @@ class X86StackFrame implements X86CompilerConstants {
 		Label handlerLabel = helper.genLabel("$$def-ex-handler");
 		cm.setDefExceptionHandler(os.setObjectRef(handlerLabel));
 		emitSynchronizationCode(context.getMonitorExitMethod());
-		os.writeLEA(X86Register.ESP, X86Register.EBP, EbpFrameRefOffset);
-		os.writePOP(X86Register.EBP);
+		os.writeLEA(asp, abp, EbpFrameRefOffset);
+		os.writePOP(abp);
 		restoreRegisters();
 		/**
 		 * Do not do a ret here, this way the return address will be used by
@@ -275,11 +284,11 @@ class X86StackFrame implements X86CompilerConstants {
 		int noArgs = method.getArgSlotCount();
 		if (index < noArgs) {
 			// Index refers to a method argument
-			return ((noArgs - index + 1) * 4) + EbpFrameRefOffset
+			return ((noArgs - index + 1) * slotSize) + EbpFrameRefOffset
 					+ SAVED_REGISTERSPACE;
 		} else {
 			// Index refers to a local variable
-			return (index - noArgs + 1) * -4;
+			return (index - noArgs + 1) * -slotSize;
 		}
 	}
 
@@ -296,22 +305,25 @@ class X86StackFrame implements X86CompilerConstants {
 
 	private void emitSynchronizationCode(VmMethod monitorMethod) {
 		if (method.isSynchronized()) {
-			os.writePUSH(X86Register.EAX);
-			os.writePUSH(X86Register.EDX);
+			final GPR aax = os.isCode32() ? (GPR)X86Register.EAX : X86Register.RAX;
+			final GPR adx = os.isCode32() ? (GPR)X86Register.EDX : X86Register.RDX;
+
+			os.writePUSH(aax);
+			os.writePUSH(adx);
 			//System.out.println("synchr. " + method);
 			if (method.isStatic()) {
 				// Get declaring class
 				final int declaringClassOffset = context
 						.getVmMemberDeclaringClassField().getOffset();
-				writeGetMethodRef(X86Register.EAX);
-				os.writePUSH(X86Register.EAX, declaringClassOffset);
+				writeGetMethodRef(aax);
+				os.writePUSH(aax, declaringClassOffset);
 				//os.writePUSH(method.getDeclaringClass());
 			} else {
-				os.writePUSH(X86Register.EBP, getEbpOffset(0));
+				os.writePUSH(context.BP, getEbpOffset(0));
 			}
 			helper.invokeJavaMethod(monitorMethod);
-			os.writePOP(X86Register.EDX);
-			os.writePOP(X86Register.EAX);
+			os.writePOP(adx);
+			os.writePOP(aax);
 		}
 	}
 
@@ -319,14 +331,14 @@ class X86StackFrame implements X86CompilerConstants {
 	 * Push the method reference in the current stackframe onto the stack
 	 */
 	public final void writePushMethodRef() {
-		os.writePUSH(X86Register.EBP, EbpMethodRefOffset);
+		os.writePUSH(context.BP, EbpMethodRefOffset);
 	}
 
 	/**
 	 * Write code to copy the method reference into the dst register.
 	 */
 	public final void writeGetMethodRef(GPR dst) {
-		os.writeMOV(INTSIZE, dst, X86Register.EBP, EbpMethodRefOffset);
+		os.writeMOV(os.getMode().getSize(), dst, context.BP, EbpMethodRefOffset);
 	}
 
 	/**

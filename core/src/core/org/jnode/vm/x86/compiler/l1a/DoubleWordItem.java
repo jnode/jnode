@@ -24,6 +24,8 @@ package org.jnode.vm.x86.compiler.l1a;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
+import org.jnode.assembler.x86.X86Register.GPR32;
+import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
@@ -34,9 +36,14 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 public abstract class DoubleWordItem extends Item implements
 		X86CompilerConstants {
 
-	private X86Register.GPR lsb;
+	/** LSB Register in 32-bit mode */
+	private X86Register.GPR32 lsb;
 
-	private X86Register.GPR msb;
+	/** MSB Register in 32-bit mode */
+	private X86Register.GPR32 msb;
+
+	/** Register in 64-bit mode */
+	private X86Register.GPR64 reg;
 
 	/**
 	 * Initialize a blank item.
@@ -52,10 +59,12 @@ public abstract class DoubleWordItem extends Item implements
 	 * @param msb
 	 */
 	protected final void initialize(int kind, int offsetToFP,
-			X86Register.GPR lsb, X86Register.GPR msb, X86Register.XMM xmm) {
+			X86Register.GPR lsb, X86Register.GPR msb, X86Register.GPR64 reg,
+			X86Register.XMM xmm) {
 		super.initialize(kind, offsetToFP, xmm);
-		this.lsb = lsb;
-		this.msb = msb;
+		this.lsb = (GPR32) lsb;
+		this.msb = (GPR32) msb;
+		this.reg = reg;
 	}
 
 	/**
@@ -68,15 +77,20 @@ public abstract class DoubleWordItem extends Item implements
 		switch (getKind()) {
 		case Kind.GPR:
 			res = L1AHelper.requestDoubleWordRegisters(ec, getType());
-			final GPR lsb = res.getLsbRegister();
-			final GPR msb = res.getMsbRegister();
-			os.writeMOV(INTSIZE, lsb, this.lsb);
-			os.writeMOV(INTSIZE, msb, this.msb);
+			if (os.isCode32()) {
+				final GPR lsb = res.getLsbRegister(ec);
+				final GPR msb = res.getMsbRegister(ec);
+				os.writeMOV(INTSIZE, lsb, this.lsb);
+				os.writeMOV(INTSIZE, msb, this.msb);
+			} else {
+				final GPR64 reg = res.getRegister(ec);
+				os.writeMOV(BITS64, reg, this.reg);
+			}
 			break;
 
 		case Kind.LOCAL:
 			res = (DoubleWordItem) factory.createLocal(getType(), super
-					.getOffsetToFP());
+					.getOffsetToFP(ec));
 			break;
 
 		case Kind.CONSTANT:
@@ -125,18 +139,23 @@ public abstract class DoubleWordItem extends Item implements
 	 * 
 	 * @return
 	 */
-	final int getLsbOffsetToFP() {
-		return super.getOffsetToFP();
+	final int getLsbOffsetToFP(EmitterContext ec) {
+		return super.getOffsetToFP(ec);
 	}
 
 	/**
-	 * Gets the register holding the LSB part of this item
+	 * Gets the register holding the LSB part of this item in 32-bit mode.
 	 * 
 	 * @return
 	 */
-	final X86Register.GPR getLsbRegister() {
-		if (Vm.VerifyAssertions)
+	final X86Register.GPR getLsbRegister(EmitterContext ec) {
+		if (!ec.getStream().isCode32()) {
+			throw new Error("Can only be used in 32-bit mode");
+		}
+		if (Vm.VerifyAssertions) {
 			Vm._assert(kind == Kind.GPR, "kind == Kind.REGISTER");
+			Vm._assert(lsb != null, "lsb != null");
+		}
 		return lsb;
 	}
 
@@ -146,31 +165,55 @@ public abstract class DoubleWordItem extends Item implements
 	 * 
 	 * @return
 	 */
-	final int getMsbOffsetToFP() {
-		return super.getOffsetToFP() + 4;
+	final int getMsbOffsetToFP(EmitterContext ec) {
+		return super.getOffsetToFP(ec) + 4;
 	}
 
 	/**
-	 * Gets the register holding the MSB part of this item
+	 * Gets the register holding the MSB part of this item in 32-bit mode.
 	 * 
 	 * @return
 	 */
-	final X86Register.GPR getMsbRegister() {
-		if (Vm.VerifyAssertions)
+	final X86Register.GPR getMsbRegister(EmitterContext ec) {
+		if (!ec.getStream().isCode32()) {
+			throw new Error("Can only be used in 32-bit mode");
+		}
+		if (Vm.VerifyAssertions) {
 			Vm._assert(kind == Kind.GPR, "kind == Kind.REGISTER");
+			Vm._assert(msb != null, "msb != null");
+		}
 		return msb;
+	}
+
+	/**
+	 * Gets the register holding this item in 64-bit mode.
+	 * 
+	 * @return
+	 */
+	final X86Register.GPR64 getRegister(EmitterContext ec) {
+		if (!ec.getStream().isCode64()) {
+			throw new Error("Can only be used in 64-bit mode");
+		}
+		if (Vm.VerifyAssertions) {
+			Vm._assert(kind == Kind.GPR, "kind == Kind.REGISTER");
+			Vm._assert(reg != null, "reg != null");
+		}
+		return reg;
 	}
 
 	/**
 	 * Gets the offset from this item to the FramePointer register. This is only
 	 * valid if this item has a LOCAL kind.
 	 * 
-	 * @return
-	 * @deprecated Use {@link #getLsbOffsetToFP()}or
-	 *             {@link #getMsbOffsetToFP()}instead.
+	 * @return In 32-bit mode, use {@link #getLsbOffsetToFP()} or
+	 *         {@link #getMsbOffsetToFP()} instead.
 	 */
-	final int getOffsetToFP() {
-		throw new Error("Do not use this");
+	final int getOffsetToFP(EmitterContext ec) {
+		if (ec.getStream().isCode32()) {
+			throw new Error("Do not use this");
+		} else {
+			return super.getOffsetToFP(ec);
+		}
 	}
 
 	/**
@@ -178,42 +221,56 @@ public abstract class DoubleWordItem extends Item implements
 	 */
 	final void load(EmitterContext ec) {
 		if (kind != Kind.GPR) {
-			X86RegisterPool pool = ec.getGPRPool();
+			final X86RegisterPool pool = ec.getGPRPool();
+			final X86Assembler os = ec.getStream();
 
-			X86Register.GPR l = (X86Register.GPR) pool.request(JvmType.INT,
-					this);
-			if (l == null) {
-				final VirtualStack vstack = ec.getVStack();
-				vstack.push(ec);
-				l = (X86Register.GPR) pool.request(JvmType.INT, this);
+			if (os.isCode32()) {
+				X86Register.GPR l = (X86Register.GPR) pool.request(JvmType.INT,
+						this);
+				if (l == null) {
+					final VirtualStack vstack = ec.getVStack();
+					vstack.push(ec);
+					l = (X86Register.GPR) pool.request(JvmType.INT, this);
+				}
+				X86Register.GPR r = (X86Register.GPR) pool.request(JvmType.INT,
+						this);
+				if (r == null) {
+					final VirtualStack vstack = ec.getVStack();
+					vstack.push(ec);
+					r = (X86Register.GPR) pool.request(JvmType.INT, this);
+				}
+				if (Vm.VerifyAssertions) {
+					Vm._assert(r != null, "r != null");
+					Vm._assert(l != null, "l != null");
+				}
+				loadTo32(ec, l, r);
+			} else {
+				GPR64 r = (GPR64) pool.request(getType(), this);
+				if (r == null) {
+					final VirtualStack vstack = ec.getVStack();
+					vstack.push(ec);
+					r = (GPR64) pool.request(getType(), this);
+				}
+				loadTo64(ec, r);
 			}
-			X86Register.GPR r = (X86Register.GPR) pool.request(JvmType.INT,
-					this);
-			if (r == null) {
-				final VirtualStack vstack = ec.getVStack();
-				vstack.push(ec);
-				r = (X86Register.GPR) pool.request(JvmType.INT, this);
-			}
-			if (Vm.VerifyAssertions)
-				Vm._assert(r != null, "r != null");
-			if (Vm.VerifyAssertions)
-				Vm._assert(l != null, "l != null");
-			loadTo(ec, l, r);
 		}
 	}
 
 	/**
-	 * ?
+	 * Load the value of this item into the given registers.
 	 * 
 	 * @param ec
 	 * @param lsb
 	 * @param msb
 	 */
-	final void loadTo(EmitterContext ec, X86Register.GPR lsb,
+	final void loadTo32(EmitterContext ec, X86Register.GPR lsb,
 			X86Register.GPR msb) {
 		final X86Assembler os = ec.getStream();
 		final X86RegisterPool pool = ec.getGPRPool();
 		final VirtualStack stack = ec.getVStack();
+		if (!os.isCode32()) {
+			throw new RuntimeException("Can only be used in 32-bit mode.");
+		}
 
 		// os.log("LongItem.log called "+Integer.toString(kind));
 		if (Vm.VerifyAssertions) {
@@ -277,7 +334,7 @@ public abstract class DoubleWordItem extends Item implements
 			break;
 
 		case Kind.CONSTANT:
-			loadToConstant(ec, os, lsb, msb);
+			loadToConstant32(ec, os, (GPR32) lsb, (GPR32) msb);
 			break;
 
 		case Kind.FPUSTACK:
@@ -300,19 +357,84 @@ public abstract class DoubleWordItem extends Item implements
 
 		}
 		kind = Kind.GPR;
-		this.lsb = lsb;
-		this.msb = msb;
+		this.lsb = (GPR32) lsb;
+		this.msb = (GPR32) msb;
 	}
 
 	/**
-	 * Load my constant to the given os.
+	 * Load the value of this item into the given registers. Only valid in
+	 * 64-bit mode.
+	 * 
+	 * @param ec
+	 * @param reg
+	 */
+	final void loadTo64(EmitterContext ec, X86Register.GPR64 reg) {
+		final X86Assembler os = ec.getStream();
+		final X86RegisterPool pool = ec.getGPRPool();
+		final VirtualStack stack = ec.getVStack();
+		if (!os.isCode64()) {
+			throw new RuntimeException("Can only be used in 64-bit mode.");
+		}
+
+		if (Vm.VerifyAssertions) {
+			Vm._assert(reg != null, "reg != null");
+		}
+
+		switch (kind) {
+		case Kind.GPR:
+			if (this.reg != reg) {
+				os.writeMOV(BITS64, reg, this.reg);
+				cleanup(ec);
+			}
+			break;
+
+		case Kind.LOCAL:
+			os.writeMOV(BITS64, reg, X86Register.RBP, offsetToFP);
+			break;
+
+		case Kind.CONSTANT:
+			loadToConstant64(ec, os, reg);
+			break;
+
+		case Kind.FPUSTACK:
+			// Make sure this item is on top of the FPU stack
+			stack.fpuStack.pop(this);
+			// Convert & move to new space on normal stack
+			os.writeLEA(X86Register.RSP, X86Register.RSP, -8);
+			popFromFPU(os, X86Register.RSP, 0);
+			os.writePOP(reg);
+			break;
+
+		case Kind.STACK:
+			if (VirtualStack.checkOperandStack) {
+				stack.operandStack.pop(this);
+			}
+			os.writePOP(reg);
+			break;
+
+		}
+		kind = Kind.GPR;
+		this.reg = reg;
+	}
+
+	/**
+	 * Load my constant to the given os in 32-bit mode.
 	 * 
 	 * @param os
 	 * @param lsb
 	 * @param msb
 	 */
-	protected abstract void loadToConstant(EmitterContext ec, X86Assembler os,
-			GPR lsb, GPR msb);
+	protected abstract void loadToConstant32(EmitterContext ec,
+			X86Assembler os, GPR32 lsb, GPR32 msb);
+
+	/**
+	 * Load my constant to the given os in 64-bit mode.
+	 * 
+	 * @param os
+	 * @param reg
+	 */
+	protected abstract void loadToConstant64(EmitterContext ec,
+			X86Assembler os, GPR64 reg);
 
 	/**
 	 * Load this item to a general purpose register tuple.
@@ -321,23 +443,39 @@ public abstract class DoubleWordItem extends Item implements
 	 */
 	final void loadToGPR(EmitterContext ec) {
 		if (kind != Kind.GPR) {
-			X86Register.GPR lsb = (X86Register.GPR) ec.getGPRPool().request(
-					JvmType.INT);
-			if (lsb == null) {
-				ec.getVStack().push(ec);
-				lsb = (X86Register.GPR) ec.getGPRPool().request(JvmType.INT);
+			final X86Assembler os = ec.getStream();
+
+			if (os.isCode32()) {
+				X86Register.GPR lsb = (X86Register.GPR) ec.getGPRPool()
+						.request(JvmType.INT);
+				if (lsb == null) {
+					ec.getVStack().push(ec);
+					lsb = (X86Register.GPR) ec.getGPRPool()
+							.request(JvmType.INT);
+				}
+				if (Vm.VerifyAssertions)
+					Vm._assert(lsb != null, "lsb != null");
+				X86Register.GPR msb = (X86Register.GPR) ec.getGPRPool()
+						.request(JvmType.INT);
+				if (msb == null) {
+					ec.getVStack().push(ec);
+					msb = (X86Register.GPR) ec.getGPRPool()
+							.request(JvmType.INT);
+				}
+				if (Vm.VerifyAssertions)
+					Vm._assert(msb != null, "msb != null");
+				loadTo32(ec, lsb, msb);
+			} else {
+				GPR64 r = (GPR64) ec.getGPRPool().request(getType());
+				if (r == null) {
+					ec.getVStack().push(ec);
+					r = (GPR64) ec.getGPRPool().request(getType());
+				}
+				if (Vm.VerifyAssertions) {
+					Vm._assert(r != null, "r != null");
+				}
+				loadTo64(ec, r);
 			}
-			if (Vm.VerifyAssertions)
-				Vm._assert(lsb != null, "lsb != null");
-			X86Register.GPR msb = (X86Register.GPR) ec.getGPRPool().request(
-					JvmType.INT);
-			if (msb == null) {
-				ec.getVStack().push(ec);
-				msb = (X86Register.GPR) ec.getGPRPool().request(JvmType.INT);
-			}
-			if (Vm.VerifyAssertions)
-				Vm._assert(msb != null, "msb != null");
-			loadTo(ec, lsb, msb);
 		}
 	}
 
@@ -369,13 +507,21 @@ public abstract class DoubleWordItem extends Item implements
 
 		switch (getKind()) {
 		case Kind.GPR:
-			os.writePUSH(msb);
-			os.writePUSH(lsb);
+			if (os.isCode32()) {
+				os.writePUSH(msb);
+				os.writePUSH(lsb);
+			} else {
+				os.writePUSH(reg);
+			}
 			break;
 
 		case Kind.LOCAL:
-			os.writePUSH(X86Register.EBP, getMsbOffsetToFP());
-			os.writePUSH(X86Register.EBP, getLsbOffsetToFP());
+			if (os.isCode32()) {
+				os.writePUSH(X86Register.EBP, getMsbOffsetToFP(ec));
+				os.writePUSH(X86Register.EBP, getLsbOffsetToFP(ec));
+			} else {
+				os.writePUSH(X86Register.RBP, getOffsetToFP(ec));
+			}
 			break;
 
 		case Kind.CONSTANT:
@@ -390,8 +536,14 @@ public abstract class DoubleWordItem extends Item implements
 			}
 			stack.fpuStack.pop(this);
 			// Convert & move to new space on normal stack
-			os.writeLEA(X86Register.ESP, X86Register.ESP, -8);
-			popFromFPU(os, X86Register.ESP, 0);
+			if (os.isCode32()) {
+				os.writeLEA(X86Register.ESP, X86Register.ESP, -8);
+				popFromFPU(os, X86Register.ESP, 0);
+			} else {
+				os.writeLEA(X86Register.RSP, X86Register.RSP, -8); // Still 8
+				// bytes
+				popFromFPU(os, X86Register.RSP, 0);
+			}
 			break;
 
 		case Kind.STACK:
@@ -439,20 +591,35 @@ public abstract class DoubleWordItem extends Item implements
 		// os.log("LongItem.push "+Integer.toString(getKind()));
 		switch (getKind()) {
 		case Kind.GPR:
-			os.writePUSH(msb);
-			os.writePUSH(lsb);
-			pushToFPU(os, X86Register.ESP, 0);
-			os.writeLEA(X86Register.ESP, X86Register.ESP, 8);
+			if (os.isCode32()) {
+				os.writePUSH(msb);
+				os.writePUSH(lsb);
+				pushToFPU(os, X86Register.ESP, 0);
+				os.writeLEA(X86Register.ESP, X86Register.ESP, 8);
+			} else {
+				os.writePUSH(reg);
+				pushToFPU(os, X86Register.RSP, 0);
+				os.writeLEA(X86Register.RSP, X86Register.RSP, 8);
+			}
 			break;
 
 		case Kind.LOCAL:
-			pushToFPU(os, X86Register.EBP, getLsbOffsetToFP());
+			if (os.isCode32()) {
+				pushToFPU(os, X86Register.EBP, getLsbOffsetToFP(ec));
+			} else {
+				pushToFPU(os, X86Register.RBP, getOffsetToFP(ec));
+			}
 			break;
 
 		case Kind.CONSTANT:
 			pushConstant(ec, os);
-			pushToFPU(os, X86Register.ESP, 0);
-			os.writeLEA(X86Register.ESP, X86Register.ESP, 8);
+			if (os.isCode32()) {
+				pushToFPU(os, X86Register.ESP, 0);
+				os.writeLEA(X86Register.ESP, X86Register.ESP, 8);
+			} else {
+				pushToFPU(os, X86Register.RSP, 0);
+				os.writeLEA(X86Register.RSP, X86Register.RSP, 8);
+			}
 			break;
 
 		case Kind.FPUSTACK:
@@ -466,8 +633,13 @@ public abstract class DoubleWordItem extends Item implements
 			if (VirtualStack.checkOperandStack) {
 				stack.operandStack.pop(this);
 			}
-			pushToFPU(os, X86Register.ESP, 0);
-			os.writeLEA(X86Register.ESP, X86Register.ESP, 8);
+			if (os.isCode32()) {
+				pushToFPU(os, X86Register.ESP, 0);
+				os.writeLEA(X86Register.ESP, X86Register.ESP, 8);
+			} else {
+				pushToFPU(os, X86Register.RSP, 0);
+				os.writeLEA(X86Register.RSP, X86Register.RSP, 8);
+			}
 			break;
 		}
 
@@ -491,11 +663,16 @@ public abstract class DoubleWordItem extends Item implements
 		// assertCondition(!ec.getVStack().contains(this), "Cannot release while
 		// on vstack");
 		final X86RegisterPool pool = ec.getGPRPool();
+		final X86Assembler os = ec.getStream();
 
 		switch (getKind()) {
 		case Kind.GPR:
-			pool.release(lsb);
-			pool.release(msb);
+			if (os.isCode32()) {
+				pool.release(lsb);
+				pool.release(msb);
+			} else {
+				pool.release(reg);
+			}
 			break;
 
 		case Kind.LOCAL:
@@ -517,13 +694,21 @@ public abstract class DoubleWordItem extends Item implements
 
 		this.lsb = null;
 		this.msb = null;
+		this.reg = null;
 		this.kind = 0;
 	}
 
 	private final X86Register request(EmitterContext ec, X86RegisterPool pool) {
-		final X86Register r = pool.request(JvmType.INT);
-		if (Vm.VerifyAssertions)
+		final X86Assembler os = ec.getStream();
+		final X86Register r;
+		if (os.isCode32()) {
+			r = pool.request(JvmType.INT);
+		} else {
+			r = pool.request(getType());
+		}
+		if (Vm.VerifyAssertions) {
 			Vm._assert(r != null, "r != null");
+		}
 		return r;
 	}
 
@@ -531,27 +716,39 @@ public abstract class DoubleWordItem extends Item implements
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#spill(EmitterContext, Register)
 	 */
 	final void spill(EmitterContext ec, X86Register reg) {
-		if (Vm.VerifyAssertions)
-			Vm._assert((getKind() == Kind.GPR)
-					&& ((this.lsb == reg) || (this.msb == reg)), "spill1");
+		final X86Assembler os = ec.getStream();
+		if (Vm.VerifyAssertions) {
+			Vm._assert(getKind() == Kind.GPR);
+			if (os.isCode32()) {
+				Vm._assert((this.lsb == reg) || (this.msb == reg), "spill1");
+			} else {
+				Vm._assert((this.reg == reg), "spill1");
+			}
+		}
 		ec.getVStack().push(ec);
 		if (isStack()) {
 			return;
 		}
 
 		final X86RegisterPool pool = ec.getGPRPool();
-		final X86Register.GPR newLsb = (X86Register.GPR) request(ec, pool);
-		final X86Register.GPR newMsb = (X86Register.GPR) request(ec, pool);
-		loadTo(ec, newLsb, newMsb);
-		pool.transferOwnerTo(newLsb, this);
-		pool.transferOwnerTo(newMsb, this);
+		if (os.isCode32()) {
+			final X86Register.GPR newLsb = (X86Register.GPR) request(ec, pool);
+			final X86Register.GPR newMsb = (X86Register.GPR) request(ec, pool);
+			loadTo32(ec, newLsb, newMsb);
+			pool.transferOwnerTo(newLsb, this);
+			pool.transferOwnerTo(newMsb, this);
+		} else {
+			final GPR64 newReg = (GPR64) request(ec, pool);
+			loadTo64(ec, newReg);
+			pool.transferOwnerTo(newReg, this);
+		}
 	}
 
 	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
 	 */
 	final boolean uses(X86Register reg) {
-		return ((kind == Kind.GPR) && (msb.equals(reg) || lsb.equals(reg)));
+		return ((kind == Kind.GPR) && ((this.msb == reg) || (this.lsb == reg) || (this.reg == reg)));
 	}
 
 	/**
@@ -561,7 +758,15 @@ public abstract class DoubleWordItem extends Item implements
 	 * @return true, when this item uses a volatile register.
 	 */
 	final boolean usesVolatileRegister(X86RegisterPool pool) {
-		return ((kind == Kind.GPR) && !(pool.isCallerSaved(lsb) && pool
-				.isCallerSaved(msb)));
+		if (kind == Kind.GPR) {
+			if (reg == null) {
+				// 32-bit
+				return (!(pool.isCallerSaved(lsb) && pool.isCallerSaved(msb)));
+			} else {
+				// 64-bit
+				return (!(pool.isCallerSaved(reg)));
+			}
+		}
+		return false;
 	}
 }

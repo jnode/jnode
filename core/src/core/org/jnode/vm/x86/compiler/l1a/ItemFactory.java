@@ -88,7 +88,7 @@ final class ItemFactory {
      */
     final LongItem createLConst(long val) {
         final LongItem item = (LongItem) getOrCreate(JvmType.LONG);
-        item.initialize(Item.Kind.CONSTANT, 0, null, null, null, val);
+        item.initialize(Item.Kind.CONSTANT, 0, null, null, null, null, val);
         return item;
     }
 
@@ -99,7 +99,7 @@ final class ItemFactory {
      */
     final DoubleItem createDConst(double val) {
         final DoubleItem item = (DoubleItem) getOrCreate(JvmType.DOUBLE);
-        item.initialize(Item.Kind.CONSTANT, 0, null, null, null, val);
+        item.initialize(Item.Kind.CONSTANT, 0, null, null, null, null, val);
         return item;
     }
 
@@ -168,7 +168,20 @@ final class ItemFactory {
      */
     public DoubleWordItem createReg(int jvmType, X86Register.GPR lsb, X86Register.GPR msb) {
         final DoubleWordItem item = (DoubleWordItem) getOrCreate(jvmType);
-        item.initialize(Item.Kind.GPR, 0, lsb, msb, null);
+        item.initialize(Item.Kind.GPR, 0, lsb, msb, null, null);
+        return item;
+    }
+
+    /**
+     * Create a doubleword register item.
+     * 
+     * @param jvmType
+     * @param lsb
+     * @param msb
+     */
+    public DoubleWordItem createReg(int jvmType, X86Register.GPR64 reg) {
+        final DoubleWordItem item = (DoubleWordItem) getOrCreate(jvmType);
+        item.initialize(Item.Kind.GPR, 0, null, null, reg, null);
         return item;
     }
 

@@ -70,7 +70,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			break;
 
 		case Kind.LOCAL:
-			res = (WordItem) factory.createLocal(getType(), getOffsetToFP());
+			res = (WordItem) factory.createLocal(getType(), getOffsetToFP(ec));
 			break;
 
 		case Kind.CONSTANT:
@@ -162,7 +162,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			break;
 
 		case Kind.LOCAL:
-			os.writeMOV(INTSIZE, reg, X86Register.EBP, getOffsetToFP());
+			os.writeMOV(INTSIZE, reg, X86Register.EBP, getOffsetToFP(ec));
 			break;
 
 		case Kind.CONSTANT:
