@@ -253,19 +253,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		refJava = os.getObjectRef(sbcClass.getMethod("unknownOpcode", "(II)V"));
 		os.getObjectRef(new Label("SoftByteCodes_unknownOpcode")).link(refJava);
 
-		/* Link SoftByteCodes_arrayStoreWriteBarrier */
-		refJava = os.getObjectRef(sbcClass.getMethod("arrayStoreWriteBarrier", "(Ljava/lang/Object;ILjava/lang/Object;)V"));
-		os.getObjectRef(new Label("SoftByteCodes_arrayStoreWriteBarrier")).link(refJava);
-
-		/* Link SoftByteCodes_putfieldWriteBarrier */
-		refJava = os.getObjectRef(sbcClass.getMethod("putfieldWriteBarrier", "(Ljava/lang/Object;ILjava/lang/Object;)V"));
-		os.getObjectRef(new Label("SoftByteCodes_putfieldWriteBarrier")).link(refJava);
-
-		/* Link SoftByteCodes_putstaticWriteBarrier */
-		refJava = os.getObjectRef(sbcClass.getMethod("putstaticWriteBarrier", "(ILjava/lang/Object;)V"));
-		os.getObjectRef(new Label("SoftByteCodes_putstaticWriteBarrier")).link(refJava);
-
-		VmType vmThreadClass = loadClass(VmThread.class);
+		final VmType vmThreadClass = loadClass(VmThread.class);
 
 		/* Link VmThread_runThread */
 		refJava = os.getObjectRef(vmThreadClass.getMethod("runThread", "(Lorg/jnode/vm/VmThread;)V"));

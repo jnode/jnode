@@ -92,12 +92,14 @@ public class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
                     }
                 }
                 break;
-               case GC_GREY: break;
-               default: {
-                   Unsafe.debug("color");
-                   Unsafe.debug(gcColor);
-                   helper.die("Unknown GC color on object");
-               }
+            case GC_GREY:
+                break;
+            default:
+                {
+                    Unsafe.debug("color");
+                    Unsafe.debug(gcColor);
+                    helper.die("Unknown GC color on object");
+                }
             }
             stack.push(object);
             mark();
@@ -209,11 +211,13 @@ public class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
         // For now do it stupid, but safe, just scan the whole stack.
         final int stackSize = thread.getStackSize();
         final Object stack = helper.getStack(thread);
-        for (int i = 0; i < stackSize; i += slotSize) {
-            Address child = Unsafe.getAddress(stack, i);
-            if (child != null) {
-                if (heapManager.isObject(child)) {
-                    processChild(child);
+        if (stack != null) {
+            for (int i = 0; i < stackSize; i += slotSize) {
+                Address child = Unsafe.getAddress(stack, i);
+                if (child != null) {
+                    if (heapManager.isObject(child)) {
+                        processChild(child);
+                    }
                 }
             }
         }

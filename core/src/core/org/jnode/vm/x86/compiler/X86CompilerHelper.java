@@ -17,6 +17,7 @@ import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmTypeState;
+import org.jnode.vm.memmgr.VmWriteBarrier;
 import org.jnode.vm.x86.X86CpuID;
 
 /**
@@ -350,11 +351,17 @@ public class X86CompilerHelper extends X86StackManager implements
      * @param valueReg
      */
     public final void writeArrayStoreWriteBarrier(X86CompilerContext context,
-            Register refReg, Register indexReg, Register valueReg) {
-        writePUSH(refReg);
-        writePUSH(indexReg);
-        writePUSH(valueReg);
-        invokeJavaMethod(context.getArrayStoreWriteBarrier(), context);
+            Register refReg, Register indexReg, Register valueReg,
+            Register scratchReg) {
+        final VmWriteBarrier wb = context.getWriteBarrier();
+        if (wb != null) {
+            os.writeMOV_Const(scratchReg, wb);
+            writePUSH(scratchReg);
+            writePUSH(refReg);
+            writePUSH(indexReg);
+            writePUSH(valueReg);
+            invokeJavaMethod(context.getArrayStoreWriteBarrier(), context);
+        }
     }
 
     /**
@@ -365,12 +372,18 @@ public class X86CompilerHelper extends X86StackManager implements
      * @param valueReg
      */
     public final void writePutfieldWriteBarrier(X86CompilerContext context,
-            VmInstanceField field, Register refReg, Register valueReg) {
+            VmInstanceField field, Register refReg, Register valueReg,
+            Register scratchReg) {
         if (field.isObjectRef()) {
-            writePUSH(refReg);
-            writePUSH(field.getOffset());
-            writePUSH(valueReg);
-            invokeJavaMethod(context.getPutfieldWriteBarrier(), context);
+            final VmWriteBarrier wb = context.getWriteBarrier();
+            if (wb != null) {
+                os.writeMOV_Const(scratchReg, wb);
+                writePUSH(scratchReg);
+                writePUSH(refReg);
+                writePUSH(field.getOffset());
+                writePUSH(valueReg);
+                invokeJavaMethod(context.getPutfieldWriteBarrier(), context);
+            }
         }
     }
 
@@ -381,11 +394,16 @@ public class X86CompilerHelper extends X86StackManager implements
      * @param valueReg
      */
     public final void writePutstaticWriteBarrier(X86CompilerContext context,
-            VmStaticField field, Register valueReg) {
+            VmStaticField field, Register valueReg, Register scratchReg) {
         if (field.isObjectRef()) {
-            writePUSH(field.getStaticsIndex());
-            writePUSH(valueReg);
-            invokeJavaMethod(context.getPutstaticWriteBarrier(), context);
+            final VmWriteBarrier wb = context.getWriteBarrier();
+            if (wb != null) {
+                os.writeMOV_Const(scratchReg, wb);
+                writePUSH(scratchReg);
+                writePUSH(field.getStaticsIndex());
+                writePUSH(valueReg);
+                invokeJavaMethod(context.getPutstaticWriteBarrier(), context);
+            }
         }
     }
 

@@ -46,7 +46,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
     private final HeapHelper helper;
 
     /** The write barrier */
-    private final DefaultWriteBarrier wb;
+    private final DefaultWriteBarrier writeBarrier;
 
     /** Debug mode? */
     private final boolean debug;
@@ -58,7 +58,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
             VmStatics statics) {
         this.debug = Vm.getVm().isDebugMode();
         this.heapManager = heapManager;
-        this.wb = (DefaultWriteBarrier) heapManager.getWriteBarrier();
+        this.writeBarrier = (DefaultWriteBarrier) heapManager.getWriteBarrier();
         this.helper = heapManager.getHelper();
         this.markStack = new GCStack();
         this.markVisitor = new GCMarkVisitor(heapManager, arch, markStack);
@@ -79,13 +79,17 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
         stats.lastGCTime = System.currentTimeMillis();
 
         // Mark
-        helper.disableReschedule();
+        helper.stopThreadsAtSafePoint();
         heapManager.setGcActive(true);
         try {
             Unsafe.debug("<mark/>");
-            wb.setActive(true);
+            if (writeBarrier != null) {
+                writeBarrier.setActive(true);
+            }
             markHeap(bootHeap, firstHeap);
-            wb.setActive(false);
+            if (writeBarrier != null) {
+                writeBarrier.setActive(false);
+            }
 
             // Sweep
             Unsafe.debug("<sweep/>");
@@ -103,16 +107,16 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
         } finally {
             heapManager.setGcActive(false);
             heapManager.resetCurrentHeap();
-            helper.enableReschedule();
+            helper.restartThreads();
         }
 
         Unsafe.debug("</gc free=");
         Unsafe.debug(heapManager.getFreeMemory());
         Unsafe.debug("/>");
-        
-        if (debug) { 
+
+        if (debug) {
             System.out.println(stats);
-        }         
+        }
     }
 
     /**
@@ -125,10 +129,13 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
         final long startTime = VmSystem.currentKernelMillis();
         long markedObjects = 0;
         boolean firstIteration = true;
+        boolean wbChanged = false;
         do {
             // Do an iteration reset
             markStack.reset();
-            wb.resetChanged();
+            if (writeBarrier != null) {
+                writeBarrier.resetChanged();
+            }
             markVisitor.reset();
             markVisitor.setRootSet(true);
             statics.walk(markVisitor, resolver);
@@ -155,7 +162,10 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
             // Do some cleanup
             markedObjects += markVisitor.getMarkedObjects();
             firstIteration = false;
-        } while (markStack.isOverflow() || wb.isChanged());
+            if (writeBarrier != null) {
+                wbChanged = writeBarrier.isChanged(); 
+            }
+        } while (markStack.isOverflow() || wbChanged);
         final long endTime = VmSystem.currentKernelMillis();
         stats.lastMarkDuration = endTime - startTime;
         stats.lastMarkedObjects = markedObjects;
