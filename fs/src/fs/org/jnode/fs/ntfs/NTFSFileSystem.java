@@ -3,11 +3,12 @@
  */
 package org.jnode.fs.ntfs;
 
-import java.io.*;
+import java.io.IOException;
 
-import org.jnode.driver.*;
-import org.jnode.driver.block.*;
-import org.jnode.fs.*;
+import org.jnode.driver.Device;
+import org.jnode.fs.AbstractFileSystem;
+import org.jnode.fs.FSEntry;
+import org.jnode.fs.FileSystemException;
 
 /**
  * @author Chira
@@ -15,39 +16,25 @@ import org.jnode.fs.*;
  * To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-public class NTFSFileSystem implements FileSystem
+public class NTFSFileSystem extends AbstractFileSystem
 {
 	
-	private Device device = null;
-	private final BlockDeviceAPI api;
 	private NTFSVolume volume = null;
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FileSystem#getDevice()
 	 */
-	public NTFSFileSystem(Device device) throws FileSystemException 
+	public NTFSFileSystem(Device device, boolean readOnly) throws FileSystemException 
 	{
-		if (device == null)
-			throw new FileSystemException("null device!");
-
-		this.device = device;
-		try {
-			api = (BlockDeviceAPI)device.getAPI(BlockDeviceAPI.class);
-		} catch (ApiNotFoundException ex) {
-			throw new FileSystemException(ex);
-		}
+		super(device, readOnly);
 		
 		try {
 			// initialize the NTFE volume
-			volume = new NTFSVolume(api);
+			volume = new NTFSVolume(getApi());
 		} catch (IOException e) {
 			throw new FileSystemException(e);
 		}
 	}
 	
-	public Device getDevice()
-	{
-		return device;
-	}
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FileSystem#getRootEntry()
 	 */
@@ -58,18 +45,19 @@ public class NTFSFileSystem implements FileSystem
 		).getEntry(".");
 		
 	}
-	/* (non-Javadoc)
-	 * @see org.jnode.fs.FileSystem#close()
-	 */
-	public void close()
-	{
-		// TODO Auto-generated method stub
-	}
+	
 	/**
 	 * @return Returns the volume.
 	 */
 	public NTFSVolume getNTFSVolume() {
 		return this.volume;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.fs.AbstractFileSystem#flush()
+	 */
+	public void flush() throws IOException {
+		// TODO Auto-generated method stub						
 	}
 
 }
