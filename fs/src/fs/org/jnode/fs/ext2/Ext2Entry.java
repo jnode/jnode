@@ -7,11 +7,8 @@ import java.io.IOException;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
-import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSFile;
-import org.jnode.fs.FileSystem;
+import org.jnode.fs.spi.AbstractFSEntry;
 
 /**
  * @author Andras Nagy
@@ -23,23 +20,16 @@ import org.jnode.fs.FileSystem;
  * 	getBlockDevice()
  * 	getCharacterDevice(), etc.
  */
-public class Ext2Entry implements FSEntry{
+public class Ext2Entry extends AbstractFSEntry {
 
 	private final Logger log = Logger.getLogger(getClass());
 	private INode iNode=null;
-	private String name=null;
 	private int type;
-	private boolean valid;
-	private Ext2FileSystem fs;
-	private Ext2Entry parentEntry;
 
-	public Ext2Entry(INode iNode, String name, int type, Ext2FileSystem fs, Ext2Entry parentEntry) {
+	public Ext2Entry(INode iNode, String name, int type, Ext2FileSystem fs, FSDirectory parent) {
+		super(fs, null, parent, name, getFSEntryType(name, iNode));
 		this.iNode = iNode;
-		this.name  = name;
 		this.type  = type;
-		this.valid = true;
-		this.fs    = fs;
-		this.parentEntry = parentEntry;
 		
 		log.setLevel(Level.INFO);
 		
@@ -47,33 +37,6 @@ public class Ext2Entry implements FSEntry{
 			(isDirectory()?" is a directory ":"")+
 			(isFile()?" is a file ":""));
 		
-	}
-	/**
-	 * Will be implemented once JNode has a notion of users and groups
-	 * @see org.jnode.fs.FSEntry#getAccessRights()
-	 */
-	public FSAccessRights getAccessRights() throws IOException {
-		throw new IOException("Not implemented yet");
-	}
-
-	/**
-	 * @see org.jnode.fs.FSEntry#getDirectory()
-	 */
-	public FSDirectory getDirectory() throws IOException {
-		if(isDirectory())
-			return new Ext2Directory( iNode, fs, this );
-		else
-			throw new IOException("Not a directory");
-	}
-
-	/**
-	 * @see org.jnode.fs.FSEntry#getFile()
-	 */
-	public FSFile getFile() throws IOException {
-		if(isFile())
-			return new Ext2File( iNode );
-		else
-			throw new IOException("Not a file");
 	}
 
 	/**
@@ -84,93 +47,29 @@ public class Ext2Entry implements FSEntry{
 	}
 
 	/**
-	 * @see org.jnode.fs.FSEntry#getName()
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * @see org.jnode.fs.FSEntry#getParent()
-	 */
-	public FSDirectory getParent() {
-		try{
-		if(parentEntry!=null)
-			return parentEntry.getDirectory();
-		else
-			return fs.getRootEntry().getDirectory();
-		}catch(IOException ioe) {
-			log.error(ioe);
-			return null;
-		}
-	}
-
-	/**
-	 * @see org.jnode.fs.FSEntry#isDirectory()
-	 */
-	public boolean isDirectory() {
-		return ((iNode.getMode()&Ext2Constants.EXT2_S_IFMT) == Ext2Constants.EXT2_S_IFDIR)?true:false;
-	}
-
-	/**
-	 * @see org.jnode.fs.FSEntry#isFile()
-	 */
-	public boolean isFile() {
-		int mode=iNode.getMode()&Ext2Constants.EXT2_S_IFMT;
-		return (mode == Ext2Constants.EXT2_S_IFREG 	||
-				mode == Ext2Constants.EXT2_FT_SYMLINK)?true:false;
-	}
-
-	/**
-	 * @see org.jnode.fs.FSEntry#setLastModified(long)
-	 */
-	public void setLastModified(long lastModified) throws IOException {
-		throw new IOException("EXT2 implementation is currently readonly");
-	}
-
-	/**
-	 * @see org.jnode.fs.FSEntry#setName(String)
-	 */
-	public void setName(String newName) throws IOException {
-		throw new IOException("EXT2 implementation is currently readonly");
-	}
-
-	/**
-	 * @see org.jnode.fs.FSObject#getFileSystem()
-	 */
-	public FileSystem getFileSystem() {
-		return iNode.getExt2FileSystem();
-	}
-
-	/**
 	 * Returns the type.
 	 * @return int type. Valid types are Ext2Constants.EXT2_FT_*
 	 */
 	public int getType() {
 		return type;
 	}
-
-	/**
-	 * @see org.jnode.fs.FSObject#isValid()
-	 */
-	public boolean isValid() {
-		return valid;
-	}
-
-	/**
-	 * Sets the valid status.
-	 * @param valid The valid status to set
-	 */
-	public void setValid(boolean valid) {
-		this.valid = valid;
+		
+	INode getINode()
+	{
+		return iNode;
 	}
 	
-	/**
-	 * Indicate if the entry has been modified in memory (ie need to be saved)
-	 * @return true if the entry need to be saved
-	 * @throws IOException
-	 */
-	public boolean isDirty() throws IOException {
-		return true;
-	}
+	static private int getFSEntryType(String name, INode iNode) {
+		int mode=iNode.getMode()&Ext2Constants.EXT2_S_IFMT;
+		
+		if("/".equals(name))
+			return AbstractFSEntry.ROOT_ENTRY;
+		else if(mode == Ext2Constants.EXT2_S_IFDIR)
+			return AbstractFSEntry.DIR_ENTRY;
+		else if(mode == Ext2Constants.EXT2_S_IFREG 	||
+				mode == Ext2Constants.EXT2_FT_SYMLINK)
+			return AbstractFSEntry.FILE_ENTRY;
+		else
+			return AbstractFSEntry.OTHER_ENTRY;
+	}	
 }
