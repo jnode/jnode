@@ -11,6 +11,7 @@ import java.util.Iterator;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.input.KeyboardAPI;
+import org.jnode.driver.input.KeyboardInterpreter;
 import org.jnode.driver.input.KeyboardInterpreterFactory;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
@@ -66,8 +67,13 @@ public class LoadkeysCommand {
                 final String country = COUNTRY.getValue(cmdLine);
                 final String region = REGION.getValue(cmdLine);
 
-                api.setKbInterpreter(KeyboardInterpreterFactory
-                        .getKeyboardInterpreter(country, region));
+                final KeyboardInterpreter kbInt = KeyboardInterpreterFactory
+                        .getKeyboardInterpreter(country, region);
+                if (kbInt != null) {
+                	api.setKbInterpreter(kbInt);
+                } else {
+                	out.println("Not found");
+                }
             }
         }
         out.println(" Done.");
