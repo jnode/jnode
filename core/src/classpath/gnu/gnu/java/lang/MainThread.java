@@ -1,5 +1,6 @@
 /* gnu.java.lang.MainThread
-   Copyright (C) 1998 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -41,16 +42,20 @@ package gnu.java.lang;
 import java.lang.reflect.*;
 
 /**
- ** MainThread is a Thread which uses the main() method of some class.
- **
- ** @author John Keiser
- ** @version 1.1.0, Aug 11 1998
- **/
-public class MainThread {
+ * MainThread is a Thread which uses the main() method of some class.
+ *
+ * @author John Keiser
+ * @author Tom Tromey (tromey@redhat.com)
+ */
+public class MainThread
+{
+  // Private data.
 	String[] args;
 	Method mainMethod;
 
-	public MainThread(String classname, String[] args) throws ClassNotFoundException, NoSuchMethodException {
+  public MainThread(String classname, String[] args)
+    throws ClassNotFoundException, NoSuchMethodException
+  {
 		Class found = Class.forName(classname);
 		Class[] argTypes = new Class[1];
 		argTypes[0] = args.getClass();
@@ -58,11 +63,19 @@ public class MainThread {
 		this.args = args;
 	}
 
-	public void run() {
-		try {
+  public void run()
+  {
+    try
+      {
 			mainMethod.invoke(null,args);
-		} catch(IllegalAccessException e) {
-		} catch(InvocationTargetException e) {
+      }
+    catch(IllegalAccessException e)
+      {
+	// Ignore.
+      }
+    catch(InvocationTargetException e)
+      {
+	// Ignore.
 		}
 	}
 }

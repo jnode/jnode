@@ -35,13 +35,13 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt;
 
-import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.AdjustmentEvent;
 import java.awt.peer.ScrollbarPeer;
-import java.io.Serializable;
-
+import java.util.EventListener;
 import javax.accessibility.Accessible;
 
 /**
@@ -50,91 +50,102 @@ import javax.accessibility.Accessible;
   * @author Aaron M. Renn (arenn@urbanophile.com)
   * @author Tom Tromey <tromey@cygnus.com>
   */
-public class Scrollbar extends Component implements Accessible, Adjustable, Serializable {
+public class Scrollbar extends Component implements Accessible,
+                                                    Adjustable
+{
 
-	// FIXME: Serialization readObject/writeObject
+// FIXME: Serialization readObject/writeObject
 
-	/*
+/*
 	 * Static Variables
 	 */
 
-	/**
+/**
 	  * Constant indicating that a scrollbar is horizontal.
 	  */
-	public static final int HORIZONTAL = 0;
+public static final int HORIZONTAL = 0;
 
-	/**
+/**
 	  * Constant indicating that a scrollbar is vertical.
 	  */
-	public static final int VERTICAL = 1;
+public static final int VERTICAL = 1;
 
-	// Serialization Constant
-	private static final long serialVersionUID = 8451667562882310543L;
+// Serialization Constant
+private static final long serialVersionUID = 8451667562882310543L;
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * @serial The amount by which the value of the scrollbar is changed
 	  * when incrementing in line mode.
 	  */
-	private int lineIncrement;
+private int lineIncrement;
 
-	/**
+/**
 	  * @serial The amount by which the value of the scrollbar is changed
 	  * when incrementing in page mode.
 	  */
-	private int pageIncrement;
+private int pageIncrement;
 
-	/**
+/**
 	  * @serial The maximum value for this scrollbar
 	  */
-	private int maximum;
+private int maximum;
 
-	/**
+/**
 	  * @serial The minimum value for this scrollbar
 	  */
-	private int minimum;
+private int minimum;
 
-	/**
+/**
 	  * @serial The orientation of this scrollbar, which will be either
 	  * the <code>HORIZONTAL</code> or <code>VERTICAL</code> constant
 	  * from this class.
 	  */
-	private int orientation;
+private int orientation;
 
-	/**
+/**
 	  * @serial The current value of this scrollbar.
 	  */
-	private int value;
+private int value;
 
-	/**
+/**
 	  * @serial The width of the scrollbar's thumb, which is relative
 	  * to the minimum and maximum value of the scrollbar.
 	  */
-	private int visibleAmount;
+private int visibleAmount;
 
-	// List of AdjustmentListener's.
-	private AdjustmentListener adjustment_listeners;
+// List of AdjustmentListener's.
+private AdjustmentListener adjustment_listeners;
 
-	/*************************************************************************/
+private transient boolean valueIsAdjusting = false;
 
 	/*
+   * The number used to generate the name returned by getName.
+   */
+  private static transient long next_scrollbar_number = 0;
+
+/*************************************************************************/
+
+/*
 	 * Constructors
 	 */
 
-	/**
+/**
 	  * Initializes a new instance of <code>Scrollbar</code> with a
 	  * vertical orientation and default values for all other parameters.
 	  *
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless() is true,
 	  */
-	public Scrollbar() {
+public
+Scrollbar()
+{
 		this(VERTICAL);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Initializes a new instance of <code>Scrollbar</code> with the
 	  * specified orientation and default values for all other parameters.
 	  * The orientation must be either the constant <code>HORIZONTAL</code> or
@@ -146,13 +157,15 @@ public class Scrollbar extends Component implements Accessible, Adjustable, Seri
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless() is true,
 	  * @exception IllegalArgumentException If the orientation value is not valid.
 	  */
-	public Scrollbar(int orientation) throws IllegalArgumentException {
+public
+Scrollbar(int orientation) throws IllegalArgumentException
+{
 		this(orientation, 0, 10, 0, 100);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Initializes a new instance of <code>Scrollbar</code> with the
 	  * specified parameters.  The orientation must be either the constant
 	  * <code>HORIZONTAL</code> or <code>VERTICAL</code>.  An incorrect value
@@ -168,12 +181,16 @@ public class Scrollbar extends Component implements Accessible, Adjustable, Seri
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless() is true,
 	  * @exception IllegalArgumentException If the orientation value is not valid.
 	  */
-	public Scrollbar(int orientation, int value, int visibleAmount, int minimum, int maximum) throws IllegalArgumentException {
+public 
+Scrollbar(int orientation, int value, int visibleAmount, int minimum, 
+          int maximum) throws IllegalArgumentException
+{
 		if (GraphicsEnvironment.isHeadless())
-			throw new HeadlessException();
+    throw new HeadlessException ();
 
 		if ((orientation != HORIZONTAL) && (orientation != VERTICAL))
-			throw new IllegalArgumentException("Bad orientation value: " + orientation);
+    throw new IllegalArgumentException("Bad orientation value: "
+				       + orientation);
 
 		this.orientation = orientation;
 
@@ -182,29 +199,30 @@ public class Scrollbar extends Component implements Accessible, Adjustable, Seri
 		// Default is 1 according to online docs.
 		lineIncrement = 1;
 
-		pageIncrement = (maximum - minimum) / 5;
-		if (pageIncrement == 0)
-			pageIncrement = 1;
-	}
+  // Default is 10 according to javadocs.
+  pageIncrement = 10;
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/*
+/*
 	 * Instance Methods
 	 */
 
-	/**
+/**
 	  * Returns the orientation constant for this object.
 	  *
 	  * @return The orientation constant for this object.
 	  */
-	public int getOrientation() {
-		return (orientation);
-	}
+public int
+getOrientation()
+{
+  return(orientation);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Sets the orientation of this scrollbar to the specified value.  This
 	  * value must be either the constant <code>HORIZONTAL</code> or
 	  * <code>VERTICAL</code> from this class or an exception will be thrown.
@@ -213,101 +231,118 @@ public class Scrollbar extends Component implements Accessible, Adjustable, Seri
 	  *
 	  * @exception IllegalArgumentException If the orientation value is not valid.
 	  */
-	public void setOrientation(int orientation) {
+public void
+setOrientation(int orientation)
+{
 		if ((orientation != HORIZONTAL) && (orientation != VERTICAL))
-			throw new IllegalArgumentException("Bad orientation value: " + orientation);
+    throw new IllegalArgumentException("Bad orientation value: "
+				       + orientation);
 
 		// FIXME: Communicate to peer?  Or must this be called before peer creation?
 		this.orientation = orientation;
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the current value for this scrollbar.
 	  *
 	  * @return The current value for this scrollbar.
 	  */
-	public int getValue() {
-		return (value);
-	}
+public int
+getValue()
+{
+  return(value);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Sets the current value for this scrollbar to the specified value.
 	  * If this is inconsistent with the minimum and maximum values for this
 	  * scrollbar, the value is silently adjusted.
 	  *
 	  * @param value The new value for this scrollbar.
 	  */
-	public void setValue(int value) {
+public void
+setValue(int value)
+{
 		setValues(value, visibleAmount, minimum, maximum);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the maximum value for this scrollbar.
 	  *
 	  * @return The maximum value for this scrollbar.
 	  */
-	public int getMaximum() {
-		return (maximum);
-	}
+public int
+getMaximum()
+{
+  return(maximum);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Sets the maximum value for this scrollbar to the specified value.
 	  * If the value is less than the current minimum value, it is silent
 	  * set to equal the minimum value.
 	  *
 	  * @param maximum The new maximum value for this scrollbar.
 	  */
-	public void setMaximum(int maximum) {
+public void
+setMaximum(int maximum)
+{
 		setValues(value, visibleAmount, minimum, maximum);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the minimum value for this scrollbar.
 	  *
 	  * @return The minimum value for this scrollbar.
 	  */
-	public int getMinimum() {
-		return (minimum);
-	}
+public int
+getMinimum()
+{
+  return(minimum);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Sets the minimum value for this scrollbar to the specified value.  If
 	  * this is not consistent with the current value and maximum, it is
 	  * silently adjusted to be consistent.
 	  *
 	  * @param minimum The new minimum value for this scrollbar.
 	  */
-	public void setMinimum(int minimum) {
+public void
+setMinimum(int minimum)
+{
 		setValues(value, visibleAmount, minimum, maximum);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the width of the scrollbar's thumb, in units relative to the
 	  * maximum and minimum value of the scrollbar.
 	  *
 	  * @return The width of the scrollbar's thumb.
 	  */
-	public int getVisibleAmount() {
-		return (visibleAmount);
-	}
+public int
+getVisibleAmount()
+{
+  return getVisible ();
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the width of the scrollbar's thumb, in units relative to the
 	  * maximum and minimum value of the scrollbar.
 	  *
@@ -316,25 +351,29 @@ public class Scrollbar extends Component implements Accessible, Adjustable, Seri
 	  * @deprecated This method is deprecated in favor of 
 	  * <code>getVisibleAmount()</code>.
 	  */
-	public int getVisible() {
-		return (getVisibleAmount());
-	}
+public int
+getVisible()
+{
+  return visibleAmount;
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Sets the width of the scrollbar's thumb, in units relative to the
 	  * maximum and minimum value of the scrollbar.
 	  *
 	  * @param visibileAmount The new visible amount value of the scrollbar.
 	  */
-	public void setVisibleAmount(int visibleAmount) {
+public void
+setVisibleAmount(int visibleAmount)
+{
 		setValues(value, visibleAmount, minimum, maximum);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Sets the current value, visible amount, minimum, and maximum for this
 	  * scrollbar.  These values are adjusted to be internally consistent
 	  * if necessary.
@@ -344,7 +383,9 @@ public class Scrollbar extends Component implements Accessible, Adjustable, Seri
 	  * @param minimum The new minimum value for this scrollbar.
 	  * @param maximum The new maximum value for this scrollbar.
 	  */
-	public synchronized void setValues(int value, int visibleAmount, int minimum, int maximum) {
+public synchronized void
+setValues(int value, int visibleAmount, int minimum, int maximum)
+{
 		if (maximum < minimum)
 			maximum = minimum;
 
@@ -354,55 +395,61 @@ public class Scrollbar extends Component implements Accessible, Adjustable, Seri
 		if (value > maximum)
 			value = maximum;
 
-		if (visibleAmount > value)
-			visibleAmount = value;
+  if (visibleAmount > maximum - minimum)
+    visibleAmount = maximum - minimum;
+
+  ScrollbarPeer peer = (ScrollbarPeer) getPeer ();
+  if (peer != null
+      && (this.value != value || this.visibleAmount != visibleAmount
+          || this.minimum != minimum || this.maximum != maximum))
+    peer.setValues(value, visibleAmount, minimum, maximum);
 
 		this.value = value;
 		this.visibleAmount = visibleAmount;
 		this.minimum = minimum;
 		this.maximum = maximum;
 
-		ScrollbarPeer sp = (ScrollbarPeer) getPeer();
-		if (sp != null)
-			sp.setValues(value, visibleAmount, minimum, maximum);
-
 		int range = maximum - minimum;
-		if (lineIncrement > range) {
+  if (lineIncrement > range)
+    {
 			if (range == 0)
 				lineIncrement = 1;
 			else
 				lineIncrement = range;
 
-			if (sp != null)
-				sp.setLineIncrement(lineIncrement);
+      if (peer != null)
+        peer.setLineIncrement(lineIncrement);
 		}
 
-		if (pageIncrement > range) {
+  if (pageIncrement > range)
+    {
 			if (range == 0)
 				pageIncrement = 1;
 			else
 				pageIncrement = range;
 
-			if (sp != null)
-				sp.setPageIncrement(pageIncrement);
-		}
+      if (peer != null)
+        peer.setPageIncrement(pageIncrement);
 	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the value added or subtracted when the user activates the scrollbar
 	  * scroll by a "unit" amount.
 	  *
 	  * @return The unit increment value.
 	  */
-	public int getUnitIncrement() {
-		return (lineIncrement);
-	}
+public int
+getUnitIncrement()
+{
+  return getLineIncrement ();
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the value added or subtracted when the user selects the scrollbar
 	  * scroll by a "unit" amount control.
 	  *
@@ -411,43 +458,29 @@ public class Scrollbar extends Component implements Accessible, Adjustable, Seri
 	  * @deprecated This method is deprecated in favor of 
 	  * <code>getUnitIncrement()</code>.
 	  */
-	public int getLineIncrement() {
-		return (lineIncrement);
-	}
+public int
+getLineIncrement()
+{
+  return lineIncrement;
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Sets the value added or subtracted to the scrollbar value when the
 	  * user selects the scroll by a "unit" amount control.
 	  *
 	  * @param unitIncrement The new unit increment amount.
 	  */
-	public synchronized void setUnitIncrement(int unitIncrement) {
-		if (unitIncrement < 0)
-			throw new IllegalArgumentException("Unit increment less than zero.");
+public synchronized void
+setUnitIncrement(int unitIncrement)
+{
+  setLineIncrement (unitIncrement);
+}
 
-		int range = maximum - minimum;
-		if (unitIncrement > range) {
-			if (range == 0)
-				unitIncrement = 1;
-			else
-				unitIncrement = range;
-		}
+/*************************************************************************/
 
-		if (unitIncrement == lineIncrement)
-			return;
-
-		lineIncrement = unitIncrement;
-
-		ScrollbarPeer sp = (ScrollbarPeer) getPeer();
-		if (sp != null)
-			sp.setLineIncrement(lineIncrement);
-	}
-
-	/*************************************************************************/
-
-	/**
+/**
 	  * Sets the value added or subtracted to the scrollbar value when the
 	  * user selects the scroll by a "unit" amount control.
 	  *
@@ -456,25 +489,48 @@ public class Scrollbar extends Component implements Accessible, Adjustable, Seri
 	  * @deprecated This method is deprecated in favor of
 	  * <code>setUnitIncrement()</code>.
 	  */
-	public void setLineIncrement(int lineIncrement) {
-		setUnitIncrement(lineIncrement);
+public void
+setLineIncrement(int lineIncrement)
+{
+  if (lineIncrement < 0)
+    throw new IllegalArgumentException ("Unit increment less than zero.");
+
+  int range = maximum - minimum;
+  if (lineIncrement > range)
+    {
+      if (range == 0)
+        lineIncrement = 1;
+      else
+        lineIncrement = range;
 	}
 
-	/*************************************************************************/
+  if (lineIncrement == this.lineIncrement)
+    return;
 
-	/**
+  this.lineIncrement = lineIncrement;
+
+  ScrollbarPeer peer = (ScrollbarPeer) getPeer ();
+  if (peer != null)
+    peer.setLineIncrement (this.lineIncrement);
+}
+
+/*************************************************************************/
+
+/**
 	  * Returns the value added or subtracted when the user activates the scrollbar
 	  * scroll by a "block" amount.
 	  *
 	  * @return The block increment value.
 	  */
-	public int getBlockIncrement() {
-		return (pageIncrement);
-	}
+public int
+getBlockIncrement()
+{
+  return getPageIncrement ();
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the value added or subtracted when the user selects the scrollbar
 	  * scroll by a "block" amount control.
 	  *
@@ -483,43 +539,29 @@ public class Scrollbar extends Component implements Accessible, Adjustable, Seri
 	  * @deprecated This method is deprecated in favor of 
 	  * <code>getBlockIncrement()</code>.
 	  */
-	public int getPageIncrement() {
-		return (pageIncrement);
-	}
+public int
+getPageIncrement()
+{
+  return pageIncrement;
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Sets the value added or subtracted to the scrollbar value when the
 	  * user selects the scroll by a "block" amount control.
 	  *
 	  * @param blockIncrement The new block increment amount.
 	  */
-	public synchronized void setBlockIncrement(int blockIncrement) {
-		if (blockIncrement < 0)
-			throw new IllegalArgumentException("Block increment less than zero.");
+public synchronized void
+setBlockIncrement(int blockIncrement)
+{
+  setPageIncrement (blockIncrement);
+}
 
-		int range = maximum - minimum;
-		if (blockIncrement > range) {
-			if (range == 0)
-				blockIncrement = 1;
-			else
-				blockIncrement = range;
-		}
+/*************************************************************************/
 
-		if (blockIncrement == pageIncrement)
-			return;
-
-		pageIncrement = blockIncrement;
-
-		ScrollbarPeer sp = (ScrollbarPeer) getPeer();
-		if (sp != null)
-			sp.setPageIncrement(pageIncrement);
-	}
-
-	/*************************************************************************/
-
-	/**
+/**
 	  * Sets the value added or subtracted to the scrollbar value when the
 	  * user selects the scroll by a "block" amount control.
 	  *
@@ -528,49 +570,77 @@ public class Scrollbar extends Component implements Accessible, Adjustable, Seri
 	  * @deprecated This method is deprecated in favor of
 	  * <code>setBlockIncrement()</code>.
 	  */
-	public void setPageIncrement(int pageIncrement) {
-		setBlockIncrement(pageIncrement);
+public void
+setPageIncrement(int pageIncrement)
+{
+  if (pageIncrement < 0)
+    throw new IllegalArgumentException ("Block increment less than zero.");
+
+  int range = maximum - minimum;
+  if (pageIncrement > range)
+    {
+      if (range == 0)
+        pageIncrement = 1;
+      else
+        pageIncrement = range;
 	}
 
-	/*************************************************************************/
+  if (pageIncrement == this.pageIncrement)
+    return;
 
-	/**
+  this.pageIncrement = pageIncrement;
+
+  ScrollbarPeer peer = (ScrollbarPeer) getPeer ();
+  if (peer != null)
+    peer.setPageIncrement (this.pageIncrement);
+}
+
+/*************************************************************************/
+
+/**
 	  * Notifies this object to create its native peer.
 	  */
-	public synchronized void addNotify() {
+public synchronized void
+addNotify()
+{
 		if (peer == null)
-			peer = getToolkit().createScrollbar(this);
-		super.addNotify();
-	}
+    peer = getToolkit ().createScrollbar (this);
+  super.addNotify ();
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Adds a new adjustment listener to the list of registered listeners
 	  * for this object.
 	  *
 	  * @param listener The listener to add.
 	  */
-	public synchronized void addAdjustmentListener(AdjustmentListener listener) {
+public synchronized void
+addAdjustmentListener(AdjustmentListener listener)
+{
 		adjustment_listeners = AWTEventMulticaster.add(adjustment_listeners, listener);
 		enableEvents(AWTEvent.ADJUSTMENT_EVENT_MASK);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Removes the specified listener from the list of registered listeners
 	  * for this object.
 	  *
 	  * @param listener The listener to remove.
 	  */
-	public synchronized void removeAdjustmentListener(AdjustmentListener listener) {
-		adjustment_listeners = AWTEventMulticaster.remove(adjustment_listeners, listener);
-	}
+public synchronized void
+removeAdjustmentListener(AdjustmentListener listener)
+{
+  adjustment_listeners = AWTEventMulticaster.remove(adjustment_listeners, 
+                                                    listener);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Processes events for this scrollbar.  It does this by calling
 	  * <code>processAdjustmentEvent()</code> if the event is an instance of
 	  * <code>AdjustmentEvent</code>, otherwise it calls the superclass to
@@ -578,16 +648,18 @@ public class Scrollbar extends Component implements Accessible, Adjustable, Seri
 	  *
 	  * @param event The event to process.
 	  */
-	protected void processEvent(AWTEvent event) {
+protected void
+processEvent(AWTEvent event)
+{
 		if (event instanceof AdjustmentEvent)
-			processAdjustmentEvent((AdjustmentEvent) event);
+    processAdjustmentEvent((AdjustmentEvent)event);
 		else
 			super.processEvent(event);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Processes adjustment events for this object by dispatching them to
 	  * any registered listeners.  Note that this method will only be called
 	  * if adjustment events are enabled.  This will happen automatically if
@@ -596,44 +668,104 @@ public class Scrollbar extends Component implements Accessible, Adjustable, Seri
 	  *
 	  * @param event The event to process.
 	  */
-	protected void processAdjustmentEvent(AdjustmentEvent event) {
+protected void
+processAdjustmentEvent(AdjustmentEvent event)
+{
+  value = event.getValue();
 		if (adjustment_listeners != null)
 			adjustment_listeners.adjustmentValueChanged(event);
-	}
+}
 
-	void dispatchEventImpl(AWTEvent e) {
+void
+dispatchEventImpl(AWTEvent e)
+{
 		if (e.id <= AdjustmentEvent.ADJUSTMENT_LAST
 			&& e.id >= AdjustmentEvent.ADJUSTMENT_FIRST
-			&& (adjustment_listeners != null || (eventMask & AWTEvent.ADJUSTMENT_EVENT_MASK) != 0))
+      && (adjustment_listeners != null 
+	  || (eventMask & AWTEvent.ADJUSTMENT_EVENT_MASK) != 0))
 			processEvent(e);
 		else
 			super.dispatchEventImpl(e);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns a debugging string for this object.
 	  *
 	  * @return A debugging string for this object.
 	  */
-	protected String paramString() {
-		return (
-			"value="
-				+ getValue()
-				+ ",visibleAmount="
-				+ getVisibleAmount()
-				+ ",minimum="
-				+ getMinimum()
-				+ ",maximum="
-				+ getMaximum()
-				+ ",pageIncrement="
-				+ pageIncrement
-				+ ",lineIncrement="
-				+ lineIncrement
-				+ ",orientation="
-				+ (orientation == HORIZONTAL ? "HORIZONTAL" : "VERTICAL")
+protected String
+paramString()
+{
+  return("value=" + getValue() + ",visibleAmount=" +
+         getVisibleAmount() + ",minimum=" + getMinimum()
+	 + ",maximum=" + getMaximum()
+	 + ",pageIncrement=" + pageIncrement
+	 + ",lineIncrement=" + lineIncrement
+	 + ",orientation=" + (orientation == HORIZONTAL
+			      ? "HORIZONTAL" : "VERTICAL")
 				+ super.paramString());
+}
+
+  /**
+   * Returns an array of all the objects currently registered as FooListeners
+   * upon this <code>Scrollbar</code>. FooListeners are registered using the 
+   * addFooListener method.
+   *
+   * @exception ClassCastException If listenerType doesn't specify a class or
+   * interface that implements java.util.EventListener.
+   */
+  public EventListener[] getListeners (Class listenerType)
+  {
+    if (listenerType == AdjustmentListener.class)
+      return AWTEventMulticaster.getListeners (adjustment_listeners,
+                                               listenerType);
+
+    return super.getListeners (listenerType);
+  }
+
+  /**
+   * Returns an array of all registered adjustment listeners.
+   */
+  public AdjustmentListener[] getAdjustmentListeners ()
+  {
+    return (AdjustmentListener[]) getListeners (AdjustmentListener.class);
+  }
+
+  /**
+   * Returns true if the value is in the process of changing.
+   *
+   * @since 1.4
+   */
+  public boolean getValueIsAdjusting ()
+  {
+    return valueIsAdjusting;
+  }
+
+  /**
+   * Sets the value of valueIsAdjusting.
+   *
+   * @since 1.4
+   */
+  public void setValueIsAdjusting (boolean valueIsAdjusting)
+  {
+    this.valueIsAdjusting = valueIsAdjusting;
 	}
 
+  /**
+   * Generate a unique name for this scroll bar.
+   *
+   * @return A unique name for this scroll bar.
+   */
+  String generateName ()
+  {
+    return "scrollbar" + getUniqueLong ();
+  }
+
+  private static synchronized long getUniqueLong ()
+  {
+    return next_scrollbar_number++;
+  }
 } // class Scrollbar 
+

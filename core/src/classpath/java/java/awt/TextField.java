@@ -35,65 +35,70 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.peer.ComponentPeer;
 import java.awt.peer.TextFieldPeer;
+import java.awt.peer.ComponentPeer;
+import java.util.EventListener;
 
 /**
   * This class implements a single line text entry field widget
   *
   * @author Aaron M. Renn (arenn@urbanophile.com)
   */
-public class TextField extends TextComponent implements java.io.Serializable {
+public class TextField extends TextComponent
+{
 
-	/*
+/*
 	 * Static Variables
 	 */
 
-	// Serialization constant
-	private static final long serialVersionUID = -2966288784432217853L;
+// Serialization constant
+private static final long serialVersionUID = -2966288784432217853L;
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/*
+/*
 	 * Instance Variables
 	 */
 
-	/**
+/**
 	  * @serial The number of columns in the text entry field.
 	  */
-	private int columns;
+private int columns;
 
-	/**
+/**
 	  * @serial The character that is echoed when doing protected input
 	  */
-	private char echoChar;
+private char echoChar;
 
-	// List of registered ActionListener's for this object.
-	private ActionListener action_listeners;
+// List of registered ActionListener's for this object.
+private ActionListener action_listeners;
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/*
+/*
 	 * Constructors
 	 */
 
-	/**
+/**
 	 * Initializes a new instance of <code>TextField</code> that is empty
 	 * and has one column.
 	 *
 	 * @exception HeadlessException If GraphicsEnvironment.isHeadless() is true,
 	 */
-	public TextField() {
+public
+TextField()
+{
 		this("", 1);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Initializes a new instance of <code>TextField</code> containing
 	  * the specified text.  The number of columns will be equal to the
 	  * length of the text string.
@@ -102,13 +107,15 @@ public class TextField extends TextComponent implements java.io.Serializable {
 	  *
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless() is true,
 	  */
-	public TextField(String text) {
+public
+TextField(String text)
+{
 		this(text, text.length());
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Initializes a new instance of <code>TextField</code> that is empty
 	  * and has the specified number of columns.
 	  *
@@ -116,13 +123,15 @@ public class TextField extends TextComponent implements java.io.Serializable {
 	  *
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless() is true,
 	  */
-	public TextField(int columns) {
+public
+TextField(int columns)
+{
 		this("", columns);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Initializes a new instance of <code>TextField</code> with the
 	  * specified text and number of columns.
 	  *
@@ -131,77 +140,84 @@ public class TextField extends TextComponent implements java.io.Serializable {
 	  *
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless() is true,
 	  */
-	public TextField(String text, int columns) {
+public
+TextField(String text, int columns)
+{
 		super(text);
 		this.columns = columns;
 
 		if (GraphicsEnvironment.isHeadless())
-			throw new HeadlessException();
-	}
+    throw new HeadlessException ();
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/*
+/*
 	 * Instance Methods
 	 */
 
-	/**
+/**
 	  * Returns the number of columns in the field.
 	  *
 	  * @return The number of columns in the field.
 	  */
-	public int getColumns() {
-		return (columns);
-	}
+public int
+getColumns()
+{
+  return(columns);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Sets the number of columns in this field to the specified value.
 	  *
 	  * @param columns The new number of columns in the field.
 	  *
 	  * @exception IllegalArgumentException If columns is less than zero.
 	  */
-	public synchronized void setColumns(int columns) {
+public synchronized void
+setColumns(int columns)
+{
 		if (columns < 0)
-			throw new IllegalArgumentException("Value is less than zero: " + columns);
+    throw new IllegalArgumentException("Value is less than zero: " +
+                                       columns);
 
 		this.columns = columns;
 		// FIXME: How to we communicate this to our peer?
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the character that is echoed to the screen when a text 
 	  * field is protected (such as when a password is being entered).
 	  *
 	  * @return The echo character for this text field.
 	  */
-	public char getEchoChar() {
-		return (echoChar);
-	}
+public char
+getEchoChar()
+{
+  return(echoChar);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Sets the character that is echoed when protected input such as
 	  * a password is displayed.
 	  *
 	  * @param echoChar The new echo character.
 	  */
-	public void setEchoChar(char echoChar) {
-		this.echoChar = echoChar;
+public void
+setEchoChar(char echoChar)
+{
+  setEchoCharacter (echoChar);
+}
 
-		TextFieldPeer tfp = (TextFieldPeer) getPeer();
-		if (tfp != null)
-			tfp.setEchoChar(echoChar);
-	}
+/*************************************************************************/
 
-	/*************************************************************************/
-
-	/**
+/**
 	  * Sets the character that is echoed when protected input such as
 	  * a password is displayed.
 	  *
@@ -210,70 +226,80 @@ public class TextField extends TextComponent implements java.io.Serializable {
 	  * @deprecated This method is deprecated in favor of 
 	  * <code>setEchoChar()</code>
 	  */
-	public void setEchoCharacter(char echoChar) {
-		setEchoChar(echoChar);
-	}
+public void
+setEchoCharacter(char echoChar)
+{
+  this.echoChar = echoChar;
 
-	/*************************************************************************/
+  TextFieldPeer peer = (TextFieldPeer) getPeer ();
+  if (peer != null)
+    peer.setEchoChar (echoChar);
+}
 
-	/**
+/*************************************************************************/
+
+/**
 	  * Tests whether or not this text field has an echo character set
 	  * so that characters the user type are not echoed to the screen.
 	  *
 	  * @return <code>true</code> if an echo character is set,
 	  * <code>false</code> otherwise.
 	  */
-	public boolean echoCharIsSet() {
+public boolean
+echoCharIsSet()
+{
 		if (echoChar == '\u0000')
-			return (false);
+    return(false);
 		else
-			return (true);
-	}
+    return(true);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the minimum size for this text field.
 	  *
 	  * @return The minimum size for this text field.
 	  */
-	public Dimension getMinimumSize() {
-		return (getMinimumSize(getColumns()));
-	}
+public Dimension
+getMinimumSize()
+{
+  return getMinimumSize (getColumns ());
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the minimum size of a text field with the specified number
 	  * of columns.
 	  *
 	  * @param columns The number of columns to get the minimum size for.
 	  */
-	public Dimension getMinimumSize(int columns) {
-		TextFieldPeer tfp = (TextFieldPeer) getPeer();
-		if (tfp == null)
-			return (null); // FIXME: What do we do if there is no peer?
+public Dimension
+getMinimumSize(int columns)
+{
+  return minimumSize (columns);
+}
 
-		return (tfp.getMinimumSize(columns));
-	}
+/*************************************************************************/
 
-	/*************************************************************************/
-
-	/**
+/**
 	  * Returns the minimum size for this text field.
 	  *
 	  * @return The minimum size for this text field.
 	  *
-	  * @deprecated This method is depcreated in favor of
+  * @deprecated This method is deprecated in favor of
 	  * <code>getMinimumSize()</code>.
 	  */
-	public Dimension minimumSize() {
-		return (getMinimumSize(getColumns()));
-	}
+public Dimension
+minimumSize()
+{
+  return minimumSize (getColumns ());
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the minimum size of a text field with the specified number
 	  * of columns.
 	  *
@@ -282,40 +308,46 @@ public class TextField extends TextComponent implements java.io.Serializable {
 	  * @deprecated This method is deprecated in favor of 
 	  * <code>getMinimumSize(int)</code>.
 	  */
-	public Dimension minimumSize(int columns) {
-		return (getMinimumSize(columns));
-	}
+public Dimension
+minimumSize(int columns)
+{
+  TextFieldPeer peer = (TextFieldPeer) getPeer ();
+  if (peer == null)
+    return null; // FIXME: What do we do if there is no peer?
 
-	/*************************************************************************/
+  return peer.getMinimumSize (columns);
+}
 
-	/**
+/*************************************************************************/
+
+/**
 	  * Returns the preferred size for this text field.
 	  *
 	  * @return The preferred size for this text field.
 	  */
-	public Dimension getPreferredSize() {
-		return (getPreferredSize(getColumns()));
-	}
+public Dimension
+getPreferredSize()
+{
+  return getPreferredSize (getColumns ());
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the preferred size of a text field with the specified number
 	  * of columns.
 	  *
 	  * @param columns The number of columns to get the preferred size for.
 	  */
-	public Dimension getPreferredSize(int columns) {
-		TextFieldPeer tfp = (TextFieldPeer) getPeer();
-		if (tfp == null)
-			return (null); // FIXME: What do we do if there is no peer?
+public Dimension
+getPreferredSize(int columns)
+{
+  return preferredSize (columns);
+}
 
-		return (tfp.getPreferredSize(columns));
-	}
+/*************************************************************************/
 
-	/*************************************************************************/
-
-	/**
+/**
 	  * Returns the preferred size for this text field.
 	  *
 	  * @return The preferred size for this text field.
@@ -323,13 +355,15 @@ public class TextField extends TextComponent implements java.io.Serializable {
 	  * @deprecated This method is deprecated in favor of 
 	  * <code>getPreferredSize()</code>.
 	  */
-	public Dimension preferredSize() {
-		return (getPreferredSize(getColumns()));
-	}
+public Dimension
+preferredSize()
+{
+  return preferredSize (getColumns ());
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the preferred size of a text field with the specified number
 	  * of columns.
 	  *
@@ -338,51 +372,63 @@ public class TextField extends TextComponent implements java.io.Serializable {
 	  * @deprecated This method is deprecated in favor of 
 	  * <code>getPreferredSize(int)</code>.
 	  */
-	public Dimension preferredSize(int columns) {
-		return (getPreferredSize(columns));
-	}
+public Dimension
+preferredSize(int columns)
+{
+  TextFieldPeer peer = (TextFieldPeer) getPeer ();
+  if (peer == null)
+    return new Dimension (0, 0);
 
-	/*************************************************************************/
+  return peer.getPreferredSize (columns);
+}
 
-	/**
+/*************************************************************************/
+
+/**
 	  * Notifies this object that it should create its native peer.
 	  */
-	public void addNotify() {
+public void
+addNotify()
+{
 		if (getPeer() != null)
 			return;
 
-		setPeer((ComponentPeer) getToolkit().createTextField(this));
-	}
+  setPeer((ComponentPeer)getToolkit().createTextField(this));
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Addes a new listener to the list of action listeners for this
 	  * object.
 	  *
 	  * @param listener The listener to add to the list.
 	  */
-	public synchronized void addActionListener(ActionListener listener) {
+public synchronized void
+addActionListener(ActionListener listener)
+{
 		action_listeners = AWTEventMulticaster.add(action_listeners, listener);
 
 		enableEvents(AWTEvent.ACTION_EVENT_MASK);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Removes the specified listener from the list of action listeners
 	  * for this object.
 	  *
 	  * @param listener The listener to remove from the list.
 	  */
-	public synchronized void removeActionListener(ActionListener listener) {
+public synchronized void
+removeActionListener(ActionListener listener)
+{
 		action_listeners = AWTEventMulticaster.remove(action_listeners, listener);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Processes the specified event.  If the event is an instance of
 	  * <code>ActionEvent</code> then <code>processActionEvent()</code> is
 	  * called to process it, otherwise the event is sent to the
@@ -390,16 +436,18 @@ public class TextField extends TextComponent implements java.io.Serializable {
 	  *
 	  * @param event The event to process.
 	  */
-	protected void processEvent(AWTEvent event) {
+protected void
+processEvent(AWTEvent event)
+{
 		if (event instanceof ActionEvent)
-			processActionEvent((ActionEvent) event);
+    processActionEvent((ActionEvent)event);
 		else
 			super.processEvent(event);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Processes an action event by calling any registered listeners.
 	  * Note to subclasses: This method is not called unless action events
 	  * are enabled on this object.  This will be true if any listeners
@@ -408,27 +456,65 @@ public class TextField extends TextComponent implements java.io.Serializable {
 	  * 
 	  * @param event The event to process.
 	  */
-	protected void processActionEvent(ActionEvent event) {
+protected void
+processActionEvent(ActionEvent event)
+{
 		if (action_listeners != null)
 			action_listeners.actionPerformed(event);
-	}
+}
 
-	void dispatchEventImpl(AWTEvent e) {
-		if (e.id <= ActionEvent.ACTION_LAST && e.id >= ActionEvent.ACTION_FIRST && (action_listeners != null || (eventMask & AWTEvent.ACTION_EVENT_MASK) != 0))
+void
+dispatchEventImpl(AWTEvent e)
+{
+  if (e.id <= ActionEvent.ACTION_LAST 
+      && e.id >= ActionEvent.ACTION_FIRST
+      && (action_listeners != null 
+	  || (eventMask & AWTEvent.ACTION_EVENT_MASK) != 0))
 			processEvent(e);
 		else
 			super.dispatchEventImpl(e);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns a debug string for this object.
 	  *
 	  * @return A debug string for this object.
 	  */
-	protected String paramString() {
-		return (getClass().getName() + "(columns=" + getColumns() + ",echoChar=" + getEchoChar());
+protected String
+paramString()
+{
+  return(getClass().getName() + "(columns=" + getColumns() + ",echoChar=" +
+         getEchoChar());
+}
+
+  /**
+   * Returns an array of all the objects currently registered as FooListeners
+   * upon this <code>TextField</code>. FooListeners are registered using the
+   * addFooListener method.
+   *
+   * @exception ClassCastException If listenerType doesn't specify a class or
+   * interface that implements java.util.EventListener.
+   *
+   * @since 1.3
+   */
+  public EventListener[] getListeners (Class listenerType)
+  {
+    if (listenerType == ActionListener.class)
+      return AWTEventMulticaster.getListeners (action_listeners, listenerType);
+
+    return super.getListeners (listenerType);
 	}
 
+  /**
+   * Return all ActionListeners register to this <code>TextField</code> object
+   * as an array.
+   *
+   * @since 1.4
+   */
+  public ActionListener[] getActionListeners ()
+  {
+    return (ActionListener[]) getListeners (ActionListener.class);
+  }
 } // class TextField

@@ -395,11 +395,17 @@ public abstract class Rectangle2D extends RectangularShape
     return new PathIterator()
     {
       /** Current coordinate. */
-      private int current = (maxx >= minx && maxy >= miny) ? 6 : 0;
+      private int current = (maxx <= minx && maxy <= miny) ? 6 : 0;
 
       public int getWindingRule()
       {
-        return WIND_EVEN_ODD;
+        // A test program showed that Sun J2SE 1.3.1 and 1.4.1_01
+        // return WIND_NON_ZERO paths.  While this does not really
+        // make any difference for rectangles (because they are not
+        // self-intersecting), it seems appropriate to behave
+        // identically.
+
+        return WIND_NON_ZERO;
       }
 
       public boolean isDone()

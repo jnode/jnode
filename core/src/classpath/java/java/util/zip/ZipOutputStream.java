@@ -35,7 +35,9 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.util.zip;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Enumeration;
@@ -53,7 +55,8 @@ import java.util.Vector;
  *
  * @author Jochen Hoenicke 
  */
-public class ZipOutputStream extends DeflaterOutputStream implements ZipConstants {
+public class ZipOutputStream extends DeflaterOutputStream implements ZipConstants
+{
 	private Vector entries = new Vector();
 	private CRC32 crc = new CRC32();
 	private ZipEntry curEntry = null;
@@ -84,7 +87,8 @@ public class ZipOutputStream extends DeflaterOutputStream implements ZipConstant
 	 * Creates a new Zip output stream, writing a zip archive.
 	 * @param out the output stream to which the zip archive is written.
 	 */
-	public ZipOutputStream(OutputStream out) {
+  public ZipOutputStream(OutputStream out)
+  {
 		super(out, new Deflater(Deflater.DEFAULT_COMPRESSION, true));
 	}
 
@@ -94,7 +98,8 @@ public class ZipOutputStream extends DeflaterOutputStream implements ZipConstant
 	 * @exception IllegalArgumentException if encoding of comment is
 	 * longer than 0xffff bytes.
 	 */
-	public void setComment(String comment) {
+  public void setComment(String comment)
+  {
 		byte[] commentBytes;
 		commentBytes = comment.getBytes();
 		if (commentBytes.length > 0xffff)
@@ -110,7 +115,8 @@ public class ZipOutputStream extends DeflaterOutputStream implements ZipConstant
 	 * @see #STORED
 	 * @see #DEFLATED
 	 */
-	public void setMethod(int method) {
+  public void setMethod(int method)
+  {
 		if (method != STORED && method != DEFLATED)
 			throw new IllegalArgumentException("Method not supported.");
 		defaultMethod = method;
@@ -122,14 +128,16 @@ public class ZipOutputStream extends DeflaterOutputStream implements ZipConstant
 	 * @exception IllegalArgumentException if level is not supported.
 	 * @see Deflater
 	 */
-	public void setLevel(int level) {
+  public void setLevel(int level)
+  {
 		def.setLevel(level);
 	}
 
 	/**
 	 * Write an unsigned short in little endian byte order.
 	 */
-	private final void writeLeShort(int value) throws IOException {
+  private final void writeLeShort(int value) throws IOException 
+  {
 		out.write(value & 0xff);
 		out.write((value >> 8) & 0xff);
 	}
@@ -137,7 +145,8 @@ public class ZipOutputStream extends DeflaterOutputStream implements ZipConstant
 	/**
 	 * Write an int in little endian byte order.
 	 */
-	private final void writeLeInt(int value) throws IOException {
+  private final void writeLeInt(int value) throws IOException 
+  {
 		writeLeShort(value);
 		writeLeShort(value >> 16);
 	}
@@ -152,7 +161,8 @@ public class ZipOutputStream extends DeflaterOutputStream implements ZipConstant
 	 * @exception IOException if an I/O error occured.
 	 * @exception ZipException if stream was finished.
 	 */
-	public void putNextEntry(ZipEntry entry) throws IOException {
+  public void putNextEntry(ZipEntry entry) throws IOException
+  {
 		if (entries == null)
 			throw new ZipException("ZipOutputStream was finished");
 
@@ -161,21 +171,28 @@ public class ZipOutputStream extends DeflaterOutputStream implements ZipConstant
 		if (method == -1)
 			method = defaultMethod;
 
-		if (method == STORED) {
-			if (entry.getCompressedSize() >= 0) {
+    if (method == STORED)
+      {
+	if (entry.getCompressedSize() >= 0)
+	  {
 				if (entry.getSize() < 0)
 					entry.setSize(entry.getCompressedSize());
 				else if (entry.getSize() != entry.getCompressedSize())
-					throw new ZipException("Method STORED, but compressed size != size");
-			} else
+	      throw new ZipException
+		("Method STORED, but compressed size != size");
+	  }
+	else
 				entry.setCompressedSize(entry.getSize());
 
 			if (entry.getSize() < 0)
 				throw new ZipException("Method STORED, but size not set");
 			if (entry.getCrc() < 0)
 				throw new ZipException("Method STORED, but crc not set");
-		} else if (method == DEFLATED) {
-			if (entry.getCompressedSize() < 0 || entry.getSize() < 0 || entry.getCrc() < 0)
+      }
+    else if (method == DEFLATED)
+      {
+	if (entry.getCompressedSize() < 0
+	    || entry.getSize() < 0 || entry.getCrc() < 0)
 				flags |= 8;
 		}
 
@@ -191,15 +208,19 @@ public class ZipOutputStream extends DeflaterOutputStream implements ZipConstant
 		curMethod = method;
 		/* Write the local file header */
 		writeLeInt(LOCSIG);
-		writeLeShort(method == STORED ? ZIP_STORED_VERSION : ZIP_DEFLATED_VERSION);
+    writeLeShort(method == STORED
+		 ? ZIP_STORED_VERSION : ZIP_DEFLATED_VERSION);
 		writeLeShort(flags);
 		writeLeShort(method);
 		writeLeInt(entry.getDOSTime());
-		if ((flags & 8) == 0) {
-			writeLeInt((int) entry.getCrc());
-			writeLeInt((int) entry.getCompressedSize());
-			writeLeInt((int) entry.getSize());
-		} else {
+    if ((flags & 8) == 0)
+      {
+	writeLeInt((int)entry.getCrc());
+	writeLeInt((int)entry.getCompressedSize());
+	writeLeInt((int)entry.getSize());
+      }
+    else
+      {
 			writeLeInt(0);
 			writeLeInt(0);
 			writeLeInt(0);
@@ -231,7 +252,8 @@ public class ZipOutputStream extends DeflaterOutputStream implements ZipConstant
 	 * @exception IOException if an I/O error occured.
 	 * @exception ZipException if no entry is active.
 	 */
-	public void closeEntry() throws IOException {
+  public void closeEntry() throws IOException
+  {
 		if (curEntry == null)
 			throw new ZipException("No open entry");
 
@@ -244,26 +266,31 @@ public class ZipOutputStream extends DeflaterOutputStream implements ZipConstant
 		if (curEntry.getSize() < 0)
 			curEntry.setSize(size);
 		else if (curEntry.getSize() != size)
-			throw new ZipException("size was " + size + ", but I expected " + curEntry.getSize());
+      throw new ZipException("size was "+size
+			     +", but I expected "+curEntry.getSize());
 
 		if (curEntry.getCompressedSize() < 0)
 			curEntry.setCompressedSize(csize);
 		else if (curEntry.getCompressedSize() != csize)
-			throw new ZipException("compressed size was " + csize + ", but I expected " + curEntry.getSize());
+      throw new ZipException("compressed size was "+csize
+			     +", but I expected "+curEntry.getSize());
 
 		if (curEntry.getCrc() < 0)
 			curEntry.setCrc(crc.getValue());
 		else if (curEntry.getCrc() != crc.getValue())
-			throw new ZipException("crc was " + Long.toHexString(crc.getValue()) + ", but I expected " + Long.toHexString(curEntry.getCrc()));
+      throw new ZipException("crc was " + Long.toHexString(crc.getValue())
+			     + ", but I expected " 
+			     + Long.toHexString(curEntry.getCrc()));
 
 		offset += csize;
 
 		/* Now write the data descriptor entry if needed. */
-		if (curMethod == DEFLATED && (curEntry.flags & 8) != 0) {
+    if (curMethod == DEFLATED && (curEntry.flags & 8) != 0)
+      {
 			writeLeInt(EXTSIG);
-			writeLeInt((int) curEntry.getCrc());
-			writeLeInt((int) curEntry.getCompressedSize());
-			writeLeInt((int) curEntry.getSize());
+	writeLeInt((int)curEntry.getCrc());
+	writeLeInt((int)curEntry.getCompressedSize());
+	writeLeInt((int)curEntry.getSize());
 			offset += EXTHDR;
 		}
 
@@ -276,16 +303,18 @@ public class ZipOutputStream extends DeflaterOutputStream implements ZipConstant
 	 * @exception IOException if an I/O error occured.
 	 * @exception ZipException if no entry is active.
 	 */
-	public void write(byte[] b, int off, int len) throws IOException {
+  public void write(byte[] b, int off, int len) throws IOException
+  {
 		if (curEntry == null)
 			throw new ZipException("No open entry.");
 
-		switch (curMethod) {
-			case DEFLATED :
+    switch (curMethod)
+      {
+      case DEFLATED:
 				super.write(b, off, len);
 				break;
 
-			case STORED :
+      case STORED:
 				out.write(b, off, len);
 				break;
 		}
@@ -299,7 +328,8 @@ public class ZipOutputStream extends DeflaterOutputStream implements ZipConstant
 	 * end of the zip file and flush the stream.
 	 * @exception IOException if an I/O error occured.
 	 */
-	public void finish() throws IOException {
+  public void finish() throws IOException
+  {
 		if (entries == null)
 			return;
 		if (curEntry != null)
@@ -309,19 +339,22 @@ public class ZipOutputStream extends DeflaterOutputStream implements ZipConstant
 		int sizeEntries = 0;
 
 		Enumeration e = entries.elements();
-		while (e.hasMoreElements()) {
+    while (e.hasMoreElements())
+      {
 			ZipEntry entry = (ZipEntry) e.nextElement();
 
 			int method = entry.getMethod();
 			writeLeInt(CENSIG);
-			writeLeShort(method == STORED ? ZIP_STORED_VERSION : ZIP_DEFLATED_VERSION);
-			writeLeShort(method == STORED ? ZIP_STORED_VERSION : ZIP_DEFLATED_VERSION);
+	writeLeShort(method == STORED
+		     ? ZIP_STORED_VERSION : ZIP_DEFLATED_VERSION);
+	writeLeShort(method == STORED
+		     ? ZIP_STORED_VERSION : ZIP_DEFLATED_VERSION);
 			writeLeShort(entry.flags);
 			writeLeShort(method);
 			writeLeInt(entry.getDOSTime());
-			writeLeInt((int) entry.getCrc());
-			writeLeInt((int) entry.getCompressedSize());
-			writeLeInt((int) entry.getSize());
+	writeLeInt((int)entry.getCrc());
+	writeLeInt((int)entry.getCompressedSize());
+	writeLeInt((int)entry.getSize());
 
 			byte[] name = entry.getName().getBytes();
 			if (name.length > 0xffff)
@@ -330,7 +363,8 @@ public class ZipOutputStream extends DeflaterOutputStream implements ZipConstant
 			if (extra == null)
 				extra = new byte[0];
 			String strComment = entry.getComment();
-			byte[] comment = strComment != null ? strComment.getBytes() : new byte[0];
+	byte[] comment = strComment != null
+	  ? strComment.getBytes() : new byte[0];
 			if (comment.length > 0xffff)
 				throw new ZipException("Comment too long.");
 

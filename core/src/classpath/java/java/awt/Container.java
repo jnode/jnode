@@ -877,11 +877,6 @@ public class Container extends Component
     return locate (x, y);
   }
 
-  public Component getComponentAt(int index)
-  {
-    return component[index];
-  }
-
   /**
    * Returns the component located at the specified point.  This is done
    * by checking whether or not a child component claims to contain this

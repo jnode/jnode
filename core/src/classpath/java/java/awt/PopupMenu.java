@@ -35,41 +35,47 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt;
 
+import java.awt.peer.MenuPeer;
 import java.awt.peer.PopupMenuPeer;
+
 /**
   * This class implement an AWT popup menu widget
   *
   * @author Aaron M. Renn (arenn@urbanophile.com)
   */
-public class PopupMenu extends Menu implements java.io.Serializable {
+public class PopupMenu extends Menu
+{
 
-	/*
+/*
 	 * Static Variables
 	 */
 
-	// Serialization Constant
-	private static final long serialVersionUID = -4620452533522760060L;
+// Serialization Constant
+private static final long serialVersionUID = -4620452533522760060L;
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/*
+/*
 	 * Constructors
 	 */
 
-	/**
+/**
 	  * Initializes a new instance of <code>PopupMenu</code>.
 	  *
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless()
 	  * returns true.
 	  */
-	public PopupMenu() {
-	}
+public
+PopupMenu()
+{
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Initializes a new instance of <code>PopupMenu</code> with the specified
 	  * label.
 	  *
@@ -78,31 +84,35 @@ public class PopupMenu extends Menu implements java.io.Serializable {
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless()
 	  * returns true.
 	  */
-	public PopupMenu(String label) {
+public
+PopupMenu(String label)
+{
 		super(label);
 
 		if (GraphicsEnvironment.isHeadless())
-			throw new HeadlessException();
-	}
+    throw new HeadlessException ();
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/*
+/*
 	 * Instance Methods
 	 */
 
-	/**
+/**
 	  * Creates this object's native peer.
 	  */
-	public void addNotify() {
-		if (peer != null)
-			peer = getToolkit().createPopupMenu(this);
-		super.addNotify();
-	}
+public void
+addNotify()
+{
+  if (peer == null)
+    peer = getToolkit ().createPopupMenu (this);
+  super.addNotify ();
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Displays this popup menu at the specified coordinates relative to
 	  * the specified component.
 	  *
@@ -110,15 +120,21 @@ public class PopupMenu extends Menu implements java.io.Serializable {
 	  * @param x The X coordinate of the menu.
 	  * @param y The Y coordinate of the menu.
 	  */
-	public void show(Component component, int x, int y) {
-		PopupMenuPeer pmp = (PopupMenuPeer) getPeer();
-		if (pmp != null) {
+public void
+show(Component component, int x, int y)
+{
+  if (getPeer() == null)
+    this.addNotify();
+  PopupMenuPeer pmp = (PopupMenuPeer)getPeer();
+  if (pmp != null)
+    {
 			/* XXX
 			Event e = new Event (component, Event.ACTION_EVENT, component);
 			e.x = x;
 			e.y = y;*/
-			pmp.show(component, x, y);
-		}
+      pmp.show (component, x, y);
 	}
+}
 
 } // class PopupMenu
+

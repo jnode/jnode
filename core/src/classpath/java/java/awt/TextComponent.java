@@ -1,5 +1,5 @@
 /* TextComponent.java -- Widgets for entering text
-   Copyright (C) 1999, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,11 +35,14 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt;
 
 import java.awt.event.TextEvent;
 import java.awt.event.TextListener;
 import java.awt.peer.TextComponentPeer;
+import java.io.Serializable;
+import java.util.EventListener;
 
 /**
   * This class provides common functionality for widgets than 
@@ -47,176 +50,196 @@ import java.awt.peer.TextComponentPeer;
   *
   * @author Aaron M. Renn (arenn@urbanophile.com)
   */
-public class TextComponent extends Component implements java.io.Serializable {
+public class TextComponent extends Component
+  implements Serializable
+{
 
-	/*
+/*
 	 * Static Variables
 	 */
 
-	// Constant for serialization
-	private static final long serialVersionUID = -2214773872412987419L;
+// Constant for serialization
+private static final long serialVersionUID = -2214773872412987419L;
 
-	/*
+/*
 	 * Instance Variables
 	 */
 
-	/**
+/**
 	  * @serial Indicates whether or not this component is editable.
 	  */
-	private boolean editable;
+private boolean editable;
 
-	/**
+/**
 	  * @serial The starting position of the selected text region.
 	  */
-	private int selectionStart;
+private int selectionStart;
 
-	/**
+/**
 	  * @serial The ending position of the selected text region.
 	  */
-	private int selectionEnd;
+private int selectionEnd;
 
-	/**
+/**
 	  * @serial The text in the component
 	  */
-	private String text;
+private String text;
 
-	/**
+/**
 	  * A list of listeners that will receive events from this object.
 	  */
-	protected transient TextListener textListener;
+protected transient TextListener textListener;
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/*
+/*
 	 * Constructors
 	 */
 
-	TextComponent(String text) {
+TextComponent(String text)
+{
 		this.text = text;
 		this.editable = true;
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/*
+/*
 	 * Instance Methods
 	 */
 
-	/**
+/**
 	  * Returns the text in this component
 	  *
 	  * @return The text in this component.
 	  */
-	public synchronized String getText() {
-		TextComponentPeer tcp = (TextComponentPeer) getPeer();
+public synchronized String
+getText()
+{
+  TextComponentPeer tcp = (TextComponentPeer)getPeer();
 		if (tcp != null)
 			text = tcp.getText();
 
-		return (text);
-	}
+  return(text);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Sets the text in this component to the specified string.
 	  *
 	  * @param text The new text for this component.
 	  */
-	public synchronized void setText(String text) {
+public synchronized void
+setText(String text)
+{
 		if (text == null)
 			text = "";
 
 		this.text = text;
 
-		TextComponentPeer tcp = (TextComponentPeer) getPeer();
+  TextComponentPeer tcp = (TextComponentPeer)getPeer();
 		if (tcp != null)
 			tcp.setText(text);
-	}
+  setCaretPosition(0);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns a string that contains the text that is currently selected.
 	  *
 	  * @return The currently selected text region.
 	  */
-	public synchronized String getSelectedText() {
+public synchronized String
+getSelectedText()
+{
 		String alltext = getText();
 		int start = getSelectionStart();
 		int end = getSelectionEnd();
 
-		return (alltext.substring(start, end));
-	}
+  return(alltext.substring(start, end));
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the starting position of the selected text region.
-	  * // FIXME: What is returned if there is no selected text?
+  * If the text is not selected then caret position is returned. 
 	  *
 	  * @return The starting position of the selected text region.
 	  */
-	public synchronized int getSelectionStart() {
-		TextComponentPeer tcp = (TextComponentPeer) getPeer();
+public synchronized int
+getSelectionStart()
+{
+  TextComponentPeer tcp = (TextComponentPeer)getPeer();
 		if (tcp != null)
 			selectionStart = tcp.getSelectionStart();
 
-		return (selectionStart);
-	}
+  return(selectionStart);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Sets the starting position of the selected region to the
 	  * specified value.  If the specified value is out of range, then it
 	  * will be silently changed to the nearest legal value.
 	  *
 	  * @param selectionStart The new start position for selected text.
 	  */
-	public synchronized void setSelectionStart(int selectionStart) {
+public synchronized void
+setSelectionStart(int selectionStart)
+{
 		select(selectionStart, getSelectionEnd());
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the ending position of the selected text region.
-	  * // FIXME: What is returned if there is no selected text.
+  * If the text is not selected, then caret position is returned 
 	  *
 	  * @return The ending position of the selected text region.
 	  */
-	public synchronized int getSelectionEnd() {
-		TextComponentPeer tcp = (TextComponentPeer) getPeer();
+public synchronized int
+getSelectionEnd()
+{
+  TextComponentPeer tcp = (TextComponentPeer)getPeer();
 		if (tcp != null)
 			selectionEnd = tcp.getSelectionEnd();
 
-		return (selectionEnd);
-	}
+  return(selectionEnd);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Sets the ending position of the selected region to the
 	  * specified value.  If the specified value is out of range, then it
 	  * will be silently changed to the nearest legal value.
 	  *
 	  * @param selectionEnd The new start position for selected text.
 	  */
-	public synchronized void setSelectionEnd(int selectionEnd) {
+public synchronized void
+setSelectionEnd(int selectionEnd)
+{
 		select(getSelectionStart(), selectionEnd);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * This method sets the selected text range to the text between the
 	  * specified start and end positions.  Illegal values for these
 	  * positions are silently fixed.
 	  *
-	  * @param startSelection The new start position for the selected text.
-	  * @param endSelection The new end position for the selected text.
+  * @param selectionStart The new start position for the selected text.
+  * @param selectionEnd The new end position for the selected text.
 	  */
-	public synchronized void select(int selectionStart, int endSelection) {
+public synchronized void
+select(int selectionStart, int selectionEnd)
+{
 		if (selectionStart < 0)
 			selectionStart = 0;
 
@@ -230,40 +253,44 @@ public class TextComponent extends Component implements java.io.Serializable {
 			selectionStart = selectionEnd;
 
 		this.selectionStart = selectionStart;
-		this.selectionEnd = endSelection;
+  this.selectionEnd = selectionEnd;
 
-		TextComponentPeer tcp = (TextComponentPeer) getPeer();
+  TextComponentPeer tcp = (TextComponentPeer)getPeer();
 		if (tcp != null)
 			tcp.select(selectionStart, selectionEnd);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Selects all of the text in the component.
 	  */
-	public synchronized void selectAll() {
+public synchronized void
+selectAll()
+{
 		select(0, getText().length());
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the current caret position in the text.
 	  *
 	  * @return The caret position in the text.
 	  */
-	public synchronized int getCaretPosition() {
-		TextComponentPeer tcp = (TextComponentPeer) getPeer();
+public synchronized int
+getCaretPosition()
+{
+  TextComponentPeer tcp = (TextComponentPeer)getPeer();
 		if (tcp != null)
-			return (tcp.getCaretPosition());
+    return(tcp.getCaretPosition());
 		else
-			return (0);
-	}
+    return(0);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Sets the caret position to the specified value.
 	  *
 	  * @param caretPosition The new caret position.
@@ -273,97 +300,111 @@ public class TextComponent extends Component implements java.io.Serializable {
 	  *
 	  * @since 1.1
 	  */
-	public synchronized void setCaretPosition(int caretPosition) {
+public synchronized void
+setCaretPosition(int caretPosition)
+{
 		if (caretPosition < 0)
-			throw new IllegalArgumentException();
+    throw new IllegalArgumentException ();
 
-		TextComponentPeer tcp = (TextComponentPeer) getPeer();
+  TextComponentPeer tcp = (TextComponentPeer)getPeer();
 		if (tcp != null)
 			tcp.setCaretPosition(caretPosition);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Tests whether or not this component's text can be edited.
 	  *
 	  * @return <code>true</code> if the text can be edited, <code>false</code>
 	  * otherwise.
 	  */
-	public boolean isEditable() {
-		return (editable);
-	}
+public boolean
+isEditable()
+{
+  return(editable);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Sets whether or not this component's text can be edited.
 	  *
 	  * @param editable <code>true</code> to enable editing of the text,
 	  * <code>false</code> to disable it.
 	  */
-	public synchronized void setEditable(boolean editable) {
+public synchronized void
+setEditable(boolean editable)
+{
 		this.editable = editable;
 
-		TextComponentPeer tcp = (TextComponentPeer) getPeer();
+  TextComponentPeer tcp = (TextComponentPeer)getPeer();
 		if (tcp != null)
 			tcp.setEditable(editable);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Notifies the component that it should destroy its native peer.
 	  */
-	public void removeNotify() {
+public void
+removeNotify()
+{
 		super.removeNotify();
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Adds a new listener to the list of text listeners for this
 	  * component.
 	  *
 	  * @param listener The listener to be added.
 	  */
-	public synchronized void addTextListener(TextListener listener) {
+public synchronized void
+addTextListener(TextListener listener)
+{
 		textListener = AWTEventMulticaster.add(textListener, listener);
 
 		enableEvents(AWTEvent.TEXT_EVENT_MASK);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Removes the specified listener from the list of listeners
 	  * for this component.
 	  *
 	  * @param listener The listener to remove.
 	  */
-	public synchronized void removeTextListener(TextListener listener) {
+public synchronized void
+removeTextListener(TextListener listener)
+{
 		textListener = AWTEventMulticaster.remove(textListener, listener);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Processes the specified event for this component.  Text events are
 	  * processed by calling the <code>processTextEvent()</code> method.
 	  * All other events are passed to the superclass method.
 	  * 
 	  * @param event The event to process.
 	  */
-	protected void processEvent(AWTEvent event) {
+protected void
+processEvent(AWTEvent event)
+{
 		if (event instanceof TextEvent)
-			processTextEvent((TextEvent) event);
+    processTextEvent((TextEvent)event);
 		else
 			super.processEvent(event);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Processes the specified text event by dispatching it to any listeners
 	  * that are registered.  Note that this method will only be called
 	  * if text event's are enabled.  This will be true if there are any
@@ -372,27 +413,60 @@ public class TextComponent extends Component implements java.io.Serializable {
 	  *
 	  * @param event The text event to process.
 	  */
-	protected void processTextEvent(TextEvent event) {
+protected void
+processTextEvent(TextEvent event)
+{
 		if (textListener != null)
 			textListener.textValueChanged(event);
-	}
+}
 
-	void dispatchEventImpl(AWTEvent e) {
-		if (e.id <= TextEvent.TEXT_LAST && e.id >= TextEvent.TEXT_FIRST && (textListener != null || (eventMask & AWTEvent.TEXT_EVENT_MASK) != 0))
+void
+dispatchEventImpl(AWTEvent e)
+{
+  if (e.id <= TextEvent.TEXT_LAST 
+      && e.id >= TextEvent.TEXT_FIRST
+      && (textListener != null 
+	  || (eventMask & AWTEvent.TEXT_EVENT_MASK) != 0))
 			processEvent(e);
 		else
 			super.dispatchEventImpl(e);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns a debugging string.
 	  *
 	  * @return A debugging string.
 	  */
-	protected String paramString() {
-		return (getClass().getName() + "(text=" + getText() + ")");
+protected String
+paramString()
+{
+  return(getClass().getName() + "(text=" + getText() + ")");
+}
+
+  /**
+   * Returns an array of all the objects currently registered as FooListeners
+   * upon this <code>TextComponent</code>. FooListeners are registered using
+   * the addFooListener method.
+   *
+   * @exception ClassCastException If listenerType doesn't specify a class or
+   * interface that implements java.util.EventListener.
+   */
+  public EventListener[] getListeners (Class listenerType)
+  {
+    if (listenerType == TextListener.class)
+      return AWTEventMulticaster.getListeners (textListener, listenerType);
+
+    return super.getListeners (listenerType);
 	}
 
+  /**
+   * Returns all text listeners registered to this object.
+   */
+  public TextListener[] getTextListeners ()
+  {
+    return (TextListener[]) getListeners (TextListener.class);
+  }
 } // class TextComponent
+

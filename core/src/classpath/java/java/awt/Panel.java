@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt;
 
 import javax.accessibility.Accessible;
@@ -51,7 +52,8 @@ import javax.accessibility.AccessibleRole;
  * @since 1.0
  * @status updated to 1.4
  */
-public class Panel extends Container implements Accessible {
+public class Panel extends Container implements Accessible
+{
 	/**
 	 * Compatible with JDK 1.0+.
 	 */
@@ -64,7 +66,8 @@ public class Panel extends Container implements Accessible {
 	 * Initializes a new instance of <code>Panel</code> that has a default
 	 * layout manager of <code>FlowLayout</code>.
 	 */
-	public Panel() {
+  public Panel()
+  {
 		this(new FlowLayout());
 	}
 
@@ -75,7 +78,8 @@ public class Panel extends Container implements Accessible {
 	 * @param layoutManager the layout manager for this object
 	 * @since 1.1
 	 */
-	public Panel(LayoutManager layoutManager) {
+  public Panel(LayoutManager layoutManager)
+  {
 		setLayout(layoutManager);
 	}
 
@@ -85,7 +89,8 @@ public class Panel extends Container implements Accessible {
 	 * @see #isDisplayable()
 	 * @see #removeNotify()
 	 */
-	public void addNotify() {
+  public void addNotify()
+  {
 		if (peer == null)
 			peer = getToolkit().createPanel(this);
 		super.addNotify();
@@ -98,7 +103,8 @@ public class Panel extends Container implements Accessible {
 	 * @return the accessibility context of this panel
 	 * @since 1.3
 	 */
-	public AccessibleContext getAccessibleContext() {
+  public AccessibleContext getAccessibleContext()
+  {
 		if (context == null)
 			context = new AccessibleAWTPanel();
 		return context;
@@ -111,7 +117,8 @@ public class Panel extends Container implements Accessible {
 	 * @author Eric Blake <ebb9@email.byu.edu>
 	 * @since 1.3
 	 */
-	protected class AccessibleAWTPanel extends AccessibleAWTContainer {
+  protected class AccessibleAWTPanel extends AccessibleAWTContainer
+  {
 		/**
 		 * Compatible with JDK 1.4+.
 		 */
@@ -120,7 +127,8 @@ public class Panel extends Container implements Accessible {
 		/**
 		 * The default constructor.
 		 */
-		protected AccessibleAWTPanel() {
+    protected AccessibleAWTPanel()
+    {
 		}
 
 		/**
@@ -129,7 +137,8 @@ public class Panel extends Container implements Accessible {
 		 * @return the role of the object
 		 * @see AccessibleRole#PANEL
 		 */
-		public AccessibleRole getAccessibleRole() {
+    public AccessibleRole getAccessibleRole()
+    {
 			return AccessibleRole.PANEL;
 		}
 	} // class AccessibleAWTPanel
