@@ -31,12 +31,12 @@ import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.stub.ReturnStub;
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
-import org.jnode.driver.FSDriverUtils;
 import org.jnode.driver.ide.DefaultIDEControllerDriver;
 import org.jnode.driver.ide.IDEBus;
 import org.jnode.driver.ide.IDEConstants;
 import org.jnode.driver.ide.IDEDevice;
 import org.jnode.driver.ide.IDEDriveDescriptor;
+import org.jnode.driver.ide.IDEDriverUtils;
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
@@ -55,7 +55,12 @@ public class MockObjectFactory
         
         boolean master = true;
         boolean primary = true;
-        IDEBus ideBus = FSDriverUtils.getIDEDeviceFactory().createIDEBus(parentDev, primary);
+        IDEBus ideBus;
+        try {
+            ideBus = IDEDriverUtils.getIDEDeviceFactory().createIDEBus(parentDev, primary);
+        } catch (NamingException ex) {
+            throw new DriverException(ex);
+        }
         
         // must have length 256 (see IDEDriveDescriptor)
         int[] data = new int[256];            
