@@ -169,7 +169,7 @@ final class RadeonCore implements RadeonConstants {
 		final int bitsPerPixel = config.getBitsPerPixel();
 		final int bytesPerLine = config.getBytesPerLine();
 		final int bytesPerScreen = bytesPerLine * height;
-		log.info("PLLInfo:" + fbinfo.getPllInfo());
+		log.debug("PLLInfo:" + fbinfo.getPllInfo());
 		currentState.calcForConfiguration(config, vgaIO, fbinfo);
 
 		// Disable video interrupts
@@ -178,14 +178,14 @@ final class RadeonCore implements RadeonConstants {
 		// Allocate the screen memory
 		final MemoryResource screen = claimDeviceMemory(bytesPerScreen, 4 * 1024);
 		//final MemoryResource screen = deviceRam;
-		log.info("Screen at 0x" + NumberUtils.hex(screen.getOffset())
+		log.debug("Screen at 0x" + NumberUtils.hex(screen.getOffset())
 				+ ", size 0x" + NumberUtils.hex(screen.getSize()));
 
 		//if (true) { throw new ResourceNotFreeException("TEST"); }
 
 		// Save the current state
 		oldVgaState.saveFromVGA(vgaIO);
-		log.info("oldState:" + oldVgaState);
+		log.debug("oldState:" + oldVgaState);
 
 		// Turn off the screen
 		final DpmsState dpmsState = getDpms();
@@ -194,7 +194,7 @@ final class RadeonCore implements RadeonConstants {
 		try {
 			// Set the new configuration
 			currentState.restoreToVGA(vgaIO);
-			log.info("NewState: " + currentState);
+			log.debug("NewState: " + currentState);
 			vgaIO.setReg32(CRTC_OFFSET, (int) screen.getOffset());
 			if (fbinfo.hasCRTC2) {
 				vgaIO.setReg32(CRTC2_OFFSET, (int) screen.getOffset());
@@ -310,7 +310,7 @@ final class RadeonCore implements RadeonConstants {
 	final void setDpms(DpmsState state) {
 		int crtc_ext_cntl = vgaIO.getReg32(CRTC_EXT_CNTL);
 		int lvds_gen_cntl = vgaIO.getReg32(LVDS_GEN_CNTL);
-//		log.info("Get LVDS_GEN_CTRL    0x" + NumberUtils.hex(lvds_gen_cntl));
+//		log.debug("Get LVDS_GEN_CTRL    0x" + NumberUtils.hex(lvds_gen_cntl));
 
 		crtc_ext_cntl &= ~(CRTC_DISPLAY_DIS | CRTC_HSYNC_DIS | CRTC_VSYNC_DIS);
 		lvds_gen_cntl &= ~(LVDS_DISPLAY_DIS | LVDS_ON);
@@ -330,10 +330,10 @@ final class RadeonCore implements RadeonConstants {
 		
 		if (fbinfo.getDviDispType() == MonitorType.LCD) {
 			vgaIO.setReg32(LVDS_GEN_CNTL, lvds_gen_cntl);
-			log.info("Set LVDS_GEN_CTRL to 0x" + NumberUtils.hex(lvds_gen_cntl));
+			log.debug("Set LVDS_GEN_CTRL to 0x" + NumberUtils.hex(lvds_gen_cntl));
 		} else {
 			vgaIO.setReg32(CRTC_EXT_CNTL, crtc_ext_cntl);			
-			log.info("Set CRTC_EXT_CNTL to 0x" + NumberUtils.hex(crtc_ext_cntl));
+			log.debug("Set CRTC_EXT_CNTL to 0x" + NumberUtils.hex(crtc_ext_cntl));
 		}
 	}
 
