@@ -179,13 +179,16 @@ public class PluginCommand {
             throws PluginException {
         final PluginDescriptor descr = mgr.getRegistry()
                 .getPluginDescriptor(id);
-
-        out.print(descr.getId());
-        out.print("; state ");
-        if (descr.getPlugin().isActive()) {
-            out.println("active");
+        if (descr != null) {           
+            out.print(descr.getId());
+            out.print("; state ");
+            if (descr.getPlugin().isActive()) {
+                out.println("active");
+            } else {
+                out.println("inactive");
+            }
         } else {
-            out.println("inactive");
+            out.println("Plugin " + id + " not found");
         }
     }
 }
