@@ -18,8 +18,11 @@ public class DefaultWriteBarrier extends VmWriteBarrier {
 
     /** Is the write barrier active? */
     private boolean active;
-    
-    /** Are there any object colors changed by the write barrier, since the last reset */
+
+    /**
+     * Are there any object colors changed by the write barrier, since the last
+     * reset
+     */
     private boolean changed;
 
     private int arrayCopyCount;
@@ -94,10 +97,11 @@ public class DefaultWriteBarrier extends VmWriteBarrier {
         if (value != null) {
             while (true) {
                 final int gcColor = helper.getObjectColor(value);
-                if (gcColor != ObjectFlags.GC_WHITE) { 
-                // Not white, we're done
+                if (gcColor > ObjectFlags.GC_WHITE) { 
+                // Not white or yellow, we're done
                 return; }
-                if (helper.atomicChangeObjectColor(value, gcColor, ObjectFlags.GC_GREY)) {
+                if (helper.atomicChangeObjectColor(value, gcColor,
+                        ObjectFlags.GC_GREY)) {
                     // Change to grey, we're done
                     changed = true;
                     return;
@@ -120,7 +124,7 @@ public class DefaultWriteBarrier extends VmWriteBarrier {
         this.changed = false;
         this.active = active;
     }
-    
+
     /**
      * @return Returns the changed.
      */

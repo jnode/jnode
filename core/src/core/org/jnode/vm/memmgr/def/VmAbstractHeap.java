@@ -6,16 +6,21 @@ package org.jnode.vm.memmgr.def;
 import org.jnode.vm.Address;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.PragmaUninterruptible;
+import org.jnode.vm.SpinLock;
 import org.jnode.vm.Uninterruptible;
-import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.memmgr.HeapHelper;
 
 /**
+ * An abstract heap class.
+ * 
+ * All changes to the structure of the heap must be made exclusive by {@link #lock()} 
+ * and {@link #unlock()}.
+ * 
  * @author epr
  */
-public abstract class VmAbstractHeap extends VmSystemObject implements Uninterruptible {
+public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible {
 
 	/** Start address of this heap (inclusive) */
 	protected Address start;
@@ -184,18 +189,24 @@ public abstract class VmAbstractHeap extends VmSystemObject implements Uninterru
 	protected abstract int getFreeSize();
 	
 	/**
-	 * Free objects that have not been marked
-	 * @return The amount of freed memory in bytes 
+	 * Join all adjacent free spaces.
 	 * @throws PragmaUninterruptible
 	 */
-	protected abstract int collect()
+	protected abstract void defragment()
 	throws PragmaUninterruptible;
 	
 	/**
 	 * Let all objects in this heap make a visit to the given visitor.
 	 * @param visitor
+	 * @param locking If true, use lock/unlock while proceeding to the next object. 	 
 	 * @throws PragmaUninterruptible
 	 */
-	protected abstract void walk(ObjectVisitor visitor)
+	protected abstract void walk(ObjectVisitor visitor, boolean locking)
 	throws PragmaUninterruptible;
+	
+	/**
+	 * Mark the given object as free space.
+	 * @param object
+	 */
+	protected abstract void free(Object object);
 }

@@ -9,7 +9,7 @@ import org.jnode.vm.Monitor;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class GCThread extends Thread {
+final class GCThread extends Thread {
 
     /** The manager */
     private final GCManager manager;

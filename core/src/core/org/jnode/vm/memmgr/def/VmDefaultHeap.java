@@ -5,11 +5,10 @@ package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.Address;
 import org.jnode.vm.ObjectVisitor;
-import org.jnode.vm.Unsafe;
+import org.jnode.vm.PragmaUninterruptible;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
-import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.HeapHelper;
@@ -138,8 +137,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
      */
     protected Object alloc(VmClassType vmClass, int alignedSize) {
 
-        if (nextFreePtr == null) { 
-        // This heap is full
+        if (nextFreePtr == null) { /* This heap is full */
         return null; }
 
         final int totalSize = alignedSize + headerSize;
@@ -149,60 +147,83 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         final int headerSize = this.headerSize;
 
         Address objectPtr = null;
-        // Search for the first free block that is large enough
-        //Screen.debug("a");
-        while (objectPtr == null) {
-            final Address ptr = nextFreePtr;
-            final int objSize = helper.getInt(ptr, sizeOffset);
-            final Object objVmt = helper.getObject(ptr, tibOffset);
-            final Address nextPtr = Address.add(ptr, objSize + headerSize);
-            if ((objVmt == FREE) && (alignedSize <= objSize)) {
-                objectPtr = ptr;
-            } else {
-                if (!inHeap(nextPtr)) {
-                    // No large enough free space has been found
-                    // A collect may recover smaller free spaces in this
-                    // heap, but we leave that to a GC iteration.
-                    nextFreePtr = null;
-                    //Screen.debug("B");
-                    return null;
+        lock();
+        try {
+            // Search for the first free block that is large enough
+            //Screen.debug("a");
+            while (objectPtr == null) {
+                final Address ptr = nextFreePtr;
+                final int objSize = helper.getInt(ptr, sizeOffset);
+                final Object objVmt = helper.getObject(ptr, tibOffset);
+                final Address nextPtr = Address.add(ptr, objSize + headerSize);
+                if ((objVmt == FREE) && (alignedSize <= objSize)) {
+                    objectPtr = ptr;
                 } else {
-                    this.nextFreePtr = nextPtr;
+                    if (!inHeap(nextPtr)) {
+                        // No large enough free space has been found
+                        // A collect may recover smaller free spaces in this
+                        // heap, but we leave that to a GC iteration.
+                        nextFreePtr = null;
+                        //Screen.debug("B");
+                        return null;
+                    } else {
+                        this.nextFreePtr = nextPtr;
+                    }
                 }
             }
-        }
-        //Screen.debug("A");
+            //Screen.debug("A");
 
-        final int curFreeSize = helper.getInt(objectPtr, sizeOffset);
-        if (curFreeSize > totalSize) {
-            // Block is larger then we need, split it up.
-            final int newFreeSize = curFreeSize - totalSize;
-            final Address newFreePtr = Address.add(objectPtr, totalSize);
-            // Set the header for the remaining free block
-            helper.setInt(newFreePtr, sizeOffset, newFreeSize);
-            helper.setInt(newFreePtr, flagsOffset, 0);
-            helper.setObject(newFreePtr, tibOffset, FREE);
-            // Set the next free offset
-            nextFreePtr = newFreePtr;
-        } else {
-            // The block is not large enough to split up, make the
-            // new object the size of the free block.
-            alignedSize = curFreeSize;
+            final int curFreeSize = helper.getInt(objectPtr, sizeOffset);
+            if (curFreeSize > totalSize) {
+                // Block is larger then we need, split it up.
+                final int newFreeSize = curFreeSize - totalSize;
+                final Address newFreePtr = Address.add(objectPtr, totalSize);
+                // Set the header for the remaining free block
+                helper.setInt(newFreePtr, sizeOffset, newFreeSize);
+                helper.setInt(newFreePtr, flagsOffset, 0);
+                helper.setObject(newFreePtr, tibOffset, FREE);
+                // Set the next free offset
+                nextFreePtr = newFreePtr;
+            } else {
+                // The block is not large enough to split up, make the
+                // new object the size of the free block.
+                alignedSize = curFreeSize;
+            }
+
+            // Create the object header
+            helper.setInt(objectPtr, sizeOffset, alignedSize);
+            helper.setInt(objectPtr, flagsOffset, 0);
+            helper.setObject(objectPtr, tibOffset, tib);
+            // Mark the object in the allocation bitmap
+            setAllocationBit(objectPtr, true);
+
+            // Fix the freeSize
+            freeSize -= alignedSize;
+        } finally {
+            unlock();
         }
 
-        // Create the object header
-        helper.setInt(objectPtr, sizeOffset, alignedSize);
-        helper.setInt(objectPtr, flagsOffset, 0);
-        helper.setObject(objectPtr, tibOffset, tib);
-        // Mark the object in the allocation bitmap
-        setAllocationBit(objectPtr, true);
         // Clear the contents of the object.
         helper.clear(objectPtr, alignedSize);
 
-        // Fix the freeSize
-        freeSize -= alignedSize;
-
         return helper.objectAt(objectPtr);
+    }
+
+    /**
+     * Mark the given object as free space.
+     * 
+     * @param object
+     */
+    protected final void free(Object object) {
+        lock();
+        try {
+            final int objSize = helper.getInt(object, sizeOffset);
+            helper.setObject(object, tibOffset, FREE);
+            setAllocationBit(object, false);
+            freeSize += objSize;
+        } finally {
+            unlock();
+        }
     }
 
     /**
@@ -214,77 +235,26 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
     }
 
     /**
-     * Free objects that have not been marked
+     * Join all adjacent free spaces.
      * 
-     * @return The amount of freed memory in bytes
+     * @throws PragmaUninterruptible
      */
-    protected int collect() {
-        // Go through the heap and free all WHITE coloured objects.
-        final int headerSize = this.headerSize;
-        final int sizeOffset = this.sizeOffset;
-        int offset = headerSize;
+    protected final void defragment() throws PragmaUninterruptible {
         final int size = getSize();
-        int freedBytes = 0;
-        int greyObjects = 0;
-        Address firstFreePtr = null;
-        while (offset < size) {
-            final Address ptr = Address.add(start, offset);
-            final Object object = helper.objectAt(ptr);
-            final Object vmt = helper.getObject(ptr, tibOffset);
-            final int objSize = helper.getInt(object, sizeOffset);
-            if (vmt != FREE) {
-                final int gcColor = helper.getObjectColor(object);
-                if (gcColor == GC_WHITE) {
-                    if (object == this) {
-                        helper.die("Try to collect heap itself");
-                    }
-                    // First call finalize
-                    final VmClassType vmClass = helper.getVmClass(object);
-                    final VmMethod fm = vmClass.getFinalizeMethod();
-                    if (fm != null) {
-                        helper.invokeFinalizer(fm, object);
-                    }
-                    // Now free the object
-                    helper.setObject(object, tibOffset, FREE);
-                    setAllocationBit(object, false);
-                    // Be a bit paranoia, so clear the memory
-                    helper.clear(ptr, objSize);
-                    // Add the size of the object to the free size counter
-                    freedBytes += objSize;
-                    // Add the size of the object to our free size.
-                    freeSize += objSize;
-                    if (firstFreePtr == null) {
-                        firstFreePtr = ptr;
-                    }
-                } else if (gcColor != GC_BLACK) {
-                    Unsafe.debug("Grey object in collor:");
-                    Unsafe.debug(helper.getVmClass(object).getName());
-                    greyObjects++;
-                }
-            } else {
-                if (firstFreePtr == null) {
-                    firstFreePtr = ptr;
-                }
-            }
-            offset += objSize + headerSize;
-        }
-        if (greyObjects > 0) {
-            Unsafe.debug("Found grey objects in collect! ");
-            Unsafe.debug(greyObjects);
-            //helper.die("Grey objects in collect");
-        }
-        // Set the address of the next free block, to the first free block
-        this.nextFreePtr = firstFreePtr;
-        // Go through the heap an combine all free spaces that are next to
-        // each other.
-        if (freedBytes > 0) {
-            offset = headerSize;
+        int offset = headerSize;
+
+        lock();
+        try {
+            Address firstFreePtr = null;
             while (offset < size) {
                 final Address ptr = Address.add(start, offset);
                 final Object object = helper.objectAt(ptr);
                 final int objSize = helper.getInt(object, sizeOffset);
                 final int nextOffset = offset + objSize + headerSize;
                 final Object vmt = helper.getObject(object, tibOffset);
+                if ((firstFreePtr == null) && (vmt == FREE)) {
+                    firstFreePtr = ptr;
+                }
                 if ((vmt == FREE) && (nextOffset < size)) {
                     final Object nextObject;
                     final Object nextVmt;
@@ -306,34 +276,65 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
                     offset = nextOffset;
                 }
             }
+            // Set the address of the next free block, to the first free block
+            this.nextFreePtr = firstFreePtr;
+        } finally {
+            unlock();
         }
-        return freedBytes;
     }
 
     /**
      * Let all objects in this heap make a visit to the given visitor.
      * 
      * @param visitor
+     * @param locking
+     *            If true, use lock/unlock while proceeding to the next object.
      */
-    protected void walk(ObjectVisitor visitor) {
+    protected final void walk(ObjectVisitor visitor, boolean locking) {
         // Go through the heap and call visit on each object
         final int headerSize = this.headerSize;
         final int sizeOffset = this.sizeOffset;
         final Object FREE = this.FREE;
         int offset = headerSize;
         final int size = getSize();
-        while (offset < size) {
-            final Address ptr = Address.add(start, offset);
-            final Object object = helper.objectAt(ptr);
-            final Object tib = helper.getObject(object, tibOffset);
-            if (tib != FREE) {
-                if (!visitor.visit(object)) {
-                    // Stop
-                    offset = size;
+
+        if (locking) {
+            while (offset < size) {
+                final Object tib;
+                final Object object;
+                final int objSize;
+
+                lock();
+                try {
+                    final Address ptr = Address.add(start, offset);
+                    object = helper.objectAt(ptr);
+                    tib = helper.getObject(object, tibOffset);
+                    objSize = helper.getInt(object, sizeOffset);
+                } finally {
+                    unlock();
                 }
+                if (tib != FREE) {
+                    if (!visitor.visit(object)) {
+                        // Stop
+                        offset = size;
+                    }
+                }
+                offset += objSize + headerSize;
             }
-            final int objSize = helper.getInt(object, sizeOffset);
-            offset += objSize + headerSize;
+        } else {
+            while (offset < size) {
+                final Address ptr = Address.add(start, offset);
+                final Object object = helper.objectAt(ptr);
+                final Object tib = helper.getObject(object, tibOffset);
+                final int objSize = helper.getInt(object, sizeOffset);
+                if (tib != FREE) {
+                    if (!visitor.visit(object)) {
+                        // Stop
+                        offset = size;
+                    }
+                }
+                offset += objSize + headerSize;
+            }
         }
     }
 }

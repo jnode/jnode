@@ -19,7 +19,7 @@ import org.jnode.vm.memmgr.HeapHelper;
 /**
  * @author epr
  */
-public class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
+final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
         Uninterruptible {
 
     /** The marking stack */
@@ -83,6 +83,7 @@ public class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
         } else if (rootSet || (gcColor == GC_GREY)) {
             switch (gcColor) {
             case GC_WHITE:
+            case GC_YELLOW:
                 {
                     final boolean ok;
                     ok = helper.atomicChangeObjectColor(object, gcColor,
@@ -230,7 +231,8 @@ public class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      */
     private void processChild(Object child) {
         final int gcColor = helper.getObjectColor(child);
-        if (gcColor == GC_WHITE) {
+        if (gcColor <= GC_WHITE) {
+            // Yellow or White
             helper.atomicChangeObjectColor(child, gcColor, GC_GREY);
             stack.push(child);
         }

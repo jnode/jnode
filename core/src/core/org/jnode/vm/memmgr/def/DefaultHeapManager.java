@@ -27,6 +27,8 @@ public final class DefaultHeapManager extends VmHeapManager {
 	public static final int DEFAULT_HEAP_SIZE = 2 * 1024 * 1024;
 	/** The GC thread */
 	private GCThread gcThread;
+	/** The finalizer thread */
+	private FinalizerThread finalizerThread;
 	/** Monitor to synchronize heap access */
 	private Monitor heapMonitor;
 	/** Are we low on memory */
@@ -167,7 +169,9 @@ public final class DefaultHeapManager extends VmHeapManager {
 		final VmArchitecture arch = Unsafe.getCurrentProcessor().getArchitecture();
 		final GCManager gcManager = new GCManager(this, arch, statics);
 		this.gcThread = new GCThread(gcManager, heapMonitor);
+		this.finalizerThread = new FinalizerThread(this);
 		gcThread.start();
+		finalizerThread.start();
 		// Calculate the trigger size
 		triggerSize = (int)Math.min(Integer.MAX_VALUE, getTotalMemory() / 5);
 	}
@@ -333,5 +337,12 @@ public final class DefaultHeapManager extends VmHeapManager {
      */
     final void resetCurrentHeap() {
         this.currentHeap = this.firstHeap;
+    }
+    
+    /**
+     * Sets the currentHeap to the first heap.
+     */
+    final void triggerFinalization() {
+        finalizerThread.trigger(false);
     }
 }
