@@ -202,34 +202,35 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 		switch (bitsPerPixel) {
 			case 8 :
 				{
-					bitmapGraphics = BitmapGraphics.create8bppInstance(videoRam, width, height, bytesPerLine, 0);
+					bitmapGraphics = BitmapGraphics.create8bppInstance(videoRam, width, height, bytesPerLine, offset);
 				}
 				break;
 			case 16 :
 				{
-					bitmapGraphics = BitmapGraphics.create16bppInstance(videoRam, width, height, bytesPerLine, 0);
+					bitmapGraphics = BitmapGraphics.create16bppInstance(videoRam, width, height, bytesPerLine, offset);
 				}
 				break;
 			case 24 :
 				{
-					bitmapGraphics = BitmapGraphics.create24bppInstance(videoRam, width, height, bytesPerLine, 0);
+					bitmapGraphics = BitmapGraphics.create24bppInstance(videoRam, width, height, bytesPerLine, offset);
 				}
 				break;
 			case 32 :
 				{
-					bitmapGraphics = BitmapGraphics.create32bppInstance(videoRam, width, height, bytesPerLine, 0);
+					bitmapGraphics = BitmapGraphics.create32bppInstance(videoRam, width, height, bytesPerLine, offset);
 				}
 				break;
 		}
+		dumpState();
 	}
 
 	public FrameBufferConfiguration[] getConfigs() {
-		final FrameBufferConfiguration[] r = new FrameBufferConfiguration[3];
 		final ColorModel cm = new DirectColorModel(bitsPerPixel, redMask, greenMask, blueMask);
-		r[0] = new VMWareConfiguration(640, 480, cm);
-		r[1] = new VMWareConfiguration(800, 600, cm);
-		r[2] = new VMWareConfiguration(1024, 768, cm);
-		return r;
+		return new FrameBufferConfiguration[] { 
+				//new VMWareConfiguration(640, 480, cm),
+				new VMWareConfiguration(800, 600, cm),
+				new VMWareConfiguration(1024, 768, cm),
+		};
 	}
 
 	/**
