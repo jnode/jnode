@@ -5,11 +5,11 @@
   <property name="descriptors.dir"     value="${build.dir}/descriptors"/>
    
   <property name="jnode-builder.jar"   value="${build.dir}/descriptors/jnode-builder.jar"/>
-  <property name="jnode-core.jar"      value="${build.dir}/descriptors/jnode-core.jar"/>
-  <property name="jnode-fs.jar"        value="${build.dir}/descriptors/jnode-fs.jar"/>
-  <property name="jnode-gui.jar"       value="${build.dir}/descriptors/jnode-gui.jar"/>
-  <property name="jnode-net.jar"       value="${build.dir}/descriptors/jnode-net.jar"/>
-  <property name="jnode-shell.jar"     value="${build.dir}/descriptors/jnode-shell.jar"/>
+  <property name="jnode-core.jar"      value="${root.dir}/core/build/classes"/>
+  <property name="jnode-fs.jar"        value="${root.dir}/fs/build/classes"/>
+  <property name="jnode-gui.jar"       value="${root.dir}/gui/build/classes"/>
+  <property name="jnode-net.jar"       value="${root.dir}/net/build/classes"/>
+  <property name="jnode-shell.jar"     value="${root.dir}/shell/build/classes"/>
   <property name="jnode-fonts.jar"     value="${build.dir}/descriptors/jnode-fonts.jar"/>
 
   <property name="ant.jar"             value="${root.dir}/core/lib/ant.jar"/>
@@ -85,6 +85,70 @@
     <ant target="clean" dir="${root.dir}/net" inheritall="on" inheritrefs="on"/>
     <ant target="clean" dir="${root.dir}/builder" inheritall="on" inheritrefs="on"/>
     <delete dir="${build.dir}" quiet="on"/>
+  </target>
+
+<!-- javadoc-small -->
+  <target name="javadoc-small">
+    <mkdir dir="${build.dir}/javadoc/small"/>
+	<javadoc destdir="${build.dir}/javadoc/small"
+	         author="true"
+    	     version="true"
+        	 use="true"
+	         windowtitle="JNode Key Packages">
+	         
+	  <sourcepath>
+	    <pathelement location="${root.dir}/core/src/classpath/gnu"/>
+	    <pathelement location="${root.dir}/core/src/classpath/java"/>
+	    <pathelement location="${root.dir}/core/src/classpath/javax"/>
+	    <pathelement location="${root.dir}/core/src/classpath/org"/>
+	    <pathelement location="${root.dir}/core/src/core"/>
+	    <pathelement location="${root.dir}/core/src/driver"/>
+	  </sourcepath>
+	  <package name="org.jnode.driver"/>
+	  <package name="org.jnode.naming"/>
+	  <package name="org.jnode.plugin"/>
+	  <package name="org.jnode.system"/>
+	  <classpath refid="cp"/>
+	  <bootclasspath refid="cp"/>
+
+      <group title="JNode" packages="org.jnode.*"/>
+      <group title="Classpath" packages="java.*,javax.*,gnu.*"/>
+      <!-- link href="http://jnode.org"/ -->
+    </javadoc>
+  </target>
+
+<!-- javadoc-full -->
+  <target name="javadoc-full">
+    <mkdir dir="${build.dir}/javadoc/full"/>
+	<javadoc destdir="${build.dir}/javadoc/full"
+	         author="true"
+    	     version="true"
+        	 use="true"
+	         windowtitle="All JNode Packages">
+	         
+	  <sourcepath>
+	    <pathelement location="${root.dir}/core/src/classpath/gnu"/>
+	    <pathelement location="${root.dir}/core/src/classpath/java"/>
+	    <pathelement location="${root.dir}/core/src/classpath/javax"/>
+	    <pathelement location="${root.dir}/core/src/classpath/org"/>
+	    <pathelement location="${root.dir}/core/src/core"/>
+	    <pathelement location="${root.dir}/core/src/driver"/>
+	    <pathelement location="${root.dir}/fs/src/fs"/>
+	    <pathelement location="${root.dir}/fs/src/driver"/>
+	    <pathelement location="${root.dir}/gui/src/awt"/>
+	    <pathelement location="${root.dir}/gui/src/driver"/>
+	    <pathelement location="${root.dir}/net/src/net"/>
+	    <pathelement location="${root.dir}/net/src/driver"/>
+	    <pathelement location="${root.dir}/shell/src/shell"/>
+	  </sourcepath>
+	  <package name="org.jnode.*"/>
+	  <classpath refid="cp"/>
+	  <bootclasspath refid="cp"/>
+
+      <group title="JNode" packages="org.jnode.*"/>
+      <group title="Classpath" packages="java.*,javax.*,gnu.*"/>
+      <!-- link href="http://jnode.org"/ -->
+    </javadoc>
   </target>
 
 </project>
