@@ -101,10 +101,10 @@ class SwingListPeer extends SwingComponentPeer implements ListPeer, SwingPeer {
     }
 
     public Dimension getMinimumSize(int s) {
-        return null;
+        return getMinimumSize();
     }
 
     public Dimension getPreferredSize(int s) {
-        return null;
+        return getPreferredSize();
     }
 }
