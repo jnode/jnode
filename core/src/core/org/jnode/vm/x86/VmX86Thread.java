@@ -3,6 +3,7 @@
  */
 package org.jnode.vm.x86;
 
+import org.jnode.util.NumberUtils;
 import org.jnode.vm.Address;
 import org.jnode.vm.VmThread;
 
@@ -13,6 +14,7 @@ import org.jnode.vm.VmThread;
  */
 public class VmX86Thread extends VmThread {
 
+	// State when not running
 	volatile int eax;
 	volatile int ebx;
 	volatile int ecx;
@@ -23,6 +25,19 @@ public class VmX86Thread extends VmThread {
 	volatile Address eip;
 	volatile Address esp;
 	volatile Address ebp;
+	
+	// State upon last system exception
+	volatile int exEax;
+	volatile int exEbx;
+	volatile int exEcx;
+	volatile int exEdx;
+	volatile int exEsi;
+	volatile int exEdi;
+	volatile int exEflags;
+	volatile int exEip;
+	volatile int exEsp;
+	volatile int exEbp;
+	volatile int exCr2;
 	
 	/**
 	 * 
@@ -64,5 +79,22 @@ public class VmX86Thread extends VmThread {
 	 */
 	protected Address getStackEnd(Object stack, int stackSize) {
 		return Address.add(Address.valueOf(stack), STACK_OVERFLOW_LIMIT);
+	}
+	
+	/**
+	 * Gets a human readable representation of the system exception state.
+	 * @return String
+	 */
+	public String getReadableErrorState() {
+		return "EAX " +NumberUtils.hex(exEax) +
+			" EBX " +NumberUtils.hex(exEbx) +
+			" ECX " +NumberUtils.hex(exEcx) +
+			" EDX " +NumberUtils.hex(exEdx) +
+			" ESI " +NumberUtils.hex(exEsi) +
+			" EDI " +NumberUtils.hex(exEdi) +
+			" ESP " +NumberUtils.hex(exEsp) +
+			" EIP " +NumberUtils.hex(exEip) +
+			" CR2 " +NumberUtils.hex(exCr2) +
+			" EFLAGS " +NumberUtils.hex(exEflags);
 	}
 }
