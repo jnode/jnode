@@ -86,7 +86,10 @@ public class BinaryQuad extends AssignQuad {
 			operation == IADD || operation == IMUL ||
 			operation == LADD || operation == LMUL ||
 			operation == FADD || operation == FMUL ||
-			operation == DADD || operation == DMUL;
+			operation == DADD || operation == DMUL ||
+			operation == IAND || operation == LAND ||
+			operation == IOR  || operation == LOR  ||
+			operation == IXOR || operation == LXOR;
 	}
 
 	public BinaryQuad(int address, IRBasicBlock block, int lhsIndex,
@@ -102,7 +105,10 @@ public class BinaryQuad extends AssignQuad {
 			operation == IADD || operation == IMUL ||
 			operation == LADD || operation == LMUL ||
 			operation == FADD || operation == FMUL ||
-			operation == DADD || operation == DMUL;
+			operation == DADD || operation == DMUL ||
+			operation == IAND || operation == LAND ||
+			operation == IOR  || operation == LOR  ||
+			operation == IXOR || operation == LXOR;
 	}
 
 	/**
