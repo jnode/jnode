@@ -86,6 +86,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     private Label endOfInlineLabel;
 
     private int maxLocals;
+    
+    private VmMethod currentMethod;
 
     private EmitterContext eContext;
 
@@ -127,6 +129,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#startMethod(org.jnode.vm.classmgr.VmMethod)
      */
     public void startMethod(VmMethod method) {
+        this.currentMethod = method;
         this.maxLocals = method.getBytecode().getNoLocals();
         this.loader = method.getDeclaringClass().getLoader();
         helper.setMethod(method);
@@ -159,7 +162,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             startOfBB = false;
         }
         final int offset = os.getLength() - startOffset;
-        cm.add(address, offset);
+        cm.add(currentMethod, address, offset);
     }
 
     /**
@@ -203,9 +206,9 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         throw new Error("NotImplemented");
     }
 
-    private void OpcodeNotImplemented(String name) {
+    /*private void OpcodeNotImplemented(String name) {
         System.out.println(name + " not implemented");
-    }
+    }*/
 
     /**
      * reserve a register for an item. The item is not loaded with the register.
@@ -243,6 +246,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     public void endInlinedMethod(VmMethod previousMethod) {
         helper.setMethod(previousMethod);
         os.setObjectRef(endOfInlineLabel);
+        this.currentMethod = previousMethod;
     }
 
     /**
@@ -255,6 +259,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         maxLocals = newMaxLocals;
         endOfInlineLabel = new Label(curInstrLabel + "_end_of_inline");
         helper.startInlinedMethod(inlinedMethod, curInstrLabel);
+        this.currentMethod = inlinedMethod;
     }
 
     /**

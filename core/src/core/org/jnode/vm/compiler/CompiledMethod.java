@@ -5,6 +5,7 @@ package org.jnode.vm.compiler;
 
 import org.jnode.assembler.NativeStream;
 import org.jnode.vm.classmgr.VmAddressMap;
+import org.jnode.vm.classmgr.VmMethod;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -92,8 +93,8 @@ public class CompiledMethod {
 	 * @param pc
 	 * @param offset
 	 */
-	public void add(int pc, int offset) {
-		addressTable.add(pc, offset);
+	public final void add(VmMethod method, int pc, int offset) {
+		addressTable.add(method, pc, offset);
 	}
 	
 	/**
