@@ -65,7 +65,7 @@ public class StandardVGAIO implements VgaConstants, VgaIO {
 	public final int getATT(int index) {
 		getSTAT();
 		vgaIO.outPortByte(ATT_I, (byte) (index));
-		return vgaIO.inPortByte(ATT_R);
+		return vgaIO.inPortByte(ATT_DR);
 	}
 
 	public final void setMISC(int val) {

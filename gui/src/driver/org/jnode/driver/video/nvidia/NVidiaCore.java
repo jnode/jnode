@@ -17,6 +17,7 @@ import org.jnode.driver.pci.PCIDevice;
 import org.jnode.driver.pci.PCIDeviceConfig;
 import org.jnode.driver.video.FrameBufferConfiguration;
 import org.jnode.driver.video.ddc.DisplayDataChannelAPI;
+import org.jnode.driver.video.spi.DpmsState;
 import org.jnode.driver.video.util.AbstractSurface;
 import org.jnode.driver.video.vgahw.DisplayMode;
 import org.jnode.naming.InitialNaming;
@@ -129,9 +130,9 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 		vgaIO.unlock();
 
 		// Turn off the screen
-		final NVidiaDpmsState dpmsState = getDpms();
+		final DpmsState dpmsState = getDpms();
 		//log.debug("Old DPMS state: " + dpmsState);
-		setDpms(NVidiaDpmsState.OFF);
+		setDpms(DpmsState.OFF);
 
 		/* power-up all nvidia hardware function blocks */
 		/*
@@ -198,9 +199,9 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 	 */
 	public synchronized void close() {
 		hwCursor.closeCursor();
-		final NVidiaDpmsState dpmsState = getDpms();
+		final DpmsState dpmsState = getDpms();
 		//log.debug("Old DPMS state: " + dpmsState);
-		setDpms(NVidiaDpmsState.OFF);
+		setDpms(DpmsState.OFF);
 		vgaIO.unlock();
 		oldVgaState.restoreToVGA(vgaIO);
 		setDpms(dpmsState);
@@ -334,7 +335,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 		return startadd;
 	}
 
-	private void setDpms(NVidiaDpmsState state) {
+	private void setDpms(DpmsState state) {
 		//log.debug("Setting DPMS to " + state);
 		/* start synchronous reset: required before turning screen off! */
 		vgaIO.setSEQ(NVSEQX_RESET, 0x01);
@@ -368,12 +369,12 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 	 * 
 	 * @return
 	 */
-	private NVidiaDpmsState getDpms() {
+	private DpmsState getDpms() {
 		final boolean display = ((vgaIO.getSEQ(NVSEQX_CLKMODE) & 0x20) == 0);
 		final int repaint1 = vgaIO.getCRT(NVCRTCX_REPAINT1);
 		final boolean hsync = ((repaint1 & 0x80) == 0);
 		final boolean vsync = ((repaint1 & 0x40) == 0);
-		return new NVidiaDpmsState(display, hsync, vsync);
+		return new DpmsState(display, hsync, vsync);
 	}
 
 	/**

@@ -3,10 +3,13 @@
  */
 package org.jnode.driver.video.ati.radeon;
 
+import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.DirectColorModel;
 
 import org.jnode.awt.image.JNodeBufferedImage;
 import org.jnode.driver.video.FrameBufferConfiguration;
+import org.jnode.driver.video.vgahw.DisplayMode;
 
 
 /**
@@ -14,13 +17,24 @@ import org.jnode.driver.video.FrameBufferConfiguration;
  */
 public class RadeonConfiguration extends FrameBufferConfiguration {
 
+    private final int bitsPerPixel;
+    private final DisplayMode displayMode;
+    
+	public static final RadeonConfiguration VESA_115 =
+		new RadeonConfiguration(32, new DisplayMode("40000 800 840 968 1056 600 601 605 628"));
+	
+	public static final RadeonConfiguration VESA_118 =
+		new RadeonConfiguration(32, new DisplayMode("65000 1024 1048 1184 1344 768 771 777 806"));
+    
     /**
-     * @param width
-     * @param height
-     * @param colorModel
+     * Initialize this instance.
+     * @param bpp
+     * @param mode
      */
-    public RadeonConfiguration(int width, int height, ColorModel colorModel) {
-        super(width, height, colorModel);
+    public RadeonConfiguration(int bpp, DisplayMode mode) {
+        super(mode.getWidth(), mode.getHeight(), createColorModel(bpp));
+        this.bitsPerPixel = bpp;
+        this.displayMode = mode;
     }
     
     /**
@@ -28,7 +42,29 @@ public class RadeonConfiguration extends FrameBufferConfiguration {
      */
     public JNodeBufferedImage createCompatibleImage(int w, int h,
             int transparency) {
-        // TODO Auto-generated method stub
-        return null;
+		return new JNodeBufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+    }
+
+    /**
+     * Create a color model for a given bits per pixel.
+     * @param bpp
+     * @return
+     */
+	private static ColorModel createColorModel(int bpp) {
+		return new DirectColorModel(bpp, 0xff0000, 0x00ff00, 0x0000ff);
+	}
+	
+    /**
+     * @return Returns the bitsPerPixel.
+     */
+    public final int getBitsPerPixel() {
+        return this.bitsPerPixel;
+    }
+    
+    /**
+     * @return Returns the displayMode.
+     */
+    public final DisplayMode getDisplayMode() {
+        return this.displayMode;
     }
 }

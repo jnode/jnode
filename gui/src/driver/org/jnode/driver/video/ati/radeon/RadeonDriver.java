@@ -26,8 +26,8 @@ public class RadeonDriver extends AbstractFrameBufferDriver implements RadeonCon
 	private final String model;
     
 	private static final FrameBufferConfiguration[] CONFIGS = new FrameBufferConfiguration[] { 
-		/*RadeonConfiguration.VESA_118, 
-		RadeonConfiguration.VESA_115*/ };
+		RadeonConfiguration.VESA_118, 
+		RadeonConfiguration.VESA_115 };
 
     
 	/**
@@ -42,8 +42,7 @@ public class RadeonDriver extends AbstractFrameBufferDriver implements RadeonCon
      * @see org.jnode.driver.video.FrameBufferAPI#getConfigurations()
      */
     public FrameBufferConfiguration[] getConfigurations() {
-        // TODO Auto-generated method stub
-        return null;
+        return CONFIGS;
     }
     /**
      * @see org.jnode.driver.video.FrameBufferAPI#getCurrentConfiguration()

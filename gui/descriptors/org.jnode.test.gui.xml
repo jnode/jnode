@@ -10,6 +10,7 @@
     <import plugin="org.jnode.awt"/>
     <import plugin="org.jnode.awt.font"/>
     <import plugin="org.jnode.awt.font.truetype"/>
+    <import plugin="org.jnode.shell.help"/>
     <import plugin="org.jnode.wt"/>
   </requires>
         
@@ -21,6 +22,7 @@
         
   <extension point="org.jnode.shell.aliases">
     <alias name="AWTTest"      class="org.jnode.test.gui.AWTTest"/>
+    <alias name="FBTest"       class="org.jnode.test.gui.FBTest"/>
     <alias name="WTTest"       class="org.jnode.test.gui.JNodeWTTest"/>
   </extension>
 

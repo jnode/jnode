@@ -20,8 +20,10 @@ public interface VgaConstants {
 
 	/** Attribute index register */
 	public static final int ATT_I = VGA_FIRST_PORT + 0x10;
-	/** Attribute read register */
-	public static final int ATT_R = VGA_FIRST_PORT + 0x11;
+	/** Attribute data read register */
+	public static final int ATT_DR = VGA_FIRST_PORT + 0x11;
+	/** Attribute data write register */
+	public static final int ATT_DW = VGA_FIRST_PORT + 0x10;
 
 	/** CRT Control index register */
 	public static final int CRTC_I = VGA_FIRST_PORT + 0x24;
