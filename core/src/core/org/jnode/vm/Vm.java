@@ -96,6 +96,7 @@ public class Vm extends VmSystemObject {
 		final Vm vm = getVm();
 		if ((vm != null) && !vm.isBootstrap()) {
 			final PrintStream out = System.out;
+			out.println("JNode VM " + vm.getVersion());
 			vm.getStatics().dumpStatistics(out);
 			if (vm.hotMethodManager != null) {
 				vm.hotMethodManager.dumpStatistics(out);
