@@ -87,7 +87,7 @@ public final class VmStackFrame extends VmSystemObject {
 	 * Gets the line number of the current instruction of this frame.
 	 * @return The line number, or -1 if not found.
 	 */
-	public final String getLineNr() {
+	public final String getLocationInfo() {
 		if (isInterpreted()) {
 			final VmByteCode bc = sfMethod.getBytecode();
 			if (bc != null) {
@@ -98,7 +98,7 @@ public final class VmStackFrame extends VmSystemObject {
 		} else {
 			final VmCompiledCode cc = sfMethod.getCompiledCode(getMagic());
 			if ((cc != null) && (sfInstructionPointer != null)) {
-				return cc.getLineNr(sfInstructionPointer);
+				return cc.getLocationInfo(sfMethod, sfInstructionPointer);
 			} else {
 				return "?";
 			}
@@ -114,21 +114,8 @@ public final class VmStackFrame extends VmSystemObject {
 		final VmType vmClass = (method == null) ? null : method.getDeclaringClass();
 		final String cname = (vmClass == null) ? "<unknown class>" : vmClass.getName();
 		final String mname = (method == null) ? "<unknown method>" : method.getName();
-		final String lineNr = getLineNr();
-		final String linePrefix;
-		final String line;
-		if (isInterpreted()) {
-			linePrefix = "";
-		} else {
-			linePrefix = "*";
-		}
-		/*if (lineNr < 0) {
-			line = "?";
-		} else {
-			line = String.valueOf(lineNr);
-		}*/
-		line = lineNr;
+		final String location = getLocationInfo();
 
-		return cname + "!" + mname + " (" + linePrefix + line + ")";
+		return cname + "!" + mname + " (" + location + ")";
 	}
 }

@@ -12,9 +12,6 @@ import org.jnode.vm.compiler.NativeCodeCompiler;
  */
 public final class VmCompiledCode extends AbstractCode {
 
-    /** The bytecode, this compiled code is derived from */
-    private final VmByteCode bytecode;
-
     /** Address of native code of this method */
     private final Address nativeCode;
 
@@ -59,7 +56,6 @@ public final class VmCompiledCode extends AbstractCode {
             Address defaultExceptionHandler, VmAddressMap addressTable) {
         this.compiler = compiler;
         this.magic = compiler.getMagic();
-        this.bytecode = bytecode;
         this.nativeCode = nativeCode;
         this.compiledCode1 = compiledCode;
         this.eTable = eTable;
@@ -123,20 +119,14 @@ public final class VmCompiledCode extends AbstractCode {
     }
 
     /**
-     * Gets the linenumber of a given address.
+     * Gets the linenumber and optional method info (for inlined methods) of a given address.
      * 
      * @param address
      * @return The linenumber for the given pc, or -1 is not found.
      */
-    public String getLineNr(Address address) {
-        if (this.bytecode != null) {
-            final int offset = (int) Address.distance(nativeCode, address);
-            final int pc = addressTable.findPC(offset);
-            return String.valueOf(bytecode.getLineNr(pc))/* + ";" + pc + ";0x"
-                    + NumberUtils.hex(offset)*/;
-            //return offset;
-        }
-        return "?";
+    public String getLocationInfo(VmMethod expectedMethod, Address address) {
+        final int offset = (int) Address.distance(nativeCode, address);
+        return addressTable.getLocationInfo(expectedMethod, offset);
     }
 
     /**
