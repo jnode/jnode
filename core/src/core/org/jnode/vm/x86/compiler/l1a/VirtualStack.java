@@ -1,0 +1,150 @@
+/*
+ * Created on 10.02.2004
+ *
+ * To change the template for this generated file go to
+ * Window - Preferences - Java - Code Generation - Code and Comments
+ */
+package org.jnode.vm.x86.compiler.l1a;
+
+import org.jnode.assembler.x86.Register;
+import org.jnode.vm.compiler.ir.Constant;
+
+/**
+ * @author Patrik Reali
+ *
+ * To change the template for this generated type comment go to
+ * Window - Preferences - Java - Code Generation - Code and Comments
+ */
+
+final class VirtualStack {
+	Item[] stack;
+	
+	// top of stack; stack[tos] is not part of the stack!
+	int	tos;
+	
+	/**
+	 * 
+	 * Constructor; create and initialize stack with default size 
+	 */
+	VirtualStack() {
+		stack = new Item[8];
+		tos = 0;
+	}
+	
+	int TOS() {
+		return tos;
+	}
+	
+	/**
+	 * Increase stack size
+	 */
+	private void growStack() {
+		Item[] tmp = new Item[stack.length * 2];
+		System.arraycopy(stack, 0, tmp, 0, stack.length);
+		stack = tmp;
+	}
+
+	/**
+	 * Pop top item from stack.
+	 * If no item on the stack, return UNKNOWN item (avoiding
+	 * this requires knowing the stack contents across basic blocks)
+	 * 
+	 * Use popItem as far as possible, but the brain-dead implementation
+	 * of all dup opcodes (from the 2nd edition of the spec) allows popping
+	 * elements without knowing their type.
+	 * 
+	 * @return top item
+	 */
+	Item popItem() {
+		if (tos == 0)
+			//TODO: support items across basic blocks
+			pushStack(Item.UNKNOWN);
+		tos--;
+		Item i = stack[tos];
+		stack[tos] = null;
+		return i;
+	}
+
+	/**
+	 * Pop top item from stack, check its type also.
+	 * 
+	 * @param type
+	 * @return
+	 * @exception VerifyError if the type does not correspond
+	 */
+	Item popItem(int type) {
+		if (tos == 0)
+			pushStack(type);
+		tos--;
+		Item i = stack[tos];
+		stack[tos] =null;
+		if (i.getType() != type)
+			throw new VerifyError();
+		return i;
+	}
+	
+	IntItem popInt() {
+		return (IntItem)popItem(Item.INT);
+	}
+	
+	RefItem popRef() {
+		return (RefItem)popItem(Item.REFERENCE);
+	}
+
+	void pushItem(Item item) {
+		if (tos == stack.length) 
+			growStack();
+		stack[tos++] = item;		
+	}
+	
+	//TODO: deprecated
+	void pushStack(int type) {
+		Item res = null;
+		switch (type) {
+			case Item.INT:
+				res = IntItem.CreateStack();
+				break;
+			case Item.REFERENCE:
+				res = RefItem.CreateStack();
+				break;
+			case Item.LONG:
+				res = LongItem.CreateStack();
+				break;
+			case Item.FLOAT:
+				res = FloatItem.CreateStack();
+				break;
+			case Item.DOUBLE:
+				res = DoubleItem.CreateStack();
+				break;			
+		}
+		pushItem(res);
+	}
+	
+	/**
+	 * load every instance of local with given index into a register
+	 * (used to avoid aliasing problems) 
+	 * 
+	 * @param index
+	 */
+	void loadLocal(int index) {
+		for (int i = 0; i < tos; i++) {
+			final Item item = stack[i];
+			if ((item.getKind() == Item.LOCAL) && (item.getLocal() == index))
+					item.load();
+		}
+		
+	}
+	
+	void push() {
+		int i = 0;
+		while ((i < tos) && (stack[i].getKind() == Item.STACK))
+			i++;
+		while (i < tos) {
+			Item item = stack[i];
+			Item.myAssert (item.getKind() != Item.STACK);
+			item.push();
+			i++;
+		}
+	}
+
+}
