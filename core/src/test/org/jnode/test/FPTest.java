@@ -73,6 +73,20 @@ public class FPTest {
 		out.println("ia    " + ia);
 		out.println("ib    " + ib);
 		
+		out.println("a == a " + (a == a));
+		out.println("a != a " + (a != a));
+		out.println("a >  a " + (a > a));
+		out.println("a >= a " + (a >= a));
+		out.println("a <  a " + (a < a));
+		out.println("a <= a " + (a <= a));
+		
+		out.println("a == b " + (a == b));
+		out.println("a != b " + (a != b));
+		out.println("a >  b " + (a > b));
+		out.println("a >= b " + (a >= b));
+		out.println("a <  b " + (a < b));
+		out.println("a <= b " + (a <= b));
+
 		out.println();
 	}
 
@@ -105,6 +119,20 @@ public class FPTest {
 		out.println("fb    " + fb);
 		out.println("ia    " + ia);
 		out.println("ib    " + ib);
+		
+		out.println("a == a " + (a == a));
+		out.println("a != a " + (a != a));
+		out.println("a >  a " + (a > a));
+		out.println("a >= a " + (a >= a));
+		out.println("a <  a " + (a < a));
+		out.println("a <= a " + (a <= a));
+		
+		out.println("a == b " + (a == b));
+		out.println("a != b " + (a != b));
+		out.println("a >  b " + (a > b));
+		out.println("a >= b " + (a >= b));
+		out.println("a <  b " + (a < b));
+		out.println("a <= b " + (a <= b));
 		
 		out.println();
 	}

@@ -1166,11 +1166,11 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("org.jnode.vm.memmgr.def");
         
         if (true) {
-        	addPreloadPackage("java.awt");
-        	addPreloadPackage("java.awt.event");
-        	addPreloadPackage("java.awt.peer");
-        	addPreloadPackage("java.awt.font");
-        	addPreloadPackage("java.awt.geom");
+        	addCompileHighOptLevel("java.awt");
+        	addCompileHighOptLevel("java.awt.event");
+        	addCompileHighOptLevel("java.awt.peer");
+        	addCompileHighOptLevel("java.awt.font");
+        	addCompileHighOptLevel("java.awt.geom");
         	
         	addPreloadPackage("javax.swing");
         	addPreloadPackage("javax.swing.border");

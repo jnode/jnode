@@ -37,37 +37,78 @@
 
 package java.nio;
 
+import javax.naming.NameNotFoundException;
+
 import gnu.classpath.RawData;
+
+import org.jnode.naming.InitialNaming;
+import org.jnode.system.MemoryResource;
+import org.jnode.system.ResourceManager;
+import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.ResourceOwner;
+import org.jnode.system.SimpleResourceOwner;
 
 final class VMDirectByteBuffer {
 
 	static RawData allocate(int capacity) {
-		throw new Error("Not implemented");
+		return new MemoryRawData(capacity);
 	}
 
 	static void free(RawData address) {
-		throw new Error("Not implemented");
+		((MemoryRawData)address).resource.release();
 	}
 
 	static byte get(RawData address, int index) {
-		throw new Error("Not implemented");
+		byte value = ((MemoryRawData)address).resource.getByte(index);
+		System.out.println("get from " + index + ", " + value);
+		return value;
 	}
 
 	static void get(RawData address, int index, byte[] dst, int offset,
 			int length) {
-		throw new Error("Not implemented");
+		((MemoryRawData)address).resource.getBytes(index, dst, offset, length);
 	}
 
 	static void put(RawData address, int index, byte value) {
-		throw new Error("Not implemented");
+		System.out.println("put at " + index + ", " + value);
+		((MemoryRawData)address).resource.setByte(index, value);
 	}
 
 	static RawData adjustAddress(RawData address, int offset) {
-		throw new Error("Not implemented");
+		final MemoryResource res = ((MemoryRawData)address).resource;
+		final long size = res.getSize() - offset;
+		try {
+			return new MemoryRawData(res.claimChildResource(offset, size, true));
+		} catch (ResourceNotFreeException ex) {
+			throw new Error("Cannot adjustAddress", ex);
+		}
 	}
 
 	static void shiftDown(RawData address, int dst_offset, int src_offset,
 			int count) {
-		throw new Error("Not implemented");
+		((MemoryRawData)address).resource.copy(src_offset, dst_offset, count);
+	}
+
+	private static class MemoryRawData extends RawData {
+
+		final MemoryResource resource;
+
+		public MemoryRawData(int size) {
+			try {
+				final ResourceManager rm = (ResourceManager) InitialNaming
+						.lookup(ResourceManager.NAME);
+				final ResourceOwner owner = new SimpleResourceOwner("java.nio");
+				resource = rm.claimMemoryResource(owner, null, size,
+						ResourceManager.MEMMODE_NORMAL);
+			} catch (NameNotFoundException ex) {
+				throw new Error("Cannot find ResourceManager", ex);
+			} catch (ResourceNotFreeException ex) {
+				throw new Error("Cannot allocate direct memory", ex);
+			}
+		}
+		
+		public MemoryRawData(MemoryResource resource) {
+			this.resource = resource;
+		}
 	}
 }

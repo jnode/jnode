@@ -636,6 +636,28 @@ int_bc:
 	ret
 
 ; ---------------------------
+; Coprocessor overrun
+; ---------------------------
+int_copro_or:
+	cmp dword [ebp+OLD_CS],USER_CS
+	jne int_die
+	mov eax,SoftByteCodes_EX_COPRO_OR
+	mov ebx,[ebp+OLD_EIP]
+	call int_system_exception
+	ret
+
+; ---------------------------
+; Coprocessor error
+; ---------------------------
+int_copro_err:
+	cmp dword [ebp+OLD_CS],USER_CS
+	jne int_die
+	mov eax,SoftByteCodes_EX_COPRO_ERR
+	mov ebx,[ebp+OLD_EIP]
+	call int_system_exception
+	ret
+
+; ---------------------------
 ; NMI
 ; ---------------------------
 int_nmi:
@@ -650,7 +672,5 @@ int_snp:
 ; Stack exception
 int_sf:
 int_copro_na:
-int_copro_or:
-int_copro_err:
 	jmp int_die	
 	
