@@ -580,7 +580,9 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	/**
 	 * Create a CMOVcc dst,src
 	 * 
-	 * @param dst,src
+	 * @param ccOpcode
+     * @param dst
+     * @param src
 	 */
 	public abstract void writeCMOVcc(int ccOpcode, X86Register dst,
 			X86Register src);
