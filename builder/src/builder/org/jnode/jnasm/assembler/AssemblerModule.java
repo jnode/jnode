@@ -3,7 +3,7 @@
  */
 package org.jnode.jnasm.assembler;
 
-import org.jnode.assembler.x86.X86Assembler;
+import org.jnode.assembler.NativeStream;
 
 import java.util.Map;
 import java.util.List;
@@ -18,5 +18,6 @@ public abstract class AssemblerModule {
         this.labels = labels;
     }
 
-    protected abstract boolean emmit(String mnemonic, List operands, X86Assembler asm);
+    public abstract boolean emmit(String mnemonic, List operands);
+    public abstract void setNativeStream(NativeStream stream);
 }

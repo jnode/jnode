@@ -3,10 +3,6 @@
  */
 package org.jnode.jnasm.preprocessor;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.List;
-
 /**
  * @author Levente S\u00e1ntha
  */
