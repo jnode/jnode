@@ -2333,11 +2333,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 
 			// Allocate tmp registers
 			final GPR classr = (GPR) L1AHelper.requestRegister(eContext,
-					JvmType.INT, false);
+					JvmType.REFERENCE, false);
 			final GPR cntr = (GPR) L1AHelper.requestRegister(eContext,
 					JvmType.INT, false);
 			final GPR tmpr = (GPR) L1AHelper.requestRegister(eContext,
-					JvmType.INT, false);
+					JvmType.REFERENCE, false);
 
 			/* Objectref is already on the stack */
 			writeResolveAndLoadClassToReg(classRef, classr);
@@ -2380,7 +2380,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 
 			// Allocate tmp registers
 			final GPR tmpr = (GPR) L1AHelper.requestRegister(eContext,
-					JvmType.INT, false);
+					JvmType.REFERENCE, false);
 			final IntItem result = (IntItem) L1AHelper.requestWordRegister(
 					eContext, JvmType.INT, false);
 
