@@ -44,7 +44,7 @@ public class KeyboardInterpreterFactory {
             } catch (Exception e) {
                 log
                         .warn("Cannot load default keyboard layout, loading US layout instead");
-                return getKeyboardInterpreter("US", null);
+                return getKeyboardInterpreter("US", null, null);
             }
             try {
                 defaultRegion = rb.getString("defaultRegion");
@@ -55,7 +55,7 @@ public class KeyboardInterpreterFactory {
             }
 
             KeyboardInterpreter ki = getKeyboardInterpreter(defaultCountry,
-                    defaultRegion);
+                    defaultRegion, null);
             if (ki == null) {
                 throw new NullPointerException("KeyboardInterpreter for "
                         + defaultCountry + " not found");
@@ -64,7 +64,7 @@ public class KeyboardInterpreterFactory {
             }
         } catch (Exception e) {
             try {
-                return getKeyboardInterpreter("US", null);
+                return getKeyboardInterpreter("US", null, null);
             } catch (Exception ex) {
                 log.error("Cannot load US keyboard interpreter", ex);
                 //FIXME : this should never happen
@@ -82,21 +82,28 @@ public class KeyboardInterpreterFactory {
      * 
      * @param country
      *            a String
-     * @param region
+     * @param language
      *            a String
-     * 
+     *
+     * @param variant
      * @return a KeyboardInterpreter
      * @version 2/8/2004
      */
     public static KeyboardInterpreter getKeyboardInterpreter(String country,
-            String region) throws InstantiationException,
+                                                             String language, String variant) throws InstantiationException,
             IllegalAccessException {
         
         final String id;
         country = country.toUpperCase();
-        if (region != null) {
-            region = region.toLowerCase();
-            id = country + "_" + region;
+        if (language != null) {
+            language = language.toLowerCase();
+            if(variant == null){
+                id = country + "_" + language;
+            }else{
+                id = country + "_" + language + "_" + variant;
+            }
+        } else if(variant != null){
+            id = country + "_" + variant;
         } else {
             id = country;
         }
