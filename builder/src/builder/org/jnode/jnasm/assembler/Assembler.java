@@ -114,22 +114,22 @@ public abstract class Assembler {
         try {
             switch (t.kind) {
                 case JNAsmConstants.DECNUMBER:
-                    ret = Integer.parseInt(s);
+                    ret = (int) Long.parseLong(s);
                     break;
 
                 case JNAsmConstants.BINNUMBER:
-                    ret = Integer.parseInt(s.substring(0, s.length() - 1), 2);
+                    ret = (int) Long.parseLong(s.substring(0, s.length() - 1), 2);
                     break;
 
                 case JNAsmConstants.OCTNUMBER:
-                    ret = Integer.parseInt(s.substring(0, s.length() - 1), 8);
+                    ret = (int) Long.parseLong(s.substring(0, s.length() - 1), 8);
                     break;
 
                 case JNAsmConstants.HEXNUMBER:
                     if (s.endsWith("h") || s.endsWith("H")) {
-                        ret = Integer.parseInt(s.substring(0, s.length() - 1), 16);
+                        ret = (int) Long.parseLong(s.substring(0, s.length() - 1), 16);
                     } else {
-                        ret = Integer.parseInt(s.substring(2), 16);
+                        ret = (int) Long.parseLong(s.substring(2), 16);
                     }
                     break;
 
