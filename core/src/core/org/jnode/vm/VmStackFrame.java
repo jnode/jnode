@@ -21,7 +21,6 @@
  
 package org.jnode.vm;
 
-import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
@@ -38,15 +37,12 @@ import org.vmmagic.unboxed.Address;
 public final class VmStackFrame extends VmSystemObject {
 
 	public static final int MAGIC_MASK = 0xFFFFFF00;
-	public static final int MAGIC_INTERPRETED = 0xF25A1200;
 	public static final int MAGIC_COMPILED = 0x21A52F00;
 
 	/** The method executing in this frame */
 	private final VmMethod sfMethod;
-	/** The program counter, only valid for interpreted methods */
-	private final int sfPc;
 	/** A magic value used to detect stack errors */
-	private final int sfMagic;
+	private final VmCompiledCode sfCompiledCode;
 	/** A reference to the return address */
 	private final Address sfReturnAddress;
 	/** A reference to instruction pointer of this frame */
@@ -59,25 +55,9 @@ public final class VmStackFrame extends VmSystemObject {
 	 */
 	VmStackFrame(Address src, VmStackReader reader, Address ip) {
 		this.sfMethod = reader.getMethod(src);
-		this.sfPc = reader.getPC(src);
-		this.sfMagic = reader.getMagic(src);
+		this.sfCompiledCode = reader.getCompiledCode(src);
 		this.sfReturnAddress = reader.getReturnAddress(src);
 		this.sfInstructionPointer = ip;
-	}
-
-	/**
-	 * Is a given stackframe of a interpreted method?
-	 * @return boolean
-	 */
-	protected final boolean isInterpreted() {
-		return ((sfMagic & MAGIC_MASK) == MAGIC_INTERPRETED);
-	}
-
-	/**
-	 * @return Returns the magic.
-	 */
-	public final int getMagic() {
-		return this.sfMagic;
 	}
 
 	/**
@@ -85,13 +65,6 @@ public final class VmStackFrame extends VmSystemObject {
 	 */
 	public final VmMethod getMethod() {
 		return this.sfMethod;
-	}
-
-	/**
-	 * @return Returns the pc.
-	 */
-	public final int getPc() {
-		return this.sfPc;
 	}
 
 	/**
@@ -106,21 +79,12 @@ public final class VmStackFrame extends VmSystemObject {
 	 * @return The line number, or -1 if not found.
 	 */
 	public final String getLocationInfo() {
-		if (isInterpreted()) {
-			final VmByteCode bc = sfMethod.getBytecode();
-			if (bc != null) {
-				return String.valueOf(bc.getLineNr(sfPc - 1));
-			} else {
-				return "?";
-			}
-		} else {
-			final VmCompiledCode cc = sfMethod.getCompiledCode(getMagic());
-			if ((cc != null) && (sfInstructionPointer != null)) {
-				return cc.getLocationInfo(sfMethod, sfInstructionPointer);
-			} else {
-				return "?";
-			}
-		}
+	    final VmCompiledCode cc = sfCompiledCode;
+	    if ((cc != null) && (sfInstructionPointer != null)) {
+	        return cc.getLocationInfo(sfMethod, sfInstructionPointer);
+	    } else {
+	        return "?";
+	    }
 	}
 
 	/**

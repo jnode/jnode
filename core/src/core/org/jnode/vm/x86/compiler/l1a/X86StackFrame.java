@@ -71,10 +71,9 @@ class X86StackFrame implements X86CompilerConstants {
 
 	private X86BinaryAssembler.ObjectInfo codeObject;
 
+    /** Offset from EBP/RBP to the save EBP/RBP */ 
 	private final int EbpFrameRefOffset;
 
-	//private static final int EbpMethodRefOffset = 0;
-	
 	/** Size of an address */
 	private final int slotSize;
 
@@ -104,7 +103,7 @@ class X86StackFrame implements X86CompilerConstants {
 		this.startCodeLabel = helper.genLabel("$$code");
 		this.footerLabel = helper.genLabel("$$footer");
 		this.slotSize = os.isCode32() ? 4 : 8;
-		this.EbpFrameRefOffset = 2 * slotSize;
+		this.EbpFrameRefOffset = 1 * slotSize;
 	}
 
 	/**
@@ -210,8 +209,6 @@ class X86StackFrame implements X86CompilerConstants {
 		// Fixed framelayout
 		saveRegisters();
 		os.writePUSH(abp);
-		os.writePUSH(entryPoints.getMagic());
-		//os.writePUSH(0); // PC, which is only used in interpreted methods
 		os.writePUSH(cm.getCompiledCodeId());
 		os.writeMOV(size, abp, asp);
 
