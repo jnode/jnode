@@ -87,8 +87,7 @@ ap_boot_in_kernel_space:
 	push ebx					; Save TSS
 	
 	; Show something
-	mov eax,ap_boot_msg
-	call sys_print_str
+	PRINT_STR ap_boot_msg
 	
 	; Load the idt
 	lidt [idt]
@@ -137,8 +136,7 @@ ap_boot_go_user_cs:
     ;jmp ap_test
 	
 	; Show that we are in user mode
-	mov eax,ap_user_msg
-	call sys_print_str
+	PRINT_STR ap_user_msg
 	
 	; Enable interrupts
 	sti

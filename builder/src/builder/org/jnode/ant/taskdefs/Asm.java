@@ -135,8 +135,15 @@ public class Asm extends MatchingTask {
         if (bits == 64) {
             cmdLine.add("-m");
             cmdLine.add("amd64");
+            
+            // Set preprocessor
+            cmdLine.add("-r");
+            cmdLine.add("nasm");
         }
         
+		cmdLine.add("-D");
+		cmdLine.add("BITS" + bits);
+
         if (outputFormat != null) {
             cmdLine.add("-f");
             cmdLine.add(outputFormat);

@@ -11,10 +11,7 @@
 
 vm_invoke_abstract:
 	%if TRACE_ABSTRACT
-		push eax
-	    mov eax,vm_invoke_abstract_msg1
-	    call sys_print_str
-	    pop eax
+	    PRINT_STR vm_invoke_abstract_msg1
 		push eax
 	    call sys_print_eax
 	    ;mov eax,[eax+VmMember_NAME_OFFSET*4]

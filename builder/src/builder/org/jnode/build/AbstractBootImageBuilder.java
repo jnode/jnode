@@ -1183,7 +1183,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("org.jnode.vm.memmgr");
         addCompileHighOptLevel("org.jnode.vm.memmgr.def");
         
-        if (true) {
+        if (false) {
         	addCompileHighOptLevel("java.awt");
         	addCompileHighOptLevel("java.awt.event");
         	addCompileHighOptLevel("java.awt.peer");
