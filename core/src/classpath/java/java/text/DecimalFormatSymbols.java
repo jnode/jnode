@@ -83,7 +83,7 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
     this (Locale.getDefault());
   }
 
-  private final String safeGetString (ResourceBundle bundle,
+  private String safeGetString(ResourceBundle bundle,
 				      String name, String def)
   {
     if (bundle != null)
@@ -99,7 +99,7 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
     return def;
   }
 
-  private final char safeGetChar (ResourceBundle bundle,
+  private char safeGetChar(ResourceBundle bundle,
 				  String name, char def)
   {
     String r = null;

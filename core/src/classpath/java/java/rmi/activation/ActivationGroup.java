@@ -1,4 +1,4 @@
-/*
+/* ActivationGroup.java --
   Copyright (c) 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -35,17 +35,17 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.rmi.activation;
 
-import java.rmi.server.UnicastRemoteObject;
-import java.rmi.RemoteException;
-import java.rmi.Remote;
 import java.rmi.MarshalledObject;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 
-public abstract class ActivationGroup
-	extends UnicastRemoteObject
-	implements ActivationInstantiator {
-
+public abstract class ActivationGroup extends UnicastRemoteObject
+  implements ActivationInstantiator
+{
 static final long serialVersionUID = -7696947875314805420L;
 
 protected ActivationGroup(ActivationGroupID groupID) throws RemoteException {

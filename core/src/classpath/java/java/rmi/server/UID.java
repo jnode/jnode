@@ -1,4 +1,4 @@
-/*
+/* UID.java --
   Copyright (c) 1996, 1997, 1998, 1999, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -35,19 +35,16 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.rmi.server;
 
-import java.io.Serializable;
-import java.io.DataOutput;
 import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Random;
-import java.lang.Thread;
-import java.lang.InterruptedException;
+import java.io.Serializable;
 
-public final class UID
-	implements Serializable {
-
+public final class UID implements Serializable
+{
 public static final long serialVersionUID = 1086053664494604050L;
 
 private static final Object lock = UID.class;

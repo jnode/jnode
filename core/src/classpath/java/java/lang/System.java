@@ -51,7 +51,7 @@ import java.util.PropertyPermission;
  * general environment.  As such, all methods are static.
  *
  * @author John Keiser
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
  * @since 1.0
  * @status still missing 1.4 functionality
  */
@@ -353,7 +353,7 @@ public final class System
    * @param sm the new SecurityManager
    * @throws SecurityException if permission is denied
    */
-  public synchronized static void setSecurityManager(SecurityManager sm)
+  public static synchronized void setSecurityManager(SecurityManager sm)
   {
     // Implementation note: the field lives in Runtime because of bootstrap
     // initialization issues. This method is synchronized so that no other
@@ -385,7 +385,8 @@ public final class System
    * @return the current time
    * @see java.util.Date
    */
-  public static long currentTimeMillis() {
+  public static long currentTimeMillis()
+  {
       return VMSystem.currentTimeMillis();
     }
 

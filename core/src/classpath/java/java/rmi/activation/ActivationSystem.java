@@ -1,5 +1,5 @@
-/*
-  Copyright (c) 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
+/* ActivationSystem.java --
+   Copyright (c) 1996, 1997, 1998, 1999, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.rmi.activation;
 
 import java.rmi.Remote;
@@ -42,7 +43,7 @@ import java.rmi.RemoteException;
 
 public interface ActivationSystem extends Remote
 {
-  int SYSTEM_PORT = 0; // XXX
+  int SYSTEM_PORT = 1098;
 
   ActivationID registerObject (ActivationDesc desc)
     throws ActivationException, UnknownGroupException, RemoteException;

@@ -1,5 +1,6 @@
 /* DatagramSocketImpl.java -- Abstract class for UDP socket implementations
-   Copyright (C) 1998, 1999 2000, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999 2000, 2001,
+                 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,8 +38,9 @@ exception statement from your version. */
 
 package java.net;
 
-import java.io.IOException;
 import java.io.FileDescriptor;
+import java.io.IOException;
+
 
 /**
  * This abstract class models a datagram socket implementation.  An
@@ -51,11 +53,11 @@ import java.io.FileDescriptor;
  * Status:  Believed complete and correct.
  *
  * @author Aaron M. Renn (arenn@urbanophile.com)
- * @author Warren Levy <warrenl@cygnus.com>
+ * @author Warren Levy (warrenl@cygnus.com)
  * @since 1.1
  */
-public abstract class DatagramSocketImpl implements SocketOptions {
-
+public abstract class DatagramSocketImpl implements SocketOptions
+{
 	/**
 	 * The local port to which this socket is bound
 	 */
@@ -69,7 +71,8 @@ public abstract class DatagramSocketImpl implements SocketOptions {
 	/**
 	 * Default, no-argument constructor for subclasses to call.
 	 */
-	public DatagramSocketImpl() {
+  public DatagramSocketImpl()
+  {
 	}
 
 	/**
@@ -99,8 +102,8 @@ public abstract class DatagramSocketImpl implements SocketOptions {
 	 * Takes a peek at the next packet received in order to retrieve the
 	 * address of the sender
 	 *
-	 * @param i The InetAddress to fill in with the information about the
-	 *          sender if the next packet
+   * @param i The <code>InetAddress</code> to fill in with the information
+   *          about the sender if the next packet
 	 *
 	 * @return The port number of the sender of the packet
 	 *
@@ -115,7 +118,7 @@ public abstract class DatagramSocketImpl implements SocketOptions {
 	 * Takes a peek at the next packet received.  This packet is not consumed.
 	 * With the next peekData/receive operation this packet will be read again.
 	 * 
-	 * @param p The DatagramPacket to fill in with the data sent.
+   * @param p The <code>DatagramPacket</code> to fill in with the data sent.
 	 *
 	 * @return The port number of the sender of the packet.
 	 * 
@@ -144,7 +147,7 @@ public abstract class DatagramSocketImpl implements SocketOptions {
 	/**
 	 * Receives a packet of data from the network  Will block until a packet
 	 * arrives.  The packet info in populated into the passed in
-	 * DatagramPacket object.
+   * <code>DatagramPacket</code> object.
 	 *
 	 * @param p A place to store the incoming packet.
 	 *
@@ -158,7 +161,7 @@ public abstract class DatagramSocketImpl implements SocketOptions {
 	/**
 	 * Connects the socket to a host specified by address and port.
 	 *
-	 * @param address The InetAddress of the host to connect to
+   * @param address The <code>InetAddress</code> of the host to connect to
 	 * @param port The port number of the host to connect to
 	 *
 	 * @exception SocketException If an error occurs
@@ -166,7 +169,8 @@ public abstract class DatagramSocketImpl implements SocketOptions {
 	 * @since 1.4
 	 */
 	protected void connect(InetAddress address, int port)
-		throws SocketException {
+    throws SocketException
+  {
 		// This method has to be overwritten by real implementations
 	}
 
@@ -175,7 +179,8 @@ public abstract class DatagramSocketImpl implements SocketOptions {
 	 * 
 	 * @since 1.4
 	 */
-	protected void disconnect() {
+  protected void disconnect()
+  {
 		// This method has to be overwritten by real implementations
 	}
 
@@ -188,20 +193,19 @@ public abstract class DatagramSocketImpl implements SocketOptions {
 	 * @exception IOException If an error occurs
 	 * @deprecated
 	 */
-	protected void setTTL(byte ttl) throws IOException {
-		setTimeToLive(ttl);
-	}
+  protected abstract void setTTL(byte ttl) throws IOException;
 
 	/**
 	 * This method returns the current Time to Live (TTL) setting on this
 	 * socket.  <b>Use <code>getTimeToLive()</code></b> instead.
 	 *
+   * @return the current time-to-live
+   * 
 	 * @exception IOException If an error occurs
-	 * @deprecated
+   * 
+   * @deprecated // FIXME: when ?
 	 */
-	protected byte getTTL() throws IOException {
-		return (byte)getTimeToLive();
-	}
+  protected abstract byte getTTL() throws IOException;
 
 	/**
 	 * Sets the Time to Live (TTL) setting on this socket to the specified
@@ -217,6 +221,8 @@ public abstract class DatagramSocketImpl implements SocketOptions {
 	 * This method returns the current Time to Live (TTL) setting on this
 	 * socket.
 	 *
+   * @return the current time-to-live
+   * 
 	 * @exception IOException If an error occurs
 	 */
 	protected abstract int getTimeToLive() throws IOException;
@@ -250,8 +256,7 @@ public abstract class DatagramSocketImpl implements SocketOptions {
 	 * 
 	 * @since 1.4
 	 */
-	protected abstract void joinGroup(
-		SocketAddress mcastaddr,
+  protected abstract void joinGroup(SocketAddress mcastaddr,
 		NetworkInterface netIf)
 		throws IOException;
 
@@ -265,54 +270,27 @@ public abstract class DatagramSocketImpl implements SocketOptions {
 	 * 
 	 * @since 1.4
 	 */
-	protected abstract void leaveGroup(
-		SocketAddress mcastaddr,
+  protected abstract void leaveGroup(SocketAddress mcastaddr,
 		NetworkInterface netIf)
 		throws IOException;
 
 	/**
 	 * Returns the FileDescriptor for this socket
+   * 
+   * @return the file descriptor associated with this socket
 	 */
-	protected FileDescriptor getFileDescriptor() {
+  protected FileDescriptor getFileDescriptor()
+  {
 		return fd;
 	}
 
 	/**
 	 * Returns the local port this socket is bound to
+   *
+   * @return the local port
 	 */
-	protected int getLocalPort() {
+  protected int getLocalPort()
+  {
 		return localPort;
 	}
-
-	/**
-	 * Sets the specified option on a socket to the passed in object.  For
-	 * options that take an integer argument, the passed in object is an
-	 * <code>Integer</code>.  For options that are set to on or off, the
-	 * value passed will be a <code>Boolean</code>.   The <code>option_id</code>
-	 * parameter is one of the defined constants in the superinterface.
-	 *
-	 * @param option_id The identifier of the option
-	 * @param val The value to set the option to
-	 *
-	 * @exception SocketException If an error occurs
-	 * @XXX This redeclaration from SocketOptions is a workaround to a gcj bug.
-	 */
-	public abstract void setOption(int option_id, Object val)
-		throws SocketException;
-
-	/**
-	 * Returns the current setting of the specified option.  The
-	 * <code>Object</code> returned will be an <code>Integer</code> for options
-	 * that have integer values.  For options that are set to on or off, a
-	 * <code>Boolean</code> will be returned.   The <code>option_id</code>
-	 * is one of the defined constants in the superinterface.
-	 *
-	 * @param option_id The option identifier
-	 *
-	 * @return The current value of the option
-	 *
-	 * @exception SocketException If an error occurs
-	 * @XXX This redeclaration from SocketOptions is a workaround to a gcj bug.
-	 */
-	public abstract Object getOption(int option_id) throws SocketException;
 }
