@@ -120,7 +120,9 @@ final class RefItem extends WordItem implements X86CompilerConstants {
 	 */
 	protected void pushConstant(EmitterContext ec, X86Assembler os) {
 		if (value == null) {
-			os.writePUSH_Const(null);
+            // Push const not supported in 64-bit mode,
+            // but PUSH imm32 will sign-extend to 64-bit
+			os.writePUSH(0);
 		} else {
 			X86CompilerHelper helper = ec.getHelper();
 			Label l = new Label(Long.toString(labelCounter++));

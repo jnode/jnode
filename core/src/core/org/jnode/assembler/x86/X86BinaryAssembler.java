@@ -108,8 +108,12 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 				throw new RuntimeException("markEnd has already been called");
 			}
 			align(ObjectLayout.OBJECT_ALIGN);
-			int size = getLength() - m_objptr;
-			set32(m_objptr - 12, size);
+			final int size = getLength() - m_objptr;
+            if (isCode32()) {
+                set32(m_objptr - (3 * 4), size);
+            } else {
+                set64(m_objptr - (3 * 8), size);                
+            }
 			m_objptr = -1;
 			inObject = false;
 		}
@@ -2720,6 +2724,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @return The offset of the start of the instruction.
 	 */
 	public final int writePUSH_Const(Object objRef) {
+        if (code64) {
+            throw new InvalidOpcodeException("Not support in 64-bit mode");
+        }
 		final int rc = m_used;
 		write8(0x68); // PUSH imm32
 		writeObjectRef(objRef, 0, false);

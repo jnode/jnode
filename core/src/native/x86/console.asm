@@ -124,12 +124,12 @@ sys_print_char%1:
 	mov ADI,scr_addr
 	mov ASI,ADI
 	add ASI,(scr_width*2)
-	mov ecx,(scr_width*(scr_height-1))
+	mov ACX,(scr_width*(scr_height-1))
 	rep movsw
 	; Now clear the last row
 	push AAX
 	mov ADI,scr_addr+((scr_width*(scr_height-1))*2)
-	mov ecx,scr_width
+	mov ACX,scr_width
 	mov eax,0x0720
 	rep stosw
 	pop AAX
