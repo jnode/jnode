@@ -32,6 +32,7 @@ import org.jnode.assembler.NativeStream.ObjectInfo;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.boot.Main;
 import org.jnode.build.AbstractBootImageBuilder;
 import org.jnode.build.BuildException;
@@ -97,8 +98,8 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 					* VmX86Architecture32.SLOT_SIZE);
 
 	public static final int JUMP_MAIN_OFFSET64 = ObjectLayout
-	.objectAlign((ObjectLayout.HEADER_SLOTS + 1)
-			* VmX86Architecture64.SLOT_SIZE);
+			.objectAlign((ObjectLayout.HEADER_SLOTS + 1)
+					* VmX86Architecture64.SLOT_SIZE);
 
 	public final int JUMP_MAIN_OFFSET() {
 		switch (bits) {
@@ -139,7 +140,8 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 	 * @return The native stream
 	 */
 	protected NativeStream createNativeStream() {
-		X86Constants.Mode mode = ((VmX86Architecture)getArchitecture()).getMode();
+		X86Constants.Mode mode = ((VmX86Architecture) getArchitecture())
+				.getMode();
 		return new X86BinaryAssembler(getCPUID(), mode, LOAD_ADDR,
 				INITIAL_OBJREFS_CAPACITY, INITIAL_SIZE, INITIAL_SIZE);
 	}
@@ -203,7 +205,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 	protected void copyKernel(NativeStream os) throws BuildException {
 		try {
 			Elf elf = Elf.newFromFile(getKernelFile().getCanonicalPath());
-			//elf.print();
+			// elf.print();
 			new ElfLinker((X86BinaryAssembler) os).loadElfObject(elf);
 		} catch (IOException ex) {
 			throw new BuildException(ex);
@@ -239,7 +241,8 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 			final int offset = os.getLength() - startLength;
 			if (offset != JUMP_MAIN_OFFSET()) {
 				throw new BuildException("JUMP_MAIN_OFFSET is incorrect ["
-						+ offset + " instead of " + JUMP_MAIN_OFFSET() + "] (set to Object headersize)");
+						+ offset + " instead of " + JUMP_MAIN_OFFSET()
+						+ "] (set to Object headersize)");
 			}
 
 			final X86BinaryAssembler os86 = (X86BinaryAssembler) os;
@@ -377,8 +380,10 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 		final VmInstanceField nativeCodeField = (VmInstanceField) vmMethodClass
 				.getField("nativeCode");
 
-		os.writeMOV_Const(X86Register.EAX, mainMethod);
-		os.writeCALL(X86Register.EAX, nativeCodeField.getOffset());
+		final GPR aax = os.isCode32() ? (GPR) X86Register.EAX : X86Register.RAX;
+
+		os.writeMOV_Const(aax, mainMethod);
+		os.writeCALL(aax, nativeCodeField.getOffset());
 		os.writeRET(); // RET instruction
 	}
 
@@ -401,24 +406,22 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 				.getField("stackEnd");
 		final VmThread initialThread = processor.getCurrentThread();
 
+		final GPR abx = os.isCode32() ? (GPR) X86Register.EBX : X86Register.RBX;
+		final GPR adx = os.isCode32() ? (GPR) X86Register.EDX : X86Register.RDX;
+
 		os.setObjectRef(new Label("$$Setup initial thread"));
-		os.writeMOV_Const(X86Register.EBX, initialThread);
+		os.writeMOV_Const(abx, initialThread);
 
 		/** Initialize initialStack.stack to Luser_stack */
-		// os.writeMOV(Register.ECX, threadStackField.getOffset());
-		os.writeMOV_Const(X86Register.EDX, initialStack);
-		os.writeMOV(INTSIZE, X86Register.EBX, threadStackField.getOffset(),
-				X86Register.EDX);
+		os.writeMOV_Const(adx, initialStack);
+		os.writeMOV(adx.getSize(), abx, threadStackField.getOffset(), adx);
 		// Calculate and set stackEnd
-		os.writeLEA(X86Register.EDX, X86Register.EDX,
-				VmThread.STACK_OVERFLOW_LIMIT);
-		os.writeMOV(INTSIZE, X86Register.EBX, threadStackEndField.getOffset(),
-				X86Register.EDX);
+		os.writeLEA(adx, adx, VmThread.STACK_OVERFLOW_LIMIT);
+		os.writeMOV(adx.getSize(), abx, threadStackEndField.getOffset(), adx);
 
 		// Set stackend in current processor
-		os.writeMOV_Const(X86Register.EBX, processor);
-		os.writeMOV(INTSIZE, X86Register.EBX, procStackEndField.getOffset(),
-				X86Register.EDX);
+		os.writeMOV_Const(abx, processor);
+		os.writeMOV(adx.getSize(), abx, procStackEndField.getOffset(), adx);
 	}
 
 	/**
@@ -436,13 +439,14 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 	protected void createInitialStack(NativeStream os, Label stackLabel,
 			Label stackPtrLabel) throws BuildException, ClassNotFoundException,
 			UnresolvedObjectRefException {
-		ObjectInfo objectInfo = os.startObject(loadClass(VmSystemObject.class));
-		int stackOffset = os.setObjectRef(stackLabel).getOffset();
-		int stackAddr = stackOffset + (int) os.getBaseAddr();
+		final ObjectInfo objectInfo = os
+				.startObject(loadClass(VmSystemObject.class));
+		final int stackOffset = os.setObjectRef(stackLabel).getOffset();
+		final int stackAddr = stackOffset + (int) os.getBaseAddr();
 		// Low stack address
-		os.write32(stackAddr + VmThread.STACK_OVERFLOW_LIMIT);
+		os.writeWord(stackAddr + VmThread.STACK_OVERFLOW_LIMIT);
 		// High stack address
-		os.write32(stackAddr + VmThread.DEFAULT_STACK_SIZE);
+		os.writeWord(stackAddr + VmThread.DEFAULT_STACK_SIZE);
 		// The actual stack space
 		for (int i = 8; i < VmThread.DEFAULT_STACK_SIZE; i++) {
 			os.write8(0);
@@ -464,14 +468,19 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 		VmType vmClass = loadClass(Vm.class);
 		VmStaticField vmField = (VmStaticField) vmClass.getField("instance");
 
-		// Setup STATICS register (EDI)
-		os.writeMOV_Const(X86Register.EDI, statics.getTable());
+		final GPR abx = os.isCode32() ? (GPR) X86Register.EBX : X86Register.RBX;
+		final GPR adi = os.isCode32() ? (GPR) X86Register.EDI : X86Register.RDI;
+		final int slotSize = os.isCode32() ? 4 : 8;
+
+		// Setup STATICS register (EDI/RDI)
+		os.writeMOV_Const(adi, statics.getTable());
 
 		/* Set Vm.instance */
-		os.writeMOV_Const(X86Register.EBX, vm);
-		final int vmOffset = (VmArray.DATA_OFFSET + vmField.getStaticsIndex()) << 2;
+		os.writeMOV_Const(abx, vm);
+		final int vmOffset = (VmArray.DATA_OFFSET * slotSize)
+				+ (vmField.getStaticsIndex() << 2);
 		log("vmOffset " + NumberUtils.hex(vmOffset), Project.MSG_VERBOSE);
-		os.writeMOV(INTSIZE, X86Register.EDI, vmOffset, X86Register.EBX);
+		os.writeMOV(abx.getSize(), adi, vmOffset, abx);
 	}
 
 	/**
@@ -489,15 +498,19 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 		final VmStaticField registryField = (VmStaticField) mainClass
 				.getField(Main.REGISTRY_FIELD_NAME);
 
-		// Setup STATICS register (EDI)
-		os.writeMOV_Const(X86Register.EDI, statics.getTable());
+		final GPR abx = os.isCode32() ? (GPR) X86Register.EBX : X86Register.RBX;
+		final GPR adi = os.isCode32() ? (GPR) X86Register.EDI : X86Register.RDI;
+		final int slotSize = os.isCode32() ? 4 : 8;
+
+		// Setup STATICS register (EDI/RDI)
+		os.writeMOV_Const(adi, statics.getTable());
 
 		/* Set Main.pluginRegistry */
-		os.writeMOV_Const(X86Register.EBX, registry);
-		final int rfOffset = (VmArray.DATA_OFFSET + registryField
-				.getStaticsIndex()) << 2;
+		os.writeMOV_Const(abx, registry);
+		final int rfOffset = (VmArray.DATA_OFFSET * slotSize)
+				+ (registryField.getStaticsIndex() << 2);
 		log("rfOffset " + NumberUtils.hex(rfOffset), Project.MSG_VERBOSE);
-		os.writeMOV(INTSIZE, X86Register.EDI, rfOffset, X86Register.EBX);
+		os.writeMOV(abx.getSize(), adi, rfOffset, abx);
 	}
 
 	protected void emitStaticInitializerCalls(NativeStream nativeOs,
@@ -518,10 +531,14 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 		final VmInstanceField nativeCodeField = (VmInstanceField) vmMethodClass
 				.getField("nativeCode");
 
-		os.writeMOV_Const(X86Register.EAX, bootClasses);
-		os.writePUSH(X86Register.EAX);
-		os.writeMOV_Const(X86Register.EAX, lfbcaMethod);
-		os.writeCALL(X86Register.EAX, nativeCodeField.getOffset());
+		final GPR aax = os.isCode32() ? (GPR) X86Register.EAX : X86Register.RAX;
+		final GPR abx = os.isCode32() ? (GPR) X86Register.EBX : X86Register.RBX;
+
+		os.writeMOV_Const(aax, bootClasses);
+		os.writePUSH(aax);
+		os.writeMOV_Const(aax, lfbcaMethod);
+		os.writeMOV(abx.getSize(), abx, aax, nativeCodeField.getOffset());		
+		os.writeCALL(abx);
 
 		// Now call all static initializers
 		for (int i = 0; (i < bootClasses.length); i++) {

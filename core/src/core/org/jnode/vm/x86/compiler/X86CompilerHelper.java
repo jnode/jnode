@@ -242,21 +242,11 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 * @param method
 	 */
 	public final void invokeJavaMethod(VmMethod method) {
-		final int staticsIdx = (VmArray.DATA_OFFSET + method.getStaticsIndex()) << 2;
-		if (os.isCode32()) {
-			if (false) {
-				os.writeMOV(INTSIZE, X86Register.EAX, context.STATICS,
-						staticsIdx);
-			} else {
-				os.writeMOV_Const(X86Register.EAX, method);
-			}
+		if (false) {
+			os.writeMOV(context.ADDRSIZE, context.AAX, context.STATICS,
+					getStaticsOffset(method));
 		} else {
-			if (false) {
-				os.writeMOV(BITS64, X86Register.RAX, context.STATICS,
-						staticsIdx);
-			} else {
-				os.writeMOV_Const(X86Register.RAX, method);
-			}
+			os.writeMOV_Const(context.AAX, method);
 		}
 		invokeJavaMethod(method.getSignature());
 	}
@@ -296,8 +286,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 			// Only when class is not initialize
 			final VmType cls = method.getDeclaringClass();
 			if (!cls.isInitialized()) {
-				final GPR aax = os.isCode32() ? (GPR) X86Register.EAX
-						: X86Register.RAX;
+				final GPR aax = context.AAX;
 				final int size = os.getMode().getSize();
 
 				// Save eax
@@ -341,6 +330,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 				os.writePUSH(X86Register.RBX);
 				os.writePUSH(X86Register.RCX);
 				os.writePUSH(X86Register.RDX);
+				os.writePUSH(X86Register.RSI);
 			}
 			// Call cls.initialize
 			os.writePUSH(classReg);
@@ -348,6 +338,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 			if (os.isCode32()) {
 				os.writePOPA();
 			} else {
+				os.writePOP(X86Register.RSI);
 				os.writePOP(X86Register.RDX);
 				os.writePOP(X86Register.RCX);
 				os.writePOP(X86Register.RBX);
@@ -536,8 +527,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	public final void writeGetStaticsEntry(Label curInstrLabel, GPR dst,
 			VmStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "gs", true);
-		final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
-		os.writeMOV(INTSIZE, dst, context.STATICS, staticsIdx);
+		os.writeMOV(INTSIZE, dst, context.STATICS, getStaticsOffset(entry));
 	}
 
 	/**
@@ -551,7 +541,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	public final void writeGetStaticsEntryToFPU(Label curInstrLabel,
 			VmStaticsEntry entry, boolean is32bit) {
 		writeLoadSTATICS(curInstrLabel, "gs", true);
-		final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
+		final int staticsIdx = getStaticsOffset(entry);
 		if (is32bit) {
 			os.writeFLD32(context.STATICS, staticsIdx);
 		} else {
@@ -569,8 +559,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	public final void writePushStaticsEntry(Label curInstrLabel,
 			VmStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "gs", true);
-		final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
-		os.writePUSH(context.STATICS, staticsIdx);
+		os.writePUSH(context.STATICS, getStaticsOffset(entry));
 	}
 
 	/**
@@ -585,9 +574,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	public final void writeGetStaticsEntry64(Label curInstrLabel, GPR lsbDst,
 			GPR msbReg, VmStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "gs64", true);
-		final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
-		os.writeMOV(INTSIZE, msbReg, context.STATICS, staticsIdx + 4); // MSB
-		os.writeMOV(INTSIZE, lsbDst, context.STATICS, staticsIdx + 0); // LSB
+		final int staticsOfs = getStaticsOffset(entry);
+		os.writeMOV(INTSIZE, msbReg, context.STATICS, staticsOfs + 4); // MSB
+		os.writeMOV(INTSIZE, lsbDst, context.STATICS, staticsOfs + 0); // LSB
 	}
 
 	/**
@@ -601,8 +590,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	public final void writeGetStaticsEntry64(Label curInstrLabel, GPR64 dstReg,
 			VmStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "gs64", true);
-		final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
-		os.writeMOV(BITS64, dstReg, context.STATICS, staticsIdx);
+		os.writeMOV(BITS64, dstReg, context.STATICS, getStaticsOffset(entry));
 	}
 
 	/**
@@ -616,8 +604,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	public final void writePutStaticsEntry(Label curInstrLabel, GPR src,
 			VmStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "ps", true);
-		final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
-		os.writeMOV(INTSIZE, context.STATICS, staticsIdx, src);
+		os.writeMOV(INTSIZE, context.STATICS, getStaticsOffset(entry), src);
 	}
 
 	/**
@@ -632,9 +619,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	public final void writePutStaticsEntry64(Label curInstrLabel, GPR lsbSrc,
 			GPR msbSrc, VmStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "ps64", true);
-		final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
-		os.writeMOV(BITS32, context.STATICS, staticsIdx + 4, msbSrc); // MSB
-		os.writeMOV(BITS32, context.STATICS, staticsIdx + 0, lsbSrc); // LSB
+		final int staticsOfs = getStaticsOffset(entry);
+		os.writeMOV(BITS32, context.STATICS, staticsOfs + 4, msbSrc); // MSB
+		os.writeMOV(BITS32, context.STATICS, staticsOfs + 0, lsbSrc); // LSB
 	}
 
 	/**
@@ -648,8 +635,22 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	public final void writePutStaticsEntry64(Label curInstrLabel, GPR64 srcReg,
 			VmStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "ps64", true);
-		final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
-		os.writeMOV(BITS64, context.STATICS, staticsIdx, srcReg);
+		os.writeMOV(BITS64, context.STATICS, getStaticsOffset(entry), srcReg);
+	}
+
+	/**
+	 * Gets the offset from the beginning of the statics table (context.STATICS)
+	 * to the given entry.
+	 * 
+	 * @param entry
+	 * @return The byte offset from context.STATICS to the entry.
+	 */
+	public final int getStaticsOffset(VmStaticsEntry entry) {
+		if (os.isCode32()) {
+			return (VmArray.DATA_OFFSET * 4) + (entry.getStaticsIndex() << 2);			
+		} else {
+			return (VmArray.DATA_OFFSET * 8) + (entry.getStaticsIndex() << 2);						
+		}
 	}
 
 	public static void assertCondition(boolean condition, String msg) {

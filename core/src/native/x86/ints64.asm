@@ -17,21 +17,29 @@ int_die_halted:	DA 0
 ; Stack for inthandler & irqhandler
 ; -------------------------------------
 
-OLD_SS      equ 112
-OLD_ESP     equ 104
-OLD_EFLAGS  equ 96
-OLD_CS      equ 88
-OLD_EIP     equ 80
-ERROR       equ 72
-INTNO   	equ 64
-HANDLER     equ 56 
-OLD_EAX     equ 48
-OLD_ECX     equ 40
-OLD_EDX     equ 32
-OLD_EBX     equ 24
-OLD_EBP     equ 16
-OLD_ESI     equ 8
-OLD_EDI     equ 0
+OLD_SS      equ 176
+OLD_ESP     equ 168
+OLD_EFLAGS  equ 160
+OLD_CS      equ 152
+OLD_EIP     equ 144
+ERROR       equ 136
+INTNO   	equ 128
+HANDLER     equ 120 
+OLD_EAX     equ 112
+OLD_ECX     equ 104
+OLD_EDX     equ 96
+OLD_EBX     equ 88
+OLD_EBP     equ 80
+OLD_ESI     equ 72
+OLD_EDI     equ 64
+OLD_R8		equ 56
+OLD_R9		equ 48
+OLD_R10		equ 40
+OLD_R11		equ 32
+OLD_R12		equ 24
+OLD_R13		equ 16
+OLD_R14		equ 8
+OLD_R15		equ 0
 
 %define GET_OLD_CS		qword [rbp+OLD_CS]
 %define GET_OLD_EIP		qword [rbp+OLD_EIP]
@@ -50,6 +58,14 @@ OLD_EDI     equ 0
 	push rbp
 	push rsi
 	push rdi
+	push r8
+	push r9
+	push r10
+	push r11
+	push r12
+	push r13
+	push r14
+	push r15
     ; Do not overwrite FS here, since it will always contain the current processor selector
     %if TRACE_INTERRUPTS
 		inc byte [0xb8000+0*2]
@@ -62,6 +78,14 @@ OLD_EDI     equ 0
 %macro int_exit 0
     mov rax,rsp
     and qword [rsp+OLD_EFLAGS],~F_NT ; Clear NT flag
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop r11
+    pop r10
+    pop r9
+    pop r8
     pop rdi
     pop rsi
     pop rbp
@@ -146,6 +170,14 @@ sys_print_intregs:
 	idm_print_reg rsp, [rbp+OLD_ESP]
 	idm_print_reg rdi, [rbp+OLD_EDI]
 	idm_print_reg rsi, [rbp+OLD_ESI]
+	idm_print_reg r8,  [rbp+OLD_R8]
+	idm_print_reg r9,  [rbp+OLD_R9]
+	idm_print_reg r10, [rbp+OLD_R10]
+	idm_print_reg r11, [rbp+OLD_R11]
+	idm_print_reg r12, [rbp+OLD_R12]
+	idm_print_reg r13, [rbp+OLD_R13]
+	idm_print_reg r14, [rbp+OLD_R14]
+	idm_print_reg r15, [rbp+OLD_R15]
 	mov ebx,[rbp+OLD_ESP]
 	idm_print_reg stack0,  [ebx+0]
 	idm_print_reg stack1,  [ebx+8]
@@ -203,6 +235,14 @@ idm_rbp:    db 0xd,0xa,'RBP  : ',0
 idm_rsp:    db        ' RSP  : ',0
 idm_rdi:    db        ' RDI  : ',0
 idm_rsi:    db 0xd,0xa,'RSI  : ',0
+idm_r8:     db        ' R8   : ',0
+idm_r9:     db        ' R9   : ',0
+idm_r10:    db 0xd,0xa,'R10  : ',0
+idm_r11:    db        ' R11  : ',0
+idm_r12:    db        ' R12  : ',0
+idm_r13:    db 0xd,0xa,'R13  : ',0
+idm_r14:    db        ' R14  : ',0
+idm_r15:    db        ' R15  : ',0
 idm_stack0: db 0xd,0xa,'STACK: ',0
 idm_stack1: db        0
 idm_stack2: db 0xd,0xa,'       ',0

@@ -384,8 +384,11 @@ public final class ClassDecoder {
 					// Increment the objectSize
 					if (wide)
 						objectSize += 8;
-					else
+					else if (Modifier.isPrimitive(signature)) {
 						objectSize += 4;
+					} else {
+						objectSize += slotSize;
+					}
 					fs = new VmInstanceField(name, signature, modifiers,
 							fieldOffset, cls, slotSize);
 				}

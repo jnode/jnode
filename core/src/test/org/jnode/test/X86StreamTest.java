@@ -24,10 +24,12 @@ package org.jnode.test;
 import java.io.FileOutputStream;
 
 import org.jnode.assembler.Label;
+import org.jnode.assembler.UnresolvedObjectRefException;
+import org.jnode.assembler.x86.X86Assembler;
+import org.jnode.assembler.x86.X86BinaryAssembler;
+import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Operation;
 import org.jnode.assembler.x86.X86Register;
-import org.jnode.assembler.x86.X86Constants;
-import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.vm.x86.X86CpuID;
 
 /**
@@ -37,9 +39,35 @@ public class X86StreamTest implements X86Constants {
 
 	public static void main(String[] args) 
 	throws Exception {
+		final Mode mode;
+		if ((args.length > 0) && args[0].equals("x86_64")) {
+			mode = Mode.CODE64;
+		} else {
+			mode = Mode.CODE32;
+		}
 		
-		final X86BinaryAssembler os = new X86BinaryAssembler(X86CpuID.createID("pentium4"), Mode.CODE32, 0);
+		final X86BinaryAssembler os = new X86BinaryAssembler(X86CpuID.createID("pentium4"), mode, 0);
 		
+		if (mode.is32()) {
+			testCode32(os);
+		} else {
+			testCode64(os);
+		}
+				
+		FileOutputStream fos = new FileOutputStream("test.bin");
+		os.writeTo(fos);
+		fos.close();
+	}
+	
+	private final static void testCode64(X86Assembler os) throws UnresolvedObjectRefException {
+		os.writeNOP();
+		final Label label = new Label("label");
+		os.writeMOV_Const(X86Register.RDI, label);
+		os.writeNOP();
+		os.setObjectRef(label);
+	}
+	
+	private final static void testCode32(X86Assembler os) throws UnresolvedObjectRefException {
 		final Label label = new Label("label");
 		os.writeADD(X86Register.EDX, X86Register.EAX);
 		os.setObjectRef(label);
@@ -143,11 +171,7 @@ public class X86StreamTest implements X86Constants {
 
 		os.writeMOVSS(X86Register.XMM0, X86Register.XMM1);
 		os.writeMOVSS(X86Register.XMM0, X86Register.ESP, 0);
-		os.writeMOVSS(X86Register.ESP, 0, X86Register.XMM1);
-				
-		FileOutputStream fos = new FileOutputStream("test.bin");
-		os.writeTo(fos);
-		fos.close();
+		os.writeMOVSS(X86Register.ESP, 0, X86Register.XMM1);		
 	}
 
 }
