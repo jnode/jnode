@@ -84,7 +84,7 @@ GLABEL Q43org5jnode2vm6Unsafe23setDoubles2e28Lorg2fvmmagic2funboxed2fAddress3bDI
 	mov ecx,[esp+8]		; count
 	test ecx,0xFFFFFFFF	; (count == 0) ??
 	jz set64_end
-set64_loop;
+set64_loop:
 	stosd				; LSB
 	xchg eax,edx		; Swap LSB,MSB
 	stosd				; MSB
