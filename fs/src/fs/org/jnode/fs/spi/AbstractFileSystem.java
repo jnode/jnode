@@ -71,12 +71,12 @@ public abstract class AbstractFileSystem implements FileSystem {
      * @see org.jnode.fs.FileSystem#close()
      */
     public void close() throws IOException {
-        closed = true;
-
         // if readOnly, nothing to do
         if (!isReadOnly()) {
             flush();
         }
+
+        closed = true;
     }
 
     public abstract void flush() throws IOException;
