@@ -17,7 +17,6 @@ import org.jnode.fs.FileSystemException;
 import org.jnode.fs.fat.BootSector;
 import org.jnode.fs.fat.FatDirectory;
 import org.jnode.fs.fat.FatFileSystem;
-import org.jnode.fs.fat.FatFormatter;
 import org.jnode.fs.fat.GrubFatFormatter;
 import org.jnode.plugin.PluginException;
 import org.jnode.util.FileUtils;

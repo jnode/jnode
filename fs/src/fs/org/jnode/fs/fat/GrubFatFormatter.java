@@ -10,12 +10,10 @@ import java.net.URLConnection;
 
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.fs.FileSystemException;
-import org.jnode.util.*;
+import org.jnode.fs.util.Geometry;
 import org.jnode.util.FileUtils;
 
 /**
- * <description>
- * 
  * @author epr
  */
 public class GrubFatFormatter {
