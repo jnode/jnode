@@ -15,6 +15,7 @@
     <library name="jnode-fs.jar">
       <export name="org.jnode.fs.ext2.*"/>
       <export name="org.jnode.fs.ext2.cache.*"/>
+      <export name="org.jnode.fs.ext2.exception.*"/>
     </library>
   </runtime>
         
