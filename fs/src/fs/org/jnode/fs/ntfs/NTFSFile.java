@@ -21,16 +21,15 @@ public class NTFSFile implements FSFile {
 	 * @see org.jnode.fs.FSFile#getLength()
 	 */
 	private NTFSFileRecord fileRecord = null;
+	private NTFSIndexEntry indexEntry = null;
 	
 	public NTFSFile(NTFSIndexEntry indexEntry) throws IOException
 	{
-		fileRecord = indexEntry.getParentFileRecord().getVolume().getIndexedFileRecord(indexEntry);
+		this.indexEntry = indexEntry; 
 	}
 	
 	public long getLength() {
-		if(fileRecord!= null)
-			return fileRecord.getRealSize();
-		return 0;
+		return indexEntry.getRealFileSize();
 	}
 
 	/* (non-Javadoc)
@@ -45,7 +44,7 @@ public class NTFSFile implements FSFile {
 	 * @see org.jnode.fs.FSFile#read(long, byte[], int, int)
 	 */
 	public void read(long fileOffset, byte[] dest, int off, int len) throws IOException {
-		fileRecord.readData(fileOffset,dest,off,len);
+		getFileRecord().readData(fileOffset,dest,off,len);
 	}
 
 	/* (non-Javadoc)
@@ -69,6 +68,27 @@ public class NTFSFile implements FSFile {
 	public FileSystem getFileSystem() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/**
+	 * @return Returns the fileRecord.
+	 */
+	public NTFSFileRecord getFileRecord() 
+	{
+		if(fileRecord == null)
+			try {
+				fileRecord = indexEntry.getParentFileRecord().getVolume().getIndexedFileRecord(indexEntry);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		return this.fileRecord;
+	}
+
+	/**
+	 * @param fileRecord The fileRecord to set.
+	 */
+	public void setFileRecord(NTFSFileRecord fileRecord) {
+		this.fileRecord = fileRecord;
 	}
 
 }

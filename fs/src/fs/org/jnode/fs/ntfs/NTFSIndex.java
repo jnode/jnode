@@ -190,7 +190,7 @@ public class NTFSIndex
 				{
 					// add the vcn to the subnodes list
 					int vcn = (int)indexEntry.getSubnodeVCN();
-					if(vcn <= lastVCN)
+					//if(vcn <= lastVCN)
 						subnodesList.add(new Integer(vcn));
 				}
 				// move the offset to next IndexEntry
