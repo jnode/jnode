@@ -349,7 +349,28 @@ addLayoutComponent(Component component, Object constraints)
   if (constraints != null && ! (constraints instanceof String))
     throw new IllegalArgumentException("Constraint must be a string");
 
-  String str = (String)constraints;
+  addLayoutComponent((String) constraints, component);
+}
+
+/*************************************************************************/
+
+/**
+  * Adds a component to the layout in the specified constraint position, 
+  * which must be one of the string constants defined in this class.
+  *
+  * @param constraints The constraint string.
+  * @param component The component to add.
+  *
+  * @exception IllegalArgumentException If the constraint object is not
+  * one of the specified constants in this class.
+  *
+  * @deprecated This method is deprecated in favor of
+  * <code>addLayoutComponent(Component, Object)</code>.
+  */
+public void
+addLayoutComponent(String constraints, Component component)
+{
+  String str = constraints;
 
   if (str == null || str.equals(CENTER))
     center = component;
@@ -371,27 +392,6 @@ addLayoutComponent(Component component, Object constraints)
     lastItem = component;
   else
     throw new IllegalArgumentException("Constraint value not valid: " + str);
-}
-
-/*************************************************************************/
-
-/**
-  * Adds a component to the layout in the specified constraint position, 
-  * which must be one of the string constants defined in this class.
-  *
-  * @param constraints The constraint string.
-  * @param component The component to add.
-  *
-  * @exception IllegalArgumentException If the constraint object is not
-  * one of the specified constants in this class.
-  *
-  * @deprecated This method is deprecated in favor of
-  * <code>addLayoutComponent(Component, Object)</code>.
-  */
-public void
-addLayoutComponent(String constraints, Component component)
-{
-  addLayoutComponent(component, constraints);
 }
 
 /*************************************************************************/
@@ -592,12 +592,13 @@ layoutContainer(Container target)
 
       int x1 = i.left;
       int x2 = x1 + w.width + hgap;
-      int x3 = t.width - i.right - e.width;
+      int x3 = Math.max(x2 + w.width + hgap, t.width - i.right - e.width);
       int ww = t.width - i.right - i.left;
 
       int y1 = i.top;
       int y2 = y1 + n.height + vgap;
-      int y3 = t.height - i.bottom - s.height;
+      int midh = Math.max(e.height, Math.max(w.height, c.height));
+      int y3 = Math.max(y2 + midh + vgap, t.height - i.bottom - s.height);
       int hh = y3-y2-vgap;
 
       setBounds(center, x2, y2, x3-x2-hgap, hh);
@@ -637,7 +638,7 @@ private static final int PREF = 2;
 private Dimension
 calcCompSize(Component comp, int what)
 {
-  if (comp == null)
+  if (comp == null || !comp.isVisible())
     return new Dimension(0, 0);
   if (what == MIN)
     return comp.getMinimumSize();

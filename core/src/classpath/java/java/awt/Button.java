@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt;
 
 import java.awt.event.ActionEvent;
@@ -49,55 +50,58 @@ import java.util.EventListener;
   * @author Aaron M. Renn (arenn@urbanophile.com)
   * @author Tom Tromey <tromey@cygnus.com>
   */
-public class Button extends Component implements java.io.Serializable {
+public class Button extends Component implements java.io.Serializable
+{
 
-	/*
+/*
 	 * Static Variables
 	 */
 
-	// FIXME: Need readObject/writeObject for serialization
+// FIXME: Need readObject/writeObject for serialization
 
-	// Serialization version constant
-	private static final long serialVersionUID = -8774683716313001058L;
+// Serialization version constant
+private static final long serialVersionUID = -8774683716313001058L;
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/*
+/*
 	 * Instance Variables
 	 */
 
-	/**
+/**
 	  * @serial The action command name for this button.
 	  */
-	private String actionCommand;
+private String actionCommand;
 
-	/**
+/**
 	  * @serial The label for this button.
 	  */
-	private String label;
+private String label;
 
-	// List of ActionListeners for this class.
-	private transient ActionListener action_listeners;
+// List of ActionListeners for this class.
+private transient ActionListener action_listeners;
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/*
+/*
 	 * Constructors
 	 */
 
-	/**
+/**
 	  * Initializes a new instance of <code>Button</code> with no label.
 	  *
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless()
 	  * returns true
 	  */
-	public Button() {
+public
+Button()
+{
 		this(null);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Initializes a new instance of <code>Button</code> with the specified
 	  * label.  The action command name is also initialized to this value.
 	  *
@@ -106,95 +110,114 @@ public class Button extends Component implements java.io.Serializable {
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless()
 	  * returns true
 	  */
-	public Button(String label) {
+public
+Button(String label)
+{
 		this.label = label;
 		actionCommand = label;
 
-		if (GraphicsEnvironment.isHeadless())
-			throw new HeadlessException();
-	}
+  if (GraphicsEnvironment.isHeadless ())
+    throw new HeadlessException ();
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/*
+/*
 	 * Instance Variables
 	 */
 
-	/**
+/**
 	  * Returns the label for this button.
 	  *
 	  * @return The label for this button.
 	  */
-	public String getLabel() {
-		return (label);
-	}
+public String
+getLabel()
+{
+  return(label);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Sets the label for this button to the specified value.
 	  *
 	  * @param label The new label for this button.
 	  */
-	public synchronized void setLabel(String label) {
+public synchronized void
+setLabel(String label)
+{
 		this.label = label;
-		if (peer != null) {
+  actionCommand = label;
+  if (peer != null)
+    {
 			ButtonPeer bp = (ButtonPeer) peer;
-			bp.setLabel(label);
-		}
+      bp.setLabel (label);
 	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns the action command name for this button.
 	  *
 	  * @return The action command name for this button.
 	  */
-	public String getActionCommand() {
-		return (actionCommand);
-	}
+public String
+getActionCommand()
+{
+  return(actionCommand);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Sets the action command name for this button to the specified value.
 	  *
 	  * @param actionCommand The new action command name.
 	  */
-	public void setActionCommand(String actionCommand) {
+public void
+setActionCommand(String actionCommand)
+{
 		this.actionCommand = actionCommand == null ? label : actionCommand;
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Adds a new entry to the list of listeners that will receive
 	  * action events from this button.
 	  *
 	  * @param listener The listener to add.
 	  */
-	public synchronized void addActionListener(ActionListener listener) {
+public synchronized void
+addActionListener(ActionListener listener)
+{
 		action_listeners = AWTEventMulticaster.add(action_listeners, listener);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Removes the specified listener from the list of listeners that will
 	  * receive action events from this button.
 	  * 
 	  * @param listener The listener to remove.
 	  */
-	public synchronized void removeActionListener(ActionListener listener) {
+public synchronized void
+removeActionListener(ActionListener listener)
+{
 		action_listeners = AWTEventMulticaster.remove(action_listeners, listener);
+}
+
+  public synchronized ActionListener[] getActionListeners()
+  {
+    return (ActionListener[])
+      AWTEventMulticaster.getListeners(action_listeners,
+                                       ActionListener.class);
 	}
 
-	public synchronized ActionListener[] getActionListeners() {
-		return (ActionListener[]) AWTEventMulticaster.getListeners(action_listeners, ActionListener.class);
-	}
-
-	/** Returns all registered EventListers of the given listenerType. 
+/** Returns all registered EventListers of the given listenerType. 
 	 * listenerType must be a subclass of EventListener, or a 
 	 * ClassClassException is thrown.
 	 *
@@ -203,26 +226,29 @@ public class Button extends Component implements java.io.Serializable {
 	 *
 	 * @since 1.3 
 	 */
-	public EventListener[] getListeners(Class listenerType) {
+  public EventListener[] getListeners(Class listenerType)
+  {
 		if (listenerType == ActionListener.class)
 			return getActionListeners();
 		return (EventListener[]) Array.newInstance(listenerType, 0);
 	}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Notifies this button that it should create its native peer object.
 	  */
-	public void addNotify() {
+public void
+addNotify()
+{
 		if (peer == null)
-			peer = getToolkit().createButton(this);
+    peer = getToolkit ().createButton (this);
 		super.addNotify();
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Processes an event for this button.  If the specified event is an
 	  * instance of <code>ActionEvent</code>, then the
 	  * <code>processActionEvent()</code> method is called to dispatch it
@@ -233,42 +259,55 @@ public class Button extends Component implements java.io.Serializable {
 	  *
 	  * @param event The event to process.
 	  */
-	protected void processEvent(AWTEvent event) {
+protected void
+processEvent(AWTEvent event)
+{
 		if (event instanceof ActionEvent)
-			processActionEvent((ActionEvent) event);
+    processActionEvent((ActionEvent)event);
 		else
 			super.processEvent(event);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * This method dispatches an action event for this button to any
 	  * registered listeners.
 	  *
 	  * @param event The event to process.
 	  */
-	protected void processActionEvent(ActionEvent event) {
+protected void
+processActionEvent(ActionEvent event)
+{
 		if (action_listeners != null)
 			action_listeners.actionPerformed(event);
-	}
+}
 
-	void dispatchEventImpl(AWTEvent e) {
-		if (e.id <= ActionEvent.ACTION_LAST && e.id >= ActionEvent.ACTION_FIRST && (action_listeners != null || (eventMask & AWTEvent.ACTION_EVENT_MASK) != 0))
+void
+dispatchEventImpl(AWTEvent e)
+{
+  if (e.id <= ActionEvent.ACTION_LAST 
+      && e.id >= ActionEvent.ACTION_FIRST
+      && (action_listeners != null 
+	  || (eventMask & AWTEvent.ACTION_EVENT_MASK) != 0))
 			processEvent(e);
 		else
 			super.dispatchEventImpl(e);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns a debugging string for this button.
 	  *
 	  * @return A debugging string for this button.
 	  */
-	protected String paramString() {
-		return ("label=" + getLabel() + ",actionCommand=" + getActionCommand() + "," + super.paramString());
-	}
+protected String
+paramString()
+{
+  return ("label=" + getLabel() + ",actionCommand=" + getActionCommand()
+	  + "," + super.paramString());
+}
 
 } // class Button 
+

@@ -1,5 +1,5 @@
-/* EmptyEnumeration.java -- a constant empty enumeration
-   Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+/*
+  Copyright (c) 1996, 1997, 1998, 1999, 2002 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -7,7 +7,7 @@ GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
-
+ 
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -35,62 +35,24 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package gnu.java.util;
+package gnu.java.rmi.server; 
 
-import java.io.Serializable;
-import java.util.Enumeration;
-import java.util.NoSuchElementException;
-
-/**
- * This is a helper class that produces an empty Enumerations. There is only
- * one instance of this class that can be used whenever one needs a
- * non-null but empty enumeration. Using this class prevents multiple
- * small objects and inner classes. <code>getInstance()</code> returns
- * the only instance of this class. It can be shared by multiple objects and
- * threads.
- *
- * @author Mark Wielaard (mark@klomp.org)
- */
-public final class EmptyEnumeration implements Enumeration, Serializable
-{
-	/** The only instance of this class */
-	private static final EmptyEnumeration instance = new EmptyEnumeration();
-
-	/**
-	 * Private constructor that creates a new empty Enumeration.
-	 */
-  private EmptyEnumeration()
-  {
+public class RMIIncomingThread extends Thread {  
+	
+	private String clientHost = null;
+	
+	public RMIIncomingThread(Runnable runnable, String s_clientHost) {
+		super(runnable);
+		clientHost = s_clientHost;		
 	}
-
-	/**
-	 * Returns the only instance of this class.
-	 * It can be shared by multiple objects and threads.
-	 *
-	 * @return the common empty enumeration
-	 */
-  public static EmptyEnumeration getInstance()
-  {
-		return instance;
+	
+	public String toString() {
+		return "RMIIncoming from " + clientHost + " " + super.toString();
 	}
-
-	/**
-	 * Returns false, since there are no elements.
-	 *
-	 * @return false
-	 */
-  public boolean hasMoreElements()
-  {
-		return false;
+	
+	public String getClientHost() {
+		return clientHost;
 	}
+	
 
-	/**
-	 * Always throws <code>NoSuchElementException</code>, since it is empty.
-	 *
-	 * @throws NoSuchElementException this is empty
-	 */
-  public Object nextElement()
-  {
-		throw new NoSuchElementException();
-	}
 }

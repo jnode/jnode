@@ -35,11 +35,14 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.peer.CheckboxMenuItemPeer;
+import java.awt.peer.MenuItemPeer;
+import java.util.EventListener;
 
 /**
   * This class implements a menu item that has a checkbox on it indicating
@@ -48,48 +51,51 @@ import java.awt.peer.CheckboxMenuItemPeer;
   * @author Aaron M. Renn (arenn@urbanophile.com)
   * @author Tom Tromey <tromey@redhat.com>
   */
-public class CheckboxMenuItem extends MenuItem implements ItemSelectable, java.io.Serializable {
+public class CheckboxMenuItem extends MenuItem implements ItemSelectable
+{
 
-	/*
+/*
 	 * Static Variables
 	 */
 
-	// Serialization constant
-	private static final long serialVersionUID = 6190621106981774043L;
+// Serialization constant
+private static final long serialVersionUID = 6190621106981774043L;
 
-	/*
+/*
 	 * Instance Variables
 	 */
 
-	/**
+/**
 	  * @serial The state of the checkbox, with <code>true</code> being on and
 	  * <code>false</code> being off.
 	  */
-	private boolean state;
+private boolean state;
 
-	// List of registered ItemListeners
-	private transient ItemListener item_listeners;
+// List of registered ItemListeners
+private transient ItemListener item_listeners;
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/*
+/*
 	 * Constructors
 	 */
 
-	/**
+/**
 	  * Initializes a new instance of <code>CheckboxMenuItem</code> with no
 	  * label and an initial state of off.
 	  *
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless()
 	  * returns true.
 	  */
-	public CheckboxMenuItem() {
+public
+CheckboxMenuItem()
+{
 		this("", false);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Initializes a new instance of <code>CheckboxMenuItem</code> with the
 	  * specified label and an initial state of off.
 	  *
@@ -98,13 +104,15 @@ public class CheckboxMenuItem extends MenuItem implements ItemSelectable, java.i
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless()
 	  * returns true.
 	  */
-	public CheckboxMenuItem(String label) {
+public
+CheckboxMenuItem(String label)
+{
 		this(label, false);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Initializes a new instance of <code>CheckboxMenuItem</code> with the
 	  * specified label and initial state.
 	  *
@@ -115,148 +123,201 @@ public class CheckboxMenuItem extends MenuItem implements ItemSelectable, java.i
 	  * @exception HeadlessException If GraphicsEnvironment.isHeadless()
 	  * returns true.
 	  */
-	public CheckboxMenuItem(String label, boolean state) {
+public
+CheckboxMenuItem(String label, boolean state)
+{
 		super(label);
 		this.state = state;
 
 		if (GraphicsEnvironment.isHeadless())
-			throw new HeadlessException();
-	}
+    throw new HeadlessException ();
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/*
+/*
 	 * Instance Methods
 	 */
 
-	/**
+/**
 	  * Returns the state of this menu item.
 	  *
 	  * @return The state of this menu item.
 	  */
-	public boolean getState() {
-		return (state);
-	}
+public boolean
+getState()
+{
+  return(state);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Sets the state of this menu item.
 	  *
 	  * @param state The initial state of the menu item, where <code>true</code>
 	  * is on, and <code>false</code> is off.
 	  */
-	public synchronized void setState(boolean state) {
+public synchronized void
+setState(boolean state)
+{
 		this.state = state;
-		if (peer != null) {
+  if (peer != null)
+    {
 			CheckboxMenuItemPeer cp = (CheckboxMenuItemPeer) peer;
-			cp.setState(state);
-		}
+      cp.setState (state);
 	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns an array of length 1 with the menu item label for this object
 	  * if the state is on.  Otherwise <code>null</code> is returned.
 	  *
 	  * @param An array with this menu item's label if it has a state of on,
 	  * or <code>null</code> otherwise.
 	  */
-	public Object[] getSelectedObjects() {
+public Object[]
+getSelectedObjects()
+{
 		if (state == false)
-			return (null);
+    return(null);
 
 		Object[] obj = new Object[1];
 		obj[0] = getLabel();
 
-		return (obj);
-	}
+  return(obj);
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Create's this object's native peer
 	  */
-	public synchronized void addNotify() {
-		if (peer != null) {
+public synchronized void
+addNotify()
+{
+  if (peer != null)
+    {
 			// This choice of toolkit seems unsatisfying, but I'm not sure
 			// what else to do.
 			peer = getToolkit().createCheckboxMenuItem(this);
 		}
-		super.addNotify();
-	}
+  super.addNotify ();
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Adds the specified listener to the list of registered item listeners
 	  * for this object.
 	  *
 	  * @param listener The listener to add.
 	  */
-	public synchronized void addItemListener(ItemListener listener) {
+public synchronized void
+addItemListener(ItemListener listener)
+{
 		item_listeners = AWTEventMulticaster.add(item_listeners, listener);
 
 		enableEvents(AWTEvent.ITEM_EVENT_MASK);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Removes the specified listener from the list of registered item
 	  * listeners for this object.
 	  *
 	  * @param listener The listener to remove.
 	  */
-	public synchronized void removeItemListener(ItemListener listener) {
+public synchronized void
+removeItemListener(ItemListener listener)
+{
 		item_listeners = AWTEventMulticaster.remove(item_listeners, listener);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Processes the specified event by calling <code>processItemEvent()</code>
 	  * if it is an instance of <code>ItemEvent</code> or calling the superclass
 	  * method otherwise.
 	  *
 	  * @param event The event to process.
 	  */
-	protected void processEvent(AWTEvent event) {
+protected void
+processEvent(AWTEvent event)
+{
 		if (event instanceof ItemEvent)
-			processItemEvent((ItemEvent) event);
+    processItemEvent((ItemEvent)event);
 		else
 			super.processEvent(event);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Processes the specified event by dispatching it to any registered listeners.
 	  *
 	  * @param event The event to process.
 	  */
-	protected void processItemEvent(ItemEvent event) {
+protected void
+processItemEvent(ItemEvent event)
+{
 		if (item_listeners != null)
 			item_listeners.itemStateChanged(event);
-	}
+}
 
-	void dispatchEventImpl(AWTEvent e) {
-		if (e.id <= ItemEvent.ITEM_LAST && e.id >= ItemEvent.ITEM_FIRST && (item_listeners != null || (eventMask & AWTEvent.ITEM_EVENT_MASK) != 0))
+void
+dispatchEventImpl(AWTEvent e)
+{
+  if (e.id <= ItemEvent.ITEM_LAST 
+      && e.id >= ItemEvent.ITEM_FIRST
+      && (item_listeners != null 
+	  || (eventMask & AWTEvent.ITEM_EVENT_MASK) != 0))
 			processEvent(e);
 		else
 			super.dispatchEventImpl(e);
-	}
+}
 
-	/*************************************************************************/
+/*************************************************************************/
 
-	/**
+/**
 	  * Returns a debugging string for this object.
 	  *
 	  * @return A debugging string for this object.
 	  */
-	public String paramString() {
-		return ("label=" + getLabel() + ",state=" + state + "," + super.paramString());
+public String
+paramString()
+{
+  return ("label=" + getLabel() + ",state=" + state
+	  + "," + super.paramString());
+}
+
+  /**
+   * Returns an array of all the objects currently registered as FooListeners
+   * upon this <code>CheckboxMenuItem</code>. FooListeners are registered using
+   * the addFooListener method.
+   *
+   * @exception ClassCastException If listenerType doesn't specify a class or
+   * interface that implements java.util.EventListener.
+   */
+  public EventListener[] getListeners (Class listenerType)
+  {
+    if (listenerType == ItemListener.class)
+      return AWTEventMulticaster.getListeners (item_listeners, listenerType); 
+	      
+    return super.getListeners (listenerType);
 	}
 
+  /**
+   * Returns an aray of all item listeners currently registered to this
+   * <code>CheckBoxMenuItem</code>.
+   */
+  public ItemListener[] getItemListeners ()
+  {
+    return (ItemListener[]) getListeners (ItemListener.class);
+  }
 } // class CheckboxMenuItem
+
