@@ -24,7 +24,7 @@ package org.jnode.test;
 import java.io.FileOutputStream;
 
 import org.jnode.assembler.Label;
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Stream;
 import org.jnode.vm.x86.X86CpuID;
@@ -40,82 +40,82 @@ public class X86StreamTest {
 		final X86Stream os = new X86Stream(X86CpuID.createID("pentium4"), 0);
 		
 		final Label label = new Label("label");
-		os.writeADD(Register.EDX, Register.EAX);
+		os.writeADD(X86Register.EDX, X86Register.EAX);
 		os.setObjectRef(label);
 		os.writeNOP();
 		os.writeLOOP(label);
 		os.writeTEST_AL(0xff);
-		os.writeTEST(Register.EBX, 0xABCD1234);
-		os.writeCMPXCHG_EAX(Register.EDX, 4, Register.ECX, false);
-		os.writeLEA(Register.ESI, Register.ESI, Register.EBX, 8, 4);
-		os.writeCMPXCHG_EAX(Register.EDX, 4, Register.ECX, true);
+		os.writeTEST(X86Register.EBX, 0xABCD1234);
+		os.writeCMPXCHG_EAX(X86Register.EDX, 4, X86Register.ECX, false);
+		os.writeLEA(X86Register.ESI, X86Register.ESI, X86Register.EBX, 8, 4);
+		os.writeCMPXCHG_EAX(X86Register.EDX, 4, X86Register.ECX, true);
 		os.writeJMP(label, 2, false);
 		os.writeCALL(label, 4, false);
-		os.writeTEST(Register.ECX, Register.EBX);
-		os.writeCMOVcc(X86Constants.JLE, Register.EAX, Register.EBX);
-		os.writeCMOVcc(X86Constants.JE, Register.EAX, Register.EBX, 5);
-		os.writeADD(Register.EAX, 28, 11);
-		os.writeCALL(Register.EAX, 28);
-		os.writeCMP(Register.EAX, Register.ECX, 4);
-		os.writeCMP(Register.EAX, 4, Register.ECX);
+		os.writeTEST(X86Register.ECX, X86Register.EBX);
+		os.writeCMOVcc(X86Constants.JLE, X86Register.EAX, X86Register.EBX);
+		os.writeCMOVcc(X86Constants.JE, X86Register.EAX, X86Register.EBX, 5);
+		os.writeADD(X86Register.EAX, 28, 11);
+		os.writeCALL(X86Register.EAX, 28);
+		os.writeCMP(X86Register.EAX, X86Register.ECX, 4);
+		os.writeCMP(X86Register.EAX, 4, X86Register.ECX);
 		os.writePrefix(X86Constants.FS_PREFIX);
-		os.writeCMP_MEM(Register.ESP, 24);
-		os.writeMOV_Const(Register.ESP, 4, 24);
-		os.writeSBB(Register.EDX, 5);
-		os.writeSBB(Register.EDX, 305);
+		os.writeCMP_MEM(X86Register.ESP, 24);
+		os.writeMOV_Const(X86Register.ESP, 4, 24);
+		os.writeSBB(X86Register.EDX, 5);
+		os.writeSBB(X86Register.EDX, 305);
 		
 		final Label jt = new Label("Jumptable");
-		os.writeSHL(Register.ECX, 2);
-		os.writeJMP(jt, Register.ECX);
+		os.writeSHL(X86Register.ECX, 2);
+		os.writeJMP(jt, X86Register.ECX);
 		os.setObjectRef(jt);
 		os.write32(0x1234ABCD);
 		os.write32(0xFFEEDDCC);
 		
 		
-		os.writeJMP(Register.EDX, 15);
-		os.writeADD(Register.EDX, Register.EBX, 5);
-		os.writeSUB(Register.EDX, 3);
-		os.writeINC(Register.EBX, 67); // INC [reg+67]
-		os.writeCMP_Const(Register.ECX, 0xF, 0x12);
-		os.writeCMP_Const(Register.ECX, 0x4, 0x1234);
-		os.writeMOV_Const(Register.EDI, Register.EAX, 4, 0x09, 0x1234);
+		os.writeJMP(X86Register.EDX, 15);
+		os.writeADD(X86Register.EDX, X86Register.EBX, 5);
+		os.writeSUB(X86Register.EDX, 3);
+		os.writeINC(X86Register.EBX, 67); // INC [reg+67]
+		os.writeCMP_Const(X86Register.ECX, 0xF, 0x12);
+		os.writeCMP_Const(X86Register.ECX, 0x4, 0x1234);
+		os.writeMOV_Const(X86Register.EDI, X86Register.EAX, 4, 0x09, 0x1234);
 
-		os.writeSETCC(Register.EDX, X86Constants.JA);
+		os.writeSETCC(X86Register.EDX, X86Constants.JA);
 
-		os.writeADD(Register.EAX, 28, 11);
-		os.writeADD(Register.EAX, 28, 255);
+		os.writeADD(X86Register.EAX, 28, 11);
+		os.writeADD(X86Register.EAX, 28, 255);
 		
-		os.writeSUB(Register.EAX, 11);
-		os.writeSUB(Register.EAX, 255);
+		os.writeSUB(X86Register.EAX, 11);
+		os.writeSUB(X86Register.EAX, 255);
 
-		os.writeSUB(Register.EAX, 28, 11);
-		os.writeSUB(Register.EAX, 28, 255);
+		os.writeSUB(X86Register.EAX, 28, 11);
+		os.writeSUB(X86Register.EAX, 28, 255);
 
-		os.writeTEST(Register.EDI, 0x40, 0xFFFFFFFF);
+		os.writeTEST(X86Register.EDI, 0x40, 0xFFFFFFFF);
 		
-		os.writeFLD32(Register.EAX, Register.ESI, 4, 15);
-		os.writeFLD64(Register.EAX, Register.ESI, 8, 15);
+		os.writeFLD32(X86Register.EAX, X86Register.ESI, 4, 15);
+		os.writeFLD64(X86Register.EAX, X86Register.ESI, 8, 15);
 		
-		os.writeCALL(Register.EAX, Register.EDX, 1, 0);
-		os.writeCALL(Register.EAX);
-		os.writeCALL(Register.ESI);
+		os.writeCALL(X86Register.EAX, X86Register.EDX, 1, 0);
+		os.writeCALL(X86Register.EAX);
+		os.writeCALL(X86Register.ESI);
 		
-		os.writeXCHG(Register.EAX, Register.EDX);
-		os.writeXCHG(Register.ESI, Register.EAX);
-		os.writeXCHG(Register.ECX, Register.EBX);
+		os.writeXCHG(X86Register.EAX, X86Register.EDX);
+		os.writeXCHG(X86Register.ESI, X86Register.EAX);
+		os.writeXCHG(X86Register.ECX, X86Register.EBX);
 
-		os.writeXCHG(Register.EAX, 13, Register.EDX);
-		os.writeXCHG(Register.ECX, 13, Register.EBX);
+		os.writeXCHG(X86Register.EAX, 13, X86Register.EDX);
+		os.writeXCHG(X86Register.ECX, 13, X86Register.EBX);
 
-		os.writeMOV(X86Constants.BITS8, Register.ECX, Register.EBX, 1, 4, Register.ESI);
-		os.writeMOV(X86Constants.BITS8, Register.EDX, Register.ECX, Register.EBX, 1, 4);
-		os.writeMOVSX(Register.EDX, Register.EDX, X86Constants.BITS8);
+		os.writeMOV(X86Constants.BITS8, X86Register.ECX, X86Register.EBX, 1, 4, X86Register.ESI);
+		os.writeMOV(X86Constants.BITS8, X86Register.EDX, X86Register.ECX, X86Register.EBX, 1, 4);
+		os.writeMOVSX(X86Register.EDX, X86Register.EDX, X86Constants.BITS8);
 
-		os.writeSAR(Register.EBP, 16, 16);
-		os.writeSAR(Register.EBP, 16, 24);
+		os.writeSAR(X86Register.EBP, 16, 16);
+		os.writeSAR(X86Register.EBP, 16, 24);
 		
-		os.writeMOVZX(Register.EBX, Register.EBX, X86Constants.BITS16);
-		os.writeAND(Register.EBX, 0x0000FFFF);
+		os.writeMOVZX(X86Register.EBX, X86Register.EBX, X86Constants.BITS16);
+		os.writeAND(X86Register.EBX, 0x0000FFFF);
 		
 		FileOutputStream fos = new FileOutputStream("test.bin");
 		os.writeTo(fos);

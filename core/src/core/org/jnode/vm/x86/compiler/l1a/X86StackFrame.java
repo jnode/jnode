@@ -24,7 +24,7 @@ package org.jnode.vm.x86.compiler.l1a;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream.ObjectRef;
 import org.jnode.assembler.x86.AbstractX86Stream;
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Stream;
 import org.jnode.vm.classmgr.VmByteCode;
@@ -140,8 +140,8 @@ class X86StackFrame implements X86CompilerConstants {
 
 		/* Go restore the previous current frame */
 		emitSynchronizationCode(context.getMonitorExitMethod());
-		os.writeLEA(Register.ESP, Register.EBP, EbpFrameRefOffset);
-		os.writePOP(Register.EBP);
+		os.writeLEA(X86Register.ESP, X86Register.EBP, EbpFrameRefOffset);
+		os.writePOP(X86Register.EBP);
 		restoreRegisters();
 		// Return
 		if (argSlotCount > 0) {
@@ -158,7 +158,7 @@ class X86StackFrame implements X86CompilerConstants {
         // Test stack overflow        
         final int stackEndOffset = context.getVmProcessorStackEnd().getOffset();
         os.writePrefix(X86Constants.FS_PREFIX);
-        os.writeCMP_MEM(Register.ESP, stackEndOffset);
+        os.writeCMP_MEM(X86Register.ESP, stackEndOffset);
         os.writeJCC(stackOverflowLabel, X86Constants.JLE);
 		
 		// Create class initialization code (if needed)
@@ -169,20 +169,20 @@ class X86StackFrame implements X86CompilerConstants {
 
 		// Fixed framelayout
 		saveRegisters();
-		os.writePUSH(Register.EBP);
+		os.writePUSH(X86Register.EBP);
 		os.writePUSH(context.getMagic());
 		//os.writePUSH(0); // PC, which is only used in interpreted methods
 		/** EAX MUST contain the VmMethod structure upon entry of the method */
-		os.writePUSH(Register.EAX);
-		os.writeMOV(INTSIZE, Register.EBP, Register.ESP);
+		os.writePUSH(X86Register.EAX);
+		os.writeMOV(INTSIZE, X86Register.EBP, X86Register.ESP);
 
 		// Emit the code to create the locals
 		final int noLocalVars = maxLocals - argSlotCount;
 		// Create and clear all local variables
 		if (noLocalVars > 0) {
-			os.writeXOR(Register.EAX, Register.EAX);
+			os.writeXOR(X86Register.EAX, X86Register.EAX);
 			for (int i = 0; i < noLocalVars; i++) {
-				os.writePUSH(Register.EAX);
+				os.writePUSH(X86Register.EAX);
 			}
 		}
 
@@ -218,9 +218,9 @@ class X86StackFrame implements X86CompilerConstants {
 				System.out.println("@#@#@#@# noLocalVars = " + noLocalVars);
 			}
 			final int ofs = Math.max(0, noLocalVars) * 4;
-			os.writeLEA(Register.ESP, Register.EBP, -ofs);
+			os.writeLEA(X86Register.ESP, X86Register.EBP, -ofs);
 			/** Push the exception in EAX */
-			os.writePUSH(Register.EAX);
+			os.writePUSH(X86Register.EAX);
 			/** Goto the real handler */
 			os.writeJMP(helper.getInstrLabel(eh.getHandlerPC()));
 
@@ -238,8 +238,8 @@ class X86StackFrame implements X86CompilerConstants {
 		Label handlerLabel = helper.genLabel("$$def-ex-handler");
 		cm.setDefExceptionHandler(os.setObjectRef(handlerLabel));
 		emitSynchronizationCode(context.getMonitorExitMethod());
-		os.writeLEA(Register.ESP, Register.EBP, EbpFrameRefOffset);
-		os.writePOP(Register.EBP);
+		os.writeLEA(X86Register.ESP, X86Register.EBP, EbpFrameRefOffset);
+		os.writePOP(X86Register.EBP);
 		restoreRegisters();
 		/**
 		 * Do not do a ret here, this way the return address will be used by
@@ -291,22 +291,22 @@ class X86StackFrame implements X86CompilerConstants {
 
 	private void emitSynchronizationCode(VmMethod monitorMethod) {
 		if (method.isSynchronized()) {
-			os.writePUSH(Register.EAX);
-			os.writePUSH(Register.EDX);
+			os.writePUSH(X86Register.EAX);
+			os.writePUSH(X86Register.EDX);
 			//System.out.println("synchr. " + method);
 			if (method.isStatic()) {
 				// Get declaring class
 				final int declaringClassOffset = context
 						.getVmMemberDeclaringClassField().getOffset();
-				writeGetMethodRef(Register.EAX);
-				os.writePUSH(Register.EAX, declaringClassOffset);
+				writeGetMethodRef(X86Register.EAX);
+				os.writePUSH(X86Register.EAX, declaringClassOffset);
 				//os.writePUSH(method.getDeclaringClass());
 			} else {
-				os.writePUSH(Register.EBP, getEbpOffset(0));
+				os.writePUSH(X86Register.EBP, getEbpOffset(0));
 			}
 			helper.invokeJavaMethod(monitorMethod);
-			os.writePOP(Register.EDX);
-			os.writePOP(Register.EAX);
+			os.writePOP(X86Register.EDX);
+			os.writePOP(X86Register.EAX);
 		}
 	}
 
@@ -314,14 +314,14 @@ class X86StackFrame implements X86CompilerConstants {
 	 * Push the method reference in the current stackframe onto the stack
 	 */
 	public final void writePushMethodRef() {
-		os.writePUSH(Register.EBP, EbpMethodRefOffset);
+		os.writePUSH(X86Register.EBP, EbpMethodRefOffset);
 	}
 
 	/**
 	 * Write code to copy the method reference into the dst register.
 	 */
-	public final void writeGetMethodRef(Register dst) {
-		os.writeMOV(INTSIZE, dst, Register.EBP, EbpMethodRefOffset);
+	public final void writeGetMethodRef(X86Register dst) {
+		os.writeMOV(INTSIZE, dst, X86Register.EBP, EbpMethodRefOffset);
 	}
 
 	/**

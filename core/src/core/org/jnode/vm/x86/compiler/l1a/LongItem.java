@@ -22,7 +22,7 @@
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
@@ -51,7 +51,7 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
      * @param msb
      * @param val
      */
-    final void initialize(int kind, int offsetToFP, Register lsb, Register msb,
+    final void initialize(int kind, int offsetToFP, X86Register lsb, X86Register msb,
             long val) {
         super.initialize(kind, offsetToFP, lsb, msb);
         this.value = val;
@@ -65,7 +65,7 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
      * @param msb
      */
     protected final void loadToConstant(EmitterContext ec,
-            AbstractX86Stream os, Register lsb, Register msb) {
+            AbstractX86Stream os, X86Register lsb, X86Register msb) {
         
         if (value != 0) {
             final int lsbv = (int) (value & 0xFFFFFFFFL);
@@ -86,7 +86,7 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
      * @param reg
      * @param disp
      */
-    protected void popFromFPU(AbstractX86Stream os, Register reg, int disp) {
+    protected void popFromFPU(AbstractX86Stream os, X86Register reg, int disp) {
         os.writeFISTP64(reg, disp);
     }
 
@@ -107,7 +107,7 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
      * @param reg
      * @param disp
      */
-    protected void pushToFPU(AbstractX86Stream os, Register reg, int disp) {
+    protected void pushToFPU(AbstractX86Stream os, X86Register reg, int disp) {
         os.writeFILD64(reg, disp);
     }
 

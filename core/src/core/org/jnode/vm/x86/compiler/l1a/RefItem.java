@@ -23,7 +23,7 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.AbstractX86Stream;
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.classmgr.VmConstString;
@@ -48,7 +48,7 @@ final class RefItem extends WordItem implements X86CompilerConstants {
 	    super(factory);
 	}
 
-	final void initialize(int kind, int offsetToFP, Register reg, VmConstString val) {
+	final void initialize(int kind, int offsetToFP, X86Register reg, VmConstString val) {
 		super.initialize(kind, reg, offsetToFP);
 		this.value = val;
 	}
@@ -86,7 +86,7 @@ final class RefItem extends WordItem implements X86CompilerConstants {
 	 * @param reg
 	 */
 	protected void loadToConstant(EmitterContext ec, AbstractX86Stream os,
-			Register reg) {
+			X86Register reg) {
 		if (value == null) {
 			os.writeXOR(reg, reg);
 		} else {
@@ -103,7 +103,7 @@ final class RefItem extends WordItem implements X86CompilerConstants {
 	 * @param reg
 	 * @param disp
 	 */
-	protected void popFromFPU(AbstractX86Stream os, Register reg, int disp) {
+	protected void popFromFPU(AbstractX86Stream os, X86Register reg, int disp) {
 		notImplemented();
 	}
 
@@ -129,7 +129,7 @@ final class RefItem extends WordItem implements X86CompilerConstants {
 	 * @param reg
 	 * @param disp
 	 */
-	protected void pushToFPU(AbstractX86Stream os, Register reg, int disp) {
+	protected void pushToFPU(AbstractX86Stream os, X86Register reg, int disp) {
 		notImplemented();
 	}
 

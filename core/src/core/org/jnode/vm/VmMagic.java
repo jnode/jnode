@@ -108,6 +108,14 @@ public final class VmMagic {
 		return null;
 	}
 
+	/**
+	 * Gets the timestamp of the current processor.
+	 * @return
+	 */
+	public static long getTimeStamp() {
+		return 0;
+	}
+	
     /**
      * Do not instantiate this class.
      */

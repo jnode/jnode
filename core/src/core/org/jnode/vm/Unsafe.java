@@ -615,8 +615,6 @@ public final class Unsafe {
 	 */
 	protected static native Address getBootHeapEnd();
 
-	public static native long getTimeStampCounter();
-
 	/**
 	 * Gets information of the JNode kernel command line.
 	 * 

@@ -244,6 +244,7 @@ public class BaseMagicHelper {
     protected static final int mATOMICOR = 108;
     protected static final int mATOMICSUB = 109;
     protected static final int mGETCURRENTFRAME = 110;
+    protected static final int mGETTIMESTAMP = 111;
 
     private static final int mLOAD_MIN = mLOADBYTE;
 
@@ -323,6 +324,7 @@ public class BaseMagicHelper {
         addMethod("getObjectColor", mGETOBJECTCOLOR);
         addMethod("isFinalized", mISFINALIZED);
         addMethod("getCurrentFrame", mGETCURRENTFRAME);
+        addMethod("getTimeStamp", mGETTIMESTAMP);
     }
 
     protected static final int getClass(VmMethod method) {

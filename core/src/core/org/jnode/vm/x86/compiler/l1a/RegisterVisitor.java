@@ -21,7 +21,7 @@
  
 package org.jnode.vm.x86.compiler.l1a;
 
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 
 
 /**
@@ -29,6 +29,6 @@ import org.jnode.assembler.x86.Register;
  */
 public interface RegisterVisitor {
 
-    public void visit(Register reg);
+    public void visit(X86Register reg);
     
 }

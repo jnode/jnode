@@ -22,7 +22,7 @@
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 
@@ -45,7 +45,7 @@ final class DoubleItem extends DoubleWordItem {
 	 * @param offsetToFP
 	 * @param value
 	 */
-	final void initialize(int kind, int offsetToFP, Register lsb, Register msb,
+	final void initialize(int kind, int offsetToFP, X86Register lsb, X86Register msb,
 			double value) {
 		super.initialize(kind, offsetToFP, lsb, msb);
 		this.value = value;
@@ -85,7 +85,7 @@ final class DoubleItem extends DoubleWordItem {
 	 * @param msb
 	 */
 	protected final void loadToConstant(EmitterContext ec,
-			AbstractX86Stream os, Register lsb, Register msb) {
+			AbstractX86Stream os, X86Register lsb, X86Register msb) {
 		final long lvalue = Double.doubleToLongBits(value);
 		final int lsbv = (int) (lvalue & 0xFFFFFFFFL);
 		final int msbv = (int) ((lvalue >>> 32) & 0xFFFFFFFFL);
@@ -101,7 +101,7 @@ final class DoubleItem extends DoubleWordItem {
 	 * @param reg
 	 * @param disp
 	 */
-	protected void popFromFPU(AbstractX86Stream os, Register reg, int disp) {
+	protected void popFromFPU(AbstractX86Stream os, X86Register reg, int disp) {
 		os.writeFSTP64(reg, disp);
 	}
 
@@ -125,7 +125,7 @@ final class DoubleItem extends DoubleWordItem {
 	 * @param reg
 	 * @param disp
 	 */
-	protected void pushToFPU(AbstractX86Stream os, Register reg, int disp) {
+	protected void pushToFPU(AbstractX86Stream os, X86Register reg, int disp) {
 		os.writeFLD64(reg, disp);
 	}
 }

@@ -23,7 +23,7 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.AbstractX86Stream;
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.system.BootLog;
 import org.jnode.vm.JvmType;
@@ -56,7 +56,7 @@ final class FPUHelper implements X86CompilerConstants {
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
-			final Register reg;
+			final X86Register reg;
 			reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, true);
 			final Item result = fpuStack.getItem(reg);
 			fpuStack.pop();
@@ -86,7 +86,7 @@ final class FPUHelper implements X86CompilerConstants {
 
 		// Prepare operands
 		final FPUStack fpuStack = vstack.fpuStack;
-		final Register reg;
+		final X86Register reg;
 		reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, false);
 		// We need reg to be ST1.
 		fxchST1(os, fpuStack, reg);
@@ -94,14 +94,14 @@ final class FPUHelper implements X86CompilerConstants {
 		final X86RegisterPool pool = ec.getPool();
 		pool.request(EAX);
 		final IntItem result = (IntItem)L1AHelper.requestWordRegister(ec, JvmType.INT, false);
-		final Register resr = result.getRegister();
+		final X86Register resr = result.getRegister();
 		
 		// Clear resultr
 		os.writeXOR(resr, resr);
 
 		if (!gt) {
 			// Reverse order
-			fxch(os, fpuStack, Register.ST1);
+			fxch(os, fpuStack, X86Register.ST1);
 		}
 		os.writeFUCOMPP(); // Compare, Pop twice
 		os.writeFNSTSW_AX(); // Store fp status word in AX
@@ -206,7 +206,7 @@ final class FPUHelper implements X86CompilerConstants {
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
-			final Register reg;
+			final X86Register reg;
 			reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, false);
 			final Item result = fpuStack.getItem(reg);
 			fpuStack.pop();
@@ -250,7 +250,7 @@ final class FPUHelper implements X86CompilerConstants {
 	 */
 	static final void fxch(AbstractX86Stream os, FPUStack fpuStack, Item item) {
 		if (!fpuStack.isTos(item)) {
-			final Register fpuReg = fpuStack.getRegister(item);
+			final X86Register fpuReg = fpuStack.getRegister(item);
 			fxch(os, fpuStack, fpuReg);
 		}
 	}
@@ -263,8 +263,8 @@ final class FPUHelper implements X86CompilerConstants {
 	 * @param fpuReg
 	 */
 	static final void fxch(AbstractX86Stream os, FPUStack fpuStack,
-			Register fpuReg) {
-		if (fpuReg == Register.ST0) {
+			X86Register fpuReg) {
+		if (fpuReg == X86Register.ST0) {
 			throw new StackException("Cannot fxch ST0");
 		}
 		os.writeFXCH(fpuReg);
@@ -279,12 +279,12 @@ final class FPUHelper implements X86CompilerConstants {
 	 * @param fpuReg
 	 */
 	private static final void fxchST1(AbstractX86Stream os, FPUStack fpuStack,
-			Register fpuReg) {
+			X86Register fpuReg) {
 		// We need reg to be ST1, if not swap
-		if (fpuReg != Register.ST1) {
+		if (fpuReg != X86Register.ST1) {
 			// Swap reg with ST0
 			fxch(os, fpuStack, fpuReg);
-			fxch(os, fpuStack, Register.ST1);
+			fxch(os, fpuStack, X86Register.ST1);
 			fxch(os, fpuStack, fpuReg);
 		}
 	}
@@ -325,7 +325,7 @@ final class FPUHelper implements X86CompilerConstants {
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
-			final Register reg;
+			final X86Register reg;
 			reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, true);
 			final Item result = fpuStack.getItem(reg);
 			fpuStack.pop();
@@ -381,7 +381,7 @@ final class FPUHelper implements X86CompilerConstants {
 			// Operand is on the FPU stack
 			if (!fpuStack.isTos(left)) {
 				// operand not on top, exchange it.
-				final Register reg = fpuStack.getRegister(left);
+				final X86Register reg = fpuStack.getRegister(left);
 				os.writeFXCH(reg);
 				fpuStack.fxch(reg);
 			}
@@ -402,12 +402,12 @@ final class FPUHelper implements X86CompilerConstants {
 	 * @param left
 	 * @param right
 	 */
-	private final static Register prepareForOperation(AbstractX86Stream os,
+	private final static X86Register prepareForOperation(AbstractX86Stream os,
 			EmitterContext ec, VirtualStack vstack, FPUStack fpuStack,
 			Item left, Item right, boolean commutative) {
 		final boolean lOnFpu = left.isFPUStack();
 		final boolean rOnFpu = right.isFPUStack();
-		final Register reg;
+		final X86Register reg;
 
 		// If the FPU stack will be full in this operation, we flush the vstack
 		// first.
@@ -444,7 +444,7 @@ final class FPUHelper implements X86CompilerConstants {
 			// Neither operands are on the FPU stack
 			left.pushToFPU(ec);
 			right.pushToFPU(ec); // Now right is on top
-			reg = Register.ST1; // Left is just below top
+			reg = X86Register.ST1; // Left is just below top
 			if (!commutative) {
 				fxch(os, fpuStack, reg);
 			}
@@ -485,7 +485,7 @@ final class FPUHelper implements X86CompilerConstants {
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
-			final Register reg;
+			final X86Register reg;
 			reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, false);
 			// We need reg to be ST1, if not swap
 			fxchST1(os, fpuStack, reg);
@@ -494,9 +494,9 @@ final class FPUHelper implements X86CompilerConstants {
 			fpuStack.pop();
 
 			// Calculate
-			os.writeFXCH(Register.ST1);
+			os.writeFXCH(X86Register.ST1);
 			os.writeFPREM();
-			os.writeFSTP(Register.ST1);
+			os.writeFSTP(X86Register.ST1);
 
 			// Push result
 			vstack.push(fpuStack.tos());
@@ -523,7 +523,7 @@ final class FPUHelper implements X86CompilerConstants {
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
-			final Register reg;
+			final X86Register reg;
 			reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, false);
 			final Item result = fpuStack.getItem(reg);
 			fpuStack.pop();

@@ -22,7 +22,7 @@
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.bytecode.TypeStack;
@@ -348,7 +348,7 @@ final class VirtualStack {
     //    }
     //
 
-    boolean uses(Register reg) {
+    boolean uses(X86Register reg) {
         for (int i = 0; i < tos; i++) {
             if (stack[i].uses(reg)) {
                 return true;
@@ -435,7 +435,7 @@ final class VirtualStack {
          * @see org.jnode.vm.x86.compiler.AbstractX86StackManager#writePUSH(int,
          *      org.jnode.assembler.x86.Register)
          */
-        public void writePUSH(int jvmType, Register reg) {
+        public void writePUSH(int jvmType, X86Register reg) {
             final Item item = ifac.createReg(jvmType, reg);
             if (Vm.VerifyAssertions)
                 Vm._assert(pool.request(reg, item), "request");
@@ -447,7 +447,7 @@ final class VirtualStack {
          *      org.jnode.assembler.x86.Register,
          *      org.jnode.assembler.x86.Register)
          */
-        public void writePUSH64(int jvmType, Register lsbReg, Register msbReg) {
+        public void writePUSH64(int jvmType, X86Register lsbReg, X86Register msbReg) {
             final Item item = ifac.createReg(jvmType, lsbReg, msbReg);
             if (Vm.VerifyAssertions) {
                 Vm._assert(pool.request(lsbReg, item), "request-lsb");

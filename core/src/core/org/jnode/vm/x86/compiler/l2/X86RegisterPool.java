@@ -21,7 +21,7 @@
  
 package org.jnode.vm.x86.compiler.l2;
 
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.util.BootableArrayList;
 import org.jnode.vm.compiler.ir.Operand;
 import org.jnode.vm.compiler.ir.RegisterPool;
@@ -36,10 +36,10 @@ public class X86RegisterPool extends RegisterPool {
 
 	public X86RegisterPool() {
 		registers = new BootableArrayList();
-		registers.add(Register.EDX);
-		registers.add(Register.ECX);
-		registers.add(Register.EBX);
-		registers.add(Register.EAX);
+		registers.add(X86Register.EDX);
+		registers.add(X86Register.ECX);
+		registers.add(X86Register.EBX);
+		registers.add(X86Register.EAX);
 //        registers.add(Register.ESI);
 //        registers.add(Register.EDI);
 //		// not sure what to do with ESI and EDI just yet...

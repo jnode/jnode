@@ -23,7 +23,7 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import java.util.ArrayList;
 
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.util.Counter;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
@@ -142,7 +142,7 @@ final class ItemFactory {
      * @param jvmType
      * @param reg
      */
-    public WordItem createReg(int jvmType, Register reg) {
+    public WordItem createReg(int jvmType, X86Register reg) {
         final WordItem item = (WordItem) getOrCreate(jvmType);
         item.initialize(Item.Kind.REGISTER, reg, 0);
         return item;
@@ -155,7 +155,7 @@ final class ItemFactory {
      * @param lsb
      * @param msb
      */
-    public DoubleWordItem createReg(int jvmType, Register lsb, Register msb) {
+    public DoubleWordItem createReg(int jvmType, X86Register lsb, X86Register msb) {
         final DoubleWordItem item = (DoubleWordItem) getOrCreate(jvmType);
         item.initialize(Item.Kind.REGISTER, 0, lsb, msb);
         return item;

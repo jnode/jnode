@@ -22,7 +22,7 @@
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
@@ -128,7 +128,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem addr = vstack.popRef();
             addr.load(ec);
-            final Register r = addr.getRegister();
+            final X86Register r = addr.getRegister();
             addr.release(ec);
             L1AHelper.requestRegister(ec, r);
             final IntItem result = (IntItem) ifac.createReg(JvmType.INT, r);
@@ -151,10 +151,10 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem addr = vstack.popRef();
             addr.load(ec);
-            final Register r = addr.getRegister();
+            final X86Register r = addr.getRegister();
             addr.release(ec);
             L1AHelper.requestRegister(ec, r);
-            final Register msb = L1AHelper.requestRegister(ec, JvmType.INT,
+            final X86Register msb = L1AHelper.requestRegister(ec, JvmType.INT,
                     false);
             final LongItem result = (LongItem) ifac.createReg(JvmType.LONG, r,
                     msb);
@@ -168,7 +168,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem result = (RefItem) L1AHelper.requestWordRegister(ec,
                     JvmType.REFERENCE, false);
-            final Register r = result.getRegister();
+            final X86Register r = result.getRegister();
             os.writeMOV_Const(r, 0xFFFFFFFF);
             vstack.push(result);
         }
@@ -177,7 +177,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem result = (RefItem) L1AHelper.requestWordRegister(ec,
                     JvmType.REFERENCE, false);
-            final Register r = result.getRegister();
+            final X86Register r = result.getRegister();
             os.writeMOV_Const(r, 1);
             vstack.push(result);
         }
@@ -193,8 +193,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             final WordItem addr = vstack.popRef();
             addr.load(ec);
             final IntItem result = (IntItem)L1AHelper.requestWordRegister(ec, JvmType.INT, true);
-            final Register addrr = addr.getRegister();
-            final Register resultr = result.getRegister();
+            final X86Register addrr = addr.getRegister();
+            final X86Register resultr = result.getRegister();
             os.writeXOR(resultr, resultr);
             os.writeCMP_Const(addrr, 0xFFFFFFFF);
             os.writeSETCC(resultr, X86Constants.JE);
@@ -208,8 +208,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             final WordItem addr = vstack.popRef();
             addr.load(ec);
             final IntItem result = (IntItem)L1AHelper.requestWordRegister(ec, JvmType.INT, true);
-            final Register addrr = addr.getRegister();
-            final Register resultr = result.getRegister();
+            final X86Register addrr = addr.getRegister();
+            final X86Register resultr = result.getRegister();
             os.writeXOR(resultr, resultr);
             os.writeTEST(addrr, addrr);
             os.writeSETCC(resultr, X86Constants.JZ);
@@ -236,7 +236,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             other.load(ec);
             addr.load(ec);
             final IntItem result = (IntItem)L1AHelper.requestWordRegister(ec, JvmType.INT, true);
-            final Register resultr = result.getRegister();
+            final X86Register resultr = result.getRegister();
             os.writeXOR(resultr, resultr);
             os.writeCMP(addr.getRegister(), other.getRegister());
             os.writeSETCC(resultr, methodToCC(mcode));
@@ -251,7 +251,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final WordItem addr = vstack.popInt();
             addr.load(ec);
-            final Register r = addr.getRegister();
+            final X86Register r = addr.getRegister();
             addr.release(ec);
             vstack.push(L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, r));
         }
@@ -268,7 +268,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final LongItem addr = vstack.popLong();
             addr.load(ec);
-            final Register r = addr.getLsbRegister();
+            final X86Register r = addr.getLsbRegister();
             addr.release(ec);
             vstack.push(L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, r));
         }
@@ -282,8 +282,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             final IntItem cnt = vstack.popInt();
             final RefItem addr = vstack.popRef();
             if (!cnt.isConstant()) {
-                L1AHelper.requestRegister(ec, Register.ECX);
-                cnt.loadTo(ec, Register.ECX);
+                L1AHelper.requestRegister(ec, X86Register.ECX);
+                cnt.loadTo(ec, X86Register.ECX);
             }
             addr.load(ec);
             final int shift = methodToShift(mcode);
@@ -302,7 +302,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final RefItem addr = vstack.popRef();
             addr.loadToBITS8GPR(ec);
-            final Register r = addr.getRegister();
+            final X86Register r = addr.getRegister();
             addr.release(ec);
             if (mcode == mLOADCHAR) {
                 os.writeMOVZX(r, r, 0, methodToSize(mcode));                
@@ -323,7 +323,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final RefItem addr = vstack.popRef();
             addr.load(ec);
-            final Register r = addr.getRegister();
+            final X86Register r = addr.getRegister();
             addr.release(ec);
             os.writeMOV(X86CompilerConstants.INTSIZE, r, r, 0);
             vstack.push(L1AHelper.requestWordRegister(ec, methodToType(mcode), r));
@@ -333,8 +333,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final RefItem addr = vstack.popRef();
             addr.load(ec);
-            final Register r = addr.getRegister();
-            final Register msb = L1AHelper.requestRegister(ec, JvmType.INT, false);
+            final X86Register r = addr.getRegister();
+            final X86Register msb = L1AHelper.requestRegister(ec, JvmType.INT, false);
             addr.release(ec);
             L1AHelper.releaseRegister(ec, msb);
             os.writeMOV(X86CompilerConstants.INTSIZE, msb, r, X86CompilerConstants.MSB);
@@ -349,8 +349,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem addr = vstack.popRef();
             ofs.load(ec);
             addr.load(ec);
-            final Register ofsr = ofs.getRegister();
-            final Register r = addr.getRegister();
+            final X86Register ofsr = ofs.getRegister();
+            final X86Register r = addr.getRegister();
             ofs.release(ec);
             addr.release(ec);
             os.writeLEA(r, r, ofsr, 1, 0);
@@ -375,8 +375,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem addr = vstack.popRef();
             ofs.load(ec);
             addr.load(ec);
-            final Register ofsr = ofs.getRegister();
-            final Register r = addr.getRegister();
+            final X86Register ofsr = ofs.getRegister();
+            final X86Register r = addr.getRegister();
             ofs.release(ec);
             addr.release(ec);
             os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ofsr, 1, 0);
@@ -389,9 +389,9 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem addr = vstack.popRef();
             ofs.load(ec);
             addr.load(ec);
-            final Register ofsr = ofs.getRegister();
-            final Register r = addr.getRegister();
-            final Register msb = L1AHelper.requestRegister(ec, JvmType.INT, false);
+            final X86Register ofsr = ofs.getRegister();
+            final X86Register r = addr.getRegister();
+            final X86Register msb = L1AHelper.requestRegister(ec, JvmType.INT, false);
             os.writeMOV(X86CompilerConstants.INTSIZE, msb, r, ofsr, 1, X86CompilerConstants.MSB);
             os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ofsr, 1, X86CompilerConstants.LSB);
             ofs.release(ec);
@@ -407,8 +407,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem addr = vstack.popRef();
             val.loadToBITS8GPR(ec);
             addr.load(ec);
-            final Register r = addr.getRegister();
-            final Register valr = val.getRegister();
+            final X86Register r = addr.getRegister();
+            final X86Register valr = val.getRegister();
             os.writeMOV(methodToSize(mcode), r, 0, valr);
             val.release(ec);
             addr.release(ec);
@@ -423,8 +423,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem addr = vstack.popRef();
             val.load(ec);
             addr.load(ec);
-            final Register r = addr.getRegister();
-            final Register valr = val.getRegister();
+            final X86Register r = addr.getRegister();
+            final X86Register valr = val.getRegister();
             os.writeMOV(X86CompilerConstants.INTSIZE, r, 0, valr);
             val.release(ec);
             addr.release(ec);
@@ -436,9 +436,9 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem addr = vstack.popRef();
             val.load(ec);
             addr.load(ec);
-            final Register r = addr.getRegister();
-            final Register lsb = val.getLsbRegister();
-            final Register msb = val.getMsbRegister();
+            final X86Register r = addr.getRegister();
+            final X86Register lsb = val.getLsbRegister();
+            final X86Register msb = val.getMsbRegister();
             os.writeMOV(X86CompilerConstants.INTSIZE, r, X86CompilerConstants.LSB, lsb);
             os.writeMOV(X86CompilerConstants.INTSIZE, r, X86CompilerConstants.MSB, msb);
             val.release(ec);
@@ -454,9 +454,9 @@ final class MagicHelper extends BaseX86MagicHelper {
             ofs.load(ec);
             val.loadToBITS8GPR(ec);
             addr.load(ec);
-            final Register r = addr.getRegister();
-            final Register ofsr = ofs.getRegister();            
-            final Register valr = val.getRegister();
+            final X86Register r = addr.getRegister();
+            final X86Register ofsr = ofs.getRegister();            
+            final X86Register valr = val.getRegister();
             os.writeMOV(methodToSize(mcode), r, ofsr, 1, 0, valr);
             ofs.release(ec);
             val.release(ec);
@@ -474,9 +474,9 @@ final class MagicHelper extends BaseX86MagicHelper {
             ofs.load(ec);
             val.load(ec);
             addr.load(ec);
-            final Register r = addr.getRegister();
-            final Register ofsr = ofs.getRegister();            
-            final Register valr = val.getRegister();
+            final X86Register r = addr.getRegister();
+            final X86Register ofsr = ofs.getRegister();            
+            final X86Register valr = val.getRegister();
             os.writeMOV(X86CompilerConstants.INTSIZE, r, ofsr, 1, 0, valr);
             ofs.release(ec);
             val.release(ec);
@@ -491,10 +491,10 @@ final class MagicHelper extends BaseX86MagicHelper {
             ofs.load(ec);
             val.load(ec);
             addr.load(ec);
-            final Register r = addr.getRegister();
-            final Register ofsr = ofs.getRegister();            
-            final Register lsb = val.getLsbRegister();
-            final Register msb = val.getMsbRegister();
+            final X86Register r = addr.getRegister();
+            final X86Register ofsr = ofs.getRegister();            
+            final X86Register lsb = val.getLsbRegister();
+            final X86Register msb = val.getMsbRegister();
             os.writeMOV(X86CompilerConstants.INTSIZE, r, ofsr, 1, X86CompilerConstants.LSB, lsb);
             os.writeMOV(X86CompilerConstants.INTSIZE, r, ofsr, 1, X86CompilerConstants.MSB, msb);
             ofs.release(ec);
@@ -510,7 +510,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             final WordItem val = (WordItem)vstack.pop();
             final WordItem old = (WordItem)vstack.pop();
             final RefItem addr = vstack.popRef();
-            final Register eax = Register.EAX;
+            final X86Register eax = X86Register.EAX;
             if (!old.uses(eax)) {
                 L1AHelper.requestRegister(ec, eax, old);
                 val.load(ec);
@@ -520,8 +520,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             }
             addr.load(ec);
 
-            final Register r = addr.getRegister();
-            final Register valr = val.getRegister();
+            final X86Register r = addr.getRegister();
+            final X86Register valr = val.getRegister();
             os.writeCMPXCHG_EAX(r, 0, valr, true);
             os.writeSETCC(eax, X86Constants.JZ);
             os.writeAND(eax, 0xFF);
@@ -541,7 +541,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             final WordItem val = (WordItem)vstack.pop();
             final WordItem old = (WordItem)vstack.pop();
             final RefItem addr = vstack.popRef();
-            final Register eax = Register.EAX;
+            final X86Register eax = X86Register.EAX;
             if (!old.uses(eax)) {
                 L1AHelper.requestRegister(ec, eax, old);
                 ofs.load(ec);
@@ -553,9 +553,9 @@ final class MagicHelper extends BaseX86MagicHelper {
             }
             addr.load(ec);
 
-            final Register r = addr.getRegister();
-            final Register valr = val.getRegister();
-            final Register ofsr = ofs.getRegister();
+            final X86Register r = addr.getRegister();
+            final X86Register valr = val.getRegister();
+            final X86Register ofsr = ofs.getRegister();
             os.writeLEA(r, r, ofsr, 1, 0);
             os.writeCMPXCHG_EAX(r, 0, valr, true);
             os.writeSETCC(eax, X86Constants.JZ);
@@ -572,7 +572,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem obj = vstack.popRef();
             obj.load(ec);
-            final Register r = obj.getRegister();
+            final X86Register r = obj.getRegister();
             // Get TIB
             os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ObjectLayout.TIB_SLOT * 4);
             // Get VmType
@@ -583,7 +583,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem obj = vstack.popRef();
             obj.load(ec);
-            final Register r = obj.getRegister();
+            final X86Register r = obj.getRegister();
             // Get TIB
             os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ObjectLayout.TIB_SLOT * 4);
             vstack.push(obj);
@@ -592,7 +592,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem obj = vstack.popRef();
             obj.load(ec);
-            final Register r = obj.getRegister();
+            final X86Register r = obj.getRegister();
             // Get flags
             os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ObjectLayout.FLAGS_SLOT * 4);
             obj.release(ec);
@@ -604,8 +604,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem obj = vstack.popRef();
             flags.load(ec);
             obj.load(ec);
-            final Register flagsr = flags.getRegister();
-            final Register r = obj.getRegister();
+            final X86Register flagsr = flags.getRegister();
+            final X86Register r = obj.getRegister();
             // Set flags
             os.writeMOV(X86CompilerConstants.INTSIZE, r, ObjectLayout.FLAGS_SLOT * 4, flagsr);
             flags.release(ec);
@@ -615,7 +615,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem obj = vstack.popRef();
             obj.load(ec);
-            final Register r = obj.getRegister();
+            final X86Register r = obj.getRegister();
             os.writeADD(r, VmArray.DATA_OFFSET * 4);
             vstack.push(obj);
         } break;
@@ -623,7 +623,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem obj = vstack.popRef();
             obj.load(ec);
-            final Register r = obj.getRegister();
+            final X86Register r = obj.getRegister();
             // Get flags
             os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ObjectLayout.FLAGS_SLOT * 4);
             os.writeAND(r, ObjectFlags.GC_COLOUR_MASK);
@@ -634,7 +634,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem obj = vstack.popRef();
             obj.load(ec);
-            final Register r = obj.getRegister();
+            final X86Register r = obj.getRegister();
             // Get flags
             os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ObjectLayout.FLAGS_SLOT * 4);
             os.writeAND(r, ObjectFlags.STATUS_FINALIZED);
@@ -650,8 +650,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem addr = vstack.popRef();
             value.load(ec);
             addr.load(ec);
-            final Register valuer = value.getRegister();
-            final Register r = addr.getRegister();
+            final X86Register valuer = value.getRegister();
+            final X86Register r = addr.getRegister();
             os.writePrefix(X86Constants.LOCK_PREFIX);
             os.writeArithOp(methodCodeToOperation(mcode), r, 0, valuer);
             value.release(ec);
@@ -660,8 +660,14 @@ final class MagicHelper extends BaseX86MagicHelper {
         case mGETCURRENTFRAME: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final WordItem result = L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, false);
-            final Register r = result.getRegister();
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, Register.EBP);
+            final X86Register r = result.getRegister();
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, X86Register.EBP);
+            vstack.push(result);
+        } break;
+        case mGETTIMESTAMP: {
+            if (Vm.VerifyAssertions) Vm._assert(isstatic);
+            final DoubleWordItem result = L1AHelper.requestDoubleWordRegisters(ec, JvmType.LONG, X86Register.EAX, X86Register.EDX);
+            os.writeRDTSC();
             vstack.push(result);
         } break;
             
