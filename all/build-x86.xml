@@ -3,7 +3,7 @@
   <property name="my-build.dir"     value="${build.dir}/x86"/>
   <property name="my-lib.dir"       value="${basedir}/lib/x86"/>
   <property name="my-conf.dir"      value="${basedir}/conf/x86"/>
-  
+
   <property name="src.native.dir"   value="${root.dir}/core/src/native"/>
   <property name="build.native.dir" value="${my-build.dir}/native"/>
   <property name="build.bootimage.dir" value="${my-build.dir}/bootimage"/>
@@ -11,15 +11,15 @@
   <property name="jnode.disk"     value="${build.dir}/jnodedisk.dat"/>
   <property name="jnode.disk.pln" value="${build.dir}/jnodedisk.pln"/>
   <property name="jnode.floppy"   value="${build.dir}/jnodefloppy.img"/>
-  
+
   <property name="grub-ver"     value="grub-0.93-i386-pc"/>
   <property name="grub.dir"     value="${my-build.dir}/${grub-ver}/boot/grub"/>
   <property name="grub.dist"    value="${my-lib.dir}/${grub-ver}.tar.gz"/>
-  
+
   <property name="grub.stage1.name"  value="stage1"/>
   <property name="grub.stage2.name"  value="stage2"/>
   <property name="grub.menu"    value="${my-conf.dir}/menu.lst"/>
-  
+
   <path id="cp-x86">
     <pathelement location="${jnode-builder.jar}"/>
     <pathelement location="${jnode-core.jar}"/>
@@ -33,7 +33,7 @@
     <pathelement location="${descriptors.dir}"/>
     <pathelement location="${dom4j.jar}"/>
   </path>
-  
+
   <target name="test-properties">
     <condition property="x86-properties.exists">
       <available file="build-x86.properties"/>
@@ -47,11 +47,11 @@
 	<property name="plugin-list" value="${src.dir}/descriptors/plugin-list.xml"/>
 	<property name="plugin.dir" value="${src.dir}/descriptors"/>
   </target>
-  
+
   <target name="prepare-props" depends="test-properties,load-properties,default-properties">
     <property name="jnode.kernel"   value="${jnodedrive.dir}/jnodesys.gz"/>
   </target>
-  
+
 <!-- Initialize all project directories -->
   <target name="prepare-dirs" depends="prepare-props">
     <mkdir dir="${build.native.dir}"/>
@@ -64,17 +64,17 @@
   <target name="test-grub">
     <available file="${grub.dir}" property="grub.exists"/>
   </target>
-  
+
   <target name="grub" depends="prepare-dirs,test-grub" unless="grub.exists">
-	<untar src="${grub.dist}" dest="${my-build.dir}" compression="gzip"/> 
+	<untar src="${grub.dist}" dest="${my-build.dir}" compression="gzip"/>
   </target>
-  
+
 <!-- Initialize all project properties -->
   <target name="prepare" depends="grub">
     <copy todir="${build.netboot.dir}">
       <fileset dir="${my-lib.dir}">
         <include name="nbgrub-*"/>
-        <include name="pxegrub-*"/> 
+        <include name="pxegrub-*"/>
      </fileset>
       <fileset dir="${my-conf.dir}">
         <include name="menu-nb.lst"/>
@@ -84,7 +84,7 @@
     <copy todir="${grub.dir}">
       <fileset dir="${my-lib.dir}">
         <include name="nbgrub-*"/>
-        <include name="pxegrub-*"/> 
+        <include name="pxegrub-*"/>
      </fileset>
       <fileset dir="${my-conf.dir}">
         <include name="menu-nb.lst"/>
@@ -94,14 +94,14 @@
   </target>
 
   <target name="asm-native" depends="prepare">
-    <taskdef name="genconst" 
+    <taskdef name="genconst"
              classname="org.jnode.build.x86.AsmConstBuilder"
              classpathref="cp-x86"/>
-    <taskdef name="asm" 
-             classname="org.jnode.ant.taskdefs.Asm" 
+    <taskdef name="asm"
+             classname="org.jnode.ant.taskdefs.Asm"
              classpathref="cp-x86"/>
-    
-    <genconst destfile="${build.native.dir}/src/java.inc" 
+
+    <genconst destfile="${build.native.dir}/src/java.inc"
               classesURL="file:///${jnode-core.jar}/">
       <!-- class classname="org.jnode.arch.x86.SoftByteCodes"/ -->
       <class classname="org.jnode.boot.Main" static="on"/>
@@ -139,13 +139,13 @@
       <class classname="java.lang.String"/>
       <class classname="java.lang.Throwable"/>
     </genconst>
-    
+
 	<dependset>
        <srcfileset dir="${src.native.dir}/x86"/>
        <srcfileset dir="${build.native.dir}/src"/>
        <targetfileset dir="${build.native.dir}/output"/>
-    </dependset>      
-    
+    </dependset>
+
     <asm srcdir="${src.native.dir}/x86"
          destdir="${build.native.dir}/output"
          outputFormat="elf"
@@ -167,7 +167,7 @@
       <classpath refid="cp-x86"/>
     </exportusage>
   </target>
-  
+
   <target name="plugins" depends="asm-native">
     <taskdef name="plugin" classname="org.jnode.build.PluginTask" classpathref="cp-x86"/>
     <plugin todir="${my-build.dir}/plugins"
@@ -183,6 +183,7 @@
       <libalias name="dnsjava-1.5.0.jar" alias="${dnsjava.jar}"/>
       <libalias name="nanoxml.jar" alias="${nanoxml.jar}"/>
       <libalias name="log4j.jar" alias="${log4j.jar}"/>
+       <libalias name="beanshell.jar" alias="${beanshell.jar}"/>
       <libalias name="lw.jar" alias="${lw.jar}"/>
       <libalias name="junit.jar" alias="${junit.jar}"/>
       <descriptors dir="${descriptors.dir}/">
@@ -201,7 +202,7 @@
              pluginDir="${my-build.dir}/plugins"
              targetArch="x86">
     </bootjar>
-    
+
     <bootimage destfile="${build.bootimage.dir}/bootimage.bin"
                listfile="${build.bootimage.dir}/bootimage.lst"
                debugfile="${build.bootimage.dir}/bootimage.debug"
@@ -218,9 +219,9 @@
     <gzip src="${build.bootimage.dir}/bootimage.bin" zipfile="${jnode.kernel}"/>
     <copy file="${jnode.kernel}" todir="${build.netboot.dir}"/>
   </target>
-  
+
   <target name="disasm">
-    <exec executable="ndisasm" dir="${basedir}" 
+    <exec executable="ndisasm" dir="${basedir}"
           output="${build.bootimage.dir}/bootimage.asm">
       <arg value="-u"/>
       <arg value="-o"/>
@@ -232,11 +233,11 @@
 <!-- Build the boot floppy & disk -->
   <target name="boot-disk" depends="java-image">
   <!-- target name="boot-floppy" -->
-    <taskdef name="bootfloppy" 
-             classname="org.jnode.build.BootFloppyBuilder" 
+    <taskdef name="bootfloppy"
+             classname="org.jnode.build.BootFloppyBuilder"
              classpathref="cp-x86"/>
-    <taskdef name="bootdisk" 
-             classname="org.jnode.build.BootDiskBuilder" 
+    <taskdef name="bootdisk"
+             classname="org.jnode.build.BootDiskBuilder"
              classpathref="cp-x86"/>
     <bootdisk destfile="${jnode.disk}"
 		        kernelfile="${jnode.kernel}"
