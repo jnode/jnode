@@ -59,7 +59,7 @@ public class FileSystemMounter implements DeviceListener, QueueProcessor {
 			fss = (FileSystemService)InitialNaming.lookup(FileSystemService.NAME);
 			asynchronousMounterThread =
 				new QueueProcessorThread("Asynchronous FS Mounter", devicesWaitingToBeMounted, this);
-         asynchronousMounterThread.start();
+			asynchronousMounterThread.start();
 		} catch (NameNotFoundException ex) {
 			throw new PluginException("Cannot find DeviceManager", ex);
 		}
@@ -78,15 +78,20 @@ public class FileSystemMounter implements DeviceListener, QueueProcessor {
 	/**
 	 * @see org.jnode.driver.DeviceListener#deviceStarted(org.jnode.driver.Device)
 	 */
-	public void deviceStarted(Device device) {
-		// add it to the queue of devices to be mounted
-      devicesWaitingToBeMounted.add(device);
+	public synchronized void deviceStarted(Device device) {
+		// add it to the queue of devices to be mounted only if the action is not
+		// already pending
+		if (!devicesWaitingToBeMounted.contains(device))
+			devicesWaitingToBeMounted.add(device);
 	}
 
 	/**
 	 * @see org.jnode.driver.DeviceListener#deviceStop(org.jnode.driver.Device)
 	 */
-	public void deviceStop(Device device) {
+	public synchronized void deviceStop(Device device) {
+		if (devicesWaitingToBeMounted.contains(device))
+			devicesWaitingToBeMounted.remove(device);
+
 		final FileSystem fs = (FileSystem)devices2FS.get(device);
 		if (fs != null) {
 			try {
@@ -105,7 +110,11 @@ public class FileSystemMounter implements DeviceListener, QueueProcessor {
 	 * @param api
 	 */
 	protected synchronized void tryToMount(Device device, FSBlockDeviceAPI api, boolean removable) {
-		log.info("Try to mount " + device.getId());
+
+		if (devices2FS.containsKey(device)) {
+			log.info("device already mounted...");
+			return;
+		}
 
 		//if (removable) {
 		//	log.error("Not mounting removable devices yet...");
@@ -113,6 +122,7 @@ public class FileSystemMounter implements DeviceListener, QueueProcessor {
 		//	return;
 		//}
 
+		log.info("Try to mount " + device.getId());
 		// Read the first sector
 		try {
 			final byte[] bs = new byte[api.getSectorSize()];

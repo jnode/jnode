@@ -56,7 +56,7 @@ public class RamDiskCommand {
 				size = 4*4096;
 			}
 			RamDiskDevice dev = new RamDiskDevice(null, "dummy", size);
-			dev.setDriver(new RamDiskDriver());
+			dev.setDriver(new RamDiskDriver(null));
 			dm.register(dev);
 		}
 
