@@ -27,8 +27,9 @@ import org.jnode.vm.Address;
 public class RadeonCore implements RadeonConstants {
 
     /** My logger */
-    final Logger log = Logger.getLogger(getClass());
+    private final Logger log = Logger.getLogger(getClass());
 
+    /** The driver */
     private final RadeonDriver driver;
 
     /** Memory mapped IO space */
@@ -37,18 +38,21 @@ public class RadeonCore implements RadeonConstants {
     /** All video RAM of the device */
     private final MemoryResource deviceRam;
 
+    /** Register accessor */
     private final RadeonVgaIO vgaIO;
-
-    private final int memSize;
 
     private final boolean hasCRTC2;
 
+    /** Register state before opening a surface */
     private final RadeonVgaState oldVgaState;
 
+    /** Register state after opening a surface */
     private final RadeonVgaState currentState;
 
+    /** PLL values */
     private final RadeonPLLInfo pllInfo;
 
+    /** Hardware cursor implementation */
     private final RadeonHardwareCursor hwCursor;
 
     /**
@@ -78,7 +82,7 @@ public class RadeonCore implements RadeonConstants {
             this.mmio = rm.claimMemoryResource(device, Address.valueOf(ioBase),
                     ioSize, ResourceManager.MEMMODE_NORMAL);
             this.vgaIO = new RadeonVgaIO(mmio);
-            this.memSize = readMemorySize();
+            final int memSize = readMemorySize();
             log.info("Memory size " + (memSize / (1024 * 1024)) + "MB");
 
             this.deviceRam = rm.claimMemoryResource(device, Address
