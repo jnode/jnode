@@ -154,54 +154,55 @@ public class NativeTest {
             IRGenerator irg = new IRGenerator(cfg);
             BytecodeParser.parse(code, irg);
 
-            BootableArrayList quads = irg.getQuadList();
-            int n = quads.size();
-            BootableHashMap liveVariables = new BootableHashMap();
-
-            for (int i=0; i<n; i+=1) {
-                System.out.println(quads.get(i));
-            }
-
-            for (int i=0; i<n; i+=1) {
-                Quad quad = (Quad) quads.get(i);
-                quad.doPass2(liveVariables);
-            }
-
-            for (int i=0; i<n; i+=1) {
-                System.out.println(quads.get(i));
-            }
-
-            System.out.println(liveVariables);
-
-            Collection lv = liveVariables.values();
-            n = lv.size();
-            LiveRange[] liveRanges = new LiveRange[n];
-            Iterator it = lv.iterator();
-            for (int i=0; i<n; i+=1) {
-                Variable v = (Variable) it.next();
-                liveRanges[i] = new LiveRange(v);
-                // System.out.println("Live range: " + liveRanges[i]);
-            }
-            Arrays.sort(liveRanges);
-            System.out.println(Arrays.asList(liveRanges));
-            LinearScanAllocator lsa = new LinearScanAllocator(liveRanges);
-            lsa.allocate();
-            System.out.println(Arrays.asList(liveRanges));
-
-            x86cg.setArgumentVariables(irg.getVariables(), irg.getNoArgs());
-            System.out.println(Arrays.asList(liveRanges));
-            x86cg.setSpilledVariables(lsa.getSpilledVariables());
-            x86cg.emitHeader();
-
-            n = quads.size();
-
-            for (int i=0; i<n; i+=1) {
-                Quad quad = (Quad) quads.get(i);
-                if (!quad.isDeadCode()) {
-                    System.out.println(quad);
-                    quad.generateCode(x86cg);
-                }
-            }
+			// TODO fix this!
+//            BootableArrayList quads = irg.getQuadList();
+//            int n = quads.size();
+//            BootableHashMap liveVariables = new BootableHashMap();
+//
+//            for (int i=0; i<n; i+=1) {
+//                System.out.println(quads.get(i));
+//            }
+//
+//            for (int i=0; i<n; i+=1) {
+//                Quad quad = (Quad) quads.get(i);
+//                quad.doPass2(liveVariables);
+//            }
+//
+//            for (int i=0; i<n; i+=1) {
+//                System.out.println(quads.get(i));
+//            }
+//
+//            System.out.println(liveVariables);
+//
+//            Collection lv = liveVariables.values();
+//            n = lv.size();
+//            LiveRange[] liveRanges = new LiveRange[n];
+//            Iterator it = lv.iterator();
+//            for (int i=0; i<n; i+=1) {
+//                Variable v = (Variable) it.next();
+//                liveRanges[i] = new LiveRange(v);
+//                // System.out.println("Live range: " + liveRanges[i]);
+//            }
+//            Arrays.sort(liveRanges);
+//            System.out.println(Arrays.asList(liveRanges));
+//            LinearScanAllocator lsa = new LinearScanAllocator(liveRanges);
+//            lsa.allocate();
+//            System.out.println(Arrays.asList(liveRanges));
+//
+//            x86cg.setArgumentVariables(irg.getVariables(), irg.getNoArgs());
+//            System.out.println(Arrays.asList(liveRanges));
+//            x86cg.setSpilledVariables(lsa.getSpilledVariables());
+//            x86cg.emitHeader();
+//
+//            n = quads.size();
+//
+//            for (int i=0; i<n; i+=1) {
+//                Quad quad = (Quad) quads.get(i);
+//                if (!quad.isDeadCode()) {
+//                    System.out.println(quad);
+//                    quad.generateCode(x86cg);
+//                }
+//            }
         }
 
         private static VmByteCode loadByteCode(String className)

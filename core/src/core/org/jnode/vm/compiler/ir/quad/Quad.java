@@ -5,14 +5,10 @@
  */
 package org.jnode.vm.compiler.ir.quad;
 
-import java.util.List;
-
 import org.jnode.util.BootableHashMap;
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
 import org.jnode.vm.compiler.ir.Operand;
-import org.jnode.vm.compiler.ir.PhiOperand;
-import org.jnode.vm.compiler.ir.Variable;
 
 /**
  * @author Madhu Siddalingaiah
@@ -33,44 +29,7 @@ public abstract class Quad {
 	}
 
 	public Operand getOperand(int varIndex) {
-		Variable operand = basicBlock.getVariables()[varIndex];
-		AssignQuad assignQuad = operand.getAssignQuad();
-		if (assignQuad == null) {
-			// This was probably a method argument
-			return operand;
-		}
-		List predList = basicBlock.getPredecessors();
-		int n = predList.size();
-
-		// if this block has 0 or 1 predecessors or assignment was in this block
-
-		if (n == 0 || n == 1 || assignQuad.getBasicBlock() == basicBlock) {
-			return assignQuad.propagate(operand);
-		}
-		
-		// Operand was assigned in more than one preceding blocks, need to merge.
-		// This assumes predecessors is an exhaustive list, e.g. includes direct
-		// and indirect predecessors. Maybe this should be split into immediate
-		// predecessors and all predecessors?
-
-		PhiOperand phi = new PhiOperand();
-		int startPC = basicBlock.getStartPC();
-		for (int i=0; i<n; i+=1) {
-			IRBasicBlock bb = (IRBasicBlock) predList.get(i);
-			if (bb.getStartPC() >= startPC) {
-				// forward reference, backpatch later
-				bb.addPhiReference(phi);
-			} else {
-				Variable[] variables = bb.getVariables();
-				Variable op = variables[varIndex];
-				assignQuad = op.getAssignQuad();
-				if (assignQuad.getBasicBlock() == bb) {
-					assignQuad.setDeadCode(false);
-					phi.addSource(op);
-				}
-			}
-		}
-		return phi;
+		return basicBlock.getVariables()[varIndex];
 	}
 
 	/**

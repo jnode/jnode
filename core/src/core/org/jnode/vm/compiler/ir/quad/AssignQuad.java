@@ -17,8 +17,10 @@ public abstract class AssignQuad extends Quad {
 	/**
 	 * Left hand side of assignment
 	 */
-	private int lhsIndex;
 	private Variable lhs;
+	
+	// TODO these two need to go!
+	private int lhsIndex;
 	private Variable[] variables;
 
 	public AssignQuad(int address, IRBasicBlock block, int lhsIndex) {
@@ -27,25 +29,6 @@ public abstract class AssignQuad extends Quad {
 		this.lhsIndex = lhsIndex;
 		this.lhs = (Variable) variables[lhsIndex].clone();
 		lhs.setAssignQuad(this);
-	}
-
-	/**
-	 * @param address
-	 * @param block
-	 * @param lhs
-	 */
-	public AssignQuad(int address, IRBasicBlock block, Variable lhs) {
-		super(address, block);
-		this.variables = block.getVariables();
-		this.lhsIndex = lhs.getIndex();
-		this.lhs = lhs;
-		// Don't call setAssignQuad(...) here because this constructor is only
-		// used for phi moves and lhs is given.
-	}
-
-	public void doSSA() {
-		variables[lhsIndex] = lhs;
-		lhs.doSSA();
 	}
 
 	/**

@@ -112,7 +112,6 @@ public class BinaryQuad extends AssignQuad {
 		this.operation = operation;
 		this.operand2 = getOperand(varIndex2);
 		refs = new Operand[] { operand1, operand2 };
-		doSSA();
 		this.commutative =
 			operation == IADD || operation == IMUL ||
 			operation == LADD || operation == LMUL ||
@@ -131,7 +130,6 @@ public class BinaryQuad extends AssignQuad {
 		this.operation = operation;
 		this.operand2 = op2;
 		refs = new Operand[] { operand1, operand2 };
-		doSSA();
 		this.commutative =
 			operation == IADD || operation == IMUL ||
 			operation == LADD || operation == LMUL ||

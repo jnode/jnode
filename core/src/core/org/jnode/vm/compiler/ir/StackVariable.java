@@ -18,19 +18,15 @@ public class StackVariable extends Variable {
 		super(type, index);
 	}
 
-	public StackVariable(int type, int index, int ssaValue) {
-		super(type, index, ssaValue);
-	}
-
 	/**
 	 * @param variable
 	 */
 	public StackVariable(StackVariable variable) {
-		this(variable.getType(), variable.getIndex(), variable.getSSAValue());
+		this(variable.getType(), variable.getIndex());
 	}
 
 	public String toString() {
-		return "s" + getSSAValue();
+		return "s" + getIndex() + '_' + getSSAValue();
 	}
 	
 	public Object clone() {

@@ -17,8 +17,6 @@ import org.jnode.vm.classmgr.VmMethod;
  * @author Madhu Siddalingaiah
  * 
  */
-// TODO simpify to use existing CFG from l1
-
 public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Comparator {
 	private boolean nextIsStartOfBB;
 
@@ -28,6 +26,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 
 	private boolean nextIsSuccessor;
 	private final ArrayList blocks = new ArrayList();
+	private VmByteCode byteCode;
 
 	/**
 	 * Create all determined basic blocks
@@ -73,16 +72,29 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 */
 	public void startMethod(VmMethod method) {
 		final VmByteCode bc = method.getBytecode();
+		byteCode = bc;
 		final int length = bc.getLength();
 		opcodeFlags = new byte[length];
 		// The first instruction is always the start of a BB.
 		this.currentBlock = startBB(0);
+		currentBlock.setStackOffset(bc.getNoLocals());
 		// The exception handler also start a basic block
 		for (int i = 0; i < bc.getNoExceptionHandlers(); i++) {
 			VmInterpretedExceptionHandler eh = bc.getExceptionHandler(i);
-			startTryBlock(eh.getStartPC());
-			startTryBlockEnd(eh.getEndPC());
-			startException(eh.getHandlerPC());
+			IRBasicBlock tryBlock = startTryBlock(eh.getStartPC());
+			IRBasicBlock endTryBlock = startTryBlockEnd(eh.getEndPC());
+			IRBasicBlock catchBlock = startException(eh.getHandlerPC());
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.bytecode.BytecodeVisitor#endMethod()
+	 */
+	public void endMethod() {
+		VmByteCode bc = byteCode;
+		// TODO add catch blocks to try successors
+		for (int i = 0; i < bc.getNoExceptionHandlers(); i++) {
+			VmInterpretedExceptionHandler eh = bc.getExceptionHandler(i);
 		}
 	}
 
@@ -330,49 +342,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 		IRBasicBlock pred = this.currentBlock;
 		IRBasicBlock succ = startBB(target);
 		pred.addSuccessor(succ);
-		succ.addPredecessor(pred);
 		endBB(nextIsSuccessor);
-	}
-
-	/**
-	 * Mark the end of a basic block
-	 */
-	private final void endBB(boolean nextIsSuccessor) {
-		nextIsStartOfBB = true;
-		this.nextIsSuccessor = nextIsSuccessor;
-	}
-
-	/**
-	 * @param address
-	 * @see org.jnode.vm.bytecode.BytecodeVisitor#startInstruction(int)
-	 */
-	public void startInstruction(int address) {
-		super.startInstruction(address);
-		opcodeFlags[address] |= BytecodeFlags.F_START_OF_INSTRUCTION;
-		if (nextIsStartOfBB) {
-			IRBasicBlock pred = this.currentBlock;
-			this.currentBlock = startBB(address);
-			if (nextIsSuccessor) {
-				pred.addSuccessor(this.currentBlock);
-				this.currentBlock.addPredecessor(pred);
-			}
-			nextIsSuccessor = true;
-			nextIsStartOfBB = false;
-		} else if (address != currentBlock.getStartPC() &&
-			(opcodeFlags[address] & BytecodeFlags.F_START_OF_BASICBLOCK) != 0 && nextIsSuccessor) {
-
-			int n = blocks.size();
-			for (int i=0; i<n; i+=1) {
-				IRBasicBlock bb = (IRBasicBlock) blocks.get(i);
-				if (bb.getStartPC() == address) {
-					IRBasicBlock pred = this.currentBlock;
-					this.currentBlock = bb;
-					pred.addSuccessor(this.currentBlock);
-					this.currentBlock.addPredecessor(pred);
-					break;
-				}
-			}
-		}
 	}
 
 	/**
@@ -399,6 +369,32 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 		return next;
 	}
 
+	/**
+	 * Mark the end of a basic block
+	 */
+	private final void endBB(boolean nextIsSuccessor) {
+		nextIsStartOfBB = true;
+		this.nextIsSuccessor = nextIsSuccessor;
+	}
+
+	/**
+	 * @param address
+	 * @see org.jnode.vm.bytecode.BytecodeVisitor#startInstruction(int)
+	 */
+	public void startInstruction(int address) {
+		super.startInstruction(address);
+		opcodeFlags[address] |= BytecodeFlags.F_START_OF_INSTRUCTION;
+		if (nextIsStartOfBB || isStartOfBB(address)) {
+			IRBasicBlock pred = this.currentBlock;
+			this.currentBlock = startBB(address);
+			if (nextIsSuccessor) {
+				pred.addSuccessor(this.currentBlock);
+			}
+			nextIsStartOfBB = false;
+			nextIsSuccessor = true;
+		}
+	}
+
 	private final boolean isStartOfBB(int address) {
 		return ((opcodeFlags[address] & BytecodeFlags.F_START_OF_BASICBLOCK) != 0);
 	}
@@ -412,9 +408,9 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * 
 	 * @param address
 	 */
-	private final void startException(int address) {
+	private final IRBasicBlock startException(int address) {
 		opcodeFlags[address] |= BytecodeFlags.F_START_OF_EXCEPTIONHANDLER;
-		startBB(address);
+		return startBB(address);
 	}
 
 	/**
@@ -422,9 +418,9 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * 
 	 * @param address
 	 */
-	private final void startTryBlock(int address) {
+	private final IRBasicBlock startTryBlock(int address) {
 		opcodeFlags[address] |= BytecodeFlags.F_START_OF_TRYBLOCK;
-		startBB(address);
+		return startBB(address);
 	}
 
 	/**
@@ -432,9 +428,9 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * 
 	 * @param address
 	 */
-	private final void startTryBlockEnd(int address) {
+	private final IRBasicBlock startTryBlockEnd(int address) {
 		opcodeFlags[address] |= BytecodeFlags.F_START_OF_TRYBLOCKEND;
-		startBB(address);
+		return startBB(address);
 	}
 
 	public int compare(Object o1, Object o2) {

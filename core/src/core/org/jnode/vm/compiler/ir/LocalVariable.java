@@ -18,19 +18,15 @@ public class LocalVariable extends Variable {
 		super(type, index);
 	}
 
-	public LocalVariable(int type, int index, int ssaValue) {
-		super(type, index, ssaValue);
-	}
-
 	/**
 	 * @param variable
 	 */
 	public LocalVariable(LocalVariable variable) {
-		this(variable.getType(), variable.getIndex(), variable.getSSAValue());
+		this(variable.getType(), variable.getIndex());
 	}
 
 	public String toString() {
-		return "l" + getSSAValue();
+		return "l" + getIndex() + '_' + getSSAValue();
 	}
 	
 	public Object clone() {

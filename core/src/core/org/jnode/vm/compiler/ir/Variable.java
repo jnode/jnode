@@ -27,32 +27,9 @@ public abstract class Variable extends Operand implements Cloneable {
 	 */
 	private int lastUseAddress;
 
-	public Variable(int type, int index, int ssaValue) {
+	public Variable(int type, int index) {
 		super(type);
 		this.index = index;
-		this.ssaValue = ssaValue;
-	}
-
-	/**
-	 * @param type
-	 */
-	public Variable(int type, int index) {
-		this(type, index, 1000*index);
-	}
-
-	public void doSSA() {
-		ssaValue += 1;
-	}
-
-	public boolean equals(Object other) {
-		if (other == null) {
-			return false;
-		}
-		return hashCode() == other.hashCode();
-	}
-
-	public int hashCode() {
-		return ssaValue;
 	}
 
 	/**
@@ -69,6 +46,13 @@ public abstract class Variable extends Operand implements Cloneable {
 		return ssaValue;
 	}
 	
+	/**
+	 * @param i
+	 */
+	public void setSSAValue(int i) {
+		ssaValue = i;
+	}
+
 	public abstract Object clone();
 
 	/**
@@ -153,5 +137,14 @@ public abstract class Variable extends Operand implements Cloneable {
 		} else {
 			throw new IllegalArgumentException("Undefined location");
 		}
+	}
+
+	public boolean equals(Object other) {
+		if (other instanceof Variable) {
+			Variable v = (Variable) other;
+			return index == v.getIndex() &&
+				ssaValue == v.getSSAValue();
+		}
+		return false;
 	}
 }

@@ -65,60 +65,19 @@ public class PhiOperand extends Operand {
 		return varIndex;
 	}
 
-	public Operand simplify() {
-		int n = sources.size();
-		Variable first = (Variable) sources.get(0);
-        Variable ret;
-		if (n == 1) {
-			ret = (Variable) first.simplify();
-		} else {
-			// We can't use var.simplify() here because the result might
-			// be a constant, which complicates code generation.
-			// sources should contain only Variable instances.
-			ret = first = first.simplifyCopy();
-			for (int i=1; i<n; i+=1) {
-				Variable var = (Variable) sources.get(i);
-				var = var.simplifyCopy();
-				AssignQuad assignQuad = var.getAssignQuad();
-				// This is more efficient than generating phi moves at the end
-				// of the block. Basically all phi sources are merged into the
-				// first.
-				
-				if (assignQuad != null) {
-					assignQuad.setLHS(first);
-				
-					// This might be in a loop, in which case this variable is live
-					// at least until the end of the loop. This looks tricky, but I
-					// think it's correct.
-					IRBasicBlock block = assignQuad.getBasicBlock().getLastPredecessor();
-                    if(block == null)
-                        first.setLastUseAddress(0);
-                    else
-					    first.setLastUseAddress(block.getEndPC()-1);
-				} else {
-                    // TODO revisit this case
-					// I'm really not sure what to do!
-					// This is the case where var was an argument, so it was
-					// not assigned.
-                    //LS
-                    if(!var.equals(first)){
-                        ((Variable)sources.get(i)).getAssignQuad().setDeadCode(false);
-                        if(ret == first)
-                            ret = (Variable) sources.get(i);
-                    }
-				}
-			}
-			// This is bold assumption that the first phi source was assigned
-			// before any others. I'm not sure if this is always true...
-		}
-        return ret;
-	}
-
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.compiler.ir.Operand#getAddressingMode()
 	 */
 	public int getAddressingMode() {
 		Variable first = (Variable) sources.get(0);
 		return first.getAddressingMode();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.Operand#simplify()
+	 */
+	// TODO complete this!
+	public Operand simplify() {
+		return null;
 	}
 }
