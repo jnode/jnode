@@ -141,6 +141,14 @@
   <target name="all" depends="arch-x86">
   </target>
 
+<!-- Build the boot files for windows NT/2K/XP (with NTLDR) -->
+  <target name="boot-files-winNT" depends="assemble">
+    <ant antfile="build-x86.xml"
+         inheritall="true"
+         inheritrefs="true"
+         target="boot-files-winNT"/>
+  </target>
+
 <!-- Create a bootable CDROM image -->
   <target name="cdrom" depends="assemble">
     <tar destfile="${sources.dist.tar.gz}" 
