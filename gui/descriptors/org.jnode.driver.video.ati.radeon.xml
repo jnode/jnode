@@ -25,6 +25,7 @@
   </extension>
   <extension point="org.jnode.driver.mappers">
     <mapper id="1002:5159" architecture="RV100" name="RV100 QY" driver-class="org.jnode.driver.video.ati.radeon.RadeonDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1002:4c57" architecture="M7" name="M7 LW" driver-class="org.jnode.driver.video.ati.radeon.RadeonDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
   </extension>
         
 </plugin>
