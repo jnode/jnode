@@ -27,6 +27,7 @@ public class X86Core extends AssemblerModule {
     private static final int REL_ARG = 3;
     private static final int ABS_ARG = 4;
     private static final int SCL_ARG = 5;
+    private static final int ZSC_ARG = 6;
 
     private static final int DISP = 3;
     private static final int DISP_MASK = ((2 << (DISP - 1)) - 1);
@@ -43,7 +44,7 @@ public class X86Core extends AssemblerModule {
     private static final int EC_ADDR = REL_ARG | CON_ARG << DISP;
     private static final int AC_ADDR = ABS_ARG | CON_ARG << DISP;
 
-    private static final String[] ARG_TYPES = {"noargument","constant","register","relative", "absolute", "scaled"};
+    private static final String[] ARG_TYPES = {"noargument","constant","register","relative", "absolute", "scaled", "simplescaled"};
 
     private final Object[] args = new Object[3];
 
@@ -72,6 +73,8 @@ public class X86Core extends AssemblerModule {
                         ret |= SCL_ARG << DISP * i;
                     } else if(ind.reg != null && ind.sreg == null){
                         ret |= REL_ARG << DISP * i;
+                    } else if(ind.reg == null && ind.sreg != null){
+                        ret |= ZSC_ARG << DISP * i;
                     } else if(ind.reg == null && ind.sreg == null){
                         ret |= ABS_ARG << DISP * i;
                     } else {
@@ -106,7 +109,8 @@ public class X86Core extends AssemblerModule {
     public static final int ADC_ISN = 0;
     public static final int ADD_ISN = ADC_ISN + 1;
     public static final int AND_ISN = ADD_ISN + 1;
-    public static final int CMP_ISN = AND_ISN + 1;
+    public static final int CALL_ISN = AND_ISN + 1;
+    public static final int CMP_ISN = CALL_ISN + 1;
     public static final int DEC_ISN = CMP_ISN + 1;
     public static final int INC_ISN = DEC_ISN + 1;
     public static final int JA_ISN = INC_ISN + 1;
@@ -177,6 +181,9 @@ public class X86Core extends AssemblerModule {
                 break;
             case AND_ISN:
                 emmitAND();
+                break;
+            case CALL_ISN:
+                emmitCALL();
                 break;
             case CMP_ISN:
                 emmitCMP();
@@ -348,6 +355,22 @@ public class X86Core extends AssemblerModule {
                 break;
             default:
                 reportAddressingError(AND_ISN, addr);
+        }
+    }
+
+    private void emmitCALL() {
+        Object o1 = operands.get(0);
+        if (o1 instanceof Token) {
+            Token t1 = (Token) o1;
+            if (Assembler.isIdent(t1)) {
+                Label lab = (Label) labels.get(t1.image);
+                lab = (lab == null) ? new Label(t1.image) : lab;
+                stream.writeCALL(lab);
+            } else {
+                throw new IllegalArgumentException("Unknown operand: " + t1.image);
+            }
+        } else {
+            throw new IllegalArgumentException("Unknown operand: " + o1);
         }
     }
 

@@ -170,17 +170,19 @@ public abstract class Assembler {
         constants.put(name, new Integer(value));
     }
 
-    int getConstant(String name) {
-        Integer i = (Integer) constants.get(name);
+    int getConstant(Token t) {
+        Integer i = (Integer) constants.get(t.image);
         try {
             if (i == null)
-                throw new IllegalArgumentException("Undefined constant: " + name);
+                throw new IllegalArgumentException("Undefined constant at line " + t.beginLine + ": " + t.image);
         } catch (RuntimeException x) {
             if (THROW) {
                 throw x;
             } else {
-                //x.printStackTrace();
-                if(pass == 2) System.err.println(x.getMessage());
+                if(pass == 2){
+                    //x.printStackTrace();
+                    System.out.println(x.getMessage());
+                }
                 return 0;
             }
         }
