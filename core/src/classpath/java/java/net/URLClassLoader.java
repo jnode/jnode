@@ -1,5 +1,6 @@
 /* URLClassLoader.java --  ClassLoader that loads classes from one or more URLs
-   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -54,11 +55,14 @@ import java.security.SecureClassLoader;
 import java.security.cert.Certificate;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+
 
 /**
  * A secure class loader that can load classes and resources from
@@ -142,9 +146,10 @@ public class URLClassLoader extends SecureClassLoader
   private final Vector urls = new Vector();
 
   /**
-   * Store pre-parsed information for each url into this vector 
-   * each element is a URL loader, corresponding to the URL of 
-   * the same index in "urls"
+   * Store pre-parsed information for each url into this vector: each
+   * element is a URL loader.  A jar file has its own class-path
+   * attribute which adds to the URLs that will be searched, but this
+   * does not add to the list of urls.
    */
   private final Vector urlinfos = new Vector();
     
@@ -187,9 +192,14 @@ public class URLClassLoader extends SecureClassLoader
 
     URLLoader(URLClassLoader classloader, URL baseURL)
     {
+      this(classloader, baseURL, baseURL);
+    }
+
+    URLLoader(URLClassLoader classloader, URL baseURL, URL overrideURL)
+    {
       this.classloader = classloader;
       this.baseURL = baseURL;
-      this.noCertCodeSource = new CodeSource(baseURL, null);
+      this.noCertCodeSource = new CodeSource(overrideURL, null);
     }
 
     /**
@@ -205,6 +215,11 @@ public class URLClassLoader extends SecureClassLoader
      * <code>null</code> there is no such <code>Manifest</code>.
      */
     Manifest getManifest()
+    {
+      return null;
+    }
+
+    Vector getClassPath()
     {
       return null;
     }
@@ -277,6 +292,8 @@ public class URLClassLoader extends SecureClassLoader
     final JarFile jarfile; // The jar file for this url
     final URL baseJarURL;  // Base jar: url for all resources loaded from jar
 
+    Vector classPath;	// The "Class-Path" attribute of this Jar's manifest
+
     public JarURLLoader(URLClassLoader classloader, URL baseURL)
     {
       super(classloader, baseURL);
@@ -289,6 +306,7 @@ public class URLClassLoader extends SecureClassLoader
       sb.append("!/");
       String jarURL = sb.toString();
 
+      this.classPath = null;
       URL baseJarURL = null;
       JarFile jarfile = null;
       try
@@ -298,6 +316,34 @@ public class URLClassLoader extends SecureClassLoader
 
 	  jarfile =
 	    ((JarURLConnection) baseJarURL.openConnection()).getJarFile();
+	  
+	  Manifest manifest;
+	  Attributes attributes;
+	  String classPathString;
+
+	  if ((manifest = jarfile.getManifest()) != null
+	      && (attributes = manifest.getMainAttributes()) != null
+	      && ((classPathString 
+		   = attributes.getValue(Attributes.Name.CLASS_PATH)) 
+		  != null))
+	    {
+	      this.classPath = new Vector();
+	      
+	      StringTokenizer st = new StringTokenizer(classPathString, " ");
+	      while (st.hasMoreElements ()) 
+		{  
+		  String e = st.nextToken ();
+		  try
+		    {
+		      URL url = new URL(baseURL, e);
+		      this.classPath.add(url);
+		    } 
+		  catch (java.net.MalformedURLException xx)
+		    {
+		      // Give up
+		    }
+		}
+	    }
         }
       catch (IOException ioe)
         {
@@ -334,6 +380,11 @@ public class URLClassLoader extends SecureClassLoader
 	{
 	  return null;
 	}
+    }
+
+    Vector getClassPath()
+    {
+      return classPath;
     }
   }
 
@@ -485,7 +536,7 @@ public class URLClassLoader extends SecureClassLoader
     Resource getResource(String name)
     {
       File file = new File(dir, name);
-      if (file.exists() && ! file.isDirectory())
+      if (file.exists())
 	return new FileResource(this, name, file);
       return null;
     }
@@ -503,11 +554,36 @@ public class URLClassLoader extends SecureClassLoader
 
     InputStream getInputStream() throws IOException
     {
+      // Delegate to the URL content handler mechanism to retrieve an
+      // HTML representation of the directory listing if a directory
+      if (file.isDirectory())
+        {
+          URL url = getURL();
+          return url.openStream();
+        }
+      // Otherwise simply return a FileInputStream
       return new FileInputStream(file);
     }
                         
     public int getLength()
     {
+      // Delegate to the URL content handler mechanism to retrieve the
+      // length of the HTML representation of the directory listing if
+      // a directory, or -1 if an exception occurs opening the directory.
+      if (file.isDirectory())
+        {
+          URL url = getURL();
+          try
+            {
+              URLConnection connection = url.openConnection();
+              return connection.getContentLength();
+            }
+          catch (IOException e)
+            {
+              return -1;
+            }
+        }
+      // Otherwise simply return the file length
       return (int) file.length();
     }
 
@@ -644,6 +720,7 @@ public class URLClassLoader extends SecureClassLoader
    */
   protected void addURL(URL newUrl)
   {
+    urls.add(newUrl);
     addURLImpl(newUrl);
   }
 
@@ -654,6 +731,9 @@ public class URLClassLoader extends SecureClassLoader
 	if (newUrl == null)
 	  return; // Silently ignore...
         
+	// Reset the toString() value.
+	thisString = null;
+
 	// Check global cache to see if there're already url loader
 	// for this url.
 	URLLoader loader = (URLLoader) urlloaders.get(newUrl);
@@ -674,8 +754,21 @@ public class URLClassLoader extends SecureClassLoader
 	    urlloaders.put(newUrl, loader);
 	  }
 
-	urls.add(newUrl);
 	urlinfos.add(loader);
+
+	Vector extraUrls = loader.getClassPath();
+	if (extraUrls != null)
+	  {
+	    Iterator it = extraUrls.iterator();
+	    while (it.hasNext())
+	      {
+		URL url = (URL)it.next();
+		URLLoader extraLoader = (URLLoader) urlloaders.get(url);
+		if (! urlinfos.contains (extraLoader))
+		  addURLImpl(url);
+	      }
+	  }
+
       }
   }
 
@@ -686,7 +779,7 @@ public class URLClassLoader extends SecureClassLoader
   private void addURLs(URL[] newUrls)
   {
     for (int i = 0; i < newUrls.length; i++)
-      addURLImpl(newUrls[i]);
+      addURL(newUrls[i]);
   }
 
   /** 
@@ -745,7 +838,7 @@ public class URLClassLoader extends SecureClassLoader
     String resourceName = className.replace('.', '/') + ".class";
     Resource resource = findURLResource(resourceName);
     if (resource == null)
-      throw new ClassNotFoundException(className + " not found in " + urls);
+      throw new ClassNotFoundException(className + " not found in " + this);
 
     // Try to read the class data, create the CodeSource, Package and
     // construct the class (and watch out for those nasty IOExceptions)
@@ -837,7 +930,44 @@ public class URLClassLoader extends SecureClassLoader
       }
     catch (IOException ioe)
       {
-	throw new ClassNotFoundException(className, ioe);
+	ClassNotFoundException cnfe;
+	cnfe = new ClassNotFoundException(className + " not found in " + this);
+	cnfe.initCause(ioe);
+	throw cnfe;
+      }
+  }
+  
+  // Cached String representation of this URLClassLoader
+  private String thisString;
+  
+  /**
+   * Returns a String representation of this URLClassLoader giving the
+   * actual Class name, the URLs that are searched and the parent
+   * ClassLoader.
+   */
+  public String toString()
+  {
+    synchronized (urlloaders)
+      {
+	if (thisString == null)
+	  {
+	    StringBuffer sb = new StringBuffer();
+	    sb.append(this.getClass().getName());
+	    sb.append("{urls=[" );
+	    URL[] thisURLs = getURLs();
+	    for (int i = 0; i < thisURLs.length; i++)
+	      {
+		sb.append(thisURLs[i]);
+		if (i < thisURLs.length - 1)
+		  sb.append(',');
+	      }
+	    sb.append(']');
+	    sb.append(", parent=");
+	    sb.append(getParent());
+	    sb.append('}');
+	    thisString = sb.toString();
+	  }
+	return thisString;
       }
   }
 
@@ -850,7 +980,7 @@ public class URLClassLoader extends SecureClassLoader
    */
   private Resource findURLResource(String resourceName)
   {
-    int max = urls.size();
+    int max = urlinfos.size();
     for (int i = 0; i < max; i++)
       {
 	URLLoader loader = (URLLoader) urlinfos.elementAt(i);
@@ -921,7 +1051,7 @@ public class URLClassLoader extends SecureClassLoader
     throws IOException
   {
     Vector resources = new Vector();
-    int max = urls.size();
+    int max = urlinfos.size();
     for (int i = 0; i < max; i++)
       {
 	URLLoader loader = (URLLoader) urlinfos.elementAt(i);
