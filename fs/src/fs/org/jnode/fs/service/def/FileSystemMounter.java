@@ -145,6 +145,7 @@ public class FileSystemMounter implements DeviceListener, QueueProcessor {
                         fileSystemService.registerFileSystem(fs);
                         log.info("Mounted " + fst.getName() + " on "
                                 + device.getId());
+                        devices2FS.put(device, fs);
                         return;
                     } catch (FileSystemException ex) {
                         log.error("Cannot mount " + fst.getName()
