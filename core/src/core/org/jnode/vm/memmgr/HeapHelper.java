@@ -26,6 +26,8 @@ public abstract class HeapHelper extends ObjectResolver {
 
 	public abstract Object getObject(Object src, int offset);
 
+	public abstract Address getAddress(Object src, int offset);
+
 	/**
 	 * Gets the color of the given object.
 	 * @param src

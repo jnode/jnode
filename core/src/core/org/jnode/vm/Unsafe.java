@@ -4,6 +4,7 @@
 package org.jnode.vm;
 
 import org.jnode.assembler.ObjectResolver;
+import org.jnode.security.JNodePermission;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
@@ -14,6 +15,8 @@ import org.jnode.vm.classmgr.VmType;
  * @author epr
  */
 public final class Unsafe {
+    
+    private static final JNodePermission GET_JUMP_TABLE_PERM = new JNodePermission("getJumpTable");
 
 	public static class UnsafeObjectResolver extends ObjectResolver {
 
@@ -343,7 +346,7 @@ public final class Unsafe {
 	 * @param offset
 	 * @return Object
 	 */
-	public static native Address getAddress(Object object, int offset);
+	static native Address getAddress(Object object, int offset);
 
 	/**
 	 * Sets a boolean at a given memory address
@@ -847,7 +850,7 @@ public final class Unsafe {
 	/**
 	 * Cause the system to stop TODO Protect me again
 	 */
-	public /*protected*/ static void die(String msg) {
+	static void die(String msg) {
 		debug("Real panic: ");
 		if (msg != null) {
 			debug(msg);
@@ -1047,7 +1050,34 @@ public final class Unsafe {
 	 * 
 	 * @return The address of the system dependent jump table.
 	 */
-	public static native Address getJumpTable();
+	private static native Address getJumpTable0();
+
+	/**
+	 * Gets the address of the system dependent jump table used for native method indirection.
+	 * 
+	 * @return The address of the system dependent jump table.
+	 */
+	public static final Address getJumpTable() {
+	    final SecurityManager sm = System.getSecurityManager();
+	    if (sm != null) {
+	        sm.checkPermission(GET_JUMP_TABLE_PERM);
+	    }
+	    return getJumpTable0();
+	}
+
+	/**
+	 * Gets a jumptable entry.
+	 * This method can only be called at runtime.
+	 * @param offset
+	 * @return The jumptable entry.
+	 */
+	public static final Address getJumpTableEntry(int offset) {
+	    final SecurityManager sm = System.getSecurityManager();
+	    if (sm != null) {
+	        sm.checkPermission(GET_JUMP_TABLE_PERM);
+	    }
+		return Unsafe.getAddress(Unsafe.getJumpTable0(), offset);
+	}
 
 	/**
 	 * Read CPU identification data.

@@ -8,6 +8,7 @@ import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.vm.Address;
+import org.jnode.vm.PragmaPrivilegedAction;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmProcessor;
@@ -56,7 +57,7 @@ public class X86CompilerHelper extends X86StackManager implements
      * @param context
      */
     public X86CompilerHelper(AbstractX86Stream os, X86CompilerContext context,
-            boolean isBootstrap) {
+            boolean isBootstrap) throws PragmaPrivilegedAction {
         super(os);
         this.context = context;
         this.isBootstrap = isBootstrap;

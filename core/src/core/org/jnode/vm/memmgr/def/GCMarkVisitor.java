@@ -214,7 +214,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
         final Object stack = helper.getStack(thread);
         if (stack != null) {
             for (int i = 0; i < stackSize; i += slotSize) {
-                Address child = Unsafe.getAddress(stack, i);
+                final Address child = helper.getAddress(stack, i);
                 if (child != null) {
                     if (heapManager.isObject(child)) {
                         processChild(child);
