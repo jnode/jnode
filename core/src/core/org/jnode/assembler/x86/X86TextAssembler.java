@@ -682,6 +682,27 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	}
 
     /**
+     *
+     */
+    public void writeCLD() {
+        println("\tCLD");
+    }
+
+    /**
+     *
+     */
+    public void writeCLI() {
+        println("\tCLI");
+    }
+
+    /**
+     *
+     */
+    public void writeCLTS() {
+        println("\tCLTS");
+    }
+
+    /**
      * Create a CMOVcc dst,src
      * 
      * @param ccOpcode
@@ -789,6 +810,10 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     public void writeCMPXCHG_EAX(GPR dstReg, int dstDisp, GPR srcReg,
             boolean lock) {
         println("\tcmpxchg [" + dstReg + disp(dstDisp) + "]," + srcReg);
+    }
+
+    public void writeCPUID() {
+        println("\tcpuid");
     }
 
     /**
@@ -1027,6 +1052,13 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     /**
+     *
+     */
+    public void writeHLT() {
+        println("\thlt");
+    }
+
+    /**
      * @see org.jnode.assembler.x86.X86Assembler#writeIDIV_EAX(GPR)
      */
     public void writeIDIV_EAX(GPR srcReg) {
@@ -1114,6 +1146,13 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      */
     public void writeINT(int vector) {
         println("\tint 0x" + NumberUtils.hex(vector, 2));
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeIRET()
+     */
+    public void writeIRET() {
+        println("\tiret");
     }
 
     /**
@@ -1489,6 +1528,13 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     /**
+     * @see org.jnode.assembler.x86.X86Assembler#writePOPF()
+     */
+    public void writePOPF() {
+        println("\tpopf");
+    }
+
+    /**
      * @see org.jnode.assembler.x86.X86Assembler#writePrefix(int)
      */
     public void writePrefix(int prefix) {
@@ -1554,6 +1600,13 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      */
     public void writePUSHA() {
         println("\tpusha");
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writePUSHF()
+     */
+    public void writePUSHF() {
+        println("\tpushf");
     }
 
     public void writeRDTSC() {
@@ -1785,6 +1838,20 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     /**
+     *
+     */
+    public void writeSTD() {
+        println("\tstd");
+    }
+
+    /**
+     *
+     */
+    public void writeSTI() {
+        println("\tsti");
+    }
+
+    /**
      * Create a SUB reg, imm32
      * 
      * @param reg
@@ -1794,7 +1861,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         println("\tsub " + reg + "," + imm32);
     }
 
-    // LS
     /**
      * 
      * @param dstReg
@@ -1820,7 +1886,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         println("\tsub " + dstReg + "," + srcReg);
     }
 
-    // LS
+
     /**
      * 
      * @param dstReg

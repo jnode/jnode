@@ -1102,6 +1102,19 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write8(0x98);
 	}
 
+    public void writeCLD() {
+        write8(0xFC);
+    }
+
+    public void writeCLI() {
+        write8(0xFA);
+    }
+
+    public void writeCLTS() {
+        write8(CRX_PREFIX);
+        write8(0x06);
+    }
+
 	/**
 	 * Create a CMOVcc dst,src
 	 * 
@@ -1264,6 +1277,14 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write2bOpcodeModRM(0x0F, 0xB1, srcReg.getSize(), dstReg, dstDisp,
 				srcReg.getNr());
 	}
+
+    /**
+     *
+     */
+    public void writeCPUID() {
+        write8(CRX_PREFIX);
+        write8(0xA2);
+    }
 
 	/**
 	 * Create a dec reg32
@@ -1569,6 +1590,13 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write8(0xc8 + fpuReg.getNr());
 	}
 
+    /**
+     *
+     */
+    public void writeHLT() {
+        write8(0xF4);
+    }
+
 	/**
 	 * Create an idiv edx:eax, srcReg.
 	 * 
@@ -1678,6 +1706,13 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write8(0xCD);
 		write8(vector);
 	}
+
+    /**
+     *
+     */
+    public void writeIRET() {
+        write8(0xCF);
+    }
 
 	/**
 	 * Create a conditional jump to a label The opcode sequence is: 0x0f
@@ -2769,6 +2804,13 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write8(0x61);
 	}
 
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writePOPF()
+     */
+    public void writePOPF() {
+        write8(0x9D);
+    }
+
 	/**
 	 * @see org.jnode.assembler.x86.X86Assembler#writePrefix(int)
 	 */
@@ -2864,6 +2906,13 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 		write8(0x60);
 	}
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writePUSHF()
+     */
+    public void writePUSHF() {
+        write8(0x9C);
+    }
 
 	public void writeRDTSC() {
 		write8(0x0F);
@@ -3180,6 +3229,20 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         testSize(srcReg, mode.getSize());
 		write2bOpcodeModRR(0x0F, 0xad, dstReg.getSize(), dstReg, srcReg.getNr());
 	}
+
+    /**
+     *
+     */
+    public void writeSTD() {
+        write8(0xFD);
+    }
+
+    /**
+     *
+     */
+    public void writeSTI() {
+        write8(0xFB);
+    }
 
 	/**
 	 * Create a SUB reg, imm32
