@@ -541,6 +541,9 @@ public abstract class DoubleWordItem extends Item implements
 			break;
 
 		case Kind.CONSTANT:
+            if (os.isCode64()) {
+                os.writeLEA(X86Register.RSP, X86Register.RSP, -8); // garbage
+            }
 			pushConstant(ec, os);
 			break;
 
