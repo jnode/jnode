@@ -87,21 +87,22 @@ public class FBTest {
         final String tests = (args.length > 2) ? args[2] : "plrREQ";
 
 
+        Surface g = null;
         try {
             final DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
             final Device dev = dm.getDevice(devId);
             final FrameBufferAPI api = (FrameBufferAPI) dev.getAPI(FrameBufferAPI.class);
             final FrameBufferConfiguration conf = api.getConfigurations()[0];
 
-            final Surface g = api.open(conf);
-            try {
-                new FBTest(g, conf.getScreenWidth(), conf.getScreenHeight(), count, tests).perform();
-                Thread.sleep(3000);
-            } finally {
-                g.close();
-            }
+            g = api.open(conf);
+            new FBTest(g, conf.getScreenWidth(), conf.getScreenHeight(), count, tests).perform();
+            Thread.sleep(3000);
         } catch (Throwable ex) {
             ex.printStackTrace();
+        } finally {
+            if (g != null) {
+                g.close();
+            }
         }
     }
 
