@@ -17,6 +17,8 @@ import org.jnode.vm.classmgr.VmMethod;
  * @author Madhu Siddalingaiah
  * 
  */
+// TODO simpify to use existing CFG from l1
+
 public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Comparator {
 	private boolean nextIsStartOfBB;
 
