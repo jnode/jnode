@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.vm.x86.compiler;
 
 import java.io.Writer;
@@ -32,6 +32,7 @@ import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86TextAssembler;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
+import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
@@ -46,77 +47,94 @@ import org.vmmagic.unboxed.Address;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public abstract class AbstractX86Compiler extends NativeCodeCompiler implements X86CompilerConstants {
+public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
+        X86CompilerConstants {
 
-	private X86CompilerContext context;
+    private X86CompilerContext context;
 
-	/**
-	 * Initialize this compiler
-	 * 
-	 * @param loader
-	 */
-	public final void initialize(VmClassLoader loader) {
-		if (context == null) {
-			context = new X86CompilerContext(loader, Vm.getHeapManager(), getMagic());
-		}
-	}
+    private TypeSizeInfo typeSizeInfo;
 
-	/**
-	 * @see org.jnode.vm.compiler.NativeCodeCompiler#createNativeStream(org.jnode.assembler.ObjectResolver)
-	 */
-	public NativeStream createNativeStream(ObjectResolver resolver) {
-		final X86BinaryAssembler os = new X86BinaryAssembler((X86CpuID) Unsafe.getCurrentProcessor().getCPUID(), context.getMode(), 0);
-		os.setResolver(resolver);
-		return os;
-	}
+    /**
+     * Initialize this compiler
+     * 
+     * @param loader
+     */
+    public final void initialize(VmClassLoader loader) {
+        if (context == null) {
+            context = new X86CompilerContext(loader, Vm.getHeapManager(),
+                    getMagic());
+            typeSizeInfo = loader.getArchitecture().getTypeSizeInfo();
+        }
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.NativeCodeCompiler#doCompileAbstract(org.jnode.vm.classmgr.VmMethod, org.jnode.assembler.NativeStream, int, boolean)
-	 */
-	protected final CompiledMethod doCompileAbstract(VmMethod method, NativeStream nos, int level, boolean isBootstrap) throws PrivilegedActionPragma {
-		if (isBootstrap) {
-			//System.out.println("Abstraxct method " + method);
-			final CompiledMethod cm = new CompiledMethod(level);
-			final X86Assembler os = (X86Assembler) nos;
-			// Create the helper
-			final X86CompilerHelper helper = new X86CompilerHelper(os, null, context, isBootstrap);
-			// Start an "object"
-			final NativeStream.ObjectInfo objectInfo = os.startObject(context.getVmMethodCodeClass());
-			// Start the code creation
-			cm.setCodeStart(os.setObjectRef(new Label(method.getMangledName() + "$$abstract-start")));
-			// Call abstract method error method
-			helper.writeJumpTableJMP(X86JumpTable.VM_INVOKE_ABSTRACT_OFS);
-			// Close the "object"
-			objectInfo.markEnd();
-			// The end
-			cm.setCodeEnd(os.setObjectRef(new Label(method.getMangledName() + "$$abstract-end")));
+    /**
+     * @see org.jnode.vm.compiler.NativeCodeCompiler#createNativeStream(org.jnode.assembler.ObjectResolver)
+     */
+    public NativeStream createNativeStream(ObjectResolver resolver) {
+        final X86BinaryAssembler os = new X86BinaryAssembler((X86CpuID) Unsafe
+                .getCurrentProcessor().getCPUID(), context.getMode(), 0);
+        os.setResolver(resolver);
+        return os;
+    }
 
-			return cm;
-		} else {
-			// Set the address of the abstract method code
-			final Address errorAddr = Unsafe.getJumpTableEntry(X86JumpTable.VM_INVOKE_ABSTRACT_OFS);
-			final VmCompiledCode code = new VmCompiledCode(this, null, errorAddr.toAddress(), null, 0, null, null, null);
-			method.addCompiledCode(code, level);
-			return null;
-		}
-	}
+    /**
+     * @see org.jnode.vm.compiler.NativeCodeCompiler#doCompileAbstract(org.jnode.vm.classmgr.VmMethod,
+     *      org.jnode.assembler.NativeStream, int, boolean)
+     */
+    protected final CompiledMethod doCompileAbstract(VmMethod method,
+            NativeStream nos, int level, boolean isBootstrap)
+            throws PrivilegedActionPragma {
+        if (isBootstrap) {
+            // System.out.println("Abstraxct method " + method);
+            final CompiledMethod cm = new CompiledMethod(level);
+            final X86Assembler os = (X86Assembler) nos;
+            // Create the helper
+            final X86CompilerHelper helper = new X86CompilerHelper(os, null,
+                    context, isBootstrap);
+            // Start an "object"
+            final NativeStream.ObjectInfo objectInfo = os.startObject(context
+                    .getVmMethodCodeClass());
+            // Start the code creation
+            cm.setCodeStart(os.setObjectRef(new Label(method.getMangledName()
+                    + "$$abstract-start")));
+            // Call abstract method error method
+            helper.writeJumpTableJMP(X86JumpTable.VM_INVOKE_ABSTRACT_OFS);
+            // Close the "object"
+            objectInfo.markEnd();
+            // The end
+            cm.setCodeEnd(os.setObjectRef(new Label(method.getMangledName()
+                    + "$$abstract-end")));
 
-	/**
-	 * @return Returns the context.
-	 */
-	protected final X86CompilerContext getContext() {
-		return this.context;
-	}
-	
-	/**
-	 * Gets the operating mode.
-	 * @return
-	 */
-	protected final X86Constants.Mode getMode() {
-		return context.getMode();
-	}
+            return cm;
+        } else {
+            // Set the address of the abstract method code
+            final Address errorAddr = Unsafe
+                    .getJumpTableEntry(X86JumpTable.VM_INVOKE_ABSTRACT_OFS);
+            final VmCompiledCode code = new VmCompiledCode(this, null,
+                    errorAddr.toAddress(), null, 0, null, null, null);
+            method.addCompiledCode(code, level);
+            return null;
+        }
+    }
 
-    public void disassemble(VmMethod method, ObjectResolver resolver, int level, Writer writer) {
+    /**
+     * @return Returns the context.
+     */
+    protected final X86CompilerContext getContext() {
+        return this.context;
+    }
+
+    /**
+     * Gets the operating mode.
+     * 
+     * @return
+     */
+    protected final X86Constants.Mode getMode() {
+        return context.getMode();
+    }
+
+    public void disassemble(VmMethod method, ObjectResolver resolver,
+            int level, Writer writer) {
 
         if (method.isNative()) {
             System.out.println(method + " is native");
@@ -128,19 +146,28 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements 
             return;
         }
 
-        X86TextAssembler tos = new X86TextAssembler(writer, (X86CpuID) Unsafe.getCurrentProcessor().getCPUID(), context.getMode());
+        X86TextAssembler tos = new X86TextAssembler(writer, (X86CpuID) Unsafe
+                .getCurrentProcessor().getCPUID(), context.getMode());
 
         doCompile(method, tos, level, false);
-        try{
+        try {
             tos.flush();
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-	/**
-	 * @see org.jnode.vm.compiler.NativeCodeCompiler#dumpStatistics()
-	 */
-	public void dumpStatistics() {
-	}
+    /**
+     * @see org.jnode.vm.compiler.NativeCodeCompiler#dumpStatistics()
+     */
+    public void dumpStatistics() {
+    }
+
+    /**
+     * Gets the type size information.
+     * @return
+     */
+    public final TypeSizeInfo getTypeSizeInfo() {
+        return typeSizeInfo;
+    }
 }

@@ -99,7 +99,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
                 signature,
                 modifiers /* | (declaringClass.isFinal() ? Modifier.ACC_FINAL : 0) */,
                 declaringClass);
-        this.argSlotCount = Signature.getArgSlotCount(signature)
+        this.argSlotCount = Signature.getArgSlotCount(declaringClass.getLoader().getArchitecture().getTypeSizeInfo(), signature)
                 + (isStatic() ? 0 : 1);
         this.returnVoid = (signature.endsWith("V"));
         char firstReturnSignatureChar = signature
