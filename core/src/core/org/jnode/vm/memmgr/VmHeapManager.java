@@ -218,7 +218,17 @@ public abstract class VmHeapManager extends VmSystemObject {
 		return array;
 	}
 	
-	private final void testInited() {
+    /**
+     * Is the given address the address of an allocated object on this heap?
+     * 
+     * @param ptr
+     *            The address to examine.
+     * @return True if the given address if a valid starting address of an
+     *         object, false otherwise.
+     */
+    public abstract boolean isObject(Address ptr);
+
+    private final void testInited() {
 		if (!inited) {
 			//Unsafe.debug("testInitid.initialize");
 			initialize();
