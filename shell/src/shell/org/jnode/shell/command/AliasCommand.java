@@ -46,6 +46,7 @@ import org.jnode.shell.help.SyntaxErrorException;
 /**
  * @author epr
  * @author qades
+ * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 public class AliasCommand implements Command
 {

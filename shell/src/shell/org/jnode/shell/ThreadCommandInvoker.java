@@ -38,6 +38,7 @@ import java.security.PrivilegedActionException;
 /**
  * User: Sam Reid Date: Dec 20, 2003 Time: 1:20:33 AM Copyright (c) Dec 20,
  * 2003 by Sam Reid
+ * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
 
