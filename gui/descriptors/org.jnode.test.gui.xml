@@ -10,6 +10,7 @@
     <import plugin="org.jnode.awt"/>
     <import plugin="org.jnode.awt.font"/>
     <import plugin="org.jnode.awt.font.truetype"/>
+    <import plugin="org.jnode.desktop"/>
     <import plugin="org.jnode.shell.help"/>
   </requires>
         
@@ -19,6 +20,14 @@
     </library>
   </runtime>
         
+  <extension point="org.jnode.desktop.apps">
+    <application name="AWTTest"      class="org.jnode.test.gui.AWTTest"/>
+    <application name="AWTDemo"      class="org.jnode.test.gui.AWTDemo"/>
+    <application name="BoxWorld"     class="org.jnode.test.gui.BoxWorld"/>      
+    <application name="Tetris"       class="org.jnode.test.gui.Tetris"/>
+    <application name="SwingTest"    class="org.jnode.test.gui.SwingTest"/>
+  </extension>
+
   <extension point="org.jnode.shell.aliases">
     <alias name="AWTTest"      class="org.jnode.test.gui.AWTTest"/>
     <alias name="AWTDemo"      class="org.jnode.test.gui.AWTDemo"/>

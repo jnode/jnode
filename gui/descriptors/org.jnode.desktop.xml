@@ -17,6 +17,8 @@
     </library>
   </runtime>
 
+  <extension-point id="apps" name="Applications that can be started from the desktop"/>
+
   <extension point="org.jnode.security.permissions">
     <permission class="java.util.PropertyPermission" name="jnode.desktop" actions="read,write"/>
   </extension>

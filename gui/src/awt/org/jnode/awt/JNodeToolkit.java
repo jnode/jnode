@@ -620,9 +620,13 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 * @return
 	 */
 	public Component getTopComponentAt(int x, int y) {
-		Component c = getTop().findComponentAt(x, y);
+		final Frame f = getTop();
+		if (f == null) {
+			return null;
+		}
+		Component c = f.findComponentAt(x, y);
 		if (c == null) {
-			c = getTop();
+			c = f;
 		}
 		return c;
 	}

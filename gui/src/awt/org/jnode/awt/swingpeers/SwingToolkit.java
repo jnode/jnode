@@ -287,28 +287,28 @@ public class SwingToolkit extends JNodeToolkit {
 		}
 	}
 
+	public Component getTopComponentAt(int x, int y) {
+		Component comp = super.getTopComponentAt(x, y);
+		SwingFramePeer.SwingFrame sfp = (SwingFramePeer.SwingFrame) SwingUtilities
+				.getAncestorOfClass(SwingFramePeer.SwingFrame.class, comp);
+		if (sfp != null) {
+			Rectangle r = sfp.getBounds();
+			Insets ins = sfp.getSwingPeer().getInsets();
+			r.x = r.x + ins.left;
+			r.y = r.y + ins.top;
+			r.width = r.width - ins.left - ins.right;
+			r.height = r.height - ins.top - ins.bottom;
+			if (r.contains(x, y)) {
+				Component c = sfp.getAwtFrame().findComponentAt(x, y);
+				if (c != null) {
+					comp = c;
+				}
+			}
+		}
+		return comp;
+	}
 
-
-    public Component getTopComponentAt(int x, int y) {
-        Component comp = super.getTopComponentAt(x, y);
-        SwingFramePeer.SwingFrame sfp = (SwingFramePeer.SwingFrame) SwingUtilities.getAncestorOfClass(SwingFramePeer.SwingFrame.class, comp);
-        if(sfp != null){
-            Rectangle r = sfp.getBounds();
-            Insets ins = sfp.getSwingPeer().getInsets();
-            r.x = r.x + ins.left;
-            r.y = r.y + ins.top;
-            r.width = r.width - ins.left - ins.right;
-            r.height = r.height - ins.top - ins.bottom;
-            if(r.contains(x, y)){
-                Component c = sfp.getAwtFrame().findComponentAt(x, y);
-                if(c != null){
-                    comp = c;
-                }
-            }
-        }
-        return comp;
-    }
-    public JNodeAwtContext getAwtContext() {
+	public JNodeAwtContext getAwtContext() {
 		return desktopFrame;
 	}
 }
