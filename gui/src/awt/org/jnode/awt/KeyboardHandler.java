@@ -72,7 +72,7 @@ public class KeyboardHandler implements KeyboardListener {
         Component source = tk.getFocusHandler().getFocusedComponent();
         if (source == null) source = tk.getTop();
         KeyEvent me = new KeyEvent(source, id, time, modifiers, keyCode, keyChar);
-        JNodeGenericPeer.q.postEvent(me);
+        JNodeGenericPeer.eventQueue.postEvent(me);
     }
 
     /**

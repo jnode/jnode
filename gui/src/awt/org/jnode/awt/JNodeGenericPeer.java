@@ -5,6 +5,7 @@ package org.jnode.awt;
 
 import java.awt.EventQueue;
 import java.awt.Toolkit;
+import java.awt.Component;
 
 /**
  * @author epr
@@ -12,28 +13,28 @@ import java.awt.Toolkit;
 public class JNodeGenericPeer {
 
 	protected final JNodeToolkit toolkit;
-	private final Object awtObject;
+	protected final Object component;
 
 	// Global event queue.
-	protected static EventQueue q;
+	protected static EventQueue eventQueue;
 
-	public JNodeGenericPeer(JNodeToolkit toolkit, Object awtObject) {
+	public JNodeGenericPeer(JNodeToolkit toolkit, Object component) {
 		this.toolkit = toolkit;
-		this.awtObject = awtObject;
+		this.component = component;
 		toolkit.incRefCount();
 	}
 
 	static void enableQueue(EventQueue sq) {
-		if (q == null) {
-			q = sq;
+		if (eventQueue == null) {
+			eventQueue = sq;
 		}
 	}
 	
 	/**
 	 * @return
 	 */
-	public final Object getAwtObject() {
-		return this.awtObject;
+	public final Object getComponent() {
+		return this.component;
 	}
 
 	/**

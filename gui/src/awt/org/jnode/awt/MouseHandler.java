@@ -143,7 +143,7 @@ public class MouseHandler implements PointerListener {
 		//TODO full support for modifiers
 		final MouseEvent me = new MouseEvent(source, id, System.currentTimeMillis(),
 				EventModifier.OLD_MASK | button, x, y, 1, false, button);
-		JNodeGenericPeer.q.postEvent(me);
+		JNodeGenericPeer.eventQueue.postEvent(me);
 	}
 
 	private static final int[] BUTTON_MASK = { PointerEvent.BUTTON_LEFT,

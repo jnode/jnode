@@ -65,7 +65,7 @@ final class SwingLightweightPeer extends SwingComponentPeer implements
 	 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
 	 */
 	public Component getAWTComponent() {
-		return component;
+		return (Component) component;
 	}
 
 	/**

@@ -47,13 +47,7 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
 
     ///////////////////////////////////////////////////////////////////////////////////////
     // Private
-
-    protected final Component component;
-
     protected final Logger log = Logger.getLogger(getClass());
-
-    private final JNodeToolkit toolkit;
-
     protected final JComponent jComponent;
 
     /**
@@ -64,9 +58,7 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
      */
     public SwingComponentPeer(JNodeToolkit toolkit, Component component, JComponent peer) {
         super(toolkit, component);
-        this.toolkit = toolkit;
         this.jComponent = peer;
-        this.component = component;
         setBounds(component.getX(), component.getY(), component.getWidth(),
                 component.getHeight());
         jComponent.addMouseListener(new MouseListenerDelegate(component));
@@ -146,7 +138,7 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
 
     public Graphics getGraphics() {
     	log.debug("getGraphics");
-        final Component parent = component.getParent();
+        final Component parent = ((Component)component).getParent();
         if (parent != null) {
             //System.out.println("creating graphics");
         	final int x = jComponent.getX();
@@ -168,7 +160,7 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
 	 * @return The location on screen
 	 */
 	public Point getLocationOnScreen() {
-		return computeLocationOnScreen(component);
+		return computeLocationOnScreen(((Component)component));
 	}
 
     private Point computeLocationOnScreen(Component component) {
@@ -197,14 +189,14 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
                 Graphics g = jComponent.getGraphics();
                 //Point p = component.getLocationOnScreen();
                 //g.translate(p.x, p.y);
-                component.paint(g);
+                ((Component)component).paint(g);
                 //g.translate(-p.x, -p.y);
             } break;
             case PaintEvent.UPDATE: {
                 Graphics g = jComponent.getGraphics();
                 //Point p = component.getLocationOnScreen();
                 //g.translate(p.x, p.y);
-                component.update(getGraphics());
+                ((Component)component).update(getGraphics());
                 //g.translate(-p.x, -p.y);
             } break;
         }
@@ -212,7 +204,7 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
 
     protected final void paintAWTComponent(){
         if(component != null)
-        q.postEvent(new PaintEvent(component, PaintEvent.PAINT, component.getBounds()));
+        eventQueue.postEvent(new PaintEvent((Component) component, PaintEvent.PAINT, ((Component)component).getBounds()));
     }
 
     public boolean handlesWheelScrolling() {
@@ -275,6 +267,25 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
      */
     public final void requestFocus() {
         jComponent.requestFocus();
+        // save old focus component
+		SwingComponentPeer oldFocusPeer;
+		Component fc = toolkit.getFocusHandler().getFocusedComponent();
+		if (fc != null) {
+			oldFocusPeer = (SwingComponentPeer) fc.getPeer();
+		} else {
+			oldFocusPeer = null;
+		}
+		// set new focus
+		toolkit.getFocusHandler().setFocusedComponent((Component) component);
+		// redraw new and (if necessary) old focus component
+		// Note that Window derived classes can also request
+		// focus, but are not traversable to focus.
+		if (oldFocusPeer != null && oldFocusPeer.isFocusTraversable()) {
+			oldFocusPeer.paintAWTComponent();
+		}
+		if (isFocusTraversable()) {
+			paintAWTComponent();
+		}
     }
 
     public final boolean requestFocus(Component lightweightChild, boolean temporary,
@@ -297,12 +308,17 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
     	final int oldWidth = jComponent.getWidth();
     	final int oldHeight = jComponent.getHeight();
         jComponent.setBounds(x, y, width, height);
+        fireComponentEvent(oldWidth, width, oldHeight, height);
+    }
+
+    void fireComponentEvent(final int oldWidth, int width, final int oldHeight, int height) {
         if ((oldWidth != width) || (oldHeight != height)) {
             fireComponentEvent(ComponentEvent.COMPONENT_RESIZED);
         } else {
             fireComponentEvent(ComponentEvent.COMPONENT_MOVED);
         }
     }
+
 
     /**
      * @see java.awt.peer.ComponentPeer#setCursor(java.awt.Cursor)
@@ -361,6 +377,6 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
      */
     protected final void fireComponentEvent(int what) {
         final EventQueue queue = toolkit.getSystemEventQueue();
-        queue.postEvent(new ComponentEvent(component, what));
+        queue.postEvent(new ComponentEvent((Component) component, what));
     }
 }
