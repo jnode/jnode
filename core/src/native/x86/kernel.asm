@@ -121,10 +121,6 @@ start64:
 
 	PRINT_STR before_start_vm_msg
 
-%ifdef BITS64
-LOOPDIE
-%endif
-
 	; Go into userspace
 	mov ABX,Luser_esp
 	mov ACX,go_user_cs
@@ -140,7 +136,11 @@ LOOPDIE
 	and eax,~F_NT
 	push AAX
 	popf
+%ifdef BITS32	
 	iret
+%else
+	iretq
+%endif	
 
 no_multiboot_loader:
     PRINT_STR no_multiboot_loader_msg
@@ -172,7 +172,9 @@ go_user_cs:
 		popf
 	%endif
 
-	CLEAR_SCREEN
+	%if 0
+		CLEAR_SCREEN
+	%endif
 
 	; Now start the virtual machine
 	xor ABP,ABP	; Clear the frame ptr
@@ -183,7 +185,12 @@ go_user_cs:
 	mov ABP,ASP
 
 	mov AAX,vm_start
+%ifdef BITS32	
 	add AAX,BootImageBuilder_JUMP_MAIN_OFFSET32
+%else
+	add AAX,BootImageBuilder_JUMP_MAIN_OFFSET64
+	LOOPDIE
+%endif	
 	call AAX
 
 	mov ADX, AAX	; Save return code in EDX

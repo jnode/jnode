@@ -6,10 +6,10 @@
 ; Author       : E.. Prangsma
 ; -----------------------------------------------
 
-%define RESUME_INT		qword[fs:VmX86Processor_RESUME_INT_OFS]
-%define RESUME_INTNO	qword[fs:VmX86Processor_RESUME_INTNO_OFS]
-%define RESUME_ERROR	qword[fs:VmX86Processor_RESUME_ERROR_OFS]
-%define RESUME_HANDLER	qword[fs:VmX86Processor_RESUME_HANDLER_OFS]
+%define RESUME_INT		qword[r15+VmX86Processor_RESUME_INT_OFS]
+%define RESUME_INTNO	qword[r15+VmX86Processor_RESUME_INTNO_OFS]
+%define RESUME_ERROR	qword[r15+VmX86Processor_RESUME_ERROR_OFS]
+%define RESUME_HANDLER	qword[r15+VmX86Processor_RESUME_HANDLER_OFS]
     
 int_die_halted:	DA 0    
     
@@ -70,7 +70,7 @@ OLD_EDI     equ 0
     pop rcx
     pop rax
     add rsp,24 ; Remove HANDLER & INTNO & ERRORCODE 
-    iret
+    iretq
 %endmacro
 
 ; -------------------------
@@ -148,11 +148,13 @@ sys_print_intregs:
 	idm_print_reg rsi, [rbp+OLD_ESI]
 	mov ebx,[rbp+OLD_ESP]
 	idm_print_reg stack0,  [ebx+0]
-	idm_print_reg stack1,  [ebx+4]
 	idm_print_reg stack1,  [ebx+8]
-	idm_print_reg stack1,  [ebx+12]
 	idm_print_reg stack1,  [ebx+16]
-	idm_print_reg stack1,  [ebx+20]
+	idm_print_reg stack1,  [ebx+24]
+	idm_print_reg stack2,  [ebx+32]
+	idm_print_reg stack1,  [ebx+40]
+	idm_print_reg stack1,  [ebx+48]
+	idm_print_reg stack1,  [ebx+56]
 	mov rbx,[rbp+OLD_EIP]
 	; If EIP == CR2, then we print the code as the address of the Top of
 	; the stack.
@@ -188,21 +190,22 @@ sys_print_intregs_loop2:
 idm_intno:  db 0xd,0xa,'int  : ',0
 idm_error:  db        ' Error: ',0
 idm_cr2:    db        ' CR2  : ',0
-idm_cr3:    db        ' CR3  : ',0
-idm_rip:    db 0xd,0xa,'EIP  : ',0
+idm_cr3:    db 0xd,0xa,'CR3  : ',0
+idm_rip:    db        ' EIP  : ',0
 idm_cs:     db        ' CS   : ',0
-idm_eflags: db        ' FLAGS: ',0
+idm_eflags: db 0xd,0xa,'FLAGS: ',0
 idm_cr0:	db        ' CR0  : ',0
-idm_rax:    db 0xd,0xa,'RAX  : ',0
-idm_rbx:    db        ' RBX  : ',0
+idm_rax:    db        ' RAX  : ',0
+idm_rbx:    db 0xd,0xa,'RBX  : ',0
 idm_rcx:    db        ' RCX  : ',0
 idm_rdx:    db        ' RDX  : ',0
 idm_rbp:    db 0xd,0xa,'RBP  : ',0
 idm_rsp:    db        ' RSP  : ',0
 idm_rdi:    db        ' RDI  : ',0
-idm_rsi:    db        ' RSI  : ',0
+idm_rsi:    db 0xd,0xa,'RSI  : ',0
 idm_stack0: db 0xd,0xa,'STACK: ',0
 idm_stack1: db        0
+idm_stack2: db 0xd,0xa,'       ',0
 idm_ipaddr: db 0xd,0xa,'CODE(',0
 idm_ip0:    db        '): ',0
 idm_ip1:    db        0

@@ -90,12 +90,24 @@ TSS_DS		equ 0x38
 	%define CURRENTTHREAD			dword[fs:VmProcessor_CURRENTTHREAD_OFS]
 	%define NEXTTHREAD				dword[fs:VmProcessor_NEXTTHREAD_OFS]
 	%define STACKEND 				dword[fs:VmProcessor_STACKEND_OFS]
+	%define STATICSTABLE			dword[fs:VmProcessor_STATICSTABLE_OFS]
+	%define IRQCOUNT				dword[fs:VmX86Processor_IRQCOUNT_OFS]
+	%define DEADLOCKCOUNTER			dword[fs:VmX86Processor_DEADLOCKCOUNTER_OFS]
+	%define DEVICENACOUNTER			dword[fs:VmX86Processor_DEVICENACOUNTER_OFS]
+	%define FXSAVECOUNTER			dword[fs:VmX86Processor_FXSAVECOUNTER_OFS]
+	%define FXRESTORECOUNTER		dword[fs:VmX86Processor_FXRESTORECOUNTER_OFS]
 %else
 	%define THREADSWITCHINDICATOR	dword[r15+VmProcessor_THREADSWITCHINDICATOR_OFS]
 	%define CURRENTPROCESSOR		qword[r15+VmProcessor_ME_OFS]
 	%define CURRENTTHREAD			qword[r15+VmProcessor_CURRENTTHREAD_OFS]
 	%define NEXTTHREAD				qword[r15+VmProcessor_NEXTTHREAD_OFS]
 	%define STACKEND 				qword[r15+VmProcessor_STACKEND_OFS]
+	%define STATICSTABLE			qword[r15+VmProcessor_STATICSTABLE_OFS]
+	%define IRQCOUNT				qword[r15+VmX86Processor_IRQCOUNT_OFS]
+	%define DEADLOCKCOUNTER			qword[r15+VmX86Processor_DEADLOCKCOUNTER_OFS]
+	%define DEVICENACOUNTER			qword[r15+VmX86Processor_DEVICENACOUNTER_OFS]
+	%define FXSAVECOUNTER			qword[r15+VmX86Processor_FXSAVECOUNTER_OFS]
+	%define FXRESTORECOUNTER		qword[r15+VmX86Processor_FXRESTORECOUNTER_OFS]
 %endif
 
 ; Invoke the method in EAX

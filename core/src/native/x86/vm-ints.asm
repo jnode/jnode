@@ -11,11 +11,6 @@
 	extern VmProcessor_reschedule
 	global currentTimeMillisStaticsIdx
 	
-%define DEADLOCKCOUNTER		dword[fs:VmX86Processor_DEADLOCKCOUNTER_OFS]
-%define DEVICENACOUNTER		dword[fs:VmX86Processor_DEVICENACOUNTER_OFS]
-%define FXSAVECOUNTER		dword[fs:VmX86Processor_FXSAVECOUNTER_OFS]
-%define FXRESTORECOUNTER	dword[fs:VmX86Processor_FXRESTORECOUNTER_OFS]
-
 currentTimeMillisStaticsIdx	DA -1
 	
 ; -----------------------------------------------
@@ -209,7 +204,7 @@ int_dev_na_ret:
 ; Handle a timer interrupt
 ; -----------------------------------------------
 timer_handler:
-	mov ADI,[fs:VmProcessor_STATICSTABLE_OFS]
+	mov ADI,STATICSTABLE
 	mov AAX,[currentTimeMillisStaticsIdx]
 	lea ADI,[ADI+AAX*4+(VmArray_DATA_OFFSET*SLOT_SIZE)]
 %ifdef BITS32	
@@ -246,7 +241,7 @@ def_irq_handler:
 	jne def_irq_kernel
 	; Increment the appropriate IRQ counter and set threadSwitch indicator.
 	mov AAX,[ABP+INTNO]
-	mov ADI,WORD [fs:VmX86Processor_IRQCOUNT_OFS]
+	mov ADI,IRQCOUNT
 	inc dword [ADI+(VmArray_DATA_OFFSET*SLOT_SIZE)+AAX*4]
 	; Set thread switch indicator
 	or THREADSWITCHINDICATOR, VmProcessor_TSI_SWITCH_NEEDED
