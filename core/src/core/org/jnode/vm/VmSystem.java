@@ -106,11 +106,15 @@ public final class VmSystem {
             // via Locale.getDefault.
             Locale.getDefault();
 
+            // Calibrate the processors
+            Unsafe.getCurrentProcessor().calibrate();
+
             // Load the initial jarfile
             initJar = loadInitJar(rm);
 
             // Start the compilation manager
             vm.startHotMethodManager();
+            
         }
     }
 
@@ -806,5 +810,23 @@ public final class VmSystem {
      */
     public static final PrintStream getOut() {
         return out;
+    }
+    
+    /**
+     * Calculate the speed of the current processor.
+     * @return
+     */
+    final static float calculateJNodeMips() throws PragmaUninterruptible {
+        final long millis = currentTimeMillis % 1000;
+        while (millis == (currentTimeMillis % 1000)) {
+            // Wait
+        }
+        long count = 0;
+        float dummy = 0.0f;
+        while (millis != (currentTimeMillis % 1000)) {
+            count++;
+            dummy += 0.5f;
+        }
+        return count / 100000.0f;
     }
 }
