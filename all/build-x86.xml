@@ -8,9 +8,9 @@
   <property name="build.native.dir" value="${my-build.dir}/native"/>
   <property name="build.bootimage.dir" value="${my-build.dir}/bootimage"/>
   <property name="build.netboot.dir" value="${my-build.dir}/netboot"/>
-  <property name="jnode.disk"     value="${build.dir}/jnodedisk.dat"/>
-  <property name="jnode.disk.pln" value="${build.dir}/jnodedisk.pln"/>
-  <!-- property name="jnode.floppy"   value="${build.dir}/jnodefloppy.img"/ -->
+  <property name="jnode.disk"     value="${my-build.dir}/jnodedisk.dat"/>
+  <property name="jnode.disk.pln" value="${my-build.dir}/jnodedisk.pln"/>
+  <property name="jnode.disk.geometry" value="64/16/32"/>
 
   <property name="grub-ver"     value="grub-0.93-i386-pc"/>
   <property name="grub.dir"     value="${my-build.dir}/${grub-ver}/boot/grub"/>
@@ -200,35 +200,30 @@
     <bootdisk destfile="${jnode.disk}"
               stage1ResourceName="${grub.stage1.name}"
               stage2ResourceName="${grub.stage2.name}"
-              plnfile="${jnode.disk.pln}">
+              plnfile="${jnode.disk.pln}"
+              geometry="${jnode.disk.geometry}">
       <fileset dir="${my-build.dir}/bootdisk"/>
     </bootdisk>
   </target>
 
 <!-- Create a full distributable bootable CDROM image -->
   <target name="cdrom" depends="boot-disk">
-    <mkdir dir="${build.dir}/cdrom"/>
-    <copy todir="${build.dir}/cdrom">
-      <fileset dir="${build.dir}">
-        <include name="jnodedisk.dat"/>
-      </fileset>
-    </copy>
-    <!-- copy todir="${build.dir}/cdrom" file="${sources.dist.tar.gz}"/ -->
+    <property name="${cdrom.dir}" value="${my-build.dir}/cdrom-full"/>
+    <mkdir dir="${cdrom.dir}"/>
+    <copy file="${jnode.disk}" todir="${cdrom.dir}"/>
+    <copy file="${sources.dist.tar.gz}" todir="${cdrom.dir}"/>
     <exec executable="mkisofs">
-      <arg line="-o ${jnode.iso} -r -hard-disk-boot -b jnodedisk.dat ${build.dir}/cdrom"/>
+      <arg line="-o ${jnode-x86.iso} -r -hard-disk-boot -b jnodedisk.dat ${cdrom.dir}"/>
     </exec>
   </target>
 
 <!-- Create a bootable CDROM image -->
   <target name="cdrom-lite" depends="boot-disk">
-    <mkdir dir="${build.dir}/cdrom-lite"/>
-    <copy todir="${build.dir}/cdrom-lite">
-      <fileset dir="${build.dir}">
-        <include name="jnodedisk.dat"/>
-      </fileset>
-    </copy>
+    <property name="${cdrom.dir}" value="${my-build.dir}/cdrom-lite"/>
+    <mkdir dir="${cdrom.dir}"/>
+    <copy file="${jnode.disk}" todir="${cdrom.dir}"/>
     <exec executable="mkisofs">
-      <arg line="-o ${build.dir}/jnode-lite.iso -r -hard-disk-boot -b jnodedisk.dat ${build.dir}/cdrom-lite"/>
+      <arg line="-o ${jnode-x86-lite.iso} -r -hard-disk-boot -b jnodedisk.dat ${cdrom.dir}"/>
     </exec>
   </target>
 
