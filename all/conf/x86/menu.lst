@@ -20,6 +20,11 @@ kernel (hd0,0)/jnode32.gz
 module (hd0,0)/full.jgz
 
 # ---------------------------
+title JNode (all plugins without MP)
+kernel (hd0,0)/jnode32.gz mp=no
+module (hd0,0)/full.jgz
+
+# ---------------------------
 title JNode GUI (all plugins)
 kernel (hd0,0)/jnode32.gz
 module (hd0,0)/fullgui.jgz
