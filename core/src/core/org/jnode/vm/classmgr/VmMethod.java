@@ -361,8 +361,8 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      * 
      * @return boolean
      */
-    public boolean isReturnWide() {
-        return wide;
+    public final boolean isReturnWide() {
+        return ((this.getModifiers() & Modifier.ACC_WIDE) != 0);
     }
 
     /**

@@ -25,9 +25,11 @@ import org.jnode.vm.VmSystemObject;
 import org.vmmagic.pragma.Uninterruptible;
 
 /**
+ * Base class for the internal representation of methods and fields.
+ * 
  * @author epr
  */
-public abstract class VmMember extends VmSystemObject implements Uninterruptible {
+abstract class VmMember extends VmSystemObject implements Uninterruptible {
 
 	/** Name of this member */
 	protected final String name;
@@ -39,8 +41,6 @@ public abstract class VmMember extends VmSystemObject implements Uninterruptible
 	protected final VmType declaringClass;
 	/** Hashcode of name+signature */
 	private final int cachedHashCode;
-	/** Is this a wide method */
-	protected final boolean wide;
 
 	/**
 	 * Create a new instance
@@ -56,12 +56,14 @@ public abstract class VmMember extends VmSystemObject implements Uninterruptible
 		} else if (name.equals("<init>")) {
 			modifiers |= Modifier.ACC_CONSTRUCTOR;
 		}
+        if (Modifier.isWide(signature)) {
+            modifiers |= Modifier.ACC_WIDE;
+        }
 		this.name = name;
 		this.signature = signature;
 		this.modifiers = modifiers;
 		this.declaringClass = declaringClass;
 		this.cachedHashCode = calcHashCode(name, signature);
-		this.wide = Modifier.isWide(signature);
 	}
 
 	/**
