@@ -10,6 +10,7 @@
     <import plugin="org.jnode.net"/>
     <import plugin="org.jnode.net.arp"/>
     <import plugin="org.jnode.net.ipv4"/>
+    <import plugin="org.jnode.net.ipv4.config"/>
     <import plugin="org.jnode.shell.help"/>
   </requires>
 

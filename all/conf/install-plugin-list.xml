@@ -62,6 +62,7 @@
     <plugin id="org.jnode.net"/>
     <plugin id="org.jnode.net.arp"/>
     <plugin id="org.jnode.net.ipv4"/>
+  <plugin id="org.jnode.net.ipv4.config"/>
     <plugin id="org.jnode.net.ipv4.core"/>
 
     <plugin id="org.jnode.protocol.ftp"/>
