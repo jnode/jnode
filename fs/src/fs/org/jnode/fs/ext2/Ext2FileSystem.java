@@ -13,6 +13,7 @@ import org.jnode.driver.Device;
 import org.jnode.fs.AbstractFileSystem;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystemException;
+import org.jnode.fs.ReadOnlyFileSystemException;
 import org.jnode.fs.ext2.cache.Block;
 import org.jnode.fs.ext2.cache.BlockCache;
 import org.jnode.fs.ext2.cache.INodeCache;
@@ -203,7 +204,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	 */
 	public void writeBlock(long nr, byte[] data, boolean forceWrite) throws IOException {
 		if(isReadOnly())
-			throw new IOException("Filesystem is mounted read-only!"); 
+			throw new ReadOnlyFileSystemException("Filesystem is mounted read-only!"); 
 			
 		Block block;
 		
