@@ -38,7 +38,7 @@ public class X86StreamTest implements X86Constants {
 	public static void main(String[] args) 
 	throws Exception {
 		
-		final X86BinaryAssembler os = new X86BinaryAssembler(X86CpuID.createID("pentium4"), Mode.BITS32, 0);
+		final X86BinaryAssembler os = new X86BinaryAssembler(X86CpuID.createID("pentium4"), Mode.CODE32, 0);
 		
 		final Label label = new Label("label");
 		os.writeADD(X86Register.EDX, X86Register.EAX);

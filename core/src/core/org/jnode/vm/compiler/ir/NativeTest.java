@@ -73,7 +73,7 @@ public class NativeTest {
             }
 
             if(binary){
-                X86BinaryAssembler os = new X86BinaryAssembler(cpuId, X86Constants.Mode.BITS32, 0);
+                X86BinaryAssembler os = new X86BinaryAssembler(cpuId, X86Constants.Mode.CODE32, 0);
                 generateCode(os, className);
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -100,7 +100,7 @@ public class NativeTest {
 //                System.out.println("result: " + execFloatFloatFloat(5, 3, b, b.length) + " " + PrimitiveTest.terniary(5, 3));
 
             }else{
-                X86TextAssembler tos = new X86TextAssembler(new OutputStreamWriter(System.out), cpuId, X86Constants.Mode.BITS32);
+                X86TextAssembler tos = new X86TextAssembler(new OutputStreamWriter(System.out), cpuId, X86Constants.Mode.CODE32);
                 generateCode(tos, className);
                 tos.flush();
             }
