@@ -342,7 +342,7 @@ public final class VmSystem {
         final VmStackReader reader = Unsafe.getCurrentProcessor()
                 .getArchitecture().getStackReader();
         final VmSystemClassLoader systemLoader = VmSystem.systemLoader;
-        VmAddress f = Unsafe.getCurrentFrame();
+        Address f = Unsafe.getCurrentFrame();
         while (reader.isValid(f)) {
             final VmMethod method = reader.getMethod(f);
             final VmClassLoader loader = method.getDeclaringClass().getLoader();
@@ -429,7 +429,7 @@ public final class VmSystem {
                 proc.enableReschedule();
             }
         } else if (current == proc.getCurrentThread()) {
-            final VmAddress curFrame = Unsafe.getCurrentFrame();
+            final Address curFrame = Unsafe.getCurrentFrame();
             mt = reader.getVmStackTrace(reader.getPrevious(curFrame), reader
                     .getReturnAddress(curFrame), STACKTRACE_LIMIT);
         } else {
@@ -497,8 +497,8 @@ public final class VmSystem {
      * @param address
      * @return Object
      */
-    public static VmAddress findThrowableHandler(Throwable ex, VmAddress frame,
-            VmAddress address) throws PrivilegedActionPragma {
+    public static Address findThrowableHandler(Throwable ex, Address frame,
+            Address address) throws PrivilegedActionPragma {
 
         try {
         	debug++;
@@ -561,7 +561,7 @@ public final class VmSystem {
                 boolean match;
 
                 if (compiled) {
-                    match = ceh.isInScope(address);
+                    match = ceh.isInScope(address.toAddress());
                 } else {
                     match = ieh.isInScope(pc);
                 }
@@ -572,11 +572,11 @@ public final class VmSystem {
                     if (catchType == null) {
                         /* Catch all exceptions */
                         if (compiled) {
-                            return ceh.getHandler();
+                            return Address.fromAddress(ceh.getHandler());
                         } else {
                             reader.setPC(frame, ieh.getHandlerPC());
                             //Screen.debug("Found ANY handler");
-                            return Unsafe.intToAddress(RC_HANDLER);
+                            return Address.fromIntSignExtend(RC_HANDLER);
                         }
                     } else {
                         if (!catchType.isResolved()) {
@@ -587,11 +587,11 @@ public final class VmSystem {
                         if (handlerClass != null) {
                             if (handlerClass.isAssignableFrom(exClass)) {
                                 if (compiled) {
-                                    return ceh.getHandler();
+                                    return Address.fromAddress(ceh.getHandler());
                                 } else {
                                     reader.setPC(frame, ieh.getHandlerPC());
                                     //Screen.debug("Found specific handler");
-                                    return Unsafe.intToAddress(RC_HANDLER);
+                                    return Address.fromIntSignExtend(RC_HANDLER);
                                 }
                             }
                         } else {
@@ -604,14 +604,14 @@ public final class VmSystem {
             }
 
             if (compiled) {
-                if (cc.contains(address)) {
-                    return cc.getDefaultExceptionHandler();
+                if (cc.contains(address.toAddress())) {
+                    return Address.fromAddress(cc.getDefaultExceptionHandler());
                 } else {
                     return null;
                 }
             } else {
                 //Screen.debug("Def.handler");
-                return Unsafe.intToAddress(RC_DEFHANDLER);
+                return Address.fromIntSignExtend(RC_DEFHANDLER);
             }
         } catch (Throwable ex2) {
             Unsafe.debug("Exception in findThrowableHandler");

@@ -30,6 +30,7 @@ import java.security.ProtectionDomain;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.vmmagic.pragma.PrivilegedActionPragma;
+import org.vmmagic.unboxed.Address;
 
 /**
  * JNode VM implementation of the java AccessControl system.
@@ -61,7 +62,7 @@ public final class VmAccessController {
             // that does not require any memory allocations.
             final VmStackReader reader = Unsafe.getCurrentProcessor()
                     .getArchitecture().getStackReader();
-            VmAddress sf = Unsafe.getCurrentFrame();
+            Address sf = Unsafe.getCurrentFrame();
             int recursionCount = 0;
             while (reader.isValid(sf)) {
                 final VmMethod method = reader.getMethod(sf);

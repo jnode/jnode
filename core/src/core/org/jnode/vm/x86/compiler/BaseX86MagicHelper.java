@@ -105,4 +105,18 @@ public class BaseX86MagicHelper extends BaseMagicHelper {
         default: throw new InternalError("Unknown mcode " + mcode);                    
         }
     }
+    
+    protected static final int methodCodeToOperation(int mcode) {
+        switch (mcode) {
+        case mATOMICADD:
+        	return X86Operation.ADD;
+        case mATOMICAND:
+        	return X86Operation.AND;
+        case mATOMICOR:
+        	return X86Operation.OR;
+        case mATOMICSUB:
+        	return X86Operation.SUB;
+        default: throw new InternalError("Unknown mcode " + mcode);                    
+        }    	
+    }
 }

@@ -27,9 +27,9 @@ public final class VmX86Thread extends VmThread {
 	volatile int esi;
 	volatile int edi;
 	volatile int eflags;
-	volatile VmAddress eip;
-	volatile VmAddress esp;
-	volatile VmAddress ebp;
+	volatile Address eip;
+	volatile Address esp;
+	volatile Address ebp;
 	
 	// State upon last system exception
 	volatile int exEax;
@@ -71,7 +71,7 @@ public final class VmX86Thread extends VmThread {
 	 * Gets the most current stackframe of this thread.
 	 * @return Stackframe 
 	 */
-	protected VmAddress getStackFrame() {
+	protected Address getStackFrame() {
 		return ebp;
 	}
 	
@@ -80,22 +80,22 @@ public final class VmX86Thread extends VmThread {
 	 * This method is only valid when this thread is not running.
 	 * @return IP 
 	 */
-	protected VmAddress getInstructionPointer() {
+	protected Address getInstructionPointer() {
 		return eip;
 	}
 
     /**
      * Gets the stackframe of the last system exception of this thread. 
      */
-    protected VmAddress getExceptionStackFrame() {
-        return VmAddress.valueOf(exEbp);
+    protected Address getExceptionStackFrame() {
+        return Address.fromIntZeroExtend(exEbp);
     }
 
     /**
      * Gets the instruction pointer of the last system exception of this thread. 
      */
-    protected VmAddress getExceptionInstructionPointer() {
-        return VmAddress.valueOf(exEip);
+    protected Address getExceptionInstructionPointer() {
+        return Address.fromIntZeroExtend(exEip);
     }
 
 	/**
@@ -151,7 +151,7 @@ public final class VmX86Thread extends VmThread {
             if (this == currentThread()) {
                 stackEnd = stackBottom;
             } else {
-                stackEnd = Address.fromAddress(esp);
+                stackEnd = esp;
             }
             
             Address ptr = stackTop;

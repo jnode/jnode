@@ -851,7 +851,7 @@ public final class Unsafe {
 	 * 
 	 * @return The address of the stackframe of the current thread
 	 */
-	protected static native VmAddress getCurrentFrame();
+	protected static native Address getCurrentFrame();
 
 	/**
 	 * Halt the processor until the next interrupt arrives.
@@ -913,33 +913,6 @@ public final class Unsafe {
 	 * @return boolean true if the value at address is changed, false otherwise.
 	 */
 	protected static native boolean atomicCompareAndSwap(VmAddress address, int oldValue, int newValue);
-
-	/**
-	 * Atomic AND. *((int*)address) &= value.
-	 * 
-	 * @param address
-	 * @param value
-	 * @return boolean
-	 */
-	protected static native boolean atomicAnd(VmAddress address, int value);
-
-	/**
-	 * Atomic OR. *((int*)address) |= value.
-	 * 
-	 * @param address
-	 * @param value
-	 * @return boolean
-	 */
-	protected static native boolean atomicOr(VmAddress address, int value);
-
-	/**
-	 * Atomic SUB. *((int*)address) -= value.
-	 * 
-	 * @param address
-	 * @param value
-	 * @return boolean
-	 */
-	protected static native boolean atomicSub(VmAddress address, int value);
 
 	protected static native int inPortByte(int portNr);
 	protected static native int inPortWord(int portNr);

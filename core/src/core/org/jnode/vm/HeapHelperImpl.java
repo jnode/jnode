@@ -28,6 +28,7 @@ import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.vmmagic.pragma.Uninterruptible;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.ObjectReference;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -91,14 +92,15 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
      * @param dst
      */
     public final void setFinalized(Object dst) {
-        final VmAddress addr = Unsafe.add(Unsafe.addressOf(dst), flagsOffset);
+    	final Address addr = ObjectReference.fromObject(dst).toAddress().add(flagsOffset);
         int oldValue;
         int newValue;
         do {
-            oldValue = Unsafe.getInt(dst, flagsOffset);
+            oldValue = addr.prepareInt();
             if ((oldValue & ObjectFlags.STATUS_FINALIZED) != 0) { return; }
             newValue = oldValue | ObjectFlags.STATUS_FINALIZED;
-        } while (!Unsafe.atomicCompareAndSwap(addr, oldValue, newValue));
+        } while (!addr.attempt(oldValue, newValue)); 
+        //} while (!Unsafe.atomicCompareAndSwap(addr, oldValue, newValue));
     }
 
     /**
@@ -112,14 +114,14 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
      */
     public boolean atomicChangeObjectColor(Object dst, int oldColor,
             int newColor) {
-        final VmAddress addr = Unsafe.add(Unsafe.addressOf(dst), flagsOffset);
+    	final Address addr = ObjectReference.fromObject(dst).toAddress().add(flagsOffset);
         int oldValue;
         int newValue;
         do {
-            oldValue = Unsafe.getInt(dst, flagsOffset);
+            oldValue = addr.prepareInt();
             if ((oldValue & ObjectFlags.GC_COLOUR_MASK) != oldColor) { return false; }
             newValue = (oldValue & ~ObjectFlags.GC_COLOUR_MASK) | newColor;
-        } while (!Unsafe.atomicCompareAndSwap(addr, oldValue, newValue));
+        } while (!addr.attempt(oldValue, newValue));
         return true;
     }
 

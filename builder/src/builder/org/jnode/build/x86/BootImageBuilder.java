@@ -279,7 +279,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		os86.set32(os.getObjectRef(new Label("currentTimeMillisStaticsIdx")).getOffset(), staticsIdx);
 
 		/* Link vm_findThrowableHandler */
-		refJava = os.getObjectRef(vmSystemClass.getMethod("findThrowableHandler", "(Ljava/lang/Throwable;Lorg/jnode/vm/VmAddress;Lorg/jnode/vm/VmAddress;)Lorg/jnode/vm/VmAddress;"));
+		refJava = os.getObjectRef(vmSystemClass.getMethod("findThrowableHandler", "(Ljava/lang/Throwable;Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Address;)Lorg/vmmagic/unboxed/Address;"));
 		os.getObjectRef(vmFindThrowableHandler).link(refJava);
 
 		/* Link MonitorManager_monitorEnter */

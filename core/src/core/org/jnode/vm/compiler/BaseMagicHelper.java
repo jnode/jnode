@@ -221,6 +221,10 @@ public class BaseMagicHelper {
     protected static final int mGETARRAYDATA = 103;
     protected static final int mGETOBJECTCOLOR = 104;
     protected static final int mISFINALIZED = 105;
+    protected static final int mATOMICADD = 106;
+    protected static final int mATOMICAND = 107;
+    protected static final int mATOMICOR = 108;
+    protected static final int mATOMICSUB = 109;
 
     private static final int mLOAD_MIN = mLOADBYTE;
 
@@ -286,6 +290,10 @@ public class BaseMagicHelper {
         addMethod("prepareAddress", mPREPAREADDRESS);
         addMethod("prepareObjectReference", mPREPAREOBJECTREFERENCE);
         addMethod("prepareWord", mPREPAREWORD);
+        addMethod("atomicAdd", mATOMICADD);
+        addMethod("atomicAnd", mATOMICAND);
+        addMethod("atomicOr", mATOMICOR);
+        addMethod("atomicSub", mATOMICSUB);
         
         // VmMagic
         addMethod("getObjectType", mGETOBJECTTYPE);
