@@ -1,7 +1,7 @@
 <project name="JNode" default="all" basedir=".">
 
   <!-- JNode version -->
-  <property name="jnode-ver" value="0.1.8-dev"/>
+  <property name="jnode-ver" value="0.1.8"/>
   
   <!-- Java target and source version -->
   <property name="java.target" value="1.4"/>
@@ -200,7 +200,7 @@
   </target>
 
   <!-- Upload a distribution -->
-  <target name="upload" depends="cdrom">
+  <target name="upload">
     <property name="upload.dir" value="${build.dir}/upload"/>
     <mkdir dir="${upload.dir}"/>
     <gzip src="${jnode-x86.iso}"
