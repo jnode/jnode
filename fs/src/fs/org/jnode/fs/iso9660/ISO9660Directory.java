@@ -8,6 +8,7 @@ import java.util.Iterator;
 
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSEntryIterator;
 import org.jnode.fs.FileSystem;
 
 /**
@@ -28,8 +29,8 @@ public final class ISO9660Directory implements FSDirectory {
     /**
      * @see org.jnode.fs.FSDirectory#iterator()
      */
-    public Iterator iterator() throws IOException {
-        return new Iterator() {
+    public FSEntryIterator iterator() throws IOException {
+        return new FSEntryIterator() {
 
             int offset = 0;
 
@@ -42,7 +43,7 @@ public final class ISO9660Directory implements FSDirectory {
                 return ((offset < buffer.length) && (buffer[ offset] > 0));
             }
 
-            public Object next() {
+            public FSEntry next() {
                 final ISO9660Volume volume = parent.getVolume();
                 final EntryRecord fEntry = new EntryRecord(volume, buffer, offset+1,
                         parent.getEncoding());
@@ -50,11 +51,6 @@ public final class ISO9660Directory implements FSDirectory {
                 return new ISO9660Entry((ISO9660FileSystem) entry
                         .getFileSystem(), fEntry);
             }
-
-            public void remove() {
-                throw new UnsupportedOperationException("Not yet implemented");
-            }
-
         };
     }
 
@@ -62,7 +58,7 @@ public final class ISO9660Directory implements FSDirectory {
      * @see org.jnode.fs.FSDirectory#getEntry(java.lang.String)
      */
     public FSEntry getEntry(String name) throws IOException {
-        for (Iterator it = this.iterator(); it.hasNext();) {
+        for (FSEntryIterator it = this.iterator(); it.hasNext();) {
             ISO9660Entry entry = (ISO9660Entry) it.next();
             if (entry.getName().equalsIgnoreCase(name)) return entry;
         }
@@ -104,4 +100,12 @@ public final class ISO9660Directory implements FSDirectory {
         return entry.getFileSystem();
     }
 
+	/**
+	 * Save all dirty (unsaved) data to the device 
+	 * @throws IOException
+	 */
+	public void flush() throws IOException
+	{
+		//TODO
+	}
 }
