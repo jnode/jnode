@@ -24,15 +24,15 @@ package org.jnode.vm.x86.compiler.l1a;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
+import org.jnode.assembler.x86.X86Register.GPR32;
+import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
  * @author Patrik Reali
- * 
- * To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Generation - Code and Comments
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class LongItem extends DoubleWordItem implements X86CompilerConstants {
 
@@ -52,21 +52,20 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
      * @param msb
      * @param val
      */
-    final void initialize(int kind, int offsetToFP, X86Register.GPR lsb, X86Register.GPR msb, X86Register.XMM xmm,
+    final void initialize(int kind, int offsetToFP, X86Register.GPR lsb, X86Register.GPR msb, X86Register.GPR64 reg, X86Register.XMM xmm,
             long val) {
-        super.initialize(kind, offsetToFP, lsb, msb, xmm);
+        super.initialize(kind, offsetToFP, lsb, msb, reg, xmm);
         this.value = val;
     }
 
     /**
-     * Load my constant to the given os.
+     * Load my constant to the given os in 32-bit mode.
      * 
      * @param os
-     * @param lsb
-     * @param msb
+     * @param reg
      */
-    protected final void loadToConstant(EmitterContext ec,
-            X86Assembler os, GPR lsb, GPR msb) {
+    protected final void loadToConstant32(EmitterContext ec,
+            X86Assembler os, GPR32 lsb, GPR32 msb) {
         
         if (value != 0) {
             final int lsbv = (int) (value & 0xFFFFFFFFL);
@@ -79,6 +78,17 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
             os.writeXOR(msb, msb);
         }
     }
+
+	/**
+	 * Load my constant to the given os in 64-bit mode.
+	 * 
+	 * @param os
+	 * @param reg
+	 */
+	protected final void loadToConstant64(EmitterContext ec,
+			X86Assembler os, GPR64 reg) {
+		os.writeMOV_Const(reg, value);
+	}
 
     /**
      * Pop the top of the FPU stack into the given memory location.

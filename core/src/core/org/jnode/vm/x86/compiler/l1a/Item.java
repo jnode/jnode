@@ -196,7 +196,7 @@ abstract class Item {
 	 * 
 	 * @return
 	 */
-	int getOffsetToFP() {
+	int getOffsetToFP(EmitterContext ec) {
 	    if (Vm.VerifyAssertions) Vm._assert(kind == Kind.LOCAL, "kind == Kind.LOCAL");
 		return offsetToFP;
 	}

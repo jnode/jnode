@@ -22,6 +22,7 @@
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 
 /**
@@ -78,6 +79,19 @@ final class L1AHelper {
 				msb);
 		pool.transferOwnerTo(lsb, result);
 		pool.transferOwnerTo(msb, result);
+		return result;
+	}
+
+	/**
+	 * Request a 64-bit register for a 8-byte item.
+	 */
+	static final DoubleWordItem requestDoubleWordRegister(
+			EmitterContext eContext, int jvmType, GPR64 reg) {
+		final X86RegisterPool pool = eContext.getGPRPool();
+		final ItemFactory ifac = eContext.getItemFactory();
+		requestRegister(eContext, reg);
+		final DoubleWordItem result = ifac.createReg(jvmType, reg);
+		pool.transferOwnerTo(reg, result);
 		return result;
 	}
 

@@ -24,6 +24,8 @@ package org.jnode.vm.x86.compiler.l1a;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
+import org.jnode.assembler.x86.X86Register.GPR32;
+import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 
@@ -46,9 +48,9 @@ final class DoubleItem extends DoubleWordItem {
 	 * @param offsetToFP
 	 * @param value
 	 */
-	final void initialize(int kind, int offsetToFP, X86Register.GPR lsb, X86Register.GPR msb, X86Register.XMM xmm,
+	final void initialize(int kind, int offsetToFP, X86Register.GPR lsb, X86Register.GPR msb, X86Register.GPR64 reg, X86Register.XMM xmm,
 			double value) {
-		super.initialize(kind, offsetToFP, lsb, msb, xmm);
+		super.initialize(kind, offsetToFP, lsb, msb, reg, xmm);
 		this.value = value;
 	}
 
@@ -79,20 +81,32 @@ final class DoubleItem extends DoubleWordItem {
 	}
 
 	/**
-	 * Load my constant to the given os.
+	 * Load my constant to the given os in 32-bit mode.
 	 * 
 	 * @param os
 	 * @param lsb
 	 * @param msb
 	 */
-	protected final void loadToConstant(EmitterContext ec,
-			X86Assembler os, GPR lsb, GPR msb) {
+	protected final void loadToConstant32(EmitterContext ec,
+			X86Assembler os, GPR32 lsb, GPR32 msb) {
 		final long lvalue = Double.doubleToLongBits(value);
 		final int lsbv = (int) (lvalue & 0xFFFFFFFFL);
 		final int msbv = (int) ((lvalue >>> 32) & 0xFFFFFFFFL);
 
 		os.writeMOV_Const(lsb, lsbv);
 		os.writeMOV_Const(msb, msbv);
+	}
+
+	/**
+	 * Load my constant to the given os in 64-bit mode.
+	 * 
+	 * @param os
+	 * @param reg
+	 */
+	protected final void loadToConstant64(EmitterContext ec,
+			X86Assembler os, GPR64 reg) {
+		final long lvalue = Double.doubleToLongBits(value);
+		os.writeMOV_Const(reg, lvalue);
 	}
 
 	/**

@@ -29,7 +29,7 @@ import org.jnode.vm.compiler.BaseMagicHelper;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class BaseX86MagicHelper extends BaseMagicHelper {
+public class BaseX86MagicHelper extends BaseMagicHelper implements X86Constants {
 
     /**
      * Convert a method code into an X86 condition code.

@@ -93,9 +93,9 @@ final class FPCompilerSSE extends FPCompiler {
 			switch (v2.getKind()) {
 			case Item.Kind.LOCAL:
 				if (type == JvmType.FLOAT) {
-					os.writeArithSSESOp(operation, r1, X86Register.EBP, v2.getOffsetToFP());
+					os.writeArithSSESOp(operation, r1, X86Register.EBP, v2.getOffsetToFP(ec));
 				} else {
-					os.writeArithSSEDOp(operation, r1, X86Register.EBP, v2.getOffsetToFP());					
+					os.writeArithSSEDOp(operation, r1, X86Register.EBP, v2.getOffsetToFP(ec));					
 				}
 				break;
 			default:

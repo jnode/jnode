@@ -23,6 +23,7 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.bytecode.TypeStack;
@@ -84,7 +85,7 @@ final class VirtualStack {
      * Increase stack size
      */
     private void growStack() {
-        Item[] tmp = new Item[stack.length * 2];
+        final Item[] tmp = new Item[stack.length * 2];
         System.arraycopy(stack, 0, tmp, 0, stack.length);
         stack = tmp;
     }
@@ -106,7 +107,7 @@ final class VirtualStack {
         //			//TODO: support items across basic blocks
         //			pushStack(Item.UNKNOWN);
         tos--;
-        Item i = stack[tos];
+        final Item i = stack[tos];
         stack[tos] = null;
         return i;
     }
@@ -151,7 +152,7 @@ final class VirtualStack {
         //            // pushStack(type);
         //        }
         tos--;
-        Item i = stack[tos];
+        final Item i = stack[tos];
         stack[tos] = null;
         if (i.getType() != type)
             throw new VerifyError("Expected:" + Integer.toString(type)
@@ -455,5 +456,17 @@ final class VirtualStack {
             }
             push(item);
         }
+
+        /**
+         * @see org.jnode.vm.x86.compiler.AbstractX86StackManager#writePUSH64(int,
+         *      GPR64)
+         */
+        public void writePUSH64(int jvmType, X86Register.GPR64 reg) {
+            final Item item = ifac.createReg(jvmType, reg);
+            if (Vm.VerifyAssertions)
+                Vm._assert(pool.request(reg, item), "request");
+            push(item);
+        }
+
     }
 }

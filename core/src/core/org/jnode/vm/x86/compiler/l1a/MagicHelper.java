@@ -25,6 +25,7 @@ import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
+import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.classmgr.ObjectFlags;
@@ -269,7 +270,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final LongItem addr = vstack.popLong();
             addr.load(ec);
-            final X86Register r = addr.getLsbRegister();
+            final X86Register r = addr.getLsbRegister(ec);
             addr.release(ec);
             vstack.push(L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, r));
         }
@@ -438,10 +439,15 @@ final class MagicHelper extends BaseX86MagicHelper {
             val.load(ec);
             addr.load(ec);
             final GPR r = addr.getRegister();
-            final GPR lsb = val.getLsbRegister();
-            final GPR msb = val.getMsbRegister();
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, X86CompilerConstants.LSB, lsb);
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, X86CompilerConstants.MSB, msb);
+            if (os.isCode32()) {
+            	final GPR lsb = val.getLsbRegister(ec);
+            	final GPR msb = val.getMsbRegister(ec);
+            	os.writeMOV(X86CompilerConstants.INTSIZE, r, X86CompilerConstants.LSB, lsb);
+            	os.writeMOV(X86CompilerConstants.INTSIZE, r, X86CompilerConstants.MSB, msb);
+            } else {
+            	final GPR64 valr = val.getRegister(ec);
+            	os.writeMOV(BITS64, r, 0, valr);            	
+            }
             val.release(ec);
             addr.release(ec);
         } break;
@@ -493,11 +499,16 @@ final class MagicHelper extends BaseX86MagicHelper {
             val.load(ec);
             addr.load(ec);
             final GPR r = addr.getRegister();
-            final GPR ofsr = ofs.getRegister();            
-            final GPR lsb = val.getLsbRegister();
-            final GPR msb = val.getMsbRegister();
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, ofsr, 1, X86CompilerConstants.LSB, lsb);
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, ofsr, 1, X86CompilerConstants.MSB, msb);
+            final GPR ofsr = ofs.getRegister();    
+            if (os.isCode32()) {
+            	final GPR lsb = val.getLsbRegister(ec);
+            	final GPR msb = val.getMsbRegister(ec);
+            	os.writeMOV(X86CompilerConstants.INTSIZE, r, ofsr, 1, X86CompilerConstants.LSB, lsb);
+            	os.writeMOV(X86CompilerConstants.INTSIZE, r, ofsr, 1, X86CompilerConstants.MSB, msb);
+            } else {
+            	final GPR64 valr = val.getRegister(ec);
+            	os.writeMOV(BITS64, r, ofsr, 1, 0, valr);            	
+            }
             ofs.release(ec);
             val.release(ec);
             addr.release(ec);
@@ -686,11 +697,17 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final DoubleWordItem v = (DoubleWordItem)vstack.pop();
             v.load(ec);
-            final X86Register.GPR lsb = v.getLsbRegister();
-            final X86Register.GPR msb = v.getMsbRegister();
-            v.release(ec);
-            final int resultType = (mcode == mLONGBITSTODOUBLE) ? JvmType.DOUBLE : JvmType.LONG;
-            vstack.push(L1AHelper.requestDoubleWordRegisters(ec, resultType, lsb, msb));            
+        	final int resultType = (mcode == mLONGBITSTODOUBLE) ? JvmType.DOUBLE : JvmType.LONG;
+            if (os.isCode32()) {
+            	final X86Register.GPR lsb = v.getLsbRegister(ec);
+            	final X86Register.GPR msb = v.getMsbRegister(ec);
+            	v.release(ec);
+            	vstack.push(L1AHelper.requestDoubleWordRegisters(ec, resultType, lsb, msb));
+            } else {
+            	final GPR64 vreg = v.getRegister(ec);
+            	v.release(ec);
+            	vstack.push(L1AHelper.requestDoubleWordRegister(ec, resultType, vreg));            	
+            }
         } break;
         case mBREAKPOINT: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
