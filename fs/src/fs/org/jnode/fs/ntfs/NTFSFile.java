@@ -23,7 +23,7 @@ public class NTFSFile implements FSFile {
 	private NTFSFileRecord fileRecord = null;
 	private NTFSIndexEntry indexEntry = null;
 	
-	public NTFSFile(NTFSIndexEntry indexEntry) throws IOException
+	public NTFSFile(NTFSIndexEntry indexEntry)
 	{
 		this.indexEntry = indexEntry; 
 	}
@@ -35,7 +35,7 @@ public class NTFSFile implements FSFile {
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FSFile#setLength(long)
 	 */
-	public void setLength(long length) throws IOException {
+	public void setLength(long length) {
 		// TODO Auto-generated method stub
 
 	}
@@ -50,7 +50,7 @@ public class NTFSFile implements FSFile {
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FSFile#write(long, byte[], int, int)
 	 */
-	public void write(long fileOffset, byte[] src, int off, int len) throws IOException {
+	public void write(long fileOffset, byte[] src, int off, int len) {
 		// TODO Auto-generated method stub
 
 	}
