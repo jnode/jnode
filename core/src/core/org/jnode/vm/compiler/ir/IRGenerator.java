@@ -1391,4 +1391,18 @@ public class IRGenerator extends BytecodeVisitor {
 		BinaryQuad bop = new BinaryQuad(address, currentBlock, s1, s1, op, stackOffset);
 		return bop.foldConstants();
 	}
+
+	/**
+	 * @return
+	 */
+	public Variable[] getVariables() {
+		return variables;
+	}
+
+	/**
+	 * @return
+	 */
+	public int getNoArgs() {
+		return this.nArgs;
+	}
 }

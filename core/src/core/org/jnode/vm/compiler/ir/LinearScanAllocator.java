@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import org.jnode.util.BootableArrayList;
-import org.jnode.util.BootableHashMap;
 
 /**
  * @author Madhu Siddalingaiah
@@ -19,39 +18,46 @@ public class LinearScanAllocator {
 	private BootableArrayList active;
 	private RegisterPool registerPool;
 	private EndPointComparator endPointComparator;
-	private int stackIndex;
-	private BootableHashMap variableMap;
+	private BootableArrayList spilledVariableList;
+	private Variable[] spilledVariables;
 
 	public LinearScanAllocator(LiveRange[] liveRanges) {
 		this.liveRanges = liveRanges;
 		this.registerPool = CodeGenerator.getInstance().getRegisterPool();
 		this.active = new BootableArrayList();
 		this.endPointComparator = new EndPointComparator();
+		this.spilledVariableList = new BootableArrayList();
 	}
 	
 	public void allocate() {
 		int n = liveRanges.length;
 		for (int i=0; i<n; i+=1) {
 			LiveRange lr = liveRanges[i];
-			expireOldRange(lr);
-			Object reg = registerPool.request(lr.getVariable().getType());
-			if (reg == null) {
-				spillRange(lr);
-			} else {
-				lr.setLocation(reg);
-				active.add(lr);
-				Collections.sort(active, endPointComparator);
+			Variable var = lr.getVariable();
+			if (!(var instanceof MethodArgument)) {
+				// don't allocate method arguments to registers
+				expireOldRange(lr);
+				Object reg = registerPool.request(var.getType());
+				if (reg == null) {
+					spillRange(lr);
+				} else {
+					lr.setLocation(new RegisterLocation(reg));
+					active.add(lr);
+					Collections.sort(active, endPointComparator);
+				}
 			}
 		}
-		this.variableMap = new BootableHashMap();
+		// This sort is probably not necessary...
+		Collections.sort(spilledVariableList, new StorageSizeComparator());
+		n = spilledVariableList.size();
+		spilledVariables = new Variable[n];
 		for (int i=0; i<n; i+=1) {
-			LiveRange lr = liveRanges[i];
-			variableMap.put(lr.getVariable(), lr.getLocation());
+			spilledVariables[i] = (Variable) spilledVariableList.get(i);
 		}
 	}
 
-	public BootableHashMap getVariableMap() {
-		return this.variableMap;
+	public Variable[] getSpilledVariables() {
+		return spilledVariables;
 	}
 
 	/**
@@ -75,14 +81,14 @@ public class LinearScanAllocator {
 		LiveRange spill = (LiveRange) active.get(active.size() - 1);
 		if (spill.getLastUseAddress() > lr.getLastUseAddress()) {
 			lr.setLocation(spill.getLocation());
-			spill.setLocation("local" + stackIndex);
-			stackIndex += 1;
+			spill.setLocation(new StackLocation());
+			this.spilledVariableList.add(spill.getVariable());
 			active.remove(spill);
 			active.add(lr);
 			Collections.sort(active);
 		} else {
-			lr.setLocation("local" + stackIndex);
-			stackIndex += 1;
+			lr.setLocation(new StackLocation());
+			this.spilledVariableList.add(lr.getVariable());
 		}
 	}
 }
@@ -95,5 +101,40 @@ class EndPointComparator implements Comparator {
 		LiveRange lr1 = (LiveRange) o1;
 		LiveRange lr2 = (LiveRange) o2;
 		return lr1.getLastUseAddress() - lr2.getLastUseAddress();
+	}
+}
+
+class StorageSizeComparator implements Comparator {
+	/* (non-Javadoc)
+	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+	 */
+	public int compare(Object o1, Object o2) {
+		Variable lr1 = (Variable) o1;
+		Variable lr2 = (Variable) o2;
+		int size1 = 0;
+		int size2 = 0;
+		// These are defined in the order on the stack
+		switch (lr1.getType()) {
+			case Operand.BYTE: size1 = 1; break;
+			case Operand.SHORT: size1 = 2; break;
+			case Operand.CHAR: size1 = 3; break;
+			case Operand.INT: size1 = 4; break;
+			case Operand.FLOAT: size1 = 5; break;
+			// this could be 32 or 64 bits, in between FLOAT and LONG is best
+			case Operand.REFERENCE: size1 = 6; break;
+			case Operand.LONG: size1 = 7; break;
+			case Operand.DOUBLE: size1 = 8; break;
+		}
+		switch (lr2.getType()) {
+			case Operand.BYTE: size2 = 1; break;
+			case Operand.SHORT: size2 = 2; break;
+			case Operand.CHAR: size2 = 3; break;
+			case Operand.INT: size2 = 4; break;
+			case Operand.FLOAT: size2 = 5; break;
+			case Operand.REFERENCE: size2 = 6; break;
+			case Operand.LONG: size2 = 7; break;
+			case Operand.DOUBLE: size2 = 8; break;
+		}
+		return size1 - size2;
 	}
 }
