@@ -67,17 +67,6 @@ public class Ext2File implements FSFile {
 
 			iNode.setMtime(System.currentTimeMillis()/1000);
 
-			/*
-			try{
-				iNode.update();
-			}catch(FileSystemException fse) {
-				throw new IOException(fse);
-			}
-			//update the group descriptors and superblock: needed if blocks have been 
-			//allocated or deallocated
-			iNode.getExt2FileSystem().updateFS();
-			*/
-			
 			return;
 		}
 		
@@ -190,19 +179,6 @@ public class Ext2File implements FSFile {
 		iNode.setSize( fileOffset+len );
 		
 		iNode.setMtime(System.currentTimeMillis()/1000);
-
-
-		/*
-		try{
-			iNode.update();
-		}catch(FileSystemException fse) {
-			throw new IOException(fse);
-		}
-		//update the group descriptors and superblock: needed if blocks have been 
-		//allocated or deallocated
-		iNode.getExt2FileSystem().updateFS();
-		*/
-				
 	}
 
 	/**

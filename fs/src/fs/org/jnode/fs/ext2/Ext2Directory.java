@@ -92,6 +92,9 @@ public class Ext2Directory implements FSDirectory {
 			int group = (int)( (newINode.getINodeNr()-1) / fs.getSuperblock().getINodesPerGroup()) ;
 			fs.modifyUsedDirsCount(group, 1);
 			
+			//update both affected directory inodes
+			iNode.update();
+			newINode.update();
 		}catch(FileSystemException fse) {
 			throw new IOException(fse);
 		}
@@ -117,6 +120,9 @@ public class Ext2Directory implements FSDirectory {
 			dr = new Ext2DirectoryRecord(newINode.getINodeNr(), Ext2Constants.EXT2_FT_REG_FILE, name);
 
 			addDirectoryRecord(dr);
+			
+			// update the directory inode
+			iNode.update();
 		}catch(FileSystemException fse) {
 			throw new IOException(fse);
 		}
@@ -171,11 +177,8 @@ public class Ext2Directory implements FSDirectory {
 			dir.write(0, dr.getData(), dr.getOffset(), dr.getRecLen());
 			log.debug("addDirectoryRecord(): LAST   record: begins at: 0, length: "+dr.getRecLen());				
 		}
-
-
 		
 		iNode.setMtime(System.currentTimeMillis()/1000);
-
 	}
 
 	/** 
