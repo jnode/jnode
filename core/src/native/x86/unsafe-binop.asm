@@ -10,32 +10,32 @@
 ; BINOP24_VALUES opcode, mask-opcode, mask
 %macro BINOP24_VALUES 3
     push ADI
-	mov ADI,[ASP+(2*SLOT_SIZE)+8]	; memPtr
-	mov eax,[ASP+(2*SLOT_SIZE)+4] 	; value
-	mov ecx,[ASP+(2*SLOT_SIZE)+0]	; count
-	jecxz %%end			; (Count == 0) ?
-	%2 eax,%3	     	; Apply Mask 
+	mov ADI,[ASP+(4*SLOT_SIZE)]		; memPtr
+	mov eax,[ASP+(3*SLOT_SIZE)] 	; value
+	mov ecx,[ASP+(2*SLOT_SIZE)]		; count
+	jecxz %%end						; (Count == 0) ?
+	%2 eax,%3	    			 	; Apply Mask 
 %%loop:
     %1 dword [ADI],eax
     lea ADI,[ADI+3]
 	loop %%loop
 %%end:
 	pop ADI
-	ret SLOT_SIZE+(2*4)
+	ret SLOT_SIZE*3
 %endmacro
 
 ; BINOP32_VALUES opcode, type, size, reg
 %macro BINOP32_VALUES 4
-	mov AAX,[ASP+SLOT_SIZE+8]	; memPtr
-	mov edx,[ASP+SLOT_SIZE+4] 	; value
-	mov ecx,[ASP+SLOT_SIZE+0]	; count
-	jecxz %%end			; (Count == 0) ?
+	mov AAX,[ASP+(3*SLOT_SIZE)]		; memPtr
+	mov edx,[ASP+(2*SLOT_SIZE)] 	; value
+	mov ecx,[ASP+(1*SLOT_SIZE)]		; count
+	jecxz %%end						; (Count == 0) ?
 %%loop:
 	%1 %2 [AAX],%4
 	add AAX,%3
 	loop %%loop
 %%end:
-	ret SLOT_SIZE+(2*4)
+	ret SLOT_SIZE*3
 %endmacro
 
 ; BINOP64_VALUES opcode
@@ -57,17 +57,17 @@
 	ret 16
 %else
 	push rdi
-	mov rdi,[rsp+(2*SLOT_SIZE)+12]	; memPtr
-	mov rax,[rsp+(2*SLOT_SIZE)+4] 	; value (long)
-	mov ecx,[rsp+(2*SLOT_SIZE)+0]	; count
-	jecxz %%end			; (Count == 0) ?
+	mov rdi,[rsp+(4*SLOT_SIZE)]		; memPtr
+	mov rax,[rsp+(3*SLOT_SIZE)] 	; value (long)
+	mov ecx,[rsp+(2*SLOT_SIZE)]		; count
+	jecxz %%end						; (Count == 0) ?
 %%loop:
-	%1 qword [rdi],rax	; LSB
+	%1 qword [rdi],rax				; LSB
 	add rdi,8
 	loop %%loop
 %%end:
 	pop rdi
-	ret SLOT_SIZE+8+4
+	ret SLOT_SIZE*3
 %endif	
 %endmacro
 
