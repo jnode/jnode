@@ -24,7 +24,9 @@
       <export name="gnu.java.net.*"/>
       <export name="gnu.java.net.protocol.*"/>
       <export name="gnu.java.net.protocol.file.*"/>
+      <export name="gnu.java.net.protocol.ftp.*"/>
       <export name="gnu.java.net.protocol.http.*"/>
+      <export name="gnu.java.net.protocol.http.event.*"/>
       <export name="gnu.java.net.protocol.jar.*"/>
       <export name="gnu.java.nio.*"/>
       <export name="gnu.java.nio.channels.*"/>
@@ -98,6 +100,9 @@
       <export name="javax.naming.event.*"/>
       <export name="javax.naming.ldap.*"/>
       <export name="javax.naming.spi.*"/>
+
+      <export name="javax.net.*"/>
+      <export name="javax.net.ssl.*"/>
 
       <export name="javax.security.*"/>
       <export name="javax.security.auth.*"/>

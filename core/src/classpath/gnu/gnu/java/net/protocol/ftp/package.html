@@ -1,4 +1,5 @@
-/* Handler.java --
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!-- package.html - describes classes in gnu.java.net.protocol.ftp package.
    Copyright (C) 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -7,7 +8,7 @@ GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
- 
+
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -33,41 +34,27 @@ module.  An independent module is a module which is not derived from
 or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version. */
+exception statement from your version. -->
 
+<html>
+<head><title>GNU Classpath - gnu.java.net.protocol.ftp</title></head>
 
-package gnu.java.net.protocol.http;
+<body>
 
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLStreamHandler;
+<p>
+This package contains an FTP client. It can handle both active and passive
+mode connections and the various transfer modes and representation types.
+</p>
 
-/**
- * An HTTP URL stream handler.
- *
- * @author Chris Burdess (dog@gnu.org)
- */
-public class Handler
-  extends URLStreamHandler
-{
+<p>
+Interaction with the server is via a simple stream interface. Only one
+concurrent stream (input or output) is supported.
+</p>
 
-  /**
-   * Returns the default HTTP port (80).
-   */
-  protected int getDefaultPort()
-  {
-    return HTTPConnection.HTTP_PORT;
-  }
+<p>
+The control connection to the server can be protected using TLS
+(the starttls method).
+</p>
 
-  /**
-   * Returns an HTTPURLConnection for the given URL.
-   */
-  public URLConnection openConnection(URL url)
-    throws IOException
-  {
-    return new HTTPURLConnection(url);
-  }
-
-}
-
+</body>
+</html>
