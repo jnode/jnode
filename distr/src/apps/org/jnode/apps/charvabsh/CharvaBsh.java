@@ -15,17 +15,15 @@ import charva.awt.event.KeyEvent;
 import charvax.swing.*;
 import charvax.swing.border.TitledBorder;
 import gnu.java.io.NullOutputStream;
-import org.jnode.driver.console.Console;
-import org.jnode.driver.console.ConsoleException;
-import org.jnode.driver.console.x86.ConsoleManager;
-import org.jnode.naming.InitialNaming;
 
-import javax.naming.NameNotFoundException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
+
+//import org.apache.commons.net.tftp.TFTP;
+//import org.apache.commons.net.tftp.TFTPClient;
+//import org.apache.tools.ant.filters.StringInputStream;
 
 /**
  * User: Sam Reid
@@ -63,15 +61,15 @@ public class CharvaBsh {
 
     private static void debug1() {
         System.err.println( "Debug1, about to create a JFrame." );
-        pause();
+//        pause();
         JFrame jf = new JFrame();
         System.err.println( "Adding a text area:" );
-        pause();
+//        pause();
         JTextArea area = new JTextArea( "inittext" );
         jf.add( area );
 
         System.err.println( "Debug1, created a JFrame, skipping showing it." );
-        pause();
+//        pause();
 //        jf.show();
         System.err.println( "Closing default toolkit." );
         Toolkit.getDefaultToolkit().close();
@@ -87,15 +85,112 @@ public class CharvaBsh {
         private JTextArea output;
         Interpreter interpreter;
 
+        void showSaveDialog() {
+            String s = JOptionPane.showInputDialog( this, "Enter a filename to save", "Save what file", JOptionPane.QUESTION_MESSAGE );
+            if( s == null ) {
+                output.append( "\nFile Save Cancelled." );
+            }
+            else {
+                output.append( "\nSaving file=" + s );
+                try {
+                    saveText( s );
+                }
+                catch( MalformedURLException e ) {
+                    e.printStackTrace();
+                    output.append( e.getMessage() );
+                }
+                catch( IOException e ) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        void showLoadDialog() {
+            String s = JOptionPane.showInputDialog( this, "Enter a filename to load", "Load what file", JOptionPane.QUESTION_MESSAGE );
+            if( s == null ) {
+                output.append( "\nFile Load Cancelled." );
+            }
+            else {
+                output.append( "\nLoading file=" + s );
+                try {
+                    loadText( s );
+                }
+                catch( MalformedURLException e ) {
+                    e.printStackTrace();
+                    output.append( e.getMessage() );
+                }
+                catch( IOException e ) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        void loadText( String filename ) throws IOException {
+            final URL url = new URL( filename );
+            final InputStream is = url.openConnection().getInputStream();
+//            editor.setText( "");
+            try {
+                int ch;
+                final StringBuffer buf = new StringBuffer();
+                while( ( ch = is.read() ) >= 0 ) {
+                    buf.append( (char)ch );
+                }
+                System.out.println( "Result:\n" + buf );
+                editor.setText( buf.toString() );
+                repaint();
+            }
+
+            finally {
+                is.close();
+            }
+
+        }
+
+//        TFTPClient client=new TFTPClient();
+
+        void saveText( String filename ) throws IOException {
+            final URL url = new URL( filename );
+            final OutputStream os = url.openConnection().getOutputStream();
+//            editor.setText( "");
+            String text = editor.getText();
+
+//            int mode=TFTP.BINARY_MODE;
+//            InputStream instream;
+//            StringReader sr=new StringReader( text );
+            InputStream instream=new ByteArrayInputStream( text.getBytes( ));
+//            InputStream instream=new BufferedInputStream( sr);
+//            StringBufferInputStream instream=new StringInputStream( text);
+            String serverAddress="192.168.2.100";//wow, hard coded.
+//            client.sendFile( filename,mode,instream,serverAddress);
+            try {
+                for( int i = 0; i < text.length(); i++ ) {
+                    char ch = text.charAt( i );
+                    os.write( ch );
+                }
+                os.flush();
+
+//                int ch;
+//                final StringBuffer buf = new StringBuffer();
+//                while( ( ch = text.charAt(i++) ) >= 0 ) {
+//                    buf.append( (char)ch );
+//                }
+//                System.out.println( "Result:\n" + buf );
+//                editor.setText( buf.toString() );
+            }
+            finally {
+                os.close();
+            }
+        }
+
         void debug( String text ) {
             output.setText( text );
             repaint();
-            try {
-                Thread.sleep( 1000 );
-            }
-            catch( InterruptedException e ) {
-                e.printStackTrace();
-            }
+//            try {
+//                Thread.sleep( 1000 );
+//            }
+//            catch( InterruptedException e ) {
+//                e.printStackTrace();
+//            }
         }
 
         void done() {
@@ -105,7 +200,7 @@ public class CharvaBsh {
             Toolkit.getDefaultToolkit().close();
 //            Toolkit.getDefaultToolkit().unregister();
             System.err.println( "Finished with Done" );
-            pause();
+//            pause();
         }
 
         void requestShell() {
@@ -184,10 +279,16 @@ public class CharvaBsh {
                 }
             } );
 
-            JMenuItem reqSh = new JMenuItem( "Request Shell" );
-            reqSh.addActionListener( new ActionListener() {
+            JMenuItem loadItem = new JMenuItem( "Load" );
+            loadItem.addActionListener( new ActionListener() {
                 public void actionPerformed( ActionEvent ae_ ) {
-                    requestShell();
+                    showLoadDialog();
+                }
+            } );
+            JMenuItem saveItem = new JMenuItem( "Save" );
+            saveItem.addActionListener( new ActionListener() {
+                public void actionPerformed( ActionEvent ae_ ) {
+                    showSaveDialog();
                 }
             } );
 
@@ -204,7 +305,8 @@ public class CharvaBsh {
             jMenuFile.add( exit );
 //            jMenuFile.add( exitNoHide );
 //            jMenuFile.add( exitReRegister );
-            jMenuFile.add( reqSh );
+            jMenuFile.add( saveItem );
+            jMenuFile.add( loadItem );
 
             setJMenuBar( menubar );
         }

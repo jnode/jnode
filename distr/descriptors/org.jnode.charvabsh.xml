@@ -10,6 +10,9 @@
         <import plugin="charva"/>
         <import plugin="org.jnode.shell"/>
         <import plugin="org.beanshell"/>
+<!--        <import plugin="org.jnode.net"/>-->
+<!--        <import plugin="org.jnode.net.ipv4"/>-->
+<!--        <import plugin="org.apache.jakarta.commons.net"/>-->
     </requires>
 
     <runtime>
