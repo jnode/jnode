@@ -107,6 +107,52 @@ public final class VmCP extends VmSystemObject {
         set(index, new Long(data));
     }
 
+    /**
+     * Read a float out of this CP
+     * 
+     * @param index
+     *            The index where to read
+     * @return float
+     */
+    public float getFloat(int index) {
+        return ((Float) get(index)).floatValue();
+    }
+
+    /**
+     * Write a float into this CP
+     * 
+     * @param index
+     *            The index where to read
+     * @param data
+     *            The float to write
+     */
+    protected void setFloat(int index, float data) {
+        set(index, new Float(data));
+    }
+
+    /**
+     * Read a double out of this CP
+     * 
+     * @param index
+     *            The index where to read
+     * @return double
+     */
+    public double getDouble(int index) {
+        return ((Double) get(index)).doubleValue();
+    }
+
+    /**
+     * Write a double into this CP
+     * 
+     * @param index
+     *            The index where to read
+     * @param data
+     *            The double to write
+     */
+    protected void setDouble(int index, double data) {
+        set(index, new Double(data));
+    }
+
     protected String getUTF8(int index) {
         return (String) get(index);
     }

@@ -14,21 +14,21 @@ import org.jnode.system.BootLog;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class ClassDecoder {
-
+    
     // ------------------------------------------
     // VM ClassLoader Code
     // ------------------------------------------
-
+    
     private static char[] ConstantValueAttrName;
-
+    
     private static char[] CodeAttrName;
-
+    
     private static char[] ExceptionsAttrName;
-
+    
     private static char[] LineNrTableAttrName;
-
+    
     //private static final Logger log = Logger.getLogger(ClassDecoder.class);
-
+    
     private static final void cl_init() {
         if (ConstantValueAttrName == null) {
             ConstantValueAttrName = "ConstantValue".toCharArray();
@@ -43,7 +43,7 @@ public final class ClassDecoder {
             LineNrTableAttrName = "LineNumberTable".toCharArray();
         }
     }
-
+    
     /**
      * Convert a class-file image into a Class object. Steps taken in this
      * phase: 1. Decode the class-file image (CLS_LS_DECODED) 2. Load the
@@ -67,7 +67,7 @@ public final class ClassDecoder {
                 rejectNatives, clc, protectionDomain);
         return cls;
     }
-
+    
     /**
      * Decode a given class.
      * 
@@ -81,24 +81,24 @@ public final class ClassDecoder {
      */
     private static final VmType decodeClass(byte[] data, int offset,
             int class_image_length, boolean rejectNatives, VmClassLoader clc, ProtectionDomain protectionDomain)
-            throws ClassFormatError {
+    throws ClassFormatError {
         if (data == null) { throw new ClassFormatError(
-                "ClassDecoder.decodeClass: data==null"); }
+        "ClassDecoder.decodeClass: data==null"); }
         final ClassReader reader = new ClassReader(data, offset,
                 class_image_length);
         final VmStatics statics = clc.getStatics();
         final int slotSize = clc.getArchitecture().getReferenceSize();
-
+        
         final int magic = reader.readu4();
         if (magic != 0xCAFEBABE) { throw new ClassFormatError("invalid magic"); }
         final int min_version = reader.readu2();
         final int maj_version = reader.readu2();
-
+        
         if (false) {
             BootLog.debug("Class file version " + maj_version + ";"
                     + min_version);
         }
-
+        
         final int cpcount = reader.readu2();
         // allocate enough space for the CP
         final byte[] tags = new byte[ cpcount];
@@ -117,7 +117,10 @@ public final class ClassDecoder {
                 break;
             case 4:
                 // float
-                cp.setInt(i, reader.readu4());
+                // cp.setInt(i, reader.readu4());
+                final int ival = reader.readu4();
+                final float fval = Float.intBitsToFloat(ival);
+                cp.setFloat(i, fval);
                 break;
             case 5:
                 // long
@@ -126,7 +129,10 @@ public final class ClassDecoder {
                 break;
             case 6:
                 // double
-                cp.setLong(i, reader.readu8());
+                // cp.setLong(i, reader.readu8());
+                final long lval = reader.readu8();
+                final double dval = Double.longBitsToDouble(lval);
+                cp.setDouble(i, dval);
                 i++;
                 break;
             case 7:
@@ -139,46 +145,46 @@ public final class ClassDecoder {
                 break;
             case 9:
                 // Fieldref
-                {
-                    final int clsIdx = reader.readu2();
-                    final int ntIdx = reader.readu2();
-                    cp.setConstFieldRef(i, new VmConstFieldRef(cp, clsIdx,
-                            ntIdx));
-                }
-                break;
+            {
+                final int clsIdx = reader.readu2();
+                final int ntIdx = reader.readu2();
+                cp.setConstFieldRef(i, new VmConstFieldRef(cp, clsIdx,
+                        ntIdx));
+            }
+            break;
             case 10:
                 // Methodref
-                {
-                    final int clsIdx = reader.readu2();
-                    final int ntIdx = reader.readu2();
-                    cp.setConstMethodRef(i, new VmConstMethodRef(cp, clsIdx,
-                            ntIdx));
-                }
-                break;
+            {
+                final int clsIdx = reader.readu2();
+                final int ntIdx = reader.readu2();
+                cp.setConstMethodRef(i, new VmConstMethodRef(cp, clsIdx,
+                        ntIdx));
+            }
+            break;
             case 11:
                 // IMethodref
-                {
-                    final int clsIdx = reader.readu2();
-                    final int ntIdx = reader.readu2();
-                    cp.setConstIMethodRef(i, new VmConstIMethodRef(cp, clsIdx,
-                            ntIdx));
-                }
-                break;
+            {
+                final int clsIdx = reader.readu2();
+                final int ntIdx = reader.readu2();
+                cp.setConstIMethodRef(i, new VmConstIMethodRef(cp, clsIdx,
+                        ntIdx));
+            }
+            break;
             case 12:
                 // Name and Type
-                {
-                    final int nIdx = reader.readu2();
-                    final int dIdx = reader.readu2();
-                    cp.setConstNameAndType(i, new VmConstNameAndType(cp, nIdx,
-                            dIdx));
-                }
-                break;
+            {
+                final int nIdx = reader.readu2();
+                final int dIdx = reader.readu2();
+                cp.setConstNameAndType(i, new VmConstNameAndType(cp, nIdx,
+                        dIdx));
+            }
+            break;
             default:
                 throw new ClassFormatError("Invalid constantpool tag: "
                         + tags[ i]);
             }
         }
-
+        
         // Now patch the required entries
         for (int i = 1; i < cpcount; i++) {
             switch (tags[ i]) {
@@ -191,12 +197,12 @@ public final class ClassDecoder {
                 break;
             }
         }
-
+        
         final int classModifiers = reader.readu2();
-
+        
         final VmConstClass this_class = cp.getConstClass(reader.readu2());
         final String clsName = this_class.getClassName();
-
+        
         final VmConstClass super_class = cp.getConstClass(reader.readu2());
         final String superClassName;
         if (super_class != null) {
@@ -204,7 +210,7 @@ public final class ClassDecoder {
         } else {
             superClassName = null;
         }
-
+        
         // Allocate the class object
         final VmType cls;
         if (Modifier.isInterface(classModifiers)) {
@@ -215,19 +221,19 @@ public final class ClassDecoder {
                     classModifiers, protectionDomain);
         }
         cls.setCp(cp);
-
+        
         // Interface table
         readInterfaces(reader, cls, cp);
-
+        
         // Field table
         readFields(reader, cls, cp, statics, slotSize);
-
+        
         // Method Table
         readMethods(reader, rejectNatives, cls, cp, statics);
-
+        
         return cls;
     }
-
+    
     /**
      * Read the interfaces table
      * 
@@ -246,7 +252,7 @@ public final class ClassDecoder {
             cls.setInterfaceTable(itable);
         }
     }
-
+    
     /**
      * Read the fields table
      * 
@@ -260,7 +266,7 @@ public final class ClassDecoder {
         final int fcount = reader.readu2();
         if (fcount > 0) {
             final VmField[] ftable = new VmField[ fcount];
-
+            
             int objectSize = 0;
             for (int i = 0; i < fcount; i++) {
                 final boolean wide;
@@ -307,16 +313,16 @@ public final class ClassDecoder {
                         staticsIdx = statics.allocIntField();
                         break;
                     default:
-                        {
-                            if (Modifier.isAddressType(signature)) {
-                                staticsIdx = statics.allocAddressField();
-                            } else {
-                                staticsIdx = statics.allocObjectField();
-                                //System.out.println(NumberUtils.hex(staticsIdx)
-                                // + "\t" + cls.getName() + "." + name);
-                            }
+                    {
+                        if (Modifier.isAddressType(signature)) {
+                            staticsIdx = statics.allocAddressField();
+                        } else {
+                            staticsIdx = statics.allocObjectField();
+                            //System.out.println(NumberUtils.hex(staticsIdx)
+                            // + "\t" + cls.getName() + "." + name);
                         }
-                        break;
+                    }
+                    break;
                     }
                     fs = new VmStaticField(name, signature, modifiers,
                             staticsIdx, cls, slotSize);
@@ -336,7 +342,7 @@ public final class ClassDecoder {
                             fieldOffset, cls, slotSize);
                 }
                 ftable[ i] = fs;
-
+                
                 // Read field attributes
                 final int acount = reader.readu2();
                 for (int a = 0; a < acount; a++) {
@@ -353,10 +359,12 @@ public final class ClassDecoder {
                             statics.setInt(staticsIdx, cp.getInt(idx));
                             break;
                         case 'D':
-                            statics.setLong(staticsIdx, cp.getLong(idx));
+                            final long lval = Double.doubleToRawLongBits(cp.getDouble(idx));
+                            statics.setLong(staticsIdx, lval);
                             break;
                         case 'F':
-                            statics.setInt(staticsIdx, cp.getInt(idx));
+                            final int ival = Float.floatToRawIntBits(cp.getFloat(idx));
+                            statics.setInt(staticsIdx, ival);
                             break;
                         case 'I':
                             statics.setInt(staticsIdx, cp.getInt(idx));
@@ -374,7 +382,7 @@ public final class ClassDecoder {
                             //throw new IllegalArgumentException("signature "
                             // + signature);
                             statics.setObject(staticsIdx, cp.getString(idx));
-                            break;
+                        break;
                         }
                     } else {
                         reader.skip(length);
@@ -387,7 +395,7 @@ public final class ClassDecoder {
             }
         }
     }
-
+    
     /**
      * Read the method table
      * 
@@ -401,13 +409,13 @@ public final class ClassDecoder {
         final int mcount = reader.readu2();
         if (mcount > 0) {
             final VmMethod[] mtable = new VmMethod[ mcount];
-
+            
             for (int i = 0; i < mcount; i++) {
                 final int modifiers = reader.readu2();
                 final String name = cp.getUTF8(reader.readu2());
                 final String signature = cp.getUTF8(reader.readu2());
                 final boolean isStatic = ((modifiers & Modifier.ACC_STATIC) != 0);
-
+                
                 final VmMethod mts;
                 final boolean isSpecial = name.equals("<init>");
                 //final int staticsIdx = statics.allocMethod();
@@ -424,7 +432,7 @@ public final class ClassDecoder {
                 }
                 //statics.setMethod(staticsIdx, mts);
                 mtable[ i] = mts;
-
+                
                 // Read methods attributes
                 final int acount = reader.readu2();
                 for (int a = 0; a < acount; a++) {
@@ -446,7 +454,7 @@ public final class ClassDecoder {
             cls.setMethodTable(mtable);
         }
     }
-
+    
     /**
      * Decode the data of a code-attribute
      * 
@@ -458,12 +466,12 @@ public final class ClassDecoder {
      */
     private static final VmByteCode readCode(ClassReader reader, VmType cls,
             VmCP cp, VmMethod method) {
-
+        
         final int maxStack = reader.readu2();
         final int noLocals = reader.readu2();
         final int codelength = reader.readu4();
         final byte[] code = reader.readBytes(codelength);
-
+        
         // Read the exception Table
         final int ecount = reader.readu2();
         final VmInterpretedExceptionHandler[] etable = new VmInterpretedExceptionHandler[ ecount];
@@ -475,7 +483,7 @@ public final class ClassDecoder {
             etable[ i] = new VmInterpretedExceptionHandler(cp, startPC, endPC,
                     handlerPC, catchType);
         }
-
+        
         // Read the attributes
         VmLineNumberMap lnTable = null;
         final int acount = reader.readu2();
@@ -488,10 +496,10 @@ public final class ClassDecoder {
                 reader.skip(len);
             }
         }
-
+        
         return new VmByteCode(method, code, noLocals, maxStack, etable, lnTable);
     }
-
+    
     /**
      * Decode the data of a Exceptions attribute
      * 
@@ -502,7 +510,7 @@ public final class ClassDecoder {
      */
     private static final VmExceptions readExceptions(ClassReader reader,
             VmType cls, VmCP cp) {
-
+        
         // Read the exceptions
         final int ecount = reader.readu2();
         final VmConstClass[] list = new VmConstClass[ ecount];
@@ -510,10 +518,10 @@ public final class ClassDecoder {
             final int idx = reader.readu2();
             list[ i] = cp.getConstClass(idx);
         }
-
+        
         return new VmExceptions(list);
     }
-
+    
     /**
      * Decode the data of a LineNumberTable-attribute
      * 
@@ -523,15 +531,15 @@ public final class ClassDecoder {
     private static final VmLineNumberMap readLineNrTable(ClassReader reader) {
         final int len = reader.readu2();
         final char[] lnTable = new char[ len * VmLineNumberMap.LNT_ELEMSIZE];
-
+        
         for (int i = 0; i < len; i++) {
             final int ofs = i * VmLineNumberMap.LNT_ELEMSIZE;
             lnTable[ ofs + VmLineNumberMap.LNT_STARTPC_OFS] = (char) reader
-                    .readu2();
+            .readu2();
             lnTable[ ofs + VmLineNumberMap.LNT_LINENR_OFS] = (char) reader
-                    .readu2();
+            .readu2();
         }
-
+        
         return new VmLineNumberMap(lnTable);
     }
 }
