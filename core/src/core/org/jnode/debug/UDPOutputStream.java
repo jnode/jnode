@@ -58,7 +58,9 @@ public class UDPOutputStream extends OutputStream {
 	    		return null;
 	            }});
 	    } catch (PrivilegedActionException ex) {
-	        throw new IOException(ex.getException());
+	        final IOException ioe = new IOException();
+	        ioe.initCause(ex.getException());
+	        throw ioe;
 	    }
 	}
 

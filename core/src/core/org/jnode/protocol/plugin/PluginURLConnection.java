@@ -61,7 +61,9 @@ public class PluginURLConnection extends URLConnection {
 				throw new IOException("Plugin jarfile not found");
 			}
 		} catch (NameNotFoundException ex) {
-			throw new IOException("Cannot find plugin manager", ex);
+			final IOException ioe = new IOException("Cannot find plugin manager");
+			ioe.initCause(ex);
+			throw ioe;
 		}
 	}
 
