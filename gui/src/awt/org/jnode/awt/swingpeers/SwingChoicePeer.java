@@ -12,12 +12,15 @@ import java.awt.event.PaintEvent;
 import java.awt.peer.ChoicePeer;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.MutableComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 
 /**
  * AWT choice peer implemented as a {@link javax.swing.JButton}.
  */
 
-class SwingChoicePeer extends JButton implements ChoicePeer, SwingPeer {
+class SwingChoicePeer extends SwingComponentPeer implements ChoicePeer, SwingPeer {
 
 	private final Choice choice;
 
@@ -25,10 +28,14 @@ class SwingChoicePeer extends JButton implements ChoicePeer, SwingPeer {
 	// Construction
 	//
 
-	public SwingChoicePeer(Choice choice) {
+	public SwingChoicePeer(SwingToolkit toolkit, Choice choice) {
+        super(toolkit, choice);
 		this.choice = choice;
-		SwingToolkit.add(choice, this);
-		SwingToolkit.copyAwtProperties(choice, this);
+        JComboBox combo = new JComboBox();
+        jComponent = combo;
+        combo.setModel(new DefaultComboBoxModel());
+		SwingToolkit.add(choice, combo);
+		SwingToolkit.copyAwtProperties(choice, combo);
 		final int cnt = choice.getItemCount();
 		for (int i = 0; i < cnt; i++) {
 			addItem(choice.getItem(i), i);
@@ -39,37 +46,26 @@ class SwingChoicePeer extends JButton implements ChoicePeer, SwingPeer {
 	// ChoicePeer
 	//
 
+    public void remove(int index) {
+        model().removeElementAt(index);
+    }
+
+    public void removeAll() {
+        model().removeAllElements();
+    }
+
 	public void add(String item, int index) {
+        model().insertElementAt(item, index);
 	}
 
-	// Deprecated
+    private DefaultComboBoxModel model() {
+        return ((DefaultComboBoxModel)((JComboBox)jComponent).getModel());
+    }
+
+    // Deprecated
 
 	public void addItem(String item, int index) {
 		add(item, index);
-	}
-
-	public boolean canDetermineObscurity() {
-		return false;
-	}
-
-	public void coalescePaintEvent(PaintEvent e) {
-		System.err.println(e);
-	}
-
-	// Buffer
-
-	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-	}
-
-	public void destroyBuffers() {
-	}
-
-	// Misc
-
-	public void dispose() {
-	}
-
-	public void flip(BufferCapabilities.FlipContents flipContents) {
 	}
 
 	/**
@@ -78,53 +74,7 @@ class SwingChoicePeer extends JButton implements ChoicePeer, SwingPeer {
 	public Component getAWTComponent() {
 		return choice;
 	}
-
-	public Image getBackBuffer() {
-		return null;
-	}
-
-	//
-	// ComponentPeer
-	//
-
-	// Events
-
-	public void handleEvent(AWTEvent e) {
-		//System.err.println(e);
-	}
-
-	public boolean handlesWheelScrolling() {
-		return false;
-	}
-
-	// Obscurity
-
-	public boolean isObscured() {
-		return false;
-	}
-
-	// Focus
-
-	public boolean requestFocus(Component lightweightChild, boolean temporary,
-			boolean focusedWindowChangeAllowed, long time) {
-		return true;
-	}
-
 	public void select(int index) {
-	}
-
-	///////////////////////////////////////////////////////////////////////////////////////
-	// Private
-	/**
-	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
-	 */
-	public void setEventMask(long mask) {
-		// TODO Auto-generated method stub
-
-	}
-
-	// Cursor
-
-	public void updateCursorImmediately() {
+        ((JComboBox)jComponent).setSelectedIndex(index);
 	}
 }

@@ -16,8 +16,10 @@ import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.Toolkit;
+import java.awt.EventQueue;
+import java.awt.Rectangle;
 import java.awt.event.PaintEvent;
+import java.awt.event.ComponentEvent;
 import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
@@ -26,6 +28,9 @@ import java.awt.peer.ComponentPeer;
 
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeToolkit;
+import org.jnode.awt.JNodeGenericPeer;
+
+import javax.swing.JComponent;
 
 /**
  * Base class for virtual component peers. Satisfies the requirements for AWT
@@ -34,7 +39,7 @@ import org.jnode.awt.JNodeToolkit;
  * in the hierarchy there is a parent who can produce a display.
  */
 
-class SwingComponentPeer implements ComponentPeer {
+class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
 
     ///////////////////////////////////////////////////////////////////////////////////////
     // Private
@@ -49,6 +54,8 @@ class SwingComponentPeer implements ComponentPeer {
 
     private final JNodeToolkit toolkit;
 
+    protected JComponent jComponent = new JComponent(){};
+
     /**
      * Initialize this instance.
      * 
@@ -56,6 +63,7 @@ class SwingComponentPeer implements ComponentPeer {
      * @param component
      */
     public SwingComponentPeer(JNodeToolkit toolkit, Component component) {
+        super(toolkit, component);
         this.toolkit = toolkit;
         this.component = component;
         setBounds(component.getX(), component.getY(), component.getWidth(),
@@ -105,6 +113,7 @@ class SwingComponentPeer implements ComponentPeer {
     }
 
     public void dispose() {
+
     }
 
     public void enable() {
@@ -127,14 +136,14 @@ class SwingComponentPeer implements ComponentPeer {
     // Fonts
 
     public FontMetrics getFontMetrics(Font font) {
-        return null;
+        return toolkit.getFontMetrics(font);
     }
 
     public Graphics getGraphics() {
     	log.debug("getGraphics");
         final Component parent = component.getParent();
         if (parent != null) {
-            System.out.println("creating graphics");
+            //System.out.println("creating graphics");
             return parent.getGraphics().create(location.x, location.y,
                     size.width, size.height);
         } else {
@@ -143,8 +152,7 @@ class SwingComponentPeer implements ComponentPeer {
     }
 
     public GraphicsConfiguration getGraphicsConfiguration() {
-        //System.err.println("getGraphicsConfiguration");
-        return null;
+        return toolkit.getGraphicsConfiguration();
     }
 
 	/**
@@ -167,34 +175,36 @@ class SwingComponentPeer implements ComponentPeer {
     }
 
     public Dimension getMinimumSize() {
-        return size;
+        return jComponent.getMinimumSize();
     }
 
     public Dimension getPreferredSize() {
-        return size;
+        return jComponent.getPreferredSize();
     }
-
-    /*
-     * public void setCursor( Cursor cursor ) { }
-     */
-
-    // Misc
-    public Toolkit getToolkit() {
-        return toolkit;
-    }
-
-    /*
-     * public boolean isFocusTraversable() { return true; }
-     */
-
-    /*
-     * public void requestFocus() { }
-     */
 
     // Events
-    public void handleEvent(AWTEvent e) {
-    	//log.debug("handleEvent(" + e + ")");
-        //System.err.println(e);
+    public void handleEvent(AWTEvent event) {
+        switch (event.getID()) {
+            case PaintEvent.PAINT: {
+                Graphics g = getGraphics();
+                Point p = component.getLocationOnScreen();
+                g.translate(p.x, p.y);
+                component.paint(g);
+                g.translate(-p.x, -p.y);
+            } break;
+            case PaintEvent.UPDATE: {
+                Graphics g = getGraphics();
+                Point p = component.getLocationOnScreen();
+                g.translate(p.x, p.y);
+                component.update(getGraphics());
+                g.translate(-p.x, -p.y);
+            } break;
+        }
+    }
+
+    private void paintAWTComponent(){
+        if(component != null)
+        q.postEvent(new PaintEvent(component, PaintEvent.PAINT, component.getBounds()));
     }
 
     public boolean handlesWheelScrolling() {
@@ -208,15 +218,14 @@ class SwingComponentPeer implements ComponentPeer {
     // Focus
 
     public boolean isFocusable() {
-        return true;
+        return jComponent.isFocusable();
     }
 
     /**
      * @see java.awt.peer.ComponentPeer#isFocusTraversable()
      */
     public boolean isFocusTraversable() {
-        // TODO Auto-generated method stub
-        return false;
+        return jComponent.isFocusTraversable();
     }
 
     // Obscurity
@@ -226,18 +235,18 @@ class SwingComponentPeer implements ComponentPeer {
     }
 
     public Dimension minimumSize() {
-        return getMinimumSize();
+        return jComponent.getMinimumSize();
     }
 
     public void paint(Graphics g) {
-        log.info("Paint");
-        //System.err.println("paint");
+        jComponent.paint(g);
+        paintAWTComponent();
     }
 
     // Deprecated
 
     public Dimension preferredSize() {
-        return getPreferredSize();
+        return jComponent.getPreferredSize();
     }
 
     public boolean prepareImage(Image img, int width, int height, ImageObserver o) {
@@ -245,18 +254,19 @@ class SwingComponentPeer implements ComponentPeer {
     }
 
     public void print(Graphics g) {
+        jComponent.print(g);
     }
 
     public void repaint(long tm, int x, int y, int width, int height) {
-        //System.err.println("repaint");
+        jComponent.repaint(tm, x, y, width, height);
+        paintAWTComponent();
     }
 
     /**
      * @see java.awt.peer.ComponentPeer#requestFocus()
      */
     public void requestFocus() {
-        // TODO Auto-generated method stub
-
+        jComponent.requestFocus();
     }
 
     public boolean requestFocus(Component lightweightChild, boolean temporary,
@@ -269,25 +279,33 @@ class SwingComponentPeer implements ComponentPeer {
     }
 
     public void setBackground(Color c) {
+        jComponent.setBackground(c);
+        paintAWTComponent();
     }
 
     // Bounds
 
     public void setBounds(int x, int y, int width, int height) {
-        //System.err.println("setBounds "+x+","+y+","+width+","+height);
-        size.width = width;
-        size.height = height;
+        Rectangle b = jComponent.getBounds();
+        jComponent.setBounds(x, y, width, height);
+        if (b.width != width || b.height != height) {
+            sendComponentEvent(ComponentEvent.COMPONENT_RESIZED);
+        } else {
+            sendComponentEvent(ComponentEvent.COMPONENT_MOVED);
+        }
+
     }
 
     /**
      * @see java.awt.peer.ComponentPeer#setCursor(java.awt.Cursor)
      */
     public void setCursor(Cursor cursor) {
-        // TODO Auto-generated method stub
+        jComponent.setCursor(cursor);
 
     }
 
     public void setEnabled(boolean b) {
+        jComponent.setEnabled(b);
     }
 
     /**
@@ -299,14 +317,20 @@ class SwingComponentPeer implements ComponentPeer {
     }
 
     public void setFont(Font f) {
+        jComponent.setFont(f);
+        paintAWTComponent();
     }
 
     public void setForeground(Color c) {
+        jComponent.setForeground(c);
+        paintAWTComponent();
     }
 
     // State
 
     public void setVisible(boolean b) {
+        jComponent.setVisible(b);
+        paintAWTComponent();
     }
 
     public void show() {
@@ -316,5 +340,14 @@ class SwingComponentPeer implements ComponentPeer {
     // Cursor
 
     public void updateCursorImmediately() {
+    }
+
+    /**
+     * Posts a component event to the AWT event queue.
+     * @param what
+     */
+    protected final void sendComponentEvent(int what) {
+        final EventQueue queue = toolkit.getSystemEventQueue();
+        queue.postEvent(new ComponentEvent(component, what));
     }
 }

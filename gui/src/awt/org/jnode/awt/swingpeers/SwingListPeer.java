@@ -3,13 +3,9 @@
  */
 package org.jnode.awt.swingpeers;
 
-import java.awt.AWTEvent;
-import java.awt.BufferCapabilities;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.List;
-import java.awt.event.PaintEvent;
 import java.awt.peer.ListPeer;
 
 import javax.swing.AbstractListModel;
@@ -20,7 +16,7 @@ import javax.swing.ListModel;
  * AWT list peer implemented as a {@link javax.swing.JList}.
  */
 
-class SwingListPeer extends JList implements ListPeer, SwingPeer {
+class SwingListPeer extends SwingComponentPeer implements ListPeer, SwingPeer {
 
 	private final List list;
 
@@ -28,10 +24,13 @@ class SwingListPeer extends JList implements ListPeer, SwingPeer {
 	// Construction
 	//
 
-	public SwingListPeer(final List list) {
+	public SwingListPeer(SwingToolkit toolkit, final List list) {
+        super(toolkit, list);
 		this.list = list;
-		SwingToolkit.add(list, this);
-		SwingToolkit.copyAwtProperties(list, this);
+        JList jList = new JList();
+        jComponent = jList;
+		SwingToolkit.add(list, jList);
+		SwingToolkit.copyAwtProperties(list, jList);
 		final ListModel model = new AbstractListModel() {
 			public Object getElementAt(int idx) {
 				return list.getItem(idx);
@@ -44,6 +43,7 @@ class SwingListPeer extends JList implements ListPeer, SwingPeer {
 	}
 
 	public void add(String item, int index) {
+
 	}
 
 	// Deprecated
@@ -52,39 +52,13 @@ class SwingListPeer extends JList implements ListPeer, SwingPeer {
 		add(item, index);
 	}
 
-	public boolean canDetermineObscurity() {
-		return false;
-	}
-
 	public void clear() {
 		removeAll();
 	}
 
-	public void coalescePaintEvent(PaintEvent e) {
-		System.err.println(e);
-	}
+    public void removeAll() {
 
-	// Buffer
-
-	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-	}
-
-	public void delItems(int start, int end) {
-	}
-
-	public void deselect(int index) {
-	}
-
-	public void destroyBuffers() {
-	}
-
-	// Misc
-
-	public void dispose() {
-	}
-
-	public void flip(BufferCapabilities.FlipContents flipContents) {
-	}
+    }
 
 	/**
 	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
@@ -93,44 +67,8 @@ class SwingListPeer extends JList implements ListPeer, SwingPeer {
 		return list;
 	}
 
-	public Image getBackBuffer() {
-		return null;
-	}
-
-	public Dimension getMinimumSize(int rows) {
-		return getMinimumSize();
-	}
-
-	public Dimension getPreferredSize(int rows) {
-		return getPreferredSize();
-	}
-
-	//
-	// ListPeer
-	//
-
 	public int[] getSelectedIndexes() {
 		return null;
-	}
-
-	//
-	// ComponentPeer
-	//
-
-	// Events
-
-	public void handleEvent(AWTEvent e) {
-		//System.err.println(e);
-	}
-
-	public boolean handlesWheelScrolling() {
-		return false;
-	}
-
-	// Obscurity
-
-	public boolean isObscured() {
-		return false;
 	}
 
 	public void makeVisible(int index) {
@@ -144,24 +82,7 @@ class SwingListPeer extends JList implements ListPeer, SwingPeer {
 		return getPreferredSize(rows);
 	}
 
-	// Focus
-
-	public boolean requestFocus(Component lightweightChild, boolean temporary,
-			boolean focusedWindowChangeAllowed, long time) {
-		return true;
-	}
-
 	public void select(int index) {
-	}
-
-	///////////////////////////////////////////////////////////////////////////////////////
-	// Private
-	/**
-	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
-	 */
-	public void setEventMask(long mask) {
-		// TODO Auto-generated method stub
-
 	}
 
 	public void setMultipleMode(boolean b) {
@@ -171,8 +92,19 @@ class SwingListPeer extends JList implements ListPeer, SwingPeer {
 		setMultipleMode(v);
 	}
 
-	// Cursor
+    public void delItems(int start_index, int end_index) {
 
-	public void updateCursorImmediately() {
-	}
+    }
+
+    public void deselect(int index) {
+
+    }
+
+    public Dimension getMinimumSize(int s) {
+        return null;
+    }
+
+    public Dimension getPreferredSize(int s) {
+        return null;
+    }
 }
