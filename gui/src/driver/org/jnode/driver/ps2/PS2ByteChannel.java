@@ -17,7 +17,7 @@ import org.jnode.util.TimeoutException;
  */
 public class PS2ByteChannel implements ByteChannel {
 
-	private final ByteQueue queue = new ByteQueue();
+	private final ByteQueue queue = new ByteQueue(1024);
 
 	public PS2ByteChannel() {
 		
