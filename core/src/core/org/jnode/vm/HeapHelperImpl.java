@@ -24,6 +24,9 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
      * @param arch
      */
     public HeapHelperImpl(VmArchitecture arch) {
+        if (Vm.getVm() != null) {
+            throw new SecurityException("Cannot instantiate HeapHelpImpl at runtime");
+        }
         final int refSize = arch.getReferenceSize();
         flagsOffset = ObjectLayout.FLAGS_SLOT * refSize;
         tibOffset = ObjectLayout.TIB_SLOT * refSize;
@@ -91,6 +94,13 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
      */
     public final Object getObject(Object src, int offset) {
         return Unsafe.getObject(src, offset);
+    }
+
+    /**
+     * @see org.jnode.vm.memmgr.HeapHelper#getAddress(Object, int)
+     */
+    public final Address getAddress(Object src, int offset) {
+        return Unsafe.getAddress(src, offset);
     }
 
     /**

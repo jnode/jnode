@@ -9,6 +9,7 @@ import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.X86Stream;
 import org.jnode.vm.Address;
+import org.jnode.vm.PragmaPrivilegedAction;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.classmgr.VmClassLoader;
@@ -50,7 +51,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements 
 	/**
 	 * @see org.jnode.vm.compiler.NativeCodeCompiler#doCompileAbstract(org.jnode.vm.classmgr.VmMethod, org.jnode.assembler.NativeStream, int, boolean)
 	 */
-	protected final CompiledMethod doCompileAbstract(VmMethod method, NativeStream nos, int level, boolean isBootstrap) {
+	protected final CompiledMethod doCompileAbstract(VmMethod method, NativeStream nos, int level, boolean isBootstrap) throws PragmaPrivilegedAction {
 		if (isBootstrap) {
 			//System.out.println("Abstraxct method " + method);
 			final CompiledMethod cm = new CompiledMethod(level);
@@ -71,7 +72,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements 
 			return cm;
 		} else {
 			// Set the address of the abstract method code
-			final Address errorAddr = X86JumpTable.getJumpTableEntry(X86JumpTable.VM_INVOKE_ABSTRACT_OFS);
+			final Address errorAddr = Unsafe.getJumpTableEntry(X86JumpTable.VM_INVOKE_ABSTRACT_OFS);
 			final VmCompiledCode code = new VmCompiledCode(this, null, errorAddr, null, 0, null, null, null);
 			method.addCompiledCode(code, level);
 			return null;

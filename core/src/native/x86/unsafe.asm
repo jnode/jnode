@@ -675,8 +675,8 @@ Q43org5jnode2vm6Unsafe23yieldPoint2e2829V:
 	UNCOND_YIELDPOINT
 	ret	
 
-; Address getJumpTable()	
-Q43org5jnode2vm6Unsafe23getJumpTable2e2829Lorg2fjnode2fvm2fAddress3b:
+; Address getJumpTable0()	
+Q43org5jnode2vm6Unsafe23getJumpTable02e2829Lorg2fjnode2fvm2fAddress3b:
 	mov eax,vm_jumpTable
 	ret
 	
