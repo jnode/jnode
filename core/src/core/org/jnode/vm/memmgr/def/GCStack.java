@@ -12,7 +12,7 @@ import org.vmmagic.pragma.Uninterruptible;
 final class GCStack extends VmSystemObject implements Uninterruptible {
 	
 	/** The default size of a stack */
-	public static final int DEFAULT_STACK_SIZE = 4*512;
+	public static final int DEFAULT_STACK_SIZE = 4096;
 	/** The actual stack */
 	private final Object[] stack;
 	/** The size of the stack (in objects) */

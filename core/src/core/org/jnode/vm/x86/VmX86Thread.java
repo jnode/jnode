@@ -7,7 +7,6 @@ import org.jnode.util.NumberUtils;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmThread;
-import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
@@ -140,7 +139,7 @@ public final class VmX86Thread extends VmThread {
      * @param visitor
      * @param heapManager
      */
-    public void visit(ObjectVisitor visitor, VmHeapManager heapManager, HeapHelper helper) {
+    public boolean visit(ObjectVisitor visitor, VmHeapManager heapManager) {
         // For now do it stupid, but safe, just scan the whole stack.
         final int stackSize = getStackSize();
         final Object stack = getStack();        
@@ -160,7 +159,9 @@ public final class VmX86Thread extends VmThread {
                 final Address child = ptr.loadAddress();
                 if (child != null) {
                     if (heapManager.isObject(child)) {
-                        visitor.visit(child);
+                        if (!visitor.visit(child)) {
+                            return false;
+                        }
                     }
                 }
                 ptr = ptr.sub(slotSize);                
@@ -169,27 +170,40 @@ public final class VmX86Thread extends VmThread {
         // Scan registers
         Address addr = Address.fromIntZeroExtend(eax);
         if (heapManager.isObject(addr)) {
-            visitor.visit(addr);
+            if (!visitor.visit(addr)) {
+                return false;
+            }
         }
         addr = Address.fromIntZeroExtend(ebx);
         if (heapManager.isObject(addr)) {
-            visitor.visit(addr);
+            if (!visitor.visit(addr)) {
+                return false;
+            }
         }
         addr = Address.fromIntZeroExtend(ecx);
         if (heapManager.isObject(addr)) {
-            visitor.visit(addr);
+            if (!visitor.visit(addr)) {
+                return false;
+            }
         }
         addr = Address.fromIntZeroExtend(edx);
         if (heapManager.isObject(addr)) {
-            visitor.visit(addr);
+            if (!visitor.visit(addr)) {
+                return false;
+            }
         }
         addr = Address.fromIntZeroExtend(esi);
         if (heapManager.isObject(addr)) {
-            visitor.visit(addr);
+            if (!visitor.visit(addr)) {
+                return false;
+            }
         }
         addr = Address.fromIntZeroExtend(edi);
         if (heapManager.isObject(addr)) {
-            visitor.visit(addr);
+            if (!visitor.visit(addr)) {
+                return false;
+            }
         }
+        return true;
     }
 }

@@ -357,7 +357,7 @@ public class Vm extends VmSystemObject implements Statistics {
      * Call the visitor for all live threads.
      * @param visitor
      */
-    static final void visitAllThreads(VmThreadVisitor visitor) {
-        getVm().allThreads.visit(visitor);
+    static final boolean visitAllThreads(VmThreadVisitor visitor) {
+        return getVm().allThreads.visit(visitor);
     }
 }
