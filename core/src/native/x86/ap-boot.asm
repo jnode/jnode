@@ -137,7 +137,11 @@ ap_boot_in_kernel_space:
 	and AAX,~F_NT
 	push AAX
 	popf
+%ifdef BITS32	
 	iret
+%else
+	iretq
+%endif		
 
 ap_boot_go_user_cs:
 %ifdef BITS32
