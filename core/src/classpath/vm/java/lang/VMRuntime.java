@@ -161,9 +161,10 @@ final class VMRuntime
      * already been mapped to a true filename.
      *
      * @param filename the file to load
+     * @param loader class loader, or <code>null</code> for the boot loader
      * @return 0 on failure, nonzero on success
      */
-    static int nativeLoad(String filename) {
+    static int nativeLoad(String filename, ClassLoader loader) {
         return 0;
     }
 
