@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSEntryIterator;
 
 /**
  * @author gbin
@@ -176,14 +177,25 @@ public class FatLfnDirectory extends FatDirectory {
 
 	}
 
-	protected void flush() throws IOException {
+	public void flush() throws IOException {
 		//System.out.println("LfnDirectory: Flush");
 		updateLFN();
 		super.flush();
 	}
 
-	public Iterator iterator() {
-		return shortNameIndex.values().iterator();
+	public FSEntryIterator iterator() {
+		return new FSEntryIterator()
+		{
+			Iterator it = shortNameIndex.values().iterator();
+			
+			public boolean hasNext() {
+				return it.hasNext();
+			}
+
+			public FSEntry next() {
+				return (FSEntry) it.next();
+			}			
+		};
 	}
 
 	/*
