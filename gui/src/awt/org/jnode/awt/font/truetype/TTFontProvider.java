@@ -5,6 +5,7 @@ package org.jnode.awt.font.truetype;
 
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -48,7 +49,21 @@ public class TTFontProvider implements FontProvider {
 	 * 
 	 * @return The set containing all fonts provides by this provider.
 	 */
-	public Set getAllFonts() {
+	public Set getAllFonts() 
+	{
+		if(fontsByName.size() == 0)
+		{
+			// load the luxisr.ttf
+			TTFFontData fontData;
+			try {
+				fontData = new TTFFontDataFile(this.getClass().getClassLoader().getResource("/" + "luxisr.ttf"));
+				TTFFont font = new TTFFont(fontData,10 );
+				fontsByName.put(font.getName(),font);
+				
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
 		return new HashSet(fontsByName.values());
 	}
 
@@ -80,7 +95,10 @@ public class TTFontProvider implements FontProvider {
 	 * @param font
 	 * @return The font data
 	 */
-	private TTFFontData getFontData(Font font) {
+	private TTFFontData getFontData(Font font) 
+	{
+		if(font instanceof TTFFont)
+			return ((TTFFont)font).getFontData();
 		return null;
 	}
 }
