@@ -4,6 +4,7 @@
 package org.jnode.vm;
 
 import org.jnode.system.MemoryResource;
+import org.jnode.system.Resource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
@@ -17,6 +18,8 @@ import org.jnode.vm.classmgr.VmArray;
  */
 final class MemoryResourceImpl extends Region implements MemoryResource {
 
+    /** My parent */
+    private final MemoryResourceImpl parent;
 	/** Start address */
 	private final Address start;
 	/** Exclusive end address */
@@ -33,6 +36,10 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	private static final ResourceOwner BYTE_ARRAY_OWNER = new SimpleResourceOwner("byte-array");
 	/** Size of an object reference */
 	private final int slotSize;
+	/** My children */
+	private MemoryResourceImpl children;
+	/** Offset relative to my parent */
+	private final long offset;
 
 	/**
 	 * Create a new instance
@@ -41,9 +48,15 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 * @param start
 	 * @param size
 	 */
-	private MemoryResourceImpl(ResourceOwner owner, Address start, long size) {
+	private MemoryResourceImpl(MemoryResourceImpl parent, ResourceOwner owner, Address start, long size) {
 		super(owner);
+		this.parent = parent;
 		this.start = start;
+		if (parent != null) {
+		    this.offset = Address.distance(parent.start, start);
+		} else {
+		    this.offset = Address.as64bit(start);
+		}
 		this.end = Unsafe.add(start, Unsafe.longToAddress(size));
 		this.size = size;
 		this.released = false;
@@ -53,9 +66,11 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 
 	public MemoryResourceImpl(Object arrayData, int length, int elementSize) {
 		super(BYTE_ARRAY_OWNER);
+		this.parent = null;
 		this.data = arrayData;
 		this.size = length * elementSize;
 		this.start = Address.addressOfArrayData(arrayData);
+		this.offset = Address.as64bit(start);
 		this.end = Unsafe.add(start, length * elementSize);
 		this.released = false;
 		this.slotSize = Unsafe.getCurrentProcessor().getArchitecture().getReferenceSize();
@@ -73,7 +88,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 */
 	protected static synchronized MemoryResource claimMemoryResource(ResourceOwner owner, Address start, long size, int mode) throws ResourceNotFreeException {
 		if (start != null) {
-			final MemoryResourceImpl res = new MemoryResourceImpl(owner, start, size);
+			final MemoryResourceImpl res = new MemoryResourceImpl(null, owner, start, size);
 			if (isFree(resources, res)) {
 				resources = add(resources, res);
 				return res;
@@ -88,10 +103,10 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			} else {
 				ptr = Unsafe.getMemoryEnd();
 			}
-			MemoryResourceImpl res = new MemoryResourceImpl(owner, ptr, size);
+			MemoryResourceImpl res = new MemoryResourceImpl(null, owner, ptr, size);
 			while (!isFree(resources, res)) {
 				ptr = Unsafe.add(ptr, 64 * 1024);
-				res = new MemoryResourceImpl(owner, ptr, size);
+				res = new MemoryResourceImpl(null, owner, ptr, size);
 			}
 			resources = add(resources, res);
 			return res;
@@ -624,18 +639,39 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	}
 
 	/**
+	 * Remove a child from my list of children.
+	 * @param child
+	 */
+	private synchronized final void removeChild(MemoryResourceImpl child) {
+	    this.children = (MemoryResourceImpl)remove(this.children, child);
+	}
+	
+	/**
 	 * Give up this resource. After this method has been called, the resource cannot be used
 	 * anymore.
 	 */
-	public void release() {
-		if (data == null) {
-			if (!this.released) {
-				this.released = true;
-				synchronized (getClass()) {
-					resources = remove(resources, this);
-				}
-			}
-		}
+	public final void release() {
+	    if (!this.released) {
+	        // Mark released as true
+	        this.released = true;
+	        
+	        // Release all children
+	        synchronized (this) {
+	            while (this.children != null) {
+	                this.children.release();
+	            }
+	        }
+	        
+	        if (parent != null) {
+		        // Remove me from parent.
+	            parent.removeChild(this);
+	        } else if (data == null) {
+	            // Remove me from global memory resource list
+	            synchronized (getClass()) {
+	                resources = remove(resources, this);
+	            }
+	        }
+	    }
 	}
 
 	private void testMemPtr(int memPtr, int size) {
@@ -1004,5 +1040,111 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	public void xorShort(int memPtr, short value, int count) {
 		testMemPtr(memPtr, count * 2);
 		Unsafe.xorShort(Unsafe.add(start, memPtr), value, count);
+	}
+
+	/**
+	 * Get a memory resource for a portion of this memory resources.
+	 * The first area of this memory resource that fits the given size
+	 * and it not claimed by any child resource is returned.
+	 * If not large enought area if found, a ResourceNotFreeException is thrown.
+	 * A child resource is always releases when the parent is released.
+	 * A child resource can be released without releasing the parent.
+	 * 
+	 * @param size Length of the returned resource in bytes.
+	 * @return
+	 */
+	public MemoryResource claimChildResource(long size, int align)
+	throws IndexOutOfBoundsException, ResourceNotFreeException {
+		if (released) {
+			throw new IndexOutOfBoundsException("MemoryResource is released");
+		}
+	    if (size < 0) {
+	        throw new IndexOutOfBoundsException("Size " + size);
+	    }
+	    if (align <= 0) {
+	        throw new IllegalArgumentException("Align must be >= 1");
+	    }
+	    
+	    long offset = 0;
+	    final int alignMask = align - 1;
+	    while (true) {
+		    final Address addr = Unsafe.add(this.start, Unsafe.longToAddress(offset));
+		    final MemoryResourceImpl child = new MemoryResourceImpl(this, getOwner(), addr, size);
+		    final MemoryResourceImpl existingChild = (MemoryResourceImpl)get(this.children, child);
+		    if (existingChild == null) {
+		        // We found a free region
+		        this.children = (MemoryResourceImpl)add(this.children, child);
+		        return child;
+		    }
+		    // We found an existing child, skip over that.
+		    offset = existingChild.getOffset() + existingChild.getSize();
+		    
+		    // Align the new offset
+		    if ((offset & alignMask) != 0) {
+		        offset = (offset + alignMask) & ~alignMask;
+		    }
+		    
+		    // Do we have space left?
+	        if (offset + size > this.size) {
+	            throw new ResourceNotFreeException();
+	        }
+	    }	    
+	}
+	
+	/**
+	 * Get a memory resource for a portion of this memory resources.
+	 * A child resource is always releases when the parent is released.
+	 * A child resource can be released without releasing the parent.
+	 * 
+	 * @param offset Offset relative to the start of this resource.
+	 * @param size Length of the returned resource in bytes.
+	 * @param allowOverlaps If true, overlapping child resources will be allowed, otherwise overlapping child resources will resulut in a ResourceNotFreeException.
+	 * @return
+	 */
+	public MemoryResource claimChildResource(long offset, long size, boolean allowOverlaps)
+	throws IndexOutOfBoundsException, ResourceNotFreeException {
+		if (released) {
+			throw new IndexOutOfBoundsException("MemoryResource is released");
+		}
+	    if (offset < 0) {
+	        throw new IndexOutOfBoundsException("Offset " + offset);
+	    }
+	    if (size < 0) {
+	        throw new IndexOutOfBoundsException("Size " + size);
+	    }
+	    if (offset + size > this.size) {
+	        throw new IndexOutOfBoundsException("Offset + size > this.size");	        
+	    }
+	    final Address addr = Unsafe.add(this.start, Unsafe.longToAddress(offset));
+	    final MemoryResourceImpl child = new MemoryResourceImpl(this, getOwner(), addr, size);
+	    synchronized (this) {
+	        // Re-test released flag
+			if (released) {
+				throw new IndexOutOfBoundsException("MemoryResource is released");
+			}
+			if (!allowOverlaps) {
+			    if (!isFree(this.children, child)) {
+			        throw new ResourceNotFreeException();
+			    }
+			}
+	        this.children = (MemoryResourceImpl)add(this.children, child);
+	    }
+	    return child;
+	}
+	
+	/**
+	 * Gets the parent resource if any.
+	 * @return The parent resource, or null if this resource has no parent.
+	 */
+	public final Resource getParent() {
+	    return parent;
+	}	
+	
+	/**
+	 * Gets the offset relative to my parent.
+	 * If this resource has no parent, the address of this buffer is returned.
+	 */
+	public final long getOffset() {
+	    return this.offset;
 	}
 }

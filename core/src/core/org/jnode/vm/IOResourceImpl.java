@@ -4,6 +4,7 @@
 package org.jnode.vm;
 
 import org.jnode.system.IOResource;
+import org.jnode.system.Resource;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.NumberUtils;
@@ -136,6 +137,14 @@ final class IOResourceImpl extends Region implements IOResource {
 		}
 	}
 
+	/**
+	 * Gets the parent resource if any.
+	 * @return The parent resource, or null if this resource has no parent.
+	 */
+	public Resource getParent() {
+	    return null;
+	}
+	
 	private void testPort(int portNr, int size) {
 		if (released) {
 			throw new IndexOutOfBoundsException("Resource is released");
