@@ -27,6 +27,9 @@ public class RadeonHardwareCursor implements RadeonConstants, HardwareCursorAPI 
 	private final HashMap cursorCache = new HashMap();
 	/** Memory reserved for cursor images */
 	private final MemoryResource cursorMem;
+	
+	private int horzOffset;
+	private int vertOffset;
 
     /**
      * Initialize this instance.
@@ -49,9 +52,10 @@ public class RadeonHardwareCursor implements RadeonConstants, HardwareCursorAPI 
     	io.setReg32(CUR_CLR1, 0);
 
     	// Set shape
-		final short[] cur = getCursor(cursor);
+		final byte[] cur = getCursor(cursor);
 		if (cur != null) {
-			cursorMem.setShorts(cur, 0, 0, 1024);
+			io.setReg32(CUR_HORZ_VERT_OFF, vertOffset + (horzOffset << 16));
+			cursorMem.setBytes(cur, 0, 0, 1024);
 		}
     }
     
@@ -75,8 +79,8 @@ public class RadeonHardwareCursor implements RadeonConstants, HardwareCursorAPI 
     	//Radeon_WaitForFifo( ai, 3 );
 
         io.setReg32(CUR_HORZ_VERT_OFF, CUR_LOCK
-    			| (xorigin << 16)
-    			| yorigin );
+    			| ((xorigin + horzOffset) << 16)
+    			| (yorigin + vertOffset));
     	io.setReg32(CUR_HORZ_VERT_POSN, CUR_LOCK
     			| (((xorigin != 0) ? 0 : x) << 16)
     			| ((yorigin != 0) ? 0 : y) );
@@ -103,25 +107,50 @@ public class RadeonHardwareCursor implements RadeonConstants, HardwareCursorAPI 
         setCursorVisible(false);
     }
     
-    private short[] getCursor(HardwareCursor cursor) {
+    private byte[] getCursor(HardwareCursor cursor) {
 		final HardwareCursorImage img = cursor.getImage(32, 32);
 		if (img == null) {
 			return null;
 		}
-		short[] res = (short[]) cursorCache.get(img);
-		if (res == null) {
-			res = new short[1024];
-			final int[] argb = img.getImage();
-			for (int i = 0; i < 1024; i++) {
-				final int v = argb[i];
-				final int a = (v >>> 24) & 0xFF;
-				final int r = ((v >> 16) & 0xFF) >> 3;
-				final int g = ((v >> 8) & 0xFF) >> 3;
-				final int b = (v & 0xFF) >> 3;
+		final int w = img.getWidth();
+		final int h = img.getHeight();
+		horzOffset = 64 - w;
+		vertOffset = 64 - h;
 
-				res[i] = (short) ((r << 10) | (g << 5) | b);
-				if (a != 0) {
-					res[i] |= 0x8000;
+		byte[] res = (byte[]) cursorCache.get(img);
+		if (res == null) {
+			res = new byte[1024];
+			final int[] argb = img.getImage();
+					
+			for (int row = 0; row < h; row++) {
+				final int imgOfs = row * w;
+				final int resOfs = row * 16;
+				
+				for (int x = 0; x < w; x++) {		
+					final int resRowIdx = resOfs + (((64 - w) + x) >> 3);
+					final int resRowBit = 1 << (7 - (((64 - w) + x) & 7));					
+
+					final int v = argb[imgOfs + x];
+					final int a = (v >>> 24) & 0xFF;
+					final int r = ((v >> 16) & 0xFF);
+					final int g = ((v >> 8) & 0xFF);
+					final int b = (v & 0xFF);
+					
+					if (a != 0) {
+						// Opaque
+						if (((r + g + b) / 3) >= 128) {
+							// White (CUR_CLR0)
+							// and:0, xor:0
+						} else {
+							// Black (CUR_CLR1)
+							// and:0, xor:1
+							res[resRowIdx+8] |= resRowBit;
+						}
+					} else {
+						// Transparent
+						// and:1, xor:0
+						res[resRowIdx] |= resRowBit;
+					}
 				}
 			}
 			cursorCache.put(img, res);
