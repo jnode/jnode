@@ -12,13 +12,14 @@ import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.FileArgument;
 
 /**
  * @author epr
  */
 public class CatCommand {
 
-    static final Argument ARG_FILE = new Argument("file",
+    static final Argument ARG_FILE = new FileArgument("file",
             "the file (or URL) to print out");
 
     public static Help.Info HELP_INFO = new Help.Info("cat",
