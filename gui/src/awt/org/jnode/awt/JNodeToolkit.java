@@ -664,7 +664,9 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
             this.waitingNativeQueue = locked;
             synchronized (locked) {
                 try {
-                    locked.wait();
+                    // Wait for as long as the human eye can tolerate it.
+                    // We wait 100ms.
+                    locked.wait(100);
                 } catch (InterruptedException e) {
                     // Ignore
                 }
