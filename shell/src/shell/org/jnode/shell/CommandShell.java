@@ -252,13 +252,14 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
     //		}
     //	}
 
-    protected Class getCommandClass(String cmd) throws ClassNotFoundException {
+    protected CommandInfo getCommandClass(String cmd) throws ClassNotFoundException {
         try {
-            return aliasMgr.getAliasClass(cmd);
+            Class cls = aliasMgr.getAliasClass(cmd);
+            return new CommandInfo(cls, aliasMgr.isInternal(cmd));
         } catch (NoSuchAliasException ex) {
             final ClassLoader cl = Thread.currentThread()
                     .getContextClassLoader();
-            return cl.loadClass(cmd);
+            return new CommandInfo(cl.loadClass(cmd), false);
         }
     }
 
@@ -486,8 +487,8 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
                 if (!cmd.trim().equals("") && cl.hasNext())
                         try {
                             // get command's help info
-                            Class cmdClass = getCommandClass(cmd);
-                            Help.Info info = Help.getInfo(cmdClass);
+                            CommandInfo cmdClass = getCommandClass(cmd);
+                            Help.Info info = Help.getInfo(cmdClass.getCommandClass());
 
                             // perform completion
                             result = cmd + " " + info.complete(cl); // prepend

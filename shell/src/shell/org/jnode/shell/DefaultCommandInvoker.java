@@ -41,9 +41,9 @@ public class DefaultCommandInvoker implements CommandInvoker {
         commandShell.addCommandToHistory(cmdLineStr);
         //        System.err.println("Got command: "+cmdLineStr+", name="+cmdName);
         try {
-            Class cmdClass = commandShell.getCommandClass(cmdName);
+            CommandInfo cmdInfo = commandShell.getCommandClass(cmdName);
             //            System.err.println("CmdClass="+cmdClass);
-            final Method main = cmdClass.getMethod("main", MAIN_ARG_TYPES);
+            final Method main = cmdInfo.getCommandClass().getMethod("main", MAIN_ARG_TYPES);
             //            System.err.println("main="+main);
             try {
                 //                System.err.println("Invoking...");
@@ -60,7 +60,7 @@ public class DefaultCommandInvoker implements CommandInvoker {
             } catch (InvocationTargetException ex) {
                 Throwable tex = ex.getTargetException();
                 if (tex instanceof SyntaxErrorException) {
-                    Help.getInfo(cmdClass).usage();
+                    Help.getInfo(cmdInfo.getCommandClass()).usage();
                     err.println(tex.getMessage());
                 } else {
                     err.println("Exception in command");

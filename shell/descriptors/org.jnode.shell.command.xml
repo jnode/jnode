@@ -19,6 +19,7 @@
     <extension point="org.jnode.shell.aliases">
         <alias name="alias" class="org.jnode.shell.command.AliasCommand"/>
         <alias name="class" class="org.jnode.shell.command.ClassCommand"/>
+        <alias name="classpath" class="org.jnode.shell.command.ClasspathCommand" internal="yes"/>
         <alias name="compile" class="org.jnode.shell.command.CompileCommand"/>
         <alias name="disasm" class="org.jnode.shell.command.DisassembleCommand"/>
         <alias name="date" class="org.jnode.shell.command.DateCommand"/>
@@ -42,6 +43,7 @@
     <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
     <permission class="java.lang.RuntimePermission" name="getProtectionDomain"/>
     <permission class="java.lang.RuntimePermission" name="createClassLoader"/>
+    <permission class="java.lang.RuntimePermission" name="setContextClassLoader"/>
     <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
     <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
     <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>
