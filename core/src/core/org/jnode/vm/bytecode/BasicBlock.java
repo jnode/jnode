@@ -3,8 +3,9 @@
  */
 package org.jnode.vm.bytecode;
 
-import java.util.ArrayList;
+import java.util.List;
 
+import org.jnode.util.BootableArrayList;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.compiler.ir.Variable;
 
@@ -21,8 +22,8 @@ public class BasicBlock extends VmSystemObject {
 	private final int startPC;
 	private int endPC;
 	private boolean startOfExceptionHandler;
-	private ArrayList predecessors;
-	private ArrayList successors;
+	private BootableArrayList predecessors;
+	private BootableArrayList successors;
 	private Variable[] variables;
 	
 	/**
@@ -35,8 +36,8 @@ public class BasicBlock extends VmSystemObject {
 		this.startPC = startPC;
 		this.endPC = endPC;
 		this.startOfExceptionHandler = startOfExceptionHandler;
-		this.predecessors = new ArrayList();
-		this.successors = new ArrayList();
+		this.predecessors = new BootableArrayList();
+		this.successors = new BootableArrayList();
 	}
 
 	/**
@@ -110,14 +111,14 @@ public class BasicBlock extends VmSystemObject {
 	/**
 	 * @return an ArrayList containing BasicBlocks that may precede this block
 	 */
-	public ArrayList getPredecessors() {
+	public List getPredecessors() {
 		return predecessors;
 	}
 
 	/**
 	 * @return an ArrayList containing BasicBlocks that may succeed this block
 	 */
-	public ArrayList getSuccessors() {
+	public List getSuccessors() {
 		return successors;
 	}
 
@@ -126,7 +127,7 @@ public class BasicBlock extends VmSystemObject {
 			this.predecessors.add(block);
 		}
 		// Closure
-		ArrayList preds = block.getPredecessors();
+		List preds = block.getPredecessors();
 		int n = preds.size();
 		for (int i=0; i<n; i+=1) {
 			BasicBlock pred = (BasicBlock) preds.get(i);
