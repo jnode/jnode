@@ -9,6 +9,7 @@
   <requires>
     <import plugin="org.jnode.fs"/>
     <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.driver.ide"/>
   </requires>
         
   <runtime>
@@ -20,6 +21,7 @@
   <extension point="org.jnode.shell.aliases">
     <alias name="FileTest"      class="org.jnode.test.fs.FileTest"/>
     <alias name="LfnTest"      class="org.jnode.test.fs.LfnTest"/>
+    <alias name="ATAPITest"      class="org.jnode.test.fs.ATAPITest"/>
   </extension>
 
 </plugin>
