@@ -344,9 +344,9 @@
           <exclude name="testsuite/**/*"/>
           <exclude name="vm/reference/**/*"/>
         </fileset>
-        <fileset dir="${root.dir}/../classpath/external/jaxp/source" includes="**/*.java">
+        <!-- fileset dir="${root.dir}/../classpath/external/jaxp/source" includes="**/*.java">
           <exclude name="gnu/xml/**/*"/>
-        </fileset>
+        </fileset -->
       </classpathsources>
     </cp-compare>
 
