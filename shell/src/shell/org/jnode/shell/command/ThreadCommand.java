@@ -28,59 +28,96 @@ import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.ThreadNameArgument;
+import org.jnode.shell.Command;
+import org.jnode.shell.CommandLine;
 import org.jnode.vm.VmSystem;
 
 /**
  * Shell command to view threads or a specific thread.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author Martin Husted Hartvig (hagar@jnode.org)
  */
-public class ThreadCommand {
 
+public class ThreadCommand  implements Command
+{
 	private static final ThreadNameArgument ARG_NAME = new ThreadNameArgument("threadName", "the name of the thread to view");
 	private static final Parameter PAR_NAME = new Parameter(ARG_NAME, Parameter.OPTIONAL);
+
 	public static Help.Info HELP_INFO = new Help.Info("thread", "View all or a specific threads", new Parameter[] { PAR_NAME });
 
+  private final static String seperator = ", ", slash_t = "\t", group = "Group ";
+
 	public static void main(String[] args) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(args);
-		new ThreadCommand().execute(cmdLine, System.in, System.out, System.err);
+
+		new ThreadCommand().execute(new CommandLine(args), System.in, System.out, System.err);
 	}
 
 	/**
 	 * Execute this command
 	 */
-	public void execute(ParsedArguments cmdLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
+	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
+    ParsedArguments parsedArguments = HELP_INFO.parse(commandLine.toStringArray());
 
 		ThreadGroup grp = Thread.currentThread().getThreadGroup();
+
 		while (grp.getParent() != null) {
 			grp = grp.getParent();
 		}
-		if (PAR_NAME.isSet(cmdLine)) {
-			showGroup(grp, out, ARG_NAME.getValue(cmdLine));
+
+		if (PAR_NAME.isSet(parsedArguments)) {
+			showGroup(grp, out, ARG_NAME.getValue(parsedArguments));
 		} else {
 			showGroup(grp, out, null);
 		}
 	}
 
 	private void showGroup(ThreadGroup grp, PrintStream out, String threadName) {
+    StringBuffer stringBuffer;
+
 		if (threadName != null) {
-			out.println("Group " + grp.getName());
+			out.print(group);
+			out.println(grp.getName());
 		}
+
 		final int max = grp.activeCount() * 2;
 		final Thread[] ts = new Thread[max];
 		grp.enumerate(ts);
+
+
+
 		for (int i = 0; i < max; i++) {
 			final Thread t = ts[i];
 			if (t != null) {
 				if ((threadName == null) || threadName.equals(t.getName())) {
-					out.print("\t");
-					out.println("" + t.getId() + ", " + t.getName() + ", " + t.getPriority() + ", " + t.getVmThread().getThreadStateName());
+					out.print(slash_t);
+          stringBuffer = new StringBuffer();
+
+          stringBuffer.append(t.getId());
+					stringBuffer.append(seperator);
+					stringBuffer.append(t.getName());
+					stringBuffer.append(seperator);
+					stringBuffer.append(t.getPriority());
+					stringBuffer.append(seperator);
+					stringBuffer.append(t.getVmThread().getThreadStateName());
+
+          out.println(stringBuffer.toString());
+          stringBuffer = null;
+
 					if (threadName != null) {
 						final Object[] trace = VmSystem.getStackTrace(t.getVmThread());
 						final int traceLen = trace.length;
 						for (int k = 0; k < traceLen; k++) {
-							out.println("\t\t" + trace[k]);
+              stringBuffer = new StringBuffer();
+              stringBuffer.append(slash_t);
+              stringBuffer.append(slash_t);
+              stringBuffer.append(trace[k]);
+
+              out.println(stringBuffer.toString());
+
+              stringBuffer = null;
 						}
+
 						return;
 					}
 				}
@@ -97,4 +134,5 @@ public class ThreadCommand {
 			}
 		}
 	}
+
 }

@@ -25,23 +25,23 @@ import java.io.InputStream;
 import java.io.PrintStream;
 
 import org.jnode.shell.CommandLine;
+import org.jnode.shell.Command;
 import org.jnode.shell.help.*;
 
 /**
  * @author epr
  */
-public class EchoCommand {
+
+public class EchoCommand implements Command{
 
 	public static Help.Info HELP_INFO = new Help.Info(
-		"echo",
-		"Print the given text",
+		"echo", "Print the given text",
 		new Parameter[]{
 			new Parameter(new StringArgument("arg", "the text to print", Argument.MULTI), Parameter.OPTIONAL)
 		}
 	);
 
-	public static void main(String[] args)
-	throws Exception {
+	public static void main(String[] args) throws Exception {
 		new EchoCommand().execute(new CommandLine(args), System.in, System.out, System.err);
 	}
 
@@ -49,21 +49,20 @@ public class EchoCommand {
 	 * Execute this command
 	 */
 	public void execute(
-		CommandLine cmdLine,
+		CommandLine commandLine,
 		InputStream in,
 		PrintStream out,
 		PrintStream err)
 	throws Exception {
 
 		int i = 0;
-		while (cmdLine.hasNext()) {
+		while (commandLine.hasNext()) {
 			if (i > 0) {
 				out.print(' ');
 			}
-			out.print(cmdLine.next());
+			out.print(commandLine.next());
 			i++;
 		}
 		out.println();
 	}
-
 }

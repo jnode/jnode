@@ -24,11 +24,15 @@ package org.jnode.shell.command;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+import java.io.InputStream;
+import java.io.PrintStream;
 
 import javax.naming.NameNotFoundException;
 
 import org.jnode.shell.Shell;
 import org.jnode.shell.ShellUtils;
+import org.jnode.shell.Command;
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
 import org.jnode.shell.help.AliasArgument;
@@ -43,11 +47,14 @@ import org.jnode.shell.help.SyntaxErrorException;
  * @author epr
  * @author qades
  */
-public class AliasCommand {
+public class AliasCommand implements Command
+{
 
-        static final AliasArgument ARG_ALIAS = new AliasArgument("alias", "the alias");
+  static final AliasArgument ARG_ALIAS = new AliasArgument("alias", "the alias");
 	static final ClassNameArgument ARG_CLASS = new ClassNameArgument("classname", "the classname");
 	static final Parameter PARAM_REMOVE = new Parameter("r", "following alias will be removed", ARG_ALIAS, Parameter.MANDATORY);
+
+  private final static String slash_t = ":\t";
 
 	public static Help.Info HELP_INFO = new Help.Info(
 		"alias", new Syntax[] {
@@ -64,34 +71,49 @@ public class AliasCommand {
 			)
 		});
 
-	public static void main(String[] args) throws NoSuchAliasException, NameNotFoundException, SyntaxErrorException {
-		ParsedArguments cmdLine = HELP_INFO.parse(args);
-
-		final Shell shell = ShellUtils.getShellManager().getCurrentShell();
-		final AliasManager aliasMgr = shell.getAliasManager();
-
-		if (cmdLine.size() == 0) {
-		    showAliases(aliasMgr);
-		} else if (PARAM_REMOVE.isSet(cmdLine)) {
-			// remove an alias
-			aliasMgr.remove(ARG_ALIAS.getValue(cmdLine));
-		} else {
-			// add an alias
-			aliasMgr.add(ARG_ALIAS.getValue(cmdLine), ARG_CLASS.getValue(cmdLine));
-		}
+	public static void main(String[] args) throws Exception {
+    new AliasCommand().execute(new CommandLine(args), System.in, System.out, System.err);
 	}
 	
-	private static void showAliases(AliasManager aliasMgr) throws NoSuchAliasException {
-	    final TreeMap map = new TreeMap();
+
+	private static void showAliases(AliasManager aliasMgr, PrintStream out) throws NoSuchAliasException {
+	  final TreeMap map = new TreeMap();
+
 		for (Iterator i = aliasMgr.aliasIterator(); i.hasNext();) {
 			final String alias = (String) i.next();
-			final String clsName = aliasMgr.getAliasClassName(alias);
-			map.put(alias, clsName);
+			map.put(alias, aliasMgr.getAliasClassName(alias));
 		}
 		
+    StringBuffer stringBuffer;
+
 		for (Iterator i = map.entrySet().iterator(); i.hasNext(); ) {
-		    final Map.Entry entry = (Map.Entry)i.next();
-			System.out.println(entry.getKey() + ":\t" + entry.getValue());
-		}	    
+		  final Map.Entry entry = (Map.Entry)i.next();
+      stringBuffer = new StringBuffer();
+      stringBuffer.append(entry.getKey());
+      stringBuffer.append(slash_t);
+      stringBuffer.append(entry.getValue());
+
+			out.println(stringBuffer.toString());
+
+      stringBuffer = null;
+		}
 	}
+
+  public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception
+  {
+    ParsedArguments parsedArguments = HELP_INFO.parse(commandLine.toStringArray());
+
+    final Shell shell = ShellUtils.getShellManager().getCurrentShell();
+    final AliasManager aliasMgr = shell.getAliasManager();
+
+    if (parsedArguments.size() == 0) {
+        showAliases(aliasMgr, out);
+    } else if (PARAM_REMOVE.isSet(parsedArguments)) {
+      // remove an alias
+      aliasMgr.remove(ARG_ALIAS.getValue(parsedArguments));
+    } else {
+      // add an alias
+      aliasMgr.add(ARG_ALIAS.getValue(parsedArguments), ARG_CLASS.getValue(parsedArguments));
+    }
+  }
 }
