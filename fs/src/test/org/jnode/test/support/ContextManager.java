@@ -33,12 +33,15 @@ import org.jnode.driver.cmos.CMOSConstants;
 import org.jnode.driver.cmos.CMOSService;
 import org.jnode.driver.floppy.support.DefaultFloppyDeviceFactory;
 import org.jnode.driver.floppy.support.FloppyDeviceFactory;
+import org.jnode.driver.ide.IDEDeviceFactory;
 import org.jnode.naming.InitialNaming;
 import org.jnode.naming.InitialNaming.NameSpace;
 import org.jnode.plugin.PluginException;
+import org.jnode.system.BootLog;
 import org.jnode.test.fs.unit.config.OsType;
 import org.jnode.test.fs.unit.config.StubNameSpace;
-import org.jnode.test.fs.unit.config.floppy.MockFloppyDeviceFactory;
+import org.jnode.test.fs.unit.config.factories.MockFloppyDeviceFactory;
+import org.jnode.test.fs.unit.config.factories.MockIDEDeviceFactory;
 import org.jnode.test.fs.unit.stubs.StubDeviceManager;
 
 
@@ -64,7 +67,7 @@ public class ContextManager
         if(!initialized)
         {
             try
-            {
+            {                
                 initLog4j();
                 initNaming();
             }
@@ -118,9 +121,8 @@ public class ContextManager
         try
         {
             namespace.bind(FloppyDeviceFactory.NAME, new MockFloppyDeviceFactory());
+            namespace.bind(IDEDeviceFactory.NAME, new MockIDEDeviceFactory());
             namespace.bind(DeviceManager.NAME, StubDeviceManager.INSTANCE);
-            
-            FloppyDeviceFactory factory = (FloppyDeviceFactory) InitialNaming.lookup(FloppyDeviceFactory.class, DefaultFloppyDeviceFactory.class);
             
             CMOSService cmos = new CMOSService()
             {
