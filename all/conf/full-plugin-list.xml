@@ -38,7 +38,7 @@
     <plugin id="org.jnode.driver.input.l10n"/>
     <plugin id="org.jnode.driver.net.3c90x"/>
     <plugin id="org.jnode.driver.net.ethernet"/>
-
+	<plugin id="org.jnode.driver.net.eepro100"/>
     <plugin id="org.jnode.driver.net.lance"/>
     <plugin id="org.jnode.driver.net.loopback"/>
     <plugin id="org.jnode.driver.net.ne2k-pci"/>
