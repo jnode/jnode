@@ -69,30 +69,17 @@ public abstract class VmStackReader extends VmSystemObject {
 	}
 
 	/**
-	 * Gets the java program counter of a given stackframe.
+	 * Gets the compiled code of a given stackframe.
 	 * @param sf Stackframe pointer
-	 * @return the pc
+	 * @return The compiled code
 	 */
-	final int getPC(Address sf) {
-		return sf.loadInt(getPCOffset(sf));
-	}
-
-	/**
-	 * Sets the java program counter of a given stackframe.
-	 * @param sf Stackframe pointer
-	 * @param pc
-	 */
-	final void setPC(Address sf, int pc) {
-		sf.store(pc, getPCOffset(sf));
-	}
-
-	/**
-	 * Gets the magic constant of a given stackframe.
-	 * @param sf Stackframe pointer
-	 * @return The magic
-	 */
-	final int getMagic(Address sf) {
-		return sf.loadInt(getMagicOffset(sf));
+	final VmCompiledCode getCompiledCode(Address sf) {
+        final int ccid = sf.loadInt(getMethodIdOffset(sf));
+        if (ccid == 0) {
+            return null;
+        } else {
+            return Vm.getCompiledMethods().get(ccid);
+        }
 	}
 
 	/**
@@ -116,10 +103,6 @@ public abstract class VmStackReader extends VmSystemObject {
 		if (getMethod(sf) == null) {
 			return false;
 		}
-		final int magic = getMagic(sf) & VmStackFrame.MAGIC_MASK;
-		if ((magic != VmStackFrame.MAGIC_COMPILED) && (magic != VmStackFrame.MAGIC_INTERPRETED)) {
-			return false;
-		}
 		return true;
 	}
 
@@ -133,7 +116,6 @@ public abstract class VmStackReader extends VmSystemObject {
 			return true;
 		}
 		return (getMethod(sf) == null)
-			&& (getMagic(sf) == 0)
 			&& (getPrevious(sf) == null);
 	}
 
@@ -157,7 +139,6 @@ public abstract class VmStackReader extends VmSystemObject {
 			Unsafe.debug("Corrupted stack!, st.length=");
 			Unsafe.debug(count);
 			Unsafe.debug(" f.magic=");
-			Unsafe.debug(getMagic(f));
 			//Unsafe.die();
 		}
 
@@ -203,13 +184,10 @@ public abstract class VmStackReader extends VmSystemObject {
 				Unsafe.debug(", ");
 			}
 			final VmMethod method = getMethod(f);
-			final int pc = getPC(f);
-			final int lineNr = method.getBytecode().getLineNr(pc);
 			final VmType vmClass = method.getDeclaringClass();
 			Unsafe.debug(vmClass.getName());
 			Unsafe.debug("::");
 			Unsafe.debug(method.getName()); 
-			Unsafe.debug(lineNr);
 			f = getPrevious(f);
 			max--;
 		}
@@ -233,13 +211,10 @@ public abstract class VmStackReader extends VmSystemObject {
 				Unsafe.debug(", ");
 			}
 			final VmMethod method = getMethod(f);
-			final int pc = getPC(f);
-			final int lineNr = method.getBytecode().getLineNr(pc);
 			final VmType vmClass = method.getDeclaringClass();
 			Unsafe.debug(vmClass.getName());
 			Unsafe.debug("::");
 			Unsafe.debug(method.getName()); 
-			Unsafe.debug(lineNr);
 			f = getPrevious(f);
 			max--;
 		}
@@ -261,20 +236,6 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @return The method id offset
 	 */
 	protected abstract Offset getMethodIdOffset(Address sf);
-
-	/**
-	 * Gets the offset within the stackframe of java program counter.
-	 * @param sf Stackframe pointer
-	 * @return The pc offset
-	 */
-	protected abstract Offset getPCOffset(Address sf);
-
-	/**
-	 * Gets the offset within the stackframe of the magic constant.
-	 * @param sf Stackframe pointer
-	 * @return The magic offset
-	 */
-	protected abstract Offset getMagicOffset(Address sf);
 
 	/**
 	 * Gets the offset within the stackframe of the return address.

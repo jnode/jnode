@@ -37,9 +37,7 @@ import org.vmmagic.unboxed.Offset;
  *   method argument n
  *   return address (pushed by CALL)
  *   old EBP
- *   magic constants
- *   java program counter
- *   VmMethod reference    (( EBP points here
+ *   CompiledCode ID (( EBP points here
  *   local variables
  *   calculation stack
  * </pre>
@@ -51,9 +49,8 @@ public final class VmX86StackReader extends VmStackReader {
 	// Locals are before this object.
 	// ...
 	public static final int METHOD_ID_OFFSET = 0;
-	public static final int MAGIC_OFFSET = 1;
-	public static final int PREVIOUS_OFFSET = 2;
-	public static final int RETURNADDRESS_OFFSET = 3;
+	public static final int PREVIOUS_OFFSET = 1;
+	public static final int RETURNADDRESS_OFFSET = 2;
 	// Stack follows here
 	// ...
 
@@ -62,14 +59,6 @@ public final class VmX86StackReader extends VmStackReader {
     public VmX86StackReader(int slotSize) {
         this.slotSize = slotSize;
     }
-    
-	/**
-	 * @param sf
-	 * @return The offset of he magic in the given stackframe
-	 */
-	protected Offset getMagicOffset(Address sf) {
-		return Offset.fromIntSignExtend(MAGIC_OFFSET * slotSize);
-	}
 
 	/**
 	 * @param sf
