@@ -3,6 +3,7 @@
  */
 package org.jnode.test.gui;
 
+import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.video.FrameBufferAPI;
@@ -37,6 +38,7 @@ public class FBTest {
             }
     );
 
+    private static final Logger log = Logger.getLogger(FBTest.class);
 
     final Surface g;
     private final int width;
@@ -57,26 +59,26 @@ public class FBTest {
     }
 
     protected void perform() {
-        System.out.println("Loop count          " + count);
+        log.info("Loop count          " + count);
         if (tests.indexOf('l') >= 0) {
-            System.out.println("Shape Line  PAINT   " + performTest(new DrawShapeLineTest(), Surface.PAINT_MODE));
-            System.out.println("Shape Line  XOR     " + performTest(new DrawShapeLineTest(), Surface.XOR_MODE));
+            log.info("Shape Line  PAINT   " + performTest(new DrawShapeLineTest(), Surface.PAINT_MODE));
+            log.info("Shape Line  XOR     " + performTest(new DrawShapeLineTest(), Surface.XOR_MODE));
         }
         if (tests.indexOf('R') >= 0) {
-            System.out.println("Shape Rect  PAINT   " + performTest(new DrawShapeRectTest(), Surface.PAINT_MODE));
-            System.out.println("Shape Rect  XOR     " + performTest(new DrawShapeRectTest(), Surface.XOR_MODE));
+            log.info("Shape Rect  PAINT   " + performTest(new DrawShapeRectTest(), Surface.PAINT_MODE));
+            log.info("Shape Rect  XOR     " + performTest(new DrawShapeRectTest(), Surface.XOR_MODE));
         }
         if (tests.indexOf('E') >= 0) {
-            System.out.println("Shape Ellipse PAINT " + performTest(new DrawShapeEllipseTest(), Surface.PAINT_MODE));
-            //System.out.println("Shape Ellipse XOR   " + performTest(new DrawShapeEllipseTest(), Surface.XOR_MODE));
+            log.info("Shape Ellipse PAINT " + performTest(new DrawShapeEllipseTest(), Surface.PAINT_MODE));
+            //log.info("Shape Ellipse XOR   " + performTest(new DrawShapeEllipseTest(), Surface.XOR_MODE));
         }
         if (tests.indexOf('A') >= 0) {
-            System.out.println("Shape Arc PAINT     " + performTest(new DrawShapeArcTest(), Surface.PAINT_MODE));
-            //System.out.println("Shape Arc XOR       " + performTest(new DrawShapeArcTest(), Surface.XOR_MODE));
+            log.info("Shape Arc PAINT     " + performTest(new DrawShapeArcTest(), Surface.PAINT_MODE));
+            //log.info("Shape Arc XOR       " + performTest(new DrawShapeArcTest(), Surface.XOR_MODE));
         }
         if (tests.indexOf('Q') >= 0) {
-            System.out.println("Shape QuadCurve PAINT " + performTest(new DrawShapeQuadTest(), Surface.PAINT_MODE));
-            //System.out.println("Shape Arc XOR       " + performTest(new DrawShapeArcTest(), Surface.XOR_MODE));
+            log.info("Shape QuadCurve PAINT " + performTest(new DrawShapeQuadTest(), Surface.PAINT_MODE));
+            //log.info("Shape Arc XOR       " + performTest(new DrawShapeArcTest(), Surface.XOR_MODE));
         }
     }
 
@@ -91,6 +93,7 @@ public class FBTest {
         try {
             final DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
             final Device dev = dm.getDevice(devId);
+            log.info("Using device " + dev.getId());
             final FrameBufferAPI api = (FrameBufferAPI) dev.getAPI(FrameBufferAPI.class);
             final FrameBufferConfiguration conf = api.getConfigurations()[0];
 
@@ -98,11 +101,13 @@ public class FBTest {
             new FBTest(g, conf.getScreenWidth(), conf.getScreenHeight(), count, tests).perform();
             Thread.sleep(3000);
         } catch (Throwable ex) {
-            ex.printStackTrace();
+            log.error("Error in FBTest", ex);
         } finally {
             if (g != null) {
+                log.info("Close graphics");
                 g.close();
             }
+            log.info("End of FBTest");
         }
     }
 
