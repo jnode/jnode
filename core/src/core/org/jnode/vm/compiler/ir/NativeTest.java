@@ -12,6 +12,7 @@ import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.bytecode.BytecodeParser;
+import org.jnode.vm.bytecode.BytecodeViewer;
 import org.jnode.vm.compiler.ir.quad.Quad;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.assembler.x86.X86Stream;
@@ -34,15 +35,15 @@ import java.util.Arrays;
  * @author Levente S?ntha
  */
 public class NativeTest {
-    static  {
+//    static  {
 //        System.loadLibrary("exec");
-    }
+//    }
 
-//    private static native int execIntIntInt(int a0, int a1, byte[] code, int size);
-//    private static native float execFloatFloatFloat(float a0, float a1, byte[] code, int size);
+    private static int execIntIntInt(int a0, int a1, byte[] code, int size){return 0;}
+    private static float execFloatFloatFloat(float a0, float a1, byte[] code, int size){return 0;}
 
     public static void main(String args[]) throws SecurityException, IOException, ClassNotFoundException {
-//        System.in.read();
+        System.in.read();
             X86CpuID cpuId = X86CpuID.createID("p5");
             boolean binary = false;
 
@@ -81,9 +82,9 @@ public class NativeTest {
                     System.out.println("J: " + icode[i]);
                 }*/
 
-                //int a0 = 149;
-                //int a1 = 100;
-//                System.out.println("result: " + execIntIntInt(a0, a1, b, b.length) + " " + PrimitiveTest.terniary(a0, a1));
+                int a0 = 199;
+                int a1 = 100;
+                System.out.println("result: " + execIntIntInt(a0, a1, b, b.length) + " " + PrimitiveTest.const1(a0, a1));
 //                System.out.println("result: " + execFloatFloatFloat(5, 3, b, b.length) + " " + PrimitiveTest.terniary(5, 3));
 
             }else{
@@ -143,8 +144,8 @@ public class NativeTest {
 
             IRControlFlowGraph cfg = new IRControlFlowGraph(code);
 
-            //BytecodeViewer bv = new BytecodeViewer();
-            //BytecodeParser.parse(code, bv);
+            BytecodeViewer bv = new BytecodeViewer();
+            BytecodeParser.parse(code, bv);
 
             //System.out.println(cfg.toString());
             //System.out.println();
@@ -156,12 +157,21 @@ public class NativeTest {
             BootableArrayList quads = irg.getQuadList();
             int n = quads.size();
             BootableHashMap liveVariables = new BootableHashMap();
+
+            for (int i=0; i<n; i+=1) {
+                System.out.println(quads.get(i));
+            }
+
             for (int i=0; i<n; i+=1) {
                 Quad quad = (Quad) quads.get(i);
-//            System.out.println(quad);
                 quad.doPass2(liveVariables);
-                System.out.println(quad);
             }
+
+            for (int i=0; i<n; i+=1) {
+                System.out.println(quads.get(i));
+            }
+
+            System.out.println(liveVariables);
 
             Collection lv = liveVariables.values();
             n = lv.size();
@@ -176,15 +186,19 @@ public class NativeTest {
             System.out.println(Arrays.asList(liveRanges));
             LinearScanAllocator lsa = new LinearScanAllocator(liveRanges);
             lsa.allocate();
+            System.out.println(Arrays.asList(liveRanges));
 
             x86cg.setArgumentVariables(irg.getVariables(), irg.getNoArgs());
+            System.out.println(Arrays.asList(liveRanges));
             x86cg.setSpilledVariables(lsa.getSpilledVariables());
             x86cg.emitHeader();
 
             n = quads.size();
+
             for (int i=0; i<n; i+=1) {
                 Quad quad = (Quad) quads.get(i);
                 if (!quad.isDeadCode()) {
+                    System.out.println(quad);
                     quad.generateCode(x86cg);
                 }
             }
@@ -198,7 +212,7 @@ public class NativeTest {
             int nMethods = type.getNoDeclaredMethods();
             for (int i=0; i<nMethods; i+=1) {
                 VmMethod method = type.getDeclaredMethod(i);
-                if ("terniary".equals(method.getName())) {
+                if ("const1".equals(method.getName())) {
                     arithMethod = method;
                     break;
                 }

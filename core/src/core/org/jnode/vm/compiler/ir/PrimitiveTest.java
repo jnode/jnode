@@ -118,14 +118,29 @@ public class PrimitiveTest {
         return l0;
     }
 
-    public static int const1(int a0, int a1) {
+    public static int const13(int a0, int a1) {
         int l0 = 1;
         for(;;){
-            l0 = a0 + a1 + l0;
-            if(l0 > 10)
+            //l0 = a0 + a1 + l0;
+            if(l0 > 0)
                 break;
+            l0++;
         }
-        return l0;
+        return a0;
+    }
+
+    public static int const1(int a0, int a1) {
+        int i0 = a0;
+        while(i0 > 0){
+            i0 = i0 -1;
+            a1 = a1 + 1;
+        }
+        return a1;
+    }
+
+    public static int const10(int a0, int a1) {
+        //while(a0-- >0) a1++;
+        return a1 + 1 + a0 * (1 + 3* a1 + 2 * a0);
     }
 
     public static int terniary1(int a0, int a1) {
