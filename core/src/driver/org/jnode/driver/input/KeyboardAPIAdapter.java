@@ -6,11 +6,16 @@ package org.jnode.driver.input;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class KeyboardAPIAdapter implements KeyboardAPI {
 
+	/** My logger */
+	private static final Logger log = Logger.getLogger(KeyboardAPIAdapter.class);
+	
 	/** All listeners */
 	private final ArrayList listeners = new ArrayList();
 	/** The interpreter */
@@ -80,10 +85,14 @@ public class KeyboardAPIAdapter implements KeyboardAPI {
 		if (event != null) {
 			for (Iterator i = listeners.iterator(); i.hasNext();) {
 				KeyboardListener l = (KeyboardListener) i.next();
-				if (event.isKeyPressed()) {
-					l.keyPressed(event);
-				} else if (event.isKeyReleased()) {
-					l.keyReleased(event);
+				try {
+					if (event.isKeyPressed()) {
+						l.keyPressed(event);
+					} else if (event.isKeyReleased()) {
+						l.keyReleased(event);
+					}
+				} catch (Throwable ex) {
+					log.error("Exception in KeyboardListener", ex);					
 				}
 				if (event.isConsumed()) {
 					break;
