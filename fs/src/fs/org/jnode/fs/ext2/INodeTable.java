@@ -24,7 +24,7 @@ public class INodeTable {
 	public INodeTable(Ext2FileSystem fs, int firstBlock) throws IOException {
 		this.fs = fs;
 		this.firstBlock = firstBlock;
-		blockSize=(int)fs.getBlockSize();
+		blockSize=fs.getBlockSize();
 		blockCount = (int)Math.ceil(
 			(double)(fs.getSuperblock().getINodesPerGroup()*INode.INODE_LENGTH) / 
 			(double) blockSize);

@@ -23,9 +23,14 @@ public class GroupDescriptor {
 
 	public GroupDescriptor(int groupNr, Ext2FileSystem fs) throws IOException{
 		//read the group descriptors from the main copy in block group 0
-		byte[] blockData = fs.getBlock( fs.getSuperblock().getFirstDataBlock() + 1);
-		byte[] data = new byte[GROUPDESCRIPTOR_LENGTH];
-		System.arraycopy(blockData, 0, data, 0, GROUPDESCRIPTOR_LENGTH);
+		//byte[] blockData = fs.getBlock( fs.getSuperblock().getFirstDataBlock() + 1);
+		long baseBlock  = fs.getSuperblock().getFirstDataBlock()+1;
+		long blockOffset=(groupNr*GROUPDESCRIPTOR_LENGTH)/fs.getBlockSize();
+		long offset 	=(groupNr*GROUPDESCRIPTOR_LENGTH)%fs.getBlockSize();
+		byte[] blockData= fs.getBlock(baseBlock + blockOffset);
+		
+		data = new byte[GROUPDESCRIPTOR_LENGTH];
+		System.arraycopy(blockData, (int)offset, data, 0, GROUPDESCRIPTOR_LENGTH);
 		this.groupNr = groupNr;
 		this.fs = fs;
 		setDirty(false);
@@ -33,6 +38,7 @@ public class GroupDescriptor {
 	}
 
 	//OLD VERSION
+	/*
 	public GroupDescriptor(byte src[], Ext2FileSystem fs, int groupNr) {
 		data = new byte[GROUPDESCRIPTOR_LENGTH];
 		System.arraycopy(src, groupNr*GROUPDESCRIPTOR_LENGTH, data, 0, GROUPDESCRIPTOR_LENGTH);
@@ -41,6 +47,7 @@ public class GroupDescriptor {
 		this.groupNr=groupNr;
 		setDirty(false);
 	}
+	*/
 	//OLD VERSION
 
 	/**
