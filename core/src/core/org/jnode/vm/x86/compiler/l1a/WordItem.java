@@ -81,7 +81,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			break;
 
 		case Kind.STACK:
-			os.writePUSH(X86Register.SP, 0);
+			os.writePUSH(X86Register.ESP, 0);
 			res = (WordItem) factory.createStack(getType());
 			if (VirtualStack.checkOperandStack) {
 				final ItemStack operandStack = ec.getVStack().operandStack;

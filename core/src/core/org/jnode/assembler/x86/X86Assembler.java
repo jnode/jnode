@@ -29,6 +29,7 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.UnresolvedObjectRefException;
+import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.vm.CpuID;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.x86.X86CpuID;
@@ -130,7 +131,7 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 
 	/**
 	 * Gets the operating mode.
-	 * @return
+	 * @return the target operating mode.
 	 */
 	public final X86Constants.Mode getMode() {
 		return mode;
@@ -358,7 +359,7 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param dstReg
 	 * @param imm32
 	 */
-	public final void writeArithOp(int operation, X86Register.GPR dstReg,
+	public final void writeArithOp(int operation, GPR dstReg,
 			int imm32) {
 		switch (operation) {
 		case X86Operation.ADD:

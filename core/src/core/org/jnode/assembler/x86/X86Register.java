@@ -30,267 +30,270 @@ import org.jnode.vm.VmSystemObject;
  */
 public class X86Register extends VmSystemObject implements X86Constants {
 
-	public static final X86Register.GPR AL = new X86Register.GPR("al", REG_AL,
-			REG8, 0);
+    /* 32-bit GPR registers */
+    public static final GPR32 EAX = new GPR32("eax", 0, true);
 
-	public static final X86Register.GPR AH = new X86Register.GPR("ah", REG8,
-			REG8, 4);
+    public static final GPR32 EBX = new GPR32("ebx", 3, true);
 
-	public static final X86Register.GPR AX = new X86Register.GPR("ax", REG_AX,
-			REG16, 0);
+    public static final GPR32 ECX = new GPR32("ecx", 1, true);
 
-	public static final X86Register.GPR EAX = new X86Register.GPR("eax",
-			REG_EAX, REG32, 0, true);
+    public static final GPR32 EDX = new GPR32("edx", 2, true);
 
-	public static final X86Register.GPR BL = new X86Register.GPR("bl", REG8,
-			REG8, 3);
+    public static final GPR32 ESP = new GPR32("esp", 4);
 
-	public static final X86Register.GPR BH = new X86Register.GPR("bh", REG8,
-			REG8, 7);
+    public static final GPR32 EBP = new GPR32("ebp", 5);
 
-	public static final X86Register.GPR BX = new X86Register.GPR("bx", REG16,
-			REG16, 3);
+    public static final GPR32 ESI = new GPR32("esi", 6);
 
-	public static final X86Register.GPR EBX = new X86Register.GPR("ebx", REG32,
-			REG32, 3, true);
+    public static final GPR32 EDI = new GPR32("edi", 7);
 
-	public static final X86Register.GPR CL = new X86Register.GPR("cl", REG_CL,
-			REG8, 1);
+    /* 64-bit GPR registers */
+    public static final GPR64 RAX = new GPR64("rax", 0);
 
-	public static final X86Register.GPR CH = new X86Register.GPR("ch", REG8,
-			REG8, 5);
+    public static final GPR64 RBX = new GPR64("rbx", 3);
 
-	public static final X86Register.GPR CX = new X86Register.GPR("cx", REG_CX,
-			REG16, 1);
+    public static final GPR64 RCX = new GPR64("rcx", 1);
 
-	public static final X86Register.GPR ECX = new X86Register.GPR("ecx",
-			REG_ECX, REG32, 1, true);
+    public static final GPR64 RDX = new GPR64("rdx", 2);
 
-	public static final X86Register.GPR DL = new X86Register.GPR("dl", REG8,
-			REG8, 2);
+    public static final GPR64 RSP = new GPR64("rsp", 4);
 
-	public static final X86Register.GPR DH = new X86Register.GPR("dh", REG8,
-			REG8, 6);
+    public static final GPR64 RBP = new GPR64("rbp", 5);
 
-	public static final X86Register.GPR DX = new X86Register.GPR("dx", REG_DX,
-			REG16, 2);
+    public static final GPR64 RSI = new GPR64("rsi", 6);
 
-	public static final X86Register.GPR EDX = new X86Register.GPR("edx", REG32,
-			REG32, 2, true);
+    public static final GPR64 RDI = new GPR64("rdi", 7);
 
-	public static final X86Register.GPR SP = new X86Register.GPR("sp", REG16,
-			REG16, 4);
+    public static final GPR64 R8 = new GPR64("r8", 8);
 
-	public static final X86Register.GPR ESP = new X86Register.GPR("esp", REG32,
-			REG32, 4);
+    public static final GPR64 R9 = new GPR64("r9", 9);
 
-	public static final X86Register.GPR BP = new X86Register.GPR("bp", REG16,
-			REG16, 5);
+    public static final GPR64 R10 = new GPR64("r10", 10);
 
-	public static final X86Register.GPR EBP = new X86Register.GPR("ebp", REG32,
-			REG32, 5);
+    public static final GPR64 R11 = new GPR64("r11", 11);
 
-	public static final X86Register.GPR SI = new X86Register.GPR("si", REG16,
-			REG16, 6);
+    public static final GPR64 R12 = new GPR64("r12", 12);
 
-	public static final X86Register.GPR ESI = new X86Register.GPR("esi", REG32,
-			REG32, 6);
+    public static final GPR64 R13 = new GPR64("r13", 13);
 
-	public static final X86Register.GPR DI = new X86Register.GPR("di", REG16,
-			REG16, 7);
+    public static final GPR64 R14 = new GPR64("r14", 14);
 
-	public static final X86Register.GPR EDI = new X86Register.GPR("edi", REG32,
-			REG32, 7);
+    public static final GPR64 R15 = new GPR64("r15", 15);
 
-	/* Floating-point registers */
-	public static final X86Register.FPU ST0 = new X86Register.FPU("st0", 0);
+    public static final GPR32 R8d = new GPR32("r8d", 8);
 
-	public static final X86Register.FPU ST1 = new X86Register.FPU("st1", 1);
+    public static final GPR32 R9d = new GPR32("r9d", 9);
 
-	public static final X86Register.FPU ST2 = new X86Register.FPU("st2", 2);
+    public static final GPR32 R10d = new GPR32("r10d", 10);
 
-	public static final X86Register.FPU ST3 = new X86Register.FPU("st3", 3);
+    public static final GPR32 R11d = new GPR32("r11d", 11);
 
-	public static final X86Register.FPU ST4 = new X86Register.FPU("st4", 4);
+    public static final GPR32 R12d = new GPR32("r12d", 12);
 
-	public static final X86Register.FPU ST5 = new X86Register.FPU("st5", 5);
+    public static final GPR32 R13d = new GPR32("r13d", 13);
 
-	public static final X86Register.FPU ST6 = new X86Register.FPU("st6", 6);
+    public static final GPR32 R14d = new GPR32("r14d", 14);
 
-	public static final X86Register.FPU ST7 = new X86Register.FPU("st7", 7);
+    public static final GPR32 R15d = new GPR32("r15d", 15);
 
-	/* MMX registers */
-	public static final X86Register.MMX MM0 = new X86Register.MMX("mm0", 0);
+    /* Floating-point registers */
+    public static final FPU ST0 = new FPU("st0", 0);
 
-	public static final X86Register.MMX MM1 = new X86Register.MMX("mm1", 1);
+    public static final FPU ST1 = new FPU("st1", 1);
 
-	public static final X86Register.MMX MM2 = new X86Register.MMX("mm2", 2);
+    public static final FPU ST2 = new FPU("st2", 2);
 
-	public static final X86Register.MMX MM3 = new X86Register.MMX("mm3", 3);
+    public static final FPU ST3 = new FPU("st3", 3);
 
-	public static final X86Register.MMX MM4 = new X86Register.MMX("mm4", 4);
+    public static final FPU ST4 = new FPU("st4", 4);
 
-	public static final X86Register.MMX MM5 = new X86Register.MMX("mm5", 5);
-
-	public static final X86Register.MMX MM6 = new X86Register.MMX("mm6", 6);
-
-	public static final X86Register.MMX MM7 = new X86Register.MMX("mm7", 7);
-
-	/* SSE registers */
-	public static final X86Register.XMM XMM0 = new X86Register.XMM("xmm0", 0);
-
-	public static final X86Register.XMM XMM1 = new X86Register.XMM("xmm1", 1);
-
-	public static final X86Register.XMM XMM2 = new X86Register.XMM("xmm2", 2);
-
-	public static final X86Register.XMM XMM3 = new X86Register.XMM("xmm3", 3);
-
-	public static final X86Register.XMM XMM4 = new X86Register.XMM("xmm4", 4);
-
-	public static final X86Register.XMM XMM5 = new X86Register.XMM("xmm5", 5);
-
-	public static final X86Register.XMM XMM6 = new X86Register.XMM("xmm6", 6);
-
-	public static final X86Register.XMM XMM7 = new X86Register.XMM("xmm7", 7);
-
-	private final String name;
-
-	private final int type;
-
-	private final int nr;
-
-	private final int size;
-
-	private final boolean suitableFor8Bit;
-
-	public X86Register(String name, int type, int type2, int nr) {
-		this(name, type, type2, nr, false);
-	}
-
-	public X86Register(String name, int type, int type2, int nr,
-			boolean suitableFor8Bit) {
-		this.name = name;
-		this.type = type;
-		this.nr = nr;
-		this.size = type & X86Constants.SIZE_MASK;
-		this.suitableFor8Bit = suitableFor8Bit;
-	}
-
-	/**
-	 * Returns the name.
-	 * 
-	 * @return String
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * Returns the type.
-	 * 
-	 * @return int
-	 */
-	public int getType() {
-		return type;
-	}
-
-	/**
-	 * Returns the nr.
-	 * 
-	 * @return int
-	 */
-	public int getNr() {
-		return nr;
-	}
-
-	/**
-	 * Returns the size of this register
-	 * 
-	 * @return int
-	 * @see X86Constants#BITS8
-	 * @see X86Constants#BITS16
-	 * @see X86Constants#BITS32
-	 * @see X86Constants#BITS64
-	 * @see X86Constants#BITS80
-	 */
-	public int getSize() {
-		return size;
-	}
-
-	public String toString() {
-		return name;
-	}
-
-	/**
-	 * Does this register have an 8-bit part.
-	 * 
-	 * @return True for EAX, EBX, ECX, EDX, false otherwise.
-	 */
-	public boolean isSuitableForBits8() {
-		return suitableFor8Bit;
-	}
-
-	public static final class GPR extends X86Register {
-
-		/**
-		 * @param name
-		 * @param type
-		 * @param type2
-		 * @param nr
-		 */
-		public GPR(String name, int type, int type2, int nr) {
-			super(name, type, type2, nr);
-		}
-
-		/**
-		 * @param name
-		 * @param type
-		 * @param type2
-		 * @param nr
-		 * @param suitableFor8Bit
-		 */
-		public GPR(String name, int type, int type2, int nr,
-				boolean suitableFor8Bit) {
-			super(name, type, type2, nr, suitableFor8Bit);
-		}
-	}
-
-	public static final class FPU extends X86Register {
-
-		/**
-		 * @param name
-		 * @param type
-		 * @param type2
-		 * @param nr
-		 */
-		public FPU(String name, int nr) {
-			super(name, (nr == 0) ? FPU0 : FPUREG, FPUREG, nr);
-		}
-	}
-
-	public static final class MMX extends X86Register {
-
-		/**
-		 * @param name
-		 * @param type
-		 * @param type2
-		 * @param nr
-		 */
-		public MMX(String name, int nr) {
-			super(name, MMXREG, MMXREG, nr);
-		}
-	}
-
-	public static final class XMM extends X86Register {
-
-		/**
-		 * @param name
-		 * @param type
-		 * @param type2
-		 * @param nr
-		 */
-		public XMM(String name, int nr) {
-			super(name, XMMREG, XMMREG, nr);
-		}
-	}
+    public static final FPU ST5 = new FPU("st5", 5);
+
+    public static final FPU ST6 = new FPU("st6", 6);
+
+    public static final FPU ST7 = new FPU("st7", 7);
+
+    /* MMX registers */
+    public static final MMX MM0 = new MMX("mm0", 0);
+
+    public static final MMX MM1 = new MMX("mm1", 1);
+
+    public static final MMX MM2 = new MMX("mm2", 2);
+
+    public static final MMX MM3 = new MMX("mm3", 3);
+
+    public static final MMX MM4 = new MMX("mm4", 4);
+
+    public static final MMX MM5 = new MMX("mm5", 5);
+
+    public static final MMX MM6 = new MMX("mm6", 6);
+
+    public static final MMX MM7 = new MMX("mm7", 7);
+
+    /* SSE registers */
+    public static final XMM XMM0 = new XMM("xmm0", 0);
+
+    public static final XMM XMM1 = new XMM("xmm1", 1);
+
+    public static final XMM XMM2 = new XMM("xmm2", 2);
+
+    public static final XMM XMM3 = new XMM("xmm3", 3);
+
+    public static final XMM XMM4 = new XMM("xmm4", 4);
+
+    public static final XMM XMM5 = new XMM("xmm5", 5);
+
+    public static final XMM XMM6 = new XMM("xmm6", 6);
+
+    public static final XMM XMM7 = new XMM("xmm7", 7);
+
+    private final String name;
+
+    private final int nr;
+
+    private final int size;
+
+    private final boolean suitableFor8Bit;
+
+    public X86Register(String name, int size, int nr) {
+        this(name, size, nr, false);
+    }
+
+    public X86Register(String name, int size, int nr, boolean suitableFor8Bit) {
+        this.name = name;
+        this.nr = nr;
+        this.size = size;
+        this.suitableFor8Bit = suitableFor8Bit;
+    }
+
+    /**
+     * Returns the name.
+     * 
+     * @return String
+     */
+    public final String getName() {
+        return name;
+    }
+
+    /**
+     * Returns the nr.
+     * 
+     * @return int
+     */
+    public final int getNr() {
+        return nr;
+    }
+
+    /**
+     * Returns the size of this register
+     * 
+     * @return int
+     * @see X86Constants#BITS8
+     * @see X86Constants#BITS16
+     * @see X86Constants#BITS32
+     * @see X86Constants#BITS64
+     * @see X86Constants#BITS80
+     */
+    public final int getSize() {
+        return size;
+    }
+
+    public final String toString() {
+        return name;
+    }
+
+    /**
+     * Does this register have an 8-bit part.
+     * 
+     * @return True for EAX, EBX, ECX, EDX, false otherwise.
+     */
+    public final boolean isSuitableForBits8() {
+        return suitableFor8Bit;
+    }
+
+    public abstract static class GPR extends X86Register {
+
+        /**
+         * @param name
+         * @param size
+         * @param nr
+         */
+        public GPR(String name, int size, int nr) {
+            super(name, size, nr);
+        }
+
+        /**
+         * @param name
+         * @param size
+         * @param nr
+         * @param suitableFor8Bit
+         */
+        public GPR(String name, int size, int nr, boolean suitableFor8Bit) {
+            super(name, size, nr, suitableFor8Bit);
+        }
+    }
+
+    public static class GPR32 extends GPR {
+
+        /**
+         * @param name
+         * @param nr
+         */
+        public GPR32(String name, int nr) {
+            super(name, X86Constants.BITS32, nr);
+        }
+
+        /**
+         * @param name
+         * @param nr
+         * @param suitableFor8Bit
+         */
+        public GPR32(String name, int nr, boolean suitableFor8Bit) {
+            super(name, X86Constants.BITS32, nr, suitableFor8Bit);
+        }
+    }
+
+    public static final class GPR64 extends GPR {
+
+        /**
+         * @param name
+         * @param nr
+         */
+        public GPR64(String name, int nr) {
+            super(name, X86Constants.BITS64, nr, true);
+        }
+    }
+
+    public static final class FPU extends X86Register {
+
+        /**
+         * @param name
+         * @param nr
+         */
+        public FPU(String name, int nr) {
+            super(name, X86Constants.BITS80, nr);
+        }
+    }
+
+    public static final class MMX extends X86Register {
+
+        /**
+         * @param name
+         * @param nr
+         */
+        public MMX(String name, int nr) {
+            super(name, X86Constants.BITS64, nr);
+        }
+    }
+
+    public static final class XMM extends X86Register {
+
+        /**
+         * @param name
+         * @param nr
+         */
+        public XMM(String name, int nr) {
+            super(name, X86Constants.BITS128, nr);
+        }
+    }
 }

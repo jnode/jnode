@@ -68,13 +68,13 @@ public class IRTest {
         }
 
         if(binary){
-            X86BinaryAssembler os = new X86BinaryAssembler(cpuId, X86Constants.Mode.BITS32, 0);
+            X86BinaryAssembler os = new X86BinaryAssembler(cpuId, X86Constants.Mode.CODE32, 0);
             generateCode(os, className);
             FileOutputStream fos = new FileOutputStream("test.bin");
             os.writeTo(fos);
             fos.close();
         }else{
-            X86TextAssembler tos = new X86TextAssembler(new OutputStreamWriter(System.out), cpuId, X86Constants.Mode.BITS32);
+            X86TextAssembler tos = new X86TextAssembler(new OutputStreamWriter(System.out), cpuId, X86Constants.Mode.CODE32);
             generateCode(tos, className);
             tos.flush();
         }

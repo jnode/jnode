@@ -121,9 +121,9 @@ public abstract class VmX86Architecture extends VmArchitecture {
      */
     public final X86Constants.Mode getMode() {
     	if (getReferenceSize() == 4) {
-    		return X86Constants.Mode.BITS32;
+    		return X86Constants.Mode.CODE32;
     	} else {
-    		return X86Constants.Mode.BITS64;
+    		return X86Constants.Mode.CODE64;
     	}
     }
 
