@@ -173,13 +173,17 @@ public class ResolverImpl implements Resolver
   {
     ProtocolAddress[] protocolAddresses = null;
 
-    System.out.println("hh0");
+    System.out.println("hh0 " + hostname);
 
     protocolAddresses = getFromHostsFile(hostname);
 
     if (protocolAddresses != null)
     {
-      System.out.println("hh0'");
+      for (int i = 0; i < protocolAddresses.length; i++)
+      {
+        ProtocolAddress protocolAddress = protocolAddresses[i];
+        System.out.println("hh0' " + protocolAddress);
+      }
       return protocolAddresses;
     }
 
