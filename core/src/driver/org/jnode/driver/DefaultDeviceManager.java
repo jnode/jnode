@@ -409,8 +409,12 @@ public class DefaultDeviceManager implements DeviceManager,
      * Find a driver from each device that has not yet has a driver connected to
      * it.
      */
-    protected void findDeviceDrivers() {
-        for (Iterator i = devices.values().iterator(); i.hasNext();) {
+    private final void findDeviceDrivers() {
+        final List devices;
+        synchronized (this) {
+            devices = new ArrayList(this.devices.values());
+        }
+        for (Iterator i = devices.iterator(); i.hasNext();) {
             final Device dev = (Device) i.next();
             if (dev.getDriver() == null) {
                 final Driver drv = findDriver(dev);
@@ -604,9 +608,8 @@ public class DefaultDeviceManager implements DeviceManager,
      * @param point
      * @param extension
      */
-    public void extensionAdded(ExtensionPoint point, Extension extension) {
-        refreshFinders();
-        refreshMappers();
+    public final void extensionAdded(ExtensionPoint point, Extension extension) {
+        loadExtensions();
         findDeviceDrivers();
     }
 
@@ -614,9 +617,8 @@ public class DefaultDeviceManager implements DeviceManager,
      * @param point
      * @param extension
      */
-    public void extensionRemoved(ExtensionPoint point, Extension extension) {
-        refreshFinders();
-        refreshMappers();
+    public final void extensionRemoved(ExtensionPoint point, Extension extension) {
+        loadExtensions();
     }
 
     /**
