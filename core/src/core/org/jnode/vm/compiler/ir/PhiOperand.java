@@ -78,16 +78,16 @@ public class PhiOperand extends Operand {
 			for (int i=1; i<n; i+=1) {
 				Variable var = (Variable) sources.get(i);
 				var = var.simplifyCopy();
-				AssignOP assignOP = var.getAssignOP();
+				AssignQuad assignQuad = var.getAssignQuad();
 				// This is more efficient than generating phi moves at the end
 				// of the block. Basically all phi sources are merged into the
 				// first.
-				assignOP.setLHS(first);
+				assignQuad.setLHS(first);
 				
 				// This might be in a loop, in which case this variable is live
 				// at least until the end of the loop. This looks tricky, but I
 				// think it's correct.
-				IRBasicBlock block = assignOP.getBasicBlock().getLastPredecessor();
+				IRBasicBlock block = assignQuad.getBasicBlock().getLastPredecessor();
 				first.setLastUseAddress(block.getEndPC()-1);
 			}
 			// This is bold assumption that the first phi source was assigned

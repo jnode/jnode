@@ -113,10 +113,10 @@ public class IRBasicBlock extends BasicBlock {
 		for (int i=0; i<n; i+=1) {
 			PhiOperand phi = (PhiOperand) phiReferences.get(i);
 			Variable op = variables[phi.getIndex()];
-			AssignOP assignOP = op.getAssignOP();
-			IRBasicBlock block = assignOP.getBasicBlock();
+			AssignQuad assignQuad = op.getAssignQuad();
+			IRBasicBlock block = assignQuad.getBasicBlock();
 			if (block == this) {
-				assignOP.setDeadCode(false);
+				assignQuad.setDeadCode(false);
 				phi.addSource(op);
 			}
 		}
