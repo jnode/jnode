@@ -658,7 +658,7 @@ public abstract class DoubleWordItem extends Item implements
 				os.writeLEA(X86Register.ESP, X86Register.ESP, 8);
 			} else {
 				pushToFPU(os, X86Register.RSP, 0);
-				os.writeLEA(X86Register.RSP, X86Register.RSP, 8);
+				os.writeLEA(X86Register.RSP, X86Register.RSP, 16); // 8-byte + garbage
 			}
 			break;
 		}
