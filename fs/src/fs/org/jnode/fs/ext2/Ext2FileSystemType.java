@@ -35,14 +35,17 @@ public class Ext2FileSystemType implements FileSystemType {
 	/**
 	 * @see org.jnode.fs.FileSystemType#supports(PartitionTableEntry, byte[])
 	 */
-	public boolean supports(PartitionTableEntry pte, byte[] firstSector) {				
-		if(pte instanceof IBMPartitionTableEntry) {
-			if(((IBMPartitionTableEntry)pte).getSystemIndicator()==IBMPartitionTypes.PARTTYPE_LINUXNATIVE)
-				return true;
-			else
-				return false;
-		}
-		else
+	public boolean supports(PartitionTableEntry pte, byte[] firstSector) {
+		if (pte instanceof IBMPartitionTableEntry) {
+			return (((IBMPartitionTableEntry)pte).getSystemIndicator() == IBMPartitionTypes.PARTTYPE_LINUXNATIVE);
+		} else
 			return false;
+	}
+
+	/**
+	 * @see org.jnode.fs.FileSystemType#format(org.jnode.driver.Device, java.lang.Object)
+	 */
+	public FileSystem format(Device device, Object specificOptions) throws FileSystemException {
+        throw new FileSystemException("Not ye implemented");
 	}
 }

@@ -45,6 +45,16 @@ public class FileSystemTypeManager implements ExtensionPointListener {
 	public Collection fileSystemTypes() {
 		return Collections.unmodifiableCollection(types.values());
 	}
+    
+    /**
+     * Get a registered filesystemType byt its name
+     * @param name the fileSystemType name
+     * @return null if it doesn't exists
+     */
+    public FileSystemType getSystemType(String name) {
+        return (FileSystemType) types.get(name);
+    }
+    
 
 	/**
 	* Load all known file system types.

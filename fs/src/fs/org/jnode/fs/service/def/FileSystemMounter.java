@@ -38,7 +38,7 @@ public class FileSystemMounter implements DeviceListener, QueueProcessor {
 	/** The DeviceManager i'm listening to */
 	private DeviceManager devMan;
 	/** The FileSystemService i'm using */
-	private FileSystemService fss;
+	private FileSystemService fileSystemService;
 	/** Mapping between a device and a mounted FileSystem */
 	private final HashMap devices2FS = new HashMap();
 
@@ -54,7 +54,7 @@ public class FileSystemMounter implements DeviceListener, QueueProcessor {
 		try {
 			devMan = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
 			devMan.addListener(this);
-			fss = (FileSystemService) InitialNaming.lookup(FileSystemService.NAME);
+			fileSystemService = (FileSystemService) InitialNaming.lookup(FileSystemService.NAME);
 			asynchronousMounterThread = new QueueProcessorThread("Asynchronous-FS-Mounter", devicesWaitingToBeMounted, this);
 			asynchronousMounterThread.start();
 		} catch (NameNotFoundException ex) {
@@ -126,13 +126,13 @@ public class FileSystemMounter implements DeviceListener, QueueProcessor {
 		try {
 			final byte[] bs = new byte[api.getSectorSize()];
 			api.read(0, bs, 0, bs.length);
-			for (Iterator i = fss.fileSystemTypes().iterator(); i.hasNext();) {
+			for (Iterator i = fileSystemService.fileSystemTypes().iterator(); i.hasNext();) {
 				final FileSystemType fst = (FileSystemType) i.next();
 				// 
 				if (fst.supports(api.getPartitionTableEntry(), bs)) {
 					try {
 						final FileSystem fs = fst.create(device);
-						fss.registerFileSystem(fs);
+						fileSystemService.registerFileSystem(fs);
 						log.info("Mounted " + fst.getName() + " on " + device.getId());
 						return;
 					} catch (FileSystemException ex) {

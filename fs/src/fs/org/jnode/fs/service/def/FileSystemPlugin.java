@@ -11,6 +11,8 @@ import javax.naming.NamingException;
 
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystem;
+import org.jnode.fs.FileSystemException;
+import org.jnode.fs.FileSystemType;
 import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
@@ -23,7 +25,7 @@ import org.jnode.plugin.PluginException;
 public class FileSystemPlugin extends Plugin implements FileSystemService {
 
 	/** Manager of fs types */
-	private final FileSystemTypeManager tm;
+	private final FileSystemTypeManager fsTypeManager;
 	/** Manager of mounted filesystems */
 	private final FileSystemManager fsm;
 	/** The FS-API implementation */
@@ -37,7 +39,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
 	 */
 	public FileSystemPlugin(PluginDescriptor descriptor) {
 		super(descriptor);
-		this.tm = new FileSystemTypeManager(descriptor.getExtensionPoint("types"));
+		this.fsTypeManager = new FileSystemTypeManager(descriptor.getExtensionPoint("types"));
 		this.fsm = new FileSystemManager();
 		this.api = new FileSystemAPIImpl(fsm);
 		fsm.initialize();
@@ -48,7 +50,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
 	 * collection are instanceof FileSystemType.
 	 */
 	public Collection fileSystemTypes() {
-		return tm.fileSystemTypes();
+		return fsTypeManager.fileSystemTypes();
 	}
 
 	/**
@@ -116,6 +118,17 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
 		InitialNaming.unbind(NAME);
 		VMIOUtils.resetAPI(this);
 		mounter = null;
+	}
+
+	/**
+	 * @see org.jnode.fs.service.FileSystemService#getFileSystemTypeForNameSystemTypes(java.lang.String)
+	 */
+	public FileSystemType getFileSystemTypeForNameSystemTypes(String name) throws FileSystemException {
+		FileSystemType result = fsTypeManager.getSystemType(name);
+		if (result == null) {
+			throw new FileSystemException("Not existent FisleSystemType");
+		}
+		return result;
 	}
 
 }
