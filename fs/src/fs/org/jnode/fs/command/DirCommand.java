@@ -36,6 +36,8 @@ public class DirCommand {
 		} else if("/".equals(dir.getCanonicalPath())) {
 			File[] roots = File.listRoots();
 			printList(roots);
+		} else if (dir.exists() && dir.isFile()) {
+		    printList(new File[] { dir });
 		} else {
 			System.err.println("No such directory " + dir);
 		}
