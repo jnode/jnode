@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import org.jnode.util.NumberUtils;
@@ -58,6 +58,12 @@ public final class VmCompiledCode extends AbstractCode {
     /** Magic of compiler */
     private final int magic;
 
+    /** Unique id of this compiled code */
+    private final int id;
+    
+    /** The method this code is generated for */
+    private final VmMethod method;
+
     /**
      * Create a new instance
      * 
@@ -69,10 +75,12 @@ public final class VmCompiledCode extends AbstractCode {
      * @param defaultExceptionHandler
      * @param addressTable
      */
-    public VmCompiledCode(NativeCodeCompiler compiler, VmByteCode bytecode,
+    VmCompiledCode(int id, VmMethod method, NativeCodeCompiler compiler, VmByteCode bytecode,
             VmAddress nativeCode, Object compiledCode, int size,
             VmCompiledExceptionHandler[] eTable,
             VmAddress defaultExceptionHandler, VmAddressMap addressTable) {
+        this.id = id;
+        this.method = method;
         this.compiler = compiler;
         this.magic = compiler.getMagic();
         this.nativeCode = nativeCode;
@@ -86,12 +94,12 @@ public final class VmCompiledCode extends AbstractCode {
         }
         if (addressTable != null) {
             addressTable.lock();
-            /*if (bytecode != null) {
-                if (bytecode.getMethod().getDeclaringClass().getName().equals(
-                        "org.jnode.vm.TryCatchNPETest")) {
-                    addressTable.writeTo(System.out);
-                }
-            }*/
+            /*
+             * if (bytecode != null) { if
+             * (bytecode.getMethod().getDeclaringClass().getName().equals(
+             * "org.jnode.vm.TryCatchNPETest")) {
+             * addressTable.writeTo(System.out); } }
+             */
         }
     }
 
@@ -130,7 +138,7 @@ public final class VmCompiledCode extends AbstractCode {
      */
     public VmCompiledExceptionHandler getExceptionHandler(int index) {
         if (eTable != null) {
-            return eTable[ index];
+            return eTable[index];
         } else {
             throw new IndexOutOfBoundsException("eTable is null; index "
                     + index);
@@ -138,14 +146,16 @@ public final class VmCompiledCode extends AbstractCode {
     }
 
     /**
-     * Gets the linenumber and optional method info (for inlined methods) of a given address.
+     * Gets the linenumber and optional method info (for inlined methods) of a
+     * given address.
      * 
      * @param address
      * @return The linenumber for the given pc, or -1 is not found.
      */
     public String getLocationInfo(VmMethod expectedMethod, Address address) {
-    	final Address codeAddr = Address.fromAddress(nativeCode);
-        final int offset = (int) address.toWord().sub(codeAddr.toWord()).toInt();
+        final Address codeAddr = Address.fromAddress(nativeCode);
+        final int offset = (int) address.toWord().sub(codeAddr.toWord())
+                .toInt();
         return addressTable.getLocationInfo(expectedMethod, offset);
     }
 
@@ -169,10 +179,10 @@ public final class VmCompiledCode extends AbstractCode {
      * @return boolean
      */
     public boolean contains(Address codePtr) {
-    	final Address start = Address.fromAddress(nativeCode);
-    	final Address end = start.add(nativeCodeSize1);
-    	
-    	return codePtr.GE(start) && codePtr.LT(end); 
+        final Address start = Address.fromAddress(nativeCode);
+        final Address end = start.add(nativeCodeSize1);
+
+        return codePtr.GE(start) && codePtr.LT(end);
     }
 
     public String toString() {
@@ -204,8 +214,9 @@ public final class VmCompiledCode extends AbstractCode {
      *            The next to set.
      */
     final void setNext(VmCompiledCode next) {
-        if (this.next != null) { throw new SecurityException(
-                "Cannot set next twice"); }
+        if (this.next != null) {
+            throw new SecurityException("Cannot set next twice");
+        }
         this.next = next;
     }
 
@@ -218,9 +229,25 @@ public final class VmCompiledCode extends AbstractCode {
     final VmCompiledCode lookup(int magic) {
         VmCompiledCode c = this;
         while (c != null) {
-            if (c.magic == magic) { return c; }
+            if (c.magic == magic) {
+                return c;
+            }
             c = c.next;
         }
         return null;
+    }
+
+    /**
+     * @return Returns the id.
+     */
+    public final int getId() {
+        return id;
+    }
+    
+    /**
+     * @return Returns the method.
+     */
+    public final VmMethod getMethod() {
+        return method;
     }
 }

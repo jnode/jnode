@@ -22,6 +22,7 @@
 package org.jnode.vm.compiler;
 
 import org.jnode.assembler.NativeStream;
+import org.jnode.vm.Vm;
 import org.jnode.vm.classmgr.VmAddressMap;
 import org.jnode.vm.classmgr.VmMethod;
 
@@ -36,7 +37,8 @@ public class CompiledMethod {
 	private CompiledExceptionHandler[] exceptionHandlers;
 	private final VmAddressMap addressTable;
 	private final int optLevel;
-	
+	private int ccId = -1;
+    
 	/**
 	 * Initialize this instance
 	 */
@@ -131,4 +133,14 @@ public class CompiledMethod {
 		return this.optLevel;
 	}
 
+    /**
+     * Gets (creates if needed) a compiled code id.
+     * @return
+     */
+    public final int getCompiledCodeId() {
+        if (ccId < 0) {
+            ccId = Vm.getCompiledMethods().createId();
+        }
+        return ccId;
+    }
 }

@@ -212,7 +212,7 @@ class X86StackFrame implements X86CompilerConstants {
 		os.writePUSH(abp);
 		os.writePUSH(entryPoints.getMagic());
 		//os.writePUSH(0); // PC, which is only used in interpreted methods
-		os.writePUSH(helper.STATICS, helper.getStaticsOffset(method));
+		os.writePUSH(cm.getCompiledCodeId());
 		os.writeMOV(size, abp, asp);
 
 		// Emit the code to create the locals

@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.vm.compiler;
 
 import java.io.Writer;
@@ -28,6 +28,7 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.UnresolvedObjectRefException;
+import org.jnode.vm.Vm;
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmSystemObject;
@@ -36,7 +37,6 @@ import org.jnode.vm.bytecode.ControlFlowGraph;
 import org.jnode.vm.classmgr.VmAddressMap;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmClassLoader;
-import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmCompiledExceptionHandler;
 import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmMethod;
@@ -63,10 +63,16 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
         final CompiledMethod cm;
         final boolean abstractM = method.isAbstract();
         if (abstractM) {
-            if (method.isStatic()) { throw new Error("Abstract & static"); }
-            if (method.isNative()) { throw new Error("Abstract & native"); }
+            if (method.isStatic()) {
+                throw new Error("Abstract & static");
+            }
+            if (method.isNative()) {
+                throw new Error("Abstract & native");
+            }
             cm = doCompileAbstract(method, os, level, true);
-            if (cm == null) { return; }
+            if (cm == null) {
+                return;
+            }
         } else {
             cm = doCompile(method, os, level, true);
         }
@@ -89,18 +95,18 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
             bc = method.getBytecode();
             final CompiledExceptionHandler[] ceh = cm.getExceptionHandlers();
             if (ceh != null) {
-                eTable = new VmCompiledExceptionHandler[ ceh.length];
+                eTable = new VmCompiledExceptionHandler[ceh.length];
                 for (int i = 0; i < ceh.length; i++) {
 
                     final VmConstClass catchType = bc.getExceptionHandler(i)
                             .getCatchType();
-                    final VmAddress startPtr = (VmAddress) ceh[ i].getStartPc()
+                    final VmAddress startPtr = (VmAddress) ceh[i].getStartPc()
                             .getObject();
-                    final VmAddress endPtr = (VmAddress) ceh[ i].getEndPc()
+                    final VmAddress endPtr = (VmAddress) ceh[i].getEndPc()
                             .getObject();
-                    final VmAddress handler = (VmAddress) ceh[ i].getHandler()
+                    final VmAddress handler = (VmAddress) ceh[i].getHandler()
                             .getObject();
-                    eTable[ i] = new VmCompiledExceptionHandler(catchType,
+                    eTable[i] = new VmCompiledExceptionHandler(catchType,
                             startPtr, endPtr, handler);
                 }
             } else {
@@ -112,8 +118,9 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
             bc = null;
         }
 
-        method.addCompiledCode(new VmCompiledCode(this, bc, nativeCode, null,
-                end - start, eTable, defExHandler, aTable), level);
+        method.addCompiledCode(Vm.getCompiledMethods().createCompiledCode(cm,
+                method, this, bc, nativeCode, null, end - start, eTable,
+                defExHandler, aTable), level);
     }
 
     /**
@@ -129,12 +136,13 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
     public void compileRuntime(VmMethod method, ObjectResolver resolver,
             int level, NativeStream os) {
 
-        if (method.isNative()) { throw new IllegalArgumentException(
-                "Cannot compile native methods"); }
+        if (method.isNative()) {
+            throw new IllegalArgumentException("Cannot compile native methods");
+        }
 
-        //long start = System.currentTimeMillis();
+        // long start = System.currentTimeMillis();
 
-        //System.out.println("Compiling " + method);
+        // System.out.println("Compiling " + method);
 
         if (os == null) {
             os = createNativeStream(resolver);
@@ -142,7 +150,9 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
         final CompiledMethod cm;
         if (method.isAbstract()) {
             cm = doCompileAbstract(method, os, level, false);
-            if (cm == null) { return; }
+            if (cm == null) {
+                return;
+            }
         } else {
             cm = doCompile(method, os, level, false);
         }
@@ -150,7 +160,7 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
         try {
             final int startOffset = cm.getCodeStart().getOffset();
             final int size = cm.getCodeEnd().getOffset() - startOffset;
-            final byte[] code = new byte[ size];
+            final byte[] code = new byte[size];
             System.arraycopy(os.getBytes(), startOffset, code, 0, size);
             final Address codePtr = VmMagic.getArrayData(code);
 
@@ -158,8 +168,8 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
                     .getDefExceptionHandler();
             final Address defExHandler;
             if (defExHRef != null) {
-                defExHandler = codePtr.add(cm
-                        .getDefExceptionHandler().getOffset()
+                defExHandler = codePtr.add(cm.getDefExceptionHandler()
+                        .getOffset()
                         - startOffset);
             } else {
                 defExHandler = null;
@@ -170,44 +180,48 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
             final VmByteCode bc = method.getBytecode();
             final CompiledExceptionHandler[] ceh = cm.getExceptionHandlers();
             if (ceh != null) {
-                eTable = new VmCompiledExceptionHandler[ ceh.length];
+                eTable = new VmCompiledExceptionHandler[ceh.length];
                 for (int i = 0; i < ceh.length; i++) {
 
                     final VmConstClass catchType = bc.getExceptionHandler(i)
                             .getCatchType();
-                    final Address startPtr = codePtr.add(ceh[ i]
-                            .getStartPc().getOffset()
+                    final Address startPtr = codePtr.add(ceh[i].getStartPc()
+                            .getOffset()
                             - startOffset);
-                    final Address endPtr = codePtr.add(ceh[ i]
-                            .getEndPc().getOffset()
+                    final Address endPtr = codePtr.add(ceh[i].getEndPc()
+                            .getOffset()
                             - startOffset);
-                    final Address handler = codePtr.add(ceh[ i]
-                            .getHandler().getOffset()
+                    final Address handler = codePtr.add(ceh[i].getHandler()
+                            .getOffset()
                             - startOffset);
 
-                    eTable[ i] = new VmCompiledExceptionHandler(catchType,
-                            startPtr.toAddress(), endPtr.toAddress(), handler.toAddress());
+                    eTable[i] = new VmCompiledExceptionHandler(catchType,
+                            startPtr.toAddress(), endPtr.toAddress(), handler
+                                    .toAddress());
                 }
             } else {
                 eTable = null;
             }
 
-            method.addCompiledCode(new VmCompiledCode(this, bc, codePtr.toAddress(), code,
-                    size, eTable, defExHandler.toAddress(), aTable), level);
+            method.addCompiledCode(Vm.getCompiledMethods().createCompiledCode(
+                    cm, method, this, bc, codePtr.toAddress(), code, size,
+                    eTable, defExHandler.toAddress(), aTable), level);
 
             // For debugging only
-            //System.out.println("Code: " + NumberUtils.hex(code));
-            //System.out.println();
-            //End of debugging only
+            // System.out.println("Code: " + NumberUtils.hex(code));
+            // System.out.println();
+            // End of debugging only
         } catch (UnresolvedObjectRefException ex) {
             throw new CompileError(ex);
         }
 
-        if (os.hasUnresolvedObjectRefs()) { throw new CompileError(
-                "Unresolved labels after compile!"); }
+        if (os.hasUnresolvedObjectRefs()) {
+            throw new CompileError("Unresolved labels after compile!");
+        }
     }
 
-    public abstract void disassemble(VmMethod method, ObjectResolver resolver, int level, Writer writer);
+    public abstract void disassemble(VmMethod method, ObjectResolver resolver,
+            int level, Writer writer);
 
     /**
      * Create a native stream for the current architecture.
@@ -299,18 +313,20 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
      * Dump compiler statistics to System.out
      */
     public abstract void dumpStatistics();
-    
+
     /**
      * Gets the magic value of this compiler.
+     * 
      * @see org.jnode.vm.VmStackFrame#MAGIC_COMPILED
      * @see org.jnode.vm.VmStackFrame#MAGIC_INTERPRETED
      * @see org.jnode.vm.VmStackFrame#MAGIC_MASK
      * @return
      */
     public abstract int getMagic();
-    
+
     /**
      * Gets the name of this compiler.
+     * 
      * @return
      */
     public abstract String getName();

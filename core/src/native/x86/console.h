@@ -48,6 +48,21 @@
 %endif
 %endmacro
 
+; Print a 32-bit int given as parameter
+%macro PRINT_INT 1
+%ifdef BITS64_ON
+	push rax
+	mov	eax,%1
+	call sys_print_eax64
+	pop rax
+%else		
+	push eax
+	mov eax,%1
+	call sys_print_eax32
+	pop eax
+%endif
+%endmacro
+
 ; Clear the screen
 %macro CLEAR_SCREEN 0
 %ifdef BITS64_ON

@@ -151,20 +151,9 @@ vmint_print_stack_loop:
 	dec ecx
 	jz vmint_print_stack_ret
 	
-	; Get the method of the current frame in EBX
-	mov ABX,[ABP+VmX86StackReader_METHOD_OFFSET] 
+	; Get the method id of the current frame in EBX
+	PRINT_INT [ABP+VmX86StackReader_METHOD_ID_OFFSET] 
 
-	; Print the classname
-    mov AAX,[ABX+VmMember_DECLARINGCLASS_OFS]
-    mov AAX,[AAX+VmType_NAME_OFS]
-    call vm_print_string
-
-    PRINT_STR double_colon_msg
-
-	; Print the methodname	
-    mov AAX,[ABX+VmMember_NAME_OFS]
-    call vm_print_string
-    
     ; Println
     PRINT_STR vmint_print_stack_msg1
 
