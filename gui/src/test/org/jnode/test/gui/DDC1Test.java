@@ -19,27 +19,27 @@ import org.jnode.util.NumberUtils;
  */
 public class DDC1Test {
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		final String devId = (args.length > 0) ? args[0] : "fb0";
-		try {
-			final Device dev = DeviceUtils.getDevice(devId);
+        final String devId = (args.length > 0) ? args[0] : "fb0";
+        try {
+            final Device dev = DeviceUtils.getDevice(devId);
 
-			System.out.println("Reading DDC1 data, please wait");
-			final DisplayDataChannelAPI api = (DisplayDataChannelAPI) dev.getAPI(DisplayDataChannelAPI.class);
-			final DDC1Reader reader = new DDC1Reader(api);
-			final EDID data = reader.read();
+            System.out.println("Reading DDC1 data, please wait");
+            final DisplayDataChannelAPI api = (DisplayDataChannelAPI) dev.getAPI(DisplayDataChannelAPI.class);
+            final DDC1Reader reader = new DDC1Reader(api);
+            final EDID data = reader.read();
 
-			System.out.println("DDC1-EDID=" + data);
-			System.out.println("DDC1-EDID (raw)=" + NumberUtils.hex(data.getRawData()));
-		} catch (DeviceNotFoundException ex) {
-			System.out.println("Cannot find device " + devId);
-		} catch (ApiNotFoundException ex) {
-			System.out.println("No DisplayDataChannelAPI found on device " + devId);
-		} catch (DDC1NoSignalException ex) {
-			System.out.println("No DDC1 signal found");
-		} catch (DDC1ParseException ex) {
-			System.out.println("Invalid DDC1 data read: " + ex.getMessage() + ", it does not hurd to try again");
-		}
-	}
+            System.out.println("DDC1-EDID=" + data);
+            System.out.println("DDC1-EDID (raw)=" + NumberUtils.hex(data.getRawData()));
+        } catch (DeviceNotFoundException ex) {
+            System.out.println("Cannot find device " + devId);
+        } catch (ApiNotFoundException ex) {
+            System.out.println("No DisplayDataChannelAPI found on device " + devId);
+        } catch (DDC1NoSignalException ex) {
+            System.out.println("No DDC1 signal found");
+        } catch (DDC1ParseException ex) {
+            System.out.println("Invalid DDC1 data read: " + ex.getMessage() + ", it does not hurd to try again");
+        }
+    }
 }

@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 package org.jnode.test.gui;
 
 import java.awt.Color;
@@ -16,48 +13,49 @@ import java.awt.image.ImageObserver;
  */
 public class ImageTest {
 
-	public static void main(String[] args) throws Exception {
-		final boolean loadOnly = (args.length > 0) && args[0].equalsIgnoreCase("loadOnly");
+    static class TestComponent extends Component implements ImageObserver {
 
-		if (!loadOnly) {
-			final Frame wnd = new Frame();
-			try {
-				wnd.setSize(600, 400);
-				wnd.add(new TestComponent());
-				wnd.show();
+        private final Image img;
 
-				//Thread.sleep(5000);
-				System.in.read();
-			} finally {
-				wnd.dispose();
-			}
-		}
-	}
+        public TestComponent() {
+            super();
+            img = Toolkit.getDefaultToolkit().createImage(ClassLoader.getSystemResource("/org/zaval/lw/rs/img/tree.gif"));
+        }
 
-	static class TestComponent extends Component implements ImageObserver {
+        public void paint(Graphics g) {
+            System.out.println("Paint called");
+            super.paint(g);
 
-		private final Image img;
+            g.setColor(Color.green);
+            g.drawRect(0, 0, getWidth(), getHeight());
+            g.drawImage(img, 1, 1, this);
+        }
 
-		public TestComponent() {
-			super();
-			img = Toolkit.getDefaultToolkit().createImage(ClassLoader.getSystemResource("/org/zaval/lw/rs/img/tree.gif"));
-		}
+        /**
+         * @see java.awt.image.ImageObserver#imageUpdate(java.awt.Image, int, int, int, int, int)
+         */
+        public boolean imageUpdate(Image img, int flags, int x, int y, int w, int h) {
+            System.out.println("imageUpdate " + flags + "," + x + "," + y + "," + w + "," + h);
+            return super.imageUpdate(img, flags, x, y, w, h);
+        }
 
-		public void paint(Graphics g) {
-			System.out.println("Paint called");
-			super.paint(g);
+    }
 
-			g.setColor(Color.GREEN);
-			g.drawRect(0, 0, getWidth(), getHeight());
-			g.drawImage(img, 1, 1, this);
-		}
-		/**
-		 * @see java.awt.image.ImageObserver#imageUpdate(java.awt.Image, int, int, int, int, int)
-		 */
-		public boolean imageUpdate(Image img, int flags, int x, int y, int w, int h) {
-			System.out.println("imageUpdate " + flags + "," + x + "," + y + "," + w + "," + h);
-			return super.imageUpdate(img, flags, x, y, w, h);
-		}
+    public static void main(String[] args) throws Exception {
+        final boolean loadOnly = (args.length > 0) && args[0].equalsIgnoreCase("loadOnly");
 
-	}
+        if (!loadOnly) {
+            final Frame wnd = new Frame();
+            try {
+                wnd.setSize(600, 400);
+                wnd.add(new TestComponent());
+                wnd.show();
+
+                //Thread.sleep(5000);
+                System.in.read();
+            } finally {
+                wnd.dispose();
+            }
+        }
+    }
 }
