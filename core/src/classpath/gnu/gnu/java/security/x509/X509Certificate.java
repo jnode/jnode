@@ -424,10 +424,10 @@ public class X509Certificate extends java.security.cert.X509Certificate
     return subjectKey;
   }
 
-  /*protected Object writeReplace() throws ObjectStreamException
+  protected Object writeReplace() throws ObjectStreamException
   {
     return super.writeReplace();
-  }*/
+  }
   
   // Own methods.
   // ------------------------------------------------------------------------
