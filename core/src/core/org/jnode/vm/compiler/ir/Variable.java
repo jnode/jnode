@@ -42,16 +42,6 @@ public abstract class Variable extends Operand implements Cloneable {
 		ssaValue += 1;
 	}
 
-	public Operand propagate() {
-		if (assignOP instanceof VariableRefAssignOP) {
-			return ((VariableRefAssignOP) assignOP).getRHS();
-		}
-		if (assignOP instanceof ConstantRefAssignOP) {
-			return ((ConstantRefAssignOP) assignOP).getRHS();
-		}
-		return this;
-	}
-
 	public boolean equals(Object other) {
 		if (other == null) {
 			return false;
