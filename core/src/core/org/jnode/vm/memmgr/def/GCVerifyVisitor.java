@@ -9,11 +9,12 @@ import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.classmgr.ObjectFlags;
-import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.HeapHelper;
+import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
+import org.vmmagic.unboxed.Offset;
 
 
 /**
@@ -32,24 +33,24 @@ final class GCVerifyVisitor extends ObjectVisitor {
         this.arch = arch;
     }
     
-    public void reset() {
+    public final void reset() {
         errorCount = 0;
     }
     
     /**
      * @see org.jnode.vm.ObjectVisitor#visit(java.lang.Object)
      */
-    public boolean visit(Object object) {
-        final VmType vmClass = VmMagic.getObjectType(object);
+    public final boolean visit(Object object) {
         final int color = helper.getObjectColor(object);
         if (color == ObjectFlags.GC_YELLOW) {
             // Ignore objects that need to be finalized.
             return true;
         }
+        final VmType vmClass = VmMagic.getObjectType(object);
         if (vmClass == null) {
             helper.die("GCVerifyError: vmClass");
         } else if (vmClass.isArray()) {
-            if (!((VmArrayClass) vmClass).isPrimitiveArray()) {
+            if (!vmClass.isPrimitiveArray()) {
                 verifyArray(object);
             }
         } else {
@@ -63,7 +64,7 @@ final class GCVerifyVisitor extends ObjectVisitor {
         return (errorCount == 0);
     }
     
-    private void verifyArray(Object object) {
+    private final void verifyArray(Object object) {
         final Object[] arr = (Object[]) object;
         final int length = arr.length;
         for (int i = 0; i < length; i++) {
@@ -75,10 +76,11 @@ final class GCVerifyVisitor extends ObjectVisitor {
     
     }
     
-    private void verifyObject(Object object, VmNormalClass vmClass) {
+    private final void verifyObject(Object object, VmNormalClass vmClass) {
         final int[] referenceOffsets = vmClass.getReferenceOffsets();
         final int cnt = referenceOffsets.length;
         final int size = vmClass.getObjectSize();
+        final Address ptr = ObjectReference.fromObject(object).toAddress();
         for (int i = 0; i < cnt; i++) {
             int offset = referenceOffsets[ i];
             if ((offset < 0) || (offset >= size)) {
@@ -86,7 +88,7 @@ final class GCVerifyVisitor extends ObjectVisitor {
                 Unsafe.debug(vmClass.getName());
                 helper.die("Class internal error");
             } else {
-                final Object child = helper.getObject(object, offset);
+                final Object child = ptr.loadObjectReference(Offset.fromIntZeroExtend(offset)).toObject();
                 if (child != null) {
                     verifyChild(child, object, "object child");
                 }
@@ -94,7 +96,7 @@ final class GCVerifyVisitor extends ObjectVisitor {
         }
     }
     
-    private void verifyChild(Object child, Object parent, String where) {
+    private final void verifyChild(Object child, Object parent, String where) {
         if (child != null) {
             final ObjectReference childRef = ObjectReference.fromObject(child);
             if (!heapManager.isObject(childRef.toAddress())) {

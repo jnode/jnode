@@ -28,8 +28,6 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
     /** An object visitor used for marking */
     private final GCMarkVisitor markVisitor;
 
-    private final GCThreadMarkVisitor threadMarkVisitor;
-    
     /** An object visitor used for sweeping */
     private final GCSweepVisitor sweepVisitor;
 
@@ -68,7 +66,6 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
         this.helper = heapManager.getHelper();
         this.markStack = new GCStack();
         this.markVisitor = new GCMarkVisitor(heapManager, arch, markStack);
-        this.threadMarkVisitor = new GCThreadMarkVisitor(heapManager, markVisitor);
         this.setWhiteVisitor = new GCSetWhiteVisitor(heapManager);
         this.verifyVisitor = new GCVerifyVisitor(heapManager, arch);
         this.sweepVisitor = new GCSweepVisitor(heapManager);
@@ -244,6 +241,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
      * @param firstHeap
      */
     private void verify(VmBootHeap bootHeap, VmAbstractHeap firstHeap) {
+        final long startTime = VmSystem.currentKernelMillis();
         verifyVisitor.reset();
         bootHeap.walk(verifyVisitor, true, 0, 0);
         VmAbstractHeap heap = firstHeap;
@@ -257,6 +255,8 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
             Unsafe.debug(" verify errors. ");
             helper.die("Corrupted heap");
         }
+        final long endTime = VmSystem.currentKernelMillis();
+        stats.lastVerifyDuration = endTime - startTime;
     }
 
     public GCStatistics getStatistics() {
