@@ -1672,6 +1672,35 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write1bOpcodeModRR(0xF7, srcReg.getSize(), srcReg, 5);
 	}
 
+    public void writeIN(int operandSize) {
+        if(operandSize == X86Constants.BITS8){
+            write8(0xEC);
+        } else if(operandSize == X86Constants.BITS16){
+            write8(0xED);
+        } else if(operandSize == X86Constants.BITS32){
+            write8(X86Constants.OSIZE_PREFIX);
+            write8(0xED);
+        } else {
+            throw new IllegalArgumentException("Invalid operand size for IN: " + operandSize);
+        }
+    }
+
+    public void writeIN(int operandSize, int imm8) {
+        if(operandSize == X86Constants.BITS8){
+            write8(0xE4);
+            write8(imm8);
+        } else if(operandSize == X86Constants.BITS16){
+            write8(0xE5);
+            write8(imm8);
+        } else if(operandSize == X86Constants.BITS32){
+            write8(X86Constants.OSIZE_PREFIX);
+            write8(0xE5);
+            write8(imm8);
+        } else {
+            throw new IllegalArgumentException("Invalid operand size for IN: " + operandSize);
+        }
+    }
+
 	/**
 	 * Create a inc reg32
 	 * 
@@ -2770,6 +2799,35 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write1bOpcodeModRM(0x0B, dstReg.getSize(), srcReg, srcDisp, dstReg
 				.getNr());
 	}
+
+    public void writeOUT(int operandSize) {
+        if(operandSize == X86Constants.BITS8){
+            write8(0xEE);
+        } else if(operandSize == X86Constants.BITS16){
+            write8(0xEF);
+        } else if(operandSize == X86Constants.BITS32){
+            write8(X86Constants.OSIZE_PREFIX);
+            write8(0xEF);
+        } else {
+            throw new IllegalArgumentException("Invalid operand size for OUT: " + operandSize);
+        }
+    }
+
+    public void writeOUT(int operandSize, int imm8) {
+        if(operandSize == X86Constants.BITS8){
+            write8(0xE6);
+            write8(imm8);
+        } else if(operandSize == X86Constants.BITS16){
+            write8(0xE7);
+            write8(imm8);
+        } else if(operandSize == X86Constants.BITS32){
+            write8(X86Constants.OSIZE_PREFIX);
+            write8(0xE7);
+            write8(imm8);
+        } else {
+            throw new IllegalArgumentException("Invalid operand size for OUT: " + operandSize);
+        }
+    }
 
 	/**
 	 * Create a pop reg32
