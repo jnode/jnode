@@ -3,12 +3,16 @@
  */
 package org.jnode.fs.ntfs;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.Iterator;
 
-import org.jnode.driver.DeviceAPI;
 import org.jnode.driver.block.BlockDeviceAPI;
-import org.jnode.fs.ntfs.attributes.*;
+import org.jnode.fs.ntfs.attributes.NTFSAttribute;
+import org.jnode.fs.ntfs.attributes.NTFSBitMapAttribute;
+import org.jnode.fs.ntfs.attributes.NTFSDataAttribute;
+import org.jnode.fs.ntfs.attributes.NTFSFileNameAttribute;
+import org.jnode.fs.ntfs.attributes.NTFSStandardInformationAttribute;
+import org.jnode.fs.ntfs.attributes.NTFSUnimplementedAttribute;
 
 /**
  * @author Chira
@@ -42,7 +46,7 @@ public class NTFSVolume
 		return bootRecord;
 	}
 	/**
-	 * @param bootRecord The bootRecord to set.
+	 * @param cluster 
 	 */
 	public byte[] readCluster(int cluster) throws IOException
 	{
