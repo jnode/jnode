@@ -46,9 +46,12 @@ public abstract class VmMethod extends VmMember {
 	private int selector;
 	/** This field will be used to mask the thread switch indicator */
 	private int threadSwitchIndicatorMask = 0xFFFFFFFF;
+	/** Optimization level of native code */
+	private int nativeCodeOptLevel = -1;
 
 	/**
 	 * Constructor for VmMethod.
+	 * 
 	 * @param name
 	 * @param signature
 	 * @param modifiers
@@ -56,18 +59,13 @@ public abstract class VmMethod extends VmMember {
 	 * @param noArgs
 	 * @param selectorMap
 	 */
-	protected VmMethod(
-		String name,
-		String signature,
-		int modifiers,
-		VmType declaringClass,
-		int noArgs,
-		SelectorMap selectorMap) {
+	protected VmMethod(String name, String signature, int modifiers, VmType declaringClass, int noArgs, SelectorMap selectorMap) {
 		this(name, signature, modifiers, declaringClass, noArgs, selectorMap.get(name, signature));
 	}
 
 	/**
 	 * Constructor for VmMethod.
+	 * 
 	 * @param name
 	 * @param signature
 	 * @param modifiers
@@ -75,13 +73,7 @@ public abstract class VmMethod extends VmMember {
 	 * @param noArgs
 	 * @param selector
 	 */
-	protected VmMethod(
-		String name,
-		String signature,
-		int modifiers,
-		VmType declaringClass,
-		int noArgs,
-		int selector) {
+	protected VmMethod(String name, String signature, int modifiers, VmType declaringClass, int noArgs, int selector) {
 		super(name, signature, modifiers, declaringClass);
 		this.noArgs = noArgs;
 		this.argSlotCount = Signature.getArgSlotCount(signature);
@@ -93,47 +85,50 @@ public abstract class VmMethod extends VmMember {
 	}
 
 	/**
-	* Get the VmClass this method is declared in.
-	** @return The declaring class
+	 * Get the VmClass this method is declared in. *
+	 * 
+	 * @return The declaring class
 	 */
 	public VmType getDeclaringClass() {
 		return declaringClass;
 	}
 
 	/**
-	 * Get the byte-code information for this method as loaded by the
-	 * classdecoder.
-	 * This may return null if this is a native or abstract method.
+	 * Get the byte-code information for this method as loaded by the classdecoder. This may return
+	 * null if this is a native or abstract method.
+	 * 
 	 * @return The original bytecode
 	 */
 	public VmByteCode getOriginalBytecode() {
 		return originalBytecode;
 	}
-	
+
 	/**
-	 * Get the currently used byte-code information for this method.
-	 * This bytecode may have been optimized.
-	 * This may return null if this is a native or abstract method.
+	 * Get the currently used byte-code information for this method. This bytecode may have been
+	 * optimized. This may return null if this is a native or abstract method.
+	 * 
 	 * @return The current bytecode
 	 */
 	public VmByteCode getBytecode() {
 		return bytecode;
 	}
-	
+
 	/**
 	 * Sets the bytecode information of this method.
+	 * 
 	 * @param bc
 	 */
 	final void setBytecode(VmByteCode bc) {
 		if (this.originalBytecode == null) {
 			this.originalBytecode = bc;
 		}
-		this.bytecode = bc;	
+		this.bytecode = bc;
 		bc.lock();
 	}
 
 	/**
 	 * Get the number of bytes in the byte-codes for this method.
+	 * 
 	 * @return Length of bytecode
 	 */
 	public int getBytecodeSize() {
@@ -142,6 +137,7 @@ public abstract class VmMethod extends VmMember {
 
 	/**
 	 * Get the number of arguments
+	 * 
 	 * @return Number of arguments
 	 */
 	public int getNoArgs() {
@@ -149,8 +145,9 @@ public abstract class VmMethod extends VmMember {
 	}
 
 	/**
-	 * Gets myself as java.lang.reflect.Method or java.lang.reflect.Constructor,
-	 * depending on isConstructor().
+	 * Gets myself as java.lang.reflect.Method or java.lang.reflect.Constructor, depending on
+	 * isConstructor().
+	 * 
 	 * @return Method
 	 */
 	public Member asMember() {
@@ -166,6 +163,7 @@ public abstract class VmMethod extends VmMember {
 
 	/**
 	 * Convert myself into a String representation
+	 * 
 	 * @return String
 	 */
 	public String toString() {
@@ -174,23 +172,21 @@ public abstract class VmMethod extends VmMember {
 
 	/**
 	 * Convert myself into a String representation
+	 * 
 	 * @return The mangled name
 	 */
 	public String getMangledName() {
-		return mangleClassName(declaringClass.getName())
-			+ mangle("#" + getName() + '.' + getSignature());
+		return mangleClassName(declaringClass.getName()) + mangle("#" + getName() + '.' + getSignature());
 	}
 
 	/**
-	 * Record an invocation of this method.
-	 * This method is called by vm_invoke in vm-invoke.asm when
-	 * this method is invocated AND ACC_PROFILE is set.
+	 * Record an invocation of this method. This method is called by vm_invoke in vm-invoke.asm
+	 * when this method is invocated AND ACC_PROFILE is set.
 	 * 
 	 * @see Modifier#ACC_PROFILE
 	 * @throws PragmaUninterruptible
 	 */
-	protected final void recordInvoke() 
-	throws PragmaUninterruptible {
+	protected final void recordInvoke() throws PragmaUninterruptible {
 		final HotMethodDetector detector = this.detector;
 		if (detector != null) {
 			if (!detector.isHot()) {
@@ -207,25 +203,37 @@ public abstract class VmMethod extends VmMember {
 	}
 
 	/**
-	 * Compile all the methods in this class during runtime.
+	 * Compile this method with n optimization level 1 higher then the
+	 * current optimization level.
 	 */
 	public final void compile() {
-		if (!isCompiled()) {
-			doCompile();
+		doCompile(nativeCodeOptLevel + 1);
+	}
+
+	/**
+	 * Compile all the methods in this class during runtime.
+	 * 
+	 * @param optLevel
+	 *            The optimization level
+	 */
+	public final void compile(int optLevel) {
+		if (!isCompiled() || (optLevel > nativeCodeOptLevel)) {
+			doCompile(optLevel);
 		}
 	}
 
 	/**
 	 * Compile all the methods in this class during runtime.
+	 * 
+	 * @param optLevel
+	 *            The optimization level
 	 */
-	private synchronized void doCompile() {
-		if (!isCompiled()) {
-			declaringClass.prepare();
-			if (!isAbstract()) {
-				declaringClass.getLoader().compile(this);
-				setModifier(true, Modifier.ACC_COMPILED);
-				setProfile(false);
-			}
+	private synchronized void doCompile(int optLevel) {
+		declaringClass.prepare();
+		if (!isAbstract()) {
+			declaringClass.getLoader().compile(this, optLevel);
+			setModifier(true, Modifier.ACC_COMPILED);
+			setProfile(false);
 		}
 	}
 
@@ -251,6 +259,7 @@ public abstract class VmMethod extends VmMember {
 
 	/**
 	 * Resolve the type of this method
+	 * 
 	 * @param cl
 	 */
 	protected synchronized void resolve(AbstractVmClassLoader cl) {
@@ -260,8 +269,7 @@ public abstract class VmMethod extends VmMember {
 	private void resolveTypes() {
 		if (paramTypes == null) {
 			try {
-				Signature sig =
-					new Signature(getSignature(), declaringClass.getLoader());
+				Signature sig = new Signature(getSignature(), declaringClass.getLoader());
 				returnType = sig.getReturnType();
 				int count = sig.getParamCount();
 				paramTypes = new VmType[count];
@@ -269,7 +277,7 @@ public abstract class VmMethod extends VmMember {
 					paramTypes[i] = sig.getParamType(i);
 				}
 			} catch (ClassNotFoundException ex) {
-				throw (Error)new NoClassDefFoundError("In method " + toString()).initCause(ex);
+				throw (Error) new NoClassDefFoundError("In method " + toString()).initCause(ex);
 			}
 		}
 	}
@@ -286,6 +294,7 @@ public abstract class VmMethod extends VmMember {
 
 	/**
 	 * Does the given array of types match my argument types?
+	 * 
 	 * @param argTypes
 	 * @return boolean
 	 */
@@ -313,6 +322,7 @@ public abstract class VmMethod extends VmMember {
 
 	/**
 	 * Does this method return void?
+	 * 
 	 * @return boolean
 	 */
 	public boolean isReturnVoid() {
@@ -321,37 +331,39 @@ public abstract class VmMethod extends VmMember {
 
 	/**
 	 * Does this method return long or double?
+	 * 
 	 * @return boolean
 	 */
 	public boolean isReturnWide() {
 		return wide;
 	}
-	
+
 	/**
 	 * @return boolean
 	 */
 	public boolean isReturnObject() {
 		return returnObject;
 	}
-	
+
 	/**
 	 * Gets the exceptions this method has declared to throw
+	 * 
 	 * @return The exceptions this method has declared to throw, never null.
 	 */
 	public VmExceptions getExceptions() {
 		if (exceptions == null) {
 			exceptions = new VmExceptions();
-		} 
+		}
 		return exceptions;
 	}
 
 	/**
 	 * Sets the exceptions this method has declared to throw
+	 * 
 	 * @param exceptions
 	 * @throws ClassFormatError
 	 */
-	final void setExceptions(VmExceptions exceptions) 
-	throws ClassFormatError {
+	final void setExceptions(VmExceptions exceptions) throws ClassFormatError {
 		if (this.exceptions == null) {
 			this.exceptions = exceptions;
 			if (exceptions.contains(PragmaUninterruptible.class)) {
@@ -361,9 +373,10 @@ public abstract class VmMethod extends VmMember {
 			throw new ClassFormatError("Cannot have more then 1 Exceptions attribute");
 		}
 	}
-	
+
 	/**
 	 * Gets the compiled code information of this method (if any)
+	 * 
 	 * @return The compiled code, or null if no compiled code has been set.
 	 */
 	public final VmCompiledCode getCompiledCode() {
@@ -371,18 +384,22 @@ public abstract class VmMethod extends VmMember {
 	}
 
 	/**
+	 * Install the generated code.
 	 * @param code
+	 * @param optLevel The optimization level of the generated code.
 	 */
-	public final void setCompiledCode(VmCompiledCode code) {
-		if (this.nativeCode != null) {
+	public final void setCompiledCode(VmCompiledCode code, int optLevel) {
+		if ((this.nativeCode != null) && (optLevel <= nativeCodeOptLevel)) {
 			throw new RuntimeException("Cannot set code twice");
 		}
 		this.nativeCode = code.getNativeCode();
 		this.compiledCode = code;
+		this.nativeCodeOptLevel = optLevel;
 	}
-	
+
 	/**
 	 * Should profiling be enabled on this method?
+	 * 
 	 * @param on
 	 */
 	protected final void setProfile(boolean on) {
@@ -395,9 +412,10 @@ public abstract class VmMethod extends VmMember {
 		}
 		setModifier(on, Modifier.ACC_PROFILE);
 	}
-	
+
 	/**
 	 * Gets the global unique selector if this method name&amp;type.
+	 * 
 	 * @return The selector
 	 */
 	public int getSelector() {
@@ -405,14 +423,18 @@ public abstract class VmMethod extends VmMember {
 	}
 
 	/**
-	 * @return
+	 * Gets the number of argument slots.
+	 * 
+	 * @return int
 	 */
 	int getArgSlotCount() {
 		return this.argSlotCount;
 	}
-	
+
 	/**
-	 * @return
+	 * Gets the number of invocations of this method.
+	 * 
+	 * @return int
 	 */
 	int getInvocationCount() {
 		return this.invocationCount;
@@ -424,8 +446,22 @@ public abstract class VmMethod extends VmMember {
 	public final int getThreadSwitchIndicatorMask() {
 		return this.threadSwitchIndicatorMask;
 	}
-	
+
+	/**
+	 * Mark this method as uninterruptable.
+	 *  
+	 */
 	final void setUninterruptible() {
 		this.threadSwitchIndicatorMask = 0;
 	}
+
+	/**
+	 * Gets the optimization level of the native code. A value of -1 means not compiled yet.
+	 * 
+	 * @return Returns the nativeCodeOptLevel.
+	 */
+	public final int getNativeCodeOptLevel() {
+		return this.nativeCodeOptLevel;
+	}
+
 }
