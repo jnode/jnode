@@ -43,7 +43,7 @@ import java.beans.PropertyVetoException;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 final class SwingFramePeer extends SwingWindowPeer implements FramePeer, ISwingContainerPeer {
 

@@ -47,7 +47,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class Editor extends JFrame {
     private JTextArea textArea;

@@ -29,7 +29,7 @@ import java.awt.peer.PanelPeer;
 
 /**
  * AWT panel peer implemented as a {@link javax.swing.JPanel}.
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 
 final class SwingPanelPeer extends SwingContainerPeer implements PanelPeer, ISwingContainerPeer {

@@ -48,7 +48,7 @@ import charva.awt.event.MouseEvent;
  * these defaults can be modified by changing the static variables
  * _defaultForeground and _defaultBackground.
  * @author
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public abstract class AbstractToolkit
         implements Runnable {

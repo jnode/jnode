@@ -28,7 +28,7 @@ import java.awt.peer.CheckboxMenuItemPeer;
 /**
  * AWT checkbox menu item peer implemented as a
  * {@link javax.swing.JCheckBoxMenuItem}.
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 
 class SwingCheckboxMenuItemPeer extends SwingMenuItemPeer implements CheckboxMenuItemPeer {

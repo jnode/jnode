@@ -38,7 +38,7 @@ import org.jnode.vm.compiler.ir.Variable;
  * The left hand side (lhs) is a Variable inherited from AssignQuad.
  *
  * @author Madhu Siddalingaiah
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class BinaryQuad extends AssignQuad {
 	private static final String[] OP_MAP = {

@@ -32,7 +32,7 @@ import org.jnode.vm.compiler.ir.Variable;
 
 /**
  * @author Madhu Siddalingaiah
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  *
  */
 public class UnaryQuad extends AssignQuad {

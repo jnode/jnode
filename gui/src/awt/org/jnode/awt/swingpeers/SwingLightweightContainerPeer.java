@@ -30,7 +30,7 @@ import java.awt.Insets;
 import java.awt.peer.LightweightPeer;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class SwingLightweightContainerPeer extends SwingContainerPeer implements LightweightPeer , ISwingPeer {
     private Insets containerInsets;

@@ -42,18 +42,18 @@ public class KeyboardInterpreter_CH_fr extends KeyboardInterpreter {
 	{
 	  Key key;
 	  keys.setKey(  1,new Key(KeyEvent.VK_ESCAPE));
-	  keys.setKey(  2,new Key('1' ,KeyEvent.VK_1,'+' ,KeyEvent.VK_ADD              ,'¦' ,KeyEvent.VK_UNDEFINED));
+	  keys.setKey(  2,new Key('1' ,KeyEvent.VK_1,'+' ,KeyEvent.VK_ADD              ,'\u00a6' ,KeyEvent.VK_UNDEFINED));
 	  keys.setKey(  3,new Key('2' ,KeyEvent.VK_2,'"' ,KeyEvent.VK_QUOTEDBL         ,'@' ,KeyEvent.VK_AT));
 	  keys.setKey(  4,new Key('3' ,KeyEvent.VK_3,'*' ,KeyEvent.VK_MULTIPLY         ,'#' ,KeyEvent.VK_UNDEFINED));
-	  keys.setKey(  5,new Key('4' ,KeyEvent.VK_4,'ç' ,'°'));
-	  keys.setKey(  6,new Key('5' ,KeyEvent.VK_5,'%' ,'§'));
-	  keys.setKey(  7,new Key('6' ,KeyEvent.VK_6,'&' ,KeyEvent.VK_UNDEFINED        ,'¬' ,KeyEvent.VK_UNDEFINED));
+	  keys.setKey(  5,new Key('4' ,KeyEvent.VK_4,'\u00e7' ,'\u00b0'));
+	  keys.setKey(  6,new Key('5' ,KeyEvent.VK_5,'%' ,'\u00a7'));
+	  keys.setKey(  7,new Key('6' ,KeyEvent.VK_6,'&' ,KeyEvent.VK_UNDEFINED        ,'\u00ac' ,KeyEvent.VK_UNDEFINED));
 	  keys.setKey(  8,new Key('7' ,KeyEvent.VK_7,'/' ,KeyEvent.VK_SLASH            ,'|' ,KeyEvent.VK_UNDEFINED));
-	  keys.setKey(  9,new Key('8' ,KeyEvent.VK_8,'(' ,KeyEvent.VK_LEFT_PARENTHESIS ,'¢' ,KeyEvent.VK_UNDEFINED));
+	  keys.setKey(  9,new Key('8' ,KeyEvent.VK_8,'(' ,KeyEvent.VK_LEFT_PARENTHESIS ,'\u00a2' ,KeyEvent.VK_UNDEFINED));
 	  keys.setKey( 10,new Key('9' ,KeyEvent.VK_9,')' ,KeyEvent.VK_RIGHT_PARENTHESIS));
 	  keys.setKey( 11,new Key('0' ,KeyEvent.VK_0,'=' ,KeyEvent.VK_EQUALS));	  
 	  
-	  keys.setKey( 12,new Key('\'',KeyEvent.VK_QUOTE ,'?' ,KeyEvent.VK_UNDEFINED   , '´', KeyEvent.VK_DEAD_ACUTE));	  
+	  keys.setKey( 12,new Key('\'',KeyEvent.VK_QUOTE ,'?' ,KeyEvent.VK_UNDEFINED   , '\u00b4', KeyEvent.VK_DEAD_ACUTE));	  
 	  
 	  keys.setKey( 13,new Key('^',KeyEvent.VK_DEAD_CIRCUMFLEX ,'`',KeyEvent.VK_DEAD_GRAVE ,'~',KeyEvent.VK_UNDEFINED));	  
 	
@@ -62,42 +62,42 @@ public class KeyboardInterpreter_CH_fr extends KeyboardInterpreter {
 	  
 	  keys.setKey( 16,new Key('q' ,'Q' ,KeyEvent.VK_Q));
 	  keys.setKey( 17,new Key('w' ,'W' ,KeyEvent.VK_W));
-	  keys.setKey( 18,new Key('e' ,'E' ,'€' ,KeyEvent.VK_E));
+	  keys.setKey( 18,new Key('e' ,'E' ,'\u20ac' ,KeyEvent.VK_E));
 	  keys.setKey( 19,new Key('r' ,'R' ,KeyEvent.VK_R));
 	  keys.setKey( 20,new Key('t' ,'T' ,KeyEvent.VK_T));
 	  keys.setKey( 21,new Key('z' ,'Z' ,KeyEvent.VK_Z));
 	  keys.setKey( 22,new Key('u' ,'U' ,KeyEvent.VK_U));
 	  key = keys.getKey(22);
-	  key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS ,new char[]{'ü' ,'Ü'});
-	  key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX,new char[]{'û' ,'Û'});
-	  key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE     ,new char[]{'ú' ,'Ú'});
-	  key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE     ,new char[]{'ù' ,'Ù'});
+	  key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS ,new char[]{'\u00fc' ,'\u00dc'});
+	  key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX,new char[]{'\u00fb' ,'\u00db'});
+	  key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE     ,new char[]{'\u00fa' ,'\u00da'});
+	  key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE     ,new char[]{'\u00f9' ,'\u00d9'});
 	  keys.setKey( 23,new Key('i' ,'I' ,KeyEvent.VK_I));
 	  key = keys.getKey(23);
-	  key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS ,new char[]{'ï' ,'Ï'});
-	  key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX,new char[]{'î' ,'Î'});
-	  key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE     ,new char[]{'í' ,'Í'});
-	  key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE     ,new char[]{'ì' ,'Ì'});
+	  key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS ,new char[]{'\u00ef' ,'\u00cf'});
+	  key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX,new char[]{'\u00ee' ,'\u00ce'});
+	  key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE     ,new char[]{'\u00ed' ,'\u00cd'});
+	  key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE     ,new char[]{'\u00ec' ,'\u00cc'});
 	  keys.setKey( 24,new Key('o' ,'O' ,KeyEvent.VK_O));
 	  key = keys.getKey(24);
-	  key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS ,new char[]{'ö' ,'Ö'});
-	  key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX,new char[]{'ô' ,'Ô'});
-	  key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE     ,new char[]{'ó' ,'Ó'});
-	  key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE     ,new char[]{'ò' ,'Ò'});
+	  key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS ,new char[]{'\u00f6' ,'\u00d6'});
+	  key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX,new char[]{'\u00f4' ,'\u00d4'});
+	  key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE     ,new char[]{'\u00f3' ,'\u00d3'});
+	  key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE     ,new char[]{'\u00f2' ,'\u00d2'});
 	  keys.setKey( 25,new Key('p' ,'P' ,KeyEvent.VK_P));
 	  
-	  keys.setKey( 26,new Key('è' ,'ü' ,'[' ,KeyEvent.VK_OPEN_BRACKET));
-	  keys.setKey( 27,new Key('¨' ,KeyEvent.VK_DEAD_DIAERESIS, '!', KeyEvent.VK_EXCLAMATION_MARK,']' ,KeyEvent.VK_CLOSE_BRACKET));	  
+	  keys.setKey( 26,new Key('\u00e8' ,'\u00fc' ,'[' ,KeyEvent.VK_OPEN_BRACKET));
+	  keys.setKey( 27,new Key('\u00a8' ,KeyEvent.VK_DEAD_DIAERESIS, '!', KeyEvent.VK_EXCLAMATION_MARK,']' ,KeyEvent.VK_CLOSE_BRACKET));	  
 	  
 	  keys.setKey(  28,new Key('\n'  ,KeyEvent.VK_ENTER));
 	  keys.setKey(29, new Key((char) 0, KeyEvent.VK_CONTROL));
    
 	  keys.setKey( 30,new Key('a' ,'A' ,'a' ,KeyEvent.VK_A));
 	  key = keys.getKey(30);
-	  key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS ,new char[]{'ä' ,'Ä'});
-	  key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX,new char[]{'â' ,'Â'});
-	  key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE     ,new char[]{'á' ,'Á'});
-	  key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE     ,new char[]{'à' ,'À'});
+	  key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS ,new char[]{'\u00e4' ,'\u00c4'});
+	  key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX,new char[]{'\u00e2' ,'\u00c2'});
+	  key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE     ,new char[]{'\u00e1' ,'\u00c1'});
+	  key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE     ,new char[]{'\u00e0' ,'\u00c0'});
 	 
 	  keys.setKey( 31,new Key('s' ,'S' ,KeyEvent.VK_S));
 	  keys.setKey( 32,new Key('d' ,'D' ,KeyEvent.VK_D));
@@ -107,11 +107,11 @@ public class KeyboardInterpreter_CH_fr extends KeyboardInterpreter {
 	  keys.setKey( 36,new Key('j' ,'J' ,KeyEvent.VK_J));
 	  keys.setKey( 37,new Key('k' ,'K' ,KeyEvent.VK_K));
 	  keys.setKey( 38,new Key('l' ,'L' ,KeyEvent.VK_L));
-	  keys.setKey( 39,new Key('é' ,'ö' ,KeyEvent.VK_UNDEFINED));
-	  keys.setKey( 40,new Key('à' ,'ä' ,'{',KeyEvent.VK_BRACELEFT));
-	  keys.setKey( 41,new Key('§' ,'°'));
+	  keys.setKey( 39,new Key('\u00e9' ,'\u00f6' ,KeyEvent.VK_UNDEFINED));
+	  keys.setKey( 40,new Key('\u00e0' ,'\u00e4' ,'{',KeyEvent.VK_BRACELEFT));
+	  keys.setKey( 41,new Key('\u00a7' ,'\u00b0'));
 	  keys.setKey( 42,new Key(KeyEvent.VK_SHIFT));
-	  keys.setKey( 43,new Key('$' ,KeyEvent.VK_DOLLAR, '£' ,KeyEvent.VK_UNDEFINED, '}',KeyEvent.VK_BRACERIGHT));
+	  keys.setKey( 43,new Key('$' ,KeyEvent.VK_DOLLAR, '\u00a3' ,KeyEvent.VK_UNDEFINED, '}',KeyEvent.VK_BRACERIGHT));
 	  keys.setKey( 44,new Key('y' ,'Y' ,KeyEvent.VK_Y));
 	  keys.setKey( 45,new Key('x' ,'X' ,KeyEvent.VK_X));
 	  keys.setKey( 46,new Key('c' ,'C' ,KeyEvent.VK_C));
@@ -127,9 +127,9 @@ public class KeyboardInterpreter_CH_fr extends KeyboardInterpreter {
 	  keys.setKey( 56,new Key(KeyEvent.VK_ALT));
 	  keys.setKey( 57,new Key(' ',KeyEvent.VK_SPACE));
 	  key = keys.getKey(57);
-	  key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS ,new char[]{'¨'});
+	  key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS ,new char[]{'\u00a8'});
 	  key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX,new char[]{'^'});
-	  key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE     ,new char[]{'´'});
+	  key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE     ,new char[]{'\u00b4'});
 	  key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE     ,new char[]{'`'});
 	  keys.setKey( 58,new Key(KeyEvent.VK_CAPS_LOCK));
 	  keys.setKey( 59,new Key(KeyEvent.VK_F1));

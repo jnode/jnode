@@ -32,7 +32,7 @@ import org.jnode.vm.classmgr.VmType;
 import java.io.OutputStreamWriter;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class DisassembleCommand {
 

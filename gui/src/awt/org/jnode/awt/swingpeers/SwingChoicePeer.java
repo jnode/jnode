@@ -29,7 +29,7 @@ import java.awt.peer.ChoicePeer;
 
 /**
  * AWT choice peer implemented as a {@link javax.swing.JButton}.
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 
 final class SwingChoicePeer extends SwingComponentPeer implements ChoicePeer {

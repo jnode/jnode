@@ -31,7 +31,7 @@ import org.jnode.vm.compiler.ir.quad.VoidReturnQuad;
 
 /**
  * @author Madhu Siddalingaiah
- * @author Levente Sántha 
+ * @author Levente S\u00e1ntha 
  */
 public abstract class CodeGenerator {
 	private static CodeGenerator cgInstance;

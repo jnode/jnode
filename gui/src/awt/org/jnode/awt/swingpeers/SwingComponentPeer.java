@@ -58,7 +58,7 @@ import java.awt.peer.ComponentPeer;
  * peers without actually displaying anything (hence, they are virtual) or by
  * delegating to the parent component, under the assumption is that somewhere up
  * in the hierarchy there is a parent who can produce a display.
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 
 class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {

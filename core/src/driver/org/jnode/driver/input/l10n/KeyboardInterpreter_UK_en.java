@@ -39,7 +39,7 @@ public class KeyboardInterpreter_UK_en extends KeyboardInterpreter
     keys.setKey(1, new Key(KeyEvent.VK_ESCAPE));
     keys.setKey(2, new Key('1', KeyEvent.VK_1, '!', KeyEvent.VK_EXCLAMATION_MARK));
     keys.setKey(3, new Key('2', KeyEvent.VK_2, '"', KeyEvent.VK_QUOTEDBL));
-    keys.setKey(4, new Key('3', '£', KeyEvent.VK_3));
+    keys.setKey(4, new Key('3', '\u00a3', KeyEvent.VK_3));
     keys.setKey(5, new Key('4', KeyEvent.VK_4, '$', KeyEvent.VK_DOLLAR));
     keys.setKey(6, new Key('5', '%', KeyEvent.VK_5));
     keys.setKey(7, new Key('6', '^', KeyEvent.VK_6));
@@ -76,7 +76,7 @@ public class KeyboardInterpreter_UK_en extends KeyboardInterpreter
     keys.setKey(38, new Key('l', 'L', KeyEvent.VK_L));
     keys.setKey(39, new Key(';', KeyEvent.VK_SEMICOLON, ':', KeyEvent.VK_COLON));
     keys.setKey(40, new Key("'".charAt(0), KeyEvent.VK_QUOTE, '@', KeyEvent.VK_AT));
-    keys.setKey(41, new Key('¬', KeyEvent.VK_BACK_QUOTE));
+    keys.setKey(41, new Key('\u00ac', KeyEvent.VK_BACK_QUOTE));
     keys.setKey(43, new Key('#', KeyEvent.VK_NUMBER_SIGN, '~', KeyEvent.VK_BACK_SLASH));
     keys.setKey(44, new Key('z', 'Z', KeyEvent.VK_Z));
     keys.setKey(45, new Key('x', 'X', KeyEvent.VK_X));
@@ -328,7 +328,7 @@ public class KeyboardInterpreter_UK_en extends KeyboardInterpreter
 		
 		ucharMap[ 2] = '!';
 		ucharMap[ 3] = '\"';
-		ucharMap[ 4] = '£'; // 0x9C
+		ucharMap[ 4] = '\u00a3'; // 0x9C
 		ucharMap[ 5] = '$';
 		ucharMap[ 6] = '%';
 		ucharMap[ 7] = '^';
@@ -364,7 +364,7 @@ public class KeyboardInterpreter_UK_en extends KeyboardInterpreter
 		ucharMap[ 38] = 'L';
 		ucharMap[ 39] = ':';
 		ucharMap[ 40] = '@';
-		ucharMap[ 41] = '¬'; // 0x78
+		ucharMap[ 41] = '\u00ac'; // 0x78
 		ucharMap[ 43] = '~';
 		ucharMap[ 44] = 'Z';
 		ucharMap[ 45] = 'X';

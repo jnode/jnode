@@ -41,7 +41,7 @@ public class KeyboardInterpreter_US_en extends KeyboardInterpreter
     keys.setKey(1, new Key(KeyEvent.VK_ESCAPE));
     keys.setKey(2, new Key('1', KeyEvent.VK_1, '!', KeyEvent.VK_EXCLAMATION_MARK));
     keys.setKey(3, new Key('2', KeyEvent.VK_2, '@', KeyEvent.VK_AT));
-    keys.setKey(4, new Key('3', KeyEvent.VK_3, '#', KeyEvent.VK_NUMBER_SIGN, '£', KeyEvent.VK_3));
+    keys.setKey(4, new Key('3', KeyEvent.VK_3, '#', KeyEvent.VK_NUMBER_SIGN, '\u00a3', KeyEvent.VK_3));
     keys.setKey(5, new Key('4', KeyEvent.VK_4, '$', KeyEvent.VK_DOLLAR));
     keys.setKey(6, new Key('5', '%', KeyEvent.VK_5));
     keys.setKey(7, new Key('6', '^', KeyEvent.VK_6));

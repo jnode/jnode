@@ -83,7 +83,7 @@ import java.awt.peer.WindowPeer;
  * AWT toolkit implemented entirely with JFC peers, thus allowing a lightweight
  * simulation of the operating system desktop.
  * 
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class SwingToolkit extends JNodeToolkit {

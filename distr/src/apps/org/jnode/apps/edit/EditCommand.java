@@ -29,7 +29,7 @@ import org.jnode.shell.help.ParsedArguments;
 import java.io.File;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class EditCommand {
     static final FileArgument ARG_EDIT = new FileArgument("file", "the file to edit");

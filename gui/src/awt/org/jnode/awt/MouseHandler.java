@@ -42,7 +42,7 @@ import javax.swing.SwingUtilities;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class MouseHandler implements PointerListener {
 
