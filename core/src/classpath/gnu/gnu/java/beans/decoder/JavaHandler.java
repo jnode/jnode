@@ -1,5 +1,5 @@
-/* GapContent.java -- 
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+/* gnu.java.beans.decoder.JavaHandler
+   Copyright (C) 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -7,7 +7,7 @@ GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
-
+ 
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -35,77 +35,59 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+package gnu.java.beans.decoder;
 
-package javax.swing.text; 
+import java.beans.ExceptionListener;
+import java.util.HashMap;
 
-import java.io.Serializable;
+import org.xml.sax.Attributes;
 
-// too lazy to make a real gapcontent.
-// lets just use a stringbuffer instead.
-import javax.swing.undo.UndoableEdit;
-
-public class GapContent
-  implements AbstractDocument.Content, Serializable
+/** Wraps a DecoderContext instance.
+ *
+ * @author Robert Schuster
+ */
+public class JavaHandler extends AbstractElementHandler
 {
-  private static final long serialVersionUID = 8374645204155842629L;
-    
-    StringBuffer buf = new StringBuffer();
+  private Context context;
+  private HashMap objectMap = new HashMap();
+  private ClassLoader classLoader;
 
-    public GapContent()
-    {
-	this(10);
-    }
-    
-    public GapContent(int size)
-    {
-    buf.append("\n");
-    }
+  /**
+   * @param PersistenceParser
+   */
+  JavaHandler(DummyHandler parent, Context decoderContext,
+              ClassLoader cl)
+  {
+    super(parent, true);
 
-    public Position createPosition(final int offset) throws BadLocationException
-    {
-	return new Position()
-	    {
-		int off = offset;
+    classLoader = cl;
 
-		public int getOffset()
-		{
-		    return off;
-		}
-	    };
-    }
+    context = decoderContext;
 
-    public int length()
-    {
-	return buf.length();
-    }
+  }
 
-  public UndoableEdit insertString(int where, String str)
-    throws BadLocationException
-    {
-	buf.insert(where, str);
-	return null;
-    }
+  protected Context startElement(Attributes attributes, ExceptionListener exceptionListener)
+    throws AssemblyException
+  {
+    // may expect version and class attribute but it not used in JDK 
+    // so we do either
+    return context;
+  }
 
-  public UndoableEdit remove(int where, int nitems)
-    throws BadLocationException
-    {
-	buf.delete(where, where + nitems);
-	return null;
-    }
+  public Object getObject(String objectId)
+  {
+    return objectMap.get(objectId);
+  }
 
-    public String getString(int where, int len) throws BadLocationException
-    {
-    return buf.substring(where, where+len);
-    }
+  public void putObject(String objectId, Object o)
+  {
+    if (objectId != null)
+      objectMap.put(objectId, o);
+  }
 
-  public void getChars(int where, int len, Segment txt)
-    throws BadLocationException
-    {
-	txt.array = new char[len];
-		
-    System.arraycopy(buf.toString().toCharArray(), where, txt.array, 0, len);
-	
-	txt.count  = len;
-	txt.offset = 0;
-    }
+  public Class instantiateClass(String className)
+    throws ClassNotFoundException
+  {
+    return Class.forName(className, false, classLoader);
+  }
 }

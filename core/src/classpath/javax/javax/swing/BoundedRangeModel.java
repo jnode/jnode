@@ -35,103 +35,134 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing;
 
 import javax.swing.event.ChangeListener;
 
 /**
- * BoundedRangeModel
  * @author	Andrew Selkirk
- * @version	1.0
  */
-public interface BoundedRangeModel {
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
+public interface BoundedRangeModel
+{
 	/**
 	 * getValue
-	 * @returns int
+   * 
+   * @return int
+   *
+   * @see #setValue(int)
 	 */
 	int getValue();
 
 	/**
 	 * setValue
-	 * @param value TODO
+   * 
+   * @param value the value
+   *
+   * @see #getValue()
 	 */
 	void setValue(int value);
 
 	/**
 	 * getMinimum
-	 * @returns int
+   * 
+   * @return int
+   *
+   * @see #setMinimum(int)
 	 */
 	int getMinimum();
 
 	/**
 	 * setMinimum
-	 * @param minimum TODO
+   * 
+   * @param minimum the minimum value
+   *
+   * @see #getMinimum()
 	 */
 	void setMinimum(int minimum);
 
 	/**
 	 * getMaximum
-	 * @returns int
+   * 
+   * @return int
+   *
+   * @see #setMaximum(int)
 	 */
 	int getMaximum();
 
 	/**
 	 * setMaximum
-	 * @param maximum TODO
+   * 
+   * @param maximum the maximum value
+   *
+   * @see #getMaximum()
 	 */
 	void setMaximum(int maximum);
 
 	/**
-	 * getValueIsAdjusting
-	 * @returns boolean
+   * Returns the value of the <code>valueIsAdjusting</code> property.
+   * 
+   * @return <code>true</code> if value is adjusting,
+   * otherwise <code>false</code>
+   *
+   * @see setValueIsAdjusting(boolean)
 	 */
 	boolean getValueIsAdjusting();
 
 	/**
 	 * setValueIsAdjusting
-	 * @param adjusting TODO
+   * 
+   * @param adjusting <code>true</code> if adjusting,
+   * <code>false</code> otherwise
+   *
+   * @see #getValueIsAdjusting()
 	 */
 	void setValueIsAdjusting(boolean adjusting);
 
 	/**
-	 * getExtent
-	 * @returns int
+   * Returns the current extent.
+   *
+   * @return the extent
+   *
+   * @see #setExtent(int)
 	 */
 	int getExtent();
 
 	/**
 	 * setExtent
-	 * @param extent TODO
+   * 
+   * @param extent the extent
+   *
+   * @see #getExtent()
 	 */
 	void setExtent(int extent);
 
 	/**
 	 * setRangeProperties
-	 * @param value TODO
-	 * @param extent TODO
-	 * @param min TODO
-	 * @param max TODO
+   * @param value the value
+   * @param extent the extent
+   * @param minnimum the minimum value
+   * @param maximum the maximum value
 	 * @param adjusting TODO
 	 */
-	void setRangeProperties(int value, int extent, int min, 
-					int max, boolean adjusting);
+  void setRangeProperties(int value, int extent, int minimum, int maximum,
+			  boolean adjusting);
 
 	/**
-	 * addChangeListener
-	 * @param listener TODO
+   * Adds a <code>ChangeListener</code> to this object.
+   * 
+   * @param listener the listener to add
+   * 
+   * @see #removeChangeListener(javax.swing.event.ChangeListener)
 	 */
 	void addChangeListener(ChangeListener listener);
 
 	/**
-	 * removeChangeListener
-	 * @param listener TODO
+   * Removes a <code>ChangeListener</code> from this object.
+   * 
+   * @param listener the listener to remove
+   *
+   * @see #addChangeListener(javax.swing.event.ChangeListener)
 	 */
 	void removeChangeListener(ChangeListener listener);
-
-
-} // BoundedRangeModel
+}

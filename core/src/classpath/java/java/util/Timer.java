@@ -343,9 +343,16 @@ public class Timer
 		{
 		  task.run();
 		}
+              catch (ThreadDeath death)
+                {
+                  // If an exception escapes, the Timer becomes invalid.
+                  queue.stop();
+                  throw death;
+                }
 	      catch (Throwable t)
 		{		
-		  /* ignore all errors */
+		  // If an exception escapes, the Timer becomes invalid.
+                  queue.stop();
 		}
 	    }
 
