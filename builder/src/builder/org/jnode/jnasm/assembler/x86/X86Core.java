@@ -9,7 +9,6 @@ import org.jnode.jnasm.assembler.Indirect;
 import org.jnode.jnasm.assembler.Assembler;
 import org.jnode.jnasm.assembler.InstructionUtils;
 import org.jnode.assembler.x86.X86Assembler;
-import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
@@ -147,6 +146,7 @@ public class X86Core extends AssemblerModule {
     }
 
     private List operands;
+    private int operandSize;
     private X86Assembler stream;
 
     public X86Core(final Map labels) {
@@ -157,8 +157,9 @@ public class X86Core extends AssemblerModule {
         this.stream = (X86Assembler) stream;
     }
 
-    public boolean emmit(String mnemonic, List operands) {
+    public boolean emmit(String mnemonic, List operands, int operandSize) {
         this.operands = operands;
+        this.operandSize = operandSize;
 
         Integer key = (Integer) INSTRUCTION_MAP.get(mnemonic);
 
@@ -288,7 +289,7 @@ public class X86Core extends AssemblerModule {
                 break;
             case EC_ADDR:
                 ind = getInd(0);
-                stream.writeADC(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                stream.writeADC(operandSize, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
             default:
                 reportAddressingError(ADC_ISN, addr);
@@ -314,7 +315,7 @@ public class X86Core extends AssemblerModule {
                 break;
             case EC_ADDR:
                 ind = getInd(0);
-                stream.writeADD(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                stream.writeADD(operandSize, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
             default:
                 reportAddressingError(ADD_ISN, addr);
@@ -340,7 +341,7 @@ public class X86Core extends AssemblerModule {
                 break;
             case EC_ADDR:
                 ind = getInd(0);
-                stream.writeAND(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                stream.writeAND(operandSize, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
             default:
                 reportAddressingError(AND_ISN, addr);
@@ -366,7 +367,7 @@ public class X86Core extends AssemblerModule {
                 break;
             case EC_ADDR:
                 ind = getInd(0);
-                stream.writeCMP_Const(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                stream.writeCMP_Const(operandSize, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
             default:
                 reportAddressingError(CMP_ISN, addr);
@@ -381,7 +382,7 @@ public class X86Core extends AssemblerModule {
                 break;
             case E_ADDR:
                 Indirect ind = getInd(0);
-                stream.writeDEC(X86Constants.BITS32, getRegister(ind.reg), ind.disp);
+                stream.writeDEC(operandSize, getRegister(ind.reg), ind.disp);
                 break;
             default:
                 reportAddressingError(DEC_ISN, addr);
@@ -396,7 +397,7 @@ public class X86Core extends AssemblerModule {
                 break;
             case E_ADDR:
                 Indirect ind = getInd(0);
-                stream.writeINC(X86Constants.BITS32, getRegister(ind.reg), ind.disp);
+                stream.writeINC(operandSize, getRegister(ind.reg), ind.disp);
                 break;
             default:
                 reportAddressingError(INC_ISN, addr);
@@ -471,22 +472,22 @@ public class X86Core extends AssemblerModule {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
-                stream.writeMOV(X86Constants.BITS32, getReg(0), getReg(1));
+                stream.writeMOV(operandSize, getReg(0), getReg(1));
                 break;
             case RC_ADDR:
                 stream.writeMOV_Const(getReg(0), getInt(1));
                 break;
             case RE_ADDR:
                 Indirect ind = getInd(1);
-                stream.writeMOV(X86Constants.BITS32, getReg(0), getRegister(ind.reg), ind.disp);
+                stream.writeMOV(operandSize, getReg(0), getRegister(ind.reg), ind.disp);
                 break;
             case ER_ADDR:
                 ind = getInd(0);
-                stream.writeMOV(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getReg(1));
+                stream.writeMOV(operandSize, getRegister(ind.reg), ind.disp, getReg(1));
                 break;
             case EC_ADDR:
                 ind = getInd(0);
-                stream.writeMOV_Const(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                stream.writeMOV_Const(operandSize, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
             default:
                 reportAddressingError(MOV_ISN, addr);
@@ -501,7 +502,7 @@ public class X86Core extends AssemblerModule {
                 break;
             case E_ADDR:
                 Indirect ind = getInd(0);
-                stream.writeNEG(X86Constants.BITS32, getRegister(ind.reg), ind.disp);
+                stream.writeNEG(operandSize, getRegister(ind.reg), ind.disp);
                 break;
             default:
                 reportAddressingError(NEG_ISN, addr);
@@ -531,7 +532,7 @@ public class X86Core extends AssemblerModule {
                 break;
             case EC_ADDR:
                 ind = getInd(0);
-                stream.writeOR(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                stream.writeOR(operandSize, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
             default:
                 reportAddressingError(OR_ISN, addr);
@@ -601,7 +602,7 @@ public class X86Core extends AssemblerModule {
                 break;
             case EC_ADDR:
                 Indirect ind = getInd(0);
-                stream.writeSHL(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                stream.writeSHL(operandSize, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
             default:
                 reportAddressingError(SHL_ISN, addr);
@@ -616,7 +617,7 @@ public class X86Core extends AssemblerModule {
                 break;
             case EC_ADDR:
                 Indirect ind = getInd(0);
-                stream.writeSHR(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                stream.writeSHR(operandSize, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
             default:
                 reportAddressingError(SHR_ISN, addr);
@@ -642,7 +643,7 @@ public class X86Core extends AssemblerModule {
                 break;
             case EC_ADDR:
                 ind = getInd(0);
-                stream.writeSUB(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                stream.writeSUB(operandSize, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
             default:
                 reportAddressingError(SUB_ISN, addr);
@@ -660,7 +661,7 @@ public class X86Core extends AssemblerModule {
                 break;
             case EC_ADDR:
                 Indirect ind = getInd(0);
-                stream.writeTEST(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                stream.writeTEST(operandSize, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
             default:
                 reportAddressingError(TEST_ISN, addr);
@@ -701,7 +702,7 @@ public class X86Core extends AssemblerModule {
                 break;
             case EC_ADDR:
                 ind = getInd(0);
-                stream.writeXOR(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                stream.writeXOR(operandSize, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
             default:
                 reportAddressingError(XOR_ISN, addr);

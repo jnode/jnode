@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class Instruction {
     private int lineNumber;
+    private String sizeInfo;
     private String label;
     private String mnemonic;
     private List operands;
@@ -50,5 +51,13 @@ public class Instruction {
 
     public void setLineNumber(int lineNumber) {
         this.lineNumber = lineNumber;
+    }
+
+    public String getSizeInfo() {
+        return sizeInfo;
+    }
+
+    public void setSizeInfo(String sizeInfo) {
+        this.sizeInfo = sizeInfo;
     }
 }

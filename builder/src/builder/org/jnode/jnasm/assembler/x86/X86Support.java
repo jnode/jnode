@@ -60,7 +60,7 @@ public class X86Support extends HardwareSupport {
             String mnemo = ins.getMnemonic();
             if (mnemo != null) {
                 try{
-                    emmit(ins.getMnemonic(), ins.getOperands());
+                    emmit(ins.getMnemonic(), ins.getOperands(), getOperandSize(ins));
                 }catch(IllegalArgumentException x){
                     if(Assembler.THROW){
                         throw x;
@@ -91,12 +91,29 @@ public class X86Support extends HardwareSupport {
         }
     }
 
-    private void emmit(String mnemonic, List operands) {
+    private void emmit(String mnemonic, List operands, int operandSize) {
         for (int i = 0; i < modules.size(); i++) {
-            if (((AssemblerModule) modules.get(i)).emmit(mnemonic, operands)) {
+            if (((AssemblerModule) modules.get(i)).emmit(mnemonic, operands, operandSize)) {
                 return;
             }
         }
         throw new IllegalArgumentException("Unknown instruction: " + mnemonic);
+    }
+
+    public static int getOperandSize(Instruction ins){
+        String size = ins.getSizeInfo();
+        if(size == null){
+            return X86Constants.BITS32;
+        } else if("byte".equals(size)) {
+            return X86Constants.BITS8;
+        } else if("word".equals(size)) {
+            return X86Constants.BITS16;
+        } else if("dword".equals(size)){
+            return X86Constants.BITS32;
+        } else if("qword".equals(size)) {
+            return X86Constants.BITS64;
+        } else {
+            throw new IllegalArgumentException("Unknown operand size: " + size);
+        }
     }
 }
