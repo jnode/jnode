@@ -1,8 +1,16 @@
+/*
+ * $Id$
+ */
+
 package org.jnode.test.net;
 
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+
+/**
+ * @author Martin Hartvig
+ */
 
 public class DnsTest
 {

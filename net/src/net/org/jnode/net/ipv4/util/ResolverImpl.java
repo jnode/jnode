@@ -13,6 +13,10 @@ import java.net.UnknownHostException;
 import java.util.Hashtable;
 import java.util.Iterator;
 
+/**
+ * @author Martin Hartvig
+ */
+
 public class ResolverImpl implements Resolver
 {
   private static ExtendedResolver resolver;
