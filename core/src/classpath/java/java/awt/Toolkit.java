@@ -371,7 +371,7 @@ public abstract class Toolkit
    * should override this method and provide real system colors for the
    * native GUI platform.
    *
-   * @param colors The array to copy the system colors into.
+   * @param systemColors The array to copy the system colors into.
    *               It must be at least 26 elements.
    *
    * @exception HeadlessException If GraphicsEnvironment.isHeadless() is true.
@@ -518,7 +518,7 @@ public abstract class Toolkit
                                              default_toolkit_name);
     try
       {
-        Class cls = Class.forName(toolkit_name);//sometimes this fails and I have to use the ContextClassLoader instead.
+        Class cls = Class.forName(toolkit_name);
 			Object obj = cls.newInstance();
 			if (!(obj instanceof Toolkit))
           throw new AWTError(toolkit_name + " is not a subclass of " +

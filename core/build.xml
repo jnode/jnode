@@ -33,6 +33,9 @@
 			<fileset dir="${basedir}/descriptors" />
 			<filterset refid="descriptors-filter" />
 		</copy>
+		<copy todir="${my-classes.dir}">
+			<fileset dir="${my-src.dir}/classpath/gnu" includes="**/*.properties" />
+		</copy>
 		<ExpandTest classname="PrimitiveIntTest" type="int" />
 		<ExpandTest classname="PrimitiveLongTest" type="long" />
 		<ExpandTest classname="PrimitiveFloatTest" type="float" />
