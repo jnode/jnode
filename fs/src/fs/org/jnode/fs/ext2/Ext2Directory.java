@@ -23,32 +23,26 @@ public class Ext2Directory implements FSDirectory {
 	boolean valid;
 	private Ext2FileSystem fs;
 	private final Logger log = Logger.getLogger(getClass());
-	private int mode;		//RO or RW mode can be set for the filesystem, but can be overridden for the
-							//directory, as writing hash indexed directories is not yet supported
-		
+	private boolean readOnly;
+			
 	public Ext2Directory(INode iNode, Ext2FileSystem fs) {
 		this.iNode=iNode;
 		valid=true;
 		this.fs = fs;
 		log.setLevel(Level.DEBUG);
 		if((iNode.getFlags() & Ext2Constants.EXT2_INDEX_FL)== 1)
-			mode = Ext2FileSystem.RO;		//force readonly
+			readOnly = true;		//force readonly
 		else
-			mode = fs.getMode();
+			readOnly = fs.isReadOnly();
 		
 		log.debug("directory size: "+iNode.getSize());
-	}
-	
-	private int getMode() {
-		return mode;
-		//return fs.getMode();
 	}
 	
 	/**
 	 * @see org.jnode.fs.FSDirectory#addDirectory(String)
 	 */
 	public FSEntry addDirectory(String name) throws IOException {
-		if(getMode()==Ext2FileSystem.RO)
+		if(isReadOnly())
 			throw new IOException("Filesystem or directory is mounted read-only!");
 			 
 		//create a new iNode for the file
@@ -77,7 +71,7 @@ public class Ext2Directory implements FSDirectory {
 	 * @see org.jnode.fs.FSDirectory#addFile(String)
 	 */
 	public FSEntry addFile(String name) throws IOException {
-		if(getMode()==Ext2FileSystem.RO)
+		if(isReadOnly())
 			throw new IOException("Filesystem or directory is mounted read-only!");
 			
 		//create a new iNode for the file
@@ -257,7 +251,7 @@ public class Ext2Directory implements FSDirectory {
 	 * @see org.jnode.fs.FSDirectory#remove(String)
 	 */
 	public void remove(String name) throws IOException {
-		if(getMode()==Ext2FileSystem.RO)
+		if(isReadOnly())
 			throw new IOException("Filesystem or directory is mounted read-only!");
 		throw new IOException("remove not yet implemented");
 	}
@@ -274,5 +268,9 @@ public class Ext2Directory implements FSDirectory {
 	 */
 	public boolean isValid() {
 		return valid;
+	}
+
+	private boolean isReadOnly() {
+		return readOnly;
 	}
 }
