@@ -15,6 +15,7 @@ import org.jnode.shell.help.OptionArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
+import org.jnode.driver.input.KeyboardInterpreterFactory;
 
 /**
  * @author Marc DENTY
@@ -56,8 +57,6 @@ public class LoadkeysCommand {
 	 * Execute this command
 	 */
 	protected void execute(String[] args, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		String classI10N = "org.jnode.driver.input.l10n.KeyboardInterpreter_";
-		
 		DeviceManager dm = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);
 		Device kb = dm.getDevice(PS2_KEYBOARD_DEV);
 		KeyboardAPI api = (KeyboardAPI)kb.getAPI(KeyboardAPI.class);
@@ -68,27 +67,10 @@ public class LoadkeysCommand {
 			return;
 		}
 		
-		String country = COUNTRY.getValue(cmdLine).toUpperCase();
+		String country = COUNTRY.getValue(cmdLine);
 		String region = REGION.getValue(cmdLine);
-		if(region != null) {
-			region = region.toLowerCase();
-		}
-		
-		out.print("Searching for "+country+ (region==null ? "":"_"+region) +"...");
-		KeyboardInterpreter interpreter = null;
-		try {
-			ClassLoader cl = Thread.currentThread().getContextClassLoader();
-			if(region == null) {
-				interpreter = (KeyboardInterpreter)cl.loadClass(classI10N+country).newInstance();
-			} else {
-				interpreter = (KeyboardInterpreter)cl.loadClass(classI10N+country+"_"+region).newInstance();
-			}
-		} catch (ClassNotFoundException e) {
-			err.println(" Failed, not found");
-			e.printStackTrace(err);
-		}
-		
-		api.setKbInterpreter(interpreter);
+
+		api.setKbInterpreter(KeyboardInterpreterFactory.getKeyboardInterpreter(country, region));
 		out.println(" Done.");
 	}
 }
