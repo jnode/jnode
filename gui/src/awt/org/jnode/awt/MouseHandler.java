@@ -63,7 +63,7 @@ public class MouseHandler implements PointerListener {
 		this.pointerAPI = pointerAPI;
 		this.screenSize = screenSize;
 		if (pointerAPI != null) {
-			log.info("Using PointerDevice " + pointerDevice.getId());
+			log.debug("Using PointerDevice " + pointerDevice.getId());
             hwCursor.setCursorImage(JNodeCursors.ARROW);
 			hwCursor.setCursorVisible(true);
 			hwCursor.setCursorPosition(x, y);
