@@ -37,9 +37,13 @@ exception statement from your version. */
 
 package java.awt;
 
+import gnu.java.awt.ClasspathToolkit;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
+import java.awt.event.InputMethodEvent;
 import java.awt.event.InvocationEvent;
+import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.EmptyStackException;
 
@@ -71,6 +75,35 @@ public class EventQueue
   private long lastWhen = System.currentTimeMillis();
 
 	private EventDispatchThread dispatchThread = new EventDispatchThread(this);
+  private boolean shutdown = false;
+
+  private long lastNativeQueueAccess = 0;
+  private long humanLatencyThreshold = 100;
+
+  synchronized void setShutdown (boolean b) 
+  {
+    shutdown = b;
+  }
+
+  synchronized boolean isShutdown ()
+  {
+    if (shutdown)
+      return true;
+
+    // This is the exact self-shutdown condition specified in J2SE:
+    // http://java.sun.com/j2se/1.4.2/docs/api/java/awt/doc-files/AWTThreadIssues.html
+    
+    if (peekEvent() == null
+        && ((ClasspathToolkit) Toolkit.getDefaultToolkit()).nativeQueueEmpty())
+      {
+        Frame[] frames = Frame.getFrames();
+        for (int i = 0; i < frames.length; ++i)
+          if (frames[i].isDisplayable())
+            return false;
+        return true;
+      }
+    return false;
+  }
 
 	/**
 	 * Initializes a new instance of <code>EventQueue</code>.
@@ -88,21 +121,54 @@ public class EventQueue
 	 * @exception InterruptedException If this thread is interrupted while
 	 * waiting for an event to be posted to the queue.
 	 */
-  public synchronized AWTEvent getNextEvent()
-    throws InterruptedException
-  {
-		if (next != null)
-			return next.getNextEvent();
+  public synchronized AWTEvent getNextEvent() throws InterruptedException {
+        if (next != null)
+            return next.getNextEvent();
 
-		while (next_in == next_out)
-			wait();
+        ClasspathToolkit tk = ((ClasspathToolkit) Toolkit.getDefaultToolkit());
+        long curr = System.currentTimeMillis();
 
-		AWTEvent res = queue[next_out];
+        if (!tk.nativeQueueEmpty()
+                && (curr - lastNativeQueueAccess > humanLatencyThreshold)) {
+            tk.iterateNativeQueue(this, false);
+            lastNativeQueueAccess = curr;
+        }
 
-		if (++next_out == queue.length)
-			next_out = 0;
-		return res;
-	}
+        while (next_in == next_out) {
+            // Only the EventDispatchThread associated with the top of the stack
+            // is
+            // allowed to get events from the native source; everyone else just
+            // waits on the head of the queue.
+
+            if (isDispatchThread()) {
+                // We are not allowed to return null from this method, yet it
+                // is possible that we actually have run out of native events
+                // in the enclosing while() loop, and none of the native events
+                // happened to cause AWT events. We therefore ought to check
+                // the isShutdown() condition here, before risking a "native
+                // wait". If we check it before entering this function we may
+                // wait forever for events after the shutdown condition has
+                // arisen.
+
+                if (isShutdown())
+                    throw new InterruptedException();
+
+                tk.iterateNativeQueue(this, true);
+                lastNativeQueueAccess = System.currentTimeMillis();
+            } else {
+                try {
+                    wait();
+                } catch (InterruptedException ie) {
+                }
+            }
+        }
+
+        AWTEvent res = queue[next_out];
+
+        if (++next_out == queue.length)
+            next_out = 0;
+        return res;
+    }
 
 	/**
 	 * Returns the next event in the queue without removing it from the queue.
@@ -159,64 +225,78 @@ public class EventQueue
 	 *
 	 * @exception NullPointerException If event is null.
 	 */
-  public synchronized void postEvent(AWTEvent evt)
-  {
-    if (evt == null)
-      throw new NullPointerException();
+  public synchronized void postEvent(AWTEvent evt) {
+        if (evt == null)
+            throw new NullPointerException();
 
-    if (next != null)
-      {
-			next.postEvent(evt);
-			return;
-		}
+        if (next != null) {
+            next.postEvent(evt);
+            return;
+        }
 
-		/* Check for any events already on the queue with the same source 
-		   and ID. */
-		int i = next_out;
-    while (i != next_in)
-      {
-			AWTEvent qevt = queue[i];
-			Object src;
-        if (qevt.id == evt.id
-            && (src = qevt.getSource()) == evt.getSource()
-            && src instanceof Component)
-          {
-				/* If there are, call coalesceEvents on the source component 
-				   to see if they can be combined. */
-				Component srccmp = (Component) src;
-				AWTEvent coalesced_evt = srccmp.coalesceEvents(qevt, evt);
-            if (coalesced_evt != null)
-              {
-					/* Yes. Replace the existing event with the combined event. */
-					queue[i] = coalesced_evt;
-					return;
-				}
-				break;
-			}
-			if (++i == queue.length)
-				i = 0;
-		}
+        /*
+         * Check for any events already on the queue with the same source and
+         * ID.
+         */
+        int i = next_out;
+        while (i != next_in) {
+            AWTEvent qevt = queue[i];
+            Object src;
+            if (qevt.id == evt.id
+                    && (src = qevt.getSource()) == evt.getSource()
+                    && src instanceof Component) {
+                /*
+                 * If there are, call coalesceEvents on the source component to
+                 * see if they can be combined.
+                 */
+                Component srccmp = (Component) src;
+                AWTEvent coalesced_evt = srccmp.coalesceEvents(qevt, evt);
+                if (coalesced_evt != null) {
+                    /* Yes. Replace the existing event with the combined event. */
+                    queue[i] = coalesced_evt;
+                    return;
+                }
+                break;
+            }
+            if (++i == queue.length)
+                i = 0;
+        }
 
-		queue[next_in] = evt;
-		if (++next_in == queue.length)
-			next_in = 0;
+        queue[next_in] = evt;
+        if (++next_in == queue.length)
+            next_in = 0;
 
-    if (next_in == next_out)
-      {
-			/* Queue is full. Extend it. */
-			AWTEvent[] oldQueue = queue;
-			queue = new AWTEvent[queue.length * 2];
+        if (next_in == next_out) {
+            /* Queue is full. Extend it. */
+            AWTEvent[] oldQueue = queue;
+            queue = new AWTEvent[queue.length * 2];
 
-			int len = oldQueue.length - next_out;
-			System.arraycopy(oldQueue, next_out, queue, 0, len);
-			if (next_out != 0)
-				System.arraycopy(oldQueue, 0, queue, len, next_out);
+            int len = oldQueue.length - next_out;
+            System.arraycopy(oldQueue, next_out, queue, 0, len);
+            if (next_out != 0)
+                System.arraycopy(oldQueue, 0, queue, len, next_out);
 
-			next_out = 0;
-			next_in = oldQueue.length;
-		}
-		notify();
-	}
+            next_out = 0;
+            next_in = oldQueue.length;
+        }
+
+        if (dispatchThread == null || !dispatchThread.isAlive()) {
+            System.out
+                    .println("Start new dispatchThread old=" + dispatchThread);
+            dispatchThread = new EventDispatchThread(this);
+            dispatchThread.start();
+        }
+
+        // Window events might represent the closing of a window, which
+        // might cause the end of the dispatch thread's life, so we'll wake
+        // it up here to give it a chance to check for shutdown.
+
+        if (!isDispatchThread() || (evt.getID() == WindowEvent.WINDOW_CLOSED)
+                || (evt.getID() == WindowEvent.WINDOW_CLOSING))
+            ((ClasspathToolkit) Toolkit.getDefaultToolkit()).wakeNativeQueue();
+
+        notify();
+    }
 
 	/**
 	 * Causes runnable to have its run method called in the dispatch thread of the
@@ -386,9 +466,10 @@ public class EventQueue
 	    next_in = 0;
 	    next_out = 0;
 
-            // Tell our EventDispatchThread that it can end execution
-            dispatchThread.interrupt ();
+            ((ClasspathToolkit) Toolkit.getDefaultToolkit()).wakeNativeQueue();
+            setShutdown(true);
 	    dispatchThread = null;
+            this.notifyAll();
           }
 		}
 	}
