@@ -117,4 +117,5 @@
   <plugin id="org.jnode.test.net"/>
 
   <plugin id="crypto-security"/>
+  <plugin id="com.jcraft.jsch"/>
 </plugin-list>
