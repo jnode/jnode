@@ -8,18 +8,18 @@ package org.jnode.driver.net.lance;
  */
 public interface LanceConstants {
 
-	//	I/O port offsets from iobase.
+	// Word I/O port offsets from iobase.
 	public static final int R_ETH_ADDR_OFFSET = 0x00;
-	public static final int RW_RDATA_OFFSET = 0x10; // Register data (RDP)
-	public static final int RW_ADDR_OFFSET = 0x12; // RAP
-	public static final int RW_RESET_OFFSET = 0x14; // RESET
-	public static final int RW_BDATA_OFFSET = 0x16; // Bus data (BDP)
+	public static final int WIO_RDP = 0x10; // Register data (RDP)
+	public static final int WIO_RAP = 0x12; // RAP
+	public static final int WIO_RESET = 0x14; // RESET
+	public static final int WIO_BDP = 0x16; // Bus data (BDP)
 
-	// I/O port offsets from iobase.
-	public static final int RDW_RDATA_OFFSET = 0x10; // Register data (RDP)
-	public static final int RDW_ADDR_OFFSET = 0x14; // RAP
-	public static final int RDW_RESET_OFFSET = 0x18; // RESET
-	public static final int RDW_BDATA_OFFSET = 0x1c; // Bus data (BDP) 
+	// Double Word I/O port offsets from iobase.
+	public static final int DWIO_RDP = 0x10; // Register data (RDP)
+	public static final int DWIO_RAP = 0x14; // RAP
+	public static final int DWIO_RESET = 0x18; // RESET
+	public static final int DWIO_BDP = 0x1c; // Bus data (BDP)
 
 	// CSR0 bits
 	public static final int CSR0_INIT = 0x0001;
@@ -70,6 +70,24 @@ public interface LanceConstants {
 	public static final int CSR4_DMAPLUS = 0x4000;
 	public static final int CSR4_EN124 = 0x8000;
 
+	// CSR5 bits
+	public static final int CSR5_SPND = 0x0001;
+	public static final int CSR5_MPMODE = 0x0002;
+	public static final int CSR5_MPEN = 0x0004;
+	public static final int CSR5_MPINTE = 0x0008;
+	public static final int CSR5_MPINT = 0x0010;
+	public static final int CSR5_MPPLBA = 0x0020;
+	public static final int CSR5_EXDINTE = 0x0040;
+	public static final int CSR5_EXDINT = 0x0080;
+	public static final int CSR5_SLPINTE = 0x0100;
+	public static final int CSR5_SLPINT = 0x0200;
+	public static final int CSR5_SINTE = 0x0400;
+	public static final int CSR5_SINT = 0x0800;
+	//public static final int CSR5_RES = 0x1000;
+	//public static final int CSR5_RES = 0x2000;
+	public static final int CSR5_LTINTEN = 0x4000;
+	public static final int CSR5_TOKINTD = 0x8000;
+
 	// CSR15 bits
 	public static final int CSR15_DRX = 0x0001;
 	public static final int CSR15_DTX = 0x0002;
@@ -90,4 +108,7 @@ public interface LanceConstants {
 	public static final int BCR2_INTLEVEL = 0x0080;
 	public static final int BCR2_APROMWE = 0x0100;
 	public static final int BCR2_TMAULOOP = 0x4000;
+	
+	// BCR9 bits
+	public static final int BCR9_FDEN = 0x0001;
 }
