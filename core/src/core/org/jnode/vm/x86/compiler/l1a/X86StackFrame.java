@@ -285,13 +285,13 @@ class X86StackFrame implements X86CompilerConstants {
 	public final int getEbpOffset(TypeSizeInfo typeSizeInfo, int index) {
 		final int noArgs = method.getArgSlotCount();
 		final int stackSlot = Signature.getStackSlotForJavaArgNumber(typeSizeInfo, method, index);
-		if (index < noArgs) {
+		if (stackSlot < noArgs) {
 			// Index refers to a method argument
-			return ((noArgs - index + 1) * slotSize) + EbpFrameRefOffset
+			return ((noArgs - stackSlot + 1) * slotSize) + EbpFrameRefOffset
 					+ SAVED_REGISTERSPACE;
 		} else {
 			// Index refers to a local variable
-			return (index - noArgs + 1) * -slotSize;
+			return (stackSlot - noArgs + 1) * -slotSize;
 		}
 	}
 
@@ -303,7 +303,11 @@ class X86StackFrame implements X86CompilerConstants {
 	 * @return int
 	 */
 	public final int getWideEbpOffset(TypeSizeInfo typeSizeInfo, int index) {
-		return getEbpOffset(typeSizeInfo, index + 1);
+        if (os.isCode32()) {
+            return getEbpOffset(typeSizeInfo, index + 1);
+        } else {
+            return getEbpOffset(typeSizeInfo, index);            
+        }
 	}
 
 	private void emitSynchronizationCode(TypeSizeInfo typeSizeInfo, VmMethod monitorMethod) {
