@@ -1254,12 +1254,23 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 			GPR srcReg);
 
 	/**
-	 * Create a mov <reg>, <imm32>
+	 * Create a MOV reg,imm32 or MOV reg,imm64 depending on the reg size.
 	 * 
-	 * @param destReg
+	 * @param dstReg
 	 * @param imm32
 	 */
-	public abstract void writeMOV_Const(GPR destReg, int imm32);
+	public abstract void writeMOV_Const(GPR dstReg, int imm32);
+
+    /**
+     * Create a MOV reg,imm64 depending on the reg size.
+     * Only valid in 64-bit mode.
+     * 
+     * @param dstReg
+     * @param imm64
+     * @throws InvalidOpcodeException In 32-bit modes.
+     */
+    public abstract void writeMOV_Const(GPR dstReg, long imm64)
+    throws InvalidOpcodeException;
 
 	/**
 	 * Create a mov size [destReg+destDisp], imm32
@@ -2019,4 +2030,17 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 			throw new IllegalArgumentException("Invalid operand size " + operandSize);
 		}
 	}
+
+    /**
+     * Test for a valid size of the given register.
+     * 
+     * @param reg The register to test
+     * @param allowedMask The allowed sizes.
+     */
+    protected final void testSize(X86Register reg, int allowedMask) {
+        final int size = reg.getSize();
+        if ((size & allowedMask) != size) {
+            throw new IllegalArgumentException("Invalid register size " + size);
+        }
+    }
 }
