@@ -25,12 +25,14 @@ import java.io.InputStream;
 import java.io.PrintStream;
 
 import org.jnode.shell.CommandLine;
+import org.jnode.shell.Command;
 import org.jnode.shell.help.Help;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class MemoryCommand {
+public class MemoryCommand implements Command
+{
 
 	public static Help.Info HELP_INFO = new Help.Info("memory", "View the current memory status");
 
