@@ -354,7 +354,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      * @return boolean
      */
     public final boolean isReturnVoid() {
-        return (signature.endsWith("V"));
+        return (signature.charAt(signature.length() - 1) == 'V');
     }
 
     /**
