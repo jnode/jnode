@@ -110,7 +110,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			/* Now create the processor */
 			final VmProcessor proc = createProcessor();
 			final VmArchitecture arch = proc.getArchitecture();
-
+			log("Building for " + proc.getCPUID());
+			
 			clsMgr = new VmClassLoader(classesURL, proc.getArchitecture());
 			final NativeStream os = createNativeStream();
 			final Object clInitCaller = new Label("$$clInitCaller");

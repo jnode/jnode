@@ -204,6 +204,7 @@
                pluginList="${plugin-list}"
                pluginDir="${my-build.dir}/plugins"
 	           targetArch="x86"
+	           cpu="${cpu}"
                />
     <!-- classesURL="file:///${classes.dir}/" -->
 

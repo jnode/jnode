@@ -36,7 +36,9 @@ import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmMethodCode;
 import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.x86.VmX86Architecture;
 import org.jnode.vm.x86.VmX86Processor;
+import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
@@ -45,10 +47,11 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 public class BootImageBuilder extends AbstractBootImageBuilder implements X86CompilerConstants {
 
 	public static final int LOAD_ADDR = 1024 * 1024;
-	private static final VmX86Processor processor = new VmX86Processor(0);
+	private VmX86Processor processor;
+	private String processorId;
 
 	/** The offset in our (java) image file to the initial jump to our main-method */
-	public static final int JUMP_MAIN_OFFSET = ObjectLayout.objectAlign((ObjectLayout.HEADER_SLOTS + 1) * processor.getArchitecture().getReferenceSize());
+	public static final int JUMP_MAIN_OFFSET = ObjectLayout.objectAlign((ObjectLayout.HEADER_SLOTS + 1) * VmX86Architecture.SLOT_SIZE);
 
 	public static final int INITIALIZE_METHOD_OFFSET = 8;
 
@@ -69,18 +72,23 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 
 	/**
 	 * Create a platform specific native stream.
+	 * 
 	 * @return The native stream
 	 */
 	protected NativeStream createNativeStream() {
-		return new X86Stream(LOAD_ADDR, 64 * 1024, 16 * 1024 * 1024);
+		return new X86Stream((X86CpuID) createProcessor().getCPUID(), LOAD_ADDR, 64 * 1024, 16 * 1024 * 1024);
 	}
 
 	/**
 	 * Create the default processor for this architecture.
+	 * 
 	 * @return The processor
 	 * @throws BuildException
 	 */
 	protected VmProcessor createProcessor() throws BuildException {
+		if (processor == null) {
+			processor = new VmX86Processor(0, X86CpuID.createID(processorId));
+		}
 		return processor;
 	}
 
@@ -230,8 +238,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		os.getObjectRef(vmCurrentTimeMillis).link(refJava);
 
 		/* Link vm_findThrowableHandler */
-		refJava =
-			os.getObjectRef(vmSystemClass.getMethod("findThrowableHandler", "(Ljava/lang/Throwable;Lorg/jnode/vm/Address;Lorg/jnode/vm/Address;)Lorg/jnode/vm/Address;"));
+		refJava = os.getObjectRef(vmSystemClass.getMethod("findThrowableHandler", "(Ljava/lang/Throwable;Lorg/jnode/vm/Address;Lorg/jnode/vm/Address;)Lorg/jnode/vm/Address;"));
 		os.getObjectRef(vmFindThrowableHandler).link(refJava);
 
 		/* Link MonitorManager_monitorEnter */
@@ -481,7 +488,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		os.set32(mb_hdr + MB_LOAD_END_ADDR, (int) os.getBaseAddr() + os.getLength());
 		os.set32(mb_hdr + MB_BSS_END_ADDR, (int) os.getBaseAddr() + os.getLength());
 	}
-	
+
 	/**
 	 * Setup the boot classes
 	 */
@@ -492,4 +499,19 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		add(new BootClassInfo("org.jnode.vm.compiler.x86", true, nonCore));
 		add(new BootClassInfo("org.jnode.vm.x86", true, core));
 	}
+	
+	/**
+	 * @return Returns the processorId.
+	 */
+	public final String getCpu() {
+		return this.processorId;
+	}
+
+	/**
+	 * @param processorId The processorId to set.
+	 */
+	public final void setCpu(String processorId) {
+		this.processorId = processorId;
+	}
+
 }
