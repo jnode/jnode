@@ -35,14 +35,20 @@ public class ApplicationBar extends JPanel {
 
 	final void startApp(final String name, final String className) {
 		try {
-			final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-			final Class cls = cl.loadClass(className);
-			final Method main = cls.getMethod("main", mainTypes);
 			final Runnable runner = new Runnable() {
 				public void run() {
 					try {
+						final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+						final Class cls = cl.loadClass(className);
+						final Method main = cls.getMethod("main", mainTypes);
 						final Object[] args = { new String[0] };
 						main.invoke(null, args);					
+					} catch (SecurityException ex) {
+						log.error("Security exception in starting class " + className, ex);
+					} catch (ClassNotFoundException ex) {
+						log.error("Cannot find class " + className);
+					} catch (NoSuchMethodException ex) {
+						log.error("Cannot find main method in " + className);
 					} catch (IllegalAccessException ex) {
 						log.error("Cannot access main method in " + className);
 					} catch (InvocationTargetException ex) {
@@ -52,12 +58,8 @@ public class ApplicationBar extends JPanel {
 			};
 			final Thread t = new Thread(runner);
 			t.start();
-		} catch (ClassNotFoundException ex) {
-			log.error("Cannot find class " + className);
 		} catch (SecurityException ex) {
 			log.error("Security exception in starting class " + className, ex);
-		} catch (NoSuchMethodException ex) {
-			log.error("Cannot find main method in " + className);
 		}
 	}
 
