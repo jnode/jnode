@@ -67,8 +67,8 @@ public class JRadioButton extends JToggleButton
     public JRadioButton(String text, Icon icon)
     {
 	super(text, icon);
-        paint_border = false;
-        content_area_filled = false;
+        borderPainted = false;
+        contentAreaFilled = false;
     }
 
     
@@ -80,7 +80,8 @@ public class JRadioButton extends JToggleButton
   
     public String getUIClassID()
     {
-	//Returns a string that specifies the name of the L&F class that renders this component.  
+	//Returns a string that specifies the name of the Look and Feel
+	//class that renders this component.  
 	return "RadioButtonUI";
     }
   
