@@ -113,12 +113,33 @@ public class JTable extends JComponent
   /**
    * A table mapping {@link java.lang.Class} objects to 
    * {@link TableCellEditor} objects. This table is consulted by the 
-   * 
+   * FIXME
    */
   protected Hashtable defaultEditorsByColumnClass;
+
+  /**
+   * A table mapping {@link java.lang.Class} objects to 
+   * {@link TableCellEditor} objects. This table is consulted by the 
+   * FIXME
+   */
   protected Hashtable defaultRenderersByColumnClass;
+
+  /**
+   * The column that is edited, -1 if the table is not edited currently.
+   */
   protected int editingColumn;
+
+  /**
+   * The row that is edited, -1 if the table is not edited currently.
+   */
   protected int editingRow;
+
+  /**
+   * The component that is used for editing.
+   * <code>null</code> if the table is not editing currently.
+   *
+   */
+  protected transient Component editorComp;
 
   /**
    * Whether or not the table should automatically compute a matching
@@ -163,8 +184,8 @@ public class JTable extends JComponent
    * 
    * @see #setRowMargin()
    * @see #getRowHeight()
-   * @see #getInterCellSpacing()
-   * @see #setInterCellSpacing()
+   * @see #getIntercellSpacing()
+   * @see #setIntercellSpacing()
    * @see TableColumnModel#getColumnMargin()
    * @see TableColumnModel#setColumnMargin()
    */
@@ -285,7 +306,7 @@ public class JTable extends JComponent
    * @see #setSelectionBackground()
    * @see #getSelectionBackground()
    */
-  Color selectionBackground;
+  protected Color selectionBackground;
 
   /**
    * The name carried in property change events when the {@link
@@ -301,7 +322,7 @@ public class JTable extends JComponent
    * @see #setSelectionForeground()
    * @see #getSelectionForeground()
    */
-  Color selectionForeground;
+  protected Color selectionForeground;
 
   /**
    * The name carried in property change events when the
@@ -386,11 +407,17 @@ public class JTable extends JComponent
   public JTable (TableModel dm, TableColumnModel cm, ListSelectionModel sm)
   {
     this.dataModel = dm == null ? createDefaultDataModel() : dm;
-    setSelectionModel(sm == null ? createDefaultListSelectionModel() : sm);
+    setSelectionModel(sm == null ? createDefaultSelectionModel() : sm);
 
     this.columnModel = cm;
+    initializeLocalVars();
+    updateUI();
+  }    
+
+  protected void initializeLocalVars()
+  {
     this.autoCreateColumnsFromModel = false;
-    if (cm == null)
+    if (columnModel == null)
       {
         this.autoCreateColumnsFromModel = true;
         createColumnsFromModel();
@@ -398,7 +425,10 @@ public class JTable extends JComponent
     this.columnModel.addColumnModelListener(this);
     
     this.defaultRenderersByColumnClass = new Hashtable();
+    createDefaultRenderers();
+
     this.defaultEditorsByColumnClass = new Hashtable();
+    createDefaultEditors();
 
     this.autoResizeMode = AUTO_RESIZE_ALL_COLUMNS;
     this.rowHeight = 16;
@@ -410,9 +440,10 @@ public class JTable extends JComponent
     this.preferredScrollableViewportSize = new Dimension(450,400);
     this.showHorizontalLines = true;
     this.showVerticalLines = true;
-    setInterCellSpacing(new Dimension(1,1));
-    setTableHeader(new JTableHeader(columnModel));
-    updateUI();
+    this.editingColumn = -1;
+    this.editingRow = -1;
+    setIntercellSpacing(new Dimension(1,1));
+    setTableHeader(createDefaultTableHeader());
   }
 
   /**
@@ -426,6 +457,27 @@ public class JTable extends JComponent
     this(new DefaultTableModel(data, columnNames));
   }
 
+  public void addColumn(TableColumn column)
+  {
+    if (column.getHeaderValue() == null)
+      {
+	String name = getColumnName(column.getModelIndex());
+	column.setHeaderValue(name);
+      }
+    
+    columnModel.addColumn(column);
+  }
+
+  protected void createDefaultEditors()
+  {
+    //FIXME: Create the editor object.
+  }
+
+  protected void createDefaultRenderers()
+  {
+    //FIXME: Create the renderer object.
+  }
+  
   /**
    * @deprecated 1.0.2, replaced by <code>new JScrollPane(JTable)</code>
    */
@@ -444,11 +496,16 @@ public class JTable extends JComponent
     return new DefaultTableModel();
   }
 
-  protected ListSelectionModel createDefaultListSelectionModel()
+  protected ListSelectionModel createDefaultSelectionModel()
   {
     return new DefaultListSelectionModel();
   }
   
+  protected JTableHeader createDefaultTableHeader()
+  {
+    return new JTableHeader(columnModel);
+  }
+ 
   private void createColumnsFromModel()
   {
     if (dataModel == null)
@@ -656,6 +713,7 @@ public class JTable extends JComponent
       return (TableCellEditor) defaultEditorsByColumnClass.get(columnClass);
     else
   {
+	// FIXME: We have at least an editor for Object.class in our defaults.
         TableCellEditor r = new DefaultCellEditor(new JTextField());
         defaultEditorsByColumnClass.put(columnClass, r);
         return r;
@@ -673,6 +731,11 @@ public class JTable extends JComponent
       renderer = getDefaultRenderer(dataModel.getColumnClass(column));
     
     return renderer;
+  }
+
+  public void setDefaultRenderer(Class columnClass, TableCellRenderer rend)
+  {
+    defaultRenderersByColumnClass.put(columnClass, rend);
   }
 
   public TableCellRenderer getDefaultRenderer(Class columnClass)
@@ -724,7 +787,7 @@ public class JTable extends JComponent
     
     return renderer.getTableCellRendererComponent(this,
                                                   dataModel.getValueAt(row, 
-                                                                       convertColumnIndexToView(column)),
+						                       convertColumnIndexToModel(column)),
                                                   isSelected,
                                                   false, // hasFocus
                                                   row, column);
@@ -803,13 +866,13 @@ public class JTable extends JComponent
 
   /**
    * Get the value of the {@link #columnCount} property by
-   * delegation to the @{link #dataModel} field.
+   * delegation to the @{link #columnModel} field.
    *
    * @return The current value of the columnCount property
    */
   public int getColumnCount()
   {
-    return dataModel.getColumnCount();
+    return columnModel.getColumnCount();    
   }
 
   /**
@@ -998,11 +1061,11 @@ public class JTable extends JComponent
   }
 
   /**
-   * Get the value of the {@link #interCellSpacing} property.
+   * Get the value of the {@link #intercellSpacing} property.
    *
    * @return The current value of the property
    */
-  public Dimension getInterCellSpacing()
+  public Dimension getIntercellSpacing()
   {
     return new Dimension(columnModel.getColumnMargin(), rowMargin);
   }
@@ -1068,6 +1131,27 @@ public class JTable extends JComponent
   }
 
   /**
+   * Removes specified column from displayable columns of this table.
+   *
+   * @param column column to removed
+   */
+  public void removeColumn(TableColumn column)
+  {    
+    columnModel.removeColumn(column);
+  }
+
+  /**
+   * Moves column at the specified index to new given location.
+   *
+   * @param column index of the column to move
+   * @param targetColumn index specifying new location of the column
+   */ 
+  public void moveColumn(int column,int targetColumn) 
+  {
+    columnModel.moveColumn(column, targetColumn);
+  }
+
+  /**
    * Set the value of the {@link #autoCreateColumnsFromModel} property.
    *
    * @param a The new value of the autoCreateColumnsFromModel property
@@ -1096,6 +1180,9 @@ public class JTable extends JComponent
    */ 
   public void setRowHeight(int r)
   {
+    if (rowHeight < 1)
+      throw new IllegalArgumentException();
+    
     rowHeight = r;
     revalidate();
     repaint();
@@ -1292,11 +1379,11 @@ public class JTable extends JComponent
   }
 
   /**
-   * Set the value of the {@link #interCellSpacing} property.
+   * Set the value of the {@link #intercellSpacing} property.
    *
-   * @param i The new value of the interCellSpacing property
+   * @param i The new value of the intercellSpacing property
    */ 
-  public void setInterCellSpacing(Dimension i)
+  public void setIntercellSpacing(Dimension i)
   {
     rowMargin = i.height;
     columnModel.setColumnMargin(i.width);
@@ -1546,11 +1633,17 @@ public class JTable extends JComponent
       }
   }
   
+  /**
+   * @deprecated Replaced by <code>doLayout()</code>
+   */
   public void sizeColumnsToFit(boolean lastColumnOnly)
   {
     doLayout();
   }
 
+  /**
+   * Obsolete since JDK 1.4. Please use <code>doLayout()</code>.
+   */
   public void sizeColumnsToFit(int resizingColumn)
   {
     doLayout();
@@ -1588,4 +1681,126 @@ public class JTable extends JComponent
     repaint();
   }
 
+  public Class getColumnClass(int column)
+  {
+    return dataModel.getColumnClass(column);
+  }
+  
+  public String getColumnName(int column)
+  {
+    return dataModel.getColumnName(column);
+  }
+
+  public int getEditingColumn()
+  {
+    return editingColumn;
+  }
+
+  public void setEditingColumn(int column)
+  {
+    editingColumn = column;
+  }
+  
+  public int getEditingRow()
+  {
+    return editingRow;
+  }
+
+  public void setEditingRow(int column)
+  {
+    editingRow = column;
+  }
+  
+  public Component getEditorComponent()
+  {
+    return editorComp;
+  }
+  
+  public boolean isEditing()
+  {
+    return editorComp != null;
+  }
+
+  public void setDefaultEditor(Class columnClass, TableCellEditor editor)
+  {
+    if (editor != null)
+      defaultEditorsByColumnClass.put(columnClass, editor);
+    else
+      defaultEditorsByColumnClass.remove(columnClass);
+  }
+
+  public void addColumnSelectionInterval(int index0, int index1)
+  {
+    if ((index0 < 0 || index0 > (getColumnCount()-1)
+         || index1 < 0 || index1 > (getColumnCount()-1)))
+      throw new IllegalArgumentException("Column index out of range.");
+    
+    getColumnModel().getSelectionModel().addSelectionInterval(index0, index1);
+  }
+  
+  public void addRowSelectionInterval(int index0, int index1)
+  {            
+    if ((index0 < 0 || index0 > (getRowCount()-1)
+         || index1 < 0 || index1 > (getRowCount()-1)))
+      throw new IllegalArgumentException("Row index out of range.");
+      	
+    getSelectionModel().addSelectionInterval(index0, index1);
+  }
+  
+  public void setColumnSelectionInterval(int index0, int index1)
+  {
+    if ((index0 < 0 || index0 > (getColumnCount()-1)
+         || index1 < 0 || index1 > (getColumnCount()-1)))
+      throw new IllegalArgumentException("Column index out of range.");
+
+    getColumnModel().getSelectionModel().setSelectionInterval(index0, index1);
+  }
+  
+  public void setRowSelectionInterval(int index0, int index1)
+  {    
+    if ((index0 < 0 || index0 > (getRowCount()-1)
+         || index1 < 0 || index1 > (getRowCount()-1)))
+      throw new IllegalArgumentException("Row index out of range.");
+
+    getSelectionModel().setSelectionInterval(index0, index1);
+  }
+  
+  public void removeColumnSelectionInterval(int index0, int index1)  
+  {
+    if ((index0 < 0 || index0 > (getColumnCount()-1)
+         || index1 < 0 || index1 > (getColumnCount()-1)))
+      throw new IllegalArgumentException("Column index out of range.");
+
+    getColumnModel().getSelectionModel().removeSelectionInterval(index0, index1);
+  }
+  
+  public void removeRowSelectionInterval(int index0, int index1)
+  {
+    if ((index0 < 0 || index0 > (getRowCount()-1)
+         || index1 < 0 || index1 > (getRowCount()-1)))
+      throw new IllegalArgumentException("Row index out of range.");
+
+    getSelectionModel().removeSelectionInterval(index0, index1);
+  }
+  
+  public boolean isColumnSelected(int column)
+  {
+    return getColumnModel().getSelectionModel().isSelectedIndex(column);
+  }
+
+  public boolean isRowSelected(int row)
+  {
+    return getSelectionModel().isSelectedIndex(row);
+  }
+
+  public boolean isCellSelected(int row, int column)
+  {
+    return isRowSelected(row) && isColumnSelected(column);
+  }
+  
+  public void selectAll()
+  {
+    setColumnSelectionInterval(0, getColumnCount() - 1);
+    setRowSelectionInterval(0, getRowCount() - 1);
+  }
 }

@@ -1,5 +1,5 @@
 /* DefaultMutableTreeNode.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package javax.swing.tree;
 
+import gnu.java.util.EmptyEnumeration;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -50,26 +52,24 @@ import java.util.Vector;
 
 /**
  * DefaultMutableTreeNode
+ *
  * @author Andrew Selkirk
  */
 public class DefaultMutableTreeNode
   implements Cloneable, MutableTreeNode, Serializable
 {
-  static final long serialVersionUID = -4298474751201349152L;
-
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  private static final long serialVersionUID = -4298474751201349152L;
 
 	/**
 	 * EMPTY_ENUMERATION
 	 */
-	public static final Enumeration EMPTY_ENUMERATION = null; // TODO
+  public static final Enumeration EMPTY_ENUMERATION =
+    EmptyEnumeration.getInstance();
 
 	/**
 	 * parent
 	 */
-	protected MutableTreeNode parent = null;
+  protected MutableTreeNode parent;
 
 	/**
 	 * children
@@ -79,943 +79,896 @@ public class DefaultMutableTreeNode
 	/**
 	 * userObject
 	 */
-	protected transient Object userObject = "";
+  protected transient Object userObject;
 
 	/**
 	 * allowsChildren
 	 */
-	protected boolean allowsChildren = true;
-
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  protected boolean allowsChildren;
 
 	/**
 	 * Constructor DefaultMutableTreeNode
 	 */
-	public DefaultMutableTreeNode() {
-		// TODO
-	} // DefaultMutableTreeNode()
+  public DefaultMutableTreeNode()
+  {
+    this(null, true);
+  }
 
 	/**
 	 * Constructor DefaultMutableTreeNode
-	 * @param value0 TODO
+   *
+   * @param userObject TODO
 	 */
-	public DefaultMutableTreeNode(Object userObject) {
-		this.userObject = userObject;
-	} // DefaultMutableTreeNode()
+  public DefaultMutableTreeNode(Object userObject)
+  {
+    this(userObject, true);
+  }
 
 	/**
 	 * Constructor DefaultMutableTreeNode
-	 * @param value0 TODO
-	 * @param value1 TODO
+   *
+   * @param userObject TODO
+   * @param allowsChildren TODO
 	 */
-	public DefaultMutableTreeNode(Object userObject, boolean allowsChildren) {
+  public DefaultMutableTreeNode(Object userObject, boolean allowsChildren)
+  {
 		this.userObject = userObject;
 		this.allowsChildren = allowsChildren;
-	} // DefaultMutableTreeNode()
-
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+  }
 
 	/**
 	 * clone
-	 * @returns Object
+   *
+   * @return Object
 	 */
-	public Object clone() {
-		return null; // TODO
-	} // clone()
+  public Object clone()
+  {
+    try
+      {
+        return super.clone();
+        // TODO: Do we need to do more here ?
+      }
+    catch (CloneNotSupportedException e)
+      {
+        // This never happens.
+        return null;
+      }
+  }
 
 	/**
 	 * toString
-	 * @returns String
+   *
+   * @return String
 	 */
-	public String toString() {
-		if (userObject == null) {
+  public String toString()
+  {
+    if (userObject == null)
 			return null;
-		} // if
+
 		return userObject.toString();
-	} // toString()
+  }
 
 	/**
 	 * add
-	 * @param value0 TODO
-	 */
-	public void add(MutableTreeNode child) {
+   *
+   * @param child TODO
+   *
+   * @throws IllegalArgumentException if <code>child</code> is null
+   * @throws IllegalStateException if the node does not allow children
+   */
+  public void add(MutableTreeNode child)
+  {
+    if (child == null)
+      throw new IllegalArgumentException();
+
+    if (! allowsChildren)
+      throw new IllegalStateException();
+    
 		children.add(child);
 		child.setParent(this);
-	} // add()
+  }
 
 	/**
 	 * getParent
-	 * @returns TreeNode
+   *
+   * @return TreeNode
 	 */
-	public TreeNode getParent() {
+  public TreeNode getParent()
+  {
 		return parent;
-	} // getParent()
+  }
 
 	/**
 	 * remove
-	 * @param value0 TODO
+   *
+   * @param index TODO
 	 */
-	public void remove(int index) {
+  public void remove(int index)
+  {
 		children.remove(index);
-	} // remove()
+  }
 
 	/**
 	 * remove
-	 * @param value0 TODO
+   *
+   * @param node TODO
 	 */
-	public void remove(MutableTreeNode node) {
+  public void remove(MutableTreeNode node)
+  {
 		children.remove(node);
-	} // remove()
+  }
 
 	/**
 	 * writeObject
-	 * @param value0 TODO
-	 * @exception IOException TODO
-	 */
-	private void writeObject(ObjectOutputStream value0) throws IOException {
-		// TODO
-	} // writeObject()
+   *
+   * @param stream TODO
+   *
+   * @exception IOException If an error occurs
+   */
+  private void writeObject(ObjectOutputStream stream)
+    throws IOException
+  {
+    // TODO: Implement me.
+  }
 
 	/**
 	 * readObject
-	 * @param value0 TODO
-	 * @exception IOException TODO
+   *
+   * @param stream TODO
+   *
+   * @exception IOException If an error occurs
 	 * @exception ClassNotFoundException TODO
 	 */
-	private void readObject(ObjectInputStream value0) throws IOException, ClassNotFoundException {
-		// TODO
-	} // readObject()
+  private void readObject(ObjectInputStream stream)
+    throws IOException, ClassNotFoundException
+  {
+    // TODO: Implement me.
+  }
 
 	/**
 	 * insert
-	 * @param value0 TODO
-	 * @param value1 TODO
+   *
+   * @param node TODO
+   * @param value TODO
 	 */
-	public void insert(MutableTreeNode node, int index) {
+  public void insert(MutableTreeNode node, int index)
+  {
 		children.insertElementAt(node, index);
-	} // insert()
+  }
 
 	/**
 	 * getPath
-	 * @returns TreeNode[]
+   *
+   * @return an array of tree nodes
 	 */
-	public TreeNode[] getPath() {
-
-		// Variables
-		TreeNode[]	path;
-		int			size;
-		int			index;
-		TreeNode	current;
-
-		// Determine length of Path
-		size = getLevel() + 1;
-
-		// Create Path
-		path = new TreeNode[size];
-		current = this;
-		for (index = size - 1; index >= 0; index--) {
-			path[index] = current;
-			current = current.getParent();
-		} // for
-
-		// Return Path
-		return path;
-
-	} // getPath()
+  public TreeNode[] getPath()
+  {
+    return getPathToRoot(this, 0);
+  }
 
 	/**
 	 * children
-	 * @returns Enumeration
+   *
+   * @return an enumeration of tree nodes
 	 */
-	public Enumeration children() {
+  public Enumeration children()
+  {
+    if (children.size() == 0)
+      return EMPTY_ENUMERATION;
+    
 		return children.elements();
-	} // children()
+  }
 
 	/**
 	 * setParent
-	 * @param value0 TODO
+   *
+   * @param node TODO
 	 */
-	public void setParent(MutableTreeNode node) {
+  public void setParent(MutableTreeNode node)
+  {
 		parent = node;
-	} // setParent()
+  }
 
 	/**
 	 * getChildAt
-	 * @param value0 TODO
-	 * @returns TreeNode
+   *
+   * @param index TODO
+   *
+   * @return TreeNode
 	 */
-	public TreeNode getChildAt(int index) {
+  public TreeNode getChildAt(int index)
+  {
 		return (TreeNode) children.elementAt(index);
-	} // getChildAt()
+  }
 
 	/**
 	 * getChildCount
-	 * @returns int
+   *
+   * @return int
 	 */
-	public int getChildCount() {
+  public int getChildCount()
+  {
 		return children.size();
-	} // getChildCount()
+  }
 
 	/**
 	 * getIndex
-	 * @param value0 TODO
-	 * @returns int
+   *
+   * @param node TODO
+   *
+   * @return int
 	 */
-	public int getIndex(TreeNode node) {
+  public int getIndex(TreeNode node)
+  {
 		return children.indexOf(node);
-	} // getIndex()
+  }
 
 	/**
 	 * setAllowsChildren
-	 * @param value0 TODO
+   *
+   * @param allowsChildren TODO
 	 */
-	public void setAllowsChildren(boolean allowsChildren) {
+  public void setAllowsChildren(boolean allowsChildren)
+  {
 		this.allowsChildren = allowsChildren;
-	} // setAllowsChildren()
+  }
 
 	/**
 	 * getAllowsChildren
-	 * @returns boolean
+   *
+   * @return boolean
 	 */
-	public boolean getAllowsChildren() {
+  public boolean getAllowsChildren()
+  {
 		return allowsChildren;
-	} // getAllowsChildren()
+  }
 
 	/**
 	 * setUserObject
-	 * @param value0 TODO
+   *
+   * @param userObject TODO
 	 */
-	public void setUserObject(Object userObject) {
+  public void setUserObject(Object userObject)
+  {
 		this.userObject = userObject;
-	} // setUserObject()
+  }
 
 	/**
 	 * getUserObject
-	 * @returns Object
+   *
+   * @return Object
 	 */
-	public Object getUserObject() {
+  public Object getUserObject()
+  {
 		return userObject;
-	} // getUserObject()
+  }
 
 	/**
 	 * removeFromParent
 	 */
-	public void removeFromParent() {
+  public void removeFromParent()
+  {
 		parent = null;
-		// TODO
-	} // removeFromParent()
+  }
 
 	/**
 	 * removeAllChildren
 	 */
-	public void removeAllChildren() {
+  public void removeAllChildren()
+  {
 		children.removeAllElements();
-	} // removeAllChildren()
+  }
 
 	/**
 	 * isNodeAncestor
-	 * @param value0 TODO
-	 * @returns boolean
-	 */
-	public boolean isNodeAncestor(TreeNode node) {
-
-		// Variables
-		TreeNode	current;
-
-		// Sanity Check
-		if (node == null) {
+   *
+   * @param node TODO
+   *
+   * @return boolean
+   */
+  public boolean isNodeAncestor(TreeNode node)
+  {
+    if (node == null)
 			return false;
-		} // if
 
-		// Search For Ancestor
-		current = this;
-		while (current != null && current != node) {
-			current = current.getParent();
-		} // while
+    TreeNode current = this;
 
-		// Check for Ancestor
-		if (current == node) {
-			return true;
-		} // if
+    while (current != null
+           && current != node)
+      current = current.getParent();
 
-		// Otherwise, no
-		return false;
-
-	} // isNodeAncestor()
+    return current == node;
+  }
 
 	/**
 	 * isNodeDescendant
-	 * @param value0 TODO
-	 * @returns boolean
-	 */
-	public boolean isNodeDescendant(DefaultMutableTreeNode node) {
-
-		// Variables
-		TreeNode	current;
-
-		// Sanity Check
-		if (node == null) {
+   *
+   * @param node0 TODO
+   *
+   * @return boolean
+   */
+  public boolean isNodeDescendant(DefaultMutableTreeNode node)
+  {
+    if (node == null)
 			return false;
-		} // if
 
-		// Search For Descendant
-		current = node;
-		while (current != null && current != this) {
-			current = current.getParent();
-		} // while
+    TreeNode current = node;
 
-		// Check for Descendant
-		if (current == this) {
-			return true;
-		} // if
+    while (current != null
+           && current != this)
+      current = current.getParent();
 
-		// Otherwise, no
-		return false;
-
-	} // isNodeDescendant()
+    return current == this;
+  }
 
 	/**
 	 * getSharedAncestor
-	 * @param value0 TODO
-	 * @returns TreeNode
-	 */
-	public TreeNode getSharedAncestor(DefaultMutableTreeNode node) {
+   *
+   * @param node TODO
+   *
+   * @return TreeNode
+   */
+  public TreeNode getSharedAncestor(DefaultMutableTreeNode node)
+  {
+    TreeNode current = this;
+    ArrayList list = new ArrayList();
 
-		// Variables
-		ArrayList	list;
-		TreeNode	current;
-
-		// Get List of Path Elements for this node
-		current = this;
-		list = new ArrayList();
-		while (current != null) {
+    while (current != null)
+      {
 			list.add(current);
 			current = current.getParent();
-		} // while
+      }
 
-		// Check if any path element of node are in list
 		current = node;
-		while (current != null) {
-			if (list.contains(current) == true) {
+
+    while (current != null)
+      {
+        if (list.contains(current))
 				return current;
-			} // if
+
 			current = current.getParent();
-		} // while
+      }
 
-		// Unable to locate shared ancestor
 		return null;
-
-	} // getSharedAncestor()
+  }
 
 	/**
 	 * isNodeRelated
-	 * @param value0 TODO
-	 * @returns boolean
-	 */
-	public boolean isNodeRelated(DefaultMutableTreeNode node) {
-
-		// Sanity Check
-		if (node == null) {
+   *
+   * @param node TODO
+   *
+   * @return boolean
+   */
+  public boolean isNodeRelated(DefaultMutableTreeNode node)
+  {
+    if (node == null)
 			return false;
-		} // if
 
-		// Check for the same root
-		if (node.getRoot() == getRoot()) {
-			return true;
-		} // if
-
-		// Nodes are not related
-		return false;
-
-	} // isNodeRelated()
+    return node.getRoot() == getRoot();
+  }
 
 	/**
 	 * getDepth
-	 * @returns int
+   *
+   * @return int
 	 */
-	public int getDepth() {
-
-		// Variables
-		TreeNode		node;
-		int				depth;
-		int				current;
-		int				size;
-		Stack			stack;
-		int				index;
-
-		// Check for children
-		if (allowsChildren == false || children.size() == 0) {
+  public int getDepth()
+  {
+    if ((! allowsChildren)
+        || children.size() == 0)
 			return 0;
-		} // if
 
-		// Process Depths
-		stack = new Stack();
+    Stack stack = new Stack();
 		stack.push(new Integer(0));
-		node = getChildAt(0);
-//System.out.println("  * Descend: 0-0");
-		depth = 0;
-		current = 1;
-		while (stack.empty() == false) {
-
-			// Check if node has children
-			if (node.getChildCount() != 0) {
+    TreeNode node = getChildAt(0);
+    int depth = 0;
+    int current = 1;
+    
+    while (! stack.empty())
+      {
+        if (node.getChildCount() != 0)
+          {
 				node = node.getChildAt(0);
 				stack.push(new Integer(0));
 				current++;
-//				System.out.println("  * Descend: 0-" + current);
-
-			// Check for next sibling
-			} else {
-
-				// Check Depth
-				if (current > depth) {
+          }
+        else
+          {
+            if (current > depth)
 					depth = current;
-				} // if
 
-				do {
+            int size;
+            int index;
 
-					// Traverse to Parent
+            do
+              {
 					node = node.getParent();
 					size = node.getChildCount();
+                index = ((Integer) stack.pop()).intValue() + 1;
 					current--;
-					index = ((Integer) stack.pop()).intValue();
-//					System.out.println("  * Ascend from: " + index + "-" + current);
-					index++;
+              }
+            while (index >= size
+                   && node != this);
 
-				} while (index >= size && node != this);
-
-				// Check for child
-				if (index < size) {
+            if (index < size)
+              {
 					node = node.getChildAt(index);
 					stack.push(new Integer(index));
 					current++;
-//					System.out.println("  * Descend: " + index + "-" + current);
-				} // if
-
-			} // if
-
-		} // while
+              }
+          }
+      }
 
 		return depth;
-
-	} // getDepth()
+  }
 
 	static Random	random = new Random(System.currentTimeMillis());
 
-	public static void growTree(DefaultMutableTreeNode root) {
-
-		// Variables
-		int						index;
+  public static void growTree(DefaultMutableTreeNode root)
+  {
 		DefaultMutableTreeNode	node;
-		DefaultMutableTreeNode	current;
 
-		current = root;
-		index = 0;
-//		while (current != root) {
-		do {
+    DefaultMutableTreeNode current = root;
+    int index = 0;
 
-//			if (random.nextInt(3) < 2) {
-			if (random.nextBoolean()) {
+    do
+      {
+        if (random.nextBoolean())
+          {
 				node = new DefaultMutableTreeNode(String.valueOf(index));
 				index++;
 				current.add(node);
 				current = node;
-			} else {
+          }
+        else
+          {
 				current = (DefaultMutableTreeNode) current.getParent();
-			} // if
-
-//		} // while
-		} while (current != root && current != null);
-
-		System.out.println("Number of nodes: " + index);
-
-/*
-		// Calc # children
-		size = random.nextInt(4);
-
-		for (index = 0; index < size; index++) {
-
-			// Create Node
-			node = new DefaultMutableTreeNode(String.valueOf(index));
-			growTree(node);
-
-			// Add Node to root
-			root.add(node);
-
-		} // for
-*/
-	} // growTree()
-
-	public static void main(String[] argv) {
-/*
-		DefaultMutableTreeNode	node1 = new DefaultMutableTreeNode("node1");
-		DefaultMutableTreeNode	node2 = new DefaultMutableTreeNode("node2");
-		DefaultMutableTreeNode	node3 = new DefaultMutableTreeNode("node3");
-		DefaultMutableTreeNode	node4 = new DefaultMutableTreeNode("node4");
-		DefaultMutableTreeNode	node5 = new DefaultMutableTreeNode("node5");
-		DefaultMutableTreeNode	node6 = new DefaultMutableTreeNode("node6");
-		DefaultMutableTreeNode	node7 = new DefaultMutableTreeNode("node7");
-		DefaultMutableTreeNode	node8 = new DefaultMutableTreeNode("node8");
-
-		node1.add(node2);
-		node1.add(node3);
-		node2.add(node4);
-		node2.add(node5);
-		node3.add(node6);
-		node3.add(node7);
-		node5.add(node8);
-
-		System.out.println("Depth (node1): " + node1.getDepth());
-		System.out.println("Depth (node2): " + node2.getDepth());
-		System.out.println("Depth (node3): " + node3.getDepth());
-*/
-
-		System.out.println("Create tree...");
-		DefaultMutableTreeNode	root = new DefaultMutableTreeNode("root");
-		growTree(root);
-		System.out.println("Find depth...");
-		System.out.println("Depth (root): " + root.getDepth());
-
-	} // main
+          }
+      }
+    while (current != root
+           && current != null);
+  }
 
 	/**
 	 * getLevel
-	 * @returns int
+   *
+   * @return int
 	 */
-	public int getLevel() {
+  public int getLevel()
+  {
+    int count = -1;
+    TreeNode current = this;
 
-		// Variables
-		TreeNode	current;
-		int			count;
-
-		// Lookup Parent
-		count = -1;
-		current = this;
-		do {
+    do
+      {
 			current = current.getParent();
 			count++;
-		} while (current != null);
+      }
+    while (current != null);
 
 		return count;
-
-	} // getLevel()
+  }
 
 	/**
 	 * getPathToRoot
-	 * @param value0 TODO
-	 * @param value1 TODO
-	 * @returns TreeNode[]
-	 */
-	protected TreeNode[] getPathToRoot(TreeNode value0, int value1) {
-		return null; // TODO
-	} // getPathToRoot()
+   *
+   * @param node TODO
+   * @param depth TODO
+   *
+   * @return TreeNode[]
+   */
+  protected TreeNode[] getPathToRoot(TreeNode node, int depth)
+  {
+    if (node == null)
+      {
+        if (depth == 0)
+          return null;
+        
+        return new TreeNode[depth];
+      }
+
+    TreeNode[] path = getPathToRoot(node.getParent(), depth + 1);
+    path[depth] = node;
+    return path;
+  }
 
 	/**
 	 * getUserObjectPath
-	 * @returns Object[]
+   *
+   * @return Object[]
 	 */
-	public Object[] getUserObjectPath() {
+  public Object[] getUserObjectPath()
+  {
+    TreeNode[] path = getPathToRoot(this, 0);
+    Object[] object = new Object[path.length];
 
-		// Variables
-		TreeNode[]	path;
-		Object[]	object;
-		int			index;
-
-		// Get Path for Tree Nodes
-		path = getPath();
-
-		// Construct Object Path
-		object = new Object[path.length];
-		for (index = 0; index < path.length; index++) {
+    for (int index = 0; index < path.length; ++index)
 			object[index] = ((DefaultMutableTreeNode) path[index]).getUserObject();
-		} // for
 
-		// Return Object Path
 		return object;
-
-	} // getUserObjectPath()
+  }
 
 	/**
 	 * getRoot
-	 * @returns TreeNode
+   *
+   * @return TreeNode
 	 */
-	public TreeNode getRoot() {
+  public TreeNode getRoot()
+  {
+    TreeNode current = this;
+    TreeNode check = current.getParent();
 
-		// Variables
-		TreeNode	current;
-		TreeNode	check;
-
-		// Lookup Parent
-		current = this;
-		check = current.getParent();
-		while (check != null) {
+    while (check != null)
+      {
 			current = check;
 			check = current.getParent();
-		} // while
+      }
 
 		return current;
-
-	} // getRoot()
+  }
 
 	/**
 	 * isRoot
-	 * @returns boolean
+   *
+   * @return boolean
 	 */
-	public boolean isRoot() {
+  public boolean isRoot()
+  {
 		return (parent == null);
-	} // isRoot()
+  }
 
 	/**
 	 * getNextNode
-	 * @returns DefaultMutableTreeNode
+   *
+   * @return DefaultMutableTreeNode
 	 */
-	public DefaultMutableTreeNode getNextNode() {
-		return null; // TODO
-	} // getNextNode()
+  public DefaultMutableTreeNode getNextNode()
+  {
+    // Return first child.
+    if (getChildCount() != 0)
+      return (DefaultMutableTreeNode) getChildAt(0);
+
+    // Return next sibling (if needed the sibling of some parent).
+    DefaultMutableTreeNode node = this;
+    DefaultMutableTreeNode sibling;
+    
+    do
+      {
+        sibling = node.getNextSibling();
+        node = (DefaultMutableTreeNode) node.getParent();
+      }
+    while (sibling == null &&
+           node != null);
+    
+    // Return sibling.
+    return sibling;
+  }
 
 	/**
 	 * getPreviousNode
-	 * @returns DefaultMutableTreeNode
+   *
+   * @return DefaultMutableTreeNode
 	 */
-	public DefaultMutableTreeNode getPreviousNode() {
-		return null; // TODO
-	} // getPreviousNode()
+  public DefaultMutableTreeNode getPreviousNode()
+  {
+    // Return null if no parent.
+    if (parent == null)
+      return null;
+    
+    DefaultMutableTreeNode sibling = getPreviousSibling();
+
+    // Return parent if no sibling.
+    if (sibling == null)
+      return (DefaultMutableTreeNode) parent;
+
+    // Return last leaf of sibling.
+    if (sibling.getChildCount() != 0)
+      return sibling.getLastLeaf();
+
+    // Return sibling.
+    return sibling;
+  }
 
 	/**
 	 * preorderEnumeration
-	 * @returns Enumeration
+   *
+   * @return Enumeration
 	 */
-	public Enumeration preorderEnumeration() {
-		return null; // TODO
-	} // preorderEnumeration()
+  public Enumeration preorderEnumeration()
+  {
+    return null; // TODO: Implement me.
+  }
 
 	/**
 	 * postorderEnumeration
-	 * @returns Enumeration
+   *
+   * @return Enumeration
 	 */
-	public Enumeration postorderEnumeration() {
-		return null; // TODO
-	} // postorderEnumeration()
+  public Enumeration postorderEnumeration()
+  {
+    return null; // TODO: Implement me.
+  }
 
 	/**
 	 * breadthFirstEnumeration
-	 * @returns Enumeration
+   *
+   * @return Enumeration
 	 */
-	public Enumeration breadthFirstEnumeration() {
-		return null; // TODO
-	} // breadthFirstEnumeration()
+  public Enumeration breadthFirstEnumeration()
+  {
+    return null; // TODO: Implement me.
+  }
 
 	/**
 	 * depthFirstEnumeration
-	 * @returns Enumeration
+   *
+   * @return Enumeration
 	 */
-	public Enumeration depthFirstEnumeration() {
-		return null; // TODO
-	} // depthFirstEnumeration()
+  public Enumeration depthFirstEnumeration()
+  {
+    return postorderEnumeration();
+  }
 
 	/**
 	 * pathFromAncestorEnumeration
-	 * @param value0 TODO
-	 * @returns Enumeration
-	 */
-	public Enumeration pathFromAncestorEnumeration(TreeNode value0) {
-		return null; // TODO
-	} // pathFromAncestorEnumeration()
+   *
+   * @param node TODO
+   *
+   * @return Enumeration
+   */
+  public Enumeration pathFromAncestorEnumeration(TreeNode node)
+  {
+    if (node == null)
+      throw new IllegalArgumentException();
 
-	/**
-	 * isNodeChild
-	 * @param value0 TODO
-	 * @returns boolean
-	 */
-	public boolean isNodeChild(TreeNode node) {
+    TreeNode parent = this;
+    Vector nodes = new Vector();
+    nodes.add(this);
 
-		// Variables
-		TreeNode	current;
+    while (parent != node && parent != null)
+      {
+        parent = parent.getParent();
+        nodes.add(0, parent);
+      }
 
-		// Sanity Check
-		if (node == null) {
-			return false;
-		} // if
+    if (parent != node)
+      throw new IllegalArgumentException();
 
-		// Process Path
-		current = node;
-		while (current != null) {
-			if (current == this) {
-				return true;
-			} // if
-			current = current.getParent();
-		} // while
+    return nodes.elements();
+  }
 
-		// Node not located in path, not child
+  /**
+   * isNodeChild
+   *
+   * @param node TODO
+   *
+   * @return boolean
+   */
+  public boolean isNodeChild(TreeNode node)
+  {
+    if (node == null)
 		return false;
 
-	} // isNodeChild()
+    return node.getParent() == this;
+  }
 
 	/**
 	 * getFirstChild
-	 * @returns TreeNode
+   *
+   * @return TreeNode
 	 */
-	public TreeNode getFirstChild() {
+  public TreeNode getFirstChild()
+  {
 		return (TreeNode) children.firstElement();
-	} // getFirstChild()
+  }
 
 	/**
 	 * getLastChild
-	 * @returns TreeNode
+   *
+   * @return TreeNode
 	 */
-	public TreeNode getLastChild() {
+  public TreeNode getLastChild()
+  {
 		return (TreeNode) children.lastElement();
-	} // getLastChild()
+  }
 
 	/**
 	 * getChildAfter
-	 * @param value0 TODO
-	 * @returns TreeNode
-	 */
-	public TreeNode getChildAfter(TreeNode node) {
-
-		// Variables
-		int		index;
-
-		// Check node
-		if (node == null || node.getParent() != this) {
+   *
+   * @param node TODO
+   *
+   * @return TreeNode
+   */
+  public TreeNode getChildAfter(TreeNode node)
+  {
+    if (node == null
+        || node.getParent() != this)
 			throw new IllegalArgumentException();
-		} // if
 
-		// Get index of child node
-		index = getIndex(node);
+    int index = getIndex(node) + 1;
 
-		// Check for child after
-		index++;
-		if (index == getChildCount()) {
+    if (index == getChildCount())
 			return null;
-		} // if
 
-		// Retrieve Child After
 		return getChildAt(index);
-
-	} // getChildAfter()
+  }
 
 	/**
 	 * getChildBefore
-	 * @param value0 TODO
-	 * @returns TreeNode
-	 */
-	public TreeNode getChildBefore(TreeNode node) {
-
-		// Variables
-		int		index;
-
-		// Check node
-		if (node == null || node.getParent() != this) {
+   *
+   * @param node TODO
+   *
+   * @return TreeNode
+   */
+  public TreeNode getChildBefore(TreeNode node)
+  {
+    if (node == null
+        || node.getParent() != this)
 			throw new IllegalArgumentException();
-		} // if
 
-		// Get index of child node
-		index = getIndex(node);
+    int index = getIndex(node) - 1;
 
-		// Check for child before
-		index--;
-		if (index < 0) {
+    if (index < 0)
 			return null;
-		} // if
 
-		// Retrieve Child Before
 		return getChildAt(index);
-
-	} // getChildBefore()
+  }
 
 	/**
 	 * isNodeSibling
-	 * @param value0 TODO
-	 * @returns boolean
-	 */
-	public boolean isNodeSibling(TreeNode node) {
-
-		// Check for null
-		if (node == null) {
+   *
+   * @param node TODO
+   *
+   * @return boolean
+   */
+  public boolean isNodeSibling(TreeNode node)
+  {
+    if (node == null)
 			return false;
-		} // if
 
-		// Check if nodes share a parent
-		if (node.getParent() == getParent() && getParent() != null) {
-			return true;
-		} // if
-
-		// Nodes are not siblings
-		return false;
-
-	} // isNodeSibling()
+    return (node.getParent() == getParent()
+            && getParent() != null);
+  }
 
 	/**
 	 * getSiblingCount
-	 * @returns int
+   *
+   * @return int
 	 */
-	public int getSiblingCount() {
-
-		// Variables
-
-		// Check for no parent
-		if (parent == null) {
+  public int getSiblingCount()
+  {
+    if (parent == null)
 			return 1;
-		} // if
 
-		// Calculate sibling count from parent's child count
 		return parent.getChildCount();
-
-	} // getSiblingCount()
+  }
 
 	/**
 	 * getNextSibling
-	 * @returns DefaultMutableTreeNode
+   *
+   * @return DefaultMutableTreeNode
 	 */
-	public DefaultMutableTreeNode getNextSibling() {
-
-		// Variables
-		int		index;
-		int		size;
-
-		// Check for Parent
-		if (parent == null) {
+  public DefaultMutableTreeNode getNextSibling()
+  {
+    if (parent == null)
 			return null;
-		} // if
 
-		// Get Index of this node
-		index = parent.getIndex(this);
+    int index = parent.getIndex(this) + 1;
 
-		// Check for Next Sibling
-		size = parent.getChildCount();
-		index++;
-		if (index == size) {
+    if (index == parent.getChildCount())
 			return null;
-		} // if
 
 		return (DefaultMutableTreeNode) parent.getChildAt(index);
-
-	} // getNextSibling()
+  }
 
 	/**
 	 * getPreviousSibling
-	 * @returns DefaultMutableTreeNode
+   *
+   * @return DefaultMutableTreeNode
 	 */
-	public DefaultMutableTreeNode getPreviousSibling() {
-
-		// Variables
-		int		index;
-
-		// Check for Parent
-		if (parent == null) {
+  public DefaultMutableTreeNode getPreviousSibling()
+  {
+    if (parent == null)
 			return null;
-		} // if
 
-		// Get Index of this node
-		index = parent.getIndex(this);
+    int index = parent.getIndex(this) - 1;
 
-		// Check for Previous Sibling
-		index--;
-		if (index < 0) {
+    if (index < 0)
 			return null;
-		} // if
 
 		return (DefaultMutableTreeNode) parent.getChildAt(index);
-
-	} // getPreviousSibling()
+  }
 
 	/**
 	 * isLeaf
-	 * @returns boolean
+   *
+   * @return boolean
 	 */
-	public boolean isLeaf() {
-		return (children.size() == 0); // TODO: check allowsChildren??
-	} // isLeaf()
+  public boolean isLeaf()
+  {
+    return children.size() == 0;
+  }
 
 	/**
 	 * getFirstLeaf
-	 * @returns DefaultMutableTreeNode
+   *
+   * @return DefaultMutableTreeNode
 	 */
-	public DefaultMutableTreeNode getFirstLeaf() {
+  public DefaultMutableTreeNode getFirstLeaf()
+  {
+    TreeNode current = this;
 
-		// Variables
-		TreeNode	current;
-
-		current = this;
-		while (current.getChildCount() > 0) {
+    while (current.getChildCount() > 0)
 			current = current.getChildAt(0);
-		} // while
 
 		return (DefaultMutableTreeNode) current;
-
-	} // getFirstLeaf()
+  }
 
 	/**
 	 * getLastLeaf
-	 * @returns DefaultMutableTreeNode
+   *
+   * @return DefaultMutableTreeNode
 	 */
-	public DefaultMutableTreeNode getLastLeaf() {
+  public DefaultMutableTreeNode getLastLeaf()
+  {
+    TreeNode current = this;
+    int size = current.getChildCount();
 
-		// Variables
-		TreeNode	current;
-		int			size;
-
-		current = this;
-		size = current.getChildCount();
-		while (size > 0) {
+    while (size > 0)
+      {
 			current = current.getChildAt(size - 1);
 			size = current.getChildCount();
-		} // while
+      }
 
 		return (DefaultMutableTreeNode) current;
-
-	} // getLastLeaf()
+  }
 
 	/**
 	 * getNextLeaf
-	 * @returns DefaultMutableTreeNode
+   *
+   * @return DefaultMutableTreeNode
 	 */
-	public DefaultMutableTreeNode getNextLeaf() {
-		return null; // TODO
-	} // getNextLeaf()
+  public DefaultMutableTreeNode getNextLeaf()
+  {
+    if (parent == null)
+      return null;
+
+    return null;
+    //return parent.getChildAfter(this);
+  }
 
 	/**
 	 * getPreviousLeaf
-	 * @returns DefaultMutableTreeNode
+   *
+   * @return DefaultMutableTreeNode
 	 */
-	public DefaultMutableTreeNode getPreviousLeaf() {
-		return null; // TODO
-	} // getPreviousLeaf()
+  public DefaultMutableTreeNode getPreviousLeaf()
+  {
+    if (parent == null)
+      return null;
+    
+    return null;
+    //return parent.getChildBefore(this);
+  }
 
 	/**
 	 * getLeafCount
-	 * @returns int
+   *
+   * @return int
 	 */
-	public int getLeafCount() {
+  public int getLeafCount()
+  {
+    int count = 0;
+    Enumeration e = depthFirstEnumeration();
 
-		// Variables
-		Enumeration	e;
-		int			count;
-		TreeNode	current;
+    while (e.hasMoreElements())
+      {
+        TreeNode current = (TreeNode) e.nextElement();
 
-		// Get Enumeration of all descendants
-		e = depthFirstEnumeration();
-
-		// Process Nodes
-		count = 0;
-		while (e.hasMoreElements() == true) {
-			current = (TreeNode) e.nextElement();
-			if (current.isLeaf() == true) {
+        if (current.isLeaf())
 				count++;
-			} // if
-		} // if
+      }
 
 		return count;
-
-	} // getLeafCount()
-
-
-} // DefaultMutableTreeNode
+  }
+}

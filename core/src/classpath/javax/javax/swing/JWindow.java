@@ -44,10 +44,10 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
 import java.awt.LayoutManager;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowEvent;
 
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
@@ -62,49 +62,42 @@ public class JWindow extends Window implements Accessible, RootPaneContainer
 {
   private static final long serialVersionUID = 5420698392125238833L;
   
-  public static final int HIDE_ON_CLOSE = 0;
-  public static final int EXIT_ON_CLOSE = 1;
-  public static final int DISPOSE_ON_CLOSE = 2;
-  public static final int DO_NOTHING_ON_CLOSE  = 3;
+  private boolean checking;
 
+  protected JRootPane rootPane;
     protected  AccessibleContext accessibleContext;
-
-    private int close_action = EXIT_ON_CLOSE;    
-    
-    
-    /***************************************************
-     *
-     *
-     *  constructors
-     *
-     *
-     *************/
 
     public JWindow()
     {
       super(SwingUtilities.getOwnerFrame());
+    windowInit();
     }
 
-    // huuu ?
-    public JWindow(Frame f)
+  public JWindow(GraphicsConfiguration gc)
     {
-	super(f);
+    super(SwingUtilities.getOwnerFrame(), gc);
+    windowInit();
     }
     
-    /***************************************************
-     *
-     *
-     *  methods, this part is shared with JDialog, JFrame
-     *
-     *
-     *************/
-
+  public JWindow(Frame owner)
+  {
+    super(owner);
+    windowInit();
+  }
   
-    private boolean checking;
-    protected  JRootPane         rootPane;
+  public JWindow(Window owner)
+  {
+    super(owner);
+    windowInit();
+  }
 
+  public JWindow(Window owner, GraphicsConfiguration gc)
+  {
+    super(owner, gc);
+    windowInit();
+  }
     
-    protected  void frameInit()
+  protected void windowInit()
     {
       super.setLayout(new BorderLayout(1, 1));
       getRootPane(); // will do set/create
@@ -112,18 +105,23 @@ public class JWindow extends Window implements Accessible, RootPaneContainer
   
   public Dimension getPreferredSize()
   {
-    Dimension d = super.getPreferredSize();
-    return d;
+    return super.getPreferredSize();
   }
 
   public  void setLayout(LayoutManager manager)
-  {    super.setLayout(manager);  }
+  {
+    super.setLayout(manager);
+  }
 
     public void setLayeredPane(JLayeredPane layeredPane) 
-    {   getRootPane().setLayeredPane(layeredPane);   }
+  {
+    getRootPane().setLayeredPane(layeredPane);
+  }
   
     public JLayeredPane getLayeredPane()
-    {   return getRootPane().getLayeredPane();     }
+  {
+    return getRootPane().getLayeredPane();
+  }
   
     public JRootPane getRootPane()
     {
@@ -142,100 +140,67 @@ public class JWindow extends Window implements Accessible, RootPaneContainer
     }
 
     public JRootPane createRootPane()
-    {   return new JRootPane();    }
+  {
+    return new JRootPane();
+  }
 
     public Container getContentPane()
-    {    return getRootPane().getContentPane();     }
+  {
+    return getRootPane().getContentPane();
+  }
 
     public void setContentPane(Container contentPane)
-    {    getRootPane().setContentPane(contentPane);    }
+  {
+    getRootPane().setContentPane(contentPane);
+  }
   
     public Component getGlassPane()
-    {    return getRootPane().getGlassPane();   }
+  {
+    return getRootPane().getGlassPane();
+  }
   
     public void setGlassPane(Component glassPane)
-    {   getRootPane().setGlassPane(glassPane);   }
-
+  {
+    getRootPane().setGlassPane(glassPane);
+  }
     
     protected  void addImpl(Component comp, Object constraints, int index)
-    {	super.addImpl(comp, constraints, index);    }
-
+  {
+    super.addImpl(comp, constraints, index);
+  }
 
     public void remove(Component comp)
-    {   getContentPane().remove(comp);  }
+  {
+    getContentPane().remove(comp);
+  }
   
     protected  boolean isRootPaneCheckingEnabled()
-    {    return checking;        }
-
+  {
+    return checking;
+  }
 
     protected  void setRootPaneCheckingEnabled(boolean enabled)
-    { checking = enabled;  }
-
+  {
+    checking = enabled;
+  }
 
     public void update(Graphics g)
-    {   paint(g);  }
-
-    protected  void processKeyEvent(KeyEvent e)
-    {	super.processKeyEvent(e);    }
-
-    /////////////////////////////////////////////////////////////////////////////////
-  
-    public AccessibleContext getAccessibleContext()
-    {    return null;  }
-  
-    int getDefaultCloseOperation()
-    {    return close_action;   }    
-    
-    protected  String paramString()
-    {   return "JWindow";     }
-
-
-    protected  void processWindowEvent(WindowEvent e)
-    {
-	//	System.out.println("PROCESS_WIN_EV-1: " + e);
-	super.processWindowEvent(e); 
-	//	System.out.println("PROCESS_WIN_EV-2: " + e);
-	switch (e.getID())
-	    {
-	    case WindowEvent.WINDOW_CLOSING:
 		{
-		    switch(close_action)
-			{
-			case EXIT_ON_CLOSE:
-			    {
-				System.out.println("user requested exit on close");
-				System.exit(1);
-				break;
+    paint(g);
 			    }
-			case DISPOSE_ON_CLOSE:
+
+  protected void processKeyEvent(KeyEvent e)
 			    {
-				System.out.println("user requested dispose on close");
-				dispose();
-				break;
+    super.processKeyEvent(e);
 			    }
-			case HIDE_ON_CLOSE:
+
+  public AccessibleContext getAccessibleContext()
 			    {
-				setVisible(false);
-				break;
-			    }
-			case DO_NOTHING_ON_CLOSE:
-			    break;
-			}
-		    break;
+    return null;
 		}
 		
-	    case WindowEvent.WINDOW_CLOSED:
-	    case WindowEvent.WINDOW_OPENED:
-	    case WindowEvent.WINDOW_ICONIFIED:
-	    case WindowEvent.WINDOW_DEICONIFIED:
-	    case WindowEvent.WINDOW_ACTIVATED:
-	    case WindowEvent.WINDOW_DEACTIVATED:
-		break;
-	    }
+  protected String paramString()
+  {
+    return "JWindow";
     }   
- 
-
-    void setDefaultCloseOperation(int operation)
-    {  close_action = operation;   }
-
 }

@@ -29,6 +29,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -80,6 +81,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     private boolean requiresCompile = false;
 
     private final VmStatics statics;
+    
+    private transient HashSet failedClassNames;
 
     /**
      * Constructor for VmClassLoader.
@@ -292,24 +295,32 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
         if (name.indexOf('/') >= 0) { throw new IllegalArgumentException(
                 "name contains '/'"); }
+        
+        if ((failedClassNames != null) && (failedClassNames.contains(name))) {
+        	throw new ClassNotFoundException(name);
+        }
+        
         final ClassInfo ci = getClassInfo(name, true);
+        
         if (!ci.isLoaded()) {
             try {
-                if (failOnNewLoad) { throw new RuntimeException(
-                        "Cannot load a new class when failOnNewLoad is set ("
-                                + name + ")"); }
                 if (name.charAt(0) == '[') {
                     ci.setVmClass(loadArrayClass(name, resolve));
                 } else {
                     ci.setVmClass(loadNormalClass(name));
                 }
+                if (failOnNewLoad) { throw new RuntimeException(
+                        "Cannot load a new class when failOnNewLoad is set ("
+                                + name + ")"); }
             } catch (ClassNotFoundException ex) {
                 ci.setLoadError(ex.toString());
                 classInfos.remove(ci.getName());
+                addFailedClassName(name);
                 throw new ClassNotFoundException(name, ex);
             } catch (IOException ex) {
                 ci.setLoadError(ex.toString());
                 classInfos.remove(ci.getName());
+                addFailedClassName(name);
                 throw new ClassNotFoundException(name, ex);
             }
             if (resolve) {
@@ -317,6 +328,13 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
             }
         }
         return ci.getVmClass();
+    }
+    
+    private final void addFailedClassName(String name) {
+    	if (failedClassNames == null) {
+    		failedClassNames = new HashSet();    		
+    	}
+    	failedClassNames.add(name);
     }
 
     /**
@@ -342,10 +360,6 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     private VmType loadNormalClass(String name) throws IOException,
             ClassNotFoundException {
 
-        if (failOnNewLoad) { throw new RuntimeException(
-                "Cannot load a new class when failOnNewLoad is set (" + name
-                        + ")"); }
-
         boolean allowNatives = false;
         allowNatives |= name.equals("org.jnode.vm.Unsafe");
         final String archN = arch.getName();
@@ -354,6 +368,11 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
         //System.out.println("bvi.loadClass: " +name);
         byte[] image = getClassStream(name);
+
+        if (failOnNewLoad) { throw new RuntimeException(
+                "Cannot load a new class when failOnNewLoad is set (" + name
+                        + ")"); }
+
         return ClassDecoder.defineClass(name, image, 0, image.length,
                 !allowNatives, this, null);
     }

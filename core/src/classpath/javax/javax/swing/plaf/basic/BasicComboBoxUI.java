@@ -80,6 +80,7 @@ import javax.swing.plaf.ComponentUI;
  * UI Delegate for JComboBox
  *
  * @author Olga Rodimina
+ * @author Robert Schuster
  */
 public class BasicComboBoxUI extends ComboBoxUI
 {
@@ -783,11 +784,14 @@ public class BasicComboBoxUI extends ComboBoxUI
       {
 	Object currentValue = comboBox.getSelectedItem();
 	boolean isPressed = arrowButton.getModel().isPressed();
-	if (currentValue != null)
-	  {
+
+	/* Gets the component to be drawn for the current value.
+	 * If there is currently no selected item we will take an empty
+	 * String as replacement.
+	 */
 	    Component comp = comboBox.getRenderer()
 	                             .getListCellRendererComponent(listBox,
-	                                                           currentValue,
+	                                                           (currentValue != null ? currentValue : ""),
 	                                                           -1,
 	                                                           isPressed,
 	                                                           hasFocus);
@@ -798,7 +802,7 @@ public class BasicComboBoxUI extends ComboBoxUI
 	    comp.setBounds(0, 0, bounds.width, bounds.height);
 	    comp.paint(g);
 	    g.translate(-borderInsets.left, -borderInsets.top);
-	  }
+	    
 	comboBox.revalidate();
       }
     else

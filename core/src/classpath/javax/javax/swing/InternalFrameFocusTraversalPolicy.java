@@ -1,5 +1,5 @@
-/* TreeCellEditor.java --
-   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
+/* InternalFrameFocusTraversalPolicy.java --
+   Copyright (C) 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -36,30 +36,20 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package javax.swing.tree;
+package javax.swing;
 
 import java.awt.Component;
-
-import javax.swing.CellEditor;
-import javax.swing.JTree;
+import java.awt.FocusTraversalPolicy;
 
 /**
- * TreeCellEditor public interface
- * @author Andrew Selkirk
+ * @author Michael Koch
+ * 
+ * @since 1.4
  */
-public interface TreeCellEditor extends CellEditor
+public abstract class InternalFrameFocusTraversalPolicy extends FocusTraversalPolicy
 {
-	/**
-	 * getTreeCellEditorComponent
-	 * @param tree TODO
-	 * @param value TODO
-	 * @param isSelected TODO
-	 * @param expanded TODO
-	 * @param leaf TODO
-	 * @param row TODO
-   * @return TODO
-	 */
-  Component getTreeCellEditorComponent(JTree tree, Object value,
-				       boolean isSelected, boolean expanded,
-			boolean leaf, int row);
+  public Component getInitialComponent(JInternalFrame frame)
+  {
+    return getDefaultComponent(frame);
+  }
 }

@@ -372,7 +372,7 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
 	displayedMnemonic = mnemonic;
 
 	if (text != null)
-	  setDisplayedMnemonicIndex(text.indexOf(mnemonic));
+	  setDisplayedMnemonicIndex(text.toUpperCase().indexOf(mnemonic));
       }
   }
 
@@ -385,7 +385,7 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
    */
   public void setDisplayedMnemonic(char mnemonic)
   {
-    setDisplayedMnemonic((int) mnemonic);
+    setDisplayedMnemonic((int) Character.toUpperCase(mnemonic));
   }
 
   /**
@@ -415,14 +415,17 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
     if (newIndex < -1 || (text != null && newIndex >= text.length()))
       throw new IllegalArgumentException();
       
-    if (text == null || text.charAt(newIndex) != displayedMnemonic)
+    if (newIndex == -1
+        || text == null
+	|| text.charAt(newIndex) != displayedMnemonic)
       newIndex = -1;
       
     if (newIndex != displayedMnemonicIndex)
     {
-      firePropertyChange(DISPLAYED_MNEMONIC_INDEX_CHANGED_PROPERTY,
-	                   displayedMnemonicIndex, newIndex);
+	int oldIndex = displayedMnemonicIndex;
 	displayedMnemonicIndex = newIndex;
+	firePropertyChange(DISPLAYED_MNEMONIC_INDEX_CHANGED_PROPERTY,
+	                   oldIndex, newIndex);
     }
   }
 
@@ -523,13 +526,13 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
    */
   public void setVerticalAlignment(int alignment)
   {
-    if (alignment != verticalAlignment)
-      {
+    if (alignment == verticalAlignment)
+      return;
+
 	int oldAlignment = verticalAlignment;
 	verticalAlignment = checkVerticalKey(alignment, "verticalAlignment");
-	firePropertyChange(VERTICAL_ALIGNMENT_CHANGED_PROPERTY, oldAlignment,
-	                   verticalAlignment);
-      }
+    firePropertyChange(VERTICAL_ALIGNMENT_CHANGED_PROPERTY,
+		       oldAlignment, verticalAlignment);
   }
 
   /**
@@ -550,6 +553,9 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
    */
   public void setHorizontalAlignment(int alignment)
   {
+    if (horizontalAlignment == alignment)
+      return;
+    
     int oldAlignment = horizontalAlignment;
     horizontalAlignment = checkHorizontalKey(alignment, "horizontalAlignment");
     firePropertyChange(HORIZONTAL_ALIGNMENT_CHANGED_PROPERTY, oldAlignment,
