@@ -27,5 +27,5 @@ public abstract class CpuID {
 	 * @param feature A platform specific feature constant.
 	 * @return boolean
 	 */
-	public abstract boolean hasFeature(int feature);
+	public abstract boolean hasFeature(long feature);
 }

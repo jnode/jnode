@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 
+import org.jnode.vm.CpuID;
 import org.jnode.vm.classmgr.VmType;
 
 public abstract class NativeStream {
@@ -30,6 +31,11 @@ public abstract class NativeStream {
 	 */
 	public abstract byte[] getBytes();
 
+	/**
+	 * Gets the identification of the CPU for which this stream will produce data.
+	 */
+	public abstract CpuID getCPUID();
+	
 	/**
 	 * Write my contents to the given stream.
 	 * @param os

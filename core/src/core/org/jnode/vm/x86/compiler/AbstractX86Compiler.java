@@ -9,11 +9,13 @@ import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.X86Stream;
 import org.jnode.vm.Address;
+import org.jnode.vm.Unsafe;
 import org.jnode.vm.classmgr.AbstractVmClassLoader;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.compiler.CompiledMethod;
 import org.jnode.vm.compiler.NativeCodeCompiler;
+import org.jnode.vm.x86.X86CpuID;
 
 /**
  * Abstract native code compiler for the Intel X86 architecture.
@@ -39,7 +41,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements 
 	 * @see org.jnode.vm.compiler.Compiler#createNativeStream(org.jnode.assembler.ObjectResolver)
 	 */
 	public NativeStream createNativeStream(ObjectResolver resolver) {
-		final X86Stream os = new X86Stream(0);
+		final X86Stream os = new X86Stream((X86CpuID)Unsafe.getCurrentProcessor().getCPUID(), 0);
 		os.setResolver(resolver);
 		return os;
 	}
