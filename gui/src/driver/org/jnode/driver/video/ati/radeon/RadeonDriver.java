@@ -3,12 +3,14 @@
  */
 package org.jnode.driver.video.ati.radeon;
 
+import org.jnode.driver.Device;
 import org.jnode.driver.DeviceException;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.pci.PCIDevice;
 import org.jnode.driver.video.AbstractFrameBufferDriver;
 import org.jnode.driver.video.AlreadyOpenException;
 import org.jnode.driver.video.FrameBufferConfiguration;
+import org.jnode.driver.video.HardwareCursorAPI;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.UnknownConfigurationException;
 import org.jnode.plugin.ConfigurationElement;
@@ -84,9 +86,9 @@ public class RadeonDriver extends AbstractFrameBufferDriver implements RadeonCon
 			throw new DriverException(ex);
 		}
 		super.startDevice();
-		//final Device dev = getDevice();
+		final Device dev = getDevice();
 		//dev.registerAPI(DisplayDataChannelAPI.class, kernel);
-		//dev.registerAPI(HardwareCursorAPI.class, kernel.getHardwareCursor());
+		dev.registerAPI(HardwareCursorAPI.class, kernel.getHardwareCursor());
 	}
 
 	/**
@@ -100,9 +102,9 @@ public class RadeonDriver extends AbstractFrameBufferDriver implements RadeonCon
 			kernel.release();
 			kernel = null;
 		}
-		//final Device dev = getDevice();
+		final Device dev = getDevice();
 		//dev.unregisterAPI(DisplayDataChannelAPI.class);
-		//dev.unregisterAPI(HardwareCursorAPI.class);
+		dev.unregisterAPI(HardwareCursorAPI.class);
 		super.stopDevice();
 	}
 
