@@ -130,14 +130,14 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
      * @see org.jnode.vm.classmgr.ObjectFlags#GC_YELLOW
      */
     public final int getObjectColor(Object src) {
-        return Unsafe.getObjectFlags(src) & ObjectFlags.GC_COLOUR_MASK;
+        return VmMagic.getObjectFlags(src) & ObjectFlags.GC_COLOUR_MASK;
     }
 
     /**
      * Gets the flags of the given object.
      */
     public final int getObjectFlags(Object src) {
-        return Unsafe.getObjectFlags(src);
+        return VmMagic.getObjectFlags(src);
     }
 
     /**
@@ -147,7 +147,7 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
      * @return
      */
     public final boolean isFinalized(Object src) {
-        return ((Unsafe.getObjectFlags(src) & ObjectFlags.STATUS_FINALIZED) != 0);
+        return ((VmMagic.getObjectFlags(src) & ObjectFlags.STATUS_FINALIZED) != 0);
     }
 
     /**
@@ -184,7 +184,7 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
      * @see org.jnode.vm.memmgr.HeapHelper#getVmClass(java.lang.Object)
      */
     public final VmClassType getVmClass(Object object) {
-        return Unsafe.getVmClass(object);
+        return VmMagic.getObjectType(object);
     }
 
     /**
@@ -213,7 +213,7 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
      * @see org.jnode.vm.memmgr.HeapHelper#unsafeSetObjectFlags(Object, int)
      */
     public final void unsafeSetObjectFlags(Object dst, int flags) {
-        Unsafe.setObjectFlags(dst, flags);
+        VmMagic.setObjectFlags(dst, flags);
     }
 
     /**

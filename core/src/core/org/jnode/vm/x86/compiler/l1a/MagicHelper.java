@@ -8,6 +8,9 @@ import org.jnode.assembler.x86.Register;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
+import org.jnode.vm.classmgr.ObjectLayout;
+import org.jnode.vm.classmgr.TIBLayout;
+import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.x86.compiler.BaseX86MagicHelper;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
@@ -247,6 +250,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, r));
         }
             break;
+        case mFROMADDRESS:
         case mFROMOBJECT: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem obj = vstack.popRef();
@@ -558,6 +562,50 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, eax));
         } break;
 
+        case mGETOBJECTTYPE: {
+            if (Vm.VerifyAssertions) Vm._assert(isstatic);
+            final RefItem obj = vstack.popRef();
+            obj.load(ec);
+            final Register r = obj.getRegister();
+            // Get TIB
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ObjectLayout.TIB_SLOT * 4);
+            // Get VmType
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, (TIBLayout.VMTYPE_INDEX + VmArray.DATA_OFFSET) * 4);
+            vstack.push(obj);
+        } break;
+        case mGETTIB: {
+            if (Vm.VerifyAssertions) Vm._assert(isstatic);
+            final RefItem obj = vstack.popRef();
+            obj.load(ec);
+            final Register r = obj.getRegister();
+            // Get TIB
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ObjectLayout.TIB_SLOT * 4);
+            vstack.push(obj);
+        } break;
+        case mGETOBJECTFLAGS: {
+            if (Vm.VerifyAssertions) Vm._assert(isstatic);
+            final RefItem obj = vstack.popRef();
+            obj.load(ec);
+            final Register r = obj.getRegister();
+            // Get flags
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ObjectLayout.FLAGS_SLOT * 4);
+            obj.release(ec);
+            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, r));
+        } break;
+        case mSETOBJECTFLAGS: {
+            if (Vm.VerifyAssertions) Vm._assert(isstatic);
+            final IntItem flags = vstack.popInt();
+            final RefItem obj = vstack.popRef();
+            flags.load(ec);
+            obj.load(ec);
+            final Register flagsr = flags.getRegister();
+            final Register r = obj.getRegister();
+            // Set flags
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, ObjectLayout.FLAGS_SLOT * 4, flagsr);
+            flags.release(ec);
+            obj.release(ec);
+        } break;
+            
         default:
             throw new InternalError("Unknown method code for method " + method);
         }

@@ -6,10 +6,10 @@ package org.jnode.vm.memmgr.def;
 
 import java.io.PrintStream;
 
-import org.jnode.vm.VmAddress;
 import org.jnode.vm.MemoryBlockManager;
 import org.jnode.vm.Monitor;
 import org.jnode.vm.Unsafe;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
@@ -20,6 +20,7 @@ import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.jnode.vm.memmgr.VmWriteBarrier;
+import org.vmmagic.unboxed.Address;
 
 public final class DefaultHeapManager extends VmHeapManager {
 
@@ -96,8 +97,8 @@ public final class DefaultHeapManager extends VmHeapManager {
      * @return True if the given address if a valid starting address of an
      *         object, false otherwise.
      */
-    public final boolean isObject(VmAddress ptr) {
-        long addrL = helper.addressToLong(ptr);
+    public final boolean isObject(Address ptr) {
+        long addrL = ptr.toLong();
         if ((addrL & (ObjectLayout.OBJECT_ALIGN - 1)) != 0) {
         // The object is not at an object aligned boundary
         return false; }

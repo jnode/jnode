@@ -4,6 +4,7 @@
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
+import org.jnode.vm.VmMagic;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.memmgr.HeapHelper;
@@ -39,7 +40,7 @@ final class GCSweepVisitor extends ObjectVisitor implements ObjectFlags,
                 // Already finalized, we can free it now
                 currentHeap.free(object);
             } else {
-                final VmClassType vmClass = helper.getVmClass(object);
+                final VmClassType vmClass = VmMagic.getObjectType(object);
                 if (!vmClass.hasFinalizer()) {
                     // No finalizer, we can free it now
                     currentHeap.free(object);

@@ -16,9 +16,9 @@ import org.jnode.vm.classmgr.VmMethod;
  */
 public abstract class HeapHelper extends ObjectResolver {
 
-	public abstract Object getTib(Object object);
+	//public abstract Object getTib(Object object);
 
-	public abstract VmClassType getVmClass(Object object);
+	//public abstract VmClassType getVmClass(Object object);
 
 	public abstract byte getByte(Object src, int offset);
 
@@ -44,7 +44,7 @@ public abstract class HeapHelper extends ObjectResolver {
 	 * @param src
 	 * @return
 	 */
-	public abstract int getObjectFlags(Object src);
+	//public abstract int getObjectFlags(Object src);
 
 	/**
 	 * Has the given object been finalized.

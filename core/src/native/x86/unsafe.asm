@@ -35,33 +35,11 @@ Q43org5jnode2vm6Unsafe23objectAt2e28Lorg2fjnode2fvm2fVmAddress3b29Ljava2flang2fO
 	mov eax,[esp+4] ; memPtr
 	ret 4
 	
-Q43org5jnode2vm6Unsafe23getVmClass2e28Ljava2flang2fObject3b29Lorg2fjnode2fvm2fclassmgr2fVmClassType3b:
-	mov eax,[esp+4] ; object reference
-	mov eax,[eax+ObjectLayout_TIB_SLOT*4] ; vmt reference
-	mov eax,[eax+(TIBLayout_VMTYPE_INDEX+VmArray_DATA_OFFSET)*4]
-	ret 4
-
-Q43org5jnode2vm6Unsafe23getTIB2e28Ljava2flang2fObject3b295bLjava2flang2fObject3b:
-	mov eax,[esp+4] ; object reference
-	mov eax,[eax+ObjectLayout_TIB_SLOT*4] ; TIB reference
-	ret 4
-
 Q43org5jnode2vm6Unsafe23getSuperClasses2e28Ljava2flang2fObject3b295bLorg2fjnode2fvm2fclassmgr2fVmType3b:
 	mov eax,[esp+4] ; object reference
 	mov eax,[eax+ObjectLayout_TIB_SLOT*4] ; TIB reference
 	mov eax,[eax+(TIBLayout_SUPERCLASSES_INDEX+VmArray_DATA_OFFSET)*4] 
 	ret 4
-
-Q43org5jnode2vm6Unsafe23getObjectFlags2e28Ljava2flang2fObject3b29I
-	mov eax,[esp+4] ; object reference
-	mov eax,[eax+ObjectLayout_FLAGS_SLOT*4] ; size
-	ret 4
-
-Q43org5jnode2vm6Unsafe23setObjectFlags2e28Ljava2flang2fObject3bI29V
-	mov eax,[esp+8] ; object reference
-	mov edx,[esp+4] ; new flags
-	mov [eax+ObjectLayout_FLAGS_SLOT*4],edx
-	ret 8
 
 Q43org5jnode2vm6Unsafe23getBoolean2e28Lorg2fjnode2fvm2fVmAddress3b29Z:
 	mov eax,[esp+4] ; memPtr
