@@ -58,13 +58,13 @@ class LfnEntry implements FSEntry {
 		FatBasicDirEntry[] entries = new FatBasicDirEntry[totalEntrySize];
 		int j = 0;
 		int checkSum = calculateCheckSum();
-		System.out.println("calculated Checksum=" + checkSum);
+		//System.out.println("calculated Checksum=" + checkSum);
 		for (int i = totalEntrySize - 2; i > 0; i--) {
 			entries[i] =
 				new FatLfnDirEntry(parent, fileName.substring(j * 13, j * 13 + 13), j + 1, (byte)checkSum, false);
 			j++;
 		}
-		System.out.println("lfn = " + fileName.substring(j * 13));
+		//System.out.println("lfn = " + fileName.substring(j * 13));
 		entries[0] = new FatLfnDirEntry(parent, fileName.substring(j * 13), j + 1, (byte)checkSum, true);
 		entries[totalEntrySize - 1] = realEntry;
 		return entries;

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.jnode.driver.block.BlockDeviceAPI;
-import org.jnode.util.NumberUtils;
 
 /**
  * <description>
@@ -68,8 +67,8 @@ public class FatDirectory extends AbstractDirectory {
 	public synchronized void read(BlockDeviceAPI device, long offset) throws IOException {
 		byte[] data = new byte[entries.size() * 32];
 		device.read(offset, data, 0, data.length);
-      System.out.println("Directory at offset :" + offset);
-      System.out.println("Length in bytes = " + entries.size() * 32);
+      //System.out.println("Directory at offset :" + offset);
+      //System.out.println("Length in bytes = " + entries.size() * 32);
       read(data);
 		resetDirty();
 	}
