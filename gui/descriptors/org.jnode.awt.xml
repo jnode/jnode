@@ -19,11 +19,13 @@
       <export name="org.jnode.awt.geom.*"/>
       <export name="org.jnode.awt.image.*"/>
       <export name="org.jnode.awt.peer.*"/>
+      <export name="org.jnode.awt.swingpeers.*"/>
       <export name="org.jnode.awt.util.*"/>
     </library>
   </runtime>
 
   <extension point="org.jnode.security.permissions">
+    <permission class="java.security.AllPermission"/>
     <permission class="java.util.PropertyPermission" name="awt.toolkit" actions="read,write"/>
     <permission class="java.util.PropertyPermission" name="jnode.awt.device" actions="read,write"/>
   </extension>
