@@ -21,16 +21,15 @@
  
 package org.jnode.shell;
 
+import gnu.java.security.action.InvokeAction;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardListener;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.SyntaxErrorException;
 
-import gnu.java.security.action.InvokeAction;
-
 import java.awt.event.KeyEvent;
-import java.io.PrintStream;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -47,6 +46,10 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
     CommandShell commandShell;
 
     private static final Class[] MAIN_ARG_TYPES = new Class[] { String[].class};
+    private static final Class[] EXECUTE_ARG_TYPES = new Class[] { CommandLine.class,InputStream.class,PrintStream.class,PrintStream.class};
+
+    private static final String MAIN_METHOD = "main";
+    private static final String EXECUTE_METHOD = "execute";
 
     private boolean blocking;
 
@@ -67,24 +70,51 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
         cmdName = cmdLine.next();
 
         commandShell.addCommandToHistory(cmdLineStr);
-        //        System.err.println("Got command: " + cmdLineStr + ", name=" +
-        // cmdName);
-        String[] args = cmdLine.getRemainder().toStringArray();
-        //        System.out.println("args.length = " + args.length);
-        //        for (int i = 0; i < args.length; i++) {
-        //            String arg = args[i];
-        //            System.out.println("arg["+i+"] = " + arg);
-        //        }
         try {
             CommandInfo cmdInfo = commandShell.getCommandClass(cmdName);
+          Method method;
+          CommandRunner cr;
 
-            //            System.err.println("CmdClass=" + cmdClass);
-            final Method main = cmdInfo.getCommandClass().getMethod("main", MAIN_ARG_TYPES);
-            //            System.err.println("main=" + main);
+          InputStream inputStream = System.in;  // will also be dynamic later
+          PrintStream errStream = System.err;   // will also be dynamic later
+          PrintStream outputStream = null;
+
+          try
+          {
+            method = cmdInfo.getCommandClass().getMethod(EXECUTE_METHOD, EXECUTE_ARG_TYPES);
+
+            if (cmdLine.sendToOutFile())
+            {
+              File file = new File(cmdLine.getOutFileName());
+
+              try
+              {
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
+                outputStream = new PrintStream(fileOutputStream);
+              }
+              catch (SecurityException e)
+              {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+              }
+              catch (FileNotFoundException e)
+              {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+              }
+            }
+            else
+            {
+              outputStream = System.out;
+            }
+
+            cr = new CommandRunner(cmdInfo.getCommandClass(), method, new Object[]{cmdLine,inputStream,outputStream,errStream});
+          }
+          catch (Exception e)
+          {
+            method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD, MAIN_ARG_TYPES);
+            cr = new CommandRunner(cmdInfo.getCommandClass(), method, new Object[]{cmdLine.getRemainder().toStringArray()});
+          }
             try {
-                //                System.err.println("Invoking...");
-                CommandRunner cr = new CommandRunner(cmdInfo.getCommandClass(), main,
-                        new Object[] { args});
+
                 if (cmdInfo.isInternal()) {
                 	cr.run();
                 } else {
@@ -105,6 +135,13 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
                 			}
                 		}
                 	}
+
+
+                }
+
+                if (outputStream != null && outputStream != System.out)
+                {
+                  outputStream.close();
                 }
                 //                System.err.println("Finished invoke.");
             } catch (Exception ex) {
