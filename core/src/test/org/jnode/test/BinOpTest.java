@@ -31,5 +31,15 @@ public class BinOpTest {
 		System.out.println("l1 >> 33 =" + NumberUtils.hex(l1 >> 33));
 		System.out.println("l1 >>> 3 =" + NumberUtils.hex(l1 >>> 3));
 		System.out.println("l1 >>> 33=" + NumberUtils.hex(l1 >>> 33));
+
+		System.out.println("i1 & 0xFF         = " + (byte) (i1 & 0xFF));
+		System.out.println("(i1 >> 8) & 0xFF  = " + (byte) ((i1 >> 8) & 0xFF));
+		System.out.println("(i1 >> 16) & 0xFF = " + (byte) ((i1 >> 16) & 0xFF));
+		System.out.println("(i1 >> 24) & 0xFF = " + (byte) ((i1 >> 24) & 0xFF));
+
+		System.out.println("i2 & 0xFF         = " + (byte) (i2 & 0xFF));
+		System.out.println("(i2 >> 8) & 0xFF  = " + (byte) ((i2 >> 8) & 0xFF));
+		System.out.println("(i2 >> 16) & 0xFF = " + (byte) ((i2 >> 16) & 0xFF));
+		System.out.println("(i2 >> 24) & 0xFF = " + (byte) ((i2 >> 24) & 0xFF));
 	}
 }

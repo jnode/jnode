@@ -92,6 +92,9 @@ public class X86StreamTest {
 		os.writeMOV(X86Constants.BITS8, Register.ECX, Register.EBX, 1, 4, Register.ESI);
 		os.writeMOV(X86Constants.BITS8, Register.EDX, Register.ECX, Register.EBX, 1, 4);
 		os.writeMOVSX(Register.EDX, Register.EDX, X86Constants.BITS8);
+
+		os.writeSAR(Register.EBP, 16, 16);
+		os.writeSAR(Register.EBP, 16, 24);
 		
 		FileOutputStream fos = new FileOutputStream("test.bin");
 		os.writeTo(fos);

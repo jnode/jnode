@@ -177,22 +177,26 @@ sys_print_intregs:
 	idm_print_reg stack1,  [ebx+16]
 	idm_print_reg stack1,  [ebx+20]
 	mov ebx,[ebp+OLD_EIP]
+	; If EIP == CR2, then we print the code as the address of the Top of
+	; the stack.
+	push eax
+	mov eax,cr2
+	cmp ebx,eax
+	pop eax
+	jne sys_print_intregs_code
+	mov ebx,[ebp+OLD_ESP]
+	mov ebx,[ebx+0]
+	sub ebx,16
+sys_print_intregs_code:
+	idm_print_reg  ipaddr, ebx
 	idm_print_byte ip0,	   [ebx+0]
-	idm_print_byte ip1,	   [ebx+1]
-	idm_print_byte ip1,	   [ebx+2]
-	idm_print_byte ip1,	   [ebx+3]
-	idm_print_byte ip1,	   [ebx+4]
-	idm_print_byte ip1,	   [ebx+5]
-	idm_print_byte ip1,	   [ebx+6]
-	idm_print_byte ip1,	   [ebx+7]
-	idm_print_byte ip1,	   [ebx+8]
-	idm_print_byte ip1,	   [ebx+9]
-	idm_print_byte ip1,	   [ebx+10]
-	idm_print_byte ip1,	   [ebx+11]
-	idm_print_byte ip1,	   [ebx+12]
-	idm_print_byte ip1,	   [ebx+13]
-	idm_print_byte ip1,	   [ebx+14]
-	idm_print_byte ip1,	   [ebx+15]
+	push ecx
+	mov ecx,32
+sys_print_intregs_loop:
+	inc ebx
+	idm_print_byte ip1, [ebx]
+	loop sys_print_intregs_loop
+	pop ecx
 	ret
 
 idm_intno:  db 0xd,0xa,'int  : ',0
@@ -216,7 +220,8 @@ idm_fs:     db        ' FS   : ',0
 idm_gs:     db        ' GS   : ',0
 idm_stack0: db 0xd,0xa,'STACK: ',0
 idm_stack1: db        0
-idm_ip0:    db 0xd,0xa,'CODE : ',0
+idm_ipaddr: db 0xd,0xa,'CODE(',0
+idm_ip0:    db        '): ',0
 idm_ip1:    db        0
 
 ; -------------------

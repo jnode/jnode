@@ -52,7 +52,8 @@ public class X86CompilerHelper implements X86CompilerConstants {
     private final boolean debug = Vm.getVm().isDebugMode();
 
     private final AbstractX86StackManager stackMgr;
-	private final AbstractX86Stream os;
+
+    private final AbstractX86Stream os;
 
     /**
      * Create a new instance
@@ -95,7 +96,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
         this.method = method;
         this.labelPrefix = method.toString() + "_";
         this.instrLabelPrefix = labelPrefix + "_bci_";
-        this.addressLabels = new Label[ method.getBytecodeSize()];
+        this.addressLabels = new Label[method.getBytecodeSize()];
     }
 
     /**
@@ -103,7 +104,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
     public void startInlinedMethod(VmMethod inlinedMethod, Label curInstrLabel) {
         this.labelPrefix = curInstrLabel + "_" + inlinedMethod + "_";
         this.instrLabelPrefix = labelPrefix + "_bci_";
-        this.addressLabels = new Label[ inlinedMethod.getBytecodeSize()];
+        this.addressLabels = new Label[inlinedMethod.getBytecodeSize()];
     }
 
     /**
@@ -113,10 +114,10 @@ public class X86CompilerHelper implements X86CompilerConstants {
      * @return The created label
      */
     public final Label getInstrLabel(int address) {
-        Label l = addressLabels[ address];
+        Label l = addressLabels[address];
         if (l == null) {
             l = new Label(instrLabelPrefix + address);
-            addressLabels[ address] = l;
+            addressLabels[address] = l;
         }
         return l;
     }
@@ -168,8 +169,8 @@ public class X86CompilerHelper implements X86CompilerConstants {
      * @param signature
      */
     public final void invokeJavaMethod(String signature) {
-        os.writeCALL(Register.EAX, context.getVmMethodNativeCodeField()
-                .getOffset());
+        final int offset = context.getVmMethodNativeCodeField().getOffset();
+        os.writeCALL(Register.EAX, offset);
         pushReturnValue(signature);
     }
 
@@ -180,7 +181,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
      */
     public final void pushReturnValue(String signature) {
         final int returnType = JvmType.getReturnType(signature);
-        assertCondition(signature.endsWith("V") == (returnType == JvmType.VOID), "Return type");
+        assertCondition(
+                signature.endsWith("V") == (returnType == JvmType.VOID),
+                "Return type");
         //System.out.println("Return type: " + returnType + "\t" + signature);
         switch (returnType) {
         case JvmType.VOID:
@@ -188,12 +191,12 @@ public class X86CompilerHelper implements X86CompilerConstants {
             break;
         case JvmType.DOUBLE:
         case JvmType.LONG:
-            // Wide return value 
+            // Wide return value
             stackMgr.writePUSH64(returnType, Register.EAX, Register.EDX);
-        	break;
+            break;
         default:
             // Normal return value
-            stackMgr.writePUSH(returnType, Register.EAX);        
+            stackMgr.writePUSH(returnType, Register.EAX);
         }
     }
 
@@ -203,7 +206,12 @@ public class X86CompilerHelper implements X86CompilerConstants {
      * @param method
      */
     public final void invokeJavaMethod(VmMethod method) {
-        os.writeMOV_Const(Register.EAX, method);
+        if (false) {
+            final int staticsIdx = (VmArray.DATA_OFFSET + method.getStaticsIndex()) << 2;
+            os.writeMOV(INTSIZE, Register.EAX, STATICS, staticsIdx);
+        } else {
+            os.writeMOV_Const(Register.EAX, method);
+        }
         invokeJavaMethod(method.getSignature());
     }
 
@@ -245,8 +253,8 @@ public class X86CompilerHelper implements X86CompilerConstants {
                 os.writeMOV(INTSIZE, EAX, methodReg, context
                         .getVmMemberDeclaringClassField().getOffset());
                 // Test declaringClass.modifiers
-                os.writeTEST(EAX, context.getVmTypeState()
-                        .getOffset(), VmTypeState.ST_INITIALIZED);
+                os.writeTEST(EAX, context.getVmTypeState().getOffset(),
+                        VmTypeState.ST_INITIALIZED);
                 final Label afterInit = new Label(method.getMangledName()
                         + "$$after-classinit");
                 os.writeJCC(afterInit, X86Constants.JNZ);
@@ -331,13 +339,16 @@ public class X86CompilerHelper implements X86CompilerConstants {
         if (method.isStatic() && !method.isInitializer()) {
             // Only when class is not initialize
             final VmType cls = method.getDeclaringClass();
-            if (!cls.isInitialized()) { return true; }
+            if (!cls.isInitialized()) {
+                return true;
+            }
         }
         return false;
     }
-    
+
     /**
      * Do we need a write barrier
+     * 
      * @return
      */
     public final boolean needsWriteBarrier() {
@@ -434,15 +445,17 @@ public class X86CompilerHelper implements X86CompilerConstants {
      * 
      * @param curInstrLabel
      * @param entry
-     * @param is32bit If true, a 32-bit load is performed, otherwise a 64-bit load.
+     * @param is32bit
+     *            If true, a 32-bit load is performed, otherwise a 64-bit load.
      */
-    public final void writeGetStaticsEntryToFPU(Label curInstrLabel, VmStaticsEntry entry, boolean is32bit) {
+    public final void writeGetStaticsEntryToFPU(Label curInstrLabel,
+            VmStaticsEntry entry, boolean is32bit) {
         writeLoadSTATICS(curInstrLabel, "gs", true);
         final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
         if (is32bit) {
-        	os.writeFLD32(STATICS, staticsIdx);
+            os.writeFLD32(STATICS, staticsIdx);
         } else {
-        	os.writeFLD64(STATICS, staticsIdx);        	
+            os.writeFLD64(STATICS, staticsIdx);
         }
     }
 
@@ -508,7 +521,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
         os.writeMOV(INTSIZE, STATICS, staticsIdx + 4, msbSrc); // MSB
         os.writeMOV(INTSIZE, STATICS, staticsIdx + 0, lsbSrc); // LSB
     }
-    
+
     public static void assertCondition(boolean condition, String msg) {
         if (!condition) {
             throw new InternalError("Assertion failed: " + msg);
