@@ -146,7 +146,7 @@ public class PluginRegistryModel extends VmSystemObject implements
     			}
     		}
     		if (!change) {
-    			throw new PluginException("Failed to resolve all descriptors");
+    			throw new PluginException("Failed to resolve all descriptors: "+descriptors);
     		}
     	}
     }
@@ -367,7 +367,7 @@ public class PluginRegistryModel extends VmSystemObject implements
         final PluginDescriptorModel descr = (PluginDescriptorModel)getPluginDescriptor(pluginId);
         if (descr != null) {
             if (descr.isSystemPlugin()) { throw new PluginException(
-                    "Cannot unload a system plugin"); }
+                    "Cannot unload a system plugin: "+pluginId); }
             
             // Unload all plugins that depend on this plugin
             final ArrayList descriptors = new ArrayList(descriptorMap.values());
