@@ -94,7 +94,6 @@ public class BinaryQuad extends AssignQuad {
 	private static final int MODE_SSR = (Operand.MODE_STACK << 16) | (Operand.MODE_STACK << 8) | Operand.MODE_REGISTER;
 	private static final int MODE_SSS = (Operand.MODE_STACK << 16) | (Operand.MODE_STACK << 8) | Operand.MODE_STACK;
 
-	private Operand operand1, operand2;
 	private int operation;
 	private Operand refs[];
 	private boolean commutative;
@@ -108,10 +107,8 @@ public class BinaryQuad extends AssignQuad {
 		int varIndex1, int operation, int varIndex2) {
 
 		super(address, block, lhsIndex);
-		this.operand1 = getOperand(varIndex1);
 		this.operation = operation;
-		this.operand2 = getOperand(varIndex2);
-		refs = new Operand[] { operand1, operand2 };
+		refs = new Operand[] { getOperand(varIndex1), getOperand(varIndex2) };
 		this.commutative =
 			operation == IADD || operation == IMUL ||
 			operation == LADD || operation == LMUL ||
@@ -126,10 +123,8 @@ public class BinaryQuad extends AssignQuad {
 		int varIndex1, int operation, Operand op2) {
 
 		super(address, block, lhsIndex);
-		this.operand1 = getOperand(varIndex1);
 		this.operation = operation;
-		this.operand2 = op2;
-		refs = new Operand[] { operand1, operand2 };
+		refs = new Operand[] { getOperand(varIndex1), op2 };
 		this.commutative =
 			operation == IADD || operation == IMUL ||
 			operation == LADD || operation == LMUL ||
@@ -151,14 +146,14 @@ public class BinaryQuad extends AssignQuad {
 	 * @return
 	 */
 	public Operand getOperand1() {
-		return operand1;
+		return refs[0];
 	}
 
 	/**
 	 * @return
 	 */
 	public Operand getOperand2() {
-		return operand2;
+		return refs[1];
 	}
 
 	/**
@@ -170,19 +165,19 @@ public class BinaryQuad extends AssignQuad {
 
 	public String toString() {
 		return getAddress() + ": " + getLHS().toString() + " = " +
-			operand1.toString() + " " + OP_MAP[operation - IADD] +
-			" " + operand2.toString();
+			refs[0].toString() + " " + OP_MAP[operation - IADD] +
+			" " + refs[1].toString();
 	}
 
 	/**
-	 * If operand1 and operand2 are both Constants, then fold them.
+	 * If refs[0] and refs[1] are both Constants, then fold them.
 	 *
 	 * @return resulting Quad after folding
 	 */
 	public Quad foldConstants() {
-		if (operand1 instanceof Constant && operand2 instanceof Constant) {
-			Constant c1 = (Constant) operand1;
-			Constant c2 = (Constant) operand2;
+		if (refs[0] instanceof Constant && refs[1] instanceof Constant) {
+			Constant c1 = (Constant) refs[0];
+			Constant c2 = (Constant) refs[1];
 			switch (operation) {
 				case IADD:
 					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
@@ -340,15 +335,15 @@ public class BinaryQuad extends AssignQuad {
 	 * @see org.jnode.vm.compiler.ir.quad.Quad#doPass2(org.jnode.util.BootableHashMap)
 	 */
 	public void doPass2(BootableHashMap liveVariables) {
-		operand1 = operand1.simplify();
-		operand2 = operand2.simplify();
-		if (operand1 instanceof Variable) {
-			Variable v = (Variable) operand1;
+		refs[0] = refs[0].simplify();
+		refs[1] = refs[1].simplify();
+		if (refs[0] instanceof Variable) {
+			Variable v = (Variable) refs[0];
 			v.setLastUseAddress(this.getAddress());
 			liveVariables.put(v, v);
 		}
-		if (operand2 instanceof Variable) {
-			Variable v = (Variable) operand2;
+		if (refs[1] instanceof Variable) {
+			Variable v = (Variable) refs[1];
 			v.setLastUseAddress(this.getAddress());
 			liveVariables.put(v, v);
 		}
@@ -364,8 +359,8 @@ public class BinaryQuad extends AssignQuad {
         cg.checkLabel(getAddress());
 		Variable lhs = getLHS();
 		int lhsMode = lhs.getAddressingMode();
-		int op1Mode = operand1.getAddressingMode();
-		int op2Mode = operand2.getAddressingMode();
+		int op1Mode = refs[0].getAddressingMode();
+		int op2Mode = refs[1].getAddressingMode();
 
 		Object reg1 = null;
 		if (lhsMode == Operand.MODE_REGISTER) {
@@ -374,13 +369,13 @@ public class BinaryQuad extends AssignQuad {
 		}
 		Object reg2 = null;
 		if (op1Mode == Operand.MODE_REGISTER) {
-			Variable var = (Variable) operand1;
+			Variable var = (Variable) refs[0];
 			RegisterLocation regLoc = (RegisterLocation) var.getLocation();
 			reg2 = regLoc.getRegister();
 		}
 		Object reg3 = null;
 		if (op2Mode == Operand.MODE_REGISTER) {
-			Variable var = (Variable) operand2;
+			Variable var = (Variable) refs[1];
 			RegisterLocation regLoc = (RegisterLocation) var.getLocation();
 			reg3 = regLoc.getRegister();
 		}
@@ -392,24 +387,24 @@ public class BinaryQuad extends AssignQuad {
 		}
 		int disp2 = 0;
 		if (op1Mode == Operand.MODE_STACK) {
-			Variable var = (Variable) operand1;
+			Variable var = (Variable) refs[0];
 			StackLocation stackLoc = (StackLocation) var.getLocation();
 			disp2 = stackLoc.getDisplacement();
 		}
 		int disp3 = 0;
 		if (op2Mode == Operand.MODE_STACK) {
-			Variable var = (Variable) operand2;
+			Variable var = (Variable) refs[1];
 			StackLocation stackLoc = (StackLocation) var.getLocation();
 			disp3 = stackLoc.getDisplacement();
 		}
 
 		Constant c2 = null;
 		if (op1Mode == Operand.MODE_CONSTANT) {
-			c2 = (Constant) operand1;
+			c2 = (Constant) refs[0];
 		}
 		Constant c3 = null;
 		if (op2Mode == Operand.MODE_CONSTANT) {
-			c3 = (Constant) operand2;
+			c3 = (Constant) refs[1];
 		}
 
 		int aMode = (lhsMode << 16) | (op1Mode << 8) | op2Mode;

@@ -48,7 +48,6 @@ public class UnaryQuad extends AssignQuad {
 	public static final int FNEG = 18;
 	public static final int DNEG = 19;
 
-	private Operand operand;
 	private int operation;
 	private Operand refs[];
 
@@ -62,8 +61,7 @@ public class UnaryQuad extends AssignQuad {
 
 		super(address, block, lhsIndex);
 		this.operation = operation;
-		this.operand = getOperand(varIndex);
-		refs = new Operand[] { operand };
+		refs = new Operand[] { getOperand(varIndex) };
 	}
 
 	/* (non-Javadoc)
@@ -76,7 +74,7 @@ public class UnaryQuad extends AssignQuad {
 	 * @return
 	 */
 	public Operand getOperand() {
-		return operand;
+		return refs[0];
 	}
 
 	/**
@@ -88,7 +86,7 @@ public class UnaryQuad extends AssignQuad {
 
 	public String toString() {
 		return getAddress() + ": " + getLHS().toString() + " = " +
-			OP_MAP[operation - I2L] + " " + operand.toString();
+			OP_MAP[operation - I2L] + " " + refs[0].toString();
 	}
 
 	/* (non-Javadoc)
@@ -106,8 +104,8 @@ public class UnaryQuad extends AssignQuad {
 	}
 
     private Quad foldConstants() {
-        if(operand instanceof Constant){
-            Constant c = (Constant) operand;
+        if(refs[0] instanceof Constant){
+            Constant c = (Constant) refs[0];
 
             switch (operation) {
                 case I2L:
@@ -198,9 +196,9 @@ public class UnaryQuad extends AssignQuad {
 	 * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
 	 */
 	public void doPass2(BootableHashMap liveVariables) {
-		operand = operand.simplify();
-		if (operand instanceof Variable) {
-			Variable v = (Variable) operand;
+		refs[0] = refs[0].simplify();
+		if (refs[0] instanceof Variable) {
+			Variable v = (Variable) refs[0];
 			v.setLastUseAddress(this.getAddress());
 			liveVariables.put(v, v);
 		}
@@ -215,8 +213,8 @@ public class UnaryQuad extends AssignQuad {
 		if (lhsLoc instanceof RegisterLocation) {
 			RegisterLocation regLoc = (RegisterLocation) lhsLoc;
 			Object lhsReg = regLoc.getRegister();
-			if (operand instanceof Variable) {
-				Variable var = (Variable) operand;
+			if (refs[0] instanceof Variable) {
+				Variable var = (Variable) refs[0];
 				Location varLoc = var.getLocation();
 				if (varLoc instanceof RegisterLocation) {
 					RegisterLocation vregLoc = (RegisterLocation) varLoc;
@@ -227,18 +225,18 @@ public class UnaryQuad extends AssignQuad {
 				} else {
 					throw new IllegalArgumentException("Unknown location: " + varLoc);
 				}
-			} else if (operand instanceof Constant) {
+			} else if (refs[0] instanceof Constant) {
 				// this probably won't happen, is should be folded earlier
-				Constant con = (Constant) operand;
+				Constant con = (Constant) refs[0];
 				cg.generateCodeFor(this, lhsReg, operation, con);
 			} else {
-				throw new IllegalArgumentException("Unknown operand: " + operand);
+				throw new IllegalArgumentException("Unknown operand: " + refs[0]);
 			}
 		} else if (lhsLoc instanceof StackLocation) {
 			StackLocation lhsStackLoc = (StackLocation) lhsLoc;
 			int lhsDisp = lhsStackLoc.getDisplacement();
-			if (operand instanceof Variable) {
-				Variable var = (Variable) operand;
+			if (refs[0] instanceof Variable) {
+				Variable var = (Variable) refs[0];
 				Location varLoc = var.getLocation();
 				if (varLoc instanceof RegisterLocation) {
 					RegisterLocation vregLoc = (RegisterLocation) varLoc;
@@ -249,11 +247,11 @@ public class UnaryQuad extends AssignQuad {
 				} else {
 					throw new IllegalArgumentException("Unknown location: " + varLoc);
 				}
-			} else if (operand instanceof Constant) {
-				Constant con = (Constant) operand;
+			} else if (refs[0] instanceof Constant) {
+				Constant con = (Constant) refs[0];
 				cg.generateCodeFor(this, lhsDisp, operation, con);
 			} else {
-				throw new IllegalArgumentException("Unknown operand: " + operand);
+				throw new IllegalArgumentException("Unknown operand: " + refs[0]);
 			}
 		} else {
 			throw new IllegalArgumentException("Unknown location: " + lhsLoc);

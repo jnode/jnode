@@ -96,6 +96,10 @@ public class PhiAssignQuad extends AssignQuad {
 	}
 
 	public String toString() {
-		return getAddress() + ": " + getLHS().toString() + " = " + phi.toString();
+		if (isDeadCode()) {
+			return getAddress() + ": " + "            nop (pruned phi)";
+		} else {
+			return getAddress() + ": " + getLHS() + " = " + phi;
+		}
 	}
 }

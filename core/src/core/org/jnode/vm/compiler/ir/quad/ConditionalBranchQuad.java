@@ -48,8 +48,6 @@ public class ConditionalBranchQuad extends BranchQuad {
     private int condition;
     private boolean commutative;
     private Operand[] refs;
-    private Operand operand2;
-    private Operand operand1;
     private static final int MODE_CC = (Operand.MODE_CONSTANT << 8) | Operand.MODE_CONSTANT;
     private static final int MODE_CR = (Operand.MODE_CONSTANT << 8) | Operand.MODE_REGISTER;
     private static final int MODE_CS = (Operand.MODE_CONSTANT << 8) | Operand.MODE_STACK;
@@ -71,14 +69,12 @@ public class ConditionalBranchQuad extends BranchQuad {
         if (condition < IF_ICMPEQ || condition > IF_ACMPNE) {
             throw new IllegalArgumentException("can't use that condition here");
         }
-        this.operand1 = getOperand(varIndex1);
         this.condition = condition;
         this.commutative = condition == IF_ICMPEQ ||
                            condition == IF_ICMPNE ||
                            condition == IF_ACMPEQ ||
                            condition == IF_ACMPNE;
-        this.operand2 = getOperand(varIndex2);
-        refs = new Operand[]{operand1, operand2};
+        refs = new Operand[]{ getOperand(varIndex1), getOperand(varIndex2) };
     }
 
     public ConditionalBranchQuad(int address, IRBasicBlock block,
@@ -88,13 +84,12 @@ public class ConditionalBranchQuad extends BranchQuad {
         if (condition < IFEQ || condition > IFNULL) {
             throw new IllegalArgumentException("can't use that condition here");
         }
-        this.operand1 = getOperand(varIndex);
         this.condition = condition;
         this.commutative = condition == IF_ICMPEQ ||
                            condition == IF_ICMPNE ||
                            condition == IF_ACMPEQ ||
                            condition == IF_ACMPNE;
-        refs = new Operand[]{operand1};
+        refs = new Operand[]{ getOperand(varIndex) };
     }
 
     /**
@@ -115,14 +110,14 @@ public class ConditionalBranchQuad extends BranchQuad {
      * @return
      */
     public Operand getOperand1() {
-        return operand1;
+        return refs[0];
     }
 
     /**
      * @return
      */
     public Operand getOperand2() {
-        return operand2;
+        return refs[1];
     }
 
     /**
@@ -134,11 +129,11 @@ public class ConditionalBranchQuad extends BranchQuad {
 
     public String toString() {
         if (condition >= IF_ICMPEQ) {
-            return getAddress() + ": if " + operand1.toString() + " " +
-                    CONDITION_MAP[condition] + " " + operand2.toString() +
+            return getAddress() + ": if " + refs[0].toString() + " " +
+                    CONDITION_MAP[condition] + " " + refs[1].toString() +
                     " goto " + getTargetAddress();
         } else {
-            return getAddress() + ": if " + operand1.toString() + " " +
+            return getAddress() + ": if " + refs[0].toString() + " " +
                     CONDITION_MAP[condition] + " goto " + getTargetAddress();
         }
     }
@@ -147,16 +142,16 @@ public class ConditionalBranchQuad extends BranchQuad {
      * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
      */
     public void doPass2(BootableHashMap liveVariables) {
-        operand1 = operand1.simplify();
-        if (operand1 instanceof Variable) {
-            Variable v = (Variable) operand1;
+        refs[0] = refs[0].simplify();
+        if (refs[0] instanceof Variable) {
+            Variable v = (Variable) refs[0];
             v.setLastUseAddress(this.getAddress());
             liveVariables.put(v, v);
         }
-        if (operand2 != null) {
-            operand2 = operand2.simplify();
-            if (operand2 instanceof Variable) {
-                Variable v = (Variable) operand2;
+        if (refs[1] != null) {
+            refs[1] = refs[1].simplify();
+            if (refs[1] instanceof Variable) {
+                Variable v = (Variable) refs[1];
                 v.setLastUseAddress(this.getAddress());
                 liveVariables.put(v, v);
             }
@@ -176,8 +171,8 @@ public class ConditionalBranchQuad extends BranchQuad {
 
 
     public void generateCodeForUnary(CodeGenerator cg) {
-        if (operand1 instanceof Variable) {
-            Location varLoc = ((Variable) operand1).getLocation();
+        if (refs[0] instanceof Variable) {
+            Location varLoc = ((Variable) refs[0]).getLocation();
             if (varLoc instanceof RegisterLocation) {
                 RegisterLocation vregLoc = (RegisterLocation) varLoc;
                 cg.generateCodeFor(this, condition, vregLoc.getRegister());
@@ -187,12 +182,12 @@ public class ConditionalBranchQuad extends BranchQuad {
             } else {
                 throw new IllegalArgumentException("Unknown location: " + varLoc);
             }
-        } else if (operand1 instanceof Constant) {
+        } else if (refs[0] instanceof Constant) {
             // this probably won't happen, is should be folded earlier
-            Constant con = (Constant) operand1;
+            Constant con = (Constant) refs[0];
             cg.generateCodeFor(this, condition, con);
         } else {
-            throw new IllegalArgumentException("Unknown operand: " + operand1);
+            throw new IllegalArgumentException("Unknown operand: " + refs[0]);
         }
     }
 
@@ -204,45 +199,45 @@ public class ConditionalBranchQuad extends BranchQuad {
      */
     public void generateCodeForBinary(CodeGenerator cg) {
         cg.checkLabel(getAddress());
-        int op1Mode = operand1.getAddressingMode();
-        int op2Mode = operand2.getAddressingMode();
+        int op1Mode = refs[0].getAddressingMode();
+        int op2Mode = refs[1].getAddressingMode();
 
         Object reg2 = null;
         if (op1Mode == Operand.MODE_REGISTER) {
-            Variable var = (Variable) operand1;
+            Variable var = (Variable) refs[0];
             RegisterLocation regLoc = (RegisterLocation) var.getLocation();
             reg2 = regLoc.getRegister();
         }
 
         Object reg3 = null;
         if (op2Mode == Operand.MODE_REGISTER) {
-            Variable var = (Variable) operand2;
+            Variable var = (Variable) refs[1];
             RegisterLocation regLoc = (RegisterLocation) var.getLocation();
             reg3 = regLoc.getRegister();
         }
 
         int disp2 = 0;
         if (op1Mode == Operand.MODE_STACK) {
-            Variable var = (Variable) operand1;
+            Variable var = (Variable) refs[0];
             StackLocation stackLoc = (StackLocation) var.getLocation();
             disp2 = stackLoc.getDisplacement();
         }
 
         int disp3 = 0;
         if (op2Mode == Operand.MODE_STACK) {
-            Variable var = (Variable) operand2;
+            Variable var = (Variable) refs[1];
             StackLocation stackLoc = (StackLocation) var.getLocation();
             disp3 = stackLoc.getDisplacement();
         }
 
         Constant c2 = null;
         if (op1Mode == Operand.MODE_CONSTANT) {
-            c2 = (Constant) operand1;
+            c2 = (Constant) refs[0];
         }
 
         Constant c3 = null;
         if (op2Mode == Operand.MODE_CONSTANT) {
-            c3 = (Constant) operand2;
+            c3 = (Constant) refs[1];
         }
 
         int aMode = (op1Mode << 8) | op2Mode;
