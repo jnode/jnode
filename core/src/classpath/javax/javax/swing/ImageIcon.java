@@ -95,7 +95,8 @@ public class ImageIcon
 
   public ImageIcon(Image image, String description)
   {
-    this.image = Toolkit.getDefaultToolkit().createImage(image.getSource());
+  	this.image = image;
+    //this.image = Toolkit.getDefaultToolkit().createImage(image.getSource());
     this.description = description;
   }
 
