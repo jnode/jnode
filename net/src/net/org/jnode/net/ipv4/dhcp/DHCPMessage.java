@@ -3,7 +3,9 @@
  */
 package org.jnode.net.ipv4.dhcp;
 
+import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
+import java.net.Inet4Address;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
@@ -22,21 +24,66 @@ public class DHCPMessage {
 
 	// RFC 2132
 	public static final int PAD_OPTION = 0;
+	/** 4 bytes */
 	public static final int SUBNET_MASK_OPTION = 1;
+	/** Signed 32-bit integer, seconds */
 	public static final int TIME_OFFSET_OPTION = 2;
+	/** IP address */
 	public static final int ROUTER_OPTION = 3;
+	/** IP address */
+	public static final int TIME_SERVER_OPTION = 4;
+	/** IP address */
+	public static final int NAME_SERVER_OPTION = 5;
+	/** IP address */
+	public static final int DNS_OPTION = 6;
+	/** IP address */
+	public static final int LOG_SERVER_OPTION = 7;
+	/** IP address */
+	public static final int COOKIE_SERVER_OPTION = 8;
+	/** IP address */
+	public static final int LPR_SERVER_OPTION = 9;
+	/** String */
+	public static final int HOST_NAME_OPTION = 12;
+	/** String */
 	public static final int DOMAIN_NAME_OPTION = 15;
+	/** Byte */
+	public static final int TTL_OPTION = 23;
+	/** IP address */
 	public static final int REQUESTED_IP_ADDRESS_OPTION = 50;
+	/** Unsigned 32-bit integer, seconds */
+	public static final int LEASE_TIME_OPTION = 51;
+	/** Byte, FILE_OVERLOAD, SNAME_OVERLOAD, BOTH_OVERLOAD */
+	public static final int OPTION_OVERLOAD_OPTION = 52;
+	public static final int FILE_OVERLOAD = 1;
+	public static final int SNAME_OVERLOAD = 2;
+	public static final int BOTH_OVERLOAD = 3;
+	/** Byte */
 	public static final int MESSAGE_TYPE_OPTION = 53;
+	/** IP address */
 	public static final int SERVER_IDENTIFIER_OPTION = 54;
+	/** String */
 	public static final int MESSAGE_OPTION = 56;
+	/** Unsigned 16-bit integer, minimum value is MIN_PACKET_SIZE */
+	public static final int MAX_PACKET_SIZE_OPTION = 57;
+	public static final int MIN_PACKET_SIZE = 576;
+	/** Unsigned 32-bit integer, seconds */
 	public static final int RENEWAL_TIME_OPTION = 58;
+	/** Unsigned 32-bit integer, seconds */
 	public static final int REBINDING_TIME_OPTION = 59;
 	public static final int CLIENT_IDENTIFIER_OPTION = 61;
 	public static final int TFTP_SERVER_OPTION = 66;
+	/** IP address */
 	public static final int SMTP_SERVER_OPTION = 69;
+	/** IP address */
 	public static final int POP3_SERVER_OPTION = 70;
+	/** IP address */
 	public static final int NNTP_SERVER_OPTION = 71;
+	/** IP address */
+	public static final int WWW_SERVER_OPTION = 72;
+	/** IP address */
+	public static final int FINGER_SERVER_OPTION = 73;
+	/** IP address */
+	public static final int IRC_SERVER_OPTION = 74;
 	public static final int END_OPTION = 255;
 
 	// message types
@@ -95,12 +142,44 @@ public class DHCPMessage {
 		return messageType;
 	}
 
+	/**
+	 * Sets a DHCP option with an array of bytes.
+	 */
 	public void setOption(int code, byte[] value) {
 		if(code == MESSAGE_TYPE_OPTION)
 			messageType = value[0];
 		else
 			options.put(new Integer(code), value);
 	}
+	/**
+	 * Sets a DHCP option with an unsigned 16-bit integer.
+	 * Convenience method.
+	 */
+	public void setOption16(int code, int value) {
+		byte[] b = new byte[] {(byte) ((value >> 8) & 0xFF), (byte) (value & 0xFF)};
+		setOption(code, b);
+	}
+	/**
+	 * Sets a DHCP option with a string.
+	 * Convenience method.
+	 */
+	public void setOption(int code, String value) {
+		try {
+			setOption(code, value.getBytes("US-ASCII"));
+		} catch(UnsupportedEncodingException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+	/**
+	 * Sets a DHCP option with an IP address.
+	 * Convenience method.
+	 */
+	public void setOption(int code, Inet4Address value) {
+		setOption(code, value.getAddress());
+	}
+	/**
+	 * Gets a DHCP option as an array of bytes.
+	 */
 	public byte[] getOption(int code) {
 		if(code == MESSAGE_TYPE_OPTION)
 			return new byte[] {(byte) messageType};
