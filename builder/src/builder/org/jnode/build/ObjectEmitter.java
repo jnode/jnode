@@ -5,20 +5,22 @@
 package org.jnode.build;
 
 import java.io.PrintWriter;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.HashMap;
 import java.util.Set;
 
 import org.jnode.assembler.BootImageNativeStream;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.x86.X86Stream;
+import org.jnode.system.BootLog;
 import org.jnode.vm.BootableObject;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmClassType;
+import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmType;
 
 public class ObjectEmitter {
@@ -28,6 +30,7 @@ public class ObjectEmitter {
 	private final BootImageNativeStream bis;
 	private final PrintWriter debugWriter;
 	private final Set legalInstanceClasses;
+	private final HashMap fieldInfos = new HashMap();
 
 	/**
 	 * Construct a new ObjectEmitter *
@@ -57,7 +60,7 @@ public class ObjectEmitter {
 		}
 
 		final Class cls = obj.getClass();
-		testForValidEmit(obj);
+		testForValidEmit(obj, cls.getName());
 
 		if (debugWriter != null) {
 			debugWriter.println("$" + Integer.toHexString(os.getLength()));
@@ -126,13 +129,15 @@ public class ObjectEmitter {
 	 * @throws BuildException
 	 *             Is if not valid to emit the given object into the boot image.
 	 */
-	private final void testForValidEmit(Object object) throws BuildException {
+	public final void testForValidEmit(Object object, String location) throws BuildException {
 		if (object == null) {
 			return;
 		} else if (object instanceof BootableObject) {
 			return;
 		} else if (object.getClass().isArray()) {
 			return;
+		} else if (object instanceof Class) {
+		    return;
 		} else {
 			final String clsName = object.getClass().getName().replace('/', '.');
 			/*
@@ -141,6 +146,19 @@ public class ObjectEmitter {
 			if (legalInstanceClasses.contains(clsName)) {
 				return;
 			}
+
+			final FieldInfo fieldInfo;
+            try {
+                fieldInfo = getFieldInfo(object.getClass());
+            } catch (ClassNotFoundException ex) {
+                throw new BuildException(ex);
+            }
+            if (!fieldInfo.isExact()) {
+			    BootLog.warn("Use of in-exact matching class ("  + clsName + ") in bootimage at " + location);
+			}
+		    legalInstanceClasses.add(clsName);
+		    return;
+			
 			/*
 			 * final Class javaClass = object.getClass(); try { final VmClassType vmClass =
 			 * (VmClassType)loaderContext.loadClass(javaClass.getName(), true);
@@ -149,10 +167,10 @@ public class ObjectEmitter {
 			 * (ClassNotFoundException ex) { throw new BuildException("VmClass not found for " +
 			 * clsName, ex);
 			 */
-			throw new BuildException("Cannot emit object of type " + clsName);
+//			throw new BuildException("Cannot emit object of type " + clsName);
 		}
 	}
-
+	
 	private void emitClass(Class c) throws BuildException {
 		try {
 			if (!c.isPrimitive()) {
@@ -257,62 +275,65 @@ public class ObjectEmitter {
 		}
 	}
 
-	private void emitObject(Class cls, Object obj) throws BuildException {
+	private void emitObject(Class cls, Object obj) throws BuildException, ClassNotFoundException {
 		final Class sCls = cls.getSuperclass();
 		if (sCls != null) {
 			emitObject(sCls, obj);
 		}
 		try {
-			final Field fields[] = cls.getDeclaredFields();
+		    final FieldInfo fieldInfo = getFieldInfo(cls);
+			//final Field fields[] = cls.getDeclaredFields();
+		    final Field[] fields = fieldInfo.getJdkInstanceFields();
 			final int len = fields.length;
-			AccessibleObject.setAccessible(fields, true);
+			//AccessibleObject.setAccessible(fields, true);
 			for (int i = 0; i < len; i++) {
-				final Field f = fields[i];
-				final int modifiers = f.getModifiers();
+			    final VmField jnodeField = fieldInfo.getJNodeInstanceField(i);
+				final Field jdkField = fields[i];
+				final int modifiers = jnodeField.getModifiers();
 
 				if ((modifiers & Modifier.STATIC) != 0) {
-					continue;
+				    throw new BuildException("Static field in instance list");
 				}
 
-				final Class fType = f.getType();
-				if ((modifiers & Modifier.TRANSIENT) != 0) {
-					if ((fType == long.class) || (fType == double.class)) {
+				if ((jdkField == null) || ((modifiers & Modifier.TRANSIENT) != 0)) {
+				    if (jnodeField.isWide()) {
 						os.write64(0);
 					} else {
 						os.write32(0);
 					}
 					if (debugWriter != null) {
-					    debugWriter.println(f.getName() + " transient: 0");
+					    debugWriter.println(jnodeField.getName() + " transient: 0");
 					}
-				} else if (fType.isPrimitive()) {
+				} else if (jnodeField.isPrimitive()) {
+					final Class fType = jdkField.getType();
 					if (debugWriter != null) {
-					    debugWriter.println(f.getName() + " " + f.get(obj));
+					    debugWriter.println(jdkField.getName() + " " + jdkField.get(obj));
 					}
 					if (fType == byte.class) {
-						os.write32(f.getByte(obj));
+						os.write32(jdkField.getByte(obj));
 					} else if (fType == boolean.class) {
-						os.write32((f.getBoolean(obj)) ? 1 : 0);
+						os.write32((jdkField.getBoolean(obj)) ? 1 : 0);
 					} else if (fType == char.class) {
-						os.write32(f.getChar(obj));
+						os.write32(jdkField.getChar(obj));
 					} else if (fType == short.class) {
-						os.write32(f.getShort(obj));
+						os.write32(jdkField.getShort(obj));
 					} else if (fType == int.class) {
-						os.write32(f.getInt(obj));
+						os.write32(jdkField.getInt(obj));
 					} else if (fType == float.class) {
-						os.write32(Float.floatToIntBits(f.getFloat(obj)));
+						os.write32(Float.floatToIntBits(jdkField.getFloat(obj)));
 					} else if (fType == long.class) {
-						os.write64(f.getLong(obj));
+						os.write64(jdkField.getLong(obj));
 					} else if (fType == double.class) {
-						os.write64(Double.doubleToLongBits(f.getDouble(obj)));
+						os.write64(Double.doubleToLongBits(jdkField.getDouble(obj)));
 					} else {
 						throw new BuildException("Unknown primitive class " + fType.getName());
 					}
 				} else {
-					final Object value = f.get(obj);
+					final Object value = jdkField.get(obj);
 					try {
-						testForValidEmit(value);
+						testForValidEmit(value, cls.getName());
 					} catch (BuildException ex) {
-						throw new BuildException("Cannot emit field " + f.getName() + " of class " + cls.getName(), ex);
+						throw new BuildException("Cannot emit field " + jdkField.getName() + " of class " + cls.getName(), ex);
 					}
 					bis.writeObjectRef(value);
 				}
@@ -322,5 +343,21 @@ public class ObjectEmitter {
 		} catch (SecurityException ex) {
 			throw new BuildException("emitting object: [" + obj + "]", ex);
 		}
+	}
+	
+	/**
+	 * Gets the field information for the given type.
+	 * @param jdkType
+	 * @throws ClassNotFoundException
+	 */
+	public FieldInfo getFieldInfo(Class jdkType) throws ClassNotFoundException {
+	    final String cname = jdkType.getName();
+	    FieldInfo info = (FieldInfo)fieldInfos.get(cname);
+	    if (info == null) {
+		    final VmType jnodeType = loaderContext.loadClass(cname, true);
+		    info = new FieldInfo(jdkType, jnodeType);
+		    fieldInfos.put(cname, info);
+	    }
+	    return info;
 	}
 }
