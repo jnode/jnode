@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.apache.jakarta.log4j" 
+        name="Log4j classes"
+        version="1.2.8"
+        provider-name="jakarta.apache.org"
+        class="org.jnode.log4j.Log4jPlugin">
+        
+  <runtime>
+    <library name="log4j.jar">
+      <export name="org.apache.log4j.*"/>
+      <export name="org.apache.log4j.helpers.*"/>
+      <export name="org.apache.log4j.or.*"/>
+      <export name="org.apache.log4j.spi.*"/>
+      <export name="org.apache.log4j.xml.*"/>
+    </library>
+    <library name="jnode-core.jar">
+      <export name="org.jnode.log4j.*"/>
+    </library>
+  </runtime>
+        
+</plugin>

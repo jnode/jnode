@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.input" 
+        name="JNode input driver"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.driver"/>
+    <import plugin="org.jnode.driver.character"/>
+    <import plugin="org.jnode.runtime"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="org.jnode.driver.input.*"/>
+    </library>
+  </runtime>
+        
+</plugin>

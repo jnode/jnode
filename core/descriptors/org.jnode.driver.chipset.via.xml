@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.chipset.via"
+        name="JNode Via Chipset drivers"
+        version="@VERSION@"
+        provider-name="jnode.org">
+
+  <requires>
+    <import plugin="org.jnode.driver"/>
+    <import plugin="org.jnode.driver.pci"/>
+  </requires>
+
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="org.jnode.driver.chipset.via.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.driver.mappers">
+    <mapper class="org.jnode.driver.chipset.via.ViaDeviceToDriverMapper"/>
+  </extension>
+
+</plugin>

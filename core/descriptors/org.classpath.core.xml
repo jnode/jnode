@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.classpath.core"
+        name="Core java classes"
+        version="@VERSION@"
+        provider-name="Classpath.org">
+
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="gnu.java.io.*"/>
+      <export name="gnu.java.io.decode.*"/>
+      <export name="gnu.java.io.encode.*"/>
+      <export name="gnu.java.net.*"/>
+      <export name="gnu.java.net.protocol.*"/>
+      <export name="gnu.java.net.protocol.file.*"/>
+      <export name="gnu.java.net.protocol.http.*"/>
+      <export name="gnu.java.net.protocol.jar.*"/>
+      <export name="gnu.java.nio.*"/>
+      <export name="gnu.java.nio.channels.*"/>
+      <export name="gnu.java.nio.charset.*"/>
+      <export name="gnu.java.lang.*"/>
+      <export name="gnu.java.lang.reflect.*"/>
+      <export name="gnu.java.locale.*"/>
+      <export name="gnu.java.util.*"/>
+      <export name="gnu.java.security.provider.*"/>
+
+      <export name="java.io.*"/>
+      <export name="java.lang.*"/>
+      <export name="java.lang.ref.*"/>
+      <export name="java.lang.reflect.*"/>
+      <export name="java.net.*"/>
+      <export name="java.nio.*"/>
+      <export name="java.nio.channels.*"/>
+      <export name="java.nio.channels.spi.*"/>
+      <export name="java.nio.charset.*"/>
+      <export name="java.nio.charset.spi.*"/>
+      <export name="java.security.*"/>
+      <export name="java.security.cert.*"/>
+      <export name="java.text.*"/>
+      <export name="java.util.*"/>
+      <export name="java.util.jar.*"/>
+      <export name="java.util.regex.*"/>
+      <export name="java.util.zip.*"/>
+
+      <export name="javax.naming.*"/>
+
+      <export name="org.xml.sax.*"/>
+    </library>
+  </runtime>
+        
+</plugin>

@@ -1,0 +1,17 @@
+#
+# $Id$
+#
+#  JNode boot menu self configured network example configuration file
+#
+
+# Configure network -> sample data below, so configure for your network
+ifconfig --address=192.168.1.101 --server=192.168.1.5 --mask=255.255.255.0 --gateway=192.168.1.1
+
+# Boot automatically after 5 secs.
+timeout 5
+
+# By default, boot the first entry.
+default 0
+
+title  JNode - Self Configured Network
+kernel (nd)/jnodesys.gz

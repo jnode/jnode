@@ -1,0 +1,15 @@
+# GRUB Configuration
+default 0
+timeout 5
+
+# JNode
+title JNode
+kernel (hd0,0)/jnodesys.gz
+
+# JNode via the network
+title JNode via dhcp
+dhcp
+kernel (nd)/jnodesys.gz
+
+
+

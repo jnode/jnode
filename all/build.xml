@@ -1,0 +1,84 @@
+<project name="JNode" default="all" basedir=".">
+
+  <property name="root.dir"            value="${basedir}/.."/>
+  <property name="build.dir"           value="${basedir}/build"/>
+  <property name="descriptors.dir"     value="${build.dir}/descriptors"/>
+   
+  <property name="jnode-builder.jar"   value="${build.dir}/descriptors/jnode-builder.jar"/>
+  <property name="jnode-core.jar"      value="${build.dir}/descriptors/jnode-core.jar"/>
+  <property name="jnode-fs.jar"        value="${build.dir}/descriptors/jnode-fs.jar"/>
+  <property name="jnode-gui.jar"       value="${build.dir}/descriptors/jnode-gui.jar"/>
+  <property name="jnode-net.jar"       value="${build.dir}/descriptors/jnode-net.jar"/>
+  <property name="jnode-shell.jar"     value="${build.dir}/descriptors/jnode-shell.jar"/>
+  <property name="jnode-fonts.jar"     value="${build.dir}/descriptors/jnode-fonts.jar"/>
+
+  <property name="ant.jar"             value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
+  <property name="commons-net.jar"     value="${root.dir}/net/lib/commons-net-1.1.0.jar"/>
+  <property name="junit.jar"           value="${root.dir}/core/lib/junit.jar"/>
+  <property name="dom4j.jar"           value="${root.dir}/builder/lib/dom4j.jar"/>
+  <property name="log4j.jar"           value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
+  <property name="nanoxml.jar"         value="${root.dir}/core/lib/nanoxml-lite-2.2.3.jar"/>
+
+  <property name="plugin-list"         value="${basedir}/conf/plugin-list.xml"/>
+  <property name="jnode-ver"           value="0.1.4"/>
+
+  <path id="cp">
+    <pathelement location="${ant.jar}"/>
+    <pathelement location="${junit.jar}"/>
+    <pathelement location="${log4j.jar}"/>
+    <pathelement location="${nanoxml.jar}"/>
+    <pathelement location="${basedir}/conf"/>
+  </path>
+  
+  <filterset id="descriptors-filter">
+    <filter token="PROVIDER" value="JNode.org"/>
+	<filter token="VERSION" value="${jnode-ver}"/>
+  </filterset>
+
+  <patternset id="exts">
+    <include name="**/*.dat"/>
+    <include name="**/*.ids"/>
+    <include name="**/*.properties"/>
+    <include name="**/*.xml"/>
+  </patternset>
+
+<!-- Initialize all project directories -->
+  <target name="prepare">
+    <tstamp/>
+    <mkdir dir="${build.dir}"/>
+    <mkdir dir="${descriptors.dir}"/>
+  </target>
+
+<!-- Assemble all subproject jar files -->
+  <target name="assemble" depends="prepare">
+    <ant target="assemble" dir="${root.dir}/core" inheritall="on" inheritrefs="on"/>
+    <ant target="assemble" dir="${root.dir}/shell" inheritall="on" inheritrefs="on"/>
+    <ant target="assemble" dir="${root.dir}/fs" inheritall="on" inheritrefs="on"/>
+    <ant target="assemble" dir="${root.dir}/gui" inheritall="on" inheritrefs="on"/>
+    <ant target="assemble" dir="${root.dir}/net" inheritall="on" inheritrefs="on"/>
+    <ant target="assemble" dir="${root.dir}/builder" inheritall="on" inheritrefs="on"/>
+  </target>
+
+<!-- Create the X86 boot image-->
+  <target name="arch-x86" depends="assemble">
+    <ant antfile="build-x86.xml" inheritall="on" inheritrefs="on"/>
+  </target>
+
+<!-- Build all -->
+  <target name="all" depends="arch-x86">
+  </target>
+
+<!-- Clean everything files -->
+  <target name="clean">
+    <ant target="clean" dir="${root.dir}/core" inheritall="on" inheritrefs="on"/>
+    <ant target="clean" dir="${root.dir}/shell" inheritall="on" inheritrefs="on"/>
+    <ant target="clean" dir="${root.dir}/fs" inheritall="on" inheritrefs="on"/>
+    <ant target="clean" dir="${root.dir}/gui" inheritall="on" inheritrefs="on"/>
+    <ant target="clean" dir="${root.dir}/net" inheritall="on" inheritrefs="on"/>
+    <ant target="clean" dir="${root.dir}/builder" inheritall="on" inheritrefs="on"/>
+    <delete dir="${build.dir}" quiet="on"/>
+  </target>
+
+</project>
+
+

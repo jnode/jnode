@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.runtime" 
+        name="JNode core runtime classes specific to X86"
+        version="@VERSION@"
+        provider-name="JNode.org"
+        class="org.jnode.system.x86.DMAPlugin">
+        
+  <requires>
+    <import plugin="org.jnode.runtime.core"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="org.jnode.system.x86.*"/>
+    </library>
+  </runtime>
+        
+</plugin>
