@@ -53,6 +53,15 @@ public abstract class VmArchitecture extends VmSystemObject {
 	public abstract NativeCodeCompiler[] getCompilers();
 
 	/**
+	 * Gets all test compilers for this architecture.
+	 * This can be used to test new compilers in a running system.
+	 * 
+	 * @return The compilers, sorted by optimization level, from least optimizations to most
+	 *         optimizations, or null for no test compilers.
+	 */
+	public abstract NativeCodeCompiler[] getTestCompilers();
+
+	/**
 	 * Gets the compiler of IMT's.
 	 * @return
 	 */

@@ -45,10 +45,10 @@ public final class VmJavaClassLoader extends VmAbstractClassLoader {
 
     /**
      * @see org.jnode.vm.classmgr.VmClassLoader#compileRuntime(org.jnode.vm.classmgr.VmMethod,
-     *      int)
+     *      int, boolean)
      */
-    public final void compileRuntime(VmMethod vmMethod, int optLevel) {
-        systemLoader.compileRuntime(vmMethod, optLevel);
+    public final void compileRuntime(VmMethod vmMethod, int optLevel, boolean enableTestCompilers) {
+        systemLoader.compileRuntime(vmMethod, optLevel, enableTestCompilers);
     }
 
     /**

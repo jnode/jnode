@@ -37,6 +37,9 @@ public final class VmX86Architecture extends VmArchitecture {
 	/** The compilers */
 	private final NativeCodeCompiler[] compilers;
 	
+	/** The compilers under test */
+	private final NativeCodeCompiler[] testCompilers;
+	
 	/** The IMT compiler */
 	private final X86IMTCompiler imtCompiler;
 
@@ -67,9 +70,12 @@ public final class VmX86Architecture extends VmArchitecture {
 		compilers[0] = new X86StubCompiler();
 		if (useL1A) {
 			compilers[1] = new X86Level1ACompiler();
+			testCompilers = null;
 		} else {
 			compilers[1] = new X86Level1Compiler();			
-		}
+			testCompilers = new NativeCodeCompiler[1];
+			testCompilers[0] = new X86Level1ACompiler();
+		}	
 	}
 	
 	/**
@@ -98,6 +104,16 @@ public final class VmX86Architecture extends VmArchitecture {
 	 */
 	public final NativeCodeCompiler[] getCompilers() {
 		return compilers;
+	}
+
+	/**
+	 * Gets all test compilers for this architecture.
+	 * 
+	 * @return The compilers, sorted by optimization level, from least
+	 *         optimizations to most optimizations.
+	 */
+	public final NativeCodeCompiler[] getTestCompilers() {
+		return testCompilers;
 	}
 
 	/**

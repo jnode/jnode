@@ -375,6 +375,15 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 				cmp.initialize(clsMgr);
 				os.getObjectRef(cmp);
 			}
+			/* Let the test compilers load its native symbol offsets */
+			final NativeCodeCompiler[] testCmps = arch.getTestCompilers();
+			if (testCmps != null) {
+				for (int i = 0; i < testCmps.length; i++) {
+					final NativeCodeCompiler cmp = testCmps[i];
+					cmp.initialize(clsMgr);
+					os.getObjectRef(cmp);
+				}
+			}
 			log("Compiling using " + cmps[0].getName() + " and "
 					+ cmps[cmps.length - 1].getName() + " compilers");
 

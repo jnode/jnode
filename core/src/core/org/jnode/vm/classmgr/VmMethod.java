@@ -221,7 +221,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
     private synchronized void doCompile(int optLevel) {
         if (!declaringClass.isPrepared()) { throw new IllegalStateException(
                 "Declaring class must have been prepared"); }
-        declaringClass.getLoader().compileRuntime(this, optLevel);
+        declaringClass.getLoader().compileRuntime(this, optLevel, false);
         //setModifier(true, Modifier.ACC_COMPILED);
     }
 

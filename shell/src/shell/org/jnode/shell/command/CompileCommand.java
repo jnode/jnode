@@ -17,20 +17,24 @@ public class CompileCommand {
 
 	static final ClassNameArgument ARG_CLASS = new ClassNameArgument("className", "the class file to compile");
 	static final IntegerArgument ARG_LEVEL = new IntegerArgument("level", "the optimization level");
+	static final IntegerArgument ARG_TEST = new IntegerArgument("test", "If 1, the test compilers are used");
 	static final Parameter PARAM_LEVEL = new Parameter(ARG_LEVEL, Parameter.OPTIONAL);
+	static final Parameter PARAM_TEST = new Parameter(ARG_TEST, Parameter.OPTIONAL);
 	
-	public static Help.Info HELP_INFO = new Help.Info("compile", "Compile a Java class", new Parameter[] { new Parameter(ARG_CLASS, Parameter.MANDATORY), PARAM_LEVEL});
+	public static Help.Info HELP_INFO = new Help.Info("compile", "Compile a Java class", new Parameter[] { new Parameter(ARG_CLASS, Parameter.MANDATORY), PARAM_LEVEL, PARAM_TEST});
 
 	public static void main(String[] args) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(args);
+		final ParsedArguments cmdLine = HELP_INFO.parse(args);
 
 		final String className = ARG_CLASS.getValue(cmdLine);
 		final int level = PARAM_LEVEL.isSet(cmdLine) ? ARG_LEVEL.getInteger(cmdLine) : 0;
+		final boolean test = PARAM_TEST.isSet(cmdLine) ? (ARG_TEST.getInteger(cmdLine) != 0) : false;
+		
 		final ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		final Class cls = cl.loadClass(className);
 		final VmType type = cls.getVmClass();
 		final long start = System.currentTimeMillis();
-		final int count = type.compileRuntime(level);
+		final int count = type.compileRuntime(level, test);
 		final long end = System.currentTimeMillis();
 		System.out.println("Compiling " + count + " methods took " + (end - start) + "ms");
 	}

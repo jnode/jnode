@@ -1499,7 +1499,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 				// Compile the methods with the least optimizing compiler
 				final int count;
 				try {
-					count = doCompileRuntime(0);
+					count = doCompileRuntime(0, false);
 				} catch (Throwable ex) {
 					state |= VmTypeState.ST_INVALID;
 					state &= ~VmTypeState.ST_COMPILING;
@@ -1719,11 +1719,11 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 *            The optimization level
 	 * @return The number of compiled methods
 	 */
-	public final synchronized int compileRuntime(int optLevel) {
+	public final synchronized int compileRuntime(int optLevel, boolean enableTestCompilers) {
 		if (!isPrepared()) {
 			throw new IllegalStateException("VmType must have been prepared");
 		}
-		return doCompileRuntime(optLevel);
+		return doCompileRuntime(optLevel, enableTestCompilers);
 	}
 
 	/**
@@ -1733,7 +1733,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 *            The optimization level
 	 * @return The number of compiled methods
 	 */
-	private final int doCompileRuntime(int optLevel) {
+	private final int doCompileRuntime(int optLevel, boolean enableTestCompilers) {
 		final VmMethod[] mt = this.methodTable;
 		int compileCount = 0;
 		if (mt != null) {
@@ -1741,7 +1741,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 			for (int i = 0; i < count; i++) {
 				final VmMethod method = mt[i];
 				if (optLevel > method.getNativeCodeOptLevel()) {
-					loader.compileRuntime(method, optLevel);
+					loader.compileRuntime(method, optLevel, enableTestCompilers);
 					//method.setModifier(true, Modifier.ACC_COMPILED);
 					compileCount++;
 				}

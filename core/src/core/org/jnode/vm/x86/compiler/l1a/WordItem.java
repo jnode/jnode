@@ -246,6 +246,24 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	}
 
 	/**
+	 * Load this item into a register that is suitable for BITS8 mode.
+	 * 
+	 * @param ec
+	 */
+	final void loadToBITS8GPR(EmitterContext ec) {
+		if (!isRegister() || !reg.isSuitableForBits8()) {
+			final X86RegisterPool pool = ec.getPool();
+			Register r = pool.request(JvmType.INT, this, true);
+			if (r == null) {
+				ec.getVStack().push(ec);
+				r = ec.getPool().request(JvmType.INT, this, true);
+			}
+			assertCondition(r != null, "r != null");
+			loadTo(ec, r);
+		}
+	}
+
+	/**
 	 * Load item into the given register (only for Category 1 items), if its
 	 * kind matches the mask.
 	 * 
