@@ -41,6 +41,8 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
     private final DefaultHeapManager heapManager;
 
     private final HeapHelper helper;
+    
+    private final ProcessChildVisitor processChildVisitor = new ProcessChildVisitor();
 
     /**
      * Create a new instance
@@ -237,18 +239,19 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      */
     private void markThreadStack(VmThread thread) {
         // For now do it stupid, but safe, just scan the whole stack.
-        final int stackSize = thread.getStackSize();
-        final Object stack = helper.getStack(thread);
-        if (stack != null) {
-            for (int i = 0; i < stackSize; i += slotSize) {
-                final Address child = helper.getAddress(stack, i);
-                if (child != null) {
-                    if (heapManager.isObject(child)) {
-                        processChild(child);
-                    }
-                }
-            }
-        }
+//        final int stackSize = thread.getStackSize();
+//        final Object stack = helper.getStack(thread);
+//        if (stack != null) {
+//            for (int i = 0; i < stackSize; i += slotSize) {
+//                final Address child = helper.getAddress(stack, i);
+//                if (child != null) {
+//                    if (heapManager.isObject(child)) {
+//                        processChild(child);
+//                    }
+//                }
+//            }
+//        }
+        thread.visit(processChildVisitor, heapManager, helper);
     }
 
     /**
@@ -256,7 +259,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      * 
      * @param child
      */
-    private void processChild(Object child) {
+    final void processChild(Object child) {
         final int gcColor = helper.getObjectColor(child);
         if (gcColor <= GC_WHITE) {
             // Yellow or White
@@ -302,5 +305,13 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      */
     public void setRootSet(boolean b) {
         rootSet = b;
+    }
+    
+    private class ProcessChildVisitor extends ObjectVisitor implements Uninterruptible {
+        
+            public boolean visit(Object object) {
+                processChild(object);
+                return true;
+            }
     }
 }

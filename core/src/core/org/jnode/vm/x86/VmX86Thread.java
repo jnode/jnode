@@ -5,7 +5,10 @@ package org.jnode.vm.x86;
 
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.Address;
+import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmThread;
+import org.jnode.vm.memmgr.HeapHelper;
+import org.jnode.vm.memmgr.VmHeapManager;
 
 /**
  * Thread implementation for Intel X86 processor.
@@ -129,4 +132,51 @@ public final class VmX86Thread extends VmThread {
 			" CR2 " +NumberUtils.hex(exCr2) +
 			" EFLAGS " +NumberUtils.hex(exEflags);
 	}
+
+    /**
+     * Visit all objects on the stack and register state of this thread.
+     * @param visitor
+     * @param heapManager
+     */
+    public void visit(ObjectVisitor visitor, VmHeapManager heapManager, HeapHelper helper) {
+        // For now do it stupid, but safe, just scan the whole stack.
+        final int stackSize = getStackSize();
+        final Object stack = getStack();
+        if (stack != null) {
+            final int slotSize = VmX86Architecture.SLOT_SIZE;
+            for (int i = 0; i < stackSize; i += slotSize) {
+                final Address child = helper.getAddress(stack, i);
+                if (child != null) {
+                    if (heapManager.isObject(child)) {
+                        visitor.visit(child);
+                    }
+                }
+            }
+        }
+        // Scan registers
+        Address addr = Address.valueOf(eax);
+        if (heapManager.isObject(addr)) {
+            visitor.visit(addr);
+        }
+        addr = Address.valueOf(ebx);
+        if (heapManager.isObject(addr)) {
+            visitor.visit(addr);
+        }
+        addr = Address.valueOf(ecx);
+        if (heapManager.isObject(addr)) {
+            visitor.visit(addr);
+        }
+        addr = Address.valueOf(edx);
+        if (heapManager.isObject(addr)) {
+            visitor.visit(addr);
+        }
+        addr = Address.valueOf(esi);
+        if (heapManager.isObject(addr)) {
+            visitor.visit(addr);
+        }
+        addr = Address.valueOf(edi);
+        if (heapManager.isObject(addr)) {
+            visitor.visit(addr);
+        }
+    }
 }
