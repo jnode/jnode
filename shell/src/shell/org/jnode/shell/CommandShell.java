@@ -127,7 +127,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 	 */
 	public void run() {
 		// Run commands from the JNode commandline first
-		final String cmdLine = System.getProperty("jnode.cmdline", "");
+		final String cmdLine = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.cmdline", ""));
 		final StringTokenizer tok = new StringTokenizer(cmdLine);
 		while (tok.hasMoreTokens()) {
 			final String e = tok.nextToken();

@@ -43,9 +43,8 @@
     </javac>
     <!-- Copy all non java files to class dir -->
     <copy todir="${my-classes.dir}">
-         <fileset dir="${my-src.dir}/driver">
-	<exclude name="**/*.java"/>
-         </fileset>
+      <fileset dir="${my-src.dir}/core" excludes="**/*.java,**/package.html"/>
+      <fileset dir="${my-src.dir}/driver" excludes="**/*.java,**/package.html"/>
     </copy> 
   </target>
 

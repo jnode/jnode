@@ -3,6 +3,9 @@
  */
 package org.jnode.driver;
 
+import gnu.java.security.actions.GetPropertyAction;
+
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -74,7 +77,7 @@ public class DefaultDeviceManager implements DeviceManager,
                 "finders extension-point cannot be null"); }
         if (mappersEP == null) { throw new IllegalArgumentException(
                 "mappers extension-point cannot be null"); }
-        cmdLine = System.getProperty("jnode.cmdline", "");
+        cmdLine = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.cmdline", ""));
         this.systemBus = new SystemBus();
         this.findersEP = findersEP;
         this.mappersEP = mappersEP;
