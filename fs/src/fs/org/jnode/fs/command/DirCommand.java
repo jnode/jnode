@@ -53,7 +53,7 @@ public class DirCommand implements Command{
 		ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
 		String dir_str = ARG_DIR.getValue(cmdLine);
 		
-		if (((dir_str == null)&&(System.getProperty("user.dir").equals("/")))||(dir_str.equals("/"))){
+		if (((dir_str == null)&&(System.getProperty("user.dir").equals("/")))||((dir_str != null)&&(dir_str.equals("/")))){
 			File[] roots = File.listRoots();
 			this.printList(roots,out);
 		} else {
