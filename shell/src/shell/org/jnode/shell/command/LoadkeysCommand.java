@@ -1,3 +1,6 @@
+/*
+ * $Id$
+ */
 package org.jnode.shell.command;
 
 import java.io.InputStream;
