@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.net.ipv4.util;
 
 import org.jnode.driver.net.NetworkException;
@@ -28,6 +28,9 @@ import org.jnode.net.ipv4.IPv4Address;
 import org.xbill.DNS.*;
 
 import java.net.UnknownHostException;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.Hashtable;
 import java.util.Iterator;
 
@@ -35,226 +38,213 @@ import java.util.Iterator;
  * @author Martin Hartvig
  */
 
-public class ResolverImpl implements Resolver
-{
-  private static ExtendedResolver resolver;
-  private static Hashtable resolvers;
+public class ResolverImpl implements Resolver {
+    private static ExtendedResolver resolver;
 
-  private static Hashtable hosts;
+    private static Hashtable resolvers;
 
-  private static Resolver res = null;
+    private static Hashtable hosts;
 
-  static
-  {
-    hosts = new Hashtable();
+    private static Resolver res = null;
 
-    // this will have to come from hosts file
-    final String localhost = "localhost";
-    ProtocolAddress[] protocolAddresses = new ProtocolAddress[]{new IPv4Address("127.0.0.1")};
+    static {
+        hosts = new Hashtable();
 
-    hosts.put(localhost, protocolAddresses);
-  }
+        // this will have to come from hosts file
+        final String localhost = "localhost";
+        ProtocolAddress[] protocolAddresses = new ProtocolAddress[] { new IPv4Address(
+                "127.0.0.1") };
 
-  private ResolverImpl()
-  {
-  }
-
-  /**
-   * Singleton
-   *
-   * @return the singleton of the resolver
-   */
-
-  public static Resolver getInstance()
-  {
-    if (res == null)
-    {
-      res = new ResolverImpl();
+        hosts.put(localhost, protocolAddresses);
     }
 
-    return res;
-  }
-
-  /**
-   * List all the dns servers
-   */
-
-  public static void printDnsServers()
-  {
-    if (resolvers == null)
-    {
-      return;
+    private ResolverImpl() {
     }
 
-    Iterator iterator = resolvers.keySet().iterator();
-    String dnsServer;
+    /**
+     * Singleton
+     * 
+     * @return the singleton of the resolver
+     */
 
-    while (iterator.hasNext())
-    {
-      dnsServer = (String) iterator.next();
-
-      System.out.println(dnsServer);
-    }
-  }
-
-  /**
-   * Add a dns server
-   *
-   * @param _dnsserver
-   * @throws NetworkException
-   */
-
-  public static void addDnsServer(ProtocolAddress _dnsserver) throws NetworkException
-  {
-
-    if (resolvers == null)
-    {
-      resolvers = new Hashtable();
-    }
-
-    if (resolver == null)
-    {
-      try
-      {
-        if (resolver == null)
-        {
-          String[] server = new String[]{_dnsserver.toString()};
-          resolver = new ExtendedResolver(server);
-
-          Lookup.setDefaultResolver(resolver);
-
-          resolvers.put(_dnsserver.toString(), resolver);
+    public static Resolver getInstance() {
+        if (res == null) {
+            res = new ResolverImpl();
         }
-      }
-      catch (UnknownHostException e)
-      {
-        throw new NetworkException("Can't add DnsServer", e);
-      }
+
+        return res;
     }
 
-    try
-    {
-      String key = _dnsserver.toString();
+    /**
+     * List all the dns servers
+     */
 
-      if (!resolvers.containsKey(key))
-      {
-        SimpleResolver simpleResolver = new SimpleResolver(key);
+    public static void printDnsServers() {
+        if (resolvers == null) {
+            return;
+        }
 
-        resolver.addResolver(simpleResolver);
-        resolvers.put(key, simpleResolver);
-      }
-    }
-    catch (UnknownHostException e)
-    {
-      throw new NetworkException("Can't add DnsServer", e);
-    }
-  }
+        Iterator iterator = resolvers.keySet().iterator();
+        String dnsServer;
 
-  /**
-   * removes a dns server
-   *
-   * @param _dnsserver
-   */
+        while (iterator.hasNext()) {
+            dnsServer = (String) iterator.next();
 
-  public static void removeDnsServer(ProtocolAddress _dnsserver)
-  {
-
-    if (resolver == null)
-    {
-      return;
+            System.out.println(dnsServer);
+        }
     }
 
-    String key = _dnsserver.toString();
-    if (resolvers.containsKey(key))
-    {
-      org.xbill.DNS.Resolver resolv = (org.xbill.DNS.Resolver) resolvers.remove(key);
+    /**
+     * Add a dns server
+     * 
+     * @param _dnsserver
+     * @throws NetworkException
+     */
 
-      if (resolver.getResolvers().length == 1)
-        resolver = null;
-      else
-        resolver.deleteResolver(resolv);
-    }
-  }
+    public static void addDnsServer(ProtocolAddress _dnsserver)
+            throws NetworkException {
 
-  /**
-   * Get from hosts file.
-   *
-   * @param _hostname
-   * @return
-   */
+        if (resolvers == null) {
+            resolvers = new Hashtable();
+        }
 
-  private ProtocolAddress[] getFromHostsFile(String _hostname)
-  {
-    // this should check for changes of the host file
+        if (resolver == null) {
+            try {
+                if (resolver == null) {
+                    String[] server = new String[] { _dnsserver.toString() };
+                    resolver = new ExtendedResolver(server);
 
-    return (ProtocolAddress[]) hosts.get(_hostname);
-  }
+                    Lookup.setDefaultResolver(resolver);
 
-  /**
-   * Gets the address(es) of the given hostname.
-   *
-   * @param hostname
-   * @return All addresses of the given hostname. The returned array is at least 1 address long.
-   * @throws java.net.UnknownHostException
-   */
+                    resolvers.put(_dnsserver.toString(), resolver);
+                }
+            } catch (UnknownHostException e) {
+                throw new NetworkException("Can't add DnsServer", e);
+            }
+        }
 
-  public ProtocolAddress[] getByName(String hostname) throws UnknownHostException
-  {
-    ProtocolAddress[] protocolAddresses = null;
+        try {
+            String key = _dnsserver.toString();
 
-    protocolAddresses = getFromHostsFile(hostname);
+            if (!resolvers.containsKey(key)) {
+                SimpleResolver simpleResolver = new SimpleResolver(key);
 
-    if (protocolAddresses != null)
-    {
-      return protocolAddresses;
+                resolver.addResolver(simpleResolver);
+                resolvers.put(key, simpleResolver);
+            }
+        } catch (UnknownHostException e) {
+            throw new NetworkException("Can't add DnsServer", e);
+        }
     }
 
-    Lookup lookup = null;
-    Lookup.setDefaultResolver(resolver);
+    /**
+     * removes a dns server
+     * 
+     * @param _dnsserver
+     */
 
-    try
-    {
-      lookup = new Lookup(hostname);
-    }
-    catch (TextParseException e)
-    {
-      throw new UnknownHostException(hostname);
-    }
+    public static void removeDnsServer(ProtocolAddress _dnsserver) {
 
-    lookup.run();
+        if (resolver == null) {
+            return;
+        }
 
-    if (lookup.getResult() == Lookup.SUCCESSFUL)
-    {
-      Record[] records = lookup.getAnswers();
+        String key = _dnsserver.toString();
+        if (resolvers.containsKey(key)) {
+            org.xbill.DNS.Resolver resolv = (org.xbill.DNS.Resolver) resolvers
+                    .remove(key);
 
-      protocolAddresses = new ProtocolAddress[records.length];
-
-      for (int i = 0; i < records.length; i++)
-      {
-        Record record = records[i];
-        protocolAddresses[i] = new IPv4Address(record.rdataToString());
-      }
-
-    }
-    else
-    {
-      throw new UnknownHostException(lookup.getErrorString());
+            if (resolver.getResolvers().length == 1) {
+                resolver = null;
+            } else {
+                resolver.deleteResolver(resolv);
+            }
+        }
     }
 
-    return protocolAddresses;
-  }
+    /**
+     * Get from hosts file.
+     * 
+     * @param _hostname
+     * @return
+     */
+    private ProtocolAddress[] getFromHostsFile(String _hostname) {
+        // this should check for changes of the host file
 
-  /**
-   * Gets the hostname of the given address.
-   *
-   * @param address
-   * @return All hostnames of the given hostname. The returned array is at least 1 hostname long.
-   * @throws java.net.UnknownHostException
-   */
+        return (ProtocolAddress[]) hosts.get(_hostname);
+    }
 
-  public String[] getByAddress(ProtocolAddress address) throws UnknownHostException
-  {
-    return new String[0]; //To change body of implemented methods use Options | File Templates.
-  }
+    /**
+     * Gets the address(es) of the given hostname.
+     * 
+     * @param hostname
+     * @return All addresses of the given hostname. The returned array is at
+     *         least 1 address long.
+     * @throws java.net.UnknownHostException
+     */
+    public ProtocolAddress[] getByName(final String hostname)
+            throws UnknownHostException {
+        final PrivilegedExceptionAction action = new PrivilegedExceptionAction() {
+            public Object run() throws UnknownHostException {
+                ProtocolAddress[] protocolAddresses;
+
+                protocolAddresses = getFromHostsFile(hostname);
+                if (protocolAddresses != null) {
+                    return protocolAddresses;
+                }
+
+                Lookup.setDefaultResolver(resolver);
+
+                final Lookup lookup;
+                try {
+                    lookup = new Lookup(hostname);
+                } catch (TextParseException e) {
+                    throw new UnknownHostException(hostname);
+                }
+
+                lookup.run();
+
+                if (lookup.getResult() == Lookup.SUCCESSFUL) {
+                    final Record[] records = lookup.getAnswers();
+                    final int recordCount = records.length;
+
+                    protocolAddresses = new ProtocolAddress[recordCount];
+
+                    for (int i = 0; i < recordCount; i++) {
+                        final Record record = records[i];
+                        protocolAddresses[i] = new IPv4Address(record.rdataToString());
+                    }
+                } else {
+                    throw new UnknownHostException(lookup.getErrorString());
+                }
+
+                return protocolAddresses;                
+            }
+        };
+        try {
+            return (ProtocolAddress[])AccessController.doPrivileged(action);
+        } catch (PrivilegedActionException ex) {
+            if (ex.getException() instanceof UnknownHostException) {
+                throw (UnknownHostException)ex.getException();
+            } else {
+                throw (UnknownHostException)new UnknownHostException().initCause(ex.getException());
+            }
+        }
+    }
+
+    /**
+     * Gets the hostname of the given address.
+     * 
+     * @param address
+     * @return All hostnames of the given hostname. The returned array is at
+     *         least 1 hostname long.
+     * @throws java.net.UnknownHostException
+     */
+
+    public String[] getByAddress(ProtocolAddress address)
+            throws UnknownHostException {
+        return new String[0]; // To change body of implemented methods use
+        // Options | File Templates.
+    }
 
 }
