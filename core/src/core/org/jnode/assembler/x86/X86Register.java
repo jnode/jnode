@@ -28,12 +28,47 @@ import org.jnode.util.BootableHashMap;
  * Registers of the x86 architecture.
  * 
  * @author epr
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net) 
  */
 public class X86Register extends VmSystemObject implements X86Constants {
 
     //Register map, it should stand in front of any register constant !!!
 
     private static final BootableHashMap registerMap = new BootableHashMap();
+
+    /* 8-bit GPR registers */
+    public static final GPR8 AL = new GPR8("al", 0);
+
+    public static final GPR8 BL = new GPR8("bl", 3);
+
+    public static final GPR8 CL = new GPR8("cl", 1);
+
+    public static final GPR8 DL = new GPR8("dl", 2);
+
+    public static final GPR8 AH = new GPR8("ah", 4);
+
+    public static final GPR8 BH = new GPR8("bh", 7);
+
+    public static final GPR8 CH = new GPR8("ch", 5);
+
+    public static final GPR8 DH = new GPR8("dh", 6);
+
+    /* 16-bit GPR registers */
+    public static final GPR16 AX = new GPR16("ax", 0, true);
+
+    public static final GPR16 BX = new GPR16("bx", 3, true);
+
+    public static final GPR16 CX = new GPR16("cx", 1, true);
+
+    public static final GPR16 DX = new GPR16("dx", 2, true);
+
+    public static final GPR16 SP = new GPR16("sp", 4);
+
+    public static final GPR16 BP = new GPR16("bp", 5);
+
+    public static final GPR16 SI = new GPR16("si", 6);
+
+    public static final GPR16 DI = new GPR16("di", 7);
 
     /* 32-bit GPR registers */
     public static final GPR32 EAX = new GPR32("eax", 0, true);
@@ -252,6 +287,37 @@ public class X86Register extends VmSystemObject implements X86Constants {
          */
         public GPR(String name, int size, int nr, boolean suitableFor8Bit) {
             super(name, size, nr, suitableFor8Bit);
+        }
+    }
+
+    public static class GPR8 extends GPR {
+
+        /**
+         * @param name
+         * @param nr
+         */
+        public GPR8(String name, int nr) {
+            super(name, X86Constants.BITS8, nr, true);
+        }
+    }
+
+    public static class GPR16 extends GPR {
+
+        /**
+         * @param name
+         * @param nr
+         */
+        public GPR16(String name, int nr) {
+            super(name, X86Constants.BITS16, nr);
+        }
+
+        /**
+         * @param name
+         * @param nr
+         * @param suitableFor8Bit
+         */
+        public GPR16(String name, int nr, boolean suitableFor8Bit) {
+            super(name, X86Constants.BITS16, nr, suitableFor8Bit);
         }
     }
 

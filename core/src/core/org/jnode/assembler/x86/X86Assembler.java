@@ -38,7 +38,7 @@ import org.jnode.vm.x86.X86CpuID;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
- * @author Levente S\u00e1ntha
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public abstract class X86Assembler extends NativeStream implements X86Constants {
 
