@@ -1,0 +1,20 @@
+#
+# $Id$
+# Default JNode boot menu configuration file
+# 
+#
+# Below are the preset menu setting for pxe boot
+# overwrite them if you want to customize your boot.
+#
+
+# Configure network
+dhcp
+
+# Boot automatically after 5 secs.
+timeout 5
+
+# By default, boot the first entry.
+default 0
+
+title  JNode
+kernel (nd)/jnodesys.gz

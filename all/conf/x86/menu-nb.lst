@@ -1,0 +1,11 @@
+# GRUB Configuration
+default 0
+timeout 2
+
+# JNode
+title JNode
+kernel (nd)/jnodesys.gz
+
+
+
+

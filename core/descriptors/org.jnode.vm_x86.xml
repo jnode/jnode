@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.vm" 
+        name="JNode VM-X86 classes"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.vm.core"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="org.jnode.assembler.x86.*"/>
+      <export name="org.jnode.vm.x86.*"/>
+      <export name="org.jnode.vm.x86.compiler.*"/>
+      <export name="org.jnode.vm.x86.compiler.l0.*"/>
+      <export name="org.jnode.vm.x86.compiler.l1.*"/>
+    </library>
+  </runtime>
+        
+</plugin>

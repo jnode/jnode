@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.runtime.core" 
+        name="JNode core runtime classes"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.util"/>
+    <import plugin="org.jnode.vm"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="org.jnode.boot.*"/>
+      <export name="org.jnode.naming.*"/>
+      <export name="org.jnode.plugin.*"/>
+      <export name="org.jnode.plugin.manager.*"/>
+      <export name="org.jnode.plugin.model.*"/>
+      <export name="org.jnode.protocol.system.*"/>
+      <export name="org.jnode.system.*"/>
+      <export name="org.jnode.system.event.*"/>
+    </library>
+  </runtime>
+        
+</plugin>

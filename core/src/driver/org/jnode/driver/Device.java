@@ -1,0 +1,307 @@
+/*
+ * $Id$
+ */
+package org.jnode.driver;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.jnode.system.ResourceOwner;
+
+/**
+ * A software representation of a hardware device.
+ * 
+ * Every device is controlled by a Driver. These drivers are found by DeviceToDriverMapper
+ * instances.
+ * 
+ * @see org.jnode.driver.Driver
+ * @see org.jnode.driver.DeviceToDriverMapper
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
+ */
+public class Device implements ResourceOwner {
+
+	/** The bus that i'm connected to */
+	private final Bus bus;
+	/** My driver */
+	private Driver driver;
+	/** My identifier */
+	private String id;
+	/** Has this device been started? */
+	private boolean started = false;
+	/** The API's implemented by this device */
+	private final HashMap apis = new HashMap();
+	/** My listeners */
+	private final ArrayList listeners = new ArrayList();
+	/** The manager */
+	private DefaultDeviceManager manager;
+
+	/**
+	 * Create a new instance
+	 * 
+	 * @param bus
+	 * @param id
+	 */
+	public Device(Bus bus, String id) {
+		this.id = id;
+		this.bus = bus;
+	}
+
+	/**
+	 * @see org.jnode.driver.Device#getDriver()
+	 * @return My driver
+	 */
+	public Driver getDriver() {
+		return driver;
+	}
+
+	/**
+	 * Gets the bus this device is connected to.
+	 * 
+	 * @return My parent bus
+	 */
+	public final Bus getBus() {
+		return this.bus;
+	}
+
+	/**
+	 * @param driver
+	 * @see org.jnode.driver.Device#setDriver(org.jnode.driver.Driver)
+	 * @throws DriverException
+	 */
+	public void setDriver(Driver driver) throws DriverException {
+		try {
+			driver.connect(this);
+			this.driver = driver;
+		} catch (DriverException ex) {
+			this.driver = null;
+			throw new DriverException("Cannot set driver", ex);
+		}
+	}
+
+	/**
+	 * @see org.jnode.driver.Device#getId()
+	 * @return The id of this device
+	 */
+	public final String getId() {
+		return id;
+	}
+
+	/**
+	 * Change the id of this device, only called by devicemanager
+	 * 
+	 * @param newId
+	 */
+	void setId(String newId) {
+		this.id = newId;
+	}
+
+	/**
+	 * Start this device.
+	 * 
+	 * @throws DriverException
+	 */
+	public final void start() throws DriverException {
+		if (driver == null) {
+			throw new DriverException("Cannot start without a driver");
+		} else if (manager == null) {
+			throw new DriverException("Cannot start without being registered");
+		} else if (!started) {
+			// Let extensions do their start work
+			onStartDevice();
+			// Let the driver start me
+			driver.startDevice();
+			// Notify my listeners
+			fireStartedEvent();
+			// I'm started
+			started = true;
+		}
+	}
+
+	/**
+	 * Start this device.
+	 * 
+	 * @throws DriverException
+	 */
+	public final void stop() throws DriverException {
+		if (driver == null) {
+			throw new DriverException("Cannot stop without a driver");
+		} else if (manager == null) {
+			throw new DriverException("Cannot stop without being registered");
+		} else if (started) {
+			// Notify my listeners
+			fireStopEvent();
+			// Let the driver stop me
+			driver.stopDevice();
+			// Let extensions do their stop work
+			onStopDevice();
+			// I'm stopped now.
+			started = false;
+		}
+	}
+
+	/**
+	 * Has this device been started?
+	 * 
+	 * @return boolean
+	 */
+	public final boolean isStarted() {
+		return started;
+	}
+
+	/**
+	 * Add an API implementation to the list of API's implemented by this device.
+	 * 
+	 * @param apiInterface
+	 * @param apiImplementation
+	 */
+	public void registerAPI(Class apiInterface, DeviceAPI apiImplementation) {
+		if (!apiInterface.isInstance(apiImplementation)) {
+			throw new IllegalArgumentException("API implementation does not implement API interface");
+		}
+		if (!apiInterface.isInterface()) {
+			throw new IllegalArgumentException("API interface must be an interface");
+		}
+		apis.put(apiInterface, apiImplementation);
+		final Class[] interfaces = apiInterface.getInterfaces();
+		if (interfaces != null) {
+			for (int i = 0; i < interfaces.length; i++) {
+				final Class intf = interfaces[i];
+				if (!apis.containsKey(intf)) {
+					apis.put(intf, apiImplementation);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Remove an API implementation from the list of API's implemented by this device.
+	 * 
+	 * @param apiInterface
+	 */
+	public void unregisterAPI(Class apiInterface) {
+		apis.remove(apiInterface);
+	}
+
+	/**
+	 * Does this device implement the given API?
+	 * 
+	 * @param apiInterface
+	 * @return boolean
+	 */
+	public boolean implementsAPI(Class apiInterface) {
+		return apis.containsKey(apiInterface);
+	}
+
+	/**
+	 * Gets all implemented API's?
+	 * 
+	 * @return A set of Class instances
+	 */
+	public Set implementedAPIs() {
+		return apis.keySet();
+	}
+
+	/**
+	 * Gets the implementation of a given API.
+	 * 
+	 * @param apiInterface
+	 * @return The api implementation
+	 * @throws ApiNotFoundException
+	 *             The given api has not been found
+	 */
+	public DeviceAPI getAPI(Class apiInterface) throws ApiNotFoundException {
+		DeviceAPI impl = (DeviceAPI) apis.get(apiInterface);
+		if (impl == null) {
+			throw new ApiNotFoundException(apiInterface.getName());
+		}
+		return impl;
+	}
+
+	/**
+	 * Add a listener
+	 * 
+	 * @param listener
+	 */
+	public void addListener(DeviceListener listener) {
+		listeners.add(listener);
+	}
+
+	/**
+	 * Remove a listener
+	 * 
+	 * @param listener
+	 */
+	public void removeListener(DeviceListener listener) {
+		listeners.remove(listener);
+	}
+
+	/**
+	 * This method is called during the start of the device. Just before the call to startDevice of
+	 * the connected driver.
+	 * 
+	 * @throws DriverException
+	 */
+	protected void onStartDevice() throws DriverException {
+	}
+
+	/**
+	 * This method is called during the stop of the device. Just after the call to stopDevice of
+	 * the connected driver.
+	 * 
+	 * @throws DriverException
+	 */
+	protected void onStopDevice() throws DriverException {
+	}
+
+	/**
+	 * Fire a deviceStarted event to all my listeners
+	 */
+	protected void fireStartedEvent() {
+		for (Iterator i = listeners.iterator(); i.hasNext();) {
+			final DeviceListener l = (DeviceListener) i.next();
+			l.deviceStarted(this);
+		}
+		manager.fireStartedEvent(this);
+	}
+
+	/**
+	 * Fire a deviceStop event to all my listeners
+	 */
+	protected void fireStopEvent() {
+		manager.fireStopEvent(this);
+		for (Iterator i = listeners.iterator(); i.hasNext();) {
+			final DeviceListener l = (DeviceListener) i.next();
+			l.deviceStop(this);
+		}
+	}
+
+	/**
+	 * @see org.jnode.system.ResourceOwner#getShortDescription()
+	 * @return The short description
+	 */
+	public String getShortDescription() {
+		return getId();
+	}
+
+	/**
+	 * @return Returns the manager.
+	 */
+	public final DeviceManager getManager() {
+		return this.manager;
+	}
+
+	/**
+	 * @param manager
+	 *            The manager to set.
+	 */
+	final void setManager(DefaultDeviceManager manager) {
+		if (this.manager != null) {
+			throw new SecurityException("Cannot overwrite the device manager");
+		} else {
+			this.manager = manager;
+		}
+	}
+
+}
