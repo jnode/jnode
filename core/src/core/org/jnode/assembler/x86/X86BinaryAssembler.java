@@ -193,7 +193,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 				// Link all unresolved links
 				for (Iterator i = unresolvedLinks.iterator(); i.hasNext();) {
 					final int addr = ((Integer) i.next()).intValue();
-					final int distance = offset - get32(addr);
+					final long distance = offset - get32(addr);
 					if (isRelJump() && (distance == 0)) {
 						if (get8(addr - 1) == 0xe9) // JMP
 						{
@@ -205,10 +205,10 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 							set8(addr - 1, 0x90);
 							set32(addr, 0x90909090); // 4 NOP's
 						} else {
-							set32(addr, distance);
+							set32(addr, (int)distance);
 						}
 					} else {
-						set32(addr, distance);
+						set32(addr, (int)distance);
 					}
 				}
 				unresolvedLinks = null;
@@ -246,13 +246,13 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	private ObjectResolver resolver;
 
-	public X86BinaryAssembler(X86CpuID cpuId, int baseAddr) {
-		this(cpuId, baseAddr, 1024, 128, 1024);
+	public X86BinaryAssembler(X86CpuID cpuId, Mode mode, int baseAddr) {
+		this(cpuId, mode, baseAddr, 1024, 128, 1024);
 	}
 
-	public X86BinaryAssembler(X86CpuID cpuId, int baseAddr,
+	public X86BinaryAssembler(X86CpuID cpuId, Mode mode, int baseAddr,
 			int initialObjectRefsCapacity, int initialSize, int growSize) {
-		super(cpuId);
+		super(cpuId, mode);
 		this.m_data = new byte[initialSize];
 		this.m_used = 0;
 		this.baseAddr = baseAddr;
@@ -505,18 +505,19 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 		inObject = true;
 
-		// The default header is 8-bytes long. The size fields add another
-		// 4 bytes, which adds up to 12 which masy not be objectaligned.
+		// The default header is 2 words long. The size fields add another
+		// word, which adds up to 3 words which masy not be objectaligned.
 		// Write some slack until it is aligned again
 		int alignSlack = 0;
-		while (ObjectLayout.objectAlign(alignSlack + 12) != (alignSlack + 12)) {
-			write32(0);
-			alignSlack += 4;
+		final int threeWords = getWordSize() * 3;
+		while (ObjectLayout.objectAlign(alignSlack + threeWords) != (alignSlack + threeWords)) {
+			writeWord(0);
+			alignSlack += getWordSize();
 		}
-		// System.out.println("alignSlack=" + alignSlack);
+//		System.out.println("alignSlack=" + alignSlack);
 
-		write32(0); // Size
-		write32(ObjectFlags.GC_DEFAULT_COLOR); // Flags
+		writeWord(0); // Size
+		writeWord(ObjectFlags.GC_DEFAULT_COLOR); // Flags
 		if (cls == null) {
 			throw new NullPointerException("cls==null");
 		} else {
@@ -597,6 +598,14 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 		write32((int) (v64 & 0xFFFFFFFF)); // lsb
 		write32((int) ((v64 >>> 32) & 0xFFFFFFFF)); // msb
+	}
+
+	public final void writeWord(long word) {
+		if (mode.is32()) {
+			write32((int)word);
+		} else {
+			write64(word);
+		}
 	}
 
 	/**
@@ -2217,19 +2226,26 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	private final void writeObjectRef(Object object, int offset,
 			boolean rawAddress) {
 		if (object == null) {
-			write32(offset);
+			writeWord(offset);
 		} else if (rawAddress) {
-			write32(resolver.addressOf32(object) + offset);
+			if (mode.is32()) {
+				write32(resolver.addressOf32(object) + offset);
+			} else {
+				write64(resolver.addressOf64(object) + offset);				
+			}
 		} else if ((resolver != null) && (!(object instanceof Label))) {
-			// System.out.println("Using resolver for " + object);
-			write32(resolver.addressOf32(object) + offset);
+			if (mode.is32()) {
+				write32(resolver.addressOf32(object) + offset);
+			} else {
+				write64(resolver.addressOf64(object) + offset);				
+			}
 		} else {
 			final X86ObjectRef ref = (X86ObjectRef) getObjectRef(object);
 			if (ref.isResolved())
-				write32(ref.getOffset() + baseAddr + offset);
+				writeWord(ref.getOffset() + baseAddr + offset);
 			else {
 				ref.addUnresolvedLink(m_used);
-				write32(-(baseAddr + offset));
+				writeWord(-(baseAddr + offset));
 			}
 		}
 	}
@@ -2424,8 +2440,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			throw new NullPointerException();
 		}
 
-		int ofs = m_used + 4;
-		X86ObjectRef ref = (X86ObjectRef) getObjectRef(object);
+		final int ofs = m_used + 4;
+		final X86ObjectRef ref = (X86ObjectRef) getObjectRef(object);
 		ref.setRelJump();
 		if (ref.isResolved()) {
 			write32(ref.getOffset() - ofs);

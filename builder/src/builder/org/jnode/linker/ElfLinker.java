@@ -64,14 +64,14 @@ public class ElfLinker {
 			throw new BuildException("Elf object is not relocatable");
 		}
 
-		Section text = elf.getSectionByName(".text");
+		final Section text = elf.getSectionByName(".text");
 		if (text == null) {
 			throw new BuildException(".text section not found");
 		}
 
 		// Write the code
-		int start = os.getLength();
-		byte[] tdata = text.getBody();
+		final int start = os.getLength();
+		final byte[] tdata = text.getBody();
 		os.write(tdata, 0, tdata.length);
 
 		// Add all resolved symbols
@@ -84,7 +84,7 @@ public class ElfLinker {
 				ref.setPublic();
 				if (!sym.isUndef()) {
 					//System.out.println("Defined symbol at " + sym.getValue() + " [" + sym.getName() + "]");
-					ref.setOffset(sym.getValue() + start);
+					ref.setOffset((int)sym.getValue() + start);
 				} else {
 					System.out.println("Undefined symbol: " + sym.getName());
 				}
@@ -102,29 +102,49 @@ public class ElfLinker {
 				if (!(r.isPcRel() || r.isAbs())) {
 					throw new BuildException("Only PC relative and ABS relocations are supported");
 				}
-				final int addr = r.getAddress() + start;
+				final long addr = r.getAddress() + start;
 				if (r.isAbs() && (r.getSymbol().getName().length() == 0)) {
 					//System.out.print("Abs reloc at "+ addr + "=" + os.get32(addr));
-					os.set32(addr, os.get32(addr) + start + baseAddr);
+					if (elf.isClass32()) {
+						os.set32((int)addr, os.get32((int)addr) + start + baseAddr);
+					} else {
+						throw new BuildException("64-bit not implemented yet");
+					}
 					//System.out.println(" base=" + baseAddr + " start=" + start);
 				} else {
 					X86BinaryAssembler.X86ObjectRef ref = (X86BinaryAssembler.X86ObjectRef)os.getObjectRef(new Label(r.getSymbol().getName()));
 					if (ref.isResolved()) {
 						//System.out.println("Resolved reloc " + ref.getObject());
 						if (r.isPcRel()) {
-							os.set32(addr, ref.getOffset() - (addr + 4));
+							if (elf.isClass32()) {
+								os.set32((int)addr, (int)(ref.getOffset() - (addr + 4)));
+							} else {
+								throw new BuildException("64-bit not implemented yet");								
+							}
 						} else if (r.isAbs()) {
-							os.set32(addr, ref.getOffset() + baseAddr);
+							if (elf.isClass32()) {
+								os.set32((int)addr, ref.getOffset() + baseAddr);
+							} else {
+								throw new BuildException("64-bit not implemented yet");								
+							}
 						} else {
 							throw new BuildException("Unknown relocation type " + r);
 						}
 					} else {
 						//System.out.println("Unresolved reloc " + ref.getObject() + " at address " + r.getAddress());
 						if (r.isAbs()) {
-							os.set32(addr, -baseAddr);
-							ref.addUnresolvedLink(addr);
+							if (elf.isClass32()) {
+								os.set32((int)addr, -baseAddr);
+								ref.addUnresolvedLink((int)addr);
+							} else {
+								throw new BuildException("64-bit not implemented yet");																
+							}
 						} else if (r.isPcRel()) { 
-							ref.addUnresolvedLink(addr);
+							if (elf.isClass32()) {
+								ref.addUnresolvedLink((int)addr);
+							} else {
+								throw new BuildException("64-bit not implemented yet");																
+							}
 						} else {
 							throw new BuildException("Unknown relocation type " + r);
 						}						

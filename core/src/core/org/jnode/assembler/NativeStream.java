@@ -177,7 +177,7 @@ public abstract class NativeStream {
 
 		/**
 		 * Gets the offset of my object within this stream. This offset is only valid if <code>isResolved() == true</code>.
-		 * @return int
+		 * @return long
 		 * @throws UnresolvedObjectRefException
 		 */
 		public abstract int getOffset()

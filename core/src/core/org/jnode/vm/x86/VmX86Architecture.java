@@ -24,6 +24,7 @@ package org.jnode.vm.x86;
 import java.nio.ByteOrder;
 import java.util.Iterator;
 
+import org.jnode.assembler.x86.X86Constants;
 import org.jnode.system.BootLog;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
@@ -90,6 +91,18 @@ public abstract class VmX86Architecture extends VmArchitecture {
      */
     public final ByteOrder getByteOrder() {
         return ByteOrder.LITTLE_ENDIAN;
+    }
+    
+    /**
+     * Gets the operating mode.
+     * @return
+     */
+    public final X86Constants.Mode getMode() {
+    	if (getReferenceSize() == 4) {
+    		return X86Constants.Mode.BITS32;
+    	} else {
+    		return X86Constants.Mode.BITS64;
+    	}
     }
 
     /**

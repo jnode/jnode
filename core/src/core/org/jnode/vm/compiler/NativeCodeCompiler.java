@@ -28,8 +28,6 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.UnresolvedObjectRefException;
-import org.jnode.assembler.x86.X86TextAssembler;
-import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmSystemObject;
@@ -42,7 +40,6 @@ import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmCompiledExceptionHandler;
 import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmMethod;
-import org.jnode.vm.x86.X86CpuID;
 import org.vmmagic.unboxed.Address;
 
 /**
@@ -210,27 +207,7 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
                 "Unresolved labels after compile!"); }
     }
 
-    public void disassemble(VmMethod method, ObjectResolver resolver, int level, Writer writer) {
-
-        if (method.isNative()) {
-            System.out.println(method + " is native");
-            return;
-        }
-
-        if (method.isAbstract()) {
-            System.out.println(method + " is abstract");
-            return;
-        }
-
-        X86TextAssembler tos = new X86TextAssembler(writer, (X86CpuID) Unsafe.getCurrentProcessor().getCPUID());
-
-        doCompile(method, tos, level, false);
-        try{
-            tos.flush();
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-    }
+    public abstract void disassemble(VmMethod method, ObjectResolver resolver, int level, Writer writer);
 
     /**
      * Create a native stream for the current architecture.
