@@ -25,7 +25,7 @@ final class DoubleItem extends Item implements X86CompilerConstants  {
 	}
 
 	/**
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#load()
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#load(EmitterContext)
 	 */
 	void load(EmitterContext ec) {
 		// TODO Auto-generated method stub
@@ -42,7 +42,7 @@ final class DoubleItem extends Item implements X86CompilerConstants  {
 //	}
 
 	/**
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#push()
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#push(EmitterContext)
 	 */
 	void push(EmitterContext ec) {
 		final AbstractX86Stream os = ec.getStream();
@@ -77,7 +77,7 @@ final class DoubleItem extends Item implements X86CompilerConstants  {
 	}
 
 	/**
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#release()
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#release(EmitterContext)
 	 */
 	void release(EmitterContext ec) {
 		switch (getKind()) {
