@@ -93,14 +93,16 @@ public class JIFSFile implements FSEntry, FSFile {
 	
 	public void read(long fileOffset, byte[] dest, int off, int len){
 		refresh();
-		byte[] readdata;
+		int foff = (int)(fileOffset);
+		System.arraycopy(data, foff,dest,off,len);
+		/*byte[] readdata;
 		readdata = data.toString().getBytes();
 		for (long i=0 ; i < len ; i++ )
 			{
-				int doff = new Long(off+i).intValue();
-				int foff = new Long(fileOffset+i).intValue();
+				int doff = (int)(off+i);
+				int foff = (int)(fileOffset+i);
 				dest[doff] = readdata[foff];
-			}
+			}*/
 	}
 	
 	public void write(long fileOffset, byte[] src, int off, int len) throws IOException{

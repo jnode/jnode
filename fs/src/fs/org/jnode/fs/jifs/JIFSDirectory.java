@@ -78,7 +78,7 @@ public class JIFSDirectory implements FSDirectory, FSEntry {
 	}
 	
 	public void refresh(){
-		return;
+		entries = new HashSet();
 	}
 	
 	public void addFSE(FSEntry entry){
