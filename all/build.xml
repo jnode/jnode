@@ -1,374 +1,331 @@
 <project name="JNode" default="all" basedir=".">
 
-  <!-- JNode version -->
-  <property name="jnode-ver" value="0.1.10-dev"/>
-  
-  <!-- Java target and source version -->
-  <property name="java.target" value="1.4"/>
-  <property name="java.source" value="1.4"/>
+	<!-- JNode version -->
+	<property name="jnode-ver" value="0.1.10-dev" />
 
-  <property name="root.dir" value="${basedir}/.."/>
-  <property name="build.dir" value="${basedir}/build"/>
-  <property name="cdroms.dir" value="${build.dir}/cdroms"/>
-  <property name="descriptors.dir" value="${build.dir}/descriptors"/>
-  <property name="plugins.dir" value="${build.dir}/plugins"/>
-  <property name="initjars.dir" value="${build.dir}/initjars"/>
-  <property name="backup.dir" value="${build.dir}/backup"/>
+	<!-- Java target and source version -->
+	<property name="java.target" value="1.4" />
+	<property name="java.source" value="1.4" />
 
-  <property name="jnode-builder.jar" value="${build.dir}/descriptors/jnode-builder.jar"/>
-  <property name="jnode-core.jar" value="${root.dir}/core/build/classes"/>
-  <property name="jnode-distr.jar" value="${root.dir}/distr/build/classes"/>
-  <property name="jnode-fs.jar" value="${root.dir}/fs/build/classes"/>
-  <property name="jnode-gui.jar" value="${root.dir}/gui/build/classes"/>
-  <property name="thinlet.jar" value="${root.dir}/gui/build/classes"/>
-  <property name="jnode-textui.jar" value="${root.dir}/textui/build/classes"/>
-  <property name="jnode-distr.jar" value="${root.dir}/distr/build/classes"/>
-  <property name="jnode-net.jar" value="${root.dir}/net/build/classes"/>
-  <property name="jnode-shell.jar" value="${root.dir}/shell/build/classes"/>
-  <property name="jnode-fonts.jar" value="${build.dir}/descriptors/jnode-fonts.jar"/>
+	<property name="root.dir" value="${basedir}/.." />
+	<property name="build.dir" value="${basedir}/build" />
+	<property name="cdroms.dir" value="${build.dir}/cdroms" />
+	<property name="descriptors.dir" value="${build.dir}/descriptors" />
+	<property name="plugins.dir" value="${build.dir}/plugins" />
+	<property name="initjars.dir" value="${build.dir}/initjars" />
+	<property name="backup.dir" value="${build.dir}/backup" />
 
-  <property name="ant.jar" value="${root.dir}/core/lib/ant.jar"/>
-  <property name="commons-net.jar" value="${root.dir}/net/lib/commons-net-1.1.0.jar"/>
-  <property name="dnsjava.jar" value="${root.dir}/net/lib/dnsjava-1.5.0.jar"/>
-  <property name="jsch.jar" value="${root.dir}/net/lib/jsch-0.1.15.jar"/>
-  <property name="junit.jar" value="${root.dir}/core/lib/junit.jar"/>
-  <property name="june.jar" value="${root.dir}/core/lib/june.jar"/>
-  <property name="dom4j.jar" value="${root.dir}/builder/lib/dom4j.jar"/>
-  <property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
-  <property name="nanoxml.jar" value="${root.dir}/core/lib/nanoxml-lite-2.2.3.jar"/>
-  <property name="gnu-crypto.jar" value="${root.dir}/core/lib/gnu-crypto.jar"/>
-  <property name="javax-crypto.jar" value="${root.dir}/core/lib/javax-crypto.jar"/>
-  <property name="javax-security.jar" value="${root.dir}/core/lib/javax-security.jar"/>
-  <property name="beanshell.jar" value="${root.dir}/shell/lib/bsh-2.0b1.jar"/>
+	<property name="jnode-builder.jar" value="${build.dir}/descriptors/jnode-builder.jar" />
+	<property name="jnode-core.jar" value="${root.dir}/core/build/classes" />
+	<property name="jnode-distr.jar" value="${root.dir}/distr/build/classes" />
+	<property name="jnode-fs.jar" value="${root.dir}/fs/build/classes" />
+	<property name="jnode-gui.jar" value="${root.dir}/gui/build/classes" />
+	<property name="thinlet.jar" value="${root.dir}/gui/build/classes" />
+	<property name="jnode-textui.jar" value="${root.dir}/textui/build/classes" />
+	<property name="jnode-distr.jar" value="${root.dir}/distr/build/classes" />
+	<property name="jnode-net.jar" value="${root.dir}/net/build/classes" />
+	<property name="jnode-shell.jar" value="${root.dir}/shell/build/classes" />
+	<property name="jnode-fonts.jar" value="${build.dir}/descriptors/jnode-fonts.jar" />
 
-  <property name="default-plugin-list" value="${basedir}/conf/default-plugin-list.xml"/>
-  <property name="full-plugin-list" value="${basedir}/conf/full-plugin-list.xml"/>
-  <property name="install-plugin-list" value="${basedir}/conf/install-plugin-list.xml"/>
-  <property name="system-plugin-list" value="${basedir}/conf/system-plugin-list.xml"/>
-  <property name="sources.dist.tar.gz" value="${build.dir}/jnodesources-${jnode-ver}.tar.gz"/>
-  <property name="jnode-x86.iso" value="${cdroms.dir}/jnode-x86.iso"/>
-  <property name="jnode-x86-lite.iso" value="${cdroms.dir}/jnode-x86-lite.iso"/>
+	<property name="ant.jar" value="${root.dir}/core/lib/ant.jar" />
+	<property name="commons-net.jar" value="${root.dir}/net/lib/commons-net-1.1.0.jar" />
+	<property name="dnsjava.jar" value="${root.dir}/net/lib/dnsjava-1.5.0.jar" />
+	<property name="jsch.jar" value="${root.dir}/net/lib/jsch-0.1.15.jar" />
+	<property name="junit.jar" value="${root.dir}/core/lib/junit.jar" />
+	<property name="june.jar" value="${root.dir}/core/lib/june.jar" />
+	<property name="dom4j.jar" value="${root.dir}/builder/lib/dom4j.jar" />
+	<property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar" />
+	<property name="nanoxml.jar" value="${root.dir}/core/lib/nanoxml-lite-2.2.3.jar" />
+	<property name="gnu-crypto.jar" value="${root.dir}/core/lib/gnu-crypto.jar" />
+	<property name="javax-crypto.jar" value="${root.dir}/core/lib/javax-crypto.jar" />
+	<property name="javax-security.jar" value="${root.dir}/core/lib/javax-security.jar" />
+	<property name="beanshell.jar" value="${root.dir}/shell/lib/bsh-2.0b1.jar" />
 
-  <path id="cp">
-    <pathelement location="${ant.jar}"/>
-    <pathelement location="${junit.jar}"/>
-    <pathelement location="${june.jar}"/>
-    <pathelement location="${log4j.jar}"/>
-    <pathelement location="${nanoxml.jar}"/>
-    <pathelement location="${gnu-crypto.jar}"/>
-    <pathelement location="${javax-crypto.jar}"/>
-    <pathelement location="${javax-security.jar}"/>
-    <pathelement location="${basedir}/conf"/>
-    <pathelement location="${beanshell.jar}"/>
-  </path>
+	<property name="default-plugin-list" value="${basedir}/conf/default-plugin-list.xml" />
+	<property name="full-plugin-list" value="${basedir}/conf/full-plugin-list.xml" />
+	<property name="install-plugin-list" value="${basedir}/conf/install-plugin-list.xml" />
+	<property name="system-plugin-list" value="${basedir}/conf/system-plugin-list.xml" />
+	<property name="sources.dist.tar.gz" value="${build.dir}/jnodesources-${jnode-ver}.tar.gz" />
+	<property name="jnode-x86.iso" value="${cdroms.dir}/jnode-x86.iso" />
+	<property name="jnode-x86-lite.iso" value="${cdroms.dir}/jnode-x86-lite.iso" />
 
-  <path id="cp-jnode">
-    <pathelement location="${jnode-builder.jar}"/>
-    <pathelement location="${jnode-core.jar}"/>
-    <pathelement location="${jnode-distr.jar}"/>
-    <pathelement location="${jnode-fs.jar}"/>
-    <pathelement location="${jnode-shell.jar}"/>
-    <pathelement location="${jnode-net.jar}"/>
-    <pathelement location="${jnode-gui.jar}"/>
-    <pathelement location="${thinlet.jar}"/>      
-    <pathelement location="${jnode-textui.jar}"/>
-    <pathelement location="${jnode-distr.jar}"/>
-    <path refid="cp"/>
-  </path>
+	<path id="cp">
+		<pathelement location="${ant.jar}" />
+		<pathelement location="${junit.jar}" />
+		<pathelement location="${june.jar}" />
+		<pathelement location="${log4j.jar}" />
+		<pathelement location="${nanoxml.jar}" />
+		<pathelement location="${gnu-crypto.jar}" />
+		<pathelement location="${javax-crypto.jar}" />
+		<pathelement location="${javax-security.jar}" />
+		<pathelement location="${basedir}/conf" />
+		<pathelement location="${beanshell.jar}" />
+	</path>
 
-
-  <filterset id="descriptors-filter">
-    <filter token="PROVIDER" value="JNode.org"/>
-    <filter token="VERSION" value="${jnode-ver}"/>
-  </filterset>
-
-  <patternset id="exts">
-    <include name="**/*.dat"/>
-    <include name="**/*.ids"/>
-    <include name="**/*.properties"/>
-    <include name="**/*.xml"/>
-  </patternset>
-
-  <!-- Initialize all project directories -->
-  <target name="prepare">
-    <tstamp/>
-    <mkdir dir="${build.dir}"/>
-    <mkdir dir="${cdroms.dir}"/>
-    <mkdir dir="${descriptors.dir}"/>
-    <mkdir dir="${plugins.dir}"/>
-    <mkdir dir="${initjars.dir}"/>
-  </target>
-
-  <!-- Assemble all subproject jar files -->
-  <target name="assemble" depends="prepare">
-    <ant target="assemble" dir="${root.dir}/core" inheritall="on" inheritrefs="on"/>
-    <ant target="assemble" dir="${root.dir}/shell" inheritall="on" inheritrefs="on"/>
-    <ant target="assemble" dir="${root.dir}/fs" inheritall="on" inheritrefs="on"/>
-    <ant target="assemble" dir="${root.dir}/gui" inheritall="on" inheritrefs="on"/>
-    <ant target="assemble" dir="${root.dir}/net" inheritall="on" inheritrefs="on"/>
-    <ant target="assemble" dir="${root.dir}/textui" inheritall="on" inheritrefs="on"/>
-    <ant target="assemble" dir="${root.dir}/builder" inheritall="on" inheritrefs="on"/>
-    <ant target="assemble" dir="${root.dir}/distr" inheritall="on" inheritrefs="on"/>
-
-    <!-- Now assemble all plugins -->
-    <taskdef name="plugin" classname="org.jnode.build.PluginTask" classpathref="cp-jnode"/>
-    <plugin todir="${plugins.dir}"
-      tmpdir="${build.dir}/tmp/plugins"
-      pluginDir="${descriptors.dir}">
-      <libalias name="jnode-core.jar" alias="${jnode-core.jar}"/>
-      <libalias name="jnode-distr.jar" alias="${jnode-distr.jar}"/>
-      <libalias name="jnode-fs.jar" alias="${jnode-fs.jar}"/>
-      <libalias name="jnode-gui.jar" alias="${jnode-gui.jar}"/>
-      <libalias name="thinlet.jar" alias="${thinlet.jar}"/>
-      <libalias name="jnode-textui.jar" alias="${jnode-textui.jar}"/>
-      <libalias name="jnode-distr.jar" alias="${jnode-distr.jar}"/>
-      <libalias name="jnode-net.jar" alias="${jnode-net.jar}"/>
-      <libalias name="jnode-shell.jar" alias="${jnode-shell.jar}"/>
-
-      <libalias name="commons-net-1.1.0.jar" alias="${commons-net.jar}"/>
-      <libalias name="dnsjava-1.5.0.jar" alias="${dnsjava.jar}"/>
-      <libalias name="jsch-0.1.15.jar" alias="${jsch.jar}"/>
-      <libalias name="nanoxml.jar" alias="${nanoxml.jar}"/>
-      <libalias name="gnu-crypto.jar" alias="${gnu-crypto.jar}"/>
-      <libalias name="javax-crypto.jar" alias="${javax-crypto.jar}"/>
-      <libalias name="javax-security.jar" alias="${javax-security.jar}"/>
-      <libalias name="log4j.jar" alias="${log4j.jar}"/>
-      <libalias name="beanshell.jar" alias="${beanshell.jar}"/>
-      <libalias name="lw.jar" alias="${lw.jar}"/>
-      <libalias name="junit.jar" alias="${junit.jar}"/>
-      <libalias name="june.jar" alias="${june.jar}"/>
-      <libalias name="ant.jar" alias="${ant.jar}"/>
-      <libalias name="ant-commons-net.jar" alias="${ant-commons-net.jar}"/>
-      <libalias name="ant-launcher.jar" alias="${ant-launcher.jar}"/>
-      <libalias name="ant-trax.jar" alias="${ant-trax.jar}"/>
-      <descriptors dir="${descriptors.dir}/">
-        <include name="*.xml"/>
-        <exclude name="*plugin-list.xml"/>
-      </descriptors>
-    </plugin>
-
-    <!-- Build all initjar's -->
-    <taskdef name="initjar" classname="org.jnode.build.InitJarBuilder" classpathref="cp-jnode"/>    
-    <!-- Default OS related plugins, normal boot -->
-    <initjar destfile="${initjars.dir}/default.jgz"
-      pluginList="${basedir}/conf/default-plugin-list.xml"
-      pluginDir="${plugins.dir}">
-    </initjar>
-    <!-- All plugins, normal boot -->
-    <initjar destfile="${initjars.dir}/full.jgz"
-      pluginList="${basedir}/conf/full-plugin-list.xml"
-      pluginDir="${plugins.dir}">
-    </initjar>
-    <!-- All plugins, gui boot -->
-    <initjar destfile="${initjars.dir}/fullgui.jgz"
-      pluginList="${basedir}/conf/gui-plugin-list.xml"
-      pluginDir="${plugins.dir}">
-    </initjar>
-    <!-- Install boot -->
-    <initjar destfile="${initjars.dir}/install.jgz"
-      pluginList="${basedir}/conf/install-plugin-list.xml"
-      pluginDir="${plugins.dir}">
-    </initjar>
-  </target>
-
-  <!-- Create the X86 boot image-->
-  <target name="arch-x86" depends="assemble">
-    <ant antfile="build-x86.xml" inheritall="on" inheritrefs="on"/>
-  </target>
-
-  <!-- Build all -->
-  <target name="all" depends="arch-x86">
-  </target>
-
-  <!-- Build the boot files for windows NT/2K/XP (with NTLDR) -->
-  <target name="boot-files-winNT" depends="assemble">
-    <ant antfile="build-x86.xml"
-      inheritall="true"
-      inheritrefs="true"
-      target="boot-files-winNT"/>
-  </target>
-
-  <!-- Create a bootable CDROM image -->
-  <target name="cdrom" depends="assemble">
-    <tar destfile="${sources.dist.tar.gz}"
-      compression="gzip"
-      basedir="${root.dir}"
-      excludes="*/build/**"/>
-    <ant antfile="build-x86.xml"
-      inheritall="true"
-      inheritrefs="true"
-      target="cdrom"/>
-  </target>
-
-  <!-- Create a bootable CDROM image -->
-  <target name="cdrom-lite" depends="assemble">
-    <ant antfile="build-x86.xml"
-      inheritall="true"
-      inheritrefs="true"
-      target="cdrom-lite"/>
-  </target>
-
-  <!-- Upload a distribution -->
-  <target name="upload">
-    <property name="upload.dir" value="${build.dir}/upload"/>
-    <mkdir dir="${upload.dir}"/>
-    <gzip src="${jnode-x86.iso}"
-      destfile="${upload.dir}/jnode-x86-${jnode-ver}.iso.gz"/>
-    <copy todir="${upload.dir}" file="${sources.dist.tar.gz}"/>
-    <ftp server="upload.sourceforge.net"
-      remotedir="incoming"
-      passive="yes"
-      newer="yes"
-      verbose="yes"
-      userid="ftp"
-      password="ftp">
-      <fileset dir="${upload.dir}"/>
-    </ftp>
-  </target>
-
-  <!-- Clean everything files -->
-  <target name="clean">
-    <ant target="clean" dir="${root.dir}/core" inheritall="on" inheritrefs="on"/>
-    <ant target="clean" dir="${root.dir}/distr" inheritall="on" inheritrefs="on"/>
-    <ant target="clean" dir="${root.dir}/shell" inheritall="on" inheritrefs="on"/>
-    <ant target="clean" dir="${root.dir}/fs" inheritall="on" inheritrefs="on"/>
-    <ant target="clean" dir="${root.dir}/gui" inheritall="on" inheritrefs="on"/>
-    <ant target="clean" dir="${root.dir}/net" inheritall="on" inheritrefs="on"/>
-    <ant target="clean" dir="${root.dir}/textui" inheritall="on" inheritrefs="on"/>
-    <ant target="clean" dir="${root.dir}/builder" inheritall="on" inheritrefs="on"/>
-    <delete dir="${build.dir}" quiet="on"/>
-  </target>
-
-  <!-- javadoc-small -->
-  <target name="javadoc-small">
-    <mkdir dir="${build.dir}/javadoc/small"/>
-    <javadoc destdir="${build.dir}/javadoc/small"
-      author="true"
-      version="true"
-      use="true"
-      windowtitle="JNode Key Packages">
-
-      <sourcepath>
-        <pathelement location="${root.dir}/core/src/classpath/gnu"/>
-        <pathelement location="${root.dir}/core/src/classpath/java"/>
-        <pathelement location="${root.dir}/core/src/classpath/javax"/>
-        <pathelement location="${root.dir}/core/src/classpath/org"/>
-        <pathelement location="${root.dir}/core/src/core"/>
-        <pathelement location="${root.dir}/core/src/driver"/>
-      </sourcepath>
-      <package name="org.jnode.driver"/>
-      <package name="org.jnode.naming"/>
-      <package name="org.jnode.plugin"/>
-      <package name="org.jnode.system"/>
-      <classpath refid="cp"/>
-      <bootclasspath refid="cp"/>
-
-      <group title="JNode" packages="org.jnode.*"/>
-      <group title="Classpath" packages="java.*,javax.*,gnu.*"/>
-      <!-- link href="http://jnode.org"/ -->
-    </javadoc>
-  </target>
-
-  <!-- javadoc-full -->
-  <target name="javadoc-full">
-    <mkdir dir="${build.dir}/javadoc/full"/>
-    <javadoc destdir="${build.dir}/javadoc/full"
-      author="true"
-      version="true"
-      use="true"
-      windowtitle="All JNode Packages">
-
-      <sourcepath>
-        <pathelement location="${root.dir}/core/src/classpath/gnu"/>
-        <pathelement location="${root.dir}/core/src/classpath/java"/>
-        <pathelement location="${root.dir}/core/src/classpath/javax"/>
-        <pathelement location="${root.dir}/core/src/classpath/org"/>
-        <pathelement location="${root.dir}/core/src/core"/>
-        <pathelement location="${root.dir}/core/src/driver"/>
-        <pathelement location="${root.dir}/distr/src/install"/>
-        <pathelement location="${root.dir}/fs/src/fs"/>
-        <pathelement location="${root.dir}/fs/src/fs"/>
-        <pathelement location="${root.dir}/fs/src/driver"/>
-        <pathelement location="${root.dir}/gui/src/awt"/>
-        <pathelement location="${root.dir}/gui/src/driver"/>
-        <pathelement location="${root.dir}/net/src/net"/>
-        <pathelement location="${root.dir}/net/src/driver"/>
-        <pathelement location="${root.dir}/shell/src/shell"/>
-      </sourcepath>
-      <package name="org.jnode.*"/>
-      <classpath refid="cp"/>
-      <bootclasspath refid="cp"/>
-
-      <group title="JNode" packages="org.jnode.*"/>
-      <group title="Classpath" packages="java.*,javax.*,gnu.*"/>
-      <!-- link href="http://jnode.org"/ -->
-    </javadoc>
-  </target>
-
-  <!-- website -->
-  <target name="website" depends="javadoc-small,assemble">
-    <ant antfile="build-x86.xml"
-      inheritall="true"
-      inheritrefs="true"
-      target="shell-usage"/>
-    <ant dir="${root.dir}/docs" inheritall="on" inheritrefs="on"/>
-  </target>
-
-  <!-- Upload website -->
-  <target name="wsupload" depends="website">
-    <ant target="wsupload" dir="${root.dir}/docs" inheritall="on" inheritrefs="on"/>
-  </target>
-
-  <!-- Backup CVS files -->
-  <target name="backup">
-    <mkdir dir="${backup.dir}"/>
-    <tstamp>
-      <format property="date" pattern="dd-MM-yyyy"/>
-    </tstamp>
-    <get src="http://cvs.sourceforge.net/cvstarballs/jnode-cvsroot.tar.bz2"
-      dest="${backup.dir}/jnode-cvsroot-${date}.tar.bz2"
-      usetimestamp="true"
-      verbose="true"/>
-  </target>
-
-  <!-- Compare classpath version of jnode with real classpath version -->
-  <target name="classpath-compare" depends="assemble">
-    <taskdef name="cp-compare" classname="org.jnode.ant.taskdefs.classpath.CompareTask" classpathref="cp-jnode"/>
-
-    <delete dir="${build.dir}/classpath-compare"/>
-    <cp-compare destdir="${build.dir}/classpath-compare">
-      <vmsources>
-        <fileset dir="${root.dir}/core/src/classpath/gnu" includes="**/*.java"/>
-        <fileset dir="${root.dir}/core/src/classpath/java" includes="**/*.java"/>
-        <fileset dir="${root.dir}/core/src/classpath/javax" includes="**/*.java"/>
-        <fileset dir="${root.dir}/core/src/classpath/org" includes="**/*.java"/>
-      </vmsources>
-      <classpathsources>
-        <fileset dir="${root.dir}/../classpath" includes="**/*.java">
-          <exclude name="compat/**/*"/>
-          <exclude name="external/**/*"/>
-          <exclude name="gnu/java/awt/peer/gtk/**/*"/>
-          <exclude name="gnu/javax/swing/plaf/gtk/**/*"/>
-          <exclude name="gnu/test/**/*"/>
-          <exclude name="gnu/xml/libxmlj/**/*"/>
-          <exclude name="test/**/*"/>
-          <exclude name="testsuite/**/*"/>
-          <exclude name="vm/reference/**/*"/>
-        </fileset>
-        <fileset dir="${root.dir}/../classpath/external/w3c_dom" includes="**/*.java">
-        </fileset>
-        <fileset dir="${root.dir}/../classpath/external/sax" includes="**/*.java">
-        </fileset>
-      </classpathsources>
-    </cp-compare>
+	<path id="cp-jnode">
+		<pathelement location="${jnode-builder.jar}" />
+		<pathelement location="${jnode-core.jar}" />
+		<pathelement location="${jnode-distr.jar}" />
+		<pathelement location="${jnode-fs.jar}" />
+		<pathelement location="${jnode-shell.jar}" />
+		<pathelement location="${jnode-net.jar}" />
+		<pathelement location="${jnode-gui.jar}" />
+		<pathelement location="${thinlet.jar}" />
+		<pathelement location="${jnode-textui.jar}" />
+		<pathelement location="${jnode-distr.jar}" />
+		<path refid="cp" />
+	</path>
 
 
-  </target>
+	<filterset id="descriptors-filter">
+		<filter token="PROVIDER" value="JNode.org" />
+		<filter token="VERSION" value="${jnode-ver}" />
+	</filterset>
 
-  <!-- Run all tests -->
-  <target name="tests" depends="assemble">
-    <ant target="tests" dir="${root.dir}/fs" inheritall="on" inheritrefs="on"/>
-  </target>
+	<patternset id="exts">
+		<include name="**/*.dat" />
+		<include name="**/*.ids" />
+		<include name="**/*.properties" />
+		<include name="**/*.xml" />
+	</patternset>
+
+	<!-- Initialize all project directories -->
+	<target name="prepare">
+		<tstamp />
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${cdroms.dir}" />
+		<mkdir dir="${descriptors.dir}" />
+		<mkdir dir="${plugins.dir}" />
+		<mkdir dir="${initjars.dir}" />
+	</target>
+
+	<!-- Assemble all subproject jar files -->
+	<target name="assemble" depends="prepare">
+		<ant target="assemble" dir="${root.dir}/core" inheritall="on" inheritrefs="on" />
+		<ant target="assemble" dir="${root.dir}/shell" inheritall="on" inheritrefs="on" />
+		<ant target="assemble" dir="${root.dir}/fs" inheritall="on" inheritrefs="on" />
+		<ant target="assemble" dir="${root.dir}/gui" inheritall="on" inheritrefs="on" />
+		<ant target="assemble" dir="${root.dir}/net" inheritall="on" inheritrefs="on" />
+		<ant target="assemble" dir="${root.dir}/textui" inheritall="on" inheritrefs="on" />
+		<ant target="assemble" dir="${root.dir}/builder" inheritall="on" inheritrefs="on" />
+		<ant target="assemble" dir="${root.dir}/distr" inheritall="on" inheritrefs="on" />
+
+		<!-- Now assemble all plugins -->
+		<taskdef name="plugin" classname="org.jnode.build.PluginTask" classpathref="cp-jnode" />
+		<plugin todir="${plugins.dir}" tmpdir="${build.dir}/tmp/plugins" pluginDir="${descriptors.dir}">
+			<libalias name="jnode-core.jar" alias="${jnode-core.jar}" />
+			<libalias name="jnode-distr.jar" alias="${jnode-distr.jar}" />
+			<libalias name="jnode-fs.jar" alias="${jnode-fs.jar}" />
+			<libalias name="jnode-gui.jar" alias="${jnode-gui.jar}" />
+			<libalias name="thinlet.jar" alias="${thinlet.jar}" />
+			<libalias name="jnode-textui.jar" alias="${jnode-textui.jar}" />
+			<libalias name="jnode-distr.jar" alias="${jnode-distr.jar}" />
+			<libalias name="jnode-net.jar" alias="${jnode-net.jar}" />
+			<libalias name="jnode-shell.jar" alias="${jnode-shell.jar}" />
+
+			<libalias name="commons-net-1.1.0.jar" alias="${commons-net.jar}" />
+			<libalias name="dnsjava-1.5.0.jar" alias="${dnsjava.jar}" />
+			<libalias name="jsch-0.1.15.jar" alias="${jsch.jar}" />
+			<libalias name="nanoxml.jar" alias="${nanoxml.jar}" />
+			<libalias name="gnu-crypto.jar" alias="${gnu-crypto.jar}" />
+			<libalias name="javax-crypto.jar" alias="${javax-crypto.jar}" />
+			<libalias name="javax-security.jar" alias="${javax-security.jar}" />
+			<libalias name="log4j.jar" alias="${log4j.jar}" />
+			<libalias name="beanshell.jar" alias="${beanshell.jar}" />
+			<libalias name="lw.jar" alias="${lw.jar}" />
+			<libalias name="junit.jar" alias="${junit.jar}" />
+			<libalias name="june.jar" alias="${june.jar}" />
+			<libalias name="ant.jar" alias="${ant.jar}" />
+			<libalias name="ant-commons-net.jar" alias="${ant-commons-net.jar}" />
+			<libalias name="ant-launcher.jar" alias="${ant-launcher.jar}" />
+			<libalias name="ant-trax.jar" alias="${ant-trax.jar}" />
+			<descriptors dir="${descriptors.dir}/">
+				<include name="*.xml" />
+				<exclude name="*plugin-list.xml" />
+			</descriptors>
+		</plugin>
+
+		<!-- Build all initjar's -->
+		<taskdef name="initjar" classname="org.jnode.build.InitJarBuilder" classpathref="cp-jnode" />
+		<!-- Default OS related plugins, normal boot -->
+		<initjar destfile="${initjars.dir}/default.jgz" pluginList="${basedir}/conf/default-plugin-list.xml" pluginDir="${plugins.dir}">
+		</initjar>
+		<!-- All plugins, normal boot -->
+		<initjar destfile="${initjars.dir}/full.jgz" pluginList="${basedir}/conf/full-plugin-list.xml" pluginDir="${plugins.dir}">
+		</initjar>
+		<!-- All plugins, gui boot -->
+		<initjar destfile="${initjars.dir}/fullgui.jgz" pluginList="${basedir}/conf/gui-plugin-list.xml" pluginDir="${plugins.dir}">
+		</initjar>
+		<!-- Install boot -->
+		<initjar destfile="${initjars.dir}/install.jgz" pluginList="${basedir}/conf/install-plugin-list.xml" pluginDir="${plugins.dir}">
+		</initjar>
+	</target>
+
+	<!-- Create the X86 boot image-->
+	<target name="arch-x86" depends="assemble">
+		<ant antfile="build-x86.xml" inheritall="on" inheritrefs="on" />
+	</target>
+
+	<!-- Build all -->
+	<target name="all" depends="arch-x86">
+	</target>
+
+	<!-- Build the boot files for windows NT/2K/XP (with NTLDR) -->
+	<target name="boot-files-winNT" depends="assemble">
+		<ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="boot-files-winNT" />
+	</target>
+
+	<!-- Create a bootable CDROM image -->
+	<target name="cdrom" depends="assemble">
+		<tar destfile="${sources.dist.tar.gz}" compression="gzip" basedir="${root.dir}" excludes="*/build/**" />
+		<ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom" />
+	</target>
+
+	<!-- Create a bootable CDROM image -->
+	<target name="cdrom-lite" depends="assemble">
+		<ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom-lite" />
+	</target>
+
+	<!-- Upload a distribution -->
+	<target name="upload">
+		<property name="upload.dir" value="${build.dir}/upload" />
+		<mkdir dir="${upload.dir}" />
+		<gzip src="${jnode-x86.iso}" destfile="${upload.dir}/jnode-x86-${jnode-ver}.iso.gz" />
+		<copy todir="${upload.dir}" file="${sources.dist.tar.gz}" />
+		<ftp server="upload.sourceforge.net" remotedir="incoming" passive="yes" newer="yes" verbose="yes" userid="ftp" password="ftp">
+			<fileset dir="${upload.dir}" />
+		</ftp>
+	</target>
+
+	<!-- Clean everything files -->
+	<target name="clean">
+		<ant target="clean" dir="${root.dir}/core" inheritall="on" inheritrefs="on" />
+		<ant target="clean" dir="${root.dir}/distr" inheritall="on" inheritrefs="on" />
+		<ant target="clean" dir="${root.dir}/shell" inheritall="on" inheritrefs="on" />
+		<ant target="clean" dir="${root.dir}/fs" inheritall="on" inheritrefs="on" />
+		<ant target="clean" dir="${root.dir}/gui" inheritall="on" inheritrefs="on" />
+		<ant target="clean" dir="${root.dir}/net" inheritall="on" inheritrefs="on" />
+		<ant target="clean" dir="${root.dir}/textui" inheritall="on" inheritrefs="on" />
+		<ant target="clean" dir="${root.dir}/builder" inheritall="on" inheritrefs="on" />
+		<delete dir="${build.dir}" quiet="on" />
+	</target>
+
+	<!-- javadoc-small -->
+	<target name="javadoc-small">
+		<mkdir dir="${build.dir}/javadoc/small" />
+		<javadoc destdir="${build.dir}/javadoc/small" author="true" version="true" use="true" windowtitle="JNode Key Packages">
+
+			<sourcepath>
+				<pathelement location="${root.dir}/core/src/classpath/gnu" />
+				<pathelement location="${root.dir}/core/src/classpath/java" />
+				<pathelement location="${root.dir}/core/src/classpath/javax" />
+				<pathelement location="${root.dir}/core/src/classpath/org" />
+				<pathelement location="${root.dir}/core/src/core" />
+				<pathelement location="${root.dir}/core/src/driver" />
+			</sourcepath>
+			<package name="org.jnode.driver" />
+			<package name="org.jnode.naming" />
+			<package name="org.jnode.plugin" />
+			<package name="org.jnode.system" />
+			<classpath refid="cp" />
+			<bootclasspath refid="cp" />
+
+			<group title="JNode" packages="org.jnode.*" />
+			<group title="Classpath" packages="java.*,javax.*,gnu.*" />
+			<!-- link href="http://jnode.org"/ -->
+		</javadoc>
+	</target>
+
+	<!-- javadoc-full -->
+	<target name="javadoc-full">
+		<mkdir dir="${build.dir}/javadoc/full" />
+		<javadoc destdir="${build.dir}/javadoc/full" author="true" version="true" use="true" windowtitle="All JNode Packages">
+
+			<sourcepath>
+				<pathelement location="${root.dir}/core/src/classpath/gnu" />
+				<pathelement location="${root.dir}/core/src/classpath/java" />
+				<pathelement location="${root.dir}/core/src/classpath/javax" />
+				<pathelement location="${root.dir}/core/src/classpath/org" />
+				<pathelement location="${root.dir}/core/src/core" />
+				<pathelement location="${root.dir}/core/src/driver" />
+				<pathelement location="${root.dir}/distr/src/install" />
+				<pathelement location="${root.dir}/fs/src/fs" />
+				<pathelement location="${root.dir}/fs/src/fs" />
+				<pathelement location="${root.dir}/fs/src/driver" />
+				<pathelement location="${root.dir}/gui/src/awt" />
+				<pathelement location="${root.dir}/gui/src/driver" />
+				<pathelement location="${root.dir}/net/src/net" />
+				<pathelement location="${root.dir}/net/src/driver" />
+				<pathelement location="${root.dir}/shell/src/shell" />
+			</sourcepath>
+			<package name="org.jnode.*" />
+			<classpath refid="cp" />
+			<bootclasspath refid="cp" />
+
+			<group title="JNode" packages="org.jnode.*" />
+			<group title="Classpath" packages="java.*,javax.*,gnu.*" />
+			<!-- link href="http://jnode.org"/ -->
+		</javadoc>
+	</target>
+
+	<!-- Backup CVS files -->
+	<target name="backup">
+		<mkdir dir="${backup.dir}" />
+		<tstamp>
+			<format property="date" pattern="dd-MM-yyyy" />
+		</tstamp>
+		<get src="http://cvs.sourceforge.net/cvstarballs/jnode-cvsroot.tar.bz2" dest="${backup.dir}/jnode-cvsroot-${date}.tar.bz2" usetimestamp="true" verbose="true" />
+	</target>
+
+	<!-- Compare classpath version of jnode with real classpath version -->
+	<target name="classpath-compare" depends="assemble">
+		<taskdef name="cp-compare" classname="org.jnode.ant.taskdefs.classpath.CompareTask" classpathref="cp-jnode" />
+
+		<delete dir="${build.dir}/classpath-compare" />
+		<cp-compare destdir="${build.dir}/classpath-compare">
+			<vmsources>
+				<fileset dir="${root.dir}/core/src/classpath/gnu" includes="**/*.java" />
+				<fileset dir="${root.dir}/core/src/classpath/java" includes="**/*.java" />
+				<fileset dir="${root.dir}/core/src/classpath/javax" includes="**/*.java" />
+				<fileset dir="${root.dir}/core/src/classpath/org" includes="**/*.java" />
+			</vmsources>
+			<classpathsources>
+				<fileset dir="${root.dir}/../classpath" includes="**/*.java">
+					<exclude name="compat/**/*" />
+					<exclude name="external/**/*" />
+					<exclude name="gnu/java/awt/peer/gtk/**/*" />
+					<exclude name="gnu/javax/swing/plaf/gtk/**/*" />
+					<exclude name="gnu/test/**/*" />
+					<exclude name="gnu/xml/libxmlj/**/*" />
+					<exclude name="test/**/*" />
+					<exclude name="testsuite/**/*" />
+					<exclude name="vm/reference/**/*" />
+				</fileset>
+				<fileset dir="${root.dir}/../classpath/external/w3c_dom" includes="**/*.java">
+				</fileset>
+				<fileset dir="${root.dir}/../classpath/external/sax" includes="**/*.java">
+				</fileset>
+			</classpathsources>
+		</cp-compare>
+
+
+	</target>
+
+	<!-- Compare classpath version of jnode with real classpath version -->
+	<target name="header-fix" depends="assemble">
+		<taskdef name="header" classname="org.jnode.ant.taskdefs.HeaderTask" classpathref="cp-jnode" />
+
+		<header 
+			update="on"
+			headerFile="${root.dir}/all/template/header.txt">
+			<fileset dir="${root.dir}/builder/src/builder" includes="**/*.java"/>
+		</header>
+	</target>
+
+	<!-- Run all tests -->
+	<target name="tests" depends="assemble">
+		<ant target="tests" dir="${root.dir}/fs" inheritall="on" inheritrefs="on" />
+	</target>
 </project>
 
 
