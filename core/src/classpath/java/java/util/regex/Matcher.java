@@ -1,5 +1,5 @@
-/* Matcher.java -- 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+/* Matcher.java -- Instance of a regular expression applied to a char sequence.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,17 +35,259 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-// Stub class until java.util.regex is implemented.
+
 package java.util.regex;
 
+import gnu.regexp.RE;
+import gnu.regexp.REMatch;
+
+/**
+ * Instance of a regular expression applied to a char sequence.
+ *
+ * @since 1.4
+ */
 public class Matcher
 {
-  public String replaceFirst(String replacement)
+  private Pattern pattern;
+  private CharSequence input;
+  private int position;
+  private int appendPosition;
+  private REMatch match;
+
+  Matcher(Pattern pattern, CharSequence input)
   {
-    throw new InternalError("Not implemented yet");
+    this.pattern = pattern;
+    this.input = input;
   }
-  public String replaceAll(String replacement)
+  
+  /**
+   * @param sb The target string buffer
+   * @param replacement The replacement string
+   *
+   * @exception IllegalStateException If no match has yet been attempted,
+   * or if the previous match operation failed
+   * @exception IndexOutOfBoundsException If the replacement string refers
+   * to a capturing group that does not exist in the pattern
+   */
+  public Matcher appendReplacement (StringBuffer sb, String replacement)
+    throws IllegalStateException
   {
-    throw new InternalError("Not implemented yet");
+    assertMatchOp();
+    sb.append(input.subSequence(appendPosition,
+				match.getStartIndex()).toString());
+    sb.append(match.substituteInto(replacement));
+    appendPosition = match.getEndIndex();
+    return this;
+  }
+
+  /**
+   * @param sb The target string buffer
+   */
+  public StringBuffer appendTail (StringBuffer sb)
+  {
+    sb.append(input.subSequence(appendPosition, input.length()).toString());
+    return sb;
+  }
+ 
+  /**
+   * @exception IllegalStateException If no match has yet been attempted,
+   * or if the previous match operation failed
+   */
+  public int end ()
+    throws IllegalStateException
+  {
+    assertMatchOp();
+    return match.getEndIndex();
+  }
+  
+  /**
+   * @param group The index of a capturing group in this matcher's pattern
+   *
+   * @exception IllegalStateException If no match has yet been attempted,
+   * or if the previous match operation failed
+   * @exception IndexOutOfBoundsException If the replacement string refers
+   * to a capturing group that does not exist in the pattern
+   */
+  public int end (int group)
+    throws IllegalStateException
+  {
+    assertMatchOp();
+    return match.getEndIndex(group);
+  }
+ 
+  public boolean find ()
+  {
+    boolean first = (match == null);
+    match = pattern.getRE().getMatch(input, position);
+    if (match != null)
+      {
+	int endIndex = match.getEndIndex();
+	// Are we stuck at the same position?
+	if (!first && endIndex == position)
+	  {
+	    match = null;
+	    // Not at the end of the input yet?
+	    if (position < input.length() - 1)
+	      {
+		position++;
+		return find(position);
+	      }
+	    else
+	      return false;
+	  }
+	position = endIndex;
+	return true;
+      }
+    return false;
+  } 
+
+  /**
+   * @param start The index to start the new pattern matching
+   *
+   * @exception IndexOutOfBoundsException If the replacement string refers
+   * to a capturing group that does not exist in the pattern
+   */
+  public boolean find (int start)
+  {
+    match = pattern.getRE().getMatch(input, start);
+    if (match != null)
+      {
+	position = match.getEndIndex();
+	return true;
+      }
+    return false;
+  }
+ 
+  /**
+   * @exception IllegalStateException If no match has yet been attempted,
+   * or if the previous match operation failed
+   */
+  public String group ()
+  {
+    assertMatchOp();
+    return match.toString();
+  }
+  
+  /**
+   * @param group The index of a capturing group in this matcher's pattern
+   *
+   * @exception IllegalStateException If no match has yet been attempted,
+   * or if the previous match operation failed
+   * @exception IndexOutOfBoundsException If the replacement string refers
+   * to a capturing group that does not exist in the pattern
+   */
+  public String group (int group)
+    throws IllegalStateException
+  {
+    assertMatchOp();
+    return match.toString(group);
+  }
+
+  /**
+   * @param replacement The replacement string
+   */
+  public String replaceFirst (String replacement)
+  {
+    reset();
+    // Semantics might not quite match
+    return pattern.getRE().substitute(input, replacement, position);
+  }
+
+  /**
+   * @param replacement The replacement string
+   */
+  public String replaceAll (String replacement)
+  {
+    reset();
+    return pattern.getRE().substituteAll(input, replacement, position);
+  }
+  
+  public int groupCount ()
+  {
+    return pattern.getRE().getNumSubs();
+  }
+ 
+  public boolean lookingAt ()
+  {
+    match = pattern.getRE().getMatch(input, 0);
+    if (match != null)
+      {
+	if (match.getStartIndex() == 0)
+	  return true;
+	match = null;
+      }
+    return false;
+  }
+  
+  /**
+   * Attempts to match the entire input sequence against the pattern. 
+   *
+   * If the match succeeds then more information can be obtained via the
+   * start, end, and group methods.
+   *
+   * @see #start
+   * @see #end
+   * @see #group
+   */
+  public boolean matches ()
+  {
+    return find(0);
+  }
+  
+  /**
+   * Returns the Pattern that is interpreted by this Matcher
+   */
+  public Pattern pattern ()
+  {
+    return pattern;
+  }
+  
+  public Matcher reset ()
+  {
+    position = 0;
+    match = null;
+    return this;
+  }
+  
+  /**
+   * @param input The new input character sequence
+   */
+  public Matcher reset (CharSequence input)
+  {
+    this.input = input;
+    return reset();
+  }
+  
+  /**
+   * @param group The index of a capturing group in this matcher's pattern
+   *
+   * @exception IllegalStateException If no match has yet been attempted,
+   * or if the previous match operation failed
+   */
+  public int start ()
+    throws IllegalStateException
+  {
+    assertMatchOp();
+    return match.getStartIndex();
+  }
+
+  /**
+   * @param group The index of a capturing group in this matcher's pattern
+   *
+   * @exception IllegalStateException If no match has yet been attempted,
+   * or if the previous match operation failed
+   * @exception IndexOutOfBoundsException If the replacement string refers
+   * to a capturing group that does not exist in the pattern
+   */
+  public int start (int group)
+    throws IllegalStateException
+  {
+    assertMatchOp();
+    return match.getStartIndex(group);
+  }
+
+  private void assertMatchOp()
+  {
+    if (match == null) throw new IllegalStateException();
   }
 }

@@ -39,11 +39,13 @@ exception statement from your version.
 
 */
 
+
 package java.util.logging;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 
 /**
  * An <code>XMLFormatter</code> formats LogRecords into
@@ -51,12 +53,16 @@ import java.util.ResourceBundle;
  *
  * @author Sascha Brawer (brawer@acm.org)
  */
-public class XMLFormatter extends Formatter {
+public class XMLFormatter
+  extends Formatter
+{
 	/**
 	 * Constructs a new XMLFormatter.
 	 */
-	public XMLFormatter() {
+  public XMLFormatter()
+  {
 	}
+
 
 	/**
 	 * The character sequence that is used to separate lines in the
@@ -71,12 +77,15 @@ public class XMLFormatter extends Formatter {
 	 */
 	private static final String lineSep = SimpleFormatter.lineSep;
 
+    
 	/**
 	 * A DateFormat for emitting time in the ISO 8601 format.
 	 * Since the API specification of SimpleDateFormat does not talk
 	 * about its thread-safety, we cannot share a singleton instance.
 	 */
-	private final SimpleDateFormat iso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+  private final SimpleDateFormat iso8601
+    = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
 
 	/**
 	 * Appends a line consisting of indentation, opening element tag,
@@ -93,7 +102,11 @@ public class XMLFormatter extends Formatter {
 	 * @param content the element content, or <code>null</code> to
 	 *        have no output whatsoever appended to <code>buf</code>.
 	 */
-	private static final void appendTag(StringBuffer buf, int indent, String tag, String content) {
+  private static final void appendTag(StringBuffer buf,
+				      int indent,
+				      String tag,
+				      String content)
+  {
 		int i;
 
 		if (content == null)
@@ -114,27 +127,30 @@ public class XMLFormatter extends Formatter {
 		 * implementation which has been reported in the Java
 		 * bug parade as bug number (FIXME: Insert number here).
 		 */
-		for (i = 0; i < content.length(); i++) {
+    for (i = 0; i < content.length(); i++)
+    {
 			char c = content.charAt(i);
-			switch (c) {
-				case '&' :
+      switch (c)
+      {
+      case '&':
 					buf.append("&amp;");
 					break;
 
-				case '<' :
+      case '<':
 					buf.append("&lt;");
 					break;
 
-				case '>' :
+      case '>':
 					buf.append("&gt;");
 					break;
 
-				default :
-					if (((c >= 0x20) && (c <= 0x7e)) || (c == /* line feed */
-						10) || (c == /* carriage return */
-						13))
+      default:
+	if (((c >= 0x20) && (c <= 0x7e))
+	    || (c == /* line feed */ 10)
+	    || (c == /* carriage return */ 13))
 						buf.append(c);
-					else {
+	else
+	{
 						buf.append("&#");
 						buf.append((int) c);
 						buf.append(';');
@@ -149,6 +165,7 @@ public class XMLFormatter extends Formatter {
 		buf.append(lineSep);
 	}
 
+
 	/**
 	 * Appends a line consisting of indentation, opening element tag,
 	 * numeric element content, closing element tag and line separator
@@ -162,21 +179,28 @@ public class XMLFormatter extends Formatter {
 	 *
 	 * @param content the element content.
 	 */
-	private static final void appendTag(StringBuffer buf, int indent, String tag, long content) {
+  private static final void appendTag(StringBuffer buf,
+				      int indent,
+				      String tag,
+				      long content)
+  {
 		appendTag(buf, indent, tag, Long.toString(content));
 	}
 
-	public String format(LogRecord record) {
+
+  public String format(LogRecord record)
+  {
 		StringBuffer buf = new StringBuffer(400);
 		Level level = record.getLevel();
 		long millis = record.getMillis();
 		Object[] params = record.getParameters();
 		ResourceBundle bundle = record.getResourceBundle();
-		String key, message;
+    String          message;
 
 		buf.append("<record>");
 		buf.append(lineSep);
 
+    
 		appendTag(buf, 1, "date", iso8601.format(new Date(millis)));
 		appendTag(buf, 1, "millis", record.getMillis());
 		appendTag(buf, 1, "sequence", record.getSequenceNumber());
@@ -197,10 +221,13 @@ public class XMLFormatter extends Formatter {
 		 * replicates the buggy behavior of the Sun implementation, as
 		 * different log files might be a big nuisance to users.
 		 */
-		try {
+    try
+    {
 			record.setResourceBundle(null);
 			message = formatMessage(record);
-		} finally {
+    }
+    finally
+    {
 			record.setResourceBundle(bundle);
 		}
 		appendTag(buf, 1, "message", message);
@@ -239,7 +266,8 @@ public class XMLFormatter extends Formatter {
 		 * implementation until Throwable has made progress.
 		 */
 		Throwable thrown = record.getThrown();
-		if (thrown != null) {
+    if (thrown != null)
+    {
 			buf.append("  <exception>");
 			buf.append(lineSep);
 
@@ -271,11 +299,13 @@ public class XMLFormatter extends Formatter {
 			buf.append(lineSep);
 		}
 
+
 		buf.append("</record>");
 		buf.append(lineSep);
 
 		return buf.toString();
 	}
+
 
 	/**
 	 * Returns a string that handlers are supposed to emit before
@@ -290,7 +320,8 @@ public class XMLFormatter extends Formatter {
 	 *     will inspect certain properties of the handler, for
 	 *     example its encoding, in order to construct the header.
 	 */
-	public String getHead(Handler h) {
+  public String getHead(Handler h)
+  {
 		StringBuffer buf;
 		String encoding;
 
@@ -356,7 +387,9 @@ public class XMLFormatter extends Formatter {
 		return buf.toString();
 	}
 
-	public String getTail(Handler h) {
+
+  public String getTail(Handler h)
+  {
 		return "</log>" + lineSep;
 	}
 }

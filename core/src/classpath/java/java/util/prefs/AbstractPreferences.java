@@ -1,5 +1,5 @@
 /* AbstractPreferences - Partial implementation of a Preference node
-   Copyright (C) 2001 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,21 +35,19 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.util.prefs;
 
-import gnu.java.util.prefs.NodeWriter;
+package java.util.prefs;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.HashMap;
 import java.util.TreeSet;
+import gnu.java.util.prefs.NodeWriter;
 
 /**
  * Partial implementation of a Preference node.
- *
- * Methods that still need to be implemented are <code>isUserNode(), XXX
  *
  * @since 1.4
  * @author Mark Wielaard (mark@klomp.org)
@@ -112,12 +110,16 @@ public abstract class AbstractPreferences extends Preferences {
 	 *            contains a '/' character
 	 */
 	protected AbstractPreferences(AbstractPreferences parent, String name) {
-		if ((name == null) // name should be given
+        if (  (name == null)                            // name should be given
 			|| (name.length() > MAX_NAME_LENGTH) // 80 characters max
 			|| (parent == null && name.length() != 0) // root has no name
 			|| (parent != null && name.length() == 0) // all other nodes do
 			|| (name.indexOf('/') != -1)) // must not contain '/'
-			throw new IllegalArgumentException("Illegal name argument '" + name + "' (parent is " + parent == null ? "" : "not " + "null)");
+            throw new IllegalArgumentException("Illegal name argument '"
+                                               + name
+                                               + "' (parent is "
+                                               + parent == null ? "" : "not "
+                                               + "null)");
 		this.parent = parent;
 		this.name = name;
 	}
@@ -152,7 +154,12 @@ public abstract class AbstractPreferences extends Preferences {
 	 * Returns true if this node comes from the user preferences tree, false
 	 * if it comes from the system preferences tree.
 	 */
-	abstract public boolean isUserNode();
+    public boolean isUserNode() {
+        AbstractPreferences root = this;
+	while (root.parent != null)
+	    root = root.parent;
+	return root == Preferences.userRoot();
+    }
 
 	/**
 	 * Returns the name of this preferences node. The name of the node cannot
@@ -170,7 +177,19 @@ public abstract class AbstractPreferences extends Preferences {
 	 * </code>
 	 */
 	public String toString() {
-		return (isUserNode() ? "User" : "System") + " Preference Node: " + absolutePath();
+        return (isUserNode() ? "User":"System")
+               + " Preference Node: "
+               + absolutePath();
+    }
+
+    /**
+     * Returns all known unremoved children of this node.
+     *
+     * @return All known unremoved children of this node
+     */
+    protected final AbstractPreferences[] cachedChildren()
+    {
+      return (AbstractPreferences[]) childCache.values().toArray();
 	}
 
 	/**
@@ -192,7 +211,7 @@ public abstract class AbstractPreferences extends Preferences {
 	 * @exception IllegalStateException when this node has been removed
 	 */
 	public String[] childrenNames() throws BackingStoreException {
-		synchronized (lock) {
+        synchronized(lock) {
 			if (isRemoved())
 				throw new IllegalStateException("Node removed");
 
@@ -239,7 +258,7 @@ public abstract class AbstractPreferences extends Preferences {
 	 * then 80 characters long
 	 */
 	public Preferences node(String path) {
-		synchronized (lock) {
+        synchronized(lock) {
 			if (isRemoved())
 				throw new IllegalStateException("Node removed");
 
@@ -292,12 +311,12 @@ public abstract class AbstractPreferences extends Preferences {
 			childPath = "";
 		} else {
 			childName = path.substring(0, nextSlash);
-			childPath = path.substring(nextSlash + 1);
+            childPath = path.substring(nextSlash+1);
 		}
 
 		// Get the child node
 		AbstractPreferences child;
-		child = (AbstractPreferences) childCache.get(childName);
+        child = (AbstractPreferences)childCache.get(childName);
 		if (child == null) {
 
 			if (childName.length() > MAX_NAME_LENGTH)
@@ -310,7 +329,7 @@ public abstract class AbstractPreferences extends Preferences {
 		}
 
 		// Lock the child and go down
-		synchronized (child.lock) {
+        synchronized(child.lock) {
 			return child.getNode(childPath);
 		}
 	}
@@ -332,7 +351,7 @@ public abstract class AbstractPreferences extends Preferences {
 	 * then 80 characters long
 	 */
 	public boolean nodeExists(String path) throws BackingStoreException {
-		synchronized (lock) {
+        synchronized(lock) {
 			if (isRemoved() && path.length() != 0)
 				throw new IllegalStateException("Node removed");
 
@@ -358,7 +377,7 @@ public abstract class AbstractPreferences extends Preferences {
 
 		// Empty String "" indicates this node
 		if (path.length() == 0)
-			return (!isRemoved());
+            return(!isRemoved());
 
 		// Calculate child name and rest of path
 		String childName;
@@ -369,12 +388,12 @@ public abstract class AbstractPreferences extends Preferences {
 			childPath = "";
 		} else {
 			childName = path.substring(0, nextSlash);
-			childPath = path.substring(nextSlash + 1);
+            childPath = path.substring(nextSlash+1);
 		}
 
 		// Get the child node
 		AbstractPreferences child;
-		child = (AbstractPreferences) childCache.get(childName);
+        child = (AbstractPreferences)childCache.get(childName);
 		if (child == null) {
 
 			if (childName.length() > MAX_NAME_LENGTH)
@@ -390,7 +409,7 @@ public abstract class AbstractPreferences extends Preferences {
 		}
 
 		// Lock the child and go down
-		synchronized (child.lock) {
+        synchronized(child.lock) {
 			return child.existsNode(childPath);
 		}
 	}
@@ -409,11 +428,13 @@ public abstract class AbstractPreferences extends Preferences {
 	 * @exception BackingStoreException when the backing store cannot be
 	 *            reached
 	 */
-	protected AbstractPreferences getChild(String name) throws BackingStoreException {
-		synchronized (lock) {
+    protected AbstractPreferences getChild(String name)
+                                    throws BackingStoreException
+    {
+        synchronized(lock) {
 			// Get all the names (not yet in the cache)
 			String[] names = childrenNamesSpi();
-			for (int i = 0; i < names.length; i++)
+            for (int i=0; i < names.length; i++)
 				if (name.equals(names[i]))
 					return childSpi(name);
 
@@ -430,7 +451,7 @@ public abstract class AbstractPreferences extends Preferences {
 	 * <code>removeNode</code> methods.
 	 */
 	protected boolean isRemoved() {
-		synchronized (lock) {
+        synchronized(lock) {
 			return removed;
 		}
 	}
@@ -445,7 +466,7 @@ public abstract class AbstractPreferences extends Preferences {
 	 * @exception IllegalStateException if this node has been removed
 	 */
 	public Preferences parent() {
-		synchronized (lock) {
+        synchronized(lock) {
 			if (isRemoved())
 				throw new IllegalStateException("Node removed");
 
@@ -458,7 +479,10 @@ public abstract class AbstractPreferences extends Preferences {
 	/**
 	 * XXX
 	 */
-	public void exportNode(OutputStream os) throws BackingStoreException, IOException {
+    public void exportNode(OutputStream os)
+                                    throws BackingStoreException,
+                                           IOException
+    {
 		NodeWriter nodeWriter = new NodeWriter(this, os);
 		nodeWriter.writePrefs();
 	}
@@ -466,7 +490,10 @@ public abstract class AbstractPreferences extends Preferences {
 	/**
 	 * XXX
 	 */
-	public void exportSubtree(OutputStream os) throws BackingStoreException, IOException {
+    public void exportSubtree(OutputStream os)
+                                    throws BackingStoreException,
+                                           IOException
+    {
 		NodeWriter nodeWriter = new NodeWriter(this, os);
 		nodeWriter.writePrefsTree();
 	}
@@ -486,13 +513,14 @@ public abstract class AbstractPreferences extends Preferences {
 	 * @exception IllegalStateException if this node has been removed
 	 */
 	public String[] keys() throws BackingStoreException {
-		synchronized (lock) {
+        synchronized(lock) {
 			if (isRemoved())
 				throw new IllegalStateException("Node removed");
 
 			return keysSpi();
 		}
 	}
+
 
 	/**
 	 * Returns the value associated with the key in this preferences node. If
@@ -514,7 +542,7 @@ public abstract class AbstractPreferences extends Preferences {
 		if (key.length() > MAX_KEY_LENGTH)
 			throw new IllegalArgumentException(key);
 
-		synchronized (lock) {
+        synchronized(lock) {
 			if (isRemoved())
 				throw new IllegalStateException("Node removed");
 
@@ -586,13 +614,13 @@ public abstract class AbstractPreferences extends Preferences {
 	 * characters present in the string then the 65 special base64 chars.
 	 */
 	private static byte[] decode64(String s) {
-		ByteArrayOutputStream bs = new ByteArrayOutputStream((s.length() / 4) * 3);
+        ByteArrayOutputStream bs = new ByteArrayOutputStream((s.length()/4)*3);
 		char[] c = new char[s.length()];
 		s.getChars(0, s.length(), c, 0);
 
 		// Convert from base64 chars
 		int endchar = -1;
-		for (int j = 0; j < c.length && endchar == -1; j++) {
+        for(int j = 0; j < c.length && endchar == -1; j++) {
 			if (c[j] >= 'A' && c[j] <= 'Z') {
 				c[j] -= 'A';
 			} else if (c[j] >= 'a' && c[j] <= 'z') {
@@ -618,19 +646,19 @@ public abstract class AbstractPreferences extends Preferences {
 
 			byte b0 = (byte) (c[i] << 2);
 			if (remaining >= 2) {
-				b0 += (c[i + 1] & 0x30) >> 4;
+                b0 += (c[i+1] & 0x30) >> 4;
 			}
 			bs.write(b0);
 
 			if (remaining >= 3) {
-				byte b1 = (byte) ((c[i + 1] & 0x0F) << 4);
-				b1 += (byte) ((c[i + 2] & 0x3C) >> 2);
+                byte b1 = (byte) ((c[i+1] & 0x0F) << 4);
+                b1 += (byte) ((c[i+2] & 0x3C) >> 2);
 				bs.write(b1);
 			}
 
 			if (remaining >= 4) {
-				byte b2 = (byte) ((c[i + 2] & 0x03) << 6);
-				b2 += c[i + 3];
+                byte b2 = (byte) ((c[i+2] & 0x03) << 6);
+                b2 += c[i+3];
 				bs.write(b2);
 			}
 
@@ -657,8 +685,7 @@ public abstract class AbstractPreferences extends Preferences {
 		if (value != null) {
 			try {
 				return Double.parseDouble(value);
-			} catch (NumberFormatException nfe) { /* ignore */
-			}
+            } catch (NumberFormatException nfe) { /* ignore */ }
 		}
 
 		return defaultVal;
@@ -680,8 +707,7 @@ public abstract class AbstractPreferences extends Preferences {
 		if (value != null) {
 			try {
 				return Float.parseFloat(value);
-			} catch (NumberFormatException nfe) { /* ignore */
-			}
+            } catch (NumberFormatException nfe) { /* ignore */ }
 		}
 
 		return defaultVal;
@@ -703,8 +729,7 @@ public abstract class AbstractPreferences extends Preferences {
 		if (value != null) {
 			try {
 				return Integer.parseInt(value);
-			} catch (NumberFormatException nfe) { /* ignore */
-			}
+            } catch (NumberFormatException nfe) { /* ignore */ }
 		}
 
 		return defaultVal;
@@ -726,8 +751,7 @@ public abstract class AbstractPreferences extends Preferences {
 		if (value != null) {
 			try {
 				return Long.parseLong(value);
-			} catch (NumberFormatException nfe) { /* ignore */
-			}
+            } catch (NumberFormatException nfe) { /* ignore */ }
 		}
 
 		return defaultVal;
@@ -749,9 +773,14 @@ public abstract class AbstractPreferences extends Preferences {
 	 * @exception IllegalStateException when this node has been removed
 	 */
 	public void put(String key, String value) {
-		if (key.length() > MAX_KEY_LENGTH || value.length() > MAX_VALUE_LENGTH)
-			throw new IllegalArgumentException("key (" + key.length() + ")" + " or value (" + value.length() + ")" + " to large");
-		synchronized (lock) {
+        if (key.length() > MAX_KEY_LENGTH
+            || value.length() > MAX_VALUE_LENGTH)
+            throw new IllegalArgumentException("key ("
+                                               + key.length() + ")"
+                                               + " or value ("
+                                               + value.length() + ")"
+                                               + " to large");
+        synchronized(lock) {
 			if (isRemoved())
 				throw new IllegalStateException("Node removed");
 
@@ -798,7 +827,7 @@ public abstract class AbstractPreferences extends Preferences {
 	 * Helper method for encoding an array of bytes as a Base64 String.
 	 */
 	private static String encode64(byte[] b) {
-		StringBuffer sb = new StringBuffer((b.length / 3) * 4);
+        StringBuffer sb = new StringBuffer((b.length/3)*4);
 
 		int i = 0;
 		int remaining = b.length;
@@ -810,11 +839,11 @@ public abstract class AbstractPreferences extends Preferences {
 			c[0] = (char) ((b[i] & 0xFC) >> 2);
 			c[1] = (char) ((b[i] & 0x03) << 4);
 			if (remaining >= 2) {
-				c[1] += (char) ((b[i + 1] & 0xF0) >> 4);
-				c[2] = (char) ((b[i + 1] & 0x0F) << 2);
+                c[1] += (char) ((b[i+1] & 0xF0) >> 4);
+                c[2] = (char) ((b[i+1] & 0x0F) << 2);
 				if (remaining >= 3) {
-					c[2] += (char) ((b[i + 2] & 0xC0) >> 6);
-					c[3] = (char) (b[i + 2] & 0x3F);
+                    c[2] += (char) ((b[i+2] & 0xC0) >> 6);
+                    c[3] = (char) (b[i+2] & 0x3F);
 				} else {
 					c[3] = 64;
 				}
@@ -824,7 +853,7 @@ public abstract class AbstractPreferences extends Preferences {
 			}
 
 			// Convert to base64 chars
-			for (int j = 0; j < 4; j++) {
+            for(int j = 0; j < 4; j++) {
 				if (c[j] < 26) {
 					c[j] += 'A';
 				} else if (c[j] < 52) {
@@ -918,7 +947,7 @@ public abstract class AbstractPreferences extends Preferences {
 		if (key.length() > MAX_KEY_LENGTH)
 			throw new IllegalArgumentException(key);
 
-		synchronized (lock) {
+        synchronized(lock) {
 			if (isRemoved())
 				throw new IllegalStateException("Node removed");
 
@@ -942,7 +971,7 @@ public abstract class AbstractPreferences extends Preferences {
 	 * @exception IllegalStateException if this node has been removed
 	 */
 	public void clear() throws BackingStoreException {
-		synchronized (lock) {
+        synchronized(lock) {
 			if (isRemoved())
 				throw new IllegalStateException("Node Removed");
 
@@ -992,6 +1021,7 @@ public abstract class AbstractPreferences extends Preferences {
 		flushNode(true);
 	}
 
+
 	/**
 	 * Private helper method that locks this node and calls either
 	 * <code>flushSpi()</code> if <code>sync</code> is false, or
@@ -1003,7 +1033,7 @@ public abstract class AbstractPreferences extends Preferences {
 	 */
 	private void flushNode(boolean sync) throws BackingStoreException {
 		String[] keys = null;
-		synchronized (lock) {
+        synchronized(lock) {
 			if (sync) {
 				syncSpi();
 			} else {
@@ -1016,7 +1046,7 @@ public abstract class AbstractPreferences extends Preferences {
 			for (int i = 0; i < keys.length; i++) {
 				// Have to lock this node again to access the childCache
 				AbstractPreferences subNode;
-				synchronized (this) {
+                synchronized(this) {
 					subNode = (AbstractPreferences) childCache.get(keys[i]);
 				}
 
@@ -1054,8 +1084,8 @@ public abstract class AbstractPreferences extends Preferences {
 		if (parent == null)
 			throw new UnsupportedOperationException("Cannot remove root node");
 
-		synchronized (parent) {
-			synchronized (this) {
+        synchronized(parent) {
+            synchronized(this) {
 				if (isRemoved())
 					throw new IllegalStateException("Node Removed");
 
@@ -1076,7 +1106,8 @@ public abstract class AbstractPreferences extends Preferences {
 	 * on that node. After all subnodes have been purged the child cache is
 	 * cleared, this nodes removed flag is set and any listeners are called.
 	 */
-	private void purge() throws BackingStoreException {
+    private void purge() throws BackingStoreException
+    {
 		// Make sure all children have an AbstractPreferences node in cache
 		String children[] = childrenNamesSpi();
 		for (int i = 0; i < children.length; i++) {
@@ -1088,7 +1119,7 @@ public abstract class AbstractPreferences extends Preferences {
 		Iterator i = childCache.values().iterator();
 		while (i.hasNext()) {
 			AbstractPreferences node = (AbstractPreferences) i.next();
-			synchronized (node) {
+            synchronized(node) {
 				node.purge();
 			}
 		}
@@ -1120,7 +1151,9 @@ public abstract class AbstractPreferences extends Preferences {
 		// XXX
 	}
 
-	public void removePreferenceChangeListener(PreferenceChangeListener listener) {
+    public void removePreferenceChangeListener
+                            (PreferenceChangeListener listener)
+    {
 		// XXX
 	}
 
