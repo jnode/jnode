@@ -55,6 +55,7 @@ final class SwingFramePeer extends SwingWindowPeer implements FramePeer, ISwingC
         desktopPane.add(frame);
         desktopPane.setSelectedFrame(frame);
         frame.toFront();
+        desktopPane.doLayout();
 	}
 
 	/**
@@ -139,7 +140,8 @@ final class SwingFramePeer extends SwingWindowPeer implements FramePeer, ISwingC
 	}
 
     public Point getLocationOnScreen() {
-        return frame.getLocation();
+
+        return jComponent.getLocation();
     }
 
 	/**
@@ -172,11 +174,13 @@ final class SwingFramePeer extends SwingWindowPeer implements FramePeer, ISwingC
         //super.handleEvent(event);
     }
 
-	private static final class SwingFrame extends JInternalFrame {
+	static final class SwingFrame extends JInternalFrame {
 		private Frame awtFrame;
+        private SwingFramePeer swingPeer;
 
         private void initialize(Frame awtFrame, SwingFramePeer peer) {
             this.awtFrame = awtFrame;
+            this.swingPeer = peer;
 			((SwingFrameContentPane) getContentPane()).initialize(awtFrame, peer);
         }
 
@@ -206,6 +210,14 @@ final class SwingFramePeer extends SwingWindowPeer implements FramePeer, ISwingC
 			}
 			super.validate();
 		}
+
+        Frame getAwtFrame() {
+            return awtFrame;
+        }
+
+        SwingFramePeer getSwingPeer() {
+            return swingPeer;
+        }
 	}
 
 	private static final class SwingFrameRootPane extends JRootPane {
@@ -262,11 +274,22 @@ final class SwingFramePeer extends SwingWindowPeer implements FramePeer, ISwingC
         public void reshape(int x, int y, int width, int height) {
             super.reshape(x, y, width, height);
             //TODO fix it
+            /*
             if (awtFrame.isVisible()) {
             	Point p = awtFrame.getLocationOnScreen();
             	Insets ins = swingPeer.getInsets();
             	awtFrame.reshape(p.x + x, p.y + y, width + ins.left + ins.right, height + ins.top + ins.bottom);
+            }*/
+            if (!swingPeer.isReshapeInProgress) {
+            	Insets ins = swingPeer.getInsets();
+            	awtFrame.reshape(x + x, y + y, width + ins.left + ins.right, height + ins.top + ins.bottom);
             }
+        }
+
+        public void setVisible(boolean v) {
+            super.setVisible(v);
+            if(!swingPeer.isSetVisibleInProgress)
+                awtFrame.setVisible(v);
         }
 
 

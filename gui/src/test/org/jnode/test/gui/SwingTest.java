@@ -40,13 +40,13 @@ public class SwingTest {
             tabs.add("Tab1", new JButton("JButton1"));
             tabs.add("Tab2", new JButton("JButton2"));
             tabs.add("Tab3", new JButton("JButton3"));
-            frame.getContentPane().add(tabs, BorderLayout.CENTER);
-            JMenuBar mb = new JMenuBar();
-            JMenu menu = new JMenu("JMenu test");
-            JMenuItem mi = new JMenuItem("JMenuItem test");
-            mb.add(menu);
-            menu.add(mi);
-            frame.setJMenuBar(mb);
+            //frame.getContentPane().add(tabs, BorderLayout.CENTER);
+//            JMenuBar mb = new JMenuBar();
+//            JMenu menu = new JMenu("JMenu test");
+//            JMenuItem mi = new JMenuItem("JMenuItem test");
+//            mb.add(menu);
+//            menu.add(mi);
+//            frame.setJMenuBar(mb);
             frame.validate();
             frame.show();
 		} catch (Exception ex) {

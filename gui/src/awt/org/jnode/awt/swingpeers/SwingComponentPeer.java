@@ -28,6 +28,7 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ComponentEvent;
 import java.awt.event.PaintEvent;
+import java.awt.event.MouseEvent;
 import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
@@ -200,10 +201,29 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
                 if (g != null) {
                 	//Point p = component.getLocationOnScreen();
                 	//g.translate(p.x, p.y);
-                	((Component)component).update(getGraphics());
+                	((Component)component).update(g);
                 	//g.translate(-p.x, -p.y);
                 }
             } break;
+            case MouseEvent.MOUSE_MOVED:
+            case MouseEvent.MOUSE_DRAGGED:
+            case MouseEvent.MOUSE_WHEEL:
+            case MouseEvent.MOUSE_PRESSED:
+            case MouseEvent.MOUSE_RELEASED:
+            case MouseEvent.MOUSE_CLICKED: {
+                    MouseEvent me = new MouseEvent(
+                            jComponent,
+                            event.getID(),
+                            ((MouseEvent)event).getWhen(),
+                            ((MouseEvent)event).getModifiers(),
+                            ((MouseEvent)event).getX(),
+                            ((MouseEvent)event).getY(),
+                            ((MouseEvent)event).getClickCount(),
+                            ((MouseEvent)event).isPopupTrigger(),
+                            ((MouseEvent)event).getButton()
+                    );
+                    jComponent.dispatchEvent(me);
+                } break;
         }
     }
 
@@ -298,8 +318,14 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
         return true;
     }
 
+    boolean isReshapeInProgress = false;
     public final void reshape(int x, int y, int width, int height) {
-        setBounds(x, y, width, height);
+        final int oldWidth = jComponent.getWidth();
+    	final int oldHeight = jComponent.getHeight();
+        isReshapeInProgress = true;
+        jComponent.reshape(x, y, width, height);
+        isReshapeInProgress = false;
+        fireComponentEvent(oldWidth, width, oldHeight, height);
     }
 
     public final void setBackground(Color c) {
@@ -310,10 +336,7 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
     // Bounds
 
     public final void setBounds(int x, int y, int width, int height) {
-    	final int oldWidth = jComponent.getWidth();
-    	final int oldHeight = jComponent.getHeight();
-        jComponent.setBounds(x, y, width, height);
-        fireComponentEvent(oldWidth, width, oldHeight, height);
+    	reshape(x, y, width, height);
     }
 
     void fireComponentEvent(final int oldWidth, int width, final int oldHeight, int height) {
@@ -357,8 +380,11 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
 
     // State
 
+    boolean isSetVisibleInProgress = false;
     public final void setVisible(boolean b) {
+        isSetVisibleInProgress = true;
         jComponent.setVisible(b);
+        isSetVisibleInProgress = false;
         paintAWTComponent();
         if(b){
             fireComponentEvent(ComponentEvent.COMPONENT_SHOWN);

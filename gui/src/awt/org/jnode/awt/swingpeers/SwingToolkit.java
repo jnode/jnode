@@ -7,8 +7,7 @@ import org.jnode.awt.JNodeAwtContext;
 import org.jnode.awt.JNodeToolkit;
 
 import javax.swing.JComponent;
-
-import java.awt.AWTError;
+import javax.swing.SwingUtilities;
 import java.awt.Button;
 import java.awt.Canvas;
 import java.awt.Checkbox;
@@ -34,6 +33,9 @@ import java.awt.Shape;
 import java.awt.TextArea;
 import java.awt.TextField;
 import java.awt.Window;
+import java.awt.Rectangle;
+import java.awt.Insets;
+import java.awt.AWTError;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.peer.DragSourceContextPeer;
 import java.awt.peer.ButtonPeer;
@@ -285,12 +287,28 @@ public class SwingToolkit extends JNodeToolkit {
 		}
 	}
 
-	/**
-	 * Gets the AWT context.
-	 * 
-	 * @return
-	 */
-	public JNodeAwtContext getAwtContext() {
+
+
+    public Component getTopComponentAt(int x, int y) {
+        Component comp = super.getTopComponentAt(x, y);
+        SwingFramePeer.SwingFrame sfp = (SwingFramePeer.SwingFrame) SwingUtilities.getAncestorOfClass(SwingFramePeer.SwingFrame.class, comp);
+        if(sfp != null){
+            Rectangle r = sfp.getBounds();
+            Insets ins = sfp.getSwingPeer().getInsets();
+            r.x = r.x + ins.left;
+            r.y = r.y + ins.top;
+            r.width = r.width - ins.left - ins.right;
+            r.height = r.height - ins.top - ins.bottom;
+            if(r.contains(x, y)){
+                Component c = sfp.getAwtFrame().findComponentAt(x, y);
+                if(c != null){
+                    comp = c;
+                }
+            }
+        }
+        return comp;
+    }
+    public JNodeAwtContext getAwtContext() {
 		return desktopFrame;
 	}
 }

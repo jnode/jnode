@@ -63,12 +63,12 @@ final class DesktopFrame extends JFrame implements JNodeAwtContext {
                 System.out.println("desktop - mouse pressed");
                 int button = event.getButton();
                 if(button == MouseEvent.BUTTON1){
-                    System.out.println("desktop - show mainpopup");
-                    mainPopup.setLightWeightPopupEnabled(true);
+                    //System.out.println("desktop - show mainpopup");
+                    //mainPopup.setLightWeightPopupEnabled(true);
                     mainPopup.show(desktop, event.getX(), event.getY());
-                    log.info("LWPopup enabled: " + mainPopup.isLightWeightPopupEnabled());
+                    //log.info("LWPopup enabled: " + mainPopup.isLightWeightPopupEnabled());
                 }else if(event.isPopupTrigger()){
-                    System.out.println("desktop - show windowspopup");
+                    //System.out.println("desktop - show windowspopup");
                     windowsPopup.show(desktop, event.getX(), event.getY());
                 }
             }
@@ -130,7 +130,21 @@ final class DesktopFrame extends JFrame implements JNodeAwtContext {
             }
         });
         mainPopup.add(mi);
-        mainPopup.addSeparator();
+        mi = new JMenuItem("AWTTest");
+        mi.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+               	runJavaMain("org.jnode.test.gui.AWTTest");
+            }
+        });
+        mainPopup.add(mi);
+        mi = new JMenuItem("SwingTest");
+        mi.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+               	runJavaMain("org.jnode.test.gui.SwingTest");
+            }
+        });
+        mainPopup.add(mi);
+//        mainPopup.addSeparator();
         mi = new JMenuItem("Close");
         mi.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -138,6 +152,8 @@ final class DesktopFrame extends JFrame implements JNodeAwtContext {
             }
         });
         mainPopup.add(mi);
+        mainPopup.setLightWeightPopupEnabled(true);
+        windowsPopup.setLightWeightPopupEnabled(true);
         desktop.add(mainPopup);
         desktop.add(windowsPopup);
     }
