@@ -4,6 +4,7 @@
 <plugin id="nanoxml" 
         name="NamoXML Lite classes"
         version="1.4"
+        system="true"
         provider-name="nanoxml.org">
         
   <runtime>

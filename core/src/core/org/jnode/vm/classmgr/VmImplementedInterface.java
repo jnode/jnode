@@ -63,7 +63,7 @@ public final class VmImplementedInterface extends VmSystemObject {
 	 * @param clc
 	 * @throws ClassNotFoundException
 	 */
-	protected void resolve(AbstractVmClassLoader clc)
+	protected void resolve(VmClassLoader clc)
 		throws ClassNotFoundException {
 		if (resolvedClass == null) {
 			final VmType type = clc.loadClass(className, true);
@@ -72,6 +72,7 @@ public final class VmImplementedInterface extends VmSystemObject {
 			} else {
 				throw new ClassNotFoundException("Class " + className + " is not an interface");
 			}
+			resolvedClass.link();
 		}
 	}
 

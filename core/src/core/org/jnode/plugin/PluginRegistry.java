@@ -3,6 +3,7 @@
  */
 package org.jnode.plugin;
 
+import java.net.URL;
 import java.util.Iterator;
 
 /**
@@ -31,4 +32,29 @@ public interface PluginRegistry {
 	 * @return Iterator&lt;PluginDescriptor&gt;
 	 */
 	public Iterator getDescriptorIterator();
+
+	/**
+	 * Load a plugin from a given URL.
+	 * This will not activate the plugin.
+	 * 
+	 * @param pluginUrl
+	 * @return The descriptor of the loaded plugin.
+	 * @throws PluginException
+	 */
+	public PluginDescriptor loadPlugin(URL pluginUrl) throws PluginException;
+
+	/**
+	 * Remove the plugin with the given id from this registry.
+	 * This will deactivate the plugin if needed.
+	 * 
+	 * @param pluginId
+	 * @throws PluginException
+	 */
+	public void unloadPlugin(String pluginId) throws PluginException;
+	
+	/**
+	 * Gets the classloader that loads classes from all loaded plugins.
+	 * @return ClassLoader
+	 */
+	public ClassLoader getPluginsClassLoader();
 }

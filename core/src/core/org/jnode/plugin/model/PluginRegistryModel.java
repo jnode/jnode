@@ -4,20 +4,14 @@
 package org.jnode.plugin.model;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
-
-import nanoxml.XMLElement;
 
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginRegistry;
-import org.jnode.util.ObjectArrayIterator;
+import org.jnode.util.BootableHashMap;
 import org.jnode.vm.VmSystemObject;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
@@ -28,16 +22,20 @@ import org.xml.sax.SAXException;
  */
 public class PluginRegistryModel extends VmSystemObject implements PluginRegistry {
 
-	private final PluginDescriptorModel[] descriptors;
-	private ExtensionPoint[] extensionPointArray;
-
-	private transient HashMap extensionsPointsCache;
+	/** A map of all descriptors (id, descriptor) */
+	private final BootableHashMap descriptorMap;
+	/** A map off all extensionpoints (id, ep) */
+	private final BootableHashMap extensionPoints;
+	private transient PluginsClassLoader classLoader;
 
 	/**
-	 * Create a new instance
+	 * Initialize this instance.
+	 * @param pluginFiles 
 	 */
 	public PluginRegistryModel(URL[] pluginFiles) throws PluginException {
-		descriptors = loadDescriptors(pluginFiles);
+		this.extensionPoints = new BootableHashMap();
+		this.descriptorMap = new BootableHashMap();
+		loadDescriptors(pluginFiles);
 		resolveDescriptors();
 	}
 
@@ -48,14 +46,7 @@ public class PluginRegistryModel extends VmSystemObject implements PluginRegistr
 	 * @return The plugin descriptor found, or null if not found
 	 */
 	public PluginDescriptor getPluginDescriptor(String pluginId) {
-
-		final int max = descriptors.length;
-		for (int i = 0; i < max; i++) {
-			if (descriptors[i].getId().equals(pluginId)) {
-				return descriptors[i];
-			}
-		}
-		return null;
+		return (PluginDescriptor) descriptorMap.get(pluginId);
 	}
 
 	/**
@@ -65,7 +56,7 @@ public class PluginRegistryModel extends VmSystemObject implements PluginRegistr
 	 * @return The extension point found, or null if not found
 	 */
 	public ExtensionPoint getExtensionPoint(String id) {
-		return (ExtensionPoint) getExtensionPointsCache().get(id);
+		return (ExtensionPoint) extensionPoints.get(id);
 	}
 
 	/**
@@ -74,55 +65,43 @@ public class PluginRegistryModel extends VmSystemObject implements PluginRegistr
 	 * @return Iterator&lt;PluginDescriptor&gt;
 	 */
 	public Iterator getDescriptorIterator() {
-		return new ObjectArrayIterator(descriptors);
+		return descriptorMap.values().iterator();
 	}
 
 	/**
 	 * Load all plugin descriptors.
 	 * 
-	 * @param pluginFiles
+	 * @param pluginUrls
 	 */
-	private PluginDescriptorModel[] loadDescriptors(URL[] pluginFiles) throws PluginException {
-
-		final int max = pluginFiles.length;
-		final PluginDescriptorModel[] list = new PluginDescriptorModel[max];
+	private void loadDescriptors(URL[] pluginUrls) throws PluginException {
+		final int max = pluginUrls.length;
 
 		for (int i = 0; i < max; i++) {
-			final URL url = pluginFiles[i];
-			//reader.setValidation(true);
-			//reader.setValidation(false);
-			//System.out.println("url=" + url);
-			final XMLElement root;
-			try {
-				root = new XMLElement(new Hashtable(), true, false);
-				final Reader r = new InputStreamReader(url.openStream());
-				try {
-					root.parseFromReader(r);
-				} finally {
-					r.close();
-				}
-			} catch (IOException ex) {
-				throw new PluginException(ex);
-			}
-			if (!root.getName().equals("plugin")) {
-				throw new PluginException("plugin element expected");
-			}
-			list[i] = new PluginDescriptorModel(this, root);
+			loadPlugin(pluginUrls[i]);
 		}
-
-		return list;
 	}
 
 	/**
 	 * Resolve all plugin descriptors.
 	 */
 	private void resolveDescriptors() throws PluginException {
-
-		final int max = descriptors.length;
-
-		for (int i = 0; i < max; i++) {
-			descriptors[i].resolve();
+		for (Iterator i = descriptorMap.values().iterator(); i.hasNext(); ) {
+			final PluginDescriptorModel descr = (PluginDescriptorModel)i.next();
+			descr.resolve();
 		}
+	}
+
+	/**
+	 * Register a plugin descriptor.
+	 * 
+	 * @param descr
+	 */
+	protected synchronized void registerPlugin(PluginDescriptorModel descr) throws PluginException {
+		final String id = descr.getId();
+		if (descriptorMap.containsKey(id)) {
+			throw new PluginException("Duplicate plugin " + id);
+		}
+		descriptorMap.put(id, descr);
 	}
 
 	/**
@@ -130,8 +109,8 @@ public class PluginRegistryModel extends VmSystemObject implements PluginRegistr
 	 * 
 	 * @param ep
 	 */
-	protected void registerExtensionPoint(ExtensionPoint ep) throws PluginException {
-		final HashMap epMap = getExtensionPointsCache();
+	protected synchronized void registerExtensionPoint(ExtensionPoint ep) throws PluginException {
+		final BootableHashMap epMap = this.extensionPoints;
 		if (epMap.containsKey(ep.getUniqueIdentifier())) {
 			throw new PluginException("Duplicate extension point " + ep.getUniqueIdentifier());
 		}
@@ -139,28 +118,47 @@ public class PluginRegistryModel extends VmSystemObject implements PluginRegistr
 	}
 
 	/**
-	 * @see org.jnode.vm.VmSystemObject#verifyBeforeEmit()
+	 * Load a plugin from a given URL. This will not activate the plugin.
+	 * 
+	 * @param pluginUrl
+	 * @return The descriptor of the loaded plugin.
+	 * @throws PluginException
 	 */
-	public void verifyBeforeEmit() {
-		super.verifyBeforeEmit();
-		extensionPointArray = new ExtensionPoint[getExtensionPointsCache().size()];
-		getExtensionPointsCache().values().toArray(extensionPointArray);
+	public PluginDescriptor loadPlugin(URL pluginUrl) throws PluginException {
+		final PluginJar pluginJar = new PluginJar(this, pluginUrl);
+		return pluginJar.getDescriptor();
 	}
 
-	private HashMap getExtensionPointsCache() {
-		if (extensionsPointsCache == null) {
-			extensionsPointsCache = new HashMap();
-			if (extensionPointArray != null) {
-				final int max = extensionPointArray.length;
-				for (int i = 0; i < max; i++) {
-					final ExtensionPoint ep = extensionPointArray[i];
-					extensionsPointsCache.put(ep.getUniqueIdentifier(), ep);
-				}
+	/**
+	 * Remove the plugin with the given id from this registry. This will deactivate the plugin if needed.
+	 * 
+	 * @param pluginId
+	 * @throws PluginException
+	 */
+	public synchronized void unloadPlugin(String pluginId) throws PluginException {
+		final PluginDescriptor descr = getPluginDescriptor(pluginId);
+		if (descr != null) {
+			if (descr.isSystemPlugin()) {
+				throw new PluginException("Cannot unload a system plugin");
 			}
+			descr.getPlugin().stop();
+			descriptorMap.remove(descr.getId());
 		}
-		return extensionsPointsCache;
+
 	}
 
+	
+	/**
+	 * Gets the classloader that loads classes from all loaded plugins.
+	 * @return ClassLoader
+	 */
+	public ClassLoader getPluginsClassLoader() {
+		if (classLoader == null) {
+			classLoader = new PluginsClassLoader(this);
+		}
+		return classLoader;
+	}
+	
 	static class DTDResolver implements EntityResolver {
 
 		/**

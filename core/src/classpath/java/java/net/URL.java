@@ -209,7 +209,7 @@ public final class URL implements Serializable {
 	  * This internal method is used in two different constructors to load
 	  * a protocol handler for this URL.
 	  *
-	  * @param The protocol to load a handler for
+	  * @param protocol The protocol to load a handler for
 	  *
 	  * @return A URLStreamHandler for this protocol, or null when not found.
 	  */
@@ -246,7 +246,8 @@ public final class URL implements Serializable {
 			String clsname = st.nextToken() + "." + protocol + ".Handler";
 
 			try {
-				Class cls = Class.forName(clsname);
+				final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+				final Class cls = cl.loadClass(clsname);
 				Object obj = cls.newInstance();
 				if (!(obj instanceof URLStreamHandler))
 					continue;
@@ -505,7 +506,7 @@ public final class URL implements Serializable {
 	 * exactly (ie, protocol, host, port, file, and ref).  Overrides
 	 * Object.equals(), implemented by calling the equals method of the handler.
 	 *
-	 * @param url The URL to compare with
+	 * @param obj The URL to compare with
 	 *
 	 * @return true if the URL is equal, false otherwise
 	 */
@@ -676,7 +677,7 @@ public final class URL implements Serializable {
 	 * URL, and matches all fields but the ref (ie, protocol, host, port,
 	 * and file);
 	 *
-	 * @param url The URL object to test with
+	 * @param other The URL object to test with
 	 *
 	 * @return true if URL matches this URL's file, false otherwise
 	 */

@@ -36,7 +36,7 @@ public class VmConstClass extends VmConstObject {
 	 * Resolve the references of this constant to loaded VmXxx objects.
 	 * @param clc
 	 */
-	protected void doResolve(AbstractVmClassLoader clc) {
+	protected void doResolve(VmClassLoader clc) {
 		if (vmClass == null) {
 			final String name = getClassName();
 			try {

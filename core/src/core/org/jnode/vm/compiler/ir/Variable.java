@@ -100,7 +100,7 @@ public abstract class Variable extends Operand implements Cloneable {
 	}
 
 	/**
-	 * @param iop
+	 * @param address
 	 */
 	public void setLastUseAddress(int address) {
 		if (address > lastUseAddress) {

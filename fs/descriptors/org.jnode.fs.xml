@@ -10,6 +10,7 @@
   <requires>
     <import plugin="org.jnode.driver"/>
     <import plugin="org.jnode.fs.service"/>
+    <import plugin="org.jnode.log4j"/>
   </requires>
         
   <runtime>

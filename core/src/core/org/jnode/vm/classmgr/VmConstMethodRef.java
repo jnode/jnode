@@ -27,7 +27,7 @@ public class VmConstMethodRef extends VmConstMemberRef {
 	 * Resolve the references of this constant to loaded VmXxx objects.
 	 * @param clc
 	 */
-	protected void doResolveMember(AbstractVmClassLoader clc) {
+	protected void doResolveMember(VmClassLoader clc) {
 		final VmType vmClass = getConstClass().getResolvedVmClass();
 		if (vmClass.isInterface()) {
 			throw new IncompatibleClassChangeError(getClassName() + " must be a class");

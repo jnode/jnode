@@ -4,12 +4,13 @@
 <plugin id="org.jnode.vm.core" 
         name="JNode VM classes"
         version="@VERSION@"
+        system="true"
         provider-name="JNode.org">
         
   <requires>
     <import plugin="org.classpath.core"/>
-    <import plugin="org.apache.jakarta.log4j"/>
-    <import plugin="org.jnode.fs.service"/>
+    <!-- import plugin="org.apache.jakarta.log4j"/ -->
+    <!-- import plugin="org.jnode.fs.service"/  -->
   </requires>
         
   <runtime>

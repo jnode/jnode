@@ -261,6 +261,8 @@ public class VmReflection {
 		
 		if (!method.isStatic()) {
 			Unsafe.pushObject(o);
+		} else {
+			method.getDeclaringClass().initialize();
 		}
 		for (int i = 0; i < argCount; i++) {
 			final VmType argType = method.getArgumentType(i);

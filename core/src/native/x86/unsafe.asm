@@ -675,6 +675,12 @@ Q43org5jnode2vm6Unsafe23debug2e28Ljava2flang2fString3b29V:
 	call vm_print_string
 	ret 4
 	
+; public static native void debug(char value);
+Q43org5jnode2vm6Unsafe23debug2e28C29V:
+	mov eax,[esp+4]
+	call sys_print_char
+	ret 4
+
 ; public static native void debug(int value);
 Q43org5jnode2vm6Unsafe23debug2e28I29V:
 	mov eax,[esp+4]

@@ -58,14 +58,6 @@ public class ByteArrayDevice extends Device implements BlockDeviceAPI {
 	}
 
 	/**
-	 * @see org.jnode.driver.Device#getDriver()
-	 * @return Driver
-	 */
-	public Driver getDriver() {
-		return null;
-	}
-
-	/**
 	 * @param driver
 	 * @see org.jnode.driver.Device#setDriver(org.jnode.driver.Driver)
 	 * @throws InvalidDriverException

@@ -3,6 +3,8 @@
  */
 package org.jnode.fs.fat;
 
+import org.jnode.fs.util.*;
+
 /**
  * @author gbin
  */

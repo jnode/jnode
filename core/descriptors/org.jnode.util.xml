@@ -4,6 +4,7 @@
 <plugin id="org.jnode.util" 
         name="JNode utility classes"
         version="@VERSION@"
+        system="true"
         provider-name="JNode.org">
         
   <runtime>

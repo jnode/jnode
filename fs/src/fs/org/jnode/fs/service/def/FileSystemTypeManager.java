@@ -71,7 +71,8 @@ public class FileSystemTypeManager implements ExtensionPointListener {
 		final String className = element.getAttribute("class");
 		if (className != null) { 
 			try {
-				final Object obj = Class.forName(className).newInstance();
+				final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+				final Object obj = cl.loadClass(className).newInstance();
 				final FileSystemType type = (FileSystemType)obj;
 				types.put(type.getName(), type);
 			} catch (ClassCastException ex) {

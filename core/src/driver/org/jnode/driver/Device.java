@@ -49,11 +49,24 @@ public class Device implements ResourceOwner {
 	}
 
 	/**
-	 * @see org.jnode.driver.Device#getDriver()
-	 * @return My driver
+	 * Gets the driver of this device.
+	 * @return My driver, can be null
 	 */
-	public Driver getDriver() {
+	final Driver getDriver() {
 		return driver;
+	}
+
+	/**
+	 * Gets the classname of my driver.
+	 * @return String can be null.
+	 */
+	public final String getDriverClassName() {
+		final Driver driver = this.driver;
+		if (driver != null) {
+			return driver.getClass().getName();
+		} else {
+			return null;
+		}
 	}
 
 	/**

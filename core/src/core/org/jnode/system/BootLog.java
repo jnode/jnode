@@ -56,6 +56,11 @@ public class BootLog {
 	 */
 	public static void error(String msg, Throwable ex) {
 		log(ERROR, System.err, msg, ex);
+		/*try {
+			Thread.sleep(2500);
+		} catch (InterruptedException ex2) {
+			// Ignore
+		}*/
 	}
 
 	/**

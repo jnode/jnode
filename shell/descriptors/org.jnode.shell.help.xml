@@ -7,11 +7,8 @@
         provider-name="JNode.org"
 	class="org.jnode.shell.help.def.SystemHelpPlugin">
 
-  <runtime>
-    <library name="jnode-shell.jar">
-      <export name="org.jnode.shell.help.*"/>
-      <export name="org.jnode.shell.help.def.*"/>
-    </library>
-  </runtime>
-
+  <requires>
+    <import plugin="org.jnode.shell"/>
+  </requires>
+        
 </plugin>

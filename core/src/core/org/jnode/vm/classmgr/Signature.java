@@ -21,7 +21,7 @@ public class Signature {
 	 * @param loader
 	 * @throws ClassNotFoundException
 	 */
-	public Signature(String signature, AbstractVmClassLoader loader)
+	public Signature(String signature, VmClassLoader loader)
 		throws ClassNotFoundException {
 		this.signature = signature;
 		this.parts = split(signature.toCharArray(), loader);
@@ -189,7 +189,7 @@ public class Signature {
 			"Invalid signature in getArgSlotCount: " + signature);
 	}
 
-	private VmType[] split(char[] signature, AbstractVmClassLoader loader)
+	private VmType[] split(char[] signature, VmClassLoader loader)
 		throws ClassNotFoundException {
 		ArrayList list = new ArrayList();
 		int ofs = 0;
