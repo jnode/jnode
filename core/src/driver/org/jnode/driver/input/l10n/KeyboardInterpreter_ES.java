@@ -3,28 +3,33 @@
  */
 package org.jnode.driver.input.l10n;
 
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+
+import org.jnode.driver.input.DeadKeyException;
 import org.jnode.driver.input.KeyboardInterpreter;
-import org.jnode.driver.input.Keys;
+import org.jnode.driver.input.UnsupportedKeyException;
 
 /*
  * @author sauron
  */
+public class KeyboardInterpreter_ES extends KeyboardInterpreter {
 
-public class KeyboardInterpreter_ES extends KeyboardInterpreter
-{
+    protected int lastDeadVK = -1;
 
-//    protected int lastDeadVK = -1;
+    protected int lastFlags = -1;
 
-//    protected int lastFlags = -1;
+    public KeyboardInterpreter_ES() {
+        super();
+    }
 
-/*
     protected char interpretExtendedScanCode(int scancode, int vk,
             boolean released) throws UnsupportedKeyException, DeadKeyException {
         // TODO
         //throw new UnsupportedKeyException();
         boolean deadKey = false;
 
-       switch (vk) {
+        switch (vk) {
         case KeyEvent.VK_DEAD_CIRCUMFLEX:
             lastDeadVK = KeyEvent.VK_DEAD_CIRCUMFLEX;
             lastFlags = getFlags();
@@ -159,15 +164,8 @@ public class KeyboardInterpreter_ES extends KeyboardInterpreter
         }
 
     }
-*/
-  protected void initKeys(Keys keys)
-  {
-    // todo look at the danish/french version for hits to implement this
-  }
 
-
-/*
-  protected void initVkMap(int[] vkMap, char[] lcharMap, char[] ucharMap,
+    protected void initVkMap(int[] vkMap, char[] lcharMap, char[] ucharMap,
             char[] altGrCharMap) {
         vkMap[ 0] = KeyEvent.VK_UNDEFINED;
         vkMap[ 1] = KeyEvent.VK_ESCAPE;
@@ -424,6 +422,6 @@ public class KeyboardInterpreter_ES extends KeyboardInterpreter
         altGrCharMap[ 41] = '\\';
         altGrCharMap[ 43] = '}';
     }
-*/
+
 }
 
