@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="charva"
+        name="Text mode widgets for JNode"
+        version="1.0.1"
+        provider-name="Rob Pitman">
+        
+  <requires>
+    <import plugin="org.jnode.driver.console.core"/>
+    <import plugin="org.jnode.driver.console"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-textui.jar">
+      <export name="charva.awt.*"/>
+      <export name="charva.awt.event.*"/>
+      <export name="charva.awt.util.*"/>
+      <export name="charvax.swing.*"/>
+      <export name="charvax.swing.border.*"/>
+      <export name="charvax.swing.event.*"/>
+      <export name="charvax.swing.filechooser.*"/>
+      <export name="charvax.swing.table.*"/>
+      <export name="charvax.swing.text.*"/>
+      <export name="charvax.swing.tree.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="user.home" actions="read"/>
+    <permission class="java.security.AllPermission" />
+  </extension>
+</plugin>
