@@ -26,7 +26,7 @@ public class TTFFont extends Font {
 	/**
 	 * @return The font data
 	 */
-	final TTFFontData getFontData() {
+	public final TTFFontData getFontData() {
 		return this.fontData;
 	}
 	
