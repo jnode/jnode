@@ -15,10 +15,12 @@ import org.jnode.vm.memmgr.HeapHelper;
 public final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
 
     private final int flagsOffset;
+
     private final int tibOffset;
 
     /**
      * Initialize this instance.
+     * 
      * @param arch
      */
     public HeapHelperImpl(VmArchitecture arch) {
@@ -91,15 +93,15 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
         return Unsafe.getObject(src, offset);
     }
 
-	/**
-	 * Gets the color of the given object.
-	 * @param src
-	 * @return
-	 * @see org.jnode.vm.classmgr.ObjectFlags#GC_BLACK
-	 * @see org.jnode.vm.classmgr.ObjectFlags#GC_GREY
-	 * @see org.jnode.vm.classmgr.ObjectFlags#GC_WHITE
-	 */
-	public final int getObjectColor(Object src) {
+    /**
+     * Gets the color of the given object.
+     * 
+     * @param src
+     * @return @see org.jnode.vm.classmgr.ObjectFlags#GC_BLACK
+     * @see org.jnode.vm.classmgr.ObjectFlags#GC_GREY
+     * @see org.jnode.vm.classmgr.ObjectFlags#GC_WHITE
+     */
+    public final int getObjectColor(Object src) {
         return Unsafe.getObjectFlags(src) & ObjectFlags.GC_COLOUR_MASK;
     }
 
@@ -113,9 +115,9 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
     /**
      * @see org.jnode.vm.memmgr.HeapHelper#getTib(java.lang.Object)
      */
-	public final Object getTib(Object object) {
-	    return Unsafe.getObject(object, tibOffset);
-	}
+    public final Object getTib(Object object) {
+        return Unsafe.getObject(object, tibOffset);
+    }
 
     /**
      * @see org.jnode.vm.memmgr.HeapHelper#getVmClass(java.lang.Object)
@@ -153,22 +155,23 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
         Unsafe.setObjectFlags(dst, flags);
     }
 
-	/**
-	 * Change the color of the given object from oldColor to newColor.
-	 * @param dst
-	 * @param oldColor
-	 * @param newColor
-	 * @return True if the color was changed, false if the current color of the object was not equal to oldColor.
-	 */
-	public boolean atomicChangeObjectColor(Object dst, int oldColor, int newColor) {
+    /**
+     * Change the color of the given object from oldColor to newColor.
+     * 
+     * @param dst
+     * @param oldColor
+     * @param newColor
+     * @return True if the color was changed, false if the current color of the
+     *         object was not equal to oldColor.
+     */
+    public boolean atomicChangeObjectColor(Object dst, int oldColor,
+            int newColor) {
         final Address addr = Unsafe.add(Unsafe.addressOf(dst), flagsOffset);
         int oldValue;
         int newValue;
         do {
             oldValue = Unsafe.getInt(dst, flagsOffset);
-            if ((oldValue & ObjectFlags.GC_COLOUR_MASK) != oldColor) {
-                return false;
-            }
+            if ((oldValue & ObjectFlags.GC_COLOUR_MASK) != oldColor) { return false; }
             newValue = (oldValue & ~ObjectFlags.GC_COLOUR_MASK) | newColor;
         } while (!Unsafe.atomicCompareAndSwap(addr, oldValue, newValue));
         return true;
@@ -253,18 +256,20 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
     public final void die(String msg) {
         Unsafe.die(msg);
     }
-	
-	/**
-	 * Block any yieldpoints on this processor.
-	 */
-	public void disableReschedule() {
-	    Unsafe.getCurrentProcessor().disableReschedule();
-	}
-	
-	/**
-	 * Unblock any yieldpoints on this processor.
-	 */
-	public void enableReschedule() {
-	    Unsafe.getCurrentProcessor().enableReschedule();
-	}
+
+    /**
+     * Stop and block all threads (on all processors) on a GC safe point. Only
+     * the calling thread (the GC thread) will continue.
+     */
+    public final void stopThreadsAtSafePoint() {
+        Unsafe.getCurrentProcessor().disableReschedule();
+    }
+
+    /**
+     * Unblock all threads (on all processors). This method is called after a
+     * call a call to {@link #stopThreadsAtSafePoint()}.
+     */
+    public void restartThreads() {
+        Unsafe.getCurrentProcessor().enableReschedule();
+    }
 }

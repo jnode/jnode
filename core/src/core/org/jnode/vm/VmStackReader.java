@@ -160,7 +160,7 @@ public abstract class VmStackReader extends VmSystemObject {
 		Address f = Unsafe.getCurrentFrame();
 		Unsafe.debug("Debug stacktrace: ");
 		boolean first = true;
-		int max = 10;
+		int max = 20;
 		while (isValid(f) && (max > 0)) {
 			if (first) {
 				first = false;
@@ -168,10 +168,13 @@ public abstract class VmStackReader extends VmSystemObject {
 				Unsafe.debug(", ");
 			}
 			final VmMethod method = getMethod(f);
+			final int pc = getPC(f);
+			final int lineNr = method.getBytecode().getLineNr(pc);
 			final VmType vmClass = method.getDeclaringClass();
 			Unsafe.debug(vmClass.getName());
 			Unsafe.debug("::");
 			Unsafe.debug(method.getName()); 
+			Unsafe.debug(lineNr);
 			f = getPrevious(f);
 			max--;
 		}

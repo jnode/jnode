@@ -82,12 +82,14 @@ public abstract class HeapHelper extends ObjectResolver {
 	public abstract Monitor getInflatedMonitor(Object object, VmArchitecture arch);
 	
 	/**
-	 * Block any yieldpoints on this processor.
+	 * Stop and block all threads (on all processors) on a GC safe point.
+	 * Only the calling thread (the GC thread) will continue.
 	 */
-	public abstract void disableReschedule(); 
+	public abstract void stopThreadsAtSafePoint(); 
 	
 	/**
-	 * Unblock any yieldpoints on this processor.
+	 * Unblock all threads (on all processors).
+	 * This method is called after a call a call to {@link #stopThreadsAtSafePoint()}.
 	 */
-	public abstract void enableReschedule(); 
+	public abstract void restartThreads(); 
 }

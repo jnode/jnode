@@ -52,7 +52,8 @@ public final class DefaultHeapManager extends VmHeapManager {
 	public DefaultHeapManager(VmClassLoader loader, HeapHelper helper, VmStatics statics) 
 	throws ClassNotFoundException {
 		super(helper);
-		this.writeBarrier = new DefaultWriteBarrier(helper);
+		//this.writeBarrier = new DefaultWriteBarrier(helper);
+		this.writeBarrier = null;
 		this.firstHeap = new VmDefaultHeap(this);
 		this.currentHeap = firstHeap;
 		this.defaultHeapClass = (VmNormalClass)loader.loadClass(VmDefaultHeap.class.getName(), true);
@@ -265,10 +266,12 @@ public final class DefaultHeapManager extends VmHeapManager {
 
 			allocatedSinceGcTrigger += alignedSize;
 			if ((allocatedSinceGcTrigger > triggerSize) && (gcThread != null)) {
+				helper.unsafeSetObjectFlags(result, ObjectFlags.GC_BLACK);
 			    Unsafe.debug("<alloc:GC trigger/>");
 			    allocatedSinceGcTrigger = 0;
 			    gcThread.trigger(/*false*/true);
 				currentHeap = firstHeap;
+				helper.unsafeSetObjectFlags(result, ObjectFlags.GC_DEFAULT_COLOR);
 			}
 		} finally {
 			if (m != null) {
@@ -308,7 +311,7 @@ public final class DefaultHeapManager extends VmHeapManager {
 	 * Print the statics on this object on out.
 	 */
 	public void dumpStatistics(PrintStream out) {
-		out.println("WriteBarrier: " + writeBarrier.toString());
+		out.println("WriteBarrier: " + writeBarrier);
 	}
 	
 	/**

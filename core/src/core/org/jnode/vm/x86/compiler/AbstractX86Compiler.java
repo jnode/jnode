@@ -10,6 +10,7 @@ import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.X86Stream;
 import org.jnode.vm.Address;
 import org.jnode.vm.Unsafe;
+import org.jnode.vm.Vm;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
@@ -33,7 +34,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements 
 	 */
 	public final void initialize(VmClassLoader loader) {
 		if (context == null) {
-			context = new X86CompilerContext(loader);
+			context = new X86CompilerContext(loader, Vm.getVm().getHeapManager());
 		}
 	}
 
