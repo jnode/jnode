@@ -233,7 +233,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		// CMP length, index
 		os.setObjectRef(test);
 		if (index.isConstant()) {
-			os.writeCMP_Const(refr, arrayLengthOffset, index.getValue());
+			os.writeCMP_Const(BITS32, refr, arrayLengthOffset, index.getValue());
 		} else {
 			os.writeCMP(refr, arrayLengthOffset, index.getRegister());
 		}
@@ -333,17 +333,17 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		if (vconst && (jvmType == JvmType.LONG)) {
 			// Store constant long
 			final long lval = ((LongItem) val).getValue();
-			os.writeMOV_Const(X86Register.EBP, disp + LSB,
+			os.writeMOV_Const(BITS32, X86Register.EBP, disp + LSB,
 					(int) (lval & 0xFFFFFFFFL));
-			os.writeMOV_Const(X86Register.EBP, disp + MSB,
+			os.writeMOV_Const(BITS32, X86Register.EBP, disp + MSB,
 					(int) ((lval >>> 32) & 0xFFFFFFFFL));
 		} else if (vconst && (jvmType == JvmType.DOUBLE)) {
 			// Store constant double
 			final long lval = Double.doubleToRawLongBits(((DoubleItem) val)
 					.getValue());
-			os.writeMOV_Const(X86Register.EBP, disp + LSB,
+			os.writeMOV_Const(BITS32, X86Register.EBP, disp + LSB,
 					(int) (lval & 0xFFFFFFFFL));
-			os.writeMOV_Const(X86Register.EBP, disp + MSB,
+			os.writeMOV_Const(BITS32, X86Register.EBP, disp + MSB,
 					(int) ((lval >>> 32) & 0xFFFFFFFFL));
 		} else if (val.isFPUStack()) {
 			// Ensure item is on top of fpu stack
@@ -548,7 +548,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		os.writeMOV(INTSIZE, tmpr, tmpr, arrayDataOffset
 				+ (TIBLayout.SUPERCLASSES_INDEX * slotSize));
 		// Length of superclassarray must be >= depth
-		os.writeCMP_Const(tmpr, arrayLengthOffset, depth);
+		os.writeCMP_Const(BITS32, tmpr, arrayLengthOffset, depth);
 		os.writeJCC(notInstanceOfLabel, X86Constants.JNA);
 		// Get superClassesArray[depth] -> objectr
 		os.writeMOV(INTSIZE, tmpr, tmpr, arrayDataOffset + (depth << 2));
@@ -2098,9 +2098,9 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		vstack.loadLocal(eContext, ebpOfs);
 
 		if (incValue == 1) {
-			os.writeINC(X86Register.EBP, ebpOfs);
+			os.writeINC(BITS32, X86Register.EBP, ebpOfs);
 		} else {
-			os.writeADD(X86Register.EBP, ebpOfs, incValue);
+			os.writeADD(BITS32, X86Register.EBP, ebpOfs, incValue);
 		}
 	}
 
@@ -2432,7 +2432,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		// Calculate
 		os.writeCDQ(); // EAX -> EDX:EAX
 		if (v2.isLocal()) {
-			os.writeIDIV_EAX(X86Register.EBP, v2.getOffsetToFP());
+			os.writeIDIV_EAX(BITS32, X86Register.EBP, v2.getOffsetToFP());
 		} else {
 			os.writeIDIV_EAX(v2.getRegister());
 		}
@@ -3506,7 +3506,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 			// Load declaringClass.typeState into scratch
 			// Test for initialized
 			final int offset = context.getVmTypeState().getOffset();
-			os.writeTEST(scratch, offset, VmTypeState.ST_INITIALIZED);
+			os.writeTEST(BITS32, scratch, offset, VmTypeState.ST_INITIALIZED);
 			final Label afterInit = new Label(curInstrLabel + "$$aci");
 			os.writeJCC(afterInit, X86Constants.JNZ);
 			// Call cls.initialize
@@ -3562,12 +3562,12 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		if (vconst && (jvmType == JvmType.INT)) {
 			// Store constant int
 			final int ival = ((IntItem) val).getValue();
-			os.writeMOV_Const(X86Register.EBP, disp, ival);
+			os.writeMOV_Const(BITS32, X86Register.EBP, disp, ival);
 		} else if (vconst && (jvmType == JvmType.FLOAT)) {
 			// Store constant float
 			final int ival = Float.floatToRawIntBits(((FloatItem) val)
 					.getValue());
-			os.writeMOV_Const(X86Register.EBP, disp, ival);
+			os.writeMOV_Const(BITS32, X86Register.EBP, disp, ival);
 		} else if (val.isFPUStack()) {
 			// Ensure item is on top of fpu stack
 			FPUHelper.fxch(os, vstack.fpuStack, val);

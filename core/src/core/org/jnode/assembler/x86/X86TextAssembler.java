@@ -41,7 +41,7 @@ import org.jnode.vm.x86.X86CpuID;
  * Debug version of AbstractX86Stream.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
- * @author Levente S\u00e1ntha
+ * @author Levente Santha
  */
 public class X86TextAssembler extends X86Assembler implements X86Operation {
 	class ObjectInfoImpl extends NativeStream.ObjectInfo {
@@ -197,6 +197,16 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 			return "" + v;
 		} else {
 			return "";
+		}
+	}
+	
+	private String size(int operandSize) {
+		switch (operandSize) {
+		case BITS8: return "byte";
+		case BITS16: return "word";
+		case BITS32: return "dword";
+		case BITS64: return "qword";
+		default: throw new IllegalArgumentException("Invalid operand size " + operandSize);
 		}
 	}
 
@@ -441,8 +451,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	/**
 	 * @see org.jnode.assembler.x86.X86Assembler#writeADC(X86Register, int, int)
 	 */
-	public void writeADC(GPR dstReg, int dstDisp, int imm32) {
-		println("\tadc [" + dstReg + disp(dstDisp) + "]," + imm32);
+	public void writeADC(int operandSize, GPR dstReg, int dstDisp, int imm32) {
+		println("\tadc " + size(operandSize) + "[" + dstReg + disp(dstDisp) + "]," + imm32);
 	}
 
 	/**
@@ -492,8 +502,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param dstDisp
 	 * @param imm32
 	 */
-	public void writeADD(GPR dstReg, int dstDisp, int imm32) {
-		println("\tadd dword[" + dstReg + disp(dstDisp) + "]," + imm32);
+	public void writeADD(int operandSize, GPR dstReg, int dstDisp, int imm32) {
+		println("\tadd " + size(operandSize) + "[" + dstReg + disp(dstDisp) + "]," + imm32);
 	}
 
 	/**
@@ -501,7 +511,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 *      X86Register)
 	 */
 	public void writeADD(GPR dstReg, int dstDisp, GPR srcReg) {
-
 		println("\tadd [" + dstReg + disp(dstDisp) + "]," + srcReg);
 	}
 
@@ -510,7 +519,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 *      X86Register)
 	 */
 	public void writeADD(GPR dstReg, GPR srcReg) {
-
 		println("\tadd " + dstReg + "," + srcReg);
 	}
 
@@ -539,8 +547,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param dstDisp
 	 * @param imm32
 	 */
-	public void writeAND(GPR dstReg, int dstDisp, int imm32) {
-		println("\tand dword[" + dstReg + disp(dstDisp) + "],0x"
+	public void writeAND(int operandSize, GPR dstReg, int dstDisp, int imm32) {
+		println("\tand " + size(operandSize) + "[" + dstReg + disp(dstDisp) + "],0x"
 				+ NumberUtils.hex(imm32));
 	}
 
@@ -724,7 +732,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 *      int)
 	 */
 	public void writeCMP_Const(GPR reg, int imm32) {
-
 		println("\tcmp " + reg + ",0x" + NumberUtils.hex(imm32));
 	}
 
@@ -735,25 +742,28 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param disp
 	 * @param imm32
 	 */
-	public void writeCMP_Const(GPR reg, int disp, int imm32) {
-		println("\tcmp dword [" + reg + disp(disp) + "],0x"
+	public void writeCMP_Const(int operandSize, GPR reg, int disp, int imm32) {
+		println("\tcmp " + size(operandSize) + "[" + reg + disp(disp) + "],0x"
 				+ NumberUtils.hex(imm32));
 	}
 
 	/**
 	 * @see org.jnode.assembler.x86.X86Assembler#writeCMP_EAX(int)
 	 */
-	public void writeCMP_EAX(int imm32) {
-
-		println("\tcmp eax,0x" + NumberUtils.hex(imm32));
+	public void writeCMP_EAX(int operandSize, int imm32) {
+		testOperandSize(operandSize, BITS32 | BITS64);
+		if (operandSize == BITS32) {
+			println("\tcmp eax,0x" + NumberUtils.hex(imm32));
+		} else {
+			println("\tcmp rax,0x" + NumberUtils.hex(imm32));			
+		}
 	}
 
 	/**
 	 * @see org.jnode.assembler.x86.X86Assembler#writeCMP_MEM(int, int)
 	 */
-	public void writeCMP_MEM(int memPtr, int imm32) {
-
-		println("\tcmp dword [" + memPtr + "],0x" + NumberUtils.hex(imm32));
+	public void writeCMP_MEM(int operandSize, int memPtr, int imm32) {
+		println("\tcmp " + size(operandSize) + "[" + memPtr + "],0x" + NumberUtils.hex(imm32));
 	}
 
 	/**
@@ -763,8 +773,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param memPtr
 	 */
 	public void writeCMP_MEM(GPR reg, int memPtr) {
-
-		println("\tcmp " + reg + ",dword [" + memPtr + "]");
+		println("\tcmp " + reg + ", [" + memPtr + "]");
 	}
 
 	/**
@@ -773,7 +782,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 */
 	public void writeCMPXCHG_EAX(GPR dstReg, int dstDisp, GPR srcReg,
 			boolean lock) {
-
 		println("\tcmpxchg [" + dstReg + disp(dstDisp) + "]," + srcReg);
 	}
 
@@ -781,23 +789,20 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @see org.jnode.assembler.x86.X86Assembler#writeDEC(X86Register)
 	 */
 	public void writeDEC(GPR dstReg) {
-
 		println("\tdec " + dstReg);
 	}
 
 	/**
 	 * @see org.jnode.assembler.x86.X86Assembler#writeDEC(X86Register, int)
 	 */
-	public void writeDEC(GPR dstReg, int dstDisp) {
-
-		println("\tdec dword [" + dstReg + disp(dstDisp) + "]");
+	public void writeDEC(int operandSize, GPR dstReg, int dstDisp) {
+		println("\tdec " + size(operandSize) + "[" + dstReg + disp(dstDisp) + "]");
 	}
 
 	/**
 	 * @see org.jnode.assembler.x86.X86Assembler#writeFADD32(X86Register, int)
 	 */
 	public void writeFADD32(GPR srcReg, int srcDisp) {
-
 		println("\tfadd dword [" + srcReg + disp(srcDisp) + "]");
 	}
 
@@ -805,7 +810,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @see org.jnode.assembler.x86.X86Assembler#writeFADD64(X86Register, int)
 	 */
 	public void writeFADD64(GPR srcReg, int srcDisp) {
-
 		println("\tfadd qword [" + srcReg + disp(srcDisp) + "]");
 	}
 
@@ -1028,8 +1032,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param srcReg
 	 * @param srcDisp
 	 */
-	public void writeIDIV_EAX(GPR srcReg, int srcDisp) {
-		println("\tidiv dword [" + srcReg + disp(srcDisp) + "]");
+	public void writeIDIV_EAX(int operandSize, GPR srcReg, int srcDisp) {
+		println("\tidiv " + size(operandSize) + "[" + srcReg + disp(srcDisp) + "]");
 	}
 
 	/**
@@ -1079,7 +1083,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @see org.jnode.assembler.x86.X86Assembler#writeIMUL_EAX(X86Register)
 	 */
 	public void writeIMUL_EAX(GPR srcReg) {
-
 		println("\timul " + srcReg);
 	}
 
@@ -1087,7 +1090,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @see org.jnode.assembler.x86.X86Assembler#writeINC(X86Register)
 	 */
 	public void writeINC(GPR dstReg) {
-
 		println("\tinc " + dstReg);
 	}
 
@@ -1096,15 +1098,14 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * 
 	 * @param dstReg
 	 */
-	public void writeINC(GPR dstReg, int disp) {
-		println("\tinc [" + dstReg + disp(disp) + "]");
+	public void writeINC(int operandSize, GPR dstReg, int disp) {
+		println("\tinc " + size(operandSize) + "[" + dstReg + disp(disp) + "]");
 	}
 
 	/**
 	 * @see org.jnode.assembler.x86.X86Assembler#writeINT(int)
 	 */
 	public void writeINT(int vector) {
-
 		println("\tint 0x" + NumberUtils.hex(vector, 2));
 	}
 
@@ -1112,7 +1113,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @see org.jnode.assembler.x86.X86Assembler#writeJCC(Label, int)
 	 */
 	public void writeJCC(Label label, int jumpOpcode) {
-
 		println("\tj" + ccName(jumpOpcode) + " " + label(label));
 	}
 
@@ -1120,7 +1120,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @see org.jnode.assembler.x86.X86Assembler#writeJMP(Label)
 	 */
 	public void writeJMP(Label label) {
-
 		println("\tjmp " + label(label));
 	}
 
@@ -1156,7 +1155,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @see org.jnode.assembler.x86.X86Assembler#writeJMP(X86Register)
 	 */
 	public void writeJMP(GPR reg32) {
-
 		println("\tjmp " + reg32);
 	}
 
@@ -1265,8 +1263,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param dstDisp
 	 * @param imm32
 	 */
-	public void writeMOV_Const(GPR dstReg, int dstDisp, int imm32) {
-		println("\tmov dword [" + dstReg + disp(dstDisp) + "],0x"
+	public void writeMOV_Const(int operandSize, GPR dstReg, int dstDisp, int imm32) {
+		println("\tmov " + size(operandSize) + "[" + dstReg + disp(dstDisp) + "],0x"
 				+ NumberUtils.hex(imm32));
 	}
 
@@ -1285,9 +1283,9 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param dstDisp
 	 * @param imm32
 	 */
-	public void writeMOV_Const(GPR dstReg, GPR dstIdxReg, int scale,
+	public void writeMOV_Const(int operandSize, GPR dstReg, GPR dstIdxReg, int scale,
 			int dstDisp, int imm32) {
-		println("\tmov dword [" + dstReg + "+" + dstIdxReg + "*" + scale
+		println("\tmov " + size(operandSize) + "[" + dstReg + "+" + dstIdxReg + "*" + scale
 				+ disp(dstDisp) + "],0x" + NumberUtils.hex(imm32));
 	}
 
@@ -1355,23 +1353,20 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @see org.jnode.assembler.x86.X86Assembler#writeNEG(X86Register)
 	 */
 	public void writeNEG(GPR dstReg) {
-
 		println("\tneg " + dstReg);
 	}
 
 	/**
 	 * @see org.jnode.assembler.x86.X86Assembler#writeNEG(X86Register, int)
 	 */
-	public void writeNEG(GPR dstReg, int dstDisp) {
-
-		println("\tneg dword [" + dstReg + disp(dstDisp) + "]");
+	public void writeNEG(int operandSize, GPR dstReg, int dstDisp) {
+		println("\tneg " + size(operandSize) + "[" + dstReg + disp(dstDisp) + "]");
 	}
 
 	/**
 	 * @see org.jnode.assembler.x86.X86Assembler#writeNOP()
 	 */
 	public void writeNOP() {
-
 		println("\tnop");
 	}
 
@@ -1379,16 +1374,14 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @see org.jnode.assembler.x86.X86Assembler#writeNOT(X86Register)
 	 */
 	public void writeNOT(GPR dstReg) {
-
 		println("\tnot " + dstReg);
 	}
 
 	/**
 	 * @see org.jnode.assembler.x86.X86Assembler#writeNOT(X86Register, int)
 	 */
-	public void writeNOT(GPR dstReg, int dstDisp) {
-
-		println("\tnot dword [" + dstReg + disp(dstDisp) + "]");
+	public void writeNOT(int operandSize, GPR dstReg, int dstDisp) {
+		println("\tnot " + size(operandSize) + "[" + dstReg + disp(dstDisp) + "]");
 	}
 
 	// LS
@@ -1408,8 +1401,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param dstDisp
 	 * @param imm32
 	 */
-	public void writeOR(GPR dstReg, int dstDisp, int imm32) {
-		println("\tor dword[" + dstReg + disp(dstDisp) + "],0x"
+	public void writeOR(int operandSize, GPR dstReg, int dstDisp, int imm32) {
+		println("\tor " + size(operandSize) + "[" + dstReg + disp(dstDisp) + "],0x"
 				+ NumberUtils.hex(imm32));
 	}
 
@@ -1418,8 +1411,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 *      X86Register)
 	 */
 	public void writeOR(GPR dstReg, int dstDisp, GPR srcReg) {
-
-		println("\tor dword [" + dstReg + disp(dstDisp) + "]," + srcReg);
+		println("\tor [" + dstReg + disp(dstDisp) + "]," + srcReg);
 	}
 
 	/**
@@ -1427,7 +1419,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 *      X86Register)
 	 */
 	public void writeOR(GPR dstReg, GPR srcReg) {
-
 		println("\tor " + dstReg + "," + srcReg);
 	}
 
@@ -1446,7 +1437,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @see org.jnode.assembler.x86.X86Assembler#writePOP(X86Register)
 	 */
 	public void writePOP(GPR dstReg) {
-
 		println("\tpop " + dstReg);
 	}
 
@@ -1454,8 +1444,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @see org.jnode.assembler.x86.X86Assembler#writePOP(X86Register, int)
 	 */
 	public void writePOP(GPR dstReg, int dstDisp) {
-
-		println("\tpop dword [" + dstReg + disp(dstDisp) + "]");
+		println("\tpop [" + dstReg + disp(dstDisp) + "]");
 	}
 
 	/**
@@ -1469,7 +1458,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @see org.jnode.assembler.x86.X86Assembler#writePrefix(int)
 	 */
 	public void writePrefix(int prefix) {
-
 		final String str;
 		switch (prefix) {
 		case FS_PREFIX:
@@ -1549,7 +1537,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @see org.jnode.assembler.x86.X86Assembler#writeRET()
 	 */
 	public void writeRET() {
-
 		println("\tret");
 	}
 
@@ -1557,7 +1544,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @see org.jnode.assembler.x86.X86Assembler#writeRET(int)
 	 */
 	public void writeRET(int imm16) {
-
 		println("\tret " + imm16);
 	}
 
@@ -1565,7 +1551,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @see org.jnode.assembler.x86.X86Assembler#writeSAHF()
 	 */
 	public void writeSAHF() {
-
 		println("\tsahf");
 	}
 
@@ -1573,7 +1558,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @see org.jnode.assembler.x86.X86Assembler#writeSAL(X86Register, int)
 	 */
 	public void writeSAL(GPR dstReg, int imm8) {
-
 		println("\tsal " + dstReg + "," + imm8);
 	}
 
@@ -1582,15 +1566,14 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param srcDisp
 	 * @param imm8
 	 */
-	public void writeSAL(GPR srcReg, int srcDisp, int imm8) {
-		println("\tsal dword [" + srcReg + disp(srcDisp) + "]," + imm8);
+	public void writeSAL(int operandSize, GPR srcReg, int srcDisp, int imm8) {
+		println("\tsal " + size(operandSize) + "[" + srcReg + disp(srcDisp) + "]," + imm8);
 	}
 
 	/**
 	 * @see org.jnode.assembler.x86.X86Assembler#writeSAL_CL(X86Register)
 	 */
 	public void writeSAL_CL(GPR dstReg) {
-
 		println("\tsal " + dstReg + ",cl");
 	}
 
@@ -1598,8 +1581,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param srcReg
 	 * @param srcDisp
 	 */
-	public void writeSAL_CL(GPR srcReg, int srcDisp) {
-		println("\tsal dword [" + srcReg + disp(srcDisp) + "],cl");
+	public void writeSAL_CL(int operandSize, GPR srcReg, int srcDisp) {
+		println("\tsal " + size(operandSize) + "[" + srcReg + disp(srcDisp) + "],cl");
 	}
 
 	/**
@@ -1614,8 +1597,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param srcDisp
 	 * @param imm8
 	 */
-	public void writeSAR(GPR srcReg, int srcDisp, int imm8) {
-		println("\tsar dword [" + srcReg + disp(srcDisp) + "]," + imm8);
+	public void writeSAR(int operandSize, GPR srcReg, int srcDisp, int imm8) {
+		println("\tsar " + size(operandSize) + "[" + srcReg + disp(srcDisp) + "]," + imm8);
 	}
 
 	/**
@@ -1629,8 +1612,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param srcReg
 	 * @param srcDisp
 	 */
-	public void writeSAR_CL(GPR srcReg, int srcDisp) {
-		println("\tsar dword [" + srcReg + disp(srcDisp) + "],cl");
+	public void writeSAR_CL(int operandSize, GPR srcReg, int srcDisp) {
+		println("\tsar " + size(operandSize) + "[" + srcReg + disp(srcDisp) + "],cl");
 	}
 
 	/**
@@ -1640,15 +1623,14 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param imm32
 	 */
 	public void writeSBB(GPR dstReg, int imm32) {
-
 		println("\tsbb " + dstReg + ",0x" + NumberUtils.hex(imm32));
 	}
 
 	/**
 	 * @see org.jnode.assembler.x86.X86Assembler#writeSBB(X86Register, int, int)
 	 */
-	public void writeSBB(GPR dstReg, int dstDisp, int imm32) {
-		println("\tsbb dword [" + dstReg + disp(dstDisp) + "],0x"
+	public void writeSBB(int operandSize, GPR dstReg, int dstDisp, int imm32) {
+		println("\tsbb " + size(operandSize) + "[" + dstReg + disp(dstDisp) + "],0x"
 				+ NumberUtils.hex(imm32));
 	}
 
@@ -1697,8 +1679,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	/**
 	 * @see org.jnode.assembler.x86.X86Assembler#writeSHL(X86Register, int, int)
 	 */
-	public void writeSHL(GPR dstReg, int dstDisp, int imm8) {
-		println("\tshl dword [" + dstReg + disp(dstDisp) + "]," + imm8);
+	public void writeSHL(int operandSize, GPR dstReg, int dstDisp, int imm8) {
+		println("\tshl " + size(operandSize) + "[" + dstReg + disp(dstDisp) + "]," + imm8);
 	}
 
 	/**
@@ -1711,8 +1693,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	/**
 	 * @see org.jnode.assembler.x86.X86Assembler#writeSHL_CL(X86Register, int)
 	 */
-	public void writeSHL_CL(GPR dstReg, int dstDisp) {
-		println("\tshl dword [" + dstReg + disp(dstDisp) + "],CL");
+	public void writeSHL_CL(int operandSize, GPR dstReg, int dstDisp) {
+		println("\tshl " + size(operandSize) + "[" + dstReg + disp(dstDisp) + "],CL");
 	}
 
 	/**
@@ -1735,8 +1717,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param srcDisp
 	 * @param imm8
 	 */
-	public void writeSHR(GPR srcReg, int srcDisp, int imm8) {
-		println("\tshr dword [" + srcReg + disp(srcDisp) + "]," + imm8);
+	public void writeSHR(int operandSize, GPR srcReg, int srcDisp, int imm8) {
+		println("\tshr " + size(operandSize) + "[" + srcReg + disp(srcDisp) + "]," + imm8);
 	}
 
 	/**
@@ -1750,8 +1732,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param srcReg
 	 * @param srcDisp
 	 */
-	public void writeSHR_CL(GPR srcReg, int srcDisp) {
-		println("\tshr dword [" + srcReg + disp(srcDisp) + "],cl");
+	public void writeSHR_CL(int operandSize, GPR srcReg, int srcDisp) {
+		println("\tshr " + size(operandSize) + "[" + srcReg + disp(srcDisp) + "],cl");
 	}
 
 	/**
@@ -1779,8 +1761,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param dstDisp
 	 * @param imm32
 	 */
-	public void writeSUB(GPR dstReg, int dstDisp, int imm32) {
-		println("\tsub dword[" + dstReg + disp(dstDisp) + "],0x"
+	public void writeSUB(int operandSize, GPR dstReg, int dstDisp, int imm32) {
+		println("\tsub " + size(operandSize) + "[" + dstReg + disp(dstDisp) + "],0x"
 				+ NumberUtils.hex(imm32));
 	}
 
@@ -1825,8 +1807,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param disp
 	 * @param imm32
 	 */
-	public void writeTEST(GPR reg, int disp, int imm32) {
-		println("\ttest [" + reg + disp(disp) + "],0x" + NumberUtils.hex(imm32));
+	public void writeTEST(int operandSize, GPR reg, int disp, int imm32) {
+		println("\ttest " + size(operandSize) + "[" + reg + disp(disp) + "],0x" + NumberUtils.hex(imm32));
 	}
 
 	/**
@@ -1836,7 +1818,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param reg2
 	 */
 	public void writeTEST(GPR reg1, GPR reg2) {
-
 		println("\ttest " + reg1 + "," + reg2);
 	}
 
@@ -1844,16 +1825,19 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @see org.jnode.assembler.x86.X86Assembler#writeTEST_AL(int)
 	 */
 	public void writeTEST_AL(int value) {
-
 		println("\ttest al," + value);
 	}
 
 	/**
 	 * @see org.jnode.assembler.x86.X86Assembler#writeTEST_EAX(int)
 	 */
-	public void writeTEST_EAX(int value) {
-
-		println("\ttest eax," + value);
+	public void writeTEST_EAX(int operandSize, int value) {
+		testOperandSize(operandSize, BITS32 | BITS64);
+		if (operandSize == BITS32) {
+			println("\ttest eax," + value);
+		} else if (operandSize == BITS64) {
+			println("\ttest rax," + value);			
+		}
 	}
 
 	/**
@@ -1893,8 +1877,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * @param dstDisp
 	 * @param imm32
 	 */
-	public void writeXOR(GPR dstReg, int dstDisp, int imm32) {
-		println("\txor dword[" + dstReg + disp(dstDisp) + "],0x"
+	public void writeXOR(int operandSize, GPR dstReg, int dstDisp, int imm32) {
+		println("\txor " + size(operandSize) + "[" + dstReg + disp(dstDisp) + "],0x"
 				+ NumberUtils.hex(imm32));
 	}
 

@@ -28,7 +28,7 @@ import org.jnode.vm.VmStackFrame;
 /**
  * @author epr
  */
-public interface X86CompilerConstants {
+public interface X86CompilerConstants extends X86Constants {
 
 	/** 
 	 * Statics table register
