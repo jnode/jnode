@@ -4,7 +4,7 @@
 package org.jnode.jnasm.preprocessor;
 
 /**
- * @author Levente S\u00e1ntha
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public class Macro {
     private static int localLabelCount = 0;

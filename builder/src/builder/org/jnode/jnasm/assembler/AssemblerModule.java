@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.List;
 
 /**
- * @author Levente S\u00e1ntha
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public abstract class AssemblerModule {
     protected final Map labels;

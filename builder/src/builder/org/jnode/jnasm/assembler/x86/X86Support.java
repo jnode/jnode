@@ -22,7 +22,7 @@ import java.io.OutputStream;
 import java.io.IOException;
 
 /**
- * @author Levente S\u00e1ntha
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public class X86Support extends HardwareSupport {
     private final List modules;

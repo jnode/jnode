@@ -7,7 +7,7 @@ import java.io.OutputStream;
 import java.io.IOException;
 
 /**
- * @author Levente S\u00e1ntha
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public abstract class HardwareSupport {
     public abstract void assemble();

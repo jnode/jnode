@@ -6,7 +6,7 @@ package org.jnode.jnasm.assembler;
 import java.util.List;
 
 /**
- * @author Levente S\u00e1ntha
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public class Instruction {
     private int lineNumber;
