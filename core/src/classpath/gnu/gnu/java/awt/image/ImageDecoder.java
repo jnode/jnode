@@ -74,6 +74,11 @@ public abstract class ImageDecoder implements ImageProducer
     this.url = url;
   }
 
+  public ImageDecoder (InputStream is)
+  {
+    this.input = is;
+  }
+
   public ImageDecoder (byte[] imagedata, int imageoffset, int imagelength)
   {
     data = imagedata;
@@ -108,6 +113,10 @@ public abstract class ImageDecoder implements ImageProducer
 	// ImageDecoder constructors so that exceptions cause
 	// imageComplete to be called with an appropriate error
 	// status.
+        if (input == null)
+          {
+            try 
+              {
 	if (url != null)
 	  input = url.openStream();
 	else
@@ -117,8 +126,17 @@ public abstract class ImageDecoder implements ImageProducer
 	    else
 	      input = new ByteArrayInputStream (data, offset, length);
 	  }
-
 	produce (list, input);
+              } 
+            finally 
+              {
+                input = null;
+              }
+          }
+        else
+          {
+            produce (list, input);
+          }
       }
     catch (Exception e)
       {
