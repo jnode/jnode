@@ -669,4 +669,25 @@ Q43org5jnode2vm6Unsafe23getJumpTable2e2829Lorg2fjnode2fvm2fAddress3b:
 	mov eax,vm_jumpTable
 	ret
 	
+; public static native void debug(String str);
+Q43org5jnode2vm6Unsafe23debug2e28Ljava2flang2fString3b29V:
+	mov eax,[esp+4]
+	call vm_print_string
+	ret 4
+	
+; public static native void debug(int value);
+Q43org5jnode2vm6Unsafe23debug2e28I29V:
+	mov eax,[esp+4]
+	call sys_print_eax
+	ret 4
+
+; public static native void debug(long value);
+Q43org5jnode2vm6Unsafe23debug2e28J29V:
+	mov eax,[esp+8]		; MSB
+	call sys_print_eax
+	mov eax,[esp+4]		; LSB
+	call sys_print_eax
+	ret 8
+		
+		
 	

@@ -6,6 +6,7 @@ package org.jnode.build.x86;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.apache.tools.ant.Project;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.UnresolvedObjectRefException;
@@ -422,7 +423,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 				VmMethod clInit = vmClass.getMethod("<clinit>", "()V");
 				if (clInit != null) {
 					os.setObjectRef(clInitCaller + "$$" + vmClass.getName());
-					log.warn("Missing static initializer in class " + vmClass.getName());
+					log("Missing static initializer in class " + vmClass.getName(), Project.MSG_WARN);
 					/*
 					 * os.writeMOV(X86Constants.rEAX, clInit);
 					 */
@@ -444,7 +445,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	 */
 	protected void storeImage(NativeStream os) throws BuildException {
 		try {
-			log.info("Creating image");
+			log("Creating image");
 			FileOutputStream fos = new FileOutputStream(getDestFile());
 			fos.write(os.getBytes(), 0, os.getLength());
 			fos.close();

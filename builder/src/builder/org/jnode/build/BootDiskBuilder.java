@@ -1,8 +1,5 @@
 /*
- * Created on Feb 20, 2003
- *
- * To change this generated comment go to 
- * Window>Preferences>Java>Code Generation>Code Template
+ * $Id$
  */
 package org.jnode.build;
 
@@ -25,7 +22,7 @@ import org.jnode.fs.partitions.ibm.IBMPartitionTypes;
 import org.jnode.fs.util.Geometry;
 
 /**
- * @author epr
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class BootDiskBuilder extends BootFloppyBuilder {
 
@@ -95,7 +92,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
 
 		/* Format partition 0 */
 		part0 = new MappedBlockDeviceSupport(device, pte.getStartLba() * bytesPerSector, pte.getNrSectors() * bytesPerSector);
-		GrubFatFormatter ff = (GrubFatFormatter)createFormatter();
+		GrubFatFormatter ff = createFormatter();
 		ff.setInstallPartition(0x0000FFFF);
 		ff.format(part0);
 		GrubBootSector part0bs = (GrubBootSector)ff.getBootSector();  
