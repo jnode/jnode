@@ -3,52 +3,57 @@
  */
 package org.jnode.driver.video.nvidia;
 
-import org.jnode.driver.video.CursorImage;
+import java.util.HashMap;
+
+import org.jnode.driver.video.HardwareCursor;
 import org.jnode.driver.video.HardwareCursorAPI;
+import org.jnode.driver.video.HardwareCursorImage;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class NVidiaHardwareCursor implements NVidiaConstants, HardwareCursorAPI {
-	
+
 	private final NVidiaVgaIO vgaIO;
 	private final int architecture;
-	
+	/** Map between HardwareCursorImage and short[] */
+	private final HashMap cursorCache = new HashMap();
+	// cursor bitmap will be stored at the start of the framebuffer
+	private static final int CURSOR_ADDRESS = 0;
+
 	public NVidiaHardwareCursor(NVidiaVgaIO vgaIO, int architecture) {
 		this.vgaIO = vgaIO;
 		this.architecture = architecture;
 	}
 
 	final void initCursor() {
-		// cursor bitmap will be stored at the start of the framebuffer
-		final int curadd = 0;
 
 		/* set cursor bitmap adress ... */
 		if (architecture <= NV04A) /* or laptop */ {
 			/* must be used this way on pre-NV10 and on all 'Go' cards! */
 			/* cursorbitmap must start on 2Kbyte boundary: */
 			/* set adress bit11-16, and set 'no doublescan' (registerbit 1 = 0) */
-			vgaIO.setCRT(NVCRTCX_CURCTL0, ((curadd & 0x0001f800) >> 9));
+			vgaIO.setCRT(NVCRTCX_CURCTL0, ((CURSOR_ADDRESS & 0x0001f800) >> 9));
 			/* set adress bit17-23, and set graphics mode cursor(?) (registerbit 7 = 1) */
-			vgaIO.setCRT(NVCRTCX_CURCTL1, (((curadd & 0x00fe0000) >> 17) | 0x80));
+			vgaIO.setCRT(NVCRTCX_CURCTL1, (((CURSOR_ADDRESS & 0x00fe0000) >> 17) | 0x80));
 			/* set adress bit24-31 */
-			vgaIO.setCRT(NVCRTCX_CURCTL2, ((curadd & 0xff000000) >> 24));
-		}
-		else
-		{
-			/* upto 4Gb RAM adressing:
-			 * can be used on NV10 and later (except for 'Go' cards)! */
-			/* NOTE:
-			 * This register does not exist on pre-NV10 and 'Go' cards. */
+			vgaIO.setCRT(NVCRTCX_CURCTL2, ((CURSOR_ADDRESS & 0xff000000) >> 24));
+		} else {
+			/*
+			 * upto 4Gb RAM adressing: can be used on NV10 and later (except for 'Go' cards)!
+			 */
+			/*
+			 * NOTE: This register does not exist on pre-NV10 and 'Go' cards.
+			 */
 
 			/* cursorbitmap must still start on 2Kbyte boundary: */
-			vgaIO.setReg32(NV32_NV10CURADD32, curadd & 0xfffff800);
+			vgaIO.setReg32(NV32_NV10CURADD32, CURSOR_ADDRESS & 0xfffff800);
 		}
 
 		/* set cursor colour: not needed because of direct nature of cursor bitmap. */
 
-		/*clear cursor*/
-		vgaIO.getVideoMem().setShort(curadd, (short)0x7fff, 1024);
+		/* clear cursor */
+		vgaIO.getVideoMem().setShort(CURSOR_ADDRESS, (short) 0x7fff, 1024);
 
 		/* select 32x32 pixel, 16bit color cursorbitmap, no doublescan */
 		vgaIO.setReg32(NV32_CURCONF, 0x02000100);
@@ -56,7 +61,7 @@ public class NVidiaHardwareCursor implements NVidiaConstants, HardwareCursorAPI 
 		/* de-activate hardware cursor for now */
 		setCursorVisible(false);
 	}
-	
+
 	public void setCursorVisible(boolean visible) {
 		int temp = vgaIO.getCRT(NVCRTCX_CURCTL0);
 		if (visible) {
@@ -66,18 +71,44 @@ public class NVidiaHardwareCursor implements NVidiaConstants, HardwareCursorAPI 
 		}
 		vgaIO.setCRT(NVCRTCX_CURCTL0, temp);
 	}
-	
+
 	public void setCursorPosition(int x, int y) {
 		vgaIO.setReg32(NVDAC_CURPOS, ((x & 0x0fff) | ((y & 0x0fff) << 16)));
 	}
 
-	
 	/**
 	 * Sets the cursor image.
 	 */
-	public void setCursorImage(CursorImage cursor) {
-		
-		// TODO implement me
-		
+	public void setCursorImage(HardwareCursor cursor) {
+		final short[] cur = getCursor(cursor);
+		if (cur != null) {
+			vgaIO.getVideoMem().setShorts(cur, 0, CURSOR_ADDRESS, 1024);
+		}
+	}
+
+	private short[] getCursor(HardwareCursor cursor) {
+		final HardwareCursorImage img = cursor.getImage(32, 32);
+		if (img == null) {
+			return null;
+		}
+		short[] res = (short[]) cursorCache.get(img);
+		if (res == null) {
+			res = new short[1024];
+			final int[] argb = img.getImage();
+			for (int i = 0; i < 1024; i++) {
+				final int v = argb[i];
+				final int a = (v >>> 24) & 0xFF;
+				final int r = ((v >> 16) & 0xFF) >> 3;
+				final int g = ((v >> 8) & 0xFF) >> 3;
+				final int b = (v & 0xFF) >> 3;
+
+				res[i] = (short) ((r << 10) | (g << 5) | b);
+				if (a != 0) {
+					res[i] |= 0x8000;
+				}
+			}
+			cursorCache.put(img, res);
+		}
+		return res;
 	}
 }
