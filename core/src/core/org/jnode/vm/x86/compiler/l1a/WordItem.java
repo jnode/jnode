@@ -413,8 +413,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
                 return;
             }
             r = pool.request(getType());
-            System.out
-                    .println("Pool state after push of " + cnt + ":\n" + pool);
+            //System.out.println("Pool state after push of " + cnt + ":\n" + pool);
             if (Vm.VerifyAssertions)
                 Vm._assert(r != null, "r != null");
         }

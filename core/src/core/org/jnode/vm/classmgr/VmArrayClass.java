@@ -97,6 +97,13 @@ public final class VmArrayClass extends VmClassType {
 			final VmInterfaceClass intfClass = (VmInterfaceClass) i.next();
 			array[index++] = intfClass;
 		}
+	
+		if (false) {
+			System.out.println("SuperClassesArray for " + getName() + ": " + getSuperClassDepth());
+			for (int i = 0; i < length; i++) {
+				System.out.println("[" + i + "]\t" + array[i].getName());
+			}
+		}
 
 		return array;
 	}

@@ -1614,17 +1614,25 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 
 		final int length = superClassDepth + 1 + allInterfaces.size();
 		final VmType[] array = new VmType[length];
-		array[0] = this;
+//		array[0] = this;
 		VmType superPtr = superClass;
 		for (int i = 0; i < superClassDepth; i++) {
-			array[superClassDepth - i] = superPtr;
+			array[superClassDepth - i - 1] = superPtr;
 			superPtr = superPtr.getSuperClass();
 		}
+		array[superClassDepth] = this;
 
 		int index = superClassDepth + 1;
 		for (Iterator i = allInterfaces.iterator(); i.hasNext();) {
 			final VmInterfaceClass intfClass = (VmInterfaceClass) i.next();
 			array[index++] = intfClass;
+		}
+		
+		if (false) {
+			System.out.println("SuperClassesArray for " + getName());
+			for (int i = 0; i < length; i++) {
+				System.out.println("[" + i + "]\t" + array[i].getName());
+			}
 		}
 
 		return array;
