@@ -584,6 +584,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 		add(new BootClassInfo("java.lang.reflect", true, nonCore));
 		add(new BootClassInfo("java.lang.ref", true, nonCore));
 		add(new BootClassInfo("org.jnode.boot", true, nonCore));
+		add(new BootClassInfo("org.jnode.system", true, nonCore));
 		add(new BootClassInfo("org.jnode.vm.MemoryBlockManager", core));
 		add(new BootClassInfo("org.jnode.vm.Monitor", core));
 		add(new BootClassInfo("org.jnode.vm.MonitorManager", core));
