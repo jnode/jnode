@@ -3,6 +3,7 @@
  */
 package org.jnode.net.ipv4.bootp;
 
+import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.Inet4Address;
 
@@ -60,9 +61,17 @@ public class BOOTPHeader {
 		}
 		byte[] tmp = new byte[128];
 		skbuf.get(tmp, 0, 32, 64);
-		serverHostName = new String(tmp, "US-ASCII").trim();
+		try {
+			serverHostName = new String(tmp, "US-ASCII").trim();
+		} catch(UnsupportedEncodingException ex) {
+			throw new RuntimeException(ex);
+		}
 		skbuf.get(tmp, 0, 96, 128);
-		bootFileName = new String(tmp, "US-ASCII").trim();
+		try {
+			bootFileName = new String(tmp, "US-ASCII").trim();
+		} catch(UnsupportedEncodingException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 	/**
@@ -145,10 +154,18 @@ public class BOOTPHeader {
 			clientHwAddress.writeTo(skbuf, 28);
 		}
 		if (serverHostName != null) {
-			skbuf.set(32, serverHostName.getBytes("US-ASCII"), 0, serverHostName.length());
+			try {
+				skbuf.set(32, serverHostName.getBytes("US-ASCII"), 0, serverHostName.length());
+			} catch(UnsupportedEncodingException ex) {
+				throw new RuntimeException(ex);
+			}
 		}
 		if (bootFileName != null) {
-			skbuf.set(96, bootFileName.getBytes("US-ASCII"), 0, bootFileName.length());
+			try {
+				skbuf.set(96, bootFileName.getBytes("US-ASCII"), 0, bootFileName.length());
+			} catch(UnsupportedEncodingException ex) {
+				throw new RuntimeException(ex);
+			}
 		}
 	}
 
