@@ -5,14 +5,11 @@ package org.jnode.test.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Button;
-import java.awt.Checkbox;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.List;
 import java.awt.Scrollbar;
@@ -22,6 +19,8 @@ import java.awt.event.ActionListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
+
+import javax.swing.JCheckBox;
 
 //import org.apache.log4j.Logger;
 
@@ -179,7 +178,7 @@ public class AWTTest {
             l.add("Item 1");
             l.add("Item 2");
             l.add("Item 3");
-            wnd.add(l, BorderLayout.NORTH);
+            //wnd.add(l, BorderLayout.NORTH);
             
             final Button b = new Button("Hello world");
             b.addActionListener(new ActionListener() {
@@ -212,7 +211,7 @@ public class AWTTest {
             
             final Button b2 = new Button("Left");
             final Scrollbar sb = new Scrollbar(Scrollbar.HORIZONTAL);
-            final Checkbox cb1 = new Checkbox("Right");
+            final JCheckBox cb1 = new JCheckBox("Right");
 
             wnd.add(b2, BorderLayout.WEST);
             b2.setBackground(Color.RED);

@@ -4,6 +4,7 @@
 package org.jnode.awt.swingpeers;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Insets;
 import java.awt.peer.ContainerPeer;
 
@@ -21,7 +22,7 @@ class SwingContainerPeer extends SwingComponentPeer implements ContainerPeer, IS
 	 * @param component
 	 * @param peer
 	 */
-	public SwingContainerPeer(JNodeToolkit toolkit, Component component,
+	public SwingContainerPeer(JNodeToolkit toolkit, Container component,
 			JComponent peer) {
 		super(toolkit, component, peer);
 	}
