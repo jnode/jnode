@@ -546,6 +546,12 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 			try {
 				log.debug("Opening AWT: Using device " + dev.getIDstring());
 				this.graphics = api.open(config.getConfig());
+                if (graphics==null){
+                    String err="No Graphics for device: "+dev.getIDstring();
+                    log.debug(err );
+                    System.err.println( "Error: "+err );
+                }
+
 				screenSize.width = config.getConfig().getScreenWidth();
 				screenSize.height = config.getConfig().getScreenHeight();
 				this.keyboardHandler = new KeyboardHandler();

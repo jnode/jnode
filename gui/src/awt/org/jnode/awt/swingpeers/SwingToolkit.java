@@ -64,7 +64,7 @@ import java.awt.peer.WindowPeer;
 /**
  * AWT toolkit implemented entirely with JFC peers, thus allowing a lightweight
  * simulation of the operating system desktop.
- * 
+ *
  * @author Levente Sántha
  */
 
@@ -74,7 +74,7 @@ public class SwingToolkit extends JNodeToolkit {
 
 	/**
 	 * Initialize this instance.
-	 * 
+	 *
 	 */
 	public SwingToolkit() {
 	}
@@ -124,6 +124,14 @@ public class SwingToolkit extends JNodeToolkit {
 	}
 
 	protected FramePeer createFrame(Frame target) {
+        if (!isGuiActive()){
+            System.err.println( "<SwingToolkit.createFrame> gui was not yet active.  Starting..." );
+            System.err.println( "Manually starting the gui..." );
+            startGui();
+        }
+        if (!isGuiActive()){
+            System.err.println( "<SwingToolkit.createFrame> gui still not yet active after startGui().  We should abort here." );
+        }
 		if (target instanceof DesktopFrame) {
 			setTop(target);
 			log.debug("createFrame:desktopFramePeer(" + target + ")");
@@ -215,7 +223,7 @@ public class SwingToolkit extends JNodeToolkit {
 	/**
 	 * Copies the generic component properties from the AWT component into the
 	 * peer.
-	 * 
+	 *
 	 * @param awtComponent
 	 * @param peer
 	 */
@@ -256,7 +264,7 @@ public class SwingToolkit extends JNodeToolkit {
 
 	/**
 	 * Paint all the lightweight children of the given container.
-	 * 
+	 *
 	 * @param awtContainer
 	 * @param g
 	 */
