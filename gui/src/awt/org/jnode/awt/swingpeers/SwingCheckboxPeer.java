@@ -17,7 +17,7 @@ import javax.swing.JCheckBox;
 /**
  * AWT checkbox peer implemented as a {@link javax.swing.JCheckBox}.
  */
-class SwingCheckboxPeer extends JCheckBox implements CheckboxPeer, SwingPeer {
+class SwingCheckboxPeer extends SwingComponentPeer implements CheckboxPeer, SwingPeer {
 
 	private final Checkbox checkBox;
 
@@ -25,36 +25,16 @@ class SwingCheckboxPeer extends JCheckBox implements CheckboxPeer, SwingPeer {
 	// Construction
 	//
 
-	public SwingCheckboxPeer(Checkbox checkBox) {
+	public SwingCheckboxPeer(SwingToolkit toolkit, Checkbox checkBox) {
+        super(toolkit, checkBox);
+        JCheckBox jcb = new JCheckBox();
 		this.checkBox = checkBox;
-		SwingToolkit.add(checkBox, this);
-		SwingToolkit.copyAwtProperties(checkBox, this);
-		setText(checkBox.getLabel());
+        jComponent = jcb;
+		SwingToolkit.add(checkBox, jcb);
+		SwingToolkit.copyAwtProperties(checkBox, jcb);
+		jcb.setText(checkBox.getLabel());
 		setState(checkBox.getState());
-	}
 
-	public boolean canDetermineObscurity() {
-		return false;
-	}
-
-	public void coalescePaintEvent(PaintEvent e) {
-		System.err.println(e);
-	}
-
-	// Buffer
-
-	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-	}
-
-	public void destroyBuffers() {
-	}
-
-	// Misc
-
-	public void dispose() {
-	}
-
-	public void flip(BufferCapabilities.FlipContents flipContents) {
 	}
 
 	/**
@@ -64,60 +44,14 @@ class SwingCheckboxPeer extends JCheckBox implements CheckboxPeer, SwingPeer {
 		return checkBox;
 	}
 
-	public Image getBackBuffer() {
-		return null;
-	}
-
-	//
-	// ComponentPeer
-	//
-
-	// Events
-
-	public void handleEvent(AWTEvent e) {
-		//System.err.println(e);
-	}
-
-	public boolean handlesWheelScrolling() {
-		return false;
-	}
-
-	// Obscurity
-
-	public boolean isObscured() {
-		return false;
-	}
-
-	// Focus
-
-	public boolean requestFocus(Component lightweightChild, boolean temporary,
-			boolean focusedWindowChangeAllowed, long time) {
-		return true;
-	}
-
 	public void setCheckboxGroup(CheckboxGroup g) {
 	}
 
-	///////////////////////////////////////////////////////////////////////////////////////
-	// Private
-	/**
-	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
-	 */
-	public void setEventMask(long mask) {
-		// TODO Auto-generated method stub
-
-	}
-
-	//
-	// CheckboxPeer
-	//
-
 	public void setState(boolean state) {
-		setSelected(state);
+		((JCheckBox)jComponent).setSelected(state);
 	}
 
-	// Cursor
-
-	public void updateCursorImmediately() {
-	}
+    public void setLabel(String label) {
+        ((JCheckBox)jComponent).setText(label);
+    }
 }

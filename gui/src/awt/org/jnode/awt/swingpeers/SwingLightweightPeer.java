@@ -20,8 +20,8 @@ final class SwingLightweightPeer extends SwingComponentPeer implements
 	// Construction
 	//
 
-	public SwingLightweightPeer(Component component) {
-		super(null, component);
+	public SwingLightweightPeer(SwingToolkit toolkit, Component component) {
+		super(toolkit, component);
 	}
 
 	//

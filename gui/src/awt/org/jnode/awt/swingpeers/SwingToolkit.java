@@ -73,16 +73,16 @@ public class SwingToolkit extends JNodeToolkit {
     // Peers
 
     protected ButtonPeer createButton(Button target) {
-        return new SwingButtonPeer(target);
+        return new SwingButtonPeer(this, target);
     }
 
     protected CanvasPeer createCanvas(Canvas target) {
         //return super.createCanvas( target );
-        return new SwingCanvasPeer(target);
+        return new SwingCanvasPeer(this, target);
     }
 
     protected CheckboxPeer createCheckbox(Checkbox target) {
-        return new SwingCheckboxPeer(target);
+        return new SwingCheckboxPeer(this, target);
     }
 
     protected CheckboxMenuItemPeer createCheckboxMenuItem(
@@ -91,11 +91,11 @@ public class SwingToolkit extends JNodeToolkit {
     }
 
     protected ChoicePeer createChoice(Choice target) {
-        return new SwingChoicePeer(target);
+        return new SwingChoicePeer(this, target);
     }
 
     protected LightweightPeer createComponent(Component target) {
-        return new SwingLightweightPeer(target);
+        return new SwingLightweightPeer(this, target);
     }
 
     protected DialogPeer createDialog(Dialog target) {
@@ -126,11 +126,11 @@ public class SwingToolkit extends JNodeToolkit {
     }
 
     protected LabelPeer createLabel(Label target) {
-        return new SwingLabelPeer(target);
+        return new SwingLabelPeer(this, target);
     }
 
     protected ListPeer createList(java.awt.List target) {
-        return new SwingListPeer(target);
+        return new SwingListPeer(this, target);
     }
 
     protected MenuPeer createMenu(Menu target) {
@@ -146,7 +146,7 @@ public class SwingToolkit extends JNodeToolkit {
     }
 
     protected PanelPeer createPanel(Panel target) {
-        return new SwingPanelPeer(target);
+        return new SwingPanelPeer(this, target);
     }
 
     protected PopupMenuPeer createPopupMenu(PopupMenu target) {

@@ -3,11 +3,19 @@
  */
 package org.jnode.awt.swingpeers;
 
+import org.jnode.awt.JNodeGraphics;
+import org.jnode.awt.JNodeToolkit;
+
 import java.awt.AWTEvent;
 import java.awt.BufferCapabilities;
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.Panel;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.EventQueue;
+import java.awt.Rectangle;
+import java.awt.Insets;
 import java.awt.event.PaintEvent;
 import java.awt.peer.PanelPeer;
 
@@ -18,7 +26,7 @@ import javax.swing.JPanel;
  * AWT panel peer implemented as a {@link javax.swing.JPanel}.
  */
 
-class SwingPanelPeer extends JPanel implements PanelPeer, SwingContainerPeer,
+class SwingPanelPeer extends SwingComponentPeer implements PanelPeer, SwingContainerPeer,
 		SwingPeer {
 
 	private final Panel panel;
@@ -27,11 +35,13 @@ class SwingPanelPeer extends JPanel implements PanelPeer, SwingContainerPeer,
 	// Construction
 	//
 
-	public SwingPanelPeer(Panel panel) {
+	public SwingPanelPeer(SwingToolkit toolkit, Panel panel) {
+        super(toolkit, panel);
+        JPanel jPanel = new JPanel();
+        jComponent = jPanel;
 		this.panel = panel;
-		SwingToolkit.add(panel, this);
-		SwingToolkit.copyAwtProperties(panel, this);
-		setLayout(null);
+		SwingToolkit.add(panel, jPanel);
+		SwingToolkit.copyAwtProperties(panel, jPanel);
 	}
 
 	/**
@@ -39,7 +49,7 @@ class SwingPanelPeer extends JPanel implements PanelPeer, SwingContainerPeer,
 	 *      javax.swing.JComponent)
 	 */
 	public void addAWTComponent(Component awtComponent, JComponent peer) {
-		add(peer);
+		((JPanel)jComponent).add(peer);
 	}
 
 	public void beginLayout() {
@@ -52,36 +62,12 @@ class SwingPanelPeer extends JPanel implements PanelPeer, SwingContainerPeer,
 	public void beginValidate() {
 	}
 
-	public boolean canDetermineObscurity() {
-		return false;
-	}
-
-	public void coalescePaintEvent(PaintEvent e) {
-		System.err.println(e);
-	}
-
-	// Buffer
-
-	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-	}
-
-	public void destroyBuffers() {
-	}
-
-	// Misc
-
-	public void dispose() {
-	}
 
 	public void endLayout() {
 	}
 
 	public void endValidate() {
 	}
-
-	public void flip(BufferCapabilities.FlipContents flipContents) {
-	}
-
 	/**
 	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
 	 */
@@ -89,53 +75,15 @@ class SwingPanelPeer extends JPanel implements PanelPeer, SwingContainerPeer,
 		return panel;
 	}
 
-	public Image getBackBuffer() {
-		return null;
-	}
-
-	//
-	// ComponentPeer
-	//
-
-	// Events
-
-	public void handleEvent(AWTEvent e) {
-		//System.err.println(e);
-	}
-
-	public boolean handlesWheelScrolling() {
-		return false;
-	}
-
-	// Obscurity
-
-	public boolean isObscured() {
-		return false;
-	}
-
 	public boolean isPaintPending() {
 		return false;
 	}
 
-	// Focus
+    public Insets getInsets() {
+        return ((JPanel)jComponent).getInsets();
+    }
 
-	public boolean requestFocus(Component lightweightChild, boolean temporary,
-			boolean focusedWindowChangeAllowed, long time) {
-		return true;
-	}
-
-	///////////////////////////////////////////////////////////////////////////////////////
-	// Private
-	/**
-	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
-	 */
-	public void setEventMask(long mask) {
-		// TODO Auto-generated method stub
-
-	}
-
-	// Cursor
-
-	public void updateCursorImmediately() {
-	}
+    public Insets insets() {
+        return getInsets();
+    }
 }
