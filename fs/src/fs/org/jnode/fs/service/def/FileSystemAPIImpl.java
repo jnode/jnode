@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSEntryIterator;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 
@@ -211,7 +212,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 			throw new IOException("Cannot list on non-directories " + directory);
 		}
 		final ArrayList list = new ArrayList();
-		for (Iterator i = entry.getDirectory().iterator(); i.hasNext();) {
+		for (FSEntryIterator i = entry.getDirectory().iterator(); i.hasNext();) {
 			final FSEntry child = (FSEntry)i.next();
 			final String name = child.getName();
 			if ((filter == null) || (filter.accept(directory, name))) {
@@ -419,16 +420,27 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 			return null;
 		}
 
+		public boolean isDirty() throws IOException {
+			return false;
+		}
+
 	}
 
 	class VirtualRootDirectory implements FSDirectory {
 
-		public Iterator iterator() {
+		public FSEntryIterator iterator() {
 			return new RootsIterator(fsm.fileSystemRoots().iterator());
 		}
 
 		public FSEntry getEntry(String name) throws IOException {
-			return getEntry("/" + name);
+			for(FSEntryIterator it = iterator() ; it.hasNext() ; )
+			{
+				FSEntry entry = it.next();
+				if(entry.getName().equals(name))
+					return entry;
+			}
+			
+			throw new IOException("Entry not found: "+name);
 		}
 
 		public FSEntry addFile(String name) throws IOException {
@@ -450,10 +462,18 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 		public FileSystem getFileSystem() {
 			return null;
 		}
-
+		
+		/**
+		 * Save all dirty (unsaved) data to the device 
+		 * @throws IOException
+		 */
+		public void flush() throws IOException
+		{
+			//do nothing
+		}
 	}
 
-	class RootsIterator implements Iterator {
+	class RootsIterator implements FSEntryIterator {
 		Iterator fileSystemsRoots;
 		public RootsIterator(Iterator fileSystemsRoots) {
 			this.fileSystemsRoots = fileSystemsRoots;
@@ -461,12 +481,9 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 		public boolean hasNext() {
 			return fileSystemsRoots.hasNext();
 		}
-		public Object next() {
+		public FSEntry next() {
 			String fs = (String)fileSystemsRoots.next();
 			return new virtualFSEntry(fs);
-		}
-		public void remove() {
-			// do nothing
 		}
 	}
 
@@ -527,6 +544,10 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 
 		public boolean isValid() {
 			return underlying.isValid();
+		}
+
+		public boolean isDirty() throws IOException {
+			return underlying.isDirty();
 		}
 
 	}
