@@ -56,13 +56,13 @@ final class ResourceManagerImpl implements ResourceManager {
 	
 	protected static ResourceManager initialize() {
 		try {
-			final Address kernelStart = Address.fromAddress(Unsafe.getKernelStart()); 
-			final Address kernelEnd = Address.fromAddress(Unsafe.getKernelEnd());
+			final Address kernelStart = Unsafe.getKernelStart(); 
+			final Address kernelEnd = Unsafe.getKernelEnd();
 			final Extent kernelSize = kernelEnd.toWord().sub(kernelStart.toWord()).toExtent();
 			MemoryResourceImpl.claimMemoryResource(new SimpleResourceOwner("kernel"), kernelStart, kernelSize, MEMMODE_NORMAL);
 
-			final Address bootHeapStart = Address.fromAddress(Unsafe.getBootHeapStart()); 
-			final Address bootHeapEnd = Address.fromAddress(Unsafe.getBootHeapEnd());
+			final Address bootHeapStart = Unsafe.getBootHeapStart(); 
+			final Address bootHeapEnd = Unsafe.getBootHeapEnd();
 			final Extent bootHeapSize = bootHeapEnd.toWord().sub(bootHeapStart.toWord()).toExtent(); 
 			MemoryResourceImpl.claimMemoryResource(new SimpleResourceOwner("bootheap"), bootHeapStart, bootHeapSize, MEMMODE_NORMAL);
 

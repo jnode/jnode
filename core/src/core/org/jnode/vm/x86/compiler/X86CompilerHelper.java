@@ -7,7 +7,6 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
 import org.jnode.assembler.x86.X86Constants;
-import org.jnode.vm.VmAddress;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
@@ -22,6 +21,7 @@ import org.jnode.vm.classmgr.VmTypeState;
 import org.jnode.vm.memmgr.VmWriteBarrier;
 import org.jnode.vm.x86.X86CpuID;
 import org.vmmagic.pragma.PrivilegedActionPragma;
+import org.vmmagic.unboxed.Address;
 
 /**
  * Helpers class used by the X86 compilers.
@@ -43,7 +43,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 
     private final Label jumpTableLabel;
 
-    private final VmAddress jumpTableAddress;
+    private final Address jumpTableAddress;
 
     private final boolean haveCMOV;
 

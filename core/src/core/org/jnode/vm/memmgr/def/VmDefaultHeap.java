@@ -3,7 +3,6 @@
  */
 package org.jnode.vm.memmgr.def;
 
-import org.jnode.vm.VmAddress;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.classmgr.ObjectFlags;
@@ -16,6 +15,7 @@ import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Offset;
+import org.vmmagic.unboxed.Word;
 
 /**
  * @author epr
@@ -121,12 +121,12 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         setAllocationBit(allocationBitmap, true);
 
         // Initialize the remaining space as free object.
-        final int remainingSize = (int) VmAddress.distance(end.toAddress(), firstObject.toAddress());
+        final Word remainingSize = end.toWord().sub(firstObject.toWord());
         final Address ptr = firstObject;
         ptr.store(remainingSize, sizeOffset);
         ptr.store(ObjectReference.fromObject(FREE), tibOffset);
         this.nextFreePtr = ptr;
-        this.freeSize = remainingSize;
+        this.freeSize = remainingSize.toInt();
     }
 
     /**

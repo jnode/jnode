@@ -3,7 +3,6 @@
  */
 package org.jnode.vm.memmgr.def;
 
-import org.jnode.assembler.ObjectResolver;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
@@ -39,9 +38,6 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
     /** My statistics */
     private final DefGCStatistics stats;
 
-    /** The object resolver */
-    private final ObjectResolver resolver;
-
     /** The low level helper */
     private final HeapHelper helper;
 
@@ -65,7 +61,6 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
         this.verifyVisitor = new GCVerifyVisitor(heapManager, arch);
         this.sweepVisitor = new GCSweepVisitor(heapManager);
         this.stats = new DefGCStatistics();
-        this.resolver = new Unsafe.UnsafeObjectResolver();
     }
 
     /**
@@ -151,7 +146,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
             markVisitor.reset();
             markVisitor.setRootSet(true);
             // Mark all roots
-            helper.visitAllRoots(markVisitor, heapManager, resolver);            
+            helper.visitAllRoots(markVisitor, heapManager);            
 //            statics.walk(markVisitor, resolver);
 //            helper.visitAllThreads(threadMarkVisitor);
             // Mark every object in the rootset

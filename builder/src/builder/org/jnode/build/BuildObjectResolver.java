@@ -6,7 +6,6 @@ package org.jnode.build;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.UnresolvedObjectRefException;
-import org.jnode.vm.VmAddress;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -19,20 +18,6 @@ public class BuildObjectResolver extends ObjectResolver {
 	public BuildObjectResolver(NativeStream os, AbstractBootImageBuilder builder) {
 		this.os = os;
 		//this.builder = builder;
-	}
-
-	/**
-	 * @see org.jnode.assembler.ObjectResolver#add(org.jnode.vm.Address, int)
-	 */
-	public VmAddress add(VmAddress address, int offset) {
-		throw new RuntimeException("Not implemented");
-	}
-
-	/**
-	 * @see org.jnode.assembler.ObjectResolver#addressOf(java.lang.Object)
-	 */
-	public VmAddress addressOf(Object object) {
-		throw new RuntimeException("Not implemented");
 	}
 
 	/**
@@ -71,33 +56,5 @@ public class BuildObjectResolver extends ObjectResolver {
 		} catch (UnresolvedObjectRefException ex) {
 			throw new RuntimeException("Unresolved object ref", ex);
 		}
-	}
-
-	/**
-	 * @see org.jnode.assembler.ObjectResolver#addressOfArrayData(java.lang.Object)
-	 */
-	public VmAddress addressOfArrayData(Object array) {
-		throw new RuntimeException("Not implemented");
-	}
-
-	/**
-	 * @see org.jnode.assembler.ObjectResolver#objectAt(org.jnode.vm.Address)
-	 */
-	public Object objectAt(VmAddress ptr) {
-		throw new RuntimeException("Not implemented");
-	}
-
-	/**
-	 * @see org.jnode.assembler.ObjectResolver#objectAt32(int)
-	 */
-	public Object objectAt32(int ptr) {
-		throw new RuntimeException("Not implemented");
-	}
-
-	/**
-	 * @see org.jnode.assembler.ObjectResolver#objectAt64(long)
-	 */
-	public Object objectAt64(long ptr) {
-		throw new RuntimeException("Not implemented");
 	}
 }

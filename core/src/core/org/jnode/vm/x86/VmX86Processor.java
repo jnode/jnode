@@ -10,7 +10,6 @@ import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeUtils;
-import org.jnode.vm.VmAddress;
 import org.jnode.vm.CpuID;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
@@ -18,6 +17,7 @@ import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmThread;
 import org.jnode.vm.classmgr.VmStatics;
 import org.vmmagic.pragma.LoadStaticsPragma;
+import org.vmmagic.unboxed.ObjectReference;
 
 /**
  * Processor implementation for the X86 architecture.
@@ -173,7 +173,7 @@ public final class VmX86Processor extends VmProcessor {
     private final void setupStructures() {
         // Clone GDT
         this.gdt = new GDT();
-        gdt.setBase(GDT.PROCESSOR_ENTRY, VmAddress.valueOf(this));
+        gdt.setBase(GDT.PROCESSOR_ENTRY, ObjectReference.fromObject(this).toAddress());
         
         // Clone TSS
         this.tss = new TSS();

@@ -115,7 +115,7 @@ public final class VmStackFrame extends VmSystemObject {
 		} else {
 			final VmCompiledCode cc = sfMethod.getCompiledCode(getMagic());
 			if ((cc != null) && (sfInstructionPointer != null)) {
-				return cc.getLocationInfo(sfMethod, sfInstructionPointer.toAddress());
+				return cc.getLocationInfo(sfMethod, sfInstructionPointer);
 			} else {
 				return "?";
 			}

@@ -263,8 +263,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final IntItem cnt = vstack.popInt();
             final RefItem addr = vstack.popRef();
-            L1AHelper.requestRegister(ec, Register.ECX);
             if (!cnt.isConstant()) {
+                L1AHelper.requestRegister(ec, Register.ECX);
                 cnt.loadTo(ec, Register.ECX);
             }
             addr.load(ec);
@@ -283,7 +283,7 @@ final class MagicHelper extends BaseX86MagicHelper {
         case mLOADSHORT: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final RefItem addr = vstack.popRef();
-            addr.load(ec);
+            addr.loadToBITS8GPR(ec);
             final Register r = addr.getRegister();
             addr.release(ec);
             if (mcode == mLOADCHAR) {
@@ -638,6 +638,13 @@ final class MagicHelper extends BaseX86MagicHelper {
             os.writeArithOp(methodCodeToOperation(mcode), r, 0, valuer);
             value.release(ec);
             addr.release(ec);
+        } break;
+        case mGETCURRENTFRAME: {
+            if (Vm.VerifyAssertions) Vm._assert(isstatic);
+            final WordItem result = L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, false);
+            final Register r = result.getRegister();
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, Register.EBP);
+            vstack.push(result);
         } break;
             
         default:

@@ -8,9 +8,10 @@ import java.nio.ByteOrder;
 
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.vm.ObjectVisitor;
-import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmSystemObject;
+import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.ObjectReference;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -160,11 +161,11 @@ public final class VmStatics extends VmSystemObject {
 		        return false;
 		    }
 		} else {
-			final ObjectResolver resolver = getResolver();
+			final Address valuePtr = ObjectReference.fromObject(value).toAddress();
 			if (slotLength == 1) {
-				statics[idx] = resolver.addressOf32(value);
+				statics[idx] = valuePtr.toInt();
 			} else {
-				final long lvalue = resolver.addressOf64(value);
+				final long lvalue = valuePtr.toLong();
 				if (lsbFirst) {
 					statics[idx + 0] = (int) (lvalue & 0xFFFFFFFFL);
 					statics[idx + 1] = (int) ((lvalue >>> 32) & 0xFFFFFFFFL);
@@ -234,8 +235,8 @@ public final class VmStatics extends VmSystemObject {
 	 * 
 	 * @param visitor
 	 */
-	public boolean walk(ObjectVisitor visitor, ObjectResolver resolver) {
-		return walk(TYPE_OBJECT, visitor, resolver);
+	public boolean walk(ObjectVisitor visitor) {
+		return walk(TYPE_OBJECT, visitor);
 	}
 
 	/**
@@ -244,7 +245,7 @@ public final class VmStatics extends VmSystemObject {
 	 * @param visitor
 	 */
 	public void walkMethods(ObjectVisitor visitor) {
-		walk(TYPE_METHOD, visitor, getResolver());
+		walk(TYPE_METHOD, visitor);
 	}
 
 	/**
@@ -253,7 +254,7 @@ public final class VmStatics extends VmSystemObject {
 	 * @param visitor
      * @return false if the last visit returned false, true otherwise.
 	 */
-	private boolean walk(int visitType, ObjectVisitor visitor, ObjectResolver resolver) {
+	private boolean walk(int visitType, ObjectVisitor visitor) {
 		final int[] table;
 		final byte[] types;
 		final int length;
@@ -265,7 +266,7 @@ public final class VmStatics extends VmSystemObject {
 				final byte type = types[i];
 				if (type == visitType) {
 					final Object object;
-					object = resolver.objectAt32(table[i]);
+					object = Address.fromIntZeroExtend(table[i]).toObjectReference().toObject();
 					if (object != null) {
 						final boolean rc = visitor.visit(object);
 						if (!rc) {
@@ -278,13 +279,6 @@ public final class VmStatics extends VmSystemObject {
 			throw new RuntimeException("SlotSize != 1 not implemented yet");
 		}
         return true;
-	}
-
-	private final ObjectResolver getResolver() {
-		if (resolver == null) {
-			resolver = new Unsafe.UnsafeObjectResolver();
-		}
-		return resolver;
 	}
 
 	public final void dumpStatistics(PrintStream out) {

@@ -59,6 +59,10 @@ public final class Word {
     return null;
   }
 
+  public Word add (int w2) {
+    return null;
+  }
+
   public Word add (Word w2) {
     return null;
   }
@@ -68,6 +72,10 @@ public final class Word {
   }
 
   public Word add (Extent w2) {
+    return null;
+  }
+
+  public Word sub (int w2) {
     return null;
   }
 

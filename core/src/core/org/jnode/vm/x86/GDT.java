@@ -6,7 +6,7 @@ package org.jnode.vm.x86;
 import java.io.PrintStream;
 
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.VmAddress;
+import org.vmmagic.unboxed.Address;
 
 /**
  * Global descriptor table wrapper.
@@ -53,8 +53,8 @@ final class GDT {
      * @param index
      * @param base
      */
-    public final void setBase(int index, VmAddress base) {
-        final int intBase = VmAddress.as32bit(base);
+    public final void setBase(int index, Address base) {
+        final int intBase = base.toInt();
         final int idx = index * 2;
         gdt[ idx + 0] &= 0x0000FFFF; // Remove base bits
         gdt[ idx + 1] &= 0x00FFFF00; // Remove base bits

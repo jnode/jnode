@@ -3,12 +3,12 @@
  */
 package org.jnode.vm.memmgr;
 
-import org.jnode.assembler.ObjectResolver;
 import org.jnode.vm.Monitor;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.classmgr.VmMethod;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Extent;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -34,7 +34,7 @@ public abstract class HeapHelper {
 
 	public abstract void clear(Address dst, int size);
 
-	public abstract Address allocateBlock(int size);
+	public abstract Address allocateBlock(Extent size);
 
 	public abstract Address getBootHeapStart();
 
@@ -70,5 +70,5 @@ public abstract class HeapHelper {
      * Visit all roots of the object tree.
      * @param visitor
      */
-    public abstract void visitAllRoots(ObjectVisitor visitor, VmHeapManager heapManager, ObjectResolver resolver); 
+    public abstract void visitAllRoots(ObjectVisitor visitor, VmHeapManager heapManager); 
 }

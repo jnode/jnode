@@ -21,6 +21,7 @@
 package org.jnode.vm;
 
 import org.jnode.util.NumberUtils;
+import org.vmmagic.unboxed.Address;
 
 /**
  * Address is not a normal Java object. Instead it is used as a reference
@@ -29,33 +30,6 @@ import org.jnode.util.NumberUtils;
  * @author epr
  */
 public abstract class VmAddress extends VmSystemObject {
-	
-	/**
-	 * Convert a 32-bit (int) address into an Address reference.
-	 * @param ptr32
-	 * @return Address
-	 */
-	public static VmAddress valueOf(int ptr32) {
-		return Unsafe.intToAddress(ptr32); 
-	}
-
-	/**
-	 * Convert a 64-bit (long) address into an Address reference.
-	 * @param ptr64
-	 * @return Address
-	 */
-	public static VmAddress valueOf(long ptr64) {
-		return Unsafe.longToAddress(ptr64); 
-	}
-
-	/**
-	 * Convert an Object reference into an Address reference.
-	 * @param object
-	 * @return Address
-	 */
-	public static VmAddress valueOf(Object object) {
-		return Unsafe.addressOf(object); 
-	}
 	
 	/**
 	 * Convert the given address to a String.
@@ -67,39 +41,9 @@ public abstract class VmAddress extends VmSystemObject {
 	public static String toString(VmAddress addr) {
 	    final int refsize = Unsafe.getCurrentProcessor().getArchitecture().getReferenceSize();
 	    if (refsize == 4) {
-	        return NumberUtils.hex(Unsafe.addressToInt(addr));
+	        return NumberUtils.hex(Address.fromAddress(addr).toInt());
 	    } else {
-	        return NumberUtils.hex(Unsafe.addressToLong(addr));	        
+	        return NumberUtils.hex(Address.fromAddress(addr).toLong());	        
 	    }
-	}
-	
-	/**
-	 * Convert an address to a 32-bit integer.
-	 * @param address
-	 * @return int
-	 */
-	public static int as32bit(VmAddress address) {
-		return Unsafe.addressToInt(address);
-	}
-
-	/**
-	 * Convert an address to a 64-bit integer.
-	 * @param address
-	 * @return long
-	 */
-	public static long as64bit(VmAddress address) {
-		return Unsafe.addressToLong(address);
-	}
-	
-	public static long distance(VmAddress a1, VmAddress a2) {
-		return Math.abs(Unsafe.addressToLong(a2) - Unsafe.addressToLong(a1));
-	}
-	
-	public static VmAddress add(VmAddress a, int incValue) {
-		return Unsafe.add(a, incValue); 
-	}
-	
-	public static int compare(VmAddress a1, VmAddress a2) {
-		return Unsafe.compare(a1, a2);
 	}
 }

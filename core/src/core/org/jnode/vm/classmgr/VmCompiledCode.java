@@ -6,6 +6,7 @@ package org.jnode.vm.classmgr;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.compiler.NativeCodeCompiler;
+import org.vmmagic.unboxed.Address;
 
 /**
  * @author epr
@@ -124,8 +125,9 @@ public final class VmCompiledCode extends AbstractCode {
      * @param address
      * @return The linenumber for the given pc, or -1 is not found.
      */
-    public String getLocationInfo(VmMethod expectedMethod, VmAddress address) {
-        final int offset = (int) VmAddress.distance(nativeCode, address);
+    public String getLocationInfo(VmMethod expectedMethod, Address address) {
+    	final Address codeAddr = Address.fromAddress(nativeCode);
+        final int offset = (int) address.toWord().sub(codeAddr.toWord()).toInt();
         return addressTable.getLocationInfo(expectedMethod, offset);
     }
 
@@ -148,11 +150,11 @@ public final class VmCompiledCode extends AbstractCode {
      * @param codePtr
      * @return boolean
      */
-    public boolean contains(VmAddress codePtr) {
-        final int cmpStart = VmAddress.compare(codePtr, nativeCode);
-        final int cmpEnd = VmAddress.compare(codePtr, VmAddress.add(nativeCode,
-                nativeCodeSize1));
-        return ((cmpStart >= 0) && (cmpEnd < 0));
+    public boolean contains(Address codePtr) {
+    	final Address start = Address.fromAddress(nativeCode);
+    	final Address end = start.add(nativeCodeSize1);
+    	
+    	return codePtr.GE(start) && codePtr.LT(end); 
     }
 
     public String toString() {

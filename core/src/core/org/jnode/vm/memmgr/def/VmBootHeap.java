@@ -10,6 +10,7 @@ import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.Offset;
 
 /**
@@ -73,7 +74,7 @@ public class VmBootHeap extends VmAbstractHeap {
         final int bits = ObjectLayout.objectAlign(heapSize)
                 / ObjectLayout.OBJECT_ALIGN;
         final int bitmapSize = ObjectLayout.objectAlign(bits / 8);
-        allocationBitmapPtr = helper.allocateBlock(bitmapSize);
+        allocationBitmapPtr = helper.allocateBlock(Extent.fromIntZeroExtend(bitmapSize));
         //allocationBitmapPtr = MemoryBlockManager.allocateBlock(bitmapSize);
 
         // Initialize the allocation bitmap

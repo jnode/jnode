@@ -98,6 +98,15 @@ public final class VmMagic {
         return false;
     }
     
+	/**
+	 * Gets the current stackframe
+	 * 
+	 * @return The address of the stackframe of the current thread
+	 */
+	protected static Address getCurrentFrame() {
+		return null;
+	}
+
     /**
      * Do not instantiate this class.
      */
