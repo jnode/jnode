@@ -45,8 +45,11 @@ grant {
 	permission java.util.PropertyPermission "gnu.java.io.*", "read";
 	
 	// Hacks to fix classpath's lack of security
+	permission java.util.PropertyPermission "awt.image.incrementalDraw", "read";
+	permission java.util.PropertyPermission "awt.image.redrawrate", "read";
 	permission java.util.PropertyPermission "awt.toolkit", "read";
 	permission java.awt.AWTPermission "accessEventQueue";
+	permission java.awt.AWTPermission "replaceKeyboardFocusManager";
 	
 	// JNode specific standard properties
 
