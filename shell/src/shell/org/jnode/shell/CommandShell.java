@@ -215,7 +215,8 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 		try {
 			return aliasMgr.getAliasClass(cmd);
 		} catch (NoSuchAliasException ex) {
-			return Class.forName(cmd);
+			final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+			return cl.loadClass(cmd);
 		}
 	}
 

@@ -76,4 +76,11 @@ public abstract class VmClassLoader extends VmSystemObject {
 	 * @return boolean
 	 */
 	public abstract boolean isSystemClassLoader();
+	
+	/**
+	 * Does a resource with a given name exist in this loader.
+	 * @param resName
+	 * @return boolean
+	 */
+	public abstract boolean resourceExists(String resName);
 }

@@ -128,6 +128,9 @@ public class PluginJar implements BootableObject {
 	 * @return boolean
 	 */
 	public final URL getResource(String resourceName) {
+		if (resourceName.startsWith("/")) {
+			resourceName = resourceName.substring(1);
+		}
 		try {
 			final JarFile jarFile = getJar(null);
 			final JarEntry entry = jarFile.getJarEntry(resourceName);
@@ -135,9 +138,10 @@ public class PluginJar implements BootableObject {
 				return null;
 			} else {
 				final String id = descriptor.getId();
-				return new URL("plugin:" + id + "!" + resourceName);
+				return new URL("plugin:" + id + "!/" + resourceName);
 			}
 		} catch (IOException ex) {
+			System.out.println("ioex: " +ex.getMessage());
 			return null;
 		}
 	}
