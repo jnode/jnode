@@ -10,8 +10,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.jnode.driver.console.Screen;
-
 /**
  * @author epr
  */
@@ -58,15 +56,15 @@ public class VmProcess extends Process {
 		}
 		
 		if (System.in == null) {
-			Screen.debug("Set System.in.");
+			Unsafe.debug("Set System.in.");
 			System.in = in;
 		}
 		if (System.out == null) {
-			Screen.debug("Set System.out.");
+			Unsafe.debug("Set System.out.");
 			System.out = out;
 		}
 		if (System.err == null) {
-			Screen.debug("Set System.err.");
+			Unsafe.debug("Set System.err.");
 			System.err = err;
 		}
 		

@@ -5,7 +5,7 @@ package org.jnode.system;
 
 import java.io.PrintStream;
 
-import org.jnode.driver.console.Screen;
+import org.jnode.vm.Unsafe;
 
 /**
  * Logging class used during bootstrap.
@@ -122,10 +122,10 @@ public class BootLog {
 			}
 		} else {
 			if (msg != null) {
-				Screen.debug(msg);
+				Unsafe.debug(msg);
 			}
 			if (ex != null) {
-				Screen.debug(ex.toString());
+				Unsafe.debug(ex.toString());
 			}
 		}
 	}

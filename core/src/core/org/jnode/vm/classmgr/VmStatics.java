@@ -13,4 +13,8 @@ public class VmStatics {
 	public static final void dumpStatistics() {
 		System.out.println("#static fields " + staticFieldCount);
 	}
+	
+	public static void main(String[] args) {
+		dumpStatistics();
+	}
 }

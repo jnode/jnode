@@ -47,14 +47,15 @@ public final class VmSystem {
 			// Initialize resource manager
 			ResourceManagerImpl.initialize();
 
-			/* Create the default screen */
-			Screen screen = Screen.getInstance();
 			/* Set System.err, System.out */
-			System.setOut(new PrintStream(new ScreenOutputStream(screen, 0x07), true));
-			System.setErr(new PrintStream(new ScreenOutputStream(screen, 0x04), true));
+			//final SystemOutputStream os = new SystemOutputStream();
+			final ScreenOutputStream os = new ScreenOutputStream(Screen.getInstance());
+			final PrintStream ps = new PrintStream(os, true);
+			System.setOut(ps);
+			System.setErr(ps);
 
 			/* Initialize the system classloader */
-			VmClassLoader loader = (VmClassLoader) (getVmClass(screen).getLoader());
+			VmClassLoader loader = (VmClassLoader) (getVmClass(Unsafe.getCurrentProcessor()).getLoader());
 			systemLoader = loader;
 			loader.initialize();
 
@@ -264,7 +265,8 @@ public final class VmSystem {
 	 */
 	public static Object[] getStackTrace(VmThread current) {
 		if (current.inException) {
-			Screen.debug("Exception in getStackTrace");
+			Unsafe.debug("Exception in getStackTrace");
+			Unsafe.die();
 			return null;
 		} else {
 			current.inException = true;
@@ -379,11 +381,11 @@ public final class VmSystem {
 
 		try {
 			if (ex == null) {
-				Screen.debug("NPE");
+				Unsafe.debug("NPE");
 				throw new NullPointerException();
 			}
 			if (frame == null) {
-				Screen.debug("frame==null");
+				Unsafe.debug("frame==null");
 				return null;
 			}
 			final VmProcessor proc = Unsafe.getCurrentProcessor();
@@ -392,7 +394,7 @@ public final class VmSystem {
 			final boolean interpreted = (magic == VmStackFrame.MAGIC_INTERPRETED);
 			final boolean compiled = (magic == VmStackFrame.MAGIC_COMPILED);
 			if (!(interpreted || compiled)) {
-				Screen.debug("Unknown magic");
+				Unsafe.debug("Unknown magic");
 				return null;
 			}
 
@@ -400,7 +402,7 @@ public final class VmSystem {
 			final VmMethod method = reader.getMethod(frame);
 			final int pc = reader.getPC(frame);
 			if (method == null) {
-				Screen.debug("Unknown method");
+				Unsafe.debug("Unknown method");
 				return null;
 			}
 
@@ -486,7 +488,7 @@ public final class VmSystem {
 				return Unsafe.intToAddress(RC_DEFHANDLER);
 			}
 		} catch (Throwable ex2) {
-			Screen.debug("Exception in findThrowableHandler");
+			Unsafe.debug("Exception in findThrowableHandler");
 			Unsafe.die();
 			return null;
 		}
@@ -501,13 +503,13 @@ public final class VmSystem {
 		Class dst_class = dst.getClass();
 
 		if (!src_class.isArray()) {
-			Screen.debug('!');
+			Unsafe.debug('!');
 			throw new ArrayStoreException("src is not an array");
 		}
 
 		if (!dst_class.isArray()) {
-			Screen.debug("dst is not an array:");
-			Screen.debug(dst_class.getName());
+			Unsafe.debug("dst is not an array:");
+			Unsafe.debug(dst_class.getName());
 			throw new ArrayStoreException("dst is not an array");
 		}
 
@@ -525,9 +527,9 @@ public final class VmSystem {
 		}
 
 		if (src_type != dst_type) {
-			Screen.debug("invalid array types:");
-			Screen.debug(src_class.getName());
-			Screen.debug(dst_class.getName());
+			Unsafe.debug("invalid array types:");
+			Unsafe.debug(src_class.getName());
+			Unsafe.debug(dst_class.getName());
 			throw new ArrayStoreException("Invalid array types");
 		}
 
@@ -576,9 +578,9 @@ public final class VmSystem {
 				elemsize = 8;
 				break;
 			default :
-				Screen.debug("uat:");
-				Screen.debug(src_type);
-				Screen.debug(src_name);
+				//Unsafe.debug("uat:");
+				//Unsafe.debug(src_type);
+				//Unsafe.debug(src_name);
 				throw new ArrayStoreException("Unknown array type");
 		}
 
