@@ -16,7 +16,7 @@ import org.jnode.vm.memmgr.HeapHelper;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class GCVerifyVisitor extends ObjectVisitor {
+final class GCVerifyVisitor extends ObjectVisitor {
 
     private final HeapHelper helper;
     private final DefaultHeapManager heapManager;

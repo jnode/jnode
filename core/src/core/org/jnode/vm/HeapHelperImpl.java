@@ -100,11 +100,36 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
      * @return @see org.jnode.vm.classmgr.ObjectFlags#GC_BLACK
      * @see org.jnode.vm.classmgr.ObjectFlags#GC_GREY
      * @see org.jnode.vm.classmgr.ObjectFlags#GC_WHITE
+     * @see org.jnode.vm.classmgr.ObjectFlags#GC_YELLOW
      */
     public final int getObjectColor(Object src) {
         return Unsafe.getObjectFlags(src) & ObjectFlags.GC_COLOUR_MASK;
     }
 
+	/**
+	 * Has the given object been finalized.
+	 * @param src
+	 * @return
+	 */
+	public final boolean isFinalized(Object src) {
+        return ((Unsafe.getObjectFlags(src) & ObjectFlags.STATUS_FINALIZED) != 0);	    
+	}
+	
+	/**
+	 * Mark the given object as finalized.
+	 * @param dst
+	 */
+	public final void setFinalized(Object dst) {
+        final Address addr = Unsafe.add(Unsafe.addressOf(dst), flagsOffset);
+        int oldValue;
+        int newValue;
+        do {
+            oldValue = Unsafe.getInt(dst, flagsOffset);
+            if ((oldValue & ObjectFlags.STATUS_FINALIZED) != 0) { return; }
+            newValue = oldValue | ObjectFlags.STATUS_FINALIZED;
+        } while (!Unsafe.atomicCompareAndSwap(addr, oldValue, newValue));
+	}
+	
     /**
      * @see org.jnode.vm.memmgr.HeapHelper#getStack(org.jnode.vm.VmThread)
      */

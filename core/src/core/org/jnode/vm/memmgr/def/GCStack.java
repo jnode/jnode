@@ -9,7 +9,7 @@ import org.jnode.vm.VmSystemObject;
 /**
  * @author epr
  */
-public class GCStack extends VmSystemObject implements Uninterruptible {
+final class GCStack extends VmSystemObject implements Uninterruptible {
 	
 	/** The default size of a stack */
 	public static final int DEFAULT_STACK_SIZE = 512;

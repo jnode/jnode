@@ -33,9 +33,23 @@ public abstract class HeapHelper extends ObjectResolver {
 	 * @see org.jnode.vm.classmgr.ObjectFlags#GC_BLACK
 	 * @see org.jnode.vm.classmgr.ObjectFlags#GC_GREY
 	 * @see org.jnode.vm.classmgr.ObjectFlags#GC_WHITE
+     * @see org.jnode.vm.classmgr.ObjectFlags#GC_YELLOW
 	 */
 	public abstract int getObjectColor(Object src);
 
+	/**
+	 * Has the given object been finalized.
+	 * @param src
+	 * @return
+	 */
+	public abstract boolean isFinalized(Object src);
+	
+	/**
+	 * Mark the given object as finalized.
+	 * @param src
+	 */
+	public abstract void setFinalized(Object src);
+	
 	public abstract void setByte(Object dst, int offset, byte value);
 
 	public abstract void setInt(Object dst, int offset, int value);

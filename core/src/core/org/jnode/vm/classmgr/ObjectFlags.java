@@ -6,6 +6,7 @@ package org.jnode.vm.classmgr;
 /**
  * This interfaces defines the flags and flags masks for the flags field
  * in an object header.
+ * 
  * @author epr
  */
 public interface ObjectFlags {
@@ -27,7 +28,7 @@ public interface ObjectFlags {
 	/**
 	 * GC flag: This object and all its children have been visited by the GC.
 	 */
-	public static final int GC_BLACK = 0x01;
+	public static final int GC_BLACK = 0x03;
 	
 	/**
 	 * GC flag: This object has been visited by the GC, but not all of its
@@ -39,9 +40,24 @@ public interface ObjectFlags {
 	 * GC flag: This object has not been visited by the GC. All objects
 	 * with this colour are garbage at the end of a mark phase.
 	 */
-	public static final int GC_WHITE = 0x03;
+	public static final int GC_WHITE = 0x01;
 	
+	/**
+	 * GC flag: This object is garbage, but the finalize method has not
+	 * been called yet. Every object with this called will be subject to 
+	 * the runFinalization process.
+	 */
+	public static final int GC_YELLOW = 0x00;
+	
+	/**
+	 * The default color of newly allocated objects.
+	 */
 	public static final int GC_DEFAULT_COLOR = GC_WHITE;
+	
+	/**
+	 * If this bit is set, the object has been finalized.
+	 */
+	public static final int STATUS_FINALIZED = 0x00000004;
 	
 	/**
 	 * Mask for status flags.

@@ -11,7 +11,7 @@ import org.jnode.vm.memmgr.HeapHelper;
 /**
  * @author epr
  */
-public class GCSetWhiteVisitor extends ObjectVisitor implements ObjectFlags, Uninterruptible {
+final class GCSetWhiteVisitor extends ObjectVisitor implements ObjectFlags, Uninterruptible {
 
 	private final HeapHelper helper;
 	
