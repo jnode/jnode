@@ -73,6 +73,7 @@ public class RadeonVgaState extends VgaState implements RadeonConstants {
         crtc.restoreToVGA(io);
         fp.saveFromVGA(io);
         restorePLL(io);
+        restorePalette(io);
     }
 
     
@@ -97,5 +98,21 @@ public class RadeonVgaState extends VgaState implements RadeonConstants {
      */
     private final void restorePLL(RadeonVgaIO io) {
         pll.restorePLL(io);
+    }
+    
+    /**
+     * @see org.jnode.driver.video.vgahw.VgaState#getPaletteEntry(org.jnode.driver.video.vgahw.VgaIO, int, byte[], byte[], byte[])
+     */
+    protected void getPaletteEntry(VgaIO vgaIO, int colorIndex, byte[] r,
+            byte[] g, byte[] b) {
+        final RadeonVgaIO io = (RadeonVgaIO)vgaIO;
+        io.getPaletteEntry(colorIndex, r, g, b);
+    }
+    /**
+     * @see org.jnode.driver.video.vgahw.VgaState#setPaletteEntry(org.jnode.driver.video.vgahw.VgaIO, int, int, int, int)
+     */
+    protected void setPaletteEntry(VgaIO vgaIO, int colorIndex, int r, int g, int b) {
+        final RadeonVgaIO io = (RadeonVgaIO)vgaIO;
+        io.setPaletteEntry(colorIndex, r, g, b);
     }
 }

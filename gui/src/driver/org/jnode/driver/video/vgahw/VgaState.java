@@ -223,7 +223,7 @@ public class VgaState {
 	}
 
 	protected void savePalette(VgaIO io) {
-		final int size = 256;
+		final int size = getPaletteSize(io);
 		final byte[] r = new byte[size];
 		final byte[] g = new byte[size];
 		final byte[] b = new byte[size];
@@ -232,6 +232,15 @@ public class VgaState {
 		}
 		//log.debug("Save-Size:" + size + ", R=" + NumberUtils.hex(r));
 		palette = new IndexColorModel(32/*6*/, size, r, g, b);
+	}
+
+	/**
+	 * Gets the length of the palette.
+	 * @param io
+	 * @return
+	 */
+	protected int getPaletteSize(VgaIO io) {
+		return 256;
 	}
 
 	protected void restorePalette(VgaIO io) {
@@ -250,7 +259,7 @@ public class VgaState {
 		}
 	}
 
-	private final void setPaletteEntry(VgaIO io, int colorIndex, int r, int g, int b) {
+	protected void setPaletteEntry(VgaIO io, int colorIndex, int r, int g, int b) {
 		io.setDACWriteIndex(colorIndex);
 		io.setDACData(r);
 		io.setDACData(g);

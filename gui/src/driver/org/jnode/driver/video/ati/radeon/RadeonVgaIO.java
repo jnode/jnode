@@ -217,4 +217,24 @@ public class RadeonVgaIO implements VgaIO, VgaConstants, RadeonConstants {
     final void setVideoRam(MemoryResource videoRam) {
         this.videoRam = videoRam;
     }
+
+    /**
+     * Gets a palette entry.
+     */
+    final void getPaletteEntry(int colorIndex, byte[] r,
+            byte[] g, byte[] b) {
+        setReg32(PALETTE_INDEX, colorIndex);
+        final int v = getReg32(PALETTE_DATA);
+        r[colorIndex] = (byte)((v >> 16) & 0xFF);
+        g[colorIndex] = (byte)((v >> 8) & 0xFF);
+        b[colorIndex] = (byte)(v & 0xFF);
+    }
+        /**
+     * Sets a palette entry.
+     * This method assumes 8-bit palette entries.
+     */
+    final void setPaletteEntry(int colorIndex, int r, int g, int b) {
+        setReg32(PALETTE_INDEX, colorIndex);
+        setReg32(PALETTE_DATA, ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF));
+    }
 }
