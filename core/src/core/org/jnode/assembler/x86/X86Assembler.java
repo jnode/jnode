@@ -700,6 +700,14 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeCDQ();
 
 	/**
+	 * Create a cdqe.
+	 * Sign extend EAX to RAX.
+	 * Only valid in 64-bit mode.
+	 */
+	public abstract void writeCDQE()
+	throws InvalidOpcodeException;
+
+	/**
 	 * Create a CMOVcc dst,src
 	 * 
 	 * @param ccOpcode

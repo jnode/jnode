@@ -28,6 +28,7 @@ import org.jnode.util.Counter;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.classmgr.VmConstString;
+import org.jnode.vm.compiler.IllegalModeException;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -166,7 +167,10 @@ final class ItemFactory {
      * @param lsb
      * @param msb
      */
-    public DoubleWordItem createReg(int jvmType, X86Register.GPR lsb, X86Register.GPR msb) {
+    public DoubleWordItem createReg(EmitterContext ec, int jvmType, X86Register.GPR lsb, X86Register.GPR msb) {
+    	if (!ec.getStream().isCode32()) {
+    		throw new IllegalModeException("Only supported in 32-bit mode");
+    	}
         final DoubleWordItem item = (DoubleWordItem) getOrCreate(jvmType);
         item.initialize(Item.Kind.GPR, 0, lsb, msb, null, null);
         return item;

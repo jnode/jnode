@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Assembler;
@@ -40,15 +40,16 @@ final class DoubleItem extends DoubleWordItem {
 	 * Initialize a blank item.
 	 */
 	DoubleItem(ItemFactory factory) {
-	    super(factory);
+		super(factory);
 	}
-	
+
 	/**
 	 * @param kind
 	 * @param offsetToFP
 	 * @param value
 	 */
-	final void initialize(int kind, int offsetToFP, X86Register.GPR lsb, X86Register.GPR msb, X86Register.GPR64 reg, X86Register.XMM xmm,
+	final void initialize(int kind, int offsetToFP, X86Register.GPR lsb,
+			X86Register.GPR msb, X86Register.GPR64 reg, X86Register.XMM xmm,
 			double value) {
 		super.initialize(kind, offsetToFP, lsb, msb, reg, xmm);
 		this.value = value;
@@ -76,7 +77,8 @@ final class DoubleItem extends DoubleWordItem {
 	 * @return
 	 */
 	double getValue() {
-	    if (Vm.VerifyAssertions) Vm._assert(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
+		if (Vm.VerifyAssertions)
+			Vm._assert(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
 		return value;
 	}
 
@@ -87,8 +89,8 @@ final class DoubleItem extends DoubleWordItem {
 	 * @param lsb
 	 * @param msb
 	 */
-	protected final void loadToConstant32(EmitterContext ec,
-			X86Assembler os, GPR32 lsb, GPR32 msb) {
+	protected final void loadToConstant32(EmitterContext ec, X86Assembler os,
+			GPR32 lsb, GPR32 msb) {
 		final long lvalue = Double.doubleToLongBits(value);
 		final int lsbv = (int) (lvalue & 0xFFFFFFFFL);
 		final int msbv = (int) ((lvalue >>> 32) & 0xFFFFFFFFL);
@@ -103,8 +105,8 @@ final class DoubleItem extends DoubleWordItem {
 	 * @param os
 	 * @param reg
 	 */
-	protected final void loadToConstant64(EmitterContext ec,
-			X86Assembler os, GPR64 reg) {
+	protected final void loadToConstant64(EmitterContext ec, X86Assembler os,
+			GPR64 reg) {
 		final long lvalue = Double.doubleToLongBits(value);
 		os.writeMOV_Const(reg, lvalue);
 	}
@@ -129,8 +131,14 @@ final class DoubleItem extends DoubleWordItem {
 		final long lvalue = Double.doubleToLongBits(value);
 		final int lsbv = (int) (lvalue & 0xFFFFFFFFL);
 		final int msbv = (int) ((lvalue >>> 32) & 0xFFFFFFFFL);
-		os.writePUSH(msbv);
-		os.writePUSH(lsbv);
+		if (os.isCode32()) {
+			os.writePUSH(msbv);
+			os.writePUSH(lsbv);
+		} else {
+			os.writeLEA(X86Register.RSP, X86Register.RSP, -8);
+			os.writeMOV_Const(BITS32, X86Register.RSP, LSB, lsbv);
+			os.writeMOV_Const(BITS32, X86Register.RSP, MSB, msbv);
+		}
 	}
 
 	/**

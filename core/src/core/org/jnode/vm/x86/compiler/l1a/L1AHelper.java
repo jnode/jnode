@@ -21,9 +21,11 @@
  
 package org.jnode.vm.x86.compiler.l1a;
 
+import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
+import org.jnode.vm.compiler.IllegalModeException;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -56,13 +58,21 @@ final class L1AHelper {
 	static final DoubleWordItem requestDoubleWordRegisters(
 			EmitterContext eContext, int jvmType) {
 		final X86RegisterPool pool = eContext.getGPRPool();
+		final X86Assembler os = eContext.getStream();
 		final ItemFactory ifac = eContext.getItemFactory();
-		final X86Register.GPR lsb = (X86Register.GPR)requestRegister(eContext, JvmType.INT, false);
-		final X86Register.GPR msb = (X86Register.GPR)requestRegister(eContext, JvmType.INT, false);
-		final DoubleWordItem result = ifac.createReg(jvmType, lsb,
-				msb);
-		pool.transferOwnerTo(lsb, result);
-		pool.transferOwnerTo(msb, result);
+		final DoubleWordItem result;
+		if (os.isCode32()) {
+			final X86Register.GPR lsb = (X86Register.GPR)requestRegister(eContext, JvmType.INT, false);
+			final X86Register.GPR msb = (X86Register.GPR)requestRegister(eContext, JvmType.INT, false);
+			result = ifac.createReg(eContext, jvmType, lsb,
+					msb);
+			pool.transferOwnerTo(lsb, result);
+			pool.transferOwnerTo(msb, result);
+		} else {
+			final GPR64 reg = (GPR64)requestRegister(eContext, jvmType, false);
+			result = ifac.createReg(jvmType, reg);
+			pool.transferOwnerTo(reg, result);
+		}
 		return result;
 	}
 
@@ -71,11 +81,14 @@ final class L1AHelper {
 	 */
 	static final DoubleWordItem requestDoubleWordRegisters(
 			EmitterContext eContext, int jvmType, X86Register.GPR lsb, X86Register.GPR msb) {
+		if (!eContext.getStream().isCode32()) {
+			throw new IllegalModeException("Only support in 32-bit mode");
+		}
 		final X86RegisterPool pool = eContext.getGPRPool();
 		final ItemFactory ifac = eContext.getItemFactory();
 		requestRegister(eContext, lsb);
 		requestRegister(eContext, msb);
-		final DoubleWordItem result = ifac.createReg(jvmType, lsb,
+		final DoubleWordItem result = ifac.createReg(eContext, jvmType, lsb,
 				msb);
 		pool.transferOwnerTo(lsb, result);
 		pool.transferOwnerTo(msb, result);
@@ -87,6 +100,9 @@ final class L1AHelper {
 	 */
 	static final DoubleWordItem requestDoubleWordRegister(
 			EmitterContext eContext, int jvmType, GPR64 reg) {
+		if (!eContext.getStream().isCode64()) {
+			throw new IllegalModeException("Only support in 64-bit mode");
+		}
 		final X86RegisterPool pool = eContext.getGPRPool();
 		final ItemFactory ifac = eContext.getItemFactory();
 		requestRegister(eContext, reg);
@@ -156,7 +172,7 @@ final class L1AHelper {
 	}
 
 	/**
-	 * Request one register for a 4-byte item.
+	 * Request one register for a single word item.
 	 */
 	static final WordItem requestWordRegister(EmitterContext eContext,
 			int jvmType, boolean supportsBits8) {
@@ -170,7 +186,7 @@ final class L1AHelper {
 	}
 
 	/**
-	 * Request specific one register for a 4-byte item.
+	 * Request specific one register for a single word item.
 	 */
 	static final WordItem requestWordRegister(EmitterContext eContext,
 			int jvmType, X86Register reg) {

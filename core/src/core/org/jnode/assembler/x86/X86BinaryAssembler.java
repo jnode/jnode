@@ -1058,6 +1058,19 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         write8(0x99);
     }
 
+	/**
+	 * Create a cdqe.
+	 * Sign extend EAX to RAX.
+	 * Only valid in 64-bit mode.
+	 */
+	public void writeCDQE()
+	throws InvalidOpcodeException {
+		if (!code64) {
+			throw new InvalidOpcodeException();
+		}
+		write8(0x98);
+	}
+
     /**
      * Create a CMOVcc dst,src
      * 

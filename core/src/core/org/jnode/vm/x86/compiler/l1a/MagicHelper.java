@@ -158,7 +158,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             L1AHelper.requestRegister(ec, r);
             final X86Register.GPR msb = (X86Register.GPR)L1AHelper.requestRegister(ec, JvmType.INT,
                     false);
-            final LongItem result = (LongItem) ifac.createReg(JvmType.LONG, r,
+            final LongItem result = (LongItem) ifac.createReg(ec, JvmType.LONG, r,
                     msb);
             os.writeXOR(msb, msb);
             pool.transferOwnerTo(r, result);
