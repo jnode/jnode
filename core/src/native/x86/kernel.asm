@@ -94,8 +94,7 @@ check_a20:
     cmp eax, dword [0x100000]
     je check_a20 ; Just loop if this is not good.
 
-    mov eax,sys_version
-    call sys_print_str
+	PRINT_STR sys_version
 
 	; Test for a valid cpu
 	call test_cpuid
@@ -105,16 +104,14 @@ check_a20:
 	; Initialize interrupt handling
 	call Lsetup_idt
 
-    mov eax,sys_version
-    call sys_print_str
+    PRINT_STR sys_version
 
 	; Initialize the FPU
 	call init_fpu
 	; Initialize SSE (if any)
 	call init_sse
 
-	mov eax,before_start_vm_msg
-	call sys_print_str
+	PRINT_STR before_start_vm_msg
 
 	; Go into userspace
 	push dword USER_DS	; old SS
@@ -133,8 +130,7 @@ check_a20:
 ;	dw USER_CS
 
 no_multiboot_loader:
-    mov eax,no_multiboot_loader_msg
-    call sys_print_str
+    PRINT_STR no_multiboot_loader_msg
     jmp _halt
 
 go_user_cs:

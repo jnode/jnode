@@ -6,18 +6,18 @@
 ; Author       : E. Prangsma
 ; -----------------------------------------------
 
-TRACE_ABSTRACT              equ 1
-TRACE_ATHROW                equ 0
-TRACE_INVOKE                equ 0
-TRACE_UNHANDLED_EXCEPTION	equ 0
-TRACE_INTERRUPTS			equ 0
+%define TRACE_ABSTRACT              1
+%define TRACE_ATHROW                0
+%define TRACE_INVOKE                0
+%define TRACE_UNHANDLED_EXCEPTION	0
+%define TRACE_INTERRUPTS			0
     
-PARANOIA					equ 1	; Be very paranoia 
-QUICK_INVOKE_OPCODES		equ 1	; Use quick opcodes for invoke opcodes
-QUICK_FIELD_OPCODES			equ 1	; Use quick opcodes for field opcodes
-TEST_STACK_OVERFLOW			equ 1	; Test for stack overflow
-FAIL_ON_ABSTRACT			equ 1	; Should the VM stop on abstract methods (1), or throw an AbstractMethodError (0)
-RECORD_INVOKE				equ 1	; Should recordInvoke() be called on method that have ACC_PROFILE set? (default 1)
+; PARANOIA					equ 1	; Be very paranoia 
+; QUICK_INVOKE_OPCODES		equ 1	; Use quick opcodes for invoke opcodes
+; QUICK_FIELD_OPCODES			equ 1	; Use quick opcodes for field opcodes
+; TEST_STACK_OVERFLOW			equ 1	; Test for stack overflow
+%define FAIL_ON_ABSTRACT			1	; Should the VM stop on abstract methods (1), or throw an AbstractMethodError (0)
+; RECORD_INVOKE				equ 1	; Should recordInvoke() be called on method that have ACC_PROFILE set? (default 1)
 
 MAX_STACK_TRACE_LENGTH		equ 30	; Maximum methods shown in a low-level stacktrace
 
@@ -29,7 +29,6 @@ bits 32
  
 	section .text
 
-;    org 0x100000
 kernel_begin:
     
 %include "i386.h"
@@ -37,6 +36,7 @@ kernel_begin:
 %include "syscall.h"
 %include "lock.h"
 %include "java.inc"
+%include "console.h"
 
 ; ----------------------
 ; JNode specifics
@@ -72,48 +72,14 @@ CURPROC_FS  equ 0x33
 %include "version.asm"
 %include "syscall.asm" 
 
-%define VMI_METHOD		dword [ebp+VmX86StackReader_METHOD_OFFSET]
-%define VMI_PC			dword [ebp+VmX86StackReader_PC_OFFSET]
-%define VMI_MAGIC		dword [ebp+VmX86StackReader_MAGIC_OFFSET]
-%define VMI_PREV_FRAME	 [ebp+VmX86StackReader_PREVIOUS_OFFSET]
+;%define VMI_METHOD		dword [ebp+VmX86StackReader_METHOD_OFFSET]
+;%define VMI_MAGIC		dword [ebp+VmX86StackReader_MAGIC_OFFSET]
+;%define VMI_PREV_FRAME	 [ebp+VmX86StackReader_PREVIOUS_OFFSET]
 %define THREADSWITCHINDICATOR	dword[fs:VmProcessor_THREADSWITCHINDICATOR_OFFSET*4]
 %define CURRENTPROCESSOR		dword[fs:VmProcessor_ME_OFFSET*4]
 %define CURRENTTHREAD			dword[fs:VmProcessor_CURRENTTHREAD_OFFSET*4]
 %define NEXTTHREAD				dword[fs:VmProcessor_NEXTTHREAD_OFFSET*4]
 %define STACKEND 				dword[fs:VmProcessor_STACKEND_OFFSET*4]
-; %define VMI_SAVED_REGISTERSPACE	12
-
-; UnConditional yieldpoint from an interpreted method
-; Register EBX and ECX are used and are not saved here!
-%macro VMI_YIELDPOINT 0
-	; Is a switch required?
-	mov ecx,VMI_METHOD
-	mov ebx,THREADSWITCHINDICATOR
-	; Use the mask from the current method
-	and ebx,[ecx+VmMethod_THREADSWITCHINDICATORMASK_OFFSET*4]
-	cmp ebx,VmProcessor_TSI_SWITCH_REQUESTED
-	jne %%noYieldPoint
-	int 0x30
-%%noYieldPoint:
-%endmacro
-
-; UnConditional yieldpoint 
-%macro UNCOND_YIELDPOINT 0
-	; Is a switch required?
-	cmp THREADSWITCHINDICATOR,VmProcessor_TSI_SWITCH_REQUESTED
-	jne %%noYieldPoint
-	int 0x30
-%%noYieldPoint:
-%endmacro
-
-; Conditional yieldpoint, only when given register is negative,
-; a yieldpoint is triggered.
-%macro COND_VMI_YIELDPOINT 1
-	test %1,%1
-	jns %%done
-	VMI_YIELDPOINT
-%%done:
-%endmacro
 
 	extern SoftByteCodes_allocArray
 	extern SoftByteCodes_allocMultiArray

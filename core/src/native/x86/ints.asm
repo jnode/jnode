@@ -100,13 +100,11 @@ inthandler_ret:
     int_exit
     
 kernel_panic:
-	mov eax,kernel_panic_msg
-	call sys_print_str
+	PRINT_STR kernel_panic_msg
 	jmp int_die
 	
 kernel_irq_panic:
-	mov eax,kernel_irq_panic_msg
-	call sys_print_str
+	PRINT_STR kernel_irq_panic_msg
 	jmp int_die
 	
 kernel_panic_msg: db 'Kernel panic!',0xd,0xa,0
@@ -125,26 +123,19 @@ int_die:
 int_die_halt:
 	cli
 	mov dword [int_die_halted],1
-	mov eax,int_die_halt_msg
-	call sys_print_str
+	PRINT_STR int_die_halt_msg
 	hlt
 
 int_die_halt_msg: db 'Real panic: int_die_halt!',0
 
 %macro idm_print_reg 2
-	push eax
-	mov eax,idm_%1
-	call sys_print_str
-	pop eax
+	PRINT_STR idm_%1
 	mov eax,%2
 	call sys_print_eax
 %endmacro
 
 %macro idm_print_byte 2
-	push eax
-	mov eax,idm_%1
-	call sys_print_str
-	pop eax
+	PRINT_STR idm_%1
 	movzx eax,byte %2
 	call sys_print_al
 %endmacro
@@ -266,8 +257,7 @@ irqhandler_suspend:
 	; Test for resume overruns
 	test eax,eax
 	jz inthandler_ret ; No overrun, finish int handler
-	mov eax,irq_resume_overrun_msg
-	call sys_print_str
+	PRINT_STR irq_resume_overrun_msg
 	jmp inthandler_ret
 
 irq_suspend_msg: db 'IRQ suspend!',0
@@ -508,8 +498,7 @@ d2:
 int_debug:
 	jmp int_die
     mov ebp,eax
-    mov eax,dbg_msg1
-    call sys_print_str
+    PRINT_STR dbg_msg1
 	mov eax,[ebp+OLD_EIP]
 	call sys_print_eax
 	mov eax,[ebp+OLD_EAX]
@@ -522,8 +511,7 @@ int_debug:
 	call sys_print_eax
 	mov eax,[ebp+OLD_ESP]
 	call sys_print_eax
-    mov eax,dbg_msg2
-    call sys_print_str
+    PRINT_STR dbg_msg2
 	ret
 
 dbg_msg1: db 'debug eip,eabcdx,sp=',0
@@ -535,14 +523,12 @@ dbg_msg2: db 0xd,0xa,0
 ; ---------------------------
 int_bp:
     mov ebp,eax
-    mov eax,bp_msg1
-    call sys_print_str
+    PRINT_STR bp_msg1
 	mov eax,[ebp+OLD_EIP]
 	call sys_print_eax
 	mov eax,[ebp+OLD_EAX]
 	call sys_print_eax
-    mov eax,bp_msg2
-    call sys_print_str
+    PRINT_STR bp_msg2
     call sys_print_intregs
 	ret
 

@@ -301,7 +301,11 @@ Q43org5jnode2vm6Unsafe23getCurrentProcessor2e2829Lorg2fjnode2fvm2fVmProcessor3b:
 
 ; Force a yieldpoint
 Q43org5jnode2vm6Unsafe23yieldPoint2e2829V:
-	UNCOND_YIELDPOINT
+	; Is a switch required?
+	cmp THREADSWITCHINDICATOR,VmProcessor_TSI_SWITCH_REQUESTED
+	jne noYieldPoint
+	int 0x30
+noYieldPoint:
 	ret	
 
 ; Address getJumpTable0()	

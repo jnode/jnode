@@ -52,8 +52,7 @@ stub_yieldPointHandler:
 %endmacro
 
 yieldPointHandler_kernelCode:
-	mov eax,yp_kernel_msg
-	call sys_print_str
+	PRINT_STR yp_kernel_msg
 	jmp int_die
 	
 yieldPointHandler:
@@ -231,8 +230,7 @@ timer_deadlock:
 	mov eax,dword [jnodeFinished]
 	test eax,eax
 	jnz timer_ret
-	mov eax,deadLock_msg
-	call sys_print_str
+	PRINT_STR deadLock_msg
 	jmp int_die
 	
 ; -----------------------------------------------
@@ -251,8 +249,7 @@ def_irq_handler:
 	ret
 	
 def_irq_kernel:
-	mov eax,irq_kernel_msg
-	call sys_print_str
+	PRINT_STR irq_kernel_msg
 	ret
 	
 ; -----------------------------------------------
@@ -324,8 +321,7 @@ int_stack_first_overflow:
 	jmp int_system_exception
 	
 doFatal_stack_overflow:
-	mov eax,fatal_so_msg
-	call sys_print_str
+	PRINT_STR fatal_so_msg
 	;call vmint_print_stack
 	jmp int_die
 	cli

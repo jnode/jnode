@@ -1,313 +1,280 @@
 <project name="JNode-x86" default="all" basedir=".">
 
-  <property name="my-build.dir"     value="${build.dir}/x86"/>
-  <property name="my-lib.dir"       value="${basedir}/lib/x86"/>
-  <property name="my-conf.dir"      value="${basedir}/conf/x86"/>
+	<property name="my-build.dir" value="${build.dir}/x86" />
+	<property name="my-lib.dir" value="${basedir}/lib/x86" />
+	<property name="my-conf.dir" value="${basedir}/conf/x86" />
 
-  <property name="src.native.dir"   value="${root.dir}/core/src/native"/>
-  <property name="build.netboot.dir" value="${my-build.dir}/netboot"/>
-  <property name="jnode.disk"     value="${my-build.dir}/jnodedisk.dat"/>
-  <property name="jnode.disk.pln" value="${my-build.dir}/jnodedisk.pln"/>
-  <property name="jnode.disk.geometry" value="64/16/63"/>
+	<property name="src.native.dir" value="${root.dir}/core/src/native" />
+	<property name="build.netboot.dir" value="${my-build.dir}/netboot" />
+	<property name="jnode.disk" value="${my-build.dir}/jnodedisk.dat" />
+	<property name="jnode.disk.pln" value="${my-build.dir}/jnodedisk.pln" />
+	<property name="jnode.disk.geometry" value="64/16/63" />
 
-  <property name="grub-ver"     value="grub-0.93-i386-pc"/>
-  <property name="grub.dir"     value="${my-build.dir}/${grub-ver}/boot/grub"/>
-  <property name="grub.dist"    value="${my-lib.dir}/${grub-ver}.tar.gz"/>
+	<property name="grub-ver" value="grub-0.93-i386-pc" />
+	<property name="grub.dir" value="${my-build.dir}/${grub-ver}/boot/grub" />
+	<property name="grub.dist" value="${my-lib.dir}/${grub-ver}.tar.gz" />
 
-  <property name="grub.stage1.name"  value="stage1"/>
-  <property name="grub.stage2.name"  value="stage2"/>
-  <property name="grub.menu"    value="${my-conf.dir}/menu.lst"/>
-  <property name="grub.menu.cdrom"    value="${my-conf.dir}/menu-cdrom.lst"/>
+	<property name="grub.stage1.name" value="stage1" />
+	<property name="grub.stage2.name" value="stage2" />
+	<property name="grub.menu" value="${my-conf.dir}/menu.lst" />
+	<property name="grub.menu.cdrom" value="${my-conf.dir}/menu-cdrom.lst" />
 
-  <!-- Properties for building the boot files for windows NT/2K/XP -->
-  <property name="partition-nt"   value="(hd0,0)"/>  
-  <property name="jnode.install-nt.dir" value="C:\jnode"/>
-  
-  <property name="bin-nt.dir"     value="${basedir}\bin-nt"/>
-  <property name="conf-nt.dir"    value="${basedir}\conf\x86-nt"/>  
-  <property name="lib-nt.dir"     value="${basedir}\lib\x86-nt"/>
-  
-  <property name="grub.stage1-nt.name"  value="stage1-nt"/>
-  <property name="grub.stage2-nt.name"  value="stage2-nt"/>
-  <property name="grub.menu-nt.name"    value="menu-nt.lst"/>
-  
-  <property name="grub.stage1-nt"  value="${lib-nt.dir}\${grub.stage1-nt.name}"/>
-  <property name="grub.stage2-nt"  value="${lib-nt.dir}\${grub.stage2-nt.name}"/>
-  <property name="grub.menu-nt"    value="${conf-nt.dir}\${grub.menu-nt.name}"/>
-  
-  <property name="grub.install-nt.exe"  value="${bin-nt.dir}\grubinstall-nt.exe"/>
-  <!-- end of Properties for building the boot files for windows NT/2K/XP -->
-  
-  <path id="cp-x86">
-    <pathelement location="${jnode-builder.jar}"/>
-    <pathelement location="${jnode-core.jar}"/>
-    <pathelement location="${jnode-fs.jar}"/>
-    <pathelement location="${jnode-shell.jar}"/>
-    <pathelement location="${jnode-net.jar}"/>
-    <pathelement location="${jnode-gui.jar}"/>
-    <path refid="cp"/>
-    <pathelement location="${my-conf.dir}"/>
-    <pathelement location="${grub.dir}"/>
-    <pathelement location="${descriptors.dir}"/>
-    <pathelement location="${dom4j.jar}"/>
-  </path>
+	<!-- Properties for building the boot files for windows NT/2K/XP -->
+	<property name="partition-nt" value="(hd0,0)" />
+	<property name="jnode.install-nt.dir" value="C:\jnode" />
 
-  <target name="test-properties">
-    <condition property="x86-properties.exists">
-      <available file="build-x86.properties"/>
-    </condition>
-  </target>
-  <target name="load-properties" if="x86-properties.exists">
-    <property file="build-x86.properties"/>
-  </target>
-  <target name="default-properties" unless="x86-properties.exists">
-    <property name="jnodedrive.dir" value="${my-build.dir}"/>
-  </target>
+	<property name="bin-nt.dir" value="${basedir}\bin-nt" />
+	<property name="conf-nt.dir" value="${basedir}\conf\x86-nt" />
+	<property name="lib-nt.dir" value="${basedir}\lib\x86-nt" />
 
-  <target name="prepare-props" depends="test-properties,load-properties,default-properties">
-    <property name="jnode.bits"     value="32"/>
-    <property name="jnode.kernel"   value="${jnodedrive.dir}/jnode${jnode.bits}.gz"/>
-    <property name="jnode.compiler"  value="default"/>
-    
-    <property name="build.native.dir" value="${my-build.dir}/${jnode.bits}bits/native"/>
-    <property name="build.bootimage.dir" value="${my-build.dir}/${jnode.bits}bits/bootimage"/>
-  </target>
+	<property name="grub.stage1-nt.name" value="stage1-nt" />
+	<property name="grub.stage2-nt.name" value="stage2-nt" />
+	<property name="grub.menu-nt.name" value="menu-nt.lst" />
 
-<!-- Initialize all project directories -->
-  <target name="prepare-dirs" depends="prepare-props">
-    <mkdir dir="${build.native.dir}"/>
-    <mkdir dir="${build.native.dir}/output"/>
-    <mkdir dir="${build.native.dir}/src"/>
-    <mkdir dir="${build.bootimage.dir}"/>
-    <mkdir dir="${build.netboot.dir}"/>
-  </target>
+	<property name="grub.stage1-nt" value="${lib-nt.dir}\${grub.stage1-nt.name}" />
+	<property name="grub.stage2-nt" value="${lib-nt.dir}\${grub.stage2-nt.name}" />
+	<property name="grub.menu-nt" value="${conf-nt.dir}\${grub.menu-nt.name}" />
 
-  <target name="test-grub">
-    <available file="${grub.dir}" property="grub.exists"/>
-  </target>
+	<property name="grub.install-nt.exe" value="${bin-nt.dir}\grubinstall-nt.exe" />
+	<!-- end of Properties for building the boot files for windows NT/2K/XP -->
 
-  <target name="grub" depends="prepare-dirs,test-grub" unless="grub.exists">
-	<untar src="${grub.dist}" dest="${my-build.dir}" compression="gzip"/>
-  </target>
+	<path id="cp-x86">
+		<pathelement location="${jnode-builder.jar}" />
+		<pathelement location="${jnode-core.jar}" />
+		<pathelement location="${jnode-fs.jar}" />
+		<pathelement location="${jnode-shell.jar}" />
+		<pathelement location="${jnode-net.jar}" />
+		<pathelement location="${jnode-gui.jar}" />
+		<path refid="cp" />
+		<pathelement location="${my-conf.dir}" />
+		<pathelement location="${grub.dir}" />
+		<pathelement location="${descriptors.dir}" />
+		<pathelement location="${dom4j.jar}" />
+	</path>
 
-<!-- Initialize all project properties -->
-  <target name="prepare" depends="grub">
-    <copy todir="${grub.dir}">
-      <fileset dir="${my-lib.dir}">
-        <include name="nbgrub-*"/>
-        <include name="pxegrub-*"/>
-     </fileset>
-      <fileset dir="${my-conf.dir}">
-        <include name="menu-nb.lst"/>
-        <include name="menu-pxe.lst*"/>
-      </fileset>
-    </copy>
-  </target>
+	<target name="test-properties">
+		<condition property="x86-properties.exists">
+			<available file="build-x86.properties" />
+		</condition>
+	</target>
+	<target name="load-properties" if="x86-properties.exists">
+		<property file="build-x86.properties" />
+	</target>
+	<target name="default-properties" unless="x86-properties.exists">
+		<property name="jnodedrive.dir" value="${my-build.dir}" />
+	</target>
 
-  <target name="asm-native" depends="prepare">
-    <taskdef name="genconst"
-             classname="org.jnode.build.x86.AsmConstBuilder"
-             classpathref="cp-x86"/>
-    <taskdef name="asm"
-             classname="org.jnode.ant.taskdefs.Asm"
-             classpathref="cp-x86"/>
+	<target name="prepare-props" depends="test-properties,load-properties,default-properties">
+		<property name="jnode.bits" value="32" />
+		<property name="jnode.kernel" value="${jnodedrive.dir}/jnode${jnode.bits}.gz" />
+		<property name="jnode.compiler" value="default" />
 
-    <genconst destfile="${build.native.dir}/src/java.inc"
-              classesURL="file:///${jnode-core.jar}/">
-      <class classname="org.jnode.boot.Main" static="on"/>
-      <class classname="org.jnode.vm.classmgr.TIBLayout" static="on"/>
-      <class classname="org.jnode.vm.classmgr.VmByteCode"/>
-      <class classname="org.jnode.vm.classmgr.VmConstFieldRef"/>
-      <class classname="org.jnode.vm.classmgr.VmConstMethodRef"/>
-      <class classname="org.jnode.vm.classmgr.VmConstIMethodRef"/>
-      <class classname="org.jnode.vm.classmgr.VmCP"/>
-      <class classname="org.jnode.vm.classmgr.VmField"/>
-      <class classname="org.jnode.vm.classmgr.VmInstanceField"/>
-      <class classname="org.jnode.vm.classmgr.VmStaticField"/>
-      <class classname="org.jnode.vm.classmgr.VmMember"/>
-      <class classname="org.jnode.vm.classmgr.VmMethod"/>
-      <class classname="org.jnode.vm.classmgr.VmInstanceMethod"/>
-      <class classname="org.jnode.vm.classmgr.VmType"/>
-      <class classname="org.jnode.vm.VmProcessor"/>
-      <class classname="org.jnode.vm.VmProcessor" static="on"/>
-      <class classname="org.jnode.vm.VmThread"/>
-      <class classname="org.jnode.build.x86.BootImageBuilder" static="on"/>
-      <class classname="org.jnode.vm.VmStackFrame" static="on"/>
-      <class classname="org.jnode.vm.VmSystem" static="on"/>
-      <class classname="org.jnode.vm.VmThread" static="on"/>
-      <class classname="org.jnode.vm.bytecode.BytecodeParser" static="on"/>
-      <class classname="org.jnode.vm.classmgr.VmCP" static="on"/>
-      <class classname="org.jnode.vm.classmgr.Modifier" static="on"/>
-      <class classname="org.jnode.vm.classmgr.VmArray" static="on"/>
-      <class classname="org.jnode.vm.classmgr.ObjectLayout" static="on"/>
-      <class classname="org.jnode.vm.SoftByteCodes" static="on"/>
-      <class classname="org.jnode.vm.x86.VmX86Processor"/>
-      <class classname="org.jnode.vm.x86.VmX86StackReader" static="on"/>
-      <class classname="org.jnode.vm.x86.VmX86Thread"/>
-      <class classname="org.jnode.vm.x86.VmX86Thread" static="on"/>
-      <class classname="java.lang.Integer"/>
-      <class classname="java.lang.Long"/>
-      <class classname="java.lang.String"/>
-      <class classname="java.lang.Throwable"/>
-    </genconst>
+		<property name="build.native.dir" value="${my-build.dir}/${jnode.bits}bits/native" />
+		<property name="build.bootimage.dir" value="${my-build.dir}/${jnode.bits}bits/bootimage" />
+	</target>
 
-	<dependset>
-       <srcfileset dir="${src.native.dir}/x86"/>
-       <srcfileset dir="${build.native.dir}/src"/>
-       <targetfileset dir="${build.native.dir}/output"/>
-    </dependset>
+	<!-- Initialize all project directories -->
+	<target name="prepare-dirs" depends="prepare-props">
+		<mkdir dir="${build.native.dir}" />
+		<mkdir dir="${build.native.dir}/output" />
+		<mkdir dir="${build.native.dir}/src" />
+		<mkdir dir="${build.bootimage.dir}" />
+		<mkdir dir="${build.netboot.dir}" />
+	</target>
 
-    <asm srcdir="${src.native.dir}/x86"
-         destdir="${build.native.dir}/output"
-         outputFormat="elf"
-         extension="o"
-         bits="${jnode.bits}"
-         listfile="${build.native.dir}/jnodenative.lst">
-      <includedir dir="${src.native.dir}/x86"/>
-      <includedir dir="${build.native.dir}/src"/>
-      <include name="jnode.asm"/>
-    </asm>
-  </target>
+	<target name="test-grub">
+		<available file="${grub.dir}" property="grub.exists" />
+	</target>
 
-  <!-- Build the java object file  -->
-  <target name="java-image" depends="asm-native">
-    <taskdef name="bootimage" classname="org.jnode.build.x86.BootImageBuilder" classpathref="cp-x86"/>
-    <taskdef name="bootjar" classname="org.jnode.build.BootJarBuilder" classpathref="cp-x86"/>
-    
-    <bootjar destfile="${build.bootimage.dir}/jnode-boot.jar"
-             pluginList="${system-plugin-list}"
-             pluginDir="${plugins.dir}"
-             targetArch="x86">
-    </bootjar>
+	<target name="grub" depends="prepare-dirs,test-grub" unless="grub.exists">
+		<untar src="${grub.dist}" dest="${my-build.dir}" compression="gzip" />
+	</target>
 
-    <bootimage destfile="${build.bootimage.dir}/bootimage.bin"
-               listfile="${build.bootimage.dir}/bootimage.lst"
-               debugfile="${build.bootimage.dir}/bootimage.debug"
-               kernelfile="${build.native.dir}/output/jnode.o"
-               jarfile="${build.bootimage.dir}/jnode-boot.jar"
-               classesURL="jar:file:///${build.bootimage.dir}/jnode-boot.jar!/"
-               pluginList="${system-plugin-list}"
-               pluginDir="${plugins.dir}"
-	           targetArch="x86"
-	           cpu="${cpu}"
-	           version="${jnode-ver}"
-    		   jnodeCompiler="${jnode.compiler}" 	
-    		   bits="${jnode.bits}"
-               />
+	<!-- Initialize all project properties -->
+	<target name="prepare" depends="grub">
+		<copy todir="${grub.dir}">
+			<fileset dir="${my-lib.dir}">
+				<include name="nbgrub-*" />
+				<include name="pxegrub-*" />
+			</fileset>
+			<fileset dir="${my-conf.dir}">
+				<include name="menu-nb.lst" />
+				<include name="menu-pxe.lst*" />
+			</fileset>
+		</copy>
+	</target>
 
-    <gzip src="${build.bootimage.dir}/bootimage.bin" zipfile="${jnode.kernel}"/>
-  </target>
+	<target name="asm-native" depends="prepare">
+		<taskdef name="genconst" classname="org.jnode.build.x86.AsmConstBuilder" classpathref="cp-x86" />
+		<taskdef name="asm" classname="org.jnode.ant.taskdefs.Asm" classpathref="cp-x86" />
 
-  <!-- Build the boot disk -->
-  <target name="boot-disk" depends="java-image">
-    <taskdef name="bootdisk"
-             classname="org.jnode.build.BootDiskBuilder"
-             classpathref="cp-x86"/>
-             
-    <property name="bootdisk.dir" value="${my-build.dir}/bootdisk"/>
-             
-    <mkdir dir="${bootdisk.dir}"/>
-    <mkdir dir="${bootdisk.dir}/boot/grub"/>
-    <copy file="${jnode.kernel}" todir="${bootdisk.dir}"/>
-    <copy file="${grub.menu}" todir="${bootdisk.dir}/boot/grub"/>
-    <copy todir="${bootdisk.dir}">
-      <fileset dir="${initjars.dir}"/>
-    </copy>
-             
-    <bootdisk destfile="${jnode.disk}"
-              stage1ResourceName="${grub.stage1.name}"
-              stage2ResourceName="${grub.stage2.name}"
-              plnfile="${jnode.disk.pln}"
-              geometry="${jnode.disk.geometry}">
-      <fileset dir="${bootdisk.dir}"/>
-    </bootdisk>
-  </target>
+		<genconst destfile="${build.native.dir}/src/java.inc" bits="${jnode.bits}" classesURL="file:///${jnode-core.jar}/">
+			<class classname="org.jnode.boot.Main" static="on" />
+			<class classname="org.jnode.vm.classmgr.TIBLayout" static="on" />
+			<class classname="org.jnode.vm.classmgr.VmByteCode" />
+			<class classname="org.jnode.vm.classmgr.VmConstFieldRef" />
+			<class classname="org.jnode.vm.classmgr.VmConstMethodRef" />
+			<class classname="org.jnode.vm.classmgr.VmConstIMethodRef" />
+			<class classname="org.jnode.vm.classmgr.VmCP" />
+			<class classname="org.jnode.vm.classmgr.VmField" />
+			<class classname="org.jnode.vm.classmgr.VmInstanceField" />
+			<class classname="org.jnode.vm.classmgr.VmStaticField" />
+			<class classname="org.jnode.vm.classmgr.VmMember" />
+			<class classname="org.jnode.vm.classmgr.VmMethod" />
+			<class classname="org.jnode.vm.classmgr.VmInstanceMethod" />
+			<class classname="org.jnode.vm.classmgr.VmType" />
+			<class classname="org.jnode.vm.VmProcessor" />
+			<class classname="org.jnode.vm.VmProcessor" static="on" />
+			<class classname="org.jnode.vm.VmThread" />
+			<class classname="org.jnode.build.x86.BootImageBuilder" static="on" />
+			<class classname="org.jnode.vm.VmStackFrame" static="on" />
+			<class classname="org.jnode.vm.VmSystem" static="on" />
+			<class classname="org.jnode.vm.VmThread" static="on" />
+			<class classname="org.jnode.vm.bytecode.BytecodeParser" static="on" />
+			<class classname="org.jnode.vm.classmgr.VmCP" static="on" />
+			<class classname="org.jnode.vm.classmgr.Modifier" static="on" />
+			<class classname="org.jnode.vm.classmgr.VmArray" static="on" />
+			<class classname="org.jnode.vm.classmgr.ObjectLayout" static="on" />
+			<class classname="org.jnode.vm.SoftByteCodes" static="on" />
+			<class classname="org.jnode.vm.x86.VmX86Processor" />
+			<class classname="org.jnode.vm.x86.VmX86StackReader" static="on" />
+			<class classname="org.jnode.vm.x86.VmX86Thread" />
+			<class classname="org.jnode.vm.x86.VmX86Thread" static="on" />
+			<class classname="java.lang.Integer" />
+			<class classname="java.lang.Long" />
+			<class classname="java.lang.String" />
+			<class classname="java.lang.Throwable" />
+		</genconst>
 
-<!-- Build the boot files for windows NT/2K/XP (with NTLDR) -->
-  <target name="boot-files-winNT" depends="java-image">
-    <mkdir dir="${jnode.install-nt.dir}"/>
-    <copy file="${jnode.kernel}" todir="${jnode.install-nt.dir}"/>
-    <copy file="${grub.menu-nt}" todir="${jnode.install-nt.dir}"/>
-    <copy todir="${jnode.install-nt.dir}">
-      <fileset dir="${initjars.dir}"/>
-    </copy>
+		<dependset>
+			<srcfileset dir="${src.native.dir}/x86" />
+			<srcfileset dir="${build.native.dir}/src" />
+			<targetfileset dir="${build.native.dir}/output" />
+		</dependset>
 
-    <copy file="${grub.stage1-nt}" todir="${jnode.install-nt.dir}"/>
-    <copy file="${grub.stage2-nt}" todir="${jnode.install-nt.dir}"/>
-    
-	<echo message="${grub.install-nt.exe} -d ${partition-nt} -1 ${jnode.install-nt.dir}\${grub.stage1-nt.name} -2 ${jnode.install-nt.dir}\${grub.stage2-nt.name} -m ${jnode.install-nt.dir}\${grub.menu-nt.name}"/>
+		<asm srcdir="${src.native.dir}/x86" destdir="${build.native.dir}/output" outputFormat="elf" extension="o" bits="${jnode.bits}" listfile="${build.native.dir}/jnodenative.lst">
+			<includedir dir="${src.native.dir}/x86" />
+			<includedir dir="${build.native.dir}/src" />
+			<include name="jnode.asm" />
+		</asm>
+	</target>
 
-	<!-- the following wait is needed else grubinstall will fail finding stage2 -->
-    <sleep seconds="20"/>
+	<!-- Build the java object file  -->
+	<target name="java-image" depends="asm-native">
+		<taskdef name="bootimage" classname="org.jnode.build.x86.BootImageBuilder" classpathref="cp-x86" />
+		<taskdef name="bootjar" classname="org.jnode.build.BootJarBuilder" classpathref="cp-x86" />
 
-    <exec executable="${grub.install-nt.exe}">
-      <arg line="-d ${partition-nt} -1 ${jnode.install-nt.dir}\${grub.stage1-nt.name} -2 ${jnode.install-nt.dir}\${grub.stage2-nt.name} -m ${jnode.install-nt.dir}\${grub.menu-nt.name}"/>
-    </exec>
-  </target>
-	
-  <macrodef name="create-cdrom">
-  	<attribute name="dir"/>
-  	<attribute name="destfile"/>
-  	<sequential>
-  	    <mkdir dir="@{dir}/boot/grub"/>
-  	    <copy file="${jnode.kernel}" todir="@{dir}"/>
-  	    <copy todir="@{dir}">
-  	    	<fileset dir="${initjars.dir}"/>
-  	    </copy>
-  	    <copy file="${my-lib.dir}/stage2_eltorito" todir="@{dir}/boot/grub"/>
-  	    <copy file="${grub.menu.cdrom}" tofile="@{dir}/boot/grub/menu.lst"/>
-  	    <exec executable="mkisofs">
-  	      <arg line="-o @{destfile} -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table @{dir}"/>
-  	    </exec>  		
-  	</sequential>
-  </macrodef>
+		<bootjar destfile="${build.bootimage.dir}/jnode-boot.jar" pluginList="${system-plugin-list}" pluginDir="${plugins.dir}" targetArch="x86">
+		</bootjar>
 
-<!-- Create a full distributable bootable CDROM image -->
-  <target name="cdrom" depends="boot-disk">
-    <copy file="${sources.dist.tar.gz}" todir="${my-build.dir}/cdrom-full"/>
-  	<create-cdrom destfile="${jnode-x86.iso}" dir="${my-build.dir}/cdrom-full"/>
-  </target>
+		<bootimage destfile="${build.bootimage.dir}/bootimage.bin" listfile="${build.bootimage.dir}/bootimage.lst" debugfile="${build.bootimage.dir}/bootimage.debug" kernelfile="${build.native.dir}/output/jnode.o" jarfile="${build.bootimage.dir}/jnode-boot.jar" classesURL="jar:file:///${build.bootimage.dir}/jnode-boot.jar!/" pluginList="${system-plugin-list}" pluginDir="${plugins.dir}" targetArch="x86" cpu="${cpu}" version="${jnode-ver}" jnodeCompiler="${jnode.compiler}" bits="${jnode.bits}" />
 
-<!-- Create a bootable CDROM image -->
-  <target name="cdrom-lite" depends="boot-disk">
-  	<create-cdrom destfile="${jnode-x86-lite.iso}" dir="${my-build.dir}/cdrom-lite"/>
-  </target>
+		<gzip src="${build.bootimage.dir}/bootimage.bin" zipfile="${jnode.kernel}" />
+	</target>
 
-<!-- Prepare for netboot -->
-  <target name="netboot" depends="java-image">
-    <copy file="${jnode.kernel}" todir="${build.netboot.dir}"/>
-    <copy todir="${build.netboot.dir}">
-      <fileset dir="${initjars.dir}"/>
-    </copy>
-    <copy todir="${build.netboot.dir}">
-      <fileset dir="${my-lib.dir}">
-        <include name="nbgrub-*"/>
-        <include name="pxegrub-*"/>
-     </fileset>
-      <fileset dir="${my-conf.dir}">
-        <include name="menu-nb.lst"/>
-        <include name="menu-pxe.lst*"/>
-      </fileset>
-    </copy>
-    <mkdir dir="${build.netboot.dir}/plugins"/>
-    <copy todir="${build.netboot.dir}/plugins">
-      <fileset dir="${plugins.dir}"/>
-    </copy>
-  </target>
+	<!-- Build the boot disk -->
+	<target name="boot-disk" depends="java-image">
+		<taskdef name="bootdisk" classname="org.jnode.build.BootDiskBuilder" classpathref="cp-x86" />
 
-  <target name="disasm">
-    <exec executable="ndisasm" dir="${basedir}"
-          output="${build.bootimage.dir}/bootimage.asm">
-      <arg value="-u"/>
-      <arg value="-o"/>
-      <arg value="0x100000"/>
-      <arg value="${build.bootimage.dir}/bootimage.bin"/>
-    </exec>
-  </target>
+		<property name="bootdisk.dir" value="${my-build.dir}/bootdisk" />
 
-<!-- Run all required targets -->
-  <target name="all" depends="boot-disk,netboot">
-  </target>
+		<mkdir dir="${bootdisk.dir}" />
+		<mkdir dir="${bootdisk.dir}/boot/grub" />
+		<copy file="${jnode.kernel}" todir="${bootdisk.dir}" />
+		<copy file="${grub.menu}" todir="${bootdisk.dir}/boot/grub" />
+		<copy todir="${bootdisk.dir}">
+			<fileset dir="${initjars.dir}" />
+		</copy>
+
+		<bootdisk destfile="${jnode.disk}" stage1ResourceName="${grub.stage1.name}" stage2ResourceName="${grub.stage2.name}" plnfile="${jnode.disk.pln}" geometry="${jnode.disk.geometry}">
+			<fileset dir="${bootdisk.dir}" />
+		</bootdisk>
+	</target>
+
+	<!-- Build the boot files for windows NT/2K/XP (with NTLDR) -->
+	<target name="boot-files-winNT" depends="java-image">
+		<mkdir dir="${jnode.install-nt.dir}" />
+		<copy file="${jnode.kernel}" todir="${jnode.install-nt.dir}" />
+		<copy file="${grub.menu-nt}" todir="${jnode.install-nt.dir}" />
+		<copy todir="${jnode.install-nt.dir}">
+			<fileset dir="${initjars.dir}" />
+		</copy>
+
+		<copy file="${grub.stage1-nt}" todir="${jnode.install-nt.dir}" />
+		<copy file="${grub.stage2-nt}" todir="${jnode.install-nt.dir}" />
+
+		<echo message="${grub.install-nt.exe} -d ${partition-nt} -1 ${jnode.install-nt.dir}\${grub.stage1-nt.name} -2 ${jnode.install-nt.dir}\${grub.stage2-nt.name} -m ${jnode.install-nt.dir}\${grub.menu-nt.name}" />
+
+		<!-- the following wait is needed else grubinstall will fail finding stage2 -->
+		<sleep seconds="20" />
+
+		<exec executable="${grub.install-nt.exe}">
+			<arg line="-d ${partition-nt} -1 ${jnode.install-nt.dir}\${grub.stage1-nt.name} -2 ${jnode.install-nt.dir}\${grub.stage2-nt.name} -m ${jnode.install-nt.dir}\${grub.menu-nt.name}" />
+		</exec>
+	</target>
+
+	<macrodef name="create-cdrom">
+		<attribute name="dir" />
+		<attribute name="destfile" />
+		<sequential>
+			<mkdir dir="@{dir}/boot/grub" />
+			<copy file="${jnode.kernel}" todir="@{dir}" />
+			<copy todir="@{dir}">
+				<fileset dir="${initjars.dir}" />
+			</copy>
+			<copy file="${my-lib.dir}/stage2_eltorito" todir="@{dir}/boot/grub" />
+			<copy file="${grub.menu.cdrom}" tofile="@{dir}/boot/grub/menu.lst" />
+			<exec executable="mkisofs">
+				<arg line="-o @{destfile} -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table @{dir}" />
+			</exec>
+		</sequential>
+	</macrodef>
+
+	<!-- Create a full distributable bootable CDROM image -->
+	<target name="cdrom" depends="boot-disk">
+		<copy file="${sources.dist.tar.gz}" todir="${my-build.dir}/cdrom-full" />
+		<create-cdrom destfile="${jnode-x86.iso}" dir="${my-build.dir}/cdrom-full" />
+	</target>
+
+	<!-- Create a bootable CDROM image -->
+	<target name="cdrom-lite" depends="boot-disk">
+		<create-cdrom destfile="${jnode-x86-lite.iso}" dir="${my-build.dir}/cdrom-lite" />
+	</target>
+
+	<!-- Prepare for netboot -->
+	<target name="netboot" depends="java-image">
+		<copy file="${jnode.kernel}" todir="${build.netboot.dir}" />
+		<copy todir="${build.netboot.dir}">
+			<fileset dir="${initjars.dir}" />
+		</copy>
+		<copy todir="${build.netboot.dir}">
+			<fileset dir="${my-lib.dir}">
+				<include name="nbgrub-*" />
+				<include name="pxegrub-*" />
+			</fileset>
+			<fileset dir="${my-conf.dir}">
+				<include name="menu-nb.lst" />
+				<include name="menu-pxe.lst*" />
+			</fileset>
+		</copy>
+		<mkdir dir="${build.netboot.dir}/plugins" />
+		<copy todir="${build.netboot.dir}/plugins">
+			<fileset dir="${plugins.dir}" />
+		</copy>
+	</target>
+
+	<target name="disasm">
+		<exec executable="ndisasm" dir="${basedir}" output="${build.bootimage.dir}/bootimage.asm">
+			<arg value="-u" />
+			<arg value="-o" />
+			<arg value="0x100000" />
+			<arg value="${build.bootimage.dir}/bootimage.bin" />
+		</exec>
+	</target>
+
+	<!-- Run all required targets -->
+	<target name="all" depends="boot-disk,netboot">
+	</target>
 
 </project>
 

@@ -92,6 +92,7 @@
 
 	<!-- Initialize all project directories -->
 	<target name="prepare">
+		<property file="${root.dir}/jnode.properties"/>
 		<tstamp />
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${cdroms.dir}" />

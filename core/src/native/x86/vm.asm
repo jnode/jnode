@@ -20,16 +20,14 @@ vm_athrow:
 		push ebx
 		mov ebx,eax
 		
-		mov eax,vm_athrow_msg1
-		call sys_print_str
+		PRINT_STR vm_athrow_msg1
 		
 		mov eax,[ebx+ObjectLayout_TIB_SLOT*4] ; get TIB of exception
 		mov eax,[eax+VmArray_DATA_OFFSET*4] ; get class (vmt[0])
 		mov eax,[eax+VmType_NAME_OFFSET*4] ; get classname of exception
 		call vm_print_string
 		
-		mov eax,vm_athrow_msg2
-		call sys_print_str
+		PRINT_STR vm_athrow_msg2
 		
 		mov eax,[ebx+Throwable_DETAILMESSAGE_OFFSET*4] ; get message of exception
 		call vm_print_string
@@ -78,10 +76,7 @@ vm_athrow_deliver_compiled:
 	
 vm_athrow_unhandled:
 	cli
-	push eax
-	mov eax,vm_athrow_msg4
-	call sys_print_str
-	pop eax
+	PRINT_STR vm_athrow_msg4
 	mov ebx,eax
 	mov eax,[ebx+ObjectLayout_TIB_SLOT*4]
 	mov eax,[eax+VmArray_DATA_OFFSET*4]
@@ -105,8 +100,7 @@ vm_print_string:
 	jmp vm_print_string_ret
 	
 vm_print_string_null:
-	mov eax,vm_print_chararray_msg1
-	call sys_print_str
+	PRINT_STR vm_print_chararray_msg1
 vm_print_string_ret:
 	pop eax
 	ret
@@ -134,8 +128,7 @@ vm_print_chararray_loop:
 	jmp vm_print_chararray_loop	
 	
 vm_print_chararray_null:
-	mov eax,vm_print_chararray_msg1
-	call sys_print_str
+	PRINT_STR vm_print_chararray_msg1
 	
 vm_print_chararray_ret:
 	pop esi
@@ -163,16 +156,14 @@ vmint_print_stack_loop:
     mov eax,[eax+VmType_NAME_OFFSET*4]
     call vm_print_string
 
-    mov eax,double_colon_msg
-    call sys_print_str
+    PRINT_STR double_colon_msg
 
 	; Print the methodname	
     mov eax,[ebx+VmMember_NAME_OFFSET*4]
     call vm_print_string
     
     ; Println
-    mov eax,vmint_print_stack_msg1
-    call sys_print_str
+    PRINT_STR vmint_print_stack_msg1
 
 	; Get the previous frame
 	mov ebp,[ebp+VmX86StackReader_PREVIOUS_OFFSET] ; Note do not '*4' here, since the offset is a java static field constant

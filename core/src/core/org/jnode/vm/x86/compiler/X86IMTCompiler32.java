@@ -37,7 +37,7 @@ import org.jnode.vm.compiler.IMTCompiler;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class X86IMTCompiler32 extends IMTCompiler implements X86CompilerConstants {
+public final class X86IMTCompiler32 extends IMTCompiler implements X86CompilerConstants {
 
 	private final int codeOfs = 24;
 

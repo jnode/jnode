@@ -10,7 +10,11 @@ cpu_features:	dd 0
 
 ; Test if the cpu is at least a pentium
 test_cpuid:
-	pusha
+	push eax
+	push ebx
+	push ecx
+	push edx
+	
 	; Test for presence of cpuid instruction
 	pushf			; Get current eflags
 	pop eax
@@ -33,7 +37,11 @@ test_cpuid:
 	test edx,FEAT_PSE
 	jz near no_pse_feat
 	; Done
-	popa
+	
+	pop edx
+	pop ecx
+	pop ebx
+	pop eax
 	ret
 
 ; Initialize the FPU
@@ -82,18 +90,15 @@ no_sse:
 	ret	
 
 no_cpuid:
-	mov eax,no_cpuid_msg
-    call sys_print_str
+	PRINT_STR no_cpuid_msg
     jmp _halt
 	
 no_fpu_feat:	
-	mov eax,no_fpu_feat_msg
-    call sys_print_str
+	PRINT_STR no_fpu_feat_msg
     jmp _halt
 	
 no_pse_feat:	
-	mov eax,no_pse_feat_msg
-    call sys_print_str
+	PRINT_STR no_pse_feat_msg
     jmp _halt
 	
 no_cpuid_msg:		db 'Processor has no CPUID. halt...',0;
