@@ -46,10 +46,10 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
@@ -173,18 +173,15 @@ public class BasicLabelUI extends LabelUI implements PropertyChangeListener
 
     String text = layoutCL(b, fm, b.getText(), icon, vr, ir, tr);
     
-    if (b.isOpaque())
-    {
-      g.setColor(b.getBackground());
-      g.fillRect(vr.x, vr.y, vr.width, vr.height);
-    }
-
     if (icon != null)
       icon.paintIcon(b, g, ir.x, ir.y);
+    if (text != null && ! text.equals(""))
+    {
     if (b.isEnabled())
       paintEnabledText(b, g, text, tr.x, tr.y + fm.getAscent());
     else
       paintDisabledText(b, g, text, tr.x, tr.y + fm.getAscent());
+    }
     g.setFont(saved_font);
   }
 
@@ -354,6 +351,7 @@ public class BasicLabelUI extends LabelUI implements PropertyChangeListener
     c.setBackground(defaults.getColor("Label.background"));
     c.setFont(defaults.getFont("Label.font"));
     c.setBorder(defaults.getBorder("Label.border"));
+    c.setOpaque(true);
     //XXX: There are properties we don't use called disabledForeground
     //and disabledShadow.
   }

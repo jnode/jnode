@@ -77,6 +77,21 @@ public abstract class BreakIterator implements Cloneable
   }
 
   /**
+   * Create a clone of this object.
+   */
+  public Object clone ()
+  {
+    try
+      {
+        return super.clone();
+      }
+    catch (CloneNotSupportedException e)
+      {
+        return null;
+      }
+  }
+  
+  /**
    * This method returns the index of the current text element boundary.
    *
    * @return The current text boundary.
@@ -121,7 +136,7 @@ public abstract class BreakIterator implements Cloneable
       {
 	ResourceBundle res
 	  = ResourceBundle.getBundle("gnu.java.locale.LocaleInformation",
-				     loc);
+				     loc, ClassLoader.getSystemClassLoader());
 	className = res.getString(type);
       }
     catch (MissingResourceException x)

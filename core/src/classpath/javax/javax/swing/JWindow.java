@@ -1,5 +1,5 @@
 /* JWindow.java --
-   Copyright (C) 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -44,11 +44,11 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics;
-import java.awt.GraphicsConfiguration;
 import java.awt.LayoutManager;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
 
@@ -58,7 +58,7 @@ import javax.accessibility.AccessibleContext;
  *
  * @author Ronald Veldema (rveldema@cs.vu.nl)
  */
-public class JWindow extends Window implements Accessible
+public class JWindow extends Window implements Accessible, RootPaneContainer
 {
     public final static int HIDE_ON_CLOSE        = 0;
     public final static int EXIT_ON_CLOSE        = 1;
@@ -80,7 +80,7 @@ public class JWindow extends Window implements Accessible
 
     public JWindow()
     {
-      this(null);
+     	super(null); // FIXME: This throws an exception.
     }
 
     // huuu ?
@@ -124,20 +124,20 @@ public class JWindow extends Window implements Accessible
   public  void setLayout(LayoutManager manager)
   {    super.setLayout(manager);  }
 
-    void setLayeredPane(JLayeredPane layeredPane) 
+    public void setLayeredPane(JLayeredPane layeredPane) 
     {   getRootPane().setLayeredPane(layeredPane);   }
   
-    JLayeredPane getLayeredPane()
+    public JLayeredPane getLayeredPane()
     {   return getRootPane().getLayeredPane();     }
   
-    JRootPane getRootPane()
+    public JRootPane getRootPane()
     {
 	if (rootPane == null)
 	    setRootPane(createRootPane());
 	return rootPane;          
     }
 
-    void setRootPane(JRootPane root)
+    public void setRootPane(JRootPane root)
     {
 	if (rootPane != null)
 	    remove(rootPane);
@@ -146,19 +146,19 @@ public class JWindow extends Window implements Accessible
 	add(rootPane, BorderLayout.CENTER);
     }
 
-    JRootPane createRootPane()
+    public JRootPane createRootPane()
     {   return new JRootPane();    }
 
-    Container getContentPane()
+    public Container getContentPane()
     {    return getRootPane().getContentPane();     }
 
-    void setContentPane(Container contentPane)
+    public void setContentPane(Container contentPane)
     {    getRootPane().setContentPane(contentPane);    }
   
-    Component getGlassPane()
+    public Component getGlassPane()
     {    return getRootPane().getGlassPane();   }
   
-    void setGlassPane(Component glassPane)
+    public void setGlassPane(Component glassPane)
     {   getRootPane().setGlassPane(glassPane);   }
 
     

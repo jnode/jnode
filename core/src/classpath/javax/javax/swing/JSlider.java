@@ -37,16 +37,14 @@ exception statement from your version. */
 
 package javax.swing;
 
-import java.awt.ComponentOrientation;
-import java.awt.MenuContainer;
 import java.awt.Dimension;
+import java.awt.MenuContainer;
 import java.awt.image.ImageObserver;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
+
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
@@ -54,7 +52,6 @@ import javax.accessibility.AccessibleStateSet;
 import javax.accessibility.AccessibleValue;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.EventListenerList;
 import javax.swing.plaf.SliderUI;
 
 
@@ -71,7 +68,7 @@ import javax.swing.plaf.SliderUI;
  * </p>
  * 
  * <table>
- * <tr><th> Property         </td><th> Stored in </td><th> Bound? </td></tr>
+ * <tr><th> Property         </th><th> Stored in </th><th> Bound? </th></tr>
  * <tr><td> extent           </td><td> model     </td><td> no     </td></tr>
  * <tr><td> inverted         </td><td> slider    </td><td> yes    </td></tr>
  * <tr><td> labelTable       </td><td> slider    </td><td> yes    </td></tr>
@@ -253,9 +250,6 @@ public class JSlider extends JComponent implements SwingConstants, Accessible,
    */
   private transient Dictionary labelTable;
 
-  /** A list of all ChangeListeners listening to this slider. */
-  private transient EventListenerList changeListenerList;
-
   /** The model used to describe the slider. */
   protected BoundedRangeModel sliderModel;
 
@@ -310,7 +304,7 @@ public class JSlider extends JComponent implements SwingConstants, Accessible,
    */
   public JSlider(int minimum, int maximum)
   {
-    this(HORIZONTAL, minimum, maximum, (maximum - minimum) / 2);
+    this(HORIZONTAL, minimum, maximum, (maximum + minimum) / 2);
   }
 
   /**
@@ -342,7 +336,6 @@ public class JSlider extends JComponent implements SwingConstants, Accessible,
       throw new IllegalArgumentException(orientation + " is not a legal orientation");
     this.orientation = orientation;
     changeListener = createChangeListener();
-    changeListenerList = new EventListenerList();
     sliderModel.addChangeListener(changeListener);
     updateUI();
   }
@@ -359,7 +352,6 @@ public class JSlider extends JComponent implements SwingConstants, Accessible,
     else
       sliderModel = model;
     changeListener = createChangeListener();
-    changeListenerList = new EventListenerList();
     sliderModel.addChangeListener(changeListener);
     updateUI();
   }
@@ -419,7 +411,7 @@ public class JSlider extends JComponent implements SwingConstants, Accessible,
    * This method returns a name to identify which look and feel class will be
    * the UI delegate for the slider.
    *
-   * @return The L&F classID. "SliderUI"
+   * @return The Look and Feel classID. "SliderUI"
    */
   public String getUIClassID()
   {
@@ -453,7 +445,7 @@ public class JSlider extends JComponent implements SwingConstants, Accessible,
    */
   public void addChangeListener(ChangeListener listener)
   {
-    changeListenerList.add(ChangeListener.class, listener);
+    listenerList.add(ChangeListener.class, listener);
   }
 
   /**
@@ -463,7 +455,7 @@ public class JSlider extends JComponent implements SwingConstants, Accessible,
    */
   public void removeChangeListener(ChangeListener listener)
   {
-    changeListenerList.remove(ChangeListener.class, listener);
+    listenerList.remove(ChangeListener.class, listener);
   }
 
   /**
@@ -473,7 +465,7 @@ public class JSlider extends JComponent implements SwingConstants, Accessible,
    */
   protected void fireStateChanged()
   {
-    Object[] changeListeners = changeListenerList.getListenerList();
+    Object[] changeListeners = listenerList.getListenerList();
     if (changeEvent == null)
       changeEvent = new ChangeEvent(this);
     for (int i = changeListeners.length - 2; i >= 0; i -= 2)
@@ -491,7 +483,7 @@ public class JSlider extends JComponent implements SwingConstants, Accessible,
    */
   public ChangeListener[] getChangeListeners()
   {
-    return (ChangeListener[]) changeListenerList.getListenerList();
+    return (ChangeListener[]) listenerList.getListeners(ChangeListener.class);
   }
 
   /**

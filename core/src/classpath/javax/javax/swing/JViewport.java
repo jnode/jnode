@@ -1,5 +1,5 @@
 /* JViewport.java -- 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -39,15 +39,12 @@ exception statement from your version. */
 package javax.swing;
 
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.image.ImageObserver;
-import javax.accessibility.Accessible;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ViewportUI;
@@ -117,7 +114,13 @@ public class JViewport extends JComponent
    *
    * @see #toViewCoordinates
    */
-  Dimension viewExtent;
+  Dimension extentSize;
+
+  /**
+   * The width and height of the view in its own coordinate space.
+   */
+
+  Dimension viewSize;
 
   Point lastPaintPosition;
 
@@ -127,17 +130,35 @@ public class JViewport extends JComponent
     updateUI();
   }
 
-  public Dimension getViewSize()
+  public Dimension getExtentSize()
   {
-    if (viewExtent == null)
+    if (extentSize == null)
       return getPreferredSize();
     else
-      return viewExtent;
+      return extentSize;
   }
+
+  public void setExtentSize(Dimension newSize)
+  {
+    extentSize = newSize;
+    fireStateChanged();
+  }
+
+  public Dimension getViewSize()
+  {
+    if (viewSize == null)
+      return getView().getPreferredSize();
+    else
+      return viewSize;
+  }
+
 
   public void setViewSize(Dimension newSize)
   {
-    viewExtent = newSize;
+    viewSize = newSize;
+    Component view = getView();
+    if (view != null)
+      view.setSize(newSize);
     fireStateChanged();
   }
 
@@ -169,7 +190,7 @@ public class JViewport extends JComponent
   public Rectangle getViewRect()
   {
     return new Rectangle(getViewPosition(), 
-                         getViewSize());
+                         getExtentSize());
   }
 
   public boolean isBackingStoreEnabled()
@@ -211,6 +232,23 @@ public class JViewport extends JComponent
     fireStateChanged();
   }
     
+  public void revalidate()
+  {
+    fireStateChanged();
+    super.revalidate();
+  }
+
+  public void reshape(int x, int y, int w, int h)
+  {
+    boolean changed = 
+      (x != getX()) 
+      || (y != getY()) 
+      || (w != getWidth())
+      || (h != getHeight());
+    super.reshape(x, y, w, h);
+    if (changed)
+      fireStateChanged();
+  }
     
   public void addImpl(Component comp, Object constraints, int index)
   {

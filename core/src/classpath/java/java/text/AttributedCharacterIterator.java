@@ -1,5 +1,5 @@
 /* AttributedCharacterIterator.java -- Iterate over attributes
-   Copyright (C) 1998, 1999 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -53,101 +53,67 @@ import java.util.Map;
   * that is defined for a particular value across an entire range of
   * characters or which is undefined over a range of characters.
   *
-  * @version 0.0
-  *
   * @author Aaron M. Renn (arenn@urbanophile.com)
   */
 public interface AttributedCharacterIterator extends CharacterIterator
 {
-
-/*
- * Inner Classes
- */
-
-/**
+  /**
   * This class defines attribute keys that are used as text attributes.
   */
-public static class Attribute implements Serializable
-{
+  public static class Attribute implements Serializable
+  {
+    private static final long serialVersionUID = -9142742483513960612L;
 
-/*************************************************************************/
-
-/*
- * Static Variables
- */
-
-/**
+    /**
   * This is the attribute for the language of the text.  The value of
   * attributes of this key type are instances of <code>Locale</code>.
   */
-public static final Attribute LANGUAGE = new Attribute("LANGUAGE");
+    public static final Attribute LANGUAGE = new Attribute ("LANGUAGE");
 
-/**
+    /**
   * This is the attribute for the reading form of text.  This is used
   * for storing pronunciation along with the written text for languages
   * which need it.  The value of attributes of this key type are
   * instances of <code>Annotation</code> which wrappers a <code>String</code>.
   */
-public static final Attribute READING = new Attribute("READING");
+    public static final Attribute READING = new Attribute ("READING");
 
-/**
+    /**
   * This is the attribute for input method segments.  The value of attributes
   * of this key type are instances of <code>Annotation</code> which wrapper
   * a <code>String</code>.
   */
-public static final Attribute INPUT_METHOD_SEGMENT =    
-                                  new Attribute("INPUT_METHOD_SEGMENT");
+    public static final Attribute INPUT_METHOD_SEGMENT =
+      new Attribute ("INPUT_METHOD_SEGMENT");
 
-/*************************************************************************/
-
-/*
- * Instance Variables
- */
-
-/**
+    /**
   * This is the name of the attribute key
   * @serial
   */
-private String name;
+    private String name;
 
-/*************************************************************************/
-
-/*
- * Constructors
- */
-
-/**
+    /**
   * This method initializes a new instance of this class with the specified
   * name.
   *
   * @param name The name of this attribute key.
   */
-protected
-Attribute(String name)
-{
+    protected Attribute (String name)
+    {
   this.name = name;
-}
+    }
 
-/*************************************************************************/
-
-/*
- * Instance Methods
- */
-
-/**
+    /**
   * This method returns the name of this attribute.
   *
   * @return The attribute name
   */
-protected String
-getName()
-{
-  return(name);
-}
+    protected String getName()
+    {
+      return name;
+    }
 
-/*************************************************************************/
-
-/**
+    /**
   * This method resolves an instance of <code>AttributedCharacterIterator.Attribute</code>
   * that is being deserialized to one of the three pre-defined attribute
   * constants.  It does this by comparing the names of the attributes.  The
@@ -157,24 +123,21 @@ getName()
   *
   * @exception InvalidObjectException If the object being deserialized cannot be resolved.
   */
-protected Object
-readResolve() throws InvalidObjectException
-{
-  if (this.equals(READING))
-    return(READING);
+    protected Object readResolve() throws InvalidObjectException
+    {
+      if (this.equals (READING))
+        return READING;
 
-  if (this.equals(LANGUAGE))
-    return(LANGUAGE);
+      if (this.equals (LANGUAGE))
+        return LANGUAGE;
 
-  if (this.equals(INPUT_METHOD_SEGMENT))
-    return(INPUT_METHOD_SEGMENT);
+      if (this.equals (INPUT_METHOD_SEGMENT))
+        return INPUT_METHOD_SEGMENT;
 
-  throw new InvalidObjectException("Can't resolve Attribute: " + getName());
-}
+      throw new InvalidObjectException ("Can't resolve Attribute: " + getName());
+    }
 
-/*************************************************************************/
-
-/**
+    /**
   * This method tests this object for equality against the specified object.
   * The two objects will be considered equal if and only if:
   * <ul>
@@ -187,72 +150,53 @@ readResolve() throws InvalidObjectException
   *
   * @return <code>true</code> if the specified object is equal to this one, <code>false</code> otherwise.
   */
-public final boolean
-equals(Object obj)
-{
+    public final boolean equals (Object obj)
+    {
   if (obj == this)
-    return(true);
+        return true;
   else 
-    return(false);
-}
+        return false;
+    }
 
-/*************************************************************************/
-
-/**
+    /**
   * This method returns a hash value for this object.
   *
   * @return A hash value for this object.
   */
-public final int
-hashCode()
-{
-  return(super.hashCode());
-}
+    public final int hashCode()
+    {
+      return super.hashCode();
+    }
 
-/*************************************************************************/
-
-/**
+    /**
   * This method returns a <code>String</code> representation of this object.
   *
   * @return A <code>String</code> representation of this object.
   */
-public String
-toString()
-{
-  return(getClass().getName() + "(" + getName() + ")");
-}
+    public String toString()
+    {
+      return getClass().getName() + "(" + getName() + ")";
+    }
 
-} // Inner class Attribute
+  } // Inner class Attribute
 
-/*************************************************************************/
-
-/*
- * Instance Methods
- */
-
-/**
+  /**
   * This method returns a list of all keys that are defined for the 
   * text range.  This can be an empty list if no attributes are defined.
   *
   * @return A list of keys 
   */
-public abstract Set
-getAllAttributeKeys();
+  Set getAllAttributeKeys();
 
-/*************************************************************************/
-
-/**
+  /**
   * This method returns a <code>Map</code> of the attributed defined for
   * the current character.
   *
   * @return A <code>Map</code> of the attributes for the current character.
   */
-public abstract Map
-getAttributes();
+  Map getAttributes();
 
-/*************************************************************************/
-
-/**
+  /**
   * This method returns the value of the specified attribute for the
   * current character.  If the attribute is not defined for the current
   * character, <code>null</code> is returned.
@@ -261,23 +205,17 @@ getAttributes();
   *
   * @return The value of the specified attribute
   */
-public abstract Object
-getAttribute(AttributedCharacterIterator.Attribute attrib);
+  Object getAttribute (AttributedCharacterIterator.Attribute attrib);
 
-/*************************************************************************/
-
-/**
+  /**
   * This method returns the index of the first character in the run that
   * contains all attributes defined for the current character.
   *
   * @return The start index of the run
   */
-public abstract int
-getRunStart();
+  int getRunStart();
 
-/*************************************************************************/
-
-/**
+  /**
   * This method returns the index of the first character in the run that
   * contains all attributes in the specified <code>Set</code> defined for
   * the current character.
@@ -286,12 +224,9 @@ getRunStart();
   *
   * @return The start index of the run.
   */
-public abstract int
-getRunStart(Set attribs);
+  int getRunStart (Set attribs);
 
-/*************************************************************************/
-
-/**
+  /**
   * This method returns the index of the first character in the run that
   * contains the specified attribute defined for the current character.
   *
@@ -299,23 +234,17 @@ getRunStart(Set attribs);
   *
   * @return The start index of the run.
   */
-public abstract int
-getRunStart(AttributedCharacterIterator.Attribute attrib);
+  int getRunStart (AttributedCharacterIterator.Attribute attrib);
 
-/*************************************************************************/
-
-/**
+  /**
   * This method returns the index of the character after the end of the run
   * that contains all attributed defined for the current character.
   *
   * @return The end index of the run.
   */
-public abstract int
-getRunLimit();
+  int getRunLimit();
 
-/*************************************************************************/
-
-/**
+  /**
   * This method returns the index of the character after the end of the run
   * that contains all attributes in the specified <code>Set</code> defined
   * for the current character.
@@ -324,12 +253,9 @@ getRunLimit();
   *
   * @return The end index of the run.
   */
-public abstract int
-getRunLimit(Set attribs);
+  int getRunLimit (Set attribs);
 
-/*************************************************************************/
-
-/**
+  /**
   * This methods returns the index of the character after the end of the run
   * that contains the specified attribute defined for the current character.
   *
@@ -337,8 +263,6 @@ getRunLimit(Set attribs);
   * 
   * @return The end index of the run.
   */
-public abstract int
-getRunLimit(AttributedCharacterIterator.Attribute attrib);
+  int getRunLimit (AttributedCharacterIterator.Attribute attrib);
 
 } // interface AttributedCharacterIterator
-

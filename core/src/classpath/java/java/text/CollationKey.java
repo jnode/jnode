@@ -1,5 +1,5 @@
 /* CollationKey.java -- Precomputed collation value
-   Copyright (C) 1998 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2003  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,6 +38,11 @@ exception statement from your version. */
 
 package java.text;
 
+/* Written using "Java Class Libraries", 2nd edition, plus online
+ * API docs for JDK 1.2 from http://www.javasoft.com.
+ * Status: Believed complete and correct.
+ */
+
 /**
   * This class represents a pre-computed series of bits representing a
   * <code>String</code> for under a particular <code>Collator</code>.  This
@@ -54,79 +59,57 @@ package java.text;
   * <code>CollationKey</code> is created by calling the
   * <code>getCollationKey</code> method on an instance of <code>Collator</code>.
   *
-  * @version 0.0
-  *
-  * @author Aaron M. Renn (arenn@urbanophile.com)
+ * @author Aaron M. Renn <arenn@urbanophile.com>
+ * @author Tom Tromey <tromey@cygnus.com>
+ * @date March 25, 1999
   */
 public final class CollationKey implements Comparable
 {
-
-/*
- * Instance Variables
- */
-
-/**
+  /**
   * This is the <code>Collator</code> this object was created from.
   */
-private Collator collator;
+  private Collator collator;
 
-/**
+  /**
   * This is the <code>String</code> this object represents.
   */
-private String str;
+  private String originalText;
 
-/**
+  /**
   * This is the bit value for this key.
   */
-private byte[] key;
+  private byte[] key;
 
-/*************************************************************************/
-
-/*
- * Constructors (no public constructors)
- */
-
-CollationKey(Collator collator, String str, byte[] key)
-{
+  CollationKey (Collator collator, String originalText, byte[] key)
+  {
   this.collator = collator;
-  this.str = str;
+    this.originalText = originalText;
   this.key = key;
-}
+  }
 
-/*************************************************************************/
-
-/*
- * Instance Methods
- */
-
-/**
-  * This method returns the <code>String</code> that this object was created
-  * from.
+  /**
+   * This method compares the specified object to this one.  An integer is 
+   * returned which indicates whether the specified object is less than, 
+   * greater than, or equal to this object.
   *
-  * @return The source <code>String</code> for this object.
-  */
-public String
-getSourceString()
-{
-  return(str);
-}
-
-/*************************************************************************/
-
-/**
-  * This method returns the collation bit sequence as a byte array.
+   * @param ck The <code>CollationKey</code> to compare against this one.
   *
-  * @param A byte array containing the collation bit sequence.
+   * @return A negative integer if this object is less than the specified object, 0 if it is equal or a positive integer if it is greater than the specified object.
   */
-public byte[]
-toByteArray()
-{
-  return(key);
-}
+  public int compareTo (CollationKey ck)
+  {
+    int max = Math.min (key.length, ck.key.length);
 
-/*************************************************************************/
+    for (int i = 0; i < max; ++i)
+      {
+	if (key[i] != ck.key[i])
+	  return key[i] - ck.key[i];
+      }
 
-/**
+    return key.length - ck.key.length;
+  }
+
+  /**
   * This method compares the specified object to this one.  The specified
   * object must be an instance of <code>CollationKey</code> or an exception
   * will be thrown.  An integer is returned which indicates whether the
@@ -136,101 +119,81 @@ toByteArray()
   *
   * @return A negative integer if this object is less than the specified object, 0 if it is equal or a positive integer if it is greater than the specified object.
   */
-public int
-compareTo(Object obj)
-{
-  return(compareTo((CollationKey)obj));
-}
-
-/*************************************************************************/
-
-/**
-  * This method compares the specified object to this one.  An integer is 
-  * returned which indicates whether the specified object is less than, 
-  * greater than, or equal to this object.
-  *
-  * @param ck The <code>CollationKey</code> to compare against this one.
-  *
-  * @return A negative integer if this object is less than the specified object, 0 if it is equal or a positive integer if it is greater than the specified object.
-  */
-public int
-compareTo(CollationKey ck)
-{
-  int i;
-  for (i = 0; i < key.length; i++)
+  public int compareTo (Object obj)
     {
-      if (ck.key.length <= i)
-        return(1);
-
-      if (key[i] < ck.key[i])
-        return(-1);
-
-      if (key[i] > ck.key[i])
-        return(1);
+    return compareTo ((CollationKey) obj);
     }
 
-  if (i == ck.key.length)
-    return(0);
-  else
-    return(-1);
-}
-
-/*************************************************************************/
-
-/**
+  /**
   * This method tests the specified <code>Object</code> for equality with
   * this object.  This will be true if and only if:
   * <p>
   * <ul>
-  * <li>The specified object must not be <code>null</code>
-  * <li>The specified object is an instance of <code>CollationKey</code>.
+   * <li>The specified object must not be <code>null</code></li>
+   * <li>The specified object is an instance of <code>CollationKey</code>.</li>
   * <li>The specified object was created from the same <code>Collator</code>
-  * as this object.
+   * as this object.</li>
   * <li>The specified object has the same source string and bit key as
-  * this object.
+   * this object.</li>
   * </ul>
   *
   * @param obj The <code>Object</code> to test for equality.
   *
   * @return <code>true</code> if the specified object is equal to this one, <code>false</code> otherwise.
   */
-public boolean
-equals(Object obj)
-{
-  if (obj == null)
-    return(false);
+  public boolean equals (Object obj)
+  {
+    if (! (obj instanceof CollationKey))
+      return false;
 
-  if (!(obj instanceof CollationKey))
-    return(false);
+    CollationKey ck = (CollationKey) obj;
 
-  CollationKey ck = (CollationKey)obj;
+    if (ck.collator != collator)
+      return false;
 
-  if (!ck.collator.equals(collator))
-    return(false);
+    if (!ck.getSourceString ().equals (getSourceString ()))
+      return false;
 
-  if (!ck.getSourceString().equals(getSourceString()))
-    return(false);
+    if (!ck.toByteArray ().equals (toByteArray ()))
+      return false;
 
-  if (!ck.toByteArray().equals(toByteArray()))
-    return(false);
+    return true;
+  }
 
-  return(true);
-}
+  /**
+   * This method returns the <code>String</code> that this object was created
+   * from.
+   *
+   * @return The source <code>String</code> for this object.
+   */
+  public String getSourceString()
+  {
+    return originalText;
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * This method returns a hash value for this object.  The hash value
   * returned will be the hash code of the bit key so that identical bit
   * keys will return the same value.
   *
   * @return A hash value for this object.
   */
-public int
-hashCode()
-{
-  return(key.hashCode());
+  public int hashCode()
+  {
+    // We just follow BitSet instead of thinking up something new.
+    long h = originalText.hashCode();
+    for (int i = key.length - 1; i >= 0; --i)
+      h ^= key[i] * (i + 1);
+    return (int) ((h >> 32) ^ h);
+  }
+
+  /**
+   * This method returns the collation bit sequence as a byte array.
+   *
+   * @param A byte array containing the collation bit sequence.
+   */
+  public byte[] toByteArray()
+  {
+    return key;
+  }
 }
-
-} // class CollationKey
-

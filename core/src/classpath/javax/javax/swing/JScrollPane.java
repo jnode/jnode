@@ -40,13 +40,15 @@ package javax.swing;
 
 import java.awt.Component;
 import java.awt.ComponentOrientation;
+import java.awt.Dimension;
 import java.awt.LayoutManager;
 import java.awt.Insets;
+import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 
-import javax.swing.border.Border;
 import javax.accessibility.Accessible;
+import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ScrollPaneUI;
@@ -431,7 +433,11 @@ public class JScrollPane
   {
     JViewport old = viewport;
     removeNonNull(old);
+    if (old != null)
+      old.removeChangeListener(scrollListener);
     viewport = v;
+    if (v != null)
+      v.addChangeListener(scrollListener);
     addNonNull(v);
     revalidate();
     repaint();
@@ -468,29 +474,64 @@ public class JScrollPane
 
   ChangeListener createScrollListener()
   {
-    return new ChangeListener() {
+    return new ChangeListener() 
+      {
+        
         public void stateChanged(ChangeEvent event)
         {
-          int xpos = 0;
-          int ypos = 0;
           JScrollBar vsb = JScrollPane.this.getVerticalScrollBar();
           JScrollBar hsb = JScrollPane.this.getHorizontalScrollBar();
+          JViewport vp = JScrollPane.this.getViewport();
           
-          if (vsb != null)
+          if (vp != null && event.getSource() == vp)
             {
-              BoundedRangeModel vmod = vsb.getModel();
-              if (vmod != null)
-                ypos = vmod.getValue();
+              // if the viewport changed, we should update the VSB / HSB
+              // models according to the new vertical and horizontal sizes
+              Rectangle vr = vp.getViewRect();
+              Dimension vs = vp.getViewSize();
+              // System.err.println("got change from viewport, vr=" + vr + ", vs=" + vs);
+              if (vsb != null
+                  && (vsb.getMinimum() != 0
+                      || vsb.getMaximum() != vs.height
+                      || vsb.getValue() != vr.y
+                      || vsb.getVisibleAmount() != vr.height))
+                {
+                  //                   System.err.println("setting vsb to "
+                  //                                      + "pos=" + vr.y 
+                  //                                      + ", ext=" + vr.height 
+                  //                                      + ", min=0"
+                  //                                      + ", max=" + vs.height);
+                  vsb.setValue(vr.y, vr.height, 0, vs.height);
+                }
+
+              if (hsb != null
+                  && (hsb.getMinimum() != 0
+                      || hsb.getMaximum() != vs.width
+                      || hsb.getValue() != vr.width
+                      || hsb.getVisibleAmount() != vr.height))
+                hsb.setValue(vr.x, vr.width, 0, vs.width);
             }
+          else
+            {
+              // otherwise we got a change update from either the VSB or
+              // HSB model, and we need to update the viewport position to
+              // match.
+
+              int xpos = 0;
+              int ypos = 0;
+              
+              if (vsb != null)
+                ypos = vsb.getValue();
 
           if (hsb != null)
-            {
-              BoundedRangeModel hmod = hsb.getModel();
-              if (hmod != null)
-                xpos = hmod.getValue();
+                xpos = hsb.getValue();
+
+              Point pt = new Point(xpos, ypos);
+
+              if (vp != null
+                  && vp.getViewPosition() != pt)
+                vp.setViewPosition(pt);
             }
-          if (JScrollPane.this.viewport != null)
-            JScrollPane.this.viewport.setViewPosition(new Point(xpos, ypos));
         }
       };
   }
@@ -529,12 +570,12 @@ public class JScrollPane
   
   public JScrollBar createHorizontalScrollBar()
   {
-    return new JScrollBar(SwingConstants.HORIZONTAL);
+    return new ScrollBar(SwingConstants.HORIZONTAL);
   }
 
   public JScrollBar createVerticalScrollBar()
   {
-    return new JScrollBar(SwingConstants.VERTICAL);
+    return new ScrollBar(SwingConstants.VERTICAL);
   }
     
   public JViewport createViewport()
@@ -554,7 +595,7 @@ public class JScrollPane
     setUI(b);
   }  
 
-  /*
+
   class ScrollBar 
     extends JScrollBar
     implements UIResource
@@ -562,17 +603,37 @@ public class JScrollPane
     public ScrollBar(int orientation)
     {
       super(orientation);
-      Component view = this.JScrollPane.getViewportView();
-      if (view == null)
-        return;
-      if (! view instanceof Scrollable)
+    }
+
+    public int getBlockIncrement(int direction)
+    {
+      Component view = JScrollPane.this.getViewport().getView();
+      if (view == null || (! (view instanceof Scrollable)))
+        return super.getBlockIncrement(direction);
+      else
         {
           Scrollable s = (Scrollable) view;
-          s.
+          return s.getScrollableBlockIncrement(JScrollPane.this.getViewport().getViewRect(), 
+                                               this.getOrientation(),
+                                               direction);
         }
     }
 
+    public int getUnitIncrement(int direction)
+    {
+      Component view = JScrollPane.this.getViewport().getView();
+      if (view == null || (! (view instanceof Scrollable)))
+        return super.getUnitIncrement(direction);
+      else
+        {
+          Scrollable s = (Scrollable) view;
+          return s.getScrollableUnitIncrement(JScrollPane.this.getViewport().getViewRect(), 
+                                              this.getOrientation(),
+                                              direction);
+        }
+    }
+
+
   }
-  */
 
 }
