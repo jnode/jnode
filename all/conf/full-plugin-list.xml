@@ -102,6 +102,7 @@
     <plugin id="org.jnode.wt"/>
     <plugin id="org.beanshell"/>
 
+    <plugin id="org.jnode.apps.charvabsh"/>
     <!-- plugin id="org.zaval.lw"/ -->
 
 </plugin-list>
