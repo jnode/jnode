@@ -609,7 +609,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writeMOV_Const(X86Register.EAX, iconst2.getValue());
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 if(reg3 == X86Register.EAX){
                     os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 }else if(reg3 == X86Register.EDX){
@@ -644,7 +644,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writeMOV_Const(X86Register.EAX, iconst2.getValue());
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 if(reg3 == X86Register.EAX){
                     os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 }else if(reg3 == X86Register.EDX){
@@ -803,7 +803,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writeMOV_Const(X86Register.EAX, iconst2.getValue());
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
                 if(reg1 == X86Register.EAX){
                     os.writePOP(X86Register.EDX);
@@ -833,7 +833,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writeMOV_Const(X86Register.EAX, iconst2.getValue());
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
                 if(reg1 == X86Register.EDX){
                     os.writePOP(X86Register.EAX);
@@ -976,7 +976,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 if(reg2 != X86Register.EAX){
                     os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 os.writePOP(X86Register.EDX);
                 if(reg1 == X86Register.EAX){
@@ -1011,7 +1011,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 if(reg2 != X86Register.EAX){
                     os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 os.writePOP(X86Register.EAX);
                 if(reg1 == X86Register.EDX){
@@ -1160,7 +1160,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 if(reg2 != X86Register.EAX){
                     os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 if(reg3 == X86Register.EAX){
                     os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 }else if(reg3 == X86Register.EDX){
@@ -1202,7 +1202,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 if(reg2 != X86Register.EAX){
                     os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 if(reg3 == X86Register.EAX){
                     os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 }else if(reg3 == X86Register.EDX){
@@ -1376,7 +1376,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 if(reg2 != X86Register.EAX){
                     os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
                 if(reg1 == X86Register.EAX){
                     os.writePOP(X86Register.EDX);
@@ -1413,7 +1413,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 if(reg2 != X86Register.EAX){
                     os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
                 if(reg1 == X86Register.EDX){
                     os.writePOP(X86Register.EAX);
@@ -1560,7 +1560,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EAX);
                 os.writePUSH(iconst3.getValue());
                 os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 os.writePOP(X86Register.EDX);
                 if(reg1 == X86Register.EAX){
@@ -1591,7 +1591,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EAX);
                 os.writePUSH(iconst3.getValue());
                 os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 os.writePOP(X86Register.EAX);
                 if(reg1 == X86Register.EDX){
@@ -1717,7 +1717,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 if(reg3 == X86Register.EAX){
                     os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 }else if(reg3 == X86Register.EDX){
@@ -1753,7 +1753,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 if(reg3 == X86Register.EAX){
                     os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 }else if(reg3 == X86Register.EDX){
@@ -1905,7 +1905,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
                 if(reg1 == X86Register.EAX){
                     os.writePOP(X86Register.EDX);
@@ -1935,7 +1935,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
                 if(reg1 == X86Register.EDX){
                     os.writePOP(X86Register.EAX);
@@ -2079,7 +2079,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writeMOV_Const(X86Register.EAX, iconst2.getValue());
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 if(reg3 == X86Register.EAX){
                     os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 }else if(reg3 == X86Register.EDX){
@@ -2108,7 +2108,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writeMOV_Const(X86Register.EAX, iconst2.getValue());
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 if(reg3 == X86Register.EAX){
                     os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 }else if(reg3 == X86Register.EDX){
@@ -2258,7 +2258,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writeMOV_Const(X86Register.EAX, iconst2.getValue());
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EAX);
                 os.writePOP(X86Register.EAX);
@@ -2284,7 +2284,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writeMOV_Const(X86Register.EAX, iconst2.getValue());
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EDX);
                 os.writePOP(X86Register.EAX);
@@ -2415,7 +2415,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 if(reg2 != X86Register.EAX){
                     os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 os.writePOP(X86Register.EDX);
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EAX);
@@ -2442,7 +2442,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 if(reg2 != X86Register.EAX){
                     os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 os.writePOP(X86Register.EAX);
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EDX);
@@ -2561,7 +2561,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 if(reg2 != X86Register.EAX){
                     os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 if(reg3 == X86Register.EAX){
                     os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 }else if(reg3 == X86Register.EDX){
@@ -2592,7 +2592,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 if(reg2 != X86Register.EAX){
                     os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 if(reg3 == X86Register.EAX){
                     os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 }else if(reg3 == X86Register.EDX){
@@ -2742,7 +2742,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 if(reg2 != X86Register.EAX){
                     os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EAX);
                 os.writePOP(X86Register.EAX);
@@ -2770,7 +2770,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 if(reg2 != X86Register.EAX){
                     os.writeMOV(X86Constants.BITS32, X86Register.EAX, (GPR)reg2);
                 }
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EDX);
                 os.writePOP(X86Register.EAX);
@@ -2902,7 +2902,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EAX);
                 os.writePUSH(iconst3.getValue());
                 os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 os.writePOP(X86Register.EDX);
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EAX);
@@ -2930,7 +2930,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EAX);
                 os.writePUSH(iconst3.getValue());
                 os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 os.writePOP(X86Register.EAX);
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EDX);
@@ -3064,7 +3064,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 if(reg3 == X86Register.EAX){
                     os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 }else if(reg3 == X86Register.EDX){
@@ -3096,7 +3096,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 if(reg3 == X86Register.EAX){
                     os.writeIDIV_EAX(BITS32, X86Register.ESP, 0);
                 }else if(reg3 == X86Register.EDX){
@@ -3255,7 +3255,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EAX);
                 os.writePOP(X86Register.EAX);
@@ -3282,7 +3282,7 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 os.writePUSH(X86Register.EDX);
                 os.writePUSH(X86Register.EAX);
                 os.writeMOV(X86Constants.BITS32, X86Register.EAX, X86Register.EBP, disp2);
-                os.writeCDQ();
+                os.writeCDQ(BITS32);
                 os.writeIDIV_EAX(BITS32, X86Register.EBP, disp3);
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, X86Register.EDX);
                 os.writePOP(X86Register.EAX);

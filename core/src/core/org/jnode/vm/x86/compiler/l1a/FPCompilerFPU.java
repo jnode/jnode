@@ -7,6 +7,7 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.x86.X86Register.FPU;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
@@ -48,8 +49,7 @@ final class FPCompilerFPU extends FPCompiler {
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
-			final X86Register reg;
-			reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, true);
+			final FPU reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, true);
 			final Item result = fpuStack.getItem(reg);
 			fpuStack.pop();
 
@@ -77,8 +77,7 @@ final class FPCompilerFPU extends FPCompiler {
 
 		// Prepare operands
 		final FPUStack fpuStack = vstack.fpuStack;
-		final X86Register reg;
-		reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, false);
+		final FPU reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, false);
 		// We need reg to be ST1.
 		fxchST1(os, fpuStack, reg);
 
@@ -184,8 +183,7 @@ final class FPCompilerFPU extends FPCompiler {
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
-			final X86Register reg;
-			reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, false);
+			final FPU reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, false);
 			final Item result = fpuStack.getItem(reg);
 			fpuStack.pop();
 
@@ -226,7 +224,7 @@ final class FPCompilerFPU extends FPCompiler {
 	 * @param fpuReg
 	 */
 	private static final void fxchST1(X86Assembler os, FPUStack fpuStack,
-			X86Register fpuReg) {
+			FPU fpuReg) {
 		// We need reg to be ST1, if not swap
 		if (fpuReg != X86Register.ST1) {
 			// Swap reg with ST0
@@ -255,8 +253,7 @@ final class FPCompilerFPU extends FPCompiler {
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
-			final X86Register reg;
-			reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, true);
+			final FPU reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, true);
 			final Item result = fpuStack.getItem(reg);
 			fpuStack.pop();
 
@@ -310,7 +307,7 @@ final class FPCompilerFPU extends FPCompiler {
 			// Operand is on the FPU stack
 			if (!fpuStack.isTos(left)) {
 				// operand not on top, exchange it.
-				final X86Register reg = fpuStack.getRegister(left);
+				final FPU reg = fpuStack.getRegister(left);
 				os.writeFXCH(reg);
 				fpuStack.fxch(reg);
 			}
@@ -331,12 +328,12 @@ final class FPCompilerFPU extends FPCompiler {
 	 * @param left
 	 * @param right
 	 */
-	private final static X86Register prepareForOperation(X86Assembler os,
+	private final static FPU prepareForOperation(X86Assembler os,
 			EmitterContext ec, VirtualStack vstack, FPUStack fpuStack,
 			Item left, Item right, boolean commutative) {
 		final boolean lOnFpu = left.isFPUStack();
 		final boolean rOnFpu = right.isFPUStack();
-		final X86Register reg;
+		final FPU reg;
 
 		// If the FPU stack will be full in this operation, we flush the vstack
 		// first.
@@ -413,8 +410,7 @@ final class FPCompilerFPU extends FPCompiler {
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
-			final X86Register reg;
-			reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, false);
+			final FPU reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, false);
 			// We need reg to be ST1, if not swap
 			fxchST1(os, fpuStack, reg);
 
@@ -450,8 +446,7 @@ final class FPCompilerFPU extends FPCompiler {
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
-			final X86Register reg;
-			reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, false);
+			final FPU reg = prepareForOperation(os, ec, vstack, fpuStack, v2, v1, false);
 			final Item result = fpuStack.getItem(reg);
 			fpuStack.pop();
 

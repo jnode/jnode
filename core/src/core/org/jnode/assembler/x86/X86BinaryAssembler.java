@@ -1051,8 +1051,17 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a cdq
+     * Sign extend EAX to EDX:EAX in 32-bit operand size.
+     * Sign extend RAX to RDX:RAX in 64-bit operand size.
 	 */
-	public final void writeCDQ() {
+	public final void writeCDQ(int operandSize) {
+        testOperandSize(operandSize, BITS32 | BITS64);
+        if (operandSize == BITS64) {
+            if (!code64) {
+                throw new InvalidOpcodeException();
+            }
+            write8(REX_W_PREFIX);
+        }
 		write8(0x99);
 	}
 

@@ -1856,7 +1856,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 				L1AHelper.requestRegister(eContext, X86Register.EDX);
 				result = (LongItem) ifac.createReg(eContext, JvmType.LONG,
 						X86Register.EAX, X86Register.EDX);
-				os.writeCDQ(); /* Sign extend EAX -> EDX:EAX */
+				os.writeCDQ(BITS32); /* Sign extend EAX -> EDX:EAX */
 				pool.transferOwnerTo(X86Register.EAX, result);
 				pool.transferOwnerTo(X86Register.EDX, result);
 				// We do not release v, because its register (EAX) is re-used in
@@ -1950,7 +1950,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		v1.loadTo(eContext, X86Register.EAX);
 
 		// EAX -> sign extend EDX:EAX
-		os.writeCDQ();
+		os.writeCDQ(BITS32);
 
 		// EAX = EDX:EAX / v2.reg
 		os.writeIDIV_EAX(v2.getRegister());
@@ -2584,7 +2584,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		v1.loadTo(eContext, X86Register.EAX);
 
 		// Calculate
-		os.writeCDQ(); // EAX -> EDX:EAX
+		os.writeCDQ(BITS32); // EAX -> EDX:EAX
 		if (v2.isLocal()) {
 			os.writeIDIV_EAX(BITS32, helper.BP, v2.getOffsetToFP(eContext));
 		} else {
@@ -2870,7 +2870,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			v1.loadTo64(eContext, X86Register.RAX);
 
 			// RAX -> sign extend RDX:RAX
-			os.writeCDQ();
+			os.writeCDQ(BITS64);
 
 			// RAX = RDX:RAX / v2.reg
 			os.writeIDIV_EAX(v2.getRegister(eContext));
@@ -3047,7 +3047,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			v1.loadTo64(eContext, X86Register.RAX);
 
 			// Calculate
-			os.writeCDQ(); // RAX -> RDX:RAX
+			os.writeCDQ(BITS64); // RAX -> RDX:RAX
 			if (v2.isLocal()) {
 				os.writeIDIV_EAX(BITS64, helper.BP, v2.getOffsetToFP(eContext));
 			} else {
