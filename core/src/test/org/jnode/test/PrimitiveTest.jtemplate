@@ -8,6 +8,33 @@ package org.jnode.test;
  */
 public class @classname@ {
 
+	public static void main(String [] args) {
+		System.out.println(add(10, 12));
+		System.out.println(add(0, -12));
+		System.out.println(add(-54, 7816));
+		System.out.println(add(-5472, -14));
+
+		System.out.println(sub(10, 12));
+		System.out.println(sub(0, -12));
+		System.out.println(sub(-54, 7816));
+		System.out.println(sub(-5472, -14));
+
+		System.out.println(mul(10, 12));
+		System.out.println(mul(0, -12));
+		System.out.println(mul(-54, 7816));
+		System.out.println(mul(-5472, -14));
+
+		System.out.println(div(10, 12));
+		System.out.println(div(0, -12));
+		System.out.println(div(-54, 7816));
+		System.out.println(div(-5472, -14));
+
+		System.out.println(rem(10, 12));
+		System.out.println(rem(0, -12));
+		System.out.println(rem(-54, 7816));
+		System.out.println(rem(-5472, -14));
+	}
+
 	public static @type@ add(@type@ a1, @type@ a2) {
 		return a1 + a2;
 	}

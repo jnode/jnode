@@ -477,7 +477,7 @@ final class FPUHelper implements X86CompilerConstants {
 		if (v1.isConstant() && v2.isConstant()) {
 			final double fpv1 = getFPValue(v1);
 			final double fpv2 = getFPValue(v2);
-			vstack.push(createConst(type, fpv1 / fpv2));
+			vstack.push(createConst(type, fpv1 % fpv2));
 		} else {
 			// Prepare stack
 			final FPUStack fpuStack = vstack.fpuStack;
@@ -490,6 +490,7 @@ final class FPUHelper implements X86CompilerConstants {
 			fpuStack.pop();
 
 			// Calculate
+			os.writeFXCH(Register.ST1);
 			os.writeFPREM();
 			os.writeFSTP(Register.ST1);
 

@@ -291,7 +291,7 @@ public abstract class DoubleWordItem extends Item implements
 			// Make sure this item is on top of the FPU stack
 			stack.fpuStack.pop(this);
 			// Convert & move to new space on normal stack
-			os.writeLEA(SP, SP, 8);
+			os.writeLEA(SP, SP, -8);
 			popFromFPU(os, SP, 0);
 			os.writePOP(lsb);
 			os.writePOP(msb);
@@ -385,7 +385,7 @@ public abstract class DoubleWordItem extends Item implements
 			}
 			stack.fpuStack.pop(this);
 			// Convert & move to new space on normal stack
-			os.writeLEA(SP, SP, 8);
+			os.writeLEA(SP, SP, -8);
 			popFromFPU(os, SP, 0);
 			break;
 
