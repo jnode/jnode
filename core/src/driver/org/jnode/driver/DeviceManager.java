@@ -33,7 +33,7 @@ public interface DeviceManager {
 	/**
 	 * The name used to lookup this service.
 	 */
-	public static final Class NAME = DeviceManager.class;//"system/DeviceManager";
+	public static final Class NAME = DeviceManager.class;
 
 	/**
 	 * Returns a collection of all known devices. The collection is not modifiable, but the
@@ -165,18 +165,4 @@ public interface DeviceManager {
      * @param defaultStartTimeout The defaultStartTimeout to set.
      */
     public void setDefaultStartTimeout(long defaultStartTimeout);
-
-    /**
-     * Fire a device started event to all the device listeners
-     * 
-     * @param device
-     */    
-    public void fireStartedEvent(Device device);
-
-    /**
-     * Fire a device stop event to all the device listeners
-     * 
-     * @param device
-     */
-    public void fireStopEvent(Device device);
 }

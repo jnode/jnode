@@ -21,21 +21,10 @@
  
 package org.jnode.driver;
 
-import gnu.java.security.action.GetPropertyAction;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Vector;
 
 import javax.naming.NamingException;
 
@@ -46,7 +35,6 @@ import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.ExtensionPointListener;
 import org.jnode.plugin.PluginException;
 import org.jnode.system.BootLog;
-import org.jnode.util.StopWatch;
 import org.jnode.work.Work;
 import org.jnode.work.WorkUtils;
 
@@ -55,7 +43,7 @@ import org.jnode.work.WorkUtils;
  * 
  * @author epr
  */
-public class DefaultDeviceManager extends AbstractDeviceManager
+public final class DefaultDeviceManager extends AbstractDeviceManager
         implements ExtensionPointListener {
 
     /** finder extension-point */
