@@ -255,17 +255,8 @@ mm_long_mode_flush:
 
 ; Enable paging on the current cpu.
 enable_paging:
-	; Set the pdir address
-	mov eax,pd_paddr
-	mov cr3,eax
-	; Set PSE in CR4 to enable 4Mb extensions
-	mov eax,CR4
-	or eax,CR4_PSE
-	mov cr4,eax
-	; Set PG in CR0 to enable paging
-	mov eax,cr0
-	or eax,CR0_PG
-	mov cr0,eax
+	; TODO implement me
+	
 	; Jump to flush any caches
 	jmp enable_pg_flush
 enable_pg_flush:
@@ -276,7 +267,7 @@ disable_paging:
 	; Reset PG in CR0 to disable paging
 	mov rax,cr0
 	and eax,~CR0_PG
-	mov cr0,eax
+	mov cr0,rax
 	; Jump to flush any caches
 	jmp disable_pg_flush
 disable_pg_flush:
