@@ -34,6 +34,20 @@
 	  <src path="${my-src.dir}/test"/>
       <classpath refid="my-cp"/>
     </javac>
+
+	<!-- copy (if exists) image of file systems (*.img.WORK files are temporary) -->
+    <copy todir="${my-classes.dir}/org/jnode/test/fs/">
+	  <fileset dir="${my-src.dir}/test/org/jnode/test/fs/">
+	    <include name="**/*.img" />
+	    <exclude name="**/*.img.WORK"/>
+	  </fileset>	    
+    </copy>  
+	<!-- copy test config files -->
+    <copy todir="${my-classes.dir}/org/jnode/test/fs/">
+	  <fileset dir="${my-src.dir}/test/org/jnode/test/fs/">
+	    <include name="**/*.xml" />
+	  </fileset>	    
+    </copy>    	
   </target>
 
 <!-- Assemble the jarfile -->
