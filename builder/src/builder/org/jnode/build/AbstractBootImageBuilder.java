@@ -469,6 +469,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			log("Boot heap size " + (bootHeapSize >>> 10) + "K bitmap size "
 					+ (bootHeapBitmapSize >>> 10) + "K");
 			clsMgr.getStatics().dumpStatistics(System.out);
+			vm.dumpStatistics(System.out);
 
 			logStatistics(os);
 
