@@ -24,10 +24,14 @@ F_DF        equ 0x00000400
 F_OF        equ 0x00000800
 F_IOPL1     equ 0x00001000
 F_IOPL2     equ 0x00002000
-F_NT        equ 0x00004000
+F_NT        equ 0x00004000	; Nested task
 F_03        equ 0x00008000
-F_RF        equ 0x00010000
-F_VM        equ 0x00020000
+F_RF        equ 0x00010000	; Resume flag
+F_VM        equ 0x00020000	; Virtual 8086 mode
+F_AC		equ 0x00040000	; Alignment check
+F_VIF		equ	0x00080000	; Virtual interrupt flag
+F_VIP		equ	0x00100000	; Virtual interrupt pending
+F_ID		equ	0x00200000	; ID flag
 
 ; ------------------
 ; CR0 flags
@@ -44,12 +48,17 @@ CR0_PG		equ 0x80000000	; Paging enabled
 ; CR4 flags
 ; ------------------
 
-CR4_VME		equ 0x00000001
-CR4_PVI		equ 0x00000002
-CR4_TSD		equ 0x00000004
-CR4_DE		equ 0x00000008
-CR4_PSE		equ 0x00000010
-CR4_MCE		equ 0x00000040
+CR4_VME			equ 1 << 0	; Virtual Mode Extensions
+CR4_PVI			equ 1 << 1	; Protected mode virtual interrupts
+CR4_TSD			equ 1 << 2	; Timestamp disable
+CR4_DE			equ 1 << 3	; Debugging extensions
+CR4_PSE			equ 1 << 4	; Page size extensions
+CR4_PAE			equ 1 << 5	; Physical address extension
+CR4_MCE			equ 1 << 6	; Machine check enable
+CR4_PGE			equ 1 << 7	; Page global enable
+CR4_PCE			equ 1 << 8	; Performance monitoring counter enable
+CR4_OSFXSR		equ 1 << 9	; Operating system FXSAVE/FXRSTOR support
+CR4_OSXMMEXCPT	equ 1 << 10	; Operating system unmasked exception support
 
 ; ------------------
 ; Page flags
@@ -69,6 +78,40 @@ iPF_AVAIL2		equ 0x00000800
 
 iPF_ADDRMASK	equ 0xFFFFF000
 iPF_FLAGSMASK	equ 0x00000FFF
+
+; ----------------------
+; CPUID feature flags
+; ----------------------
+
+FEAT_FPU		equ 1 << 0
+FEAT_VME		equ 1 << 1
+FEAT_DE			equ 1 << 2
+FEAT_PSE		equ 1 << 3
+FEAT_TSC		equ 1 << 4
+FEAT_MSR		equ 1 << 5
+FEAT_PAE		equ 1 << 6
+FEAT_MCE		equ 1 << 7
+FEAT_CX8		equ 1 << 8
+FEAT_APIC		equ 1 << 9
+FEAT_SEP		equ 1 << 11
+FEAT_MTRR		equ 1 << 12
+FEAT_PGE		equ 1 << 13
+FEAT_MCA		equ 1 << 14
+FEAT_CMOV		equ 1 << 15
+FEAT_PAT		equ 1 << 16
+FEAT_PSE36		equ 1 << 17
+FEAT_PSN		equ 1 << 18
+FEAT_CLFSH		equ 1 << 19
+FEAT_DS			equ 1 << 21
+FEAT_ACPI		equ 1 << 22
+FEAT_MMX		equ 1 << 23
+FEAT_FXSR		equ 1 << 24
+FEAT_SSE		equ 1 << 25
+FEAT_SSE2		equ 1 << 26
+FEAT_SS			equ 1 << 27
+FEAT_HTT		equ 1 << 28
+FEAT_TM			equ 1 << 29
+FEAT_PBE		equ 1 << 31
 
 ; ----------------------
 ; Multiboot Info struct

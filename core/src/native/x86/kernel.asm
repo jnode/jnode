@@ -97,25 +97,21 @@ check_a20:
     mov eax,sys_version
     call sys_print_str
 
+	; Test for a valid cpu
+	call test_cpuid
+
+	; Initialize memory manager
 	call Lsetup_mm
+	; Initialize interrupt handling
 	call Lsetup_idt
 
     mov eax,sys_version
     call sys_print_str
 
-	mov eax,before_sti_msg
-	call sys_print_str
-
-	; Initialized the FPU
-	fninit
-	; Setup rounding mode
-	lea esp,[esp-4]
-	fstcw [esp]
-	or word [esp], 0x0C00
-	fldcw [esp]
-	lea esp,[esp+4]
-
-	;sti
+	; Initialize the FPU
+	call init_fpu
+	; Initialize SSE (if any)
+	call init_sse
 
 	mov eax,before_start_vm_msg
 	call sys_print_str
@@ -205,7 +201,6 @@ _kbcmd_accept:
 	ret
 
 no_multiboot_loader_msg: db 'No multiboot loader. halt...',0;
-before_sti_msg:          db 'Before STI',0xd,0xa,0
 before_start_vm_msg:     db 'Before start_vm',0xd,0xa,0
 after_vm_msg:  			 db 'VM returned with EAX ',0
 
