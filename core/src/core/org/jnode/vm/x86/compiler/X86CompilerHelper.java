@@ -44,7 +44,7 @@ public class X86CompilerHelper extends X86StackManager implements X86CompilerCon
 			jumpTableLabel = null;
 			jumpTableAddress = Unsafe.getJumpTable();
 		}
-		final X86CpuID cpuId = (X86CpuID)os.getCPUID();
+		final X86CpuID cpuId = (X86CpuID) os.getCPUID();
 		haveCMOV = cpuId.hasFeature(X86CpuID.FEAT_CMOV);
 	}
 
@@ -164,33 +164,33 @@ public class X86CompilerHelper extends X86StackManager implements X86CompilerCon
 	 * Write class initialization code
 	 * 
 	 * @param method
-	 * @param methodReg Register that holds the method reference before 
-	 * this method is called.
+	 * @param methodReg
+	 *            Register that holds the method reference before this method is called.
 	 * @return true if code was written, false otherwise
 	 */
-	public final boolean writeClassInitialize(VmMethod method, Register methodReg, X86CompilerContext context) {
+	public final boolean writeClassInitialize(VmMethod method, Register methodReg, Register scratch, X86CompilerContext context) {
 		// Only for static methods (non <clinit>)
 		if (method.isStatic() && !method.isInitializer()) {
 			// Only when class is not initialize
 			final VmType cls = method.getDeclaringClass();
 			if (!cls.isInitialized()) {
 				// Save eax
-				writePUSH(Register.EAX);
+				writePUSH(EAX);
 				// Do the is initialized test
-				//os.writeMOV_Const(Register.EAX, cls);
-				os.writeMOV(INTSIZE, Register.EAX, methodReg, context.getVmMemberDeclaringClassField().getOffset());
-				
-				os.writeMOV(INTSIZE, Register.EAX, Register.EAX, context.getVmTypeModifiers().getOffset());
+				// Move method.declaringClass -> scratch
+				os.writeMOV(INTSIZE, scratch, methodReg, context.getVmMemberDeclaringClassField().getOffset());
+				// Move declaringClass.modifiers -> EAX
+				os.writeMOV(INTSIZE, EAX, scratch, context.getVmTypeModifiers().getOffset());
 				os.writeTEST_EAX(Modifier.ACC_INITIALIZED);
 				final Label afterInit = new Label(method.getMangledName() + "$$after-classinit");
 				os.writeJCC(afterInit, X86Constants.JNZ);
 				// Call cls.initialize
-				os.writeMOV_Const(Register.EAX, cls);
-				writePUSH(Register.EAX);
+				os.writeMOV(INTSIZE, EAX, scratch);
+				writePUSH(EAX);
 				invokeJavaMethod(context.getVmTypeInitialize(), context);
 				os.setObjectRef(afterInit);
 				// Restore eax
-				writePOP(Register.EAX);
+				writePOP(EAX);
 				return true;
 			}
 		}
@@ -200,8 +200,8 @@ public class X86CompilerHelper extends X86StackManager implements X86CompilerCon
 	/**
 	 * Write method counter increment code.
 	 * 
-	 * @param methodReg Register that holds the method reference before 
-	 * this method is called.
+	 * @param methodReg
+	 *            Register that holds the method reference before this method is called.
 	 */
 	public final void writeIncInvocationCount(Register methodReg, X86CompilerContext context) {
 		final int offset = context.getVmMethodInvocationCountField().getOffset();
@@ -210,7 +210,9 @@ public class X86CompilerHelper extends X86StackManager implements X86CompilerCon
 
 	/**
 	 * Write stack overflow test code.
-	 * @param calcReg Register used for intermediate calculation
+	 * 
+	 * @param calcReg
+	 *            Register used for intermediate calculation
 	 * @param method
 	 * @param context
 	 */
@@ -220,7 +222,7 @@ public class X86CompilerHelper extends X86StackManager implements X86CompilerCon
 		//vm_invoke_testStackOverflow:
 		//int 0x31
 		//vm_invoke_testStackOverflowDone:
-		
+
 		final int offset = context.getVmProcessorStackEnd().getOffset();
 		final Label doneLabel = new Label(method + "$$stackof-done");
 		os.writePrefix(X86Constants.FS_PREFIX);
@@ -229,14 +231,19 @@ public class X86CompilerHelper extends X86StackManager implements X86CompilerCon
 		os.writeINT(0x31);
 		os.setObjectRef(doneLabel);
 	}
-	
+
 	/**
-	 * Write code to get an entry out of the constant pool of the declaring class
-	 * of the current method.
-	 * @param dst Destination register
-	 * @param methodReg Register that holds a reference to the current method
-	 * @param cpIdx Index in the constant pool
-	 * @param context The compiler context
+	 * Write code to get an entry out of the constant pool of the declaring class of the current
+	 * method.
+	 * 
+	 * @param dst
+	 *            Destination register
+	 * @param methodReg
+	 *            Register that holds a reference to the current method
+	 * @param cpIdx
+	 *            Index in the constant pool
+	 * @param context
+	 *            The compiler context
 	 */
 	public final void writeGetCPEntry(Register dst, Register methodReg, int cpIdx, X86CompilerContext context, int slotSize) {
 		// First get the declaring class
@@ -269,9 +276,10 @@ public class X86CompilerHelper extends X86StackManager implements X86CompilerCon
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Is CMOVxx support bu the current cpu.
+	 * 
 	 * @return Returns the haveCMOV.
 	 */
 	public final boolean haveCMOV() {
