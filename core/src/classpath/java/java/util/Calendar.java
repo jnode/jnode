@@ -1,5 +1,5 @@
 /* Calendar.java --
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -398,10 +398,10 @@ public abstract class Calendar implements Serializable, Cloneable
 	 * The version of the serialized data on the stream. 
 	 * <dl><dt>0 or not present</dt>
 	 * <dd> JDK 1.1.5 or later.</dd>
-	 * <dl><dt>1</dt>
+   * <dt>1</dt>
 	 * <dd>JDK 1.1.6 or later.  This always writes a correct `time' value
 	 * on the stream, as well as the other fields, to be compatible with
-	 * earlier versions</dd>
+   * earlier versions</dd></dl>
 	 * @since JDK1.1.6
 	 * @serial
 	 */
@@ -454,6 +454,7 @@ public abstract class Calendar implements Serializable, Cloneable
 		firstDayOfWeek = ((Integer) rb.getObject("firstDayOfWeek")).intValue();
     minimalDaysInFirstWeek = ((Integer) rb.getObject("minimalDaysInFirstWeek"))
                              .intValue();
+    clear();
 	}
 
 	/**
@@ -828,16 +829,10 @@ public abstract class Calendar implements Serializable, Cloneable
 		isTimeSet = false;
 		areFieldsSet = false;
     int zoneOffs = zone.getRawOffset();
-
-    int hour = zoneOffs / (60 * 60 * 1000);
-    int minute = (zoneOffs - 60 * 60 * 1000 * hour) / (60 * 1000);
-    int seconds = (zoneOffs - 60 * 60 * 1000 * hour - 60 * 1000 * minute) / 1000;
-    int millis = zoneOffs - 60 * 60 * 1000 * hour - 60 * 1000 * minute
-                 - seconds * 1000;
     int[] tempFields = 
                        {
-                         1, 1970, JANUARY, 1, 1, 1, 1, THURSDAY, 1, AM, hour,
-                         hour, minute, seconds, millis, zoneOffs, 0
+                         1, 1970, JANUARY, 1, 1, 1, 1, THURSDAY, 1, AM, 0, 0, 0,
+                         0, 0, zoneOffs, 0
                        };
     fields = tempFields;
     for (int i = 0; i < FIELD_COUNT; i++)

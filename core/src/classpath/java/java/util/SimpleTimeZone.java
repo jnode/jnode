@@ -1,5 +1,5 @@
 /* java.util.SimpleTimeZone
-   Copyright (C) 1998, 1999, 2000, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2003, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -228,6 +228,7 @@ public class SimpleTimeZone extends TimeZone
    * startMode, endMode and dstSavings.  And there is a optional section
    * as described in writeObject.
    * </dd>
+   * </dl>
    *
    * XXX - JDK 1.2 Beta 4 docu states 1.1.4, but my 1.1.5 has the old
    * version.
@@ -424,6 +425,9 @@ public class SimpleTimeZone extends TimeZone
    */
   private int checkRule(int month, int day, int dayOfWeek)
   {
+    if (month < 0 || month > 11)
+      throw new IllegalArgumentException("month out of range");
+
     int daysInMonth = getDaysInMonth(month, 1);
     if (dayOfWeek == 0)
       {
@@ -689,7 +693,8 @@ public class SimpleTimeZone extends TimeZone
 	boolean afterStart = ! isBefore(year, month, day, dayOfWeek, millis,
 	                                startMode, startMonth, startDay,
 	                                startDayOfWeek, startTime);
-	boolean beforeEnd = isBefore(year, month, day, dayOfWeek, millis,
+	boolean beforeEnd = isBefore(year, month, day, dayOfWeek,
+				     millis + dstSavings,
 	                             endMode, endMonth, endDay, endDayOfWeek,
 	                             endTime);
 
