@@ -24,7 +24,7 @@ package org.jnode.vm.classmgr;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class VmSpecialMethod extends VmStaticMethod {
+public final class VmSpecialMethod extends VmStaticMethod {
 
     /**
      * @param name
