@@ -22,7 +22,7 @@
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Assembler;
-import org.jnode.vm.x86.compiler.X86CompilerContext;
+import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 
 /**
@@ -51,7 +51,7 @@ final class EmitterContext {
 	private final ItemFactory itemfac;
 
 	/** The compiler context */
-	private final X86CompilerContext context;
+	private final EntryPoints context;
 
 	/**
 	 * Create a new context
@@ -59,7 +59,7 @@ final class EmitterContext {
 	EmitterContext(X86Assembler os, X86CompilerHelper helper,
 			VirtualStack vstack, X86RegisterPool gprPool,
 			X86RegisterPool xmmPool, ItemFactory ifac,
-			X86CompilerContext context) {
+			EntryPoints context) {
 		this.os = os;
 		this.helper = helper;
 		this.vstack = vstack;
@@ -125,7 +125,7 @@ final class EmitterContext {
 	 * Gets the compiler context.
 	 * @return
 	 */
-	final X86CompilerContext getContext() {
+	final EntryPoints getContext() {
 		return context;
 	}
 }

@@ -57,10 +57,10 @@ import org.jnode.vm.classmgr.VmStaticMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmTypeState;
 import org.jnode.vm.compiler.CompiledMethod;
+import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.compiler.InlineBytecodeVisitor;
 import org.jnode.vm.x86.compiler.AbstractX86StackManager;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
-import org.jnode.vm.x86.compiler.X86CompilerContext;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 import org.jnode.vm.x86.compiler.X86IMTCompiler32;
 import org.jnode.vm.x86.compiler.X86IMTCompiler64;
@@ -93,7 +93,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 	private final CompiledMethod cm;
 
 	/** Current context */
-	private final X86CompilerContext context;
+	private final EntryPoints context;
 
 	/** Bytecode Address of current instruction */
 	private int curAddress;
@@ -175,7 +175,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 	 * @param context
 	 */
 public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
-			boolean isBootstrap, X86CompilerContext context,
+			boolean isBootstrap, EntryPoints context,
 			MagicHelper magicHelper, TypeSizeInfo typeSizeInfo) {
 		this.os = (X86Assembler) outputStream;
 		this.context = context;

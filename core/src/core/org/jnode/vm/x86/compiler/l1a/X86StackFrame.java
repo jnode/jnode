@@ -35,8 +35,8 @@ import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmMethodCode;
 import org.jnode.vm.compiler.CompiledExceptionHandler;
 import org.jnode.vm.compiler.CompiledMethod;
+import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
-import org.jnode.vm.x86.compiler.X86CompilerContext;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 import org.jnode.vm.x86.compiler.X86JumpTable;
 import org.vmmagic.pragma.LoadStaticsPragma;
@@ -54,7 +54,7 @@ class X86StackFrame implements X86CompilerConstants {
 
 	private final X86CompilerHelper helper;
 
-	private final X86CompilerContext context;
+	private final EntryPoints context;
 
 	private final CompiledMethod cm;
 
@@ -93,7 +93,7 @@ class X86StackFrame implements X86CompilerConstants {
 	 * @param cm
 	 */
 	public X86StackFrame(X86Assembler os, X86CompilerHelper helper,
-			VmMethod method, X86CompilerContext context, CompiledMethod cm) {
+			VmMethod method, EntryPoints context, CompiledMethod cm) {
 		this.os = os;
 		this.helper = helper;
 		this.method = method;
@@ -159,8 +159,8 @@ class X86StackFrame implements X86CompilerConstants {
 		final Label stackOverflowLabel = helper.genLabel("$$stack-overflow");
 		final GPR asp = helper.SP;
 		final GPR abp = helper.BP;
-		final GPR aax = os.isCode32() ? (GPR)X86Register.EAX : X86Register.RAX;
-		final int size = os.getMode().getSize();
+		final GPR aax = helper.AAX;
+		final int size = helper.ADDRSIZE;
 
 		// Begin footer
 		// Now start the actual footer
@@ -193,6 +193,15 @@ class X86StackFrame implements X86CompilerConstants {
         }
         os.writeJCC(stackOverflowLabel, X86Constants.JLE);
         
+        // Load the statics table reference
+        if (method.canThrow(LoadStaticsPragma.class)) {
+            helper.writeLoadSTATICS(helper.genLabel("$$edi"), "init", false);
+        }
+
+        // Load method address into AAX
+        final int methodOffset = helper.getStaticsOffset(method);
+        os.writeMOV(size, aax, helper.STATICS, methodOffset);        
+        
         // Test stack alignment
         writeStackAlignmentTest(helper.genLabel("$$stackAlignment"));
         
@@ -207,7 +216,6 @@ class X86StackFrame implements X86CompilerConstants {
 		os.writePUSH(abp);
 		os.writePUSH(context.getMagic());
 		//os.writePUSH(0); // PC, which is only used in interpreted methods
-		/** EAX MUST contain the VmMethod structure upon entry of the method */
 		os.writePUSH(aax);
 		os.writeMOV(size, abp, asp);
 
@@ -221,12 +229,7 @@ class X86StackFrame implements X86CompilerConstants {
 			}
 		}
 
-		// Load the statics table reference
-		if (method.canThrow(LoadStaticsPragma.class)) {
-			helper.writeLoadSTATICS(helper.genLabel("$$edi"), "init", false);
-		}
-
-		/* Create the synchronization enter code */
+		// Create the synchronization enter code
 		emitSynchronizationCode(typeSizeInfo, context.getMonitorEnterMethod());
 		
 		// And jump back to the actual code start
