@@ -30,121 +30,129 @@ import org.jnode.vm.compiler.ir.quad.VoidReturnQuad;
  * @author Levente Sántha
  */
 public class X86CodeGenerator extends CodeGenerator {
-	private Variable[] spilledVariables;
-	private AbstractX86Stream os;
-	private int displacement;
+    private static final Register SR1 = Register.EAX;
+    private static final Register SR2 = Register.EBX;
+    private static final Register SR3 = Register.ECX;
+    private static final Register SR4 = Register.EDX;
+    private Variable[] spilledVariables;
+    private AbstractX86Stream os;
+    private int displacement;
     private String labelPrefix;
     private String instrLabelPrefix;
     private Label[] addressLabels;
 
-	private final RegisterPool registerPool;
+    private final RegisterPool registerPool;
 
-	/**
-	 * Initialize this instance
-	 */
-	public X86CodeGenerator(AbstractX86Stream x86Stream, int lenght) {
-		CodeGenerator.setCodeGenerator(this);
-		this.registerPool = new X86RegisterPool();
-		this.os = x86Stream;
+    /**
+     * Initialize this instance
+     */
+    public X86CodeGenerator(AbstractX86Stream x86Stream, int lenght) {
+        CodeGenerator.setCodeGenerator(this);
+        this.registerPool = new X86RegisterPool();
+        this.os = x86Stream;
 
         labelPrefix = "label";
         instrLabelPrefix = labelPrefix + "_bci_";
         addressLabels = new Label[lenght];
-	}
+    }
 
     public final Label getInstrLabel(int address) {
-        Label l = addressLabels[ address];
+        Label l = addressLabels[address];
         if (l == null) {
             l = new Label(instrLabelPrefix + address);
-            addressLabels[ address] = l;
+            addressLabels[address] = l;
         }
         return l;
     }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#getRegisterPool()
-	 */
-	public RegisterPool getRegisterPool() {
-		return registerPool;
-	}
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#getRegisterPool()
+     */
+    public RegisterPool getRegisterPool() {
+        return registerPool;
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#supports3AddrOps()
-	 */
-	public boolean supports3AddrOps() {
-		return false;
-	}
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#supports3AddrOps()
+     */
+    public boolean supports3AddrOps() {
+        return false;
+    }
 
-	/**
-	 * @param vars
-	 * @param nArgs
-	 */
-	public void setArgumentVariables(Variable[] vars, int nArgs) {
-		displacement = 0;
-		for (int i=0; i<nArgs; i+=1) {
-			// TODO this might not be right, check with Ewout
-			displacement = vars[i].getIndex() * 4;
-			vars[i].setLocation(new StackLocation(displacement));
-		}
-		// not sure how big the last arg is...
-		displacement += 8;
-	}
+    /**
+     * @param vars
+     * @param nArgs
+     */
+    public void setArgumentVariables(Variable[] vars, int nArgs) {
+        displacement = 0;
+        for (int i = 0; i < nArgs; i += 1) {
+            // TODO this might not be right, check with Ewout
+            displacement = vars[i].getIndex() * 4;
+            vars[i].setLocation(new StackLocation(displacement));
+        }
+        // not sure how big the last arg is...
+        displacement += 8;
+    }
 
-	/**
-	 * @param variables
-	 */
-	public void setSpilledVariables(Variable[] variables) {
-		this.spilledVariables = variables;
-		int n = spilledVariables.length;
-		for (int i=0; i<n; i+=1) {
-			StackLocation loc = (StackLocation) spilledVariables[i].getLocation();
-			loc.setDisplacement(displacement);
-			switch (spilledVariables[i].getType()) {
-				case Operand.BYTE:
-				case Operand.CHAR:
-				case Operand.SHORT:
-				case Operand.INT:
-				case Operand.FLOAT:
-				case Operand.REFERENCE:
-					displacement += 4;
-					break;
-				case Operand.LONG:
-				case Operand.DOUBLE:
-					displacement += 8;
-					break;
-			}
-		}
-	}
+    /**
+     * @param variables
+     */
+    public void setSpilledVariables(Variable[] variables) {
+        this.spilledVariables = variables;
+        int n = spilledVariables.length;
+        for (int i = 0; i < n; i += 1) {
+            StackLocation loc = (StackLocation) spilledVariables[i].getLocation();
+            loc.setDisplacement(displacement);
+            switch (spilledVariables[i].getType()) {
+                case Operand.BYTE:
+                case Operand.CHAR:
+                case Operand.SHORT:
+                case Operand.INT:
+                case Operand.FLOAT:
+                case Operand.REFERENCE:
+                    displacement += 4;
+                    break;
+                case Operand.LONG:
+                case Operand.DOUBLE:
+                    displacement += 8;
+                    break;
+            }
+        }
+    }
 
-	/**
-	 *
-	 */
-	public void emitHeader() {
-		// TODO Auto-generated method stub
+    /**
+     *
+     */
+    public void emitHeader() {
+        os.writePUSH(Register.EBP);
+        //os.writePUSH(context.getMagic());
+        //os.writePUSH(0); // PC, which is only used in interpreted methods
+        /** EAX MUST contain the VmMethod structure upon entry of the method */
+        //os.writePUSH(Register.EAX);
+        os.writeMOV(X86Constants.BITS32, Register.EBP, Register.ESP);
+    }
 
-	}
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.ConditionalBranchQuad)
+     */
+    public void generateCodeFor(ConditionalBranchQuad quad) {
+        throw new IllegalArgumentException("Unknown operation");
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.ConditionalBranchQuad)
-	 */
-	public void generateCodeFor(ConditionalBranchQuad quad) {
-		// TODO Auto-generated method stub
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.ConstantRefAssignQuad)
+     */
+    public void generateCodeFor(ConstantRefAssignQuad quad) {
+        throw new IllegalArgumentException("Unknown operation");
 
-	}
-
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.ConstantRefAssignQuad)
-	 */
-	public void generateCodeFor(ConstantRefAssignQuad quad) {
-		// TODO Auto-generated method stub
-
-	}
+    }
 
     private int prev_addr = 0;
-    public void checkLabel(int address){
-        for(int i = prev_addr + 1; i<= address; i++){
+
+    public void checkLabel(int address) {
+        for (int i = prev_addr + 1; i <= address; i++) {
             Label l = addressLabels[i];
-            if(l == null){
+            if (l == null) {
                 l = getInstrLabel(i);
             }
             os.setObjectRef(l);
@@ -152,81 +160,121 @@ public class X86CodeGenerator extends CodeGenerator {
         prev_addr = address;
     }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnconditionalBranchQuad)
-	 */
-	public void generateCodeFor(UnconditionalBranchQuad quad) {
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnconditionalBranchQuad)
+     */
+    public void generateCodeFor(UnconditionalBranchQuad quad) {
         checkLabel(quad.getAddress());
-		os.writeJMP(getInstrLabel(quad.getTargetAddress()));
-	}
+        os.writeJMP(getInstrLabel(quad.getTargetAddress()));
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.VariableRefAssignQuad)
-	 */
-	public void generateCodeFor(VariableRefAssignQuad quad) {
-	}
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.VariableRefAssignQuad)
+     */
+    public void generateCodeFor(VariableRefAssignQuad quad) {
+        Variable lhs = quad.getLHS();
+        if (lhs.getAddressingMode() == Operand.MODE_REGISTER) {
+            Object reg1 = ((RegisterLocation)lhs.getLocation()).getRegister();
+            Operand rhs = quad.getRHS();
+            int mode = rhs.getAddressingMode();
+            if (mode == Operand.MODE_CONSTANT) {
+                throw new IllegalArgumentException("Unknown operation");
+            } else if (mode == Operand.MODE_REGISTER) {
+                Object reg2 = ((RegisterLocation) ((Variable) rhs).getLocation()).getRegister();
+                os.writeMOV(X86Constants.BITS32, (Register)reg1, (Register) reg2);
+            } else if (mode == Operand.MODE_STACK) {
+                int disp2 = ((StackLocation) ((Variable) rhs).getLocation()).getDisplacement();
+                os.writeMOV(X86Constants.BITS32, (Register)reg1, Register.EBP, disp2);
+            }
+        } else if (lhs.getAddressingMode() == Operand.MODE_STACK) {
+            int disp1 = ((StackLocation)lhs.getLocation()).getDisplacement();
+            Operand rhs = quad.getRHS();
+            int mode = rhs.getAddressingMode();
+            if (mode == Operand.MODE_CONSTANT) {
+                throw new IllegalArgumentException("Unknown operation");
+            } else if (mode == Operand.MODE_REGISTER) {
+                Object reg2 = ((RegisterLocation) ((Variable) rhs).getLocation()).getRegister();
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+            } else if (mode == Operand.MODE_STACK) {
+                //int disp2 = ((StackLocation) ((Variable) rhs).getLocation()).getDisplacement();
+                throw new IllegalArgumentException("Unknown operation");
+            }
+        }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.VarReturnQuad)
-	 */
-	public void generateCodeFor(VarReturnQuad quad) {
+    }
+
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.VarReturnQuad)
+     */
+    public void generateCodeFor(VarReturnQuad quad) {
         checkLabel(quad.getAddress());
-		Operand op = quad.getOperand();
-		// TODO must deal with other types, see else case also
-		if (op instanceof IntConstant) {
-			IntConstant iconst = (IntConstant) op;
-			os.writeMOV_Const(Register.EAX, iconst.getValue());
-		} else if (op instanceof Variable) {
-			Variable var = (Variable) op;
-			Location loc = var.getLocation();
-			if (loc instanceof RegisterLocation) {
-				RegisterLocation regLoc = (RegisterLocation) loc;
-				Register src = (Register) regLoc.getRegister();
-				if (!src.equals(Register.EAX)) {
-					os.writeMOV(X86Constants.BITS32, Register.EAX, src);
-				}
-			} else {
-				StackLocation stackLoc = (StackLocation) loc;
-				os.writeMOV(X86Constants.BITS32, Register.EAX, Register.EBP,
-					stackLoc.getDisplacement());
-			}
-		}
-		os.writeRET();
-	}
+        Operand op = quad.getOperand();
+        // TODO must deal with other types, see else case also
+        if (op instanceof IntConstant) {
+            IntConstant iconst = (IntConstant) op;
+            os.writeMOV_Const(Register.EAX, iconst.getValue());
+        } else if (op instanceof Variable) {
+            Variable var = (Variable) op;
+            Location loc = var.getLocation();
+            if (loc instanceof RegisterLocation) {
+                RegisterLocation regLoc = (RegisterLocation) loc;
+                Register src = (Register) regLoc.getRegister();
+                if (!src.equals(Register.EAX)) {
+                    os.writeMOV(X86Constants.BITS32, Register.EAX, src);
+                }
+            } else {
+                StackLocation stackLoc = (StackLocation) loc;
+                os.writeMOV(X86Constants.BITS32, Register.EAX, Register.EBP,
+                        stackLoc.getDisplacement());
+            }
+        }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.VoidReturnQuad)
-	 */
-	public void generateCodeFor(VoidReturnQuad quad) {
-        checkLabel(quad.getAddress());
-		os.writeRET();
-	}
+        //TODO: hack for testing
+        os.writeMOV(X86Constants.BITS32, Register.ESP,  Register.EBP);
+        os.writePOP(Register.EBP);
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad, java.lang.Object, int, org.jnode.vm.compiler.ir.Constant)
-	 */
-	public void generateCodeFor(UnaryQuad quad, Object lhsReg, int operation,
-		Constant con) {
-        checkLabel(quad.getAddress());
-		switch(operation) {
-			case UnaryQuad.INEG:
-				IntConstant iconst = (IntConstant) con;
-				os.writeMOV_Const((Register) lhsReg, iconst.getValue());
-				os.writeNEG((Register) lhsReg);
-				break;
-			// TODO finish operations
-			default:
-				throw new IllegalArgumentException("Unknown operation");
-		}
-	}
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad, java.lang.Object, int, java.lang.Object)
-	 */
-	public void generateCodeFor(UnaryQuad quad, Object lhsReg, int operation,
-		Object rhsReg) {
+        os.writeRET();
+    }
+
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.VoidReturnQuad)
+     */
+    public void generateCodeFor(VoidReturnQuad quad) {
         checkLabel(quad.getAddress());
-		switch(operation) {
+
+        //TODO: hack for testing
+        os.writeMOV(X86Constants.BITS32, Register.ESP,  Register.EBP);
+        os.writePOP(Register.EBP);
+
+        os.writeRET();
+    }
+
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad, java.lang.Object, int, org.jnode.vm.compiler.ir.Constant)
+     */
+    public void generateCodeFor(UnaryQuad quad, Object lhsReg, int operation,
+                                Constant con) {
+        checkLabel(quad.getAddress());
+        switch (operation) {
+            case UnaryQuad.INEG:
+                IntConstant iconst = (IntConstant) con;
+                os.writeMOV_Const((Register) lhsReg, iconst.getValue());
+                os.writeNEG((Register) lhsReg);
+                break;
+                // TODO finish operations
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
+    }
+
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad, java.lang.Object, int, java.lang.Object)
+     */
+    public void generateCodeFor(UnaryQuad quad, Object lhsReg, int operation,
+                                Object rhsReg) {
+        checkLabel(quad.getAddress());
+        switch (operation) {
             case UnaryQuad.I2L:
             case UnaryQuad.I2F:
             case UnaryQuad.I2D:
@@ -243,28 +291,28 @@ public class X86CodeGenerator extends CodeGenerator {
             case UnaryQuad.I2C:
             case UnaryQuad.I2S:
                 throw new IllegalArgumentException("Unknown operation");
-			case UnaryQuad.INEG:
-				if (lhsReg != rhsReg) {
-					os.writeMOV(X86Constants.BITS32, (Register) lhsReg, (Register) rhsReg);
-				}
-				os.writeNEG((Register) lhsReg);
-				break;
+            case UnaryQuad.INEG:
+                if (lhsReg != rhsReg) {
+                    os.writeMOV(X86Constants.BITS32, (Register) lhsReg, (Register) rhsReg);
+                }
+                os.writeNEG((Register) lhsReg);
+                break;
             case UnaryQuad.LNEG:
             case UnaryQuad.FNEG:
             case UnaryQuad.DNEG:
-			// TODO finish operations
-			default:
-				throw new IllegalArgumentException("Unknown operation");
-		}
-	}
+                // TODO finish operations
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad, java.lang.Object, int, int)
-	 */
-	public void generateCodeFor(UnaryQuad quad, Object lhsReg, int operation,
-		int rhsDisp) {
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad, java.lang.Object, int, int)
+     */
+    public void generateCodeFor(UnaryQuad quad, Object lhsReg, int operation,
+                                int rhsDisp) {
         checkLabel(quad.getAddress());
-		switch(operation) {
+        switch (operation) {
             case UnaryQuad.I2L:
             case UnaryQuad.I2F:
             case UnaryQuad.I2D:
@@ -281,27 +329,27 @@ public class X86CodeGenerator extends CodeGenerator {
             case UnaryQuad.I2C:
             case UnaryQuad.I2S:
                 throw new IllegalArgumentException("Unknown operation");
-			case UnaryQuad.INEG:
-				os.writeMOV(X86Constants.BITS32, (Register) lhsReg, Register.EBP,
-					rhsDisp);
-				os.writeNEG((Register) lhsReg);
-				break;
+            case UnaryQuad.INEG:
+                os.writeMOV(X86Constants.BITS32, (Register) lhsReg, Register.EBP,
+                        rhsDisp);
+                os.writeNEG((Register) lhsReg);
+                break;
             case UnaryQuad.LNEG:
             case UnaryQuad.FNEG:
             case UnaryQuad.DNEG:
-			// TODO finish operations
-			default:
-				throw new IllegalArgumentException("Unknown operation");
-		}
-	}
+                // TODO finish operations
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad, int, int, java.lang.Object)
-	 */
-	public void generateCodeFor(UnaryQuad quad, int lhsDisp, int operation,
-		Object rhsReg) {
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad, int, int, java.lang.Object)
+     */
+    public void generateCodeFor(UnaryQuad quad, int lhsDisp, int operation,
+                                Object rhsReg) {
         checkLabel(quad.getAddress());
-		switch(operation) {
+        switch (operation) {
             case UnaryQuad.I2L:
             case UnaryQuad.I2F:
             case UnaryQuad.I2D:
@@ -318,106 +366,149 @@ public class X86CodeGenerator extends CodeGenerator {
             case UnaryQuad.I2C:
             case UnaryQuad.I2S:
                 throw new IllegalArgumentException("Unknown operation");
-			case UnaryQuad.INEG:
-				os.writeMOV(X86Constants.BITS32, Register.EBP,
-					lhsDisp, (Register) rhsReg);
-				os.writeNEG(Register.EBP, lhsDisp);
-				break;
+            case UnaryQuad.INEG:
+                os.writeMOV(X86Constants.BITS32, Register.EBP,
+                        lhsDisp, (Register) rhsReg);
+                os.writeNEG(Register.EBP, lhsDisp);
+                break;
             case UnaryQuad.LNEG:
             case UnaryQuad.FNEG:
             case UnaryQuad.DNEG:
-			// TODO finish operations
-			default:
-				throw new IllegalArgumentException("Unknown operation");
-		}
-	}
+                // TODO finish operations
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad, int, int, int)
-	 */
-	public void generateCodeFor(UnaryQuad quad, int lhsDisp, int operation, int rhsDisp) {
-		throw new IllegalArgumentException("ineg memory-memory not done");
-	}
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad, int, int, int)
+     */
+    public void generateCodeFor(UnaryQuad quad, int lhsDisp, int operation, int rhsDisp) {
+        throw new IllegalArgumentException("ineg memory-memory not done");
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad, int, int, org.jnode.vm.compiler.ir.Constant)
-	 */
-	public void generateCodeFor(UnaryQuad quad, int lhsDisp, int operation, Constant con) {
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad, int, int, org.jnode.vm.compiler.ir.Constant)
+     */
+    public void generateCodeFor(UnaryQuad quad, int lhsDisp, int operation, Constant con) {
         checkLabel(quad.getAddress());
-		switch(operation) {
-			case UnaryQuad.INEG:
-				IntConstant iconst = (IntConstant) con;
-				os.writeMOV_Const(Register.EBP, lhsDisp, iconst.getValue());
-				os.writeNEG(Register.EBP, lhsDisp);
-				break;
-			// TODO finish operations
-			default:
-				throw new IllegalArgumentException("Unknown operation");
-		}
-	}
+        switch (operation) {
+            case UnaryQuad.INEG:
+                IntConstant iconst = (IntConstant) con;
+                os.writeMOV_Const(Register.EBP, lhsDisp, iconst.getValue());
+                os.writeNEG(Register.EBP, lhsDisp);
+                break;
+                // TODO finish operations
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
+    }
 
-    /// WE should not get to this method
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, org.jnode.vm.compiler.ir.Constant, int, org.jnode.vm.compiler.ir.Constant)
-	 */
-	public void generateBinaryOP(Object reg1, Constant c2, int operation, Constant c3) {
-		switch(operation) {
-			case BinaryQuad.IADD:
-//				IntConstant iconst1 = (IntConstant) c2;
-				//IntConstant iconst2 = (IntConstant) c3;
-//				os.writeMOV_Const((Register) reg1, iconst1.getValue());
-				// TODO STOPPED HERE...
-//				break;
-			// TODO finish operations
-			default:
-				throw new IllegalArgumentException("Unknown operation");
-		}
-	}
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, org.jnode.vm.compiler.ir.Constant, int, java.lang.Object)
-	 */
-	public void generateBinaryOP(Object reg1, Constant c2, int operation, Object reg3) {
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, org.jnode.vm.compiler.ir.Constant, int, org.jnode.vm.compiler.ir.Constant)
+     */
+    public void generateBinaryOP(Object reg1, Constant c2, int operation, Constant c3) {
+        throw new IllegalArgumentException("Constants should be folded");
+    }
+
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, org.jnode.vm.compiler.ir.Constant, int, java.lang.Object)
+     */
+    public void generateBinaryOP(Object reg1, Constant c2, int operation, Object reg3) {
         IntConstant iconst2 = (IntConstant) c2;
-		switch(operation) {
-			case BinaryQuad.IADD:
-				os.writeMOV_Const((Register) reg1, iconst2.getValue());
-				os.writeADD((Register)reg1, (Register)reg3);
-				break;
+        switch (operation) {
+            case BinaryQuad.IADD:
+                os.writeMOV_Const((Register) reg1, iconst2.getValue());
+                os.writeADD((Register) reg1, (Register) reg3);
+                break;
 
             case BinaryQuad.IAND:
                 os.writeMOV_Const((Register) reg1, iconst2.getValue());
-                os.writeAND((Register)reg1, (Register)reg3);
+                os.writeAND((Register) reg1, (Register) reg3);
                 break;
 
             case BinaryQuad.IDIV:   //needs EAX
-                throw new IllegalArgumentException("Unknown operation");
+                os.writePUSH(Register.EDX);
+                os.writePUSH(Register.EAX);
+
+                os.writeMOV_Const(Register.EAX, iconst2.getValue());
+
+                if(reg3 == Register.EDX){
+                    os.writePUSH(Register.EBX);
+                    os.writeMOV(X86Constants.BITS32, Register.EBX,  Register.EDX);
+                    os.writeCDQ();
+                    os.writeIDIV_EAX(Register.EBX);
+                    os.writePOP(Register.EBX);
+                }else{
+                    os.writeCDQ();
+                    os.writeIDIV_EAX((Register) reg3);
+                }
+                if(reg1 != Register.EAX){
+                    os.writeMOV(X86Constants.BITS32, (Register)reg1, Register.EAX);
+                    os.writePOP(Register.EAX);
+                }else{
+                    os.writePOP(Register.EDX);
+                }
+                os.writePOP(Register.EDX);
+                break;
 
             case BinaryQuad.IMUL:
                 os.writeIMUL_3((Register) reg1, (Register) reg3, iconst2.getValue());
-				break;
+                break;
 
             case BinaryQuad.IOR:
                 os.writeMOV_Const((Register) reg1, iconst2.getValue());
-                os.writeOR((Register)reg1, (Register)reg3);
+                os.writeOR((Register) reg1, (Register) reg3);
                 break;
 
             case BinaryQuad.IREM:   //needs EAX
-            case BinaryQuad.ISHL:   //needs CL
-            case BinaryQuad.ISHR:   //needs CL
                 throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISHL:   //needs CL
+                os.writeMOV_Const((Register) reg1, iconst2.getValue());
+                if (reg3 != Register.CX){
+                    os.writePUSH(Register.CX);
+                    os.writeMOV(X86Constants.BITS32, Register.CX, (Register) reg3);
+                    os.writeSAL_CL((Register) reg1);
+                    os.writePOP(Register.CX);
+                }else{
+                    os.writeSAL_CL((Register) reg1);
+                }
+                break;
+
+            case BinaryQuad.ISHR:   //needs CL
+                os.writeMOV_Const((Register) reg1, iconst2.getValue());
+                if (reg3 != Register.CX){
+                    os.writePUSH(Register.CX);
+                    os.writeMOV(X86Constants.BITS32, Register.CX, (Register) reg3);
+                    os.writeSAL_CL((Register) reg1);
+                    os.writePOP(Register.CX);
+                }else{
+                    os.writeSAR_CL((Register) reg1);
+                }
+                break;
 
             case BinaryQuad.ISUB:
                 os.writeMOV_Const((Register) reg1, iconst2.getValue());
-                os.writeSUB((Register)reg1, (Register)reg3);
+                os.writeSUB((Register) reg1, (Register) reg3);
                 break;
 
             case BinaryQuad.IUSHR:
-                throw new IllegalArgumentException("Unknown operation");
+                os.writeMOV_Const((Register) reg1, iconst2.getValue());
+                if (reg3 != Register.CX){
+                    os.writePUSH(Register.CX);
+                    os.writeMOV(X86Constants.BITS32, Register.CX, (Register) reg3);
+                    os.writeSAL_CL((Register) reg1);
+                    os.writePOP(Register.CX);
+                }else{
+                    os.writeSHR_CL((Register) reg1);
+                }
+                break;
 
             case BinaryQuad.IXOR:
                 os.writeMOV_Const((Register) reg1, iconst2.getValue());
-                os.writeXOR((Register)reg1, (Register)reg3);
+                os.writeXOR((Register) reg1, (Register) reg3);
                 break;
 
             case BinaryQuad.DADD:
@@ -441,30 +532,45 @@ public class X86CodeGenerator extends CodeGenerator {
             case BinaryQuad.LSUB:
             case BinaryQuad.LUSHR:
             case BinaryQuad.LXOR:
-			default:
-				throw new IllegalArgumentException("Unknown operation");
-		}
-	}
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, org.jnode.vm.compiler.ir.Constant, int, int)
-	 */
-	public void generateBinaryOP(Object reg1, Constant c2, int operation, int disp3) {
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, org.jnode.vm.compiler.ir.Constant, int, int)
+     */
+    public void generateBinaryOP(Object reg1, Constant c2, int operation, int disp3) {
         IntConstant iconst2 = (IntConstant) c2;
-		switch(operation) {
+        switch (operation) {
 
-			case BinaryQuad.IADD:
-				os.writeMOV_Const((Register) reg1, iconst2.getValue());
-				os.writeADD((Register)reg1, Register.EBP, disp3);
-				break;
+            case BinaryQuad.IADD:
+                os.writeMOV_Const((Register) reg1, iconst2.getValue());
+                os.writeADD((Register) reg1, Register.EBP, disp3);
+                break;
 
             case BinaryQuad.IAND:
                 os.writeMOV_Const((Register) reg1, iconst2.getValue());
-				os.writeAND((Register)reg1, Register.EBP, disp3);
-				break;
+                os.writeAND((Register) reg1, Register.EBP, disp3);
+                break;
 
             case BinaryQuad.IDIV:   //not supported
-                throw new IllegalArgumentException("Unknown operation");
+                os.writePUSH(Register.EDX);
+                os.writePUSH(Register.EAX);
+
+                os.writeMOV_Const(Register.EAX, iconst2.getValue());
+
+                os.writeCDQ();
+                os.writeIDIV_EAX(Register.EBP, disp3);
+
+                if(reg1 != Register.EAX){
+                    os.writeMOV(X86Constants.BITS32, (Register)reg1, Register.EAX);
+                    os.writePOP(Register.EAX);
+                }else{
+                    os.writePOP(Register.EDX);
+                }
+                os.writePOP(Register.EDX);
+                break;
 
             case BinaryQuad.IMUL:
                 os.writeIMUL_3((Register) reg1, Register.EBP, disp3, iconst2.getValue());
@@ -472,26 +578,45 @@ public class X86CodeGenerator extends CodeGenerator {
 
             case BinaryQuad.IOR:
                 os.writeMOV_Const((Register) reg1, iconst2.getValue());
-				os.writeOR((Register)reg1, Register.EBP, disp3);
-				break;
+                os.writeOR((Register) reg1, Register.EBP, disp3);
+                break;
 
             case BinaryQuad.IREM:   //not supported
-            case BinaryQuad.ISHL:   //not supported
-            case BinaryQuad.ISHR:   //not supported
                 throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISHL:   //not supported
+                os.writeMOV_Const((Register) reg1, iconst2.getValue());
+                os.writePUSH(Register.CX);
+                os.writeMOV(X86Constants.BITS32, Register.CX, Register.EBP, disp3);
+                os.writeSAL_CL((Register) reg1);
+                os.writePOP(Register.CX);
+                break;
+
+            case BinaryQuad.ISHR:   //not supported
+                os.writeMOV_Const((Register) reg1, iconst2.getValue());
+                os.writePUSH(Register.CX);
+                os.writeMOV(X86Constants.BITS32, Register.CX, Register.EBP, disp3);
+                os.writeSAR_CL((Register) reg1);
+                os.writePOP(Register.CX);
+                break;
 
             case BinaryQuad.ISUB:
                 os.writeMOV_Const((Register) reg1, iconst2.getValue());
-				os.writeSUB((Register)reg1, Register.EBP, disp3);
-				break;
+                os.writeSUB((Register) reg1, Register.EBP, disp3);
+                break;
 
             case BinaryQuad.IUSHR:  //not supported
-                throw new IllegalArgumentException("Unknown operation");
+                os.writeMOV_Const((Register) reg1, iconst2.getValue());
+                os.writePUSH(Register.CX);
+                os.writeMOV(X86Constants.BITS32, Register.CX, Register.EBP, disp3);
+                os.writeSHR_CL((Register) reg1);
+                os.writePOP(Register.CX);
+                break;
 
             case BinaryQuad.IXOR:
                 os.writeMOV_Const((Register) reg1, iconst2.getValue());
-				os.writeXOR((Register)reg1, Register.EBP, disp3);
-				break;
+                os.writeXOR((Register) reg1, Register.EBP, disp3);
+                break;
 
             case BinaryQuad.DADD:
             case BinaryQuad.DDIV:
@@ -514,34 +639,53 @@ public class X86CodeGenerator extends CodeGenerator {
             case BinaryQuad.LSUB:
             case BinaryQuad.LUSHR:
             case BinaryQuad.LXOR:
-			default:
-				throw new IllegalArgumentException("Unknown operation");
+            default:
+                throw new IllegalArgumentException("Unknown operation");
         }
-	}
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, java.lang.Object, int, org.jnode.vm.compiler.ir.Constant)
-	 */
-	public void generateBinaryOP(Object reg1, Object reg2, int operation, Constant c3) {
-		IntConstant iconst3 = (IntConstant) c3;
-		switch(operation) {
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, java.lang.Object, int, org.jnode.vm.compiler.ir.Constant)
+     */
+    public void generateBinaryOP(Object reg1, Object reg2, int operation, Constant c3) {
+        IntConstant iconst3 = (IntConstant) c3;
+        switch (operation) {
 
-			case BinaryQuad.IADD:
+            case BinaryQuad.IADD:
                 if (reg1 != reg2) {
                     os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
                 }
-                os.writeADD((Register)reg1, iconst3.getValue());
-				break;
+                os.writeADD((Register) reg1, iconst3.getValue());
+                break;
 
             case BinaryQuad.IAND:
                 if (reg1 != reg2) {
                     os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
                 }
-                os.writeAND((Register)reg1, iconst3.getValue());
+                os.writeAND((Register) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IDIV:   //needs EAX
-                throw new IllegalArgumentException("Unknown operation");
+                os.writePUSH(Register.EDX);
+                os.writePUSH(Register.EAX);
+                if(reg2 != Register.EAX){
+                    os.writeMOV(X86Constants.BITS32, Register.EAX, (Register)reg2);
+                }
+
+                os.writePUSH(Register.EBX);
+                os.writeMOV_Const(Register.EBX, iconst3.getValue());
+                os.writeCDQ();
+                os.writeIDIV_EAX(Register.EBX);
+                os.writePOP(Register.EBX);
+
+                if(reg1 != Register.EAX){
+                    os.writeMOV(X86Constants.BITS32, (Register)reg1, Register.EAX);
+                    os.writePOP(Register.EAX);
+                }else{
+                    os.writePOP(Register.EDX);
+                }
+                os.writePOP(Register.EDX);
+                break;
 
             case BinaryQuad.IMUL:
                 os.writeIMUL_3((Register) reg1, (Register) reg2, iconst3.getValue());
@@ -551,30 +695,46 @@ public class X86CodeGenerator extends CodeGenerator {
                 if (reg1 != reg2) {
                     os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
                 }
-                os.writeOR((Register)reg1, iconst3.getValue());
-				break;
+                os.writeOR((Register) reg1, iconst3.getValue());
+                break;
 
             case BinaryQuad.IREM:   //needs EAX
-            case BinaryQuad.ISHL:   //needs CL
-            case BinaryQuad.ISHR:   //needs CL
                 throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISHL:   //needs CL
+                if (reg1 != reg2) {
+                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+                }
+                os.writeSAL((Register) reg1, iconst3.getValue());
+                break;
+
+            case BinaryQuad.ISHR:   //needs CL
+                if (reg1 != reg2) {
+                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+                }
+                os.writeSAR((Register) reg1, iconst3.getValue());
+                break;
 
             case BinaryQuad.ISUB:
                 if (reg1 != reg2) {
                     os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
                 }
-                os.writeSUB((Register)reg1, iconst3.getValue());
+                os.writeSUB((Register) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
-                throw new IllegalArgumentException("Unknown operation");
+                if (reg1 != reg2) {
+                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+                }
+                os.writeSHR((Register) reg1, iconst3.getValue());
+                break;
 
             case BinaryQuad.IXOR:
                 if (reg1 != reg2) {
                     os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
                 }
-                os.writeXOR((Register)reg1, iconst3.getValue());
-				break;
+                os.writeXOR((Register) reg1, iconst3.getValue());
+                break;
 
             case BinaryQuad.DADD:
             case BinaryQuad.DDIV:
@@ -597,17 +757,17 @@ public class X86CodeGenerator extends CodeGenerator {
             case BinaryQuad.LSUB:
             case BinaryQuad.LUSHR:
             case BinaryQuad.LXOR:
-			default:
-				throw new IllegalArgumentException("Unknown operation");
-		}
-	}
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, java.lang.Object, int, java.lang.Object)
-	 */
-	public void generateBinaryOP(Object reg1, Object reg2, int operation, Object reg3) {
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, java.lang.Object, int, java.lang.Object)
+     */
+    public void generateBinaryOP(Object reg1, Object reg2, int operation, Object reg3) {
 
-        switch(operation) {
+        switch (operation) {
 
             case BinaryQuad.IADD:
                 if (reg1 != reg2) {
@@ -623,10 +783,32 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writeAND((Register) reg1, (Register) reg3);
                 break;
 
-            case BinaryQuad.IDIV:   //needs EAX
-                throw new IllegalArgumentException("Unknown operation");
+            case BinaryQuad.IDIV:   //needs EAX, EDX  //TODO verify
+                os.writePUSH(Register.EDX);
+                os.writePUSH(Register.EAX);
+                if(reg2 != Register.EAX){
+                    os.writeMOV(X86Constants.BITS32, Register.EAX, (Register)reg2);
+                }
+                if(reg3 == Register.EDX){
+                    os.writePUSH(Register.EBX);
+                    os.writeMOV(X86Constants.BITS32, Register.EBX,  Register.EDX);
+                    os.writeCDQ();
+                    os.writeIDIV_EAX(Register.EBX);
+                    os.writePOP(Register.EBX);
+                }else{
+                    os.writeCDQ();
+                    os.writeIDIV_EAX((Register) reg3);
+                }
+                if(reg1 != Register.EAX){
+                    os.writeMOV(X86Constants.BITS32, (Register)reg1, Register.EAX);
+                    os.writePOP(Register.EAX);
+                }else{
+                    os.writePOP(Register.EDX);
+                }
+                os.writePOP(Register.EDX);
+                break;
 
-            case BinaryQuad.IMUL:   //needs EAX
+            case BinaryQuad.IMUL:
                 if (reg1 != reg2) {
                     os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
                 }
@@ -640,10 +822,56 @@ public class X86CodeGenerator extends CodeGenerator {
                 os.writeOR((Register) reg1, (Register) reg3);
                 break;
 
-            case BinaryQuad.IREM:   //needs EAX
+            case BinaryQuad.IREM:   //needs EAX, EDX  //TODO verify
+                os.writePUSH(Register.EDX);
+                os.writePUSH(Register.EAX);
+                if(reg2 != Register.EAX){
+                    os.writeMOV(X86Constants.BITS32, Register.EAX, (Register)reg2);
+                }
+                if(reg3 == Register.EDX){
+                    os.writePUSH(Register.EBX);
+                    os.writeMOV(X86Constants.BITS32, Register.EBX,  Register.EDX);
+                    os.writeCDQ();
+                    os.writeIDIV_EAX(Register.EBX);
+                    os.writePOP(Register.EBX);
+                }else{
+                    os.writeCDQ();
+                    os.writeIDIV_EAX((Register) reg3);
+                }
+                if(reg1 != Register.EDX){
+                    os.writeMOV(X86Constants.BITS32, (Register)reg1, Register.EDX);
+                }
+                os.writePOP(Register.EAX);
+                os.writePOP(Register.EDX);
+                break;
+
             case BinaryQuad.ISHL:   //needs CL
+                if (reg1 != reg2) {
+                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+                }
+                if (reg3 != Register.CX){
+                    os.writePUSH(Register.CX);
+                    os.writeMOV(X86Constants.BITS32, Register.CX, (Register) reg3);
+                    os.writeSAL_CL((Register) reg1);
+                    os.writePOP(Register.CX);
+                }else{
+                    os.writeSAL_CL((Register) reg1);
+                }
+                break;
+
             case BinaryQuad.ISHR:   //needs CL
-                throw new IllegalArgumentException("Unknown operation");
+                if (reg1 != reg2) {
+                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+                }
+                if (reg3 != Register.CX){
+                    os.writePUSH(Register.CX);
+                    os.writeMOV(X86Constants.BITS32, Register.CX, (Register) reg3);
+                    os.writeSAR_CL((Register) reg1);
+                    os.writePOP(Register.CX);
+                }else{
+                    os.writeSAL_CL((Register) reg1);
+                }
+                break;
 
             case BinaryQuad.ISUB:
                 if (reg1 != reg2) {
@@ -653,7 +881,18 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
-                throw new IllegalArgumentException("Unknown operation");
+                if (reg1 != reg2) {
+                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+                }
+                if (reg3 != Register.CX){
+                    os.writePUSH(Register.CX);
+                    os.writeMOV(X86Constants.BITS32, Register.CX, (Register) reg3);
+                    os.writeSHR_CL((Register) reg1);
+                    os.writePOP(Register.CX);
+                }else{
+                    os.writeSAL_CL((Register) reg1);
+                }
+                break;
 
             case BinaryQuad.IXOR:
                 if (reg1 != reg2) {
@@ -686,13 +925,13 @@ public class X86CodeGenerator extends CodeGenerator {
             default:
                 throw new IllegalArgumentException("Unknown operation");
         }
-	}
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, java.lang.Object, int, int)
-	 */
-	public void generateBinaryOP(Object reg1, Object reg2, int operation, int disp3) {
-        switch(operation) {
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, java.lang.Object, int, int)
+     */
+    public void generateBinaryOP(Object reg1, Object reg2, int operation, int disp3) {
+        switch (operation) {
 
             case BinaryQuad.IADD:
                 if (reg1 != reg2) {
@@ -709,7 +948,23 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IDIV:   //needs EAX
-                throw new IllegalArgumentException("Unknown operation");
+                os.writePUSH(Register.EDX);
+                os.writePUSH(Register.EAX);
+                if(reg2 != Register.EAX){
+                    os.writeMOV(X86Constants.BITS32, Register.EAX, (Register)reg2);
+                }
+                os.writeCDQ();
+                os.writeIDIV_EAX(Register.EBP, disp3);
+                if(reg1 != Register.EAX){
+                    os.writeMOV(X86Constants.BITS32, (Register)reg1, Register.EAX);
+                    os.writePOP(Register.EAX);
+                }else{
+                    //throw away the old value of EAX
+                    os.writePOP(Register.EDX);
+                }
+                os.writePOP(Register.EDX);
+                break;
+
 
             case BinaryQuad.IMUL:
                 if (reg1 != reg2) {
@@ -726,9 +981,27 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IREM:   //needs EAX
-            case BinaryQuad.ISHL:   //needs CL
-            case BinaryQuad.ISHR:   //needs CL
                 throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISHL:   //needs CL
+                if (reg1 != reg2) {
+                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+                }
+                os.writePUSH(Register.CX);
+                os.writeMOV(X86Constants.BITS32, Register.CX, Register.EBP, disp3);
+                os.writeSAL_CL((Register) reg1);
+                os.writePOP(Register.CX);
+                break;
+
+            case BinaryQuad.ISHR:   //needs CL
+                if (reg1 != reg2) {
+                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+                }
+                os.writePUSH(Register.CX);
+                os.writeMOV(X86Constants.BITS32, Register.CX, Register.EBP, disp3);
+                os.writeSAR_CL((Register) reg1);
+                os.writePOP(Register.CX);
+                break;
 
             case BinaryQuad.ISUB:
                 if (reg1 != reg2) {
@@ -738,7 +1011,14 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
-                throw new IllegalArgumentException("Unknown operation");
+                if (reg1 != reg2) {
+                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+                }
+                os.writePUSH(Register.CX);
+                os.writeMOV(X86Constants.BITS32, Register.CX, Register.EBP, disp3);
+                os.writeSHR_CL((Register) reg1);
+                os.writePOP(Register.CX);
+                break;
 
             case BinaryQuad.IXOR:
                 if (reg1 != reg2) {
@@ -771,27 +1051,47 @@ public class X86CodeGenerator extends CodeGenerator {
             default:
                 throw new IllegalArgumentException("Unknown operation");
         }
-	}
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, int, int, org.jnode.vm.compiler.ir.Constant)
-	 */
-	public void generateBinaryOP(Object reg1, int disp2, int operation, Constant c3) {
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, int, int, org.jnode.vm.compiler.ir.Constant)
+     */
+    public void generateBinaryOP(Object reg1, int disp2, int operation, Constant c3) {
         IntConstant iconst3 = (IntConstant) c3;
-        switch(operation) {
+        switch (operation) {
 
             case BinaryQuad.IADD:
                 os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
-                os.writeADD((Register)reg1, iconst3.getValue());
+                os.writeADD((Register) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IAND:
                 os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
-                os.writeAND((Register)reg1, iconst3.getValue());
+                os.writeAND((Register) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IDIV:   //needs EAX
-                throw new IllegalArgumentException("Unknown operation");
+                os.writePUSH(Register.EDX);
+                os.writePUSH(Register.EAX);
+
+                os.writeMOV(X86Constants.BITS32, Register.EAX, Register.EBP, disp2);
+
+                os.writePUSH(Register.EBX);
+                os.writeMOV_Const(Register.EBX, iconst3.getValue());
+
+                os.writeCDQ();
+                os.writeIDIV_EAX(Register.EBX);
+
+                os.writePOP(Register.EBX);
+
+                if(reg1 != Register.EAX){
+                    os.writeMOV(X86Constants.BITS32, (Register)reg1, Register.EAX);
+                    os.writePOP(Register.EAX);
+                }else{
+                    os.writePOP(Register.EDX);
+                }
+                os.writePOP(Register.EDX);
+                break;
 
             case BinaryQuad.IMUL:   //needs EAX
                 os.writeIMUL_3((Register) reg1, Register.EBP, disp2, iconst3.getValue());
@@ -799,25 +1099,35 @@ public class X86CodeGenerator extends CodeGenerator {
 
             case BinaryQuad.IOR:
                 os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
-                os.writeOR((Register)reg1, iconst3.getValue());
+                os.writeOR((Register) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IREM:   //needs EAX
-            case BinaryQuad.ISHL:   //needs CL
-            case BinaryQuad.ISHR:   //needs CL
                 throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISHL:   //needs CL
+                os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
+                os.writeSAL((Register) reg1, iconst3.getValue());
+                break;
+
+            case BinaryQuad.ISHR:   //needs CL
+                os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
+                os.writeSAR((Register) reg1, iconst3.getValue());
+                break;
 
             case BinaryQuad.ISUB:
                 os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
-                os.writeSUB((Register)reg1, iconst3.getValue());
+                os.writeSUB((Register) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
-                throw new IllegalArgumentException("Unknown operation");
+                os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
+                os.writeSHR((Register) reg1, iconst3.getValue());
+                break;
 
             case BinaryQuad.IXOR:
                 os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
-                os.writeXOR((Register)reg1, iconst3.getValue());
+                os.writeXOR((Register) reg1, iconst3.getValue());
                 break;
 
             case BinaryQuad.DADD:
@@ -844,13 +1154,13 @@ public class X86CodeGenerator extends CodeGenerator {
             default:
                 throw new IllegalArgumentException("Unknown operation");
         }
-	}
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, int, int, java.lang.Object)
-	 */
-	public void generateBinaryOP(Object reg1, int disp2, int operation, Object reg3) {
-		switch(operation) {
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, int, int, java.lang.Object)
+     */
+    public void generateBinaryOP(Object reg1, int disp2, int operation, Object reg3) {
+        switch (operation) {
 
             case BinaryQuad.IADD:
                 os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
@@ -863,7 +1173,28 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IDIV:   //needs EAX
-                throw new IllegalArgumentException("Unknown operation");
+                os.writePUSH(Register.EDX);
+                os.writePUSH(Register.EAX);
+                os.writeMOV(X86Constants.BITS32, Register.EAX, Register.EBP, disp2);
+
+                if(reg3 == Register.EDX){
+                    os.writePUSH(Register.EBX);
+                    os.writeMOV(X86Constants.BITS32, Register.EBX,  Register.EDX);
+                    os.writeCDQ();
+                    os.writeIDIV_EAX(Register.EBX);
+                    os.writePOP(Register.EBX);
+                }else{
+                    os.writeCDQ();
+                    os.writeIDIV_EAX((Register) reg3);
+                }
+                if(reg1 != Register.EAX){
+                    os.writeMOV(X86Constants.BITS32, (Register)reg1, Register.EAX);
+                    os.writePOP(Register.EAX);
+                }else{
+                    os.writePOP(Register.EDX);
+                }
+                os.writePOP(Register.EDX);
+                break;
 
             case BinaryQuad.IMUL:   //needs EAX
                 os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
@@ -876,9 +1207,31 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IREM:   //needs EAX
-            case BinaryQuad.ISHL:   //needs CL
-            case BinaryQuad.ISHR:   //needs CL
                 throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISHL:   //needs CL
+                os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
+                if (reg3 != Register.CX){
+                    os.writePUSH(Register.CX);
+                    os.writeMOV(X86Constants.BITS32, Register.CX, (Register) reg3);
+                    os.writeSHR_CL((Register) reg1);
+                    os.writePOP(Register.CX);
+                }else{
+                    os.writeSAL_CL((Register) reg1);
+                }
+                break;
+
+            case BinaryQuad.ISHR:   //needs CL
+                os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
+                if (reg3 != Register.CX){
+                    os.writePUSH(Register.CX);
+                    os.writeMOV(X86Constants.BITS32, Register.CX, (Register) reg3);
+                    os.writeSHR_CL((Register) reg1);
+                    os.writePOP(Register.CX);
+                }else{
+                    os.writeSAR_CL((Register) reg1);
+                }
+                break;
 
             case BinaryQuad.ISUB:
                 os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
@@ -886,7 +1239,16 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
-                throw new IllegalArgumentException("Unknown operation");
+                os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
+                if (reg3 != Register.CX){
+                    os.writePUSH(Register.CX);
+                    os.writeMOV(X86Constants.BITS32, Register.CX, (Register) reg3);
+                    os.writeSHR_CL((Register) reg1);
+                    os.writePOP(Register.CX);
+                }else{
+                    os.writeSHR_CL((Register) reg1);
+                }
+                break;
 
             case BinaryQuad.IXOR:
                 os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
@@ -917,13 +1279,13 @@ public class X86CodeGenerator extends CodeGenerator {
             default:
                 throw new IllegalArgumentException("Unknown operation");
         }
-	}
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, int, int, int)
-	 */
-	public void generateBinaryOP(Object reg1, int disp2, int operation, int disp3) {
-        switch(operation) {
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, int, int, int)
+     */
+    public void generateBinaryOP(Object reg1, int disp2, int operation, int disp3) {
+        switch (operation) {
             case BinaryQuad.IADD:
                 os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
                 os.writeADD((Register) reg1, Register.EBP, disp3);
@@ -935,7 +1297,22 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IDIV:   //needs EAX
-                throw new IllegalArgumentException("Unknown operation");
+                os.writePUSH(Register.EDX);
+                os.writePUSH(Register.EAX);
+
+                os.writeMOV(X86Constants.BITS32, Register.EAX, Register.EBP, disp2);
+
+                os.writeCDQ();
+                os.writeIDIV_EAX(Register.EBP, disp3);
+
+                if(reg1 != Register.EAX){
+                    os.writeMOV(X86Constants.BITS32, (Register)reg1, Register.EAX);
+                    os.writePOP(Register.EAX);
+                }else{
+                    os.writePOP(Register.EDX);
+                }
+                os.writePOP(Register.EDX);
+                break;
 
             case BinaryQuad.IMUL:   //needs EAX
                 os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
@@ -948,9 +1325,23 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IREM:   //needs EAX
-            case BinaryQuad.ISHL:   //needs CL
-            case BinaryQuad.ISHR:   //needs CL
                 throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISHL:   //needs CL
+                os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
+                os.writePUSH(Register.CX);
+                os.writeMOV(X86Constants.BITS32, Register.CX, Register.EBP, disp3);
+                os.writeSAL_CL((Register) reg1);
+                os.writePOP(Register.CX);
+                break;
+
+            case BinaryQuad.ISHR:   //needs CL
+                os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
+                os.writePUSH(Register.CX);
+                os.writeMOV(X86Constants.BITS32, Register.CX, Register.EBP, disp3);
+                os.writeSAR_CL((Register) reg1);
+                os.writePOP(Register.CX);
+                break;
 
             case BinaryQuad.ISUB:
                 os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
@@ -958,7 +1349,12 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
-                throw new IllegalArgumentException("Unknown operation");
+                os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
+                os.writePUSH(Register.CX);
+                os.writeMOV(X86Constants.BITS32, Register.CX, Register.EBP, disp3);
+                os.writeSHR_CL((Register) reg1);
+                os.writePOP(Register.CX);
+                break;
 
             case BinaryQuad.IXOR:
                 os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
@@ -989,24 +1385,23 @@ public class X86CodeGenerator extends CodeGenerator {
             default:
                 throw new IllegalArgumentException("Unknown operation");
         }
-	}
+    }
 
 
     /// WE should not get to this method
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, org.jnode.vm.compiler.ir.Constant, int, org.jnode.vm.compiler.ir.Constant)
-	 */
-	public void generateBinaryOP(int disp1, Constant c2, int operation, Constant c3) {
-		// not supported, see next method
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, org.jnode.vm.compiler.ir.Constant, int, org.jnode.vm.compiler.ir.Constant)
+     */
+    public void generateBinaryOP(int disp1, Constant c2, int operation, Constant c3) {
+        throw new IllegalArgumentException("Constants should be folded");
+    }
 
-	}
-
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, org.jnode.vm.compiler.ir.Constant, int, java.lang.Object)
-	 */
-	public void generateBinaryOP(int disp1, Constant c2, int operation, Object reg3) {
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, org.jnode.vm.compiler.ir.Constant, int, java.lang.Object)
+     */
+    public void generateBinaryOP(int disp1, Constant c2, int operation, Object reg3) {
         IntConstant iconst2 = (IntConstant) c2;
-		switch(operation) {
+        switch (operation) {
             case BinaryQuad.IADD:
                 os.writeMOV_Const(Register.EBP, disp1, iconst2.getValue());
                 os.writeADD(Register.EBP, disp1, (Register) reg3);
@@ -1027,9 +1422,31 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IREM:   //needs EAX
-            case BinaryQuad.ISHL:   //needs CL
-            case BinaryQuad.ISHR:   //needs CL
                 throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISHL:   //needs CL
+                os.writeMOV_Const(Register.EBP, disp1, iconst2.getValue());
+                if(reg3 != Register.CX){
+                    os.writePUSH(Register.CX);
+                    os.writeMOV(X86Constants.BITS32, Register.CX, (Register) reg3);
+                    os.writeSAL_CL(Register.EBP, disp1);
+                    os.writePOP(Register.CX);
+                }else{
+                    os.writeSAL_CL(Register.EBP, disp1);
+                }
+                break;
+
+            case BinaryQuad.ISHR:   //needs CL
+                os.writeMOV_Const(Register.EBP, disp1, iconst2.getValue());
+                if(reg3 != Register.CX){
+                    os.writePUSH(Register.CX);
+                    os.writeMOV(X86Constants.BITS32, Register.CX, (Register) reg3);
+                    os.writeSAR_CL(Register.EBP, disp1);
+                    os.writePOP(Register.CX);
+                }else{
+                    os.writeSAR_CL(Register.EBP, disp1);
+                }
+                break;
 
             case BinaryQuad.ISUB:
                 os.writeMOV_Const(Register.EBP, disp1, iconst2.getValue());
@@ -1037,7 +1454,16 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
-                throw new IllegalArgumentException("Unknown operation");
+                os.writeMOV_Const(Register.EBP, disp1, iconst2.getValue());
+                if(reg3 != Register.CX){
+                    os.writePUSH(Register.CX);
+                    os.writeMOV(X86Constants.BITS32, Register.CX, (Register) reg3);
+                    os.writeSHR_CL(Register.EBP, disp1);
+                    os.writePOP(Register.CX);
+                }else{
+                    os.writeSHR_CL(Register.EBP, disp1);
+                }
+                break;
 
             case BinaryQuad.IXOR:   //not supported
                 os.writeMOV_Const(Register.EBP, disp1, iconst2.getValue());
@@ -1068,25 +1494,92 @@ public class X86CodeGenerator extends CodeGenerator {
             default:
                 throw new IllegalArgumentException("Unknown operation");
         }
-	}
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, org.jnode.vm.compiler.ir.Constant, int, int)
-	 */
-	public void generateBinaryOP(int disp1, Constant c2, int operation, int disp3) {
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, org.jnode.vm.compiler.ir.Constant, int, int)
+     */
+    public void generateBinaryOP(int disp1, Constant c2, int operation, int disp3) {
         IntConstant iconst2 = (IntConstant) c2;
-		switch(operation) {
+        switch (operation) {
             case BinaryQuad.IADD:
+                os.writePUSH(SR1);
+                os.writeMOV_Const(SR1, iconst2.getValue());
+                os.writeADD(SR1, Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                os.writePOP(SR1);
+                break;
+
             case BinaryQuad.IAND:
+                os.writePUSH(SR1);
+                os.writeMOV_Const(SR1, iconst2.getValue());
+                os.writeAND(SR1, Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                os.writePOP(SR1);
+                break;
+
             case BinaryQuad.IDIV:
+                throw new IllegalArgumentException("Unknown operation");
+
             case BinaryQuad.IMUL:
+                os.writePUSH(SR1);
+                os.writeMOV_Const(SR1, iconst2.getValue());
+                os.writeIMUL(SR1, Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                os.writePOP(SR1);
+                break;
+
             case BinaryQuad.IOR:
+                os.writePUSH(SR1);
+                os.writeMOV_Const(SR1, iconst2.getValue());
+                os.writeOR(SR1, Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                os.writePOP(SR1);
+                break;
+
             case BinaryQuad.IREM:
+                throw new IllegalArgumentException("Unknown operation");
+
             case BinaryQuad.ISHL:
+                os.writeMOV_Const(Register.EBP, disp1, iconst2.getValue());
+                os.writePUSH(Register.CX);
+                os.writeMOV(X86Constants.BITS32, Register.CX, Register.EBP, disp3);
+                os.writeSAL_CL(Register.EBP, disp1);
+                os.writePOP(Register.CX);
+                break;
+
             case BinaryQuad.ISHR:
+                os.writeMOV_Const(Register.EBP, disp1, iconst2.getValue());
+                os.writePUSH(Register.CX);
+                os.writeMOV(X86Constants.BITS32, Register.CX, Register.EBP, disp3);
+                os.writeSAR_CL(Register.EBP, disp1);
+                os.writePOP(Register.CX);
+                break;
+
             case BinaryQuad.ISUB:
+                os.writePUSH(SR1);
+                os.writeMOV_Const(SR1, iconst2.getValue());
+                os.writeSUB(SR1, Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                os.writePOP(SR1);
+                break;
+
             case BinaryQuad.IUSHR:
+                os.writeMOV_Const(Register.EBP, disp1, iconst2.getValue());
+                os.writePUSH(Register.CX);
+                os.writeMOV(X86Constants.BITS32, Register.CX, Register.EBP, disp3);
+                os.writeSHR_CL(Register.EBP, disp1);
+                os.writePOP(Register.CX);
+                break;
+
             case BinaryQuad.IXOR:
+                os.writePUSH(SR1);
+                os.writeMOV_Const(SR1, iconst2.getValue());
+                os.writeXOR(SR1, Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                os.writePOP(SR1);
+                break;
+
             case BinaryQuad.DADD:
             case BinaryQuad.DDIV:
             case BinaryQuad.DMUL:
@@ -1145,16 +1638,16 @@ public class X86CodeGenerator extends CodeGenerator {
             default:
                 throw new IllegalArgumentException("Unknown operation");
         }
-	}
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, java.lang.Object, int, org.jnode.vm.compiler.ir.Constant)
-	 */
-	public void generateBinaryOP(int disp1, Object reg2, int operation, Constant c3) {
-		IntConstant iconst3 = (IntConstant) c3;
-		switch(operation) {
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, java.lang.Object, int, org.jnode.vm.compiler.ir.Constant)
+     */
+    public void generateBinaryOP(int disp1, Object reg2, int operation, Constant c3) {
+        IntConstant iconst3 = (IntConstant) c3;
+        switch (operation) {
 
-			case BinaryQuad.IADD:
+            case BinaryQuad.IADD:
                 os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
                 os.writeADD(Register.EBP, disp1, iconst3.getValue());
                 break;
@@ -1165,7 +1658,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IDIV:   //needs EAX
-            case BinaryQuad.IMUL:   //needs EAX
+            case BinaryQuad.IMUL:   //needs EAX //TODO
                 throw new IllegalArgumentException("Unknown operation");
 
             case BinaryQuad.IOR:
@@ -1174,9 +1667,17 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IREM:   //needs EAX
-            case BinaryQuad.ISHL:   //needs CL
-            case BinaryQuad.ISHR:   //needs CL
                 throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISHL:   //needs CL
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                os.writeSAL(Register.EBP, disp1, iconst3.getValue());
+                break;
+
+            case BinaryQuad.ISHR:   //needs CL
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                os.writeSAR(Register.EBP, disp1, iconst3.getValue());
+                break;
 
             case BinaryQuad.ISUB:
                 os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
@@ -1184,7 +1685,9 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
-                throw new IllegalArgumentException("Unknown operation");
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                os.writeSHR(Register.EBP, disp1, iconst3.getValue());
+                break;
 
             case BinaryQuad.IXOR:
                 os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
@@ -1212,16 +1715,16 @@ public class X86CodeGenerator extends CodeGenerator {
             case BinaryQuad.LSUB:
             case BinaryQuad.LUSHR:
             case BinaryQuad.LXOR:
-			default:
-				throw new IllegalArgumentException("Unknown operation");
-		}
-	}
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, java.lang.Object, int, java.lang.Object)
-	 */
-	public void generateBinaryOP(int disp1, Object reg2, int operation, Object reg3) {
-        switch(operation) {
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, java.lang.Object, int, java.lang.Object)
+     */
+    public void generateBinaryOP(int disp1, Object reg2, int operation, Object reg3) {
+        switch (operation) {
             case BinaryQuad.IADD:
                 os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
                 os.writeADD(Register.EBP, disp1, (Register) reg3);
@@ -1233,7 +1736,7 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IDIV:   //needs EAX
-            case BinaryQuad.IMUL:   //needs EAX
+            case BinaryQuad.IMUL:   //needs EAX     //TODO
                 throw new IllegalArgumentException("Unknown operation");
 
             case BinaryQuad.IOR:
@@ -1242,9 +1745,31 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IREM:   //needs EAX
-            case BinaryQuad.ISHL:   //needs CL
-            case BinaryQuad.ISHR:   //needs CL
                 throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISHL:   //needs CL
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                if(reg3 != Register.CX){
+                    os.writePUSH(Register.CX);
+                    os.writeMOV(X86Constants.BITS32, Register.CX, (Register) reg3);
+                    os.writeSAL_CL(Register.EBP, disp1);
+                    os.writePOP(Register.CX);
+                }else{
+                    os.writeSAL_CL(Register.EBP, disp1);
+                }
+                break;
+
+            case BinaryQuad.ISHR:   //needs CL
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                if(reg3 != Register.CX){
+                    os.writePUSH(Register.CX);
+                    os.writeMOV(X86Constants.BITS32, Register.CX, (Register) reg3);
+                    os.writeSAR_CL(Register.EBP, disp1);
+                    os.writePOP(Register.CX);
+                }else{
+                    os.writeSAR_CL(Register.EBP, disp1);
+                }
+                break;
 
             case BinaryQuad.ISUB:
                 os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
@@ -1252,7 +1777,16 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.IUSHR:  //needs CL
-                throw new IllegalArgumentException("Unknown operation");
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                if(reg3 != Register.CX){
+                    os.writePUSH(Register.CX);
+                    os.writeMOV(X86Constants.BITS32, Register.CX, (Register) reg3);
+                    os.writeSHR_CL(Register.EBP, disp1);
+                    os.writePOP(Register.CX);
+                }else{
+                    os.writeSHR_CL(Register.EBP, disp1);
+                }
+                break;
 
             case BinaryQuad.IXOR:
                 os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
@@ -1283,39 +1817,87 @@ public class X86CodeGenerator extends CodeGenerator {
             default:
                 throw new IllegalArgumentException("Unknown operation");
         }
-	}
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, java.lang.Object, int, int)
-	 */
-	public void generateBinaryOP(int disp1, Object reg2, int operation, int disp3) {
-		throw new IllegalArgumentException("Unknown operation");
-	}
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, java.lang.Object, int, int)
+     */
+    public void generateBinaryOP(int disp1, Object reg2, int operation, int disp3) {
+        switch (operation) {
+            case BinaryQuad.IADD:
+                os.writePUSH((Register) reg2);
+                os.writeADD((Register) reg2, Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                os.writePOP((Register) reg2);
+                break;
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, int, int, org.jnode.vm.compiler.ir.Constant)
-	 */
-	public void generateBinaryOP(int disp1, int disp2, int operation, Constant c3) {
-        //IntConstant iconst3 = (IntConstant) c3;
-        switch(operation) {
 
-            case BinaryQuad.IADD:   //not supported due to the move bellow
-//                if(disp1 != disp2){
-//                    os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, Register.EBP, disp2);
-//                }
-//                os.writeADD(Register.EBP, disp1, iconst3.getValue());
-//                break;
+            case BinaryQuad.IAND:
+                os.writePUSH((Register) reg2);
+                os.writeAND((Register) reg2, Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                os.writePOP((Register) reg2);
+                break;
 
-            case BinaryQuad.IAND:   //not supported
             case BinaryQuad.IDIV:   //needs EAX
+                throw new IllegalArgumentException("Unknown operation");
+
             case BinaryQuad.IMUL:   //needs EAX
-            case BinaryQuad.IOR:    //not supported
+                os.writePUSH((Register) reg2);
+                os.writeIMUL((Register) reg2, Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                os.writePOP((Register) reg2);
+                break;
+
+
+            case BinaryQuad.IOR:
+                os.writePUSH((Register) reg2);
+                os.writeOR((Register) reg2, Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                os.writePOP((Register) reg2);
+                break;
+
             case BinaryQuad.IREM:   //needs EAX
+                throw new IllegalArgumentException("Unknown operation");
+
             case BinaryQuad.ISHL:   //needs CL
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                os.writePUSH(Register.CX);
+                os.writeMOV(X86Constants.BITS32, Register.CX, Register.EBP, disp3);
+                os.writeSAL_CL(Register.EBP, disp1);
+                os.writePOP(Register.CX);
+                break;
+
             case BinaryQuad.ISHR:   //needs CL
-            case BinaryQuad.ISUB:   //not supported
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                os.writePUSH(Register.CX);
+                os.writeMOV(X86Constants.BITS32, Register.CX, Register.EBP, disp3);
+                os.writeSAR_CL(Register.EBP, disp1);
+                os.writePOP(Register.CX);
+                break;
+
+            case BinaryQuad.ISUB:
+                os.writePUSH((Register) reg2);
+                os.writeSUB((Register) reg2, Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                os.writePOP((Register) reg2);
+                break;
+
             case BinaryQuad.IUSHR:  //needs CL
-            case BinaryQuad.IXOR:   //not supported
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                os.writePUSH(Register.CX);
+                os.writeMOV(X86Constants.BITS32, Register.CX, Register.EBP, disp3);
+                os.writeSHR_CL(Register.EBP, disp1);
+                os.writePOP(Register.CX);
+                break;
+
+            case BinaryQuad.IXOR:
+                os.writePUSH((Register) reg2);
+                os.writeXOR((Register) reg2, Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                os.writePOP((Register) reg2);
+                break;
+
             case BinaryQuad.DADD:
             case BinaryQuad.DDIV:
             case BinaryQuad.DMUL:
@@ -1340,32 +1922,346 @@ public class X86CodeGenerator extends CodeGenerator {
             default:
                 throw new IllegalArgumentException("Unknown operation");
         }
-	}
+    }
 
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, int, int, java.lang.Object)
-	 */
-	public void generateBinaryOP(int disp1, int disp2, int operation, Object reg3) {
-		//not supported for the reason in the previous method
-	}
-
-	/**
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, int, int, int)
-	 */
-	public void generateBinaryOP(int disp1, int disp2, int operation, int disp3) {
-        switch(operation) {
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, int, int, org.jnode.vm.compiler.ir.Constant)
+     */
+    public void generateBinaryOP(int disp1, int disp2, int operation, Constant c3) {
+        IntConstant iconst3 = (IntConstant) c3;
+        switch (operation) {
+            //todo optimize
             case BinaryQuad.IADD:   //not supported due to the move bellow
-            case BinaryQuad.IAND:   //not supported
+                os.writePUSH(SR1);
+                os.writeMOV(X86Constants.BITS32, SR1, Register.EBP, disp2);
+                os.writeADD(SR1, iconst3.getValue());
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                os.writePOP(SR1);
+                break;
+
+            case BinaryQuad.IAND:
+                os.writePUSH(SR1);
+                os.writeMOV(X86Constants.BITS32, SR1, Register.EBP, disp2);
+                os.writeAND(SR1, iconst3.getValue());
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                os.writePOP(SR1);
+                break;
+
             case BinaryQuad.IDIV:   //needs EAX
-            case BinaryQuad.IMUL:   //needs EAX
-            case BinaryQuad.IOR:    //not supported
-            case BinaryQuad.IREM:   //needs EAX
-            case BinaryQuad.ISHL:   //needs CL
-            case BinaryQuad.ISHR:   //needs CL
-            case BinaryQuad.ISUB:   //not supported
-            case BinaryQuad.IUSHR:  //needs CL
-            case BinaryQuad.IXOR:   //not supported
                 throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.IMUL:
+                os.writePUSH(SR1);
+                os.writeIMUL_3(SR1, Register.EBP, disp2, iconst3.getValue());
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                os.writePOP(SR1);
+                break;
+
+            case BinaryQuad.IOR:    //not supported
+                os.writePUSH(SR1);
+                os.writeMOV(X86Constants.BITS32, SR1, Register.EBP, disp2);
+                os.writeOR(SR1, iconst3.getValue());
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                os.writePOP(SR1);
+                break;
+
+            case BinaryQuad.IREM:   //needs EAX
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISHL:   //needs CL
+                if(disp1 != disp2){
+                    os.writePUSH(SR1);
+                    os.writeMOV(X86Constants.BITS32, SR1, Register.EBP, disp2);
+                    os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                    os.writePOP(SR1);
+                }
+                os.writeSAL(Register.EBP, disp1, iconst3.getValue());
+                break;
+
+            case BinaryQuad.ISHR:   //needs CL
+                if(disp1 != disp2){
+                    os.writePUSH(SR1);
+                    os.writeMOV(X86Constants.BITS32, SR1, Register.EBP, disp2);
+                    os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                    os.writePOP(SR1);
+                }
+                os.writeSAR(Register.EBP, disp1, iconst3.getValue());
+                break;
+
+            case BinaryQuad.ISUB:   //not supported
+                os.writePUSH(SR1);
+                os.writeMOV(X86Constants.BITS32, SR1, Register.EBP, disp2);
+                os.writeSUB(SR1, iconst3.getValue());
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                os.writePOP(SR1);
+                break;
+
+            case BinaryQuad.IUSHR:  //needs CL
+                if(disp1 != disp2){
+                    os.writePUSH(SR1);
+                    os.writeMOV(X86Constants.BITS32, SR1, Register.EBP, disp2);
+                    os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                    os.writePOP(SR1);
+                }
+                os.writeSHR(Register.EBP, disp1, iconst3.getValue());
+                break;
+
+            case BinaryQuad.IXOR:   //not supported
+                os.writePUSH(SR1);
+                os.writeMOV(X86Constants.BITS32, SR1, Register.EBP, disp2);
+                os.writeXOR(SR1, iconst3.getValue());
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                os.writePOP(SR1);
+                break;
+
+            case BinaryQuad.DADD:
+            case BinaryQuad.DDIV:
+            case BinaryQuad.DMUL:
+            case BinaryQuad.DREM:
+            case BinaryQuad.DSUB:
+            case BinaryQuad.FADD:
+            case BinaryQuad.FDIV:
+            case BinaryQuad.FMUL:
+            case BinaryQuad.FREM:
+            case BinaryQuad.FSUB:
+            case BinaryQuad.LADD:
+            case BinaryQuad.LAND:
+            case BinaryQuad.LDIV:
+            case BinaryQuad.LMUL:
+            case BinaryQuad.LOR:
+            case BinaryQuad.LREM:
+            case BinaryQuad.LSHL:
+            case BinaryQuad.LSHR:
+            case BinaryQuad.LSUB:
+            case BinaryQuad.LUSHR:
+            case BinaryQuad.LXOR:
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
+    }
+
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, int, int, java.lang.Object)
+     */
+    public void generateBinaryOP(int disp1, int disp2, int operation, Object reg3) {
+        switch (operation) {
+            case BinaryQuad.IADD:
+                if(disp1 != disp2){
+                    os.writePUSH(Register.EBP,disp2);
+                    os.writePOP(Register.EBP, disp1);
+                }
+                os.writeADD(Register.EBP, disp1, (Register)reg3);
+                break;
+
+
+            case BinaryQuad.IAND:
+                if(disp1 != disp2){
+                    os.writePUSH(Register.EBP,disp2);
+                    os.writePOP(Register.EBP, disp1);
+                }
+                os.writeAND(Register.EBP, disp1, (Register)reg3);
+                break;
+
+            case BinaryQuad.IDIV:   //needs EAX
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.IMUL:   //needs EAX
+                //os.writePUSH(Register.EBP,disp2);
+                //os.writePOP(Register.EBP, disp1);
+                //os.writeIMUL(Register.EBP, disp1, (Register)reg3);
+                throw new IllegalArgumentException("Unknown operation");
+                //break;
+
+
+            case BinaryQuad.IOR:
+                if(disp1 != disp2){
+                    os.writePUSH(Register.EBP,disp2);
+                    os.writePOP(Register.EBP, disp1);
+                }
+                os.writeOR(Register.EBP, disp1, (Register)reg3);
+                break;
+
+            case BinaryQuad.IREM:   //needs EAX
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISHL:   //needs CL
+                if(disp1 != disp2){
+                    os.writePUSH(Register.EBP,disp2);
+                    os.writePOP(Register.EBP, disp1);
+                }
+                if(reg3 != Register.CX){
+                    os.writePUSH(Register.CX);
+                    os.writeMOV(X86Constants.BITS32, Register.CX, (Register) reg3);
+                    os.writeSAL_CL(Register.EBP, disp1);
+                    os.writePOP(Register.CX);
+                }else{
+                    os.writeSAL_CL(Register.EBP, disp1);
+                }
+                break;
+
+            case BinaryQuad.ISHR:   //needs CL
+                if(disp1 != disp2){
+                    os.writePUSH(Register.EBP,disp2);
+                    os.writePOP(Register.EBP, disp1);
+                }
+                if(reg3 != Register.CX){
+                    os.writePUSH(Register.CX);
+                    os.writeMOV(X86Constants.BITS32, Register.CX, (Register) reg3);
+                    os.writeSAR_CL(Register.EBP, disp1);
+                    os.writePOP(Register.CX);
+                }else{
+                    os.writeSAR_CL(Register.EBP, disp1);
+                }
+                break;
+
+            case BinaryQuad.ISUB:
+                if(disp1 != disp2){
+                    os.writePUSH(Register.EBP,disp2);
+                    os.writePOP(Register.EBP, disp1);
+                }
+                os.writeSUB(Register.EBP, disp1, (Register)reg3);
+                break;
+
+            case BinaryQuad.IUSHR:  //needs CL
+                if(disp1 != disp2){
+                    os.writePUSH(Register.EBP,disp2);
+                    os.writePOP(Register.EBP, disp1);
+                }
+                if(reg3 != Register.CX){
+                    os.writePUSH(Register.CX);
+                    os.writeMOV(X86Constants.BITS32, Register.CX, (Register) reg3);
+                    os.writeSHR_CL(Register.EBP, disp1);
+                    os.writePOP(Register.CX);
+                }else{
+                    os.writeSHR_CL(Register.EBP, disp1);
+                }
+                break;
+
+            case BinaryQuad.IXOR:
+                if(disp1 != disp2){
+                    os.writePUSH(Register.EBP,disp2);
+                    os.writePOP(Register.EBP, disp1);
+                }
+                os.writeXOR(Register.EBP, disp1, (Register)reg3);
+                break;
+
+            case BinaryQuad.DADD:
+            case BinaryQuad.DDIV:
+            case BinaryQuad.DMUL:
+            case BinaryQuad.DREM:
+            case BinaryQuad.DSUB:
+            case BinaryQuad.FADD:
+            case BinaryQuad.FDIV:
+            case BinaryQuad.FMUL:
+            case BinaryQuad.FREM:
+            case BinaryQuad.FSUB:
+            case BinaryQuad.LADD:
+            case BinaryQuad.LAND:
+            case BinaryQuad.LDIV:
+            case BinaryQuad.LMUL:
+            case BinaryQuad.LOR:
+            case BinaryQuad.LREM:
+            case BinaryQuad.LSHL:
+            case BinaryQuad.LSHR:
+            case BinaryQuad.LSUB:
+            case BinaryQuad.LUSHR:
+            case BinaryQuad.LXOR:
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
+    }
+
+    /**
+     * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, int, int, int)
+     */
+    public void generateBinaryOP(int disp1, int disp2, int operation, int disp3) {
+        switch (operation) {
+            case BinaryQuad.IADD:
+                os.writePUSH(SR1);
+                os.writeMOV(X86Constants.BITS32, SR1, Register.EBP, disp2);
+                os.writeADD(SR1, Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                os.writePOP(SR1);
+                break;
+
+            case BinaryQuad.IAND:
+                os.writePUSH(SR1);
+                os.writeMOV(X86Constants.BITS32, SR1, Register.EBP, disp2);
+                os.writeAND(SR1, Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                os.writePOP(SR1);
+                break;
+
+            case BinaryQuad.IDIV:
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.IMUL:
+                os.writePUSH(SR1);
+                os.writeMOV(X86Constants.BITS32, SR1, Register.EBP, disp2);
+                os.writeIMUL(SR1, Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                os.writePOP(SR1);
+                break;
+
+            case BinaryQuad.IOR:
+                os.writePUSH(SR1);
+                os.writeMOV(X86Constants.BITS32, SR1, Register.EBP, disp2);
+                os.writeOR(SR1, Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                os.writePOP(SR1);
+                break;
+
+            case BinaryQuad.IREM:
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISHL:
+                if(disp1 != disp2){
+                    os.writePUSH(Register.EBP,disp2);
+                    os.writePOP(Register.EBP, disp1);
+                }
+                os.writePUSH(Register.CX);
+                os.writeMOV(X86Constants.BITS32, Register.CX, Register.EBP, disp3);
+                os.writeSAL_CL(Register.EBP, disp1);
+                os.writePOP(Register.CX);
+                break;
+
+            case BinaryQuad.ISHR:
+                if(disp1 != disp2){
+                    os.writePUSH(Register.EBP,disp2);
+                    os.writePOP(Register.EBP, disp1);
+                }
+                os.writePUSH(Register.CX);
+                os.writeMOV(X86Constants.BITS32, Register.CX, Register.EBP, disp3);
+                os.writeSAR_CL(Register.EBP, disp1);
+                os.writePOP(Register.CX);
+                break;
+
+            case BinaryQuad.ISUB:
+                os.writePUSH(SR1);
+                os.writeMOV(X86Constants.BITS32, SR1, Register.EBP, disp2);
+                os.writeSUB(SR1, Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                os.writePOP(SR1);
+                break;
+
+            case BinaryQuad.IUSHR:
+                if(disp1 != disp2){
+                    os.writePUSH(Register.EBP,disp2);
+                    os.writePOP(Register.EBP, disp1);
+                }
+                os.writePUSH(Register.CX);
+                os.writeMOV(X86Constants.BITS32, Register.CX, Register.EBP, disp3);
+                os.writeSHR_CL(Register.EBP, disp1);
+                os.writePOP(Register.CX);
+                break;
+
+            case BinaryQuad.IXOR:
+                os.writePUSH(SR1);
+                os.writeMOV(X86Constants.BITS32, SR1, Register.EBP, disp2);
+                os.writeXOR(SR1, Register.EBP, disp3);
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, SR1);
+                os.writePOP(SR1);
+                break;
 
             case BinaryQuad.DADD:
                 os.writeFLD64(Register.EBP, disp2);
@@ -1445,8 +2341,10 @@ public class X86CodeGenerator extends CodeGenerator {
             default:
                 throw new IllegalArgumentException("Unknown operation");
         }
-	}
+    }
 
+
+    /********** BRANCHES ***************************************/
     /**
      * @param quad
      * @param condition
@@ -1470,7 +2368,7 @@ public class X86CodeGenerator extends CodeGenerator {
     }
 
     private void generateJumpForUnaryCondition(ConditionalBranchQuad quad, int condition) {
-        switch(condition){
+        switch (condition) {
             case ConditionalBranchQuad.IFEQ:
                 os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JE);
                 break;
@@ -1514,7 +2412,7 @@ public class X86CodeGenerator extends CodeGenerator {
      * @param cons
      */
     public void generateCodeFor(ConditionalBranchQuad quad, int condition, Constant cons) {
-        switch(condition){
+        switch (condition) {
             case ConditionalBranchQuad.IFEQ:
             case ConditionalBranchQuad.IFNE:
             case ConditionalBranchQuad.IFGT:
@@ -1535,7 +2433,7 @@ public class X86CodeGenerator extends CodeGenerator {
      * @param c2
      */
     public void generateCodeFor(ConditionalBranchQuad quad, Constant c1, int condition, Constant c2) {
-        switch(condition){
+        switch (condition) {
             case ConditionalBranchQuad.IF_ICMPEQ:
             case ConditionalBranchQuad.IF_ICMPNE:
             case ConditionalBranchQuad.IF_ICMPGT:
@@ -1556,7 +2454,7 @@ public class X86CodeGenerator extends CodeGenerator {
      * @param disp2
      */
     public void generateCodeFor(ConditionalBranchQuad quad, Constant c1, int condition, int disp2) {
-        switch(condition){
+        switch (condition) {
             case ConditionalBranchQuad.IF_ICMPEQ:
             case ConditionalBranchQuad.IF_ICMPNE:
             case ConditionalBranchQuad.IF_ICMPGT:
@@ -1577,7 +2475,7 @@ public class X86CodeGenerator extends CodeGenerator {
      * @param reg2
      */
     public void generateCodeFor(ConditionalBranchQuad quad, Constant c1, int condition, Object reg2) {
-        switch(condition){
+        switch (condition) {
             case ConditionalBranchQuad.IF_ICMPEQ:
             case ConditionalBranchQuad.IF_ICMPNE:
             case ConditionalBranchQuad.IF_ICMPGT:
@@ -1599,7 +2497,7 @@ public class X86CodeGenerator extends CodeGenerator {
      */
     public void generateCodeFor(ConditionalBranchQuad quad, int disp1, int condition, Constant c2) {
         checkLabel(quad.getAddress());
-        os.writeCMP_Const(Register.EBP, disp1, ((IntConstant)c2).getValue());
+        os.writeCMP_Const(Register.EBP, disp1, ((IntConstant) c2).getValue());
         generateJumpForBinaryCondition(quad, condition);
     }
 
@@ -1610,7 +2508,7 @@ public class X86CodeGenerator extends CodeGenerator {
      * @param disp2
      */
     public void generateCodeFor(ConditionalBranchQuad quad, int disp1, int condition, int disp2) {
-        switch(condition){
+        switch (condition) {
             case ConditionalBranchQuad.IF_ICMPEQ:
             case ConditionalBranchQuad.IF_ICMPNE:
             case ConditionalBranchQuad.IF_ICMPGT:
@@ -1644,7 +2542,7 @@ public class X86CodeGenerator extends CodeGenerator {
      */
     public void generateCodeFor(ConditionalBranchQuad quad, Object reg1, int condition, Constant c2) {
         checkLabel(quad.getAddress());
-        os.writeCMP_Const((Register) reg1, ((IntConstant)c2).getValue());
+        os.writeCMP_Const((Register) reg1, ((IntConstant) c2).getValue());
         generateJumpForBinaryCondition(quad, condition);
     }
 
@@ -1656,7 +2554,7 @@ public class X86CodeGenerator extends CodeGenerator {
      */
     public void generateCodeFor(ConditionalBranchQuad quad, Object reg1, int condition, int disp2) {
         checkLabel(quad.getAddress());
-        os.writeCMP((Register) reg1, Register.EBP, disp2 );
+        os.writeCMP((Register) reg1, Register.EBP, disp2);
         generateJumpForBinaryCondition(quad, condition);
     }
 
@@ -1673,7 +2571,7 @@ public class X86CodeGenerator extends CodeGenerator {
     }
 
     private void generateJumpForBinaryCondition(ConditionalBranchQuad quad, int condition) {
-        switch(condition){
+        switch (condition) {
             case ConditionalBranchQuad.IF_ICMPEQ:
                 os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JE);
                 break;

@@ -22,8 +22,8 @@ public class X86RegisterPool extends RegisterPool {
 		registers.add(Register.EBX);
 		registers.add(Register.ECX);
 		registers.add(Register.EDX);
-        //registers.add(Register.ESI);
-        //registers.add(Register.EDI);
+        registers.add(Register.ESI);
+        registers.add(Register.EDI);
 		// not sure what to do with ESI and EDI just yet...
 	}
 
