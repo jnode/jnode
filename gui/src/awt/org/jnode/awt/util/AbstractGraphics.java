@@ -47,7 +47,7 @@ public abstract class AbstractGraphics extends Graphics2D {
 	private Color bgColor = Color.WHITE;
 	private Color fgColor = Color.BLACK;
 	private Color xorColor = null;
-	private Font font = new Font("Dialog", Font.PLAIN, 10);
+	private Font font = new Font("Luxi Sans", Font.PLAIN, 10);
 	private Shape clip;
 	private Stroke stroke = DEFAULT_STROKE;
 	AffineTransform transform = new AffineTransform();
