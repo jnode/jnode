@@ -4,7 +4,6 @@
 package org.jnode.jnasm.preprocessor;
 
 import java.util.HashMap;
-import java.util.Collection;
 import java.util.HashSet;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -15,15 +14,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.StringReader;
 import java.io.Reader;
+import java.lang.reflect.Constructor;
 
 /**
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public abstract class Preprocessor {
-    static HashMap multiMacros = new HashMap();
-    static HashMap singleMacros = new HashMap();
-    static HashSet localLabels = new HashSet();
-    boolean substitute = true;
+    private static final String PARSER_CLASS = "org.jnode.jnasm.preprocessor.gen.JNAsmPP";
+    protected static HashMap multiMacros = new HashMap();
+    protected static HashMap singleMacros = new HashMap();
+    protected static HashSet localLabels = new HashSet();
+    protected boolean substitute = true;
 
     public static void main(String[] argv) throws Exception{
         newInstance(System.in).print(new OutputStreamWriter(System.out));
@@ -32,15 +33,28 @@ public abstract class Preprocessor {
     }
 
     public static Preprocessor newInstance(InputStream in){
-        singleMacros.put("BITS32", "");
-        return new JNAsmPP(in);
+        try{
+            singleMacros.put("BITS32", "");
+            Class clazz = Class.forName(PARSER_CLASS);
+            Constructor cons = clazz.getConstructor(new Class[]{InputStream.class});
+            return (Preprocessor) cons.newInstance(new Object[]{in});
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
     }
 
     public static Preprocessor newInstance(Reader reader){
-        return new JNAsmPP(reader);
+        try{
+            singleMacros.put("BITS32", "");
+            Class clazz = Class.forName(PARSER_CLASS);
+            Constructor cons = clazz.getConstructor(new Class[]{Reader.class});
+            return (Preprocessor) cons.newInstance(new Object[]{reader});
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
     }
 
-    String processFile(String file){
+    protected String processFile(String file){
         StringWriter sw = new StringWriter();
         sw.write(";start include " + file + "\n");
         try{
@@ -53,7 +67,7 @@ public abstract class Preprocessor {
         return sw.toString();
     }
 
-    String processString(String str){
+    protected String processString(String str){
         StringWriter sw = new StringWriter();
         newInstance(new StringReader(str)).print(sw);
         sw.flush();
@@ -63,82 +77,12 @@ public abstract class Preprocessor {
 
     public void print(Writer w){
         try{
-            PrintWriter pw = new PrintWriter(w);
-            Token t = jnasmppInput();
-            while (t != null) {
-                  print(t, pw);
-                  t = t.next;
-            }
-            pw.flush();
-        } catch (ParseException pe){
+            jnasmppInput(new PrintWriter(w));
+        } catch (Exception pe){
             pe.printStackTrace();
             System.exit(-1);
         }
     }
 
-    void clearTokens(Token start, Token end){
-        for(Token t = start; t != end; t = t.next){
-            if(t.kind != JNAsmPPConstants.LINE_END){
-                t.image = "";
-            }
-        }
-        if(end.kind != JNAsmPPConstants.LINE_END) end.image = "";
-    }
-
-    void clearTokens(Token start){
-        for(Token t = start; t != null && t.kind != JNAsmPPConstants.LINE_END; t = t.next){
-            t.image = "";
-        }
-    }
-
-    void singleLineMacroCall(Token t){
-        if(substitute){
-            String s = (String)singleMacros.get(t.image);
-            if(s != null) t.image = s;
-        }
-    }
-
-    void multiLineMacroCall(Token nameToken, Collection params){
-        if(substitute){
-            String name = nameToken.image.trim();
-            Macro macro = (Macro)multiMacros.get(name);
-            if(macro != null){
-                String[] sparams = new String[0];
-                if( params != null ){
-                    sparams = (String[]) params.toArray(new String[params.size()]);
-                }
-                clearTokens(nameToken);
-                String expansion = macro.expand(sparams);
-                if(expansion != null){
-                    //System.err.println(macro.toString() + " exp " + expansion);
-                    nameToken.image = processString(expansion);
-                    //System.err.println(" exp proc " + nameToken.image);
-                }
-            }
-        }
-    }
-
-    abstract Token jnasmppInput() throws ParseException ;
-
-    static String extractImage(Token start, Token end) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        for(Token t = start.next; t != end; t=t.next){
-            print(t, pw);
-        }
-        pw.flush();
-        return sw.toString();
-    }
-
-    static void print(Token t, PrintWriter ostr) {
-        Token tt = t.specialToken;
-        if (tt != null) {
-          while (tt.specialToken != null) tt = tt.specialToken;
-          while (tt != null) {
-            ostr.print(tt.image);
-            tt = tt.next;
-          }
-        }
-        ostr.print(t.image);
-    }        
+    public abstract void jnasmppInput(PrintWriter pw) throws Exception ;
 }

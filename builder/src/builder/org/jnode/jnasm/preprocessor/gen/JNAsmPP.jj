@@ -1,0 +1,481 @@
+options{
+    STATIC = false;
+}
+
+PARSER_BEGIN(JNAsmPP)
+
+package org.jnode.jnasm.preprocessor.gen;
+
+import java.util.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import org.jnode.jnasm.preprocessor.Macro;
+import org.jnode.jnasm.preprocessor.Preprocessor;
+
+/**
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
+ */
+public class JNAsmPP extends Preprocessor {
+    protected void clearTokens(Token start, Token end){
+        for(Token t = start; t != end; t = t.next){
+            if(t.kind != JNAsmPPConstants.LINE_END){
+                t.image = "";
+            }
+        }
+        if(end.kind != JNAsmPPConstants.LINE_END) end.image = "";
+    }
+
+    protected void clearTokens(Token start){
+        for(Token t = start; t != null && t.kind != JNAsmPPConstants.LINE_END; t = t.next){
+            t.image = "";
+        }
+    }
+
+    protected void singleLineMacroCall(Token t){
+        if(substitute){
+            String s = (String)singleMacros.get(t.image);
+            if(s != null) t.image = s;
+        }
+    }
+
+    protected void multiLineMacroCall(Token nameToken, Collection params){
+        if(substitute){
+            String name = nameToken.image.trim();
+            Macro macro = (Macro)multiMacros.get(name);
+            if(macro != null){
+                String[] sparams = new String[0];
+                if( params != null ){
+                    sparams = (String[]) params.toArray(new String[params.size()]);
+                }
+                clearTokens(nameToken);
+                String expansion = macro.expand(sparams);
+                if(expansion != null){
+                    //System.err.println(macro.toString() + " exp " + expansion);
+                    nameToken.image = processString(expansion);
+                    //System.err.println(" exp proc " + nameToken.image);
+                }
+            }
+        }
+    }
+
+    protected static String extractImage(Token start, Token end) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        for(Token t = start.next; t != end; t=t.next){
+            print(t, pw);
+        }
+        pw.flush();
+        return sw.toString();
+    }
+
+    protected static void print(Token t, PrintWriter ostr) {
+        Token tt = t.specialToken;
+        if (tt != null) {
+          while (tt.specialToken != null) tt = tt.specialToken;
+          while (tt != null) {
+            ostr.print(tt.image);
+            tt = tt.next;
+          }
+        }
+        ostr.print(t.image);
+    }
+}
+
+PARSER_END(JNAsmPP)
+
+<DEFAULT, ifdef_state, macro_state, line_state, define_body, other_state, define_state> SPECIAL_TOKEN :
+{
+    <WHITE: <MCWHITE> >
+}
+
+<*> TOKEN :
+{
+    <MACRO:     "%macro" > : macro_state
+|   <ENDMACRO:  "%endmacro" >
+|   <DEFINE:    "%define" > : define_state
+|   <INCLUDE:   "%include" >
+|   <IF:        "%if" > : ifdef_state
+|   <ELSE:      "%else" >
+|   <ENDIF:     "%endif" >
+|   <IFDEF:     "%ifdef" > : ifdef_state
+|   <UNDEF:     "%undef" > : ifdef_state
+|   <LINE:      "%line" >  : line_state
+}
+
+<*> TOKEN :
+{
+    <#FILENAME: ( <LETTER> | <DIGIT> | "." | "-" | "_" ) + >
+|   <QFILENAME: "\"" <FILENAME> "\"">
+|   <#LETTER: ["a"-"z","A"-"Z","_"] >
+|   <#DIGIT: ["0"-"9"] >
+|   <#COLON: ":">
+|   <#ZERO: "0" >
+|   <#MCWHITE: ( [ " ","\t","\f" ] ) + >
+
+}
+
+<other_state, ifdef_state, DEFAULT> TOKEN :
+{   <#_OTHER: (
+              "[" | "]" | "{" | "}" | "'" | "(" | ")"
+            | "+" | "-" | "*" | "/" | "." | "|" | ":"
+            | "~" | "#" | "$" | "<" | ">" | "!" | "="
+            | "&" | "?" | "@" | "," | "^" ) >
+|   <OTHER: <_OTHER> ( <_OTHER> ) * >
+|   <MTARGET: "%%" ( <LETTER> | <DIGIT> ) + >
+|   <NUMBER: <ZERO> | ["1"-"9"] (<DIGIT>) * >
+}
+
+<DEFAULT, other_state, ifdef_state> TOKEN :
+{
+    <MPARAM: "%"( ["1"-"9"]) + > : other_state
+}
+
+<DEFAULT> TOKEN :
+{
+    <MACROCALL: <MLM_IDENT> <MCWHITE>> : macro_call
+}
+
+<macro_call> TOKEN :
+{
+    <COMA: ",">
+}
+
+<DEFAULT , macro_state, define_body, other_state, macro_call, ifdef_state> TOKEN :
+{
+    <LINE_END: "\r" | "\n" | "\r\n" > : DEFAULT
+|   <COMMENT: ";" (~["\n","\r"]) * > { matchedToken.image = ""; }
+}
+
+<ifdef_state> TOKEN :
+{
+    <IDENT: <LETTER> ( <LETTER> | <DIGIT> ) * > : DEFAULT
+}
+
+<define_state> TOKEN :
+{
+    <SLM_IDENT: <LETTER> ( <LETTER> | <DIGIT> ) * > : define_body
+}
+
+<define_body> TOKEN :
+{
+    <SLM_BODY: <SLM_BODY_CHAR> ( <SLM_BODY_CHAR> | <MCWHITE> ) * > : DEFAULT
+|   <#SLM_BODY_CHAR: <LETTER> | <DIGIT>
+            | "[" | "]" | "{" | "}" | "'" | "(" | ")"
+            | "+" | "-" | "*" | "/" | ":" >
+}
+
+<macro_state> TOKEN :
+{
+    <MLM_PARAMETER_COUNT : <ZERO> | ["1"-"9"] (<DIGIT>) * > : macro_state
+|   <MINUS: "-"> : macro_state
+|   <MLM_NAME: <MLM_IDENT> > : macro_state
+}
+
+<line_state> TOKEN :
+{
+    <LNUMBER: <NUMBER> > : line_state
+|   <PLUS: "+"> : line_state
+|   <LFILENAME: <FILENAME> > : DEFAULT
+}
+
+<other_state, DEFAULT> TOKEN :
+{
+    <MLM_IDENT: <LETTER> ( <LETTER> | <DIGIT> ) * > : other_state
+|   <MLABEL: "%%" ( <LETTER> | <DIGIT> ) + <COLON> >
+|   <MPARAMLABEL: (<MLM_IDENT>)? "%"( ["1"-"9"]) + <COLON> > : other_state
+
+}
+
+<macro_call> TOKEN :
+{
+    <MC_OTHER: (
+              "[" | "]" | "{" | "}" | "'" | "(" | ")"
+            | "+" | "-" | "*" | "/" | "." | "|" | ":"
+            | "~" | "#" | "$" | "<" | ">" | "!" | "="
+            | "&" | "?" | "@" | "%" | "^" ) + | <MCWHITE> > : macro_call
+|   <MC_IDENT: <MLM_IDENT> > : macro_call
+|   <MC_NUMBER: <NUMBER> > : macro_call
+}
+
+void jnasmppInput(PrintWriter pw) :
+
+{ Token firstToken;}
+
+{
+    {
+        firstToken = getToken(1);
+    }
+
+
+    ( line() | define() | macro() | include() | ifBlock() | ifdef() | undef() | lineDirective() ) *
+
+
+    {
+            Token t = firstToken;
+            while (t != null) {
+                  print(t, pw);
+                  t = t.next;
+            }
+            pw.flush();
+    }
+}
+
+
+void define() :
+
+{ Token def, ident, body = null;}
+
+{
+    def=<DEFINE> ident=<SLM_IDENT> [ body=<SLM_BODY> ] [ <COMMENT> ] <LINE_END>
+
+
+    {
+        if(substitute){
+            singleMacros.put(ident.image, body != null ? body.image : "");
+            def.image = "";
+            ident.image = "";
+            if(body != null) body.image = "";
+        }
+    }
+}
+
+void undef() :
+{ Token def, ident;}
+{
+    def=<UNDEF>  ident=<IDENT> [ <COMMENT> ] <LINE_END>
+
+    {
+        if(substitute){
+            singleMacros.remove(ident.image);
+            def.image = "";
+            ident.image = "";
+        }
+    }
+}
+
+void lineDirective() :
+{Token def, lend; }
+{
+    def=<LINE>  <LNUMBER> [ <PLUS> <LNUMBER> ] [ <LFILENAME> ] lend=<LINE_END>
+
+    { clearTokens(def, lend);}
+}
+
+void include() :
+
+{ Token def, fn, lend;}
+
+{
+    def=<INCLUDE> fn=<QFILENAME> [ <COMMENT> ] lend=<LINE_END>
+
+
+    {
+        if(substitute){
+            def.image = processFile(fn.image.substring(1, fn.image.length() -1));
+            fn.image = "";
+            lend.image = "";
+        }
+    }
+}
+
+void ifBlock() :
+
+{ Token def, ident = null, number = null, end, lend;}
+
+{
+    def=<IF> ( ident=<IDENT> | number=<NUMBER> ) [ <COMMENT> ] lend=<LINE_END>
+    { substitute = false; }
+    ( line() ) *
+    { substitute = true; }
+    end=<ENDIF> [ <COMMENT> ] <LINE_END>
+
+
+    {
+        if(substitute){
+            if(number != null && "1".equals(number.image) ||
+                  ident != null && "1".equals(String.valueOf(singleMacros.get(ident.image)))){
+                String image = extractImage(lend, end);
+                def.next = end.next;
+                def.image = processString(image);
+            } else {
+                clearTokens(def,end);
+            }
+        }
+    }
+}
+
+void ifdef() :
+
+{ Token def, ident, elsedef = null, end, lend;}
+
+{
+
+    def=<IFDEF> ident=<IDENT> [ <COMMENT> ] lend=<LINE_END>
+    { substitute = false; }
+    ( ifdefBody() ) *
+    [ elsedef = elseBlock() ]
+    { substitute = true; }
+    end=<ENDIF> [ <COMMENT> ] <LINE_END>
+
+
+    {
+        if(substitute){
+            Object obj = singleMacros.get(ident.image);
+            if(obj == null){
+                if(elsedef == null){
+                    clearTokens(def,end);
+                }else{
+                    clearTokens(def,elsedef);
+                    String image = extractImage(elsedef, end);
+                    elsedef.next = end.next;
+                    elsedef.image = processString(image);
+                }
+            }else{
+                String image;
+                if(elsedef == null){
+                    image = extractImage(lend, end);
+                    def.next = end.next;
+                    def.image = processString(image);
+                }else{
+                    image = extractImage(lend, elsedef);
+                    def.next = elsedef.next;
+                    def.image = processString(image);
+                    clearTokens(elsedef, end);
+                }
+            }
+        }
+    }
+}
+
+void ifdefBody() :
+
+{ }
+
+{
+    line() | include() | define() | macro() | undef()
+}
+
+Token elseBlock() :
+
+{ Token def; }
+
+{
+    def = <ELSE> [ <COMMENT> ] <LINE_END>
+    ( ifdefBody() ) *
+
+    {
+        return def;
+    }
+}
+
+
+void macro() :
+
+{ Token def,name, param, max_param = null, start, end; Collection params = null;}
+
+{
+    def=<MACRO> name=<MLM_NAME> param=<MLM_PARAMETER_COUNT> [<MINUS> max_param=<MLM_PARAMETER_COUNT> {token_source.SwitchTo(macro_call);} [params=parameterList()] ] [ <COMMENT> ] start=<LINE_END>
+
+    { substitute = false; }
+
+    ( line() | ifBlock() | ifdef() ) *
+
+    { substitute = true; }
+
+    end=<ENDMACRO> [ <COMMENT> ] <LINE_END>
+
+
+    {
+        Macro macro = new Macro();
+        macro.setName(name.image);
+        multiMacros.put(name.image, macro);
+        macro.setParamCount(Integer.parseInt(param.image));
+        if(max_param != null){
+            macro.setMaxParamCount(Integer.parseInt(max_param.image));
+        }
+        macro.setBody(extractImage(start, end));
+        if(params != null){
+            macro.setDefaultValues((String[])params.toArray(new String[params.size()]));
+        }
+        macro.setLocalLabels((String[])localLabels.toArray(new String[localLabels.size()]));
+        localLabels.clear();
+        clearTokens(def, end);
+    }
+}
+
+void line() :
+{
+    Collection params = null;
+    Token macro = null;
+}
+{
+    [
+        other()
+    |   macro=<MACROCALL> [ params=parameterList() ] { multiLineMacroCall(macro, params); }
+    ]
+
+    [ <COMMENT> ] <LINE_END>
+
+}
+
+Collection parameterList() :
+{
+    ArrayList list = new ArrayList();
+    String s;
+}
+{
+    s=multiLineMacroParam() { list.add(s); }
+    ( <COMA> s=multiLineMacroParam()  { list.add(s); } ) *
+
+    {return list;}
+}
+
+String multiLineMacroParam() :
+{
+    StringBuffer sb = new StringBuffer();
+    Token t;
+}
+{
+    (
+        ( t=<MC_OTHER> | t=<MC_NUMBER> | t=<MC_IDENT> { singleLineMacroCall(t);} )
+        { sb.append(t.image); }
+    )+
+
+    { return sb.toString();}
+}
+
+void other() :
+{ Token prefix, suffix = null;}
+{
+    prefix=otherPrefixToken() ( suffix=otherSuffixToken() ) *
+
+    {
+        if(substitute && (suffix == null) ){
+            multiLineMacroCall(prefix, null);
+        }
+    }
+}
+
+Token otherToken() :
+{ Token t; }
+{
+    ( t=<MPARAM> | t=<OTHER> | t=<NUMBER> | t=<MLM_IDENT> { singleLineMacroCall(t);} )
+
+    {return t;}
+}
+
+
+Token otherPrefixToken() :
+{ Token t; }
+{
+    ( t=<MLABEL> { localLabels.add(token.image.substring(0, token.image.length() -1 )); }
+    | t=<OTHER> | t=<MPARAMLABEL> | t=<MPARAM> | t=<MLM_IDENT> { singleLineMacroCall(t);} )
+
+    {return t;}
+}
+
+Token otherSuffixToken() :
+{ Token t; }
+{
+      ( t=otherToken() | t=<MTARGET> { localLabels.add(token.image); } ) { return t; }
+}
