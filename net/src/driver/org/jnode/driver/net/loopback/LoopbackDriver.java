@@ -13,41 +13,47 @@ import org.jnode.net.ethernet.EthernetConstants;
 /**
  * @author epr
  */
+
 /**
  * Driver for loopback device.
+ *
  * @author epr
  */
-public class LoopbackDriver extends AbstractNetDriver implements EthernetConstants { 
+public class LoopbackDriver extends AbstractNetDriver implements EthernetConstants
+{
 
-	private static final EthernetAddress hwAddress = new EthernetAddress("00-00-00-00-00-00");
+  private static final EthernetAddress hwAddress = new EthernetAddress("00-00-00-00-00-00");
 
-	/**
-	 * Gets the hardware address of this device
-	 */
-	public HardwareAddress getAddress() {
-		return hwAddress;
-	}
+  /**
+   * Gets the hardware address of this device
+   */
+  public HardwareAddress getAddress()
+  {
+    return hwAddress;
+  }
 
-	/**
-	 * Gets the maximum transfer unit, the number of bytes this device can
-	 * transmit at a time.
-	 */
-	public int getMTU() {
-		return ETH_DATA_LEN;
-	}
+  /**
+   * Gets the maximum transfer unit, the number of bytes this device can
+   * transmit at a time.
+   */
+  public int getMTU()
+  {
+    return ETH_DATA_LEN;
+  }
 
-	/**
-	 * @see org.jnode.driver.net.spi.AbstractNetDriver#doTransmit(SocketBuffer, HardwareAddress)
-	 */
-	protected void doTransmit(SocketBuffer skbuf, HardwareAddress destination) throws NetworkException {
-		skbuf.setDevice(getDevice());
-		onReceive(skbuf);
-	}
-	
-	/**
-	 * @see org.jnode.driver.net.spi.AbstractNetDriver#getDevicePrefix()
-	 */
-	protected String getDevicePrefix() {
-		return LOOPBACK_DEVICE_PREFIX;
-	}
+  /**
+   * @see org.jnode.driver.net.spi.AbstractNetDriver#doTransmit(SocketBuffer, HardwareAddress)
+   */
+  protected void doTransmit(SocketBuffer skbuf, HardwareAddress destination) throws NetworkException
+  {
+    onReceive(skbuf);
+  }
+
+  /**
+   * @see org.jnode.driver.net.spi.AbstractNetDriver#getDevicePrefix()
+   */
+  protected String getDevicePrefix()
+  {
+    return LOOPBACK_DEVICE_PREFIX;
+  }
 }
