@@ -11,7 +11,7 @@ import org.jnode.system.MemoryResource;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class NVidiaVgaIO implements VgaIO, VgaConstants, NVidiaConstants {
+public final class NVidiaVgaIO implements VgaIO, VgaConstants, NVidiaConstants {
 
 	private final MemoryResource mmio;
 	private final MemoryResource mem;
@@ -28,7 +28,7 @@ public class NVidiaVgaIO implements VgaIO, VgaConstants, NVidiaConstants {
 		this.mmio = mmio;
 		this.mem = mem;
 	}
-
+	
 	/**
 	 * @see org.jnode.driver.video.vgahw.VgaIO#getATT(int)
 	 */
