@@ -134,7 +134,8 @@ public final class X86IMTCompiler32 extends IMTCompiler implements X86CompilerCo
 		// Create the jump table
 		int extraIndex = imtLength * IMT_ENTRY_SIZE;
 		for (int i = 0; i < imtLength; i++) {
-			int ofs = i * IMT_ENTRY_SIZE;
+            final int ofsStart = i * IMT_ENTRY_SIZE;
+            int ofs = ofsStart;
 
 			if (imtCollisions[i]) {
 				// Complex route
@@ -201,6 +202,10 @@ public final class X86IMTCompiler32 extends IMTCompiler implements X86CompilerCo
 				code[ofs++] = (byte)0x90;
 				code[ofs++] = (byte)0x90;
 			}
+            
+            if (ofs > ofsStart + IMT_ENTRY_SIZE) {
+                throw new InternalError("Adjust IMT_ENTRY_SIZE to " + (ofs - ofsStart));
+            }
 		}
 
 		return new X86CompiledIMT(code);
