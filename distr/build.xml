@@ -8,6 +8,7 @@
 <!-- Subproject specific classpath -->
   <path id="my-cp">
     <pathelement location="${jnode-core.jar}"/>
+    <pathelement location="${jnode-gui.jar}"/>
     <pathelement location="${jnode-shell.jar}"/>
     <path refid="cp"/>
   </path>
@@ -29,6 +30,7 @@
            compiler="modern"
 	       includeJavaRuntime="false">
 	  <bootclasspath path="${jnode-core.jar}"/>
+	  <src path="${my-src.dir}/apps"/>
 	  <src path="${my-src.dir}/install"/>
       <classpath refid="my-cp"/>
     </javac>

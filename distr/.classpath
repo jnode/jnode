@@ -2,5 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src/install"/>
 	<classpathentry kind="src" path="/JNode-Core"/>
+	<classpathentry kind="src" path="src/apps"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
