@@ -162,10 +162,10 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	}
 
 	public void close() throws IOException {
-		super.close();
-		
-		//mark the filesystem clean
+        //mark the filesystem clean
 		superblock.setState(Ext2Constants.EXT2_VALID_FS);
+
+		super.close();
 	}
 	
 	/**
@@ -202,7 +202,8 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	 * @return data block nr
 	 */
 	public byte[] getBlock(long nr) throws IOException{
-
+		if(isClosed())
+			throw new IOException("FS closed");
 		//log.debug("blockCache size: "+blockCache.size());
 		
 		int blockSize = superblock.getBlockSize();
@@ -235,6 +236,9 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	 * @throws IOException
 	 */
 	public void writeBlock(long nr, byte[] data, boolean forceWrite) throws IOException {
+		if(isClosed())
+			throw new IOException("FS closed");
+
 		if(isReadOnly())
 			throw new ReadOnlyFileSystemException("Filesystem is mounted read-only!"); 
 			
