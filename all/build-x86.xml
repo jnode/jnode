@@ -241,6 +241,10 @@
         <include name="menu-pxe.lst*"/>
       </fileset>
     </copy>
+    <mkdir dir="${build.netboot.dir}/plugins"/>
+    <copy todir="${build.netboot.dir}/plugins">
+      <fileset dir="${plugins.dir}"/>
+    </copy>
   </target>
 
   <target name="disasm">
