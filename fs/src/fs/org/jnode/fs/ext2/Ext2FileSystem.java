@@ -182,7 +182,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 			
 			log.info("superblock.getBlockSize(): "+superblock.getBlockSize());
 
-			createRootEntry();
+			buildRootEntry();
 			
 			//write everything to disk
 			flush();
@@ -245,18 +245,15 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	}
 	
 	/**
-	 * @see org.jnode.fs.FileSystem#getRootEntry()
+	 * @see org.jnode.fs.AbstractFileSystem#createRootEntry()
 	 */
-	public FSEntry getRootEntry() throws IOException {
+	public FSEntry createRootEntry() throws IOException {
 		try{
-			if(!isClosed()) {
-				return new Ext2Entry( getINode(Ext2Constants.EXT2_ROOT_INO), 
-									  "/", Ext2Constants.EXT2_FT_DIR, this, null );
-			}
+			return new Ext2Entry( getINode(Ext2Constants.EXT2_ROOT_INO), 
+								  "/", Ext2Constants.EXT2_FT_DIR, this, null );
 		}catch(FileSystemException e) {
 			throw new IOException(e);
 		}
-		return null;
 	}
 	
 	/**
@@ -817,22 +814,22 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	 * 
 	 */
 	protected FSFile createFile(FSEntry entry) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		Ext2Entry e = (Ext2Entry) entry;
+		return new Ext2File(e.getINode());
 	}
 
 	/**
 	 * 
 	 */
 	protected FSDirectory createDirectory(FSEntry entry) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		Ext2Entry e = (Ext2Entry) entry;
+		return new Ext2Directory(e);
 	}
 
 	/**
 	 * 
 	 */
-	protected FSEntry createRootEntry() throws IOException {
+	protected FSEntry buildRootEntry() throws IOException {
 		//a free inode has been found: create the inode and write it into the inode table			
 		long iNodeTableBlock  = groupDescriptors[0].getInodeTable();	//the first block of the inode table
 		INodeTable iNodeTable = new INodeTable(this, (int)iNodeTableBlock);

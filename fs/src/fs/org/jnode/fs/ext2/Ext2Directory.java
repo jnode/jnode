@@ -4,27 +4,26 @@
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSEntryIterator;
-import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
+import org.jnode.fs.spi.AbstractFSDirectory;
+import org.jnode.fs.spi.AbstractFileSystem;
+import org.jnode.fs.spi.FSEntryTable;
+import org.jnode.fs.util.FSUtils;
 
 /**
  * @author Andras Nagy
  */
-public class Ext2Directory implements FSDirectory {
+public class Ext2Directory extends AbstractFSDirectory {
 	
 	INode iNode;
-	boolean valid;
-	private Ext2FileSystem fs;
-	private Ext2Entry entry;
+	private Ext2Entry entry;		
 	private final Logger log = Logger.getLogger(getClass());
-	private boolean readOnly;
 			
 	/**
 	 * 
@@ -32,25 +31,30 @@ public class Ext2Directory implements FSDirectory {
 	 * @param fs
 	 * @param entry	the Ext2Entry representing this directory
 	 */
-	public Ext2Directory(INode iNode, Ext2FileSystem fs, Ext2Entry entry) {
-		this.iNode=iNode;
-		valid=true;
-		this.fs = fs;
+	public Ext2Directory(Ext2Entry entry) throws IOException {
+		super((Ext2FileSystem) entry.getFileSystem());
+		this.iNode = entry.getINode();
+		Ext2FileSystem fs = (Ext2FileSystem) entry.getFileSystem();		
 		this.entry = entry;
 		log.setLevel(Level.DEBUG);
+		boolean readOnly;
 		if((iNode.getFlags() & Ext2Constants.EXT2_INDEX_FL)== 1)
 			readOnly = true;		//force readonly
 		else
 			readOnly = fs.isReadOnly();
+		setRights(true, !readOnly);
 		
 		log.debug("directory size: "+iNode.getSize());		
 	}
 	
 	/**
-	 * @see org.jnode.fs.FSDirectory#addDirectory(String)
+	 * Method to create a new ext2 directory entry from the given name
+	 * @param name
+	 * @return
+	 * @throws IOException
 	 */
-	public synchronized FSEntry addDirectory(String name) throws IOException {
-		if(isReadOnly())
+	public synchronized FSEntry createDirectoryEntry(String name) throws IOException {
+		if(!canWrite())
 			throw new IOException("Filesystem or directory is mounted read-only!");
 			 
 		//create a new iNode for the file
@@ -58,6 +62,7 @@ public class Ext2Directory implements FSDirectory {
 		INode newINode;
 		Ext2DirectoryRecord dr;
 		Ext2Entry newEntry;
+		Ext2FileSystem fs = (Ext2FileSystem) getFileSystem(); 
 		try{
 			int rights = 0xFFFF & (Ext2Constants.EXT2_S_IRWXU | Ext2Constants.EXT2_S_IRWXG | Ext2Constants.EXT2_S_IRWXO);
 			newINode = fs.createINode((int)iNode.getGroup(), Ext2Constants.EXT2_S_IFDIR, rights, 0, 0);
@@ -68,11 +73,11 @@ public class Ext2Directory implements FSDirectory {
 			
 			newINode.setLinksCount( newINode.getLinksCount()+1 );
 
-			newEntry = new Ext2Entry(newINode, name, Ext2Constants.EXT2_FT_DIR, fs, this.entry);
+			newEntry = new Ext2Entry(newINode, name, Ext2Constants.EXT2_FT_DIR, fs, this);
 			
 			//add "."
 			
-			Ext2Directory newDir = new Ext2Directory(newINode, fs, newEntry);
+			Ext2Directory newDir = new Ext2Directory(newEntry);
 			Ext2DirectoryRecord drThis = new Ext2DirectoryRecord( fs, newINode.getINodeNr(), Ext2Constants.EXT2_FT_DIR, "." );
 			newDir.addDirectoryRecord( drThis );
 			newINode.setLinksCount( 2 );
@@ -101,15 +106,19 @@ public class Ext2Directory implements FSDirectory {
 	}
 
 	/**
-	 * @see org.jnode.fs.FSDirectory#addFile(String)
+	 * Abstract method to create a new ext2 file entry from the given name
+	 * @param name
+	 * @return
+	 * @throws IOException
 	 */
-	public synchronized FSEntry addFile(String name) throws IOException {
-		if(isReadOnly())
+	public synchronized FSEntry createFileEntry(String name) throws IOException {
+		if(!canWrite())
 			throw new IOException("Filesystem or directory is mounted read-only!");
 		//create a new iNode for the file
 		//TODO: access rights, file type, UID and GID should be passed through the FSDirectory interface
 		INode newINode;
 		Ext2DirectoryRecord dr;
+		Ext2FileSystem fs = (Ext2FileSystem) getFileSystem();		
 		try{
 			int rights = 0xFFFF & (Ext2Constants.EXT2_S_IRWXU | Ext2Constants.EXT2_S_IRWXG | Ext2Constants.EXT2_S_IRWXO);
 			newINode = fs.createINode((int)iNode.getGroup(), Ext2Constants.EXT2_S_IFREG, rights, 0, 0);
@@ -126,7 +135,7 @@ public class Ext2Directory implements FSDirectory {
 			throw new IOException(fse);
 		}
 		
-		return new Ext2Entry(newINode, name, Ext2Constants.EXT2_FT_REG_FILE, fs, this.entry); 
+		return new Ext2Entry(newINode, name, Ext2Constants.EXT2_FT_REG_FILE, fs, this); 
 	}
 	
 	/**
@@ -136,11 +145,12 @@ public class Ext2Directory implements FSDirectory {
 	 * @throws IOException
 	 */
 	protected FSEntry addINode(int iNodeNr, String linkName, int fileType) throws IOException {
-		if(isReadOnly())
+		if(!canWrite())
 			throw new IOException("Filesystem or directory is mounted read-only!");
 			
 		//TODO: access rights, file type, UID and GID should be passed through the FSDirectory interface
 		Ext2DirectoryRecord dr;
+		Ext2FileSystem fs = (Ext2FileSystem) getFileSystem();		
 		try{
 			dr = new Ext2DirectoryRecord(fs, iNodeNr, fileType, linkName);
 			addDirectoryRecord(dr);
@@ -152,7 +162,7 @@ public class Ext2Directory implements FSDirectory {
 			
 			linkedINode.setLinksCount( linkedINode.getLinksCount()+1 );
 			
-			return new Ext2Entry(linkedINode, linkName, fileType, fs, this.entry); 
+			return new Ext2Entry(linkedINode, linkName, fileType, fs, this); 
 		
 		}catch(FileSystemException fse) {
 			throw new IOException(fse);
@@ -163,12 +173,13 @@ public class Ext2Directory implements FSDirectory {
 		Ext2File dir = new Ext2File(iNode);		//read itself as a file
 
 		//find the last directory record (if any)
-		Ext2FSEntryIterator iterator = (Ext2FSEntryIterator)iterator();
+		Ext2FSEntryIterator iterator = new Ext2FSEntryIterator(iNode);
 		Ext2DirectoryRecord rec=null;
 		while(iterator.hasNext()) {
 			rec = iterator.nextDirectoryRecord();
 		}
 		
+		Ext2FileSystem fs = (Ext2FileSystem) getFileSystem();		
 		if(rec!=null) {
 			long lastPos = rec.getFileOffset(); 
 			long lastLen = rec.getRecLen();
@@ -225,24 +236,6 @@ public class Ext2Directory implements FSDirectory {
 		return (int)(index % iNode.getExt2FileSystem().getBlockSize());
 	}
 
-	/**
-	 * @see org.jnode.fs.FSDirectory#getEntry(String)
-	 */
-	/*
-	 * Needs to be synchronized to ensure that it is not called concurrently
-	 * with addDirectoryRecord which would modify the underlying structure
-	 */
-	public synchronized FSEntry getEntry(String name) throws IOException{
-		//parse the directory and search for the file
-		FSEntryIterator iterator=iterator();
-		while(iterator.hasNext()) {
-			FSEntry entry = iterator.next();
-			if(entry.getName().equals(name))
-				return entry;
-		}
-		return null;
-	}
-	
 	private INode getINode() {
 		return iNode;
 	}
@@ -264,6 +257,7 @@ public class Ext2Directory implements FSDirectory {
 		
 		public boolean hasNext() {
 			Ext2DirectoryRecord dr;
+			Ext2FileSystem fs = (Ext2FileSystem) getFileSystem();			
 			do {
 				if(index>=iNode.getSize())
 					return false;
@@ -285,10 +279,11 @@ public class Ext2Directory implements FSDirectory {
 			}
 			
 			Ext2DirectoryRecord dr = current;
+			Ext2FileSystem fs = (Ext2FileSystem) getFileSystem();			
 			current = null;
 			try{
 				return new Ext2Entry( ((Ext2FileSystem)getFileSystem()).getINode(dr.getINodeNr()),
-										dr.getName(), dr.getType(), fs, Ext2Directory.this.entry );
+										dr.getName(), dr.getType(), fs, Ext2Directory.this);
 			}catch(IOException e) {
 				throw new NoSuchElementException("Root cause: "+e.getMessage());
 			}catch(FileSystemException e) {
@@ -314,46 +309,31 @@ public class Ext2Directory implements FSDirectory {
 	}
 
 	/**
-	 * @see org.jnode.fs.FSDirectory#iterator()
+	 * Read the entries from the device and return the result in
+	 * a new FSEntryTable
+	 * @return 
 	 */
-	public org.jnode.fs.FSEntryIterator iterator() throws IOException {
-		log.debug("Ext2Directory.Iterator()");
-		return new Ext2FSEntryIterator(iNode);				
+	protected FSEntryTable readEntries() throws IOException {
+		Ext2FSEntryIterator it = new Ext2FSEntryIterator(iNode);
+		ArrayList entries = new ArrayList();
+		
+		while(it.hasNext())
+		{
+			FSEntry entry = it.next();
+			log.debug("readEntries: entry="+FSUtils.toString(entry, false));
+			entries.add(entry);
+		}
+		
+		FSEntryTable table = new FSEntryTable((AbstractFileSystem) getFileSystem(), entries);
+		
+		return table;
 	}
 
 	/**
-	 * @see org.jnode.fs.FSDirectory#remove(String)
+	 * Write the entries in the table to the device.
+	 * @param table
 	 */
-	public void remove(String name) throws IOException {
-		if(isReadOnly())
-			throw new IOException("Filesystem or directory is mounted read-only!");
-		throw new IOException("remove not yet implemented");
+	protected void writeEntries(FSEntryTable table) throws IOException {
+		//nothing to do because createFileEntry and createDirectoryEntry do the job
 	}
-
-	/**
-	 * @see org.jnode.fs.FSObject#getFileSystem()
-	 */
-	public FileSystem getFileSystem() {
-		return iNode.getExt2FileSystem();
-	}
-
-	/**
-	 * @see org.jnode.fs.FSObject#isValid()
-	 */
-	public boolean isValid() {
-		return valid;
-	}
-
-	private boolean isReadOnly() {
-		return readOnly;
-	}
-	
-	/**
-	 * Save all dirty (unsaved) data to the device 
-	 * @throws IOException
-	 */
-	public void flush() throws IOException
-	{
-		//TODO
-	}	
 }

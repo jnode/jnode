@@ -7,22 +7,21 @@ import java.io.IOException;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.jnode.fs.FSFile;
-import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
+import org.jnode.fs.ReadOnlyFileSystemException;
+import org.jnode.fs.spi.AbstractFSFile;
 
 /**
  * @author Andras Nagy
  */
-public class Ext2File implements FSFile {
+public class Ext2File extends AbstractFSFile {
 
 	INode iNode;
-	boolean valid;
 	private final Logger log = Logger.getLogger(getClass());
 
 	public Ext2File(INode iNode) {
+		super(iNode.getExt2FileSystem());
 		this.iNode=iNode;		
-		valid = true;
 		log.setLevel(Level.DEBUG);
 	}
 
@@ -42,6 +41,9 @@ public class Ext2File implements FSFile {
 	 * @see org.jnode.fs.FSFile#setLength(long)
 	 */
 	public void setLength(long length) throws IOException {
+		if(!canWrite())
+			throw new ReadOnlyFileSystemException("FileSystem or File is readonly");
+		
 		long blockSize = iNode.getExt2FileSystem().getBlockSize();
 		
 		//if length<getLength(), then the file is truncated
@@ -179,28 +181,6 @@ public class Ext2File implements FSFile {
 		iNode.setSize( fileOffset+len );
 		
 		iNode.setMtime(System.currentTimeMillis()/1000);
-	}
-
-	/**
-	 * @see org.jnode.fs.FSObject#isValid()
-	 */
-	public boolean isValid() {
-		return valid;
-	}
-
-	/**
-	 * @see org.jnode.fs.FSObject#getFileSystem()
-	 */
-	public FileSystem getFileSystem() {
-		return null;
-	}
-
-	/**
-	 * Sets the valid status.
-	 * @param valid The valid status to set
-	 */
-	public void setValid(boolean valid) {
-		this.valid = valid;
 	}
 
 	/**
