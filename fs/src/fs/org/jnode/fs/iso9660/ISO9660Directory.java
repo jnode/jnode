@@ -44,7 +44,7 @@ public final class ISO9660Directory implements FSDirectory {
 
             public Object next() {
                 final ISO9660Volume volume = parent.getVolume();
-                final EntryRecord fEntry = new EntryRecord(volume, buffer, offset,
+                final EntryRecord fEntry = new EntryRecord(volume, buffer, offset+1,
                         parent.getEncoding());
                 offset += fEntry.getLengthOfDirectoryEntry();
                 return new ISO9660Entry((ISO9660FileSystem) entry

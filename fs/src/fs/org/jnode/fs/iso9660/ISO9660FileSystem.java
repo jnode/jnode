@@ -18,6 +18,7 @@ import org.jnode.fs.spi.AbstractFileSystem;
 public class ISO9660FileSystem extends AbstractFileSystem {
 
     private final ISO9660Volume volume;
+    private ISO9660Entry rootEntry;
 
     /**
      * @see org.jnode.fs.FileSystem#getDevice()
@@ -39,8 +40,10 @@ public class ISO9660FileSystem extends AbstractFileSystem {
      * @see org.jnode.fs.FileSystem#getRootEntry()
      */
     public FSEntry getRootEntry() throws IOException {
-        return new ISO9660Entry(this, volume.getPrimaryVolumeDescriptor()
-                .getRootDirectoryEntry());
+        if (rootEntry == null) {
+            rootEntry = new ISO9660Entry(this, volume.getRootDirectoryEntry());
+        }
+        return rootEntry;
     }
 
     /**

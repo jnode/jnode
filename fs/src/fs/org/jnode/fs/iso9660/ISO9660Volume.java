@@ -13,7 +13,7 @@ import org.jnode.system.BootLog;
  * @author vali
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class ISO9660Volume {
+public class ISO9660Volume implements ISO9660Constants {
 
     private final BlockDeviceAPI api;
 
@@ -21,6 +21,14 @@ public class ISO9660Volume {
 
     private final PrimaryVolumeDescriptor primaryVolumeDescriptor;
 
+    private final SupplementaryVolumeDescriptor supplementaryVolumeDescriptor;
+
+    /**
+     * Initialize this instance.
+     * 
+     * @param api
+     * @throws IOException
+     */
     public ISO9660Volume(FSBlockDeviceAPI api) throws IOException {
         this.api = api;
         this.blockSize = api.getSectorSize();
@@ -28,36 +36,43 @@ public class ISO9660Volume {
         final byte[] buffer = new byte[ blockSize];
 
         PrimaryVolumeDescriptor pVD = null;
+        SupplementaryVolumeDescriptor sVD = null;
         boolean done = false;
         for (int currentLBN = 16; !done; currentLBN++) {
             // read the LB
             this.readFromLBN(currentLBN, 0, buffer, 0, blockSize);
             final int type = VolumeDescriptor.getType(buffer);
             switch (type) {
-            case VolumeDescriptor.Type.TERMINATOR:
+            case VolumeDescriptorType.TERMINATOR:
                 done = true;
                 break;
-            case VolumeDescriptor.Type.BOOTRECORD:
-                BootLog.info("Found boot record");
+            case VolumeDescriptorType.BOOTRECORD:
+                BootLog.debug("Found boot record");
                 break;
-            case VolumeDescriptor.Type.PRIMARY_DESCRIPTOR:
-                BootLog.info("Found primary descriptor");
-            	pVD = new PrimaryVolumeDescriptor(this, buffer);
-            	pVD.printOut();
+            case VolumeDescriptorType.PRIMARY_DESCRIPTOR:
+                BootLog.debug("Found primary descriptor");
+                pVD = new PrimaryVolumeDescriptor(this, buffer);
+                //pVD.dump(System.out);
                 break;
-            case VolumeDescriptor.Type.SUPPLEMENTARY_DESCRIPTOR:
-                BootLog.info("Found supplementatory descriptor");
+            case VolumeDescriptorType.SUPPLEMENTARY_DESCRIPTOR:
+                BootLog.debug("Found supplementatory descriptor");
+                final SupplementaryVolumeDescriptor d = new SupplementaryVolumeDescriptor(
+                        this, buffer);
+                if (d.isEncodingKnown()) {
+                    sVD = d;
+                }
                 break;
-            case VolumeDescriptor.Type.PARTITION_DESCRIPTOR:
-                BootLog.info("Found partition descriptor");
+            case VolumeDescriptorType.PARTITION_DESCRIPTOR:
+                BootLog.debug("Found partition descriptor");
                 break;
             default:
-                BootLog.info("Found unknown descriptor with type " + type);
+                BootLog.debug("Found unknown descriptor with type " + type);
             }
         }
         if (pVD == null) { throw new IOException(
                 "No primary volume descriptor found"); }
         this.primaryVolumeDescriptor = pVD;
+        this.supplementaryVolumeDescriptor = sVD;
     }
 
     /**
@@ -76,9 +91,13 @@ public class ISO9660Volume {
     }
 
     /**
-     * @return Returns the volumeDescriptor.
+     * Gets the root directory entry of this volume.
      */
-    public PrimaryVolumeDescriptor getPrimaryVolumeDescriptor() {
-        return primaryVolumeDescriptor;
+    public EntryRecord getRootDirectoryEntry() throws IOException {
+        if (supplementaryVolumeDescriptor != null) {
+            return supplementaryVolumeDescriptor.getRootDirectoryEntry();
+        } else {
+            return primaryVolumeDescriptor.getRootDirectoryEntry();
+        }
     }
 }
