@@ -182,6 +182,7 @@ go_user_cs:
 	jz _halt
 	
 	; Reset the system
+	CMOS_WRITE 0x0F, 0x00	; Shutdown code := Soft reset
 	mov bl,0xfe				; Reset system
 	call _kbcmd
 

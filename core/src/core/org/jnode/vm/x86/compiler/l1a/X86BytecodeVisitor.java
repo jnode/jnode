@@ -203,9 +203,9 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         if (!cond) throw new Error("assert failed");
     }
 
-    private final void notImplemented() {
+    /*private final void notImplemented() {
         throw new Error("NotImplemented");
-    }
+    }*/
 
     /*private void OpcodeNotImplemented(String name) {
         System.out.println(name + " not implemented");

@@ -4,6 +4,8 @@
 package org.jnode.shell.command;
 
 import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.naming.NameNotFoundException;
 
@@ -11,7 +13,13 @@ import org.jnode.shell.Shell;
 import org.jnode.shell.ShellUtils;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
-import org.jnode.shell.help.*;
+import org.jnode.shell.help.AliasArgument;
+import org.jnode.shell.help.ClassNameArgument;
+import org.jnode.shell.help.Help;
+import org.jnode.shell.help.Parameter;
+import org.jnode.shell.help.ParsedArguments;
+import org.jnode.shell.help.Syntax;
+import org.jnode.shell.help.SyntaxErrorException;
 
 /**
  * @author epr
@@ -45,10 +53,7 @@ public class AliasCommand {
 		final AliasManager aliasMgr = shell.getAliasManager();
 
 		if (cmdLine.size() == 0) {
-			for (Iterator i = aliasMgr.aliasIterator(); i.hasNext();) {
-				final String alias = (String) i.next();
-				System.out.println(alias + ":\t" + aliasMgr.getAliasClassName(alias));
-			}
+		    showAliases(aliasMgr);
 		} else if (PARAM_REMOVE.isSet(cmdLine)) {
 			// remove an alias
 			aliasMgr.remove(ARG_ALIAS.getValue(cmdLine));
@@ -56,5 +61,19 @@ public class AliasCommand {
 			// add an alias
 			aliasMgr.add(ARG_ALIAS.getValue(cmdLine), ARG_CLASS.getValue(cmdLine));
 		}
+	}
+	
+	private static void showAliases(AliasManager aliasMgr) throws NoSuchAliasException {
+	    final TreeMap map = new TreeMap();
+		for (Iterator i = aliasMgr.aliasIterator(); i.hasNext();) {
+			final String alias = (String) i.next();
+			final String clsName = aliasMgr.getAliasClassName(alias);
+			map.put(alias, clsName);
+		}
+		
+		for (Iterator i = map.entrySet().iterator(); i.hasNext(); ) {
+		    final Map.Entry entry = (Map.Entry)i.next();
+			System.out.println(entry.getKey() + ":\t" + entry.getValue());
+		}	    
 	}
 }

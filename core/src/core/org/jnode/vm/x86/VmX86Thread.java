@@ -12,7 +12,7 @@ import org.jnode.vm.VmThread;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class VmX86Thread extends VmThread {
+public final class VmX86Thread extends VmThread {
 
 	// State when not running
 	volatile int eax;
@@ -40,12 +40,20 @@ public class VmX86Thread extends VmThread {
 	volatile int exCr2;
 	
 	/**
-	 * 
+	 * Initialize this instance 
 	 */
 	VmX86Thread() {
 		super();
 	}
 
+    /**
+     * Create a new instance. This constructor can only be called during the
+     * bootstrap phase.
+     */
+    VmX86Thread(byte[] stack) {
+        super(stack, getStackEnd(stack, stack.length), stack.length);
+    }
+    
 	/**
 	 * @param javaThread
 	 */
@@ -93,6 +101,16 @@ public class VmX86Thread extends VmThread {
 	 */
 	protected Address getStackEnd(Object stack, int stackSize) {
 		return Address.add(Address.valueOf(stack), STACK_OVERFLOW_LIMIT);
+	}
+	
+	/**
+	 * Calculate the end of the stack. 
+	 * @param stack
+	 * @param stackSize
+	 * @return End address of the stack
+	 */
+	private static Address getStackEnd(byte[] stack, int stackSize) {
+		return Address.add(Address.addressOfArrayData(stack), STACK_OVERFLOW_LIMIT);
 	}
 	
 	/**

@@ -8,6 +8,11 @@
 
     global Lsetup_idt
 
+%define RESUME_INT		dword[fs:VmX86Processor_RESUME_INT_OFFSET*4]
+%define RESUME_INTNO	dword[fs:VmX86Processor_RESUME_INTNO_OFFSET*4]
+%define RESUME_ERROR	dword[fs:VmX86Processor_RESUME_ERROR_OFFSET*4]
+%define RESUME_HANDLER	dword[fs:VmX86Processor_RESUME_HANDLER_OFFSET*4]
+    
 ; -------------------------------------
 ; Stack for inthandler & irqhandler
 ; -------------------------------------
@@ -74,26 +79,21 @@ inthandler:
 	jne kernel_panic
 	mov ebx,[esp+HANDLER]
 	call ebx
-	test dword [resume_int],0xFFFFFFFF
+	test dword RESUME_INT,0xFFFFFFFF
 	jz inthandler_ret
 	; Resume the interrupt (caused by an an IRQ)
 	;jmp int_die
 	mov ebp,esp
-	mov eax,[resume_intno]
+	mov eax,RESUME_INTNO
 	mov [ebp+INTNO],eax
-	mov eax,[resume_error]
+	mov eax,RESUME_ERROR
 	mov [ebp+ERROR],eax
-	mov eax,[resume_handler]
+	mov eax,RESUME_HANDLER
 	mov [ebp+HANDLER],eax
-	mov dword [resume_int],0
+	mov dword RESUME_INT,0
 	jmp irqhandler_resume
 inthandler_ret:
     int_exit
-    
-resume_int: dd 0
-resume_intno: dd 0
-resume_error: dd 0
-resume_handler: dd 0
     
 kernel_panic:
 	mov eax,kernel_panic_msg
@@ -235,13 +235,13 @@ irqhandler_suspend:
 	;jmp int_die
 	and dword [esp+OLD_EFLAGS],~F_IF
 	mov eax,[esp+INTNO]
-	mov dword [resume_intno],eax
+	mov RESUME_INTNO,eax
 	mov eax,[esp+ERROR]
-	mov dword [resume_error],eax
+	mov RESUME_ERROR,eax
 	mov eax,[esp+HANDLER]
-	mov dword [resume_handler],eax
+	mov RESUME_HANDLER,eax
 	mov eax,1
-	xchg dword [resume_int],eax
+	xchg RESUME_INT,eax
 	; Test for resume overruns
 	test eax,eax
 	jz inthandler_ret ; No overrun, finish int handler
@@ -399,6 +399,7 @@ Lsetup_idt:
 	
 	intport 0x30, yieldPointHandler, 3
 	intport 0x31, int_stack_overflow, 3
+	intport 0x32, syscallHandler, 3
 
 	lidt [idt]
 

@@ -10,7 +10,9 @@
 	extern SoftByteCodes_systemException
 	extern VmProcessor_reschedule
 	
-deadLockCounter				dd 0
+%define DEADLOCKCOUNTER	dword[fs:VmX86Processor_DEADLOCKCOUNTER_OFFSET*4]
+
+;deadLockCounter				dd 0
 currentTimeMillisStaticsIdx	dd -1
 	
 ; -----------------------------------------------
@@ -57,7 +59,7 @@ yieldPointHandler:
 	; Mark switch active
 	or THREADSWITCHINDICATOR,VmProcessor_TSI_SWITCH_ACTIVE
 	and THREADSWITCHINDICATOR,~VmProcessor_TSI_SWITCH_NEEDED
-	mov dword [deadLockCounter], 0
+	mov DEADLOCKCOUNTER, 0
 	; Setup the user stack to add a return address to the current EIP
 	; and change the current EIP to yieldPointHandler_doReschedule, which will 
 	; save the registers and call VmScheduler.reschedule
@@ -138,8 +140,8 @@ timer_handler:
 	jnz timer_ret
 	; Set a thread switch needed indicator
 	or THREADSWITCHINDICATOR, VmProcessor_TSI_SWITCH_NEEDED
-	inc dword [deadLockCounter]
-	test dword [deadLockCounter], 0x4000
+	inc DEADLOCKCOUNTER
+	test DEADLOCKCOUNTER, 0x4000
 	jnz timer_deadlock
 timer_ret:
 	mov al,0x60 ; EOI IRQ0

@@ -323,12 +323,15 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
                 "Cannot load a new class when failOnNewLoad is set (" + name
                         + ")"); }
 
-        final boolean rejectNatives = (!name.equals("org.jnode.vm.Unsafe"));
+        boolean allowNatives = false;
+        allowNatives |= name.equals("org.jnode.vm.Unsafe");
+        final String archN = arch.getName();
+        allowNatives |= name.equals("org.jnode.vm." + archN + ".Unsafe" + archN.toUpperCase());
 
         //System.out.println("bvi.loadClass: " +name);
         byte[] image = getClassStream(name);
         return ClassDecoder.defineClass(name, image, 0, image.length,
-                rejectNatives, this, null);
+                !allowNatives, this, null);
     }
 
     /**

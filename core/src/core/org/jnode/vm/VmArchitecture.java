@@ -5,6 +5,7 @@ package org.jnode.vm;
 
 import java.nio.ByteOrder;
 
+import org.jnode.system.ResourceManager;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 
@@ -49,6 +50,21 @@ public abstract class VmArchitecture extends VmSystemObject {
 	 *         optimizations.
 	 */
 	public abstract NativeCodeCompiler[] getCompilers();
+
+	/**
+	 * Find and start all processors in the system.
+	 * All all discovered processors to the given list.
+	 * The bootstrap processor is already on the given list.
+	 */
+	protected abstract void initializeProcessors(ResourceManager rm);
+	
+	/**
+	 * Call this method to register a processor found in {@link #initializeProcessors(ResourceManager)}.
+	 * @param cpu
+	 */
+	protected final void addProcessor(VmProcessor cpu) {
+	    Vm.getVm().addProcessor(cpu);
+	}
 
 	/**
 	 * Create a processor instance for this architecture.

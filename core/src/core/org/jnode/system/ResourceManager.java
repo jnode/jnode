@@ -22,7 +22,7 @@ public interface ResourceManager {
 
 	/** Allocate memory compatible with DMA rules */
 	public static final int MEMMODE_ALLOC_DMA = 0x01;
-
+	
 	/**
 	 * Claim a range of IO ports.
 	 * 

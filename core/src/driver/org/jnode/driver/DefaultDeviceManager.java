@@ -448,6 +448,8 @@ public class DefaultDeviceManager implements DeviceManager,
                 finder.findDevices(this, systemBus);
             } catch (DeviceException ex) {
                 BootLog.error("Error while trying to find system devices", ex);
+            } catch (RuntimeException ex) {
+                BootLog.error("Runtime exception while trying to find system devices", ex);
             }
         }
     }

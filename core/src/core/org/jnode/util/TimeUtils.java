@@ -3,6 +3,8 @@
  */
 package org.jnode.util;
 
+import org.jnode.vm.VmSystem;
+
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -21,4 +23,18 @@ public class TimeUtils {
         	return false;
         }
     }    
+    
+    /**
+     * Wait for ms milliseconds in a busy waiting loop.
+     * This method is very CPU intensive, so be carefull.
+     * @param ms
+     */
+    public static void loop(long ms) {
+        final long start = VmSystem.currentKernelMillis();
+        while (true) {
+            if ((start + ms) <= VmSystem.currentKernelMillis()) {
+                break;
+            }
+        }
+    }
 }

@@ -105,6 +105,9 @@ public final class VmSystem {
             // Initialize the monitors for the heap manager
             vm.getHeapManager().start();
 
+            // Find & start all processors
+            vm.initializeProcessors(rm);
+            
             /* We're done initializing */
             inited = true;
             Unsafe.getCurrentProcessor().systemReadyForThreadSwitch();

@@ -33,19 +33,33 @@ bits 32
 kernel_begin:
     
 %include "i386.h"
+%include "cmos.h"
+%include "syscall.h"
 %include "java.inc"
+
+%macro LOOPDIE 0
+%%l:
+	jmp %%l
+%endmacro
+
+%macro FLUSH 0
+	jmp %%l
+%%l:
+%endmacro
 
 %include "kernel.asm"
 %include "ints.asm"
 %include "mm.asm"
 %include "console.asm"
 %include "version.asm"
+%include "syscall.asm" 
 
 %define VMI_METHOD		dword [ebp+VmX86StackReader_METHOD_OFFSET]
 %define VMI_PC			dword [ebp+VmX86StackReader_PC_OFFSET]
 %define VMI_MAGIC		dword [ebp+VmX86StackReader_MAGIC_OFFSET]
 %define VMI_PREV_FRAME	 [ebp+VmX86StackReader_PREVIOUS_OFFSET]
 %define THREADSWITCHINDICATOR	dword[fs:VmProcessor_THREADSWITCHINDICATOR_OFFSET*4]
+%define CURRENTPROCESSOR		dword[fs:VmProcessor_ME_OFFSET*4]
 %define CURRENTTHREAD			dword[fs:VmProcessor_CURRENTTHREAD_OFFSET*4]
 %define NEXTTHREAD				dword[fs:VmProcessor_NEXTTHREAD_OFFSET*4]
 %define STACKEND 				dword[fs:VmProcessor_STACKEND_OFFSET*4]
@@ -107,11 +121,13 @@ kernel_begin:
 %include "unsafe-binop.asm"
 %include "unsafe-setmulti.asm"
 %include "unsafe-cpuid.asm"
+%include "unsafex86.asm"
 %include "vm.asm"
 %include "vm-invoke.asm"
 %include "vm-ints.asm"
 %include "vm-compile.asm"
 %include "vm-jumptable.asm"
+%include "ap-boot.asm"
 
 		align 4096
 kernel_end:
