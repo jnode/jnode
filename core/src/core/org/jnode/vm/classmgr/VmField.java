@@ -89,8 +89,8 @@ public abstract class VmField extends VmMember {
 	 * Is this a field of double width (double, long)
 	 * @return boolean
 	 */
-	public boolean isWide() {
-		return wide;
+	public final boolean isWide() {
+        return ((this.getModifiers() & Modifier.ACC_WIDE) != 0);
 	}
 
 	/**
