@@ -7,6 +7,7 @@
 	<classpathentry kind="src" path="src/classpath/vm"/>
 	<classpathentry kind="src" path="src/core"/>
 	<classpathentry kind="src" path="src/vmmagic"/>
+	<classpathentry kind="src" path="src/mmtk"/>
 	<classpathentry kind="src" path="src/driver"/>
 	<classpathentry kind="src" path="src/test"/>
 	<classpathentry kind="src" path="src/native/x86"/>
