@@ -18,49 +18,63 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.util;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class Counter extends Statistic {
+public final class Counter extends Statistic
+{
 
-    private int counter;
-	
-	public Counter(String name) {
-		super(name, null);
-	}
+  private final static String is = "=";
+  private int counter = 0;
 
-	public Counter(String name, String description) {
-	    super(name, description);
-	}
+  public Counter(String name)
+  {
+    super(name, null);
+  }
 
-	/**
-	 * Gets the counter of this statistic
-	 * @return the counter
-	 */
-	public int get() {
-		return counter;
-	}
-	
-	public Object getValue() {
-	    return new Integer(counter);
-	}
+  public Counter(String name, String description)
+  {
+    super(name, description);
+  }
 
-	/**
-	 * Increment the counter of this statistic by 1.
-	 */
-	public void inc() {
-		counter++;
-	}
-	
-	/**
-	 * Convert to a String representation
-	 * @see java.lang.Object#toString()
-	 * @return String
-	 */
-	public String toString() {
-		return getName() + "=" + counter;
-	}
+  /**
+   * Gets the counter of this statistic
+   *
+   * @return the counter
+   */
+  public int get()
+  {
+    return counter;
+  }
+
+  public Object getValue()
+  {
+    return new Integer(counter);
+  }
+
+  /**
+   * Increment the counter of this statistic by 1.
+   */
+  public void inc()
+  {
+    counter++;
+  }
+
+  /**
+   * Convert to a String representation
+   *
+   * @return String
+   * @see java.lang.Object#toString()
+   */
+  public String toString()
+  {
+    StringBuffer stringBuffer = new StringBuffer(getName());
+    stringBuffer.append(is);
+    stringBuffer.append(counter);
+
+    return stringBuffer.toString();
+  }
 }
