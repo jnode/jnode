@@ -13,6 +13,7 @@ import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
+import org.jnode.assembler.UnresolvedObjectRefException;
 
 import java.util.Map;
 import java.util.List;
@@ -88,21 +89,37 @@ public class X86Core extends AssemblerModule {
     }
 
 
-    public static final int ADD_ISN = 0;
+    public static final int ADC_ISN = 0;
+    public static final int ADD_ISN = ADC_ISN + 1;
     public static final int AND_ISN = ADD_ISN + 1;
     public static final int CMP_ISN = AND_ISN + 1;
     public static final int DEC_ISN = CMP_ISN + 1;
     public static final int INC_ISN = DEC_ISN + 1;
-    public static final int JMP_ISN = INC_ISN + 1;
-    public static final int LEA_ISN = JMP_ISN + 1;
-    public static final int MOV_ISN = LEA_ISN + 1;
-    public static final int NOP_ISN = MOV_ISN + 1;
+    public static final int JA_ISN = INC_ISN + 1;
+    public static final int JAE_ISN = JA_ISN + 1;
+    public static final int JB_ISN = JAE_ISN + 1;
+    public static final int JE_ISN = JB_ISN + 1;
+    public static final int JL_ISN = JE_ISN + 1;
+    public static final int JLE_ISN = JL_ISN + 1;
+    public static final int JMP_ISN = JLE_ISN + 1;
+    public static final int JNE_ISN = JMP_ISN + 1;
+    public static final int JNZ_ISN = JNE_ISN + 1;
+    public static final int JZ_ISN = JNZ_ISN + 1;
+    public static final int LEA_ISN = JZ_ISN + 1;
+    public static final int LOOP_ISN = LEA_ISN + 1;
+    public static final int MOV_ISN = LOOP_ISN + 1;
+    public static final int NEG_ISN = MOV_ISN + 1;
+    public static final int NOP_ISN = NEG_ISN + 1;
     public static final int OR_ISN = NOP_ISN + 1;
     public static final int POP_ISN = OR_ISN + 1;
-    public static final int PUSH_ISN = POP_ISN + 1;
-    public static final int RET_ISN = PUSH_ISN + 1;
-    public static final int SHR_ISN = RET_ISN + 1;
-    public static final int TEST_ISN = SHR_ISN + 1;
+    public static final int POPA_ISN = POP_ISN + 1;
+    public static final int PUSH_ISN = POPA_ISN + 1;
+    public static final int PUSHA_ISN = PUSH_ISN + 1;
+    public static final int RET_ISN = PUSHA_ISN + 1;
+    public static final int SHL_ISN = RET_ISN + 1;
+    public static final int SHR_ISN = SHL_ISN + 1;
+    public static final int SUB_ISN = SHR_ISN + 1;
+    public static final int TEST_ISN = SUB_ISN + 1;
     public static final int XCHG_ISN = TEST_ISN + 1;
     public static final int XOR_ISN = XCHG_ISN + 1;
 
@@ -136,6 +153,9 @@ public class X86Core extends AssemblerModule {
         if (key == null) return false;
 
         switch (key.intValue()) {
+            case ADC_ISN:
+                emmitADC();
+                break;
             case ADD_ISN:
                 emmitADD();
                 break;
@@ -151,14 +171,45 @@ public class X86Core extends AssemblerModule {
             case INC_ISN:
                 emmitINC();
                 break;
+            case JA_ISN:
+                emmitJCC(X86Assembler.JA);
+            case JAE_ISN:
+                emmitJCC(X86Assembler.JAE);
+            case JB_ISN:
+                emmitJCC(X86Assembler.JB);
+                break;
+            case JE_ISN:
+                emmitJCC(X86Assembler.JE);
+                break;
+            case JL_ISN:
+                emmitJCC(X86Assembler.JL);
+                break;
+            case JLE_ISN:
+                emmitJCC(X86Assembler.JLE);
+                break;
             case JMP_ISN:
                 emmitJMP();
+                break;
+            case JNE_ISN:
+                emmitJCC(X86Assembler.JNE);
+                break;
+            case JNZ_ISN:
+                emmitJCC(X86Assembler.JNZ);
+                break;
+            case JZ_ISN:
+                emmitJCC(X86Assembler.JZ);
                 break;
             case LEA_ISN:
                 emmitLEA();
                 break;
+            case LOOP_ISN:
+                emmitLOOP();
+                break;
             case MOV_ISN:
                 emmitMOV();
+                break;
+            case NEG_ISN:
+                emmitNEG();
                 break;
             case NOP_ISN:
                 emmitNOP();
@@ -169,14 +220,26 @@ public class X86Core extends AssemblerModule {
             case POP_ISN:
                 emmitPOP();
                 break;
+            case POPA_ISN:
+                emmitPOPA();
+                break;
             case PUSH_ISN:
                 emmitPUSH();
+                break;
+            case PUSHA_ISN:
+                emmitPUSHA();
                 break;
             case RET_ISN:
                 emmitRET();
                 break;
+            case SHL_ISN:
+                emmitSHL();
+                break;
             case SHR_ISN:
                 emmitSHR();
+                break;
+            case SUB_ISN:
+                emmitSUB();
                 break;
             case TEST_ISN:
                 emmitTEST();
@@ -192,6 +255,32 @@ public class X86Core extends AssemblerModule {
         }
 
         return true;
+    }
+
+    private void emmitADC() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RR_ADDR:
+                stream.writeADC(getReg(0), getReg(1));
+                break;
+            case RC_ADDR:
+                stream.writeADC(getReg(0), getInt(1));
+                break;
+            case RI_ADDR:
+                Indirect ind = getInd(1);
+                stream.writeADC(getReg(0), getRegister(ind.reg), ind.disp);
+                break;
+            case IR_ADDR:
+                ind = getInd(0);
+                stream.writeADC(getRegister(ind.reg), ind.disp, getReg(1));
+                break;
+            case IC_ADDR:
+                ind = getInd(0);
+                stream.writeADC(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                break;
+            default:
+                reportAddressingError(ADC_ISN, addr);
+        }
     }
 
     private void emmitADD() {
@@ -318,6 +407,22 @@ public class X86Core extends AssemblerModule {
         }
     }
 
+    private void emmitJCC(int jumpCode) {
+        Object o1 = operands.get(0);
+        if (o1 instanceof Token) {
+            Token t1 = (Token) o1;
+            if (Assembler.isIdent(t1)) {
+                Label lab = (Label) labels.get(t1.image);
+                lab = (lab == null) ? new Label(t1.image) : lab;
+                stream.writeJCC(lab, jumpCode);
+            } else {
+                System.out.println("unkown operand: " + t1.image);
+            }
+        } else {
+            System.out.println("unkown operand: " + o1);
+        }
+    }
+
     private void emmitLEA() {
         int addr = getAddressingMode(2);
         switch (addr) {
@@ -327,6 +432,26 @@ public class X86Core extends AssemblerModule {
                 break;
             default:
                 reportAddressingError(LEA_ISN, addr);
+        }
+    }
+
+    private void emmitLOOP() {
+        Object o1 = operands.get(0);
+        if (o1 instanceof Token) {
+            Token t1 = (Token) o1;
+            if (Assembler.isIdent(t1)) {
+                Label lab = (Label) labels.get(t1.image);
+                lab = (lab == null) ? new Label(t1.image) : lab;
+                try{
+                    stream.writeLOOP(lab);
+                }catch(UnresolvedObjectRefException x){
+                    x.printStackTrace();
+                }
+            } else {
+                System.out.println("unkown operand: " + t1.image);
+            }
+        } else {
+            System.out.println("unkown operand: " + o1);
         }
     }
 
@@ -353,6 +478,21 @@ public class X86Core extends AssemblerModule {
                 break;
             default:
                 reportAddressingError(MOV_ISN, addr);
+        }
+    }
+
+    private void emmitNEG() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case R_ADDR:
+                stream.writeNEG(getReg(0));
+                break;
+            case I_ADDR:
+                Indirect ind = getInd(0);
+                stream.writeNEG(X86Constants.BITS32, getRegister(ind.reg), ind.disp);
+                break;
+            default:
+                reportAddressingError(NEG_ISN, addr);
         }
     }
 
@@ -401,6 +541,10 @@ public class X86Core extends AssemblerModule {
         }
     }
 
+    private void emmitPOPA() {
+        stream.writePOPA();
+    }
+
     private void emmitPUSH() {
         int addr = getAddressingMode(1);
         switch (addr) {
@@ -419,6 +563,10 @@ public class X86Core extends AssemblerModule {
         }
     }
 
+    private void emmitPUSHA() {
+        stream.writePUSHA();
+    }
+
     private void emmitRET() {
         int addr = getAddressingMode(1);
         switch (addr) {
@@ -430,6 +578,21 @@ public class X86Core extends AssemblerModule {
                 break;
             default:
                 reportAddressingError(RET_ISN, addr);
+        }
+    }
+
+    private void emmitSHL() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RC_ADDR:
+                stream.writeSHL(getReg(0), getInt(1));
+                break;
+            case IC_ADDR:
+                Indirect ind = getInd(0);
+                stream.writeSHL(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                break;
+            default:
+                reportAddressingError(SHL_ISN, addr);
         }
     }
 
@@ -445,6 +608,32 @@ public class X86Core extends AssemblerModule {
                 break;
             default:
                 reportAddressingError(SHR_ISN, addr);
+        }
+    }
+
+    private void emmitSUB() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RR_ADDR:
+                stream.writeSUB(getReg(0), getReg(1));
+                break;
+            case RC_ADDR:
+                stream.writeSUB(getReg(0), getInt(1));
+                break;
+            case RI_ADDR:
+                Indirect ind = getInd(1);
+                stream.writeSUB(getReg(0), getRegister(ind.reg), ind.disp);
+                break;
+            case IR_ADDR:
+                ind = getInd(0);
+                stream.writeSUB(getRegister(ind.reg), ind.disp, getReg(1));
+                break;
+            case IC_ADDR:
+                ind = getInd(0);
+                stream.writeSUB(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                break;
+            default:
+                reportAddressingError(SUB_ISN, addr);
         }
     }
 
