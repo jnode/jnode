@@ -669,6 +669,10 @@ public class TCPControlBlock extends IPv4ControlBlock implements TCPConstants {
 						waitUntilState(TCPS_CLOSED, 0);
 					}
 					break;
+                case TCPS_CLOSED:
+                {
+                    // Ignore
+                } break;
 				default :
 					throw new SocketException("Illegal state in close (" + getStateName() + ")");
 			}
