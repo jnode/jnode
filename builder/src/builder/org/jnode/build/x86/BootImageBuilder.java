@@ -73,6 +73,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	 * Construct a new BootImageBuilder
 	 */
 	public BootImageBuilder() {
+		System.setProperty("file.encoding", "8859_1");
 	}
 
 	/**
