@@ -108,18 +108,19 @@ public abstract class VmStackReader extends VmSystemObject {
 	/**
 	 * Gets the stacktrace for a given current frame.
 	 * @param argFrame
+	 * @param limit Maximum length of returned array.
 	 * @return VmStackFrame[]
 	 */
-	final VmStackFrame[] getVmStackTrace(Address argFrame) {
+	final VmStackFrame[] getVmStackTrace(Address argFrame, int limit) {
 
 		final Address frame = argFrame;
 		Address f = frame;
 		int count = 0;
-		while (isValid(f)) {
+		while (isValid(f) && (count < limit)) {
 			count++;
 			f = getPrevious(f);
 		}
-		if ((f != null) && !isStackBottom(f)) {
+		if ((f != null) && !isStackBottom(f) && (count < limit)) {
 			Screen.debug("Corrupted stack!, st.length=");
 			Screen.debug(count);
 			Screen.debug(" f.magic=");

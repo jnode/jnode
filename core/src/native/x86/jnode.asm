@@ -25,6 +25,8 @@ bits 32
  
 %include "rmconfig.h"
  
+%define KERNEL_STACKEND		(kernel_stack + VmThread_STACK_OVERFLOW_LIMIT)
+ 
 	section .text
 
 ;    org 0x100000
