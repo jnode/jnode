@@ -33,15 +33,11 @@ import org.jnode.vm.classmgr.VmTypeState;
 import org.jnode.vm.compiler.CompileError;
 import org.jnode.vm.compiler.CompiledMethod;
 import org.jnode.vm.compiler.InlineBytecodeVisitor;
-import org.jnode.vm.compiler.ir.Constant;
-import org.jnode.vm.compiler.ir.IntConstant;
 import org.jnode.vm.x86.VmX86Architecture;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 import org.jnode.vm.x86.compiler.X86CompilerContext;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 import org.jnode.vm.x86.compiler.X86JumpTable;
-
-import org.jnode.vm.x86.compiler.l1a.VirtualStack;
 
 /**
  * Actual converter from bytecodes to X86 native code.

@@ -1,17 +1,14 @@
 /*
- * Created on 01.03.2004
- *
+ * $Id$
  */
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.Register;
-import org.jnode.vm.compiler.ir.Constant;
 
 /**
  * @author Patrik Reali
  *
  * IntItems are stored in a register and have type INT
- * 
  */
 
 //TODO: maybe split in a class for each kind? It would be a nices OO design, but would create tons of classes.... could use internal classes for this

@@ -1,23 +1,17 @@
 /*
- * Created on 03.03.2004
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * $Id$
  */
 package org.jnode.vm.x86.compiler.l1a;
 
 /**
  * @author Patrik Reali
- *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
  */
 final class FloatItem extends Item {
 
 	private float value;
 	/**
 	 * @param kind
-	 * @param type
+	 * @param value
 	 * @param local
 	 */
 	private FloatItem(int kind,  int local, float value) {

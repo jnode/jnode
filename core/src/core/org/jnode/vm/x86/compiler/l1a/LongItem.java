@@ -1,8 +1,5 @@
 /*
- * Created on 03.03.2004
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * $Id$
  */
 package org.jnode.vm.x86.compiler.l1a;
 
@@ -22,7 +19,7 @@ final class LongItem extends Item {
 
 	/**
 	 * @param kind
-	 * @param type
+	 * @param val
 	 * @param local
 	 */
 	private LongItem(int kind, int local, Register lsb, Register msb, long val) {

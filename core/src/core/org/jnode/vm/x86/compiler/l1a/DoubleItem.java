@@ -1,16 +1,10 @@
 /*
- * Created on 03.03.2004
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * $Id$
  */
 package org.jnode.vm.x86.compiler.l1a;
 
 /**
  * @author Patrik Reali
- *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
  */
 final class DoubleItem extends Item {
 
@@ -18,8 +12,8 @@ final class DoubleItem extends Item {
 	
 	/**
 	 * @param kind
-	 * @param type
 	 * @param local
+	 * @param value
 	 */
 	public DoubleItem(int kind,  int local, double value) {
 		super(kind, DOUBLE, local);
@@ -27,7 +21,7 @@ final class DoubleItem extends Item {
 		this.value = value;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#load()
 	 */
 	void load() {
@@ -36,7 +30,7 @@ final class DoubleItem extends Item {
 
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#loadToFPU()
 	 */
 	void loadToFPU() {
@@ -45,7 +39,7 @@ final class DoubleItem extends Item {
 
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#push()
 	 */
 	void push() {
@@ -54,7 +48,7 @@ final class DoubleItem extends Item {
 
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#release()
 	 */
 	void release() {
