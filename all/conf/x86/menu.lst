@@ -2,9 +2,16 @@
 default 0
 timeout 5
 
+
 # ---------------------------
 title JNode (default)
 kernel (hd0,0)/jnodesys.gz
+module (hd0,0)/default.jgz
+
+# ---------------------------
+
+title JNode (default without MP)
+kernel (hd0,0)/jnodesys.gz mp=no
 module (hd0,0)/default.jgz
 
 # ---------------------------
