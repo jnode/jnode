@@ -1090,7 +1090,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 	 * @param classRef
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_checkcast(org.jnode.vm.classmgr.VmConstClass)
 	 */
-	public final void visit_checkcast(VmConstClass classRef) {
+	public final void visit_checkcast(VmConstClass classRef) { 
 		// Pre-claim ECX
 		requestRegister(ECX);
 		requestRegister(EAX);

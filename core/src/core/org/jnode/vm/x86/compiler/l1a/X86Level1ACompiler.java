@@ -25,7 +25,7 @@ import org.jnode.vm.x86.compiler.AbstractX86Compiler;
  *  
  *   
  *    
- *     
+ *      
  *       HIGH VALUES first-arg ... last-arg old EIP old EBP magic method local 0 ... local n calculation stack LOW VALUES
  *        
  *      
