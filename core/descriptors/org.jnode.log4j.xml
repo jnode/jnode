@@ -8,7 +8,6 @@
         class="org.jnode.log4j.config.Log4jConfigurePlugin">
         
   <requires>
-    <import plugin="org.apache.jakarta.log4j"/>
     <import plugin="org.jnode.driver.console"/>
   </requires>
         

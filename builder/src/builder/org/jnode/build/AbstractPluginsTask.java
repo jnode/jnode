@@ -44,7 +44,7 @@ public abstract class AbstractPluginsTask extends AbstractPluginTask {
 	protected PluginRegistry getPluginRegistry() 
 	throws PluginException, MalformedURLException {
 		final PluginRegistry piRegistry;
-		piRegistry = new PluginRegistryModel(getPluginList().getDescriptorUrlList());
+		piRegistry = new PluginRegistryModel(getPluginList().getPluginList());
 		return piRegistry;
 	}
 

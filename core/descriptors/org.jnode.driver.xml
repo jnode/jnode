@@ -7,10 +7,6 @@
         provider-name="JNode.org"
         class="org.jnode.driver.DriverPlugin">
         
-  <requires>
-    <import plugin="org.jnode.runtime"/>
-  </requires>
-        
   <runtime>
     <library name="jnode-core.jar">
       <export name="org.jnode.driver.*"/>

@@ -42,15 +42,15 @@ public class Asm extends MatchingTask {
 	public void execute() throws BuildException {
 
 		if (srcdir == null) {
-			throw new BuildException("Error: srcdir attribute must be set!", location);
+			throw new BuildException("Error: srcdir attribute must be set!", getLocation());
 		} else if (!srcdir.isDirectory()) {
-			throw new BuildException("Error: srcdir directory is not valid!", location);
+			throw new BuildException("Error: srcdir directory is not valid!", getLocation());
 		}
 
 		if (destdir == null) {
-			throw new BuildException("Error: destdir attribute must be set!", location);
+			throw new BuildException("Error: destdir attribute must be set!", getLocation());
 		} else if (!destdir.isDirectory()) {
-			throw new BuildException("Error: destdir directory is not valid!", location);
+			throw new BuildException("Error: destdir directory is not valid!", getLocation());
 		}
 
 		try {

@@ -10,7 +10,6 @@
     <import plugin="org.jnode.awt"/>
     <import plugin="org.jnode.awt.font"/>
     <import plugin="org.jnode.awt.font.truetype"/>
-    <import plugin="org.jnode.runtime"/>
     <import plugin="org.jnode.wt"/>
   </requires>
         

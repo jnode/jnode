@@ -24,6 +24,7 @@
   <property name="nanoxml.jar"         value="${root.dir}/core/lib/nanoxml-lite-2.2.3.jar"/>
   <property name="beanshell.jar"         value="${root.dir}/shell/lib/bsh-2.0b1.jar"/>
 
+  <property name="full-plugin-list"    value="${basedir}/conf/full-plugin-list.xml"/>
   <property name="system-plugin-list"  value="${basedir}/conf/system-plugin-list.xml"/>
   <property name="jnode-ver"           value="0.1.5"/>
 
@@ -219,7 +220,7 @@
   </target>
 
 <!-- website -->
-  <target name="website" depends="javadoc-small">
+  <target name="website" depends="javadoc-small,assemble">
     <ant antfile="build-x86.xml"
          inheritall="true"
          inheritrefs="true"

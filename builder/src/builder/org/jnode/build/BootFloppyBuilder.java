@@ -8,7 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.log4j.Logger;
+import org.apache.tools.ant.Task;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
@@ -26,13 +26,12 @@ import org.jnode.util.FileUtils;
  * 
  * @author epr
  */
-public class BootFloppyBuilder {
+public class BootFloppyBuilder extends Task {
 
 	private File destFile;
 	private File kernelFile;
 	private File menuFile;
 	private File initJarFile;
-	private final Logger log = Logger.getLogger(getClass());
 	private String stage1ResourceName;
 	private String stage2ResourceName;
 
@@ -163,7 +162,7 @@ public class BootFloppyBuilder {
 		fh.setLength(size);
 		fh.write(0, buf, 0, buf.length);
 
-		log.info("Added " + src + " as " + fname + " size " + (size / 1024) + "Kb");
+		log("Added " + src + " as " + fname + " size " + (size / 1024) + "Kb");
 	}
 
 	/**

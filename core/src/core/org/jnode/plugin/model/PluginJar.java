@@ -82,7 +82,7 @@ public class PluginJar implements BootableObject {
 				r.close();
 			}
 		} catch (IOException ex) {
-			throw new PluginException(ex);
+			throw new PluginException("Plugin " + pluginUrl, ex);
 		}
 		if (!root.getName().equals("plugin")) {
 			throw new PluginException("plugin element expected");
@@ -151,7 +151,7 @@ public class PluginJar implements BootableObject {
 				return new URL("plugin:" + id + "!/" + resourceName);
 			}
 		} catch (IOException ex) {
-			System.out.println("ioex: " +ex.getMessage());
+			System.out.println("ioex: " + ex.getMessage());
 			return null;
 		}
 	}
