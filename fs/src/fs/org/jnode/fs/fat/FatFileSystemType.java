@@ -20,12 +20,6 @@ public class FatFileSystemType implements FileSystemType {
 	public static final String NAME = "FAT";
 
 	/**
-	 * Public default constructor
-	 */
-	public FatFileSystemType() {
-	}
-
-	/**
 	 * Gets the unique name of this file system type.
 	 */
 	public String getName() {

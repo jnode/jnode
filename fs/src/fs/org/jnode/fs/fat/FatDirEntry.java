@@ -246,7 +246,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
 	 * @param newLength
 	 *           The length to set
 	 */
-	public synchronized void updateLength(long newLength) throws IOException {
+	public synchronized void updateLength(long newLength) {
 		//System.out.println("updateLength(" + newLength + ") on " + getName());
 		this.length = newLength;
 		setDirty();
@@ -284,7 +284,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
 	 * 
 	 * @return File
 	 */
-	public FatFile getFatFile() throws IOException {
+	public FatFile getFatFile() {
 		return getFatFileSystem().getFile(this);
 	}
 
@@ -403,7 +403,6 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
 				ch = Character.toUpperCase(name.charAt(i));
 				if (ch == 0xe5) {
 					ch = (char)0x05;
-				} else {
 				}
 			} else {
 				ch = ' ';

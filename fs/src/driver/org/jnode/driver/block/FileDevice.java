@@ -16,11 +16,10 @@ import org.jnode.driver.Device;
  * @author epr
  */
 public class FileDevice extends Device implements BlockDeviceAPI {
-	
+
 	private RandomAccessFile raf;
-	
-	public FileDevice(File file, String mode) 
-	throws FileNotFoundException, IOException {
+
+	public FileDevice(File file, String mode) throws FileNotFoundException, IOException {
 		super(null, "file" + System.currentTimeMillis());
 		raf = new RandomAccessFile(file, mode);
 		registerAPI(BlockDeviceAPI.class, this);
@@ -31,8 +30,7 @@ public class FileDevice extends Device implements BlockDeviceAPI {
 	 * @return The length
 	 * @throws IOException
 	 */
-	public long getLength() 
-	throws IOException {
+	public long getLength() throws IOException {
 		return raf.length();
 	}
 
@@ -58,7 +56,7 @@ public class FileDevice extends Device implements BlockDeviceAPI {
 	 * @throws IOException
 	 */
 	public void write(long devOffset, byte[] src, int srcOffset, int length) throws IOException {
-//		log.debug("fd.write devOffset=" + devOffset + ", length=" + length);
+		//		log.debug("fd.write devOffset=" + devOffset + ", length=" + length);
 		raf.seek(devOffset);
 		raf.write(src, srcOffset, length);
 	}
@@ -66,16 +64,15 @@ public class FileDevice extends Device implements BlockDeviceAPI {
 	 * @see org.jnode.driver.block.BlockDeviceAPI#flush()
 	 * @throws IOException
 	 */
-	public void flush() throws IOException {
+	public void flush() {
+		// Nothing to flush
 	}
-	
-	public void setLength(long length) 
-	throws IOException {
+
+	public void setLength(long length) throws IOException {
 		raf.setLength(length);
 	}
-	
-	public void close() 
-	throws IOException {
+
+	public void close() throws IOException {
 		raf.close();
 	}
 }

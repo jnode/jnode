@@ -9,7 +9,6 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.jnode.driver.block.BlockDeviceAPI;
-import org.jnode.fs.FileSystemException;
 import org.jnode.fs.util.Geometry;
 import org.jnode.util.FileUtils;
 
@@ -65,8 +64,7 @@ public class GrubFatFormatter {
 	 * 
 	 * @param mediumDescriptor
 	 */
-	public GrubFatFormatter(int bootSectorOffset, String stage1ResourceName, String stage2ResourceName)
-		throws IOException {
+	public GrubFatFormatter(int bootSectorOffset, String stage1ResourceName, String stage2ResourceName) {
 		GrubBootSector bs = (GrubBootSector)createBootSector(stage1ResourceName, stage2ResourceName);
 		bs.setOemName("JNode1.0");
 		formatter = FatFormatter.fat144FloppyFormatter(calculateReservedSectors(512), bs);
@@ -89,8 +87,6 @@ public class GrubFatFormatter {
 			return new GrubBootSector(stage1);
 		} catch (IOException ex) {
 			throw new RuntimeException(ex);
-		} catch (FileSystemException e) {
-			throw new RuntimeException(e);
 		}
 	}
 
@@ -124,7 +120,7 @@ public class GrubFatFormatter {
 	public void format(BlockDeviceAPI api) throws IOException {
 
 		formatter.format(api);
-		GrubBootSector bs = (GrubBootSector) formatter.getBootSector();
+		GrubBootSector bs = (GrubBootSector)formatter.getBootSector();
 		/* Fixup the blocklist end the end of the first sector of stage2 */
 		DosUtils.set32(stage2, 512 - 8, bootSectorOffset + 2);
 
@@ -178,11 +174,10 @@ public class GrubFatFormatter {
 	public int getInstallPartition() {
 		return installPartition;
 	}
-    
-   public BootSector getBootSector()
-   {
-   	return formatter.getBootSector();
-   }
+
+	public BootSector getBootSector() {
+		return formatter.getBootSector();
+	}
 
 	/**
 	 * Sets the installPartition.

@@ -3,8 +3,6 @@
  */
 package org.jnode.fs.fat;
 
-import org.jnode.fs.FileSystemException;
-
 /**
  * <description>
  * 
@@ -24,7 +22,7 @@ public class GrubBootSector extends BootSector {
 	 * Constructor for GrubBootSector.
 	 * @param src
 	 */
-	public GrubBootSector(byte[] src) throws FileSystemException {
+	public GrubBootSector(byte[] src) {
 		super(src);
 	}
 	

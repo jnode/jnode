@@ -22,11 +22,12 @@ public class FileSystemManager {
 	/**
 	 * Create a new instance
 	 */
-	protected FileSystemManager() {
-	}
+	//protected FileSystemManager() {
+	//}
 
 	/**
 	 * Register a mounted filesystem
+	 * 
 	 * @param fs
 	 */
 	public void registerFileSystem(FileSystem fs) {
@@ -35,14 +36,16 @@ public class FileSystemManager {
 
 	/**
 	 * Unregister a mounted filesystem
+	 * 
 	 * @param fs
 	 */
 	public void unregisterFileSystem(FileSystem fs) {
 		filesystems.remove(fs.getDevice().getId());
 	}
-	
+
 	/**
 	 * Gets the filesystem registered on the given device.
+	 * 
 	 * @param device
 	 * @return null if no filesystem was found.
 	 */
@@ -52,6 +55,7 @@ public class FileSystemManager {
 
 	/**
 	 * Gets the filesystem registered on the given name.
+	 * 
 	 * @param rootName
 	 * @return null if no filesystem was found.
 	 */
@@ -60,13 +64,13 @@ public class FileSystemManager {
 	}
 
 	/**
-	 * Gets all registered filesystems.
-	 * All instances of the returned collection are instanceof FileSystem.
+	 * Gets all registered filesystems. All instances of the returned collection
+	 * are instanceof FileSystem.
 	 */
 	public Collection fileSystems() {
 		return Collections.unmodifiableCollection(filesystems.values());
 	}
-	
+
 	public Set fileSystemRoots() {
 		return filesystems.keySet();
 	}
@@ -75,6 +79,7 @@ public class FileSystemManager {
 	 * Initialize this manager
 	 */
 	protected void initialize() {
+		// Do nothing
 	}
-	
+
 }

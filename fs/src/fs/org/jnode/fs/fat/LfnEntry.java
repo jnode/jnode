@@ -19,7 +19,8 @@ import org.jnode.fs.FileSystem;
 class LfnEntry implements FSEntry {
 	// decompacted LFN entry
 	private String fileName;
-	private Date creationTime;
+	// TODO: Make them available
+   private Date creationTime;
 	private Date lastAccessed;
 	private FatLfnDirectory parent;
 	private FatDirEntry realEntry;
@@ -94,7 +95,7 @@ class LfnEntry implements FSEntry {
 		return realEntry.getParent();
 	}
 
-	public long getLastModified() throws IOException {
+	public long getLastModified() {
 		return realEntry.getLastModified();
 	}
 
@@ -106,12 +107,12 @@ class LfnEntry implements FSEntry {
 		return realEntry.isDirectory();
 	}
 
-	public void setName(String newName) throws IOException {
+	public void setName(String newName) {
 		fileName = newName;
 		realEntry.setName(parent.generateShortNameFor(newName));
 	}
 
-	public void setLastModified(long lastModified) throws IOException {
+	public void setLastModified(long lastModified) {
 		realEntry.setLastModified(lastModified);
 	}
 

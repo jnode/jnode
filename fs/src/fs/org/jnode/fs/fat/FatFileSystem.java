@@ -71,7 +71,7 @@ public class FatFileSystem implements FileSystem {
 		} catch (IOException ex) {
 			throw new FileSystemException(ex);
 		} catch (Exception e) { // something bad happened in the FAT boot
-										// sector... just ignore this FS
+			// sector... just ignore this FS
 			throw new FileSystemException(e);
 		}
 	}
@@ -137,7 +137,7 @@ public class FatFileSystem implements FileSystem {
 	 * 
 	 * @param entry
 	 */
-	public synchronized FatFile getFile(FatDirEntry entry) throws IOException {
+	public synchronized FatFile getFile(FatDirEntry entry) {
 
 		FatFile file = (FatFile)files.get(entry);
 		if (file == null) {

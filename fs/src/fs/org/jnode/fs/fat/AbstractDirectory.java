@@ -348,9 +348,9 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 	 * 
 	 * @param src
 	 */
-	protected synchronized void read(byte[] src) throws IOException {
+	protected synchronized void read(byte[] src) {
 		int size = entries.size();
-      //System.out.println("Abstract read --> dir size = " + size);
+		//System.out.println("Abstract read --> dir size = " + size);
 		for (int i = 0; i < size; i++) {
 			int index = i * 32;
 			if (src[index] == 0) {
@@ -371,7 +371,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 	 * 
 	 * @param dest
 	 */
-	protected synchronized void write(byte[] dest) throws IOException {
+	protected synchronized void write(byte[] dest) {
 		//System.out.println("abstract write ---------------");
 		int size = entries.size();
 		byte[] empty = new byte[32];

@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLConnection;
 
-import org.jnode.driver.DriverException;
 import org.jnode.driver.block.FileDevice;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSFile;
@@ -18,7 +17,6 @@ import org.jnode.fs.fat.BootSector;
 import org.jnode.fs.fat.FatDirectory;
 import org.jnode.fs.fat.FatFileSystem;
 import org.jnode.fs.fat.GrubFatFormatter;
-import org.jnode.plugin.PluginException;
 import org.jnode.util.FileUtils;
 
 /**
@@ -49,7 +47,7 @@ public class FatTest {
 	}
 
 	public static void printInfo(File file, PrintWriter out)
-		throws IOException, PluginException, DriverException, FileSystemException {
+		throws IOException, FileSystemException {
 		FileDevice fd = new FileDevice(file, "r");
 		FatFileSystem fs = new FatFileSystem(fd);
 		try {

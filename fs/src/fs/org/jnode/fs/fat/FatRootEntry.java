@@ -14,10 +14,10 @@ import org.jnode.fs.FSFile;
  * @author epr
  */
 public class FatRootEntry extends FatObject implements FSEntry {
-	
+
 	/** The actual root directory */
 	private final FatDirectory rootDir;
-	
+
 	public FatRootEntry(FatDirectory rootDir) {
 		super(rootDir.getFatFileSystem());
 		this.rootDir = rootDir;
@@ -29,21 +29,21 @@ public class FatRootEntry extends FatObject implements FSEntry {
 	public String getName() {
 		return "";
 	}
-	
+
 	/**
 	 * Gets the directory this entry is a part of.
 	 */
 	public FSDirectory getParent() {
 		return null;
 	}
-	
+
 	/**
 	 * Gets the last modification time of this entry.
+	 * 
 	 * @throws IOException
 	 */
 
-	public long getLastModified()
-	throws IOException {
+	public long getLastModified() {
 		return System.currentTimeMillis();
 	}
 
@@ -64,25 +64,24 @@ public class FatRootEntry extends FatObject implements FSEntry {
 	/**
 	 * Sets the name of this entry.
 	 */
-	public void setName(String newName)
-	throws IOException {
+	public void setName(String newName) throws IOException {
 		throw new IOException("Cannot change name of root directory");
 	}
-	
+
 	/**
 	 * Sets the last modification time of this entry.
+	 * 
 	 * @throws IOException
 	 */
-	public void setLastModified(long lastModified)
-	throws IOException {
+	public void setLastModified(long lastModified) throws IOException {
+		throw new IOException("Cannot change last modified of root directory");
 	}
-	
+
 	/**
-	 * Gets the file this entry refers to. This method can only be called
-	 * if <code>isFile</code> returns true.
+	 * Gets the file this entry refers to. This method can only be called if
+	 * <code>isFile</code> returns true.
 	 */
-	public FSFile getFile()
-	throws IOException {
+	public FSFile getFile() throws IOException {
 		throw new IOException("Not a file");
 	}
 
@@ -93,13 +92,13 @@ public class FatRootEntry extends FatObject implements FSEntry {
 	public FSDirectory getDirectory() {
 		return rootDir;
 	}
-	
+
 	/**
 	 * Gets the accessrights for this entry.
+	 * 
 	 * @throws IOException
 	 */
-	public FSAccessRights getAccessRights()
-	throws IOException {
+	public FSAccessRights getAccessRights() throws IOException {
 		throw new IOException("Not implemented yet");
 	}
 }
