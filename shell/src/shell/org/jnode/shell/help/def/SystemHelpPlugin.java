@@ -31,7 +31,7 @@ public class SystemHelpPlugin extends Plugin {
 	protected void startPlugin() throws PluginException {
 		try {
 			final Help help = new DefaultHelp();
-			InitialNaming.bind(Help.SYSTEM_HELP_NAME, help);
+			InitialNaming.bind(Help.NAME, help);
 		} catch (NamingException ex) {
 			throw new PluginException("Cannot bind system help", ex);
 		}
@@ -41,6 +41,6 @@ public class SystemHelpPlugin extends Plugin {
 	 * Stop this plugin
 	 */
 	protected void stopPlugin() throws PluginException {
-		InitialNaming.unbind(Help.SYSTEM_HELP_NAME);
+		InitialNaming.unbind(Help.NAME);
 	}
 }

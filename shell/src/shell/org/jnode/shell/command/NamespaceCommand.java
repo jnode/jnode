@@ -39,7 +39,7 @@ public class NamespaceCommand {
 			
 		Set names = InitialNaming.nameSet();
 		for (Iterator i = names.iterator(); i.hasNext(); ) {
-			String name = (String)i.next();
+			final Object name = i.next();
 			out.println(name);
 		}
 	}

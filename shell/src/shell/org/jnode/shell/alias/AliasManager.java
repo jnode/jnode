@@ -13,7 +13,7 @@ public interface AliasManager {
 	/**
 	 * Name of the system alias manager (in the InitialNaming namespace)
 	 */
-	public static final String SYSTEM_ALIAS_MGR_NAME = "system/aliasmanager";
+	public static final Class NAME = AliasManager.class;//"system/aliasmanager";
 	
 	public static final String ALIASES_EP_NAME = "org.jnode.shell.aliases";
 	

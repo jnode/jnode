@@ -15,7 +15,7 @@ public interface DeviceManager {
 	/**
 	 * The name used to lookup this service.
 	 */
-	public static final String NAME = "system/DeviceManager";
+	public static final Class NAME = DeviceManager.class;//"system/DeviceManager";
 
 	/**
 	 * Returns a collection of all known devices. The collection is not modifiable, but the

@@ -15,7 +15,7 @@ public interface ResourceManager {
 	/**
 	 * Name used to bind the ResourceManager under in the InitialNaming namespace.
 	 */
-	public static final String NAME = "system/ResourceManager";
+	public static final Class NAME = ResourceManager.class;//"system/ResourceManager";
 
 	/** Allocate memory anywhere in the address space */
 	public static final int MEMMODE_NORMAL = 0x00;

@@ -18,7 +18,7 @@ public interface FileSystemService {
 	/**
 	 * Name used to lookup a FileSystemTypeManager in the initial namespace.
 	 */
-	public static final String NAME = "system/FileSystemService";
+	public static final Class NAME = FileSystemService.class;//"system/FileSystemService";
 	
 	/**
 	 * Gets all registered file system types.

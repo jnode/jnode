@@ -4,9 +4,9 @@
 package org.jnode.naming;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
@@ -36,11 +36,11 @@ public class InitialNaming {
 	 * @param service
 	 * @throws NameAlreadyBoundException if the name already exists within this namespace
 	 */
-	public static void bind(String name, Object service) 
+	public static void bind(Class name, Object service) 
 	throws NamingException, NameAlreadyBoundException {
 		synchronized (namespace) {
 			if (namespace.containsKey(name)) {
-				throw new NameAlreadyBoundException(name);
+				throw new NameAlreadyBoundException(name.getName());
 			}
 			namespace.put(name, service);
 		}
@@ -52,7 +52,7 @@ public class InitialNaming {
 	 * returns without an error.
 	 * @param name
 	 */
-	public static void unbind(String name) {
+	public static void unbind(Class name) {
 		synchronized (namespace) {
 			namespace.remove(name);
 		}
@@ -63,22 +63,22 @@ public class InitialNaming {
 	 * @param name
 	 * @throws NameNotFoundException if the name was not found in this namespace
 	 */
-	public static Object lookup(String name) 
+	public static Object lookup(Class name) 
 	throws NameNotFoundException {
 		final Object result = namespace.get(name);
 		if (result == null) {
-			throw new NameNotFoundException(name);
+			throw new NameNotFoundException(name.getName());
 		}
 		return result;
 	}
 
 	/**
-	 * Gets a set containing all names (String) of the bound services.
+	 * Gets a set containing all names (Class) of the bound services.
 	 */
 	public static Set nameSet() {
-		final TreeSet result;
+		final Set result;
 		synchronized (namespace) {
-			result = new TreeSet(namespace.keySet());
+			result = new HashSet(namespace.keySet());
 		}
 		return result;
 	}

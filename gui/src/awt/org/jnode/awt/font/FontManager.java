@@ -12,7 +12,7 @@ import java.awt.Graphics2D;
  */
 public interface FontManager {
 
-	public static final String NAME = "FontManager";
+	public static final Class NAME = FontManager.class;//"FontManager";
 
 	/**
 	 * Returns an array containing a one-point size instance of all fonts 
