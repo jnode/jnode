@@ -32,10 +32,10 @@ GLABEL Q43org5jnode2vm6Unsafe23getCPUID2e285bI29I
 	
 	test ADI,ADI		; is id null?
 	je cpuid_ret
-	cmp eax,[ADI+VmArray_LENGTH_OFFSET*4]
+	cmp eax,[ADI+VmArray_LENGTH_OFFSET*SLOT_SIZE]
 	ja cpuid_ret		; id is not large enough?
 	
-	lea ADI,[ADI+VmArray_DATA_OFFSET*4]		; Load &id[0] into edi
+	lea ADI,[ADI+VmArray_DATA_OFFSET*SLOT_SIZE]		; Load &id[0] into edi
 	push AAX
 	pushf
 	cld

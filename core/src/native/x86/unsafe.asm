@@ -17,10 +17,10 @@ GLABEL Q43org5jnode2vm6Unsafe23pushObject2e28Ljava2flang2fObject3b29V
 	ret
 
 GLABEL Q43org5jnode2vm6Unsafe23getSuperClasses2e28Ljava2flang2fObject3b295bLorg2fjnode2fvm2fclassmgr2fVmType3b
-	mov eax,[esp+4] ; object reference
-	mov eax,[eax+ObjectLayout_TIB_SLOT*4] ; TIB reference
-	mov eax,[eax+(TIBLayout_SUPERCLASSES_INDEX+VmArray_DATA_OFFSET)*4] 
-	ret 4
+	mov AAX,[ASP+SLOT_SIZE] ; object reference
+	mov eax,[AAX+ObjectLayout_TIB_SLOT*SLOT_SIZE] ; TIB reference
+	mov AAX,[AAX+(TIBLayout_SUPERCLASSES_INDEX+VmArray_DATA_OFFSET)*SLOT_SIZE] 
+	ret SLOT_SIZE
 
 ; static native void clear(Address memPtr, Extent size)
 GLABEL Q43org5jnode2vm6Unsafe23clear2e28Lorg2fvmmagic2funboxed2fAddress3bLorg2fvmmagic2funboxed2fExtent3b29V
@@ -252,11 +252,11 @@ GLABEL Q43org5jnode2vm6Unsafe23getCmdLine2e285bB29I
 	mov AAX,[ASP+SLOT_SIZE]		; destination
 	test AAX,AAX				; Is null?
 	jz after_copyCmdLine
-	mov ecx,[AAX+(VmArray_LENGTH_OFFSET*4)]
+	mov ecx,[AAX+(VmArray_LENGTH_OFFSET*SLOT_SIZE)]
 	push ASI
 	push ADI
 	mov ASI,multiboot_cmdline
-	lea ADI,[AAX+(VmArray_DATA_OFFSET*4)]
+	lea ADI,[AAX+(VmArray_DATA_OFFSET*SLOT_SIZE)]
 	cld
 	rep	movsb
 	pop ADI

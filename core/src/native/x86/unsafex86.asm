@@ -17,8 +17,8 @@ GLABEL Q53org5jnode2vm3x869UnsafeX8623getGDT2e285bI29I
 	push ACX
 	cld
 	
-	mov ecx,[AAX+VmArray_LENGTH_OFFSET*4]
-	lea ADI,[AAX+VmArray_DATA_OFFSET*4]
+	mov ecx,[AAX+VmArray_LENGTH_OFFSET*SLOT_SIZE]
+	lea ADI,[AAX+VmArray_DATA_OFFSET*SLOT_SIZE]
 	mov ASI,gdtstart
 	rep movsd
 	
@@ -43,8 +43,8 @@ GLABEL Q53org5jnode2vm3x869UnsafeX8623getTSS2e285bI29I
 	push ACX
 	cld
 	
-	mov ecx,[AAX+VmArray_LENGTH_OFFSET*4]
-	lea ADI,[AAX+VmArray_DATA_OFFSET*4]
+	mov ecx,[AAX+VmArray_LENGTH_OFFSET*SLOT_SIZE]
+	lea ADI,[AAX+VmArray_DATA_OFFSET*SLOT_SIZE]
 	mov ASI,tss
 	rep movsd
 	
@@ -89,7 +89,7 @@ GLABEL Q53org5jnode2vm3x869UnsafeX8623setupBootCode2e28Lorg2fvmmagic2funboxed2fA
 	
 	; Patch ap_gdt_ptr address
 	lea ADI,[AAX+(ap_gdt_ptr-ap_boot)]
-	lea ACX,[ADX+VmArray_DATA_OFFSET*4]
+	lea ACX,[ADX+VmArray_DATA_OFFSET*SLOT_SIZE]
 	mov [ADI],ACX
 
 	; Patch ap_boot32_lgdt
@@ -99,7 +99,7 @@ GLABEL Q53org5jnode2vm3x869UnsafeX8623setupBootCode2e28Lorg2fvmmagic2funboxed2fA
 
 	; Patch ap_boot32_ltss
 	lea ADI,[AAX+(ap_boot32_ltss-ap_boot)+1]	; Opcode MOV ebx,v (BBxxxxxxxx)
-	lea ACX,[ABX+VmArray_DATA_OFFSET*4]
+	lea ACX,[ABX+VmArray_DATA_OFFSET*SLOT_SIZE]
 	mov [ADI],ecx
 	
 	; Set the Warm boot address in the BIOS data area

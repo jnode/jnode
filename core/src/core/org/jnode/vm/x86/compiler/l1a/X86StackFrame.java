@@ -28,6 +28,7 @@ import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
+import org.jnode.vm.classmgr.Signature;
 import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmInterpretedExceptionHandler;
@@ -156,7 +157,7 @@ class X86StackFrame implements X86CompilerConstants {
 		restoreRegisters();
 		// Return
 		if (argSlotCount > 0) {
-			os.writeRET(argSlotCount * 4);
+			os.writeRET(argSlotCount * slotSize);
 		} else {
 			os.writeRET();
 		}
@@ -282,7 +283,8 @@ class X86StackFrame implements X86CompilerConstants {
 	 * @return int
 	 */
 	public final int getEbpOffset(TypeSizeInfo typeSizeInfo, int index) {
-		int noArgs = method.getArgSlotCount();
+		final int noArgs = method.getArgSlotCount();
+		final int stackSlot = Signature.getStackSlotForJavaArgNumber(typeSizeInfo, method, index);
 		if (index < noArgs) {
 			// Index refers to a method argument
 			return ((noArgs - index + 1) * slotSize) + EbpFrameRefOffset

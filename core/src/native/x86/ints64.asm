@@ -6,10 +6,10 @@
 ; Author       : E.. Prangsma
 ; -----------------------------------------------
 
-%define RESUME_INT		qword[r15+VmX86Processor_RESUME_INT_OFS]
-%define RESUME_INTNO	qword[r15+VmX86Processor_RESUME_INTNO_OFS]
-%define RESUME_ERROR	qword[r15+VmX86Processor_RESUME_ERROR_OFS]
-%define RESUME_HANDLER	qword[r15+VmX86Processor_RESUME_HANDLER_OFS]
+%define RESUME_INT		qword[r12+VmX86Processor_RESUME_INT_OFS]
+%define RESUME_INTNO	qword[r12+VmX86Processor_RESUME_INTNO_OFS]
+%define RESUME_ERROR	qword[r12+VmX86Processor_RESUME_ERROR_OFS]
+%define RESUME_HANDLER	qword[r12+VmX86Processor_RESUME_HANDLER_OFS]
     
 int_die_halted:	DA 0    
     
