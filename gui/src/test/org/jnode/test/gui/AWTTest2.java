@@ -12,6 +12,13 @@ import java.awt.Frame;
 public class AWTTest2 {
 
     public static void main(String[] args) throws InterruptedException {
+        int sleep = 5;
+        try{
+            sleep = Integer.parseInt(args[0]);
+        }catch(Exception e){
+            //ignore
+        }
+        
         Frame wnd = new Frame();
         try {
             wnd.setSize(600, 400);
@@ -19,8 +26,8 @@ public class AWTTest2 {
             bw.init();
             wnd.add(bw, BorderLayout.CENTER);
             wnd.show();
-
-			Thread.sleep(5000);
+            bw.requestFocus();
+			Thread.sleep(sleep * 1000);
 
 			wnd.hide();
         } finally {
