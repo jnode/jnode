@@ -14,17 +14,17 @@ import org.jnode.fs.ntfs.NTFSUTIL;
 public class EntryRecord
 {
 	private byte[] buff = null;
-	private PrimaryVolume volume = null; 
+	private ISO9660Volume volume = null; 
 	
 	public EntryRecord(byte[] buff)
 	{
 		this.buff = buff;
 	}
-	public EntryRecord(PrimaryVolume volume, byte[] buff, int offset)
+	public EntryRecord(ISO9660Volume volume, byte[] buff, int offset)
 	{
 		this.volume = volume;
-		this.buff = new byte[unsignedByteToInt(buff[offset])]; 
-		System.arraycopy(buff,offset,this.buff,0,unsignedByteToInt(buff[offset]));
+		this.buff = new byte[Util.unsignedByteToInt(buff[offset])]; 
+		System.arraycopy(buff,offset,this.buff,0,Util.unsignedByteToInt(buff[offset]));
 	}
 	public void readFileData(long offset,byte[] buffer,int bufferOffset, int size) throws IOException
 	{
@@ -36,13 +36,9 @@ public class EntryRecord
 		volume.readFromLBN(this.getLocationOfExtent(),0,buffer,0,this.getDataLength());
 		return buffer;
 	}
-	public static int unsignedByteToInt(byte b) 
-	{
-		return (int) b & 0xFF;
-  }
 	public int getLengthOfDirectoryEntry()
 	{
-		return unsignedByteToInt(buff[0]);
+		return Util.unsignedByteToInt(buff[0]);
 	}
 	public int getLengthOfExtendedAttribute()
 	{
@@ -96,15 +92,13 @@ public class EntryRecord
 	/**
 	 * @return Returns the volume.
 	 */
-	public PrimaryVolume getVolume()
-	{
+	public ISO9660Volume getVolume() {
 		return volume;
 	}
 	/**
 	 * @param volume The volume to set.
 	 */
-	public void setVolume(PrimaryVolume volume)
-	{
+	public void setVolume(ISO9660Volume volume) {
 		this.volume = volume;
 	}
 }

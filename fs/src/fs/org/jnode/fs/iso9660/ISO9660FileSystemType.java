@@ -3,6 +3,8 @@
  */
 package org.jnode.fs.iso9660;
 
+import java.io.IOException;
+
 import org.jnode.driver.*;
 import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.*;
@@ -19,7 +21,8 @@ public class ISO9660FileSystemType implements FileSystemType {
 	public static final String NAME = "CDFS";
 	public static final String TAG = "CDFS";
 
-	public String getName() {
+	public String getName() 
+	{
 		return NAME;
 	}
 
@@ -29,7 +32,18 @@ public class ISO9660FileSystemType implements FileSystemType {
 	 * @see org.jnode.fs.FileSystemType#supports(org.jnode.fs.partitions.PartitionTableEntry,
 	 *      byte[])
 	 */
-	public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
+	public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) 
+	{
+		byte[] buffer = new byte[10];
+		try {
+			devApi.read(16 * ISO9660FileSystem.DefaultLBNSize,buffer,0,10);
+			if(new String(buffer,1,5).equals("CD001"))
+				return true;
+			else
+				return false;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 	/*
