@@ -21,6 +21,7 @@ import org.jnode.vm.classmgr.Signature;
 import org.jnode.vm.classmgr.TIBLayout;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmClassLoader;
+import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmConstFieldRef;
 import org.jnode.vm.classmgr.VmConstIMethodRef;
@@ -59,7 +60,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     private static final boolean debug = false;
 
     /** If true, do additional verifications. Helps to develop this compiler */
-    private static final boolean paranoia = true;
+    private static final boolean paranoia = false;
 
     /** Offset in bytes of the first data entry within an array-object */
     private final int arrayDataOffset;
@@ -479,6 +480,57 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             os.writeLEA(SP, SP, size);
         }
         v.release(eContext);
+    }
+
+    /**
+     * Emit the core of the instanceof code.
+     * 
+     * @param objectr
+     *            Register containing the object reference
+     * @param trueLabel
+     *            Where to jump for a true result. A false result will continue
+     *            directly after this method Register ECX must be free and it
+     *            destroyed.
+     */
+    private final void instanceOfClass(Register objectr, VmClassType type,
+            Register tmpr, Register resultr, Label trueLabel, boolean skipNullTest) {
+
+    	final int depth = type.getSuperClassDepth();
+    	final int staticsOfs = arrayDataOffset + (type.getStaticsIndex() << 2);
+        final Label notInstanceOfLabel = new Label(this.curInstrLabel
+                + "notInstanceOf");
+
+    	// Clear result (means !instanceof)
+        if (resultr != null) {
+        	os.writeXOR(resultr, resultr);
+        }
+        // Test objectr == null
+        if (!skipNullTest) {
+        	// Is objectr null?
+        	os.writeTEST(objectr, objectr);
+            os.writeJCC(notInstanceOfLabel, X86Constants.JZ);
+        }
+    	// TIB -> tmp 
+        os.writeMOV(INTSIZE, tmpr, objectr, tibOffset);
+        // SuperClassesArray -> tmp 
+        os.writeMOV(INTSIZE, tmpr, tmpr, arrayDataOffset
+                + (TIBLayout.SUPERCLASSES_INDEX * slotSize));
+        // Length of superclassarray must be >= depth
+        os.writeCMP_Const(tmpr, arrayLengthOffset, depth);
+        os.writeJCC(notInstanceOfLabel, X86Constants.JNA);
+        // Get superClassesArray[depth] -> objectr
+        os.writeMOV(INTSIZE, tmpr, tmpr, arrayDataOffset + (depth << 2));
+        // Compare objectr with classtype
+        os.writeCMP(STATICS, staticsOfs, tmpr);
+        if (resultr != null) {
+        	os.writeSETCC(resultr, X86Constants.JE);
+        } else {
+        	// Conditional forward jump is assumed not to be taken.
+        	// Therefor will the JCC followed by a JMP be faster.
+        	os.writeJCC(notInstanceOfLabel, X86Constants.JNE);
+        	os.writeJMP(trueLabel);
+        }
+        os.setObjectRef(notInstanceOfLabel);
     }
 
     /**
@@ -972,53 +1024,106 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_checkcast(org.jnode.vm.classmgr.VmConstClass)
      */
     public final void visit_checkcast(VmConstClass classRef) {
-        // Pre-claim ECX
-        L1AHelper.requestRegister(eContext, ECX);
-        L1AHelper.requestRegister(eContext, EAX);
-
-        // check that top item is a reference
-        final RefItem ref = vstack.popRef();
-
-        // Load the ref
-        ref.load(eContext);
-        final Register refr = ref.getRegister();
-        final Register classr = EAX;
-        final Register tmpr = L1AHelper.requestRegister(eContext, JvmType.INT,
-                false);
-
-        // Resolve the class
-        writeResolveAndLoadClassToReg(classRef, classr);
-
-        final Label okLabel = new Label(this.curInstrLabel + "cc-ok");
-
-        /* Is objectref null? */
-        os.writeTEST(refr, refr);
-        os.writeJCC(okLabel, X86Constants.JZ);
-        /* Is instanceof? */
-        instanceOf(refr, classr, tmpr, okLabel, true);
-        /* Not instanceof */
-
-        // Release temp registers here, so invokeJavaMethod can use it
-        L1AHelper.releaseRegister(eContext, ECX);
-        L1AHelper.releaseRegister(eContext, classr);
-        L1AHelper.releaseRegister(eContext, tmpr);
-
-        // Call SoftByteCodes.systemException
-        os.writePUSH(SoftByteCodes.EX_CLASSCAST);
-        os.writePUSH(0);
-        invokeJavaMethod(context.getSystemExceptionMethod());
-        final RefItem exi = vstack.popRef();
-        assertCondition(exi.uses(EAX), "item must be in eax");
-        exi.release(eContext);
-
-        /* Exception in EAX, throw it */
-        helper.writeJumpTableCALL(X86JumpTable.VM_ATHROW_OFS);
-
-        /* Normal exit */
-        os.setObjectRef(okLabel);
-
-        // Leave ref on stack
-        vstack.push(ref);
+    	// Resolve classRef
+    	classRef.resolve(loader);
+    	final VmType resolvedType = classRef.getResolvedVmClass();
+    	
+    	if (resolvedType.isInterface() || resolvedType.isArray()) {    
+    		// ClassRef is an interface or array, do the slow test
+    		
+    		// Pre-claim ECX
+    		L1AHelper.requestRegister(eContext, ECX);
+    		L1AHelper.requestRegister(eContext, EAX);
+    		
+    		// check that top item is a reference
+    		final RefItem ref = vstack.popRef();
+    		
+    		// Load the ref
+    		ref.load(eContext);
+    		final Register refr = ref.getRegister();
+    		final Register classr = EAX;
+    		final Register tmpr = L1AHelper.requestRegister(eContext, JvmType.INT,
+    				false);
+    		
+    		// Resolve the class
+    		writeResolveAndLoadClassToReg(classRef, classr);
+    		
+    		final Label okLabel = new Label(this.curInstrLabel + "cc-ok");
+    		
+    		/* Is objectref null? */
+    		os.writeTEST(refr, refr);
+    		os.writeJCC(okLabel, X86Constants.JZ);
+    		/* Is instanceof? */
+    		instanceOf(refr, classr, tmpr, okLabel, true);
+    		/* Not instanceof */
+    		
+    		// Release temp registers here, so invokeJavaMethod can use it
+    		L1AHelper.releaseRegister(eContext, ECX);
+    		L1AHelper.releaseRegister(eContext, classr);
+    		L1AHelper.releaseRegister(eContext, tmpr);
+    		
+    		// Call SoftByteCodes.systemException
+    		os.writePUSH(SoftByteCodes.EX_CLASSCAST);
+    		os.writePUSH(0);
+    		invokeJavaMethod(context.getSystemExceptionMethod());
+    		final RefItem exi = vstack.popRef();
+    		assertCondition(exi.uses(EAX), "item must be in eax");
+    		exi.release(eContext);
+    		
+    		/* Exception in EAX, throw it */
+    		helper.writeJumpTableCALL(X86JumpTable.VM_ATHROW_OFS);
+    		
+    		/* Normal exit */
+    		os.setObjectRef(okLabel);
+    		
+    		// Leave ref on stack
+    		vstack.push(ref);
+    	} else {
+			// classRef is a class, do the fast test
+    		
+    		// Pre-claim EAX
+    		L1AHelper.requestRegister(eContext, EAX);
+    		
+    		// check that top item is a reference
+    		final RefItem ref = vstack.popRef();
+    		
+    		// Load the ref
+    		ref.load(eContext);
+    		final Register refr = ref.getRegister();
+    		final Register tmpr = L1AHelper.requestRegister(eContext, JvmType.INT,
+    				false);
+    		
+    		final Label okLabel = new Label(this.curInstrLabel + "cc-ok");
+    		
+    		// Is objectref null?
+    		os.writeTEST(refr, refr);
+    		os.writeJCC(okLabel, X86Constants.JZ);
+    		// Is instanceof?
+    		instanceOfClass(refr, (VmClassType)resolvedType, tmpr, null, okLabel, true);
+    		// Not instanceof 
+    		
+    		// Release temp registers here, so invokeJavaMethod can use it
+    		L1AHelper.releaseRegister(eContext, EAX);
+    		L1AHelper.releaseRegister(eContext, tmpr);
+    		
+    		// Call SoftByteCodes.systemException
+    		os.writePUSH(SoftByteCodes.EX_CLASSCAST);
+    		os.writePUSH(0);
+    		invokeJavaMethod(context.getSystemExceptionMethod());
+    		final RefItem exi = vstack.popRef();
+    		assertCondition(exi.uses(EAX), "item must be in eax");
+    		exi.release(eContext);
+    		
+    		/* Exception in EAX, throw it */
+    		helper.writeJumpTableCALL(X86JumpTable.VM_ATHROW_OFS);
+    		
+    		/* Normal exit */
+    		os.setObjectRef(okLabel);
+    		
+    		// Leave ref on stack
+    		vstack.push(ref);
+			
+		}
     }
 
     /**
@@ -2046,51 +2151,81 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_instanceof(org.jnode.vm.classmgr.VmConstClass)
      */
     public final void visit_instanceof(VmConstClass classRef) {
-        // Prepare
-        final X86RegisterPool pool = eContext.getPool();
+    	// Resolve the classRef
+    	classRef.resolve(loader);
+    	
+		// Prepare
+		final X86RegisterPool pool = eContext.getPool();
+		final VmType resolvedType = classRef.getResolvedVmClass();
+		
+		if (resolvedType.isInterface() || resolvedType.isArray()) {    
+    		// It is an interface, do it the hard way
+    		
+    		// Pre-claim ECX
+    		L1AHelper.requestRegister(eContext, ECX);
+    		
+    		// Load reference
+    		final RefItem ref = vstack.popRef();
+    		ref.load(eContext);
+    		final Register refr = ref.getRegister();
+    		
+    		// Allocate tmp registers
+    		final Register classr = L1AHelper.requestRegister(eContext,
+    				JvmType.INT, false);
+    		final Register tmpr = L1AHelper.requestRegister(eContext, JvmType.INT,
+    				false);
+    		
+    		/* Objectref is already on the stack */
+    		writeResolveAndLoadClassToReg(classRef, classr);
+    		
+    		final Label trueLabel = new Label(this.curInstrLabel + "io-true");
+    		final Label endLabel = new Label(this.curInstrLabel + "io-end");
+    		
+    		/* Is instanceof? */
+    		instanceOf(refr, classr, tmpr, trueLabel, false);
+    		/* Not instanceof */
+    		//TODO: use setcc instead of jumps
+    		os.writeXOR(refr, refr);
+    		os.writeJMP(endLabel);
+    		
+    		os.setObjectRef(trueLabel);
+    		os.writeMOV_Const(refr, 1);
+    		
+    		// Push result
+    		os.setObjectRef(endLabel);
+    		ref.release(eContext);
+    		L1AHelper.requestRegister(eContext, refr);
+    		final IntItem result = (IntItem)ifac.createReg(JvmType.INT, refr);
+    		pool.transferOwnerTo(refr, result);
+    		vstack.push(result);
+    		
+    		// Release
+    		pool.release(classr);
+    		pool.release(tmpr);
+    		pool.release(ECX);
+    	} else {
+    		// It is a class, do the fast way
+    		
+    		// Load reference
+    		final RefItem ref = vstack.popRef();
+    		ref.load(eContext);
+    		final Register refr = ref.getRegister();
+    		
+    		// Allocate tmp registers
+    		final Register tmpr = L1AHelper.requestRegister(eContext, JvmType.INT,
+    				false);
+    		final IntItem result = (IntItem)L1AHelper.requestWordRegister(eContext, JvmType.INT, false);
+    		
+    		// Is instanceof
+    		instanceOfClass(refr, (VmClassType)classRef.getResolvedVmClass(), tmpr, result.getRegister(), null, false);
 
-        // Pre-claim ECX
-        L1AHelper.requestRegister(eContext, ECX);
-
-        // Load reference
-        final RefItem ref = vstack.popRef();
-        ref.load(eContext);
-        final Register refr = ref.getRegister();
-
-        // Allocate tmp registers
-        final Register classr = L1AHelper.requestRegister(eContext,
-                JvmType.INT, false);
-        final Register tmpr = L1AHelper.requestRegister(eContext, JvmType.INT,
-                false);
-
-        /* Objectref is already on the stack */
-        writeResolveAndLoadClassToReg(classRef, classr);
-
-        final Label trueLabel = new Label(this.curInstrLabel + "io-true");
-        final Label endLabel = new Label(this.curInstrLabel + "io-end");
-
-        /* Is instanceof? */
-        instanceOf(refr, classr, tmpr, trueLabel, false);
-        /* Not instanceof */
-        //TODO: use setcc instead of jumps
-        os.writeXOR(refr, refr);
-        os.writeJMP(endLabel);
-
-        os.setObjectRef(trueLabel);
-        os.writeMOV_Const(refr, 1);
-
-        // Push result
-        os.setObjectRef(endLabel);
-        ref.release(eContext);
-        L1AHelper.requestRegister(eContext, refr);
-        final IntItem result = (IntItem)ifac.createReg(JvmType.INT, refr);
-        pool.transferOwnerTo(refr, result);
-        vstack.push(result);
-
-        // Release
-        pool.release(classr);
-        pool.release(tmpr);
-        pool.release(ECX);
+    		// Push result
+    		vstack.push(result);
+    		
+    		// Release
+    		ref.release(eContext);
+    		pool.release(tmpr);
+    	}
     }
 
     /**
