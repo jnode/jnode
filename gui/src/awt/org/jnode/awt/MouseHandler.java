@@ -3,12 +3,10 @@
  */
 package org.jnode.awt;
 
-import gnu.java.awt.EventModifier;
-
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 
@@ -160,9 +158,11 @@ public class MouseHandler implements PointerListener {
 		}
 		//log.debug("Source: " + source.getClass().getName());
 		//TODO full support for modifiers
-        Point p = source.getLocationOnScreen();
+        final Point p = source.getLocationOnScreen();
+        final boolean popupTrigger = (button == MouseEvent.BUTTON2);
+        
 		final MouseEvent me = new MouseEvent(source, id, System.currentTimeMillis(),
-				EventModifier.OLD_MASK | button, x - p.x, y - p.y, 1, button == MouseEvent.BUTTON2, button);
+				0, x - p.x, y - p.y, 1, popupTrigger, button);
 		JNodeGenericPeer.eventQueue.postEvent(me);
 		return source;
 	}

@@ -3,16 +3,6 @@
  */
 package org.jnode.awt.swingpeers;
 
-import org.apache.log4j.Logger;
-import org.jnode.awt.JNodeToolkit;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JDesktopPane;
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -26,6 +16,20 @@ import java.awt.event.ContainerListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyVetoException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JDesktopPane;
+import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+
+import org.apache.log4j.Logger;
+import org.jnode.awt.JNodeToolkit;
+import org.jnode.test.gui.BoxWorld;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -60,7 +64,9 @@ final class DesktopFrame extends JFrame {
                 int button = event.getButton();
                 if(button == MouseEvent.BUTTON1){
                     System.out.println("desktop - show mainpopup");
+                    mainPopup.setLightWeightPopupEnabled(true);
                     mainPopup.show(desktop, event.getX(), event.getY());
+                    log.info("LWPopup enabled: " + mainPopup.isLightWeightPopupEnabled());
                 }else if(event.isPopupTrigger()){
                     System.out.println("desktop - show windowspopup");
                     windowsPopup.show(desktop, event.getX(), event.getY());
@@ -113,18 +119,14 @@ final class DesktopFrame extends JFrame {
         JMenuItem mi = new JMenuItem("BoxWorld");
         mi.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-//                BoxWorld.main(new String[0]);
+            	runJavaMain("org.jnode.test.gui.BoxWorld");
             }
         });
         mainPopup.add(mi);
         mi = new JMenuItem("Tetris");
         mi.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try{
-//                    Tetris.main(new String[0]);
-                }catch(Exception x){
-                    x.printStackTrace();
-                }
+               	runJavaMain("org.jnode.test.gui.Tetris");
             }
         });
         mainPopup.add(mi);
@@ -139,6 +141,26 @@ final class DesktopFrame extends JFrame {
         mainPopup.add(mi);
         desktop.add(mainPopup);
         desktop.add(windowsPopup);
+    }
+    
+    private void runJavaMain(String className) {
+    	try {
+    		final Class cls = Thread.currentThread().getContextClassLoader().loadClass(className);
+    		Class[] types = { String[].class };
+    		Method m = cls.getMethod("main", types);
+    		Object[] args = { new String[0] };
+    		m.invoke(null, args);
+    	} catch (ClassNotFoundException ex) {
+    		log.error(ex);
+    	} catch (SecurityException ex) {
+    		log.error(ex);
+		} catch (NoSuchMethodException ex) {
+    		log.error(ex);
+		} catch (IllegalAccessException ex) {
+    		log.error(ex);
+		} catch (InvocationTargetException ex) {
+    		log.error(ex);
+		}
     }
 
     /**
