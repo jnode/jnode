@@ -55,6 +55,8 @@ public class SoftByteCodes implements Uninterruptible {
 	public static final int EX_STACKOVERFLOW = 5;
 
 	//public static final int EX_CLASSCAST = 6;
+	public static final int EX_COPRO_OR = 7;
+	public static final int EX_COPRO_ERR = 8;
 
 	private static VmHeapManager heapManager;
 
@@ -415,6 +417,10 @@ public class SoftByteCodes implements Uninterruptible {
 //				Unsafe.die("Classcast failed");				
 //			}
 //			return new ClassCastException();
+		case EX_COPRO_OR:
+			throw new ArithmeticException("Coprocessor overrun");
+		case EX_COPRO_ERR:
+			throw new ArithmeticException("Coprocessor error");
 		default:
 			return new UnknownError("Unknown system-exception at " + hexAddress
 					+ state);
