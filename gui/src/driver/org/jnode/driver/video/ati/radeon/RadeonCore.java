@@ -15,6 +15,7 @@ import org.jnode.driver.DriverException;
 import org.jnode.driver.pci.PCIBaseAddress;
 import org.jnode.driver.pci.PCIDevice;
 import org.jnode.driver.pci.PCIDeviceConfig;
+import org.jnode.driver.video.HardwareCursorAPI;
 import org.jnode.driver.video.spi.DpmsState;
 import org.jnode.driver.video.util.AbstractSurface;
 import org.jnode.naming.InitialNaming;
@@ -46,6 +47,7 @@ public class RadeonCore extends AbstractSurface implements RadeonConstants {
     private int startAddress;
     private int bytesPerLine;
     private final RadeonPLLInfo pllInfo;
+    private final RadeonHardwareCursor hwCursor;
     
 	/**
 	 * @param driver
@@ -85,8 +87,9 @@ public class RadeonCore extends AbstractSurface implements RadeonConstants {
 		//this.acc = new NVidiaAcceleration(vgaIO, architecture);
 		
 		log.info("Memory size " + (memSize / (1024*1024)) + "MB");
-		oldVgaState = new RadeonVgaState(hasCRTC2, vgaIO);
-		currentState = new RadeonVgaState(hasCRTC2, vgaIO);
+		this.oldVgaState = new RadeonVgaState(hasCRTC2, vgaIO);
+		this.currentState = new RadeonVgaState(hasCRTC2, vgaIO);
+		this.hwCursor = new RadeonHardwareCursor(vgaIO);
 	}
 
     /**
@@ -144,9 +147,7 @@ public class RadeonCore extends AbstractSurface implements RadeonConstants {
 		final int pixelDepth = (this.bitsPerPixel + 1) / 8;
 		this.bytesPerLine = width * pixelDepth;		
 		currentState.saveFromVGA(vgaIO);
-		log.info("OldState=" + currentState);
 		currentState.calcForConfiguration(config, pllInfo, vgaIO);
-		log.info("CalcState=" + currentState);
 		
 		// Set the new configuration
 		currentState.restoreToVGA(vgaIO);
@@ -188,15 +189,12 @@ public class RadeonCore extends AbstractSurface implements RadeonConstants {
 	public synchronized void close() {
 		//hwCursor.closeCursor();
 		final DpmsState dpmsState = getDpms();
-		//log.debug("Old DPMS state: " + dpmsState);
 		setDpms(DpmsState.OFF);
 		oldVgaState.restoreToVGA(vgaIO);
 		setDpms(dpmsState);
 
 		driver.close(this);
 		super.close();
-		
-		log.info("DAC_CNTL=0x" + NumberUtils.hex(vgaIO.getReg32(DAC_CNTL)));
 	}
 	
     /**
@@ -206,6 +204,13 @@ public class RadeonCore extends AbstractSurface implements RadeonConstants {
     final void release() {
         mmio.release();
         videoRam.release();
+    }
+    
+    /**
+     * Gets the hardware cursor API implementation.
+     */
+    final HardwareCursorAPI getHardwareCursor() {
+        return hwCursor;
     }
     
     /**
