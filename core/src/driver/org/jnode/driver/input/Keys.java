@@ -1,14 +1,17 @@
+/*
+ * $Id$
+ */
+
 package org.jnode.driver.input;
 
 import java.util.Arrays;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mh
- * Date: 06-04-2004
- * Time: 13:11:30
- * To change this template use File | Settings | File Templates.
+ * @author Martin Husted Hartvig
+ * @since 0.1.6
  */
+
+
 public class Keys
 {
   private Key[] keys = new Key[128];
