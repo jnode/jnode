@@ -123,4 +123,13 @@ public final class ISO9660Entry implements FSEntry {
     public void setCDFSentry(EntryRecord sentry) {
         entryRecord = sentry;
     }
+
+	/**
+	 * Indicate if the entry has been modified in memory (ie need to be saved)
+	 * @return true if the entry need to be saved
+	 * @throws IOException
+	 */
+	public boolean isDirty() throws IOException {
+		return true;
+	}
 }
