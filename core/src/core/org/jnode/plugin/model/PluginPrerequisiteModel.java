@@ -39,4 +39,13 @@ public class PluginPrerequisiteModel extends PluginModelObject implements Plugin
 			throw new PluginException("Unknown plugin " + plugin + " in import of " + getDeclaringPluginDescriptor().getId()); 
 		}
 	}
+
+	/**
+	 * Remove all references to (elements of) other plugin descriptors
+	 * 
+	 * @throws PluginException
+	 */
+	protected void unresolve() throws PluginException {
+	    // Nothing to do
+	}
 }

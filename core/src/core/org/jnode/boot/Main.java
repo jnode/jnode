@@ -46,19 +46,23 @@ public class Main {
 
 			BootLog.info("Starting PluginManager");
 			final PluginManager piMgr = new DefaultPluginManager(pluginRegistry);
-			piMgr.startPlugins();
-
-			final long end = VmSystem.currentKernelMillis();
-			System.out.println("JNode initialization finished in " + (end - start) + "ms.");
+			piMgr.startSystemPlugins();
 
 			final ClassLoader loader = pluginRegistry.getPluginsClassLoader();
 			final String mainClassName = proc.getMainClassName();
+			final Runnable main;
 			if (mainClassName != null) {
 				final Class mainClass = loader.loadClass(mainClassName);
-				final Runnable main = (Runnable) mainClass.newInstance();
-				main.run();
+				main = (Runnable) mainClass.newInstance();
 			} else {
 				BootLog.warn("No Main-Class found");
+				main = null;
+			}
+			final long end = VmSystem.currentKernelMillis();
+			System.out.println("JNode initialization finished in " + (end - start) + "ms.");
+
+			if (main != null) {
+			    main.run();
 			}
 
 		} catch (Throwable ex) {

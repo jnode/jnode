@@ -47,6 +47,16 @@ public class LibraryModel extends PluginModelObject implements Library {
 		// Do nothing
 	}
 
+
+	/**
+	 * Remove all references to (elements of) other plugin descriptors
+	 * 
+	 * @throws PluginException
+	 */
+	protected void unresolve() throws PluginException {
+	    // Do nothing
+	}
+	
 	/**
 	 * Gets the name of the jar file or directory
 	 */

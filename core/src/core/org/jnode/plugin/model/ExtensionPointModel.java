@@ -50,6 +50,15 @@ public class ExtensionPointModel extends PluginModelObject implements
         // Do nothing
     }
 
+	/**
+	 * Remove all references to (elements of) other plugin descriptors
+	 * 
+	 * @throws PluginException
+	 */
+	protected void unresolve() throws PluginException {
+	    // Do nothing
+	}
+	
     /**
      * Returns the simple identifier of this extension point. This identifier is
      * a non-empty string containing no period characters ('.') and is

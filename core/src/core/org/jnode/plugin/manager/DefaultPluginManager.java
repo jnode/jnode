@@ -24,6 +24,7 @@ import org.jnode.plugin.PluginManager;
 import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.model.PluginRegistryModel;
+import org.jnode.security.JNodePermission;
 import org.jnode.system.BootLog;
 
 /**
@@ -39,6 +40,9 @@ public final class DefaultPluginManager extends PluginManager {
 
     private static final int START_TIMEOUT = 10000;
 
+    private static final JNodePermission START_SYSTEM_PLUGINS_PERM = new JNodePermission("startSystemPlugins");
+    private static final JNodePermission STOP_PLUGINS_PERM = new JNodePermission("stopPlugins");
+    
     /**
      * Initialize a new instance. This will also bind this pluginmanager in the
      * initial namespace.
@@ -71,11 +75,16 @@ public final class DefaultPluginManager extends PluginManager {
     }
 
     /**
-     * Start all plugins that can be started, but have not been started yet
+     * Start all system plugins and plugins with the auto-start flag on.
      * 
      * @throws PluginException
      */
-    public void startPlugins() throws PluginException {
+    public void startSystemPlugins() throws PluginException {
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkPermission(START_SYSTEM_PLUGINS_PERM);
+        }
+        
         // Resolve all plugins
         ((PluginRegistryModel) registry).resolveDescriptors();
 
@@ -87,43 +96,37 @@ public final class DefaultPluginManager extends PluginManager {
         final String cmdLine = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.cmdline", ""));
         final boolean debug = (cmdLine.indexOf("debug") > 0);
         final List descrList = createPluginDescriptorList();
-        final ArrayList errors = new ArrayList(descrList.size());
-        for (Iterator i = descrList.iterator(); i.hasNext();) {
-            final PluginDescriptor descr = (PluginDescriptor) i.next();
-            try {
-                //===== Removed to call the startPlugin() method
-                //if (canStart(descr)) {
-                //	Syslog.debug("Starting " + descr.getId());
-                //	descr.getPlugin().start();
-                //} else {
-                //	Syslog.warn("Skipping start of " + descr.getId() + " due to
-                // depencies.");
-                //}
 
-                if (debug) {
-                    Thread.sleep(250);
-                }
-
-                startPlugin(descr);
-
-            } catch (Throwable ex) {
-                BootLog.error("Cannot start " + descr.getId(), ex);
-                if (debug) {
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException ex1) {
-                        // Ignore
+        // 2 loops, first start all system plugins,
+        // then start all auto-start plugins
+        for (int type = 0; type < 2; type++) {            
+            for (Iterator i = descrList.iterator(); i.hasNext();) {
+                final PluginDescriptor descr = (PluginDescriptor) i.next();
+                try {
+                    final boolean start;
+                    if (type == 0) {
+                        start = descr.isSystemPlugin();
+                    } else {
+                        start = (!descr.isSystemPlugin()) && descr.isAutoStart();
+                    }
+                    if (start) {
+                        if (debug) {
+                            Thread.sleep(250);
+                        }
+                        
+                        startSinglePlugin(descr.getPlugin());
+                    }
+                } catch (Throwable ex) {
+                    BootLog.error("Cannot start " + descr.getId(), ex);
+                    if (debug) {
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException ex1) {
+                            // Ignore
+                        }
                     }
                 }
-                errors.add(new StartError(ex, descr.getId()));
             }
-        }
-
-        // Show all errors
-        for (Iterator i = errors.iterator(); i.hasNext();) {
-            final StartError error = (StartError) i.next();
-            BootLog.error("Error starting plugin " + error.getPluginId(), error
-                    .getException());
         }
 
         // Wait a while until all plugins have finished their startup process
@@ -153,35 +156,14 @@ public final class DefaultPluginManager extends PluginManager {
     }
 
     /**
-     * Starts a single plugin.
-     * 
-     * @param d
-     *            The descriptor to start.
-     * @throws PluginException
-     *             if the plugin fails to start.
-     */
-    public void startPlugin(PluginDescriptor d) throws PluginException {
-        try {
-            if (canStart(d)) {
-                BootLog.debug("Starting " + d.getId());
-                startSinglePlugin(d.getPlugin());
-            } else {
-                BootLog.warn("Skipping start of " + d.getId()
-                        + " due to to depencies.");
-            }
-        } catch (PluginException ex) {
-            BootLog.error("Error starting " + d.getId());
-            throw ex;
-        } catch (Throwable ex) {
-            BootLog.error("Error starting " + d.getId());
-            throw new PluginException(ex);
-        }
-    }
-
-    /**
      * Stop all plugins that have been started
      */
-    public void stopPlugins() {
+    public final void stopPlugins() {
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkPermission(STOP_PLUGINS_PERM);
+        }
+
         try {
             final List descrList = createPluginDescriptorList();
             Collections.reverse(descrList);
@@ -206,7 +188,7 @@ public final class DefaultPluginManager extends PluginManager {
      * @throws PluginException
      *             if the plugin fails to stop.
      */
-    public void stopPlugin(PluginDescriptor d) throws PluginException {
+    private final void stopPlugin(PluginDescriptor d) throws PluginException {
         final String id = d.getId();
         for (Iterator i = registry.getDescriptorIterator(); i.hasNext();) {
             final PluginDescriptor descr = (PluginDescriptor) i.next();
@@ -288,22 +270,6 @@ public final class DefaultPluginManager extends PluginManager {
             if (!nameSet.contains(pr.getPluginId())) { 
             //Syslog.debug("Not in set: " + pr.getPluginId());
             return false; }
-        }
-        return true;
-    }
-
-    /**
-     * Can the plugin of the given descriptor be started?
-     * 
-     * @param descr
-     */
-    private boolean canStart(PluginDescriptor descr) throws PluginException {
-        final PluginPrerequisite[] prereq = descr.getPrerequisites();
-        for (int i = 0; i < prereq.length; i++) {
-            final PluginPrerequisite pr = prereq[ i];
-            final PluginDescriptor prDescr = registry.getPluginDescriptor(pr
-                    .getPluginId());
-            if (!prDescr.getPlugin().isActive()) { return false; }
         }
         return true;
     }

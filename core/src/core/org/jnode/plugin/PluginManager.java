@@ -3,6 +3,8 @@
  */
 package org.jnode.plugin;
 
+import org.jnode.system.BootLog;
+
 /**
  * Interface of manager of all plugins in the system.
  * 
@@ -29,38 +31,20 @@ public abstract class PluginManager {
 	 */
 	public abstract PluginLoaderManager getLoaderManager();
 
-	/**
-	 * Start all plugins that can be started, but have not been started yet
-	 * 
-	 * @throws PluginException
-	 */
-	public abstract void startPlugins() throws PluginException;
-
-	/**
-	 * Starts a single plugin from its descriptor.
-	 * 
-	 * @param d
-	 *            The plugins descriptor to start.
-	 * @throws PluginException
-	 *             if an error was encounterd and the plugin does not start.
-	 */
-	public abstract void startPlugin(PluginDescriptor d) throws PluginException;
+    /**
+     * Start all system plugins and plugins with the auto-start flag on.
+     * This method requires a JNodePermission("startSystemPlugins").
+     * 
+     * @throws PluginException
+     */
+	public abstract void startSystemPlugins() throws PluginException;
 
 	/**
 	 * Stop all plugins that have been started
+     * This method requires a JNodePermission("stopPlugins").
 	 */
 	public abstract void stopPlugins();
 
-	/**
-	 * Stops a plugin and all plugins that depend on it.
-	 * 
-	 * @param d
-	 *            the plugins descriptor to stop.
-	 * @throws PluginException
-	 *             if an error was encountered and the plugin is unable to stop.
-	 */
-	public abstract void stopPlugin(PluginDescriptor d) throws PluginException;
-	
 	/**
 	 * Start the given plugin.
 	 * No dependent plugins will be started.
@@ -69,7 +53,15 @@ public abstract class PluginManager {
 	 * @throws PluginException
 	 */
 	protected final void startSinglePlugin(Plugin plugin) throws PluginException {
-		plugin.start();
+	    try {
+	        plugin.start();
+	    } catch (PluginException ex) {
+	        BootLog.error("Error starting " + plugin.getDescriptor().getId());
+	        throw ex;
+	    } catch (Throwable ex) {
+	        BootLog.error("Error starting " + plugin.getDescriptor().getId());
+	        throw new PluginException(ex);
+	    }
 	}
 	
 	/**
@@ -80,6 +72,14 @@ public abstract class PluginManager {
 	 * @throws PluginException
 	 */
 	protected final void stopSinglePlugin(Plugin plugin) throws PluginException {
-		plugin.stop();
+	    try {
+	        plugin.stop();
+	    } catch (PluginException ex) {
+	        BootLog.error("Error stopping " + plugin.getDescriptor().getId());
+	        throw ex;
+	    } catch (Throwable ex) {
+	        BootLog.error("Error stopping " + plugin.getDescriptor().getId());
+	        throw new PluginException(ex);
+	    }
 	}
 }

@@ -59,6 +59,21 @@ public class ExtensionModel extends PluginModelObject implements Extension {
 		}
 	}
 
+
+	/**
+	 * Remove all references to (elements of) other plugin descriptors
+	 * 
+	 * @throws PluginException
+	 */
+	protected void unresolve() throws PluginException {
+		final ExtensionPointModel ep = (ExtensionPointModel) getDeclaringPluginDescriptor().getPluginRegistry().getExtensionPoint(point);
+		if (ep == null) {
+			throw new PluginException("Unknown extension-point " + point);
+		} else {
+			ep.remove(this);
+		}	    
+	}
+	
 	/**
 	 * Returns the simple identifier of this extension, or null if this extension does not have an
 	 * identifier. This identifier is specified in the plug-in manifest (plugin.xml) file as a

@@ -10,6 +10,9 @@ import java.io.PrintStream;
 import java.util.Locale;
 import java.util.Properties;
 
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.jnode.system.BootLog;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
@@ -58,6 +61,8 @@ public final class VmSystem {
     private static MemoryResource initJar;
 
     private static PrintStream out;
+
+    private static final String LAYOUT = "%-5p [%c{1}]: %m%n";
 
     /**
      * Initialize the Virtual Machine
@@ -115,6 +120,10 @@ public final class VmSystem {
             // Start the compilation manager
             vm.startHotMethodManager();
             
+            // Initialize log4j
+    		final Logger root = Logger.getRootLogger();
+    		final ConsoleAppender infoApp = new ConsoleAppender(new PatternLayout(LAYOUT));
+    		root.addAppender(infoApp);
         }
     }
 
@@ -184,6 +193,9 @@ public final class VmSystem {
         res.put("user.home", "/");
         res.put("user.dir", "/");
 
+        // Log4j properties
+        res.put("log4j.defaultInitOverride", "true");
+        
         // GNU properties
         res.put("gnu.java.io.encoding_scheme_alias.US-ASCII", "ISO8859-1");
         res.put("gnu.java.io.encoding_scheme_alias.UTF-16LE", "UTF16LE");

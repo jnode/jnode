@@ -27,6 +27,8 @@ import org.jnode.plugin.ExtensionPointListener;
 import org.jnode.plugin.PluginException;
 import org.jnode.system.BootLog;
 import org.jnode.util.StopWatch;
+import org.jnode.work.Work;
+import org.jnode.work.WorkUtils;
 
 /**
  * Default device manager.
@@ -63,6 +65,8 @@ public class DefaultDeviceManager implements DeviceManager,
     /** The JNode command line */
     private final String cmdLine;
 
+    private boolean extensionsLoaded = false;
+    
     private long defaultStartTimeout = 10000;
 
     private long fastStartTimeout = 1000;
@@ -86,8 +90,6 @@ public class DefaultDeviceManager implements DeviceManager,
         this.mappersEP = mappersEP;
         findersEP.addListener(this);
         mappersEP.addListener(this);
-        refreshFinders();
-        refreshMappers();
     }
 
     /**
@@ -428,7 +430,12 @@ public class DefaultDeviceManager implements DeviceManager,
     /**
      * Use all device finders to find all system devices.
      */
-    protected void findDevices() {
+    protected void findDevices() throws InterruptedException {
+        waitUntilExtensionsLoaded();
+        final ArrayList finders;
+        synchronized (this) {
+            finders = new ArrayList(this.finders);
+        }
         for (Iterator i = finders.iterator(); i.hasNext();) {
             final DeviceFinder finder = (DeviceFinder) i.next();
             try {
@@ -470,11 +477,29 @@ public class DefaultDeviceManager implements DeviceManager,
     public void start() throws PluginException {
         try {
             InitialNaming.bind(NAME, this);
+            WorkUtils.add(new Work("Start device manager") {
+                public void execute() {
+                    loadExtensions();
+                }
+                });
         } catch (NamingException ex) {
             throw new PluginException(ex);
         }
     }
+    
+    private synchronized void loadExtensions() {
+        refreshFinders();
+        refreshMappers();  
+        extensionsLoaded = true;
+        notifyAll();
+    }
 
+    private synchronized void waitUntilExtensionsLoaded() throws IllegalMonitorStateException, InterruptedException {
+        while (!extensionsLoaded) {
+            wait();
+        }
+    }
+    
     /**
      * Stop this manager
      * 
@@ -595,7 +620,7 @@ public class DefaultDeviceManager implements DeviceManager,
     /**
      * Refresh the list of finders, based on the mappers extension-point.
      */
-    protected void refreshFinders() {
+    private final void refreshFinders() {
         mappers.clear();
         final Extension[] extensions = findersEP.getExtensions();
         BootLog.debug("Found " + extensions.length + " device finders");
@@ -613,7 +638,7 @@ public class DefaultDeviceManager implements DeviceManager,
     /**
      * Refresh the list of mappers, based on the mappers extension-point.
      */
-    protected void refreshMappers() {
+    private final void refreshMappers() {
         mappers.clear();
         final Extension[] extensions = mappersEP.getExtensions();
         BootLog.debug("Found " + extensions.length + " mapper extensions");
