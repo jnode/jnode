@@ -118,24 +118,27 @@ public final class VmStatics extends VmSystemObject {
 		return idx;
 	}
 
-	final void setInt(int idx, int value) {
-		if (locked) {
-			throw new RuntimeException("Locked");
-		}
+	public final void setInt(int idx, int value) {
 		if (types[idx] != TYPE_INT) {
 			throw new IllegalArgumentException("Type error " + types[idx]);
 		}
-		statics[idx] = value;
+		if (statics[idx] != value) {
+			if (locked) {
+				throw new RuntimeException("Locked");
+			}
+		    statics[idx] = value;
+		}
 	}
 
-	final void setObject(int idx, Object value) {
-		if (locked) {
-			throw new RuntimeException("Locked");
-		}
+	public final void setObject(int idx, Object value) {
 		if (types[idx] != TYPE_OBJECT) {
 			throw new IllegalArgumentException("Type error " + types[idx]);
 		}
-		setRawObject(idx, value);
+		if (setRawObject(idx, value)) {
+			if (locked) {
+				throw new RuntimeException("Locked");
+			}		    
+		}
 	}
 
 	/*final void setMethod(int idx, VmMethod value) {
@@ -148,9 +151,14 @@ public final class VmStatics extends VmSystemObject {
 		setRawObject(idx, value);
 	}*/
 
-	private final void setRawObject(int idx, Object value) {
+	private final boolean setRawObject(int idx, Object value) {
 		if (objects != null) {
-			objects[idx] = value;
+		    if (objects[idx] != value) {
+		        objects[idx] = value;
+		        return true;
+		    } else {
+		        return false;
+		    }
 		} else {
 			final ObjectResolver resolver = getResolver();
 			if (slotLength == 1) {
@@ -165,10 +173,11 @@ public final class VmStatics extends VmSystemObject {
 					statics[idx + 0] = (int) ((lvalue >>> 32) & 0xFFFFFFFFL);
 				}
 			}
+			return true;
 		}
 	}
 
-	final void setLong(int idx, long value) {
+	public final void setLong(int idx, long value) {
 		if (locked) {
 			throw new RuntimeException("Locked");
 		}

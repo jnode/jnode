@@ -14,6 +14,7 @@ import java.util.Iterator;
 import org.jnode.assembler.NativeStream;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Unsafe;
+import org.jnode.vm.Vm;
 import org.jnode.vm.VmReflection;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.VmSystemObject;
@@ -876,6 +877,15 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 */
 	public final boolean isInitialized() {
 		return ((state & VmTypeState.ST_INITIALIZED) != 0);
+	}
+
+	/**
+	 * Mark this type initialized.
+	 * Can only be called during bootstrapping.
+	 */
+	public final void setInitialized() {
+	    Vm._assert(!Vm.isRunningVm());
+		state |= VmTypeState.ST_INITIALIZED;
 	}
 
 	/**
