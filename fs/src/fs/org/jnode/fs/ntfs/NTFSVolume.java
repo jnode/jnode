@@ -11,8 +11,11 @@ import org.jnode.fs.ntfs.attributes.NTFSAttribute;
 import org.jnode.fs.ntfs.attributes.NTFSBitMapAttribute;
 import org.jnode.fs.ntfs.attributes.NTFSDataAttribute;
 import org.jnode.fs.ntfs.attributes.NTFSFileNameAttribute;
+import org.jnode.fs.ntfs.attributes.NTFSIndexAllocationAttribute;
+import org.jnode.fs.ntfs.attributes.NTFSIndexRootAttribute;
 import org.jnode.fs.ntfs.attributes.NTFSStandardInformationAttribute;
 import org.jnode.fs.ntfs.attributes.NTFSUnimplementedAttribute;
+
 
 /**
  * @author Chira
@@ -57,11 +60,11 @@ public class NTFSVolume
 		return buff;
 	}
 	
-	public byte[] readClusters(int firstCluster, int howMany) throws IOException
+	public byte[] readClusters(long firstCluster, long howMany) throws IOException
 	{
-		byte[] buff = new byte[getClusterSize() * howMany];
+		byte[] buff = new byte[(int) (getClusterSize() * howMany)];
 
-		int clusterOffset = firstCluster * getClusterSize();
+		long clusterOffset = firstCluster * getClusterSize();
 		for(int i = 0 ; i< howMany;i++)
 		{	
 			api.read(clusterOffset + (i * getClusterSize()),buff,i * getClusterSize(),	getClusterSize());
@@ -103,6 +106,9 @@ public class NTFSVolume
 			int offset = 0;
 			NTFSFileRecord fileRecord = null;
 			public boolean hasNext() {
+				if(fileRecord != null)
+					if(fileRecord.getAlocatedSize() <= 0)
+						return false;
 				return true;
 			}
 
@@ -110,6 +116,7 @@ public class NTFSVolume
 				if(fileRecord != null)
 					offset += Math.round(fileRecord.getAlocatedSize() / NTFSVolume.this.getClusterSize());
 				fileRecord = getFileRecord(offset);
+				//System.out.println("File: " + fileRecord.getFileName() +"," + offset );
 				return fileRecord;
 			}
 
@@ -126,7 +133,9 @@ public class NTFSVolume
 		{
 			fileRecord = (NTFSFileRecord) itr.next();	
 			if(fileRecord.getFileName().equals("."))
+			{
 				return fileRecord; 
+			}
 		}	
 		return null;
 	}
@@ -141,7 +150,7 @@ public class NTFSVolume
 			return null;
 		}
 		
-		NTFSFileRecord fileRecord = new NTFSFileRecord();
+		NTFSFileRecord fileRecord = new NTFSFileRecord(this);
 		//  check for the magic numberb to see if we have a filerecord
 		if(NTFSFileRecord.hasMagicNumber(buf))
 		{
@@ -149,122 +158,151 @@ public class NTFSVolume
 			
 			//fill the NTFSFileRecord header data
 			fileRecord.setRealSize(
-					NTFSUTIL.ARRAY2INT( buf, 0x18)
+					NTFSUTIL.READ32_INT( buf, 0x18)
 			);
 			fileRecord.setAlocatedSize(
-					NTFSUTIL.ARRAY2INT( buf, 0x1C)
+					NTFSUTIL.READ32_INT( buf, 0x1C)
 			);
 			fileRecord.setHardLinkCount(
-					NTFSUTIL.makeWORDfrom2Bytes(buf[0x12],buf[0x13])
+					NTFSUTIL.READ16_INT(buf[0x12],buf[0x13])
 			);
 			fileRecord.setUpdateSequenceOffset(
-					NTFSUTIL.makeWORDfrom2Bytes(buf[0x4],buf[0x5])
+					NTFSUTIL.READ16_INT(buf[0x4],buf[0x5])
 			);
+			fileRecord.setUpdateSequenceSize(
+					NTFSUTIL.READ16_INT(buf[0x6],buf[0x7])
+			);
+			
 			fileRecord.setSequenceNumber(
-					NTFSUTIL.makeWORDfrom2Bytes(buf[0x10],buf[0x11])
+					NTFSUTIL.READ16_INT(buf[0x10],buf[0x11])
 			);
 			fileRecord.setFirtAttributeOffset(
-					NTFSUTIL.makeWORDfrom2Bytes(buf[0x14],buf[0x15])
+					NTFSUTIL.READ16_INT(buf[0x14],buf[0x15])
 			);
 			fileRecord.setFlags(
-					NTFSUTIL.makeWORDfrom2Bytes(buf[0x16],buf[0x17])
+					NTFSUTIL.READ16_INT(buf[0x16],buf[0x17])
 			);
 			fileRecord.setNextAttributeID(
-					NTFSUTIL.makeWORDfrom2Bytes(buf[0x28],buf[0x29])
+					NTFSUTIL.READ16_INT(buf[0x28],buf[0x29])
 			);
 			
 			// fill attribtes list without data
 			int offset = fileRecord.getFirtAttributeOffset();
+			
+			/*
+			 * check the fixup
+			 */
+			// calculate the Update sequence number
+			int usn = NTFSUTIL.READ16_INT(
+						buf[fileRecord.getUpdateSequenceOffset()],
+						buf[fileRecord.getUpdateSequenceOffset() + 1]);
+			// check each sector if the last 2 bytes are equal with the USN from header
+			for(int i = 1; i <= this.getBootRecord().SectorPerCluster * this.getBootRecord().ClustersPerMFTRecord;i++)
+			{
+				int sectusn = NTFSUTIL.READ16_INT(
+								buf[(i * this.getBootRecord().BytesPerSector)-2],
+								buf[(i * this.getBootRecord().BytesPerSector)-1]
+								);
+				if(sectusn != usn)
+					throw new RuntimeException("ERROR! - USN doesn't mach");
+				else
+				{
+					//copy the USN buffer to the end
+					buf[(i * this.getBootRecord().BytesPerSector)-2] = buf[fileRecord.getUpdateSequenceOffset() + (i * 2)]; 
+					buf[(i * this.getBootRecord().BytesPerSector)-1] = buf[fileRecord.getUpdateSequenceOffset() + (i * 2) + 1]; 
+				}
+			}
 			
 			outer: for(;;)
 			{
 				if(offset >= fileRecord.getRealSize())
 					break;
 				NTFSAttribute attribute = null;
-				int type = NTFSUTIL.ARRAY2INT( buf, offset);
+				int type = NTFSUTIL.READ32_INT( buf, offset);
 				if(type == -1)
 					break;
 				switch(type)
 				{
-					case 0x10: attribute = new NTFSStandardInformationAttribute();
+					case 0x10: 
+						attribute = new NTFSStandardInformationAttribute(fileRecord);
+						fileRecord.getAttributeMap().put(new Integer(0x10),attribute);
 						break; 
-					case 0x30: attribute = new NTFSFileNameAttribute();
+					case 0x30: 
+						attribute = new NTFSFileNameAttribute(fileRecord);
+						fileRecord.getAttributeMap().put(new Integer(0x30),attribute);
 						break;
-					case 0x80: attribute = new NTFSDataAttribute();
+					case 0x80: 
+						attribute = new NTFSDataAttribute(fileRecord);
+						fileRecord.getAttributeMap().put(new Integer(0x80),attribute);
 						break;
-					case 0xb0: attribute = new NTFSBitMapAttribute();
+					case 0xb0: 
+						attribute = new NTFSBitMapAttribute(fileRecord);
+						fileRecord.getAttributeMap().put(new Integer(0xb0),attribute);
 						break;
-					default:  attribute = new NTFSUnimplementedAttribute();
+					case 0x90: 
+						attribute = new NTFSIndexRootAttribute(fileRecord);
+						fileRecord.getAttributeMap().put(new Integer(0x90),attribute);
+						break;
+					case 0xA0: attribute = new NTFSIndexAllocationAttribute(fileRecord);
+						fileRecord.getAttributeMap().put(new Integer(0xA0),attribute);
+						break;
+					default:  
+						attribute = new NTFSUnimplementedAttribute(fileRecord);
+						fileRecord.getAttributeMap().put(new Integer(0xFF),attribute);
 						break;
 					}
 				attribute.setAttributeType(
-						NTFSUTIL.ARRAY2INT( buf, offset));
+						NTFSUTIL.READ32_INT( buf, offset));
 				attribute.setLength(
-						NTFSUTIL.ARRAY2INT( buf, offset + 4));
-				attribute.setAttributeLength(
-						NTFSUTIL.ARRAY2INT( buf, offset + 0x10));
+						NTFSUTIL.READ32_INT( buf, offset + 4));
 				attribute.setAttributeOffset(
-						NTFSUTIL.makeWORDfrom2Bytes(buf[offset + 0x14],buf[offset + 0x15]));
-				attribute.processAttributeData(
-						NTFSUTIL.extractSubBuffer(
-									buf,
-									offset + attribute.getAttributeOffset(),
-									attribute.getAttributeLength()));
-				fileRecord.getAttributeList().add(attribute);
+						NTFSUTIL.READ16_INT(buf[offset + 0x14],buf[offset + 0x15]));
+				attribute.setResident(
+						buf[offset + 0x08]==0);
+				attribute.setNameLength(buf[offset + 0x09]);
+				attribute.setNameOffset(
+						NTFSUTIL.READ16_INT(buf[offset + 0x0A],buf[offset + 0x0B]));
+				
+				// if it is named fill the name attribute 
+				if(attribute.getNameLength() > 0)
+				{	
+					char[] namebuf = new char[attribute.getNameLength()];
+					for(int i = 0;i < attribute.getNameLength();i++)
+					{
+						namebuf[i] = NTFSUTIL.READ16_CHAR(
+								buf[offset + attribute.getNameOffset() + (i*2)],
+								buf[offset + attribute.getNameOffset() + (i*2) + 1]);
+					}
+					attribute.setName( new String(namebuf));
+				}		
+				if(attribute.isResident())
+				{	
+					attribute.setAttributeLength(
+						NTFSUTIL.READ32_INT( buf, offset + 0x10));
+					attribute.processAttributeData(NTFSUTIL.extractSubBuffer(
+							buf,
+							offset + attribute.getAttributeOffset(),
+							attribute.getAttributeLength()));
+				}
+				else
+				{	
+					attribute.setStartVCN(
+							NTFSUTIL.READ32_INT( buf, offset + 0x10));
+					attribute.setLastVCN(
+							NTFSUTIL.READ32_INT( buf, offset + 0x18));
+					attribute.setDataRunsOffset(
+							NTFSUTIL.READ16_INT( buf[offset + 0x20],buf[offset + 0x21]));
+					attribute.setAttributeAlocatedSize(
+							NTFSUTIL.READ32_INT( buf, offset + 0x28));
+					if(attribute.getDataRunsOffset() > 0)
+						attribute.processDataRuns(NTFSUTIL.extractSubBuffer(
+							buf,
+							offset + attribute.getDataRunsOffset(),
+							attribute.getLength() - (attribute.getDataRunsOffset())));
+				}
 				offset+= attribute.getLength();
 			}
 		}
 		return fileRecord;
-	}
-	public void printFileRecords()	
-	{
-		if(this.getBootRecord() == null)
-			return;
-		
-			// printout data
-		System.out.println("------------ File record data -------------");
-		/*System.out.println("Real size of the file record: " + fileRecord.getRealSize());
-			System.out.println("Disk alocated size of the file record: " + fileRecord.getAlocatedSize());
-			System.out.println("Hard link count: " + fileRecord.getHardLinkCount());
-			System.out.println("Next Attr. ID: " + fileRecord.getNextAttributeID());
-			if(fileRecord.getFlags() == 0x02)
-				System.out.println("This is a directory!" );
-			else
-				if(fileRecord.getFlags() == 0x01)
-					System.out.println("Record in use!" );
-			else
-				System.out.println("Flags: " + fileRecord.getFlags());
-			System.out.println("Offset Attr.: 0x" + Integer.toHexString(fileRecord.getFirtAttributeOffset()));
-			*/
-		for(Iterator itr = this.getNTFSIterator();itr.hasNext();)
-		{
-			NTFSFileRecord fileRecord = (NTFSFileRecord) itr.next();	
-			
-			for(Iterator it = fileRecord.getAttributeList().iterator();it.hasNext();)
-			{
-				NTFSAttribute attribute = (NTFSAttribute) it.next();
-				if( attribute instanceof NTFSFileNameAttribute)
-				{	
-					System.out.println(((NTFSFileNameAttribute)attribute).getFileName());
-				}
-				/*switch (attribute.getAttributeType())
-				{
-					case 0x10 : System.out.println("Attr. type: $STANDARD_INFORMATION");
-							break;
-					case 0x20 : System.out.println("Attr. type: $ATTRIBUTE_LIST"); 
-							break;
-					case 0x30 : System.out.println("Attr. type: $FILE_NAME"); 
-							break;
-					case 0x40 : System.out.println("Attr. type: $OBJECT_ID"); 
-							break;
-					case 0x80 : System.out.println("Attr. type: $DATA"); 
-						break;
-					case 0xb0 : System.out.println("Attr. type: $BITMAP");
-						break;
-					default :	System.out.println("Attr. type: NOT KNOWN( 0x" + Integer.toHexString(attribute.getAttributeType()) + ")" );
-				
-				}*/
-			}
-		}		
 	}
 }

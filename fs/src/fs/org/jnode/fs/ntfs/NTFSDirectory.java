@@ -1,3 +1,6 @@
+/*
+ * $Id$
+ */
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
@@ -18,9 +21,15 @@ public class NTFSDirectory implements FSDirectory {
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FSDirectory#iterator()
 	 */
+	private NTFSFileRecord fileRecord = null;
+	
+	public NTFSDirectory(NTFSFileRecord record)
+	{
+		this.fileRecord = record;
+	}
+	
 	public Iterator iterator() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return new NTFSDirIterator(this);
 	}
 
 	/* (non-Javadoc)
@@ -69,6 +78,20 @@ public class NTFSDirectory implements FSDirectory {
 	public FileSystem getFileSystem() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/**
+	 * @return Returns the fileRecord.
+	 */
+	public NTFSFileRecord getFileRecord() {
+		return this.fileRecord;
+	}
+
+	/**
+	 * @param fileRecord The fileRecord to set.
+	 */
+	public void setFileRecord(NTFSFileRecord fileRecord) {
+		this.fileRecord = fileRecord;
 	}
 
 }
