@@ -169,7 +169,7 @@ final class VMRuntime
      * @param status the status to end the process with
      */
     static void exit(int status) {
-		Thread.currentThread().getThreadGroup().getProcess().exit(status);
+        throw new Error("Cannot exit yet");
     }
 
     /**

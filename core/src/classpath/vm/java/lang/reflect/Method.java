@@ -69,8 +69,6 @@ import org.jnode.vm.classmgr.VmMethod;
  * @author Eric Blake <ebb9@email.byu.edu>
  * @see Member
  * @see Class
- * @see java.lang.Class#getMethod(String,Object[])
- * @see java.lang.Class#getDeclaredMethod(String,Object[])
  * @see java.lang.Class#getMethods()
  * @see java.lang.Class#getDeclaredMethods()
  * @since 1.1

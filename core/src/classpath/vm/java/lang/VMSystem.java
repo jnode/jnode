@@ -35,15 +35,13 @@
 
 package java.lang;
 
-import java.util.Properties;
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.nio.ByteOrder;
 
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmSystem;
-import org.jnode.vm.classmgr.VmStaticField;
-import org.jnode.vm.classmgr.VmStatics;
 
 /**
  * VMSystem is a package-private helper class for System that the VM must
@@ -123,7 +121,7 @@ public final class VMSystem {
      */
 
     /**
-     * Set {@link #in}to a new InputStream.
+     * Set System.in to a new InputStream.
      * 
      * @param in
      *            the new InputStream
@@ -134,7 +132,7 @@ public final class VMSystem {
     }
 
     /**
-     * Set {@link #out}to a new PrintStream.
+     * Set System.out to a new PrintStream.
      * 
      * @param out
      *            the new PrintStream
@@ -145,7 +143,7 @@ public final class VMSystem {
     }
 
     /**
-     * Set {@link #err}to a new PrintStream.
+     * Set System.err to a new PrintStream.
      * 
      * @param err
      *            the new PrintStream
