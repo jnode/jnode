@@ -80,14 +80,16 @@ class X86StackFrame implements X86CompilerConstants {
 
     /**
      * Emit code to create the stack frame
+     * @return The length of os at the start of the method code.
      */
-    public void emitHeader() {
+    public int emitHeader() {
 
         final VmMethodCode code = new VmMethodCode();
         final Label startLabel = helper.genLabel("$$start");
         codeObject = os.startObject(context.getVmMethodCodeClass());
         os.setObjectRef(code);
         cm.setCodeStart(os.setObjectRef(startLabel));
+        final int rc = os.getLength();
 
         // Test for stack overflow
         helper.writeStackOverflowTest(method);
@@ -126,6 +128,8 @@ class X86StackFrame implements X86CompilerConstants {
 
         /* Create the synchronization enter code */
         emitSynchronizationCode(context.getMonitorEnterMethod());
+
+	return rc;
     }
 
     /**
