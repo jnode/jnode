@@ -127,9 +127,6 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 	/** Should we set the current instruction label on startInstruction? */
 	private boolean setCurInstrLabel;
 
-	/** Size of an object reference */
-	private final int slotSize;
-
 	/** Stackframe utility */
 	private X86StackFrame stackFrame;
 
@@ -178,7 +175,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 	 */
 public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			boolean isBootstrap, X86CompilerContext context,
-			MagicHelper magicHelper, TypeSizeInfo typeSizeInfo, int slotSize) {
+			MagicHelper magicHelper, TypeSizeInfo typeSizeInfo) {
 		this.os = (X86Assembler) outputStream;
 		this.context = context;
         this.typeSizeInfo = typeSizeInfo;
@@ -194,11 +191,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			xmmPool = new X86RegisterPool.XMMs64();
 		}
 		this.ifac = ItemFactory.getFactory();
-		AbstractX86StackManager stackMgr = vstack.createStackMgr(gprPool,
+		final AbstractX86StackManager stackMgr = vstack.createStackMgr(gprPool,
 				ifac);
 		this.helper = new X86CompilerHelper(os, stackMgr, context, isBootstrap);
 		this.cm = cm;
-		this.slotSize = slotSize;
+        final int slotSize = helper.SLOTSIZE;
 		this.arrayLengthOffset = VmArray.LENGTH_OFFSET * slotSize;
 		this.arrayDataOffset = VmArray.DATA_OFFSET * slotSize;
 		this.tibOffset = ObjectLayout.TIB_SLOT * slotSize;
@@ -602,16 +599,20 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			os.writeTEST(objectr, objectr);
 			os.writeJCC(notInstanceOfLabel, X86Constants.JZ);
 		}
+        
+        final int slotSize = helper.SLOTSIZE;
+        final int asize = helper.ADDRSIZE;
+        
 		// TIB -> tmp
-		os.writeMOV(helper.ADDRSIZE, tmpr, objectr, tibOffset);
+		os.writeMOV(asize, tmpr, objectr, tibOffset);
 		// SuperClassesArray -> tmp
-		os.writeMOV(helper.ADDRSIZE, tmpr, tmpr, arrayDataOffset
+		os.writeMOV(asize, tmpr, tmpr, arrayDataOffset
 				+ (TIBLayout.SUPERCLASSES_INDEX * slotSize));
 		// Length of superclassarray must be >= depth
 		os.writeCMP_Const(BITS32, tmpr, arrayLengthOffset, depth);
 		os.writeJCC(notInstanceOfLabel, X86Constants.JNA);
 		// Get superClassesArray[depth] -> objectr
-		os.writeMOV(helper.ADDRSIZE, tmpr, tmpr, arrayDataOffset + (depth * slotSize));
+		os.writeMOV(asize, tmpr, tmpr, arrayDataOffset + (depth * slotSize));
 		// Compare objectr with classtype
 		os.writeCMP(helper.STATICS, staticsOfs, tmpr);
 		if (resultr != null) {
@@ -655,13 +656,17 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			os.writeTEST(objectr, objectr);
 			os.writeJCC(notInstanceOfLabel, X86Constants.JZ);
 		}
+        
+        final int slotSize = helper.SLOTSIZE;
+        final int asize = helper.ADDRSIZE;
+        
 		/* TIB -> tmp */
-		os.writeMOV(helper.ADDRSIZE, tmpr, objectr, tibOffset);
+		os.writeMOV(asize, tmpr, objectr, tibOffset);
 		/* SuperClassesArray -> tmp */
-		os.writeMOV(helper.ADDRSIZE, tmpr, tmpr, arrayDataOffset
+		os.writeMOV(asize, tmpr, tmpr, arrayDataOffset
 				+ (TIBLayout.SUPERCLASSES_INDEX * slotSize));
 		/* SuperClassesArray.length -> cntr */
-		os.writeMOV(helper.ADDRSIZE, cntr, tmpr, arrayLengthOffset);
+		os.writeMOV(asize, cntr, tmpr, arrayLengthOffset);
 		/* &superClassesArray[cnt-1] -> tmpr */
 		os.writeLEA(tmpr, tmpr, cntr, slotSize, arrayDataOffset - slotSize);
 
@@ -2421,7 +2426,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		dropParameters(method, true);
 		// Get objectref -> EAX
 		os.writeMOV(helper.ADDRSIZE, helper.AAX, helper.SP, argSlotCount
-				* slotSize);
+				* helper.SLOTSIZE);
 		// Write the actual invokeinterface
 		if (os.isCode32()) {
 			X86IMTCompiler32.emitInvokeInterface(os, method);
@@ -2514,13 +2519,16 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			final int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef
 					.getSignature());
 
+            final int slotSize = helper.SLOTSIZE;
+            final int asize = helper.ADDRSIZE;
+            
 			/* Get objectref -> EAX */
-			os.writeMOV(helper.ADDRSIZE, helper.AAX, helper.SP, argSlotCount
+			os.writeMOV(asize, helper.AAX, helper.SP, argSlotCount
 					* slotSize);
 			/* Get VMT of objectef -> EAX */
-			os.writeMOV(helper.ADDRSIZE, helper.AAX, helper.AAX, tibOffset);
+			os.writeMOV(asize, helper.AAX, helper.AAX, tibOffset);
 			/* Get entry in VMT -> EAX */
-			os.writeMOV(helper.ADDRSIZE, helper.AAX, helper.AAX,
+			os.writeMOV(asize, helper.AAX, helper.AAX,
 					arrayDataOffset + (tibIndex * slotSize));
 			/* Now invoke the method */
 			invokeJavaMethod(methodRef.getSignature());
