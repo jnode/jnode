@@ -13,333 +13,438 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
  */
 public abstract class WordItem extends Item implements X86CompilerConstants {
 
-    private Register reg;
+	/**
+	 * Create a WordItem in a local variable.
+	 * 
+	 * @param jvmType
+	 *            INT, REFERENCE, FLOAT
+	 * @param offset
+	 * @return
+	 */
+	static final WordItem createLocal(int jvmType, int offset) {
+		switch (jvmType) {
+		case JvmType.INT:
+			return IntItem.createLocal(offset);
+		case JvmType.REFERENCE:
+			return RefItem.createLocal(offset);
+		case JvmType.FLOAT:
+			return FloatItem.createLocal(offset);
+		default:
+			throw new IllegalArgumentException("Invalid type " + jvmType);
+		}
+	}
 
-    protected WordItem(int kind, Register reg, int local) {
-        super(kind, local);
-        this.reg = reg;
-        
-        assertCondition((kind != Kind.REGISTER) || (reg != null), "kind == register implies that reg != null");
-    }
+	/**
+	 * Create a WordItem in on the stack.
+	 * 
+	 * @param jvmType
+	 *            INT, REFERENCE, FLOAT
+	 * @return
+	 */
+	static final WordItem createStack(int jvmType) {
+		switch (jvmType) {
+		case JvmType.INT:
+			return IntItem.createStack();
+		case JvmType.REFERENCE:
+			return RefItem.createStack();
+		case JvmType.FLOAT:
+			return FloatItem.createStack();
+		default:
+			throw new IllegalArgumentException("Invalid type " + jvmType);
+		}
+	}
 
-    /**
-     * Gets the register the is used by this item.
-     * 
-     * @return
-     */
-    final Register getRegister() {
-        assertCondition(kind == Kind.REGISTER, "Must be register");
-        return reg;
-    }
+	/**
+	 * Create a WordItem in a register.
+	 * 
+	 * @param jvmType
+	 *            INT, REFERENCE, FLOAT
+	 * @param reg
+	 * @return
+	 */
+	static final WordItem createReg(int jvmType, Register reg) {
+		switch (jvmType) {
+		case JvmType.INT:
+			return IntItem.createReg(reg);
+		case JvmType.REFERENCE:
+			return RefItem.createRegister(reg);
+		case JvmType.FLOAT:
+			return FloatItem.createReg(reg);
+		default:
+			throw new IllegalArgumentException("Invalid type " + jvmType);
+		}
+	}
 
-    /**
-     * load item with register reg. Assumes that reg is properly allocated
-     * 
-     * @param ec
-     *            current emitter context
-     * @param reg
-     *            register to load the item to
-     */
-    final void loadTo(EmitterContext ec, Register reg) {
-        assertCondition(reg != null, "Reg != null");
-        final AbstractX86Stream os = ec.getStream();
-        final X86RegisterPool pool = ec.getPool();
-        final VirtualStack stack = ec.getVStack();
-        assertCondition(!pool.isFree(reg), "reg not free");
+	private Register reg;
 
-        switch (kind) {
-        case Kind.REGISTER:
-            if (this.reg != reg) {
-                os.writeMOV(INTSIZE, reg, this.reg);
-                release(ec);
-            }
-            break;
+	protected WordItem(int kind, Register reg, int local) {
+		super(kind, local);
+		this.reg = reg;
+		assertCondition((kind != Kind.REGISTER) || (reg != null),
+				"kind == register implies that reg != null");
+	}
 
-        case Kind.LOCAL:
-            os.writeMOV(INTSIZE, reg, FP, getOffsetToFP());
-            break;
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#clone()
+	 */
+	protected Item clone(EmitterContext ec) {
+		final Item res;
+		switch (getKind()) {
+		case Kind.REGISTER:
+			final X86RegisterPool pool = ec.getPool();
+			final Register r = pool.request(JvmType.INT);
+			res = createReg(getType(), r);
+			pool.transferOwnerTo(r, res);
+			break;
 
-        case Kind.CONSTANT:
-            loadToConstant(ec, os, reg);
-            break;
+		case Kind.LOCAL:
+			res = createLocal(getType(), getOffsetToFP());
+			break;
 
-        case Kind.FPUSTACK:
-            // Make sure this item is on top of the FPU stack
-            stack.fpuStack.pop(this);
-            // Convert & move to new space on normal stack
-            os.writeLEA(SP, SP, 4);
-            popFromFPU(os, SP, 0);
-            os.writePOP(reg);
-            break;
+		case Kind.CONSTANT:
+			res = cloneConstant();
+			break;
 
-        case Kind.STACK:
-            //TODO: make sure this is on top os stack
-            if (VirtualStack.checkOperandStack) {
-                stack.operandStack.pop(this);
-            }
-            os.writePOP(reg);
-            break;
-            
-        default:
-        	throw new IllegalArgumentException("Invalid item kind");
-        }
-        kind = Kind.REGISTER;
-        this.reg = reg;
-    }
+		case Kind.FPUSTACK:
+			//TODO
+			notImplemented();
+			res = null;
+			break;
 
-    /**
-     * Load my constant to the given os.
-     * 
-     * @param os
-     * @param reg
-     */
-    protected abstract void loadToConstant(EmitterContext ec,
-            AbstractX86Stream os, Register reg);
+		case Kind.STACK:
+			AbstractX86Stream os = ec.getStream();
+			os.writePUSH(Register.SP, 0);
+			res = createStack(getType());
+			if (VirtualStack.checkOperandStack) {
+				final VirtualStack stack = ec.getVStack();
+				stack.operandStack.push(res);
+			}
+			break;
 
-    /**
-     * @see org.jnode.vm.x86.compiler.l1a.Item#load(EmitterContext)
-     */
-    final void load(EmitterContext ec) {
-        if (kind != Kind.REGISTER) {
-            final X86RegisterPool pool = ec.getPool();
-            Register r = pool.request(getType(), this);
-            if (r == null) {
-                final VirtualStack vstack = ec.getVStack();
-                vstack.push(ec);
-                r = pool.request(getType(), this);
-            }
-            assertCondition(r != null, "r != null");
-            loadTo(ec, r);
-        }
-    }
+		default:
+			throw new IllegalArgumentException("Invalid item kind");
+		}
+		return res;
+	}
 
-    /**
-     * Load this item to a general purpose register.
-     * 
-     * @param ec
-     */
-    final void loadToGPR(EmitterContext ec) {
-        if (kind != Kind.REGISTER) {
-            Register r = ec.getPool().request(JvmType.INT);
-            if (r == null) {
-                ec.getVStack().push(ec);
-                r = ec.getPool().request(JvmType.INT);
-            }
-            assertCondition(r != null, "r != null");
-            loadTo(ec, r);
-        }
-    }
+	/**
+	 * Create a clone of this item, which must be a constant.
+	 * 
+	 * @return
+	 */
+	protected abstract Item cloneConstant();
 
-    /**
-     * Load item into the given register (only for Category 1 items), if its
-     * kind matches the mask.
-     * 
-     * @param t0
-     *            the destination register
-     */
-    final void loadToIf(EmitterContext ec, int mask, Register t0) {
-        if ((getKind() & mask) > 0) loadTo(ec, t0);
-    }
+	/**
+	 * Gets the register the is used by this item.
+	 * 
+	 * @return
+	 */
+	final Register getRegister() {
+		assertCondition(kind == Kind.REGISTER, "Must be register");
+		return reg;
+	}
 
-    /**
-     * @see org.jnode.vm.x86.compiler.l1a.Item#push(EmitterContext)
-     */
-    final void push(EmitterContext ec) {
-        final AbstractX86Stream os = ec.getStream();
-        final VirtualStack stack = ec.getVStack();
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#load(EmitterContext)
+	 */
+	final void load(EmitterContext ec) {
+		if (kind != Kind.REGISTER) {
+			final X86RegisterPool pool = ec.getPool();
+			Register r = pool.request(getType(), this);
+			if (r == null) {
+				final VirtualStack vstack = ec.getVStack();
+				vstack.push(ec);
+				r = pool.request(getType(), this);
+			}
+			assertCondition(r != null, "r != null");
+			loadTo(ec, r);
+		}
+	}
 
-        switch (getKind()) {
-        case Kind.REGISTER:
-            os.writePUSH(reg);
-            break;
+	/**
+	 * load item with register reg. Assumes that reg is properly allocated
+	 * 
+	 * @param ec
+	 *            current emitter context
+	 * @param reg
+	 *            register to load the item to
+	 */
+	final void loadTo(EmitterContext ec, Register reg) {
+		assertCondition(reg != null, "Reg != null");
+		final AbstractX86Stream os = ec.getStream();
+		final X86RegisterPool pool = ec.getPool();
+		final VirtualStack stack = ec.getVStack();
+		assertCondition(!pool.isFree(reg), "reg not free");
 
-        case Kind.LOCAL:
-            os.writePUSH(FP, offsetToFP);
-            break;
+		switch (kind) {
+		case Kind.REGISTER:
+			if (this.reg != reg) {
+				os.writeMOV(INTSIZE, reg, this.reg);
+				release(ec);
+			}
+			break;
 
-        case Kind.CONSTANT:
-            pushConstant(ec, os);
-            break;
+		case Kind.LOCAL:
+			os.writeMOV(INTSIZE, reg, FP, getOffsetToFP());
+			break;
 
-        case Kind.FPUSTACK:
-            // Make sure this item is on top of the FPU stack
-            stack.fpuStack.pop(this);
-            // Convert & move to new space on normal stack
-            os.writeLEA(SP, SP, 4);
-            popFromFPU(os, SP, 0);
-            break;
+		case Kind.CONSTANT:
+			loadToConstant(ec, os, reg);
+			break;
 
-        case Kind.STACK:
-            //nothing to do
-            if (VirtualStack.checkOperandStack) {
-                // the item is not really pushed and popped
-                // but this checks that it is really the top
-                // element
-                stack.operandStack.pop(this);
-            }
-            break;
-            
-        default:
-        	throw new IllegalArgumentException("Invalid item kind");
-        }
-        release(ec);
-        kind = Kind.STACK;
+		case Kind.FPUSTACK:
+			// Make sure this item is on top of the FPU stack
+			stack.fpuStack.pop(this);
+			// Convert & move to new space on normal stack
+			os.writeLEA(SP, SP, 4);
+			popFromFPU(os, SP, 0);
+			os.writePOP(reg);
+			break;
 
-        if (VirtualStack.checkOperandStack) {
-            stack.operandStack.push(this);
-        }
-    }
+		case Kind.STACK:
+			//TODO: make sure this is on top os stack
+			if (VirtualStack.checkOperandStack) {
+				stack.operandStack.pop(this);
+			}
+			os.writePOP(reg);
+			break;
 
-    /**
-     * @see org.jnode.vm.x86.compiler.l1a.Item#pushToFPU(EmitterContext)
-     */
-    final void pushToFPU(EmitterContext ec) {
-        final AbstractX86Stream os = ec.getStream();
-        final VirtualStack stack = ec.getVStack();
+		default:
+			throw new IllegalArgumentException("Invalid item kind");
+		}
+		kind = Kind.REGISTER;
+		this.reg = reg;
+	}
 
-        switch (getKind()) {
-        case Kind.REGISTER:
-            os.writePUSH(reg);
-        	pushToFPU(os, SP, 0);
-            os.writeLEA(SP, SP, 4);
-            break;
+	/**
+	 * Load my constant to the given os.
+	 * 
+	 * @param os
+	 * @param reg
+	 */
+	protected abstract void loadToConstant(EmitterContext ec,
+			AbstractX86Stream os, Register reg);
 
-        case Kind.LOCAL:
-            pushToFPU(os, FP, offsetToFP);
-            break;
+	/**
+	 * Load this item to a general purpose register.
+	 * 
+	 * @param ec
+	 */
+	final void loadToGPR(EmitterContext ec) {
+		if (kind != Kind.REGISTER) {
+			Register r = ec.getPool().request(JvmType.INT);
+			if (r == null) {
+				ec.getVStack().push(ec);
+				r = ec.getPool().request(JvmType.INT);
+			}
+			assertCondition(r != null, "r != null");
+			loadTo(ec, r);
+		}
+	}
 
-        case Kind.CONSTANT:
-            pushConstant(ec, os);
-            pushToFPU(os, SP, 0);
-            os.writeLEA(SP, SP, 4);
-            break;
+	/**
+	 * Load item into the given register (only for Category 1 items), if its
+	 * kind matches the mask.
+	 * 
+	 * @param t0
+	 *            the destination register
+	 */
+	final void loadToIf(EmitterContext ec, int mask, Register t0) {
+		if ((getKind() & mask) > 0)
+			loadTo(ec, t0);
+	}
 
-        case Kind.FPUSTACK:
-            // Assert this item is at the top of the stack
-            stack.fpuStack.pop(this);
-        	stack.fpuStack.push(this);
-            break;
+	/**
+	 * Pop the top of the FPU stack into the given memory location.
+	 * 
+	 * @param os
+	 * @param reg
+	 * @param disp
+	 */
+	protected abstract void popFromFPU(AbstractX86Stream os, Register reg,
+			int disp);
 
-        case Kind.STACK:
-            if (VirtualStack.checkOperandStack) {
-                stack.operandStack.pop(this);
-            }
-            pushToFPU(os, SP, 0);
-            os.writeLEA(SP, SP, 4);
-            break;
-            
-        default:
-        	throw new IllegalArgumentException("Invalid item kind");
-        }
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#push(EmitterContext)
+	 */
+	final void push(EmitterContext ec) {
+		final AbstractX86Stream os = ec.getStream();
+		final VirtualStack stack = ec.getVStack();
 
-        release(ec);
-        kind = Kind.FPUSTACK;
-        stack.fpuStack.push(this);
-    }
+		switch (getKind()) {
+		case Kind.REGISTER:
+			os.writePUSH(reg);
+			break;
 
-    /**
-     * Push my constant on the stack using the given os.
-     * 
-     * @param os
-     */
-    protected abstract void pushConstant(EmitterContext ec, AbstractX86Stream os);
+		case Kind.LOCAL:
+			os.writePUSH(FP, offsetToFP);
+			break;
 
-    /**
-     * Push the value at the given memory location on the FPU stack.
-     * 
-     * @param os
-     * @param reg
-     * @param disp
-     */
-    protected abstract void pushToFPU(AbstractX86Stream os, Register reg, int disp);
+		case Kind.CONSTANT:
+			pushConstant(ec, os);
+			break;
 
-    /**
-     * Pop the top of the FPU stack into the given memory location.
-     * 
-     * @param os
-     * @param reg
-     * @param disp
-     */
-    protected abstract void popFromFPU(AbstractX86Stream os, Register reg, int disp);
+		case Kind.FPUSTACK:
+			// Make sure this item is on top of the FPU stack
+			final FPUStack fpuStack = stack.fpuStack;
+			if (!fpuStack.isTos(this)) {
+				FPUHelper.fxch(os, fpuStack, fpuStack.getRegister(this));
+			}
+			stack.fpuStack.pop(this);
+			// Convert & move to new space on normal stack
+			os.writeLEA(SP, SP, 4);
+			popFromFPU(os, SP, 0);
+			break;
 
-    /**
-     * @see org.jnode.vm.x86.compiler.l1a.Item#release(EmitterContext)
-     */
-    final void release(EmitterContext ec) {
-        final X86RegisterPool pool = ec.getPool();
+		case Kind.STACK:
+			//nothing to do
+			if (VirtualStack.checkOperandStack) {
+				// the item is not really pushed and popped
+				// but this checks that it is really the top
+				// element
+				stack.operandStack.pop(this);
+			}
+			break;
 
-        switch (getKind()) {
-        case Kind.REGISTER:
-            pool.release(reg);
-            assertCondition(pool.isFree(reg), "reg is free");
-            break;
+		default:
+			throw new IllegalArgumentException("Invalid item kind");
+		}
+		release(ec);
+		kind = Kind.STACK;
 
-        case Kind.LOCAL:
-            // nothing to do
-            break;
+		if (VirtualStack.checkOperandStack) {
+			stack.operandStack.push(this);
+		}
+	}
 
-        case Kind.CONSTANT:
-            // nothing to do
-            break;
+	/**
+	 * Push my constant on the stack using the given os.
+	 * 
+	 * @param os
+	 */
+	protected abstract void pushConstant(EmitterContext ec, AbstractX86Stream os);
 
-        case Kind.FPUSTACK:
-            // nothing to do
-            break;
+	/**
+	 * Push the value at the given memory location on the FPU stack.
+	 * 
+	 * @param os
+	 * @param reg
+	 * @param disp
+	 */
+	protected abstract void pushToFPU(AbstractX86Stream os, Register reg,
+			int disp);
 
-        case Kind.STACK:
-            //nothing to do
-            break;
-        
-        default:
-        	throw new IllegalArgumentException("Invalid item kind");
-        }
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#pushToFPU(EmitterContext)
+	 */
+	final void pushToFPU(EmitterContext ec) {
+		final AbstractX86Stream os = ec.getStream();
+		final VirtualStack stack = ec.getVStack();
 
-        this.reg = null;
-        this.kind = 0;
-    }
+		switch (getKind()) {
+		case Kind.REGISTER:
+			os.writePUSH(reg);
+			pushToFPU(os, SP, 0);
+			os.writeLEA(SP, SP, 4);
+			break;
 
-    /**
-     * @see org.jnode.vm.x86.compiler.l1a.Item#spill(EmitterContext, Register)
-     */
-    final void spill(EmitterContext ec, Register reg) {
-        assertCondition((getKind() == Kind.REGISTER) && (this.reg == reg), "spill1");
-        final X86RegisterPool pool = ec.getPool();
-        Register r = pool.request(getType());
-        if (r == null) {
-            int cnt = ec.getVStack().push(ec);
-            if (getKind() == Kind.STACK) { return; }
-            r = pool.request(getType());
-            System.out
-                    .println("Pool state after push of " + cnt + ":\n" + pool);
-            assertCondition(r != null, "r != null");
-        }
-        loadTo(ec, r);
-        pool.transferOwnerTo(r, this);
-    }
+		case Kind.LOCAL:
+			pushToFPU(os, FP, offsetToFP);
+			break;
 
-    /**
-     * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
-     */
-    final boolean uses(Register reg) {
-        return ((kind == Kind.REGISTER) && this.reg.equals(reg));
-    }
+		case Kind.CONSTANT:
+			pushConstant(ec, os);
+			pushToFPU(os, SP, 0);
+			os.writeLEA(SP, SP, 4);
+			break;
 
-    /**
-     * Create a WordItem in a register.
-     * @param jvmType INT, REFERENCE, FLOAT
-     * @param reg
-     * @return
-     */
-    static final WordItem createReg(int jvmType, Register reg) {
-        switch (jvmType) {
-        case JvmType.INT:
-            return IntItem.createReg(reg);
-        case JvmType.REFERENCE:
-            return RefItem.createRegister(reg);
-        case JvmType.FLOAT:
-            return FloatItem.createReg(reg);
-        default:
-            throw new IllegalArgumentException("Invalid type " + jvmType);
-        }
-    }
+		case Kind.FPUSTACK:
+			// Assert this item is at the top of the stack
+			stack.fpuStack.pop(this);
+			stack.fpuStack.push(this);
+			return;
+			//break;
+
+		case Kind.STACK:
+			if (VirtualStack.checkOperandStack) {
+				stack.operandStack.pop(this);
+			}
+			pushToFPU(os, SP, 0);
+			os.writeLEA(SP, SP, 4);
+			break;
+
+		default:
+			throw new IllegalArgumentException("Invalid item kind");
+		}
+
+		release(ec);
+		kind = Kind.FPUSTACK;
+		stack.fpuStack.push(this);
+	}
+
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#release(EmitterContext)
+	 */
+	final void release(EmitterContext ec) {
+		//assertCondition(!ec.getVStack().contains(this), "Cannot release while on vstack");
+		final X86RegisterPool pool = ec.getPool();
+
+		switch (getKind()) {
+		case Kind.REGISTER:
+			pool.release(reg);
+			assertCondition(pool.isFree(reg), "reg is free");
+			break;
+
+		case Kind.LOCAL:
+			// nothing to do
+			break;
+
+		case Kind.CONSTANT:
+			// nothing to do
+			break;
+
+		case Kind.FPUSTACK:
+			// nothing to do
+			break;
+
+		case Kind.STACK:
+			//nothing to do
+			break;
+
+		default:
+			throw new IllegalArgumentException("Invalid item kind");
+		}
+
+		this.reg = null;
+		this.kind = 0;
+	}
+
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#spill(EmitterContext, Register)
+	 */
+	final void spill(EmitterContext ec, Register reg) {
+		assertCondition((getKind() == Kind.REGISTER) && (this.reg == reg),
+				"spill1");
+		final X86RegisterPool pool = ec.getPool();
+		Register r = pool.request(getType());
+		if (r == null) {
+			int cnt = ec.getVStack().push(ec);
+			if (getKind() == Kind.STACK) {
+				return;
+			}
+			r = pool.request(getType());
+			System.out
+					.println("Pool state after push of " + cnt + ":\n" + pool);
+			assertCondition(r != null, "r != null");
+		}
+		loadTo(ec, r);
+		pool.transferOwnerTo(r, this);
+	}
+
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
+	 */
+	final boolean uses(Register reg) {
+		return ((kind == Kind.REGISTER) && this.reg.equals(reg));
+	}
 }

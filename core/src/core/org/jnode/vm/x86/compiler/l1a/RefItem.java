@@ -13,153 +13,120 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
 
 /**
  * @author Patrik Reali
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class RefItem extends WordItem implements X86CompilerConstants {
 
-    private VmConstString value;
+	static RefItem createConst(VmConstString value) {
+		return new RefItem(Kind.CONSTANT, null, value, 0);
+	}
 
-    // generate unique labels for writeStatics (should use current label)
-    private long labelCounter;
+	static RefItem createLocal(int offsetToFP) {
+		return new RefItem(Kind.LOCAL, null, null, offsetToFP);
+	}
 
-    /**
-     * @param kind
-     * @param reg
-     * @param val
-     * @param offsetToFP
-     */
-    private RefItem(int kind, Register reg, VmConstString val, int offsetToFP) {
-        super(kind, reg, offsetToFP);
-        this.value = val;
-    }
+	static RefItem createRegister(Register reg) {
+		return new RefItem(Kind.REGISTER, reg, null, 0);
+	}
 
-    /**
-     * Get the JVM type of this item
-     * 
-     * @return the JVM type
-     */
-    int getType() {
-        return JvmType.REFERENCE;
-    }
+	static RefItem createStack() {
+		return new RefItem(Kind.STACK, null, null, 0);
+	}
 
-    /**
-     * Gets the value of this reference. Item must have a CONSTANT kind.
-     * 
-     * @return
-     */
-    VmConstString getValue() {
-        assertCondition(getKind() == Kind.CONSTANT, "kind == Kind.CONSTANT");
-        return value;
-    }
+	// generate unique labels for writeStatics (should use current label)
+	private long labelCounter;
 
-    /**
-     * Load my constant to the given os.
-     * 
-     * @param os
-     * @param reg
-     */
-    protected void loadToConstant(EmitterContext ec, AbstractX86Stream os, Register reg) {
-        if (value == null) {
-            os.writeMOV_Const(reg, value);
-        } else {
-            X86CompilerHelper helper = ec.getHelper();
-            Label l = new Label(Long.toString(labelCounter++));
-            helper.writeGetStaticsEntry(l, reg, value);
-        }
-    }
+	private VmConstString value;
 
-    /**
-     * Push my constant on the stack using the given os.
-     * 
-     * @param os
-     */
-    protected void pushConstant(EmitterContext ec, AbstractX86Stream os) {
-        if (value == null) {
-            os.writePUSH_Const(null);
-        } else {
-            X86CompilerHelper helper = ec.getHelper();
-            Label l = new Label(Long.toString(labelCounter++));
-            helper.writePushStaticsEntry(l, value);
-        }
-    }
+	/**
+	 * @param kind
+	 * @param reg
+	 * @param val
+	 * @param offsetToFP
+	 */
+	private RefItem(int kind, Register reg, VmConstString val, int offsetToFP) {
+		super(kind, reg, offsetToFP);
+		this.value = val;
+	}
 
-    /**
-     * Push the given memory location on the FPU stack.
-     * 
-     * @param os
-     * @param reg
-     * @param disp
-     */
-    protected void pushToFPU(AbstractX86Stream os, Register reg, int disp) {
-        notImplemented();
-    }
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.WordItem#cloneConstant()
+	 */
+	protected Item cloneConstant() {
+		return createConst(getValue());
+	}
 
-    /**
-     * Pop the top of the FPU stack into the given memory location.
-     * 
-     * @param os
-     * @param reg
-     * @param disp
-     */
-    protected void popFromFPU(AbstractX86Stream os, Register reg, int disp) {
-        notImplemented();
-    }
+	/**
+	 * Get the JVM type of this item
+	 * 
+	 * @return the JVM type
+	 */
+	int getType() {
+		return JvmType.REFERENCE;
+	}
 
-    /**
-     * @see org.jnode.vm.x86.compiler.l1a.Item#clone()
-     */
-    Item clone(EmitterContext ec) {
-        Item res = null;
-        switch (getKind()) {
-        case Kind.REGISTER:
-            final X86RegisterPool pool = ec.getPool();
-            final Register r = pool.request(JvmType.INT);
-            res = createRegister(r);
-            pool.transferOwnerTo(r, res);
-            break;
+	/**
+	 * Gets the value of this reference. Item must have a CONSTANT kind.
+	 * 
+	 * @return
+	 */
+	VmConstString getValue() {
+		assertCondition(getKind() == Kind.CONSTANT, "kind == Kind.CONSTANT");
+		return value;
+	}
 
-        case Kind.LOCAL:
-            res = createLocal(getOffsetToFP());
-            break;
+	/**
+	 * Load my constant to the given os.
+	 * 
+	 * @param os
+	 * @param reg
+	 */
+	protected void loadToConstant(EmitterContext ec, AbstractX86Stream os,
+			Register reg) {
+		if (value == null) {
+			os.writeMOV_Const(reg, value);
+		} else {
+			X86CompilerHelper helper = ec.getHelper();
+			Label l = new Label(Long.toString(labelCounter++));
+			helper.writeGetStaticsEntry(l, reg, value);
+		}
+	}
 
-        case Kind.CONSTANT:
-            res = createConst(value);
-            break;
+	/**
+	 * Pop the top of the FPU stack into the given memory location.
+	 * 
+	 * @param os
+	 * @param reg
+	 * @param disp
+	 */
+	protected void popFromFPU(AbstractX86Stream os, Register reg, int disp) {
+		notImplemented();
+	}
 
-        case Kind.FPUSTACK:
-            //TODO
-            notImplemented();
-            break;
+	/**
+	 * Push my constant on the stack using the given os.
+	 * 
+	 * @param os
+	 */
+	protected void pushConstant(EmitterContext ec, AbstractX86Stream os) {
+		if (value == null) {
+			os.writePUSH_Const(null);
+		} else {
+			X86CompilerHelper helper = ec.getHelper();
+			Label l = new Label(Long.toString(labelCounter++));
+			helper.writePushStaticsEntry(l, value);
+		}
+	}
 
-        case Kind.STACK:
-            AbstractX86Stream os = ec.getStream();
-            os.writePUSH(Register.SP, 0);
-            res = createStack();
-            if (VirtualStack.checkOperandStack) {
-                final VirtualStack stack = ec.getVStack();
-                stack.operandStack.push(res);
-            }
-            break;
-            
-        default:
-        	throw new IllegalArgumentException("Invalid item kind");
-        }
-        return res;
-    }
-
-    static RefItem createRegister(Register reg) {
-        return new RefItem(Kind.REGISTER, reg, null, 0);
-    }
-
-    static RefItem createConst(VmConstString value) {
-        return new RefItem(Kind.CONSTANT, null, value, 0);
-    }
-
-    static RefItem createLocal(int offsetToFP) {
-        return new RefItem(Kind.LOCAL, null, null, offsetToFP);
-    }
-
-    static RefItem createStack() {
-        return new RefItem(Kind.STACK, null, null, 0);
-    }
+	/**
+	 * Push the given memory location on the FPU stack.
+	 * 
+	 * @param os
+	 * @param reg
+	 * @param disp
+	 */
+	protected void pushToFPU(AbstractX86Stream os, Register reg, int disp) {
+		notImplemented();
+	}
 
 }

@@ -198,6 +198,40 @@ public class X86CpuID extends CpuID {
 	public final boolean hasFeature(int feature) {
 		return ((this.features & feature) == feature);
 	}
+	
+	public final boolean hasFPU() { return hasFeature(FEAT_FPU); }
+	public final boolean hasVME() { return hasFeature(FEAT_VME); }
+	public final boolean hasDE() { return hasFeature(FEAT_DE); }
+	public final boolean hasPSE() { return hasFeature(FEAT_PSE); }
+	public final boolean hasTSC() { return hasFeature(FEAT_TSC); }
+	public final boolean hasMSR() { return hasFeature(FEAT_MSR); }
+	public final boolean hasPAE() { return hasFeature(FEAT_PAE); }
+	public final boolean hasMCE() { return hasFeature(FEAT_MCE); }
+	public final boolean hasCX8() { return hasFeature(FEAT_CX8); }
+	public final boolean hasAPIC() { return hasFeature(FEAT_APIC); }
+	public final boolean hasSEP() { return hasFeature(FEAT_SEP); }
+	public final boolean hasMTRR() { return hasFeature(FEAT_MTRR); }
+	public final boolean hasPGE() { return hasFeature(FEAT_PGE); }
+	public final boolean hasMCA() { return hasFeature(FEAT_MCA); }
+	public final boolean hasCMOV() { return hasFeature(FEAT_CMOV); }
+	public final boolean hasPAT() { return hasFeature(FEAT_PAT); }
+	public final boolean hasPSE36() { return hasFeature(FEAT_PSE36); }
+	public final boolean hasPSN() { return hasFeature(FEAT_PSN); }
+	public final boolean hasCLFSH() { return hasFeature(FEAT_CLFSH); }
+	public final boolean hasDS() { return hasFeature(FEAT_DS); }
+	public final boolean hasACPI() { return hasFeature(FEAT_ACPI); }
+	public final boolean hasMMX() { return hasFeature(FEAT_MMX); }
+	public final boolean hasFXSR() { return hasFeature(FEAT_FXSR); }
+	public final boolean hasSSE() { return hasFeature(FEAT_SSE); }
+	public final boolean hasSSE2() { return hasFeature(FEAT_SSE2); }
+	public final boolean hasSS() { return hasFeature(FEAT_SS); }
+	public final boolean hasHTT() { return hasFeature(FEAT_HTT); }
+	public final boolean hasTM() { return hasFeature(FEAT_TM); }
+	public final boolean hasPBE() { return hasFeature(FEAT_PBE); }
+	// Extended features
+	public final boolean hasEST() { return hasFeature(FEAT_EST); }
+	public final boolean hasTM2() { return hasFeature(FEAT_TM2); } 
+	public final boolean hasCNXTID() { return hasFeature(FEAT_CNXTID); } 
 
 	/**
 	 * Convert all features to a human readable string.

@@ -101,40 +101,6 @@ final class LongItem extends DoubleWordItem  implements X86CompilerConstants {
     }
 
 	/**
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#clone()
-	 */
-	final Item clone(EmitterContext ec) {
-		Item res = null;
-		switch (getKind()) {
-			case Kind.REGISTER:
-				//TODO
-				notImplemented();
-				break;
-				
-			case Kind.LOCAL:
-				//TODO
-				notImplemented();
-				break;
-				
-			case Kind.CONSTANT:
-				//TODO
-				notImplemented();
-				break;
-				
-			case Kind.FPUSTACK:
-				//TODO
-				notImplemented();
-				break;
-			
-			case Kind.STACK:
-				//TODO
-				notImplemented();
-				break;
-		}
-		return res;
-	}
-
-    /**
      * Gets the LSB part of the constant value of this item.
      * @return
      */
@@ -167,4 +133,10 @@ final class LongItem extends DoubleWordItem  implements X86CompilerConstants {
         assertCondition(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
         return value;
     }
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.DoubleWordItem#cloneConstant()
+	 */
+	protected Item cloneConstant() {
+		return createConst(getValue());
+	}
 }
