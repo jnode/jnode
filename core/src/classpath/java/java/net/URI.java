@@ -1,4 +1,4 @@
-/* URI.java - An URI class
+/* URI.java - An URI class --
    Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -618,7 +618,7 @@ public final class URI implements Comparable, Serializable
 	 */
   public boolean isAbsolute()
   {
-    return (scheme != null);
+    return scheme != null;
 	}
 
 	/**

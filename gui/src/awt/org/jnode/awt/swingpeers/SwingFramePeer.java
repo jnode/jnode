@@ -573,7 +573,7 @@ final class SwingFramePeer implements FramePeer, SwingContainerPeer {
 		/**
 		 * @see javax.swing.JRootPane#createContentPane()
 		 */
-		protected JComponent createContentPane() {
+		protected Container createContentPane() {
 			return new SwingFrameContentPane();
 		}
 	}

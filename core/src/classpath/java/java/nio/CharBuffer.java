@@ -74,7 +74,7 @@ public abstract class CharBuffer extends Buffer
    * @exception IndexOutOfBoundsException If the preconditions on the offset
    * and length parameters do not hold
    */
-  final public static CharBuffer wrap(char[] array, int offset, int length)
+  public static final CharBuffer wrap(char[] array, int offset, int length)
   {
     return new CharBufferImpl(array, 0, array.length, offset + length, offset, -1, false);
   }
@@ -86,7 +86,7 @@ public abstract class CharBuffer extends Buffer
    *
    * @return a new <code>CharBuffer</code> object
    */
-  final public static CharBuffer wrap(CharSequence seq)
+  public static final CharBuffer wrap(CharSequence seq)
   {
     return wrap(seq, 0, seq.length());
   }
@@ -103,7 +103,7 @@ public abstract class CharBuffer extends Buffer
    * @exception IndexOutOfBoundsException If the preconditions on the offset
    * and length parameters do not hold
    */
-  final public static CharBuffer wrap(CharSequence seq, int start, int end)
+  public static final CharBuffer wrap(CharSequence seq, int start, int end)
   {
     // FIXME: implement better handling of java.lang.String.
     // Probably share data with String via reflection.
@@ -131,7 +131,7 @@ public abstract class CharBuffer extends Buffer
    *
    * @return a new <code>CharBuffer</code> object
    */
-  final public static CharBuffer wrap(char[] array)
+  public static final CharBuffer wrap(char[] array)
   {
     return wrap(array, 0, array.length);
   }
@@ -202,7 +202,7 @@ public abstract class CharBuffer extends Buffer
       {
         char[] toPut = new char [src.remaining ()];
         src.get (toPut);
-        src.put (toPut);
+	put (toPut);
       }
 
     return this;
@@ -297,11 +297,25 @@ public abstract class CharBuffer extends Buffer
   
   /**
    * Calculates a hash code for this buffer.
+   *
+   * This is done with int arithmetic,
+   * where ** represents exponentiation, by this formula:<br>
+   * <code>s[position()] + 31 + (s[position()+1] + 30)*31**1 + ... +
+   * (s[limit()-1]+30)*31**(limit()-1)</code>.
+   * Where s is the buffer data. Note that the hashcode is dependent
+   * on buffer content, and therefore is not useful if the buffer
+   * content may change.
    */
   public int hashCode ()
   {
-    // FIXME: Check what SUN calculates here.
-    return super.hashCode ();
+    int hashCode = get(position()) + 31;
+    int multiplier = 1;
+    for (int i = position() + 1; i < limit(); ++i)
+      {
+	  multiplier *= 31;
+	  hashCode += (get(i) + 30)*multiplier;
+      }
+    return hashCode;
   }
   
   /**

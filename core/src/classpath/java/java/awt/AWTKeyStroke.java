@@ -1,5 +1,5 @@
 /* AWTKeyStroke.java -- an immutable key stroke
-   Copyright (C) 2002 Free Software Foundation
+   Copyright (C) 2002, 2004  Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -48,9 +48,9 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
@@ -452,16 +452,9 @@ public class AWTKeyStroke implements Serializable
       }
     while (t.hasMoreTokens());
     // Now token contains the VK name we must parse.
-    Integer code = null;
-    try {
-    	code = (Integer) vktable.get(token);
-    } catch (NullPointerException ex) {
-    	System.out.println("token   = " + token);
-    	System.out.println("vktable = " + ((vktable != null) ? "not null" : " null"));
-    }
-    if (code == null || t.hasMoreTokens()) {
-    	throw new IllegalArgumentException("code=" + code + ", vktable.size=" + vktable.size());
-    }
+    Integer code = (Integer) vktable.get(token);
+    if (code == null || t.hasMoreTokens())
+      throw new IllegalArgumentException();
     return getAWTKeyStroke(KeyEvent.CHAR_UNDEFINED, code.intValue(),
                            modifiers, released);
   }

@@ -68,7 +68,7 @@ public abstract class DoubleBuffer extends Buffer
    * @exception IndexOutOfBoundsException If the preconditions on the offset
    * and length parameters do not hold
    */
-  final public static DoubleBuffer wrap (double[] array, int offset, int length)
+  public static final DoubleBuffer wrap (double[] array, int offset, int length)
   {
     return new DoubleBufferImpl (array, 0, array.length, offset + length, offset, -1, false);
   }
@@ -77,7 +77,7 @@ public abstract class DoubleBuffer extends Buffer
    * Wraps a <code>double</code> array into a <code>DoubleBuffer</code>
    * object.
    */
-  final public static DoubleBuffer wrap (double[] array)
+  public static final DoubleBuffer wrap (double[] array)
   {
     return wrap (array, 0, array.length);
   }
@@ -148,7 +148,7 @@ public abstract class DoubleBuffer extends Buffer
       {
         double[] toPut = new double [src.remaining ()];
         src.get (toPut);
-        src.put (toPut);
+        put (toPut);
   }
 
     return this;
@@ -243,11 +243,27 @@ public abstract class DoubleBuffer extends Buffer
 
   /**
    * Calculates a hash code for this buffer.
+   *
+   * This is done with <code>long</code> arithmetic,
+   * where ** represents exponentiation, by this formula:<br>
+   * <code>s[position()] + 31 + (s[position()+1] + 30)*31**1 + ... +
+   * (s[limit()-1]+30)*31**(limit()-1)</code>.
+   * Where s is the buffer data, in Double.doubleToLongBits() form
+   * Note that the hashcode is dependent on buffer content, 
+   * and therefore is not useful if the buffer content may change.
+   *
+   * @return the hash code (casted to int)
    */
   public int hashCode ()
   {
-    // FIXME: Check what SUN calculates here.
-    return super.hashCode ();
+    long hashCode = Double.doubleToLongBits(get(position())) + 31;
+    long multiplier = 1;
+    for (int i = position() + 1; i < limit(); ++i)
+      {
+	  multiplier *= 31;
+	  hashCode += (Double.doubleToLongBits(get(i)) + 30)*multiplier;
+      }
+    return ((int)hashCode);
   }
 
   /**

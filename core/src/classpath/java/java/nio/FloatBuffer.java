@@ -68,7 +68,7 @@ public abstract class FloatBuffer extends Buffer
    * @exception IndexOutOfBoundsException If the preconditions on the offset
    * and length parameters do not hold
    */
-  final public static FloatBuffer wrap (float[] array, int offset, int length)
+  public static final FloatBuffer wrap (float[] array, int offset, int length)
   {
     return new FloatBufferImpl (array, 0, array.length, offset + length, offset, -1, false);
   }
@@ -77,7 +77,7 @@ public abstract class FloatBuffer extends Buffer
    * Wraps a <code>float</code> array into a <code>FloatBuffer</code>
    * object.
    */
-  final public static FloatBuffer wrap (float[] array)
+  public static final FloatBuffer wrap (float[] array)
   {
     return wrap (array, 0, array.length);
   }
@@ -148,7 +148,7 @@ public abstract class FloatBuffer extends Buffer
       {
         float[] toPut = new float [src.remaining ()];
         src.get (toPut);
-        src.put (toPut);
+        put (toPut);
   }
 
     return this;
@@ -243,11 +243,27 @@ public abstract class FloatBuffer extends Buffer
 
   /**
    * Calculates a hash code for this buffer.
+   *
+   * This is done with <code>int</code> arithmetic,
+   * where ** represents exponentiation, by this formula:<br>
+   * <code>s[position()] + 31 + (s[position()+1] + 30)*31**1 + ... +
+   * (s[limit()-1]+30)*31**(limit()-1)</code>.
+   * Where s is the buffer data, in Float.floatToIntBits() form
+   * Note that the hashcode is dependent on buffer content, 
+   * and therefore is not useful if the buffer content may change.
+   *
+   * @return the hash code
    */
   public int hashCode ()
   {
-    // FIXME: Check what SUN calculates here.
-    return super.hashCode ();
+    int hashCode = Float.floatToIntBits(get(position())) + 31;
+    int multiplier = 1;
+    for (int i = position() + 1; i < limit(); ++i)
+      {
+	  multiplier *= 31;
+	  hashCode += (Float.floatToIntBits(get(i)) + 30)*multiplier;
+      }
+    return hashCode;
   }
 
   /**

@@ -42,14 +42,11 @@ package java.net;
   * This class serves a container for username/password pairs.
   *
   * @author Aaron M. Renn (arenn@urbanophile.com)
+ *
   * @since 1.2
   */
 public final class PasswordAuthentication
 {
-  /*
- * Instance Variables
- */
-
   /**
   * The username 
   */
@@ -59,12 +56,6 @@ public final class PasswordAuthentication
   * The password
   */
   private char[] password;
-
-  /*************************************************************************/
-
-  /*
- * Constructors
- */
 
   /**
     * Creates a new <code>PasswordAuthentication</code> object from the
@@ -79,12 +70,6 @@ public final class PasswordAuthentication
   this.password = password;
   }
 
-  /*************************************************************************/
-
-  /*
- * Instance Methods
- */
-
   /**
   * Returns the username associated with this object
   *
@@ -92,7 +77,7 @@ public final class PasswordAuthentication
   */
   public String getUserName()
   {
-    return (username);
+    return username;
   }
  
   /**
@@ -102,6 +87,6 @@ public final class PasswordAuthentication
   */
   public char[] getPassword()
   {
-    return (password);
+    return password;
   }
-} // class PasswordAuthentication
+}

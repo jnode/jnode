@@ -68,7 +68,7 @@ public abstract class IntBuffer extends Buffer
    * @exception IndexOutOfBoundsException If the preconditions on the offset
    * and length parameters do not hold
    */
-  final public static IntBuffer wrap (int[] array, int offset, int length)
+  public static final IntBuffer wrap (int[] array, int offset, int length)
   {
     return new IntBufferImpl (array, 0, array.length, offset + length, offset, -1, false);
   }
@@ -77,7 +77,7 @@ public abstract class IntBuffer extends Buffer
    * Wraps a <code>int</code> array into a <code>IntBuffer</code>
    * object.
    */
-  final public static IntBuffer wrap (int[] array)
+  public static final IntBuffer wrap (int[] array)
   {
     return wrap (array, 0, array.length);
   }
@@ -148,7 +148,7 @@ public abstract class IntBuffer extends Buffer
       {
         int[] toPut = new int [src.remaining ()];
         src.get (toPut);
-        src.put (toPut);
+        put (toPut);
   }
 
     return this;
@@ -243,11 +243,27 @@ public abstract class IntBuffer extends Buffer
 
   /**
    * Calculates a hash code for this buffer.
+   *
+   * This is done with <code>int</code> arithmetic,
+   * where ** represents exponentiation, by this formula:<br>
+   * <code>s[position()] + 31 + (s[position()+1] + 30)*31**1 + ... +
+   * (s[limit()-1]+30)*31**(limit()-1)</code>.
+   * Where s is the buffer data. Note that the hashcode is dependent
+   * on buffer content, and therefore is not useful if the buffer
+   * content may change.
+   *
+   * @return the hash code
    */
   public int hashCode ()
   {
-    // FIXME: Check what SUN calculates here.
-    return super.hashCode ();
+    int hashCode = get(position()) + 31;
+    int multiplier = 1;
+    for (int i = position() + 1; i < limit(); ++i)
+      {
+	  multiplier *= 31;
+	  hashCode += (get(i) + 30)*multiplier;
+      }
+    return hashCode;
   }
 
   /**
