@@ -3,7 +3,6 @@
  */
 package org.jnode.fs.ntfs;
 
-import java.text.DateFormat;
 import java.util.Date;
 
 /**
