@@ -77,6 +77,7 @@ inthandler:
 	test dword [resume_int],0xFFFFFFFF
 	jz inthandler_ret
 	; Resume the interrupt (caused by an an IRQ)
+	;jmp int_die
 	mov ebp,esp
 	mov eax,[resume_intno]
 	mov [ebp+INTNO],eax
@@ -231,6 +232,7 @@ irqhandler_ret:
 	%endif
 	int_exit
 irqhandler_suspend:
+	;jmp int_die
 	and dword [esp+OLD_EFLAGS],~F_IF
 	mov eax,[esp+INTNO]
 	mov dword [resume_intno],eax
@@ -241,7 +243,7 @@ irqhandler_suspend:
 	mov eax,1
 	xchg dword [resume_int],eax
 	; Test for resume overruns
-	test eax,0xFFFFFFFF
+	test eax,eax
 	jz inthandler_ret ; No overrun, finish int handler
 	mov eax,irq_resume_overrun_msg
 	call sys_print_str
@@ -555,6 +557,7 @@ int_pf:
 	call int_system_exception
 	ret
 int_pf_npe:
+	;jmp int_die
 	mov eax,SoftByteCodes_EX_NULLPOINTER
 	mov ebx,[ebp+OLD_EIP]
 	call int_system_exception

@@ -20,6 +20,7 @@ import org.jnode.build.BuildException;
 import org.jnode.linker.Elf;
 import org.jnode.linker.ElfLinker;
 import org.jnode.plugin.PluginRegistry;
+import org.jnode.util.NumberUtils;
 import org.jnode.vm.MathSupport;
 import org.jnode.vm.MonitorManager;
 import org.jnode.vm.SoftByteCodes;
@@ -153,6 +154,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 			final X86Stream os86 = (X86Stream) os;
 			final Label introCode = new Label("$$introCode");
 			
+			os86.setObjectRef(new Label("$$jmp-introCode"));
 			os86.writeJMP(introCode);
 			initObject.markEnd();
 
@@ -402,6 +404,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		/* Set Vm.instance */
 		os.writeMOV_Const(Register.EBX, vm);
 		final int vmOffset = (VmArray.DATA_OFFSET + vmField.getStaticsIndex()) << 2;
+		System.out.println("vmOffset " + NumberUtils.hex(vmOffset));
 		os.writeMOV(INTSIZE, Register.EDI, vmOffset, Register.EBX);
 	}
 
@@ -415,8 +418,8 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	 */
 	protected void initMain(X86Stream os, PluginRegistry registry) throws BuildException, ClassNotFoundException {
 		os.setObjectRef(new Label("$$Initialize Main"));
-		VmType mainClass = loadClass(Main.class);
-		VmStaticField registryField = (VmStaticField) mainClass.getField(Main.REGISTRY_FIELD_NAME);
+		final VmType mainClass = loadClass(Main.class);
+		final VmStaticField registryField = (VmStaticField) mainClass.getField(Main.REGISTRY_FIELD_NAME);
 
 		// Setup STATICS register (EDI)
 		os.writeMOV_Const(Register.EDI, statics.getTable());
@@ -424,6 +427,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		/* Set Main.pluginRegistry */
 		os.writeMOV_Const(Register.EBX, registry);
 		final int rfOffset = (VmArray.DATA_OFFSET + registryField.getStaticsIndex()) << 2;
+		System.out.println("rfOffset " + NumberUtils.hex(rfOffset));
 		os.writeMOV(INTSIZE, Register.EDI, rfOffset, Register.EBX);
 	}
 

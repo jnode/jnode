@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.tools.ant.Project;
 import org.jnode.assembler.Label;
@@ -29,6 +30,7 @@ import org.jnode.assembler.x86.X86Stream;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.model.PluginRegistryModel;
+import org.jnode.util.NumberUtils;
 import org.jnode.vm.DefaultHeapManager;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
@@ -40,6 +42,7 @@ import org.jnode.vm.VmHeapManager;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.ObjectLayout;
+import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmMethodCode;
 import org.jnode.vm.classmgr.VmStatics;
@@ -122,14 +125,14 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			blockedObjects.add(clsMgr);
 			blockedObjects.add(clsMgr.getStatics());
 			blockedObjects.add(clsMgr.getStatics().getTable());
-			
+
 			// Create the VM
 			final Vm vm = new Vm(arch, new DefaultHeapManager(clsMgr));
 			blockedObjects.add(vm);
-			
+
 			final VmProcessor proc = createProcessor(clsMgr.getStatics());
 			log("Building for " + proc.getCPUID());
-			
+
 			final Label clInitCaller = new Label("$$clInitCaller");
 			VmType systemClasses[] = VmType.initializeForBootImage(clsMgr);
 			for (int i = 0; i < systemClasses.length; i++) {
@@ -155,8 +158,9 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			loadClass(VmBootHeap.class);
 			loadClass(VmDefaultHeap.class);
 			loadClass(VmHeapManager.class);
+			loadClass(VmStatics.class);
 			loadClass(vm.getHeapManager().getClass());
-			
+
 			/* Now emit the processor */
 			os.getObjectRef(proc);
 
@@ -181,17 +185,44 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			// Now emit all object images to the actual image
 			emitObjects(os, arch, blockedObjects);
 
-			/* Set the bootclasses */
-			VmType bootClasses[] = clsMgr.prepareAfterBootstrap();
-			os.getObjectRef(bootClasses);
-			emitObjects(os, arch, blockedObjects);
-
 			// Disallow the loading of new classes
 			clsMgr.setFailOnNewLoad(true);
 			// Turn auto-compilation on
 			clsMgr.setCompileRequired();
+
+			// Emit the classmanager
+			log("Emit vm");
+			blockedObjects.remove(vm);
+			emitObjects(os, arch, blockedObjects);
+			// Twice, this is intended!
+			emitObjects(os, arch, blockedObjects);
+
+			/* Set the bootclasses */
+			log("prepare bootClassArray");
+			final VmType bootClasses[] = clsMgr.prepareAfterBootstrap();
+			os.getObjectRef(bootClasses);
+			emitObjects(os, arch, blockedObjects);
+			// Twice, this is intended!
+			emitObjects(os, arch, blockedObjects);
+			
+			// Emit the classmanager
+			log("Emit clsMgr");
+			blockedObjects.remove(clsMgr);
+			emitObjects(os, arch, blockedObjects);
+			// Twice, this is intended!
+			emitObjects(os, arch, blockedObjects);
+
+			// Emit the classmanager
+			log("Emit statics");
+			blockedObjects.remove(clsMgr.getStatics());
+			emitObjects(os, arch, blockedObjects);
+			// Twice, this is intended!
+			emitObjects(os, arch, blockedObjects);
+
 			// Emit the remaining objects
+			log("Emit rest; blocked=" + blockedObjects);
 			emitObjects(os, arch, null);
+			log("statics table 0x" + NumberUtils.hex(os.getObjectRef(clsMgr.getStatics().getTable()).getOffset()));
 
 			/* Write static initializer code */
 			emitStaticInitializerCalls(os, bootClasses, clInitCaller);
@@ -213,7 +244,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			storeImage(os);
 
 			// Generate the listfile
-			printLabels(os, bootClasses);
+			printLabels(os, bootClasses, clsMgr.getStatics());
 
 			// Generate debug info
 			for (int i = 0; i < cmps.length; i++) {
@@ -334,15 +365,6 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
 	protected abstract void emitStaticInitializerCalls(NativeStream os, VmType[] bootClasses, Object clInitCaller) throws ClassNotFoundException;
 
-	public final void emitObject(NativeStream os, Object object) 
-	throws ClassNotFoundException {
-		if (blockedObjects.contains(object)) {
-			throw new IllegalStateException("Cannot emit a blocked object here");
-		}
-		final ObjectEmitter emitter = new ObjectEmitter(clsMgr, os, null, legalInstanceClasses);
-		emitter.emitObject(object);
-	}
-	
 	/**
 	 * Emit all objects to the native stream that have not yet been emitted to this stream.
 	 * 
@@ -353,6 +375,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 	private final void emitObjects(NativeStream os, VmArchitecture arch, Set blockObjects) throws BuildException {
 		log("Emitting objects", Project.MSG_DEBUG);
 		PrintWriter debugOut = null;
+		final TreeSet emittedClassNames = new TreeSet();
 		try {
 			if (debug) {
 				debugOut = new PrintWriter(new FileWriter(debugFile));
@@ -366,18 +389,19 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 				loops++;
 				compileClasses(os, arch);
 				final Collection objectRefs = new ArrayList(os.getObjectRefs());
-				int unresolved = 0; // Number of unresolved references found in the following loop
+				int unresolvedFound = 0; // Number of unresolved references found in the following
+				// loop
 				int emitted = 0; // Number of emitted objects in the following loop
 				for (Iterator i = objectRefs.iterator(); i.hasNext();) {
 					X86Stream.ObjectRef ref = (X86Stream.ObjectRef) i.next();
 					if (!ref.isResolved()) {
 						final Object obj = ref.getObject();
 						if (!(obj instanceof Label)) {
-							unresolved++;
+							unresolvedFound++;
 							if (obj instanceof VmType) {
 								((VmType) obj).link();
 							}
-							
+
 							final boolean skip;
 							if (blockObjects == null) {
 								skip = false;
@@ -386,7 +410,11 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 							}
 
 							if (!skip) {
-							//if (obj != skipMe) {
+								if (blockObjects == null) {
+									emittedClassNames.add(obj.getClass().getName());
+									//log("emitObject " + obj.getClass().getName());
+								}
+								//if (obj != skipMe) {
 								emitter.emitObject(obj);
 								emitted++;
 								X86Stream.ObjectRef newRef = os.getObjectRef(obj);
@@ -400,12 +428,18 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 						}
 					}
 				}
-				if (unresolved == lastUnresolved) {
-					if ((unresolved == 0) || (blockObjects != null)) {
+				if (unresolvedFound == lastUnresolved) {
+					if (unresolvedFound == 0) {
 						break;
 					}
+					if (blockedObjects != null) {
+						if (unresolvedFound == (emitted + blockObjects.size())) {
+							//log("UnresolvedFound " + unresolvedFound + ", emitted " + emitted + ",blocked " + blockObjects.size());
+							break;
+						}
+					}
 				}
-				lastUnresolved = unresolved;
+				lastUnresolved = unresolvedFound;
 				cnt += emitted;
 			}
 			final long end = System.currentTimeMillis();
@@ -413,6 +447,9 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			if (debugOut != null) {
 				debugOut.close();
 				debugOut = null;
+			}
+			if (blockObjects == null) {
+				log("Emitted classes: " + emittedClassNames);
 			}
 		} catch (ClassNotFoundException ex) {
 			throw new BuildException(ex);
@@ -620,7 +657,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 	 * @throws BuildException
 	 * @throws UnresolvedObjectRefException
 	 */
-	protected final void printLabels(NativeStream os, VmType[] bootClasses) throws BuildException, UnresolvedObjectRefException {
+	protected final void printLabels(NativeStream os, VmType[] bootClasses, VmStatics statics) throws BuildException, UnresolvedObjectRefException {
 		try {
 			int unresolvedCount = 0;
 			final PrintWriter w = new PrintWriter(new FileWriter(listFile));
@@ -649,6 +686,18 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 				w.println();
 			}
 			w.println();
+
+			// Print the statics table
+			final int[] table = (int[]) statics.getTable();
+			for (int i = 0; i < table.length; i++) {
+				w.print(NumberUtils.hex((VmArray.DATA_OFFSET + i) << 2));
+				w.print(":");
+				w.print(NumberUtils.hex(statics.getType(i), 2));
+				w.print("\t");
+				w.print(NumberUtils.hex(table[i]));
+				w.println();
+			}
+
 			// Look for unresolved labels and put all resolved
 			// label into the sorted map. This will be used later
 			// to print to the listing file.

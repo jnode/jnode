@@ -30,6 +30,7 @@ public final class VmStatics extends VmSystemObject {
 	private final int slotLength;
 	private final boolean lsbFirst;
 	private transient ObjectResolver resolver;
+	private transient boolean locked;
 
 	static int staticFieldCount;
 	static int staticMethodCount;
@@ -94,6 +95,9 @@ public final class VmStatics extends VmSystemObject {
 	}
 
 	final void setInt(int idx, int value) {
+		if (locked) {
+			throw new RuntimeException("Locked");
+		}
 		if (types[idx] != TYPE_INT) {
 			throw new IllegalArgumentException("Type error " + types[idx]);
 		}
@@ -101,6 +105,9 @@ public final class VmStatics extends VmSystemObject {
 	}
 
 	final void setObject(int idx, Object value) {
+		if (locked) {
+			throw new RuntimeException("Locked");
+		}
 		if (types[idx] != TYPE_OBJECT) {
 			throw new IllegalArgumentException("Type error " + types[idx]);
 		}
@@ -108,6 +115,9 @@ public final class VmStatics extends VmSystemObject {
 	}
 
 	final void setMethod(int idx, VmMethod value) {
+		if (locked) {
+			throw new RuntimeException("Locked");
+		}
 		if (types[idx] != TYPE_METHOD) {
 			throw new IllegalArgumentException("Type error " + types[idx]);
 		}
@@ -135,6 +145,9 @@ public final class VmStatics extends VmSystemObject {
 	}
 
 	final void setLong(int idx, long value) {
+		if (locked) {
+			throw new RuntimeException("Locked");
+		}
 		if (types[idx] != TYPE_LONG) {
 			throw new IllegalArgumentException("Type error " + types[idx]);
 		}
@@ -155,6 +168,9 @@ public final class VmStatics extends VmSystemObject {
 	 * @return the index of the allocated entry.
 	 */
 	private final synchronized int alloc(byte type, int length) {
+		if (locked) {
+			throw new RuntimeException("Locked");
+		}
 		final int idx = next;
 		types[idx] = type;
 		next += length;
@@ -168,6 +184,15 @@ public final class VmStatics extends VmSystemObject {
 	 */
 	public final Object getTable() {
 		return statics;
+	}
+
+	/**
+	 * Get the statics type at a given index
+	 * 
+	 * @return int
+	 */
+	public final int getType(int index) {
+		return types[index];
 	}
 
 	/**
@@ -222,15 +247,23 @@ public final class VmStatics extends VmSystemObject {
 	 * @see org.jnode.vm.VmSystemObject#verifyBeforeEmit()
 	 */
 	public void verifyBeforeEmit() {
-		System.out.println("VmStatics#verifyBeforeEmit");
+		System.out.println("VmStatics#verifyBeforeEmit " + slotLength + ", " + resolver);
 		final int max = statics.length;
+		int count = 0;
 		for (int i = 0; i < max; i++) {
 			final Object value = objects[i];
 			if (value != null) {
+				count++;
 				if (slotLength == 1) {
 					statics[i] = resolver.addressOf32(value);
+					if (statics[i] == 0) {
+						throw new RuntimeException("addressof32(" + value + ") is null");
+					}
 				} else {
 					final long lvalue = resolver.addressOf64(value);
+					if (lvalue == 0L) {
+						throw new RuntimeException("addressof64(" + value + ") is null");
+					}
 					if (lsbFirst) {
 						statics[i + 0] = (int) (lvalue & 0xFFFFFFFFL);
 						statics[i + 1] = (int) ((lvalue >>> 32) & 0xFFFFFFFFL);
@@ -243,5 +276,8 @@ public final class VmStatics extends VmSystemObject {
 				throw new RuntimeException("Method is null");
 			}
 		}
+		objects = null;
+		locked = true;
+		System.out.println("VmStatics#verifyBeforeEmit count=" + count);
 	}
 }

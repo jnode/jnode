@@ -8,8 +8,6 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import org.jnode.vm.classmgr.VmByteCode;
-import org.jnode.vm.classmgr.VmConstIMethodRef;
-import org.jnode.vm.classmgr.VmConstMethodRef;
 import org.jnode.vm.classmgr.VmInterpretedExceptionHandler;
 import org.jnode.vm.classmgr.VmMethod;
 
@@ -343,34 +341,6 @@ public class BasicBlockFinder extends BytecodeVisitorSupport implements Bytecode
 	}
 
 	/**
-	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokeinterface(org.jnode.vm.classmgr.VmConstIMethodRef, int)
-	 */
-	public void visit_invokeinterface(VmConstIMethodRef methodRef, int count) {
-		yieldPoint();
-	}
-
-	/**
-	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokespecial(org.jnode.vm.classmgr.VmConstMethodRef)
-	 */
-	public void visit_invokespecial(VmConstMethodRef methodRef) {
-		yieldPoint();
-	}
-
-	/**
-	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokestatic(org.jnode.vm.classmgr.VmConstMethodRef)
-	 */
-	public void visit_invokestatic(VmConstMethodRef methodRef) {
-		yieldPoint();
-	}
-
-	/**
-	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokevirtual(org.jnode.vm.classmgr.VmConstMethodRef)
-	 */
-	public void visit_invokevirtual(VmConstMethodRef methodRef) {
-		yieldPoint();
-	}
-
-	/**
 	 * Add branching information (to the given target) to the basic blocks information.
 	 * 
 	 * @param target
@@ -449,13 +419,6 @@ public class BasicBlockFinder extends BytecodeVisitorSupport implements Bytecode
 	private final void startTryBlockEnd(int address) {
 		opcodeFlags[address] |= F_START_OF_TRYBLOCKEND;
 		startBB(address);
-	}
-
-	/**
-	 * Mark a yieldpoint.
-	 */
-	private final void yieldPoint() {
-		opcodeFlags[curAddress] |= F_YIELDPOINT;
 	}
 
 	/**

@@ -72,6 +72,8 @@ yieldPointHandler_reschedule:
 	pop ebp
 	; Now save the current thread state
 	mov edi,CURRENTTHREAD
+	cmp edi,NEXTTHREAD
+	je near yieldPointHandler_done
 	SAVEREG VmX86Thread_EAX_OFFSET, OLD_EAX
 	SAVEREG VmX86Thread_EBX_OFFSET, OLD_EBX
 	SAVEREG VmX86Thread_ECX_OFFSET, OLD_ECX
@@ -143,7 +145,6 @@ timer_ret:
 	mov al,0x60 ; EOI IRQ0
 	out 0x20,al
 	ret
-	ret
 	
 timer_deadlock:
 	mov eax,deadLock_msg
@@ -178,6 +179,8 @@ def_irq_kernel:
 ; EBP Old register block
 ; -----------------------------------------------
 int_system_exception:
+	test THREADSWITCHINDICATOR,VmProcessor_TSI_SYSTEM_READY
+	jz near int_die
 	;jmp int_die
 	; Setup the user stack to add a return address to the current EIP
 	; and change the current EIP to doSystemException, which will 
