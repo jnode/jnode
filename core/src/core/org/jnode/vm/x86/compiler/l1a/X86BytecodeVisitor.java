@@ -695,20 +695,6 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	}
 
 	/**
-	 * Generate code to invoke the method with the given signature.
-	 * 
-	 * @param method
-	 */
-	private final void invokeJavaMethod(String signature) {
-		if (log) {
-			os.log("VStack: " + vstack + ", method: " + signature);
-		}
-		helper.invokeJavaMethod(signature);
-        // Test the stack alignment
-        stackFrame.writeStackAlignmentTest(curInstrLabel);
-	}
-
-	/**
 	 * Generate code to invoke the given method.
 	 * 
 	 * @param method
@@ -2470,13 +2456,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 
 			dropParameters(sm, true);
 
-			// Get method from statics table
-            if (os.isCode32()) {
-                helper.writeGetStaticsEntry(curInstrLabel, helper.AAX, sm);
-            } else {
-                helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)helper.AAX, sm);                
-            }
-			invokeJavaMethod(methodRef.getSignature());
+			// Call the methods code from the statics table
+			helper.invokeJavaMethod(sm);
 			// Result is already on the stack.
 		} catch (ClassCastException ex) {
 			BootLog.error(methodRef.getResolvedVmMethod().getClass().getName()
@@ -2502,13 +2483,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 
 			dropParameters(method, false);
 
-			// Get static field object
-            if (os.isCode32()) {
-                helper.writeGetStaticsEntry(curInstrLabel, helper.AAX, method);
-            } else {
-                helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)helper.AAX, method);                
-            }
-			invokeJavaMethod(methodRef.getSignature());
+            // Call the methods native code from the statics table
+            helper.invokeJavaMethod(method);
 			// Result is already on the stack.
 		}
 	}
@@ -2549,8 +2525,10 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			/* Get entry in VMT -> EAX */
 			os.writeMOV(asize, helper.AAX, helper.AAX,
 					arrayDataOffset + (tibIndex * slotSize));
+            
 			/* Now invoke the method */
-			invokeJavaMethod(methodRef.getSignature());
+            os.writeCALL(helper.AAX, context.getVmMethodNativeCodeField().getOffset());
+            helper.pushReturnValue(methodRef.getSignature());
 			// Result is already on the stack.
 		}
 	}

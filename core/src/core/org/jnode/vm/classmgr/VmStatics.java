@@ -28,6 +28,7 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.Vm;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmSystemObject;
 import org.vmmagic.unboxed.Address;
@@ -43,7 +44,7 @@ public final class VmStatics extends VmSystemObject {
 	private static final byte TYPE_LONG = 0x02;
 	private static final byte TYPE_OBJECT = 0x03;
 	private static final byte TYPE_ADDRESS = 0x04;
-	private static final byte TYPE_METHOD = 0x05;
+	private static final byte TYPE_METHOD_CODE = 0x05;
 	private static final byte TYPE_STRING = 0x06;
 	private static final byte TYPE_CLASS = 0x07;
 	private static final byte MAX_TYPE = TYPE_CLASS;
@@ -118,15 +119,26 @@ public final class VmStatics extends VmSystemObject {
 	}
 
 	/**
-	 * Allocate an {@link org.jnode.vm.classmgr.VmMethod} type entry.
+	 * Allocate an method code type entry.
 	 * 
 	 * @return the index of the allocated entry.
 	 */
-	final int allocMethod(VmMethod method) {
-		final int idx = alloc(TYPE_METHOD, slotLength);
-		setRawObject(idx, method);
+	final int allocMethodCode() {
+		final int idx = alloc(TYPE_METHOD_CODE, slotLength);
 		return idx;
 	}
+    
+    /**
+     * Set the pointer of the native code of a method in the table at the given index.
+     * @param idx
+     * @param nativeCode
+     */
+    final void setMethodCode(int idx, VmAddress nativeCode) {
+        if (types[idx] != TYPE_METHOD_CODE) {
+            throw new IllegalArgumentException("Type error " + types[idx]);
+        }
+        setRawObject(idx, nativeCode);
+    }
 
 	/**
 	 * Allocate an {@link org.jnode.vm.classmgr.VmType} type entry.
@@ -359,7 +371,7 @@ public final class VmStatics extends VmSystemObject {
 	public final void dumpStatistics(PrintStream out) {
 		out.println("#static int fields  " + typeCounter[TYPE_INT]);
 		out.println("#static long fields " + typeCounter[TYPE_LONG]);
-		out.println("#methods            " + typeCounter[TYPE_METHOD]);
+		out.println("#methods            " + typeCounter[TYPE_METHOD_CODE]);
 		out.println("#types              " + typeCounter[TYPE_CLASS]);
 		out.println("table.length        " + next);
 	}
@@ -393,7 +405,7 @@ public final class VmStatics extends VmSystemObject {
 						statics[i + 0] = (int) ((lvalue >>> 32) & 0xFFFFFFFFL);
 					}
 				}
-			} else if (types[i] == TYPE_METHOD) {
+			} else if (types[i] == TYPE_METHOD_CODE) {
 				throw new RuntimeException("Method is null");
 			}
 		}

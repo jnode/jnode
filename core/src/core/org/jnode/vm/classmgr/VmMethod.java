@@ -112,7 +112,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
         } else {
             this.selector = cl.getSelectorMap().get(name, signature);
         }
-        this.staticsIndex = cl.getStatics().allocMethod(this);
+        this.staticsIndex = cl.getStatics().allocMethodCode();
     }
 
     /**
@@ -454,6 +454,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
         this.compiledCode = code;
         this.nativeCode = code.getNativeCode();
         this.compiledCode = code;
+        Vm.getVm().getStatics().setMethodCode(getStaticsIndex(), code.getNativeCode());
         this.nativeCodeOptLevel = optLevel;
     }
 

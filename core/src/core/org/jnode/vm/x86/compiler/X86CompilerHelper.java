@@ -219,22 +219,6 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	}
 
 	/**
-	 * Emit code to invoke a method, where the reference to the VmMethod
-	 * instance is in register EAX.
-	 * 
-	 * @param signature
-	 */
-	public final void invokeJavaMethod(String signature) {
-		final int offset = entryPoints.getVmMethodNativeCodeField().getOffset();
-		if (os.isCode32()) {
-			os.writeCALL(X86Register.EAX, offset);
-		} else {
-			os.writeCALL(X86Register.RAX, offset);
-		}
-		pushReturnValue(signature);
-	}
-
-	/**
 	 * Emit code to push the returncode of the given method signature.
 	 * 
 	 * @param signature
@@ -260,11 +244,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 			}
 			break;
 		case JvmType.REFERENCE:
-			if (os.isCode32()) {
-				stackMgr.writePUSH(returnType, X86Register.EAX);
-			} else {
-				stackMgr.writePUSH(returnType, X86Register.RAX);
-			}
+			stackMgr.writePUSH(returnType, AAX);
 			break;
 		default:
 			// int/float return value
@@ -278,13 +258,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 * @param method
 	 */
 	public final void invokeJavaMethod(VmMethod method) {
-		if (false) {
-			os.writeMOV(this.ADDRSIZE, this.AAX, this.STATICS,
-					getStaticsOffset(method));
-		} else {
-			os.writeMOV_Const(this.AAX, method);
-		}
-		invokeJavaMethod(method.getSignature());
+        final int offset = getStaticsOffset(method);
+        os.writeCALL(STATICS, offset);
+        pushReturnValue(method.getSignature());
 	}
 
 	/**
