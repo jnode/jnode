@@ -27,7 +27,9 @@
 
   <property name="full-plugin-list"    value="${basedir}/conf/full-plugin-list.xml"/>
   <property name="system-plugin-list"  value="${basedir}/conf/system-plugin-list.xml"/>
-  <property name="jnode-ver"           value="0.1.5"/>
+  <property name="jnode-ver"           value="0.1.6"/>
+  <property name="sources.dist.tar.gz" value="${build.dir}/jnodesources-${jnode-ver}.tar.gz"/>
+  <property name="jnode.iso"           value="${build.dir}/jnode.iso"/>
 
   <path id="cp">
     <pathelement location="${ant.jar}"/>
@@ -124,6 +126,10 @@
 
 <!-- Create a bootable CDROM image -->
   <target name="cdrom" depends="assemble">
+    <tar destfile="${sources.dist.tar.gz}" 
+         compression="gzip"
+         basedir="${root.dir}"
+         excludes="**/build/**"/>
     <ant antfile="build-x86.xml"
          inheritall="true"
          inheritrefs="true"
@@ -140,8 +146,10 @@
 
   <!-- Upload a distribution -->
   <target name="upload" depends="cdrom">
-    <gzip src="${build.dir}/jnode.iso"
-          zipfile="${build.dir}/jnode-${jnode-ver}.iso.gz"/>
+    <mkdir dir="${build.dir}/upload"/>
+    <gzip src="${jnode.iso}"
+          destfile="${build.dir}/upload/jnode-${jnode-ver}.iso.gz"/>
+    <copy todir="${build.dir}/upload" file="${sources.dist.tar.gz}"/>
     <ftp server="upload.sourceforge.net"
          remotedir="incoming"
          passive="yes"
@@ -149,9 +157,7 @@
          verbose="yes"
          userid="ftp"
          password="ftp">
-      <fileset dir="${build.dir}">
-        <include name="jnode-${jnode-ver}.iso.gz"/>
-      </fileset>
+      <fileset dir="${build.dir}/upload"/>
     </ftp>
   </target>
   
