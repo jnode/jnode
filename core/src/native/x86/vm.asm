@@ -23,7 +23,7 @@ GLABEL vm_athrow
 		PRINT_STR vm_athrow_msg1
 		
 		mov AAX,[ABX+ObjectLayout_TIB_SLOT*SLOT_SIZE] 	; get TIB of exception
-		mov AAX,[AAX+VmArray_DATA_OFFSET*4]				; get class (vmt[0])
+		mov AAX,[AAX+VmArray_DATA_OFFSET*SLOT_SIZE]		; get class (vmt[0])
 		mov AAX,[AAX+VmType_NAME_OFS] 					; get classname of exception
 		call vm_print_string
 		
@@ -76,7 +76,7 @@ vm_athrow_unhandled:
 	PRINT_STR vm_athrow_msg4
 	mov ABX,AAX
 	mov AAX,[ABX+ObjectLayout_TIB_SLOT*SLOT_SIZE]
-	mov AAX,[AAX+VmArray_DATA_OFFSET*4]
+	mov AAX,[AAX+VmArray_DATA_OFFSET*SLOT_SIZE]
 	mov AAX,[AAX+VmType_NAME_OFS]
 	call vm_print_string
 	mov AAX,[ABX+Throwable_DETAILMESSAGE_OFS] ; get message of exception
@@ -112,8 +112,8 @@ vm_print_chararray:
     
 	test AAX,AAX
 	je vm_print_chararray_null
-	mov ecx,[AAX+VmArray_LENGTH_OFFSET*4]
-	lea ASI,[AAX+VmArray_DATA_OFFSET*4]
+	mov ecx,[AAX+VmArray_LENGTH_OFFSET*SLOT_SIZE]
+	lea ASI,[AAX+VmArray_DATA_OFFSET*SLOT_SIZE]
 	cld
 	
 vm_print_chararray_loop:
@@ -150,7 +150,7 @@ vmint_print_stack_loop:
 	jz vmint_print_stack_ret
 	
 	; Get the method of the current frame in EBX
-	mov ABX,[ABP+VmX86StackReader_METHOD_OFFSET] ; Note do not '*4'here, since it is a java constants
+	mov ABX,[ABP+VmX86StackReader_METHOD_OFFSET] 
 
 	; Print the classname
     mov AAX,[ABX+VmMember_DECLARINGCLASS_OFS]
@@ -167,7 +167,7 @@ vmint_print_stack_loop:
     PRINT_STR vmint_print_stack_msg1
 
 	; Get the previous frame
-	mov ABP,[ABP+VmX86StackReader_PREVIOUS_OFFSET] ; Note do not '*4' here, since the offset is a java static field constant
+	mov ABP,[ABP+VmX86StackReader_PREVIOUS_OFFSET] 
 	jmp vmint_print_stack_loop
 	
 vmint_print_stack_ret:

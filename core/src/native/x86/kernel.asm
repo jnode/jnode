@@ -159,7 +159,7 @@ go_user_cs:
 	mov ASP,Luser_esp
 %ifdef BITS64
 	; Setup current processor
-	mov r15, vmCurProcessor
+	mov r12, vmCurProcessor
 %endif	
 	sti
 

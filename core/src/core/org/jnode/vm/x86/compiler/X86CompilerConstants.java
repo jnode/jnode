@@ -46,7 +46,7 @@ public interface X86CompilerConstants extends X86Constants {
      * VmProcessor register in 64-bit mode.
      * Do not change this constant!
      */
-    public static final X86Register.GPR64 PROCESSOR64 = X86Register.R15;
+    public static final X86Register.GPR64 PROCESSOR64 = X86Register.R12;
 
 	/** Size of a byte */
 	public static final int BYTESIZE = X86Constants.BITS8;
