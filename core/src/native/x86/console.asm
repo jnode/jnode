@@ -139,7 +139,7 @@ sys_print_char%1:
 	mov WORD [scr_ofs],(scr_width*(scr_height-1))
 %%pc_ok:
 	call set_cursor%1
-	call serial_send_char%1
+	call kdb_send_char%1
 	SPINLOCK_EXIT console_lock
 	ret
 

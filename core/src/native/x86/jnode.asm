@@ -80,7 +80,7 @@ TSS_DS		equ 0x38
   %include "ints64.asm"
 %endif
 %include "console.asm"
-%include "serial.asm"
+%include "kdb.asm"
 %include "ints.asm"
 %include "version.asm"
 %include "syscall.asm" 
@@ -137,8 +137,8 @@ scr_ofs:		DA 0
 hexchars: 		db '0123456789ABCDEF' 
 SPINLOCK		console_lock
 jnodeFinished:	DA 0
-serial_enabled	dd 0
-serial_port		dd 0x3f8
+kdb_enabled		dd 0
+kdb_port		dd 0x3f8
   
 		align 4096
 	global vm_start

@@ -345,9 +345,17 @@ GLABEL Q43org5jnode2vm6Unsafe23setKdbEnabled2e28Z29Z
 	mov AAX,[ASP+SLOT_SIZE]
 	push ADX
 	mov ADX,AAX
-	mov eax,[serial_enabled]
-	mov [serial_enabled],edx
+	mov eax,[kdb_enabled]
+	mov [kdb_enabled],edx
 	pop ADX
 	ret SLOT_SIZE
 	
+; public static native boolean isKdbEnabled();
+GLABEL Q43org5jnode2vm6Unsafe23isKdbEnabled2e2829Z
+	mov eax,[kdb_enabled]
+	ret 
+	
+; static native int readKdbInput();
+GLABEL Q43org5jnode2vm6Unsafe23readKdbInput2e2829I
+	jmp kdb_recv_char
 	

@@ -526,6 +526,17 @@ public final class Unsafe {
      */
     public static native boolean setKdbEnabled(boolean on);
 
+    /** 
+     * Is the kernel debugger enabled?
+     */
+    public static native boolean isKdbEnabled();
+
+    /**
+     * Read a single byte from the kernel debugger input queue.
+     * @return The byte, or -1 if no data available.
+     */
+    static native int readKdbInput();
+    
 	/**
 	 * Initialize the new Thread.
 	 * 
