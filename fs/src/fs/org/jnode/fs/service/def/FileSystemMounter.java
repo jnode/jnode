@@ -141,7 +141,7 @@ final class FileSystemMounter implements DeviceListener, QueueProcessor {
             for (Iterator i = fileSystemService.fileSystemTypes().iterator(); i
                     .hasNext();) {
                 final FileSystemType fst = (FileSystemType) i.next();
-                if (fst.supports(ptEntry, bs)) {
+                if (fst.supports(ptEntry, bs, api)) {
                     try {
                         final FileSystem fs = fst.create(device);
                         fileSystemService.registerFileSystem(fs);

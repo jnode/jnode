@@ -23,6 +23,8 @@
     <plugin id="org.jnode.driver.firmware.bios"/>
     <!-- plugin id="org.jnode.driver.floppy"/ -->
     <plugin id="org.jnode.driver.ide"/>
+    <plugin id="org.jnode.driver.ide.atapi"/>
+    <plugin id="org.jnode.driver.ide.disk"/>
     <plugin id="org.jnode.driver.input"/>
     <plugin id="org.jnode.driver.input.l10n"/>
     <plugin id="org.jnode.driver.net.3c90x"/>

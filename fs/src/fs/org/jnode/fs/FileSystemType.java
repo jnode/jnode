@@ -4,6 +4,7 @@
 package org.jnode.fs;
 
 import org.jnode.driver.Device;
+import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.partitions.PartitionTableEntry;
 
 /**
@@ -28,7 +29,7 @@ public interface FileSystemType {
 	 *           partition table entry.
 	 * @param firstSector
 	 */
-	public boolean supports(PartitionTableEntry pte, byte[] firstSector);
+	public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi);
 
 	/**
 	 * Create a filesystem from a given device.

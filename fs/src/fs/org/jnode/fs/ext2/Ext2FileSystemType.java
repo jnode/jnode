@@ -4,6 +4,7 @@
 package org.jnode.fs.ext2;
 
 import org.jnode.driver.Device;
+import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
@@ -33,9 +34,9 @@ public class Ext2FileSystemType implements FileSystemType {
 	}
 
 	/**
-	 * @see org.jnode.fs.FileSystemType#supports(PartitionTableEntry, byte[])
+	 * @see org.jnode.fs.FileSystemType#supports(PartitionTableEntry, byte[], FSBlockDeviceAPI)
 	 */
-	public boolean supports(PartitionTableEntry pte, byte[] firstSector) {
+	public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
 		if (pte instanceof IBMPartitionTableEntry) {
 			return (((IBMPartitionTableEntry)pte).getSystemIndicator() == IBMPartitionTypes.PARTTYPE_LINUXNATIVE);
 		} else

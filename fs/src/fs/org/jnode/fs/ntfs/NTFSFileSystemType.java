@@ -3,9 +3,12 @@
  */
 package org.jnode.fs.ntfs;
 
-import org.jnode.driver.*;
-import org.jnode.fs.*;
-import org.jnode.fs.partitions.*;
+import org.jnode.driver.Device;
+import org.jnode.driver.block.FSBlockDeviceAPI;
+import org.jnode.fs.FileSystem;
+import org.jnode.fs.FileSystemException;
+import org.jnode.fs.FileSystemType;
+import org.jnode.fs.partitions.PartitionTableEntry;
 
 /**
  * @author Chira
@@ -28,7 +31,7 @@ public class NTFSFileSystemType implements FileSystemType {
 	 * @see org.jnode.fs.FileSystemType#supports(org.jnode.fs.partitions.PartitionTableEntry,
 	 *      byte[])
 	 */
-	public boolean supports(PartitionTableEntry pte, byte[] firstSector) {
+	public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
 		return new String(firstSector, 0x03, 8).startsWith(TAG);
 	}
 	/*
