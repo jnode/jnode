@@ -54,7 +54,8 @@ public abstract class VmHeapManager extends VmSystemObject {
 	 * @return The new instance
 	 */
 	public final Object newInstance(VmType cls) {
-		cls.link();
+		//cls.link();
+		cls.initialize();
 		return newInstance(cls, ((VmNormalClass)cls).getObjectSize());
 	}
 
