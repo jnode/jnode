@@ -37,7 +37,7 @@ public class Ext2FileSystem implements FileSystem {
 	private final Object groupDescriptorLock;
 	private final Object superblockLock;
 	
-	private final boolean DEBUG=true;
+	//private final boolean DEBUG=true;
 	
 	private int mode;
 	public static final int RO = 0;	//read-only mode
@@ -241,7 +241,7 @@ public class Ext2FileSystem implements FileSystem {
 			throw new IOException("Filesystem is mounted read-only!"); 
 			
 		Block block;
-		int blockSize = superblock.getBlockSize();
+		/*int blockSize =*/ superblock.getBlockSize();
 		
 		Integer key=new Integer((int)nr);
 		//check if the block is in the cache
@@ -283,6 +283,7 @@ public class Ext2FileSystem implements FileSystem {
 			}
 	}
 	
+	private static final long TIMEOUT = 100;
 	/**
 	 * timedWrite writes to disk and waits for timeout, if the operation does not finish
 	 * in time, restart it.
@@ -290,7 +291,6 @@ public class Ext2FileSystem implements FileSystem {
 	 * @param nr		the number of the block to write
 	 * @param data		the data in the block
 	 */
-	private static final long TIMEOUT = 100;
 	private void timedWrite(long nr, byte[] data) throws IOException{
 		boolean finished = false;
 		Timer writeTimer;
@@ -346,7 +346,7 @@ public class Ext2FileSystem implements FileSystem {
 		if((iNodeNr<1)||(iNodeNr>superblock.getINodesCount()))
 			throw new FileSystemException("INode number ("+iNodeNr+") out of range (0-"+superblock.getINodesCount()+")");
 			
-		Integer key=new Integer((int)iNodeNr);
+		Integer key=new Integer(iNodeNr);
 		
 		//log.debug("iNodeCache size: "+inodeCache.size());
 		
@@ -449,10 +449,10 @@ public class Ext2FileSystem implements FileSystem {
 		//a free inode has been found: create the inode and write it into the inode table			
 		long iNodeTableBlock  = groupDescriptors[preferredBlockBroup].getInodeTable();	//the first block of the inode table
 		INodeTable iNodeTable = new INodeTable(this, (int)iNodeTableBlock);
-		byte[] iNodeData = new byte[INode.INODE_LENGTH];
+		//byte[] iNodeData = new byte[INode.INODE_LENGTH];
 		int iNodeNr = res.getINodeNr((int)superblock.getINodesPerGroup());
 		INode iNode = new INode(this, 
-								new INodeDescriptor(iNodeTable, (int)iNodeNr, groupNr, res.getIndex()),
+								new INodeDescriptor(iNodeTable, iNodeNr, groupNr, res.getIndex()),
 								fileFormat, accessRights,
 								uid, gid);		
 		//trigger a write to disk
@@ -578,9 +578,9 @@ public class Ext2FileSystem implements FileSystem {
 	 * First check for a whole byte of free blocks (0x00) in the bitmap, then 
 	 * check for any free bit. If blocks are found, mark them as allocated.
 	 * 
-	 * @return:	the index of the block (from the beginning of the partition)
-	 * @param: int group: the block group to check
-	 * @param: int threshold: 	find the free blocks only if there are at least
+	 * @return	the index of the block (from the beginning of the partition)
+	 * @param group the block group to check
+	 * @param threshold 	find the free blocks only if there are at least
 	 * 							<code>threshold</code> number of free blocks
 	 */
 	public BlockReservation findFreeBlocks(int group, long threshold) throws IOException{

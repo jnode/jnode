@@ -63,7 +63,7 @@ public class Block {
 
 	/**
 	 * Set the dirty flag.
-	 * @param boolean
+	 * @param b 
 	 */
 	public void setDirty(boolean b) {
 		dirty = b;

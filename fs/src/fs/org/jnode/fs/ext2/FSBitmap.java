@@ -14,7 +14,7 @@ public class FSBitmap {
 	private static final boolean DEBUG=true;	
 	/**
 	 * Check if the block/inode is free according to the bitmap.
-	 * @param int index: the index of the block/inode relative to the block group 
+	 * @param index the index of the block/inode relative to the block group 
 	 * 		  (not relative to the whole fs)
 	 * @return true if the block/inode is free, false otherwise
 	 */
