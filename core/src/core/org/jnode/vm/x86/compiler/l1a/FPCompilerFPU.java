@@ -8,6 +8,8 @@ import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
+import org.jnode.assembler.x86.X86Register.GPR32;
+import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.system.BootLog;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
@@ -482,7 +484,12 @@ final class FPCompilerFPU extends FPCompiler {
 				final int offset = idx.getValue() * 4;
 				os.writeFLD32(refr, offset + arrayDataOffset);
 			} else {
-				final GPR idxr = idx.getRegister();
+				GPR idxr = idx.getRegister();
+                if (os.isCode64()) {
+                    final GPR64 idxr64 = (GPR64)ec.getGPRPool().getRegisterInSameGroup(idxr, JvmType.LONG);
+                    os.writeMOVSXD(idxr64, (GPR32)idxr);
+                    idxr = idxr64;
+                }
 				os.writeFLD32(refr, idxr, 4, arrayDataOffset);
 			}
 		} else {
@@ -490,7 +497,12 @@ final class FPCompilerFPU extends FPCompiler {
 				final int offset = idx.getValue() * 8;
 				os.writeFLD64(refr, offset + arrayDataOffset);
 			} else {
-				final GPR idxr = idx.getRegister();
+				GPR idxr = idx.getRegister();
+                if (os.isCode64()) {
+                    final GPR64 idxr64 = (GPR64)ec.getGPRPool().getRegisterInSameGroup(idxr, JvmType.LONG);
+                    os.writeMOVSXD(idxr64, (GPR32)idxr);
+                    idxr = idxr64;
+                }
 				os.writeFLD64(refr, idxr, 8, arrayDataOffset);
 			}
 		}

@@ -70,7 +70,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 		case Kind.GPR:
 			res = L1AHelper.requestWordRegister(ec, getType(), false);
 			final GPR r = res.getRegister();
-			os.writeMOV(INTSIZE, r, gpr);
+			os.writeMOV(gpr.getSize(), r, gpr);
 			break;
 
 		case Kind.LOCAL:

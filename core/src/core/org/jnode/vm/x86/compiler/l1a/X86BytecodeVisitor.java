@@ -28,6 +28,7 @@ import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Operation;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
+import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.system.BootLog;
 import org.jnode.vm.JvmType;
@@ -660,14 +661,18 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
         final int slotSize = helper.SLOTSIZE;
         final int asize = helper.ADDRSIZE;
         
-		/* TIB -> tmp */
+		// TIB -> tmp
 		os.writeMOV(asize, tmpr, objectr, tibOffset);
-		/* SuperClassesArray -> tmp */
+		// SuperClassesArray -> tmp
 		os.writeMOV(asize, tmpr, tmpr, arrayDataOffset
 				+ (TIBLayout.SUPERCLASSES_INDEX * slotSize));
-		/* SuperClassesArray.length -> cntr */
-		os.writeMOV(asize, cntr, tmpr, arrayLengthOffset);
-		/* &superClassesArray[cnt-1] -> tmpr */
+		// SuperClassesArray.length -> cntr 
+		os.writeMOV(BITS32, cntr, tmpr, arrayLengthOffset);
+		// &superClassesArray[cnt-1] -> tmpr
+        if (os.isCode64()) {
+            // the MOV to cntr already zero-extends it, so no extension needed.
+            cntr = L1AHelper.get64BitReg(eContext, cntr);
+        }
 		os.writeLEA(tmpr, tmpr, cntr, slotSize, arrayDataOffset - slotSize);
 
 		os.setObjectRef(loopLabel);
@@ -800,7 +805,14 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			final int offset = index.getValue() * scale;
 			os.writeLEA(dst, refr, arrayDataOffset + offset);
 		} else {
-			os.writeLEA(dst, refr, index.getRegister(), scale, arrayDataOffset);
+            final GPR32 idxr = (GPR32)index.getRegister();
+            if (os.isCode32()) {
+                os.writeLEA(dst, refr, idxr, scale, arrayDataOffset);
+            } else {
+                final GPR64 idxr64 = (GPR64)eContext.getGPRPool().getRegisterInSameGroup(idxr, JvmType.LONG);
+                os.writeMOVSXD(idxr64, (GPR32)idxr);
+                os.writeLEA(dst, refr, idxr64, scale, arrayDataOffset);
+            }
 		}
 	}
 
@@ -2705,7 +2717,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		// Load
 		idx.load(eContext);
 		ref.load(eContext);
-		final GPR idxr = idx.getRegister();
+		GPR idxr = idx.getRegister();
 		final GPR refr = ref.getRegister();
 
 		// Verify
@@ -2714,6 +2726,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		// Get data
 		final DoubleWordItem result = L1AHelper.requestDoubleWordRegisters(
 				eContext, JvmType.LONG);
+        if (os.isCode64()) {
+            final GPR64 idxr64 = (GPR64)eContext.getGPRPool().getRegisterInSameGroup(idxr, JvmType.LONG);
+            os.writeMOVSXD(idxr64, (GPR32)idxr);
+            idxr = idxr64;
+        }
 		os.writeLEA(refr, refr, idxr, 8, arrayDataOffset);
 		if (os.isCode32()) {
 			os.writeMOV(INTSIZE, result.getLsbRegister(eContext), refr, LSB);
@@ -3612,7 +3629,12 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			final int offset = idx.getValue() * scale;
 			os.writeMOV(valSize, resultr, refr, offset + arrayDataOffset);
 		} else {
-			final GPR idxr = idx.getRegister();
+			GPR idxr = idx.getRegister();
+            if (os.isCode64()) {
+                final GPR64 idxr64 = (GPR64)eContext.getGPRPool().getRegisterInSameGroup(idxr, JvmType.LONG);
+                os.writeMOVSXD(idxr64, (GPR32)idxr);
+                idxr = idxr64;
+            }
 			os.writeMOV(valSize, resultr, refr, idxr, scale, arrayDataOffset);
 		}
 
@@ -3696,6 +3718,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		ref.load(eContext);
 		final GPR refr = ref.getRegister();
 		final GPR valr = val.getRegister();
+        final X86RegisterPool pool = eContext.getGPRPool();
 
 		// Verify
 		checkBounds(ref, idx);
@@ -3705,7 +3728,12 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			final int offset = idx.getValue() * scale;
 			os.writeMOV(valSize, refr, offset + arrayDataOffset, valr);
 		} else {
-			final GPR idxr = idx.getRegister();
+			GPR idxr = idx.getRegister();
+            if (os.isCode64()) {
+                final GPR64 idxr64 = (GPR64)pool.getRegisterInSameGroup(idxr, JvmType.LONG);
+                os.writeMOVSXD(idxr64, (GPR32)idxr);
+                idxr = idxr64;
+            }
 			os.writeMOV(valSize, refr, idxr, scale, arrayDataOffset, valr);
 		}
 
@@ -3713,8 +3741,12 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		if ((jvmType == JvmType.REFERENCE) && useBarrier) {
 			// the write barrier could easily be modified to avoid using a
 			// scratch register
-			final X86RegisterPool pool = eContext.getGPRPool();
-			final GPR idxr = idx.getRegister();
+			final GPR idxr;
+            if (os.isCode32()) {
+                idxr = idx.getRegister();
+            } else {
+                idxr = (GPR)eContext.getGPRPool().getRegisterInSameGroup(idx.getRegister(), JvmType.LONG);                
+            }
 			final GPR scratch = (GPR) pool.request(JvmType.INT);
 			helper.writeArrayStoreWriteBarrier(refr, idxr, valr, scratch);
 			pool.release(scratch);
