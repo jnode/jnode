@@ -113,4 +113,16 @@ public interface EEPRO100Constants {
     final static int PortSelfTest = 1;
     final static int PortPartialReset = 2;
     final static int PortDump = 3;
+    
+    final static int RxComplete = 0x8000;
+    final static int RxOK = 0x2000;
+	final static int RxErrCRC = 0x0800;
+	final static int RxErrAlign = 0x0400; 
+	final static int RxErrTooBig = 0x0200; 
+	final static int RxErrSymbol = 0x0010;
+	final static int RxEth2Type = 0x0020;
+	final static int RxNoMatch = 0x0004;
+	final static int RxNoIAMatch = 0x0002;
+    final static int TxUnderrun = 0x1000; 
+    final static int StatusComplete = 0x8000;
 }

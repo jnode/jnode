@@ -5,7 +5,6 @@
 package org.jnode.driver.net.eepro100;
 
 import org.apache.log4j.Logger;
-import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 
 /**
@@ -16,22 +15,26 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 
     protected final Logger log = Logger.getLogger(getClass());
 
+    //static final public int RX_NR_FRAME = 32;
     static final public int DATA_BUFFER_SIZE = 1536;
 
     public EEPRO100TxFD[] txRing = new EEPRO100TxFD[TX_RING_SIZE];
     public EEPRO100RxFD[] rxRing = new EEPRO100RxFD[RX_RING_SIZE];
     EEPRO100RxFD[] rxPackets = new EEPRO100RxFD[128];
-    //private int tx_threshold;
+    
+    private int txThreshold = 0x01200000;
     private int curTx;
     private int curRx;
     private int dirtyTx;
     private int dirtyRx;
+    
 
     private EEPRO100RxFD last_rxf;
     private int rxPacketIndex;
 
-    byte[] data;
-    MemoryResource mem;
+    ResourceManager rm;
+    
+    
 
     /**
      *  
@@ -40,9 +43,6 @@ public class EEPRO100Buffer implements EEPRO100Constants {
         /* Set up the Tx queue early.. */
 		curTx = 0;
 		dirtyTx = 0;
-        
-        this.data = new byte[DATA_BUFFER_SIZE];
-        this.mem = rm.asMemoryResource(data);
     }
 
     /* Initialize the Rx and Tx rings, along with various 'dev' bits. */
@@ -54,7 +54,7 @@ public class EEPRO100Buffer implements EEPRO100Constants {
         rxPacketIndex = 0;
 
         for (i = 0; i < rxPackets.length; i++)
-            rxPackets[i] = new EEPRO100RxFD(mem);
+            rxPackets[i] = new EEPRO100RxFD(this.rm);
 
         log.debug("rxPacket 0: " + Integer.toHexString(rxPackets[0].getBufferAddress()));
 
@@ -83,12 +83,14 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 
     public final void initTxRing() {
         for (int i = 0; i < txRing.length; i++) {
-            //txRing[i] = new TxFD();
+            txRing[i] = new EEPRO100TxFD(rm);
         }
-        //log.debug("txRing:"+
-        // Integer.toHexString(txRing[0].getBufferAddress()));
+        //log.debug("txRing:"+ Integer.toHexString(txRing[0].getFirstDPDAddress()));
 
     }
+           
+    //--- Accessors ---
+    
     /**
      * @return Returns the curRx.
      */
@@ -136,5 +138,17 @@ public class EEPRO100Buffer implements EEPRO100Constants {
      */
     public void setDirtyTx(int dirtyTx) {
         this.dirtyTx = dirtyTx;
+    }
+    /**
+     * @return Returns the txThreshold.
+     */
+    public int getTxThreshold() {
+        return txThreshold;
+    }
+    /**
+     * @param txThreshold The txThreshold to set.
+     */
+    public void setTxThreshold(int txThreshold) {
+        this.txThreshold = txThreshold;
     }
 }

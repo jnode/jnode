@@ -66,7 +66,8 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
     /** Enable congestion control in the DP83840. */
     final static boolean congenb = false;
 
-    
+    /** */
+    boolean txFull;
 
     /**
      * Create a new instance and allocate all resources
@@ -103,7 +104,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
         // Initialize registers.
         regs = new EEPRO100Registers(iobase, io);
         // Initialize statistical counters.
-        stats = new EEPRO100Stats(rm,regs);
+        stats = new EEPRO100Stats(rm, regs);
         // Initialize RX/TX Buffers.
         RxTxBuffer = new EEPRO100Buffer(rm);
 
@@ -164,50 +165,42 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
         log.debug("Board assembly " + Integer.toHexString(eeprom[8]) + " " + Integer.toHexString(eeprom[9] >> 8) + "  " + (eeprom[9] & 0xff) + " connectors present: ");
         for (i = 0; i < 4; i++) {
             if ((eeprom[5] & (1 << i)) != 0) log.debug(connectors[i]);
-            log.debug("Primary interface chip " + (phys[(eeprom[6] >> 8) & 15]));
-            log.debug(" PHY #" + (eeprom[6] & 0x1f));
-            if ((eeprom[7] & 0x0700) != 0) {
-                log.debug("Secondary interface chip " + (phys[(eeprom[7] >> 8) & 7]));
-            }
-
-            if (((eeprom[6] >> 8) & 0x3f) == DP83840 || ((eeprom[6] >> 8) & 0x3f) == DP83840A) {
-                int mdi_reg23 = mdioRead(eeprom[6] & 0x1f, 23) | 0x0422;
-                if (congenb) mdi_reg23 |= 0x0100;
-                log.debug("DP83840 specific setup, setting register 23 to " + Integer.toHexString(mdi_reg23));
-                mdioWrite(eeprom[6] & 0x1f, 23, mdi_reg23);
-            }
-            if ((option >= 0) && (option & 0x330) != 0) {
-                log.debug("  Forcing " + ((option & 0x300) != 0 ? 100 : 10) + "Mbs " + ((option & 0x220) != 0 ? "full" : "half") + "-duplex operation.");
-                mdioWrite(eeprom[6] & 0x1f, 0, ((option & 0x300) != 0 ? 0x2000 : 0) | /* 100mbps? */
-                ((option & 0x220) != 0 ? 0x0100 : 0)); /* Full duplex? */
-            } else {
-                int mii_bmcrctrl = mdioRead(eeprom[6] & 0x1f, 0);
-                /* Reset out of a transceiver left in 10baseT-fixed mode. */
-                if ((mii_bmcrctrl & 0x3100) == 0) mdioWrite(eeprom[6] & 0x1f, 0, 0x8000);
-            }
         }
+        log.debug("Primary interface chip " + (phys[(eeprom[6] >> 8) & 15]));
+        log.debug(" PHY #" + (eeprom[6] & 0x1f));
+        if ((eeprom[7] & 0x0700) != 0) log.debug("Secondary interface chip " + (phys[(eeprom[7] >> 8) & 7]));
 
+        if (((eeprom[6] >> 8) & 0x3f) == DP83840 || ((eeprom[6] >> 8) & 0x3f) == DP83840A) {
+            int mdi_reg23 = mdioRead(eeprom[6] & 0x1f, 23) | 0x0422;
+            if (congenb) mdi_reg23 |= 0x0100;
+            log.debug("DP83840 specific setup, setting register 23 to " + Integer.toHexString(mdi_reg23));
+            mdioWrite(eeprom[6] & 0x1f, 23, mdi_reg23);
+        }
+        if ((option >= 0) && (option & 0x330) != 0) {
+            log.debug("  Forcing " + ((option & 0x300) != 0 ? 100 : 10) + "Mbs " + ((option & 0x220) != 0 ? "full" : "half") + "-duplex operation.");
+            mdioWrite(eeprom[6] & 0x1f, 0, ((option & 0x300) != 0 ? 0x2000 : 0) | /* 100mbps? */
+            ((option & 0x220) != 0 ? 0x0100 : 0)); /* Full duplex? */
+        } else {
+            int mii_bmcrctrl = mdioRead(eeprom[6] & 0x1f, 0);
+            log.debug("Reset out of a transceiver left in 10baseT-fixed mode.");
+            if ((mii_bmcrctrl & 0x3100) == 0) mdioWrite(eeprom[6] & 0x1f, 0, 0x8000);
+        }
+        /* Perform a system self-test. */
         byte[] data = new byte[32];
         MemoryResource selfTest = rm.asMemoryResource(data);
-
-        /* Perform a system self-test. */
         log.debug("self test: " + Integer.toHexString(Address.as32bit(selfTest.getAddress())));
-
         regs.setReg32(SCBPort, Address.as32bit(selfTest.getAddress()) | PortSelfTest);
-        selfTest.setInt(2, 0); // rom signature
-        selfTest.setInt(0, -1); //status
-        int boguscnt = 16000; // Timeout for set-test.
+        /* rom signature */
+        selfTest.setShort(2, (short) 0);
+        /* Status */
+        selfTest.setShort(0, (short) -1);
+        /* Timeout for self-test */
+        int boguscnt = 16000;
         do {
             systemDelay(10);
-            int i0 = 100;
-            while (i0-- > 0)
-                ;
         } while (selfTest.getInt(0) == -1 && --boguscnt >= 0);
 
-        StringBuffer sb = new StringBuffer();
-
         if (boguscnt < 0) {
-            /* Test optimized out. */
             log.debug("Self test failed, status" + Long.toHexString(selfTest.getLong(4)) + "Failure to initialize the i82557.");
             log.debug("Verify that the card is a bus-master capable slot.");
         } else {
@@ -216,34 +209,16 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
             log.debug("Serial sub-system self-test: " + ((results & 0x0020) == 0 ? "failed" : "passed"));
             log.debug("Internal registers self-test:" + ((results & 0x0008) == 0 ? "failed" : "passed"));
             log.debug(" ROM checksum self-test:" + ((results & 0x0004) == 0 ? "failed" : "passed") + "(" + Integer.toHexString(selfTest.getInt(2)) + ")");
-            log.debug(sb.toString());
-            sb.setLength(0);
         }
-
         /* reset adapter to default state */
         regs.setReg32(SCBPort, PortReset);
         systemDelay(100);
-        // 	pci_dev = pdev;
-        // 	chip_id = chip_idx;
-        // 	drv_flags = pci_id_tbl[chip_idx].drv_flags;
-        // 	acpi_pwr = acpi_idle_state;
-
-        /*
-         * full_duplex = option >= 0 && (option & 0x220) ? 1 : 0; if (card_idx >=
-         * 0) { if (full_duplex[card_idx] >= 0) full_duplex =
-         * full_duplex[card_idx]; } if (full_duplex) medialock = 1;
-         */
-
-        // 		phy[0] = eeprom[6];
-        // 		phy[1] = eeprom[7];
-        // 		rxBug = (eeprom[3] & 0x03) == 3;
-        // 		if (rxBug)
-        // 			System.out.println("Receiver lock-up workaround activated.");
-    } /*
-       * (non-Javadoc)
-       * 
-       * @see org.jnode.driver.net.AbstractDeviceCore#getHwAddress()
-       */
+    }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.jnode.driver.net.AbstractDeviceCore#getHwAddress()
+     */
     public HardwareAddress getHwAddress() {
         return hwAddress;
     }
@@ -265,11 +240,8 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
         //setupInterrupt();
         /* Fire up the hardware. */
         //resume();
-
         //rx_mode = -1; /* Invalid -> always reset the mode. */
-
         //setRxMode();
-
         log.debug(this.flags.getName() + ": Done open(), status ");
     }
 
@@ -304,10 +276,84 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
         // TODO Auto-generated method stub
         // Set the source address
         hwAddress.writeTo(buf, 6);
+
     }
 
     public void handleInterrupt(int irq) {
-        // TODO Not yet implemented
+        int bogusCount = 20;
+        int status;
+
+        if ((RxTxBuffer.getCurRx() - RxTxBuffer.getDirtyRx()) > 15) {
+            log.debug("curRx > dirtyRx " + RxTxBuffer.getCurRx() + " " + RxTxBuffer.getDirtyRx());
+            //showstate();
+        }
+
+        do {
+            status = regs.getReg16(SCBStatus);
+            regs.setReg16(SCBStatus, status & IntrAllNormal);
+            if ((status & IntrAllNormal) == 0) break;
+            if ((status & (IntrRxDone | IntrRxSuspend)) != 0)
+            /* rx() */;
+
+            if ((status & (IntrCmdDone | IntrCmdIdle | IntrDrvrIntr)) != 0) {
+                int dirtyTx0;
+                dirtyTx0 = RxTxBuffer.getDirtyTx();
+                while ((RxTxBuffer.getCurTx() - dirtyTx0) > 0) {
+                    int entry = dirtyTx0 & (TX_RING_SIZE - 1);
+                    status = RxTxBuffer.txRing[entry].getStatus();
+                    if ((status & StatusComplete) == 0) {
+                        if ((RxTxBuffer.getCurTx() - dirtyTx0) > 0 && (RxTxBuffer.txRing[(dirtyTx0 + 1) & TX_RING_SIZE - 1].getStatus() & StatusComplete) != 0) {
+                            log.debug("Command unit failed to mark command." + NumberUtils.hex(status) + "as complete at " + RxTxBuffer.getDirtyTx());
+                        } else {
+                            break;
+                        }
+
+                    }
+
+                    if ((status & TxUnderrun) != 0) {
+                        if (RxTxBuffer.getTxThreshold() < 0x01e00000) {
+                            RxTxBuffer.setTxThreshold(RxTxBuffer.getTxThreshold() + 0x00040000);
+                        }
+                    }
+                    if ((status & 0x70000) == CmdNOp) {
+                        //mc_setup_busy = 0;
+                    }
+                    dirtyTx0++;
+                }
+                if (RxTxBuffer.getCurTx() - dirtyTx0 > TX_RING_SIZE) {
+                    log.debug("out-of-sync dirty pointer, " + dirtyTx0 + " vs. " + RxTxBuffer.getCurTx() + " full=" + txFull);
+                    dirtyTx0 += TX_RING_SIZE;
+                }
+
+                RxTxBuffer.setDirtyTx(dirtyTx0);
+                if (txFull && RxTxBuffer.getCurTx() - RxTxBuffer.getDirtyTx() < TX_QUEUE_UNFULL) {
+                    /*
+                     * The ring is no longer full, clear tbusy.
+                     */
+                    txFull = false;
+                    // netif_resume_tx_queue(dev);
+                }
+            }
+            if ((status & IntrRxSuspend) != 0) {
+                //interruptError(status);
+            }
+
+            if (--bogusCount < 0) {
+                /*
+                 * StringBuffer sb = new StringBuffer();
+                 * sb.append(name).append(": Too much work at interrupt,
+                 * status="); sb.append(Integer.toHexString(status));
+                 * System.out.println(sb.toString());
+                 */
+                /*
+                 * Clear all interrupt sources.
+                 */
+                regs.setReg16(SCBStatus, 0xfc00);
+                break;
+            }
+
+        } while (true);
+        return;
     }
 
     //--- PRIVATE METHODS ---
@@ -425,7 +471,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
     //--- MD IO METHODS
 
     final int mdioRead(int phy_id, int location) {
-        int val, boguscnt = 7; /* <64 usec. to complete, typ 27 ticks */
+        int val, boguscnt = 64; /* <64 usec. to complete, typ 27 ticks */
         regs.setReg32(SCBCtrlMDI, 0x08000000 | (location << 16) | (phy_id << 21));
         do {
             systemDelay(10);
@@ -439,7 +485,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
     }
 
     final int mdioWrite(int phy_id, int location, int value) {
-        int val, boguscnt = 7; /* <64 usec. to complete, typ 27 ticks */
+        int val, boguscnt = 64; /* <64 usec. to complete, typ 27 ticks */
         regs.setReg32(SCBCtrlMDI, 0x04000000 | (location << 16) | (phy_id << 21) | value);
         do {
             systemDelay(10);
