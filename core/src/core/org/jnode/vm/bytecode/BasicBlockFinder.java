@@ -17,7 +17,7 @@ import org.jnode.vm.classmgr.VmMethod;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Madhu Siddalingaiah
  */
-class BasicBlockFinder extends BytecodeVisitorSupport {
+public class BasicBlockFinder extends BytecodeVisitorSupport {
 
 	public static final byte F_START_OF_BASICBLOCK = 0x0001;
 	public static final byte F_START_OF_TRYBLOCK = 0x0002;
@@ -28,8 +28,6 @@ class BasicBlockFinder extends BytecodeVisitorSupport {
 	private final ArrayList blocks = new ArrayList();
 	private byte[] opcodeFlags;
 	private boolean nextIsStartOfBB;
-	private BasicBlock currentBlock;
-	private boolean nextIsSuccessor = true;
 
 	/**
 	 * Create all determined basic blocks
@@ -78,7 +76,7 @@ class BasicBlockFinder extends BytecodeVisitorSupport {
 		final int length = bc.getLength();
 		opcodeFlags = new byte[length];
 		// The first instruction is always the start of a BB.
-		this.currentBlock = startBB(0);
+		startBB(0);
 		// The exception handler also start a basic block
 		for (int i = 0; i < bc.getNoExceptionHandlers(); i++) {
 			VmInterpretedExceptionHandler eh = bc.getExceptionHandler(i);
@@ -206,7 +204,6 @@ class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_goto(int address) {
 		addBranch(address);
-		nextIsSuccessor = false;
 	}
 
 	/**
@@ -265,7 +262,6 @@ class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_athrow() {
 		endBB();
-		nextIsSuccessor = false;
 	}
 
 	/**
@@ -273,7 +269,6 @@ class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_areturn() {
 		endBB();
-		nextIsSuccessor = false;
 	}
 
 	/**
@@ -281,7 +276,6 @@ class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_dreturn() {
 		endBB();
-		nextIsSuccessor = false;
 	}
 
 	/**
@@ -289,7 +283,6 @@ class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_freturn() {
 		endBB();
-		nextIsSuccessor = false;
 	}
 
 	/**
@@ -297,7 +290,6 @@ class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_ireturn() {
 		endBB();
-		nextIsSuccessor = false;
 	}
 
 	/**
@@ -305,7 +297,6 @@ class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_lreturn() {
 		endBB();
-		nextIsSuccessor = false;
 	}
 
 	/**
@@ -314,7 +305,6 @@ class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_ret(int index) {
 		endBB();
-		nextIsSuccessor = false;
 	}
 
 	/**
@@ -322,7 +312,6 @@ class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_return() {
 		endBB();
-		nextIsSuccessor = false;
 	}
 
 	/**
@@ -331,10 +320,7 @@ class BasicBlockFinder extends BytecodeVisitorSupport {
 	 * @param target
 	 */
 	private final void addBranch(int target) {
-		BasicBlock pred = this.currentBlock;
-		BasicBlock succ = startBB(target);
-		pred.addSuccessor(succ);
-		succ.addPredecessor(pred);
+		startBB(target);
 		endBB();
 	}
 
@@ -353,28 +339,8 @@ class BasicBlockFinder extends BytecodeVisitorSupport {
 		super.startInstruction(address);
 		opcodeFlags[address] |= F_START_OF_INSTRUCTION;
 		if (nextIsStartOfBB) {
-			BasicBlock pred = this.currentBlock;
-			this.currentBlock = startBB(address);
-			if (nextIsSuccessor) {
-				pred.addSuccessor(this.currentBlock);
-				this.currentBlock.addPredecessor(pred);
-			}
-			nextIsSuccessor = true;
+			startBB(address);
 			nextIsStartOfBB = false;
-		} else if (address != currentBlock.getStartPC() &&
-			(opcodeFlags[address] & F_START_OF_BASICBLOCK) != 0 && nextIsSuccessor) {
-
-			int n = blocks.size();
-			for (int i=0; i<n; i+=1) {
-				BasicBlock bb = (BasicBlock) blocks.get(i);
-				if (bb.getStartPC() == address) {
-					BasicBlock pred = this.currentBlock;
-					this.currentBlock = bb;
-					pred.addSuccessor(this.currentBlock);
-					this.currentBlock.addPredecessor(pred);
-					break;
-				}
-			}
 		}
 	}
 
@@ -383,23 +349,11 @@ class BasicBlockFinder extends BytecodeVisitorSupport {
 	 * 
 	 * @param address
 	 */
-	private final BasicBlock startBB(int address) {
-		BasicBlock next = null;
+	private final void startBB(int address) {
 		if ((opcodeFlags[address] & F_START_OF_BASICBLOCK) == 0) {
 			opcodeFlags[address] |= F_START_OF_BASICBLOCK;
-			next = new BasicBlock(address);
-			blocks.add(next);
-		} else {
-			int n = blocks.size();
-			for (int i=0; i<n; i+=1) {
-				BasicBlock bb = (BasicBlock) blocks.get(i);
-				if (bb.getStartPC() == address) {
-					next = bb;
-					break;
-				}
-			}
+			blocks.add(new BasicBlock(address));
 		}
-		return next;
 	}
 
 	private final boolean isStartOfBB(int address) {
