@@ -3,12 +3,8 @@
  */
 package org.jnode.awt.swingpeers;
 
-import java.awt.AWTEvent;
-import java.awt.BufferCapabilities;
 import java.awt.Component;
-import java.awt.Image;
 import java.awt.Label;
-import java.awt.event.PaintEvent;
 import java.awt.peer.LabelPeer;
 
 import javax.swing.JLabel;
@@ -26,10 +22,9 @@ class SwingLabelPeer extends SwingComponentPeer implements LabelPeer, SwingPeer 
 	//
 
 	public SwingLabelPeer(SwingToolkit toolkit, Label label) {
-        super(toolkit, label);
-        JLabel jLabel = new JLabel();
+        super(toolkit, label, new JLabel());
+        final JLabel jLabel = (JLabel)jComponent;
 		this.label = label;
-        jComponent = jLabel;
 		SwingToolkit.add(label, jLabel);
 		SwingToolkit.copyAwtProperties(label, jLabel);
 		setText(label.getText());

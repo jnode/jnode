@@ -25,10 +25,9 @@ class SwingListPeer extends SwingComponentPeer implements ListPeer, SwingPeer {
 	//
 
 	public SwingListPeer(SwingToolkit toolkit, final List list) {
-        super(toolkit, list);
+        super(toolkit, list, new JList());
 		this.list = list;
-        JList jList = new JList();
-        jComponent = jList;
+        final JList jList = (JList)jComponent;
 		SwingToolkit.add(list, jList);
 		SwingToolkit.copyAwtProperties(list, jList);
 		final ListModel model = new AbstractListModel() {

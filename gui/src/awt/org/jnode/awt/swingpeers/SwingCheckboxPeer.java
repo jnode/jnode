@@ -3,13 +3,9 @@
  */
 package org.jnode.awt.swingpeers;
 
-import java.awt.AWTEvent;
-import java.awt.BufferCapabilities;
 import java.awt.Checkbox;
 import java.awt.CheckboxGroup;
 import java.awt.Component;
-import java.awt.Image;
-import java.awt.event.PaintEvent;
 import java.awt.peer.CheckboxPeer;
 
 import javax.swing.JCheckBox;
@@ -26,10 +22,9 @@ class SwingCheckboxPeer extends SwingComponentPeer implements CheckboxPeer, Swin
 	//
 
 	public SwingCheckboxPeer(SwingToolkit toolkit, Checkbox checkBox) {
-        super(toolkit, checkBox);
-        JCheckBox jcb = new JCheckBox();
+        super(toolkit, checkBox, new JCheckBox());
 		this.checkBox = checkBox;
-        jComponent = jcb;
+		final JCheckBox jcb = (JCheckBox)jComponent;
 		SwingToolkit.add(checkBox, jcb);
 		SwingToolkit.copyAwtProperties(checkBox, jcb);
 		jcb.setText(checkBox.getLabel());

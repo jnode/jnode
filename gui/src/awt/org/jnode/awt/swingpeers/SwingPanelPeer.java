@@ -3,20 +3,9 @@
  */
 package org.jnode.awt.swingpeers;
 
-import org.jnode.awt.JNodeGraphics;
-import org.jnode.awt.JNodeToolkit;
-
-import java.awt.AWTEvent;
-import java.awt.BufferCapabilities;
 import java.awt.Component;
-import java.awt.Image;
-import java.awt.Panel;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.EventQueue;
-import java.awt.Rectangle;
 import java.awt.Insets;
-import java.awt.event.PaintEvent;
+import java.awt.Panel;
 import java.awt.peer.PanelPeer;
 
 import javax.swing.JComponent;
@@ -36,9 +25,8 @@ class SwingPanelPeer extends SwingComponentPeer implements PanelPeer, SwingConta
 	//
 
 	public SwingPanelPeer(SwingToolkit toolkit, Panel panel) {
-        super(toolkit, panel);
-        JPanel jPanel = new JPanel();
-        jComponent = jPanel;
+        super(toolkit, panel, new JPanel());
+        final JPanel jPanel = (JPanel)jComponent;
 		this.panel = panel;
 		SwingToolkit.add(panel, jPanel);
 		SwingToolkit.copyAwtProperties(panel, jPanel);
