@@ -5,7 +5,7 @@ package org.jnode.fs.iso9660;
 
 import java.io.IOException;
 
-import org.jnode.fs.ntfs.NTFSUTIL;
+import org.jnode.util.LittleEndian;
 
 
 /**
@@ -23,8 +23,8 @@ public class EntryRecord
 	public EntryRecord(ISO9660Volume volume, byte[] buff, int offset)
 	{
 		this.volume = volume;
-		this.buff = new byte[Util.unsignedByteToInt(buff[offset])]; 
-		System.arraycopy(buff,offset,this.buff,0,Util.unsignedByteToInt(buff[offset]));
+		this.buff = new byte[LittleEndian.getUInt8(buff, offset)]; 
+		System.arraycopy(buff,offset,this.buff,0,LittleEndian.getUInt8(buff, offset));
 	}
 	public void readFileData(long offset,byte[] buffer,int bufferOffset, int size) throws IOException
 	{
@@ -36,9 +36,10 @@ public class EntryRecord
 		volume.readFromLBN(this.getLocationOfExtent(),0,buffer,0,this.getDataLength());
 		return buffer;
 	}
+
 	public int getLengthOfDirectoryEntry()
 	{
-		return Util.unsignedByteToInt(buff[0]);
+		return LittleEndian.getUInt8(buff, 0);
 	}
 	public int getLengthOfExtendedAttribute()
 	{
@@ -46,11 +47,11 @@ public class EntryRecord
 	}
 	public int getLocationOfExtent()
 	{
-		return NTFSUTIL.LE_READ_U32_INT(buff,2);
+		return (int)LittleEndian.getUInt32(buff,2);
 	}
 	public int getDataLength()
 	{
-		return NTFSUTIL.LE_READ_U32_INT(buff,10);
+		return (int)LittleEndian.getUInt32(buff,10);
 	}
 	public boolean isDirectory()
 	{

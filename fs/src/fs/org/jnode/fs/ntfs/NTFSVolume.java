@@ -131,7 +131,7 @@ public class NTFSVolume
 		NTFSNonResidentAttribute dataAttribute = (NTFSNonResidentAttribute) this.getMFTRecord().getAttribute(NTFSFileRecord.$DATA);
 		// find out the VCN
 		
-		int offset = this.getBootRecord().getBytesPerFileRecord() * (indexEntry.getFileReferenceNumber());
+		long offset = this.getBootRecord().getBytesPerFileRecord() * (indexEntry.getFileReferenceNumber());
 		
 		// read the buffer
 		byte [] buffer = null;
@@ -145,7 +145,7 @@ public class NTFSVolume
 					this,
 					NTFSUTIL.extractSubBuffer(
 								buffer,
-								offset % this.getClusterSize(),
+								(int)(offset % this.getClusterSize()),
 								this.getBootRecord().getBytesPerFileRecord())
 			); 
 		

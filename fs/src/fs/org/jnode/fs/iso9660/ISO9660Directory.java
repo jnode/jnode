@@ -13,9 +13,6 @@ import org.jnode.fs.FileSystem;
 
 /**
  * @author Chira
- *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
  */
 public class ISO9660Directory implements FSDirectory
 {
@@ -29,7 +26,7 @@ public class ISO9660Directory implements FSDirectory
 		this.entry = entry;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.fs.FSDirectory#iterator()
 	 */
 	public Iterator iterator() throws IOException
@@ -59,7 +56,7 @@ public class ISO9660Directory implements FSDirectory
 			
 		};
 	}
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.fs.FSDirectory#getEntry(java.lang.String)
 	 */
 	public FSEntry getEntry(String name) throws IOException
@@ -73,7 +70,7 @@ public class ISO9660Directory implements FSDirectory
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.fs.FSDirectory#addFile(java.lang.String)
 	 */
 	public FSEntry addFile(String name) throws IOException
@@ -81,7 +78,7 @@ public class ISO9660Directory implements FSDirectory
 		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.fs.FSDirectory#addDirectory(java.lang.String)
 	 */
 	public FSEntry addDirectory(String name) throws IOException
@@ -89,7 +86,7 @@ public class ISO9660Directory implements FSDirectory
 		throw new UnsupportedOperationException("Not yet implemented");	
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.fs.FSDirectory#remove(java.lang.String)
 	 */
 	public void remove(String name) throws IOException
@@ -97,7 +94,7 @@ public class ISO9660Directory implements FSDirectory
 		throw new UnsupportedOperationException("Not yet implemented");	
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.fs.FSObject#isValid()
 	 */
 	public boolean isValid()
@@ -105,7 +102,7 @@ public class ISO9660Directory implements FSDirectory
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.fs.FSObject#getFileSystem()
 	 */
 	public FileSystem getFileSystem()
