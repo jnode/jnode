@@ -5,6 +5,7 @@
 package org.jnode.net.command;
 
 import java.net.SocketException;
+import java.net.InetAddress;
 import java.util.Hashtable;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -49,7 +50,7 @@ public class PingCommand implements ICMPListener {
 
     private int ttl = 255;
 
-    static final HostArgument DST = new HostArgument("host", "the target host");
+    static final HostNameArgument DST = new HostNameArgument("host", "the target host");
 
     public static Help.Info HELP_INFO = new Help.Info(
             "ping",
@@ -62,8 +63,8 @@ public class PingCommand implements ICMPListener {
         cmd.execute();
     }
 
-    public PingCommand(IPv4Address destination) {
-        this.dst = destination;
+    public PingCommand(InetAddress destination) {
+        this.dst = new IPv4Address(destination);
     }
 
     public void execute() throws SocketException, InterruptedException {
