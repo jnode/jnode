@@ -8,6 +8,7 @@
         
   <requires>
     <import plugin="org.jnode.awt"/>
+    <import plugin="org.jnode.driver.pci"/>
     <import plugin="org.jnode.driver.video"/>
     <import plugin="org.jnode.driver.video.vgahw"/>
   </requires>
@@ -18,9 +19,13 @@
     </library>
   </runtime>
 
-  <extension point="org.jnode.driver.finders">
-    <finder class="org.jnode.driver.video.vga.VGAFinder"/>
+  <extension point="org.jnode.driver.mappers">
+    <mapper id="03:00" driver-class="org.jnode.driver.video.vga.VGADriver" class="org.jnode.driver.pci.PCIClassToDriverMapper"/>
   </extension>
+
+  <!-- extension point="org.jnode.driver....finders...">
+    <finder class="org.jnode.driver.video.vga.VGAFinder"/>
+  </extension -->
         
   <extension point="org.jnode.security.permissions">
     <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
