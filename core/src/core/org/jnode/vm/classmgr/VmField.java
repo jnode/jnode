@@ -40,8 +40,16 @@ public abstract class VmField extends VmMember {
 	 * Is this a field with a primitive type?
 	 * @return boolean
 	 */
-	public boolean isPrimitive() {
+	public final boolean isPrimitive() {
 		return primitive;
+	}
+	
+	/**
+	 * Is this a field transient?
+	 * @return boolean
+	 */
+	public final boolean isTransient() {
+		return ((this.getModifiers() & Modifier.ACC_TRANSIENT) != 0);
 	}
 	
 	/**
