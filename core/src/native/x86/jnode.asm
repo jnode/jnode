@@ -107,9 +107,9 @@ kernel_end:
 
 extern Luser_esp
 
-scr_ofs:		dd 0
+scr_ofs:		DA 0
 SPINLOCK		console_lock
-jnodeFinished:	dd 0
+jnodeFinished:	DA 0
 
 		align 4096
 	global vm_start

@@ -16,107 +16,104 @@
 ; -----------------------------------------------
 vm_athrow:
 	%if TRACE_ATHROW
-		push eax
-		push ebx
-		mov ebx,eax
+		push AAX
+		push ABX
+		mov ABX,AAX
 		
 		PRINT_STR vm_athrow_msg1
 		
-		mov eax,[ebx+ObjectLayout_TIB_SLOT*4] ; get TIB of exception
-		mov eax,[eax+VmArray_DATA_OFFSET*4] ; get class (vmt[0])
-		mov eax,[eax+VmType_NAME_OFS] ; get classname of exception
+		mov AAX,[ABX+ObjectLayout_TIB_SLOT*SLOT_SIZE] 	; get TIB of exception
+		mov AAX,[AAX+VmArray_DATA_OFFSET*4]				; get class (vmt[0])
+		mov AAX,[AAX+VmType_NAME_OFS] 					; get classname of exception
 		call vm_print_string
 		
 		PRINT_STR vm_athrow_msg2
 		
-		mov eax,[ebx+Throwable_DETAILMESSAGE_OFS] ; get message of exception
+		mov AAX,[ABX+Throwable_DETAILMESSAGE_OFS] ; get message of exception
 		call vm_print_string
 
-		pop ebx
-		pop eax
+		pop ABX
+		pop AAX
 	%endif
 	
 vm_athrow_notrace:
 	%if TRACE_ATHROW
-		push eax
 		; Show location of exception
-		mov eax,[esp+4]
-		call sys_print_eax
-		pop eax
+		PRINT_WORD [ASP+SLOT_SIZE]
 	%endif
 		
 	; Test for unhandled exception
-	test ebp,ebp
+	test ABP,ABP
 	jz vm_athrow_unhandled	
 	
 vm_athrow_notrace_pop_eip:
-	pop edx ; return address
-	lea edx,[edx-5] ; The call to this method is a 5 byte instruction
+	pop ADX				; return address
+	lea ADX,[ADX-5]		; The call to this method is a 5 byte instruction
 
-	push eax ; save exception
-	push edx ; save address
+	push AAX			; save exception
+	push ADX			; save address
 		
 	; Setup call to SoftByteCodes.findThrowableHandler
-	push eax ; exception
-	push ebp ; frame
-	push edx ; address
-	mov eax,vm_findThrowableHandler
+	push AAX			; exception
+	push ABP			; frame
+	push ADX			; address
+	mov AAX, vm_findThrowableHandler
 	INVOKE_JAVA_METHOD
 	; eax now contains the handler address of the exception, move it to ebx
-	mov ebx,eax
+	mov ABX,AAX
 	
-	pop edx ; restore address
-	pop eax ; restore exception
+	pop ADX				; restore address
+	pop AAX				; restore exception
 		
 vm_athrow_deliver_compiled:
-	test ebx,ebx
+	test ABX,ABX
 	jz vm_athrow_notrace_pop_eip	
 	; Jump to the compiled exception handler
-	jmp ebx
+	jmp ABX
 	
 vm_athrow_unhandled:
 	cli
 	PRINT_STR vm_athrow_msg4
-	mov ebx,eax
-	mov eax,[ebx+ObjectLayout_TIB_SLOT*4]
-	mov eax,[eax+VmArray_DATA_OFFSET*4]
-	mov eax,[eax+VmType_NAME_OFS]
+	mov ABX,AAX
+	mov AAX,[ABX+ObjectLayout_TIB_SLOT*SLOT_SIZE]
+	mov AAX,[AAX+VmArray_DATA_OFFSET*4]
+	mov AAX,[AAX+VmType_NAME_OFS]
 	call vm_print_string
-	mov eax,[ebx+Throwable_DETAILMESSAGE_OFS] ; get message of exception
+	mov AAX,[ABX+Throwable_DETAILMESSAGE_OFS] ; get message of exception
 	call vm_print_string
 	cli
 	hlt
 	ret
 	
 ; -----------------------------------------------
-; Print a java.lang.String in EAX
+; Print a java.lang.String in EAX/RAX
 ; -----------------------------------------------
 vm_print_string:
-	push eax
-	test eax,eax
+	push AAX
+	test AAX,AAX
 	jz vm_print_string_null
-	mov eax,[eax] ; String.char[] value -> eax
+	mov AAX,[AAX] ; String.char[] value -> eax
 	call vm_print_chararray
 	jmp vm_print_string_ret
 	
 vm_print_string_null:
 	PRINT_STR vm_print_chararray_msg1
 vm_print_string_ret:
-	pop eax
+	pop AAX
 	ret
 
 ; -----------------------------------------------
 ; Print a char array in who's reference is in EAX
 ; -----------------------------------------------
 vm_print_chararray:
-    push eax
-    push ecx
-    push esi
+    push AAX
+    push ACX
+    push ASI
     
-	cmp eax,0
+	test AAX,AAX
 	je vm_print_chararray_null
-	mov ecx,[eax+VmArray_LENGTH_OFFSET*4]
-	lea esi,[eax+VmArray_DATA_OFFSET*4]
+	mov ecx,[AAX+VmArray_LENGTH_OFFSET*4]
+	lea ASI,[AAX+VmArray_DATA_OFFSET*4]
 	cld
 	
 vm_print_chararray_loop:
@@ -131,9 +128,9 @@ vm_print_chararray_null:
 	PRINT_STR vm_print_chararray_msg1
 	
 vm_print_chararray_ret:
-	pop esi
-	pop ecx
-	pop eax
+	pop ASI
+	pop ACX
+	pop AAX
 	ret
 	
 ; -----------------------------------------------
@@ -143,30 +140,30 @@ vmint_print_stack:
 	mov ecx,MAX_STACK_TRACE_LENGTH
 
 vmint_print_stack_loop:
-	test ebp,ebp ; Test for bottom of stack
+	test ABP,ABP 					; Test for bottom of stack
 	jz vmint_print_stack_ret
 	dec ecx
 	jz vmint_print_stack_ret
 	
 	; Get the method of the current frame in EBX
-	mov ebx,[ebp+VmX86StackReader_METHOD_OFFSET] ; Note do not '*4'here, since it is a java constants
+	mov ABX,[ABP+VmX86StackReader_METHOD_OFFSET] ; Note do not '*4'here, since it is a java constants
 
 	; Print the classname
-    mov eax,[ebx+VmMember_DECLARINGCLASS_OFS]
-    mov eax,[eax+VmType_NAME_OFS]
+    mov AAX,[ABX+VmMember_DECLARINGCLASS_OFS]
+    mov AAX,[AAX+VmType_NAME_OFS]
     call vm_print_string
 
     PRINT_STR double_colon_msg
 
 	; Print the methodname	
-    mov eax,[ebx+VmMember_NAME_OFS]
+    mov AAX,[ABX+VmMember_NAME_OFS]
     call vm_print_string
     
     ; Println
     PRINT_STR vmint_print_stack_msg1
 
 	; Get the previous frame
-	mov ebp,[ebp+VmX86StackReader_PREVIOUS_OFFSET] ; Note do not '*4' here, since the offset is a java static field constant
+	mov ABP,[ABP+VmX86StackReader_PREVIOUS_OFFSET] ; Note do not '*4' here, since the offset is a java static field constant
 	jmp vmint_print_stack_loop
 	
 vmint_print_stack_ret:

@@ -7,23 +7,23 @@
 ; -----------------------------------------------
 
 %macro SPINLOCK 1
-%1: dd 0
+%1: DA 0
 %endmacro
 
 %macro SPINLOCK_ENTER 1
-	push eax
+	push AAX
 %%tryLock:	
-	mov eax,1
-	lock xchg eax,dword [%1]
-	test eax,eax
+	mov AAX,1
+	lock xchg AAX,WORD [%1]
+	test AAX,AAX
 	jnz %%tryLock
-	pop eax
+	pop AAX
 %endmacro
 
 %macro SPINLOCK_EXIT 1
-	push eax
-	xor eax,eax
-	mov dword [%1],eax
-	pop eax
+	push AAX
+	xor AAX,AAX
+	mov WORD [%1],AAX
+	pop AAX
 %endmacro
 	

@@ -23,55 +23,54 @@ video_mode_reg	equ 0x3d8
 
 ; Set the cursor at offset [scr_ofs]
 set_cursor:
-	push eax
-	push edx
+	push AAX
+	push ADX
 	mov eax,14
 	mov edx,video_prt_reg
 	out dx,al
-	mov eax,[scr_ofs]
+	mov AAX,[scr_ofs]
 	shr eax,8
 	mov edx,video_prt_val
 	out dx,al
 	mov eax,15
 	mov edx,video_prt_reg
 	out dx,al
-	mov eax,[scr_ofs]
+	mov AAX,[scr_ofs]
 	mov edx,video_prt_val
 	out dx,al
-	pop edx
-	pop eax
+	pop ADX
+	pop AAX
 	ret
 
 ; Hide the cursor 
 hide_cursor:
-	push eax
-	push edx
+	push AAX
+	push ADX
 	mov eax,10
 	mov edx,video_prt_reg
 	out dx,al
 	mov eax,0xFF
 	mov edx,video_prt_val
 	out dx,al
-	pop edx
-	pop eax
+	pop ADX
+	pop AAX
 	ret
 
 ; Clear the screen
 sys_clrscr:
 	SPINLOCK_ENTER console_lock
-	push eax
-	push ecx
-	push edi
+	push AAX
+	push ACX
+	push ADI
 	mov ecx,scr_width*scr_height
-	mov edi,scr_addr
+	mov ADI,scr_addr
 	mov eax,0x0720
 	rep stosw
-	mov dword [scr_ofs],0
-	;call set_cursor
+	mov WORD [scr_ofs],0
 	call hide_cursor
-	pop edi
-	pop ecx
-	pop eax
+	pop ADI
+	pop ACX
+	pop AAX
 	SPINLOCK_EXIT console_lock
 	ret
 
@@ -85,68 +84,68 @@ sys_print_char:
 	jmp pc_ok
 pc_nextline
 	; next line
-	push eax
-	push ebx
-	push edx
-	mov eax,[scr_ofs]
-	xor edx,edx
-	mov ebx,scr_width
-	div ebx
-	sub [scr_ofs],edx
-	add dword [scr_ofs],scr_width
-	pop edx
-	pop ebx
-	pop eax
+	push AAX
+	push ABX
+	push ADX
+	mov AAX,[scr_ofs]
+	xor ADX,ADX
+	mov ABX,scr_width
+	div ABX
+	sub [scr_ofs],ADX
+	add WORD [scr_ofs],scr_width
+	pop ADX
+	pop ABX
+	pop AAX
 	jmp pc_check_eos
 pc_normal:
-	push edi
-	mov edi,[scr_ofs]
-	shl edi,1
-	add edi,scr_addr
+	push ADI
+	mov ADI,[scr_ofs]
+	shl ADI,1
+	add ADI,scr_addr
 	mov ah,0x08 ; Color: gray on black background
-	mov [edi],ax
-	inc dword [scr_ofs]
-	pop edi
+	mov [ADI],ax
+	inc WORD [scr_ofs]
+	pop ADI
 pc_check_eos:
-	cmp dword [scr_ofs],(scr_width*scr_height)
+	cmp WORD [scr_ofs],(scr_width*scr_height)
 	jne pc_ok
 	; Scroll up
-	push edi
-	push esi
-	push ecx
-	mov edi,scr_addr
-	mov esi,edi
-	add esi,(scr_width*2)
+	push ADI
+	push ADI
+	push ACX
+	mov ADI,scr_addr
+	mov ASI,ADI
+	add ASI,(scr_width*2)
 	mov ecx,(scr_width*(scr_height-1))
 	rep movsw
 	; Now clear the last row
-	push eax
-	mov edi,scr_addr+((scr_width*(scr_height-1))*2)
+	push AAX
+	mov ADI,scr_addr+((scr_width*(scr_height-1))*2)
 	mov ecx,scr_width
 	mov eax,0x0720
 	rep stosw
-	pop eax
-	pop ecx
-	pop esi
-	pop edi
-	mov dword [scr_ofs],(scr_width*(scr_height-1))
+	pop AAX
+	pop ACX
+	pop ASI
+	pop ADI
+	mov WORD [scr_ofs],(scr_width*(scr_height-1))
 pc_ok:
 	call set_cursor
 	SPINLOCK_EXIT console_lock
 	ret
 
 %macro digit 1
-	mov eax,ebx
-	shr eax,%1
-	and eax,0x0f
+	mov AAX,ABX
+	shr AAX,%1
+	and AAX,0x0f
 	mov al,[hexchars+eax]
 	call sys_print_char
 %endmacro
 
 ; Print a value in EAX (in hex format)
 sys_print_eax:
-	push eax
-	push ebx
+	push AAX
+	push ABX
 	mov ebx,eax
 	digit 28
 	digit 24
@@ -158,34 +157,63 @@ sys_print_eax:
 	digit 0
 	mov al,' '
 	call sys_print_char
-	pop ebx
-	pop eax
+	pop ABX
+	pop AAX
 	ret
+
+%ifdef BITS64
+; Print a value in RAX (in hex format)
+sys_print_rax:
+	push AAX
+	push ABX
+	mov ABX,AAX
+	digit 60
+	digit 56
+	digit 52
+	digit 48
+	digit 44
+	digit 40
+	digit 36
+	digit 32
+	digit 28
+	digit 24
+	digit 20
+	digit 16
+	digit 12
+	digit 8
+	digit 4
+	digit 0
+	mov al,' '
+	call sys_print_char
+	pop ABX
+	pop AAX
+	ret
+%endif
 
 ; Print a value in AL (in hex format)
 sys_print_al:
-	push eax
-	push ebx
+	push AAX
+	push ABX
 	mov ebx,eax
 	digit 4
 	digit 0
 	mov al,' '
 	call sys_print_char
-	pop ebx
-	pop eax
+	pop ABX
+	pop AAX
 	ret
 
-; Print a null terminated string pointed to by EAX
+; Print a null terminated string pointed to by EAX/RAX
 sys_print_str:
-	push esi
-	mov esi,eax
+	push ASI
+	mov ASI,AAX
 ps_lp:
-	mov al,[esi]
+	mov al,[ASI]
 	cmp al,0
 	je ps_ready
-	inc esi
+	inc ASI
 	call sys_print_char
 	jmp ps_lp
 ps_ready:
-	pop esi
+	pop ASI
 	ret

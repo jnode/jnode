@@ -11,12 +11,7 @@
 ; Author       : E. Prangsma
 ; -----------------------------------------------
 
-%ifdef BITS32
-	align 4
-%endif
-%ifdef BITS64
-	align 8
-%endif
+	align SLOT_SIZE
 	
 vm_jumpTable:
 	DA vm_athrow

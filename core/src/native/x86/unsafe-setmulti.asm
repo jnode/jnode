@@ -10,58 +10,58 @@
 ; void setBytes(Address memPtr, byte value, int count);
 Q43org5jnode2vm6Unsafe23setBytes2e28Lorg2fvmmagic2funboxed2fAddress3bBI29V:
 	push ADI
-	mov ADI,[ASP+(2*SLOT_SIZE)*8]	; memPtr
-	mov eax,[ASP+(2*SLOT_SIZE)+4] 	; value
-	mov ecx,[ASP+(2*SLOT_SIZE)+0]	; count
+	mov ADI,[ASP+(4*SLOT_SIZE)]		; memPtr
+	mov eax,[ASP+(3*SLOT_SIZE)] 	; value
+	mov ecx,[ASP+(2*SLOT_SIZE)]		; count
 	rep stosb
 	pop ADI
-	ret SLOT_SIZE+(2*4)
+	ret SLOT_SIZE*3
 
 ; void setShorts(Address memPtr, short value, int count);
 ; void setChars(Address memPtr, char value, int count);
 Q43org5jnode2vm6Unsafe23setShorts2e28Lorg2fvmmagic2funboxed2fAddress3bSI29V:
 Q43org5jnode2vm6Unsafe23setChars2e28Lorg2fvmmagic2funboxed2fAddress3bCI29V:
 	push ADI
-	mov ADI,[ASP+(2*SLOT_SIZE)+8]	; memPtr
-	mov eax,[ASP+(2*SLOT_SIZE)+4] 	; value
-	mov ecx,[ASP+(2*SLOT_SIZE)+0]	; count
+	mov ADI,[ASP+(4*SLOT_SIZE)]		; memPtr
+	mov eax,[ASP+(3*SLOT_SIZE)] 	; value
+	mov ecx,[ASP+(2*SLOT_SIZE)]		; count
 	rep stosw
 	pop ADI
-	ret SLOT_SIZE+(2*4)
+	ret SLOT_SIZE*3
 
 ; void setInts(Address memPtr, int value, int count);
 ; void setFloats(Address memPtr, float value, int count);
 Q43org5jnode2vm6Unsafe23setInts2e28Lorg2fvmmagic2funboxed2fAddress3bII29V:
 Q43org5jnode2vm6Unsafe23setFloats2e28Lorg2fvmmagic2funboxed2fAddress3bFI29V:
 	push ADI
-	mov ADI,[ASP+(2*SLOT_SIZE)+8]	; memPtr
-	mov eax,[ASP+(2*SLOT_SIZE)+4] 	; value
-	mov ecx,[ASP+(2*SLOT_SIZE)+0]	; count
+	mov ADI,[ASP+(4*SLOT_SIZE)]		; memPtr
+	mov eax,[ASP+(3*SLOT_SIZE)] 	; value
+	mov ecx,[ASP+(2*SLOT_SIZE)]		; count
 	rep stosd
 	pop ADI
-	ret SLOT_SIZE+(2*4)
+	ret SLOT_SIZE*3
 
 ; void setObjects(Address memPtr, Object value, int count);
 Q43org5jnode2vm6Unsafe23setObjects2e28Lorg2fvmmagic2funboxed2fAddress3bLjava2flang2fObject3bI29V:
 	push ADI
-	mov ADI,[ASP+(2*SLOT_SIZE)+4+SLOT_SIZE]	; memPtr
-	mov AAX,[ASP+(2*SLOT_SIZE)+4]		 	; value
-	mov ecx,[ASP+(2*SLOT_SIZE)+0]			; count
+	mov ADI,[ASP+(4*SLOT_SIZE)]		; memPtr
+	mov AAX,[ASP+(3*SLOT_SIZE)]	 	; value
+	mov ecx,[ASP+(2*SLOT_SIZE)]		; count
 %ifdef BITS32	
 	rep stosd
 %else
 	rep stosq
 %endif	
 	pop ADI
-	ret (2*SLOT_SIZE)+4
+	ret SLOT_SIZE*3
 
 ; void setInts24(Address memPtr, int value, int count);
 Q43org5jnode2vm6Unsafe23setInts242e28Lorg2fvmmagic2funboxed2fAddress3bII29V:
 	push ADI
-	mov ADI,[ASP+(2*SLOT_SIZE)+8]	; memPtr
-	mov eax,[ASP+(2*SLOT_SIZE)+4] 	; value
-	mov ecx,[ASP+(2*SLOT_SIZE)+0]	; count
-	and eax,0xFFFFFF	; Mask of high 8-bits
+	mov ADI,[ASP+(4*SLOT_SIZE)]		; memPtr
+	mov eax,[ASP+(3*SLOT_SIZE)] 	; value
+	mov ecx,[ASP+(2*SLOT_SIZE)]		; count
+	and eax,0xFFFFFF				; Mask of high 8-bits
 set24_loop:
 	mov edx,[ADI]
 	and edx,0xFF000000
@@ -70,7 +70,7 @@ set24_loop:
 	lea ADI,[ADI+3]
 	loop set24_loop
 	pop ADI
-	ret SLOT_SIZE+(2*4)
+	ret SLOT_SIZE*3
 
 ; void setLongs(Address memPtr, long value, int count);
 ; void setDoubles(Address memPtr, double value, int count);
@@ -95,12 +95,12 @@ set64_end:
 	ret 16
 %else
 	push ADI
-	mov ADI,[ASP+(2*SLOT_SIZE)+12]	; memPtr
-	mov AAX,[ASP+(2*SLOT_SIZE)+4] 	; value
-	mov ecx,[ASP+(2*SLOT_SIZE)+0]	; count
+	mov ADI,[ASP+(4*SLOT_SIZE)]		; memPtr
+	mov AAX,[ASP+(3*SLOT_SIZE)] 	; value
+	mov ecx,[ASP+(2*SLOT_SIZE)]		; count
 	rep stosq
 	pop ADI
-	ret SLOT_SIZE+4+8
+	ret SLOT_SIZE*3
 %endif	
 		align 4096
 
