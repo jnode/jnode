@@ -106,10 +106,6 @@
 
   <plugin id="org.jnode.work"/>
 
-  <plugin id="charva"/>
-  <plugin id="org.jnode.apps.edit"/>
-  <plugin id="org.jnode.wt"/>
-
   <plugin id="crypto-security"/>
   <plugin id="com.jcraft.jsch"/>
 
