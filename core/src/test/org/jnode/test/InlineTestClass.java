@@ -41,9 +41,9 @@ public class InlineTestClass {
         return x;
     }
 
-    private int privateGetXai(Object dummy, int i) {
+    /*private int privateGetXai(Object dummy, int i) {
         return i;
-    }
+    }*/
 
     public static int staticGetXai(Object dummy, int i) {
         return i;
