@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Image;
 import java.awt.Shape;
 import java.awt.Rectangle;
+import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AreaAveragingScaleFilter;
 import java.awt.image.BufferedImage;
@@ -84,8 +85,16 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 	 */
 	public final boolean drawImage(Image image, int x, int y, Color bgcolor, ImageObserver observer) {
 		try {
+            if(transform != null){
+                Point p = new Point(x, y);
+                transform.transform(p,p);
+                x = p.x; y = p.y;
+            }
 			final Raster raster = getCompatibleRaster(image);
-			surface.drawCompatibleRaster(raster, 0, 0, x, y, raster.getWidth(), raster.getHeight(), bgcolor);
+            Rectangle r = getClipBounds();
+            int w = Math.min(raster.getWidth(), r.width);
+            int h = Math.min(raster.getHeight(), r.height);
+			surface.drawCompatibleRaster(raster, 0, 0, x, y, w, h, bgcolor);
 			return true;
 		} catch (InterruptedException ex) {
 			return false;
@@ -102,8 +111,16 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 	 */
 	public final boolean drawImage(Image image, int x, int y, ImageObserver observer) {
 		try {
+            if(transform != null){
+                Point p = new Point(x, y);
+                transform.transform(p,p);
+                x = p.x; y = p.y;
+            }
 			final Raster raster = getCompatibleRaster(image);
-			surface.drawCompatibleRaster(raster, 0, 0, x, y, raster.getWidth(), raster.getHeight(), null);
+            Rectangle r = getClipBounds();
+            int w = Math.min(raster.getWidth(), r.width);
+            int h = Math.min(raster.getHeight(), r.height);
+			surface.drawCompatibleRaster(raster, 0, 0, x, y, w, h, null);
 			return true;
 		} catch (InterruptedException ex) {
 			return false;
