@@ -11,6 +11,7 @@
     <library name="jnode-core.jar">
       <export name="gnu.classpath.*"/>
       <export name="gnu.java.awt.*"/>
+      <export name="gnu.java.awt.color.*"/>
       <export name="gnu.java.awt.peer.*"/>
       <export name="gnu.java.awt.image.*"/>
       <export name="gnu.java.beans.*"/>

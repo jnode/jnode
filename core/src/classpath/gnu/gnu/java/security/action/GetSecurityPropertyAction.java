@@ -1,4 +1,4 @@
-/* GetPropertyAction.java
+/* GetSecurityPropertyAction.java
    Copyright (C) 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,52 +38,39 @@ exception statement from your version. */
 package gnu.java.security.action;
 
 import java.security.PrivilegedAction;
+import java.security.Security;
 
 /**
- * PrivilegedAction implementation that calls System.getProperty() with
- * the property name passed to its constructor.
+ * PrivilegedAction implementation that calls Security.getProperty()
+ * with the property name passed to its constructor.
  *
  * Example of use:
  * <code>
- * GetPropertyAction action = new GetPropertyAction("http.proxyPort");
- * String port = AccessController.doPrivileged(action);
+ * GetSecurityPropertyAction action = new GetSecurityPropertyAction("javax.net.ssl.trustStorePassword");
+ * String passwd = AccessController.doPrivileged(action);
  * </code>
  */
-public class GetPropertyAction implements PrivilegedAction
+public class GetSecurityPropertyAction extends GetPropertyAction
 {
-  String name;
-  String value = null;
-
-  public GetPropertyAction()
+  public GetSecurityPropertyAction()
   {
-  }
-  
-  public GetPropertyAction(String propName)
-  {
-    setParameters(propName);
   }
 
-  public GetPropertyAction(String propName, String defaultValue)
+  public GetSecurityPropertyAction (String propName)
   {
-    setParameters(propName, defaultValue);
+    super (propName);
   }
-  
+
+  public GetSecurityPropertyAction(String propName, String defaultValue)
+  {
+    super (propName, defaultValue);
+  }
+
   public Object run()
   {
-    return System.getProperty(name, value);
+    String val = Security.getProperty (name);
+    if (val == null)
+      val = value;
+    return val;
   }
-  
-  public GetPropertyAction setParameters(String propName)
-  {
-    this.name = propName;
-    this.value = null;
-    return this;
-  }
-
-  public GetPropertyAction setParameters(String propName, String defaultValue)
-  {
-    this.name = propName;
-    this.value = defaultValue;
-    return this;
-    }
 }
