@@ -85,6 +85,9 @@
       <export name="javax.naming.event.*"/>
       <export name="javax.naming.ldap.*"/>
       <export name="javax.naming.spi.*"/>
+
+      <export name="javax.swing.*"/>
+
       <export name="javax.xml.parsers.*"/>
 
       <export name="org.w3c.dom.*"/>
