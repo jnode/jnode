@@ -744,8 +744,9 @@ public final class VmSystem {
 
 		final Address srcPtr = srcAddr.add(dataOffset + (srcPos * elemsize));
 		final Address dstPtr = dstAddr.add(dataOffset + (dstPos * elemsize));
+        final Extent size = Extent.fromIntZeroExtend(length * elemsize);
 
-		Unsafe.copy(srcPtr, dstPtr, length * elemsize);
+		Unsafe.copy(srcPtr, dstPtr, size);
 
 		if (isObjectArray) {
 			final VmWriteBarrier wb = Vm.getHeapManager().getWriteBarrier();

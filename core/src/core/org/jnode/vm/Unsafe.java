@@ -405,7 +405,7 @@ public final class Unsafe {
 	 * @param size
 	 */
 	protected static native void copy(Address srcMemPtr, Address destMemPtr,
-			int size);
+			Extent size);
 
 	/**
 	 * Push an integer onto the execution stack

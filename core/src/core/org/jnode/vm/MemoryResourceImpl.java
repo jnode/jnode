@@ -166,7 +166,8 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		}
 		testMemPtr(memPtr, length);
 		final Address dstPtr = VmMagic.getArrayData(dst).add(dstOfs);
-		Unsafe.copy(start.add(Offset.fromIntZeroExtend(memPtr)), dstPtr, length);
+        final Extent size = Extent.fromIntZeroExtend(length);
+		Unsafe.copy(start.add(Offset.fromIntZeroExtend(memPtr)), dstPtr, size);
 	}
 
 	/**
@@ -200,7 +201,8 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		}
 		testMemPtr(memPtr, length * 2);
 		final Address dstPtr = VmMagic.getArrayData(dst).add(dstOfs * 2);
-		Unsafe.copy(start.add(Offset.fromIntZeroExtend(memPtr)), dstPtr, length * 2);
+        final Extent size = Extent.fromIntZeroExtend(length * 2);
+		Unsafe.copy(start.add(Offset.fromIntZeroExtend(memPtr)), dstPtr, size);
 	}
 
 	/**
@@ -234,7 +236,8 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		}
 		testMemPtr(memPtr, length * 2);
 		final Address dstPtr = VmMagic.getArrayData(dst).add(dstOfs * 2);
-		Unsafe.copy(start.add(Offset.fromIntZeroExtend(memPtr)), dstPtr, length * 2);
+        final Extent size = Extent.fromIntZeroExtend(length * 2);
+		Unsafe.copy(start.add(Offset.fromIntZeroExtend(memPtr)), dstPtr, size);
 	}
 
 	/**
@@ -268,7 +271,8 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		}
 		testMemPtr(memPtr, length * 4);
 		final Address dstPtr = VmMagic.getArrayData(dst).add(dstOfs * 4);
-		Unsafe.copy(start.add(Offset.fromIntZeroExtend(memPtr)), dstPtr, length * 4);
+        final Extent size = Extent.fromIntZeroExtend(length);
+		Unsafe.copy(start.add(Offset.fromIntZeroExtend(memPtr)), dstPtr, size);
 	}
 
 	/**
@@ -302,7 +306,8 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		}
 		testMemPtr(memPtr, length * 8);
 		final Address dstPtr = VmMagic.getArrayData(dst).add(dstOfs * 8);
-		Unsafe.copy(start.add(Offset.fromIntZeroExtend(memPtr)), dstPtr, length * 8);
+        final Extent size = Extent.fromIntZeroExtend(length * 8);
+		Unsafe.copy(start.add(Offset.fromIntZeroExtend(memPtr)), dstPtr, size);
 	}
 
 	/**
@@ -324,7 +329,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 * @param dstOfs
 	 * @param length
 	 */
-	public void getChars(int memPtr, float[] dst, int dstOfs, int length) {
+	public void getFloats(int memPtr, float[] dst, int dstOfs, int length) {
 		if (dstOfs < 0) {
 			throw new IndexOutOfBoundsException("dstOfs < 0");
 		}
@@ -336,7 +341,8 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		}
 		testMemPtr(memPtr, length * 4);
 		final Address dstPtr = VmMagic.getArrayData(dst).add(dstOfs * 4);
-		Unsafe.copy(start.add(Offset.fromIntZeroExtend(memPtr)), dstPtr, length * 4);
+        final Extent size = Extent.fromIntZeroExtend(length * 4);
+		Unsafe.copy(start.add(Offset.fromIntZeroExtend(memPtr)), dstPtr, size);
 	}
 
 	/**
@@ -370,7 +376,8 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		}
 		testMemPtr(memPtr, length * 8);
 		final Address dstPtr = VmMagic.getArrayData(dst).add(dstOfs * 8);
-		Unsafe.copy(start.add(Offset.fromIntZeroExtend(memPtr)), dstPtr, length * 8);
+        final Extent size = Extent.fromIntZeroExtend(length * 8);
+		Unsafe.copy(start.add(Offset.fromIntZeroExtend(memPtr)), dstPtr, size);
 	}
 
 	/**
@@ -418,7 +425,8 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		}
 		testMemPtr(dstPtr, length);
 		final Address srcPtr = VmMagic.getArrayData(src).add(srcOfs);
-		Unsafe.copy(srcPtr, start.add(dstPtr), length);
+        final Extent size = Extent.fromIntZeroExtend(length);
+		Unsafe.copy(srcPtr, start.add(dstPtr), size);
 	}
 
 	/**
@@ -452,7 +460,8 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		}
 		testMemPtr(dstPtr, length * 2);
 		final Address srcPtr = VmMagic.getArrayData(src).add(srcOfs * 2);
-		Unsafe.copy(srcPtr, start.add(dstPtr), length * 2);
+        final Extent size = Extent.fromIntZeroExtend(length * 2);
+		Unsafe.copy(srcPtr, start.add(dstPtr), size);
 	}
 
 	/**
@@ -486,7 +495,8 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		}
 		testMemPtr(dstPtr, length * 2);
 		final Address srcPtr = VmMagic.getArrayData(src).add(srcOfs * 2);
-		Unsafe.copy(srcPtr, start.add(dstPtr), length * 2);
+        final Extent size = Extent.fromIntZeroExtend(length * 2);
+		Unsafe.copy(srcPtr, start.add(dstPtr), size);
 	}
 
 	/**
@@ -520,7 +530,8 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		}
 		testMemPtr(dstPtr, length * 4);
 		final Address srcPtr = VmMagic.getArrayData(src).add(srcOfs * 4);
-		Unsafe.copy(srcPtr, start.add(dstPtr), length * 4);
+        final Extent size = Extent.fromIntZeroExtend(length * 4);
+		Unsafe.copy(srcPtr, start.add(dstPtr), size);
 	}
 
 	/**
@@ -554,7 +565,8 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		}
 		testMemPtr(dstPtr, length * 4);
 		final Address srcPtr = VmMagic.getArrayData(src).add(srcOfs * 4);
-		Unsafe.copy(srcPtr, start.add(dstPtr), length * 4);
+        final Extent size = Extent.fromIntZeroExtend(length * 4);
+		Unsafe.copy(srcPtr, start.add(dstPtr), size);
 	}
 
 	/**
@@ -588,7 +600,8 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		}
 		testMemPtr(dstPtr, length * 8);
 		final Address srcPtr = VmMagic.getArrayData(src).add(srcOfs * 8);
-		Unsafe.copy(srcPtr, start.add(dstPtr), length * 8);
+        final Extent size = Extent.fromIntZeroExtend(length * 8);
+		Unsafe.copy(srcPtr, start.add(dstPtr), size);
 	}
 
 	/**
@@ -622,7 +635,8 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		}
 		testMemPtr(dstPtr, length * 8);
 		final Address srcPtr = VmMagic.getArrayData(src).add(srcOfs * 8);
-		Unsafe.copy(srcPtr, start.add(dstPtr), length * 8);
+        final Extent size = Extent.fromIntZeroExtend(length * 8);
+		Unsafe.copy(srcPtr, start.add(dstPtr), size);
 	}
 
 	/**
@@ -654,9 +668,10 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		Unsafe.clear(start.add(Offset.fromIntZeroExtend(memPtr)), Extent.fromIntSignExtend(size));
 	}
 
-	public void copy(int srcMemPtr, int destMemPtr, int size) {
-		testMemPtr(srcMemPtr, size);
-		testMemPtr(destMemPtr, size);
+	public void copy(int srcMemPtr, int destMemPtr, int length) {
+		testMemPtr(srcMemPtr, length);
+		testMemPtr(destMemPtr, length);
+        final Extent size = Extent.fromIntZeroExtend(length);
 		Unsafe.copy(start.add(srcMemPtr), start.add(destMemPtr), size);
 	}
 

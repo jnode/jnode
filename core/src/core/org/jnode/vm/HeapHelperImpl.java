@@ -69,7 +69,7 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
     /**
      * @see org.jnode.vm.memmgr.HeapHelper#copy(Address, Address, int)
      */
-    public final void copy(Address src, Address dst, int size) {
+    public final void copy(Address src, Address dst, Extent size) {
         Unsafe.copy(src, dst, size);
     }
 
