@@ -27,7 +27,7 @@ final class LongItem extends Item  implements X86CompilerConstants {
 	 * @param val
 	 */
 	private LongItem(int kind, int offsetToFP, Register lsb, Register msb, long val) {
-		super(kind, LONG, offsetToFP);
+		super(kind, JvmType.LONG, offsetToFP);
 
 		this.lsb = lsb;
 		this.msb = msb;
@@ -42,7 +42,7 @@ final class LongItem extends Item  implements X86CompilerConstants {
 		myAssert(lsb != null);
 		myAssert(msb != null);
 		switch (kind) {
-			case REGISTER:
+			case Kind.REGISTER:
 				// invariant: (msb != lsb) && (this.msb != this.lsb)
 				if (msb != this.lsb) {
 					// generic case; avoid only if msb is lsb' (value overwriting)
@@ -83,7 +83,7 @@ final class LongItem extends Item  implements X86CompilerConstants {
 					// invariant: (msb == this.lsb) && (lsb == this.msb)
 					// swap registers
 					//TODO: handle allocation failure
-					Register reg = (Register)pool.request(INT);
+					Register reg = (Register)pool.request(JvmType.INT);
 					os.writeMOV(INTSIZE, reg, this.lsb);
 					os.writeMOV(INTSIZE, this.lsb, this.msb);
 					os.writeMOV(INTSIZE, this.msb, reg);
@@ -91,12 +91,12 @@ final class LongItem extends Item  implements X86CompilerConstants {
 				}
 				break;
 				
-			case LOCAL:
+			case Kind.LOCAL:
 				os.writeMOV(INTSIZE, lsb, FP, offsetToFP);
 				os.writeMOV(INTSIZE, msb, FP, offsetToFP+4);
 				break;
 				
-			case CONSTANT:
+			case Kind.CONSTANT:
 			    final int lsbv = (int) (value & 0xFFFFFFFFL);
 			    final int msbv = (int) ((value >>> 32) & 0xFFFFFFFFL);
 
@@ -104,12 +104,12 @@ final class LongItem extends Item  implements X86CompilerConstants {
 				os.writeMOV_Const(msb, msbv);
 				break;
 				
-			case FREGISTER:
+			case Kind.FREGISTER:
 				//TODO
 				notImplemented();
 				break;
 				
-			case STACK:
+			case Kind.STACK:
 				if (VirtualStack.checkOperandStack) {
 					final VirtualStack stack = ec.getVStack();
 					stack.popFromOperandStack(this);
@@ -119,7 +119,7 @@ final class LongItem extends Item  implements X86CompilerConstants {
 				break;
 
 		}
-		kind = REGISTER;
+		kind = Kind.REGISTER;
 		this.lsb = lsb;
 		this.msb = msb;
 	}
@@ -128,11 +128,11 @@ final class LongItem extends Item  implements X86CompilerConstants {
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#load()
 	 */
 	void load(EmitterContext ec) {
-		if (kind != REGISTER) {
+		if (kind != Kind.REGISTER) {
 			X86RegisterPool pool = ec.getPool();
 			
-			final Register l = (Register)pool.request(INT, this);
-			final Register r = (Register)pool.request(INT, this);
+			final Register l = (Register)pool.request(JvmType.INT, this);
+			final Register r = (Register)pool.request(JvmType.INT, this);
 			myAssert(r != null);
 			myAssert(l != null);
 			loadTo(ec, l, r);
@@ -154,27 +154,27 @@ final class LongItem extends Item  implements X86CompilerConstants {
 	Item clone(EmitterContext ec) {
 		Item res = null;
 		switch (getKind()) {
-			case REGISTER:
+			case Kind.REGISTER:
 				//TODO
 				notImplemented();
 				break;
 				
-			case LOCAL:
+			case Kind.LOCAL:
 				//TODO
 				notImplemented();
 				break;
 				
-			case CONSTANT:
+			case Kind.CONSTANT:
 				//TODO
 				notImplemented();
 				break;
 				
-			case FREGISTER:
+			case Kind.FREGISTER:
 				//TODO
 				notImplemented();
 				break;
 			
-			case STACK:
+			case Kind.STACK:
 				//TODO
 				notImplemented();
 				break;
@@ -189,17 +189,17 @@ final class LongItem extends Item  implements X86CompilerConstants {
 		final AbstractX86Stream os = ec.getStream();
 		os.log("LongItem.push "+Integer.toString(getKind()));	
 		switch (getKind()) {
-			case REGISTER:
+			case Kind.REGISTER:
 			    os.writePUSH(msb);
 			    os.writePUSH(lsb);
 				break;
 				
-			case LOCAL:
+			case Kind.LOCAL:
 				os.writePUSH(FP, offsetToFP+4);
 				os.writePUSH(FP, offsetToFP);
 				break;
 				
-			case CONSTANT:
+			case Kind.CONSTANT:
 			    final int lsbv = (int) (value & 0xFFFFFFFFL);
 			    final int msbv = (int) ((value >>> 32) & 0xFFFFFFFFL);
 
@@ -207,17 +207,17 @@ final class LongItem extends Item  implements X86CompilerConstants {
 			    os.writePUSH(lsbv);
 				break;
 				
-			case FREGISTER:
+			case Kind.FREGISTER:
 				//TODO
 				notImplemented();
 				break;
 				
-			case STACK:
+			case Kind.STACK:
 				//nothing to do
 				if (VirtualStack.checkOperandStack) {
 					final VirtualStack stack = ec.getVStack();
 					
-					if (kind == STACK) {
+					if (kind == Kind.STACK) {
 						// the item is not really pushed and popped
 						// but this checks that it is really the top
 						// element
@@ -228,7 +228,7 @@ final class LongItem extends Item  implements X86CompilerConstants {
 		}
 
 		release(ec);
-		kind = STACK;		
+		kind = Kind.STACK;		
 
 		if (VirtualStack.checkOperandStack) {
 			final VirtualStack stack = ec.getVStack();
@@ -244,25 +244,25 @@ final class LongItem extends Item  implements X86CompilerConstants {
 		final X86RegisterPool pool = ec.getPool();
 		
 		switch (getKind()) {
-			case REGISTER:
+			case Kind.REGISTER:
 				pool.release(lsb);
 				pool.release(msb);
 				break;
 				
-			case LOCAL:
+			case Kind.LOCAL:
 				// nothing to do
 				break;
 				
-			case CONSTANT:
+			case Kind.CONSTANT:
 				// nothing to do
 				break;
 				
-			case FREGISTER:
+			case Kind.FREGISTER:
 				//TODO
 				notImplemented();
 				break;
 				
-			case STACK:
+			case Kind.STACK:
 				// nothing to do
 				break;
 		}
@@ -279,22 +279,22 @@ final class LongItem extends Item  implements X86CompilerConstants {
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
 	 */
 	boolean uses(Register reg) {
-		return ((kind == REGISTER) && (msb.equals(reg) || lsb.equals(reg)));
+		return ((kind == Kind.REGISTER) && (msb.equals(reg) || lsb.equals(reg)));
 	}
 
 	static LongItem createStack() {
-		return new LongItem(STACK, 0, null, null, 0);
+		return new LongItem(Kind.STACK, 0, null, null, 0);
 	}
 	
 	static LongItem createConst(long value) {
-		return new LongItem(CONSTANT, 0, null, null, value);
+		return new LongItem(Kind.CONSTANT, 0, null, null, value);
 	}
 	
 	static LongItem createReg(Register lsb, Register msb) {
-		return new LongItem(REGISTER, 0, lsb, msb, 0);
+		return new LongItem(Kind.REGISTER, 0, lsb, msb, 0);
 	}
 	
 	static LongItem createLocal(int offsetToFP) {
-		return new LongItem(LOCAL, offsetToFP, null, null, 0);
+		return new LongItem(Kind.LOCAL, offsetToFP, null, null, 0);
 	}
 }

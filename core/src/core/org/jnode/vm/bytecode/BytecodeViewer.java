@@ -3,6 +3,8 @@
  */
 package org.jnode.vm.bytecode;
 
+import java.io.PrintStream;
+
 import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmConstFieldRef;
 import org.jnode.vm.classmgr.VmConstIMethodRef;
@@ -20,6 +22,7 @@ public class BytecodeViewer extends BytecodeVisitor {
 	private int address;
 	private ControlFlowGraph cfg;
 	private String indent = "";
+	private final PrintStream out;
 
 	/**
 	 * @param parser
@@ -32,7 +35,14 @@ public class BytecodeViewer extends BytecodeVisitor {
 	 * Constructor for BytecodeViewer.
 	 */
 	public BytecodeViewer() {
-		this(null);
+		this(null, System.out);
+	}
+
+	/**
+	 * Constructor for BytecodeViewer.
+	 */
+	public BytecodeViewer(PrintStream out) {
+		this(null, out);
 	}
 
 	/**
@@ -41,7 +51,17 @@ public class BytecodeViewer extends BytecodeVisitor {
 	 * @param cfg
 	 */
 	public BytecodeViewer(ControlFlowGraph cfg) {
+		this(cfg, System.out);
+	}
+
+	/**
+	 * Constructor for BytecodeViewer.
+	 * 
+	 * @param cfg
+	 */
+	public BytecodeViewer(ControlFlowGraph cfg, PrintStream out) {
 		this.cfg = cfg;
+		this.out = out;
 	}
 
 	/**
@@ -49,14 +69,14 @@ public class BytecodeViewer extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#startMethod(org.jnode.vm.classmgr.VmMethod)
 	 */
 	public void startMethod(VmMethod method) {
-		System.out.println("Method: " + method.getName() + ", #locals " + method.getBytecode().getNoLocals());
+		out.println("Method: " + method.getName() + ", #locals " + method.getBytecode().getNoLocals());
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#endMethod()
 	 */
 	public void endMethod() {
-		System.out.println("end\n");
+		out.println("end\n");
 	}
 
 	/**
@@ -1161,10 +1181,10 @@ public class BytecodeViewer extends BytecodeVisitor {
 	}
 
 	public void out(String line) {
-	    System.out.print(indent);
-		System.out.print(address);
-		System.out.print(":\t");
-		System.out.println(line);
+	    out.print(indent);
+		out.print(address);
+		out.print(":\t");
+		out.println(line);
 	}
 	
 	public void indent() {

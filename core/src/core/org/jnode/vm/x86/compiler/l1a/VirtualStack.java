@@ -123,20 +123,20 @@ final class VirtualStack {
 	
 	IntItem popInt() {
 		// testing in pop and casting here: test is just redundant
-		return (IntItem)pop(Item.INT);
+		return (IntItem)pop(Item.JvmType.INT);
 	}
 	
 	RefItem popRef() {
 		// testing in pop and casting here: test is just redundant
-		return (RefItem)pop(Item.REFERENCE);
+		return (RefItem)pop(Item.JvmType.REFERENCE);
 	}
 
 	/**
 	 * Push item on stack.
 	 */
 	void push(Item item) {
-		if ((item.getKind() == Item.STACK) && (tos > 0))
-			Item.myAssert(stack[tos-1].getKind() == Item.STACK);
+		if ((item.getKind() == Item.Kind.STACK) && (tos > 0))
+			Item.myAssert(stack[tos-1].getKind() == Item.Kind.STACK);
 
 		if (tos == stack.length) 
 			growStack();
@@ -150,7 +150,7 @@ final class VirtualStack {
 	 */
 	void push1(Item item) {
 		push(item);
-		if (checkOperandStack && (item.getKind() == Item.STACK)) {
+		if (checkOperandStack && (item.getKind() == Item.Kind.STACK)) {
 			pushOnOperandStack(item);
 		}
 	}
@@ -159,31 +159,25 @@ final class VirtualStack {
 	Item createStack(int type) {
 		Item res = null;
 		switch (type) {
-			case Item.INT:
+			case Item.JvmType.INT:
 				res = IntItem.createStack();
 				break;
-			case Item.REFERENCE:
+			case Item.JvmType.REFERENCE:
 				res = RefItem.createStack();
 				break;
-			case Item.LONG:
+			case Item.JvmType.LONG:
 				res = LongItem.createStack();
 				break;
-			case Item.FLOAT:
+			case Item.JvmType.FLOAT:
 				res = FloatItem.createStack();
 				break;
-			case Item.DOUBLE:
+			case Item.JvmType.DOUBLE:
 				res = DoubleItem.createStack();
 				break;			
 			default:
 				throw new VerifyError("No type " + Integer.toString(type));
 		}
 		return res;
-	}
-	
-	//TODO: deprecated
-	void pushStack(int type) {
-		Item res = createStack(type);
-		push(res);
 	}
 	
 	/**
@@ -195,7 +189,7 @@ final class VirtualStack {
 	void loadLocal(EmitterContext ec, int offsetToFP) {
 		for (int i = 0; i < tos; i++) {
 			final Item item = stack[i];
-			if ((item.getKind() == Item.LOCAL) && (item.getOffsetToFP() == offsetToFP))
+			if ((item.getKind() == Item.Kind.LOCAL) && (item.getOffsetToFP() == offsetToFP))
 					item.load(ec);
 		}
 		
@@ -203,11 +197,11 @@ final class VirtualStack {
 	
 	void push(EmitterContext ec) {
 		int i = 0;
-		while ((i < tos) && (stack[i].getKind() == Item.STACK))
+		while ((i < tos) && (stack[i].getKind() == Item.Kind.STACK))
 			i++;
 		while (i < tos) {
 			Item item = stack[i];
-			Item.myAssert (item.getKind() != Item.STACK);
+			Item.myAssert (item.getKind() != Item.Kind.STACK);
 			item.push(ec);
 			i++;
 		}
@@ -224,7 +218,7 @@ final class VirtualStack {
 
 	private void prependToOperandStack(Item item) {
 		os.log("prepend");
-		Item.myAssert(item.getKind() == Item.STACK);
+		Item.myAssert(item.getKind() == Item.Kind.STACK);
 
 		if (operandTos == operandStack.length) 
 			growOperandStack();
@@ -237,7 +231,7 @@ final class VirtualStack {
 	}
 
 	void pushOnOperandStack(Item item) {
-		Item.myAssert(item.getKind() == Item.STACK);
+		Item.myAssert(item.getKind() == Item.Kind.STACK);
 
 		if (operandTos == operandStack.length) 
 			growOperandStack();

@@ -19,7 +19,7 @@ final class FloatItem extends Item implements X86CompilerConstants  {
 	 * @param value
 	 */
 	private FloatItem(int kind,  int offsetToFP, float value) {
-		super(kind, FLOAT, offsetToFP);
+		super(kind, JvmType.FLOAT, offsetToFP);
 		
 		this.value = value;
 	}
@@ -47,27 +47,27 @@ final class FloatItem extends Item implements X86CompilerConstants  {
 	Item clone(EmitterContext ec) {
 		Item res = null;
 		switch (getKind()) {
-			case REGISTER:
+			case Kind.REGISTER:
 				//TODO
 				notImplemented();
 				break;
 				
-			case LOCAL:
+			case Kind.LOCAL:
 				//TODO
 				notImplemented();
 				break;
 				
-			case CONSTANT:
+			case Kind.CONSTANT:
 				//TODO
 				notImplemented();
 				break;
 				
-			case FREGISTER:
+			case Kind.FREGISTER:
 				//TODO
 				notImplemented();
 				break;
 			
-			case STACK:
+			case Kind.STACK:
 				//TODO
 				notImplemented();
 				break;
@@ -82,29 +82,29 @@ final class FloatItem extends Item implements X86CompilerConstants  {
 		final AbstractX86Stream os = ec.getStream();
 		
 		switch (getKind()) {
-			case REGISTER:
+			case Kind.REGISTER:
 				//TODO
 				notImplemented();
 				break;
 				
-			case LOCAL:
+			case Kind.LOCAL:
 				os.writePUSH(FP, offsetToFP);
 				break;
 				
-			case CONSTANT:
+			case Kind.CONSTANT:
 				os.writePUSH(Float.floatToRawIntBits(value));
 				break;
 				
-			case FREGISTER:
+			case Kind.FREGISTER:
 				//TODO
 				notImplemented();
 				break;
 
-			case STACK:
+			case Kind.STACK:
 				if (VirtualStack.checkOperandStack) {
 					final VirtualStack stack = ec.getVStack();
 			
-					if (kind == STACK) {
+					if (kind == Kind.STACK) {
 						// the item is not really pushed and popped
 						// but this checks that it is really the top
 						// element
@@ -114,7 +114,7 @@ final class FloatItem extends Item implements X86CompilerConstants  {
 				break;
 		}
 		release(ec);
-		kind = STACK;
+		kind = Kind.STACK;
 		if (VirtualStack.checkOperandStack) {
 			final VirtualStack stack = ec.getVStack();
 			stack.pushOnOperandStack(this);
@@ -126,20 +126,20 @@ final class FloatItem extends Item implements X86CompilerConstants  {
 	 */
 	void release(EmitterContext ec) {
 		switch (getKind()) {
-			case REGISTER:
+			case Kind.REGISTER:
 				//TODO
 				notImplemented();
 				break;
 				
-			case LOCAL:
+			case Kind.LOCAL:
 				// nothing to do
 				break;
 				
-			case CONSTANT:
+			case Kind.CONSTANT:
 				// nothing to do
 				break;
 				
-			case FREGISTER:
+			case Kind.FREGISTER:
 				//TODO
 				notImplemented();
 				break;
@@ -161,18 +161,18 @@ final class FloatItem extends Item implements X86CompilerConstants  {
 	}
 
 	static FloatItem createStack() {
-		return new FloatItem(STACK, 0, 0);
+		return new FloatItem(Kind.STACK, 0, 0);
 	}
 	
 	static FloatItem createLocal(int offsetToFP) {
-		return new FloatItem(LOCAL, offsetToFP, 0);
+		return new FloatItem(Kind.LOCAL, offsetToFP, 0);
 	}
 	
 	static FloatItem createConst(float val) {
-		return new FloatItem(CONSTANT, 0, val);
+		return new FloatItem(Kind.CONSTANT, 0, val);
 	}
 	
 	static FloatItem createFReg() {
-		return new FloatItem(FREGISTER, 0, 0);
+		return new FloatItem(Kind.FREGISTER, 0, 0);
 	}
 }

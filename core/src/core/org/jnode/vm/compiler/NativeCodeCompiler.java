@@ -285,4 +285,10 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
      * @return
      */
     public abstract int getMagic();
+    
+    /**
+     * Gets the name of this compiler.
+     * @return
+     */
+    public abstract String getName();
 }
