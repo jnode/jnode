@@ -60,99 +60,122 @@ public interface VMWareConstants {
 	public static final int SVGA_FIFO_STOP = 3;
 
 	public static final int SVGA_CMD_UPDATE = 1;
-	/* FIFO layout:
-		X, Y, Width, Height */
+	/*
+	 * FIFO layout:
+	 */
 
 	public static final int SVGA_CMD_RECT_FILL = 2;
-	/* FIFO layout:
-		Color, X, Y, Width, Height */
+	/*
+	 * FIFO layout:
+	 */
 
 	public static final int SVGA_CMD_RECT_COPY = 3;
-	/* FIFO layout:
-		Source X, Source Y, Dest X, Dest Y, Width, Height */
+	/*
+	 * FIFO layout:
+	 */
 
 	public static final int SVGA_CMD_DEFINE_BITMAP = 4;
-	/* FIFO layout:
-		Pixmap ID, Width, Height, <scanlines> */
+	/*
+	 * FIFO layout:
+	 */
 
 	public static final int SVGA_CMD_DEFINE_BITMAP_SCANLINE = 5;
-	/* FIFO layout:
-		Pixmap ID, Width, Height, Line #, scanline */
+	/*
+	 * FIFO layout:
+	 */
 
 	public static final int SVGA_CMD_DEFINE_PIXMAP = 6;
-	/* FIFO layout:
-		Pixmap ID, Width, Height, Depth, <scanlines> */
+	/*
+	 * FIFO layout:
+	 */
 
 	public static final int SVGA_CMD_DEFINE_PIXMAP_SCANLINE = 7;
-	/* FIFO layout:
-		Pixmap ID, Width, Height, Depth, Line #, scanline */
+	/*
+	 * FIFO layout:
+	 */
 
 	public static final int SVGA_CMD_RECT_BITMAP_FILL = 8;
-	/* FIFO layout:
-		Bitmap ID, X, Y, Width, Height, Foreground, Background */
+	/*
+	 * FIFO layout:
+	 */
 
 	public static final int SVGA_CMD_RECT_PIXMAP_FILL = 9;
-	/* FIFO layout:
-		Pixmap ID, X, Y, Width, Height */
+	/*
+	 * FIFO layout:
+	 */
 
 	public static final int SVGA_CMD_RECT_BITMAP_COPY = 10;
-	/* FIFO layout:
-		Bitmap ID, Source X, Source Y, Dest X, Dest Y,
-		Width, Height, Foreground, Background */
+	/*
+	 * FIFO layout: Bitmap ID, Source X, Source Y, Dest X, Dest Y,
+	 */
 
 	public static final int SVGA_CMD_RECT_PIXMAP_COPY = 11;
-	/* FIFO layout:
-		Pixmap ID, Source X, Source Y, Dest X, Dest Y, Width, Height */
+	/*
+	 * FIFO layout:
+	 */
 
 	public static final int SVGA_CMD_FREE_OBJECT = 12;
-	/* FIFO layout:
-		Object (pixmap, bitmap, ...) ID */
+	/*
+	 * FIFO layout:
+	 */
 
 	public static final int SVGA_CMD_RECT_ROP_FILL = 13;
-	/* FIFO layout:
-		Color, X, Y, Width, Height, ROP */
+	/*
+	 * FIFO layout:
+	 */
 
 	public static final int SVGA_CMD_RECT_ROP_COPY = 14;
-	/* FIFO layout:
-		Source X, Source Y, Dest X, Dest Y, Width, Height, ROP */
+	/*
+	 * FIFO layout:
+	 */
 
 	public static final int SVGA_CMD_RECT_ROP_BITMAP_FILL = 15;
-	/* FIFO layout:
-		ID, X, Y, Width, Height, Foreground, Background, ROP */
+	/*
+	 * FIFO layout:
+	 */
 
 	public static final int SVGA_CMD_RECT_ROP_PIXMAP_FILL = 16;
-	/* FIFO layout:
-		ID, X, Y, Width, Height, ROP */
+	/*
+	 * FIFO layout:
+	 */
 
 	public static final int SVGA_CMD_RECT_ROP_BITMAP_COPY = 17;
-	/* FIFO layout:
-		ID, Source X, Source Y,
-		Dest X, Dest Y, Width, Height, Foreground, Background, ROP */
+	/*
+	 * FIFO layout: ID, Source X, Source Y,
+	 */
 
 	public static final int SVGA_CMD_RECT_ROP_PIXMAP_COPY = 18;
-	/* FIFO layout:
-		ID, Source X, Source Y, Dest X, Dest Y, Width, Height, ROP */
+	/*
+	 * FIFO layout:
+	 */
 
 	public static final int SVGA_CMD_DEFINE_CURSOR = 19;
-	/* FIFO layout:
-	   ID, Hotspot X, Hotspot Y, Width, Height,
-	   Depth for AND mask, Depth for XOR mask,
-	   <scanlines for AND mask>, <scanlines for XOR mask> */
+	/*
+	 * FIFO layout: ID, Hotspot X, Hotspot Y, Width, Height, Depth for AND mask, Depth for XOR
+	 * mask,
+	 */
 
 	public static final int SVGA_CMD_DISPLAY_CURSOR = 20;
-	/* FIFO layout:
-	   ID, On/Off (1 or 0) */
+	/*
+	 * FIFO layout:
+	 */
 
 	public static final int SVGA_CMD_MOVE_CURSOR = 21;
-	/* FIFO layout:
-	   X, Y */
+	/*
+	 * FIFO layout:
+	 */
+
+	public static final int SVGA_CMD_DEFINE_ALPHA_CURSOR = 22;
+	/*
+	 * FIFO layout: ID, Hotspot X, Hotspot Y, Width, Height,
+	 */
 
 	public static final int SVGA_CMD_MAX = 22;
 
 	public static final int GUEST_OS_OTHER = 0x5000 + 10;
 
 	/*
-	 * Raster codes 
+	 * Raster codes
 	 */
 	public static final int SVGA_ROP_CLEAR = 0x00;
 	public static final int SVGA_ROP_AND = 0x01;
@@ -182,4 +205,11 @@ public interface VMWareConstants {
 	public static final int SVGA_CAP_RASTER_OP = 0x0010;
 	public static final int SVGA_CAP_CURSOR = 0x0020;
 	public static final int SVGA_CAP_CURSOR_BYPASS = 0x0040;
+	public static final int SVGA_CAP_CURSOR_BYPASS_2 = 0x0080;
+	public static final int SVGA_CAP_8BIT_EMULATION = 0x0100;
+	public static final int SVGA_CAP_ALPHA_CURSOR = 0x0200;
+	public static final int SVGA_CAP_GLYPH = 0x0400;
+	public static final int SVGA_CAP_GLYPH_CLIPPING = 0x0800;
+	public static final int SVGA_CAP_OFFSCREEN_1 = 0x1000;
+	public static final int SVGA_CAP_ALPHA_BLEND = 0x2000;
 }
