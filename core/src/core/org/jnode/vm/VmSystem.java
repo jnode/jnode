@@ -56,6 +56,8 @@ public final class VmSystem {
     private static SystemOutputStream bootOut;
 
     private static MemoryResource initJar;
+    
+    private static PrintStream out;
 
     /**
      * Initialize the Virtual Machine
@@ -70,6 +72,7 @@ public final class VmSystem {
             //final ScreenOutputStream os = new
             // ScreenOutputStream(Screen.getInstance());
             final PrintStream ps = new PrintStream(bootOut, true);
+            VmSystem.out = ps;
             System.setOut(ps);
             System.setErr(ps);
 
@@ -787,4 +790,10 @@ public final class VmSystem {
         return initJar;
     }
 
+    /**
+     * @return Returns the out.
+     */
+    public static final PrintStream getOut() {
+        return out;
+    }
 }

@@ -15,7 +15,7 @@ public class KeyboardAPIAdapter implements KeyboardAPI {
 	private final ArrayList listeners = new ArrayList();
 	/** The interpreter */
 	private KeyboardInterpreter interpreter = null/*new KeyboardInterpreter()*/;
-
+	
 	/**
 	 * @see org.jnode.driver.input.KeyboardAPI#addKeyboardListener(org.jnode.driver.input.KeyboardListener)
 	 */
@@ -23,6 +23,23 @@ public class KeyboardAPIAdapter implements KeyboardAPI {
 		listeners.add(l);
 	}
 
+	/**
+	 * Claim to be the preferred listener.
+	 * The given listener must have been added by addKeyboardListener.
+	 * If there is a security manager, this method will call
+	 * <code>checkPermission(new DriverPermission("setPreferredListener"))</code>.
+	 * @param l
+	 */
+	public synchronized void setPreferredListener(KeyboardListener l) {
+	    final SecurityManager sm = System.getSecurityManager();
+	    if (sm != null) {
+	        sm.checkPermission(SET_PREFERRED_LISTENER_PERMISSION);
+	    }
+	    if (listeners.remove(l)) {
+	        listeners.add(0, l);
+	    }
+	}
+	
 	/**
 	 * @see org.jnode.driver.input.KeyboardAPI#getKbInterpreter()
 	 */

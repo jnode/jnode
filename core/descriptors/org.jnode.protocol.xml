@@ -4,7 +4,6 @@
 <plugin id="org.jnode.protocol" 
         name="JNode protocol handler factory"
         version="@VERSION@"
-        system="true"
         provider-name="JNode.org"
         class="org.jnode.protocol.ProtocolHandlerFactoryPlugin">
         

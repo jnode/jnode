@@ -47,7 +47,7 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 		switch(vk) {
 			case KeyEvent.VK_DEAD_CIRCUMFLEX:
 				lastDeadVK = KeyEvent.VK_DEAD_CIRCUMFLEX;
-				lastFlags = flags;
+				lastFlags = getFlags();
 				deadKey = true;
 				break;
 		}
@@ -148,7 +148,7 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 	 * Japanese variants can be implemented this way. You'll need to add some arrays.</p>
 	 *
 	 */
-	protected void initVkMap() {
+	protected void initVkMap(int []vkMap, char[] lcharMap, char[] ucharMap, char[] altGrCharMap) {
 		vkMap[0] = KeyEvent.VK_UNDEFINED;
 		vkMap[1] = KeyEvent.VK_ESCAPE;
 		vkMap[2] = KeyEvent.VK_AMPERSAND;
@@ -233,6 +233,7 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 		vkMap[81] = KeyEvent.VK_NUMPAD3;
 		vkMap[82] = KeyEvent.VK_NUMPAD0;
 		vkMap[83] = KeyEvent.VK_DECIMAL;
+		vkMap[84] = KeyEvent.VK_PRINTSCREEN;
 		vkMap[86] = KeyEvent.VK_LESS;
 		vkMap[87] = KeyEvent.VK_F11;
 		vkMap[88] = KeyEvent.VK_F12;

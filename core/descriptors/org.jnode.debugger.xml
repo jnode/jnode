@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.driver.input" 
-        name="JNode input driver"
+<plugin id="org.jnode.debugger" 
+        name="JNode Debugger"
         version="@VERSION@"
-        provider-name="JNode.org">
+        provider-name="JNode.org"
+        class="org.jnode.debugger.DebuggerPlugin">
         
   <requires>
-    <import plugin="org.jnode.driver"/>
-    <import plugin="org.jnode.driver.character"/>
+    <import plugin="org.jnode.driver.input"/>
   </requires>
         
   <runtime>
     <library name="jnode-core.jar">
-      <export name="org.jnode.driver.input.*"/>
+      <export name="org.jnode.debugger.*"/>
     </library>
   </runtime>
         
   <extension point="org.jnode.security.permissions">
     <permission class="org.jnode.driver.DriverPermission" name="setPreferredListener"/>
+    <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
   </extension>
         
 </plugin>

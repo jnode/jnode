@@ -267,7 +267,7 @@ public class LanceCore
 		hwAddress.writeTo(buf, 6);
 
 		// debug dump for investigating VWWare 3 network problems
-		//dumpDebugInfo();
+		dumpDebugInfo();
 
 		// ask buffer manager to send out the data
 		bufferManager.transmit(buf);
