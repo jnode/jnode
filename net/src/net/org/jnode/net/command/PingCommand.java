@@ -65,7 +65,7 @@ public class PingCommand implements ICMPListener{
 		ICMPProtocol icmpProtocol = (ICMPProtocol)netLayer.getProtocol(ICMPProtocol.IPPROTO_ICMP);
 		icmpProtocol.addListener(tthis);
 		
-//		Statistics stat = new Statistics();
+		Statistics stat = new Statistics();
 		int id_count = 0;
 		int seq_count = 0;
 		while(tthis.count != 0){
@@ -77,8 +77,7 @@ public class PingCommand implements ICMPListener{
 			ICMPEchoHeader transportHeader = new ICMPEchoHeader(8, id_count, seq_count);
 			transportHeader.prefixTo(packet);
 			
-//			Request r = new Request(stat, System.currentTimeMillis(), id_count, seq_count);
-			Request r = new Request(System.currentTimeMillis(), id_count, seq_count);
+			Request r = new Request(stat, System.currentTimeMillis(), id_count, seq_count);
 			Request.registerRequest(r);
 			netLayer.transmit(netHeader, packet);
 			tthis.timer.schedule(r, tthis.timeout);
@@ -97,8 +96,8 @@ public class PingCommand implements ICMPListener{
 		}
 		icmpProtocol.removeListener(tthis);
 		
-//		System.out.println("-> Packet statistics");
-//		System.out.println(stat.getStatistics());
+		System.out.println("-> Packet statistics");
+		System.out.println(stat.getStatistics());
 	}
 	
 	private long match(int id, int seq){
@@ -130,11 +129,12 @@ public class PingCommand implements ICMPListener{
 
 class Request extends TimerTask{
 	private static Hashtable requests = new Hashtable();
+	private Statistics stat;
 	private long timestamp;
 	private int id, seq;
 	
-//	Request(Statistics s, long timestamp, int id, int seq){
-	Request(long timestamp, int id, int seq){
+	Request(Statistics stat, long timestamp, int id, int seq){
+		this.stat = stat;
 		this.timestamp = timestamp;
 		this.id = id;
 		this.seq = seq;
@@ -153,6 +153,7 @@ class Request extends TimerTask{
 	
 	public void run() {
 		requests.remove(new Integer(this.seq));
+		stat.recordLost();
 	}
 	
 	long getTimestamp() {
@@ -165,7 +166,7 @@ class Request extends TimerTask{
 		return seq;
 	}
 }
-/*
+
 class Statistics{
 	private long  received=0, lost=0;
 	private long min=0, max=Integer.MAX_VALUE;
@@ -187,8 +188,9 @@ class Statistics{
 	
 	String getStatistics(){
 		long packets = received+lost;
+		long percent = 0;
 		if (packets != 0){
-			long percent = (lost/packets)*100;
+			percent = (lost/packets)*100;
 		}
 		long avg = sum/packets;
 		return new String(
@@ -198,4 +200,4 @@ class Statistics{
 			"round-trip min/avg/max = "+ min +"/"+ avg +"/"+ max +" ms"
 		);
 	}
-}*/
+}
