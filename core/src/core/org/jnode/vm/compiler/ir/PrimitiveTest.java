@@ -168,7 +168,95 @@ public class PrimitiveTest {
         return l0%l1;
     }
 
-    public static int terniary(int a0, int a1) {
+    public static int terniary11(int a0, int a1) {
         return a0<<a1;
+    }
+
+    public static int terniary12(int a0, int a1) {
+        short s = (short)(2*a0);
+        byte b = (byte)(a1 * 2);
+        char c = (char)(a1 + a0);
+        int l1 = a0 + s;
+        int l2 = a1 + b;
+        return l1 + l2 + c;
+    }
+
+    public static int terniary13(int a0, int a1) {
+        byte b = (byte)(a1 + 1);
+        return b;
+    }
+
+    public static float terniary14(float a0, float a1) {
+        return 1 + a0 + a1;
+    }
+
+    public static int terniary15(int a0, int a1) {
+        return a0 * a1 + a0 * a1;
+    }
+
+    //error
+    public static int terniary16(int a0, int a1) {
+        int s = 0;
+        for(int i = 0; i < 10000; i++)
+            s = a0 *s + a1*s + i + 1;
+        return s;
+    }
+
+    public static int terniary18(int a0, int a1) {
+        return (a0 /a1 + a1 / a0 + (a0 - a1)/ (a0 + a1) + (a0 + a1)/(a0* a1))/(a0*a1/(a0 + a1) + 1);
+    }
+
+    public static int terniary17(int a0, int a1) {
+        return (a0*a0 + a1*a1 + a1*a0)/ ((a0 + a1) + (a0 + a1)/(a0 + a0));
+    }
+
+    public static int terniary20(int a0, int a1){
+        int l0 = a0/a1;
+        int l1 = (a0 + a1)/2;
+        int l2 = (a0 * a1)/(a0 + a1);
+        int l3 = (l0 + l1 + l2)/(a0 + a1);
+        return ((1 + l0)/(1 + l1) + (2 + l0)/(1 + l2) + (3 + l0)/(1 + l3) + (4 + l1)/(1 + l2) + (5 + l2)/(1 + l3))/(a0 - a1);
+    }
+
+    public static int terniary19(int a0, int a1){
+        int l1 = a0;
+        int l3 = a0 + a0;
+        return 1/(1 + a0) + (1 + l1)/(1 + l1) + (1 + l1)/(1 + l3);
+    }
+
+    public static int terniary21(int a0, int a1){
+        return (1 * a0)/(1 * a0 )+ (1 * a0)/(1 * a0) + (1 * a0)/(1 * a0);// + (1 * a0)/(1 * a0) +
+                //(1 * a0)/(1 * a0 );
+    }
+
+    //failure
+    public static int terniary22(int a0, int a1){
+        int l0 = a0 + a1;
+        int l1 = a0 + a1;
+        int l2 = a0 + a1;
+        int l3 = a0 + a1;
+        int l4 = a0 + a1;
+        int l5 = a0 + a1;
+        int l6 = a0 + a1;
+        int l7 = a0 + a1;
+        int l8 = a0 + a1;
+        //int l9 = a0 + a1;
+        return l0 + l1 + l2 + l3 + l4 + l5 + l6 + l7 + l8;// + l9;
+    }
+
+    public static int terniary23(int a0, int a1){
+        return ((((((a0 * a1 + a1) << a1)/a0)>>>a0) + a0*a1)>>(a1 - 2)) + (((17*a0*a1)<<3)%(a0 + a1 +1));
+    }
+
+    public static float terniary24(float a0, float a1){
+      //  float l0 = a0 + a1;
+    //    float l1 = a0 + a1;
+  //      int l2 = (int)l0 + 2;
+//        float l3 = l1 + (float)l2;
+        return a0;//l3;
+    }
+
+    public static int terniary(int a0, int a1){
+        return (int)((float)a0 + (float) a1);
     }
 }
