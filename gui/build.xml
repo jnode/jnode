@@ -32,7 +32,8 @@
 	  <src path="${my-src.dir}/awt"/>
 	  <src path="${my-src.dir}/driver"/>
 	  <src path="${my-src.dir}/test"/>
-          <src path="${my-src.dir}/wt"/>
+      <src path="${my-src.dir}/wt"/>
+      <src path="${my-src.dir}/textgui"/>
       <classpath refid="my-cp"/>
     </javac>
   </target>
