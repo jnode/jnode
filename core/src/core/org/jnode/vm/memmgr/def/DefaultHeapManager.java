@@ -44,8 +44,11 @@ public final class DefaultHeapManager extends VmHeapManager {
 	private final VmAbstractHeap firstHeap;
 	/** The heap currently used for allocation */
 	private VmAbstractHeap currentHeap;
+	/** The heap used for allocations during a GC */
+	private VmAbstractHeap gcHeap;
 	/** The class of the default heap type. Set by initialize */
 	private final VmNormalClass defaultHeapClass;
+	/** The statics table */
 	private final VmStatics statics;
 	/** The number of allocated bytes since the last GC trigger */
 	private int allocatedSinceGcTrigger;
@@ -164,7 +167,10 @@ public final class DefaultHeapManager extends VmHeapManager {
 
 		// Initialize the first normal heap
 		Address ptr = helper.allocateBlock(DEFAULT_HEAP_SIZE);
-		firstHeap.initialize(ptr, Address.add(ptr, DEFAULT_HEAP_SIZE), slotSize);	
+		firstHeap.initialize(ptr, Address.add(ptr, DEFAULT_HEAP_SIZE), slotSize);
+		
+		// Initialize the GC heap
+		gcHeap = allocHeap(DEFAULT_HEAP_SIZE, false);
 	}
 	
 	public void start() {
@@ -198,17 +204,6 @@ public final class DefaultHeapManager extends VmHeapManager {
 	 * @return Object
 	 */
 	protected Object allocObject(VmClassType vmClass, int size) {
-		if (gcActive) {
-		    Unsafe.debug("allocObject(");
-		    Unsafe.debug(vmClass.getName());
-		    Unsafe.debug(", ");
-		    Unsafe.debug(size);
-		    Unsafe.debug(");");
-            Unsafe.getCurrentProcessor().getArchitecture().getStackReader()
-            .debugStackTrace();
-		    helper.die("allocObject during GC");
-		}
-	
 		// Make sure the class is initialized
 		vmClass.initialize();
 		
@@ -219,71 +214,79 @@ public final class DefaultHeapManager extends VmHeapManager {
 		Object result = null;
 		int oomCount = 0;
 
-		final Monitor m = heapMonitor;
-		//final Monitor m = null;
-		if (m != null) {
-			m.enter();
-		}
-		try {
-			while (result == null) {
-				// The current heap is full
-				if (heap == null) {
-					//Unsafe.debug("allocHeap in allocObject("); Unsafe.debug(alignedSize);
-					//Unsafe.debug(") ");
-					int newHeapSize = DEFAULT_HEAP_SIZE;  
-					if (size > newHeapSize) {
-						// this is a BIG object, try to allocate a new heap 
-						// only for it
-						newHeapSize = size;
-					}
-					if ((heap = allocHeap(newHeapSize)) == null) {
-						lowOnMemory = true;
-						// It was not possible to allocate another heap.
-						// First try to GC, if we've done that before
-						// in this allocation, then we're in real panic.
-						if (oomCount == 0) {
-							oomCount++;
-							Unsafe.debug("<oom/>");
-						    gcThread.trigger(true);
-							heap = firstHeap;
-							currentHeap = firstHeap;
-						} else {
-							Unsafe.debug("Out of memory in allocObject(");
-							Unsafe.debug(size);
-							Unsafe.debug(")");
-							throw OOME;
-							//Unsafe.die();
-						}
-					} else {
-						//Unsafe.debug("AO.G");
-						// We successfully allocated a new heap, set it
-						// to current, so we'll use it for the following
-						// allocations.
-						currentHeap = heap;
-					}
-				}
-
-				result = heap.alloc(vmClass, alignedSize);
-
-				if (result == null) {
-					heap = heap.getNext();
-				}
-			}
-			vmClass.incInstanceCount();
-			lowOnMemory = false;
-			// Allocated objects are initially black.
-			helper.unsafeSetObjectFlags(result, ObjectFlags.GC_DEFAULT_COLOR);
-
-			allocatedSinceGcTrigger += alignedSize;
-			if ((allocatedSinceGcTrigger > triggerSize) && (gcThread != null)) {
-			    Unsafe.debug("<alloc:GC trigger/>");
-			    allocatedSinceGcTrigger = 0;
-			    gcThread.trigger(false);
-			}
-		} finally {
-			if (m != null) {
-				m.exit();
-			}
+		if (gcActive) {
+		    Unsafe.debug("Using GC Heap sz"); Unsafe.debug(alignedSize);
+		    result = gcHeap.alloc(vmClass, alignedSize);
+		    if (result == null) {
+		        helper.die("Out of GC heap memory.");
+		    }
+		} else {
+		    final Monitor m = heapMonitor;
+		    //final Monitor m = null;
+		    if (m != null) {
+		        m.enter();
+		    }
+		    try {
+		        while (result == null) {
+		            // The current heap is full
+		            if (heap == null) {
+		                //Unsafe.debug("allocHeap in allocObject("); Unsafe.debug(alignedSize);
+		                //Unsafe.debug(") ");
+		                int newHeapSize = DEFAULT_HEAP_SIZE;  
+		                if (size > newHeapSize) {
+		                    // this is a BIG object, try to allocate a new heap 
+		                    // only for it
+		                    newHeapSize = size;
+		                }
+		                if ((heap = allocHeap(newHeapSize, true)) == null) {
+		                    lowOnMemory = true;
+		                    // It was not possible to allocate another heap.
+		                    // First try to GC, if we've done that before
+		                    // in this allocation, then we're in real panic.
+		                    if (oomCount == 0) {
+		                        oomCount++;
+		                        Unsafe.debug("<oom/>");
+		                        gcThread.trigger(true);
+		                        heap = firstHeap;
+		                        currentHeap = firstHeap;
+		                    } else {
+		                        Unsafe.debug("Out of memory in allocObject(");
+		                        Unsafe.debug(size);
+		                        Unsafe.debug(")");
+		                        throw OOME;
+		                        //Unsafe.die();
+		                    }
+		                } else {
+		                    //Unsafe.debug("AO.G");
+		                    // We successfully allocated a new heap, set it
+		                    // to current, so we'll use it for the following
+		                    // allocations.
+		                    currentHeap = heap;
+		                }
+		            }
+		            
+		            result = heap.alloc(vmClass, alignedSize);
+		            
+		            if (result == null) {
+		                heap = heap.getNext();
+		            }
+		        }
+		        vmClass.incInstanceCount();
+		        lowOnMemory = false;
+		        // Allocated objects are initially black.
+		        helper.unsafeSetObjectFlags(result, ObjectFlags.GC_DEFAULT_COLOR);
+		        
+		        allocatedSinceGcTrigger += alignedSize;
+		        if ((allocatedSinceGcTrigger > triggerSize) && (gcThread != null)) {
+		            Unsafe.debug("<alloc:GC trigger/>");
+		            allocatedSinceGcTrigger = 0;
+		            gcThread.trigger(false);
+		        }
+		    } finally {
+		        if (m != null) {
+		            m.exit();
+		        }
+		    }
 		}
 		
 		return result;
@@ -296,7 +299,7 @@ public final class DefaultHeapManager extends VmHeapManager {
 	 * @param size
 	 * @return The heap
 	 */
-	private VmAbstractHeap allocHeap(int size) {
+	private VmAbstractHeap allocHeap(int size, boolean addToHeapList) {
 		//Unsafe.debug("allocHeap");
 		final Address start = helper.allocateBlock(size);
 		//final Address start = MemoryBlockManager.allocateBlock(size);
@@ -308,7 +311,9 @@ public final class DefaultHeapManager extends VmHeapManager {
 		final VmAbstractHeap heap = VmDefaultHeap.setupHeap(helper, start, defaultHeapClass, slotSize);
 		heap.initialize(start, end, slotSize);
 
-		firstHeap.append(heap);
+		if (addToHeapList) {
+		    firstHeap.append(heap);
+		}
 		return heap;
 	}
 
