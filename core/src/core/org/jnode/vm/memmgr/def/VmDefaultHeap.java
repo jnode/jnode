@@ -324,7 +324,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
      *            If true, use lock/unlock while proceeding to the next object.
      */
     protected final void walk(ObjectVisitor visitor, boolean locking,
-            int flagsMask, int flagsValue) {
+            Word flagsMask, Word flagsValue) {
         // Go through the heap and call visit on each object
         final int headerSize = this.headerSize;
         final Offset sizeOffset = this.sizeOffset;
@@ -338,7 +338,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
                 final Object tib;
                 final Object object;
                 final int objSize;
-                final int flags;
+                final Word flags;
 
                 lock();
                 try {
@@ -346,12 +346,12 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
                     object = ptr.toObjectReference().toObject();
                     tib = ptr.loadObjectReference(tibOffset);
                     objSize = ptr.loadInt(sizeOffset);
-                    flags = (flagsMask == 0) ? 0 : (VmMagic.getObjectFlags(object) & flagsMask);
+                    flags = (flagsMask.isZero()) ? Word.zero() : VmMagic.getObjectFlags(object).and(flagsMask);
                 } finally {
                     unlock();
                 }
                 if (tib != FREE) {
-                    if (flags == flagsValue) {
+                    if (flags.EQ(flagsValue)) {
                         if (!visitor.visit(object)) {
                             // Stop
                             offset = size;
@@ -366,9 +366,9 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
                 final Object object = ptr.toObjectReference().toObject();
                 final Object tib = ptr.loadObjectReference(tibOffset);
                 final int objSize = ptr.loadInt(sizeOffset);
-                final int flags = (flagsMask == 0) ? 0 : (VmMagic.getObjectFlags(object) & flagsMask);
+                final Word flags = flagsMask.isZero() ? Word.zero() : VmMagic.getObjectFlags(object).and(flagsMask);
                 if (tib != FREE) {
-                    if (flags == flagsValue) {
+                    if (flags.EQ(flagsValue)) {
                         if (!visitor.visit(object)) {
                             // Stop
                             offset = size;
