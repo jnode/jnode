@@ -14,6 +14,7 @@ import org.jnode.driver.video.HardwareCursorAPI;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.UnknownConfigurationException;
 import org.jnode.driver.video.ddc.DisplayDataChannelAPI;
+import org.jnode.plugin.ConfigurationElement;
 import org.jnode.system.ResourceNotFreeException;
 
 /**
@@ -29,6 +30,13 @@ public class NVidiaDriver extends AbstractFrameBufferDriver implements NVidiaCon
 	private static final FrameBufferConfiguration[] CONFIGS = new FrameBufferConfiguration[] { 
 		NVidiaConfiguration.VESA_118, 
 		NVidiaConfiguration.VESA_115 };
+
+	/**
+	 * Create a new instance
+	 */
+	public NVidiaDriver(ConfigurationElement config) throws DriverException {
+	    this(parseArchitecture(config), config.getAttribute("name"));
+	}
 
 	/**
 	 * Create a new instance
@@ -103,6 +111,23 @@ public class NVidiaDriver extends AbstractFrameBufferDriver implements NVidiaCon
 		dev.unregisterAPI(DisplayDataChannelAPI.class);
 		dev.unregisterAPI(HardwareCursorAPI.class);
 		super.stopDevice();
+	}
+	
+	private static final int parseArchitecture(ConfigurationElement config) throws DriverException {
+	    final String arch = config.getAttribute("architecture");
+	    if (arch == null) {
+	        throw new DriverException("Architecture must be set");
+	    } else if (arch.equals("NV04A")) {
+	        return NV04A;
+	    } else if (arch.equals("NV10A")) {
+	        return NV10A;
+	    } else if (arch.equals("NV20A")) {
+	        return NV20A;
+	    } else if (arch.equals("NV30A")) {
+	        return NV30A;
+	    } else {
+	        throw new DriverException("Unknown architecture " + arch);
+	    }
 	}
 
 }

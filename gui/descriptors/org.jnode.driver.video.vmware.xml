@@ -20,7 +20,9 @@
   </runtime>
 
   <extension point="org.jnode.driver.mappers">
-    <mapper class="org.jnode.driver.video.vmware.VMWareDeviceToDriverMapper"/>
+    <!--  mapper class="org.jnode.driver.video.vmware.VMWareDeviceToDriverMapper"/ -->
+    <mapper id="15ad:0710" name="VMWare SVGA" driver-class="org.jnode.driver.video.vmware.VMWareDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="15ad:0405" name="VMWare SVGA1" driver-class="org.jnode.driver.video.vmware.VMWareDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
   </extension>
         
   <extension point="org.jnode.security.permissions">
