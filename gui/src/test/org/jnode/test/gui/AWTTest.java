@@ -4,6 +4,8 @@
 package org.jnode.test.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Button;
+import java.awt.Checkbox;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -11,15 +13,14 @@ import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.List;
+import java.awt.Scrollbar;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
-
-import javax.swing.JButton;
-import javax.swing.JScrollBar;
 
 //import org.apache.log4j.Logger;
 
@@ -167,27 +168,36 @@ public class AWTTest {
         final Frame wnd = new Frame();
         try {
             wnd.setSize(600, 400);
+            wnd.setLayout(new BorderLayout());
             //wnd.setLocation(75, 50);
-            final JButton b = new JButton("Hello world");
+            wnd.setBackground(Color.GREEN);
+            
+            final List l = new List();
+            l.add("Item 1");
+            l.add("Item 2");
+            l.add("Item 3");
+            wnd.add(l, BorderLayout.CENTER);
+            
+            final Button b = new Button("Hello world");
             b.addActionListener(new ActionListener() {
                 int i =0;
                 public void actionPerformed(ActionEvent e) {
                     System.out.println("Action performed " + e);
                     switch(i){
                     case 0:{
-                        wnd.add(new JButton(String.valueOf(i)), BorderLayout.WEST);
+                        wnd.add(new Button(String.valueOf(i)), BorderLayout.WEST);
                         break;
                     }
                     case 1:{
-                        wnd.add(new JButton(String.valueOf(i)), BorderLayout.SOUTH);
+                        wnd.add(new Button(String.valueOf(i)), BorderLayout.SOUTH);
                         break;
                     }
                     case 2:{
-                        wnd.add(new JButton(String.valueOf(i)), BorderLayout.EAST);
+                        wnd.add(new Button(String.valueOf(i)), BorderLayout.EAST);
                         break;
                     }
                     default:
-                        b.setText(String.valueOf(i));
+                        b.setLabel(String.valueOf(i));
                     }
                     i++;
                     wnd.validate();
@@ -195,7 +205,16 @@ public class AWTTest {
             });
             wnd.add(b, BorderLayout.NORTH);
             b.setBackground(Color.YELLOW);
-            wnd.add(new JScrollBar(), BorderLayout.SOUTH);
+            
+            final Button b2 = new Button("Left");
+            wnd.add(b2, BorderLayout.WEST);
+            b2.setBackground(Color.RED);
+            
+            final Checkbox cb1 = new Checkbox("Right");
+            wnd.add(cb1, BorderLayout.EAST);
+            cb1.setBackground(Color.WHITE);
+            
+            wnd.add(new Scrollbar(Scrollbar.HORIZONTAL), BorderLayout.SOUTH);
             //wnd.add(new TestComponent(useDoubleBuffer), BorderLayout.CENTER);
             //wnd.add(new TestComponent(useDoubleBuffer), BorderLayout.CENTER);
             b.requestFocus();
@@ -203,18 +222,22 @@ public class AWTTest {
             Font f = wnd.getFont();
             System.out.println(f.getName());
             wnd.getFontMetrics(f);
-            wnd.setBackground(Color.GREEN);
 
             Thread.sleep(5000);
+            b2.setBackground(Color.RED);
 
 
 //            Font f = wnd.getFont();
 //            System.out.println(f.getName());
 //            wnd.getFontMetrics(f);
 
-            for (int i = 0; i < 50; i++) {
+            for (int i = 0; i < 10; i++) {
             	wnd.setLocation(wnd.getX() + 5, wnd.getY() + 4);
-                Thread.sleep(100);
+            	if ((i % 10) == 0) {
+            		Thread.sleep(2500);
+            	} else {
+            		Thread.sleep(100);
+            	}
             }
             
             Thread.sleep(5000);
