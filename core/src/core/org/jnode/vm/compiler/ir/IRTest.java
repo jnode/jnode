@@ -124,7 +124,7 @@ public class IRTest {
 		int nMethods = type.getNoDeclaredMethods();
 		for (int i=0; i<nMethods; i+=1) {
 			VmMethod method = type.getDeclaredMethod(i);
-			if ("simple".equals(method.getName())) {
+			if ("const1".equals(method.getName())) {
 				arithMethod = method;
 				break;
 			}
@@ -169,5 +169,14 @@ public class IRTest {
 	public static int simple(int a0, int a1) {
 		int l0 = a1;
 		return -l0;
+	}
+
+    public static int const1(int a0, int a1) {
+        int l1 = -134;
+        int l2 = 2;
+        int l3 = 3;
+		//return (int)(1 + 2 * 3.5 + 1) % 6  ;
+        //return  - ((l1 + l2 + l3 + l1* l2* l3) / l2);
+        return (byte) 2 + a1;
 	}
 }
