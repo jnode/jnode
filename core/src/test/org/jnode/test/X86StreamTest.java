@@ -73,6 +73,8 @@ public class X86StreamTest {
 		os.writeSUB(Register.EAX, 28, 11);
 		os.writeSUB(Register.EAX, 28, 255);
 
+		os.writeTEST(Register.EDI, 0x40, 0xFFFFFFFF);
+		
 		FileOutputStream fos = new FileOutputStream("test.bin");
 		os.writeTo(fos);
 		fos.close();

@@ -3,6 +3,9 @@
  */
 package org.jnode.vm.bytecode;
 
+import java.util.Iterator;
+
+import org.jnode.util.BootableArrayList;
 import org.jnode.vm.VmSystemObject;
 
 /**
@@ -19,6 +22,8 @@ public class BasicBlock extends VmSystemObject {
 	private final int startPC;
 	private int endPC;
 	private boolean startOfExceptionHandler;
+	private TypeStack startStack;
+	private BootableArrayList entryBlocks = new BootableArrayList();
 	
 	/**
 	 * Create a new instance
@@ -84,12 +89,31 @@ public class BasicBlock extends VmSystemObject {
 	 * @return String
 	 */
 	public String toString() {
-		final String str = "" + startPC + "-" + endPC;
+		final StringBuffer buf = new StringBuffer();
+		buf.append(startPC);
+		buf.append('-');
+		buf.append(endPC);
+		buf.append(" [entry:");
+		buf.append(startStack);
+		buf.append(';');
+		addEntryBlockInfo(buf);
+		buf.append(']');
 		if (startOfExceptionHandler) {
-			return str + " (EH)";
-		} else {
-			return str;
+			buf.append(" (EH)");
 		}
+		return buf.toString();
+	}
+	
+	private void addEntryBlockInfo(StringBuffer buf) {
+	    for (Iterator i = entryBlocks.iterator(); i.hasNext(); ) {
+	        final BasicBlock bb = (BasicBlock)i.next();
+	        buf.append(bb.getStartPC());
+	        buf.append('-');
+	        buf.append(bb.getEndPC());
+	        if (i.hasNext()) {
+	            buf.append(',');
+	        }
+	    }
 	}
 	
 	/**
@@ -99,4 +123,32 @@ public class BasicBlock extends VmSystemObject {
 	public final boolean isStartOfExceptionHandler() {
 		return startOfExceptionHandler;
 	}
+	
+    /**
+     * Gets the stack types at the start of this basic block.
+     * @return Returns the startStack.
+     * @see org.jnode.vm.JvmType
+     */
+    public final TypeStack getStartStack() {
+        return this.startStack;
+    }
+
+    /**
+     * Set the stack types at the start of this basic block.
+     * @param startStack The startStack to set.
+     * @see org.jnode.vm.JvmType
+     */
+    public final void setStartStack(TypeStack startStack) {
+        this.startStack = startStack;
+    }
+    
+    /**
+     * Add a list of block that can can transfer execution to this block.  
+     * @param entryBlock
+     */
+    public final void addEntryBlock(BasicBlock entryBlock) {
+        if (entryBlock != null) {
+            this.entryBlocks.add(entryBlock);
+        }
+    }
 }

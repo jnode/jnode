@@ -5,7 +5,7 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
-import org.jnode.vm.x86.compiler.JvmType;
+import org.jnode.vm.JvmType;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
@@ -26,7 +26,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      * @return
      */
     final Register getRegister() {
-        myAssert(kind == Kind.REGISTER);
+        assertCondition(kind == Kind.REGISTER, "Must be register");
         return reg;
     }
 
@@ -39,10 +39,10 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      *            register to load the item to
      */
     final void loadTo(EmitterContext ec, Register reg) {
-        myAssert(reg != null);
+        assertCondition(reg != null, "Reg != null");
         AbstractX86Stream os = ec.getStream();
         X86RegisterPool pool = ec.getPool();
-        myAssert(!pool.isFree(reg));
+        assertCondition(!pool.isFree(reg), "reg not free");
 
         switch (kind) {
         case Kind.REGISTER:
@@ -98,7 +98,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
                 vstack.push(ec);
                 r = pool.request(getType(), this);
             }
-            myAssert(r != null);
+            assertCondition(r != null, "r != null");
             loadTo(ec, r);
         }
     }
@@ -115,7 +115,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
                 ec.getVStack().push(ec);
                 r = ec.getPool().request(JvmType.INT);
             }
-            myAssert(r != null);
+            assertCondition(r != null, "r != null");
             loadTo(ec, r);
         }
     }
@@ -238,7 +238,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
         switch (getKind()) {
         case Kind.REGISTER:
             pool.release(reg);
-            myAssert(pool.isFree(reg));
+            assertCondition(pool.isFree(reg), "reg is free");
             break;
 
         case Kind.LOCAL:
@@ -265,7 +265,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      * @see org.jnode.vm.x86.compiler.l1a.Item#spill(EmitterContext, Register)
      */
     final void spill(EmitterContext ec, Register reg) {
-        myAssert((getKind() == Kind.REGISTER) && (this.reg == reg));
+        assertCondition((getKind() == Kind.REGISTER) && (this.reg == reg), "spill1");
         final X86RegisterPool pool = ec.getPool();
         Register r = pool.request(getType());
         if (r == null) {
@@ -274,7 +274,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
             r = pool.request(getType());
             System.out
                     .println("Pool state after push of " + cnt + ":\n" + pool);
-            myAssert(r != null);
+            assertCondition(r != null, "r != null");
         }
         loadTo(ec, r);
         pool.transferOwnerTo(r, this);

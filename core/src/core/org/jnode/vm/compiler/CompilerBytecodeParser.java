@@ -31,6 +31,12 @@ public class CompilerBytecodeParser extends BytecodeParser implements BytecodeFl
 	 */
 	protected void fireStartInstruction(int address) {
 		final int flags = cfg.getOpcodeFlags(address);
+		if ((flags & F_START_OF_TRYBLOCK) != 0) {
+		    handler.startTryBlock();
+		}
+		if ((flags & F_START_OF_TRYBLOCKEND) != 0) {
+		    handler.endTryBlock();
+		}
 		super.fireStartInstruction(address);
 		if ((flags & F_YIELDPOINT) != 0) {
 			handler.yieldPoint();

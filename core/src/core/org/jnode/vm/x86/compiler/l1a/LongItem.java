@@ -5,7 +5,7 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
-import org.jnode.vm.x86.compiler.*;
+import org.jnode.vm.JvmType;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
@@ -42,7 +42,7 @@ final class LongItem extends DoubleWordItem  implements X86CompilerConstants {
      * @return
      */
     final long getValue() {
-        myAssert(kind == Kind.CONSTANT);
+        assertCondition(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
         return value;
     }
 
@@ -51,7 +51,7 @@ final class LongItem extends DoubleWordItem  implements X86CompilerConstants {
      * @return
      */
     final int getLsbValue() {
-        myAssert(kind == Kind.CONSTANT);
+        assertCondition(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
         return (int)(value & 0xFFFFFFFFL);
     }
 
@@ -60,7 +60,7 @@ final class LongItem extends DoubleWordItem  implements X86CompilerConstants {
      * @return
      */
     final int getMsbValue() {
-        myAssert(kind == Kind.CONSTANT);
+        assertCondition(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
         return (int)((value >>> 32) & 0xFFFFFFFFL);
     }
     

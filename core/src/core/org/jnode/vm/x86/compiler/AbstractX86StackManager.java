@@ -4,6 +4,7 @@
 package org.jnode.vm.x86.compiler;
 
 import org.jnode.assembler.x86.Register;
+import org.jnode.vm.*;
 
 
 /**

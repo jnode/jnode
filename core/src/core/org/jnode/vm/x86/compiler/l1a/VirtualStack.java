@@ -5,8 +5,9 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
+import org.jnode.vm.JvmType;
+import org.jnode.vm.bytecode.TypeStack;
 import org.jnode.vm.x86.compiler.AbstractX86StackManager;
-import org.jnode.vm.x86.compiler.JvmType;
 
 /**
  * @author Patrik Reali
@@ -28,7 +29,7 @@ final class VirtualStack {
     private int tos;
 
     final ItemStack operandStack;
-    
+
     final ItemStack fpuStack = new ItemStack(Item.Kind.FPUSTACK);
 
     /**
@@ -182,10 +183,14 @@ final class VirtualStack {
      * Push item on stack.
      */
     void push(Item item) {
-        if ((item.getKind() == Item.Kind.STACK) && (tos > 0))
-                Item.myAssert(stack[ tos - 1].getKind() == Item.Kind.STACK);
+        if ((item.getKind() == Item.Kind.STACK) && (tos > 0)) {
+            Item.assertCondition(stack[ tos - 1].getKind() == Item.Kind.STACK,
+                    "stack[ tos - 1].getKind() == Item.Kind.STACK");
+        }
 
-        if (tos == stack.length) growStack();
+        if (tos == stack.length) {
+            growStack();
+        }
 
         stack[ tos++] = item;
     }
@@ -202,7 +207,7 @@ final class VirtualStack {
     }
 
     //TODO: deprecated
-    Item createStack(int type) {
+    static Item createStack(int type) {
         Item res = null;
         switch (type) {
         case JvmType.INT:
@@ -254,7 +259,8 @@ final class VirtualStack {
         int cnt = 0;
         while (i < tos) {
             final Item item = stack[ i];
-            Item.myAssert(item.getKind() != Item.Kind.STACK);
+            Item.assertCondition(item.getKind() != Item.Kind.STACK,
+                    "item.getKind() != Item.Kind.STACK");
             item.push(ec);
             i++;
             cnt++;
@@ -283,8 +289,55 @@ final class VirtualStack {
         return false;
     }
 
+    /**
+     * Create a typestack reflecting the state of this stack.
+     * 
+     * @return
+     */
+    TypeStack asTypeStack() {
+        final TypeStack tstack = new TypeStack();
+        for (int i = 0; i < tos; i++) {
+            tstack.push(stack[ i].getType());
+        }
+        return tstack;
+    }
+
+    /**
+     * Push items (kind = STACK) on stack for each type in the given
+     * typestack. 
+     * @param tstack May be null or empty
+     */
+    final void pushAll(TypeStack tstack) {
+        if ((tstack != null) && !tstack.isEmpty()) {
+            final int size = tstack.size();
+            for (int i = 0; i < size; i++) {
+                final int type = tstack.getType(i);
+                final Item item = VirtualStack.createStack(type);
+                push(item);
+                if (VirtualStack.checkOperandStack) {
+                    operandStack.push(item);
+                }
+            }
+        }
+    }
+
     final AbstractX86StackManager createStackMgr() {
         return new StackManagerImpl();
+    }
+
+    public String toString() {
+        final StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < tos; i++) {
+            if (i != 0) {
+                buf.append(',');
+            }
+            buf.append('(');
+            buf.append(stack[ i].getType());
+            buf.append(',');
+            buf.append(stack[ i].getKind());
+            buf.append(')');
+        }
+        return buf.toString();
     }
 
     final class StackManagerImpl implements AbstractX86StackManager {

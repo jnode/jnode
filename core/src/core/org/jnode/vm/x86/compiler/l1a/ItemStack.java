@@ -37,7 +37,7 @@ final class ItemStack {
     }
 
     final void push(Item item) {
-        Item.myAssert(item.getKind() == expectedKind);
+        Item.assertCondition(item.getKind() == expectedKind, "item.getKind() == expectedKind");
         if (tos == stack.length) grow();
         stack[ tos++] = item;
     }

@@ -69,8 +69,8 @@ abstract class Item {
      * Assert.
      * @param cond
      */
-    static void myAssert(boolean cond) {
-        if (!cond) { throw new Error("assertion failure"); }
+    static void assertCondition(boolean cond, String message) {
+        if (!cond) { throw new Error("Assertion failure: " + message); }
     }
 
     /**
@@ -113,7 +113,7 @@ abstract class Item {
      * @return
      */
     int getOffsetToFP() {
-        myAssert(kind == Kind.LOCAL);
+        assertCondition(kind == Kind.LOCAL, "kind == Kind.LOCAL");
         return offsetToFP;
     }
 

@@ -5,7 +5,7 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
-import org.jnode.vm.x86.compiler.JvmType;
+import org.jnode.vm.JvmType;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
@@ -48,7 +48,7 @@ public abstract class DoubleWordItem extends Item implements
      * @return
      */
     final Register getLsbRegister() {
-        myAssert(kind == Kind.REGISTER);
+        assertCondition(kind == Kind.REGISTER, "kind == Kind.REGISTER");
         return lsb;
     }
 
@@ -58,7 +58,7 @@ public abstract class DoubleWordItem extends Item implements
      * @return
      */
     final Register getMsbRegister() {
-        myAssert(kind == Kind.REGISTER);
+        assertCondition(kind == Kind.REGISTER, "kind == Kind.REGISTER");
         return msb;
     }
 
@@ -104,9 +104,9 @@ public abstract class DoubleWordItem extends Item implements
         AbstractX86Stream os = ec.getStream();
         X86RegisterPool pool = ec.getPool();
         //os.log("LongItem.log called "+Integer.toString(kind));
-        myAssert(lsb != msb);
-        myAssert(lsb != null);
-        myAssert(msb != null);
+        assertCondition(lsb != msb, "lsb != msb");
+        assertCondition(lsb != null, "lsb != null");
+        assertCondition(msb != null, "msb != null");
         switch (kind) {
         case Kind.REGISTER:
             // invariant: (msb != lsb) && (this.msb != this.lsb)
@@ -212,13 +212,13 @@ public abstract class DoubleWordItem extends Item implements
                 ec.getVStack().push(ec);
                 lsb = ec.getPool().request(JvmType.INT);
             }
-            myAssert(lsb != null);
+            assertCondition(lsb != null, "lsb != null");
             Register msb = ec.getPool().request(JvmType.INT);
             if (msb == null) {
                 ec.getVStack().push(ec);
                 msb = ec.getPool().request(JvmType.INT);
             }
-            myAssert(msb != null);
+            assertCondition(msb != null, "msb != null");
             loadTo(ec, lsb, msb);
         }
     }
@@ -242,8 +242,8 @@ public abstract class DoubleWordItem extends Item implements
                 vstack.push(ec);
                 r = pool.request(getType(), this);
             }
-            myAssert(r != null);
-            myAssert(l != null);
+            assertCondition(r != null, "r != null");
+            assertCondition(l != null, "l != null");
             loadTo(ec, l, r);
         }
     }

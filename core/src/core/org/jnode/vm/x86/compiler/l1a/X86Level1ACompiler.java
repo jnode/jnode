@@ -8,6 +8,7 @@ import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.x86.X86Stream;
 import org.jnode.vm.Unsafe;
+import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.compiler.CompiledMethod;
 import org.jnode.vm.compiler.CompilerBytecodeVisitor;
@@ -20,10 +21,40 @@ import org.jnode.vm.x86.compiler.AbstractX86Compiler;
  * Native code compiler for the Intel x86 architecture.
  * 
  * <pre>
- *  HIGH VALUES first-arg ... last-arg old EIP old EBP magic method local 0 ... local n calculation stack LOW VALUES
+ * 
+ *  
  *   
- * <h1>long entries</h1>
- *  PUSH: MSB, LSB POP: LSB, MSB
+ *    
+ *     
+ *       HIGH VALUES first-arg ... last-arg old EIP old EBP magic method local 0 ... local n calculation stack LOW VALUES
+ *        
+ *      
+ *     
+ *    
+ *   
+ *  
+ * <h1>
+ * 
+ *  
+ *   
+ *    
+ *     long entries
+ *     
+ *    
+ *   
+ *  
+ * </h1>
+ * 
+ *  
+ *   
+ *    
+ *     
+ *       PUSH: MSB, LSB POP: LSB, MSB
+ *      
+ *     
+ *    
+ *   
+ *  
  * </pre>
  */
 public class X86Level1ACompiler extends AbstractX86Compiler {
@@ -49,11 +80,11 @@ public class X86Level1ACompiler extends AbstractX86Compiler {
      */
     protected CompilerBytecodeVisitor createBytecodeVisitor(VmMethod method,
             CompiledMethod cm, NativeStream os, int level, boolean isBootstrap) {
-        InlineBytecodeVisitor cbv = new X86BytecodeVisitor(os, cm, isBootstrap,
-                getContext());
+        final InlineBytecodeVisitor cbv;
+        cbv = new X86BytecodeVisitor(os, cm, isBootstrap, getContext());
         if (inlineMethods) {
-            return new InliningBytecodeVisitor(cbv, method.getDeclaringClass()
-                    .getLoader());
+            final VmClassLoader loader = method.getDeclaringClass().getLoader();
+            return new InliningBytecodeVisitor(cbv, loader);
         } else {
             return cbv;
         }
@@ -66,21 +97,22 @@ public class X86Level1ACompiler extends AbstractX86Compiler {
      * @return NativeStream
      */
     public NativeStream createNativeStream(ObjectResolver resolver) {
-        X86Stream os = new X86Stream((X86CpuID) Unsafe.getCurrentProcessor()
-                .getCPUID(), 0);
+        X86CpuID cpuid = (X86CpuID) Unsafe.getCurrentProcessor().getCPUID();
+        X86Stream os = new X86Stream(cpuid, 0);
         os.setResolver(resolver);
         return os;
     }
-    
+
     /**
      * @see org.jnode.vm.compiler.NativeCodeCompiler#getMagic()
      */
     public final int getMagic() {
         return L1A_COMPILER_MAGIC;
     }
-    
+
     /**
      * Gets the name of this compiler.
+     * 
      * @return
      */
     public String getName() {

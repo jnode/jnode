@@ -11,11 +11,18 @@ import org.jnode.vm.classmgr.VmMethod;
 public abstract class InlineBytecodeVisitor extends CompilerBytecodeVisitor {
 
     /**
-     * An inlined method will follow next.
+     * An inlined method header will follow next.
      * @param inlinedMethod
      * @param newMaxLocals The new maxlocals count. 
      */
-    public abstract void startInlinedMethod(VmMethod inlinedMethod, int newMaxLocals);
+    public abstract void startInlinedMethodHeader(VmMethod inlinedMethod, int newMaxLocals);
+    
+    /**
+     * An inlined method code will follow next.
+     * @param inlinedMethod
+     * @param newMaxLocals The new maxlocals count. 
+     */
+    public abstract void startInlinedMethodCode(VmMethod inlinedMethod, int newMaxLocals);
     
     /**
      * An inlined method has ended.

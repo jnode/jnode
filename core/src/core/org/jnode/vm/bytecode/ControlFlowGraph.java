@@ -6,7 +6,6 @@ package org.jnode.vm.bytecode;
 import java.util.Iterator;
 
 import org.jnode.util.ObjectArrayIterator;
-import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.VmByteCode;
 
 /**
@@ -14,7 +13,7 @@ import org.jnode.vm.classmgr.VmByteCode;
  * 
  * @author epr
  */
-public class ControlFlowGraph extends VmSystemObject {
+public class ControlFlowGraph {
 	
 	private final byte[] opcodeFlags;
 	private final BasicBlock[] bblocks;
