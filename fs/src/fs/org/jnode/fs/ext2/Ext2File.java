@@ -103,8 +103,6 @@ public class Ext2File extends AbstractFSFile {
 
                     iNode.setMtime(System.currentTimeMillis() / 1000);
 
-                    //setLength done, unlock the inode from the cache
-                    iNode.decLocked();
                     return;
                 }
 
