@@ -163,7 +163,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
                 try {
                     return ci.getVmClass();
                 } catch (ClassNotFoundException ex) {
-                    throw new RuntimeException(ex);
+                    //throw new RuntimeException(ex);
+                    return null;
                 }
             } else {
                 return null;
