@@ -2536,7 +2536,7 @@ public class Area implements Shape, Cloneable
       if (x.length == 1)
 	return createNode(b, (Intersection) x[0]);
 
-      return createNodes(b, x);
+      return this.createNodes(b, x);
     }
 
     /**
@@ -2840,7 +2840,7 @@ public class Area implements Shape, Cloneable
 	  if (x.length == 1)
 	    return createNode(b, (Intersection) x[0]);
 
-	  return createNodes(b, x);
+	  return this.createNodes(b, x);
         }
       return 0;
     }
@@ -3254,7 +3254,7 @@ public class Area implements Shape, Cloneable
       if (x.length == 1)
 	return createNode(b, x[0]);
 
-      return createNodes(b, x);
+      return this.createNodes(b, x);
     }
 
     /**
