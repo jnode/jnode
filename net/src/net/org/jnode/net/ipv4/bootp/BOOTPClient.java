@@ -26,7 +26,6 @@ import java.security.PrivilegedExceptionAction;
 /**
  * @author epr
  * @author markhale
- * @author Martin Hartvig
  */
 public class BOOTPClient
 {
@@ -171,10 +170,6 @@ public class BOOTPClient
     log.info("Got Your IP address    : " + hdr.getYourIPAddress());
     log.info("Got Server IP address  : " + hdr.getServerIPAddress());
     log.info("Got Gateway IP address : " + hdr.getGatewayIPAddress());
-/*
-        log.info("Got Dns1 IP address    : " + hdr.getDns1IPAddress());
-        log.info("Got Dns2 IP address    : " + hdr.getDns2IPAddress());
-*/
 
     final IPv4ConfigurationService cfg;
     try
@@ -198,12 +193,5 @@ public class BOOTPClient
       cfg.addRoute(new IPv4Address(hdr.getServerIPAddress()),
           new IPv4Address(hdr.getGatewayIPAddress()), device, false);
     }
-
-/*
-        if (hdr.getDns1IPAddress() != null) {
-            ResolverImpl.addDnsServer(new IPv4Address(hdr.getDns1IPAddress()));
-            ResolverImpl.addDnsServer(new IPv4Address(hdr.getDns2IPAddress()));
-        }
-*/
   }
 }
