@@ -83,6 +83,16 @@ yieldPointHandler_reschedule:
 	SAVEREG VmX86Thread_ESP_OFS, OLD_ESP
 	SAVEREG VmX86Thread_EIP_OFS, OLD_EIP
 	SAVEREG VmX86Thread_EFLAGS_OFS, OLD_EFLAGS
+%ifdef BITS64
+	SAVEREG VmX86Thread64_R8_OFS, OLD_R8
+	SAVEREG VmX86Thread64_R9_OFS, OLD_R9
+	SAVEREG VmX86Thread64_R10_OFS, OLD_R10
+	SAVEREG VmX86Thread64_R11_OFS, OLD_R11
+	; Skip R12, because it is constant (contains processor)
+	SAVEREG VmX86Thread64_R13_OFS, OLD_R13
+	SAVEREG VmX86Thread64_R14_OFS, OLD_R14
+	SAVEREG VmX86Thread64_R15_OFS, OLD_R15
+%endif	
 	
 	; Save FPU / XMM state
 yieldPointHandler_fxSave:
@@ -124,6 +134,16 @@ yieldPointHandler_restore:
 	RESTOREREG VmX86Thread_ESP_OFS, OLD_ESP
 	RESTOREREG VmX86Thread_EIP_OFS, OLD_EIP
 	RESTOREREG VmX86Thread_EFLAGS_OFS, OLD_EFLAGS
+%ifdef BITS64
+	RESTOREREG VmX86Thread64_R8_OFS, OLD_R8
+	RESTOREREG VmX86Thread64_R9_OFS, OLD_R9
+	RESTOREREG VmX86Thread64_R10_OFS, OLD_R10
+	RESTOREREG VmX86Thread64_R11_OFS, OLD_R11
+	; Skip R12, because it is constant (contains processor)
+	RESTOREREG VmX86Thread64_R13_OFS, OLD_R13
+	RESTOREREG VmX86Thread64_R14_OFS, OLD_R14
+	RESTOREREG VmX86Thread64_R15_OFS, OLD_R15
+%endif	
 	
 	; Restore FPU / XMM state is delayed until actual use
 	; We do set the CR0.TS flag.
