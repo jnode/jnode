@@ -16,7 +16,11 @@ import charva.awt.event.KeyEvent;
 import charvax.swing.*;
 import charvax.swing.border.TitledBorder;
 import gnu.java.io.NullOutputStream;
+import org.jnode.shell.CommandShell;
+import org.jnode.shell.Shell;
+import org.jnode.shell.ShellUtils;
 
+import javax.naming.NameNotFoundException;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -197,8 +201,11 @@ public class CharvaBsh {
             ConsoleInterface bshConsole = new BSHConsole( output );
             interpreter = new Interpreter( bshConsole );
             interpreter.setClassLoader( Thread.currentThread().getContextClassLoader() );
+
+            CharvaBshCommandInvoker shell = new CharvaBshCommandInvoker();
             try {
                 interpreter.set( "interpreter", interpreter );
+                interpreter.set( "shell", shell );
             }
             catch( EvalError evalError ) {
                 writeError( evalError );
@@ -273,30 +280,15 @@ public class CharvaBsh {
         }
 
         private void writeError( EvalError evalError ) {
-
-//            StringWriter wr = new StringWriter();
-//            evalError.printStackTrace( new PrintWriter( wr ) );
-//                String errorStr = wr.toString();
             output.append( "<Evaluation Error>\n" + evalError );
             if( evalError instanceof TargetError ) {
                 TargetError te = (TargetError)evalError;
-//                Throwable target = te.getTarget();
-//                StackTraceElement[] elm = target.getStackTrace();
-//                for( int i = 0; i < elm.length && i < NUM_TRACE; i++ ) {
-//                    output.append( "\n" + elm[i].toString() );
-//                }
                 StringWriter wr = new StringWriter();
                 Throwable target = te.getTarget();
                 target.printStackTrace( new PrintWriter( wr ) );
                 String text = wr.toString();
                 output.append( "\n" + text );
             }
-//            output.append( "Evaluation Error: " + evalError.getMessage() + "\n" );
-//            output.append( "in line number: " + evalError.getErrorLineNumber() + "\n" );
-//            output.append( evalError.getScriptStackTrace() + "\n" );
-//            output.append( evalError.getErrorText() );
-//            output.append( evalError.);
-//                output.append( errorStr );
         }
     }
 
@@ -386,6 +378,34 @@ public class CharvaBsh {
             println( "" + i );
         }
 
+    }
+
+    public static class CharvaBshCommandInvoker {
+        private Shell shell;
+
+        public CharvaBshCommandInvoker() {
+            try {
+                shell = ShellUtils.getShellManager().getCurrentShell();
+            }
+            catch( NameNotFoundException e ) {
+                e.printStackTrace();
+            }
+        }
+
+        public void invoke( String command ) {
+            if( shell != null ) {
+                if( shell instanceof CommandShell ) {
+                    CommandShell cs = (CommandShell)shell;
+                    cs.getDefaultCommandInvoker().invoke( command );
+                }
+                else {
+                    System.err.println( "Shell wasn't a CommandShell: " + shell.getClass() );
+                }
+            }
+            else {
+                System.err.println( "Shell is null." );
+            }
+        }
     }
 
 }
