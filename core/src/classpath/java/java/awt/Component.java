@@ -1046,16 +1046,21 @@ public abstract class Component
 	 * Sets the font for this component to the specified font. This is a bound
 	 * property.
 	 *
-	 * @param font the new font for this component
+   * @param newFont the new font for this component
+   * 
 	 * @see #getFont()
 	 */
-  public void setFont(Font f)
+  public void setFont(Font newFont)
   {
-		firePropertyChange("font", font, f);
+    if (font == newFont)
+      return;
+    
+    Font oldFont = font;
+    font = newFont;
 		if (peer != null)
-			peer.setFont(f);
+      peer.setFont(font);
+    firePropertyChange("font", oldFont, newFont);
     invalidate();
-		font = f;
 	}
 
 	/**
@@ -1075,7 +1080,7 @@ public abstract class Component
 	 *
 	 * @return the locale for this component
 	 * @throws IllegalComponentStateException if it has no locale or parent
-	 * @see setLocale(Locale)
+   * @see #setLocale(Locale)
 	 * @since 1.1
 	 */
   public Locale getLocale()
@@ -1092,12 +1097,16 @@ public abstract class Component
 	 * Sets the locale for this component to the specified locale. This is a
 	 * bound property.
 	 *
-	 * @param locale the new locale for this component
+   * @param newLocale the new locale for this component
 	 */
-  public void setLocale(Locale l)
+  public void setLocale(Locale newLocale)
   {
-		firePropertyChange("locale", locale, l);
-		locale = l;
+    if (locale == newLocale)
+      return;
+
+    Locale oldLocale = locale;
+    locale = newLocale;
+    firePropertyChange("locale", oldLocale, newLocale);
 		// New writing/layout direction or more/less room for localized labels.
 		invalidate();
 	}
@@ -1353,7 +1362,7 @@ public abstract class Component
       peer.setBounds (x, y, width, height);
 
     // Erase old bounds and repaint new bounds for lightweights.
-    if (isLightweight())
+    if (isLightweight() && isShowing ())
       {
         boolean shouldRepaintParent = false;
         boolean shouldRepaintSelf = false;
@@ -1371,19 +1380,22 @@ public abstract class Component
             shouldRepaintSelf = parentBounds.intersects(newBounds);
           }
 
-        if (shouldRepaintParent)
+        if (shouldRepaintParent && parent != null)
           parent.repaint(oldx, oldy, oldwidth, oldheight);
         if (shouldRepaintSelf)
           repaint();
       }
 
-    if (oldx != x || oldy != y)
+    // Only post event if this component is visible and has changed size.
+    if (isShowing ()
+        && (oldx != x || oldy != y))
       {
         ComponentEvent ce = new ComponentEvent(this,
                                                ComponentEvent.COMPONENT_MOVED);
         getToolkit().getSystemEventQueue().postEvent(ce);
       }
-    if (oldwidth != width || oldheight != height)
+    if (isShowing ()
+        && (oldwidth != width || oldheight != height))
       {
         ComponentEvent ce = new ComponentEvent(this,
                                                ComponentEvent.COMPONENT_RESIZED);
@@ -1946,7 +1958,7 @@ public abstract class Component
 	 * @see Graphics#drawImage(Image, int, int, ImageObserver)
 	 * @see Graphics#drawImage(Image, int, int, int, int, Color, ImageObserver)
 	 * @see Graphics#drawImage(Image, int, int, int, int, ImageObserver)
-	 * @see ImageObserver#update(Image, int, int, int, int, int)
+   * @see ImageObserver#imageUpdate(Image, int, int, int, int, int)
 	 */
   public boolean imageUpdate(Image img, int flags, int x, int y, int w, int h)
   {
@@ -2088,7 +2100,7 @@ public abstract class Component
 	 * @param observer the observer to notify of image loading progress
 	 * @return the image observer flags indicating the status of the load
 	 * @see #prepareImage(Image, int, int, ImageObserver)
-	 * @see #Toolkit#checkImage(Image, int, int, ImageObserver)
+   * @see Toolkit#checkImage(Image, int, int, ImageObserver)
 	 * @throws NullPointerException if image is null
 	 */
   public int checkImage(Image image, ImageObserver observer)
@@ -2106,7 +2118,7 @@ public abstract class Component
 	 * @param observer the observer to notify of image loading progress
 	 * @return the image observer flags indicating the status of the load
 	 * @see #prepareImage(Image, int, int, ImageObserver)
-	 * @see #Toolkit#checkImage(Image, int, int, ImageObserver)
+   * @see Toolkit#checkImage(Image, int, int, ImageObserver)
 	 */
   public int checkImage(Image image, int width, int height,
                         ImageObserver observer)
@@ -2125,7 +2137,7 @@ public abstract class Component
 	 * @param ignoreRepaint the new setting for ignoring repaint events
 	 * @see #getIgnoreRepaint()
 	 * @see BufferStrategy
-	 * @see GraphicsDevice.setFullScreenWindow(Window)
+   * @see GraphicsDevice#setFullScreenWindow(Window)
 	 * @since 1.4
 	 */
   public void setIgnoreRepaint(boolean ignoreRepaint)
@@ -2298,9 +2310,9 @@ public abstract class Component
 	 * @see #getComponentListeners()
 	 * @since 1.1
 	 */
-  public synchronized void addComponentListener(ComponentListener l)
+  public synchronized void addComponentListener(ComponentListener listener)
   {
-		componentListener = AWTEventMulticaster.add(componentListener, l);
+    componentListener = AWTEventMulticaster.add(componentListener, listener);
 		if (componentListener != null)
 			enableEvents(AWTEvent.COMPONENT_EVENT_MASK);
 	}
@@ -2315,9 +2327,9 @@ public abstract class Component
 	 * @see #getComponentListeners()
 	 * @since 1.1
 	 */
-  public synchronized void removeComponentListener(ComponentListener l)
+  public synchronized void removeComponentListener(ComponentListener listener)
   {
-		componentListener = AWTEventMulticaster.remove(componentListener, l);
+    componentListener = AWTEventMulticaster.remove(componentListener, listener);
 	}
 
 	/**
@@ -2346,9 +2358,9 @@ public abstract class Component
 	 * @see #getFocusListeners()
 	 * @since 1.1
 	 */
-  public synchronized void addFocusListener(FocusListener l)
+  public synchronized void addFocusListener(FocusListener listener)
   {
-		focusListener = AWTEventMulticaster.add(focusListener, l);
+    focusListener = AWTEventMulticaster.add(focusListener, listener);
 		if (focusListener != null)
 			enableEvents(AWTEvent.FOCUS_EVENT_MASK);
 	}
@@ -2363,9 +2375,9 @@ public abstract class Component
 	 * @see #getFocusListeners()
 	 * @since 1.1
 	 */
-  public synchronized void removeFocusListener(FocusListener l)
+  public synchronized void removeFocusListener(FocusListener listener)
   {
-		focusListener = AWTEventMulticaster.remove(focusListener, l);
+    focusListener = AWTEventMulticaster.remove(focusListener, listener);
 	}
 
 	/**
@@ -2393,9 +2405,9 @@ public abstract class Component
 	 * @see #getHierarchyListeners()
 	 * @since 1.3
 	 */
-  public synchronized void addHierarchyListener(HierarchyListener l)
+  public synchronized void addHierarchyListener(HierarchyListener listener)
   {
-		hierarchyListener = AWTEventMulticaster.add(hierarchyListener, l);
+    hierarchyListener = AWTEventMulticaster.add(hierarchyListener, listener);
 		if (hierarchyListener != null)
 			enableEvents(AWTEvent.HIERARCHY_EVENT_MASK);
 	}
@@ -2410,9 +2422,9 @@ public abstract class Component
 	 * @see #getHierarchyListeners()
 	 * @since 1.3
 	 */
-  public synchronized void removeHierarchyListener(HierarchyListener l)
+  public synchronized void removeHierarchyListener(HierarchyListener listener)
   {
-		hierarchyListener = AWTEventMulticaster.remove(hierarchyListener, l);
+    hierarchyListener = AWTEventMulticaster.remove(hierarchyListener, listener);
 	}
 
 	/**
@@ -2442,10 +2454,10 @@ public abstract class Component
 	 * @since 1.3
 	 */
   public synchronized void
-    addHierarchyBoundsListener(HierarchyBoundsListener l)
+    addHierarchyBoundsListener(HierarchyBoundsListener listener)
   {
     hierarchyBoundsListener =
-      AWTEventMulticaster.add(hierarchyBoundsListener, l);
+      AWTEventMulticaster.add(hierarchyBoundsListener, listener);
 		if (hierarchyBoundsListener != null)
 			enableEvents(AWTEvent.HIERARCHY_BOUNDS_EVENT_MASK);
 	}
@@ -2461,10 +2473,10 @@ public abstract class Component
 	 * @since 1.3
 	 */
   public synchronized void
-    removeHierarchyBoundsListener(HierarchyBoundsListener l)
+    removeHierarchyBoundsListener(HierarchyBoundsListener listener)
   {
     hierarchyBoundsListener =
-      AWTEventMulticaster.remove(hierarchyBoundsListener, l);
+      AWTEventMulticaster.remove(hierarchyBoundsListener, listener);
 	}
 
 	/**
@@ -2493,9 +2505,9 @@ public abstract class Component
 	 * @see #getKeyListeners()
 	 * @since 1.1
 	 */
-  public synchronized void addKeyListener(KeyListener l)
+  public synchronized void addKeyListener(KeyListener listener)
   {
-		keyListener = AWTEventMulticaster.add(keyListener, l);
+    keyListener = AWTEventMulticaster.add(keyListener, listener);
 		if (keyListener != null)
 			enableEvents(AWTEvent.KEY_EVENT_MASK);
 	}
@@ -2510,9 +2522,9 @@ public abstract class Component
 	 * @see #getKeyListeners()
 	 * @since 1.1
 	 */
-  public synchronized void removeKeyListener(KeyListener l)
+  public synchronized void removeKeyListener(KeyListener listener)
   {
-		keyListener = AWTEventMulticaster.remove(keyListener, l);
+    keyListener = AWTEventMulticaster.remove(keyListener, listener);
 	}
 
 	/**
@@ -2540,9 +2552,9 @@ public abstract class Component
 	 * @see #getMouseListeners()
 	 * @since 1.1
 	 */
-  public synchronized void addMouseListener(MouseListener l)
+  public synchronized void addMouseListener(MouseListener listener)
   {
-		mouseListener = AWTEventMulticaster.add(mouseListener, l);
+    mouseListener = AWTEventMulticaster.add(mouseListener, listener);
 		if (mouseListener != null)
 			enableEvents(AWTEvent.MOUSE_EVENT_MASK);
 	}
@@ -2557,9 +2569,9 @@ public abstract class Component
 	 * @see #getMouseListeners()
 	 * @since 1.1
 	 */
-  public synchronized void removeMouseListener(MouseListener l)
+  public synchronized void removeMouseListener(MouseListener listener)
   {
-		mouseListener = AWTEventMulticaster.remove(mouseListener, l);
+    mouseListener = AWTEventMulticaster.remove(mouseListener, listener);
 	}
 
 	/**
@@ -2587,9 +2599,9 @@ public abstract class Component
 	 * @see #getMouseMotionListeners()
 	 * @since 1.1
 	 */
-  public synchronized void addMouseMotionListener(MouseMotionListener l)
+  public synchronized void addMouseMotionListener(MouseMotionListener listener)
   {
-		mouseMotionListener = AWTEventMulticaster.add(mouseMotionListener, l);
+    mouseMotionListener = AWTEventMulticaster.add(mouseMotionListener, listener);
 		if (mouseMotionListener != null)
 			enableEvents(AWTEvent.MOUSE_EVENT_MASK);
 	}
@@ -2604,9 +2616,9 @@ public abstract class Component
 	 * @see #getMouseMotionListeners()
 	 * @since 1.1
 	 */
-  public synchronized void removeMouseMotionListener(MouseMotionListener l)
+  public synchronized void removeMouseMotionListener(MouseMotionListener listener)
   {
-		mouseMotionListener = AWTEventMulticaster.remove(mouseMotionListener, l);
+    mouseMotionListener = AWTEventMulticaster.remove(mouseMotionListener, listener);
 	}
 
 	/**
@@ -2636,9 +2648,9 @@ public abstract class Component
 	 * @see #getMouseWheelListeners()
 	 * @since 1.4
 	 */
-  public synchronized void addMouseWheelListener(MouseWheelListener l)
+  public synchronized void addMouseWheelListener(MouseWheelListener listener)
   {
-		mouseWheelListener = AWTEventMulticaster.add(mouseWheelListener, l);
+    mouseWheelListener = AWTEventMulticaster.add(mouseWheelListener, listener);
 		if (mouseWheelListener != null)
 			enableEvents(AWTEvent.MOUSE_WHEEL_EVENT_MASK);
 	}
@@ -2654,9 +2666,9 @@ public abstract class Component
 	 * @see #getMouseWheelListeners()
 	 * @since 1.4
 	 */
-  public synchronized void removeMouseWheelListener(MouseWheelListener l)
+  public synchronized void removeMouseWheelListener(MouseWheelListener listener)
   {
-		mouseWheelListener = AWTEventMulticaster.remove(mouseWheelListener, l);
+    mouseWheelListener = AWTEventMulticaster.remove(mouseWheelListener, listener);
 	}
 
 	/**
@@ -2686,9 +2698,9 @@ public abstract class Component
 	 * @see #getInputMethodRequests()
 	 * @since 1.2
 	 */
-  public synchronized void addInputMethodListener(InputMethodListener l)
+  public synchronized void addInputMethodListener(InputMethodListener listener)
   {
-		inputMethodListener = AWTEventMulticaster.add(inputMethodListener, l);
+    inputMethodListener = AWTEventMulticaster.add(inputMethodListener, listener);
 		if (inputMethodListener != null)
 			enableEvents(AWTEvent.INPUT_METHOD_EVENT_MASK);
 	}
@@ -2703,9 +2715,9 @@ public abstract class Component
 	 * @see #getInputMethodRequests()
 	 * @since 1.2
 	 */
-  public synchronized void removeInputMethodListener(InputMethodListener l)
+  public synchronized void removeInputMethodListener(InputMethodListener listener)
   {
-		inputMethodListener = AWTEventMulticaster.remove(inputMethodListener, l);
+    inputMethodListener = AWTEventMulticaster.remove(inputMethodListener, listener);
 	}
 
 	/**
@@ -3169,15 +3181,15 @@ public abstract class Component
    * AWT 1.0 event handler.
    *
    * This method calls one of the event-specific handler methods.  For
-   * example for key events, either {@link #keyDown (Event evt, int
-   * key)} or {@link keyUp (Event evt, int key)} is called.  A derived
+   * example for key events, either {@link #keyDown(Event,int)}
+   * or {@link #keyUp(Event,int)} is called.  A derived
    * component can override one of these event-specific methods if it
    * only needs to handle certain event types.  Otherwise it can
    * override handleEvent itself and handle any event.
 	 *
 	 * @param evt the event to handle
    * @return true if the event was handled, false otherwise
-   * @deprecated use {@link #processEvent (AWTEvent)} instead
+   * @deprecated use {@link #processEvent(AWTEvent)} instead
 	 */
   public boolean handleEvent (Event evt)
   {
@@ -3460,8 +3472,8 @@ public abstract class Component
    * Specify whether this component can receive focus. This method also
    * sets the {@link #isFocusTraversableOverridden} field to 1, which
    * appears to be the undocumented way {@link
-   * DefaultFocusTraversalPolicy#accept()} determines whether to respect
-   * the {@link #isFocusable()} method of the component.
+   * DefaultFocusTraversalPolicy#accept(Component)} determines whether to
+   * respect the {@link #isFocusable()} method of the component.
 	 *
 	 * @param focusable the new focusable status
 	 * @since 1.4
@@ -3475,10 +3487,10 @@ public abstract class Component
 
 	/**
    * Sets the focus traversal keys for one of the three focus
-   * traversal directions supported by Components: {@link
-   * #KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS}, {@link
-   * #KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS}, or {@link
-   * #KeyboardFocusManager.UP_CYCLE_TRAVERSAL_KEYS}. Normally, the
+   * traversal directions supported by Components:
+   * {@link #KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS},
+   * {@link #KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS}, or
+   * {@link #KeyboardFocusManager.UP_CYCLE_TRAVERSAL_KEYS}. Normally, the
    * default values should match the operating system's native
    * choices. To disable a given traversal, use
    * <code>Collections.EMPTY_SET</code>. The event dispatcher will
@@ -3707,7 +3719,7 @@ public abstract class Component
    * receives a FOCUS_GAINED event.
 	 *
    * The behaviour of this method is platform-dependent.
-   * {@link #requestFocusInWindow} should be used instead.
+   * {@link #requestFocusInWindow()} should be used instead.
    *
    * @see #requestFocusInWindow ()
 	 * @see FocusEvent
@@ -3782,7 +3794,7 @@ public abstract class Component
    * receives a FOCUS_GAINED event.
    *
    * The behaviour of this method is platform-dependent.
-   * {@link #requestFocusInWindow} should be used instead.
+   * {@link #requestFocusInWindow()} should be used instead.
    *
    * If the return value is false, the request is guaranteed to fail.
    * If the return value is true, the request will succeed unless it
@@ -4060,8 +4072,8 @@ public abstract class Component
    * However, if this is a Window, the default focus owner in the
    * window in the current focus cycle is focused instead.
 	 *
-   * @see #requestFocus ()
-   * @see #isFocusCycleRoot ()
+   * @see #requestFocus()
+   * @see #isFocusCycleRoot(Container)
 	 * @since 1.4
 	 */
   public void transferFocusUpCycle ()

@@ -358,7 +358,10 @@ public class ZipFile implements ZipConstants
       {
 			HashMap entries = getEntries();
 			ZipEntry entry = (ZipEntry) entries.get(name);
-			return entry != null ? (ZipEntry) entry.clone() : null;
+        // If we didn't find it, maybe it's a directory.
+        if (entry == null && !name.endsWith("/"))
+            entry = (ZipEntry) entries.get(name + '/');
+	return entry != null ? new ZipEntry(entry, name) : null;
       }
     catch (IOException ioe)
       {

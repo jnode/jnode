@@ -55,6 +55,7 @@ public class ZipEntry implements ZipConstants, Cloneable
   private static final int KNOWN_CSIZE  = 2;
   private static final int KNOWN_CRC    = 4;
   private static final int KNOWN_TIME   = 8;
+  private static final int KNOWN_EXTRA  = 16;
 
 	private static Calendar cal;
 
@@ -102,7 +103,12 @@ public class ZipEntry implements ZipConstants, Cloneable
 	 */
   public ZipEntry(ZipEntry e)
   {
-		name = e.name;
+    this(e, e.name);
+  }
+
+  ZipEntry(ZipEntry e, String name)
+  {
+    this.name = name;
 		known = e.known;
 		size = e.size;
 		compressedSize = e.compressedSize;
@@ -186,6 +192,9 @@ public class ZipEntry implements ZipConstants, Cloneable
   {
 		if ((known & KNOWN_TIME) == 0)
 			return -1;
+
+    // The extra bytes might contain the time (posix/unix extension)
+    parseExtra ();
 
 		int sec = 2 * (dostime & 0x1f);
 		int min = (dostime >> 5) & 0x3f;
@@ -317,10 +326,23 @@ public class ZipEntry implements ZipConstants, Cloneable
 			this.extra = null;
 			return;
 		}
-
 		if (extra.length > 0xffff)
 			throw new IllegalArgumentException();
 		this.extra = extra;
+  }
+
+  private void parseExtra()
+  {
+    // Already parsed?
+    if ((known & KNOWN_EXTRA) != 0)
+      return;
+
+    if (extra == null)
+      {
+	known |= KNOWN_EXTRA;
+	return;
+      }
+
     try
       {
 			int pos = 0;
@@ -351,6 +373,8 @@ public class ZipEntry implements ZipConstants, Cloneable
 			/* be lenient */
 			return;
 		}
+
+    known |= KNOWN_EXTRA;
 	}
 
 	/**
