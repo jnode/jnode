@@ -393,6 +393,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 				os.writePOP(helper.BP, disp + MSB);
 			} else {
 				os.writePOP(helper.BP, disp);
+                os.writeLEA(X86Register.RSP, X86Register.RSP, 8); // garbage
 			}
 		} else {
 			// Load into register
