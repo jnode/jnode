@@ -75,7 +75,7 @@ final class FPUHelper implements X86CompilerConstants {
 		pool.request(EAX);
 		final Register resr = pool.request(JvmType.INT);
 
-		if (gt) {
+		if (!gt) {
 			// Reverse order
 			fxch(os, fpuStack, Register.ST1);
 		}

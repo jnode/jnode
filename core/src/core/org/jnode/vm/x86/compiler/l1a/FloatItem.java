@@ -48,7 +48,7 @@ final class FloatItem extends WordItem {
 	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.WordItem#cloneConstant()
 	 */
-	protected Item cloneConstant() {
+	protected WordItem cloneConstant() {
 		return createConst(getValue());
 	}
 
