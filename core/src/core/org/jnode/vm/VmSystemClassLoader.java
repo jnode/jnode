@@ -7,6 +7,7 @@
  */
 package org.jnode.vm;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,9 +16,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.TreeMap;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.vm.classmgr.ClassDecoder;
@@ -48,9 +48,9 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     private transient ObjectResolver resolver;
 
-    private byte[] systemRtJar;
+    private Map systemRtJar;
 
-    private static JarFile systemJarFile;
+    //private static JarFile systemJarFile;
 
     private final ClassLoader parent;
 
@@ -62,7 +62,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     private boolean requiresCompile = false;
 
     private final VmStatics statics;
-    
+
     /**
      * Constructor for VmClassLoader.
      * 
@@ -193,6 +193,11 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
             for (Iterator i = classInfos.values().iterator(); i.hasNext();) {
                 final ClassInfo ci = (ClassInfo) i.next();
                 result[ j++] = ci.getVmClass();
+                if (systemRtJar != null) {
+                    final String cfName = ci.getName().replace('.', '/')
+                            + ".class";
+                    systemRtJar.remove(cfName);
+                }
             }
             bootClasses = result;
             return result;
@@ -217,8 +222,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     }
 
     /**
-     * Gets the ClassInfo for the given name. If not found and create is True,
-     * a new ClassInfo is created, added to the list and returned. If not found
+     * Gets the ClassInfo for the given name. If not found and create is True, a
+     * new ClassInfo is created, added to the list and returned. If not found
      * and create is False, null is returned.
      * 
      * @param name
@@ -261,7 +266,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
         VmType cls = findLoadedClass(name);
         if (cls != null) { return cls; }
-        if (classInfos == null) { 
+        if (classInfos == null) {
         //Unsafe.debug("classInfos==null");
         throw new ClassNotFoundException(name); }
 
@@ -326,7 +331,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         boolean allowNatives = false;
         allowNatives |= name.equals("org.jnode.vm.Unsafe");
         final String archN = arch.getName();
-        allowNatives |= name.equals("org.jnode.vm." + archN + ".Unsafe" + archN.toUpperCase());
+        allowNatives |= name.equals("org.jnode.vm." + archN + ".Unsafe"
+                + archN.toUpperCase());
 
         //System.out.println("bvi.loadClass: " +name);
         byte[] image = getClassStream(name);
@@ -348,8 +354,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     }
 
     /**
-     * Gets an inputstream for the class file that contains the given
-     * classname.
+     * Gets an inputstream for the class file that contains the given classname.
      * 
      * @param clsName
      * @return InputStream
@@ -359,22 +364,32 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      */
     private byte[] getClassStream(String clsName) throws MalformedURLException,
             IOException, ClassNotFoundException {
-        final String fName = clsName.replace('.', '/') + ".class";
-        final InputStream is = getResourceAsStream(fName);
-        if (is == null) {
-            throw new ClassNotFoundException("Class resource of " + clsName
-                    + " not found.");
-        } else {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            int len;
-            byte[] buf = new byte[ 4096];
-            while ((len = is.read(buf)) > 0) {
-                bos.write(buf, 0, len);
-            }
-            buf = null;
-            is.close();
 
-            return bos.toByteArray();
+        final String fName = clsName.replace('.', '/') + ".class";
+
+        if (systemRtJar != null) {
+            final byte[] data = (byte[]) systemRtJar.get(fName);
+            if (data == null) { throw new ClassNotFoundException(
+                    "System class " + clsName + " not found."); }
+            systemRtJar.remove(fName);
+            return data;
+        } else {
+            final InputStream is = getResourceAsStream(fName);
+            if (is == null) {
+                throw new ClassNotFoundException("Class resource of " + clsName
+                        + " not found.");
+            } else {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                int len;
+                byte[] buf = new byte[ 4096];
+                while ((len = is.read(buf)) > 0) {
+                    bos.write(buf, 0, len);
+                }
+                buf = null;
+                is.close();
+
+                return bos.toByteArray();
+            }
         }
     }
 
@@ -411,13 +426,10 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
             URL url = new URL(classesURL, name);
             //System.out.println("url=" + url);
             return url.openStream();
-        } else if ((systemJarFile != null) || (systemRtJar != null)) {
-            if (systemJarFile == null) {
-                systemJarFile = new JarFile(systemRtJar);
-            }
-            JarEntry entry = systemJarFile.getJarEntry(name);
-            if (entry != null) {
-                return systemJarFile.getInputStream(entry);
+        } else if (systemRtJar != null) {
+            final byte[] data = (byte[]) systemRtJar.get(name);
+            if (data != null) {
+                return new ByteArrayInputStream(data);
             } else {
                 return null;
             }
@@ -528,14 +540,17 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     }
 
     /**
-     * Sets the systemRtJar.
+     * Sets the systemRtJar. The given map must contains the resource names as
+     * keys of type String, and the actual resources as byte array.
      * 
-     * @param systemRtJar
+     * @param resources
      *            The systemRtJar to set
      */
-    public void setSystemRtJar(byte[] systemRtJar) {
+    public void setSystemRtJar(Map resources) {
         if (this.systemRtJar == null) {
-            this.systemRtJar = systemRtJar;
+            this.systemRtJar = resources;
+        } else {
+            throw new SecurityException("Cannot override system RT jar");
         }
     }
 
@@ -633,8 +648,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         }
 
         /**
-         * Signal a class loading error. This will release other threads
-         * waiting for this class with a ClassNotFoundException.
+         * Signal a class loading error. This will release other threads waiting
+         * for this class with a ClassNotFoundException.
          */
         public final synchronized void setLoadError(String errorMsg) {
             this.error = true;

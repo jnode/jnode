@@ -10,10 +10,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -21,6 +23,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 
 import org.apache.tools.ant.Project;
@@ -31,6 +34,7 @@ import org.jnode.assembler.x86.X86Stream;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.model.PluginRegistryModel;
+import org.jnode.util.BootableHashMap;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.HeapHelperImpl;
 import org.jnode.vm.Unsafe;
@@ -239,7 +243,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             }
 
             // Load the jarfile as byte-array
-            copyJarFile(os);
+            copyJarFile(blockedObjects);
 
             // Now emit all object images to the actual image
             emitObjects(os, arch, blockedObjects);
@@ -386,31 +390,38 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * Copy the jnode.jar file into a byte array that is added to the java
      * image.
      * 
-     * @param os
+     * @param blockedObjects
      * @throws BuildException
      */
-    protected final void copyJarFile(NativeStream os) throws BuildException {
+    protected final void copyJarFile(Set blockedObjects) throws BuildException {
 
         try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            FileInputStream fis = new FileInputStream(jarFile);
-            final byte[] buf = new byte[ 4096];
-            int len;
-            while ((len = fis.read(buf)) > 0) {
-                bos.write(buf, 0, len);
+            final JarFile jar = new JarFile(jarFile);
+            final BootableHashMap resources = new BootableHashMap();
+            for (Enumeration e = jar.entries(); e.hasMoreElements(); ) {
+                final JarEntry entry = (JarEntry)e.nextElement();
+                final byte[] data = read(jar.getInputStream(entry));
+                resources.put(entry.getName(), data);
             }
-            fis.close();
-            bos.close();
-
-            final byte[] systemRtJar = bos.toByteArray();
-            os.getObjectRef(systemRtJar);
-            clsMgr.setSystemRtJar(systemRtJar);
-
+            blockedObjects.add(resources);
+            clsMgr.setSystemRtJar(resources);
         } catch (IOException ex) {
             throw new BuildException(ex);
         }
     }
 
+    private byte[] read(InputStream is) throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        final byte[] buf = new byte[ 4096];
+        int len;
+        while ((len = is.read(buf)) > 0) {
+            bos.write(buf, 0, len);
+        }
+        is.close();
+        bos.close();
+        return bos.toByteArray();
+    }
+    
     /**
      * Emit code to bootstrap the java image
      * 
