@@ -9,6 +9,7 @@ import gnu.java.awt.peer.ClasspathTextLayoutPeer;
 import gnu.java.security.action.GetPropertyAction;
 
 import java.awt.AWTError;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -552,6 +553,20 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 	public Frame getTop() {
 	    return top;
+	}
+	
+	/**
+	 * Gets the top most visible component at a given location.
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public Component getTopComponentAt(int x, int y) {
+		Component c = getTop().findComponentAt(x, y);
+		if (c == null) {
+			c = getTop();
+		}
+		return c;
 	}
 	
 	protected void setTop(Frame frame) {

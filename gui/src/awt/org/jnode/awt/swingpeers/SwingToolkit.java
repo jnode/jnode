@@ -112,9 +112,9 @@ public class SwingToolkit extends JNodeToolkit {
     }
 
     protected FramePeer createFrame(Frame target) {
-    	setTop(target);
         final int rc = incRefCount();
         if (target instanceof DesktopFrame) {
+        	setTop(target);
             log.debug("createFrame:desktopFramePeer(" + target + ")");
             // Only desktop is real frame
             return new DesktopFramePeer(this, target);
