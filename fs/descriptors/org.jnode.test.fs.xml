@@ -8,14 +8,30 @@
         
   <requires>
     <import plugin="org.jnode.fs"/>
+    <import plugin="org.jnode.fs.ext2"/>    
+    <import plugin="org.jnode.fs.fat"/>
+    <import plugin="org.jnode.fs.ntfs"/>
+    <import plugin="org.jnode.fs.iso9660"/>
     <import plugin="org.jnode.shell"/>
     <import plugin="org.jnode.driver.ide"/>
-    <import plugin="org.jnode.driver.scsi"/>
+    <import plugin="org.jnode.driver.scsi"/> 
+	<import plugin="org.junit" version="3.8"/>
+    <import plugin="org.jnode.driver.block"/>
+    <import plugin="org.jnode.driver.block.ramdisk"/>    
+    <import plugin="org.jnode.fs.service"/>
+    <import plugin="org.jnode.log4j"/>	
   </requires>
         
   <runtime>
     <library name="jnode-fs.jar">
       <export name="org.jnode.test.fs.*"/>
+      <export name="org.jnode.test.fs.unit.*"/>      
+      <export name="org.jnode.test.fs.unit.tests.*"/>
+      <export name="org.jnode.test.fs.unit.config.*"/>      
+      <export name="org.jnode.fs.ext2.*"/>
+      <export name="org.jnode.fs.ntfs.*"/>
+      <export name="org.jnode.fs.fat.*"/>
+      <export name="org.jnode.fs.iso9660.*"/>              
     </library>
   </runtime>
         
@@ -24,6 +40,14 @@
     <alias name="FileTest"      class="org.jnode.test.fs.FileTest"/>
     <alias name="LfnTest"      class="org.jnode.test.fs.LfnTest"/>
     <alias name="SCSITest"      class="org.jnode.test.fs.SCSITest"/>
+    <alias name="AllFSTest" class="org.jnode.test.fs.AllFSTest"/>    
   </extension>
 
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="user.home" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="user.dir" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="os.name" actions="read"/>
+	<permission class="java.io.FilePermission" name="/junit.properties" actions="read"/>    
+	<permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write,delete"/>
+  </extension>
 </plugin>
