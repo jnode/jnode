@@ -47,7 +47,9 @@ KERNEL_DS   equ 0x10
 USER_CS     equ 0x1B
 USER_DS     equ 0x23
 TSS_DS      equ 0x28
+%ifdef BITS32
 CURPROC_FS  equ 0x33
+%endif
 
 %macro LOOPDIE 0
 %%l:
@@ -74,20 +76,23 @@ CURPROC_FS  equ 0x33
 %include "version.asm"
 %include "syscall.asm" 
 
-%define THREADSWITCHINDICATOR	dword[fs:VmProcessor_THREADSWITCHINDICATOR_OFS]
-%define CURRENTPROCESSOR		dword[fs:VmProcessor_ME_OFS]
-%define CURRENTTHREAD			dword[fs:VmProcessor_CURRENTTHREAD_OFS]
-%define NEXTTHREAD				dword[fs:VmProcessor_NEXTTHREAD_OFS]
-%define STACKEND 				dword[fs:VmProcessor_STACKEND_OFS]
+%ifdef BITS32
+	%define THREADSWITCHINDICATOR	dword[fs:VmProcessor_THREADSWITCHINDICATOR_OFS]
+	%define CURRENTPROCESSOR		dword[fs:VmProcessor_ME_OFS]
+	%define CURRENTTHREAD			dword[fs:VmProcessor_CURRENTTHREAD_OFS]
+	%define NEXTTHREAD				dword[fs:VmProcessor_NEXTTHREAD_OFS]
+	%define STACKEND 				dword[fs:VmProcessor_STACKEND_OFS]
+%else
+	%define THREADSWITCHINDICATOR	dword[r15+VmProcessor_THREADSWITCHINDICATOR_OFS]
+	%define CURRENTPROCESSOR		qword[r15+VmProcessor_ME_OFS]
+	%define CURRENTTHREAD			qword[r15+VmProcessor_CURRENTTHREAD_OFS]
+	%define NEXTTHREAD				qword[r15+VmProcessor_NEXTTHREAD_OFS]
+	%define STACKEND 				qword[r15+VmProcessor_STACKEND_OFS]
+%endif
 
 ; Invoke the method in EAX
 %macro INVOKE_JAVA_METHOD 0
-	%ifdef BITS32
-		call [eax+VmMethod_NATIVECODE_OFS]
-	%endif
-	%ifdef BITS64
-		call [rax+VmMethod_NATIVECODE_OFS]
-	%endif
+	call [AAX+VmMethod_NATIVECODE_OFS]
 %endmacro
 
 %include "unsafe.asm"
