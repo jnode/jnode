@@ -89,7 +89,7 @@ public class Vm extends VmSystemObject implements Statistics {
 		this.statics = statics;
 		this.processors = new BootableArrayList();
 		this.atomManager = new VmAtom.Manager();
-        this.allThreads = new VmThreadQueue("all", false, true);
+        this.allThreads = new VmThreadQueue("all", false, true, false);
 	}
 
 	/**
