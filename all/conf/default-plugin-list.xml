@@ -82,8 +82,8 @@
   <plugin id="org.jnode.fs.partitions.command"/>
   <plugin id="org.jnode.fs.service"/>
   <plugin id="org.jnode.fs.initrd"/>
-  <plugin id="org.jifs"/>
-  <plugin id="org.jifs.command"/>
+  <plugin id="org.jnode.fs.jifs"/>
+  <plugin id="org.jnode.fs.jifs.command"/>
 
   <plugin id="org.jnode.log4j"/>
 
