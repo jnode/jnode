@@ -16,7 +16,7 @@ JNode-GUI   The AWT implementation and the various video & input device drivers
 JNode-Net   The Network implementation and the various network device drivers
 JNode-Shell The Command line shell and several system commands
 
-Each sub-project has the same directory structure.
+Each sub-project has the same directory structure:
 
 <subprj>/build       All build results 
 <subprj>/descriptors All plugin descriptors
