@@ -29,6 +29,23 @@ public interface RadeonConstants {
         public static final int M9 = 9;
     }
 
+    public static class MonitorType {
+
+    	public static final int NONE = 0;
+    	public static final int CRT = 1;/* CRT */
+    	public static final int LCD = 2;/* LCD */
+    	public static final int DFP = 3;/* DVI */
+    	public static final int CTV = 4;/* composite TV */
+    	public static final int STV = 5;/* S-Video out */
+    	
+    	private static final String[] NAMES = { "NONE", "CRT", "LCD", "DFP", "CTV", "STV" };
+    	
+    	public static String toString(int monitorType) {
+    		return NAMES[monitorType];
+    	}
+    
+    }
+    
     public static final int RADEON_REGSIZE = 0x4000;
 
     public static final int MM_INDEX = 0x0000;
@@ -305,12 +322,16 @@ public interface RadeonConstants {
     public static final int PALETTE_30_DATA = 0x00B8;
 
     public static final int CRTC_H_TOTAL_DISP = 0x0200;
+    public static final int CRTC2_H_TOTAL_DISP = 0x0300;
 
     public static final int CRTC_H_SYNC_STRT_WID = 0x0204;
+    public static final int CRTC2_H_SYNC_STRT_WID = 0x0304;
 
     public static final int CRTC_V_TOTAL_DISP = 0x0208;
+    public static final int CRTC2_V_TOTAL_DISP = 0x0308;
 
     public static final int CRTC_V_SYNC_STRT_WID = 0x020C;
+    public static final int  CRTC2_V_SYNC_STRT_WID = 0x030c;
 
     public static final int CRTC_VLINE_CRNT_VLINE = 0x0210;
 
@@ -323,10 +344,16 @@ public interface RadeonConstants {
     public static final int CRTC_OFFSET_RIGHT = 0x0220;
 
     public static final int CRTC_OFFSET = 0x0224;
+    public static final int CRTC2_OFFSET = 0x0324;
 
     public static final int CRTC_OFFSET_CNTL = 0x0228;
+    public static final int CRTC_TILE_EN = (1 << 15);
+
+    public static final int CRTC2_OFFSET_CNTL = 0x0328;
+    public static final int CRTC2_TILE_EN = (1 << 15);
 
     public static final int CRTC_PITCH = 0x022C;
+    public static final int CRTC2_PITCH = 0x032c;
 
     public static final int OVR_CLR = 0x0230;
 
@@ -967,13 +994,22 @@ public interface RadeonConstants {
     public static final int CRTC_VBLANK = 0x00000001;
 
     /* CRTC2_GEN_CNTL bit constants */
-    public static final int CRT2_ON = (1 << 7);
-
-    public static final int CRTC2_DISPLAY_DIS = (1 << 23);
-
-    public static final int CRTC2_EN = (1 << 25);
-
-    public static final int CRTC2_DISP_REQ_EN_B = (1 << 26);
+	public static final int CRTC2_DBL_SCAN_EN      =(1 <<  0);
+	public static final int CRTC2_INTERLACE_EN     =(1 <<  1);
+	public static final int CRTC2_SYNC_TRISTAT     =(1 <<  4);
+	public static final int CRTC2_HSYNC_TRISTAT    =(1 <<  5);
+	public static final int CRTC2_VSYNC_TRISTAT    =(1 <<  6);
+	public static final int CRTC2_CRT2_ON          =(1 <<  7);
+	public static final int CRTC2_PIX_WIDTH_SHIFT  =8;
+	public static final int CRTC2_PIX_WIDTH_MASK   =(0xf << 8);
+	public static final int CRTC2_ICON_EN          =(1 << 15);
+	public static final int CRTC2_CUR_EN           =(1 << 16);
+	public static final int CRTC2_CUR_MODE_MASK    =(7 << 20);
+	public static final int CRTC2_DISP_DIS         =(1 << 23);
+	public static final int CRTC2_EN               =(1 << 25);
+	public static final int CRTC2_DISP_REQ_EN_B    =(1 << 26);
+	public static final int CRTC2_HSYNC_DIS        =(1 << 28);
+	public static final int CRTC2_VSYNC_DIS        =(1 << 29);
 
     /* CUR_OFFSET, CUR_HORZ_VERT_POSN, CUR_HORZ_VERT_OFF bit constants */
     public static final int CUR_LOCK = 0x80000000;

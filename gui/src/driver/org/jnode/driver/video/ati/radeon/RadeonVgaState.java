@@ -11,29 +11,33 @@ import org.jnode.driver.video.vgahw.VgaState;
  */
 public class RadeonVgaState extends VgaState implements RadeonConstants {
 
+	private boolean calculated = false;
+	
     /* CRTC regs */
-    private final RadeonCrtcRegs crtc;
+    private final CrtcRegs crtc1;
+    private final CrtcRegs crtc2;
 
     /* Common regs */
-    private final RadeonCommonRegs common;
+    private final CommonRegs common;
 
     /* PLL regs */
-    private final RadeonPllRegs pll;
+    private final PllRegs pll;
     //private final RadeonPllRegs pll2;
     
     /* Flatpanel regs */
-    private final RadeonFpRegs fp;
+    private final FpRegs fp;
 
     /**
      * Initialize from a given IO.
      * 
      * @param io
      */
-    public RadeonVgaState(boolean hasCRTC2, RadeonVgaIO io) {
-        this.common = new RadeonCommonRegs();
-        this.crtc = new RadeonCrtcRegs();
-        this.fp = new RadeonFpRegs();
-        this.pll = new RadeonPllRegs(false);
+    public RadeonVgaState(int architecture, boolean hasCRTC2, RadeonVgaIO io) {
+        this.common = new CommonRegs();
+        this.crtc1 = new CrtcRegs(0);
+        this.crtc2 = (hasCRTC2 ? new CrtcRegs(1) : null);
+        this.fp = new FpRegs();
+        this.pll = new PllRegs(architecture, false);
         //this.pll2 = hasCRTC2 ? new RadeonPllRegs(true) : null;
         saveFromVGA(io);
     }
@@ -43,10 +47,17 @@ public class RadeonVgaState extends VgaState implements RadeonConstants {
      * @param config
      * @param io
      */
-    final void calcForConfiguration(RadeonConfiguration config, RadeonPLLInfo pllInfo, RadeonVgaIO io) {
+    final void calcForConfiguration(RadeonConfiguration config, RadeonVgaIO io, FBInfo fbinfo) {
         saveFromVGA(io);
-        crtc.calcForConfiguration(config, pllInfo, io);
-        pll.calcForConfiguration(config.getDisplayMode().getFreq() / 10, pllInfo);
+        PLLInfo pllInfo = fbinfo.getPllInfo();
+        common.calcForConfiguration();
+        crtc1.calcForConfiguration(config, pllInfo, io, fbinfo);
+        if (crtc2 != null) {
+            crtc2.calcForConfiguration(config, pllInfo, io, fbinfo);        	
+        }
+        fp.calcForConfiguration(config, pllInfo, io, fbinfo, crtc1);
+        pll.calcForConfiguration(fbinfo, config.getDisplayMode().getFreq() / 10, pllInfo);
+        calculated = true;
     }
         
     /**
@@ -58,9 +69,12 @@ public class RadeonVgaState extends VgaState implements RadeonConstants {
         final RadeonVgaIO io = (RadeonVgaIO)vgaIO;        
         super.saveFromVGA(io);
         common.saveFromVGA(io);
-        crtc.saveFromVGA(io);
+        crtc1.saveFromVGA(io);
+        if (crtc2 != null) {
+        	crtc2.saveFromVGA(io);
+        }
         fp.saveFromVGA(io);
-        savePLL(io);
+        pll.savePLL(io);
     }
 
     /**
@@ -69,12 +83,19 @@ public class RadeonVgaState extends VgaState implements RadeonConstants {
      */
     public final void restoreToVGA(VgaIO vgaIO) {
         final RadeonVgaIO io = (RadeonVgaIO)vgaIO;
-        super.restoreToVGA(io);
+        
+        if (!calculated) {
+        	super.restoreToVGA(io);
+        }
         common.restoreToVGA(io);
-        crtc.restoreToVGA(io);
-        fp.saveFromVGA(io);
-        restorePLL(io);
+        crtc1.restoreToVGA(io);
+        if (crtc2 != null) {
+        	crtc2.restoreToVGA(io);
+        }
+        pll.restorePLL(io);
+        fp.restoreToVGA(io);        
         restorePalette(io);
+        pll.finalizeRestorePLL(io);
     }
 
     
@@ -82,23 +103,7 @@ public class RadeonVgaState extends VgaState implements RadeonConstants {
      * @see org.jnode.driver.video.vgahw.VgaState#toString()
      */
     public String toString() {
-        return pll.toString();
-    }
-    
-    /**
-     * Save the PLL registers.
-     * @param io
-     */
-    private final void savePLL(RadeonVgaIO io) {
-        pll.savePLL(io);
-    }
-
-    /**
-     * Restore the PLL registers
-     * @param io
-     */
-    private final void restorePLL(RadeonVgaIO io) {
-        pll.restorePLL(io);
+        return pll.toString() + ", " + crtc1 + ", " + fp;
     }
     
     /**
