@@ -29,6 +29,11 @@ public interface X86CompilerConstants {
 	public static final Register S0 = Register.ECX;
 	
 	/** 
+	 * Scratch register 1
+	 */
+	public static final Register S1 = Register.EBX;
+	
+	/** 
 	 * Stack pointer register
 	 * Do not change this constant!
 	 */
