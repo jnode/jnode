@@ -52,7 +52,7 @@ public abstract class AbstractFSEntry extends AbstractFSObject implements FSEntr
 		this.type = type; 
 		this.name = name;
 		this.table = table;
-		this.lastModified = 0;
+		this.lastModified = System.currentTimeMillis();
 		this.parent = parent;
 		//TODO : this.rights = ???????;
 	}
@@ -74,7 +74,7 @@ public abstract class AbstractFSEntry extends AbstractFSObject implements FSEntr
 	/**
 	 * Return the date of the last modification of this entry
 	 */
-	final public long getLastModified() {
+	public long getLastModified() throws IOException {
 		return lastModified;
 	}
 	
