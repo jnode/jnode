@@ -27,13 +27,12 @@ public class NTFSEntry implements FSEntry {
 	 */
 	public NTFSEntry(NTFSFileRecord fileRecord)
 	{
-		this.indexEntry = new NTFSIndexEntry();
+		this.indexEntry = new NTFSIndexEntry(fileRecord);
 		
 		NTFSFileNameAttribute att = (NTFSFileNameAttribute) fileRecord.getAttribute(NTFSFileRecord.$FILE_NAME);
 		
 		indexEntry.setFileName(att.getFileName());
 		indexEntry.setFileNameFlags(att.getFileNameFlags());
-		indexEntry.setFileRecords(fileRecord);
 	}
 	
 	public NTFSEntry(NTFSIndexEntry indexEntry)
@@ -99,7 +98,7 @@ public class NTFSEntry implements FSEntry {
 	 */
 	public FSFile getFile() throws IOException {
 		// TODO Auto-generated method stub
-		return null;
+		return new NTFSFile(indexEntry);
 	}
 
 	/* (non-Javadoc)

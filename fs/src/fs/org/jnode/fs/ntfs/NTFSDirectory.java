@@ -9,6 +9,7 @@ import java.util.Iterator;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
+import org.jnode.fs.ntfs.attributes.NTFSIndexAllocationAttribute;
 
 /**
  * @author vali
@@ -37,6 +38,8 @@ public class NTFSDirectory implements FSDirectory {
 	 */
 	public FSEntry getEntry(String name) throws IOException {
 		// TODO Auto-generated method stub
+		if(fileRecord != null)
+			return new NTFSEntry(((NTFSIndexAllocationAttribute)fileRecord.getAttribute(NTFSFileRecord.$INDEX_ALLOCATION)).getFileIndexByName(name));
 		return null;
 	}
 
