@@ -17,6 +17,7 @@ import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Bus;
+import org.jnode.driver.DeviceException;
 import org.jnode.driver.DriverException;
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.IOResource;
@@ -25,6 +26,7 @@ import org.jnode.system.IRQResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
+import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
 
 /**
@@ -41,6 +43,8 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	private int activeCount = 0;
 	private final PS2ByteChannel kbChannel = new PS2ByteChannel();
 	private final PS2ByteChannel mouseChannel = new PS2ByteChannel();
+	/** If true, the interrupt handler will read and process the input queue */
+	private boolean irqReadQueue = true;
 
 	/**
 	 * Create a PS2 object.
@@ -99,14 +103,17 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	 * @see org.jnode.system.IRQHandler#handleInterrupt(int)
 	 */
 	public synchronized final void handleInterrupt(int irq) {
-		processQueues();
+		if (irqReadQueue) {
+			processQueues();
+		}
 	}
 
 	/**
 	 * Read the queue until it is empty and process the read data.
 	 */
-	private final void processQueues() {
+	final void processQueues() {
 		int status;
+		//System.out.print('<');
 		while (((status = readStatus()) & AUX_STAT_OBF) != 0) {
 			final int data = readData();
 
@@ -125,6 +132,7 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 				channel.handleScancode(data);
 			}
 		}
+		//System.out.print('>');
 	}
 
 	/**
@@ -141,7 +149,7 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	 * 
 	 * @param b
 	 */
-	private void writeController(int b) {
+	private void writeController(int b) throws DeviceException {
 		waitWrite();
 		ioResCtrl.outPortByte(PS2_CTRL_PORT, b);
 	}
@@ -151,7 +159,7 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	 * 
 	 * @param b
 	 */
-	private final void writeData(int b) {
+	private final void writeData(int b) throws DeviceException {
 		waitWrite();
 		ioResData.outPortByte(PS2_DATA_PORT, b);
 	}
@@ -159,12 +167,17 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	/**
 	 * Wait for a non-ready inputbuffer.
 	 */
-	private final void waitWrite() {
+	private final void waitWrite() throws DeviceException {
 		int count = 0;
-		while (((readStatus() & STAT_IBF) != 0) && (count < 1000)) {
-			count++;
-			Thread.yield();
+		while (count < 1000) {
+			if ((readStatus() & STAT_IBF) == 0) {
+				return;
+			} else {
+				count++;
+				Thread.yield();
+			}
 		}
+		throw new DeviceException("InputBuffer full");
 	}
 
 	/**
@@ -181,7 +194,7 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	 * 
 	 * @return int
 	 */
-	final int getMode() {
+	final int getMode() throws DeviceException {
 		writeController(CCMD_READ_MODE);
 		return readData();
 	}
@@ -189,9 +202,42 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	/**
 	 * Sets the mode register
 	 */
-	final void setMode(int mode) {
+	final void setMode(int mode) throws DeviceException {
 		writeController(CCMD_WRITE_MODE);
 		writeData(mode);
+	}
+
+	/**
+	 * Test for the presence of a connected mouse device
+	 * 
+	 * @return true if a mouse is present, false if not
+	 */
+	final boolean testMouse() throws DeviceException {
+		irqReadQueue = false;
+		try {
+			writeController(CCMD_TEST_MOUSE);
+			final int status = readStatus();
+			final int rc = readData();
+			log.debug("testMouse rc=0x" + NumberUtils.hex(rc, 2) + ", status 0x" + NumberUtils.hex(status, 2));
+			return (rc != 0xFF);
+		} finally {
+			irqReadQueue = true;
+			processQueues();
+		}
+	}
+
+	/**
+	 * Activate/Deactivate the mouse
+	 */
+	final void setMouseEnabled(boolean enable) throws DeviceException {
+		writeController(enable ? CCMD_MOUSE_ENABLE : CCMD_MOUSE_DISABLE);
+	}
+
+	/**
+	 * Activate/Deactivate the keyboard
+	 */
+	final void setKeyboardEnabled(boolean enable) throws DeviceException {
+		writeController(enable ? CCMD_KB_ENABLE : CCMD_KB_DISABLE);
 	}
 
 	/**
@@ -200,7 +246,7 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	 * @param cmd
 	 * @return
 	 */
-	final boolean writeMouseCommand(int cmd) {
+	final boolean writeMouseCommand(int cmd) throws DeviceException {
 		// First clear the mouse channel, otherwise we might read
 		// old data back
 		mouseChannel.clear();
@@ -239,7 +285,7 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	 * @param cmds
 	 * @return
 	 */
-	final boolean writeMouseCommands(int[] cmds) {
+	final boolean writeMouseCommands(int[] cmds) throws DeviceException {
 		boolean ok = true;
 		for (int i = 0; i < cmds.length; i++) {
 			ok &= writeMouseCommand(cmds[i]);

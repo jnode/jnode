@@ -62,6 +62,8 @@ public interface PS2Constants {
 	int MODE_DISABLE_MOUSE = 0x20; /* Disable mouse interface */
 	int MODE_KCC = 0x40; /* Scan code conversion to PC format */
 	int MODE_RFU = 0x80;
+	
+	int MODE_DEFAULT = MODE_INT | MODE_MOUSE_INT | MODE_SYS | MODE_KCC;
 
 	/*
 	 * Device commands
