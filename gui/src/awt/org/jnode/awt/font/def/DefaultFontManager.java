@@ -115,13 +115,15 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      * @param y
      */
     public void drawText(Graphics2D g, String text, Font font, int x, int y) {
-        final FontProvider prv = getProvider(font);
+        FontProvider prv = getProvider(font);
+        Font l_font = font;
         if (prv == null) {
-        	log.error("No FontProvider for font=" + font);
-        } else {
-        	final TextRenderer renderer = prv.getTextRenderer(font);
-        	renderer.render(g, text, x, y);
+            l_font = new Font("Luxi Sans", Font.PLAIN, 10);
+        	log.error("No FontProvider for font=" + font + " using " + l_font + " instead.");
+            prv = getProvider(l_font);
         }
+      	final TextRenderer renderer = prv.getTextRenderer(l_font);
+       	renderer.render(g, text, x, y);
     }
 
     /**
