@@ -130,12 +130,6 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
     // Set the header object in the buffer-field
     skbuf.setNetworkLayerHeader(hdr);
 
-/*
-// Set the Link header
-    final EthernetHeader hdrLink = new EthernetHeader(skbuf);
-    skbuf.setLinkLayerHeader(hdrLink);
-    skbuf.setProtocolID(EthernetUtils.getProtocol(hdrLink));
-*/
     // Remove header from skbuf-data
     skbuf.pull(hdr.getLength());
     // Trim the end of the message, to we have a valid length
@@ -152,8 +146,7 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
     }
 
     // Update the ARP cache for the source address
-    if (skbuf.getLinkLayerHeader() != null)
-      updateARPCache(skbuf.getLinkLayerHeader().getSourceAddress(), hdr.getSourceAddress());
+    updateARPCache(skbuf.getLinkLayerHeader().getSourceAddress(), hdr.getSourceAddress());
 
     // Get my IP address
     final IPv4ProtocolAddressInfo myAddrInfo = (IPv4ProtocolAddressInfo) deviceAPI
