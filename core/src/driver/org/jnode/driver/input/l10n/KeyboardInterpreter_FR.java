@@ -17,6 +17,8 @@ import org.jnode.driver.input.DeadKeyException;
  * @since 0.15
  */
 public class KeyboardInterpreter_FR extends KeyboardInterpreter {
+	protected int lastDeadVK = -1;
+	protected int lastFlags = -1;
 	
 	public KeyboardInterpreter_FR() {
 		super();
@@ -26,6 +28,10 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 	/**
 	 * Method interpretExtendedScanCode this method sould be used to handle the dead keys and other special keys
 	 *
+	 * @param    scancode            an int
+	 * @param    vk                  an int
+	 * @param    released            a  boolean
+	 *
 	 * @return   the char to use or throws an Exception
 	 * @exception   UnsupportedKeyException is thrown if the current key is not handled by this method
 	 * @exception   DeadKeyException is thrown if the current key is a dead key
@@ -34,10 +40,103 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 	 * @version  2/8/2004
 	 * @since 0.15
 	 */
-	protected char interpretExtendedScanCode() throws UnsupportedKeyException, DeadKeyException {
-		// TODO
-		throw new UnsupportedKeyException();
+	protected char interpretExtendedScanCode(int scancode, int vk, boolean released) throws UnsupportedKeyException, DeadKeyException {
+		boolean deadKey = false;
+//		System.err.print("vk = "+vk);
+		switch(vk) {
+			case KeyEvent.VK_DEAD_CIRCUMFLEX:
+				lastDeadVK = KeyEvent.VK_DEAD_CIRCUMFLEX;
+				lastFlags = flags;
+				deadKey = true;
+				break;
+		}
+		if(deadKey) {
+//			System.err.println("Dead key pressed : vk="+vk+", flags="+flags);
+			throw new DeadKeyException();
+		} else {
+			try {
+				switch(lcharMap[scancode]) {
+					case 'a':
+						switch(lastDeadVK) {
+							case KeyEvent.VK_DEAD_CIRCUMFLEX:
+								if(lastFlags == KeyEvent.SHIFT_DOWN_MASK) {
+									return 'ä';
+								} else {
+									return 'â';
+								}
+							default:
+								throw new UnsupportedKeyException();
+						}
+					case 'e':
+						switch(lastDeadVK) {
+							case KeyEvent.VK_DEAD_CIRCUMFLEX:
+								if(lastFlags == KeyEvent.SHIFT_DOWN_MASK) {
+									return 'ë';
+								} else {
+									return 'ê';
+								}
+							default:
+								throw new UnsupportedKeyException();
+						}
+					case 'i':
+						switch(lastDeadVK) {
+							case KeyEvent.VK_DEAD_CIRCUMFLEX:
+								if(lastFlags == KeyEvent.SHIFT_DOWN_MASK) {
+									return 'ï';
+								} else {
+									return 'î';
+								}
+							default:
+								throw new UnsupportedKeyException();
+						}
+					case 'o':
+						switch(lastDeadVK) {
+							case KeyEvent.VK_DEAD_CIRCUMFLEX:
+								if(lastFlags == KeyEvent.SHIFT_DOWN_MASK) {
+									return 'ö';
+								} else {
+									return 'ô';
+								}
+							default:
+								throw new UnsupportedKeyException();
+						}
+					case 'u':
+						switch(lastDeadVK) {
+							case KeyEvent.VK_DEAD_CIRCUMFLEX:
+								if(lastFlags == KeyEvent.SHIFT_DOWN_MASK) {
+									return 'ü';
+								} else {
+									return 'û';
+								}
+							default:
+								throw new UnsupportedKeyException();
+						}
+					case 'y':
+						switch(lastDeadVK) {
+							case KeyEvent.VK_DEAD_CIRCUMFLEX:
+								if(lastFlags == KeyEvent.SHIFT_DOWN_MASK) {
+									return 'ÿ';
+								} else {
+									throw new UnsupportedKeyException();
+								}
+							default:
+								throw new UnsupportedKeyException();
+						}
+					default:
+						throw new UnsupportedKeyException();
+				}
+			} finally {
+				if(!released) {
+//					System.err.println("deadKey reset");
+					lastDeadVK = -1;
+					lastFlags = -1;
+				}
+			}
+		}
 	}
+	
+	
+	
 	
 	/**
 	 * Initialize the mapping between scancode and virtual key code.
@@ -147,7 +246,7 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 		vkMap[103] = KeyEvent.VK_PAGE_DOWN;
 		vkMap[104] = KeyEvent.VK_UP;
 		vkMap[105] = KeyEvent.VK_SEPARATOR;
-		vkMap[111] = KeyEvent.VK_FINAL;
+		vkMap[111] = KeyEvent.VK_SLASH;
 		vkMap[112] = KeyEvent.VK_CONTROL;
 		vkMap[113] = KeyEvent.VK_LEFT;
 		vkMap[114] = KeyEvent.VK_DOWN;
@@ -221,6 +320,7 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 		lcharMap[83] = '.';
 		
 		lcharMap[86] = '<';
+		lcharMap[111] = '/';
 		
 		ucharMap[2] = '1';
 		ucharMap[3] = '2';
@@ -287,8 +387,9 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 		ucharMap[81] = '3';
 		ucharMap[82] = '0';
 		ucharMap[83] = '.';
-
+		
 		ucharMap[86] = '>';
+		ucharMap[111] = '/';
 		
 		altGrCharMap[41] = '¬';
 		int i = 2;
@@ -351,9 +452,11 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 		altGrCharMap[i++]  = '·';
 		altGrCharMap[i++]  = '?';
 		altGrCharMap[i++]  = '?';
-
+		
 		altGrCharMap[86]   = '|';
+		altGrCharMap[111]   = '/';
 	}
 }
+
 
 

@@ -74,9 +74,12 @@ public abstract class KeyboardInterpreter {
 			}
 		}
 		if (vk != 0) {
-			char ch = (char)-1;
+			char ch;
 			try {
-				ch = interpretExtendedScanCode();
+				ch = interpretExtendedScanCode(scancode, vk, released);
+				long time = System.currentTimeMillis();
+				lastScancode = scancode;
+				return new KeyboardEvent(released ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED, time, flags, vk, ch);
 			} catch (UnsupportedKeyException e) {
 				if ((flags & InputEvent.SHIFT_DOWN_MASK) != 0) {
 					ch = ucharMap[scancode];
@@ -85,11 +88,13 @@ public abstract class KeyboardInterpreter {
 				} else {
 					ch = lcharMap[scancode];
 				}
+				long time = System.currentTimeMillis();
+				lastScancode = scancode;
+				return new KeyboardEvent(released ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED, time, flags, vk, ch);
 			}
-			catch (DeadKeyException e) {}
-			long time = System.currentTimeMillis();
-			lastScancode = scancode;
-			return new KeyboardEvent(released ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED, time, flags, vk, ch);
+			catch (DeadKeyException e) {
+				return null;
+			}
 		} else {
 			lastScancode = scancode;
 			return null;
@@ -164,6 +169,10 @@ public abstract class KeyboardInterpreter {
 	/**
 	 * Method interpretExtendedScanCode this method sould be used to handle the dead keys and other special keys
 	 *
+	 * @param    scancode            an int
+	 * @param    vk                  an int
+	 * @param    released            a  boolean
+	 *
 	 * @return   the char to use or throws an Exception
 	 * @exception   UnsupportedKeyException is thrown if the current key is not handled by this method
 	 * @exception   DeadKeyException is thrown if the current key is a dead key
@@ -172,6 +181,7 @@ public abstract class KeyboardInterpreter {
 	 * @version  2/8/2004
 	 * @since 0.15
 	 */
-	protected abstract char interpretExtendedScanCode() throws UnsupportedKeyException, DeadKeyException;
+	protected abstract char interpretExtendedScanCode(int scancode, int vk, boolean released) throws UnsupportedKeyException, DeadKeyException;
 }
+
 
