@@ -1,6 +1,6 @@
 /* AffineTransformOp.java --  This class performs affine 
- * transformation between two images or rasters in 2 
- * dimensions. Copyright (C) 2004 Free Software Foundation
+   transformation between two images or rasters in 2 dimensions.
+   Copyright (C) 2004 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -38,11 +38,12 @@ exception statement from your version. */
 
 package java.awt.image;
 
-import java.awt.*;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.*;
-
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 /**
  * This class performs affine transformation between two images or 
@@ -53,8 +54,8 @@ import java.awt.geom.*;
  
 public class AffineTransformOp implements BufferedImageOp, RasterOp
 {
-    public static final int TYPE_BILINEAR = 0;
     public static final int TYPE_NEAREST_NEIGHBOR = 1;
+    public static final int TYPE_BILINEAR = 2;
 
     private AffineTransform transform;
     private RenderingHints hints;

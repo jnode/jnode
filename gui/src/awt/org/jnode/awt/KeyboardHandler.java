@@ -9,7 +9,7 @@ import org.jnode.driver.input.KeyboardAPI;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.Device;
 import org.jnode.driver.ApiNotFoundException;
-import org.jnode.awt.peer.JNodeToolkit;
+import org.jnode.awt.peer.RawJNodeToolkit;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -61,7 +61,7 @@ public class KeyboardHandler implements KeyboardListener {
      * @param keyChar
      */
     private void postEvent(int id, long time, int modifiers, int keyCode, char keyChar) {
-        JNodeToolkit tk = (JNodeToolkit) JNodeToolkit.getDefaultToolkit();
+        RawJNodeToolkit tk = (RawJNodeToolkit) RawJNodeToolkit.getDefaultToolkit();
         Component source = tk.getFocusHandler().getFocusedComponent();
         if (source == null) source = tk.getTop();
         KeyEvent me = new KeyEvent(source, id, time, modifiers, keyCode, keyChar);

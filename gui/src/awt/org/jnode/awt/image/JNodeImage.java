@@ -73,7 +73,6 @@ public class JNodeImage extends Image {
 	 * @return The graphics
 	 */
 	public Graphics getGraphics() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

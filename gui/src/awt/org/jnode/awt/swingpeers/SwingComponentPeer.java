@@ -17,6 +17,7 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.PaintEvent;
+import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
@@ -24,6 +25,7 @@ import java.awt.image.VolatileImage;
 import java.awt.peer.ComponentPeer;
 
 import org.apache.log4j.Logger;
+import org.jnode.awt.image.JNodeBufferedImage;
 
 /**
  * Base class for virtual component peers. Satisfies the requirements for AWT
@@ -32,9 +34,20 @@ import org.apache.log4j.Logger;
  * in the hierarchy there is a parent who can produce a display.
  */
 
-public class SwingComponentPeer implements ComponentPeer {
+class SwingComponentPeer implements ComponentPeer {
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+    // Private
+
+    private final Component component;
+
+    private Point location = new Point();
 
     private final Logger log = Logger.getLogger(getClass());
+
+    protected Dimension size = new Dimension();
+
+    private final Toolkit toolkit;
 
     /**
      * Initialize this instance.
@@ -53,16 +66,68 @@ public class SwingComponentPeer implements ComponentPeer {
         // ).setDoubleBufferingEnabled( false );
     }
 
-    public void paint(Graphics g) {
-        log.info("Paint");
-        //System.err.println("paint");
+    public boolean canDetermineObscurity() {
+        return false;
     }
 
-    public void repaint(long tm, int x, int y, int width, int height) {
-        //System.err.println("repaint");
+    public int checkImage(Image img, int width, int height, ImageObserver o) {
+        return toolkit.checkImage(img, width, height, o);
     }
 
-    public void print(Graphics g) {
+    public void coalescePaintEvent(PaintEvent e) {
+        //System.err.println( "coalescePaintEvent: " + e );
+    }
+
+    // Buffer
+
+    public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
+    }
+
+    // Image
+
+    public Image createImage(ImageProducer producer) {
+        return toolkit.createImage(producer);
+    }
+
+    public Image createImage(int width, int height) {
+		return new JNodeBufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    }
+
+    public VolatileImage createVolatileImage(int width, int height) {
+	    throw new RuntimeException("Not implemented");
+    }
+
+    public void destroyBuffers() {
+    }
+
+    public void disable() {
+        setEnabled(false);
+    }
+
+    public void dispose() {
+    }
+
+    public void enable() {
+        setEnabled(true);
+    }
+
+    public void flip(BufferCapabilities.FlipContents flipContents) {
+    }
+
+    public Image getBackBuffer() {
+        return null;
+    }
+
+    // Color
+
+    public ColorModel getColorModel() {
+        return toolkit.getColorModel();
+    }
+
+    // Fonts
+
+    public FontMetrics getFontMetrics(Font font) {
+        return null;
     }
 
     public Graphics getGraphics() {
@@ -80,14 +145,6 @@ public class SwingComponentPeer implements ComponentPeer {
         return null;
     }
 
-    // Bounds
-
-    public void setBounds(int x, int y, int width, int height) {
-        //System.err.println("setBounds "+x+","+y+","+width+","+height);
-        size.width = width;
-        size.height = height;
-    }
-
     public Point getLocationOnScreen() {
         Point screen = new Point(location);
         Component parent = component.getParent();
@@ -99,41 +156,21 @@ public class SwingComponentPeer implements ComponentPeer {
         return screen;
     }
 
-    public Dimension getPreferredSize() {
-        return size;
-    }
-
     public Dimension getMinimumSize() {
         return size;
     }
 
-    // State
-
-    public void setVisible(boolean b) {
+    public Dimension getPreferredSize() {
+        return size;
     }
 
-    public void setEnabled(boolean b) {
-    }
+    /*
+     * public void setCursor( Cursor cursor ) { }
+     */
 
-    // Obscurity
-
-    public boolean isObscured() {
-        return false;
-    }
-
-    public boolean canDetermineObscurity() {
-        return false;
-    }
-
-    // Focus
-
-    public boolean isFocusable() {
-        return true;
-    }
-
-    public boolean requestFocus(Component lightweightChild, boolean temporary,
-            boolean focusedWindowChangeAllowed, long time) {
-        return true;
+    // Misc
+    public Toolkit getToolkit() {
+        return toolkit;
     }
 
     /*
@@ -149,95 +186,41 @@ public class SwingComponentPeer implements ComponentPeer {
         //System.err.println(e);
     }
 
-    public void coalescePaintEvent(PaintEvent e) {
-        //System.err.println( "coalescePaintEvent: " + e );
-    }
-
     public boolean handlesWheelScrolling() {
         return false;
     }
 
-    // Color
-
-    public ColorModel getColorModel() {
-        return toolkit.getColorModel();
+    public void hide() {
+        setVisible(false);
     }
 
-    public void setForeground(Color c) {
-    }
+    // Focus
 
-    public void setBackground(Color c) {
-    }
-
-    // Fonts
-
-    public FontMetrics getFontMetrics(Font font) {
-        return null;
-    }
-
-    public void setFont(Font f) {
-    }
-
-    // Cursor
-
-    public void updateCursorImmediately() {
-    }
-
-    /*
-     * public void setCursor( Cursor cursor ) { }
-     */
-
-    // Misc
-    public Toolkit getToolkit() {
-        return toolkit;
-    }
-
-    public void dispose() {
-    }
-
-    // Buffer
-
-    public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-    }
-
-    public void destroyBuffers() {
-    }
-
-    public void flip(BufferCapabilities.FlipContents flipContents) {
-    }
-
-    public Image getBackBuffer() {
-        return null;
-    }
-
-    // Image
-
-    public Image createImage(ImageProducer producer) {
-        System.err.println("createImage(producer)");
-        return null;
-    }
-
-    public Image createImage(int width, int height) {
-        Component parent = component.getParent();
-        if (parent != null)
-            return parent.createImage(width, height);
-        else
-            throw new Error();
-    }
-
-    public VolatileImage createVolatileImage(int width, int height) {
-        // These babies are created by hardware
-        return null;
-    }
-
-    public boolean prepareImage(Image img, int w, int h, ImageObserver o) {
-        System.err.println("prepareImage");
+    public boolean isFocusable() {
         return true;
     }
 
-    public int checkImage(Image img, int w, int h, ImageObserver o) {
-        System.err.println("checkImage");
-        return ImageObserver.ALLBITS;
+    /**
+     * @see java.awt.peer.ComponentPeer#isFocusTraversable()
+     */
+    public boolean isFocusTraversable() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    // Obscurity
+
+    public boolean isObscured() {
+        return false;
+    }
+
+    public Dimension minimumSize() {
+        return getMinimumSize();
+    }
+
+    public void paint(Graphics g) {
+        log.info("Paint");
+        //System.err.println("paint");
     }
 
     // Deprecated
@@ -246,47 +229,15 @@ public class SwingComponentPeer implements ComponentPeer {
         return getPreferredSize();
     }
 
-    public Dimension minimumSize() {
-        return getMinimumSize();
+    public boolean prepareImage(Image img, int width, int height, ImageObserver o) {
+        return toolkit.prepareImage(img, width, height, o);
     }
 
-    public void show() {
-        setVisible(true);
+    public void print(Graphics g) {
     }
 
-    public void hide() {
-        setVisible(false);
-    }
-
-    public void enable() {
-        setEnabled(true);
-    }
-
-    public void disable() {
-        setEnabled(false);
-    }
-
-    public void reshape(int x, int y, int width, int height) {
-        setBounds(x, y, width, height);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // Private
-
-    protected Component component;
-
-    protected Toolkit toolkit;
-
-    protected Point location = new Point();
-
-    protected Dimension size = new Dimension();
-
-    /**
-     * @see java.awt.peer.ComponentPeer#isFocusTraversable()
-     */
-    public boolean isFocusTraversable() {
-        // TODO Auto-generated method stub
-        return false;
+    public void repaint(long tm, int x, int y, int width, int height) {
+        //System.err.println("repaint");
     }
 
     /**
@@ -297,6 +248,26 @@ public class SwingComponentPeer implements ComponentPeer {
 
     }
 
+    public boolean requestFocus(Component lightweightChild, boolean temporary,
+            boolean focusedWindowChangeAllowed, long time) {
+        return true;
+    }
+
+    public void reshape(int x, int y, int width, int height) {
+        setBounds(x, y, width, height);
+    }
+
+    public void setBackground(Color c) {
+    }
+
+    // Bounds
+
+    public void setBounds(int x, int y, int width, int height) {
+        //System.err.println("setBounds "+x+","+y+","+width+","+height);
+        size.width = width;
+        size.height = height;
+    }
+
     /**
      * @see java.awt.peer.ComponentPeer#setCursor(java.awt.Cursor)
      */
@@ -305,11 +276,34 @@ public class SwingComponentPeer implements ComponentPeer {
 
     }
 
+    public void setEnabled(boolean b) {
+    }
+
     /**
      * @see java.awt.peer.ComponentPeer#setEventMask(long)
      */
     public void setEventMask(long mask) {
         // TODO Auto-generated method stub
 
+    }
+
+    public void setFont(Font f) {
+    }
+
+    public void setForeground(Color c) {
+    }
+
+    // State
+
+    public void setVisible(boolean b) {
+    }
+
+    public void show() {
+        setVisible(true);
+    }
+
+    // Cursor
+
+    public void updateCursorImmediately() {
     }
 }

@@ -39,7 +39,6 @@ exception statement from your version. */
 package java.awt;
 
 import java.awt.peer.FramePeer;
-import java.util.Enumeration;
 import java.util.Vector;
 
 /**
@@ -317,6 +316,7 @@ setMenuBar(MenuBar menuBar)
       this.menuBar.removeNotify();  
     if (menuBar != null)
       menuBar.addNotify();
+    invalidateTree ();
     ((FramePeer) peer).setMenuBar(menuBar);
   }
   this.menuBar = menuBar;

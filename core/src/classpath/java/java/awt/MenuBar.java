@@ -45,14 +45,19 @@ import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import javax.accessibility.Accessible;
+import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleRole;
+
 /**
   * This class implements a menu bar in the AWT system.
   *
   * @author Aaron M. Renn (arenn@urbanophile.com)
   * @author Tom Tromey <tromey@redhat.com>
+  * @author Andrew John Hughes <gnu_andrew@member.fsf.org>
   */
 public class MenuBar extends MenuComponent
-  implements MenuContainer, Serializable
+  implements MenuContainer, Serializable, Accessible
 {
 
 /*
@@ -77,6 +82,14 @@ private Menu helpMenu;
   * @serial The menus contained in this menu bar.
   */
 private Vector menus = new Vector();
+
+  /**
+   * The accessible context for this component.
+   *
+   * @see #getAccessibleContext()
+   * @serial ignored.
+   */
+  private transient AccessibleContext accessibleContext;
 
 /*************************************************************************/
 
@@ -128,17 +141,17 @@ setHelpMenu(Menu menu)
       helpMenu.removeNotify ();
       helpMenu.parent = null;
     }
+  helpMenu = menu;
 
-  if (menu.parent != null)
-    menu.parent.remove (menu);
   if (menu.parent != null)
     menu.parent.remove (menu);
   menu.parent = this;
 
+  MenuBarPeer peer = (MenuBarPeer) getPeer ();
   if (peer != null)
     {
-      MenuBarPeer mp = (MenuBarPeer) peer;
-      mp.addHelpMenu (menu);
+      menu.addNotify();
+      peer.addHelpMenu (menu);
     }
 }
 
@@ -163,8 +176,7 @@ add(Menu menu)
 
   if (peer != null)
     {
-      MenuBarPeer mp = (MenuBarPeer) peer;
-      mp.addMenu (menu);
+      menu.addNotify();
     }
 
   return(menu);
@@ -234,8 +246,7 @@ getMenuCount()
 public int
 countMenus()
 {
-  // FIXME: How does the help menu fit in here?
-  return menus.size ();
+  return menus.size () + (getHelpMenu () == null ? 0 : 1);
 }
 
 /*************************************************************************/
@@ -268,6 +279,11 @@ addNotify()
   {
     Menu mi = (Menu)e.nextElement();
     mi.addNotify();
+  }
+  if (helpMenu != null)
+  {
+    helpMenu.addNotify();
+    ((MenuBarPeer) peer).addHelpMenu(helpMenu);
   }
 }
 
@@ -352,5 +368,57 @@ deleteShortcut(MenuShortcut shortcut)
   while ((it = getShortcutMenuItem (shortcut)) != null)
     it.deleteShortcut ();
 }
+
+/**
+ * Gets the AccessibleContext associated with this <code>MenuBar</code>.
+ * The context is created, if necessary.
+ *
+ * @return the associated context
+ */
+public AccessibleContext getAccessibleContext()
+{
+  /* Create the context if this is the first request */
+  if (accessibleContext == null)
+    {
+      /* Create the context */
+      accessibleContext = new AccessibleAWTMenuBar();
+    }
+  return accessibleContext;
+}
+
+/**
+ * This class provides accessibility support for AWT menu bars.
+ *
+ * @author Andrew John Hughes <gnu_andrew@member.fsf.org>
+ */
+protected class AccessibleAWTMenuBar
+  extends AccessibleAWTMenuComponent
+{
+  
+  /**
+   * Compatible with JDK 1.4.2 revision 5
+   */
+  private static final long serialVersionUID = -8577604491830083815L;
+
+  /**
+   * This is the default constructor, which simply calls the default
+   * constructor of the superclass.
+   */
+  protected AccessibleAWTMenuBar()
+  {
+    super();
+  }
+
+  /**
+   * Returns the accessible role relating to the menu bar.
+   *
+   * @return <code>AccessibleRole.MENU_BAR</code>.
+   */
+  public AccessibleRole getAccessibleRole()
+  {
+    return AccessibleRole.MENU_BAR;
+  }
+
+} // class AccessibleAWTMenuBar
 
 } // class MenuBar

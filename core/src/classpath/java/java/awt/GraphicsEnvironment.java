@@ -1,5 +1,5 @@
 /* GraphicsEnvironment.java -- information about the graphics environment
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,7 +35,10 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt;
+
+import gnu.java.awt.ClasspathToolkit;
 
 import java.awt.image.BufferedImage;
 import java.util.Locale;
@@ -45,21 +48,20 @@ import java.util.Locale;
  * on a given platform. The resources might be local or remote, and specify
  * the valid configurations for displaying graphics.
  *
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
  * @see GraphicsDevice
  * @see GraphicsConfiguration
  * @since 1.4
  * @status updated to 1.4
  */
-public abstract class GraphicsEnvironment {
-	
-	private static GraphicsEnvironment localEnv;
-	
+public abstract class GraphicsEnvironment
+{
 	/**
 	 * The environment must be obtained from a factory or query method, hence
 	 * this constructor is protected.
 	 */
-	protected GraphicsEnvironment() {
+  protected GraphicsEnvironment()
+  {
 	}
 
 	/**
@@ -68,22 +70,11 @@ public abstract class GraphicsEnvironment {
 	 * XXX Not implemented in Classpath yet.
 	 * @return the local environment
 	 */
-	public static GraphicsEnvironment getLocalGraphicsEnvironment() {
-		return localEnv;
-	}
-
-	/**
-	 * Returns the local graphics environment.
-	 *
-	 * XXX Not implemented in Classpath yet.
-	 * @return the local environment
-	 */
-	public static void setLocalGraphicsEnvironment(GraphicsEnvironment env) {
-		if ((localEnv != null) || (env == null)) {
-			throw new SecurityException("Cannot overwrite the local graphics environment");
-		} else {
-			localEnv = env;
-		}
+  public static GraphicsEnvironment getLocalGraphicsEnvironment()
+  {
+    ClasspathToolkit tk;
+    tk = ((ClasspathToolkit) Toolkit.getDefaultToolkit ());
+    return tk.getLocalGraphicsEnvironment ();
 	}
 
 	/**
@@ -98,7 +89,8 @@ public abstract class GraphicsEnvironment {
 	 *         unsupported
 	 * @since 1.4
 	 */
-	public static boolean isHeadless() {
+  public static boolean isHeadless()
+  {
 		// XXX Should be: getLocalGraphicsEnvironment().isHeadlessInstance();
 		return false;
 	}
@@ -114,7 +106,8 @@ public abstract class GraphicsEnvironment {
 	 *         unsupported
 	 * @since 1.4
 	 */
-	public boolean isHeadlessInstance() {
+  public boolean isHeadlessInstance()
+  {
 		return false;
 	}
 
@@ -193,7 +186,8 @@ public abstract class GraphicsEnvironment {
 	 * @see #getMaximumWindowBounds()
 	 * @since 1.4
 	 */
-	public Point getCenterPoint() {
+  public Point getCenterPoint()
+  {
 		Rectangle r = getMaximumWindowBounds();
 		return new Point(r.x + r.width / 2, r.y + r.height / 2);
 	}
@@ -213,7 +207,8 @@ public abstract class GraphicsEnvironment {
 	 * @see Toolkit#getScreenInsets(GraphicsConfiguration)
 	 * @since 1.4
 	 */
-	public Rectangle getMaximumWindowBounds() {
+  public Rectangle getMaximumWindowBounds()
+  {
 		return getDefaultScreenDevice().getDefaultConfiguration().getBounds();
 	}
 } // class GraphicsEnvironment

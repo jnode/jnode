@@ -50,14 +50,14 @@ import java.awt.peer.WindowPeer;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 
-import org.jnode.awt.AbstractJNodeToolkit;
+import org.jnode.awt.JNodeToolkit;
 
 /**
  * AWT toolkit implemented entirely with JFC peers, thus allowing a lightweight
  * simulation of the operating system desktop.
  */
 
-public class SwingToolkit extends AbstractJNodeToolkit {
+public class SwingToolkit extends JNodeToolkit {
 
     private JFrame desktopFrame = null;
 
@@ -114,9 +114,7 @@ public class SwingToolkit extends AbstractJNodeToolkit {
     }
 
     protected FramePeer createFrame(Frame target) {
-        log.debug("createFrame", new Exception("Stacktrace"));
         final int rc = incRefCount();
-        log.debug("createFrame refCount=" + rc);
         if (!initialized) {
             log.debug("createFrame:desktopFramePeer(" + target + ")");
             // Only desktop is real frame
@@ -186,7 +184,7 @@ public class SwingToolkit extends AbstractJNodeToolkit {
     }
     
     /**
-     * @see org.jnode.awt.AbstractJNodeToolkit#onClose()
+     * @see org.jnode.awt.JNodeToolkit#onClose()
      */
     protected void onClose() {
         log.debug("onClose");
@@ -197,18 +195,14 @@ public class SwingToolkit extends AbstractJNodeToolkit {
     }
 
     /**
-     * @see org.jnode.awt.AbstractJNodeToolkit#onInitialize()
+     * @see org.jnode.awt.JNodeToolkit#onInitialize()
      */
     protected void onInitialize() {
-        log.debug("onInitialize", new Exception("Stacktrace"));
+        log.debug("onInitialize");
         desktopFrame = new JFrame("");
-        log.debug("onInitialize.1");
         desktopFrame.setSize(getScreenSize().width, getScreenSize().height);
-        log.debug("onInitialize.2");
         desktop = new JDesktopPane();
-        log.debug("onInitialize.3");
         desktopFrame.getContentPane().add(desktop);
-        log.debug("desktopFrame.show");
         desktopFrame.show();
     }
 }
