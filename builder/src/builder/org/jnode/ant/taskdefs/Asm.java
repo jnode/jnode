@@ -133,6 +133,8 @@ public class Asm extends MatchingTask {
         cmdLine.add(dstFile.toString());
 
         if (bits == 64) {
+        	cmdLine.add("-m");
+        	cmdLine.add("amd64");
             // Set preprocessor
             cmdLine.add("-r");
             cmdLine.add("nasm");
