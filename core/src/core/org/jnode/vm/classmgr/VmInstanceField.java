@@ -55,7 +55,7 @@ public class VmInstanceField extends VmField {
 	 * Gets the offset of this field in the object
 	 * @return int
 	 */
-	public int getOffset() {
+	public final int getOffset() {
 		return offset;
 	}
 
@@ -63,7 +63,7 @@ public class VmInstanceField extends VmField {
 	 * Resolve the offset on this field in a class.
 	 * @param classOffset
 	 */
-	protected void resolveOffset(int classOffset) {
+	protected final void resolveOffset(int classOffset) {
 		offset += classOffset;
 	}
 

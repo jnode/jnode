@@ -26,7 +26,7 @@ package org.jnode.vm.classmgr;
  * 
  * @author epr
  */
-public class VmInstanceMethod extends VmMethod {
+public final class VmInstanceMethod extends VmMethod {
 
 	/** Offset of this method in the VMT of its declaring class */
 	private int tibOffset;
