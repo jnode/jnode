@@ -10,10 +10,12 @@ import java.awt.CheckboxMenuItem;
 import java.awt.Choice;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.Graphics;
 import java.awt.Label;
 import java.awt.Menu;
 import java.awt.MenuBar;
@@ -22,6 +24,7 @@ import java.awt.Panel;
 import java.awt.PopupMenu;
 import java.awt.ScrollPane;
 import java.awt.Scrollbar;
+import java.awt.Shape;
 import java.awt.TextArea;
 import java.awt.TextField;
 import java.awt.Window;
@@ -237,5 +240,35 @@ public class SwingToolkit extends JNodeToolkit {
 			}
 		}
 	}
-
+	
+	/**
+	 * Paint all the lightweight children of the given container.
+	 * @param awtContainer
+	 * @param g
+	 */
+	public static void paintLightWeightChildren(Container awtContainer, Graphics g, int dx, int dy) {
+		final Shape oldClip = g.getClip();
+		try {
+			final Component[] comps = awtContainer.getComponents();
+			final int cnt = comps.length;
+			for (int i = 0; i < cnt; i++) {
+				final Component child = comps[i];
+				if (child.isVisible() && child.isLightweight()) {
+					final int x = child.getX() - dx;
+					final int y = child.getY() - dy;
+					final int width = child.getWidth();
+					final int height = child.getHeight();
+					g.setClip(x, y, width, height);
+					g.translate(x, y);
+					try {
+						child.paint(g);
+					} finally {
+						g.translate(-x, -y);
+					}
+				}
+			}
+		} finally {
+			g.setClip(oldClip);
+		}
+	}
 }

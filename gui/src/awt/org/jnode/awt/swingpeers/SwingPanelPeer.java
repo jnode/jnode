@@ -4,6 +4,7 @@
 package org.jnode.awt.swingpeers;
 
 import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.peer.PanelPeer;
@@ -77,6 +78,14 @@ final class SwingPanelPeer extends SwingComponentPeer implements PanelPeer,
 		 */
 		public Component getAWTComponent() {
 			return awtComponent;
+		}
+			
+		/**
+		 * @see javax.swing.JComponent#paintChildren(java.awt.Graphics)
+		 */
+		protected void paintChildren(Graphics g) {
+			super.paintChildren(g);
+			SwingToolkit.paintLightWeightChildren(awtComponent, g, 0, 0);
 		}
 	}
 }

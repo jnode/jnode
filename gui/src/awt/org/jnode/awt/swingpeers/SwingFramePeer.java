@@ -56,7 +56,7 @@ final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
 
 		this.awtFrame = awtFrame;
 		this.toolkit = toolkit;
-		this.frame = new SwingFrame(awtFrame);
+		this.frame = new SwingFrame(awtFrame, this);
 		desktopPane.add(frame);
 
 		SwingToolkit.copyAwtProperties(awtFrame, this.frame);
@@ -535,9 +535,9 @@ final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
 
 		private Frame awtFrame;
 
-		public SwingFrame(Frame awtFrame) {
+		public SwingFrame(Frame awtFrame, SwingFramePeer peer) {
 			this.awtFrame = awtFrame;
-			((SwingFrameContentPane)getContentPane()).setFrame(awtFrame);
+			((SwingFrameContentPane) getContentPane()).initialize(awtFrame, peer);
 		}
 
 		/**
@@ -580,11 +580,13 @@ final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
 
 	private static final class SwingFrameContentPane extends JComponent {
 
-		private Frame awtFrame;
+		private Frame awtComponent;
+		private SwingFramePeer peer;
 
-		public void setFrame(Frame awtFrame) {
-			this.awtFrame = awtFrame;
-			awtFrame.invalidate();
+		public void initialize(Frame awtComponent, SwingFramePeer peer) {
+			this.awtComponent = awtComponent;
+			this.peer = peer;
+			awtComponent.invalidate();
 		}
 
 		/**
@@ -592,8 +594,8 @@ final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
 		 */
 		public void invalidate() {
 			super.invalidate();
-			if (awtFrame != null) {
-				awtFrame.invalidate();
+			if (awtComponent != null) {
+				awtComponent.invalidate();
 			}
 		}
 
@@ -601,8 +603,8 @@ final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
 		 * @see java.awt.Component#doLayout()
 		 */
 		public void doLayout() {
-			if (awtFrame != null) {
-				awtFrame.doLayout();
+			if (awtComponent != null) {
+				awtComponent.doLayout();
 			}
 			super.doLayout();
 		}
@@ -611,10 +613,19 @@ final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
 		 * @see java.awt.Component#validate()
 		 */
 		public void validate() {
-			if (awtFrame != null) {
-				awtFrame.validate();
+			if (awtComponent != null) {
+				awtComponent.validate();
 			}
 			super.validate();
+		}
+
+		/**
+		 * @see javax.swing.JComponent#paintChildren(java.awt.Graphics)
+		 */
+		protected void paintChildren(Graphics g) {
+			super.paintChildren(g);
+			final Insets insets = peer.getInsets();
+			SwingToolkit.paintLightWeightChildren(awtComponent, g, insets.left, insets.top);
 		}
 	}
 }
