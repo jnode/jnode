@@ -4,11 +4,13 @@
 package org.jnode.vm.x86;
 
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.VmAddress;
 import org.jnode.vm.ObjectVisitor;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmThread;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
+import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.ObjectReference;
 
 /**
  * Thread implementation for Intel X86 processor.
@@ -141,40 +143,51 @@ public final class VmX86Thread extends VmThread {
     public void visit(ObjectVisitor visitor, VmHeapManager heapManager, HeapHelper helper) {
         // For now do it stupid, but safe, just scan the whole stack.
         final int stackSize = getStackSize();
-        final Object stack = getStack();
+        final Object stack = getStack();        
         if (stack != null) {
+            final Address stackBottom = ObjectReference.fromObject(stack).toAddress();
+            final Address stackTop = stackBottom.add(stackSize);
+            final Address stackEnd;
+            if (this == currentThread()) {
+                stackEnd = stackBottom;
+            } else {
+                stackEnd = Address.fromAddress(esp);
+            }
+            
+            Address ptr = stackTop;
             final int slotSize = VmX86Architecture.SLOT_SIZE;
-            for (int i = 0; i < stackSize; i += slotSize) {
-                final VmAddress child = helper.getAddress(stack, i);
+            while (ptr.GE(stackEnd)) {
+                final Address child = ptr.loadAddress();
                 if (child != null) {
                     if (heapManager.isObject(child)) {
                         visitor.visit(child);
                     }
                 }
+                ptr = ptr.sub(slotSize);                
             }
         }
         // Scan registers
-        VmAddress addr = VmAddress.valueOf(eax);
+        Address addr = Address.fromIntZeroExtend(eax);
         if (heapManager.isObject(addr)) {
             visitor.visit(addr);
         }
-        addr = VmAddress.valueOf(ebx);
+        addr = Address.fromIntZeroExtend(ebx);
         if (heapManager.isObject(addr)) {
             visitor.visit(addr);
         }
-        addr = VmAddress.valueOf(ecx);
+        addr = Address.fromIntZeroExtend(ecx);
         if (heapManager.isObject(addr)) {
             visitor.visit(addr);
         }
-        addr = VmAddress.valueOf(edx);
+        addr = Address.fromIntZeroExtend(edx);
         if (heapManager.isObject(addr)) {
             visitor.visit(addr);
         }
-        addr = VmAddress.valueOf(esi);
+        addr = Address.fromIntZeroExtend(esi);
         if (heapManager.isObject(addr)) {
             visitor.visit(addr);
         }
-        addr = VmAddress.valueOf(edi);
+        addr = Address.fromIntZeroExtend(edi);
         if (heapManager.isObject(addr)) {
             visitor.visit(addr);
         }

@@ -7,6 +7,7 @@ import org.jnode.vm.Monitor;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmThread;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.VmArrayClass;
@@ -38,7 +39,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
 
     private final VmArchitecture arch;
 
-    private final int slotSize;
+//    private final int slotSize;
 
     private final DefaultHeapManager heapManager;
 
@@ -59,7 +60,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
         this.rootSet = false;
         this.arch = arch;
         this.helper = heapManager.getHelper();
-        this.slotSize = arch.getReferenceSize();
+//        this.slotSize = arch.getReferenceSize();
     }
 
     /**
@@ -77,16 +78,6 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
          * Unsafe.getCurrentProcessor().getArchitecture().getStackReader()
          * .debugStackTrace(); helper.die("Internal error"); return false;
          */
-        try {
-            // TEST for a valid vmclass.
-            helper.getVmClass(object);
-        } catch (NullPointerException ex) {
-            Unsafe.debug("\nObject address ");
-            Unsafe.debug(helper.addressOf32(object));
-            Unsafe.debug("\nObject TIB ");
-            Unsafe.debug(helper.addressOf32(helper.getTib(object)));
-            helper.die("NPE in processChild; probably corrupted heap");
-        }
 
         //testObject(object, Unsafe.getVmClass(object));
         // Check the current color first, since a stackoverflow of
@@ -138,7 +129,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
         while (!stack.isEmpty()) {
             final Object object = stack.pop();
             markedObjects++;
-            final VmType vmClass = helper.getVmClass(object);
+            final VmType vmClass = VmMagic.getObjectType(object);
             if (vmClass == null) {
                 Unsafe.debug("Oops vmClass == null in (");
                 Unsafe.debug(markedObjects);
@@ -160,7 +151,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
                     }
                 }
             }
-            processChild(helper.getTib(object));
+            processChild(VmMagic.getTIB(object));
             final Monitor monitor = helper.getInflatedMonitor(object, arch);
             if (monitor != null) {
                 processChild(monitor);
@@ -215,26 +206,8 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
                 Unsafe.debug(vmClass.getName());
                 helper.die("Class internal error");
             } else {
-                final Object child = objAddr.loadObjectReference(Offset.fromIntZeroExtend(offset));
-                //final Object child = helper.getObject(object, offset);
+                final ObjectReference child = objAddr.loadObjectReference(Offset.fromIntZeroExtend(offset));
                 if (child != null) {
-                    try {
-                        // TEST for a valid vmclass.
-                        helper.getVmClass(child);
-                    } catch (NullPointerException ex) {
-                        Unsafe.debug("\nObject type  ");
-                        Unsafe.debug(vmClass.getName());
-                        Unsafe.debug("\nChild addr   ");
-                        Unsafe.debug(helper.addressOf32(child));
-                        Unsafe.debug("\nField offset ");
-                        Unsafe.debug(offset);
-                        Unsafe.debug("\nC.IsObject?  ");
-                        Unsafe.debug(heapManager.isObject(helper.addressOf(child)) ? "Yes" : "No");
-                        Unsafe.debug("\nO.IsObject?  ");
-                        Unsafe.debug(heapManager.isObject(helper.addressOf(object)) ? "Yes" : "No");
-                        Unsafe.debug('\n');
-                        helper.die("NPE in processChild; probably corrupted heap");
-                    }
                     processChild(child);
                 }
             }
@@ -247,19 +220,6 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      * @param thread
      */
     private void markThreadStack(VmThread thread) {
-        // For now do it stupid, but safe, just scan the whole stack.
-//        final int stackSize = thread.getStackSize();
-//        final Object stack = helper.getStack(thread);
-//        if (stack != null) {
-//            for (int i = 0; i < stackSize; i += slotSize) {
-//                final Address child = helper.getAddress(stack, i);
-//                if (child != null) {
-//                    if (heapManager.isObject(child)) {
-//                        processChild(child);
-//                    }
-//                }
-//            }
-//        }
         thread.visit(processChildVisitor, heapManager, helper);
     }
 
@@ -275,13 +235,12 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
             helper.atomicChangeObjectColor(child, gcColor, GC_GREY);
             try {
                 // TEST for a valid vmclass.
-                helper.getVmClass(child);
                 stack.push(child);
             } catch (NullPointerException ex) {
                 Unsafe.debug("\nObject address ");
                 Unsafe.debug(helper.addressOf32(child));
                 Unsafe.debug("\nObject TIB ");
-                Unsafe.debug(helper.addressOf32(helper.getTib(child)));
+                Unsafe.debug(helper.addressOf32(VmMagic.getTIB(child)));
                 helper.die("NPE in processChild; probably corrupted heap");
             }
         }

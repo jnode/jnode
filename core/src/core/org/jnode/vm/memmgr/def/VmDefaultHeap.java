@@ -5,6 +5,7 @@ package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.ObjectVisitor;
+import org.jnode.vm.VmMagic;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
@@ -323,7 +324,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
                     object = helper.objectAt(ptr);
                     tib = helper.getObject(object, tibOffset);
                     objSize = helper.getInt(object, sizeOffset);
-                    flags = (flagsMask == 0) ? 0 : (helper.getObjectFlags(object) & flagsMask);
+                    flags = (flagsMask == 0) ? 0 : (VmMagic.getObjectFlags(object) & flagsMask);
                 } finally {
                     unlock();
                 }
@@ -343,7 +344,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
                 final Object object = helper.objectAt(ptr);
                 final Object tib = helper.getObject(object, tibOffset);
                 final int objSize = helper.getInt(object, sizeOffset);
-                final int flags = (flagsMask == 0) ? 0 : (helper.getObjectFlags(object) & flagsMask);
+                final int flags = (flagsMask == 0) ? 0 : (VmMagic.getObjectFlags(object) & flagsMask);
                 if (tib != FREE) {
                     if (flags == flagsValue) {
                         if (!visitor.visit(object)) {

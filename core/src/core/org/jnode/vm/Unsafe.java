@@ -136,44 +136,12 @@ public final class Unsafe {
 	protected static native Object objectAt(VmAddress memPtr);
 
 	/**
-	 * Gets the VmClass of the given object.
-	 * 
-	 * @param object
-	 * @return VmClass
-	 */
-	protected static native VmClassType getVmClass(Object object);
-
-	/**
-	 * Gets the Type Information Block of the given object.
-	 * 
-	 * @param object
-	 * @return VmClass
-	 */
-	protected static native Object[] getTIB(Object object);
-
-	/**
 	 * Gets the Super Classes Array of the given object.
 	 * 
 	 * @param object
 	 * @return VmType[]
 	 */
 	protected static native VmType[] getSuperClasses(Object object);
-
-	/**
-	 * Gets all of the flags of the given object.
-	 * 
-	 * @param object
-	 * @return int
-	 */
-	protected static native int getObjectFlags(Object object);
-
-	/**
-	 * Sets all of the flags of the given object.
-	 * 
-	 * @param object
-	 * @param flags
-	 */
-	protected static native void setObjectFlags(Object object, int flags);
 
 	/**
 	 * Gets the GC flags of the given object

@@ -3,14 +3,15 @@
  */
 package org.jnode.vm.memmgr.def;
 
-import org.jnode.vm.VmAddress;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.SpinLock;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.pragma.Uninterruptible;
 import org.vmmagic.pragma.UninterruptiblePragma;
+import org.vmmagic.unboxed.Address;
 
 /**
  * An abstract heap class.
@@ -95,8 +96,8 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * @param addr
 	 * @return boolean
 	 */
-	protected boolean isObject(VmAddress addr) {
-		long addrL = helper.addressToLong(addr);
+	protected boolean isObject(Address addr) {
+		long addrL = addr.toLong();
 		if ((addrL < startL) || (addrL >= endL)) {
 			// The object if not within this heap
 			return false;

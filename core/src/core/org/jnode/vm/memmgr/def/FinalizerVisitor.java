@@ -4,6 +4,7 @@
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
+import org.jnode.vm.VmMagic;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmMethod;
@@ -32,7 +33,7 @@ final class FinalizerVisitor extends ObjectVisitor implements ObjectFlags {
     public boolean visit(Object object) {
         final int color = helper.getObjectColor(object);
         if (color == GC_YELLOW) {
-            final VmClassType type = helper.getVmClass(object);
+            final VmClassType type = VmMagic.getObjectType(object);
             final VmMethod fm = type.getFinalizeMethod();
             if (fm != null) {
                 try {

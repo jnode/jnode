@@ -283,7 +283,7 @@ public final class VmSystem {
         if (obj == null) {
             throw new NullPointerException();
         } else {
-            return Unsafe.getVmClass(obj);
+            return VmMagic.getObjectType(obj);
         }
     }
 
@@ -520,7 +520,7 @@ public final class VmSystem {
                 return null;
             }
 
-            final VmType exClass = Unsafe.getVmClass(ex);
+            final VmType exClass = VmMagic.getObjectType(ex);
             final VmMethod method = reader.getMethod(frame);
             final int pc = reader.getPC(frame);
             if (method == null) {

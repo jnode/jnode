@@ -5,6 +5,7 @@ package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.ObjectVisitor;
+import org.jnode.vm.VmMagic;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.memmgr.HeapHelper;
@@ -122,7 +123,7 @@ public class VmBootHeap extends VmAbstractHeap {
         while (offset < size) {
             final VmAddress ptr = VmAddress.add(start, offset);
             final Object object = helper.objectAt(ptr);
-            final int flags = helper.getObjectFlags(object) & flagsMask;
+            final int flags = VmMagic.getObjectFlags(object) & flagsMask;
             if ((flags != flagsValue) || visitor.visit(object)) {
                 // Continue
                 int objSize = helper.getInt(ptr, sizeOffset);

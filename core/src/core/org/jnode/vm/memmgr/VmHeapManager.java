@@ -5,8 +5,9 @@ package org.jnode.vm.memmgr;
 
 import java.io.PrintStream;
 
-import org.jnode.vm.VmAddress;
 import org.jnode.vm.Unsafe;
+import org.jnode.vm.VmAddress;
+import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmArrayClass;
@@ -14,6 +15,7 @@ import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.def.VmBootHeap;
+import org.vmmagic.unboxed.Address;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -156,7 +158,7 @@ public abstract class VmHeapManager extends VmSystemObject {
 	 */
 	public final Object clone(Cloneable object) {
 		testInited();
-		final VmClassType objectClass = helper.getVmClass(object);
+		final VmClassType objectClass = VmMagic.getObjectType(object);
 		final VmAddress objectAddr = helper.addressOf(object);
 		final int size;
 		if (objectClass.isArray()) {
@@ -226,7 +228,7 @@ public abstract class VmHeapManager extends VmSystemObject {
      * @return True if the given address if a valid starting address of an
      *         object, false otherwise.
      */
-    public abstract boolean isObject(VmAddress ptr);
+    public abstract boolean isObject(Address ptr);
 
     private final void testInited() {
 		if (!inited) {

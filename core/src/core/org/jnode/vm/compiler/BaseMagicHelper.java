@@ -22,6 +22,8 @@ public class BaseMagicHelper {
     protected static final int cOFFSET = 4;
 
     protected static final int cWORD = 5;
+    
+    protected static final int cVMMAGIC = 6;
 
     protected static final int mADD = 1;
 
@@ -210,6 +212,11 @@ public class BaseMagicHelper {
     protected static final int mATTEMPTWORD_OFS = 95;
 
     protected static final int mFROMOBJECT = 96;
+    protected static final int mFROMADDRESS = 97;
+    protected static final int mGETOBJECTTYPE = 98;
+    protected static final int mGETTIB = 99;
+    protected static final int mGETOBJECTFLAGS = 100;
+    protected static final int mSETOBJECTFLAGS = 101;
 
     private static final int mLOAD_MIN = mLOADBYTE;
 
@@ -255,6 +262,7 @@ public class BaseMagicHelper {
         addMethod("fromIntSignExtend", mFROMINTSIGNEXTEND);
         addMethod("fromIntZeroExtend", mFROMINTZEROEXTEND);
         addMethod("fromLong", mFROMLONG);
+        addMethod("fromAddress", mFROMADDRESS);
         addMethod("fromObject", mFROMOBJECT);
         addMethod("lsh", mLSH);
         addMethod("rsha", mRSHA);
@@ -273,6 +281,12 @@ public class BaseMagicHelper {
         addMethod("prepareAddress", mPREPAREADDRESS);
         addMethod("prepareObjectReference", mPREPAREOBJECTREFERENCE);
         addMethod("prepareWord", mPREPAREWORD);
+        
+        // VmMagic
+        addMethod("getObjectType", mGETOBJECTTYPE);
+        addMethod("getTIB", mGETTIB);
+        addMethod("getObjectFlags", mGETOBJECTFLAGS);
+        addMethod("setObjectFlags", mSETOBJECTFLAGS);
     }
 
     protected static final int getClass(VmMethod method) {
@@ -286,6 +300,8 @@ public class BaseMagicHelper {
             return cOBJECTREFERENCE;
         } else if (cname.equals("Offset")) {
             return cOFFSET;
+        } else if (cname.equals("VmMagic")) {
+            return cVMMAGIC;
         } else if (cname.equals("Word")) {
             return cWORD;
         } else {

@@ -7,10 +7,12 @@ import org.jnode.vm.Monitor;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.VmMagic;
 import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.HeapHelper;
+import org.vmmagic.unboxed.ObjectReference;
 
 
 /**
@@ -37,7 +39,7 @@ final class GCVerifyVisitor extends ObjectVisitor {
      * @see org.jnode.vm.ObjectVisitor#visit(java.lang.Object)
      */
     public boolean visit(Object object) {
-        final VmType vmClass = helper.getVmClass(object);
+        final VmType vmClass = VmMagic.getObjectType(object);
         if (vmClass == null) {
             helper.die("GCVerifyError: vmClass");
         } else if (vmClass.isArray()) {
@@ -47,7 +49,7 @@ final class GCVerifyVisitor extends ObjectVisitor {
         } else {
             verifyObject(object, (VmNormalClass) vmClass);
         }
-        verifyChild(helper.getTib(object), object, "tib");
+        verifyChild(VmMagic.getTIB(object), object, "tib");
         final Monitor monitor = helper.getInflatedMonitor(object, arch);
         if (monitor != null) {
             verifyChild(monitor, object, "monitor");
@@ -88,11 +90,12 @@ final class GCVerifyVisitor extends ObjectVisitor {
     
     private void verifyChild(Object child, Object parent, String where) {
         if (child != null) {
-            if (!heapManager.isObject(helper.addressOf(child))) {
+            final ObjectReference childRef = ObjectReference.fromObject(child);
+            if (!heapManager.isObject(childRef.toAddress())) {
                 Unsafe.debug("GCVerifyError: in ");
                 Unsafe.debug(where);
                 Unsafe.debug(", parent type ");
-                Unsafe.debug(helper.getVmClass(parent).getName());
+                Unsafe.debug(VmMagic.getObjectType(parent).getName());
                 Unsafe.debug("; child is not an object. ");
                 errorCount++;
             }

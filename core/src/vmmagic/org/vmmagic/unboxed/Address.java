@@ -4,6 +4,8 @@
 //$Id$
 package org.vmmagic.unboxed;
 
+import org.jnode.vm.VmAddress;
+
 /**
  * Stub implementation of an Address type. Needs commenting.
  * 
@@ -20,6 +22,15 @@ public final class Address {
     }
 
     public static Address fromIntZeroExtend(int address) {
+        return null;
+    }
+    
+    /**
+     * Temporary method to easy the transition from VmAddress to Address.
+     * @param address
+     * @return The address
+     */
+    public static Address fromAddress(VmAddress address) {
         return null;
     }
 
