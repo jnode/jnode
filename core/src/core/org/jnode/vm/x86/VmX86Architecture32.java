@@ -21,6 +21,7 @@
 package org.jnode.vm.x86;
 
 import org.jnode.vm.VmProcessor;
+import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.compiler.IMTCompiler;
 import org.jnode.vm.x86.compiler.X86IMTCompiler32;
@@ -37,6 +38,9 @@ public final class VmX86Architecture32 extends VmX86Architecture {
 
     /** The IMT compiler */
     private final X86IMTCompiler32 imtCompiler;
+    
+    /** The type size information */
+    private final TypeSizeInfo typeSizeInfo;
 
     /**
      * Initialize this instance.
@@ -47,11 +51,13 @@ public final class VmX86Architecture32 extends VmX86Architecture {
 
     /**
      * Initialize this instance.
+     * 
      * @param compiler
      */
     public VmX86Architecture32(String compiler) {
         super(compiler);
         this.imtCompiler = new X86IMTCompiler32();
+        this.typeSizeInfo = new TypeSizeInfo(1, 1, 2, 2, 1);
     }
 
     /**
@@ -79,5 +85,14 @@ public final class VmX86Architecture32 extends VmX86Architecture {
      */
     public final int getReferenceSize() {
         return SLOT_SIZE;
+    }
+
+    /**
+     * Gets the type size information of this architecture.
+     * 
+     * @return
+     */
+    public final TypeSizeInfo getTypeSizeInfo() {
+        return typeSizeInfo;
     }
 }

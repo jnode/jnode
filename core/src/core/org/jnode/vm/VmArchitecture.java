@@ -24,6 +24,7 @@ package org.jnode.vm;
 import java.nio.ByteOrder;
 
 import org.jnode.system.ResourceManager;
+import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.compiler.IMTCompiler;
 import org.jnode.vm.compiler.NativeCodeCompiler;
@@ -63,6 +64,12 @@ public abstract class VmArchitecture extends VmSystemObject {
 	 * @return Reference size
 	 */
 	public abstract int getReferenceSize();
+    
+    /**
+     * Gets the type size information of this architecture.
+     * @return
+     */
+    public abstract TypeSizeInfo getTypeSizeInfo();
 
 	/**
 	 * Gets the stackreader for this architecture.

@@ -38,6 +38,7 @@ import org.jnode.vm.bytecode.TypeStack;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.Signature;
 import org.jnode.vm.classmgr.TIBLayout;
+import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmClassType;
@@ -149,7 +150,10 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 
 	/** FP instruction compiler */
 	private final FPCompiler fpCompiler;
-
+    
+    /** Type size information */
+    private final TypeSizeInfo typeSizeInfo;
+    
 	/**
 	 * Virtual Stack: this stack contains values that have been computed but not
 	 * emitted yet; emission is delayed to allow for optimizations, in
@@ -174,9 +178,10 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 	 */
 public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			boolean isBootstrap, X86CompilerContext context,
-			MagicHelper magicHelper, int slotSize) {
+			MagicHelper magicHelper, TypeSizeInfo typeSizeInfo, int slotSize) {
 		this.os = (X86Assembler) outputStream;
 		this.context = context;
+        this.typeSizeInfo = typeSizeInfo;
 		this.magicHelper = magicHelper;
 		this.vstack = new VirtualStack(os);
 		final X86RegisterPool gprPool;
@@ -2506,7 +2511,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			dropParameters(mts, true);
 
 			final int tibIndex = method.getTibOffset();
-			final int argSlotCount = Signature.getArgSlotCount(methodRef
+			final int argSlotCount = Signature.getArgSlotCount(typeSizeInfo, methodRef
 					.getSignature());
 
 			/* Get objectref -> EAX */
