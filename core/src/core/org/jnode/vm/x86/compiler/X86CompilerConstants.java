@@ -43,6 +43,9 @@ public interface X86CompilerConstants {
 	/** EAX register */
 	public static final Register EAX = Register.EAX;
 
+	/** ECX register */
+	public static final Register ECX = Register.ECX;
+
 	/** EDX register */
 	public static final Register EDX = Register.EDX;
 
