@@ -251,6 +251,7 @@ class X86StackFrame implements X86CompilerConstants {
     private void emitSynchronizationCode(VmMethod monitorMethod) {
         if (method.isSynchronized()) {
             os.writePUSH(Register.EAX);
+            os.writePUSH(Register.EDX);
             //System.out.println("synchr. " + method);
             if (method.isStatic()) {
                 // Get declaring class
@@ -263,6 +264,7 @@ class X86StackFrame implements X86CompilerConstants {
                 os.writePUSH(Register.EBP, getEbpOffset(0));
             }
             helper.invokeJavaMethod(monitorMethod);
+            os.writePOP(Register.EDX);
             os.writePOP(Register.EAX);
         }
     }

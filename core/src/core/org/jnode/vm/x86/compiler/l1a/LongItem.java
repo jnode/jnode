@@ -37,7 +37,7 @@ final class LongItem extends Item  implements X86CompilerConstants {
 	void loadTo(EmitterContext ec, Register lsb, Register msb) {
 		AbstractX86Stream os = ec.getStream();
 		X86RegisterPool pool = ec.getPool();
-		
+		os.log("LongItem.log called "+Integer.toString(kind));		
 		myAssert(lsb != msb);
 		switch (kind) {
 			case REGISTER:
@@ -108,6 +108,10 @@ final class LongItem extends Item  implements X86CompilerConstants {
 				break;
 				
 			case STACK:
+				if (VirtualStack.checkOperandStack) {
+					final VirtualStack stack = ec.getVStack();
+					stack.popFromOperandStack(this);
+				}
 				os.writePOP(lsb);
 				os.writePOP(msb);
 				break;
@@ -180,7 +184,7 @@ final class LongItem extends Item  implements X86CompilerConstants {
 	 */
 	void push(EmitterContext ec) {
 		final AbstractX86Stream os = ec.getStream();
-		
+		os.log("LongItem.push "+Integer.toString(getKind()));	
 		switch (getKind()) {
 			case REGISTER:
 			    os.writePUSH(lsb);
@@ -207,10 +211,27 @@ final class LongItem extends Item  implements X86CompilerConstants {
 				
 			case STACK:
 				//nothing to do
+				if (VirtualStack.checkOperandStack) {
+					final VirtualStack stack = ec.getVStack();
+					
+					if (kind == STACK) {
+						// the item is not really pushed and popped
+						// but this checks that it is really the top
+						// element
+						stack.popFromOperandStack(this);
+					}
+				}
 				break;
 		}
+
 		release(ec);
-		kind = STACK;
+		kind = STACK;		
+
+		if (VirtualStack.checkOperandStack) {
+			final VirtualStack stack = ec.getVStack();
+			stack.pushOnOperandStack(this);
+
+		}
 	}
 
 	/* (non-Javadoc)
