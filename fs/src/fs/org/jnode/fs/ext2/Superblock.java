@@ -134,7 +134,7 @@ public class Superblock {
 	/**
 	 * Update the superblock copies on the disk
 	 */
-	public void update() throws IOException {
+	public synchronized void update() throws IOException {
 		if(isDirty()) {
 			log.debug("Updating superblock copies");
 			byte[] oldData;
@@ -170,7 +170,8 @@ public class Superblock {
 		}
 		
 	}
-	
+
+	//this field is only written during format (so no synchronization issues here)
 	public long getINodesCount() {
 		return Ext2Utils.get32(data, 0);
 	}
@@ -179,6 +180,7 @@ public class Superblock {
 		setDirty(true);
 	}
 	
+	//this field is only written during format (so no synchronization issues here)
 	public long getBlocksCount() {
 		return Ext2Utils.get32(data, 4);
 	}
@@ -187,6 +189,7 @@ public class Superblock {
 		setDirty(true);
 	}
 	
+	//this field is only written during format (so no synchronization issues here)
 	public long getRBlocksCount() {
 		return Ext2Utils.get32(data, 8);
 	}
@@ -195,22 +198,23 @@ public class Superblock {
 		setDirty(true);
 	}
 
-	public long getFreeBlocksCount() {
+	public synchronized long getFreeBlocksCount() {
 		return Ext2Utils.get32(data, 12);
 	}
-	public void setFreeBlocksCount(long count) {
+	public synchronized void setFreeBlocksCount(long count) {
 		Ext2Utils.set32(data, 12, count);
 		setDirty(true);
 	}
 
-	public long getFreeInodesCount() {
+	public synchronized long getFreeInodesCount() {
 		return Ext2Utils.get32(data, 16);
 	}
-	public void setFreeInodesCount(long count) {
+	public synchronized void setFreeInodesCount(long count) {
 		Ext2Utils.set32(data, 16, count);
 		setDirty(true);
 	}
 
+	//this field is only written during format (so no synchronization issues here)
 	public long getFirstDataBlock() {
 		return Ext2Utils.get32(data, 20);
 	}
@@ -219,6 +223,7 @@ public class Superblock {
 		setDirty(true);
 	}
 
+	//this field is only written during format (so no synchronization issues here)
 	private long getLogBlockSize() {
 		return Ext2Utils.get32(data, 24);
 	}
@@ -227,6 +232,7 @@ public class Superblock {
 		setDirty(true);
 	}
 	
+	//this field is only written during format (so no synchronization issues here)
 	public int getBlockSize() {
 		return 1024 << getLogBlockSize();
 	}
@@ -240,6 +246,7 @@ public class Superblock {
 		setDirty(true);
 	}
 
+	//this field is only written during format (so no synchronization issues here)
 	private long getLogFragSize() {
 		return Ext2Utils.get32(data, 28);
 	}
@@ -248,6 +255,7 @@ public class Superblock {
 		setDirty(true);
 	}
 	
+	//this field is only written during format (so no synchronization issues here)
 	public int getFragSize() {
 		if(getLogFragSize()>0)
 			return 1024 << getLogFragSize();
@@ -268,6 +276,7 @@ public class Superblock {
 		setDirty(true);
 	}
 
+	//this field is only written during format (so no synchronization issues here)
 	public long getBlocksPerGroup() {
 		return Ext2Utils.get32(data, 32);
 	}
@@ -276,6 +285,7 @@ public class Superblock {
 		setDirty(true);
 	}
 
+	//this field is only written during format (so no synchronization issues here)
 	public long getFragsPerGroup() {
 		return Ext2Utils.get32(data, 36);
 	}
@@ -284,6 +294,7 @@ public class Superblock {
 		setDirty(true);
 	}
 	
+	//this field is only written during format (so no synchronization issues here)
 	public long getINodesPerGroup() {
 		return Ext2Utils.get32(data, 40);
 	}
@@ -292,6 +303,7 @@ public class Superblock {
 		setDirty(true);
 	}
 
+	//this field is only written during mounting (so no synchronization issues here)
 	public long getMTime() {
 		return Ext2Utils.get32(data, 44);
 	}
@@ -300,14 +312,15 @@ public class Superblock {
 		setDirty(true);
 	}
 
-	public long getWTime() {
+	public synchronized long getWTime() {
 		return Ext2Utils.get32(data, 48);
 	}
-	public void setWTime(long time) {
+	public synchronized void setWTime(long time) {
 		Ext2Utils.set32(data, 48, time);
 		setDirty(true);
 	}
 	
+	//this field is only written during mounting (so no synchronization issues here)
 	public int getMntCount() {
 		return Ext2Utils.get16(data, 52);
 	}
@@ -316,6 +329,7 @@ public class Superblock {
 		setDirty(true);
 	}
 	
+	//this field is only written during format (so no synchronization issues here)
 	public int getMaxMntCount() {
 		return Ext2Utils.get16(data, 54);
 	}
@@ -324,6 +338,7 @@ public class Superblock {
 		setDirty(true);
 	}
 
+	//this field is only written during format (so no synchronization issues here)
 	public int getMagic() {
 		return Ext2Utils.get16(data, 56);
 	}
@@ -332,14 +347,15 @@ public class Superblock {
 		setDirty(true);
 	}
 		
-	public int getState() {
+	public synchronized int getState() {
 		return Ext2Utils.get16(data, 58);
 	}
-	public void setState(int state) {
+	public synchronized void setState(int state) {
 		Ext2Utils.set16(data, 58, state);
 		setDirty(true);
 	}
 
+	//this field is only written during format (so no synchronization issues here)
 	public int getErrors() {
 		return Ext2Utils.get16(data, 60);
 	}
@@ -348,6 +364,7 @@ public class Superblock {
 		setDirty(true);
 	}
 
+	//this field is only written during format (so no synchronization issues here)
 	public int getMinorRevLevel() {
 		return Ext2Utils.get16(data, 62);
 	}
@@ -356,6 +373,7 @@ public class Superblock {
 		setDirty(true);
 	}	
 	
+	//this field is only written during filesystem check (so no synchronization issues here)
 	public long getLastCheck() {
 		return Ext2Utils.get32(data, 64);
 	}
@@ -364,6 +382,7 @@ public class Superblock {
 		setDirty(true);
 	}
 	
+	//this field is only written during format (so no synchronization issues here)
 	public long getCheckInterval() {
 		return Ext2Utils.get32(data, 68);
 	}
@@ -372,6 +391,7 @@ public class Superblock {
 		setDirty(true);
 	}
 	
+	//this field is only written during format (so no synchronization issues here)
 	public long getCreatorOS() {
 		return Ext2Utils.get32(data, 72);
 	}
@@ -380,6 +400,7 @@ public class Superblock {
 		setDirty(true);
 	}
 	
+	//this field is only written during format (so no synchronization issues here)
 	public long getRevLevel() {
 		return Ext2Utils.get32(data, 76);
 	}
@@ -388,6 +409,7 @@ public class Superblock {
 		setDirty(true);
 	}
 	
+	//this field is only written during format (so no synchronization issues here)
 	public int getDefResuid() {
 		return Ext2Utils.get16(data, 80);
 	}
@@ -396,6 +418,7 @@ public class Superblock {
 		setDirty(true);
 	}
 	
+	//this field is only written during format (so no synchronization issues here)
 	public int getDefResgid() {
 		return Ext2Utils.get16(data, 82);
 	}
@@ -404,6 +427,7 @@ public class Superblock {
 		setDirty(true);
 	}
 
+	//this field is only written during format (so no synchronization issues here)
 	public long getFirstInode() {
 		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
 			return Ext2Utils.get32(data, 84);
@@ -415,6 +439,7 @@ public class Superblock {
 		setDirty(true);
 	}
 			
+	//this field is only written during format (so no synchronization issues here)
 	public long getINodeSize() {
 		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
 			return Ext2Utils.get16(data, 88);
@@ -427,17 +452,18 @@ public class Superblock {
 	}
 
 	//XXX what to return for old versions?
-	public long getBlockGroupNr() {
+	public synchronized long getBlockGroupNr() {
 		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
 			return Ext2Utils.get16(data, 90);
 		else 
 			return 0;
 	}
-	public void setBlockGroupNr(int i) {
+	public synchronized void setBlockGroupNr(int i) {
 		Ext2Utils.set16(data, 90, i);
 		setDirty(true);
 	}
 	
+	//this field is only written during format (so no synchronization issues here)
 	public long getFeatureCompat() {
 		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
 			return Ext2Utils.get32(data, 92);
@@ -449,6 +475,7 @@ public class Superblock {
 		setDirty(true);
 	}
 
+	//this field is only written during format (so no synchronization issues here)
 	public long getFeatureIncompat() {
 		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
 			return Ext2Utils.get32(data, 96);
@@ -460,6 +487,7 @@ public class Superblock {
 		setDirty(true);
 	}
 	
+	//this field is only written during format (so no synchronization issues here)
 	public long getFeatureROCompat() {
 		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
 			return Ext2Utils.get32(data, 100);
@@ -471,6 +499,7 @@ public class Superblock {
 		setDirty(true);
 	}
 
+	//this field is only written during format (so no synchronization issues here)
 	public byte[] getUUID() {
 		byte[] result=new byte[16];	
 		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
@@ -484,7 +513,6 @@ public class Superblock {
 	}
 
 	//	TODO: setters from this point on...
-
 	public String getVolumeName() {
 		StringBuffer result=new StringBuffer();
 		if(getRevLevel()==Ext2Constants.EXT2_DYNAMIC_REV)
@@ -519,6 +547,7 @@ public class Superblock {
 			return 11;
 	}
 	
+	//this field is only written during format (so no synchronization issues here)
 	public int getPreallocBlocks() {
 		return Ext2Utils.get8(data, 204);
 	}
@@ -527,6 +556,7 @@ public class Superblock {
 		setDirty(true);
 	}
 
+	//this field is only written during format (so no synchronization issues here)
 	public int getPreallocDirBlocks() {
 		return Ext2Utils.get8(data, 205);
 	}
@@ -552,6 +582,7 @@ public class Superblock {
 	public long getLastOrphan() {
 		return Ext2Utils.get8(data, 232);
 	}
+
 	/**
 	 * @return
 	 */

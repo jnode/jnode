@@ -49,7 +49,7 @@ public class Ext2Directory implements FSDirectory {
 	/**
 	 * @see org.jnode.fs.FSDirectory#addDirectory(String)
 	 */
-	public FSEntry addDirectory(String name) throws IOException {
+	public synchronized FSEntry addDirectory(String name) throws IOException {
 		if(isReadOnly())
 			throw new IOException("Filesystem or directory is mounted read-only!");
 			 
@@ -66,7 +66,6 @@ public class Ext2Directory implements FSDirectory {
 
 			addDirectoryRecord(dr);
 			
-			//TODO: add synchronization
 			newINode.setLinksCount( newINode.getLinksCount()+1 );
 
 			newEntry = new Ext2Entry(newINode, name, Ext2Constants.EXT2_FT_DIR, fs, this.entry);
@@ -85,11 +84,7 @@ public class Ext2Directory implements FSDirectory {
 			
 			//increase the reference count for the parent directory
 			INode parentINode = fs.getINode((int)parentINodeNr);
-			//to be able to synchronize to the inode object requires that an inode cache is used and
-			//it contains only one copy of any inode
-			synchronized(parentINode) {
-				parentINode.setLinksCount( parentINode.getLinksCount()+1 ); 
-			}
+			parentINode.setLinksCount( parentINode.getLinksCount()+1 ); 
 			
 			//update the number of used directories in the block group
 			int group = (int)( (newINode.getINodeNr()-1) / fs.getSuperblock().getINodesPerGroup()) ;
@@ -108,10 +103,9 @@ public class Ext2Directory implements FSDirectory {
 	/**
 	 * @see org.jnode.fs.FSDirectory#addFile(String)
 	 */
-	public FSEntry addFile(String name) throws IOException {
+	public synchronized FSEntry addFile(String name) throws IOException {
 		if(isReadOnly())
 			throw new IOException("Filesystem or directory is mounted read-only!");
-			
 		//create a new iNode for the file
 		//TODO: access rights, file type, UID and GID should be passed through the FSDirectory interface
 		INode newINode;
@@ -124,7 +118,6 @@ public class Ext2Directory implements FSDirectory {
 
 			addDirectoryRecord(dr);
 			
-			//TODO: add synchronization
 			newINode.setLinksCount( newINode.getLinksCount()+1 );
 
 			// update the directory inode
@@ -137,7 +130,7 @@ public class Ext2Directory implements FSDirectory {
 	}
 	
 	/**
-	 * Attach an inode to a file.
+	 * Attach an inode to a directory (not used normally, only during fs creation)
 	 * @param iNodeNr
 	 * @return
 	 * @throws IOException
@@ -157,7 +150,6 @@ public class Ext2Directory implements FSDirectory {
 			
 			INode linkedINode = fs.getINode(iNodeNr);
 			
-			//TODO: add synchronization
 			linkedINode.setLinksCount( linkedINode.getLinksCount()+1 );
 			
 			return new Ext2Entry(linkedINode, linkName, fileType, fs, this.entry); 
@@ -167,7 +159,7 @@ public class Ext2Directory implements FSDirectory {
 		}
 	}
 	
-	private void addDirectoryRecord(Ext2DirectoryRecord dr) throws IOException, FileSystemException{
+	private synchronized void addDirectoryRecord(Ext2DirectoryRecord dr) throws IOException, FileSystemException{
 		Ext2File dir = new Ext2File(iNode);		//read itself as a file
 
 		//find the last directory record (if any)
@@ -215,6 +207,7 @@ public class Ext2Directory implements FSDirectory {
 			log.debug("addDirectoryRecord(): LAST   record: begins at: 0, length: "+dr.getRecLen());				
 		}
 		
+		//dir.flush();
 		iNode.setMtime(System.currentTimeMillis()/1000);
 	}
 
@@ -235,7 +228,11 @@ public class Ext2Directory implements FSDirectory {
 	/**
 	 * @see org.jnode.fs.FSDirectory#getEntry(String)
 	 */
-	public FSEntry getEntry(String name) throws IOException{
+	/*
+	 * Needs to be synchronized to ensure that it is not called concurrently
+	 * with addDirectoryRecord which would modify the underlying structure
+	 */
+	public synchronized FSEntry getEntry(String name) throws IOException{
 		//parse the directory and search for the file
 		FSEntryIterator iterator=iterator();
 		while(iterator.hasNext()) {

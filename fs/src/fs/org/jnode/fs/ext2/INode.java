@@ -646,20 +646,20 @@ public class INode {
 	}
 	
 	// **************** other persistent inode data *******************
-	public int getMode() {
+	public synchronized int getMode() {
 		int iMode=Ext2Utils.get16(data, 0);
 		//log.debug("INode.getIMode(): "+Ext2Print.hexFormat(iMode));
 		return iMode;
 	}
-	public void setMode(int imode) {
+	public synchronized void setMode(int imode) {
 		Ext2Utils.set16(data, 0, imode);
 		setDirty(true);
 	}
 	
-	public int getUid() {
+	public synchronized int getUid() {
 		return Ext2Utils.get16(data, 2);		
 	}
-	public void setUid(int uid) {
+	public synchronized void setUid(int uid) {
 		Ext2Utils.set16(data, 2, uid);
 		setDirty(true);	
 	}
@@ -668,11 +668,11 @@ public class INode {
 	 * Return the size of the file in bytes.
 	 * @return the size of the file in bytes
 	 */
-	public long getSize() {
+	public synchronized long getSize() {
 		return Ext2Utils.get32(data, 4);	
 	}
 	
-	public void setSize(long size) {
+	public synchronized void setSize(long size) {
 		Ext2Utils.set32(data, 4, size);
 		setDirty(true);
 	}
@@ -686,50 +686,50 @@ public class INode {
 		return (long)Math.ceil((double)getSize()/(double)getExt2FileSystem().getBlockSize());
 	}
 	
-	public long getAtime() {
+	public synchronized long getAtime() {
 		return Ext2Utils.get32(data, 8);
 	}
-	public void setAtime(long atime) {
+	public synchronized void setAtime(long atime) {
 		Ext2Utils.set32(data, 8, atime);
 		setDirty(true);
 	}
 
-	public long getCtime() {
+	public synchronized long getCtime() {
 		return Ext2Utils.get32(data, 12);
 	}
-	public void setCtime(long ctime) {
+	public synchronized void setCtime(long ctime) {
 		Ext2Utils.set32(data, 12, ctime);
 		setDirty(true);
 	}
 		
-	public long getMtime() {
+	public synchronized long getMtime() {
 		return Ext2Utils.get32(data, 16);
 	}
-	public void setMtime(long mtime) {
+	public synchronized void setMtime(long mtime) {
 		Ext2Utils.set32(data, 16, mtime);
 		setDirty(true);
 	}
 		
-	public long getDtime() {
+	public synchronized long getDtime() {
 		return Ext2Utils.get32(data, 20);
 	}	
-	public void setDtime(long dtime) {
+	public synchronized void setDtime(long dtime) {
 		Ext2Utils.set32(data, 20, dtime);
 		setDirty(true);
 	}
 
-	public int getGid() {
+	public synchronized int getGid() {
 		return Ext2Utils.get16(data, 24);
 	}
-	public void setGid(int gid) {
+	public synchronized void setGid(int gid) {
 		Ext2Utils.set16(data, 24, gid);		
 		setDirty(true);
 	}
 			
-	public int getLinksCount() {
+	public synchronized int getLinksCount() {
 		return Ext2Utils.get16(data, 26);
 	}
-	public void setLinksCount(int lc) {
+	public synchronized void setLinksCount(int lc) {
 		Ext2Utils.set16(data, 26, lc);
 		setDirty(true);
 	}
@@ -737,60 +737,60 @@ public class INode {
 	/**
 	 * Return the size in 512-byte blocks.
 	 */
-	public long getBlocks() {
+	public synchronized long getBlocks() {
 		return Ext2Utils.get32(data, 28);
 	}
-	public void setBlocks(long count) {
+	public synchronized void setBlocks(long count) {
 		log.debug("setBlocks("+count+")");
 		Ext2Utils.set32(data, 28, count);
 		setDirty(true);
 	}
 	//this value is set by setSize
 
-	public long getFlags() {
+	public synchronized long getFlags() {
 		return Ext2Utils.get32(data, 32);
 	}	
-	public void setFlags(long flags) {
+	public synchronized void setFlags(long flags) {
 		Ext2Utils.set32(data, 32, flags);
 		setDirty(true);
 	}
 	
-	public long getOSD1() {
+	public synchronized long getOSD1() {
 		return Ext2Utils.get32(data, 36);
 	}
-	public void setOSD1(long osd1) {
+	public synchronized void setOSD1(long osd1) {
 		Ext2Utils.set32(data, 36, osd1);
 		setDirty(true);		
 	}
 	
-	public long getGeneration() {
+	public synchronized long getGeneration() {
 		return Ext2Utils.get32(data, 100);	
 	}
-	public void setGeneration(long gen) {
+	public synchronized void setGeneration(long gen) {
 		Ext2Utils.set32(data, 100, gen);	
 		setDirty(true);
 	}
 
-	public long getFileACL() {
+	public synchronized long getFileACL() {
 		return Ext2Utils.get32(data, 104);	
 	}
-	public void setFileACL(long acl) {
+	public synchronized void setFileACL(long acl) {
 		Ext2Utils.set32(data, 104, acl);	
 		setDirty(true);
 	}
 
-	public long getDirACL() {
+	public synchronized long getDirACL() {
 		return Ext2Utils.get32(data, 108);	
 	}
-	public void setDirACL(long acl) {
+	public synchronized void setDirACL(long acl) {
 		Ext2Utils.set32(data, 108, acl);	
 		setDirty(true);
 	}
 
-	public long getFAddr() {
+	public synchronized long getFAddr() {
 		return Ext2Utils.get32(data, 112);	
 	}
-	public void setFAddr(long faddr) {
+	public synchronized void setFAddr(long faddr) {
 		Ext2Utils.set32(data, 112, faddr);	
 		setDirty(true);
 	}
@@ -804,5 +804,4 @@ public class INode {
 	public void setDirty(boolean b) {
 		dirty = b;
 	}
-
 }

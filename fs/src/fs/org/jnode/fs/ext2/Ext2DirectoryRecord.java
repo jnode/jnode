@@ -40,12 +40,12 @@ public class Ext2DirectoryRecord {
 		this.fileOffset = fileOffset;
 		
 		//make a copy of the data
-		/*
-		byte[] newData = new byte[getRecLen()];
-		System.arraycopy(data, offset, newData, 0, getRecLen());
-		this.data = newData;
-		setOffset(0);
-		*/
+		synchronized(data) {
+			byte[] newData = new byte[getRecLen()];
+			System.arraycopy(data, offset, newData, 0, getRecLen());
+			this.data = newData;
+			setOffset(0);
+		}
 	}
 	
 	/**
@@ -90,11 +90,11 @@ public class Ext2DirectoryRecord {
 	 * Returns the fileType.
 	 * @return short
 	 */
-	public int getType() {
+	public synchronized int getType() {
 		return Ext2Utils.get8(data, offset+7);
 	}
 
-	private void setType(int type) { 
+	private synchronized void setType(int type) { 
 		if(!fs.hasIncompatFeature(Ext2Constants.EXT2_FEATURE_INCOMPAT_FILETYPE))
 			return;
 		Ext2Utils.set8(data, offset+7, type);
@@ -103,10 +103,10 @@ public class Ext2DirectoryRecord {
 	 * Returns the iNodeNr.
 	 * @return long
 	 */
-	public int getINodeNr() {
+	public synchronized int getINodeNr() {
 		return (int)Ext2Utils.get32(data, offset);
 	}
-	private void setINodeNr(long nr) {
+	private synchronized void setINodeNr(long nr) {
 		Ext2Utils.set32(data, offset, nr);
 	}
 	
@@ -114,7 +114,7 @@ public class Ext2DirectoryRecord {
 	 * Returns the name.
 	 * @return StringBuffer
 	 */
-	public String getName() {
+	public synchronized String getName() {
 		StringBuffer name = new StringBuffer();
 		if(getINodeNr()!=0) {
 			//TODO: character conversion??
@@ -124,7 +124,7 @@ public class Ext2DirectoryRecord {
 		}
 		return name.toString();
 	}
-	private void setName(String name) {
+	private synchronized void setName(String name) {
 		for(int i=0; i<name.length(); i++)
 			Ext2Utils.set8(data, offset+8+i, name.charAt(i));
 	}
@@ -133,17 +133,17 @@ public class Ext2DirectoryRecord {
 	 * Returns the recLen.
 	 * @return int
 	 */
-	public int getRecLen() {
+	public synchronized int getRecLen() {
 		return Ext2Utils.get16(data, offset+4);
 	}
-	private void setRecLen(int len) {
+	private synchronized void setRecLen(int len) {
 		Ext2Utils.set16(data, offset+4, len);
 	}
 	
-	private int getNameLen() {
+	private synchronized int getNameLen() {
 		return Ext2Utils.get8(data, offset+6);
 	}
-	private void setNameLen(int len) {
+	private synchronized void setNameLen(int len) {
 		Ext2Utils.set8(data, offset+6, len);
 	}
 	
@@ -151,7 +151,7 @@ public class Ext2DirectoryRecord {
 	 * The last directory record's length is set such that it extends until the end of the block.
 	 * This method truncates it when a new record is added to the directory
 	 */
-	protected void truncateRecord() {
+	protected synchronized void truncateRecord() {
 		int newLength = getNameLen() + 8;
 		//record length is padded to n*4 bytes
 		if(newLength%4!=0)
@@ -167,7 +167,7 @@ public class Ext2DirectoryRecord {
 	 * @param beginning: the offset where the record begins
 	 * @param end: the offset where the record should end (usually the size a filesystem block)  
 	 */ 
-	protected void expandRecord(long beginning, long end) throws FileSystemException{
+	protected synchronized void expandRecord(long beginning, long end) throws FileSystemException{
 		log.debug("expandRecord("+beginning + ", "+ end+")");
 		if(beginning+getNameLen()+8 < end) {
 			//the record fits in the block
@@ -183,5 +183,4 @@ public class Ext2DirectoryRecord {
 			throw new FileSystemException("The directory record does not fit into the block!");
 		log.debug("expandRecord(): newLength: "+getRecLen());
 	}
-	
 }
