@@ -412,7 +412,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
         // if it's the tab key, we want to trigger command line completion
         case KeyEvent.VK_TAB:
             ke.consume();
-        	CompletionInfo info = currentLine.complete(currentPrompt);
+        	/*CompletionInfo info =*/ currentLine.complete(currentPrompt);
 
     		if(completion.needNewPrompt())
     		{			
@@ -663,7 +663,7 @@ class Line
     public CompletionInfo complete(String currentPrompt)
     {
     	CompletionInfo info = null;
-    	int oldPosOnCurrentLine = posOnCurrentLine;
+    	//int oldPosOnCurrentLine = posOnCurrentLine;
         if (posOnCurrentLine != currentLine.length()) {
             String ending = currentLine.substring(posOnCurrentLine);
             info = shell.complete(currentLine.substring(0,
