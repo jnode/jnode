@@ -55,7 +55,7 @@ public class Device implements ResourceOwner {
 	/** My listeners */
 	private final ArrayList listeners = new ArrayList();
 	/** The manager */
-	private DefaultDeviceManager manager;
+	private DeviceManager manager;
 
 	/**
 	 * Create a new instance
@@ -343,7 +343,7 @@ public class Device implements ResourceOwner {
 	 * @param manager
 	 *            The manager to set.
 	 */
-	final void setManager(DefaultDeviceManager manager) {
+	final void setManager(DeviceManager manager) {
 		if (this.manager != null) {
 			throw new SecurityException("Cannot overwrite the device manager");
 		} else {
