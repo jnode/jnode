@@ -98,9 +98,11 @@ public class NTFSIndex
 			
 			// offset inside root attribute
 			int offset = NTFSIndex.this.getIndexRootAttribute().getAttributeOffset() + 0x10 + 
-			NTFSUTIL.LE_READ_32_INT(
-					node,
-					NTFSIndex.this.getIndexRootAttribute().getAttributeOffset() + 0x10);
+										NTFSUTIL.LE_READ_32_INT(
+												node,
+												NTFSIndex.this.getIndexRootAttribute().getAttributeOffset() + 0x10);
+			
+			int lastVCN = (int) NTFSIndex.this.getIndexAllocationAttribute().getLastVCN();
 			
 			NTFSIndexEntry indexEntry = null;
 			
@@ -120,11 +122,13 @@ public class NTFSIndex
 					Integer intSubNodeVCN = (Integer) subnodesList.iterator().next();
 					int subnodeVCN = intSubNodeVCN.intValue(); 
 					subnodesList.remove(intSubNodeVCN);
+					//System.out.println("read subnode at vcn:" + subnodeVCN);
 					if(subnodeVCN > NTFSIndex.this.getIndexAllocationAttribute().getLastVCN() )
 					{
 						System.out.println("Something is wrong. You try to read VCN="  + subnodeVCN + " but my last VCN=" + NTFSIndex.this.getIndexAllocationAttribute().getLastVCN());
 						
 					}
+					//System.out.println(NTFSIndex.this.getIndexAllocationAttribute().getFlags());
 					try
 					{
 						// ok now set the node buffer to an indexrecord
@@ -160,12 +164,34 @@ public class NTFSIndex
 											entrysize
 									)
 						);
+				
+				
+				/*
+				 * ---------------
+				 */
+				
+				/*if(indexEntry.hasSubNodes())
+					System.out.println("has subnode VCN = " + NTFSUTIL.LE_READ_U32_INT(
+							node,
+							offset + (entrysize - 8)));
+				if(!indexEntry.isLastIndexEntryInSubnode())
+				{
+					System.out.println(indexEntry.getFileName());
+				}
+				else
+					System.out.println("last index entry");
+				*/
+				
+				/*
+				 * ----------------
+				 */
+				
 				if(indexEntry.hasSubNodes())
 				{
 					// add the vcn to the subnodes list
-					subnodesList.add(new Integer(NTFSUTIL.LE_READ_U32_INT(
-											node,
-											offset + (entrysize - 8))));
+					int vcn = (int)indexEntry.getSubnodeVCN();
+					if(vcn <= lastVCN)
+						subnodesList.add(new Integer(vcn));
 				}
 				// move the offset to next IndexEntry
 				offset += entrysize;
