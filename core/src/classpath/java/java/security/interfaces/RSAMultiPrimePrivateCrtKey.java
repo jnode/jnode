@@ -1,5 +1,5 @@
-/* DSAPublicKey.java -- A Digital Signature Algorithm private key
-   Copyright (C) 1998, 2000 Free Software Foundation, Inc.
+/* RSAMultiPrimePrivateCrtKey.java --
+   Copyright (C) 2003, Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,20 +37,74 @@ exception statement from your version. */
 
 package java.security.interfaces;
 
-import java.security.PrivateKey;
 import java.math.BigInteger;
+import java.security.spec.RSAOtherPrimeInfo;
 
 /**
- * This interface models a Digital Signature Algorithm (DSA) private key
+ * The interface to an RSA multi-prime private key, as defined in the PKCS#1
+ * v2.1, using the <i>Chinese Remainder Theorem</i> (CRT) information values.
  *
- * @version 0.0
- *
- * @author Aaron M. Renn (arenn@urbanophile.com)
+ * @since 1.4
+ * @see java.security.spec.RSAPrivateKeySpec
+ * @see java.security.spec.RSAMultiPrimePrivateCrtKeySpec
+ * @see RSAPrivateKey
+ * @see RSAPrivateCrtKey
  */
-public interface DSAPrivateKey extends DSAKey, PrivateKey
+public interface RSAMultiPrimePrivateCrtKey extends RSAPrivateKey
 {
+  // Constants
+  // --------------------------------------------------------------------------
+
+  // Methods
+  // --------------------------------------------------------------------------
+
   /**
-   * This method returns the value of the DSA private key
+   * Returns the public exponent.
+   *
+   * @return the public exponent.
    */
-  BigInteger getX();
+  BigInteger getPublicExponent();
+
+  /**
+   * Returns the primeP.
+   *
+   * @return the primeP.
+   */
+  BigInteger getPrimeP();
+
+  /**
+   * Returns the primeQ.
+   *
+   * @return the primeQ.
+   */
+  BigInteger getPrimeQ();
+
+  /**
+   * Returns the primeExponentP.
+   *
+   * @return the primeExponentP.
+   */
+  BigInteger getPrimeExponentP();
+
+  /**
+   * Returns the primeExponentQ.
+   *
+   * @return the primeExponentQ.
+   */
+  BigInteger getPrimeExponentQ();
+
+  /**
+   * Returns the crtCoefficient.
+   *
+   * @return the crtCoefficient.
+   */
+  BigInteger getCrtCoefficient();
+
+  /**
+   * Returns the otherPrimeInfo or <code>null</code> if there are only two
+   * prime factors (p and q).
+   *
+   * @return the otherPrimeInfo.
+   */
+  RSAOtherPrimeInfo[] getOtherPrimeInfo();
 }

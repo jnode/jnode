@@ -1,5 +1,5 @@
-/* DSAPublicKey.java -- A Digital Signature Algorithm private key
-   Copyright (C) 1998, 2000 Free Software Foundation, Inc.
+/* PSSParameterSpec.java --
+   Copyright (C) 2003, Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,22 +35,56 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.security.interfaces;
-
-import java.security.PrivateKey;
-import java.math.BigInteger;
+package java.security.spec;
 
 /**
- * This interface models a Digital Signature Algorithm (DSA) private key
+ * This class specifies a parameter spec for RSA PSS encoding scheme, as
+ * defined in the PKCS#1 v2.1.
  *
- * @version 0.0
- *
- * @author Aaron M. Renn (arenn@urbanophile.com)
+ * @since 1.4
+ * @see AlgorithmParameterSpec
+ * @see java.security.Signature
  */
-public interface DSAPrivateKey extends DSAKey, PrivateKey
+public class PSSParameterSpec implements AlgorithmParameterSpec
 {
+  // Constants and fields
+  // --------------------------------------------------------------------------
+
+  private int saltLen;
+
+  // Constructor(s)
+  // --------------------------------------------------------------------------
+
   /**
-   * This method returns the value of the DSA private key
+   * Creates a new <code>PSSParameterSpec</code> given the salt length as
+   * defined in PKCS#1.
+   *
+   * @param saltLen the length of salt in bits to be used in PKCS#1 PSS encoding.
+   * @throws IllegalArgumentException if <code>saltLen</code> is less than
+   * <code>0</code>.
    */
-  BigInteger getX();
+  public PSSParameterSpec(int saltLen)
+  {
+    super();
+
+    if (saltLen < 0)
+      throw new IllegalArgumentException();
+    this.saltLen = saltLen;
+  }
+
+  // Class methods
+  // --------------------------------------------------------------------------
+
+  // Instance methods
+  // --------------------------------------------------------------------------
+
+  /**
+   * Returns the salt length in bits.
+   *
+   * @return the salt length.
+   */
+  public int getSaltLength()
+  {
+    return this.saltLen;
+  }
 }
