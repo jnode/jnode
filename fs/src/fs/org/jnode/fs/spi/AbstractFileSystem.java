@@ -8,6 +8,7 @@ import java.io.IOException;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.block.BlockDeviceAPI;
+import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
@@ -25,6 +26,8 @@ public abstract class AbstractFileSystem implements FileSystem {
 
     private final BlockDeviceAPI api;
 
+    private final FSBlockDeviceAPI fsApi;
+
     private boolean closed;
 
     /**
@@ -41,7 +44,13 @@ public abstract class AbstractFileSystem implements FileSystem {
         } catch (ApiNotFoundException e) {
             throw new FileSystemException("Device is not a partition!", e);
         }
-
+        FSBlockDeviceAPI fsApi = null;
+        try {
+            fsApi = (FSBlockDeviceAPI) device.getAPI(FSBlockDeviceAPI.class);
+        } catch (ApiNotFoundException e) {
+            // Ignore
+        }
+        this.fsApi = fsApi;
         this.closed = false;
         this.readOnly = readOnly;
     }
@@ -77,6 +86,17 @@ public abstract class AbstractFileSystem implements FileSystem {
      */
     public final BlockDeviceAPI getApi() {
         return api;
+    }
+
+    /**
+     * @return Returns the api.
+     */
+    public final FSBlockDeviceAPI getFSApi() throws ApiNotFoundException {
+        if (fsApi == null) {
+            throw new ApiNotFoundException(FSBlockDeviceAPI.class.getName());
+        } else {
+            return fsApi;
+        }
     }
 
     /**
