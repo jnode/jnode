@@ -1,77 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <plugin-list>
-    <manifest>
-        <attribute key="Main-Class" value="org.jnode.install.Main"/>
-    </manifest>
+  <manifest>
+    <attribute key="Main-Class" value="org.jnode.install.Main"/>
+  </manifest>
 
-    <plugin id="org.apache.jakarta.commons.net"/>
-    <plugin id="org.xbill.DNS"/>
+  <plugin id="org.apache.jakarta.commons.net"/>
+  <plugin id="org.xbill.dns"/>
 
-    <plugin id="org.jnode.driver.console"/>
-    <plugin id="org.jnode.driver.console.core"/>
-    <plugin id="org.jnode.driver.console.textscreen"/>
-    <plugin id="org.jnode.driver.textscreen"/>
-    <plugin id="org.jnode.driver.textscreen.core"/>
+  <plugin id="org.jnode.driver.console"/>
+  <plugin id="org.jnode.driver.console.core"/>
+  <plugin id="org.jnode.driver.console.textscreen"/>
+  <plugin id="org.jnode.driver.textscreen"/>
+  <plugin id="org.jnode.driver.textscreen.core"/>
 
-    <plugin id="org.jnode.driver"/>
-    <plugin id="org.jnode.driver.acpi"/>
-    <plugin id="org.jnode.driver.character"/>
-    <plugin id="org.jnode.driver.block"/>
-    <plugin id="org.jnode.driver.block.ramdisk"/>
-    <plugin id="org.jnode.driver.chipset.via"/>
-    <plugin id="org.jnode.driver.cmos"/>
-    <plugin id="org.jnode.driver.finder"/>
-    <plugin id="org.jnode.driver.firmware"/>
-    <plugin id="org.jnode.driver.firmware.bios"/>
-    <!-- plugin id="org.jnode.driver.floppy"/ -->
-    <plugin id="org.jnode.driver.ide"/>
-    <plugin id="org.jnode.driver.ide.atapi"/>
-    <plugin id="org.jnode.driver.ide.disk"/>
-    <plugin id="org.jnode.driver.input"/>
-    <plugin id="org.jnode.driver.input.l10n"/>
-    <plugin id="org.jnode.driver.net.3c90x"/>
-    <plugin id="org.jnode.driver.net.ethernet"/>
-	<plugin id="org.jnode.driver.net.eepro100"/>
-    <plugin id="org.jnode.driver.net.lance"/>
-    <plugin id="org.jnode.driver.net.loopback"/>
-    <plugin id="org.jnode.driver.net.ne2k-pci"/>
-    <plugin id="org.jnode.driver.net.rtl8139"/>
-    <plugin id="org.jnode.driver.pci"/>
-    <plugin id="org.jnode.driver.pnp"/>
-    <plugin id="org.jnode.driver.ps2"/>
-    <plugin id="org.jnode.driver.scsi"/>
-    <plugin id="org.jnode.driver.scsi.cdrom"/>
-    <plugin id="org.jnode.driver.serial"/>
-    <plugin id="org.jnode.driver.usb"/>
-    <plugin id="org.jnode.driver.usb.hub"/>
-    <plugin id="org.jnode.driver.usb.input"/>
-    <plugin id="org.jnode.driver.usb.storage"/>
-    <plugin id="org.jnode.driver.usb.uhci"/>
+  <plugin id="org.jnode.driver"/>
+  <plugin id="org.jnode.driver.acpi"/>
+  <plugin id="org.jnode.driver.character"/>
+  <plugin id="org.jnode.driver.block"/>
+  <plugin id="org.jnode.driver.block.ramdisk"/>
+  <plugin id="org.jnode.driver.chipset.via"/>
+  <plugin id="org.jnode.driver.cmos"/>
+  <plugin id="org.jnode.driver.finder"/>
+  <plugin id="org.jnode.driver.firmware"/>
+  <plugin id="org.jnode.driver.firmware.bios"/>
+  <!-- plugin id="org.jnode.driver.floppy"/ -->
+  <plugin id="org.jnode.driver.ide"/>
+  <plugin id="org.jnode.driver.ide.atapi"/>
+  <plugin id="org.jnode.driver.ide.disk"/>
+  <plugin id="org.jnode.driver.input"/>
+  <plugin id="org.jnode.driver.input.l10n"/>
+  <plugin id="org.jnode.driver.net.3c90x"/>
+  <plugin id="org.jnode.driver.net.ethernet"/>
+  <plugin id="org.jnode.driver.net.eepro100"/>
+  <plugin id="org.jnode.driver.net.lance"/>
+  <plugin id="org.jnode.driver.net.loopback"/>
+  <plugin id="org.jnode.driver.net.ne2k-pci"/>
+  <plugin id="org.jnode.driver.net.rtl8139"/>
+  <plugin id="org.jnode.driver.pci"/>
+  <plugin id="org.jnode.driver.pnp"/>
+  <plugin id="org.jnode.driver.ps2"/>
+  <plugin id="org.jnode.driver.scsi"/>
+  <plugin id="org.jnode.driver.scsi.cdrom"/>
+  <plugin id="org.jnode.driver.serial"/>
+  <plugin id="org.jnode.driver.usb"/>
+  <plugin id="org.jnode.driver.usb.hub"/>
+  <plugin id="org.jnode.driver.usb.input"/>
+  <plugin id="org.jnode.driver.usb.storage"/>
+  <plugin id="org.jnode.driver.usb.uhci"/>
 
-    <plugin id="org.jnode.fs"/>
-    <plugin id="org.jnode.fs.ext2"/>
-    <plugin id="org.jnode.fs.fat"/>
-    <plugin id="org.jnode.fs.iso9660"/>
-    <plugin id="org.jnode.fs.ntfs"/>
-    <plugin id="org.jnode.fs.partitions.ibm"/>
-    <plugin id="org.jnode.fs.service"/>
-    <plugin id="org.jnode.fs.initrd"/>
+  <plugin id="org.jnode.fs"/>
+  <plugin id="org.jnode.fs.ext2"/>
+  <plugin id="org.jnode.fs.fat"/>
+  <plugin id="org.jnode.fs.iso9660"/>
+  <plugin id="org.jnode.fs.ntfs"/>
+  <plugin id="org.jnode.fs.partitions.ibm"/>
+  <plugin id="org.jnode.fs.service"/>
+  <plugin id="org.jnode.fs.initrd"/>
 
-    <plugin id="org.jnode.install"/>
+  <plugin id="org.jnode.install"/>
 
-    <plugin id="org.jnode.log4j"/>
+  <plugin id="org.jnode.log4j"/>
 
-    <plugin id="org.jnode.net"/>
-    <plugin id="org.jnode.net.arp"/>
-    <plugin id="org.jnode.net.ipv4"/>
+  <plugin id="org.jnode.net"/>
+  <plugin id="org.jnode.net.arp"/>
+  <plugin id="org.jnode.net.ipv4"/>
   <plugin id="org.jnode.net.ipv4.config"/>
-    <plugin id="org.jnode.net.ipv4.core"/>
+  <plugin id="org.jnode.net.ipv4.core"/>
 
-    <plugin id="org.jnode.protocol.ftp"/>
-    <plugin id="org.jnode.protocol.tftp"/>
+  <plugin id="org.jnode.protocol.ftp"/>
+  <plugin id="org.jnode.protocol.tftp"/>
 
-    <plugin id="org.jnode.work"/>
+  <plugin id="org.jnode.work"/>
 
-    <plugin id="charva"/>
+  <plugin id="charva"/>
 </plugin-list>
