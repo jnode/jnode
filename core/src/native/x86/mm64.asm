@@ -151,17 +151,19 @@ Lsetup_mm:
 	mov edi,pd0_addr	
 	SETUP_PDIR (PF_DEFAULT | iPF_PSE)
 	mov edi,pd1_addr 
-	SETUP_PDIR PF_DEFAULT | iPF_PSE
+	SETUP_PDIR (PF_DEFAULT | iPF_PSE)
 	mov edi,pd2_addr
-	SETUP_PDIR PF_DEFAULT | iPF_PSE
+	SETUP_PDIR (PF_DEFAULT | iPF_PSE)
 	mov edi,pd3_addr
-	SETUP_PDIR PF_DEFAULT | iPF_PSE
+	SETUP_PDIR (PF_DEFAULT | iPF_PSE)
 	
 	; Setup the first entry of pd0 to a 4Kb page table
 	mov edi,pd0_addr
 	SET_PT_ENTRY pt0_addr, 0, PF_DEFAULT
 	
 	; Setup the low 2Mb page table
+	xor eax,eax						; We start at address 0
+	xor edx,edx
 	mov edi,pt0_addr
 	SETUP_PTABLE PF_DEFAULT
 	
@@ -169,7 +171,6 @@ Lsetup_mm:
 	mov edi,pt0_addr
 	SET_PT_ENTRY 0, 0, 0
 	
-	LOOPDIE
 ;
 ; Fixup the TSS entry in the GDT
 ;
@@ -186,10 +187,11 @@ Lsetup_mm:
 ; Now load our own (temporary) 32-bits GDT
 ;
 
-	lgdt [gdt32]
-	jmp dword KERNEL_CS:mm_gdt32_flush
+	lgdt [gdt64_32]
+	jmp dword KERNEL32_CS:mm_gdt32_flush
 mm_gdt32_flush:	
-	
+	mov eax,KERNEL32_DS
+	mov ds,ax
 ; 
 ; Switch to long-mode (64-bit)
 ;
@@ -201,7 +203,8 @@ mm_gdt32_flush:
 	
 	; Enable physical address extensions
 	mov eax,cr4
-	or eax,CR4_PAE
+	or eax,CR4_PSE		; Enable page size extensions
+	or eax,CR4_PAE		; Enable physical address extensions
 	mov cr4,eax
 	
 	; Load the page-map level-4 address
@@ -229,7 +232,7 @@ mm_long_mode:
 	mov rsp,Lkernel_esp
 	
 	; Reload the GDT
-	lgdt [gdt64]
+	lgdt [gdt64_64]
 	
 	; Load TSS
 	mov eax, TSS_DS
@@ -250,6 +253,8 @@ mm_long_mode:
     jmp mm_long_mode_flush
 mm_long_mode_flush:
 
+	PRINT_STR in_long_mode_msg
+	
 	; We're done	
 	jmp start64
 
@@ -273,47 +278,23 @@ disable_paging:
 disable_pg_flush:
 	ret
 
-
-mem_start_str:	db 'mem-start ',0
-mem_size_str:	db 0xd,0xa,'mem-size  ',0
-enable_pg_msg:  db 'enable paging',0xd,0xa,0
-done_pg_msg:    db 'paging setup finished',0xd,0xa,0
+mem_start_str:		db 'mem-start ',0
+mem_size_str:		db 0xd,0xa,'mem-size  ',0
+enable_pg_msg:  	db 'enable paging',0xd,0xa,0
+done_pg_msg:	    db 'paging setup finished',0xd,0xa,0
+in_long_mode_msg:   db 'Long mode enabled',0xd,0xa,0
 
 ; -----------------------------------------------
-; GDT
+; 64-bit GDT
 ; -----------------------------------------------
 
-gdt32:
-	dw (gdt32end-gdt32start)-1
-	dd gdt32start
-
-gdt32start:
-    ; Entry 0, should be NULL
-	dd 0 ;null
-	dd 0
-
-    ; Entry 1 (selector 0x08)
-    ; Kernel CS
-	dw 0ffffh ;limit
-	dw 0 ;base
-	db 0 ;more base
-	db 9ah ;dpl=0,code
-	db 0cfh ;other stuff (i forget), more limit
-	db 0 ;base
-
-    ; Entry 2 (selector 0x10)
-    ; Kernel DS
-	dw 0ffffh
-	dw 0
-	db 0
-	db 92h ;dpl=0,data
-	db 0cfh
-	db 0
-gdt32end:
-
-gdt64:
+gdt64_32:
 	dw (gdtend-gdtstart)-1
 	dd gdtstart
+
+gdt64_64:
+	dw (gdtend-gdtstart)-1
+	dq gdtstart
 
 gdtstart:
     ; Entry 0, should be NULL
@@ -322,15 +303,51 @@ gdtstart:
 
     ; Entry 1 (selector 0x08)
     ; Kernel CS
-	dw 0ffffh ;limit
-	dw 0 ;base
-	db 0 ;more base
-	db 9ah ;dpl=0,code
-	db 0cfh ;other stuff (i forget), more limit
-	db 0 ;base
+	dw 0ffffh 			; limit
+	dw 0 				; base
+	db 0				; more base
+	db 9ah				; dpl=0,code
+	db 02fh 			; L=1, D=0, more limit
+	db 0 				; base
 
     ; Entry 2 (selector 0x10)
     ; Kernel DS
+	dw 0ffffh
+	dw 0
+	db 0
+	db 92h 				; dpl=0,data
+	db 0cfh
+	db 0
+
+    ; Entry 3 (selector 0x1B)
+    ; User CS
+	dw 0ffffh 			; limit
+	dw 0				; base
+	db 0				; more base
+	db 0xFA				; dpl=3,code
+	db 0x2F				; L=1, D=0, more limit
+	db 0				; base
+
+    ; Entry 4 (selector 0x23)
+    ; User DS
+	dw 0ffffh
+	dw 0
+	db 0
+	db 0xF2				; dpl=3,data
+	db 0xCF
+	db 0
+
+    ; Entry 5 (selector 0x28)
+    ; Kernel-32 CS
+	dw 0ffffh 			; limit
+	dw 0 				; base
+	db 0				; more base
+	db 9ah				; dpl=0,code
+	db 0cfh 			; more limit
+	db 0 				; base
+
+    ; Entry 6 (selector 0x30)
+    ; Kernel-32 DS
 	dw 0ffffh
 	dw 0
 	db 0
@@ -338,33 +355,17 @@ gdtstart:
 	db 0cfh
 	db 0
 
-    ; Entry 3 (selector 0x1B)
-    ; User CS
-	dw 0ffffh ;limit
-	dw 0 ;base
-	db 0 ;more base
-	db 0xFA ;dpl=3,code
-	db 0xCF ;other stuff (i forget), more limit
-	db 0 ;base
-
-    ; Entry 4 (selector 0x23)
-    ; User DS
-	dw 0ffffh
-	dw 0
-	db 0
-	db 0xF2 ;dpl=3,data
-	db 0xCF
-	db 0
-
-    ; Entry 5 (select 0x28)
+    ; Entry 5 (select 0x38)
     ; TSS
 gdt_tss:
     dw tss_e-tss
-    dw 0 ; Fixed later
-    db 0 ; Fixed later
+    dw 0				; Fixed later
+    db 0				; Fixed later
     db 0x89
     db 0
-    db 0 ; Fixed later
+    db 0				; Fixed later
+    dd 0				; base 63-32
+    dd 0				; Reserved
 gdtend:
 
 ; -----------------------------------------------
