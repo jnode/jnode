@@ -89,7 +89,7 @@ public abstract class NativeStream {
 	 * Write a reference to the given object
 	 * @param object
 	 */
-	public abstract void writeObjectRef(Object object);
+	//public abstract void writeObjectRef(Object object);
 
 	/**
 	 * Write a 64-bit integer

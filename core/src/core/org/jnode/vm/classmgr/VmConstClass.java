@@ -16,8 +16,8 @@ public class VmConstClass extends VmConstObject {
 	private VmType vmClass;
 	private String name;
 
-	public VmConstClass(VmCP cp, int nameIndex) {
-		super(cp);
+	public VmConstClass(VmCP cp, int cpIdx, int nameIndex) {
+		super(cp, cpIdx);
 		this.nameIndex = nameIndex;
 	}
 

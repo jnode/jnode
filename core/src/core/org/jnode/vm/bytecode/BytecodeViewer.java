@@ -15,7 +15,7 @@ import org.jnode.vm.classmgr.VmMethod;
  * @author epr
  */
 public class BytecodeViewer extends BytecodeVisitor {
-	
+
 	private int address;
 	private ControlFlowGraph cfg;
 
@@ -35,6 +35,7 @@ public class BytecodeViewer extends BytecodeVisitor {
 
 	/**
 	 * Constructor for BytecodeViewer.
+	 * 
 	 * @param cfg
 	 */
 	public BytecodeViewer(ControlFlowGraph cfg) {
@@ -69,7 +70,6 @@ public class BytecodeViewer extends BytecodeVisitor {
 			}
 		}
 	}
-
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#endInstruction()
@@ -141,10 +141,10 @@ public class BytecodeViewer extends BytecodeVisitor {
 
 	/**
 	 * @param value
-	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(java.lang.Object)
+	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(int, java.lang.Object)
 	 */
-	public void visit_ldc(Object value) {
-		out("ldc " + value);
+	public void visit_ldc(int cpIdx, Object value) {
+		out("ldc " + value + "\t#" + cpIdx);
 	}
 
 	/**
@@ -954,11 +954,7 @@ public class BytecodeViewer extends BytecodeVisitor {
 	 * @param addresses
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_tableswitch(int, int, int, int[])
 	 */
-	public void visit_tableswitch(
-		int defValue,
-		int lowValue,
-		int highValue,
-		int[] addresses) {
+	public void visit_tableswitch(int defValue, int lowValue, int highValue, int[] addresses) {
 		out("tableswitch def=" + defValue);
 		for (int i = 0; i < addresses.length; i++) {
 			out("\t" + (lowValue + i) + "\t-> " + addresses[i]);
@@ -971,14 +967,11 @@ public class BytecodeViewer extends BytecodeVisitor {
 	 * @param addresses
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lookupswitch(int, int[], int[])
 	 */
-	public void visit_lookupswitch(
-		int defValue,
-		int[] matchValues,
-		int[] addresses) {
-			out("lookupswitch def=" + defValue);
-			for (int i = 0; i < addresses.length; i++) {
-				out("\t" + matchValues[i] + "\t-> " + addresses[i]);
-			}
+	public void visit_lookupswitch(int defValue, int[] matchValues, int[] addresses) {
+		out("lookupswitch def=" + defValue);
+		for (int i = 0; i < addresses.length; i++) {
+			out("\t" + matchValues[i] + "\t-> " + addresses[i]);
+		}
 	}
 
 	/**
@@ -1082,7 +1075,8 @@ public class BytecodeViewer extends BytecodeVisitor {
 	/**
 	 * @param methodRef
 	 * @param count
-	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokeinterface(org.jnode.vm.classmgr.VmConstIMethodRef, int)
+	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokeinterface(org.jnode.vm.classmgr.VmConstIMethodRef,
+	 *      int)
 	 */
 	public void visit_invokeinterface(VmConstIMethodRef methodRef, int count) {
 		out("invokeinterface " + methodRef + ", count=" + count);
@@ -1159,7 +1153,8 @@ public class BytecodeViewer extends BytecodeVisitor {
 	/**
 	 * @param clazz
 	 * @param dimensions
-	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_multianewarray(org.jnode.vm.classmgr.VmConstClass, int)
+	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_multianewarray(org.jnode.vm.classmgr.VmConstClass,
+	 *      int)
 	 */
 	public void visit_multianewarray(VmConstClass clazz, int dimensions) {
 		out("multianewarray " + clazz + " " + dimensions);
@@ -1180,13 +1175,13 @@ public class BytecodeViewer extends BytecodeVisitor {
 	public void visit_ifnonnull(int address) {
 		out("ifnonnull " + address);
 	}
-	
+
 	protected void out(String line) {
 		System.out.print(address);
 		System.out.print(":\t");
 		System.out.println(line);
 	}
-	
+
 	protected void out(Object obj) {
 		String str = obj.toString();
 		out(str);

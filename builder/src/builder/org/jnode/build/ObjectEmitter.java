@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Set;
 
+import org.jnode.assembler.BootImageNativeStream;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.x86.X86Stream;
 import org.jnode.vm.BootableObject;
@@ -23,6 +24,7 @@ public class ObjectEmitter {
 
 	private final AbstractVmClassLoader loaderContext;
 	private final NativeStream os;
+	private final BootImageNativeStream bis;
 	private final PrintWriter debugWriter;
 	private final Set legalInstanceClasses;
 
@@ -37,6 +39,7 @@ public class ObjectEmitter {
 	public ObjectEmitter(AbstractVmClassLoader b, NativeStream os, PrintWriter debug, Set legalInstanceClasses) {
 		this.loaderContext = b;
 		this.os = os;
+		this.bis = (BootImageNativeStream)os;
 		this.legalInstanceClasses = legalInstanceClasses;
 		this.debugWriter = debug;
 	}
@@ -153,23 +156,23 @@ public class ObjectEmitter {
 				// in java.lang.Class
 
 				// vmClass
-				os.writeObjectRef(loaderContext.loadClass(c.getName(), true));
+				bis.writeObjectRef(loaderContext.loadClass(c.getName(), true));
 				// declaredConstructors
-				os.writeObjectRef(null);
+				bis.writeObjectRef(null);
 				// declaredFields;
-				os.writeObjectRef(null);
+				bis.writeObjectRef(null);
 				// declaredMethods;
-				os.writeObjectRef(null);
+				bis.writeObjectRef(null);
 				// fields;
-				os.writeObjectRef(null);
+				bis.writeObjectRef(null);
 				// methods;
-				os.writeObjectRef(null);
+				bis.writeObjectRef(null);
 				// interfaces;
-				os.writeObjectRef(null);
+				bis.writeObjectRef(null);
 				// defaultConstructor;
-				os.writeObjectRef(null);
+				bis.writeObjectRef(null);
 				// name
-				os.writeObjectRef(null);
+				bis.writeObjectRef(null);
 			}
 		} catch (ClassNotFoundException ex) {
 			throw new BuildException("emitting object: [" + c + "]", ex);
@@ -179,7 +182,7 @@ public class ObjectEmitter {
 	private void emitString(String s) throws BuildException {
 		// This layout should match the order and type of fields
 		// in java.lang.String
-		os.writeObjectRef(s.toCharArray()); // char[] value
+		bis.writeObjectRef(s.toCharArray()); // char[] value
 		os.write32(s.length()); // int count
 		os.write32(s.hashCode()); // int cachedHashCode
 		os.write32(0); // int offset
@@ -242,7 +245,7 @@ public class ObjectEmitter {
 		} else {
 			final Object[] a = (Object[]) obj;
 			for (int i = 0; i < len; i++) {
-				os.writeObjectRef(a[i]);
+				bis.writeObjectRef(a[i]);
 			}
 		}
 	}
@@ -298,7 +301,7 @@ public class ObjectEmitter {
 					} catch (BuildException ex) {
 						throw new BuildException("Cannot emit field " + f.getName() + " of class " + cls.getName(), ex);
 					}
-					os.writeObjectRef(value);
+					bis.writeObjectRef(value);
 				}
 			}
 		} catch (IllegalAccessException ex) {

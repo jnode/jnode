@@ -15,8 +15,8 @@ public abstract class VmConstMemberRef extends VmConstObject {
 	private int nameTypeIndex;
 	private int cachedHashCode;
 	
-	public VmConstMemberRef(VmCP cp, int classIndex, int nameTypeIndex) {
-		super(cp);
+	public VmConstMemberRef(VmCP cp, int cpIdx, int classIndex, int nameTypeIndex) {
+		super(cp, cpIdx);
 		this.classIndex = classIndex;
 		this.nameTypeIndex = nameTypeIndex;
 	}

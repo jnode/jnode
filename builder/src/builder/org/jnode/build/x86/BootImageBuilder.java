@@ -412,7 +412,8 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		final VmType vmMethodClass = loadClass(VmMethod.class);
 		final VmInstanceField nativeCodeField = (VmInstanceField)vmMethodClass.getField("nativeCode");
 		
-		os.writePUSH(bootClasses);
+		os.writeMOV_Const(Register.EAX, bootClasses);
+		os.writePUSH(Register.EAX);
 		os.writeMOV_Const(Register.EAX, lfbcaMethod);
 		os.writeCALL(Register.EAX, nativeCodeField.getOffset());
 
