@@ -215,6 +215,7 @@ public abstract class KeyboardInterpreter
           vk = 0;
       }
     }
+
     return vk;
   }
 
@@ -268,8 +269,8 @@ public abstract class KeyboardInterpreter
       case KeyEvent.VK_RIGHT:
       case KeyEvent.VK_PRINTSCREEN:
       case KeyEvent.VK_ALT_GRAPH:
-      case KeyEvent.VK_CONTROL:
       case KeyEvent.VK_PROPS:
+      case KeyEvent.VK_CONTROL:  // both normal and extend should return 0
         if (extended)
           return 0;
         break;

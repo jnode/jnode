@@ -248,7 +248,7 @@ public class KeyboardInterpreter_ES extends KeyboardInterpreter
     keys.setKey(27, key);
 
     keys.setKey(28, new Key('\n', KeyEvent.VK_ENTER));
-
+    keys.setKey(29, new Key((char) 0, KeyEvent.VK_CONTROL));
     keys.setKey(30, new Key('a', 'A', KeyEvent.VK_A));
     key = keys.getKey(30);
     key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE, new char[]{'á', 'Á'});
