@@ -39,8 +39,6 @@ public class SCSITest {
 
     private boolean unlock = false;
 
-    private boolean eject = false;
-
     public static void main(String[] args) throws Exception {
         SCSITest test = new SCSITest(args);
         test.run();
@@ -81,8 +79,6 @@ public class SCSITest {
                     lock = true;
                 } else if (arg.equals("-unlock")) {
                     unlock = true;
-                } else if (arg.equals("-eject")) {
-                    eject = true;
                 }
             } else {
                 name = arg;
