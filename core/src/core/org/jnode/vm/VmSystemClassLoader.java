@@ -489,16 +489,26 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * @param optLevel
      *            The optimization level
      */
-    public void compileRuntime(VmMethod vmMethod, int optLevel) {
-        final NativeCodeCompiler cmps[] = arch.getCompilers();
+    public void compileRuntime(VmMethod vmMethod, int optLevel, boolean enableTestCompilers) {
+        final NativeCodeCompiler cmps[];
+        int index;
+        if (enableTestCompilers) {
+        	index = optLevel;
+        	optLevel += arch.getCompilers().length;
+        	cmps = arch.getTestCompilers();
+        } else {
+        	index = optLevel;
+        	cmps = arch.getCompilers();
+        }
+        
         final NativeCodeCompiler cmp;
-        if (optLevel < 0) {
-            optLevel = 0;
-        } else if (optLevel >= cmps.length) {
-            optLevel = cmps.length - 1;
+        if (index < 0) {
+            index = 0;
+        } else if (index >= cmps.length) {
+            index = cmps.length - 1;
         }
         if (vmMethod.getNativeCodeOptLevel() < optLevel) {
-            cmp = cmps[ optLevel];
+            cmp = cmps[ index];
             cmp.compileRuntime(vmMethod, getResolver(), optLevel, null);
         }
     }

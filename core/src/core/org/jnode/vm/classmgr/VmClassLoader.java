@@ -57,8 +57,9 @@ public abstract class VmClassLoader extends VmSystemObject {
 	 * 
 	 * @param vmMethod The method to compile
 	 * @param optLevel The optimization level
+	 * @param enableTestCompilers If true, test compilers at taken into account when selecting the compiler
 	 */
-	public abstract void compileRuntime(VmMethod vmMethod, int optLevel);
+	public abstract void compileRuntime(VmMethod vmMethod, int optLevel, boolean enableTestCompilers);
 	
     /**
      * Compile the given IMT.

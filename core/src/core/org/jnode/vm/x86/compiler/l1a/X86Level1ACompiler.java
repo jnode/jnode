@@ -60,7 +60,7 @@ import org.jnode.vm.x86.compiler.AbstractX86Compiler;
 public class X86Level1ACompiler extends AbstractX86Compiler {
 
     /** Should this compiler try to inline methods? */
-    private final boolean inlineMethods = true;
+    private final boolean inlineMethods = false;
 
     /**
      * Initialize this instance.

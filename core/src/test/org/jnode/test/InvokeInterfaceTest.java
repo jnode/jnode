@@ -3,31 +3,40 @@
  */
 package org.jnode.test;
 
+import org.jnode.util.StopWatch;
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class InvokeInterfaceTest {
 
 	public static void main(String[] args) {
-		A a2 = new B();
-		
-		System.out.print("a2.foo  : (expect B.foo) ="); 
-		a2.foo();
-		System.out.print("a2.foo2 : (expect B.foo2)="); 
-		a2.foo2();
+		A a = new B();
+
+		final StopWatch sw = new StopWatch();
+		int a1 = 1;
+		int a2 = 1;
+		for (int i = 0; i < 10000; i++) {
+			a1 = a.foo(a1);
+			a2 = a.foo2(a1, a2);
+		}
+		System.out.println("a1=" + a1 + ", a2=" + a2);
+		System.out.println("Time taken " + sw);
 	}
-	
+
 	static interface A {
-		public void foo();
-		public void foo2();
+		public int foo(int a1);
+
+		public int foo2(int a1, int a2);
 	}
 
 	static class B implements A {
-		public void foo2() {
-			System.out.println("B.foo2");
+		public int foo2(int a1, int a2) {
+			return a1 + a2 + a1;
 		}
-		public void foo() {
-			System.out.println("B.foo");
+
+		public int foo(int a1) {
+			return a1 + a1;
 		}
 	}
 }
