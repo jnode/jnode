@@ -3,7 +3,9 @@
  */
 package org.jnode.plugin;
 
+import org.jnode.security.JNodePermission;
 import org.jnode.system.BootLog;
+
 
 /**
  * Abstract plugin class.
@@ -16,6 +18,11 @@ public abstract class Plugin {
 	private final PluginDescriptor descriptor;
 	/** Has this plugin been started? */
 	private boolean started;
+	
+	/** Permission required to start a plugin */
+	private static final JNodePermission START_PERM = new JNodePermission("startPlugin");
+	/** Permission required to stop a plugin */
+	private static final JNodePermission STOP_PERM = new JNodePermission("stopPlugin");
 
 	/**
 	 * Initialize a new instance
@@ -41,24 +48,34 @@ public abstract class Plugin {
 
 	/**
 	 * Start this plugin
-	 * 
+	 * To invoke this method, a JNodePermission("startPlugin") is required. 
 	 * @throws PluginException
 	 */
-	final void start() throws PluginException {
+	public final void start() throws PluginException {
+	    final SecurityManager sm = System.getSecurityManager();
+	    if (sm != null) {
+	        sm.checkPermission(START_PERM);
+	    }
 		if (!started) {
-			startPlugin();
-			started = true;
-		} else {
-			BootLog.debug("Plugin " + descriptor.getId() + " already started");
+		    if (descriptor.hasCustomPluginClass()) {
+		        BootLog.debug("__Starting " + descriptor.getId());
+		    }
+		    startPlugin();
+		    started = true;
 		}
 	}
 
 	/**
 	 * Stop this plugin.
+	 * To invoke this method, a JNodePermission("stopPlugin") is required. 
 	 * 
 	 * @throws PluginException
 	 */
-	final void stop() throws PluginException {
+	public final void stop() throws PluginException {
+	    final SecurityManager sm = System.getSecurityManager();
+	    if (sm != null) {
+	        sm.checkPermission(STOP_PERM);
+	    }
 		if (started) {
 			stopPlugin();
 			started = false;

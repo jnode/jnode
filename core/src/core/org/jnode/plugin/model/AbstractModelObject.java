@@ -57,4 +57,11 @@ public abstract class AbstractModelObject extends VmSystemObject {
 	 * @throws PluginException
 	 */
 	protected abstract void resolve() throws PluginException;
+
+	/**
+	 * Remove all references to (elements of) other plugin descriptors
+	 * 
+	 * @throws PluginException
+	 */
+	protected abstract void unresolve() throws PluginException;
 }

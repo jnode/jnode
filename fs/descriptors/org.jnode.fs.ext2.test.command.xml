@@ -9,7 +9,7 @@
   <requires>
     <import plugin="org.jnode.fs"/>
     <import plugin="org.jnode.fs.ext2"/>
-    <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.shell.help"/>
   </requires>
         
   <runtime>

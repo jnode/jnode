@@ -5,7 +5,7 @@
         name="JNode Help System"
         version="@VERSION@"
         provider-name="JNode.org"
-	class="org.jnode.shell.help.def.SystemHelpPlugin">
+		class="org.jnode.shell.help.def.SystemHelpPlugin">
 
   <requires>
     <import plugin="org.jnode.shell"/>

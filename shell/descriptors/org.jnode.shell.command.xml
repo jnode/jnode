@@ -7,7 +7,7 @@
     provider-name="JNode.org">
 
     <requires>
-        <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.shell.help"/>
     </requires>
 
     <runtime>

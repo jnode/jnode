@@ -102,6 +102,19 @@ public interface PluginDescriptor {
 	public boolean isSystemPlugin();
 	
 	/**
+	 * Does this plugin have a custom plugin class specified?
+	 * @return
+	 */
+	public boolean hasCustomPluginClass();
+	
+	/**
+	 * Has this plugin the auto-start flag set.
+	 * If true, the plugin will be started automatically at boot/load time.
+	 * @return
+	 */
+	public boolean isAutoStart();
+	
+	/**
 	 * Gets the classloader of this plugin descriptor.
 	 * @return ClassLoader
 	 */

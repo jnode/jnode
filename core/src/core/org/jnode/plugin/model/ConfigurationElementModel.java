@@ -93,4 +93,11 @@ public class ConfigurationElementModel extends PluginModelObject implements Conf
 	protected void resolve() {
 		// Do nothing 
 	}
+
+	/**
+	 * Remove all references to (elements of) other plugin descriptors
+	 */
+	protected void unresolve() {
+	    // Do nothing
+	}
 }

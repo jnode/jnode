@@ -847,7 +847,7 @@ public final class Unsafe {
 	/**
 	 * Cause the system to stop TODO Protect me again
 	 */
-	protected static void die(String msg) {
+	public /*protected*/ static void die(String msg) {
 		debug("Real panic: ");
 		if (msg != null) {
 			debug(msg);

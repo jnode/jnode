@@ -34,7 +34,9 @@ public class DeviceFinderPlugin extends Plugin {
 			devMan.findDevices();
 		} catch (NameNotFoundException ex) {
 			throw new PluginException("Cannot find DeviceManager");
-		}
+		} catch (InterruptedException ex) {
+		    throw new PluginException("findDevices was interrupted", ex);
+        }
 	}
 
 	/**
