@@ -59,7 +59,7 @@ import java.util.ResourceBundle;
  * static factory methods in this class such as 
  * <code>getCurrencyInstance</code>.
  * 
- * @author Tom Tromey <tromey@cygnus.com>
+ * @author Tom Tromey (tromey@cygnus.com)
  * @author Aaron M. Renn (arenn@urbanophile.com)
  * @date March 4, 1999
  */
@@ -347,7 +347,11 @@ public abstract class NumberFormat extends Format implements Cloneable
    */
   public static NumberFormat getCurrencyInstance (Locale loc)
   {
-    return computeInstance (loc, "currencyFormat", "$#,##0.00;($#,##0.00)");
+    NumberFormat format;
+    
+    format = computeInstance (loc, "currencyFormat", "$#,##0.00;($#,##0.00)");
+    format.setMaximumFractionDigits(format.getCurrency().getDefaultFractionDigits());  
+    return format;
   }
 
   /**
@@ -478,6 +482,7 @@ public abstract class NumberFormat extends Format implements Cloneable
   public static NumberFormat getIntegerInstance(Locale locale)
   {
     NumberFormat format = computeInstance (locale, "numberFormat", "#,##0");
+    format.setMaximumFractionDigits(0);
     format.setParseIntegerOnly (true);
     return format;
   }
