@@ -1648,12 +1648,12 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     }
 
     /**
-     * Helper method for visit_if_icmpxx and visit_if_acmpxx
+     * Helper method for visit_if_icmpxx 
      * 
      * @param address
      * @param jccOpcode
      */
-    private final void visit_if_xcmp(int address, int jccOpcode) {
+    private final void visit_if_icmp(int address, int jccOpcode) {
         IntItem v2 = vstack.popInt();
         IntItem v1 = vstack.popInt();
         //TODO: can be less restrictive: v1 must not be register
@@ -1680,11 +1680,46 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     }
 
     /**
+     * Helper method for visit_if_acmpxx
+     * 
+     * @param address
+     * @param jccOpcode
+     */
+    private final void visit_if_acmp(int address, int jccOpcode) {
+        RefItem v2 = vstack.popRef();
+        RefItem v1 = vstack.popRef();
+        //TODO: can be less restrictive: v1 must not be register
+        prepareForOperation(v1, v2);
+
+        Register r1 = v1.getRegister();
+
+        switch (v2.getKind()) {
+        case Item.REGISTER:
+            os.writeCMP(r1, v2.getRegister());
+            break;
+        case Item.LOCAL:
+            os.writeCMP(r1, FP, v2.getOffsetToFP());
+            break;
+        case Item.CONSTANT:
+	    //TODO: implement writeCMP_Const(reg, object)
+            //Object c2 = v2.getValue();
+            //os.writeCMP_Const(r1, c2);
+	    v2.load(eContext);
+            os.writeCMP(r1, v2.getRegister());
+            break;
+        }
+        v1.release(eContext);
+        v2.release(eContext);
+        //TODO: shall I flush the stack before the jump?
+        os.writeJCC(helper.getInstrLabel(address), jccOpcode);
+    }
+
+    /**
      * @param address
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_acmpeq(int)
      */
     public final void visit_if_acmpeq(int address) {
-        visit_if_xcmp(address, X86Constants.JE); // JE
+        visit_if_acmp(address, X86Constants.JE); // JE
     }
 
     /**
@@ -1692,7 +1727,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_acmpne(int)
      */
     public final void visit_if_acmpne(int address) {
-        visit_if_xcmp(address, X86Constants.JNE); // JNE
+        visit_if_acmp(address, X86Constants.JNE); // JNE
     }
 
     /**
@@ -1700,7 +1735,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpeq(int)
      */
     public final void visit_if_icmpeq(int address) {
-        visit_if_xcmp(address, X86Constants.JE); // JE
+        visit_if_icmp(address, X86Constants.JE); // JE
     }
 
     /**
@@ -1708,7 +1743,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpge(int)
      */
     public final void visit_if_icmpge(int address) {
-        visit_if_xcmp(address, X86Constants.JGE); // JGE
+        visit_if_icmp(address, X86Constants.JGE); // JGE
     }
 
     /**
@@ -1716,7 +1751,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpgt(int)
      */
     public final void visit_if_icmpgt(int address) {
-        visit_if_xcmp(address, X86Constants.JG); // JG
+        visit_if_icmp(address, X86Constants.JG); // JG
     }
 
     /**
@@ -1724,7 +1759,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmple(int)
      */
     public final void visit_if_icmple(int address) {
-        visit_if_xcmp(address, X86Constants.JLE); // JLE
+        visit_if_icmp(address, X86Constants.JLE); // JLE
     }
 
     /**
@@ -1732,7 +1767,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmplt(int)
      */
     public final void visit_if_icmplt(int address) {
-        visit_if_xcmp(address, X86Constants.JL); // JL
+        visit_if_icmp(address, X86Constants.JL); // JL
     }
 
     /**
@@ -1740,7 +1775,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpne(int)
      */
     public final void visit_if_icmpne(int address) {
-        visit_if_xcmp(address, X86Constants.JNE); // JNE
+        visit_if_icmp(address, X86Constants.JNE); // JNE
     }
 
     private void visit_ifxx(int type, int address, int jccOpcode) {
@@ -1892,9 +1927,10 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      */
     public final void visit_instanceof(VmConstClass classRef) {
         //TODO: port to orp-style
+	X86RegisterPool pool = eContext.getPool();
         vstack.push(eContext);
         RefItem v = vstack.popRef();
-        vstack.pushItem(v);
+	v.release(eContext);
 
         /* Objectref is already on the stack */
         writeResolveAndLoadClassToEAX(classRef, S0);
@@ -1907,6 +1943,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         /* Is instanceof? */
         instanceOf(trueLabel);
         /* Not instanceof */
+	//TODO: use setcc instead of jumps
         os.writeXOR(T0, T0);
         os.writeJMP(endLabel);
 
@@ -1914,7 +1951,13 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         os.writeMOV_Const(T0, 1);
 
         os.setObjectRef(endLabel);
-        os.writePUSH(T0);
+        //os.writePUSH(T0);
+
+	// WARNING: when porting this code, result of request must be checked
+	pool.request(T0);
+	IntItem res = IntItem.createRegister(T0);
+	pool.transferOwnerTo(T0, res);
+	vstack.pushItem(res);
     }
 
     private void pushReturnValue(String signature) {
@@ -2120,7 +2163,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         final VmMethod mts = methodRef.getResolvedVmMethod();
 
         final int nofArgs = mts.getNoArguments();
-        for (int i = 0; i < nofArgs; i++) {
+        for (int i = 0; (!vstack.isEmpty() && (i < nofArgs)); i++) {
             //TODO: check parameter type
             Item v = vstack.popItem();
             v.release(eContext);
@@ -2938,12 +2981,11 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     public final void visit_newarray(int type) {
         IntItem count = vstack.popInt();
         count.loadIf(eContext, Item.STACK);
-        //        helper.writePOP(S0); /* Elements */
+	vstack.push(eContext);  /* flush stack, result also on stack */
 
         /* Setup a call to SoftByteCodes.allocArray */
         helper.writePUSH(type); /* type */
-        //        helper.writePUSH(S0); /* elements */
-        count.push(eContext);
+        count.push(eContext);   /* count */
 
         helper.invokeJavaMethod(context.getAllocPrimitiveArrayMethod());
         /* Result is already on the stack */
@@ -3054,9 +3096,11 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      */
     public final void visit_putstatic(VmConstFieldRef fieldRef) {
         //TODO: port to orp-style
-        vstack.push(eContext);
-        Item val = vstack.popItem();
-        val.release(eContext);
+	if (!vstack.isEmpty()) {
+            vstack.push(eContext);
+            Item val = vstack.popItem();
+            val.release(eContext);
+	}
 
         fieldRef.resolve(loader);
         final VmStaticField sf = (VmStaticField) fieldRef.getResolvedVmField();
