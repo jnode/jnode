@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bootp>
+   <host ethernetAddress="00:00:00:00:00:00" ipAddress="192.168.0.1"/>
+</bootp>
