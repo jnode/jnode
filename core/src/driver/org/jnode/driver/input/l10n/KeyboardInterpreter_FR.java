@@ -1,8 +1,6 @@
-/**
- * KeyboardInterpreter_FR.java
- *
- * @author Created by Marc DENTY on Feb 01 2004
- * @since 0.15
+/*
+ * Created on Mar 1, 2003
+ * $Id$
  */
 
 package org.jnode.driver.input.l10n;
@@ -10,7 +8,12 @@ import org.jnode.driver.input.KeyboardInterpreter;
 import java.awt.event.KeyEvent;
 
 
-
+/**
+ * KeyboardInterpreter_FR.java
+ *
+ * @author Created by Marc DENTY on Feb 01 2004
+ * @since 0.15
+ */
 public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 	
 	/**
