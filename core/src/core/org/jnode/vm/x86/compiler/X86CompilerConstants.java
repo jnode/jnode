@@ -31,53 +31,10 @@ import org.jnode.vm.VmStackFrame;
 public interface X86CompilerConstants {
 
 	/** 
-	 * Volatile register 0
-	 * Do not change this constant!
-	 */
-	public static final X86Register T0 = X86Register.EAX;
-
-	/** 
-	 * Volatile register 1
-	 * Do not change this constant!
-	 */
-	public static final X86Register T1 = X86Register.EDX;
-	
-	/** 
-	 * Scratch register 0
-	 */
-	public static final X86Register S0 = X86Register.ECX;
-	
-	/** 
-	 * Scratch register 1
-	 */
-	public static final X86Register S1 = X86Register.EBX;
-	
-	/** 
-	 * Stack pointer register
-	 * Do not change this constant!
-	 */
-	public static final X86Register SP = X86Register.ESP;
-	
-	/** 
-	 * Frame pointer register
-	 * Do not change this constant!
-	 */
-	public static final X86Register FP = X86Register.EBP;
-
-	/** 
 	 * Statics table register
 	 * Do not change this constant!
 	 */
-	public static final X86Register STATICS = X86Register.EDI;
-
-	/** EAX register */
-	public static final X86Register EAX = X86Register.EAX;
-
-	/** ECX register */
-	public static final X86Register ECX = X86Register.ECX;
-
-	/** EDX register */
-	public static final X86Register EDX = X86Register.EDX;
+	public static final X86Register.GPR STATICS = X86Register.EDI;
 
 	/** Size of a byte */
 	public static final int BYTESIZE = X86Constants.BITS8;

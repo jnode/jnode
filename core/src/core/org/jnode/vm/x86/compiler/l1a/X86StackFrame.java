@@ -162,10 +162,10 @@ class X86StackFrame implements X86CompilerConstants {
         os.writeJCC(stackOverflowLabel, X86Constants.JLE);
 		
 		// Create class initialization code (if needed)
-		helper.writeClassInitialize(method, EAX, ECX);
+		helper.writeClassInitialize(method, X86Register.EAX, X86Register.ECX);
 
 		// Increment the invocation count
-		helper.writeIncInvocationCount(EAX);
+		helper.writeIncInvocationCount(X86Register.EAX);
 
 		// Fixed framelayout
 		saveRegisters();

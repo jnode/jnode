@@ -265,23 +265,23 @@ public class X86CompilerHelper implements X86CompilerConstants {
             final VmType cls = method.getDeclaringClass();
             if (!cls.isInitialized()) {
                 // Save eax
-                os.writePUSH(EAX);
+                os.writePUSH(X86Register.EAX);
                 // Do the is initialized test
                 // Move method.declaringClass -> EAX
-                os.writeMOV(INTSIZE, EAX, methodReg, context
+                os.writeMOV(INTSIZE, X86Register.EAX, methodReg, context
                         .getVmMemberDeclaringClassField().getOffset());
                 // Test declaringClass.modifiers
-                os.writeTEST(EAX, context.getVmTypeState().getOffset(),
+                os.writeTEST(X86Register.EAX, context.getVmTypeState().getOffset(),
                         VmTypeState.ST_INITIALIZED);
                 final Label afterInit = new Label(method.getMangledName()
                         + "$$after-classinit");
                 os.writeJCC(afterInit, X86Constants.JNZ);
                 // Call cls.initialize
-                os.writePUSH(EAX);
+                os.writePUSH(X86Register.EAX);
                 invokeJavaMethod(context.getVmTypeInitialize());
                 os.setObjectRef(afterInit);
                 // Restore eax
-                os.writePOP(EAX);
+                os.writePOP(X86Register.EAX);
                 return true;
             }
         }

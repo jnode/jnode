@@ -804,7 +804,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         writeModRM(0x23, srcReg.getNr(), srcDisp, dstReg.getNr());
     }
 
-    public void writeArithSSEDOp(int operation, X86Register dst, X86Register src) {
+    public void writeArithSSEDOp(int operation, X86Register.XMM dst, X86Register.XMM src) {
         write8(0xF2);
         write8(0x0F);
         switch (operation) {
@@ -824,8 +824,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         writeModRR(src.getNr(), dst.getNr());
     }
 
-    public void writeArithSSEDOp(int operation, X86Register dst,
-            X86Register src, int srcDisp) {
+    public void writeArithSSEDOp(int operation, X86Register.XMM dst,
+            X86Register.GPR src, int srcDisp) {
         write8(0xF2);
         write8(0x0F);
         switch (operation) {
@@ -845,7 +845,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         writeModRM(src.getNr(), srcDisp, dst.getNr());
     }
 
-    public void writeArithSSESOp(int operation, X86Register dst, X86Register src) {
+    public void writeArithSSESOp(int operation, X86Register.XMM dst, X86Register.XMM src) {
         write8(0xF3);
         write8(0x0F);
         switch (operation) {
@@ -865,8 +865,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         writeModRR(src.getNr(), dst.getNr());
     }
 
-    public void writeArithSSESOp(int operation, X86Register dst,
-            X86Register src, int srcDisp) {
+    public void writeArithSSESOp(int operation, X86Register.XMM dst,
+            X86Register.GPR src, int srcDisp) {
         write8(0xF3);
         write8(0x0F);
         switch (operation) {

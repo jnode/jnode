@@ -153,7 +153,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
             break;
 
         case Kind.LOCAL:
-            os.writeMOV(INTSIZE, reg, FP, getOffsetToFP());
+            os.writeMOV(INTSIZE, reg, X86Register.EBP, getOffsetToFP());
             break;
 
         case Kind.CONSTANT:
@@ -165,8 +165,8 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
             FPUHelper.fxch(os, stack.fpuStack, this);
             stack.fpuStack.pop(this);
             // Convert & move to new space on normal stack
-            os.writeLEA(SP, SP, -4);
-            popFromFPU(os, SP, 0);
+            os.writeLEA(X86Register.ESP, X86Register.ESP, -4);
+            popFromFPU(os, X86Register.ESP, 0);
             os.writePOP(reg);
             break;
 
@@ -266,7 +266,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
             break;
 
         case Kind.LOCAL:
-            os.writePUSH(FP, offsetToFP);
+            os.writePUSH(X86Register.EBP, offsetToFP);
             break;
 
         case Kind.CONSTANT:
@@ -279,8 +279,8 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
             FPUHelper.fxch(os, fpuStack, this);
             stack.fpuStack.pop(this);
             // Convert & move to new space on normal stack
-            os.writeLEA(SP, SP, -4);
-            popFromFPU(os, SP, 0);
+            os.writeLEA(X86Register.ESP, X86Register.ESP, -4);
+            popFromFPU(os, X86Register.ESP, 0);
             break;
 
         case Kind.STACK:
@@ -331,18 +331,18 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
         switch (getKind()) {
         case Kind.REGISTER:
             os.writePUSH(reg);
-            pushToFPU(os, SP, 0);
-            os.writeLEA(SP, SP, 4);
+            pushToFPU(os, X86Register.ESP, 0);
+            os.writeLEA(X86Register.ESP, X86Register.ESP, 4);
             break;
 
         case Kind.LOCAL:
-            pushToFPU(os, FP, offsetToFP);
+            pushToFPU(os, X86Register.EBP, offsetToFP);
             break;
 
         case Kind.CONSTANT:
             pushConstant(ec, os);
-            pushToFPU(os, SP, 0);
-            os.writeLEA(SP, SP, 4);
+            pushToFPU(os, X86Register.ESP, 0);
+            os.writeLEA(X86Register.ESP, X86Register.ESP, 4);
             break;
 
         case Kind.FPUSTACK:
@@ -356,8 +356,8 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
             if (VirtualStack.checkOperandStack) {
                 stack.operandStack.pop(this);
             }
-            pushToFPU(os, SP, 0);
-            os.writeLEA(SP, SP, 4);
+            pushToFPU(os, X86Register.ESP, 0);
+            os.writeLEA(X86Register.ESP, X86Register.ESP, 4);
             break;
 
         default:
