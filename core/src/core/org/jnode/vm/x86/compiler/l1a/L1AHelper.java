@@ -21,7 +21,7 @@
  
 package org.jnode.vm.x86.compiler.l1a;
 
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.JvmType;
 
 /**
@@ -44,7 +44,7 @@ final class L1AHelper {
 	 * 
 	 * @param reg
 	 */
-	static final void releaseRegister(EmitterContext eContext, Register reg) {
+	static final void releaseRegister(EmitterContext eContext, X86Register reg) {
 		final X86RegisterPool pool = eContext.getPool();
 		pool.release(reg);
 	}
@@ -56,8 +56,8 @@ final class L1AHelper {
 			EmitterContext eContext, int jvmType) {
 		final X86RegisterPool pool = eContext.getPool();
 		final ItemFactory ifac = eContext.getItemFactory();
-		final Register lsb = requestRegister(eContext, JvmType.INT, false);
-		final Register msb = requestRegister(eContext, JvmType.INT, false);
+		final X86Register lsb = requestRegister(eContext, JvmType.INT, false);
+		final X86Register msb = requestRegister(eContext, JvmType.INT, false);
 		final DoubleWordItem result = ifac.createReg(jvmType, lsb,
 				msb);
 		pool.transferOwnerTo(lsb, result);
@@ -69,7 +69,7 @@ final class L1AHelper {
 	 * Request two register for a 8-byte item.
 	 */
 	static final DoubleWordItem requestDoubleWordRegisters(
-			EmitterContext eContext, int jvmType, Register lsb, Register msb) {
+			EmitterContext eContext, int jvmType, X86Register lsb, X86Register msb) {
 		final X86RegisterPool pool = eContext.getPool();
 		final ItemFactory ifac = eContext.getItemFactory();
 		requestRegister(eContext, lsb);
@@ -87,7 +87,7 @@ final class L1AHelper {
 	 * 
 	 * @param reg
 	 */
-	static final void requestRegister(EmitterContext eContext, Register reg) {
+	static final void requestRegister(EmitterContext eContext, X86Register reg) {
 		final X86RegisterPool pool = eContext.getPool();
 		if (!pool.isFree(reg)) {
 			final Item i = (Item) pool.getOwner(reg);
@@ -102,10 +102,10 @@ final class L1AHelper {
 	 * Request a register of a given type, not tied to an item. Make sure to
 	 * release the register afterwards.
 	 */
-	static final Register requestRegister(EmitterContext eContext, int type,
+	static final X86Register requestRegister(EmitterContext eContext, int type,
 			boolean supportsBits8) {
 		final X86RegisterPool pool = eContext.getPool();
-		Register r = pool.request(type, supportsBits8);
+		X86Register r = pool.request(type, supportsBits8);
 		if (r == null) {
 			eContext.getVStack().push(eContext);
 			r = pool.request(type, supportsBits8);
@@ -123,7 +123,7 @@ final class L1AHelper {
 	 * @param it
 	 *            the item requiring the register
 	 */
-	static final void requestRegister(EmitterContext eContext, Register reg,
+	static final void requestRegister(EmitterContext eContext, X86Register reg,
 			Item it) {
 		final X86RegisterPool pool = eContext.getPool();
 
@@ -148,7 +148,7 @@ final class L1AHelper {
 			int jvmType, boolean supportsBits8) {
 		final X86RegisterPool pool = eContext.getPool();
 		final ItemFactory ifac = eContext.getItemFactory();
-		final Register reg = requestRegister(eContext, JvmType.INT,
+		final X86Register reg = requestRegister(eContext, JvmType.INT,
 				supportsBits8);
 		final WordItem result = ifac.createReg(jvmType, reg);
 		pool.transferOwnerTo(reg, result);
@@ -159,7 +159,7 @@ final class L1AHelper {
 	 * Request specific one register for a 4-byte item.
 	 */
 	static final WordItem requestWordRegister(EmitterContext eContext,
-			int jvmType, Register reg) {
+			int jvmType, X86Register reg) {
 		final X86RegisterPool pool = eContext.getPool();
 		final ItemFactory ifac = eContext.getItemFactory();
 		pool.request(reg);

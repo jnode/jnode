@@ -29,7 +29,7 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.assembler.NativeStream.ObjectInfo;
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Stream;
 import org.jnode.boot.Main;
 import org.jnode.build.AbstractBootImageBuilder;
@@ -354,8 +354,8 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		final VmMethod mainMethod = vmMainClass.getMethod(Main.MAIN_METHOD_NAME, Main.MAIN_METHOD_SIGNATURE);
 		final VmInstanceField nativeCodeField = (VmInstanceField) vmMethodClass.getField("nativeCode");
 
-		os.writeMOV_Const(Register.EAX, mainMethod);
-		os.writeCALL(Register.EAX, nativeCodeField.getOffset());
+		os.writeMOV_Const(X86Register.EAX, mainMethod);
+		os.writeCALL(X86Register.EAX, nativeCodeField.getOffset());
 		os.writeRET(); // RET instruction
 	}
 
@@ -375,19 +375,19 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		final VmThread initialThread = processor.getCurrentThread();
 
 		os.setObjectRef(new Label("$$Setup initial thread"));
-		os.writeMOV_Const(Register.EBX, initialThread);
+		os.writeMOV_Const(X86Register.EBX, initialThread);
 
 		/** Initialize initialStack.stack to Luser_stack */
 		//os.writeMOV(Register.ECX, threadStackField.getOffset());
-		os.writeMOV_Const(Register.EDX, initialStack);
-		os.writeMOV(INTSIZE, Register.EBX, threadStackField.getOffset(), Register.EDX);
+		os.writeMOV_Const(X86Register.EDX, initialStack);
+		os.writeMOV(INTSIZE, X86Register.EBX, threadStackField.getOffset(), X86Register.EDX);
 		// Calculate and set stackEnd
-		os.writeLEA(Register.EDX, Register.EDX, VmThread.STACK_OVERFLOW_LIMIT);
-		os.writeMOV(INTSIZE, Register.EBX, threadStackEndField.getOffset(), Register.EDX);
+		os.writeLEA(X86Register.EDX, X86Register.EDX, VmThread.STACK_OVERFLOW_LIMIT);
+		os.writeMOV(INTSIZE, X86Register.EBX, threadStackEndField.getOffset(), X86Register.EDX);
 		
 		// Set stackend in current processor
-		os.writeMOV_Const(Register.EBX, processor);
-		os.writeMOV(INTSIZE, Register.EBX, procStackEndField.getOffset(), Register.EDX);
+		os.writeMOV_Const(X86Register.EBX, processor);
+		os.writeMOV(INTSIZE, X86Register.EBX, procStackEndField.getOffset(), X86Register.EDX);
 	}
 
 	/**
@@ -431,13 +431,13 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		VmStaticField vmField = (VmStaticField) vmClass.getField("instance");
 		
 		// Setup STATICS register (EDI)
-		os.writeMOV_Const(Register.EDI, statics.getTable());
+		os.writeMOV_Const(X86Register.EDI, statics.getTable());
 
 		/* Set Vm.instance */
-		os.writeMOV_Const(Register.EBX, vm);
+		os.writeMOV_Const(X86Register.EBX, vm);
 		final int vmOffset = (VmArray.DATA_OFFSET + vmField.getStaticsIndex()) << 2;
 		log("vmOffset " + NumberUtils.hex(vmOffset), Project.MSG_VERBOSE);
-		os.writeMOV(INTSIZE, Register.EDI, vmOffset, Register.EBX);
+		os.writeMOV(INTSIZE, X86Register.EDI, vmOffset, X86Register.EBX);
 	}
 
 	/**
@@ -454,13 +454,13 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		final VmStaticField registryField = (VmStaticField) mainClass.getField(Main.REGISTRY_FIELD_NAME);
 
 		// Setup STATICS register (EDI)
-		os.writeMOV_Const(Register.EDI, statics.getTable());
+		os.writeMOV_Const(X86Register.EDI, statics.getTable());
 
 		/* Set Main.pluginRegistry */
-		os.writeMOV_Const(Register.EBX, registry);
+		os.writeMOV_Const(X86Register.EBX, registry);
 		final int rfOffset = (VmArray.DATA_OFFSET + registryField.getStaticsIndex()) << 2;
 		log("rfOffset " + NumberUtils.hex(rfOffset), Project.MSG_VERBOSE);
-		os.writeMOV(INTSIZE, Register.EDI, rfOffset, Register.EBX);
+		os.writeMOV(INTSIZE, X86Register.EDI, rfOffset, X86Register.EBX);
 	}
 
 	protected void emitStaticInitializerCalls(NativeStream nativeOs, VmType[] bootClasses, Object clInitCaller) throws ClassNotFoundException {
@@ -476,10 +476,10 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		final VmType vmMethodClass = loadClass(VmMethod.class);
 		final VmInstanceField nativeCodeField = (VmInstanceField) vmMethodClass.getField("nativeCode");
 
-		os.writeMOV_Const(Register.EAX, bootClasses);
-		os.writePUSH(Register.EAX);
-		os.writeMOV_Const(Register.EAX, lfbcaMethod);
-		os.writeCALL(Register.EAX, nativeCodeField.getOffset());
+		os.writeMOV_Const(X86Register.EAX, bootClasses);
+		os.writePUSH(X86Register.EAX);
+		os.writeMOV_Const(X86Register.EAX, lfbcaMethod);
+		os.writeCALL(X86Register.EAX, nativeCodeField.getOffset());
 
 		// Now call all static initializers
 		for (int i = 0;(i < bootClasses.length); i++) {

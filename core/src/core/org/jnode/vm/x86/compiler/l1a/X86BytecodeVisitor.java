@@ -24,7 +24,7 @@ package org.jnode.vm.x86.compiler.l1a;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.x86.AbstractX86Stream;
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Operation;
 import org.jnode.system.BootLog;
@@ -207,7 +207,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         final Label failed = new Label(curInstrLabel + "$$cbfailed");
 
         assertCondition(ref.isRegister(), "ref must be in a register");
-        final Register refr = ref.getRegister();
+        final X86Register refr = ref.getRegister();
         
         os.writeJMP(test);
         os.setObjectRef(failed);
@@ -264,7 +264,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         val.load(eContext);
         idx.loadIf(eContext, ~Item.Kind.CONSTANT);
         ref.load(eContext);
-        final Register refr = ref.getRegister();
+        final X86Register refr = ref.getRegister();
 
         // Check bound
         checkBounds(ref, idx);
@@ -352,8 +352,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         } else {
             // Load into register
             val.load(eContext);
-            final Register lsb = val.getLsbRegister();
-            final Register msb = val.getMsbRegister();
+            final X86Register lsb = val.getLsbRegister();
+            final X86Register msb = val.getMsbRegister();
             // Store
             os.writeMOV(INTSIZE, FP, disp + LSB, lsb);
             os.writeMOV(INTSIZE, FP, disp + MSB, msb);
@@ -397,7 +397,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             final X86RegisterPool pool = eContext.getPool();
             pool.visitUsedRegisters(new RegisterVisitor() {
 
-                public void visit(Register reg) {
+                public void visit(X86Register reg) {
                     if (!vstack.uses(reg)) {
                         throw new InternalError("Register " + reg
                                 + " is in use outsite of the vstack in method "
@@ -507,8 +507,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      *            directly after this method Register ECX must be free and it
      *            destroyed.
      */
-    private final void instanceOfClass(Register objectr, VmClassType type,
-            Register tmpr, Register resultr, Label trueLabel, boolean skipNullTest) {
+    private final void instanceOfClass(X86Register objectr, VmClassType type,
+            X86Register tmpr, X86Register resultr, Label trueLabel, boolean skipNullTest) {
 
     	final int depth = type.getSuperClassDepth();
     	final int staticsOfs = arrayDataOffset + (type.getStaticsIndex() << 2);
@@ -565,8 +565,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      *            directly after this method Register ECX must be free and it
      *            destroyed.
      */
-    private final void instanceOf(Register objectr, Register typer,
-            Register tmpr, Register cntr, Label trueLabel, boolean skipNullTest) {
+    private final void instanceOf(X86Register objectr, X86Register typer,
+            X86Register tmpr, X86Register cntr, Label trueLabel, boolean skipNullTest) {
         final Label loopLabel = new Label(this.curInstrLabel + "loop");
         final Label notInstanceOfLabel = new Label(this.curInstrLabel
                 + "notInstanceOf");
@@ -645,7 +645,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             v1 = tmp;
         }
 
-        final Register r1 = v1.getRegister();
+        final X86Register r1 = v1.getRegister();
         switch (v2.getKind()) {
         case Item.Kind.REGISTER:
             os.writeArithOp(operation, r1, v2.getRegister());
@@ -679,7 +679,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         final IntItem val = vstack.popInt();
         val.load(eContext);
 
-        final Register valr = val.getRegister();
+        final X86Register valr = val.getRegister();
         if (isconst) {
             final int imm8 = shift.getValue();
             os.writeShift(operation, valr, imm8);
@@ -703,10 +703,10 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @param index
      * @param scale
      */
-    private final void loadArrayEntryOffset(Register dst, RefItem ref,
+    private final void loadArrayEntryOffset(X86Register dst, RefItem ref,
             IntItem index, int scale) {
         assertCondition(ref.isRegister(), "ref must be in a register");
-        final Register refr = ref.getRegister();
+        final X86Register refr = ref.getRegister();
         if (index.isConstant()) {
             final int offset = index.getValue() * scale;
             os.writeLEA(dst, refr, arrayDataOffset + offset);
@@ -733,8 +733,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             v1 = tmp;
         }
 
-        final Register r1_lsb = v1.getLsbRegister();
-        final Register r1_msb = v1.getMsbRegister();
+        final X86Register r1_lsb = v1.getLsbRegister();
+        final X86Register r1_msb = v1.getMsbRegister();
         switch (v2.getKind()) {
         case Item.Kind.REGISTER:
             os.writeArithOp(operationLsb, r1_lsb, v2.getLsbRegister());
@@ -933,7 +933,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         // Claim EAX, we're going to use it later
         L1AHelper.requestRegister(eContext, EAX);
         // Request tmp register
-        final Register classr = L1AHelper.requestRegister(eContext,
+        final X86Register classr = L1AHelper.requestRegister(eContext,
                 JvmType.INT, false);
 
         // Pop
@@ -941,7 +941,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 
         // Load the count value
         cnt.load(eContext);
-        final Register cntr = cnt.getRegister();
+        final X86Register cntr = cnt.getRegister();
 
         // Resolve the class
         writeResolveAndLoadClassToReg(classRef, classr);
@@ -977,8 +977,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 
         // Load
         ref.load(eContext);
-        final Register refr = ref.getRegister();
-        final Register resultr = result.getRegister();
+        final X86Register refr = ref.getRegister();
+        final X86Register resultr = result.getRegister();
 
         // Get length
         os.writeMOV(INTSIZE, resultr, refr, arrayLengthOffset);
@@ -1065,11 +1065,11 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     		
     		// Load the ref
     		ref.load(eContext);
-    		final Register refr = ref.getRegister();
-    		final Register classr = EAX;
-    		final Register cntr = L1AHelper.requestRegister(eContext, JvmType.INT,
+    		final X86Register refr = ref.getRegister();
+    		final X86Register classr = EAX;
+    		final X86Register cntr = L1AHelper.requestRegister(eContext, JvmType.INT,
     				false);
-    		final Register tmpr = L1AHelper.requestRegister(eContext, JvmType.INT,
+    		final X86Register tmpr = L1AHelper.requestRegister(eContext, JvmType.INT,
     				false);
     		
     		// Resolve the class
@@ -1110,8 +1110,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     		
     		// Load the ref
     		ref.load(eContext);
-    		final Register refr = ref.getRegister();
-    		final Register tmpr = L1AHelper.requestRegister(eContext, JvmType.INT,
+    		final X86Register refr = ref.getRegister();
+    		final X86Register tmpr = L1AHelper.requestRegister(eContext, JvmType.INT,
     				false);
     		
     		final Label okLabel = new Label(this.curInstrLabel + "cc-ok");
@@ -1177,7 +1177,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 
         idx.loadIf(eContext, ~Item.Kind.CONSTANT);
         ref.load(eContext);
-        final Register refr = ref.getRegister();
+        final X86Register refr = ref.getRegister();
 
         checkBounds(ref, idx);
         FPUHelper.ensureStackCapacity(os, eContext, vstack, 1);
@@ -1186,7 +1186,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             final int offset = idx.getValue() * 8;
             os.writeFLD64(refr, offset + arrayDataOffset);
         } else {
-            final Register idxr = idx.getRegister();
+            final X86Register idxr = idx.getRegister();
             os.writeFLD64(refr, idxr, 8, arrayDataOffset);
         }
 
@@ -1396,16 +1396,16 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         final int c2 = v2.getCategory();
         
         // Perform a stack swap independent of the actual form 
-		os.writePOP(Register.EAX); // Value1
-		os.writePOP(Register.EBX); // Value2
-		os.writePOP(Register.ECX); // Value3
-		os.writePOP(Register.EDX); // Value4
-		os.writePUSH(Register.EBX); // Value2
-		os.writePUSH(Register.EAX); // Value1
-		os.writePUSH(Register.EDX); // Value4
-		os.writePUSH(Register.ECX); // Value3
-		os.writePUSH(Register.EBX); // Value2
-		os.writePUSH(Register.EAX); // Value1
+		os.writePOP(X86Register.EAX); // Value1
+		os.writePOP(X86Register.EBX); // Value2
+		os.writePOP(X86Register.ECX); // Value3
+		os.writePOP(X86Register.EDX); // Value4
+		os.writePUSH(X86Register.EBX); // Value2
+		os.writePUSH(X86Register.EAX); // Value1
+		os.writePUSH(X86Register.EDX); // Value4
+		os.writePUSH(X86Register.ECX); // Value3
+		os.writePUSH(X86Register.EBX); // Value2
+		os.writePUSH(X86Register.EAX); // Value1
 
 		// Now update the operandstack
         // cope with brain-dead definition from Sun (look-like somebody there
@@ -1589,7 +1589,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         // Pop & load
         final RefItem ref = vstack.popRef();
         ref.load(eContext);
-        final Register refr = ref.getRegister();
+        final X86Register refr = ref.getRegister();
 
         // get field
         final Item result;
@@ -1612,8 +1612,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             } else {
                 final DoubleWordItem idw = L1AHelper
                         .requestDoubleWordRegisters(eContext, type);
-                final Register lsb = idw.getLsbRegister();
-                final Register msb = idw.getMsbRegister();
+                final X86Register lsb = idw.getLsbRegister();
+                final X86Register msb = idw.getMsbRegister();
                 os.writeMOV(INTSIZE, lsb, refr, fieldOffset + LSB);
                 os.writeMOV(INTSIZE, msb, refr, fieldOffset + MSB);
                 result = idw;
@@ -1639,7 +1639,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         // Initialize if needed
         if (!sf.getDeclaringClass().isInitialized()) {
             final X86RegisterPool pool = eContext.getPool();
-            final Register tmp = L1AHelper.requestRegister(eContext,
+            final X86Register tmp = L1AHelper.requestRegister(eContext,
                     JvmType.INT, false);
             writeInitializeClass(fieldRef, tmp);
             pool.release(tmp);
@@ -1655,14 +1655,14 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         } else if (!fieldRef.isWide()) {
             final WordItem result = L1AHelper.requestWordRegister(eContext,
                     type, false);
-            final Register resultr = result.getRegister();
+            final X86Register resultr = result.getRegister();
             helper.writeGetStaticsEntry(curInstrLabel, resultr, sf);
             vstack.push(result);
         } else {
             final DoubleWordItem result = L1AHelper.requestDoubleWordRegisters(
                     eContext, type);
-            final Register lsb = result.getLsbRegister();
-            final Register msb = result.getMsbRegister();
+            final X86Register lsb = result.getLsbRegister();
+            final X86Register msb = result.getMsbRegister();
             helper.writeGetStaticsEntry64(curInstrLabel, lsb, msb, sf);
             vstack.push(result);
         }
@@ -1686,7 +1686,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             vstack.push(ifac.createIConst((byte) v.getValue()));
         } else {
             v.loadToBITS8GPR(eContext);
-            final Register r = v.getRegister();
+            final X86Register r = v.getRegister();
             os.writeMOVSX(r, r, BYTESIZE);
             vstack.push(v);
         }
@@ -1701,7 +1701,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             vstack.push(ifac.createIConst((char) v.getValue()));
         } else {
             v.load(eContext);
-            final Register r = v.getRegister();
+            final X86Register r = v.getRegister();
             os.writeMOVZX(r, r, WORDSIZE);
             vstack.push(v);
         }
@@ -1757,7 +1757,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             vstack.push(ifac.createIConst((short) v.getValue()));
         } else {
             v.load(eContext);
-            final Register r = v.getRegister();
+            final X86Register r = v.getRegister();
             os.writeMOVSX(r, r, WORDSIZE);
             vstack.push(v);
         }
@@ -1820,7 +1820,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 
         // Load v2, v1 into a register
         v2.load(eContext);
-        v1.loadTo(eContext, Register.EAX);
+        v1.loadTo(eContext, X86Register.EAX);
 
         // EAX -> sign extend EDX:EAX
         os.writeCDQ();
@@ -1829,7 +1829,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         os.writeIDIV_EAX(v2.getRegister());
 
         // Free unused registers
-        pool.release(Register.EDX);
+        pool.release(X86Register.EDX);
         v2.release(eContext);
 
         // And push the result on the vstack.
@@ -1857,7 +1857,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             v1 = tmp;
         }
 
-        Register r1 = v1.getRegister();
+        X86Register r1 = v1.getRegister();
 
         switch (v2.getKind()) {
         case Item.Kind.REGISTER:
@@ -1914,7 +1914,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             v1 = tmp;
         }
 
-        Register r1 = v1.getRegister();
+        X86Register r1 = v1.getRegister();
 
         switch (v2.getKind()) {
         case Item.Kind.REGISTER:
@@ -2082,7 +2082,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             }
         } else {
             val.load(eContext);
-            final Register valr = val.getRegister();
+            final X86Register valr = val.getRegister();
             // flush vstack before jumping
             vstack.push(eContext);
 
@@ -2149,7 +2149,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             v1 = tmp;
         }
 
-        final Register r1 = v1.getRegister();
+        final X86Register r1 = v1.getRegister();
         switch (v2.getKind()) {
         case Item.Kind.REGISTER:
             os.writeIMUL(r1, v2.getRegister());
@@ -2227,14 +2227,14 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     		// Load reference
     		final RefItem ref = vstack.popRef();
     		ref.load(eContext);
-    		final Register refr = ref.getRegister();
+    		final X86Register refr = ref.getRegister();
     		
     		// Allocate tmp registers
-    		final Register classr = L1AHelper.requestRegister(eContext,
+    		final X86Register classr = L1AHelper.requestRegister(eContext,
     				JvmType.INT, false);
-    		final Register cntr = L1AHelper.requestRegister(eContext, JvmType.INT,
+    		final X86Register cntr = L1AHelper.requestRegister(eContext, JvmType.INT,
     				false);
-    		final Register tmpr = L1AHelper.requestRegister(eContext, JvmType.INT,
+    		final X86Register tmpr = L1AHelper.requestRegister(eContext, JvmType.INT,
     				false);
     		
     		/* Objectref is already on the stack */
@@ -2272,10 +2272,10 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     		// Load reference
     		final RefItem ref = vstack.popRef();
     		ref.load(eContext);
-    		final Register refr = ref.getRegister();
+    		final X86Register refr = ref.getRegister();
     		
     		// Allocate tmp registers
-    		final Register tmpr = L1AHelper.requestRegister(eContext, JvmType.INT,
+    		final X86Register tmpr = L1AHelper.requestRegister(eContext, JvmType.INT,
     				false);
     		final IntItem result = (IntItem)L1AHelper.requestWordRegister(eContext, JvmType.INT, false);
     		
@@ -2526,7 +2526,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         } else {
             final X86RegisterPool pool = eContext.getPool();
             v.load(eContext);
-            final Register lsb = v.getLsbRegister();
+            final X86Register lsb = v.getLsbRegister();
             v.release(eContext);
             pool.request(lsb);
             final IntItem result = (IntItem)ifac.createReg(JvmType.INT, lsb);
@@ -2552,8 +2552,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         // Load
         idx.load(eContext);
         ref.load(eContext);
-        final Register idxr = idx.getRegister();
-        final Register refr = ref.getRegister();
+        final X86Register idxr = idx.getRegister();
+        final X86Register refr = ref.getRegister();
 
         // Verify
         checkBounds(ref, idx);
@@ -2596,16 +2596,16 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 
         // Load
         v2.load(eContext);
-        final Register v2_lsb = v2.getLsbRegister();
-        final Register v2_msb = v2.getMsbRegister();
+        final X86Register v2_lsb = v2.getLsbRegister();
+        final X86Register v2_msb = v2.getMsbRegister();
         v1.load(eContext);
-        final Register v1_lsb = v1.getLsbRegister();
-        final Register v1_msb = v1.getMsbRegister();
+        final X86Register v1_lsb = v1.getLsbRegister();
+        final X86Register v1_msb = v1.getMsbRegister();
 
         // Claim result reg
         final IntItem result = (IntItem) L1AHelper.requestWordRegister(
                 eContext, JvmType.INT, false);
-        final Register resr = result.getRegister();
+        final X86Register resr = result.getRegister();
 
         final Label ltLabel = new Label(curInstrLabel + "lt");
         final Label endLabel = new Label(curInstrLabel + "end");
@@ -2690,12 +2690,12 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         v2.release1(eContext);
         v1.release1(eContext);
 
-        writePOP64(Register.EBX, Register.ECX); // Value 2
-        final Register v2_lsb = Register.EBX;
-        final Register v2_msb = Register.ECX;
-        writePOP64(Register.ESI, Register.EDI); // Value 1
-        final Register v1_lsb = Register.ESI;
-        final Register v1_msb = Register.EDI;
+        writePOP64(X86Register.EBX, X86Register.ECX); // Value 2
+        final X86Register v2_lsb = X86Register.EBX;
+        final X86Register v2_msb = X86Register.ECX;
+        writePOP64(X86Register.ESI, X86Register.EDI); // Value 1
+        final X86Register v1_lsb = X86Register.ESI;
+        final X86Register v1_msb = X86Register.EDI;
 
         final Label tmp1 = new Label(curInstrLabel + "$tmp1");
         final Label tmp2 = new Label(curInstrLabel + "$tmp2");
@@ -2738,8 +2738,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         } else {
             // Load val
             v.load(eContext);
-            final Register lsb = v.getLsbRegister();
-            final Register msb = v.getMsbRegister();
+            final X86Register lsb = v.getLsbRegister();
+            final X86Register msb = v.getMsbRegister();
 
             // Calculate
             os.writeNEG(msb); // msb := -msb
@@ -2765,7 +2765,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 
         final IntItem key = vstack.popInt();
         key.load(eContext);
-        final Register keyr = key.getRegister();
+        final X86Register keyr = key.getRegister();
         // Conservative assumption, flush stack
         vstack.push(eContext);
         key.release(eContext);
@@ -2816,8 +2816,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         L1AHelper.requestRegister(eContext, ECX, v2);
         v2.loadTo(eContext, ECX);
         v1.load(eContext);
-        final Register v1_lsb = v1.getLsbRegister();
-        final Register v1_msb = v1.getMsbRegister();
+        final X86Register v1_lsb = v1.getLsbRegister();
+        final X86Register v1_msb = v1.getMsbRegister();
 
         os.writeAND(ECX, 63);
         os.writeCMP_Const(ECX, 32);
@@ -2857,8 +2857,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 
         // Load val
         val.load(eContext);
-        final Register lsb = val.getLsbRegister();
-        final Register msb = val.getMsbRegister();
+        final X86Register lsb = val.getLsbRegister();
+        final X86Register msb = val.getMsbRegister();
 
         // Calculate
         os.writeAND(ECX, 63);
@@ -2919,8 +2919,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 
         // Load val
         val.load(eContext);
-        final Register lsb = val.getLsbRegister();
-        final Register msb = val.getMsbRegister();
+        final X86Register lsb = val.getLsbRegister();
+        final X86Register msb = val.getMsbRegister();
 
         // Calculate
         os.writeAND(ECX, 63);
@@ -2996,7 +2996,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         os.writePUSH(dimensions); /* elements */
         invokeJavaMethod(context.getAllocPrimitiveArrayMethod());
         final RefItem dims = vstack.popRef();
-        final Register dimsr = dims.getRegister();
+        final X86Register dimsr = dims.getRegister();
         // Dimension array is now in dimsr
 
         // Pop all dimensions (note the reverse order that allocMultiArray
@@ -3009,7 +3009,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         }
 
         // Allocate tmp register
-        final Register classr = L1AHelper.requestRegister(eContext,
+        final X86Register classr = L1AHelper.requestRegister(eContext,
                 JvmType.REFERENCE, false);
 
         // Resolve the array class
@@ -3037,7 +3037,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         vstack.push(eContext);
 
         // Allocate tmp register
-        final Register classr = L1AHelper.requestRegister(eContext,
+        final X86Register classr = L1AHelper.requestRegister(eContext,
                 JvmType.REFERENCE, false);
 
         writeResolveAndLoadClassToReg(classRef, classr);
@@ -3118,17 +3118,17 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         // Load value & ref
         val.load(eContext);
         ref.load(eContext);
-        final Register refr = ref.getRegister();
+        final X86Register refr = ref.getRegister();
 
         if (!wide) {
             final WordItem wval = (WordItem) val;
-            final Register valr = wval.getRegister();
+            final X86Register valr = wval.getRegister();
 
             // Store field
             os.writeMOV(INTSIZE, refr, offset, valr);
             // Writebarrier
             if (!inf.isPrimitive() && helper.needsWriteBarrier()) {
-                final Register tmp = L1AHelper.requestRegister(eContext,
+                final X86Register tmp = L1AHelper.requestRegister(eContext,
                         JvmType.INT, false);
                 helper.writePutfieldWriteBarrier(inf, refr, valr, tmp);
                 L1AHelper.releaseRegister(eContext, tmp);
@@ -3154,7 +3154,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 
         // Initialize class if needed
         if (!sf.getDeclaringClass().isInitialized()) {
-            final Register tmp = L1AHelper.requestRegister(eContext,
+            final X86Register tmp = L1AHelper.requestRegister(eContext,
                     JvmType.INT, false);
             writeInitializeClass(fieldRef, tmp);
             L1AHelper.releaseRegister(eContext, tmp);
@@ -3167,11 +3167,11 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         // Put static field
         if (!fieldRef.isWide()) {
             final WordItem wval = (WordItem) val;
-            final Register valr = wval.getRegister();
+            final X86Register valr = wval.getRegister();
 
             helper.writePutStaticsEntry(curInstrLabel, valr, sf);
             if (!sf.isPrimitive() && helper.needsWriteBarrier()) {
-                final Register tmp = L1AHelper.requestRegister(eContext,
+                final X86Register tmp = L1AHelper.requestRegister(eContext,
                         JvmType.INT, false);
                 helper.writePutstaticWriteBarrier(sf, valr, tmp);
                 L1AHelper.releaseRegister(eContext, tmp);
@@ -3255,7 +3255,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         //IMPROVE: check Jaos implementation
         final IntItem val = vstack.popInt();
         val.load(eContext);
-        final Register valr = val.getRegister();
+        final X86Register valr = val.getRegister();
         vstack.push(eContext);
 
         final int n = addresses.length;
@@ -3317,7 +3317,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 
         // Create result
         final WordItem result;
-        final Register resultr;
+        final X86Register resultr;
         if (isfloat) {
             result = (WordItem)ifac.createFPUStack(JvmType.FLOAT);
             resultr = null;
@@ -3330,7 +3330,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         // Load
         idx.loadIf(eContext, ~Item.Kind.CONSTANT);
         ref.load(eContext);
-        final Register refr = ref.getRegister();
+        final X86Register refr = ref.getRegister();
 
         // Verify
         checkBounds(ref, idx);
@@ -3352,7 +3352,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
                 os.writeMOV(valSize, resultr, refr, offset + arrayDataOffset);
             }
         } else {
-            final Register idxr = idx.getRegister();
+            final X86Register idxr = idx.getRegister();
             if (isfloat) {
                 os.writeFLD32(refr, idxr, scale, arrayDataOffset);
             } else {
@@ -3442,8 +3442,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         }
         idx.loadIf(eContext, ~Item.Kind.CONSTANT | extraLoadIdxMask);
         ref.load(eContext);
-        final Register refr = ref.getRegister();
-        final Register valr = val.getRegister();
+        final X86Register refr = ref.getRegister();
+        final X86Register valr = val.getRegister();
 
         // Verify
         checkBounds(ref, idx);
@@ -3453,7 +3453,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             final int offset = idx.getValue() * scale;
             os.writeMOV(valSize, refr, offset + arrayDataOffset, valr);
         } else {
-            final Register idxr = idx.getRegister();
+            final X86Register idxr = idx.getRegister();
             os.writeMOV(valSize, refr, idxr, scale, arrayDataOffset, valr);
         }
 
@@ -3462,8 +3462,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             // the write barrier could easily be modified to avoid using a
             // scratch register
             final X86RegisterPool pool = eContext.getPool();
-            final Register idxr = idx.getRegister();
-            final Register scratch = pool.request(JvmType.INT);
+            final X86Register idxr = idx.getRegister();
+            final X86Register scratch = pool.request(JvmType.INT);
             helper.writeArrayStoreWriteBarrier(refr, idxr, valr, scratch);
             pool.release(scratch);
         }
@@ -3502,7 +3502,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @param scratch
      */
     private final void writeInitializeClass(VmConstFieldRef fieldRef,
-            Register scratch) {
+            X86Register scratch) {
         // Get fieldRef via constantpool to avoid direct object references in
         // the native code
 
@@ -3539,7 +3539,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @param lsbReg
      * @param msbReg
      */
-    private final void writePOP64(Register lsbReg, Register msbReg) {
+    private final void writePOP64(X86Register lsbReg, X86Register msbReg) {
         os.writePOP(lsbReg);
         os.writePOP(msbReg);
     }
@@ -3551,7 +3551,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @param classRef
      */
     private final void writeResolveAndLoadClassToReg(VmConstClass classRef,
-            Register dst) {
+            X86Register dst) {
         // Resolve the class
         classRef.resolve(loader);
         final VmType type = classRef.getResolvedVmClass();
@@ -3602,7 +3602,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         } else {
             // Load into register
             val.load(eContext);
-            final Register valr = val.getRegister();
+            final X86Register valr = val.getRegister();
             // Store
             os.writeMOV(INTSIZE, FP, disp, valr);
         }

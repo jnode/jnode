@@ -22,7 +22,7 @@
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
@@ -37,7 +37,7 @@ final class IntItem extends WordItem implements X86CompilerConstants {
 
 	private int value;
 
-	final void initialize(int kind, int offsetToFP, Register reg, int value) {
+	final void initialize(int kind, int offsetToFP, X86Register reg, int value) {
 		super.initialize(kind, reg, offsetToFP);
 		this.value = value;
 	}
@@ -74,7 +74,7 @@ final class IntItem extends WordItem implements X86CompilerConstants {
 	 * @param reg
 	 */
 	protected void loadToConstant(EmitterContext ec, AbstractX86Stream os,
-			Register reg) {
+			X86Register reg) {
 		if (value != 0) {
 			os.writeMOV_Const(reg, value);
 		} else {
@@ -89,7 +89,7 @@ final class IntItem extends WordItem implements X86CompilerConstants {
 	 * @param reg
 	 * @param disp
 	 */
-	protected void popFromFPU(AbstractX86Stream os, Register reg, int disp) {
+	protected void popFromFPU(AbstractX86Stream os, X86Register reg, int disp) {
 		os.writeFISTP32(reg, disp);
 	}
 
@@ -109,7 +109,7 @@ final class IntItem extends WordItem implements X86CompilerConstants {
 	 * @param reg
 	 * @param disp
 	 */
-	protected void pushToFPU(AbstractX86Stream os, Register reg, int disp) {
+	protected void pushToFPU(AbstractX86Stream os, X86Register reg, int disp) {
 		os.writeFILD32(reg, disp);
 	}
 }

@@ -22,7 +22,7 @@
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
@@ -33,9 +33,9 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 public abstract class DoubleWordItem extends Item implements
         X86CompilerConstants {
 
-    private Register lsb;
+    private X86Register lsb;
 
-    private Register msb;
+    private X86Register msb;
 
     /**
      * Initialize a blank item.
@@ -50,8 +50,8 @@ public abstract class DoubleWordItem extends Item implements
      * @param lsb
      * @param msb
      */
-    protected final void initialize(int kind, int offsetToFP, Register lsb,
-            Register msb) {
+    protected final void initialize(int kind, int offsetToFP, X86Register lsb,
+            X86Register msb) {
         super.initialize(kind, offsetToFP);
         this.lsb = lsb;
         this.msb = msb;
@@ -67,8 +67,8 @@ public abstract class DoubleWordItem extends Item implements
         switch (getKind()) {
         case Kind.REGISTER:
             res = L1AHelper.requestDoubleWordRegisters(ec, getType());
-            final Register lsb = res.getLsbRegister();
-            final Register msb = res.getMsbRegister();
+            final X86Register lsb = res.getLsbRegister();
+            final X86Register msb = res.getMsbRegister();
             os.writeMOV(INTSIZE, lsb, this.lsb);
             os.writeMOV(INTSIZE, msb, this.msb);
             break;
@@ -132,7 +132,7 @@ public abstract class DoubleWordItem extends Item implements
      * 
      * @return
      */
-    final Register getLsbRegister() {
+    final X86Register getLsbRegister() {
         if (Vm.VerifyAssertions) Vm._assert(kind == Kind.REGISTER, "kind == Kind.REGISTER");
         return lsb;
     }
@@ -152,7 +152,7 @@ public abstract class DoubleWordItem extends Item implements
      * 
      * @return
      */
-    final Register getMsbRegister() {
+    final X86Register getMsbRegister() {
         if (Vm.VerifyAssertions) Vm._assert(kind == Kind.REGISTER, "kind == Kind.REGISTER");
         return msb;
     }
@@ -176,13 +176,13 @@ public abstract class DoubleWordItem extends Item implements
         if (kind != Kind.REGISTER) {
             X86RegisterPool pool = ec.getPool();
 
-            Register l = pool.request(JvmType.INT, this);
+            X86Register l = pool.request(JvmType.INT, this);
             if (l == null) {
                 final VirtualStack vstack = ec.getVStack();
                 vstack.push(ec);
                 l = pool.request(JvmType.INT, this);
             }
-            Register r = pool.request(JvmType.INT, this);
+            X86Register r = pool.request(JvmType.INT, this);
             if (r == null) {
                 final VirtualStack vstack = ec.getVStack();
                 vstack.push(ec);
@@ -201,7 +201,7 @@ public abstract class DoubleWordItem extends Item implements
      * @param lsb
      * @param msb
      */
-    final void loadTo(EmitterContext ec, Register lsb, Register msb) {
+    final void loadTo(EmitterContext ec, X86Register lsb, X86Register msb) {
         final AbstractX86Stream os = ec.getStream();
         final X86RegisterPool pool = ec.getPool();
         final VirtualStack stack = ec.getVStack();
@@ -303,7 +303,7 @@ public abstract class DoubleWordItem extends Item implements
      * @param msb
      */
     protected abstract void loadToConstant(EmitterContext ec,
-            AbstractX86Stream os, Register lsb, Register msb);
+            AbstractX86Stream os, X86Register lsb, X86Register msb);
 
     /**
      * Load this item to a general purpose register tuple.
@@ -312,13 +312,13 @@ public abstract class DoubleWordItem extends Item implements
      */
     final void loadToGPR(EmitterContext ec) {
         if (kind != Kind.REGISTER) {
-            Register lsb = ec.getPool().request(JvmType.INT);
+            X86Register lsb = ec.getPool().request(JvmType.INT);
             if (lsb == null) {
                 ec.getVStack().push(ec);
                 lsb = ec.getPool().request(JvmType.INT);
             }
             if (Vm.VerifyAssertions) Vm._assert(lsb != null, "lsb != null");
-            Register msb = ec.getPool().request(JvmType.INT);
+            X86Register msb = ec.getPool().request(JvmType.INT);
             if (msb == null) {
                 ec.getVStack().push(ec);
                 msb = ec.getPool().request(JvmType.INT);
@@ -335,7 +335,7 @@ public abstract class DoubleWordItem extends Item implements
      * @param reg
      * @param disp
      */
-    protected abstract void popFromFPU(AbstractX86Stream os, Register reg,
+    protected abstract void popFromFPU(AbstractX86Stream os, X86Register reg,
             int disp);
 
     /**
@@ -406,7 +406,7 @@ public abstract class DoubleWordItem extends Item implements
      * @param reg
      * @param disp
      */
-    protected abstract void pushToFPU(AbstractX86Stream os, Register reg,
+    protected abstract void pushToFPU(AbstractX86Stream os, X86Register reg,
             int disp);
 
     /**
@@ -500,8 +500,8 @@ public abstract class DoubleWordItem extends Item implements
         this.kind = 0;
     }
 
-    private final Register request(EmitterContext ec, X86RegisterPool pool) {
-        final Register r = pool.request(JvmType.INT);
+    private final X86Register request(EmitterContext ec, X86RegisterPool pool) {
+        final X86Register r = pool.request(JvmType.INT);
         if (Vm.VerifyAssertions) Vm._assert(r != null, "r != null");
         return r;
     }
@@ -509,7 +509,7 @@ public abstract class DoubleWordItem extends Item implements
     /**
      * @see org.jnode.vm.x86.compiler.l1a.Item#spill(EmitterContext, Register)
      */
-    final void spill(EmitterContext ec, Register reg) {
+    final void spill(EmitterContext ec, X86Register reg) {
         if (Vm.VerifyAssertions) Vm._assert((getKind() == Kind.REGISTER)
                 && ((this.lsb == reg) || (this.msb == reg)), "spill1");
         ec.getVStack().push(ec);
@@ -518,8 +518,8 @@ public abstract class DoubleWordItem extends Item implements
         }
 
         final X86RegisterPool pool = ec.getPool();
-        final Register newLsb = request(ec, pool);
-        final Register newMsb = request(ec, pool);
+        final X86Register newLsb = request(ec, pool);
+        final X86Register newMsb = request(ec, pool);
         loadTo(ec, newLsb, newMsb);
         pool.transferOwnerTo(newLsb, this);
         pool.transferOwnerTo(newMsb, this);
@@ -528,7 +528,7 @@ public abstract class DoubleWordItem extends Item implements
     /**
      * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
      */
-    final boolean uses(Register reg) {
+    final boolean uses(X86Register reg) {
         return ((kind == Kind.REGISTER) && (msb.equals(reg) || lsb.equals(reg)));
     }
 

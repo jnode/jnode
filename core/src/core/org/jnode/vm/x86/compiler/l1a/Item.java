@@ -21,7 +21,7 @@
  
 package org.jnode.vm.x86.compiler.l1a;
 
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.util.Counter;
 import org.jnode.vm.Vm;
 
@@ -264,12 +264,12 @@ abstract class Item {
 	 * @param reg
 	 *            the register to be spilled
 	 */
-	abstract void spill(EmitterContext ec, Register reg);
+	abstract void spill(EmitterContext ec, X86Register reg);
 
 	/**
 	 * Spill this item if it uses the given register.
 	 */
-	final void spillIfUsing(EmitterContext ec, Register reg) {
+	final void spillIfUsing(EmitterContext ec, X86Register reg) {
 		if (uses(reg)) {
 			spill(ec, reg);
 		}
@@ -281,7 +281,7 @@ abstract class Item {
 	 * @param reg
 	 * @return true, when reg is used by this item
 	 */
-	abstract boolean uses(Register reg);
+	abstract boolean uses(X86Register reg);
 
 	/**
 	 * enquire whether the item uses a volatile register

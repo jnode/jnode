@@ -21,7 +21,7 @@
  
 package org.jnode.vm.x86.compiler;
 
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.*;
 
 
@@ -36,7 +36,7 @@ public interface AbstractX86StackManager {
 	 * @param reg
 	 * @see JvmType
 	 */
-	public void writePUSH(int jvmType, Register reg);
+	public void writePUSH(int jvmType, X86Register reg);
 
 	/**
 	 * Write code to push a 64-bit word on the stack
@@ -45,5 +45,5 @@ public interface AbstractX86StackManager {
 	 * @param msbReg
 	 * @see JvmType
 	 */
-	public void writePUSH64(int jvmType, Register lsbReg, Register msbReg);
+	public void writePUSH64(int jvmType, X86Register lsbReg, X86Register msbReg);
 }

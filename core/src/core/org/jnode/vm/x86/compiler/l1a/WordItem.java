@@ -22,7 +22,7 @@
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
@@ -32,13 +32,13 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
  */
 public abstract class WordItem extends Item implements X86CompilerConstants {
 
-    private Register reg;
+    private X86Register reg;
 
     protected WordItem(ItemFactory factory) {
         super(factory);
     }
 
-    protected final void initialize(int kind, Register reg, int local) {
+    protected final void initialize(int kind, X86Register reg, int local) {
         super.initialize(kind, local);
         this.reg = reg;
         if (Vm.VerifyAssertions)
@@ -56,7 +56,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
         switch (getKind()) {
         case Kind.REGISTER:
             res = L1AHelper.requestWordRegister(ec, getType(), false);
-            final Register r = res.getRegister();
+            final X86Register r = res.getRegister();
             os.writeMOV(INTSIZE, r, reg);
             break;
 
@@ -75,7 +75,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
             break;
 
         case Kind.STACK:
-            os.writePUSH(Register.SP, 0);
+            os.writePUSH(X86Register.SP, 0);
             res = (WordItem) factory.createStack(getType());
             if (VirtualStack.checkOperandStack) {
                 final ItemStack operandStack = ec.getVStack().operandStack;
@@ -103,7 +103,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      * 
      * @return The register that contains this item
      */
-    final Register getRegister() {
+    final X86Register getRegister() {
         if (Vm.VerifyAssertions)
             Vm._assert(kind == Kind.REGISTER, "Must be register");
         return reg;
@@ -115,7 +115,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
     final void load(EmitterContext ec) {
         if (kind != Kind.REGISTER) {
             final X86RegisterPool pool = ec.getPool();
-            Register r = pool.request(getType(), this);
+            X86Register r = pool.request(getType(), this);
             if (r == null) {
                 final VirtualStack vstack = ec.getVStack();
                 vstack.push(ec);
@@ -135,7 +135,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      * @param reg
      *            register to load the item to
      */
-    final void loadTo(EmitterContext ec, Register reg) {
+    final void loadTo(EmitterContext ec, X86Register reg) {
         if (Vm.VerifyAssertions)
             Vm._assert(reg != null, "Reg != null");
         final AbstractX86Stream os = ec.getStream();
@@ -192,7 +192,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      * @param reg
      */
     protected abstract void loadToConstant(EmitterContext ec,
-            AbstractX86Stream os, Register reg);
+            AbstractX86Stream os, X86Register reg);
 
     /**
      * Load this item to a general purpose register.
@@ -201,7 +201,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      */
     final void loadToGPR(EmitterContext ec) {
         if (kind != Kind.REGISTER) {
-            Register r = ec.getPool().request(JvmType.INT);
+            X86Register r = ec.getPool().request(JvmType.INT);
             if (r == null) {
                 ec.getVStack().push(ec);
                 r = ec.getPool().request(JvmType.INT);
@@ -220,7 +220,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
     final void loadToBITS8GPR(EmitterContext ec) {
         if (!isRegister() || !reg.isSuitableForBits8()) {
             final X86RegisterPool pool = ec.getPool();
-            Register r = pool.request(JvmType.INT, this, true);
+            X86Register r = pool.request(JvmType.INT, this, true);
             if (r == null) {
                 ec.getVStack().push(ec);
                 r = ec.getPool().request(JvmType.INT, this, true);
@@ -238,7 +238,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      * @param t0
      *            the destination register
      */
-    final void loadToIf(EmitterContext ec, int mask, Register t0) {
+    final void loadToIf(EmitterContext ec, int mask, X86Register t0) {
         if ((getKind() & mask) > 0)
             loadTo(ec, t0);
     }
@@ -250,7 +250,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      * @param reg
      * @param disp
      */
-    protected abstract void popFromFPU(AbstractX86Stream os, Register reg,
+    protected abstract void popFromFPU(AbstractX86Stream os, X86Register reg,
             int disp);
 
     /**
@@ -318,7 +318,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      * @param reg
      * @param disp
      */
-    protected abstract void pushToFPU(AbstractX86Stream os, Register reg,
+    protected abstract void pushToFPU(AbstractX86Stream os, X86Register reg,
             int disp);
 
     /**
@@ -419,12 +419,12 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
     /**
      * @see org.jnode.vm.x86.compiler.l1a.Item#spill(EmitterContext, Register)
      */
-    final void spill(EmitterContext ec, Register reg) {
+    final void spill(EmitterContext ec, X86Register reg) {
         if (Vm.VerifyAssertions)
             Vm._assert((getKind() == Kind.REGISTER) && (this.reg == reg),
                     "spill1");
         final X86RegisterPool pool = ec.getPool();
-        Register r = pool.request(getType());
+        X86Register r = pool.request(getType());
         if (r == null) {
             int cnt = ec.getVStack().push(ec);
             if (getKind() == Kind.STACK) {
@@ -442,7 +442,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
     /**
      * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
      */
-    final boolean uses(Register reg) {
+    final boolean uses(X86Register reg) {
         return ((kind == Kind.REGISTER) && this.reg.equals(reg));
     }
 

@@ -21,7 +21,7 @@
  
 package org.jnode.vm.x86.compiler.l1a;
 
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.bytecode.StackException;
 
 /**
@@ -29,9 +29,9 @@ import org.jnode.vm.bytecode.StackException;
  */
 final class FPUStack extends ItemStack {
 
-    private static final Register[] REGS = { Register.ST0, Register.ST1,
-            Register.ST2, Register.ST3, Register.ST4, Register.ST5,
-            Register.ST6, Register.ST7};
+    private static final X86Register[] REGS = { X86Register.ST0, X86Register.ST1,
+            X86Register.ST2, X86Register.ST3, X86Register.ST4, X86Register.ST5,
+            X86Register.ST6, X86Register.ST7};
 
     /**
      * Initialize this instance.
@@ -43,11 +43,11 @@ final class FPUStack extends ItemStack {
     /**
      * Gets the FPU register that contains the given item.
      * 
-     * @see org.jnode.assembler.x86.Register#ST1
+     * @see org.jnode.assembler.x86.X86Register#ST1
      * @param item
      * @return
      */
-    final Register getRegister(Item item) {
+    final X86Register getRegister(Item item) {
         for (int i = 0; i < tos; i++) {
             if (stack[ tos - (i + 1)] == item) { return REGS[ i]; }
         }
@@ -57,7 +57,7 @@ final class FPUStack extends ItemStack {
     /**
      * Gets the item that is contained in the given register.
      */
-    final Item getItem(Register fpuReg) {
+    final Item getItem(X86Register fpuReg) {
         final int idx = tos-(fpuReg.getNr() + 1);
         return stack[idx];
     }
@@ -66,7 +66,7 @@ final class FPUStack extends ItemStack {
      * Swap the top of the stack (ST0) with the given FPU reg.
      * @param fpuReg
      */
-    final void fxch(Register fpuReg) {
+    final void fxch(X86Register fpuReg) {
         final int idx1 = tos-1;
         final int idx2 = tos-(fpuReg.getNr() + 1);
         final Item tmp = stack[idx1];

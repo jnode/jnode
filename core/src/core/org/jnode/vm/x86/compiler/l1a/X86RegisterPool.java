@@ -22,7 +22,7 @@
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.JvmType;
 
 /**
@@ -59,11 +59,11 @@ final class X86RegisterPool {
 		// The order of this array determines the cost of using the register.
 		// The cost of a register is lower when its index in this
 		// array is higher.
-		return new RegisterUsage[] { new RegisterUsage(Register.EAX, false),
-				new RegisterUsage(Register.EDX, false),
-				new RegisterUsage(Register.ECX, false),
-				new RegisterUsage(Register.EBX, false),
-				new RegisterUsage(Register.ESI, false) };
+		return new RegisterUsage[] { new RegisterUsage(X86Register.EAX, false),
+				new RegisterUsage(X86Register.EDX, false),
+				new RegisterUsage(X86Register.ECX, false),
+				new RegisterUsage(X86Register.EBX, false),
+				new RegisterUsage(X86Register.ESI, false) };
 		// EDI always points to the statics, do not use
 	}
 
@@ -76,7 +76,7 @@ final class X86RegisterPool {
 	 *            the register owner
 	 * @return the allocated register or null
 	 */
-	public Register request(int type, Object owner) {
+	public X86Register request(int type, Object owner) {
 		return request(type, owner, false);
 	}
 
@@ -89,7 +89,7 @@ final class X86RegisterPool {
 	 *            the register owner
 	 * @return the allocated register or null
 	 */
-	public Register request(int type, Object owner, boolean supportBits8) {
+	public X86Register request(int type, Object owner, boolean supportBits8) {
 		if (type == JvmType.LONG || type == JvmType.DOUBLE) {
 			return null;
 		}
@@ -108,14 +108,14 @@ final class X86RegisterPool {
 	/**
 	 * @see org.jnode.vm.compiler.ir.RegisterPool#request(int)
 	 */
-	public Register request(int type) {
+	public X86Register request(int type) {
 		return request(type, null, false);
 	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.RegisterPool#request(int)
 	 */
-	public Register request(int type, boolean supportsBits8) {
+	public X86Register request(int type, boolean supportsBits8) {
 		return request(type, null, supportsBits8);
 	}
 
@@ -125,7 +125,7 @@ final class X86RegisterPool {
 	 * @param register
 	 * @return true, when register is free
 	 */
-	public boolean isFree(Register register) {
+	public boolean isFree(X86Register register) {
 		return get(register).isFree();
 	}
 
@@ -135,7 +135,7 @@ final class X86RegisterPool {
 	 * @param register
 	 * @return true, when register is to be saved by a called method
 	 */
-	public boolean isCallerSaved(Register register) {
+	public boolean isCallerSaved(X86Register register) {
 		return get(register).isCallerSaved();
 	}
 
@@ -145,7 +145,7 @@ final class X86RegisterPool {
 	 * @param register
 	 * @return false, if the register is already in use
 	 */
-	public boolean request(Register register, Object owner) {
+	public boolean request(X86Register register, Object owner) {
 		final RegisterUsage ru = get(register);
 		final boolean free = ru.isFree();
 		if (free) {
@@ -160,7 +160,7 @@ final class X86RegisterPool {
 	 * @param register
 	 * @return false, if the register is already in use
 	 */
-	public boolean request(Register register) {
+	public boolean request(X86Register register) {
 		return request(register, null);
 	}
 
@@ -170,7 +170,7 @@ final class X86RegisterPool {
 	 * @param register
 	 * @return the owner (may be null if not set or when register not allocated)
 	 */
-	public Object getOwner(Register register) {
+	public Object getOwner(X86Register register) {
 		return get(register).getOwner();
 	}
 
@@ -182,14 +182,14 @@ final class X86RegisterPool {
 	 * @param newOwner
 	 *            the register's new owner
 	 */
-	public void transferOwnerTo(Register register, Object newOwner) {
+	public void transferOwnerTo(X86Register register, Object newOwner) {
 		get(register).setOwner(newOwner);
 	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.RegisterPool#release(java.lang.Object)
 	 */
-	public void release(Register register) {
+	public void release(X86Register register) {
 		get(register).release();
 	}
 
@@ -218,7 +218,7 @@ final class X86RegisterPool {
 	 * @param reg
 	 * @return
 	 */
-	private RegisterUsage get(Register reg) {
+	private RegisterUsage get(X86Register reg) {
 		for (int i = regCount - 1; i >= 0; i--) {
 			final RegisterUsage ru = registers[i];
 			if (ru.reg == reg) {
@@ -262,7 +262,7 @@ final class X86RegisterPool {
 	 * @author Ewout Prangsma (epr@users.sourceforge.net)
 	 */
 	private static final class RegisterUsage {
-		final Register reg;
+		final X86Register reg;
 
 		private Object owner;
 
@@ -275,7 +275,7 @@ final class X86RegisterPool {
 		 * 
 		 * @param reg
 		 */
-		public RegisterUsage(Register reg, boolean callerSaved) {
+		public RegisterUsage(X86Register reg, boolean callerSaved) {
 			this.reg = reg;
 			this.inuse = false;
 			this.callerSaved = callerSaved;

@@ -22,7 +22,7 @@
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
-import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 
@@ -45,7 +45,7 @@ final class FloatItem extends WordItem {
 	 * @param offsetToFP
 	 * @param value
 	 */
-	final void initialize(int kind, int offsetToFP, Register reg, float value) {
+	final void initialize(int kind, int offsetToFP, X86Register reg, float value) {
 		super.initialize(kind, reg, offsetToFP);
 		this.value = value;
 	}
@@ -83,7 +83,7 @@ final class FloatItem extends WordItem {
 	 * @param reg
 	 */
 	protected void loadToConstant(EmitterContext ec, AbstractX86Stream os,
-			Register reg) {
+			X86Register reg) {
 		os.writeMOV_Const(reg, Float.floatToIntBits(value));
 	}
 
@@ -94,7 +94,7 @@ final class FloatItem extends WordItem {
 	 * @param reg
 	 * @param disp
 	 */
-	protected void popFromFPU(AbstractX86Stream os, Register reg, int disp) {
+	protected void popFromFPU(AbstractX86Stream os, X86Register reg, int disp) {
 		os.writeFSTP32(reg, disp);
 	}
 
@@ -114,7 +114,7 @@ final class FloatItem extends WordItem {
 	 * @param reg
 	 * @param disp
 	 */
-	protected void pushToFPU(AbstractX86Stream os, Register reg, int disp) {
+	protected void pushToFPU(AbstractX86Stream os, X86Register reg, int disp) {
 		os.writeFLD32(reg, disp);
 	}
 }
