@@ -71,6 +71,9 @@ public final class Inet4Address extends InetAddress {
 	protected Inet4Address(byte[] addr, String host) {
 		super(addr, host);
 	}
+	protected Inet4Address(byte[] addr) {
+		this(addr, null);
+	}
 
 	/**
 	 * Checks if the address is a multicast address

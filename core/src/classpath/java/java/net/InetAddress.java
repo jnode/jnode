@@ -329,7 +329,7 @@ public class InetAddress implements Serializable {
                     break;
                 }
             }
-            if (i == 4) { return (new InetAddress(ip)); }
+            if (i == 4) { return (new Inet4Address(ip)); }
         }
 
         // Wasn't an IP, so try the lookup
