@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.protocol.ftp" 
+        name="JNode FTP protocol handler"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.net.ipv4"/>
+    <import plugin="org.apache.jakarta.commons.net"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-net.jar">
+      <export name="org.jnode.protocol.ftp.*"/>
+    </library>
+  </runtime>
+        
+</plugin>
