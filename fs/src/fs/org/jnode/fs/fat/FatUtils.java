@@ -5,7 +5,6 @@ package org.jnode.fs.fat;
 
 import org.apache.log4j.Logger;
 import org.jnode.fs.util.DosUtils;
-import org.jnode.fs.util.FSUtils;
 
 /**
  * <description>
