@@ -85,5 +85,4 @@ public class BlockBitmap extends FSBitmap {
 		
 		return new BlockReservation(false, -1, -1);
 	}
-
 }

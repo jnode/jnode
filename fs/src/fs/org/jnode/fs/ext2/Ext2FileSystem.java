@@ -530,10 +530,12 @@ public class Ext2FileSystem extends AbstractFileSystem {
 			if(result.isSuccessful()) {
 				writeBlock(groupDescriptors[group].getBlockBitmap(), bitmap, false);
 				modifyFreeBlocksCount(group, -1-result.getPreallocCount());
-				result.setBlock( result.getBlock()+superblock.getFirstDataBlock() );
+				//result.setBlock( result.getBlock()+superblock.getFirstDataBlock() );
+				result.setBlock(blockNr);
 			}
 			return result;
 		}
+
 	}
 	
 	/**

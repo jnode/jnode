@@ -376,7 +376,7 @@ public class INode {
 				tripleIndirectBlockNr = findFreeBlock(allocatedBlocks++);
 				Ext2Utils.set32(data, 40+13*4, tripleIndirectBlockNr);
 
-log.info("reserved triple indirect block: "+tripleIndirectBlockNr);
+				//log.debug("reserved triple indirect block: "+tripleIndirectBlockNr);
 
 				//need to blank the block so that e2fsck does not complain
 				byte[] zeroes=new byte[fs.getBlockSize()];	//blank the block
