@@ -53,6 +53,7 @@ import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmMethodCode;
+import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.classmgr.VmType;
@@ -99,6 +100,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * optimized compilation
      */
     private final HashSet compileHighOptLevelPackages = new HashSet();
+    private final HashSet preloadPackages = new HashSet();
 
     protected boolean debug = false;
 
@@ -136,6 +138,10 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
     protected final void addCompileHighOptLevel(String name) {
         compileHighOptLevelPackages.add(name);
+    }
+
+    protected final void addPreloadPackage(String name) {
+        preloadPackages.add(name);
     }
 
     protected void cleanup() {
@@ -871,6 +877,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
                 if (compileHighOptLevelPackages.contains(cName)) {
                     load = true;
+                } else if (preloadPackages.contains(cName)) {
+                	load = true;
                 }
 
                 final int lastDotIdx = cName.lastIndexOf('.');
@@ -879,6 +887,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
                 if (compileHighOptLevelPackages.contains(pkg)) {
                     load = true;
+                } else if (preloadPackages.contains(pkg)) {
+                	load = true;
                 }
 
                 if (load) {
@@ -935,6 +945,18 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                         w.print(", ");
                         w.print(cnt);
                         w.print(" instances");
+                        if (vmClass instanceof VmNormalClass) {
+                        	long objSize = ((VmNormalClass)vmClass).getObjectSize();
+                        	long totalSize = objSize * cnt;
+                            w.print(", ");
+                        	w.print(objSize);
+                            w.print(" objsize ");
+                        	w.print(totalSize);
+                            w.print(" totsize");
+                            if (totalSize > 200000) {
+                            	log(vmClass.getName() + " is large (" + totalSize + " , #" + cnt + ")", Project.MSG_WARN);
+                            }
+                        }
                     }
                 }
                 if (vmClass.isArray()) {
@@ -946,6 +968,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                         w.print(len
                                 / ((VmArrayClass) vmClass).getInstanceCount());
                         w.print(" avg length ");
+                        w.print(((VmArrayClass)vmClass).getMaximumLength());
+                        w.print(" max length ");
                     }
                 }
                 int cnt = vmClass.getNoInterfaces();
@@ -1140,6 +1164,21 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("org.jnode.vm.compiler.ir.quad");
         addCompileHighOptLevel("org.jnode.vm.memmgr");
         addCompileHighOptLevel("org.jnode.vm.memmgr.def");
+        
+        if (true) {
+        	addPreloadPackage("java.awt");
+        	addPreloadPackage("java.awt.event");
+        	addPreloadPackage("java.awt.peer");
+        	addPreloadPackage("java.awt.font");
+        	addPreloadPackage("java.awt.geom");
+        	
+        	addPreloadPackage("javax.swing");
+        	addPreloadPackage("javax.swing.border");
+        	addPreloadPackage("javax.swing.event");
+        	addPreloadPackage("javax.swing.plaf");
+        	addPreloadPackage("javax.swing.plaf.basic");
+        	addPreloadPackage("javax.swing.plaf.metal");
+        }
     }
 
     /**
