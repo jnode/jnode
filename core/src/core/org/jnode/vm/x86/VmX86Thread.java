@@ -49,10 +49,12 @@ public final class VmX86Thread extends VmThread {
 	volatile Address ebp;
 	
 	private static final int FXSTATE_SIZE = 512+16;
+	public static final int FXF_USED = 0x01; // FX has been used since last thread switch
 	
 	// Saved state of FPU & XMM
 	private final byte[] fxState;
 	private volatile Address fxStatePtr;	// This value is set in assembler code
+	private volatile int fxFlags;
 	
 	// State upon last system exception
 	volatile int exEax;

@@ -21,7 +21,7 @@ test_cpuid:
 	pushf
 	pop eax			; Get new eflags back
 	xor eax,ecx		; Should be different, so != 0
-	jz no_cpuid
+	jz near no_cpuid
 	; Now execute cpuid
 	mov eax,1
 	cpuid
@@ -29,9 +29,9 @@ test_cpuid:
 	mov [cpu_features],edx
 	; Test for FPU, PSE
 	test edx,FEAT_FPU
-	jz no_fpu_feat
+	jz near no_fpu_feat
 	test edx,FEAT_PSE
-	jz no_pse_feat
+	jz near no_pse_feat
 	; Done
 	popa
 	ret
@@ -45,10 +45,14 @@ init_fpu:
 	or word [esp], 0x0C00
 	fldcw [esp]
 	lea esp,[esp+4]
+	mov eax,cr0
+	or eax,CR0_MP			; Enable monitoring FPU 
+	mov eax,cr0
 	ret
 	
 ; Initialize SSE (if any)
 init_sse:
+	; Test for SSE feature
 	test dword [cpu_features], FEAT_SSE
 	jz no_sse
 	mov eax,cr4
@@ -59,6 +63,19 @@ init_sse:
 	and eax,~CR0_EM			; Disable fpu emulation (we don't need it anyway)
 	or eax,CR0_MP			; Enable monitoring FPU 
 	mov eax,cr0
+	; Setup MXCSR
+	lea esp,[esp-4]
+	stmxcsr [esp]
+	pop eax
+	or eax,MXCSR_IM			; Disable invalid operation exception
+	or eax,MXCSR_DM			; Disable denormalized operand exception
+	and eax,~MXCSR_ZM		; Enable zero-divide exception
+	or eax,MXCSR_OM			; Disable overflow exception
+	or eax,MXCSR_UM			; Disable underflow exception
+	or eax,MXCSR_PM			; Disable precision exception
+	push eax
+	ldmxcsr [esp]					
+	lea esp,[esp+4]
 	ret
 	
 no_sse:

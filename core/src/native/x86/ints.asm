@@ -299,7 +299,7 @@ int_noerror int_bp, 3			; Breakpoint
 int_noerror int_of, 4			; Overflow
 int_noerror int_bc, 5			; Bounds check
 int_noerror int_inv_oc, 6		; Invalid opcode
-int_noerror int_copro_na, 7		; Coprocessor not available
+int_noerror int_dev_na, 7		; Device not available
 int_error   int_df, 8			; Double fault
 int_noerror int_copro_or, 9		; Coprocessor overrun
 int_error   int_inv_tss, 10		; Invalid TSS
@@ -394,7 +394,7 @@ Lsetup_idt:
 	intport 4, int_of			; Overflow
 	intport 5, int_bc, 3		; Bounds check
 	intport 6, int_inv_oc		; Invalid opcode
-	intport 7, int_copro_na		; Coprocessor not available
+	intport 7, int_dev_na		; Device not available
 	intport 8, int_df			; Double fault
 	intport 9, int_copro_or		; Coprocessor overrun
 	intport 10, int_inv_tss		; Invalid TSS
@@ -679,7 +679,6 @@ int_inv_tss:
 int_snp:
 ; Stack exception
 int_sf:
-int_copro_na:
 	jmp int_die	
 
 ; ---------------------------
