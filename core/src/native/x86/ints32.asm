@@ -90,7 +90,7 @@ inthandler:
 	jne near kernel_panic
 	mov ebx,[esp+HANDLER]
 	call ebx
-	test dword RESUME_INT,0xFFFFFFFF
+	test RESUME_INT,0xFFFFFFFF
 	jz inthandler_ret
 	; Resume the interrupt (caused by an an IRQ)
 	;jmp int_die
@@ -101,7 +101,7 @@ inthandler:
 	mov [ebp+ERROR],eax
 	mov eax,RESUME_HANDLER
 	mov [ebp+HANDLER],eax
-	mov dword RESUME_INT,0
+	mov RESUME_INT,0
 	jmp irqhandler_resume
 inthandler_ret:
     int_exit
