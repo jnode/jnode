@@ -1,5 +1,5 @@
-/* GapContent.java -- 
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+/* gnu.java.beans.decoder.LongHandler
+   Copyright (C) 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -7,7 +7,7 @@ GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
-
+ 
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -35,77 +35,25 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+package gnu.java.beans.decoder;
 
-package javax.swing.text; 
 
-import java.io.Serializable;
-
-// too lazy to make a real gapcontent.
-// lets just use a stringbuffer instead.
-import javax.swing.undo.UndoableEdit;
-
-public class GapContent
-  implements AbstractDocument.Content, Serializable
+/** Creates a Long instance from the character data in a &lt;long&gt; tag.
+ *
+ * @author Robert Schuster
+ */
+class LongHandler extends SimpleHandler
 {
-  private static final long serialVersionUID = 8374645204155842629L;
-    
-    StringBuffer buf = new StringBuffer();
+  /**
+   * @param PersistenceParser
+   */
+  LongHandler(ElementHandler parent)
+  {
+    super(parent);
+  }
 
-    public GapContent()
-    {
-	this(10);
-    }
-    
-    public GapContent(int size)
-    {
-    buf.append("\n");
-    }
-
-    public Position createPosition(final int offset) throws BadLocationException
-    {
-	return new Position()
-	    {
-		int off = offset;
-
-		public int getOffset()
-		{
-		    return off;
-		}
-	    };
-    }
-
-    public int length()
-    {
-	return buf.length();
-    }
-
-  public UndoableEdit insertString(int where, String str)
-    throws BadLocationException
-    {
-	buf.insert(where, str);
-	return null;
-    }
-
-  public UndoableEdit remove(int where, int nitems)
-    throws BadLocationException
-    {
-	buf.delete(where, where + nitems);
-	return null;
-    }
-
-    public String getString(int where, int len) throws BadLocationException
-    {
-    return buf.substring(where, where+len);
-    }
-
-  public void getChars(int where, int len, Segment txt)
-    throws BadLocationException
-    {
-	txt.array = new char[len];
-		
-    System.arraycopy(buf.toString().toCharArray(), where, txt.array, 0, len);
-	
-	txt.count  = len;
-	txt.offset = 0;
-    }
+  protected Object parse(String number) throws NumberFormatException
+  {
+    return Long.valueOf(number);
+  }
 }

@@ -197,6 +197,13 @@ public class JTree extends JComponent
   {
     protected Object childValue;
     protected boolean loadedChildren;
+
+    /**
+     * Currently not set or used by this class.
+     * It might be set and used in later versions of this class.
+     */
+    protected boolean hasChildren;
+    
     public DynamicUtilTreeNode(Object value,
                                Object children) 
     {
