@@ -80,7 +80,7 @@ public class KeyboardInterpreter_DV extends KeyboardInterpreter
     keys.setKey(39, new Key('s', 'S',KeyEvent.VK_S));//KeyEvent.VK_SEMICOLON, ':', KeyEvent.VK_COLON));
     keys.setKey(40, new Key("-".charAt(0), KeyEvent.VK_MINUS, '_', KeyEvent.VK_UNDERSCORE));
     keys.setKey(41, new Key('`', '~', KeyEvent.VK_BACK_QUOTE));
-    keys.setKey(43, new Key('\\', '|', KeyEvent.VK_BACK_SLASH));
+    keys.setKey(43, new Key('\\', "|".charAt(0), KeyEvent.VK_BACK_SLASH));
     keys.setKey(44, new Key(';', KeyEvent.VK_SEMICOLON,':', KeyEvent.VK_COLON));
     keys.setKey(45, new Key('q', 'Q', KeyEvent.VK_Q));
     keys.setKey(46, new Key('j', 'J', KeyEvent.VK_J));
@@ -369,7 +369,7 @@ public class KeyboardInterpreter_DV extends KeyboardInterpreter
 		ucharMap[39] = ':';
 		ucharMap[40] = '\"';
 		ucharMap[41] = '~';
-		ucharMap[43] = '|';
+		ucharMap[43] = "|".charAt(0);
 		ucharMap[44] = 'Z';
 		ucharMap[45] = 'X';
 		ucharMap[46] = 'C';

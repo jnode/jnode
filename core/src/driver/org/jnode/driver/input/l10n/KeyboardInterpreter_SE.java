@@ -172,7 +172,7 @@ public class KeyboardInterpreter_SE extends KeyboardInterpreter
     keys.setKey(81, new Key('3', KeyEvent.VK_NUMPAD3));
     keys.setKey(82, new Key('0', KeyEvent.VK_NUMPAD0));
     keys.setKey(83, new Key(',', KeyEvent.VK_DECIMAL));
-    keys.setKey(86, new Key('<', KeyEvent.VK_LESS, '>', KeyEvent.VK_GREATER, '|', KeyEvent.VK_UNDEFINED));
+    keys.setKey(86, new Key('<', KeyEvent.VK_LESS, '>', KeyEvent.VK_GREATER, "|".charAt(0), KeyEvent.VK_UNDEFINED));
 
     keys.setKey(42, new Key(KeyEvent.VK_SHIFT));
     keys.setKey(54, new Key(KeyEvent.VK_SHIFT));

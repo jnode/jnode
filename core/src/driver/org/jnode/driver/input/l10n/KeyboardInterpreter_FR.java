@@ -45,7 +45,7 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter
     keys.setKey(4, new Key('"', KeyEvent.VK_QUOTEDBL, '3', KeyEvent.VK_3, '#', KeyEvent.VK_NUMBER_SIGN));
     keys.setKey(5, new Key('\'', KeyEvent.VK_QUOTE, '4', KeyEvent.VK_4, '{', KeyEvent.VK_BRACELEFT));
     keys.setKey(6, new Key('(', KeyEvent.VK_LEFT_PARENTHESIS, '5', KeyEvent.VK_5, '[', KeyEvent.VK_OPEN_BRACKET));
-    keys.setKey(7, new Key('-', KeyEvent.VK_MINUS, '6', KeyEvent.VK_6, '|', KeyEvent.VK_UNDEFINED));
+    keys.setKey(7, new Key('-', KeyEvent.VK_MINUS, '6', KeyEvent.VK_6, "|".charAt(0), KeyEvent.VK_UNDEFINED));
     keys.setKey(8, new Key('\u00e8', '7', '`', KeyEvent.VK_7));
     keys.setKey(9, new Key('_', KeyEvent.VK_UNDERSCORE, '8', KeyEvent.VK_8, '\\', KeyEvent.VK_BACK_SLASH));
     keys.setKey(10, new Key('\u00e7', '9', '^', KeyEvent.VK_9));
@@ -55,7 +55,7 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter
 
     /*
     key = new Key();
-    key.setAltGrChar('|');
+    key.setAltGrChar("|".charAt(0));
     key.setAltGrVirtuelKey(KeyEvent.VK_DEAD_ACUTE);
     key.setLowerVirtuelKey(KeyEvent.VK_DEAD_ACUTE);
     key.setUpperVirtuelKey(KeyEvent.VK_DEAD_GRAVE);
@@ -181,7 +181,7 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter
     keys.setKey(81, new Key('3', KeyEvent.VK_NUMPAD3));
     keys.setKey(82, new Key('0', KeyEvent.VK_NUMPAD0));
     keys.setKey(83, new Key('.', KeyEvent.VK_DECIMAL));
-    keys.setKey(86, new Key('<', KeyEvent.VK_LESS, '>', KeyEvent.VK_GREATER, '|', KeyEvent.VK_UNDEFINED));
+    keys.setKey(86, new Key('<', KeyEvent.VK_LESS, '>', KeyEvent.VK_GREATER, "|".charAt(0), KeyEvent.VK_UNDEFINED));
 
     keys.setKey(42, new Key(KeyEvent.VK_SHIFT));
     keys.setKey(54, new Key(KeyEvent.VK_SHIFT));

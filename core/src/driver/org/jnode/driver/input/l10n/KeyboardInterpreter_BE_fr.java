@@ -35,7 +35,7 @@ public class KeyboardInterpreter_BE_fr extends KeyboardInterpreter_FR {
     {
       Key key;
 
-      keys.setKey(2, new Key('&', '1', '|', KeyEvent.VK_1));
+      keys.setKey(2, new Key('&', '1', "|".charAt(0), KeyEvent.VK_1));
       keys.setKey(3, new Key('\u00e9', '2', '@', KeyEvent.VK_2));
       keys.setKey(4, new Key('"', KeyEvent.VK_QUOTEDBL, '3', KeyEvent.VK_3, '#', KeyEvent.VK_NUMBER_SIGN));
       keys.setKey(5, new Key('\'', KeyEvent.VK_QUOTE, '4', KeyEvent.VK_4));

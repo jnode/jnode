@@ -49,7 +49,7 @@ public class KeyboardInterpreter_ES extends KeyboardInterpreter
 
     //First spanish keyboard row
     keys.setKey(1, new Key('\u00ba', '\u00aa'));
-    keys.setKey(2, new Key('1', KeyEvent.VK_1, '!', KeyEvent.VK_EXCLAMATION_MARK, '|',KeyEvent.VK_1));
+    keys.setKey(2, new Key('1', KeyEvent.VK_1, '!', KeyEvent.VK_EXCLAMATION_MARK, "|".charAt(0),KeyEvent.VK_1));
     keys.setKey(3, new Key('2', KeyEvent.VK_2, '"', KeyEvent.VK_QUOTEDBL, '@', KeyEvent.VK_AT));
     keys.setKey(4, new Key('3', KeyEvent.VK_3, '\u00b7', KeyEvent.VK_3, '#', KeyEvent.VK_NUMBER_SIGN));
     keys.setKey(5, new Key('4', KeyEvent.VK_4, '$', KeyEvent.VK_DOLLAR, '~', KeyEvent.VK_4));

@@ -78,7 +78,7 @@ public class KeyboardInterpreter_IT extends KeyboardInterpreter {
         keys.setKey(38, new Key('l', 'L', KeyEvent.VK_L));
         keys.setKey(39, new Key('\u00f2', '\u00e7', '@', KeyEvent.VK_AT));
         keys.setKey(40, new Key('\u00e0', '\u00b0', '#', KeyEvent.VK_NUMBER_SIGN));
-        keys.setKey(41, new Key('\\', '|', KeyEvent.VK_BACK_SLASH));
+        keys.setKey(41, new Key('\\', "|".charAt(0), KeyEvent.VK_BACK_SLASH));
         keys.setKey(42, new Key(KeyEvent.VK_SHIFT));
         keys.setKey(43, new Key('\u00f9', '\u00a7'));
         keys.setKey(44, new Key('z', 'Z', KeyEvent.VK_Z));

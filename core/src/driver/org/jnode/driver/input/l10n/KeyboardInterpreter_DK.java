@@ -53,8 +53,8 @@ public class KeyboardInterpreter_DK extends KeyboardInterpreter
     keys.setKey(12, new Key('+', '?', KeyEvent.VK_PLUS));
 
     key = new Key();
-    key.setAltGrChar('|');
-    key.setAltGrVirtuelKey(KeyEvent.VK_DEAD_ACUTE);
+    key.setAltGrChar("|".charAt(0));
+    key.setAltGrVirtuelKey(KeyEvent.VK_UNDEFINED);
     key.setLowerVirtuelKey(KeyEvent.VK_DEAD_ACUTE);
     key.setUpperVirtuelKey(KeyEvent.VK_DEAD_GRAVE);
     keys.setKey(13, key);
