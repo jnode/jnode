@@ -21,9 +21,11 @@ import java.awt.PrintJob;
 import java.awt.datatransfer.Clipboard;
 import java.awt.font.FontRenderContext;
 import java.awt.im.InputMethodHighlight;
+import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
+import java.awt.image.VolatileImage;
 import java.awt.peer.FontPeer;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -146,6 +148,21 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	public Image createImage(ImageProducer producer) {
 		return new JNodeImage(producer);
 	}
+
+	/**
+	 * JNode specific method.
+	 * Create a buffered image compatible with the graphics configuration.
+	 * @param width
+	 * @param height
+	 * @return
+	 */
+    public BufferedImage createCompatibleImage(int width, int height) {
+    	return config.createCompatibleImage(width, height);
+    }
+
+    public VolatileImage createVolatileImage(int width, int height) {
+	    throw new RuntimeException("Not implemented");
+    }
 
 	/**
 	 * @param filename
