@@ -66,8 +66,10 @@ public class Vm extends VmSystemObject implements Statistics {
 	private transient HashMap statistics;
 	/** The atom manager */
 	private final VmAtom.Manager atomManager;
+    /** Lock for accessing the all threads list */
+    private final SpinLock allThreadsLock;
     /** List of all threads */
-    private final VmThreadQueue allThreads;
+    private final VmThreadQueue.AllThreadsQueue allThreads;
 	
 	/** Should assertions be verified? */
 	public static final boolean VerifyAssertions = true;
@@ -89,7 +91,8 @@ public class Vm extends VmSystemObject implements Statistics {
 		this.statics = statics;
 		this.processors = new BootableArrayList();
 		this.atomManager = new VmAtom.Manager();
-        this.allThreads = new VmThreadQueue("all", false, true, false);
+        this.allThreadsLock = new SpinLock();
+        this.allThreads = new VmThreadQueue.AllThreadsQueue("all");
 	}
 
 	/**
@@ -349,7 +352,19 @@ public class Vm extends VmSystemObject implements Statistics {
      * @param thread
      */
     static final void registerThread(VmThread thread) {
-        getVm().allThreads.add(thread, true, "Vm");
+        final Vm vm = getVm();
+        final VmThreadQueue.AllThreadsQueue q = vm.allThreads;
+        if (isWritingImage()) {
+            q.add(thread, "Vm");            
+        } else {
+            final SpinLock lock = vm.allThreadsLock;
+            lock.lock();
+            try {
+                q.add(thread, "Vm");
+            } finally {
+                lock.unlock();
+            }
+        }
     }
     
     /**
@@ -357,7 +372,15 @@ public class Vm extends VmSystemObject implements Statistics {
      * @param thread
      */
     static final void unregisterThread(VmThread thread) {
-        getVm().allThreads.remove(thread);
+        final Vm vm = getVm();
+        final SpinLock lock = vm.allThreadsLock;
+        final VmThreadQueue.AllThreadsQueue q = vm.allThreads;
+        lock.lock();
+        try {
+            q.remove(thread);
+        } finally {
+            lock.unlock();
+        }
     }
     
     /**
@@ -365,6 +388,14 @@ public class Vm extends VmSystemObject implements Statistics {
      * @param visitor
      */
     static final boolean visitAllThreads(VmThreadVisitor visitor) {
-        return getVm().allThreads.visit(visitor);
+        final Vm vm = getVm();
+        final SpinLock lock = vm.allThreadsLock;
+        final VmThreadQueue.AllThreadsQueue q = vm.allThreads;
+        lock.lock();
+        try {
+            return q.visit(visitor);
+        } finally {
+            lock.unlock();
+        }
     }
 }
