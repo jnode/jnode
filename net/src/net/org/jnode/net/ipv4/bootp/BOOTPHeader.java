@@ -35,7 +35,9 @@ public class BOOTPHeader {
 	private final Inet4Address yourIPAddress;
 	private final Inet4Address serverIPAddress;
 	private final Inet4Address gatewayIPAddress;
-	
+	private String serverHostName;
+	private String bootFileName;
+
 	/**
 	 * Create a new header and read it from the given buffer
 	 * @param skbuf
@@ -56,6 +58,11 @@ public class BOOTPHeader {
 		} else {
 			clientHwAddress = null;
 		}
+		byte[] tmp = new byte[128];
+		skbuf.get(tmp, 0, 32, 64);
+		serverHostName = new String(tmp, "US-ASCII").trim();
+		skbuf.get(tmp, 0, 96, 128);
+		bootFileName = new String(tmp, "US-ASCII").trim();
 	}
 
 	/**
@@ -137,18 +144,36 @@ public class BOOTPHeader {
 		if (clientHwAddress != null) {
 			clientHwAddress.writeTo(skbuf, 28);
 		}
+		if (serverHostName != null) {
+			skbuf.set(32, serverHostName.getBytes("US-ASCII"), 0, serverHostName.length());
+		}
+		if (bootFileName != null) {
+			skbuf.set(96, bootFileName.getBytes("US-ASCII"), 0, bootFileName.length());
+		}
 	}
 
-	/*private void setServerHostName(String sname) {
-		final int len = sname.length();
-		if(sname != null && len > 63)
-			throw new IllegalArgumentException("Server host name is too long, "+len+" > 127.");
-	}*/
-	/*private void setBootFileName(String file) {
-		final int len = file.length();
-		if(file != null && len > 127)
-			throw new IllegalArgumentException("Boot file name is too long, "+len+" > 127.");
-	}*/
+	/**
+	 * The server host name should not exceed 63 characters (bytes).
+	 */
+	public void setServerHostName(String sname) {
+		if(sname != null && sname.length() > 63)
+			throw new IllegalArgumentException("Server host name is too long, "+sname.length()+" > 63.");
+		serverHostName = sname;
+	}
+	public String getServerHostName() {
+		return serverHostName;
+	}
+	/**
+	 * The boot file name should not exceed 127 characters (bytes).
+	 */
+	public void setBootFileName(String file) {
+		if(file != null && file.length() > 127)
+			throw new IllegalArgumentException("Boot file name is too long, "+file.length()+" > 127.");
+		bootFileName = file;
+	}
+	public String getBootFileName() {
+		return bootFileName;
+	}
 
 	/**
 	 * Gets the client hardware address
