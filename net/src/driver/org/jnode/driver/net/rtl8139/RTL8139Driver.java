@@ -10,6 +10,7 @@ import org.jnode.driver.net.ethernet.spi.BasicEthernetDriver;
 import org.jnode.driver.net.ethernet.spi.Flags;
 import org.jnode.driver.net.spi.AbstractDeviceCore;
 import org.jnode.driver.pci.PCIDevice;
+import org.jnode.plugin.ConfigurationElement;
 import org.jnode.system.ResourceNotFreeException;
 
 /**
@@ -20,10 +21,16 @@ public class RTL8139Driver extends BasicEthernetDriver {
 
     /**
      * Create new driver instance for this device
+     */
+    public RTL8139Driver(ConfigurationElement config) {
+        this(new RTL8139Flags(config));
+    }
+
+    /**
+     * Create new driver instance for this device
      * 
      * @param flags
      */
-
     public RTL8139Driver(RTL8139Flags flags) {
         this.flags = flags;
     }

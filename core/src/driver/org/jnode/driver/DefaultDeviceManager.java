@@ -5,6 +5,8 @@ package org.jnode.driver;
 
 import gnu.java.security.actions.GetPropertyAction;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -621,7 +623,7 @@ public class DefaultDeviceManager implements DeviceManager,
      * Refresh the list of finders, based on the mappers extension-point.
      */
     private final void refreshFinders() {
-        mappers.clear();
+        finders.clear();
         final Extension[] extensions = findersEP.getExtensions();
         BootLog.debug("Found " + extensions.length + " device finders");
 
@@ -700,21 +702,46 @@ public class DefaultDeviceManager implements DeviceManager,
             try {
                 final Class cls = Thread.currentThread()
                         .getContextClassLoader().loadClass(className);
-                final DeviceToDriverMapper mapper = (DeviceToDriverMapper) cls
-                        .newInstance();
+                final DeviceToDriverMapper mapper = newMapperInstance(cls, element);
                 mappers.add(mapper);
             } catch (ClassNotFoundException ex) {
-                BootLog.error("Cannot find mapper class " + className);
+                BootLog.error("Cannot find mapper class " + className, ex);
             } catch (IllegalAccessException ex) {
-                BootLog.error("Cannot access mapper class " + className);
+                BootLog.error("Cannot access mapper class " + className, ex);
             } catch (InstantiationException ex) {
-                BootLog.error("Cannot instantiate mapper class " + className);
+                BootLog.error("Cannot instantiate mapper class " + className, ex);
             } catch (ClassCastException ex) {
                 BootLog
                         .error("Mapper class "
                                 + className
                                 + " does not implement the DeviceToDriverMapper interface");
             }
+        } else {
+            BootLog.error("class attribute required in mapper");
+        }
+    }
+    
+    /**
+     * Instantiate the device to driver mapper.
+     * First look for a constructor with a ConfigurationElement parameter,
+     * if not found, use the default constructor.
+     * 
+     * @param cls
+     * @param element
+     * @return
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     */
+    private DeviceToDriverMapper newMapperInstance(Class cls, ConfigurationElement element) throws InstantiationException, IllegalAccessException {
+        try {
+            final Constructor c = cls.getConstructor(new Class[] { ConfigurationElement.class });
+            try {
+                return (DeviceToDriverMapper)c.newInstance(new Object[] { element });
+            } catch (InvocationTargetException ex1) {
+                throw new InstantiationException(ex1.getTargetException());
+            }
+        } catch (NoSuchMethodException ex) {
+            return (DeviceToDriverMapper) cls.newInstance();
         }
     }
 

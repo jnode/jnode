@@ -20,7 +20,8 @@
   </runtime>
   
   <extension point="org.jnode.driver.mappers">
-    <mapper class="org.jnode.driver.net._3c90x._3c90xDeviceToDriverMapper"/>
+    <!-- mapper class="org.jnode.driver.net._3c90x._3c90xDeviceToDriverMapper"/ -->
+    <mapper id="10b7:9200" name="3C905C_TXM" driver-class="org.jnode.driver.net._3c90x._3c90xDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
   </extension>
         
   <extension point="org.jnode.security.permissions">

@@ -9,6 +9,7 @@ import org.jnode.driver.net.ne2000.Ne2000Core;
 import org.jnode.driver.net.ne2000.Ne2000Driver;
 import org.jnode.driver.net.ne2000.Ne2000Flags;
 import org.jnode.driver.pci.PCIDevice;
+import org.jnode.plugin.ConfigurationElement;
 import org.jnode.system.ResourceNotFreeException;
 
 /**
@@ -16,6 +17,13 @@ import org.jnode.system.ResourceNotFreeException;
  */
 public class Ne2000PCIDriver extends Ne2000Driver {
 	
+	/**
+	 * Create a new instance
+	 */
+	public Ne2000PCIDriver(ConfigurationElement config) {
+		super(new Ne2000Flags(config));
+	}
+
 	/**
 	 * Create a new instance
 	 * @param flags

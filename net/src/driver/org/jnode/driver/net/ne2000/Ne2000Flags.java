@@ -3,6 +3,8 @@
  */
 package org.jnode.driver.net.ne2000;
 
+import org.jnode.plugin.ConfigurationElement;
+
 /**
  * @author epr
  */
@@ -14,6 +16,13 @@ public class Ne2000Flags {
 	private final int memSize;
 	private final boolean b16;
 	
+	/**
+	 * Create a new instance 
+	 */
+	public Ne2000Flags(ConfigurationElement config) {
+	    this(config.getAttribute("name"));
+	}
+
 	/**
 	 * Create a new instance 
 	 * @param name Device name
