@@ -32,9 +32,12 @@
       <export name="gnu.java.text.*"/>
       <export name="gnu.java.util.*"/>
       <export name="gnu.java.util.prefs.*"/>
+      <export name="gnu.java.security.*"/>
+      <export name="gnu.java.security.actions.*"/>
       <export name="gnu.java.security.der.*"/>
       <export name="gnu.java.security.provider.*"/>
       <export name="gnu.java.security.util.*"/>
+      <export name="gnu.java.security.x509.*"/>
 
       <export name="java.applet.*"/>
       <export name="java.awt.*"/>

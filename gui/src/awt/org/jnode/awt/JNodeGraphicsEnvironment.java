@@ -3,11 +3,14 @@
  */
 package org.jnode.awt;
 
+import gnu.java.security.actions.GetPropertyAction;
+
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
+import java.security.AccessController;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -89,7 +92,7 @@ public class JNodeGraphicsEnvironment extends GraphicsEnvironment {
 	 * @return The default screen device
 	 */
 	public GraphicsDevice getDefaultScreenDevice() {
-		final String devId = System.getProperty("jnode.awt.device", "fb0");
+		final String devId = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.awt.device", "fb0"));
 		if ((defaultDevice == null) || !devId.equals(defaultDevice.getIDstring())){
 			final GraphicsDevice[] devs = getScreenDevices();
 			for (int i = 0;(defaultDevice == null) && (i < devs.length); i++) {

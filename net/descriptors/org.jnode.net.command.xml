@@ -31,4 +31,8 @@
     <alias name="tftp" class="org.jnode.net.command.TftpCommand"/>
   </extension>
 
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.net.NetPermission" name="bootpClient"/>
+  </extension>
+        
 </plugin>

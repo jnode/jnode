@@ -10,6 +10,7 @@
   <requires>
     <import plugin="nanoxml"/>
     <import plugin="org.jnode.util"/>
+    <import plugin="org.jnode.security"/>
     <import plugin="org.jnode.vm"/>
   </requires>
         

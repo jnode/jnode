@@ -79,7 +79,7 @@ public final class AccessController {
      */
     public static void checkPermission(Permission perm)
             throws AccessControlException {
-        VmAccessController.getContext().checkPermission(perm);
+        VmAccessController.checkPermission(perm);
     }
 
     /**
@@ -96,7 +96,7 @@ public final class AccessController {
      *            method.
      */
     public static Object doPrivileged(PrivilegedAction action) {
-        return VmAccessController.doPrivileged(action);
+        return VmAccessController.doPrivileged(action, null);
     }
 
     /**
@@ -141,7 +141,7 @@ public final class AccessController {
      */
     public static Object doPrivileged(PrivilegedExceptionAction action)
             throws PrivilegedActionException {
-        return VmAccessController.doPrivileged(action);
+        return VmAccessController.doPrivileged(action, null);
     }
 
     /**

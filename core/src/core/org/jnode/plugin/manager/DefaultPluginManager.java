@@ -93,6 +93,13 @@ public class DefaultPluginManager extends PluginManager {
 
             } catch (Throwable ex) {
                 BootLog.error("Cannot start " + descr.getId(), ex);
+                if (debug) {
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException ex1) {
+                        // Ignore
+                    }
+                }
                 errors.add(new StartError(ex, descr.getId()));
             }
         }

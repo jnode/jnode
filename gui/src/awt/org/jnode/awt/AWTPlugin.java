@@ -3,8 +3,11 @@
  */
 package org.jnode.awt;
 
+import gnu.java.security.actions.SetPropertyAction;
+
 import java.awt.GraphicsEnvironment;
 import java.awt.image.VMImageUtils;
+import java.security.AccessController;
 
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
@@ -27,7 +30,7 @@ public class AWTPlugin extends Plugin {
 	 * @throws PluginException
 	 */
 	protected void startPlugin() throws PluginException {
-		System.getProperties().setProperty("awt.toolkit", "org.jnode.awt.peer.JNodeToolkit");
+	    AccessController.doPrivileged(new SetPropertyAction("awt.toolkit", "org.jnode.awt.peer.JNodeToolkit"));
 		VMImageUtils.setAPI(new VMImageAPIImpl(), this);
 		GraphicsEnvironment.setLocalGraphicsEnvironment(new JNodeGraphicsEnvironment());
 	}

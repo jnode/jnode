@@ -37,7 +37,10 @@
 
 package java.net;
 
+import gnu.java.security.actions.GetIntegerAction;
+
 import java.io.Serializable;
+import java.security.AccessController;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
@@ -113,14 +116,19 @@ public class InetAddress implements Serializable {
     // Static initializer for the cache
     static {
         // Look for properties that override default caching behavior
-        cache_size = Integer.getInteger("gnu.java.net.dns_cache_size",
-                DEFAULT_CACHE_SIZE).intValue();
-        cache_period = Integer.getInteger("gnu.java.net.dns_cache_period",
-                DEFAULT_CACHE_PERIOD * 60 * 1000).intValue();
-
-        cache_purge_pct = Integer.getInteger(
-                "gnu.java.net.dns_cache_purge_pct", DEFAULT_CACHE_PURGE_PCT)
+        cache_size = ((Integer) AccessController
+                .doPrivileged(new GetIntegerAction(
+                        "gnu.java.net.dns_cache_size", DEFAULT_CACHE_SIZE)))
                 .intValue();
+        cache_period = ((Integer) AccessController
+                .doPrivileged(new GetIntegerAction(
+                        "gnu.java.net.dns_cache_period",
+                        DEFAULT_CACHE_PERIOD * 60 * 1000))).intValue();
+
+        cache_purge_pct = ((Integer) AccessController
+                .doPrivileged(new GetIntegerAction(
+                        "gnu.java.net.dns_cache_purge_pct",
+                        DEFAULT_CACHE_PURGE_PCT))).intValue();
 
         // Fallback to defaults if necessary
         if ((cache_purge_pct < 1) || (cache_purge_pct > 100))

@@ -37,7 +37,7 @@ public class IPv4Address implements ProtocolAddress, Serializable {
 	/**
 	 * Reads an address at a given offset from the given buffer
 	 * @param skbuf
-	 * @param skbufOffset
+	 * @param offset
 	 */
 	public static Inet4Address readFrom(SocketBuffer skbuf, int offset) {
 		byte[] address = new byte[length];

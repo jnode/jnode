@@ -101,6 +101,8 @@ public class Vm extends VmSystemObject {
 				vm.hotMethodManager.dumpStatistics(out);
 			}
 			vm.heapManager.dumpStatistics(out);
+			final SecurityManager sm = System.getSecurityManager();
+			out.println("Security manager: " + sm);
 		}
 	}
 	

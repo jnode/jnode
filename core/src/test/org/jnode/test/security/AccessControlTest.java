@@ -5,6 +5,7 @@ package org.jnode.test.security;
 
 import java.security.AccessControlContext;
 import java.security.AccessController;
+import java.security.Policy;
 import java.security.PrivilegedAction;
 
 
@@ -35,5 +36,6 @@ public class AccessControlTest implements Runnable {
         System.out.println("[" + name + "]");
         System.out.println("AccessControlContext = " + acc);
         System.out.println("DomainCombiner       = " + acc.getDomainCombiner());        
+        System.out.println("Policy               = " + Policy.getPolicy());        
     }
 }

@@ -11,7 +11,7 @@
     <import plugin="org.jnode.driver.video"/>
     <import plugin="org.jnode.log4j"/>
   </requires>
-        
+  
   <runtime>
     <library name="jnode-gui.jar">
       <export name="org.jnode.awt.*"/>
@@ -23,4 +23,9 @@
     </library>
   </runtime>
 
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="awt.toolkit" actions="read,write"/>
+    <permission class="java.util.PropertyPermission" name="jnode.awt.device" actions="read,write"/>
+  </extension>
+        
 </plugin>

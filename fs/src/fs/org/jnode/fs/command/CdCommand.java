@@ -23,7 +23,7 @@ public class CdCommand {
 
 		final File dir = ARG_DIR.getFile(cmdLine);
 		if (dir.exists() && dir.isDirectory()) {
-			System.getProperties().setProperty("user.dir", dir.getAbsoluteFile().getCanonicalPath());
+			System.setProperty("user.dir", dir.getAbsoluteFile().getCanonicalPath());
 		} else if("/".equals(dir.getCanonicalPath())) {
 			System.getProperties().setProperty("user.dir", "/");
 		} else {
