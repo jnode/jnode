@@ -976,6 +976,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param rDisp
 	 */
 	public final void writeBOUND(GPR lReg, GPR rReg, int rDisp) {
+        if (code64) {
+            throw new InvalidOpcodeException();
+        }
 		write1bOpcodeModRM(0x62, 0, rReg, rDisp, lReg.getNr());
 	}
 
@@ -1058,8 +1061,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 */
 	public void writeCMOVcc(int ccOpcode, GPR dst, GPR src) {
 		if (!haveCMOV) {
-			throw new IllegalArgumentException(
-					"CMOVcc not support on current cpu");
+			throw new InvalidOpcodeException("CMOVcc not supported");
 		}
 		write2bOpcodeModRR(0x0F, ccOpcode - 0x40, src.getSize(), src, dst.getNr());
 	}
@@ -1073,8 +1075,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 */
 	public void writeCMOVcc(int ccOpcode, GPR dst, GPR src, int srcDisp) {
 		if (!haveCMOV) {
-			throw new IllegalArgumentException(
-					"CMOVcc not support on current cpu");
+			throw new InvalidOpcodeException("CMOVcc not supported");
 		}
 		write2bOpcodeModRM(0x0F, ccOpcode - 0x40, dst.getSize(), src, srcDisp, dst.getNr());
 	}
@@ -1164,7 +1165,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 */
 	public final void writeCMP_MEM(int operandSize, int memPtr, int imm32) {
 		testOperandSize(operandSize, BITS32 | BITS64);
-		// TODO fix for 64-bit mode
+        write1bOpcodeREXPrefix(operandSize, 0);
 		write8(0x81); // Opcode
 		write8(0x3D); // effective address == disp32
 		write32(memPtr);
@@ -1178,6 +1179,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param memPtr
 	 */
 	public void writeCMP_MEM(GPR reg, int memPtr) {
+        if (code64) {
+            throw new InvalidOpcodeException("Not implemented");
+        }
 		// TODO fix for 64-bit mode
 		write8(0x3b); // opcode
 		write8((reg.getNr() << 3) | 5); // disp32
@@ -1206,7 +1210,11 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param dstReg
 	 */
 	public final void writeDEC(GPR dstReg) {
-		write8(0x48 + dstReg.getNr());
+        if (code32) {
+            write8(0x48 + dstReg.getNr());
+        } else {
+            write1bOpcodeModRR(0xFF, dstReg.getSize(), dstReg, 1);
+        }
 	}
 
 	/**
@@ -1577,7 +1585,11 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param dstReg
 	 */
 	public final void writeINC(GPR dstReg) {
-		write8(0x40 + dstReg.getNr());
+        if (code32) {
+            write8(0x40 + dstReg.getNr());
+        } else {
+            write1bOpcodeModRR(0xFF, dstReg.getSize(), dstReg, 0);
+        }
 	}
 
 	/**
@@ -1732,6 +1744,24 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 	}
 	
+    /**
+     * Write a REX prefix byte if needed for ModRM and ModRR encoded opcodes.
+     * @param rm
+     * @param reg
+     */
+    private final void write1bOpcodeREXPrefix(int operandSize, int reg) {
+        int rex = 0;
+        if (operandSize == BITS64) {
+            rex |= REX_W_PREFIX;
+        }
+        if (reg > 7) {
+            rex |= REX_B_PREFIX;
+        }
+        if (rex != 0) {
+            write8(rex);
+        }   
+    }
+
 	/**
 	 * Write a REX prefix byte if needed for ModRM and ModRR encoded opcodes.
 	 * @param rm
@@ -2516,6 +2546,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @see org.jnode.assembler.x86.X86Assembler#writePOPA()
 	 */
 	public void writePOPA() {
+        if (code64) {
+            throw new InvalidOpcodeException();
+        }
 		write8(0x61);
 	}
 
@@ -2603,6 +2636,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @see org.jnode.assembler.x86.X86Assembler#writePUSHA()
 	 */
 	public void writePUSHA() {
+        if (code64) {
+            throw new InvalidOpcodeException();
+        }
 		write8(0x60);
 	}
 

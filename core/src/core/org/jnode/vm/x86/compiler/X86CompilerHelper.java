@@ -299,11 +299,25 @@ public class X86CompilerHelper implements X86CompilerConstants {
             final Label afterInit = new Label(curInstrLabel
                     + "$$after-classinit-ex");
             os.writeJCC(afterInit, X86Constants.JNZ);
-            os.writePUSHA();
+            if (os.isCode32()) {
+                os.writePUSHA();
+            } else {
+                os.writePUSH(X86Register.EAX);
+                os.writePUSH(X86Register.EBX);
+                os.writePUSH(X86Register.ECX);
+                os.writePUSH(X86Register.EDX);
+            }
             // Call cls.initialize
             os.writePUSH(classReg);
             invokeJavaMethod(context.getVmTypeInitialize());
-            os.writePOPA();
+            if (os.isCode32()) {
+                os.writePOPA();
+            } else {
+                os.writePOP(X86Register.EDX);
+                os.writePOP(X86Register.ECX);
+                os.writePOP(X86Register.EBX);
+                os.writePOP(X86Register.EAX);
+            }
             // Set label
             os.setObjectRef(afterInit);
         }
@@ -327,7 +341,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
      * 
      * @param method
      */
-    public final void writeStackOverflowTest(VmMethod method) {
+    public final void writeStackOverflowTest(VmMethod method_) {
         //cmp esp,STACKEND
         //jg vm_invoke_testStackOverflowDone
         //vm_invoke_testStackOverflow:
@@ -335,8 +349,12 @@ public class X86CompilerHelper implements X86CompilerConstants {
         //vm_invoke_testStackOverflowDone:
         final int offset = context.getVmProcessorStackEnd().getOffset();
         final Label doneLabel = new Label(labelPrefix + "$$stackof-done");
-        os.writePrefix(X86Constants.FS_PREFIX);
-        os.writeCMP_MEM(X86Register.ESP, offset);
+        if (os.isCode32()) {
+            os.writePrefix(X86Constants.FS_PREFIX);
+            os.writeCMP_MEM(X86Register.ESP, offset);
+        } else {
+            os.writeCMP(X86Register.RSP, PROCESSOR64, offset);
+        }
         os.writeJCC(doneLabel, X86Constants.JG);
         os.writeINT(0x31);
         os.setObjectRef(doneLabel);
@@ -354,16 +372,24 @@ public class X86CompilerHelper implements X86CompilerConstants {
             if (debug) {
                 final Label ok = new Label(curInstrLabel + labelPrefix
                         + "$$ediok");
+                if (os.isCode32()) {
                 os.writePrefix(X86Constants.FS_PREFIX);
                 os.writeCMP_MEM(STATICS, offset);
+                } else {
+                    os.writeCMP(STATICS, PROCESSOR64, offset);
+                }
                 os.writeJCC(ok, X86Constants.JE);
                 os.writeINT(0x88);
                 os.setObjectRef(ok);
             }
         } else {
-            os.writeXOR(STATICS, STATICS);
-            os.writePrefix(X86Constants.FS_PREFIX);
-            os.writeMOV(INTSIZE, STATICS, STATICS, offset);
+            if (os.isCode32()) {
+                os.writeXOR(STATICS, STATICS);
+                os.writePrefix(X86Constants.FS_PREFIX);
+                os.writeMOV(INTSIZE, STATICS, STATICS, offset);
+            } else {
+                os.writeMOV(BITS64, STATICS, PROCESSOR64, offset);
+            }
         }
     }
 

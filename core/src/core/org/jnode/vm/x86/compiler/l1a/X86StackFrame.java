@@ -158,8 +158,12 @@ class X86StackFrame implements X86CompilerConstants {
         
         // Test stack overflow        
         final int stackEndOffset = context.getVmProcessorStackEnd().getOffset();
-        os.writePrefix(X86Constants.FS_PREFIX);
-        os.writeCMP_MEM(X86Register.ESP, stackEndOffset);
+        if (os.isCode32()) {
+            os.writePrefix(X86Constants.FS_PREFIX);
+            os.writeCMP_MEM(X86Register.ESP, stackEndOffset);
+        } else {
+            os.writeCMP(X86Register.RSP, PROCESSOR64, stackEndOffset);
+        }
         os.writeJCC(stackOverflowLabel, X86Constants.JLE);
 		
 		// Create class initialization code (if needed)
