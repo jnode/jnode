@@ -22,6 +22,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.BufferCapabilities.FlipContents;
 import java.awt.event.PaintEvent;
+import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
@@ -31,7 +32,7 @@ import java.awt.peer.FramePeer;
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeGenericPeer;
 import org.jnode.awt.JNodeGraphics;
-import org.jnode.awt.image.JNodeImage;
+import org.jnode.awt.image.JNodeBufferedImage;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -216,22 +217,22 @@ final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
     /**
      * @see java.awt.peer.ComponentPeer#createImage(java.awt.image.ImageProducer)
      */
-    public Image createImage(ImageProducer prod) {
-        return new JNodeImage(prod);
+    public Image createImage(ImageProducer producer) {
+        return toolkit.createImage(producer);
     }
 
     /**
      * @see java.awt.peer.ComponentPeer#createImage(int, int)
      */
     public Image createImage(int width, int height) {
-        return new JNodeImage(width, height);
+    	return toolkit.createCompatibleImage(width, height);
     }
 
     /**
      * @see java.awt.peer.ComponentPeer#createVolatileImage(int, int)
      */
     public VolatileImage createVolatileImage(int width, int height) {
-        throw new RuntimeException("Not implemented");
+    	return toolkit.createVolatileImage(width, height);
     }
 
     /**
