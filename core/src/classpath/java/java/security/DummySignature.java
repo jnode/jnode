@@ -49,9 +49,6 @@ final class DummySignature extends Signature
 
   public Object clone() throws CloneNotSupportedException
   {
-    if (!(sigSpi instanceof Cloneable))
-      throw new CloneNotSupportedException();
-
     Signature result = new DummySignature
 	    ((SignatureSpi) sigSpi.clone(), this.getAlgorithm());
     result.provider = this.getProvider();
