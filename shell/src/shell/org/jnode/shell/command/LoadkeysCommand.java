@@ -25,18 +25,18 @@ public class LoadkeysCommand {
 	
 	//FIXME: why can't I import org.jnode.driver.ps2.PS2Constants (compilation error)
 	public static String PS2_KEYBOARD_DEV = "ps2keyboard";
-		static final OptionArgument COUNTRY =
+	static final OptionArgument COUNTRY =
 		new OptionArgument(
 		"action",
 		"country parameter",
-		new OptionArgument.Option[] { new OptionArgument.Option("", "Specify country")});
+		new OptionArgument.Option[] { new OptionArgument.Option("country", "Specify country")});
 	static final OptionArgument REGION =
 		new OptionArgument(
 		"action",
 		"region parameter",
-		new OptionArgument.Option[] { new OptionArgument.Option("", "Specify region")});
+		new OptionArgument.Option[] { new OptionArgument.Option("region", "Specify region")});
 	
-	static final Parameter PARAM_COUNTRY = new Parameter(COUNTRY, Parameter.MANDATORY);
+	static final Parameter PARAM_COUNTRY = new Parameter(COUNTRY, Parameter.OPTIONAL);
 	static final Parameter PARAM_REGION  = new Parameter(REGION, Parameter.OPTIONAL);
 	
 	public static Help.Info HELP_INFO =
@@ -58,9 +58,14 @@ public class LoadkeysCommand {
 	protected void execute(String[] args, InputStream in, PrintStream out, PrintStream err) throws Exception {
 		String classI10N = "org.jnode.driver.input.l10n.KeyboardInterpreter_";
 		
+		DeviceManager dm = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);
+		Device kb = dm.getDevice(PS2_KEYBOARD_DEV);
+		KeyboardAPI api = (KeyboardAPI)kb.getAPI(KeyboardAPI.class);
+		
 		ParsedArguments cmdLine = HELP_INFO.parse(args);
 		if(!PARAM_COUNTRY.isSatisfied()) {
-			err.println("You *MUST* specify a country !");
+			out.println("layout currently loaded : "+api.getKbInterpreter().getClass().getName());
+			return;
 		}
 		
 		String country = COUNTRY.getValue(cmdLine).toUpperCase();
@@ -83,11 +88,6 @@ public class LoadkeysCommand {
 			e.printStackTrace(err);
 		}
 		
-		DeviceManager dm;
-		
-		dm = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);
-		Device kb = dm.getDevice(PS2_KEYBOARD_DEV);
-		KeyboardAPI api = (KeyboardAPI)kb.getAPI(KeyboardAPI.class);
 		api.setKbInterpreter(interpreter);
 		out.println(" Done.");
 	}
