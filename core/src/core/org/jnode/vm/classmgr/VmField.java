@@ -31,7 +31,7 @@ public abstract class VmField extends VmMember {
 		int modifiers,
 		VmType declaringClass,
 		int slotSize) {
-		super(name, signature, modifiers, declaringClass);
+		super(name, signature, modifiers | (((Modifier.isPrimitive(signature) || Modifier.isAddressType(signature)) ? 0 : Modifier.ACC_OBJECTREF)), declaringClass);
 		this.primitive = Modifier.isPrimitive(signature);
 		this.typeSize = Modifier.getTypeSize(signature, slotSize);
 	}
@@ -50,6 +50,14 @@ public abstract class VmField extends VmMember {
 	 */
 	public boolean isAddressType() {
 		return Modifier.isAddressType(signature);
+	}
+
+	/**
+	 * Is the field a non-primitive field and not an address type?
+	 * @return boolean
+	 */
+	public boolean isObjectRef() {
+		return Modifier.isObjectRef(getModifiers());
 	}
 
 	/**

@@ -20,8 +20,10 @@ public class Modifier {
 	public static final int ACC_STRICT = 0x00000800; // F Declared strictfp; floating-point mode is
 													 // FP-strict
 
+	/** Is a member wide (long, double) */
 	public static final int ACC_WIDE = 0x00010000;
-	public static final int ACC_ARRAY = 0x00020000;
+	/** Is a field an object reference */
+	public static final int ACC_OBJECTREF = 0x00020000;
 	public static final int ACC_COMPILED = 0x00040000;
 	public static final int ACC_INITIALIZER = 0x00080000;
 	public static final int ACC_CONSTRUCTOR = 0x00100000;
@@ -61,6 +63,11 @@ public class Modifier {
 
 	public static boolean isFinal(int modifier) {
 		int mask = ACC_FINAL;
+		return ((modifier & mask) == mask);
+	}
+
+	public static boolean isObjectRef(int modifier) {
+		int mask = ACC_OBJECTREF;
 		return ((modifier & mask) == mask);
 	}
 
@@ -111,11 +118,6 @@ public class Modifier {
 
 	public static boolean isCompiled(int modifier) {
 		int mask = ACC_COMPILED;
-		return ((modifier & mask) == mask);
-	}
-
-	public static boolean isArray(int modifier) {
-		int mask = ACC_ARRAY;
 		return ((modifier & mask) == mask);
 	}
 
@@ -297,8 +299,8 @@ public class Modifier {
 		if ((modifiers & ACC_WIDE) != 0) {
 			b.append("wide ");
 		}
-		if ((modifiers & ACC_ARRAY) != 0) {
-			b.append("array ");
+		if ((modifiers & ACC_OBJECTREF) != 0) {
+			b.append("objectref ");
 		}
 		if ((modifiers & ACC_COMPILED) != 0) {
 			b.append("compiled ");

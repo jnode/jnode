@@ -4,6 +4,8 @@
 
 package org.jnode.vm.memmgr.def;
 
+import java.io.PrintStream;
+
 import org.jnode.vm.Address;
 import org.jnode.vm.MemoryBlockManager;
 import org.jnode.vm.Monitor;
@@ -22,8 +24,8 @@ public final class DefaultHeapManager extends VmHeapManager {
 
 	/** Default size in bytes of a new heap */
 	public static final int DEFAULT_HEAP_SIZE = 2 * 1024 * 1024;
-	/** A GC manager alllocated early, so we have it when we're out of memory */
-	private GCManager gcManager;
+	/** The GC thread */
+	private GCThread gcThread;
 	/** Monitor to synchronize heap access */
 	private Monitor heapMonitor;
 	/** Are we low on memory */
@@ -38,6 +40,9 @@ public final class DefaultHeapManager extends VmHeapManager {
 	/** The class of the default heap type. Set by initialize */
 	private final VmNormalClass defaultHeapClass;
 	private final VmStatics statics;
+	/** The number of allocated bytes since the last GC trigger */
+	private int allocatedSinceGcTrigger;
+	private int triggerSize = Integer.MAX_VALUE;
 
 	/**
 	 * Make this private, so we cannot be instantiated
@@ -45,7 +50,7 @@ public final class DefaultHeapManager extends VmHeapManager {
 	public DefaultHeapManager(VmClassLoader loader, HeapHelper helper, VmStatics statics) 
 	throws ClassNotFoundException {
 		super(helper);
-		this.writeBarrier = new DefaultWriteBarrier(loader.getArchitecture(), helper);
+		this.writeBarrier = new DefaultWriteBarrier(helper);
 		this.firstHeap = new VmDefaultHeap(this);
 		this.currentHeap = firstHeap;
 		this.defaultHeapClass = (VmNormalClass)loader.loadClass(VmDefaultHeap.class.getName(), true);
@@ -89,18 +94,8 @@ public final class DefaultHeapManager extends VmHeapManager {
 	/**
 	 * Start a garbage collection process
 	 */
-	public void gc() {
-		final Monitor m = heapMonitor;
-		if (m != null) {
-			m.enter();
-		}
-		try {
-			gcManager.gc(bootHeap, firstHeap);
-		} finally {
-			if (m != null) {
-				m.exit();
-			}
-		}
+	public final void gc() {
+	    gcThread.trigger(true);
 	}
 
 	/**
@@ -167,9 +162,11 @@ public final class DefaultHeapManager extends VmHeapManager {
 		// Create a Heap monitor
 		heapMonitor = new Monitor();
 		final VmArchitecture arch = Unsafe.getCurrentProcessor().getArchitecture();
-		this.gcManager = new GCManager(this, arch, statics);
-		// Do nothing for now
-		// We will start the GC thread here
+		final GCManager gcManager = new GCManager(this, arch, statics);
+		this.gcThread = new GCThread(gcManager, heapMonitor);
+		gcThread.start();
+		// Calculate the trigger size
+		triggerSize = (int)Math.min(Integer.MAX_VALUE, getTotalMemory() / 5);
 	}
 	
 	
@@ -250,6 +247,15 @@ public final class DefaultHeapManager extends VmHeapManager {
 			}
 			vmClass.incInstanceCount();
 			lowOnMemory = false;
+			// Allocated objects are initially black.
+			//helper.unsafeSetObjectFlags(result, ObjectFlags.GC_BLACK);
+
+			allocatedSinceGcTrigger += alignedSize;
+			if ((allocatedSinceGcTrigger > triggerSize) && (gcThread != null)) {
+			    Unsafe.debug("<alloc:GC trigger/>");
+			    allocatedSinceGcTrigger = 0;
+			    //gcThread.trigger(false);
+			}
 		} finally {
 			if (m != null) {
 				m.exit();
@@ -282,5 +288,19 @@ public final class DefaultHeapManager extends VmHeapManager {
 
 		firstHeap.append(heap);
 		return heap;
+	}
+
+	/**
+	 * Print the statics on this object on out.
+	 */
+	public void dumpStatistics(PrintStream out) {
+		out.println("WriteBarrier: " + writeBarrier.toString());
+	}
+	
+	/**
+	 * @return Returns the bootHeap.
+	 */
+	final VmBootHeap getBootHeap() {
+		return this.bootHeap;
 	}
 }

@@ -31,8 +31,8 @@ public abstract class VmAbstractHeap extends VmSystemObject implements Uninterru
 	protected int headerSize;
 	/** Offset of the flags field in an object header */
 	protected int flagsOffset;
-	/** Offset of the vmt field in an object header */
-	protected int vmtOffset;
+	/** Offset of the type information block field in an object header */
+	protected int tibOffset;
 	/** Start address of allocation bitmap */
 	protected Address allocationBitmapPtr;
 	/** The next heap (linked list) */
@@ -55,7 +55,7 @@ public abstract class VmAbstractHeap extends VmSystemObject implements Uninterru
 	protected final void initializeAbstract(int slotSize) {
 		this.headerSize = ObjectLayout.HEADER_SLOTS * slotSize;
 		this.flagsOffset = ObjectLayout.FLAGS_SLOT * slotSize;
-		this.vmtOffset = ObjectLayout.TIB_SLOT * slotSize;
+		this.tibOffset = ObjectLayout.TIB_SLOT * slotSize;
 		this.startL = helper.addressToLong(start);
 		this.endL = helper.addressToLong(end);
 		this.size = (int)(helper.addressToLong(end) - helper.addressToLong(start));

@@ -25,6 +25,7 @@ import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmInterpretedExceptionHandler;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.memmgr.VmWriteBarrier;
 
 /**
  * System support for the Virtual Machine
@@ -578,26 +579,32 @@ public final class VmSystem {
 			throw new IndexOutOfBoundsException("dstPos+length > dst.length");
 		}
 
-		int elemsize;
+		final int elemsize;
+		final boolean isObjectArray;
 		switch (src_type) {
 			case 'Z' : // Boolean
 			case 'B' : // Byte
 				elemsize = 1;
+				isObjectArray = false;
 				break;
 			case 'C' : // Character
 			case 'S' : // Short
 				elemsize = 2;
+				isObjectArray = false;
 				break;
 			case 'I' : // Integer
 			case 'F' : // Float
 				elemsize = 4;
+				isObjectArray = false;
 				break;
 			case 'L' : // Object
 				elemsize = slotSize;
+				isObjectArray = true;
 				break;
 			case 'J' : // Long
 			case 'D' : // Double
 				elemsize = 8;
+				isObjectArray = false;
 				break;
 			default :
 				//Unsafe.debug("uat:");
@@ -610,6 +617,13 @@ public final class VmSystem {
 		Address dstPtr = Unsafe.add(Unsafe.addressOf(dst), dataOffset + (dstPos * elemsize));
 
 		Unsafe.copy(srcPtr, dstPtr, length * elemsize);
+		
+		if (isObjectArray) {
+			final VmWriteBarrier wb = Vm.getVm().getHeapManager().getWriteBarrier();
+			if (wb != null) {
+				wb.arrayCopyWriteBarrier(src, srcPos, srcPos + length);
+			}
+		}
 	}
 
 	/**

@@ -3,6 +3,8 @@
  */
 package org.jnode.vm;
 
+import java.io.PrintStream;
+
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.compiler.HotMethodManager;
 import org.jnode.vm.memmgr.VmHeapManager;
@@ -85,10 +87,12 @@ public class Vm extends VmSystemObject {
 	public static void main(String[] args) {
 		final Vm vm = getVm();
 		if ((vm != null) && !vm.isBootstrap()) {
-			Unsafe.getCurrentProcessor().getStatics().dumpStatistics();
+			final PrintStream out = System.out;
+			Unsafe.getCurrentProcessor().getStatics().dumpStatistics(out);
 			if (vm.hotMethodManager != null) {
-				vm.hotMethodManager.dumpStatistics();
+				vm.hotMethodManager.dumpStatistics(out);
 			}
+			vm.heapManager.dumpStatistics(out);
 		}
 	}
 }

@@ -3,6 +3,7 @@
  */
 package org.jnode.vm.classmgr;
 
+import java.io.PrintStream;
 import java.nio.ByteOrder;
 
 import org.jnode.assembler.ObjectResolver;
@@ -251,12 +252,12 @@ public final class VmStatics extends VmSystemObject {
 		return resolver;
 	}
 
-	public final void dumpStatistics() {
-		System.out.println("#static fields  " + staticFieldCount);
-		System.out.println("#static methods " + staticMethodCount);
-		System.out.println("#methods        " + methodCount);
-		System.out.println("#types          " + typeCount);
-		System.out.println("table.length    " + next);
+	public final void dumpStatistics(PrintStream out) {
+		out.println("#static fields  " + staticFieldCount);
+		out.println("#static methods " + staticMethodCount);
+		out.println("#methods        " + methodCount);
+		out.println("#types          " + typeCount);
+		out.println("table.length    " + next);
 	}
 
 	/**

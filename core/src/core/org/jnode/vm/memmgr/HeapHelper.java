@@ -16,6 +16,8 @@ import org.jnode.vm.classmgr.VmMethod;
  */
 public abstract class HeapHelper extends ObjectResolver {
 
+	public abstract Object getTib(Object object);
+
 	public abstract VmClassType getVmClass(Object object);
 
 	public abstract byte getByte(Object src, int offset);
@@ -24,7 +26,15 @@ public abstract class HeapHelper extends ObjectResolver {
 
 	public abstract Object getObject(Object src, int offset);
 
-	public abstract int getObjectFlags(Object src);
+	/**
+	 * Gets the color of the given object.
+	 * @param src
+	 * @return
+	 * @see org.jnode.vm.classmgr.ObjectFlags#GC_BLACK
+	 * @see org.jnode.vm.classmgr.ObjectFlags#GC_GREY
+	 * @see org.jnode.vm.classmgr.ObjectFlags#GC_WHITE
+	 */
+	public abstract int getObjectColor(Object src);
 
 	public abstract void setByte(Object dst, int offset, byte value);
 
@@ -32,7 +42,16 @@ public abstract class HeapHelper extends ObjectResolver {
 
 	public abstract void setObject(Object dst, int offset, Object value);
 
-	public abstract void setObjectFlags(Object dst, int flags);
+	public abstract void unsafeSetObjectFlags(Object dst, int flags);
+
+	/**
+	 * Change the color of the given object from oldColor to newColor.
+	 * @param dst
+	 * @param oldColor
+	 * @param newColor
+	 * @return True if the color was changed, false if the current color of the object was not equal to oldColor.
+	 */
+	public abstract boolean atomicChangeObjectColor(Object dst, int oldColor, int newColor);
 
 	public abstract void copy(Address src, Address dst, int size);
 
@@ -61,16 +80,4 @@ public abstract class HeapHelper extends ObjectResolver {
 	 *         inflated monitor.
 	 */
 	public abstract Monitor getInflatedMonitor(Object object, VmArchitecture arch);
-
-	/**
-	 * Atomic compare and swap. Compares the int value addressed by the given address with the given old value. If they are equal, the value at the given address is replace by the new value and true
-	 * is returned, otherwise nothing is changed and false is returned.
-	 * 
-	 * @param address
-	 * @param oldValue
-	 * @param newValue
-	 * @return boolean true if the value at address is changed, false otherwise.
-	 */
-	public abstract boolean atomicCompareAndSwap(Address address, int oldValue, int newValue);
-
 }

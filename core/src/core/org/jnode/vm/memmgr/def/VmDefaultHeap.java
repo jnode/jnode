@@ -93,7 +93,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 		// Make the bitmap an object, so it is easy to manipulate.
 		helper.setInt(allocationBitmapPtr, sizeOffset, allocationBitmapSize);
 		helper.setInt(allocationBitmapPtr, flagsOffset, 0);
-		helper.setObject(allocationBitmapPtr, vmtOffset, VmType.getObjectClass().getTIB());
+		helper.setObject(allocationBitmapPtr, tibOffset, VmType.getObjectClass().getTIB());
 		firstObject = Address.add(firstObject, allocationBitmapSize + headerSize);
 		helper.clear(allocationBitmapPtr, allocationBitmapSize);
 		this.allocationBitmap = helper.objectAt(allocationBitmapPtr);
@@ -107,7 +107,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 		final int remainingSize = (int)Address.distance(end, firstObject);
 		final Address ptr = firstObject;
 		helper.setInt(ptr, sizeOffset, remainingSize);
-		helper.setObject(ptr, vmtOffset, FREE);
+		helper.setObject(ptr, tibOffset, FREE);
 		this.nextFreePtr = ptr;
 		this.freeSize = remainingSize;
 	}
@@ -128,9 +128,9 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 		}
 		
 		final int totalSize = alignedSize + headerSize;
-		final Object vmt = vmClass.getTIB();
+		final Object tib = vmClass.getTIB();
 		//final int size = getSize();
-		final int vmtOffset = this.vmtOffset;
+		final int tibOffset = this.tibOffset;
 		final int headerSize = this.headerSize;
 
 		Address objectPtr = null;
@@ -139,7 +139,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 		while (objectPtr == null) {
 			final Address ptr = nextFreePtr;
 			final int objSize = helper.getInt(ptr, sizeOffset);
-			final Object objVmt = helper.getObject(ptr, vmtOffset);
+			final Object objVmt = helper.getObject(ptr, tibOffset);
 			final Address nextPtr = Address.add(ptr, objSize + headerSize);
 			if ((objVmt == FREE) && (alignedSize <= objSize)) {
 				objectPtr = ptr;
@@ -166,7 +166,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 			// Set the header for the remaining free block
 			helper.setInt(newFreePtr, sizeOffset, newFreeSize);
 			helper.setInt(newFreePtr, flagsOffset, 0);
-			helper.setObject(newFreePtr, vmtOffset, FREE);
+			helper.setObject(newFreePtr, tibOffset, FREE);
 			// Set the next free offset
 			nextFreePtr = newFreePtr;
 		} else {
@@ -178,7 +178,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 		// Create the object header
 		helper.setInt(objectPtr, sizeOffset, alignedSize);
 		helper.setInt(objectPtr, flagsOffset, 0);
-		helper.setObject(objectPtr, vmtOffset, vmt);
+		helper.setObject(objectPtr, tibOffset, tib);
 		// Mark the object in the allocation bitmap
 		setAllocationBit(objectPtr, true);
 		// Clear the contents of the object.
@@ -214,11 +214,10 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 		while (offset < size) {
 			final Address ptr = Address.add(start, offset);
 			final Object object = helper.objectAt(ptr);
-			final Object vmt = helper.getObject(ptr, vmtOffset);
+			final Object vmt = helper.getObject(ptr, tibOffset);
 			final int objSize = helper.getInt(object, sizeOffset);
 			if (vmt != FREE) {
-				final int flags = helper.getObjectFlags(object);
-				final int gcColor = flags & GC_COLOUR_MASK;
+				final int gcColor = helper.getObjectColor(object);
 				if (gcColor == GC_WHITE) {
 					// First call finalize
 					final VmMethod fm = helper.getVmClass(object).getMethod("finalize", "()V");
@@ -226,7 +225,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 						helper.invokeFinalizer(fm, object);
 					}
 					// Now free the object
-					helper.setObject(object, vmtOffset, FREE);
+					helper.setObject(object, tibOffset, FREE);
 					setAllocationBit(object, false);
 					// Be a bit paranoia, so clear the memory
 					helper.clear(ptr, objSize);
@@ -237,7 +236,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 					if (firstFreePtr == null) {
 						firstFreePtr = ptr;
 					}
-				} else if (gcColor == GC_GREY) {
+				} else if (gcColor != GC_BLACK) {
 					greyObjects++;
 				}
 			} else {
@@ -250,6 +249,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 		if (greyObjects > 0) {
 			Unsafe.debug("Found grey objects in collect! ");
 			Unsafe.debug(greyObjects);
+			helper.die("Grey objects in collect");
 		}
 		// Set the address of the next free block, to the first free block
 		this.nextFreePtr = firstFreePtr;
@@ -262,12 +262,12 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 				final Object object = helper.objectAt(ptr);
 				final int objSize = helper.getInt(object, sizeOffset);
 				final int nextOffset = offset + objSize + headerSize;
-				final Object vmt = helper.getObject(object, vmtOffset);
+				final Object vmt = helper.getObject(object, tibOffset);
 				if ((vmt == FREE) && (nextOffset < size)) { 
 					final Object nextObject;
 					final Object nextVmt;
 					nextObject = helper.objectAt(Address.add(start, nextOffset));
-					nextVmt = helper.getObject(nextObject, vmtOffset);
+					nextVmt = helper.getObject(nextObject, tibOffset);
 					if (nextVmt == FREE) {
 						// Combine two free spaces
 						int nextObjSize = helper.getInt(nextObject, sizeOffset);
@@ -301,8 +301,8 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 		while (offset < size) {
 			final Address ptr = Address.add(start, offset);
 			final Object object = helper.objectAt(ptr);
-			final Object vmt = helper.getObject(object, vmtOffset);
-			if (vmt != FREE) {
+			final Object tib = helper.getObject(object, tibOffset);
+			if (tib != FREE) {
 				if (!visitor.visit(object)) {
 					// Stop
 					offset = size;

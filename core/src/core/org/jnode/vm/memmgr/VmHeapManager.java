@@ -3,6 +3,8 @@
  */
 package org.jnode.vm.memmgr;
 
+import java.io.PrintStream;
+
 import org.jnode.vm.Address;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmSystemObject;
@@ -11,7 +13,7 @@ import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.memmgr.def.*;
+import org.jnode.vm.memmgr.def.VmBootHeap;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -237,4 +239,8 @@ public abstract class VmHeapManager extends VmSystemObject {
 	 */
 	public abstract VmWriteBarrier getWriteBarrier();
 
+	/**
+	 * Print the statics on this object on out.
+	 */
+	public abstract void dumpStatistics(PrintStream out);
 }
