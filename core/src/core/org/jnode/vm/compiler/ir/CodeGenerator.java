@@ -4,9 +4,9 @@
  */
 package org.jnode.vm.compiler.ir;
 
-import org.jnode.vm.compiler.ir.quad.*;
 import org.jnode.vm.compiler.ir.quad.ConditionalBranchQuad;
 import org.jnode.vm.compiler.ir.quad.ConstantRefAssignQuad;
+import org.jnode.vm.compiler.ir.quad.UnaryQuad;
 import org.jnode.vm.compiler.ir.quad.UnconditionalBranchQuad;
 import org.jnode.vm.compiler.ir.quad.VarReturnQuad;
 import org.jnode.vm.compiler.ir.quad.VariableRefAssignQuad;
