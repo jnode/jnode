@@ -25,7 +25,7 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -90,7 +90,7 @@ final class RadeonCore implements RadeonConstants {
 			final int fbBase = (int) fbAddr.getMemoryBase() /* & 0xFF800000 */;
 
 			// Map Memory Mapped IO
-			this.mmio = rm.claimMemoryResource(device, Address.valueOf(ioBase),
+			this.mmio = rm.claimMemoryResource(device, VmAddress.valueOf(ioBase),
 					ioSize, ResourceManager.MEMMODE_NORMAL);
 			this.vgaIO = new RadeonVgaIO(mmio);
 			final int memSize = readMemorySize();
@@ -98,7 +98,7 @@ final class RadeonCore implements RadeonConstants {
 			this.accel = new RadeonAcceleration(vgaIO);
 
 			// Map Device RAM
-			this.deviceRam = rm.claimMemoryResource(device, Address
+			this.deviceRam = rm.claimMemoryResource(device, VmAddress
 					.valueOf(fbBase), memSize, ResourceManager.MEMMODE_NORMAL);
 			vgaIO.setVideoRam(deviceRam);
 
@@ -107,7 +107,7 @@ final class RadeonCore implements RadeonConstants {
 			if (romAddr != null) {
 				romAddr.setEnabled(true);
 				if (romAddr.isEnabled()) {
-					rom = rm.claimMemoryResource(device, Address
+					rom = rm.claimMemoryResource(device, VmAddress
 							.valueOf(romAddr.getRomBase()), romAddr.getSize(),
 							ResourceManager.MEMMODE_NORMAL);
 					if (!verifyBiosSignature(rom)) {
@@ -383,24 +383,24 @@ final class RadeonCore implements RadeonConstants {
 					}
 				});
 
-		final Address start = Address.valueOf(0xC0000);
-		final Address end = Address.valueOf(0xF0000);
-		final int size = (int) Address.distance(start, end);
+		final VmAddress start = VmAddress.valueOf(0xC0000);
+		final VmAddress end = VmAddress.valueOf(0xF0000);
+		final int size = (int) VmAddress.distance(start, end);
 		final int stepSize = 0x1000;
 		int offset = 0;
 		while (offset < size) {
-			final Address romAddr;
+			final VmAddress romAddr;
 			// Search for BIOS expansion
-			romAddr = scanner.findInt8Array(Address.add(start, offset), size
+			romAddr = scanner.findInt8Array(VmAddress.add(start, offset), size
 					- offset, BIOS_ROM_SIGNATURE, 0, BIOS_ROM_SIGNATURE.length,
 					stepSize);
 			if (romAddr == null) {
 				return null;
 			} else {
-				offset = (int) Address.distance(start, romAddr) + stepSize;
+				offset = (int) VmAddress.distance(start, romAddr) + stepSize;
 			}
 			// Search for ATI signature
-			final Address atiSigAddr;
+			final VmAddress atiSigAddr;
 			atiSigAddr = scanner.findInt8Array(romAddr, 128, ATI_ROM_SIGNATURE,
 					0, ATI_ROM_SIGNATURE.length, 1);
 			if (atiSigAddr == null) {
@@ -417,7 +417,7 @@ final class RadeonCore implements RadeonConstants {
 			mem.release();
 
 			log.info("Found ATI ROM at 0x"
-					+ NumberUtils.hex(Address.as32bit(romAddr)) + " size="
+					+ NumberUtils.hex(VmAddress.as32bit(romAddr)) + " size="
 					+ NumberUtils.size(romSize));
 			return rm.claimMemoryResource(owner, romAddr, romSize,
 					ResourceManager.MEMMODE_NORMAL);

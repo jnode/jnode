@@ -204,7 +204,8 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 		    final String cname = VMClassHelper.getClassNamePortion(name);
 		    if (cname.equals("Address") || cname.equals("AddressArray") ||
 		            cname.equals("Extent") || cname.equals("ExtentArray") ||
-		            cname.equals("Offset") || cname.equals("OffsetArray") ||
+		            cname.equals("ObjectReference") || cname.equals("ObjectReferenceArray") ||
+                    cname.equals("Offset") || cname.equals("OffsetArray") ||
 		            cname.equals("Word") || cname.equals("WordArray")) {
 		        accessFlags |= Modifier.ACC_MAGIC;
 		    }		 

@@ -3,7 +3,7 @@
  */
 package org.jnode.system;
 
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 /**
  * Interface or Manager of all system resources.
@@ -46,7 +46,7 @@ public interface ResourceManager {
 	 * @return The claimed resource
 	 * @throws ResourceNotFreeException
 	 */
-	public MemoryResource claimMemoryResource(ResourceOwner owner, Address start, long size, int mode) throws ResourceNotFreeException;
+	public MemoryResource claimMemoryResource(ResourceOwner owner, VmAddress start, long size, int mode) throws ResourceNotFreeException;
 
 	/**
 	 * Register an interrupt handler for a given irq number.

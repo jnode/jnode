@@ -61,7 +61,7 @@ public final class VmAccessController {
             // that does not require any memory allocations.
             final VmStackReader reader = Unsafe.getCurrentProcessor()
                     .getArchitecture().getStackReader();
-            Address sf = Unsafe.getCurrentFrame();
+            VmAddress sf = Unsafe.getCurrentFrame();
             int recursionCount = 0;
             while (reader.isValid(sf)) {
                 final VmMethod method = reader.getMethod(sf);

@@ -7,7 +7,7 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
 import org.jnode.assembler.x86.X86Constants;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
@@ -43,7 +43,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 
     private final Label jumpTableLabel;
 
-    private final Address jumpTableAddress;
+    private final VmAddress jumpTableAddress;
 
     private final boolean haveCMOV;
 

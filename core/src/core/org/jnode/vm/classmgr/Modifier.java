@@ -209,7 +209,8 @@ public class Modifier {
 	}
 
 	public static boolean isAddressType(String signature) {
-		return "Lorg/jnode/vm/Address;".equals(signature) || "Lorg/jnode/vm/PhysicalAddress".equals(signature);
+		return "Lorg/jnode/vm/VmAddress;".equals(signature) || 
+               "Lorg/vmmagic/unboxed/Address;".equals(signature);
 	}
 
 	/**

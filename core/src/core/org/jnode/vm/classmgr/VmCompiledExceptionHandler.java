@@ -3,16 +3,16 @@
  */
 package org.jnode.vm.classmgr;
 
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 /**
  * @author epr
  */
 public class VmCompiledExceptionHandler extends AbstractExceptionHandler {
 
-	private final Address handler;
-	private final Address startPtr;
-	private final Address endPtr;
+	private final VmAddress handler;
+	private final VmAddress startPtr;
+	private final VmAddress endPtr;
 
 	/**
 	 * Create a new instance
@@ -21,7 +21,7 @@ public class VmCompiledExceptionHandler extends AbstractExceptionHandler {
 	 * @param end
 	 * @param handler
 	 */
-	public VmCompiledExceptionHandler(VmConstClass catchType, Address start, Address end, Address handler) {
+	public VmCompiledExceptionHandler(VmConstClass catchType, VmAddress start, VmAddress end, VmAddress handler) {
 		super(catchType);
 		this.startPtr = start;
 		this.endPtr = end;
@@ -32,7 +32,7 @@ public class VmCompiledExceptionHandler extends AbstractExceptionHandler {
 	 * Returns the endPtr.
 	 * @return Object
 	 */
-	public Address getEnd() {
+	public VmAddress getEnd() {
 		return endPtr;
 	}
 
@@ -40,7 +40,7 @@ public class VmCompiledExceptionHandler extends AbstractExceptionHandler {
 	 * Returns the handler.
 	 * @return Object
 	 */
-	public Address getHandler() {
+	public VmAddress getHandler() {
 		return handler;
 	}
 
@@ -48,7 +48,7 @@ public class VmCompiledExceptionHandler extends AbstractExceptionHandler {
 	 * Returns the startPtr.
 	 * @return Object
 	 */
-	public Address getStart() {
+	public VmAddress getStart() {
 		return startPtr;
 	}
 	
@@ -57,9 +57,9 @@ public class VmCompiledExceptionHandler extends AbstractExceptionHandler {
 	 * @param address
 	 * @return True if address is between start and end, false otherwise
 	 */
-	public boolean isInScope(Address address) {
-		final int cmpStart = Address.compare(address, startPtr);
-		final int cmpEnd = Address.compare(address, endPtr);
+	public boolean isInScope(VmAddress address) {
+		final int cmpStart = VmAddress.compare(address, startPtr);
+		final int cmpEnd = VmAddress.compare(address, endPtr);
 		return ((cmpStart >= 0) && (cmpEnd < 0));
 	}
 }

@@ -7,7 +7,7 @@ import org.jnode.net.SocketBuffer;
 import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 /**
  * @author epr
@@ -28,9 +28,9 @@ public class _3c90xRxRing implements _3c90xConstants {
 	/** Offset within mem of first ethernet frame */
 	private final int firstFrameOffset;
 	/** 32-bit address first UDP */
-	private final Address firstUPDAddress;
+	private final VmAddress firstUPDAddress;
 	/** 32-bit address of first ethernet frame */
-	private final Address firstFrameAddress;
+	private final VmAddress firstFrameAddress;
 	
 	/**
 	 * Create a new instance
@@ -45,8 +45,8 @@ public class _3c90xRxRing implements _3c90xConstants {
 		this.nrFrames = nrFrames;
 		this.mem = rm.asMemoryResource(data);
 		
-		final Address memAddr = mem.getAddress();
-		int addr = Address.as32bit(memAddr);
+		final VmAddress memAddr = mem.getAddress();
+		int addr = VmAddress.as32bit(memAddr);
 		int offset = 0;
 		// Align on 16-byte boundary
 		while ((addr & 15) != 0) {
@@ -55,9 +55,9 @@ public class _3c90xRxRing implements _3c90xConstants {
 		}
 		
 		this.firstUPDOffset = offset;
-		this.firstUPDAddress = Address.add(memAddr, firstUPDOffset);
+		this.firstUPDAddress = VmAddress.add(memAddr, firstUPDOffset);
 		this.firstFrameOffset = firstUPDOffset + (nrFrames * UPD_SIZE);
-		this.firstFrameAddress = Address.add(memAddr, firstFrameOffset);
+		this.firstFrameAddress = VmAddress.add(memAddr, firstFrameOffset);
 	}
 	
 	/**
@@ -69,14 +69,14 @@ public class _3c90xRxRing implements _3c90xConstants {
 			final int updOffset = firstUPDOffset + (i * UPD_SIZE);
 			// Set next UPD ptr
 			if (i+1 < nrFrames) {
-				mem.setInt(updOffset+0, Address.as32bit(firstUPDAddress) + ((i+1) * UPD_SIZE));
+				mem.setInt(updOffset+0, VmAddress.as32bit(firstUPDAddress) + ((i+1) * UPD_SIZE));
 			} else {
-				mem.setInt(updOffset+0, Address.as32bit(firstUPDAddress));
+				mem.setInt(updOffset+0, VmAddress.as32bit(firstUPDAddress));
 			}
 			// Set pkt status
 			mem.setInt(updOffset+4, 0);
 			// Set fragment address
-			mem.setInt(updOffset+8, Address.as32bit(firstFrameAddress) + (i * FRAME_SIZE));
+			mem.setInt(updOffset+8, VmAddress.as32bit(firstFrameAddress) + (i * FRAME_SIZE));
 			// Set fragment size
 			mem.setInt(updOffset+12, FRAME_SIZE | (1<<31));
 		}
@@ -118,7 +118,7 @@ public class _3c90xRxRing implements _3c90xConstants {
 	/**
 	 * Gets the address of the first UPD of this ring.
 	 */
-	public Address getFirstUPDAddress() {
+	public VmAddress getFirstUPDAddress() {
 		return firstUPDAddress;
 	}
 

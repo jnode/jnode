@@ -6,7 +6,7 @@ package org.jnode.build;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.UnresolvedObjectRefException;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -24,14 +24,14 @@ public class BuildObjectResolver extends ObjectResolver {
 	/**
 	 * @see org.jnode.assembler.ObjectResolver#add(org.jnode.vm.Address, int)
 	 */
-	public Address add(Address address, int offset) {
+	public VmAddress add(VmAddress address, int offset) {
 		throw new RuntimeException("Not implemented");
 	}
 
 	/**
 	 * @see org.jnode.assembler.ObjectResolver#addressOf(java.lang.Object)
 	 */
-	public Address addressOf(Object object) {
+	public VmAddress addressOf(Object object) {
 		throw new RuntimeException("Not implemented");
 	}
 
@@ -76,14 +76,14 @@ public class BuildObjectResolver extends ObjectResolver {
 	/**
 	 * @see org.jnode.assembler.ObjectResolver#addressOfArrayData(java.lang.Object)
 	 */
-	public Address addressOfArrayData(Object array) {
+	public VmAddress addressOfArrayData(Object array) {
 		throw new RuntimeException("Not implemented");
 	}
 
 	/**
 	 * @see org.jnode.assembler.ObjectResolver#objectAt(org.jnode.vm.Address)
 	 */
-	public Object objectAt(Address ptr) {
+	public Object objectAt(VmAddress ptr) {
 		throw new RuntimeException("Not implemented");
 	}
 

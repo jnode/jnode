@@ -173,9 +173,9 @@ public final class VmSystem {
      *         available.
      */
     private static MemoryResource loadInitJar(ResourceManager rm) {
-        final Address start = Unsafe.getInitJarStart();
-        final Address end = Unsafe.getInitJarEnd();
-        final long size = Address.distance(end, start);
+        final VmAddress start = Unsafe.getInitJarStart();
+        final VmAddress end = Unsafe.getInitJarEnd();
+        final long size = VmAddress.distance(end, start);
         if (size == 0L) {
             // No initial jarfile
             BootLog.info("No initial jarfile found");
@@ -293,7 +293,7 @@ public final class VmSystem {
      * @param obj
      * @return int
      */
-    public static Address addressOf(Object obj) {
+    public static VmAddress addressOf(Object obj) {
         return Unsafe.addressOf(obj);
     }
 
@@ -340,7 +340,7 @@ public final class VmSystem {
         final VmStackReader reader = Unsafe.getCurrentProcessor()
                 .getArchitecture().getStackReader();
         final VmSystemClassLoader systemLoader = VmSystem.systemLoader;
-        Address f = Unsafe.getCurrentFrame();
+        VmAddress f = Unsafe.getCurrentFrame();
         while (reader.isValid(f)) {
             final VmMethod method = reader.getMethod(f);
             final VmClassLoader loader = method.getDeclaringClass().getLoader();
@@ -427,7 +427,7 @@ public final class VmSystem {
                 proc.enableReschedule();
             }
         } else if (current == proc.getCurrentThread()) {
-            final Address curFrame = Unsafe.getCurrentFrame();
+            final VmAddress curFrame = Unsafe.getCurrentFrame();
             mt = reader.getVmStackTrace(reader.getPrevious(curFrame), reader
                     .getReturnAddress(curFrame), STACKTRACE_LIMIT);
         } else {
@@ -495,8 +495,8 @@ public final class VmSystem {
      * @param address
      * @return Object
      */
-    public static Address findThrowableHandler(Throwable ex, Address frame,
-            Address address) throws PrivilegedActionPragma {
+    public static VmAddress findThrowableHandler(Throwable ex, VmAddress frame,
+            VmAddress address) throws PrivilegedActionPragma {
 
         try {
         	debug++;
@@ -724,9 +724,9 @@ public final class VmSystem {
             throw new ArrayStoreException("Unknown array type");
         }
 
-        Address srcPtr = Unsafe.add(Unsafe.addressOf(src), dataOffset
+        VmAddress srcPtr = Unsafe.add(Unsafe.addressOf(src), dataOffset
                 + (srcPos * elemsize));
-        Address dstPtr = Unsafe.add(Unsafe.addressOf(dst), dataOffset
+        VmAddress dstPtr = Unsafe.add(Unsafe.addressOf(dst), dataOffset
                 + (dstPos * elemsize));
 
         Unsafe.copy(srcPtr, dstPtr, length * elemsize);
@@ -952,7 +952,7 @@ public final class VmSystem {
         final Vm vm = Vm.getVm();
         final int ptrSize = vm.getArch().getReferenceSize();
         final Object staticsTable = Unsafe.getCurrentProcessor().getStaticsTable();
-        final Address ptr = Address.addressOfArrayData(staticsTable);
+        final VmAddress ptr = VmAddress.addressOfArrayData(staticsTable);
         Unsafe.setObject(ptr, f.getStaticsIndex() * ptrSize, value);
     }
 }

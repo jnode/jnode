@@ -8,7 +8,7 @@ import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.X86Stream;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.classmgr.VmClassLoader;
@@ -72,7 +72,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements 
 			return cm;
 		} else {
 			// Set the address of the abstract method code
-			final Address errorAddr = Unsafe.getJumpTableEntry(X86JumpTable.VM_INVOKE_ABSTRACT_OFS);
+			final VmAddress errorAddr = Unsafe.getJumpTableEntry(X86JumpTable.VM_INVOKE_ABSTRACT_OFS);
 			final VmCompiledCode code = new VmCompiledCode(this, null, errorAddr, null, 0, null, null, null);
 			method.addCompiledCode(code, level);
 			return null;

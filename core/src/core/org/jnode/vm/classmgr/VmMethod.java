@@ -8,13 +8,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 import org.vmmagic.pragma.UninterruptiblePragma;
 
 public abstract class VmMethod extends VmMember implements VmStaticsEntry {
 
     /** Address of native code of this method */
-    private Address nativeCode;
+    private VmAddress nativeCode;
 
     /** #Slots taken by arguments of this method (including this pointer) */
     private final int argSlotCount;
@@ -514,7 +514,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
         if (nativeCode == null) {
             System.err.println("nativeCode == null in " + this);
         } else {
-            final int ptr = Address.as32bit(nativeCode);
+            final int ptr = VmAddress.as32bit(nativeCode);
             if ((ptr < 0) || (Math.abs(ptr) < 4096)) {
                 System.err.println("nativeCode has low address " + ptr + " in "
                         + this);

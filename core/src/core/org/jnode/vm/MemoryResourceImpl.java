@@ -38,9 +38,9 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
     /** My parent */
     private final MemoryResourceImpl parent;
 	/** Start address */
-	private final Address start;
+	private final VmAddress start;
 	/** Exclusive end address */
-	private final Address end;
+	private final VmAddress end;
 	/** Size in bytes */
 	private final long size;
 	/** Has this resource been released? */
@@ -65,14 +65,14 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 * @param start
 	 * @param size
 	 */
-	private MemoryResourceImpl(MemoryResourceImpl parent, ResourceOwner owner, Address start, long size) {
+	private MemoryResourceImpl(MemoryResourceImpl parent, ResourceOwner owner, VmAddress start, long size) {
 		super(owner);
 		this.parent = parent;
 		this.start = start;
 		if (parent != null) {
-		    this.offset = Address.distance(parent.start, start);
+		    this.offset = VmAddress.distance(parent.start, start);
 		} else {
-		    this.offset = Address.as64bit(start);
+		    this.offset = VmAddress.as64bit(start);
 		}
 		this.end = Unsafe.add(start, Unsafe.longToAddress(size));
 		this.size = size;
@@ -86,8 +86,8 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		this.parent = null;
 		this.data = arrayData;
 		this.size = length * elementSize;
-		this.start = Address.addressOfArrayData(arrayData);
-		this.offset = Address.as64bit(start);
+		this.start = VmAddress.addressOfArrayData(arrayData);
+		this.offset = VmAddress.as64bit(start);
 		this.end = Unsafe.add(start, length * elementSize);
 		this.released = false;
 		this.slotSize = Unsafe.getCurrentProcessor().getArchitecture().getReferenceSize();
@@ -103,7 +103,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 * @return The claimed resource
 	 * @throws ResourceNotFreeException
 	 */
-	protected static synchronized MemoryResource claimMemoryResource(ResourceOwner owner, Address start, long size, int mode) throws ResourceNotFreeException {
+	protected static synchronized MemoryResource claimMemoryResource(ResourceOwner owner, VmAddress start, long size, int mode) throws ResourceNotFreeException {
 		if (start != null) {
 			final MemoryResourceImpl res = new MemoryResourceImpl(null, owner, start, size);
 			if (isFree(resources, res)) {
@@ -114,7 +114,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			}
 		} else {
 			// Find a range
-			Address ptr;
+			VmAddress ptr;
 			if (mode == ResourceManager.MEMMODE_ALLOC_DMA) {
 				ptr = Unsafe.getMinAddress();
 			} else {
@@ -160,7 +160,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
 		}
 		testMemPtr(memPtr, length);
-		Address dstPtr = Unsafe.add(Unsafe.addressOf(dst), (VmArray.DATA_OFFSET * slotSize) + dstOfs);
+		VmAddress dstPtr = Unsafe.add(Unsafe.addressOf(dst), (VmArray.DATA_OFFSET * slotSize) + dstOfs);
 		Unsafe.copy(Unsafe.add(start, memPtr), dstPtr, length);
 	}
 
@@ -194,7 +194,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
 		}
 		testMemPtr(memPtr, length * 2);
-		Address dstPtr = Unsafe.add(Unsafe.addressOf(dst), (VmArray.DATA_OFFSET * slotSize) + (dstOfs * 2));
+		VmAddress dstPtr = Unsafe.add(Unsafe.addressOf(dst), (VmArray.DATA_OFFSET * slotSize) + (dstOfs * 2));
 		Unsafe.copy(Unsafe.add(start, memPtr), dstPtr, length * 2);
 	}
 
@@ -228,7 +228,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
 		}
 		testMemPtr(memPtr, length * 2);
-		Address dstPtr = Unsafe.add(Unsafe.addressOf(dst), (VmArray.DATA_OFFSET * slotSize) + (dstOfs * 2));
+		VmAddress dstPtr = Unsafe.add(Unsafe.addressOf(dst), (VmArray.DATA_OFFSET * slotSize) + (dstOfs * 2));
 		Unsafe.copy(Unsafe.add(start, memPtr), dstPtr, length * 2);
 	}
 
@@ -262,7 +262,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
 		}
 		testMemPtr(memPtr, length * 4);
-		Address dstPtr = Unsafe.add(Unsafe.addressOf(dst), (VmArray.DATA_OFFSET * slotSize) + (dstOfs * 4));
+		VmAddress dstPtr = Unsafe.add(Unsafe.addressOf(dst), (VmArray.DATA_OFFSET * slotSize) + (dstOfs * 4));
 		Unsafe.copy(Unsafe.add(start, memPtr), dstPtr, length * 4);
 	}
 
@@ -296,7 +296,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
 		}
 		testMemPtr(memPtr, length * 8);
-		Address dstPtr = Unsafe.add(Unsafe.addressOf(dst), (VmArray.DATA_OFFSET * slotSize) + (dstOfs * 8));
+		VmAddress dstPtr = Unsafe.add(Unsafe.addressOf(dst), (VmArray.DATA_OFFSET * slotSize) + (dstOfs * 8));
 		Unsafe.copy(Unsafe.add(start, memPtr), dstPtr, length * 8);
 	}
 
@@ -330,7 +330,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
 		}
 		testMemPtr(memPtr, length * 4);
-		Address dstPtr = Unsafe.add(Unsafe.addressOf(dst), (VmArray.DATA_OFFSET * slotSize) + (dstOfs * 4));
+		VmAddress dstPtr = Unsafe.add(Unsafe.addressOf(dst), (VmArray.DATA_OFFSET * slotSize) + (dstOfs * 4));
 		Unsafe.copy(Unsafe.add(start, memPtr), dstPtr, length * 4);
 	}
 
@@ -364,7 +364,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
 		}
 		testMemPtr(memPtr, length * 8);
-		Address dstPtr = Unsafe.add(Unsafe.addressOf(dst), (VmArray.DATA_OFFSET * slotSize) + (dstOfs * 8));
+		VmAddress dstPtr = Unsafe.add(Unsafe.addressOf(dst), (VmArray.DATA_OFFSET * slotSize) + (dstOfs * 8));
 		Unsafe.copy(Unsafe.add(start, memPtr), dstPtr, length * 8);
 	}
 
@@ -412,7 +412,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
 		}
 		testMemPtr(dstPtr, length);
-		Address srcPtr = Unsafe.add(Unsafe.addressOf(src), (VmArray.DATA_OFFSET * slotSize) + srcOfs);
+		VmAddress srcPtr = Unsafe.add(Unsafe.addressOf(src), (VmArray.DATA_OFFSET * slotSize) + srcOfs);
 		Unsafe.copy(srcPtr, Unsafe.add(start, dstPtr), length);
 	}
 
@@ -446,7 +446,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
 		}
 		testMemPtr(dstPtr, length * 2);
-		Address srcPtr = Unsafe.add(Unsafe.addressOf(src), (VmArray.DATA_OFFSET * slotSize) + (srcOfs * 2));
+		VmAddress srcPtr = Unsafe.add(Unsafe.addressOf(src), (VmArray.DATA_OFFSET * slotSize) + (srcOfs * 2));
 		Unsafe.copy(srcPtr, Unsafe.add(start, dstPtr), length * 2);
 	}
 
@@ -480,7 +480,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
 		}
 		testMemPtr(dstPtr, length * 2);
-		Address srcPtr = Unsafe.add(Unsafe.addressOf(src), (VmArray.DATA_OFFSET * slotSize) + (srcOfs * 2));
+		VmAddress srcPtr = Unsafe.add(Unsafe.addressOf(src), (VmArray.DATA_OFFSET * slotSize) + (srcOfs * 2));
 		Unsafe.copy(srcPtr, Unsafe.add(start, dstPtr), length * 2);
 	}
 
@@ -514,7 +514,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
 		}
 		testMemPtr(dstPtr, length * 4);
-		Address srcPtr = Unsafe.add(Unsafe.addressOf(src), (VmArray.DATA_OFFSET * slotSize) + (srcOfs * 4));
+		VmAddress srcPtr = Unsafe.add(Unsafe.addressOf(src), (VmArray.DATA_OFFSET * slotSize) + (srcOfs * 4));
 		Unsafe.copy(srcPtr, Unsafe.add(start, dstPtr), length * 4);
 	}
 
@@ -548,7 +548,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
 		}
 		testMemPtr(dstPtr, length * 4);
-		Address srcPtr = Unsafe.add(Unsafe.addressOf(src), (VmArray.DATA_OFFSET * slotSize) + (srcOfs * 4));
+		VmAddress srcPtr = Unsafe.add(Unsafe.addressOf(src), (VmArray.DATA_OFFSET * slotSize) + (srcOfs * 4));
 		Unsafe.copy(srcPtr, Unsafe.add(start, dstPtr), length * 4);
 	}
 
@@ -582,7 +582,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
 		}
 		testMemPtr(dstPtr, length * 8);
-		Address srcPtr = Unsafe.add(Unsafe.addressOf(src), (VmArray.DATA_OFFSET * slotSize) + (srcOfs * 8));
+		VmAddress srcPtr = Unsafe.add(Unsafe.addressOf(src), (VmArray.DATA_OFFSET * slotSize) + (srcOfs * 8));
 		Unsafe.copy(srcPtr, Unsafe.add(start, dstPtr), length * 8);
 	}
 
@@ -616,7 +616,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			throw new IndexOutOfBoundsException("dstOfs + length > dst.length");
 		}
 		testMemPtr(dstPtr, length * 8);
-		Address srcPtr = Unsafe.add(Unsafe.addressOf(src), (VmArray.DATA_OFFSET * slotSize) + (srcOfs * 8));
+		VmAddress srcPtr = Unsafe.add(Unsafe.addressOf(src), (VmArray.DATA_OFFSET * slotSize) + (srcOfs * 8));
 		Unsafe.copy(srcPtr, Unsafe.add(start, dstPtr), length * 8);
 	}
 
@@ -713,7 +713,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 * Gets the address of the first byte of this buffer
 	 * @return Address of first byte in buffer
 	 */
-	public Address getAddress() {
+	public VmAddress getAddress() {
 		return start;
 	}
 
@@ -747,7 +747,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 * @return a negative integer, zero, or a positive integer as this region is less than,
 	 *         overlapping, or greater than the address.
 	 */
-	public int compareTo(Address address) {
+	public int compareTo(VmAddress address) {
 		int rc = Unsafe.compare(this.end, address);
 		if (rc <= 0) {
 			// this < address
@@ -1085,7 +1085,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	    long offset = 0;
 	    final int alignMask = align - 1;
 	    while (true) {
-		    final Address addr = Unsafe.add(this.start, Unsafe.longToAddress(offset));
+		    final VmAddress addr = Unsafe.add(this.start, Unsafe.longToAddress(offset));
 		    final MemoryResourceImpl child = new MemoryResourceImpl(this, getOwner(), addr, size);
 		    final MemoryResourceImpl existingChild = (MemoryResourceImpl)get(this.children, child);
 		    if (existingChild == null) {
@@ -1132,7 +1132,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	    if (offset + size > this.size) {
 	        throw new IndexOutOfBoundsException("Offset + size > this.size");	        
 	    }
-	    final Address addr = Unsafe.add(this.start, Unsafe.longToAddress(offset));
+	    final VmAddress addr = Unsafe.add(this.start, Unsafe.longToAddress(offset));
 	    final MemoryResourceImpl child = new MemoryResourceImpl(this, getOwner(), addr, size);
 	    synchronized (this) {
 	        // Re-test released flag

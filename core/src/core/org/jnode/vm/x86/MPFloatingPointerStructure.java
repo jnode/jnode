@@ -10,7 +10,7 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 
 /**
@@ -72,8 +72,8 @@ public class MPFloatingPointerStructure {
      * Gets the physical address of the MP configuration table.
      * @return
      */
-    final Address getMPConfigTablePtr() {
-        return Address.valueOf(mem.getInt(0x04));
+    final VmAddress getMPConfigTablePtr() {
+        return VmAddress.valueOf(mem.getInt(0x04));
     }
     
     /**
@@ -113,7 +113,7 @@ public class MPFloatingPointerStructure {
     }
     
     private final boolean initConfigTable(ResourceManager rm, ResourceOwner owner) {
-        final Address tablePtr = getMPConfigTablePtr();
+        final VmAddress tablePtr = getMPConfigTablePtr();
         int size = 0x2C; // Base table length
         try {
             MemoryResource mem = rm.claimMemoryResource(owner, tablePtr, size, ResourceManager.MEMMODE_NORMAL);
@@ -149,11 +149,11 @@ public class MPFloatingPointerStructure {
      */
     private static MPFloatingPointerStructure find(ResourceManager rm, ResourceOwner owner, int startPtr, int endPtr) {
         final MemoryScanner ms = rm.getMemoryScanner();
-        Address ptr = Address.valueOf(startPtr);
+        VmAddress ptr = VmAddress.valueOf(startPtr);
         int size = endPtr - startPtr;  
         final int stepSize = 16;
         while (size > 0) {
-            Address res = ms.findInt32(ptr, size, MAGIC, stepSize);
+            VmAddress res = ms.findInt32(ptr, size, MAGIC, stepSize);
             if (res != null) {
                 try {
                     final MemoryResource mem;
@@ -169,7 +169,7 @@ public class MPFloatingPointerStructure {
                     BootLog.warn("Cannot claim MP region");
                 }
             }
-            ptr = Address.add(ptr, stepSize);
+            ptr = VmAddress.add(ptr, stepSize);
             size -= stepSize;
         }
         return null;

@@ -7,7 +7,7 @@ package org.jnode.driver.net.rtl8139;
 import org.jnode.net.SocketBuffer;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 /**
  * @author Martin Husted Hartvig
@@ -32,7 +32,7 @@ public class RTL8139RxRing implements RTL8139Constants
   private final int firstUPDOffset;
 
   /** 32-bit address first UDP */
-  private final Address firstUPDAddress;
+  private final VmAddress firstUPDAddress;
 
   private int index;
 
@@ -53,11 +53,11 @@ public class RTL8139RxRing implements RTL8139Constants
     this.nrFrames = nrFrames;
     this.mem = rm.asMemoryResource(data);
 
-    final Address memAddr = mem.getAddress();
+    final VmAddress memAddr = mem.getAddress();
     int offset = 0;
 
     this.firstUPDOffset = offset;
-    this.firstUPDAddress = Address.add(memAddr, firstUPDOffset);
+    this.firstUPDAddress = VmAddress.add(memAddr, firstUPDOffset);
   }
 
   /**
@@ -133,7 +133,7 @@ public class RTL8139RxRing implements RTL8139Constants
    * Gets the address of the first UPD of this ring.
    */
 
-  public Address getFirstUPDAddress()
+  public VmAddress getFirstUPDAddress()
   {
     return firstUPDAddress;
   }

@@ -251,9 +251,9 @@ public class VmReflection {
      * @param sf
      * @return The address of the static field data
      */
-    private static final Address getStaticFieldAddress(VmStaticField sf) {
+    private static final VmAddress getStaticFieldAddress(VmStaticField sf) {
         final VmProcessor proc = Unsafe.getCurrentProcessor();
-        final Address tablePtr = Address.addressOfArrayData(proc
+        final VmAddress tablePtr = VmAddress.addressOfArrayData(proc
                 .getStaticsTable());
         final int offset = sf.getStaticsIndex() << 2;
         return Unsafe.add(tablePtr, offset);

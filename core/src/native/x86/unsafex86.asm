@@ -63,8 +63,8 @@ Q53org5jnode2vm3x869UnsafeX8623getAPBootCodeSize2e2829I:
 	mov eax,ap_boot_end-ap_boot
 	ret
 
-; void setupBootCode(Address memory, int[] gdtBase, int[] tss);
-Q53org5jnode2vm3x869UnsafeX8623setupBootCode2e28Lorg2fjnode2fvm2fAddress3b5bI5bI29V:
+; void setupBootCode(VmAddress memory, int[] gdtBase, int[] tss);
+Q53org5jnode2vm3x869UnsafeX8623setupBootCode2e28Lorg2fjnode2fvm2fVmAddress3b5bI5bI29V:
 	push ebx
 	
 	mov eax,[esp+16]		; memory

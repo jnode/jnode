@@ -3,7 +3,7 @@
  */
 package org.jnode.vm.memmgr.def;
 
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
@@ -19,7 +19,7 @@ import org.vmmagic.pragma.UninterruptiblePragma;
 public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 
     /** Offset within this heap of the next free memory block */
-    private Address nextFreePtr;
+    private VmAddress nextFreePtr;
 
     /** The allocation bitmap as object, so we won't throw it away in a GC cycle */
     private Object allocationBitmap;
@@ -47,7 +47,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
      * @param slotSize
      * @return the heap
      */
-    protected static VmAbstractHeap setupHeap(HeapHelper helper, Address start,
+    protected static VmAbstractHeap setupHeap(HeapHelper helper, VmAddress start,
             VmNormalClass heapClass, int slotSize) {
         final int headerSize = ObjectLayout
                 .objectAlign((ObjectLayout.HEADER_SLOTS + 1) * slotSize);
@@ -57,7 +57,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         final int flagsOffset = ObjectLayout.FLAGS_SLOT * slotSize;
 
         // Setup a heap object, so the heap can initialize itself.
-        Address heapPtr = Address.add(start, headerSize);
+        VmAddress heapPtr = VmAddress.add(start, headerSize);
         final int heapObjSize = ObjectLayout.objectAlign(heapClass
                 .getObjectSize());
         helper.setInt(heapPtr, sizeOffset, heapObjSize);
@@ -79,7 +79,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
      *            End address of this heap (first address after this heap)
      * @param slotSize
      */
-    protected void initialize(Address start, Address end, int slotSize) {
+    protected void initialize(VmAddress start, VmAddress end, int slotSize) {
 
         // Set my variables
         this.start = start;
@@ -90,12 +90,12 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         final int size = getSize();
 
         final int mySize = helper.getInt(this, sizeOffset);
-        final Address myAddr = helper.addressOf(this);
-        Address firstObject;
+        final VmAddress myAddr = helper.addressOf(this);
+        VmAddress firstObject;
         if (inHeap(myAddr)) {
-            firstObject = Address.add(myAddr, mySize + headerSize);
+            firstObject = VmAddress.add(myAddr, mySize + headerSize);
         } else {
-            firstObject = Address.add(start, headerSize);
+            firstObject = VmAddress.add(start, headerSize);
         }
 
         // Initialize an allocation bitmap
@@ -108,7 +108,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         helper.setInt(allocationBitmapPtr, flagsOffset, GC_DEFAULT_COLOR);
         helper.setObject(allocationBitmapPtr, tibOffset, VmType
                 .getObjectClass().getTIB());
-        firstObject = Address.add(firstObject, allocationBitmapSize
+        firstObject = VmAddress.add(firstObject, allocationBitmapSize
                 + headerSize);
         helper.clear(allocationBitmapPtr, allocationBitmapSize);
         this.allocationBitmap = helper.objectAt(allocationBitmapPtr);
@@ -119,8 +119,8 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         setAllocationBit(allocationBitmap, true);
 
         // Initialize the remaining space as free object.
-        final int remainingSize = (int) Address.distance(end, firstObject);
-        final Address ptr = firstObject;
+        final int remainingSize = (int) VmAddress.distance(end, firstObject);
+        final VmAddress ptr = firstObject;
         helper.setInt(ptr, sizeOffset, remainingSize);
         helper.setObject(ptr, tibOffset, FREE);
         this.nextFreePtr = ptr;
@@ -149,16 +149,16 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         final int tibOffset = this.tibOffset;
         final int headerSize = this.headerSize;
 
-        Address objectPtr = null;
+        VmAddress objectPtr = null;
         lock();
         try {
             // Search for the first free block that is large enough
             //Screen.debug("a");
             while (objectPtr == null) {
-                final Address ptr = nextFreePtr;
+                final VmAddress ptr = nextFreePtr;
                 final int objSize = helper.getInt(ptr, sizeOffset);
                 final Object objVmt = helper.getObject(ptr, tibOffset);
-                final Address nextPtr = Address.add(ptr, objSize + headerSize);
+                final VmAddress nextPtr = VmAddress.add(ptr, objSize + headerSize);
                 if ((objVmt == FREE) && (alignedSize <= objSize)) {
                     objectPtr = ptr;
                 } else {
@@ -188,7 +188,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
                     Unsafe.debug("\nheaderSize  "); Unsafe.debug(headerSize);
                     throw new Error("Block splitup failed");
                 }*/
-                final Address newFreePtr = Address.add(objectPtr, totalSize);
+                final VmAddress newFreePtr = VmAddress.add(objectPtr, totalSize);
                 // Set the header for the remaining free block
                 helper.setInt(newFreePtr, sizeOffset, newFreeSize);
                 helper.setInt(newFreePtr, flagsOffset, 0);
@@ -256,9 +256,9 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 
         lock();
         try {
-            Address firstFreePtr = null;
+            VmAddress firstFreePtr = null;
             while (offset < size) {
-                final Address ptr = Address.add(start, offset);
+                final VmAddress ptr = VmAddress.add(start, offset);
                 final Object object = helper.objectAt(ptr);
                 final int objSize = helper.getInt(object, sizeOffset);
                 final int nextOffset = offset + objSize + headerSize;
@@ -270,7 +270,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
                     final Object nextObject;
                     final Object nextVmt;
                     nextObject = helper
-                            .objectAt(Address.add(start, nextOffset));
+                            .objectAt(VmAddress.add(start, nextOffset));
                     nextVmt = helper.getObject(nextObject, tibOffset);
                     if (nextVmt == FREE) {
                         // Combine two free spaces
@@ -319,7 +319,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 
                 lock();
                 try {
-                    final Address ptr = Address.add(start, offset);
+                    final VmAddress ptr = VmAddress.add(start, offset);
                     object = helper.objectAt(ptr);
                     tib = helper.getObject(object, tibOffset);
                     objSize = helper.getInt(object, sizeOffset);
@@ -339,7 +339,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
             }
         } else {
             while (offset < size) {
-                final Address ptr = Address.add(start, offset);
+                final VmAddress ptr = VmAddress.add(start, offset);
                 final Object object = helper.objectAt(ptr);
                 final Object tib = helper.getObject(object, tibOffset);
                 final int objSize = helper.getInt(object, sizeOffset);

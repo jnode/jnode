@@ -3,7 +3,7 @@
  */
 package org.jnode.system;
 
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 
 /**
@@ -517,7 +517,7 @@ public interface MemoryResource extends Resource {
 	 * Gets the address of the first byte of this buffer 
 	 * @return The address of the first byte of this buffer
 	 */
-	public abstract Address getAddress();
+	public abstract VmAddress getAddress();
 	
 	/**
 	 * Get a memory resource for a portion of this memory resources.

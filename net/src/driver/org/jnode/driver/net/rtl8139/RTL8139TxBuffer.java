@@ -8,7 +8,7 @@ import org.jnode.net.SocketBuffer;
 import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 /**
  * @author Martin Husted Hartvig
@@ -30,7 +30,7 @@ public class RTL8139TxBuffer implements RTL8139Constants
   private final int firstDPDOffset;
 
   /** 32-bit address first DPD */
-  private final Address firstDPDAddress;
+  private final VmAddress firstDPDAddress;
 
   /**
    * Create a new instance
@@ -46,12 +46,12 @@ public class RTL8139TxBuffer implements RTL8139Constants
     this.data = new byte[size];
     this.mem = rm.asMemoryResource(data);
 
-    final Address memAddr = mem.getAddress();
+    final VmAddress memAddr = mem.getAddress();
     //int addr = Address.as32bit(memAddr);
     int offset = 0;
 
     this.firstDPDOffset = offset;
-    this.firstDPDAddress = Address.add(memAddr, firstDPDOffset);
+    this.firstDPDAddress = VmAddress.add(memAddr, firstDPDOffset);
   }
 
   /**
@@ -75,7 +75,7 @@ public class RTL8139TxBuffer implements RTL8139Constants
   /**
    * Gets the address of the first DPD in this buffer.
    */
-  public Address getFirstDPDAddress()
+  public VmAddress getFirstDPDAddress()
   {
     return firstDPDAddress;
   }

@@ -4,7 +4,7 @@
 package org.jnode.vm.x86;
 
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmThread;
 import org.jnode.vm.memmgr.HeapHelper;
@@ -25,9 +25,9 @@ public final class VmX86Thread extends VmThread {
 	volatile int esi;
 	volatile int edi;
 	volatile int eflags;
-	volatile Address eip;
-	volatile Address esp;
-	volatile Address ebp;
+	volatile VmAddress eip;
+	volatile VmAddress esp;
+	volatile VmAddress ebp;
 	
 	// State upon last system exception
 	volatile int exEax;
@@ -69,7 +69,7 @@ public final class VmX86Thread extends VmThread {
 	 * Gets the most current stackframe of this thread.
 	 * @return Stackframe 
 	 */
-	protected Address getStackFrame() {
+	protected VmAddress getStackFrame() {
 		return ebp;
 	}
 	
@@ -78,22 +78,22 @@ public final class VmX86Thread extends VmThread {
 	 * This method is only valid when this thread is not running.
 	 * @return IP 
 	 */
-	protected Address getInstructionPointer() {
+	protected VmAddress getInstructionPointer() {
 		return eip;
 	}
 
     /**
      * Gets the stackframe of the last system exception of this thread. 
      */
-    protected Address getExceptionStackFrame() {
-        return Address.valueOf(exEbp);
+    protected VmAddress getExceptionStackFrame() {
+        return VmAddress.valueOf(exEbp);
     }
 
     /**
      * Gets the instruction pointer of the last system exception of this thread. 
      */
-    protected Address getExceptionInstructionPointer() {
-        return Address.valueOf(exEip);
+    protected VmAddress getExceptionInstructionPointer() {
+        return VmAddress.valueOf(exEip);
     }
 
 	/**
@@ -102,8 +102,8 @@ public final class VmX86Thread extends VmThread {
 	 * @param stackSize
 	 * @return End address of the stack
 	 */
-	protected Address getStackEnd(Object stack, int stackSize) {
-		return Address.add(Address.valueOf(stack), STACK_OVERFLOW_LIMIT);
+	protected VmAddress getStackEnd(Object stack, int stackSize) {
+		return VmAddress.add(VmAddress.valueOf(stack), STACK_OVERFLOW_LIMIT);
 	}
 	
 	/**
@@ -112,8 +112,8 @@ public final class VmX86Thread extends VmThread {
 	 * @param stackSize
 	 * @return End address of the stack
 	 */
-	private static Address getStackEnd(byte[] stack, int stackSize) {
-		return Address.add(Address.addressOfArrayData(stack), STACK_OVERFLOW_LIMIT);
+	private static VmAddress getStackEnd(byte[] stack, int stackSize) {
+		return VmAddress.add(VmAddress.addressOfArrayData(stack), STACK_OVERFLOW_LIMIT);
 	}
 	
 	/**
@@ -145,7 +145,7 @@ public final class VmX86Thread extends VmThread {
         if (stack != null) {
             final int slotSize = VmX86Architecture.SLOT_SIZE;
             for (int i = 0; i < stackSize; i += slotSize) {
-                final Address child = helper.getAddress(stack, i);
+                final VmAddress child = helper.getAddress(stack, i);
                 if (child != null) {
                     if (heapManager.isObject(child)) {
                         visitor.visit(child);
@@ -154,27 +154,27 @@ public final class VmX86Thread extends VmThread {
             }
         }
         // Scan registers
-        Address addr = Address.valueOf(eax);
+        VmAddress addr = VmAddress.valueOf(eax);
         if (heapManager.isObject(addr)) {
             visitor.visit(addr);
         }
-        addr = Address.valueOf(ebx);
+        addr = VmAddress.valueOf(ebx);
         if (heapManager.isObject(addr)) {
             visitor.visit(addr);
         }
-        addr = Address.valueOf(ecx);
+        addr = VmAddress.valueOf(ecx);
         if (heapManager.isObject(addr)) {
             visitor.visit(addr);
         }
-        addr = Address.valueOf(edx);
+        addr = VmAddress.valueOf(edx);
         if (heapManager.isObject(addr)) {
             visitor.visit(addr);
         }
-        addr = Address.valueOf(esi);
+        addr = VmAddress.valueOf(esi);
         if (heapManager.isObject(addr)) {
             visitor.visit(addr);
         }
-        addr = Address.valueOf(edi);
+        addr = VmAddress.valueOf(edi);
         if (heapManager.isObject(addr)) {
             visitor.visit(addr);
         }

@@ -8,7 +8,7 @@ import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.X86Stream;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
@@ -45,7 +45,7 @@ public class X86StubCompiler extends AbstractX86Compiler {
 			super.compileRuntime(method, resolver, level, os);
 		} else {
 			// Only set the code address of the interpreter
-			final Address intrAddr = Unsafe.getJumpTableEntry(X86JumpTable.VM_INVOKE_METHOD_AFTER_RECOMPILE_OFS);
+			final VmAddress intrAddr = Unsafe.getJumpTableEntry(X86JumpTable.VM_INVOKE_METHOD_AFTER_RECOMPILE_OFS);
 			final VmCompiledCode code = new VmCompiledCode(this, null, intrAddr, null, 0, null, null, null);
 			method.addCompiledCode(code, level);
 		}

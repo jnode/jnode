@@ -13,13 +13,15 @@ import org.jnode.vm.classmgr.VmMethod;
  */
 public class BaseMagicHelper {
 
-    protected static final int ADDRESS = 1;
+    protected static final int cADDRESS = 1;
 
-    protected static final int EXTENT = 2;
+    protected static final int cEXTENT = 2;
 
-    protected static final int OFFSET = 3;
+    protected static final int cOBJECTREFERENCE = 3;
 
-    protected static final int WORD = 4;
+    protected static final int cOFFSET = 4;
+
+    protected static final int cWORD = 5;
 
     protected static final int mADD = 1;
 
@@ -176,27 +178,45 @@ public class BaseMagicHelper {
     protected static final int mSTOREOBJECTREFERENCE_OFS = 79;
 
     protected static final int mPREPAREINT = 80;
+
     protected static final int mPREPAREINT_OFS = 81;
+
     protected static final int mPREPAREADDRESS = 82;
+
     protected static final int mPREPAREADDRESS_OFS = 83;
+
     protected static final int mPREPAREWORD = 84;
+
     protected static final int mPREPAREWORD_OFS = 85;
+
     protected static final int mPREPAREOBJECTREFERENCE = 86;
+
     protected static final int mPREPAREOBJECTREFERENCE_OFS = 87;
 
     protected static final int mATTEMPTINT = 88;
+
     protected static final int mATTEMPTINT_OFS = 89;
+
     protected static final int mATTEMPTADDRESS = 90;
+
     protected static final int mATTEMPTADDRESS_OFS = 91;
+
     protected static final int mATTEMPTOBJECTREFERENCE = 92;
+
     protected static final int mATTEMPTOBJECTREFERENCE_OFS = 93;
+
     protected static final int mATTEMPTWORD = 94;
+
     protected static final int mATTEMPTWORD_OFS = 95;
 
+    protected static final int mFROMOBJECT = 96;
+
     private static final int mLOAD_MIN = mLOADBYTE;
+
     private static final int mLOAD_MAX = mLOADOBJECTREFERENCE_OFS;
 
     private static final int mPREPARE_MIN = mPREPAREINT;
+
     private static final int mPREPARE_MAX = mPREPAREOBJECTREFERENCE_OFS;
 
     private final BootableHashMap methodNames = new BootableHashMap();
@@ -235,6 +255,7 @@ public class BaseMagicHelper {
         addMethod("fromIntSignExtend", mFROMINTSIGNEXTEND);
         addMethod("fromIntZeroExtend", mFROMINTZEROEXTEND);
         addMethod("fromLong", mFROMLONG);
+        addMethod("fromObject", mFROMOBJECT);
         addMethod("lsh", mLSH);
         addMethod("rsha", mRSHA);
         addMethod("rshl", mRSHL);
@@ -258,13 +279,15 @@ public class BaseMagicHelper {
         final String cname = VMClassHelper.getClassNamePortion(method
                 .getDeclaringClass().getName());
         if (cname.equals("Address")) {
-            return ADDRESS;
+            return cADDRESS;
         } else if (cname.equals("Extent")) {
-            return EXTENT;
+            return cEXTENT;
+        } else if (cname.equals("ObjectReference")) {
+            return cOBJECTREFERENCE;
         } else if (cname.equals("Offset")) {
-            return OFFSET;
+            return cOFFSET;
         } else if (cname.equals("Word")) {
-            return WORD;
+            return cWORD;
         } else {
             throw new InternalError("Unknown magic type " + cname);
         }
@@ -283,8 +306,8 @@ public class BaseMagicHelper {
                     + method.getDeclaringClass().getName());
         }
         int mcode = mcodeInt.intValue();
-        if (((mcode >= mLOAD_MIN) && (mcode <= mLOAD_MAX)) || 
-            ((mcode >= mPREPARE_MIN) && (mcode <= mPREPARE_MAX))) {
+        if (((mcode >= mLOAD_MIN) && (mcode <= mLOAD_MAX))
+                || ((mcode >= mPREPARE_MIN) && (mcode <= mPREPARE_MAX))) {
             if (method.getNoArguments() == 1) {
                 mcode++;
             }
@@ -299,7 +322,8 @@ public class BaseMagicHelper {
             mcode = mATTEMPTINT;
             break;
         case 'L':
-            final String argType = VMClassHelper.getClassNamePortion(method.getArgumentType(0).getName());
+            final String argType = VMClassHelper.getClassNamePortion(method
+                    .getArgumentType(0).getName());
             if (argType.equals("Address")) {
                 mcode = mATTEMPTADDRESS;
             } else if (argType.equals("ObjectReference")) {
@@ -308,7 +332,7 @@ public class BaseMagicHelper {
                 mcode = mATTEMPTWORD;
             } else {
                 throw new InternalError("Unknown method " + method.getName()
-                        + " in " + method.getDeclaringClass().getName());            
+                        + " in " + method.getDeclaringClass().getName());
             }
             break;
         default:
@@ -346,7 +370,8 @@ public class BaseMagicHelper {
             mcode = mSTOREDOUBLE;
             break;
         case 'L':
-            final String argType = VMClassHelper.getClassNamePortion(method.getArgumentType(0).getName());
+            final String argType = VMClassHelper.getClassNamePortion(method
+                    .getArgumentType(0).getName());
             if (argType.equals("Address")) {
                 mcode = mSTOREADDRESS;
             } else if (argType.equals("ObjectReference")) {
@@ -355,7 +380,7 @@ public class BaseMagicHelper {
                 mcode = mSTOREWORD;
             } else {
                 throw new InternalError("Unknown method " + method.getName()
-                        + " in " + method.getDeclaringClass().getName());            
+                        + " in " + method.getDeclaringClass().getName());
             }
             break;
         default:

@@ -6,7 +6,7 @@ package org.jnode.driver.net.lance;
 import org.apache.log4j.Logger;
 import org.jnode.system.MemoryResource;
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 /**
  * @author Chris Cole
@@ -41,7 +41,7 @@ public class Descriptor {
 		//	Address.as32bit(Address.addressOfArrayData(data));
 		// Set the address
 		final int buffAddress =
-			Address.as32bit(Address.add(mem.getAddress(), dataBufferOffset));
+			VmAddress.as32bit(VmAddress.add(mem.getAddress(), dataBufferOffset));
 		mem.setInt(offset + 0x00, buffAddress);
 		mem.setShort(offset + 0x04, (short) (-BufferManager.DATA_BUFFER_SIZE));
 		mem.setShort(offset + STATUS, (short) 0);
@@ -78,7 +78,7 @@ public class Descriptor {
 			out.debug(
 				"0x"
 					+ NumberUtils.hex(
-						Address.as32bit(mem.getAddress()) + offset + i)
+						VmAddress.as32bit(mem.getAddress()) + offset + i)
 					+ " : 0x"
 					+ NumberUtils.hex((byte) i)
 					+ " : 0x"
