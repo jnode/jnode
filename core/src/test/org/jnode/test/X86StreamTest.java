@@ -63,7 +63,16 @@ public class X86StreamTest {
 		os.writeMOV_Const(Register.EDI, Register.EAX, 4, 0x09, 0x1234);
 
 		os.writeSETCC(Register.EDX, X86Constants.JA);
+
+		os.writeADD(Register.EAX, 28, 11);
+		os.writeADD(Register.EAX, 28, 255);
 		
+		os.writeSUB(Register.EAX, 11);
+		os.writeSUB(Register.EAX, 255);
+
+		os.writeSUB(Register.EAX, 28, 11);
+		os.writeSUB(Register.EAX, 28, 255);
+
 		FileOutputStream fos = new FileOutputStream("test.bin");
 		os.writeTo(fos);
 		fos.close();
