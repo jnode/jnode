@@ -13,6 +13,7 @@ import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register.CRX;
 import org.jnode.assembler.x86.X86Register.GPR;
+import org.jnode.assembler.x86.X86Register.SR;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.UnresolvedObjectRefException;
@@ -143,7 +144,8 @@ public class X86Core extends AssemblerModule {
     public static final int JNE_ISN = JMP_ISN + 1;
     public static final int JNZ_ISN = JNE_ISN + 1;
     public static final int JZ_ISN = JNZ_ISN + 1;
-    public static final int LDMXCSR_ISN = JZ_ISN + 1;
+    public static final int JECXZ_ISN = JZ_ISN + 1;
+    public static final int LDMXCSR_ISN = JECXZ_ISN + 1;
     public static final int LEA_ISN = LDMXCSR_ISN + 1;
     public static final int LMSW_ISN = LEA_ISN + 1;
     public static final int LODSW_ISN = LMSW_ISN + 1;
@@ -288,6 +290,10 @@ public class X86Core extends AssemblerModule {
                 break;
             case JE_ISN:
                 emmitJCC(X86Assembler.JE);
+                break;
+//TODO the X86BinaryAssembler support for this is buggy, cannot handle forward jumps.
+          case JECXZ_ISN:
+                emmitJECXZ();
                 break;
             case JL_ISN:
                 emmitJCC(X86Assembler.JL);
@@ -764,6 +770,22 @@ public class X86Core extends AssemblerModule {
         }
     }
 
+    private final void emmitJECXZ() {
+        Object o1 = operands.get(0);
+        if (o1 instanceof Token) {
+            Token t1 = (Token) o1;
+            if (Assembler.isIdent(t1)) {
+                Label lab = (Label) labels.get(t1.image);
+                lab = (lab == null) ? new Label(t1.image) : lab;
+                stream.writeJECXZ(lab);
+            } else {
+                throw new IllegalArgumentException("Unknown operand: " + t1.image);
+            }
+        } else {
+            throw new IllegalArgumentException("Unknown operand: " + o1);
+        }
+    }
+
     private final void emmitLDMXCSR() {
         int addr = getAddressingMode(1);
         switch (addr) {
@@ -840,12 +862,16 @@ public class X86Core extends AssemblerModule {
             case RR_ADDR:
                 X86Register r1 = X86Register.getRegister(((Token) args[0]).image);
                 X86Register r2 = X86Register.getRegister(((Token) args[1]).image);
-                if(r1 instanceof CRX && r2 instanceof GPR){
+                if(r1 instanceof GPR && r2 instanceof GPR){
+                    stream.writeMOV(operandSize, (GPR) r1, (GPR) r2);
+                } else if(r1 instanceof CRX && r2 instanceof GPR){
                     stream.writeMOV((CRX) r1, (GPR) r2);
                 } else if(r1 instanceof GPR && r2 instanceof CRX){
                     stream.writeMOV((GPR) r1, (CRX) r2);
-                } else if(r1 instanceof GPR && r2 instanceof GPR){
-                    stream.writeMOV(operandSize, getReg(0), getReg(1));
+                } else if(r1 instanceof SR && r2 instanceof GPR){
+                    stream.writeMOV((SR) r1, (GPR) r2);
+                } else if(r1 instanceof GPR && r2 instanceof SR){
+                    stream.writeMOV((GPR) r1, (SR) r2);
                 } else {
                     throw new IllegalArgumentException("Invalid register usage: mov " + r1 + "," + r2); 
                 }
@@ -983,7 +1009,14 @@ public class X86Core extends AssemblerModule {
         int addr = getAddressingMode(1);
         switch (addr) {
             case R_ADDR:
-                stream.writePOP(getReg(0));
+                X86Register r1 = X86Register.getRegister(((Token) args[0]).image);
+                if(r1 instanceof GPR){
+                    stream.writePOP((GPR) r1);
+                } else if(r1 instanceof SR){
+                    stream.writePOP((SR) r1);
+                } else {
+                    throw new IllegalArgumentException("Invalid register usage: pop " + r1);
+                }
                 break;
             case E_ADDR:
                 Indirect ind = getInd(0);
@@ -1009,7 +1042,14 @@ public class X86Core extends AssemblerModule {
                 stream.writePUSH(getInt(0));
                 break;
             case R_ADDR:
-                stream.writePUSH(getReg(0));
+                X86Register r1 = X86Register.getRegister(((Token) args[0]).image);
+                if(r1 instanceof GPR){
+                    stream.writePUSH((GPR) r1);
+                } else if(r1 instanceof SR){
+                    stream.writePUSH((SR) r1);
+                } else {
+                    throw new IllegalArgumentException("Invalid register usage: push " + r1); 
+                }
                 break;
             case E_ADDR:
                 Indirect ind = getInd(0);

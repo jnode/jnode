@@ -38,6 +38,7 @@ import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.assembler.x86.X86Register.CRX;
+import org.jnode.assembler.x86.X86Register.SR;
 import org.jnode.assembler.x86.X86Register.XMM;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
@@ -1851,6 +1852,39 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		writeRelativeObjectRef(label);
 	}
 
+    //TODO this method does not handle the forward jumps correctly, needs further work.
+    //Also the general purpose version of the method writeJCC(Lable lebal, int jumpcode)
+    //for handling byte sized target for the jump would render this method unnecessary.
+    /**
+     * Create a LOOP label instruction. The given label must have be resolved
+     * before!
+     *
+     * @param label
+     */
+    public final void writeJECXZ(Label label) {
+        final ObjectRef ref = getObjectRef(label);
+        write8(0x67);
+        write8(0xE3);
+        final int offset = m_used + 1;
+        if (ref.isResolved()) {
+            try{
+            int distance = ref.getOffset() - offset;
+            if (X86Utils.isByte(distance)) {
+                write8(distance);
+            } else {
+                throw new UnresolvedObjectRefException("Label " + label
+                        + " is out of range (distance " + distance + ")");
+            }
+            }catch(UnresolvedObjectRefException x){
+                throw new RuntimeException(x);
+            }
+        } else {
+            ref.addUnresolvedLink(m_used, 1);
+            write8(offset);
+        }
+    }
+
+
 	/**
 	 * Create a relative jump to a given label
 	 * 
@@ -2408,11 +2442,39 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param srcReg
 	 */
 	public final void writeMOV(GPR dstReg, CRX srcReg) {
-        testSize(srcReg, mode.getSize());
+        testSize(dstReg, mode.getSize());
         write8(CRX_PREFIX);
         write8(0x20);
 		writeModRR(dstReg.getNr() & 7, srcReg.getNr() & 7);
 	}
+
+    /**
+	 * Create a mov <dstReg>, <srcReg>
+	 *
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public final void writeMOV(SR dstReg, GPR srcReg) {
+        if(X86Register.CS.equals(dstReg))
+            throw new IllegalArgumentException("Cannot MOV to CS");
+
+        testSize(srcReg, BITS16 | BITS32);
+        write8(0x8E);
+		writeModRR(srcReg.getNr() & 7, dstReg.getNr() & 7);
+	}
+
+    /**
+	 * Create a mov <dstReg>, <srcReg>
+	 *
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public final void writeMOV(GPR dstReg, SR srcReg) {
+        testSize(dstReg, BITS16 | BITS32);
+        write8(0x8C);
+		writeModRR(dstReg.getNr() & 7, srcReg.getNr() & 7);
+	}
+
 
 	/**
 	 * Create a mov <dstReg>, <srcReg>
@@ -3014,6 +3076,31 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         write1bOpcodeReg(0x58, dstReg);
 	}
 
+    /**
+	 * Create a pop sreg
+	 *
+	 * @param dstReg
+	 */
+	public final void writePOP(SR dstReg) {
+        if(X86Register.ES.equals(dstReg)){
+            write8(0x07);
+        } else if(X86Register.DS.equals(dstReg)){
+            write8(0x1F);
+        } else if(X86Register.FS.equals(dstReg)){
+            write8(0x0F);
+            write8(0xA1);
+        } else if(X86Register.GS.equals(dstReg)){
+            write8(0x0F);
+            write8(0xA9);
+        } else if(X86Register.SS.equals(dstReg)){
+            write8(0x17);
+        } else if(X86Register.CS.equals(dstReg)){
+            throw new IllegalArgumentException("Cannot POP to CS");
+        } else {
+            throw new IllegalArgumentException("Unknown segment register: " + dstReg);
+        }
+	}
+
 	/**
 	 * Create a pop dword [reg32+disp]
 	 * 
@@ -3075,6 +3162,34 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         final int rc = m_used;
         write1bOpcodeReg(0x50, srcReg);
 		return rc;
+	}
+
+    /**
+     * Create a push srcReg
+     *
+     * @param srcReg
+     * @return The ofset of the start of the instruction.
+     */
+    public final int writePUSH(SR srcReg) {
+        final int rc = m_used;
+        if (X86Register.ES.equals(srcReg)) {
+            write8(0x06);
+        } else if (X86Register.DS.equals(srcReg)) {
+            write8(0x1E);
+        } else if (X86Register.FS.equals(srcReg)) {
+            write8(0x0F);
+            write8(0xA0);
+        } else if (X86Register.GS.equals(srcReg)) {
+            write8(0x0F);
+            write8(0xA8);
+        } else if (X86Register.SS.equals(srcReg)) {
+            write8(0x16);
+        } else if (X86Register.CS.equals(srcReg)) {
+            write8(0x0E);
+        } else {
+            throw new IllegalArgumentException("Unknown segment register: " + srcReg);
+        }
+        return rc;
 	}
 
 	/**

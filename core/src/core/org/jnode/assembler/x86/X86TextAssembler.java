@@ -36,6 +36,7 @@ import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.assembler.x86.X86Register.CRX;
 import org.jnode.assembler.x86.X86Register.XMM;
+import org.jnode.assembler.x86.X86Register.SR;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.x86.X86CpuID;
@@ -1245,6 +1246,13 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeJECXZ(Label)
+     */
+    public void writeJECXZ(Label label) {
+        println("\tjecxz" + label(label));
+    }
+
+    /**
      * @see org.jnode.assembler.x86.X86Assembler#writeJMP(Label)
      */
     public void writeJMP(Label label) {
@@ -1362,6 +1370,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         println("\tmov " + size(operandSize) + "[" + dstReg + disp(dstDisp)
                 + "]," + srcReg);
     }
+
     /**
      * @see org.jnode.assembler.x86.X86Assembler#writeMOV(CRX, GPR)
      */
@@ -1375,6 +1384,21 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     public void writeMOV(GPR dstReg, CRX srcReg) {
         println("\tmov " + dstReg + "," + size(BITS32) + " " + srcReg);
     }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeMOV(CRX, GPR)
+     */
+    public void writeMOV(SR dstReg, GPR srcReg) {
+        println("\tmov " + dstReg + "," + size(BITS16) + " " + srcReg);
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeMOV(GPR, CRX)
+     */
+    public void writeMOV(GPR dstReg, SR srcReg) {
+        println("\tmov " + dstReg + "," + size(BITS16) + " " + srcReg);
+    }
+
 
     /**
      * @see org.jnode.assembler.x86.X86Assembler#writeMOV(int, GPR, GPR)
@@ -1660,6 +1684,13 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     /**
+     * @see org.jnode.assembler.x86.X86Assembler#writePOP(SR)
+     */
+    public void writePOP(SR dstReg) {
+        println("\tpop " + dstReg);
+    }
+
+    /**
      * @see org.jnode.assembler.x86.X86Assembler#writePOP(GPR, int)
      */
     public void writePOP(GPR dstReg, int dstDisp) {
@@ -1714,6 +1745,14 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         return println("\tpush " + srcReg);
     }
 
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writePUSH(SR)
+     * @return The ofset of the start of the instruction.
+     */
+    public int writePUSH(SR srcReg) {
+        return println("\tpush " + srcReg);
+    }
+    
     /**
      * @see org.jnode.assembler.x86.X86Assembler#writePUSH(GPR, int)
      * @return The ofset of the start of the instruction.
