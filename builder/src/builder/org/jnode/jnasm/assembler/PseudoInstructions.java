@@ -17,6 +17,8 @@ public class PseudoInstructions extends AssemblerModule {
     public static final int DB_ISN = 0;
     public static final int DW_ISN = DB_ISN + 1;
     public static final int DD_ISN = DW_ISN + 1;
+    public static final int RESB_ISN = DD_ISN + 1;
+    public static final int RESD_ISN = RESB_ISN + 1;
 
     static {
         Map map = InstructionUtils.getInstructionMap(PseudoInstructions.class);
@@ -52,6 +54,12 @@ public class PseudoInstructions extends AssemblerModule {
                 break;
             case DD_ISN:
                 emmitDD();
+                break;
+            case RESB_ISN:
+                emmitRESB();
+                break;
+            case RESD_ISN:
+                emmitRESD();
                 break;
             default:
                 throw new Error("Invalid instruction binding " + key.intValue() + " for " + mnemonic);
@@ -119,5 +127,13 @@ public class PseudoInstructions extends AssemblerModule {
                 System.out.println("unkown data: " + o);
             }
         }
+    }
+
+    private void emmitRESB() {
+        for ( int i = ((Integer) operands.get(0)).intValue(); i-- > 0; stream.write8(0) );
+    }
+
+    private void emmitRESD() {
+        for ( int i = 4 * ((Integer) operands.get(0)).intValue(); i-- > 0; stream.write8(0) );
     }
 }

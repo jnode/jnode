@@ -59,7 +59,11 @@ public class X86Support extends HardwareSupport {
             }
             String mnemo = ins.getMnemonic();
             if (mnemo != null) {
-                emmit(ins.getMnemonic(), ins.getOperands());
+                try{
+                    emmit(ins.getMnemonic(), ins.getOperands());
+                }catch(IllegalArgumentException x){
+                    System.out.println(x.getMessage() + " at line " + ins.getLineNumber());
+                }
             }
         }
     }

@@ -25,20 +25,23 @@ public class X86Core extends AssemblerModule {
     private static final int NUL_ARG = 0;
     private static final int CON_ARG = 1;
     private static final int REG_ARG = 2;
-    private static final int IND_ARG = 3;
-    private static final int DISP = 2;
+    private static final int REL_ARG = 3;
+    private static final int ABS_ARG = 4;
+    private static final int SCL_ARG = 5;
+    private static final int DISP = 3;
+    private static final int DISP_MASK = (2 << (DISP - 1) - 1);
 
     private static final int N_ADDR = NUL_ARG;
     private static final int C_ADDR = CON_ARG;
     private static final int R_ADDR = REG_ARG;
     private static final int RR_ADDR = REG_ARG | REG_ARG << DISP;
     private static final int RC_ADDR = REG_ARG | CON_ARG << DISP;
-    private static final int RI_ADDR = REG_ARG | IND_ARG << DISP;
-    private static final int I_ADDR = IND_ARG;
-    private static final int IR_ADDR = IND_ARG | REG_ARG << DISP;
-    private static final int IC_ADDR = IND_ARG | CON_ARG << DISP;
+    private static final int RE_ADDR = REG_ARG | REL_ARG << DISP;
+    private static final int E_ADDR = REL_ARG;
+    private static final int ER_ADDR = REL_ARG | REG_ARG << DISP;
+    private static final int EC_ADDR = REL_ARG | CON_ARG << DISP;
 
-    private static final String[] ARG_TYPES = {"noargument","constant","register","indirect"};
+    private static final String[] ARG_TYPES = {"noargument","constant","register","relative", "absolute", "scaled"};
 
     private final Object[] args = new Object[3];
 
@@ -58,11 +61,20 @@ public class X86Core extends AssemblerModule {
                 if (o == null) break;
 
                 if (o instanceof Integer) {
-                    ret |= CON_ARG << 2 * i;
+                    ret |= CON_ARG << DISP * i;
                 } else if (o instanceof Token && Assembler.isIdent((Token) o)) {
-                    ret |= REG_ARG << 2 * i;
+                    ret |= REG_ARG << DISP * i;
                 } else if (o instanceof Indirect) {
-                    ret |= IND_ARG << 2 * i;
+                    Indirect ind = (Indirect) o;
+                    if(ind.reg != null && ind.sreg != null){
+                        ret |= SCL_ARG << DISP * i;
+                    } else if(ind.reg != null && ind.sreg == null){
+                        ret |= REL_ARG << DISP * i;
+                    } else if(ind.reg == null && ind.sreg == null){
+                        ret |= ABS_ARG << DISP * i;
+                    } else {
+                        System.out.println("unkown indirect: " + ind);
+                    }
                 } else {
                     System.out.println("unkown operand: " + o);
                 }
@@ -266,15 +278,15 @@ public class X86Core extends AssemblerModule {
             case RC_ADDR:
                 stream.writeADC(getReg(0), getInt(1));
                 break;
-            case RI_ADDR:
+            case RE_ADDR:
                 Indirect ind = getInd(1);
                 stream.writeADC(getReg(0), getRegister(ind.reg), ind.disp);
                 break;
-            case IR_ADDR:
+            case ER_ADDR:
                 ind = getInd(0);
                 stream.writeADC(getRegister(ind.reg), ind.disp, getReg(1));
                 break;
-            case IC_ADDR:
+            case EC_ADDR:
                 ind = getInd(0);
                 stream.writeADC(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
@@ -292,15 +304,15 @@ public class X86Core extends AssemblerModule {
             case RC_ADDR:
                 stream.writeADD(getReg(0), getInt(1));
                 break;
-            case RI_ADDR:
+            case RE_ADDR:
                 Indirect ind = getInd(1);
                 stream.writeADD(getReg(0), getRegister(ind.reg), ind.disp);
                 break;
-            case IR_ADDR:
+            case ER_ADDR:
                 ind = getInd(0);
                 stream.writeADD(getRegister(ind.reg), ind.disp, getReg(1));
                 break;
-            case IC_ADDR:
+            case EC_ADDR:
                 ind = getInd(0);
                 stream.writeADD(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
@@ -318,15 +330,15 @@ public class X86Core extends AssemblerModule {
             case RC_ADDR:
                 stream.writeAND(getReg(0), getInt(1));
                 break;
-            case RI_ADDR:
+            case RE_ADDR:
                 Indirect ind = getInd(1);
                 stream.writeAND(getReg(0), getRegister(ind.reg), ind.disp);
                 break;
-            case IR_ADDR:
+            case ER_ADDR:
                 ind = getInd(0);
                 stream.writeAND(getRegister(ind.reg), ind.disp, getReg(1));
                 break;
-            case IC_ADDR:
+            case EC_ADDR:
                 ind = getInd(0);
                 stream.writeAND(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
@@ -344,15 +356,15 @@ public class X86Core extends AssemblerModule {
             case RC_ADDR:
                 stream.writeCMP_Const(getReg(0), getInt(1));
                 break;
-            case RI_ADDR:
+            case RE_ADDR:
                 Indirect ind = getInd(1);
                 stream.writeCMP(getReg(0), getRegister(ind.reg), ind.disp);
                 break;
-            case IR_ADDR:
+            case ER_ADDR:
                 ind = getInd(0);
                 stream.writeCMP(getRegister(ind.reg), ind.disp, getReg(1));
                 break;
-            case IC_ADDR:
+            case EC_ADDR:
                 ind = getInd(0);
                 stream.writeCMP_Const(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
@@ -367,7 +379,7 @@ public class X86Core extends AssemblerModule {
             case R_ADDR:
                 stream.writeDEC(getReg(0));
                 break;
-            case I_ADDR:
+            case E_ADDR:
                 Indirect ind = getInd(0);
                 stream.writeDEC(X86Constants.BITS32, getRegister(ind.reg), ind.disp);
                 break;
@@ -382,7 +394,7 @@ public class X86Core extends AssemblerModule {
             case R_ADDR:
                 stream.writeINC(getReg(0));
                 break;
-            case I_ADDR:
+            case E_ADDR:
                 Indirect ind = getInd(0);
                 stream.writeINC(X86Constants.BITS32, getRegister(ind.reg), ind.disp);
                 break;
@@ -426,7 +438,7 @@ public class X86Core extends AssemblerModule {
     private void emmitLEA() {
         int addr = getAddressingMode(2);
         switch (addr) {
-            case RI_ADDR:
+            case RE_ADDR:
                 Indirect ind = getInd(1);
                 stream.writeLEA(getReg(0), getRegister(ind.reg), ind.disp);
                 break;
@@ -464,15 +476,15 @@ public class X86Core extends AssemblerModule {
             case RC_ADDR:
                 stream.writeMOV_Const(getReg(0), getInt(1));
                 break;
-            case RI_ADDR:
+            case RE_ADDR:
                 Indirect ind = getInd(1);
                 stream.writeMOV(X86Constants.BITS32, getReg(0), getRegister(ind.reg), ind.disp);
                 break;
-            case IR_ADDR:
+            case ER_ADDR:
                 ind = getInd(0);
                 stream.writeMOV(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getReg(1));
                 break;
-            case IC_ADDR:
+            case EC_ADDR:
                 ind = getInd(0);
                 stream.writeMOV_Const(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
@@ -487,7 +499,7 @@ public class X86Core extends AssemblerModule {
             case R_ADDR:
                 stream.writeNEG(getReg(0));
                 break;
-            case I_ADDR:
+            case E_ADDR:
                 Indirect ind = getInd(0);
                 stream.writeNEG(X86Constants.BITS32, getRegister(ind.reg), ind.disp);
                 break;
@@ -509,15 +521,15 @@ public class X86Core extends AssemblerModule {
             case RC_ADDR:
                 stream.writeOR(getReg(0), getInt(1));
                 break;
-            case RI_ADDR:
+            case RE_ADDR:
                 Indirect ind = getInd(1);
                 stream.writeOR(getReg(0), getRegister(ind.reg), ind.disp);
                 break;
-            case IR_ADDR:
+            case ER_ADDR:
                 ind = getInd(0);
                 stream.writeOR(getRegister(ind.reg), ind.disp, getReg(1));
                 break;
-            case IC_ADDR:
+            case EC_ADDR:
                 ind = getInd(0);
                 stream.writeOR(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
@@ -532,7 +544,7 @@ public class X86Core extends AssemblerModule {
             case R_ADDR:
                 stream.writePOP(getReg(0));
                 break;
-            case I_ADDR:
+            case E_ADDR:
                 Indirect ind = getInd(0);
                 stream.writePOP(getRegister(ind.reg), ind.disp);
                 break;
@@ -554,7 +566,7 @@ public class X86Core extends AssemblerModule {
             case R_ADDR:
                 stream.writePUSH(getReg(0));
                 break;
-            case I_ADDR:
+            case E_ADDR:
                 Indirect ind = getInd(0);
                 stream.writePUSH(getRegister(ind.reg), ind.disp);
                 break;
@@ -587,7 +599,7 @@ public class X86Core extends AssemblerModule {
             case RC_ADDR:
                 stream.writeSHL(getReg(0), getInt(1));
                 break;
-            case IC_ADDR:
+            case EC_ADDR:
                 Indirect ind = getInd(0);
                 stream.writeSHL(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
@@ -602,7 +614,7 @@ public class X86Core extends AssemblerModule {
             case RC_ADDR:
                 stream.writeSHR(getReg(0), getInt(1));
                 break;
-            case IC_ADDR:
+            case EC_ADDR:
                 Indirect ind = getInd(0);
                 stream.writeSHR(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
@@ -620,15 +632,15 @@ public class X86Core extends AssemblerModule {
             case RC_ADDR:
                 stream.writeSUB(getReg(0), getInt(1));
                 break;
-            case RI_ADDR:
+            case RE_ADDR:
                 Indirect ind = getInd(1);
                 stream.writeSUB(getReg(0), getRegister(ind.reg), ind.disp);
                 break;
-            case IR_ADDR:
+            case ER_ADDR:
                 ind = getInd(0);
                 stream.writeSUB(getRegister(ind.reg), ind.disp, getReg(1));
                 break;
-            case IC_ADDR:
+            case EC_ADDR:
                 ind = getInd(0);
                 stream.writeSUB(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
@@ -646,7 +658,7 @@ public class X86Core extends AssemblerModule {
             case RC_ADDR:
                 stream.writeTEST(getReg(0), getInt(1));
                 break;
-            case IC_ADDR:
+            case EC_ADDR:
                 Indirect ind = getInd(0);
                 stream.writeTEST(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
@@ -661,7 +673,7 @@ public class X86Core extends AssemblerModule {
             case RR_ADDR:
                 stream.writeXCHG(getReg(0), getReg(1));
                 break;
-            case IR_ADDR:
+            case ER_ADDR:
                 Indirect ind = getInd(0);
                 stream.writeXCHG(getRegister(ind.reg), ind.disp, getReg(1));
                 break;
@@ -679,15 +691,15 @@ public class X86Core extends AssemblerModule {
             case RC_ADDR:
                 stream.writeXOR(getReg(0), getInt(1));
                 break;
-            case RI_ADDR:
+            case RE_ADDR:
                 Indirect ind = getInd(1);
                 stream.writeXOR(getReg(0), getRegister(ind.reg), ind.disp);
                 break;
-            case IR_ADDR:
+            case ER_ADDR:
                 ind = getInd(0);
                 stream.writeXOR(getRegister(ind.reg), ind.disp, getReg(1));
                 break;
-            case IC_ADDR:
+            case EC_ADDR:
                 ind = getInd(0);
                 stream.writeXOR(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
                 break;
@@ -700,11 +712,13 @@ public class X86Core extends AssemblerModule {
         String err = "";
         int ad = addressing;
         do {
-            err += " " + ARG_TYPES[ad & 3];
+            err += " " + ARG_TYPES[ad & DISP_MASK];
             ad >>= DISP;
         } while(ad != 0);
 
-        System.out.println("Unkown addressing mode (" + err + " ) for " + MNEMONICS[instruction]);
+        String msg  = "Unkown addressing mode (" + err + " ) for " + MNEMONICS[instruction];
+        //System.out.println(msg);
+        throw new IllegalArgumentException(msg);
     }
 
     static final X86Register.GPR getRegister(Token t) {
