@@ -969,12 +969,10 @@ public final class VmSystem {
 		final VmStaticField f = (VmStaticField) clazz.getVmClass().getField(
 				fieldName);
 		final Vm vm = Vm.getVm();
-		final int ptrSize = vm.getArch().getReferenceSize();
 		final Object staticsTable = Unsafe.getCurrentProcessor()
 				.getStaticsTable();
 		final Address ptr = VmMagic.getArrayData(staticsTable);
-		ptr.store(ObjectReference.fromObject(value), Offset.fromIntSignExtend(f
-				.getStaticsIndex()
-				* ptrSize));
+        final Offset offset = Offset.fromIntZeroExtend(f.getStaticsIndex() << 2);
+		ptr.store(ObjectReference.fromObject(value), offset);
 	}
 }

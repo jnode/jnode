@@ -655,8 +655,16 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     /**
      * @see org.jnode.assembler.x86.X86Assembler#writeCDQ()
      */
-    public void writeCDQ() {
-        println("\tcdq");
+    public void writeCDQ(int operandSize) {
+        testOperandSize(operandSize, BITS32 | BITS64);
+        if (operandSize == BITS32) {
+            println("\tcdq");
+        } else {
+            if (!code64) {
+                throw new InvalidOpcodeException();
+            }
+            println("\tcqo");            
+        }
     }
 
 	/**

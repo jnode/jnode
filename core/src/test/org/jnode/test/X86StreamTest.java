@@ -60,6 +60,9 @@ public class X86StreamTest implements X86Constants {
 	}
 	
 	private final static void testCode64(X86Assembler os) throws UnresolvedObjectRefException {
+        os.writeCDQE();
+        os.writeMOV_Const(X86Register.R15, 0xFFFFFFFFL);
+        os.writeAND(X86Register.RAX, X86Register.R15);
         os.writeMOVSXD(X86Register.R14, X86Register.R14d);
         os.writePUSH(X86Register.RAX);
         os.writePUSH(X86Register.R8);

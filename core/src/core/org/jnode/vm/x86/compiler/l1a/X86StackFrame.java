@@ -138,7 +138,7 @@ class X86StackFrame implements X86CompilerConstants {
      * Write code to test the alignment of the stack pointer.
      */
     public void writeStackAlignmentTest(Label curInstrLabel) {
-        if (os.isCode64()) {
+        if (false && os.isCode64()) {
             final int idx = os.getLength();
             final Label test = new Label(curInstrLabel + "$$stackAlignTest" + idx);
             final Label failed = new Label(curInstrLabel + "$$stackAlign" + idx);

@@ -706,8 +706,10 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 
 	/**
 	 * Create a cdq
+     * Sign extend EAX to EDX:EAX in 32-bit operand size.
+     * Sign extend RAX to RDX:RAX in 64-bit operand size.
 	 */
-	public abstract void writeCDQ();
+	public abstract void writeCDQ(int operandSize);
 
 	/**
 	 * Create a cdqe.

@@ -88,7 +88,11 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
 	 */
 	protected final void loadToConstant64(EmitterContext ec, X86Assembler os,
 			GPR64 reg) {
-		os.writeMOV_Const(reg, value);
+        if (value == 0) {
+            os.writeXOR(reg, reg);
+        } else {
+            os.writeMOV_Const(reg, value);
+        }
 	}
 
 	/**
