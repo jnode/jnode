@@ -1,20 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.test.net" 
-        name="JNode NET Test classes"
-        version="@VERSION@"
-        provider-name="JNode.org">
-        
+<plugin id="org.jnode.test.net"
+  name="JNode NET Test classes"
+  version="@VERSION@"
+  provider-name="JNode.org">
+
   <runtime>
     <library name="jnode-net.jar">
       <export name="org.jnode.test.net.*"/>
     </library>
   </runtime>
-        
+
   <extension point="org.jnode.shell.aliases">
-    <alias name="URLTest"      class="org.jnode.test.net.URLTest"/>
-    <alias name="TCPTest"      class="org.jnode.test.net.TCPTest"/>
+    <alias name="URLTest" class="org.jnode.test.net.URLTest"/>
+    <alias name="TCPTest" class="org.jnode.test.net.TCPTest"/>
+    <alias name="DnsTest" class="org.jnode.test.net.DnsTest"/>
+    <alias name="ARPTest" class="org.jnode.test.net.ARPTest"/>
+    <alias name="NetTest" class="org.jnode.test.net.NetTest"/>
+    <alias name="URLTest" class="org.jnode.test.net.URLTest"/>
+    <alias name="UDPTest" class="org.jnode.test.net.UDPTest"/>
+    <alias name="UDPSendTest" class="org.jnode.test.net.UDPSendTest"/>
+    <alias name="ChecksumTest" class="org.jnode.test.net.ChecksumTest"/>
   </extension>
 
 </plugin>
