@@ -10,6 +10,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.geom.RectangularShape;
+import java.awt.geom.Rectangle2D;
 
 import org.jnode.driver.video.Surface;
 
@@ -93,7 +94,7 @@ public abstract class AbstractSurface implements Surface {
 		}
 
 		Rectangle bounds = txShape.getBounds();
-		if (txShape instanceof RectangularShape) {
+		if (txShape instanceof Rectangle2D) {
 			if (txClip != null) {
 				bounds = bounds.createIntersection(txClip.getBounds2D()).getBounds();
 //				System.out.println("Clipped bounds " + bounds);

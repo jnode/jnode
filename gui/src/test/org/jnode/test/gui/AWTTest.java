@@ -5,6 +5,9 @@ package org.jnode.test.gui;
 
 import javax.swing.JButton;
 import javax.swing.JList;
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
+import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.Color;
@@ -15,6 +18,8 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Shape;
 import java.awt.Font;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
@@ -162,16 +167,41 @@ public class AWTTest {
 
     public static void main(String[] args) throws InterruptedException {
         boolean useDoubleBuffer = (args.length > 0) && args[0].equals("buffer");
-        Frame wnd = new Frame();
+        final Frame wnd = new Frame();
         try {
             wnd.setSize(600, 400);
-            Button b = new Button("Hello world");
+            final JButton b = new JButton("Hello world");
+            b.addActionListener(new ActionListener() {
+                int i =0;
+                public void actionPerformed(ActionEvent e) {
+                    System.out.println("Action performed " + e);
+                    switch(i){
+                    case 0:{
+                        wnd.add(new JButton(String.valueOf(i)), BorderLayout.WEST);
+                        break;
+                    }
+                    case 1:{
+                        wnd.add(new JButton(String.valueOf(i)), BorderLayout.SOUTH);
+                        break;
+                    }
+                    case 2:{
+                        wnd.add(new JButton(String.valueOf(i)), BorderLayout.EAST);
+                        break;
+                    }
+                    default:
+                        b.setText(String.valueOf(i));
+                    }
+                }
+            });
             wnd.add(b, BorderLayout.NORTH);
             wnd.add(new TestComponent(useDoubleBuffer), BorderLayout.CENTER);
+            b.requestFocus();
             wnd.show();
-            Font f = wnd.getFont();
-            System.out.println(f.getName());
-            wnd.getFontMetrics(f);
+
+
+//            Font f = wnd.getFont();
+//            System.out.println(f.getName());
+//            wnd.getFontMetrics(f);
 
             Thread.sleep(5000);
 

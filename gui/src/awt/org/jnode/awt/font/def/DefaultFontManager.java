@@ -119,7 +119,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
         Font l_font = font;
         if (prv == null) {
             l_font = new Font("Luxi Sans", Font.PLAIN, 10);
-        	log.error("No FontProvider for font=" + font + " using " + l_font + " instead.");
+        	//log.error("No FontProvider for font=" + font + " using " + l_font + " instead.");
             prv = getProvider(l_font);
         }
       	final TextRenderer renderer = prv.getTextRenderer(l_font);
