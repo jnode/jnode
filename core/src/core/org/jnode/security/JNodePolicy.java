@@ -109,7 +109,7 @@ final class JNodePolicy extends PolicyFile {
             final CodeSource cs = new CodeSource(url, null);
             final Permissions perms = new Permissions();
             codeSource2Permissions.put(cs, perms);
-            BootLog.info("Adding permissions for " + cs);
+            //BootLog.debug("Adding permissions for " + cs);
             final ConfigurationElement[] elems = ext.getConfigurationElements();
             final int count = elems.length;
             for (int i = 0; i < count; i++) {

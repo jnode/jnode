@@ -3,10 +3,13 @@
  */
 package org.jnode.driver.chipset.i440BX;
 
+import java.security.PrivilegedExceptionAction;
+
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.DeviceUtils;
+import org.jnode.driver.DriverException;
 import org.jnode.driver.pci.PCIDevice;
 import org.jnode.driver.smbus.DIMM;
 import org.jnode.driver.smbus.DIMMDriver;
@@ -16,6 +19,8 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.system.IOResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.ResourceOwner;
+import org.jnode.util.AccessControllerUtils;
 import org.jnode.util.NumberUtils;
 
 /**
@@ -70,7 +75,7 @@ public class i82371AB_ACPI_SMBusControler extends SMBusControler {
 
 	IOResource ioRes = null;
 
-	public i82371AB_ACPI_SMBusControler(PCIDevice device) {
+	public i82371AB_ACPI_SMBusControler(PCIDevice device) throws DriverException {
 		this.device = device;
 		// gets the IO registers address base from the PCI configuration register
 		// see paragraph 7.3 in chipset specification
@@ -96,7 +101,7 @@ public class i82371AB_ACPI_SMBusControler extends SMBusControler {
 		try {
 			final ResourceManager rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
 			try {
-				ioRes = rm.claimIOResource(device, hostStatusIORegister, 14);
+				ioRes = claimPorts(rm, device, hostStatusIORegister, 14);
 			} catch (ResourceNotFreeException ex1) {
 			}
 		} catch (NameNotFoundException ex) {
@@ -274,5 +279,19 @@ public class i82371AB_ACPI_SMBusControler extends SMBusControler {
 		}
 		return status;
 
+	}
+
+	private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner, final int low, final int length) throws ResourceNotFreeException, DriverException {
+		try {
+            return (IOResource)AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction() {
+                public Object run() throws ResourceNotFreeException {
+            		return rm.claimIOResource(owner, low, length);
+                    }});
+		} catch (ResourceNotFreeException ex) {
+		    throw ex;
+        } catch (Exception ex) {
+            throw new DriverException("Unknown exception", ex);
+        }
+	    
 	}
 }

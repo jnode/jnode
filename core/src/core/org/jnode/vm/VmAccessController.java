@@ -49,9 +49,6 @@ public final class VmAccessController {
                 if (method.canThrow(PragmaDoPrivileged.class)) {
                     // Stop here with the current thread's stacktrace.
                     break;
-                } else if (method.canThrow(PragmaPrivilegedAction.class)) {
-                    // Break here, do not include inherited thread context
-                    return;
                 } else if (method.canThrow(PragmaCheckPermission.class)) {
                     // Be paranoia for now, let's check for recursive
                     // checkPermission calls.
@@ -67,10 +64,13 @@ public final class VmAccessController {
                         //Unsafe.debug(":pd");
                         if (!pd.implies(perm)) { 
                         //Unsafe.debug("Permission denied");
-                        throw new AccessControlException("Permission \""
-                                + perm + "\" not granted"); }
+                        throw new AccessControlException("Permission \"" + perm
+                                + "\" not granted"); }
                     }
                 }
+                if (method.canThrow(PragmaPrivilegedAction.class)) { 
+                    // Break here, do not include inherited thread context
+                    return; }
                 sf = reader.getPrevious(sf);
             }
 

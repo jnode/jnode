@@ -3,6 +3,8 @@
  */
 package org.jnode.system.x86;
 
+import java.security.PrivilegedExceptionAction;
+
 import javax.naming.NameNotFoundException;
 
 import org.jnode.naming.InitialNaming;
@@ -12,6 +14,7 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
+import org.jnode.util.AccessControllerUtils;
 import org.jnode.vm.Address;
 
 /*
@@ -92,9 +95,9 @@ public class DMA implements DMAConstants {
 
 		try {
 			final ResourceOwner owner = new SimpleResourceOwner("DMA-X86");
-			pageIO = rm.claimIOResource(owner, 0x81, 0x8f - 0x81 + 1);
-			dma1IO = rm.claimIOResource(owner, 0x00, 16);
-			dma2IO = rm.claimIOResource(owner, 0xc0, 32);
+			pageIO = claimPorts(rm, owner, 0x81, 0x8f - 0x81 + 1);
+			dma1IO = claimPorts(rm, owner, 0x00, 16);
+			dma2IO = claimPorts(rm, owner, 0xc0, 32);
 
 			this.pageIO = pageIO;
 			this.dma1IO = dma1IO;
@@ -303,5 +306,19 @@ public class DMA implements DMAConstants {
 		if (pageStart != pageEnd) {
 			throw new IllegalArgumentException("Invalid address alignment. DMA block cannot cross pages");
 		}
+	}
+
+	private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner, final int low, final int length) throws ResourceNotFreeException, DMAException {
+		try {
+            return (IOResource)AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction() {
+                public Object run() throws ResourceNotFreeException {
+            		return rm.claimIOResource(owner, low, length);
+                    }});
+		} catch (ResourceNotFreeException ex) {
+		    throw ex;
+        } catch (Exception ex) {
+            throw new DMAException("Unknown exception", ex);
+        }
+	    
 	}
 }

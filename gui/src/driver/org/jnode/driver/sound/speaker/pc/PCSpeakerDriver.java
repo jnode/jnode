@@ -1,5 +1,9 @@
-
+/*
+ * $Id$
+ */
 package org.jnode.driver.sound.speaker.pc;
+import java.security.PrivilegedExceptionAction;
+
 import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.Device;
@@ -11,6 +15,8 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.system.IOResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.ResourceOwner;
+import org.jnode.util.AccessControllerUtils;
 
 /** A driver for the internal speaker of a IBM Compatable machine.
  *  @author Matt Paine
@@ -51,8 +57,8 @@ public class PCSpeakerDriver extends Driver implements SpeakerAPI
 		{
 			final Device dev = getDevice();
 			final ResourceManager rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
-			speakIO = rm.claimIOResource(dev, SPEAKER_PORT, 1);
-			pitIO = rm.claimIOResource(dev, CHANNEL2_PORT, 2);
+			speakIO = claimPorts(rm, dev, SPEAKER_PORT, 1);
+			pitIO = claimPorts(rm, dev, CHANNEL2_PORT, 2);
 			getDevice().registerAPI(SpeakerAPI.class, this);
 			// do a test beep during startup
 			//beep();
@@ -119,6 +125,18 @@ public class PCSpeakerDriver extends Driver implements SpeakerAPI
 		speakIO.outPortByte(SPEAKER_PORT, oldPort);
 	}
 
-
+	private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner, final int low, final int length) throws ResourceNotFreeException, DriverException {
+		try {
+            return (IOResource)AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction() {
+                public Object run() throws ResourceNotFreeException {
+            		return rm.claimIOResource(owner, low, length);
+                    }});
+		} catch (ResourceNotFreeException ex) {
+		    throw ex;
+        } catch (Exception ex) {
+            throw new DriverException("Unknown exception", ex);
+        }
+	    
+	}
 }
 

@@ -12,6 +12,7 @@
 package org.jnode.driver.ps2;
 
 import java.io.IOException;
+import java.security.PrivilegedExceptionAction;
 
 import javax.naming.NameNotFoundException;
 
@@ -26,6 +27,7 @@ import org.jnode.system.IRQResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
+import org.jnode.util.AccessControllerUtils;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
 
@@ -69,8 +71,8 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 				throw new DriverException("Cannot find ResourceManager: ", ex);
 			}
 			if (ioResData == null) {
-				ioResData = rm.claimIOResource(owner, PS2_DATA_PORT, 1);
-				ioResCtrl = rm.claimIOResource(owner, PS2_CTRL_PORT, 1);
+				ioResData = claimPorts(rm, owner, PS2_DATA_PORT, 1);
+				ioResCtrl = claimPorts(rm, owner, PS2_CTRL_PORT, 1);
 			}
 			final IRQResource irqRes = rm.claimIRQ(owner, irq, this, true);
 			if (activeCount == 0) {
@@ -307,4 +309,17 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 		return this.mouseChannel;
 	}
 
+	private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner, final int low, final int length) throws ResourceNotFreeException, DriverException {
+		try {
+            return (IOResource)AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction() {
+                public Object run() throws ResourceNotFreeException {
+            		return rm.claimIOResource(owner, low, length);
+                    }});
+		} catch (ResourceNotFreeException ex) {
+		    throw ex;
+        } catch (Exception ex) {
+            throw new DriverException("Unknown exception", ex);
+        }
+	    
+	}
 }

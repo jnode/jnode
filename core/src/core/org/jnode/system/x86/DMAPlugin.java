@@ -133,7 +133,7 @@ public class DMAPlugin extends Plugin implements DMAManager {
 			throw new PluginException("Cannot initialize DMA", ex);
 		} catch (NamingException ex) {
 			throw new PluginException("Cannot bind DMAService", ex);
-		}
+        }
 	}
 
 	/**

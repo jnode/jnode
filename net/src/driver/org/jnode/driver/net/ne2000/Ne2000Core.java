@@ -3,6 +3,7 @@
  */
 package org.jnode.driver.net.ne2000;
 
+import java.security.PrivilegedExceptionAction;
 import java.util.Arrays;
 
 import javax.naming.NameNotFoundException;
@@ -24,6 +25,7 @@ import org.jnode.system.IRQResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
+import org.jnode.util.AccessControllerUtils;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
 
@@ -93,7 +95,7 @@ public abstract class Ne2000Core extends AbstractDeviceCore
 		}
 		this.irq = rm.claimIRQ(owner, irq, this, true);
 		try {
-			io = rm.claimIOResource(owner, iobase, iolength);
+			io = claimPorts(rm, owner, iobase, iolength);
 		} catch (ResourceNotFreeException ex) {
 			this.irq.release();
 			throw ex;
@@ -668,4 +670,17 @@ public abstract class Ne2000Core extends AbstractDeviceCore
 			"Cannot find NIC memory of " + flags.getName());
 	}
 
+	private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner, final int low, final int length) throws ResourceNotFreeException, DriverException {
+		try {
+            return (IOResource)AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction() {
+                public Object run() throws ResourceNotFreeException {
+            		return rm.claimIOResource(owner, low, length);
+                    }});
+		} catch (ResourceNotFreeException ex) {
+		    throw ex;
+        } catch (Exception ex) {
+            throw new DriverException("Unknown exception", ex);
+        }
+	    
+	}
 }

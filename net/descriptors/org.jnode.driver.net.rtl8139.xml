@@ -23,4 +23,8 @@
     <mapper class="org.jnode.driver.net.rtl8139.RTL8139DeviceToDriverMapper"/>
   </extension>
         
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
+  </extension>
+        
 </plugin>

@@ -3,6 +3,8 @@
  */
 package org.jnode.driver.net._3c90x;
 
+import java.security.PrivilegedExceptionAction;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
@@ -13,89 +15,110 @@ import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.util.TimeoutException;
+import org.jnode.util.AccessControllerUtils;
 
 /**
  * @author epr
  */
 public class _3c90xDriver extends AbstractEthernetDriver {
 
-	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
-	/** The actual device driver */
-	private _3c90xCore dd;
-	/** The device flags */
-	private final _3c90xFlags flags;
+    /** My logger */
+    private final Logger log = Logger.getLogger(getClass());
 
-	/**
-	 * Create a new instance
-	 * 
-	 * @param flags
-	 */
-	public _3c90xDriver(_3c90xFlags flags) {
-		this.flags = flags;
-	}
+    /** The actual device driver */
+    private _3c90xCore dd;
 
-	/**
-	 * Gets the hardware address of this device
-	 */
-	public HardwareAddress getAddress() {
-		return dd.getHwAddress();
-	}
+    /** The device flags */
+    private final _3c90xFlags flags;
 
-	/**
-	 * @see org.jnode.driver.net.AbstractNetDriver#doTransmit(SocketBuffer, HardwareAddress)
-	 */
-	protected void doTransmitEthernet(SocketBuffer skbuf) throws NetworkException {
-		try {
-			// Pad
-			if (skbuf.getSize() < ETH_ZLEN) {
-				skbuf.append(ETH_ZLEN - skbuf.getSize());
-			}
+    /**
+     * Create a new instance
+     * 
+     * @param flags
+     */
+    public _3c90xDriver(_3c90xFlags flags) {
+        this.flags = flags;
+    }
 
-			dd.transmit(skbuf, 5000);
-		} catch (InterruptedException ex) {
-			throw new NetworkException("Interrupted", ex);
-		} catch (TimeoutException ex) {
-			throw new NetworkException("Timeout", ex);
-		}
-	}
+    /**
+     * Gets the hardware address of this device
+     */
+    public HardwareAddress getAddress() {
+        return dd.getHwAddress();
+    }
 
-	/**
-	 * @see org.jnode.driver.Driver#startDevice()
-	 */
-	protected void startDevice() throws DriverException {
-		try {
-			dd = newCore(getDevice(), flags);
-			dd.initialize();
-			super.startDevice();
-		} catch (ResourceNotFreeException ex) {
-			throw new DriverException("Cannot claim " + flags.getName() + " resources", ex);
-		}
-	}
+    /**
+     * @see org.jnode.driver.net.AbstractNetDriver#doTransmit(SocketBuffer,
+     *      HardwareAddress)
+     */
+    protected void doTransmitEthernet(SocketBuffer skbuf)
+            throws NetworkException {
+        try {
+            // Pad
+            if (skbuf.getSize() < ETH_ZLEN) {
+                skbuf.append(ETH_ZLEN - skbuf.getSize());
+            }
 
-	/**
-	 * Create a new _3c90xCore instance
-	 */
-	protected _3c90xCore newCore(Device device, _3c90xFlags flags) throws DriverException, ResourceNotFreeException {
-		return new _3c90xCore(this, device, (PCIDevice) device, flags);
-	}
+            dd.transmit(skbuf, 5000);
+        } catch (InterruptedException ex) {
+            throw new NetworkException("Interrupted", ex);
+        } catch (TimeoutException ex) {
+            throw new NetworkException("Timeout", ex);
+        }
+    }
 
-	/**
-	 * @see org.jnode.driver.Driver#stopDevice()
-	 */
-	protected void stopDevice() throws DriverException {
-		log.debug("stopDevice");
-		super.stopDevice();
-		dd.disable();
-		dd.release();
-		dd = null;
-		log.debug("done");
-	}
+    /**
+     * @see org.jnode.driver.Driver#startDevice()
+     */
+    protected void startDevice() throws DriverException {
+        try {
+            dd = newCore(getDevice(), flags);
+            dd.initialize();
+            super.startDevice();
+        } catch (ResourceNotFreeException ex) {
+            throw new DriverException("Cannot claim " + flags.getName()
+                    + " resources", ex);
+        }
+    }
 
-	/**
-	 * Gets the device flags
-	 */
-	public _3c90xFlags getFlags() {
-		return flags;
-	}
+    /**
+     * Create a new _3c90xCore instance
+     */
+    protected _3c90xCore newCore(final Device device, final _3c90xFlags flags)
+            throws DriverException, ResourceNotFreeException {
+        try {
+            return (_3c90xCore) AccessControllerUtils
+                    .doPrivileged(new PrivilegedExceptionAction() {
+                        public Object run() throws DriverException, ResourceNotFreeException {
+                            return new _3c90xCore(_3c90xDriver.this, device, (PCIDevice) device,
+                                    flags);
+                        }
+                    });
+        } catch (DriverException ex) {
+            throw ex;
+        } catch (ResourceNotFreeException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new DriverException(ex);
+        }
+    }
+
+    /**
+     * @see org.jnode.driver.Driver#stopDevice()
+     */
+    protected void stopDevice() throws DriverException {
+        log.debug("stopDevice");
+        super.stopDevice();
+        dd.disable();
+        dd.release();
+        dd = null;
+        log.debug("done");
+    }
+
+    /**
+     * Gets the device flags
+     */
+    public _3c90xFlags getFlags() {
+        return flags;
+    }
 }

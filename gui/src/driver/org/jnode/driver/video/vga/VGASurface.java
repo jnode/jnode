@@ -12,6 +12,7 @@ import java.awt.image.Raster;
 
 import org.jnode.awt.util.AwtUtils;
 import org.jnode.awt.util.BitmapGraphics;
+import org.jnode.driver.DriverException;
 import org.jnode.driver.video.FrameBufferConfiguration;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.util.AbstractSurface;
@@ -29,7 +30,7 @@ public class VGASurface extends AbstractSurface implements Surface, VgaConstants
 	private final IndexColorModel model;
 	private final BitmapGraphics bitmapGraphics;
 
-	public VGASurface(VGADriver driver) throws ResourceNotFreeException {
+	public VGASurface(VGADriver driver) throws ResourceNotFreeException, DriverException {
 		super(640, 480);
 		this.vga = new StandardVGA(driver.getDevice(), VGADriver.COLOR_MODEL);
 		this.vgaIO = new StandardVGAIO(driver.getDevice(), vga.getVgaMem());

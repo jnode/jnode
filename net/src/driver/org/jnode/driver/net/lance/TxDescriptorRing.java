@@ -52,13 +52,13 @@ public class TxDescriptorRing extends DescriptorRing {
 		}
 	}
 
-	private TxDescriptor getAvailableDescriptor() {
+	/*private TxDescriptor getAvailableDescriptor() {
 		for (int i = 0; i < length; i++) {
 			if (txDescriptors[i].isOwnerSelf())
 				return txDescriptors[i];
 		}
 		return null;
-	}
+	}*/
 
 	public void dumpData(PrintStream out) {
 		out.println("Transmit Ring Descriptors - 16 bit mode");

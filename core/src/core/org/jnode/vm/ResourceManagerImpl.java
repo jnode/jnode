@@ -13,6 +13,7 @@ import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
+import org.jnode.system.ResourcePermission;
 import org.jnode.system.SimpleResourceOwner;
 
 /**
@@ -22,6 +23,8 @@ import org.jnode.system.SimpleResourceOwner;
  */
 final class ResourceManagerImpl implements ResourceManager {
 	
+    private final ResourcePermission IOPORTS_PERM = new ResourcePermission("ioports");
+    
 	/**
 	 * Hidden constructor.
 	 */
@@ -60,6 +63,10 @@ final class ResourceManagerImpl implements ResourceManager {
 	 */
 	public IOResource claimIOResource(ResourceOwner owner, int startPort, int length)
 	throws ResourceNotFreeException {
+	    final SecurityManager sm = System.getSecurityManager();
+	    if (sm != null) {
+	        sm.checkPermission(IOPORTS_PERM);
+	    }
 		return IOResourceImpl.claimIOResource(owner, startPort, length);
 	}
 

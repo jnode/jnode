@@ -150,6 +150,7 @@ public final class VmSystem {
         arch = vm.getArch().getName();
 
         final Properties res = new Properties();
+        // Java properties
         res.put("java.version", "1.1.0");
         res.put("java.vendor", "JNode.org");
         res.put("java.vendor.url", "http://jnode.org");
@@ -169,13 +170,15 @@ public final class VmSystem {
         res.put("os.name", "JNode");
         res.put("os.arch", arch);
         res.put("os.version", vm.getVersion());
-        //res.put("policy.provider", "org.jnode.security.JNodePolicy");
         res.put("file.separator", "/");
         res.put("path.separator", ":");
         res.put("line.separator", "\n");
         res.put("user.name", "System");
         res.put("user.home", "/");
         res.put("user.dir", "/");
+        
+        // GNU properties
+        res.put("gnu.java.io.encoding_scheme_alias.US-ASCII", "ISO8859-1"); 
 
         return res;
     }
