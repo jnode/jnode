@@ -12,7 +12,6 @@ import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.vm.Address;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.bytecode.BasicBlock;
-import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.bytecode.ControlFlowGraph;
 import org.jnode.vm.classmgr.AbstractVmClassLoader;
 import org.jnode.vm.classmgr.VmAddressMap;
@@ -212,11 +211,12 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
 				bc.setCompilerData(cfg);
 			}
 			// Compile the code 1 basic block at a time
+			final CompilerBytecodeParser parser = new CompilerBytecodeParser(bc, cfg, bcv);
 			bcv.startMethod(method);
 			for (Iterator i = cfg.basicBlockIterator(); i.hasNext();) {
 				final BasicBlock bb = (BasicBlock) i.next();
 				bcv.startBasicBlock(bb);
-				BytecodeParser.parse(bc, bcv, bb.getStartPC(), bb.getEndPC(), false);
+				parser.parse(bb.getStartPC(), bb.getEndPC(), false);
 				bcv.endBasicBlock();
 			}
 			bcv.endMethod();

@@ -12,6 +12,7 @@ import org.jnode.vm.classmgr.VmCP;
 import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmConstFieldRef;
 import org.jnode.vm.classmgr.VmConstIMethodRef;
+import org.jnode.vm.classmgr.VmMethod;
 
 /**
  * <description>
@@ -62,7 +63,7 @@ public class BytecodeParser {
 	 * @param bc
 	 * @param handler
 	 */
-	private BytecodeParser(VmByteCode bc, BytecodeVisitor handler) {
+	protected BytecodeParser(VmByteCode bc, BytecodeVisitor handler) {
 		this.bc = bc;
 		this.bytecode = bc.getBytecode();
 		this.cp = bc.getCP();
@@ -121,7 +122,7 @@ public class BytecodeParser {
 		this.endPC = endPCArg;
 		handler.setParser(this);
 		if (startEndMethod) {
-			handler.startMethod(bc.getMethod());
+			fireStartMethod(bc.getMethod());
 		}
 
 		while (offset < endPC) {
@@ -130,7 +131,7 @@ public class BytecodeParser {
 			this.continueAt = -1;
 			this.address = offset;
 			this.wide = false;
-			handler.startInstruction(address);
+			fireStartInstruction(address);
 			this.opcode = getu1();
 			final int cpIdx;
 
@@ -870,13 +871,13 @@ public class BytecodeParser {
 				default :
 					throw new ClassFormatError("Invalid opcode");
 			}
-			handler.endInstruction();
+			fireEndInstruction();
 			if (continueAt >= 0) {
 				offset = continueAt;
 			}
 		}
 		if (startEndMethod) {
-			handler.endMethod();
+			fireEndMethod();
 		}
 	}
 
@@ -1015,5 +1016,34 @@ public class BytecodeParser {
 	public int getEndPC() {
 		return this.endPC;
 	}
-
+	
+	/**
+	 * Call the startInstruction method of the handler.
+	 * @param address
+	 */
+	protected void fireStartInstruction(int address) {
+		handler.startInstruction(address);
+	}
+	
+	/**
+	 * Call the endInstruction method of the handler.
+	 */
+	protected void fireEndInstruction() {
+		handler.endInstruction();
+	}
+	
+	/**
+	 * Call the startInstruction method of the handler.
+	 * @param address
+	 */
+	protected void fireStartMethod(VmMethod method) {
+		handler.startMethod(method);
+	}
+	
+	/**
+	 * Call the endMethod method of the handler.
+	 */
+	protected void fireEndMethod() {
+		handler.endMethod();
+	}
 }
