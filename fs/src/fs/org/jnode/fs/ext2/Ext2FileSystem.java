@@ -241,7 +241,6 @@ public class Ext2FileSystem implements FileSystem {
 			throw new IOException("Filesystem is mounted read-only!"); 
 			
 		Block block;
-		/*int blockSize =*/ superblock.getBlockSize();
 		
 		Integer key=new Integer((int)nr);
 		//check if the block is in the cache

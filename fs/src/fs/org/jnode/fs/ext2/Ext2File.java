@@ -65,6 +65,7 @@ public class Ext2File implements FSFile {
 			}
 			iNode.setSize(length);
 			
+			/*
 			try{
 				iNode.update();
 			}catch(FileSystemException fse) {
@@ -73,7 +74,8 @@ public class Ext2File implements FSFile {
 			//update the group descriptors and superblock: needed if blocks have been 
 			//allocated or deallocated
 			iNode.getExt2FileSystem().updateFS();
-
+			*/
+			
 			return;
 		}
 		
@@ -182,7 +184,7 @@ public class Ext2File implements FSFile {
 		}
 		iNode.setSize( fileOffset+len );
 		
-		//TODO: remove ---
+		/*
 		try{
 			iNode.update();
 		}catch(FileSystemException fse) {
@@ -191,7 +193,7 @@ public class Ext2File implements FSFile {
 		//update the group descriptors and superblock: needed if blocks have been 
 		//allocated or deallocated
 		iNode.getExt2FileSystem().updateFS();
-		// ----------------
+		*/
 				
 	}
 
@@ -221,8 +223,15 @@ public class Ext2File implements FSFile {
 	 * Flush any cached data to the disk.
 	 * @throws IOException
 	 */
-	public void flush()
-	throws IOException {
-	    // TOTO Andras, please implement this
+	public void flush() throws IOException {
+		log.debug("Ext2File.flush()");
+		try{
+			iNode.update();
+		}catch(FileSystemException fse) {
+			throw new IOException(fse);
+		}
+		//update the group descriptors and superblock: needed if blocks have been 
+		//allocated or deallocated
+		iNode.getExt2FileSystem().updateFS();
 	}
 }
