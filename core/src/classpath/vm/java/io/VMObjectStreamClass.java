@@ -37,6 +37,8 @@ exception statement from your version. */
 
 package java.io;
 
+import java.lang.reflect.Field;
+
 final class VMObjectStreamClass {
 	/**
 	  * Returns true if CLAZZ has a static class initializer
@@ -44,5 +46,33 @@ final class VMObjectStreamClass {
 	  */
 	static boolean hasClassInitializer(Class clazz) {
 		return false;
+	}
+	
+	static void setBooleanNative(Field field, Object obj, boolean value) {
+	    // TODO implement me
+	}
+	static void setByteNative(Field field, Object obj, byte value) {
+	    // TODO implement me
+	}
+	static void setCharNative(Field field, Object obj, char value) {
+	    // TODO implement me
+	}
+	static void setShortNative(Field field, Object obj, short value) {
+	    // TODO implement me
+	}
+	static void setIntNative(Field field, Object obj, int value) {
+	    // TODO implement me
+	}
+	static void setFloatNative(Field field, Object obj, float value) {
+	    // TODO implement me
+	}
+	static void setLongNative(Field field, Object obj, long value) {
+	    // TODO implement me
+	}
+	static void setDoubleNative(Field field, Object obj, double value) {
+	    // TODO implement me
+	}
+	static void setObjectNative(Field field, Object obj, Object value) {
+	    // TODO implement me
 	}
 }
