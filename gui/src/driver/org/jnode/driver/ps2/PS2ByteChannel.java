@@ -58,6 +58,17 @@ public class PS2ByteChannel implements ByteChannel {
 	}
 
 	/**
+	 * Return the first byte from this channel, without removing it.
+	 * This method blocks until a byte is available.
+	 */
+	public int peek(long timeout) throws IOException, TimeoutException, InterruptedException {
+		if (!isOpen()) {
+			throw new ClosedChannelException();
+		}
+		return queue.peek(timeout) & 0xFF;
+	}
+
+	/**
 	 * @see java.nio.channels.WritableByteChannel#write(java.nio.ByteBuffer)
 	 */
 	public int write(ByteBuffer src) throws IOException {

@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jnode.driver.DeviceException;
 import org.jnode.driver.DriverException;
+import org.jnode.util.NumberUtils;
 
 /**
  * author qades
@@ -40,6 +41,7 @@ public class MouseInterpreter implements PointerInterpreter {
 
 	public boolean probe(AbstractPointerDriver d) {
 		try {
+		    log.debug("Probe mouse");
 			// reset the mouse
 			if (!d.initPointer()) {
 				log.debug("Reset mouse failed");
@@ -48,7 +50,7 @@ public class MouseInterpreter implements PointerInterpreter {
 			int id = d.getPointerId();
 			if (id != 0) {
 				// does not seem to be a mouse, more likely a tablet of touch screen
-				log.debug("PointerId == " + id);
+				log.debug("PointerId 0x" + NumberUtils.hex(id, 2));
 				return false;
 			}
 
@@ -62,6 +64,7 @@ public class MouseInterpreter implements PointerInterpreter {
 			// but a mouse with a wheel will change its mouse ID
 
 			id = d.getPointerId();
+			log.debug("Actual pointerId 0x" + NumberUtils.hex(id, 2));
 			// select protocol
 			for (Iterator i = protocolsHandlers.iterator(); i.hasNext();) {
 				final MouseProtocolHandler p = (MouseProtocolHandler) i.next();
