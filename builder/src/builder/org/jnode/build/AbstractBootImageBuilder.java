@@ -376,7 +376,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 	 * Emit all objects to the native stream that have not yet been emitted to this stream.
 	 * 
 	 * @param os
-	 * @param skipMe
+	 * @param arch
+	 * @param blockObjects
 	 * @throws BuildException
 	 */
 	private final void emitObjects(NativeStream os, VmArchitecture arch, Set blockObjects) throws BuildException {
