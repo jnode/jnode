@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.video.ati.mach64" 
+        name="JNode Video ATI Mach64 SVGA Driver"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.awt"/>
+    <import plugin="org.jnode.driver"/>
+    <import plugin="org.jnode.driver.pci"/>
+    <import plugin="org.jnode.driver.video"/>
+    <import plugin="org.jnode.driver.video.vgahw"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-gui.jar">
+      <export name="org.jnode.driver.video.ati.mach64.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.system.ResourcePermission" name="memoryScanner"/>
+  </extension>
+  <extension point="org.jnode.driver.mappers">
+    <mapper id="1002:4755" name="3D RAGE II+ (GTB)" driver-class="org.jnode.driver.video.ati.mach64.Mach64Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+  </extension>
+        
+</plugin>

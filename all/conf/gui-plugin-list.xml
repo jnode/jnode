@@ -60,6 +60,7 @@
   <plugin id="org.jnode.driver.sound.speaker.pc"/>
   <plugin id="org.jnode.driver.sound.command"/>
   <plugin id="org.jnode.driver.video"/>
+  <plugin id="org.jnode.driver.video.ati.mach64"/>
   <plugin id="org.jnode.driver.video.ati.radeon"/>
   <plugin id="org.jnode.driver.video.nvidia"/>
   <plugin id="org.jnode.driver.video.vga"/>
