@@ -61,7 +61,7 @@ public class NTFSFileSystem implements FileSystem
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FileSystem#close()
 	 */
-	public void close() throws IOException
+	public void close()
 	{
 		// TODO Auto-generated method stub
 	}
