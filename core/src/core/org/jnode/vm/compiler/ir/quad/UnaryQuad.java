@@ -17,6 +17,7 @@ import org.jnode.vm.compiler.ir.Variable;
 
 /**
  * @author Madhu Siddalingaiah
+ * @author Levente Sántha
  *
  */
 public class UnaryQuad extends AssignQuad {
@@ -96,10 +97,105 @@ public class UnaryQuad extends AssignQuad {
 	 */
 	// TODO should fold constants, see BinaryQuad::propagate(...)
 	public Operand propagate(Variable operand) {
+        Quad quad = foldConstants();
+		if (quad instanceof ConstantRefAssignQuad) {
+			setDeadCode(true);
+			ConstantRefAssignQuad cop = (ConstantRefAssignQuad) quad;
+			return cop.getRHS();
+		}
 		return operand;
 	}
 
-	/* (non-Javadoc)
+    private Quad foldConstants() {
+        if(operand instanceof Constant){
+            Constant c = (Constant) operand;
+
+            switch (operation) {
+                case I2L:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.i2l());
+
+                case I2F:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.i2f());
+
+                case I2D:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.i2d());
+
+                case L2I:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.l2i());
+
+                case L2F:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.l2f());
+
+                case L2D:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.l2d());
+
+                case F2I:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.f2i());
+
+                case F2L:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.f2l());
+
+                case F2D:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.f2d());
+
+                case D2I:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.d2i());
+
+                case D2L:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.d2l());
+
+                case D2F:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.d2f());
+
+                case I2B:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.i2b());
+
+                case I2C:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.i2c());
+
+                case I2S:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.i2s());
+
+				case INEG:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.iNeg());
+
+                case LNEG:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.lNeg());
+
+                case FNEG:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.fNeg());
+
+                case DNEG:
+					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+						this.getLHS().getIndex(), c.dNeg());
+
+                default:
+					throw new IllegalArgumentException("Don't know how to fold those yet...");
+            }
+        }
+        return this;
+    }
+
+
+    /* (non-Javadoc)
 	 * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
 	 */
 	public void doPass2(BootableHashMap liveVariables) {

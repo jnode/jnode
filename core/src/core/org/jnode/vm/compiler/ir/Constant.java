@@ -33,7 +33,105 @@ public abstract class Constant extends Operand {
 	public static Constant getInstance(Object value) {
 		return new ReferenceConstant(value);
 	}
-	
+
+    ///////////////// UNARY OPERATIONS ////////////////////
+    public Constant i2l() {
+        int i = ((IntConstant) this).getValue();
+        return new LongConstant(i);
+    }
+
+    public Constant i2f() {
+        int i = ((IntConstant) this).getValue();
+        return new FloatConstant(i);
+    }
+
+    public Constant i2d() {
+        int i = ((IntConstant) this).getValue();
+        return new DoubleConstant(i);
+    }
+
+    public Constant l2i() {
+        long l = ((LongConstant) this).getValue();
+        return new IntConstant((int) l);
+    }
+
+    public Constant l2f() {
+        long l = ((LongConstant) this).getValue();
+        return new FloatConstant(l);
+    }
+
+    public Constant l2d() {
+        long l = ((LongConstant) this).getValue();
+        return new DoubleConstant(l);
+    }
+
+    public Constant f2i() {
+        float f = ((FloatConstant) this).getValue();
+        return new IntConstant((int) f);
+    }
+
+    public Constant f2l() {
+        float f = ((FloatConstant) this).getValue();
+        return new LongConstant((long) f);
+    }
+
+    public Constant f2d() {
+        float f = ((FloatConstant) this).getValue();
+        return new DoubleConstant(f);
+    }
+
+    public Constant d2i() {
+        double d = ((DoubleConstant) this).getValue();
+        return new IntConstant((int) d);
+    }
+
+    public Constant d2l() {
+        double d = ((DoubleConstant) this).getValue();
+        return new LongConstant((long) d);
+    }
+
+    public Constant d2f() {
+        double d = ((DoubleConstant) this).getValue();
+        return new FloatConstant((float) d);
+    }
+
+    public Constant i2b() {
+        int i = ((IntConstant) this).getValue();
+        return new IntConstant((byte) i);
+    }
+
+    public Constant i2c() {
+        int i = ((IntConstant) this).getValue();
+        return new IntConstant((char) i);
+    }
+
+    public Constant i2s() {
+        int i = ((IntConstant) this).getValue();
+        return new IntConstant((short) i);
+    }
+
+    public Constant iNeg() {
+        int i = ((IntConstant) this).getValue();
+        return new IntConstant(-i);
+    }
+
+    public Constant fNeg() {
+        float f = ((FloatConstant) this).getValue();
+        return new FloatConstant(-f);
+    }
+
+    public Constant lNeg() {
+        long l = ((LongConstant) this).getValue();
+        return new LongConstant(-l);
+    }
+
+    public Constant dNeg() {
+        double d = ((DoubleConstant) this).getValue();
+        return new DoubleConstant(-d);
+    }
+
+
+    ///////////////// BINARY OPERATIONS ////////////////////
 	/**
 	 * @param c2
 	 */
