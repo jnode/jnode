@@ -1,6 +1,6 @@
 /* SimpleDateFormat.java -- A class for parsing/formating simple 
    date constructs
-   Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -39,16 +39,21 @@ exception statement from your version. */
 
 package java.text;
 
+import gnu.java.text.AttributedFormatBuffer;
+import gnu.java.text.FormatBuffer;
+import gnu.java.text.FormatCharacterIterator;
+import gnu.java.text.StringFormatBuffer;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.Locale;
-import java.util.TimeZone;
 import java.util.SimpleTimeZone;
-import java.util.Vector;
-import java.io.ObjectInputStream;
-import java.io.IOException;
+import java.util.TimeZone;
 
 /**
  * SimpleDateFormat provides convenient methods for parsing and formatting
@@ -71,7 +76,7 @@ public class SimpleDateFormat extends DateFormat
     }
   }
 
-  private transient Vector tokens;
+  private transient ArrayList tokens;
   private DateFormatSymbols formatData;  // formatData
   private Date defaultCenturyStart;
   private transient int defaultCentury;
@@ -82,7 +87,7 @@ public class SimpleDateFormat extends DateFormat
   // This string is specified in the JCL.  We set it here rather than
   // do a DateFormatSymbols(Locale.US).getLocalPatternChars() since
   // someone could theoretically change those values (though unlikely).
-  private static final String standardChars = "GyMdkHmsSEDFwWahKz";
+  private static final String standardChars = "GyMdkHmsSEDFwWahKzZ";
 
   private void readObject(ObjectInputStream stream)
     throws IOException, ClassNotFoundException
@@ -98,7 +103,7 @@ public class SimpleDateFormat extends DateFormat
       set2DigitYearStart(defaultCenturyStart);
 
     // Set up items normally taken care of by the constructor.
-    tokens = new Vector();
+    tokens = new ArrayList();
     compileFormat(pattern);
   }
 
@@ -117,26 +122,27 @@ public class SimpleDateFormat extends DateFormat
       field = formatData.getLocalPatternChars().indexOf(thisChar);
       if (field == -1) {
 	current = null;
-	if (Character.isLetter(thisChar)) {
+	if ((thisChar >= 'A' && thisChar <= 'Z')
+	    || (thisChar >= 'a' && thisChar <= 'z')) {
 	  // Not a valid letter
-	  tokens.addElement(new FieldSizePair(-1,0));
+	  tokens.add(new FieldSizePair(-1,0));
 	} else if (thisChar == '\'') {
 	  // Quoted text section; skip to next single quote
 	  pos = pattern.indexOf('\'',i+1);
 	  if (pos == -1) {
 	    // This ought to be an exception, but spec does not
 	    // let us throw one.
-	    tokens.addElement(new FieldSizePair(-1,0));
+	    tokens.add(new FieldSizePair(-1,0));
 	  }
 	  if ((pos+1 < pattern.length()) && (pattern.charAt(pos+1) == '\'')) {
-	    tokens.addElement(pattern.substring(i+1,pos+1));
+	    tokens.add(pattern.substring(i+1,pos+1));
 	  } else {
-	    tokens.addElement(pattern.substring(i+1,pos));
+	    tokens.add(pattern.substring(i+1,pos));
 	  }
 	  i = pos;
 	} else {
 	  // A special character
-	  tokens.addElement(new Character(thisChar));
+	  tokens.add(new Character(thisChar));
 	}
       } else {
 	// A valid field
@@ -144,7 +150,7 @@ public class SimpleDateFormat extends DateFormat
 	  current.size++;
 	} else {
 	  current = new FieldSizePair(field,1);
-	  tokens.addElement(current);
+	  tokens.add(current);
 	}
       }
     }
@@ -153,9 +159,9 @@ public class SimpleDateFormat extends DateFormat
   public String toString() 
   {
     StringBuffer output = new StringBuffer();
-    Enumeration e = tokens.elements();
-    while (e.hasMoreElements()) {
-      output.append(e.nextElement().toString());
+    Iterator i = tokens.iterator();
+    while (i.hasNext()) {
+      output.append(i.next().toString());
     }
     return output.toString();
   }
@@ -175,13 +181,15 @@ public class SimpleDateFormat extends DateFormat
     Locale locale = Locale.getDefault();
     calendar = new GregorianCalendar(locale);
     computeCenturyStart();
-    tokens = new Vector();
+    tokens = new ArrayList();
     formatData = new DateFormatSymbols(locale);
     pattern = (formatData.dateFormats[DEFAULT] + ' '
 	       + formatData.timeFormats[DEFAULT]);
     compileFormat(pattern);
     numberFormat = NumberFormat.getInstance(locale);
     numberFormat.setGroupingUsed (false);
+    numberFormat.setParseIntegerOnly (true);
+    numberFormat.setMaximumFractionDigits (0);
   }
   
   /**
@@ -202,12 +210,14 @@ public class SimpleDateFormat extends DateFormat
     super();
     calendar = new GregorianCalendar(locale);
     computeCenturyStart();
-    tokens = new Vector();
+    tokens = new ArrayList();
     formatData = new DateFormatSymbols(locale);
     compileFormat(pattern);
     this.pattern = pattern;
     numberFormat = NumberFormat.getInstance(locale);
     numberFormat.setGroupingUsed (false);
+    numberFormat.setParseIntegerOnly (true);
+    numberFormat.setMaximumFractionDigits (0);
   }
 
   /**
@@ -219,12 +229,14 @@ public class SimpleDateFormat extends DateFormat
     super();
     calendar = new GregorianCalendar();
     computeCenturyStart ();
-    tokens = new Vector();
+    tokens = new ArrayList();
     this.formatData = formatData;
     compileFormat(pattern);
     this.pattern = pattern;
     numberFormat = NumberFormat.getInstance();
     numberFormat.setGroupingUsed (false);
+    numberFormat.setParseIntegerOnly (true);
+    numberFormat.setMaximumFractionDigits (0);
   }
 
   // What is the difference between localized and unlocalized?  The
@@ -261,7 +273,7 @@ public class SimpleDateFormat extends DateFormat
    */
   public void applyPattern(String pattern)
   {
-    tokens = new Vector();
+    tokens = new ArrayList();
     compileFormat(pattern);
     this.pattern = pattern;
   }
@@ -354,13 +366,13 @@ public class SimpleDateFormat extends DateFormat
    * object.  This will be true if and only if the specified object:
    * <p>
    * <ul>
-   * <li>Is not <code>null</code>.
-   * <li>Is an instance of <code>SimpleDateFormat</code>.
+   * <li>Is not <code>null</code>.</li>
+   * <li>Is an instance of <code>SimpleDateFormat</code>.</li>
    * <li>Is equal to this object at the superclass (i.e., <code>DateFormat</code>)
-   *     level.
-   * <li>Has the same formatting pattern.
-   * <li>Is using the same formatting symbols.
-   * <li>Is using the same century for two digit years.
+   *     level.</li>
+   * <li>Has the same formatting pattern.</li>
+   * <li>Is using the same formatting symbols.</li>
+   * <li>Is using the same century for two digit years.</li>
    * </ul>
    *
    * @param obj The object to compare for equality against.
@@ -370,9 +382,6 @@ public class SimpleDateFormat extends DateFormat
    */
   public boolean equals(Object o)
   {
-    if (o == null)
-      return false;
-
     if (!super.equals(o))
       return false;
 
@@ -381,10 +390,10 @@ public class SimpleDateFormat extends DateFormat
 
     SimpleDateFormat sdf = (SimpleDateFormat)o;
 
-    if (!toPattern().equals(sdf.toPattern()))
+    if (defaultCentury != sdf.defaultCentury)
       return false;
 
-    if (!get2DigitYearStart().equals(sdf.get2DigitYearStart()))
+    if (!toPattern().equals(sdf.toPattern()))
       return false;
 
     if (!getDateFormatSymbols().equals(sdf.getDateFormatSymbols()))
@@ -393,113 +402,181 @@ public class SimpleDateFormat extends DateFormat
     return true;
   }
 
+  /**
+   * This method returns a hash value for this object.
+   *
+   * @return A hash value for this object.
+   */
+  public int hashCode()
+  {
+    return super.hashCode() ^ toPattern().hashCode() ^ defaultCentury ^
+      getDateFormatSymbols().hashCode();
+  }
+
 
   /**
    * Formats the date input according to the format string in use,
    * appending to the specified StringBuffer.  The input StringBuffer
    * is returned as output for convenience.
    */
-  public StringBuffer format(Date date, StringBuffer buffer, FieldPosition pos)
+  final private void formatWithAttribute(Date date, FormatBuffer buffer, FieldPosition pos)
   {
     String temp;
+    AttributedCharacterIterator.Attribute attribute;
     calendar.setTime(date);
     
     // go through vector, filling in fields where applicable, else toString
-    Enumeration e = tokens.elements();
-    while (e.hasMoreElements()) {
-      Object o = e.nextElement();
-      if (o instanceof FieldSizePair) {
+    Iterator iter = tokens.iterator();
+    while (iter.hasNext())
+      {
+	Object o = iter.next();
+	if (o instanceof FieldSizePair)
+	  {
 	FieldSizePair p = (FieldSizePair) o;
 	int beginIndex = buffer.length();
-	switch (p.field) {
+	    
+	    switch (p.field)
+	      {
 	case ERA_FIELD:
-	  buffer.append(formatData.eras[calendar.get(Calendar.ERA)]);
+		buffer.append (formatData.eras[calendar.get (Calendar.ERA)], DateFormat.Field.ERA);
 	  break;
 	case YEAR_FIELD:
-	  temp = String.valueOf(calendar.get(Calendar.YEAR));
-	  if (p.size < 4)
-	    buffer.append(temp.substring(temp.length()-2));
+		// If we have two digits, then we truncate.  Otherwise, we
+		// use the size of the pattern, and zero pad.
+		buffer.setDefaultAttribute (DateFormat.Field.YEAR);
+		if (p.size == 2)
+		  {
+		    temp = String.valueOf (calendar.get (Calendar.YEAR));
+		    buffer.append (temp.substring (temp.length() - 2));
+		  }
 	  else
-	    buffer.append(temp);
+		  withLeadingZeros (calendar.get (Calendar.YEAR), p.size, buffer);
 	  break;
 	case MONTH_FIELD:
+		buffer.setDefaultAttribute (DateFormat.Field.MONTH);
 	  if (p.size < 3)
-	    withLeadingZeros(calendar.get(Calendar.MONTH)+1,p.size,buffer);
-	  else if (p.size < 4) {
-		final int month = calendar.get(Calendar.MONTH);
-		buffer.append(formatData.shortMonths[month]);
-	  }
+		  withLeadingZeros (calendar.get (Calendar.MONTH) + 1, p.size, buffer);
+		else if (p.size < 4)
+		  buffer.append (formatData.shortMonths[calendar.get (Calendar.MONTH)]);
 	  else
-	    buffer.append(formatData.months[calendar.get(Calendar.MONTH)]);
+		  buffer.append (formatData.months[calendar.get (Calendar.MONTH)]);
 	  break;
 	case DATE_FIELD:
-	  withLeadingZeros(calendar.get(Calendar.DATE),p.size,buffer);
+		buffer.setDefaultAttribute (DateFormat.Field.DAY_OF_MONTH);
+		withLeadingZeros (calendar.get (Calendar.DATE), p.size, buffer);
 	  break;
 	case HOUR_OF_DAY1_FIELD: // 1-24
-	  withLeadingZeros(((calendar.get(Calendar.HOUR_OF_DAY)+23)%24)+1,p.size,buffer);
+		buffer.setDefaultAttribute(DateFormat.Field.HOUR_OF_DAY1);
+		withLeadingZeros ( ((calendar.get (Calendar.HOUR_OF_DAY) + 23) % 24) + 1, 
+				   p.size, buffer);
 	  break;
 	case HOUR_OF_DAY0_FIELD: // 0-23
-	  withLeadingZeros(calendar.get(Calendar.HOUR_OF_DAY),p.size,buffer);
+		buffer.setDefaultAttribute (DateFormat.Field.HOUR_OF_DAY0);
+		withLeadingZeros (calendar.get (Calendar.HOUR_OF_DAY), p.size, buffer);
 	  break;
 	case MINUTE_FIELD:
-	  withLeadingZeros(calendar.get(Calendar.MINUTE),p.size,buffer);
+		buffer.setDefaultAttribute (DateFormat.Field.MINUTE);
+		withLeadingZeros (calendar.get (Calendar.MINUTE),
+				  p.size, buffer);
 	  break;
 	case SECOND_FIELD:
-	  withLeadingZeros(calendar.get(Calendar.SECOND),p.size,buffer);
+		buffer.setDefaultAttribute (DateFormat.Field.SECOND);
+		withLeadingZeros(calendar.get (Calendar.SECOND), 
+				 p.size, buffer);
 	  break;
 	case MILLISECOND_FIELD:
-	  withLeadingZeros(calendar.get(Calendar.MILLISECOND),p.size,buffer);
+		buffer.setDefaultAttribute (DateFormat.Field.MILLISECOND);
+		withLeadingZeros (calendar.get (Calendar.MILLISECOND), p.size, buffer);
 	  break;
 	case DAY_OF_WEEK_FIELD:
+		buffer.setDefaultAttribute (DateFormat.Field.DAY_OF_WEEK);
 	  if (p.size < 4)
-	    buffer.append(formatData.shortWeekdays[calendar.get(Calendar.DAY_OF_WEEK)]);
+		  buffer.append (formatData.shortWeekdays[calendar.get (Calendar.DAY_OF_WEEK)]);
 	  else
-	    buffer.append(formatData.weekdays[calendar.get(Calendar.DAY_OF_WEEK)]);
+		  buffer.append (formatData.weekdays[calendar.get (Calendar.DAY_OF_WEEK)]);
 	  break;
 	case DAY_OF_YEAR_FIELD:
-	  withLeadingZeros(calendar.get(Calendar.DAY_OF_YEAR),p.size,buffer);
+		buffer.setDefaultAttribute (DateFormat.Field.DAY_OF_YEAR);
+		withLeadingZeros (calendar.get (Calendar.DAY_OF_YEAR), p.size, buffer);
 	  break;
 	case DAY_OF_WEEK_IN_MONTH_FIELD:
-	  withLeadingZeros(calendar.get(Calendar.DAY_OF_WEEK_IN_MONTH),p.size,buffer);
+		buffer.setDefaultAttribute (DateFormat.Field.DAY_OF_WEEK_IN_MONTH);
+		withLeadingZeros (calendar.get (Calendar.DAY_OF_WEEK_IN_MONTH), 
+				 p.size, buffer);
 	  break;
 	case WEEK_OF_YEAR_FIELD:
-	  withLeadingZeros(calendar.get(Calendar.WEEK_OF_YEAR),p.size,buffer);
+		buffer.setDefaultAttribute (DateFormat.Field.WEEK_OF_YEAR);
+		withLeadingZeros (calendar.get (Calendar.WEEK_OF_YEAR),
+				  p.size, buffer);
 	  break;
 	case WEEK_OF_MONTH_FIELD:
-	  withLeadingZeros(calendar.get(Calendar.WEEK_OF_MONTH),p.size,buffer);
+		buffer.setDefaultAttribute (DateFormat.Field.WEEK_OF_MONTH);
+		withLeadingZeros (calendar.get (Calendar.WEEK_OF_MONTH),
+				  p.size, buffer);
 	  break;
 	case AM_PM_FIELD:
-	  buffer.append(formatData.ampms[calendar.get(Calendar.AM_PM)]);
+		buffer.setDefaultAttribute (DateFormat.Field.AM_PM);
+		buffer.append (formatData.ampms[calendar.get (Calendar.AM_PM)]);
 	  break;
 	case HOUR1_FIELD: // 1-12
-	  withLeadingZeros(((calendar.get(Calendar.HOUR)+11)%12)+1,p.size,buffer);
+		buffer.setDefaultAttribute (DateFormat.Field.HOUR1);
+		withLeadingZeros (((calendar.get (Calendar.HOUR) + 11) % 12) + 1, p.size, buffer);
 	  break;
 	case HOUR0_FIELD: // 0-11
-	  withLeadingZeros(calendar.get(Calendar.HOUR),p.size,buffer);
+		buffer.setDefaultAttribute (DateFormat.Field.HOUR0);
+		withLeadingZeros (calendar.get (Calendar.HOUR), p.size, buffer);
 	  break;
 	case TIMEZONE_FIELD:
+		buffer.setDefaultAttribute (DateFormat.Field.TIME_ZONE);
 	  TimeZone zone = calendar.getTimeZone();
-	  boolean isDST = calendar.get(Calendar.DST_OFFSET) != 0;
+		boolean isDST = calendar.get (Calendar.DST_OFFSET) != 0;
 	  // FIXME: XXX: This should be a localized time zone.
-	  String zoneID = zone.getDisplayName(isDST, p.size > 3 ? TimeZone.LONG : TimeZone.SHORT);
-	  buffer.append(zoneID);
+		String zoneID = zone.getDisplayName (isDST, p.size > 3 ? TimeZone.LONG : TimeZone.SHORT);
+		buffer.append (zoneID);
 	  break;
 	default:
-	  throw new IllegalArgumentException("Illegal pattern character");
+		throw new IllegalArgumentException ("Illegal pattern character " + p.field);
 	}
-	if (pos != null && p.field == pos.getField())
+	    if (pos != null && (buffer.getDefaultAttribute() == pos.getFieldAttribute()
+				|| p.field == pos.getField()))
 	  {
 	    pos.setBeginIndex(beginIndex);
 	    pos.setEndIndex(buffer.length());
 	  }
-      } else {
-	buffer.append(o.toString());
+	  } 
+      else
+	{  
+	  buffer.append(o.toString(), null);
+	}
       }
     }
+  
+  public StringBuffer format(Date date, StringBuffer buffer, FieldPosition pos)
+  {
+    formatWithAttribute(date, new StringFormatBuffer (buffer), pos);
+
     return buffer;
   }
 
-  private void withLeadingZeros(int value, int length, StringBuffer buffer) 
+  public AttributedCharacterIterator formatToCharacterIterator(Object date)
+    throws IllegalArgumentException
+  {
+    if (date == null)
+      throw new NullPointerException("null argument");
+    if (!(date instanceof Date))
+      throw new IllegalArgumentException("argument should be an instance of java.util.Date");
+
+    AttributedFormatBuffer buf = new AttributedFormatBuffer();
+    formatWithAttribute((Date)date, buf,
+			null);
+    buf.sync();
+        
+    return new FormatCharacterIterator(buf.getBuffer().toString(),
+				       buf.getRanges(),
+				       buf.getAttributes());
+  }
+
+  private void withLeadingZeros(int value, int length, FormatBuffer buffer) 
   {
     String valStr = String.valueOf(value);
     for (length -= valStr.length(); length > 0; length--)
@@ -569,6 +646,14 @@ public class SimpleDateFormat extends DateFormat
 	while (++fmt_index < fmt_max && pattern.charAt(fmt_index) == ch)
 	  ;
 	int fmt_count = fmt_index - first;
+
+	// We might need to limit the number of digits to parse in
+	// some cases.  We look to the next pattern character to
+	// decide.
+	boolean limit_digits = false;
+	if (fmt_index < fmt_max
+	    && standardChars.indexOf(pattern.charAt(fmt_index)) >= 0)
+	  limit_digits = true;
 	--fmt_index;
 
 	// We can handle most fields automatically: most either are
@@ -672,7 +757,6 @@ public class SimpleDateFormat extends DateFormat
 		    found_zone = true;
 		    saw_timezone = true;
 		    TimeZone tz = TimeZone.getTimeZone (strings[0]);
-		    calendar.setTimeZone (tz);
 		    calendar.set (Calendar.ZONE_OFFSET, tz.getRawOffset ());
 		    offset = 0;
 		    if (k > 2 && tz instanceof SimpleTimeZone)
@@ -701,6 +785,8 @@ public class SimpleDateFormat extends DateFormat
 	if (is_numeric)
 	  {
 	    numberFormat.setMinimumIntegerDigits(fmt_count);
+	    if (limit_digits)
+	      numberFormat.setMaximumIntegerDigits(fmt_count);
 	    if (maybe2DigitYear)
 	      index = pos.getIndex();
 	    Number n = numberFormat.parse(dateStr, pos);

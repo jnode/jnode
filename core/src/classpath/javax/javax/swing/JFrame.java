@@ -1,5 +1,5 @@
 /* JFrame.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -45,10 +45,10 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics;
-import java.awt.GraphicsConfiguration;
 import java.awt.LayoutManager;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+
 import javax.accessibility.AccessibleContext;
 
 /**
@@ -57,16 +57,11 @@ import javax.accessibility.AccessibleContext;
  *
  * @author Ronald Veldema (rveldema@cs.vu.nl)
  */
-public class JFrame extends Frame
+public class JFrame extends Frame implements WindowConstants, RootPaneContainer
 {
-    public final static int HIDE_ON_CLOSE        = 0;
-    public final static int EXIT_ON_CLOSE        = 1;
-    public final static int DISPOSE_ON_CLOSE     = 2;
-    public final static int DO_NOTHING_ON_CLOSE  = 3;
-
     protected  AccessibleContext accessibleContext;
 
-    private int close_action = EXIT_ON_CLOSE;    
+    private int close_action = HIDE_ON_CLOSE;    
     
 
     /***************************************************
@@ -126,20 +121,20 @@ public class JFrame extends Frame
   public  void setLayout(LayoutManager manager)
   {    super.setLayout(manager);  }
 
-    void setLayeredPane(JLayeredPane layeredPane) 
+  public void setLayeredPane(JLayeredPane layeredPane) 
     {   getRootPane().setLayeredPane(layeredPane);   }
   
-    JLayeredPane getLayeredPane()
+  public JLayeredPane getLayeredPane()
     {   return getRootPane().getLayeredPane();     }
   
-    JRootPane getRootPane()
+  public JRootPane getRootPane()
     {
 	if (rootPane == null)
 	    setRootPane(createRootPane());
 	return rootPane;          
     }
 
-    void setRootPane(JRootPane root)
+  public void setRootPane(JRootPane root)
     {
 	if (rootPane != null)
 	    remove(rootPane);
@@ -148,20 +143,19 @@ public class JFrame extends Frame
 	add(rootPane, BorderLayout.CENTER);
     }
 
-    JRootPane createRootPane()
+  public JRootPane createRootPane()
     {   return new JRootPane();    }
 
     public Container getContentPane()
     {    return getRootPane().getContentPane();     }
 
-    // @classpath-bugfix
     public void setContentPane(Container contentPane)
     {    getRootPane().setContentPane(contentPane);    }
   
-    Component getGlassPane()
+  public Component getGlassPane()
     {    return getRootPane().getGlassPane();   }
   
-    void setGlassPane(Component glassPane)
+  public void setGlassPane(Component glassPane)
     {   getRootPane().setGlassPane(glassPane);   }
 
     
@@ -193,7 +187,7 @@ public class JFrame extends Frame
     return accessibleContext;
   }
   
-    int getDefaultCloseOperation()
+    public int getDefaultCloseOperation()
     {    return close_action;   }
 
     
@@ -213,7 +207,7 @@ public class JFrame extends Frame
 			{
 			case EXIT_ON_CLOSE:
 			    {
-				System.exit(1);
+				System.exit(0);
 				break;
 			    }
 			case DISPOSE_ON_CLOSE:
@@ -242,9 +236,30 @@ public class JFrame extends Frame
 	    }
     }   
  
-
-    // @classpath-bugfix
+    /**
+     * Defines what happens when this frame is closed. Can be one off
+     * <code>EXIT_ON_CLOSE</code>,
+     * <code>DISPOSE_ON_CLOSE</code>,
+     * <code>HIDE_ON_CLOSE</code> or
+     * <code>DO_NOTHING_ON_CLOSE</code>.
+     * The default is <code>HIDE_ON_CLOSE</code>.
+     * When <code>EXIT_ON_CLOSE</code> is specified this method calls
+     * <code>SecurityManager.checkExit(0)</code> which might throw a
+     * <code>SecurityException</code>. When the specified operation is
+     * not one of the above a <code>IllegalArgumentException</code> is
+     * thrown.
+     */
     public void setDefaultCloseOperation(int operation)
-    {  close_action = operation;   }
+    {
+      SecurityManager sm = System.getSecurityManager();
+      if (sm != null && operation == EXIT_ON_CLOSE)
+	sm.checkExit(0);
+
+      if (operation != EXIT_ON_CLOSE && operation != DISPOSE_ON_CLOSE
+	  && operation != HIDE_ON_CLOSE && operation != DO_NOTHING_ON_CLOSE)
+	throw new IllegalArgumentException("operation = " + operation);
+	  
+      close_action = operation;
+    }
 
 }

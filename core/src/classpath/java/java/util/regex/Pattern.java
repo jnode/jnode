@@ -38,8 +38,8 @@ exception statement from your version. */
 package java.util.regex;
 
 import gnu.regexp.RE;
-import gnu.regexp.RESyntax;
 import gnu.regexp.REException;
+import gnu.regexp.RESyntax;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -66,12 +66,6 @@ public class Pattern implements Serializable
   private final int flags;
 
   private final RE re;
-
-  private Pattern (String regex)
-    throws PatternSyntaxException
-  {
-    this (regex, 0);
-  }
 
   private Pattern (String regex, int flags)
     throws PatternSyntaxException

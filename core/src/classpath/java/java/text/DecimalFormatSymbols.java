@@ -1,5 +1,5 @@
 /* DecimalFormatSymbols.java -- Format symbols used by DecimalFormat
-   Copyright (C) 1999, 2000, 2001 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2000, 2001, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,12 +38,13 @@ exception statement from your version. */
 
 package java.text;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.util.Currency;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.io.ObjectInputStream;
-import java.io.IOException;
 
 /**
  * This class is a container for the symbols used by 
@@ -129,7 +130,7 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
     try
       {
 	res = ResourceBundle.getBundle("gnu.java.locale.LocaleInformation",
-				       loc);
+		loc, ClassLoader.getSystemClassLoader());
       }
     catch (MissingResourceException x)
       {
@@ -157,6 +158,7 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
     percent = safeGetChar (res, "percent", '%');
     perMill = safeGetChar (res, "perMill", '\u2030');
     zeroDigit = safeGetChar (res, "zeroDigit", '0');
+    locale = loc;
   }
 
   /**
@@ -165,9 +167,9 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
    * regard to the specified object:
    * <p>
    * <ul>
-   * <li>It is not <code>null</code>.
-   * <li>It is an instance of <code>DecimalFormatSymbols</code>
-   * <li>All of its symbols are identical to the symbols in this object.
+   * <li>It is not <code>null</code>.</li>
+   * <li>It is an instance of <code>DecimalFormatSymbols</code>.</li>
+   * <li>All of its symbols are identical to the symbols in this object.</li>
    * </ul>
    *
    * @return <code>true</code> if the specified object is equal to this
@@ -192,6 +194,18 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
 	    && percent == dfs.percent
 	    && perMill == dfs.perMill
 	    && zeroDigit == dfs.zeroDigit);
+  }
+
+  /**
+   * Returns the currency corresponding to the currency symbol stored
+   * in the instance of <code>DecimalFormatSymbols</code>.
+   *
+   * @return A new instance of <code>Currency</code> if
+   * the currency code matches a known one.
+   */
+  public Currency getCurrency ()
+  {
+    return Currency.getInstance (currencySymbol);
   }
 
   /**
@@ -351,6 +365,16 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
     // separator -- JCL book.  This probably isn't a very good hash
     // code.
     return zeroDigit << 16 + groupingSeparator << 8 + decimalSeparator;
+  }
+
+  /**
+   * This method sets the currency to the specified value.
+   *
+   * @param currency The new currency
+   */
+  public void setCurrency (Currency currency)
+  {
+    setCurrencySymbol (currency.getSymbol());
   }
 
   /**
@@ -557,13 +581,20 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
   /**
    * @serial This value represents the type of object being de-serialized.
    * 0 indicates a pre-Java 1.1.6 version, 1 indicates 1.1.6 or later.
+   * 0 indicates a pre-Java 1.1.6 version, 1 indicates 1.1.6 or later,
+   * 2 indicates 1.4 or later
    */
-  private int serialVersionOnStream = 1;
+  private int serialVersionOnStream = 2;
   /**
    * @serial This is the character used to represent 0.
    */
   private char zeroDigit;
 
+  /**
+   * @serial The locale of these currency symbols.
+   */
+  private Locale locale;
+ 
   private static final long serialVersionUID = 5772796243397350300L;
 
   private void readObject(ObjectInputStream stream)
@@ -574,7 +605,10 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
       {
         monetarySeparator = decimalSeparator;
 	exponential = 'E';
-	serialVersionOnStream = 1;
       }
+    if (serialVersionOnStream < 2)
+	locale = Locale.getDefault();
+
+    serialVersionOnStream = 2;
   }
 }

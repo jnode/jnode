@@ -1,5 +1,5 @@
 /* CompoundName.java --
-   Copyright (C) 2001 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -40,8 +40,8 @@ package javax.naming;
 
 import java.io.Serializable;
 import java.util.Enumeration;
-import java.util.Properties;
 import java.util.NoSuchElementException;
+import java.util.Properties;
 import java.util.Vector;
 
 /**
@@ -264,7 +264,7 @@ public class CompoundName implements Name, Cloneable, Serializable
     int delta = elts.size () - cn.elts.size ();
     for (int i = 0; i < cn.elts.size (); ++i)
       {
-	String f = canonicalize ((String) elts.get (i));
+	String f = canonicalize ((String) elts.get (delta + i));
 	if (! f.equals (canonicalize ((String) cn.elts.get (i))))
 	  return false;
       }

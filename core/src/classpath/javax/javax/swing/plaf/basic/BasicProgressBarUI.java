@@ -573,7 +573,7 @@ public class BasicProgressBarUI extends ProgressBarUI
 	  }
       }
 
-    if (progressBar.isStringPainted())
+    if (progressBar.isStringPainted() && !progressBar.getString().equals(""))
       paintString(g, 0, 0, or.width, or.height, amountFull, insets);
     g.setColor(saved);
   }
@@ -605,7 +605,7 @@ public class BasicProgressBarUI extends ProgressBarUI
     g.setColor(c.getForeground());
     g.fill3DRect(box.x, box.y, box.width, box.height, true);
 
-    if (progressBar.isStringPainted())
+    if (progressBar.isStringPainted() && !progressBar.getString().equals(""))
       paintString(g, 0, 0, or.width, or.height,
                   getAmountFull(insets, or.width, or.height), insets);
 
@@ -712,6 +712,7 @@ public class BasicProgressBarUI extends ProgressBarUI
     progressBar.setForeground(defaults.getColor("ProgressBar.foreground"));
     progressBar.setBackground(defaults.getColor("ProgressBar.background"));
     progressBar.setBorder(defaults.getBorder("ProgressBar.border"));
+    progressBar.setOpaque(true);
 
     selectionForeground = defaults.getColor("ProgressBar.selectionForeground");
     selectionBackground = defaults.getColor("ProgressBar.selectionBackground");

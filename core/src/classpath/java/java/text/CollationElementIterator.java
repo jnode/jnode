@@ -1,5 +1,5 @@
 /* CollationElementIterator.java -- Walks through collation elements
-   Copyright (C) 1998, 1999, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2002, 2003, 2004  Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -38,6 +38,13 @@ exception statement from your version. */
 
 package java.text;
 
+import java.util.Vector;
+
+/* Written using "Java Class Libraries", 2nd edition, plus online
+ * API docs for JDK 1.2 from http://www.javasoft.com.
+ * Status: Believed complete and correct to JDK 1.1.
+ */
+
 /**
   * This class walks through the character collation elements of a 
   * <code>String</code> as defined by the collation rules in an instance of 
@@ -46,49 +53,129 @@ package java.text;
   * <code>getCollationElementIterator</code> method on 
   * <code>RuleBasedCollator</code>.
   *
-  * @author Aaron M. Renn (arenn@urbanophile.com)
+ * @author Aaron M. Renn <arenn@urbanophile.com>
+ * @author Tom Tromey <tromey@cygnus.com>
+ * @author Guilhem Lavaux <guilhem.lavaux@free.fr>
   */
 public final class CollationElementIterator
 {
+  /**
+   * This is a constant value that is returned to indicate that the end of 
+   * the string was encountered.
+   */
+  public static final int NULLORDER = -1;
 
-/*
- * Static Variables
+  /**
+   * This is the RuleBasedCollator this object was created from.
  */
+  RuleBasedCollator collator;
 
-/**
-  * This is a constant value that is returned to indicate that the end of 
-  * the string was encountered.
+  /**
+   * This is the String that is being iterated over.
   */
-public static final int NULLORDER = -1;
+  String text;
 
-/*************************************************************************/
+  /**
+   * This is the index into the collation decomposition where we are currently scanning.
+   */
+  int index;
 
-/*
- * Instance Variables
+  /**
+   * This is the index into the String where we are currently scanning.
  */
+  int textIndex;
 
-/**
-  * This is the RuleBasedCollator this object was created from.
+  /**
+   * Array containing the collation decomposition of the
+   * text given to the constructor.
   */
-private RuleBasedCollator rbc;
+  private Object[] text_decomposition;
 
-/**
-  * This is the String that is being iterated over.
+  /**
+   * Array containing the index of the specified block.
   */
-private String str;
+  private int[] text_indexes;
 
-/**
-  * This is the index into the String where we are currently scanning.
+  /**
+   * This method initializes a new instance of <code>CollationElementIterator</code>
+   * to iterate over the specified <code>String</code> using the rules in the
+   * specified <code>RuleBasedCollator</code>.
+   *
+   * @param collator The <code>RuleBasedCollation</code> used for calculating collation values
+   * @param text The <code>String</code> to iterate over.
   */
-private int pos;
+  CollationElementIterator(RuleBasedCollator collator, String text)
+  {
+    this.collator = collator;
 
-/*************************************************************************/
+    setText (text);    
+  }
 
-/*
- * Static Methods
+  RuleBasedCollator.CollationElement nextBlock()
+  {
+    if (index >= text_decomposition.length)
+      return null;
+    
+    RuleBasedCollator.CollationElement e =
+      (RuleBasedCollator.CollationElement) text_decomposition[index];
+    
+    textIndex = text_indexes[index+1];
+
+    index++;
+
+    return e;
+  }
+
+  RuleBasedCollator.CollationElement previousBlock()
+  {
+    if (index == 0)
+      return null;
+    
+    index--;
+    RuleBasedCollator.CollationElement e =
+      (RuleBasedCollator.CollationElement) text_decomposition[index];
+
+    textIndex = text_indexes[index+1];
+    
+    return e;
+  }
+
+  /**
+   * This method returns the collation ordering value of the next character sequence
+   * in the string (it may be an extended character following collation rules).
+   * This method will return <code>NULLORDER</code> if the
+   * end of the string was reached.
+   *
+   * @return The collation ordering value.
  */
+  public int next()
+  {
+    RuleBasedCollator.CollationElement e = nextBlock();
 
-/**
+    if (e == null)
+      return NULLORDER;
+    
+    return e.getValue();
+  }
+
+  /**
+   * This method returns the collation ordering value of the previous character
+   * in the string.  This method will return <code>NULLORDER</code> if the
+   * beginning of the string was reached.
+   *
+   * @return The collation ordering value.
+   */
+  public int previous()
+  {
+    RuleBasedCollator.CollationElement e = previousBlock();
+
+    if (e == null)
+      return NULLORDER;
+    
+    return e.getValue();
+  }
+
+  /**
   * This method returns the primary order value for the given collation
   * value.
   *
@@ -96,15 +183,23 @@ private int pos;
   *
   * @return The primary order value of the specified collation value.  This is the high 16 bits.
   */
-public static final int primaryOrder (int order)
-{
+  public static final int primaryOrder(int order)
+  {
   // From the JDK 1.2 spec.
   return order >>> 16;
-}
+  }
 
-/*************************************************************************/
+  /**
+   * This method resets the internal position pointer to read from the
+   * beginning of the <code>String</code> again.
+   */
+  public void reset()
+  {
+    index = 0;
+    textIndex = 0;
+  }
 
-/**
+  /**
   * This method returns the secondary order value for the given collation
   * value.
   *
@@ -112,15 +207,13 @@ public static final int primaryOrder (int order)
   *
   * @return The secondary order value of the specified collation value.  This is the bits 8-15.
   */
-public static final short secondaryOrder (int order)
-{
+  public static final short secondaryOrder(int order)
+  {
   // From the JDK 1.2 spec.
   return (short) ((order >>> 8) & 255);
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * This method returns the tertiary order value for the given collation
   * value.
   *
@@ -128,93 +221,205 @@ public static final short secondaryOrder (int order)
   *
   * @return The tertiary order value of the specified collation value.  This is the low eight bits.
   */
-public static final short tertiaryOrder (int order)
-{
+  public static final short tertiaryOrder(int order)
+  {
   // From the JDK 1.2 spec.
   return (short) (order & 255);
-}
+  }
 
-/*************************************************************************/
-
-/*
- * Constructors
- */
-
-/**
-  * This method initializes a new instance of <code>CollationElementIterator</code>
-  * to iterate over the specified <code>String</code> using the rules in the
-  * specified <code>RuleBasedCollator</code>.
+  /**
+   * This method sets the <code>String</code> that it is iterating over
+   * to the specified <code>String</code>.
   *
-  * @param rbc The <code>RuleBasedCollation</code> used for calculating collation values
-  * @param str The <code>String</code> to iterate over.
+   * @param text The new <code>String</code> to iterate over.
+   *
+   * @since 1.2
   */
-CollationElementIterator(RuleBasedCollator rbc, String str)
-{
-  this.rbc = rbc;
-  this.str = str;
-}
+  public void setText(String text)
+  {
+    int idx = 0;
+    int idx_idx = 0;
+    int alreadyExpanded = 0;
+    int idxToMove = 0;
 
-/*************************************************************************/
+    this.text = text;
+    this.index = 0;
 
-/*
- * Instance Methods
+    String work_text = text.intern();
+
+    Vector v = new Vector();
+    Vector vi = new Vector();
+
+    // Build element collection ordered as they come in "text".
+    while (idx < work_text.length())
+      {
+	String key, key_old;
+
+	Object object = null;
+	int p = 1;
+	
+	// IMPROVE: use a TreeMap with a prefix-ordering rule.
+	key_old = key = null;
+	do
+	  {
+	    if (object != null)
+	      key_old = key;
+	    key = work_text.substring (idx, idx+p);
+	    object = collator.prefix_tree.get (key);
+	    if (object != null && idx < alreadyExpanded)
+	      {
+		RuleBasedCollator.CollationElement prefix = (RuleBasedCollator.CollationElement)object;
+		if (prefix.expansion != null && 
+		    prefix.expansion.startsWith(work_text.substring(0, idx)))
+		{
+		  object = null;
+		  key = key_old;
+		}
+	      }
+	    p++;
+	  }
+	while (idx+p <= work_text.length());
+	
+	if (object == null)
+	  key = key_old;
+	
+	RuleBasedCollator.CollationElement prefix =
+	  (RuleBasedCollator.CollationElement) collator.prefix_tree.get (key);
+
+	/*
+	 * First case: There is no such sequence in the database.
+	 * We will have to build one from the context.
  */
+	if (prefix == null)
+	  {
+	    /*
+	     * We are dealing with sequences in an expansion. They
+	     * are treated as accented characters (tertiary order).
+	     */
+	    if (alreadyExpanded > 0)
+	      {
+		RuleBasedCollator.CollationElement e =
+		  collator.getDefaultAccentedElement (work_text.charAt (idx));
 
-/**
-  * This method sets the <code>String</code> that it is iterating over
-  * to the specified <code>String</code>.
-  *
-  * @param The new <code>String</code> to iterate over.
+		v.add (e);
+		vi.add (new Integer(idx_idx));
+		idx++;
+		alreadyExpanded--;
+		if (alreadyExpanded == 0)
+		  {
+		    /* There is not any characters left in the expansion set.
+		     * We can increase the pointer in the source string.
   */
-public void
-setText(String str)
-{
-  this.str = str;
-  pos = 0;
-}
+		    idx_idx += idxToMove;
+		    idxToMove = 0; 
+		  }
+		else
+		  idx_idx++;
+	      }
+	    else
+	      {
+		/* This is a normal character. */
+		RuleBasedCollator.CollationElement e =
+		  collator.getDefaultElement (work_text.charAt (idx));
+		Integer i_ref = new Integer(idx_idx);
 
-/*************************************************************************/
+		/* Don't forget to mark it as a special sequence so the
+		 * string can be ordered.
+		 */
+		v.add (RuleBasedCollator.SPECIAL_UNKNOWN_SEQ);
+		vi.add (i_ref);
+		v.add (e);
+		vi.add (i_ref);
+		idx_idx++;
+		idx++;
+	      }
+	    continue;
+	  }
+ 
+	/*
+	 * Second case: Here we have found a matching sequence.
+	 * Here we have an expansion string prepend it to the "work text" and
+	 * add the corresponding sorting element. We must also mark 
+	 */
+	if (prefix.expansion != null)
+	  {
+	    work_text = prefix.expansion
+	      + work_text.substring (idx+prefix.key.length());
+	    idx = 0;
+	    v.add (prefix);
+	    vi.add (new Integer(idx_idx));
+	    if (alreadyExpanded == 0)
+	      idxToMove = prefix.key.length();
+	    alreadyExpanded += prefix.expansion.length()-prefix.key.length();
+	  }
+	else
+	  {
+	    /* Third case: the simplest. We have got the prefix and it
+	     * has not to be expanded.
+	     */
+	    v.add (prefix);
+	    vi.add (new Integer(idx_idx));
+	    idx += prefix.key.length();
+	    /* If the sequence is in an expansion, we must decrease the
+	     * counter.
+	     */
+	    if (alreadyExpanded > 0)
+	      {
+		alreadyExpanded -= prefix.key.length();
+		if (alreadyExpanded == 0)
+		  {
+		    idx_idx += idxToMove;
+		    idxToMove = 0;
+		  }
+	      } else
+		idx_idx += prefix.key.length();
+	  }
+      }
 
-/**
+    text_decomposition = v.toArray();
+    text_indexes = new int[vi.size()+1];
+    for (int i = 0; i < vi.size(); i++) 
+      {
+	text_indexes[i] = ((Integer)vi.elementAt(i)).intValue();
+      }
+    text_indexes[vi.size()] = text.length();
+  }
+
+  /**
   * This method sets the <code>String</code> that it is iterating over
   * to the <code>String</code> represented by the specified
   * <code>CharacterIterator</code>.
   *
-  * @param ci The <code>CharacterIterator</code> containing the new <code>String</code> to iterate over.
+   * @param source The <code>CharacterIterator</code> containing the new
+   * <code>String</code> to iterate over.
   */
-public void
-setText(CharacterIterator ci)
-{
-  StringBuffer sb = new StringBuffer("");
-
-  // For now assume we read from the beginning of the string.
-  char c = ci.first();
-  while (c != CharacterIterator.DONE)
+  public void setText(CharacterIterator source)
     {
-      sb.append(c);
-      c = ci.next();
-    }
+    StringBuffer expand = new StringBuffer();
 
-  setText(sb.toString());
-}
+    // For now assume we read from the beginning of the string.
+    for (char c = source.first();
+	 c != CharacterIterator.DONE;
+	 c = source.next())
+      expand.append(c);
 
-/*************************************************************************/
+    setText(expand.toString());
+  }
 
-/**
+  /**
   * This method returns the current offset into the <code>String</code>
   * that is being iterated over.
   *
   * @return The iteration index position.
+   *
+   * @since 1.2
   */
-public int
-getOffset()
-{
-  return(pos);
-}
+  public int getOffset()
+  {
+    return textIndex;
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * This method sets the iteration index position into the current
   * <code>String</code> to the specified value.  This value must not
   * be negative and must not be greater than the last index position
@@ -224,23 +429,30 @@ getOffset()
   *
   * @exception IllegalArgumentException If the new offset is not valid.
   */
-public void
-setOffset(int offset)
-{
+  public void setOffset(int offset)
+  {
   if (offset < 0)
     throw new IllegalArgumentException("Negative offset: " + offset);
 
-  if ((str.length() > 0) && (offset > 0))
-    throw new IllegalArgumentException("Offset too large: " + offset);
-  else if (offset > (str.length() - 1))
+    if (offset > (text.length() - 1))
     throw new IllegalArgumentException("Offset too large: " + offset);
 
-  pos = offset;
-}    
+    for (index = 0; index < text_decomposition.length; index++)
+      {	
+	if (offset <= text_indexes[index])
+	  break;
+      }
+    /*
+     * As text_indexes[0] == 0, we should not have to take care whether index is
+     * greater than 0. It is always.
+     */
+    if (text_indexes[index] == offset)
+      textIndex = offset;
+    else
+      textIndex = text_indexes[index-1];
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * This method returns the maximum length of any expansion sequence that
   * ends with the specified collation order value.  (Whatever that means).
   *
@@ -248,64 +460,8 @@ setOffset(int offset)
   *
   * @param The maximum length of an expansion sequence.
   */
-public int
-getMaxExpansion(int value)
-{
-  //************ Implement me!!!!!!!!!
-  return(5);
+  public int getMaxExpansion(int value)
+  {
+    return 1;
+  }
 }
-
-/*************************************************************************/
-
-/**
-  * This method resets the internal position pointer to read from the
-  * beginning of the <code>String again.
-  */
-public void
-reset()
-{
-  pos = 0;
-}
-
-/*************************************************************************/
-
-/**
-  * This method returns the collation ordering value of the next character
-  * in the string.  This method will return <code>NULLORDER</code> if the
-  * end of the string was reached.
-  *
-  * @return The collation ordering value.
-  */
-public int
-next()
-{
-  ++pos;
-  if (pos >= str.length())
-    return(NULLORDER);
-
-  String s = str.charAt(pos) + "";
-  return(rbc.getCollationElementValue(s));
-}
-
-/*************************************************************************/
-
-/**
-  * This method returns the collation ordering value of the previous character
-  * in the string.  This method will return <code>NULLORDER</code> if the
-  * beginning of the string was reached.
-  *
-  * @return The collation ordering value.
-  */
-public int
-previous()
-{
-  --pos;
-  if (pos < 0)
-    return(NULLORDER);
-
-  String s = str.charAt(pos) + "";
-  return(rbc.getCollationElementValue(s));
-}
-
-} // class CollationElementIterator
-

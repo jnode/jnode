@@ -82,7 +82,34 @@ public class BasicIconFactory implements Serializable
   }
   public static Icon getMenuArrowIcon()
   {
-    return new DummyIcon();
+    return new Icon()
+      {
+	public int getIconHeight()
+	{
+	  return 12;
+	}
+
+	public int getIconWidth()
+	{
+	  return 12;
+	}
+
+	public void paintIcon(Component c, Graphics g, int x, int y)
+	{
+	  g.translate(x, y);
+
+	  Color saved = g.getColor();
+
+	  g.setColor(Color.BLACK);
+
+	  g.fillPolygon(new Polygon(new int[] { 3, 9, 3 },
+                                  new int[] { 2, 6, 10 },
+                                  3));
+
+	  g.setColor(saved);
+	  g.translate(-x, -y);
+	}
+      };
   }
 
   public static Icon getCheckBoxIcon()
@@ -196,11 +223,11 @@ public class BasicIconFactory implements Serializable
   }
   public static Icon getCheckBoxMenuItemIcon()
   {
-    return new DummyIcon();
+    return getCheckBoxIcon();
   }
   public static Icon getRadioButtonMenuItemIcon()
   {
-    return new DummyIcon();
+    return getRadioButtonIcon();
   }
   public static Icon createEmptyFrameIcon()
   {

@@ -1,5 +1,5 @@
 /* java.math.BigDecimal -- Arbitrary precision decimals.
-   Copyright (C) 1999, 2000, 2001 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2000, 2001, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -189,7 +189,9 @@ public class BigDecimal extends Number implements Comparable
 	  {
 	    int exp = Integer.parseInt (num.substring (point));
 	    exp -= scale;
-	    if (exp > 0)
+	    if (signum () == 0)
+	      scale = 0;
+	    else if (exp > 0)
 	      {
 		intVal = intVal.multiply (BigInteger.valueOf (10).pow (exp));
 		scale = 0;
@@ -212,7 +214,7 @@ public class BigDecimal extends Number implements Comparable
   public static BigDecimal valueOf (long val, int scale) 
     throws NumberFormatException 
   {
-    if (scale == 0)
+    if ((scale == 0) && ((int)val == val))
       switch ((int) val)
 	{
 	case 0:
@@ -266,12 +268,11 @@ public class BigDecimal extends Number implements Comparable
       throw new ArithmeticException ("scale is negative: " + newScale);
 
     if (intVal.signum () == 0)	// handle special case of 0.0/0.0
-      return ZERO;
+      return newScale == 0 ? ZERO : new BigDecimal (ZERO.intVal, newScale);
     
     // Ensure that pow gets a non-negative value.
-    int valScale = val.scale;
     BigInteger valIntVal = val.intVal;
-    int power = newScale + 1 - (scale - val.scale);
+    int power = newScale - (scale - val.scale);
     if (power < 0)
       {
 	// Effectively increase the scale of val to avoid an
@@ -283,50 +284,53 @@ public class BigDecimal extends Number implements Comparable
     BigInteger dividend = intVal.multiply (BigInteger.valueOf (10).pow (power));
     
     BigInteger parts[] = dividend.divideAndRemainder (valIntVal);
-//      System.out.println("int: " + parts[0]);
-//      System.out.println("rem: " + parts[1]);
 
-    int roundDigit = parts[0].mod (BigInteger.valueOf (10)).intValue ();
-    BigInteger unrounded = parts[0].divide (BigInteger.valueOf (10));
-
-    if (roundDigit == 0 && parts[1].signum () == 0) // no rounding necessary
+    BigInteger unrounded = parts[0];
+    if (parts[1].signum () == 0) // no remainder, no rounding necessary
       return new BigDecimal (unrounded, newScale);
 
-    int sign = unrounded.signum ();
+    if (roundingMode == ROUND_UNNECESSARY)
+      throw new ArithmeticException ("newScale is not large enough");
 
-    switch (roundingMode)
+    int sign = intVal.signum () * valIntVal.signum ();
+
+    if (roundingMode == ROUND_CEILING)
+      roundingMode = (sign > 0) ? ROUND_UP : ROUND_DOWN;
+    else if (roundingMode == ROUND_FLOOR)
+      roundingMode = (sign < 0) ? ROUND_UP : ROUND_DOWN;
+    else
       {
-      case ROUND_UNNECESSARY:
-	throw new ArithmeticException ("newScale is not large enough");
-      case ROUND_CEILING:
-	roundingMode = (sign == 1) ? ROUND_UP : ROUND_DOWN;
-	break;
-      case ROUND_FLOOR:
-	roundingMode = (sign == 1) ? ROUND_DOWN : ROUND_UP;
-	break;
+	// half is -1 if remainder*2 < positive intValue (*power), 0 if equal,
+	// 1 if >. This implies that the remainder to round is less than,
+	// equal to, or greater than half way to the next digit.
+	BigInteger posRemainder
+	  = parts[1].signum () < 0 ? parts[1].negate() : parts[1];
+	valIntVal = valIntVal.signum () < 0 ? valIntVal.negate () : valIntVal;
+	int half = posRemainder.shiftLeft(1).compareTo(valIntVal);
+
+	switch(roundingMode)
+      {
       case ROUND_HALF_UP:
-	roundingMode = (roundDigit >= 5) ? ROUND_UP : ROUND_DOWN;
+	    roundingMode = (half < 0) ? ROUND_DOWN : ROUND_UP;
 	break;
       case ROUND_HALF_DOWN:
-	roundingMode = (roundDigit > 5) ? ROUND_UP : ROUND_DOWN;
+	    roundingMode = (half > 0) ? ROUND_UP : ROUND_DOWN;
 	break;
       case ROUND_HALF_EVEN:
-	if (roundDigit < 5)
+	    if (half < 0)
 	  roundingMode = ROUND_DOWN;
-	else
-	  {
-	    int rightmost = 
-	      unrounded.mod (BigInteger.valueOf (10)).intValue ();
-	    if (rightmost % 2 == 1) // odd, then ROUND_HALF_UP
+	    else if (half > 0)
 	      roundingMode = ROUND_UP;
-	    else // even, then ROUND_HALF_DOWN
-	      roundingMode = (roundDigit > 5) ? ROUND_UP : ROUND_DOWN;
-	  }
+	    else if (unrounded.testBit(0)) // odd, then ROUND_HALF_UP
+	      roundingMode = ROUND_UP;
+	    else                           // even, ROUND_HALF_DOWN
+	      roundingMode = ROUND_DOWN;
 	break;
+      }
       }
 
     if (roundingMode == ROUND_UP)
-      return new BigDecimal (unrounded.add (BigInteger.valueOf (1)), newScale);
+      unrounded = unrounded.add (BigInteger.valueOf (sign > 0 ? 1 : -1));
 
     // roundingMode == ROUND_DOWN
     return new BigDecimal (unrounded, newScale);
@@ -429,6 +433,11 @@ public class BigDecimal extends Number implements Comparable
     return scale;
   }
   
+  public BigInteger unscaledValue()
+  {
+    return intVal;
+  }
+
   public BigDecimal abs () 
   {
     return new BigDecimal (intVal.abs (), scale);

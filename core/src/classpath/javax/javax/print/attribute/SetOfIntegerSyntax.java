@@ -1,5 +1,5 @@
 /* SetOfIntegerSyntax.java -- 
-   Copyright (C) 2003 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -148,8 +148,8 @@ public abstract class SetOfIntegerSyntax
    * @param lowerBound the lower bound value
    * @param upperBound the upper bound value
    *
-   * @exception IllegalArgumentException if lowerBound <= uppbound
-   * and lowerBound < 0
+   * @exception IllegalArgumentException if lowerBound &lt;= upperbound
+   * and lowerBound &lt; 0
    */
   protected SetOfIntegerSyntax(int lowerBound, int upperBound)
   {
@@ -199,7 +199,7 @@ public abstract class SetOfIntegerSyntax
    *
    * @param obj the object to test
    *
-   * @returns true if both objects are equal, false otherwise.
+   * @return true if both objects are equal, false otherwise.
    */
   public boolean equals(Object obj)
   {

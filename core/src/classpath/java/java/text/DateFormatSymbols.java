@@ -1,5 +1,5 @@
-/* ChoiceFormat.java -- Format over a range of numbers
-   Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+/* DateFormatSymbols.java -- Format over a range of numbers
+   Copyright (C) 1998, 1999, 2000, 2001, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -98,7 +98,8 @@ public class DateFormatSymbols implements java.io.Serializable, Cloneable
   public DateFormatSymbols (Locale locale) throws MissingResourceException
   {
     ResourceBundle res
-      = ResourceBundle.getBundle("gnu.java.locale.LocaleInformation", locale);
+      = ResourceBundle.getBundle("gnu.java.locale.LocaleInformation", locale,
+      				 ClassLoader.getSystemClassLoader());
 
     ampms = res.getStringArray ("ampms");
     eras = res.getStringArray ("eras");
@@ -156,24 +157,24 @@ public class DateFormatSymbols implements java.io.Serializable, Cloneable
     * locale):
     * <p>
     * <ul>
-    * <li>0 - era (G)
-    * <li>1 - year (y)
-    * <li>2 - month (M)
-    * <li 3 - day of month (d)
-    * <li>4 - hour out of 12, from 1-12 (h)
-    * <li>5 - hour out of 24, from 0-23 (H)
-    * <li>6 - minute (m)
-    * <li>7 - second (s)
-    * <li>8 - millisecond (S)
-    * <li>9 - date of week (E)
-    * <li>10 - date of year (D)
-    * <li>11 - day of week in month, eg. "4th Thur in Nov" (F)
-    * <li>12 - week in year (w)
-    * <li>13 - week in month (W)
-    * <li>14 - am/pm (a)
-    * <li>15 - hour out of 24, from 1-24 (k)
-    * <li>16 - hour out of 12, from 0-11 (K)
-    * <li>17 - time zone (z)
+    * <li>0 - era (G)</li>
+    * <li>1 - year (y)</li>
+    * <li>2 - month (M)</li>
+    * <li>3 - day of month (d)</li>
+    * <li>4 - hour out of 12, from 1-12 (h)</li>
+    * <li>5 - hour out of 24, from 0-23 (H)</li>
+    * <li>6 - minute (m)</li>
+    * <li>7 - second (s)</li>
+    * <li>8 - millisecond (S)</li>
+    * <li>9 - date of week (E)</li>
+    * <li>10 - date of year (D)</li>
+    * <li>11 - day of week in month, eg. "4th Thur in Nov" (F)</li>
+    * <li>12 - week in year (w)</li>
+    * <li>13 - week in month (W)</li>
+    * <li>14 - am/pm (a)</li>
+    * <li>15 - hour out of 24, from 1-24 (k)</li>
+    * <li>16 - hour out of 12, from 0-11 (K)</li>
+    * <li>17 - time zone (z)</li>
     * </ul>
     *
     * @return The format patter characters
@@ -245,11 +246,12 @@ public class DateFormatSymbols implements java.io.Serializable, Cloneable
    * the array contains five values:
    * <P>
    * <ul>
-   * <li>0 - The non-localized time zone id string.
-   * <li>1 - The long name of the time zone (standard time).
-   * <li>2 - The short name of the time zone (standard time).
-   * <li>3 - The long name of the time zone (daylight savings time).
-   * <li>4 - the short name of the time zone (daylight savings time).
+   * <li>0 - The non-localized time zone id string.</li>
+   * <li>1 - The long name of the time zone (standard time).</li>
+   * <li>2 - The short name of the time zone (standard time).</li>
+   * <li>3 - The long name of the time zone (daylight savings time).</li>
+   * <li>4 - the short name of the time zone (daylight savings time).</li>
+   * </ul>
    *
    * @return The list of time zone display strings.
    */
@@ -295,24 +297,24 @@ public class DateFormatSymbols implements java.io.Serializable, Cloneable
     * locale):
     * <p>
     * <ul>
-    * <li>0 - era (G)
-    * <li>1 - year (y)
-    * <li>2 - month (M)
-    * <li 3 - day of month (d)
-    * <li>4 - hour out of 12, from 1-12 (h)
-    * <li>5 - hour out of 24, from 0-23 (H)
-    * <li>6 - minute (m)
-    * <li>7 - second (s)
-    * <li>8 - millisecond (S)
-    * <li>9 - date of week (E)
-    * <li>10 - date of year (D)
-    * <li>11 - day of week in month, eg. "4th Thur in Nov" (F)
-    * <li>12 - week in year (w)
-    * <li>13 - week in month (W)
-    * <li>14 - am/pm (a)
-    * <li>15 - hour out of 24, from 1-24 (k)
-    * <li>16 - hour out of 12, from 0-11 (K)
-    * <li>17 - time zone (z)
+    * <li>0 - era (G)</li>
+    * <li>1 - year (y)</li>
+    * <li>2 - month (M)</li>
+    * <li>3 - day of month (d)</li>
+    * <li>4 - hour out of 12, from 1-12 (h)</li>
+    * <li>5 - hour out of 24, from 0-23 (H)</li>
+    * <li>6 - minute (m)</li>
+    * <li>7 - second (s)</li>
+    * <li>8 - millisecond (S)</li>
+    * <li>9 - date of week (E)</li>
+    * <li>10 - date of year (D)</li>
+    * <li>11 - day of week in month, eg. "4th Thur in Nov" (F)</li>
+    * <li>12 - week in year (w)</li>
+    * <li>13 - week in month (W)</li>
+    * <li>14 - am/pm (a)</li>
+    * <li>15 - hour out of 24, from 1-24 (k)</li>
+    * <li>16 - hour out of 12, from 0-11 (K)</li>
+    * <li>17 - time zone (z)</li>
     * </ul>
     *
     * @param localPatternChars The new format patter characters
@@ -386,11 +388,12 @@ public class DateFormatSymbols implements java.io.Serializable, Cloneable
    * the array contains five values:
    * <P>
    * <ul>
-   * <li>0 - The non-localized time zone id string.
-   * <li>1 - The long name of the time zone (standard time).
-   * <li>2 - The short name of the time zone (standard time).
-   * <li>3 - The long name of the time zone (daylight savings time).
-   * <li>4 - the short name of the time zone (daylight savings time).
+   * <li>0 - The non-localized time zone id string.</li>
+   * <li>1 - The long name of the time zone (standard time).</li>
+   * <li>2 - The short name of the time zone (standard time).</li>
+   * <li>3 - The long name of the time zone (daylight savings time).</li>
+   * <li>4 - the short name of the time zone (daylight savings time).</li>
+   * </ul>
    *
    * @return The list of time zone display strings.
    */
@@ -438,15 +441,15 @@ public class DateFormatSymbols implements java.io.Serializable, Cloneable
    * This will be true if and only if the specified object:
    * <p>
    * <ul>
-   * <li> Is not <code>null</code>.
-   * <li> Is an instance of <code>DateFormatSymbols</code>.
-   * <li> Contains identical formatting symbols to this object.
+   * <li> Is not <code>null</code>.</li>
+   * <li> Is an instance of <code>DateFormatSymbols</code>.</li>
+   * <li> Contains identical formatting symbols to this object.</li>
    * </ul>
    * 
    * @param obj The <code>Object</code> to test for equality against.
    *
    * @return <code>true</code> if the specified object is equal to this one,
-   * </code>false</code> otherwise.
+   * <code>false</code> otherwise.
    */
   public boolean equals (Object obj)
   {
