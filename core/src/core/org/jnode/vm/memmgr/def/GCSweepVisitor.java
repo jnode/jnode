@@ -49,7 +49,7 @@ final class GCSweepVisitor extends ObjectVisitor implements ObjectFlags,
                     helper.atomicChangeObjectColor(object, gcColor, GC_YELLOW);
                 }
             }
-        } else {
+        } else if (gcColor != GC_YELLOW) {
             helper.atomicChangeObjectColor(object, gcColor, GC_WHITE);
         }
         return true;

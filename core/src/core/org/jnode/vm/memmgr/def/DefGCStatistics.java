@@ -29,18 +29,20 @@ final class DefGCStatistics extends GCStatistics {
 
     long lastGCTime;
     long lastMarkDuration;
+    int lastMarkIterations;
     long lastSweepDuration;
     long lastCleanupDuration;
     long lastFreedBytes;
     long lastMarkedObjects;
 
     public String toString() {
-        return "lastGCTime        " + lastGCTime + "\n" +
-               "lastMarkDuration  " + lastMarkDuration + "\n" +
-               "lastSweepDuration " + lastSweepDuration + "\n" +
+        return "lastGCTime          " + lastGCTime + "\n" +
+               "lastMarkIterations  " + lastMarkIterations + "\n" +
+               "lastMarkDuration    " + lastMarkDuration + "\n" +
+               "lastSweepDuration   " + lastSweepDuration + "\n" +
                "lastCleanupDuration " + lastCleanupDuration + "\n" +
-               "lastMarkedObjects " + lastMarkedObjects + "\n" +
-               "lastFreedBytes    " + lastFreedBytes;
+               "lastMarkedObjects   " + lastMarkedObjects + "\n" +
+               "lastFreedBytes      " + lastFreedBytes;
     }
     
 }

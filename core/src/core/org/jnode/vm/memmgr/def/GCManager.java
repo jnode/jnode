@@ -143,11 +143,13 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
         }
 
         final long startTime = VmSystem.currentKernelMillis();
+        stats.lastMarkIterations = 0;
         long markedObjects = 0;
         boolean firstIteration = true;
         boolean wbChanged = false;
         do {
             // Do an iteration reset
+            stats.lastMarkIterations++;
             markStack.reset();
             if (writeBarrier != null) {
                 writeBarrier.resetChanged();
