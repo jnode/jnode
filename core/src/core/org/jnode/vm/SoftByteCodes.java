@@ -382,6 +382,15 @@ public class SoftByteCodes implements Uninterruptible {
 					+ state);
 		}
 	}
+	
+	/**
+	 * Throw an array index out of bounds exception.
+	 * @param array
+	 * @param index
+	 */
+	public static void throwArrayOutOfBounds(Object array, int index) throws PragmaUninterruptible {
+		throw new ArrayIndexOutOfBoundsException(index);
+	}
 
 	public static void unknownOpcode(int opcode, int pc)
 			throws PragmaUninterruptible, PragmaLoadStatics,
