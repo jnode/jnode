@@ -65,6 +65,7 @@ public abstract class AbstractTest extends TestCase {
 	 */
 	public void setUp() throws Exception
 	{
+        System.gc();
 		log.info("BEGIN "+getTestName()); // marker for log4j traces
         
         TestConfig tc = getTestConfig();
@@ -76,6 +77,7 @@ public abstract class AbstractTest extends TestCase {
         {
             tc.setUp();
         }
+        System.gc();
 	}
 	
 	/**
@@ -83,12 +85,15 @@ public abstract class AbstractTest extends TestCase {
 	 */
 	public void tearDown() throws Exception
 	{
+        System.gc();
+        
         if(testConfig != null)
         {
             testConfig.tearDown();
         }
         
         log.info("END "+getTestName()); // marker for log4j traces
+        System.gc();        
 	}
 
     final protected TestConfig getTestConfig()

@@ -21,24 +21,11 @@
 
 package org.jnode.test.support;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.jnode.test.fs.AllFSTest;
-import org.jnode.test.fs.unit.config.FSTestConfig;
-import org.jnode.test.fs.unit.config.OsType;
-import org.jnode.test.fs.unit.config.device.DeviceParam;
-import org.jnode.test.fs.unit.config.device.FileParam;
-import org.jnode.test.fs.unit.config.fs.FS;
-import org.jnode.test.fs.unit.config.fs.FSAccessMode;
-import org.jnode.test.fs.unit.config.fs.FSType;
-import org.jnode.test.fs.unit.tests.BasicFSTest;
-import org.jnode.test.fs.unit.tests.ConcurrentAccessFSTest;
-import org.jnode.test.fs.unit.tests.FileFSTest;
-import org.jnode.test.fs.unit.tests.TreeFSTest;
-
 import junit.framework.TestSuite;
+
+import org.apache.log4j.Logger;
 
 abstract public class AbstractTestSuite extends TestSuite
 {
@@ -53,22 +40,36 @@ abstract public class AbstractTestSuite extends TestSuite
      * (for each couple (config, TestSuite class))
      */
     final public void init()
-    {        
+    {
+        try
+        {
         List configs = getConfigs();
         Class[] testSuites = getTestSuites();
         log.info(configs.size()+" configs, "+
                  testSuites.length+" TestSuites"); 
         
-        for(int i = 0 ; i < configs.size() ; i++)
+        int nbConfigs = configs.size();
+        TestConfig cfg;
+        ConfigManager cfgManager = ConfigManager.getInstance();
+        
+        for(int i = 0 ; i < nbConfigs ; i++)
         {
-            TestConfig cfg = (TestConfig) configs.get(i);
-            ConfigManager.getInstance().addConfig(cfg);
+            cfg = (TestConfig) configs.get(i);
+            cfgManager.addConfig(cfg);
             
             for(int j = 0 ; j < testSuites.length ; j++)
             {
                 addTestSuite(testSuites[j]);
             }
         }
+    }
+    catch(OutOfMemoryError oome)
+    {
+        oome.printStackTrace();
+        System.err.println("freeMemory:"+Runtime.getRuntime().freeMemory());
+        System.err.println("maxMemory:"+Runtime.getRuntime().maxMemory());
+        System.err.println("totalMemory:"+Runtime.getRuntime().totalMemory());
+    }        
     }
     
     /**
