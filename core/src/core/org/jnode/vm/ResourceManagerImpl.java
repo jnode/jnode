@@ -10,6 +10,7 @@ import org.jnode.system.IOResource;
 import org.jnode.system.IRQHandler;
 import org.jnode.system.IRQResource;
 import org.jnode.system.MemoryResource;
+import org.jnode.system.MemoryScanner;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
@@ -24,11 +25,14 @@ import org.jnode.system.SimpleResourceOwner;
 final class ResourceManagerImpl implements ResourceManager {
 	
     private final ResourcePermission IOPORTS_PERM = new ResourcePermission("ioports");
+    private final ResourcePermission MEMSCAN_PERM = new ResourcePermission("memoryScanner");
+    private final MemoryScanner memScan;
     
 	/**
 	 * Hidden constructor.
 	 */
 	private ResourceManagerImpl() {
+	    memScan = new MemoryScannerImpl();
 	}
 	
 	protected static ResourceManager initialize() {
@@ -161,5 +165,17 @@ final class ResourceManagerImpl implements ResourceManager {
 	 */
 	public MemoryResource asMemoryResource(double[] data) {
 		return new MemoryResourceImpl(data, data.length, 8);
+	}
+	
+	/** 
+	 * Gets the memory scanner.
+	 * This method will requires a ResourcePermission("memoryScanner"). 
+	 */
+	public MemoryScanner getMemoryScanner() {
+	    final SecurityManager sm = System.getSecurityManager();
+	    if (sm != null) {
+	        sm.checkPermission(MEMSCAN_PERM);
+	    }
+	    return memScan;
 	}
 }

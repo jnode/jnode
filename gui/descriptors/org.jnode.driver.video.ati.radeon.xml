@@ -20,6 +20,9 @@
     </library>
   </runtime>
 
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.system.ResourcePermission" name="memoryScanner"/>
+  </extension>
   <extension point="org.jnode.driver.mappers">
     <mapper id="1002:5159" architecture="RV100" name="RV100 QY" driver-class="org.jnode.driver.video.ati.radeon.RadeonDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
   </extension>

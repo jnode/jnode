@@ -47,6 +47,12 @@ public interface ExtensionPoint {
 	public void addListener(ExtensionPointListener listener);
 	
 	/**
+	 * Add a listener to the front of the listeners list.
+	 * @param listener
+	 */
+	public void addPriorityListener(ExtensionPointListener listener);
+	
+	/**
 	 * Remove a listener
 	 * @param listener
 	 */

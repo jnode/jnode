@@ -115,4 +115,10 @@ public interface ResourceManager {
 	 * @return The claimed resource
 	 */
 	public MemoryResource asMemoryResource(double[] data);
+	
+	/** 
+	 * Gets the memory scanner.
+	 * This method will requires a ResourcePermission("memoryScanner"). 
+	 */
+	public MemoryScanner getMemoryScanner();
 }

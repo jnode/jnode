@@ -29,7 +29,7 @@ public class SecurityPlugin extends Plugin implements ExtensionPointListener {
         super(descriptor);
         permissionsEp = descriptor.getExtensionPoint("permissions");
         policy = new JNodePolicy(permissionsEp);
-        permissionsEp.addListener(this);
+        permissionsEp.addPriorityListener(this);
     }
 
     /**

@@ -529,6 +529,8 @@ int_gpf:
 	jne int_gpf_2
 	; A hlt was called, do a hlt
 int_gpf_hlt:
+	cmp eax,_halt
+	je int_gpf_halt
 	inc dword [ebp+OLD_EIP] ; Return past the hlt instruction
 	test dword [ebp+OLD_EFLAGS],F_IF
 	jz int_gpf_1
@@ -539,6 +541,11 @@ int_gpf_1:
 int_gpf_2:
 	jmp int_die
 
+int_gpf_halt:
+	cli
+	hlt
+	jmp int_die
+	
 ; ---------------------------
 ; Page fault
 ; ---------------------------

@@ -73,7 +73,7 @@ public class Main {
 			return -2;
 		}
 		Unsafe.debug("System has finished");
-		return 0;
+		return VmSystem.getExitCode();
 	}
 	
 	private static void sleepForever() {

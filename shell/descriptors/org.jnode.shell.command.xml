@@ -26,7 +26,6 @@
         <alias name="set" class="org.jnode.shell.command.SetCommand"/>
         <alias name="exec" class="org.jnode.shell.command.ExecCommand"/>
         <alias name="gc" class="org.jnode.shell.command.GcCommand"/>
-        <alias name="halt" class="org.jnode.shell.command.HaltCommand"/>
         <alias name="help" class="org.jnode.shell.command.HelpCommand"/>
         <alias name="history" class="org.jnode.shell.command.HistoryCommand"/>
         <alias name="java" class="org.jnode.shell.command.JavaCommand"/>

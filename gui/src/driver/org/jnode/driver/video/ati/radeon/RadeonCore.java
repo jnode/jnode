@@ -3,6 +3,9 @@
  */
 package org.jnode.driver.video.ati.radeon;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
@@ -11,13 +14,16 @@ import org.jnode.driver.DriverException;
 import org.jnode.driver.pci.PCIBaseAddress;
 import org.jnode.driver.pci.PCIDevice;
 import org.jnode.driver.pci.PCIDeviceConfig;
+import org.jnode.driver.pci.PCIRomAddress;
 import org.jnode.driver.video.HardwareCursorAPI;
 import org.jnode.driver.video.spi.DpmsState;
 import org.jnode.driver.video.vgahw.DisplayMode;
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.MemoryResource;
+import org.jnode.system.MemoryScanner;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.ResourceOwner;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.Address;
 
@@ -37,6 +43,9 @@ public class RadeonCore implements RadeonConstants {
 
     /** All video RAM of the device */
     private final MemoryResource deviceRam;
+
+    /** Video ROM (can be null) */
+    private final MemoryResource rom;
 
     /** Register accessor */
     private final RadeonVgaIO vgaIO;
@@ -70,6 +79,7 @@ public class RadeonCore implements RadeonConstants {
         final PCIDeviceConfig pciCfg = device.getConfig();
         final PCIBaseAddress ioAddr = pciCfg.getBaseAddresses()[ 2];
         final PCIBaseAddress fbAddr = pciCfg.getBaseAddresses()[ 0];
+        final PCIRomAddress romAddr = pciCfg.getRomAddress();
         log.info("Found ATI " + model + ", chipset 0x"
                 + NumberUtils.hex(pciCfg.getRevision()));
         try {
@@ -79,19 +89,50 @@ public class RadeonCore implements RadeonConstants {
             final int ioSize = ioAddr.getSize();
             final int fbBase = (int) fbAddr.getMemoryBase() /* & 0xFF800000 */;
 
+            // Map Memory Mapped IO
             this.mmio = rm.claimMemoryResource(device, Address.valueOf(ioBase),
                     ioSize, ResourceManager.MEMMODE_NORMAL);
             this.vgaIO = new RadeonVgaIO(mmio);
             final int memSize = readMemorySize();
-            log.info("Memory size " + (memSize / (1024 * 1024)) + "MB");
+            log.info("Memory size " + NumberUtils.size(memSize));
 
+            // Map Device RAM
             this.deviceRam = rm.claimMemoryResource(device, Address
                     .valueOf(fbBase), memSize, ResourceManager.MEMMODE_NORMAL);
             vgaIO.setVideoRam(deviceRam);
+
+            // Find ROM
+            MemoryResource rom = null;
+            if (romAddr != null) {
+                romAddr.setEnabled(true);
+                if (romAddr.isEnabled()) {
+                    rom = rm.claimMemoryResource(device, Address
+                            .valueOf(romAddr.getRomBase()), romAddr.getSize(),
+                            ResourceManager.MEMMODE_NORMAL);
+                    if (!verifyBiosSignature(rom)) {
+                        log.info("Signature mismatch");
+                        rom.release();
+                        rom = null;
+                    }
+                } else {
+                    log.debug("Failed to enabled expansion ROM");
+                }
+            }
+            if (rom == null) {
+                // Use the ISA regions rom instead
+                rom = findRom(device, rm);
+            }
+            this.rom = rom;
+
             log.debug("Found ATI " + model + ", FB at 0x"
                     + NumberUtils.hex(fbBase) + "s0x"
                     + NumberUtils.hex(memSize) + ", MMIO at 0x"
-                    + NumberUtils.hex(ioBase));
+                    + NumberUtils.hex(ioBase) + ", ROM "
+                    + pciCfg.getRomAddress());
+
+            if (this.rom != null) {
+                log.info("ROM[0-3] 0x" + NumberUtils.hex(rom.getInt(0)));
+            }
 
         } catch (NameNotFoundException ex) {
             throw new ResourceNotFreeException(ex);
@@ -128,7 +169,8 @@ public class RadeonCore implements RadeonConstants {
         // Allocate the screen memory
         final MemoryResource screen = claimDeviceMemory(bytesPerScreen,
                 4 * 1024);
-        log.debug("Screen at 0x" + NumberUtils.hex(screen.getOffset()) + ", size 0x" + NumberUtils.hex(screen.getSize()));
+        log.debug("Screen at 0x" + NumberUtils.hex(screen.getOffset())
+                + ", size 0x" + NumberUtils.hex(screen.getSize()));
 
         //if (true) { throw new ResourceNotFreeException("TEST"); }
 
@@ -138,43 +180,43 @@ public class RadeonCore implements RadeonConstants {
         // Turn off the screen
         final DpmsState dpmsState = getDpms();
         setDpms(DpmsState.OFF);
-        
-        try {            
+
+        try {
             // Set the new configuration
             currentState.restoreToVGA(vgaIO);
             vgaIO.setReg32(CRTC_OFFSET, (int) screen.getOffset());
-            
+
             // Set the 8-bit palette
             setPalette(1.0f);
-            
+
             // Create the graphics helper & clear the screen
             final BitmapGraphics bitmapGraphics;
             switch (bitsPerPixel) {
             case 8:
-                bitmapGraphics = BitmapGraphics.create8bppInstance(screen, width,
-                        height, bytesPerLine, 0);
+                bitmapGraphics = BitmapGraphics.create8bppInstance(screen,
+                        width, height, bytesPerLine, 0);
                 screen.setByte(0, (byte) 0, pixels);
                 break;
             case 16:
-                bitmapGraphics = BitmapGraphics.create16bppInstance(screen, width,
-                        height, bytesPerLine, 0);
+                bitmapGraphics = BitmapGraphics.create16bppInstance(screen,
+                        width, height, bytesPerLine, 0);
                 screen.setShort(0, (byte) 0, pixels);
                 break;
             case 24:
-                bitmapGraphics = BitmapGraphics.create24bppInstance(screen, width,
-                        height, bytesPerLine, 0);
+                bitmapGraphics = BitmapGraphics.create24bppInstance(screen,
+                        width, height, bytesPerLine, 0);
                 screen.setInt24(0, 0, pixels);
                 break;
             case 32:
-                bitmapGraphics = BitmapGraphics.create32bppInstance(screen, width,
-                        height, bytesPerLine, 0);
+                bitmapGraphics = BitmapGraphics.create32bppInstance(screen,
+                        width, height, bytesPerLine, 0);
                 screen.setInt(0, 0, pixels);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid bits per pixel "
                         + bitsPerPixel);
             }
-            return new RadeonSurface(this, config, bitmapGraphics, screen);            
+            return new RadeonSurface(this, config, bitmapGraphics, screen);
         } finally {
             // Turn the screen back on
             setDpms(dpmsState);
@@ -188,7 +230,7 @@ public class RadeonCore implements RadeonConstants {
      */
     final synchronized void close() {
         hwCursor.close();
-        
+
         // Save the screen state and turn of the screen
         final DpmsState dpmsState = getDpms();
         setDpms(DpmsState.OFF);
@@ -209,6 +251,9 @@ public class RadeonCore implements RadeonConstants {
     final void release() {
         mmio.release();
         deviceRam.release();
+        if (rom != null) {
+            rom.release();
+        }
     }
 
     /**
@@ -272,5 +317,66 @@ public class RadeonCore implements RadeonConstants {
     final MemoryResource claimDeviceMemory(long size, int align)
             throws IndexOutOfBoundsException, ResourceNotFreeException {
         return deviceRam.claimChildResource(size, align);
+    }
+
+    /**
+     * Look for the ROM in the ISA region.
+     * @param rm
+     * @return The claimed ROM region, or null if not found.
+     */
+    private final MemoryResource findRom(final ResourceOwner owner, final ResourceManager rm) throws ResourceNotFreeException {
+        final MemoryScanner scanner = (MemoryScanner) AccessController
+                .doPrivileged(new PrivilegedAction() {
+
+                    public Object run() {
+                        return rm.getMemoryScanner();
+                    }
+                });
+
+        final Address start = Address.valueOf(0xC0000);
+        final Address end = Address.valueOf(0xF0000);
+        final int size = (int)Address.distance(start, end);
+        final int stepSize = 0x1000;
+        int offset = 0;
+        while (offset < size) {
+            final Address romAddr;
+            // Search for BIOS expansion
+            romAddr = scanner.findInt8Array(Address.add(start, offset), size - offset, BIOS_ROM_SIGNATURE, 0, BIOS_ROM_SIGNATURE.length, stepSize);
+            if (romAddr == null) {
+                return null;
+            } else {
+                offset = (int)Address.distance(start, romAddr) + stepSize;
+            }
+            // Search for ATI signature
+            final Address atiSigAddr;
+            atiSigAddr = scanner.findInt8Array(romAddr, 128, ATI_ROM_SIGNATURE, 0, ATI_ROM_SIGNATURE.length, 1);
+            if (atiSigAddr == null) {
+                continue;
+            }
+            
+            // We found it
+            // Claim a small region, so we can read the size.
+            MemoryResource mem;
+            mem = rm.claimMemoryResource(owner, romAddr, 4, ResourceManager.MEMMODE_NORMAL);
+            final int blocks = mem.getByte(2) & 0xFF; 
+            final int romSize = blocks * 512;
+            mem.release();            
+            
+            log.info("Found ATI ROM at 0x" + NumberUtils.hex(Address.as32bit(romAddr)) + " size=" + NumberUtils.size(romSize));
+            return rm.claimMemoryResource(owner, romAddr, romSize, ResourceManager.MEMMODE_NORMAL);                        
+        }
+
+        return null;
+    }
+
+    /**
+     * Verify the ROM signature as being an ATI BIOS expansion area.
+     * @param rom
+     * @return
+     */
+    private final boolean verifyBiosSignature(MemoryResource rom) {
+        if ((rom.getByte(0) & 0xFF) != 0x55) { return false; }
+        if ((rom.getByte(1) & 0xFF) != 0xAA) { return false; }
+        return true;
     }
 }

@@ -109,6 +109,17 @@ public class ExtensionPointModel extends PluginModelObject implements
         listeners.add(listener);
     }
 
+	/**
+	 * Add a listener to the front of the listeners list.
+	 * @param listener
+	 */
+	public void addPriorityListener(ExtensionPointListener listener) {
+        if (listeners == null) {
+            listeners = new Vector();
+        }
+        listeners.add(0, listener);	    
+	}
+	
     /**
      * Remove a listener
      * 

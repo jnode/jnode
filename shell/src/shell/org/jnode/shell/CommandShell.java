@@ -14,7 +14,9 @@ import java.security.AccessController;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.StringTokenizer;
+
 import javax.naming.NameNotFoundException;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.console.Console;
 import org.jnode.driver.console.ConsoleManager;
@@ -29,6 +31,7 @@ import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.CompletionException;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
+import org.jnode.vm.VmSystem;
 
 /**
  * @author epr
@@ -124,7 +127,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
             defaultCommandInvoker = new DefaultCommandInvoker(this);
             threadCommandInvoker = new ThreadCommandInvoker(this);
             this.commandInvoker = threadCommandInvoker; //default to separate
-                                                        // threads for commands.
+            // threads for commands.
             aliasMgr = ((AliasManager) InitialNaming.lookup(AliasManager.NAME))
                     .createAliasManager();
             AccessController.doPrivileged(new SetPropertyAction(
@@ -172,9 +175,15 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
                     threadSuspended = true;
                     while (threadSuspended)
                         wait();
-                    if (currentLine.length() > 0)
-                            processCommand(currentLine.trim());
-                    if (currentLine.trim().equals("halt")) halt = true;
+                    if (currentLine.length() > 0) {
+                        processCommand(currentLine.trim());
+                    }
+
+                    if (VmSystem.isShuttingDown()) {
+                        halt = true;
+                    }
+
+                    //if (currentLine.trim().equals("halt")) halt = true;
                     currentLine = "";
                     historyIndex = -1;
                 }
@@ -509,9 +518,9 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 
                             // perform completion
                             result = cmd + " " + info.complete(cl); // prepend
-                                                                    // command
-                                                                    // name and
-                                                                    // space
+                            // command
+                            // name and
+                            // space
                             // again
                         } catch (ClassNotFoundException ex) {
                             throw new CompletionException(
@@ -519,15 +528,15 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
                         } catch (HelpException ex) {
                             ex.printStackTrace();
                             throw new CompletionException(
-                            "Command class not found");
+                                    "Command class not found");
                         }
             }
             if (result == null) // assume this is the alias to be called
                     result = defaultArg.complete(cmd);
 
             if (!partial.equals(result) && !dirty) { // performed direct
-                                                     // completion without
-                                                     // listing
+                // completion without
+                // listing
                 dirty = true; // indicate we want to have a new prompt
                 for (int i = 0; i < partial.length() + currentPrompt.length(); i++)
                     System.out.print("\b"); // clear line (cheap approach)
@@ -544,7 +553,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
         if (dirty) {
             dirty = false;
             System.out.print(currentPrompt + result); // print the prompt and go
-                                                      // on with normal
+            // on with normal
             // operation
         }
         return result;
