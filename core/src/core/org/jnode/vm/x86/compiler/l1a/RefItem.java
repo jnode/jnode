@@ -124,8 +124,7 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 				break;
 				
 			case CONSTANT:
-				//TODO
-				notImplemented();
+				os.writePUSH_Const(value);
 				break;
 				
 			case FREGISTER:

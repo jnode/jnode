@@ -122,6 +122,16 @@ final class X86RegisterPool extends org.jnode.vm.compiler.ir.RegisterPool {
 		return allocated.get(register);
 	}
 	
+	/**
+	 * transfer ownership of a register
+	 * 
+	 * @param register the register to be transferred
+	 * @param newOwner the register's new owner
+	 */
+	public void transferOwnerTo(Object register, Object newOwner) {
+		allocated.put(register, newOwner);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.compiler.ir.RegisterPool#release(java.lang.Object)
 	 */
