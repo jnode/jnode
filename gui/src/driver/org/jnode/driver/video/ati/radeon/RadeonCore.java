@@ -34,7 +34,6 @@ public class RadeonCore extends AbstractSurface implements RadeonConstants {
 	private final Logger log = Logger.getLogger(getClass());
     private RadeonConfiguration config;
     private final RadeonDriver driver;
-    private final int architecture;
     private final MemoryResource mmio;
     private final MemoryResource videoRam;
     private final RadeonVgaIO vgaIO;
@@ -57,7 +56,6 @@ public class RadeonCore extends AbstractSurface implements RadeonConstants {
 	public RadeonCore(RadeonDriver driver, int architecture, String model, PCIDevice device) throws ResourceNotFreeException, DriverException {
 		super(640, 480);
 		this.driver = driver;
-		this.architecture = architecture;
 		this.hasCRTC2 = (architecture != Architecture.R100); 
 		this.pllInfo = new RadeonPLLInfo();
 		
@@ -197,6 +195,8 @@ public class RadeonCore extends AbstractSurface implements RadeonConstants {
 
 		driver.close(this);
 		super.close();
+		
+		log.info("DAC_CNTL=0x" + NumberUtils.hex(vgaIO.getReg32(DAC_CNTL)));
 	}
 	
     /**
@@ -244,14 +244,8 @@ public class RadeonCore extends AbstractSurface implements RadeonConstants {
      */
 	private final void setPalette(float brightness) {
 		for (int i = 0; i < 256; i++) {
-			int v = (int) (i * brightness);
-			if (v > 255) {
-				v = 255;
-			}
-			vgaIO.setDACWriteIndex(i);
-			vgaIO.setDACData(v); // r
-			vgaIO.setDACData(v); // g
-			vgaIO.setDACData(v); // b
+			final int v = Math.min(255, (int) (i * brightness));
+			vgaIO.setPaletteEntry(i, v, v, v);
 		}
 	}
 }
