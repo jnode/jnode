@@ -19,13 +19,20 @@ final class FloatItem extends Item implements X86CompilerConstants  {
 	 * @param value
 	 */
 	private FloatItem(int kind,  int offsetToFP, float value) {
-		super(kind, JvmType.FLOAT, offsetToFP);
+		super(kind, offsetToFP);
 		
 		this.value = value;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#load()
+
+	/**
+	 * Get the JVM type of this item
+	 * @return the JVM type
+	 */
+	int getType() { return JvmType.FLOAT; }
+	
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#load(EmitterContext)
 	 */
 	void load(EmitterContext ec) {
 		// TODO Auto-generated method stub
@@ -33,15 +40,7 @@ final class FloatItem extends Item implements X86CompilerConstants  {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#loadToFPU()
-	 */
-//	void loadToFPU(EmitterContext ec) {
-//		// TODO Auto-generated method stub
-//		notImplemented();
-//	}
-
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#clone()
 	 */
 	Item clone(EmitterContext ec) {
@@ -75,8 +74,8 @@ final class FloatItem extends Item implements X86CompilerConstants  {
 		return res;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#push()
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#push(EmitterContext)
 	 */
 	void push(EmitterContext ec) {
 		final AbstractX86Stream os = ec.getStream();
@@ -121,8 +120,8 @@ final class FloatItem extends Item implements X86CompilerConstants  {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#release()
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#release(EmitterContext)
 	 */
 	void release(EmitterContext ec) {
 		switch (getKind()) {
@@ -153,7 +152,7 @@ final class FloatItem extends Item implements X86CompilerConstants  {
 		notImplemented();
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
 	 */
 	boolean uses(Register reg) {
