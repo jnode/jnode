@@ -74,7 +74,7 @@ public class ISO9660FileSystemType implements FileSystemType {
      * @see org.jnode.fs.FileSystemType#create(Device, boolean)
      */
     public FileSystem create(Device device, boolean readOnly) throws FileSystemException {
-        return new ISO9660FileSystem(device, readOnly);  // not readOnly !
+        return new ISO9660FileSystem(device, readOnly);
     }
 
     /**
