@@ -44,7 +44,7 @@ import java.util.Iterator;
 
 /**
  *  
- * @author Andreas Hänel
+ * @author Andreas Haenel
  */
 public class JIFSDirectory implements FSDirectory, FSEntry {
 
