@@ -17,6 +17,11 @@ import org.jnode.vm.compiler.ir.Variable;
 /**
  * @author Madhu Siddalingaiah
  *
+ * This class represents binary operations of the form:
+ * 
+ *   lhs = operand1 operation operand2, where operation is +, -, <<, |, && etc.
+ * 
+ * The left hand side (lhs) is a Variable inherited from AssignQuad.
  */
 public class BinaryQuad extends AssignQuad {
 	private static final String[] OP_MAP = {
@@ -65,6 +70,9 @@ public class BinaryQuad extends AssignQuad {
 	public static final int IXOR = 31;
 	public static final int LXOR = 32;
 
+	/*
+	 * These are used to simplify addressing mode testing
+	 */
 	private static final int MODE_RCC = (Operand.MODE_REGISTER << 16) | (Operand.MODE_CONSTANT << 8) | Operand.MODE_CONSTANT;
 	private static final int MODE_RCR = (Operand.MODE_REGISTER << 16) | (Operand.MODE_CONSTANT << 8) | Operand.MODE_REGISTER;
 	private static final int MODE_RCS = (Operand.MODE_REGISTER << 16) | (Operand.MODE_CONSTANT << 8) | Operand.MODE_STACK;
@@ -167,7 +175,10 @@ public class BinaryQuad extends AssignQuad {
 	}
 
 	/**
-	 * @return
+	 * If operand1 and operand2 are both Constants, then fold them.
+	 * TODO: this only supports int +, -, *, / right now.
+	 * 
+	 * @return resulting Quad after folding
 	 */
 	public Quad foldConstants() {
 		if (operand1 instanceof Constant && operand2 instanceof Constant) {
@@ -210,7 +221,11 @@ public class BinaryQuad extends AssignQuad {
 		return operand;
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * Simplifies operands by calling operand.simplify().
+	 * simplify will combine phi references and propagate copies
+	 * This method will also update liveness of operands by setting last use addr
+	 * 
 	 * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
 	 */
 	public void doPass2(BootableHashMap liveVariables) {
@@ -228,7 +243,10 @@ public class BinaryQuad extends AssignQuad {
 		}
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * Code generation is complicated by the permutations of addressing modes.
+	 * This is not as nice as it could be, but it could be worse!
+	 * 
 	 * @see org.jnode.vm.compiler.ir.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
 	 */
 	public void generateCode(CodeGenerator cg) {
