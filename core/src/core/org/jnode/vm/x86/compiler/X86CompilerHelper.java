@@ -149,7 +149,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	/**
 	 * Insert a yieldpoint into the code
 	 */
-	public final void yieldPoint(Object curInstrLabel, X86CompilerContext context) {
+	public final void writeYieldPoint(Object curInstrLabel, X86CompilerContext context) {
 		if (method.getThreadSwitchIndicatorMask() != 0) {
 			final Object doneLabel = new Label(curInstrLabel + "noYP");
 			os.writePrefix(X86Constants.FS_PREFIX);
@@ -213,7 +213,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 * @param method
 	 * @param context
 	 */
-	public final void writeStackOverflowTest(Register calcReg, VmMethod method, X86CompilerContext context) {
+	public final void writeStackOverflowTest(VmMethod method, X86CompilerContext context) {
 		//cmp esp,STACKEND
 		//jg vm_invoke_testStackOverflowDone
 		//vm_invoke_testStackOverflow:
@@ -222,9 +222,8 @@ public class X86CompilerHelper implements X86CompilerConstants {
 		
 		final int offset = context.getVmProcessorStackEnd().getOffset();
 		final Label doneLabel = new Label(method + "$$stackof-done");
-		os.writeXOR(calcReg, calcReg);
 		os.writePrefix(X86Constants.FS_PREFIX);
-		os.writeCMP(Register.ESP, calcReg, offset);
+		os.writeCMP_MEM(Register.ESP, offset);
 		os.writeJCC(doneLabel, X86Constants.JG);
 		os.writeINT(0x31);
 		os.setObjectRef(doneLabel);
