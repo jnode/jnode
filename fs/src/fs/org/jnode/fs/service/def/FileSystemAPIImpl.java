@@ -165,7 +165,7 @@ public class FileSystemAPIImpl implements VMFileSystemAPI {
 	 * @throws IOException
 	 */
 	public void delete(File file) throws IOException {
-		final File parent = file.getParentFile();
+		final File parent = file.getAbsoluteFile().getParentFile();
 		if (parent == null) {
 			throw new IOException("There is no parent of " + file);
 		}
@@ -290,7 +290,7 @@ public class FileSystemAPIImpl implements VMFileSystemAPI {
 		if (entry == null) {
 			if (mode.canWrite()) {
 				// Try to create the file
-				final FSEntry parent = getEntry(file.getParentFile());
+				final FSEntry parent = getEntry(file.getAbsoluteFile().getParentFile());
 				if (parent == null) {
 					throw new IOException(
 						"Cannot create " + file.getAbsolutePath() + ", parent directory does not exist");
