@@ -75,7 +75,11 @@ final class FPUHelper implements X86CompilerConstants {
 
 		final X86RegisterPool pool = ec.getPool();
 		pool.request(EAX);
-		final Register resr = pool.request(JvmType.INT);
+		final IntItem result = (IntItem)L1AHelper.requestWordRegister(ec, JvmType.INT, false);
+		final Register resr = result.getRegister();
+		
+		// Clear resultr
+		os.writeXOR(resr, resr);
 
 		if (!gt) {
 			// Reverse order
@@ -89,37 +93,32 @@ final class FPUHelper implements X86CompilerConstants {
 		fpuStack.pop();
 		fpuStack.pop();
 
-		final Label eqLabel = new Label(curInstrLabel + "eq");
+		final Label gtLabel = new Label(curInstrLabel + "gt");
 		final Label ltLabel = new Label(curInstrLabel + "lt");
 		final Label endLabel = new Label(curInstrLabel + "end");
-		os.writeJCC(eqLabel, X86Constants.JE);
+		os.writeJCC(gtLabel, X86Constants.JA); 
 		os.writeJCC(ltLabel, X86Constants.JB);
+		os.writeJMP(endLabel); // equal
 		// Greater
+		os.setObjectRef(gtLabel);
 		if (gt) {
-			os.writeMOV_Const(resr, -1);
+			os.writeDEC(resr);
 		} else {
-			os.writeMOV_Const(resr, 1);
+			os.writeINC(resr);
 		}
-		os.writeJMP(endLabel);
-		// Equal
-		os.setObjectRef(eqLabel);
-		os.writeXOR(resr, resr);
 		os.writeJMP(endLabel);
 		// Less
 		os.setObjectRef(ltLabel);
 		if (gt) {
-			os.writeMOV_Const(resr, 1);
+			os.writeINC(resr);
 		} else {
-			os.writeMOV_Const(resr, -1);
+			os.writeDEC(resr);
 		}
 		// End
 		os.setObjectRef(endLabel);
 
 		// Push result
-		final ItemFactory ifac = ec.getItemFactory();
-		final IntItem res = (IntItem)ifac.createReg(JvmType.INT, resr);
-		pool.transferOwnerTo(resr, res);
-		vstack.push(res);
+		vstack.push(result);
 
 		// Release
 		pool.release(EAX);
