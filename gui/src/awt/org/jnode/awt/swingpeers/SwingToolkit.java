@@ -64,259 +64,254 @@ import java.awt.peer.WindowPeer;
 /**
  * AWT toolkit implemented entirely with JFC peers, thus allowing a lightweight
  * simulation of the operating system desktop.
- *
+ * 
  * @author Levente Sántha
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
+public final class SwingToolkit extends JNodeToolkit {
 
-public class SwingToolkit extends JNodeToolkit {
+    private DesktopFrame desktopFrame;
 
-	private DesktopFrame desktopFrame;
+    /**
+     * Initialize this instance.
+     *  
+     */
+    public SwingToolkit() {
+    }
 
-	/**
-	 * Initialize this instance.
-	 *
-	 */
-	public SwingToolkit() {
-	}
+    // Peers
 
-	// Peers
+    protected ButtonPeer createButton(Button target) {
+        return new SwingButtonPeer(this, target);
+    }
 
-	protected ButtonPeer createButton(Button target) {
-		return new SwingButtonPeer(this, target);
-	}
+    protected CanvasPeer createCanvas(Canvas target) {
+        // return super.createCanvas( target );
+        return new SwingCanvasPeer(this, target);
+    }
 
-	protected CanvasPeer createCanvas(Canvas target) {
-		// return super.createCanvas( target );
-		return new SwingCanvasPeer(this, target);
-	}
+    protected CheckboxPeer createCheckbox(Checkbox target) {
+        return new SwingCheckboxPeer(this, target);
+    }
 
-	protected CheckboxPeer createCheckbox(Checkbox target) {
-		return new SwingCheckboxPeer(this, target);
-	}
+    protected CheckboxMenuItemPeer createCheckboxMenuItem(
+            CheckboxMenuItem target) {
+        return new SwingCheckboxMenuItemPeer(this, target);
+    }
 
-	protected CheckboxMenuItemPeer createCheckboxMenuItem(
-			CheckboxMenuItem target) {
-		return new SwingCheckboxMenuItemPeer(this, target);
-	}
+    protected ChoicePeer createChoice(Choice target) {
+        return new SwingChoicePeer(this, target);
+    }
 
-	protected ChoicePeer createChoice(Choice target) {
-		return new SwingChoicePeer(this, target);
-	}
+    protected LightweightPeer createComponent(Component target) {
+        if (target instanceof Container)
+            return new SwingLightweightContainerPeer(this, (Container) target);
+        else
+            return new SwingLightweightPeer(this, target);
+    }
 
-	protected LightweightPeer createComponent(Component target) {
-		if (target instanceof Container)
-			return new SwingLightweightContainerPeer(this, (Container) target);
-		else
-			return new SwingLightweightPeer(this, target);
-	}
+    protected DialogPeer createDialog(Dialog target) {
+        return new SwingDialogPeer(this, target);
+    }
 
-	protected DialogPeer createDialog(Dialog target) {
-		return new SwingDialogPeer(this, target);
-	}
+    public DragSourceContextPeer createDragSourceContextPeer(
+            DragGestureEvent dge) {
+        return null;
+    }
 
-	public DragSourceContextPeer createDragSourceContextPeer(
-			DragGestureEvent dge) {
-		return null;
-	}
+    protected FileDialogPeer createFileDialog(FileDialog target) {
+        return null;
+    }
 
-	protected FileDialogPeer createFileDialog(FileDialog target) {
-		return null;
-	}
-
-	protected FramePeer createFrame(Frame target) {
-        if (!isGuiActive()){ //Automatically starts the gui if not yet started.  This may be a bad idea.
-            System.err.println( "<SwingToolkit.createFrame> gui was not yet active.  Starting..." );
-            System.err.println( "Manually starting the gui..." );
-            startGui();
+    protected FramePeer createFrame(Frame target) {
+        if (!isGuiActive()) {
+            throw new AWTError("AWT is currently not available");
         }
-        if (!isGuiActive()){
-            System.err.println( "<SwingToolkit.createFrame> gui still not yet active after startGui().  We should abort here." );
+        if (target instanceof DesktopFrame) {
+            setTop(target);
+            log.debug("createFrame:desktopFramePeer(" + target + ")");
+            // Only desktop is real frame
+            return new DesktopFramePeer(this, target);
+        } else {
+            if (!isGuiActive()) {
+                throw new AWTError("Gui is not active");
+            }
+            log.debug("createFrame:normal(" + target + ")");
+            // Other frames are emulated
+            return new SwingFramePeer(this, desktopFrame.getDesktop(), target);
         }
-		if (target instanceof DesktopFrame) {
-			setTop(target);
-			log.debug("createFrame:desktopFramePeer(" + target + ")");
-			// Only desktop is real frame
-			return new DesktopFramePeer(this, target);
-		} else {
-			if (!isGuiActive()) {
-				throw new AWTError("Gui is not active");
-			}
-			log.debug("createFrame:normal(" + target + ")");
-			// Other frames are emulated
-			return new SwingFramePeer(this, desktopFrame.getDesktop(), target);
-		}
-	}
+    }
 
-	protected LabelPeer createLabel(Label target) {
-		return new SwingLabelPeer(this, target);
-	}
+    protected LabelPeer createLabel(Label target) {
+        return new SwingLabelPeer(this, target);
+    }
 
-	protected ListPeer createList(java.awt.List target) {
-		return new SwingListPeer(this, target);
-	}
+    protected ListPeer createList(java.awt.List target) {
+        return new SwingListPeer(this, target);
+    }
 
-	protected MenuPeer createMenu(Menu target) {
-		return new SwingMenuPeer(this, target);
-	}
+    protected MenuPeer createMenu(Menu target) {
+        return new SwingMenuPeer(this, target);
+    }
 
-	protected MenuBarPeer createMenuBar(MenuBar target) {
-		return new SwingMenuBarPeer(this, target);
-	}
+    protected MenuBarPeer createMenuBar(MenuBar target) {
+        return new SwingMenuBarPeer(this, target);
+    }
 
-	protected MenuItemPeer createMenuItem(MenuItem target) {
-		return new SwingMenuItemPeer(this, target);
-	}
+    protected MenuItemPeer createMenuItem(MenuItem target) {
+        return new SwingMenuItemPeer(this, target);
+    }
 
-	protected PanelPeer createPanel(Panel target) {
-		return new SwingPanelPeer(this, target);
-	}
+    protected PanelPeer createPanel(Panel target) {
+        return new SwingPanelPeer(this, target);
+    }
 
-	protected PopupMenuPeer createPopupMenu(PopupMenu target) {
-		return new SwingPopupMenuPeer(this, target);
-	}
+    protected PopupMenuPeer createPopupMenu(PopupMenu target) {
+        return new SwingPopupMenuPeer(this, target);
+    }
 
-	protected ScrollbarPeer createScrollbar(Scrollbar target) {
-		return new SwingScrollbarPeer(this, target);
-	}
+    protected ScrollbarPeer createScrollbar(Scrollbar target) {
+        return new SwingScrollbarPeer(this, target);
+    }
 
-	protected ScrollPanePeer createScrollPane(ScrollPane target) {
-		return new SwingScrollPanePeer(this, target);
-	}
+    protected ScrollPanePeer createScrollPane(ScrollPane target) {
+        return new SwingScrollPanePeer(this, target);
+    }
 
-	protected TextAreaPeer createTextArea(TextArea target) {
-		return new SwingTextAreaPeer(this, target);
-	}
+    protected TextAreaPeer createTextArea(TextArea target) {
+        return new SwingTextAreaPeer(this, target);
+    }
 
-	protected TextFieldPeer createTextField(TextField target) {
-		return new SwingTextFieldPeer(this, target);
-	}
+    protected TextFieldPeer createTextField(TextField target) {
+        return new SwingTextFieldPeer(this, target);
+    }
 
-	protected WindowPeer createWindow(Window target) {
-		return new SwingWindowPeer(this, target);
-	}
+    protected WindowPeer createWindow(Window target) {
+        return new SwingWindowPeer(this, target);
+    }
 
-	// /////////////////////////////////////////////////////////////////////////////////////
-	// Private
+    // /////////////////////////////////////////////////////////////////////////////////////
+    // Private
 
-	final void onDisposeFrame() {
-		// Nothing to do
-	}
+    final void onDisposeFrame() {
+        // Nothing to do
+    }
 
-	/**
-	 * @see org.jnode.awt.JNodeToolkit#onClose()
-	 */
-	protected void onClose() {
-		log.debug("onClose");
-		desktopFrame.dispose();
-		desktopFrame = null;
-	}
+    /**
+     * @see org.jnode.awt.JNodeToolkit#onClose()
+     */
+    protected void onClose() {
+        log.debug("onClose");
+        desktopFrame.dispose();
+        desktopFrame = null;
+    }
 
-	/**
-	 * @see org.jnode.awt.JNodeToolkit#onInitialize()
-	 */
-	protected void onInitialize() {
-		log.debug("onInitialize");
-		desktopFrame = new DesktopFrame(getScreenSize());
-		desktopFrame.show();
-	}
+    /**
+     * @see org.jnode.awt.JNodeToolkit#onInitialize()
+     */
+    protected void onInitialize() {
+        log.debug("onInitialize");
+        desktopFrame = new DesktopFrame(getScreenSize());
+        desktopFrame.show();
+    }
 
-	/**
-	 * Copies the generic component properties from the AWT component into the
-	 * peer.
-	 *
-	 * @param awtComponent
-	 * @param peer
-	 */
-	final static void copyAwtProperties(Component awtComponent, JComponent peer) {
-		Color c;
-		Font f;
-		if ((c = awtComponent.getForeground()) != null) {
-			peer.setForeground(c);
-		}
-		if ((c = awtComponent.getBackground()) != null) {
-			peer.setBackground(c);
-		}
-		if ((f = awtComponent.getFont()) != null) {
-			peer.setFont(f);
-		}
-	}
+    /**
+     * Copies the generic component properties from the AWT component into the
+     * peer.
+     * 
+     * @param awtComponent
+     * @param peer
+     */
+    final static void copyAwtProperties(Component awtComponent, JComponent peer) {
+        Color c;
+        Font f;
+        if ((c = awtComponent.getForeground()) != null) {
+            peer.setForeground(c);
+        }
+        if ((c = awtComponent.getBackground()) != null) {
+            peer.setBackground(c);
+        }
+        if ((f = awtComponent.getFont()) != null) {
+            peer.setFont(f);
+        }
+    }
 
-	public static void add(Component component, JComponent peer) {
-		final ISwingContainerPeer containerPeer = getContainerPeer(component);
-		if (containerPeer != null) {
-			containerPeer.addAWTComponent(component, peer);
-		}
-	}
+    public static void add(Component component, JComponent peer) {
+        final ISwingContainerPeer containerPeer = getContainerPeer(component);
+        if (containerPeer != null) {
+            containerPeer.addAWTComponent(component, peer);
+        }
+    }
 
-	private static ISwingContainerPeer getContainerPeer(Component component) {
-		final Component parent = component.getParent();
-		if (parent == null) {
-			return null;
-		} else {
-			final ComponentPeer parentPeer = parent.getPeer();
-			if (parentPeer instanceof ISwingContainerPeer) {
-				return (ISwingContainerPeer) parentPeer;
-			} else {
-				return getContainerPeer(parent);
-			}
-		}
-	}
+    private static ISwingContainerPeer getContainerPeer(Component component) {
+        final Component parent = component.getParent();
+        if (parent == null) {
+            return null;
+        } else {
+            final ComponentPeer parentPeer = parent.getPeer();
+            if (parentPeer instanceof ISwingContainerPeer) {
+                return (ISwingContainerPeer) parentPeer;
+            } else {
+                return getContainerPeer(parent);
+            }
+        }
+    }
 
-	/**
-	 * Paint all the lightweight children of the given container.
-	 *
-	 * @param awtContainer
-	 * @param g
-	 */
-	public static void paintLightWeightChildren(Container awtContainer,
-			Graphics g, int dx, int dy) {
-		final Shape oldClip = g.getClip();
-		try {
-			final Component[] comps = awtContainer.getComponents();
-			final int cnt = comps.length;
-			for (int i = 0; i < cnt; i++) {
-				final Component child = comps[i];
-				if (child.isVisible() && child.isLightweight()) {
-					final int x = child.getX() - dx;
-					final int y = child.getY() - dy;
-					final int width = child.getWidth();
-					final int height = child.getHeight();
-					g.setClip(x, y, width, height);
-					g.translate(x, y);
-					try {
-						child.paint(g);
-					} finally {
-						g.translate(-x, -y);
-					}
-				}
-			}
-		} finally {
-			g.setClip(oldClip);
-		}
-	}
+    /**
+     * Paint all the lightweight children of the given container.
+     * 
+     * @param awtContainer
+     * @param g
+     */
+    public static void paintLightWeightChildren(Container awtContainer,
+            Graphics g, int dx, int dy) {
+        final Shape oldClip = g.getClip();
+        try {
+            final Component[] comps = awtContainer.getComponents();
+            final int cnt = comps.length;
+            for (int i = 0; i < cnt; i++) {
+                final Component child = comps[i];
+                if (child.isVisible() && child.isLightweight()) {
+                    final int x = child.getX() - dx;
+                    final int y = child.getY() - dy;
+                    final int width = child.getWidth();
+                    final int height = child.getHeight();
+                    g.setClip(x, y, width, height);
+                    g.translate(x, y);
+                    try {
+                        child.paint(g);
+                    } finally {
+                        g.translate(-x, -y);
+                    }
+                }
+            }
+        } finally {
+            g.setClip(oldClip);
+        }
+    }
 
-	public Component getTopComponentAt(int x, int y) {
-		Component comp = super.getTopComponentAt(x, y);
-		SwingFramePeer.SwingFrame sfp = (SwingFramePeer.SwingFrame) SwingUtilities
-				.getAncestorOfClass(SwingFramePeer.SwingFrame.class, comp);
-		if (sfp != null) {
-			Rectangle r = sfp.getBounds();
-			Insets ins = sfp.getSwingPeer().getInsets();
-			r.x = r.x + ins.left;
-			r.y = r.y + ins.top;
-			r.width = r.width - ins.left - ins.right;
-			r.height = r.height - ins.top - ins.bottom;
-			if (r.contains(x, y)) {
-				Component c = sfp.getAwtFrame().findComponentAt(x, y);
-				if (c != null) {
-					comp = c;
-				}
-			}
-		}
-		return comp;
-	}
+    public Component getTopComponentAt(int x, int y) {
+        Component comp = super.getTopComponentAt(x, y);
+        SwingFramePeer.SwingFrame sfp = (SwingFramePeer.SwingFrame) SwingUtilities
+                .getAncestorOfClass(SwingFramePeer.SwingFrame.class, comp);
+        if (sfp != null) {
+            Rectangle r = sfp.getBounds();
+            Insets ins = sfp.getSwingPeer().getInsets();
+            r.x = r.x + ins.left;
+            r.y = r.y + ins.top;
+            r.width = r.width - ins.left - ins.right;
+            r.height = r.height - ins.top - ins.bottom;
+            if (r.contains(x, y)) {
+                Component c = sfp.getAwtFrame().findComponentAt(x, y);
+                if (c != null) {
+                    comp = c;
+                }
+            }
+        }
+        return comp;
+    }
 
-	public JNodeAwtContext getAwtContext() {
-		return desktopFrame;
-	}
+    public JNodeAwtContext getAwtContext() {
+        return desktopFrame;
+    }
 }
