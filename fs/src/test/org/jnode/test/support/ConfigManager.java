@@ -28,14 +28,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Category;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.spi.RootCategory;
-import org.jnode.test.fs.AllFSTest;
+import org.jnode.naming.InitialNaming;
+import org.jnode.plugin.PluginException;
 import org.jnode.test.fs.unit.config.OsType;
-import org.jnode.test.fs.unit.config.FSTestConfig;
+import org.jnode.test.fs.unit.config.StubNameSpace;
+import org.jnode.test.fs.unit.stubs.StubDeviceManager;
 
 
 public class ConfigManager
@@ -86,50 +85,11 @@ public class ConfigManager
         return cfg;
     }
     
-    public static void initLog4j()
-    {
-        if(!log4jInitialized && OsType.OTHER_OS.isCurrentOS())
-        {
-            // configure Log4j only if outside of JNode
-            // (because JNode has its own config for Log4j)
-            
-            try
-            {                      
-                // name must be of max 8 characters !!!
-                // but extension can be larger that 3 characters !!!!!
-                // (probably only under windows)
-                String configLog4j = "log4jCfg.properties";
-                
-                URL url = ConfigManager.class.getResource(configLog4j);
-                if(url == null)
-                {
-                    System.err.println("can't find resource "+configLog4j);
-                }
-                else
-                {
-                    PropertyConfigurator.configure(url);
-                }
-                
-                Category.getRoot().setLevel(Level.FATAL);
-                
-                log4jInitialized = true;
-            }
-            catch(OutOfMemoryError oome)
-            {
-                oome.printStackTrace();
-                System.err.println("freeMemory:"+Runtime.getRuntime().freeMemory());
-                System.err.println("maxMemory:"+Runtime.getRuntime().maxMemory());
-                System.err.println("totalMemory:"+Runtime.getRuntime().totalMemory());
-            }
-            
-        }        
-    }
-    
     private ConfigManager()
     {        
         configs = new HashMap(); 
         iterators = new HashMap();
-        initLog4j();
+        ContextManager.getInstance().init();
     }        
     
     static private class TestKey
