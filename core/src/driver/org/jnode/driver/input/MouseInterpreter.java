@@ -18,21 +18,23 @@ public class MouseInterpreter implements PointerInterpreter {
 
 	/** My logger */
 	private final Logger log = Logger.getLogger(getClass());
-	private static final transient List protocols = new ArrayList();
+	/** List of valid protocol handlers */
+	private static final List protocolsHandlers = new ArrayList();
 
 	private byte[] data; // will be defined as 3 or 4 bytes, according to the protocol
 	private int pos = 0;
-	MouseProtocol protocol;
+	private MouseProtocolHandler protocol;
 
 	static {
 		// should be configurable via an ExtensionPoint
-		protocols.add(new LogitechWheelMouseProtocol());
-		protocols.add(new LogitechProtocol());
+		protocolsHandlers.add(new LogitechWheelMouseProtocol());
+		protocolsHandlers.add(new LogitechProtocol());
 	}
 
 	public String getName() {
-		if (protocol == null)
+		if (protocol == null) {
 			return "No Mouse";
+		}
 		return protocol.getName();
 	}
 
@@ -61,8 +63,8 @@ public class MouseInterpreter implements PointerInterpreter {
 
 			id = d.getPointerId();
 			// select protocol
-			for (Iterator i = protocols.iterator(); i.hasNext();) {
-				final MouseProtocol p = (MouseProtocol) i.next();
+			for (Iterator i = protocolsHandlers.iterator(); i.hasNext();) {
+				final MouseProtocolHandler p = (MouseProtocolHandler) i.next();
 				if (p.supportsId(id)) {
 					this.protocol = p;
 					break;
@@ -84,24 +86,40 @@ public class MouseInterpreter implements PointerInterpreter {
 		}
 	}
 
-	public PointerEvent handleScancode(int scancode) {
-		if (protocol == null)
+	/**
+	 * Process a given byte from the device.
+	 * @param scancode
+	 * @return A valid event, or null
+	 */
+	public synchronized PointerEvent handleScancode(int scancode) {
+		if (protocol == null) {
 			return null;
+		}
 
 		// build the data block
 		data[pos++] = (byte) (scancode & 0xff);
 		pos %= data.length;
-		if (pos != 0)
+		if (pos != 0) {
 			return null;
+		}
+
+		//System.out.println("data:" + NumberUtils.hex(data));
 		// this debug output is for debugging the mouse protocol
 		/*
 		 * String line = ""; for( int i = 0; i < data.length; i++ ) line += "[0x" +
 		 * Integer.toHexString(data[i]) + "]"; log.debug(line);
 		 */
 
-		PointerEvent event = protocol.buildEvent(data);
+		final PointerEvent event = protocol.buildEvent(data);
 		// this debug output is to dump the pointer events
 		// log.debug(event.toString());
 		return event;
+	}
+	
+	/**
+	 * Reset the state of this interpreter.
+	 */
+	public synchronized void reset() {
+		pos = 0;
 	}
 }

@@ -22,9 +22,8 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 
 	/** My logger */
 	private final Logger log = Logger.getLogger(getClass());
-	final ByteBuffer buf = ByteBuffer.allocate(1);
-	ByteChannel channel;
-	PointerInterpreter interpreter;
+	private ByteChannel channel;
+	private PointerInterpreter interpreter;
 	private PointerDaemon daemon;
 	private final ArrayList listeners = new ArrayList();
 
@@ -52,8 +51,13 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 	protected synchronized void startDevice() throws DriverException {
 		final Device dev = getDevice();
 		log.info("Starting " + dev.getId());
-		channel = getChannel();
-		interpreter = createInterpreter();
+		this.channel = getChannel();
+		this.interpreter = createInterpreter();
+		try {
+			setRate(80);
+		} catch (DeviceException ex) {
+			log.error("Cannot set default rate", ex);
+		}
 
 		// start the deamon anyway, so we can register a mouse later
 		daemon = new PointerDaemon(dev.getId() + "-daemon");
@@ -114,33 +118,41 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 	}
 
 	/**
+	 * Read scancodes from the input channel and dispatch them as events.
+	 */
+	final void processChannel() {
+		final ByteBuffer buf = ByteBuffer.allocate(1);
+		while ((channel != null) && channel.isOpen()) {
+			try {
+				buf.rewind();
+				if (channel.read(buf) != 1) {
+					continue;
+				}
+				final byte scancode = buf.get(0);
+				if (interpreter != null) {
+					final PointerEvent event = interpreter.handleScancode(scancode & 0xff);
+					if (event != null) {
+						//log.debug(event);
+						dispatchEvent(event);
+					}
+				}
+			} catch (Throwable ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+	
+	/**
 	 * PointerDaemon that translates scancodes to MouseEvents and dispatches those events.
 	 */
 	class PointerDaemon extends Thread {
-
+	
 		public PointerDaemon(String name) {
 			super(name);
 		}
 
 		public void run() {
-			while ((channel != null) && channel.isOpen()) {
-				try {
-					buf.rewind();
-					if (channel.read(buf) != 1) {
-						continue;
-					}
-					final byte scancode = buf.get(0);
-					if (interpreter != null) {
-						final PointerEvent event = interpreter.handleScancode(scancode & 0xff);
-						if (event != null) {
-							//log.debug(event);
-							dispatchEvent(event);
-						}
-					}
-				} catch (Throwable ex) {
-					ex.printStackTrace();
-				}
-			}
+			processChannel();
 		}
 	}
 

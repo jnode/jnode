@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.jnode.driver.DeviceException;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.input.AbstractPointerDriver;
+import org.jnode.driver.input.PointerInterpreter;
 import org.jnode.system.IRQResource;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
@@ -98,6 +99,10 @@ public class PS2PointerDriver extends AbstractPointerDriver implements PS2Consta
 		super.startDevice();
 		// Make sure all queues are empty
 		bus.processQueues();
+		final PointerInterpreter interpreter = getPointerInterpreter();
+		if (interpreter != null) {
+			interpreter.reset();
+		}
 	}
 
 	/**
