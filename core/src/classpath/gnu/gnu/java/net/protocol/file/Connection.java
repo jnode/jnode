@@ -96,6 +96,10 @@ public class Connection extends URLConnection
   public Connection(URL url)
   {
     super (url);
+    
+    // @classpath-bugfix
+	/* Set up some variables */
+	doInput = true;
 
     permission = new FilePermission(getURL().getFile(), DEFAULT_PERMISSION);
   }
