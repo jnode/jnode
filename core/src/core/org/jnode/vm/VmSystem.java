@@ -274,7 +274,7 @@ public final class VmSystem {
 	public static Object[] getStackTrace(VmThread current) {
 		if (current.inException) {
 			Unsafe.debug("Exception in getStackTrace");
-			Unsafe.die();
+			Unsafe.die("getStackTrace");
 			return null;
 		} else {
 			current.inException = true;
@@ -465,7 +465,7 @@ public final class VmSystem {
 			}
 		} catch (Throwable ex2) {
 			Unsafe.debug("Exception in findThrowableHandler");
-			Unsafe.die();
+			Unsafe.die("findThrowableHandler");
 			return null;
 		}
 	}

@@ -1473,7 +1473,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 						final Throwable targetEx = ex.getTargetException();
 						if (targetEx != null) {
 							ex.getTargetException().printStackTrace();
-							Unsafe.die();
+							//Unsafe.die("VmType.doInitialize");
 							throw new ExceptionInInitializerError(ex.getTargetException());
 						} else {
 							throw new ExceptionInInitializerError("targetEx == null");

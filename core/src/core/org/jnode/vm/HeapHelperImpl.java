@@ -194,4 +194,11 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
 		return MonitorManager.getInflatedMonitor(object, arch);
 	}
 
+	/**
+	 * @see org.jnode.vm.memmgr.HeapHelper#die(java.lang.String)
+	 */
+	public final void die(String msg) {
+		Unsafe.die(msg);
+	}
+
 }

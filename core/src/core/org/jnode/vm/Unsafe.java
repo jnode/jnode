@@ -89,6 +89,7 @@ public final class Unsafe {
 
 		/**
 		 * Gets the address of the first element of the given array.
+		 * 
 		 * @param array
 		 * @return The address of the array data.
 		 */
@@ -370,8 +371,7 @@ public final class Unsafe {
 	protected static native void setByte(Address memPtr, byte value);
 
 	/**
-	 * Sets a byte at a given memory address While count is greater then 1, the address is
-	 * incremented and the process repeats.
+	 * Sets a byte at a given memory address While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -380,8 +380,7 @@ public final class Unsafe {
 	protected static native void setBytes(Address memPtr, byte value, int count);
 
 	/**
-	 * Perform a bitwise AND of the byte at the given address and the given value. While count is
-	 * greater then 1, the address is incremented and the process repeats.
+	 * Perform a bitwise AND of the byte at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -391,8 +390,7 @@ public final class Unsafe {
 	protected static native void andByte(Address memPtr, byte value, int count);
 
 	/**
-	 * Perform a bitwise OR of the byte at the given address and the given value. While count is
-	 * greater then 1, the address is incremented and the process repeats.
+	 * Perform a bitwise OR of the byte at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -402,8 +400,7 @@ public final class Unsafe {
 	protected static native void orByte(Address memPtr, byte value, int count);
 
 	/**
-	 * Perform a bitwise XOR of the byte at the given address and the given value While count is
-	 * greater then 1, the address is incremented and the process repeats.
+	 * Perform a bitwise XOR of the byte at the given address and the given value While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -430,8 +427,7 @@ public final class Unsafe {
 	protected static native void setShort(Address memPtr, short value);
 
 	/**
-	 * Sets a short at a given memory address While count is greater then 1, the address is
-	 * incremented and the process repeats.
+	 * Sets a short at a given memory address While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -440,8 +436,7 @@ public final class Unsafe {
 	protected static native void setShorts(Address memPtr, short value, int count);
 
 	/**
-	 * Perform a bitwise AND of the short at the given address and the given value. While count is
-	 * greater then 1, the address is incremented and the process repeats.
+	 * Perform a bitwise AND of the short at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -451,8 +446,7 @@ public final class Unsafe {
 	protected static native void andShort(Address memPtr, short value, int count);
 
 	/**
-	 * Perform a bitwise OR of the short at the given address and the given value. While count is
-	 * greater then 1, the address is incremented and the process repeats.
+	 * Perform a bitwise OR of the short at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -462,8 +456,7 @@ public final class Unsafe {
 	protected static native void orShort(Address memPtr, short value, int count);
 
 	/**
-	 * Perform a bitwise XOR of the short at the given address and the given value While count is
-	 * greater then 1, the address is incremented and the process repeats.
+	 * Perform a bitwise XOR of the short at the given address and the given value While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -490,8 +483,7 @@ public final class Unsafe {
 	protected static native void setChar(Address memPtr, char value);
 
 	/**
-	 * Sets a char at a given memory address While count is greater then 1, the address is
-	 * incremented and the process repeats.
+	 * Sets a char at a given memory address While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -500,8 +492,7 @@ public final class Unsafe {
 	protected static native void setChars(Address memPtr, char value, int count);
 
 	/**
-	 * Perform a bitwise AND of the char at the given address and the given value. While count is
-	 * greater then 1, the address is incremented and the process repeats.
+	 * Perform a bitwise AND of the char at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -511,8 +502,7 @@ public final class Unsafe {
 	protected static native void andChar(Address memPtr, char value, int count);
 
 	/**
-	 * Perform a bitwise OR of the char at the given address and the given value. While count is
-	 * greater then 1, the address is incremented and the process repeats.
+	 * Perform a bitwise OR of the char at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -522,8 +512,7 @@ public final class Unsafe {
 	protected static native void orChar(Address memPtr, char value, int count);
 
 	/**
-	 * Perform a bitwise XOR of the char at the given address and the given value While count is
-	 * greater then 1, the address is incremented and the process repeats.
+	 * Perform a bitwise XOR of the char at the given address and the given value While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -550,8 +539,7 @@ public final class Unsafe {
 	protected static native void setInt(Address memPtr, int value);
 
 	/**
-	 * Sets an int at a given memory address While count is greater then 1, the address is
-	 * incremented and the process repeats.
+	 * Sets an int at a given memory address While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -560,8 +548,7 @@ public final class Unsafe {
 	protected static native void setInts(Address memPtr, int value, int count);
 
 	/**
-	 * Perform a bitwise AND of the int at the given address and the given value. While count is
-	 * greater then 1, the address is incremented and the process repeats.
+	 * Perform a bitwise AND of the int at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -571,8 +558,7 @@ public final class Unsafe {
 	protected static native void andInt(Address memPtr, int value, int count);
 
 	/**
-	 * Perform a bitwise OR of the int at the given address and the given value. While count is
-	 * greater then 1, the address is incremented and the process repeats.
+	 * Perform a bitwise OR of the int at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -582,8 +568,7 @@ public final class Unsafe {
 	protected static native void orInt(Address memPtr, int value, int count);
 
 	/**
-	 * Perform a bitwise XOR of the int at the given address and the given value While count is
-	 * greater then 1, the address is incremented and the process repeats.
+	 * Perform a bitwise XOR of the int at the given address and the given value While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -593,8 +578,7 @@ public final class Unsafe {
 	protected static native void xorInt(Address memPtr, int value, int count);
 
 	/**
-	 * Sets a 24-bit int at a given memory address While count is greater then 1, the address is
-	 * incremented and the process repeats.
+	 * Sets a 24-bit int at a given memory address While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -603,8 +587,7 @@ public final class Unsafe {
 	protected static native void setInts24(Address memPtr, int value, int count);
 
 	/**
-	 * Perform a bitwise AND of the 24-bit int at the given address and the given value. While
-	 * count is greater then 1, the address is incremented and the process repeats.
+	 * Perform a bitwise AND of the 24-bit int at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -614,8 +597,7 @@ public final class Unsafe {
 	protected static native void andInt24(Address memPtr, int value, int count);
 
 	/**
-	 * Perform a bitwise OR of the 24-bit int at the given address and the given value. While count
-	 * is greater then 1, the address is incremented and the process repeats.
+	 * Perform a bitwise OR of the 24-bit int at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -625,8 +607,7 @@ public final class Unsafe {
 	protected static native void orInt24(Address memPtr, int value, int count);
 
 	/**
-	 * Perform a bitwise XOR of the 24-bit int at the given address and the given value While count
-	 * is greater then 1, the address is incremented and the process repeats.
+	 * Perform a bitwise XOR of the 24-bit int at the given address and the given value While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -653,8 +634,7 @@ public final class Unsafe {
 	protected static native void setLong(Address memPtr, long value);
 
 	/**
-	 * Sets a long at a given memory address While count is greater then 1, the address is
-	 * incremented and the process repeats.
+	 * Sets a long at a given memory address While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -663,8 +643,7 @@ public final class Unsafe {
 	protected static native void setLongs(Address memPtr, long value, int count);
 
 	/**
-	 * Perform a bitwise AND of the long at the given address and the given value. While count is
-	 * greater then 1, the address is incremented and the process repeats.
+	 * Perform a bitwise AND of the long at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -674,8 +653,7 @@ public final class Unsafe {
 	protected static native void andLong(Address memPtr, long value, int count);
 
 	/**
-	 * Perform a bitwise OR of the long at the given address and the given value. While count is
-	 * greater then 1, the address is incremented and the process repeats.
+	 * Perform a bitwise OR of the long at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -685,8 +663,7 @@ public final class Unsafe {
 	protected static native void orLong(Address memPtr, long value, int count);
 
 	/**
-	 * Perform a bitwise XOR of the long at the given address and the given value While count is
-	 * greater then 1, the address is incremented and the process repeats.
+	 * Perform a bitwise XOR of the long at the given address and the given value While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -713,8 +690,7 @@ public final class Unsafe {
 	protected static native void setFloat(Address memPtr, float value);
 
 	/**
-	 * Sets a float at a given memory address While count is greater then 1, the address is
-	 * incremented and the process repeats.
+	 * Sets a float at a given memory address While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -740,8 +716,7 @@ public final class Unsafe {
 	protected static native void setDouble(Address memPtr, double value);
 
 	/**
-	 * Sets a double at a given memory address While count is greater then 1, the address is
-	 * incremented and the process repeats.
+	 * Sets a double at a given memory address While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -767,8 +742,7 @@ public final class Unsafe {
 	protected static native void setObject(Address memPtr, Object value);
 
 	/**
-	 * Sets a Object at a given memory address While count is greater then 1, the address is
-	 * incremented and the process repeats.
+	 * Sets a Object at a given memory address While count is greater then 1, the address is incremented and the process repeats.
 	 * 
 	 * @param memPtr
 	 * @param value
@@ -871,10 +845,20 @@ public final class Unsafe {
 	protected static native void idle();
 
 	/**
-	 * Cause the system to stop
-	 * TODO Protect me again
+	 * Cause the system to stop TODO Protect me again
 	 */
-	public /*protected*/static native void die();
+	protected static void die(String msg) {
+		debug("Real panic: ");
+		if (msg != null) {
+			debug(msg);
+		}
+		die();
+	}
+
+	/**
+	 * Cause the system to stop TODO Protect me again
+	 */
+	private static native void die();
 
 	/**
 	 * Print the given string on the screen.
@@ -893,6 +877,7 @@ public final class Unsafe {
 
 	/**
 	 * Initialize the new Thread.
+	 * 
 	 * @param curThread
 	 * @param newStack
 	 * @param stackSize
@@ -900,9 +885,8 @@ public final class Unsafe {
 	protected static native void initThread(VmThread curThread, Object newStack, int stackSize);
 
 	/**
-	 * Atomic compare and swap. Compares the int value addressed by the given address with the
-	 * given old value. If they are equal, the value at the given address is replace by the new
-	 * value and true is returned, otherwise nothing is changed and false is returned.
+	 * Atomic compare and swap. Compares the int value addressed by the given address with the given old value. If they are equal, the value at the given address is replace by the new value and true
+	 * is returned, otherwise nothing is changed and false is returned.
 	 * 
 	 * @param address
 	 * @param oldValue
@@ -961,48 +945,56 @@ public final class Unsafe {
 
 	/**
 	 * Gets the minimum valid address in the addressspace of the current architecture.
+	 * 
 	 * @return Address
 	 */
 	protected static native Address getMinAddress();
 
 	/**
 	 * Gets the maximum valid address in the addressspace of the current architecture.
+	 * 
 	 * @return Address
 	 */
 	protected static native Address getMaxAddress();
 
 	/**
 	 * Gets the (inclusive) start address of the available memory.
+	 * 
 	 * @return Address
 	 */
 	protected static native Address getMemoryStart();
 
 	/**
 	 * Gets the (exclusive) end address of the available memory.
+	 * 
 	 * @return Address
 	 */
 	protected static native Address getMemoryEnd();
 
 	/**
 	 * Gets the (inclusive) start address of the kernel.
+	 * 
 	 * @return Address
 	 */
 	protected static native Address getKernelStart();
 
 	/**
 	 * Gets the (exclusive) end address of the kernel.
+	 * 
 	 * @return Address
 	 */
 	protected static native Address getKernelEnd();
 
 	/**
 	 * Gets the (inclusive) start address of the boot heap.
+	 * 
 	 * @return Address
 	 */
 	protected static native Address getBootHeapStart();
 
 	/**
 	 * Gets the (exclusive) end address of the boot heap.
+	 * 
 	 * @return Address
 	 */
 	protected static native Address getBootHeapEnd();
@@ -1032,24 +1024,20 @@ public final class Unsafe {
 	static native void yieldPoint();
 
 	/**
-	 * Gets the address of the system dependent jump table used for native
-	 * method indirection.
+	 * Gets the address of the system dependent jump table used for native method indirection.
 	 * 
 	 * @return The address of the system dependent jump table.
 	 */
 	public static native Address getJumpTable();
-	
+
 	/**
 	 * Read CPU identification data.
 	 * 
-	 * If id is null, this method will return the length of the id array
-	 * that is required to fit all data.
-	 * If id is not null and long enough, it is filled with all identification
-	 * data.
+	 * If id is null, this method will return the length of the id array that is required to fit all data. If id is not null and long enough, it is filled with all identification data.
 	 * 
-	 * @param id 
+	 * @param id
 	 * @return The required length of id.
 	 */
 	static native int getCPUID(int[] id);
-	
+
 }

@@ -123,7 +123,7 @@ public class X86CompilerHelper extends X86StackManager implements X86CompilerCon
 	public final void invokeJavaMethod(String signature, X86CompilerContext context) {
 		os.writeCALL(Register.EAX, context.getVmMethodNativeCodeField().getOffset());
 		//writeJumpTableCALL(X86JumpTable.VM_INVOKE_OFS);
-		char ch = signature.charAt(signature.length() - 1);
+		final char ch = signature.charAt(signature.length() - 1);
 		if (ch == 'V') {
 			/** No return value */
 		} else if ((ch == 'J') || (ch == 'D')) {
