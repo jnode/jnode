@@ -9,295 +9,192 @@ import java.awt.event.KeyEvent;
 
 /**
  * A KeyboardInterpreter translate scancodes into KeyboardEvent's.
- *
  * @author epr
- * @author Martin Husted Hartvig
  */
-public abstract class KeyboardInterpreter
-{
+public abstract class KeyboardInterpreter {
+	
+	private int flags;
+	
+	private final int[] vkMap;
+	protected final char[] lcharMap;
+	private final char[] ucharMap;
+	private final char[] altGrCharMap;
+	private boolean extendedMode;
+	
+	public final static int XT_RELEASE = 0x80;
+	public final static int XT_EXTENDED = 0xE0;
+	
+	public KeyboardInterpreter() {
+		vkMap = new int[256];
+		lcharMap = new char[256];
+		ucharMap = new char[256];
+		altGrCharMap = new char[256];
+		initVkMap(vkMap, lcharMap, ucharMap, altGrCharMap);
+	}
+	
+	/**
+	 * Interpret a given scancode into a keyevent.
+	 * @param scancode
+	 */
+	public final KeyboardEvent interpretScancode(int scancode) {		
+		final boolean extendedMode = this.extendedMode;
 
-  private int flags;
-
-  protected int lastDeadVK = -1;
-
-  protected final Keys keys;
-  private final UnsupportedKeyException unsupportedKeyException = new UnsupportedKeyException();
-
-  private boolean extendedMode;
-  private int capsLock = 0;
-
-
-  public final static int XT_RELEASE = 0x80;
-  public final static int XT_EXTENDED = 0xE0;
-
-  public KeyboardInterpreter()
-  {
-    keys = new Keys();
-
-    initKeys(keys);
-  }
-
-  /**
-   * Interpret a given scancode into a keyevent.
-   *
-   * @param scancode
-   */
-  public final KeyboardEvent interpretScancode(int scancode)
-  {
-    final boolean extendedMode = this.extendedMode;
-
-    if (scancode == XT_EXTENDED)
-    {
-      this.extendedMode = true;
-      return null;
+		if (scancode == XT_EXTENDED) {
+		    this.extendedMode = true;
+			return null;
+		} else {
+		    this.extendedMode = false;
+		}
+		final boolean released = ((scancode & XT_RELEASE) != 0);
+		final long time = System.currentTimeMillis();		
+		scancode &= 0x7f;
+		
+		final int vk = deriveKeyCode(scancode, extendedMode);
+		// debug output to find new keycodes
+		//VmSystem.getOut().println("[" + (extendedMode ? "E" : "N") + scancode + "," + vk + "] " /*+ KeyEvent.getKeyText(vk)*/);
+		adjustFlags(vk, released);
+		if (vk != 0) {
+			try {
+				final char ch;
+				ch = interpretExtendedScanCode(scancode, vk, released);
+				return new KeyboardEvent(released ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED, time, flags, vk, ch);
+			} catch (UnsupportedKeyException e) {
+				final char ch;
+				if ((flags & InputEvent.SHIFT_DOWN_MASK) != 0) {
+					ch = ucharMap[scancode];
+				} else if((flags & InputEvent.ALT_GRAPH_DOWN_MASK) != 0) {
+					ch = altGrCharMap[scancode];
+				} else {
+					ch = lcharMap[scancode];
+				}
+				return new KeyboardEvent(released ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED, time, flags, vk, ch);
+			}
+			catch (DeadKeyException e) {
+				return null;
+			}
+		} else {
+			return null;
+		}
+	}
+	
+	private void adjustFlags(int vk, boolean released) {
+		final int mask;
+		switch (vk) {
+			case KeyEvent.VK_ALT :
+			    //VmSystem.getOut().println("VK_ALT");
+				mask = InputEvent.ALT_DOWN_MASK;
+				break;
+			case KeyEvent.VK_ALT_GRAPH :
+			    //VmSystem.getOut().println("VK_ALT_GRAPH");
+				mask = InputEvent.ALT_GRAPH_DOWN_MASK;
+				break;
+			case KeyEvent.VK_CONTROL :
+				mask = InputEvent.CTRL_DOWN_MASK;
+				break;
+			case KeyEvent.VK_SHIFT :
+				mask = InputEvent.SHIFT_DOWN_MASK;
+				break;
+			default :
+				mask = 0;
+		}
+		
+		if (mask != 0) {
+			if (released) {
+				this.flags &= ~mask;
+			} else {
+				this.flags |= mask;
+			}
+		}	    
+	}
+	
+	protected int deriveKeyCode(int scancode, boolean extended) {
+		int vk = vkMap[scancode];
+		if (extended) {
+			switch (scancode) {
+				case 82 :
+					vk = KeyEvent.VK_INSERT;
+					break;
+				case 71 :
+					vk = KeyEvent.VK_HOME;
+					break;
+				case 73 :
+					vk = KeyEvent.VK_PAGE_UP;
+					break;
+				case 83 :
+					vk = KeyEvent.VK_DELETE;
+					break;
+				case 79 :
+					vk = KeyEvent.VK_END;
+					break;
+				case 81 :
+					vk = KeyEvent.VK_PAGE_DOWN;
+					break;
+				case 72 :
+					vk = KeyEvent.VK_UP;
+					break;
+				case 75 :
+					vk = KeyEvent.VK_LEFT;
+					break;
+				case 80 :
+					vk = KeyEvent.VK_DOWN;
+					break;
+				case 77 :
+					vk = KeyEvent.VK_RIGHT;
+					break;
+				case 28 :
+					vk = KeyEvent.VK_ENTER;
+					break;
+				case 55 :
+					vk = KeyEvent.VK_PRINTSCREEN;
+					break;
+				case 56 :
+					vk = KeyEvent.VK_ALT_GRAPH;
+					break;
+				case 29 :
+					vk = KeyEvent.VK_CONTROL;
+					break;
+				case 93 :
+					vk = KeyEvent.VK_PROPS;
+					break;
+				case 53 :
+					vk = KeyEvent.VK_DIVIDE;
+					break;
+				default :
+					vk = 0;
+			}
+		}
+		return vk;
+	}
+	
+	/**
+	 * Initialize the mapping between scancode and virtual key code.
+	 */
+	protected abstract void initVkMap(int []vkMap, char[] lcharMap, char[] ucharMap, char[] altGrCharMap);
+	
+	
+	/**
+	 * Method interpretExtendedScanCode this method sould be used to handle the dead keys and other special keys
+	 *
+	 * @param    scancode            an int
+	 * @param    vk                  an int
+	 * @param    released            a  boolean
+	 *
+	 * @return   the char to use or throws an Exception
+	 * @exception   UnsupportedKeyException is thrown if the current key is not handled by this method
+	 * @exception   DeadKeyException is thrown if the current key is a dead key
+	 *
+	 * @author 	Marc DENTY
+	 * @version  2/8/2004
+	 * @since 0.15
+	 */
+	protected abstract char interpretExtendedScanCode(int scancode, int vk, boolean released) throws UnsupportedKeyException, DeadKeyException;
+	
+    /**
+     * @return Returns the flags.
+     */
+    protected final int getFlags() {
+        return this.flags;
     }
-    else
-    {
-      this.extendedMode = false;
-    }
-
-    final boolean released = ((scancode & XT_RELEASE) != 0);
-    final long time = System.currentTimeMillis();
-
-    scancode &= 0x7f;
-
-    int vk = deriveKeyCode(scancode, extendedMode);
-
-    // debug output to find new keycodes
-//    System.out.println("[" + (extendedMode ? "E" : "N") + scancode + "," + vk + "] " /*+ KeyEvent.getKeyText(vk)*/);
-
-    adjustFlags(vk, released);
-
-    // debug output to find new keycodes
-//    System.out.println("[" + (extendedMode ? "E" : "N") + scancode + "," + vk + "] " /*+ KeyEvent.getKeyText(vk)*/);
-
-    try
-    {
-      final char ch;
-      ch = interpretExtendedScanCode(scancode, vk, released);
-      return new KeyboardEvent(released ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED, time, flags, vk, ch);
-    }
-    catch (UnsupportedKeyException e)
-    {
-      final char ch;
-      if ((flags & InputEvent.SHIFT_DOWN_MASK) != 0)
-      {
-        ch = keys.getKey(scancode).getUpperChar();
-        vk = keys.getKey(scancode).getUpperVirtuelKey();
-      }
-      else if ((flags & InputEvent.ALT_GRAPH_DOWN_MASK) != 0)
-      {
-        ch = keys.getKey(scancode).getAltGrChar();
-        vk = keys.getKey(scancode).getAltGrVirtuelKey();
-      }
-      else
-      {
-        ch = keys.getKey(scancode).getLowerChar();
-        vk = keys.getKey(scancode).getLowerVirtuelKey();
-      }
-      return new KeyboardEvent(released ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED, time, flags, vk, ch);
-    }
-    catch (DeadKeyException e)
-    {
-      return null;
-    }
-  }
-
-  private void adjustFlags(int vk, boolean released)
-  {
-    final int mask;
-    switch (vk)
-    {
-      case KeyEvent.VK_ALT:
-        mask = InputEvent.ALT_DOWN_MASK;
-        break;
-      case KeyEvent.VK_ALT_GRAPH:
-        mask = InputEvent.ALT_GRAPH_DOWN_MASK;
-        break;
-      case KeyEvent.VK_CONTROL:
-        mask = InputEvent.CTRL_DOWN_MASK;
-        break;
-      case KeyEvent.VK_SHIFT:
-        mask = InputEvent.SHIFT_DOWN_MASK;
-        break;
-      case KeyEvent.VK_CAPS_LOCK:
-        if (capsLock == 0 || capsLock == 3)
-          mask = InputEvent.SHIFT_DOWN_MASK;
-        else
-          mask = 0;
-
-        capsLock++;
-        capsLock %= 4;
-
-        break;
-      default :
-        mask = 0;
-    }
-
-    if (mask != 0)
-    {
-      if (released)
-      {
-        this.flags &= ~mask;
-      }
-      else
-      {
-        this.flags |= mask;
-      }
-    }
-  }
-
-  protected int deriveKeyCode(int scancode, boolean extended)
-  {
-    int vk = keys.getKey(scancode).getLowerVirtuelKey();
-
-    if (extended)
-    {
-      switch (scancode)
-      {
-        case 82:
-          vk = KeyEvent.VK_INSERT;
-          break;
-        case 71:
-          vk = KeyEvent.VK_HOME;
-          break;
-        case 73:
-          vk = KeyEvent.VK_PAGE_UP;
-          break;
-        case 83:
-          vk = KeyEvent.VK_DELETE;
-          break;
-        case 79:
-          vk = KeyEvent.VK_END;
-          break;
-        case 81:
-          vk = KeyEvent.VK_PAGE_DOWN;
-          break;
-        case 72:
-          vk = KeyEvent.VK_UP;
-          break;
-        case 75:
-          vk = KeyEvent.VK_LEFT;
-          break;
-        case 80:
-          vk = KeyEvent.VK_DOWN;
-          break;
-        case 77:
-          vk = KeyEvent.VK_RIGHT;
-          break;
-        case 28:
-          vk = KeyEvent.VK_ENTER;
-          break;
-        case 55:
-          vk = KeyEvent.VK_PRINTSCREEN;
-          break;
-        case 56:
-          vk = KeyEvent.VK_ALT_GRAPH;
-          break;
-        case 29:
-          vk = KeyEvent.VK_CONTROL;
-          break;
-        case 93:
-          vk = KeyEvent.VK_PROPS;
-          break;
-        case 53:
-          vk = KeyEvent.VK_DIVIDE;
-          break;
-        default :
-          vk = 0;
-      }
-    }
-    return vk;
-  }
-
-
-  /**
-   * Method interpretExtendedScanCode this method sould be used to handle the dead keys and other special keys
-   *
-   * @param scancode an int
-   * @param vk       an int
-   * @param released a  boolean
-   * @return the char to use or throws an Exception
-   * @throws UnsupportedKeyException is thrown if the current key is not handled by this method
-   * @throws DeadKeyException        is thrown if the current key is a dead key
-   * @since 0.15
-   */
-  protected char interpretExtendedScanCode(int scancode, int vk, boolean released) throws UnsupportedKeyException, DeadKeyException
-  {
-    boolean deadKey = false;
-
-    switch (vk)
-    {
-      case KeyEvent.VK_DEAD_ABOVEDOT:
-      case KeyEvent.VK_DEAD_ABOVERING:
-      case KeyEvent.VK_DEAD_ACUTE:
-      case KeyEvent.VK_DEAD_BREVE:
-      case KeyEvent.VK_DEAD_CARON:
-      case KeyEvent.VK_DEAD_CEDILLA:
-      case KeyEvent.VK_DEAD_CIRCUMFLEX:
-      case KeyEvent.VK_DEAD_DIAERESIS:
-      case KeyEvent.VK_DEAD_DOUBLEACUTE:
-      case KeyEvent.VK_DEAD_GRAVE:
-      case KeyEvent.VK_DEAD_IOTA:
-      case KeyEvent.VK_DEAD_MACRON:
-      case KeyEvent.VK_DEAD_OGONEK:
-      case KeyEvent.VK_DEAD_SEMIVOICED_SOUND:
-      case KeyEvent.VK_DEAD_TILDE:
-      case KeyEvent.VK_DEAD_VOICED_SOUND:
-        lastDeadVK = vk;
-        deadKey = true;
-        break;
-    }
-
-    if (deadKey)
-    {
-      throw new DeadKeyException();
-    }
-    else if (lastDeadVK != -1)
-    {
-      try
-      {
-        Key key = keys.getKey(scancode);
-
-        char[] deadChars = key.getDeadKeyChar(lastDeadVK);
-
-        if (flags == InputEvent.SHIFT_DOWN_MASK)
-        {
-          if (deadChars.length > 1)
-          {
-            return deadChars[1];
-          }
-          else
-            throw new UnsupportedKeyException();
-        }
-        else if (deadChars.length > 0)
-          return deadChars[0];
-        else
-          return 0;
-      }
-      finally
-      {
-        if (!released)
-        {
-          lastDeadVK = -1;
-        }
-      }
-    }
-
-    throw unsupportedKeyException;
-  }
-
-  /**
-   * @return Returns the flags.
-   */
-  protected final int getFlags()
-  {
-    return this.flags;
-  }
-
-
-  protected abstract void initKeys(Keys keys);
-
 }
 
 
