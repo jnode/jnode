@@ -3,26 +3,23 @@
  */
 package org.jnode.test.gui;
 
-import javax.swing.JButton;
-import javax.swing.JList;
-import javax.swing.JDesktopPane;
-import javax.swing.JInternalFrame;
-import javax.swing.JFrame;
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Shape;
-import java.awt.Font;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
+
+import javax.swing.JButton;
+import javax.swing.JScrollBar;
 
 //import org.apache.log4j.Logger;
 
@@ -170,6 +167,7 @@ public class AWTTest {
         final Frame wnd = new Frame();
         try {
             wnd.setSize(600, 400);
+            //wnd.setLocation(75, 50);
             final JButton b = new JButton("Hello world");
             b.addActionListener(new ActionListener() {
                 int i =0;
@@ -196,15 +194,29 @@ public class AWTTest {
                 }
             });
             wnd.add(b, BorderLayout.NORTH);
-            wnd.add(new TestComponent(useDoubleBuffer), BorderLayout.CENTER);
+            b.setBackground(Color.YELLOW);
+            wnd.add(new JScrollBar(), BorderLayout.SOUTH);
+            //wnd.add(new TestComponent(useDoubleBuffer), BorderLayout.CENTER);
+            //wnd.add(new TestComponent(useDoubleBuffer), BorderLayout.CENTER);
             b.requestFocus();
             wnd.show();
+            Font f = wnd.getFont();
+            System.out.println(f.getName());
+            wnd.getFontMetrics(f);
+            wnd.setBackground(Color.GREEN);
+
+            Thread.sleep(5000);
 
 
 //            Font f = wnd.getFont();
 //            System.out.println(f.getName());
 //            wnd.getFontMetrics(f);
 
+            for (int i = 0; i < 50; i++) {
+            	wnd.setLocation(wnd.getX() + 5, wnd.getY() + 4);
+                Thread.sleep(100);
+            }
+            
             Thread.sleep(5000);
 
             wnd.hide();
