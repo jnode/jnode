@@ -20,10 +20,27 @@ final class DoubleItem extends Item implements X86CompilerConstants  {
 	 * @param value
 	 */
 	public DoubleItem(int kind,  int offsetToFP, double value) {
-		super(kind, JvmType.DOUBLE, offsetToFP);
+		super(kind, offsetToFP);
 		
 		this.value = value;
 	}
+
+	/**
+	 * Get the JVM type of this item
+	 * @return the JVM type
+	 */
+	int getType() { return JvmType.DOUBLE; }
+	
+    /**
+     * Return the current item's computational type category (JVM Spec, p. 83).
+     * In practice, this is the number of double words needed by the item (1 or
+     * 2)
+     * 
+     * @return computational type category
+     */
+    final int getCategory() {
+        return 2;
+    }
 
 	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#load(EmitterContext)
@@ -42,7 +59,7 @@ final class DoubleItem extends Item implements X86CompilerConstants  {
 //		notImplemented();
 //	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#clone()
 	 */
 	Item clone(EmitterContext ec) {
@@ -163,7 +180,7 @@ final class DoubleItem extends Item implements X86CompilerConstants  {
 		notImplemented();
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
 	 */
 	boolean uses(Register reg) {

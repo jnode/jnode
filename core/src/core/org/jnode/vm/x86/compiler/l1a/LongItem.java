@@ -27,14 +27,38 @@ final class LongItem extends Item  implements X86CompilerConstants {
 	 * @param val
 	 */
 	private LongItem(int kind, int offsetToFP, Register lsb, Register msb, long val) {
-		super(kind, JvmType.LONG, offsetToFP);
+		super(kind, offsetToFP);
 
 		this.lsb = lsb;
 		this.msb = msb;
 		this.value = val;
 	}
 
-	void loadTo(EmitterContext ec, Register lsb, Register msb) {
+
+	/**
+	 * Get the JVM type of this item
+	 * @return the JVM type
+	 */
+	int getType() { return JvmType.LONG; }
+	
+    /**
+     * Return the current item's computational type category (JVM Spec, p. 83).
+     * In practice, this is the number of double words needed by the item (1 or
+     * 2)
+     * 
+     * @return computational type category
+     */
+    final int getCategory() {
+        return 2;
+    }
+
+    /**
+     * ?
+     * @param ec
+     * @param lsb
+     * @param msb
+     */
+	private final void loadTo(EmitterContext ec, Register lsb, Register msb) {
 		AbstractX86Stream os = ec.getStream();
 		X86RegisterPool pool = ec.getPool();
 		os.log("LongItem.log called "+Integer.toString(kind));		
@@ -83,7 +107,7 @@ final class LongItem extends Item  implements X86CompilerConstants {
 					// invariant: (msb == this.lsb) && (lsb == this.msb)
 					// swap registers
 					//TODO: handle allocation failure
-					Register reg = (Register)pool.request(JvmType.INT);
+					Register reg = pool.request(JvmType.INT);
 					os.writeMOV(INTSIZE, reg, this.lsb);
 					os.writeMOV(INTSIZE, this.lsb, this.msb);
 					os.writeMOV(INTSIZE, this.msb, reg);
@@ -124,31 +148,22 @@ final class LongItem extends Item  implements X86CompilerConstants {
 		this.msb = msb;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#load()
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#load(EmitterContext)
 	 */
-	void load(EmitterContext ec) {
+	final void load(EmitterContext ec) {
 		if (kind != Kind.REGISTER) {
 			X86RegisterPool pool = ec.getPool();
 			
-			final Register l = (Register)pool.request(JvmType.INT, this);
-			final Register r = (Register)pool.request(JvmType.INT, this);
+			final Register l = pool.request(JvmType.INT, this);
+			final Register r = pool.request(JvmType.INT, this);
 			myAssert(r != null);
 			myAssert(l != null);
 			loadTo(ec, l, r);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#loadToFPU()
-	 */
-	void loadToFPU(EmitterContext ec) {
-		// TODO Auto-generated method stub
-		notImplemented();
-
-	}
-
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#clone()
 	 */
 	Item clone(EmitterContext ec) {
@@ -182,10 +197,10 @@ final class LongItem extends Item  implements X86CompilerConstants {
 		return res;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#push()
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#push(EmitterContext)
 	 */
-	void push(EmitterContext ec) {
+	final void push(EmitterContext ec) {
 		final AbstractX86Stream os = ec.getStream();
 		os.log("LongItem.push "+Integer.toString(getKind()));	
 		switch (getKind()) {
@@ -237,10 +252,10 @@ final class LongItem extends Item  implements X86CompilerConstants {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#release()
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#release(EmitterContext)
 	 */
-	void release(EmitterContext ec) {
+	final void release(EmitterContext ec) {
 		final X86RegisterPool pool = ec.getPool();
 		
 		switch (getKind()) {
@@ -271,14 +286,14 @@ final class LongItem extends Item  implements X86CompilerConstants {
 	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#spill(EmitterContext, Register)
 	 */
-	void spill(EmitterContext ec, Register reg) {
+	final void spill(EmitterContext ec, Register reg) {
 		notImplemented();
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
 	 */
-	boolean uses(Register reg) {
+	final boolean uses(Register reg) {
 		return ((kind == Kind.REGISTER) && (msb.equals(reg) || lsb.equals(reg)));
 	}
 

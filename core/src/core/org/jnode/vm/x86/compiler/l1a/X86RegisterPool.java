@@ -3,165 +3,296 @@
  */
 package org.jnode.vm.x86.compiler.l1a;
 
-import java.util.Iterator;
-
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
-import org.jnode.util.BootableArrayList;
-import org.jnode.util.BootableHashMap;
 import org.jnode.vm.compiler.ir.Operand;
 
 /**
-* @author Madhu Siddalingaiah
-* @author Patrik Reali
- *
- * Handle the pool of registers
- * Taken from l2 compiler. Should be merged with it in the end, integrating the changes.
+ * @author Madhu Siddalingaiah
+ * @author Patrik Reali
+ * @author Ewout Prangsma
+ * 
+ * Handle the pool of registers Taken from l2 compiler. Should be merged with it
+ * in the end, integrating the changes.
+ * 
+ * TODO: merge with l2's version of X86RegisterPool
  */
+final class X86RegisterPool {
 
-//TODO: merge with l2's version of X86RegisterPool
-//TODO: not all registers are equivalent; try to return EBX and ECX when possible, spare EAX, EDX
+    /** All available registers and their current usage */
+    private final RegisterUsage[] registers;
+    
+    /** Length of registers */
+    private final int regCount;
 
-final class X86RegisterPool extends org.jnode.vm.compiler.ir.RegisterPool {
+    /**
+     * Initialize this instance.
+     */
+    public X86RegisterPool() {
+        this.registers = initialize();
+        this.regCount = registers.length;
+    }
 
-	private BootableArrayList registers;
-	private BootableHashMap allocated;
+    /**
+     * Initialize register pool
+     *  
+     */
+    private final RegisterUsage[] initialize() {
+        // The order of this array determines the cost of using the register.
+        // The cost of a register is lower when its index in this
+        // array is higher.
+        return new RegisterUsage[] {
+                new RegisterUsage(Register.EAX),
+                new RegisterUsage(Register.EDX),
+                new RegisterUsage(Register.EBX),
+                new RegisterUsage(Register.ECX),
+                new RegisterUsage(Register.ESI)
+        };
+        // EDI always points to the statics, do not use
+    }
 
-	public X86RegisterPool() {
-		initialize();
-	}
-	
-	/**
-	 * Initialize register pool
-	 *
-	 */
-	private void initialize() {
-		registers = new BootableArrayList();
-		registers.add(Register.EAX);
-		registers.add(Register.EBX);
-		registers.add(Register.ECX);
-		registers.add(Register.EDX);
-		registers.add(Register.ESI);
-		// EDI always points to the statics, do not use
-		allocated = new BootableHashMap();
-	}
-	
-	/**
-	 * require a register from the pool
-	 * 
-	 * @param type the register type (from Operand)
-	 * @param owner the register owner
-	 * @return the allocated register or null
-	 */
-	public Object request(int type, Object owner) {
-		if (type == Operand.LONG) {
-			return null;
-		}
-		if (type == Operand.FLOAT || type == Operand.DOUBLE) {
-			return null;
-		}
-		if (registers.size() == 0) {
-			return null;
-		} else {
-			Object reg =registers.remove(registers.size() - 1);
-			allocated.put(reg, owner);
-			return reg;
-		}
-	}
-	
+    /**
+     * require a register from the pool
+     * 
+     * @param type
+     *            the register type (from Operand)
+     * @param owner
+     *            the register owner
+     * @return the allocated register or null
+     */
+    public Register request(int type, Object owner) {
+        if (type == Operand.LONG) { return null; }
+        if (type == Operand.FLOAT || type == Operand.DOUBLE) { return null; }
+        
+        for (int i = regCount-1; i >= 0; i--) {
+            final RegisterUsage ru = registers[i];
+            if (ru.request(owner)) {
+                return ru.reg;
+            }
+        }
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.jnode.vm.compiler.ir.RegisterPool#request(int)
-	 */
-	public Object request(int type) {
-		return request(type, null);
-	}
-	
-	/**
-	 * Check whether the given register is free
-	 * 
-	 * @param register
-	 * @return true, when register is free
-	 */
-	public boolean isFree(Object register) {
-		return registers.contains(register);
-	}
-	
-	/**
-	 * Require a particular register
-	 * 
-	 * @param register
-	 * @return false, if the register is already in use
-	 */
-	public boolean request(Object register, Object owner) {
-		boolean free = isFree(register);
-		if (free) {
-			registers.remove(register);
-			allocated.put(register, owner);
-		}
-		return free;
-	}
+    /**
+     * @see org.jnode.vm.compiler.ir.RegisterPool#request(int)
+     */
+    public Register request(int type) {
+        return request(type, null);
+    }
 
-	/**
-	 * Require a particular register
-	 * 
-	 * @param register
-	 * @return false, if the register is already in use
-	 */
-	public boolean request(Object register) {
-		return request(register, null);
-	}
+    /**
+     * Check whether the given register is free
+     * 
+     * @param register
+     * @return true, when register is free
+     */
+    public boolean isFree(Register register) {
+        return get(register).isFree();
+    }
 
-	/**
-	 * return the register's owner
-	 * 
-	 * @param register
-	 * @return the owner (may be null if not set or when register not allocated)
-	 */
-	public Object getOwner(Object register) {
-		return allocated.get(register);
-	}
-	
-	/**
-	 * transfer ownership of a register
-	 * 
-	 * @param register the register to be transferred
-	 * @param newOwner the register's new owner
-	 */
-	public void transferOwnerTo(Object register, Object newOwner) {
-		allocated.put(register, newOwner);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.jnode.vm.compiler.ir.RegisterPool#release(java.lang.Object)
-	 */
-	public void release(Object register) {
-		registers.add(register);
-		allocated.remove(register);
-	}
+    /**
+     * Require a particular register
+     * 
+     * @param register
+     * @return false, if the register is already in use
+     */
+    public boolean request(Register register, Object owner) {
+        final RegisterUsage ru = get(register);
+        final boolean free = ru.isFree();
+        if (free) {
+            ru.request(owner);
+        }
+        return free;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.jnode.vm.compiler.ir.RegisterPool#supports3AddrOps()
-	 */
-	public boolean supports3AddrOps() {
-		return false;
-	}
+    /**
+     * Require a particular register
+     * 
+     * @param register
+     * @return false, if the register is already in use
+     */
+    public boolean request(Register register) {
+        return request(register, null);
+    }
 
-	/**
-	 * Reset the register pool
-	 * 
-	 * @param os stream for issuing warning messages
-	 */
-	public void reset(AbstractX86Stream os) {
-		if (allocated.size() != 0) {
-			// resetting a register pool with items in use
-			Iterator inUse = allocated.keySet().iterator();
-			while (inUse.hasNext()) {
-				os.log("Warning: register in use"+inUse.next().toString());
-			}
-			throw new Error("Register(s) in use");
-		}
-		initialize();
-	}
+    /**
+     * return the register's owner
+     * 
+     * @param register
+     * @return the owner (may be null if not set or when register not allocated)
+     */
+    public Object getOwner(Register register) {
+        return get(register).getOwner();
+    }
 
+    /**
+     * transfer ownership of a register
+     * 
+     * @param register
+     *            the register to be transferred
+     * @param newOwner
+     *            the register's new owner
+     */
+    public void transferOwnerTo(Register register, Object newOwner) {
+        get(register).setOwner(newOwner);
+    }
+
+    /**
+     * @see org.jnode.vm.compiler.ir.RegisterPool#release(java.lang.Object)
+     */
+    public void release(Register register) {
+        get(register).release();
+    }
+
+    /**
+     * Reset the register pool
+     * 
+     * @param os
+     *            stream for issuing warning messages
+     */
+    public void reset(AbstractX86Stream os) {
+        boolean inuse = false;
+        for (int i = regCount-1; i >= 0; i--) {
+            if (!registers[i].isFree()) {
+                os.log("Warning: register in use" + registers[i].reg);                
+                inuse = true;
+            }
+        }
+        if (inuse) {
+            throw new Error("Register(s) in use");
+        }
+    }
+    
+    final void showRequestTrace(Register reg) {
+        RegisterUsage ru = get(reg);
+        if (!ru.isFree()) {
+            ru.getRequestTrace().printStackTrace();
+        }
+    }
+    
+    /**
+     * Gets the register usage for a given register.
+     * @param reg
+     * @return
+     */
+    private RegisterUsage get(Register reg) {
+        for (int i = regCount-1; i >= 0; i--) {
+            final RegisterUsage ru = registers[i];
+            if (ru.reg == reg) {
+                return ru;
+            }
+        }
+        throw new IllegalArgumentException("Unknown register " + reg);
+    }
+    
+    /**
+     * Invoke the visit method on the given visitor for all used registers.
+     * @param visitor
+     */
+    public void visitUsedRegisters(RegisterVisitor visitor) {
+        for (int i = 0; i < regCount; i++ ) {
+            final RegisterUsage ru = registers[i];
+            if (!ru.isFree()) {
+                visitor.visit(ru.reg);
+            }
+        }
+    }
+    
+    public String toString() {
+        final StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < regCount; i++) {
+            buf.append(registers[i].toString());
+            buf.append("\n");
+        }
+        return buf.toString();
+    }
+
+    
+    
+    /**
+     * Register usage information for a single register.
+     * @author Ewout Prangsma (epr@users.sourceforge.net)
+     */
+    private static final class RegisterUsage {
+        final Register reg;
+        private Object owner;
+        private boolean inuse;
+        private Throwable requestTrace;
+        
+        /**
+         * Initialize this instance.
+         * @param reg
+         */
+        public RegisterUsage(Register reg) {
+            this.reg = reg;
+            this.inuse = false;
+        }
+        
+        /**
+         * Register this register for the given owner.
+         * @param owner
+         * @return True if request succeeds, false if this register is already used.
+         */
+        public boolean request(Object owner) {
+            if (this.inuse) {
+                return false;
+            } else {
+                this.owner = owner;
+                this.inuse = true;
+                this.requestTrace = new Exception("Requesttrace of " + reg);
+                //System.out.println("Request of " + reg);
+                return true;
+            }
+        }
+        
+        /**
+         * Release the given owner from this register.
+         */
+        public void release() {
+            //System.out.println("Release of " + reg);
+            this.owner = null;
+            this.inuse = false;
+        }
+        
+        /**
+         * Is this register currently not used.
+         * @return
+         */
+        public boolean isFree() {
+            return (!this.inuse);
+        }
+        
+        /**
+         * Gets the current owner of this register.
+         * @return
+         */
+        public Object getOwner() {
+            return owner;
+        }
+        
+        /**
+         * Sets the current owner of this register.
+         */
+        public void setOwner(Object owner) {
+            if (!this.inuse) {
+                throw new IllegalStateException("Must be inuse");
+            }
+            this.owner = owner;
+        }
+        
+        public Throwable getRequestTrace() {
+            return requestTrace;
+        }
+        
+        public String toString() {
+            if (inuse) {
+                //StringWriter buf = new StringWriter();
+                //requestTrace.printStackTrace(new PrintWriter(buf));
+                //return reg + " used by " + owner + buf.toString();
+                return reg + " used by " + owner;
+            } else {
+                return reg + " free";
+            }
+        }
+    }
 }
