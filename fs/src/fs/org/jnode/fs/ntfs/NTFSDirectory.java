@@ -94,8 +94,7 @@ public class NTFSDirectory implements FSDirectory {
 	 * @see org.jnode.fs.FSObject#isValid()
 	 */
 	public boolean isValid() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	/* (non-Javadoc)

@@ -24,8 +24,14 @@ public class NTFSVolume
 	
 	private byte currentNameSpace = LONG_FILE_NAMES;
 	
-	private NTFSBootRecord bootRecord = null;
 	private BlockDeviceAPI api = null;
+	
+	// local chache for faster access 
+	private int clusterSize = -1;
+	private NTFSBootRecord bootRecord = null;
+	NTFSFileRecord  mftFileRecord = null;
+	NTFSFileRecord  rootDirectory = null;
+	
 	/**
 	 * 
 	 */
@@ -80,7 +86,9 @@ public class NTFSVolume
 	
 	public int getClusterSize()
 	{
-		return this.getBootRecord().getSectorPerCluster() * this.getBootRecord().getBytesPerSector();
+		if(clusterSize < 0 )
+			clusterSize =  this.getBootRecord().getSectorPerCluster() * this.getBootRecord().getBytesPerSector();
+		return clusterSize;
 	}
 	public void setBootRecord(NTFSBootRecord bootRecord)
 	{
@@ -91,24 +99,29 @@ public class NTFSVolume
 	 */
 	public NTFSFileRecord getMFTRecord() throws IOException
 	{
-		if(this.getBootRecord().getBytesPerFileRecord() < this.getClusterSize())
-		{
-			return new NTFSFileRecord(
-					this,
-					this.readDataFromCluster(
-							this.getBootRecord().getMFTPointer(),
-							this.getBootRecord().getBytesPerFileRecord(),
-							0
-					));
-					
+		if(mftFileRecord == null)
+		{	
+			if(this.getBootRecord().getBytesPerFileRecord() < this.getClusterSize())
+			{
+				mftFileRecord = new NTFSFileRecord(
+						this,
+						this.readDataFromCluster(
+								this.getBootRecord().getMFTPointer(),
+								this.getBootRecord().getBytesPerFileRecord(),
+								0
+						));
+						
+			}
+			else
+				mftFileRecord = new NTFSFileRecord(
+							this,
+							this.readClusters(
+									this.getBootRecord().getMFTPointer(),
+									this.getBootRecord().getBytesPerFileRecord() / this.getClusterSize()
+							)
+			);
 		}
-		return new NTFSFileRecord(
-					this,
-					this.readClusters(
-							this.getBootRecord().getMFTPointer(),
-							this.getBootRecord().getBytesPerFileRecord() / this.getClusterSize()
-					)
-		);
+		return mftFileRecord;
 		
 	}
 	
@@ -139,67 +152,65 @@ public class NTFSVolume
 	}
 	public NTFSFileRecord getRootDirectory() throws IOException
 	{
-		// first find the filerecord for root 
-		NTFSNonResidentAttribute dataAttribute = ((NTFSNonResidentAttribute)getMFTRecord().getAttribute(NTFSFileRecord.$DATA));
-		
-		int bytesPerFileRecord = this.getBootRecord().getBytesPerFileRecord();
-		int clusterSize = this.getClusterSize();
-		
-		int howmanyToRead = 1;
-		
-		if( bytesPerFileRecord > clusterSize)
-		{
-			howmanyToRead = bytesPerFileRecord / clusterSize; 
-		}
-		
-		int vcn = 0;
-		
-		byte[] data = dataAttribute.readVCN(
-					vcn,
-					howmanyToRead
-			);	
-
-		int offset = 0;
-		
-		while(true)
-		{
+		if(rootDirectory == null)
+		{	
+			// first find the filerecord for root 
+			NTFSNonResidentAttribute dataAttribute = ((NTFSNonResidentAttribute)getMFTRecord().getAttribute(NTFSFileRecord.$DATA));
 			
-			NTFSFileRecord record = new NTFSFileRecord(
-					this,
-					NTFSUTIL.extractSubBuffer(
-						data,
-						offset,
-						bytesPerFileRecord
-					)
+			int howmanyToRead = 1;
+			
+			if( this.getBootRecord().getBytesPerFileRecord() > getClusterSize())
+			{
+				howmanyToRead = this.getBootRecord().getBytesPerFileRecord() / getClusterSize(); 
+			}
+			int vcn = 0;
+			
+			byte[] data = dataAttribute.readVCN(
+						vcn,
+						howmanyToRead
 				);
 			
-			if(record.isDirectory() && record.getFileName().equals("."))
-			{
-				return record;
-			}
+			int offset = 0;
 			
-			if(bytesPerFileRecord < clusterSize)
-			{	
-				offset += bytesPerFileRecord;
-				if(offset == clusterSize)
+			while(true)
+			{
+				NTFSFileRecord record = new NTFSFileRecord(
+						this,
+						NTFSUTIL.extractSubBuffer(
+							data,
+							offset,
+							this.getBootRecord().getBytesPerFileRecord()
+						)
+					);
+				if(record.isDirectory() && record.getFileName().equals("."))
+				{
+					rootDirectory = record;
+					break;
+				}
+				if(this.getBootRecord().getBytesPerFileRecord() < getClusterSize())
+				{	
+					offset += this.getBootRecord().getBytesPerFileRecord();
+					if(offset == getClusterSize())
+					{
+						vcn += howmanyToRead;
+						data = dataAttribute.readVCN(
+								vcn,
+								howmanyToRead
+						);
+						offset=0;
+					}
+				}
+				else
 				{
 					vcn += howmanyToRead;
 					data = dataAttribute.readVCN(
 							vcn,
 							howmanyToRead
 					);
-					offset=0;
 				}
 			}
-			else
-			{
-				vcn += howmanyToRead;
-				data = dataAttribute.readVCN(
-						vcn,
-						howmanyToRead
-				);
-			}
 		}
+		return rootDirectory;
 	}
 	/**
 	 * @return Returns the currentNameSpace.

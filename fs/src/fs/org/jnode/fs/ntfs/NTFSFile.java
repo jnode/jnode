@@ -45,8 +45,7 @@ public class NTFSFile implements FSFile {
 	 * @see org.jnode.fs.FSFile#read(long, byte[], int, int)
 	 */
 	public void read(long fileOffset, byte[] dest, int off, int len) throws IOException {
-		// TODO Auto-generated method stub
-
+		fileRecord.readData(fileOffset,dest,off,len);
 	}
 
 	/* (non-Javadoc)
@@ -61,8 +60,7 @@ public class NTFSFile implements FSFile {
 	 * @see org.jnode.fs.FSObject#isValid()
 	 */
 	public boolean isValid() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	/* (non-Javadoc)
