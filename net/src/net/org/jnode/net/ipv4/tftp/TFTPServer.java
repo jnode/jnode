@@ -44,6 +44,7 @@ public class TFTPServer extends TFTP {
 		try {
 			server.run();
 		} catch(SocketException ex) {
+			Logger.getLogger(TFTPServer.class).fatal("Socket exception", ex);
 		}
 	}
 
@@ -71,7 +72,7 @@ public class TFTPServer extends TFTP {
 	}
 
 	private void processRequest(TFTPPacket packet) throws IOException {
-		log.debug(packet.getAddress()+":"+packet.getPort()+" "+packet.toString());
+		log.debug("Received packet: "+packet.getAddress()+":"+packet.getPort()+" "+packet.toString());
 		final int type = packet.getType();
 		switch(type) {
 			case TFTPPacket.WRITE_REQUEST:
