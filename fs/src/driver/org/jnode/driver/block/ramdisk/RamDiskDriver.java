@@ -3,8 +3,6 @@
  */
 package org.jnode.driver.block.ramdisk;
 
-import java.io.IOException;
-
 import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
@@ -23,11 +21,12 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 
 	/**
 	 * Start the device
+	 * 
 	 * @throws DriverException
 	 */
 	protected void startDevice() throws DriverException {
 		try {
-			this.device = (RamDiskDevice) getDevice();
+			this.device = (RamDiskDevice)getDevice();
 			this.device.getManager().rename(device, "ramdisk", true);
 			if (this.data == null) {
 				this.data = new byte[device.getSize()];
@@ -40,11 +39,11 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 
 	/**
 	 * Stop the device
+	 * 
 	 * @throws DriverException
 	 */
-	protected void stopDevice() throws DriverException {
+	protected void stopDevice() {
 		this.device.unregisterAPI(FSBlockDeviceAPI.class);
-		//this.data = null;
 		this.device = null;
 	}
 
@@ -68,7 +67,7 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 	 * @see org.jnode.driver.block.BlockDeviceAPI#flush()
 	 * @throws IOException
 	 */
-	public void flush() throws IOException {
+	public void flush() {
 		// Do nothing
 	}
 
@@ -77,7 +76,7 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 	 * @return The length
 	 * @throws IOException
 	 */
-	public long getLength() throws IOException {
+	public long getLength() {
 		return data.length;
 	}
 
@@ -89,8 +88,8 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 	 * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
 	 * @throws IOException
 	 */
-	public void read(long devOffset, byte[] dest, int destOffset, int length) throws IOException {
-		System.arraycopy(this.data, (int) devOffset, dest, destOffset, length);
+	public void read(long devOffset, byte[] dest, int destOffset, int length) {
+		System.arraycopy(this.data, (int)devOffset, dest, destOffset, length);
 	}
 
 	/**
@@ -101,7 +100,7 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
 	 * @throws IOException
 	 */
-	public void write(long devOffset, byte[] src, int srcOffset, int length) throws IOException {
-        System.arraycopy(src, srcOffset, this.data, (int) devOffset, length);
+	public void write(long devOffset, byte[] src, int srcOffset, int length) {
+		System.arraycopy(src, srcOffset, this.data, (int)devOffset, length);
 	}
 }

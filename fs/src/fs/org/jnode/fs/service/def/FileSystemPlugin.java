@@ -30,10 +30,10 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
 	private final VMFileSystemAPI api;
 	/** The mounter */
 	private FileSystemMounter mounter;
-	
+
 	/**
 	 * Create a new instance
-	 *
+	 *  
 	 */
 	public FileSystemPlugin(PluginDescriptor descriptor) {
 		super(descriptor);
@@ -44,15 +44,16 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
 	}
 
 	/**
-	 * Gets all registered file system types.
-	 * All instances of the returned collection are instanceof FileSystemType.
+	 * Gets all registered file system types. All instances of the returned
+	 * collection are instanceof FileSystemType.
 	 */
 	public Collection fileSystemTypes() {
 		return tm.fileSystemTypes();
 	}
-	
+
 	/**
 	 * Register a mounted filesystem
+	 * 
 	 * @param fs
 	 */
 	public void registerFileSystem(FileSystem fs) {
@@ -61,14 +62,16 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
 
 	/**
 	 * Unregister a mounted filesystem
+	 * 
 	 * @param fs
 	 */
 	public void unregisterFileSystem(FileSystem fs) {
 		fsm.unregisterFileSystem(fs);
 	}
-	
+
 	/**
 	 * Gets the filesystem registered on the given device.
+	 * 
 	 * @param device
 	 * @return null if no filesystem was found.
 	 */
@@ -77,21 +80,20 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
 	}
 
 	/**
-	 * Gets all registered filesystems.
-	 * All instances of the returned collection are instanceof FileSystem.
+	 * Gets all registered filesystems. All instances of the returned collection
+	 * are instanceof FileSystem.
 	 */
 	public Collection fileSystems() {
 		return fsm.fileSystems();
 	}
-	
-	
+
 	/**
 	 * Gets the filesystem API.
 	 */
 	public VMFileSystemAPI getApi() {
 		return api;
 	}
-	
+
 	/**
 	 * Start this plugin
 	 */
@@ -109,7 +111,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
 	/**
 	 * Stop this plugin
 	 */
-	protected void stopPlugin() throws PluginException {
+	protected void stopPlugin() {
 		mounter.stop();
 		InitialNaming.unbind(NAME);
 		VMIOUtils.resetAPI(this);

@@ -24,14 +24,14 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginException;
 
 /**
- * A FileSystemMounter listens to the DeviceManager and once a Device
- * that implements the BlockDeviceAPI is started, it tries to mount
- * a FileSystem on that device.
+ * A FileSystemMounter listens to the DeviceManager and once a Device that
+ * implements the BlockDeviceAPI is started, it tries to mount a FileSystem on
+ * that device.
  * 
  * @author epr
  */
 public class FileSystemMounter implements DeviceListener {
-	
+
 	/** My logger */
 	private final Logger log = Logger.getLogger(getClass());
 	/** The DeviceManager i'm listening to */
@@ -40,13 +40,13 @@ public class FileSystemMounter implements DeviceListener {
 	private FileSystemService fss;
 	/** Mapping between a device and a mounted FileSystem */
 	private final HashMap devices2FS = new HashMap();
-	
+
 	/**
 	 * Start the FS mounter.
+	 * 
 	 * @throws ServiceException
 	 */
-	public void start()
-	throws PluginException {
+	public void start() throws PluginException {
 		try {
 			devMan = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);
 			devMan.addListener(this);
@@ -54,18 +54,18 @@ public class FileSystemMounter implements DeviceListener {
 		} catch (NameNotFoundException ex) {
 			throw new PluginException("Cannot find DeviceManager", ex);
 		}
-		
+
 	}
 
 	/**
 	 * Stop the FS mounter.
+	 * 
 	 * @throws ServiceException
-	 */	
-	public void stop() 
-	throws PluginException {
+	 */
+	public void stop() {
 		devMan.removeListener(this);
 	}
-	
+
 	/**
 	 * @see org.jnode.driver.DeviceListener#deviceStarted(org.jnode.driver.Device)
 	 */
@@ -75,7 +75,7 @@ public class FileSystemMounter implements DeviceListener {
 			if (device.implementsAPI(RemovableDeviceAPI.class)) {
 				tryToMount(device, api, true);
 			} else {
-				tryToMount(device, api, false);				
+				tryToMount(device, api, false);
 			}
 		} catch (ApiNotFoundException ex) {
 			// Just ignore this device.
@@ -96,9 +96,10 @@ public class FileSystemMounter implements DeviceListener {
 			devices2FS.remove(device);
 		}
 	}
-	
+
 	/**
 	 * Try to mount a filesystem on the given device.
+	 * 
 	 * @param device
 	 * @param api
 	 */
@@ -107,15 +108,15 @@ public class FileSystemMounter implements DeviceListener {
 
 		//if (removable) {
 		//	log.error("Not mounting removable devices yet...");
-			// TODO Implement mounting of removable devices
+		// TODO Implement mounting of removable devices
 		//	return;
 		//}
-		
+
 		// Read the first sector
 		try {
 			final byte[] bs = new byte[api.getSectorSize()];
 			api.read(0, bs, 0, bs.length);
-			for (Iterator i = fss.fileSystemTypes().iterator(); i.hasNext(); ) {
+			for (Iterator i = fss.fileSystemTypes().iterator(); i.hasNext();) {
 				final FileSystemType fst = (FileSystemType)i.next();
 				// 
 				if (fst.supports(api.getPartitionTableEntry(), bs)) {

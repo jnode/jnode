@@ -18,8 +18,7 @@ public class MappedBlockDeviceSupport extends Device implements BlockDeviceAPI {
 	private final long offset;
 	private final long length;
 
-	public MappedBlockDeviceSupport(Device parent, long offset, long length) 
-	throws IOException {
+	public MappedBlockDeviceSupport(Device parent, long offset, long length) throws IOException {
 		super(parent.getBus(), "mapped-" + parent.getId());
 		this.parent = parent;
 		try {
@@ -46,7 +45,7 @@ public class MappedBlockDeviceSupport extends Device implements BlockDeviceAPI {
 	 * @return The length
 	 * @throws IOException
 	 */
-	public long getLength() throws IOException {
+	public long getLength() {
 		return length;
 	}
 
@@ -58,8 +57,7 @@ public class MappedBlockDeviceSupport extends Device implements BlockDeviceAPI {
 	 * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
 	 * @throws IOException
 	 */
-	public void read(long devOffset, byte[] dest, int destOffset, int length)
-	throws IOException {
+	public void read(long devOffset, byte[] dest, int destOffset, int length) throws IOException {
 		if (devOffset < 0) {
 			throw new IOException("Out of mapping: offset < 0");
 		}
@@ -80,8 +78,7 @@ public class MappedBlockDeviceSupport extends Device implements BlockDeviceAPI {
 	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
 	 * @throws IOException
 	 */
-	public void write(long devOffset, byte[] src, int srcOffset, int length)
-	throws IOException {
+	public void write(long devOffset, byte[] src, int srcOffset, int length) throws IOException {
 		if (devOffset < 0) {
 			throw new IOException("Out of mapping: offset < 0");
 		}

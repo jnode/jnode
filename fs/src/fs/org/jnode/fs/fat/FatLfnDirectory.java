@@ -75,7 +75,7 @@ public class FatLfnDirectory extends FatDirectory {
 		return entry;
 	}
 
-	public FSEntry getEntry(String name) throws IOException {
+	public FSEntry getEntry(String name) {
 		//System.out.println("Search : " + name);
 		name = name.trim();
 		FSEntry entry;
@@ -88,7 +88,7 @@ public class FatLfnDirectory extends FatDirectory {
 
 	}
 
-	protected synchronized void read(byte[] src) throws IOException {
+	protected synchronized void read(byte[] src) {
 		super.read(src);
 		readLFN();
 	}
