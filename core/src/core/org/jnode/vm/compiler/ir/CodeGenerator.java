@@ -81,11 +81,6 @@ public abstract class CodeGenerator {
 
 	/**
 	 * @param quad
-	 */
-	public abstract void generateCodeFor(BinaryQuad quad);
-
-	/**
-	 * @param quad
 	 * @param lhsReg
 	 * @param operation
 	 * @param con
@@ -137,4 +132,166 @@ public abstract class CodeGenerator {
 	 */
 	public abstract void generateCodeFor(UnaryQuad quad, int lhsDisp,
 		int operation, Constant con);
+
+	/**
+	 * @param reg1
+	 * @param c2
+	 * @param operation
+	 * @param c3
+	 */
+	public abstract void generateBinaryOP(Object reg1, Constant c2,
+		int operation, Constant c3);
+
+	/**
+	 * @param reg1
+	 * @param c2
+	 * @param operation
+	 * @param reg3
+	 */
+	public abstract void generateBinaryOP(Object reg1, Constant c2,
+		int operation, Object reg3);
+
+	/**
+	 * @param reg1
+	 * @param c2
+	 * @param operation
+	 * @param disp3
+	 */
+	public abstract void generateBinaryOP(Object reg1, Constant c2,
+		int operation, int disp3);
+
+	/**
+	 * @param reg1
+	 * @param reg2
+	 * @param operation
+	 * @param c3
+	 */
+	public abstract void generateBinaryOP(Object reg1, Object reg2,
+		int operation, Constant c3);
+
+	/**
+	 * @param reg1
+	 * @param reg2
+	 * @param operation
+	 * @param reg3
+	 */
+	public abstract void generateBinaryOP(Object reg1, Object reg2,
+		int operation, Object reg3);
+
+	/**
+	 * @param reg1
+	 * @param reg2
+	 * @param operation
+	 * @param disp3
+	 */
+	public abstract void generateBinaryOP(Object reg1, Object reg2,
+		int operation, int disp3);
+
+	/**
+	 * @param reg1
+	 * @param disp2
+	 * @param operation
+	 * @param c3
+	 */
+	public abstract void generateBinaryOP(Object reg1, int disp2,
+		int operation, Constant c3);
+
+	/**
+	 * @param reg1
+	 * @param disp2
+	 * @param operation
+	 * @param reg3
+	 */
+	public abstract void generateBinaryOP(Object reg1, int disp2,
+		int operation, Object reg3);
+
+	/**
+	 * @param reg1
+	 * @param disp2
+	 * @param operation
+	 * @param disp3
+	 */
+	public abstract void generateBinaryOP(Object reg1, int disp2,
+		int operation, int disp3);
+
+	/**
+	 * @param disp1
+	 * @param c2
+	 * @param operation
+	 * @param c3
+	 */
+	public abstract void generateBinaryOP(int disp1, Constant c2,
+		int operation, Constant c3);
+
+	/**
+	 * @param disp1
+	 * @param c2
+	 * @param operation
+	 * @param reg3
+	 */
+	public abstract void generateBinaryOP(int disp1, Constant c2,
+		int operation, Object reg3);
+
+	/**
+	 * @param disp1
+	 * @param c2
+	 * @param operation
+	 * @param disp3
+	 */
+	public abstract void generateBinaryOP(int disp1, Constant c2,
+		int operation, int disp3);
+
+	/**
+	 * @param disp1
+	 * @param reg2
+	 * @param operation
+	 * @param c3
+	 */
+	public abstract void generateBinaryOP(int disp1, Object reg2,
+		int operation, Constant c3);
+
+	/**
+	 * @param disp1
+	 * @param reg2
+	 * @param operation
+	 * @param reg3
+	 */
+	public abstract void generateBinaryOP(int disp1, Object reg2,
+		int operation, Object reg3);
+
+	/**
+	 * @param disp1
+	 * @param reg2
+	 * @param operation
+	 * @param disp3
+	 */
+	public abstract void generateBinaryOP(int disp1, Object reg2,
+		int operation, int disp3);
+
+	/**
+	 * @param disp1
+	 * @param disp2
+	 * @param operation
+	 * @param c3
+	 */
+	public abstract void generateBinaryOP(int disp1, int disp2,
+		int operation, Constant c3);
+
+	/**
+	 * @param disp1
+	 * @param disp2
+	 * @param operation
+	 * @param reg3
+	 */
+	public abstract void generateBinaryOP(int disp1, int disp2,
+		int operation, Object reg3);
+
+	/**
+	 * @param disp1
+	 * @param disp2
+	 * @param operation
+	 * @param disp3
+	 */
+	public abstract void generateBinaryOP(int disp1, int disp2,
+		int operation, int disp3);
 }

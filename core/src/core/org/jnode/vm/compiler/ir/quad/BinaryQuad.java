@@ -10,6 +10,8 @@ import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.Constant;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
 import org.jnode.vm.compiler.ir.Operand;
+import org.jnode.vm.compiler.ir.RegisterLocation;
+import org.jnode.vm.compiler.ir.StackLocation;
 import org.jnode.vm.compiler.ir.Variable;
 
 /**
@@ -62,6 +64,25 @@ public class BinaryQuad extends AssignQuad {
 	public static final int LOR = 30;
 	public static final int IXOR = 31;
 	public static final int LXOR = 32;
+
+	private static final int MODE_RCC = (Operand.MODE_REGISTER << 16) | (Operand.MODE_CONSTANT << 8) | Operand.MODE_CONSTANT;
+	private static final int MODE_RCR = (Operand.MODE_REGISTER << 16) | (Operand.MODE_CONSTANT << 8) | Operand.MODE_REGISTER;
+	private static final int MODE_RCS = (Operand.MODE_REGISTER << 16) | (Operand.MODE_CONSTANT << 8) | Operand.MODE_STACK;
+	private static final int MODE_RRC = (Operand.MODE_REGISTER << 16) | (Operand.MODE_REGISTER << 8) | Operand.MODE_CONSTANT;
+	private static final int MODE_RRR = (Operand.MODE_REGISTER << 16) | (Operand.MODE_REGISTER << 8) | Operand.MODE_REGISTER;
+	private static final int MODE_RRS = (Operand.MODE_REGISTER << 16) | (Operand.MODE_REGISTER << 8) | Operand.MODE_STACK;
+	private static final int MODE_RSC = (Operand.MODE_REGISTER << 16) | (Operand.MODE_STACK << 8) | Operand.MODE_CONSTANT;
+	private static final int MODE_RSR = (Operand.MODE_REGISTER << 16) | (Operand.MODE_STACK << 8) | Operand.MODE_REGISTER;
+	private static final int MODE_RSS = (Operand.MODE_REGISTER << 16) | (Operand.MODE_STACK << 8) | Operand.MODE_STACK;
+	private static final int MODE_SCC = (Operand.MODE_STACK << 16) | (Operand.MODE_CONSTANT << 8) | Operand.MODE_CONSTANT;
+	private static final int MODE_SCR = (Operand.MODE_STACK << 16) | (Operand.MODE_CONSTANT << 8) | Operand.MODE_REGISTER;
+	private static final int MODE_SCS = (Operand.MODE_STACK << 16) | (Operand.MODE_CONSTANT << 8) | Operand.MODE_STACK;
+	private static final int MODE_SRC = (Operand.MODE_STACK << 16) | (Operand.MODE_REGISTER << 8) | Operand.MODE_CONSTANT;
+	private static final int MODE_SRR = (Operand.MODE_STACK << 16) | (Operand.MODE_REGISTER << 8) | Operand.MODE_REGISTER;
+	private static final int MODE_SRS = (Operand.MODE_STACK << 16) | (Operand.MODE_REGISTER << 8) | Operand.MODE_STACK;
+	private static final int MODE_SSC = (Operand.MODE_STACK << 16) | (Operand.MODE_STACK << 8) | Operand.MODE_CONSTANT;
+	private static final int MODE_SSR = (Operand.MODE_STACK << 16) | (Operand.MODE_STACK << 8) | Operand.MODE_REGISTER;
+	private static final int MODE_SSS = (Operand.MODE_STACK << 16) | (Operand.MODE_STACK << 8) | Operand.MODE_STACK;
 
 	private Operand operand1, operand2;
 	private int operation;
@@ -170,7 +191,7 @@ public class BinaryQuad extends AssignQuad {
 						this.getLHS().getIndex(), c1.iDiv(c2));
 
 				default:
-					throw new IllegalArgumentException("Don't know how to fold those...");
+					throw new IllegalArgumentException("Don't know how to fold those yet...");
 			}
 		}
 		return this;
@@ -211,7 +232,139 @@ public class BinaryQuad extends AssignQuad {
 	 * @see org.jnode.vm.compiler.ir.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
 	 */
 	public void generateCode(CodeGenerator cg) {
-		cg.generateCodeFor(this);
+		Variable lhs = getLHS();
+		int lhsMode = lhs.getAddressingMode();
+		int op1Mode = operand1.getAddressingMode();
+		int op2Mode = operand2.getAddressingMode();
+		
+		Object reg1 = null;
+		if (lhsMode == Operand.MODE_REGISTER) {
+			RegisterLocation regLoc = (RegisterLocation) lhs.getLocation();
+			reg1 = regLoc.getRegister();
+		}
+		Object reg2 = null;
+		if (op1Mode == Operand.MODE_REGISTER) {
+			Variable var = (Variable) operand1;
+			RegisterLocation regLoc = (RegisterLocation) var.getLocation();
+			reg2 = regLoc.getRegister();
+		}
+		Object reg3 = null;
+		if (op2Mode == Operand.MODE_REGISTER) {
+			Variable var = (Variable) operand2;
+			RegisterLocation regLoc = (RegisterLocation) var.getLocation();
+			reg3 = regLoc.getRegister();
+		}
+
+		int disp1 = 0;
+		if (lhsMode == Operand.MODE_STACK) {
+			StackLocation stackLoc = (StackLocation) lhs.getLocation();
+			disp1 = stackLoc.getDisplacement();
+		}
+		int disp2 = 0;
+		if (op1Mode == Operand.MODE_STACK) {
+			Variable var = (Variable) operand1;
+			StackLocation stackLoc = (StackLocation) var.getLocation();
+			disp2 = stackLoc.getDisplacement();
+		}
+		int disp3 = 0;
+		if (op2Mode == Operand.MODE_STACK) {
+			Variable var = (Variable) operand2;
+			StackLocation stackLoc = (StackLocation) var.getLocation();
+			disp3 = stackLoc.getDisplacement();
+		}
+
+		Constant c2 = null;
+		if (op1Mode == Operand.MODE_CONSTANT) {
+			c2 = (Constant) operand1;
+		}
+		Constant c3 = null;
+		if (op2Mode == Operand.MODE_CONSTANT) {
+			c3 = (Constant) operand2;
+		}
+
+		int aMode = (lhsMode << 16) | (op1Mode << 8) | op2Mode;
+		switch (aMode) {
+			case MODE_RCC:
+				cg.generateBinaryOP(reg1, c2, operation, c3);
+				break;
+			case MODE_RCR:
+				if (reg1 == reg3 && commutative && !cg.supports3AddrOps()) {
+					cg.generateBinaryOP(reg1, reg3, operation, c2);
+				} else {
+					cg.generateBinaryOP(reg1, c2, operation, reg3);
+				}
+				break;
+			case MODE_RCS:
+				cg.generateBinaryOP(reg1, c2, operation, disp3);
+				break;
+			case MODE_RRC:
+				cg.generateBinaryOP(reg1, reg2, operation, c3);
+				break;
+			case MODE_RRR:
+				if (reg1 == reg3 && commutative && !cg.supports3AddrOps()) {
+					cg.generateBinaryOP(reg1, reg3, operation, reg2);
+				} else {
+					cg.generateBinaryOP(reg1, reg2, operation, reg3);
+				}
+				break;
+			case MODE_RRS:
+				cg.generateBinaryOP(reg1, reg2, operation, disp3);
+				break;
+			case MODE_RSC:
+				cg.generateBinaryOP(reg1, disp2, operation, c3);
+				break;
+			case MODE_RSR:
+				if (reg1 == reg3 && commutative && !cg.supports3AddrOps()) {
+					cg.generateBinaryOP(reg1, reg3, operation, disp2);
+				} else {
+					cg.generateBinaryOP(reg1, disp2, operation, reg3);
+				}
+				break;
+			case MODE_RSS:
+				cg.generateBinaryOP(reg1, disp2, operation, disp3);
+				break;
+			case MODE_SCC:
+				cg.generateBinaryOP(disp1, c2, operation, c3);
+				break;
+			case MODE_SCR:
+				cg.generateBinaryOP(disp1, c2, operation, reg3);
+				break;
+			case MODE_SCS:
+				if (disp1 == disp3 && commutative && !cg.supports3AddrOps()) {
+					cg.generateBinaryOP(disp1, disp3, operation, c2);
+				} else {
+					cg.generateBinaryOP(disp1, c2, operation, disp3);
+				}
+				break;
+			case MODE_SRC:
+				cg.generateBinaryOP(disp1, reg2, operation, c3);
+				break;
+			case MODE_SRR:
+				cg.generateBinaryOP(disp1, reg2, operation, reg3);
+				break;
+			case MODE_SRS:
+				if (disp1 == disp3 && commutative && !cg.supports3AddrOps()) {
+					cg.generateBinaryOP(disp1, disp3, operation, reg2);
+				} else {
+					cg.generateBinaryOP(disp1, reg2, operation, disp3);
+				}
+				break;
+			case MODE_SSC:
+				cg.generateBinaryOP(disp1, disp2, operation, c3);
+				break;
+			case MODE_SSR:
+				cg.generateBinaryOP(disp1, disp2, operation, reg3);
+				break;
+			case MODE_SSS:
+				if (disp1 == disp3 && commutative && !cg.supports3AddrOps()) {
+					cg.generateBinaryOP(disp1, disp3, operation, disp2);
+				} else {
+					cg.generateBinaryOP(disp1, disp2, operation, disp3);
+				}
+				break;
+			default:
+				throw new IllegalArgumentException("Undefined addressing mode: " + aMode);
+		}
 	}
 
 	/* (non-Javadoc)

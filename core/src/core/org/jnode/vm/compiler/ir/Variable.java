@@ -141,4 +141,17 @@ public abstract class Variable extends Operand implements Cloneable {
 	public void setLocation(Location loc) {
 		this.location = loc;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.Operand#getAddressingMode()
+	 */
+	public int getAddressingMode() {
+		if (location instanceof StackLocation) {
+			return Operand.MODE_STACK;
+		} else if (location instanceof RegisterLocation) {
+			return Operand.MODE_REGISTER;
+		} else {
+			throw new IllegalArgumentException("Undefined location");
+		}
+	}
 }
