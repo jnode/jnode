@@ -1,1 +1,8 @@
 build 
+bak
+build
+docs
+lib
+.classpath
+.project
+src.jpx
