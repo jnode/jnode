@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<psf version="2.0">
+	<provider id="org.eclipse.team.cvs.core.cvsnature">
+		<project reference="1.0,:ext:cvs.sourceforge.net:/cvsroot/jnode,jnode/core,JNode-Core"/>
+		<project reference="1.0,:ext:cvs.sourceforge.net:/cvsroot/jnode,jnode/all,JNode-All"/>
+		<project reference="1.0,:ext:cvs.sourceforge.net:/cvsroot/jnode,jnode/builder,JNode-Builder"/>
+		<project reference="1.0,:ext:cvs.sourceforge.net:/cvsroot/jnode,jnode/distr,JNode-Distr"/>
+		<project reference="1.0,:ext:cvs.sourceforge.net:/cvsroot/jnode,jnode/docs,JNode-Docs"/>
+		<project reference="1.0,:ext:cvs.sourceforge.net:/cvsroot/jnode,jnode/fs,JNode-FS"/>
+		<project reference="1.0,:ext:cvs.sourceforge.net:/cvsroot/jnode,jnode/gui,JNode-GUI"/>
+		<project reference="1.0,:ext:cvs.sourceforge.net:/cvsroot/jnode,jnode/net,JNode-Net"/>
+		<project reference="1.0,:ext:cvs.sourceforge.net:/cvsroot/jnode,jnode/shell,JNode-Shell"/>
+		<project reference="1.0,:ext:cvs.sourceforge.net:/cvsroot/jnode,jnode/textui,JNode-TextUI"/>
+	</provider>
+</psf>
