@@ -16,10 +16,12 @@
     <import plugin="org.jnode.driver.ide"/>
     <import plugin="org.jnode.driver.scsi"/> 
 	<import plugin="org.junit" version="3.8"/>
+	<import plugin="org.june"/>	
     <import plugin="org.jnode.driver.block"/>
     <import plugin="org.jnode.driver.block.ramdisk"/>    
     <import plugin="org.jnode.fs.service"/>
     <import plugin="org.jnode.log4j"/>	
+    <import plugin="org.apache.tools.ant"/>
   </requires>
         
   <runtime>
@@ -28,6 +30,7 @@
       <export name="org.jnode.test.fs.unit.*"/>      
       <export name="org.jnode.test.fs.unit.tests.*"/>
       <export name="org.jnode.test.fs.unit.config.*"/>      
+      <export name="org.jnode.test.fs.unit.ant.*"/>         
       <export name="org.jnode.fs.ext2.*"/>
       <export name="org.jnode.fs.ntfs.*"/>
       <export name="org.jnode.fs.fat.*"/>
