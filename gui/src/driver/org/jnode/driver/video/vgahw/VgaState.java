@@ -31,7 +31,7 @@ import org.jnode.util.NumberUtils;
  */
 public class VgaState {
 
-    //private final Logger log = Logger.getLogger(getClass());
+    //private static final Logger log = Logger.getLogger(VgaState.class);
 	private final int[] seq;
 	private final int[] crt;
 	private final int[] gra;

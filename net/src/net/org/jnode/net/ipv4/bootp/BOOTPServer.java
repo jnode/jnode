@@ -42,7 +42,7 @@ import org.jnode.net.ipv4.IPv4Address;
  */
 public class BOOTPServer {
 
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(BOOTPServer.class);
 
 	public static final int SERVER_PORT = 67;
 	public static final int CLIENT_PORT = 68;

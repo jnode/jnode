@@ -49,7 +49,7 @@ public class UDPProtocol implements IPv4Protocol, IPv4Constants
   /**
    * My logger
    */
-  private final Logger log = Logger.getLogger(getClass());
+  private static final Logger log = Logger.getLogger(UDPProtocol.class);
 
   /**
    * The underlying IP service

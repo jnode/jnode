@@ -83,7 +83,7 @@ public class JNodeBufferedImageGraphics extends AbstractSurfaceGraphics {
 	private static class BufferedImageSurface extends AbstractSurface {
 
 		/** My logger */
-		private final Logger log = Logger.getLogger(getClass());
+		private static final Logger log = Logger.getLogger(BufferedImageSurface.class);
 		private final BufferedImage sImage;
 		private final BitmapGraphics bitmapGraphics;
 		private final ColorModel model;

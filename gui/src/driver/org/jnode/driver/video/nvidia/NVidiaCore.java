@@ -63,7 +63,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 	/** Hardware cursor implementation */
 	private final NVidiaHardwareCursor hwCursor;
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(NVidiaCore.class);
 	private final int MaxVClockFreqKHz;
 	/** Size of card memory in MB */
 	private final int memSize;

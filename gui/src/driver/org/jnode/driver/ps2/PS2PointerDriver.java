@@ -38,7 +38,7 @@ import org.jnode.util.TimeoutException;
  */
 public class PS2PointerDriver extends AbstractPointerDriver implements PS2Constants {
 
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(PS2PointerDriver.class);
 	
 	static final int CMD_SET_RES = 0xE8; /* Set resolution */
 	static final int CMD_SET_SCALE11 = 0xE6; /* Set 1:1 scaling */

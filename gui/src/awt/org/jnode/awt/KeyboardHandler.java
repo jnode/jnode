@@ -38,7 +38,7 @@ import org.jnode.driver.input.KeyboardListener;
  * @author Levente S\u00e1ntha
  */
 public class KeyboardHandler implements KeyboardListener {
-    private final Logger log = Logger.getLogger(KeyboardHandler.class);
+    private static final Logger log = Logger.getLogger(KeyboardHandler.class);
     private KeyboardAPI keyboardAPI;
 
     public KeyboardHandler() {

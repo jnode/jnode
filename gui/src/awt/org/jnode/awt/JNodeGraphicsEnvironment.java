@@ -52,7 +52,7 @@ import org.jnode.naming.InitialNaming;
 public class JNodeGraphicsEnvironment extends GraphicsEnvironment {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(JNodeGraphicsEnvironment.class);
 	private JNodeFrameBufferDevice[] devices;
 	private GraphicsDevice defaultDevice;
 

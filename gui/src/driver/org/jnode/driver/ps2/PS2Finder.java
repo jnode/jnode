@@ -37,7 +37,7 @@ import org.jnode.util.NumberUtils;
 public class PS2Finder implements DeviceFinder, PS2Constants {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(PS2Finder.class);
 
 	/**
 	 * @see org.jnode.driver.DeviceFinder#findDevices(org.jnode.driver.DeviceManager, org.jnode.driver.Bus)

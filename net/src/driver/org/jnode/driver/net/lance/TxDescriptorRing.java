@@ -31,7 +31,7 @@ import org.jnode.system.MemoryResource;
  */
 public class TxDescriptorRing extends DescriptorRing {
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(TxDescriptorRing.class);
 
 	private TxDescriptor[] txDescriptors;
 

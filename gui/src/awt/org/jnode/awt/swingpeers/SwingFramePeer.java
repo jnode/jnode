@@ -47,7 +47,7 @@ import java.beans.PropertyVetoException;
  */
 final class SwingFramePeer extends SwingWindowPeer implements FramePeer, ISwingContainerPeer {
 
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(SwingFramePeer.class);
 	private final SwingFrame frame;
 
 	public SwingFramePeer(SwingToolkit toolkit, JDesktopPane desktopPane, Frame awtFrame) {

@@ -58,7 +58,7 @@ final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
 
     private final SwingToolkit toolkit;
 
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(DesktopFramePeer.class);
 
     private static final Point TOP_LEFT = new Point(0, 0);
 

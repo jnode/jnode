@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
  */
 public class TCPTimer extends Thread {
 
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(TCPTimer.class);
 	private final TCPControlBlockList cbList;
 	private boolean stop = false;
 	private long counter;

@@ -34,7 +34,7 @@ import org.jnode.net.SocketBuffer;
 public class IPv4FragmentList implements IPv4Constants {
 	
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(IPv4FragmentList.class);
 	/** When was this object created */
 	private final long creationTime;
 	/** List of fragments */

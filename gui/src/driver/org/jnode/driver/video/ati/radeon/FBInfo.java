@@ -32,7 +32,7 @@ import org.jnode.util.NumberUtils;
  */
 final class FBInfo implements RadeonConstants  {
 
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(FBInfo.class);
 	
 	final boolean hasCRTC2;
 

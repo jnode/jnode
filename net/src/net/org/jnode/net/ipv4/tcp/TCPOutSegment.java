@@ -33,7 +33,7 @@ import org.jnode.net.ipv4.IPv4Header;
 public class TCPOutSegment extends TCPSegment {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(TCPOutSegment.class);
 	private final TCPDataBuffer buffer;
 	private int dataOffset;
 	/** Timeout counter, if 0, re-transmit */

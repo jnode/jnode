@@ -38,7 +38,7 @@ import org.jnode.util.NumberUtils;
 public class RadeonHardwareCursor implements RadeonConstants, HardwareCursorAPI {
 
     /** My logger */
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(RadeonHardwareCursor.class);
     /** Radeon register accessor */
     private final RadeonVgaIO io;
 	/** Map between HardwareCursorImage and short[] */

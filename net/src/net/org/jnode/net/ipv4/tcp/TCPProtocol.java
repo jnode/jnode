@@ -65,7 +65,7 @@ public class TCPProtocol implements IPv4Protocol, IPv4Constants, TCPConstants {
     private final TCPTimer timer;
 
     /** My logger */
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(TCPProtocol.class);
 
     /**
      * Initialize a new instance

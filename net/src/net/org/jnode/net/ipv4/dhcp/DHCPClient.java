@@ -46,7 +46,7 @@ import java.net.InetAddress;
 public class DHCPClient extends BOOTPClient
 {
 
-  private final Logger log = Logger.getLogger(getClass());
+  private static final Logger log = Logger.getLogger(DHCPClient.class);
 
   /**
    * Create a DHCP discovery packet

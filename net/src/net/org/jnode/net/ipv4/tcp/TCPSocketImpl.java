@@ -47,7 +47,7 @@ public class TCPSocketImpl extends SocketImpl {
 	/** The input stream */
 	private TCPInputStream is;
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(TCPSocketImpl.class);
 
 	/**
 	 * Initialize a new instance

@@ -47,7 +47,7 @@ import org.jnode.util.NumberUtils;
 public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(PS2Bus.class);
 	private IOResource ioResData;
 	private IOResource ioResCtrl;
 	private int activeCount = 0;

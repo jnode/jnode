@@ -31,7 +31,7 @@ import org.jnode.system.MemoryResource;
  */
 public class RxDescriptorRing extends DescriptorRing {
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(RxDescriptorRing.class);
 	
 	private RxDescriptor[] rxDescriptors;
 

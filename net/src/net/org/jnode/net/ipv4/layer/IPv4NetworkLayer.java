@@ -52,7 +52,7 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
   /**
    * My logger
    */
-  private final Logger log = Logger.getLogger(getClass());
+  private static final Logger log = Logger.getLogger(IPv4NetworkLayer.class);
 
   private final HashMap protocols = new HashMap();
 

@@ -49,7 +49,7 @@ import org.jnode.util.TimeoutException;
 public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(ARPNetworkLayer.class);
 	/** My statistics */
 	private final ARPStatistics stat = new ARPStatistics();
 	/** ARP cache */

@@ -38,7 +38,7 @@ import org.jnode.driver.net.NetDeviceAPI;
 final class NetDeviceMonitor implements DeviceListener {
     
     /** My logger */
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(NetDeviceMonitor.class);
     private final ConfigurationProcessor processor;
     private final NetConfigurationData config;
     

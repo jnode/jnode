@@ -38,7 +38,7 @@ import org.jnode.util.Statistics;
 public class RAWProtocol implements IPv4Protocol, IPv4Constants {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(RAWProtocol.class);
 	/** The service i'm a part of */
 	//private final IPv4Service ipService;
 	/** My statistics */

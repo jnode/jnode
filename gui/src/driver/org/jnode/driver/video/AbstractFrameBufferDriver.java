@@ -37,7 +37,7 @@ import org.jnode.naming.InitialNaming;
 public abstract class AbstractFrameBufferDriver extends Driver implements FrameBufferAPI {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(AbstractFrameBufferDriver.class);
 
 	/**Device name prefix of framebuffer devices */
 	public static final String FB_DEVICE_PREFIX = "fb";

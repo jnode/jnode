@@ -42,7 +42,7 @@ import org.jnode.util.AccessControllerUtils;
 public class _3c90xDriver extends AbstractEthernetDriver {
 
     /** My logger */
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(_3c90xDriver.class);
 
     /** The actual device driver */
     private _3c90xCore dd;

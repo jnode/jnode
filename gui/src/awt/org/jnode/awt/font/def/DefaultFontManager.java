@@ -49,7 +49,7 @@ import org.jnode.plugin.PluginException;
  */
 public class DefaultFontManager implements FontManager, ExtensionPointListener {
 
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(DefaultFontManager.class);
     private final ExtensionPoint providersEP;
     private final HashMap providers = new HashMap();
 
