@@ -10,8 +10,8 @@ package org.jnode.driver.console;
 public interface ConsoleManager {
 	
 	public static final Class NAME = ConsoleManager.class;//"ConsoleManager";
-	public static final String UserConsoleName = "UserConsole";
-	public static final int MAX_USER_CONSOLE_NR = 6;
+	public static final String ShellConsoleName = "ShellConsole";
+	public static final int MAX_SHELL_CONSOLE_NR = 6;
 	
 	/**
 	 * Create and return a new console.
@@ -27,11 +27,13 @@ public interface ConsoleManager {
 	 */
 	public Console getConsole(String name);
 	
-	public Console getUserConsole(int index);
+	public Console getShellConsole(int index);
 	
-	public Console createUserConsole() throws ConsoleException;
+	public Console createShellConsole() throws ConsoleException;
 
 	public Console getConsoleWithAccelerator(int keyCode);
+
+	public String[] listConsoleNames();
 	
 	/**
 	 * Gets the currently focused console.

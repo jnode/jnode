@@ -95,7 +95,7 @@ public interface Console extends FocusListener {
 	/**
 	 * returns true if the console is userConsole
 	 */
-	public boolean isUserConsole(); 
+	public boolean isShellConsole(); 
 
 	/**
 	 * Close this console
@@ -122,6 +122,8 @@ public interface Console extends FocusListener {
 	 * @return PrintStream
 	 */
 	public PrintStream getOut();
+	
+	public String getConsoleName();
 	
 	/**
 	 * returns the registered name for this console
