@@ -77,7 +77,8 @@ public class DefaultDeviceManager implements DeviceManager,
                 "finders extension-point cannot be null"); }
         if (mappersEP == null) { throw new IllegalArgumentException(
                 "mappers extension-point cannot be null"); }
-        cmdLine = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.cmdline", ""));
+        cmdLine = (String) AccessController.doPrivileged(new GetPropertyAction(
+                "jnode.cmdline", ""));
         this.systemBus = new SystemBus();
         this.findersEP = findersEP;
         this.mappersEP = mappersEP;
@@ -135,8 +136,8 @@ public class DefaultDeviceManager implements DeviceManager,
     /**
      * Register a new device. This involves the following steps:
      * <ul>
-     * <li>Search for a suitable driver for the device. If not found the
-     * driver startup is delayed.
+     * <li>Search for a suitable driver for the device. If not found the driver
+     * startup is delayed.
      * <li>Connect the driver to the device, if a driver is found
      * <li>Attempt to start the device. If this fails an exception is printed
      * in the log. You can test if the device was started succesfully, by read
@@ -207,7 +208,7 @@ public class DefaultDeviceManager implements DeviceManager,
     }
 
     /**
-     * Rename a registered device, optionally using an autonumber postfix
+     * Rename a device, optionally using an autonumber postfix
      * 
      * @param device
      * @param name
@@ -232,9 +233,10 @@ public class DefaultDeviceManager implements DeviceManager,
             if (devices.containsKey(newId)) { throw new DeviceAlreadyRegisteredException(
                     newId); }
             // Remove the old id
-            devices.remove(device.getId());
-            // Add the new id
-            devices.put(newId, device);
+            if (devices.remove(device.getId()) != null) {
+                // Add the new id
+                devices.put(newId, device);
+            }
             // Change the device id
             device.setId(newId);
         }
@@ -311,8 +313,8 @@ public class DefaultDeviceManager implements DeviceManager,
     }
 
     /**
-     * Find a driver from each device that has not yet has a driver connected
-     * to it.
+     * Find a driver from each device that has not yet has a driver connected to
+     * it.
      */
     protected void findDeviceDrivers() {
         for (Iterator i = devices.values().iterator(); i.hasNext();) {
@@ -327,7 +329,8 @@ public class DefaultDeviceManager implements DeviceManager,
                     } catch (DriverException ex) {
                         BootLog.error("Cannot start " + dev.getId(), ex);
                     } catch (TimeoutException ex) {
-                        BootLog.error("Device " + dev.getId() + " failed to startup in time");
+                        BootLog.error("Device " + dev.getId()
+                                + " failed to startup in time");
                     }
                 }
             }
@@ -361,7 +364,7 @@ public class DefaultDeviceManager implements DeviceManager,
                 final DeviceToDriverMapper mapper;
                 mapper = (DeviceToDriverMapper) i.next();
                 Driver drv = mapper.findDriver(device);
-                if (drv != null) { 
+                if (drv != null) {
                 //Syslog.debug("Found driver for " + device);
                 return drv; }
             }
@@ -583,8 +586,7 @@ public class DefaultDeviceManager implements DeviceManager,
         /**
          * @param o1
          * @param o2
-         * @see java.util.Comparator#compare(java.lang.Object,
-         *      java.lang.Object)
+         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
          * @return int
          */
         public int compare(Object o1, Object o2) {
