@@ -37,6 +37,7 @@ import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.x86.compiler.BaseX86MagicHelper;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 import org.jnode.vm.x86.compiler.X86CompilerContext;
+import org.jnode.vm.x86.compiler.X86CompilerHelper;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -57,7 +58,8 @@ final class MagicHelper extends BaseX86MagicHelper {
         final X86Assembler os = ec.getStream();
         final ItemFactory ifac = ec.getItemFactory();
         final X86RegisterPool pool = ec.getGPRPool();
-        final X86CompilerContext context = ec.getContext();    
+        final X86CompilerContext context = ec.getContext();  
+        final X86CompilerHelper helper = ec.getHelper();
         final int slotSize = os.isCode32() ? 4 : 8;
 
         switch (mcode) {
@@ -653,9 +655,9 @@ final class MagicHelper extends BaseX86MagicHelper {
             obj.load(ec);
             final GPR r = obj.getRegister();
             // Get TIB
-            os.writeMOV(context.ADDRSIZE, r, r, ObjectLayout.TIB_SLOT * slotSize);
+            os.writeMOV(helper.ADDRSIZE, r, r, ObjectLayout.TIB_SLOT * slotSize);
             // Get VmType
-            os.writeMOV(context.ADDRSIZE, r, r, (TIBLayout.VMTYPE_INDEX + VmArray.DATA_OFFSET) * slotSize);
+            os.writeMOV(helper.ADDRSIZE, r, r, (TIBLayout.VMTYPE_INDEX + VmArray.DATA_OFFSET) * slotSize);
             vstack.push(obj);
         } break;
         case mGETTIB: {
@@ -664,7 +666,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             obj.load(ec);
             final GPR r = obj.getRegister();
             // Get TIB
-            os.writeMOV(context.ADDRSIZE, r, r, ObjectLayout.TIB_SLOT * slotSize);
+            os.writeMOV(helper.ADDRSIZE, r, r, ObjectLayout.TIB_SLOT * slotSize);
             vstack.push(obj);
         } break;
         case mGETOBJECTFLAGS: {
@@ -673,7 +675,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             obj.load(ec);
             final GPR r = obj.getRegister();
             // Get flags
-            os.writeMOV(context.ADDRSIZE, r, r, ObjectLayout.FLAGS_SLOT * slotSize);
+            os.writeMOV(helper.ADDRSIZE, r, r, ObjectLayout.FLAGS_SLOT * slotSize);
             obj.release(ec);
             vstack.push(L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, r));
         } break;
@@ -686,7 +688,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             final GPR flagsr = flags.getRegister();
             final GPR r = obj.getRegister();
             // Set flags
-            os.writeMOV(context.ADDRSIZE, r, ObjectLayout.FLAGS_SLOT * slotSize, flagsr);
+            os.writeMOV(helper.ADDRSIZE, r, ObjectLayout.FLAGS_SLOT * slotSize, flagsr);
             flags.release(ec);
             obj.release(ec);
         } break;
@@ -744,7 +746,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final WordItem result = L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, false);
             final GPR r = result.getRegister();
-            os.writeMOV(context.ADDRSIZE, r, context.BP);
+            os.writeMOV(helper.ADDRSIZE, r, helper.BP);
             vstack.push(result);
         } break;
         case mGETTIMESTAMP: {

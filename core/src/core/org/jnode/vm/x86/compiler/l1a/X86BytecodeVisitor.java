@@ -358,25 +358,25 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		if (vconst && (jvmType == JvmType.LONG)) {
 			// Store constant long
 			final long lval = ((LongItem) val).getValue();
-			os.writeMOV_Const(BITS32, context.BP, disp + LSB,
+			os.writeMOV_Const(BITS32, helper.BP, disp + LSB,
 					(int) (lval & 0xFFFFFFFFL));
-			os.writeMOV_Const(BITS32, context.BP, disp + MSB,
+			os.writeMOV_Const(BITS32, helper.BP, disp + MSB,
 					(int) ((lval >>> 32) & 0xFFFFFFFFL));
 		} else if (vconst && (jvmType == JvmType.DOUBLE)) {
 			// Store constant double
 			final long lval = Double.doubleToRawLongBits(((DoubleItem) val)
 					.getValue());
-			os.writeMOV_Const(BITS32, context.BP, disp + LSB,
+			os.writeMOV_Const(BITS32, helper.BP, disp + LSB,
 					(int) (lval & 0xFFFFFFFFL));
-			os.writeMOV_Const(BITS32, context.BP, disp + MSB,
+			os.writeMOV_Const(BITS32, helper.BP, disp + MSB,
 					(int) ((lval >>> 32) & 0xFFFFFFFFL));
 		} else if (val.isFPUStack()) {
 			// Ensure item is on top of fpu stack
 			FPUHelper.fxch(os, vstack.fpuStack, val);
 			if (jvmType == JvmType.DOUBLE) {
-				os.writeFSTP64(context.BP, disp);
+				os.writeFSTP64(helper.BP, disp);
 			} else {
-				os.writeFISTP64(context.BP, disp);
+				os.writeFISTP64(helper.BP, disp);
 			}
 			vstack.fpuStack.pop(val);
 		} else if (val.isStack()) {
@@ -385,10 +385,10 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 				vstack.operandStack.pop(val);
 			}
 			if (os.isCode32()) {
-				os.writePOP(context.BP, disp + LSB);
-				os.writePOP(context.BP, disp + MSB);
+				os.writePOP(helper.BP, disp + LSB);
+				os.writePOP(helper.BP, disp + MSB);
 			} else {
-				os.writePOP(context.BP, disp);
+				os.writePOP(helper.BP, disp);
 			}
 		} else {
 			// Load into register
@@ -397,12 +397,12 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 				final GPR lsb = val.getLsbRegister(eContext);
 				final GPR msb = val.getMsbRegister(eContext);
 				// Store
-				os.writeMOV(INTSIZE, context.BP, disp + LSB, lsb);
-				os.writeMOV(INTSIZE, context.BP, disp + MSB, msb);
+				os.writeMOV(INTSIZE, helper.BP, disp + LSB, lsb);
+				os.writeMOV(INTSIZE, helper.BP, disp + MSB, msb);
 			} else {
 				final GPR64 reg = val.getRegister(eContext);
 				// Store
-				os.writeMOV(BITS64, context.BP, disp, reg);
+				os.writeMOV(BITS64, helper.BP, disp, reg);
 			}
 		}
 
@@ -554,7 +554,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			if (VirtualStack.checkOperandStack) {
 				vstack.operandStack.pop(v);
 			}
-			os.writeLEA(context.SP, context.SP, size);
+			os.writeLEA(helper.SP, helper.SP, size);
 		}
 		v.release(eContext);
 	}
@@ -603,7 +603,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		// Get superClassesArray[depth] -> objectr
 		os.writeMOV(INTSIZE, tmpr, tmpr, arrayDataOffset + (depth << 2));
 		// Compare objectr with classtype
-		os.writeCMP(context.STATICS, staticsOfs, tmpr);
+		os.writeCMP(helper.STATICS, staticsOfs, tmpr);
 		if (resultr != null) {
 			os.writeSETCC(resultr, X86Constants.JE);
 		} else {
@@ -713,7 +713,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			os.writeArithOp(operation, r1, (X86Register.GPR) v2.getRegister());
 			break;
 		case Item.Kind.LOCAL:
-			os.writeArithOp(operation, r1, context.BP, v2
+			os.writeArithOp(operation, r1, helper.BP, v2
 					.getOffsetToFP(eContext));
 			break;
 		case Item.Kind.CONSTANT:
@@ -809,9 +809,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 						.getMsbRegister(eContext));
 				break;
 			case Item.Kind.LOCAL:
-				os.writeArithOp(operationLsb, r1_lsb, context.BP, v2
+				os.writeArithOp(operationLsb, r1_lsb, helper.BP, v2
 						.getLsbOffsetToFP(eContext));
-				os.writeArithOp(operationMsb, r1_msb, context.BP, v2
+				os.writeArithOp(operationMsb, r1_msb, helper.BP, v2
 						.getMsbOffsetToFP(eContext));
 				break;
 			case Item.Kind.CONSTANT:
@@ -1951,7 +1951,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			os.writeCMP(r1, v2.getRegister());
 			break;
 		case Item.Kind.LOCAL:
-			os.writeCMP(r1, context.BP, v2.getOffsetToFP(eContext));
+			os.writeCMP(r1, helper.BP, v2.getOffsetToFP(eContext));
 			break;
 		case Item.Kind.CONSTANT:
 			v2.load(eContext);
@@ -2008,7 +2008,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			os.writeCMP(r1, v2.getRegister());
 			break;
 		case Item.Kind.LOCAL:
-			os.writeCMP(r1, context.BP, v2.getOffsetToFP(eContext));
+			os.writeCMP(r1, helper.BP, v2.getOffsetToFP(eContext));
 			break;
 		case Item.Kind.CONSTANT:
 			final int c2 = v2.getValue();
@@ -2193,9 +2193,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		vstack.loadLocal(eContext, ebpOfs);
 
 		if (incValue == 1) {
-			os.writeINC(BITS32, context.BP, ebpOfs);
+			os.writeINC(BITS32, helper.BP, ebpOfs);
 		} else {
-			os.writeADD(BITS32, context.BP, ebpOfs, incValue);
+			os.writeADD(BITS32, helper.BP, ebpOfs, incValue);
 		}
 	}
 
@@ -2266,7 +2266,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			}
 			break;
 		case Item.Kind.LOCAL:
-			os.writeIMUL(r1, context.BP, v2.getOffsetToFP(eContext));
+			os.writeIMUL(r1, helper.BP, v2.getOffsetToFP(eContext));
 			break;
 		}
 		v2.release(eContext);
@@ -2403,7 +2403,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		// remove parameters from vstack
 		dropParameters(method, true);
 		// Get objectref -> EAX
-		os.writeMOV(context.ADDRSIZE, context.AAX, context.SP, argSlotCount
+		os.writeMOV(helper.ADDRSIZE, helper.AAX, helper.SP, argSlotCount
 				* slotSize);
 		// Write the actual invokeinterface
 		if (os.isCode32()) {
@@ -2431,9 +2431,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 
 			// Get method from statics table
             if (os.isCode32()) {
-                helper.writeGetStaticsEntry(curInstrLabel, context.AAX, sm);
+                helper.writeGetStaticsEntry(curInstrLabel, helper.AAX, sm);
             } else {
-                helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)context.AAX, sm);                
+                helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)helper.AAX, sm);                
             }
 			invokeJavaMethod(methodRef.getSignature());
 			// Result is already on the stack.
@@ -2463,9 +2463,9 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 
 			// Get static field object
             if (os.isCode32()) {
-                helper.writeGetStaticsEntry(curInstrLabel, context.AAX, method);
+                helper.writeGetStaticsEntry(curInstrLabel, helper.AAX, method);
             } else {
-                helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)context.AAX, method);                
+                helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)helper.AAX, method);                
             }
 			invokeJavaMethod(methodRef.getSignature());
 			// Result is already on the stack.
@@ -2498,12 +2498,12 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 					.getSignature());
 
 			/* Get objectref -> EAX */
-			os.writeMOV(context.ADDRSIZE, context.AAX, context.SP, argSlotCount
+			os.writeMOV(helper.ADDRSIZE, helper.AAX, helper.SP, argSlotCount
 					* slotSize);
 			/* Get VMT of objectef -> EAX */
-			os.writeMOV(context.ADDRSIZE, context.AAX, context.AAX, tibOffset);
+			os.writeMOV(helper.ADDRSIZE, helper.AAX, helper.AAX, tibOffset);
 			/* Get entry in VMT -> EAX */
-			os.writeMOV(context.ADDRSIZE, context.AAX, context.AAX,
+			os.writeMOV(helper.ADDRSIZE, helper.AAX, helper.AAX,
 					arrayDataOffset + (tibIndex * slotSize));
 			/* Now invoke the method */
 			invokeJavaMethod(methodRef.getSignature());
@@ -2541,7 +2541,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		// Calculate
 		os.writeCDQ(); // EAX -> EDX:EAX
 		if (v2.isLocal()) {
-			os.writeIDIV_EAX(BITS32, context.BP, v2.getOffsetToFP(eContext));
+			os.writeIDIV_EAX(BITS32, helper.BP, v2.getOffsetToFP(eContext));
 		} else {
 			os.writeIDIV_EAX(v2.getRegister());
 		}
@@ -2999,7 +2999,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			// Calculate
 			os.writeCDQ(); // RAX -> RDX:RAX
 			if (v2.isLocal()) {
-				os.writeIDIV_EAX(BITS64, context.BP, v2.getOffsetToFP(eContext));
+				os.writeIDIV_EAX(BITS64, helper.BP, v2.getOffsetToFP(eContext));
 			} else {
 				os.writeIDIV_EAX(v2.getRegister(eContext));
 			}
@@ -3432,7 +3432,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		final int ebpOfs = stackFrame.getEbpOffset(index);
 
 		// Load ret & jmp
-		os.writeJMP(context.BP, ebpOfs);
+		os.writeJMP(helper.BP, ebpOfs);
 	}
 
 	/**
@@ -3798,19 +3798,19 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		if (vconst && (jvmType == JvmType.INT)) {
 			// Store constant int
 			final int ival = ((IntItem) val).getValue();
-			os.writeMOV_Const(BITS32, context.BP, disp, ival);
+			os.writeMOV_Const(BITS32, helper.BP, disp, ival);
 		} else if (vconst && (jvmType == JvmType.FLOAT)) {
 			// Store constant float
 			final int ival = Float.floatToRawIntBits(((FloatItem) val)
 					.getValue());
-			os.writeMOV_Const(BITS32, context.BP, disp, ival);
+			os.writeMOV_Const(BITS32, helper.BP, disp, ival);
 		} else if (val.isFPUStack()) {
 			// Ensure item is on top of fpu stack
 			FPUHelper.fxch(os, vstack.fpuStack, val);
 			if (jvmType == JvmType.FLOAT) {
-				os.writeFSTP32(context.BP, disp);
+				os.writeFSTP32(helper.BP, disp);
 			} else {
-				os.writeFISTP32(context.BP, disp);
+				os.writeFISTP32(helper.BP, disp);
 			}
 			vstack.fpuStack.pop(val);
 		} else if (val.isStack()) {
@@ -3818,13 +3818,13 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			if (VirtualStack.checkOperandStack) {
 				vstack.operandStack.pop(val);
 			}
-			os.writePOP(context.BP, disp);
+			os.writePOP(helper.BP, disp);
 		} else {
 			// Load into register
 			val.load(eContext);
 			final GPR valr = val.getRegister();
 			// Store
-			os.writeMOV(INTSIZE, context.BP, disp, valr);
+			os.writeMOV(INTSIZE, helper.BP, disp, valr);
 		}
 
 		// Release

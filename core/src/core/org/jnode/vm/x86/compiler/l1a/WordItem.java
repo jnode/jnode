@@ -29,7 +29,7 @@ import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
-import org.jnode.vm.x86.compiler.X86CompilerContext;
+import org.jnode.vm.x86.compiler.X86CompilerHelper;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -157,7 +157,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 		final X86Assembler os = ec.getStream();
 		final X86RegisterPool pool = ec.getGPRPool();
 		final VirtualStack stack = ec.getVStack();
-		final X86CompilerContext context = ec.getContext();
+		final X86CompilerHelper helper = ec.getHelper();
 		if (Vm.VerifyAssertions) {
 			Vm._assert(!pool.isFree(reg), "reg not free");
 		}
@@ -171,7 +171,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			break;
 
 		case Kind.LOCAL:
-			os.writeMOV(reg.getSize(), reg, context.BP, getOffsetToFP(ec));
+			os.writeMOV(reg.getSize(), reg, helper.BP, getOffsetToFP(ec));
 			break;
 
 		case Kind.CONSTANT:
@@ -183,8 +183,8 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			FPUHelper.fxch(os, stack.fpuStack, this);
 			stack.fpuStack.pop(this);
 			// Convert & move to new space on normal stack
-			os.writeLEA(context.SP, context.SP, -4);
-			popFromFPU(os, context.SP, 0);
+			os.writeLEA(helper.SP, helper.SP, -4);
+			popFromFPU(os, helper.SP, 0);
 			os.writePOP(reg);
 			break;
 
@@ -285,7 +285,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	final void push(EmitterContext ec) {
 		final X86Assembler os = ec.getStream();
 		final VirtualStack stack = ec.getVStack();
-		final X86CompilerContext context = ec.getContext();
+		final X86CompilerHelper helper = ec.getHelper();
 
 		switch (getKind()) {
 		case Kind.GPR:
@@ -293,7 +293,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			break;
 
 		case Kind.LOCAL:
-			os.writePUSH(context.BP, offsetToFP);
+			os.writePUSH(helper.BP, offsetToFP);
 			break;
 
 		case Kind.CONSTANT:
@@ -306,8 +306,8 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			FPUHelper.fxch(os, fpuStack, this);
 			stack.fpuStack.pop(this);
 			// Convert & move to new space on normal stack
-			os.writeLEA(context.SP, context.SP, -4);
-			popFromFPU(os, context.SP, 0);
+			os.writeLEA(helper.SP, helper.SP, -4);
+			popFromFPU(os, helper.SP, 0);
 			break;
 
 		case Kind.STACK:
@@ -353,23 +353,23 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	final void pushToFPU(EmitterContext ec) {
 		final X86Assembler os = ec.getStream();
 		final VirtualStack stack = ec.getVStack();
-		final X86CompilerContext context = ec.getContext();
+		final X86CompilerHelper helper = ec.getHelper();
 
 		switch (getKind()) {
 		case Kind.GPR:
 			os.writePUSH(gpr);
-			pushToFPU(os, context.SP, 0);
-			os.writeLEA(context.SP, context.SP, 4);
+			pushToFPU(os, helper.SP, 0);
+			os.writeLEA(helper.SP, helper.SP, 4);
 			break;
 
 		case Kind.LOCAL:
-			pushToFPU(os, context.BP, offsetToFP);
+			pushToFPU(os, helper.BP, offsetToFP);
 			break;
 
 		case Kind.CONSTANT:
 			pushConstant(ec, os);
-			pushToFPU(os, context.SP, 0);
-			os.writeLEA(context.SP, context.SP, 4);
+			pushToFPU(os, helper.SP, 0);
+			os.writeLEA(helper.SP, helper.SP, 4);
 			break;
 
 		case Kind.FPUSTACK:
@@ -383,8 +383,8 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			if (VirtualStack.checkOperandStack) {
 				stack.operandStack.pop(this);
 			}
-			pushToFPU(os, context.SP, 0);
-			os.writeLEA(context.SP, context.SP, 4);
+			pushToFPU(os, helper.SP, 0);
+			os.writeLEA(helper.SP, helper.SP, 4);
 			break;
 
 		default:
