@@ -6,13 +6,19 @@ package org.jnode.build;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.GZip;
 import org.apache.tools.ant.taskdefs.Jar;
 import org.apache.tools.ant.taskdefs.Manifest;
 import org.apache.tools.ant.types.FileSet;
+import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
+import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.model.PluginJar;
 
 /**
@@ -66,9 +72,11 @@ public class InitJarBuilder extends AbstractPluginsTask {
 			}
 			
 			final URL[] pluginList = piList.getPluginList();
+			final ArrayList pluginJars = new ArrayList(pluginList.length);
 			for (int i = 0; i < pluginList.length; i++) {
 				final URL url = pluginList[i];
 				final PluginJar piJar = new PluginJar(null, url);
+				pluginJars.add(piJar);
 				if (piJar.getDescriptor().isSystemPlugin()) {
 					log("System plugin " + piJar.getDescriptor().getId() +" in plugin-list will be ignored", Project.MSG_WARN);
 				} else {
@@ -79,6 +87,7 @@ public class InitJarBuilder extends AbstractPluginsTask {
 					jarTask.addFileset(fs);
 				}
 			}
+			testPluginPrerequisites(pluginJars);
 
 			/*
 			 * for (Iterator i = piRegistry.getDescriptorIterator(); i.hasNext(); ) { final PluginDescriptor descr = (PluginDescriptor)i.next(); final Runtime rt = descr.getRuntime(); if (rt != null) {
@@ -112,4 +121,28 @@ public class InitJarBuilder extends AbstractPluginsTask {
 		destFile = file;
 	}
 
+	/**
+	 * Ensure that all plugin prerequisites are met.
+	 * @throws BuildException
+	 */
+	protected void testPluginPrerequisites(List pluginJars) 
+	throws BuildException {
+	    final HashSet ids = new HashSet();
+		
+		for (Iterator i = pluginJars.iterator(); i.hasNext(); ) {
+		    final PluginJar piJar = (PluginJar)i.next();
+			final PluginDescriptor descr = piJar.getDescriptor();
+			ids.add(descr.getId());
+		}
+		for (Iterator i = pluginJars.iterator(); i.hasNext(); ) {
+		    final PluginJar piJar = (PluginJar)i.next();
+			final PluginDescriptor descr = piJar.getDescriptor();
+			final PluginPrerequisite[] prereqs = descr.getPrerequisites();
+			for (int j = 0; j < prereqs.length; j++) {
+			    if (!ids.contains(prereqs[j].getPluginId())) {
+					throw new BuildException("Cannot find plugin " + prereqs[j].getPluginId() + ", which is required by " + descr.getId());
+				}
+			}
+		}
+	}
 }

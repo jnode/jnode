@@ -161,9 +161,7 @@ public final class VmSystem {
 
         final String arch;
         final Vm vm = Vm.getVm();
-        arch = Unsafe.getCurrentProcessor().getArchitecture().getName();
-        Unsafe.debug("arch=");
-        Unsafe.debug(arch);
+        arch = vm.getArch().getName();
 
         final Properties res = new Properties();
         res.put("java.version", "1.1.0");

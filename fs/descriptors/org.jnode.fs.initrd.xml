@@ -11,7 +11,6 @@
     <import plugin="org.jnode.driver.block.ramdisk"/>
     <import plugin="org.jnode.fs.fat"/>
     <import plugin="org.jnode.fs.service"/>
-    <import plugin="org.jnode.fs.command"/>
     <import plugin="org.jnode.log4j"/>
   </requires>
         

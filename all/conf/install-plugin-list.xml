@@ -2,7 +2,7 @@
 
 <plugin-list>
     <manifest>
-        <attribute key="Main-Class" value="org.jnode.shell.CommandShell"/>
+        <attribute key="Main-Class" value="org.jnode.install.Main"/>
     </manifest>
 
     <plugin id="org.apache.jakarta.commons.net"/>
@@ -11,22 +11,13 @@
     <plugin id="org.jnode.driver.console"/>
     <plugin id="org.jnode.driver.console.core"/>
 
-    <plugin id="org.jnode.awt"/>
-    <plugin id="org.jnode.awt.font"/>
-    <plugin id="org.jnode.awt.font.truetype"/>
-    <plugin id="org.jnode.debug"/>
-    <plugin id="org.jnode.debug.command"/>
     <plugin id="org.jnode.driver"/>
     <plugin id="org.jnode.driver.acpi"/>
-    <plugin id="org.jnode.driver.acpi.command"/>
     <plugin id="org.jnode.driver.character"/>
     <plugin id="org.jnode.driver.block"/>
     <plugin id="org.jnode.driver.block.ramdisk"/>
-    <plugin id="org.jnode.driver.block.ramdisk.command"/>
     <plugin id="org.jnode.driver.chipset.via"/>
     <plugin id="org.jnode.driver.cmos"/>
-    <plugin id="org.jnode.driver.command"/>
-    <plugin id="org.jnode.driver.console.command"/>
     <plugin id="org.jnode.driver.finder"/>
     <plugin id="org.jnode.driver.firmware"/>
     <plugin id="org.jnode.driver.firmware.bios"/>
@@ -46,14 +37,6 @@
     <plugin id="org.jnode.driver.pnp"/>
     <plugin id="org.jnode.driver.ps2"/>
     <plugin id="org.jnode.driver.serial"/>
-    <plugin id="org.jnode.driver.sound.speaker"/>
-    <plugin id="org.jnode.driver.sound.speaker.pc"/>
-    <plugin id="org.jnode.driver.sound.command"/>
-    <plugin id="org.jnode.driver.video"/>
-    <plugin id="org.jnode.driver.video.nvidia"/>
-    <plugin id="org.jnode.driver.video.vga"/>
-    <plugin id="org.jnode.driver.video.vgahw"/>
-    <plugin id="org.jnode.driver.video.vmware"/>
     <plugin id="org.jnode.driver.usb"/>
     <plugin id="org.jnode.driver.usb.hub"/>
     <plugin id="org.jnode.driver.usb.input"/>
@@ -61,42 +44,25 @@
     <plugin id="org.jnode.driver.usb.uhci"/>
 
     <plugin id="org.jnode.fs"/>
-    <plugin id="org.jnode.fs.command"/>
     <plugin id="org.jnode.fs.fat"/>
     <plugin id="org.jnode.fs.ext2"/>
     <plugin id="org.jnode.fs.ntfs"/>
     <plugin id="org.jnode.fs.partitions.ibm"/>
-    <plugin id="org.jnode.fs.partitions.command"/>
     <plugin id="org.jnode.fs.service"/>
     <plugin id="org.jnode.fs.initrd"/>
 
+    <plugin id="org.jnode.install"/>
+
     <plugin id="org.jnode.log4j"/>
-    <plugin id="org.jnode.log4j.command"/>
 
     <plugin id="org.jnode.net"/>
     <plugin id="org.jnode.net.arp"/>
-    <plugin id="org.jnode.net.command"/>
     <plugin id="org.jnode.net.ipv4"/>
     <plugin id="org.jnode.net.ipv4.core"/>
-    <plugin id="org.jnode.plugin.command"/>
 
     <plugin id="org.jnode.protocol.tftp"/>
-
-    <plugin id="org.jnode.shell"/>
-    <plugin id="org.jnode.shell.help"/>
-    <plugin id="org.jnode.shell.command"/>
-    <plugin id="org.jnode.system.command"/>
-    <plugin id="org.jnode.test"/>
-    <plugin id="org.jnode.test.fs"/>
-    <plugin id="org.jnode.test.gui"/>
-    <plugin id="org.jnode.test.net"/>
 
     <plugin id="org.jnode.work"/>
 
     <plugin id="charva"/>
-    <plugin id="org.jnode.wt"/>
-    <plugin id="org.beanshell"/>
-
-    <!-- plugin id="org.zaval.lw"/ -->
-
 </plugin-list>
