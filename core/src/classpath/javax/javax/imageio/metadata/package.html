@@ -1,5 +1,6 @@
-/* RSAPrivateCrtKey.java -- An RSA private key in CRT format
-   Copyright (C) 1998 Free Software Foundation, Inc.
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!-- package.html - describes classes in javax.imageio.metadata package.
+   Copyright (C) 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -33,63 +34,13 @@ module.  An independent module is a module which is not derived from
 or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version. */
+exception statement from your version. -->
 
-package java.security.interfaces;
+<html>
+<head><title>GNU Classpath - javax.imageio.metadata</title></head>
 
-import java.math.BigInteger;
+<body>
+<p></p>
 
-/**
- * This interface provides access to information about an RSA private
- * key in Chinese Remainder Theorem (CRT) format.
- *
- * @version 0.0
- *
- * @author Aaron M. Renn (arenn@urbanophile.com)
- */
-public interface RSAPrivateCrtKey extends RSAPrivateKey
-{
-  long serialVersionUID = -5682214253527700368L;
-
-  /**
-   * Returns the public exponent for this key
-   *
-   * @return The public exponent for this key
-   */
-  BigInteger getPublicExponent();
-
-  /**
-   * Returns the primeP value
-   *
-   * @return The primeP value
-   */
-  BigInteger getPrimeP();
-
-  /**
-   * Returns the primeQ value
-   *
-   * @return The primeQ value
-   */
-  BigInteger getPrimeQ();
-
-  /**
-   * Returns the primeExponentP
-   *
-   * @return The primeExponentP
-   */
-  BigInteger getPrimeExponentP();
-
-  /**
-   * Returns the primeExponentQ
-   *
-   * @return The primeExponentQ
-   */
-  BigInteger getPrimeExponentQ();
-
-  /**
-   * Returns the CRT coefficient
-   *
-   * @return The CRT coefficient
-   */
-  BigInteger getCrtCoefficient();
-}
+</body>
+</html>

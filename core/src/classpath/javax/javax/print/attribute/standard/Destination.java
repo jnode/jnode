@@ -1,5 +1,5 @@
-/* RSAPrivateCrtKey.java -- An RSA private key in CRT format
-   Copyright (C) 1998 Free Software Foundation, Inc.
+/* Destination.java --
+   Copyright (C) 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,61 +35,48 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.security.interfaces;
 
-import java.math.BigInteger;
+package javax.print.attribute.standard;
+
+import java.net.URI;
+
+import javax.print.attribute.PrintJobAttribute;
+import javax.print.attribute.PrintRequestAttribute;
+import javax.print.attribute.URISyntax;
 
 /**
- * This interface provides access to information about an RSA private
- * key in Chinese Remainder Theorem (CRT) format.
- *
- * @version 0.0
- *
- * @author Aaron M. Renn (arenn@urbanophile.com)
+ * @author Michael Koch (konqueror@gmx.de)
  */
-public interface RSAPrivateCrtKey extends RSAPrivateKey
+public final class Destination extends URISyntax
+  implements PrintJobAttribute, PrintRequestAttribute
 {
-  long serialVersionUID = -5682214253527700368L;
+  private static final long serialVersionUID = 7923912792485606497L;
 
   /**
-   * Returns the public exponent for this key
-   *
-   * @return The public exponent for this key
+   * Constructs a <code>Destination</code> object.
    */
-  BigInteger getPublicExponent();
+  public Destination(URI uri)
+  {
+    super(uri);
+  }
 
   /**
-   * Returns the primeP value
+   * Returns category of this class.
    *
-   * @return The primeP value
+   * @return the class <code>Destination</code> itself
    */
-  BigInteger getPrimeP();
+  public Class getCategory()
+  {
+    return Destination.class;
+  }
 
   /**
-   * Returns the primeQ value
+   * Returns name of this class.
    *
-   * @return The primeQ value
+   * @return the string "printer-uri"
    */
-  BigInteger getPrimeQ();
-
-  /**
-   * Returns the primeExponentP
-   *
-   * @return The primeExponentP
-   */
-  BigInteger getPrimeExponentP();
-
-  /**
-   * Returns the primeExponentQ
-   *
-   * @return The primeExponentQ
-   */
-  BigInteger getPrimeExponentQ();
-
-  /**
-   * Returns the CRT coefficient
-   *
-   * @return The CRT coefficient
-   */
-  BigInteger getCrtCoefficient();
+  public String getName()
+  {
+    return "destination";
+  }
 }
