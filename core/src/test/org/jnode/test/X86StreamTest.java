@@ -19,7 +19,7 @@ public class X86StreamTest {
 	public static void main(String[] args) 
 	throws Exception {
 		
-		final X86Stream os = new X86Stream(X86CpuID.createID(null), 0);
+		final X86Stream os = new X86Stream(X86CpuID.createID("pentium4"), 0);
 		
 		final Label label = new Label("label");
 		os.writeADD(Register.EDX, Register.EAX);
@@ -36,6 +36,10 @@ public class X86StreamTest {
 		os.writeTEST(Register.ECX, Register.EBX);
 		os.writeCMOVcc(X86Constants.JLE, Register.EAX, Register.EBX);
 		os.writeCMOVcc(X86Constants.JE, Register.EAX, Register.EBX, 5);
+		os.writeADD(Register.EAX, 28, 11);
+		os.writeCALL(Register.EAX, 28);
+		os.writeCMP(Register.EAX, Register.ECX, 4);
+		os.writeCMP(Register.EAX, 4, Register.ECX);
 		
 		FileOutputStream fos = new FileOutputStream("test.bin");
 		os.writeTo(fos);

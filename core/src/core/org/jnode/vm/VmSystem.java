@@ -31,6 +31,8 @@ public final class VmSystem {
 	public static final int RC_HANDLER = 0xFFFFFFFB;
 	public static final int RC_DEFHANDLER = 0xFFFFFFF1;
 
+	private static final int STACKTRACE_LIMIT = 256;
+	
 	private static boolean inited;
 	private static VmClassLoader systemLoader;
 	private static String cmdLine;
@@ -229,7 +231,7 @@ public final class VmSystem {
 	 */
 	public static Class[] getClassContext() {
 		final VmStackReader reader = Unsafe.getCurrentProcessor().getArchitecture().getStackReader();
-		final VmStackFrame[] stack = reader.getVmStackTrace(Unsafe.getCurrentFrame());
+		final VmStackFrame[] stack = reader.getVmStackTrace(Unsafe.getCurrentFrame(), STACKTRACE_LIMIT);
 		final int count = stack.length;
 		final Class[] result = new Class[count];
 
@@ -277,11 +279,11 @@ public final class VmSystem {
 		final VmStackFrame[] mt;
 		Address lastIP = null;
 		if (current == proc.getCurrentThread()) {
-			mt = reader.getVmStackTrace(reader.getPrevious(Unsafe.getCurrentFrame()));
+			mt = reader.getVmStackTrace(reader.getPrevious(Unsafe.getCurrentFrame()), STACKTRACE_LIMIT);
 		} else {
 			proc.disableReschedule();
 			try {
-				mt = reader.getVmStackTrace(current.getStackFrame());
+				mt = reader.getVmStackTrace(current.getStackFrame(), STACKTRACE_LIMIT);
 				lastIP = current.getInstructionPointer();
 			} finally {
 				proc.enableReschedule();

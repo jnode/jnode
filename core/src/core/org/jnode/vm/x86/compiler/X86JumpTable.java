@@ -24,12 +24,10 @@ public class X86JumpTable {
 	public static final int VM_ATHROW_OFS = 8;
 	/** Jumptable offset of vm_athrow_notrace */
 	public static final int VM_ATHROW_NOTRACE_OFS = 12;
-	/** Jumptable offset of vm_invoke */
-	public static final int VM_INVOKE_OFS = 16;
 	/** Jumptable offset of vm_interpreter */
-	public static final int VM_INTERPRETER_OFS = 20;
+	public static final int VM_INTERPRETER_OFS = 16;
 	/** Jumptable offset of vm_invoke_abstract */
-	public static final int VM_INVOKE_ABSTRACT_OFS = 24;
+	public static final int VM_INVOKE_ABSTRACT_OFS = 20;
 	
 	/** Label name of the jumptable */
 	public static final String JUMPTABLE_NAME = "vm_jumpTable";

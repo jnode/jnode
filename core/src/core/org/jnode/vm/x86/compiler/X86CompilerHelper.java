@@ -120,8 +120,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 * 
 	 * @param signature
 	 */
-	public final void invokeJavaMethod(String signature) {
-		writeJumpTableCALL(X86JumpTable.VM_INVOKE_OFS);
+	public final void invokeJavaMethod(String signature, X86CompilerContext context) {
+		os.writeCALL(Register.EAX, context.getVmMethodNativeCodeField().getOffset());
+		//writeJumpTableCALL(X86JumpTable.VM_INVOKE_OFS);
 		char ch = signature.charAt(signature.length() - 1);
 		if (ch == 'V') {
 			/** No return value */
@@ -140,9 +141,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 * 
 	 * @param method
 	 */
-	public final void invokeJavaMethod(VmMethod method) {
+	public final void invokeJavaMethod(VmMethod method, X86CompilerContext context) {
 		os.writeMOV_Const(Register.EAX, method);
-		invokeJavaMethod(method.getSignature());
+		invokeJavaMethod(method.getSignature(), context);
 	}
 
 	/**
@@ -185,7 +186,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 				os.writeJCC(afterInit, X86Constants.JNZ);
 				// Call cls.initialize
 				os.writePUSH(cls);
-				invokeJavaMethod(context.getVmTypeInitialize());
+				invokeJavaMethod(context.getVmTypeInitialize(), context);
 				os.setObjectRef(afterInit);
 				// Restore eax
 				os.writePOP(Register.EAX);
@@ -193,6 +194,40 @@ public class X86CompilerHelper implements X86CompilerConstants {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Write method counter increment code.
+	 * 
+	 * @param methodReg Register that holds the method reference before 
+	 * this method is called.
+	 */
+	public final void writeIncInvocationCount(Register methodReg, X86CompilerContext context) {
+		final int offset = context.getVmMethodInvocationCountField().getOffset();
+		os.writeADD(methodReg, offset, 1);
+	}
+
+	/**
+	 * Write stack overflow test code.
+	 * @param calcReg Register used for intermediate calculation
+	 * @param method
+	 * @param context
+	 */
+	public final void writeStackOverflowTest(Register calcReg, VmMethod method, X86CompilerContext context) {
+		//cmp esp,STACKEND
+		//jg vm_invoke_testStackOverflowDone
+		//vm_invoke_testStackOverflow:
+		//int 0x31
+		//vm_invoke_testStackOverflowDone:
+		
+		final int offset = context.getVmProcessorStackEnd().getOffset();
+		final Label doneLabel = new Label(method + "$$stackof-done");
+		os.writeXOR(calcReg, calcReg);
+		os.writePrefix(X86Constants.FS_PREFIX);
+		os.writeCMP(Register.ESP, calcReg, offset);
+		os.writeJCC(doneLabel, X86Constants.JG);
+		os.writeINT(0x31);
+		os.setObjectRef(doneLabel);
 	}
 
 	/**

@@ -285,6 +285,7 @@ int_error   int_sf, 12		; Stack fault
 int_error   int_gpf, 13		; General protection fault
 int_error   int_pf, 14		; Page fault
 int_noerror int_copro_err, 16	; Coprocessor error
+int_noerror int_stack_overflow,0x31	; Stack overflow trap
 
 ; IRQ handler code
 ; Parameters <irq no> <handler>
@@ -395,6 +396,7 @@ Lsetup_idt:
 	intport 0x2F, irq15
 	
 	intport 0x30, yieldPointHandler, 3
+	intport 0x31, int_stack_overflow, 3
 
 	lidt [idt]
 
@@ -589,8 +591,6 @@ int_div:
 int_bc:
 	cmp dword [ebp+OLD_CS],USER_CS
 	jne int_die
-	cmp dword [ebp+OLD_EIP],vm_invoke_testStackOverflow
-	je int_bc_stackOverflow
 	mov eax,SoftByteCodes_EX_INDEXOUTOFBOUNDS
 	mov ebx,[ebp+OLD_EIP]
 	; Determine index register number
@@ -603,11 +603,6 @@ int_bc:
 	; Now throw the exception
 	call int_system_exception
 	ret
-
-int_bc_stackOverflow:
-	call int_stack_overflow
-	ret
-
 
 ; ---------------------------
 ; NMI

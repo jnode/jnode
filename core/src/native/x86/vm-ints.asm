@@ -64,10 +64,11 @@ yieldPointHandler:
 yieldPointHandler_reschedule:
 	; Actually call VmScheduler.reschedule (in kernel mode!)
 	push ebp
-	xor ebp,ebp					; Make java stacktraces terminate
-	mov eax,VmProcessor_reschedule
-	push dword vmCurProcessor	; this
-	call vm_invoke
+	xor ebp,ebp						; Make java stacktraces terminate
+	mov STACKEND,KERNEL_STACKEND	; Set kernel stack end for correct stackoverflow tests
+	mov eax,VmProcessor_reschedule	; Load reschedule method
+	push dword vmCurProcessor		; this
+	INVOKE_JAVA_METHOD
 	pop ebp
 	; Now save the current thread state
 	mov edi,CURRENTTHREAD
@@ -92,10 +93,35 @@ yieldPointHandler_reschedule:
 	RESTOREREG VmX86Thread_ESP_OFFSET, OLD_ESP
 	RESTOREREG VmX86Thread_EIP_OFFSET, OLD_EIP
 	RESTOREREG VmX86Thread_EFLAGS_OFFSET, OLD_EFLAGS
+	; Fix old stack overflows
+	mov ecx,[edi+VmThread_STACKOVERFLOW_OFFSET*4]
+	test ecx,ecx
+	jnz yieldPointHandler_fixStackOverflow
+yieldPointHandler_afterStackOverflow:
+	; Set the new thread parameters
 	mov CURRENTTHREAD,edi
+	; Reload stackend
+	mov ebx,[edi+VmThread_STACKEND_OFFSET*4]
+	mov STACKEND,ebx
 yieldPointHandler_done:
 	and THREADSWITCHINDICATOR,~VmProcessor_TSI_SWITCH_ACTIVE
 	ret
+
+; Fix a previous stack overflow
+; EDI contains reference the VmThread
+yieldPointHandler_fixStackOverflow:
+	; Is the stack overflow resolved?
+	mov ecx,[edi+VmThread_STACKEND_OFFSET*4]
+	add ecx,VmThread_STACK_OVERFLOW_LIMIT
+	; Is current ESP not beyond limit anymore
+	cmp dword [edi+VmX86Thread_ESP_OFFSET*4],ecx
+	jle yieldPointHandler_afterStackOverflow		; No still below limit
+	; Reset stackoverflow flag
+	mov [edi+VmThread_STACKEND_OFFSET*4],ecx
+	mov dword [edi+VmThread_STACKOVERFLOW_OFFSET*4],0
+	jmp yieldPointHandler_afterStackOverflow
+
+
 	
 ; -----------------------------------------------
 ; Handle a timer interrupt
@@ -149,7 +175,7 @@ def_irq_kernel:
 ; EBP Old register block
 ; -----------------------------------------------
 int_system_exception:
-	jmp int_die
+	;jmp int_die
 	; Setup the user stack to add a return address to the current EIP
 	; and change the current EIP to doSystemException, which will 
 	; save the registers and call SoftByteCodes.systemException
@@ -167,13 +193,15 @@ doSystemException:
 	push eax ; Exception number
 	push ebx ; Address
 	mov eax,SoftByteCodes_systemException
-	call vm_invoke
+	INVOKE_JAVA_METHOD
 	jmp vm_athrow
 	
 ; -----------------------------------------------
 ; Handle a stackoverflow
 ; -----------------------------------------------
 int_stack_overflow:
+	cmp dword [ebp+OLD_CS],USER_CS
+	jne doFatal_stack_overflow
 	mov eax,CURRENTTHREAD
 	mov ecx,[eax+VmThread_STACKOVERFLOW_OFFSET*4]
 	jecxz int_stack_first_overflow
@@ -182,8 +210,10 @@ int_stack_overflow:
 int_stack_first_overflow:
 	inc dword [eax+VmThread_STACKOVERFLOW_OFFSET*4]
 	; Remove the stackoverflow limit
-	mov ebx,[eax+VmThread_STACK_OFFSET*4]
-	sub dword [ebx],VmThread_STACK_OVERFLOW_LIMIT
+	mov edx,[eax+VmThread_STACKEND_OFFSET*4]
+	sub edx,VmThread_STACK_OVERFLOW_LIMIT
+	mov [eax+VmThread_STACKEND_OFFSET*4],edx
+	mov STACKEND,edx
 	mov eax,SoftByteCodes_EX_STACKOVERFLOW
 	mov dword [ebp+OLD_EIP],doSystemException
 	jmp int_system_exception

@@ -55,4 +55,14 @@ public class VmX86Thread extends VmThread {
 	protected Address getInstructionPointer() {
 		return eip;
 	}
+
+	/**
+	 * Calculate the end of the stack. 
+	 * @param stack
+	 * @param stackSize
+	 * @return End address of the stack
+	 */
+	protected Address getStackEnd(Object stack, int stackSize) {
+		return Address.add(Address.valueOf(stack), STACK_OVERFLOW_LIMIT);
+	}
 }

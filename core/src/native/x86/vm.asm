@@ -71,7 +71,7 @@ vm_athrow_notrace_pop_eip:
 	push ebp ; frame
 	push edx ; address
 	mov eax,vm_findThrowableHandler
-	call vm_invoke
+	INVOKE_JAVA_METHOD
 	; eax now contains the handler address of the exception, move it to ebx
 	mov ebx,eax
 	

@@ -478,7 +478,7 @@ Q43org5jnode2vm6Unsafe23invokeLong2e28Lorg2fjnode2fvm2fclassmgr2fVmMethod3b29J:
 Q43org5jnode2vm6Unsafe23invokeObject2e28Lorg2fjnode2fvm2fclassmgr2fVmMethod3b29Ljava2flang2fObject3b:
 	pop eax 			; Get return address
 	xchg eax,[esp+0]	; EAX now contains method argument, Top of stack now contains return address
-	jmp vm_invoke
+	jmp [eax+VmMethod_NATIVECODE_OFFSET*4]
 
 ; int Unsafe.initThread(VmThread thread, Object newStack, int stackSize)
 ; Initialize the new Thread.
@@ -510,11 +510,13 @@ Q43org5jnode2vm6Unsafe23initThread2e28Lorg2fjnode2fvm2fVmThread3bLjava2flang2fOb
 	push ebx ; Dummy
 	push ebx ; Dummy
 	push ecx ; newThread	; Objectref for runThread
-	push ebx ; Dummy		; vm_invoke "return address"
+	push ebx ; Dummy		; method "return address"
 	
-	mov [ecx+VmX86Thread_EAX_OFFSET*4],dword VmThread_runThread
+	mov eax,VmThread_runThread
+	mov [ecx+VmX86Thread_EAX_OFFSET*4],eax ; runThread method
 	mov [ecx+VmX86Thread_EBP_OFFSET*4],ebp
-	mov [ecx+VmX86Thread_EIP_OFFSET*4],dword vm_invoke
+	mov eax,[eax+VmMethod_NATIVECODE_OFFSET*4]
+	mov [ecx+VmX86Thread_EIP_OFFSET*4],eax
 	mov [ecx+VmX86Thread_ESP_OFFSET*4], esp		; Save current esp
 	pushf
 	pop eax
