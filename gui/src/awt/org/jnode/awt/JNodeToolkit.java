@@ -82,6 +82,8 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 	private LRUCache fontCache = new LRUCache(50);
 
+	private Frame top;
+
 	public JNodeToolkit() {
 		refCount = 0;
 		this.focusHandler = new FocusHandler(this);
@@ -522,6 +524,14 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	public void sync() {
 		// TODO Auto-generated method stub
 
+	}
+
+	public Frame getTop() {
+	    return top;
+	}
+	
+	protected void setTop(Frame frame) {
+		this.top = frame;
 	}
 
 	private class LRUCache extends java.util.LinkedHashMap {

@@ -114,6 +114,7 @@ public class SwingToolkit extends JNodeToolkit {
     }
 
     protected FramePeer createFrame(Frame target) {
+    	setTop(target);
         final int rc = incRefCount();
         if (!initialized) {
             log.debug("createFrame:desktopFramePeer(" + target + ")");
