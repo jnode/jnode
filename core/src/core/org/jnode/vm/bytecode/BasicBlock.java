@@ -3,11 +3,7 @@
  */
 package org.jnode.vm.bytecode;
 
-import java.util.List;
-
-import org.jnode.util.BootableArrayList;
 import org.jnode.vm.VmSystemObject;
-import org.jnode.vm.compiler.ir.Variable;
 
 /**
  * A Basic block of instructions.
@@ -23,9 +19,6 @@ public class BasicBlock extends VmSystemObject {
 	private final int startPC;
 	private int endPC;
 	private boolean startOfExceptionHandler;
-	private BootableArrayList predecessors;
-	private BootableArrayList successors;
-	private Variable[] variables;
 	
 	/**
 	 * Create a new instance
@@ -37,8 +30,6 @@ public class BasicBlock extends VmSystemObject {
 		this.startPC = startPC;
 		this.endPC = endPC;
 		this.startOfExceptionHandler = startOfExceptionHandler;
-		this.predecessors = new BootableArrayList();
-		this.successors = new BootableArrayList();
 	}
 
 	/**
@@ -60,14 +51,14 @@ public class BasicBlock extends VmSystemObject {
 	/**
 	 * @param endPC The endPC to set.
 	 */
-	final void setEndPC(int endPC) {
+	public final void setEndPC(int endPC) {
 		this.endPC = endPC;
 	}
 
 	/**
 	 * @param startOfExceptionHandler The startOfExceptionHandler to set.
 	 */
-	final void setStartOfExceptionHandler(boolean startOfExceptionHandler) {
+	public final void setStartOfExceptionHandler(boolean startOfExceptionHandler) {
 		this.startOfExceptionHandler = startOfExceptionHandler;
 	}
 
@@ -107,56 +98,5 @@ public class BasicBlock extends VmSystemObject {
 	 */
 	public final boolean isStartOfExceptionHandler() {
 		return startOfExceptionHandler;
-	}
-
-	/**
-	 * @return an ArrayList containing BasicBlocks that may precede this block
-	 */
-	public List getPredecessors() {
-		return predecessors;
-	}
-
-	/**
-	 * @return a List containing BasicBlocks that may succeed this block
-	 */
-	public List getSuccessors() {
-		return successors;
-	}
-
-	final void addPredecessor(BasicBlock block) {
-		if (!this.predecessors.contains(block)) {
-			this.predecessors.add(block);
-		}
-		// Closure
-		List preds = block.getPredecessors();
-		int n = preds.size();
-		for (int i=0; i<n; i+=1) {
-			BasicBlock pred = (BasicBlock) preds.get(i);
-			if (!predecessors.contains(pred)) {
-				addPredecessor(pred);
-			}
-			pred.addSuccessor(this);
-		}
-	}
-
-	// This isn't complete, but it's good enough for now...
-	final void addSuccessor(BasicBlock block) {
-		if (!this.successors.contains(block)) {
-			this.successors.add(block);
-		}
-	}
-
-	/**
-	 * @return
-	 */
-	public Variable[] getVariables() {
-		return variables;
-	}
-
-	/**
-	 * @param variables
-	 */
-	public void setVariables(Variable[] variables) {
-		this.variables = variables;
 	}
 }
