@@ -79,7 +79,7 @@ public class KeyboardInterpreter_US_en extends KeyboardInterpreter
     keys.setKey(39, new Key(';', KeyEvent.VK_SEMICOLON, ':', KeyEvent.VK_COLON));
     keys.setKey(40, new Key("'".charAt(0), KeyEvent.VK_QUOTE, '"', KeyEvent.VK_QUOTEDBL));
     keys.setKey(41, new Key('`', '~', KeyEvent.VK_BACK_QUOTE));
-    keys.setKey(43, new Key('\\', '|', KeyEvent.VK_BACK_SLASH));
+    keys.setKey(43, new Key('\\', "|".charAt(0), KeyEvent.VK_BACK_SLASH));
     keys.setKey(44, new Key('z', 'Z', KeyEvent.VK_Z));
     keys.setKey(45, new Key('x', 'X', KeyEvent.VK_X));
     keys.setKey(46, new Key('c', 'C', KeyEvent.VK_C));

@@ -135,8 +135,8 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
     Key key;
 
     key = new Key();
-    key.setAltGrChar('|');
-    key.setAltGrVirtuelKey(KeyEvent.VK_DEAD_ACUTE);
+    key.setAltGrChar("|".charAt(0));
+    key.setAltGrVirtuelKey(KeyEvent.VK_UNDEFINED);
     key.setLowerVirtuelKey(KeyEvent.VK_DEAD_ACUTE);
     key.setUpperVirtuelKey(KeyEvent.VK_DEAD_GRAVE);
     keys.setKey(13, key);

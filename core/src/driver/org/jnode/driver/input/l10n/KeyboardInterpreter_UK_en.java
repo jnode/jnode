@@ -107,7 +107,7 @@ public class KeyboardInterpreter_UK_en extends KeyboardInterpreter
 
     keys.setKey(83, new Key('.', KeyEvent.VK_DECIMAL));
 
-    keys.setKey(86, new Key('\\', '|', KeyEvent.VK_BACK_SLASH));
+    keys.setKey(86, new Key('\\', "|".charAt(0), KeyEvent.VK_BACK_SLASH));
 
     keys.setKey(42, new Key(KeyEvent.VK_SHIFT));
     keys.setKey(54, new Key(KeyEvent.VK_SHIFT));

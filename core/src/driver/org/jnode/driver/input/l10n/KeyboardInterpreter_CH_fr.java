@@ -48,7 +48,7 @@ public class KeyboardInterpreter_CH_fr extends KeyboardInterpreter {
 	  keys.setKey(  5,new Key('4' ,KeyEvent.VK_4,'\u00e7' ,'\u00b0'));
 	  keys.setKey(  6,new Key('5' ,KeyEvent.VK_5,'%' ,'\u00a7'));
 	  keys.setKey(  7,new Key('6' ,KeyEvent.VK_6,'&' ,KeyEvent.VK_UNDEFINED        ,'\u00ac' ,KeyEvent.VK_UNDEFINED));
-	  keys.setKey(  8,new Key('7' ,KeyEvent.VK_7,'/' ,KeyEvent.VK_SLASH            ,'|' ,KeyEvent.VK_UNDEFINED));
+	  keys.setKey(  8,new Key('7' ,KeyEvent.VK_7,'/' ,KeyEvent.VK_SLASH            ,"|".charAt(0) ,KeyEvent.VK_UNDEFINED));
 	  keys.setKey(  9,new Key('8' ,KeyEvent.VK_8,'(' ,KeyEvent.VK_LEFT_PARENTHESIS ,'\u00a2' ,KeyEvent.VK_UNDEFINED));
 	  keys.setKey( 10,new Key('9' ,KeyEvent.VK_9,')' ,KeyEvent.VK_RIGHT_PARENTHESIS));
 	  keys.setKey( 11,new Key('0' ,KeyEvent.VK_0,'=' ,KeyEvent.VK_EQUALS));	  

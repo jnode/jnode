@@ -39,7 +39,7 @@ public class KeyboardInterpreter_NO extends KeyboardInterpreter
   {
     Key key;
 
-    keys.setKey(1, new Key('|', '\u00a7'));
+    keys.setKey(1, new Key("|".charAt(0), '\u00a7'));
     keys.setKey(2, new Key('1', KeyEvent.VK_1, '!', KeyEvent.VK_EXCLAMATION_MARK));
     keys.setKey(3, new Key('2', KeyEvent.VK_2, '"', KeyEvent.VK_QUOTEDBL, '@', KeyEvent.VK_AT));
     keys.setKey(4, new Key('3', KeyEvent.VK_3, '#', KeyEvent.VK_NUMBER_SIGN, '\u00a3', KeyEvent.VK_3));
