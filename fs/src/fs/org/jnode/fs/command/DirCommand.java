@@ -22,23 +22,27 @@ public class DirCommand {
 		ParsedArguments cmdLine = HELP_INFO.parse(args);
 
 		File dir = ARG_DIR.getFile(cmdLine);
-		if (dir == null)
+		if (dir == null) {
 			dir = new File(".");
-
-		File[] list = dir.listFiles();
-		if (list == null)
-			return;
-
-		for (int i = 0; i < list.length; i++) {
-			File f = list[i];
-			if (f.isDirectory()) {
-				System.out.print("[" + f.getName() + "]");
-			} else {
-				System.out.print(f.getName() + " " + f.length());
-			}
-			System.out.println();
 		}
-		System.out.println();
+
+		if (dir.exists() && dir.isDirectory()) {
+			final File[] list = dir.listFiles();
+			if (list != null) {
+				for (int i = 0; i < list.length; i++) {
+					File f = list[i];
+					if (f.isDirectory()) {
+						System.out.print("[" + f.getName() + "]");
+					} else {
+						System.out.print(f.getName() + " " + f.length());
+					}
+					System.out.println();
+				}
+				System.out.println();
+			}
+		} else {
+			System.err.println("No such directory " + dir);
+		}
 	}
 
 }

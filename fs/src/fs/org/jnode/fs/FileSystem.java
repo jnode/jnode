@@ -18,7 +18,7 @@ public interface FileSystem {
 	public Device getDevice();
 	
 	/**
-	 * Gets the root entry of this filesystem. This is usually a director,
+	 * Gets the root entry of this filesystem. This is usually a directory,
 	 * but this is not required.
 	 */
 	public FSEntry getRootEntry()

@@ -32,7 +32,7 @@ public class FileSystemManager {
 	 */
 	public void registerFileSystem(FileSystem fs) {
 		String idToMount = fs.getDevice().getId();
-		filesystems.put(fs.getDevice().getId(), fs);
+		filesystems.put(idToMount, fs);
 	}
 
 	/**
