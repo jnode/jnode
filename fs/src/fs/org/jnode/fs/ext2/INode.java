@@ -90,7 +90,7 @@ public class INode {
 			return fs.getBlock( Ext2Utils.get32(data,40+(int)i*4) );
 
 		//see the indirect blocks (12; indirectCount-1)
-		int indirectCount = fs.getSuperblock().getBlockSize() << 2; //a block index is 4 bytes long
+		int indirectCount = fs.getSuperblock().getBlockSize() >> 2; //a block index is 4 bytes long
 		if(i<12+indirectCount) {
 			long offset=i-12;
 			//the 12th index points to the indirect block
