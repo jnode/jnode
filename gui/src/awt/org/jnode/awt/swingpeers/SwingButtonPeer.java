@@ -21,19 +21,55 @@ import org.jnode.awt.swingpeers.event.MouseMotionListenerDelegate;
  * AWT button peer implemented as a {@link javax.swing.JButton}.
  */
 
-class SwingButtonPeer extends JButton implements ButtonPeer {
+class SwingButtonPeer extends JButton implements ButtonPeer, SwingPeer {
+	private final Button button;
 
-	//
 	// Construction
 	//
 
 	public SwingButtonPeer(Button button) {
+		this.button = button;
 		SwingToolkit.add(button, this);
 		SwingToolkit.copyAwtProperties(button, this);
 		setText(button.getLabel());
 		addActionListener(new ActionListenerDelegate(button));
 		addMouseListener(new MouseListenerDelegate(button));
 		addMouseMotionListener(new MouseMotionListenerDelegate(button));
+	}
+
+	public boolean canDetermineObscurity() {
+		return false;
+	}
+
+	public void coalescePaintEvent(PaintEvent e) {
+		System.err.println(e);
+	}
+
+	// Buffer
+
+	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
+	}
+
+	public void destroyBuffers() {
+	}
+
+	// Misc
+
+	public void dispose() {
+	}
+
+	public void flip(BufferCapabilities.FlipContents flipContents) {
+	}
+
+	/**
+	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+	 */
+	public Component getAWTComponent() {
+		return button;
+	}
+
+	public Image getBackBuffer() {
+		return null;
 	}
 
 	//
@@ -46,10 +82,6 @@ class SwingButtonPeer extends JButton implements ButtonPeer {
 		//System.err.println(e);
 	}
 
-	public void coalescePaintEvent(PaintEvent e) {
-		System.err.println(e);
-	}
-
 	public boolean handlesWheelScrolling() {
 		return false;
 	}
@@ -60,40 +92,9 @@ class SwingButtonPeer extends JButton implements ButtonPeer {
 		return false;
 	}
 
-	public boolean canDetermineObscurity() {
-		return false;
-	}
-
-	// Focus
-
 	public boolean requestFocus(Component lightweightChild, boolean temporary,
 			boolean focusedWindowChangeAllowed, long time) {
 		return true;
-	}
-
-	// Buffer
-
-	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-	}
-
-	public void destroyBuffers() {
-	}
-
-	public void flip(BufferCapabilities.FlipContents flipContents) {
-	}
-
-	public Image getBackBuffer() {
-		return null;
-	}
-
-	// Cursor
-
-	public void updateCursorImmediately() {
-	}
-
-	// Misc
-
-	public void dispose() {
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////
@@ -105,5 +106,10 @@ class SwingButtonPeer extends JButton implements ButtonPeer {
 	public void setEventMask(long mask) {
 		// TODO Auto-generated method stub
 
+	}
+
+	// Cursor
+
+	public void updateCursorImmediately() {
 	}
 }

@@ -17,14 +17,16 @@ import javax.swing.JButton;
  * AWT choice peer implemented as a {@link javax.swing.JButton}.
  */
 
-class SwingChoicePeer extends JButton implements ChoicePeer {
+class SwingChoicePeer extends JButton implements ChoicePeer, SwingPeer {
+
+	private final Choice choice;
 
 	//
 	// Construction
 	//
 
 	public SwingChoicePeer(Choice choice) {
-		super();
+		this.choice = choice;
 		SwingToolkit.add(choice, this);
 		SwingToolkit.copyAwtProperties(choice, this);
 		final int cnt = choice.getItemCount();
@@ -40,13 +42,45 @@ class SwingChoicePeer extends JButton implements ChoicePeer {
 	public void add(String item, int index) {
 	}
 
-	public void select(int index) {
-	}
-
 	// Deprecated
 
 	public void addItem(String item, int index) {
 		add(item, index);
+	}
+
+	public boolean canDetermineObscurity() {
+		return false;
+	}
+
+	public void coalescePaintEvent(PaintEvent e) {
+		System.err.println(e);
+	}
+
+	// Buffer
+
+	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
+	}
+
+	public void destroyBuffers() {
+	}
+
+	// Misc
+
+	public void dispose() {
+	}
+
+	public void flip(BufferCapabilities.FlipContents flipContents) {
+	}
+
+	/**
+	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+	 */
+	public Component getAWTComponent() {
+		return choice;
+	}
+
+	public Image getBackBuffer() {
+		return null;
 	}
 
 	//
@@ -59,10 +93,6 @@ class SwingChoicePeer extends JButton implements ChoicePeer {
 		//System.err.println(e);
 	}
 
-	public void coalescePaintEvent(PaintEvent e) {
-		System.err.println(e);
-	}
-
 	public boolean handlesWheelScrolling() {
 		return false;
 	}
@@ -73,10 +103,6 @@ class SwingChoicePeer extends JButton implements ChoicePeer {
 		return false;
 	}
 
-	public boolean canDetermineObscurity() {
-		return false;
-	}
-
 	// Focus
 
 	public boolean requestFocus(Component lightweightChild, boolean temporary,
@@ -84,29 +110,7 @@ class SwingChoicePeer extends JButton implements ChoicePeer {
 		return true;
 	}
 
-	// Buffer
-
-	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-	}
-
-	public void destroyBuffers() {
-	}
-
-	public void flip(BufferCapabilities.FlipContents flipContents) {
-	}
-
-	public Image getBackBuffer() {
-		return null;
-	}
-
-	// Cursor
-
-	public void updateCursorImmediately() {
-	}
-
-	// Misc
-
-	public void dispose() {
+	public void select(int index) {
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////
@@ -117,5 +121,10 @@ class SwingChoicePeer extends JButton implements ChoicePeer {
 	public void setEventMask(long mask) {
 		// TODO Auto-generated method stub
 
+	}
+
+	// Cursor
+
+	public void updateCursorImmediately() {
 	}
 }

@@ -17,96 +17,107 @@ import javax.swing.JScrollBar;
  * AWT scrollbar peer implemented as a {@link javax.swing.JScrollBar}.
  */
 
-class SwingScrollbarPeer extends JScrollBar implements ScrollbarPeer {
+class SwingScrollbarPeer extends JScrollBar implements ScrollbarPeer, SwingPeer {
 
-    //
-    // Construction
-    //
+	private final Scrollbar scrollbar;
 
-    public SwingScrollbarPeer(Scrollbar sb) {
-        SwingToolkit.add(sb, this);
-        SwingToolkit.copyAwtProperties(sb, this);
-        setOrientation(sb.getOrientation());
-        setBlockIncrement(sb.getBlockIncrement());
-        setUnitIncrement(sb.getUnitIncrement());
-        setValues(sb.getValue(), sb.getVisibleAmount(), sb.getMinimum(), sb.getMaximum());
-    }
+	//
+	// Construction
+	//
 
-    //
-    // ScrollbarPeer
-    //
+	public SwingScrollbarPeer(Scrollbar sb) {
+		this.scrollbar = sb;
+		SwingToolkit.add(sb, this);
+		SwingToolkit.copyAwtProperties(sb, this);
+		setOrientation(sb.getOrientation());
+		setBlockIncrement(sb.getBlockIncrement());
+		setUnitIncrement(sb.getUnitIncrement());
+		setValues(sb.getValue(), sb.getVisibleAmount(), sb.getMinimum(), sb
+				.getMaximum());
+	}
 
-    public void setLineIncrement(int l) {
-    }
+	public boolean canDetermineObscurity() {
+		return false;
+	}
 
-    public void setPageIncrement(int l) {
-    }
+	public void coalescePaintEvent(PaintEvent e) {
+		System.err.println(e);
+	}
 
-    //
-    // ComponentPeer
-    //
+	// Buffer
 
-    // Events
+	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
+	}
 
-    public void handleEvent(AWTEvent e) {
-        //System.err.println(e);
-    }
+	public void destroyBuffers() {
+	}
 
-    public void coalescePaintEvent(PaintEvent e) {
-        System.err.println(e);
-    }
+	// Misc
 
-    public boolean handlesWheelScrolling() {
-        return false;
-    }
+	public void dispose() {
+	}
 
-    // Obscurity
+	public void flip(BufferCapabilities.FlipContents flipContents) {
+	}
 
-    public boolean isObscured() {
-        return false;
-    }
+	/**
+	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+	 */
+	public Component getAWTComponent() {
+		return scrollbar;
+	}
 
-    public boolean canDetermineObscurity() {
-        return false;
-    }
+	public Image getBackBuffer() {
+		return null;
+	}
 
-    // Focus
+	//
+	// ComponentPeer
+	//
 
-    public boolean requestFocus(Component lightweightChild, boolean temporary,
-            boolean focusedWindowChangeAllowed, long time) {
-        return true;
-    }
+	// Events
 
-    // Buffer
+	public void handleEvent(AWTEvent e) {
+		//System.err.println(e);
+	}
 
-    public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-    }
+	public boolean handlesWheelScrolling() {
+		return false;
+	}
 
-    public void destroyBuffers() {
-    }
+	// Obscurity
 
-    public void flip(BufferCapabilities.FlipContents flipContents) {
-    }
+	public boolean isObscured() {
+		return false;
+	}
 
-    public Image getBackBuffer() {
-        return null;
-    }
+	// Focus
 
-    // Cursor
+	public boolean requestFocus(Component lightweightChild, boolean temporary,
+			boolean focusedWindowChangeAllowed, long time) {
+		return true;
+	}
 
-    public void updateCursorImmediately() {
-    }
+	/**
+	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
+	 */
+	public void setEventMask(long mask) {
+		// TODO Auto-generated method stub
 
-    // Misc
+	}
 
-    public void dispose() {
-    }
+	//
+	// ScrollbarPeer
+	//
 
-    /**
-     * @see java.awt.peer.ComponentPeer#setEventMask(long)
-     */
-    public void setEventMask(long mask) {
-        // TODO Auto-generated method stub
+	public void setLineIncrement(int l) {
+	}
 
-    }
+	public void setPageIncrement(int l) {
+	}
+
+	// Cursor
+
+	public void updateCursorImmediately() {
+	}
 }

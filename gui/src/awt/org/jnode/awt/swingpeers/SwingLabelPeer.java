@@ -17,93 +17,102 @@ import javax.swing.JLabel;
  * AWT label peer implemented as a {@link javax.swing.JLabel}.
  */
 
-class SwingLabelPeer extends JLabel implements LabelPeer {
+class SwingLabelPeer extends JLabel implements LabelPeer, SwingPeer {
 
-    //
-    // Construction
-    //
+	private final Label label;
 
-    public SwingLabelPeer(Label label) {
-        super();
-        SwingToolkit.add(label, this);
-        SwingToolkit.copyAwtProperties(label, this);
-        setText(label.getText());
-    }
+	//
+	// Construction
+	//
 
-    //
-    // LabelPeer
-    //
+	public SwingLabelPeer(Label label) {
+		this.label = label;
+		SwingToolkit.add(label, this);
+		SwingToolkit.copyAwtProperties(label, this);
+		setText(label.getText());
+	}
 
-    public void setAlignment(int alignment) {
-    }
+	public boolean canDetermineObscurity() {
+		return false;
+	}
 
-    //
-    // ComponentPeer
-    //
+	public void coalescePaintEvent(PaintEvent e) {
+		System.err.println(e);
+	}
 
-    // Events
+	// Buffer
 
-    public void handleEvent(AWTEvent e) {
-        //System.err.println(e);
-    }
+	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
+	}
 
-    public void coalescePaintEvent(PaintEvent e) {
-        System.err.println(e);
-    }
+	public void destroyBuffers() {
+	}
 
-    public boolean handlesWheelScrolling() {
-        return false;
-    }
+	// Misc
 
-    // Obscurity
+	public void dispose() {
+	}
 
-    public boolean isObscured() {
-        return false;
-    }
+	public void flip(BufferCapabilities.FlipContents flipContents) {
+	}
 
-    public boolean canDetermineObscurity() {
-        return false;
-    }
+	/**
+	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+	 */
+	public Component getAWTComponent() {
+		return label;
+	}
 
-    // Focus
+	public Image getBackBuffer() {
+		return null;
+	}
 
-    public boolean requestFocus(Component lightweightChild, boolean temporary,
-            boolean focusedWindowChangeAllowed, long time) {
-        return true;
-    }
+	//
+	// ComponentPeer
+	//
 
-    // Buffer
+	// Events
 
-    public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-    }
+	public void handleEvent(AWTEvent e) {
+		//System.err.println(e);
+	}
 
-    public void destroyBuffers() {
-    }
+	public boolean handlesWheelScrolling() {
+		return false;
+	}
 
-    public void flip(BufferCapabilities.FlipContents flipContents) {
-    }
+	// Obscurity
 
-    public Image getBackBuffer() {
-        return null;
-    }
+	public boolean isObscured() {
+		return false;
+	}
 
-    // Cursor
+	// Focus
 
-    public void updateCursorImmediately() {
-    }
+	public boolean requestFocus(Component lightweightChild, boolean temporary,
+			boolean focusedWindowChangeAllowed, long time) {
+		return true;
+	}
 
-    // Misc
+	//
+	// LabelPeer
+	//
 
-    public void dispose() {
-    }
+	public void setAlignment(int alignment) {
+	}
 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // Private
-    /**
-     * @see java.awt.peer.ComponentPeer#setEventMask(long)
-     */
-    public void setEventMask(long mask) {
-        // TODO Auto-generated method stub
+	///////////////////////////////////////////////////////////////////////////////////////
+	// Private
+	/**
+	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
+	 */
+	public void setEventMask(long mask) {
+		// TODO Auto-generated method stub
 
-    }
+	}
+
+	// Cursor
+
+	public void updateCursorImmediately() {
+	}
 }

@@ -3,10 +3,14 @@
  */
 package org.jnode.awt.swingpeers;
 
+import java.awt.AWTEvent;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
+
+import org.apache.log4j.Logger;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -14,6 +18,7 @@ import javax.swing.JFrame;
 final class DesktopFrame extends JFrame {
 
 	private final JDesktopPane desktop;
+	private final Logger log = Logger.getLogger(getClass());
 	
 	/**
 	 * Initialize this instance.
@@ -31,5 +36,14 @@ final class DesktopFrame extends JFrame {
 	 */
 	final JDesktopPane getDesktop() {
 		return desktop;
+	}
+
+	/**
+	 * @see javax.swing.JFrame#frameInit()
+	 */
+	protected void frameInit() {
+		super.setLayout(new BorderLayout());
+		enableEvents(AWTEvent.WINDOW_EVENT_MASK);
+		getRootPane(); // will do set/create
 	}
 }

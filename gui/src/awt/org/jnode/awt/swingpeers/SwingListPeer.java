@@ -20,54 +20,30 @@ import javax.swing.ListModel;
  * AWT list peer implemented as a {@link javax.swing.JList}.
  */
 
-class SwingListPeer extends JList implements ListPeer {
+class SwingListPeer extends JList implements ListPeer, SwingPeer {
+
+	private final List list;
 
 	//
 	// Construction
 	//
 
 	public SwingListPeer(final List list) {
-		super();
+		this.list = list;
 		SwingToolkit.add(list, this);
 		SwingToolkit.copyAwtProperties(list, this);
 		final ListModel model = new AbstractListModel() {
-			public int getSize() { return list.getItemCount(); }
-			public Object getElementAt(int idx) { return list.getItem(idx); }
-		};		
-	}
+			public Object getElementAt(int idx) {
+				return list.getItem(idx);
+			}
 
-	//
-	// ListPeer
-	//
-
-	public int[] getSelectedIndexes() {
-		return null;
+			public int getSize() {
+				return list.getItemCount();
+			}
+		};
 	}
 
 	public void add(String item, int index) {
-	}
-
-	public void delItems(int start, int end) {
-	}
-
-	public void select(int index) {
-	}
-
-	public void deselect(int index) {
-	}
-
-	public void makeVisible(int index) {
-	}
-
-	public void setMultipleMode(boolean b) {
-	}
-
-	public Dimension getPreferredSize(int rows) {
-		return getPreferredSize();
-	}
-
-	public Dimension getMinimumSize(int rows) {
-		return getMinimumSize();
 	}
 
 	// Deprecated
@@ -76,20 +52,65 @@ class SwingListPeer extends JList implements ListPeer {
 		add(item, index);
 	}
 
+	public boolean canDetermineObscurity() {
+		return false;
+	}
+
 	public void clear() {
 		removeAll();
 	}
 
-	public void setMultipleSelections(boolean v) {
-		setMultipleMode(v);
+	public void coalescePaintEvent(PaintEvent e) {
+		System.err.println(e);
 	}
 
-	public Dimension preferredSize(int rows) {
-		return getPreferredSize(rows);
+	// Buffer
+
+	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
 	}
 
-	public Dimension minimumSize(int rows) {
-		return getMinimumSize(rows);
+	public void delItems(int start, int end) {
+	}
+
+	public void deselect(int index) {
+	}
+
+	public void destroyBuffers() {
+	}
+
+	// Misc
+
+	public void dispose() {
+	}
+
+	public void flip(BufferCapabilities.FlipContents flipContents) {
+	}
+
+	/**
+	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+	 */
+	public Component getAWTComponent() {
+		return list;
+	}
+
+	public Image getBackBuffer() {
+		return null;
+	}
+
+	public Dimension getMinimumSize(int rows) {
+		return getMinimumSize();
+	}
+
+	public Dimension getPreferredSize(int rows) {
+		return getPreferredSize();
+	}
+
+	//
+	// ListPeer
+	//
+
+	public int[] getSelectedIndexes() {
+		return null;
 	}
 
 	//
@@ -102,10 +123,6 @@ class SwingListPeer extends JList implements ListPeer {
 		//System.err.println(e);
 	}
 
-	public void coalescePaintEvent(PaintEvent e) {
-		System.err.println(e);
-	}
-
 	public boolean handlesWheelScrolling() {
 		return false;
 	}
@@ -116,8 +133,15 @@ class SwingListPeer extends JList implements ListPeer {
 		return false;
 	}
 
-	public boolean canDetermineObscurity() {
-		return false;
+	public void makeVisible(int index) {
+	}
+
+	public Dimension minimumSize(int rows) {
+		return getMinimumSize(rows);
+	}
+
+	public Dimension preferredSize(int rows) {
+		return getPreferredSize(rows);
 	}
 
 	// Focus
@@ -127,29 +151,7 @@ class SwingListPeer extends JList implements ListPeer {
 		return true;
 	}
 
-	// Buffer
-
-	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-	}
-
-	public void destroyBuffers() {
-	}
-
-	public void flip(BufferCapabilities.FlipContents flipContents) {
-	}
-
-	public Image getBackBuffer() {
-		return null;
-	}
-
-	// Cursor
-
-	public void updateCursorImmediately() {
-	}
-
-	// Misc
-
-	public void dispose() {
+	public void select(int index) {
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////
@@ -160,5 +162,17 @@ class SwingListPeer extends JList implements ListPeer {
 	public void setEventMask(long mask) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public void setMultipleMode(boolean b) {
+	}
+
+	public void setMultipleSelections(boolean v) {
+		setMultipleMode(v);
+	}
+
+	// Cursor
+
+	public void updateCursorImmediately() {
 	}
 }

@@ -19,132 +19,142 @@ import javax.swing.JTextField;
  * AWT text field peer implemented as a {@link javax.swing.JTextField}.
  */
 
-class SwingTextFieldPeer extends JTextField implements TextFieldPeer {
+class SwingTextFieldPeer extends JTextField implements TextFieldPeer, SwingPeer {
 
-    //
-    // Construction
-    //
+	private final TextField textField;
 
-    public SwingTextFieldPeer(TextField textField) {
-        SwingToolkit.add(textField, this);
-        SwingToolkit.copyAwtProperties(textField, this);
+	//
+	// Construction
+	//
+
+	public SwingTextFieldPeer(TextField textField) {
+		this.textField = textField;
+		SwingToolkit.add(textField, this);
+		SwingToolkit.copyAwtProperties(textField, this);
 		setText(textField.getText());
 		setColumns(textField.getColumns());
 		setEditable(textField.isEditable());
-    }
+	}
 
-    //
-    // TextFieldPeer
-    //
+	public boolean canDetermineObscurity() {
+		return false;
+	}
 
-    public void setEchoChar(char echoChar) {
-    }
+	public void coalescePaintEvent(PaintEvent e) {
+		System.err.println(e);
+	}
 
-    public Dimension getPreferredSize(int columns) {
-        return null;
-    }
+	// Buffer
 
-    public Dimension getMinimumSize(int columns) {
-        return null;
-    }
+	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
+	}
 
-    // Deprecated
+	public void destroyBuffers() {
+	}
 
-    public void setEchoCharacter(char c) {
-        setEchoChar(c);
-    }
+	// Misc
 
-    public Dimension preferredSize(int cols) {
-        return getPreferredSize(cols);
-    }
+	public void dispose() {
+	}
 
-    public Dimension minimumSize(int cols) {
-        return getMinimumSize(cols);
-    }
+	public long filterEvents(long mask) {
+		return 0;
+	}
 
-    //
-    // TextComponentPeer
-    //
+	public void flip(BufferCapabilities.FlipContents flipContents) {
+	}
 
-    public int getIndexAtPoint(int x, int y) {
-        return 0;
-    }
+	/**
+	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+	 */
+	public Component getAWTComponent() {
+		return textField;
+	}
 
-    public Rectangle getCharacterBounds(int i) {
-        return null;
-    }
+	public Image getBackBuffer() {
+		return null;
+	}
 
-    public long filterEvents(long mask) {
-        return 0;
-    }
+	public Rectangle getCharacterBounds(int i) {
+		return null;
+	}
 
-    //
-    // ComponentPeer
-    //
+	//
+	// TextComponentPeer
+	//
 
-    // Events
+	public int getIndexAtPoint(int x, int y) {
+		return 0;
+	}
 
-    public void handleEvent(AWTEvent e) {
-        //System.err.println(e);
-    }
+	public Dimension getMinimumSize(int columns) {
+		return null;
+	}
 
-    public void coalescePaintEvent(PaintEvent e) {
-        System.err.println(e);
-    }
+	public Dimension getPreferredSize(int columns) {
+		return null;
+	}
 
-    public boolean handlesWheelScrolling() {
-        return false;
-    }
+	//
+	// ComponentPeer
+	//
 
-    // Obscurity
+	// Events
 
-    public boolean isObscured() {
-        return false;
-    }
+	public void handleEvent(AWTEvent e) {
+		//System.err.println(e);
+	}
 
-    public boolean canDetermineObscurity() {
-        return false;
-    }
+	public boolean handlesWheelScrolling() {
+		return false;
+	}
 
-    // Focus
+	// Obscurity
 
-    public boolean requestFocus(Component lightweightChild, boolean temporary,
-            boolean focusedWindowChangeAllowed, long time) {
-        return true;
-    }
+	public boolean isObscured() {
+		return false;
+	}
 
-    // Buffer
+	public Dimension minimumSize(int cols) {
+		return getMinimumSize(cols);
+	}
 
-    public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-    }
+	public Dimension preferredSize(int cols) {
+		return getPreferredSize(cols);
+	}
 
-    public void destroyBuffers() {
-    }
+	// Focus
 
-    public void flip(BufferCapabilities.FlipContents flipContents) {
-    }
+	public boolean requestFocus(Component lightweightChild, boolean temporary,
+			boolean focusedWindowChangeAllowed, long time) {
+		return true;
+	}
 
-    public Image getBackBuffer() {
-        return null;
-    }
+	//
+	// TextFieldPeer
+	//
 
-    // Cursor
+	public void setEchoChar(char echoChar) {
+	}
 
-    public void updateCursorImmediately() {
-    }
+	// Deprecated
 
-    // Misc
+	public void setEchoCharacter(char c) {
+		setEchoChar(c);
+	}
 
-    public void dispose() {
-    }
+	///////////////////////////////////////////////////////////////////////////////////////
+	// Private
+	/**
+	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
+	 */
+	public void setEventMask(long mask) {
+		// TODO Auto-generated method stub
 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // Private
-    /**
-     * @see java.awt.peer.ComponentPeer#setEventMask(long)
-     */
-    public void setEventMask(long mask) {
-        // TODO Auto-generated method stub
+	}
 
-    }
+	// Cursor
+
+	public void updateCursorImmediately() {
+	}
 }

@@ -17,28 +17,55 @@ import javax.swing.JCheckBox;
 /**
  * AWT checkbox peer implemented as a {@link javax.swing.JCheckBox}.
  */
-class SwingCheckboxPeer extends JCheckBox implements CheckboxPeer {
+class SwingCheckboxPeer extends JCheckBox implements CheckboxPeer, SwingPeer {
+
+	private final Checkbox checkBox;
 
 	//
 	// Construction
 	//
 
 	public SwingCheckboxPeer(Checkbox checkBox) {
+		this.checkBox = checkBox;
 		SwingToolkit.add(checkBox, this);
 		SwingToolkit.copyAwtProperties(checkBox, this);
 		setText(checkBox.getLabel());
 		setState(checkBox.getState());
 	}
 
-	//
-	// CheckboxPeer
-	//
-
-	public void setState(boolean state) {
-		setSelected(state);
+	public boolean canDetermineObscurity() {
+		return false;
 	}
 
-	public void setCheckboxGroup(CheckboxGroup g) {
+	public void coalescePaintEvent(PaintEvent e) {
+		System.err.println(e);
+	}
+
+	// Buffer
+
+	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
+	}
+
+	public void destroyBuffers() {
+	}
+
+	// Misc
+
+	public void dispose() {
+	}
+
+	public void flip(BufferCapabilities.FlipContents flipContents) {
+	}
+
+	/**
+	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+	 */
+	public Component getAWTComponent() {
+		return checkBox;
+	}
+
+	public Image getBackBuffer() {
+		return null;
 	}
 
 	//
@@ -51,10 +78,6 @@ class SwingCheckboxPeer extends JCheckBox implements CheckboxPeer {
 		//System.err.println(e);
 	}
 
-	public void coalescePaintEvent(PaintEvent e) {
-		System.err.println(e);
-	}
-
 	public boolean handlesWheelScrolling() {
 		return false;
 	}
@@ -65,10 +88,6 @@ class SwingCheckboxPeer extends JCheckBox implements CheckboxPeer {
 		return false;
 	}
 
-	public boolean canDetermineObscurity() {
-		return false;
-	}
-
 	// Focus
 
 	public boolean requestFocus(Component lightweightChild, boolean temporary,
@@ -76,29 +95,7 @@ class SwingCheckboxPeer extends JCheckBox implements CheckboxPeer {
 		return true;
 	}
 
-	// Buffer
-
-	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-	}
-
-	public void destroyBuffers() {
-	}
-
-	public void flip(BufferCapabilities.FlipContents flipContents) {
-	}
-
-	public Image getBackBuffer() {
-		return null;
-	}
-
-	// Cursor
-
-	public void updateCursorImmediately() {
-	}
-
-	// Misc
-
-	public void dispose() {
+	public void setCheckboxGroup(CheckboxGroup g) {
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////
@@ -109,5 +106,18 @@ class SwingCheckboxPeer extends JCheckBox implements CheckboxPeer {
 	public void setEventMask(long mask) {
 		// TODO Auto-generated method stub
 
+	}
+
+	//
+	// CheckboxPeer
+	//
+
+	public void setState(boolean state) {
+		setSelected(state);
+	}
+
+	// Cursor
+
+	public void updateCursorImmediately() {
 	}
 }

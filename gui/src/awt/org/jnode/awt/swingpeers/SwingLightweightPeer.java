@@ -13,8 +13,7 @@ import java.awt.peer.LightweightPeer;
  */
 
 final class SwingLightweightPeer extends SwingComponentPeer implements
-		LightweightPeer, ContainerPeer {
-
+		LightweightPeer, ContainerPeer, SwingPeer {
 	private Insets containerInsets;
 
 	//
@@ -58,6 +57,13 @@ final class SwingLightweightPeer extends SwingComponentPeer implements
 	public void endValidate() {
 		// TODO Auto-generated method stub
 
+	}
+
+	/**
+	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+	 */
+	public Component getAWTComponent() {
+		return component;
 	}
 
 	/**

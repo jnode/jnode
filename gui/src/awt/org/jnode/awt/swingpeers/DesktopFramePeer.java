@@ -22,7 +22,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.BufferCapabilities.FlipContents;
 import java.awt.event.PaintEvent;
-import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
@@ -32,7 +31,6 @@ import java.awt.peer.FramePeer;
 import org.apache.log4j.Logger;
 import org.jnode.awt.JNodeGenericPeer;
 import org.jnode.awt.JNodeGraphics;
-import org.jnode.awt.image.JNodeBufferedImage;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
