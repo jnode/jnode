@@ -7,3 +7,4 @@ lib
 .project
 src.jpx
 *.patch
+jnode.properties
