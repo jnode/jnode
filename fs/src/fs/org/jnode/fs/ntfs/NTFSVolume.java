@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.jnode.driver.block.BlockDeviceAPI;
+import org.jnode.fs.FileSystemException;
 
 
 /**
@@ -19,7 +20,6 @@ public class NTFSVolume
 {
 	private NTFSBootRecord bootRecord = null;
 	private BlockDeviceAPI api = null;
-	private NTFS_MFTRecord MTFRecord = new NTFS_MFTRecord();
 	/**
 	 * 
 	 */
@@ -28,11 +28,14 @@ public class NTFSVolume
 		super();
 		if(bootRecord == null)
 			bootRecord = new NTFSBootRecord();
+		// I hope this is enaugh..should be
 		byte[] buffer = new byte[512];
+		this.api = api;
+		
 		api.read(0,buffer,0,512);
 		bootRecord.initBootRecordData(buffer);
-		this.api = api;
 	}
+	
 	/**
 	 * @return Returns the bootRecord.
 	 */
@@ -43,18 +46,23 @@ public class NTFSVolume
 	/**
 	 * @param cluster 
 	 */
-	public byte[] readCluster(int cluster) throws IOException
+	public byte[] readCluster(long cluster) throws IOException
 	{
 		byte[] buff = new byte[getClusterSize() ];
-		int clusterOffset = cluster * getClusterSize();
+		long clusterOffset = cluster * getClusterSize();
 		
 		api.read(clusterOffset,buff,0,	getClusterSize());
 		return buff;
 	}
 	
+	public byte[] readDataFromCluster(long cluster, int howManyBytes, int offset) throws IOException
+	{
+		return NTFSUTIL.extractSubBuffer(readCluster(cluster),offset,howManyBytes);
+	}
+	
 	public byte[] readClusters(long firstCluster, long howMany) throws IOException
 	{
-		byte[] buff = new byte[(int) (getClusterSize() * howMany)];
+		byte[] buff = new byte[(int) (howMany * getClusterSize())];
 
 		long clusterOffset = firstCluster * getClusterSize();
 		for(int i = 0 ; i< howMany;i++)
@@ -66,7 +74,7 @@ public class NTFSVolume
 	
 	public int getClusterSize()
 	{
-		return this.getBootRecord().SectorPerCluster * this.getBootRecord().BytesPerSector;
+		return this.getBootRecord().getSectorPerCluster() * this.getBootRecord().getBytesPerSector();
 	}
 	public void setBootRecord(NTFSBootRecord bootRecord)
 	{
@@ -75,62 +83,126 @@ public class NTFSVolume
 	/**
 	 * @return Returns the mTFRecord.
 	 */
-	public NTFS_MFTRecord getMTFRecord()
+	public NTFSFileRecord getMFTRecord() throws IOException
 	{
-		return MTFRecord;
-	}
-	/**
-	 * @param record The mTFRecord to set.
-	 */
-	public void setMTFRecord(NTFS_MFTRecord record)
-	{
-		MTFRecord = record;
-	}
-	public NTFSFileRecord getFirstFileRecord() throws IOException
-	{
-		return getFileRecord(0);
-	}
-	public Iterator getNTFSIterator()
-	{
-		return new Iterator()
+		if(this.getBootRecord().getBytesPerFileRecord() < this.getClusterSize())
 		{
-
-			int offset = 0;
-			NTFSFileRecord fileRecord = null;
-			
-			public boolean hasNext() 
-			{
-				if(offset == -1)
-					return false;
-				if(fileRecord != null)
-					if(fileRecord.getAlocatedSize() <= 0)
-						return false;
-				return true;
-			}
-
-			public Object next() {
-				if(fileRecord != null)
-					offset += Math.round(fileRecord.getAlocatedSize() / NTFSVolume.this.getClusterSize());
-				try 
-				{
+			return new NTFSFileRecord(
+					this,
+					this.readDataFromCluster(
+							this.getBootRecord().getMFTPointer(),
+							this.getBootRecord().getBytesPerFileRecord(),
+							0
+					));
 					
-					fileRecord = getFileRecord(offset);
-					
-				} catch (IOException e) {
-					offset = -1;
-					return null;
-				}
-				//System.out.println("File: " + fileRecord.getFileName() +"," + offset );
-				return fileRecord;
-			}
-
-			public void remove() {
-				throw new UnsupportedOperationException("not yet implemented");
-			}
+		}
+		return new NTFSFileRecord(
+					this,
+					this.readClusters(
+							this.getBootRecord().getMFTPointer(),
+							this.getBootRecord().getBytesPerFileRecord() / this.getClusterSize()
+					)
+		);
 		
-		};
 	}
-	public NTFSFileRecord getRootDirectory()
+	public Iterator getNTFSIterator() throws IOException
+	{
+		if(this.getBootRecord().getBytesPerFileRecord() < this.getClusterSize())
+			// loop over bytes from sector
+			return new Iterator()
+			{
+	
+				int offset = 0;
+				int clusterOffset = 0;
+				NTFSFileRecord fileRecord = NTFSVolume.this.getMFTRecord();
+				
+			    byte[] buffer = NTFSVolume.this.getMFTRecord().getAttribute(NTFSFileRecord.$DATA).readVCN(0,1,NTFSVolume.this.getClusterSize()); 
+				
+				public boolean hasNext() 
+				{
+					return new String(buffer,offset,4).equals("FILE");
+				}
+	
+				public Object next() {
+					try {
+						fileRecord = new NTFSFileRecord(
+											NTFSVolume.this,
+											NTFSUTIL.extractSubBuffer(
+														buffer
+														,offset,
+														NTFSVolume.this.getBootRecord().getBytesPerFileRecord())
+						);
+						
+						offset += NTFSVolume.this.getBootRecord().getBytesPerFileRecord();
+						
+						if(offset >= NTFSVolume.this.getClusterSize())
+						{	
+							clusterOffset++;
+							offset = 0;
+							buffer = NTFSVolume.this.getMFTRecord().getAttribute(NTFSFileRecord.$DATA).readVCN(clusterOffset,1,NTFSVolume.this.getClusterSize());
+						}
+						
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				
+					return fileRecord;
+				}
+	
+				public void remove() {
+					throw new UnsupportedOperationException("not yet implemented");
+				}
+			
+			};
+		else
+			return new Iterator()
+			{
+	
+				int clusterOffset = 0;
+				
+				NTFSFileRecord fileRecord = NTFSVolume.this.getMFTRecord();
+				//number of VCNS
+				int VCNNumber = fileRecord.getAttribute(NTFSFileRecord.$DATA).getNumberOfVCN();
+				
+				byte[] buffer = NTFSVolume.this.getMFTRecord().getAttribute(NTFSFileRecord.$DATA).readVCN(
+						clusterOffset,
+						NTFSVolume.this.getBootRecord().getBytesPerFileRecord() / NTFSVolume.this.getClusterSize(),
+						NTFSVolume.this.getClusterSize());
+				
+				
+				public boolean hasNext() 
+				{
+					if(clusterOffset < VCNNumber && new String(buffer,0,4).equals(NTFSFileRecord.MAGIC_NUMBER)) 
+					 	return true;
+					else
+						return false;
+				}
+	
+				public Object next() {
+					try {
+							fileRecord = new NTFSFileRecord(
+												NTFSVolume.this,
+															buffer
+							);
+						clusterOffset+= NTFSVolume.this.getBootRecord().getBytesPerFileRecord() / NTFSVolume.this.getClusterSize();
+						buffer = NTFSVolume.this.getMFTRecord().getAttribute(NTFSFileRecord.$DATA).readVCN(
+								clusterOffset,
+								NTFSVolume.this.getBootRecord().getBytesPerFileRecord() / NTFSVolume.this.getClusterSize(),
+								NTFSVolume.this.getClusterSize());
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				
+					return fileRecord;
+				}
+	
+				public void remove() {
+					throw new UnsupportedOperationException("not yet implemented");
+				}
+			
+			};
+}
+	public NTFSFileRecord getRootDirectory() throws IOException
 	{
 		NTFSFileRecord  fileRecord = null;
 		for(Iterator itr = this.getNTFSIterator();itr.hasNext();)
@@ -143,9 +215,5 @@ public class NTFSVolume
 			}
 		}	
 		return null;
-	}
-	public NTFSFileRecord getFileRecord(int MFTClusterOffset) throws IOException
-	{
-		return new NTFSFileRecord(this,MFTClusterOffset);
 	}
 }

@@ -13,7 +13,7 @@ import java.util.Date;
  */
 public class NTFSUTIL {
 
-	public static int READ16_INT(byte up, byte low)
+	public static int LE_READ_U16_INT(byte up, byte low)
 	{
 		int word = low;
 		word = (word << 8) | (up & 0xff);
@@ -26,7 +26,7 @@ public class NTFSUTIL {
 		return word;
 	}
 	
-	public static long READ64_LONG (byte[] abArray, int offset)
+	public static long LE_READ_U64_LONG (byte[] abArray, int offset)
 	{
 		int b1 = abArray[offset + 7] & 0xFF;
 		int b2 = abArray[offset + 6] & 0xFF;
@@ -55,7 +55,7 @@ public class NTFSUTIL {
 		return temp;
 	}
 
-	public static int READ32_INT (byte[] abArray, int offset)
+	public static int LE_READ_U32_INT (byte[] abArray, int offset)
 	{
 		int b1 = abArray[offset + 3] & 0x000000FF;
 		int b2 = abArray[offset + 2] & 0x000000FF;
@@ -68,7 +68,20 @@ public class NTFSUTIL {
 				(b3 << 8) | 
 				b4) & 0xFFFFFFFF;
 	}
-	public static int READ24_INT (byte[] abArray, int offset)
+	public static int LE_READ_32_INT (byte[] abArray, int offset)
+	{
+		int b1 = abArray[offset + 3];
+		int b2 = abArray[offset + 2];
+		int b3 = abArray[offset + 1];
+		int b4 = abArray[offset + 0];
+		
+		return 
+				(b1 << 24) | 
+				(b2 << 16) | 
+				(b3 << 8) | 
+				 b4;
+	}
+	public static int LE_READ_U24_INT (byte[] abArray, int offset)
 	{
 		int b1 = abArray[offset + 2] & 0x000000FF;
 		int b2 = abArray[offset + 1] & 0x000000FF;

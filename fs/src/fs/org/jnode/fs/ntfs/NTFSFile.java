@@ -22,10 +22,12 @@ public class NTFSFile implements FSFile {
 	 */
 	private NTFSIndexEntry indexEntry = null;
 	private NTFSFileRecord fileRecord = null;
+	
 	public NTFSFile(NTFSIndexEntry indexEntry)
 	{
 		this.indexEntry = indexEntry;
 	}
+	
 	public long getLength() {
 		// TODO Auto-generated method stub
 		if(indexEntry != null)

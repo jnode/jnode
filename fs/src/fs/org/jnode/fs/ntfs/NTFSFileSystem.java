@@ -62,4 +62,11 @@ public class NTFSFileSystem implements FileSystem
 	{
 		// TODO Auto-generated method stub
 	}
+	/**
+	 * @return Returns the volume.
+	 */
+	public NTFSVolume getNTFSVolume() {
+		return this.volume;
+	}
+
 }
