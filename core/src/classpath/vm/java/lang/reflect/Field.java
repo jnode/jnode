@@ -37,10 +37,8 @@
 
 package java.lang.reflect;
 
-import org.jnode.vm.JvmType;
 import org.jnode.vm.VmReflection;
 import org.jnode.vm.classmgr.VmField;
-import org.jnode.vm.classmgr.VmStaticField;
 
 /**
  * The Field class represents a member variable of a class. It also allows
