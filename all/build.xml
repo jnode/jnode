@@ -1,5 +1,7 @@
 <project name="JNode" default="all" basedir=".">
 
+  <property name="jnode-ver"           value="0.1.7"/>
+
   <property name="root.dir"            value="${basedir}/.."/>
   <property name="build.dir"           value="${basedir}/build"/>
   <property name="cdroms.dir"          value="${build.dir}/cdroms"/>
@@ -28,10 +30,10 @@
   <property name="nanoxml.jar"         value="${root.dir}/core/lib/nanoxml-lite-2.2.3.jar"/>
   <property name="beanshell.jar"         value="${root.dir}/shell/lib/bsh-2.0b1.jar"/>
 
+  <property name="default-plugin-list" value="${basedir}/conf/default-plugin-list.xml"/>
   <property name="full-plugin-list"    value="${basedir}/conf/full-plugin-list.xml"/>
   <property name="install-plugin-list" value="${basedir}/conf/install-plugin-list.xml"/>
   <property name="system-plugin-list"  value="${basedir}/conf/system-plugin-list.xml"/>
-  <property name="jnode-ver"           value="0.1.6"/>
   <property name="sources.dist.tar.gz" value="${build.dir}/jnodesources-${jnode-ver}.tar.gz"/>
   <property name="jnode-x86.iso"       value="${cdroms.dir}/jnode-x86.iso"/>
   <property name="jnode-x86-lite.iso"  value="${cdroms.dir}/jnode-x86-lite.iso"/>
@@ -120,6 +122,11 @@
 
     <!-- Build all initjar's -->
     <taskdef name="initjar" classname="org.jnode.build.InitJarBuilder" classpathref="cp-jnode"/>    
+    <!-- Default OS related plugins, normal boot -->
+    <initjar destfile="${initjars.dir}/default.jgz"
+             pluginList="${basedir}/conf/default-plugin-list.xml"
+             pluginDir="${plugins.dir}">
+    </initjar>
     <!-- All plugins, normal boot -->
     <initjar destfile="${initjars.dir}/full.jgz"
              pluginList="${basedir}/conf/full-plugin-list.xml"

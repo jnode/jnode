@@ -2,18 +2,29 @@
 default 0
 timeout 5
 
-# JNode
-title JNode
+# ---------------------------
+title JNode (default)
+kernel (hd0,0)/jnodesys.gz
+module (hd0,0)/default.jgz
+
+# ---------------------------
+title JNode (all plugins)
 kernel (hd0,0)/jnodesys.gz
 module (hd0,0)/full.jgz
 
-# JNode via the network
-title JNode via dhcp
+# ---------------------------
+title JNode via dhcp (default)
+dhcp
+kernel (nd)/jnodesys.gz
+module (nd)/default.jgz
+
+# ---------------------------
+title JNode via dhcp (all plugins)
 dhcp
 kernel (nd)/jnodesys.gz
 module (nd)/full.jgz
 
-# JNode Install
+# ---------------------------
 title JNode Install
 kernel (hd0,0)/jnodesys.gz
 module (hd0,0)/install.jgz
