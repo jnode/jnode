@@ -40,6 +40,8 @@
   <extension point="org.jnode.security.permissions">
     <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
     <permission class="java.lang.RuntimePermission" name="getProtectionDomain"/>
+    <permission class="java.lang.RuntimePermission" name="createClassLoader"/>
+    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
     <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
   </extension>       
         
