@@ -92,7 +92,7 @@ public class FatFormatter {
 
 		fat = new Fat(fatSize, mediumDescriptor, bs.getSectorsPerFat(), bs.getBytesPerSector());
 		fat.setMediumDescriptor(bs.getMediumDescriptor());
-		System.out.println("bs.getNrRootDirEntries()=" + bs.getNrRootDirEntries());
+		//System.out.println("bs.getNrRootDirEntries()=" + bs.getNrRootDirEntries());
 
 		rootDir = new FatLfnDirectory(null, bs.getNrRootDirEntries());
 	}

@@ -390,7 +390,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
 	 * @param offset
 	 */
 	public void write(byte[] dest, int offset) {
-		System.out.println("FatDir entry write at" + offset);
+		//System.out.println("FatDir entry write at" + offset);
 		if (unused) {
 			dest[offset] = 0;
 		} else if (deleted) {

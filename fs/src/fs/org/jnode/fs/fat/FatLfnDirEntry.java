@@ -26,9 +26,8 @@ public class FatLfnDirEntry extends FatBasicDirEntry {
 
 	public FatLfnDirEntry(AbstractDirectory dir, String subName, int ordinal, byte checkSum, boolean isLast) {
 		super(dir);
-		System.out.println("Create lfn entry with subname '" + subName + "'");
-		char[] unicodechar = new char[13]; // { ' ', ' ', ' ', ' ', ' ', ' ', '
-													  // ', ' ', ' ', ' ', ' ', ' ', ' ' };
+		//System.out.println("Create lfn entry with subname '" + subName + "'");
+		char[] unicodechar = new char[13]; //{ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
 		subName.getChars(0, subName.length(), unicodechar, 0);
 		if (isLast) {
 			DosUtils.set8(rawData, 0, ordinal + (1 << 6)); // set the 6th
@@ -56,7 +55,7 @@ public class FatLfnDirEntry extends FatBasicDirEntry {
 		DosUtils.set16(rawData, 26, 0); // sector... unused
 		DosUtils.set16(rawData, 28, unicodechar[11]);
 		DosUtils.set16(rawData, 30, unicodechar[12]);
-		System.out.println("Est ce meme '" + getSubstring() + "'");
+		//System.out.println("Est ce meme '" + getSubstring() + "'");
 
 	}
 

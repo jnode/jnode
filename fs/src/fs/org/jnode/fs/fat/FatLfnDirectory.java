@@ -130,7 +130,7 @@ public class FatLfnDirectory extends FatDirectory {
          {
             shortNameIndex.put(current.getRealEntry().getName(), current);
             longFileNameIndex.put(current.getName(), current);
-		      System.out.println(" Found a real entry : |" + current + "|");
+		      //System.out.println(" Found a real entry : |" + current + "|");
          }
 		}
 

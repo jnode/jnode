@@ -350,7 +350,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 	 */
 	protected synchronized void read(byte[] src) throws IOException {
 		int size = entries.size();
-      System.out.println("Abstract read --> dir size = " + size);
+      //System.out.println("Abstract read --> dir size = " + size);
 		for (int i = 0; i < size; i++) {
 			int index = i * 32;
 			if (src[index] == 0) {
