@@ -71,7 +71,8 @@ public class ICMPProtocol implements IPv4Protocol, IPv4Constants, ICMPConstants,
 		
 		// Update statistics
 		stat.ipackets.inc();
-		
+
+		try {
 		final ICMPHeader hdr = createHeader(skbuf);
 		skbuf.setTransportLayerHeader(hdr);
 		skbuf.pull(hdr.getLength());
@@ -93,6 +94,10 @@ public class ICMPProtocol implements IPv4Protocol, IPv4Constants, ICMPConstants,
 
 			default:
 				log.debug("GOT ICMP type " + hdr.getType() + ", code " + hdr.getCode());			
+		}
+		} catch (SocketException ex) {
+		    // TODO fix me
+		    // Ignore for now
 		}
 	}
 	
