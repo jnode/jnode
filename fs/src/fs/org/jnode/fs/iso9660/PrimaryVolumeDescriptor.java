@@ -4,9 +4,7 @@
 package org.jnode.fs.iso9660;
 
 import java.io.IOException;
-
-import org.jnode.util.BigEndian;
-import org.jnode.util.LittleEndian;
+import java.io.PrintStream;
 
 /**
  * Wrapper for a Primary Volume Descriptor.
@@ -24,19 +22,19 @@ public class PrimaryVolumeDescriptor extends VolumeDescriptor {
 
     private final String volumeSetIdentifier;
 
-    private final long numberOfLB;
+    private final long spaceSize;
 
     private final int LBSize;
 
-    private final int pathTableSize;
+    private final long pathTableSize;
 
-    private final int locationOfTyp_L_PathTable;
+    private final long locationOfTyp_L_PathTable;
 
-    private final int locationOfOptionalTyp_L_PathTable;
+    private final long locationOfOptionalTyp_L_PathTable;
 
-    private final int locationOfTyp_M_PathTable;
+    private final long locationOfTyp_M_PathTable;
 
-    private final int locationOfOptionalTyp_M_PathTable;
+    private final long locationOfOptionalTyp_M_PathTable;
 
     private final int volumeSetSize;
 
@@ -44,71 +42,67 @@ public class PrimaryVolumeDescriptor extends VolumeDescriptor {
 
     /**
      * Initialize this instance.
+     * 
      * @param volume
-     * @param buff
+     * @param buffer
      * @throws IOException
      */
-    public PrimaryVolumeDescriptor(ISO9660Volume volume, byte[] buff)
+    public PrimaryVolumeDescriptor(ISO9660Volume volume, byte[] buffer)
             throws IOException {
-        super(volume, buff);
-        this.systemIdentifier = new String(buff, 8, 31);
-        this.volumeIdentifier = new String(buff, 40, 31);
-        this.volumeSetIdentifier = new String(buff, 190, 127);
-        this.numberOfLB = LittleEndian.getUInt32(buff, 80);
-        this.volumeSetSize = LittleEndian.getUInt16(buff, 120);
+        super(volume, buffer);
+        this.systemIdentifier = getAChars(buffer, 9, 41 - 9);
+        this.volumeIdentifier = getDChars(buffer, 41, 73 - 41);
+        this.volumeSetIdentifier = getDChars(buffer, 191, 319 - 191);
+        this.spaceSize = getUInt32Both(buffer, 81);
+        this.volumeSetSize = getUInt16Both(buffer, 121);
 
-        this.LBSize = LittleEndian.getUInt16(buff, 128);
+        this.LBSize = getUInt16Both(buffer, 129);
         // path table info
-        this.pathTableSize = (int) LittleEndian.getUInt32(buff, 132);
-        this.locationOfTyp_L_PathTable = (int) LittleEndian
-                .getUInt32(buff, 140);
-        this.locationOfOptionalTyp_L_PathTable = (int) LittleEndian.getUInt32(
-                buff, 144);
-        this.locationOfTyp_M_PathTable = (int) BigEndian.getUInt32(buff, 148);
-        this.locationOfOptionalTyp_M_PathTable = (int) BigEndian.getUInt32(
-                buff, 152);
+        this.pathTableSize = getUInt32Both(buffer, 133);
+        this.locationOfTyp_L_PathTable = getUInt32LE(buffer, 141);
+        this.locationOfOptionalTyp_L_PathTable = getUInt32LE(buffer, 145);
+        this.locationOfTyp_M_PathTable = getUInt32BE(buffer, 149);
+        this.locationOfOptionalTyp_M_PathTable = getUInt32BE(buffer, 153);
 
-        this.rootDirectoryEntry = new EntryRecord(volume, buff, 156, "US-ASCII");
+        this.rootDirectoryEntry = new EntryRecord(volume, buffer, 157,
+                DEFAULT_ENCODING);
     }
 
-    public void printOut() {
-        System.out.println("Primary volume information: ");
-        System.out.println("	- Standard Identifier: "
-                + this.getStandardIdentifier());
-        System.out.println("	- System Identifier: "
-                + this.getSystemIdentifier());
-        System.out.println("	- Volume Identifier: "
-                + this.getVolumeIdentifier());
-        System.out.println("	- Volume set Identifier: "
+    public void dump(PrintStream out) {
+        out.println("Primary volume information: ");
+        out.println("	- Standard Identifier: " + this.getStandardIdentifier());
+        out.println("	- System Identifier: " + this.getSystemIdentifier());
+        out.println("	- Volume Identifier: " + this.getVolumeIdentifier());
+        out.println("	- Volume set Identifier: "
                 + this.getVolumeSetIdentifier());
-        System.out.println("	- Volume set size: " + this.getVolumeSetSize());
-        System.out.println("	- Number of LBs: " + this.getNumberOfLB());
-        System.out.println("	- Size of LBs: " + this.getLBSize());
-        System.out.println("	- PathTable size: " + this.getPathTableSize());
-        System.out.println("		- Location of L PathTable : "
+        out.println("	- Volume set size: " + this.getVolumeSetSize());
+        out.println("	- Number of LBs: " + this.getSpaceSize());
+        out.println("	- Size of LBs: " + this.getLBSize());
+        out.println("	- PathTable size: " + this.getPathTableSize());
+        out.println("		- Location of L PathTable : "
                 + this.getLocationOfTyp_L_PathTable());
-        System.out.println("		- Location of Optional L PathTable : "
+        out.println("		- Location of Optional L PathTable : "
                 + this.getLocationOfOptionalTyp_L_PathTable());
-        System.out.println("		- Location of M PathTable : "
+        out.println("		- Location of M PathTable : "
                 + this.getLocationOfTyp_M_PathTable());
-        System.out.println("		- Location of Optional M PathTable : "
+        out.println("		- Location of Optional M PathTable : "
                 + this.getLocationOfOptionalTyp_M_PathTable());
-        System.out.println("	- Root directory entry: ");
-        System.out.println("		- Size: "
+        out.println("	- Root directory entry: ");
+        out.println("		- Size: "
                 + this.getRootDirectoryEntry().getLengthOfDirectoryEntry());
-        System.out.println("		- Extended attribute size: "
+        out.println("		- Extended attribute size: "
                 + this.getRootDirectoryEntry().getLengthOfExtendedAttribute());
-        System.out.println("		- Location of the extent: "
+        out.println("		- Location of the extent: "
                 + this.getRootDirectoryEntry().getLocationOfExtent());
-        //System.out.println(" - Length of the file identifier: " +
+        //out.println(" - Length of the file identifier: " +
         // this.getRootDirectoryEntry().getLengthOfFileIdentifier());
-        System.out.println("		- is directory: "
+        out.println("		- is directory: "
                 + this.getRootDirectoryEntry().isDirectory());
-        System.out.println("		- File identifier: "
+        out.println("		- File identifier: "
                 + this.getRootDirectoryEntry().getFileIdentifier());
-        System.out.println("		- Data Length: "
+        out.println("		- Data Length: "
                 + this.getRootDirectoryEntry().getDataLength());
-        System.out.println("		- File unit size: "
+        out.println("		- File unit size: "
                 + this.getRootDirectoryEntry().getFileUnitSize());
 
     }
@@ -116,8 +110,8 @@ public class PrimaryVolumeDescriptor extends VolumeDescriptor {
     /**
      * @return Returns the numberOfLB.
      */
-    public long getNumberOfLB() {
-        return numberOfLB;
+    public long getSpaceSize() {
+        return spaceSize;
     }
 
     /**
@@ -130,35 +124,35 @@ public class PrimaryVolumeDescriptor extends VolumeDescriptor {
     /**
      * @return Returns the patheTableSize.
      */
-    public int getPathTableSize() {
+    public long getPathTableSize() {
         return pathTableSize;
     }
 
     /**
      * @return Returns the locationOfOptionalTyp_L_PathTable.
      */
-    public int getLocationOfOptionalTyp_L_PathTable() {
+    public long getLocationOfOptionalTyp_L_PathTable() {
         return locationOfOptionalTyp_L_PathTable;
     }
 
     /**
      * @return Returns the locationOfOptionalTyp_M_PathTable.
      */
-    public int getLocationOfOptionalTyp_M_PathTable() {
+    public long getLocationOfOptionalTyp_M_PathTable() {
         return locationOfOptionalTyp_M_PathTable;
     }
 
     /**
      * @return Returns the locationOfTyp_L_PathTable.
      */
-    public int getLocationOfTyp_L_PathTable() {
+    public long getLocationOfTyp_L_PathTable() {
         return locationOfTyp_L_PathTable;
     }
 
     /**
      * @return Returns the locationOfTyp_M_PathTable.
      */
-    public int getLocationOfTyp_M_PathTable() {
+    public long getLocationOfTyp_M_PathTable() {
         return locationOfTyp_M_PathTable;
     }
 

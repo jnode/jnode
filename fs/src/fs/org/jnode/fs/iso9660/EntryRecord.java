@@ -6,13 +6,11 @@ package org.jnode.fs.iso9660;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import org.jnode.util.LittleEndian;
-
 /**
  * @author Chira
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class EntryRecord {
+public class EntryRecord extends Descriptor {
 
     private final int entryLength;
     private final int extAttributeLength;
@@ -30,18 +28,19 @@ public class EntryRecord {
      * Initialize this instance.
      * @param volume
      * @param buff
-     * @param offset
+     * @param bp
      */
-    public EntryRecord(ISO9660Volume volume, byte[] buff, int offset, String encoding) {
+    public EntryRecord(ISO9660Volume volume, byte[] buff, int bp, String encoding) {
+        final int offset = bp - 1;
         this.volume = volume;
         this.encoding = encoding;
-        this.entryLength = LittleEndian.getUInt8(buff, offset+0);
-        this.extAttributeLength = LittleEndian.getUInt8(buff, offset+1);
-        this.extentLocation = LittleEndian.getUInt32(buff, offset+2);
-        this.dataLength = (int)LittleEndian.getUInt32(buff, offset+10);
-        this.fileUnitSize = LittleEndian.getUInt8(buff, offset+26);
-        this.interleaveSize = LittleEndian.getUInt8(buff, offset+27);
-       	this.flags = LittleEndian.getUInt8(buff, offset + 25);
+        this.entryLength = getUInt8(buff, offset+1);
+        this.extAttributeLength = getUInt8(buff, offset+2);
+        this.extentLocation = getUInt32LE(buff, offset+3);
+        this.dataLength = (int)getUInt32LE(buff, offset+11);
+        this.fileUnitSize = getUInt8(buff, offset+27);
+        this.interleaveSize = getUInt8(buff, offset+28);
+       	this.flags = getUInt8(buff, offset + 26);
        	// This must be after flags, because of isDirectory.
        	this.identifier = getFileIdentifier(buff, offset, isDirectory(), encoding);
     }
@@ -107,17 +106,23 @@ public class EntryRecord {
     }
 
     private final String getFileIdentifier(byte[] buff, int offset, boolean isDir, String encoding) {
-        final int fidLength = LittleEndian.getUInt8(buff, offset+32);
+        final int fidLength = getUInt8(buff, offset+33);
         if (isDir) {
-            final int buff33 = LittleEndian.getUInt8(buff, offset+33);
-            if ((fidLength == 1) && (buff33 == 0x00)) {
+            final int buff34 = getUInt8(buff, offset+34);
+            if ((fidLength == 1) && (buff34 == 0x00)) {
                 return ".";
-            } else if ((fidLength == 1) && (buff33 == 0x01)) {
+            } else if ((fidLength == 1) && (buff34 == 0x01)) {
                 return "..";
             }
         }
         try {
-            return new String(buff, offset+33, fidLength, encoding);
+            final String id = getDChars(buff, offset+34, fidLength, encoding);
+            final int sep2Idx = id.indexOf(SEPARATOR2);
+            if (sep2Idx >= 0) {
+                return id.substring(0, sep2Idx);
+            } else {
+                return id;
+            }
         } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
         }
