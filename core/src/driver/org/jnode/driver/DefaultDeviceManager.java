@@ -47,9 +47,12 @@ public class DefaultDeviceManager implements DeviceManager, ExtensionPointListen
 	private final ExtensionPoint mappersEP;
 	/** The system bus */
 	private final Bus systemBus;
+	/** The JNode command line */
+	private final String cmdLine;
 
 	/**
 	 * Create a new instance
+	 * 
 	 * @param findersEP
 	 * @param mappersEP
 	 */
@@ -60,6 +63,7 @@ public class DefaultDeviceManager implements DeviceManager, ExtensionPointListen
 		if (mappersEP == null) {
 			throw new IllegalArgumentException("mappers extension-point cannot be null");
 		}
+		cmdLine = System.getProperty("jnode.cmdline", "");
 		this.systemBus = new SystemBus();
 		this.findersEP = findersEP;
 		this.mappersEP = mappersEP;
@@ -148,6 +152,11 @@ public class DefaultDeviceManager implements DeviceManager, ExtensionPointListen
 				// Connect the device to the driver
 				device.setDriver(drv);
 			}
+		}
+		// Test for no<id> on the command line
+		if (cmdLine.indexOf("no" + device.getId()) >= 0) {
+			BootLog.info("Blocking the start of " + device.getId());
+			shouldStart = false;
 		}
 		// Add the device to my list
 		devices.put(device.getId(), device);
@@ -238,24 +247,26 @@ public class DefaultDeviceManager implements DeviceManager, ExtensionPointListen
 
 	/**
 	 * Add a device listener
+	 * 
 	 * @param listener
 	 */
 	public void addListener(DeviceListener listener) {
 		synchronized (deviceListeners) {
 			deviceListeners.add(listener);
-		}		
+		}
 	}
-	
+
 	/**
 	 * Add a device listener
+	 * 
 	 * @param listener
 	 */
 	public void removeListener(DeviceListener listener) {
 		synchronized (deviceListeners) {
 			deviceListeners.remove(listener);
-		}				
+		}
 	}
-	
+
 	/**
 	 * Stop all devices
 	 */
@@ -275,6 +286,7 @@ public class DefaultDeviceManager implements DeviceManager, ExtensionPointListen
 	/**
 	 * Gets the system bus. The system bus is the root of all hardware busses and devices connected
 	 * to these busses.
+	 * 
 	 * @return The system bus
 	 */
 	public Bus getSystemBus() {
@@ -340,6 +352,7 @@ public class DefaultDeviceManager implements DeviceManager, ExtensionPointListen
 
 	/**
 	 * Start this manager
+	 * 
 	 * @throws PluginException
 	 */
 	public void start() throws PluginException {
@@ -352,6 +365,7 @@ public class DefaultDeviceManager implements DeviceManager, ExtensionPointListen
 
 	/**
 	 * Stop this manager
+	 * 
 	 * @throws PluginException
 	 */
 	public void stop() throws PluginException {
@@ -459,7 +473,7 @@ public class DefaultDeviceManager implements DeviceManager, ExtensionPointListen
 				configureMapper(mappers, elements[j]);
 			}
 		}
-		
+
 		// Now sort them
 		Collections.sort(mappers, MapperComparator.INSTANCE);
 	}
@@ -526,16 +540,16 @@ public class DefaultDeviceManager implements DeviceManager, ExtensionPointListen
 	static class SystemBus extends Bus {
 
 	}
-	
+
 	/**
 	 * Comparator used to sort DeviceToDriverMapper's.
 	 * 
 	 * @author Ewout Prangsma (epr@users.sourceforge.net)
 	 */
 	static class MapperComparator implements Comparator {
-		
+
 		public static final MapperComparator INSTANCE = new MapperComparator();
-		
+
 		/**
 		 * @param o1
 		 * @param o2
@@ -543,8 +557,8 @@ public class DefaultDeviceManager implements DeviceManager, ExtensionPointListen
 		 * @return int
 		 */
 		public int compare(Object o1, Object o2) {
-			final DeviceToDriverMapper m1 = (DeviceToDriverMapper)o1;
-			final DeviceToDriverMapper m2 = (DeviceToDriverMapper)o2;
+			final DeviceToDriverMapper m1 = (DeviceToDriverMapper) o1;
+			final DeviceToDriverMapper m2 = (DeviceToDriverMapper) o2;
 			final int ml1 = m1.getMatchLevel();
 			final int ml2 = m2.getMatchLevel();
 			if (ml1 < ml2) {
@@ -556,5 +570,5 @@ public class DefaultDeviceManager implements DeviceManager, ExtensionPointListen
 			}
 		}
 
-}
+	}
 }
