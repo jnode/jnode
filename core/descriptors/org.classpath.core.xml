@@ -73,11 +73,17 @@
       <export name="java.nio.channels.spi.*"/>
       <export name="java.nio.charset.*"/>
       <export name="java.nio.charset.spi.*"/>
+      <export name="java.rmi.*"/>
+      <export name="java.rmi.activation.*"/>
+      <export name="java.rmi.dgc.*"/>
+      <export name="java.rmi.registry.*"/>
+      <export name="java.rmi.server.*"/>
       <export name="java.security.*"/>
       <export name="java.security.acl.*"/>
       <export name="java.security.cert.*"/>
       <export name="java.security.interfaces.*"/>
       <export name="java.security.spec.*"/>
+      <export name="java.sql.*"/>
       <export name="java.text.*"/>
       <export name="java.util.*"/>
       <export name="java.util.jar.*"/>
