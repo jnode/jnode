@@ -115,6 +115,15 @@ public interface PluginDescriptor {
 	public ClassLoader getPluginClassLoader();
 	
 	/**
+	 * Gets the configuration data of this plugin.
+	 * Returns null if no "configuration-class" attribute has been 
+	 * specified in the descriptor.
+	 * @return The persistent configuration data.
+	 */
+	public PluginConfiguration getConfiguration()
+	throws PluginException;
+	
+	/**
 	 * Add a listener to this descriptor.
 	 * @param listener
 	 */
