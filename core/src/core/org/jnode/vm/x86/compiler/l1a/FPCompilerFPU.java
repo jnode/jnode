@@ -111,10 +111,10 @@ final class FPCompilerFPU extends FPCompiler {
             os.writeJCC(ltLabel, X86Constants.JB);
         } else {
             // Emulate JA
-            os.writeTEST(X86Register.EAX, X86Constants.F_CF | X86Constants.F_ZF);
+            os.writeTEST(X86Register.EAX, (X86Constants.F_CF | X86Constants.F_ZF) << 8);
             os.writeJCC(gtLabel, X86Constants.JZ);
             // Emulate JB
-            os.writeTEST(X86Register.EAX, X86Constants.F_CF);
+            os.writeTEST(X86Register.EAX, (X86Constants.F_CF) << 8);
             os.writeJCC(ltLabel, X86Constants.JNZ);            
         }
 		os.writeJMP(endLabel); // equal
