@@ -1,7 +1,7 @@
 <project name="JNode" default="help" basedir=".">
 
 	<!-- JNode version -->
-	<property name="jnode-ver" value="0.1.10" />
+	<property name="jnode-ver" value="0.1.11-dev" />
 
 	<!-- Java target and source version -->
 	<property name="java.target" value="1.4" />
