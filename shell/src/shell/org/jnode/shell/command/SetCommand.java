@@ -22,27 +22,41 @@
 package org.jnode.shell.command;
 
 import org.jnode.shell.help.*;
+import org.jnode.shell.Command;
+import org.jnode.shell.CommandLine;
 
-public class SetCommand {
+import java.io.InputStream;
+import java.io.PrintStream;
+
+
+/**
+ * Shell command to set property values.
+ *
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author Martin Husted Hartvig (hagar@jnode.org)
+ */
+
+public class SetCommand implements Command{
 
 	static final PropertyNameArgument ARG_KEY = new PropertyNameArgument("key", "the property name");
 	static final StringArgument ARG_VALUE = new StringArgument("value", "the value to set the property to");
 
-        public static final Help.Info HELP_INFO = new Help.Info(
-		"set",
-		"Sets a system property",
+  public static final Help.Info HELP_INFO = new Help.Info(
+		"set", "Sets a system property",
 		new Parameter[]{
 			new Parameter(ARG_KEY, Parameter.MANDATORY),
 			new Parameter(ARG_VALUE, Parameter.MANDATORY),
 		}
 	);
 
-	public static void main(String[] args) throws SyntaxErrorException {
-		ParsedArguments cmdLine = HELP_INFO.parse(args);
-
-                String key = ARG_KEY.getValue(cmdLine);
-		String value = ARG_VALUE.getValue(cmdLine);
-		System.getProperties().setProperty(key, value);
+	public static void main(String[] args) throws Exception {
+    new SetCommand().execute(new CommandLine(args), System.in, System.out, System.err);
 	}
 
+  public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception
+  {
+    ParsedArguments parsedArguments = HELP_INFO.parse(commandLine.toStringArray());
+
+    System.getProperties().setProperty(ARG_KEY.getValue(parsedArguments), ARG_VALUE.getValue(parsedArguments));
+  }
 }

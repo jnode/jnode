@@ -22,7 +22,9 @@
 package org.jnode.shell.command;
 
 import org.jnode.shell.CommandLine;
+import org.jnode.shell.Command;
 import org.jnode.shell.help.Help;
+import org.jnode.shell.help.ParsedArguments;
 import org.jnode.vm.Vm;
 import org.jnode.vm.memmgr.HeapStatistics;
 
@@ -32,29 +34,28 @@ import java.io.PrintStream;
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
-public class OnHeapCommand
+public class OnHeapCommand implements Command
 {
 
-  public static Help.Info HELP_INFO = new Help.Info("onheap",
-      "count objects on the heap");
+  public static Help.Info HELP_INFO = new Help.Info("onheap", "count objects on the heap");
 
   public static void main(String[] args)
       throws Exception
   {
-    new OnHeapCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+    new OnHeapCommand().execute(null, System.in, System.out, System.err);
   }
 
   /**
    * Execute this command
    */
-  public void execute(CommandLine cmdLine,
+  public void execute(CommandLine commandLine,
                       InputStream in,
                       PrintStream out,
                       PrintStream err)
       throws Exception
   {
-
     HeapStatistics stats = Vm.getHeapManager().getHeapStatistics();
+
     out.println("on heap      : " + stats.toString());
   }
 

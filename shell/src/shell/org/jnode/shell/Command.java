@@ -21,6 +21,8 @@
 
 package org.jnode.shell;
 
+import org.jnode.shell.help.ParsedArguments;
+
 import java.io.InputStream;
 import java.io.PrintStream;
 
@@ -33,5 +35,5 @@ public interface Command
   /**
    * Execute this command
    */
-  public void execute(CommandLine cmdLine, InputStream in, PrintStream out, PrintStream err) throws Exception;
+  public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception;
 }
