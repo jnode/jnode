@@ -192,7 +192,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
             final VmProcessor proc = createProcessor(clsMgr.getStatics());
             log("Building for " + proc.getCPUID());
-
+            
             final Label clInitCaller = new Label("$$clInitCaller");
             VmType systemClasses[] = VmType.initializeForBootImage(clsMgr);
             for (int i = 0; i < systemClasses.length; i++) {

@@ -3,6 +3,8 @@
  */
 package org.jnode.vm.classmgr;
 
+import java.security.ProtectionDomain;
+
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -22,8 +24,8 @@ public final class VmPrimitiveClass extends VmNormalClass {
      * @param typeSize
      */
     public VmPrimitiveClass(String name, VmNormalClass superClass,
-            VmClassLoader loader, int typeSize, boolean floatingPoint) {
-        super(name, superClass, loader, typeSize);
+            VmClassLoader loader, int typeSize, boolean floatingPoint, ProtectionDomain protectionDomain) {
+        super(name, superClass, loader, typeSize, protectionDomain);
         this.floatingPoint = floatingPoint;
         this.wide = (typeSize == 8);
     }

@@ -5,6 +5,7 @@
 package org.jnode.vm.classmgr;
 
 import java.lang.reflect.InvocationTargetException;
+import java.security.ProtectionDomain;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -15,10 +16,12 @@ import org.jnode.vm.PragmaLoadStatics;
 import org.jnode.vm.Uninterruptible;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmReflection;
+import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 
-public abstract class VmType extends VmSystemObject implements VmStaticsEntry, Uninterruptible {
+public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
+        Uninterruptible {
 
     /**
      * The parent of this class. Normally VmClass instance, during loading
@@ -85,9 +88,12 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry, U
 
     /** Error message during linkage */
     private String errorMsg;
-    
+
     /** Index of this type in the statics index */
     private final int staticsIndex;
+
+    /** The protection domain of this class */
+    private final ProtectionDomain protectionDomain;
 
     private static VmNormalClass ObjectClass;
 
@@ -140,8 +146,9 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry, U
      * @param accessFlags
      */
     protected VmType(String name, String superClassName, VmClassLoader loader,
-            int accessFlags) {
-        this(name, null, superClassName, loader, accessFlags, -1);
+            int accessFlags, ProtectionDomain protectionDomain) {
+        this(name, null, superClassName, loader, accessFlags, -1,
+                protectionDomain);
     }
 
     /**
@@ -153,9 +160,9 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry, U
      * @param typeSize
      */
     VmType(String name, VmNormalClass superClass, VmClassLoader loader,
-            int typeSize) {
+            int typeSize, ProtectionDomain protectionDomain) {
         this(name, superClass, superClass.getName(), loader,
-                Modifier.ACC_PUBLIC, typeSize);
+                Modifier.ACC_PUBLIC, typeSize, protectionDomain);
     }
 
     /**
@@ -167,10 +174,12 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry, U
      * @param loader
      * @param accessFlags
      * @param typeSize
+     * @param protectionDomain
+     *            the protection domain of this type.
      */
     private VmType(String name, VmNormalClass superClass,
             String superClassName, VmClassLoader loader, int accessFlags,
-            int typeSize) {
+            int typeSize, ProtectionDomain protectionDomain) {
         if (superClassName == null) {
             if (!name.equals("java.lang.Object")) { throw new IllegalArgumentException(
                     "superClassName cannot be null in class " + name); }
@@ -185,6 +194,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry, U
         this.modifiers = accessFlags;
         this.state = VmTypeState.ST_LOADED;
         this.loader = loader;
+        this.protectionDomain = protectionDomain;
         this.staticsIndex = loader.getStatics().allocClass(this);
         if (name.charAt(0) == '[') {
             this.interfaceTable = new VmImplementedInterface[] {
@@ -206,7 +216,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry, U
      * @return VmClass[]
      * @throws ClassNotFoundException
      */
-    public final static VmType[] initializeForBootImage(VmClassLoader clc)
+    public final static VmType[] initializeForBootImage(VmSystemClassLoader clc)
             throws ClassNotFoundException {
         ObjectClass = (VmNormalClass) clc.loadClass("java.lang.Object", false);
         CloneableClass = (VmInterfaceClass) clc.loadClass(
@@ -218,16 +228,25 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry, U
         CloneableClass.link();
         SerializableClass.link();
 
+        final ProtectionDomain protectionDomain = null;
         BooleanClass = new VmPrimitiveClass("boolean", ObjectClass, clc, 1,
-                false);
-        ByteClass = new VmPrimitiveClass("byte", ObjectClass, clc, 1, false);
-        CharClass = new VmPrimitiveClass("char", ObjectClass, clc, 2, false);
-        ShortClass = new VmPrimitiveClass("short", ObjectClass, clc, 2, false);
-        IntClass = new VmPrimitiveClass("int", ObjectClass, clc, 4, false);
-        FloatClass = new VmPrimitiveClass("float", ObjectClass, clc, 4, true);
-        LongClass = new VmPrimitiveClass("long", ObjectClass, clc, 8, false);
-        DoubleClass = new VmPrimitiveClass("double", ObjectClass, clc, 8, true);
-        VoidClass = new VmPrimitiveClass("void", ObjectClass, clc, 0, false);
+                false, protectionDomain);
+        ByteClass = new VmPrimitiveClass("byte", ObjectClass, clc, 1, false,
+                protectionDomain);
+        CharClass = new VmPrimitiveClass("char", ObjectClass, clc, 2, false,
+                protectionDomain);
+        ShortClass = new VmPrimitiveClass("short", ObjectClass, clc, 2, false,
+                protectionDomain);
+        IntClass = new VmPrimitiveClass("int", ObjectClass, clc, 4, false,
+                protectionDomain);
+        FloatClass = new VmPrimitiveClass("float", ObjectClass, clc, 4, true,
+                protectionDomain);
+        LongClass = new VmPrimitiveClass("long", ObjectClass, clc, 8, false,
+                protectionDomain);
+        DoubleClass = new VmPrimitiveClass("double", ObjectClass, clc, 8, true,
+                protectionDomain);
+        VoidClass = new VmPrimitiveClass("void", ObjectClass, clc, 0, false,
+                protectionDomain);
 
         BooleanClass.link();
         ByteClass.link();
@@ -274,7 +293,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry, U
      * @param bootClasses
      */
     protected static void loadFromBootClassArray(VmType[] bootClasses)
-    throws PragmaLoadStatics {
+            throws PragmaLoadStatics {
         Unsafe.debug("loadFromBootClassArray");
         int count = bootClasses.length;
         for (int i = 0; i < count; i++) {
@@ -411,7 +430,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry, U
             name = getArrayClassName();
         }
         final VmArrayClass arrayClass = new VmArrayClass(name,
-                this.getLoader(), this, -1);
+                this.getLoader(), this, -1, protectionDomain);
         if (link) {
             arrayClass.link();
         }
@@ -1906,12 +1925,22 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry, U
     protected final VmType[] getSuperClassesArray() {
         return superClassesArray;
     }
-    
+
     /**
      * Gets the index of this type in the statics table.
+     * 
      * @return Returns the staticsIndex.
      */
     public final int getStaticsIndex() {
         return this.staticsIndex;
     }
+
+    /**
+     * Gets the protection domain of this type.
+     * 
+     * @return the protection domain of this type.
+     */
+    public final ProtectionDomain getProtectionDomain() {
+        return protectionDomain;
+    } 
 }

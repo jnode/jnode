@@ -3,6 +3,8 @@
  */
 package org.jnode.vm.classmgr;
 
+import java.security.ProtectionDomain;
+
 /**
  * @author epr
  */
@@ -19,8 +21,8 @@ public class VmNormalClass extends VmClassType {
 	 * @param loader
 	 * @param typeSize
 	 */
-	protected VmNormalClass(String name, VmNormalClass superClass, VmClassLoader loader, int typeSize) {
-		super(name, superClass, loader, typeSize);
+	protected VmNormalClass(String name, VmNormalClass superClass, VmClassLoader loader, int typeSize, ProtectionDomain protectionDomain) {
+		super(name, superClass, loader, typeSize, protectionDomain);
 		testClassType();
 	}
 
@@ -30,8 +32,8 @@ public class VmNormalClass extends VmClassType {
 	 * @param loader
 	 * @param accessFlags
 	 */
-	public VmNormalClass(String name, String superClassName, VmClassLoader loader, int accessFlags) {
-		super(name, superClassName, loader, accessFlags);
+	public VmNormalClass(String name, String superClassName, VmClassLoader loader, int accessFlags, ProtectionDomain protectionDomain) {
+		super(name, superClassName, loader, accessFlags, protectionDomain);
 		testClassType();
 	}
 

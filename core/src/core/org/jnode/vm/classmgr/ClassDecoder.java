@@ -4,8 +4,15 @@
 
 package org.jnode.vm.classmgr;
 
+import java.security.ProtectionDomain;
+
 import org.jnode.system.BootLog;
 
+/**
+ * Decoder of .class files into VmType instances.
+ * 
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
+ */
 public final class ClassDecoder {
 
     // ------------------------------------------
@@ -54,10 +61,10 @@ public final class ClassDecoder {
      */
     public static final VmType defineClass(String className, byte[] data,
             int offset, int class_image_length, boolean rejectNatives,
-            VmClassLoader clc) {
+            VmClassLoader clc, ProtectionDomain protectionDomain) {
         cl_init();
-        VmType cls = decodeClass(data, offset, class_image_length,
-                rejectNatives, clc);
+        final VmType cls = decodeClass(data, offset, class_image_length,
+                rejectNatives, clc, protectionDomain);
         return cls;
     }
 
@@ -73,7 +80,7 @@ public final class ClassDecoder {
      * @throws ClassFormatError
      */
     private static final VmType decodeClass(byte[] data, int offset,
-            int class_image_length, boolean rejectNatives, VmClassLoader clc)
+            int class_image_length, boolean rejectNatives, VmClassLoader clc, ProtectionDomain protectionDomain)
             throws ClassFormatError {
         if (data == null) { throw new ClassFormatError(
                 "ClassDecoder.decodeClass: data==null"); }
@@ -202,10 +209,10 @@ public final class ClassDecoder {
         final VmType cls;
         if (Modifier.isInterface(classModifiers)) {
             cls = new VmInterfaceClass(clsName, superClassName, clc,
-                    classModifiers);
+                    classModifiers, protectionDomain);
         } else {
             cls = new VmNormalClass(clsName, superClassName, clc,
-                    classModifiers);
+                    classModifiers, protectionDomain);
         }
         cls.setCp(cp);
 

@@ -122,7 +122,7 @@ public final class VmSystem {
             vm.startHotMethodManager();
 
             Unsafe.debug("B");
-}
+        }
     }
 
     /**
