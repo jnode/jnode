@@ -11,6 +11,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Paint;
 import java.awt.Polygon;
@@ -34,6 +35,9 @@ import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.Map;
+
+import org.jnode.awt.JNodeGraphicsEnvironment;
+import org.jnode.awt.peer.JNodeToolkit;
 
 /**
  * @author epr
@@ -171,9 +175,9 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @param y
 	 * @see java.awt.Graphics2D#drawString(java.lang.String, float, float)
 	 */
-	public void drawString(String text, float x, float y) {
-		// TODO Auto-generated method stub
-
+	public void drawString(String text, float x, float y) 
+	{
+		this.drawString(text,Math.round(x),Math.round(y));
 	}
 
 	/**
@@ -183,7 +187,10 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @see java.awt.Graphics#drawString(java.lang.String, int, int)
 	 */
 	public void drawString(String text, int x, int y) {
-		drawString(text, (float) x, (float) y);
+		System.out.println("drawText():" + text);
+		Font f = ((JNodeGraphicsEnvironment)GraphicsEnvironment.getLocalGraphicsEnvironment()).getAllFonts()[0];	
+		if(f != null)
+			((JNodeToolkit)Toolkit.getDefaultToolkit()).getFontManager().drawText(this,text,f,x,y);
 	}
 
 	/**
