@@ -51,9 +51,9 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
      * @param msb
      * @param val
      */
-    final void initialize(int kind, int offsetToFP, X86Register lsb, X86Register msb,
+    final void initialize(int kind, int offsetToFP, X86Register.GPR lsb, X86Register.GPR msb, X86Register.XMM xmm,
             long val) {
-        super.initialize(kind, offsetToFP, lsb, msb);
+        super.initialize(kind, offsetToFP, lsb, msb, xmm);
         this.value = val;
     }
 

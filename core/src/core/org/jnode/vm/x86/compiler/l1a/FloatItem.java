@@ -45,7 +45,7 @@ final class FloatItem extends WordItem {
 	 * @param offsetToFP
 	 * @param value
 	 */
-	final void initialize(int kind, int offsetToFP, X86Register reg, float value) {
+	final void initialize(int kind, int offsetToFP, X86Register.GPR reg, float value) {
 		super.initialize(kind, reg, offsetToFP);
 		this.value = value;
 	}

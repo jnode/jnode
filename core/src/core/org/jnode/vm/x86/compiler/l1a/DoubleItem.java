@@ -45,9 +45,9 @@ final class DoubleItem extends DoubleWordItem {
 	 * @param offsetToFP
 	 * @param value
 	 */
-	final void initialize(int kind, int offsetToFP, X86Register lsb, X86Register msb,
+	final void initialize(int kind, int offsetToFP, X86Register.GPR lsb, X86Register.GPR msb, X86Register.XMM xmm,
 			double value) {
-		super.initialize(kind, offsetToFP, lsb, msb);
+		super.initialize(kind, offsetToFP, lsb, msb, xmm);
 		this.value = value;
 	}
 

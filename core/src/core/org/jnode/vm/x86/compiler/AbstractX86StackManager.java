@@ -36,7 +36,7 @@ public interface AbstractX86StackManager {
 	 * @param reg
 	 * @see JvmType
 	 */
-	public void writePUSH(int jvmType, X86Register reg);
+	public void writePUSH(int jvmType, X86Register.GPR reg);
 
 	/**
 	 * Write code to push a 64-bit word on the stack
@@ -45,5 +45,5 @@ public interface AbstractX86StackManager {
 	 * @param msbReg
 	 * @see JvmType
 	 */
-	public void writePUSH64(int jvmType, X86Register lsbReg, X86Register msbReg);
+	public void writePUSH64(int jvmType, X86Register.GPR lsbReg, X86Register.GPR msbReg);
 }

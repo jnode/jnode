@@ -435,7 +435,7 @@ final class VirtualStack {
          * @see org.jnode.vm.x86.compiler.AbstractX86StackManager#writePUSH(int,
          *      org.jnode.assembler.x86.Register)
          */
-        public void writePUSH(int jvmType, X86Register reg) {
+        public void writePUSH(int jvmType, X86Register.GPR reg) {
             final Item item = ifac.createReg(jvmType, reg);
             if (Vm.VerifyAssertions)
                 Vm._assert(pool.request(reg, item), "request");
@@ -447,7 +447,7 @@ final class VirtualStack {
          *      org.jnode.assembler.x86.Register,
          *      org.jnode.assembler.x86.Register)
          */
-        public void writePUSH64(int jvmType, X86Register lsbReg, X86Register msbReg) {
+        public void writePUSH64(int jvmType, X86Register.GPR lsbReg, X86Register.GPR msbReg) {
             final Item item = ifac.createReg(jvmType, lsbReg, msbReg);
             if (Vm.VerifyAssertions) {
                 Vm._assert(pool.request(lsbReg, item), "request-lsb");
