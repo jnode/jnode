@@ -68,7 +68,6 @@ public class ConfigManager
         }
         
         TestConfig cfg = (TestConfig) it.next();
-        System.out.print(": "+cfg);        
         return cfg;
     }
     
@@ -76,21 +75,36 @@ public class ConfigManager
     {
         if(!log4jInitialized && OsType.OTHER_OS.isCurrentOS())
         {
-            // configure Log4j only is outside of JNode
+            // configure Log4j only if outside of JNode
             // (because JNode has its own config for Log4j)
-            //String configLog4j = "/"+getClass().getName().replace('.', '/')+"/log4jForTests.properties";
-            String configLog4j = "log4jForTests.properties";
-            URL url = ConfigManager.class.getResource(configLog4j);
-            if(url == null)
-            {
-                System.err.println("can't find resource "+configLog4j);
+            
+            try
+            {                      
+                // name must be of max 8 characters !!!
+                // but extension can be larger that 3 characters !!!!!
+                // (probably only under windows)
+                String configLog4j = "log4jCfg.properties";
+                
+                URL url = ConfigManager.class.getResource(configLog4j);
+                if(url == null)
+                {
+                    System.err.println("can't find resource "+configLog4j);
+                }
+                else
+                {
+                    PropertyConfigurator.configure(url);
+                }
+                
+                log4jInitialized = true;
             }
-            else
+            catch(OutOfMemoryError oome)
             {
-                PropertyConfigurator.configure(url);
+                oome.printStackTrace();
+                System.err.println("freeMemory:"+Runtime.getRuntime().freeMemory());
+                System.err.println("maxMemory:"+Runtime.getRuntime().maxMemory());
+                System.err.println("totalMemory:"+Runtime.getRuntime().totalMemory());
             }
             
-            log4jInitialized = true;            
         }        
     }
     
