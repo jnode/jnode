@@ -12,11 +12,12 @@ package java.lang;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.Serializable;
 
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmSystem;
 
-public class Throwable {
+public class Throwable implements Serializable {
 
     private static final int MAX_ELEMENTS = 20;
     
