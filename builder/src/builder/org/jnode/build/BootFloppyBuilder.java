@@ -83,7 +83,9 @@ public class BootFloppyBuilder extends Task {
             copySystemFiles(sysDev);
             sysDevApi.flush();
         } catch (ApiNotFoundException ex) {
-            throw new IOException("BlockDeviceAPI not found on device", ex);
+			final IOException ioe = new IOException("BlockDeviceAPI not found on device");
+			ioe.initCause(ex);
+			throw ioe;
         } finally {
             newFd.close();
         }
@@ -100,7 +102,9 @@ public class BootFloppyBuilder extends Task {
         try {
             ff.format((BlockDeviceAPI) dev.getAPI(BlockDeviceAPI.class));
         } catch (ApiNotFoundException ex) {
-            throw new IOException("Cannot find BlockDeviceAPI", ex);
+			final IOException ioe = new IOException("BlockDeviceAPI not found on device");
+			ioe.initCause(ex);
+			throw ioe;
         }
     }
 

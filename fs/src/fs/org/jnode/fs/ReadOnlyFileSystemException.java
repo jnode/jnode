@@ -1,8 +1,5 @@
 /*
- * Created on 30 mars 2004
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * $Id$
  */
 package org.jnode.fs;
 
@@ -19,13 +16,15 @@ public class ReadOnlyFileSystemException extends IOException {
 	 * @param cause
 	 */
 	public ReadOnlyFileSystemException(String message, Throwable cause) {
-		super(message, cause);
+		super(message);
+		initCause(cause);
 	}
 	/**
 	 * @param cause
 	 */
 	public ReadOnlyFileSystemException(Throwable cause) {
-		super(cause);
+		super();
+		initCause(cause);
 	}
 	/**
 	 * @param message

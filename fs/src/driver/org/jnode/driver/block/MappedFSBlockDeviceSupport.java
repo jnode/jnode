@@ -29,7 +29,9 @@ public class MappedFSBlockDeviceSupport extends MappedBlockDeviceSupport impleme
         try {
             this.parentApi = (FSBlockDeviceAPI) parent.getAPI(FSBlockDeviceAPI.class);
         } catch (ApiNotFoundException ex) {
-            throw new IOException(ex);
+			final IOException ioe = new IOException("BlockDeviceAPI not found on device");
+			ioe.initCause(ex);
+			throw ioe;
         }
         registerAPI(FSBlockDeviceAPI.class, this);
     }

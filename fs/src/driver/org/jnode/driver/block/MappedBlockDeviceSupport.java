@@ -24,7 +24,9 @@ public class MappedBlockDeviceSupport extends Device implements BlockDeviceAPI {
 		try {
 			this.parentApi = (BlockDeviceAPI)parent.getAPI(BlockDeviceAPI.class);
 		} catch (ApiNotFoundException ex) {
-			throw new IOException("BlockDeviceAPI not found on parent device", ex);
+			final IOException ioe = new IOException("BlockDeviceAPI not found on device");
+			ioe.initCause(ex);
+			throw ioe;
 		}
 		this.offset = offset;
 		this.length = length;
