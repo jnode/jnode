@@ -9,13 +9,14 @@ import org.jnode.vm.MemoryBlockManager;
 import org.jnode.vm.Monitor;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmArchitecture;
-import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.ObjectLayout;
+import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
+import org.jnode.vm.memmgr.VmWriteBarrier;
 
 public final class DefaultHeapManager extends VmHeapManager {
 
@@ -27,6 +28,8 @@ public final class DefaultHeapManager extends VmHeapManager {
 	private Monitor heapMonitor;
 	/** Are we low on memory */
 	private boolean lowOnMemory;
+	/** The used write barrier */
+	private final VmWriteBarrier writeBarrier;
 
 	/** The first heap. */
 	private final VmAbstractHeap firstHeap;
@@ -42,6 +45,7 @@ public final class DefaultHeapManager extends VmHeapManager {
 	public DefaultHeapManager(VmClassLoader loader, HeapHelper helper, VmStatics statics) 
 	throws ClassNotFoundException {
 		super(helper);
+		this.writeBarrier = new DefaultWriteBarrier(loader.getArchitecture(), helper);
 		this.firstHeap = new VmDefaultHeap(this);
 		this.currentHeap = firstHeap;
 		this.defaultHeapClass = (VmNormalClass)loader.loadClass(VmDefaultHeap.class.getName(), true);
@@ -168,6 +172,15 @@ public final class DefaultHeapManager extends VmHeapManager {
 		// We will start the GC thread here
 	}
 	
+	
+	/**
+	 * Gets the write barrier used by this heap manager (if any).
+	 * @return The write barrier, or null if no write barrier is used.
+	 */
+	public final VmWriteBarrier getWriteBarrier() {
+		return writeBarrier;
+	}
+
 	/**
 	 * Allocate a new instance for the given class. Not that this method cannot be synchronized,
 	 * since obtaining a monitor might require creating one, which in turn needs this method.

@@ -61,4 +61,16 @@ public abstract class HeapHelper extends ObjectResolver {
 	 *         inflated monitor.
 	 */
 	public abstract Monitor getInflatedMonitor(Object object, VmArchitecture arch);
+
+	/**
+	 * Atomic compare and swap. Compares the int value addressed by the given address with the given old value. If they are equal, the value at the given address is replace by the new value and true
+	 * is returned, otherwise nothing is changed and false is returned.
+	 * 
+	 * @param address
+	 * @param oldValue
+	 * @param newValue
+	 * @return boolean true if the value at address is changed, false otherwise.
+	 */
+	public abstract boolean atomicCompareAndSwap(Address address, int oldValue, int newValue);
+
 }
