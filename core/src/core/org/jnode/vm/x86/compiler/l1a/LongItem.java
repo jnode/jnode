@@ -39,6 +39,8 @@ final class LongItem extends Item  implements X86CompilerConstants {
 		X86RegisterPool pool = ec.getPool();
 		os.log("LongItem.log called "+Integer.toString(kind));		
 		myAssert(lsb != msb);
+		myAssert(lsb != null);
+		myAssert(msb != null);
 		switch (kind) {
 			case REGISTER:
 				// invariant: (msb != lsb) && (this.msb != this.lsb)
@@ -90,8 +92,8 @@ final class LongItem extends Item  implements X86CompilerConstants {
 				break;
 				
 			case LOCAL:
-				os.writeMOV(INTSIZE, lsb, FP, getOffsetToFP());
-				os.writeMOV(INTSIZE, msb, FP, getOffsetToFP()+4);
+				os.writeMOV(INTSIZE, lsb, FP, offsetToFP);
+				os.writeMOV(INTSIZE, msb, FP, offsetToFP+4);
 				break;
 				
 			case CONSTANT:
@@ -131,7 +133,8 @@ final class LongItem extends Item  implements X86CompilerConstants {
 			
 			final Register l = (Register)pool.request(INT, this);
 			final Register r = (Register)pool.request(INT, this);
-	
+			myAssert(r != null);
+			myAssert(l != null);
 			loadTo(ec, l, r);
 		}
 	}
@@ -187,8 +190,8 @@ final class LongItem extends Item  implements X86CompilerConstants {
 		os.log("LongItem.push "+Integer.toString(getKind()));	
 		switch (getKind()) {
 			case REGISTER:
-			    os.writePUSH(lsb);
 			    os.writePUSH(msb);
+			    os.writePUSH(lsb);
 				break;
 				
 			case LOCAL:
@@ -200,8 +203,8 @@ final class LongItem extends Item  implements X86CompilerConstants {
 			    final int lsbv = (int) (value & 0xFFFFFFFFL);
 			    final int msbv = (int) ((value >>> 32) & 0xFFFFFFFFL);
 
-			    os.writePUSH(lsbv);
 			    os.writePUSH(msbv);
+			    os.writePUSH(lsbv);
 				break;
 				
 			case FREGISTER:
