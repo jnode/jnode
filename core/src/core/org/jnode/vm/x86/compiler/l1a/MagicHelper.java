@@ -694,11 +694,14 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem obj = vstack.popRef();
             obj.load(ec);
             final GPR r = obj.getRegister();
+            final RefItem result = (RefItem)L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, false);
+            final GPR resultr = result.getRegister();
             // Get TIB
             os.writeMOV(helper.ADDRSIZE, r, r, ObjectLayout.TIB_SLOT * slotSize);
             // Get VmType
-            os.writeMOV(helper.ADDRSIZE, r, r, (TIBLayout.VMTYPE_INDEX + VmArray.DATA_OFFSET) * slotSize);
-            vstack.push(obj);
+            os.writeMOV(helper.ADDRSIZE, resultr, r, (TIBLayout.VMTYPE_INDEX + VmArray.DATA_OFFSET) * slotSize);
+            obj.release(ec);
+            vstack.push(result);
         } break;
         case mGETTIB: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);

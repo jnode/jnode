@@ -29,8 +29,8 @@ GLABEL Q43org5jnode2vm6Unsafe23clear2e28Lorg2fvmmagic2funboxed2fAddress3bLorg2fv
 	push ADI
 	push ACX
 	mov ADI,ADX
-	mov ecx,eax
-	shr ecx,2
+	mov ACX,AAX
+	shr ACX,2
 	xor eax,eax
 	cld
 	rep stosd
@@ -38,7 +38,7 @@ GLABEL Q43org5jnode2vm6Unsafe23clear2e28Lorg2fvmmagic2funboxed2fAddress3bLorg2fv
 	pop ADI
 	ret SLOT_SIZE*2
 
-GLABEL Q43org5jnode2vm6Unsafe23copy2e28Lorg2fvmmagic2funboxed2fAddress3bLorg2fvmmagic2funboxed2fAddress3bI29V
+GLABEL Q43org5jnode2vm6Unsafe23copy2e28Lorg2fvmmagic2funboxed2fAddress3bLorg2fvmmagic2funboxed2fAddress3bLorg2fvmmagic2funboxed2fExtent3b29V
 	push ABX
 	mov ABX,ASP
 	push ADI
@@ -47,7 +47,7 @@ GLABEL Q43org5jnode2vm6Unsafe23copy2e28Lorg2fvmmagic2funboxed2fAddress3bLorg2fvm
 	
 	mov ASI,[ABX+(4*SLOT_SIZE)]		; srcMemPtr
 	mov ADI,[ABX+(3*SLOT_SIZE)]		; destMemPtr
-	mov ecx,[ABX+(2*SLOT_SIZE)]		; size
+	mov ACX,[ABX+(2*SLOT_SIZE)]		; size
 	
 	; Test the direction for copying
 	cmp ASI,ADI

@@ -80,12 +80,13 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 
         // Setup a heap object, so the heap can initialize itself.
         final Address heapPtr = start.add(headerSize);
-        final int heapObjSize = ObjectLayout.objectAlign(heapClass
-                .getObjectSize());
+        final Word heapObjSize = Word.fromIntZeroExtend(ObjectLayout.objectAlign(heapClass
+                .getObjectSize()));
+        final Word flags = Word.fromIntZeroExtend(ObjectFlags.GC_DEFAULT_COLOR);
         heapPtr.store(heapObjSize, sizeOffset);
-        heapPtr.store(ObjectFlags.GC_DEFAULT_COLOR, flagsOffset);
+        heapPtr.store(flags, flagsOffset);
         heapPtr.store(ObjectReference.fromObject(heapClass.getTIB()), vmtOffset);
-        helper.clear(heapPtr, heapObjSize);
+        helper.clear(heapPtr, heapObjSize.toInt());
 
         VmDefaultHeap heap = (VmDefaultHeap) heapPtr.toObjectReference().toObject();
         heap.helper = helper;
@@ -112,7 +113,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         final int size = getSize();
 
         final Address myAddr = ObjectReference.fromObject(this).toAddress();
-        final int mySize = myAddr.loadInt(sizeOffset);
+        final Word mySize = myAddr.loadWord(sizeOffset);
         Address firstObject;
         if (inHeap(myAddr)) {
             firstObject = myAddr.add(mySize).add(headerSize);
@@ -276,30 +277,32 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
      * @throws UninterruptiblePragma
      */
     protected final void defragment() throws UninterruptiblePragma {
-        final int size = getSize();
-        int offset = headerSize;
+        final Word size = Word.fromIntZeroExtend(getSize());
+        final Word headerSize = Word.fromIntZeroExtend(this.headerSize);
+        Word offset = headerSize;
         final Offset sizeOffset = this.sizeOffset;
         final Offset tibOffset = this.tibOffset;
+        
 
         lock();
         try {
             Address firstFreePtr = null;
-            while (offset < size) {
+            while (offset.LT(size)) {
                 final Address ptr = start.add(offset);
-                final int objSize = ptr.loadInt(sizeOffset);
-                final int nextOffset = offset + objSize + headerSize;
+                final Word objSize = ptr.loadWord(sizeOffset);
+                final Word nextOffset = offset.add(objSize).add(headerSize);
                 final Object vmt = ptr.loadObjectReference(tibOffset);
                 if ((firstFreePtr == null) && (vmt == FREE)) {
                     firstFreePtr = ptr;
                 }
-                if ((vmt == FREE) && (nextOffset < size)) {
+                if ((vmt == FREE) && (nextOffset.LT(size))) {
                     final Object nextVmt;
                     final Address nextObjectPtr = start.add(nextOffset);
                     nextVmt = nextObjectPtr.loadObjectReference(tibOffset);
                     if (nextVmt == FREE) {
                         // Combine two free spaces
-                        int nextObjSize = nextObjectPtr.loadInt(sizeOffset);
-                        int newObjSize = objSize + headerSize + nextObjSize;
+                        Word nextObjSize = nextObjectPtr.loadWord(sizeOffset);
+                        Word newObjSize = objSize.add(headerSize).add(nextObjSize);
                         ptr.store(newObjSize, sizeOffset);
                         // Do not increment offset here, because there may be
                         // another next free object, which we will combine
@@ -328,18 +331,18 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
     protected final void walk(ObjectVisitor visitor, boolean locking,
             Word flagsMask, Word flagsValue) {
         // Go through the heap and call visit on each object
-        final int headerSize = this.headerSize;
+        final Word headerSize = Word.fromIntZeroExtend(this.headerSize);
         final Offset sizeOffset = this.sizeOffset;
         final Offset tibOffset = this.tibOffset;
         final Object FREE = this.FREE;
-        int offset = headerSize;
-        final int size = getSize();
+        Word offset = headerSize;
+        final Word size = Word.fromIntZeroExtend(getSize());
 
         if (locking) {
-            while (offset < size) {
+            while (offset.LT(size)) {
                 final Object tib;
                 final Object object;
-                final int objSize;
+                final Word objSize;
                 final Word flags;
 
                 lock();
@@ -347,7 +350,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
                     final Address ptr = start.add(offset);
                     object = ptr.toObjectReference().toObject();
                     tib = ptr.loadObjectReference(tibOffset);
-                    objSize = ptr.loadInt(sizeOffset);
+                    objSize = ptr.loadWord(sizeOffset);
                     flags = (flagsMask.isZero()) ? Word.zero() : VmMagic.getObjectFlags(object).and(flagsMask);
                 } finally {
                     unlock();
@@ -356,28 +359,28 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
                     if (flags.EQ(flagsValue)) {
                         if (!visitor.visit(object)) {
                             // Stop
-                            offset = size;
+                            return;
                         }
                     }
                 }
-                offset += objSize + headerSize;
+                offset = offset.add(objSize).add(headerSize);
             }
         } else {
-            while (offset < size) {
+            while (offset.LT(size)) {
                 final Address ptr = start.add(offset);
                 final Object object = ptr.toObjectReference().toObject();
                 final Object tib = ptr.loadObjectReference(tibOffset);
-                final int objSize = ptr.loadInt(sizeOffset);
+                final Word objSize = ptr.loadWord(sizeOffset);
                 final Word flags = flagsMask.isZero() ? Word.zero() : VmMagic.getObjectFlags(object).and(flagsMask);
                 if (tib != FREE) {
                     if (flags.EQ(flagsValue)) {
                         if (!visitor.visit(object)) {
                             // Stop
-                            offset = size;
+                            return;
                         }
                     }
                 }
-                offset += objSize + headerSize;
+                offset = offset.add(objSize).add(headerSize);
             }
         }
     }

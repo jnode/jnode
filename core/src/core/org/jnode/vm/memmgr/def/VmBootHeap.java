@@ -100,13 +100,13 @@ public class VmBootHeap extends VmAbstractHeap {
         helper.clear(allocationBitmapPtr, bitmapSize);
         // Go through the heap and mark all objects in the allocation bitmap.
         final Word heapSizeW = Word.fromIntZeroExtend(heapSize);
-        final Word headerSizeW = Word.fromIntZeroExtend(headerSize);
-        Word offset = Word.fromIntZeroExtend(headerSize);
+        final Word headerSize = Word.fromIntZeroExtend(this.headerSize);
+        Word offset = headerSize;
         while (offset.LT(heapSizeW)) {
             final Address ptr = start.add(offset);
             setAllocationBit(ptr, true);
             final Word objSize = ptr.loadWord(sizeOffset);
-            offset = offset.add(objSize).add(headerSizeW);
+            offset = offset.add(objSize).add(headerSize);
         }
         //Unsafe.debug("end of bootheap.initialize");
     }

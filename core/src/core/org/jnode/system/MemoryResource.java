@@ -127,7 +127,7 @@ public interface MemoryResource extends Resource {
 	 * @param dstOfs
 	 * @param length
 	 */
-	public abstract void getChars(int memPtr, float[] dst, int dstOfs, int length);
+	public abstract void getFloats(int memPtr, float[] dst, int dstOfs, int length);
 	
 	/**
 	 * Gets a double at the given memory address

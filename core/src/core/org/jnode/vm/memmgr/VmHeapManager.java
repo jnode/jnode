@@ -33,6 +33,7 @@ import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.def.VmBootHeap;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Offset;
 
@@ -191,7 +192,7 @@ public abstract class VmHeapManager extends VmSystemObject {
 			size = normalClass.getObjectSize();
 		}
 		final Object newObj = allocObject(objectClass, size);
-		helper.copy(objectPtr, ObjectReference.fromObject(newObj).toAddress(), size);
+		helper.copy(objectPtr, ObjectReference.fromObject(newObj).toAddress(), Extent.fromIntZeroExtend(size));
 		return newObj;
 	}
 

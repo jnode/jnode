@@ -48,7 +48,7 @@ public abstract class HeapHelper {
 	 */
 	public abstract boolean atomicChangeObjectColor(Object dst, int oldColor, int newColor);
 
-	public abstract void copy(Address src, Address dst, int size);
+	public abstract void copy(Address src, Address dst, Extent size);
 
 	public abstract void clear(Address dst, int size);
 

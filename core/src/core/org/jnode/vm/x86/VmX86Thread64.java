@@ -4,6 +4,9 @@
 package org.jnode.vm.x86;
 
 import org.jnode.util.NumberUtils;
+import org.jnode.vm.ObjectVisitor;
+import org.jnode.vm.memmgr.VmHeapManager;
+import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Word;
 
 /**
@@ -16,7 +19,6 @@ public final class VmX86Thread64 extends VmX86Thread {
 	volatile Word r9;
 	volatile Word r10;
 	volatile Word r11;
-	volatile Word r12;
 	volatile Word r13;
 	volatile Word r14;
 	volatile Word r15;
@@ -58,4 +60,57 @@ public final class VmX86Thread64 extends VmX86Thread {
 				+ NumberUtils.hex(exCr2.toLong()) + " RFLAGS "
 				+ NumberUtils.hex(exEflags.toInt());
 	}
+    
+    /**
+     * @see org.jnode.vm.VmThread#visit(org.jnode.vm.ObjectVisitor, org.jnode.vm.memmgr.VmHeapManager)
+     */
+    public boolean visit(ObjectVisitor visitor, VmHeapManager heapManager) {
+        if (!super.visit(visitor, heapManager)) {
+            return false;
+        }
+        // Scan registers
+        Address addr = r8.toAddress();
+        if (heapManager.isObject(addr)) {
+            if (!visitor.visit(addr)) {
+                return false;
+            }
+        }
+        addr = r9.toAddress();
+        if (heapManager.isObject(addr)) {
+            if (!visitor.visit(addr)) {
+                return false;
+            }
+        }
+        addr = r10.toAddress();
+        if (heapManager.isObject(addr)) {
+            if (!visitor.visit(addr)) {
+                return false;
+            }
+        }
+        addr = r11.toAddress();
+        if (heapManager.isObject(addr)) {
+            if (!visitor.visit(addr)) {
+                return false;
+            }
+        }
+        addr = r13.toAddress();
+        if (heapManager.isObject(addr)) {
+            if (!visitor.visit(addr)) {
+                return false;
+            }
+        }
+        addr = r14.toAddress();
+        if (heapManager.isObject(addr)) {
+            if (!visitor.visit(addr)) {
+                return false;
+            }
+        }
+        addr = r15.toAddress();
+        if (heapManager.isObject(addr)) {
+            if (!visitor.visit(addr)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
