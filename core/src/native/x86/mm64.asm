@@ -160,7 +160,7 @@ Lsetup_mm:
 	
 	; Setup the first entry of pd0 to a 4Kb page table
 	mov edi,pd0_addr
-	SET_PT_ENTRY pg0_addr, 0, PF_DEFAULT
+	SET_PT_ENTRY pt0_addr, 0, PF_DEFAULT
 	
 	; Setup the low 2Mb page table
 	mov edi,pt0_addr
@@ -232,7 +232,7 @@ mm_long_mode:
 	lgdt [gdt64]
 	
 	; Load TSS
-	mov eax, TSS_SEL
+	mov eax, TSS_DS
 	ltr ax
 	
 	; Reload CR3

@@ -135,7 +135,7 @@ sys_print_intregs:
 	idm_print_reg error, [rbp+ERROR]
 	idm_print_reg cr2, cr2
 	idm_print_reg cr3, cr3
-	idm_print_reg eip, [rbp+OLD_EIP]
+	idm_print_reg rip, [rbp+OLD_EIP]
 	idm_print_reg cs,  [rbp+OLD_CS]
 	idm_print_reg eflags, [rbp+OLD_EFLAGS]
 	idm_print_reg cr0, cr0
@@ -190,18 +190,18 @@ idm_intno:  db 0xd,0xa,'int  : ',0
 idm_error:  db        ' Error: ',0
 idm_cr2:    db        ' CR2  : ',0
 idm_cr3:    db        ' CR3  : ',0
-idm_eip:    db 0xd,0xa,'EIP  : ',0
+idm_rip:    db 0xd,0xa,'EIP  : ',0
 idm_cs:     db        ' CS   : ',0
 idm_eflags: db        ' FLAGS: ',0
 idm_cr0:	db        ' CR0  : ',0
-idm_eax:    db 0xd,0xa,'RAX  : ',0
-idm_ebx:    db        ' RBX  : ',0
-idm_ecx:    db        ' RCX  : ',0
-idm_edx:    db        ' RDX  : ',0
-idm_ebp:    db 0xd,0xa,'RBP  : ',0
-idm_esp:    db        ' RSP  : ',0
-idm_edi:    db        ' RDI  : ',0
-idm_esi:    db        ' RSI  : ',0
+idm_rax:    db 0xd,0xa,'RAX  : ',0
+idm_rbx:    db        ' RBX  : ',0
+idm_rcx:    db        ' RCX  : ',0
+idm_rdx:    db        ' RDX  : ',0
+idm_rbp:    db 0xd,0xa,'RBP  : ',0
+idm_rsp:    db        ' RSP  : ',0
+idm_rdi:    db        ' RDI  : ',0
+idm_rsi:    db        ' RSI  : ',0
 idm_stack0: db 0xd,0xa,'STACK: ',0
 idm_stack1: db        0
 idm_ipaddr: db 0xd,0xa,'CODE(',0

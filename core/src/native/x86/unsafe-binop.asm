@@ -13,7 +13,8 @@
 	mov ADI,[ASP+(4*SLOT_SIZE)]		; memPtr
 	mov eax,[ASP+(3*SLOT_SIZE)] 	; value
 	mov ecx,[ASP+(2*SLOT_SIZE)]		; count
-	jecxz %%end						; (Count == 0) ?
+	test ecx,ecx
+	jz %%end						; (Count == 0) ?
 	%2 eax,%3	    			 	; Apply Mask 
 %%loop:
     %1 dword [ADI],eax
@@ -29,7 +30,8 @@
 	mov AAX,[ASP+(3*SLOT_SIZE)]		; memPtr
 	mov edx,[ASP+(2*SLOT_SIZE)] 	; value
 	mov ecx,[ASP+(1*SLOT_SIZE)]		; count
-	jecxz %%end						; (Count == 0) ?
+	test ecx,ecx
+	jz %%end						; (Count == 0) ?
 %%loop:
 	%1 %2 [AAX],%4
 	add AAX,%3
@@ -60,7 +62,8 @@
 	mov rdi,[rsp+(4*SLOT_SIZE)]		; memPtr
 	mov rax,[rsp+(3*SLOT_SIZE)] 	; value (long)
 	mov ecx,[rsp+(2*SLOT_SIZE)]		; count
-	jecxz %%end						; (Count == 0) ?
+	test ecx,ecx
+	jz %%end						; (Count == 0) ?
 %%loop:
 	%1 qword [rdi],rax				; LSB
 	add rdi,8

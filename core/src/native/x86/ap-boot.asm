@@ -73,14 +73,17 @@ ap_boot_end:
 ; End of copied code
 ; ===============================================	
 
+%undef BITS64_ON
 ap_boot_in_kernel_space:
 	mov eax,KERNEL_DS
 	mov ss,ax
 	mov ds,ax
 	mov es,ax
 	mov gs,ax
+%ifdef BITS32	
 	mov eax,CURPROC_FS
 	mov fs,ax
+%endif	
 	
 	; Load kernel ESP (EBX contains pointer to TSS)
 	mov esp,[ebx+0x04]			; Kernel ESP
@@ -93,37 +96,51 @@ ap_boot_in_kernel_space:
 	lidt [idt]
 	FLUSH
 	
+%ifdef BITS32	
 	; Enable paging
 	call enable_paging
+	
+	; Restore TSS
+	pop ebx						
+%else
+
+	; Switch to long-mode
+	
+	; TODO implement me
+	bits 64
+	%define BITS64_ON
+
+%endif
 
 	; Now load the TSS into TR
     mov eax,TSS_DS
     ltr ax
     ; set IOPL to 3
     pushf
-    pop eax
-    or eax,F_IOPL1 | F_IOPL2
-    push eax
+    pop AAX
+    or AAX,F_IOPL1 | F_IOPL2
+    push AAX
     popf
     FLUSH
     
 	; Go into userspace
-	pop ebx						; Restore TSS
-	mov ecx,[ebx+0x38]			; User ESP
+	mov ACX,[ebx+0x38]			; User ESP
 
+	mov AAX,ap_boot_go_user_cs
 	push dword USER_DS			; old SS
-	push ecx					; old ESP
+	push ACX					; old ESP
 	pushf						; old EFLAGS
 	push dword USER_CS			; old CS
-	push ap_boot_go_user_cs		; old EIP
+	push AAX					; old EIP
 	pushf
-	pop eax
-	and eax,~F_NT
-	push eax
+	pop AAX
+	and AAX,~F_NT
+	push AAX
 	popf
 	iret
 
 ap_boot_go_user_cs:
+%ifdef BITS32
 	mov eax,USER_DS
 	mov ss,ax
 	mov esp,ecx
@@ -132,6 +149,7 @@ ap_boot_go_user_cs:
 	mov gs,ax
 	mov eax,CURPROC_FS
 	mov fs,ax
+%endif	
 
     ;jmp ap_test
 	
@@ -142,13 +160,13 @@ ap_boot_go_user_cs:
 	sti
 	
 	; Jump to java code
-	xor ebp,ebp ; Clear the frame ptr
-	push ebp    ; previous EBP
-	push ebp    ; MAGIC    (here invalid ON PURPOSE!)
-	push ebp    ; PC           (here invalid ON PURPOSE!)
-	push ebp    ; VmMethod (here invalid ON PURPOSE!)
-	mov ebp,esp
-	mov eax,VmX86Processor_applicationProcessorMain
+	xor ABP,ABP		; Clear the frame ptr
+	push ABP		; previous EBP
+	push ABP		; MAGIC    (here invalid ON PURPOSE!)
+	push ABP		; PC           (here invalid ON PURPOSE!)
+	push ABP		; VmMethod (here invalid ON PURPOSE!)
+	mov ABP,ASP
+	mov AAX,VmX86Processor_applicationProcessorMain
 	INVOKE_JAVA_METHOD
 	
 	; Return from java code
