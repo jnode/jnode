@@ -76,6 +76,6 @@ public class X86Level1ACompiler extends AbstractX86Compiler {
      * @see org.jnode.vm.compiler.NativeCodeCompiler#getMagic()
      */
     public final int getMagic() {
-        return L1_COMPILER_MAGIC;
+        return L1A_COMPILER_MAGIC;
     }
 }

@@ -79,6 +79,9 @@ public interface X86CompilerConstants {
 	/** Magic value for L1 compiler */
 	public static final int L1_COMPILER_MAGIC =  VmStackFrame.MAGIC_COMPILED  | 0x2b;
 
+	/** Magic value for L1a compiler */
+	public static final int L1A_COMPILER_MAGIC =  VmStackFrame.MAGIC_COMPILED  | 0x3c;
+
 	/** Magic value for l2 compiler */
 	public static final int L2_COMPILER_MAGIC = VmStackFrame.MAGIC_COMPILED | 0x8e;
 }

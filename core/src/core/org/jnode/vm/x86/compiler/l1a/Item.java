@@ -1,17 +1,10 @@
 /*
- * Created on 10.02.2004
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * $Id$
  */
 package org.jnode.vm.x86.compiler.l1a;
 
-import org.jnode.assembler.x86.Register;
-import org.jnode.vm.compiler.ir.Constant;
 
 /**
- * @author Patrik Reali
- *
  * This class is the base of all virtual stack items.
  * To improve performance and avoid type casts,
  * all accessor methods are defined here (as abstract),
@@ -21,8 +14,9 @@ import org.jnode.vm.compiler.ir.Constant;
  * meaningful way). The compiler knows about the various
  * types and must access only the legal methods.
  * 
+ * @author Patrik Reali
+ *
  */
-
 abstract class Item {
 	/*
 	 * Description of the virtual stack entry kind
@@ -239,7 +233,7 @@ abstract class Item {
 	abstract void release();
 	
 	/**
-	 * @param string
+	 * @param type
 	 * @return
 	 */
 	 static int SignatureToType(char type) {

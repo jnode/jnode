@@ -1,21 +1,11 @@
 /*
- * Created on 10.02.2004
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * $Id$
  */
 package org.jnode.vm.x86.compiler.l1a;
 
-import org.jnode.assembler.x86.Register;
-import org.jnode.vm.compiler.ir.Constant;
-
 /**
  * @author Patrik Reali
- *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
  */
-
 final class VirtualStack {
 	Item[] stack;
 	
