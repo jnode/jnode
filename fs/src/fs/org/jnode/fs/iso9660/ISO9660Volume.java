@@ -19,21 +19,21 @@ public class ISO9660Volume {
 
     private final int blockSize;
 
-    private final VolumeDescriptor primaryVolumeDescriptor;
+    private final PrimaryVolumeDescriptor primaryVolumeDescriptor;
 
     public ISO9660Volume(FSBlockDeviceAPI api) throws IOException {
         this.api = api;
         this.blockSize = api.getSectorSize();
 
-        final byte[] buff = new byte[ blockSize];
+        final byte[] buffer = new byte[ blockSize];
 
-        VolumeDescriptor pVD = null;
+        PrimaryVolumeDescriptor pVD = null;
         boolean done = false;
         for (int currentLBN = 16; !done; currentLBN++) {
             // read the LB
-            this.readFromLBN(currentLBN, 0, buff, 0, blockSize);
-            final VolumeDescriptor vd = new VolumeDescriptor(this, buff);
-            switch (vd.getType()) {
+            this.readFromLBN(currentLBN, 0, buffer, 0, blockSize);
+            final int type = VolumeDescriptor.getType(buffer);
+            switch (type) {
             case VolumeDescriptor.Type.TERMINATOR:
                 done = true;
                 break;
@@ -42,7 +42,8 @@ public class ISO9660Volume {
                 break;
             case VolumeDescriptor.Type.PRIMARY_DESCRIPTOR:
                 BootLog.info("Found primary descriptor");
-                pVD = vd;
+            	pVD = new PrimaryVolumeDescriptor(this, buffer);
+            	pVD.printOut();
                 break;
             case VolumeDescriptor.Type.SUPPLEMENTARY_DESCRIPTOR:
                 BootLog.info("Found supplementatory descriptor");
@@ -51,12 +52,7 @@ public class ISO9660Volume {
                 BootLog.info("Found partition descriptor");
                 break;
             default:
-                BootLog.info("Found unknown descriptor with type " + vd.getType());
-            /*
-             * if(vd.getType() ==
-             * VolumeDescriptor.SupplementaryVolumeDescriptor_TYPE) {
-             * this.setVolumeDescriptor(vd); }
-             */
+                BootLog.info("Found unknown descriptor with type " + type);
             }
         }
         if (pVD == null) { throw new IOException(
@@ -82,7 +78,7 @@ public class ISO9660Volume {
     /**
      * @return Returns the volumeDescriptor.
      */
-    public VolumeDescriptor getVolumeDescriptor() {
+    public PrimaryVolumeDescriptor getPrimaryVolumeDescriptor() {
         return primaryVolumeDescriptor;
     }
 }
