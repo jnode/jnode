@@ -59,7 +59,7 @@ import org.vmmagic.unboxed.Address;
 public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_IDs, HardwareCursorAPI {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(VMWareCore.class);
 	private final VMWareDriver driver;
 	private final int indexPort;
 	private final int valuePort;

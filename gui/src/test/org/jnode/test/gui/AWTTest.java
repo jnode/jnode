@@ -53,7 +53,7 @@ public class AWTTest {
     static class TestComponent extends Component {
 
         /** My logger */
-//		private final Logger log = Logger.getLogger(getClass());
+//		private static final Logger log = Logger.getLogger(TestComponent.class);
         private final boolean useDoubleBuffer;
 
         public TestComponent(boolean useDoubleBuffer) {

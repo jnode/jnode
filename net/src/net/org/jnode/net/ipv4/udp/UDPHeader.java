@@ -35,7 +35,7 @@ import org.jnode.util.NumberUtils;
 public class UDPHeader implements TransportLayerHeader, UDPConstants {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(UDPHeader.class);
 	private final int srcPort;
 	private final int dstPort;
 	private final int udpLength;

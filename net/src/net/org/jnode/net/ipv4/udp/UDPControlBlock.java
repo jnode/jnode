@@ -27,7 +27,7 @@ import org.jnode.net.ipv4.IPv4ControlBlockList;
 public class UDPControlBlock extends IPv4ControlBlock implements UDPConstants {
 
     /** My logger */
-    //private final Logger log = Logger.getLogger(getClass());
+    //private static final Logger log = Logger.getLogger(UDPControlBlock.class);
     public UDPControlBlock(IPv4ControlBlockList list, int protocol, int ttl) {
         super(list, protocol, ttl);
     }

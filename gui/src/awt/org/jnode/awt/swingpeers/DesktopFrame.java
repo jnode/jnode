@@ -39,7 +39,7 @@ import org.jnode.awt.JNodeAwtContext;
 final class DesktopFrame extends JFrame implements JNodeAwtContext {
     private static final Color DESKTOP_BACKGROUND_COLOR = new Color(70, 130, 180);
 	private final JDesktopPane desktop;
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(DesktopFrame.class);
 	
 	/**
 	 * Initialize this instance.

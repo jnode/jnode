@@ -49,7 +49,7 @@ import org.jnode.util.QueueProcessorThread;
 public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, QueueProcessor {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(AbstractNetDriver.class);
 	/** Device prefix for ethernet devices */
 	public static final String ETH_DEVICE_PREFIX = "eth";
 	/** Device prefix for loopback devices */

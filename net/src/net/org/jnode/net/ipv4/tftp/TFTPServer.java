@@ -46,7 +46,7 @@ import org.apache.commons.net.tftp.TFTPPacketException;
  */
 public class TFTPServer extends TFTP {
 
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(TFTPServer.class);
 
 	/** current client address */
 	private InetAddress clientAddress;

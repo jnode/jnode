@@ -51,7 +51,7 @@ import org.vmmagic.unboxed.Address;
 final class RadeonCore implements RadeonConstants {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(RadeonCore.class);
 
 	/** The driver */
 	private final RadeonDriver driver;

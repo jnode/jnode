@@ -54,7 +54,7 @@ public class MouseHandler implements PointerListener
   /**
    * My logger
    */
-  private final Logger log = Logger.getLogger(getClass());
+  private static final Logger log = Logger.getLogger(MouseHandler.class);
 
   private final PointerAPI pointerAPI;
 

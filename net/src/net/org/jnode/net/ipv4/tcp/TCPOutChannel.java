@@ -34,7 +34,7 @@ import org.jnode.net.ipv4.IPv4Header;
 public class TCPOutChannel {
 	
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(TCPOutChannel.class);
 	/** The protocol */
 	private final TCPProtocol tcp;
 	/** All unacked segments */

@@ -40,7 +40,7 @@ import org.jnode.util.TimeoutException;
 public class TCPControlBlock extends IPv4ControlBlock implements TCPConstants {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(TCPControlBlock.class);
 	/** The outgoing channel */
 	private final TCPOutChannel outChannel;
 	/** The incoming channel */

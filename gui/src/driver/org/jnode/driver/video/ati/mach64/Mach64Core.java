@@ -48,7 +48,7 @@ import org.vmmagic.unboxed.Offset;
 final class Mach64Core implements Mach64Constants  {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(Mach64Core.class);
 
 	/** The driver we belong to */
 	private final Mach64Driver driver;

@@ -36,7 +36,7 @@ import org.jnode.system.MemoryResource;
 public class ImageConsumerInt extends AbstractMemoryImageConsumer {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(ImageConsumerInt.class);
 
 	/**
 	 * @param target

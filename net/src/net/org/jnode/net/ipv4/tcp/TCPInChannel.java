@@ -35,7 +35,7 @@ import org.jnode.net.ipv4.IPv4Header;
 public class TCPInChannel {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(TCPInChannel.class);
 	/** Segments that have been received, but are out of order */
 	private final LinkedList futureSegments = new LinkedList();
 	/** The next expected sequence number */

@@ -39,7 +39,7 @@ import org.jnode.awt.font.TextRenderer;
 public class TTFontProvider implements FontProvider {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(TTFontProvider.class);
 	/** Cache font renderers */
 	private final HashMap renderers = new HashMap();
 	/** Cache font metrics */

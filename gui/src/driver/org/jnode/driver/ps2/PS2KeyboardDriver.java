@@ -38,7 +38,7 @@ public class PS2KeyboardDriver extends AbstractKeyboardDriver implements PS2Cons
 	private final PS2Bus bus;
 	private final PS2ByteChannel channel;
 	private IRQResource irq;
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(PS2KeyboardDriver.class);
 
 	PS2KeyboardDriver(PS2Bus ps2) {
 		this.bus = ps2;

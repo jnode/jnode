@@ -53,7 +53,7 @@ import org.jnode.driver.video.Surface;
 public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 
 	private final Surface surface;
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(AbstractSurfaceGraphics.class);
 	private int mode = Surface.PAINT_MODE;
 
 	/**

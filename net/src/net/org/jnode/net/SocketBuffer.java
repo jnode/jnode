@@ -43,7 +43,7 @@ public class SocketBuffer {
 	private static final int INITIAL_SIZE = 256;
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(SocketBuffer.class);
 	/** Actual data */
 	private byte[] data;
 	/** Size of the buffer that is in use */

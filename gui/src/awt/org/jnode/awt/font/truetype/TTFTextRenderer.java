@@ -36,7 +36,7 @@ import org.jnode.driver.video.Surface;
 public class TTFTextRenderer implements TextRenderer {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(TTFTextRenderer.class);
 	private final TTFFontData fontData;
 	private final double fontSize;
 	private final RenderCache renderCache;

@@ -36,7 +36,7 @@ import org.jnode.net.ProtocolAddress;
 public class ARPCache {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(ARPCache.class);
 	private final HashMap hw2p = new HashMap();
 	private final HashMap p2hw = new HashMap();
 	

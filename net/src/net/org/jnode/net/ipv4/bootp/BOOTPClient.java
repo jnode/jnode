@@ -52,7 +52,7 @@ public class BOOTPClient {
 	/**
 	 * My logger
 	 */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(BOOTPClient.class);
 
 	private static final int RECEIVE_TIMEOUT = 10 * 1000; // 10 seconds
 

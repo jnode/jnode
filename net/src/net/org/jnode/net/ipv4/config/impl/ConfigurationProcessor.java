@@ -35,7 +35,7 @@ public class ConfigurationProcessor implements QueueProcessor {
 
     private final Queue queue = new Queue();
 
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(ConfigurationProcessor.class);
 
     private QueueProcessorThread thread;
 

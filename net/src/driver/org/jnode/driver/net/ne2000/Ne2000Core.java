@@ -56,7 +56,7 @@ public abstract class Ne2000Core extends AbstractDeviceCore
 	private static final int TX_PAGES = 6;
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(Ne2000Core.class);
 	/** Start of IO address space */
 	protected final int iobase;
 	/** IO address space */

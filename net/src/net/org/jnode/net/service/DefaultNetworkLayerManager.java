@@ -51,7 +51,7 @@ import org.jnode.util.QueueProcessor;
 public class DefaultNetworkLayerManager implements NetworkLayerManager, QueueProcessor, ExtensionPointListener  {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(DefaultNetworkLayerManager.class);
 	/** Registered packet types */
 	private final HashMap layers = new HashMap();
 	/** Queue of received packets */
