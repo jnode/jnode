@@ -6,6 +6,7 @@ package org.jnode.system.x86;
 import org.jnode.system.DMAException;
 import org.jnode.system.DMAResource;
 import org.jnode.system.MemoryResource;
+import org.jnode.system.Resource;
 import org.jnode.system.ResourceOwner;
 
 /**
@@ -88,4 +89,10 @@ public class X86DMAChannel implements DMAResource, DMAConstants {
 		return dmanr;
 	}
 
+    /**
+     * @see org.jnode.system.Resource#getParent()
+     */
+    public Resource getParent() {
+        return null;
+    }
 }

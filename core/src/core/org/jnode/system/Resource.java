@@ -24,5 +24,11 @@ public interface Resource {
 	 * cannot be used anymore.
 	 */
 	public void release();
+	
+	/**
+	 * Gets the parent resource if any.
+	 * @return The parent resource, or null if this resource has no parent.
+	 */
+	public Resource getParent();
 
 }
