@@ -2101,118 +2101,21 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      */
     public final void visit_invokeinterface(VmConstIMethodRef methodRef,
             int count) {
-        //TODO: port to orp-style
         vstack.push(eContext);
 
+        // Resolve the method
         methodRef.resolve(loader);
-        /*
-         * if (!methodRef.getConstClass().isResolved()) { Label startClassLabel =
-         * new Label(this.curInstrLabel + "startClass");
-         * os.setObjectRef(startClassLabel);
-         * resolveClass(methodRef.getConstClass()); patch_NOP(startClassLabel); }
-         * 
-         * if (!methodRef.isResolved()) { Label startLabel = new
-         * Label(this.curInstrLabel + "start"); os.setObjectRef(startLabel);
-         * resolveMethod(methodRef); patch_NOP(startLabel);
-         */
-
         final VmMethod method = methodRef.getResolvedVmMethod();
         final int argSlotCount = count - 1;
-
-        if (false) {
-            final int selector = method.getSelector();
-            final int imtIndex = selector % ObjectLayout.IMT_LENGTH;
-            final Label noCollLabel = new Label(this.curInstrLabel
-                    + "NoCollision");
-            final Label findSelectorLabel = new Label(this.curInstrLabel
-                    + "FindSelector");
-            final Label endLabel = new Label(this.curInstrLabel + "End");
-
-            // remove parameters from vstack
-            dropParameters(method, true);
-
-            // Get objectref -> EBX
-            os.writeMOV(INTSIZE, Register.EBX, SP, argSlotCount * slotSize);
-
-            /*
-             * // methodRef -> EDX os.writeMOV_Const(Register.EDX, methodRef); //
-             * methodRef.selector -> ecx os.writeMOV(INTSIZE, Register.ECX,
-             * Register.EDX,
-             * context.getVmConstIMethodRefSelectorField().getOffset()); //
-             * methodRef.selector -> eax os.writeMOV(INTSIZE, Register.EAX,
-             * Register.ECX); // Clear edx os.writeXOR(Register.EDX,
-             * Register.EDX); // IMT_LENGTH -> ESI
-             * os.writeMOV_Const(Register.ESI, ObjectLayout.IMT_LENGTH); //
-             * selector % IMT_LENGTH -> edx
-             */
-            os.writeMOV_Const(ECX, selector);
-            os.writeMOV_Const(EDX, imtIndex);
-            // Output: EBX=objectref, ECX=selector, EDX=imtIndex
-
-            /* objectref.TIB -> ebx */
-            os.writeMOV(INTSIZE, Register.EBX, Register.EBX, tibOffset);
-            /* boolean[] imtCollisions -> esi */
-            os.writeMOV(INTSIZE, Register.ESI, Register.EBX, arrayDataOffset
-                    + (TIBLayout.IMTCOLLISIONS_INDEX * slotSize));
-            /* Has collision at imt[index] ? */
-            os.writeMOV(INTSIZE, Register.EAX, Register.ESI, Register.EDX, 1,
-                    arrayDataOffset);
-            os.writeTEST_AL(0xFF);
-            /* Object[] imt -> esi */
-            os.writeMOV(INTSIZE, Register.ESI, Register.EBX, arrayDataOffset
-                    + (TIBLayout.IMT_INDEX * slotSize));
-            /* selector -> ebx */
-            os.writeMOV(INTSIZE, Register.EBX, Register.ECX);
-
-            os.writeJCC(noCollLabel, X86Constants.JZ);
-
-            // We have a collision
-            /* imt[index] (=collisionList) -> esi */
-            os.writeMOV(INTSIZE, Register.ESI, Register.ESI, Register.EDX, 4,
-                    arrayDataOffset);
-            /* collisionList.length -> ecx */
-            os.writeMOV(INTSIZE, Register.ECX, Register.ESI, arrayLengthOffset);
-            /* &collisionList[0] -> esi */
-            os.writeLEA(Register.ESI, Register.ESI, arrayDataOffset);
-
-            os.setObjectRef(findSelectorLabel);
-
-            /* collisionList[index] -> eax */
-            os.writeLODSD();
-            /* collisionList[index].selector == selector? */
-            os.writeMOV(INTSIZE, Register.EDX, Register.EAX, context
-                    .getVmMethodSelectorField().getOffset());
-            os.writeCMP(Register.EBX, Register.EDX);
-            os.writeJCC(endLabel, X86Constants.JE);
-            try {
-                os.writeLOOP(findSelectorLabel);
-            } catch (UnresolvedObjectRefException ex) {
-                throw new CompileError(ex);
-            }
-            /* Force a NPE further on */
-            os.writeXOR(Register.EAX, Register.EAX);
-            os.writeJMP(endLabel);
-
-            os.setObjectRef(noCollLabel);
-            /* imt[index] -> eax */
-            os.writeMOV(INTSIZE, Register.EAX, Register.ESI, Register.EDX, 4,
-                    arrayDataOffset);
-
-            os.setObjectRef(endLabel);
-
-            /** Now invoke the method */
-            invokeJavaMethod(methodRef.getSignature());
-            // Result is already on the stack.
-        } else {
-            // remove parameters from vstack
-            dropParameters(method, true);
-            // Get objectref -> EAX
-            os.writeMOV(INTSIZE, EAX, SP, argSlotCount * slotSize);
-            // Write the actual invokeinterface
-            X86IMTCompiler.emitInvokeInterface(os, method);
-            // Write the push result
-            helper.pushReturnValue(method.getSignature());
-        }
+        
+        // remove parameters from vstack
+        dropParameters(method, true);
+        // Get objectref -> EAX
+        os.writeMOV(INTSIZE, EAX, SP, argSlotCount * slotSize);
+        // Write the actual invokeinterface
+        X86IMTCompiler.emitInvokeInterface(os, method);
+        // Write the push result
+        helper.pushReturnValue(method.getSignature());
     }
 
     /**
@@ -3236,6 +3139,11 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         if (isfloat) {
             FPUHelper.ensureStackCapacity(os, eContext, vstack, 1);
         }
+        
+        if (jvmType == JvmType.CHAR) {
+        	// Clear resultr, so we avoid a MOVZX afterwards.
+        	os.writeXOR(resultr, resultr);
+        }
 
         // Load data
         if (idx.isConstant()) {
@@ -3260,9 +3168,9 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         case JvmType.BYTE:
             os.writeMOVSX(resultr, resultr, BYTESIZE);
             break;
-        case JvmType.CHAR:
-            os.writeMOVZX(resultr, resultr, WORDSIZE);
-            break;
+//        case JvmType.CHAR:
+//            os.writeMOVZX(resultr, resultr, WORDSIZE);
+//            break;
         case JvmType.SHORT:
             os.writeMOVSX(resultr, resultr, WORDSIZE);
             break;
