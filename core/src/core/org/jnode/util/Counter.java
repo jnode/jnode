@@ -64,6 +64,13 @@ public final class Counter extends Statistic
   }
 
   /**
+   * Add <i>increment</i> to the counter of this statistic.
+   */
+  public void add(int increment) {
+      counter+=increment;
+  }
+      
+  /**
    * Convert to a String representation
    *
    * @return String
