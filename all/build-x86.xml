@@ -253,7 +253,8 @@
     </copy>
     <zip zipfile="${build.dir}/cdrom/jnodesource.zip">
       <fileset dir="${root.dir}">
-        <exclude name="build/**/*"/>
+        <exclude name="**/build/**"/>
+
       </fileset>
     </zip>
     <exec executable="mkisofs">
