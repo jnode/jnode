@@ -37,7 +37,6 @@ exception statement from your version. */
 
 package gnu.java.awt.image;
 
-import java.awt.image.ColorModel;
 import java.awt.image.ImageConsumer;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -50,7 +49,7 @@ import java.util.Vector;
 
 public class XBMDecoder extends ImageDecoder {
 	BufferedReader reader;
-	static final ColorModel cm = ColorModel.getRGBdefault();
+	//static final ColorModel cm = ColorModel.getRGBdefault();
 	static final int black = 0xff000000;
 	static final int transparent = 0x00000000;
 	static final int masktable[] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
