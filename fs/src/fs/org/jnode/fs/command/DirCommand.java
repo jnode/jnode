@@ -51,12 +51,7 @@ public class DirCommand implements Command{
 	}
 	
 	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		ParsedArguments cmdLine;
-
-    if (in.available()>0)
-      cmdLine = HELP_INFO.parse((new CommandLine(in)).toStringArray());
-    else
-      cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+		ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
 
     String dir_str = ARG_DIR.getValue(cmdLine);
 		
