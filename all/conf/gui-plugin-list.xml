@@ -117,7 +117,6 @@
   <plugin id="org.jnode.apps.debug"/>
 
   <plugin id="org.junit"/>
-  <plugin id="org.june"/>
   <plugin id="org.apache.tools.ant"/>
   <plugin id="org.jnode.test"/>
   <plugin id="org.jnode.test.fs"/>
