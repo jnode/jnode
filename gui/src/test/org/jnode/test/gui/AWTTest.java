@@ -1,6 +1,7 @@
+/*
+ * $Id$
+ */
 package org.jnode.test.gui;
-
-import org.apache.log4j.Logger;
 
 import java.awt.BorderLayout;
 import java.awt.Button;
