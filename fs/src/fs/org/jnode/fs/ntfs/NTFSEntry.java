@@ -16,12 +16,17 @@ import org.jnode.fs.FileSystem;
  */
 public class NTFSEntry implements FSEntry {
 
+	private NTFSFileRecord fileRecord = null;
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FSEntry#getName()
 	 */
+	public NTFSEntry(NTFSFileRecord fileRecord)
+	{
+		this.fileRecord = fileRecord;
+	}
 	public String getName() {
 		// TODO Auto-generated method stub
-		return null;
+		return fileRecord.getFileName();
 	}
 
 	/* (non-Javadoc)
@@ -45,7 +50,7 @@ public class NTFSEntry implements FSEntry {
 	 */
 	public boolean isFile() {
 		// TODO Auto-generated method stub
-		return false;
+		return !isDirectory();
 	}
 
 	/* (non-Javadoc)
@@ -53,7 +58,7 @@ public class NTFSEntry implements FSEntry {
 	 */
 	public boolean isDirectory() {
 		// TODO Auto-generated method stub
-		return false;
+		return fileRecord.isDirectory();
 	}
 
 	/* (non-Javadoc)
