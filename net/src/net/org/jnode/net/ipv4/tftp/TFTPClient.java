@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.DataInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -29,7 +30,8 @@ public class TFTPClient extends org.apache.commons.net.tftp.TFTPClient {
 	public final static String HELP_CMD = "help";
 	public final static String QUIT_CMD = "quit";
 	
-	private final BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+	//private final BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+    private final DataInputStream in = new DataInputStream(System.in);
 	private InetAddress serverAddress;
 	private int mode = BINARY_MODE;
 	private boolean quit;
