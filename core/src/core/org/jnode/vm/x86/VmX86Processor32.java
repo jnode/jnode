@@ -20,13 +20,25 @@
  */
 package org.jnode.vm.x86;
 
+import org.jnode.system.MemoryResource;
+import org.jnode.system.ResourceManager;
+import org.jnode.system.ResourceNotFreeException;
+import org.jnode.system.ResourceOwner;
 import org.jnode.vm.VmThread;
 import org.jnode.vm.classmgr.VmStatics;
+import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.ObjectReference;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public final class VmX86Processor32 extends VmX86Processor {
+
+    /** TSS used in this processor */
+    private TSS32 tss;
+
+    /** Space of boot code */
+    private MemoryResource bootCode;
 
     /**
      * @param id
@@ -68,4 +80,47 @@ public final class VmX86Processor32 extends VmX86Processor {
         return new VmX86Thread32(stack);
     }
 
+    /**
+     * Setup the given GDT for use by this processor.
+     * 
+     * @param gdt
+     */
+    protected void setupGDT(GDT gdt) {
+        gdt.setBase(GDT.PROCESSOR_ENTRY, ObjectReference.fromObject(this)
+                .toAddress());
+        // Clone TSS
+        this.tss = new TSS32();
+        gdt.setBase(GDT.TSS_ENTRY, tss.getAddress());
+
+        // Create kernel stack
+        tss.setKernelStack(new byte[VmThread.DEFAULT_STACK_SIZE]);
+    }
+
+    /**
+     * Setup the initial user stack
+     */
+    protected final void setupUserStack(byte[] userStack) {
+        tss.setUserStack(userStack);
+    }
+
+    /**
+     * Setup a memory region with bootcode for this processor.
+     * 
+     * @param rm
+     */
+    protected final Address setupBootCode(ResourceManager rm, GDT gdt)
+            throws ResourceNotFreeException {
+        // Setup the AP bootcode
+        final int size = UnsafeX86.getAPBootCodeSize();
+
+        // Claim the memory
+        this.bootCode = rm.claimMemoryResource(ResourceOwner.SYSTEM, null,
+                size, ResourceManager.MEMMODE_ALLOC_DMA);
+
+        // Initialize the memory
+        UnsafeX86.setupBootCode(bootCode.getAddress(), gdt.getGdt(), tss
+                .getTSS());
+
+        return bootCode.getAddress();
+    }
 }

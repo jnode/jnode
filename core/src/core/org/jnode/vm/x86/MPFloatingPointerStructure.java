@@ -65,7 +65,7 @@ public class MPFloatingPointerStructure {
     
     /**
      * Gets the length of this structure in bytes.
-     * @return
+     * @return the length
      */
     final int getLength() {
         return (16 * (mem.getByte(0x08) & 0xFF));
@@ -88,7 +88,7 @@ public class MPFloatingPointerStructure {
     
     /**
      * Gets the physical address of the MP configuration table.
-     * @return
+     * @return the address
      */
     final Address getMPConfigTablePtr() {
         return Address.fromIntZeroExtend(mem.getInt(0x04));
@@ -163,7 +163,7 @@ public class MPFloatingPointerStructure {
      * @param owner
      * @param startPtr
      * @param endPtr
-     * @return
+     * @return The structure found, or null if not found
      */
     private static MPFloatingPointerStructure find(ResourceManager rm, ResourceOwner owner, int startPtr, int endPtr) {
         final MemoryScanner ms = rm.getMemoryScanner();

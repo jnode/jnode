@@ -93,12 +93,12 @@ public class X86CpuID extends CpuID {
 			// Pentium 4
 			id = new int[12];
 			id[0] = 0x02;
-			id[7] = FEAT_FPU | FEAT_PSE | FEAT_CMOV;
+			id[7] = FEAT_FPU | FEAT_PSE | FEAT_CMOV | FEAT_SSE | FEAT_SSE2;
 		} else if (procId.equals("pentium3")) {
 			// Pentium 3
 			id = new int[16];
 			id[0] = 0x03;
-			id[7] = FEAT_FPU | FEAT_PSE | FEAT_CMOV;
+			id[7] = FEAT_FPU | FEAT_PSE | FEAT_CMOV | FEAT_SSE;
 		} else if (procId.equals("pentium2")) {
 			// Pentium 2
 			id = new int[12];
@@ -196,7 +196,7 @@ public class X86CpuID extends CpuID {
 	 * Gets the number of logical processors. 
 	 * This method will only return more then 1 of this processor
 	 * has the Hyper Threading feature.
-	 * @return
+	 * @return The number of logical processors.
 	 */
 	public final int getLogicalProcessors() {
 	    if (hasFeature(FEAT_HTT)) {

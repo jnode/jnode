@@ -57,7 +57,7 @@ import org.jnode.vm.x86.VmX86Architecture;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 import org.jnode.vm.x86.compiler.X86CompilerContext;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
-import org.jnode.vm.x86.compiler.X86IMTCompiler;
+import org.jnode.vm.x86.compiler.X86IMTCompiler32;
 import org.jnode.vm.x86.compiler.X86JumpTable;
 
 /**
@@ -2311,7 +2311,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         // Get objectref -> EAX
         os.writeMOV(INTSIZE, EAX, SP, argSlotCount * slotSize);
         // Write the actual invokeinterface
-        X86IMTCompiler.emitInvokeInterface(os, method);
+        X86IMTCompiler32.emitInvokeInterface(os, method);
         // Write the push result
         helper.pushReturnValue(method.getSignature());
     }

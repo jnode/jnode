@@ -43,7 +43,7 @@ public class MPProcessorEntry extends MPEntry {
 
     /**
      * Gets the flags.
-     * @return
+     * @return The flags
      */
     public int getFlags() {
         return mem.getByte(3) & 0xFF;        
@@ -51,7 +51,7 @@ public class MPProcessorEntry extends MPEntry {
     
     /**
      * Is this the bootstrap processor?
-     * @return
+     * @return True/false
      */
     public final boolean isBootstrap() {
         return ((getFlags() & F_BOOTSTRAP) != 0);
@@ -59,7 +59,7 @@ public class MPProcessorEntry extends MPEntry {
     
     /**
      * Is this the bootstrap enabled?
-     * @return
+     * @return True/false
      */
     public final boolean isEnabled() {
         return ((getFlags() & F_ENABLED) != 0);

@@ -161,7 +161,7 @@ public class MPConfigTable {
         final int cnt = getEntryCount();
         final ArrayList list = new ArrayList(cnt);
         int offset = 0x2C;
-        final int size = (int)mem.getSize().toInt();
+        final int size = mem.getSize().toInt();
         try {
             while (offset < size) {
                 final int type = mem.getByte(offset);

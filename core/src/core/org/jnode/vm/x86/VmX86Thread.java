@@ -21,7 +21,6 @@
  
 package org.jnode.vm.x86;
 
-import org.jnode.util.NumberUtils;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmThread;
@@ -53,9 +52,9 @@ public abstract class VmX86Thread extends VmThread {
 	public static final int FXF_USED = 0x01; // FX has been used since last thread switch
 	
 	// Saved state of FPU & XMM
-	private final byte[] fxState;
-	private volatile Address fxStatePtr;	// This value is set in assembler code
-	private volatile int fxFlags;
+	final byte[] fxState;
+	volatile Address fxStatePtr;	// This value is set in assembler code
+	volatile int fxFlags;
 	
 	// State upon last system exception
 	volatile Word exEax;

@@ -35,16 +35,22 @@ final class GDT {
 
     public static final int NULL_ENTRY = 0;
 
+    /** Entry for kernel code (cpl=0) */
     public static final int KERNEL_CODE_ENTRY = 1;
 
+    /** Entry for kernel data (cpl=0) */
     public static final int KERNEL_DATA_ENTRY = 2;
 
+    /** Entry for user code (cpl=3) */
     public static final int USER_CODE_ENTRY = 3;
 
+    /** Entry for user data (cpl=3) */
     public static final int USER_DATA_ENTRY = 4;
 
+    /** Entry for tss */
     public static final int TSS_ENTRY = 5;
 
+    /** Entry for current processor. Only valid in 32-bit mode */
     public static final int PROCESSOR_ENTRY = 6;
 
     private final int[] gdt;
