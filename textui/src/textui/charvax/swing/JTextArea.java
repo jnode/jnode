@@ -431,6 +431,7 @@ public class JTextArea
         toolkit.blankBox( origin, getSize(), colorpair );
         toolkit.setCursor( origin );
 
+        StringBuffer charBuffer = new StringBuffer();
         /* Scan through the entire document, drawing each character in it.
          */
         ScrollEvent scrollevent = null;
@@ -464,14 +465,23 @@ public class JTextArea
                         if( row >= _rows ) {
                             _rows++;
                         }
+                        if(charBuffer.length() > 0){
+                            toolkit.addString( charBuffer.toString(), 0, colorpair );
+                            charBuffer.setLength(0);
+                        }
                         toolkit.setCursor( origin.addOffset( col, row ) );
                     }
                     else {
-                        toolkit.addChar( chr, 0, colorpair );
+                        charBuffer.append(chr);
+                        //toolkit.addChar( chr, 0, colorpair );
                         col++;
                     }
                 }
                 else {	// We have reached the right-hand column.
+                    if(charBuffer.length() > 0){
+                        toolkit.addString( charBuffer.toString(), 0, colorpair );
+                        charBuffer.setLength(0);
+                    }
                     if( _lineWrap == false ) {
                         if( chr == '\n' ) {
                             col = 0;
@@ -534,6 +544,10 @@ public class JTextArea
                 }		// end if we have reached the right-hand column
             }		// end FOR loop.
 
+        if(charBuffer.length() > 0){
+            toolkit.addString( charBuffer.toString(), 0, colorpair );
+            charBuffer.setLength(0);
+        }
         /* Check for the case where the caret position is after the last
          * character of the document.
          */
