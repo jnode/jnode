@@ -42,6 +42,9 @@ public interface X86Constants {
 	/** Lock prefix */
 	public static final int LOCK_PREFIX = 0xF0;
 
+    /** rep prefix */
+	public static final int REP_PREFIX = 0xF3;
+
     /** CRX prefix */
     public static final int CRX_PREFIX = 0x0F;
 

@@ -1312,6 +1312,18 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write1bOpcodeModRM(0xff, operandSize, dstReg, dstDisp, 1);
 	}
 
+    /**
+     * Create an div edx:eax, srcReg.
+     *
+     * If srcReg is 64-bit, the div rdx:rax, srcReg is created.
+     *
+     * @param srcReg
+     */
+    public final void writeDIV_EAX(GPR srcReg) {
+        write1bOpcodeModRR(0xF7, srcReg.getSize(), srcReg, 6);
+    }
+
+
 	/**
 	 * Create a fadd dword [srcReg+srcDisp]
 	 * 
@@ -1474,6 +1486,18 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 				srcIndexReg);
 	}
 
+    /**
+	 * Create a fldcw word [srcReg+srcDisp]
+	 *
+	 * @param srcReg
+	 * @param srcDisp
+	 */
+	public final void writeFLDCW(GPR srcReg, int srcDisp) {
+        write8(0x67);
+        write8(0xd9);
+        writeModRM(srcReg.getNr() & 7, srcDisp, 5);
+	}
+
 	/**
 	 * Create a fmul dword [srcReg+srcDisp]
 	 * 
@@ -1502,6 +1526,26 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write8(0xc8 + fpuReg.getNr());
 	}
 
+    /**
+     * Create a fninit
+     */
+    public final void writeFNINIT() {
+        write8(0xdb);
+        write8(0xe3);
+    }
+
+    /**
+	 * Create a fnsave [srcReg+srcDisp]
+	 *
+	 * @param srcReg
+	 * @param srcDisp
+	 */
+	public final void writeFNSAVE(GPR srcReg, int srcDisp) {
+        write8(0x67);
+        write8(0xdd);
+        writeModRM(srcReg.getNr() & 7, srcDisp, 6);
+	}
+
 	/**
 	 * Create a fnstsw, Store fp status word in AX
 	 */
@@ -1517,6 +1561,31 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write8(0xd9);
 		write8(0xf8);
 	}
+
+    /**
+     * Create a frstor [srcReg+srcDisp]
+     *
+     * @param srcReg
+     * @param srcDisp
+     */
+    public final void writeFRSTOR(GPR srcReg, int srcDisp) {
+        write8(0x67);
+        write8(0xdd);
+        writeModRM(srcReg.getNr() & 7, srcDisp, 4);
+    }
+
+    /**
+     * Create a fstcw word [srcReg+srcDisp]
+     *
+     * @param srcReg
+     * @param srcDisp
+     */
+    public final void writeFSTCW(GPR srcReg, int srcDisp) {
+        write8(0x67);
+        write8(0x9b);
+        write8(0xd9);
+        writeModRM(srcReg.getNr() & 7, srcDisp, 7);
+    }
 
 	/**
 	 * @see org.jnode.assembler.x86.X86Assembler#writeFSTP(X86Register)
@@ -1589,6 +1658,32 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write8(0xd9);
 		write8(0xc8 + fpuReg.getNr());
 	}
+
+    /**
+     * Create a fxrstor [srcReg+srcDisp]
+     *
+     * @param srcReg
+     * @param srcDisp
+     */
+    public final void writeFXRSTOR(GPR srcReg, int srcDisp) {
+        write8(0x67);
+        write8(0x0f);
+        write8(0xae);
+        writeModRM(srcReg.getNr() & 7, srcDisp, 1);
+    }
+
+    /**
+     * Create a fxsave [srcReg+srcDisp]
+     *
+     * @param srcReg
+     * @param srcDisp
+     */
+    public final void writeFXSAVE(GPR srcReg, int srcDisp) {
+        write8(0x67);
+        write8(0x0f);
+        write8(0xae);
+        writeModRM(srcReg.getNr() & 7, srcDisp, 0);
+    }
 
     /**
      *
@@ -1812,12 +1907,26 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	/**
 	 * Create a absolute jump to [reg+disp]
 	 * 
-	 * @param reg32
+	 * @param reg
+     * @param disp
 	 */
 	public final void writeJMP(GPR reg, int disp) {
         testSize(reg, mode.getSize());
         write2bOpcodeReg(0xFF, 0xA0, reg);
 		write32(disp);
+	}
+
+    /**
+	 * Create a ldmxcsr dword [srcReg+disp]
+	 *
+	 * @param srcReg
+	 * @param disp
+	 */
+	public final void writeLDMXCSR(GPR srcReg, int disp) {
+        write8(0x67);
+        write8(0x0f);
+        write8(0xae);
+        writeModRM(srcReg.getNr() & 7, disp, 2);
 	}
 
 	/**
@@ -1851,12 +1960,32 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 				.getNr(), scale, srcIdxReg);
 	}
 
+    /**
+	 * Create a lmsw srcReg
+	 *
+	 * @param srcReg
+	 */
+	public final void writeLMSW(GPR srcReg) {
+        testSize(srcReg, X86Constants.BITS16);
+        write8(0x0f);
+        write8(0x01);
+        writeModRR(srcReg.getNr() & 7, 6);
+	}
+
 	/**
 	 * Create a LODSD
 	 */
 	public final void writeLODSD() {
+        write8(OSIZE_PREFIX);
 		write8(0xAD);
 	}
+
+    /**
+     * Create a LODSW
+     */
+    public final void writeLODSW() {
+        write8(0xAD);
+    }
 
 	/**
 	 * Create a LOOP label instruction. The given label must have be resolved
@@ -1884,10 +2013,22 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 	}
 
+    /**
+	 * Create a ltr word reg
+	 *
+	 * @param srcReg
+	 */
+	public final void writeLTR(GPR srcReg) {
+        testSize(srcReg, X86Constants.BITS16);
+        write8(0x0f);
+        write8(0x00);
+        writeModRR(srcReg.getNr() & 7, 3);
+	}
+
 	/**
 	 * Write a REX prefix byte if needed for ModRM and ModRR encoded opcodes.
 	 * 
-	 * @param rm
+	 * @param operandSize
 	 * @param reg
 	 */
 	private final void write1bOpcodeREXPrefix(int operandSize, int reg) {
@@ -1950,9 +2091,11 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Write a REX prefix byte if needed.
-	 * 
-	 * @param rm
+	 *
+     * @param operandSize
+     * @param base
 	 * @param reg
+     * @param index
 	 */
 	private final void writeModRMSibREXPrefix(int operandSize, GPR base,
 			int reg, GPR index) {
@@ -2032,7 +2175,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * Write a 2-byte instruction followed by a mod-r/m byte+offset for the
 	 * following addressing scheme's [rm] disp8[rm] disp32[rm]
 	 * 
-	 * @param opcode
+	 * @param opcode1
+     * @param opcode2
+     * @param operandSize
 	 * @param rm
 	 * @param disp
 	 * @param reg
@@ -2049,7 +2194,10 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * Write a 2-byte instruction followed by a mod-r/m byte+offset for the
 	 * following addressing scheme's [rm] disp8[rm] disp32[rm]
 	 * 
-	 * @param opcode
+	 * @param opcode1
+     * @param opcode2
+     * @param opcode3
+     * @param operandSize
 	 * @param rm
 	 * @param disp
 	 * @param reg
@@ -2173,7 +2321,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * Write a 2-byte instruction followed by a mod-r/m byte for the following
 	 * addressing scheme rm
 	 * 
-	 * @param opcode
+	 * @param opcode1
+     * @param opcode2
+     * @param operandSize
 	 * @param rm
 	 * @param reg
 	 */
@@ -2189,7 +2339,10 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * Write a 3-byte instruction followed by a mod-r/m byte for the following
 	 * addressing scheme rm
 	 * 
-	 * @param opcode
+	 * @param opcode1
+     * @param opcode2
+     * @param opcode3
+     * @param operandSize
 	 * @param rm
 	 * @param reg
 	 */
@@ -2478,6 +2631,21 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write32(imm32);
 	}
 
+    /**
+	 * Create a movsb
+	 */
+	public void writeMOVSB() {
+        write8(0xA4);
+	}
+
+    /**
+	 * Create a movsd
+	 */
+	public void writeMOVSD() {
+        write8(OSIZE_PREFIX);
+        write8(0xA5);
+	}
+
 	/**
 	 * Create a movsd [dst+dstDisp],src
 	 * 
@@ -2584,6 +2752,13 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			throw new InvalidOpcodeException();
 		}
 		write1bOpcodeModRR(0x63, dstReg.getSize(), srcReg, dstReg.getNr());
+	}
+
+    /**
+	 * Create a movsw
+	 */
+	public void writeMOVSW() {
+        write8(0xA5);
 	}
 
 	/**
@@ -3300,6 +3475,41 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
      */
     public void writeSTI() {
         write8(0xFB);
+    }
+
+    /**
+	 * Create a stmxcsr dword [srcReg+disp]
+	 *
+	 * @param srcReg
+	 * @param disp
+	 */
+	public final void writeSTMXCSR(GPR srcReg, int disp) {
+        write8(0x67);
+        write8(0x0f);
+        write8(0xae);
+        writeModRM(srcReg.getNr() & 7, disp, 3);
+	}
+
+    /**
+     *
+     */
+    public void writeSTOSB() {
+        write8(0xAA);
+    }
+
+    /**
+     *
+     */
+    public void writeSTOSD() {
+        write8(OSIZE_PREFIX);
+        write8(0xAB);
+    }
+
+    /**
+     *
+     */
+    public void writeSTOSW() {
+        write8(0xAB);
     }
 
 	/**

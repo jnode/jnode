@@ -854,6 +854,14 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeDEC(int operandSize, GPR dstReg, int dstDisp);
 
+    /**
+     * Create a div eax, srcReg
+     *
+     * @param srcReg
+     */
+    public abstract void writeDIV_EAX(GPR srcReg);
+
+
 	/**
 	 * Create a fadd dword [srcReg+srcDisp]
 	 * 
@@ -982,6 +990,14 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeFLD64(GPR srcReg, int srcDisp);
 
+    /**
+	 * Create a fldcw word [srcReg+srcDisp]
+	 *
+	 * @param srcReg
+	 * @param srcDisp
+	 */
+	public abstract void writeFLDCW(GPR srcReg, int srcDisp);
+
 	/**
 	 * Create a fmul dword [srcReg+srcDisp]
 	 * 
@@ -1005,6 +1021,19 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeFMULP(X86Register fpuReg);
 
+    /**
+     * Create a fninit
+     */
+    public abstract void writeFNINIT();
+
+    /**
+	 * Create a fnsave [srcReg+srcDisp]
+	 *
+	 * @param srcReg
+	 * @param srcDisp
+	 */
+	public abstract void writeFNSAVE(GPR srcReg, int srcDisp);
+
 	/**
 	 * Create a fnstsw, Store fp status word in AX
 	 */
@@ -1014,6 +1043,22 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * Create a fprem
 	 */
 	public abstract void writeFPREM();
+
+    /**
+	 * Create a frstor [srcReg+srcDisp]
+	 *
+	 * @param srcReg
+	 * @param srcDisp
+	 */
+	public abstract void writeFRSTOR(GPR srcReg, int srcDisp);
+
+    /**
+	 * Create a fstcw word [srcReg+srcDisp]
+	 *
+	 * @param srcReg
+	 * @param srcDisp
+	 */
+	public abstract void writeFSTCW(GPR srcReg, int srcDisp);
 
 	/**
 	 * Create a fstp fpuReg
@@ -1070,6 +1115,22 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * Create a fxch fpuReg Swap ST0 and fpuReg
 	 */
 	public abstract void writeFXCH(X86Register fpuReg);
+
+    /**
+	 * Create a fxrstor [srcReg+srcDisp]
+	 *
+	 * @param srcReg
+	 * @param srcDisp
+	 */
+	public abstract void writeFXRSTOR(GPR srcReg, int srcDisp);
+
+    /**
+	 * Create a fxsave [srcReg+srcDisp]
+	 *
+	 * @param srcReg
+	 * @param srcDisp
+	 */
+	public abstract void writeFXSAVE(GPR srcReg, int srcDisp);
 
     /**
 	 * Create a hlt
@@ -1224,6 +1285,14 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeJMP(Object tablePtr, int offset,
 			boolean rawAddress);
 
+    /**
+	 * Create a ldmxcsr [srcReg+disp]
+	 *
+	 * @param srcReg
+	 * @param disp
+	 */
+	public abstract void writeLDMXCSR(GPR srcReg, int disp);
+
 	/**
 	 * Create a lea dstReg,[srcReg+srcIdxReg*scale+disp]
 	 * 
@@ -1245,10 +1314,22 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeLEA(GPR dstReg, GPR srcReg, int disp);
 
+    /**
+	 * Create a lmsw reg
+	 *
+	 * @param srcReg
+	 */
+	public abstract void writeLMSW(GPR srcReg);
+
 	/**
 	 * Create a LODSD
 	 */
 	public abstract void writeLODSD();
+
+    /**
+	 * Create a LODSW
+	 */
+	public abstract void writeLODSW();
 
 	/**
 	 * Create a LOOP label instruction. The given label must have be resolved
@@ -1259,6 +1340,13 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeLOOP(Label label)
 			throws UnresolvedObjectRefException;
+
+    /**
+	 * Create a ltr reg
+	 *
+	 * @param srcReg
+	 */
+	public abstract void writeLTR(GPR srcReg);
 
     /**
 	 * Create a mov <dstReg>, <srcReg>
@@ -1381,8 +1469,17 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeMOV_Const(int operandSize, GPR dstReg, GPR dstIdxReg, int scale,
 			int dstDisp, int imm32);
 
+    /**
+     * Create a movsb
+     */
+    public abstract void writeMOVSB();
+
+    /**
+     * Create a movsd
+     */
+    public abstract void writeMOVSD();
+
 	/**
->>>>>>> 1.10
 	 * Create a movsd [dst+dstDisp],src
 	 * 
 	 * @param dst
@@ -1456,6 +1553,11 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeMOVSXD(GPR64 dstReg, GPR32 srcReg)
 	throws InvalidOpcodeException;
+
+    /**
+     * Create a movsw
+     */
+    public abstract void writeMOVSW();
 
 	/**
 	 * Create a movzx <dstReg>, <srcReg>
@@ -1996,6 +2098,29 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * Create a STI
 	 */
 	public abstract void writeSTI();
+
+    /**
+	 * Create a stmxcsr [srcReg+disp]
+	 *
+	 * @param srcReg
+	 * @param disp
+	 */
+	public abstract void writeSTMXCSR(GPR srcReg, int disp);
+
+    /**
+	 * Create a STOSB
+	 */
+	public abstract void writeSTOSB();
+
+    /**
+	 * Create a STOSD
+	 */
+	public abstract void writeSTOSD();
+
+    /**
+	 * Create a STOSW
+	 */
+	public abstract void writeSTOSW();
 
 	/**
 	 * Create a SUB dstReg, srcReg

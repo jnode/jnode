@@ -155,7 +155,7 @@ public abstract class Assembler {
             if (THROW) {
                 throw x;
             } else {
-                //x.printStackTrace();
+                x.printStackTrace();
                 System.err.println("Invaid int: " + x.getMessage());
                 return 0;
             }

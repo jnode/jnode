@@ -120,7 +120,15 @@ public class X86Core extends AssemblerModule {
     public static final int CMP_ISN = CLTS_ISN + 1;
     public static final int CPUID_ISN = CMP_ISN + 1;
     public static final int DEC_ISN = CPUID_ISN + 1;
-    public static final int HLT_ISN = DEC_ISN + 1;
+    public static final int DIV_ISN = DEC_ISN + 1;
+    public static final int FLDCW_ISN = DIV_ISN + 1;
+    public static final int FNINIT_ISN = FLDCW_ISN + 1;
+    public static final int FNSAVE_ISN = FNINIT_ISN + 1;
+    public static final int FRSTOR_ISN = FNSAVE_ISN + 1;
+    public static final int FSTCW_ISN = FRSTOR_ISN + 1;
+    public static final int FXRSTOR_ISN = FSTCW_ISN + 1;
+    public static final int FXSAVE_ISN = FXRSTOR_ISN + 1;
+    public static final int HLT_ISN = FXSAVE_ISN + 1;
     public static final int IN_ISN = HLT_ISN + 1;
     public static final int INC_ISN = IN_ISN + 1;
     public static final int INT_ISN = INC_ISN + 1;
@@ -135,10 +143,18 @@ public class X86Core extends AssemblerModule {
     public static final int JNE_ISN = JMP_ISN + 1;
     public static final int JNZ_ISN = JNE_ISN + 1;
     public static final int JZ_ISN = JNZ_ISN + 1;
-    public static final int LEA_ISN = JZ_ISN + 1;
-    public static final int LOOP_ISN = LEA_ISN + 1;
-    public static final int MOV_ISN = LOOP_ISN + 1;
-    public static final int NEG_ISN = MOV_ISN + 1;
+    public static final int LDMXCSR_ISN = JZ_ISN + 1;
+    public static final int LEA_ISN = LDMXCSR_ISN + 1;
+    public static final int LMSW_ISN = LEA_ISN + 1;
+    public static final int LODSW_ISN = LMSW_ISN + 1;
+    public static final int LOOP_ISN = LODSW_ISN + 1;
+    public static final int LTR_ISN = LOOP_ISN + 1;
+    public static final int MOV_ISN = LTR_ISN + 1;
+    public static final int MOVSB_ISN = MOV_ISN + 1;
+    public static final int MOVSW_ISN = MOVSB_ISN + 1;
+    public static final int MOVSD_ISN = MOVSW_ISN + 1;
+    public static final int MOVZX_ISN = MOVSD_ISN + 1;
+    public static final int NEG_ISN = MOVZX_ISN + 1;
     public static final int NOP_ISN = NEG_ISN + 1;
     public static final int OR_ISN = NOP_ISN + 1;
     public static final int OUT_ISN = OR_ISN + 1;
@@ -153,7 +169,11 @@ public class X86Core extends AssemblerModule {
     public static final int SHR_ISN = SHL_ISN + 1;
     public static final int STD_ISN = SHR_ISN + 1;
     public static final int STI_ISN = STD_ISN + 1;
-    public static final int SUB_ISN = STI_ISN + 1;
+    public static final int STMXCSR_ISN = STI_ISN + 1;
+    public static final int STOSB_ISN = STMXCSR_ISN + 1;
+    public static final int STOSD_ISN = STOSB_ISN + 1;
+    public static final int STOSW_ISN = STOSD_ISN + 1;
+    public static final int SUB_ISN = STOSW_ISN + 1;
     public static final int TEST_ISN = SUB_ISN + 1;
     public static final int XCHG_ISN = TEST_ISN + 1;
     public static final int XOR_ISN = XCHG_ISN + 1;
@@ -220,6 +240,30 @@ public class X86Core extends AssemblerModule {
             case DEC_ISN:
                 emmitDEC();
                 break;
+            case DIV_ISN:
+                emmitDIV();
+                break;
+            case FLDCW_ISN:
+                emmitFLDCW();
+                break;
+            case FNINIT_ISN:
+                emmitFNINIT();
+                break;
+            case FNSAVE_ISN:
+                emmitFNSAVE();
+                break;
+            case FRSTOR_ISN:
+                emmitFRSTOR();
+                break;
+            case FSTCW_ISN:
+                emmitFSTCW();
+                break;
+            case FXRSTOR_ISN:
+                emmitFXRSTOR();
+                break;
+            case FXSAVE_ISN:
+                emmitFXSAVE();
+                break;
             case HLT_ISN:
                 emmitHLT();
                 break;
@@ -263,14 +307,38 @@ public class X86Core extends AssemblerModule {
             case JZ_ISN:
                 emmitJCC(X86Assembler.JZ);
                 break;
+            case LDMXCSR_ISN:
+                emmitLDMXCSR();
+                break;
             case LEA_ISN:
                 emmitLEA();
+                break;
+            case LMSW_ISN:
+                emmitLMSW();
+                break;
+            case LODSW_ISN:
+                emmitLODSW();
                 break;
             case LOOP_ISN:
                 emmitLOOP();
                 break;
+            case LTR_ISN:
+                emmitLTR();
+                break;
             case MOV_ISN:
                 emmitMOV();
+                break;
+            case MOVSB_ISN:
+                emmitMOVSB();
+                break;
+            case MOVSW_ISN:
+                emmitMOVSW();
+                break;
+            case MOVSD_ISN:
+                emmitMOVSD();
+                break;
+            case MOVZX_ISN:
+                emmitMOVZX();
                 break;
             case NEG_ISN:
                 emmitNEG();
@@ -316,6 +384,18 @@ public class X86Core extends AssemblerModule {
                 break;
             case STI_ISN:
                 emmitSTI();
+                break;
+            case STMXCSR_ISN:
+                emmitSTMXCSR();
+                break;
+            case STOSB_ISN:
+                emmitSTOSB();
+                break;
+            case STOSD_ISN:
+                emmitSTOSD();
+                break;
+            case STOSW_ISN:
+                emmitSTOSW();
                 break;
             case SUB_ISN:
                 emmitSUB();
@@ -495,6 +575,93 @@ public class X86Core extends AssemblerModule {
         }
     }
 
+    private final void emmitDIV() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case R_ADDR:
+                stream.writeDIV_EAX(getReg(0));
+                break;
+            default:
+                reportAddressingError(DIV_ISN, addr);
+        }
+    }
+
+    private final void emmitFLDCW() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case E_ADDR:
+                Indirect ind = getInd(0);
+                stream.writeFLDCW(getRegister(ind.reg), ind.disp);
+                break;
+            default:
+                reportAddressingError(FLDCW_ISN, addr);
+        }
+    }
+
+    private final void emmitFNINIT() {
+        stream.writeFNINIT();
+    }
+
+    private final void emmitFNSAVE() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case E_ADDR:
+                Indirect ind = getInd(0);
+                stream.writeFNSAVE(getRegister(ind.reg), ind.disp);
+                break;
+            default:
+                reportAddressingError(FNSAVE_ISN, addr);
+        }
+    }
+
+    private final void emmitFRSTOR() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case E_ADDR:
+                Indirect ind = getInd(0);
+                stream.writeFRSTOR(getRegister(ind.reg), ind.disp);
+                break;
+            default:
+                reportAddressingError(FRSTOR_ISN, addr);
+        }
+    }
+
+    private final void emmitFSTCW() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case E_ADDR:
+                Indirect ind = getInd(0);
+                stream.writeFSTCW(getRegister(ind.reg), ind.disp);
+                break;
+            default:
+                reportAddressingError(FSTCW_ISN, addr);
+        }
+    }
+
+    private final void emmitFXRSTOR() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case E_ADDR:
+                Indirect ind = getInd(0);
+                stream.writeFXRSTOR(getRegister(ind.reg), ind.disp);
+                break;
+            default:
+                reportAddressingError(FXRSTOR_ISN, addr);
+        }
+    }
+
+    private final void emmitFXSAVE() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case E_ADDR:
+                Indirect ind = getInd(0);
+                stream.writeFXSAVE(getRegister(ind.reg), ind.disp);
+                break;
+            default:
+                reportAddressingError(FXSAVE_ISN, addr);
+        }
+    }
+
     private final void emmitHLT() {
         stream.writeHLT();
     }
@@ -597,6 +764,18 @@ public class X86Core extends AssemblerModule {
         }
     }
 
+    private final void emmitLDMXCSR() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case E_ADDR:
+                Indirect ind = getInd(0);
+                stream.writeLDMXCSR(getRegister(ind.reg), ind.disp);
+                break;
+            default:
+                reportAddressingError(LDMXCSR_ISN, addr);
+        }
+    }
+
     private final void emmitLEA() {
         int addr = getAddressingMode(2);
         switch (addr) {
@@ -607,6 +786,21 @@ public class X86Core extends AssemblerModule {
             default:
                 reportAddressingError(LEA_ISN, addr);
         }
+    }
+
+    private final void emmitLMSW() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case R_ADDR:
+                stream.writeLMSW(getReg(0));
+                break;
+            default:
+                reportAddressingError(LMSW_ISN, addr);
+        }
+    }
+
+    private final void emmitLODSW() {
+        stream.writeLODSW();
     }
 
     private final void emmitLOOP() {
@@ -626,6 +820,17 @@ public class X86Core extends AssemblerModule {
             }
         } else {
             throw new IllegalArgumentException("Unknown operand: " + o1);
+        }
+    }
+
+    private final void emmitLTR() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case R_ADDR:
+                stream.writeLTR(getReg(0));
+                break;
+            default:
+                reportAddressingError(LTR_ISN, addr);
         }
     }
 
@@ -662,6 +867,34 @@ public class X86Core extends AssemblerModule {
                 break;
             default:
                 reportAddressingError(MOV_ISN, addr);
+        }
+    }
+
+    private final void emmitMOVSB() {
+        stream.writeMOVSB();
+    }
+
+    private final void emmitMOVSW() {
+        stream.writeMOVSW();
+    }
+
+    private final void emmitMOVSD() {
+        stream.writeMOVSD();
+    }
+
+    private final void emmitMOVZX() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RR_ADDR:
+                GPR reg2 = getReg(1);
+                stream.writeMOVZX(getReg(0), reg2, reg2.getSize());
+                break;
+            case RE_ADDR:
+                Indirect ind = getInd(1);
+                stream.writeMOVZX(getReg(0), getRegister(ind.reg), ind.disp, operandSize);
+                break;
+            default:
+                reportAddressingError(MOVZX_ISN, addr);
         }
     }
 
@@ -845,6 +1078,30 @@ public class X86Core extends AssemblerModule {
 
     private final void emmitSTI() {
         stream.writeSTI();
+    }
+
+    private final void emmitSTMXCSR() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case E_ADDR:
+                Indirect ind = getInd(0);
+                stream.writeSTMXCSR(getRegister(ind.reg), ind.disp);
+                break;
+            default:
+                reportAddressingError(STMXCSR_ISN, addr);
+        }
+    }
+
+    private final void emmitSTOSB() {
+        stream.writeSTOSB();
+    }
+
+    private final void emmitSTOSD() {
+        stream.writeSTOSD();
+    }
+
+    private final void emmitSTOSW() {
+        stream.writeSTOSW();
     }
 
     private final void emmitSUB() {
