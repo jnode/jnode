@@ -27,18 +27,27 @@ import org.jnode.driver.video.HardwareCursorAPI;
  */
 public class MouseHandler implements PointerListener {
 
-	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final int[] BUTTON_MASK = { PointerEvent.BUTTON_LEFT,
+			PointerEvent.BUTTON_RIGHT, PointerEvent.BUTTON_MIDDLE };
 
-	private int x;
+	private static final int[] BUTTON_NUMBER = { 1, 2, 3 };
 
-	private int y;
+	private boolean[] buttonState = new boolean[3];
 
 	private final HardwareCursorAPI hwCursor;
+
+	/** My logger */
+	private final Logger log = Logger.getLogger(getClass());
 
 	private final PointerAPI pointerAPI;
 
 	private final Dimension screenSize;
+
+	private int x;
+
+	private int y;
+	
+	private Component lastSource;
 
 	/**
 	 * Create a new instance
@@ -113,13 +122,13 @@ public class MouseHandler implements PointerListener {
 			final int nr = BUTTON_NUMBER[i];
 			if ((buttons & mask) != 0) {
 				if (!buttonState[i]) {
-					postEvent(MouseEvent.MOUSE_PRESSED, nr);
+					lastSource = postEvent(null, MouseEvent.MOUSE_PRESSED, nr);
 					buttonState[i] = true;
 					eventFired = true;
 				}
 			} else if (buttonState[i]) {
-				postEvent(MouseEvent.MOUSE_RELEASED, nr);
-				postEvent(MouseEvent.MOUSE_CLICKED, nr);
+				lastSource = postEvent(null, MouseEvent.MOUSE_RELEASED, nr);
+				postEvent(lastSource, MouseEvent.MOUSE_CLICKED, nr);
 				buttonState[i] = false;
 				eventFired = true;
 			}
@@ -127,32 +136,34 @@ public class MouseHandler implements PointerListener {
 		/* Must have been a drag or move. */
 		if (!eventFired) {
 			if (buttonState[0]) {
-				postEvent(MouseEvent.MOUSE_DRAGGED, MouseEvent.BUTTON1);
+				postEvent(lastSource, MouseEvent.MOUSE_DRAGGED, MouseEvent.BUTTON1);
 			} else if (buttonState[1]) {
-				postEvent(MouseEvent.MOUSE_DRAGGED, MouseEvent.BUTTON2);
+				postEvent(lastSource, MouseEvent.MOUSE_DRAGGED, MouseEvent.BUTTON2);
 			} else if (buttonState[2]) {
-				postEvent(MouseEvent.MOUSE_DRAGGED, MouseEvent.BUTTON3);
+				postEvent(lastSource, MouseEvent.MOUSE_DRAGGED, MouseEvent.BUTTON3);
 			} else {
-				postEvent(MouseEvent.MOUSE_MOVED, MouseEvent.NOBUTTON);
+				postEvent(lastSource, MouseEvent.MOUSE_MOVED, MouseEvent.NOBUTTON);
 			}
 		}
 	}
 
-	private void postEvent(int id, int button) {
-		final JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
-		Component source = tk.getTopComponentAt(x, y);
+	/**
+	 * Post a mouse event with the given id and button.
+	 * @param id
+	 * @param button
+	 * @return The source component used to send the event to.
+	 */
+	private Component postEvent(Component source, int id, int button) {
+		if (source == null) {
+			final JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
+			source = tk.getTopComponentAt(x, y);
+		}
 		//log.debug("Source: " + source.getClass().getName());
 		//TODO full support for modifiers
         Point p = source.getLocationOnScreen();
 		final MouseEvent me = new MouseEvent(source, id, System.currentTimeMillis(),
 				EventModifier.OLD_MASK | button, x - p.x, y - p.y, 1, button == MouseEvent.BUTTON2, button);
 		JNodeGenericPeer.eventQueue.postEvent(me);
+		return source;
 	}
-
-	private static final int[] BUTTON_MASK = { PointerEvent.BUTTON_LEFT,
-			PointerEvent.BUTTON_RIGHT, PointerEvent.BUTTON_MIDDLE };
-
-	private static final int[] BUTTON_NUMBER = { 1, 2, 3 };
-
-	private boolean[] buttonState = new boolean[3];
 }
