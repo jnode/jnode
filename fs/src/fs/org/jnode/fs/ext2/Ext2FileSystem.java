@@ -67,17 +67,19 @@ public class Ext2FileSystem extends AbstractFileSystem {
 			groupDescriptors = new GroupDescriptor[groupCount];
 			
 			//OLD VERSION
+			/*
+			data=getBlock(superblock.getFirstDataBlock()+1);    
 			for(int i=0; i<groupCount; i++) {
-			   data=getBlock(superblock.getFirstDataBlock()+1);    
 			   groupDescriptors[i] = new GroupDescriptor(data, this, i);
 			} 
+			*/
 			//OLD VERSION
 			       
-			/*
+			
 			for(int i=0; i<groupCount; i++) {
 				groupDescriptors[i]=new GroupDescriptor(i, this);
 			}
-			*/	
+				
 		} catch (FileSystemException e) {
 			throw e;
 		} catch (Exception e) {
@@ -154,7 +156,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	/**
 	 * Return the block size of the file system
 	 */
-	public long getBlockSize() {
+	public int getBlockSize() {
 		return superblock.getBlockSize();	
 	}
 
@@ -183,8 +185,8 @@ public class Ext2FileSystem extends AbstractFileSystem {
 				result=(Block)blockCache.get(key);
 			else{
 				byte[] data = new byte[blockSize];
-				//api.read( nr*blockSize, data, 0, blockSize );
-				timedRead(nr, data);
+				getApi().read( nr*blockSize, data, 0, blockSize );
+				//timedRead(nr, data);
 				result=new Block(this, nr, data);
 				blockCache.put(key, result);
 			}
@@ -209,6 +211,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 		Block block;
 		
 		Integer key=new Integer((int)nr);
+		int blockSize=superblock.getBlockSize();
 		//check if the block is in the cache
 		synchronized(blockCache) {
 			if(blockCache.containsKey(key)) {
@@ -217,8 +220,8 @@ public class Ext2FileSystem extends AbstractFileSystem {
 				block.setData(data);
 				if(forceWrite || SYNC_WRITE) {
 					//write the block to disk
-					//api.write(nr*blockSize, data, 0, blockSize);
-					timedWrite(nr, data);
+					getApi().write(nr*blockSize, data, 0, blockSize);
+					//timedWrite(nr, data);
 					block.setDirty(false);
 
 					log.debug("writing block "+nr+" to disk");
@@ -228,8 +231,8 @@ public class Ext2FileSystem extends AbstractFileSystem {
 				//If the block was not in the cache, I see no reason to put it
 				//in the cache when it is written.
 				//It is simply written to disk.
-				//api.write(nr*blockSize, data, 0, blockSize);
-				timedWrite(nr, data);
+				getApi().write(nr*blockSize, data, 0, blockSize);
+				//timedWrite(nr, data);
 			}
 		}
 	}
@@ -248,7 +251,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 			}
 	}
 	
-	private static final long TIMEOUT = 100;
+	//private static final long TIMEOUT = 100;
 	/**
 	 * timedWrite writes to disk and waits for timeout, if the operation does not finish
 	 * in time, restart it.
@@ -256,6 +259,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	 * @param nr		the number of the block to write
 	 * @param data		the data in the block
 	 */
+	/*
 	private void timedWrite(long nr, byte[] data) throws IOException{
 		boolean finished = false;
 		Timer writeTimer;
@@ -299,7 +303,9 @@ public class Ext2FileSystem extends AbstractFileSystem {
 			}
 		}
 	}
-		
+	*/
+	
+	
 	public Superblock getSuperblock() {
 		return superblock;
 	}	
@@ -508,9 +514,8 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	 * Modify the number of used directories in a block group
 	 * @param group
 	 * @param diff
-	 * @throws IOException
 	 */
-	protected void modifyUsedDirsCount(int group, int diff) throws IOException  {
+	protected void modifyUsedDirsCount(int group, int diff) {
 		GroupDescriptor gdesc = groupDescriptors[group];
 		synchronized(gdesc) {
 			gdesc.setUsedDirsCount( gdesc.getUsedDirsCount()+diff );
