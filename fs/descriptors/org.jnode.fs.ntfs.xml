@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.fs.ntfs" 
+        name="JNode NTFS FileSystem"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.fs"/>
+    <import plugin="org.jnode.fs.partitions.ibm"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.fs.ntfs.*"/>
+      <export name="org.jnode.fs.ntfs.attributes.*"/>
+    </library>
+  </runtime>
+        
+  <extension point="org.jnode.fs.types">
+    <type class="org.jnode.fs.ntfs.NTFSFileSystemType"/>
+  </extension>
+        
+</plugin>
