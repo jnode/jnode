@@ -41,11 +41,10 @@ public class MouseHandler implements PointerListener {
 
 	private final Dimension screenSize;
 
-	private int x;
-
-	private int y;
-	
 	private Component lastSource;
+	
+	private int x;
+	private int y;
 
 	/**
 	 * Create a new instance
@@ -83,7 +82,7 @@ public class MouseHandler implements PointerListener {
 			log.debug("Using PointerDevice " + pointerDevice.getId());
 			hwCursor.setCursorImage(JNodeCursors.ARROW);
 			hwCursor.setCursorVisible(true);
-			hwCursor.setCursorPosition(x, y);
+			hwCursor.setCursorPosition(0, 0);
 			pointerAPI.addPointerListener(this);
 		}
 	}
@@ -162,10 +161,32 @@ public class MouseHandler implements PointerListener {
 			final Point p = source.getLocationOnScreen();
 			final boolean popupTrigger = (button == MouseEvent.BUTTON2);
 			
+			final int ex = x - p.x;
+			final int ey = y - p.y;
+			final int modifiers = buttonToModifiers(button);
+			
 			final MouseEvent me = new MouseEvent(source, id, System.currentTimeMillis(),
-					0, x - p.x, y - p.y, 1, popupTrigger, button);
+					modifiers, ex, ey, 1, popupTrigger, button);
 			JNodeGenericPeer.eventQueue.postEvent(me);
+			if (id == MouseEvent.MOUSE_CLICKED) {
+				log.info("MouseClicked to " + source + " at " + ex + "," + ey);
+			}
+		} else {
+			log.info("NO MouseEvent, " + source + " not visible");
 		}
 		return source;
+	}
+	
+	private final int buttonToModifiers(int button) {
+		switch (button) {
+		case MouseEvent.BUTTON1:
+			return MouseEvent.BUTTON1_MASK;
+		case MouseEvent.BUTTON2:
+			return MouseEvent.BUTTON2_MASK;
+		case MouseEvent.BUTTON3:
+			return MouseEvent.BUTTON3_MASK;
+		default:
+			return 0;
+		}
 	}
 }
