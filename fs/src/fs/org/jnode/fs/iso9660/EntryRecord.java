@@ -108,22 +108,16 @@ public class EntryRecord {
 
     private final String getFileIdentifier(byte[] buff, int offset, boolean isDir, String encoding) {
         final int fidLength = LittleEndian.getUInt8(buff, offset+32);
-        //BootLog.info("offset=" + offset + ", fidLength=" + fidLength + ", buff.length=" + buff.length);
-        final int idLength;
         if (isDir) {
             final int buff33 = LittleEndian.getUInt8(buff, offset+33);
             if ((fidLength == 1) && (buff33 == 0x00)) {
                 return ".";
             } else if ((fidLength == 1) && (buff33 == 0x01)) {
                 return "..";
-            } else {
-                idLength = fidLength;
             }
-        } else {
-            idLength = Math.max(0, fidLength - 2);
         }
         try {
-            return new String(buff, offset+33, idLength, encoding);
+            return new String(buff, offset+33, fidLength, encoding);
         } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
         }

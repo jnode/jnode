@@ -39,7 +39,7 @@ public class ISO9660FileSystem extends AbstractFileSystem {
      * @see org.jnode.fs.FileSystem#getRootEntry()
      */
     public FSEntry getRootEntry() throws IOException {
-        return new ISO9660Entry(this, volume.getVolumeDescriptor()
+        return new ISO9660Entry(this, volume.getPrimaryVolumeDescriptor()
                 .getRootDirectoryEntry());
     }
 
