@@ -18,6 +18,7 @@ public final class VmArrayClass extends VmClassType {
 	private final VmType componentType;
 	
 	private long totalLength;
+	private int maxLength;
 
 	/**
 	 * @param name
@@ -138,9 +139,16 @@ public final class VmArrayClass extends VmClassType {
 	
 	public final synchronized void incTotalLength(int len) {
 	    this.totalLength += len;
+	    if (len > maxLength) {
+	    	maxLength = len;
+	    }
 	}
 	
 	public long getTotalLength() {
 	    return totalLength;
+	}
+	
+	public int getMaximumLength() {
+		return maxLength;
 	}
 }

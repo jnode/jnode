@@ -8,7 +8,7 @@ package org.jnode.vm.classmgr;
  * 
  * @author epr
  */
-public class VmConstIMethodRef extends VmConstMethodRef {
+public final class VmConstIMethodRef extends VmConstMethodRef {
 
 	/** The selector of this methods name&type */
 	private int selector = -1;
@@ -19,8 +19,8 @@ public class VmConstIMethodRef extends VmConstMethodRef {
 	 * @param classIndex
 	 * @param nameTypeIndex
 	 */
-	public VmConstIMethodRef(VmCP cp, int classIndex, int nameTypeIndex) {
-		super(cp, classIndex, nameTypeIndex);
+	public VmConstIMethodRef(VmConstClass constClass, String name, String descriptor) {
+		super(constClass, name, descriptor);
 	}
 
 	/**

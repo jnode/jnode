@@ -9,7 +9,7 @@ package org.jnode.vm.classmgr;
  * 
  * @author Ewout Prangsma (ewout@users.sourceforge.net)
  */
-public class VmConstFieldRef extends VmConstMemberRef  {
+public final class VmConstFieldRef extends VmConstMemberRef  {
 
 	/** The reference to the resolved field */
 	private VmField vmResolvedField;
@@ -20,8 +20,8 @@ public class VmConstFieldRef extends VmConstMemberRef  {
 	 * @param classIndex
 	 * @param nameTypeIndex
 	 */
-	public VmConstFieldRef(VmCP cp, int classIndex, int nameTypeIndex) {
-		super(cp, classIndex, nameTypeIndex);
+	public VmConstFieldRef(VmConstClass constClass, String name, String descriptor) {
+		super(constClass, name, descriptor);
 	}
 
 	/**

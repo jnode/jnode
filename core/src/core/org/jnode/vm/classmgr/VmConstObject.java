@@ -13,11 +13,9 @@ import org.vmmagic.pragma.Uninterruptible;
  */
 public abstract class VmConstObject extends VmSystemObject implements Uninterruptible {
 
-	protected final VmCP cp;
 	private boolean resolved = false;
 	
-	public VmConstObject(VmCP cp) {
-		this.cp = cp;
+	public VmConstObject() {
 	}
 	
 	/**
@@ -44,4 +42,8 @@ public abstract class VmConstObject extends VmSystemObject implements Uninterrup
 	 * @param clc
 	 */
 	protected abstract void doResolve(VmClassLoader clc);
+	
+	void link(VmCP cp) {
+		// Override when needed
+	}
 }

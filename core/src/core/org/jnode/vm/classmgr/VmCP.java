@@ -201,14 +201,6 @@ public final class VmCP extends VmSystemObject {
         set(index, value);
     }
 
-    public VmConstNameAndType getConstNameAndType(int index) {
-        return (VmConstNameAndType) get(index);
-    }
-
-    protected void setConstNameAndType(int index, VmConstNameAndType value) {
-        set(index, value);
-    }
-
     public Object getAny(int index) {
         return get(index);
     }
@@ -255,5 +247,9 @@ public final class VmCP extends VmSystemObject {
         if (data == null) { throw new NullPointerException(
                 "Cannot set a null data"); }
         cp[ index] = data;
+    }
+    
+    final void reset(int index) {
+    	cp[index] = null;
     }
 }

@@ -17,8 +17,7 @@ public final class VmConstString extends VmConstObject implements VmStaticsEntry
      * Initialize this instance.
      * @param staticsIndex
      */
-    public VmConstString(VmCP cp, int staticsIndex) {
-        super(cp);
+    public VmConstString(int staticsIndex) {
         this.staticsIndex = staticsIndex;
     }
     

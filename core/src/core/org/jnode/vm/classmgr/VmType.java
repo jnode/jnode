@@ -394,7 +394,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 					result[i + 2] = name.charAt(i);
 				}
 			}
-			arrayClassName = new String(result);
+			arrayClassName = new String(result).intern();
 		}
 		return arrayClassName;
 	}
