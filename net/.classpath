@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="/JNode-Core/lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="src" path="/JNode-Shell"/>
 	<classpathentry kind="lib" path="lib/commons-net-1.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/dnsjava-1.5.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
