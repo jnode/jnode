@@ -30,7 +30,7 @@ import java.awt.peer.DialogPeer;
 
 /**
  * AWT dialog peer implemented as a {@link javax.swing.JInternalFrame}.
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 
 class SwingDialogPeer extends SwingWindowPeer implements DialogPeer,

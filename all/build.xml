@@ -344,6 +344,24 @@
 	<target name="tests" depends="assemble">
 		<ant target="tests" dir="${root.dir}/fs" inheritall="on" inheritrefs="on" />
 	</target>
+
+	<!-- Check the encoding of all files -->
+	<target name="encoding-test" depends="assemble">
+		<taskdef name="n2a" classname="org.jnode.ant.taskdefs.Native2AsciiTask" classpathref="cp-jnode" />
+
+		<n2a update="off">
+			<fileset dir="${root.dir}" includes="**/*.java"/>
+		</n2a>
+	</target>
+
+	<!-- Check and fix the encoding of all files -->
+	<target name="encoding-fix" depends="assemble">
+		<taskdef name="n2a" classname="org.jnode.ant.taskdefs.Native2AsciiTask" classpathref="cp-jnode" />
+
+		<n2a update="on">
+			<fileset dir="${root.dir}" includes="**/*.java"/>
+		</n2a>
+	</target>
 </project>
 
 

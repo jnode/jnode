@@ -187,7 +187,7 @@ public class IRControlFlowGraph {
 				for all predecessors, p, of b
 					runner = p
 					while runner != doms[b]
-						add b to runner’s dominance frontier set
+						add b to runner\u2019s dominance frontier set
 						runner = doms[runner]
 	*/
 	private void computeDominanceFrontier() {

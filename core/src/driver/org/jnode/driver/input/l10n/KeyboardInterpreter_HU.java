@@ -30,7 +30,7 @@ import java.awt.event.KeyEvent;
 
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  * @since 0.1.9
  */
 public class KeyboardInterpreter_HU extends KeyboardInterpreter {
@@ -48,9 +48,9 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
         keys.setKey(8, new Key('7', KeyEvent.VK_7, '=', KeyEvent.VK_EQUALS));
         keys.setKey(9, new Key('8', KeyEvent.VK_8, '(', KeyEvent.VK_LEFT_PARENTHESIS));
         keys.setKey(10, new Key('9', KeyEvent.VK_9, ')', KeyEvent.VK_RIGHT_PARENTHESIS));
-        keys.setKey(11, new Key('ö', 'Ö', KeyEvent.VK_UNDEFINED));
-        keys.setKey(12, new Key('ü', 'Ü', KeyEvent.VK_UNDEFINED));
-        keys.setKey(13, new Key('ó', 'Ó', KeyEvent.VK_UNDEFINED));
+        keys.setKey(11, new Key('\u00f6', '\u00d6', KeyEvent.VK_UNDEFINED));
+        keys.setKey(12, new Key('\u00fc', '\u00dc', KeyEvent.VK_UNDEFINED));
+        keys.setKey(13, new Key('\u00f3', '\u00d3', KeyEvent.VK_UNDEFINED));
 
         keys.setKey(14, new Key(KeyEvent.VK_BACK_SPACE));
         keys.setKey(15, new Key('\t', KeyEvent.VK_TAB));
@@ -66,7 +66,7 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
         keys.setKey(24, new Key('o', 'O', KeyEvent.VK_O));
         keys.setKey(25, new Key('p', 'P', KeyEvent.VK_P));
         keys.setKey(26, new Key('?', '?', KeyEvent.VK_UNDEFINED));
-        keys.setKey(27, new Key('ú', 'Ú', KeyEvent.VK_UNDEFINED));
+        keys.setKey(27, new Key('\u00fa', '\u00da', KeyEvent.VK_UNDEFINED));
 
         keys.setKey(28, new Key('\n', KeyEvent.VK_ENTER));
         keys.setKey(29, new Key(KeyEvent.VK_CONTROL));
@@ -80,8 +80,8 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
         keys.setKey(36, new Key('j', 'J', KeyEvent.VK_J));
         keys.setKey(37, new Key('k', 'K', KeyEvent.VK_K));
         keys.setKey(38, new Key('l', 'L', KeyEvent.VK_L));
-        keys.setKey(39, new Key('é', 'É', KeyEvent.VK_UNDEFINED));
-        keys.setKey(40, new Key('á', 'Á', KeyEvent.VK_UNDEFINED));
+        keys.setKey(39, new Key('\u00e9', '\u00c9', KeyEvent.VK_UNDEFINED));
+        keys.setKey(40, new Key('\u00e1', '\u00c1', KeyEvent.VK_UNDEFINED));
 
         keys.setKey(41, new Key('0', KeyEvent.VK_0));
         keys.setKey(42, new Key(KeyEvent.VK_SHIFT));
@@ -107,7 +107,7 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
         keys.setKey(69, new Key(KeyEvent.VK_NUM_LOCK));
         keys.setKey(70, new Key(KeyEvent.VK_SCROLL_LOCK));
 
-        keys.setKey(86, new Key('í', 'Í', KeyEvent.VK_UNDEFINED));
+        keys.setKey(86, new Key('\u00ed', '\u00cd', KeyEvent.VK_UNDEFINED));
 
         keys.setKey(87, new Key(KeyEvent.VK_F11));
         keys.setKey(88, new Key(KeyEvent.VK_F12));
@@ -143,38 +143,38 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
 
 
 
-    keys.setKey(18, new Key('e', KeyEvent.VK_E, 'E', KeyEvent.VK_E, '€', KeyEvent.VK_EURO_SIGN));
+    keys.setKey(18, new Key('e', KeyEvent.VK_E, 'E', KeyEvent.VK_E, '\u20ac', KeyEvent.VK_EURO_SIGN));
     key = keys.getKey(18);
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE, new char[]{'é', 'É'});
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE, new char[]{'è', 'È'});
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS, new char[]{'ë', 'Ë'});
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX, new char[]{'ê', 'Ê'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE, new char[]{'\u00e9', '\u00c9'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE, new char[]{'\u00e8', '\u00c8'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS, new char[]{'\u00eb', '\u00cb'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX, new char[]{'\u00ea', '\u00ca'});
 
     keys.setKey(22, new Key('u', 'U', KeyEvent.VK_U));
     key = keys.getKey(22);
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE, new char[]{'ú', 'Ú'});
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE, new char[]{'ù', 'Ù'});
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS, new char[]{'ü', 'Ü'});
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX, new char[]{'û', 'Û'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE, new char[]{'\u00fa', '\u00da'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE, new char[]{'\u00f9', '\u00d9'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS, new char[]{'\u00fc', '\u00dc'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX, new char[]{'\u00fb', '\u00db'});
 
 
     keys.setKey(23, new Key('i', 'I', KeyEvent.VK_I));
     key = keys.getKey(23);
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE, new char[]{'í', 'Í'});
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE, new char[]{'ì', 'Ì'});
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS, new char[]{'ï', 'Ï'});
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX, new char[]{'î', 'Î'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE, new char[]{'\u00ed', '\u00cd'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE, new char[]{'\u00ec', '\u00cc'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS, new char[]{'\u00ef', '\u00cf'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX, new char[]{'\u00ee', '\u00ce'});
 
 
     keys.setKey(24, new Key('o', 'O', KeyEvent.VK_O));
     key = keys.getKey(24);
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE, new char[]{'ó', 'Ó'});
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE, new char[]{'ò', 'Ò'});
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS, new char[]{'ö', 'Ö'});
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX, new char[]{'ô', 'Ô'});
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_TILDE, new char[]{'õ', 'Õ'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE, new char[]{'\u00f3', '\u00d3'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE, new char[]{'\u00f2', '\u00d2'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS, new char[]{'\u00f6', '\u00d6'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX, new char[]{'\u00f4', '\u00d4'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_TILDE, new char[]{'\u00f5', '\u00d5'});
 
-    keys.setKey(26, new Key('å', 'Å', KeyEvent.VK_UNDEFINED));
+    keys.setKey(26, new Key('\u00e5', '\u00c5', KeyEvent.VK_UNDEFINED));
 
     key = new Key();
     key.setLowerVirtuelKey(KeyEvent.VK_DEAD_DIAERESIS);
@@ -186,11 +186,11 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
 
     keys.setKey(30, new Key('a', 'A', KeyEvent.VK_A));
     key = keys.getKey(30);
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE, new char[]{'á', 'Á'});
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE, new char[]{'à', 'À'});
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS, new char[]{'ä', 'Ä'});
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX, new char[]{'â', 'Â'});
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_TILDE, new char[]{'ã', 'Ã'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE, new char[]{'\u00e1', '\u00c1'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE, new char[]{'\u00e0', '\u00c0'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS, new char[]{'\u00e4', '\u00c4'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX, new char[]{'\u00e2', '\u00c2'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_TILDE, new char[]{'\u00e3', '\u00c3'});
 
 
     keys.setKey(43, new Key("'".charAt(0), KeyEvent.VK_QUOTE, '*', KeyEvent.VK_MULTIPLY));
@@ -203,9 +203,9 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
 
     keys.setKey(57, new Key(' ', KeyEvent.VK_SPACE));
     key = keys.getKey(57);
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE, new char[]{'´'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_ACUTE, new char[]{'\u00b4'});
     key.addDeadKeyChar(KeyEvent.VK_DEAD_GRAVE, new char[]{'`'});
-    key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS, new char[]{'¨'});
+    key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS, new char[]{'\u00a8'});
     key.addDeadKeyChar(KeyEvent.VK_DEAD_CIRCUMFLEX, new char[]{'^'});
     key.addDeadKeyChar(KeyEvent.VK_DEAD_TILDE, new char[]{'~'});
 
@@ -345,7 +345,7 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
 		vkMap[115] = KeyEvent.VK_RIGHT;
 		vkMap[116] = KeyEvent.VK_PAUSE;
 
-		lcharMap[1] = 'í';
+		lcharMap[1] = '\u00ed';
 		lcharMap[2] = '1';
 		lcharMap[3] = '2';
 		lcharMap[4] = '3';
@@ -355,9 +355,9 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
 		lcharMap[8] = '7';
 		lcharMap[9] = '8';
 		lcharMap[10] = '9';
-		lcharMap[11] = 'ö';
-		lcharMap[12] = 'ü';
-		lcharMap[13] = 'ó';
+		lcharMap[11] = '\u00f6';
+		lcharMap[12] = '\u00fc';
+		lcharMap[13] = '\u00f3';
 		lcharMap[14] = '\b';
 		lcharMap[15] = '\t';
 		lcharMap[16] = 'q';
@@ -370,8 +370,8 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
 		lcharMap[23] = 'i';
 		lcharMap[24] = 'o';
 		lcharMap[25] = 'p';
-		lcharMap[26] = 'õ';
-		lcharMap[27] = 'ú';
+		lcharMap[26] = '\u00f5';
+		lcharMap[27] = '\u00fa';
 		lcharMap[28] = '\n';
 		lcharMap[30] = 'a';
 		lcharMap[31] = 's';
@@ -382,8 +382,8 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
 		lcharMap[36] = 'j';
 		lcharMap[37] = 'k';
 		lcharMap[38] = 'l';
-		lcharMap[39] = 'é';
-		lcharMap[40] = 'á';
+		lcharMap[39] = '\u00e9';
+		lcharMap[40] = '\u00e1';
 		lcharMap[41] = '`';
 		lcharMap[43] = '?';
 		lcharMap[44] = 'z';
@@ -413,7 +413,7 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
 		
 		lcharMap[86] = '<';
 
-        ucharMap[1] = 'Í';
+        ucharMap[1] = '\u00cd';
 		ucharMap[2] = '\'';
 		ucharMap[3] = '\"';
 		ucharMap[4] = '+';
@@ -423,9 +423,9 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
 		ucharMap[8] = '=';
 		ucharMap[9] = '(';
 		ucharMap[10] = ')';
-		ucharMap[11] = 'Ö';
-		ucharMap[12] = 'Ü';
-		ucharMap[13] = 'Ó';
+		ucharMap[11] = '\u00d6';
+		ucharMap[12] = '\u00dc';
+		ucharMap[13] = '\u00d3';
 		ucharMap[14] = '\b';
 		ucharMap[15] = '\t';
 		ucharMap[16] = 'Q';
@@ -438,8 +438,8 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
 		ucharMap[23] = 'I';
 		ucharMap[24] = 'O';
 		ucharMap[25] = 'P';
-		ucharMap[26] = 'Õ';
-		ucharMap[27] = 'Ú';
+		ucharMap[26] = '\u00d5';
+		ucharMap[27] = '\u00da';
 		ucharMap[28] = '\n';
 		ucharMap[30] = 'A';
 		ucharMap[31] = 'S';
@@ -450,10 +450,10 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
 		ucharMap[36] = 'J';
 		ucharMap[37] = 'K';
 		ucharMap[38] = 'L';
-		ucharMap[39] = 'É';
-		ucharMap[40] = 'Á';
+		ucharMap[39] = '\u00c9';
+		ucharMap[40] = '\u00c1';
 		ucharMap[41] = '~';
-		ucharMap[43] = 'Û';
+		ucharMap[43] = '\u00db';
 		ucharMap[44] = 'Z';
 		ucharMap[45] = 'X';
 		ucharMap[46] = 'C';
@@ -482,9 +482,9 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
 
 		ucharMap[86] = '>';
 		
-		altGrCharMap[41] = '¬';
+		altGrCharMap[41] = '\u00ac';
 		int i = 2;
-		altGrCharMap[i++]  = '¹';
+		altGrCharMap[i++]  = '\u00b9';
 		altGrCharMap[i++]  = '~';
 		altGrCharMap[i++]  = '#';
 		altGrCharMap[i++]  = '{';
@@ -499,17 +499,17 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
 //		altGrCharMap[i++]  = ' ';// backspace do nothing
 //		altGrCharMap[i++]  = ' ';// tab do nothing
 		i+=2;
-		altGrCharMap[i++]  = 'æ';
-		altGrCharMap[i++]  = '«';
-		altGrCharMap[i++]  = '¤';
-		altGrCharMap[i++]  = '¶';
+		altGrCharMap[i++]  = '\u00e6';
+		altGrCharMap[i++]  = '\u00ab';
+		altGrCharMap[i++]  = '\u00a4';
+		altGrCharMap[i++]  = '\u00b6';
 		altGrCharMap[i++]  = '?';
 //		altGrCharMap[i++]  = ' '; // y -> do nothing
 //		altGrCharMap[i++]  = ' '; // u -> do nothing
 //		altGrCharMap[i++]  = ' '; // i -> do nothing
 		i+=3;
-		altGrCharMap[i++]  = 'ø';
-		altGrCharMap[i++]  = 'þ';
+		altGrCharMap[i++]  = '\u00f8';
+		altGrCharMap[i++]  = '\u00fe';
 //		altGrCharMap[i++]  = ' '; // dead ^ -> do nothing
 		i++;
 		altGrCharMap[i++]  = '?';
@@ -517,8 +517,8 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
 //		altGrCharMap[i++]  = ' '; // Ctrl -> do nothing
 		i+=2;
 		altGrCharMap[i++]  = '@';
-		altGrCharMap[i++]  = 'ß';
-		altGrCharMap[i++]  = 'ð';
+		altGrCharMap[i++]  = '\u00df';
+		altGrCharMap[i++]  = '\u00f0';
 		altGrCharMap[i++]  = '?';
 		altGrCharMap[i++]  = '?';
 		altGrCharMap[i++]  = '?';
@@ -526,13 +526,13 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
 //		altGrCharMap[i++]  = ' '; // k -> do nothing
 		i++;
 		altGrCharMap[i++]  = '?';
-		altGrCharMap[i++]  = 'µ';
+		altGrCharMap[i++]  = '\u00b5';
 //		altGrCharMap[i++]  = ' '; // % -> do nothing
 //		altGrCharMap[i++]  = ' '; // * -> do nothing
 		i+=2;
 		altGrCharMap[i++]  = '?';
-		altGrCharMap[i++]  = '»';
-		altGrCharMap[i++]  = '¢';
+		altGrCharMap[i++]  = '\u00bb';
+		altGrCharMap[i++]  = '\u00a2';
 //		altGrCharMap[i++]  = ' '; // v -> do nothing
 //		altGrCharMap[i++]  = ' '; // b -> do nothing
 		i+=2;
@@ -540,7 +540,7 @@ public class KeyboardInterpreter_HU extends KeyboardInterpreter {
 //		altGrCharMap[i++]  = ' '; // , -> do nothing
 //		altGrCharMap[i++]  = ' '; // ; -> do nothing
 		i+=2;
-		altGrCharMap[i++]  = '·';
+		altGrCharMap[i++]  = '\u00b7';
 		altGrCharMap[i++]  = '?';
 		altGrCharMap[i++]  = '?';
 

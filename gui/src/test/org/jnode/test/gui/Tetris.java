@@ -33,7 +33,7 @@ import java.awt.Panel;
 import java.util.Random;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class Tetris extends Panel implements KeyListener {
 	private static final int[][][][] BLOCKS = {

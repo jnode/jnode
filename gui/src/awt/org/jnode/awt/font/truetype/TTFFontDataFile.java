@@ -85,7 +85,7 @@ public class TTFFontDataFile extends TTFFontData {
 		// read table entries
 		for (int i = 0; i < numberOfTables; i++) {
 			ttf.seek(12 + i * 16);
-			// read TAG  = 4 –byte identifier.
+			// read TAG  = 4 \u2013byte identifier.
 			byte b[] = new byte[4];
 			ttf.readFully(b);
 			String tag = new String(b);

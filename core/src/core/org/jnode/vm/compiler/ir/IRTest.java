@@ -45,7 +45,7 @@ import org.jnode.vm.x86.compiler.l2.X86CodeGenerator;
 
 /**
  * @author Madhu Siddalingaiah
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class IRTest {
 	public static void main(String args[]) throws SecurityException, IOException, ClassNotFoundException {

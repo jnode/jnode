@@ -45,7 +45,7 @@ import org.jnode.vm.compiler.ir.quad.VoidReturnQuad;
 
 /**
  * @author Madhu Siddalingaiah
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class X86CodeGenerator extends CodeGenerator {
     private static final X86Register SR1 = X86Register.EAX;

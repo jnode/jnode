@@ -34,7 +34,7 @@ import java.awt.peer.PopupMenuPeer;
 
 /**
  * AWT popup menu peer implemented as a {@link javax.swing.JPopupMenu}.
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 
 class SwingPopupMenuPeer extends SwingMenuPeer implements PopupMenuPeer {

@@ -28,7 +28,7 @@ import java.awt.peer.MenuBarPeer;
 
 /**
  * AWT menu bar peer implemented as a {@link javax.swing.JMenuBar}.
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 
 class SwingMenuBarPeer extends SwingMenuComponentPeer implements MenuBarPeer {

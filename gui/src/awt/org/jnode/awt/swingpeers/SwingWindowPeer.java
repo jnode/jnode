@@ -28,7 +28,7 @@ import java.awt.peer.WindowPeer;
 
 /**
  * AWT window peer implemented as a {@link javax.swing.JInternalFrame}.
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 
 class SwingWindowPeer extends SwingContainerPeer implements WindowPeer {

@@ -32,7 +32,7 @@ import java.awt.peer.MenuPeer;
 
 /**
  * AWT menu peer implemented as a {@link javax.swing.JMenu}.
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 
 class SwingMenuPeer extends SwingMenuItemPeer implements MenuPeer {

@@ -23,7 +23,7 @@ package org.jnode.vm.compiler.ir;
 
 /**
  * @author Madhu Siddalingaiah
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public abstract class Constant extends Operand {
 	public Constant(int type) {

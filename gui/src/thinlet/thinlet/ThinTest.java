@@ -6,7 +6,7 @@ import java.awt.BorderLayout;
 
 /**
  * A simple test for Thinlet
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public class ThinTest extends Thinlet {
     private static final String MARKUP=

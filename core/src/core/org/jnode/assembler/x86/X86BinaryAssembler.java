@@ -44,7 +44,7 @@ import org.jnode.vm.x86.X86CpuID;
  * Implementation of AbstractX86Stream.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  * @author Patrik Reali (patrik_reali@users.sourceforge.net)
  */
 public class X86BinaryAssembler extends X86Assembler implements X86Constants,

@@ -28,7 +28,7 @@ import javax.swing.JComponent;
 import java.awt.peer.MenuComponentPeer;
 
 /**
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 public abstract class SwingMenuComponentPeer extends JNodeGenericPeer implements MenuComponentPeer{
     protected JComponent jComponent;

@@ -31,7 +31,7 @@ import java.awt.peer.ListPeer;
 
 /**
  * AWT list peer implemented as a {@link javax.swing.JList}.
- * @author Levente Sántha
+ * @author Levente S\u00e1ntha
  */
 
 class SwingListPeer extends SwingComponentPeer implements ListPeer {

@@ -48,7 +48,7 @@ import java.util.Stack;
 import java.util.Vector;
 
 /**
- * * @author Levente Sántha
+ * * @author Levente S\u00e1ntha
  */
 public class BoxWorld extends Panel implements WindowListener, KeyListener,
         MouseListener, MouseMotionListener, ActionListener, ItemListener {
@@ -1047,7 +1047,7 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
     private static String[] help = { "s - start game", "n - next world",
             "p - previous world", "u - undo", "r - redo", "b - toggle beep",
             "h - help", " ", "Press C to continue", " ", "Create by",
-            "Levente Sántha, 2002",
+            "Levente S\u00e1ntha, 2002",
 
     };
 
