@@ -98,11 +98,13 @@ public class Utilities
     for (int offset = s.offset; offset < (s.offset + s.count); ++offset)
       {
         char c = buffer[offset];
-        if (len > 0 && (c == '\t' || c == '\n'))
+        if (c == '\t' || c == '\n')
           {
+            if (len > 0) {
 	    g.drawChars(buffer, pos, len, pixelX, pixelY + ascent);            
             pixelX += pixelWidth;
             pixelWidth = 0;
+            }
             pos = offset+1;
             len = 0;
           }

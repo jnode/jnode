@@ -1,5 +1,5 @@
-/* SSLPermission.java -- SSL permission class.
-   Copyright (C) 2004 Free Software Foundation, Inc.
+/* BasicTextPaneUI.java -- 
+   Copyright (C) 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -36,31 +36,34 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package javax.net.ssl;
+package javax.swing.plaf.basic;
 
-import java.security.BasicPermission;
+import java.beans.PropertyChangeEvent;
 
-/**
- * A permission used for accessing SSL classes.
- */
-public final class SSLPermission extends BasicPermission
+import javax.swing.JComponent;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.text.Element;
+import javax.swing.text.PlainView;
+import javax.swing.text.View;
+
+public class BasicTextPaneUI extends BasicTextUI
 {
-
-  // Constant.
-  // -------------------------------------------------------------------------
-
-  private static final long serialVersionUID = -3456898025505876775L;
-
-  // Constructors.
-  // -------------------------------------------------------------------------
-
-  public SSLPermission(String name)
+  public static ComponentUI createUI(JComponent comp)
   {
-    super(name);
+    return new BasicTextPaneUI();
   }
 
-  public SSLPermission(String name, String actions)
+  public BasicTextPaneUI()
   {
-    super(name, actions);
+  }
+
+  public View create(Element elem)
+  {
+    return new PlainView(elem);
+  }
+
+  protected String getPropertyPrefix()
+  {
+    return "TextPane";
   }
 }

@@ -226,6 +226,19 @@ public class Raster
 		return createWritableRaster(sm, dataBuffer, location);
 	}
 
+  public static WritableRaster
+  createPackedRaster(DataBuffer dataBuffer,
+		     int w, int h,
+		     int bitsPerPixel,
+		     Point location)
+  {
+    SampleModel sm =
+      new MultiPixelPackedSampleModel(dataBuffer.getDataType(),
+				       w, h,
+				       bitsPerPixel);
+    return createWritableRaster(sm, dataBuffer, location);
+  }
+    
   public static Raster createRaster(SampleModel sm, DataBuffer db,
 				    Point location)
   {

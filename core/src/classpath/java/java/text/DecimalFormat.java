@@ -447,7 +447,7 @@ public class DecimalFormat extends NumberFormat
 				&& useExponentialNotation == dup.useExponentialNotation);
 	}
 
-  protected void formatInternal (double number, FormatBuffer dest,
+  private void formatInternal (double number, FormatBuffer dest,
 				 FieldPosition fieldPos)
   {
 		// A very special case.

@@ -122,23 +122,28 @@ public class JarFile extends ZipFile
 	private Manifest manifest;
 
   /** Whether to verify the manifest and all entries. */
-	private boolean verify;
+  boolean verify;
 
   /** Whether the has already been loaded. */
 	private boolean manifestRead = false;
 
   /** Whether the signature files have been loaded. */
-  private boolean signaturesRead = false;
+  boolean signaturesRead = false;
 
-  /** A map between entry names and booleans, signaling whether or
-      not that entry has been verified. */
-  private HashMap verified = new HashMap();
+  /**
+   * A map between entry names and booleans, signaling whether or
+   * not that entry has been verified.
+   * Only be accessed with lock on this JarFile*/
+  HashMap verified = new HashMap();
 
-  /** A mapping from entry name to certificates, if any. */
-  private HashMap entryCerts;
+  /**
+   * A mapping from entry name to certificates, if any.
+   * Only accessed with lock on this JarFile.
+   */
+  HashMap entryCerts;
 
-  private static boolean DEBUG = false;
-  private static void debug(Object msg)
+  static boolean DEBUG = false;
+  static void debug(Object msg)
   {
     System.err.print(JarFile.class.getName());
     System.err.print(" >>> ");
@@ -303,21 +308,23 @@ public class JarFile extends ZipFile
 	 */
   public Enumeration entries() throws IllegalStateException
   {
-		return new JarEnumeration(super.entries());
+    return new JarEnumeration(super.entries(), this);
 	}
 
 	/**
 	 * Wraps a given Zip Entries Enumeration. For every zip entry a
 	 * JarEntry is created and the corresponding Attributes are looked up.
 	 */
-  private class JarEnumeration implements Enumeration
+  private static class JarEnumeration implements Enumeration
   {
 
 		private final Enumeration entries;
+    private final JarFile jarfile;
 
-    JarEnumeration(Enumeration e)
+    JarEnumeration(Enumeration e, JarFile f)
     {
 			entries = e;
+      jarfile = f;
 		}
 
     public boolean hasMoreElements()
@@ -332,7 +339,7 @@ public class JarFile extends ZipFile
 			Manifest manifest;
       try
 	{
-				manifest = getManifest();
+	  manifest = jarfile.getManifest();
 	}
       catch (IOException ioe)
 	{
@@ -344,32 +351,35 @@ public class JarFile extends ZipFile
 				jar.attr = manifest.getAttributes(jar.getName());
 			}
 
-      if (!signaturesRead)
+      synchronized(jarfile)
+	{
+	  if (!jarfile.signaturesRead)
         try
           {
-            readSignatures();
+		jarfile.readSignatures();
           }
         catch (IOException ioe)
           {
-            if (DEBUG)
+		if (JarFile.DEBUG)
               {
-                debug(ioe);
+		    JarFile.debug(ioe);
                 ioe.printStackTrace();
               }
-            signaturesRead = true; // fudge it.
+		jarfile.signaturesRead = true; // fudge it.
           }
 
       // Include the certificates only if we have asserted that the
       // signatures are valid. This means the certificates will not be
       // available if the entry hasn't been read yet.
-      if (entryCerts != null && verified.containsKey(zip.getName())
-          && ((Boolean) verified.get(zip.getName())).booleanValue())
+	  if (jarfile.entryCerts != null
+	      && jarfile.verified.get(zip.getName()) == Boolean.TRUE)
         {
-          Set certs = (Set) entryCerts.get(jar.getName());
+	      Set certs = (Set) jarfile.entryCerts.get(jar.getName());
           if (certs != null)
             jar.certs = (Certificate[])
               certs.toArray(new Certificate[certs.size()]);
         }
+	}
 			return jar;
 		}
 	}
@@ -379,7 +389,7 @@ public class JarFile extends ZipFile
 	 * It actually returns a JarEntry not a zipEntry
 	 * @param name XXX
 	 */
-  public ZipEntry getEntry(String name)
+  public synchronized ZipEntry getEntry(String name)
   {
 		ZipEntry entry = super.getEntry(name);
     if (entry != null)
@@ -419,8 +429,7 @@ public class JarFile extends ZipFile
         if (DEBUG)
           debug("entryCerts=" + entryCerts + " verified " + name
                 + " ? " + verified.get(name));
-        if (entryCerts != null && verified.containsKey(name)
-            && ((Boolean) verified.get(name)).booleanValue())
+	if (entryCerts != null && verified.get(name) == Boolean.TRUE)
           {
             Set certs = (Set) entryCerts.get(name);
             if (certs != null)
@@ -449,13 +458,13 @@ public class JarFile extends ZipFile
       {
         if (DEBUG)
           debug("reading and verifying " + entry);
-        return new EntryInputStream(entry, super.getInputStream(entry));
+        return new EntryInputStream(entry, super.getInputStream(entry), this);
       }
     else
       {
         if (DEBUG)
           debug("reading already verified entry " + entry);
-        if (!((Boolean) verified.get(entry.getName())).booleanValue())
+        if (verify && verified.get(entry.getName()) == Boolean.FALSE)
           throw new ZipException("digest for " + entry + " is invalid");
         return super.getInputStream(entry);
       }
@@ -479,7 +488,7 @@ public class JarFile extends ZipFile
 	 * Returns the manifest for this JarFile or null when the JarFile does not
 	 * contain a manifest file.
 	 */
-  public Manifest getManifest() throws IOException
+  public synchronized Manifest getManifest() throws IOException
   {
 		if (!manifestRead)
 			manifest = readManifest();
@@ -487,6 +496,7 @@ public class JarFile extends ZipFile
 		return manifest;
 	}
 
+  // Only called with lock on this JarFile.
   private void readSignatures() throws IOException
   {
     Map pkcs7Dsa = new HashMap();
@@ -872,8 +882,9 @@ public class JarFile extends ZipFile
   /**
    * A utility class that verifies jar entries as they are read.
    */
-  private class EntryInputStream extends FilterInputStream
+  private static class EntryInputStream extends FilterInputStream
   {
+    private final JarFile jarfile;
     private final long length;
     private long pos;
     private final ZipEntry entry;
@@ -881,17 +892,25 @@ public class JarFile extends ZipFile
     private final MessageDigest[] md;
     private boolean checked;
 
-    EntryInputStream(final ZipEntry entry, final InputStream in)
+    EntryInputStream(final ZipEntry entry,
+		     final InputStream in,
+		     final JarFile jar)
       throws IOException
     {
       super(in);
       this.entry = entry;
+      this.jarfile = jar;
 
       length = entry.getSize();
       pos = 0;
       checked = false;
 
-      Attributes attr = manifest.getAttributes(entry.getName());
+      Attributes attr;
+      Manifest manifest = jarfile.getManifest();
+      if (manifest != null)
+	attr = manifest.getAttributes(entry.getName());
+      else
+	attr = null;
       if (DEBUG)
         debug("verifying entry " + entry + " attr=" + attr);
       if (attr == null)
@@ -1011,17 +1030,24 @@ public class JarFile extends ZipFile
                   + " comp=" + new java.math.BigInteger(hash).toString(16));
           if (!Arrays.equals(hash, hashes[i]))
             {
+	      synchronized(jarfile)
+		{
               if (DEBUG)
                 debug(entry + " could NOT be verified");
-              verified.put(entry.getName(), Boolean.FALSE);
+		  jarfile.verified.put(entry.getName(), Boolean.FALSE);
+		}
               return;
               // XXX ??? what do we do here?
               // throw new ZipException("message digest mismatch");
             }
         }
+
+      synchronized(jarfile)
+	{
       if (DEBUG)
         debug(entry + " has been VERIFIED");
-      verified.put(entry.getName(), Boolean.TRUE);
+	  jarfile.verified.put(entry.getName(), Boolean.TRUE);
+	}
     }
   }
 }
