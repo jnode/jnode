@@ -510,23 +510,215 @@ public class X86CodeGenerator extends CodeGenerator {
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, java.lang.Object, int, java.lang.Object)
 	 */
 	public void generateBinaryOP(Object reg1, Object reg2, int operation, Object reg3) {
-		// TODO Auto-generated method stub
 
+        switch(operation) {
+
+            case BinaryQuad.IADD:
+                if (reg1 != reg2) {
+                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+                }
+                os.writeADD((Register) reg1, (Register) reg3);
+                break;
+
+            case BinaryQuad.IAND:
+                if (reg1 != reg2) {
+                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+                }
+                os.writeAND((Register) reg1, (Register) reg3);
+                break;
+
+            case BinaryQuad.IDIV:   //needs EAX
+            case BinaryQuad.IMUL:   //needs EAX
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.IOR:
+                if (reg1 != reg2) {
+                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+                }
+                os.writeOR((Register) reg1, (Register) reg3);
+                break;
+
+            case BinaryQuad.IREM:   //needs EAX
+            case BinaryQuad.ISHL:   //needs CL
+            case BinaryQuad.ISHR:   //needs CL
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISUB:
+                if (reg1 != reg2) {
+                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+                }
+                os.writeSUB((Register) reg1, (Register) reg3);
+                break;
+
+            case BinaryQuad.IUSHR:  //needs CL
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.IXOR:
+                if (reg1 != reg2) {
+                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+                }
+                os.writeXOR((Register) reg1, (Register) reg3);
+                break;
+
+            case BinaryQuad.DADD:
+            case BinaryQuad.DDIV:
+            case BinaryQuad.DMUL:
+            case BinaryQuad.DREM:
+            case BinaryQuad.DSUB:
+            case BinaryQuad.FADD:
+            case BinaryQuad.FDIV:
+            case BinaryQuad.FMUL:
+            case BinaryQuad.FREM:
+            case BinaryQuad.FSUB:
+            case BinaryQuad.LADD:
+            case BinaryQuad.LAND:
+            case BinaryQuad.LDIV:
+            case BinaryQuad.LMUL:
+            case BinaryQuad.LOR:
+            case BinaryQuad.LREM:
+            case BinaryQuad.LSHL:
+            case BinaryQuad.LSHR:
+            case BinaryQuad.LSUB:
+            case BinaryQuad.LUSHR:
+            case BinaryQuad.LXOR:
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
 	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, java.lang.Object, int, int)
 	 */
 	public void generateBinaryOP(Object reg1, Object reg2, int operation, int disp3) {
-		// TODO Auto-generated method stub
+        switch(operation) {
 
+            case BinaryQuad.IADD:
+                if (reg1 != reg2) {
+                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+                }
+                os.writeADD((Register) reg1, Register.EBP, disp3);
+                break;
+
+            case BinaryQuad.IAND:   //not supported
+//                if (reg1 != reg2) {
+//                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+//                }
+//                os.writeAND((Register) reg1, Register.EBP, disp3);
+//                break;
+
+            case BinaryQuad.IDIV:   //needs EAX
+            case BinaryQuad.IMUL:   //needs EAX
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.IOR:    //not supported
+//                if (reg1 != reg2) {
+//                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+//                }
+//                os.writeOR((Register) reg1, Register.EBP, disp3);
+//                break;
+
+            case BinaryQuad.IREM:   //needs EAX
+            case BinaryQuad.ISHL:   //needs CL
+            case BinaryQuad.ISHR:   //needs CL
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISUB:   //not supported
+//                if (reg1 != reg2) {
+//                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+//                }
+//                os.writeSUB((Register) reg1, Register.EBP, disp3);
+//                break;
+
+            case BinaryQuad.IUSHR:  //needs CL
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.IXOR:   //not supported
+//                if (reg1 != reg2) {
+//                    os.writeMOV(X86Constants.BITS32, (Register) reg1, (Register) reg2);
+//                }
+//                os.writeXOR((Register) reg1, Register.EBP, disp3);
+//                break;
+
+            case BinaryQuad.DADD:
+            case BinaryQuad.DDIV:
+            case BinaryQuad.DMUL:
+            case BinaryQuad.DREM:
+            case BinaryQuad.DSUB:
+            case BinaryQuad.FADD:
+            case BinaryQuad.FDIV:
+            case BinaryQuad.FMUL:
+            case BinaryQuad.FREM:
+            case BinaryQuad.FSUB:
+            case BinaryQuad.LADD:
+            case BinaryQuad.LAND:
+            case BinaryQuad.LDIV:
+            case BinaryQuad.LMUL:
+            case BinaryQuad.LOR:
+            case BinaryQuad.LREM:
+            case BinaryQuad.LSHL:
+            case BinaryQuad.LSHR:
+            case BinaryQuad.LSUB:
+            case BinaryQuad.LUSHR:
+            case BinaryQuad.LXOR:
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
 	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, int, int, org.jnode.vm.compiler.ir.Constant)
 	 */
 	public void generateBinaryOP(Object reg1, int disp2, int operation, Constant c3) {
-		// TODO Auto-generated method stub
+        IntConstant iconst3 = (IntConstant) c3;
+        switch(operation) {
+
+            case BinaryQuad.IADD:   //not supported
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.IAND:
+                os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
+                os.writeAND((Register)reg1, iconst3.getValue());
+                break;
+
+            case BinaryQuad.IDIV:   //needs EAX
+            case BinaryQuad.IMUL:   //needs EAX
+            case BinaryQuad.IOR:    //not supported
+            case BinaryQuad.IREM:   //needs EAX
+            case BinaryQuad.ISHL:   //needs CL
+            case BinaryQuad.ISHR:   //needs CL
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISUB:
+                os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
+                os.writeSUB((Register)reg1, iconst3.getValue());
+                break;
+
+            case BinaryQuad.IUSHR:  //needs CL
+            case BinaryQuad.IXOR:   //not supported
+            case BinaryQuad.DADD:
+            case BinaryQuad.DDIV:
+            case BinaryQuad.DMUL:
+            case BinaryQuad.DREM:
+            case BinaryQuad.DSUB:
+            case BinaryQuad.FADD:
+            case BinaryQuad.FDIV:
+            case BinaryQuad.FMUL:
+            case BinaryQuad.FREM:
+            case BinaryQuad.FSUB:
+            case BinaryQuad.LADD:
+            case BinaryQuad.LAND:
+            case BinaryQuad.LDIV:
+            case BinaryQuad.LMUL:
+            case BinaryQuad.LOR:
+            case BinaryQuad.LREM:
+            case BinaryQuad.LSHL:
+            case BinaryQuad.LSHR:
+            case BinaryQuad.LSUB:
+            case BinaryQuad.LUSHR:
+            case BinaryQuad.LXOR:
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
 
 	}
 
@@ -534,16 +726,115 @@ public class X86CodeGenerator extends CodeGenerator {
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, int, int, java.lang.Object)
 	 */
 	public void generateBinaryOP(Object reg1, int disp2, int operation, Object reg3) {
-		// TODO Auto-generated method stub
+		switch(operation) {
 
+            case BinaryQuad.IADD:
+                os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
+                os.writeADD((Register) reg1, (Register) reg3);
+                break;
+
+            case BinaryQuad.IAND:
+                os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
+                os.writeAND((Register) reg1, (Register) reg3);
+                break;
+
+            case BinaryQuad.IDIV:   //needs EAX
+            case BinaryQuad.IMUL:   //needs EAX
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.IOR:
+                os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
+                os.writeOR((Register) reg1, (Register) reg3);
+                break;
+
+            case BinaryQuad.IREM:   //needs EAX
+            case BinaryQuad.ISHL:   //needs CL
+            case BinaryQuad.ISHR:   //needs CL
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISUB:
+                os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
+                os.writeSUB((Register) reg1, (Register) reg3);
+                break;
+
+            case BinaryQuad.IUSHR:  //needs CL
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.IXOR:
+                os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
+                os.writeXOR((Register) reg1, (Register) reg3);
+                break;
+
+            case BinaryQuad.DADD:
+            case BinaryQuad.DDIV:
+            case BinaryQuad.DMUL:
+            case BinaryQuad.DREM:
+            case BinaryQuad.DSUB:
+            case BinaryQuad.FADD:
+            case BinaryQuad.FDIV:
+            case BinaryQuad.FMUL:
+            case BinaryQuad.FREM:
+            case BinaryQuad.FSUB:
+            case BinaryQuad.LADD:
+            case BinaryQuad.LAND:
+            case BinaryQuad.LDIV:
+            case BinaryQuad.LMUL:
+            case BinaryQuad.LOR:
+            case BinaryQuad.LREM:
+            case BinaryQuad.LSHL:
+            case BinaryQuad.LSHR:
+            case BinaryQuad.LSUB:
+            case BinaryQuad.LUSHR:
+            case BinaryQuad.LXOR:
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
 	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, int, int, int)
 	 */
 	public void generateBinaryOP(Object reg1, int disp2, int operation, int disp3) {
-		// TODO Auto-generated method stub
+        switch(operation) {
+            case BinaryQuad.IADD:
+                os.writeMOV(X86Constants.BITS32, (Register) reg1, Register.EBP, disp2);
+                os.writeADD((Register) reg1, Register.EBP, disp3);
+                break;
 
+            case BinaryQuad.IAND:   //not supported
+            case BinaryQuad.IDIV:   //needs EAX
+            case BinaryQuad.IMUL:   //needs EAX
+            case BinaryQuad.IOR:    //not supported
+            case BinaryQuad.IREM:   //needs EAX
+            case BinaryQuad.ISHL:   //needs CL
+            case BinaryQuad.ISHR:   //needs CL
+            case BinaryQuad.ISUB:   //not supported
+            case BinaryQuad.IUSHR:  //needs CL
+            case BinaryQuad.IXOR:   //not supported
+            case BinaryQuad.DADD:
+            case BinaryQuad.DDIV:
+            case BinaryQuad.DMUL:
+            case BinaryQuad.DREM:
+            case BinaryQuad.DSUB:
+            case BinaryQuad.FADD:
+            case BinaryQuad.FDIV:
+            case BinaryQuad.FMUL:
+            case BinaryQuad.FREM:
+            case BinaryQuad.FSUB:
+            case BinaryQuad.LADD:
+            case BinaryQuad.LAND:
+            case BinaryQuad.LDIV:
+            case BinaryQuad.LMUL:
+            case BinaryQuad.LOR:
+            case BinaryQuad.LREM:
+            case BinaryQuad.LSHL:
+            case BinaryQuad.LSHR:
+            case BinaryQuad.LSUB:
+            case BinaryQuad.LUSHR:
+            case BinaryQuad.LXOR:
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
 	}
 
 
@@ -552,7 +843,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, org.jnode.vm.compiler.ir.Constant, int, org.jnode.vm.compiler.ir.Constant)
 	 */
 	public void generateBinaryOP(int disp1, Constant c2, int operation, Constant c3) {
-		// TODO Auto-generated method stub
+		// not supported, see next method
 
 	}
 
@@ -560,39 +851,184 @@ public class X86CodeGenerator extends CodeGenerator {
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, org.jnode.vm.compiler.ir.Constant, int, java.lang.Object)
 	 */
 	public void generateBinaryOP(int disp1, Constant c2, int operation, Object reg3) {
-		// TODO Auto-generated method stub
+        IntConstant iconst2 = (IntConstant) c2;
+		switch(operation) {
+            case BinaryQuad.IADD:   //not supported
+// this kind of MOV is not supported
+//                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, iconst2);
+//                os.writeADD(Register.EBP, disp1, (Register) reg3);
+//                break;
 
+            case BinaryQuad.IAND:   //not supported
+            case BinaryQuad.IDIV:   //needs EAX
+            case BinaryQuad.IMUL:   //needs EAX
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.IOR:
+            case BinaryQuad.IREM:   //needs EAX
+            case BinaryQuad.ISHL:   //needs CL
+            case BinaryQuad.ISHR:   //needs CL
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISUB:   //not supported
+            case BinaryQuad.IUSHR:  //needs CL
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.IXOR:   //not supported
+            case BinaryQuad.DADD:
+            case BinaryQuad.DDIV:
+            case BinaryQuad.DMUL:
+            case BinaryQuad.DREM:
+            case BinaryQuad.DSUB:
+            case BinaryQuad.FADD:
+            case BinaryQuad.FDIV:
+            case BinaryQuad.FMUL:
+            case BinaryQuad.FREM:
+            case BinaryQuad.FSUB:
+            case BinaryQuad.LADD:
+            case BinaryQuad.LAND:
+            case BinaryQuad.LDIV:
+            case BinaryQuad.LMUL:
+            case BinaryQuad.LOR:
+            case BinaryQuad.LREM:
+            case BinaryQuad.LSHL:
+            case BinaryQuad.LSHR:
+            case BinaryQuad.LSUB:
+            case BinaryQuad.LUSHR:
+            case BinaryQuad.LXOR:
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
 	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, org.jnode.vm.compiler.ir.Constant, int, int)
 	 */
 	public void generateBinaryOP(int disp1, Constant c2, int operation, int disp3) {
-		// TODO Auto-generated method stub
-
+        //not supported due to the reason in the previous method
 	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, java.lang.Object, int, org.jnode.vm.compiler.ir.Constant)
 	 */
 	public void generateBinaryOP(int disp1, Object reg2, int operation, Constant c3) {
-		// TODO Auto-generated method stub
+		IntConstant iconst3 = (IntConstant) c3;
+		switch(operation) {
 
+			case BinaryQuad.IADD:
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                os.writeADD(Register.EBP, disp1, iconst3.getValue());
+                break;
+
+            case BinaryQuad.IAND:   //not supported
+            case BinaryQuad.IDIV:   //needs EAX
+            case BinaryQuad.IMUL:   //needs EAX
+            case BinaryQuad.IOR:    //not supported
+            case BinaryQuad.IREM:   //needs EAX
+            case BinaryQuad.ISHL:   //needs CL
+            case BinaryQuad.ISHR:   //needs CL
+            case BinaryQuad.ISUB:   //not supported
+            case BinaryQuad.IUSHR:  //needs CL
+            case BinaryQuad.IXOR:   //not supported
+            case BinaryQuad.DADD:
+            case BinaryQuad.DDIV:
+            case BinaryQuad.DMUL:
+            case BinaryQuad.DREM:
+            case BinaryQuad.DSUB:
+            case BinaryQuad.FADD:
+            case BinaryQuad.FDIV:
+            case BinaryQuad.FMUL:
+            case BinaryQuad.FREM:
+            case BinaryQuad.FSUB:
+            case BinaryQuad.LADD:
+            case BinaryQuad.LAND:
+            case BinaryQuad.LDIV:
+            case BinaryQuad.LMUL:
+            case BinaryQuad.LOR:
+            case BinaryQuad.LREM:
+            case BinaryQuad.LSHL:
+            case BinaryQuad.LSHR:
+            case BinaryQuad.LSUB:
+            case BinaryQuad.LUSHR:
+            case BinaryQuad.LXOR:
+			default:
+				throw new IllegalArgumentException("Unknown operation");
+		}
 	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, java.lang.Object, int, java.lang.Object)
 	 */
 	public void generateBinaryOP(int disp1, Object reg2, int operation, Object reg3) {
-		// TODO Auto-generated method stub
+        switch(operation) {
+            case BinaryQuad.IADD:
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                os.writeADD(Register.EBP, disp1, (Register) reg3);
+                break;
 
+            case BinaryQuad.IAND:
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                os.writeAND(Register.EBP, disp1, (Register) reg3);
+                break;
+
+            case BinaryQuad.IDIV:   //needs EAX
+            case BinaryQuad.IMUL:   //needs EAX
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.IOR:
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                os.writeOR(Register.EBP, disp1, (Register) reg3);
+                break;
+
+            case BinaryQuad.IREM:   //needs EAX
+            case BinaryQuad.ISHL:   //needs CL
+            case BinaryQuad.ISHR:   //needs CL
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.ISUB:
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                os.writeSUB(Register.EBP, disp1, (Register) reg3);
+                break;
+
+            case BinaryQuad.IUSHR:  //needs CL
+                throw new IllegalArgumentException("Unknown operation");
+
+            case BinaryQuad.IXOR:
+                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg2);
+                os.writeXOR(Register.EBP, disp1, (Register) reg3);
+                break;
+
+            case BinaryQuad.DADD:
+            case BinaryQuad.DDIV:
+            case BinaryQuad.DMUL:
+            case BinaryQuad.DREM:
+            case BinaryQuad.DSUB:
+            case BinaryQuad.FADD:
+            case BinaryQuad.FDIV:
+            case BinaryQuad.FMUL:
+            case BinaryQuad.FREM:
+            case BinaryQuad.FSUB:
+            case BinaryQuad.LADD:
+            case BinaryQuad.LAND:
+            case BinaryQuad.LDIV:
+            case BinaryQuad.LMUL:
+            case BinaryQuad.LOR:
+            case BinaryQuad.LREM:
+            case BinaryQuad.LSHL:
+            case BinaryQuad.LSHR:
+            case BinaryQuad.LSUB:
+            case BinaryQuad.LUSHR:
+            case BinaryQuad.LXOR:
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
 	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, java.lang.Object, int, int)
 	 */
 	public void generateBinaryOP(int disp1, Object reg2, int operation, int disp3) {
-		// TODO Auto-generated method stub
+		// not supported
 
 	}
 
@@ -600,23 +1036,154 @@ public class X86CodeGenerator extends CodeGenerator {
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, int, int, org.jnode.vm.compiler.ir.Constant)
 	 */
 	public void generateBinaryOP(int disp1, int disp2, int operation, Constant c3) {
-		// TODO Auto-generated method stub
+        IntConstant iconst3 = (IntConstant) c3;
+        switch(operation) {
 
+            case BinaryQuad.IADD:   //not supported due to the move bellow
+//                if(disp1 != disp2){
+//                    os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, Register.EBP, disp2);
+//                }
+//                os.writeADD(Register.EBP, disp1, iconst3.getValue());
+//                break;
+
+            case BinaryQuad.IAND:   //not supported
+            case BinaryQuad.IDIV:   //needs EAX
+            case BinaryQuad.IMUL:   //needs EAX
+            case BinaryQuad.IOR:    //not supported
+            case BinaryQuad.IREM:   //needs EAX
+            case BinaryQuad.ISHL:   //needs CL
+            case BinaryQuad.ISHR:   //needs CL
+            case BinaryQuad.ISUB:   //not supported
+            case BinaryQuad.IUSHR:  //needs CL
+            case BinaryQuad.IXOR:   //not supported
+            case BinaryQuad.DADD:
+            case BinaryQuad.DDIV:
+            case BinaryQuad.DMUL:
+            case BinaryQuad.DREM:
+            case BinaryQuad.DSUB:
+            case BinaryQuad.FADD:
+            case BinaryQuad.FDIV:
+            case BinaryQuad.FMUL:
+            case BinaryQuad.FREM:
+            case BinaryQuad.FSUB:
+            case BinaryQuad.LADD:
+            case BinaryQuad.LAND:
+            case BinaryQuad.LDIV:
+            case BinaryQuad.LMUL:
+            case BinaryQuad.LOR:
+            case BinaryQuad.LREM:
+            case BinaryQuad.LSHL:
+            case BinaryQuad.LSHR:
+            case BinaryQuad.LSUB:
+            case BinaryQuad.LUSHR:
+            case BinaryQuad.LXOR:
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
 	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, int, int, java.lang.Object)
 	 */
 	public void generateBinaryOP(int disp1, int disp2, int operation, Object reg3) {
-		// TODO Auto-generated method stub
-
+		//not supported for the reason in the previous method
 	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, int, int, int)
 	 */
 	public void generateBinaryOP(int disp1, int disp2, int operation, int disp3) {
-		// TODO Auto-generated method stub
+        switch(operation) {
+            case BinaryQuad.IADD:   //not supported due to the move bellow
+            case BinaryQuad.IAND:   //not supported
+            case BinaryQuad.IDIV:   //needs EAX
+            case BinaryQuad.IMUL:   //needs EAX
+            case BinaryQuad.IOR:    //not supported
+            case BinaryQuad.IREM:   //needs EAX
+            case BinaryQuad.ISHL:   //needs CL
+            case BinaryQuad.ISHR:   //needs CL
+            case BinaryQuad.ISUB:   //not supported
+            case BinaryQuad.IUSHR:  //needs CL
+            case BinaryQuad.IXOR:   //not supported
+                throw new IllegalArgumentException("Unknown operation");
 
+            case BinaryQuad.DADD:
+                os.writeFLD64(Register.EBP, disp2);
+                os.writeFADD64(Register.EBP, disp3);
+                os.writeFSTP64(Register.EBP, disp1);
+                break;
+
+            case BinaryQuad.DDIV:
+                os.writeFLD64(Register.EBP, disp2);
+                os.writeFDIV64(Register.EBP, disp3);
+                os.writeFSTP64(Register.EBP, disp1);
+                break;
+
+            case BinaryQuad.DMUL:
+                os.writeFLD64(Register.EBP, disp2);
+                os.writeFMUL64(Register.EBP, disp3);
+                os.writeFSTP64(Register.EBP, disp1);
+                break;
+
+            case BinaryQuad.DREM:
+                os.writeFLD64(Register.EBP, disp3);
+                os.writeFLD64(Register.EBP, disp2);
+                os.writeFPREM();
+                os.writeFSTP64(Register.EBP, disp1);
+                os.writeFFREE(Register.ST0);
+                break;
+
+            case BinaryQuad.DSUB:
+                os.writeFLD64(Register.EBP, disp2);
+                os.writeFSUB64(Register.EBP, disp3);
+                os.writeFSTP64(Register.EBP, disp1);
+                break;
+
+            case BinaryQuad.FADD:
+                os.writeFLD32(Register.EBP, disp2);
+                os.writeFADD32(Register.EBP, disp3);
+                os.writeFSTP32(Register.EBP, disp1);
+                break;
+
+            case BinaryQuad.FDIV:
+                os.writeFLD32(Register.EBP, disp2);
+                os.writeFADD32(Register.EBP, disp3);
+                os.writeFSTP32(Register.EBP, disp1);
+                break;
+
+            case BinaryQuad.FMUL:
+                os.writeFLD32(Register.EBP, disp2);
+                os.writeFMUL32(Register.EBP, disp3);
+                os.writeFSTP32(Register.EBP, disp1);
+                break;
+
+            case BinaryQuad.FREM:
+                os.writeFLD32(Register.EBP, disp3);
+                os.writeFLD32(Register.EBP, disp2);
+                os.writeFPREM();
+                os.writeFSTP32(Register.EBP, disp1);
+                os.writeFFREE(Register.ST0);
+                break;
+
+            case BinaryQuad.FSUB:
+                os.writeFLD32(Register.EBP, disp2);
+                os.writeFSUB32(Register.EBP, disp3);
+                os.writeFSTP32(Register.EBP, disp1);
+                break;
+
+            case BinaryQuad.LADD:
+            case BinaryQuad.LAND:
+            case BinaryQuad.LDIV:
+            case BinaryQuad.LMUL:
+            case BinaryQuad.LOR:
+            case BinaryQuad.LREM:
+            case BinaryQuad.LSHL:
+            case BinaryQuad.LSHR:
+            case BinaryQuad.LSUB:
+            case BinaryQuad.LUSHR:
+            case BinaryQuad.LXOR:
+            default:
+                throw new IllegalArgumentException("Unknown operation");
+        }
 	}
 }

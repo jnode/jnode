@@ -21,6 +21,8 @@ public class X86RegisterPool extends RegisterPool {
 		registers.add(Register.EBX);
 		registers.add(Register.ECX);
 		registers.add(Register.EDX);
+        //registers.add(Register.ESI);
+        //registers.add(Register.EDI);
 		// not sure what to do with ESI and EDI just yet...
 	}
 
@@ -32,9 +34,15 @@ public class X86RegisterPool extends RegisterPool {
 			return null;
 		}
 		if (type == Operand.FLOAT || type == Operand.DOUBLE) {
-			throw new IllegalArgumentException("floats and double not yet supported");
+			//throw new IllegalArgumentException("floats and double not yet supported");
+            return null;
 		}
-		return registers.remove(registers.size() - 1);
+        int size = registers.size();
+        if(size == 0){
+            return null;
+        }else{
+		    return registers.remove(size - 1);
+        }
 	}
 
 	/* (non-Javadoc)
