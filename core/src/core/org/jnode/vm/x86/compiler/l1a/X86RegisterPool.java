@@ -159,6 +159,7 @@ final class X86RegisterPool extends org.jnode.vm.compiler.ir.RegisterPool {
 			while (inUse.hasNext()) {
 				os.log("Warning: register in use"+inUse.next().toString());
 			}
+			throw new Error("Register(s) in use");
 		}
 		initialize();
 	}

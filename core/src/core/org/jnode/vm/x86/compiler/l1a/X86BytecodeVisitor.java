@@ -223,9 +223,11 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         // check item doesn't already use register
         if (!it.uses(reg)) {
             if (!pool.isFree(reg)) {
-                notImplemented();
                 //TODO: spill register; make sure that the stack items 
                 // and floating items are handled correctly
+                final Item i = (Item)pool.getOwner(reg);
+		i.spill(eContext, reg);
+		assertCondition(pool.isFree(reg));
             }
             pool.request(reg, it);
         }
@@ -352,6 +354,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      */
     public final void visit_anewarray(VmConstClass classRef) {
         vstack.push(eContext);
+	Item count = vstack.popInt();
+	count.release(eContext);
 
         writeResolveAndLoadClassToEAX(classRef, S0);
         helper.writePOP(S0); /* Count */
@@ -372,9 +376,9 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         RefItem i = vstack.popRef();
         requestRegister(EAX, i);
         i.loadTo(eContext, EAX);
+        i.release(eContext);
         
         visit_return();
-        i.release(eContext);
     }
 
     /**
@@ -664,7 +668,6 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         val.release(eContext);
         idx.release(eContext);
         ref.release(eContext);
-        vstack.pushItem(DoubleItem.createStack());
 
         os.writeMOV(INTSIZE, T0, SP, 8); // Index
         os.writeMOV(INTSIZE, S0, SP, 12); // Arrayref
@@ -681,8 +684,6 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      */
     public final void visit_dcmpg() {
         //TODO: port to orp-style
-        vstack.push(eContext);
-
         visit_dfcmp(true, false);
     }
 
@@ -691,8 +692,6 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      */
     public final void visit_dcmpl() {
         //TODO: port to orp-style
-        vstack.push(eContext);
-
         visit_dfcmp(false, false);
     }
 
@@ -1126,6 +1125,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         }
 
         // do not release ref, it is recycled into the result
+	vstack.push(eContext);  // make vstack contiguous
         vstack.pushItem(FloatItem.createStack());
     }
 
@@ -1218,7 +1218,13 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         }
         // End
         os.setObjectRef(endLabel);
-        helper.writePUSH(Register.ECX);
+        //helper.writePUSH(Register.ECX);
+
+	final X86RegisterPool pool = eContext.getPool();
+	pool.request(Register.ECX);  // no check, this won't fail
+	IntItem res = IntItem.createRegister(Register.ECX);
+	pool.transferOwnerTo(Register.ECX, res);
+	vstack.pushItem(res);
     }
 
     /**
@@ -2238,9 +2244,9 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         IntItem v = vstack.popInt();
         requestRegister(EAX, v);
         v.loadTo(eContext, EAX);
+        v.release(eContext);
 
         visit_return();
-        v.release(eContext);
     }
 
     /**
@@ -2343,10 +2349,14 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      */
     public final void visit_iushr() {
         IntItem shift = vstack.popInt();
-        requestRegister(ECX, shift);
+
+        if (shift.getKind() != Item.CONSTANT) {
+            requestRegister(ECX, shift);
+            shift.loadTo(eContext, ECX);
+	}
+
         IntItem value = vstack.popInt();
 
-        shift.loadToIf(eContext, ~Item.CONSTANT, ECX);
         value.load(eContext);
 
         Register v = value.getRegister();
@@ -2504,8 +2514,10 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     public final void visit_lastore() {
         //TODO: port to orp-style
         vstack.push(eContext);
+	Item val = vstack.popItem(Item.LONG);
         IntItem idx = vstack.popInt();
         RefItem ref = vstack.popRef();
+	val.release(eContext);
         idx.release(eContext);
         ref.release(eContext);
 
@@ -2691,6 +2703,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         //BootLog.debug("lookupswitch length=" + n);
 
         IntItem key = vstack.popInt();
+	key.load(eContext);
         Register r = key.getRegister();
         // Conservative assumption, flush stack
         vstack.push(eContext);
@@ -2856,8 +2869,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     public final void visit_lushr() {
         //TODO: port to orp-style
         vstack.push(eContext);
-        Item v2 = vstack.popItem(Item.LONG);
-        Item v1 = vstack.popItem(Item.LONG);
+        Item v2 = vstack.popItem(Item.INT);    // shift
+        Item v1 = vstack.popItem(Item.LONG);   // value
         v2.release(eContext);
         v1.release(eContext);
         vstack.pushItem(LongItem.createStack());

@@ -129,6 +129,13 @@ final class FloatItem extends Item implements X86CompilerConstants  {
 		}
 	}
 
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#spill(EmitterContext, Register)
+	 */
+	void spill(EmitterContext ec, Register reg) {
+		notImplemented();
+	}
+
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
 	 */
