@@ -22,7 +22,11 @@
 package org.jnode.fs.command;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.PrintStream;
 
+import org.jnode.shell.Command;
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.FileArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -34,35 +38,39 @@ import org.jnode.shell.help.ParsedArguments;
  * TODO if file exist change modified date
  * 
  * @author Yves Galante (yves.galante@jmob.net)
+ * @author Andreas H\u00e4nel
  */
-public class TouchCommand {
+public class TouchCommand implements Command{
 
     static final FileArgument ARG_TOUCH = new FileArgument("file",
             "the file to touch");
 
     public static Help.Info HELP_INFO = new Help.Info("touch",
-            "the file to touch", new Parameter[] { new Parameter(ARG_TOUCH,
+            "touch a file", new Parameter[] { new Parameter(ARG_TOUCH,
                     Parameter.MANDATORY)});
 
     public static void main(String[] args) throws Exception {
-
-        final ParsedArguments cmdLine = HELP_INFO.parse(args);
-        final File file = ARG_TOUCH.getFile(cmdLine);
-        final File parentFile = file.getParentFile();
+    	new TouchCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+    }
+    
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
+    	ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+        File file = ARG_TOUCH.getFile(cmdLine);
+         File parentFile = file.getParentFile();
 
         if (!file.exists()) {
             if (parentFile!=null && !parentFile.exists()) {
                 if (!parentFile.mkdirs()) {
-                    System.err.println("Parent dirs can't create");
+                    err.println("Parent dirs can't create");
                 }
             }
             if (file.createNewFile()) {
-                System.out.println("File created");
+                out.println("File created");
             } else {
-                System.err.println("File can't create");
+                err.println("File can't create");
             }
         } else {
-            System.out.println("File already exist");
+            out.println("File already exist");
         }
     }
 }

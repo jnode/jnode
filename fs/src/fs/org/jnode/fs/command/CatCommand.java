@@ -23,9 +23,12 @@ package org.jnode.fs.command;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.jnode.shell.Command;
+import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -34,8 +37,9 @@ import org.jnode.shell.help.FileArgument;
 
 /**
  * @author epr
+ * @author Andreas H\u00e4nel
  */
-public class CatCommand {
+public class CatCommand implements Command{
 
     static final Argument ARG_FILE = new FileArgument("file",
             "the file (or URL) to print out");
@@ -45,23 +49,27 @@ public class CatCommand {
             new Parameter[] { new Parameter(ARG_FILE, Parameter.MANDATORY)});
 
     public static void main(String[] args) throws Exception {
-        final ParsedArguments cmdLine = HELP_INFO.parse(args);
-        final URL url = openURL(ARG_FILE.getValue(cmdLine));
-        final InputStream is = url.openStream();
+    	new CatCommand().execute(new CommandLine(args), System.in, System.out, System.err);
+    }
+    
+    public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
+    	ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+        URL url = openURL(ARG_FILE.getValue(cmdLine));
+        InputStream is = url.openStream();
         if (is == null) {
-            System.err.println("Not found " + ARG_FILE.getValue(cmdLine));
+            err.println("Not found " + ARG_FILE.getValue(cmdLine));
         } else {
             int len;
             final byte[] buf = new byte[ 1024];
             while ((len = is.read(buf)) > 0) {
-                System.out.write(buf, 0, len);
+               out.write(buf, 0, len);
             }
-            System.out.flush();
+            out.flush();
             is.close();
         }
     }
 
-    private static URL openURL(String fname) throws MalformedURLException {
+    private URL openURL(String fname) throws MalformedURLException {
         try {
             return new URL(fname);
         } catch (MalformedURLException ex) {
