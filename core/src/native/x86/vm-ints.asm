@@ -15,8 +15,7 @@
 %define FXSAVECOUNTER		dword[fs:VmX86Processor_FXSAVECOUNTER_OFS]
 %define FXRESTORECOUNTER	dword[fs:VmX86Processor_FXRESTORECOUNTER_OFS]
 
-;deadLockCounter				dd 0
-currentTimeMillisStaticsIdx	dd -1
+currentTimeMillisStaticsIdx	DA -1
 	
 ; -----------------------------------------------
 ; Low level Yield Point Handler
@@ -29,7 +28,7 @@ stub_yieldPointHandler:
 	push dword 0		; INTNO (not relevant)
 	push dword 0		; Handler (not relevant)
 	int_entry
-	mov ebp,esp
+	mov ABP,ASP
 	call yieldPointHandler
 	int_exit
 	
@@ -40,15 +39,15 @@ stub_yieldPointHandler:
 ; Save a register
 ; Usage: SAVEREG VmX86Thread-offset, ebp-offset
 %macro SAVEREG 2
-	mov ecx,[ebp+%2]
-	mov [edi+%1],ecx
+	mov ACX,[ABP+%2]
+	mov [ADI+%1],ACX
 %endmacro
 
 ; Restore a register
 ; Usage: RESTOREREG VmX86Thread-offset, ebp-offset
 %macro RESTOREREG 2
-	mov ecx,[edi+%1]
-	mov [ebp+%2],ecx
+	mov ACX,[ADI+%1]
+	mov [ABP+%2],ACX
 %endmacro
 
 yieldPointHandler_kernelCode:
@@ -56,7 +55,7 @@ yieldPointHandler_kernelCode:
 	jmp int_die
 	
 yieldPointHandler:
-	cmp dword [ebp+OLD_CS],USER_CS
+	cmp GET_OLD_CS,USER_CS
 	jne yieldPointHandler_kernelCode
 	; Mark switch active
 	or THREADSWITCHINDICATOR,VmProcessor_TSI_SWITCH_ACTIVE
@@ -67,16 +66,16 @@ yieldPointHandler:
 	; save the registers and call VmScheduler.reschedule
 yieldPointHandler_reschedule:
 	; Actually call VmScheduler.reschedule (in kernel mode!)
-	push ebp
-	xor ebp,ebp						; Make java stacktraces terminate
+	push ABP
+	xor ABP,ABP						; Make java stacktraces terminate
 	mov STACKEND,KERNEL_STACKEND	; Set kernel stack end for correct stackoverflow tests
-	mov eax,VmProcessor_reschedule	; Load reschedule method
+	mov AAX,VmProcessor_reschedule	; Load reschedule method
 	push dword vmCurProcessor		; this
 	INVOKE_JAVA_METHOD
-	pop ebp
+	pop ABP
 	; Now save the current thread state
-	mov edi,CURRENTTHREAD
-	cmp edi,NEXTTHREAD
+	mov ADI,CURRENTTHREAD
+	cmp ADI,NEXTTHREAD
 	je near yieldPointHandler_done
 	SAVEREG VmX86Thread_EAX_OFS, OLD_EAX
 	SAVEREG VmX86Thread_EBX_OFS, OLD_EBX
@@ -92,24 +91,24 @@ yieldPointHandler_reschedule:
 	; Save FPU / XMM state
 yieldPointHandler_fxSave:
 	; Is the FX used since the last thread switch?
-	test dword [edi+VmX86Thread_FXFLAGS_OFS],VmX86Thread_FXF_USED
+	test dword [ADI+VmX86Thread_FXFLAGS_OFS],VmX86Thread_FXF_USED
 	jz yieldPointHandler_restore	; No... do not save anything
 	; Increment counter
 	inc FXSAVECOUNTER
 	; Clear FXF_USED flag
-	and dword [edi+VmX86Thread_FXFLAGS_OFS],~VmX86Thread_FXF_USED
+	and dword [ADI+VmX86Thread_FXFLAGS_OFS],~VmX86Thread_FXF_USED
 	; Load fxStatePtr	
 yieldPointHandler_loadFxStatePtr:
-	mov ebx, [edi+VmX86Thread_FXSTATEPTR_OFS]
-	test ebx,ebx
+	mov ABX, [ADI+VmX86Thread_FXSTATEPTR_OFS]
+	test ABX,ABX
 	jz yieldPointHandler_fxSaveInit
 	; We have a valid fxState address in ebx
 	test dword [cpu_features],FEAT_FXSR
 	jz yieldPointHandler_fpuSave
-	fxsave [ebx]
+	fxsave [ABX]
 	jmp yieldPointHandler_restore
 yieldPointHandler_fpuSave:
-	fnsave [ebx]
+	fnsave [ABX]
 	jmp yieldPointHandler_restore
 
 yieldPointHandler_fxSaveInit:
@@ -118,7 +117,7 @@ yieldPointHandler_fxSaveInit:
 
 	; Restore the next thread
 yieldPointHandler_restore:
-	mov edi,NEXTTHREAD
+	mov ADI,NEXTTHREAD
 	RESTOREREG VmX86Thread_EAX_OFS, OLD_EAX
 	RESTOREREG VmX86Thread_EBX_OFS, OLD_EBX
 	RESTOREREG VmX86Thread_ECX_OFS, OLD_ECX
@@ -132,21 +131,21 @@ yieldPointHandler_restore:
 	
 	; Restore FPU / XMM state is delayed until actual use
 	; We do set the CR0.TS flag.
-	mov eax,cr0
-	or eax,CR0_TS
-	mov cr0,eax
+	mov AAX,cr0
+	or AAX,CR0_TS
+	mov cr0,AAX
 	
 	; Fix old stack overflows
 yieldPointHandler_fixOldStackOverflow:
-	mov ecx,[edi+VmThread_STACKOVERFLOW_OFS]
+	mov ecx,[ADI+VmThread_STACKOVERFLOW_OFS]
 	test ecx,ecx
 	jnz yieldPointHandler_fixStackOverflow
 yieldPointHandler_afterStackOverflow:
 	; Set the new thread parameters
-	mov CURRENTTHREAD,edi
+	mov CURRENTTHREAD,ADI
 	; Reload stackend
-	mov ebx,[edi+VmThread_STACKEND_OFS]
-	mov STACKEND,ebx
+	mov ABX,[ADI+VmThread_STACKEND_OFS]
+	mov STACKEND,ABX
 yieldPointHandler_done:
 	and THREADSWITCHINDICATOR,~VmProcessor_TSI_SWITCH_ACTIVE
 	ret
@@ -155,23 +154,23 @@ yieldPointHandler_done:
 ; EDI contains reference the VmThread
 yieldPointHandler_fixStackOverflow:
 	; Is the stack overflow resolved?
-	mov ecx,[edi+VmThread_STACKEND_OFS]
-	add ecx,VmThread_STACK_OVERFLOW_LIMIT
+	mov ACX,[ADI+VmThread_STACKEND_OFS]
+	add ACX,VmThread_STACK_OVERFLOW_LIMIT
 	; Is current ESP not beyond limit anymore
-	cmp dword [edi+VmX86Thread_ESP_OFS],ecx
+	cmp [ADI+VmX86Thread_ESP_OFS],ACX
 	jle yieldPointHandler_afterStackOverflow		; No still below limit
 	; Reset stackoverflow flag
-	mov [edi+VmThread_STACKEND_OFS],ecx
-	mov dword [edi+VmThread_STACKOVERFLOW_OFS],0
+	mov [ADI+VmThread_STACKEND_OFS],ACX
+	mov dword [ADI+VmThread_STACKOVERFLOW_OFS],0
 	jmp yieldPointHandler_afterStackOverflow
 
 ; Set the fxStatePtr in the thread given in edi.
 ; The fxStatePtr must be 16-byte aligned
 fixFxStatePtr:
-	mov ebx,[edi+VmX86Thread_FXSTATE_OFS]
-	add ebx,(VmArray_DATA_OFFSET*4) + 15
-	and ebx,~0xF;
-	mov [edi+VmX86Thread_FXSTATEPTR_OFS],ebx
+	mov ABX,[ADI+VmX86Thread_FXSTATE_OFS]
+	add ABX,(VmArray_DATA_OFFSET*SLOT_SIZE) + 15
+	and ABX,~0xF;
+	mov [ADI+VmX86Thread_FXSTATEPTR_OFS],ABX
 	ret	
 	
 ; -----------------------------------------------
@@ -184,23 +183,23 @@ fixFxStatePtr:
 int_dev_na:
 	; Increment counter
 	inc DEVICENACOUNTER
-	mov edi,CURRENTTHREAD
+	mov ADI,CURRENTTHREAD
 	; Mark FX as being used since last thread switch
-	or dword [edi+VmX86Thread_FXFLAGS_OFS],VmX86Thread_FXF_USED;
+	or dword [ADI+VmX86Thread_FXFLAGS_OFS],VmX86Thread_FXF_USED;
 	; Clear CR0.TS
 	clts
 	; Restore fx state (if any)
-	mov ebx, [edi+VmX86Thread_FXSTATEPTR_OFS]
-	test ebx,ebx
+	mov ABX, [ADI+VmX86Thread_FXSTATEPTR_OFS]
+	test ABX,ABX
 	jz int_dev_na_ret		; No valid fxStatePtr yet, do not restore
 	; Increment counter
 	inc FXRESTORECOUNTER
 	test dword [cpu_features],FEAT_FXSR
 	jz int_dev_na_fpuRestore
-	fxrstor [ebx]
+	fxrstor [ABX]
 	ret
 int_dev_na_fpuRestore:
-	frstor [ebx]
+	frstor [ABX]
 int_dev_na_ret:
 	ret
 
@@ -209,12 +208,17 @@ int_dev_na_ret:
 ; Handle a timer interrupt
 ; -----------------------------------------------
 timer_handler:
-	mov edi,[fs:VmProcessor_STATICSTABLE_OFS]
-	mov eax,[currentTimeMillisStaticsIdx]
-	lea edi,[edi+eax*4+(VmArray_DATA_OFFSET*4)]
+	mov ADI,[fs:VmProcessor_STATICSTABLE_OFS]
+	mov AAX,[currentTimeMillisStaticsIdx]
+	lea ADI,[ADI+AAX*4+(VmArray_DATA_OFFSET*SLOT_SIZE)]
+%ifdef BITS32	
 	inc dword [edi+0]
 	adc dword [edi+4],0
 	test dword [edi+0],0x07
+%else
+	inc qword [rdi+0]
+	test qword [rdi+0],0x07
+%endif	
 	jnz timer_ret
 	; Set a thread switch needed indicator
 	or THREADSWITCHINDICATOR, VmProcessor_TSI_SWITCH_NEEDED
@@ -227,8 +231,8 @@ timer_ret:
 	ret
 	
 timer_deadlock:
-	mov eax,dword [jnodeFinished]
-	test eax,eax
+	mov AAX,WORD [jnodeFinished]
+	test AAX,AAX
 	jnz timer_ret
 	PRINT_STR deadLock_msg
 	jmp int_die
@@ -237,12 +241,12 @@ timer_deadlock:
 ; Handle an IRQ interrupt
 ; -----------------------------------------------
 def_irq_handler:
-	cmp dword [ebp+OLD_CS],USER_CS
+	cmp GET_OLD_CS,USER_CS
 	jne def_irq_kernel
 	; Increment the appropriate IRQ counter and set threadSwitch indicator.
-	mov eax,[ebp+INTNO]
-	mov edi,dword [fs:VmX86Processor_IRQCOUNT_OFS]
-	inc dword [edi+(VmArray_DATA_OFFSET*4)+eax*4]
+	mov AAX,[ABP+INTNO]
+	mov ADI,WORD [fs:VmX86Processor_IRQCOUNT_OFS]
+	inc dword [ADI+(VmArray_DATA_OFFSET*SLOT_SIZE)+AAX*4]
 	; Set thread switch indicator
 	or THREADSWITCHINDICATOR, VmProcessor_TSI_SWITCH_NEEDED
 	; Done
@@ -264,7 +268,7 @@ int_system_exception:
 	jz near int_die
 	;jmp int_die
 	; Save the exception state
-	mov edi,CURRENTTHREAD
+	mov ADI,CURRENTTHREAD
 	SAVEREG VmX86Thread_EXEAX_OFS, OLD_EAX
 	SAVEREG VmX86Thread_EXEBX_OFS, OLD_EBX
 	SAVEREG VmX86Thread_EXECX_OFS, OLD_ECX
@@ -275,26 +279,26 @@ int_system_exception:
 	SAVEREG VmX86Thread_EXESP_OFS, OLD_ESP
 	SAVEREG VmX86Thread_EXEIP_OFS, OLD_EIP
 	SAVEREG VmX86Thread_EXEFLAGS_OFS, OLD_EFLAGS
-	mov ecx,cr2
-	mov [edi+VmX86Thread_EXCR2_OFS],ecx
+	mov ACX,cr2
+	mov [ADI+VmX86Thread_EXCR2_OFS],ACX
 	
 	; Setup the user stack to add a return address to the current EIP
 	; and change the current EIP to doSystemException, which will 
 	; save the registers and call SoftByteCodes.systemException
-	mov edi,[ebp+OLD_ESP]
-	lea edi,[edi-4]
-	mov [ebp+OLD_EAX],eax ; Exception number
-	mov [ebp+OLD_EBX],ebx ; Address
-	mov eax,[ebp+OLD_EIP]
-	mov [edi+0],eax
-	mov [ebp+OLD_ESP],edi
-	mov dword [ebp+OLD_EIP],doSystemException
+	mov ADI,[ABP+OLD_ESP]
+	lea ADI,[ADI-SLOT_SIZE]
+	mov [ABP+OLD_EAX],AAX		; Exception number
+	mov [ABP+OLD_EBX],ABX		; Address
+	mov AAX,[ABP+OLD_EIP]
+	mov [ADI+0],AAX
+	mov [ABP+OLD_ESP],ADI
+	mov WORD [ABP+OLD_EIP],doSystemException
 	ret
 	
 doSystemException:	
-	push eax ; Exception number
-	push ebx ; Address
-	mov eax,SoftByteCodes_systemException
+	push AAX ; Exception number
+	push ABX ; Address
+	mov AAX,SoftByteCodes_systemException
 	INVOKE_JAVA_METHOD
 	jmp vm_athrow
 	
@@ -302,22 +306,22 @@ doSystemException:
 ; Handle a stackoverflow
 ; -----------------------------------------------
 int_stack_overflow:
-	cmp dword [ebp+OLD_CS],USER_CS
+	cmp GET_OLD_CS,USER_CS
 	jne doFatal_stack_overflow
-	mov eax,CURRENTTHREAD
-	mov ecx,[eax+VmThread_STACKOVERFLOW_OFS]
+	mov AAX,CURRENTTHREAD
+	mov ecx,[AAX+VmThread_STACKOVERFLOW_OFS]
 	jecxz int_stack_first_overflow
 	jmp doFatal_stack_overflow
 		
 int_stack_first_overflow:
-	inc dword [eax+VmThread_STACKOVERFLOW_OFS]
+	inc dword [AAX+VmThread_STACKOVERFLOW_OFS]
 	; Remove the stackoverflow limit
-	mov edx,[eax+VmThread_STACKEND_OFS]
-	sub edx,VmThread_STACK_OVERFLOW_LIMIT
-	mov [eax+VmThread_STACKEND_OFS],edx
-	mov STACKEND,edx
-	mov eax,SoftByteCodes_EX_STACKOVERFLOW
-	mov dword [ebp+OLD_EIP],doSystemException
+	mov ADX,[AAX+VmThread_STACKEND_OFS]
+	sub ADX,VmThread_STACK_OVERFLOW_LIMIT
+	mov [AAX+VmThread_STACKEND_OFS],ADX
+	mov STACKEND,ADX
+	mov AAX,SoftByteCodes_EX_STACKOVERFLOW
+	mov WORD [ABP+OLD_EIP],doSystemException
 	jmp int_system_exception
 	
 doFatal_stack_overflow:

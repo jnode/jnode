@@ -53,18 +53,18 @@ ap_boot32_ltss:
 	align 4
 ap_gdtbase48:		
 	dw (gdtend-gdtstart)-1
-	dd gdtstart
+	DA gdtstart
 
 	align 4
 ap_idtbase48:
 	dw 0
-	dd 0
+	DA 0
 
 	align 4
 ap_gdtbase:
 	dw (gdtend-gdtstart)-1
 ap_gdt_ptr:
-	dd 0
+	DA 0
 	
 	bits 32
 ap_boot_end:	

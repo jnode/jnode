@@ -65,61 +65,61 @@ Q53org5jnode2vm3x869UnsafeX8623getAPBootCodeSize2e2829I:
 
 ; void setupBootCode(Address memory, int[] gdtBase, int[] tss);
 Q53org5jnode2vm3x869UnsafeX8623setupBootCode2e28Lorg2fvmmagic2funboxed2fAddress3b5bI5bI29V:
-	push ebx
+	push ABX
 	
-	mov eax,[esp+16]		; memory
-	mov edx,[esp+12]		; gdt
-	mov ebx,[esp+8]			; tss
+	mov AAX,[ASP+(4*SLOT_SIZE)]		; memory
+	mov ADX,[ASP+(3*SLOT_SIZE)]		; gdt
+	mov ABX,[ASP+(2*SLOT_SIZE)]		; tss
 
-	push esi
-	push edi
-	push ecx
+	push ASI
+	push ADI
+	push ACX
 	cld
 
 	; Copy memory
-	mov ecx,ap_boot_end-ap_boot		; length
-	mov edi,eax						; memory is destination
-	mov esi,ap_boot					; ap_boot code is source
+	mov ACX,ap_boot_end-ap_boot		; length
+	mov ADI,AAX						; memory is destination
+	mov ASI,ap_boot					; ap_boot code is source
 	rep movsb						; copy...
 	
 	; Patch JUMP 16 to 32 address
-	lea edi,[eax+(ap_boot16_jmp-ap_boot)+2]	; Opcode JMP (66EAxxxxxxxx0800)
-	lea ecx,[eax+(ap_boot32-ap_boot)]
-	mov [edi],ecx
+	lea ADI,[AAX+(ap_boot16_jmp-ap_boot)+2]	; Opcode JMP (66EAxxxxxxxx0800)
+	lea ACX,[AAX+(ap_boot32-ap_boot)]
+	mov [ADI],ecx
 	
 	; Patch ap_gdt_ptr address
-	lea edi,[eax+(ap_gdt_ptr-ap_boot)]
-	lea ecx,[edx+VmArray_DATA_OFFSET*4]
-	mov [edi],ecx
+	lea ADI,[AAX+(ap_gdt_ptr-ap_boot)]
+	lea ACX,[ADX+VmArray_DATA_OFFSET*4]
+	mov [ADI],ACX
 
 	; Patch ap_boot32_lgdt
-	lea edi,[eax+(ap_boot32_lgdt-ap_boot)+3] ; Opcode LGDT (0F0115xxxxxxxx)
-	lea ecx,[eax+(ap_gdtbase-ap_boot)]
-	mov [edi],ecx
+	lea ADI,[AAX+(ap_boot32_lgdt-ap_boot)+3] ; Opcode LGDT (0F0115xxxxxxxx)
+	lea ACX,[AAX+(ap_gdtbase-ap_boot)]
+	mov [ADI],ecx
 
 	; Patch ap_boot32_ltss
-	lea edi,[eax+(ap_boot32_ltss-ap_boot)+1]	; Opcode MOV ebx,v (BBxxxxxxxx)
-	lea ecx,[ebx+VmArray_DATA_OFFSET*4]
-	mov [edi],ecx
+	lea ADI,[AAX+(ap_boot32_ltss-ap_boot)+1]	; Opcode MOV ebx,v (BBxxxxxxxx)
+	lea ACX,[ABX+VmArray_DATA_OFFSET*4]
+	mov [ADI],ecx
 	
 	; Set the Warm boot address in the BIOS data area
 	SYSCALL SC_DISABLE_PAGING	; We need to access page 0
-	mov ecx,eax					; Memory offset
-	and ecx,0xf
+	mov ACX,AAX					; Memory offset
+	and ACX,0xf
 	mov word [0x467],cx			
-	mov ecx,eax					; Memory segment
+	mov ACX,AAX					; Memory segment
 	shr ecx,4
 	mov word [0x469],cx			
 	SYSCALL SC_ENABLE_PAGING	; Restore paging
 	; Write 0xA to CMOS address 0xF: "Jump to DWORD ..." 
 	CMOS_WRITE 0x0F, 0x0A
 
-	pop ecx
-	pop edi
-	pop esi
-	pop ebx
+	pop ACX
+	pop ADI
+	pop ASI
+	pop ABX
 
-	ret 8
+	ret SLOT_SIZE*3
 
 
 	
