@@ -19,6 +19,7 @@ import org.jnode.driver.DriverException;
 import org.jnode.driver.pci.PCIDevice;
 import org.jnode.driver.pci.PCI_IDs;
 import org.jnode.driver.video.FrameBufferConfiguration;
+import org.jnode.driver.video.HardwareCursorAPI;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.util.AbstractSurface;
 import org.jnode.naming.InitialNaming;
@@ -33,7 +34,7 @@ import org.jnode.vm.Address;
 /**
  * @author epr
  */
-public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_IDs {
+public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_IDs, HardwareCursorAPI {
 
 	/** My logger */
 	private final Logger log = Logger.getLogger(getClass());
@@ -60,6 +61,10 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	private boolean fifoDirty = false;
 	private BitmapGraphics bitmapGraphics;
 	private ColorModel model;
+	private static final int MOUSE_ID = 1;
+	private int curX;
+	private int curY;
+	private boolean curVisible;
 
 	/**
 	 * Create a new instance
@@ -158,6 +163,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 		setMode(w, h, config.getColorModel());
 		fillRect(0, 0, w, h, 0, PAINT_MODE);
 		//dumpState(); // For debugging purposes
+		defineCursor();
 	}
 
 	/**
@@ -245,15 +251,6 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 		writeWordToFIFO(y);
 		writeWordToFIFO(width);
 		writeWordToFIFO(height);
-	}
-
-	/**
-	 * Enable/Disable the cursor.
-	 * 
-	 * @param enable
-	 */
-	public final void setCursorEnabled(boolean enable) {
-		setReg32(SVGA_REG_CURSOR_ON, (enable) ? 1 : 0);
 	}
 
 	/**
@@ -377,16 +374,17 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	protected final void drawPixel(int x, int y, int color, int mode) {
 		bitmapGraphics.drawPixels(x, y, 1, color, mode);
 		/*
-		 * if ((x >= 0) && (x < width) && (y > = 0) && (y < height)) { y; final int ofs; if (mode ==
-		 * Surface.XOR_MODE) { switch (bitsPerPixel) { case 8 : ofs = ofsY + x;
-		 * videoRam.xorByte(ofs, (byte) color, 1); break; case 16 : ofs = ofsY + (x << 1);
-		 * videoRam.xorShort(ofs, (short) color, 1); break; case 24 : 3); videoRam.xorShort(ofs,
-		 * (short) (color & 0xFFFF), 1); videoRam.xorByte(ofs + 2, (byte) ((color >> 16) & 0xFF),
-		 * 1); break; case 32 : ofs = ofsY + (x << 2); videoRam.xorInt(ofs, color, 1); break;
-		 * default : throw new RuntimeException("Unknown bitsPerPixel"); } } else { switch
-		 * (bitsPerPixel) { case 8 : ofs = ofsY + x; videoRam.setByte(ofs, (byte) color); break;
-		 * case 16 : ofs = ofsY + (x << 1); videoRam.setShort(ofs, (short) color); break; case 24 :
-		 * 3); videoRam.setShort(ofs, (short) (color & 0xFFFF)); videoRam.setByte(ofs + 2, (byte)
+		 * if ((x >= 0) && (x < width) && (y > = 0) && (y
+		 * < height)) { y; final int ofs; if (mode == Surface.XOR_MODE) { switch (bitsPerPixel) {
+		 * case 8 : ofs = ofsY + x; videoRam.xorByte(ofs, (byte) color, 1); break; case 16 : ofs =
+		 * ofsY + (x << 1); videoRam.xorShort(ofs, (short) color, 1); break; case 24 : 3);
+		 * videoRam.xorShort(ofs, (short) (color & 0xFFFF), 1); videoRam.xorByte(ofs + 2, (byte)
+		 * ((color >> 16) & 0xFF), 1); break; case 32 : ofs = ofsY + (x
+		 * << 2); videoRam.xorInt(ofs, color, 1); break; default : throw new
+		 * RuntimeException("Unknown bitsPerPixel"); } } else { switch (bitsPerPixel) { case 8 :
+		 * ofs = ofsY + x; videoRam.setByte(ofs, (byte) color); break; case 16 : ofs = ofsY + (x
+		 * << 1); videoRam.setShort(ofs, (short) color); break; case 24 : 3);
+		 * videoRam.setShort(ofs, (short) (color & 0xFFFF)); videoRam.setByte(ofs + 2, (byte)
 		 * ((color >> 16) & 0xFF)); break; case 32 : ofs = ofsY + (x << 2); videoRam.setInt(ofs,
 		 * color); break; default : throw new RuntimeException("Unknown bitsPerPixel"); } }
 		 */
@@ -690,6 +688,77 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	 */
 	public ColorModel getColorModel() {
 		return model;
+	}
+
+	/**
+	 * @see org.jnode.driver.video.HardwareCursorAPI#setCursorPosition(int, int)
+	 */
+	public synchronized void setCursorPosition(int x, int y) {
+		this.curX = x;
+		this.curY = y;
+		setCursor(curVisible, curX, curY);
+	}
+
+	/**
+	 * @see org.jnode.driver.video.HardwareCursorAPI#setCursorVisible(boolean)
+	 */
+	public synchronized void setCursorVisible(boolean visible) {
+		this.curVisible = visible;
+		setCursor(curVisible, curX, curY);
+	}
+
+	private void defineCursor() {
+		// Wait for the FIFO
+		syncFIFO();
+
+		// Command
+		writeWordToFIFO(SVGA_CMD_DEFINE_CURSOR);
+		// Mouse id
+		writeWordToFIFO(MOUSE_ID);
+		// Hotspot X
+		writeWordToFIFO(0);
+		// Hotspot Y
+		writeWordToFIFO(0);
+		// Width
+		writeWordToFIFO(2);
+		// Height
+		writeWordToFIFO(2);
+		// Depth for AND mask
+		writeWordToFIFO(1);
+		// Depth for XOR mask
+		writeWordToFIFO(1);
+		// Scanlines for AND mask
+		for (int i = 0; i < 4; i++) {
+			writeWordToFIFO(0);
+		}
+		// Scanlines for XOR mask
+		for (int i = 0; i < 4; i++) {
+			writeWordToFIFO(0xFFFFFF);
+		}
+		syncFIFO();
+		setCursor(false, 0, 0);
+	}
+
+	private void setCursor(boolean visible, int x, int y) {
+		setReg32(SVGA_REG_CURSOR_ID, MOUSE_ID);
+		if (visible) {
+			if (hasCapability(SVGA_CAP_CURSOR_BYPASS)) {
+				//System.out.println("bypass " + x + ", " + y);
+				setReg32(SVGA_REG_CURSOR_X, x);
+				setReg32(SVGA_REG_CURSOR_Y, y);
+			} else {
+				//System.out.println("move " + x + ", " + y);
+				syncFIFO();
+				writeWordToFIFO(SVGA_CMD_MOVE_CURSOR);
+				writeWordToFIFO(x);
+				writeWordToFIFO(y);
+			}
+		}
+		setReg32(SVGA_REG_CURSOR_ON, visible ? 1 : 0);
+	}
+
+	private final boolean hasCapability(int cap) {
+		return ((this.capabilities & cap) == cap);
 	}
 
 }
