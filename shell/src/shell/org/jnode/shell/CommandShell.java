@@ -560,7 +560,7 @@ class Line
     private int posOnCurrentLine = 0;    
 
     /** Contains the current line * */
-    private String currentLine = "";
+    private StringBuffer currentLine = new StringBuffer(80);
     
     private boolean shortened = true;
     private int oldLength = 0;
@@ -575,13 +575,14 @@ class Line
     
     public String getContent()
     {
-    	return currentLine;
+    	return currentLine.toString();
     }
     
     public void setContent(String content)
     {
     	startModif();
-    	currentLine = content;
+    	currentLine.setLength(0);
+    	currentLine.append(content);
     	moveEnd();
     	endModif();
     }
@@ -616,13 +617,9 @@ class Line
     
     public boolean backspace()
     {
-        if (currentLine.length() != 0 && posOnCurrentLine > 0) {
-        	startModif();
-            posOnCurrentLine--;
-            currentLine = currentLine.substring(0, posOnCurrentLine)
-                    + currentLine.substring(posOnCurrentLine + 1,
-                            currentLine.length());
-        	endModif();
+        if (posOnCurrentLine > 0) {
+        	moveLeft();
+        	delete();
             return true;
         }    	
         return false;
@@ -630,14 +627,10 @@ class Line
     
     public void delete()
     {
-    	startModif();
-        if (posOnCurrentLine == 0 && currentLine.length() > 0) {
-            currentLine = currentLine.substring(1);
-        	endModif();
-        } else if (posOnCurrentLine < currentLine.length()) {
-            currentLine = currentLine.substring(0, posOnCurrentLine)
-                    + currentLine.substring(posOnCurrentLine + 1,
-                            currentLine.length());
+        if ((posOnCurrentLine >= 0) && (posOnCurrentLine < currentLine.length())) 
+        {
+        	startModif();
+            currentLine.deleteCharAt(posOnCurrentLine);
             endModif();
         }    	
     }
@@ -652,17 +645,15 @@ class Line
                     posOnCurrentLine)); 
             if(info.getCompleted() != null)
             {
-	            currentLine = info.getCompleted() + ending;
-				setContent(currentLine);
+				setContent(info.getCompleted() + ending);
 	            posOnCurrentLine = currentLine.length() - ending.length();
 				completed = true;	            
 	        }
         } else {
-        	info = shell.complete(currentLine);
+        	info = shell.complete(currentLine.toString());
         	if(info.getCompleted() != null)
         	{ 
-	            currentLine = info.getCompleted();
-				setContent(currentLine);
+				setContent(info.getCompleted());
 	            posOnCurrentLine = currentLine.length();
 				completed = true;	            
 			}
@@ -675,11 +666,9 @@ class Line
     {
     	startModif();
         if (posOnCurrentLine == currentLine.length()) {
-            currentLine += c;
+            currentLine.append(c);
         } else {
-            currentLine = currentLine.substring(0, posOnCurrentLine)
-                    + c
-                    + currentLine.substring(posOnCurrentLine);
+            currentLine.insert(posOnCurrentLine, c);
         }
         posOnCurrentLine++;    	
     	endModif();
