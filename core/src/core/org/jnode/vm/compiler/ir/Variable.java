@@ -96,7 +96,7 @@ public abstract class Variable extends Operand implements Cloneable {
 		}
 		// Add one so this live range starts just after this operation.
 		// This way live range interference computation is simplified.
-		return this.assignQuad.getAddress() + 1;
+		return this.assignQuad.getLHSLiveAddress();
 	}
 
 	/**

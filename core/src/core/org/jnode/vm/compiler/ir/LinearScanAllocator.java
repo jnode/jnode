@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import org.jnode.util.BootableArrayList;
+import org.jnode.util.BootableHashMap;
 
 /**
  * @author Madhu Siddalingaiah
@@ -15,22 +16,17 @@ import org.jnode.util.BootableArrayList;
  */
 public class LinearScanAllocator {
 	private LiveRange[] liveRanges;
-	private int availableRegisters;
 	private BootableArrayList active;
-	private BootableArrayList registerPool;
+	private RegisterPool registerPool;
 	private EndPointComparator endPointComparator;
 	private int stackIndex;
+	private BootableHashMap variableMap;
 
-	public LinearScanAllocator(LiveRange[] liveRanges, int availableRegisters) {
+	public LinearScanAllocator(LiveRange[] liveRanges) {
 		this.liveRanges = liveRanges;
-		this.availableRegisters = availableRegisters;
-		this.registerPool = new BootableArrayList();
+		this.registerPool = RegisterPool.getInstance();
 		this.active = new BootableArrayList();
-		for (int i=availableRegisters-1; i>=0; i-=1) {
-			String name = "r" + i;
-			registerPool.add(name);
-		}
-		endPointComparator = new EndPointComparator();
+		this.endPointComparator = new EndPointComparator();
 	}
 	
 	public void allocate() {
@@ -38,14 +34,24 @@ public class LinearScanAllocator {
 		for (int i=0; i<n; i+=1) {
 			LiveRange lr = liveRanges[i];
 			expireOldRange(lr);
-			if (active.size() >= availableRegisters) {
+			Object reg = registerPool.request(lr.getVariable().getType());
+			if (reg == null) {
 				spillRange(lr);
 			} else {
-				lr.setLocation((String) registerPool.remove(registerPool.size()-1));
+				lr.setLocation(reg);
 				active.add(lr);
 				Collections.sort(active, endPointComparator);
 			}
 		}
+		this.variableMap = new BootableHashMap();
+		for (int i=0; i<n; i+=1) {
+			LiveRange lr = liveRanges[i];
+			variableMap.put(lr.getVariable(), lr.getLocation());
+		}
+	}
+
+	public BootableHashMap getVariableMap() {
+		return this.variableMap;
 	}
 
 	/**
@@ -58,7 +64,7 @@ public class LinearScanAllocator {
 				return;
 			}
 			active.remove(l);
-			registerPool.add(l.getLocation());
+			registerPool.release(l.getLocation());
 		}
 	}
 

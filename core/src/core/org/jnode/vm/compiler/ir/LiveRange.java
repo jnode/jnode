@@ -12,7 +12,9 @@ public class LiveRange implements Comparable {
 	private Variable variable;
 	private int assignAddress;
 	private int lastUseAddress;
-	private String location;
+	// TODO this needs to be a more specific class, location can be a
+	// register or a local variable
+	private Object location;
 
 	/**
 	 * 
@@ -66,14 +68,14 @@ public class LiveRange implements Comparable {
 	/**
 	 * @return
 	 */
-	public String getLocation() {
+	public Object getLocation() {
 		return location;
 	}
 
 	/**
 	 * @param string
 	 */
-	public void setLocation(String string) {
+	public void setLocation(Object string) {
 		location = string;
 	}
 }
