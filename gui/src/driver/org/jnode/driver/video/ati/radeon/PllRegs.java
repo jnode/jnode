@@ -166,16 +166,18 @@ final class PllRegs implements RadeonConstants {
 	 */
 	private void dumpPLLRegs(RadeonVgaIO io, String msg) {
 		if (false) {
-			System.out.println(msg);
-			for (int i = 0; i <= 0x2e; i++) {
-				System.out.println("PLL[" + NumberUtils.hex(i, 2) + "]="
-						+ NumberUtils.hex(io.getPLL(i)));
+			if (false) {
+				System.out.println(msg);
+				for (int i = 0; i <= 0x2e; i++) {
+					System.out.println("PLL[" + NumberUtils.hex(i, 2) + "]="
+							+ NumberUtils.hex(io.getPLL(i)));
+				}
+			} else {
+				System.out.println(msg);
+				System.out.println("PPLL_DIV_3   0x" + NumberUtils.hex(io.getPLL(PPLL_DIV_3)));
+				System.out.println("PPLL_REF_DIV 0x" + NumberUtils.hex(io.getPLL(PPLL_REF_DIV)));
+				System.out.println("HTOTAL_CNTL  0x" + NumberUtils.hex(io.getPLL(HTOTAL_CNTL)));
 			}
-		} else {
-			System.out.println(msg);
-			System.out.println("PPLL_DIV_3   0x" + NumberUtils.hex(io.getPLL(PPLL_DIV_3)));
-			System.out.println("PPLL_REF_DIV 0x" + NumberUtils.hex(io.getPLL(PPLL_REF_DIV)));
-			System.out.println("HTOTAL_CNTL  0x" + NumberUtils.hex(io.getPLL(HTOTAL_CNTL)));
 		}
 	}
 
@@ -194,7 +196,7 @@ final class PllRegs implements RadeonConstants {
 			// formula is for generated frequency is:
 			//   (ref_freq * feedback_div) / (ref_div * post_div )
 
-			System.out.println("Req. freq=" + freq);
+//			System.out.println("Req. freq=" + freq);
 			int pll_output_freq = 0;
 			final int ppll_max = info.getMaxPllFreq();
 			final int ppll_min = info.getMinPllFreq();
@@ -202,14 +204,14 @@ final class PllRegs implements RadeonConstants {
 			if (freq * 12 < ppll_min) {
 				freq = ppll_min / 12;
 			}
-			System.out.println("Act. freq=" + freq);
+//			System.out.println("Act. freq=" + freq);
 
 			// find proper divider by trial-and-error
 			int bitvalue;
 			for (bitvalue = 0; bitvalue < DIVIDERS.length; bitvalue++) {
 				pll_output_freq = DIVIDERS[bitvalue] * freq;
-				System.out.println("bitvalue=" + bitvalue + ", post_div="
-						+ pll_output_freq);
+//				System.out.println("bitvalue=" + bitvalue + ", post_div="
+//						+ pll_output_freq);
 
 				if (pll_output_freq >= ppll_min && pll_output_freq <= ppll_max) {
 					break;
@@ -231,9 +233,9 @@ final class PllRegs implements RadeonConstants {
 
 			final int vclk_freq = (ref_clk * feedback_div)
 					/ (ref_div * pll_output_freq);
-			System.out.println("vclk_freq=" + vclk_freq + ", fbdiv="
-					+ feedback_div + ", postdiv=" + pll_output_freq
-					+ ", bitvalue=" + bitvalue);
+//			System.out.println("vclk_freq=" + vclk_freq + ", fbdiv="
+//					+ feedback_div + ", postdiv=" + pll_output_freq
+//					+ ", bitvalue=" + bitvalue);
 		}
 	}
 
