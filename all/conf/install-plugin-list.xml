@@ -10,6 +10,9 @@
 
     <plugin id="org.jnode.driver.console"/>
     <plugin id="org.jnode.driver.console.core"/>
+    <plugin id="org.jnode.driver.console.textscreen"/>
+    <plugin id="org.jnode.driver.textscreen"/>
+    <plugin id="org.jnode.driver.textscreen.core"/>
 
     <plugin id="org.jnode.driver"/>
     <plugin id="org.jnode.driver.acpi"/>

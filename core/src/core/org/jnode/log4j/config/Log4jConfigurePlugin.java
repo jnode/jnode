@@ -14,9 +14,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.jnode.driver.console.ConsoleException;
 import org.jnode.driver.console.ConsoleManager;
-import org.jnode.driver.console.x86.ScrollableShellConsole;
+import org.jnode.driver.console.TextConsole;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
@@ -29,7 +28,6 @@ import org.jnode.system.BootLog;
 public class Log4jConfigurePlugin extends Plugin {
 
 	public static final String LAYOUT = "%-5p [%c{1}]: %m%n";
-	private static final String DebugConsoleName = "DebugConsole";
 	
 	/**
 	 * @param descriptor
@@ -46,7 +44,7 @@ public class Log4jConfigurePlugin extends Plugin {
 		try {
 		    // Create the appenders
 			final ConsoleManager conMgr = (ConsoleManager)InitialNaming.lookup(ConsoleManager.NAME);
-			final ScrollableShellConsole console = new ScrollableShellConsole(conMgr, DebugConsoleName);
+			final TextConsole console = (TextConsole)conMgr.createConsole("Log4j", ConsoleManager.CreateOptions.TEXT | ConsoleManager.CreateOptions.SCROLLABLE | ConsoleManager.CreateOptions.NO_SYSTEM_OUT_ERR_IN);
 			conMgr.registerConsole(console);
 			
 			console.setAcceleratorKeyCode(KeyEvent.VK_F7);
@@ -70,8 +68,6 @@ public class Log4jConfigurePlugin extends Plugin {
 			}
 		} catch (NameNotFoundException ex) {
 			root.error("ConsoleManager not found", ex);
-		} catch (ConsoleException e) {
-			root.error("Log4J console can not be created", e);
 		}
 	}
 
