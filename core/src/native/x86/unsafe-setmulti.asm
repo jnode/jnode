@@ -95,12 +95,12 @@ set64_end:
 	ret 16
 %else
 	push ADI
-	mov ADI,[ASP+(4*SLOT_SIZE)]		; memPtr
-	mov AAX,[ASP+(3*SLOT_SIZE)] 	; value
+	mov ADI,[ASP+(5*SLOT_SIZE)]		; memPtr
+	mov AAX,[ASP+(3*SLOT_SIZE)] 	; value (+garbage)
 	mov ecx,[ASP+(2*SLOT_SIZE)]		; count
 	rep stosq
 	pop ADI
-	ret SLOT_SIZE*3
+	ret SLOT_SIZE*4
 %endif	
 		align 4096
 

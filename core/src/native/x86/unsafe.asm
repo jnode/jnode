@@ -321,7 +321,7 @@ GLABEL Q43org5jnode2vm6Unsafe23debug2e28J29V
 	mov rax,[rsp+SLOT_SIZE]
 	call sys_print_rax64
 %endif	
-	ret 8
+	ret SLOT_SIZE*2
 		
 ; public static native void debug(Address value);
 ; public static native void debug(Word value);

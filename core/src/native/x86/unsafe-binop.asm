@@ -59,8 +59,8 @@
 	ret 16
 %else
 	push rdi
-	mov rdi,[rsp+(4*SLOT_SIZE)]		; memPtr
-	mov rax,[rsp+(3*SLOT_SIZE)] 	; value (long)
+	mov rdi,[rsp+(5*SLOT_SIZE)]		; memPtr
+	mov rax,[rsp+(3*SLOT_SIZE)] 	; value (long)  +garbage
 	mov ecx,[rsp+(2*SLOT_SIZE)]		; count
 	test ecx,ecx
 	jz %%end						; (Count == 0) ?
@@ -70,7 +70,7 @@
 	loop %%loop
 %%end:
 	pop rdi
-	ret SLOT_SIZE*3
+	ret SLOT_SIZE*4
 %endif	
 %endmacro
 
