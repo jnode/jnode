@@ -19,7 +19,7 @@ import java.io.StringWriter;
 import java.io.InputStreamReader;
 
 /**
- * @author Levente S\u00e1ntha
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public abstract class Assembler {
     public static final boolean THROW = false;

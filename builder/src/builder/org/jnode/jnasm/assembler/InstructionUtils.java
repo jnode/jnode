@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.lang.reflect.Field;
 
 /**
- * @author Levente S\u00e1ntha
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public class InstructionUtils {
     private static final String INSTRUCTION_ID_SUFFIX = "_ISN";

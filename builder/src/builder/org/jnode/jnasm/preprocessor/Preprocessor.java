@@ -17,7 +17,7 @@ import java.io.StringReader;
 import java.io.Reader;
 
 /**
- * @author Levente S\u00e1ntha
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public abstract class Preprocessor {
     static HashMap multiMacros = new HashMap();

@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.List;
 
 /**
- * @author Levente S\u00e1ntha
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public class X86Core extends AssemblerModule {
     private static final int NUL_ARG = 0;
@@ -27,6 +27,7 @@ public class X86Core extends AssemblerModule {
     private static final int REL_ARG = 3;
     private static final int ABS_ARG = 4;
     private static final int SCL_ARG = 5;
+
     private static final int DISP = 3;
     private static final int DISP_MASK = ((2 << (DISP - 1)) - 1);
 
@@ -36,9 +37,11 @@ public class X86Core extends AssemblerModule {
     private static final int RR_ADDR = REG_ARG | REG_ARG << DISP;
     private static final int RC_ADDR = REG_ARG | CON_ARG << DISP;
     private static final int RE_ADDR = REG_ARG | REL_ARG << DISP;
+    private static final int RA_ADDR = REG_ARG | ABS_ARG << DISP;
     private static final int E_ADDR = REL_ARG;
     private static final int ER_ADDR = REL_ARG | REG_ARG << DISP;
     private static final int EC_ADDR = REL_ARG | CON_ARG << DISP;
+    private static final int AC_ADDR = ABS_ARG | CON_ARG << DISP;
 
     private static final String[] ARG_TYPES = {"noargument","constant","register","relative", "absolute", "scaled"};
 
@@ -361,6 +364,10 @@ public class X86Core extends AssemblerModule {
                 Indirect ind = getInd(1);
                 stream.writeCMP(getReg(0), getRegister(ind.reg), ind.disp);
                 break;
+            case RA_ADDR:
+                ind = getInd(1);
+                stream.writeCMP_MEM(getReg(0), ind.disp);
+                break;
             case ER_ADDR:
                 ind = getInd(0);
                 stream.writeCMP(getRegister(ind.reg), ind.disp, getReg(1));
@@ -368,6 +375,10 @@ public class X86Core extends AssemblerModule {
             case EC_ADDR:
                 ind = getInd(0);
                 stream.writeCMP_Const(operandSize, getRegister(ind.reg), ind.disp, getInt(1));
+                break;
+            case AC_ADDR:
+                ind = getInd(0);
+                stream.writeCMP_MEM(operandSize, ind.disp, getInt(1));
                 break;
             default:
                 reportAddressingError(CMP_ISN, addr);
