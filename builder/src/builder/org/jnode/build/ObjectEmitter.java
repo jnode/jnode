@@ -16,6 +16,7 @@ import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.x86.X86Stream;
 import org.jnode.vm.BootableObject;
 import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmType;
@@ -107,7 +108,7 @@ public class ObjectEmitter {
 		} else if (cls.equals(Class.class)) {
 			emitClass((Class) obj);
 		} else if (cls.isArray()) {
-			emitArray(cls, obj);
+		    emitArray(cls, obj, (VmArrayClass)vmClass);
 		} else {
 			emitObject(cls, obj);
 		}
@@ -205,9 +206,10 @@ public class ObjectEmitter {
 		os.write64(l.longValue()); // long value
 	}
 
-	private void emitArray(Class cls, Object obj) {
+	private void emitArray(Class cls, Object obj, VmArrayClass vmClass) {
 		final Class cmpType = cls.getComponentType();
 		final int len = Array.getLength(obj);
+		vmClass.incTotalLength(len);
 		os.write32(len);
 		if (cmpType == byte.class) {
 			final byte[] a = (byte[]) obj;
