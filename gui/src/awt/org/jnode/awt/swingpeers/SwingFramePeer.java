@@ -189,7 +189,7 @@ final class SwingFramePeer extends SwingWindowPeer implements FramePeer, ISwingC
 
     // Events
     public void handleEvent(AWTEvent event) {
-        //super.handleEvent(event);
+        super.handleEvent(event);
     }
 
 	static final class SwingFrame extends JInternalFrame {

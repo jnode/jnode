@@ -18,17 +18,12 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
-package org.jnode.awt.swingpeers;
 
-import org.apache.log4j.Logger;
-import org.jnode.awt.JNodeGenericPeer;
-import org.jnode.awt.JNodeGraphics;
+package org.jnode.awt.swingpeers;
 
 import java.awt.AWTEvent;
 import java.awt.AWTException;
 import java.awt.BufferCapabilities;
-import java.awt.BufferCapabilities.FlipContents;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -43,6 +38,7 @@ import java.awt.Insets;
 import java.awt.MenuBar;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.BufferCapabilities.FlipContents;
 import java.awt.event.PaintEvent;
 import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
@@ -50,24 +46,36 @@ import java.awt.image.ImageProducer;
 import java.awt.image.VolatileImage;
 import java.awt.peer.FramePeer;
 
+import org.apache.log4j.Logger;
+import org.jnode.awt.JNodeGenericPeer;
+import org.jnode.awt.JNodeGraphics;
+import org.jnode.vm.Unsafe;
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
 
     private final SwingToolkit toolkit;
+
     private final Logger log = Logger.getLogger(getClass());
+
     private static final Point TOP_LEFT = new Point(0, 0);
+
     private Insets insets;
+    
+    private final Frame awtFrame;
 
     /**
-     * Initialize 
+     * Initialize
+     * 
      * @param toolkit
      * @param frame
      */
     public DesktopFramePeer(SwingToolkit toolkit, Frame frame) {
         super(toolkit, frame);
         this.toolkit = toolkit;
+        this.awtFrame = frame;
     }
 
     /**
@@ -175,9 +183,9 @@ final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
      * @see java.awt.peer.ContainerPeer#getInsets()
      */
     public Insets getInsets() {
-    	if (insets == null) {
-    		insets = new Insets(0, 0, 0, 0);
-    	}
+        if (insets == null) {
+            insets = new Insets(0, 0, 0, 0);
+        }
         return insets;
     }
 
@@ -241,14 +249,14 @@ final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
      * @see java.awt.peer.ComponentPeer#createImage(int, int)
      */
     public Image createImage(int width, int height) {
-    	return toolkit.createCompatibleImage(width, height);
+        return toolkit.createCompatibleImage(width, height);
     }
 
     /**
      * @see java.awt.peer.ComponentPeer#createVolatileImage(int, int)
      */
     public VolatileImage createVolatileImage(int width, int height) {
-    	return toolkit.createVolatileImage(width, height);
+        return toolkit.createVolatileImage(width, height);
     }
 
     /**
@@ -305,15 +313,15 @@ final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
      * @see java.awt.peer.ComponentPeer#getGraphics()
      */
     public Graphics getGraphics() {
-    	log.debug("getGraphics");
-		return new JNodeGraphics(this);
+        log.debug("getGraphics");
+        return new JNodeGraphics(this);
     }
 
     /**
      * @see java.awt.peer.ComponentPeer#getGraphicsConfiguration()
      */
     public GraphicsConfiguration getGraphicsConfiguration() {
-		return toolkit.getGraphicsConfiguration();
+        return toolkit.getGraphicsConfiguration();
     }
 
     /**
@@ -341,9 +349,8 @@ final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
      * @see java.awt.peer.ComponentPeer#handleEvent(java.awt.AWTEvent)
      */
     public void handleEvent(AWTEvent e) {
-        log.debug("handleEvent(" + e + ")");
-        // TODO Auto-generated method stub
-
+        Unsafe.debug("handleEvent(" + e + ")");
+        // log.debug("handleEvent(" + e + ")");
     }
 
     /**
@@ -357,7 +364,8 @@ final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
     /**
      * @see java.awt.peer.ComponentPeer#hide()
      */
-    public void hide() {
+    public final void hide() {
+        setVisible(false);
     }
 
     /**
@@ -426,9 +434,15 @@ final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
      * @see java.awt.peer.ComponentPeer#repaint(long, int, int, int, int)
      */
     public void repaint(long tm, int x, int y, int width, int height) {
-    	log.info("repaint (" + tm + ", " + x + ", " + y + ", " + width + ", " + height);
-        // TODO Auto-generated method stub
+        log.info("repaint (" + tm + ", " + x + ", " + y + ", " + width + ", "
+                + height);
+        if (x == 0 && y == 0 && width == 0 && height == 0) {
+            return;
+        }
 
+        eventQueue.postEvent(
+                new PaintEvent(awtFrame, PaintEvent.UPDATE, new Rectangle(x,
+                        y, width, height)));
     }
 
     /**
@@ -517,16 +531,16 @@ final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
      * @see java.awt.peer.ComponentPeer#setVisible(boolean)
      */
     public void setVisible(boolean visible) {
-        // TODO Auto-generated method stub
-
+        if (visible) {
+            paintAWTComponent();
+        }
     }
 
     /**
      * @see java.awt.peer.ComponentPeer#show()
      */
-    public void show() {
-        // TODO Auto-generated method stub
-
+    public final void show() {
+        setVisible(true);
     }
 
     /**
@@ -535,5 +549,12 @@ final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
     public void updateCursorImmediately() {
         // TODO Auto-generated method stub
 
+    }
+
+    protected final void paintAWTComponent() {
+        if (component != null) {
+            eventQueue.postEvent(new PaintEvent((Component) component,
+                    PaintEvent.PAINT, ((Component) component).getBounds()));
+        }
     }
 }
