@@ -42,7 +42,11 @@ public class X86CpuID extends CpuID {
 	public static final int FEAT_HTT = (1 << 28);
 	public static final int FEAT_TM = (1 << 29);
 	public static final int FEAT_PBE = (1 << 31);
-	
+	// Extended features
+	public static final long FEAT_EST = (1L << 39);
+	public static final long FEAT_TM2 = (1L << 40);
+	public static final long FEAT_CNXTID = (1L << 42);
+
 	/** The cpu id data */
 	private final int[] data;
 	/** Name of the processor */
@@ -51,7 +55,51 @@ public class X86CpuID extends CpuID {
 	private final int model;
 	private final int family;
 	private final int features;
-	
+	private final long exFeatures;
+
+	/**
+	 * Create a cpu id that contains the data of a processor identified by the given processor id.
+	 * 
+	 * @param procId
+	 *            "i586", "pentium" for Pentium, "i686", "pentium2" for Pentium II, "pentium3" for
+	 *            Pentium III "pentium4" for Pentium 4 can be null
+	 * @return New cpu id.
+	 */
+	public static X86CpuID createID(String procId) {
+		// Handle default
+		if (procId == null) {
+			procId = "pentium";
+		}
+		final int[] id;
+		if (procId.equals("pentium4")) {
+			// Pentium 4
+			id = new int[12];
+			id[0] = 0x02;
+			id[7] = FEAT_FPU | FEAT_PSE | FEAT_CMOV;
+		} else if (procId.equals("pentium3")) {
+			// Pentium 3
+			id = new int[16];
+			id[0] = 0x03;
+			id[7] = FEAT_FPU | FEAT_PSE | FEAT_CMOV;
+		} else if (procId.equals("pentium2")) {
+			// Pentium 2
+			id = new int[12];
+			id[0] = 0x02;
+			id[7] = FEAT_FPU | FEAT_PSE | FEAT_CMOV;
+			
+		} else {
+			// Pentium
+			id = new int[8];
+			id[0] = 0x01;
+			id[7] = FEAT_FPU | FEAT_PSE;
+		}
+		// Set name GenuineIntel
+		id[1] = 0x756e6547;
+		id[2] = 0x6c65746e;
+		id[3] = 0x49656e69;
+		return new X86CpuID(id);
+	}
+
 	/**
 	 * Initialize this instance
 	 */
@@ -62,10 +110,12 @@ public class X86CpuID extends CpuID {
 		this.model = (eax >> 4) & 0xF;
 		this.family = (eax >> 8) & 0xF;
 		this.features = data[7];
+		this.exFeatures = features | (((long) data[6]) << 32);
 	}
-	
+
 	/**
 	 * Gets the processor name.
+	 * 
 	 * @return The processor name
 	 */
 	public String getName() {
@@ -78,14 +128,13 @@ public class X86CpuID extends CpuID {
 		}
 		return name;
 	}
-	
+
 	private final void intToString(StringBuffer buf, int value) {
-		buf.append((char)(value & 0xFF));
-		buf.append((char)((value >> 8) & 0xFF));
-		buf.append((char)((value >> 16) & 0xFF));
-		buf.append((char)((value >>> 24) & 0xFF));
+		buf.append((char) (value & 0xFF));
+		buf.append((char) ((value >> 8) & 0xFF));
+		buf.append((char) ((value >> 16) & 0xFF));
+		buf.append((char) ((value >>> 24) & 0xFF));
 	}
-	
 
 	/**
 	 * @return Returns the family.
@@ -114,9 +163,20 @@ public class X86CpuID extends CpuID {
 	public final int getFeatures() {
 		return this.features;
 	}
-	
+
 	/**
 	 * Has this CPU a given feature.
+	 * 
+	 * @param feature
+	 * @return boolean
+	 */
+	public final boolean hasFeature(long feature) {
+		return ((this.exFeatures & feature) == feature);
+	}
+
+	/**
+	 * Has this CPU a given feature.
+	 * 
 	 * @param feature
 	 * @return boolean
 	 */
@@ -126,6 +186,7 @@ public class X86CpuID extends CpuID {
 
 	/**
 	 * Convert all features to a human readable string.
+	 * 
 	 * @return The available features.
 	 */
 	private final String getFeatureString() {
@@ -159,6 +220,10 @@ public class X86CpuID extends CpuID {
 		getFeatureString(buf, FEAT_HTT, "HTT");
 		getFeatureString(buf, FEAT_TM, "TM");
 		getFeatureString(buf, FEAT_PBE, "PBE");
+		// Extended features
+		getFeatureString(buf, FEAT_EST, "EST");
+		getFeatureString(buf, FEAT_TM2, "TM2");
+		getFeatureString(buf, FEAT_CNXTID, "CNXTID");
 		return buf.toString();
 	}
 
@@ -171,17 +236,33 @@ public class X86CpuID extends CpuID {
 		}
 	}
 
+	private final void getFeatureString(StringBuffer buf, long feature, String featName) {
+		if (hasFeature(feature)) {
+			if (buf.length() > 0) {
+				buf.append(',');
+			}
+			buf.append(featName);
+		}
+	}
+
 	/**
 	 * Convert to a string representation.
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return "CPU:" +
-		" name:" + getName() +
-		" family:" + getFamily() +
-		" model:" + getModel() +
-		" step:" + getSteppingID() +
-		" features:" + getFeatureString() +
-		" raw:" + NumberUtils.hex(data, 8);
-	}	
+		return "CPU:"
+			+ " name:"
+			+ getName()
+			+ " family:"
+			+ getFamily()
+			+ " model:"
+			+ getModel()
+			+ " step:"
+			+ getSteppingID()
+			+ " features:"
+			+ getFeatureString()
+			+ " raw:"
+			+ NumberUtils.hex(data, 8);
+	}
 }

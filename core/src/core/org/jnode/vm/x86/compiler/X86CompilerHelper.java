@@ -13,6 +13,7 @@ import org.jnode.vm.VmProcessor;
 import org.jnode.vm.classmgr.Modifier;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.x86.X86CpuID;
 
 /**
  * Helpers class used by the X86 compilers.
@@ -26,6 +27,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	private final boolean isBootstrap;
 	private final Label jumpTableLabel;
 	private final Address jumpTableAddress;
+	private final boolean haveCMOV;
 
 	/**
 	 * Create a new instance
@@ -42,6 +44,8 @@ public class X86CompilerHelper implements X86CompilerConstants {
 			jumpTableLabel = null;
 			jumpTableAddress = Unsafe.getJumpTable();
 		}
+		final X86CpuID cpuId = (X86CpuID)os.getCPUID();
+		haveCMOV = cpuId.hasFeature(X86CpuID.FEAT_CMOV);
 	}
 
 	/**
@@ -159,9 +163,11 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 * Write class initialization code
 	 * 
 	 * @param method
+	 * @param methodReg Register that holds the method reference before 
+	 * this method is called.
 	 * @return true if code was written, false otherwise
 	 */
-	public final boolean writeClassInitialize(VmMethod method, X86CompilerContext context, boolean isBootstrap) {
+	public final boolean writeClassInitialize(VmMethod method, Register methodReg, X86CompilerContext context) {
 		// Only for static methods (non <clinit>)
 		if (method.isStatic() && !method.isInitializer()) {
 			// Only when class is not initialize
@@ -170,7 +176,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
 				// Save eax
 				os.writePUSH(Register.EAX);
 				// Do the is initialized test
-				os.writeMOV_Const(Register.EAX, cls);
+				//os.writeMOV_Const(Register.EAX, cls);
+				os.writeMOV(INTSIZE, Register.EAX, methodReg, context.getVmMemberDeclaringClassField().getOffset());
+				
 				os.writeMOV(INTSIZE, Register.EAX, Register.EAX, context.getVmTypeModifiers().getOffset());
 				os.writeTEST_EAX(Modifier.ACC_INITIALIZED);
 				final Label afterInit = new Label(method.getMangledName() + "$$after-classinit");
@@ -204,4 +212,13 @@ public class X86CompilerHelper implements X86CompilerConstants {
 		}
 		return false;
 	}
+	
+	/**
+	 * Is CMOVxx support bu the current cpu.
+	 * @return Returns the haveCMOV.
+	 */
+	public final boolean haveCMOV() {
+		return this.haveCMOV;
+	}
+
 }

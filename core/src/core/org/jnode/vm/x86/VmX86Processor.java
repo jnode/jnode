@@ -19,8 +19,11 @@ public final class VmX86Processor extends VmProcessor {
 	/**
 	 * @param id
 	 */
-	public VmX86Processor(int id) {
+	public VmX86Processor(int id, X86CpuID cpuId) {
 		super(id, VmX86Architecture.INSTANCE);
+		if (cpuId != null) {
+			setCPUID(cpuId);
+		}
 	}
 
 	/**
