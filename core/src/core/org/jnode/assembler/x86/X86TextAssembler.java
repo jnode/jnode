@@ -154,8 +154,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * 
 	 * @param out
 	 */
-	public X86TextAssembler(Writer out, X86CpuID cpuId) {
-		this(out, cpuId, null);
+	public X86TextAssembler(Writer out, X86CpuID cpuId, Mode mode) {
+		this(out, cpuId, mode, null);
 	}
 
 	/**
@@ -163,8 +163,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 	 * 
 	 * @param out
 	 */
-	public X86TextAssembler(Writer out, X86CpuID cpuId, String stripPrefix) {
-		super(cpuId);
+	public X86TextAssembler(Writer out, X86CpuID cpuId, Mode mode, String stripPrefix) {
+		super(cpuId, mode);
 		this.out = new PrintWriter(out);
 		this.stripPrefix = stripPrefix;
 	}

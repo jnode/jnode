@@ -30,6 +30,7 @@ import java.net.MalformedURLException;
 
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86BinaryAssembler;
+import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86TextAssembler;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.bytecode.BytecodeParser;
@@ -72,7 +73,7 @@ public class NativeTest {
             }
 
             if(binary){
-                X86BinaryAssembler os = new X86BinaryAssembler(cpuId, 0);
+                X86BinaryAssembler os = new X86BinaryAssembler(cpuId, X86Constants.Mode.BITS32, 0);
                 generateCode(os, className);
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -99,7 +100,7 @@ public class NativeTest {
 //                System.out.println("result: " + execFloatFloatFloat(5, 3, b, b.length) + " " + PrimitiveTest.terniary(5, 3));
 
             }else{
-                X86TextAssembler tos = new X86TextAssembler(new OutputStreamWriter(System.out), cpuId);
+                X86TextAssembler tos = new X86TextAssembler(new OutputStreamWriter(System.out), cpuId, X86Constants.Mode.BITS32);
                 generateCode(tos, className);
                 tos.flush();
             }

@@ -40,14 +40,16 @@ import org.jnode.vm.x86.X86CpuID;
 public abstract class X86Assembler extends NativeStream implements X86Constants {
 
 	protected final X86CpuID cpuId;
+	protected final Mode mode;
 
 	/**
 	 * Initialize this instance
 	 * 
 	 * @param cpuId
 	 */
-	public X86Assembler(X86CpuID cpuId) {
+	public X86Assembler(X86CpuID cpuId, Mode mode) {
 		this.cpuId = cpuId;
+		this.mode = mode;
 	}
 
 	/**
@@ -126,6 +128,22 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 		return cpuId;
 	}
 
+	/**
+	 * Gets the operating mode.
+	 * @return
+	 */
+	public final X86Constants.Mode getMode() {
+		return mode;
+	}
+	
+	/**
+	 * Gets the size of a word in bytes.
+	 * @return 4 or 8 depending on the operating mode.
+	 */
+	public final int getWordSize() {
+		return mode.is32() ? 4 : 8;
+	}
+	
 	/**
 	 * Are there unresolved references?
 	 * 
@@ -340,7 +358,8 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param dstReg
 	 * @param imm32
 	 */
-	public final void writeArithOp(int operation, X86Register.GPR dstReg, int imm32) {
+	public final void writeArithOp(int operation, X86Register.GPR dstReg,
+			int imm32) {
 		switch (operation) {
 		case X86Operation.ADD:
 			writeADD(dstReg, imm32);
@@ -581,8 +600,8 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * Create a CMOVcc dst,src
 	 * 
 	 * @param ccOpcode
-     * @param dst
-     * @param src
+	 * @param dst
+	 * @param src
 	 */
 	public abstract void writeCMOVcc(int ccOpcode, X86Register dst,
 			X86Register src);
@@ -1164,46 +1183,56 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 
 	/**
 	 * Create a movsd dst,src
+	 * 
 	 * @param dst
 	 * @param src
 	 */
 	public abstract void writeMOVSD(X86Register.XMM dst, X86Register.XMM src);
-	
+
 	/**
 	 * Create a movsd dst,[src+srcDisp]
+	 * 
 	 * @param dst
 	 * @param src
 	 */
-	public abstract void writeMOVSD(X86Register.XMM dst, X86Register.GPR src, int srcDisp);
-	
+	public abstract void writeMOVSD(X86Register.XMM dst, X86Register.GPR src,
+			int srcDisp);
+
 	/**
 	 * Create a movsd [dst+dstDisp],src
+	 * 
 	 * @param dst
 	 * @param src
 	 */
-	public abstract void writeMOVSD(X86Register.GPR dst, int dstDisp, X86Register.XMM src);
-	
+	public abstract void writeMOVSD(X86Register.GPR dst, int dstDisp,
+			X86Register.XMM src);
+
 	/**
 	 * Create a movss dst,src
+	 * 
 	 * @param dst
 	 * @param src
 	 */
 	public abstract void writeMOVSS(X86Register.XMM dst, X86Register.XMM src);
-	
+
 	/**
 	 * Create a movss dst,[src+srcDisp]
+	 * 
 	 * @param dst
 	 * @param src
 	 */
-	public abstract void writeMOVSS(X86Register.XMM dst, X86Register.GPR src, int srcDisp);
-	
+	public abstract void writeMOVSS(X86Register.XMM dst, X86Register.GPR src,
+			int srcDisp);
+
 	/**
 	 * Create a movss [dst+dstDisp],src
+	 * 
 	 * @param dst
 	 * @param src
 	 */
-	public abstract void writeMOVSS(X86Register.GPR dst, int dstDisp, X86Register.XMM src);
-	
+	public abstract void writeMOVSS(X86Register.GPR dst, int dstDisp,
+			X86Register.XMM src);
+
 	/**
 	 * Create a movsx <dstReg>, <srcReg>
 	 * 

@@ -30,6 +30,7 @@ import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.assembler.NativeStream.ObjectInfo;
 import org.jnode.assembler.x86.X86BinaryAssembler;
+import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.boot.Main;
 import org.jnode.build.AbstractBootImageBuilder;
@@ -95,10 +96,16 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 			.objectAlign((ObjectLayout.HEADER_SLOTS + 1)
 					* VmX86Architecture32.SLOT_SIZE);
 
+	public static final int JUMP_MAIN_OFFSET64 = ObjectLayout
+	.objectAlign((ObjectLayout.HEADER_SLOTS + 1)
+			* VmX86Architecture64.SLOT_SIZE);
+
 	public final int JUMP_MAIN_OFFSET() {
 		switch (bits) {
 		case 32:
 			return JUMP_MAIN_OFFSET32;
+		case 64:
+			return JUMP_MAIN_OFFSET64;
 		default:
 			throw new IllegalArgumentException("Unknown bits " + bits);
 		}
@@ -132,7 +139,8 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 	 * @return The native stream
 	 */
 	protected NativeStream createNativeStream() {
-		return new X86BinaryAssembler(getCPUID(), LOAD_ADDR,
+		X86Constants.Mode mode = ((VmX86Architecture)getArchitecture()).getMode();
+		return new X86BinaryAssembler(getCPUID(), mode, LOAD_ADDR,
 				INITIAL_OBJREFS_CAPACITY, INITIAL_SIZE, INITIAL_SIZE);
 	}
 
@@ -195,6 +203,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 	protected void copyKernel(NativeStream os) throws BuildException {
 		try {
 			Elf elf = Elf.newFromFile(getKernelFile().getCanonicalPath());
+			//elf.print();
 			new ElfLinker((X86BinaryAssembler) os).loadElfObject(elf);
 		} catch (IOException ex) {
 			throw new BuildException(ex);
@@ -230,7 +239,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 			final int offset = os.getLength() - startLength;
 			if (offset != JUMP_MAIN_OFFSET()) {
 				throw new BuildException("JUMP_MAIN_OFFSET is incorrect ["
-						+ offset + "] (set to Object headersize)");
+						+ offset + " instead of " + JUMP_MAIN_OFFSET() + "] (set to Object headersize)");
 			}
 
 			final X86BinaryAssembler os86 = (X86BinaryAssembler) os;

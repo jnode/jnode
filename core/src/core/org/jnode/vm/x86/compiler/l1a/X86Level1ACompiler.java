@@ -118,7 +118,7 @@ public class X86Level1ACompiler extends AbstractX86Compiler {
      */
     public NativeStream createNativeStream(ObjectResolver resolver) {
         X86CpuID cpuid = (X86CpuID) Unsafe.getCurrentProcessor().getCPUID();
-        X86BinaryAssembler os = new X86BinaryAssembler(cpuid, 0);
+        X86BinaryAssembler os = new X86BinaryAssembler(cpuid, getMode(), 0);
         os.setResolver(resolver);
         return os;
     }

@@ -18,9 +18,10 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.linker;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 
@@ -114,6 +115,62 @@ public class LoadUtil {
 		return (intval);
 	}
 
+	public static long little64(RandomAccessFile in) {
+		byte buf8[] = new byte[8];
+		long intval = 0;
+		try {
+			in.read(buf8);
+		} catch (java.io.IOException m) {
+			System.out.println("File read error");
+			return (0);
+		}
+		final int v0 = buf8[0];
+		final int v1 = buf8[1];
+		final int v2 = buf8[2];
+		final int v3 = buf8[3];
+		final int v4 = buf8[4];
+		final int v5 = buf8[5];
+		final int v6 = buf8[6];
+		final int v7 = buf8[7];
+		intval |= (v0 & 0xFF) << (8 * 0);
+		intval |= (v1 & 0xFF) << (8 * 1);
+		intval |= (v2 & 0xFF) << (8 * 2);
+		intval |= (v3 & 0xFF) << (8 * 3);
+		intval |= (v4 & 0xFF) << (8 * 4);
+		intval |= (v5 & 0xFF) << (8 * 5);
+		intval |= (v6 & 0xFF) << (8 * 6);
+		intval |= (v7 & 0xFF) << (8 * 7);
+		return (intval);
+	}
+
+	public static long little64(InputStream in) {
+		byte buf8[] = new byte[8];
+		long intval = 0;
+		try {
+			in.read(buf8);
+		} catch (java.io.IOException m) {
+			System.out.println("File read error");
+			return (0);
+		}
+		final int v0 = buf8[0];
+		final int v1 = buf8[1];
+		final int v2 = buf8[2];
+		final int v3 = buf8[3];
+		final int v4 = buf8[4];
+		final int v5 = buf8[5];
+		final int v6 = buf8[6];
+		final int v7 = buf8[7];
+		intval |= (v0 & 0xFF) << (8 * 0);
+		intval |= (v1 & 0xFF) << (8 * 1);
+		intval |= (v2 & 0xFF) << (8 * 2);
+		intval |= (v3 & 0xFF) << (8 * 3);
+		intval |= (v4 & 0xFF) << (8 * 4);
+		intval |= (v5 & 0xFF) << (8 * 5);
+		intval |= (v6 & 0xFF) << (8 * 6);
+		intval |= (v7 & 0xFF) << (8 * 7);
+		return (intval);
+	}
+
 	public static boolean bytes(RandomAccessFile in, byte b[]) {
 		try {
 			in.read(b);
@@ -133,4 +190,107 @@ public class LoadUtil {
 		}
 		return (true);
 	}
+
+	/**
+	 * Load a program address.
+	 * 
+	 * @param out
+	 * @param e_ident
+	 * @return
+	 * @throws IOException
+	 */
+	public static long loadAddr(RandomAccessFile in, byte[] e_ident)
+			throws IOException {
+		if (e_ident[Elf.EI_CLASS] == Elf.ELFCLASS32) {
+			return little32(in);
+		} else {
+			return little64(in);
+		}
+	}
+
+	/**
+	 * Load a program address.
+	 * 
+	 * @param out
+	 * @param e_ident
+	 * @return
+	 * @throws IOException
+	 */
+	public static long loadAddr(InputStream in, byte[] e_ident)
+			throws IOException {
+		if (e_ident[Elf.EI_CLASS] == Elf.ELFCLASS32) {
+			return little32(in);
+		} else {
+			return little64(in);
+		}
+	}
+
+	/**
+	 * Load a file offset.
+	 * 
+	 * @param out
+	 * @param e_ident
+	 * @return
+	 * @throws IOException
+	 */
+	public static long loadOff(RandomAccessFile in, byte[] e_ident)
+			throws IOException {
+		if (e_ident[Elf.EI_CLASS] == Elf.ELFCLASS32) {
+			return little32(in);
+		} else {
+			return little64(in);
+		}
+	}
+
+	/**
+	 * Load a file offset.
+	 * 
+	 * @param out
+	 * @param e_ident
+	 * @return
+	 * @throws IOException
+	 */
+	public static long loadOff(InputStream in, byte[] e_ident)
+			throws IOException {
+		if (e_ident[Elf.EI_CLASS] == Elf.ELFCLASS32) {
+			return little32(in);
+		} else {
+			return little64(in);
+		}
+	}
+
+	/**
+	 * Load an Xword
+	 * 
+	 * @param out
+	 * @param e_ident
+	 * @return
+	 * @throws IOException
+	 */
+	public static long loadXword(RandomAccessFile in, byte[] e_ident)
+			throws IOException {
+		if (e_ident[Elf.EI_CLASS] == Elf.ELFCLASS32) {
+			return little32(in);
+		} else {
+			return little64(in);
+		}
+	}
+
+	/**
+	 * Load an Xword
+	 * 
+	 * @param out
+	 * @param e_ident
+	 * @return
+	 * @throws IOException
+	 */
+	public static long loadXword(InputStream in, byte[] e_ident)
+			throws IOException {
+		if (e_ident[Elf.EI_CLASS] == Elf.ELFCLASS32) {
+			return little32(in);
+		} else {
+			return little64(in);
+		}
+	}
+
 }
