@@ -140,8 +140,18 @@ public final class Method extends AccessibleObject implements Member {
 			final int cnt = exceptions.getLength();
 			final ArrayList list = new ArrayList(cnt);
 			for (int i = 0; i < cnt; i++) {
-				list.add(exceptions.getException(i).getResolvedVmClass().asClass());
-			}			
+        try
+        {
+          list.add(exceptions.getException(i).getResolvedVmClass().asClass());
+        }
+        catch (Exception e)
+        {
+          // there is some missing getException(i).getResolvedVmClass()
+          // if one makes a system.out on the methods it fails, looks "java.lang.Exception" is missing
+          // I think I'll look into it, if I can.
+          // 10/03/2005 Martin Husted Hartvig
+        }
+      }
 			exceptionTypes = list;
 		}
 		return (Class[])exceptionTypes.toArray(new Class[exceptionTypes.size()]);
