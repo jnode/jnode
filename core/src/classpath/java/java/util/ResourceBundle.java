@@ -124,6 +124,7 @@ public abstract class ResourceBundle
     ClassLoader getCallingClassLoader()
     {
       Class[] stack = getClassContext();
+        /*
       for (int i = 0; i < stack.length; i++)
 	{
 	  if (stack[i] != Security.class && stack[i] != ResourceBundle.class)
@@ -131,6 +132,8 @@ public abstract class ResourceBundle
 	}
 
       return null;
+      */
+      return stack[3].getClassLoader();
     }
   }
 
