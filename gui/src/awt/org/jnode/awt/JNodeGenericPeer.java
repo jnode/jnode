@@ -56,6 +56,6 @@ public class JNodeGenericPeer {
 	 * Destroy the peer and release all resource
 	 */
 	public void dispose() {
-		toolkit.decRefCount();
+		toolkit.decRefCount(false);
 	}
 }
