@@ -71,6 +71,14 @@ public class IPv4Address implements ProtocolAddress, Serializable {
 
 	/**
 	 * Create a new instance
+	 * @param address The array that is directly used. Not copied!
+	 */
+	private IPv4Address(byte[] address) { 
+		this.address = address;
+	}
+
+	/**
+	 * Create a new instance
 	 * @param skbuf
 	 * @param offset
 	 */
@@ -321,6 +329,18 @@ public class IPv4Address implements ProtocolAddress, Serializable {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Calculate the and or this address with the given mask.
+	 * @param mask
+	 */
+	public IPv4Address and(IPv4Address mask) {
+		final byte[] res = new byte[length];
+		for (int i = 0; i < length; i++) {
+			res[i] = (byte)(address[i] & mask.address[i]);
+		}
+		return new IPv4Address(res);
 	}
 
 	/**
