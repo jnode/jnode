@@ -1,9 +1,16 @@
 /*Copyright, Sam Reid, 2003.*/
 package org.jnode.apps.charvabsh;
 
+import gnu.java.io.NullOutputStream;
+
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.Reader;
+import java.io.StringReader;
+
+import bsh.ConsoleInterface;
 import bsh.EvalError;
 import bsh.Interpreter;
-import bsh.ConsoleInterface;
 import charva.awt.BorderLayout;
 import charva.awt.Color;
 import charva.awt.Container;
@@ -12,14 +19,16 @@ import charva.awt.event.ActionEvent;
 import charva.awt.event.ActionListener;
 import charva.awt.event.KeyAdapter;
 import charva.awt.event.KeyEvent;
-import charvax.swing.*;
+import charvax.swing.BoxLayout;
+import charvax.swing.JFrame;
+import charvax.swing.JLabel;
+import charvax.swing.JMenu;
+import charvax.swing.JMenuBar;
+import charvax.swing.JMenuItem;
+import charvax.swing.JPanel;
+import charvax.swing.JScrollPane;
+import charvax.swing.JTextArea;
 import charvax.swing.border.TitledBorder;
-import gnu.java.io.NullOutputStream;
-
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.Reader;
-import java.io.StringReader;
 
 /**
  * User: Sam Reid
@@ -155,12 +164,12 @@ public class CharvaBsh {
     }
     static class BSHConsole implements ConsoleInterface{
         BSHOutputAdapter out;
-        private JTextArea output;
+        //private final JTextArea output;
         Reader reader=new StringReader("456");
 
         public BSHConsole(JTextArea output) {
             this.out=new BSHOutputAdapter(output);
-            this.output=output;
+            //this.output=output;
         }
 
         public Reader getIn() {

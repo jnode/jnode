@@ -8,7 +8,6 @@
 <!-- Subproject specific classpath -->
   <path id="my-cp">
     <pathelement location="${jnode-core.jar}"/>
-      <pathelement location="C:\Java\downloads\jnode\dev-march2\jnode\gui\build\classes"/>
     <path refid="cp"/>
   </path>
 

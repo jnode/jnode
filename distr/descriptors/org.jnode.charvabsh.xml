@@ -3,7 +3,7 @@
 
 <plugin id="org.jnode.apps.charvabsh"
     name="Charva Beanshell"
-    version="1.0"
+    version="@VERSION@"
     provider-name="JNode.org">
 
     <requires>
@@ -13,7 +13,7 @@
     </requires>
 
     <runtime>
-        <library name="jnode-apps-charvabsh.jar">
+        <library name="jnode-distr.jar">
             <export name="org.jnode.apps.charvabsh.*"/>
         </library>
     </runtime>
