@@ -10,11 +10,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.jnode.vm.VmClassLoader;
+import org.jnode.vm.bytecode.BasicBlock;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.bytecode.BytecodeViewer;
 import org.jnode.vm.bytecode.BytecodeVisitor;
+import org.jnode.vm.bytecode.ControlFlowGraph;
 import org.jnode.vm.classmgr.ClassDecoder;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmConstClass;
@@ -30,7 +33,7 @@ import org.jnode.vm.x86.VmX86Architecture;
  *
  */
 public class IRGenerator extends BytecodeVisitor {
-	private final static Constant NULL_CONSTANT = new Constant(Constant.REFERENCE, "null");
+	private final static Constant NULL_CONSTANT = Constant.getInstance(null);
 	private VmMethod method;
 	private int nArgs;
 	private int nLocals;
@@ -39,11 +42,15 @@ public class IRGenerator extends BytecodeVisitor {
 	private Variable[] variables;
 	private int address;
 	private ArrayList iopList;
+	private Iterator basicBlockIterator;
+	private BasicBlock currentBlock;
 
 	/**
 	 * 
 	 */
-	public IRGenerator() {
+	public IRGenerator(ControlFlowGraph cfg) {
+		basicBlockIterator = cfg.basicBlockIterator();
+		currentBlock = (BasicBlock) basicBlockIterator.next();
 	}
 
 	public ArrayList getIOPList() {
@@ -65,14 +72,14 @@ public class IRGenerator extends BytecodeVisitor {
 		nArgs = method.getNoArgs();
 		nLocals = code.getNoLocals();
 		maxStack = code.getMaxStack();
-		stackOffset = nArgs + nLocals;
-		variables = new Variable[nArgs + nLocals + maxStack];
+		stackOffset = nLocals;
+		variables = new Variable[nLocals + maxStack];
 		int index = 0;
 		for (int i=0; i<nArgs; i+=1) {
 			variables[index] = new MethodArgument(Operand.UNKNOWN, index);
 			index += 1;
 		}
-		for (int i=0; i<nLocals; i+=1) {
+		for (int i=nArgs; i<nLocals; i+=1) {
 			variables[index] = new LocalVariable(Operand.UNKNOWN, index);
 			index += 1;
 		}
@@ -81,6 +88,7 @@ public class IRGenerator extends BytecodeVisitor {
 			index += 1;
 		}
 		iopList = new ArrayList(code.getLength() >> 1);
+		currentBlock.setVariables(variables);
 	}
 
 	/* (non-Javadoc)
@@ -94,6 +102,19 @@ public class IRGenerator extends BytecodeVisitor {
 	 */
 	public void startInstruction(int address) {
 		this.address = address;
+		if (address >= currentBlock.getEndPC()) {
+			currentBlock = (BasicBlock) basicBlockIterator.next();
+			Variable[] prevVars = variables;
+			int n = variables.length;
+			variables = new Variable[n];
+			for (int i=0; i<n; i+=1) {
+				variables[i] = prevVars[i];
+			}
+			currentBlock.setVariables(variables);
+		}
+		if (address < currentBlock.getStartPC() || address >= currentBlock.getEndPC()) {
+			throw new AssertionError("instruction not in basic block!");
+		}
 	}
 
 	/* (non-Javadoc)
@@ -108,13 +129,12 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_nop() {
 	}
 
-	// TODO fix all load/store ops to skip add to iopList, see iconst/bipush
-	
+	// TODO fix all binary ops to use BinaryOP.getInstance(...)
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_aconst_null()
 	 */
 	public void visit_aconst_null() {
-		iopList.add(new ConstantRefAssignOP(address, variables, stackOffset,
+		iopList.add(new ConstantRefAssignOP(address, currentBlock, stackOffset,
 			NULL_CONSTANT));
 		stackOffset += 1;
 	}
@@ -123,9 +143,9 @@ public class IRGenerator extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iconst(int)
 	 */
 	public void visit_iconst(int value) {
-		IOP iop = new ConstantRefAssignOP(address, variables, stackOffset,
-					new Constant(Constant.INT, new Integer(value)));
-		// iopList.add(iop);
+		IOP iop = new ConstantRefAssignOP(address, currentBlock, stackOffset,
+					Constant.getInstance(value));
+		iopList.add(iop);
 		stackOffset += 1;
 	}
 
@@ -133,8 +153,8 @@ public class IRGenerator extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lconst(long)
 	 */
 	public void visit_lconst(long value) {
-		iopList.add(new ConstantRefAssignOP(address, variables, stackOffset,
-			new Constant(Constant.LONG, new Long(value))));
+		iopList.add(new ConstantRefAssignOP(address, currentBlock, stackOffset,
+			Constant.getInstance(value)));
 		stackOffset += 2;
 	}
 
@@ -142,8 +162,8 @@ public class IRGenerator extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fconst(float)
 	 */
 	public void visit_fconst(float value) {
-		iopList.add(new ConstantRefAssignOP(address, variables, stackOffset,
-			new Constant(Constant.FLOAT, new Float(value))));
+		iopList.add(new ConstantRefAssignOP(address, currentBlock, stackOffset,
+			Constant.getInstance(value)));
 		stackOffset += 1;
 	}
 
@@ -151,8 +171,8 @@ public class IRGenerator extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dconst(double)
 	 */
 	public void visit_dconst(double value) {
-		iopList.add(new ConstantRefAssignOP(address, variables, stackOffset,
-			new Constant(Constant.DOUBLE, new Double(value))));
+		iopList.add(new ConstantRefAssignOP(address, currentBlock, stackOffset,
+			Constant.getInstance(value)));
 		stackOffset += 2;
 	}
 
@@ -160,9 +180,9 @@ public class IRGenerator extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_bipush(byte)
 	 */
 	public void visit_bipush(byte value) {
-		ConstantRefAssignOP assignOP = new ConstantRefAssignOP(address, variables, stackOffset,
-					new Constant(Constant.BYTE, new Byte(value)));
-		// iopList.add(assignOP);
+		ConstantRefAssignOP assignOP = new ConstantRefAssignOP(address, currentBlock,
+			stackOffset, Constant.getInstance(value));
+		iopList.add(assignOP);
 		stackOffset += 1;
 	}
 
@@ -170,8 +190,8 @@ public class IRGenerator extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_sipush(short)
 	 */
 	public void visit_sipush(short value) {
-		iopList.add(new ConstantRefAssignOP(address, variables, stackOffset,
-			new Constant(Constant.SHORT, new Short(value))));
+		iopList.add(new ConstantRefAssignOP(address, currentBlock, stackOffset,
+			Constant.getInstance(value)));
 		stackOffset += 1;
 	}
 
@@ -195,8 +215,9 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_iload(int index) {
 		variables[index].setType(Operand.INT);
 		variables[stackOffset].setType(Operand.INT);
-		VariableRefAssignOP assignOP = new VariableRefAssignOP(address, variables, stackOffset, index);
-		// iopList.add(assignOP);
+		VariableRefAssignOP assignOP = new VariableRefAssignOP(address, currentBlock,
+			stackOffset, index);
+		iopList.add(assignOP);
 		stackOffset += 1;
 	}
 
@@ -206,7 +227,8 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_lload(int index) {
 		variables[index].setType(Operand.LONG);
 		variables[stackOffset].setType(Operand.LONG);
-		iopList.add(new VariableRefAssignOP(address, variables, stackOffset, index));
+		iopList.add(new VariableRefAssignOP(address, currentBlock,
+			stackOffset, index));
 		stackOffset += 2;
 	}
 
@@ -216,7 +238,8 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_fload(int index) {
 		variables[index].setType(Operand.FLOAT);
 		variables[stackOffset].setType(Operand.FLOAT);
-		iopList.add(new VariableRefAssignOP(address, variables, stackOffset, index));
+		iopList.add(new VariableRefAssignOP(address, currentBlock,
+			stackOffset, index));
 		stackOffset += 1;
 	}
 
@@ -226,7 +249,8 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_dload(int index) {
 		variables[index].setType(Operand.DOUBLE);
 		variables[stackOffset].setType(Operand.DOUBLE);
-		iopList.add(new VariableRefAssignOP(address, variables, stackOffset, index));
+		iopList.add(new VariableRefAssignOP(address, currentBlock,
+			stackOffset, index));
 		stackOffset += 2;
 	}
 
@@ -236,7 +260,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_aload(int index) {
 		variables[index].setType(Operand.REFERENCE);
 		variables[stackOffset].setType(Operand.REFERENCE);
-		iopList.add(new VariableRefAssignOP(address, variables, stackOffset, index));
+		iopList.add(new VariableRefAssignOP(address, currentBlock, stackOffset, index));
 		stackOffset += 1;
 	}
 
@@ -303,8 +327,8 @@ public class IRGenerator extends BytecodeVisitor {
 		stackOffset -= 1;
 		variables[index].setType(Operand.INT);
 		variables[stackOffset].setType(Operand.INT);
-		VariableRefAssignOP assignOP = new VariableRefAssignOP(address, variables, index, stackOffset);
-		// iopList.add(assignOP);
+		VariableRefAssignOP assignOP = new VariableRefAssignOP(address, currentBlock, index, stackOffset);
+		iopList.add(assignOP);
 	}
 
 	/* (non-Javadoc)
@@ -314,7 +338,7 @@ public class IRGenerator extends BytecodeVisitor {
 		stackOffset -= 2;
 		variables[index].setType(Operand.LONG);
 		variables[stackOffset].setType(Operand.LONG);
-		iopList.add(new VariableRefAssignOP(address, variables, index, stackOffset));
+		iopList.add(new VariableRefAssignOP(address, currentBlock, index, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -324,7 +348,7 @@ public class IRGenerator extends BytecodeVisitor {
 		stackOffset -= 1;
 		variables[index].setType(Operand.FLOAT);
 		variables[stackOffset].setType(Operand.FLOAT);
-		iopList.add(new VariableRefAssignOP(address, variables, index, stackOffset));
+		iopList.add(new VariableRefAssignOP(address, currentBlock, index, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -334,7 +358,7 @@ public class IRGenerator extends BytecodeVisitor {
 		stackOffset -= 2;
 		variables[index].setType(Operand.DOUBLE);
 		variables[stackOffset].setType(Operand.DOUBLE);
-		iopList.add(new VariableRefAssignOP(address, variables, index, stackOffset));
+		iopList.add(new VariableRefAssignOP(address, currentBlock, index, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -344,7 +368,7 @@ public class IRGenerator extends BytecodeVisitor {
 		stackOffset -= 1;
 		variables[index].setType(Operand.REFERENCE);
 		variables[stackOffset].setType(Operand.REFERENCE);
-		iopList.add(new VariableRefAssignOP(address, variables, index, stackOffset));
+		iopList.add(new VariableRefAssignOP(address, currentBlock, index, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -470,11 +494,9 @@ public class IRGenerator extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iadd()
 	 */
 	public void visit_iadd() {
+		iopList.add(BinaryOP.getInstance(address, currentBlock, stackOffset,
+			BinaryOP.IADD, Operand.INT));
 		stackOffset -= 1;
-		int s1 = stackOffset - 1;
-		variables[s1].setType(Operand.INT);
-		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.IADD, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -485,7 +507,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.LONG);
 		variables[stackOffset].setType(Operand.LONG);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.LADD, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.LADD, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -496,7 +518,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		variables[s1].setType(Operand.FLOAT);
 		variables[stackOffset].setType(Operand.FLOAT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.FADD, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.FADD, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -507,18 +529,16 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.INT);
 		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.DADD, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.DADD, stackOffset));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_isub()
 	 */
 	public void visit_isub() {
+		iopList.add(BinaryOP.getInstance(address, currentBlock, stackOffset,
+			BinaryOP.ISUB, Operand.INT));
 		stackOffset -= 1;
-		int s1 = stackOffset - 1;
-		variables[s1].setType(Operand.INT);
-		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.ISUB, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -529,7 +549,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.LONG);
 		variables[stackOffset].setType(Operand.LONG);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.LSUB, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.LSUB, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -540,7 +560,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		variables[s1].setType(Operand.FLOAT);
 		variables[stackOffset].setType(Operand.FLOAT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.FSUB, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.FSUB, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -551,18 +571,16 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.DOUBLE);
 		variables[stackOffset].setType(Operand.DOUBLE);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.DSUB, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.DSUB, stackOffset));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_imul()
 	 */
 	public void visit_imul() {
+		iopList.add(BinaryOP.getInstance(address, currentBlock, stackOffset,
+			BinaryOP.IMUL, Operand.INT));
 		stackOffset -= 1;
-		int s1 = stackOffset - 1;
-		variables[s1].setType(Operand.INT);
-		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.IMUL, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -573,7 +591,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.LONG);
 		variables[stackOffset].setType(Operand.LONG);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.LMUL, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.LMUL, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -584,7 +602,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		variables[s1].setType(Operand.FLOAT);
 		variables[stackOffset].setType(Operand.FLOAT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.FMUL, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.FMUL, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -595,18 +613,16 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.DOUBLE);
 		variables[stackOffset].setType(Operand.DOUBLE);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.DMUL, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.DMUL, stackOffset));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_idiv()
 	 */
 	public void visit_idiv() {
+		iopList.add(BinaryOP.getInstance(address, currentBlock, stackOffset,
+			BinaryOP.IDIV, Operand.INT));
 		stackOffset -= 1;
-		int s1 = stackOffset - 1;
-		variables[s1].setType(Operand.INT);
-		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.IDIV, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -617,7 +633,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.LONG);
 		variables[stackOffset].setType(Operand.LONG);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.LDIV, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.LDIV, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -628,7 +644,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		variables[s1].setType(Operand.FLOAT);
 		variables[stackOffset].setType(Operand.FLOAT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.FDIV, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.FDIV, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -639,7 +655,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.DOUBLE);
 		variables[stackOffset].setType(Operand.DOUBLE);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.DDIV, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.DDIV, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -650,7 +666,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		variables[s1].setType(Operand.INT);
 		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.IREM, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.IREM, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -661,7 +677,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.LONG);
 		variables[stackOffset].setType(Operand.LONG);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.LREM, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.LREM, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -672,7 +688,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		variables[s1].setType(Operand.FLOAT);
 		variables[stackOffset].setType(Operand.FLOAT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.FREM, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.FREM, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -683,7 +699,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.DOUBLE);
 		variables[stackOffset].setType(Operand.DOUBLE);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.DREM, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.DREM, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -692,7 +708,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_ineg() {
 		int s1 = stackOffset - 1;
 		variables[s1].setType(Operand.INT);
-		iopList.add(new UnaryOP(address, variables, s1, UnaryOP.INEG, s1));
+		iopList.add(new UnaryOP(address, currentBlock, s1, UnaryOP.INEG, s1));
 	}
 
 	/* (non-Javadoc)
@@ -701,7 +717,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_lneg() {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.LONG);
-		iopList.add(new UnaryOP(address, variables, s1, UnaryOP.LNEG, s1));
+		iopList.add(new UnaryOP(address, currentBlock, s1, UnaryOP.LNEG, s1));
 	}
 
 	/* (non-Javadoc)
@@ -710,7 +726,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_fneg() {
 		int s1 = stackOffset - 1;
 		variables[s1].setType(Operand.FLOAT);
-		iopList.add(new UnaryOP(address, variables, s1, UnaryOP.FNEG, s1));
+		iopList.add(new UnaryOP(address, currentBlock, s1, UnaryOP.FNEG, s1));
 	}
 
 	/* (non-Javadoc)
@@ -719,7 +735,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_dneg() {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.DOUBLE);
-		iopList.add(new UnaryOP(address, variables, s1, UnaryOP.DNEG, s1));
+		iopList.add(new UnaryOP(address, currentBlock, s1, UnaryOP.DNEG, s1));
 	}
 
 	/* (non-Javadoc)
@@ -730,7 +746,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		variables[s1].setType(Operand.INT);
 		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.ISHL, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.ISHL, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -741,7 +757,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.LONG);
 		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.LSHL, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.LSHL, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -752,7 +768,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		variables[s1].setType(Operand.INT);
 		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.ISHR, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.ISHR, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -763,7 +779,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.LONG);
 		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.LSHR, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.LSHR, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -774,7 +790,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		variables[s1].setType(Operand.INT);
 		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.IUSHR, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.IUSHR, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -785,7 +801,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		variables[s1].setType(Operand.INT);
 		variables[stackOffset].setType(Operand.LONG);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.LUSHR, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.LUSHR, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -796,7 +812,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		variables[s1].setType(Operand.INT);
 		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.IAND, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.IAND, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -807,7 +823,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.LONG);
 		variables[stackOffset].setType(Operand.LONG);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.LAND, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.LAND, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -818,7 +834,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		variables[s1].setType(Operand.INT);
 		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.IOR, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.IOR, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -829,7 +845,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.INT);
 		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.LOR, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.LOR, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -840,7 +856,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		variables[s1].setType(Operand.INT);
 		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.IXOR, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.IXOR, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -851,7 +867,7 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.LONG);
 		variables[stackOffset].setType(Operand.LONG);
-		iopList.add(new BinaryOP(address, variables, s1, s1, BinaryOP.LXOR, stackOffset));
+		iopList.add(new BinaryOP(address, currentBlock, s1, s1, BinaryOP.LXOR, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -859,7 +875,7 @@ public class IRGenerator extends BytecodeVisitor {
 	 */
 	public void visit_iinc(int index, int incValue) {
 		variables[index].setType(Operand.INT);
-		iopList.add(new UnaryOP(address, variables, index, UnaryOP.IINC, incValue));
+		iopList.add(new UnaryOP(address, currentBlock, index, UnaryOP.IINC, incValue));
 	}
 
 	/* (non-Javadoc)
@@ -868,7 +884,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_i2l() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.LONG);
-		iopList.add(new UnaryOP(address, variables, stackOffset, UnaryOP.I2L, stackOffset));
+		iopList.add(new UnaryOP(address, currentBlock, stackOffset, UnaryOP.I2L, stackOffset));
 		stackOffset += 2;
 	}
 
@@ -878,7 +894,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_i2f() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.FLOAT);
-		iopList.add(new UnaryOP(address, variables, stackOffset, UnaryOP.I2F, stackOffset));
+		iopList.add(new UnaryOP(address, currentBlock, stackOffset, UnaryOP.I2F, stackOffset));
 		stackOffset += 1;
 	}
 
@@ -888,7 +904,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_i2d() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.DOUBLE);
-		iopList.add(new UnaryOP(address, variables, stackOffset, UnaryOP.I2D, stackOffset));
+		iopList.add(new UnaryOP(address, currentBlock, stackOffset, UnaryOP.I2D, stackOffset));
 		stackOffset += 2;
 	}
 
@@ -898,7 +914,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_l2i() {
 		stackOffset -= 2;
 		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new UnaryOP(address, variables, stackOffset, UnaryOP.L2I, stackOffset));
+		iopList.add(new UnaryOP(address, currentBlock, stackOffset, UnaryOP.L2I, stackOffset));
 		stackOffset += 1;
 	}
 
@@ -908,7 +924,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_l2f() {
 		stackOffset -= 2;
 		variables[stackOffset].setType(Operand.FLOAT);
-		iopList.add(new UnaryOP(address, variables, stackOffset, UnaryOP.L2F, stackOffset));
+		iopList.add(new UnaryOP(address, currentBlock, stackOffset, UnaryOP.L2F, stackOffset));
 		stackOffset += 1;
 	}
 
@@ -918,7 +934,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_l2d() {
 		stackOffset -= 2;
 		variables[stackOffset].setType(Operand.DOUBLE);
-		iopList.add(new UnaryOP(address, variables, stackOffset, UnaryOP.L2D, stackOffset));
+		iopList.add(new UnaryOP(address, currentBlock, stackOffset, UnaryOP.L2D, stackOffset));
 		stackOffset += 2;
 	}
 
@@ -928,7 +944,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_f2i() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new UnaryOP(address, variables, stackOffset, UnaryOP.F2I, stackOffset));
+		iopList.add(new UnaryOP(address, currentBlock, stackOffset, UnaryOP.F2I, stackOffset));
 		stackOffset += 1;
 	}
 
@@ -938,7 +954,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_f2l() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.LONG);
-		iopList.add(new UnaryOP(address, variables, stackOffset, UnaryOP.F2L, stackOffset));
+		iopList.add(new UnaryOP(address, currentBlock, stackOffset, UnaryOP.F2L, stackOffset));
 		stackOffset += 2;
 	}
 
@@ -948,7 +964,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_f2d() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.DOUBLE);
-		iopList.add(new UnaryOP(address, variables, stackOffset, UnaryOP.F2D, stackOffset));
+		iopList.add(new UnaryOP(address, currentBlock, stackOffset, UnaryOP.F2D, stackOffset));
 		stackOffset += 2;
 	}
 
@@ -958,7 +974,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_d2i() {
 		stackOffset -= 2;
 		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new UnaryOP(address, variables, stackOffset, UnaryOP.D2I, stackOffset));
+		iopList.add(new UnaryOP(address, currentBlock, stackOffset, UnaryOP.D2I, stackOffset));
 		stackOffset += 1;
 	}
 
@@ -968,7 +984,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_d2l() {
 		stackOffset -= 2;
 		variables[stackOffset].setType(Operand.LONG);
-		iopList.add(new UnaryOP(address, variables, stackOffset, UnaryOP.D2L, stackOffset));
+		iopList.add(new UnaryOP(address, currentBlock, stackOffset, UnaryOP.D2L, stackOffset));
 		stackOffset += 2;
 	}
 
@@ -985,7 +1001,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_i2b() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.BYTE);
-		iopList.add(new UnaryOP(address, variables, stackOffset, UnaryOP.I2B, stackOffset));
+		iopList.add(new UnaryOP(address, currentBlock, stackOffset, UnaryOP.I2B, stackOffset));
 		stackOffset += 1;
 	}
 
@@ -995,7 +1011,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_i2c() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.CHAR);
-		iopList.add(new UnaryOP(address, variables, stackOffset, UnaryOP.I2C, stackOffset));
+		iopList.add(new UnaryOP(address, currentBlock, stackOffset, UnaryOP.I2C, stackOffset));
 		stackOffset += 1;
 	}
 
@@ -1005,7 +1021,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_i2s() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.SHORT);
-		iopList.add(new UnaryOP(address, variables, stackOffset, UnaryOP.I2S, stackOffset));
+		iopList.add(new UnaryOP(address, currentBlock, stackOffset, UnaryOP.I2S, stackOffset));
 		stackOffset += 1;
 	}
 
@@ -1048,105 +1064,163 @@ public class IRGenerator extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifeq(int)
 	 */
 	public void visit_ifeq(int address) {
-		throw new IllegalArgumentException("byte code not yet supported");
+		stackOffset -= 1;
+		variables[stackOffset].setType(Operand.INT);
+		iopList.add(new ConditionalBranchOP(this.address, currentBlock, stackOffset,
+			ConditionalBranchOP.IFEQ, address));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifne(int)
 	 */
 	public void visit_ifne(int address) {
-		throw new IllegalArgumentException("byte code not yet supported");
+		stackOffset -= 1;
+		variables[stackOffset].setType(Operand.INT);
+		iopList.add(new ConditionalBranchOP(this.address, currentBlock, stackOffset,
+			ConditionalBranchOP.IFNE, address));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iflt(int)
 	 */
 	public void visit_iflt(int address) {
-		throw new IllegalArgumentException("byte code not yet supported");
+		stackOffset -= 1;
+		variables[stackOffset].setType(Operand.INT);
+		iopList.add(new ConditionalBranchOP(this.address, currentBlock, stackOffset,
+			ConditionalBranchOP.IFLT, address));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifge(int)
 	 */
 	public void visit_ifge(int address) {
-		throw new IllegalArgumentException("byte code not yet supported");
+		stackOffset -= 1;
+		variables[stackOffset].setType(Operand.INT);
+		iopList.add(new ConditionalBranchOP(this.address, currentBlock, stackOffset,
+			ConditionalBranchOP.IFGE, address));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifgt(int)
 	 */
 	public void visit_ifgt(int address) {
-		throw new IllegalArgumentException("byte code not yet supported");
+		stackOffset -= 1;
+		variables[stackOffset].setType(Operand.INT);
+		iopList.add(new ConditionalBranchOP(this.address, currentBlock, stackOffset,
+			ConditionalBranchOP.IFGT, address));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ifle(int)
 	 */
 	public void visit_ifle(int address) {
-		throw new IllegalArgumentException("byte code not yet supported");
+		stackOffset -= 1;
+		variables[stackOffset].setType(Operand.INT);
+		iopList.add(new ConditionalBranchOP(this.address, currentBlock, stackOffset,
+			ConditionalBranchOP.IFLE, address));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpeq(int)
 	 */
 	public void visit_if_icmpeq(int address) {
-		throw new IllegalArgumentException("byte code not yet supported");
+		stackOffset -= 2;
+		int s1 = stackOffset + 1;
+		variables[s1].setType(Operand.INT);
+		variables[stackOffset].setType(Operand.INT);
+		iopList.add(new ConditionalBranchOP(this.address, currentBlock, s1,
+			ConditionalBranchOP.IF_ICMPEQ, stackOffset, address));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpne(int)
 	 */
 	public void visit_if_icmpne(int address) {
-		throw new IllegalArgumentException("byte code not yet supported");
+		stackOffset -= 2;
+		int s1 = stackOffset + 1;
+		variables[s1].setType(Operand.INT);
+		variables[stackOffset].setType(Operand.INT);
+		iopList.add(new ConditionalBranchOP(this.address, currentBlock, s1,
+			ConditionalBranchOP.IF_ICMPNE, stackOffset, address));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmplt(int)
 	 */
 	public void visit_if_icmplt(int address) {
-		throw new IllegalArgumentException("byte code not yet supported");
+		stackOffset -= 2;
+		int s1 = stackOffset + 1;
+		variables[s1].setType(Operand.INT);
+		variables[stackOffset].setType(Operand.INT);
+		iopList.add(new ConditionalBranchOP(this.address, currentBlock, s1,
+			ConditionalBranchOP.IF_ICMPLT, stackOffset, address));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpge(int)
 	 */
 	public void visit_if_icmpge(int address) {
-		throw new IllegalArgumentException("byte code not yet supported");
+		stackOffset -= 2;
+		int s1 = stackOffset + 1;
+		variables[s1].setType(Operand.INT);
+		variables[stackOffset].setType(Operand.INT);
+		iopList.add(new ConditionalBranchOP(this.address, currentBlock, s1,
+			ConditionalBranchOP.IF_ICMPGE, stackOffset, address));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmpgt(int)
 	 */
 	public void visit_if_icmpgt(int address) {
-		throw new IllegalArgumentException("byte code not yet supported");
+		stackOffset -= 2;
+		int s1 = stackOffset + 1;
+		variables[s1].setType(Operand.INT);
+		variables[stackOffset].setType(Operand.INT);
+		iopList.add(new ConditionalBranchOP(this.address, currentBlock, s1,
+			ConditionalBranchOP.IF_ICMPGT, stackOffset, address));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_icmple(int)
 	 */
 	public void visit_if_icmple(int address) {
-		throw new IllegalArgumentException("byte code not yet supported");
+		stackOffset -= 2;
+		int s1 = stackOffset + 1;
+		variables[s1].setType(Operand.INT);
+		variables[stackOffset].setType(Operand.INT);
+		iopList.add(new ConditionalBranchOP(this.address, currentBlock, stackOffset,
+			ConditionalBranchOP.IF_ICMPLE, s1, address));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_acmpeq(int)
 	 */
 	public void visit_if_acmpeq(int address) {
-		throw new IllegalArgumentException("byte code not yet supported");
+		stackOffset -= 2;
+		int s1 = stackOffset + 1;
+		variables[s1].setType(Operand.REFERENCE);
+		variables[stackOffset].setType(Operand.REFERENCE);
+		iopList.add(new ConditionalBranchOP(this.address, currentBlock, stackOffset,
+			ConditionalBranchOP.IF_ACMPEQ, s1, address));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_if_acmpne(int)
 	 */
 	public void visit_if_acmpne(int address) {
-		throw new IllegalArgumentException("byte code not yet supported");
+		stackOffset -= 2;
+		int s1 = stackOffset + 1;
+		variables[s1].setType(Operand.REFERENCE);
+		variables[stackOffset].setType(Operand.REFERENCE);
+		iopList.add(new ConditionalBranchOP(this.address, currentBlock, stackOffset,
+			ConditionalBranchOP.IF_ACMPNE, s1, address));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_goto(int)
 	 */
 	public void visit_goto(int address) {
-		throw new IllegalArgumentException("byte code not yet supported");
+		iopList.add(new UnconditionalBranchOP(this.address, currentBlock, address));
 	}
 
 	/* (non-Javadoc)
@@ -1183,7 +1257,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_ireturn() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.INT);
-		iopList.add(new VarReturnOP(address, variables, stackOffset));
+		iopList.add(new VarReturnOP(address, currentBlock, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -1192,7 +1266,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_lreturn() {
 		stackOffset -= 2;
 		variables[stackOffset].setType(Operand.LONG);
-		iopList.add(new VarReturnOP(address, variables, stackOffset));
+		iopList.add(new VarReturnOP(address, currentBlock, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -1201,7 +1275,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_freturn() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.FLOAT);
-		iopList.add(new VarReturnOP(address, variables, stackOffset));
+		iopList.add(new VarReturnOP(address, currentBlock, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -1210,7 +1284,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_dreturn() {
 		stackOffset -= 2;
 		variables[stackOffset].setType(Operand.DOUBLE);
-		iopList.add(new VarReturnOP(address, variables, stackOffset));
+		iopList.add(new VarReturnOP(address, currentBlock, stackOffset));
 	}
 
 	/* (non-Javadoc)
@@ -1219,14 +1293,14 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_areturn() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.REFERENCE);
-		iopList.add(new VarReturnOP(address, variables, stackOffset));
+		iopList.add(new VarReturnOP(address, currentBlock, stackOffset));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_return()
 	 */
 	public void visit_return() {
-		iopList.add(new VoidReturnOP(address));
+		iopList.add(new VoidReturnOP(address, currentBlock));
 	}
 
 	/* (non-Javadoc)
@@ -1397,17 +1471,60 @@ public class IRGenerator extends BytecodeVisitor {
 		BytecodeViewer bv = new BytecodeViewer();
 		BytecodeParser.parse(code, bv);
 
+		System.out.println();
+		ControlFlowGraph cfg = new ControlFlowGraph(code);
+		System.out.println(cfg.toString());
+
 		System.out.println();		
-		IRGenerator irg = new IRGenerator();
+		IRGenerator irg = new IRGenerator(cfg);
 		BytecodeParser.parse(code, irg);
 		ArrayList iops = irg.getIOPList();
 		int n = iops.size();
+		boolean printDeadCode = false;
+		boolean printDetail = false;
 		for (int i=0; i<n; i+=1) {
-			System.out.println(iops.get(i));
+			IOP iop = (IOP) iops.get(i);
+			if (printDeadCode && iop.isDeadCode()) {
+				if (printDetail) {
+					printIOPDetail(iop);
+				}
+				System.out.println(iop);
+			}
+			if (!iop.isDeadCode()) {
+				if (printDetail) {
+					printIOPDetail(iop);
+				}
+				System.out.println(iop);
+			}
+		}
+	}
+
+	public static void printIOPDetail(IOP iop) {
+		System.out.print(iop.getBasicBlock());
+		System.out.print(" ");
+		Variable[] vars = iop.getBasicBlock().getVariables();
+		System.out.print("[");
+		for (int j=0; j<vars.length; j+=1) {
+			System.out.print(vars[j]);
+			System.out.print(",");
+		}
+		System.out.print("] ");
+		if (iop.isDeadCode()) {
+			System.out.print("(dead) ");
 		}
 	}
 
 	public static int arithOpt(int a, int b, int c) {
-		return b*b - 4*a*c;
+		int result = 1;
+		if (a == 0) {
+			result = 2;
+		}
+		if (a == 1) {
+			result = 3;
+		}
+		if (a == 2) {
+			result = 3;
+		}
+		return result;
 	}
 }
