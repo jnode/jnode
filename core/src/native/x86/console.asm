@@ -24,7 +24,7 @@ video_mode_reg	equ 0x3d8
 	mov AAX,ABX
 	shr AAX,%1
 	and AAX,0x0f
-	mov al,[hexchars+eax]
+	mov al,[eax+hexchars]
 	call sys_print_char%2
 %endmacro
 
