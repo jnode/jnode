@@ -65,8 +65,8 @@
 	</target>
 
 	<target name="prepare-props" depends="test-properties,load-properties,default-properties">
-		<property name="jnode.bits" value="32" />
-		<property name="jnode.kernel" value="${jnodedrive.dir}/jnode${jnode.bits}.gz" />
+		<property name="jnode.kernel.dir" value="${jnodedrive.dir}" />
+		<property name="jnode.kernel" value="${jnode.kernel.dir}/jnode${jnode.bits}.gz" />
 		<property name="jnode.compiler" value="default" />
 
 		<property name="build.native.dir" value="${my-build.dir}/${jnode.bits}bits/native" />
@@ -218,7 +218,9 @@
 		<attribute name="destfile" />
 		<sequential>
 			<mkdir dir="@{dir}/boot/grub" />
-			<copy file="${jnode.kernel}" todir="@{dir}" />
+			<copy todir="@{dir}">
+				<fileset dir="${jnode.kernel.dir}" includes="jnode*.gz"/>
+			</copy>
 			<copy todir="@{dir}">
 				<fileset dir="${initjars.dir}" />
 			</copy>
@@ -231,13 +233,13 @@
 	</macrodef>
 
 	<!-- Create a full distributable bootable CDROM image -->
-	<target name="cdrom" depends="boot-disk">
+	<target name="cdrom" depends="prepare">
 		<copy file="${sources.dist.tar.gz}" todir="${my-build.dir}/cdrom-full" />
 		<create-cdrom destfile="${jnode-x86.iso}" dir="${my-build.dir}/cdrom-full" />
 	</target>
 
 	<!-- Create a bootable CDROM image -->
-	<target name="cdrom-lite" depends="boot-disk">
+	<target name="cdrom-lite" depends="prepare">
 		<create-cdrom destfile="${jnode-x86-lite.iso}" dir="${my-build.dir}/cdrom-lite" />
 	</target>
 
@@ -261,15 +263,6 @@
 		<copy todir="${build.netboot.dir}/plugins">
 			<fileset dir="${plugins.dir}" />
 		</copy>
-	</target>
-
-	<target name="disasm">
-		<exec executable="ndisasm" dir="${basedir}" output="${build.bootimage.dir}/bootimage.asm">
-			<arg value="-u" />
-			<arg value="-o" />
-			<arg value="0x100000" />
-			<arg value="${build.bootimage.dir}/bootimage.bin" />
-		</exec>
 	</target>
 
 	<!-- Run all required targets -->
