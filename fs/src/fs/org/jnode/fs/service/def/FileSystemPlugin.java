@@ -67,6 +67,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
 	 * @param device
 	 */
 	public FileSystem unregisterFileSystem(Device device) {
+		api.rootRemoved(new java.io.File(fsm.getMountPoint(device)));
 		return fsm.unregisterFileSystem(device);
 	}
 
