@@ -1,5 +1,6 @@
 /* SocketImpl.java -- Abstract socket implementation class
-   Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,7 +38,11 @@ exception statement from your version. */
 
 package java.net;
 
-import java.io.*;
+import java.io.FileDescriptor;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 
 /* Written using on-line Java Platform 1.2 API Specification.
  * Believed complete and correct.
@@ -57,7 +62,7 @@ import java.io.*;
  * a factory.
  *
  * @author Aaron M. Renn (arenn@urbanophile.com)
- * @author Per Bothner <bothner@cygnus.com>
+ * @author Per Bothner (bothner@cygnus.com)
  */
 public abstract class SocketImpl implements SocketOptions
 {
@@ -108,7 +113,8 @@ public abstract class SocketImpl implements SocketOptions
    *
    * @exception IOException If an error occurs
    */
-  protected abstract void connect(String host, int port) throws IOException;
+  protected abstract void connect(String host, int port)
+    throws IOException;
 
   /**
    * Connects to the remote address and port specified as arguments.
@@ -148,7 +154,8 @@ public abstract class SocketImpl implements SocketOptions
    *
    * @exception IOException If an error occurs
    */
-  protected abstract void bind(InetAddress host, int port) throws IOException;
+  protected abstract void bind(InetAddress host, int port)
+    throws IOException;
 
   /**
    * Starts listening for connections on a socket. The backlog parameter
@@ -215,25 +222,37 @@ public abstract class SocketImpl implements SocketOptions
    *
    * @return A FileDescriptor for this socket.
    */
-  protected FileDescriptor getFileDescriptor() { return fd; }
+  protected FileDescriptor getFileDescriptor()
+  {
+    return fd;
+  }
 
   /**
    * Returns the remote address this socket is connected to
    *
    * @return The remote address
    */
-  protected InetAddress getInetAddress() { return address; }
+  protected InetAddress getInetAddress()
+  {
+    return address;
+  }
 
   /**
    * Returns the remote port this socket is connected to
    *
    * @return The remote port
    */
-  protected int getPort() { return port; }
+  protected int getPort()
+  {
+    return port;
+  }
 
   /**
    * Returns true or false when this socket supports sending urgent data
    * or not.
+   *
+   * @return true if the socket implementation supports sending urgent data,
+   * false otherwise
    *
    * @since 1.4
    */
@@ -253,15 +272,17 @@ public abstract class SocketImpl implements SocketOptions
    *
    * @since 1.4
    */
-  protected abstract void sendUrgentData(int data)
-    throws IOException;
+  protected abstract void sendUrgentData(int data) throws IOException;
   
   /**
    * Returns the local port this socket is bound to
    *
    * @return The local port
    */
-  protected int getLocalPort() { return localport; }
+  protected int getLocalPort()
+  {
+    return localport;
+  }
 
   /**
    * Returns a <code>String</code> representing the remote host and port of
@@ -271,42 +292,10 @@ public abstract class SocketImpl implements SocketOptions
    */
   public String toString()
   {
-    return "[addr=" + address
-	    + ",port=" + port
-	    + ",localport=" + localport + "]";
+    return "[addr="
+           + ((address == null) ? "0.0.0.0/0.0.0.0" : address.toString())
+           + ",port=" + port + ",localport=" + localport + "]";
   }
-
-  /**
-   * Sets the specified option on a socket to the passed in object.  For
-   * options that take an integer argument, the passed in object is an
-   * <code>Integer</code>.  For options that are set to on or off, the
-   * value passed will be a <code>Boolean</code>.   The <code>option_id</code> 
-   * parameter is one of the defined constants in the superinterface.
-   *
-   * @param option_id The identifier of the option
-   * @param val The value to set the option to
-   *
-   * @exception SocketException If an error occurs
-   * @XXX This redeclaration from SocketOptions is a workaround to a gcj bug.
-   */
-  public abstract void setOption(int option_id, Object val)
-    throws SocketException;
-
-  /**
-   * Returns the current setting of the specified option.  The 
-   * <code>Object</code> returned will be an <code>Integer</code> for options 
-   * that have integer values.  For options that are set to on or off, a 
-   * <code>Boolean</code> will be returned.   The <code>option_id</code>
-   * is one of the defined constants in the superinterface.
-   *
-   * @param option_id The option identifier
-   *
-   * @return The current value of the option
-   *
-   * @exception SocketException If an error occurs
-   * @XXX This redeclaration from SocketOptions is a workaround to a gcj bug.
-   */
-  public abstract Object getOption(int option_id) throws SocketException;
 
   /**
    * Shut down the input side of this socket.  Subsequent reads will
@@ -314,7 +303,10 @@ public abstract class SocketImpl implements SocketOptions
    *
    * @exception IOException if an error occurs
    */
-  protected abstract void shutdownInput () throws IOException;
+  protected void shutdownInput() throws IOException
+  {
+    throw new IOException("Not implemented in this socket class");
+  }
 
   /**
    * Shut down the output side of this socket.  Subsequent writes will
@@ -322,5 +314,8 @@ public abstract class SocketImpl implements SocketOptions
    *
    * @exception IOException if an error occurs
    */
-  protected abstract void shutdownOutput () throws IOException;
+  protected void shutdownOutput() throws IOException
+  {
+    throw new IOException("Not implemented in this socket class");
+  }
 }
