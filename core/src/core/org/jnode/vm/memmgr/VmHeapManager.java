@@ -6,7 +6,6 @@ package org.jnode.vm.memmgr;
 import java.io.PrintStream;
 
 import org.jnode.vm.Unsafe;
-import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.VmArray;
@@ -161,12 +160,11 @@ public abstract class VmHeapManager extends VmSystemObject {
 	public final Object clone(Cloneable object) {
 		testInited();
 		final VmClassType objectClass = VmMagic.getObjectType(object);
-		final VmAddress objectAddr = helper.addressOf(object);
+		final Address objectPtr = ObjectReference.fromObject(object).toAddress();
 		final int size;
 		if (objectClass.isArray()) {
 			final int slotSize = Unsafe.getCurrentProcessor().getArchitecture().getReferenceSize();
 			final VmArrayClass arrayClass = (VmArrayClass) objectClass;
-            final Address objectPtr = ObjectReference.fromObject(object).toAddress();
 			final int length = objectPtr.loadInt(Offset.fromIntSignExtend(VmArray.LENGTH_OFFSET * slotSize));
 			final int elemSize = arrayClass.getComponentType().getTypeSize();
 			size = (VmArray.DATA_OFFSET * slotSize) * (length * elemSize);
@@ -175,7 +173,7 @@ public abstract class VmHeapManager extends VmSystemObject {
 			size = normalClass.getObjectSize();
 		}
 		final Object newObj = allocObject(objectClass, size);
-		helper.copy(objectAddr, helper.addressOf(newObj), size);
+		helper.copy(objectPtr, ObjectReference.fromObject(newObj).toAddress(), size);
 		return newObj;
 	}
 

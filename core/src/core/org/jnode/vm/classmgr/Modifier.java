@@ -210,7 +210,10 @@ public class Modifier {
 
 	public static boolean isAddressType(String signature) {
 		return "Lorg/jnode/vm/VmAddress;".equals(signature) || 
-               "Lorg/vmmagic/unboxed/Address;".equals(signature);
+               "Lorg/vmmagic/unboxed/Address;".equals(signature) ||
+               "Lorg/vmmagic/unboxed/Extent;".equals(signature) ||
+               "Lorg/vmmagic/unboxed/Offset;".equals(signature) ||
+               "Lorg/vmmagic/unboxed/Word;".equals(signature);
 	}
 
 	/**

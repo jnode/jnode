@@ -5,7 +5,6 @@ package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.SpinLock;
-import org.jnode.vm.VmAddress;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.memmgr.HeapHelper;
@@ -26,23 +25,19 @@ import org.vmmagic.unboxed.Offset;
 public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible {
 
 	/** Start address of this heap (inclusive) */
-	protected VmAddress start;
+	protected Address start;
 	/** End address of this heap (exclusive) */
-	protected VmAddress end;
-	/** Start address of this heap (inclusive) */
-	private long startL;
-	/** End address of this heap (exclusive) */
-	private long endL;
+	protected Address end;
 	/** Size of this heap in bytes */
 	private int size;
 	/** Size of an object header in bytes */
 	protected int headerSize;
 	/** Offset of the flags field in an object header */
-	protected int flagsOffset;
+	protected Offset flagsOffset;
 	/** Offset of the type information block field in an object header */
-	protected int tibOffset;
+	protected Offset tibOffset;
 	/** Start address of allocation bitmap */
-	protected VmAddress allocationBitmapPtr;
+	protected Address allocationBitmapPtr;
 	/** The next heap (linked list) */
 	private VmAbstractHeap next;
 	
@@ -62,11 +57,9 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 */
 	protected final void initializeAbstract(int slotSize) {
 		this.headerSize = ObjectLayout.HEADER_SLOTS * slotSize;
-		this.flagsOffset = ObjectLayout.FLAGS_SLOT * slotSize;
-		this.tibOffset = ObjectLayout.TIB_SLOT * slotSize;
-		this.startL = helper.addressToLong(start);
-		this.endL = helper.addressToLong(end);
-		this.size = (int)(helper.addressToLong(end) - helper.addressToLong(start));
+		this.flagsOffset = Offset.fromIntSignExtend(ObjectLayout.FLAGS_SLOT * slotSize);
+		this.tibOffset = Offset.fromIntSignExtend(ObjectLayout.TIB_SLOT * slotSize);
+		this.size = end.toWord().sub(start.toWord()).toInt();
 	}
 	
 	/**
@@ -83,8 +76,6 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * @return boolean
 	 */
 	protected final boolean isObject(Address addr) {
-		final Address start = Address.fromAddress(this.start);
-		final Address end = Address.fromAddress(this.end);
 		if (addr.LT(start) || addr.GE(end)) {
 			// The object if not within this heap
 			return false;
@@ -94,7 +85,7 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 		int bit = offset / ObjectLayout.OBJECT_ALIGN;
 		final Offset idx = Offset.fromIntZeroExtend(bit / 8);
 		final int mask = 1 << (bit & 7);
-		final Address bitmapPtr = Address.fromAddress(this.allocationBitmapPtr);
+		final Address bitmapPtr = this.allocationBitmapPtr;
 		final int value = bitmapPtr.loadByte(idx);
 		return ((value & mask) == mask);
 	}
@@ -106,8 +97,6 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * @return boolean
 	 */
 	protected final boolean inHeap(Address addr) {
-		final Address start = Address.fromAddress(this.start);
-		final Address end = Address.fromAddress(this.end);
 		return (addr.GE(start) && addr.LT(end));
 	}
 
@@ -118,8 +107,6 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 */	
 	protected final void setAllocationBit(Object object, boolean on) {
 		final Address addr = ObjectReference.fromObject(object).toAddress();
-		final Address start = Address.fromAddress(this.start);
-		final Address end = Address.fromAddress(this.end);
 		if (addr.LT(start) || addr.GE(end)) {
 			return;
 		}
@@ -128,7 +115,7 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 		final int bit = offset / ObjectLayout.OBJECT_ALIGN;
 		final Offset idx = Offset.fromIntZeroExtend(bit / 8);
 		final int mask = 1 << (bit & 7);
-		final Address bitmapPtr = Address.fromAddress(this.allocationBitmapPtr);
+		final Address bitmapPtr = this.allocationBitmapPtr;
 		int value = bitmapPtr.loadByte(idx);
 		if (on) {
 			value |= mask;
@@ -164,7 +151,7 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * @param end End address of this heap (first address after this heap)
 	 * @param slotSize
 	 */
-	protected abstract void initialize(VmAddress start, VmAddress end, int slotSize);
+	protected abstract void initialize(Address start, Address end, int slotSize);
 	
 	/**
 	 * Allocate a new instance for the given class.

@@ -337,7 +337,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             // Create the VM
             final HeapHelper helper = new HeapHelperImpl(arch);
             final Vm vm = new Vm(version, arch, new DefaultHeapManager(clsMgr,
-                    helper, clsMgr.getStatics()), clsMgr.getStatics(), debug);
+                    helper), clsMgr.getStatics(), debug);
             blockedObjects.add(vm);
 
             final VmProcessor proc = createProcessor(clsMgr.getStatics());

@@ -6,14 +6,14 @@ package org.jnode.vm.memmgr;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.vm.Monitor;
 import org.jnode.vm.ObjectVisitor;
-import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.classmgr.VmMethod;
+import org.vmmagic.unboxed.Address;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public abstract class HeapHelper extends ObjectResolver {
+public abstract class HeapHelper {
 
 	/**
 	 * Mark the given object as finalized.
@@ -30,17 +30,15 @@ public abstract class HeapHelper extends ObjectResolver {
 	 */
 	public abstract boolean atomicChangeObjectColor(Object dst, int oldColor, int newColor);
 
-	public abstract void copy(VmAddress src, VmAddress dst, int size);
+	public abstract void copy(Address src, Address dst, int size);
 
-	public abstract void clear(VmAddress dst, int size);
+	public abstract void clear(Address dst, int size);
 
-	public abstract long addressToLong(VmAddress a);
+	public abstract Address allocateBlock(int size);
 
-	public abstract VmAddress allocateBlock(int size);
+	public abstract Address getBootHeapStart();
 
-	public abstract VmAddress getBootHeapStart();
-
-	public abstract VmAddress getBootHeapEnd();
+	public abstract Address getBootHeapEnd();
 
 	public abstract void invokeFinalizer(VmMethod finalizer, Object object);
 	

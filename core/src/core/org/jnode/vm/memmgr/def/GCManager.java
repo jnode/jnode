@@ -9,7 +9,6 @@ import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmSystemObject;
-import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.memmgr.GCStatistics;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.pragma.Uninterruptible;
@@ -43,9 +42,6 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
     /** The object resolver */
     private final ObjectResolver resolver;
 
-    /** The statics table */
-    private final VmStatics statics;
-
     /** The low level helper */
     private final HeapHelper helper;
 
@@ -58,8 +54,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
     /**
      * Create a new instance
      */
-    public GCManager(DefaultHeapManager heapManager, VmArchitecture arch,
-            VmStatics statics) {
+    public GCManager(DefaultHeapManager heapManager, VmArchitecture arch) {
         this.debug = true || Vm.getVm().isDebugMode();
         this.heapManager = heapManager;
         this.writeBarrier = (DefaultWriteBarrier) heapManager.getWriteBarrier();
@@ -70,7 +65,6 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
         this.verifyVisitor = new GCVerifyVisitor(heapManager, arch);
         this.sweepVisitor = new GCSweepVisitor(heapManager);
         this.stats = new DefGCStatistics();
-        this.statics = statics;
         this.resolver = new Unsafe.UnsafeObjectResolver();
     }
 
