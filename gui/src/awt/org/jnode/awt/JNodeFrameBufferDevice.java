@@ -28,7 +28,7 @@ public class JNodeFrameBufferDevice extends GraphicsDevice implements DeviceList
 		try {
 			this.api = (FrameBufferAPI)device.getAPI(FrameBufferAPI.class);
 		} catch (ApiNotFoundException ex) {
-			throw new IllegalArgumentException("Not a FrameBuffer device", ex);
+			throw new IllegalArgumentException("Not a FrameBuffer device " + device.getId());
 		}
 		final FrameBufferConfiguration[] fbConfigs = api.getConfigurations();
 		configs = new JNodeGraphicsConfiguration[fbConfigs.length];
