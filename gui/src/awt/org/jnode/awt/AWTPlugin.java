@@ -17,8 +17,8 @@ import org.jnode.plugin.PluginException;
  */
 public class AWTPlugin extends Plugin {
 
-    private static final String TOOLKIT = "org.jnode.awt.peer.RawJNodeToolkit";
-    //private static final String TOOLKIT = "org.jnode.awt.swingpeers.SwingToolkit";
+//    private static final String TOOLKIT = "org.jnode.awt.peer.RawJNodeToolkit";
+    private static final String TOOLKIT = "org.jnode.awt.swingpeers.SwingToolkit";
     
 	/**
 	 * @param descriptor
