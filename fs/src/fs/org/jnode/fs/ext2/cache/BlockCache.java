@@ -29,14 +29,14 @@ public class BlockCache extends LinkedHashMap{
 		cacheListeners.addElement(listener);
 	}
 		
-	private boolean containsKey(Integer key) {
+	/*private boolean containsKey(Integer key) {
 		boolean result = super.containsKey(key);
 		if(result)
 			log.debug("CACHE HIT, size:"+size());
 		else
 			log.debug("CACHE MISS");
 		return result;
-	}
+	}*/
 	
 	protected boolean removeEldestEntry(Map.Entry eldest) {
 		if(size()>MAX_SIZE) {

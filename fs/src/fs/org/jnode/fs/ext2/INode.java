@@ -51,7 +51,7 @@ public class INode {
 	/**
 	 * Create a new INode object from scratch
 	 * @param fs
-	 * @param dec
+	 * @param desc
 	 */
 	public INode(Ext2FileSystem fs, INodeDescriptor desc, int fileFormat, int accessRights, int uid, int gid){
 		this.fs = fs;
@@ -198,10 +198,7 @@ public class INode {
 	 * Free up block dataBlockNr, and free up any indirect blocks, if needed 
 	 * @param dataBlockNr
 	 * @param offset
-	 * @param allocatedBlocks
-	 * @param value
 	 * @param indirectionLevel
-	 * @return boolean value indicates, that the parent block (dataBlockNr) can be freed up as well
 	 * @throws IOException
 	 */
 	private final void indirectFree(long dataBlockNr, long offset, int indirectionLevel)
@@ -415,7 +412,6 @@ public class INode {
 	 * Free up the ith data block of the inode. It is neccessary to free up indirect 
 	 * blocks as well, if the last pointer on an indirect block has been freed. 
 	 * @param i
-	 * @return
 	 * @throws IOException
 	 */
 	protected synchronized void freeDataBlock(long i) throws IOException, FileSystemException {

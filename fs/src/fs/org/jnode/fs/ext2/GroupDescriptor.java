@@ -46,7 +46,6 @@ public class GroupDescriptor {
 	/**
 	 * GroupDescriptors are duplicated in every block group: if a GroupDescriptor changes,
 	 * all copies have to be changed.
-	 * @param groupNr
 	 */
 	protected void updateGroupDescriptors() throws IOException{
 		//all the copies of the group descriptors have to be modified in sync
