@@ -172,14 +172,6 @@ public class X86CodeGenerator extends CodeGenerator {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.BinaryQuad)
-	 */
-	public void generateCodeFor(BinaryQuad quad) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-Javadoc)
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad, java.lang.Object, int, org.jnode.vm.compiler.ir.Constant)
 	 */
 	public void generateCodeFor(UnaryQuad quad, Object lhsReg, int operation,
@@ -203,7 +195,9 @@ public class X86CodeGenerator extends CodeGenerator {
 		Object rhsReg) {
 		switch(operation) {
 			case UnaryQuad.INEG:
-				os.writeMOV(X86Constants.BITS32, (Register) lhsReg, (Register) rhsReg);
+				if (lhsReg != rhsReg) {
+					os.writeMOV(X86Constants.BITS32, (Register) lhsReg, (Register) rhsReg);
+				}
 				os.writeNEG((Register) lhsReg);
 				break;
 			// TODO finish operations
@@ -267,5 +261,158 @@ public class X86CodeGenerator extends CodeGenerator {
 			default:
 				throw new IllegalArgumentException("Unknown operation");
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, org.jnode.vm.compiler.ir.Constant, int, org.jnode.vm.compiler.ir.Constant)
+	 */
+	public void generateBinaryOP(Object reg1, Constant c2, int operation, Constant c3) {
+		switch(operation) {
+			case BinaryQuad.IADD:
+				IntConstant iconst1 = (IntConstant) c2;
+				IntConstant iconst2 = (IntConstant) c3;
+				os.writeMOV_Const((Register) reg1, iconst1.getValue());
+				// TODO STOPPED HERE...
+				break;
+			// TODO finish operations
+			default:
+				throw new IllegalArgumentException("Unknown operation");
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, org.jnode.vm.compiler.ir.Constant, int, java.lang.Object)
+	 */
+	public void generateBinaryOP(Object reg1, Constant c2, int operation, Object reg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, org.jnode.vm.compiler.ir.Constant, int, int)
+	 */
+	public void generateBinaryOP(Object reg1, Constant c2, int operation, int disp3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, java.lang.Object, int, org.jnode.vm.compiler.ir.Constant)
+	 */
+	public void generateBinaryOP(Object reg1, Object reg2, int operation, Constant c3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, java.lang.Object, int, java.lang.Object)
+	 */
+	public void generateBinaryOP(Object reg1, Object reg2, int operation, Object reg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, java.lang.Object, int, int)
+	 */
+	public void generateBinaryOP(Object reg1, Object reg2, int operation, int disp3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, int, int, org.jnode.vm.compiler.ir.Constant)
+	 */
+	public void generateBinaryOP(Object reg1, int disp2, int operation, Constant c3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, int, int, java.lang.Object)
+	 */
+	public void generateBinaryOP(Object reg1, int disp2, int operation, Object reg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, int, int, int)
+	 */
+	public void generateBinaryOP(Object reg1, int disp2, int operation, int disp3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, org.jnode.vm.compiler.ir.Constant, int, org.jnode.vm.compiler.ir.Constant)
+	 */
+	public void generateBinaryOP(int disp1, Constant c2, int operation, Constant c3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, org.jnode.vm.compiler.ir.Constant, int, java.lang.Object)
+	 */
+	public void generateBinaryOP(int disp1, Constant c2, int operation, Object reg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, org.jnode.vm.compiler.ir.Constant, int, int)
+	 */
+	public void generateBinaryOP(int disp1, Constant c2, int operation, int disp3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, java.lang.Object, int, org.jnode.vm.compiler.ir.Constant)
+	 */
+	public void generateBinaryOP(int disp1, Object reg2, int operation, Constant c3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, java.lang.Object, int, java.lang.Object)
+	 */
+	public void generateBinaryOP(int disp1, Object reg2, int operation, Object reg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, java.lang.Object, int, int)
+	 */
+	public void generateBinaryOP(int disp1, Object reg2, int operation, int disp3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, int, int, org.jnode.vm.compiler.ir.Constant)
+	 */
+	public void generateBinaryOP(int disp1, int disp2, int operation, Constant c3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, int, int, java.lang.Object)
+	 */
+	public void generateBinaryOP(int disp1, int disp2, int operation, Object reg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, int, int, int)
+	 */
+	public void generateBinaryOP(int disp1, int disp2, int operation, int disp3) {
+		// TODO Auto-generated method stub
+		
 	}
 }
