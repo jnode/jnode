@@ -5,54 +5,39 @@ package org.jnode.fs.iso9660;
 
 import java.io.IOException;
 
-import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
-import org.jnode.driver.block.BlockDeviceAPI;
+import org.jnode.fs.AbstractFileSystem;
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 
 
 /**
  * @author Chira
  */
-public class ISO9660FileSystem implements FileSystem
+public class ISO9660FileSystem extends AbstractFileSystem
 {
 
 	public static int DefaultLBNSize = 2048;
 
-	private Device device = null;
-	private final BlockDeviceAPI api;
 	private ISO9660Volume volume = null;
 
 	/**
 	 * @see org.jnode.fs.FileSystem#getDevice()
 	 */
-	public ISO9660FileSystem(Device device) throws FileSystemException 
+	public ISO9660FileSystem(Device device, boolean readOnly) throws FileSystemException	
 	{
-		if (device == null)
-			throw new FileSystemException("null device!");
-
-		this.device = device;
-		try {
-			api = (BlockDeviceAPI)device.getAPI(BlockDeviceAPI.class);
-		} catch (ApiNotFoundException ex) {
-			throw new FileSystemException(ex);
-		}
+		super(device, readOnly);
+		
 		//byte[] buff = new byte[ISO9660FileSystem.DefaultLBNSize];
 		try
 		{
-			volume = new ISO9660Volume(api);
+			volume = new ISO9660Volume(getApi());
 		} catch (IOException e)
 		{
 			throw new FileSystemException(e);
 		}
 	}
 	
-	public Device getDevice()
-	{
-		return device;
-	}
 	/**
 	 * @see org.jnode.fs.FileSystem#getRootEntry()
 	 */
@@ -61,13 +46,7 @@ public class ISO9660FileSystem implements FileSystem
 		return new ISO9660Entry(volume.getVolumeDescriptor().getRootDirectoryEntry());
 		
 	}
-	/**
-	 * @see org.jnode.fs.FileSystem#close()
-	 */
-	public void close()
-	{
-		// TODO Auto-generated method stub
-	}
+		
 	/**
 	 * @return Returns the volume.
 	 */
@@ -75,5 +54,10 @@ public class ISO9660FileSystem implements FileSystem
 		return this.volume;
 	}
 
-
+	/* (non-Javadoc)
+	 * @see org.jnode.fs.AbstractFileSystem#flush()
+	 */
+	public void flush() throws IOException {
+		//TODO: perhaps nothing todo (always readOnly ?)
+	}
 }
