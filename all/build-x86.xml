@@ -200,7 +200,7 @@
       			initJarFile="${initjars.dir}/full.jgz"/>
   </target>
 
-<!-- Create a bootable CDROM image -->
+<!-- Create a full distributable bootable CDROM image -->
   <target name="cdrom" depends="boot-disk">
     <mkdir dir="${build.dir}/cdrom"/>
     <copy todir="${build.dir}/cdrom">
@@ -216,6 +216,19 @@
     </zip>
     <exec executable="mkisofs">
       <arg line="-o ${build.dir}/jnode.iso -r -hard-disk-boot -b jnodedisk.dat ${build.dir}/cdrom"/>
+    </exec>
+  </target>
+
+<!-- Create a bootable CDROM image -->
+  <target name="cdrom-lite" depends="boot-disk">
+    <mkdir dir="${build.dir}/cdrom-lite"/>
+    <copy todir="${build.dir}/cdrom-lite">
+      <fileset dir="${build.dir}">
+        <include name="jnodedisk.dat"/>
+      </fileset>
+    </copy>
+    <exec executable="mkisofs">
+      <arg line="-o ${build.dir}/jnode-lite.iso -r -hard-disk-boot -b jnodedisk.dat ${build.dir}/cdrom-lite"/>
     </exec>
   </target>
 
