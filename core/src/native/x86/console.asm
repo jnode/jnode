@@ -11,6 +11,13 @@
     global sys_print_char   ; Print a single character in AL
     global sys_print_str    ; Print a null-terminated (byte) character array point by EAX
 
+%macro PRINT_CHAR 1
+	push eax
+	mov eax,%1
+	call sys_print_char
+	pop eax
+%endmacro
+
 scr_width	equ 80
 scr_height	equ 25
 scr_addr	equ 0xb8000

@@ -236,6 +236,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	 * @param bootClasses
 	 */
 	protected static void loadFromBootClassArray(VmType[] bootClasses) {
+		Unsafe.debug("loadFromBootClassArray");
 		int count = bootClasses.length;
 		for (int i = 0; i < count; i++) {
 			VmType vmClass = bootClasses[i];
