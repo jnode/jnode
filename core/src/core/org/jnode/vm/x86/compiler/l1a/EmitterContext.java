@@ -38,10 +38,10 @@ final class EmitterContext {
     private final X86CompilerHelper helper;
 
     /** GPR Register Pool */
-    private final X86RegisterPool.GPRs gprPool;
+    private final X86RegisterPool gprPool;
 
     /** XMM Register Pool */
-    private final X86RegisterPool.XMMs xmmPool;
+    private final X86RegisterPool xmmPool;
 
     /** Virtual Stack */
     private final VirtualStack vstack;
@@ -53,7 +53,7 @@ final class EmitterContext {
      * Create a new context
      */
     EmitterContext(X86Assembler os, X86CompilerHelper helper,
-            VirtualStack vstack, X86RegisterPool.GPRs gprPool, X86RegisterPool.XMMs xmmPool, ItemFactory ifac) {
+            VirtualStack vstack, X86RegisterPool gprPool, X86RegisterPool xmmPool, ItemFactory ifac) {
         this.os = os;
         this.helper = helper;
         this.vstack = vstack;
@@ -85,7 +85,7 @@ final class EmitterContext {
      * 
      * @return the current emitter's GPR register pool
      */
-    final X86RegisterPool.GPRs getGPRPool() {
+    final X86RegisterPool getGPRPool() {
         return gprPool;
     }
 
@@ -94,7 +94,7 @@ final class EmitterContext {
      * 
      * @return the current emitter's XMM register pool
      */
-    final X86RegisterPool.XMMs getXMMPool() {
+    final X86RegisterPool getXMMPool() {
         return xmmPool;
     }
 
