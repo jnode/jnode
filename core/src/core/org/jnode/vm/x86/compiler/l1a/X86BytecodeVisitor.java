@@ -548,7 +548,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         RefItem ref = vstack.popRef();
         vstack.push(ref);
 
-	if (vstack.checkOperandStack) {
+	if (VirtualStack.checkOperandStack) {
 		// sanity check
 		vstack.popFromOperandStack(ref);
 		vstack.pushOnOperandStack(ref);
@@ -3145,13 +3145,13 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         vstack.push(eContext);
 	if (!vstack.isEmpty()) {
             Item val = vstack.pop();
-	    if (vstack.checkOperandStack) {
+	    if (VirtualStack.checkOperandStack) {
 		    vstack.popFromOperandStack(val);
 	    }
 	    assertCondition(val.getCategory() == ((wide) ? 2 : 1));
 	    if (!vstack.isEmpty()) {
                 RefItem ref = vstack.popRef();
-		    if (vstack.checkOperandStack) {
+		    if (VirtualStack.checkOperandStack) {
 			    vstack.popFromOperandStack(ref);
 		    }
 		// in fact, should release val first, in case they are on
