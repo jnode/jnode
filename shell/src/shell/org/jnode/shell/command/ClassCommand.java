@@ -9,7 +9,6 @@ import org.jnode.shell.help.ClassNameArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
-import org.jnode.vm.classmgr.VmType;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -25,16 +24,15 @@ public class ClassCommand {
 
 		String className = ARG_CLASS.getValue(cmdLine);
 		final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		final VmType type = cl.loadClass(className).getVmClass();
+		final Class type = cl.loadClass(className);
 		showClass(type, System.out);
 	}
 	
-	private static void showClass(VmType type, PrintStream out) {
-		out.println("Name        : " + type.getName());
-		out.println("Is abstract : " + type.isAbstract());
-		out.println("Is array    : " + type.isArray());
-		out.println("Is primitive: " + type.isPrimitive());
-		out.println("Is compiled : " + type.isCompiled());
-		out.println("Is valid    : " + !type.isInvalid());
+	private static void showClass(Class type, PrintStream out) {
+		out.println("Name             : " + type.getName());
+		//out.println("Is abstract      : " + type.isAbstract());
+		out.println("Is array         : " + type.isArray());
+		out.println("Is primitive     : " + type.isPrimitive());
+		out.println("Protection domain: " + type.getProtectionDomain());
 	}
 }
