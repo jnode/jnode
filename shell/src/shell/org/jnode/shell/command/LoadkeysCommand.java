@@ -26,20 +26,24 @@ import org.jnode.shell.help.Syntax;
  */
 public class LoadkeysCommand {
 
-    static final Argument COUNTRY = new Argument("action", "country parameter");
+    static final Argument COUNTRY = new Argument("country", "country parameter");
 
-    static final Argument REGION = new Argument("action", "region parameter");
+    static final Argument LANGUAGE = new Argument("language", "language parameter");
+
+    static final Argument VARIANT = new Argument("variant", "variant parameter");
 
     static final Parameter PARAM_COUNTRY = new Parameter(COUNTRY);
 
-    static final Parameter PARAM_REGION = new Parameter(REGION, Parameter.OPTIONAL);
+    static final Parameter PARAM_REGION = new Parameter(LANGUAGE, Parameter.OPTIONAL);
+
+    static final Parameter PARAM_VARIANT = new Parameter(VARIANT, Parameter.OPTIONAL);
 
     public static Help.Info HELP_INFO = new Help.Info(
             "loadkeys",
             new Syntax[] { 
             	new Syntax("Display the current keyboard layout"),
             	new Syntax("change the current keyboard layout\n\tExample : loadkeys FR fr",
-                    PARAM_COUNTRY, PARAM_REGION)
+                    PARAM_COUNTRY, PARAM_REGION, PARAM_VARIANT)
 				});
 
     public static void main(String[] args) throws Exception {
@@ -65,10 +69,20 @@ public class LoadkeysCommand {
                         + api.getKbInterpreter().getClass().getName());
             } else {
                 final String country = COUNTRY.getValue(cmdLine);
-                final String region = REGION.getValue(cmdLine);
+                String language = LANGUAGE.getValue(cmdLine);
+                String variant = VARIANT.getValue(cmdLine);
+
+                //TODO add more validation for country and language
+                if(language != null &&
+                        !language.equals(language.toLowerCase()) &&
+                        variant == null){
+
+                    variant = language;
+                    language = null;
+                }
 
                 final KeyboardInterpreter kbInt = KeyboardInterpreterFactory
-                        .getKeyboardInterpreter(country, region);
+                        .getKeyboardInterpreter(country, language, variant);
                 if (kbInt != null) {
                 	api.setKbInterpreter(kbInt);
                 } else {
