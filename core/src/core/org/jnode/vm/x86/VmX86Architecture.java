@@ -20,7 +20,6 @@ import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.compiler.IMTCompiler;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.x86.compiler.X86IMTCompiler;
-import org.jnode.vm.x86.compiler.l1.X86Level1Compiler;
 import org.jnode.vm.x86.compiler.l1a.X86Level1ACompiler;
 import org.jnode.vm.x86.compiler.stub.X86StubCompiler;
 
@@ -64,18 +63,11 @@ public final class VmX86Architecture extends VmArchitecture {
 	 * @param compiler L1a to use L1A compiler, L1 compiler otherwise.
 	 */
 	public VmX86Architecture(String compiler) {
-		final boolean useL1A = ((compiler == null) || compiler.equalsIgnoreCase("L1A") || compiler.equalsIgnoreCase("default"));
 		imtCompiler = new X86IMTCompiler();
 		compilers = new NativeCodeCompiler[2];
 		compilers[0] = new X86StubCompiler();
-		if (useL1A) {
-			compilers[1] = new X86Level1ACompiler();
-			testCompilers = null;
-		} else {
-			compilers[1] = new X86Level1Compiler();			
-			testCompilers = new NativeCodeCompiler[1];
-			testCompilers[0] = new X86Level1ACompiler();
-		}	
+		compilers[1] = new X86Level1ACompiler();
+		testCompilers = null;
 	}
 	
 	/**

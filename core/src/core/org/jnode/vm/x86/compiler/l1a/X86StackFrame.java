@@ -7,6 +7,7 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream.ObjectRef;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
+import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Stream;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmInterpretedExceptionHandler;
@@ -42,11 +43,11 @@ class X86StackFrame implements X86CompilerConstants {
 	/** Label of the footer */
 	private final Label footerLabel;
 
-	/** Label of the create locals code */
-	private final Label createLocalsLabel;
+	/** Label at start of method init code */
+	private final Label initLabel;
 
-	/** Label of the create locals return address */
-	private final Label createLocalsRetLabel;
+	/** Label at start of actual method code */
+	private final Label startCodeLabel;
 
 	private X86Stream.ObjectInfo codeObject;
 
@@ -76,8 +77,8 @@ class X86StackFrame implements X86CompilerConstants {
 		this.context = context;
 		this.cm = cm;
 		this.bc = method.getBytecode();
-		this.createLocalsLabel = helper.genLabel("$$gen-locals");
-		this.createLocalsRetLabel = helper.genLabel("$$gen-locals-ret");
+		this.initLabel = helper.genLabel("$$init");
+		this.startCodeLabel = helper.genLabel("$$code");
 		this.footerLabel = helper.genLabel("$$footer");
 	}
 
@@ -99,10 +100,49 @@ class X86StackFrame implements X86CompilerConstants {
 			// Debug only
 			os.writeBreakPoint();
 		}
+		
+		// Jump to init code
+		os.writeJMP(initLabel);
+		// Set startCode label
+		os.setObjectRef(startCodeLabel);
 
-		// Test for stack overflow
-		helper.writeStackOverflowTest(method);
+		return rc;
+	}
 
+	/**
+	 * Emit code to end the stack frame
+	 */
+	public void emitTrailer(int maxLocals) {
+		final int argSlotCount = method.getArgSlotCount();
+		final Label stackOverflowLabel = helper.genLabel("$$stack-overflow");
+
+		// Begin footer
+		// Now start the actual footer
+		os.setObjectRef(footerLabel);
+
+		/* Go restore the previous current frame */
+		emitSynchronizationCode(context.getMonitorExitMethod());
+		os.writeLEA(Register.ESP, Register.EBP, EbpFrameRefOffset);
+		os.writePOP(Register.EBP);
+		restoreRegisters();
+		// Return
+		if (argSlotCount > 0) {
+			os.writeRET(argSlotCount * 4);
+		} else {
+			os.writeRET();
+		}
+		// End footer
+
+		// Begin header
+        // Init starts here
+        os.setObjectRef(initLabel);
+        
+        // Test stack overflow        
+        final int stackEndOffset = context.getVmProcessorStackEnd().getOffset();
+        os.writePrefix(X86Constants.FS_PREFIX);
+        os.writeCMP_MEM(Register.ESP, stackEndOffset);
+        os.writeJCC(stackOverflowLabel, X86Constants.JLE);
+		
 		// Create class initialization code (if needed)
 		helper.writeClassInitialize(method, EAX, ECX);
 
@@ -118,37 +158,7 @@ class X86StackFrame implements X86CompilerConstants {
 		os.writePUSH(Register.EAX);
 		os.writeMOV(INTSIZE, Register.EBP, Register.ESP);
 
-		//final int noArgs = method.getNoArgs();
-		//final int noLocals = bc.getNoLocals();
-		//final int noLocalVars = noLocals - noArgs;
-
-		// Create and clear all local variables
-		os.writeJMP(createLocalsLabel);
-		os.setObjectRef(createLocalsRetLabel);
-		/*
-		 * if (noLocalVars > 0) { os.writeXOR(Register.EAX, Register.EAX); for
-		 * (int i = 0; i < noLocalVars; i++) { os.writePUSH(Register.EAX); }
-		 */
-
-		// Load the statics table reference
-		if (method.canThrow(LoadStaticsPragma.class)) {
-			helper.writeLoadSTATICS(helper.genLabel("$$edi"), "init", false);
-		}
-
-		/* Create the synchronization enter code */
-		emitSynchronizationCode(context.getMonitorEnterMethod());
-
-		return rc;
-	}
-
-	/**
-	 * Emit code to end the stack frame
-	 */
-	public void emitTrailer(int maxLocals) {
-		final int argSlotCount = method.getArgSlotCount();
-
 		// Emit the code to create the locals
-		os.setObjectRef(createLocalsLabel);
 		final int noLocalVars = maxLocals - argSlotCount;
 		// Create and clear all local variables
 		if (noLocalVars > 0) {
@@ -157,22 +167,22 @@ class X86StackFrame implements X86CompilerConstants {
 				os.writePUSH(Register.EAX);
 			}
 		}
-		os.writeJMP(createLocalsRetLabel);
 
-		// Now start the actual footer
-		os.setObjectRef(footerLabel);
-
-		/* Go restore the previous current frame */
-		emitSynchronizationCode(context.getMonitorExitMethod());
-		os.writeLEA(Register.ESP, Register.EBP, EbpFrameRefOffset);
-		os.writePOP(Register.EBP);
-		restoreRegisters();
-		// Return
-		if (argSlotCount > 0) {
-			os.writeRET(argSlotCount * 4);
-		} else {
-			os.writeRET();
+		// Load the statics table reference
+		if (method.canThrow(LoadStaticsPragma.class)) {
+			helper.writeLoadSTATICS(helper.genLabel("$$edi"), "init", false);
 		}
+
+		/* Create the synchronization enter code */
+		emitSynchronizationCode(context.getMonitorEnterMethod());
+		
+		// And jump back to the actual code start
+		os.writeJMP(startCodeLabel);
+
+		// Write stack overflow code
+		os.setObjectRef(stackOverflowLabel);
+        os.writeINT(0x31);
+        // End header       
 
 		// No set the exception start&endPtr's
 		//final int noLocals = bc.getNoLocals();
