@@ -1,12 +1,13 @@
+/*
+ * $Id$
+ */
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
-import java.util.HashMap;
 
-import org.jnode.driver.ide.IDEDiskPartitionDriver;
 import org.jnode.driver.Device;
 import org.jnode.driver.Driver;
-
+import org.jnode.driver.ide.IDEDiskPartitionDriver;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;

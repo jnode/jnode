@@ -1,3 +1,6 @@
+/*
+ * $Id$
+ */
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
@@ -38,14 +41,14 @@ public class Ext2Directory implements FSDirectory {
 	/** 
 	 * Return the number of the block that contains the given byte
 	 */
-	private int translateToBlock(long index) {
+	int translateToBlock(long index) {
 		return (int)(index / iNode.getExt2FileSystem().getBlockSize());
 	}
 	
 	/**
 	 * Return the offset inside the block that contains the given byte
 	 */
-	private int translateToOffset(long index) {
+	int translateToOffset(long index) {
 		return (int)(index % iNode.getExt2FileSystem().getBlockSize());
 	}
 
@@ -72,10 +75,10 @@ public class Ext2Directory implements FSDirectory {
 		Ext2DirectoryRecord current;
 		boolean noMoreEntries = false;
 		
-		INode iNode;
+		//INode iNode;
 		
 		public FSEntryIterator(INode iNode) {
-			this.iNode = iNode;
+			//this.iNode = iNode;
 			
 			lastBlockIndex = -1;
 			blockIndex = 0;

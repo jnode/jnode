@@ -1,6 +1,7 @@
+/*
+ * $Id$
+ */
 package org.jnode.fs.ext2;
-
-import org.apache.log4j.Logger;
 
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystem;

@@ -1,3 +1,6 @@
+/*
+ * $Id$
+ */
 package org.jnode.fs.ext2;
 
 /**
@@ -17,7 +20,6 @@ public class Ext2Utils {
 	/**
 	 * Sets an unsigned 8-bit byte at a given offset
 	 * @param offset
-	 * @return int
 	 */
 	public static  void set8(byte[] data, int offset, int value) {
 		data[offset] = (byte)(value & 0xFF);
@@ -37,7 +39,6 @@ public class Ext2Utils {
 	/**
 	 * Sets an unsigned 16-bit word at a given offset
 	 * @param offset
-	 * @return int
 	 */
 	public static void set16(byte[] data, int offset, int value) {
 		data[offset] = (byte)(value & 0xFF);
@@ -62,7 +63,6 @@ public class Ext2Utils {
 	/**
 	 * Sets an unsigned 32-bit word at a given offset
 	 * @param offset
-	 * @return int
 	 */
 	public static void set32(byte[] data, int offset, int value) {
 		data[offset] = (byte)(value & 0xFF);
