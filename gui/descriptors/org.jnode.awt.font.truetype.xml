@@ -23,4 +23,7 @@
     <mapper class="org.jnode.awt.font.truetype.TTFontProvider"/>
   </extension>
         
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="jnode.font.renderer" actions="read"/>
+  </extension>
 </plugin>

@@ -92,7 +92,11 @@ public class TTFontProvider implements FontProvider {
 	public TextRenderer getTextRenderer(Font font) {
 		TextRenderer r = (TextRenderer) renderers.get(font);
 		if (r == null) {
-			r = new TTFTextRenderer(renderCache, getFontData(font), font.getSize());
+            if (System.getProperty("jnode.font.renderer", "simple").equals("new")) {
+                r = new TTFTextRenderer(renderCache, getFontData(font), font.getSize());
+            } else {
+                r = new TTFSimpleTextRenderer(getFontData(font), font.getSize());                
+            }
 			renderers.put(font, r);
 		}
 		return r;
