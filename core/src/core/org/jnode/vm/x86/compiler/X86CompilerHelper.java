@@ -151,7 +151,7 @@ public class X86CompilerHelper extends X86StackManager implements X86CompilerCon
 	 */
 	public final void writeYieldPoint(Object curInstrLabel, X86CompilerContext context) {
 		if (method.getThreadSwitchIndicatorMask() != 0) {
-			final Object doneLabel = new Label(curInstrLabel + "noYP");
+			final Label doneLabel = new Label(curInstrLabel + "noYP");
 			os.writePrefix(X86Constants.FS_PREFIX);
 			os.writeCMP_MEM(context.getVmThreadSwitchIndicatorOffset(), VmProcessor.TSI_SWITCH_REQUESTED);
 			os.writeJCC(doneLabel, X86Constants.JNE);

@@ -115,7 +115,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			
 			clsMgr = new VmClassLoader(classesURL, proc.getArchitecture());
 			final NativeStream os = createNativeStream();
-			final Object clInitCaller = new Label("$$clInitCaller");
+			final Label clInitCaller = new Label("$$clInitCaller");
 			VmType systemClasses[] = VmType.initializeForBootImage(clsMgr);
 			for (int i = 0; i < systemClasses.length; i++) {
 				clsMgr.addLoadedClass(systemClasses[i].getName(), systemClasses[i]);
@@ -278,7 +278,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 	 * @param pluginRegistry
 	 * @throws BuildException
 	 */
-	protected abstract void initImageHeader(NativeStream os, Object clInitCaller, PluginRegistry pluginRegistry) throws BuildException;
+	protected abstract void initImageHeader(NativeStream os, Label clInitCaller, PluginRegistry pluginRegistry) throws BuildException;
 
 	/**
 	 * Create the initial stack space.

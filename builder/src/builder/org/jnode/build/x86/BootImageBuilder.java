@@ -126,7 +126,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	 * @param pluginRegistry
 	 * @throws BuildException
 	 */
-	protected void initImageHeader(NativeStream os, Object clInitCaller, PluginRegistry pluginRegistry) throws BuildException {
+	protected void initImageHeader(NativeStream os, Label clInitCaller, PluginRegistry pluginRegistry) throws BuildException {
 		try {
 			int startLength = os.getLength();
 
@@ -289,7 +289,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		final VmType vmMethodClass = loadClass(VmMethod.class);
 		final VmType vmMainClass = loadClass(Main.class);
 		final VmMethod mainMethod = vmMainClass.getMethod(Main.MAIN_METHOD_NAME, Main.MAIN_METHOD_SIGNATURE);
-		final VmInstanceField nativeCodeField = (VmInstanceField)vmMethodClass.getField("nativeCode");
+		final VmInstanceField nativeCodeField = (VmInstanceField) vmMethodClass.getField("nativeCode");
 
 		os.writeMOV_Const(Register.EAX, mainMethod);
 		os.writeCALL(Register.EAX, nativeCodeField.getOffset());
@@ -410,8 +410,8 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		final VmType vmClassClass = loadClass(VmType.class);
 		final VmMethod lfbcaMethod = vmClassClass.getMethod("loadFromBootClassArray", "([Lorg/jnode/vm/classmgr/VmType;)V");
 		final VmType vmMethodClass = loadClass(VmMethod.class);
-		final VmInstanceField nativeCodeField = (VmInstanceField)vmMethodClass.getField("nativeCode");
-		
+		final VmInstanceField nativeCodeField = (VmInstanceField) vmMethodClass.getField("nativeCode");
+
 		os.writeMOV_Const(Register.EAX, bootClasses);
 		os.writePUSH(Register.EAX);
 		os.writeMOV_Const(Register.EAX, lfbcaMethod);
@@ -509,7 +509,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		add(new BootClassInfo("org.jnode.vm.compiler.x86", true, nonCore));
 		add(new BootClassInfo("org.jnode.vm.x86", true, core));
 	}
-	
+
 	/**
 	 * @return Returns the processorId.
 	 */
@@ -518,7 +518,8 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	}
 
 	/**
-	 * @param processorId The processorId to set.
+	 * @param processorId
+	 *            The processorId to set.
 	 */
 	public final void setCpu(String processorId) {
 		this.processorId = processorId;
