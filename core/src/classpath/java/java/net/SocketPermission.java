@@ -301,9 +301,9 @@ public final class SocketPermission extends Permission implements Serializable {
             // Who didn't resolve? Just assume current address is canonical
             // enough
             // Is this ok to do?
-            if (ourcanonical == null) ourcanonical = ourhost;
-            if (theircanonical == null) theircanonical = theirhost;
         }
+        if (ourcanonical == null) ourcanonical = ourhost;
+        if (theircanonical == null) theircanonical = theirhost;
 
         if (ourcanonical.equals(theircanonical)) return (true);
 

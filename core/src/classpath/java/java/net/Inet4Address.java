@@ -97,9 +97,7 @@ public final class Inet4Address extends InetAddress {
 	 * @since 1.4
 	 */
 	public boolean isAnyLocalAddress() {
-		byte[] anylocal = { 0, 0, 0, 0 };
-
-		return addr == anylocal;
+		return (addr[0] == 0) && (addr[1] == 0) && (addr[2] == 0) && (addr[3] == 0);
 	}
 
 	/**
