@@ -194,12 +194,31 @@ public class X86CodeGenerator extends CodeGenerator {
 	public void generateCodeFor(UnaryQuad quad, Object lhsReg, int operation,
 		Object rhsReg) {
 		switch(operation) {
+            case UnaryQuad.I2L:
+            case UnaryQuad.I2F:
+            case UnaryQuad.I2D:
+            case UnaryQuad.L2I:
+            case UnaryQuad.L2F:
+            case UnaryQuad.L2D:
+            case UnaryQuad.F2I:
+            case UnaryQuad.F2L:
+            case UnaryQuad.F2D:
+            case UnaryQuad.D2I:
+            case UnaryQuad.D2L:
+            case UnaryQuad.D2F:
+            case UnaryQuad.I2B:
+            case UnaryQuad.I2C:
+            case UnaryQuad.I2S:
+                throw new IllegalArgumentException("Unknown operation");
 			case UnaryQuad.INEG:
 				if (lhsReg != rhsReg) {
 					os.writeMOV(X86Constants.BITS32, (Register) lhsReg, (Register) rhsReg);
 				}
 				os.writeNEG((Register) lhsReg);
 				break;
+            case UnaryQuad.LNEG:
+            case UnaryQuad.FNEG:
+            case UnaryQuad.DNEG:
 			// TODO finish operations
 			default:
 				throw new IllegalArgumentException("Unknown operation");
@@ -212,11 +231,30 @@ public class X86CodeGenerator extends CodeGenerator {
 	public void generateCodeFor(UnaryQuad quad, Object lhsReg, int operation,
 		int rhsDisp) {
 		switch(operation) {
+            case UnaryQuad.I2L:
+            case UnaryQuad.I2F:
+            case UnaryQuad.I2D:
+            case UnaryQuad.L2I:
+            case UnaryQuad.L2F:
+            case UnaryQuad.L2D:
+            case UnaryQuad.F2I:
+            case UnaryQuad.F2L:
+            case UnaryQuad.F2D:
+            case UnaryQuad.D2I:
+            case UnaryQuad.D2L:
+            case UnaryQuad.D2F:
+            case UnaryQuad.I2B:
+            case UnaryQuad.I2C:
+            case UnaryQuad.I2S:
+                throw new IllegalArgumentException("Unknown operation");
 			case UnaryQuad.INEG:
 				os.writeMOV(X86Constants.BITS32, (Register) lhsReg, Register.EBP,
 					rhsDisp);
 				os.writeNEG((Register) lhsReg);
 				break;
+            case UnaryQuad.LNEG:
+            case UnaryQuad.FNEG:
+            case UnaryQuad.DNEG:
 			// TODO finish operations
 			default:
 				throw new IllegalArgumentException("Unknown operation");
@@ -229,11 +267,30 @@ public class X86CodeGenerator extends CodeGenerator {
 	public void generateCodeFor(UnaryQuad quad, int lhsDisp, int operation,
 		Object rhsReg) {
 		switch(operation) {
+            case UnaryQuad.I2L:
+            case UnaryQuad.I2F:
+            case UnaryQuad.I2D:
+            case UnaryQuad.L2I:
+            case UnaryQuad.L2F:
+            case UnaryQuad.L2D:
+            case UnaryQuad.F2I:
+            case UnaryQuad.F2L:
+            case UnaryQuad.F2D:
+            case UnaryQuad.D2I:
+            case UnaryQuad.D2L:
+            case UnaryQuad.D2F:
+            case UnaryQuad.I2B:
+            case UnaryQuad.I2C:
+            case UnaryQuad.I2S:
+                throw new IllegalArgumentException("Unknown operation");
 			case UnaryQuad.INEG:
 				os.writeMOV(X86Constants.BITS32, Register.EBP,
 					lhsDisp, (Register) rhsReg);
 				os.writeNEG(Register.EBP, lhsDisp);
 				break;
+            case UnaryQuad.LNEG:
+            case UnaryQuad.FNEG:
+            case UnaryQuad.DNEG:
 			// TODO finish operations
 			default:
 				throw new IllegalArgumentException("Unknown operation");
@@ -284,16 +341,108 @@ public class X86CodeGenerator extends CodeGenerator {
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, org.jnode.vm.compiler.ir.Constant, int, java.lang.Object)
 	 */
 	public void generateBinaryOP(Object reg1, Constant c2, int operation, Object reg3) {
-		// TODO Auto-generated method stub
-		
+        IntConstant iconst2 = (IntConstant) c2;
+		switch(operation) {
+			case BinaryQuad.IADD:
+				os.writeMOV_Const((Register) reg1, iconst2.getValue());
+				os.writeADD((Register)reg1, (Register)reg3);
+				break;
+            case BinaryQuad.IAND:
+                os.writeMOV_Const((Register) reg1, iconst2.getValue());
+                os.writeAND((Register)reg1, (Register)reg3);
+                break;
+            case BinaryQuad.IDIV:
+            case BinaryQuad.IMUL:
+                throw new IllegalArgumentException("Unknown operation");
+            case BinaryQuad.IOR:
+                os.writeMOV_Const((Register) reg1, iconst2.getValue());
+                os.writeOR((Register)reg1, (Register)reg3);
+                break;
+            case BinaryQuad.IREM:
+            case BinaryQuad.ISHL:
+            case BinaryQuad.ISHR:
+            case BinaryQuad.ISUB:
+                os.writeMOV_Const((Register) reg1, iconst2.getValue());
+                os.writeSUB((Register)reg1, (Register)reg3);
+                break;
+            case BinaryQuad.IUSHR:
+                throw new IllegalArgumentException("Unknown operation");
+            case BinaryQuad.IXOR:
+                os.writeMOV_Const((Register) reg1, iconst2.getValue());
+                os.writeXOR((Register)reg1, (Register)reg3);
+                break;
+            case BinaryQuad.DADD:
+            case BinaryQuad.DDIV:
+            case BinaryQuad.DMUL:
+            case BinaryQuad.DREM:
+            case BinaryQuad.DSUB:
+            case BinaryQuad.FADD:
+            case BinaryQuad.FDIV:
+            case BinaryQuad.FMUL:
+            case BinaryQuad.FREM:
+            case BinaryQuad.FSUB:
+            case BinaryQuad.LADD:
+            case BinaryQuad.LAND:
+            case BinaryQuad.LDIV:
+            case BinaryQuad.LMUL:
+            case BinaryQuad.LOR:
+            case BinaryQuad.LREM:
+            case BinaryQuad.LSHL:
+            case BinaryQuad.LSHR:
+            case BinaryQuad.LSUB:
+            case BinaryQuad.LUSHR:
+            case BinaryQuad.LXOR:
+			default:
+				throw new IllegalArgumentException("Unknown operation");
+		}
 	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(java.lang.Object, org.jnode.vm.compiler.ir.Constant, int, int)
 	 */
 	public void generateBinaryOP(Object reg1, Constant c2, int operation, int disp3) {
-		// TODO Auto-generated method stub
-		
+        IntConstant iconst2 = (IntConstant) c2;
+		switch(operation) {
+			case BinaryQuad.IADD:
+				os.writeMOV_Const((Register) reg1, iconst2.getValue());
+				os.writeADD((Register)reg1, Register.EBP, disp3);
+				break;
+//            case BinaryQuad.IAND:
+            case BinaryQuad.IDIV:
+            case BinaryQuad.IMUL:
+                throw new IllegalArgumentException("Unknown operation");
+//            case BinaryQuad.IOR:
+            case BinaryQuad.IREM:
+            case BinaryQuad.ISHL:
+            case BinaryQuad.ISHR:
+            case BinaryQuad.ISUB:
+            case BinaryQuad.IUSHR:
+                throw new IllegalArgumentException("Unknown operation");
+//            case BinaryQuad.IXOR:
+            case BinaryQuad.DADD:
+            case BinaryQuad.DDIV:
+            case BinaryQuad.DMUL:
+            case BinaryQuad.DREM:
+            case BinaryQuad.DSUB:
+            case BinaryQuad.FADD:
+            case BinaryQuad.FDIV:
+            case BinaryQuad.FMUL:
+            case BinaryQuad.FREM:
+            case BinaryQuad.FSUB:
+            case BinaryQuad.LADD:
+            case BinaryQuad.LAND:
+            case BinaryQuad.LDIV:
+            case BinaryQuad.LMUL:
+            case BinaryQuad.LOR:
+            case BinaryQuad.LREM:
+            case BinaryQuad.LSHL:
+            case BinaryQuad.LSHR:
+            case BinaryQuad.LSUB:
+            case BinaryQuad.LUSHR:
+            case BinaryQuad.LXOR:
+			default:
+				throw new IllegalArgumentException("Unknown operation");
+        }
 	}
 
 	/**
