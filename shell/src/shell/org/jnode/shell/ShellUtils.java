@@ -13,7 +13,7 @@ import org.jnode.naming.InitialNaming;
 public class ShellUtils {
 
 	/**
-	 * Get the current shell manager
+	 * Get the current shell manager.
 	 * @return The current shell manager
 	 * @throws NameNotFoundException
 	 */
