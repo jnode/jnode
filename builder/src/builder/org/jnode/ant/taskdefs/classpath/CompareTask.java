@@ -52,6 +52,7 @@ public class CompareTask extends Task {
         final Map vmFiles = scanJavaFiles(vmDirs);
         final Map classpathFiles = scanJavaFiles(classpathDirs);
         final TreeSet allFiles = new TreeSet();
+        final Map packageDiffs = new TreeMap();
         allFiles.addAll(vmFiles.keySet());
         allFiles.addAll(classpathFiles.keySet());
         
@@ -79,7 +80,7 @@ public class CompareTask extends Task {
                     missingInVm++;
                 } else {                    
                     final String diffFileName = vmFile.getClassName() + ".diff";
-                    int rc = runDiff(vmFile, cpFile, diffFileName);
+                    int rc = runDiff(vmFile, cpFile, diffFileName, packageDiffs);
                     switch (rc) {
                     case NO_CHANGE: break;
                     case NEEDS_MERGE:
@@ -101,8 +102,21 @@ public class CompareTask extends Task {
                     // Let's compare them
                 }
             }
+
+            // Package diffs
+            for (Iterator i = packageDiffs.entrySet().iterator(); i.hasNext(); ) {
+                final Map.Entry entry = (Map.Entry)i.next();
+                final String pkg = (String)entry.getKey();
+                final String diff = (String)entry.getValue();
+                final String diffFileName = pkg + ".diff";
+                processPackageDiff(diffFileName, pkg, diff);
+                reportPackageDiff(out, pkg, diffFileName);
+            }
+            
+            out.println("</table><p/>");
+            
             // Summary
-            out.println("</table><p/><a name='summary'/><h2>Summary</h2>");
+            out.println("<a name='summary'/><h2>Summary</h2>");
             if (missingInCp > 0) {
             	out.println("Found " + missingInCp + " files missing in classpath</br>");
             	log("Found " + missingInCp + " files missing in classpath");
@@ -134,7 +148,7 @@ public class CompareTask extends Task {
         }
     }
     
-    protected int runDiff(JavaFile vmFile, JavaFile cpFile, String diffFileName) throws IOException, InterruptedException {
+    protected int runDiff(JavaFile vmFile, JavaFile cpFile, String diffFileName, Map packageDiffs) throws IOException, InterruptedException {
         final String[] cmd = {
               "diff",
               "-b", // Ignore white space change
@@ -159,6 +173,16 @@ public class CompareTask extends Task {
                 os.flush();
                 
                 final String diffStr = new String(diff);
+                final String pkg = vmFile.getPackageName();
+                String pkgDiff;
+                if (packageDiffs.containsKey(pkg)) {
+                    pkgDiff = (String)packageDiffs.get(pkg);
+                    pkgDiff = pkgDiff + "diff\n" + diffStr; 
+                } else {
+                    pkgDiff = diffStr;
+                }
+                packageDiffs.put(pkg, pkgDiff);
+                
                 if (diffStr.indexOf(vmSpecificTag) >= 0) {
                     return VM_SPECIFIC;
                 } else if (diffStr.indexOf(classpathBugfixTag) >= 0) {
@@ -173,7 +197,17 @@ public class CompareTask extends Task {
             return NO_CHANGE;
         }
     }
-    
+
+    private void processPackageDiff(String diffFileName, String pkg, String diff) throws IOException {
+        File diffFile = new File(destDir, diffFileName);
+        FileWriter os = new FileWriter(diffFile);
+        try {
+            os.write(diff);
+            os.flush();
+        } finally {
+            os.close();
+        }        
+    }
     
     protected void reportHeader(PrintWriter out) {
         out.println("<html>");
@@ -220,6 +254,13 @@ public class CompareTask extends Task {
         out.println("<tr class='classpath-bugfix'>");
         out.println("<td>" + fname + "</td>");
         out.println("<td>Local classpath bugfix. (<a href='" + diffFileName + "'>diff</a>)</td>");
+        out.println("</tr>");
+    }
+    
+    protected void reportPackageDiff(PrintWriter out, String pkg, String diffFileName) {
+        out.println("<tr class='needsmerge'>");
+        out.println("<td>" + pkg + "</td>");
+        out.println("<td><a href='" + diffFileName + "'>diff</a></td>");
         out.println("</tr>");
     }
     
