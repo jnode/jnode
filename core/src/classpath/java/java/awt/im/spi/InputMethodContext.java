@@ -37,11 +37,11 @@ exception statement from your version. */
 
 package java.awt.im.spi;
 
+import java.awt.HeadlessException;
 import java.awt.Window;
 import java.awt.font.TextHitInfo;
 import java.awt.im.InputMethodRequests;
 import java.text.AttributedCharacterIterator;
-
 import javax.swing.JFrame;
 
 /**
@@ -53,7 +53,8 @@ import javax.swing.JFrame;
  * @since 1.3
  * @status updated to 1.4
  */
-public interface InputMethodContext extends InputMethodRequests {
+public interface InputMethodContext extends InputMethodRequests
+{
 	/**
 	 * Create an input method event and dispatch it to the client.
 	 *
@@ -63,7 +64,9 @@ public interface InputMethodContext extends InputMethodRequests {
 	 * @param caret the insertion point of the commit, or null
 	 * @param visiblePosition the best location to make visible, or null
 	 */
-	void dispatchInputMethodEvent(int id, AttributedCharacterIterator text, int count, TextHitInfo caret, TextHitInfo visiblePosition);
+  void dispatchInputMethodEvent(int id, AttributedCharacterIterator text,
+                                int count, TextHitInfo caret,
+                                TextHitInfo visiblePosition);
 
 	/**
 	 * Creates a top-level window for use by the input method. This window should

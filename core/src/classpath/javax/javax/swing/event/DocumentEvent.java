@@ -90,65 +90,46 @@ public interface DocumentEvent {
 	/**
 	 * EventType
 	 */
-	class EventType {
-
-		//-------------------------------------------------------------
-		// Variables --------------------------------------------------
-		//-------------------------------------------------------------
-
+  class EventType
+  {
 		/**
 		 * INSERT
 		 */
-		EventType INSERT = new EventType("INSERT"); // TODO
+    public static final EventType INSERT = new EventType("INSERT"); // TODO
 
 		/**
 		 * REMOVE
 		 */
-		EventType REMOVE = new EventType("REMOVE"); // TODO
+    public static final EventType REMOVE = new EventType("REMOVE"); // TODO
 
 		/**
 		 * CHANGE
 		 */
-		EventType CHANGE = new EventType("CHANGE"); // TODO
+    public static final EventType CHANGE = new EventType("CHANGE"); // TODO
 
 		/**
 		 * typeString
 		 */
 		private String type;
 
-
-		//-------------------------------------------------------------
-		// Initialization ---------------------------------------------
-		//-------------------------------------------------------------
-
 		/**
 		 * Constructor EventType
 		 * @param type TODO
 		 */
-		private EventType(String type) {
+    private EventType(String type)
+    {
 			this.type = type;
-		} // EventType()
-
-
-		//-------------------------------------------------------------
-		// Methods ----------------------------------------------------
-		//-------------------------------------------------------------
+    }
 
 		/**
 		 * toString
 		 * @returns String
 		 */
-		public String toString() {
-			return type; // TODO
-		} // toString()
-
-
-	} // EventType
-
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+    public String toString()
+    {
+      return type;
+    }
+  }
 
 	/**
 	 * getType

@@ -1,5 +1,5 @@
 /* InputContext.java -- provides the context for text input
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,21 +37,20 @@ exception statement from your version. */
 
 package java.awt.im;
 
-import gnu.java.util.EmptyEnumeration;
-
 import java.awt.AWTEvent;
 import java.awt.AWTException;
 import java.awt.Component;
 import java.awt.im.spi.InputMethod;
 import java.awt.im.spi.InputMethodDescriptor;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
+import gnu.java.util.EmptyEnumeration;
 
 /**
  * Provides a context for controlling input methods and keyboard layouts.
@@ -79,39 +78,59 @@ import java.util.Locale;
  * @since 1.2
  * @status updated to 1.4, but unverified
  */
-public class InputContext {
+public class InputContext
+{
 	/**
 	 * The list of installed input method descriptors.
 	 */
 	private static final ArrayList descriptors = new ArrayList();
-	static {
+  static
+  {
 		Enumeration e;
-		try {
-			e = ClassLoader.getSystemResources("META_INF/services/java.awt.im.spi.InputMethodDescriptor");
-		} catch (IOException ex) {
+    try
+      {
+        e = ClassLoader.getSystemResources
+          ("META_INF/services/java.awt.im.spi.InputMethodDescriptor");
+      }
+    catch (IOException ex)
+      {
 			// XXX Should we do something else?
 			e = EmptyEnumeration.getInstance();
 		}
-		while (e.hasMoreElements()) {
+    while (e.hasMoreElements())
+      {
 			URL url = (URL) e.nextElement();
 			BufferedReader in;
 			String line;
-			try {
-				in = new BufferedReader(new InputStreamReader(url.openConnection().getInputStream(), "UTF-8"));
+        try
+          {
+            in = new BufferedReader
+              (new InputStreamReader(url.openConnection().getInputStream(),
+                                     "UTF-8"));
 				line = in.readLine().trim();
-			} catch (IOException ignored) {
+          }
+        catch (IOException ignored)
+          {
 				continue;
 			}
-			outer : while (line != null) {
-				try {
-					if (line.charAt(0) != '#') {
+      outer:
+        while (line != null)
+          {
+            try
+              {
+                if (line.charAt(0) != '#')
+                  {
 						Class c = Class.forName(line);
 						descriptors.add((InputMethodDescriptor) c.newInstance());
 					}
 					line = in.readLine().trim();
-				} catch (IOException ex) {
+              }
+            catch (IOException ex)
+              {
 					continue outer;
-				} catch (Exception ignored) {
+              }
+            catch (Exception ignored)
+              {
 				}
 			}
 		}
@@ -130,7 +149,8 @@ public class InputContext {
 	 * Construct an InputContext. This is protected, so clients must use
 	 * {@link #getInstance()} instead.
 	 */
-	protected InputContext() {
+  protected InputContext()
+  {
 	}
 
 	/**
@@ -138,7 +158,8 @@ public class InputContext {
 	 *
 	 * @return a new instance, initialized to the default locale if available
 	 */
-	public static InputContext getInstance() {
+  public static InputContext getInstance()
+  {
 		InputContext ic = new InputContext();
 		ic.selectInputMethod(Locale.getDefault());
 		return ic;
@@ -181,27 +202,38 @@ public class InputContext {
 	 * @return true if the new locale is active
 	 * @throws NullPointerException if locale is null
 	 */
-	public boolean selectInputMethod(Locale locale) {
-		if (im != null && im.setLocale(locale)) {
+  public boolean selectInputMethod(Locale locale)
+  {
+    if (im != null && im.setLocale(locale))
+      {
 			recent.put(locale, im);
 			return true;
 		}
 		InputMethod next = (InputMethod) recent.get(locale);
-		outer : if (next != null)
-			for (int i = 0, limit = descriptors.size(); i < limit; i++) {
+  outer:
+    if (next != null)
+      for (int i = 0, limit = descriptors.size(); i < limit; i++)
+        {
 				InputMethodDescriptor d = (InputMethodDescriptor) descriptors.get(i);
 				Locale[] list;
-				try {
+          try
+            {
 					list = d.getAvailableLocales();
-				} catch (AWTException ignored) {
+            }
+          catch (AWTException ignored)
+            {
 					continue;
 				}
-				for (int j = list.length; --j >= 0;)
-					if (locale.equals(list[j])) {
-						try {
+          for (int j = list.length; --j >= 0; )
+            if (locale.equals(list[j]))
+              {
+                try
+                  {
 							next = d.createInputMethod();
 							recent.put(locale, next);
-						} catch (Exception ignored) {
+                  }
+                catch (Exception ignored)
+                  {
 							continue;
 						}
 					}
@@ -209,10 +241,14 @@ public class InputContext {
 		if (next == null)
 			return false;
 		// XXX I'm not sure if this does all the necessary steps in the switch.
-		if (im != null) {
-			try {
+    if (im != null)
+      {
+        try
+          {
 				next.setCompositionEnabled(im.isCompositionEnabled());
-			} catch (UnsupportedOperationException ignored) {
+          }
+        catch (UnsupportedOperationException ignored)
+          {
 			}
 			im.endComposition();
 			im.deactivate(false);
@@ -238,7 +274,8 @@ public class InputContext {
 	 * @return the locale of the current input method, or null
 	 * @since 1.3
 	 */
-	public Locale getLocale() {
+  public Locale getLocale()
+  {
 		return im == null ? null : im.getLocale();
 	}
 
@@ -251,7 +288,8 @@ public class InputContext {
 	 *
 	 * @param subsets the set of Unicode subsets to accept, or null
 	 */
-	public void setCharacterSubsets(Character.Subset[] subsets) {
+  public void setCharacterSubsets(Character.Subset[] subsets)
+  {
 		this.subsets = subsets;
 		if (im != null)
 			im.setCharacterSubsets(subsets);
@@ -269,7 +307,8 @@ public class InputContext {
 	 * @see #isCompositionEnabled()
 	 * @since 1.3
 	 */
-	public void setCompositionEnabled(boolean enable) {
+  public void setCompositionEnabled(boolean enable)
+  {
 		if (im == null)
 			throw new UnsupportedOperationException();
 		im.setCompositionEnabled(enable);
@@ -284,7 +323,8 @@ public class InputContext {
 	 * @see #setCompositionEnabled(boolean)
 	 * @since 1.3
 	 */
-	public boolean isCompositionEnabled() {
+  public boolean isCompositionEnabled()
+  {
 		if (im == null)
 			throw new UnsupportedOperationException();
 		return im.isCompositionEnabled();
@@ -299,10 +339,10 @@ public class InputContext {
 	 *
 	 * @throws UnsupportedOperationException if there is no current input method,
 	 *         or the input method does not support reconversion
-	 * @throws UnsupportedOperationException if ther
 	 * @since 1.3
 	 */
-	public void reconvert() {
+  public void reconvert()
+  {
 		if (im == null)
 			throw new UnsupportedOperationException();
 		im.reconvert();
@@ -316,7 +356,8 @@ public class InputContext {
 	 * @param event the event to dispatch
 	 * @throws NullPointerException if event is null
 	 */
-	public void dispatchEvent(AWTEvent event) {
+  public void dispatchEvent(AWTEvent event)
+  {
 		if (im != null)
 			im.dispatchEvent(event);
 	}
@@ -332,9 +373,11 @@ public class InputContext {
 	 * @param client the client component
 	 * @throws NullPointerException if client is null
 	 */
-	public void removeNotify(Component client) {
+  public void removeNotify(Component client)
+  {
 		// XXX What to do with client information?
-		if (im != null) {
+    if (im != null)
+      {
 			im.deactivate(false);
 			im.removeNotify();
 		}
@@ -350,7 +393,8 @@ public class InputContext {
 	 * insertion point in the client text outside the range of the composed text,
 	 * or when text is saved to file.
 	 */
-	public void endComposition() {
+  public void endComposition()
+  {
 		if (im != null)
 			im.endComposition();
 	}
@@ -361,8 +405,10 @@ public class InputContext {
 	 * Window. If no input methods are available, then this method has no
 	 * effect.
 	 */
-	public void dispose() {
-		if (im != null) {
+  public void dispose()
+  {
+    if (im != null)
+      {
 			im.deactivate(false);
 			im.dispose();
 		}
@@ -379,7 +425,8 @@ public class InputContext {
 	 *
 	 * @return the control object, or null
 	 */
-	public Object getInputMethodControlObject() {
+  public Object getInputMethodControlObject()
+  {
 		return im == null ? null : im.getControlObject();
 	}
 } // class InputContext

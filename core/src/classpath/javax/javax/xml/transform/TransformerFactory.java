@@ -54,7 +54,7 @@ public abstract class TransformerFactory {
 	//-------------------------------------------------------------
 
 	/**
-	 * Returns an object encapsulating the &lt;?xml-stylesheet?&gt;
+	 * Returns an object encapsulating the &lt;?xml-stylesheet&nbsp;?&gt;
 	 * processing instruction from the document that matches the
 	 * specified criteria.
 	 */

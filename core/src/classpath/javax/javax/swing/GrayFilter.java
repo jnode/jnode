@@ -49,10 +49,10 @@ public class GrayFilter extends RGBImageFilter
     private int p;
 
     /**
-       Create a GrayFilter. If b is true then brighten. Also, indicate how much gray.
-       
-       @param b if brighten
-       @param p percent of gray, 0 - 100
+   * Create a GrayFilter. If b is true then brighten. Also, indicate how much gray.
+   *    
+   * @param b if brighten
+   * @param p percent of gray, 0 - 100
     */
     public GrayFilter(boolean b, int p)
     {
@@ -61,25 +61,25 @@ public class GrayFilter extends RGBImageFilter
     }
 
     /**
-       Create grayed image
-
-       @param i image to gray
-
-       @return a grayed image
+   * Create grayed image
+   *
+   * @param src image to gray
+   *
+   * @return a grayed image
      */
     public static Image createDisabledImage(Image src)
     {
-	return Toolkit.getDefaultToolkit().createImage( new FilteredImageSource(src.getSource(),
-										new GrayFilter(false, 100)));
+    return (Toolkit.getDefaultToolkit().
+	    createImage(new FilteredImageSource(src.getSource(),
+						new GrayFilter(false, 100))));
     }
 
     /**
-       Filter RGB to gray
+   * Filter RGB to gray
      */
-    public int filterRGB(int x,
-			 int y,
-			 int rgb)
+  public int filterRGB(int x, int y, int rgb)
     {
-	return (int) ( ( p * ( 0.299 * ( (0xff0000 & rgb) >> 16) + 0.587 * ( (0xff00 & rgb) >> 8 ) + 0.114 * (0xff & rgb ) ) ));
+    return (int) (p * (0.299 * ((0xff0000 & rgb) >> 16)
+		       + 0.587 * ((0xff00 & rgb) >> 8) + 0.114 * (0xff & rgb)));
     }
 }

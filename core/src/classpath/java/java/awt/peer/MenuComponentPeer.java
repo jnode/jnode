@@ -40,8 +40,6 @@ package java.awt.peer;
 
 public interface MenuComponentPeer
 {
-
-public abstract void dispose();
-
+  void dispose();
 } // interface MenuComponentPeer
 

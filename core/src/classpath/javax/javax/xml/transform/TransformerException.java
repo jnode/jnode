@@ -160,7 +160,7 @@ public class TransformerException extends Exception {
 
 
 	public void printStackTrace() {
-		printStackTrace(System.out);
+		printStackTrace(System.out);// shouldn't it be System.err?
 	}
 
 	public void printStackTrace(PrintStream stream) {

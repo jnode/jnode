@@ -49,70 +49,83 @@ package java.awt.image;
 /**
  * @author Rolf W. Rasmussen <rolfwr@ii.uib.no>
  */
-public class DataBufferInt extends DataBuffer {
-	
+public final class DataBufferInt extends DataBuffer
+{
 	private int[] data;
 	private int[][] bankData;
 
-	public DataBufferInt(int size) {
+  public DataBufferInt(int size)
+  {
 		super(TYPE_INT, size);
 		data = new int[size];
 	}
 
-	public DataBufferInt(int size, int numBanks) {
+  public DataBufferInt(int size, int numBanks)
+  {
 		super(TYPE_INT, size, numBanks);
 		bankData = new int[numBanks][size];
 		data = bankData[0];
 	}
 
-	public DataBufferInt(int[] dataArray, int size) {
+  public DataBufferInt(int[] dataArray, int size)
+  {
 		super(TYPE_INT, size);
 		data = dataArray;
 	}
 
-	public DataBufferInt(int[] dataArray, int size, int offset) {
+  public DataBufferInt(int[] dataArray, int size, int offset)
+  {
 		super(TYPE_INT, size, 1, offset);
 		data = dataArray;
 	}
 
-	public DataBufferInt(int[][] dataArray, int size) {
+  public DataBufferInt(int[][] dataArray, int size)
+  {
 		super(TYPE_INT, size, dataArray.length);
 		bankData = dataArray;
 		data = bankData[0];
 	}
 
-	public DataBufferInt(int[][] dataArray, int size, int[] offsets) {
+  public DataBufferInt(int[][] dataArray, int size, int[] offsets)
+  {
 		super(TYPE_INT, size, dataArray.length, offsets);
 		bankData = dataArray;
 		data = bankData[0];
 	}
 
-	public int[] getData() {
+  public int[] getData()
+  {
 		return data;
 	}
 
-	public int[] getData(int bank) {
+  public int[] getData(int bank)
+  {
 		return bankData[bank];
 	}
 
-	public int[][] getBankData() {
+  public int[][] getBankData()
+  {
 		return bankData;
 	}
 
-	public int getElem(int i) {
-		return data[i + offset];
+  public int getElem(int i)
+  {
+    return data[i+offset];
 	}
 
-	public int getElem(int bank, int i) {
+  public int getElem(int bank, int i)
+  {
 		// get unsigned int as int
-		return bankData[bank][i + offsets[bank]];
+    return bankData[bank][i+offsets[bank]];
 	}
 
-	public void setElem(int i, int val) {
-		data[i + offset] = val;
+  public void setElem(int i, int val)
+  {
+    data[i+offset] = (int) val;
 	}
 
-	public void setElem(int bank, int i, int val) {
-		bankData[bank][i + offsets[bank]] = val;
+  public void setElem(int bank, int i, int val)
+  {
+    bankData[bank][i+offsets[bank]] = (int) val;
 	}
 }

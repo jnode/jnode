@@ -56,50 +56,30 @@ public class CellRendererPane extends Container implements Accessible
 {
   private static final long serialVersionUID = -7642183829532984273L;
 
-	//-------------------------------------------------------------
-	// Classes ----------------------------------------------------
-	//-------------------------------------------------------------
-
 	/**
 	 * AccessibleCellRendererPane
 	 */
-	protected class AccessibleCellRendererPane extends AccessibleAWTContainer {
-
-          private static final long serialVersionUID = 7300340301783504481L;
-
-		//-------------------------------------------------------------
-		// Initialization ---------------------------------------------
-		//-------------------------------------------------------------
+  protected class AccessibleCellRendererPane extends AccessibleAWTContainer
+  {
+    private static final long serialVersionUID = -8981090083147391074L;
 
 		/**
 		 * Constructor AccessibleCellRendererPane
 		 * @param component TODO
 		 */
-		protected AccessibleCellRendererPane(CellRendererPane component) {
-			super();
-			// TODO
-		} // AccessibleCellRendererPane()
-
-
-		//-------------------------------------------------------------
-		// Methods ----------------------------------------------------
-		//-------------------------------------------------------------
+    protected AccessibleCellRendererPane()
+    {
+    }
 
 		/**
 		 * getAccessibleRole
 		 * @returns AccessibleRole
 		 */
-		public AccessibleRole getAccessibleRole() {
+    public AccessibleRole getAccessibleRole()
+    {
 			return AccessibleRole.PANEL;
-		} // getAccessibleRole()
-
-
-	} // AccessibleCellRendererPane
-
-
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+    }
+  }
 
 	/**
 	 * accessibleContext
@@ -211,14 +191,13 @@ public class CellRendererPane extends Container implements Accessible
 
 	/**
 	 * getAccessibleContext
-	 * @returns AccessibleContext
+   * @return AccessibleContext
 	 */
-	public AccessibleContext getAccessibleContext() {
-		if (accessibleContext == null) {
-			accessibleContext = new AccessibleCellRendererPane(this);
-		} // if
-		return accessibleContext;
-	} // getAccessibleContext()
+  public AccessibleContext getAccessibleContext()
+  {
+    if (accessibleContext == null)
+      accessibleContext = new AccessibleCellRendererPane();
 
-
-} // CellRendererPane
+    return accessibleContext;
+  }
+}

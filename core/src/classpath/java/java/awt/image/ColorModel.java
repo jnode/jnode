@@ -1,4 +1,4 @@
-/* Copyright (C) 1999, 2000, 2002  Free Software Foundation
+/* Copyright (C) 1999, 2000, 2002, 2003  Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -33,6 +33,7 @@ or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
+
 
 package java.awt.image;
 
@@ -75,12 +76,12 @@ import gnu.java.awt.Buffers;
  * </ul>
  *
  * @author Rolf W. Rasmussen <rolfwr@ii.uib.no>
- * @author C. Brian Jones (cbj@gnu.org) 
+ * @author C. Brian Jones <cbj@gnu.org>
  */
-public abstract class ColorModel implements Transparency {
-
-	protected final int pixel_bits;
-	protected final int transferType;
+public abstract class ColorModel implements Transparency
+{
+  protected int pixel_bits;
+  protected int transferType;
 
 	int[] bits;
 	ColorSpace cspace;
@@ -88,13 +89,15 @@ public abstract class ColorModel implements Transparency {
 	boolean hasAlpha;
 	boolean isAlphaPremultiplied;
 
-	static int[] nArray(int value, int times) {
+  static int[] nArray(int value, int times)
+  {
 		int[] array = new int[times];
 		java.util.Arrays.fill(array, value);
 		return array;
 	}
 
-	static byte[] nArray(byte value, int times) {
+  static byte[] nArray(byte value, int times)
+  {
 		byte[] array = new byte[times];
 		java.util.Arrays.fill(array, value);
 		return array;
@@ -106,8 +109,15 @@ public abstract class ColorModel implements Transparency {
 	 * class.
 	 * @param b the number of bits wide used for bit size of pixel values
 	 */
-	public ColorModel(int bits) {
-		this(bits, nArray(bits / 4, 4), ColorSpace.getInstance(ColorSpace.CS_sRGB), true, false, TRANSLUCENT, Buffers.smallestAppropriateTransferType(bits));
+  public ColorModel(int bits)
+  {
+    this(bits * 4, // total bits, sRGB, four channels
+	 nArray(bits, 4), // bits for each channel
+	 ColorSpace.getInstance(ColorSpace.CS_sRGB), // sRGB
+	 true, // has alpha
+	 false, // not premultiplied
+	 TRANSLUCENT,
+	 Buffers.smallestAppropriateTransferType(bits * 4));
 	}
 
 	/**
@@ -119,17 +129,22 @@ public abstract class ColorModel implements Transparency {
 	 * transparency is not a valid value, or if the sum of the number of bits in
 	 * bits is less than 1 or if any of the elements in bits is less than 0.
 	 */
-	protected ColorModel(int pixel_bits, int[] bits, ColorSpace cspace, boolean hasAlpha, boolean isAlphaPremultiplied, int transparency, int transferType) {
+  protected ColorModel(int pixel_bits, int[] bits, ColorSpace cspace,
+		       boolean hasAlpha, boolean isAlphaPremultiplied,
+		       int transparency, int transferType)
+  {
 		int bits_sum = 0;
-		for (int i = 0; i < bits.length; i++) {
-			if (bits[i] < 0)
-				throw new IllegalArgumentException();
+    for (int i = 0; i < bits.length; i++)
+      {
+        if (bits [i] < 0)
+          throw new IllegalArgumentException ();
 
-			bits_sum |= bits[i];
+        bits_sum |= bits [i];
 		}
 
-		if ((bits.length < cspace.getNumComponents()) || (bits_sum < 1))
-			throw new IllegalArgumentException();
+    if ((bits.length < cspace.getNumComponents())
+        || (bits_sum < 1))
+      throw new IllegalArgumentException ();
 
 		this.pixel_bits = pixel_bits;
 		this.bits = bits;
@@ -140,46 +155,60 @@ public abstract class ColorModel implements Transparency {
 		this.transferType = transferType;
 	}
 
+  public void finalize()
+  {
+    // Do nothing here.
+  }
+
 	/**
 	 * Returns the default color model which in Sun's case is an instance
 	 * of <code>DirectColorModel</code>.
 	 */
-	public static ColorModel getRGBdefault() {
+  public static ColorModel getRGBdefault()
+  {
 		return new DirectColorModel(32, 0xff0000, 0xff00, 0xff, 0xff000000);
 	}
 
-	public final boolean hasAlpha() {
+  public final boolean hasAlpha()
+  {
 		return hasAlpha;
 	}
 
-	public final boolean isAlphaPremultiplied() {
+  public final boolean isAlphaPremultiplied()
+  {
 		return isAlphaPremultiplied;
 	}
 
 	/**
 	 * Get get number of bits wide used for the bit size of pixel values
 	 */
-	public int getPixelSize() {
+  public int getPixelSize()
+  {
 		return pixel_bits;
 	}
 
-	public int getComponentSize(int componentIdx) {
+  public int getComponentSize(int componentIdx)
+  {
 		return bits[componentIdx];
 	}
 
-	public int[] getComponentSize() {
+  public int[] getComponentSize()
+  {
 		return bits;
 	}
 
-	public int getTransparency() {
+  public int getTransparency()
+  {
 		return transparency;
 	}
 
-	public int getNumComponents() {
+  public int getNumComponents()
+  {
 		return getNumColorComponents() + (hasAlpha ? 1 : 0);
 	}
 
-	public int getNumColorComponents() {
+  public int getNumColorComponents()
+  {
 		return cspace.getNumComponents();
 	}
 
@@ -234,9 +263,15 @@ public abstract class ColorModel implements Transparency {
 	 *
 	 * @return a pixel in sRGB color space, encoded in default
 	 * 0xAARRGGBB format.  */
-	public int getRGB(int pixel) {
-		return ((getAlpha(pixel) & 0xff) << 24) | ((getRed(pixel) & 0xff) << 16) | ((getGreen(pixel) & 0xff) << 8) | ((getBlue(pixel) & 0xff) << 0);
+  public int getRGB(int pixel)
+  {
+    return 
+      ((getAlpha(pixel) & 0xff) << 24) |
+      ((  getRed(pixel) & 0xff) << 16) |
+      ((getGreen(pixel) & 0xff) <<  8) |
+      (( getBlue(pixel) & 0xff) <<  0);
 	}
+
 
 	/**
 	 * In this color model we know that the whole pixel value will
@@ -244,8 +279,10 @@ public abstract class ColorModel implements Transparency {
 	 * array.
 	 */
 	final int getPixelFromArray(Object inData) {
-		DataBuffer data = Buffers.createBufferFromData(transferType, inData, 1);
-		//Object da = Buffers.getData(data);
+    DataBuffer data =
+      Buffers.createBufferFromData(transferType, inData, 1);
+    Object da = Buffers.getData(data);
+
 		return data.getElem(0);
 	}
 
@@ -259,14 +296,16 @@ public abstract class ColorModel implements Transparency {
 	 * @param array of transferType containing a single pixel.  The
 	 * pixel should be encoded in the natural way of the color model.
 	 */
-	public int getRed(Object inData) {
+  public int getRed(Object inData)
+  {
 		return getRed(getPixelFromArray(inData));
 	}
 
 	/**
 	 * @see #getRed(Object)
 	 */
-	public int getGreen(Object inData) {
+  public int getGreen(Object inData)
+  {
 		return getGreen(getPixelFromArray(inData));
 	}
 
@@ -301,8 +340,13 @@ public abstract class ColorModel implements Transparency {
 	 *
 	 * @see #getDataElements(int, Object)
 	 */
-	public int getRGB(Object inData) {
-		return ((getAlpha(inData) & 0xff) << 24) | ((getRed(inData) & 0xff) << 16) | ((getGreen(inData) & 0xff) << 8) | ((getBlue(inData) & 0xff) << 0);
+  public int getRGB(Object inData)
+  {
+    return 
+      ((getAlpha(inData) & 0xff) << 24) |
+      ((  getRed(inData) & 0xff) << 16) |
+      ((getGreen(inData) & 0xff) <<  8) |
+      (( getBlue(inData) & 0xff) <<  0);
 	}
 
 	/**
@@ -343,8 +387,9 @@ public abstract class ColorModel implements Transparency {
 	 *  
 	 * @see #getRGB(Object)
 	 */
-	public Object getDataElements(int rgb, Object pixel) {
-		// FIXME: implement
+  public Object getDataElements(int rgb, Object pixel)
+  {
+    // subclasses has to implement this method.
 		throw new UnsupportedOperationException();
 	}
 
@@ -363,8 +408,9 @@ public abstract class ColorModel implements Transparency {
 	 * according to the color model. Each component sample is stored
 	 * as a separate element in the array.
 	 */
-	public int[] getComponents(int pixel, int[] components, int offset) {
-		// FIXME: implement
+  public int[] getComponents(int pixel, int[] components, int offset)
+  {
+    // subclasses has to implement this method.
 		throw new UnsupportedOperationException();
 	}
 
@@ -384,22 +430,30 @@ public abstract class ColorModel implements Transparency {
 	 * according to the color model. Each component sample is stored
 	 * as a separate element in the array.
 	 */
-	public int[] getComponents(Object pixel, int[] components, int offset) {
+  public int[] getComponents(Object pixel, int[] components, int offset)
+  {
+    // subclasses has to implement this method.
 		throw new UnsupportedOperationException();
 	}
 
 	/**
 	 * Convert normalized components to unnormalized components.
 	 */
-	public int[] getUnnormalizedComponents(float[] normComponents, int normOffset, int[] components, int offset) {
+  public int[] getUnnormalizedComponents(float[] normComponents,
+					 int normOffset,
+					 int[] components,
+					 int offset)
+  {
 		int numComponents = getNumComponents();
-		if (components == null) {
+    if (components == null)
+    {
 			components = new int[offset + numComponents];
 		}
 
-		for (int i = 0; i < numComponents; i++) {
+    for (int i=0; i<numComponents; i++)
+    {
 			float in = normComponents[normOffset++];
-			int out = (int) (in * ((1 << getComponentSize(i)) - 1));
+      int out = (int) (in * ((1<<getComponentSize(i)) - 1));
 			components[offset++] = out;
 		}
 		return components;
@@ -408,21 +462,40 @@ public abstract class ColorModel implements Transparency {
 	/**
 	 * Convert unnormalized components to normalized components.
 	 */
-	public float[] getNormalizedComponents(int[] components, int offset, float[] normComponents, int normOffset) {
+  public float[] getNormalizedComponents(int[] components,
+					 int offset,
+					 float[] normComponents,
+					 int normOffset)
+  {
 		int numComponents = getNumComponents();
-		if (normComponents == null) {
+    if (normComponents == null)
+    {
 			normComponents = new float[normOffset + numComponents];
 		}
 
-		for (int i = 0; i < numComponents; i++) {
+    for (int i=0; i<numComponents; i++)
+    {
 			float in = components[offset++];
-			float out = in / ((1 << getComponentSize(i)) - 1);
+      float out = in / ((1<<getComponentSize(i)) - 1);
 			normComponents[normOffset++] = out;
 		}
 		return normComponents;
 	}
 
 	/**
+   * Convert unnormalized components to normalized components.
+   *
+   * @since 1.4
+   */
+  public float[] getNormalizedComponents (Object pixel,
+                                          float[] normComponents,
+                                          int normOffset)
+  {
+    // subclasses has to implement this method.
+    throw new UnsupportedOperationException();
+  }
+
+  /**
 	 * Converts the unnormalized component samples from an array to a
 	 * pixel value. I.e. composes the pixel from component samples, but
 	 * does not perform any color conversion or scaling of the samples.
@@ -444,34 +517,54 @@ public abstract class ColorModel implements Transparency {
 	 *
 	 * @return pixel value encoded according to the color model.
 	 */
-	public int getDataElement(int[] components, int offset) {
+  public int getDataElement(int[] components, int offset)
+  {
+    // subclasses has to implement this method.
 		throw new UnsupportedOperationException();
 	}
 
-	public Object getDataElements(int[] components, int offset, Object obj) {
+  public int getDataElement (float[] components, int offset)
+  {
+    // subclasses has to implement this method.
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean equals(Object obj) {
-		if (!(obj instanceof ColorModel))
-			return false;
+  public Object getDataElements(int[] components, int offset, Object obj)
+  {
+    // subclasses has to implement this method.
+    throw new UnsupportedOperationException();
+  }
+
+  public int getDataElements (float[] components, Object obj)
+  {
+    // subclasses has to implement this method.
+    throw new UnsupportedOperationException();
+  }
+  
+  public boolean equals(Object obj)
+  {
+    if (!(obj instanceof ColorModel)) return false;
 
 		ColorModel o = (ColorModel) obj;
-		return (pixel_bits == o.pixel_bits)
-			&& (transferType == o.transferType)
-			&& (transparency == o.transparency)
-			&& (hasAlpha == o.hasAlpha)
-			&& (isAlphaPremultiplied == isAlphaPremultiplied)
-			&& (bits.equals(o.bits))
-			&& (cspace.equals(o.cspace));
+    return 
+      (pixel_bits == o.pixel_bits) &&
+      (transferType == o.transferType) &&
+      (transparency == o.transparency) &&
+      (hasAlpha == o.hasAlpha) &&
+      (isAlphaPremultiplied == isAlphaPremultiplied) &&
+      (bits.equals(o.bits)) &&
+      (cspace.equals(o.cspace));
 	}
 
-	public final ColorSpace getColorSpace() {
+  public final ColorSpace getColorSpace()
+  {
 		return cspace;
 	}
 
 	// Typically overridden
-	public ColorModel coerceData(WritableRaster raster, boolean isAlphaPremultiplied) {
+  public ColorModel coerceData(WritableRaster raster,
+			       boolean isAlphaPremultiplied)
+  {
 		if (this.isAlphaPremultiplied == isAlphaPremultiplied)
 			return this;
 
@@ -479,20 +572,22 @@ public abstract class ColorModel implements Transparency {
 		int h = raster.getHeight();
 		int x = raster.getMinX();
 		int y = raster.getMinY();
-		int size = w * h;
+    int size = w*h;
 		int numColors = getNumColorComponents();
 		int numComponents = getNumComponents();
-		int alphaScale = (1 << getComponentSize(numColors)) - 1;
+    int alphaScale = (1<<getComponentSize(numColors)) - 1;
 		double[] pixels = raster.getPixels(x, y, w, h, (double[]) null);
 
-		for (int i = 0; i < size; i++) {
-			double alpha = pixels[i * numComponents + numColors] * alphaScale;
-			for (int c = 0; c < numColors; c++) {
-				int offset = i * numComponents + c;
+    for (int i=0; i<size; i++)
+      {
+	double alpha = pixels[i*numComponents+numColors]*alphaScale;
+	for (int c=0; c<numColors; c++)
+	  {
+	    int offset = i*numComponents+c;
 				if (isAlphaPremultiplied)
-					pixels[offset] = pixels[offset] / alpha;
+		pixels[offset] = pixels[offset]/alpha;
 				else
-					pixels[offset] = pixels[offset] * alpha;
+	      pixels[offset] = pixels[offset]*alpha;
 			}
 		}
 
@@ -502,28 +597,39 @@ public abstract class ColorModel implements Transparency {
 		return null;
 	}
 
-	// Typically overridden
-	public boolean isCompatibleRaster(Raster raster) {
+  /**
+   * Checks if the given raster has a compatible data-layout (SampleModel).
+   * @param raster The Raster to test.
+   * @return true if raster is compatible.
+   */ 
+  public boolean isCompatibleRaster(Raster raster)
+  {
 		SampleModel sampleModel = raster.getSampleModel();
 		return isCompatibleSampleModel(sampleModel);
 	}
 
 	// Typically overridden
-	public WritableRaster createCompatibleWritableRaster(int w, int h) {
-		return new WritableRaster(createCompatibleSampleModel(w, h), new Point(0, 0));
+  public WritableRaster createCompatibleWritableRaster(int w, int h)
+  {
+    return new WritableRaster(createCompatibleSampleModel(w, h),
+			      new Point(0, 0));
 	}
 
 	// Typically overridden
-	public SampleModel createCompatibleSampleModel(int w, int h) {
+  public SampleModel createCompatibleSampleModel(int w, int h)
+  {
 		throw new UnsupportedOperationException();
 	}
 
 	// Typically overridden
-	public boolean isCompatibleSampleModel(SampleModel sm) {
+  public boolean isCompatibleSampleModel(SampleModel sm)
+  {
 		return sm.getTransferType() == transferType;
 	}
 
-	public void finalize() {
+  public final int getTransferType ()
+  {
+    return transferType;
 	}
 
 	/**
@@ -533,7 +639,8 @@ public abstract class ColorModel implements Transparency {
 	 * @return null, as per JDK 1.3 doc. Subclasses will only return
 	 * null if no alpha raster exists.
 	 */
-	public WritableRaster getAlphaRaster(WritableRaster raster) {
+  public WritableRaster getAlphaRaster(WritableRaster raster)
+  {
 		return null;
 
 		/* It is a mystery to me why we couldn't use the following code...
@@ -555,22 +662,18 @@ public abstract class ColorModel implements Transparency {
 		*/
 	}
 
-	String stringParam() {
-		return "pixel_bits="
-			+ pixel_bits
-			+ ", cspace="
-			+ cspace
-			+ ", transferType="
-			+ transferType
-			+ ", transparency="
-			+ transparency
-			+ ", hasAlpha="
-			+ hasAlpha
-			+ ", isAlphaPremultiplied="
-			+ isAlphaPremultiplied;
+  String stringParam()
+  {
+    return "pixel_bits=" + pixel_bits +
+      ", cspace=" + cspace +
+      ", transferType=" + transferType +
+      ", transparency=" + transparency +
+      ", hasAlpha=" + hasAlpha +
+      ", isAlphaPremultiplied=" + isAlphaPremultiplied;
 	}
 
-	public String toString() {
+  public String toString()
+  {
 		return getClass().getName() + "[" + stringParam() + "]";
 	}
 }

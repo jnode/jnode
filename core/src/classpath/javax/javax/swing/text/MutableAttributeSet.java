@@ -44,12 +44,8 @@ import java.util.Enumeration;
  * @author	Andrew Selkirk
  * @version	1.0
  */
-public interface MutableAttributeSet extends AttributeSet {
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
+public interface MutableAttributeSet extends AttributeSet
+{
 	/**
 	 * addAttribute
 	 * @param name TODO
@@ -86,6 +82,4 @@ public interface MutableAttributeSet extends AttributeSet {
 	 * @param parent TODO
 	 */
 	void setResolveParent(AttributeSet parent);
-
-
-} // MutableAttributeSet
+}

@@ -39,10 +39,15 @@ exception statement from your version. */
 package java.awt.peer;
 
 import java.awt.Component;
+import java.awt.Event;
+
 public interface PopupMenuPeer extends MenuPeer
 {
+  /**
+   * Part of the older API, replaced by event version instead.
+   */
+  void show (Component origin, int x, int y);
 
-public abstract void show (Component origin, int x, int y);
-
+  void show (Event e);
 } // interface PopupMenuPeer
 

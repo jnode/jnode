@@ -35,7 +35,6 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package javax.swing.plaf.basic;
 
 import java.awt.Color;
@@ -55,12 +54,15 @@ import javax.swing.text.Position;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 
+
 public class BasicTextUI extends TextUI
   implements ViewFactory
 {
     int gap = 3;
     View view = null; // was: new RootView();
-    Color textColor, disabledTextColor, normalBackgroundColor;
+  Color textColor;
+  Color disabledTextColor;
+  Color normalBackgroundColor;
     EditorKit kit = new DefaultEditorKit();
     
     /* *****************************************************************
@@ -89,7 +91,6 @@ public class BasicTextUI extends TextUI
     }
     * (end of commented out section)
     *************************************************************** */
-
     public BasicTextUI()
     {
     }
@@ -99,14 +100,13 @@ public class BasicTextUI extends TextUI
 	return new BasicTextUI();
     }
 
-    
     public void installUI(final JComponent c) 
     {
 	super.installUI(c);
 
-	textColor                = new Color(0,0,0);
+    textColor = new Color(0, 0, 0);
 	disabledTextColor        = new Color(130, 130, 130);
-	normalBackgroundColor    = new Color(192,192,192);
+    normalBackgroundColor = new Color(192, 192, 192);
     }
     
     public Dimension getPreferredSize(JComponent c) 
@@ -118,10 +118,9 @@ public class BasicTextUI extends TextUI
 	float w = v.getPreferredSpan(View.X_AXIS);
 	float h = v.getPreferredSpan(View.Y_AXIS);
 
-	return new Dimension((int)w, (int) h);
+    return new Dimension((int) w, (int) h);
     }
     
-
     public void paint(Graphics g, JComponent c)
     {      
 	//	view.paint(
@@ -132,10 +131,8 @@ public class BasicTextUI extends TextUI
 	damageRange(t, p0, p1, null, null);
     }    
 
-    public void damageRange(JTextComponent t, 
-		     int p0, int p1, 
-		     Position.Bias firstBias,
-		     Position.Bias secondBias)
+  public void damageRange(JTextComponent t, int p0, int p1,
+                          Position.Bias firstBias, Position.Bias secondBias)
     {
     }
 
@@ -144,10 +141,8 @@ public class BasicTextUI extends TextUI
 	return kit;
     }
     
-    public int getNextVisualPositionFrom(JTextComponent t, 
-				  int pos,
-				  Position.Bias b, 
-				  int direction,
+  public int getNextVisualPositionFrom(JTextComponent t, int pos,
+                                       Position.Bias b, int direction,
 				  Position.Bias[] biasRet)
         throws BadLocationException
     {
@@ -181,7 +176,7 @@ public class BasicTextUI extends TextUI
 	return 0;
     } 
 
-  public View create (Element elem)
+  public View create(Element elem)
   {
     // subclasses have to implement this to get this functionality
     return null;

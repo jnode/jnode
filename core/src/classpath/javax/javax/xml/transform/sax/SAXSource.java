@@ -123,6 +123,10 @@ public class SAXSource implements Source
 	    InputSource	retval;
 	    boolean	ok = false;
 
+      if (in instanceof SAXSource) {
+        return ((SAXSource) in).inputSource;
+      }
+      
 	    if (in.getSystemId () != null) {
 		retval = new InputSource (in.getSystemId ());
 		ok = true;

@@ -35,7 +35,7 @@ public interface Locator2 extends Locator
     /**
      * Returns the version of XML used for the entity.  This will
      * normally be the identifier from the current entity's
-     * <em>&lt;?xmlversion='...'...?&gt;</em> declaration,
+     * <em>&lt;?xml&nbsp;version='...'&nbsp;...?&gt;</em> declaration,
      * or be defaulted by the parser.
      *
      * <p> At this writing, only one version ("1.0") is defined, but it
@@ -51,7 +51,7 @@ public interface Locator2 extends Locator
      * Returns the name of the character encoding for the entity.
      * If the encoding was declared externally (for example, in a MIME
      * Content-Type header), that will be the name returned.  Else if there
-     * was an <em>&lt;?xml...encoding='...'?&gt;</em> declaration at
+     * was an <em>&lt;?xml&nbsp;...encoding='...'?&gt;</em> declaration at
      * the start of the document, that encoding name will be returned.
      * Otherwise the encoding will been inferred (normally to be UTF-8, or
      * some UTF-16 variant), and that inferred name will be returned.

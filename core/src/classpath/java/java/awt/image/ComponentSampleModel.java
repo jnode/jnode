@@ -43,7 +43,8 @@ import gnu.java.awt.Buffers;
 /**
  * @author Rolf W. Rasmussen <rolfwr@ii.uib.no>
  */
-public class ComponentSampleModel extends SampleModel {
+public class ComponentSampleModel extends SampleModel
+{
 	protected int[] bandOffsets;
 	protected int[] bankIndices;
 
@@ -59,20 +60,34 @@ public class ComponentSampleModel extends SampleModel {
 
 	private boolean tightPixelPacking = false;
 
-	public ComponentSampleModel(int dataType, int w, int h, int pixelStride, int scanlineStride, int[] bandOffsets) {
-		this(dataType, w, h, pixelStride, scanlineStride, new int[bandOffsets.length], bandOffsets);
+  public ComponentSampleModel(int dataType,
+			      int w, int h,
+			      int pixelStride,
+			      int scanlineStride,
+			      int[] bandOffsets)
+  {
+    this(dataType, w, h, pixelStride, scanlineStride,
+	 new int[bandOffsets.length], bandOffsets);
 	}
 
-	public ComponentSampleModel(int dataType, int w, int h, int pixelStride, int scanlineStride, int[] bankIndices, int[] bandOffsets) {
+  public ComponentSampleModel(int dataType,
+			      int w, int h,
+			      int pixelStride,
+			      int scanlineStride,
+			      int[] bankIndices,
+			      int[] bandOffsets)
+  {
 		super(dataType, w, h, bandOffsets.length);
-		if ((pixelStride < 0) || (scanlineStride < 0) || (bandOffsets.length < 1) || (bandOffsets.length != bankIndices.length))
+    if ((pixelStride<0) || (scanlineStride<0) || 
+	(bandOffsets.length<1) ||
+	(bandOffsets.length != bankIndices.length))
 			throw new IllegalArgumentException();
 
 		this.bandOffsets = bandOffsets;
 		this.bankIndices = bankIndices;
 
-		for (int b = 0; b < bankIndices.length; b++)
-			this.numBanks = Math.max(this.numBanks, bankIndices[b] + 1);
+    for (int b=0; b<bankIndices.length; b++)
+      this.numBanks = Math.max(this.numBanks, bankIndices[b]+1);
 
 		this.scanlineStride = scanlineStride;
 		this.pixelStride = pixelStride;
@@ -82,10 +97,12 @@ public class ComponentSampleModel extends SampleModel {
 		/* FIXME: May these checks should be reserved for the
 		   PixelInterleavedSampleModel? */
 
-		if (pixelStride == numBands) {
+    if (pixelStride == numBands)
+      {
 			tightPixelPacking = true;
-			for (int b = 0; b < numBands; b++) {
-				if ((bandOffsets[b] != b) || (bankIndices[b] != 0)) {
+	for (int b=0; b<numBands; b++) {
+	  if ((bandOffsets[b] != b) || (bankIndices[b] !=0))
+	    {
 					tightPixelPacking = false;
 					break;
 				}
@@ -93,43 +110,56 @@ public class ComponentSampleModel extends SampleModel {
 		}
 	}
 
-	public SampleModel createCompatibleSampleModel(int w, int h) {
-		return new ComponentSampleModel(dataType, w, h, pixelStride, scanlineStride, bankIndices, bandOffsets);
+  public SampleModel createCompatibleSampleModel(int w, int h)
+  {
+    return new ComponentSampleModel(dataType, w, h, pixelStride,
+				    scanlineStride, bankIndices,
+				    bandOffsets);
 	}
 
-	public SampleModel createSubsetSampleModel(int[] bands) {
+  public SampleModel createSubsetSampleModel(int[] bands)
+  {
 		int numBands = bands.length;
 
 		int[] bankIndices = new int[numBands];
 		int[] bandOffsets = new int[numBands];
-		for (int b = 0; b < numBands; b++) {
+    for (int b=0; b<numBands; b++)
+      {
 			bankIndices[b] = this.bankIndices[bands[b]];
 			bandOffsets[b] = this.bandOffsets[bands[b]];
 		}
 
-		return new ComponentSampleModel(dataType, width, height, pixelStride, scanlineStride, bankIndices, bandOffsets);
+    return new ComponentSampleModel(dataType, width, height, pixelStride,
+				    scanlineStride, bankIndices,
+				    bandOffsets);
 	}
 
-	public DataBuffer createDataBuffer() {
+  public DataBuffer createDataBuffer()
+  {
 		// Maybe this value should be precalculated in the constructor?
 		int highestOffset = 0;
-		for (int b = 0; b < numBands; b++) {
+    for (int b=0; b<numBands; b++)
+      {
 			highestOffset = Math.max(highestOffset, bandOffsets[b]);
 		}
-		int size = pixelStride * (width - 1) + scanlineStride * (height - 1) + highestOffset + 1;
+    int size = pixelStride*(width-1) + scanlineStride*(height-1) +
+      highestOffset + 1;
 
 		return Buffers.createBuffer(getDataType(), size, numBanks);
 	}
 
-	public int getOffset(int x, int y) {
+  public int getOffset(int x, int y)
+  {
 		return getOffset(x, y, 0);
 	}
 
-	public int getOffset(int x, int y, int b) {
-		return bandOffsets[b] + pixelStride * x + scanlineStride * y;
+  public int getOffset(int x, int y, int b)
+  {
+    return bandOffsets[b] + pixelStride*x + scanlineStride*y;
 	}
 
-	public final int[] getSampleSize() {
+  public final int[] getSampleSize()
+  {
 		int size = DataBuffer.getDataTypeSize(getDataType());
 		int[] sizes = new int[numBands];
 
@@ -137,32 +167,39 @@ public class ComponentSampleModel extends SampleModel {
 		return sizes;
 	}
 
-	public final int getSampleSize(int band) {
+  public final int getSampleSize(int band)
+  {
 		return DataBuffer.getDataTypeSize(getDataType());
 	}
 
-	public final int[] getBankIndices() {
+  public final int[] getBankIndices()
+  {
 		return bankIndices;
 	}
 
-	public final int[] getBandOffsets() {
+  public final int[] getBandOffsets()
+  {
 		return bandOffsets;
 	}
 
-	public final int getScanlineStride() {
+  public final int getScanlineStride()
+  {
 		return scanlineStride;
 	}
 
-	public final int getPixelStride() {
+  public final int getPixelStride()
+  {
 		return pixelStride;
 	}
 
-	public final int getNumDataElements() {
+  public final int getNumDataElements()
+  {
 		return numBands;
 	}
 
-	public Object getDataElements(int x, int y, Object obj, DataBuffer data) {
-		int xyOffset = pixelStride * x + scanlineStride * y;
+  public Object getDataElements(int x, int y, Object obj, DataBuffer data)
+  {
+    int xyOffset = pixelStride*x + scanlineStride*y;
 
 		int[] totalBandDataOffsets = new int[numBands];
 
@@ -178,79 +215,96 @@ public class ComponentSampleModel extends SampleModel {
 
 		int[] bankOffsets = data.getOffsets();
 
-		for (int b = 0; b < numBands; b++) {
-			totalBandDataOffsets[b] = bandOffsets[b] + bankOffsets[bankIndices[b]] + xyOffset;
+    for (int b=0; b<numBands; b++)
+      {
+	totalBandDataOffsets[b] = 
+	  bandOffsets[b]+bankOffsets[bankIndices[b]] + xyOffset;
 		}
 
-		try {
-			switch (getTransferType()) {
-				case DataBuffer.TYPE_BYTE :
+    try
+      {
+	switch (getTransferType())
+	  {
+	  case DataBuffer.TYPE_BYTE:
 					DataBufferByte inByte = (DataBufferByte) data;
 					byte[] outByte = (byte[]) obj;
-					if (outByte == null)
-						outByte = new byte[numBands];
+	    if (outByte == null) outByte = new byte[numBands];
 
-					for (int b = 0; b < numBands; b++) {
+	    for (int b=0; b<numBands; b++)
+	      {
 						int dOffset = totalBandDataOffsets[b];
 						outByte[b] = inByte.getData(bankIndices[b])[dOffset];
 					}
 					return outByte;
 
-				case DataBuffer.TYPE_USHORT :
+	  case DataBuffer.TYPE_USHORT:
 					DataBufferUShort inUShort = (DataBufferUShort) data;
 					short[] outUShort = (short[]) obj;
-					if (outUShort == null)
-						outUShort = new short[numBands];
+	    if (outUShort == null) outUShort = new short[numBands];
 
-					for (int b = 0; b < numBands; b++) {
+	    for (int b=0; b<numBands; b++)
+	      {
 						int dOffset = totalBandDataOffsets[b];
 						outUShort[b] = inUShort.getData(bankIndices[b])[dOffset];
 					}
 					return outUShort;
 
-				case DataBuffer.TYPE_INT :
+	  case DataBuffer.TYPE_INT:
 					DataBufferInt inInt = (DataBufferInt) data;
 					int[] outInt = (int[]) obj;
-					if (outInt == null)
-						outInt = new int[numBands];
+	    if (outInt == null) outInt = new int[numBands];
 
-					for (int b = 0; b < numBands; b++) {
+	    for (int b=0; b<numBands; b++)
+	      {
 						int dOffset = totalBandDataOffsets[b];
 						outInt[b] = inInt.getData(bankIndices[b])[dOffset];
 					}
 					return outInt;
 
 					// FIXME: Fill in the other possible types.
-				default :
-					throw new IllegalStateException("unknown transfer type " + getTransferType());
+	  default:
+	      throw new IllegalStateException("unknown transfer type " +
+					      getTransferType());
+	  }
 			}
-		} catch (ArrayIndexOutOfBoundsException aioobe) {
-			String msg = "While reading data elements, " + "x=" + x + ", y=" + y + ", " + ", xyOffset=" + xyOffset + ", data.getSize()=" + data.getSize() + ": " + aioobe;
+    catch (ArrayIndexOutOfBoundsException aioobe)
+      {
+	String msg = "While reading data elements, " +
+	  "x=" + x + ", y=" + y +", " + ", xyOffset=" + xyOffset +
+	  ", data.getSize()=" + data.getSize() + ": " + aioobe;
 			throw new ArrayIndexOutOfBoundsException(msg);
 		}
 	}
 
-	public Object getDataElements(int x, int y, int w, int h, Object obj, DataBuffer data) {
-		if (!tightPixelPacking) {
+  public Object getDataElements(int x, int y, int w, int h, Object obj,
+				DataBuffer data)
+  {
+    if (!tightPixelPacking)
+      {
 			return super.getDataElements(x, y, w, h, obj, data);
 		}
 
 		// using get speedup
 
 		// We can copy whole rows
-		int rowSize = w * numBands;
-		int dataSize = rowSize * h;
+    int rowSize = w*numBands;
+    int dataSize = rowSize*h;
 
-		DataBuffer transferBuffer = Buffers.createBuffer(getTransferType(), obj, dataSize);
+    DataBuffer transferBuffer =
+      Buffers.createBuffer(getTransferType(), obj, dataSize);
 		obj = Buffers.getData(transferBuffer);
 
-		int inOffset = pixelStride * x + scanlineStride * y + data.getOffset(); // Assumes only one band is used
+    int inOffset =
+      pixelStride*x +
+      scanlineStride*y +
+      data.getOffset(); // Assumes only one band is used
 
 		/* We don't add band offsets since we assume that bands have
 		   offsets 0, 1, 2, ... */
 
 		// See if we can copy everything in one go
-		if (scanlineStride == rowSize) {
+    if (scanlineStride == rowSize)
+      {
 			// Collapse scan lines:
 			rowSize *= h;
 			// We ignore scanlineStride since it won't be of any use
@@ -259,7 +313,8 @@ public class ComponentSampleModel extends SampleModel {
 
 		int outOffset = 0;
 		Object inArray = Buffers.getData(data);
-		for (int yd = 0; yd < h; yd++) {
+    for (int yd = 0; yd<h; yd++)
+      {
 			System.arraycopy(inArray, inOffset, obj, outOffset, rowSize);
 			inOffset += scanlineStride;
 			outOffset += rowSize;
@@ -267,58 +322,73 @@ public class ComponentSampleModel extends SampleModel {
 		return obj;
 	}
 
-	public void setDataElements(int x, int y, int w, int h, Object obj, DataBuffer data) {
-		if (!tightPixelPacking) {
+  public void setDataElements(int x, int y, int w, int h,
+			      Object obj, DataBuffer data)
+  {
+    if (!tightPixelPacking)
+      {
 			super.setDataElements(x, y, w, h, obj, data);
 			return;
 		}
 
 		// using set speedup, we can copy whole rows
-		int rowSize = w * numBands;
-		//int dataSize = rowSize * h;
+    int rowSize = w*numBands;
+    int dataSize = rowSize*h;
 
-		//DataBuffer transferBuffer = Buffers.createBufferFromData(getTransferType(), obj, dataSize);
+    DataBuffer transferBuffer =
+      Buffers.createBufferFromData(getTransferType(), obj, dataSize);
 
 		int[] bankOffsets = data.getOffsets();
 
-		int outOffset = pixelStride * x + scanlineStride * y + bankOffsets[0]; // same assuptions as in get...
+    int outOffset =
+      pixelStride*x +
+      scanlineStride*y +
+      bankOffsets[0]; // same assuptions as in get...
 
 		// See if we can copy everything in one go
-		if (scanlineStride == rowSize) {
+    if (scanlineStride == rowSize)
+      {
 			// Collapse scan lines:
-			scanlineStride = rowSize *= h;
+	rowSize *= h;
 			h = 1;
 		}
 
 		int inOffset = 0;
 		Object outArray = Buffers.getData(data);
-		for (int yd = 0; yd < h; yd++) {
+    for (int yd = 0; yd<h; yd++)
+      {
 			System.arraycopy(obj, inOffset, outArray, outOffset, rowSize);
 			outOffset += scanlineStride;
 			inOffset += rowSize;
 		}
 	}
 
-	public int[] getPixel(int x, int y, int[] iArray, DataBuffer data) {
-		int offset = pixelStride * x + scanlineStride * y;
-		if (iArray == null)
-			iArray = new int[numBands];
-		for (int b = 0; b < numBands; b++) {
-			iArray[b] = data.getElem(bankIndices[b], offset + bandOffsets[b]);
+  public int[] getPixel(int x, int y, int[] iArray, DataBuffer data)
+  {
+    int offset = pixelStride*x + scanlineStride*y;
+    if (iArray == null) iArray = new int[numBands];
+    for (int b=0; b<numBands; b++)
+      {
+	iArray[b] = data.getElem(bankIndices[b], offset+bandOffsets[b]);
 		}
 		return iArray;
 	}
 
-	public int[] getPixels(int x, int y, int w, int h, int[] iArray, DataBuffer data) {
-		int offset = pixelStride * x + scanlineStride * y;
-		if (iArray == null)
-			iArray = new int[numBands * w * h];
+  public int[] getPixels(int x, int y, int w, int h, int[] iArray,
+			 DataBuffer data)
+  {
+    int offset = pixelStride*x + scanlineStride*y;
+    if (iArray == null) iArray = new int[numBands*w*h];
 		int outOffset = 0;
-		for (y = 0; y < h; y++) {
+    for (y=0; y<h; y++)
+      {
 			int lineOffset = offset;
-			for (x = 0; x < w; x++) {
-				for (int b = 0; b < numBands; b++) {
-					iArray[outOffset++] = data.getElem(bankIndices[b], lineOffset + bandOffsets[b]);
+	for (x=0; x<w; x++)
+	  {
+	    for (int b=0; b<numBands; b++)
+	      {
+		iArray[outOffset++] = 
+		  data.getElem(bankIndices[b], lineOffset+bandOffsets[b]);
 				}
 				lineOffset += pixelStride;
 			}
@@ -327,60 +397,67 @@ public class ComponentSampleModel extends SampleModel {
 		return iArray;
 	}
 
-	public int getSample(int x, int y, int b, DataBuffer data) {
+  public int getSample(int x, int y, int b, DataBuffer data)
+  {
 		return data.getElem(bankIndices[b], getOffset(x, y, b));
 	}
 
-	public void setDataElements(int x, int y, Object obj, DataBuffer data) {
-		int offset = pixelStride * x + scanlineStride * y;
+  public void setDataElements(int x, int y, Object obj, DataBuffer data)
+  {
+    int offset = pixelStride*x + scanlineStride*y;
 		int[] totalBandDataOffsets = new int[numBands];
 		int[] bankOffsets = data.getOffsets();
-		for (int b = 0; b < numBands; b++)
-			totalBandDataOffsets[b] = bandOffsets[b] + bankOffsets[bankIndices[b]] + offset;
+    for (int b=0; b<numBands; b++)
+      totalBandDataOffsets[b] =
+	bandOffsets[b]+bankOffsets[bankIndices[b]] + offset;
 
-		switch (getTransferType()) {
-			case DataBuffer.TYPE_BYTE :
+    switch (getTransferType())
+      {
+      case DataBuffer.TYPE_BYTE:
 				{
 					DataBufferByte out = (DataBufferByte) data;
 					byte[] in = (byte[]) obj;
 
-					for (int b = 0; b < numBands; b++)
+	  for (int b=0; b<numBands; b++)
 						out.getData(bankIndices[b])[totalBandDataOffsets[b]] = in[b];
 
 					return;
 				}
-			case DataBuffer.TYPE_USHORT :
+      case DataBuffer.TYPE_USHORT:
 				{
 					DataBufferUShort out = (DataBufferUShort) data;
 					short[] in = (short[]) obj;
 
-					for (int b = 0; b < numBands; b++)
+	  for (int b=0; b<numBands; b++)
 						out.getData(bankIndices[b])[totalBandDataOffsets[b]] = in[b];
 
 					return;
 				}
-			case DataBuffer.TYPE_INT :
+      case DataBuffer.TYPE_INT:
 				{
 					DataBufferInt out = (DataBufferInt) data;
 					int[] in = (int[]) obj;
 
-					for (int b = 0; b < numBands; b++)
+	  for (int b=0; b<numBands; b++)
 						out.getData(bankIndices[b])[totalBandDataOffsets[b]] = in[b];
 
 					return;
 				}
-			default :
-				throw new UnsupportedOperationException("transfer type not " + "implemented");
+      default:
+	throw new UnsupportedOperationException("transfer type not " +
+						"implemented");
 		}
 	}
 
-	public void setPixel(int x, int y, int[] iArray, DataBuffer data) {
-		int offset = pixelStride * x + scanlineStride * y;
-		for (int b = 0; b < numBands; b++)
-			data.setElem(bankIndices[b], offset + bandOffsets[b], iArray[b]);
+  public void setPixel(int x, int y, int[] iArray, DataBuffer data)
+  {
+    int offset = pixelStride*x + scanlineStride*y;
+    for (int b=0; b<numBands; b++)
+      data.setElem(bankIndices[b], offset+bandOffsets[b], iArray[b]);
 	}
 
-	public void setSample(int x, int y, int b, int s, DataBuffer data) {
+  public void setSample(int x, int y, int b, int s, DataBuffer data)
+  {
 		data.setElem(bankIndices[b], getOffset(x, y, b), s);
 	}
 }

@@ -74,6 +74,9 @@ public abstract class DocumentBuilderFactory {
 	// Methods ----------------------------------------------------
 	//-------------------------------------------------------------
 
+  /**
+   * @exception IllegalArgumentException if implementation doesn't recognize the attribute
+   */
 	public abstract Object getAttribute(String name) 
 		throws IllegalArgumentException;
 
@@ -104,6 +107,9 @@ public abstract class DocumentBuilderFactory {
 	public abstract DocumentBuilder newDocumentBuilder()
 		throws ParserConfigurationException;
 
+  /**
+   * @exception FactoryConfigurationError if the implementation is not available
+   */
 	public static DocumentBuilderFactory newInstance() {
 		try {
 		    return (DocumentBuilderFactory)
@@ -116,6 +122,9 @@ public abstract class DocumentBuilderFactory {
 		}
 	}
 
+  /**
+   * @exception IllegalArgumentException if implementation doesn't recognize the attribute
+   */
 	public abstract void setAttribute(String name, Object value) 
 		throws IllegalArgumentException;
 
