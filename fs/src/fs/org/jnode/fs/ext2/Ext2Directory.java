@@ -26,9 +26,6 @@ public class Ext2Directory extends AbstractFSDirectory {
 	private final Logger log = Logger.getLogger(getClass());
 			
 	/**
-	 * 
-	 * @param iNode
-	 * @param fs
 	 * @param entry	the Ext2Entry representing this directory
 	 */
 	public Ext2Directory(Ext2Entry entry) throws IOException {
@@ -53,10 +50,10 @@ public class Ext2Directory extends AbstractFSDirectory {
 	 * @return
 	 * @throws IOException
 	 */
-	public synchronized FSEntry createDirectoryEntry(String name) throws IOException {
+	public FSEntry createDirectoryEntry(String name) throws IOException {
 		if(!canWrite())
 			throw new IOException("Filesystem or directory is mounted read-only!");
-			 
+
 		//create a new iNode for the file
 		//TODO: access rights, file type, UID and GID should be passed through the FSDirectory interface
 		INode newINode;
@@ -102,7 +99,7 @@ public class Ext2Directory extends AbstractFSDirectory {
 			throw new IOException(fse);
 		}
 		
-		return newEntry; 
+		return newEntry;
 	}
 
 	/**
@@ -111,9 +108,10 @@ public class Ext2Directory extends AbstractFSDirectory {
 	 * @return
 	 * @throws IOException
 	 */
-	public synchronized FSEntry createFileEntry(String name) throws IOException {
+	public FSEntry createFileEntry(String name) throws IOException {
 		if(!canWrite())
 			throw new IOException("Filesystem or directory is mounted read-only!");
+
 		//create a new iNode for the file
 		//TODO: access rights, file type, UID and GID should be passed through the FSDirectory interface
 		INode newINode;
@@ -134,7 +132,6 @@ public class Ext2Directory extends AbstractFSDirectory {
 		}catch(FileSystemException fse) {
 			throw new IOException(fse);
 		}
-		
 		return new Ext2Entry(newINode, name, Ext2Constants.EXT2_FT_REG_FILE, fs, this); 
 	}
 	
@@ -169,57 +166,62 @@ public class Ext2Directory extends AbstractFSDirectory {
 		}
 	}
 	
-	private synchronized void addDirectoryRecord(Ext2DirectoryRecord dr) throws IOException, FileSystemException{
+	private void addDirectoryRecord(Ext2DirectoryRecord dr) throws IOException, FileSystemException{
 		Ext2File dir = new Ext2File(iNode);		//read itself as a file
 
-		//find the last directory record (if any)
-		Ext2FSEntryIterator iterator = new Ext2FSEntryIterator(iNode);
-		Ext2DirectoryRecord rec=null;
-		while(iterator.hasNext()) {
-			rec = iterator.nextDirectoryRecord();
-		}
-		
-		Ext2FileSystem fs = (Ext2FileSystem) getFileSystem();		
-		if(rec!=null) {
-			long lastPos = rec.getFileOffset(); 
-			long lastLen = rec.getRecLen();
-
-			//truncate the last record to its minimal size (cut the padding from the end)
-			rec.truncateRecord();
-			
-			//directoryRecords may not extend over block boundaries:
-			//	see if the new record fits in the same block after truncating the last record
-			long remainingLength = fs.getBlockSize() - (lastPos%fs.getBlockSize()) - rec.getRecLen();
-			log.debug("LAST-1 record: begins at: "+lastPos+", length: "+lastLen);
-			log.debug("LAST-1 truncated length: "+rec.getRecLen());
-			log.debug("Remaining length: "+remainingLength);
-			if(remainingLength >= dr.getRecLen()) {			
-				//write back the last record truncated
-				dir.write( lastPos, rec.getData(), rec.getOffset(), rec.getRecLen() );
-	
-				//pad the end of the new record with zeroes
-				dr.expandRecord(lastPos+rec.getRecLen(), lastPos+rec.getRecLen()+remainingLength);
-				//append the new record at the end of the list
-				dir.write( lastPos+rec.getRecLen(), dr.getData(), dr.getOffset(), dr.getRecLen() );
-				log.debug("addDirectoryRecord(): LAST   record: begins at: "+
-						 (rec.getFileOffset()+rec.getRecLen())+", length: "+dr.getRecLen());
-			} else {
-				//the new record must go to the next block
-				//(the previously last record (rec) stays padded to the end of the block, so we can 
-				// append after that)
-				dr.expandRecord(lastPos+lastLen, lastPos+lastLen+fs.getBlockSize());
-				
-				dir.write( lastPos+lastLen, dr.getData(), dr.getOffset(), dr.getRecLen() );
-				log.debug("addDirectoryRecord(): LAST   record: begins at: "+(lastPos+lastLen)+", length: "+dr.getRecLen());	
+		//a single inode may be represented by more than one Ext2Directory instances, 
+		//but each will use the same instance of the underlying inode (see Ext2FileSystem.getINode()),
+		//so synchronize to the inode
+		synchronized(iNode) {	
+			//find the last directory record (if any)
+			Ext2FSEntryIterator iterator = new Ext2FSEntryIterator(iNode);
+			Ext2DirectoryRecord rec=null;
+			while(iterator.hasNext()) {
+				rec = iterator.nextDirectoryRecord();
 			}
-		} else {	//rec==null, ie. this is the first record in the directory
-			dr.expandRecord(0, fs.getBlockSize());
-			dir.write(0, dr.getData(), dr.getOffset(), dr.getRecLen());
-			log.debug("addDirectoryRecord(): LAST   record: begins at: 0, length: "+dr.getRecLen());				
-		}
+			
+			Ext2FileSystem fs = (Ext2FileSystem) getFileSystem();		
+			if(rec!=null) {
+				long lastPos = rec.getFileOffset(); 
+				long lastLen = rec.getRecLen();
+	
+				//truncate the last record to its minimal size (cut the padding from the end)
+				rec.truncateRecord();
+				
+				//directoryRecords may not extend over block boundaries:
+				//	see if the new record fits in the same block after truncating the last record
+				long remainingLength = fs.getBlockSize() - (lastPos%fs.getBlockSize()) - rec.getRecLen();
+				log.debug("LAST-1 record: begins at: "+lastPos+", length: "+lastLen);
+				log.debug("LAST-1 truncated length: "+rec.getRecLen());
+				log.debug("Remaining length: "+remainingLength);
+				if(remainingLength >= dr.getRecLen()) {			
+					//write back the last record truncated
+					dir.write( lastPos, rec.getData(), rec.getOffset(), rec.getRecLen() );
 		
-		//dir.flush();
-		iNode.setMtime(System.currentTimeMillis()/1000);
+					//pad the end of the new record with zeroes
+					dr.expandRecord(lastPos+rec.getRecLen(), lastPos+rec.getRecLen()+remainingLength);
+					//append the new record at the end of the list
+					dir.write( lastPos+rec.getRecLen(), dr.getData(), dr.getOffset(), dr.getRecLen() );
+					log.debug("addDirectoryRecord(): LAST   record: begins at: "+
+							 (rec.getFileOffset()+rec.getRecLen())+", length: "+dr.getRecLen());
+				} else {
+					//the new record must go to the next block
+					//(the previously last record (rec) stays padded to the end of the block, so we can 
+					// append after that)
+					dr.expandRecord(lastPos+lastLen, lastPos+lastLen+fs.getBlockSize());
+					
+					dir.write( lastPos+lastLen, dr.getData(), dr.getOffset(), dr.getRecLen() );
+					log.debug("addDirectoryRecord(): LAST   record: begins at: "+(lastPos+lastLen)+", length: "+dr.getRecLen());	
+				}
+			} else {	//rec==null, ie. this is the first record in the directory
+				dr.expandRecord(0, fs.getBlockSize());
+				dir.write(0, dr.getData(), dr.getOffset(), dr.getRecLen());
+				log.debug("addDirectoryRecord(): LAST   record: begins at: 0, length: "+dr.getRecLen());				
+			}
+			
+			//dir.flush();
+			iNode.setMtime(System.currentTimeMillis()/1000);
+		}
 	}
 
 	/** 

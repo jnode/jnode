@@ -23,7 +23,7 @@ public class GroupDescriptor {
 
 	public GroupDescriptor() {
 		data = new byte[GROUPDESCRIPTOR_LENGTH];
-		log.setLevel(Level.DEBUG);		
+		log.setLevel(Level.INFO);		
 	}
 	
 	/*

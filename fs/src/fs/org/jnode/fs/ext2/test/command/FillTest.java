@@ -18,11 +18,12 @@ public class FillTest {
 		FileOutputStream fos = new FileOutputStream(fname, false);
 		int written=0;
 		while(written<kilos) {
-			System.out.print(".");
+			if(written%10 == 0)
+				System.out.print(".");
 			fos.write(bbuf, 0, 1024);
 			written++;
 			if((written%100)==0)
-				System.out.println("\n"+written+" KB");
+				System.out.println(written+" KB");
 		}
 		
 		fos.close();

@@ -46,7 +46,7 @@ public class INodeTable {
 	 * @throws FileSystemException
 	 * @throws IOException
 	 */
-	public synchronized byte[] getINodeTableBlock(int blockNo) throws FileSystemException, IOException{
+	private byte[] getINodeTableBlock(int blockNo) throws FileSystemException, IOException{
 		if(blockNo < blockCount) 
 			return fs.getBlock(firstBlock+blockNo);
 		else throw new FileSystemException("Trying to get block #"+blockNo+
@@ -60,7 +60,7 @@ public class INodeTable {
 	 * @throws FileSystemException
 	 * @throws IOException
 	 */
-	public synchronized void writeINodeTableBlock(byte[] data, int blockNo) throws FileSystemException, IOException {
+	private void writeINodeTableBlock(byte[] data, int blockNo) throws FileSystemException, IOException {
 		if(blockNo < blockCount) 
 			fs.writeBlock(firstBlock+blockNo, data, false);
 		else throw new FileSystemException("Trying to write block #"+blockNo+
@@ -70,6 +70,9 @@ public class INodeTable {
 	/** 
 	 * Get the indexth inode from the inode table.
 	 * (index is not an inode number, it is just an index in the inode table)
+	 * 
+	 * For each inode table, only one instance of INodeTable exists, so it is safe
+	 * to synchronize to it
 	 */
 	public synchronized byte[] getInodeData(int index) throws IOException, FileSystemException{
 		byte data[] = new byte[INode.INODE_LENGTH];
@@ -87,6 +90,10 @@ public class INodeTable {
 		return data;
 	}
 	
+	/* 
+	 * For each inode table, only one instance of INodeTable exists, so it is safe
+	 * to synchronize to it
+	 */
 	public synchronized void writeInodeData(int index, byte[] data) throws IOException, FileSystemException {
 		int indexCopied = 0;
 		while(indexCopied<INode.INODE_LENGTH) {
