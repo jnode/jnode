@@ -16,7 +16,6 @@
     <import plugin="org.jnode.driver.ide"/>
     <import plugin="org.jnode.driver.scsi"/> 
 	<import plugin="org.junit" version="3.8"/>
-	<import plugin="org.june"/>	
     <import plugin="org.jnode.driver.block"/>
     <import plugin="org.jnode.driver.block.ramdisk"/>    
     <import plugin="org.jnode.fs.service"/>
