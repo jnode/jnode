@@ -23,7 +23,7 @@
 
 package java.awt;
 
-import gnu.java.security.actions.GetPropertyAction;
+import gnu.java.security.action.GetPropertyAction;
 
 import java.awt.datatransfer.Clipboard;
 import java.awt.dnd.DragGestureEvent;

@@ -5,7 +5,7 @@
  */
 package org.jnode.shell;
 
-import gnu.java.security.actions.InvokeAction;
+import gnu.java.security.action.InvokeAction;
 
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;

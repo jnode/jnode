@@ -37,7 +37,7 @@
 
 package java.net;
 
-import gnu.java.security.actions.GetIntegerAction;
+import gnu.java.security.action.GetIntegerAction;
 
 import java.io.Serializable;
 import java.security.AccessController;

@@ -11,7 +11,7 @@ import org.jnode.shell.help.Help;
 import org.jnode.shell.help.HelpException;
 import org.jnode.shell.help.SyntaxErrorException;
 
-import gnu.java.security.actions.InvokeAction;
+import gnu.java.security.action.InvokeAction;
 
 import java.awt.event.KeyEvent;
 import java.io.PrintStream;

@@ -6,7 +6,7 @@
  */
 package org.jnode.shell.command;
 
-import gnu.java.security.actions.GetPropertiesAction;
+import gnu.java.security.action.GetPropertiesAction;
 
 import java.io.InputStream;
 import java.io.PrintStream;

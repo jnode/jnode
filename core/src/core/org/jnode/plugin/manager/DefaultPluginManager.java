@@ -3,7 +3,7 @@
  */
 package org.jnode.plugin.manager;
 
-import gnu.java.security.actions.GetPropertyAction;
+import gnu.java.security.action.GetPropertyAction;
 
 import java.security.AccessController;
 import java.util.ArrayList;

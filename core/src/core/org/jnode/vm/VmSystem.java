@@ -277,9 +277,8 @@ public final class VmSystem {
      * 
      * @param obj
      * @return Object
-     * @throws CloneNotSupportedException
      */
-    public static Object clone(Object obj) throws CloneNotSupportedException {
+    public static Object clone(Cloneable obj) {
         return Vm.getVm().getHeapManager().clone(obj);
     }
 

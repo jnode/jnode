@@ -35,7 +35,7 @@
 
 package java.net;
 
-import gnu.java.security.actions.GetPropertyAction;
+import gnu.java.security.action.GetPropertyAction;
 
 import java.io.IOException;
 import java.io.InputStream;
