@@ -358,7 +358,8 @@ public class VmReflection {
 	 * @throws InvocationTargetException
 	 */
 	public static Object newInstance(VmMethod constructor, Object[] args) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-		Object obj = HeapManager.newInstance(constructor.getDeclaringClass());
+		final VmHeapManager hm = Vm.getVm().getHeapManager();
+		final Object obj = hm.newInstance(constructor.getDeclaringClass());
 		invoke(constructor, obj, args);
 		return obj;
 	}
@@ -372,7 +373,8 @@ public class VmReflection {
 	 * @throws InvocationTargetException
 	 */
 	public static Object newInstance(VmMethod constructor) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-		Object obj = HeapManager.newInstance(constructor.getDeclaringClass());
+		final VmHeapManager hm = Vm.getVm().getHeapManager();
+		final Object obj = hm.newInstance(constructor.getDeclaringClass());
 		Unsafe.pushObject(obj);
 		Unsafe.invokeVoid(constructor);
 		return obj;

@@ -1488,9 +1488,14 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 					try {
 						VmReflection.invokeStatic(initMethod);
 					} catch (InvocationTargetException ex) {
-						ex.getTargetException().printStackTrace();
-						Unsafe.die();
-						throw new ExceptionInInitializerError(ex.getTargetException());
+						final Throwable targetEx = ex.getTargetException();
+						if (targetEx != null) {
+							ex.getTargetException().printStackTrace();
+							Unsafe.die();
+							throw new ExceptionInInitializerError(ex.getTargetException());
+						} else {
+							throw new ExceptionInInitializerError("targetEx == null");
+						}
 					}
 				}
 				modifiers |= Modifier.ACC_INITIALIZED;

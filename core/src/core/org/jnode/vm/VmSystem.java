@@ -70,7 +70,7 @@ public final class VmSystem {
 			MonitorManager.initialize();
 
 			// Initialize the monitors for the heap manager
-			HeapManager.initializeMonitors();
+			Vm.getVm().getHeapManager().start();
 
 			/* We're done initializing */
 			inited = true;
@@ -92,6 +92,8 @@ public final class VmSystem {
 
 		final String arch;
 		arch = Unsafe.getCurrentProcessor().getArchitecture().getName();
+		Unsafe.debug("arch=");
+		Unsafe.debug(arch);
 
 		final Properties res = new Properties();
 		res.put("java.version", "1.1.0");
@@ -179,7 +181,7 @@ public final class VmSystem {
 	 * @throws CloneNotSupportedException
 	 */
 	public static Object clone(Object obj) throws CloneNotSupportedException {
-		return HeapManager.clone(obj);
+		return Vm.getVm().getHeapManager().clone(obj);
 	}
 
 	/**
@@ -256,7 +258,7 @@ public final class VmSystem {
 
 	protected static Object allocStack(int size) {
 		try {
-			return HeapManager.newInstance2(systemLoader.loadClass("org.jnode.vm.VmSystemObject", true), size);
+			return Vm.getVm().getHeapManager().newInstance(systemLoader.loadClass("org.jnode.vm.VmSystemObject", true), size);
 		} catch (ClassNotFoundException ex) {
 			throw (NoClassDefFoundError) new NoClassDefFoundError().initCause(ex);
 		}
@@ -276,7 +278,7 @@ public final class VmSystem {
 			current.inException = true;
 		}
 
-		if (HeapManager.isLowOnMemory()) {
+		if (Vm.getVm().getHeapManager().isLowOnMemory()) {
 			return null;
 		}
 
@@ -607,5 +609,17 @@ public final class VmSystem {
 	 */
 	public static VmClassLoader getSystemClassLoader() {
 		return systemLoader;
+	}
+	
+	public static long freeMemory() {
+		return Vm.getVm().getHeapManager().getFreeMemory();
+	}
+	
+	public static long totalMemory() {
+		return Vm.getVm().getHeapManager().getTotalMemory();
+	}
+	
+	public static void gc() {
+		Vm.getVm().getHeapManager().gc();
 	}
 }

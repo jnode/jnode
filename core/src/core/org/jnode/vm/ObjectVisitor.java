@@ -6,7 +6,7 @@ package org.jnode.vm;
 /**
  * @author epr
  */
-public abstract class ObjectVisitor {
+public abstract class ObjectVisitor extends VmSystemObject  {
 
 	/**
 	 * Generic visit method for objects.

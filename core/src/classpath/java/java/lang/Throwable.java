@@ -1,13 +1,11 @@
 /*
- *  java.lang.Throwable
- *
- *  (c) 1997 George David Morrison
- *
- *  API version: 1.0.2
- *
- *  History:
- *  01FEB1997  George David Morrison
- *    Initial version
+ * java.lang.Throwable
+ * 
+ * (c) 1997 George David Morrison
+ * 
+ * API version: 1.0.2
+ * 
+ * History: 01FEB1997 George David Morrison Initial version
  */
 
 package java.lang;
@@ -42,7 +40,23 @@ public class Throwable {
 	}
 
 	public void printStackTrace() {
-		printStackTrace(System.err);
+		PrintStream s = System.err;
+		if (s != null) {
+			printStackTrace(System.err);
+		} else {
+			final Object[] st = this.backtrace;
+			if (st != null) {
+				final int cnt = st.length;
+				for (int i = 0; i < cnt; i++) {
+					final Object o = st[i];
+					if (o != null) {
+						Unsafe.debug(o.toString());
+					} else {
+						Unsafe.debug("null");
+					}
+				}
+			}
+		}
 	}
 
 	public void printStackTrace(PrintStream s) {
@@ -55,7 +69,7 @@ public class Throwable {
 			for (int i = 0; i < cnt; i++) {
 				final Object ste = st[i];
 				if ((ste != null) && (ste instanceof char[])) {
-					s.print((char[])ste);
+					s.print((char[]) ste);
 				} else {
 					s.print(ste);
 				}
@@ -80,7 +94,7 @@ public class Throwable {
 			for (int i = 0; i < cnt; i++) {
 				final Object ste = st[i];
 				if ((ste != null) && (ste instanceof char[])) {
-					s.print((char[])ste);
+					s.print((char[]) ste);
 				} else {
 					s.print(ste);
 				}
@@ -115,6 +129,7 @@ public class Throwable {
 
 	/**
 	 * Returns the cause.
+	 * 
 	 * @return Throwable
 	 */
 	public Throwable getCause() {
@@ -122,15 +137,16 @@ public class Throwable {
 	}
 
 	/**
-	 * Initialize the cause of this Throwable.  This may only be called once
-	 * during the object lifetime, including implicitly by chaining
-	 * constructors.
-	 *
-	 * @param cause the cause of this Throwable, may be null
+	 * Initialize the cause of this Throwable. This may only be called once during the object
+	 * lifetime, including implicitly by chaining constructors.
+	 * 
+	 * @param cause
+	 *            the cause of this Throwable, may be null
 	 * @return this
-	 * @throws IllegalArgumentException if cause is this (a Throwable can't be
-	 *         its own cause!)
-	 * @throws IllegalStateException if the cause has already been set
+	 * @throws IllegalArgumentException
+	 *             if cause is this (a Throwable can't be its own cause!)
+	 * @throws IllegalStateException
+	 *             if the cause has already been set
 	 * @since 1.4
 	 */
 	public Throwable initCause(Throwable cause) {

@@ -27,6 +27,8 @@ public class SoftByteCodes implements Uninterruptible {
 	public static final int EX_ABSTRACTMETHOD = 4;
 	public static final int EX_STACKOVERFLOW = 5;
 	public static final int EX_CLASSCAST = 6;
+	
+	private static VmHeapManager heapManager;
 
 	/**
 	 * Is the given object instance of the given class.
@@ -178,11 +180,15 @@ public class SoftByteCodes implements Uninterruptible {
 		//Screen.debug("ao cls{");
 		//Screen.debug(vmClass.getName());
 
+		VmHeapManager hm = heapManager;
+		if (hm == null) {
+			heapManager = hm = Vm.getVm().getHeapManager();
+		}
 		Object result;
 		if (size < 0) {
-			result = HeapManager.newInstance(vmClass);
+			result = hm.newInstance(vmClass);
 		} else {
-			result = HeapManager.newInstance2(vmClass, size);
+			result = hm.newInstance(vmClass, size);
 		}
 		//Screen.debug("}");
 
@@ -258,7 +264,11 @@ public class SoftByteCodes implements Uninterruptible {
 			throw new NoClassDefFoundError();
 		}
 
-		final Object result = HeapManager.newArray((VmArrayClass)arrCls, elements);
+		VmHeapManager hm = heapManager;
+		if (hm == null) {
+			heapManager = hm = Vm.getVm().getHeapManager();
+		}
+		final Object result = hm.newArray((VmArrayClass)arrCls, elements);
 
 		//Screen.debug("}");
 		return result;
@@ -273,7 +283,11 @@ public class SoftByteCodes implements Uninterruptible {
 	 */
 	public static Object allocPrimitiveArray(int atype, int elements) 
 	throws PragmaUninterruptible {
-		final Object result = HeapManager.newArray(VmType.getPrimitiveArrayClass(atype), elements);
+		VmHeapManager hm = heapManager;
+		if (hm == null) {
+			heapManager = hm = Vm.getVm().getHeapManager();
+		}
+		final Object result = hm.newArray(VmType.getPrimitiveArrayClass(atype), elements);
 		return result;
 	}
 
@@ -286,7 +300,11 @@ public class SoftByteCodes implements Uninterruptible {
 	 */
 	public static Object allocArray(VmType vmClass, int elements) 
 	throws PragmaUninterruptible {
-		final Object result = HeapManager.newArray((VmArrayClass)vmClass, elements);
+		VmHeapManager hm = heapManager;
+		if (hm == null) {
+			heapManager = hm = Vm.getVm().getHeapManager();
+		}
+		final Object result = hm.newArray((VmArrayClass)vmClass, elements);
 		return result;
 	}
 
@@ -299,6 +317,7 @@ public class SoftByteCodes implements Uninterruptible {
 	 */
 	public static Throwable systemException(int nr, int address) 
 	throws PragmaUninterruptible {
+		Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
 		String hexAddress = NumberUtils.hex(address, 8);
 		switch (nr) {
 			case EX_NULLPOINTER: return new NullPointerException("NPE at address " + hexAddress);
