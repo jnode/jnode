@@ -79,7 +79,7 @@ public final class DefaultPluginManager extends PluginManager {
      * 
      * @throws PluginException
      */
-    public void startSystemPlugins() throws PluginException {
+    public void startSystemPlugins(List descriptors) throws PluginException {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(START_SYSTEM_PLUGINS_PERM);
@@ -87,6 +87,7 @@ public final class DefaultPluginManager extends PluginManager {
         
         // Resolve all plugins
         ((PluginRegistryModel) registry).resolveDescriptors();
+        ((PluginRegistryModel) registry).resolveDescriptors(descriptors);
 
         // Set the context classloader
         Thread.currentThread().setContextClassLoader(

@@ -90,6 +90,7 @@ public class PluginTask extends AbstractPluginTask {
 			}
 			descr = new PluginDescriptorModel(root);
 		} catch (PluginException ex) {
+			ex.printStackTrace();
 			throw new BuildException("Building " + descriptor + " failed", ex);
 		}
 

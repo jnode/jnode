@@ -77,12 +77,6 @@ public interface PluginDescriptor {
 	public Runtime getRuntime();
 
 	/**
-	 * Gets the registry this plugin is declared in.
-	 * @return The registry
-	 */
-	public PluginRegistry getPluginRegistry();
-	
-	/**
 	 * Gets the plugin that is described by this descriptor.
 	 * If no plugin class is given in the descriptor, an empty
 	 * plugin is returned.

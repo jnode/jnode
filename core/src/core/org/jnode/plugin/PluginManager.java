@@ -3,6 +3,8 @@
  */
 package org.jnode.plugin;
 
+import java.util.List;
+
 import org.jnode.system.BootLog;
 
 /**
@@ -37,7 +39,7 @@ public abstract class PluginManager {
      * 
      * @throws PluginException
      */
-	public abstract void startSystemPlugins() throws PluginException;
+	public abstract void startSystemPlugins(List descriptors) throws PluginException;
 
 	/**
 	 * Stop all plugins that have been started

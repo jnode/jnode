@@ -50,8 +50,8 @@ public class ExtensionModel extends PluginModelObject implements Extension {
 		}
 	}
 
-	protected void resolve() throws PluginException {
-		final ExtensionPointModel ep = (ExtensionPointModel) getDeclaringPluginDescriptor().getPluginRegistry().getExtensionPoint(point);
+	protected void resolve(PluginRegistryModel registry) throws PluginException {
+		final ExtensionPointModel ep = (ExtensionPointModel) registry.getExtensionPoint(point);
 		if (ep == null) {
 			throw new PluginException("Unknown extension-point " + point);
 		} else {
@@ -65,8 +65,8 @@ public class ExtensionModel extends PluginModelObject implements Extension {
 	 * 
 	 * @throws PluginException
 	 */
-	protected void unresolve() throws PluginException {
-		final ExtensionPointModel ep = (ExtensionPointModel) getDeclaringPluginDescriptor().getPluginRegistry().getExtensionPoint(point);
+	protected void unresolve(PluginRegistryModel registry) throws PluginException {
+		final ExtensionPointModel ep = (ExtensionPointModel) registry.getExtensionPoint(point);
 		if (ep == null) {
 			throw new PluginException("Unknown extension-point " + point);
 		} else {
@@ -108,5 +108,10 @@ public class ExtensionModel extends PluginModelObject implements Extension {
 	 */
 	public String getExtensionPointUniqueIdentifier() {
 		return point;
+	}
+	
+	public String getExtensionPointPluginId() {
+		final int idx = point.lastIndexOf('.');
+		return point.substring(0, idx);
 	}
 }

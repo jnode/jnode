@@ -5,10 +5,13 @@ package org.jnode.boot;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginLoader;
 import org.jnode.plugin.PluginRegistry;
@@ -45,19 +48,21 @@ public class InitJarProcessor {
 	 * 
 	 * @param piRegistry
 	 */
-	public void loadPlugins(PluginRegistry piRegistry) {
+	public List loadPlugins(PluginRegistry piRegistry) {
 		if (jarFile == null) {
-			return;
+			return null;
 		}
 
 		final InitJarPluginLoader loader = new InitJarPluginLoader();
+		final ArrayList descriptors = new ArrayList();
 		for (Enumeration e = jarFile.entries(); e.hasMoreElements();) {
 			final JarEntry entry = (JarEntry) e.nextElement();
 			if (entry.getName().endsWith(".jar")) {
 				try {
 					// Load it
 				    loader.setIs(jarFile.getInputStream(entry));
-					piRegistry.loadPlugin(loader, "", "", false);
+					final PluginDescriptor descr = piRegistry.loadPlugin(loader, "", "", false);
+					descriptors.add(descr);
 				} catch (IOException ex) {
 					BootLog.error("Cannot load " + entry.getName(), ex);
 				} catch (PluginException ex) {
@@ -65,6 +70,7 @@ public class InitJarProcessor {
 				}
 			}
 		}
+		return descriptors;
 	}
 	
 	static class InitJarPluginLoader extends PluginLoader {

@@ -9,12 +9,17 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
+import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginLoader;
+import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.util.BootableHashMap;
 import org.jnode.vm.VmSystemObject;
@@ -44,8 +49,8 @@ public class PluginRegistryModel extends VmSystemObject implements
     public PluginRegistryModel(URL[] pluginFiles) throws PluginException {
         this.extensionPoints = new BootableHashMap();
         this.descriptorMap = new BootableHashMap();
-        loadDescriptors(pluginFiles);
-        resolveDescriptors();
+        final List descriptors = loadDescriptors(pluginFiles);
+        resolveDescriptors(descriptors);
     }
 
     /**
@@ -82,13 +87,15 @@ public class PluginRegistryModel extends VmSystemObject implements
      * 
      * @param pluginUrls
      */
-    private void loadDescriptors(URL[] pluginUrls) throws PluginException {
+    private List loadDescriptors(URL[] pluginUrls) throws PluginException {
         final int max = pluginUrls.length;
-
+        final ArrayList descriptors = new ArrayList(max);
+        
         for (int i = 0; i < max; i++) {
             //System.out.println(pluginUrls[i]);
-            loadPlugin(pluginUrls[ i], false);
+            descriptors.add(loadPlugin(pluginUrls[ i], false));
         }
+        return descriptors;
     }
 
     /**
@@ -98,8 +105,47 @@ public class PluginRegistryModel extends VmSystemObject implements
         for (Iterator i = descriptorMap.values().iterator(); i.hasNext();) {
             final PluginDescriptorModel descr = (PluginDescriptorModel) i
                     .next();
-            descr.resolve();
+            descr.resolve(this);
         }
+    }
+
+    /**
+     * Resolve all given plugin descriptors in such an order that the
+     * depencencies are dealt with 
+     */
+    public void resolveDescriptors(Collection descriptors) throws PluginException {
+    	while (!descriptors.isEmpty()) {
+    		boolean change = false;
+    		for (Iterator i = descriptors.iterator(); i.hasNext(); ) {
+    			final PluginDescriptorModel descr = (PluginDescriptorModel)i.next();
+    			if (canResolve(descr)) {
+    				descr.resolve(this);
+    				i.remove();
+    				change = true;
+    			}
+    		}
+    		if (!change) {
+    			throw new PluginException("Failed to resolve all descriptors");
+    		}
+    	}
+    }
+    
+    private final boolean canResolve(PluginDescriptorModel descr) {
+    	final PluginPrerequisite reqs[] = descr.getPrerequisites();
+    	final int length = reqs.length;
+    	for (int i = 0; i < length; i++) {
+    		if (getPluginDescriptor(reqs[i].getPluginId()) == null) {
+    			return false;
+    		}
+    	}
+    	final Extension[] exts = descr.getExtensions();
+    	final int extsLength = exts.length;
+    	for (int i = 0; i < extsLength; i++) {
+    		if (getPluginDescriptor(exts[i].getExtensionPointPluginId()) == null) {
+    			return false;
+    		}
+    	}
+    	return true;
     }
 
     /**
@@ -129,15 +175,14 @@ public class PluginRegistryModel extends VmSystemObject implements
     }
 
     /**
-     * Load a plugin from a given URL. This will not activate the plugin.
+     * Unregister a known extension point.
      * 
-     * @param pluginUrl
-     * @return The descriptor of the loaded plugin.
-     * @throws PluginException
+     * @param ep
      */
-    public PluginDescriptor loadPlugin(final URL pluginUrl)
+    protected synchronized void unregisterExtensionPoint(ExtensionPoint ep)
             throws PluginException {
-        return loadPlugin(pluginUrl, true);
+        final BootableHashMap epMap = this.extensionPoints;
+        epMap.remove(ep.getUniqueIdentifier());
     }
 
     /**
@@ -169,7 +214,7 @@ public class PluginRegistryModel extends VmSystemObject implements
         }
         final PluginDescriptorModel descr = pluginJar.getDescriptorModel();
         if (resolve) {
-            descr.resolve();
+            descr.resolve(this);
         }
         return descr;
     }
@@ -209,24 +254,11 @@ public class PluginRegistryModel extends VmSystemObject implements
         }
         final PluginDescriptorModel descr = pluginJar.getDescriptorModel();
         if (resolve) {
-            descr.resolve();
+            descr.resolve(this);
         }
         return descr;
 	}
 	
-    /**
-     * Load a plugin from a given InputStream. This will not activate the
-     * plugin.
-     * 
-     * @param is
-     * @return The descriptor of the loaded plugin.
-     * @throws PluginException
-     */
-    public PluginDescriptor loadPlugin(InputStream is) throws PluginException {
-        final PluginJar pluginJar = new PluginJar(this, is, null);
-        return pluginJar.getDescriptor();
-    }
-
     /**
      * Remove the plugin with the given id from this registry.
      * 

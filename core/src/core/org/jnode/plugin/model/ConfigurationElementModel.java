@@ -90,14 +90,14 @@ public class ConfigurationElementModel extends PluginModelObject implements Conf
 	/**
 	 * Resolve all references to (elements of) other plugin descriptors
 	 */
-	protected void resolve() {
+	protected void resolve(PluginRegistryModel registry) {
 		// Do nothing 
 	}
 
 	/**
 	 * Remove all references to (elements of) other plugin descriptors
 	 */
-	protected void unresolve() {
+	protected void unresolve(PluginRegistryModel registry) {
 	    // Do nothing
 	}
 }
