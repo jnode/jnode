@@ -9,7 +9,7 @@
 	extern vm_findThrowableHandler
 	extern VmMethod_Class
 
-vm_invoke_abstract:
+GLABEL vm_invoke_abstract
 	%if TRACE_ABSTRACT
 	    PRINT_STR vm_invoke_abstract_msg1
 	    PRINT_WORD AAX

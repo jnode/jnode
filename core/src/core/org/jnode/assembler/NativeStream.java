@@ -198,6 +198,13 @@ public abstract class NativeStream {
 		public abstract void link(ObjectRef objectRef)
 		throws UnresolvedObjectRefException;
 		
+		/**
+		 * Add an offset that needs to be resolved by this objectref.
+		 * @param offset
+		 * @param patchSize
+		 */
+		public abstract void addUnresolvedLink(int offset, int patchSize);
+		
 		public String toString() {
 			return object.toString();
 		}

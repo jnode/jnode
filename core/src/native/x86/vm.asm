@@ -14,7 +14,7 @@
 ; Input
 ;   eax  Exception to throw
 ; -----------------------------------------------
-vm_athrow:
+GLABEL vm_athrow
 	%if TRACE_ATHROW
 		push AAX
 		push ABX

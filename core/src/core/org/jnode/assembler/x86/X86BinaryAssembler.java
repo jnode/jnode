@@ -111,6 +111,28 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 	}
 
+	public final class UnresolvedOffset {
+		private final int offset;
+
+		private final int patchSize;
+
+		public UnresolvedOffset(int offset, int patchSize) {
+			if ((patchSize != 4) && (patchSize != 8)) {
+				throw new IllegalArgumentException("PatchSize: " + patchSize);
+			}
+			this.offset = offset;
+			this.patchSize = patchSize;
+		}
+
+		public final int getOffset() {
+			return offset;
+		}
+
+		public final int getPatchSize() {
+			return patchSize;
+		}
+	}
+
 	public class X86ObjectRef extends NativeStream.ObjectRef {
 
 		private int dataOffset;
@@ -129,14 +151,18 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			this.isRelJump = false;
 		}
 
-		public void addUnresolvedLink(int offset) {
+		public void addUnresolvedLink(int offset, int patchSize) {
 			if (unresolvedLinks == null) {
 				unresolvedLinks = new LinkedList();
 			}
-			unresolvedLinks.add(new Integer(offset));
+			unresolvedLinks.add(new UnresolvedOffset(offset, patchSize));
 		}
 
-		public int getOffset() {
+		public int getOffset() throws UnresolvedObjectRefException {
+			if (!isResolved()) {
+				throw new UnresolvedObjectRefException("Unresolved object: "
+						+ this);
+			}
 			return dataOffset;
 		}
 
@@ -145,7 +171,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			int[] offsets = new int[cnt];
 			int ofs = 0;
 			for (Iterator i = unresolvedLinks.iterator(); i.hasNext(); ofs++) {
-				offsets[ofs] = ((Integer) i.next()).intValue();
+				offsets[ofs] = ((UnresolvedOffset) i.next()).getOffset();
 			}
 			return offsets;
 		}
@@ -188,30 +214,64 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 						"Offset is already set. Duplicate labels? ("
 								+ getObject() + ")");
 			}
+			if (offset < 0) {
+				throw new IllegalArgumentException("Offset: " + offset);
+			}
 			this.dataOffset = offset;
 			if (unresolvedLinks != null) {
 				// Link all unresolved links
 				for (Iterator i = unresolvedLinks.iterator(); i.hasNext();) {
-					final int addr = ((Integer) i.next()).intValue();
-					final long distance = offset - get32(addr);
-					if (isRelJump() && (distance == 0)) {
-						if (get8(addr - 1) == 0xe9) // JMP
-						{
-							set8(addr - 1, 0x90); // NOP
-							set32(addr, 0x90909090); // 4 NOP's
-						} else if (get8(addr - 2) == 0x0f) // Jcc
-						{
-							set8(addr - 2, 0x90);
-							set8(addr - 1, 0x90);
-							set32(addr, 0x90909090); // 4 NOP's
-						} else {
-							set32(addr, (int)distance);
-						}
+					final UnresolvedOffset unrOfs = (UnresolvedOffset) i.next();
+					final int addr = unrOfs.getOffset();
+					if (unrOfs.getPatchSize() == 4) {
+						resolve32(addr, offset);
 					} else {
-						set32(addr, (int)distance);
+						resolve64(addr, offset);
 					}
 				}
 				unresolvedLinks = null;
+			}
+		}
+
+		/**
+		 * Resolve a 32-bit patch location.
+		 * 
+		 * @param addr
+		 * @param offset
+		 */
+		private final void resolve32(int addr, int offset) {
+			final int distance = offset - get32(addr);
+			if (isRelJump() && (distance == 0)) {
+				if (get8(addr - 1) == 0xe9) // JMP
+				{
+					set8(addr - 1, 0x90); // NOP
+					set32(addr, 0x90909090); // 4 NOP's
+				} else if (get8(addr - 2) == 0x0f) // Jcc
+				{
+					set8(addr - 2, 0x90);
+					set8(addr - 1, 0x90);
+					set32(addr, 0x90909090); // 4 NOP's
+				} else {
+					set32(addr, (int) distance);
+				}
+			} else {
+				set32(addr, (int) distance);
+			}
+		}
+
+		/**
+		 * Resolve a 32-bit patch location.
+		 * 
+		 * @param addr
+		 * @param offset
+		 */
+		private final void resolve64(int addr, int offset) {
+			final long distance = offset - get64(addr);
+			if (isRelJump()) {
+				throw new IllegalArgumentException(
+						"RelJump not supported for 64-bit");
+			} else {
+				set64(addr, distance);
 			}
 		}
 
@@ -311,6 +371,21 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		int v4 = m_data[offset];
 		return (v1 & 0xFF) | ((v2 & 0xFF) << 8) | ((v3 & 0xFF) << 16)
 				| ((v4 & 0xFF) << 24);
+	}
+
+	public final long get64(int offset) {
+		long v1 = m_data[offset++];
+		long v2 = m_data[offset++];
+		long v3 = m_data[offset++];
+		long v4 = m_data[offset++];
+		long v5 = m_data[offset++];
+		long v6 = m_data[offset++];
+		long v7 = m_data[offset++];
+		long v8 = m_data[offset];
+		return (v1 & 0xFF) | ((v2 & 0xFF) << 8) | ((v3 & 0xFF) << 16)
+				| ((v4 & 0xFF) << 24) | ((v5 & 0xFF) << 32)
+				| ((v6 & 0xFF) << 40) | ((v7 & 0xFF) << 48)
+				| ((v8 & 0xFF) << 56);
 	}
 
 	public final int get8(int offset) {
@@ -466,6 +541,25 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		m_data[offset++] = (byte) ((v32 >> 24) & 0xFF);
 	}
 
+	public final void set64(int offset, long v64) {
+		m_data[offset++] = (byte) (v64 & 0xFF);
+		m_data[offset++] = (byte) ((v64 >> 8) & 0xFF);
+		m_data[offset++] = (byte) ((v64 >> 16) & 0xFF);
+		m_data[offset++] = (byte) ((v64 >> 24) & 0xFF);
+		m_data[offset++] = (byte) ((v64 >> 32) & 0xFF);
+		m_data[offset++] = (byte) ((v64 >> 40) & 0xFF);
+		m_data[offset++] = (byte) ((v64 >> 48) & 0xFF);
+		m_data[offset++] = (byte) ((v64 >> 56) & 0xFF);
+	}
+
+	public final void setWord(int offset, long word) {
+		if (mode.is32()) {
+			set32(offset, (int) word);
+		} else {
+			set64(offset, word);
+		}
+	}
+
 	public final void set8(int offset, int v8) {
 		m_data[offset] = (byte) v8;
 	}
@@ -514,7 +608,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			writeWord(0);
 			alignSlack += getWordSize();
 		}
-//		System.out.println("alignSlack=" + alignSlack);
+		// System.out.println("alignSlack=" + alignSlack);
 
 		writeWord(0); // Size
 		writeWord(ObjectFlags.GC_DEFAULT_COLOR); // Flags
@@ -602,7 +696,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	public final void writeWord(long word) {
 		if (mode.is32()) {
-			write32((int)word);
+			write32((int) word);
 		} else {
 			write64(word);
 		}
@@ -2231,20 +2325,24 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			if (mode.is32()) {
 				write32(resolver.addressOf32(object) + offset);
 			} else {
-				write64(resolver.addressOf64(object) + offset);				
+				write64(resolver.addressOf64(object) + offset);
 			}
 		} else if ((resolver != null) && (!(object instanceof Label))) {
 			if (mode.is32()) {
 				write32(resolver.addressOf32(object) + offset);
 			} else {
-				write64(resolver.addressOf64(object) + offset);				
+				write64(resolver.addressOf64(object) + offset);
 			}
 		} else {
 			final X86ObjectRef ref = (X86ObjectRef) getObjectRef(object);
 			if (ref.isResolved())
-				writeWord(ref.getOffset() + baseAddr + offset);
+				try {
+					writeWord(ref.getOffset() + baseAddr + offset);
+				} catch (UnresolvedObjectRefException e) {
+					throw new RuntimeException(e);
+				}
 			else {
-				ref.addUnresolvedLink(m_used);
+				ref.addUnresolvedLink(m_used, getWordSize());
 				writeWord(-(baseAddr + offset));
 			}
 		}
@@ -2444,9 +2542,13 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		final X86ObjectRef ref = (X86ObjectRef) getObjectRef(object);
 		ref.setRelJump();
 		if (ref.isResolved()) {
-			write32(ref.getOffset() - ofs);
+			try {
+				write32(ref.getOffset() - ofs);
+			} catch (UnresolvedObjectRefException ex) {
+				throw new RuntimeException(ex);
+			}
 		} else {
-			ref.addUnresolvedLink(m_used);
+			ref.addUnresolvedLink(m_used, 4);
 			write32(ofs);
 		}
 	}

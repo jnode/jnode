@@ -17,7 +17,7 @@
 ;	 * @param id 
 ;	 * @return The required length of id.
 ;	public static native int getCPUID(int[] id);
-Q43org5jnode2vm6Unsafe23getCPUID2e285bI29I:
+GLABEL Q43org5jnode2vm6Unsafe23getCPUID2e285bI29I
 	mov AAX,[ASP+SLOT_SIZE]		; Get id
 	push ADI
 	push ABX

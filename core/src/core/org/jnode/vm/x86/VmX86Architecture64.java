@@ -52,13 +52,6 @@ public final class VmX86Architecture64 extends VmX86Architecture {
 	}
 
 	/**
-	 * @see org.jnode.vm.VmArchitecture#getName()
-	 */
-	public final String getName() {
-		return "x86_64";
-	}
-
-	/**
 	 * @see org.jnode.vm.VmArchitecture#getReferenceSize()
 	 */
 	public final int getReferenceSize() {

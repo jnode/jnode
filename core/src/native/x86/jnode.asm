@@ -61,6 +61,11 @@ CURPROC_FS  equ 0x33
 %%l:
 %endmacro
 
+%macro GLABEL 1
+	global %1
+%1:
+%endmacro
+
 %include "kernel.asm"
 %include "cpu.asm"
 %ifdef BITS32

@@ -272,14 +272,18 @@ public class Section {
 		return (sh_type == SHT_REL);
 	}
 
+	public boolean isRelaTab() {
+		return (sh_type == SHT_RELA);
+	}
+
 	public int getNoRelocs() {
-		if (!isRelTab())
+		if (!(isRelTab() || isRelaTab()))
 			throw new RuntimeException("Only valid to reloc table sections");
 		return m_reltab.size();
 	}
 
 	public Reloc getReloc(int index) {
-		if (!isRelTab())
+		if (!(isRelTab() || isRelaTab()))
 			throw new RuntimeException("Only valid to reloc table sections");
 		return (Reloc) m_reltab.elementAt(index);
 	}
@@ -450,6 +454,20 @@ public class Section {
 		}
 	}
 
+	private void loadRelaTab() throws IOException {
+		if (!isRelaTab()) {
+			throw new RuntimeException(
+					"Only valid for relocation table sections");
+		}
+
+		final ByteArrayInputStream in = new ByteArrayInputStream(m_body);
+		final long cnt = (sh_size == 0) ? 0 : (sh_size / sh_entsize);
+		m_reltab = new Vector();
+		for (long i = 0; i < cnt; i++) {
+			m_reltab.addElement(new Reloca(elf, in));
+		}
+	}
+
 	private void storeRelTab() throws IOException {
 		if (!isRelTab())
 			throw new RuntimeException(
@@ -492,6 +510,8 @@ public class Section {
 				loadStrTab();
 			} else if (isRelTab()) {
 				loadRelTab();
+			} else if (isRelaTab()) {
+				loadRelaTab();
 			}
 		}
 		return m_body;

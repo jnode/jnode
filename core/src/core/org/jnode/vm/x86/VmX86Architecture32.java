@@ -73,15 +73,6 @@ public final class VmX86Architecture32 extends VmX86Architecture {
     }
 
     /**
-     * Gets the name of this architecture.
-     * 
-     * @return name
-     */
-    public final String getName() {
-        return "x86";
-    }
-
-    /**
      * Gets the size in bytes of an object reference.
      * 
      * @return Size of reference, always 4 here
