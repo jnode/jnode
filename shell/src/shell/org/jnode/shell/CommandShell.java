@@ -92,23 +92,21 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 	 *
 	 * @see java.lang.Object
 	 */
-	public CommandShell() throws ShellException {
+	public CommandShell() throws NameNotFoundException, ShellException 
+	{
+		this(((ConsoleManager) InitialNaming.lookup(ConsoleManager.NAME)).getFocus());
+	}
+	public CommandShell(Console cons) throws ShellException {
 		try {
-			ConsoleManager cm = (ConsoleManager) InitialNaming.lookup(ConsoleManager.NAME);
-			if (cm != null) {
-				console = cm.getFocus();
-				this.out = console.getOut();
-				this.err = console.getErr();
-				
-				//  listen to the keyboard
-				console.addKeyboardListener(this);
-				defaultCommandInvoker = new DefaultCommandInvoker(this);
-				threadCommandInvoker = new ThreadCommandInvoker(this);
-				this.commandInvoker = threadCommandInvoker; //default to separate threads for commands.
-			} else {
-				this.out = System.out;
-				this.err = System.err;
-			}
+			this.console = cons;
+			this.out = this.console.getOut();
+			this.err = this.console.getErr();
+			
+			//  listen to the keyboard
+			this.console.addKeyboardListener(this);
+			defaultCommandInvoker = new DefaultCommandInvoker(this);
+			threadCommandInvoker = new ThreadCommandInvoker(this);
+			this.commandInvoker = threadCommandInvoker; //default to separate threads for commands.
 			aliasMgr = ((AliasManager) InitialNaming.lookup(AliasManager.NAME)).createAliasManager();
 			System.getProperties().setProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
 			ShellUtils.getShellManager().registerShell(this);
