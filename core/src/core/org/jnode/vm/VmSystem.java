@@ -458,8 +458,8 @@ public final class VmSystem {
             final VmStackReader reader = proc.getArchitecture()
                     .getStackReader();
             final int magic = reader.getMagic(frame);
-            final boolean interpreted = (magic == VmStackFrame.MAGIC_INTERPRETED);
-            final boolean compiled = (magic == VmStackFrame.MAGIC_COMPILED);
+            final boolean interpreted = ((magic & VmStackFrame.MAGIC_MASK) == VmStackFrame.MAGIC_INTERPRETED);
+            final boolean compiled = ((magic & VmStackFrame.MAGIC_MASK) == VmStackFrame.MAGIC_COMPILED);
             if (!(interpreted || compiled)) {
                 Unsafe.debug("Unknown magic");
                 return null;
@@ -481,7 +481,7 @@ public final class VmSystem {
             //}
             final int count;
             final VmByteCode bc = method.getBytecode();
-            final VmCompiledCode cc = method.getCompiledCode();
+            final VmCompiledCode cc = method.getCompiledCode(magic);
             if (bc != null) {
                 count = bc.getNoExceptionHandlers();
             } else {

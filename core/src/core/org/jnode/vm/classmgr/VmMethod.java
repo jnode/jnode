@@ -76,7 +76,11 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      */
     protected VmMethod(String name, String signature, int modifiers,
             VmType declaringClass) {
-        super(name, signature, modifiers /*| (declaringClass.isFinal() ? Modifier.ACC_FINAL : 0)*/, declaringClass);
+        super(
+                name,
+                signature,
+                modifiers /* | (declaringClass.isFinal() ? Modifier.ACC_FINAL : 0) */,
+                declaringClass);
         this.argSlotCount = Signature.getArgSlotCount(signature)
                 + (isStatic() ? 0 : 1);
         this.returnVoid = (signature.endsWith("V"));
@@ -368,6 +372,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
 
     /**
      * Can this method throw the given exception type.
+     * 
      * @param exceptionClass
      * @return
      */
@@ -378,15 +383,29 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
             return exceptions.contains(exceptionClass);
         }
     }
-    
-    
+
     /**
      * Gets the compiled code information of this method (if any)
      * 
      * @return The compiled code, or null if no compiled code has been set.
      */
-    public final VmCompiledCode getCompiledCode() {
+    public final VmCompiledCode getDefaultCompiledCode() {
         return compiledCode;
+    }
+
+    /**
+     * Gets the compiled code for a given magic value (if any)
+     * 
+     * @return The compiled code, or null if no compiled code with the given
+     *         magic has been set.
+     */
+    public final VmCompiledCode getCompiledCode(int magic) {
+        final VmCompiledCode c = compiledCode;
+        if (c != null) {
+            return c.lookup(magic);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -396,9 +415,11 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      * @param optLevel
      *            The optimization level of the generated code.
      */
-    public final void setCompiledCode(VmCompiledCode code, int optLevel) {
+    public final void addCompiledCode(VmCompiledCode code, int optLevel) {
         if ((this.nativeCode != null) && (optLevel <= nativeCodeOptLevel)) { throw new RuntimeException(
                 "Cannot set code twice"); }
+        code.setNext(this.compiledCode);
+        this.compiledCode = code;
         this.nativeCode = code.getNativeCode();
         this.compiledCode = code;
         this.nativeCodeOptLevel = optLevel;

@@ -23,7 +23,7 @@ public class ViewMethodTest {
             final VmMethod method = cls.getDeclaredMethod(i);
             if ((mname == null) || method.getName().equals(mname)) {
                 System.out.println("OptL: " + method.getNativeCodeOptLevel());
-                System.out.println("Code: " + method.getCompiledCode());
+                System.out.println("Code: " + method.getDefaultCompiledCode());
             }
         }
 

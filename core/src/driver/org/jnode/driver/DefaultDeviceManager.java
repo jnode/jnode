@@ -176,7 +176,9 @@ public class DefaultDeviceManager implements DeviceManager,
         if (shouldStart) {
             // Try to start the device
             try {
+                BootLog.debug("Starting " + device.getId());
                 device.start();
+                BootLog.debug("Started " + device.getId());
             } catch (DriverException ex) {
                 BootLog.error("Cannot start " + device.getId(), ex);
             }

@@ -59,7 +59,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @return The magic
 	 */
 	final int getMagic(Address sf) {
-		return Unsafe.getInt(sf, getMagicOffset(sf)) & VmStackFrame.MAGIC_MASK;
+		return Unsafe.getInt(sf, getMagicOffset(sf));
 	}
 
 	/**
@@ -83,7 +83,7 @@ public abstract class VmStackReader extends VmSystemObject {
 		if (getMethod(sf) == null) {
 			return false;
 		}
-		final int magic = getMagic(sf);
+		final int magic = getMagic(sf) & VmStackFrame.MAGIC_MASK;
 		if ((magic != VmStackFrame.MAGIC_COMPILED) && (magic != VmStackFrame.MAGIC_INTERPRETED)) {
 			return false;
 		}

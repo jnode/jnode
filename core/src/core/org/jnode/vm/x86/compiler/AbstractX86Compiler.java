@@ -34,7 +34,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements 
 	 */
 	public final void initialize(VmClassLoader loader) {
 		if (context == null) {
-			context = new X86CompilerContext(loader, Vm.getVm().getHeapManager());
+			context = new X86CompilerContext(loader, Vm.getVm().getHeapManager(), getMagic());
 		}
 	}
 
@@ -73,7 +73,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements 
 			// Set the address of the abstract method code
 			final Address errorAddr = X86JumpTable.getJumpTableEntry(X86JumpTable.VM_INVOKE_ABSTRACT_OFS);
 			final VmCompiledCode code = new VmCompiledCode(this, null, errorAddr, null, 0, null, null, null);
-			method.setCompiledCode(code, level);
+			method.addCompiledCode(code, level);
 			return null;
 		}
 	}

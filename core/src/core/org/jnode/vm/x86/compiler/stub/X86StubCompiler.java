@@ -46,7 +46,7 @@ public class X86StubCompiler extends AbstractX86Compiler {
 			// Only set the code address of the interpreter
 			final Address intrAddr = X86JumpTable.getJumpTableEntry(X86JumpTable.VM_INVOKE_METHOD_AFTER_RECOMPILE_OFS);
 			final VmCompiledCode code = new VmCompiledCode(this, null, intrAddr, null, 0, null, null, null);
-			method.setCompiledCode(code, level);
+			method.addCompiledCode(code, level);
 		}
 	}
 
@@ -117,5 +117,11 @@ public class X86StubCompiler extends AbstractX86Compiler {
 		os.setResolver(resolver);
 		return os;
 	}
-
+   
+    /**
+     * @see org.jnode.vm.compiler.NativeCodeCompiler#getMagic()
+     */
+    public final int getMagic() {
+        return STUB_COMPILER_MAGIC;
+    }
 }
