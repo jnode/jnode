@@ -85,16 +85,24 @@ public class ResolverImpl implements Resolver
   public static void addDnsServer(ProtocolAddress _dnsserver) throws NetworkException
   {
 
+    if (resolvers == null)
+    {
+      resolvers = new Hashtable();
+    }
+
     if (resolver == null)
     {
       try
       {
-        //        resolver = (ExtendedResolver) Lookup.getDefaultResolver();
-
         if (resolver == null)
         {
-          resolver = new ExtendedResolver();
+          String[] server = new String[]{_dnsserver.toString()};
+          resolver = new ExtendedResolver(server);
+          System.out.println(resolver.getResolvers().length);
+
           Lookup.setDefaultResolver(resolver);
+
+          resolvers.put(_dnsserver.toString(), resolver);
         }
       }
       catch (UnknownHostException e)
@@ -106,10 +114,6 @@ public class ResolverImpl implements Resolver
     try
     {
       String key = _dnsserver.toString();
-      if (resolvers == null)
-      {
-        resolvers = new Hashtable();
-      }
 
       if (!resolvers.containsKey(key))
       {
@@ -142,8 +146,12 @@ public class ResolverImpl implements Resolver
     String key = _dnsserver.toString();
     if (resolvers.containsKey(key))
     {
-      SimpleResolver simpleResolver = (SimpleResolver) resolvers.remove(key);
-      resolver.deleteResolver(simpleResolver);
+      org.xbill.DNS.Resolver resolv = (org.xbill.DNS.Resolver) resolvers.remove(key);
+
+      if (resolver.getResolvers().length == 1)
+        resolver = null;
+      else
+        resolver.deleteResolver(resolv);
     }
   }
 
@@ -173,21 +181,12 @@ public class ResolverImpl implements Resolver
   {
     ProtocolAddress[] protocolAddresses = null;
 
-    System.out.println("hh0 " + hostname);
-
     protocolAddresses = getFromHostsFile(hostname);
 
     if (protocolAddresses != null)
     {
-      for (int i = 0; i < protocolAddresses.length; i++)
-      {
-        ProtocolAddress protocolAddress = protocolAddresses[i];
-        System.out.println("hh0' " + protocolAddress);
-      }
       return protocolAddresses;
     }
-
-    System.out.println("hh1");
 
     Lookup lookup = null;
     Lookup.setDefaultResolver(resolver);
@@ -200,16 +199,12 @@ public class ResolverImpl implements Resolver
     {
       throw new UnknownHostException(hostname);
     }
-    System.out.println("hh3");
 
     lookup.run();
-    System.out.println("hh4");
 
     if (lookup.getResult() == Lookup.SUCCESSFUL)
     {
       Record[] records = lookup.getAnswers();
-
-      System.out.println("hh5");
 
       protocolAddresses = new ProtocolAddress[records.length];
 
@@ -217,16 +212,14 @@ public class ResolverImpl implements Resolver
       {
         Record record = records[i];
         protocolAddresses[i] = new IPv4Address(record.rdataToString());
-
-        System.out.println(record.getName() + " " + record.rdataToString());
       }
+
     }
     else
     {
-      System.out.println("lookup.getErrorString() " + lookup.getErrorString());
+      throw new UnknownHostException(lookup.getErrorString());
     }
 
-    System.out.println("hh6");
     return protocolAddresses;
   }
 
@@ -243,28 +236,4 @@ public class ResolverImpl implements Resolver
     return new String[0]; //To change body of implemented methods use Options | File Templates.
   }
 
-  public static void main(String[] args)
-  {
-    ProtocolAddress protocolAddress = new IPv4Address("192.168.1.32");
-    try
-    {
-      ResolverImpl.addDnsServer(protocolAddress);
-    }
-    catch (NetworkException e)
-    {
-
-    }
-    try
-    {
-      ProtocolAddress[] re = ResolverImpl.getInstance().getByName("www.jnode.ddd");
-      if (re.length > 0)
-      {
-        System.out.println(re[0]);
-      }
-    }
-    catch (UnknownHostException e)
-    {
-
-    }
-  }
 }

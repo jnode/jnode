@@ -24,4 +24,8 @@
     <alias name="ChecksumTest" class="org.jnode.test.net.ChecksumTest"/>
   </extension>
 
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.net.SocketPermission" name="*:53" actions="resolve,accept,connect,listen"/>
+  </extension>
+
 </plugin>
