@@ -79,7 +79,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
     final void gc() {
         // Prepare
         final VmBootHeap bootHeap = heapManager.getBootHeap();
-        final VmAbstractHeap firstHeap = heapManager.getFirstHeap();
+        final VmAbstractHeap firstHeap = heapManager.getHeapList();
         stats.lastGCTime = System.currentTimeMillis();
 
         final boolean locking = (writeBarrier != null);
@@ -144,8 +144,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
      * @param bootHeap
      * @param firstHeap
      */
-    private final void markHeap(VmBootHeap bootHeap, VmAbstractHeap firstHeap,
-            boolean locking) {
+    private final void markHeap(VmBootHeap bootHeap, VmAbstractHeap firstHeap,             boolean locking) {
 
         if (writeBarrier != null) {
             writeBarrier.setActive(true);

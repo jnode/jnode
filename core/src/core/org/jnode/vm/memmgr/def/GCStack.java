@@ -56,6 +56,9 @@ final class GCStack extends VmSystemObject implements Uninterruptible {
 		} else {
 			stackPtr--;
 			Object result = stack[stackPtr];
+			if (result == null) {
+				throw new IllegalStateException("Null object found on GCStack");
+			}
 			stack[stackPtr] = null;
 			return result;
 		}

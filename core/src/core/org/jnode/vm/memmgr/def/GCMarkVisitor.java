@@ -73,6 +73,16 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
          * Unsafe.getCurrentProcessor().getArchitecture().getStackReader()
          * .debugStackTrace(); helper.die("Internal error"); return false;
          */
+        try {
+            // TEST for a valid vmclass.
+            helper.getVmClass(object);
+        } catch (NullPointerException ex) {
+            Unsafe.debug("\nObject address ");
+            Unsafe.debug(helper.addressOf32(object));
+            Unsafe.debug("\nObject TIB ");
+            Unsafe.debug(helper.addressOf32(helper.getTib(object)));
+            helper.die("NPE in processChild; probably corrupted heap");
+        }
 
         //testObject(object, Unsafe.getVmClass(object));
         // Check the current color first, since a stackoverflow of
@@ -197,6 +207,23 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
             } else {
                 final Object child = helper.getObject(object, offset);
                 if (child != null) {
+                    try {
+                        // TEST for a valid vmclass.
+                        helper.getVmClass(child);
+                    } catch (NullPointerException ex) {
+                        Unsafe.debug("\nObject type  ");
+                        Unsafe.debug(vmClass.getName());
+                        Unsafe.debug("\nChild addr   ");
+                        Unsafe.debug(helper.addressOf32(child));
+                        Unsafe.debug("\nField offset ");
+                        Unsafe.debug(offset);
+                        Unsafe.debug("\nC.IsObject?  ");
+                        Unsafe.debug(heapManager.isObject(helper.addressOf(child)) ? "Yes" : "No");
+                        Unsafe.debug("\nO.IsObject?  ");
+                        Unsafe.debug(heapManager.isObject(helper.addressOf(object)) ? "Yes" : "No");
+                        Unsafe.debug('\n');
+                        helper.die("NPE in processChild; probably corrupted heap");
+                    }
                     processChild(child);
                 }
             }
@@ -234,7 +261,17 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
         if (gcColor <= GC_WHITE) {
             // Yellow or White
             helper.atomicChangeObjectColor(child, gcColor, GC_GREY);
-            stack.push(child);
+            try {
+                // TEST for a valid vmclass.
+                helper.getVmClass(child);
+                stack.push(child);
+            } catch (NullPointerException ex) {
+                Unsafe.debug("\nObject address ");
+                Unsafe.debug(helper.addressOf32(child));
+                Unsafe.debug("\nObject TIB ");
+                Unsafe.debug(helper.addressOf32(helper.getTib(child)));
+                helper.die("NPE in processChild; probably corrupted heap");
+            }
         }
     }
 
