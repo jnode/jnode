@@ -65,7 +65,9 @@ public class VGADriver extends AbstractFrameBufferDriver implements VgaConstants
 				return vga;
 			} catch (ResourceNotFreeException ex) {
 				throw new DeviceException(ex);
-			}
+			} catch (DriverException ex) {
+				throw new DeviceException(ex);
+            }
 		} else {
 			throw new UnknownConfigurationException();
 		}

@@ -3,6 +3,8 @@
  */
 package org.jnode.driver.net.lance;
 
+import java.security.PrivilegedExceptionAction;
+
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
@@ -25,6 +27,7 @@ import org.jnode.system.IRQResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
+import org.jnode.util.AccessControllerUtils;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
 
@@ -113,7 +116,7 @@ public class LanceCore
 		}
 		this.irq = rm.claimIRQ(owner, irq, this, true);
 		try {
-			ioResource = rm.claimIOResource(owner, iobase, iolength);
+			ioResource = claimPorts(rm, owner, iobase, iolength);
 		} catch (ResourceNotFreeException ex) {
 			this.irq.release();
 			throw ex;
@@ -280,7 +283,7 @@ public class LanceCore
 	public void handleInterrupt(int irq) {
 		while ((io.getCSR(0) & CSR0_INTR) != 0) {
 			final int csr0 = io.getCSR(0);
-			final int csr3 = io.getCSR(3);
+			/*final int csr3 =*/ io.getCSR(3);
 			final int csr4 = io.getCSR(4);
 			final int csr5 = io.getCSR(5);
 
@@ -403,7 +406,7 @@ public class LanceCore
 		}
 	}
 
-	private void dumpDebugInfo() {
+	/*private void dumpDebugInfo() {
 		//bufferManager.dumpData(System.out);
 
 		/*private int validVMWareLanceRegs[] =
@@ -456,6 +459,20 @@ public class LanceCore
 			int bcr_0 = getBCR(k);
 			System.out.println("BCR" + k + " : " + NumberUtils.hex(bcr_0));
 		}
-		*/
+		
+	}*/
+
+	private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner, final int low, final int length) throws ResourceNotFreeException, DriverException {
+		try {
+            return (IOResource)AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction() {
+                public Object run() throws ResourceNotFreeException {
+            		return rm.claimIOResource(owner, low, length);
+                    }});
+		} catch (ResourceNotFreeException ex) {
+		    throw ex;
+        } catch (Exception ex) {
+            throw new DriverException("Unknown exception", ex);
+        }
+	    
 	}
 }

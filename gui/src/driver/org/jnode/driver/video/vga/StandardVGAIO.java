@@ -3,8 +3,11 @@
  */
 package org.jnode.driver.video.vga;
 
+import java.security.PrivilegedExceptionAction;
+
 import javax.naming.NameNotFoundException;
 
+import org.jnode.driver.DriverException;
 import org.jnode.driver.video.vgahw.VgaConstants;
 import org.jnode.driver.video.vgahw.VgaIO;
 import org.jnode.naming.InitialNaming;
@@ -13,6 +16,7 @@ import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
+import org.jnode.util.AccessControllerUtils;
 
 /**
  * @author epr
@@ -29,10 +33,10 @@ public class StandardVGAIO implements VgaConstants, VgaIO {
 	/**
 	 * Create a new instance
 	 */
-	public StandardVGAIO(ResourceOwner owner, MemoryResource mem) throws ResourceNotFreeException {
+	public StandardVGAIO(ResourceOwner owner, MemoryResource mem) throws ResourceNotFreeException, DriverException {
 		try {
 			ResourceManager rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
-			vgaIO = rm.claimIOResource(owner, VGA_FIRST_PORT, VGA_LAST_PORT - VGA_FIRST_PORT + 1);
+			vgaIO = claimPorts(rm, owner, VGA_FIRST_PORT, VGA_LAST_PORT - VGA_FIRST_PORT + 1);
 			this.mem = mem;
 			current_mode = getColorMode();
 		} catch (NameNotFoundException ex) {
@@ -146,5 +150,19 @@ public class StandardVGAIO implements VgaConstants, VgaIO {
 
 	private final int getColorMode() {
 		return (vgaIO.inPortByte(MISC_R) & 1);
+	}
+
+	private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner, final int low, final int length) throws ResourceNotFreeException, DriverException {
+		try {
+            return (IOResource)AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction() {
+                public Object run() throws ResourceNotFreeException {
+            		return rm.claimIOResource(owner, low, length);
+                    }});
+		} catch (ResourceNotFreeException ex) {
+		    throw ex;
+        } catch (Exception ex) {
+            throw new DriverException("Unknown exception", ex);
+        }
+	    
 	}
 }

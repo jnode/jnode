@@ -4,6 +4,8 @@
 
 package org.jnode.driver.net.rtl8139;
 
+import java.security.PrivilegedExceptionAction;
+
 import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.Device;
@@ -25,6 +27,7 @@ import org.jnode.system.IRQResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
+import org.jnode.util.AccessControllerUtils;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
 import org.jnode.vm.Address;
@@ -91,7 +94,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
 		this.irq = rm.claimIRQ(owner, irq, this, true);
 
 		try {
-			io = rm.claimIOResource(owner, iobase, iolength);
+			io = claimPorts(rm, owner, iobase, iolength);
 		} catch (ResourceNotFreeException ex) {
 			this.irq.release();
 			throw ex;
@@ -690,5 +693,19 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
 
 	public final void setReg32(int reg, int value) {
 		io.outPortDword(iobase + reg, value);
+	}
+
+	private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner, final int low, final int length) throws ResourceNotFreeException, DriverException {
+		try {
+            return (IOResource)AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction() {
+                public Object run() throws ResourceNotFreeException {
+            		return rm.claimIOResource(owner, low, length);
+                    }});
+		} catch (ResourceNotFreeException ex) {
+		    throw ex;
+        } catch (Exception ex) {
+            throw new DriverException("Unknown exception", ex);
+        }
+	    
 	}
 }

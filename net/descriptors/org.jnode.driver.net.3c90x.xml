@@ -23,4 +23,9 @@
     <mapper class="org.jnode.driver.net._3c90x._3c90xDeviceToDriverMapper"/>
   </extension>
         
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
+    <permission class="org.jnode.system.ResourcePermission" name="irq"/>
+  </extension>
+        
 </plugin>

@@ -15,7 +15,7 @@ public interface ResourceManager {
 	/**
 	 * Name used to bind the ResourceManager under in the InitialNaming namespace.
 	 */
-	public static final Class NAME = ResourceManager.class;//"system/ResourceManager";
+	public static final Class NAME = ResourceManager.class;
 
 	/** Allocate memory anywhere in the address space */
 	public static final int MEMMODE_NORMAL = 0x00;
@@ -24,7 +24,9 @@ public interface ResourceManager {
 	public static final int MEMMODE_ALLOC_DMA = 0x01;
 
 	/**
-	 * Claim a range of IO ports
+	 * Claim a range of IO ports.
+	 * 
+	 * This method will requires a ResourcePermission("ioports"). 
 	 * 
 	 * @param owner
 	 * @param startPort

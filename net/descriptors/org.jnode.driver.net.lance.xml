@@ -23,4 +23,8 @@
     <mapper class="org.jnode.driver.net.lance.LanceDeviceToDriverMapper"/>
   </extension>
         
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
+  </extension>
+        
 </plugin>

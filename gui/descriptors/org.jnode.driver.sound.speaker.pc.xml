@@ -21,4 +21,8 @@
 		<finder class="org.jnode.driver.sound.speaker.pc.PCSpeakerFinder" />
 	</extension>
 
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
+  </extension>
+        
 </plugin>

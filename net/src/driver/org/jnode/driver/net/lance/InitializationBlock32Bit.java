@@ -33,7 +33,7 @@ public class InitializationBlock32Bit {
 		this.offset = offset;
 
 		// Populate the initial data structure
-		mem.setShort(offset + 0x00, (short) mode);
+		mem.setShort(offset + 0x00, mode);
 		mem.setByte(offset + 0x02, getEncodedRingLength(rxRing.getLength()));
 		mem.setByte(offset + 0x03, getEncodedRingLength(txRing.getLength()));
 		mem.setByte(offset + 0x04, physicalAddr.get(0));
@@ -44,8 +44,8 @@ public class InitializationBlock32Bit {
 		mem.setByte(offset + 0x09, physicalAddr.get(5));
 		mem.setInt(offset + 0x0C, (int) (logicalAddr & 0xFFFFFFFF));
 		mem.setInt(offset + 0x10, (int) ((logicalAddr >> 32) & 0xFFFFFFFF));
-		mem.setInt(offset + 0x14, (int) rxRing.getAddressAs32());
-		mem.setInt(offset + 0x18, (int) txRing.getAddressAs32());
+		mem.setInt(offset + 0x14, rxRing.getAddressAs32());
+		mem.setInt(offset + 0x18, txRing.getAddressAs32());
 	}
 
 	private byte getEncodedRingLength(int ringLength) {

@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.driver.serial" 
-        name="JNode serial port driver"
+<plugin id="org.jnode.driver.chipset.i440BX"
+        name="JNode i440BX chipset drivers"
         version="@VERSION@"
         provider-name="JNode.org">
-        
+
   <requires>
-    <import plugin="org.jnode.driver"/>
-    <import plugin="org.jnode.driver.character"/>
+    <import plugin="org.jnode.driver.chipset"/>
   </requires>
-        
+
   <runtime>
     <library name="jnode-core.jar">
-      <export name="org.jnode.driver.serial.*"/>
+      <export name="org.jnode.driver.chipset.i440BX.*"/>
     </library>
   </runtime>
 
-  <extension point="org.jnode.driver.finders">
-    <mapper class="org.jnode.driver.serial.SerialPortFinder"/>
+  <extension point="org.jnode.driver.mappers">
+    <mapper class="org.jnode.driver.chipset.i440BX.i440BXDeviceToDriverMapper"/>
   </extension>
-        
+
   <extension point="org.jnode.security.permissions">
     <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
   </extension>

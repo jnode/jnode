@@ -10,6 +10,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 import java.awt.image.DirectColorModel;
 import java.awt.image.Raster;
+import java.security.PrivilegedExceptionAction;
 
 import javax.naming.NameNotFoundException;
 
@@ -30,6 +31,7 @@ import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
+import org.jnode.util.AccessControllerUtils;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.Address;
 
@@ -92,7 +94,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 
 		try {
 			final ResourceManager rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
-			ports = rm.claimIOResource(device, basePort, SVGA_NUM_PORTS * 4);
+			ports = claimPorts(rm, device, basePort, SVGA_NUM_PORTS * 4);
 			final int id = getVMWareID();
 			if (id == SVGA_ID_0 || id == SVGA_ID_INVALID) {
 				dumpState();
@@ -873,4 +875,17 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 		return ((this.capabilities & cap) == cap);
 	}
 
+	private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner, final int low, final int length) throws ResourceNotFreeException, DriverException {
+		try {
+            return (IOResource)AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction() {
+                public Object run() throws ResourceNotFreeException {
+            		return rm.claimIOResource(owner, low, length);
+                    }});
+		} catch (ResourceNotFreeException ex) {
+		    throw ex;
+        } catch (Exception ex) {
+            throw new DriverException("Unknown exception", ex);
+        }
+	    
+	}
 }

@@ -21,4 +21,8 @@
     <mapper class="org.jnode.driver.ps2.PS2Finder"/>
   </extension>
 
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
+  </extension>
+        
 </plugin>
