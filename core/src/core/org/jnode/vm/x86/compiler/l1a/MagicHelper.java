@@ -298,7 +298,11 @@ final class MagicHelper extends BaseX86MagicHelper {
         case mLOADFLOAT: 
         case mLOADADDRESS: 
         case mLOADOBJECTREFERENCE:
-        case mLOADWORD: {
+        case mLOADWORD:
+        case mPREPAREINT:
+        case mPREPAREADDRESS:
+        case mPREPAREOBJECTREFERENCE:
+        case mPREPAREWORD: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final RefItem addr = vstack.popRef();
             addr.load(ec);
@@ -344,7 +348,11 @@ final class MagicHelper extends BaseX86MagicHelper {
         case mLOADFLOAT_OFS: 
         case mLOADADDRESS_OFS: 
         case mLOADOBJECTREFERENCE_OFS:
-        case mLOADWORD_OFS: {
+        case mLOADWORD_OFS:
+        case mPREPAREINT_OFS:
+        case mPREPAREADDRESS_OFS:
+        case mPREPAREOBJECTREFERENCE_OFS:
+        case mPREPAREWORD_OFS: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final RefItem ofs = vstack.popRef();
             final RefItem addr = vstack.popRef();
@@ -374,7 +382,174 @@ final class MagicHelper extends BaseX86MagicHelper {
             L1AHelper.releaseRegister(ec, msb);
             vstack.push(L1AHelper.requestDoubleWordRegisters(ec, methodToType(mcode), r, msb));
         } break;
-            
+        case mSTOREBYTE: 
+        case mSTORECHAR:
+        case mSTORESHORT: {
+            if (Vm.VerifyAssertions) Vm._assert(!isstatic);
+            final IntItem val = vstack.popInt();
+            final RefItem addr = vstack.popRef();
+            val.loadToBITS8GPR(ec);
+            addr.load(ec);
+            final Register r = addr.getRegister();
+            final Register valr = val.getRegister();
+            os.writeMOV(methodToSize(mcode), r, 0, valr);
+            val.release(ec);
+            addr.release(ec);
+        } break;
+        case mSTOREINT: 
+        case mSTOREFLOAT:
+        case mSTOREADDRESS:
+        case mSTOREOBJECTREFERENCE: 
+        case mSTOREWORD: {
+            if (Vm.VerifyAssertions) Vm._assert(!isstatic);
+            final WordItem val = (WordItem)vstack.pop();
+            final RefItem addr = vstack.popRef();
+            val.load(ec);
+            addr.load(ec);
+            final Register r = addr.getRegister();
+            final Register valr = val.getRegister();
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, 0, valr);
+            val.release(ec);
+            addr.release(ec);
+        } break;
+        case mSTORELONG: 
+        case mSTOREDOUBLE: {
+            if (Vm.VerifyAssertions) Vm._assert(!isstatic);
+            final DoubleWordItem val = (DoubleWordItem)vstack.pop();
+            final RefItem addr = vstack.popRef();
+            val.load(ec);
+            addr.load(ec);
+            final Register r = addr.getRegister();
+            final Register lsb = val.getLsbRegister();
+            final Register msb = val.getMsbRegister();
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, X86CompilerConstants.LSB, lsb);
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, X86CompilerConstants.MSB, msb);
+            val.release(ec);
+            addr.release(ec);
+        } break;
+        case mSTOREBYTE_OFS: 
+        case mSTORECHAR_OFS:
+        case mSTORESHORT_OFS: {
+            if (Vm.VerifyAssertions) Vm._assert(!isstatic);
+            final RefItem ofs = vstack.popRef();
+            final IntItem val = vstack.popInt();
+            final RefItem addr = vstack.popRef();
+            ofs.load(ec);
+            val.loadToBITS8GPR(ec);
+            addr.load(ec);
+            final Register r = addr.getRegister();
+            final Register ofsr = ofs.getRegister();            
+            final Register valr = val.getRegister();
+            os.writeMOV(methodToSize(mcode), r, ofsr, 1, 0, valr);
+            ofs.release(ec);
+            val.release(ec);
+            addr.release(ec);
+        } break;
+        case mSTOREINT_OFS: 
+        case mSTOREFLOAT_OFS:
+        case mSTOREADDRESS_OFS:
+        case mSTOREOBJECTREFERENCE_OFS: 
+        case mSTOREWORD_OFS: {
+            if (Vm.VerifyAssertions) Vm._assert(!isstatic);
+            final RefItem ofs = vstack.popRef();
+            final WordItem val = (WordItem)vstack.pop();
+            final RefItem addr = vstack.popRef();
+            ofs.load(ec);
+            val.load(ec);
+            addr.load(ec);
+            final Register r = addr.getRegister();
+            final Register ofsr = ofs.getRegister();            
+            final Register valr = val.getRegister();
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, ofsr, 1, 0, valr);
+            ofs.release(ec);
+            val.release(ec);
+            addr.release(ec);
+        } break;
+        case mSTORELONG_OFS: 
+        case mSTOREDOUBLE_OFS: {
+            if (Vm.VerifyAssertions) Vm._assert(!isstatic);
+            final RefItem ofs = vstack.popRef();
+            final DoubleWordItem val = (DoubleWordItem)vstack.pop();
+            final RefItem addr = vstack.popRef();
+            ofs.load(ec);
+            val.load(ec);
+            addr.load(ec);
+            final Register r = addr.getRegister();
+            final Register ofsr = ofs.getRegister();            
+            final Register lsb = val.getLsbRegister();
+            final Register msb = val.getMsbRegister();
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, ofsr, 1, X86CompilerConstants.LSB, lsb);
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, ofsr, 1, X86CompilerConstants.MSB, msb);
+            ofs.release(ec);
+            val.release(ec);
+            addr.release(ec);
+        } break;
+        
+        case mATTEMPTINT:
+        case mATTEMPTADDRESS:
+        case mATTEMPTOBJECTREFERENCE:
+        case mATTEMPTWORD: {
+            if (Vm.VerifyAssertions) Vm._assert(!isstatic);
+            final WordItem val = (WordItem)vstack.pop();
+            final WordItem old = (WordItem)vstack.pop();
+            final RefItem addr = vstack.popRef();
+            final Register eax = Register.EAX;
+            if (!old.uses(eax)) {
+                L1AHelper.requestRegister(ec, eax, old);
+                val.load(ec);
+                old.loadTo(ec, eax);
+            } else {
+                val.load(ec);
+            }
+            addr.load(ec);
+
+            final Register r = addr.getRegister();
+            final Register valr = val.getRegister();
+            os.writeCMPXCHG_EAX(r, 0, valr, true);
+            os.writeSETCC(eax, X86Constants.JZ);
+            os.writeAND(eax, 0xFF);
+
+            val.release(ec);
+            old.release(ec);
+            addr.release(ec);
+            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, eax));
+        } break;
+
+        case mATTEMPTINT_OFS:
+        case mATTEMPTADDRESS_OFS:
+        case mATTEMPTOBJECTREFERENCE_OFS:
+        case mATTEMPTWORD_OFS: {
+            if (Vm.VerifyAssertions) Vm._assert(!isstatic);
+            final RefItem ofs = vstack.popRef();
+            final WordItem val = (WordItem)vstack.pop();
+            final WordItem old = (WordItem)vstack.pop();
+            final RefItem addr = vstack.popRef();
+            final Register eax = Register.EAX;
+            if (!old.uses(eax)) {
+                L1AHelper.requestRegister(ec, eax, old);
+                ofs.load(ec);
+                val.load(ec);
+                old.loadTo(ec, eax);
+            } else {
+                ofs.load(ec);
+                val.load(ec);
+            }
+            addr.load(ec);
+
+            final Register r = addr.getRegister();
+            final Register valr = val.getRegister();
+            final Register ofsr = ofs.getRegister();
+            os.writeLEA(r, r, ofsr, 1, 0);
+            os.writeCMPXCHG_EAX(r, 0, valr, true);
+            os.writeSETCC(eax, X86Constants.JZ);
+            os.writeAND(eax, 0xFF);
+
+            ofs.release(ec);
+            val.release(ec);
+            old.release(ec);
+            addr.release(ec);
+            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, eax));
+        } break;
 
         default:
             throw new InternalError("Unknown method code for method " + method);

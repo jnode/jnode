@@ -48,11 +48,17 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
      */
     protected final void loadToConstant(EmitterContext ec,
             AbstractX86Stream os, Register lsb, Register msb) {
-        final int lsbv = (int) (value & 0xFFFFFFFFL);
-        final int msbv = (int) ((value >>> 32) & 0xFFFFFFFFL);
-
-        os.writeMOV_Const(lsb, lsbv);
-        os.writeMOV_Const(msb, msbv);
+        
+        if (value != 0) {
+            final int lsbv = (int) (value & 0xFFFFFFFFL);
+            final int msbv = (int) ((value >>> 32) & 0xFFFFFFFFL);
+            
+            os.writeMOV_Const(lsb, lsbv);
+            os.writeMOV_Const(msb, msbv);
+        } else {
+            os.writeXOR(lsb, lsb);
+            os.writeXOR(msb, msb);
+        }
     }
 
     /**
