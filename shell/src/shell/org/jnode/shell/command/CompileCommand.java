@@ -29,7 +29,7 @@ public class CompileCommand {
 		final int level = PARAM_LEVEL.isSet(cmdLine) ? ARG_LEVEL.getInteger(cmdLine) : 0;
 		final VmType type = VmSystem.getSystemClassLoader().loadClass(filename, true);
 		final long start = System.currentTimeMillis();
-		final int count = type.compile(level);
+		final int count = type.compileRuntime(level);
 		final long end = System.currentTimeMillis();
 		System.out.println("Compiling " + count + " methods took " + (end - start) + "ms");
 	}

@@ -49,7 +49,7 @@ multiboot_ok:
 
 	; Copy command line (if any)
 	mov esi,[multiboot_info+MBI_CMDLINE]
-	test esi,0xFFFFFFFF
+	test esi,esi
 	jz skip_multiboot_cmdline
 	mov edi,multiboot_cmdline
 	mov ecx,MBI_CMDLINE_MAX

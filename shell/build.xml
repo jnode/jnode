@@ -35,9 +35,9 @@
 
 <!-- Assemble the jarfile -->
   <target name="assemble" depends="compile">
-    <jar jarfile="${my.jar}">
+    <!-- jar jarfile="${my.jar}">
       <fileset dir="${my-classes.dir}"/>
-    </jar>
+    </jar -->
   </target>
 
 <!-- Do it all -->

@@ -64,7 +64,7 @@ public class SoftByteCodes implements Uninterruptible {
 	public static VmField resolveField(VmMethod currentMethod, VmConstFieldRef fieldRef, boolean isStatic) 
 	throws PragmaUninterruptible {
 		if (!fieldRef.getConstClass().isResolved()) {
-			resolveClass(currentMethod, fieldRef.getConstClass());
+			resolveClass(fieldRef.getConstClass());
 		}
 		VmField result;
 		if (fieldRef.isResolved()) {
@@ -100,7 +100,7 @@ public class SoftByteCodes implements Uninterruptible {
 	public static VmMethod resolveMethod(VmMethod currentMethod, VmConstMethodRef methodRef) 
 	throws PragmaUninterruptible {
 		if (!methodRef.getConstClass().isResolved()) {
-			resolveClass(currentMethod, methodRef.getConstClass());
+			resolveClass(methodRef.getConstClass());
 		}
 		if (methodRef.isResolved()) {
 			return methodRef.getResolvedVmMethod();
@@ -137,7 +137,7 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @return VmClass
 	 * @throws PragmaUninterruptible
 	 */
-	public static VmType resolveClass(VmMethod currentMethod, VmConstClass classRef) 
+	public static VmType resolveClass(VmConstClass classRef) 
 	throws PragmaUninterruptible {
 		if (classRef.isResolved()) {
 			return classRef.getResolvedVmClass();

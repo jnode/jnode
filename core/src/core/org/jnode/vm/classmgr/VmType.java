@@ -12,8 +12,10 @@ import java.util.Iterator;
 
 import org.jnode.assembler.NativeStream;
 import org.jnode.vm.Uninterruptible;
+import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmReflection;
 import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.compiler.NativeCodeCompiler;
 
 public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
@@ -1167,7 +1169,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 		// Compile the methods with the least optimizing compiler
 		if (loader.isCompileRequired()) {
-			compile();
+			compileRuntime(0);
 		}
 
 		// Notify all threads that are waiting for me
@@ -1300,39 +1302,26 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	 * 
 	 * @param compiler
 	 * @param os
-	 * @param level
+	 * @param optLevel
 	 *            The optimization level
 	 */
-	public final synchronized void compile(org.jnode.vm.compiler.Compiler compiler, NativeStream os, int level) {
-		if (!isCompiled()) {
-			prepare();
-			final VmMethod[] mt = methodTable;
-			if (mt != null) {
-				final int count = mt.length;
-				for (int i = 0; i < count; i++) {
-					VmMethod method = mt[i];
-					if (method.isNative()) {
-						compiler.compile(method, os, level);
-						method.setModifier(true, Modifier.ACC_COMPILED);
-						method.setProfile(false);
-					} else if (!method.isAbstract()) {
-						compiler.compile(method, os, level);
-						method.setModifier(true, Modifier.ACC_COMPILED);
-						method.setProfile(false);
-					}
+	public final synchronized void compileBootstrap(NativeCodeCompiler compiler, NativeStream os, int optLevel) {
+		if (!isPrepared()) {
+			throw new IllegalStateException("VmType must have been prepared");
+		}
+		final VmMethod[] mt = methodTable;
+		if (mt != null) {
+			final int count = mt.length;
+			for (int i = 0; i < count; i++) {
+				final VmMethod method = mt[i];
+				if (optLevel > method.getNativeCodeOptLevel()) {
+					compiler.compileBootstrap(method, os, optLevel);
+					method.setModifier(true, Modifier.ACC_COMPILED);
+					method.setProfile(false);
 				}
 			}
-			modifiers |= Modifier.ACC_COMPILED;
 		}
-	}
-
-	/**
-	 * Compile all the methods in this class during runtime.
-	 * 
-	 * @return The number of compiled methods
-	 */
-	public final int compile() {
-		return compile(0);
+		modifiers |= Modifier.ACC_COMPILED;
 	}
 
 	/**
@@ -1342,25 +1331,25 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	 *            The optimization level
 	 * @return The number of compiled methods
 	 */
-	public final synchronized int compile(int optLevel) {
+	public final synchronized int compileRuntime(int optLevel) {
+		if (!isPrepared()) {
+			throw new IllegalStateException("VmType must have been prepared");
+		}
+		final VmMethod[] mt = this.methodTable;
 		int compileCount = 0;
-		prepare();
-		final VmMethod[] mt = methodTable;
 		if (mt != null) {
 			final int count = mt.length;
 			for (int i = 0; i < count; i++) {
 				final VmMethod method = mt[i];
 				if (optLevel > method.getNativeCodeOptLevel()) {
-					if (!method.isAbstract()) {
-						loader.compile(method, optLevel);
-						method.setModifier(true, Modifier.ACC_COMPILED);
-						method.setProfile(false);
-						compileCount++;
-					}
+					loader.compileRuntime(method, optLevel);
+					method.setModifier(true, Modifier.ACC_COMPILED);
+					method.setProfile(false);
+					compileCount++;
 				}
 			}
 		}
-		modifiers |= Modifier.ACC_COMPILED;
+		this.modifiers |= Modifier.ACC_COMPILED;
 		return compileCount;
 	}
 
@@ -1498,6 +1487,8 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 					try {
 						VmReflection.invokeStatic(initMethod);
 					} catch (InvocationTargetException ex) {
+						ex.getTargetException().printStackTrace();
+						Unsafe.die();
 						throw new ExceptionInInitializerError(ex.getTargetException());
 					}
 				}

@@ -6,9 +6,6 @@
 ; Author       : E. Prangsma
 ; -----------------------------------------------
 
-	extern VmClass_initialize 
-	extern VmClass_compile
-	extern VmMethod_compile
 	extern vm_findThrowableHandler
 	extern VmMethod_Class
 

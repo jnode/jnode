@@ -8,13 +8,10 @@
 
 TRACE_ABSTRACT              equ 1
 TRACE_ATHROW                equ 0
-TRACE_CLINIT                equ 0
-TRACE_COMPILE               equ 0
 TRACE_INVOKE                equ 0
 TRACE_UNHANDLED_EXCEPTION	equ 0
 TRACE_INTERRUPTS			equ 0
     
-FORCE_COMPILE_METHODS		equ 0	; Compile methods before invocation?
 PARANOIA					equ 1	; Be very paranoia 
 QUICK_INVOKE_OPCODES		equ 1	; Use quick opcodes for invoke opcodes
 QUICK_FIELD_OPCODES			equ 1	; Use quick opcodes for field opcodes
@@ -57,9 +54,11 @@ kernel_begin:
 %include "unsafe.asm"
 %include "unsafe-binop.asm"
 %include "unsafe-setmulti.asm"
+%include "unsafe-cpuid.asm"
 %include "vm.asm"
 %include "vm-invoke.asm"
 %include "vm-ints.asm"
+%include "vm-jumptable.asm"
 
 		align 4096
 kernel_end:

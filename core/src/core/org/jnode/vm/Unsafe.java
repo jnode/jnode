@@ -324,7 +324,7 @@ public final class Unsafe {
 	 * @param offset
 	 * @return Object
 	 */
-	protected static native Address getAddress(Object object, int offset);
+	public static native Address getAddress(Object object, int offset);
 
 	/**
 	 * Sets a boolean at a given memory address
@@ -854,8 +854,9 @@ public final class Unsafe {
 
 	/**
 	 * Cause the system to stop
+	 * TODO Protect me again
 	 */
-	protected static native void die();
+	public /*protected*/static native void die();
 
 	/**
 	 * Initialize the new Thread.
@@ -996,4 +997,26 @@ public final class Unsafe {
 	 * Trigger a yieldpoint
 	 */
 	static native void yieldPoint();
+
+	/**
+	 * Gets the address of the system dependent jump table used for native
+	 * method indirection.
+	 * 
+	 * @return The address of the system dependent jump table.
+	 */
+	public static native Address getJumpTable();
+	
+	/**
+	 * Read CPU identification data.
+	 * 
+	 * If id is null, this method will return the length of the id array
+	 * that is required to fit all data.
+	 * If id is not null and long enough, it is filled with all identification
+	 * data.
+	 * 
+	 * @param id 
+	 * @return The required length of id.
+	 */
+	public static native int getCPUID(int[] id);
+	
 }

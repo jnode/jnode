@@ -5,7 +5,8 @@ package org.jnode.vm.x86;
 
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmStackReader;
-import org.jnode.vm.compiler.Compiler;
+import org.jnode.vm.compiler.NativeCodeCompiler;
+import org.jnode.vm.x86.compiler.l0.X86Level0Compiler;
 import org.jnode.vm.x86.compiler.l1.X86Level1Compiler;
 
 /**
@@ -16,12 +17,13 @@ import org.jnode.vm.x86.compiler.l1.X86Level1Compiler;
 public final class VmX86Architecture extends VmArchitecture {
 
 	final static VmX86Architecture INSTANCE = new VmX86Architecture();
+	public static final int SLOT_SIZE = 4;
 	
 	/** The stackreader of this architecture */
 	private final VmX86StackReader stackReader = new VmX86StackReader();
 	
 	/** The compilers */
-	private final Compiler[] compilers = { /*new X86Level0Compiler(),*/ new X86Level1Compiler() };
+	private final NativeCodeCompiler[] compilers = { new X86Level0Compiler(), new X86Level1Compiler() };
 	
 	/**
 	 * Gets the name of this architecture.
@@ -36,7 +38,7 @@ public final class VmX86Architecture extends VmArchitecture {
 	 * @return Size of reference, always 4 here
 	 */
 	public final int getReferenceSize() {
-		return 4;
+		return SLOT_SIZE;
 	}
 
 	/**
@@ -53,7 +55,7 @@ public final class VmX86Architecture extends VmArchitecture {
 	 * @return The compilers, sorted by optimization level, from least optimizations to most
 	 *         optimizations.
 	 */
-	public final Compiler[] getCompilers() {
+	public final NativeCodeCompiler[] getCompilers() {
 		return compilers;
 	}
 }

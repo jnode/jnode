@@ -53,10 +53,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	public static final int INITIALIZE_METHOD_OFFSET = 8;
 
 	private final Label vmInvoke = new Label("vm_invoke");
-	private final Label vmClassCompile = new Label("VmClass_compile");
-	private final Label vmMethodCompile = new Label("VmMethod_compile");
 	private final Label vmMethodRecordInvoke = new Label("VmMethod_recordInvoke");
-	private final Label vmClassInitialize = new Label("VmClass_initialize");
 	private final Label vmFindThrowableHandler = new Label("vm_findThrowableHandler");
 	private final Label vmCurrentTimeMillis = new Label("VmSystem_currentTimeMillis");
 	private final Label vmReschedule = new Label("VmProcessor_reschedule");
@@ -157,19 +154,10 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	 * @throws UnresolvedObjectRefException
 	 */
 	protected void linkNativeSymbols(NativeStream os) throws ClassNotFoundException, UnresolvedObjectRefException {
-		/* Link VmClass_compile */
-		VmType vmClassClass = loadClass(VmType.class);
-		NativeStream.ObjectRef refJava = os.getObjectRef(vmClassClass.getMethod("compile", "()I"));
-		os.getObjectRef(vmClassCompile).link(refJava);
-
-		/* Link vm_class_initialize */
-		refJava = os.getObjectRef(vmClassClass.getMethod("initialize", "()V"));
-		os.getObjectRef(vmClassInitialize).link(refJava);
+		NativeStream.ObjectRef refJava;
 
 		/* Link VmMethod_compile */
 		VmType vmMethodClass = loadClass(VmMethod.class);
-		refJava = os.getObjectRef(vmMethodClass.getMethod("compile", "()V"));
-		os.getObjectRef(vmMethodCompile).link(refJava);
 
 		/* Link VmMethod_recordInvoke */
 		refJava = os.getObjectRef(vmMethodClass.getMethod("recordInvoke", "()V"));
@@ -185,7 +173,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		os.getObjectRef(sbcSystemException).link(refJava);
 
 		/* Link SoftByteCodes_resolveClass */
-		refJava = os.getObjectRef(sbcClass.getMethod("resolveClass", "(Lorg/jnode/vm/classmgr/VmMethod;Lorg/jnode/vm/classmgr/VmConstClass;)Lorg/jnode/vm/classmgr/VmType;"));
+		refJava = os.getObjectRef(sbcClass.getMethod("resolveClass", "(Lorg/jnode/vm/classmgr/VmConstClass;)Lorg/jnode/vm/classmgr/VmType;"));
 		os.getObjectRef(new Label("SoftByteCodes_resolveClass")).link(refJava);
 
 		/* Link SoftByteCodes_resolveField */
@@ -406,10 +394,9 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		os.setObjectRef(clInitCaller);
 
 		// Call VmClass.loadFromBootClassArray
-		VmType vmClassClass = loadClass(VmType.class);
-		VmMethod lfbcaMethod = vmClassClass.getMethod("loadFromBootClassArray", "([Lorg/jnode/vm/classmgr/VmType;)V");
-		os.writeMOV_Const(Register.EAX, bootClasses);
-		os.writePUSH(Register.EAX);
+		final VmType vmClassClass = loadClass(VmType.class);
+		final VmMethod lfbcaMethod = vmClassClass.getMethod("loadFromBootClassArray", "([Lorg/jnode/vm/classmgr/VmType;)V");
+		os.writePUSH(bootClasses);
 		os.writeMOV_Const(Register.EAX, lfbcaMethod);
 		os.writeCALL(vmInvoke);
 
@@ -428,7 +415,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 				}
 			}
 		}
-		os.write8(0xc3); // RET
+		os.writeRET(); // RET
 		os.align(4096);
 
 		initCallerObject.markEnd();

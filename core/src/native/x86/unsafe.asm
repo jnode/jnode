@@ -637,7 +637,7 @@ Q43org5jnode2vm6Unsafe23getTimeStampCounter2e2829J:
 ; protected static native int getCmdLine(byte[] destination);
 Q43org5jnode2vm6Unsafe23getCmdLine2e285bB29I:	
 	mov eax,[esp+4]		; destination
-	test eax,0xFFFFFFFF	; Is null?
+	test eax,eax		; Is null?
 	jz after_copyCmdLine
 	mov ecx,[eax+(VmArray_LENGTH_OFFSET*4)]
 	push esi
@@ -662,4 +662,9 @@ Q43org5jnode2vm6Unsafe23yieldPoint2e2829V:
 	UNCOND_YIELDPOINT
 	ret	
 
+; Address getJumpTable()	
+Q43org5jnode2vm6Unsafe23getJumpTable2e2829Lorg2fjnode2fvm2fAddress3b:
+	mov eax,vm_jumpTable
+	ret
+	
 	

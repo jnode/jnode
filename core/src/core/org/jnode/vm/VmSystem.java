@@ -453,7 +453,7 @@ public final class VmSystem {
 						}
 					} else {
 						if (!catchType.isResolved()) {
-							SoftByteCodes.resolveClass(method, catchType);
+							SoftByteCodes.resolveClass(catchType);
 						}
 						final VmType handlerClass = catchType.getResolvedVmClass();
 						if (handlerClass != null) {
