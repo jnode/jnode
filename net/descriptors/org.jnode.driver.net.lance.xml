@@ -10,6 +10,7 @@
     <import plugin="org.jnode.driver"/>
     <import plugin="org.jnode.driver.net.ethernet"/>
     <import plugin="org.jnode.net"/>
+	<import plugin="org.jnode.driver.pci"/> 
   </requires>
         
   <runtime>
