@@ -169,7 +169,8 @@ final class VMRuntime
      * @param status the status to end the process with
      */
     static void exit(int status) {
-        throw new Error("Cannot exit yet");
+//LS        throw new Error("Cannot exit yet");
+        System.err.println("Cannot exit yet with System.exit()");
     }
 
     /**
