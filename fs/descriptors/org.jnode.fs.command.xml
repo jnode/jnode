@@ -22,6 +22,8 @@
     <alias name="cd"  class="org.jnode.fs.command.CdCommand"/>
     <alias name="dir" class="org.jnode.fs.command.DirCommand"/>
     <alias name="format" class="org.jnode.fs.command.FormatCommand"/>
+    <alias name="mkdir" class="org.jnode.fs.command.MkdirCommand"/>
+    <alias name="del" class="org.jnode.fs.command.DeleteCommand"/>
   </extension>
 
 </plugin>
