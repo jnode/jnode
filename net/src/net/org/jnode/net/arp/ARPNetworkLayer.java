@@ -222,6 +222,10 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
 	throws TimeoutException, NetworkException {
 		final long start = System.currentTimeMillis();
 		long lastReq = 0;
+
+		if (log.isDebugEnabled()) {
+		    log.debug("getHardwareAddress(" + address + ", " + myAddress + ", " + device.getId() + ", " + timeout + ")");
+		}
 		
 		if (address.equals(myAddress)) {
 			// This is simple, just return my address

@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.net.NetDeviceAPI;
 import org.jnode.driver.net.NetworkException;
+import org.jnode.net.HardwareAddress;
 import org.jnode.net.InvalidLayerException;
 import org.jnode.net.LayerAlreadyRegisteredException;
 import org.jnode.net.NetworkLayer;
@@ -22,6 +23,7 @@ import org.jnode.net.NoSuchProtocolException;
 import org.jnode.net.ProtocolAddress;
 import org.jnode.net.SocketBuffer;
 import org.jnode.net.TransportLayer;
+import org.jnode.net.arp.ARPNetworkLayer;
 import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.net.ipv4.IPv4Address;
 import org.jnode.net.ipv4.IPv4Constants;
@@ -36,6 +38,7 @@ import org.jnode.net.ipv4.raw.RAWProtocol;
 import org.jnode.net.ipv4.tcp.TCPProtocol;
 import org.jnode.net.ipv4.udp.UDPProtocol;
 import org.jnode.net.ipv4.util.ResolverImpl;
+import org.jnode.net.util.NetUtils;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.Statistics;
 
@@ -64,6 +67,9 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
 
     /** The sender */
     private final IPv4Sender sender;
+
+    /** The ARP network layer */
+    private ARPNetworkLayer arp;
 
     /**
      * Initialize a new instance
@@ -135,6 +141,10 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
             return;
         }
 
+        // Update the ARP cache for the source address
+        updateARPCache(skbuf.getLinkLayerHeader().getSourceAddress(), hdr
+                .getSourceAddress());
+
         // Get my IP address
         final IPv4ProtocolAddressInfo myAddrInfo = (IPv4ProtocolAddressInfo) deviceAPI
                 .getProtocolAddressInfo(getProtocolID());
@@ -157,7 +167,7 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
                         .getDestinationAddress().isBroadcast();
             }
         }
-        if (!shouldProcess) { 
+        if (!shouldProcess) {
         //log.debug("IPPacket not for me, ignoring (dst=" + dstAddr + ")");
         return; }
 
@@ -374,6 +384,23 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
             return ResolverImpl.getInstance().getByName(hostname);
         } catch (UnknownHostException ex) {
             return null;
+        }
+    }
+
+    private void updateARPCache(HardwareAddress hwAddr, ProtocolAddress pAddr) {
+        if (arp == null) {
+            try {
+                arp = (ARPNetworkLayer) NetUtils.getNLM().getNetworkLayer(
+                        EthernetConstants.ETH_P_ARP);
+                //arp = (ARPService)InitialNaming.lookup(ARPService.NAME);
+            } catch (NoSuchProtocolException ex) {
+                log.error("Cannot find ARP layer", ex);
+            } catch (NetworkException ex) {
+                log.error("Cannot network layer manager", ex);
+            }
+        }
+        if (arp != null) {
+            arp.getCache().set(hwAddr, pAddr, true);
         }
     }
 }

@@ -160,6 +160,7 @@ public class ResolverImpl implements Resolver {
 		protocolAddresses = getFromHostsFile(hostname);
 
 		if (protocolAddresses != null) {
+			System.out.println("hh0'");
 			return protocolAddresses;
 		}
 
