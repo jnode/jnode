@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.video.nvidia" 
+        name="JNode Video NVidia SVGA driver"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.driver"/>
+    <import plugin="org.jnode.driver.pci"/>
+    <import plugin="org.jnode.driver.video"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-gui.jar">
+      <export name="org.jnode.driver.video.nvidia.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.driver.mappers">
+    <mapper class="org.jnode.driver.video.nvidia.NVidiaDeviceToDriverMapper"/>
+  </extension>
+        
+</plugin>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.fs.fat" 
+        name="JNode FAT FileSystem"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.fs"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.fs.fat.*"/>
+    </library>
+  </runtime>
+        
+  <extension point="org.jnode.fs.types">
+    <type class="org.jnode.fs.fat.FatFileSystemType"/>
+  </extension>
+        
+</plugin>

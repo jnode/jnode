@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.net.command" 
+        name="JNode Network Shell Commands"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.net"/>
+    <import plugin="org.jnode.net.arp"/>
+    <import plugin="org.jnode.net.ipv4"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-net.jar">
+      <export name="org.jnode.net.command.*"/>
+    </library>
+  </runtime>
+                
+  <extension point="org.jnode.shell.aliases">
+    <alias name="arp" class="org.jnode.net.command.ArpCommand"/>
+    <alias name="bootp" class="org.jnode.net.command.BootpCommand"/>
+    <alias name="ifconfig" class="org.jnode.net.command.IfconfigCommand"/>
+    <alias name="netstat" class="org.jnode.net.command.NetstatCommand"/>
+    <alias name="route" class="org.jnode.net.command.RouteCommand"/>
+  </extension>
+
+</plugin>

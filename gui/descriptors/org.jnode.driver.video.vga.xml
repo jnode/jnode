@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.video.vga" 
+        name="JNode Video Standard VGA driver"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.driver.video"/>
+    <import plugin="org.jnode.driver.video.vgahw"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-gui.jar">
+      <export name="org.jnode.driver.video.vga.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.driver.finders">
+    <finder class="org.jnode.driver.video.vga.VGAFinder"/>
+  </extension>
+        
+</plugin>

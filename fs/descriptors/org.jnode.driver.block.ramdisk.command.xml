@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.block.ramdisk.command" 
+        name="JNode Ramdisk related commands"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.driver.block.ramdisk"/>
+    <import plugin="org.jnode.shell"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.driver.block.ramdisk.command.*"/>
+    </library>
+  </runtime>
+        
+  <extension point="org.jnode.shell.aliases">
+    <alias name="ramdisk"  class="org.jnode.driver.block.ramdisk.command.RamDiskCommand"/>
+  </extension>
+
+</plugin>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.net.3c90x" 
+        name="JNode 3Com 90x driver"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.driver"/>
+    <import plugin="org.jnode.driver.net.ethernet"/>
+    <import plugin="org.jnode.net"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-net.jar">
+      <export name="org.jnode.driver.net._3c90x.*"/>
+    </library>
+  </runtime>
+  
+  <extension point="org.jnode.driver.mappers">
+    <mapper class="org.jnode.driver.net._3c90x._3c90xDeviceToDriverMapper"/>
+  </extension>
+        
+</plugin>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.net.ipv4" 
+        name="JNode IPv4 Network Layer"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.net"/>
+    <import plugin="org.jnode.net.arp"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-net.jar">
+      <export name="org.jnode.net.ipv4.*"/>
+      <export name="org.jnode.net.ipv4.bootp.*"/>
+      <export name="org.jnode.net.ipv4.icmp.*"/>
+      <export name="org.jnode.net.ipv4.raw.*"/>
+      <export name="org.jnode.net.ipv4.tcp.*"/>
+      <export name="org.jnode.net.ipv4.udp.*"/>
+      <export name="org.jnode.net.ipv4.util.*"/>
+    </library>
+  </runtime>
+  
+  <extension point="org.jnode.net.networkLayers">
+    <layer class="org.jnode.net.ipv4.IPv4NetworkLayer"/>
+  </extension>
+  
+</plugin>

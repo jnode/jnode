@@ -1,0 +1,789 @@
+/*
+ * $Id$
+ */
+package org.jnode.awt.util;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Composite;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.Toolkit;
+import java.awt.RenderingHints.Key;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
+import java.awt.image.ImageObserver;
+import java.awt.image.RenderedImage;
+import java.awt.image.renderable.RenderableImage;
+import java.text.AttributedCharacterIterator;
+import java.util.Map;
+
+/**
+ * @author epr
+ */
+public abstract class AbstractGraphics extends Graphics2D {
+
+	private static final Stroke DEFAULT_STROKE = new BasicStroke();
+
+	private Color bgColor = Color.WHITE;
+	private Color fgColor = Color.BLACK;
+	private Color xorColor = null;
+	private Font font = new Font("Dialog", Font.PLAIN, 10);
+	private Shape clip;
+	private Stroke stroke = DEFAULT_STROKE;
+	AffineTransform transform = new AffineTransform();
+	private Paint paint = Color.WHITE;
+	private Composite composite;
+
+	/**
+	 * Initialize this instance
+	 * @param width
+	 * @param height
+	 */
+	public AbstractGraphics(int width, int height) {
+		clip = new Rectangle(0, 0, width, height);
+	}
+
+	/**
+	 * Initialize this instance as a copy of the given instance
+	 * @param src
+	 */
+	public AbstractGraphics(AbstractGraphics src) {
+		this.bgColor = src.bgColor;
+		this.fgColor = src.fgColor;
+		this.xorColor = src.xorColor;
+		this.font = src.font;
+		this.clip = src.clip;
+		this.stroke = src.stroke;
+		this.transform = new AffineTransform(src.transform);
+		this.paint = src.paint;
+		this.composite = src.composite;
+	}
+
+	/**
+	 * @param hints
+	 * @see java.awt.Graphics2D#addRenderingHints(java.util.Map)
+	 */
+	public void addRenderingHints(Map hints) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * @param s
+	 * @see java.awt.Graphics2D#clip(java.awt.Shape)
+	 */
+	public void clip(Shape s) {
+		//clip = clip.
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * @param shape
+	 * @see java.awt.Graphics2D#draw(java.awt.Shape)
+	 */
+	public abstract void draw(Shape shape);
+
+	/**
+	 * @param image
+	 * @param op
+	 * @param x
+	 * @param y
+	 * @see java.awt.Graphics2D#drawImage(java.awt.image.BufferedImage, java.awt.image.BufferedImageOp, int, int)
+	 */
+	public void drawImage(BufferedImage image, BufferedImageOp op, int x, int y) {
+		final Image img1 = op.filter(image, null);
+		drawImage(img1, new AffineTransform(1f, 0f, 0f, 1f, x, y), null);
+	}
+
+	/**
+	 * @param image
+	 * @param xform
+	 * @param obs
+	 * @see java.awt.Graphics2D#drawImage(java.awt.Image, java.awt.geom.AffineTransform, java.awt.image.ImageObserver)
+	 * @return boolean
+	 */
+	public boolean drawImage(Image image, AffineTransform xform, ImageObserver obs) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/**
+	 * @param image
+	 * @param xform
+	 * @see java.awt.Graphics2D#drawRenderableImage(java.awt.image.renderable.RenderableImage, java.awt.geom.AffineTransform)
+	 */
+	public void drawRenderableImage(RenderableImage image, AffineTransform xform) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * @param image
+	 * @param xform
+	 * @see java.awt.Graphics2D#drawRenderedImage(java.awt.image.RenderedImage, java.awt.geom.AffineTransform)
+	 */
+	public void drawRenderedImage(RenderedImage image, AffineTransform xform) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * @param iterator
+	 * @param x
+	 * @param y
+	 * @see java.awt.Graphics2D#drawString(java.text.AttributedCharacterIterator, float, float)
+	 */
+	public void drawString(AttributedCharacterIterator iterator, float x, float y) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * @param iterator
+	 * @param x
+	 * @param y
+	 * @see java.awt.Graphics2D#drawString(java.text.AttributedCharacterIterator, int, int)
+	 */
+	public void drawString(AttributedCharacterIterator iterator, int x, int y) {
+		drawString(iterator, (float) x, (float) y);
+	}
+
+	/**
+	 * @param text
+	 * @param x
+	 * @param y
+	 * @see java.awt.Graphics2D#drawString(java.lang.String, float, float)
+	 */
+	public void drawString(String text, float x, float y) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * @param text
+	 * @param x
+	 * @param y
+	 * @see java.awt.Graphics#drawString(java.lang.String, int, int)
+	 */
+	public void drawString(String text, int x, int y) {
+		drawString(text, (float) x, (float) y);
+	}
+
+	/**
+	 * @param shape
+	 * @see java.awt.Graphics2D#fill(java.awt.Shape)
+	 */
+	public abstract void fill(Shape shape);
+
+	/**
+	 * @see java.awt.Graphics2D#getBackground()
+	 * @return The background color
+	 */
+	public Color getBackground() {
+		return bgColor;
+	}
+
+	/**
+	 * @see java.awt.Graphics2D#getComposite()
+	 * @return Composite
+	 */
+	public Composite getComposite() {
+		return composite;
+	}
+
+	/**
+	 * @see java.awt.Graphics2D#getDeviceConfiguration()
+	 * @return The configuration
+	 */
+	public abstract GraphicsConfiguration getDeviceConfiguration();
+
+	/**
+	 * @see java.awt.Graphics2D#getPaint()
+	 * @return Paint
+	 */
+	public Paint getPaint() {
+		return paint;
+	}
+
+	/**
+	 * @param hintKey
+	 * @see java.awt.Graphics2D#getRenderingHint(java.awt.RenderingHints.Key)
+	 * @return Object
+	 */
+	public Object getRenderingHint(Key hintKey) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * @see java.awt.Graphics2D#getRenderingHints()
+	 * @return The hints
+	 */
+	public RenderingHints getRenderingHints() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * @see java.awt.Graphics2D#getStroke()
+	 * @return The stroke
+	 */
+	public Stroke getStroke() {
+		return stroke;
+	}
+
+	/**
+	 * @see java.awt.Graphics2D#getTransform()
+	 * @return The transform
+	 */
+	public AffineTransform getTransform() {
+		return new AffineTransform(transform);
+	}
+
+	/**
+	 * @param rect
+	 * @param text
+	 * @param onStroke
+	 * @see java.awt.Graphics2D#hit(java.awt.Rectangle, java.awt.Shape, boolean)
+	 * @return boolean
+	 */
+	public boolean hit(Rectangle rect, Shape text, boolean onStroke) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/**
+	 * @param theta
+	 * @param x
+	 * @param y
+	 * @see java.awt.Graphics2D#rotate(double, double, double)
+	 */
+	public void rotate(double theta, double x, double y) {
+		transform(AffineTransform.getRotateInstance(theta, x, y));
+	}
+
+	/**
+	 * @param theta
+	 * @see java.awt.Graphics2D#rotate(double)
+	 */
+	public void rotate(double theta) {
+		transform(AffineTransform.getRotateInstance(theta));
+	}
+
+	/**
+	 * @param scaleX
+	 * @param scaleY
+	 * @see java.awt.Graphics2D#scale(double, double)
+	 */
+	public void scale(double scaleX, double scaleY) {
+		transform(AffineTransform.getScaleInstance(scaleX, scaleY));
+	}
+
+	/**
+	 * @param color
+	 * @see java.awt.Graphics2D#setBackground(java.awt.Color)
+	 */
+	public void setBackground(Color color) {
+		this.bgColor = color;
+	}
+
+	/**
+	 * @param comp
+	 * @see java.awt.Graphics2D#setComposite(java.awt.Composite)
+	 */
+	public void setComposite(Composite comp) {
+		this.composite = comp;
+	}
+
+	/**
+	 * @param paint
+	 * @see java.awt.Graphics2D#setPaint(java.awt.Paint)
+	 */
+	public void setPaint(Paint paint) {
+		if (paint != null) {
+			this.paint = paint;
+		}
+	}
+
+	/**
+	 * @param hintKey
+	 * @param hintValue
+	 * @see java.awt.Graphics2D#setRenderingHint(java.awt.RenderingHints.Key, java.lang.Object)
+	 */
+	public void setRenderingHint(Key hintKey, Object hintValue) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * @param hints
+	 * @see java.awt.Graphics2D#setRenderingHints(java.util.Map)
+	 */
+	public void setRenderingHints(Map hints) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * @param stroke
+	 * @see java.awt.Graphics2D#setStroke(java.awt.Stroke)
+	 */
+	public void setStroke(Stroke stroke) {
+		this.stroke = stroke;
+	}
+
+	/**
+	 * @param Tx
+	 * @see java.awt.Graphics2D#setTransform(java.awt.geom.AffineTransform)
+	 */
+	public void setTransform(AffineTransform Tx) {
+		this.transform = Tx;
+	}
+
+	/**
+	 * @param shearX
+	 * @param shearY
+	 * @see java.awt.Graphics2D#shear(double, double)
+	 */
+	public void shear(double shearX, double shearY) {
+		transform(AffineTransform.getScaleInstance(shearX, shearY));
+	}
+
+	/**
+	 * @param Tx
+	 * @see java.awt.Graphics2D#transform(java.awt.geom.AffineTransform)
+	 */
+	public void transform(AffineTransform Tx) {
+		transform.concatenate(Tx);
+	}
+
+	/**
+	 * @param tx
+	 * @param ty
+	 * @see java.awt.Graphics2D#translate(double, double)
+	 */
+	public void translate(double tx, double ty) {
+		transform(AffineTransform.getTranslateInstance(tx, ty));
+	}
+
+	/**
+	 * @param x
+	 * @param y
+	 * @see java.awt.Graphics#translate(int, int)
+	 */
+	public void translate(int x, int y) {
+		transform(AffineTransform.getTranslateInstance(x, y));
+	}
+
+	/**
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @see java.awt.Graphics#clearRect(int, int, int, int)
+	 */
+	public void clearRect(int x, int y, int width, int height) {
+		final Color saveColor = getColor();
+		setColor(bgColor);
+		fillRect(x, y, width, height);
+		setColor(saveColor);
+	}
+
+	/**
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @see java.awt.Graphics#clipRect(int, int, int, int)
+	 */
+	public void clipRect(int x, int y, int width, int height) {
+		clip(new Rectangle(x, y, width, height));
+	}
+
+	/**
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @param dx
+	 * @param dy
+	 * @see java.awt.Graphics#copyArea(int, int, int, int, int, int)
+	 */
+	public abstract void copyArea(int x, int y, int width, int height, int dx, int dy);
+
+	/**
+	 * @see java.awt.Graphics#create()
+	 * @return The graphics
+	 */
+	public abstract Graphics create();
+
+	/**
+	 * @see java.awt.Graphics#dispose()
+	 */
+	public void dispose() {
+		// Nothing to do here
+	}
+
+	/**
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @param startAngle
+	 * @param arcAngle
+	 * @see java.awt.Graphics#drawArc(int, int, int, int, int, int)
+	 */
+	public void drawArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
+		draw(new Arc2D.Float(x, y, width, height, startAngle, arcAngle, Arc2D.OPEN));
+	}
+
+	/**
+	 * @param image
+	 * @param x
+	 * @param y
+	 * @param bgcolor
+	 * @param observer
+	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, java.awt.Color, java.awt.image.ImageObserver)
+	 * @return boolean
+	 */
+	public boolean drawImage(Image image, int x, int y, Color bgcolor, ImageObserver observer) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/**
+	 * @param image
+	 * @param x
+	 * @param y
+	 * @param observer
+	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, java.awt.image.ImageObserver)
+	 * @return boolean
+	 */
+	public boolean drawImage(Image image, int x, int y, ImageObserver observer) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/**
+	 * @param image
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @param bgcolor
+	 * @param observer
+	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int, java.awt.Color, java.awt.image.ImageObserver)
+	 * @return boolean
+	 */
+	public boolean drawImage(Image image, int x, int y, int width, int height, Color bgcolor, ImageObserver observer) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/**
+	 * @param image
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @param observer
+	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int, java.awt.image.ImageObserver)
+	 * @return boolean
+	 */
+	public boolean drawImage(Image image, int x, int y, int width, int height, ImageObserver observer) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/**
+	 * @param image
+	 * @param dx1
+	 * @param dy1
+	 * @param dx2
+	 * @param dy2
+	 * @param sx1
+	 * @param sy1
+	 * @param sx2
+	 * @param sy2
+	 * @param bgcolor
+	 * @param observer
+	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int, int, int, int, int, java.awt.Color, java.awt.image.ImageObserver)
+	 * @return boolean
+	 */
+	public boolean drawImage(Image image, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, Color bgcolor, ImageObserver observer) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/**
+	 * @param image
+	 * @param dx1
+	 * @param dy1
+	 * @param dx2
+	 * @param dy2
+	 * @param sx1
+	 * @param sy1
+	 * @param sx2
+	 * @param sy2
+	 * @param observer
+	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int, int, int, int, int, java.awt.image.ImageObserver)
+	 * @return boolean
+	 */
+	public boolean drawImage(Image image, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, ImageObserver observer) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/**
+	 * @param x1
+	 * @param y1
+	 * @param x2
+	 * @param y2
+	 * @see java.awt.Graphics#drawLine(int, int, int, int)
+	 */
+	public final void drawLine(int x1, int y1, int x2, int y2) {
+		draw(new Line2D.Float(x1, y1, x2, y2));
+	}
+
+	/**
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @see java.awt.Graphics#drawOval(int, int, int, int)
+	 */
+	public final void drawOval(int x, int y, int width, int height) {
+		draw(new Ellipse2D.Float(x, y, width, height));
+	}
+
+	/**
+	 * @param xPoints
+	 * @param yPoints
+	 * @param npoints
+	 * @see java.awt.Graphics#drawPolygon(int[], int[], int)
+	 */
+	public final void drawPolygon(int[] xPoints, int[] yPoints, int npoints) {
+		draw(new Polygon(xPoints, yPoints, npoints));
+	}
+
+	/**
+	 * @param xPoints
+	 * @param yPoints
+	 * @param npoints
+	 * @see java.awt.Graphics#drawPolyline(int[], int[], int)
+	 */
+	public final void drawPolyline(int[] xPoints, int[] yPoints, int npoints) {
+		final GeneralPath path = new GeneralPath(GeneralPath.WIND_NON_ZERO, npoints * 2);
+		path.moveTo(xPoints[0], yPoints[0]);
+		for (int i = 1; i < npoints; i++) {
+			path.lineTo(xPoints[i], yPoints[i]);
+		}
+		draw(path);
+	}
+
+	/**
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @param arcWidth
+	 * @param arcHeight
+	 * @see java.awt.Graphics#drawRoundRect(int, int, int, int, int, int)
+	 */
+	public final void drawRoundRect(int x, int y, int width, int height, int arcWidth, int arcHeight) {
+		draw(new RoundRectangle2D.Float(x, y, width, height, arcWidth, arcHeight));
+	}
+
+	/**
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @param startAngle
+	 * @param arcAngle
+	 * @see java.awt.Graphics#fillArc(int, int, int, int, int, int)
+	 */
+	public final void fillArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
+		fill(new Arc2D.Float(x, y, width, height, startAngle, arcAngle, Arc2D.OPEN));
+	}
+
+	/**
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @see java.awt.Graphics#fillOval(int, int, int, int)
+	 */
+	public final void fillOval(int x, int y, int width, int height) {
+		fill(new Ellipse2D.Float(x, y, width, height));
+	}
+
+	/**
+	 * @param xPoints
+	 * @param yPoints
+	 * @param npoints
+	 * @see java.awt.Graphics#fillPolygon(int[], int[], int)
+	 */
+	public final void fillPolygon(int[] xPoints, int[] yPoints, int npoints) {
+		fill(new Polygon(xPoints, yPoints, npoints));
+	}
+
+	/**
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @see java.awt.Graphics#fillRect(int, int, int, int)
+	 */
+	public final void fillRect(int x, int y, int width, int height) {
+		fill(new Rectangle2D.Float(x, y, width, height));
+	}
+
+	/**
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @param arcWidth
+	 * @param arcHeight
+	 * @see java.awt.Graphics#fillRoundRect(int, int, int, int, int, int)
+	 */
+	public final void fillRoundRect(int x, int y, int width, int height, int arcWidth, int arcHeight) {
+		fill(new RoundRectangle2D.Float(x, y, width, height, arcWidth, arcHeight));
+	}
+
+	/**
+	 * @see java.awt.Graphics#getClip()
+	 * @return Shape
+	 */
+	public Shape getClip() {
+		return clip;
+	}
+
+	/**
+	 * @see java.awt.Graphics#getClipBounds()
+	 * @return The clip bounds
+	 */
+	public Rectangle getClipBounds() {
+		return clip.getBounds();
+	}
+
+	/**
+	 * @see java.awt.Graphics#getColor()
+	 * @return The color
+	 */
+	public Color getColor() {
+		return fgColor;
+	}
+
+	/**
+	 * Gets the color set by setXORColor, or null when this Graphics
+	 * is in Paint mode. 
+	 * @return The XOR mode color
+	 */
+	public Color getXORColor() {
+		return xorColor;
+	}
+
+	/**
+	 * @see java.awt.Graphics#getFont()
+	 * @return The current font
+	 */
+	public Font getFont() {
+		return font;
+	}
+
+	/**
+	 * @param font
+	 * @see java.awt.Graphics#getFontMetrics(java.awt.Font)
+	 * @return The metrics
+	 */
+	public FontMetrics getFontMetrics(Font font) {
+		return Toolkit.getDefaultToolkit().getFontMetrics(font);
+	}
+
+	/**
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @see java.awt.Graphics#setClip(int, int, int, int)
+	 */
+	public void setClip(int x, int y, int width, int height) {
+		clip = new Rectangle(x, y, width, height);
+	}
+
+	/**
+	 * @param clip
+	 * @see java.awt.Graphics#setClip(java.awt.Shape)
+	 */
+	public void setClip(Shape clip) {
+		this.clip = clip;
+	}
+
+	/**
+	 * @param color
+	 * @see java.awt.Graphics#setColor(java.awt.Color)
+	 */
+	public void setColor(Color color) {
+		this.fgColor = color;
+	}
+
+	/**
+	 * @param font
+	 * @see java.awt.Graphics#setFont(java.awt.Font)
+	 */
+	public void setFont(Font font) {
+		this.font = font;
+	}
+
+	/**
+	 * @see java.awt.Graphics#setPaintMode()
+	 */
+	public void setPaintMode() {
+		this.xorColor = null;
+	}
+
+	/**
+	 * @param color
+	 * @see java.awt.Graphics#setXORMode(java.awt.Color)
+	 */
+	public void setXORMode(Color color) {
+		this.xorColor = color;
+	}
+	
+	protected final void transform(double[] srcPts, int srcOff, double[] dstPts, int dstOff, int num) {
+		transform.transform(srcPts, srcOff, dstPts, dstOff, num);
+	}
+
+	protected final void transform(float[] srcPts, int srcOff, float[] dstPts, int dstOff, int num) {
+		transform.transform(srcPts, srcOff, dstPts, dstOff, num);
+	}
+
+	protected final void transform(double[] srcPts, int srcOff, float[] dstPts, int dstOff, int num) {
+		transform.transform(srcPts, srcOff, dstPts, dstOff, num);
+	}
+
+	protected final void transform(float[] srcPts, int srcOff, double[] dstPts, int dstOff, int num) {
+		transform.transform(srcPts, srcOff, dstPts, dstOff, num);
+	}
+}

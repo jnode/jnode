@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.shell.help"
+        name="JNode Help System"
+        version="@VERSION@"
+        provider-name="JNode.org"
+	class="org.jnode.shell.help.def.SystemHelpPlugin">
+
+  <runtime>
+    <library name="jnode-shell.jar">
+      <export name="org.jnode.shell.help.*"/>
+      <export name="org.jnode.shell.help.def.*"/>
+    </library>
+  </runtime>
+
+</plugin>

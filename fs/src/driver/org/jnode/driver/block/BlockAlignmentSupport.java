@@ -1,0 +1,131 @@
+/*
+ * $Id$
+ */
+package org.jnode.driver.block;
+
+import java.io.IOException;
+
+import org.apache.log4j.Logger;
+
+/**
+ * @author epr
+ */
+public class BlockAlignmentSupport implements BlockDeviceAPI {
+
+	/** My logger */
+	private final Logger log = Logger.getLogger(getClass());
+	private final BlockDeviceAPI parentApi;
+	private int alignment;
+
+	public BlockAlignmentSupport(BlockDeviceAPI parentApi, int alignment) {
+		this.parentApi = parentApi;
+		this.alignment = alignment;
+		if (alignment < 0) {
+			throw new IllegalArgumentException("alignment < 0");
+		}
+	}
+
+	/**
+	 * @see org.jnode.driver.block.BlockDeviceAPI#getLength()
+	 * @return The length
+	 * @throws IOException
+	 */
+	public long getLength() throws IOException {
+		return parentApi.getLength();
+	}
+
+	/**
+	 * @param devOffset
+	 * @param dest
+	 * @param destOffset
+	 * @param length
+	 * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
+	 * @throws IOException
+	 */
+	public void read(long devOffset, byte[] dest, int destOffset, int length)
+	throws IOException {
+		
+		if (length == 0) {
+			return;
+		}
+		
+		final int ofsMisAlign = (int)(devOffset % alignment);
+		final int lenMisAlign = (length % alignment);
+		
+		/*log.debug("devOffset  =" + devOffset);
+		log.debug("length     =" + length);
+		log.debug("ofsMisAlign=" + ofsMisAlign);
+		log.debug("lenMisAlign=" + lenMisAlign);*/
+		
+		if ((ofsMisAlign != 0) || (lenMisAlign != 0)) {
+			final byte[] buf = new byte[length + ofsMisAlign + (alignment - lenMisAlign)];
+			parentApi.read(devOffset - ofsMisAlign, buf, 0, buf.length);
+			if (ofsMisAlign != 0) {
+				System.arraycopy(buf, alignment - ofsMisAlign, dest, destOffset, length);
+			} else {
+				System.arraycopy(buf, 0, dest, destOffset, length);
+			}
+		} else {
+			// Aligned call, pass on
+			parentApi.read(devOffset, dest, destOffset, length);
+		}
+	}
+
+	/**
+	 * @param devOffset
+	 * @param src
+	 * @param srcOffset
+	 * @param length
+	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
+	 * @throws IOException
+	 */
+	public void write(long devOffset, byte[] src, int srcOffset, int length)
+	throws IOException {
+		
+		if (length == 0) {
+			return;
+		}
+		
+		final int ofsMisAlign = (int)(devOffset % alignment);
+		final int lenMisAlign = (length % alignment);
+		
+		if ((ofsMisAlign != 0) || (lenMisAlign != 0)) {
+			log.warn("Very expensive misaligned write called!");
+			final byte[] buf = new byte[length + ofsMisAlign + (alignment - lenMisAlign)];
+			// TODO: This is very expensive, make it cheaper!
+			parentApi.read(devOffset - ofsMisAlign, buf, 0, buf.length);
+			if (ofsMisAlign != 0) {
+				System.arraycopy(src, srcOffset, buf, alignment - ofsMisAlign, length);
+			} else {
+				System.arraycopy(src, srcOffset, buf, 0, length);
+			}
+			parentApi.write(devOffset - ofsMisAlign, buf, 0, buf.length);
+		} else {
+			// Aligned call, pass on
+			parentApi.write(devOffset, src, srcOffset, length);
+		}
+	}
+
+	/**
+	 * @see org.jnode.driver.block.BlockDeviceAPI#flush()
+	 * @throws IOException
+	 */
+	public void flush() throws IOException {
+		parentApi.flush();
+	}
+
+	/**
+	 * Gets the alignment value
+	 * @return alignment
+	 */
+	public int getAlignment() {
+		return alignment;
+	} 
+	
+	/**
+	 * @param i
+	 */
+	public void setAlignment(int i) {
+		alignment = i;
+	}
+}

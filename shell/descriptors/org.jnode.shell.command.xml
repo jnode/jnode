@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.shell.command" 
+        name="JNode System Commands"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.shell"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-shell.jar">
+      <export name="org.jnode.shell.command.*"/>
+    </library>
+  </runtime>
+        
+  <extension point="org.jnode.shell.aliases">
+    <alias name="alias" class="org.jnode.shell.command.AliasCommand"/>
+    <alias name="class" class="org.jnode.shell.command.ClassCommand"/>
+    <alias name="compile" class="org.jnode.shell.command.CompileCommand"/>
+	<alias name="date" class="org.jnode.shell.command.DateCommand"/>
+    <alias name="echo" class="org.jnode.shell.command.EchoCommand"/>
+    <alias name="env" class="org.jnode.shell.command.EnvCommand"/>
+    <alias name="set" class="org.jnode.shell.command.SetCommand"/>
+    <alias name="exec" class="org.jnode.shell.command.ExecCommand"/>
+    <alias name="gc" class="org.jnode.shell.command.GcCommand"/>
+    <alias name="halt" class="org.jnode.shell.command.HaltCommand"/>
+    <alias name="help" class="org.jnode.shell.command.HelpCommand"/>
+	<alias name="history" class="org.jnode.shell.command.HistoryCommand"/>
+    <alias name="java" class="org.jnode.shell.command.JavaCommand"/>
+    <alias name="memory" class="org.jnode.shell.command.MemoryCommand"/>
+    <alias name="namespace" class="org.jnode.shell.command.NamespaceCommand"/>
+    <alias name="test" class="org.jnode.shell.command.TestCommand"/>
+    <alias name="thread" class="org.jnode.shell.command.ThreadCommand"/>
+  </extension>
+
+</plugin>

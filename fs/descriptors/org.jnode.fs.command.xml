@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.fs.command" 
+        name="JNode filesystem commands"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.fs"/>
+    <import plugin="org.jnode.shell"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.fs.command.*"/>
+    </library>
+  </runtime>
+        
+  <extension point="org.jnode.shell.aliases">
+    <alias name="cat" class="org.jnode.fs.command.CatCommand"/>
+    <alias name="cd"  class="org.jnode.fs.command.CdCommand"/>
+    <alias name="dir" class="org.jnode.fs.command.DirCommand"/>
+    <alias name="format" class="org.jnode.fs.command.FormatCommand"/>
+  </extension>
+
+</plugin>
