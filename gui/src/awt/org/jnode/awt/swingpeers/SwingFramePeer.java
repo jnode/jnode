@@ -326,7 +326,7 @@ final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
 	 * @see java.awt.peer.ComponentPeer#getGraphics()
 	 */
 	public Graphics getGraphics() {
-        Insets ins = frame.getInsets();
+        Insets ins = getInsets();
         Graphics g = frame.getGraphics();
         g.translate(ins.left, ins.top);
 		return g;
