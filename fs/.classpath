@@ -10,6 +10,5 @@
 	<classpathentry kind="lib" path="/JNode-Core/lib/nanoxml-lite-2.2.3.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/ant.jar"/>
-	<classpathentry kind="lib" path="/JNode-Core/lib/june.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
