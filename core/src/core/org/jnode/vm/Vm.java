@@ -3,6 +3,9 @@
  */
 package org.jnode.vm;
 
+import org.jnode.vm.classmgr.VmStatics;
+import org.jnode.vm.compiler.HotMethodManager;
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
@@ -18,6 +21,8 @@ public class Vm extends VmSystemObject {
 	private final VmHeapManager heapManager;
 	/** The boot heap */
 	private final VmBootHeap bootHeap;
+	/** The hot method manager */
+	private HotMethodManager hotMethodManager;
 
 	/**
 	 * Initialize a new instance
@@ -66,11 +71,20 @@ public class Vm extends VmSystemObject {
 	public final VmHeapManager getHeapManager() {
 		return this.heapManager;
 	}
+	
+	final void startHotMethodManager() {
+		final VmStatics statics = Unsafe.getCurrentProcessor().getStatics();
+		this.hotMethodManager = new HotMethodManager(arch, statics);
+		hotMethodManager.start();
+	}
 
 	public static void main(String[] args) {
 		final Vm vm = getVm();
 		if ((vm != null) && !vm.isBootstrap()) {
 			Unsafe.getCurrentProcessor().getStatics().dumpStatistics();
+			if (vm.hotMethodManager != null) {
+				vm.hotMethodManager.dumpStatistics();
+			}
 		}
 	}
 }

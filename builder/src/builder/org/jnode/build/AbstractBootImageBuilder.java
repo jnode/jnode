@@ -191,14 +191,14 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			clsMgr.setCompileRequired();
 
 			// Emit the classmanager
-			log("Emit vm");
+			log("Emit vm", Project.MSG_VERBOSE);
 			blockedObjects.remove(vm);
 			emitObjects(os, arch, blockedObjects);
 			// Twice, this is intended!
 			emitObjects(os, arch, blockedObjects);
 
 			/* Set the bootclasses */
-			log("prepare bootClassArray");
+			log("prepare bootClassArray", Project.MSG_VERBOSE);
 			final VmType bootClasses[] = clsMgr.prepareAfterBootstrap();
 			os.getObjectRef(bootClasses);
 			emitObjects(os, arch, blockedObjects);
@@ -206,23 +206,23 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			emitObjects(os, arch, blockedObjects);
 			
 			// Emit the classmanager
-			log("Emit clsMgr");
+			log("Emit clsMgr", Project.MSG_VERBOSE);
 			blockedObjects.remove(clsMgr);
 			emitObjects(os, arch, blockedObjects);
 			// Twice, this is intended!
 			emitObjects(os, arch, blockedObjects);
 
 			// Emit the classmanager
-			log("Emit statics");
+			log("Emit statics", Project.MSG_VERBOSE);
 			blockedObjects.remove(clsMgr.getStatics());
 			emitObjects(os, arch, blockedObjects);
 			// Twice, this is intended!
 			emitObjects(os, arch, blockedObjects);
 
 			// Emit the remaining objects
-			log("Emit rest; blocked=" + blockedObjects);
+			log("Emit rest; blocked=" + blockedObjects, Project.MSG_VERBOSE);
 			emitObjects(os, arch, null);
-			log("statics table 0x" + NumberUtils.hex(os.getObjectRef(clsMgr.getStatics().getTable()).getOffset()));
+			log("statics table 0x" + NumberUtils.hex(os.getObjectRef(clsMgr.getStatics().getTable()).getOffset()), Project.MSG_VERBOSE);
 
 			/* Write static initializer code */
 			emitStaticInitializerCalls(os, bootClasses, clInitCaller);
@@ -254,6 +254,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			final int bootHeapBitmapSize = (bootHeapSize / ObjectLayout.OBJECT_ALIGN) >> 3;
 			log("Boot heap size " + (bootHeapSize >>> 10) + "K bitmap size " + (bootHeapBitmapSize >>> 10) + "K");
 			clsMgr.getStatics().dumpStatistics();
+			
+			logStatistics(os);
 
 			log("Done.");
 		} catch (Throwable ex) {
@@ -449,7 +451,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 				debugOut = null;
 			}
 			if (blockObjects == null) {
-				log("Emitted classes: " + emittedClassNames);
+				log("Emitted classes: " + emittedClassNames, Project.MSG_VERBOSE);
 			}
 		} catch (ClassNotFoundException ex) {
 			throw new BuildException(ex);
@@ -861,4 +863,6 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 	public VmClassLoader getClsMgr() {
 		return clsMgr;
 	}
+	
+	protected abstract void logStatistics(NativeStream os);
 }

@@ -1319,7 +1319,6 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 				if (optLevel > method.getNativeCodeOptLevel()) {
 					compiler.compileBootstrap(method, os, optLevel);
 					method.setModifier(true, Modifier.ACC_COMPILED);
-					method.setProfile(false);
 				}
 			}
 		}
@@ -1346,7 +1345,6 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 				if (optLevel > method.getNativeCodeOptLevel()) {
 					loader.compileRuntime(method, optLevel);
 					method.setModifier(true, Modifier.ACC_COMPILED);
-					method.setProfile(false);
 					compileCount++;
 				}
 			}

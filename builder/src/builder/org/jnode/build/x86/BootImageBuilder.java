@@ -50,6 +50,9 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 public class BootImageBuilder extends AbstractBootImageBuilder implements X86CompilerConstants {
 
 	public static final int LOAD_ADDR = 1024 * 1024;
+	public static final int INITIAL_OBJREFS_CAPACITY = 200000;
+	public static final int INITIAL_SIZE = 16*1024*1024;
+	
 	private VmX86Processor processor;
 	private String processorId;
 	private final VmX86Architecture arch = new VmX86Architecture();
@@ -61,7 +64,6 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	public static final int INITIALIZE_METHOD_OFFSET = 8;
 
 	//private final Label vmInvoke = new Label("vm_invoke");
-	private final Label vmMethodRecordInvoke = new Label("VmMethod_recordInvoke");
 	private final Label vmFindThrowableHandler = new Label("vm_findThrowableHandler");
 	private final Label vmReschedule = new Label("VmProcessor_reschedule");
 	private final Label sbcSystemException = new Label("SoftByteCodes_systemException");
@@ -80,7 +82,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	 * @return The native stream
 	 */
 	protected NativeStream createNativeStream() {
-		return new X86Stream(getCPUID(), LOAD_ADDR, 64 * 1024, 16 * 1024 * 1024);
+		return new X86Stream(getCPUID(), LOAD_ADDR, INITIAL_OBJREFS_CAPACITY, INITIAL_SIZE);
 	}
 
 	/**
@@ -185,7 +187,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 			initCallMain(os86);
 
 			initCodeObject.markEnd();
-
+			
 		} catch (ClassNotFoundException ex) {
 			throw new BuildException(ex);
 		}
@@ -203,10 +205,6 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 
 		/* Link VmMethod_compile */
 		VmType vmMethodClass = loadClass(VmMethod.class);
-
-		/* Link VmMethod_recordInvoke */
-		refJava = os.getObjectRef(vmMethodClass.getMethod("recordInvoke", "()V"));
-		os.getObjectRef(vmMethodRecordInvoke).link(refJava);
 
 		/* Link VmMethod_Class */
 		refJava = os.getObjectRef(vmMethodClass);
@@ -404,7 +402,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		/* Set Vm.instance */
 		os.writeMOV_Const(Register.EBX, vm);
 		final int vmOffset = (VmArray.DATA_OFFSET + vmField.getStaticsIndex()) << 2;
-		System.out.println("vmOffset " + NumberUtils.hex(vmOffset));
+		log("vmOffset " + NumberUtils.hex(vmOffset), Project.MSG_VERBOSE);
 		os.writeMOV(INTSIZE, Register.EDI, vmOffset, Register.EBX);
 	}
 
@@ -427,7 +425,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		/* Set Main.pluginRegistry */
 		os.writeMOV_Const(Register.EBX, registry);
 		final int rfOffset = (VmArray.DATA_OFFSET + registryField.getStaticsIndex()) << 2;
-		System.out.println("rfOffset " + NumberUtils.hex(rfOffset));
+		log("rfOffset " + NumberUtils.hex(rfOffset), Project.MSG_VERBOSE);
 		os.writeMOV(INTSIZE, Register.EDI, rfOffset, Register.EBX);
 	}
 
@@ -537,8 +535,11 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	protected void setupBootClasses() {
 		super.setupBootClasses();
 		final int core = BootClassInfo.F_ALL;
-		final int nonCore = BootClassInfo.F_RESOLVEALL;
-		add(new BootClassInfo("org.jnode.vm.compiler.x86", true, nonCore));
+		add(new BootClassInfo("org.jnode.assembler.x86", true, core));
+		add(new BootClassInfo("org.jnode.assembler.x86.X86Stream", core));
+		add(new BootClassInfo("org.jnode.vm.x86.compiler", true, core));
+		add(new BootClassInfo("org.jnode.vm.x86.compiler.l0", true, core));
+		add(new BootClassInfo("org.jnode.vm.x86.compiler.l1", true, core));
 		add(new BootClassInfo("org.jnode.vm.x86", true, core));
 	}
 
@@ -561,4 +562,15 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		return X86CpuID.createID(processorId);
 	}
 
+	protected void logStatistics(NativeStream os) {
+		final X86Stream os86 = (X86Stream)os;
+		final int count = os86.getObjectRefsCount();
+		if (count > INITIAL_OBJREFS_CAPACITY) {
+			log("Increase BootImageBuilder.INITIAL_OBJREFS_CAPACITY to " + count + " for faster build.", Project.MSG_WARN);
+		}
+		final int size = os86.getLength();
+		if (size > INITIAL_SIZE) {
+			log("Increase BootImageBuilder.INITIAL_SIZE to " + size + " for faster build.", Project.MSG_WARN);
+		}
+	}
 }
