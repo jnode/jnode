@@ -17,6 +17,7 @@ public class KeyboardInterpreter {
 	private int[] vkMap;
 	private char[] lcharMap;
 	private char[] ucharMap;
+	private char[] altGrCharMap;
 	private int lastScancode;
 
 	public final static int XT_RELEASE = 0x80;
@@ -26,7 +27,8 @@ public class KeyboardInterpreter {
 		vkMap = new int[256];
 		lcharMap = new char[256];
 		ucharMap = new char[256];
-		initVkMap(vkMap, lcharMap, ucharMap);
+		altGrCharMap = new char[256];
+		initVkMap(vkMap, lcharMap, ucharMap, altGrCharMap);
 	}
 
 	/**
@@ -44,11 +46,14 @@ public class KeyboardInterpreter {
 		scancode &= 0x7f;
 		int vk = deriveKeyCode(scancode, (lastScancode == XT_EXTENDED));
 		// debug output to find new keycodes
-		// log.debug("[" + (lastScancode == XT_EXTENDED ? "E" : "N") + scancode + "] " + KeyEvent.getKeyText(vk));
+//		System.err.println("[" + (lastScancode == XT_EXTENDED ? "E" : "N") + scancode + "] " /*+ KeyEvent.getKeyText(vk)*/);
 		int mask;
 		switch (vk) {
 			case KeyEvent.VK_ALT :
 				mask = InputEvent.ALT_DOWN_MASK;
+				break;
+			case KeyEvent.VK_ALT_GRAPH :
+				mask = InputEvent.ALT_GRAPH_DOWN_MASK;
 				break;
 			case KeyEvent.VK_CONTROL :
 				mask = InputEvent.CTRL_DOWN_MASK;
@@ -72,6 +77,8 @@ public class KeyboardInterpreter {
 			char ch;
 			if ((flags & InputEvent.SHIFT_DOWN_MASK) != 0) {
 				ch = ucharMap[scancode];
+			} else if((flags & InputEvent.ALT_GRAPH_DOWN_MASK) != 0) {
+				ch = altGrCharMap[scancode];
 			} else {
 				ch = lcharMap[scancode];
 			}
@@ -123,7 +130,7 @@ public class KeyboardInterpreter {
 					vk = KeyEvent.VK_PRINTSCREEN;
 					break;
 				case 56 :
-					vk = KeyEvent.VK_ALT;
+					vk = KeyEvent.VK_ALT_GRAPH;
 					break;
 				case 29 :
 					vk = KeyEvent.VK_CONTROL;
@@ -145,7 +152,7 @@ public class KeyboardInterpreter {
 	 * Initialize the mapping between scancode and virtual key code.
 	 * @param vkMap
 	 */
-	protected void initVkMap(int[] vkMap, char[] lcharMap, char[] ucharMap) {
+	protected void initVkMap(int[] vkMap, char[] lcharMap, char[] ucharMap, char[] altGrCharMap) {
 		vkMap[0] = KeyEvent.VK_UNDEFINED;
 		vkMap[1] = KeyEvent.VK_ESCAPE;
 		vkMap[2] = KeyEvent.VK_1;
