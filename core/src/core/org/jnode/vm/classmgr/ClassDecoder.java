@@ -109,7 +109,7 @@ public final class ClassDecoder {
             switch (tag) {
             case 1:
                 // Utf8
-                cp.setUTF8(i, new String(reader.readUTF()));
+                cp.setUTF8(i, reader.readUTF());
                 break;
             case 3:
                 // int
