@@ -17,13 +17,35 @@ public class IntTest {
 	}
 
 	public void run() {
-		test(0, 5);
-		test(-1481821192, 1);
+		testInt(0, 5);
+		testInt(-1481821192, 1);
+		testLong(0L, 5L);
+		testLong(-1481821192L, 1L);
 	}
 
-	public void test(int a, int b) {
+	public void testInt(int a, int b) {
+		System.out.println("int");
 		System.out.println("a     = " + a);
 		System.out.println("b     = " + b);
+		System.out.println("-a    = " + (-a));
+		System.out.println("-b    = " + (-b));
+		System.out.println("a + b = " + (a + b));
+		System.out.println("a - b = " + (a - b));
+		System.out.println("a * b = " + (a * b));
+		System.out.println("a / b = " + (a / b));
+		System.out.println("a % b = " + (a % b));
+	}
+
+	public void testLong(long a, long b) {
+		System.out.println("long");
+		System.out.println("a     = " + a);
+		System.out.println("b     = " + b);
+		System.out.println("-a    = " + (-a));
+		System.out.println("-b    = " + (-b));
+		System.out.println("a + b = " + (a + b));
+		System.out.println("a - b = " + (a - b));
+		System.out.println("a * b = " + (a * b));
+		System.out.println("a / b = " + (a / b));
 		System.out.println("a % b = " + (a % b));
 	}
 }
