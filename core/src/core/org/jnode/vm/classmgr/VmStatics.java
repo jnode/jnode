@@ -309,15 +309,6 @@ public final class VmStatics extends VmSystemObject {
 	}
 
 	/**
-	 * Let all methods in this statics-table make a visit to the given visitor.
-	 * 
-	 * @param visitor
-	 */
-	public void walkMethods(ObjectVisitor visitor) {
-		walk(TYPE_METHOD, visitor);
-	}
-
-	/**
 	 * Let all objects in this statics-table make a visit to the given visitor.
 	 * 
 	 * @param visitor

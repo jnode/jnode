@@ -34,7 +34,6 @@ import org.jnode.util.Statistics;
 import org.jnode.vm.classmgr.CompiledCodeList;
 import org.jnode.vm.classmgr.VmAtom;
 import org.jnode.vm.classmgr.VmStatics;
-import org.jnode.vm.compiler.HotMethodManager;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.vmmagic.pragma.NoInlinePragma;
 
@@ -51,8 +50,6 @@ public class Vm extends VmSystemObject implements Statistics {
 	private final VmArchitecture arch;
 	/** The heap manager */
 	private final VmHeapManager heapManager;
-	/** The hot method manager */
-	private HotMethodManager hotMethodManager;
 	/** Set this boolean to turn the hot method manager on/off */
 	private final boolean runHotMethodManager = false;
 	/** Should this VM run in debug mode? */
@@ -153,17 +150,6 @@ public class Vm extends VmSystemObject implements Statistics {
 		return instance.heapManager;
 	}
 
-	/**
-	 * Start the hot method compiler.
-	 *  
-	 */
-	final void startHotMethodManager() {
-		if (runHotMethodManager) {
-			this.hotMethodManager = new HotMethodManager(arch, statics);
-			hotMethodManager.start();
-		}
-	}
-
     /**
      * Returns the number of available processors currently available to the
      * virtual machine. This number may change over time; so a multi-processor
@@ -187,9 +173,6 @@ public class Vm extends VmSystemObject implements Statistics {
 			out.println("JNode VM " + vm.getVersion());
 			vm.dumpStatistics(out);
 			vm.getStatics().dumpStatistics(out);
-			if (vm.hotMethodManager != null) {
-				vm.hotMethodManager.dumpStatistics(out);
-			}
 			vm.heapManager.dumpStatistics(out);
 			final SecurityManager sm = System.getSecurityManager();
 			out.println("Security manager: " + sm);

@@ -151,9 +151,6 @@ public final class VmSystem {
             // Load the initial jarfile
             initJar = loadInitJar(rm);
 
-            // Start the compilation manager
-            vm.startHotMethodManager();
-
             // Initialize log4j
             final Logger root = Logger.getRootLogger();
             final ConsoleAppender infoApp = new ConsoleAppender(
