@@ -14,6 +14,7 @@ import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.ExtensionPointListener;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
+import org.jnode.util.BooleanUtils;
 
 
 /**
@@ -60,7 +61,7 @@ public class DefaultAliasManager implements AliasManager, ExtensionPointListener
 					className = getAliasClassName(className);
 				}
 			} catch (NoSuchAliasException e) {}
-			aliases.put(alias, new Alias(alias, className));
+			aliases.put(alias, new Alias(alias, className, false));
 		}
 	}
 	
@@ -87,6 +88,17 @@ public class DefaultAliasManager implements AliasManager, ExtensionPointListener
 		return getAlias(alias).getAliasClass();
 	}
 	
+	/**
+	 * Should the given alias be invoked in the context of the shell, instead of
+	 * in its own context.
+	 * 
+	 * @param alias
+	 */
+	public boolean isInternal(String alias)
+			throws NoSuchAliasException {
+		return getAlias(alias).isInternal();
+	}
+
 	/**
 	 * Gets the classname of a given alias
 	 * @param alias
@@ -161,8 +173,9 @@ public class DefaultAliasManager implements AliasManager, ExtensionPointListener
 	private void createAlias(Map aliases, ConfigurationElement element) {
 		final String name = element.getAttribute("name");
 		final String className = element.getAttribute("class");
+		final boolean internal = BooleanUtils.valueOf(element.getAttribute("internal"));
 		if ((name != null) && (className != null)) {
-			aliases.put(name, new Alias(name, className));
+			aliases.put(name, new Alias(name, className, internal));
 		}
 	}
 	
@@ -184,10 +197,12 @@ public class DefaultAliasManager implements AliasManager, ExtensionPointListener
 		private final String alias;
 		private final String className;
 		private Class aliasClass;
+		private final boolean internal;
 		
-		public Alias(String alias, String className) {
+		public Alias(String alias, String className, boolean internal) {
 			this.alias = alias;
 			this.className = className;
+			this.internal = internal;
 		}
 		
 		/**
@@ -213,6 +228,15 @@ public class DefaultAliasManager implements AliasManager, ExtensionPointListener
 				aliasClass = Thread.currentThread().getContextClassLoader().loadClass(className);
 			}
 			return aliasClass;
+		}
+		
+		/**
+		 * Should this alias be executed in the context of the shell, instead of
+		 * in its own context.
+		 * @return
+		 */
+		public final boolean isInternal() {
+			return internal;
 		}
 	}
 }

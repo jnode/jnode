@@ -8,7 +8,7 @@ package org.jnode.shell.help;
  */
 public class SyntaxErrorException extends HelpException {
     
-	SyntaxErrorException(String message) {
+	public SyntaxErrorException(String message) {
 		super(message);
 	}
 }

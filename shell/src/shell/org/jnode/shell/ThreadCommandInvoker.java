@@ -60,31 +60,35 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
         //            System.out.println("arg["+i+"] = " + arg);
         //        }
         try {
-            Class cmdClass = commandShell.getCommandClass(cmdName);
+            CommandInfo cmdInfo = commandShell.getCommandClass(cmdName);
 
             //            System.err.println("CmdClass=" + cmdClass);
-            final Method main = cmdClass.getMethod("main", MAIN_ARG_TYPES);
+            final Method main = cmdInfo.getCommandClass().getMethod("main", MAIN_ARG_TYPES);
             //            System.err.println("main=" + main);
             try {
                 //                System.err.println("Invoking...");
-                CommandRunner cr = new CommandRunner(cmdClass, main,
+                CommandRunner cr = new CommandRunner(cmdInfo.getCommandClass(), main,
                         new Object[] { args});
-                Thread threadProcess = new Thread(cr, cmdName);
-                threadProcess.start();
-                //                cr.run();
-                this.blocking = true;
-                this.blockingThread = Thread.currentThread();
-                while (blocking) {
-                    try {
-                        Thread.sleep(6000);
-                    } catch (InterruptedException interrupted) {
-                        if (!blocking) {
-                            //interruption was okay, break normally.
-                        } else {
-                            //abnormal interruption
-                            interrupted.printStackTrace();
-                        }
-                    }
+                if (cmdInfo.isInternal()) {
+                	cr.run();
+                } else {
+                	Thread threadProcess = new Thread(cr, cmdName);
+                	threadProcess.start();
+                	//                cr.run();
+                	this.blocking = true;
+                	this.blockingThread = Thread.currentThread();
+                	while (blocking) {
+                		try {
+                			Thread.sleep(6000);
+                		} catch (InterruptedException interrupted) {
+                			if (!blocking) {
+                				//interruption was okay, break normally.
+                			} else {
+                				//abnormal interruption
+                				interrupted.printStackTrace();
+                			}
+                		}
+                	}
                 }
                 //                System.err.println("Finished invoke.");
             } catch (Exception ex) {
@@ -101,7 +105,8 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
         } catch (ClassCastException ex) {
             err.println("Invalid command " + cmdName);
         } catch (Exception ex) {
-            err.println("I FOUND AN ERROR: " + ex);
+            err.println("Unknown error: " + ex.getMessage());
+            ex.printStackTrace(err);
         }
     }
 
