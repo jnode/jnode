@@ -29,6 +29,9 @@ public class Fat {
 
 	private final long eofMarker;
 	private boolean dirty;
+	
+	/** entry index for find next free entry*/
+	private int lastFreeCluster = 2;
 
 	/**
 	 * Create a new instance
@@ -142,14 +145,14 @@ public class Fat {
 					break;
 				case 16 :
 					{
-						int idx = i * 2;
+						int idx = i << 1;
 						data[idx] = (byte) (v & 0xFF);
 						data[idx + 1] = (byte) ((v >> 8) & 0xFF);
 					}
 					break;
 				case 32 :
 					{
-						int idx = i * 4;
+						int idx = i << 2;
 						data[idx] = (byte) (v & 0xFF);
 						data[idx + 1] = (byte) ((v >> 8) & 0xFF);
 						data[idx + 2] = (byte) ((v >> 16) & 0xFF);
@@ -243,16 +246,31 @@ public class Fat {
 	public synchronized long allocNew() throws IOException {
 
 		int i;
-		for (i = 2; i < entries.length; i++) {
+		int entryIndex = -1;
+		
+		for (i = lastFreeCluster; i < entries.length; i++) {
 			if (isFreeCluster(entries[i])) {
-				entries[i] = eofMarker;
-				this.dirty = true;
-				return i;
-			} else {
-				//System.out.print("[" + entries[i] + "] ");
+				entryIndex=i;
+				break;
+			} 
+		}
+		if(entryIndex<0){	
+			for(i = 2; i < lastFreeCluster;i++){
+				if (isFreeCluster(entries[i])) {
+					entryIndex=i;
+					break;
+				} 			 
 			}
 		}
-		throw new IOException("FAT Full (" + entries.length + ", " + i + ")");
+		if(entryIndex < 0){
+			throw new IOException("FAT Full (" + entries.length + ", " + i + ")");
+		}
+		entries[entryIndex] = eofMarker;
+		lastFreeCluster = entryIndex+1;
+		this.dirty      = true;
+
+		return entryIndex;
+		
 	}
 
 	/**
@@ -381,7 +399,16 @@ public class Fat {
 	 * @return boolean
 	 */
 	protected boolean isEofCluster(long entry) {
-		return (entry >= eofMarker);
+		switch (bitSize) {
+			case 12 :
+				return (entry >=0xFF8); 
+			case 16 :
+				return ((entry >= 0xFFF8));  
+			case 32 :
+				return (entry >= 0xFFFFFFF8); 
+			default :
+				throw new IllegalArgumentException("Invalid bitSize " + bitSize);
+		}
 	}
 
 	protected void testCluster(long cluster) throws IllegalArgumentException {

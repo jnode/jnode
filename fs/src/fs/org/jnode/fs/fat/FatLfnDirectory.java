@@ -135,7 +135,7 @@ public class FatLfnDirectory extends FatDirectory {
 		}
 
 	}
-	private void updateLFN() {
+	private void updateLFN() throws IOException{
 		//System.out.println("Update LFN");
 		Iterator allEntries = shortNameIndex.values().iterator();
 		Vector destination = new Vector();
@@ -148,12 +148,28 @@ public class FatLfnDirectory extends FatDirectory {
 			}
 		}
 
-		int size = destination.size();
-
-		for (int i = 0; i < size; i++) {
-			entries.set(i, destination.get(i));
+		final int size = destination.size();
+		if(entries.size()<size){ 
+			if (!canChangeSize(size)) {
+				throw new IOException("Directory is full");
+			}
 		}
-		int entireSize = entries.size();
+		
+		boolean useAdd=false;
+		for (int i = 0; i < size; i++) {
+			if(!useAdd){
+				try{
+					entries.set(i, destination.get(i));
+				}catch(ArrayIndexOutOfBoundsException aEx){
+					useAdd=true;
+				}
+			}
+			if(useAdd){
+				entries.add(i, destination.get(i));
+			}
+		}
+		
+		final int entireSize = entries.size();
 		for (int i = size; i < entireSize; i++) {
 			entries.set(i, null); // remove stale entries
 		}
