@@ -57,7 +57,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener
   /**
    * My logger
    */
-  private final Logger log = Logger.getLogger(getClass());
+  private static final Logger log = Logger.getLogger(CommandShell.class);
 
   private PrintStream out;
 
