@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.tools.ant.Project;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.UnresolvedObjectRefException;
@@ -34,6 +34,7 @@ import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmClassLoader;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmMethodCode;
 import org.jnode.vm.classmgr.VmType;
@@ -60,7 +61,6 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 	private Set legalInstanceClasses;
 
 	protected static boolean debug = true;
-	protected final Logger log = Logger.getLogger(getClass());
 
 	protected static final Label bootHeapStart = new Label("$$bootHeapStart");
 	protected static final Label bootHeapEnd = new Label("$$bootHeapEnd");
@@ -194,11 +194,15 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			// Generate the listfile
 			printLabels(os, bootClasses);
 
+			// Generate debug info
 			for (int i = 0; i < cmps.length; i++) {
 				cmps[i].dumpStatistics();
 			}
+			final int bootHeapSize = os.getObjectRef(bootHeapEnd).getOffset() - os.getObjectRef(bootHeapStart).getOffset();
+			final int bootHeapBitmapSize = (bootHeapSize / ObjectLayout.OBJECT_ALIGN) >> 3;
+			log("Boot heap size " + (bootHeapSize >>> 10) + "K bitmap size " + (bootHeapBitmapSize >>> 10) + "K");
 
-			log.info("Done.");
+			log("Done.");
 		} catch (Throwable ex) {
 			ex.printStackTrace();
 			throw new BuildException(ex);
@@ -307,7 +311,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 	 * @throws BuildException
 	 */
 	private final void emitObjects(NativeStream os, VmArchitecture arch, Object skipMe) throws BuildException {
-		log.info("Emitting objects ");
+		log("Emitting objects", Project.MSG_DEBUG);
 		PrintWriter debugOut = null;
 		try {
 			if (debug) {
@@ -357,7 +361,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 				cnt += emitted;
 			}
 			final long end = System.currentTimeMillis();
-			log.info("Emitted " + cnt + " objects, took " + (end - start) + "ms in " + loops + " loops");
+			log("Emitted " + cnt + " objects, took " + (end - start) + "ms in " + loops + " loops");
 			if (debugOut != null) {
 				debugOut.close();
 				debugOut = null;
@@ -464,7 +468,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 	   */
 	protected void storeImage(NativeStream os) throws BuildException {
 		try {
-			log.info("Creating image");
+			log("Creating image");
 			FileOutputStream fos = new FileOutputStream(destFile);
 			fos.write(os.getBytes(), 0, os.getLength());
 			fos.close();
@@ -485,6 +489,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 		add(new BootClassInfo("java.lang.reflect", true, nonCore));
 		add(new BootClassInfo("java.lang.ref", true, nonCore));
 		add(new BootClassInfo("org.jnode.boot", true, nonCore));
+		add(new BootClassInfo("org.jnode.vm.MemoryBlockManager", core));
 		add(new BootClassInfo("org.jnode.vm.Monitor", core));
 		add(new BootClassInfo("org.jnode.vm.MonitorManager", core));
 		add(new BootClassInfo("org.jnode.vm", true, core));

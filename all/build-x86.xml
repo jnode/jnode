@@ -104,6 +104,7 @@
     <genconst destfile="${build.native.dir}/src/java.inc" 
               classesURL="file:///${jnode-core.jar}/">
       <!-- class classname="org.jnode.arch.x86.SoftByteCodes"/ -->
+      <class classname="org.jnode.boot.Main" static="on"/>
       <class classname="org.jnode.vm.classmgr.TIBLayout" static="on"/>
       <class classname="org.jnode.vm.classmgr.VmByteCode"/>
       <class classname="org.jnode.vm.classmgr.VmConstFieldRef"/>

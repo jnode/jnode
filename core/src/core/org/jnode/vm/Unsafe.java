@@ -859,6 +859,21 @@ public final class Unsafe {
 	public /*protected*/static native void die();
 
 	/**
+	 * Print the given string on the screen.
+	 */
+	public static native void debug(String str);
+
+	/**
+	 * Print the given value on the screen.
+	 */
+	public static native void debug(int value);
+
+	/**
+	 * Print the given value on the screen.
+	 */
+	public static native void debug(long value);
+
+	/**
 	 * Initialize the new Thread.
 	 * @param curThread
 	 * @param newStack
@@ -874,7 +889,7 @@ public final class Unsafe {
 	 * @param address
 	 * @param oldValue
 	 * @param newValue
-	 * @return boolean
+	 * @return boolean true if the value at address is changed, false otherwise.
 	 */
 	protected static native boolean atomicCompareAndSwap(Address address, int oldValue, int newValue);
 
