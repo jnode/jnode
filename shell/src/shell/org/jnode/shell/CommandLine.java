@@ -24,6 +24,8 @@ package org.jnode.shell;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.io.InputStream;
+import java.io.IOException;
 
 /**
  * This class represents the command line as an iterator.
@@ -45,9 +47,11 @@ public class CommandLine {
 	public static final char SEND_OUTPUT_TO_CHAR = '>';
 	public static final char COMMENT_CHAR = '#';
 
-	private final String s;
+	private String s;
 	private int pos = 0;
 	private int type = LITERAL;
+
+  private static final char linebreak = "\n".charAt(0);
 
 	//private boolean inEscape = false;
 	private boolean inFullEscape = false;
@@ -55,10 +59,8 @@ public class CommandLine {
 
   private String outFileName = null;
 
-	/**
-	* Creates a new instance.
-	*/
-	public CommandLine(String s)
+
+  private void setCommandLine(String s)
   {
     int send_to_file = s.indexOf(SEND_OUTPUT_TO_CHAR);
 
@@ -79,6 +81,14 @@ public class CommandLine {
     {
       this.s = s;
     }
+  }
+
+  /**
+	* Creates a new instance.
+	*/
+	public CommandLine(String s)
+  {
+    setCommandLine(s);
 	}
 
 	/**
@@ -88,6 +98,34 @@ public class CommandLine {
 	public CommandLine(String[] args) {
 		this(escape(args));
 	}
+
+  public CommandLine(InputStream in)
+  {
+    StringBuffer stringBuffer = new StringBuffer();
+
+    try
+    {
+      if (in.available() > 0)
+      {
+        int data = in.read();
+        char ch;
+        while (data>-1)
+        {
+          ch = (char)data;
+          if (ch != linebreak)
+            stringBuffer.append(ch);
+
+          data = in.read();
+        }
+      }
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+
+    setCommandLine(stringBuffer.toString());
+  }
 
 	/**
 	* Reset, so a call to nextToken will retreive the first token.
