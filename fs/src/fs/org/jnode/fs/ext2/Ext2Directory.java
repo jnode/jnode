@@ -73,11 +73,10 @@ public class Ext2Directory extends AbstractFSDirectory {
 			newEntry = new Ext2Entry(newINode, name, Ext2Constants.EXT2_FT_DIR, fs, this);
 			
 			//add "."
-			
 			Ext2Directory newDir = new Ext2Directory(newEntry);
 			Ext2DirectoryRecord drThis = new Ext2DirectoryRecord( fs, newINode.getINodeNr(), Ext2Constants.EXT2_FT_DIR, "." );
-			newDir.addDirectoryRecord( drThis );
 			newINode.setLinksCount( 2 );
+			newDir.addDirectoryRecord( drThis );
 						
 			//add ".."
 			long parentINodeNr = ((Ext2Directory)entry.getDirectory()).getINode().getINodeNr();
@@ -92,8 +91,7 @@ public class Ext2Directory extends AbstractFSDirectory {
 			int group = (int)( (newINode.getINodeNr()-1) / fs.getSuperblock().getINodesPerGroup()) ;
 			fs.modifyUsedDirsCount(group, 1);
 			
-			//update both affected directory inodes
-			iNode.update();
+			//update the new inode
 			newINode.update();
 		}catch(FileSystemException fse) {
 			throw new IOException(fse);
@@ -127,8 +125,6 @@ public class Ext2Directory extends AbstractFSDirectory {
 			
 			newINode.setLinksCount( newINode.getLinksCount()+1 );
 
-			// update the directory inode
-			iNode.update();
 		}catch(FileSystemException fse) {
 			throw new IOException(fse);
 		}
@@ -167,60 +163,87 @@ public class Ext2Directory extends AbstractFSDirectory {
 	}
 	
 	private void addDirectoryRecord(Ext2DirectoryRecord dr) throws IOException, FileSystemException{
-		Ext2File dir = new Ext2File(iNode);		//read itself as a file
-
+		//synchronize to the inode cache to make sure that the inode does not get
+		//flushed between reading it and locking it
+		synchronized(((Ext2FileSystem)getFileSystem()).getInodeCache()) {
+			//reread the inode before synchronizing to it to make sure
+			//all threads use the same instance
+			int iNodeNr = iNode.getINodeNr();
+			iNode = ((Ext2FileSystem)getFileSystem()).getINode(iNodeNr);
+			
+			//lock the inode into the cache so it is not flushed before synchronizing to it
+			//(otherwise a new instance of INode referring to the same inode could be put
+			//in the cache resulting in the possibility of two threads manipulating the same
+			//inode at the same time because they would synchronize to different INode instances)
+			iNode.incLocked();
+		}
 		//a single inode may be represented by more than one Ext2Directory instances, 
 		//but each will use the same instance of the underlying inode (see Ext2FileSystem.getINode()),
-		//so synchronize to the inode
-		synchronized(iNode) {	
-			//find the last directory record (if any)
-			Ext2FSEntryIterator iterator = new Ext2FSEntryIterator(iNode);
-			Ext2DirectoryRecord rec=null;
-			while(iterator.hasNext()) {
-				rec = iterator.nextDirectoryRecord();
-			}
-			
-			Ext2FileSystem fs = (Ext2FileSystem) getFileSystem();		
-			if(rec!=null) {
-				long lastPos = rec.getFileOffset(); 
-				long lastLen = rec.getRecLen();
-	
-				//truncate the last record to its minimal size (cut the padding from the end)
-				rec.truncateRecord();
-				
-				//directoryRecords may not extend over block boundaries:
-				//	see if the new record fits in the same block after truncating the last record
-				long remainingLength = fs.getBlockSize() - (lastPos%fs.getBlockSize()) - rec.getRecLen();
-				log.debug("LAST-1 record: begins at: "+lastPos+", length: "+lastLen);
-				log.debug("LAST-1 truncated length: "+rec.getRecLen());
-				log.debug("Remaining length: "+remainingLength);
-				if(remainingLength >= dr.getRecLen()) {			
-					//write back the last record truncated
-					dir.write( lastPos, rec.getData(), rec.getOffset(), rec.getRecLen() );
-		
-					//pad the end of the new record with zeroes
-					dr.expandRecord(lastPos+rec.getRecLen(), lastPos+rec.getRecLen()+remainingLength);
-					//append the new record at the end of the list
-					dir.write( lastPos+rec.getRecLen(), dr.getData(), dr.getOffset(), dr.getRecLen() );
-					log.debug("addDirectoryRecord(): LAST   record: begins at: "+
-							 (rec.getFileOffset()+rec.getRecLen())+", length: "+dr.getRecLen());
-				} else {
-					//the new record must go to the next block
-					//(the previously last record (rec) stays padded to the end of the block, so we can 
-					// append after that)
-					dr.expandRecord(lastPos+lastLen, lastPos+lastLen+fs.getBlockSize());
-					
-					dir.write( lastPos+lastLen, dr.getData(), dr.getOffset(), dr.getRecLen() );
-					log.debug("addDirectoryRecord(): LAST   record: begins at: "+(lastPos+lastLen)+", length: "+dr.getRecLen());	
+		//so synchronize to the inode.
+		synchronized(iNode) {
+			try{
+				Ext2File dir = new Ext2File(iNode);		//read itself as a file
+
+				//find the last directory record (if any)
+				Ext2FSEntryIterator iterator = new Ext2FSEntryIterator(iNode);
+				Ext2DirectoryRecord rec=null;
+				while(iterator.hasNext()) {
+					rec = iterator.nextDirectoryRecord();
 				}
-			} else {	//rec==null, ie. this is the first record in the directory
-				dr.expandRecord(0, fs.getBlockSize());
-				dir.write(0, dr.getData(), dr.getOffset(), dr.getRecLen());
-				log.debug("addDirectoryRecord(): LAST   record: begins at: 0, length: "+dr.getRecLen());				
-			}
+				
+				Ext2FileSystem fs = (Ext2FileSystem) getFileSystem();		
+				if(rec!=null) {
+					long lastPos = rec.getFileOffset(); 
+					long lastLen = rec.getRecLen();
+		
+					//truncate the last record to its minimal size (cut the padding from the end)
+					rec.truncateRecord();
+					
+					//directoryRecords may not extend over block boundaries:
+					//	see if the new record fits in the same block after truncating the last record
+					long remainingLength = fs.getBlockSize() - (lastPos%fs.getBlockSize()) - rec.getRecLen();
+					log.debug("LAST-1 record: begins at: "+lastPos+", length: "+lastLen);
+					log.debug("LAST-1 truncated length: "+rec.getRecLen());
+					log.debug("Remaining length: "+remainingLength);
+					if(remainingLength >= dr.getRecLen()) {			
+						//write back the last record truncated
+						dir.write( lastPos, rec.getData(), rec.getOffset(), rec.getRecLen() );
 			
-			//dir.flush();
-			iNode.setMtime(System.currentTimeMillis()/1000);
+						//pad the end of the new record with zeroes
+						dr.expandRecord(lastPos+rec.getRecLen(), lastPos+rec.getRecLen()+remainingLength);
+						//append the new record at the end of the list
+						dir.write( lastPos+rec.getRecLen(), dr.getData(), dr.getOffset(), dr.getRecLen() );
+						log.debug("addDirectoryRecord(): LAST   record: begins at: "+
+								 (rec.getFileOffset()+rec.getRecLen())+", length: "+dr.getRecLen());
+					} else {
+						//the new record must go to the next block
+						//(the previously last record (rec) stays padded to the end of the block, so we can 
+						// append after that)
+						dr.expandRecord(lastPos+lastLen, lastPos+lastLen+fs.getBlockSize());
+						
+						dir.write( lastPos+lastLen, dr.getData(), dr.getOffset(), dr.getRecLen() );
+						log.debug("addDirectoryRecord(): LAST   record: begins at: "+(lastPos+lastLen)+", length: "+dr.getRecLen());	
+					}
+				} else {	//rec==null, ie. this is the first record in the directory
+					dr.expandRecord(0, fs.getBlockSize());
+					dir.write(0, dr.getData(), dr.getOffset(), dr.getRecLen());
+					log.debug("addDirectoryRecord(): LAST   record: begins at: 0, length: "+dr.getRecLen());				
+				}
+				
+				//dir.flush();
+				iNode.setMtime(System.currentTimeMillis()/1000);
+				
+				// update the directory inode
+				iNode.update();
+				
+				//unlock the inode from the cache
+				iNode.decLocked();			
+				return;
+			}catch(Throwable t) {
+				//could not fininsh the operation, unlock the inode from the cache
+				iNode.decLocked();
+				throw new IOException(t);
+			}
 		}
 	}
 
@@ -258,16 +281,20 @@ public class Ext2Directory extends AbstractFSDirectory {
 		}
 		
 		public boolean hasNext() {
-			Ext2DirectoryRecord dr;
-			Ext2FileSystem fs = (Ext2FileSystem) getFileSystem();			
-			do {
-				if(index>=iNode.getSize())
-					return false;
-				
-				dr = new Ext2DirectoryRecord(fs, data, index, index);
-				index+=dr.getRecLen();	
-			} while(dr.getINodeNr()==0);			//inode nr=0 means the entry is unused
-
+			Ext2DirectoryRecord dr=null;
+			Ext2FileSystem fs = (Ext2FileSystem) getFileSystem();
+			try{
+				do {
+					if(index>=iNode.getSize())
+						return false;
+					
+					dr = new Ext2DirectoryRecord(fs, data, index, index);
+					index+=dr.getRecLen();	
+				} while(dr.getINodeNr()==0);			//inode nr=0 means the entry is unused
+			}catch(Exception e){
+				fs.handleFSError(e);
+				return false;
+			}
 			current = dr;
 			return true;
 		}

@@ -23,12 +23,22 @@ public class INode {
 	
 	private final Logger log = Logger.getLogger(getClass());
 
-	//the data constituting the inode itself
+	/**
+	 * the data constituting the inode itself
+	 */
 	private byte[] data;
 	
-	private boolean dirty;
+	private volatile boolean dirty;
 	
-	//nonpersistent data stored in memory only
+	/**
+	 * If an inode is locked, it may not be flushed from the cache
+	 * (locked counts the number of threads that have locked the inode)
+	 */
+	private volatile int locked;
+	
+	/**
+	 * nonpersistent data stored in memory only
+	 */
 	INodeDescriptor desc = null;
 	
 	private Ext2FileSystem fs;
@@ -42,6 +52,7 @@ public class INode {
 		this.fs = fs;
 		this.desc = desc;
 		this.data = new byte[INODE_LENGTH];
+		locked = 0;
 		log.setLevel(Level.INFO);
 	}
 	
@@ -73,7 +84,7 @@ public class INode {
 		log.setLevel(Level.DEBUG);
 	}
 	
-	protected long getINodeNr() {
+	protected int getINodeNr() {
 		return desc.getINodeNr();
 	}
 
@@ -814,5 +825,24 @@ public class INode {
 
 	public void setDirty(boolean b) {
 		dirty = b;
+	}
+
+	public synchronized boolean isLocked() {
+		return locked>0;
+	}
+	
+	public synchronized void incLocked() {
+		++locked;
+	}
+	
+	public synchronized void decLocked() {
+		--locked;
+		if(locked==0)
+			this.notifyAll();
+		if(locked<0) {
+			//What!??
+			locked = 0;
+			throw new RuntimeException("INode has been unlocked more than locked");
+		}			
 	}
 }
