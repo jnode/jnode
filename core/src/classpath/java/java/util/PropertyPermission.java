@@ -1,5 +1,5 @@
 /* PropertyPermission.java -- permission to get and set System properties
-   Copyright (C) 1999, 2000, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2000, 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,13 +38,13 @@ exception statement from your version. */
 
 package java.util;
 
-import java.security.Permission;
-import java.security.BasicPermission;
-import java.security.PermissionCollection;
-import java.io.ObjectStreamField;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.IOException;
+import java.io.ObjectStreamField;
+import java.security.BasicPermission;
+import java.security.Permission;
+import java.security.PermissionCollection;
 
 /**
  * This class represents the permission to access and modify a property.<br>
@@ -121,7 +121,7 @@ public final class PropertyPermission extends BasicPermission
     super(name);
     if (actions == null)
       throw new IllegalArgumentException();
-    setActions(actions.toLowerCase());
+    setActions(actions);
   }
 
   /**
@@ -134,14 +134,37 @@ public final class PropertyPermission extends BasicPermission
    */
   private void setActions(String str)
   {
+    // Initialising the class java.util.Locale ...
+    //    tries to initialise the Locale.defaultLocale static
+    //    which calls System.getProperty, 
+    //    which calls SecurityManager.checkPropertiesAccess,
+    //    which creates a PropertyPermission with action "read,write",
+    //    which calls setActions("read,write").
+    // If we now were to call toLowerCase on 'str',
+    //    this would call Locale.getDefault() which returns null
+    //       because Locale.defaultLocale hasn't been set yet
+    //    then toLowerCase will fail with a null pointer exception.
+    // 
+    // The solution is to take a punt on 'str' being lower case, and
+    // test accordingly.  If that fails, we convert 'str' to lower case 
+    // and try the tests again.
     if ("read".equals(str))
       actions = READ;
     else if ("write".equals(str))
       actions = WRITE;
     else if ("read,write".equals(str) || "write,read".equals(str))
       actions = READ | WRITE;
+    else {
+      String lstr = str.toLowerCase();
+      if ("read".equals(lstr))
+	actions = READ;
+      else if ("write".equals(lstr))
+	actions = WRITE;
+      else if ("read,write".equals(lstr) || "write,read".equals(lstr))
+	actions = READ | WRITE;
     else
       throw new IllegalArgumentException("illegal action " + str);
+    }
   }
 
   /**

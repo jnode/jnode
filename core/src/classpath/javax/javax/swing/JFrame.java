@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing;
 
 import java.awt.AWTEvent;
@@ -47,8 +48,8 @@ import java.awt.Graphics;
 import java.awt.LayoutManager;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
-import javax.accessibility.AccessibleContext;
 
+import javax.accessibility.AccessibleContext;
 
 /**
  * Unlike JComponent derivatives, JFrame inherits from
@@ -60,7 +61,7 @@ public class JFrame extends Frame
   implements WindowConstants, RootPaneContainer
 {
   private static final long serialVersionUID = -3362141868504252139L;
-  private static boolean defaultLookAndFeelDecorated = false;    
+  private static boolean defaultLookAndFeelDecorated;
   private int close_action = HIDE_ON_CLOSE;
   protected AccessibleContext accessibleContext;
   protected JRootPane rootPane;

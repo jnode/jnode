@@ -1,5 +1,5 @@
 /* Charset.java -- 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,7 +35,10 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.nio.charset;
+
+import gnu.java.nio.charset.Provider;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -47,7 +50,6 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import gnu.java.nio.charset.Provider;
 
 /**
  * @author Jesse Rosenstock
@@ -154,7 +156,7 @@ public abstract class Charset implements Comparable
 	// XXX: we need to support multiple providers, reading them from
 	// java.nio.charset.spi.CharsetProvider in the resource directory
 	// META-INF/services
-  private static final CharsetProvider provider ()
+  private static CharsetProvider provider ()
   {
     return Provider.provider ();
 	}
