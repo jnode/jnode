@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/awt"/>
+	<classpathentry kind="src" path="src/textgui"/>
 	<classpathentry kind="src" path="src/driver"/>
 	<classpathentry kind="src" path="src/wt"/>
 	<classpathentry kind="src" path="src/test"/>
