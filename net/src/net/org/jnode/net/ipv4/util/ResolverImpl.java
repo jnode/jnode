@@ -98,7 +98,6 @@ public class ResolverImpl implements Resolver
         {
           String[] server = new String[]{_dnsserver.toString()};
           resolver = new ExtendedResolver(server);
-          System.out.println(resolver.getResolvers().length);
 
           Lookup.setDefaultResolver(resolver);
 
