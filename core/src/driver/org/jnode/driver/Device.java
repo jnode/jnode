@@ -127,10 +127,10 @@ public class Device implements ResourceOwner {
 			onStartDevice();
 			// Let the driver start me
 			driver.startDevice();
-			// Notify my listeners
-			fireStartedEvent();
 			// I'm started
 			started = true;
+			// Notify my listeners
+			fireStartedEvent();
 		}
 	}
 
