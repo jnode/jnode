@@ -10,6 +10,7 @@ import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.memmgr.*;
 
 /**
  * <description>

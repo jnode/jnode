@@ -12,6 +12,7 @@ import org.jnode.vm.classmgr.VmConstMethodRef;
 import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.memmgr.*;
 
 /**
  * Class with software implementations of "difficult" java bytecodes.

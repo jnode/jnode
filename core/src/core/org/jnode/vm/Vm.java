@@ -5,6 +5,7 @@ package org.jnode.vm;
 
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.compiler.HotMethodManager;
+import org.jnode.vm.memmgr.*;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -19,8 +20,6 @@ public class Vm extends VmSystemObject {
 	private final VmArchitecture arch;
 	/** The heap manager */
 	private final VmHeapManager heapManager;
-	/** The boot heap */
-	private final VmBootHeap bootHeap;
 	/** The hot method manager */
 	private HotMethodManager hotMethodManager;
 
@@ -34,7 +33,6 @@ public class Vm extends VmSystemObject {
 		this.bootstrap = true;
 		this.arch = arch;
 		this.heapManager = heapManager;
-		this.bootHeap = new VmBootHeap();
 	}
 
 	/**
@@ -58,13 +56,6 @@ public class Vm extends VmSystemObject {
 		return instance;
 	}
 
-	/**
-	 * @return Returns the bootHeap.
-	 */
-	public final VmBootHeap getBootHeap() {
-		return this.bootHeap;
-	}
-	
 	/**
 	 * @return Returns the heapManager.
 	 */

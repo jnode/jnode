@@ -52,7 +52,8 @@ public final class MemoryBlockManager extends VmSystemObject implements Uninterr
 				Unsafe.debug("ret null."); Unsafe.debug(blockSize);
 				Unsafe.debug("allocated blocks"); Unsafe.debug(allocatedBlocks);
 				Unsafe.debug("total blocks"); Unsafe.debug(blockCount);
-				//Unsafe.die();
+				Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
+				Unsafe.die();
 				return null;
 			}
 			// Mark all blocks as in use
@@ -97,7 +98,7 @@ public final class MemoryBlockManager extends VmSystemObject implements Uninterr
 	 * Gets the size of non-allocated memory blocks.
 	 * @return The free size in bytes
 	 */
-	static long getFreeMemory() {
+	public static long getFreeMemory() {
 		return (blockCount - allocatedBlocks) << BLOCK_SIZE_SHIFT;
 	}
 

@@ -11,6 +11,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
+import org.jnode.driver.DeviceException;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
 
@@ -29,6 +30,7 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 
 	/**
 	 * Add a pointer listener
+	 * 
 	 * @param l
 	 */
 	public void addPointerListener(PointerListener l) {
@@ -37,6 +39,7 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 
 	/**
 	 * Remove a pointer listener
+	 * 
 	 * @param l
 	 */
 	public void removePointerListener(PointerListener l) {
@@ -47,9 +50,10 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 	 * Start the pointer device.
 	 */
 	protected synchronized void startDevice() throws DriverException {
+		final Device dev = getDevice();
+		log.info("Starting " + dev.getId());
 		channel = getChannel();
 		interpreter = createInterpreter();
-		final Device dev = getDevice();
 
 		// start the deamon anyway, so we can register a mouse later
 		daemon = new PointerDaemon(dev.getId() + "-daemon");
@@ -58,7 +62,12 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 	}
 
 	protected PointerInterpreter createInterpreter() {
-		initPointer(); // bring mouse into stable state
+		try {
+			initPointer(); // bring mouse into stable state
+		} catch (DeviceException ex) {
+			log.error("Cannot initialize pointer", ex);
+			return null;
+		}
 
 		PointerInterpreter i = new MouseInterpreter();
 		if (i.probe(this)) {
@@ -91,6 +100,7 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 
 	/**
 	 * Dispatch a given pointer event to all known listeners.
+	 * 
 	 * @param event
 	 */
 	protected void dispatchEvent(PointerEvent event) {
@@ -104,15 +114,14 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 	}
 
 	/**
-	 * PointerDaemon that translates scancodes to MouseEvents and dispatches
-	 * those events.
+	 * PointerDaemon that translates scancodes to MouseEvents and dispatches those events.
 	 */
 	class PointerDaemon extends Thread {
 
 		public PointerDaemon(String name) {
 			super(name);
 		}
-		
+
 		public void run() {
 			while ((channel != null) && channel.isOpen()) {
 				try {
@@ -144,7 +153,9 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 
 	/**
 	 * Sets the Interpreter.
-	 * @param interpreter the Interpreter
+	 * 
+	 * @param interpreter
+	 *            the Interpreter
 	 */
 	public void setPointerInterpreter(PointerInterpreter interpreter) {
 		if (interpreter == null)
@@ -153,15 +164,15 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 	}
 
 	/**
-	 * Gets the byte channel.
-	 * This is implementation specific
+	 * Gets the byte channel. This is implementation specific
+	 * 
 	 * @return The byte channel
 	 */
 	protected abstract ByteChannel getChannel();
 	protected abstract int getPointerId() throws DriverException;
-	protected abstract boolean initPointer();
-	protected abstract boolean enablePointer();
-	protected abstract boolean disablePointer();
-	protected abstract boolean setRate(int samples);
+	protected abstract boolean initPointer() throws DeviceException;
+	protected abstract boolean enablePointer() throws DeviceException;
+	protected abstract boolean disablePointer() throws DeviceException;
+	protected abstract boolean setRate(int samples) throws DeviceException;
 
 }
