@@ -38,7 +38,7 @@
     <plugin id="org.jnode.driver.pnp"/>
     <plugin id="org.jnode.driver.ps2"/>
     <plugin id="org.jnode.driver.scsi"/>
-    <plugin id="org.jnode.driver.scsi.mmc"/>
+    <plugin id="org.jnode.driver.scsi.cdrom"/>
     <plugin id="org.jnode.driver.serial"/>
     <plugin id="org.jnode.driver.usb"/>
     <plugin id="org.jnode.driver.usb.hub"/>
@@ -47,10 +47,10 @@
     <plugin id="org.jnode.driver.usb.uhci"/>
 
     <plugin id="org.jnode.fs"/>
-    <plugin id="org.jnode.fs.fat"/>
     <plugin id="org.jnode.fs.ext2"/>
-    <plugin id="org.jnode.fs.ntfs"/>
+    <plugin id="org.jnode.fs.fat"/>
     <plugin id="org.jnode.fs.iso9660"/>
+    <plugin id="org.jnode.fs.ntfs"/>
     <plugin id="org.jnode.fs.partitions.ibm"/>
     <plugin id="org.jnode.fs.service"/>
     <plugin id="org.jnode.fs.initrd"/>
