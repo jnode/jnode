@@ -152,4 +152,12 @@ public class PcTextScreen extends AbstractPcTextScreen implements TextScreen {
     public void sync() {
         // Nothing to do here
     }
+
+    public void setCursor( int x, int y ) {
+        instance.setCursor( x,y);
+    }
+
+    public void setCursorVisible( boolean visible ) {
+        instance.setCursorVisible( visible );
+    }
 }

@@ -45,7 +45,7 @@ class TextScreenConsole extends AbstractConsole implements TextConsole {
 
 	private PrintStream savedErr;
 
-	private boolean cursorVisible = false;
+	private boolean cursorVisible = true;
 
 	private final boolean claimSystemOutErrIn;
 
@@ -215,6 +215,7 @@ class TextScreenConsole extends AbstractConsole implements TextConsole {
 	public void setCursor(int x, int y) {
 		this.curX = x;
 		this.curY = y;
+        screen.setCursor(x,y);
 		syncScreen();
 	}
 
@@ -262,6 +263,7 @@ class TextScreenConsole extends AbstractConsole implements TextConsole {
 	 */
 	public void setCursorVisible(boolean visible) {
 		this.cursorVisible = visible;
+        screen.setCursorVisible(visible);
 		syncScreen();
 	}
 

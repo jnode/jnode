@@ -13,9 +13,16 @@ public class PcBufferTextScreen extends AbstractPcTextScreen implements TextScre
 
     /** My parent */
     private final AbstractPcTextScreen parent;
-    
+
     /** Actual content buffer */
     private final char[] buffer;
+
+    /** Temporary buffer that includes the cursor.  This goes to the video device.
+     * Slower, but more likely to be correct than a temporary pointer to the last character
+     * the cursor was over, as in previous versions.*/
+    private final char[]screenBuffer;
+    private int cursorIndex=0;
+    private boolean cursorVisible=true;
 
     /**
      * Initialize this instance.
@@ -25,30 +32,31 @@ public class PcBufferTextScreen extends AbstractPcTextScreen implements TextScre
     public PcBufferTextScreen(int width, int height, AbstractPcTextScreen parent) {
         super(width, height);
         this.buffer = new char[width * height];
+        this.screenBuffer=new char[buffer.length];
         this.parent = parent;
     }
-    
+
     /**
      * @see org.jnode.driver.textscreen.TextScreen#copyContent(int, int, int)
      */
     public void copyContent(int srcOffset, int destOffset, int length) {
         System.arraycopy(buffer, srcOffset, buffer, destOffset, length);
     }
-    
+
     /**
      * @see org.jnode.driver.textscreen.TextScreen#getChar(int)
      */
     public char getChar(int offset) {
         return (char)(buffer[offset] & 0xFF);
     }
-    
+
     /**
      * @see org.jnode.driver.textscreen.TextScreen#getColor(int)
      */
     public int getColor(int offset) {
         return (char)((buffer[offset] >> 8) & 0xFF);
     }
-    
+
     /**
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char, int, int)
      */
@@ -58,7 +66,7 @@ public class PcBufferTextScreen extends AbstractPcTextScreen implements TextScre
             buffer[offset+i] = v;
         }
     }
-    
+
     /**
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int, int)
      */
@@ -69,7 +77,7 @@ public class PcBufferTextScreen extends AbstractPcTextScreen implements TextScre
             buffer[offset+i] = v;
         }
     }
-    
+
     /**
      * @see org.jnode.driver.textscreen.TextScreen#set(int, char[], int, int, int[], int)
      */
@@ -87,14 +95,23 @@ public class PcBufferTextScreen extends AbstractPcTextScreen implements TextScre
      * compatible.
      * @param dst
      */
-    public void copyTo(TextScreen dst) {
-        if (dst instanceof AbstractPcTextScreen) {
-            ((AbstractPcTextScreen)dst).copyFrom(buffer, getTopOffset());
-        } else {
-            throw new IllegalArgumentException("Unknown destionation type " + dst.getClass().getName());
+    public void copyTo( TextScreen dst ) {
+        if( dst instanceof AbstractPcTextScreen ) {
+            char[] toScreen = buffer;
+            if( cursorVisible&&cursorIndex<buffer.length&&cursorIndex>=0 ) {
+                System.arraycopy( buffer, 0, screenBuffer, 0, buffer.length );
+                char origValue = buffer[cursorIndex];
+                origValue |= 0x7000;//from december 2003 jnode code.
+                screenBuffer[cursorIndex] = origValue;
+                toScreen = screenBuffer;
+            }
+            ( (AbstractPcTextScreen)dst ).copyFrom( toScreen, getTopOffset() );
+        }
+        else {
+            throw new IllegalArgumentException( "Unknown destination type " + dst.getClass().getName() );
         }
     }
-    
+
     /**
      * Return the offset in the buffer of the first visible row.
      * @return
@@ -121,7 +138,15 @@ public class PcBufferTextScreen extends AbstractPcTextScreen implements TextScre
     public void sync() {
         copyTo(parent);
     }
-    
+
+    public void setCursor( int x, int y ) {
+        this.cursorIndex=getOffset( x,y);
+    }
+
+    public void setCursorVisible( boolean visible ) {
+        this.cursorVisible=visible;
+    }
+
     /**
      * @return Returns the parent.
      */

@@ -118,5 +118,9 @@ public interface TextScreen {
      * Ensure that the given row is visible.
      * @param row
      */
-    public void ensureVisible(int row);    
+    public void ensureVisible(int row);
+
+    void setCursor( int x, int y );
+
+    void setCursorVisible( boolean visible );
 }
