@@ -28,7 +28,8 @@
 	       debug="on"
 	       optimize="on"
            compiler="modern"
-	       includeJavaRuntime="false">
+	       includeJavaRuntime="false"
+    	target="${java.target}" source="${java.source}">
 	  <bootclasspath path="${jnode-core.jar}"/>
 	  <src path="${my-src.dir}/apps"/>
 	  <src path="${my-src.dir}/install"/>

@@ -64,7 +64,7 @@ public final class VmX86Architecture extends VmArchitecture {
 	 * @param compiler L1a to use L1A compiler, L1 compiler otherwise.
 	 */
 	public VmX86Architecture(String compiler) {
-		final boolean useL1A = ((compiler != null) && compiler.equalsIgnoreCase("L1A"));
+		final boolean useL1A = ((compiler == null) || compiler.equalsIgnoreCase("L1A") || compiler.equalsIgnoreCase("default"));
 		imtCompiler = new X86IMTCompiler();
 		compilers = new NativeCodeCompiler[2];
 		compilers[0] = new X86StubCompiler();

@@ -61,6 +61,7 @@ public class X86Level1ACompiler extends AbstractX86Compiler {
 
     /** Should this compiler try to inline methods? */
     private final boolean inlineMethods = true;
+    private final MagicHelper magicHelper = new MagicHelper();
 
     /**
      * Initialize this instance.
@@ -81,7 +82,7 @@ public class X86Level1ACompiler extends AbstractX86Compiler {
     protected CompilerBytecodeVisitor createBytecodeVisitor(VmMethod method,
             CompiledMethod cm, NativeStream os, int level, boolean isBootstrap) {
         final InlineBytecodeVisitor cbv;
-        cbv = new X86BytecodeVisitor(os, cm, isBootstrap, getContext());
+        cbv = new X86BytecodeVisitor(os, cm, isBootstrap, getContext(), magicHelper);
         if (inlineMethods) {
             final VmClassLoader loader = method.getDeclaringClass().getLoader();
             return new InliningBytecodeVisitor(cbv, loader);

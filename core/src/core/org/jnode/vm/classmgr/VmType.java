@@ -4,6 +4,8 @@
 
 package org.jnode.vm.classmgr;
 
+import gnu.java.lang.VMClassHelper;
+
 import java.lang.reflect.InvocationTargetException;
 import java.security.ProtectionDomain;
 import java.util.Arrays;
@@ -195,7 +197,18 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 		if (name.indexOf('/') >= 0) {
 			throw new IllegalArgumentException("name contains '/'");
 		}
-
+		
+		final String pkg = VMClassHelper.getPackagePortion(name);
+		if (pkg.equals("org.vmmagic.unboxed")) {
+		    final String cname = VMClassHelper.getClassNamePortion(name);
+		    if (cname.equals("Address") || cname.equals("AddressArray") ||
+		            cname.equals("Extent") || cname.equals("ExtentArray") ||
+		            cname.equals("Offset") || cname.equals("OffsetArray") ||
+		            cname.equals("Word") || cname.equals("WordArray")) {
+		        accessFlags |= Modifier.ACC_MAGIC;
+		    }		 
+		}
+		
 		this.name = name;
 		this.superClass = superClass;
 		this.superClassName = superClassName;
@@ -787,6 +800,15 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 */
 	public final boolean isAbstract() {
 		return Modifier.isAbstract(modifiers);
+	}
+
+	/**
+	 * Is this type a magic type.
+	 * 
+	 * @return boolean
+	 */
+	public final boolean isMagicType() {
+		return Modifier.isMagic(modifiers);
 	}
 
 	/**

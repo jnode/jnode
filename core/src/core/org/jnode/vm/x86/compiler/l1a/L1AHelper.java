@@ -136,4 +136,17 @@ final class L1AHelper {
 		pool.transferOwnerTo(reg, result);
 		return result;
 	}
+
+	/**
+	 * Request specific one register for a 4-byte item.
+	 */
+	static final WordItem requestWordRegister(EmitterContext eContext,
+			int jvmType, Register reg) {
+		final X86RegisterPool pool = eContext.getPool();
+		final ItemFactory ifac = eContext.getItemFactory();
+		pool.request(reg);
+		final WordItem result = ifac.createReg(jvmType, reg);
+		pool.transferOwnerTo(reg, result);
+		return result;
+	}
 }
