@@ -48,13 +48,16 @@ import java.util.ResourceBundle;
 
 /**
  * This class is a container for the symbols used by 
- * <code>DecimalFormat</code> to format numbers and currency.  These are
+ * <code>DecimalFormat</code> to format numbers and currency
+ * for a particular locale.  These are
  * normally handled automatically, but an application can override
  * values as desired using this class.
  *
- * @author Tom Tromey <tromey@cygnus.com>
+ * @author Tom Tromey (tromey@cygnus.com)
  * @author Aaron M. Renn (arenn@urbanophile.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @date February 24, 1999
+ * @see java.text.DecimalFormat
  */
 /* Written using "Java Class Libraries", 2nd edition, plus online
  * API docs for JDK 1.2 from http://www.javasoft.com.
@@ -83,6 +86,14 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
     this (Locale.getDefault());
   }
 
+  /**
+   * Retrieves a valid string, either using the supplied resource
+   * bundle or the default value.
+   *
+   * @param bundle the resource bundle to use to find the string.
+   * @param name key for the string in the resource bundle.
+   * @param def default value for the string.
+   */
   private String safeGetString(ResourceBundle bundle,
 				      String name, String def)
   {
@@ -123,6 +134,7 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
    * <code>DecimalFormatSymbols</code> for the specified locale.
    *
    * @param locale The local to load symbols for.
+   * @throws NullPointerException if the locale is null.
    */
   public DecimalFormatSymbols (Locale loc)
   {
@@ -136,14 +148,12 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
       {
 	res = null;
       }
-    currencySymbol = safeGetString (res, "currencySymbol", "$");
+    setCurrency(Currency.getInstance(loc));
     decimalSeparator = safeGetChar (res, "decimalSeparator", '.');
     digit = safeGetChar (res, "digit", '#');
     exponential = safeGetChar (res, "exponential", 'E');
     groupingSeparator = safeGetChar (res, "groupingSeparator", ',');
     infinity = safeGetString (res, "infinity", "\u221e");
-    // FIXME: default?
-    intlCurrencySymbol = safeGetString (res, "intlCurrencySymbol", "$");
     try
       {
 	monetarySeparator = safeGetChar (res, "monetarySeparator", '.');
@@ -198,14 +208,15 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
 
   /**
    * Returns the currency corresponding to the currency symbol stored
-   * in the instance of <code>DecimalFormatSymbols</code>.
+   * in this instance of <code>DecimalFormatSymbols</code>.
    *
-   * @return A new instance of <code>Currency</code> if
-   * the currency code matches a known one.
+   * @return An instance of <code>Currency</code> which matches
+   *         the currency used, or null if there is no corresponding
+   *         instance.
    */
   public Currency getCurrency ()
   {
-    return Currency.getInstance (currencySymbol);
+    return currency;
   }
 
   /**
@@ -241,7 +252,13 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
     return digit;
   }
 
-  // This is our own extension.
+  /**
+   * This method returns the character used to represent the exponential
+   * format.  This is a GNU Classpath extension.
+   *
+   * @return the character used to represent an exponential in a format
+   *         pattern string.
+   */
   char getExponential ()
   {
     return exponential;
@@ -270,10 +287,10 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
   }
 
   /**
-   * This method returns the currency symbol in international format.  For
-   * example, "C$" for Canadian dollars.
+   * This method returns the ISO 4217 currency code for
+   * the currency used.
    *
-   * @return The currency symbol in international format.
+   * @return the ISO 4217 currency code.
    */
   public String getInternationalCurrencySymbol ()
   {
@@ -368,13 +385,17 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
   }
 
   /**
-   * This method sets the currency to the specified value.
+   * This method sets the currency symbol and ISO 4217 currency
+   * code to the values obtained from the supplied currency.
    *
-   * @param currency The new currency
+   * @param currency the currency from which to obtain the values.
+   * @throws NullPointerException if the currency is null.
    */
   public void setCurrency (Currency currency)
   {
-    setCurrencySymbol (currency.getSymbol());
+    this.currency = currency;
+    intlCurrencySymbol = currency.getCurrencyCode();
+    currencySymbol = currency.getSymbol();
   }
 
   /**
@@ -408,7 +429,12 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
     this.digit = digit;
   }
 
-  // This is our own extension.
+  /**
+   * This method sets the exponential character used in the format string to
+   * the specified value.  This is a GNU Classpath extension.
+   *
+   * @param exp the character used for the exponential in a format pattern.
+   */
   void setExponential (char exp)
   {
     exponential = exp;
@@ -435,14 +461,31 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
   }
 
   /**
-   * This method sets the international currency symbols to the
-   * specified value. 
+   * This method sets the international currency symbol to the
+   * specified value. If a valid <code>Currency</code> instance
+   * exists for the international currency code, then this is
+   * used for the currency attribute, and the currency symbol
+   * is set to the corresponding value from this instance.
+   * Otherwise, the currency attribute is set to null and the
+   * symbol is left unmodified. 
    *
-   * @param intlCurrencySymbol The new international currency symbol.
+   * @param currencyCode The new international currency symbol.
    */
-  public void setInternationalCurrencySymbol (String currency)
+  public void setInternationalCurrencySymbol (String currencyCode)
   {
-    intlCurrencySymbol = currency;
+    intlCurrencySymbol = currencyCode;
+    try
+      {
+	currency = Currency.getInstance(currencyCode);
+      }
+    catch (IllegalArgumentException exception)
+      {
+	currency = null;
+      }
+    if (currency != null)
+      {
+        setCurrencySymbol(currency.getSymbol(locale));
+      }
   }
 
   /**
@@ -595,6 +638,16 @@ public final class DecimalFormatSymbols implements Cloneable, Serializable
    */
   private Locale locale;
  
+  /**
+   * The currency used for the symbols in this instance.
+   * This is stored temporarily for efficiency reasons,
+   * as well as to ensure that the correct instance
+   * is restored from the currency code.
+   *
+   * @serial Ignored.
+   */
+  private transient Currency currency;
+
   private static final long serialVersionUID = 5772796243397350300L;
 
   private void readObject(ObjectInputStream stream)

@@ -1,5 +1,5 @@
 /* Book.java -- A mixed group of pages to print.
-   Copyright (C) 1999 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -48,48 +48,34 @@ import java.util.Vector;
   */
 public class Book implements Pageable
 {
-
-/*
-	 * Instance Variables
+  /**
+   * Painter objects for the book.
 	 */
+  Vector printables = new Vector();
 
-// Painter objects for the book
-Vector printables = new Vector();
-
-// Page formats for the book
-Vector page_formats = new Vector();
-
-/*************************************************************************/
-
-/*
-	 * Constructors
+  /**
+   * Page formats for the book.
 	 */
+  Vector page_formats = new Vector();
 
-/** 
+  /**
 	  * Initializes a new instance of <code>Book</code> that is empty.
 	  */
-public
-Book()
-{
-  ;
-}
+  public Book()
+  {
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * Returns the number of pages in this book.
 	  *
 	  * @return The number of pages in this book.
 	  */
-public int
-getNumberOfPages()
-{
-  return(printables.size());
-}
+  public int getNumberOfPages()
+  {
+    return printables.size();
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * This method returns the <code>PageFormat</code> object for the
 	  * specified page.
 	  *
@@ -100,15 +86,12 @@ getNumberOfPages()
 	  *
 	  * @exception IndexOutOfBoundsException If the page number is not valid.
 	  */
-public PageFormat
-getPageFormat(int page_number)
-{
-  return((PageFormat)page_formats.elementAt(page_number));
-}
+  public PageFormat getPageFormat(int page_number)
+  {
+    return (PageFormat) page_formats.elementAt(page_number);
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * This method returns the <code>Printable</code> object for the
 	  * specified page.
 	  *
@@ -119,15 +102,12 @@ getPageFormat(int page_number)
 	  *
 	  * @exception IndexOutOfBoundsException If the page number is not valid.
 	  */
-public Printable
-getPrintable(int page_number)
-{
-  return((Printable)printables.elementAt(page_number));
-}
+  public Printable getPrintable(int page_number)
+  {
+    return (Printable) printables.elementAt(page_number);
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * This method appends a page to the end of the book.
 	  *
 	  * @param printable The <code>Printable</code> for this page.
@@ -135,15 +115,12 @@ getPrintable(int page_number)
 	  *
 	  * @exception NullPointerException If either argument is <code>null</code>.
 	  */
-public void
-append(Printable printable, PageFormat page_format)
-{
+  public void append(Printable printable, PageFormat page_format)
+  {
 		append(printable, page_format, 1);
-} 
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * This method appends the specified number of pages to the end of the book.
 	  * Each one will be associated with the specified <code>Printable</code>
 	  * and <code>PageFormat</code>.
@@ -154,19 +131,16 @@ append(Printable printable, PageFormat page_format)
 	  *
 	  * @exception NullPointerException If any argument is <code>null</code>.
 	  */
-public void
-append(Printable printable, PageFormat page_format, int num_pages)
-{
+  public void append(Printable printable, PageFormat page_format, int num_pages)
+  {
   for (int i = 0; i < num_pages; i++)
     {
       printables.addElement(printable);
 			page_formats.addElement(page_format);
 		}
-}
+  }
 
-/*************************************************************************/
-
-/**
+  /**
 	  * This method changes the <code>Printable</code> and <code>PageFormat</code>
 	  * for the specified page.  The page must already exist or an exception
 	  * will be thrown.
@@ -177,10 +151,9 @@ append(Printable printable, PageFormat page_format, int num_pages)
 	  *
   * @throws IndexOutOfBoundsException If the specified page does not exist.
 	  */
-public void
-setPage(int page_num, Printable printable, PageFormat page_format)
-{
+  public void setPage(int page_num, Printable printable, PageFormat page_format)
+  {
 		printables.setElementAt(printable, page_num);
 		page_formats.setElementAt(page_format, page_num);
-}
+  }
 }

@@ -42,7 +42,8 @@ import gnu.classpath.RawData;
 
 abstract class DirectByteBufferImpl extends ByteBuffer
 {
-  /** The owner is used to keep alive the object that actually owns the
+  /**
+   * The owner is used to keep alive the object that actually owns the
     * memory. There are three possibilities:
     *  1) owner == this: We allocated the memory and we should free it,
     *                    but *only* in finalize (if we've been sliced
@@ -55,9 +56,10 @@ abstract class DirectByteBufferImpl extends ByteBuffer
     *                                 memory and should free it.
     */
   private final Object owner;
+  
   final RawData address;
 
-  final static class ReadOnly extends DirectByteBufferImpl
+  static final class ReadOnly extends DirectByteBufferImpl
   {
     ReadOnly(Object owner, RawData address,
 	     int capacity, int limit,
@@ -82,7 +84,7 @@ abstract class DirectByteBufferImpl extends ByteBuffer
     }
   }
 
-  final static class ReadWrite extends DirectByteBufferImpl
+  static final class ReadWrite extends DirectByteBufferImpl
   {
     ReadWrite(int capacity)
   {
@@ -186,12 +188,19 @@ abstract class DirectByteBufferImpl extends ByteBuffer
   
   public ByteBuffer compact()
   {
+    checkIfReadOnly();
+    mark = -1;
     int pos = position();
     if (pos > 0)
       {
 	int count = remaining();
 	VMDirectByteBuffer.shiftDown(address, 0, pos, count);
 	position(count);
+	limit(capacity());
+      }
+    else
+      {
+	position(limit());
 	limit(capacity());
       }
     return this;

@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.ByteOrder;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -208,9 +209,8 @@ public final class VmSystem {
 
 	public static void insertSystemProperties(Properties res) {
 
-		final String arch;
 		final Vm vm = Vm.getVm();
-		arch = vm.getArch().getName();
+		final VmArchitecture arch = vm.getArch();
 
 		// Java properties
 		res.put("java.version", "1.1.0");
@@ -230,7 +230,7 @@ public final class VmSystem {
 		res.put("java.compiler", "Internal");
 		res.put("java.ext.dirs", "");
 		res.put("os.name", "JNode");
-		res.put("os.arch", arch);
+		res.put("os.arch", arch.getName());
 		res.put("os.version", vm.getVersion());
 		res.put("file.separator", "/");
 		res.put("path.separator", ":");
@@ -243,6 +243,7 @@ public final class VmSystem {
 		res.put("log4j.defaultInitOverride", "true");
 
 		// GNU properties
+		res.put("gnu.cpu.endian", (arch.getByteOrder() == ByteOrder.BIG_ENDIAN) ? "big" : "little");
 		res.put("gnu.java.io.encoding_scheme_alias.US-ASCII", "ISO8859-1");
 		res.put("gnu.java.io.encoding_scheme_alias.UTF-16LE", "UTF16LE");
 		res.put("gnu.java.io.encoding_scheme_alias.UTF-16BE", "UTF16BE");
