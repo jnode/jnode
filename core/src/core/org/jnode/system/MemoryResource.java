@@ -3,7 +3,9 @@
  */
 package org.jnode.system;
 
-import org.jnode.vm.VmAddress;
+import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Extent;
+import org.vmmagic.unboxed.Offset;
 
 
 /**
@@ -511,13 +513,13 @@ public interface MemoryResource extends Resource {
 	 * Returns the size of this buffer in bytes.
 	 * @return int
 	 */
-	public abstract long getSize();
+	public abstract Extent getSize();
 	
 	/**
 	 * Gets the address of the first byte of this buffer 
 	 * @return The address of the first byte of this buffer
 	 */
-	public abstract VmAddress getAddress();
+	public abstract Address getAddress();
 	
 	/**
 	 * Get a memory resource for a portion of this memory resources.
@@ -531,7 +533,22 @@ public interface MemoryResource extends Resource {
 	 * @param align Align of this boundary. Align must be a multiple of 2.
 	 * @return
 	 */
-	public abstract MemoryResource claimChildResource(long size, int align)
+	public abstract MemoryResource claimChildResource(Extent size, int align)
+	throws IndexOutOfBoundsException, ResourceNotFreeException;
+	
+	/**
+	 * Get a memory resource for a portion of this memory resources.
+	 * The first area of this memory resource that fits the given size
+	 * and it not claimed by any child resource is returned.
+	 * If not large enought area if found, a ResourceNotFreeException is thrown.
+	 * A child resource is always releases when the parent is released.
+	 * A child resource can be released without releasing the parent.
+	 * 
+	 * @param size Length of the returned resource in bytes.
+	 * @param align Align of this boundary. Align must be a multiple of 2.
+	 * @return
+	 */
+	public MemoryResource claimChildResource(int size, int align)
 	throws IndexOutOfBoundsException, ResourceNotFreeException;
 	
 	/**
@@ -544,14 +561,27 @@ public interface MemoryResource extends Resource {
 	 * @param allowOverlaps If true, overlapping child resources will be allowed, otherwise overlapping child resources will resulut in a ResourceNotFreeException.
 	 * @return
 	 */
-	public abstract MemoryResource claimChildResource(long offset, long size, boolean allowOverlaps)
+	public abstract MemoryResource claimChildResource(Offset offset, Extent size, boolean allowOverlaps)
+	throws IndexOutOfBoundsException, ResourceNotFreeException;
+	
+	/**
+	 * Get a memory resource for a portion of this memory resources.
+	 * A child resource is always releases when the parent is released.
+	 * A child resource can be released without releasing the parent.
+	 * 
+	 * @param offset Offset relative to the start of this resource.
+	 * @param size Length of the returned resource in bytes.
+	 * @param allowOverlaps If true, overlapping child resources will be allowed, otherwise overlapping child resources will resulut in a ResourceNotFreeException.
+	 * @return
+	 */
+	public abstract MemoryResource claimChildResource(int offset, int size, boolean allowOverlaps)
 	throws IndexOutOfBoundsException, ResourceNotFreeException;
 	
 	/**
 	 * Gets the offset relative to my parent.
 	 * If this resource has no parent, the address of this buffer is returned.
 	 */
-	public abstract long getOffset();
+	public abstract Offset getOffset();
 }
 	
 	

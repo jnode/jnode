@@ -253,8 +253,8 @@ public class VmReflection {
      */
     private static final VmAddress getStaticFieldAddress(VmStaticField sf) {
         final VmProcessor proc = Unsafe.getCurrentProcessor();
-        final VmAddress tablePtr = VmAddress.addressOfArrayData(proc
-                .getStaticsTable());
+        final VmAddress tablePtr = VmMagic.getArrayData(proc
+                .getStaticsTable()).toAddress();
         final int offset = sf.getStaticsIndex() << 2;
         return Unsafe.add(tablePtr, offset);
     }

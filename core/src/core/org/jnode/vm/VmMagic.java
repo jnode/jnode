@@ -21,6 +21,7 @@
 package org.jnode.vm;
 
 import org.jnode.vm.classmgr.VmClassType;
+import org.vmmagic.unboxed.Address;
 
 /**
  * Class containing "magic" methods that are interpreted by the VM itself,
@@ -80,6 +81,15 @@ public final class VmMagic {
         
     }
 
+    /**
+     * Gets the address of the first array element of the given array.
+     * @param array
+     * @return
+     */
+    public static Address getArrayData(Object array) {
+    	return null;
+    }
+    
     /**
      * Has the given object been finalized.
      * @param src

@@ -13,8 +13,8 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
-import org.jnode.vm.VmAddress;
 import org.jnode.vm.Unsafe;
+import org.vmmagic.unboxed.Address;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -37,7 +37,7 @@ public class PcTextScreen extends AbstractPcTextScreen implements TextScreen {
      */
     private PcTextScreen() throws ResourceNotFreeException {
         super(80, 25);
-        VmAddress ptr = VmAddress.valueOf(0xb8000);
+        Address ptr = Address.fromIntZeroExtend(0xb8000);
         try {
             final ResourceManager rm = (ResourceManager) InitialNaming
                     .lookup(ResourceManager.NAME);

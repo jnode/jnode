@@ -60,78 +60,78 @@
 ; AND
 ; -----------------------------------------------
 
-; void andByte(VmAddress memPtr, byte value, int count);
-Q43org5jnode2vm6Unsafe23andByte2e28Lorg2fjnode2fvm2fVmAddress3bBI29V:
+; void andByte(Address memPtr, byte value, int count);
+Q43org5jnode2vm6Unsafe23andByte2e28Lorg2fvmmagic2funboxed2fAddress3bBI29V:
 	BINOP32_VALUES and, byte, 1, dl
 
-; void andShort(VmAddress memPtr, short value, int count);
-; void andChar(VmAddress memPtr, char value, int count);
-Q43org5jnode2vm6Unsafe23andShort2e28Lorg2fjnode2fvm2fVmAddress3bSI29V:
-Q43org5jnode2vm6Unsafe23andChar2e28Lorg2fjnode2fvm2fVmAddress3bCI29V:
+; void andShort(Address memPtr, short value, int count);
+; void andChar(Address memPtr, char value, int count);
+Q43org5jnode2vm6Unsafe23andShort2e28Lorg2fvmmagic2funboxed2fAddress3bSI29V:
+Q43org5jnode2vm6Unsafe23andChar2e28Lorg2fvmmagic2funboxed2fAddress3bCI29V:
 	BINOP32_VALUES and, word, 2, dx
 
-; void andInt24(VmAddress memPtr, int value, int count);
-Q43org5jnode2vm6Unsafe23andInt242e28Lorg2fjnode2fvm2fVmAddress3bII29V:
+; void andInt24(Address memPtr, int value, int count);
+Q43org5jnode2vm6Unsafe23andInt242e28Lorg2fvmmagic2funboxed2fAddress3bII29V:
 	BINOP24_VALUES and, or, 0xFF000000
 
-; void andInt(VmAddress memPtr, int value, int count);
-Q43org5jnode2vm6Unsafe23andInt2e28Lorg2fjnode2fvm2fVmAddress3bII29V:
+; void andInt(Address memPtr, int value, int count);
+Q43org5jnode2vm6Unsafe23andInt2e28Lorg2fvmmagic2funboxed2fAddress3bII29V:
 	BINOP32_VALUES and, dword, 4, edx
 
-; void andLong(VmAddress memPtr, long value, int count);
-Q43org5jnode2vm6Unsafe23andLong2e28Lorg2fjnode2fvm2fVmAddress3bJI29V:
+; void andLong(Address memPtr, long value, int count);
+Q43org5jnode2vm6Unsafe23andLong2e28Lorg2fvmmagic2funboxed2fAddress3bJI29V:
 	BINOP64_VALUES and
 	
 ; -----------------------------------------------
 ; OR
 ; -----------------------------------------------
 
-; void orByte(VmAddress memPtr, byte value, int count);
-Q43org5jnode2vm6Unsafe23orByte2e28Lorg2fjnode2fvm2fVmAddress3bBI29V:
+; void orByte(Address memPtr, byte value, int count);
+Q43org5jnode2vm6Unsafe23orByte2e28Lorg2fvmmagic2funboxed2fAddress3bBI29V:
 	BINOP32_VALUES or, byte, 1, dl
 
-; void orShort(VmAddress memPtr, short value, int count);
-; void orChar(VmAddress memPtr, char value, int count);
-Q43org5jnode2vm6Unsafe23orShort2e28Lorg2fjnode2fvm2fVmAddress3bSI29V:
-Q43org5jnode2vm6Unsafe23orChar2e28Lorg2fjnode2fvm2fVmAddress3bCI29V:
+; void orShort(Address memPtr, short value, int count);
+; void orChar(Address memPtr, char value, int count);
+Q43org5jnode2vm6Unsafe23orShort2e28Lorg2fvmmagic2funboxed2fAddress3bSI29V:
+Q43org5jnode2vm6Unsafe23orChar2e28Lorg2fvmmagic2funboxed2fAddress3bCI29V:
 	BINOP32_VALUES or, word, 2, dx
 
-; void orInt24(VmAddress memPtr, int value, int count);
-Q43org5jnode2vm6Unsafe23orInt242e28Lorg2fjnode2fvm2fVmAddress3bII29V:
+; void orInt24(Address memPtr, int value, int count);
+Q43org5jnode2vm6Unsafe23orInt242e28Lorg2fvmmagic2funboxed2fAddress3bII29V:
 	BINOP24_VALUES or, and, 0x00FFFFFF
 
-; void orInt(VmAddress memPtr, int value, int count);
-Q43org5jnode2vm6Unsafe23orInt2e28Lorg2fjnode2fvm2fVmAddress3bII29V:
+; void orInt(Address memPtr, int value, int count);
+Q43org5jnode2vm6Unsafe23orInt2e28Lorg2fvmmagic2funboxed2fAddress3bII29V:
 	BINOP32_VALUES or, dword, 4, edx
 
-; void orLong(VmAddress memPtr, long value, int count);
-Q43org5jnode2vm6Unsafe23orLong2e28Lorg2fjnode2fvm2fVmAddress3bJI29V:
+; void orLong(Address memPtr, long value, int count);
+Q43org5jnode2vm6Unsafe23orLong2e28Lorg2fvmmagic2funboxed2fAddress3bJI29V:
 	BINOP64_VALUES or
 	
 ; -----------------------------------------------
 ; XOR
 ; -----------------------------------------------
 
-; void xorByte(VmAddress memPtr, byte value, int count);
-Q43org5jnode2vm6Unsafe23xorByte2e28Lorg2fjnode2fvm2fVmAddress3bBI29V:
+; void xorByte(Address memPtr, byte value, int count);
+Q43org5jnode2vm6Unsafe23xorByte2e28Lorg2fvmmagic2funboxed2fAddress3bBI29V:
 	BINOP32_VALUES xor, byte, 1, dl
 
-; void xorShort(VmAddress memPtr, short value, int count);
-; void xorChar(VmAddress memPtr, char value, int count);
-Q43org5jnode2vm6Unsafe23xorShort2e28Lorg2fjnode2fvm2fVmAddress3bSI29V:
-Q43org5jnode2vm6Unsafe23xorChar2e28Lorg2fjnode2fvm2fVmAddress3bCI29V:
+; void xorShort(Address memPtr, short value, int count);
+; void xorChar(Address memPtr, char value, int count);
+Q43org5jnode2vm6Unsafe23xorShort2e28Lorg2fvmmagic2funboxed2fAddress3bSI29V:
+Q43org5jnode2vm6Unsafe23xorChar2e28Lorg2fvmmagic2funboxed2fAddress3bCI29V:
 	BINOP32_VALUES xor, word, 2, dx
 
-; void xorInt24(VmAddress memPtr, int value, int count);
-Q43org5jnode2vm6Unsafe23xorInt242e28Lorg2fjnode2fvm2fVmAddress3bII29V:
+; void xorInt24(Address memPtr, int value, int count);
+Q43org5jnode2vm6Unsafe23xorInt242e28Lorg2fvmmagic2funboxed2fAddress3bII29V:
 	BINOP24_VALUES xor, and, 0x00FFFFFF
 
-; void xorInt(VmAddress memPtr, int value, int count);
-Q43org5jnode2vm6Unsafe23xorInt2e28Lorg2fjnode2fvm2fVmAddress3bII29V:
+; void xorInt(Address memPtr, int value, int count);
+Q43org5jnode2vm6Unsafe23xorInt2e28Lorg2fvmmagic2funboxed2fAddress3bII29V:
 	BINOP32_VALUES xor, dword, 4, edx
 
-; void xorLong(VmAddress memPtr, long value, int count);
-Q43org5jnode2vm6Unsafe23xorLong2e28Lorg2fjnode2fvm2fVmAddress3bJI29V:
+; void xorLong(Address memPtr, long value, int count);
+Q43org5jnode2vm6Unsafe23xorLong2e28Lorg2fvmmagic2funboxed2fAddress3bJI29V:
 	BINOP64_VALUES xor
 	
 	

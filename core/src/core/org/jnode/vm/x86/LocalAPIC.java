@@ -7,8 +7,10 @@ import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
+import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeUtils;
-import org.jnode.vm.VmAddress;
+import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Extent;
 
 
 /**
@@ -73,8 +75,8 @@ final class LocalAPIC {
      * @param owner
      * @param ptr
      */
-    public LocalAPIC(ResourceManager rm, ResourceOwner owner, VmAddress ptr) throws ResourceNotFreeException {
-        mem = rm.claimMemoryResource(owner, ptr, 4096, ResourceManager.MEMMODE_NORMAL);
+    public LocalAPIC(ResourceManager rm, ResourceOwner owner, Address ptr) throws ResourceNotFreeException {
+        mem = rm.claimMemoryResource(owner, ptr, Extent.fromIntZeroExtend(4096), ResourceManager.MEMMODE_NORMAL);
     }
 
     /**
@@ -124,12 +126,12 @@ final class LocalAPIC {
      * @param dstId
      * @param vector Address must be a 4K aligned address below 1Mb.
      */
-    public final void sendStartupIPI(int dstId, VmAddress vector) {
+    public final void sendStartupIPI(int dstId, Address vector) {
         final int high = (dstId & 0xFF) << 24;
         int low = ICR_DELIVERY_MODE_STARTUP | ICR_DESTINATION_MODE_PHYSICAL | ICR_DESTINATION_SHORTHAND_NONE;
-        int v = VmAddress.as32bit(vector);
+        int v = vector.toInt();
         if ((v & 0xFFF00FFF) != 0) {
-            throw new IllegalArgumentException("Invalid vector " + VmAddress.toString(vector) + " must be like 0x000vv000");
+            throw new IllegalArgumentException("Invalid vector 0x" + NumberUtils.hex(vector.toInt()) + " must be like 0x000vv000");
         }
         low |= (v >> 12) & 0xFF;
         mem.setInt(REG_ICR_HIGH, high);

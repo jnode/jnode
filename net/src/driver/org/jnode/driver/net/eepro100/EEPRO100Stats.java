@@ -8,7 +8,7 @@ package org.jnode.driver.net.eepro100;
 
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
-import org.jnode.vm.VmAddress;
+import org.vmmagic.unboxed.Address;
 
 /**
  * @author flesire
@@ -22,7 +22,7 @@ public class EEPRO100Stats implements EEPRO100Constants {
 
     private byte[] stats;
     private MemoryResource mem;
-    private VmAddress memAddr;
+    private Address memAddr;
 
     /** Statistical counters */
     private int tx_aborted_errors;
@@ -48,7 +48,7 @@ public class EEPRO100Stats implements EEPRO100Constants {
     }
 
     public void loadBlock() {
-        regs.setReg32(SCBPointer, VmAddress.as32bit(memAddr));
+        regs.setReg32(SCBPointer, memAddr.toInt());
         mem.setInt(64, 0);
         regs.setReg8(SCBCmd, CUStatsAddr);
     }

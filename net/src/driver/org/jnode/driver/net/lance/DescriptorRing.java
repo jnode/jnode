@@ -4,7 +4,6 @@
 package org.jnode.driver.net.lance;
 
 import org.jnode.system.MemoryResource;
-import org.jnode.vm.VmAddress;
 
 /**
  * @author Chris Cole
@@ -31,7 +30,7 @@ public class DescriptorRing {
 	}
 	
 	public int getAddressAs32() {
-		return VmAddress.as32bit(VmAddress.add(mem.getAddress(), offset));
+		return mem.getAddress().add(offset).toInt();
 	}
 
 }

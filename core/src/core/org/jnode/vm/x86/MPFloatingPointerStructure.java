@@ -10,7 +10,7 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.VmAddress;
+import org.vmmagic.unboxed.Address;
 
 
 /**
@@ -72,8 +72,8 @@ public class MPFloatingPointerStructure {
      * Gets the physical address of the MP configuration table.
      * @return
      */
-    final VmAddress getMPConfigTablePtr() {
-        return VmAddress.valueOf(mem.getInt(0x04));
+    final Address getMPConfigTablePtr() {
+        return Address.fromIntZeroExtend(mem.getInt(0x04));
     }
     
     /**
@@ -113,7 +113,7 @@ public class MPFloatingPointerStructure {
     }
     
     private final boolean initConfigTable(ResourceManager rm, ResourceOwner owner) {
-        final VmAddress tablePtr = getMPConfigTablePtr();
+        final Address tablePtr = getMPConfigTablePtr();
         int size = 0x2C; // Base table length
         try {
             MemoryResource mem = rm.claimMemoryResource(owner, tablePtr, size, ResourceManager.MEMMODE_NORMAL);
@@ -149,11 +149,11 @@ public class MPFloatingPointerStructure {
      */
     private static MPFloatingPointerStructure find(ResourceManager rm, ResourceOwner owner, int startPtr, int endPtr) {
         final MemoryScanner ms = rm.getMemoryScanner();
-        VmAddress ptr = VmAddress.valueOf(startPtr);
+        Address ptr = Address.fromIntZeroExtend(startPtr);
         int size = endPtr - startPtr;  
         final int stepSize = 16;
         while (size > 0) {
-            VmAddress res = ms.findInt32(ptr, size, MAGIC, stepSize);
+            Address res = ms.findInt32(ptr, size, MAGIC, stepSize);
             if (res != null) {
                 try {
                     final MemoryResource mem;
@@ -169,7 +169,7 @@ public class MPFloatingPointerStructure {
                     BootLog.warn("Cannot claim MP region");
                 }
             }
-            ptr = VmAddress.add(ptr, stepSize);
+            ptr = ptr.add(stepSize);
             size -= stepSize;
         }
         return null;

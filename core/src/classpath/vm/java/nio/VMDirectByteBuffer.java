@@ -47,6 +47,8 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
+import org.vmmagic.unboxed.Extent;
+import org.vmmagic.unboxed.Offset;
 
 final class VMDirectByteBuffer {
 
@@ -76,9 +78,9 @@ final class VMDirectByteBuffer {
 
 	static RawData adjustAddress(RawData address, int offset) {
 		final MemoryResource res = ((MemoryRawData)address).resource;
-		final long size = res.getSize() - offset;
+		final Extent size = res.getSize().sub(offset);
 		try {
-			return new MemoryRawData(res.claimChildResource(offset, size, true));
+			return new MemoryRawData(res.claimChildResource(Offset.fromIntZeroExtend(offset), size, true));
 		} catch (ResourceNotFreeException ex) {
 			throw new Error("Cannot adjustAddress", ex);
 		}

@@ -8,75 +8,71 @@ import org.jnode.net.SocketBuffer;
 import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
-import org.jnode.vm.VmAddress;
+import org.vmmagic.unboxed.Address;
 
 /**
  * @author Martin Husted Hartvig
  */
 
-public class RTL8139TxBuffer implements RTL8139Constants
-{
+public class RTL8139TxBuffer implements RTL8139Constants {
 
-  private static final int DPD_SIZE = 16;
-  private static final int FRAME_SIZE = EthernetConstants.ETH_FRAME_LEN;
+	private static final int DPD_SIZE = 16;
 
-  /** The actual data */
-  private final byte[] data;
+	private static final int FRAME_SIZE = EthernetConstants.ETH_FRAME_LEN;
 
-  /** MemoryResource mapper around data */
-  private final MemoryResource mem;
+	/** The actual data */
+	private final byte[] data;
 
-  /** Offset within mem of first DPD */
-  private final int firstDPDOffset;
+	/** MemoryResource mapper around data */
+	private final MemoryResource mem;
 
-  /** 32-bit address first DPD */
-  private final VmAddress firstDPDAddress;
+	/** Offset within mem of first DPD */
+	private final int firstDPDOffset;
 
-  /**
-   * Create a new instance
-   * 
-   * @param rm 
-   */
+	/** 32-bit address first DPD */
+	private final Address firstDPDAddress;
 
-  public RTL8139TxBuffer(ResourceManager rm)
-  {
+	/**
+	 * Create a new instance
+	 * 
+	 * @param rm
+	 */
 
-    // Create a large enough buffer
-    final int size = (DPD_SIZE + FRAME_SIZE) + 16 /*alignment*/;
-    this.data = new byte[size];
-    this.mem = rm.asMemoryResource(data);
+	public RTL8139TxBuffer(ResourceManager rm) {
 
-    final VmAddress memAddr = mem.getAddress();
-    //int addr = Address.as32bit(memAddr);
-    int offset = 0;
+		// Create a large enough buffer
+		final int size = (DPD_SIZE + FRAME_SIZE) + 16 /* alignment */;
+		this.data = new byte[size];
+		this.mem = rm.asMemoryResource(data);
 
-    this.firstDPDOffset = offset;
-    this.firstDPDAddress = VmAddress.add(memAddr, firstDPDOffset);
-  }
+		final Address memAddr = mem.getAddress();
+		// int addr = Address.as32bit(memAddr);
+		int offset = 0;
 
-  /**
-   * Initialize this ring to its default (empty) state
-   */
-  public void initialize(SocketBuffer src) throws IllegalArgumentException
-  {
-    // Setup the DPD
+		this.firstDPDOffset = offset;
+		this.firstDPDAddress = memAddr.add(firstDPDOffset);
+	}
 
-    // Copy the data from the buffer
-    final int len = src.getSize();
-    if (len > FRAME_SIZE)
-    {
-      throw new IllegalArgumentException("Length must be <= ETH_FRAME_LEN");
-    }
+	/**
+	 * Initialize this ring to its default (empty) state
+	 */
+	public void initialize(SocketBuffer src) throws IllegalArgumentException {
+		// Setup the DPD
 
-    src.get(data, firstDPDOffset, 0, len);
-  }
+		// Copy the data from the buffer
+		final int len = src.getSize();
+		if (len > FRAME_SIZE) {
+			throw new IllegalArgumentException(
+					"Length must be <= ETH_FRAME_LEN");
+		}
 
+		src.get(data, firstDPDOffset, 0, len);
+	}
 
-  /**
-   * Gets the address of the first DPD in this buffer.
-   */
-  public VmAddress getFirstDPDAddress()
-  {
-    return firstDPDAddress;
-  }
+	/**
+	 * Gets the address of the first DPD in this buffer.
+	 */
+	public Address getFirstDPDAddress() {
+		return firstDPDAddress;
+	}
 }

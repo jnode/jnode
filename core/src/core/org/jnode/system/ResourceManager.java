@@ -3,7 +3,8 @@
  */
 package org.jnode.system;
 
-import org.jnode.vm.VmAddress;
+import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Extent;
 
 /**
  * Interface or Manager of all system resources.
@@ -46,7 +47,19 @@ public interface ResourceManager {
 	 * @return The claimed resource
 	 * @throws ResourceNotFreeException
 	 */
-	public MemoryResource claimMemoryResource(ResourceOwner owner, VmAddress start, long size, int mode) throws ResourceNotFreeException;
+	public MemoryResource claimMemoryResource(ResourceOwner owner, Address start, Extent size, int mode) throws ResourceNotFreeException;
+
+	/**
+	 * Claim a memory region
+	 * 
+	 * @param owner
+	 * @param start
+	 * @param size
+	 * @param mode
+	 * @return The claimed resource
+	 * @throws ResourceNotFreeException
+	 */
+	public MemoryResource claimMemoryResource(ResourceOwner owner, Address start, int size, int mode) throws ResourceNotFreeException;
 
 	/**
 	 * Register an interrupt handler for a given irq number.

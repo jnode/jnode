@@ -30,7 +30,6 @@ import org.jnode.system.ResourceOwner;
 import org.jnode.util.AccessControllerUtils;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
-import org.jnode.vm.VmAddress;
 
 /**
  * 
@@ -104,7 +103,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
 
 		for (int i = 0; i < txBuffers.length; i++) {
 			txBuffers[i] = new RTL8139TxBuffer(rm);
-			setReg32(REG_TX_ADDR0 + (4 * i), VmAddress.as32bit(txBuffers[i].getFirstDPDAddress()));
+			setReg32(REG_TX_ADDR0 + (4 * i), txBuffers[i].getFirstDPDAddress().toInt());
 		}
 
 		powerUpDevice();
@@ -302,7 +301,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
 		// initialize our buffer
 		rxRing.initialize();
 
-		setReg32(REG_RX_BUF, VmAddress.as32bit(rxRing.getFirstUPDAddress()));
+		setReg32(REG_RX_BUF, rxRing.getFirstUPDAddress().toInt());
 
 		autoNegotiate();
 

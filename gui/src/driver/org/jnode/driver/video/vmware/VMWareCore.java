@@ -33,7 +33,7 @@ import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.AccessControllerUtils;
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.VmAddress;
+import org.vmmagic.unboxed.Address;
 
 /**
  * @author epr
@@ -110,7 +110,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 			this.maxHeight = getReg32(SVGA_REG_MAX_HEIGHT);
 			final int bitsPerPixel = getReg32(SVGA_REG_BITS_PER_PIXEL);
 			this.bytesPerLine = getReg32(SVGA_REG_BYTES_PER_LINE);
-			this.videoRam = rm.claimMemoryResource(device, VmAddress.valueOf(videoRamBase), videoRamSize, ResourceManager.MEMMODE_NORMAL);
+			this.videoRam = rm.claimMemoryResource(device, Address.fromIntZeroExtend(videoRamBase), videoRamSize, ResourceManager.MEMMODE_NORMAL);
 			this.bitsPerPixel = bitsPerPixel;
 			switch (bitsPerPixel) {
 				case 8 :
@@ -640,7 +640,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	private final MemoryResource initFifo(ResourceOwner owner, ResourceManager rm) throws ResourceNotFreeException {
 		final int physBase = getReg32(SVGA_REG_MEM_START);
 		final int size = getReg32(SVGA_REG_MEM_SIZE);
-		final VmAddress address = VmAddress.valueOf(physBase);
+		final Address address = Address.fromIntZeroExtend(physBase);
 
 		log.debug("Found FIFO at 0x" + NumberUtils.hex(physBase) + ", size 0x" + NumberUtils.hex(size));
 

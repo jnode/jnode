@@ -17,7 +17,7 @@ class MemoryResourceInputStream extends InputStream {
     
     public MemoryResourceInputStream(MemoryResource resource) {
         this.resource = resource;
-        this.length = (int)resource.getSize();
+        this.length = resource.getSize().toInt();
     }     
     
     /**
