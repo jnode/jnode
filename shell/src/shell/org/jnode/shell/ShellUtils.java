@@ -17,7 +17,7 @@ public class ShellUtils {
 	 * @return The current shell manager
 	 * @throws NameNotFoundException
 	 */
-	public static ShellManager getShellManager() 
+	public static ShellManager getShellManager()
 	throws NameNotFoundException {
 		return (ShellManager)InitialNaming.lookup(ShellManager.NAME);
 	}
