@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="/JNode-Core/lib/nanoxml-lite-2.2.3.jar"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/gnu-crypto.jar"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/javax-crypto.jar"/>
+	<classpathentry kind="lib" path="lib/jsch-0.1.15.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
