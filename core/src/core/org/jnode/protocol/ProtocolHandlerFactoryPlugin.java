@@ -38,7 +38,7 @@ public class ProtocolHandlerFactoryPlugin extends Plugin implements
      */
     public ProtocolHandlerFactoryPlugin(PluginDescriptor descriptor) {
         super(descriptor);
-        this.handlersEp = descriptor.getExtensionPoint("protocols");
+        this.handlersEp = descriptor.getExtensionPoint("handlers");
         reloadHandlers();
     }
 

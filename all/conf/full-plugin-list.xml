@@ -16,6 +16,8 @@
     <plugin id="org.jnode.awt.font.truetype"/>
     <plugin id="org.jnode.debug"/>
     <plugin id="org.jnode.debug.command"/>
+    <plugin id="org.jnode.debugger"/>
+
     <plugin id="org.jnode.driver"/>
     <plugin id="org.jnode.driver.acpi"/>
     <plugin id="org.jnode.driver.acpi.command"/>

@@ -13,13 +13,13 @@ import java.awt.event.KeyEvent;
  */
 public abstract class KeyboardInterpreter {
 	
-	protected int flags;
+	private int flags;
 	
-	protected int[] vkMap;
-	protected char[] lcharMap;
-	protected char[] ucharMap;
-	protected char[] altGrCharMap;
-	protected int lastScancode;
+	private final int[] vkMap;
+	protected final char[] lcharMap;
+	private final char[] ucharMap;
+	private final char[] altGrCharMap;
+	private boolean extendedMode;
 	
 	public final static int XT_RELEASE = 0x80;
 	public final static int XT_EXTENDED = 0xE0;
@@ -29,31 +29,63 @@ public abstract class KeyboardInterpreter {
 		lcharMap = new char[256];
 		ucharMap = new char[256];
 		altGrCharMap = new char[256];
-		initVkMap();
+		initVkMap(vkMap, lcharMap, ucharMap, altGrCharMap);
 	}
 	
 	/**
 	 * Interpret a given scancode into a keyevent.
 	 * @param scancode
 	 */
-	public KeyboardEvent interpretScancode(int scancode) {
-		
+	public final KeyboardEvent interpretScancode(int scancode) {		
+		final boolean extendedMode = this.extendedMode;
+
 		if (scancode == XT_EXTENDED) {
-			lastScancode = scancode;
+		    this.extendedMode = true;
+			return null;
+		} else {
+		    this.extendedMode = false;
+		}
+		final boolean released = ((scancode & XT_RELEASE) != 0);
+		final long time = System.currentTimeMillis();		
+		scancode &= 0x7f;
+		
+		final int vk = deriveKeyCode(scancode, extendedMode);
+		// debug output to find new keycodes
+		//VmSystem.getOut().println("[" + (extendedMode ? "E" : "N") + scancode + "," + vk + "] " /*+ KeyEvent.getKeyText(vk)*/);
+		adjustFlags(vk, released);
+		if (vk != 0) {
+			try {
+				final char ch;
+				ch = interpretExtendedScanCode(scancode, vk, released);
+				return new KeyboardEvent(released ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED, time, flags, vk, ch);
+			} catch (UnsupportedKeyException e) {
+				final char ch;
+				if ((flags & InputEvent.SHIFT_DOWN_MASK) != 0) {
+					ch = ucharMap[scancode];
+				} else if((flags & InputEvent.ALT_GRAPH_DOWN_MASK) != 0) {
+					ch = altGrCharMap[scancode];
+				} else {
+					ch = lcharMap[scancode];
+				}
+				return new KeyboardEvent(released ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED, time, flags, vk, ch);
+			}
+			catch (DeadKeyException e) {
+				return null;
+			}
+		} else {
 			return null;
 		}
-		
-		boolean released = ((scancode & XT_RELEASE) != 0);
-		scancode &= 0x7f;
-		int vk = deriveKeyCode(scancode, (lastScancode == XT_EXTENDED));
-		// debug output to find new keycodes
-//		System.err.println("[" + (lastScancode == XT_EXTENDED ? "E" : "N") + scancode + "] " /*+ KeyEvent.getKeyText(vk)*/);
-		int mask;
+	}
+	
+	private void adjustFlags(int vk, boolean released) {
+		final int mask;
 		switch (vk) {
 			case KeyEvent.VK_ALT :
+			    //VmSystem.getOut().println("VK_ALT");
 				mask = InputEvent.ALT_DOWN_MASK;
 				break;
 			case KeyEvent.VK_ALT_GRAPH :
+			    //VmSystem.getOut().println("VK_ALT_GRAPH");
 				mask = InputEvent.ALT_GRAPH_DOWN_MASK;
 				break;
 			case KeyEvent.VK_CONTROL :
@@ -68,37 +100,11 @@ public abstract class KeyboardInterpreter {
 		
 		if (mask != 0) {
 			if (released) {
-				flags &= ~mask;
+				this.flags &= ~mask;
 			} else {
-				flags |= mask;
+				this.flags |= mask;
 			}
-		}
-		if (vk != 0) {
-			char ch;
-			try {
-				ch = interpretExtendedScanCode(scancode, vk, released);
-				long time = System.currentTimeMillis();
-				lastScancode = scancode;
-				return new KeyboardEvent(released ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED, time, flags, vk, ch);
-			} catch (UnsupportedKeyException e) {
-				if ((flags & InputEvent.SHIFT_DOWN_MASK) != 0) {
-					ch = ucharMap[scancode];
-				} else if((flags & InputEvent.ALT_GRAPH_DOWN_MASK) != 0) {
-					ch = altGrCharMap[scancode];
-				} else {
-					ch = lcharMap[scancode];
-				}
-				long time = System.currentTimeMillis();
-				lastScancode = scancode;
-				return new KeyboardEvent(released ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED, time, flags, vk, ch);
-			}
-			catch (DeadKeyException e) {
-				return null;
-			}
-		} else {
-			lastScancode = scancode;
-			return null;
-		}
+		}	    
 	}
 	
 	protected int deriveKeyCode(int scancode, boolean extended) {
@@ -163,7 +169,7 @@ public abstract class KeyboardInterpreter {
 	/**
 	 * Initialize the mapping between scancode and virtual key code.
 	 */
-	protected abstract void initVkMap();
+	protected abstract void initVkMap(int []vkMap, char[] lcharMap, char[] ucharMap, char[] altGrCharMap);
 	
 	
 	/**
@@ -182,6 +188,13 @@ public abstract class KeyboardInterpreter {
 	 * @since 0.15
 	 */
 	protected abstract char interpretExtendedScanCode(int scancode, int vk, boolean released) throws UnsupportedKeyException, DeadKeyException;
+	
+    /**
+     * @return Returns the flags.
+     */
+    protected final int getFlags() {
+        return this.flags;
+    }
 }
 
 
