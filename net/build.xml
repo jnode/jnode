@@ -1,54 +1,55 @@
 <project name="JNode-Builder" default="all" basedir=".">
 
-  <property name="my-build.dir"   value="${basedir}/build"/>
+  <property name="my-build.dir" value="${basedir}/build"/>
   <property name="my-classes.dir" value="${my-build.dir}/classes"/>
-  <property name="my-src.dir"     value="${basedir}/src"/>
-  <property name="my.jar"         value="${jnode-net.jar}"/>
+  <property name="my-src.dir" value="${basedir}/src"/>
+  <property name="my.jar" value="${jnode-net.jar}"/>
 
-<!-- Subproject specific classpath -->
+  <!-- Subproject specific classpath -->
   <path id="my-cp">
     <pathelement location="${jnode-core.jar}"/>
     <pathelement location="${jnode-shell.jar}"/>
     <pathelement location="${commons-net.jar}"/>
     <pathelement location="${dnsjava.jar}"/>
+    <pathelement location="${jsch.jar}"/>
     <path refid="cp"/>
   </path>
 
-<!-- Initialize all subproject directories -->
+  <!-- Initialize all subproject directories -->
   <target name="prepare">
     <mkdir dir="${my-classes.dir}"/>
     <copy todir="${descriptors.dir}">
       <fileset dir="${basedir}/descriptors"/>
-	  <filterset refid="descriptors-filter"/>
+      <filterset refid="descriptors-filter"/>
     </copy>
   </target>
 
-<!-- Compile all subproject java files -->
+  <!-- Compile all subproject java files -->
   <target name="compile" depends="prepare">
     <javac destdir="${my-classes.dir}"
-	       debug="on"
-	       optimize="on"
-           compiler="modern"
-	       includeJavaRuntime="false">
-	  <bootclasspath path="${jnode-core.jar}"/>
-	  <src path="${my-src.dir}/net"/>
-	  <src path="${my-src.dir}/driver"/>
-	  <src path="${my-src.dir}/test"/>
+      debug="on"
+      optimize="on"
+      compiler="modern"
+      includeJavaRuntime="false">
+      <bootclasspath path="${jnode-core.jar}"/>
+      <src path="${my-src.dir}/net"/>
+      <src path="${my-src.dir}/driver"/>
+      <src path="${my-src.dir}/test"/>
       <classpath refid="my-cp"/>
     </javac>
   </target>
 
-<!-- Assemble the jarfile -->
+  <!-- Assemble the jarfile -->
   <target name="assemble" depends="compile">
     <!-- jar jarfile="${my.jar}">
       <fileset dir="${my-classes.dir}"/>
     </jar -->
   </target>
 
-<!-- Do it all -->
+  <!-- Do it all -->
   <target name="all" depends="assemble"/>
 
-<!-- Clean everything -->
+  <!-- Clean everything -->
   <target name="clean">
     <delete dir="${my-build.dir}" quiet="true"/>
   </target>
