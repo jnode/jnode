@@ -16,7 +16,7 @@ public abstract class Command {
 	 * Has this command finished?
 	 * @return boolean
 	 */
-	public boolean isFinished() {
+	public final boolean isFinished() {
 		return finished;
 	}
 	
@@ -24,22 +24,11 @@ public abstract class Command {
 	 * Mark this command as finished.
 	 * Notify all waiting threads.
 	 */
-	protected synchronized void notifyFinished() {
+	protected final synchronized void notifyFinished() {
 		finished = true;
 		notifyAll();
 	}
 	
-	/**
-	 * Block the current thread, until this command has finished.
-	 * @throws InterruptedException
-	 */
-	public synchronized void waitUntilFinished() 
-	throws InterruptedException {
-		while (!finished) {
-			wait();
-		}
-	}
-
 	/**
 	 * Block the current thread, until this command has finished.
 	 * @param timeout
