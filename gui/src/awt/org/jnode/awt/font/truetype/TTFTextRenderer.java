@@ -74,7 +74,7 @@ public class TTFTextRenderer implements TextRenderer {
 				tx.translate(hmTable.getAdvanceWidth(index), 0);
 			}
 			g.draw(gp);
-			g.fill(gp);
+			//g.fill(gp);
 		} catch (IOException ex) {
 			log.error("Error drawing text", ex);
 		}

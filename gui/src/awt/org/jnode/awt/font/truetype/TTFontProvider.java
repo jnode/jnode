@@ -24,6 +24,8 @@ public class TTFontProvider implements FontProvider {
 	private final Logger log = Logger.getLogger(getClass());
 	/** Cache font renderers */
 	private final HashMap renderers = new HashMap();
+	/** Cache font metrics */
+	private final HashMap metrics = new HashMap();
 	/** All loaded fonts (name, TTFFont) */
 	private final HashMap fontsByName = new HashMap();
 	/** Have the system fonts been loaded yet */
@@ -83,7 +85,16 @@ public class TTFontProvider implements FontProvider {
 	 * @return The metrics
 	 */
 	public FontMetrics getFontMetrics(Font font) {
-		return null;
+		FontMetrics fm = (FontMetrics) metrics.get(font);
+		if (fm == null) {
+			try {
+				fm = new TTFFontMetrics(font, getFontData(font));
+				metrics.put(font, fm);
+			} catch (IOException ex) {
+				log.error("Cannot create font metrics for " + font, ex);
+			}
+		}
+		return fm;
 	}
 
 	/**
@@ -95,8 +106,15 @@ public class TTFontProvider implements FontProvider {
 	private TTFFontData getFontData(Font font) {
 		if (font instanceof TTFFont) {
 			return ((TTFFont) font).getFontData();
+		} else {
+			final TTFFont ttf = (TTFFont) fontsByName.get(font.getName());
+			if (ttf != null) {
+				return ttf.getFontData();
+			} else {
+				log.warn("Font not instanceof TTFFont: " + font.getClass().getName());
+				return null;
+			}
 		}
-		return null;
 	}
 
 	/**

@@ -23,6 +23,12 @@ public class TTFFontMetrics extends FontMetrics {
 	public TTFFontMetrics(Font font, TTFFontData fontData)
 	throws IOException {
 		super(font);
+		if (font == null) {
+			throw new IllegalArgumentException("font cannot be null");
+		}
+		if (fontData == null) {
+			throw new IllegalArgumentException("fontData cannot be null");
+		}
 		this.fontData = fontData;
 		this.scale = font.getSize() / fontData.getHorizontalHeaderTable().getAscent();
 	}
