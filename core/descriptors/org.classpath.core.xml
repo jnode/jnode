@@ -37,10 +37,13 @@
       <export name="gnu.java.util.prefs.*"/>
       <export name="gnu.java.security.*"/>
       <export name="gnu.java.security.action.*"/>
+      <export name="gnu.java.security.ber.*"/>
       <export name="gnu.java.security.der.*"/>
+      <export name="gnu.java.security.pkcs.*"/>
       <export name="gnu.java.security.provider.*"/>
       <export name="gnu.java.security.util.*"/>
       <export name="gnu.java.security.x509.*"/>
+      <export name="gnu.java.security.x509.ext.*"/>
 
       <export name="java.applet.*"/>
       <export name="java.awt.*"/>
@@ -88,6 +91,15 @@
       <export name="javax.naming.event.*"/>
       <export name="javax.naming.ldap.*"/>
       <export name="javax.naming.spi.*"/>
+
+      <export name="javax.security.*"/>
+      <export name="javax.security.auth.*"/>
+      <export name="javax.security.auth.callback.*"/>
+      <export name="javax.security.auth.login.*"/>
+      <export name="javax.security.auth.spi.*"/>
+      <export name="javax.security.auth.x500.*"/>
+      <export name="javax.security.cert.*"/>
+      <export name="javax.security.sasl.*"/>
 
       <export name="javax.swing.*"/>
       <export name="javax.swing.border.*"/>
