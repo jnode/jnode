@@ -8,7 +8,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
-import org.jnode.driver.block.BlockDeviceAPI;
+import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
@@ -24,7 +24,7 @@ public class Ext2FileSystem implements FileSystem {
 	 * remarks about the code: -wherever the number (count) of some structure is known (e.g. number of block groups), I use an array to store them
 	 */
 	private final Device device;
-	private final BlockDeviceAPI api;
+	private final FSBlockDeviceAPI api;
 	private boolean closed;
 	private Superblock superblock;
 	private GroupDescriptor groupDescriptors[];
@@ -43,9 +43,9 @@ public class Ext2FileSystem implements FileSystem {
 		this.device = device;
 
 		try {
-			this.api = (BlockDeviceAPI) device.getAPI(BlockDeviceAPI.class);
+			this.api = (FSBlockDeviceAPI) device.getAPI(FSBlockDeviceAPI.class);
 		} catch (ApiNotFoundException ex) {
-			throw new FileSystemException("Device is not a block device", ex);
+			throw new FileSystemException("Device is not a partition", ex);
 		}
 		closed = false;
 		byte data[];
@@ -127,7 +127,6 @@ public class Ext2FileSystem implements FileSystem {
 	 */
 	public void flush() throws IOException {
 
-		//final BlockDeviceAPI api = this.api;
 		//XXX
 		throw new IOException("Yet unimplemented");
 	}
