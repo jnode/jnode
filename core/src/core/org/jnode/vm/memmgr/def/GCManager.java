@@ -83,6 +83,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
         stats.lastGCTime = System.currentTimeMillis();
 
         final boolean locking = (writeBarrier != null);
+        final boolean verbose = debug;
         helper.stopThreadsAtSafePoint();
         heapManager.setGcActive(true);
         try {
@@ -90,7 +91,9 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
             //helper.stopThreadsAtSafePoint();
             //heapManager.setGcActive(true);
             try {
-                Unsafe.debug("<mark/>");
+                if (verbose) {
+                    Unsafe.debug("<mark/>");
+                }
                 markHeap(bootHeap, firstHeap, locking);
             } finally {
                 //heapManager.setGcActive(false);
@@ -98,16 +101,22 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
             }
 
             // Sweep
-            Unsafe.debug("<sweep/>");
+            if (verbose) {
+                Unsafe.debug("<sweep/>");
+            }
             sweep(firstHeap);
 
             // Cleanup
-            Unsafe.debug("<cleanup/>");
+            if (verbose) {
+                Unsafe.debug("<cleanup/>");
+            }
             cleanup(bootHeap, firstHeap);
 
             // Verification
             if (debug) {
-                Unsafe.debug("<verify/>");
+                if (verbose) {
+                    Unsafe.debug("<verify/>");
+                }
                 verify(bootHeap, firstHeap);
             }
         } finally {
@@ -119,12 +128,13 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
         // Start the finalization process
         heapManager.triggerFinalization();
 
-        Unsafe.debug("</gc free=");
-        Unsafe.debug(heapManager.getFreeMemory());
-        Unsafe.debug("/>");
-
-        if (debug) {
-            System.out.println(stats);
+        if (verbose) {
+            Unsafe.debug("</gc free=");
+            Unsafe.debug(heapManager.getFreeMemory());
+            Unsafe.debug("/>");
+            if (debug) {
+                System.out.println(stats);
+            }
         }
     }
 
