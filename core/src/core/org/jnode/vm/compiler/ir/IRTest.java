@@ -107,8 +107,8 @@ public class IRTest {
     private static void generateCode(AbstractX86Stream os, String className) throws MalformedURLException, ClassNotFoundException {
 		
 		//VmByteCode code = loadByteCode(className, "arithOptIntx");
-		VmByteCode code = loadByteCode(className, "simpleWhile");
-		//VmByteCode code = loadByteCode(className, "terniary2");
+		//VmByteCode code = loadByteCode(className, "simpleWhile");
+		VmByteCode code = loadByteCode(className, "terniary2");
 
         X86CodeGenerator x86cg = new X86CodeGenerator(os, code.getLength());
 
@@ -137,6 +137,10 @@ public class IRTest {
         	}
         }
 		System.out.println();
+
+		// TODO constant folding, copy propagation, deconstruct SSA
+		// reorder addresses, compute liveness, allocate regs, and then...
+		// generate code ;-)
 
 
 //        BootableArrayList quads = irg.getQuadList();
