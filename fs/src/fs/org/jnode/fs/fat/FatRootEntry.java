@@ -16,9 +16,9 @@ import org.jnode.fs.FSFile;
 public class FatRootEntry extends FatObject implements FSEntry {
 	
 	/** The actual root directory */
-	private final FatRootDirectory rootDir;
+	private final FatDirectory rootDir;
 	
-	public FatRootEntry(FatRootDirectory rootDir) {
+	public FatRootEntry(FatDirectory rootDir) {
 		super(rootDir.getFatFileSystem());
 		this.rootDir = rootDir;
 	}

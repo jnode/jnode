@@ -14,6 +14,7 @@ import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.FSBlockDeviceAPI;
+import org.jnode.fs.fat.BootSector;
 import org.jnode.fs.fat.Fat;
 import org.jnode.fs.fat.FatFormatter;
 import org.jnode.fs.partitions.PartitionTableEntry;
@@ -98,13 +99,13 @@ public class FormatCommand {
 			}
 
 			FatFormatter ff =
-				new FatFormatter(
+				FatFormatter.HDFormatter(
 					sectorSize,
 					(int)numberOfSectors,
 					SECTOR_PER_TRACK,
 					NB_HEADS,
 					fatSize,
-					(int)offset,
+					(int)offset,1,
 					FAT_STANDARD_BS);
 			ff.format(api);
 
@@ -127,7 +128,7 @@ public class FormatCommand {
 
 	}
 
-	private static final byte[] FAT_STANDARD_BS =
+	private static final BootSector FAT_STANDARD_BS = new BootSector(
 		new byte[] {
 			(byte)0xEB,
 			(byte)0x48,
@@ -640,5 +641,5 @@ public class FormatCommand {
 			(byte)0x00,
 			(byte)0x00,
 			(byte)0x55,
-			(byte)0xAA };
+			(byte)0xAA });
 }

@@ -4,10 +4,9 @@
 package org.jnode.fs.fat;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.jnode.driver.block.BlockDeviceAPI;
-import org.jnode.util.*;
+
 
 /**
  * <description>
@@ -23,9 +22,36 @@ public class FatFormatter {
 
 	private BootSector bs;
 	private Fat fat;
-	private FatRootDirectory rootDir;
+	private FatDirectory rootDir;
 
-	private FatFormatter(
+	public static FatFormatter fat144FloppyFormatter(int reservedSectors, BootSector bs) {
+		return new FatFormatter(FLOPPY_DESC, 512, 1, 2880, 18, 2, Fat.FAT12, 2, 0, reservedSectors, bs);
+	}
+
+	public static FatFormatter HDFormatter(
+		int bps,
+		int nbTotalSectors,
+		int sectorsPerTrack,
+		int nbHeads,
+		int fatSize,
+		int hiddenSectors,
+      int reservedSectors,
+      BootSector bs) {
+		return new FatFormatter(
+			HD_DESC,
+			bps,
+			calculateDefaultSectorsPerCluster(bps, nbTotalSectors),
+			nbTotalSectors,
+			sectorsPerTrack,
+			nbHeads,
+			fatSize,
+			2,
+			hiddenSectors,
+         reservedSectors,
+         bs);
+	}
+
+	protected FatFormatter(
 		int mediumDescriptor,
 		int bps,
 		int spc,
@@ -33,9 +59,11 @@ public class FatFormatter {
 		int sectorsPerTrack,
 		int nbHeads,
 		int fatSize,
+		int nbFats,
 		int hiddenSectors,
-		Object data) {
-		bs = createBootSector(data);
+		int reservedSectors,
+      BootSector bs) {
+		this.bs = bs;
 		float fatEntrySize;
 		switch (fatSize) {
 			case Fat.FAT12 :
@@ -51,85 +79,22 @@ public class FatFormatter {
 
 		bs.setMediumDescriptor(mediumDescriptor);
 		bs.setOemName("JNode1.0");
-
-		switch (mediumDescriptor) {
-			case FLOPPY_DESC :
-				// 1.44Mb 3,5" floppy
-				bs.setBytesPerSector(512);
-				bs.setSectorsPerCluster(1);
-				bs.setNrReservedSectors(1);
-				bs.setNrFats(2);
-				bs.setNrRootDirEntries(224);
-				bs.setNrLogicalSectors(2880);
-				bs.setSectorsPerFat(9);
-				bs.setSectorsPerTrack(18);
-				bs.setNrHeads(2);
-				bs.setNrHiddenSectors(0);
-				break;
-			case HD_DESC :
-				bs.setBytesPerSector(bps);
-				bs.setNrReservedSectors(1);
-				bs.setNrRootDirEntries(calculateDefaultRootDirectorySize(bps,nbTotalSectors));
-				bs.setNrLogicalSectors(nbTotalSectors);
-				bs.setSectorsPerFat((Math.round(nbTotalSectors / (spc * (bps / fatEntrySize))) + 1));
-				bs.setSectorsPerCluster(spc);
-				bs.setNrFats(2);
-				bs.setSectorsPerTrack(sectorsPerTrack);
-				bs.setNrHeads(nbHeads);
-				bs.setNrHiddenSectors(hiddenSectors);
-				break;
-			case RAMDISK_DESC :
-				bs.setBytesPerSector(bps);
-				bs.setNrReservedSectors(1);
-				bs.setNrRootDirEntries(calculateDefaultRootDirectorySize(bps,nbTotalSectors));
-				bs.setNrLogicalSectors(nbTotalSectors);
-				bs.setSectorsPerFat((Math.round(nbTotalSectors / (spc * (bps / fatEntrySize))) + 1));
-				bs.setSectorsPerCluster(spc);
-				bs.setNrFats(2);
-				bs.setSectorsPerTrack(sectorsPerTrack);
-				bs.setNrHeads(nbHeads);
-				bs.setNrHiddenSectors(hiddenSectors);
-				break;
-
-			default :
-				throw new IllegalArgumentException("Unknown medium descriptor");
-		}
+		bs.setBytesPerSector(bps);
+		bs.setNrReservedSectors(reservedSectors);
+		bs.setNrRootDirEntries(mediumDescriptor == FLOPPY_DESC ?  224 : calculateDefaultRootDirectorySize(bps, nbTotalSectors));
+		bs.setNrLogicalSectors(nbTotalSectors);
+		bs.setSectorsPerFat((Math.round(nbTotalSectors / (spc * (bps / fatEntrySize))) + 1));
+		bs.setSectorsPerCluster(spc);
+		bs.setNrFats(2);
+		bs.setSectorsPerTrack(sectorsPerTrack);
+		bs.setNrHeads(nbHeads);
+		bs.setNrHiddenSectors(hiddenSectors);
 
 		fat = new Fat(fatSize, mediumDescriptor, bs.getSectorsPerFat(), bs.getBytesPerSector());
 		fat.setMediumDescriptor(bs.getMediumDescriptor());
-		rootDir = new FatRootDirectory(null, bs.getNrRootDirEntries());
-	}
+		System.out.println("bs.getNrRootDirEntries()=" + bs.getNrRootDirEntries());
 
-	/**
-	 * 
-	 * Format with default cluster size for an harddrive
-	 * 
-	 * @param bps
-	 * @param nbTotalSectors
-	 * @param sectorsPerTrack
-	 * @param nbHeads
-	 * @param fatSize
-	 * @param hiddenSectors
-	 * @param data
-	 */
-	public FatFormatter(
-		int bps,
-		int nbTotalSectors,
-		int sectorsPerTrack,
-		int nbHeads,
-		int fatSize,
-		int hiddenSectors,
-		Object data) {
-		this(
-			HD_DESC,
-			bps,
-			calculateDefaultSectorsPerCluster(bps, nbTotalSectors),
-			nbTotalSectors,
-			sectorsPerTrack,
-			nbHeads,
-			fatSize,
-			hiddenSectors,
-			data);
+		rootDir = new FatLfnDirectory(null, bs.getNrRootDirEntries());
 	}
 
 	private static int calculateDefaultSectorsPerCluster(int bps, int nbTotalSectors) {
@@ -164,14 +129,14 @@ public class FatFormatter {
 	private static int calculateDefaultRootDirectorySize(int bps, int nbTotalSectors) {
 		int totalSize = bps * nbTotalSectors;
 		// take a default 1/5 of the size for root max
-		if ((totalSize == 0) || (totalSize >= MAX_DIRECTORY * 5 * 32)) { // ok take the max
+		if (totalSize >= MAX_DIRECTORY * 5 * 32) { // ok take the max
 			return MAX_DIRECTORY;
 		} else
 			return totalSize / (5 * 32);
 	}
 
-	public FatFormatter(int bps, int spc, Geometry geom, int fatSize, Object data) {
-		this(HD_DESC, bps, spc, (int)geom.getTotalSectors(), geom.getSectors(), geom.getHeads(), fatSize, 0, data);
+	/*public FatFormatter(int bps, int spc, Geometry geom, int fatSize, Object data) {
+		this(HD_DESC, bps, spc, (int)geom.getTotalSectors(), geom.getSectors(), geom.getHeads(), fatSize, 0, 1, data);
 	}
 
 	public FatFormatter(
@@ -183,12 +148,13 @@ public class FatFormatter {
 		int fatSize,
 		int hiddenSectors,
 		Object data) {
-		this(HD_DESC, bps, spc, nbTotalSectors, sectorsPerTrack, nbHeads, fatSize, hiddenSectors, data);
-	}
+		this(HD_DESC, bps, spc, nbTotalSectors, sectorsPerTrack, nbHeads, fatSize, hiddenSectors, 1, data);
+	}*/
 
-	public FatFormatter(int mediumDescriptor, Object data) {
-		this(mediumDescriptor, 0, 0, 0, 0, Fat.FAT12, 0, data);
-	}
+	/*
+	 * public FatFormatter(int mediumDescriptor, Object data) {
+	 * this(mediumDescriptor, 0, 0, 0, 0, 0, Fat.FAT12, 0, data);
+	 */
 
 	/**
 	 * Set the label
@@ -196,23 +162,7 @@ public class FatFormatter {
 	 * @param label
 	 */
 	public void setLabel(String label) throws IOException {
-		FatDirEntry labelEntry = null;
-		for (Iterator i = rootDir.iterator();(labelEntry == null) && i.hasNext();) {
-			FatDirEntry e = (FatDirEntry)i.next();
-			if (e.isLabel()) {
-				labelEntry = e;
-			}
-		}
-		if (labelEntry == null) {
-			labelEntry = rootDir.addFatFile(label);
-			labelEntry.setLabel();
-		}
-		labelEntry.setName(label);
-		if (label.length() > 8) {
-			labelEntry.setExt(label.substring(8));
-		} else {
-			labelEntry.setExt("");
-		}
+		rootDir.setLabel(label);
 	}
 
 	/**
@@ -232,18 +182,6 @@ public class FatFormatter {
 		rootDir.write(api, FatUtils.getRootDirOffset(bs));
 
 		api.flush();
-	}
-
-	/**
-	 * Create a new bootsector Override this to add bootable code to the
-	 * bootsector
-	 * 
-	 * @return BootSector
-	 */
-	protected BootSector createBootSector(Object data) {
-		if (data != null)
-			return new BootSector((byte[])data);
-		return new BootSector(512);
 	}
 
 	/**

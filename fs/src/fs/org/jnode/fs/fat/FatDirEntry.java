@@ -15,7 +15,7 @@ import org.jnode.util.NumberUtils;
 /**
  * @author epr
  */
-public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
+public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
 
 	/** Name of this entry */
 	private String name;
@@ -38,8 +38,25 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 	/** Directory this entry is a part of */
 	private final AbstractDirectory parent;
 
+	public static FatBasicDirEntry fatDirEntryFactory(AbstractDirectory dir, byte[] src, int offset) {
+		int flags = DosUtils.get8(src, offset + 0x0b);
+		boolean r = (flags & F_READONLY) != 0;
+		boolean h = (flags & F_HIDDEN) != 0;
+		boolean s = (flags & F_SYSTEM) != 0;
+		boolean v = (flags & F_LABEL) != 0;
+
+		if (r && h && s && v) {
+			// this is a LFN entry, don't need to parse it!
+			return new FatLfnDirEntry(dir, src, offset);
+		}
+		FatDirEntry entry = new FatDirEntry(dir, src, offset);
+		return entry;
+
+	}
+
 	/**
 	 * Create a new entry
+	 * 
 	 * @param dir
 	 */
 	public FatDirEntry(AbstractDirectory dir) {
@@ -48,12 +65,13 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Create a new entry
+	 * 
 	 * @param dir
 	 * @param name
 	 * @param ext
 	 */
 	public FatDirEntry(AbstractDirectory dir, String name, String ext) {
-		super(dir.getFatFileSystem());
+		super(dir);
 		this.parent = dir;
 		this.name = name;
 		this.ext = ext;
@@ -64,36 +82,36 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Create a new entry from a FAT directory image.
+	 * 
 	 * @param dir
 	 * @param src
 	 * @param offset
 	 */
 	public FatDirEntry(AbstractDirectory dir, byte[] src, int offset) {
-		super(dir.getFatFileSystem());
+		super(dir, src, offset);
+
 		this.parent = dir;
 		unused = (src[offset] == 0);
 		deleted = (DosUtils.get8(src, offset) == 0xe5);
 
 		char[] nameArr = new char[8];
 		for (int i = 0; i < nameArr.length; i++) {
-			nameArr[i] = (char) DosUtils.get8(src, offset + i);
+			nameArr[i] = (char)DosUtils.get8(src, offset + i);
 		}
 		if (DosUtils.get8(src, offset) == 0x05) {
-			nameArr[0] = (char) 0xe5;
+			nameArr[0] = (char)0xe5;
 		}
 		this.name = new String(nameArr).trim();
 
 		char[] extArr = new char[3];
 		for (int i = 0; i < extArr.length; i++) {
-			extArr[i] = (char) DosUtils.get8(src, offset + 0x08 + i);
+			extArr[i] = (char)DosUtils.get8(src, offset + 0x08 + i);
 		}
 		this.ext = new String(extArr).trim();
 
 		this.flags = DosUtils.get8(src, offset + 0x0b);
 		this.lastModified =
-			DosUtils.decodeDateTime(
-				DosUtils.get16(src, offset + 0x18),
-				DosUtils.get16(src, offset + 0x16));
+			DosUtils.decodeDateTime(DosUtils.get16(src, offset + 0x18), DosUtils.get16(src, offset + 0x16));
 		this.startCluster = DosUtils.get16(src, offset + 0x1a);
 		this.length = DosUtils.get32(src, offset + 0x1c);
 		this._dirty = false;
@@ -101,6 +119,7 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Returns the attribute.
+	 * 
 	 * @return int
 	 */
 	public int getFlags() {
@@ -109,6 +128,7 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Returns the changeDate.
+	 * 
 	 * @return long
 	 */
 	public long getLastModified() {
@@ -117,6 +137,7 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Returns the deleted.
+	 * 
 	 * @return boolean
 	 */
 	public boolean isDeleted() {
@@ -125,6 +146,7 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Returns the ext.
+	 * 
 	 * @return String
 	 */
 	public String getExt() {
@@ -141,18 +163,16 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Returns the length.
+	 * 
 	 * @return long
 	 */
 	public long getLength() {
-		/*if (isDirectory()) {
-			return 0; 
-		} else {*/
-			return length;
-		//}
+		return length;
 	}
 
 	/**
 	 * Returns the name.
+	 * 
 	 * @return String
 	 */
 	public String getNameOnly() {
@@ -161,6 +181,7 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Returns the startCluster.
+	 * 
 	 * @return int
 	 */
 	public int getStartCluster() {
@@ -169,6 +190,7 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Returns the unused.
+	 * 
 	 * @return boolean
 	 */
 	public boolean isUnused() {
@@ -177,6 +199,7 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Sets the flags.
+	 * 
 	 * @param flags
 	 */
 	public void setFlags(int flags) {
@@ -186,7 +209,8 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Sets the last modification date.
-	 * @param lastModified 
+	 * 
+	 * @param lastModified
 	 */
 	public void setLastModified(long lastModified) {
 		this.lastModified = lastModified;
@@ -195,7 +219,9 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Sets the deleted.
-	 * @param deleted The deleted to set
+	 * 
+	 * @param deleted
+	 *           The deleted to set
 	 */
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
@@ -204,7 +230,9 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Sets the ext.
-	 * @param ext The ext to set
+	 * 
+	 * @param ext
+	 *           The ext to set
 	 */
 	public void setExt(String ext) {
 		this.ext = ext;
@@ -212,22 +240,25 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 	}
 
 	/**
-	 * Updates the length of the entry. This method is called by FatFile.setLength.
-	 * @param newLength The length to set
+	 * Updates the length of the entry. This method is called by
+	 * FatFile.setLength.
+	 * 
+	 * @param newLength
+	 *           The length to set
 	 */
 	public synchronized void updateLength(long newLength) throws IOException {
 		//System.out.println("updateLength(" + newLength + ") on " + getName());
 		this.length = newLength;
 		setDirty();
 	}
-	
+
 	/**
-	 * Gets the single instance of the file connected to this entry.
-	 * Returns null if the file is 0 bytes long
+	 * Gets the single instance of the file connected to this entry. Returns
+	 * null if the file is 0 bytes long
+	 * 
 	 * @return File
 	 */
-	public FSFile getFile() 
-	throws IOException {
+	public FSFile getFile() throws IOException {
 		if (isFile()) {
 			return getFatFile();
 		} else {
@@ -239,28 +270,29 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 	 * Gets the directory this entry refers to. This method can only be called
 	 * if <code>isDirectory</code> returns true.
 	 */
-	public FSDirectory getDirectory()
-	throws IOException {
+	public FSDirectory getDirectory() throws IOException {
 		if (isDirectory()) {
 			return getFatFile().getDirectory();
 		} else {
 			throw new IOException("Not a directory");
 		}
 	}
-	
+
 	/**
-	 * Gets the single instance of the file connected to this entry.
-	 * Returns null if the file is 0 bytes long
+	 * Gets the single instance of the file connected to this entry. Returns
+	 * null if the file is 0 bytes long
+	 * 
 	 * @return File
 	 */
-	public FatFile getFatFile()
-	throws IOException {
+	public FatFile getFatFile() throws IOException {
 		return getFatFileSystem().getFile(this);
 	}
 
 	/**
 	 * Sets the name.
-	 * @param name The name to set
+	 * 
+	 * @param name
+	 *           The name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -269,7 +301,9 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Sets the startCluster.
-	 * @param startCluster The startCluster to set
+	 * 
+	 * @param startCluster
+	 *           The startCluster to set
 	 */
 	protected void setStartCluster(int startCluster) {
 		this.startCluster = startCluster;
@@ -278,7 +312,9 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Sets the unused.
-	 * @param unused The unused to set
+	 * 
+	 * @param unused
+	 *           The unused to set
 	 */
 	public void setUnused(boolean unused) {
 		this.unused = unused;
@@ -319,6 +355,7 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Does this entry refer to a file?
+	 * 
 	 * @see org.jnode.fs.FSEntry#isFile()
 	 */
 	public boolean isFile() {
@@ -327,6 +364,7 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Does this entry refer to a directory?
+	 * 
 	 * @see org.jnode.fs.FSEntry#isDirectory()
 	 */
 	public boolean isDirectory() {
@@ -345,17 +383,18 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 		setFlags(flags | F_ARCHIVE);
 	}
 
-	/** 
+	/**
 	 * Write my contents to the given byte-array
+	 * 
 	 * @param dest
 	 * @param offset
 	 */
 	public void write(byte[] dest, int offset) {
-		//System.out.println("write() on " + getName());
+		System.out.println("FatDir entry write at" + offset);
 		if (unused) {
 			dest[offset] = 0;
 		} else if (deleted) {
-			dest[offset] = (byte) 0xe5;
+			dest[offset] = (byte)0xe5;
 		}
 
 		for (int i = 0; i < 8; i++) {
@@ -363,13 +402,13 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 			if (i < name.length()) {
 				ch = Character.toUpperCase(name.charAt(i));
 				if (ch == 0xe5) {
-					ch = (char) 0x05;
+					ch = (char)0x05;
 				} else {
 				}
 			} else {
 				ch = ' ';
 			}
-			dest[offset + i] = (byte) ch;
+			dest[offset + i] = (byte)ch;
 		}
 
 		for (int i = 0; i < 3; i++) {
@@ -379,7 +418,7 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 			} else {
 				ch = ' ';
 			}
-			dest[offset + 0x08 + i] = (byte) ch;
+			dest[offset + 0x08 + i] = (byte)ch;
 		}
 
 		DosUtils.set8(dest, offset + 0x0b, flags);
@@ -417,8 +456,7 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 		b.append("(0x");
 		b.append(NumberUtils.hex(flags, 2));
 		b.append(")");
-		
-		
+
 		b.append(" date=");
 		b.append(new Date(getLastModified()));
 		b.append(" startCluster=");
@@ -434,17 +472,18 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Returns the dirty.
+	 * 
 	 * @return boolean
 	 */
 	public final boolean isDirty() {
 		return _dirty;
 	}
-	
+
 	protected final void setDirty() {
 		this._dirty = true;
 		parent.setDirty();
 	}
-	
+
 	/**
 	 * @return The directory this entry belongs to.
 	 */
@@ -454,10 +493,10 @@ public class FatDirEntry extends FatObject implements FSEntry, FatConstants {
 
 	/**
 	 * Gets the accessrights for this entry.
+	 * 
 	 * @throws IOException
 	 */
-	public FSAccessRights getAccessRights()
-	throws IOException {
+	public FSAccessRights getAccessRights() throws IOException {
 		throw new IOException("Not implemented yet");
 	}
 }

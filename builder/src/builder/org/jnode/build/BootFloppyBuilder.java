@@ -18,7 +18,6 @@ import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.fat.FatFileSystem;
-import org.jnode.fs.fat.FatFormatter;
 import org.jnode.fs.fat.GrubFatFormatter;
 import org.jnode.util.FileUtils;
 
@@ -95,8 +94,7 @@ public class BootFloppyBuilder {
 	 * @throws IOException
 	 */
 	protected void formatDevice(Device dev) throws IOException {
-		FatFormatter ff = createFormatter();
-		ff.setLabel("JNode Boot");
+		GrubFatFormatter ff = createFormatter();
 		try {
 			ff.format((BlockDeviceAPI) dev.getAPI(BlockDeviceAPI.class));
 		} catch (ApiNotFoundException ex) {
@@ -223,8 +221,8 @@ public class BootFloppyBuilder {
 		this.menuFile = menuFile;
 	}
 
-	protected FatFormatter createFormatter() throws IOException {
-		return new GrubFatFormatter(0xf0, 0, stage1ResourceName, stage2ResourceName);
+	protected GrubFatFormatter createFormatter() throws IOException {
+		return new GrubFatFormatter(0, stage1ResourceName, stage2ResourceName);
 	}
 
 	protected long getDeviceLength() {

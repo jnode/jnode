@@ -179,7 +179,7 @@ public class FatFile extends FatObject implements FSFile {
 	throws IOException {
 		if (dir == null) {
 			final FatFileSystem fs = getFatFileSystem();
-			dir = new FatDirectory(fs, this);
+			dir = new FatLfnDirectory(fs, this);
 		}
 		return dir;
 	}

@@ -23,7 +23,7 @@ public class FatFileSystem implements FileSystem {
 	private final BlockDeviceAPI api;
 	private BootSector bs;
 	private Fat fat;
-	private final FatRootDirectory rootDir;
+	private final FatDirectory rootDir;
 	private final FatRootEntry rootEntry;
 	private final HashMap files = new HashMap();
 
@@ -42,7 +42,7 @@ public class FatFileSystem implements FileSystem {
 			//System.out.println(bs);
 
 			Fat[] fats = new Fat[bs.getNrFats()];
-			rootDir = new FatRootDirectory(this, bs.getNrRootDirEntries());
+			rootDir = new FatLfnDirectory(this, bs.getNrRootDirEntries());
 			int bitSize;
 
 			if (bs.getMediumDescriptor() == 0xf8) {
@@ -173,7 +173,7 @@ public class FatFileSystem implements FileSystem {
 	 * 
 	 * @return RootDirectory
 	 */
-	public FatRootDirectory getRootDir() {
+	public FatDirectory getRootDir() {
 		return rootDir;
 	}
 

@@ -105,11 +105,11 @@ public class FileSystemMounter implements DeviceListener {
 	protected void tryToMount(Device device, FSBlockDeviceAPI api, boolean removable) {
 		log.info("Try to mount " + device.getId());
 
-		if (removable) {
-			log.error("Not mounting removable devices yet...");
+		//if (removable) {
+		//	log.error("Not mounting removable devices yet...");
 			// TODO Implement mounting of removable devices
-			return;
-		}
+		//	return;
+		//}
 		
 		// Read the first sector
 		try {

@@ -18,13 +18,14 @@ import org.jnode.util.FileUtils;
  * 
  * @author epr
  */
-public class GrubFatFormatter extends FatFormatter {
+public class GrubFatFormatter {
 
 	private byte[] stage1;
 	private byte[] stage2;
 	private int bootSectorOffset;
 	private String configFile;
 	private int installPartition = 0xFFFFFFFF;
+	private FatFormatter formatter;
 
 	/**
 	 * @param bps
@@ -32,10 +33,33 @@ public class GrubFatFormatter extends FatFormatter {
 	 * @param geom
 	 * @param fatSize
 	 */
-	public GrubFatFormatter(int bps, int spc, Geometry geom, int fatSize, int bootSectorOffset, String stage1ResourceName, String stage2ResourceName) {
-		super(bps, spc, geom, fatSize, new String[] { stage1ResourceName, stage2ResourceName });
+	public GrubFatFormatter(
+		int bps,
+		int spc,
+		Geometry geom,
+		int fatSize,
+		int bootSectorOffset,
+		String stage1ResourceName,
+		String stage2ResourceName) {
+
+		GrubBootSector bs = (GrubBootSector)createBootSector(stage1ResourceName, stage2ResourceName);
+		bs.setOemName("JNode1.0");
+		formatter =
+			FatFormatter.HDFormatter(
+				bps,
+				(int)geom.getTotalSectors(),
+				geom.getSectors(),
+				geom.getHeads(),
+				fatSize,
+				0,
+				calculateReservedSectors(512),
+				bs);
 		this.bootSectorOffset = bootSectorOffset;
-		init();
+
+	}
+
+	private int calculateReservedSectors(int bps) {
+		return stage2.length / bps + 1 + 1;
 	}
 
 	/**
@@ -43,46 +67,32 @@ public class GrubFatFormatter extends FatFormatter {
 	 * 
 	 * @param mediumDescriptor
 	 */
-	public GrubFatFormatter(int mediumDescriptor, int bootSectorOffset, String stage1ResourceName, String stage2ResourceName) throws IOException {
-		super(mediumDescriptor, new String[] { stage1ResourceName, stage2ResourceName });
-		this.bootSectorOffset = bootSectorOffset;
-		init();
-	}
-
-	private void init() {
-		GrubBootSector bs = (GrubBootSector) getBootSector();
+	public GrubFatFormatter(int bootSectorOffset, String stage1ResourceName, String stage2ResourceName)
+		throws IOException {
+		GrubBootSector bs = (GrubBootSector)createBootSector(stage1ResourceName, stage2ResourceName);
 		bs.setOemName("JNode1.0");
-
-		int stage2Sectors = stage2.length / bs.getBytesPerSector() + 1;
-
-		bs.setNrReservedSectors(1 + stage2Sectors);
-		//bs.setStage2Sector(1);
-
-		//System.out.println("stage2 length " + stage2.length);
-		//System.out.println("stage2 sectors " + stage2Sectors);
-		//System.out.println("res. sectors " + bs.getNrReservedSectors());
+		formatter = FatFormatter.fat144FloppyFormatter(calculateReservedSectors(512), bs);
+		this.bootSectorOffset = bootSectorOffset;
 	}
 
 	/**
 	 * @see org.jnode.fs.fat.FatFormatter#createBootSector(Object)
 	 */
-	protected BootSector createBootSector(Object data) {
-		final String[] names = (String[])data;
-		if (names[0] == null) {
-			names[0] = "stage1";
+	private BootSector createBootSector(String stage1Name, String stage2Name) {
+		if (stage1Name == null) {
+			stage1Name = "stage1";
 		}
-		if (names[1] == null) {
-			names[1] = "stage2";
+		if (stage2Name == null) {
+			stage2Name = "stage2";
 		}
 		try {
-			getStage1(names[0]);
-			getStage2(names[1]);
-
+			getStage1(stage1Name);
+			getStage2(stage2Name);
 			return new GrubBootSector(stage1);
 		} catch (IOException ex) {
-            throw new RuntimeException(ex);
+			throw new RuntimeException(ex);
 		} catch (FileSystemException e) {
-            throw new RuntimeException(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -115,8 +125,8 @@ public class GrubFatFormatter extends FatFormatter {
 	 */
 	public void format(BlockDeviceAPI api) throws IOException {
 
-		super.format(api);
-		GrubBootSector bs = (GrubBootSector) getBootSector();
+		formatter.format(api);
+		GrubBootSector bs = (GrubBootSector) formatter.getBootSector();
 		/* Fixup the blocklist end the end of the first sector of stage2 */
 		DosUtils.set32(stage2, 512 - 8, bootSectorOffset + 2);
 
@@ -131,7 +141,7 @@ public class GrubFatFormatter extends FatFormatter {
 			}
 			ofs++; /* Skip '\0' */
 			for (int i = 0; i < configFile.length(); i++) {
-				stage2[ofs++] = (byte) configFile.charAt(i);
+				stage2[ofs++] = (byte)configFile.charAt(i);
 			}
 			stage2[ofs] = 0;
 		}
@@ -158,7 +168,7 @@ public class GrubFatFormatter extends FatFormatter {
 	 * Sets the configFile.
 	 * 
 	 * @param configFile
-	 *            The configFile to set
+	 *           The configFile to set
 	 */
 	public void setConfigFile(String configFile) {
 		this.configFile = configFile;
@@ -170,12 +180,17 @@ public class GrubFatFormatter extends FatFormatter {
 	public int getInstallPartition() {
 		return installPartition;
 	}
+    
+   public BootSector getBootSector()
+   {
+   	return formatter.getBootSector();
+   }
 
 	/**
 	 * Sets the installPartition.
 	 * 
 	 * @param installPartition
-	 *            The installPartition to set
+	 *           The installPartition to set
 	 */
 	public void setInstallPartition(int installPartition) {
 		this.installPartition = installPartition;
