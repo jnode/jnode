@@ -29,7 +29,7 @@ import org.jnode.vm.x86.VmX86Architecture;
  */
 public class IRGenerator extends BytecodeVisitor {
 	private final static Constant NULL_CONSTANT = Constant.getInstance(null);
-	private VmMethod method;
+//	private VmMethod method;
 	private int nArgs;
 	private int nLocals;
 	private int maxStack;
@@ -62,7 +62,7 @@ public class IRGenerator extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#startMethod(org.jnode.vm.classmgr.VmMethod)
 	 */
 	public void startMethod(VmMethod method) {
-		this.method = method;
+//		this.method = method;
 		VmByteCode code = method.getBytecode();
 		nArgs = method.getNoArgs();
 		nLocals = code.getNoLocals();
