@@ -11,299 +11,16 @@
 	extern bootHeapEnd
 	extern freeMemoryStart
 
-Q43org5jnode2vm6Unsafe23addressOf2e28Ljava2flang2fObject3b29Lorg2fjnode2fvm2fVmAddress3b:
-Q43org5jnode2vm6Unsafe23addressToInt2e28Lorg2fjnode2fvm2fVmAddress3b29I:
-Q43org5jnode2vm6Unsafe23intToAddress2e28I29Lorg2fjnode2fvm2fVmAddress3b:
-	mov eax,[esp+4] ; object
-	ret 4
-
-Q43org5jnode2vm6Unsafe23addressToLong2e28Lorg2fjnode2fvm2fVmAddress3b29J:
-	mov eax,[esp+4] ; address -> lsb
-	xor edx,edx		; msb
-	ret 4
-
-Q43org5jnode2vm6Unsafe23longToAddress2e28J29Lorg2fjnode2fvm2fVmAddress3b:
-	mov eax,[esp+4] ; LSB long -> address
-	ret 8 			; We ignore the MSB here.
-
 Q43org5jnode2vm6Unsafe23pushInt2e28I29V:
 Q43org5jnode2vm6Unsafe23pushLong2e28J29V:
 Q43org5jnode2vm6Unsafe23pushObject2e28Ljava2flang2fObject3b29V:
 	ret
 
-Q43org5jnode2vm6Unsafe23objectAt2e28Lorg2fjnode2fvm2fVmAddress3b29Ljava2flang2fObject3b:
-	mov eax,[esp+4] ; memPtr
-	ret 4
-	
 Q43org5jnode2vm6Unsafe23getSuperClasses2e28Ljava2flang2fObject3b295bLorg2fjnode2fvm2fclassmgr2fVmType3b:
 	mov eax,[esp+4] ; object reference
 	mov eax,[eax+ObjectLayout_TIB_SLOT*4] ; TIB reference
 	mov eax,[eax+(TIBLayout_SUPERCLASSES_INDEX+VmArray_DATA_OFFSET)*4] 
 	ret 4
-
-Q43org5jnode2vm6Unsafe23getBoolean2e28Lorg2fjnode2fvm2fVmAddress3b29Z:
-	mov eax,[esp+4] ; memPtr
-	movzx eax,byte [eax]
-	ret 4
-
-; boolean getBoolean(Object object, int offset);
-Q43org5jnode2vm6Unsafe23getBoolean2e28Ljava2flang2fObject3bI29Z:
-	mov eax,[esp+8] ; Object
-	add eax,[esp+4] ; Offset
-	movzx eax,byte [eax]
-	ret 8
-
-Q43org5jnode2vm6Unsafe23getByte2e28Lorg2fjnode2fvm2fVmAddress3b29B:
-	mov eax,[esp+4] ; memPtr
-	movsx eax,byte [eax]
-	ret 4
-	
-; byte getByte(Object object, int offset);
-Q43org5jnode2vm6Unsafe23getByte2e28Ljava2flang2fObject3bI29B:
-	mov eax,[esp+8] ; Object
-	add eax,[esp+4] ; Offset
-	movsx eax,byte [eax]
-	ret 8
-	
-Q43org5jnode2vm6Unsafe23getChar2e28Lorg2fjnode2fvm2fVmAddress3b29C:
-	mov eax,[esp+4] ; memPtr
-	movzx eax,word [eax]
-	ret 4
-
-Q43org5jnode2vm6Unsafe23getShort2e28Lorg2fjnode2fvm2fVmAddress3b29S:
-	mov eax,[esp+4] ; memPtr
-	movsx eax,word [eax]
-	ret 4
-
-; short getShort(Object object, int offset);
-Q43org5jnode2vm6Unsafe23getShort2e28Ljava2flang2fObject3bI29S:
-	mov eax,[esp+8] ; Object
-	add eax,[esp+4] ; Offset
-	movsx eax,word [eax]
-	ret 8
-
-; char getChar(Object object, int offset);
-Q43org5jnode2vm6Unsafe23getChar2e28Ljava2flang2fObject3bI29C:
-	mov eax,[esp+8] ; Object
-	add eax,[esp+4] ; Offset
-	movzx eax,word [eax]
-	ret 8
-
-; int getInt(VmAddress memPtr);
-Q43org5jnode2vm6Unsafe23getInt2e28Lorg2fjnode2fvm2fVmAddress3b29I:
-	mov eax,[esp+4] ; memPtr
-	mov eax,dword [eax]
-	ret 4
-	
-; int getInt(Object object, int offset);
-Q43org5jnode2vm6Unsafe23getInt2e28Ljava2flang2fObject3bI29I:
-	mov eax,[esp+8] ; Object
-	add eax,[esp+4] ; Offset
-	mov eax,dword [eax]
-	ret 8
-	
-; long getLong(VmAddress memPtr);
-Q43org5jnode2vm6Unsafe23getLong2e28Lorg2fjnode2fvm2fVmAddress3b29J:
-	mov eax,[esp+4] ; memPtr
-	mov edx,dword [eax+4] ; MSB
-	mov eax,dword [eax+0] ; LSB
-	ret 4
-
-; long getLong(Object object, int offset);
-Q43org5jnode2vm6Unsafe23getLong2e28Ljava2flang2fObject3bI29J:
-	mov eax,[esp+8] ; Object
-	add eax,[esp+4] ; Offset
-	mov edx,dword [eax+4] ; MSB
-	mov eax,dword [eax+0] ; LSB
-	ret 8
-
-; float getFloat(VmAddress memPtr);
-Q43org5jnode2vm6Unsafe23getFloat2e28Lorg2fjnode2fvm2fVmAddress3b29F:
-	mov eax,[esp+4] ; memPtr
-	mov eax,dword [eax]
-	ret 4
-
-; float getFloat(Object objec, int offset);
-Q43org5jnode2vm6Unsafe23getFloat2e28Ljava2flang2fObject3bI29F:
-	mov eax,[esp+8] ; Object
-	add eax,[esp+4] ; Offset
-	mov eax,dword [eax]
-	ret 8
-
-; double getDouble(VmAddress memPtr);
-Q43org5jnode2vm6Unsafe23getDouble2e28Lorg2fjnode2fvm2fVmAddress3b29D:
-	mov eax,[esp+4] ; memPtr
-	mov edx,dword [eax+4] ; MSB
-	mov eax,dword [eax+0] ; LSB
-	ret 4
-
-; double getDouble(Object object, int offset);
-Q43org5jnode2vm6Unsafe23getDouble2e28Ljava2flang2fObject3bI29D:
-	mov eax,[esp+8] ; Object
-	add eax,[esp+4] ; Offset
-	mov edx,dword [eax+4] ; MSB
-	mov eax,dword [eax+0] ; LSB
-	ret 8
-
-; Object getObject(VmAddress memPtr);
-; VmAddress getAddress(VmAddress memPtr);
-Q43org5jnode2vm6Unsafe23getObject2e28Lorg2fjnode2fvm2fVmAddress3b29Ljava2flang2fObject3b:
-Q43org5jnode2vm6Unsafe23getAddress2e28Lorg2fjnode2fvm2fVmAddress3b29Lorg2fjnode2fvm2fVmAddress3b:
-	mov eax,[esp+4] ; memPtr
-	mov eax,dword [eax]
-	ret 4
-
-; Object getObject(Object object, int offset);
-; VmAddress getAddress(Object object, int offset);
-Q43org5jnode2vm6Unsafe23getObject2e28Ljava2flang2fObject3bI29Ljava2flang2fObject3b:
-Q43org5jnode2vm6Unsafe23getAddress2e28Ljava2flang2fObject3bI29Lorg2fjnode2fvm2fVmAddress3b:
-	mov eax,[esp+8] ; Object
-	add eax,[esp+4] ; Offset
-	mov eax,dword [eax]
-	ret 8
-
-; void setBoolean(VmAddress memPtr, boolean value);
-Q43org5jnode2vm6Unsafe23setBoolean2e28Lorg2fjnode2fvm2fVmAddress3bZ29V:
-	mov eax,[esp+8] ; memPtr
-	mov edx,[esp+4] ; value
-	mov byte [eax],dl
-	ret 8
-
-; void setBoolean(Object object, int offset, boolean value);
-Q43org5jnode2vm6Unsafe23setBoolean2e28Ljava2flang2fObject3bIZ29V:
-	mov eax,[esp+12] ; Object
-	add eax,[esp+8]  ; Offset
-	mov edx,[esp+4]  ; value
-	mov byte [eax],dl
-	ret 12
-
-; void setByte(VmAddress memPtr, byte value);
-Q43org5jnode2vm6Unsafe23setByte2e28Lorg2fjnode2fvm2fVmAddress3bB29V:
-	mov eax,[esp+8] ; memPtr
-	mov edx,[esp+4] ; value
-	mov byte [eax],dl
-	ret 8
-
-; void setByte(Object object, int offset, byte value);
-Q43org5jnode2vm6Unsafe23setByte2e28Ljava2flang2fObject3bIB29V:
-	mov eax,[esp+12] ; Object
-	add eax,[esp+8]  ; Offset
-	mov edx,[esp+4] ; value
-	mov byte [eax],dl
-	ret 12
-
-; void setShort(VmAddress memPtr, short value);
-Q43org5jnode2vm6Unsafe23setShort2e28Lorg2fjnode2fvm2fVmAddress3bS29V:
-	mov eax,[esp+8] ; memPtr
-	mov edx,[esp+4] ; value
-	mov word [eax],dx
-	ret 8
-
-; void setShort(Object object, int offset, short value);
-Q43org5jnode2vm6Unsafe23setShort2e28Ljava2flang2fObject3bIS29V:
-	mov eax,[esp+12] ; Object
-	add eax,[esp+8]  ; Offset
-	mov edx,[esp+4] ; value
-	mov word [eax],dx
-	ret 12
-
-; void setChar(VmAddress memPtr, char value);
-Q43org5jnode2vm6Unsafe23setChar2e28Lorg2fjnode2fvm2fVmAddress3bC29V:
-	mov eax,[esp+8] ; memPtr
-	mov edx,[esp+4] ; value
-	mov word [eax],dx
-	ret 8
-
-; void setChar(Object object, int offset, char value);
-Q43org5jnode2vm6Unsafe23setChar2e28Ljava2flang2fObject3bIC29V:
-	mov eax,[esp+12] ; Object
-	add eax,[esp+8]  ; Offset
-	mov edx,[esp+4] ; value
-	mov word [eax],dx
-	ret 12
-
-; void setInt(VmAddress memPtr, int value);
-Q43org5jnode2vm6Unsafe23setInt2e28Lorg2fjnode2fvm2fVmAddress3bI29V:
-	mov eax,[esp+8] ; memPtr
-	mov edx,[esp+4] ; value
-	mov dword [eax],edx
-	ret 8
-
-; void setInt(Object object, int offset, int value);
-Q43org5jnode2vm6Unsafe23setInt2e28Ljava2flang2fObject3bII29V:
-	mov eax,[esp+12] ; Object
-	add eax,[esp+8]  ; Offset
-	mov edx,[esp+4] ; value
-	mov dword [eax],edx
-	ret 12
-
-; void setLong(VmAddress memPtr, long value);
-Q43org5jnode2vm6Unsafe23setLong2e28Lorg2fjnode2fvm2fVmAddress3bJ29V:
-	mov eax,[esp+12] ; memPtr
-	mov edx,[esp+8] ; value MSB
-	mov dword [eax+4],edx
-	mov edx,[esp+4] ; value LSB
-	mov dword [eax+0],edx
-	ret 12
-
-; void setLong(Object object, int offset, long value);
-Q43org5jnode2vm6Unsafe23setLong2e28Ljava2flang2fObject3bIJ29V:
-	mov eax,[esp+16] ; Object
-	add eax,[esp+12]  ; Offset
-	mov edx,[esp+8] ; value MSB
-	mov dword [eax+4],edx
-	mov edx,[esp+4] ; value LSB
-	mov dword [eax+0],edx
-	ret 16
-
-; void setFloat(VmAddress memPtr, float value);
-Q43org5jnode2vm6Unsafe23setFloat2e28Lorg2fjnode2fvm2fVmAddress3bF29V:
-	mov eax,[esp+8] ; memPtr
-	mov edx,[esp+4] ; value
-	mov dword [eax],edx
-	ret 8
-
-; void setFloat(Object object, int offset, float value);
-Q43org5jnode2vm6Unsafe23setFloat2e28Ljava2flang2fObject3bIF29V:
-	mov eax,[esp+12] ; Object
-	add eax,[esp+8]  ; Offset
-	mov edx,[esp+4] ; value
-	mov dword [eax],edx
-	ret 12
-
-; void setDouble(VmAddress memPtr, double value);
-Q43org5jnode2vm6Unsafe23setDouble2e28Lorg2fjnode2fvm2fVmAddress3bD29V:
-	mov eax,[esp+12] ; memPtr
-	mov edx,[esp+8] ; value MSB
-	mov dword [eax+4],edx
-	mov edx,[esp+4] ; value LSB
-	mov dword [eax+0],edx
-	ret 12
-
-; void setDouble(Object object, int offset, double value);
-Q43org5jnode2vm6Unsafe23setDouble2e28Ljava2flang2fObject3bID29V:
-	mov eax,[esp+16] ; Object
-	add eax,[esp+12]  ; Offset
-	mov edx,[esp+8] ; value MSB
-	mov dword [eax+4],edx
-	mov edx,[esp+4] ; value LSB
-	mov dword [eax+0],edx
-	ret 16
-
-; void setObject(VmAddress memPtr, Object value);
-Q43org5jnode2vm6Unsafe23setObject2e28Lorg2fjnode2fvm2fVmAddress3bLjava2flang2fObject3b29V:
-	mov eax,[esp+8] ; memPtr
-	mov edx,[esp+4] ; value
-	mov dword [eax],edx
-	ret 8
-
-; void setObject(Object object, int offset, Object value);
-Q43org5jnode2vm6Unsafe23setObject2e28Ljava2flang2fObject3bILjava2flang2fObject3b29V:
-	mov eax,[esp+12] ; Object
-	add eax,[esp+8]  ; Offset
-	mov edx,[esp+4] ; value
-	mov dword [eax],edx
-	ret 12
 
 Q43org5jnode2vm6Unsafe23intBitsToFloat2e28I29F:
 	mov eax,[esp+4]
@@ -430,11 +147,6 @@ Q43org5jnode2vm6Unsafe23outPortDword2e28II29V:
 	out dx,eax
 	ret 8
 
-; VmAddress getCurrentFrame()	
-Q43org5jnode2vm6Unsafe23getCurrentFrame2e2829Lorg2fvmmagic2funboxed2fAddress3b:
-	mov eax,ebp
-	ret
-	
 Q43org5jnode2vm6Unsafe23idle2e2829V:
 	sti
 	hlt
@@ -509,49 +221,13 @@ Q43org5jnode2vm6Unsafe23initThread2e28Lorg2fjnode2fvm2fVmThread3bLjava2flang2fOb
 	
 initThread_msg1: db 'New esp=',0
 
-; public static native int compare(VmAddress a1, VmAddress a2);
-Q43org5jnode2vm6Unsafe23compare2e28Lorg2fjnode2fvm2fVmAddress3bLorg2fjnode2fvm2fVmAddress3b29I:
-	mov eax,[esp+8]
-	cmp eax,[esp+4]
-	jl compare_lt
-	jg compare_gt
-	xor eax,eax ; equal
-	ret 8
-compare_lt:
-	mov eax,-1
-	ret 8
-compare_gt:
-	mov eax,1
-	ret 8
-
-; public static native VmAddress add(VmAddress addr, int incValue);
-; public static native VmAddress add(VmAddress a1, VmAddress a2);
-Q43org5jnode2vm6Unsafe23add2e28Lorg2fjnode2fvm2fVmAddress3bI29Lorg2fjnode2fvm2fVmAddress3b:
-Q43org5jnode2vm6Unsafe23add2e28Lorg2fjnode2fvm2fVmAddress3bLorg2fjnode2fvm2fVmAddress3b29Lorg2fjnode2fvm2fVmAddress3b:
-	mov eax,[esp+4] ; incValue
-	add eax,[esp+8] ; addr
-	ret 8
-
-; protected static native boolean atomicCompareAndSwap(VmAddress address, int oldValue, int newValue)
-Q43org5jnode2vm6Unsafe23atomicCompareAndSwap2e28Lorg2fjnode2fvm2fVmAddress3bII29Z:
-	mov eax,[esp+8] ; old value
-	mov ecx,[esp+4] ; new value
-	mov edx,[esp+12] ; address
-	lock cmpxchg dword [edx], ecx
-	jnz cas_not_ok
-	mov eax,1
-	ret 12
-cas_not_ok:
-	xor eax,eax
-	ret 12
-
-; public static native VmAddress getMaxAddress()
-Q43org5jnode2vm6Unsafe23getMaxAddress2e2829Lorg2fjnode2fvm2fVmAddress3b:
+; public static native Address getMaxAddress()
+Q43org5jnode2vm6Unsafe23getMaxAddress2e2829Lorg2fvmmagic2funboxed2fAddress3b:
 	mov eax,0xFFC00000	; 4Gb - 4Mb
 	ret
 	
 ; public static native VmAddress getMinAddress()
-Q43org5jnode2vm6Unsafe23getMinAddress2e2829Lorg2fjnode2fvm2fVmAddress3b:
+Q43org5jnode2vm6Unsafe23getMinAddress2e2829Lorg2fvmmagic2funboxed2fAddress3b:
 	mov eax,free_paddr
 	ret
 	
@@ -594,11 +270,6 @@ Q43org5jnode2vm6Unsafe23getBootHeapStart2e2829Lorg2fvmmagic2funboxed2fAddress3b:
 ; public static native Address getBootHeapEnd()
 Q43org5jnode2vm6Unsafe23getBootHeapEnd2e2829Lorg2fvmmagic2funboxed2fAddress3b:
 	mov eax,bootHeapEnd
-	ret
-	
-; public static native long getTimeStampCounter()
-Q43org5jnode2vm6Unsafe23getTimeStampCounter2e2829J:
-	rdtsc
 	ret
 	
 ; Gets information of the JNode kernel command line.

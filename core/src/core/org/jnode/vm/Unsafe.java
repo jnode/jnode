@@ -509,20 +509,6 @@ public final class Unsafe {
 	protected static native void initThread(VmThread curThread,
 			Object newStack, int stackSize);
 
-	/**
-	 * Atomic compare and swap. Compares the int value addressed by the given
-	 * address with the given old value. If they are equal, the value at the
-	 * given address is replace by the new value and true is returned, otherwise
-	 * nothing is changed and false is returned.
-	 * 
-	 * @param address
-	 * @param oldValue
-	 * @param newValue
-	 * @return boolean true if the value at address is changed, false otherwise.
-	 */
-	protected static native boolean atomicCompareAndSwap(VmAddress address,
-			int oldValue, int newValue);
-
 	protected static native int inPortByte(int portNr);
 
 	protected static native int inPortWord(int portNr);
@@ -549,7 +535,7 @@ public final class Unsafe {
 	 * 
 	 * @return Address
 	 */
-	protected static native VmAddress getMinAddress();
+	protected static native Address getMinAddress();
 
 	/**
 	 * Gets the maximum valid address in the addressspace of the current
@@ -557,7 +543,7 @@ public final class Unsafe {
 	 * 
 	 * @return Address
 	 */
-	protected static native VmAddress getMaxAddress();
+	protected static native Address getMaxAddress();
 
 	/**
 	 * Gets the (inclusive) start address of the available memory.

@@ -71,22 +71,6 @@ iPF_ADDRMASK	equ 0xFFFFF000
 iPF_FLAGSMASK	equ 0x00000FFF
 
 ; ----------------------
-; JNode specifics
-; ----------------------
-
-; Default Page flags
-PF_DEFAULT	equ iPF_PRESENT|iPF_WRITE|iPF_USER
-PF_DEFAULT_RO	equ iPF_PRESENT|iPF_USER
-
-; Segment selectors
-KERNEL_CS   equ 0x08
-KERNEL_DS   equ 0x10
-USER_CS     equ 0x1B
-USER_DS     equ 0x23
-TSS_DS      equ 0x28
-CURPROC_FS  equ 0x33
-
-; ----------------------
 ; Multiboot Info struct
 ; ----------------------
 
