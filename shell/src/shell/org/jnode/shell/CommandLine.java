@@ -384,7 +384,7 @@ public class CommandLine {
     return outFileName;
   }
 
-  private void setOutFileName(String outFileName)
+  void setOutFileName(String outFileName)
   {
     this.outFileName = outFileName;
   }
