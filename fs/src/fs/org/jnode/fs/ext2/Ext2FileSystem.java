@@ -5,6 +5,7 @@ package org.jnode.fs.ext2;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.block.BlockDeviceAPI;
@@ -29,6 +30,7 @@ public class Ext2FileSystem implements FileSystem {
 	private GroupDescriptor groupDescriptors[];
 	private int groupCount;
 	private BlockCache cache;
+	private final Logger log = Logger.getLogger(getClass());
 
 	/**
 	 * Constructor for Ext2FileSystem.
@@ -87,8 +89,8 @@ public class Ext2FileSystem implements FileSystem {
 			throw new FileSystemException(e);
 		}
 
-		Ext2Debugger.debug("Ext2fs filesystem constructed sucessfully");
-		Ext2Debugger.debug(
+		log.debug("Ext2fs filesystem constructed sucessfully");
+		log.debug(
 			"	superblock:	#blocks:		"
 				+ superblock.getBlocksCount()
 				+ "\n"
@@ -141,7 +143,7 @@ public class Ext2FileSystem implements FileSystem {
 	 * @see org.jnode.fs.FileSystem#getRootEntry()
 	 */
 	public FSEntry getRootEntry() throws IOException {
-		Ext2Debugger.debug("Ext2FileSystem.getRootEntry()", 2);
+		log.debug("Ext2FileSystem.getRootEntry()");
 		try {
 			if (!closed) {
 				return new Ext2Entry(getINode(Ext2Constants.EXT2_ROOT_INO), "/", Ext2Constants.EXT2_FT_DIR);
