@@ -2392,7 +2392,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             os.writeSUB(v1.getRegister(), v2.getRegister());
             break;
         case Item.LOCAL:
-            os.writeSUB(v1.getRegister(), v2.getOffsetToFP(), FP);
+            os.writeSUB(v1.getRegister(), FP, v2.getOffsetToFP());
             break;
         case Item.CONSTANT:
             //IMPROVE: implement SUB(reg, imm32)
