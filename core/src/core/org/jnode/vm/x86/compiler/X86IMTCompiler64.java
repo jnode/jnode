@@ -33,6 +33,7 @@ import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.compiler.CompiledIMT;
+import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.compiler.IMTCompiler;
 
 /**
@@ -216,7 +217,7 @@ public final class X86IMTCompiler64 extends IMTCompiler implements
 	 * @param loader
 	 */
 	public void initialize(VmClassLoader loader) {
-		final X86CompilerContext context = new X86CompilerContext(loader, null,
+		final EntryPoints context = new EntryPoints(loader, null,
 				0);
 		final int actCodeOfs = context.getVmMethodNativeCodeField().getOffset();
 		final int actSelectorOfs = context.getVmMethodSelectorField()

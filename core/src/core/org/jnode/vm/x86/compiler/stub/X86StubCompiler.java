@@ -32,9 +32,9 @@ import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.compiler.CompiledMethod;
 import org.jnode.vm.compiler.CompilerBytecodeVisitor;
+import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.x86.compiler.AbstractX86Compiler;
-import org.jnode.vm.x86.compiler.X86CompilerContext;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 import org.jnode.vm.x86.compiler.X86JumpTable;
 import org.vmmagic.pragma.PrivilegedActionPragma;
@@ -87,7 +87,7 @@ public class X86StubCompiler extends AbstractX86Compiler {
 			cm.setCodeStart(nos.getObjectRef(label));
 		} else {
 			final X86Assembler os = (X86Assembler) nos;
-			final X86CompilerContext context = getContext();
+			final EntryPoints context = getEntryPoints();
 			// Create the helper
 			final CCompilerHelper ih = new CCompilerHelper(os, null, context, isBootstrap);
 			// Start an "object"

@@ -34,9 +34,9 @@ import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.TIBLayout;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.x86.compiler.BaseX86MagicHelper;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
-import org.jnode.vm.x86.compiler.X86CompilerContext;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 
 /**
@@ -58,7 +58,7 @@ final class MagicHelper extends BaseX86MagicHelper {
         final X86Assembler os = ec.getStream();
         final ItemFactory ifac = ec.getItemFactory();
         final X86RegisterPool pool = ec.getGPRPool();
-        final X86CompilerContext context = ec.getContext();  
+        final EntryPoints context = ec.getContext();  
         final X86CompilerHelper helper = ec.getHelper();
         final int slotSize = os.isCode32() ? 4 : 8;
 

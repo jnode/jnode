@@ -37,6 +37,7 @@ import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmStaticsEntry;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmTypeState;
+import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.memmgr.VmWriteBarrier;
 import org.jnode.vm.x86.X86CpuID;
 import org.vmmagic.pragma.PrivilegedActionPragma;
@@ -76,7 +77,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
     /** The size of stack slot in bytes (4/8) */
     public final int SLOTSIZE;
     
-	private final X86CompilerContext context;
+	private final EntryPoints entryPoints;
 
 	private VmMethod method;
 
@@ -99,10 +100,10 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	/**
 	 * Create a new instance
 	 * 
-	 * @param context
+	 * @param entryPoints
 	 */
 	public X86CompilerHelper(X86Assembler os, AbstractX86StackManager stackMgr,
-			X86CompilerContext context, boolean isBootstrap)
+			EntryPoints entryPoints, boolean isBootstrap)
 			throws PrivilegedActionPragma {
 		this.os = os;
         if (os.isCode32()) {
@@ -126,7 +127,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
             this.ADDRSIZE = X86Constants.BITS64;
             this.SLOTSIZE = 8;
         }
-		this.context = context;
+		this.entryPoints = entryPoints;
 		this.stackMgr = stackMgr;
 		this.isBootstrap = isBootstrap;
 		final X86CpuID cpuId = (X86CpuID) os.getCPUID();
@@ -224,7 +225,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 * @param signature
 	 */
 	public final void invokeJavaMethod(String signature) {
-		final int offset = context.getVmMethodNativeCodeField().getOffset();
+		final int offset = entryPoints.getVmMethodNativeCodeField().getOffset();
 		if (os.isCode32()) {
 			os.writeCALL(X86Register.EAX, offset);
 		} else {
@@ -292,7 +293,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	public final void writeYieldPoint(Object curInstrLabel) {
 		if (method.getThreadSwitchIndicatorMask() != 0) {
 			final Label doneLabel = new Label(curInstrLabel + "noYP");
-			final int offset = context.getVmThreadSwitchIndicatorOffset();
+			final int offset = entryPoints.getVmThreadSwitchIndicatorOffset();
 			final int flag = VmProcessor.TSI_SWITCH_REQUESTED;
 			if (os.isCode32()) {
 				os.writePrefix(X86Constants.FS_PREFIX);
@@ -328,17 +329,17 @@ public class X86CompilerHelper implements X86CompilerConstants {
 				os.writePUSH(aax);
 				// Do the is initialized test
 				// Move method.declaringClass -> EAX
-				os.writeMOV(size, aax, methodReg, context
+				os.writeMOV(size, aax, methodReg, entryPoints
 						.getVmMemberDeclaringClassField().getOffset());
 				// Test declaringClass.modifiers
-				os.writeTEST(BITS32, aax, context.getVmTypeState().getOffset(),
+				os.writeTEST(BITS32, aax, entryPoints.getVmTypeState().getOffset(),
 						VmTypeState.ST_INITIALIZED);
 				final Label afterInit = new Label(method.getMangledName()
 						+ "$$after-classinit");
 				os.writeJCC(afterInit, X86Constants.JNZ);
 				// Call cls.initialize
 				os.writePUSH(aax);
-				invokeJavaMethod(context.getVmTypeInitialize());
+				invokeJavaMethod(entryPoints.getVmTypeInitialize());
 				os.setObjectRef(afterInit);
 				// Restore eax
 				os.writePOP(aax);
@@ -353,7 +354,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 		if (!cls.isInitialized()) {
 			// Test declaringClass.modifiers
 			os.writeTEST(BITS32, classReg,
-					context.getVmTypeState().getOffset(),
+					entryPoints.getVmTypeState().getOffset(),
 					VmTypeState.ST_INITIALIZED);
 			final Label afterInit = new Label(curInstrLabel
 					+ "$$after-classinit-ex");
@@ -377,7 +378,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 			}
 			// Call cls.initialize
 			os.writePUSH(classReg);
-			invokeJavaMethod(context.getVmTypeInitialize());
+			invokeJavaMethod(entryPoints.getVmTypeInitialize());
 			if (os.isCode32()) {
 				os.writePOPA();
 			} else {
@@ -408,7 +409,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 *            called.
 	 */
 	public final void writeIncInvocationCount(GPR methodReg) {
-		final int offset = context.getVmMethodInvocationCountField()
+		final int offset = entryPoints.getVmMethodInvocationCountField()
 				.getOffset();
 		os.writeINC(BITS32, methodReg, offset);
 	}
@@ -424,7 +425,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 		// vm_invoke_testStackOverflow:
 		// int 0x31
 		// vm_invoke_testStackOverflowDone:
-		final int offset = context.getVmProcessorStackEnd().getOffset();
+		final int offset = entryPoints.getVmProcessorStackEnd().getOffset();
 		final Label doneLabel = new Label(labelPrefix + "$$stackof-done");
 		if (os.isCode32()) {
 			os.writePrefix(X86Constants.FS_PREFIX);
@@ -444,7 +445,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 */
 	public final void writeLoadSTATICS(Label curInstrLabel, String labelPrefix,
 			boolean isTestOnly) {
-		final int offset = context.getVmProcessorStaticsTable().getOffset();
+		final int offset = entryPoints.getVmProcessorStaticsTable().getOffset();
 		if (isTestOnly) {
 			if (debug) {
 				final Label ok = new Label(curInstrLabel + labelPrefix
@@ -494,7 +495,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 * @return True/false
 	 */
 	public final boolean needsWriteBarrier() {
-		return (context.getWriteBarrier() != null);
+		return (entryPoints.getWriteBarrier() != null);
 	}
 
 	/**
@@ -506,14 +507,14 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 */
 	public final void writeArrayStoreWriteBarrier(GPR refReg, GPR indexReg,
 			GPR valueReg, GPR scratchReg) {
-		final VmWriteBarrier wb = context.getWriteBarrier();
+		final VmWriteBarrier wb = entryPoints.getWriteBarrier();
 		if (wb != null) {
 			os.writeMOV_Const(scratchReg, wb);
 			os.writePUSH(scratchReg);
 			os.writePUSH(refReg);
 			os.writePUSH(indexReg);
 			os.writePUSH(valueReg);
-			invokeJavaMethod(context.getArrayStoreWriteBarrier());
+			invokeJavaMethod(entryPoints.getArrayStoreWriteBarrier());
 		}
 	}
 
@@ -527,14 +528,14 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	public final void writePutfieldWriteBarrier(VmInstanceField field,
 			GPR refReg, GPR valueReg, GPR scratchReg) {
 		if (field.isObjectRef()) {
-			final VmWriteBarrier wb = context.getWriteBarrier();
+			final VmWriteBarrier wb = entryPoints.getWriteBarrier();
 			if (wb != null) {
 				os.writeMOV_Const(scratchReg, wb);
 				os.writePUSH(scratchReg);
 				os.writePUSH(refReg);
 				os.writePUSH(field.getOffset());
 				os.writePUSH(valueReg);
-				invokeJavaMethod(context.getPutfieldWriteBarrier());
+				invokeJavaMethod(entryPoints.getPutfieldWriteBarrier());
 			}
 		}
 	}
@@ -552,13 +553,13 @@ public class X86CompilerHelper implements X86CompilerConstants {
             Vm._assert(valueReg.getSize() == this.ADDRSIZE, "valueReg wrong size");
         }
 		if (field.isObjectRef()) {
-			final VmWriteBarrier wb = context.getWriteBarrier();
+			final VmWriteBarrier wb = entryPoints.getWriteBarrier();
 			if (wb != null) {
 				os.writeMOV_Const(scratchReg, wb);
 				os.writePUSH(scratchReg);
 				os.writePUSH(field.getStaticsIndex());
 				os.writePUSH(valueReg);
-				invokeJavaMethod(context.getPutstaticWriteBarrier());
+				invokeJavaMethod(entryPoints.getPutstaticWriteBarrier());
 			}
 		}
 	}

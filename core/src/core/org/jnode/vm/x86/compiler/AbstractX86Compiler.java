@@ -37,7 +37,9 @@ import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.compiler.CompiledMethod;
+import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.compiler.NativeCodeCompiler;
+import org.jnode.vm.x86.VmX86Architecture;
 import org.jnode.vm.x86.X86CpuID;
 import org.vmmagic.pragma.PrivilegedActionPragma;
 import org.vmmagic.unboxed.Address;
@@ -50,7 +52,8 @@ import org.vmmagic.unboxed.Address;
 public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
         X86CompilerConstants {
 
-    private X86CompilerContext context;
+    private EntryPoints context;
+    private X86Constants.Mode mode;
 
     private TypeSizeInfo typeSizeInfo;
 
@@ -61,8 +64,9 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
      */
     public final void initialize(VmClassLoader loader) {
         if (context == null) {
-            context = new X86CompilerContext(loader, Vm.getHeapManager(),
+            context = new EntryPoints(loader, Vm.getHeapManager(),
                     getMagic());
+            mode = ((VmX86Architecture)loader.getArchitecture()).getMode();
             typeSizeInfo = loader.getArchitecture().getTypeSizeInfo();
         }
     }
@@ -72,7 +76,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
      */
     public NativeStream createNativeStream(ObjectResolver resolver) {
         final X86BinaryAssembler os = new X86BinaryAssembler((X86CpuID) Unsafe
-                .getCurrentProcessor().getCPUID(), context.getMode(), 0);
+                .getCurrentProcessor().getCPUID(), mode, 0);
         os.setResolver(resolver);
         return os;
     }
@@ -120,7 +124,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
     /**
      * @return Returns the context.
      */
-    protected final X86CompilerContext getContext() {
+    protected final EntryPoints getEntryPoints() {
         return this.context;
     }
 
@@ -130,7 +134,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
      * @return
      */
     protected final X86Constants.Mode getMode() {
-        return context.getMode();
+        return mode;
     }
 
     public void disassemble(VmMethod method, ObjectResolver resolver,
@@ -147,7 +151,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
         }
 
         X86TextAssembler tos = new X86TextAssembler(writer, (X86CpuID) Unsafe
-                .getCurrentProcessor().getCPUID(), context.getMode());
+                .getCurrentProcessor().getCPUID(), mode);
 
         doCompile(method, tos, level, false);
         try {
