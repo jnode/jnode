@@ -4,53 +4,71 @@
 package org.jnode.vm;
 
 /**
- * This class is used to allocate and free fixed size blocks of memory. This memory is not garbage
- * collected, nor is each block addressable as a java object. Since this manager is used by the
- * Object allocation, do not allocate object in this class.
+ * This class is used to allocate and free fixed size blocks of memory. This
+ * memory is not garbage collected, nor is each block addressable as a java
+ * object. Since this manager is used by the Object allocation, do not allocate
+ * object in this class.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class MemoryBlockManager extends VmSystemObject implements Uninterruptible {
+public final class MemoryBlockManager extends VmSystemObject implements
+		Uninterruptible {
 
 	/** Size of a memory block. */
 	static final int BLOCK_SIZE_SHIFT = 16;
+
 	static final int BLOCK_SIZEa = (1 << BLOCK_SIZE_SHIFT);
+
 	/** Inclusive start address of first block */
 	private static long startPtr;
+
 	/** Exclusive end address of last block */
 	private static long endPtr;
+
 	/** Address of lock to my structures */
 	private static Address lockPtr;
+
 	/** Address of usage bitmap */
 	private static Address bitmapPtr;
+
 	/** Total number of blocks */
 	private static long blockCount;
+
 	/** Has this class be initialized yet */
 	private static boolean initialized;
+
 	/** Number of allocated blocks */
 	private static long allocatedBlocks;
+
 	/** Number of next allocatable block */
 	private static long nextBlockNr;
 
 	/**
-	 * Allocate a new block of memory at blockSize large. The actual size is aligned on BLOCK_SIZE.
+	 * Allocate a new block of memory at blockSize large. The actual size is
+	 * aligned on BLOCK_SIZE.
 	 * 
 	 * @param blockSize
-	 * @return The address of the start of the block, or null when no memory is available.
+	 * @return The address of the start of the block, or null when no memory is
+	 *         available.
 	 */
 	static final Address allocateBlock(int blockSize) {
 		if (!initialized) {
 			initialize();
 		}
+		if (false) {
+			Unsafe.debug("allocateBlock");
+			Unsafe.debug(Unsafe.addressToInt(lockPtr));
+		}
 		enter();
 		try {
 			// Calculate the number of blocks needed
-			final int reqBlockCount = (int)(blockAlign(blockSize, true) >>> BLOCK_SIZE_SHIFT);
+			final int reqBlockCount = (int) (blockAlign(blockSize, true) >>> BLOCK_SIZE_SHIFT);
 			// Find a large enough series of blocks
 			final long nr = findFreeBlocks(reqBlockCount);
 			if (nr == -1L) {
 				//Unsafe.debug("ret null."); Unsafe.debug(blockSize);
-				//Unsafe.debug("allocated blocks"); Unsafe.debug(allocatedBlocks);
+				//Unsafe.debug("allocated blocks");
+				// Unsafe.debug(allocatedBlocks);
 				//Unsafe.debug("total blocks"); Unsafe.debug(blockCount);
 				//Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
 				//Unsafe.die("allocateBlock");
@@ -70,18 +88,20 @@ public final class MemoryBlockManager extends VmSystemObject implements Uninterr
 	}
 
 	/**
-	 * Free a previously allocated new block of memory at blockSize large. 
-	 * The actual size is aligned on BLOCK_SIZE.
-	 *
-	 * @param ptr The block address as returned by allocateBlock .
-	 * @param blockSize The size of the block as given to allocateBlock.
+	 * Free a previously allocated new block of memory at blockSize large. The
+	 * actual size is aligned on BLOCK_SIZE.
+	 * 
+	 * @param ptr
+	 *            The block address as returned by allocateBlock .
+	 * @param blockSize
+	 *            The size of the block as given to allocateBlock.
 	 */
 	static final void freeBlock(Address ptr, int blockSize) {
 		enter();
 		try {
 			// Calculate the block number
 			final long nr = (Unsafe.addressToLong(ptr) - startPtr) >>> BLOCK_SIZE_SHIFT;
-			// Calculate the number of blocks 
+			// Calculate the number of blocks
 			final long reqBlockCount = blockAlign(blockSize, true) >>> BLOCK_SIZE_SHIFT;
 			// Mark all blocks as free
 			for (long i = 0; i < reqBlockCount; i++) {
@@ -96,6 +116,7 @@ public final class MemoryBlockManager extends VmSystemObject implements Uninterr
 
 	/**
 	 * Gets the size of non-allocated memory blocks.
+	 * 
 	 * @return The free size in bytes
 	 */
 	public static long getFreeMemory() {
@@ -103,7 +124,8 @@ public final class MemoryBlockManager extends VmSystemObject implements Uninterr
 	}
 
 	/**
-	 * Find the first free memory block that is following by freeBlockCount-1 free memory blocks.
+	 * Find the first free memory block that is following by freeBlockCount-1
+	 * free memory blocks.
 	 * 
 	 * @param freeBlockCount
 	 * @return The block number of the first block, or -1 if not found.
@@ -161,25 +183,35 @@ public final class MemoryBlockManager extends VmSystemObject implements Uninterr
 		} else {
 			v &= ~mask;
 		}
-		Unsafe.setByte(ptr, (byte)v);
+		Unsafe.setByte(ptr, (byte) v);
 	}
 
 	/**
 	 * Initialize this manager.
 	 */
 	private final static void initialize() {
-		//Unsafe.debug("initialize.");
-		
-		startPtr = blockAlign(Unsafe.addressToLong(Unsafe.getMemoryStart()), true);
+		Unsafe.debug("initialize.");
+
+		startPtr = blockAlign(Unsafe.addressToLong(Unsafe.getMemoryStart()),
+				true);
 		endPtr = blockAlign(Unsafe.addressToLong(Unsafe.getMemoryEnd()), false);
 		final long size = endPtr - startPtr;
 		Unsafe.debug(size);
 		blockCount = (size >>> BLOCK_SIZE_SHIFT);
-		// Create a lock (4 bytes) and usage bitmap at the front of the memory region
+		// Create a lock (4 bytes) and usage bitmap at the front of the memory
+		// region
 		final long rawBitmapSize = (blockCount >>> 3);
 		//final long rawBitmapSize = blockCount;
 		final long bitmapSize = blockAlign(4 + rawBitmapSize, true);
+		if (false) {
+			Unsafe.debug("startPtr:");
+			Unsafe.debug(startPtr);
+		}
 		lockPtr = Unsafe.longToAddress(startPtr);
+		if (false) {
+			Unsafe.debug("lockPtr:");
+			Unsafe.debug(Unsafe.addressToInt(lockPtr));
+		}
 		bitmapPtr = Unsafe.longToAddress(startPtr + 4);
 		// Clear the lock & bitmap size
 		clear(lockPtr, bitmapSize);
@@ -190,18 +222,22 @@ public final class MemoryBlockManager extends VmSystemObject implements Uninterr
 		// Mark as initialized
 		initialized = true;
 
-		//Unsafe.debug("BitmapPtr "); Unsafe.debug(Unsafe.addressToLong(bitmapPtr)); 
-		//Unsafe.debug("LockPtr "); Unsafe.debug(Unsafe.addressToLong(lockPtr)); 
-		//Unsafe.debug("StartPtr "); Unsafe.debug(startPtr); 
-		//Unsafe.debug("BitmapSize "); Unsafe.debug(bitmapSize); 
+		//Unsafe.debug("BitmapPtr ");
+		// Unsafe.debug(Unsafe.addressToLong(bitmapPtr));
+		//Unsafe.debug("LockPtr ");
+		// Unsafe.debug(Unsafe.addressToLong(lockPtr));
+		//Unsafe.debug("StartPtr "); Unsafe.debug(startPtr);
+		//Unsafe.debug("BitmapSize "); Unsafe.debug(bitmapSize);
 		//Unsafe.debug("Block count "); Unsafe.debug(blockCount);
 		//Unsafe.die();
-		//Unsafe.debug("end of initialize.");
+		if (false) {
+			Unsafe.debug("end of initialize.");
+		}
 	}
 
 	/**
-	 * Claim access to my structures. This is done without using java monitorenter/exit
-	 * instructions, since they may need a memory allocation.
+	 * Claim access to my structures. This is done without using java
+	 * monitorenter/exit instructions, since they may need a memory allocation.
 	 */
 	private static final void enter() {
 		while (!Unsafe.atomicCompareAndSwap(lockPtr, 0, 1)) {
@@ -234,6 +270,7 @@ public final class MemoryBlockManager extends VmSystemObject implements Uninterr
 
 	/**
 	 * Clear a large area of memory. Fill the memory with zeros.
+	 * 
 	 * @param ptr
 	 * @param size
 	 */
@@ -241,7 +278,7 @@ public final class MemoryBlockManager extends VmSystemObject implements Uninterr
 		//Unsafe.debug("clear");
 		//Unsafe.debug(size);
 		while (size != 0) {
-			final int part = (int)Math.min(size, 0x7fffffffL);
+			final int part = (int) Math.min(size, 0x7fffffffL);
 			//Unsafe.debug(size);
 			Unsafe.clear(ptr, part);
 			ptr = Unsafe.add(ptr, part);

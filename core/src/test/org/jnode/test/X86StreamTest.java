@@ -82,6 +82,13 @@ public class X86StreamTest {
 		os.writeCALL(Register.EAX);
 		os.writeCALL(Register.ESI);
 		
+		os.writeXCHG(Register.EAX, Register.EDX);
+		os.writeXCHG(Register.ESI, Register.EAX);
+		os.writeXCHG(Register.ECX, Register.EBX);
+
+		os.writeXCHG(Register.EAX, 13, Register.EDX);
+		os.writeXCHG(Register.ECX, 13, Register.EBX);
+
 		FileOutputStream fos = new FileOutputStream("test.bin");
 		os.writeTo(fos);
 		fos.close();

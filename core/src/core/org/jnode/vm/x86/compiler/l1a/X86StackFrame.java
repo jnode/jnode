@@ -27,281 +27,292 @@ import org.jnode.vm.x86.compiler.X86JumpTable;
  */
 class X86StackFrame implements X86CompilerConstants {
 
-    private final VmMethod method;
+	private final VmMethod method;
 
-    private final AbstractX86Stream os;
+	private final AbstractX86Stream os;
 
-    private final X86CompilerHelper helper;
+	private final X86CompilerHelper helper;
 
-    private final X86CompilerContext context;
+	private final X86CompilerContext context;
 
-    private final CompiledMethod cm;
+	private final CompiledMethod cm;
 
-    private final VmByteCode bc;
+	private final VmByteCode bc;
 
-    /** Label of the footer */
-    private final Label footerLabel;
+	/** Label of the footer */
+	private final Label footerLabel;
 
-    /** Label of the create locals code */
-    private final Label createLocalsLabel;
+	/** Label of the create locals code */
+	private final Label createLocalsLabel;
 
-    /** Label of the create locals return address */
-    private final Label createLocalsRetLabel;
+	/** Label of the create locals return address */
+	private final Label createLocalsRetLabel;
 
-    private X86Stream.ObjectInfo codeObject;
+	private X86Stream.ObjectInfo codeObject;
 
-    private static final int EbpFrameRefOffset = 8;
+	private static final int EbpFrameRefOffset = 8;
 
-    private static final int EbpMethodRefOffset = 0;
+	private static final int EbpMethodRefOffset = 0;
 
-    /** Number of byte on the stack occupied by saved registers. See {@link #saveRegisters()} */
-    private static final int SAVED_REGISTERSPACE = 0 * 4;
+	/**
+	 * Number of byte on the stack occupied by saved registers. See
+	 * {@link #saveRegisters()}
+	 */
+	private static final int SAVED_REGISTERSPACE = 0 * 4;
 
-    /**
-     * Create a new instance
-     * 
-     * @param os
-     * @param method
-     * @param context
-     * @param cm
-     */
-    public X86StackFrame(AbstractX86Stream os, X86CompilerHelper helper,
-            VmMethod method, X86CompilerContext context, CompiledMethod cm) {
-        this.os = os;
-        this.helper = helper;
-        this.method = method;
-        this.context = context;
-        this.cm = cm;
-        this.bc = method.getBytecode();
-        this.createLocalsLabel = helper.genLabel("$$gen-locals");
-        this.createLocalsRetLabel = helper.genLabel("$$gen-locals-ret");
-        this.footerLabel = helper.genLabel("$$footer");
-    }
+	/**
+	 * Create a new instance
+	 * 
+	 * @param os
+	 * @param method
+	 * @param context
+	 * @param cm
+	 */
+	public X86StackFrame(AbstractX86Stream os, X86CompilerHelper helper,
+			VmMethod method, X86CompilerContext context, CompiledMethod cm) {
+		this.os = os;
+		this.helper = helper;
+		this.method = method;
+		this.context = context;
+		this.cm = cm;
+		this.bc = method.getBytecode();
+		this.createLocalsLabel = helper.genLabel("$$gen-locals");
+		this.createLocalsRetLabel = helper.genLabel("$$gen-locals-ret");
+		this.footerLabel = helper.genLabel("$$footer");
+	}
 
-    /**
-     * Emit code to create the stack frame
-     * @return The length of os at the start of the method code.
-     */
-    public int emitHeader() {
+	/**
+	 * Emit code to create the stack frame
+	 * 
+	 * @return The length of os at the start of the method code.
+	 */
+	public int emitHeader() {
 
-        final VmMethodCode code = new VmMethodCode();
-        final Label startLabel = helper.genLabel("$$start");
-        codeObject = os.startObject(context.getVmMethodCodeClass());
-        os.setObjectRef(code);
-        cm.setCodeStart(os.setObjectRef(startLabel));
-        final int rc = os.getLength();
+		final VmMethodCode code = new VmMethodCode();
+		final Label startLabel = helper.genLabel("$$start");
+		codeObject = os.startObject(context.getVmMethodCodeClass());
+		os.setObjectRef(code);
+		cm.setCodeStart(os.setObjectRef(startLabel));
+		final int rc = os.getLength();
 
-        // Test for stack overflow
-        helper.writeStackOverflowTest(method);
+		if (false) {
+			// Debug only
+			os.writeBreakPoint();
+		}
 
-        // Create class initialization code (if needed)
-        helper.writeClassInitialize(method, EAX, ECX);
+		// Test for stack overflow
+		helper.writeStackOverflowTest(method);
 
-        // Increment the invocation count
-        helper.writeIncInvocationCount(EAX);
+		// Create class initialization code (if needed)
+		helper.writeClassInitialize(method, EAX, ECX);
 
-        // Fixed framelayout
-        saveRegisters();
-        os.writePUSH(Register.EBP);
-        os.writePUSH(context.getMagic());
-        //os.writePUSH(0); // PC, which is only used in interpreted methods
-        /** EAX MUST contain the VmMethod structure upon entry of the method */
-        os.writePUSH(Register.EAX);
-        os.writeMOV(INTSIZE, Register.EBP, Register.ESP);
+		// Increment the invocation count
+		helper.writeIncInvocationCount(EAX);
 
-        //final int noArgs = method.getNoArgs();
-        //final int noLocals = bc.getNoLocals();
-        //final int noLocalVars = noLocals - noArgs;
+		// Fixed framelayout
+		saveRegisters();
+		os.writePUSH(Register.EBP);
+		os.writePUSH(context.getMagic());
+		//os.writePUSH(0); // PC, which is only used in interpreted methods
+		/** EAX MUST contain the VmMethod structure upon entry of the method */
+		os.writePUSH(Register.EAX);
+		os.writeMOV(INTSIZE, Register.EBP, Register.ESP);
 
-        // Create and clear all local variables
-        os.writeJMP(createLocalsLabel);
-        os.setObjectRef(createLocalsRetLabel);
-        /*
-         * if (noLocalVars > 0) { os.writeXOR(Register.EAX, Register.EAX); for
-         * (int i = 0; i < noLocalVars; i++) { os.writePUSH(Register.EAX); }
-         */
+		//final int noArgs = method.getNoArgs();
+		//final int noLocals = bc.getNoLocals();
+		//final int noLocalVars = noLocals - noArgs;
 
-        // Load the statics table reference
-        if (method.canThrow(PragmaLoadStatics.class)) {
-            helper.writeLoadSTATICS(helper.genLabel("$$edi"), "init", false);
-        }
+		// Create and clear all local variables
+		os.writeJMP(createLocalsLabel);
+		os.setObjectRef(createLocalsRetLabel);
+		/*
+		 * if (noLocalVars > 0) { os.writeXOR(Register.EAX, Register.EAX); for
+		 * (int i = 0; i < noLocalVars; i++) { os.writePUSH(Register.EAX); }
+		 */
 
-        /* Create the synchronization enter code */
-        emitSynchronizationCode(context.getMonitorEnterMethod());
+		// Load the statics table reference
+		if (method.canThrow(PragmaLoadStatics.class)) {
+			helper.writeLoadSTATICS(helper.genLabel("$$edi"), "init", false);
+		}
 
-	return rc;
-    }
+		/* Create the synchronization enter code */
+		emitSynchronizationCode(context.getMonitorEnterMethod());
 
-    /**
-     * Emit code to end the stack frame
-     */
-    public void emitTrailer(int maxLocals) {
-        final int argSlotCount = method.getArgSlotCount();
+		return rc;
+	}
 
-        // Emit the code to create the locals
-        os.setObjectRef(createLocalsLabel);
-        final int noLocalVars = maxLocals - argSlotCount;
-        // Create and clear all local variables
-        if (noLocalVars > 0) {
-            os.writeXOR(Register.EAX, Register.EAX);
-            for (int i = 0; i < noLocalVars; i++) {
-                os.writePUSH(Register.EAX);
-            }
-        }
-        os.writeJMP(createLocalsRetLabel);
+	/**
+	 * Emit code to end the stack frame
+	 */
+	public void emitTrailer(int maxLocals) {
+		final int argSlotCount = method.getArgSlotCount();
 
-        // Now start the actual footer
-        os.setObjectRef(footerLabel);
+		// Emit the code to create the locals
+		os.setObjectRef(createLocalsLabel);
+		final int noLocalVars = maxLocals - argSlotCount;
+		// Create and clear all local variables
+		if (noLocalVars > 0) {
+			os.writeXOR(Register.EAX, Register.EAX);
+			for (int i = 0; i < noLocalVars; i++) {
+				os.writePUSH(Register.EAX);
+			}
+		}
+		os.writeJMP(createLocalsRetLabel);
 
-        /* Go restore the previous current frame */
-        emitSynchronizationCode(context.getMonitorExitMethod());
-        os.writeLEA(Register.ESP, Register.EBP, EbpFrameRefOffset);
-        os.writePOP(Register.EBP);
-        restoreRegisters();
-        // Return
-        if (argSlotCount > 0) {
-            os.writeRET(argSlotCount * 4);
-        } else {
-            os.writeRET();
-        }
+		// Now start the actual footer
+		os.setObjectRef(footerLabel);
 
-        // No set the exception start&endPtr's
-        //final int noLocals = bc.getNoLocals();
-        //final int noLocalVars = noLocals - noArgs;
-        final int count = bc.getNoExceptionHandlers();
-        CompiledExceptionHandler[] ceh = new CompiledExceptionHandler[ count];
-        for (int i = 0; i < count; i++) {
-            final VmInterpretedExceptionHandler eh = bc.getExceptionHandler(i);
-            final Label handlerLabel = helper.genLabel("$$ex-handler" + i);
+		/* Go restore the previous current frame */
+		emitSynchronizationCode(context.getMonitorExitMethod());
+		os.writeLEA(Register.ESP, Register.EBP, EbpFrameRefOffset);
+		os.writePOP(Register.EBP);
+		restoreRegisters();
+		// Return
+		if (argSlotCount > 0) {
+			os.writeRET(argSlotCount * 4);
+		} else {
+			os.writeRET();
+		}
 
-            final ObjectRef handlerRef = os.setObjectRef(handlerLabel);
+		// No set the exception start&endPtr's
+		//final int noLocals = bc.getNoLocals();
+		//final int noLocalVars = noLocals - noArgs;
+		final int count = bc.getNoExceptionHandlers();
+		CompiledExceptionHandler[] ceh = new CompiledExceptionHandler[count];
+		for (int i = 0; i < count; i++) {
+			final VmInterpretedExceptionHandler eh = bc.getExceptionHandler(i);
+			final Label handlerLabel = helper.genLabel("$$ex-handler" + i);
 
-            /** Clear the calculation stack (only locals are left) */
-            os.writeLEA(Register.ESP, Register.EBP, -(noLocalVars * 4));
-            /** Push the exception in EAX */
-            os.writePUSH(Register.EAX);
-            /** Goto the real handler */
-            os.writeJMP(helper.getInstrLabel(eh.getHandlerPC()));
+			final ObjectRef handlerRef = os.setObjectRef(handlerLabel);
 
-            ceh[ i] = new CompiledExceptionHandler();
-            ceh[ i].setStartPc(os.getObjectRef(helper.getInstrLabel(eh
-                    .getStartPC())));
-            ceh[ i].setEndPc(os.getObjectRef(helper
-                    .getInstrLabel(eh.getEndPC())));
-            ceh[ i].setHandler(handlerRef);
+			/** Clear the calculation stack (only locals are left) */
+			os.writeLEA(Register.ESP, Register.EBP, -(noLocalVars * 4));
+			/** Push the exception in EAX */
+			os.writePUSH(Register.EAX);
+			/** Goto the real handler */
+			os.writeJMP(helper.getInstrLabel(eh.getHandlerPC()));
 
-        }
-        cm.setExceptionHandlers(ceh);
+			ceh[i] = new CompiledExceptionHandler();
+			ceh[i].setStartPc(os.getObjectRef(helper.getInstrLabel(eh
+					.getStartPC())));
+			ceh[i].setEndPc(os
+					.getObjectRef(helper.getInstrLabel(eh.getEndPC())));
+			ceh[i].setHandler(handlerRef);
 
-        // Now create the default exception handler
-        Label handlerLabel = helper.genLabel("$$def-ex-handler");
-        cm.setDefExceptionHandler(os.setObjectRef(handlerLabel));
-        emitSynchronizationCode(context.getMonitorExitMethod());
-        os.writeLEA(Register.ESP, Register.EBP, EbpFrameRefOffset);
-        os.writePOP(Register.EBP);
-        restoreRegisters();
-        /**
-         * Do not do a ret here, this way the return address will be used by
-         * vm_athrow as its return address
-         */
-        helper.writeJumpTableJMP(X86JumpTable.VM_ATHROW_NOTRACE_OFS);
-        //os.writeJMP(helper.VM_ATHROW_NOTRACE);
+		}
+		cm.setExceptionHandlers(ceh);
 
-        codeObject.markEnd();
-        cm.setCodeEnd(os.setObjectRef(helper.genLabel("$$end-code-object")));
-    }
+		// Now create the default exception handler
+		Label handlerLabel = helper.genLabel("$$def-ex-handler");
+		cm.setDefExceptionHandler(os.setObjectRef(handlerLabel));
+		emitSynchronizationCode(context.getMonitorExitMethod());
+		os.writeLEA(Register.ESP, Register.EBP, EbpFrameRefOffset);
+		os.writePOP(Register.EBP);
+		restoreRegisters();
+		/**
+		 * Do not do a ret here, this way the return address will be used by
+		 * vm_athrow as its return address
+		 */
+		helper.writeJumpTableJMP(X86JumpTable.VM_ATHROW_NOTRACE_OFS);
+		//os.writeJMP(helper.VM_ATHROW_NOTRACE);
 
-    /**
-     * Emit a jump to the exit code
-     */
-    public void emitReturn() {
-        os.writeJMP(footerLabel);
-    }
+		codeObject.markEnd();
+		cm.setCodeEnd(os.setObjectRef(helper.genLabel("$$end-code-object")));
+	}
 
-    /**
-     * Gets the offset to EBP (current stack frame) for the local with the
-     * given index.
-     * 
-     * @param index
-     * @return int
-     */
-    public final int getEbpOffset(int index) {
-        int noArgs = method.getArgSlotCount();
-        if (index < noArgs) {
-            // Index refers to a method argument
-            return ((noArgs - index + 1) * 4) + EbpFrameRefOffset
-                    + SAVED_REGISTERSPACE;
-        } else {
-            // Index refers to a local variable
-            return (index - noArgs + 1) * -4;
-        }
-    }
+	/**
+	 * Emit a jump to the exit code
+	 */
+	public void emitReturn() {
+		os.writeJMP(footerLabel);
+	}
 
-    /**
-     * Gets the offset to EBP (current stack frame) for the wide local with the
-     * given index.
-     * 
-     * @param index
-     * @return int
-     */
-    public final int getWideEbpOffset(int index) {
-        return getEbpOffset(index + 1);
-    }
+	/**
+	 * Gets the offset to EBP (current stack frame) for the local with the given
+	 * index.
+	 * 
+	 * @param index
+	 * @return int
+	 */
+	public final int getEbpOffset(int index) {
+		int noArgs = method.getArgSlotCount();
+		if (index < noArgs) {
+			// Index refers to a method argument
+			return ((noArgs - index + 1) * 4) + EbpFrameRefOffset
+					+ SAVED_REGISTERSPACE;
+		} else {
+			// Index refers to a local variable
+			return (index - noArgs + 1) * -4;
+		}
+	}
 
-    private void emitSynchronizationCode(VmMethod monitorMethod) {
-        if (method.isSynchronized()) {
-            os.writePUSH(Register.EAX);
-            os.writePUSH(Register.EDX);
-            //System.out.println("synchr. " + method);
-            if (method.isStatic()) {
-                // Get declaring class
-                final int declaringClassOffset = context
-                        .getVmMemberDeclaringClassField().getOffset();
-                writeGetMethodRef(Register.EAX);
-                os.writePUSH(Register.EAX, declaringClassOffset);
-                //os.writePUSH(method.getDeclaringClass());
-            } else {
-                os.writePUSH(Register.EBP, getEbpOffset(0));
-            }
-            helper.invokeJavaMethod(monitorMethod);
-            os.writePOP(Register.EDX);
-            os.writePOP(Register.EAX);
-        }
-    }
+	/**
+	 * Gets the offset to EBP (current stack frame) for the wide local with the
+	 * given index.
+	 * 
+	 * @param index
+	 * @return int
+	 */
+	public final int getWideEbpOffset(int index) {
+		return getEbpOffset(index + 1);
+	}
 
-    /**
-     * Push the method reference in the current stackframe onto the stack
-     */
-    public final void writePushMethodRef() {
-        os.writePUSH(Register.EBP, EbpMethodRefOffset);
-    }
+	private void emitSynchronizationCode(VmMethod monitorMethod) {
+		if (method.isSynchronized()) {
+			os.writePUSH(Register.EAX);
+			os.writePUSH(Register.EDX);
+			//System.out.println("synchr. " + method);
+			if (method.isStatic()) {
+				// Get declaring class
+				final int declaringClassOffset = context
+						.getVmMemberDeclaringClassField().getOffset();
+				writeGetMethodRef(Register.EAX);
+				os.writePUSH(Register.EAX, declaringClassOffset);
+				//os.writePUSH(method.getDeclaringClass());
+			} else {
+				os.writePUSH(Register.EBP, getEbpOffset(0));
+			}
+			helper.invokeJavaMethod(monitorMethod);
+			os.writePOP(Register.EDX);
+			os.writePOP(Register.EAX);
+		}
+	}
 
-    /**
-     * Write code to copy the method reference into the dst register.
-     */
-    public final void writeGetMethodRef(Register dst) {
-        os.writeMOV(INTSIZE, dst, Register.EBP, EbpMethodRefOffset);
-    }
+	/**
+	 * Push the method reference in the current stackframe onto the stack
+	 */
+	public final void writePushMethodRef() {
+		os.writePUSH(Register.EBP, EbpMethodRefOffset);
+	}
 
-    /**
-     * Write code to save the callee saved registers.
-     * @see #SAVED_REGISTERSPACE
-     * @see org.jnode.vm.x86.VmX86StackReader
-     */
-    private final void saveRegisters() {
-        //os.writePUSH(Register.EBX);
-        //os.writePUSH(Register.EDI);
-        //os.writePUSH(Register.ESI);
-    }
+	/**
+	 * Write code to copy the method reference into the dst register.
+	 */
+	public final void writeGetMethodRef(Register dst) {
+		os.writeMOV(INTSIZE, dst, Register.EBP, EbpMethodRefOffset);
+	}
 
-    /**
-     * Write code to restore the callee saved registers.
-     * @see #SAVED_REGISTERSPACE
-     * @see org.jnode.vm.x86.VmX86StackReader
-     */
-    private final void restoreRegisters() {
-        //os.writePOP(Register.ESI);
-        //os.writePOP(Register.EDI);
-        //os.writePOP(Register.EBX);
-    }
+	/**
+	 * Write code to save the callee saved registers.
+	 * 
+	 * @see #SAVED_REGISTERSPACE
+	 * @see org.jnode.vm.x86.VmX86StackReader
+	 */
+	private final void saveRegisters() {
+		//os.writePUSH(Register.EBX);
+		//os.writePUSH(Register.EDI);
+		//os.writePUSH(Register.ESI);
+	}
+
+	/**
+	 * Write code to restore the callee saved registers.
+	 * 
+	 * @see #SAVED_REGISTERSPACE
+	 * @see org.jnode.vm.x86.VmX86StackReader
+	 */
+	private final void restoreRegisters() {
+		//os.writePOP(Register.ESI);
+		//os.writePOP(Register.EDI);
+		//os.writePOP(Register.EBX);
+	}
 }

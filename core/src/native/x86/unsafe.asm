@@ -707,5 +707,9 @@ Q43org5jnode2vm6Unsafe23debug2e28J29V:
 	call sys_print_eax
 	ret 8
 		
-		
+; public static native void breakPoint();
+Q43org5jnode2vm6Unsafe23breakPoint2e2829V:
+	int3
+	ret
+	
 	

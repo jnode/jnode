@@ -76,12 +76,16 @@ public abstract class DoubleWordItem extends Item implements
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#clone()
 	 */
 	protected final Item clone(EmitterContext ec) {
-		Item res;
+		final Item res;
+		final AbstractX86Stream os = ec.getStream();
+
 		switch (getKind()) {
 		case Kind.REGISTER:
 			final X86RegisterPool pool = ec.getPool();
 			final Register lsb = pool.request(JvmType.INT);
 			final Register msb = pool.request(JvmType.INT);
+			os.writeMOV(INTSIZE, lsb, this.lsb);
+			os.writeMOV(INTSIZE, msb, this.msb);
 			res = createReg(getType(), lsb, msb);
 			pool.transferOwnerTo(lsb, res);
 			pool.transferOwnerTo(msb, res);
@@ -270,12 +274,7 @@ public abstract class DoubleWordItem extends Item implements
 			} else {
 				// invariant: (msb == this.lsb) && (lsb == this.msb)
 				// swap registers
-				//TODO: handle allocation failure
-				Register reg = pool.request(JvmType.INT);
-				os.writeMOV(INTSIZE, reg, this.lsb);
-				os.writeMOV(INTSIZE, this.lsb, this.msb);
-				os.writeMOV(INTSIZE, this.msb, reg);
-				pool.release(reg);
+				os.writeXCHG(this.lsb, this.msb);
 			}
 			break;
 
@@ -370,8 +369,8 @@ public abstract class DoubleWordItem extends Item implements
 			break;
 
 		case Kind.LOCAL:
-			os.writePUSH(FP, getLsbOffsetToFP());
 			os.writePUSH(FP, getMsbOffsetToFP());
+			os.writePUSH(FP, getLsbOffsetToFP());
 			break;
 
 		case Kind.CONSTANT:
@@ -521,7 +520,7 @@ public abstract class DoubleWordItem extends Item implements
 		assertCondition((getKind() == Kind.REGISTER)
 				&& ((this.lsb == reg) || (this.msb == reg)), "spill1");
 		ec.getVStack().push(ec);
-		if (getKind() == Kind.STACK) {
+		if (isStack()) {
 			return;
 		}
 
