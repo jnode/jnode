@@ -40,8 +40,8 @@ public class NTFSFileSystemType implements FileSystemType {
 	/**
 	 * @see org.jnode.fs.FileSystemType#create(org.jnode.driver.Device)
 	 */
-	public FileSystem create(Device device) throws FileSystemException {
-		return new NTFSFileSystem(device);
+	public FileSystem create(Device device, boolean readOnly) throws FileSystemException {
+		return new NTFSFileSystem(device, readOnly);
 	}
 
 	/**
