@@ -242,11 +242,11 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
 	/**
 	 * Release all resources
 	 */
-	public synchronized void release() {
-		log.debug("io.release");
+	public void release() {
 		io.release();
 		log.debug("irq.release");
 		irq.release();
+	    log.debug("end of release");
 	}
 
 	/**
