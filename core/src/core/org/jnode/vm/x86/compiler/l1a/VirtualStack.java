@@ -92,6 +92,19 @@ final class VirtualStack {
         stack[tos] = null;
         return i;
     }
+    
+    /**
+     * Equals to pop, but also pops of the operand stack if the popped item is
+     * on the stack.
+     * @return
+     */
+    Item pop1() {
+    	final Item i = pop();
+    	if (checkOperandStack && i.isStack()) {
+    		operandStack.pop(i);
+    	}
+    	return i;
+    }
 
     /**
      * Pop top item from stack, check its type also. If none is present, create

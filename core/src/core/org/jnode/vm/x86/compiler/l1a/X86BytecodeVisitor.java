@@ -834,7 +834,11 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             BootLog.debug("#" + address + "\t" + vstack);
         }
         if (log) {
-            os.log("#" + address);
+            if (debug) {
+                os.log("#" + address + " VStack: " + vstack.toString());
+            } else {
+            	os.log("#" + address);
+            }
         }
         this.curAddress = address;
         this.curInstrLabel = helper.getInstrLabel(address);
@@ -1363,48 +1367,63 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup2_x2()
      */
     public final void visit_dup2_x2() {
-        final Item v1 = vstack.pop();
-        final Item v2 = vstack.pop();
+    	// Push all on the stack, since this opcode is just too complicated
+        vstack.push(eContext);
+        
+        System.out.println("####### dup2_x2");
+
+        final Item v1 = vstack.pop1();
+        final Item v2 = vstack.pop1();
         final int c1 = v1.getCategory();
         final int c2 = v2.getCategory();
-        v1.loadIf(eContext, Item.Kind.STACK | Item.Kind.FPUSTACK);
-        v2.loadIf(eContext, Item.Kind.STACK | Item.Kind.FPUSTACK);
+        
+        // Perform a stack swap independent of the actual form 
+		os.writePOP(Register.EAX); // Value1
+		os.writePOP(Register.EBX); // Value2
+		os.writePOP(Register.ECX); // Value3
+		os.writePOP(Register.EDX); // Value4
+		os.writePUSH(Register.EBX); // Value2
+		os.writePUSH(Register.EAX); // Value1
+		os.writePUSH(Register.EDX); // Value4
+		os.writePUSH(Register.ECX); // Value3
+		os.writePUSH(Register.EBX); // Value2
+		os.writePUSH(Register.EAX); // Value1
+
+		// Now update the operandstack
         // cope with brain-dead definition from Sun (look-like somebody there
         // was to eager to optimize this and it landed in the compiler...
         if (c2 == 2) {
             // form 4
             assertCondition(c1 == 2, "category mismatch");
-            vstack.push(v1.clone(eContext));
-            vstack.push(v2);
-            vstack.push(v1);
+            vstack.push1(ifac.createStack(v1.getType()));
+            vstack.push1(v2);
+            vstack.push1(v1);
         } else {
-            final Item v3 = vstack.pop();
-            v3.loadIf(eContext, Item.Kind.STACK | Item.Kind.FPUSTACK);
+            final Item v3 = vstack.pop1();
             int c3 = v3.getCategory();
             if (c1 == 2) {
                 // form 2
                 assertCondition(c3 == 1, "category mismatch");
-                vstack.push(v1.clone(eContext));
-                vstack.push(v3);
-                vstack.push(v2);
-                vstack.push(v1);
+                vstack.push1(ifac.createStack(v1.getType()));
+                vstack.push1(v3);
+                vstack.push1(v2);
+                vstack.push1(v1);
             } else if (c3 == 2) {
                 // form 3
-                vstack.push(v2.clone(eContext));
-                vstack.push(v1.clone(eContext));
-                vstack.push(v3);
-                vstack.push(v2);
-                vstack.push(v1);
+                vstack.push1(ifac.createStack(v2.getType()));
+                vstack.push1(ifac.createStack(v1.getType()));
+                vstack.push1(v3);
+                vstack.push1(v2);
+                vstack.push1(v1);
             } else {
                 // form 1
-                final Item v4 = vstack.pop();
-                v4.loadIf(eContext, Item.Kind.STACK | Item.Kind.FPUSTACK);
-                vstack.push(v2.clone(eContext));
-                vstack.push(v1.clone(eContext));
-                vstack.push(v4);
-                vstack.push(v3);
-                vstack.push(v2);
-                vstack.push(v1);
+                final Item v4 = vstack.pop1();
+                vstack.push1(ifac.createStack(v2.getType()));
+                vstack.push1(ifac.createStack(v1.getType()));
+                vstack.push1(v4);
+                vstack.push1(v3);
+                vstack.push1(v2);
+                vstack.push1(v1);
             }
         }
     }
