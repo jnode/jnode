@@ -210,8 +210,6 @@ public class X86CompilerHelper extends X86StackManager implements X86CompilerCon
 	/**
 	 * Write stack overflow test code.
 	 * 
-	 * @param calcReg
-	 *            Register used for intermediate calculation
 	 * @param method
 	 * @param context
 	 */

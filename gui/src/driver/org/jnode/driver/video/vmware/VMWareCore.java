@@ -313,8 +313,8 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	/**
 	 * Fill a given rectangle with a given color
 	 * 
-	 * @param x1
-	 * @param y1
+	 * @param x
+	 * @param y
 	 * @param width
 	 * @param height
 	 * @param color
@@ -478,7 +478,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	/**
 	 * Gets the contents of a 32-bit register
 	 * 
-	 * @param nIndex
+	 * @param index
 	 * @return
 	 */
 	private final int getReg32(int index) {
@@ -489,8 +489,8 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	/**
 	 * Sets the contents of a 32-bit register
 	 * 
-	 * @param nIndex
-	 * @param nValue
+	 * @param index
+	 * @param value
 	 */
 	private final void setReg32(int index, int value) {
 		ports.outPortDword(indexPort, index);
@@ -500,7 +500,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	/**
 	 * Write the given word to the FIFO.
 	 * 
-	 * @param nValue
+	 * @param value
 	 */
 	private final void writeWordToFIFO(int value) {
 		fifoDirty = true;
@@ -567,7 +567,9 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	/**
 	 * Convert the given color to a value suitable for VMWare
 	 * 
-	 * @param color
+	 * @param r
+	 * @param g
+	 * @param b
 	 */
 	protected final int convertColor(int r, int g, int b) {
 		return ((r << redMaskShift) & redMask) | ((g << greenMaskShift) & greenMask) | ((b << blueMaskShift) & blueMask);
@@ -717,8 +719,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	
 	/**
 	 * Sets the cursor image.
-	 * @param width The width of the cursor image, this also is the height.
-	 * @param arbg The image a matrix of ARGB pixels.
+	 * @param cursor
 	 */
 	public void setCursorImage(CursorImage cursor) {
 		if (hasCapability(SVGA_CAP_ALPHA_CURSOR)) {

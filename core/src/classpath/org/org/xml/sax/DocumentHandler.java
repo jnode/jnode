@@ -40,9 +40,7 @@ package org.xml.sax;
  * @since SAX 1.0
  * @author David Megginson
  * @version 2.0.1 (sax2r2)
- * @see org.xml.sax.Parser#setDocumentHandler
  * @see org.xml.sax.Locator
- * @see org.xml.sax.HandlerBase
  */
 public interface DocumentHandler {
     
@@ -124,8 +122,7 @@ public interface DocumentHandler {
      * @param atts The attributes attached to the element, if any.
      * @exception org.xml.sax.SAXException Any SAX exception, possibly
      *            wrapping another exception.
-     * @see #endElement
-     * @see org.xml.sax.AttributeList 
+     * @see #endElement(String)
      */
     public abstract void startElement (String name, AttributeList atts)
 	throws SAXException;
@@ -172,7 +169,7 @@ public interface DocumentHandler {
      * @param length The number of characters to read from the array.
      * @exception org.xml.sax.SAXException Any SAX exception, possibly
      *            wrapping another exception.
-     * @see #ignorableWhitespace 
+     * @see #ignorableWhitespace(char[], int, int) 
      * @see org.xml.sax.Locator
      */
     public abstract void characters (char ch[], int start, int length)
@@ -201,7 +198,7 @@ public interface DocumentHandler {
      * @param length The number of characters to read from the array.
      * @exception org.xml.sax.SAXException Any SAX exception, possibly
      *            wrapping another exception.
-     * @see #characters
+     * @see #characters(char[], int, int)
      */
     public abstract void ignorableWhitespace (char ch[], int start, int length)
 	throws SAXException;

@@ -13,7 +13,7 @@ public class ReferenceConstant extends Constant {
 	private Object value;
 
 	/**
-	 * @param type
+	 * @param value
 	 */
 	public ReferenceConstant(Object value) {
 		super(Operand.REFERENCE);

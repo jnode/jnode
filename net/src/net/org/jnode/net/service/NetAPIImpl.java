@@ -27,7 +27,7 @@ import org.jnode.net.ipv4.util.Ifconfig;
 public class NetAPIImpl implements VMNetAPI {
 
 	/**
-	 * @see java.net.NetAPI#getInetAddresses(org.jnode.driver.Device)
+	 * @see java.net.VMNetAPI#getInetAddresses(org.jnode.driver.Device)
 	 */
 	public List getInetAddresses(Device netDevice) {
 		final Vector list = new Vector(1, 1);

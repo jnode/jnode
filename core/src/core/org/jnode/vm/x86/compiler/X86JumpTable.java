@@ -37,12 +37,11 @@ public class X86JumpTable {
 	 * This method can only be called at runtime.
 	 * @param offset
 	 * @return The jumptable entry.
-	 * @see #VM_PATCH_MOV_EAX_IMM32_IDX
-	 * @see #VM_PATCH_NOP_IDX
-	 * @see #VM_ATHROW_IDX
-	 * @see #VM_ATHROW_NOTRACE_IDX
-	 * @see #VM_INVOKE_IDX
-	 * @see #VM_INTERPRETER_IDX
+	 * @see #VM_PATCH_MOV_EAX_IMM32_OFS
+	 * @see #VM_PATCH_NOP_OFS
+	 * @see #VM_ATHROW_OFS
+	 * @see #VM_ATHROW_NOTRACE_OFS
+	 * @see #VM_INTERPRETER_OFS
 	 */
 	public static Address getJumpTableEntry(int offset) {
 		return Unsafe.getAddress(Unsafe.getJumpTable(), offset);

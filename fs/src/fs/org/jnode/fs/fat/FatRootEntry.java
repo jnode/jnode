@@ -39,8 +39,6 @@ public class FatRootEntry extends FatObject implements FSEntry {
 
 	/**
 	 * Gets the last modification time of this entry.
-	 * 
-	 * @throws IOException
 	 */
 
 	public long getLastModified() {

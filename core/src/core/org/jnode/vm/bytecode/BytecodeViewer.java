@@ -1075,8 +1075,7 @@ public class BytecodeViewer extends BytecodeVisitor {
 	/**
 	 * @param methodRef
 	 * @param count
-	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokeinterface(org.jnode.vm.classmgr.VmConstIMethodRef,
-	 *      int)
+	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokeinterface(org.jnode.vm.classmgr.VmConstIMethodRef, int)
 	 */
 	public void visit_invokeinterface(VmConstIMethodRef methodRef, int count) {
 		out("invokeinterface " + methodRef + ", count=" + count);
@@ -1153,8 +1152,7 @@ public class BytecodeViewer extends BytecodeVisitor {
 	/**
 	 * @param clazz
 	 * @param dimensions
-	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_multianewarray(org.jnode.vm.classmgr.VmConstClass,
-	 *      int)
+	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_multianewarray(org.jnode.vm.classmgr.VmConstClass, int)
 	 */
 	public void visit_multianewarray(VmConstClass clazz, int dimensions) {
 		out("multianewarray " + clazz + " " + dimensions);

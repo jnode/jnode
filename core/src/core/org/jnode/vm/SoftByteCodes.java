@@ -134,7 +134,6 @@ public class SoftByteCodes implements Uninterruptible {
 	/**
 	 * Resolve a const reference to a class to the actual class, in the context
 	 * of the given current method.
-	 * @param currentMethod
 	 * @param classRef
 	 * @return VmClass
 	 * @throws PragmaUninterruptible

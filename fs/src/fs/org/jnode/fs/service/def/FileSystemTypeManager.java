@@ -48,7 +48,6 @@ public class FileSystemTypeManager implements ExtensionPointListener {
 
 	/**
 	* Load all known file system types.
-	* @throws ServiceException
 	*/
 	protected synchronized void refreshFileSystemTypes() {
 		types.clear();

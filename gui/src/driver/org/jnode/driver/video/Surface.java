@@ -17,7 +17,9 @@ import java.awt.image.Raster;
  */
 public interface Surface {
 
+	/** Paint (opaque mode) */
 	public static final int PAINT_MODE = 0x00;
+	/** XOR mode */
 	public static final int XOR_MODE = 0x01;
 
 	/**

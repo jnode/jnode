@@ -98,7 +98,6 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
 	 * 
 	 * @param method
 	 * @param resolver
-	 * @param allocator
 	 * @param level
 	 *            Optimization level
 	 * @param os
@@ -188,7 +187,7 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
 	 * Compile the given method into the given stream.
 	 * 
 	 * @param method
-	 * @param outputStream
+	 * @param os
 	 * @param level
 	 *            Optimization level
 	 * @param isBootstrap
@@ -229,7 +228,7 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
 	 * Compile the given abstract method into the given stream.
 	 * 
 	 * @param method
-	 * @param outputStream
+	 * @param os
 	 * @param level
 	 *            Optimization level
 	 * @param isBootstrap

@@ -185,7 +185,7 @@ public class DefaultPluginManager implements PluginManager {
 	 * Can the given descriptor be added to a startPlugin ordered list?
 	 * 
 	 * @param descr
-	 * @param names
+	 * @param nameSet
 	 */
 	private boolean canAdd(PluginDescriptor descr, HashSet nameSet) {
 		//Syslog.debug("Testing " + descr.getId());

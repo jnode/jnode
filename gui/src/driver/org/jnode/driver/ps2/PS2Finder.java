@@ -22,8 +22,7 @@ public class PS2Finder implements DeviceFinder, PS2Constants {
 	private final Logger log = Logger.getLogger(getClass());
 
 	/**
-	 * @see org.jnode.driver.DeviceFinder#findDevices(org.jnode.driver.DeviceManager,
-	 *      org.jnode.driver.Bus)
+	 * @see org.jnode.driver.DeviceFinder#findDevices(org.jnode.driver.DeviceManager, org.jnode.driver.Bus)
 	 */
 	public void findDevices(DeviceManager devMan, Bus bus) throws DeviceException {
 		try {

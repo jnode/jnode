@@ -37,8 +37,7 @@ public interface IPv4Service {
 	 * 
 	 * @param hdr
 	 * @param skbuf
-	 * @throws NoRouteToHostException No suitable route for this packet was found
-	 * @throws NetworkException The packet could not be transmitted.
+	 * @throws SocketException The packet cannot be transmitted
 	 */
 	public void transmit(IPv4Header hdr, SocketBuffer skbuf)
 	throws SocketException;

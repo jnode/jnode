@@ -62,7 +62,6 @@ public class FileDevice extends Device implements BlockDeviceAPI {
 	}
 	/**
 	 * @see org.jnode.driver.block.BlockDeviceAPI#flush()
-	 * @throws IOException
 	 */
 	public void flush() {
 		// Nothing to flush

@@ -40,7 +40,7 @@ public class ExtensionPointModel extends PluginModelObject implements ExtensionP
 	
 	/**
 	 * Resolve all references to (elements of) other plugin descriptors
-	 * @throws DocumentException
+	 * @throws PluginException
 	 */
 	protected void resolve() 
 	throws PluginException {

@@ -43,7 +43,6 @@ public class MappedBlockDeviceSupport extends Device implements BlockDeviceAPI {
 	/**
 	 * @see org.jnode.driver.block.BlockDeviceAPI#getLength()
 	 * @return The length
-	 * @throws IOException
 	 */
 	public long getLength() {
 		return length;

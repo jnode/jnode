@@ -605,7 +605,6 @@ public abstract class Ne2000Core extends AbstractDeviceCore
 	/**
 	 * Gets the value of a register
 	 * @param reg
-	 * @param page
 	 */
 	private int getReg(int reg) {
 		return io.inPortByte(iobase + reg);
@@ -614,7 +613,7 @@ public abstract class Ne2000Core extends AbstractDeviceCore
 	/**
 	 * Gets the value of a register
 	 * @param reg
-	 * @param page
+	 * @param value
 	 */
 	private void setReg(int reg, int value) {
 		io.outPortByte(iobase + reg, value);

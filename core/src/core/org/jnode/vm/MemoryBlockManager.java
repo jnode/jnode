@@ -149,7 +149,6 @@ public final class MemoryBlockManager extends VmSystemObject implements Uninterr
 	 * Is a block identified by it blockNr [0..blockCount-1] already used.
 	 * 
 	 * @param blockNr
-	 * @return boolean
 	 */
 	private static final void setInUse(long blockNr, boolean inUse) {
 		final long offset = blockNr >>> 3; // we still need a byte offset

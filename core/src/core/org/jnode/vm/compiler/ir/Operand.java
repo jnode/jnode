@@ -32,7 +32,7 @@ public class Operand {
 		return type;
 	}
 	/**
-	 * @param i
+	 * @param type
 	 */
 	public void setType(int type) {
 		this.type = type;

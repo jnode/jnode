@@ -56,7 +56,7 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	/**
 	 * All necessary resources are claimed in this method.
 	 * 
-	 * @param the
+	 * @param owner the
 	 *            driver for which the resources are to be claimed
 	 * @return the IRQResource for the driver in question
 	 */

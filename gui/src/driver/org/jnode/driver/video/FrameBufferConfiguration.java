@@ -16,6 +16,12 @@ public abstract class FrameBufferConfiguration {
 	private final int height;
 	private final ColorModel colorModel;
 	
+	/**
+	 * Initialize this instance.
+	 * @param width
+	 * @param height
+	 * @param colorModel
+	 */
 	public FrameBufferConfiguration(int width, int height, ColorModel colorModel) {
 		this.colorModel = colorModel;
 		this.height = height;

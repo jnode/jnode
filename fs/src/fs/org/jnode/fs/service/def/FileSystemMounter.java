@@ -50,7 +50,7 @@ public class FileSystemMounter implements DeviceListener, QueueProcessor {
 	/**
 	 * Start the FS mounter.
 	 * 
-	 * @throws ServiceException
+	 * @throws PluginException
 	 */
 	public void start() throws PluginException {
 		try {
@@ -68,8 +68,6 @@ public class FileSystemMounter implements DeviceListener, QueueProcessor {
 
 	/**
 	 * Stop the FS mounter.
-	 * 
-	 * @throws ServiceException
 	 */
 	public void stop() {
 		devMan.removeListener(this);

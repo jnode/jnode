@@ -28,16 +28,14 @@ public class VGABitmapGraphics extends BitmapGraphics {
 	}
 
 	/**
-	 * @see org.jnode.awt.util.BitmapGraphics#doDrawImage(java.awt.image.Raster, int, int, int,
-	 *      int, int, int, int)
+	 * @see org.jnode.awt.util.BitmapGraphics#doDrawImage(java.awt.image.Raster, int, int, int, int, int, int, int)
 	 */
 	protected void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width, int height, int bgColor) {
 		doDrawImage(src, srcX, srcY, dstX, dstY, width, height);
 	}
 
 	/**
-	 * @see org.jnode.awt.util.BitmapGraphics#doDrawImage(java.awt.image.Raster, int, int, int,
-	 *      int, int, int)
+	 * @see org.jnode.awt.util.BitmapGraphics#doDrawImage(java.awt.image.Raster, int, int, int, int, int, int)
 	 */
 	protected void doDrawImage(Raster src, int srcX, int srcY, int dstX, int dstY, int width, int height) {
 		vgaIO.setGRAF(1, 0);
@@ -126,7 +124,7 @@ public class VGABitmapGraphics extends BitmapGraphics {
 	}
 
 	/**
-	 * @see org.jnode.awt.util.BitmapGraphics#doDrawPixel(int, int, int, int)
+	 * @see org.jnode.awt.util.BitmapGraphics#doDrawPixels(int, int, int, int, int)
 	 */
 	protected void doDrawPixels(int x, int y, int count, int color, int mode) {
 		for (int i = 0; i < count; i++) {
