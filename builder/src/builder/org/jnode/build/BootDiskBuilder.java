@@ -22,7 +22,7 @@ import org.jnode.fs.fat.GrubBootSector;
 import org.jnode.fs.fat.GrubFatFormatter;
 import org.jnode.fs.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.fs.partitions.ibm.IBMPartitionTypes;
-import org.jnode.util.Geometry;
+import org.jnode.fs.util.Geometry;
 
 /**
  * @author epr

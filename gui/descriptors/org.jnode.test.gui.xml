@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.test" 
-        name="JNode Test classes"
+<plugin id="org.jnode.test.gui" 
+        name="JNode GUI Test classes"
         version="@VERSION@"
         provider-name="JNode.org">
         
@@ -11,15 +11,13 @@
   </requires>
         
   <runtime>
-    <library name="jnode-core.jar">
-      <export name="org.jnode.test.*"/>
-      <export name="org.jnode.test.bugs.*"/>
+    <library name="jnode-gui.jar">
+      <export name="org.jnode.test.gui.*"/>
     </library>
   </runtime>
         
   <extension point="org.jnode.shell.aliases">
-    <alias name="ArithOpt"      class="org.jnode.test.ArithOpt"/>
-    <alias name="Sieve"      class="org.jnode.test.Sieve"/>
+    <alias name="AWTTest"      class="org.jnode.test.gui.AWTTest"/>
   </extension>
 
 </plugin>

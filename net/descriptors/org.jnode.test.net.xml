@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.test" 
-        name="JNode Test classes"
+<plugin id="org.jnode.test.net" 
+        name="JNode NET Test classes"
         version="@VERSION@"
         provider-name="JNode.org">
         
@@ -11,15 +11,14 @@
   </requires>
         
   <runtime>
-    <library name="jnode-core.jar">
-      <export name="org.jnode.test.*"/>
-      <export name="org.jnode.test.bugs.*"/>
+    <library name="jnode-net.jar">
+      <export name="org.jnode.test.net.*"/>
     </library>
   </runtime>
         
   <extension point="org.jnode.shell.aliases">
-    <alias name="ArithOpt"      class="org.jnode.test.ArithOpt"/>
-    <alias name="Sieve"      class="org.jnode.test.Sieve"/>
+    <alias name="URLTest"      class="org.jnode.test.net.URLTest"/>
+    <alias name="TCPTest"      class="org.jnode.test.net.TCPTest"/>
   </extension>
 
 </plugin>
