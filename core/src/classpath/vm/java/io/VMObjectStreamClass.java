@@ -1,6 +1,5 @@
-/* IllegalMonitorStateException.java -- thrown when trying to wait or
-   notify a monitor that is not owned
-   Copyright (C) 1998, 1999, 2001, 2002 Free Software Foundation, Inc.
+/* VMObjectStreamClass.java -- VM helper functions for ObjectStreamClass
+   Copyright (C) 2003  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -8,7 +7,7 @@ GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
-
+ 
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -36,43 +35,14 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+package java.io;
 
-package java.lang;
-
-/**
- * Thrown when a thread attempts to wait or notify on a monitor that it
- * does not own (ie. it has not synchronized on the object). For example:<br>
- * <pre>
- * void m() {
- *   notify();
- * }
- * </pre>
- *
- * @author Brian Jones
- * @author Warren Levy <warrenl@cygnus.com>
- * @status updated to 1.4
- */
-public class IllegalMonitorStateException extends RuntimeException
-{
-  /**
-   * Compatible with JDK 1.0+.
-   */
-  private static final long serialVersionUID = 3713306369498869069L;
-
-  /**
-   * Create an exception without a message.
-   */
-  public IllegalMonitorStateException()
-  {
-  }
-
-  /**
-   * Create an exception with a message.
-   *
-   * @param s the message
-   */
-  public IllegalMonitorStateException(String s)
-  {
-    super(s);
-  }
+final class VMObjectStreamClass {
+	/**
+	  * Returns true if CLAZZ has a static class initializer
+	  * (a.k.a. <clinit>).
+	  */
+	static boolean hasClassInitializer(Class clazz) {
+		return false;
+	}
 }
