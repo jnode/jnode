@@ -61,7 +61,7 @@ import java.util.ResourceBundle;
  * the basis of Japanese, Chinese, and Korean. Finally, <b>TL</b> languages
  * flow top-to-bottom in a line, left-to-right, as in Mongolian.
  *
- * <p>This is a pretty poor excuse for a type-safe enum, since it is not
+ * <p>This is a pretty poor excuse for a type-safe enumeration, since it is not
  * guaranteed that orientation objects are unique (thanks to serialization),
  * yet there is no equals() method. You would be wise to compare the output
  * of isHorizontal() and isLeftToRight() rather than comparing objects with
