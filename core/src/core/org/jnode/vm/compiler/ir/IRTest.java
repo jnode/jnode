@@ -201,6 +201,12 @@ public class IRTest {
 	}
 
     public static int const1(int a0, int a1) {
+        int l1 = a1 | a0;
+        int l2 = a0 & a1;
+        return l1 ^ l1 + l2 ^ l2 - 2  * l1 * l2;
+	}
+
+    public static int const4(int a0, int a1) {
         int l1 = a1 + a0;
         int l2 = a0 * a1;
         return l1 * l1 + l2 * l2 + 2  * l1 * l2;
