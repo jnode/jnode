@@ -4,12 +4,15 @@
 package org.jnode.shell.command.driver;
 
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.TreeMap;
 
 import javax.naming.NameNotFoundException;
 
+import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
+import org.jnode.driver.DeviceInfoAPI;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.DriverException;
@@ -155,6 +158,12 @@ public class DeviceCommand {
 			out.println(prefix + prefix + api.getName());
 		}
 		out.println();
+		try {
+            final DeviceInfoAPI infoApi = (DeviceInfoAPI)dev.getAPI(DeviceInfoAPI.class);
+            infoApi.showInfo(new PrintWriter(out));
+        } catch (ApiNotFoundException ex) {
+            // Ignore
+        }
 	}
 
 	/**
