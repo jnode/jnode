@@ -1,5 +1,5 @@
 /* Runtime.java -- access to the VM process
-   Copyright (C) 1998, 2002, 2003, 2004 Free Software Foundation
+   Copyright (C) 1998, 2002, 2003, 2004, 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -93,17 +93,40 @@ public class Runtime
   {
     if (current != null)
       throw new InternalError("Attempt to recreate Runtime");
+    
+    // If used by underlying VM this contains the directories where Classpath's own
+    // native libraries are located.
+    String bootPath = SystemProperties.getProperty("gnu.classpath.boot.library.path", "");
+    
+    // If properly set by the user this contains the directories where the application's
+    // native libraries are located. On operating systems where a LD_LIBRARY_PATH environment
+    // variable is available a VM should preset java.library.path with value of this
+    // variable.
     String path = SystemProperties.getProperty("java.library.path", ".");
     String pathSep = SystemProperties.getProperty("path.separator", ":");
     String fileSep = SystemProperties.getProperty("file.separator", "/");
-    StringTokenizer t = new StringTokenizer(path, pathSep);
-    libpath = new String[t.countTokens()];
-    for (int i = 0; i < libpath.length; i++)
-      {
-        String prefix = t.nextToken();
+
+    StringTokenizer t1 = new StringTokenizer(bootPath, pathSep);
+    StringTokenizer t2 = new StringTokenizer(path, pathSep);
+    libpath = new String[t1.countTokens() + t2.countTokens()];
+    
+    int i = 0;
+    while(t1.hasMoreTokens()) {
+      String prefix = t1.nextToken();
+      if (! prefix.endsWith(fileSep))
+        prefix += fileSep;
+      
+      libpath[i] = prefix;
+      i++;
+    }
+    
+    while(t2.hasMoreTokens()) {
+      String prefix = t2.nextToken();
         if (! prefix.endsWith(fileSep))
           prefix += fileSep;
+  
         libpath[i] = prefix;
+      i++;
 		}
 	}
 
@@ -687,6 +710,13 @@ public class Runtime
    * <code>System.mapLibraryName(libname)</code>. There may be a security
    * check, of <code>checkLink</code>.
    *
+   * <p>Note: Besides <code>java.library.path</code> a VM may chose to search
+   * for native libraries in a path that is specified by the
+   * <code>gnu.classpath.boot.library.path</code> system property. However
+   * this is for internal usage or development of GNU Classpath only.
+   * <b>A Java application must not load a non-system library by changing
+   * this property otherwise it will break compatibility.</b></p>
+   *
    * <p>
    * The library is loaded using the class loader associated with the
    * class associated with the invoking method.
@@ -731,7 +761,7 @@ public class Runtime
 	return;
       }
     throw new UnsatisfiedLinkError("Native library `" + libname
-      + "' not found (as file `" + filename + "')");
+      + "' not found (as file `" + filename + "') in gnu.classpath.boot.library.path and java.library.path");
 	}
 
   /**
