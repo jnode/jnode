@@ -4,14 +4,14 @@
 package org.jnode.vm.x86;
 
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.Unsafe;
+import org.jnode.vm.CpuID;
 
 /**
  * Class used to identify the current processor.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class X86CpuID {
+public class X86CpuID extends CpuID {
 
 	public static final int FEAT_FPU = (1 << 0);
 	public static final int FEAT_VME = (1 << 1);
@@ -55,10 +55,8 @@ public class X86CpuID {
 	/**
 	 * Initialize this instance
 	 */
-	public X86CpuID() {
-		final int length = Unsafe.getCPUID(null);
-		this.data = new int[length];
-		Unsafe.getCPUID(data);
+	X86CpuID(int[] data) {
+		this.data = data;
 		final int eax = data[4];
 		this.steppingID = eax & 0xF;
 		this.model = (eax >> 4) & 0xF;
