@@ -6,7 +6,6 @@ package org.jnode.fs.spi;
 import java.io.IOException;
 
 import org.jnode.fs.FSFile;
-import org.jnode.fs.FileSystem;
 
 /**
  * An abstract implementation of FSFile that contains common things

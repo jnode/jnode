@@ -5,6 +5,7 @@ package org.jnode.fs;
 
 import java.util.List;
 
+import org.jnode.fs.spi.*;
 import org.jnode.fs.spi.AbstractFileSystem;
 
 /**

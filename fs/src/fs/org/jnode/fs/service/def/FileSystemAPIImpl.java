@@ -213,7 +213,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 		}
 		final ArrayList list = new ArrayList();
 		for (FSEntryIterator i = entry.getDirectory().iterator(); i.hasNext();) {
-			final FSEntry child = (FSEntry)i.next();
+			final FSEntry child = i.next();
 			final String name = child.getName();
 			if ((filter == null) || (filter.accept(directory, name))) {
 				list.add(name);

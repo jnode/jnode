@@ -12,14 +12,14 @@ import org.jnode.system.MemoryResource;
  */
 public class EEPRO100TxFD {
     
-    private int bufferAddress;
-    private MemoryResource mem;
+    //private int bufferAddress;
+    //private MemoryResource mem;
 
     /**
      * 
      */
     public EEPRO100TxFD(MemoryResource mem) {
-        this.mem = mem;
+        //this.mem = mem;
         
     }
 

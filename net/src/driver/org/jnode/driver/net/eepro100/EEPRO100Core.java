@@ -37,7 +37,7 @@ import org.jnode.vm.Address;
  */
 public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPRO100Constants, EthernetConstants {
     /** Device Driver */
-    private final EEPRO100Driver driver;
+    //private final EEPRO100Driver driver;
     /** Start of IO address space */
     private final int iobase;
     /** IO address space resource */
@@ -74,7 +74,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
      * @throws ResourceNotFreeException
      */
     public EEPRO100Core(EEPRO100Driver driver, ResourceOwner owner, PCIDevice device, Flags flags) throws ResourceNotFreeException, DriverException {
-        this.driver = driver;
+        //this.driver = driver;
         this.flags = (EEPRO100Flags) flags;
 
         final PCIDeviceConfig config = device.getConfig();
@@ -112,7 +112,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
 
         short sum = 0;
         int j;
-        int read_cmd, ee_size;
+        //int read_cmd, ee_size;
 
         sizeEeprom();
 
@@ -445,7 +445,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
             systemDelay(10);
             val = regs.getReg32(SCBCtrlMDI);
             if (--boguscnt < 0) {
-                StringBuffer sb = new StringBuffer();
+                //StringBuffer sb = new StringBuffer();
                 log.debug("eepro100: mdioWrite() timed out with val =" + Integer.toHexString(val));
                 break;
             }
