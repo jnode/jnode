@@ -3,6 +3,8 @@
  */
 package org.jnode.fs.ext2;
 
+import java.io.IOException;
+
 import org.jnode.driver.Device;
 import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.FileSystem;
@@ -39,10 +41,21 @@ public class Ext2FileSystemType implements FileSystemType {
 	 * @see org.jnode.fs.FileSystemType#supports(PartitionTableEntry, byte[], FSBlockDeviceAPI)
 	 */
 	public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
-		if (pte instanceof IBMPartitionTableEntry) {
-			return (((IBMPartitionTableEntry)pte).getSystemIndicator() == IBMPartitionTypes.PARTTYPE_LINUXNATIVE);
-		} else
-			return false;
+		if(pte!=null) {
+			if (pte instanceof IBMPartitionTableEntry)
+				return (((IBMPartitionTableEntry)pte).getSystemIndicator() == IBMPartitionTypes.PARTTYPE_LINUXNATIVE);
+		}
+		else {	//no partition table entry (e.g. ramdisk)
+			//need to check the magic
+			byte[] magic=new byte[2];
+			try{
+				devApi.read(1024+56, magic, 0, 2);
+			}catch(IOException e) {
+				return false;
+			}
+			return (Ext2Utils.get16(magic,0)==0xEF53);
+		}
+		return false;
 	}
 
 	/**
