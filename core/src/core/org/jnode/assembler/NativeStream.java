@@ -138,6 +138,12 @@ public abstract class NativeStream {
 	public abstract void write8(int value);
 
 	/**
+	 * Write a word with the processor specific word size.
+	 * @param word
+	 */
+	public abstract void writeWord(long word);
+
+	/**
 	 * Write a series of bytes
 	 * @param data
 	 * @param ofs

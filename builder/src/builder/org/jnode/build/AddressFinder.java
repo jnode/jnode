@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.build;
 
 import java.io.BufferedReader;
@@ -36,23 +36,38 @@ import org.jnode.build.x86.BootImageBuilder;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class AddressFinder {
-	
+
 	private static final int HDRLEN = 15;
+
 	private static final int MAXWIDTH = 75;
-	private static final String NDISASM = (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) ? "ndisasmw" : "ndisasm";
-	
+
+	private static final String NDISASM = (System.getProperty("os.name")
+			.toLowerCase().indexOf("win") >= 0) ? "ndisasmw" : "ndisasm";
+
+	private static final ArchInfo[] archs = {
+			new ArchInfo("x86", "all/build/x86/32bits/bootimage/bootimage.bin",
+					"all/build/x86/bootimage/32bits/bootimage.lst", NDISASM
+							+ " -u -o "),
+			new ArchInfo("x86_64",
+					"all/build/x86/64bits/bootimage/bootimage.bin",
+					"all/build/x86/64bits/bootimage/bootimage.lst",
+					"udis86 --code64 --offset --origin ") };
+
 	public static void main(String[] args) throws IllegalArgumentException,
 			SecurityException, IOException, InterruptedException {
-		String listFileName = "all/build/x86/bootimage/bootimage.lst";
-		String imageFileName = "all/build/x86/bootimage/bootimage.bin";
+
 		long loadAddress = BootImageBuilder.LOAD_ADDR;
 		long address = 0;
 		boolean disasm = false;
 		int disasmLength = 128;
 
 		if (args.length > 0) {
+			final String archName = args[0];
+			final ArchInfo arch = findArch(archName);
+			final String listFileName = arch.getListFile();
+			final String imageFileName = arch.getBootImageFile();
 			int i;
-			for (i = 0; i < args.length; i++) {
+			for (i = 1; i < args.length; i++) {
 				String arg = args[i];
 				if (arg.charAt(0) == '-') {
 					arg = arg.substring(1);
@@ -71,15 +86,27 @@ public class AddressFinder {
 			final long labelAddress = findLabel(listFileName, address);
 
 			if (disasm) {
-				disasm(imageFileName, labelAddress, disasmLength, loadAddress);
+				disasm(arch, imageFileName, labelAddress, disasmLength,
+						loadAddress);
 			}
 		} else {
 			usage();
 		}
 	}
 
+	private static ArchInfo findArch(String name) {
+		for (int i = 0; i < archs.length; i++) {
+			if (archs[i].getArch().equals(name)) {
+				return archs[i];
+			}
+		}
+		usage();
+		return null;
+	}
+
 	private static void usage() {
-		System.out.println("Usage: findaddress [-d] [-l length] address");
+		System.out
+				.println("Usage: findaddress architecture [-d] [-l length] address");
 		System.exit(1);
 	}
 
@@ -115,7 +142,7 @@ public class AddressFinder {
 			fin.close();
 		}
 	}
-	
+
 	private static void printLabel(String label) {
 		int idx;
 		final String BCI = "__bci_";
@@ -124,15 +151,16 @@ public class AddressFinder {
 			println(indent + "Label:", label.substring(0, idx));
 			label = label.substring(idx + BCI.length());
 			idx = 0;
-			while ((idx < label.length()) && Character.isDigit(label.charAt(idx))) {
+			while ((idx < label.length())
+					&& Character.isDigit(label.charAt(idx))) {
 				idx++;
 			}
 			println(indent + "BCI:", label.substring(0, idx));
-			label = (idx < label.length()) ? label.substring(idx+1) : "";
+			label = (idx < label.length()) ? label.substring(idx + 1) : "";
 			indent += "  ";
 		}
 	}
-	
+
 	private static void println(String hdr, String arg) {
 		String s = fixlen(hdr, HDRLEN) + arg;
 		while (s.length() > 0) {
@@ -145,7 +173,7 @@ public class AddressFinder {
 			}
 		}
 	}
-	
+
 	private static String fixlen(String v, int length) {
 		while (v.length() < length) {
 			v += " ";
@@ -156,9 +184,10 @@ public class AddressFinder {
 		return v;
 	}
 
-	private static void disasm(String imageFileName, long address, int length,
-			long loadAddress) throws IllegalArgumentException,
-			SecurityException, IOException, InterruptedException {
+	private static void disasm(ArchInfo arch, String imageFileName,
+			long address, int length, long loadAddress)
+			throws IllegalArgumentException, SecurityException, IOException,
+			InterruptedException {
 		final RandomAccessFile raf = new RandomAccessFile(imageFileName, "r");
 		try {
 			final long offset = address - loadAddress;
@@ -171,9 +200,10 @@ public class AddressFinder {
 			os.write(data);
 			os.close();
 
-			final String cmdLine = NDISASM + " -u -o " + address + " "
+			final String cmdLine = arch.getDisasmCmd() + address + " "
 					+ tmpFile.getAbsolutePath();
 			exec(cmdLine);
+			//tmpFile.delete();
 		} finally {
 			raf.close();
 		}
@@ -187,6 +217,45 @@ public class AddressFinder {
 		stderr.start();
 		stdout.start();
 		proc.waitFor();
+	}
+
+	private static final class ArchInfo {
+		private final String arch;
+
+		private final String listFile;
+
+		private final String bootImageFile;
+
+		private final String disasmCmd;
+
+		/**
+		 * @param bootImageFile
+		 * @param listFile
+		 * @param disasmCmd
+		 */
+		public ArchInfo(String arch, String bootImageFile,
+				final String listFile, final String disasmCmd) {
+			this.arch = arch;
+			this.bootImageFile = bootImageFile;
+			this.listFile = listFile;
+			this.disasmCmd = disasmCmd;
+		}
+
+		public final String getArch() {
+			return arch;
+		}
+
+		public final String getBootImageFile() {
+			return bootImageFile;
+		}
+
+		public final String getDisasmCmd() {
+			return disasmCmd;
+		}
+
+		public final String getListFile() {
+			return listFile;
+		}
 	}
 
 	static class CopyThread extends Thread {

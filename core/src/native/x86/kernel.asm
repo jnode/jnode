@@ -189,7 +189,6 @@ go_user_cs:
 	add AAX,BootImageBuilder_JUMP_MAIN_OFFSET32
 %else
 	add AAX,BootImageBuilder_JUMP_MAIN_OFFSET64
-	LOOPDIE
 %endif	
 	call AAX
 

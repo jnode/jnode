@@ -20,7 +20,7 @@
  */
 
 package org.jnode.assembler.x86;
-
+ 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
@@ -708,19 +708,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	}
 
 	public final void write64(long v64) {
-		if (!inObject) {
-			throw new IllegalArgumentException("Cannot write out of an object");
-		}
 		write32((int) (v64 & 0xFFFFFFFF)); // lsb
 		write32((int) ((v64 >>> 32) & 0xFFFFFFFF)); // msb
-	}
-
-	public final void writeWord(long word) {
-		if (mode.is32()) {
-			write32((int) word);
-		} else {
-			write64(word);
-		}
 	}
 
 	/**
@@ -2277,7 +2266,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param label
 	 */
 	public final void writeMOV_Const(GPR dstReg, Object label) {
-		write8(0xb8 + dstReg.getNr());
+		testOperandSize(dstReg.getSize(), mode.getSize());
+		write1bOpcodeREXPrefix(dstReg.getSize(), dstReg.getNr());
+		write8(0xb8 + (dstReg.getNr() & 7));
 		writeObjectRef(label, 0, false);
 	}
 
@@ -2527,13 +2518,15 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			}
 		} else {
 			final X86ObjectRef ref = (X86ObjectRef) getObjectRef(object);
-			if (ref.isResolved())
+			if (ref.isResolved()) {
 				try {
+					//System.out.println("Resolved offset " + ref.getOffset());
 					writeWord(ref.getOffset() + baseAddr + offset);
 				} catch (UnresolvedObjectRefException e) {
 					throw new RuntimeException(e);
 				}
-			else {
+			} else {
+				//System.out.println("Unresolved");
 				ref.addUnresolvedLink(m_used, getWordSize());
 				writeWord(-(baseAddr + offset));
 			}

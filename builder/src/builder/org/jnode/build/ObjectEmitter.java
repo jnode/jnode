@@ -253,7 +253,7 @@ public class ObjectEmitter {
 		final Class cmpType = cls.getComponentType();
 		final int len = Array.getLength(obj);
 		vmClass.incTotalLength(len);
-		os.write32(len);
+		os.writeWord(len);
 		if (cmpType == byte.class) {
 			final byte[] a = (byte[]) obj;
 			os.write(a, 0, len);
@@ -323,6 +323,8 @@ public class ObjectEmitter {
 				if ((jdkField == null) || ((modifiers & Modifier.TRANSIENT) != 0)) {
 				    if (jnodeField.isWide()) {
 						os.write64(0);
+				    } else if (!jnodeField.isPrimitive()) {
+				    	os.writeWord(0);
 					} else {
 						os.write32(0);
 					}

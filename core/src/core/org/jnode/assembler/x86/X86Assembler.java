@@ -289,6 +289,14 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
      */
 	public abstract void write8(int v8);
 
+	public final void writeWord(long word) {
+		if (mode.is32()) {
+			write32((int) word);
+		} else {
+			write64(word);
+		}
+	}
+
 	/**
 	 * Create a ADC dstReg, srcReg
 	 * 
