@@ -82,7 +82,7 @@ public abstract class AbstractKeyboardDriver extends Driver implements KeyboardA
 	 * @return The created interpreter
 	 */
 	protected KeyboardInterpreter createKeyboardInterpreter() {
-		return new KeyboardInterpreter();
+		return KeyboardInterpreterFactory.getDefaultKeyboardInterpreter();
 	}
 
 	/**

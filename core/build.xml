@@ -41,6 +41,12 @@
 	  <src path="${my-src.dir}/test"/>
       <classpath refid="my-cp"/>
     </javac>
+    <!-- Copy all non java files to class dir -->
+    <copy todir="${my-classes.dir}">
+         <fileset dir="${my-src.dir}/driver">
+	<exclude name="**/*.java"/>
+         </fileset>
+    </copy> 
   </target>
 
 <!-- Assemble the jarfile -->
