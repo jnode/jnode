@@ -133,9 +133,9 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         this.maxLocals = method.getBytecode().getNoLocals();
         this.loader = method.getDeclaringClass().getLoader();
         helper.setMethod(method);
-        this.startOffset = os.getLength();
+        // this.startOffset = os.getLength();
         this.stackFrame = new X86StackFrame(os, helper, method, context, cm);
-        stackFrame.emitHeader();
+        this.startOffset = stackFrame.emitHeader();
     }
 
     /**
