@@ -19,11 +19,11 @@ public class VGAFinder implements DeviceFinder {
 	 * @see org.jnode.driver.DeviceFinder#findDevices(org.jnode.driver.DeviceManager, org.jnode.driver.Bus)
 	 */
 	public void findDevices(DeviceManager devMan, Bus bus) throws DeviceException {
-		try {
+		/*try {
 			devMan.register(new VGADevice(bus));
 		} catch (DriverException ex) {
 			throw new DeviceException(ex);
-		}
+		}*/
 	}
 
 	public static class VGADevice extends Device {

@@ -27,6 +27,10 @@ public class VGADriver extends AbstractFrameBufferDriver implements VgaConstants
 	private FrameBufferConfiguration currentConfig;
 	private VGASurface vga;
 
+	public VGADriver() {
+	    new Throwable("Stacktrace").printStackTrace();
+	}
+	
 	/**
 	 * @see org.jnode.driver.Driver#stopDevice()
 	 */
