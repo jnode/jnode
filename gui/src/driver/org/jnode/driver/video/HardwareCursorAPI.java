@@ -26,6 +26,6 @@ public interface HardwareCursorAPI extends DeviceAPI {
 	/**
 	 * Sets the cursor image.
 	 */
-	public void setCursorImage(CursorImage cursor);
+	public void setCursorImage(HardwareCursor cursor);
 	
 }

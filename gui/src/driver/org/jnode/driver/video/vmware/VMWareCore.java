@@ -18,9 +18,10 @@ import org.jnode.awt.util.BitmapGraphics;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.pci.PCIDevice;
 import org.jnode.driver.pci.PCI_IDs;
-import org.jnode.driver.video.CursorImage;
 import org.jnode.driver.video.FrameBufferConfiguration;
+import org.jnode.driver.video.HardwareCursor;
 import org.jnode.driver.video.HardwareCursorAPI;
+import org.jnode.driver.video.HardwareCursorImage;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.util.AbstractSurface;
 import org.jnode.naming.InitialNaming;
@@ -721,18 +722,18 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	 * Sets the cursor image.
 	 * @param cursor
 	 */
-	public void setCursorImage(CursorImage cursor) {
+	public void setCursorImage(HardwareCursor cursor) {
 		if (hasCapability(SVGA_CAP_ALPHA_CURSOR)) {
-			defineARGBCursor(cursor);
+			defineARGBCursor(cursor.getImage(16, 16));
 		} else {
-			defineCursor(cursor);
+			defineCursor(cursor.getImage(16, 16));
 		}
 	}
 	
 	/**
 	 * Sets the cursor image.
 	 */
-	private void defineCursor(CursorImage cursor) {
+	private void defineCursor(HardwareCursorImage cursor) {
 		
 		final int[] argb = cursor.getImage();
 		final int size = argb.length;
@@ -788,7 +789,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	/**
 	 * Sets the cursor image.
 	 */
-	private void defineARGBCursor(CursorImage cursor) {
+	private void defineARGBCursor(HardwareCursorImage cursor) {
 		
 		final int[] argb = cursor.getImage();
 		final int size = argb.length;
