@@ -46,6 +46,28 @@ public class NumberUtils {
             return s;
         }
     }
+
+	/**
+	 * Converts a byte to an unsigned value.
+	 * @author markhale
+	 */
+	public static int toUnsigned(final byte b) {
+		return b & 0xFF;
+	}
+	/**
+	 * Converts a short to an unsigned value.
+	 * @author markhale
+	 */
+	public static int toUnsigned(final short s) {
+		return s & 0xFFFF;
+	}
+	/**
+	 * Converts an int to an unsigned value.
+	 * @author markhale
+	 */
+	public static long toUnsigned(final int i) {
+		return i & 0xFFFFFFFFL;
+	}
     
 	/**
 	 * Gets the hexadecimal representation of the given number. The result is 
