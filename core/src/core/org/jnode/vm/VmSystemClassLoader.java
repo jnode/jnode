@@ -327,7 +327,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         //System.out.println("bvi.loadClass: " +name);
         byte[] image = getClassStream(name);
         return ClassDecoder.defineClass(name, image, 0, image.length,
-                rejectNatives, this, selectorMap, statics);
+                rejectNatives, this);
     }
 
     /**

@@ -4,6 +4,8 @@
 package org.jnode.vm.classmgr;
 
 /**
+ * VM representation of a non-static method.
+ * 
  * @author epr
  */
 public class VmInstanceMethod extends VmMethod {
@@ -16,18 +18,13 @@ public class VmInstanceMethod extends VmMethod {
 	 * @param signature
 	 * @param modifiers
 	 * @param declaringClass
-	 * @param noArgs
-	 * @param selectorMap
 	 */
 	public VmInstanceMethod(
 		String name,
 		String signature,
 		int modifiers,
-		VmType declaringClass,
-		int noArgs,
-		SelectorMap selectorMap,
-		int staticsIdx) {
-		super(name, signature, modifiers, declaringClass, noArgs, selectorMap, staticsIdx);
+		VmType declaringClass) {
+		super(name, signature, modifiers, declaringClass);
 	}
 	
 	/**
@@ -35,7 +32,7 @@ public class VmInstanceMethod extends VmMethod {
 	 * @param method
 	 */
 	public VmInstanceMethod(VmInstanceMethod method) {
-		super(method.getName(), method.signature, method.getModifiers(), method.declaringClass, method.getNoArgs(), method.getSelector(), method.getStaticsIndex());
+		super(method);
 		if (!method.isAbstract()) {
 			throw new IllegalArgumentException("Method must be abstract");
 		}

@@ -4,6 +4,8 @@
 package org.jnode.vm.classmgr;
 
 /**
+ * VM representation of a special (&lt;init&gt;) method.
+ * 
  * @author epr
  */
 public final class VmStaticField extends VmField {

@@ -67,7 +67,7 @@ public class IRGenerator extends BytecodeVisitor {
 	 */
 	public void startMethod(VmMethod method) {
 		VmByteCode code = method.getBytecode();
-		nArgs = method.getNoArgs();
+		nArgs = method.getArgSlotCount();
 		nLocals = code.getNoLocals();
 		maxStack = code.getMaxStack();
 		stackOffset = nLocals;

@@ -50,15 +50,14 @@ public final class ClassDecoder {
      * @param class_image_length
      * @param rejectNatives
      * @param clc
-     * @param selectorMap
      * @return The defined class
      */
     public static final VmType defineClass(String className, byte[] data,
             int offset, int class_image_length, boolean rejectNatives,
-            VmClassLoader clc, SelectorMap selectorMap, VmStatics statics) {
+            VmClassLoader clc) {
         cl_init();
         VmType cls = decodeClass(data, offset, class_image_length,
-                rejectNatives, clc, selectorMap, statics);
+                rejectNatives, clc);
         return cls;
     }
 
@@ -70,16 +69,17 @@ public final class ClassDecoder {
      * @param class_image_length
      * @param rejectNatives
      * @param clc
-     * @param selectorMap
      * @return The decoded class
      * @throws ClassFormatError
      */
     private static final VmType decodeClass(byte[] data, int offset,
-            int class_image_length, boolean rejectNatives, VmClassLoader clc,
-            SelectorMap selectorMap, VmStatics statics) throws ClassFormatError {
+            int class_image_length, boolean rejectNatives, VmClassLoader clc)
+            throws ClassFormatError {
         if (data == null) { throw new ClassFormatError(
                 "ClassDecoder.decodeClass: data==null"); }
-        final ClassReader reader = new ClassReader(data, offset, class_image_length);
+        final ClassReader reader = new ClassReader(data, offset,
+                class_image_length);
+        final VmStatics statics = clc.getStatics();
         final int slotSize = clc.getArchitecture().getReferenceSize();
 
         final int magic = reader.readu4();
@@ -124,8 +124,7 @@ public final class ClassDecoder {
                 break;
             case 7:
                 // class
-                cp.setConstClass(i, new VmConstClass(cp, i,
-                        reader.readu2()));
+                cp.setConstClass(i, new VmConstClass(cp, i, reader.readu2()));
                 break;
             case 8:
                 // String
@@ -179,7 +178,8 @@ public final class ClassDecoder {
             case 8:
                 // String
                 final int idx = cp.getInt(i);
-                final int staticsIdx = statics.allocConstantStringField(cp.getUTF8(idx));
+                final int staticsIdx = statics.allocConstantStringField(cp
+                        .getUTF8(idx));
                 cp.setString(i, new VmConstString(cp, i, staticsIdx));
                 break;
             }
@@ -216,7 +216,7 @@ public final class ClassDecoder {
         readFields(reader, cls, cp, statics, slotSize);
 
         // Method Table
-        readMethods(reader, rejectNatives, cls, cp, selectorMap, statics);
+        readMethods(reader, rejectNatives, cls, cp, statics);
 
         return cls;
     }
@@ -228,14 +228,12 @@ public final class ClassDecoder {
      * @param cls
      * @param cp
      */
-    private static void readInterfaces(ClassReader reader, VmType cls,
-            VmCP cp) {
+    private static void readInterfaces(ClassReader reader, VmType cls, VmCP cp) {
         final int icount = reader.readu2();
         if (icount > 0) {
             final VmImplementedInterface[] itable = new VmImplementedInterface[ icount];
             for (int i = 0; i < icount; i++) {
-                final VmConstClass icls = cp
-                        .getConstClass(reader.readu2());
+                final VmConstClass icls = cp.getConstClass(reader.readu2());
                 itable[ i] = new VmImplementedInterface(icls.getClassName());
             }
             cls.setInterfaceTable(itable);
@@ -390,11 +388,9 @@ public final class ClassDecoder {
      * @param rejectNatives
      * @param cls
      * @param cp
-     * @param selectorMap
      */
     private static void readMethods(ClassReader reader, boolean rejectNatives,
-            VmType cls, VmCP cp, SelectorMap selectorMap,
-            VmStatics statics) {
+            VmType cls, VmCP cp, VmStatics statics) {
         final int mcount = reader.readu2();
         if (mcount > 0) {
             final VmMethod[] mtable = new VmMethod[ mcount];
@@ -403,29 +399,23 @@ public final class ClassDecoder {
                 final int modifiers = reader.readu2();
                 final String name = cp.getUTF8(reader.readu2());
                 final String signature = cp.getUTF8(reader.readu2());
-                int argSlotCount = Signature.getArgSlotCount(signature);
                 final boolean isStatic = ((modifiers & Modifier.ACC_STATIC) != 0);
-
-                if ((modifiers & Modifier.ACC_STATIC) == 0) {
-                    argSlotCount++; // add the "this" argument
-                }
 
                 final VmMethod mts;
                 final boolean isSpecial = name.equals("<init>");
-                final int staticsIdx = statics.allocMethod();
+                //final int staticsIdx = statics.allocMethod();
                 if (isStatic || isSpecial) {
                     if (isSpecial) {
                         mts = new VmSpecialMethod(name, signature, modifiers,
-                                cls, argSlotCount, staticsIdx);
+                                cls);
                     } else {
                         mts = new VmStaticMethod(name, signature, modifiers,
-                                cls, argSlotCount, staticsIdx);
+                                cls);
                     }
                 } else {
-                    mts = new VmInstanceMethod(name, signature, modifiers, cls,
-                            argSlotCount, selectorMap, staticsIdx);
+                    mts = new VmInstanceMethod(name, signature, modifiers, cls);
                 }
-                statics.setMethod(staticsIdx, mts);
+                //statics.setMethod(staticsIdx, mts);
                 mtable[ i] = mts;
 
                 // Read methods attributes
@@ -459,8 +449,8 @@ public final class ClassDecoder {
      * @param method
      * @return The read code
      */
-    private static final VmByteCode readCode(ClassReader reader,
-            VmType cls, VmCP cp, VmMethod method) {
+    private static final VmByteCode readCode(ClassReader reader, VmType cls,
+            VmCP cp, VmMethod method) {
 
         final int maxStack = reader.readu2();
         final int noLocals = reader.readu2();
@@ -529,8 +519,10 @@ public final class ClassDecoder {
 
         for (int i = 0; i < len; i++) {
             final int ofs = i * VmLineNumberMap.LNT_ELEMSIZE;
-            lnTable[ ofs + VmLineNumberMap.LNT_STARTPC_OFS] = (char) reader.readu2();
-            lnTable[ ofs + VmLineNumberMap.LNT_LINENR_OFS] = (char) reader.readu2();
+            lnTable[ ofs + VmLineNumberMap.LNT_STARTPC_OFS] = (char) reader
+                    .readu2();
+            lnTable[ ofs + VmLineNumberMap.LNT_LINENR_OFS] = (char) reader
+                    .readu2();
         }
 
         return new VmLineNumberMap(lnTable);
