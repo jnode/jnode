@@ -127,6 +127,14 @@
          target="cdrom"/>
   </target>
 
+<!-- Create a bootable CDROM image -->
+  <target name="cdrom-lite" depends="assemble">
+    <ant antfile="build-x86.xml"
+         inheritall="true"
+         inheritrefs="true"
+         target="cdrom-lite"/>
+  </target>
+
   <!-- Upload a distribution -->
   <target name="upload" depends="cdrom">
     <gzip src="${build.dir}/jnode.iso"
