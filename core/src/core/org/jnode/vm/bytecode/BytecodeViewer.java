@@ -127,22 +127,6 @@ public class BytecodeViewer extends BytecodeVisitor {
 
 	/**
 	 * @param value
-	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_bipush(byte)
-	 */
-	public void visit_bipush(byte value) {
-		out("bipush " + value);
-	}
-
-	/**
-	 * @param value
-	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_sipush(short)
-	 */
-	public void visit_sipush(short value) {
-		out("spush " + value);
-	}
-
-	/**
-	 * @param value
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(VmConstString)
 	 */
 	public void visit_ldc(VmConstString value) {

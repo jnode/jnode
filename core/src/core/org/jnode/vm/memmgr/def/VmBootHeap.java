@@ -113,16 +113,17 @@ public class VmBootHeap extends VmAbstractHeap {
      *            This parameter is irrelevant here, since the structure of
      *            this heap never changes.
      */
-    protected void walk(ObjectVisitor visitor, boolean locking) {
+    protected void walk(ObjectVisitor visitor, boolean locking, int flagsMask, int flagsValue) {
         // Go through the heap and mark all objects in the allocation bitmap.
         final int headerSize = this.headerSize;
         final int sizeOffset = this.sizeOffset;
         final int size = getSize();
         int offset = headerSize;
         while (offset < size) {
-            Address ptr = Address.add(start, offset);
-            Object object = helper.objectAt(ptr);
-            if (visitor.visit(object)) {
+            final Address ptr = Address.add(start, offset);
+            final Object object = helper.objectAt(ptr);
+            final int flags = helper.getObjectFlags(object) & flagsMask;
+            if ((flags != flagsValue) || visitor.visit(object)) {
                 // Continue
                 int objSize = helper.getInt(ptr, sizeOffset);
                 offset += objSize + headerSize;

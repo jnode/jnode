@@ -20,8 +20,8 @@ public class VmConstFieldRef extends VmConstMemberRef  {
 	 * @param classIndex
 	 * @param nameTypeIndex
 	 */
-	public VmConstFieldRef(VmCP cp, int cpIdx, int classIndex, int nameTypeIndex) {
-		super(cp, cpIdx, classIndex, nameTypeIndex);
+	public VmConstFieldRef(VmCP cp, int classIndex, int nameTypeIndex) {
+		super(cp, classIndex, nameTypeIndex);
 	}
 
 	/**

@@ -141,12 +141,6 @@ public class DelegatingBytecodeVisitor extends BytecodeVisitor {
         delegate.visit_bastore();
     }
     /**
-     * @param value
-     */
-    public void visit_bipush(byte value) {
-        delegate.visit_bipush(value);
-    }
-    /**
      * 
      */
     public void visit_caload() {
@@ -938,12 +932,6 @@ public class DelegatingBytecodeVisitor extends BytecodeVisitor {
      */
     public void visit_sastore() {
         delegate.visit_sastore();
-    }
-    /**
-     * @param value
-     */
-    public void visit_sipush(short value) {
-        delegate.visit_sipush(value);
     }
     /**
      * 

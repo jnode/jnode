@@ -177,12 +177,6 @@ public class CompilerBytecodeViewer extends InlineBytecodeVisitor {
         viewer.visit_bastore();
     }
     /**
-     * @param value
-     */
-    public void visit_bipush(byte value) {
-        viewer.visit_bipush(value);
-    }
-    /**
      * 
      */
     public void visit_caload() {
@@ -973,12 +967,6 @@ public class CompilerBytecodeViewer extends InlineBytecodeVisitor {
      */
     public void visit_sastore() {
         viewer.visit_sastore();
-    }
-    /**
-     * @param value
-     */
-    public void visit_sipush(short value) {
-        viewer.visit_sipush(value);
     }
     /**
      * 

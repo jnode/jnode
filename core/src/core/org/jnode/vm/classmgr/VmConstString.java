@@ -3,11 +3,13 @@
  */
 package org.jnode.vm.classmgr;
 
+import org.jnode.vm.VmSystemObject;
+
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class VmConstString extends VmConstObject {
+public final class VmConstString extends VmSystemObject implements VmStaticsEntry {
 
     /** Index in the statics table of the string constant. */
     private final int staticsIndex;
@@ -16,16 +18,8 @@ public final class VmConstString extends VmConstObject {
      * Initialize this instance.
      * @param staticsIndex
      */
-    public VmConstString(VmCP cp, int cpIdx, int staticsIndex) {
-        super(cp, cpIdx);
+    public VmConstString(int staticsIndex) {
         this.staticsIndex = staticsIndex;
-    }
-    
-    /**
-     * @see org.jnode.vm.classmgr.VmConstObject#doResolve(org.jnode.vm.classmgr.VmClassLoader)
-     */
-    protected final void doResolve(VmClassLoader clc) {
-        // Nothing to do
     }
     
     /**

@@ -6,6 +6,7 @@ package org.jnode.driver.block.ramdisk;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
+import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.partitions.PartitionTableEntry;
 
@@ -46,8 +47,10 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 
 			if (this.data == null) {
 				this.data = new byte[device.getSize()];
+				this.device.registerAPI(BlockDeviceAPI.class, this);
+			} else {
+				this.device.registerAPI(FSBlockDeviceAPI.class, this);
 			}
-			this.device.registerAPI(FSBlockDeviceAPI.class, this);
 		} catch (DeviceAlreadyRegisteredException ex) {
 			throw new DriverException(ex);
 		}
@@ -58,6 +61,7 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 	 */
 	protected void stopDevice() {
 		this.device.unregisterAPI(FSBlockDeviceAPI.class);
+		this.device.unregisterAPI(BlockDeviceAPI.class);
 		this.device = null;
 	}
 

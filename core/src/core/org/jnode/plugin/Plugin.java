@@ -77,6 +77,19 @@ public abstract class Plugin {
 	}
 
 	/**
+	 * Has this plugin finished its startup work.
+	 * Most plugins do their start work in the {@link #startPlugin()} method.
+	 * However, some plugins create thread there to do some work in the background.
+	 * These plugins should overwrite this method and return true when the startup
+	 * process is fully finished.
+	 * 
+	 * @return True if this plugins has fully finished its startup process, false otherwise.
+	 */
+	public boolean isStartFinished() {
+	    return started;
+	}
+	
+	/**
 	 * Actually start this plugin.
 	 * 
 	 * @throws PluginException

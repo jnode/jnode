@@ -189,25 +189,6 @@ public class IRGenerator extends BytecodeVisitor {
 	}
 
 	/**
-	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_bipush(byte)
-	 */
-	public void visit_bipush(byte value) {
-		ConstantRefAssignQuad assignQuad = new ConstantRefAssignQuad(address, currentBlock,
-			stackOffset, Constant.getInstance(value));
-		quadList.add(assignQuad);
-		stackOffset += 1;
-	}
-
-	/**
-	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_sipush(short)
-	 */
-	public void visit_sipush(short value) {
-		quadList.add(new ConstantRefAssignQuad(address, currentBlock, stackOffset,
-			Constant.getInstance(value)));
-		stackOffset += 1;
-	}
-
-	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(VmConstString)
 	 */
 	public void visit_ldc(VmConstString value) {

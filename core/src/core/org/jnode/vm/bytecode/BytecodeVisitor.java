@@ -30,8 +30,8 @@ public abstract class BytecodeVisitor {
 	// -- 10 --
 	public abstract void visit_fconst(float value);
 	public abstract void visit_dconst(double value);
-	public abstract void visit_bipush(byte value);
-	public abstract void visit_sipush(short value);
+	/** @deprecated */
+	public final void visit_sipush(short value) {}
 	public abstract void visit_ldc(VmConstString value);
 	// -- 20 --
 	public abstract void visit_iload(int index);

@@ -8,7 +8,7 @@ package org.jnode.vm.classmgr;
  * 
  * @author epr
  */
-public final class VmStaticField extends VmField {
+public final class VmStaticField extends VmField implements VmStaticsEntry {
 
 	/** The index in the statics table */
 	private final int staticsIndex;

@@ -113,4 +113,16 @@ public interface DeviceManager {
 	 * @return The system bus
 	 */
 	public Bus getSystemBus();
+	
+    /**
+     * Gets the default timeout for device startup.
+     * @return Returns the defaultStartTimeout.
+     */
+    public long getDefaultStartTimeout();
+
+    /**
+     * Sets the default timeout for device startup.
+     * @param defaultStartTimeout The defaultStartTimeout to set.
+     */
+    public void setDefaultStartTimeout(long defaultStartTimeout);
 }

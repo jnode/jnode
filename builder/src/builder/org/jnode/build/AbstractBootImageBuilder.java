@@ -39,6 +39,7 @@ import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmClassType;
@@ -86,7 +87,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     /** Set of jbects that should not yet be emitted */
     private final Set blockedObjects = new HashSet();
 
-    protected static boolean debug = false;
+    protected boolean debug = false;
 
     protected static final Label bootHeapStart = new Label("$$bootHeapStart");
 
@@ -116,6 +117,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     }
 
     public final void execute() throws BuildException {
+        debug = (getProject().getProperty("jnode.debug") != null);
 
         final long lmJar = jarFile.lastModified();
         final long lmKernel = kernelFile.lastModified();
@@ -304,13 +306,15 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
             logStatistics(os);
 
+            BytecodeParser.dumpStatistics();
+            
             log("Optimized methods     : " + totalHighMethods + ", avg size "
                     + (totalHighMethodSize / totalHighMethods) + ", tot size "
                     + totalHighMethodSize);
             log("Ondemand comp. methods: " + totalLowMethods + ", avg size "
                     + (totalLowMethodSize / totalLowMethods) + ", tot size "
                     + totalLowMethodSize);
-
+            
             log("Done.");
         } catch (Throwable ex) {
             ex.printStackTrace();

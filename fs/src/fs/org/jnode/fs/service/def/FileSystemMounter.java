@@ -27,139 +27,152 @@ import org.jnode.util.QueueProcessor;
 import org.jnode.util.QueueProcessorThread;
 
 /**
- * A FileSystemMounter listens to the DeviceManager and once a Device that implements the BlockDeviceAPI is started, it tries to mount a FileSystem on that device.
+ * A FileSystemMounter listens to the DeviceManager and once a Device that
+ * implements the BlockDeviceAPI is started, it tries to mount a FileSystem on
+ * that device.
  * 
  * @author epr
  */
 public class FileSystemMounter implements DeviceListener, QueueProcessor {
 
-	/** My logger */
-	private static final Logger log = Logger.getLogger(FileSystemMounter.class);
-	/** The DeviceManager i'm listening to */
-	private DeviceManager devMan;
-	/** The FileSystemService i'm using */
-	private FileSystemService fileSystemService;
-	/** Mapping between a device and a mounted FileSystem */
-	private final HashMap devices2FS = new HashMap();
+    /** My logger */
+    private static final Logger log = Logger.getLogger(FileSystemMounter.class);
 
-	private QueueProcessorThread asynchronousMounterThread;
-	private final Queue devicesWaitingToBeMounted = new Queue();
+    /** The DeviceManager i'm listening to */
+    private DeviceManager devMan;
 
-	/**
-	 * Start the FS mounter.
-	 * 
-	 * @throws PluginException
-	 */
-	public void start() throws PluginException {
-		try {
-			devMan = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
-			devMan.addListener(this);
-			fileSystemService = (FileSystemService) InitialNaming.lookup(FileSystemService.NAME);
-			asynchronousMounterThread = new QueueProcessorThread("Asynchronous-FS-Mounter", devicesWaitingToBeMounted, this);
-			asynchronousMounterThread.start();
-		} catch (NameNotFoundException ex) {
-			throw new PluginException("Cannot find DeviceManager", ex);
-		}
+    /** The FileSystemService i'm using */
+    private FileSystemService fileSystemService;
 
-	}
+    /** Mapping between a device and a mounted FileSystem */
+    private final HashMap devices2FS = new HashMap();
 
-	/**
-	 * Stop the FS mounter.
-	 */
-	public void stop() {
-		devMan.removeListener(this);
-		asynchronousMounterThread.stopProcessor();
-		asynchronousMounterThread = null;
-	}
+    private QueueProcessorThread asynchronousMounterThread;
 
-	/**
-	 * @see org.jnode.driver.DeviceListener#deviceStarted(org.jnode.driver.Device)
-	 */
-	public synchronized void deviceStarted(Device device) {
-		// add it to the queue of devices to be mounted only if the action is not
-		// already pending
-		if (!devicesWaitingToBeMounted.contains(device)) {
-			devicesWaitingToBeMounted.add(device);
-		}
-	}
+    private final Queue devicesWaitingToBeMounted = new Queue();
 
-	/**
-	 * @see org.jnode.driver.DeviceListener#deviceStop(org.jnode.driver.Device)
-	 */
-	public synchronized void deviceStop(Device device) {
-		if (devicesWaitingToBeMounted.contains(device)) {
-			devicesWaitingToBeMounted.remove(device);
-		}
+    /**
+     * Start the FS mounter.
+     * 
+     * @throws PluginException
+     */
+    public void start() throws PluginException {
+        try {
+            devMan = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+            devMan.addListener(this);
+            fileSystemService = (FileSystemService) InitialNaming
+                    .lookup(FileSystemService.NAME);
+            asynchronousMounterThread = new QueueProcessorThread(
+                    "Asynchronous-FS-Mounter", devicesWaitingToBeMounted, this);
+            asynchronousMounterThread.start();
+        } catch (NameNotFoundException ex) {
+            throw new PluginException("Cannot find DeviceManager", ex);
+        }
 
-		final FileSystem fs = (FileSystem) devices2FS.get(device);
-		if (fs != null) {
-			try {
-				fs.close();
-			} catch (IOException ex) {
-				log.error("Cannot close filesystem", ex);
-			}
-			devices2FS.remove(device);
-		}
-	}
+    }
 
-	/**
-	 * Try to mount a filesystem on the given device.
-	 * 
-	 * @param device
-	 * @param api
-	 */
-	protected synchronized void tryToMount(Device device, FSBlockDeviceAPI api, boolean removable) {
+    /**
+     * Stop the FS mounter.
+     */
+    public void stop() {
+        devMan.removeListener(this);
+        asynchronousMounterThread.stopProcessor();
+        asynchronousMounterThread = null;
+    }
 
-		if (devices2FS.containsKey(device)) {
-			log.info("device already mounted...");
-			return;
-		}
+    /**
+     * @see org.jnode.driver.DeviceListener#deviceStarted(org.jnode.driver.Device)
+     */
+    public final void deviceStarted(Device device) {
+        // add it to the queue of devices to be mounted only if the action is
+        // not
+        // already pending
+        devicesWaitingToBeMounted.add(device);
+    }
 
-		//if (removable) {
-		//	log.error("Not mounting removable devices yet...");
-		// TODO Implement mounting of removable devices
-		//	return;
-		//}
+    /**
+     * @see org.jnode.driver.DeviceListener#deviceStop(org.jnode.driver.Device)
+     */
+    public final void deviceStop(Device device) {
+        final FileSystem fs;
+        synchronized (this) {
+            fs = (FileSystem) devices2FS.get(device);
+            devices2FS.remove(device);
+        }
+        if (fs != null) {
+            try {
+                fs.close();
+            } catch (IOException ex) {
+                log.error("Cannot close filesystem", ex);
+            }
+        }
+    }
 
-		log.info("Try to mount " + device.getId());
-		// Read the first sector
-		try {
-			final byte[] bs = new byte[api.getSectorSize()];
-			api.read(0, bs, 0, bs.length);
-			for (Iterator i = fileSystemService.fileSystemTypes().iterator(); i.hasNext();) {
-				final FileSystemType fst = (FileSystemType) i.next();
-				// 
-				if (fst.supports(api.getPartitionTableEntry(), bs)) {
-					try {
-						final FileSystem fs = fst.create(device);
-						fileSystemService.registerFileSystem(fs);
-						log.info("Mounted " + fst.getName() + " on " + device.getId());
-						return;
-					} catch (FileSystemException ex) {
-						log.error("Cannot mount " + fst.getName() + " filesystem on " + device.getId(), ex);
-					}
-				}
-			}
-			log.info("No filesystem found for " + device.getId());
-		} catch (IOException ex) {
-			log.error("Cannot read bootsector of " + device.getId());
-		}
-	}
+    /**
+     * Try to mount a filesystem on the given device.
+     * 
+     * @param device
+     * @param api
+     */
+    protected void tryToMount(Device device, FSBlockDeviceAPI api,
+            boolean removable) {
 
-	/**
-	 * @see org.jnode.util.QueueProcessor#process(java.lang.Object)
-	 */
-	public void process(Object queuedObject) throws Exception {
-		Device device = (Device) queuedObject;
-		try {
-			FSBlockDeviceAPI api = (FSBlockDeviceAPI) device.getAPI(FSBlockDeviceAPI.class);
-			if (device.implementsAPI(RemovableDeviceAPI.class)) {
-				tryToMount(device, api, true);
-			} else {
-				tryToMount(device, api, false);
-			}
-		} catch (ApiNotFoundException ex) {
-			// Just ignore this device.
-		}
-	}
+        synchronized (this) {
+            if (devices2FS.containsKey(device)) {
+                log.info("device already mounted...");
+                return;
+            }
+        }
+
+        //if (removable) {
+        //	log.error("Not mounting removable devices yet...");
+        // TODO Implement mounting of removable devices
+        //	return;
+        //}
+
+        log.info("Try to mount " + device.getId());
+        // Read the first sector
+        try {
+            final byte[] bs = new byte[ api.getSectorSize()];
+            api.read(0, bs, 0, bs.length);
+            for (Iterator i = fileSystemService.fileSystemTypes().iterator(); i
+                    .hasNext();) {
+                final FileSystemType fst = (FileSystemType) i.next();
+                // 
+                if (fst.supports(api.getPartitionTableEntry(), bs)) {
+                    try {
+                        final FileSystem fs = fst.create(device);
+                        fileSystemService.registerFileSystem(fs);
+                        log.info("Mounted " + fst.getName() + " on "
+                                + device.getId());
+                        return;
+                    } catch (FileSystemException ex) {
+                        log.error("Cannot mount " + fst.getName()
+                                + " filesystem on " + device.getId(), ex);
+                    }
+                }
+            }
+            log.info("No filesystem found for " + device.getId());
+        } catch (IOException ex) {
+            log.error("Cannot read bootsector of " + device.getId());
+        }
+    }
+
+    /**
+     * @see org.jnode.util.QueueProcessor#process(java.lang.Object)
+     */
+    public void process(Object queuedObject) throws Exception {
+        Device device = (Device) queuedObject;
+        try {
+            FSBlockDeviceAPI api = (FSBlockDeviceAPI) device
+                    .getAPI(FSBlockDeviceAPI.class);
+            if (device.implementsAPI(RemovableDeviceAPI.class)) {
+                tryToMount(device, api, true);
+            } else {
+                tryToMount(device, api, false);
+            }
+        } catch (ApiNotFoundException ex) {
+            // Just ignore this device.
+        }
+    }
 }

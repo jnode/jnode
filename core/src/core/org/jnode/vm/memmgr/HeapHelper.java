@@ -38,6 +38,13 @@ public abstract class HeapHelper extends ObjectResolver {
 	public abstract int getObjectColor(Object src);
 
 	/**
+	 * Gets the flags of the given object.
+	 * @param src
+	 * @return
+	 */
+	public abstract int getObjectFlags(Object src);
+
+	/**
 	 * Has the given object been finalized.
 	 * @param src
 	 * @return

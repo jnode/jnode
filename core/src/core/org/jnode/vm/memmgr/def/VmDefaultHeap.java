@@ -290,7 +290,8 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
      * @param locking
      *            If true, use lock/unlock while proceeding to the next object.
      */
-    protected final void walk(ObjectVisitor visitor, boolean locking) {
+    protected final void walk(ObjectVisitor visitor, boolean locking,
+            int flagsMask, int flagsValue) {
         // Go through the heap and call visit on each object
         final int headerSize = this.headerSize;
         final int sizeOffset = this.sizeOffset;
@@ -303,6 +304,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
                 final Object tib;
                 final Object object;
                 final int objSize;
+                final int flags;
 
                 lock();
                 try {
@@ -310,13 +312,16 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
                     object = helper.objectAt(ptr);
                     tib = helper.getObject(object, tibOffset);
                     objSize = helper.getInt(object, sizeOffset);
+                    flags = (flagsMask == 0) ? 0 : (helper.getObjectFlags(object) & flagsMask);
                 } finally {
                     unlock();
                 }
                 if (tib != FREE) {
-                    if (!visitor.visit(object)) {
-                        // Stop
-                        offset = size;
+                    if (flags == flagsValue) {
+                        if (!visitor.visit(object)) {
+                            // Stop
+                            offset = size;
+                        }
                     }
                 }
                 offset += objSize + headerSize;
@@ -327,10 +332,13 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
                 final Object object = helper.objectAt(ptr);
                 final Object tib = helper.getObject(object, tibOffset);
                 final int objSize = helper.getInt(object, sizeOffset);
+                final int flags = (flagsMask == 0) ? 0 : (helper.getObjectFlags(object) & flagsMask);
                 if (tib != FREE) {
-                    if (!visitor.visit(object)) {
-                        // Stop
-                        offset = size;
+                    if (flags == flagsValue) {
+                        if (!visitor.visit(object)) {
+                            // Stop
+                            offset = size;
+                        }
                     }
                 }
                 offset += objSize + headerSize;

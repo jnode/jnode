@@ -19,8 +19,8 @@ public class VmConstIMethodRef extends VmConstMethodRef {
 	 * @param classIndex
 	 * @param nameTypeIndex
 	 */
-	public VmConstIMethodRef(VmCP cp, int cpIdx, int classIndex, int nameTypeIndex) {
-		super(cp, cpIdx, classIndex, nameTypeIndex);
+	public VmConstIMethodRef(VmCP cp, int classIndex, int nameTypeIndex) {
+		super(cp, classIndex, nameTypeIndex);
 	}
 
 	/**
@@ -28,7 +28,7 @@ public class VmConstIMethodRef extends VmConstMethodRef {
 	 * @param clc
 	 */
 	protected void doResolveMember(VmClassLoader clc) {
-		VmType vmClass = getConstClass().getResolvedVmClass();
+		final VmType vmClass = getConstClass().getResolvedVmClass();
 		if (!vmClass.isInterface()) {
 			throw new IncompatibleClassChangeError(getClassName() + " must be an interface");
 		}

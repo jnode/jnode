@@ -106,6 +106,13 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
         return Unsafe.getObjectFlags(src) & ObjectFlags.GC_COLOUR_MASK;
     }
 
+    /**
+     * Gets the flags of the given object.
+     */
+    public final int getObjectFlags(Object src) {
+        return Unsafe.getObjectFlags(src);
+    }
+
 	/**
 	 * Has the given object been finalized.
 	 * @param src

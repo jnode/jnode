@@ -7,6 +7,7 @@ import org.jnode.plugin.PluginManager;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.manager.DefaultPluginManager;
 import org.jnode.system.BootLog;
+import org.jnode.vm.PragmaLoadStatics;
 import org.jnode.vm.PragmaUninterruptible;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmSystem;
@@ -29,7 +30,7 @@ public class Main {
 	 * 
 	 * @return int
 	 */
-	public static int vmMain() throws PragmaUninterruptible {
+	public static int vmMain() throws PragmaUninterruptible, PragmaLoadStatics {
 		//return 15;
 		try {
 			Unsafe.debug("Starting JNode\n");

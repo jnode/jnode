@@ -155,7 +155,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
             markVisitor.setRootSet(true);
             statics.walk(markVisitor, resolver);
             // Mark every object in the rootset
-            bootHeap.walk(markVisitor, locking);
+            bootHeap.walk(markVisitor, locking, 0, 0);
             if (!firstIteration) {
                 // If there was an overflow in the last iteration,
                 // we must also walk through the other heap to visit
@@ -164,7 +164,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
                 markVisitor.setRootSet(false);
                 VmAbstractHeap heap = firstHeap;
                 while ((heap != null) && (!markStack.isOverflow())) {
-                    heap.walk(markVisitor, locking);
+                    heap.walk(markVisitor, locking, 0, 0);
                     heap = heap.getNext();
                 }
             }
@@ -200,7 +200,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
         while (heap != null) {
             //freedBytes += heap.collect();
             sweepVisitor.setCurrentHeap(heap);
-            heap.walk(sweepVisitor, true);
+            heap.walk(sweepVisitor, true, 0, 0);
             heap = heap.getNext();
         }
     }
@@ -212,7 +212,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
      * @param firstHeap
      */
     private void cleanup(VmBootHeap bootHeap, VmAbstractHeap firstHeap) {
-        bootHeap.walk(setWhiteVisitor, true);
+        bootHeap.walk(setWhiteVisitor, true, 0, 0);
         VmAbstractHeap heap = firstHeap;
         while (heap != null) {
             heap.defragment();
@@ -229,10 +229,10 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
      */
     private void verify(VmBootHeap bootHeap, VmAbstractHeap firstHeap) {
         verifyVisitor.reset();
-        bootHeap.walk(verifyVisitor, true);
+        bootHeap.walk(verifyVisitor, true, 0, 0);
         VmAbstractHeap heap = firstHeap;
         while (heap != null) {
-            heap.walk(verifyVisitor, true);
+            heap.walk(verifyVisitor, true, 0, 0);
             heap = heap.getNext();
         }
         final int errorCount = verifyVisitor.getErrorCount();
