@@ -21,8 +21,6 @@
 
 package org.jnode.shell;
 
-import org.jnode.shell.help.ParsedArguments;
-
 import java.io.InputStream;
 import java.io.PrintStream;
 
@@ -33,7 +31,13 @@ import java.io.PrintStream;
 public interface Command
 {
   /**
-   * Execute this command
+   * This will be execute'ed when the command is called.
+   * 
+   * @param commandLine what comes in from the user
+   * @param in input stream, most offen this is System.in, but it can be a file or piped.
+   * @param out output stream, mostly this is System.out, but it can be a file or piped.
+   * @param err err stream, mostly this is System.err, but it can be a file or piped.
+   * @throws Exception
    */
   public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception;
 }
