@@ -19,135 +19,146 @@ import javax.swing.JScrollPane;
  * AWT scroll pane peer implemented as a {@link javax.swing.JScrollPane}.
  */
 
-class SwingScrollPanePeer extends JScrollPane implements ScrollPanePeer, SwingContainerPeer {
-    //
-    // Construction
-    //
+class SwingScrollPanePeer extends JScrollPane implements ScrollPanePeer,
+		SwingContainerPeer, SwingPeer {
+	private final ScrollPane scrollPane;
 
-    public SwingScrollPanePeer(ScrollPane scrollPane) {
-        super();
-        SwingToolkit.add(scrollPane, this);
-        SwingToolkit.copyAwtProperties(scrollPane, this);
-    }
+	//
+	// Construction
+	//
+
+	public SwingScrollPanePeer(ScrollPane scrollPane) {
+		this.scrollPane = scrollPane;
+		SwingToolkit.add(scrollPane, this);
+		SwingToolkit.copyAwtProperties(scrollPane, this);
+	}
 
 	/**
-	 * @see org.jnode.awt.swingpeers.SwingContainerPeer#addAWTComponent(java.awt.Component, javax.swing.JComponent)
+	 * @see org.jnode.awt.swingpeers.SwingContainerPeer#addAWTComponent(java.awt.Component,
+	 *      javax.swing.JComponent)
 	 */
 	public void addAWTComponent(Component awtComponent, JComponent peer) {
 		add(peer);
 	}
 
-    public void beginLayout() {
-    }
+	public void beginLayout() {
+	}
 
-    //
-    // ContainerPeer
-    //
+	//
+	// ContainerPeer
+	//
 
-    public void beginValidate() {
-    }
+	public void beginValidate() {
+	}
 
-    public boolean canDetermineObscurity() {
-        return false;
-    }
+	public boolean canDetermineObscurity() {
+		return false;
+	}
 
-    public void childResized(int w, int h) {
-    }
+	public void childResized(int w, int h) {
+	}
 
-    public void coalescePaintEvent(PaintEvent e) {
-        System.err.println(e);
-    }
+	public void coalescePaintEvent(PaintEvent e) {
+		System.err.println(e);
+	}
 
-    // Buffer
+	// Buffer
 
-    public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-    }
+	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
+	}
 
-    public void destroyBuffers() {
-    }
+	public void destroyBuffers() {
+	}
 
-    // Misc
+	// Misc
 
-    public void dispose() {
-    }
+	public void dispose() {
+	}
 
-    public void endLayout() {
-    }
+	public void endLayout() {
+	}
 
-    public void endValidate() {
-    }
+	public void endValidate() {
+	}
 
-    public void flip(BufferCapabilities.FlipContents flipContents) {
-    }
+	public void flip(BufferCapabilities.FlipContents flipContents) {
+	}
 
-    public Image getBackBuffer() {
-        return null;
-    }
+	/**
+	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+	 */
+	public Component getAWTComponent() {
+		return scrollPane;
+	}
 
-    //
-    // ScrollPanePeer
-    //
+	public Image getBackBuffer() {
+		return null;
+	}
 
-    public int getHScrollbarHeight() {
-        return 0;
-    }
+	//
+	// ScrollPanePeer
+	//
 
-    public int getVScrollbarWidth() {
-        return 0;
-    }
+	public int getHScrollbarHeight() {
+		return 0;
+	}
 
-    //
-    // ComponentPeer
-    //
+	public int getVScrollbarWidth() {
+		return 0;
+	}
 
-    // Events
+	//
+	// ComponentPeer
+	//
 
-    public void handleEvent(AWTEvent e) {
-        //System.err.println(e);
-    }
+	// Events
 
-    public boolean handlesWheelScrolling() {
-        return false;
-    }
+	public void handleEvent(AWTEvent e) {
+		//System.err.println(e);
+	}
 
-    // Obscurity
+	public boolean handlesWheelScrolling() {
+		return false;
+	}
 
-    public boolean isObscured() {
-        return false;
-    }
+	// Obscurity
 
-    public boolean isPaintPending() {
-        return false;
-    }
+	public boolean isObscured() {
+		return false;
+	}
 
-    // Focus
+	public boolean isPaintPending() {
+		return false;
+	}
 
-    public boolean requestFocus(Component lightweightChild, boolean temporary,
-            boolean focusedWindowChangeAllowed, long time) {
-        return true;
-    }
+	// Focus
 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // Private
-    /**
-     * @see java.awt.peer.ComponentPeer#setEventMask(long)
-     */
-    public void setEventMask(long mask) {
-        // TODO Auto-generated method stub
+	public boolean requestFocus(Component lightweightChild, boolean temporary,
+			boolean focusedWindowChangeAllowed, long time) {
+		return true;
+	}
 
-    }
+	///////////////////////////////////////////////////////////////////////////////////////
+	// Private
+	/**
+	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
+	 */
+	public void setEventMask(long mask) {
+		// TODO Auto-generated method stub
 
-    public void setScrollPosition(int x, int y) {
-    }
+	}
 
-    public void setUnitIncrement(Adjustable adj, int u) {
-    }
+	public void setScrollPosition(int x, int y) {
+	}
 
-    public void setValue(Adjustable adj, int v) {
-    }
+	public void setUnitIncrement(Adjustable adj, int u) {
+	}
 
-    // Cursor
+	public void setValue(Adjustable adj, int v) {
+	}
 
-    public void updateCursorImmediately() {
-    }
+	// Cursor
+
+	public void updateCursorImmediately() {
+	}
 }

@@ -17,84 +17,94 @@ import javax.swing.JComponent;
  * AWT canvas peer implemented as a {@link javax.swing.JComponent}.
  */
 
-class SwingCanvasPeer extends JComponent implements CanvasPeer {
+class SwingCanvasPeer extends JComponent implements CanvasPeer, SwingPeer {
 
-    //
-    // Construction
-    //
+	private final Canvas canvas;
 
-    public SwingCanvasPeer(Canvas canvas) {
-        SwingToolkit.add(canvas, this);
-        SwingToolkit.copyAwtProperties(canvas, this);
-    }
+	//
+	// Construction
+	//
 
-    //
-    // ComponentPeer
-    //
+	public SwingCanvasPeer(Canvas canvas) {
+		this.canvas = canvas;
+		SwingToolkit.add(canvas, this);
+		SwingToolkit.copyAwtProperties(canvas, this);
+	}
 
-    // Events
+	public boolean canDetermineObscurity() {
+		return false;
+	}
 
-    public void handleEvent(AWTEvent e) {
-        //System.err.println(e);
-    }
+	public void coalescePaintEvent(PaintEvent e) {
+		System.err.println(e);
+	}
 
-    public void coalescePaintEvent(PaintEvent e) {
-        System.err.println(e);
-    }
+	// Buffer
 
-    public boolean handlesWheelScrolling() {
-        return false;
-    }
+	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
+	}
 
-    // Obscurity
+	public void destroyBuffers() {
+	}
 
-    public boolean isObscured() {
-        return false;
-    }
+	// Misc
 
-    public boolean canDetermineObscurity() {
-        return false;
-    }
+	public void dispose() {
+	}
 
-    // Focus
+	public void flip(BufferCapabilities.FlipContents flipContents) {
+	}
 
-    public boolean requestFocus(Component lightweightChild, boolean temporary,
-            boolean focusedWindowChangeAllowed, long time) {
-        return true;
-    }
+	/**
+	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+	 */
+	public Component getAWTComponent() {
+		return canvas;
+	}
 
-    // Buffer
+	public Image getBackBuffer() {
+		return null;
+	}
 
-    public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-    }
+	//
+	// ComponentPeer
+	//
 
-    public void destroyBuffers() {
-    }
+	// Events
 
-    public void flip(BufferCapabilities.FlipContents flipContents) {
-    }
+	public void handleEvent(AWTEvent e) {
+		//System.err.println(e);
+	}
 
-    public Image getBackBuffer() {
-        return null;
-    }
+	public boolean handlesWheelScrolling() {
+		return false;
+	}
 
-    // Cursor
+	// Obscurity
 
-    public void updateCursorImmediately() {
-    }
+	public boolean isObscured() {
+		return false;
+	}
 
-    // Misc
+	// Focus
 
-    public void dispose() {
-    }
+	public boolean requestFocus(Component lightweightChild, boolean temporary,
+			boolean focusedWindowChangeAllowed, long time) {
+		return true;
+	}
 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // Private
-    /**
-     * @see java.awt.peer.ComponentPeer#setEventMask(long)
-     */
-    public void setEventMask(long mask) {
-        // TODO Auto-generated method stub
+	///////////////////////////////////////////////////////////////////////////////////////
+	// Private
+	/**
+	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
+	 */
+	public void setEventMask(long mask) {
+		// TODO Auto-generated method stub
 
-    }
+	}
+
+	// Cursor
+
+	public void updateCursorImmediately() {
+	}
 }

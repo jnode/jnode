@@ -18,13 +18,17 @@ import javax.swing.JPanel;
  * AWT panel peer implemented as a {@link javax.swing.JPanel}.
  */
 
-class SwingPanelPeer extends JPanel implements PanelPeer, SwingContainerPeer {
+class SwingPanelPeer extends JPanel implements PanelPeer, SwingContainerPeer,
+		SwingPeer {
+
+	private final Panel panel;
+
 	//
 	// Construction
 	//
 
 	public SwingPanelPeer(Panel panel) {
-		super();
+		this.panel = panel;
 		SwingToolkit.add(panel, this);
 		SwingToolkit.copyAwtProperties(panel, this);
 		setLayout(null);
@@ -76,6 +80,13 @@ class SwingPanelPeer extends JPanel implements PanelPeer, SwingContainerPeer {
 	}
 
 	public void flip(BufferCapabilities.FlipContents flipContents) {
+	}
+
+	/**
+	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+	 */
+	public Component getAWTComponent() {
+		return panel;
 	}
 
 	public Image getBackBuffer() {

@@ -22,14 +22,16 @@ import javax.swing.text.BadLocationException;
  * AWT text area peer implemented as a {@link javax.swing.JTextArea}.
  */
 
-class SwingTextAreaPeer extends JTextArea implements TextAreaPeer {
+class SwingTextAreaPeer extends JTextArea implements TextAreaPeer, SwingPeer {
+
+	private final TextArea textArea;
 
 	//
 	// Construction
 	//
 
 	public SwingTextAreaPeer(TextArea textArea) {
-		super();
+		this.textArea = textArea;
 
 		switch (textArea.getScrollbarVisibility()) {
 		case TextArea.SCROLLBARS_BOTH:
@@ -59,34 +61,47 @@ class SwingTextAreaPeer extends JTextArea implements TextAreaPeer {
 		setEditable(textArea.isEditable());
 	}
 
-	//
-	// TextAreaPeer
-	//
+	public boolean canDetermineObscurity() {
+		return false;
+	}
 
-	public Dimension getPreferredSize(int rows, int columns) {
+	public void coalescePaintEvent(PaintEvent e) {
+		System.err.println(e);
+	}
+
+	// Buffer
+
+	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
+	}
+
+	public void destroyBuffers() {
+	}
+
+	// Misc
+
+	public void dispose() {
+	}
+
+	public long filterEvents(long mask) {
+		return 0;
+	}
+
+	public void flip(BufferCapabilities.FlipContents flipContents) {
+	}
+
+	/**
+	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+	 */
+	public Component getAWTComponent() {
+		return textArea;
+	}
+
+	public Image getBackBuffer() {
 		return null;
 	}
 
-	public Dimension getMinimumSize(int rows, int columns) {
+	public Rectangle getCharacterBounds(int i) {
 		return null;
-	}
-
-	// Deprectated
-
-	public void insertText(String txt, int pos) {
-		insert(txt, pos);
-	}
-
-	public void replaceText(String txt, int start, int end) {
-		replaceRange(txt, start, end);
-	}
-
-	public Dimension preferredSize(int rows, int cols) {
-		return getPreferredSize(rows, cols);
-	}
-
-	public Dimension minimumSize(int rows, int cols) {
-		return getMinimumSize(rows, cols);
 	}
 
 	//
@@ -97,12 +112,16 @@ class SwingTextAreaPeer extends JTextArea implements TextAreaPeer {
 		return 0;
 	}
 
-	public Rectangle getCharacterBounds(int i) {
+	public Dimension getMinimumSize(int rows, int columns) {
 		return null;
 	}
 
-	public long filterEvents(long mask) {
-		return 0;
+	//
+	// TextAreaPeer
+	//
+
+	public Dimension getPreferredSize(int rows, int columns) {
+		return null;
 	}
 
 	//
@@ -115,54 +134,8 @@ class SwingTextAreaPeer extends JTextArea implements TextAreaPeer {
 		//System.err.println(e);
 	}
 
-	public void coalescePaintEvent(PaintEvent e) {
-		System.err.println(e);
-	}
-
 	public boolean handlesWheelScrolling() {
 		return false;
-	}
-
-	// Obscurity
-
-	public boolean isObscured() {
-		return false;
-	}
-
-	public boolean canDetermineObscurity() {
-		return false;
-	}
-
-	// Focus
-
-	public boolean requestFocus(Component lightweightChild, boolean temporary,
-			boolean focusedWindowChangeAllowed, long time) {
-		return true;
-	}
-
-	// Buffer
-
-	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-	}
-
-	public void destroyBuffers() {
-	}
-
-	public void flip(BufferCapabilities.FlipContents flipContents) {
-	}
-
-	public Image getBackBuffer() {
-		return null;
-	}
-
-	// Cursor
-
-	public void updateCursorImmediately() {
-	}
-
-	// Misc
-
-	public void dispose() {
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////
@@ -178,11 +151,42 @@ class SwingTextAreaPeer extends JTextArea implements TextAreaPeer {
 		}
 	}
 
+	// Deprectated
+
+	public void insertText(String txt, int pos) {
+		insert(txt, pos);
+	}
+
+	// Obscurity
+
+	public boolean isObscured() {
+		return false;
+	}
+
+	public Dimension minimumSize(int rows, int cols) {
+		return getMinimumSize(rows, cols);
+	}
+
+	public Dimension preferredSize(int rows, int cols) {
+		return getPreferredSize(rows, cols);
+	}
+
 	/**
 	 * @see java.awt.peer.TextAreaPeer#replaceRange(java.lang.String, int, int)
 	 */
 	public void replaceRange(String text, int start_pos, int end_pos) {
 		// TODO implement me
+	}
+
+	public void replaceText(String txt, int start, int end) {
+		replaceRange(txt, start, end);
+	}
+
+	// Focus
+
+	public boolean requestFocus(Component lightweightChild, boolean temporary,
+			boolean focusedWindowChangeAllowed, long time) {
+		return true;
 	}
 
 	/**
@@ -191,5 +195,10 @@ class SwingTextAreaPeer extends JTextArea implements TextAreaPeer {
 	public void setEventMask(long mask) {
 		// TODO Auto-generated method stub
 
+	}
+
+	// Cursor
+
+	public void updateCursorImmediately() {
 	}
 }

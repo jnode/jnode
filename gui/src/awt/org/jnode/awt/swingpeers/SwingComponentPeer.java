@@ -7,6 +7,7 @@ import java.awt.AWTEvent;
 import java.awt.BufferCapabilities;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -38,7 +39,7 @@ class SwingComponentPeer implements ComponentPeer {
     ///////////////////////////////////////////////////////////////////////////////////////
     // Private
 
-    private final Component component;
+    protected final Component component;
 
     private Point location = new Point();
 
@@ -146,14 +147,23 @@ class SwingComponentPeer implements ComponentPeer {
         return null;
     }
 
-    public Point getLocationOnScreen() {
-        final Point screen = new Point(location);
-        final Component parent = component.getParent();
-        if (parent != null) {
-            final Point parentScreen = parent.getLocationOnScreen();
-            screen.translate(parentScreen.x, parentScreen.y);
+	/**
+	 * @see java.awt.peer.ComponentPeer#getLocationOnScreen()
+	 * @return The location on screen
+	 */
+	public Point getLocationOnScreen() {
+		return computeLocationOnScreen(component);
+	}
+
+    private Point computeLocationOnScreen(Component component) {
+        Container parent = component.getParent();
+        if(parent == null)
+            return component.getLocation();
+        else{
+            Point p = computeLocationOnScreen(parent);
+            p.translate(component.getX(), component.getY());
+            return p;
         }
-        return screen;
     }
 
     public Dimension getMinimumSize() {
