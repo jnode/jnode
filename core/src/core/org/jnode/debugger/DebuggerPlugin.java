@@ -3,6 +3,7 @@
  */
 package org.jnode.debugger;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -40,7 +41,7 @@ public class DebuggerPlugin extends Plugin implements DeviceListener {
         try {
             final DeviceManager dm = DeviceUtils.getDeviceManager();
             dm.addListener(this);
-            final Collection devs = dm.getDevices();
+            final Collection devs = new ArrayList(dm.getDevices());
             for (Iterator i = devs.iterator(); i.hasNext();) {
                 addListeners((Device) i.next());
             }
