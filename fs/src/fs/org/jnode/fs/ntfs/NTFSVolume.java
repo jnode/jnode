@@ -6,6 +6,8 @@ package org.jnode.fs.ntfs;
 import java.io.*;
 import java.util.*;
 
+import org.jnode.driver.DeviceAPI;
+import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.fs.ntfs.attributes.*;
 
 /**
@@ -17,17 +19,20 @@ import org.jnode.fs.ntfs.attributes.*;
 public class NTFSVolume
 {
 	private NTFSBootRecord bootRecord = null;
-	private RandomAccessFile dataStream = null;
+	private BlockDeviceAPI api = null;
 	private NTFS_MFTRecord MTFRecord = new NTFS_MFTRecord();
 	/**
 	 * 
 	 */
-	public NTFSVolume(RandomAccessFile file) throws IOException
+	public NTFSVolume(BlockDeviceAPI api) throws IOException
 	{
 		super();
 		if(bootRecord == null)
-			bootRecord = new NTFSBootRecord(file);
-		this.dataStream = file;
+			bootRecord = new NTFSBootRecord();
+		byte[] buffer = new byte[512];
+		api.read(0,buffer,0,512);
+		bootRecord.initBootRecordData(buffer);
+		this.api = api;
 	}
 	/**
 	 * @return Returns the bootRecord.
@@ -43,14 +48,8 @@ public class NTFSVolume
 	{
 		byte[] buff = new byte[getClusterSize() ];
 		int clusterOffset = cluster * getClusterSize();
-		System.out.println("Offset: " + clusterOffset + " , Size: " + getClusterSize());
-		this.dataStream.seek(clusterOffset);
-		int size = this.dataStream.read(
-				buff,
-				0,
-				getClusterSize());
-		if(size <= 0)
-			throw new RuntimeException("Can not read closter from file!");
+		
+		api.read(clusterOffset,buff,0,	getClusterSize());
 		return buff;
 	}
 	
@@ -61,13 +60,7 @@ public class NTFSVolume
 		int clusterOffset = firstCluster * getClusterSize();
 		for(int i = 0 ; i< howMany;i++)
 		{	
-			this.dataStream.seek(clusterOffset + (i * getClusterSize()));
-			int size = this.dataStream.read(
-					buff,
-					i * getClusterSize(),
-					getClusterSize());
-			if(size <= 0)
-				throw new RuntimeException("Can not read closter from file!");
+			api.read(clusterOffset + (i * getClusterSize()),buff,i * getClusterSize(),	getClusterSize());
 		}
 		return buff;
 	}
