@@ -112,7 +112,7 @@ public class MPFloatingPointerStructure {
         return true;
     }
     
-    private final void initConfigTable(ResourceManager rm, ResourceOwner owner) {
+    private final boolean initConfigTable(ResourceManager rm, ResourceOwner owner) {
         final Address tablePtr = getMPConfigTablePtr();
         int size = 0x2C; // Base table length
         try {
@@ -125,9 +125,17 @@ public class MPFloatingPointerStructure {
             size = baseTableLen;
             mem = rm.claimMemoryResource(owner, tablePtr, size, ResourceManager.MEMMODE_NORMAL);
             this.configTable = new MPConfigTable(mem);
+            if (configTable.isValid()) {
+                return true;
+            } else {
+                configTable.release();
+                configTable = null;
+                return false;
+            }
         } catch (ResourceNotFreeException ex) {
             BootLog.warn("Cannot claim MP config table region");
             ex.printStackTrace();
+            return false;
         }
     }
     
@@ -152,8 +160,9 @@ public class MPFloatingPointerStructure {
                     mem = rm.claimMemoryResource(owner, ptr, 16, ResourceManager.MEMMODE_NORMAL);
                     final MPFloatingPointerStructure mp = new MPFloatingPointerStructure(mem);
                     if (mp.isValid()) {
-                        mp.initConfigTable(rm, owner);
-                        return mp;
+                        if (mp.initConfigTable(rm, owner)) {
+                            return mp;
+                        }
                     }
                     mp.release();
                 } catch (ResourceNotFreeException ex) {
