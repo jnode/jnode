@@ -27,6 +27,7 @@ import org.jnode.shell.help.Syntax;
  */
 public class PingCommand implements ICMPListener{
 	private Timer timer = new Timer();
+	private Statistics stat = new Statistics();
 	private boolean wait = true;
 	
 	private int count = 4;
@@ -65,10 +66,10 @@ public class PingCommand implements ICMPListener{
 		ICMPProtocol icmpProtocol = (ICMPProtocol)netLayer.getProtocol(ICMPProtocol.IPPROTO_ICMP);
 		icmpProtocol.addListener(tthis);
 		
-		Statistics stat = new Statistics();
 		int id_count = 0;
 		int seq_count = 0;
 		while(tthis.count != 0){
+			
 			if (!tthis.flood)
 			tthis.wait = true;
 			
@@ -77,7 +78,7 @@ public class PingCommand implements ICMPListener{
 			ICMPEchoHeader transportHeader = new ICMPEchoHeader(8, id_count, seq_count);
 			transportHeader.prefixTo(packet);
 			
-			Request r = new Request(stat, System.currentTimeMillis(), id_count, seq_count);
+			Request r = new Request(tthis.stat, System.currentTimeMillis(), id_count, seq_count);
 			Request.registerRequest(r);
 			netLayer.transmit(netHeader, packet);
 			tthis.timer.schedule(r, tthis.timeout);
@@ -97,11 +98,10 @@ public class PingCommand implements ICMPListener{
 		icmpProtocol.removeListener(tthis);
 		
 		System.out.println("-> Packet statistics");
-		System.out.println(stat.getStatistics());
+		System.out.println(tthis.stat.getStatistics());
 	}
 	
-	private long match(int id, int seq){
-		Request r = Request.getRequest(seq);
+	private long match(int id, int seq, Request r){
 		if ((r != null) && (id == r.getId()))
 		return r.getTimestamp();
 		else
@@ -110,25 +110,35 @@ public class PingCommand implements ICMPListener{
 	
 	public void packetReceived(SocketBuffer skbuf) {
 		long received = System.currentTimeMillis();
+		
 		IPv4Header hdr1 = (IPv4Header)skbuf.getNetworkLayerHeader();
 		ICMPEchoHeader hdr2 = (ICMPEchoHeader)skbuf.getTransportLayerHeader();
 		
-		long timestamp = match(hdr2.getIdentifier() ,hdr2.getSeqNumber());
+		int seq = hdr2.getSeqNumber();
+		Request r = Request.getRequest(seq);
+		if ((r==null) && (r.Obsolete()))
+		return;
 		
+		long timestamp = match(hdr2.getIdentifier() ,seq ,r);
+		
+		long roundtrip = received-timestamp;
 		if (timestamp != -1){
 			System.out.print("Reply from "+ dst.toString() +": ");
 			System.out.print(hdr1.getDataLength()-8 +"bytes of data ");
 			System.out.print("ttl="+ hdr1.getTtl()+" ");
 			System.out.print("seq="+ hdr2.getSeqNumber()+" ");
-			System.out.print("time=" + (received-timestamp) + "ms");
+			System.out.print("time=" + (roundtrip) + "ms");
 			System.out.println();
 		}
 		wait = false;
+		this.stat.recordPacket(roundtrip);
+		Request.removeRequest(seq);
 	}
 }
 
 class Request extends TimerTask{
 	private static Hashtable requests = new Hashtable();
+	private boolean obsolete = false;
 	private Statistics stat;
 	private long timestamp;
 	private int id, seq;
@@ -146,14 +156,26 @@ class Request extends TimerTask{
 	static Request getRequest(int seq){
 		return (Request)requests.get(new Integer(seq));
 	}
-	
+	static Request removeRequest(int seq){
+		return (Request)requests.remove(new Integer(seq));
+	}
 	static boolean isEmpty(){
 		return requests.isEmpty();
 	}
 	
 	public void run() {
-		requests.remove(new Integer(this.seq));
-		stat.recordLost();
+		if (this.Obsolete()){
+			stat.recordLost();
+			Request.removeRequest(this.seq);
+		}
+	}
+	
+	synchronized boolean Obsolete(){
+		if (!obsolete){
+			this.obsolete = true;
+			return false;
+		}else
+		return true;
 	}
 	
 	long getTimestamp() {
@@ -169,7 +191,7 @@ class Request extends TimerTask{
 
 class Statistics{
 	private long  received=0, lost=0;
-	private long min=0, max=Integer.MAX_VALUE;
+	private long min=Integer.MAX_VALUE, max=0;
 	private long sum;
 	
 	void recordPacket(long roundtrip){
