@@ -8,7 +8,6 @@ import org.jnode.vm.Monitor;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmArchitecture;
-import org.jnode.vm.VmThread;
 import org.jnode.vm.classmgr.VmMethod;
 
 /**
@@ -16,57 +15,12 @@ import org.jnode.vm.classmgr.VmMethod;
  */
 public abstract class HeapHelper extends ObjectResolver {
 
-	//public abstract Object getTib(Object object);
-
-	//public abstract VmClassType getVmClass(Object object);
-
-	public abstract byte getByte(Object src, int offset);
-
-	public abstract int getInt(Object src, int offset);
-
-	public abstract Object getObject(Object src, int offset);
-
-	public abstract VmAddress getAddress(Object src, int offset);
-
-	/**
-	 * Gets the color of the given object.
-	 * @param src
-	 * @return
-	 * @see org.jnode.vm.classmgr.ObjectFlags#GC_BLACK
-	 * @see org.jnode.vm.classmgr.ObjectFlags#GC_GREY
-	 * @see org.jnode.vm.classmgr.ObjectFlags#GC_WHITE
-     * @see org.jnode.vm.classmgr.ObjectFlags#GC_YELLOW
-	 */
-	public abstract int getObjectColor(Object src);
-
-	/**
-	 * Gets the flags of the given object.
-	 * @param src
-	 * @return
-	 */
-	//public abstract int getObjectFlags(Object src);
-
-	/**
-	 * Has the given object been finalized.
-	 * @param src
-	 * @return
-	 */
-	public abstract boolean isFinalized(Object src);
-	
 	/**
 	 * Mark the given object as finalized.
 	 * @param src
 	 */
 	public abstract void setFinalized(Object src);
 	
-	public abstract void setByte(Object dst, int offset, byte value);
-
-	public abstract void setInt(Object dst, int offset, int value);
-
-	public abstract void setObject(Object dst, int offset, Object value);
-
-	public abstract void unsafeSetObjectFlags(Object dst, int flags);
-
 	/**
 	 * Change the color of the given object from oldColor to newColor.
 	 * @param dst
@@ -81,8 +35,6 @@ public abstract class HeapHelper extends ObjectResolver {
 	public abstract void clear(VmAddress dst, int size);
 
 	public abstract long addressToLong(VmAddress a);
-
-	public abstract Object getStack(VmThread thread);
 
 	public abstract VmAddress allocateBlock(int size);
 

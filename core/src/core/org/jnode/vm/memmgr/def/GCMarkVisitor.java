@@ -80,7 +80,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
         //testObject(object, Unsafe.getVmClass(object));
         // Check the current color first, since a stackoverflow of
         // the mark stack results in another iteration of visits.
-        final int gcColor = helper.getObjectColor(object);
+        final int gcColor = VmMagic.getObjectColor(object);
         if (gcColor == GC_BLACK) {
             return true;
         } else if (rootSet || (gcColor == GC_GREY)) {
@@ -145,7 +145,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
             if (monitor != null) {
                 processChild(monitor);
             }
-            final int gcColor = helper.getObjectColor(object);
+            final int gcColor = VmMagic.getObjectColor(object);
             helper.atomicChangeObjectColor(object, gcColor, GC_BLACK);
         }
     }
@@ -209,7 +209,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      * @param child
      */
     final void processChild(Object child) {
-        final int gcColor = helper.getObjectColor(child);
+        final int gcColor = VmMagic.getObjectColor(child);
         if (gcColor <= GC_WHITE) {
             // Yellow or White
             helper.atomicChangeObjectColor(child, gcColor, GC_GREY);

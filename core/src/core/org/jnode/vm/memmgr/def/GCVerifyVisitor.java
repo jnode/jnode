@@ -41,7 +41,7 @@ final class GCVerifyVisitor extends ObjectVisitor {
      * @see org.jnode.vm.ObjectVisitor#visit(java.lang.Object)
      */
     public final boolean visit(Object object) {
-        final int color = helper.getObjectColor(object);
+        final int color = VmMagic.getObjectColor(object);
         if (color == ObjectFlags.GC_YELLOW) {
             // Ignore objects that need to be finalized.
             return true;
@@ -104,11 +104,11 @@ final class GCVerifyVisitor extends ObjectVisitor {
                 Unsafe.debug(where);
                 Unsafe.debug(", parent type ");
                 Unsafe.debug(VmMagic.getObjectType(parent).getName());
-                Unsafe.debug(helper.getObjectColor(parent));
+                Unsafe.debug(VmMagic.getObjectColor(parent));
                 Unsafe.debug("; child (");
                 Unsafe.debug(childRef.toAddress().toInt());
                 Unsafe.debug(") is not an object ");
-                Unsafe.debug(helper.getObjectColor(childRef));
+                Unsafe.debug(VmMagic.getObjectColor(childRef));
                 errorCount++;
             }
         }

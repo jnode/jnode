@@ -4,6 +4,7 @@
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
+import org.jnode.vm.VmMagic;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.pragma.Uninterruptible;
@@ -25,7 +26,7 @@ final class GCSetWhiteVisitor extends ObjectVisitor implements ObjectFlags, Unin
 	 * @return boolean
 	 */
 	public boolean visit(Object object) {
-		final int gcColor = helper.getObjectColor(object);
+		final int gcColor = VmMagic.getObjectColor(object);
         if (gcColor != GC_YELLOW) {
             helper.atomicChangeObjectColor(object, gcColor, GC_WHITE);
         }
