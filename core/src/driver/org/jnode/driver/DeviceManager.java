@@ -64,6 +64,28 @@ public interface DeviceManager {
 	public void unregister(Device device) throws DriverException;
 
 	/**
+	 * Start a given device.
+	 * The device must have been registered. 
+	 * This method blocks until the device has been started. 
+	 * 
+	 * @param device
+	 * @throws DeviceNotFoundException The device has not been registered.
+	 * @throws DriverException
+	 */
+	public void start(Device device) throws DeviceNotFoundException, DriverException;
+
+	/**
+	 * Stop a given device.
+	 * The device must have been registered.
+	 * This method blocks until the device has been stopped. 
+	 * 
+	 * @param device
+	 * @throws DeviceNotFoundException The device has not been registered.
+	 * @throws DriverException
+	 */
+	public void stop(Device device) throws DeviceNotFoundException, DriverException;
+
+	/**
 	 * Rename a registered device, optionally using an autonumber postfix
 	 * 
 	 * @param device

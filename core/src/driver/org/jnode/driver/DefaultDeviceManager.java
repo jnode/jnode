@@ -26,7 +26,7 @@ import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.ExtensionPointListener;
 import org.jnode.plugin.PluginException;
 import org.jnode.system.BootLog;
-import org.jnode.util.TimeoutException;
+import org.jnode.util.StopWatch;
 
 /**
  * Default device manager.
@@ -64,6 +64,8 @@ public class DefaultDeviceManager implements DeviceManager,
     private final String cmdLine;
 
     private long defaultStartTimeout = 10000;
+
+    private long fastStartTimeout = 1000;
 
     /**
      * Create a new instance
@@ -150,7 +152,45 @@ public class DefaultDeviceManager implements DeviceManager,
      * @throws DeviceAlreadyRegisteredException
      * @throws DriverException
      */
-    public synchronized void register(Device device)
+    public void register(Device device)
+            throws DeviceAlreadyRegisteredException, DriverException {
+
+        boolean shouldStart;
+
+        // Perform the actual registration.
+        shouldStart = doRegister(device);
+
+        // Test for no<id> on the command line
+        if (cmdLine.indexOf("no" + device.getId()) >= 0) {
+            BootLog.info("Blocking the start of " + device.getId());
+            shouldStart = false;
+        }
+
+        // Notify my listeners
+        fireRegisteredEvent(device);
+
+        // Should we start the device?
+        if (shouldStart) {
+            // Try to start the device
+            try {
+                start(device);
+            } catch (DeviceNotFoundException ex) {
+                // Should not happen
+                BootLog.error("Device removed before being started", ex);
+            }
+        }
+    }
+
+    /**
+     * Actually register the device. The device is not started, nor is the
+     * registered event fired.
+     * 
+     * @param device
+     * @throws DeviceAlreadyRegisteredException
+     * @throws DriverException
+     * @return true if the device should be tried to start.
+     */
+    private synchronized final boolean doRegister(Device device)
             throws DeviceAlreadyRegisteredException, DriverException {
         final String devID = device.getId();
         if (devices.containsKey(devID)) { throw new DeviceAlreadyRegisteredException(
@@ -168,28 +208,11 @@ public class DefaultDeviceManager implements DeviceManager,
                 device.setDriver(drv);
             }
         }
-        // Test for no<id> on the command line
-        if (cmdLine.indexOf("no" + device.getId()) >= 0) {
-            BootLog.info("Blocking the start of " + device.getId());
-            shouldStart = false;
-        }
         // Add the device to my list
         devices.put(device.getId(), device);
-        // Notify my listeners
-        fireRegisteredEvent(device);
-        if (shouldStart) {
-            // Try to start the device
-            try {
-                BootLog.debug("Starting " + device.getId());
-                //new DeviceStarter(device).start(getDefaultStartTimeout());
-                device.start();
-                BootLog.debug("Started " + device.getId());
-            } catch (DriverException ex) {
-                BootLog.error("Cannot start " + device.getId(), ex);
-            } catch (Throwable ex) {
-                BootLog.error("Cannot start " + device.getId(), ex);
-            }
-        }
+
+        // We're done
+        return shouldStart;
     }
 
     /**
@@ -199,15 +222,78 @@ public class DefaultDeviceManager implements DeviceManager,
      * @param device
      * @throws DriverException
      */
-    public synchronized void unregister(Device device) throws DriverException {
+    public void unregister(Device device) throws DriverException {
         // First stop the device if it is running
-        if (device.isStarted()) {
-            device.stop();
+        try {
+            stop(device);
+            // Notify my listeners
+            fireUnregisterEvent(device);
+            // Actually remove it
+            synchronized (this) {
+                devices.remove(device.getId());
+            }
+        } catch (DeviceNotFoundException ex) {
+            // Not found, so stop
+            BootLog.debug("Device not found in unregister");
         }
-        // Notify my listeners
-        fireUnregisterEvent(device);
-        // Actually remove it
-        devices.remove(device.getId());
+    }
+
+    /**
+     * Start a given device. The device must have been registered.
+     * 
+     * @param device
+     * @throws DeviceNotFoundException
+     *             The device has not been registered.
+     * @throws DriverException
+     */
+    public void start(Device device) throws DeviceNotFoundException,
+            DriverException {
+        // Make sure the device exists.
+        getDevice(device.getId());
+        // Start it (if needed)
+        if (!device.isStarted()) {
+            try {
+                BootLog.debug("Starting " + device.getId());
+                //new DeviceStarter(device).start(getDefaultStartTimeout());
+                final StopWatch sw = new StopWatch();
+                device.start();
+                sw.stop();
+                if (sw.isElapsedLongerThen(defaultStartTimeout)) {
+                    BootLog.error("Device startup took " + sw + ": "
+                            + device.getId());
+                } else if (sw.isElapsedLongerThen(fastStartTimeout)) {
+                    BootLog.info("Device startup took " + sw + ": "
+                            + device.getId());
+                }
+                BootLog.debug("Started " + device.getId());
+            } catch (DriverException ex) {
+                BootLog.error("Cannot start " + device.getId(), ex);
+                //} catch (TimeoutException ex) {
+                //    BootLog.warn("Timeout in start of " + device.getId());
+            } catch (Throwable ex) {
+                BootLog.error("Cannot start " + device.getId(), ex);
+            }
+        }
+    }
+
+    /**
+     * Stop a given device. The device must have been registered.
+     * 
+     * @param device
+     * @throws DeviceNotFoundException
+     *             The device has not been registered.
+     * @throws DriverException
+     */
+    public void stop(Device device) throws DeviceNotFoundException,
+            DriverException {
+        // Make sure the device exists.
+        getDevice(device.getId());
+        // Stop it
+        if (device.isStarted()) {
+            BootLog.debug("Starting " + device.getId());
+            device.stop();
+            BootLog.debug("Stopped " + device.getId());
+        }
     }
 
     /**
@@ -327,13 +413,12 @@ public class DefaultDeviceManager implements DeviceManager,
                 if (drv != null) {
                     try {
                         dev.setDriver(drv);
-                        final DeviceStarter starter = new DeviceStarter(dev);
-                        starter.start(defaultStartTimeout);
+                        start(dev);
                     } catch (DriverException ex) {
                         BootLog.error("Cannot start " + dev.getId(), ex);
-                    } catch (TimeoutException ex) {
-                        BootLog.error("Device " + dev.getId()
-                                + " failed to startup in time");
+                    } catch (DeviceNotFoundException ex) {
+                        // Should not happen
+                        BootLog.error("Device is gone before is can be started " + dev.getId(), ex);
                     }
                 }
             }
@@ -405,10 +490,20 @@ public class DefaultDeviceManager implements DeviceManager,
      * 
      * @param device
      */
-    protected void fireRegisteredEvent(Device device) {
-        for (Iterator i = listeners.iterator(); i.hasNext();) {
+    protected final void fireRegisteredEvent(Device device) {
+        final List list;
+        synchronized (this.listeners) {
+            list = new ArrayList(this.listeners);
+        }
+        final StopWatch sw = new StopWatch();
+        for (Iterator i = list.iterator(); i.hasNext();) {
             final DeviceManagerListener l = (DeviceManagerListener) i.next();
+            sw.start();
             l.deviceRegistered(device);
+            if (sw.isElapsedLongerThen(100)) {
+                BootLog.error("DeviceManagerListener took " + sw
+                        + " in deviceRegistered: " + l.getClass().getName());
+            }
         }
     }
 
@@ -417,10 +512,20 @@ public class DefaultDeviceManager implements DeviceManager,
      * 
      * @param device
      */
-    protected void fireUnregisterEvent(Device device) {
-        for (Iterator i = listeners.iterator(); i.hasNext();) {
+    protected final void fireUnregisterEvent(Device device) {
+        final List list;
+        synchronized (this.listeners) {
+            list = new ArrayList(this.listeners);
+        }
+        final StopWatch sw = new StopWatch();
+        for (Iterator i = list.iterator(); i.hasNext();) {
             final DeviceManagerListener l = (DeviceManagerListener) i.next();
+            sw.start();
             l.deviceUnregister(device);
+            if (sw.isElapsedLongerThen(100)) {
+                BootLog.error("DeviceManagerListener took " + sw
+                        + " in deviceUnregister: " + l.getClass().getName());
+            }
         }
     }
 
@@ -430,9 +535,19 @@ public class DefaultDeviceManager implements DeviceManager,
      * @param device
      */
     protected void fireStartedEvent(Device device) {
-        for (Iterator i = deviceListeners.iterator(); i.hasNext();) {
+        final List list;
+        synchronized (this.deviceListeners) {
+            list = new ArrayList(this.deviceListeners);
+        }
+        final StopWatch sw = new StopWatch();
+        for (Iterator i = list.iterator(); i.hasNext();) {
             final DeviceListener l = (DeviceListener) i.next();
+            sw.start();
             l.deviceStarted(device);
+            if (sw.isElapsedLongerThen(100)) {
+                BootLog.error("DeviceListener (in manager) took " + sw
+                        + " in deviceStarted: " + l.getClass().getName());
+            }
         }
     }
 
@@ -442,9 +557,19 @@ public class DefaultDeviceManager implements DeviceManager,
      * @param device
      */
     protected void fireStopEvent(Device device) {
-        for (Iterator i = deviceListeners.iterator(); i.hasNext();) {
+        final List list;
+        synchronized (this.deviceListeners) {
+            list = new ArrayList(this.deviceListeners);
+        }
+        final StopWatch sw = new StopWatch();
+        for (Iterator i = list.iterator(); i.hasNext();) {
             final DeviceListener l = (DeviceListener) i.next();
+            sw.start();
             l.deviceStop(device);
+            if (sw.isElapsedLongerThen(100)) {
+                BootLog.error("DeviceListener (in manager) took " + sw
+                        + " in deviceStop: " + l.getClass().getName());
+            }
         }
     }
 
