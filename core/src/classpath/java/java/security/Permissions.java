@@ -188,16 +188,15 @@ public final class Permissions extends PermissionCollection
             }
         };
     }
-} // class Permissions
 
-/**
+  /**
  * Implements the permission collection for all permissions without one of
  * their own, and obeys serialization of JDK.
  * 
  * @author Eric Blake <ebb9@email.byu.edu>
  */
-class PermissionsHash extends PermissionCollection
-{
+  private static final class PermissionsHash extends PermissionCollection
+  {
     /**
      * Compatible with JDK 1.1+.
      */
@@ -242,4 +241,5 @@ class PermissionsHash extends PermissionCollection
   {
         return perms.elements();
     }
+  } // class PermissionsHash
 } // class Permissions

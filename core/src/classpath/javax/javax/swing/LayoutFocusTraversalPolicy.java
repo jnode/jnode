@@ -1,5 +1,5 @@
-/* UTF_16LE.java -- 
-   Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
+/* LayoutFocusTraversalPolicy.java --
+   Copyright (C) 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -36,48 +36,52 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package gnu.java.nio.charset;
+package javax.swing;
 
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
+import java.awt.Component;
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
- * UTF-16LE charset.
- *
- * @author Jesse Rosenstock
+ * @author Graydon Hoare
+ * @author Michael Koch
+ * 
+ * @since 1.4
  */
-final class UTF_16LE extends Charset
+public class LayoutFocusTraversalPolicy 
+  extends SortingFocusTraversalPolicy
+  implements Serializable
 {
-  UTF_16LE ()
+  private static class LayoutComparator
+    implements Comparator
   {
-    super ("UTF-16LE", new String[] {
-        // witnessed by the internet
-        "UTF16LE", 
-        /* These names are provided by
-         * http://oss.software.ibm.com/cgi-bin/icu/convexp?s=ALL
-         */
-        "x-utf-16le", "ibm-1202", "ibm-13490", "ibm-17586",
-        "UTF16_LittleEndian",
-        // see http://java.sun.com/j2se/1.5.0/docs/guide/intl/encoding.doc.html
-        "UnicodeLittleUnmarked"
-    });
-	}
+    public LayoutComparator()
+    {
+      // Do nothing here.
+    }
+    
+    public int compare(Object o1, Object o2)
+    {
+      Component comp1 = (Component) o1;
+      Component comp2 = (Component) o2;
 
-  public boolean contains (Charset cs)
-  {
-    return cs instanceof US_ASCII || cs instanceof ISO_8859_1
-      || cs instanceof UTF_8 || cs instanceof UTF_16BE
-      || cs instanceof UTF_16LE || cs instanceof UTF_16;
-	}
+      int x1 = comp1.getX();
+      int y1 = comp1.getY();
+      int x2 = comp2.getX();
+      int y2 = comp2.getY();
+      
+      if (x1 == x2 && y1 == y2)
+	return 0;
+      
+      if ((y1 < y2) || ((y1 == y2) && (x1 < x2)))
+	return -1;
 
-  public CharsetDecoder newDecoder ()
+      return 1;
+    }
+  }
+  
+  public LayoutFocusTraversalPolicy()
   {
-    return new UTF_16Decoder (this, UTF_16Decoder.LITTLE_ENDIAN);
-	}
-
-  public CharsetEncoder newEncoder ()
-  {
-    return new UTF_16Encoder (this, UTF_16Encoder.LITTLE_ENDIAN, true);
-	}
+    super(new LayoutComparator());
+  }
 }
