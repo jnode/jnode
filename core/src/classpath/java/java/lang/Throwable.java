@@ -72,15 +72,15 @@ public class Throwable {
 		if (st != null) {
 			final int cnt = st.length;
 			final int max = Math.min(cnt, MAX_ELEMENTS);
-			s.print("Trace(" + cnt + "): ");
+			//s.print("Trace(" + cnt + "): ");
 			for (int i = 0; i < max; i++) {
 				final Object ste = st[i];
 				if ((ste != null) && (ste instanceof char[])) {
-					s.print((char[]) ste);
+					s.println((char[]) ste);
 				} else {
-					s.print(ste);
+					s.println(ste);
 				}
-				s.println();
+				//s.println();
 			}
 			if (cnt > max) {
 			    s.println("...");
@@ -101,18 +101,18 @@ public class Throwable {
 		if (st != null) {
 			final int cnt = st.length;
 			final int max = Math.min(cnt, MAX_ELEMENTS);
-			s.print("Trace(" + cnt + "): ");
+			//s.print("Trace(" + cnt + "): ");
 			for (int i = 0; i < max; i++) {
 				final Object ste = st[i];
 				if ((ste != null) && (ste instanceof char[])) {
-					s.print((char[]) ste);
+					s.println((char[]) ste);
 				} else {
-					s.print(ste);
+					s.println(ste);
 				}
-				s.println();
-				if (cnt > max) {
-				    s.println("...");
-				}
+				//s.println();
+			}
+			if (cnt > max) {
+			    s.println("...");
 			}
 		} else {
 			s.print("No stacktrace!");
