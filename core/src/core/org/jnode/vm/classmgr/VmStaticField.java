@@ -6,16 +6,16 @@ package org.jnode.vm.classmgr;
 /**
  * @author epr
  */
-public class VmStaticField extends VmField {
+public final class VmStaticField extends VmField {
 
-	/** Static data (used for static fields only) */
-	private final Object staticData;
+	/** The index in the statics table */
+	private final int staticsIndex;
 
 	/**
 	 * @param name
 	 * @param signature
 	 * @param modifiers
-	 * @param staticData
+	 * @param staticsIndex
 	 * @param declaringClass
 	 * @param slotSize
 	 */
@@ -23,21 +23,22 @@ public class VmStaticField extends VmField {
 		String name,
 		String signature,
 		int modifiers,
-		Object staticData,
+		int staticsIndex,
 		VmType declaringClass,
 		int slotSize) {
 		super(name, signature, modifiers, declaringClass, slotSize);
 		if (!Modifier.isStatic(modifiers)) {
 			throw new IllegalArgumentException("Instance field in VmStaticField");
 		}
-		this.staticData = staticData;
+		VmStatics.staticFieldCount++;
+		this.staticsIndex = staticsIndex;
 	}
 
 	/**
-	 * Gets the value of this field if it is a static field.
-	 * @return Object
+	 * Gets the indexe of this field in the statics table.
+	 * @return Returns the staticsIndex.
 	 */
-	public Object getStaticData() {
-		return staticData;
+	public final int getStaticsIndex() {
+		return this.staticsIndex;
 	}
 }

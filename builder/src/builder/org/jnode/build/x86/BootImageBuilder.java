@@ -24,6 +24,7 @@ import org.jnode.vm.HeapManager;
 import org.jnode.vm.MathSupport;
 import org.jnode.vm.MonitorManager;
 import org.jnode.vm.SoftByteCodes;
+import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmBootHeap;
 import org.jnode.vm.VmDefaultHeap;
 import org.jnode.vm.VmProcessor;
@@ -31,11 +32,13 @@ import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.VmThread;
 import org.jnode.vm.classmgr.ObjectLayout;
+import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmMethodCode;
 import org.jnode.vm.classmgr.VmStaticField;
+import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.x86.VmX86Architecture;
 import org.jnode.vm.x86.VmX86Processor;
@@ -50,6 +53,8 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	public static final int LOAD_ADDR = 1024 * 1024;
 	private VmX86Processor processor;
 	private String processorId;
+	private final VmX86Architecture arch = new VmX86Architecture();
+	private VmStatics statics;
 
 	/** The offset in our (java) image file to the initial jump to our main-method */
 	public static final int JUMP_MAIN_OFFSET = ObjectLayout.objectAlign((ObjectLayout.HEADER_SLOTS + 1) * VmX86Architecture.SLOT_SIZE);
@@ -59,7 +64,6 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	//private final Label vmInvoke = new Label("vm_invoke");
 	private final Label vmMethodRecordInvoke = new Label("VmMethod_recordInvoke");
 	private final Label vmFindThrowableHandler = new Label("vm_findThrowableHandler");
-	private final Label vmCurrentTimeMillis = new Label("VmSystem_currentTimeMillis");
 	private final Label vmReschedule = new Label("VmProcessor_reschedule");
 	private final Label sbcSystemException = new Label("SoftByteCodes_systemException");
 	private final Label vmThreadRunThread = new Label("VmThread_runThread");
@@ -77,7 +81,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	 * @return The native stream
 	 */
 	protected NativeStream createNativeStream() {
-		return new X86Stream((X86CpuID) createProcessor().getCPUID(), LOAD_ADDR, 64 * 1024, 16 * 1024 * 1024);
+		return new X86Stream(getCPUID(), LOAD_ADDR, 64 * 1024, 16 * 1024 * 1024);
 	}
 
 	/**
@@ -86,11 +90,22 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	 * @return The processor
 	 * @throws BuildException
 	 */
-	protected VmProcessor createProcessor() throws BuildException {
+	protected VmProcessor createProcessor(VmStatics statics) throws BuildException {
+		this.statics = statics;
 		if (processor == null) {
-			processor = new VmX86Processor(0, X86CpuID.createID(processorId));
+			processor = new VmX86Processor(0, arch, statics, getCPUID());
 		}
 		return processor;
+	}
+
+	/**
+	 * Gets the target architecture.
+	 * 
+	 * @return The target architecture
+	 * @throws BuildException
+	 */
+	protected VmArchitecture getArchitecture() throws BuildException {
+		return arch;
 	}
 
 	/**
@@ -131,14 +146,34 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 			int startLength = os.getLength();
 
 			VmType vmCodeClass = loadClass(VmMethodCode.class);
-			X86Stream.ObjectInfo initObject = os.startObject(vmCodeClass);
+			final X86Stream.ObjectInfo initObject = os.startObject(vmCodeClass);
 			final int offset = os.getLength() - startLength;
 			if (offset != JUMP_MAIN_OFFSET) {
 				throw new BuildException("JUMP_MAIN_OFFSET is incorrect [" + offset + "] (set to Object headersize)");
 			}
 
 			final X86Stream os86 = (X86Stream) os;
+			final Label introCode = new Label("$$introCode");
+			
+			os86.writeJMP(introCode);
+			initObject.markEnd();
 
+			// The loading of class can emit object in between, so first load
+			// all required classes here.
+			loadClass(HeapManager.class);
+			loadClass(Main.class);
+			loadClass(MathSupport.class);
+			loadClass(MonitorManager.class);
+			loadClass(SoftByteCodes.class);
+			loadClass(VmMethod.class);
+			loadClass(VmProcessor.class);
+			loadClass(VmThread.class);
+			loadClass(VmType.class);
+			loadClass(VmSystem.class);
+			loadClass(VmSystemObject.class);
+			
+			final X86Stream.ObjectInfo initCodeObject = os.startObject(vmCodeClass);
+			os86.setObjectRef(introCode);
 			initMain(os86, pluginRegistry);
 			initHeapManager(os86);
 			initVmThread(os86);
@@ -148,7 +183,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 
 			initCallMain(os86);
 
-			initObject.markEnd();
+			initCodeObject.markEnd();
 
 		} catch (ClassNotFoundException ex) {
 			throw new BuildException(ex);
@@ -233,10 +268,11 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		refJava = os.getObjectRef(processor);
 		os.getObjectRef(vmCurProcessor).link(refJava);
 
-		/* Link VmSystem_currentTimeMillis */
-		VmType vmSystemClass = loadClass(VmSystem.class);
-		refJava = os.getObjectRef(((VmStaticField) vmSystemClass.getField("currentTimeMillis")).getStaticData());
-		os.getObjectRef(vmCurrentTimeMillis).link(refJava);
+		/* Set statics index of VmSystem_currentTimeMillis */
+		final VmType vmSystemClass = loadClass(VmSystem.class);
+		final int staticsIdx = ((VmStaticField) vmSystemClass.getField("currentTimeMillis")).getStaticsIndex();
+		final X86Stream os86 = (X86Stream)os;
+		os86.set32(os.getObjectRef(new Label("currentTimeMillisStaticsIdx")).getOffset(), staticsIdx);
 
 		/* Link vm_findThrowableHandler */
 		refJava = os.getObjectRef(vmSystemClass.getMethod("findThrowableHandler", "(Ljava/lang/Throwable;Lorg/jnode/vm/Address;Lorg/jnode/vm/Address;)Lorg/jnode/vm/Address;"));
@@ -366,16 +402,19 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		VmBootHeap bootHeap = new VmBootHeap();
 		VmDefaultHeap firstHeap = new VmDefaultHeap();
 
+		// Setup STATICS register (EDI)
+		os.writeMOV_Const(Register.EDI, statics.getTable());
+
 		/* Set VmHeap.bootHeap */
 		os.writeMOV_Const(Register.EBX, bootHeap);
-		os.writeMOV_Const(Register.EAX, bootHeapField.getStaticData());
-		os.writeMOV(INTSIZE, Register.EAX, 0, Register.EBX);
+		final int bhOffset = (VmArray.DATA_OFFSET + bootHeapField.getStaticsIndex()) << 2;
+		os.writeMOV(INTSIZE, Register.EDI, bhOffset, Register.EBX);
 		//asm.assemble(os, "mov [eax],ebx");
 
 		/* Set VmHeap.firstHeap */
 		os.writeMOV_Const(Register.EBX, firstHeap);
-		os.writeMOV_Const(Register.EAX, firstHeapField.getStaticData());
-		os.writeMOV(INTSIZE, Register.EAX, 0, Register.EBX);
+		final int fhOffset = (VmArray.DATA_OFFSET + firstHeapField.getStaticsIndex()) << 2;
+		os.writeMOV(INTSIZE, Register.EDI, fhOffset, Register.EBX);
 		//asm.assemble(os, "mov [eax],ebx");
 	}
 
@@ -392,11 +431,13 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		VmType mainClass = loadClass(Main.class);
 		VmStaticField registryField = (VmStaticField) mainClass.getField(Main.REGISTRY_FIELD_NAME);
 
+		// Setup STATICS register (EDI)
+		os.writeMOV_Const(Register.EDI, statics.getTable());
+
 		/* Set Main.pluginRegistry */
 		os.writeMOV_Const(Register.EBX, registry);
-		os.writeMOV_Const(Register.EAX, registryField.getStaticData());
-		os.writeMOV(INTSIZE, Register.EAX, 0, Register.EBX);
-		//asm.assemble(os, "mov [eax],ebx");
+		final int rfOffset = (VmArray.DATA_OFFSET + registryField.getStaticsIndex()) << 2;
+		os.writeMOV(INTSIZE, Register.EDI, rfOffset, Register.EBX);
 	}
 
 	protected void emitStaticInitializerCalls(NativeStream nativeOs, VmType[] bootClasses, Object clInitCaller) throws ClassNotFoundException {
@@ -523,6 +564,10 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	 */
 	public final void setCpu(String processorId) {
 		this.processorId = processorId;
+	}
+
+	protected X86CpuID getCPUID() {
+		return X86CpuID.createID(processorId);
 	}
 
 }

@@ -45,7 +45,9 @@ public final class VmSystem {
 	public static void initialize() {
 		if (!inited) {
 			// Initialize resource manager
+			Unsafe.debug("1");
 			ResourceManagerImpl.initialize();
+			Unsafe.debug("2");
 
 			/* Set System.err, System.out */
 			//final SystemOutputStream os = new SystemOutputStream();
@@ -53,7 +55,9 @@ public final class VmSystem {
 			final PrintStream ps = new PrintStream(os, true);
 			System.setOut(ps);
 			System.setErr(ps);
-
+			
+			Unsafe.debug("3");
+			
 			/* Initialize the system classloader */
 			VmClassLoader loader = (VmClassLoader) (getVmClass(Unsafe.getCurrentProcessor()).getLoader());
 			systemLoader = loader;

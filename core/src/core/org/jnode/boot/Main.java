@@ -30,11 +30,13 @@ public class Main {
 	 */
 	public static int vmMain() {
 		try {
+			Unsafe.debug("Starting JNode\n");
 			final long start = VmSystem.currentKernelMillis();
 
+			//Unsafe.debug("VmSystem.initialize\n");
 			VmSystem.initialize();
-			Unsafe.debug("Starting JNode\n");
 
+			//Unsafe.debug("Starting PluginManager");
 			final PluginManager piMgr = new DefaultPluginManager(pluginRegistry);
 			piMgr.startPlugins();
 

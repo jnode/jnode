@@ -4,6 +4,7 @@
 
 package org.jnode.vm.classmgr;
 
+import org.jnode.assembler.ObjectResolver;
 import org.jnode.system.BootLog;
 
 public final class ClassDecoder {
@@ -54,14 +55,17 @@ public final class ClassDecoder {
 		int class_image_length,
 		boolean rejectNatives,
 		AbstractVmClassLoader clc,
-		SelectorMap selectorMap) {
+		SelectorMap selectorMap,
+		VmStatics statics,
+		ObjectResolver resolver) {
 		cl_init();
-		VmType cls = decodeClass(data, offset, class_image_length, rejectNatives, clc, selectorMap);
+		VmType cls = decodeClass(data, offset, class_image_length, rejectNatives, clc, selectorMap, statics, resolver);
 		return cls;
 	}
 
 	/**
 	 * Decode a given class.
+	 * 
 	 * @param data
 	 * @param offset
 	 * @param class_image_length
@@ -71,7 +75,15 @@ public final class ClassDecoder {
 	 * @return The decoded class
 	 * @throws ClassFormatError
 	 */
-	private static final VmType decodeClass(byte[] data, int offset, int class_image_length, boolean rejectNatives, AbstractVmClassLoader clc, SelectorMap selectorMap)
+	private static final VmType decodeClass(
+		byte[] data,
+		int offset,
+		int class_image_length,
+		boolean rejectNatives,
+		AbstractVmClassLoader clc,
+		SelectorMap selectorMap,
+		VmStatics statics,
+		ObjectResolver resolver)
 		throws ClassFormatError {
 		if (data == null) {
 			throw new ClassFormatError("ClassDecoder.decodeClass: data==null");
@@ -191,7 +203,7 @@ public final class ClassDecoder {
 		readInterfaces(data, pos, cls, cp);
 
 		// Field table
-		readFields(data, pos, cls, cp, slotSize);
+		readFields(data, pos, cls, cp, statics, slotSize, resolver);
 
 		// Method Table
 		readMethods(data, rejectNatives, pos, cls, cp, selectorMap);
@@ -228,7 +240,7 @@ public final class ClassDecoder {
 	 * @param cp
 	 * @param slotSize
 	 */
-	private static void readFields(byte[] data, int[] pos, VmType cls, VmCP cp, int slotSize) {
+	private static void readFields(byte[] data, int[] pos, VmType cls, VmCP cp, VmStatics statics, int slotSize, ObjectResolver resolver) {
 		final int fcount = cl_readu2(data, pos);
 		if (fcount > 0) {
 			final VmField[] ftable = new VmField[fcount];
@@ -249,47 +261,49 @@ public final class ClassDecoder {
 						wide = false;
 				}
 				final boolean isstatic = (modifiers & Modifier.ACC_STATIC) != 0;
-				Object staticData = null;
+				final int staticsIdx;
 				final VmField fs;
 				if (isstatic) {
 					// If static allocate space for it.
 					switch (signature.charAt(0)) {
 						case 'B' :
-							staticData = new VmStaticByte();
+							staticsIdx = statics.allocIntField();
 							break;
 						case 'C' :
-							staticData = new VmStaticChar();
+							staticsIdx = statics.allocIntField();
 							break;
 						case 'D' :
-							staticData = new VmStaticDouble();
+							staticsIdx = statics.allocLongField();
 							break;
 						case 'F' :
-							staticData = new VmStaticFloat();
+							staticsIdx = statics.allocIntField();
 							break;
 						case 'I' :
-							staticData = new VmStaticInt();
+							staticsIdx = statics.allocIntField();
 							break;
 						case 'J' :
-							staticData = new VmStaticLong();
+							staticsIdx = statics.allocLongField();
 							break;
 						case 'S' :
-							staticData = new VmStaticShort();
+							staticsIdx = statics.allocIntField();
 							break;
 						case 'Z' :
-							staticData = new VmStaticBoolean();
+							staticsIdx = statics.allocIntField();
 							break;
 						default :
 							{
 								if (Modifier.isAddressType(signature)) {
-									staticData = new VmStaticAddress();
+									staticsIdx = statics.allocAddressField();
 								} else {
-									staticData = new VmStaticObject();
+									staticsIdx = statics.allocObjectField();
+									//System.out.println(NumberUtils.hex(staticsIdx) + "\t" + cls.getName() + "." + name);
 								}
 							}
 							break;
 					}
-					fs = new VmStaticField(name, signature, modifiers, staticData, cls, slotSize);
+					fs = new VmStaticField(name, signature, modifiers, staticsIdx, cls, slotSize);
 				} else {
+					staticsIdx = -1;
 					final int fieldOffset;
 					// Set the offset (keep in mind that this will be fixed
 					// by ClassResolver with respect to the objectsize of the super-class.
@@ -312,31 +326,32 @@ public final class ClassDecoder {
 						final int idx = cl_readu2(data, pos);
 						switch (signature.charAt(0)) {
 							case 'B' :
-								 ((VmStaticByte) staticData).setValue((byte) cp.getInt(idx));
+								statics.setInt(staticsIdx, cp.getInt(idx));
 								break;
 							case 'C' :
-								 ((VmStaticChar) staticData).setValue((char) cp.getInt(idx));
+								statics.setInt(staticsIdx, cp.getInt(idx));
 								break;
 							case 'D' :
-								 ((VmStaticDouble) staticData).setValue(Double.longBitsToDouble(cp.getLong(idx)));
+								statics.setLong(staticsIdx, cp.getLong(idx));
 								break;
 							case 'F' :
-								 ((VmStaticFloat) staticData).setValue(Float.intBitsToFloat(cp.getInt(idx)));
+								statics.setInt(staticsIdx, cp.getInt(idx));
 								break;
 							case 'I' :
-								 ((VmStaticInt) staticData).setValue(cp.getInt(idx));
+								statics.setInt(staticsIdx, cp.getInt(idx));
 								break;
 							case 'J' :
-								 ((VmStaticLong) staticData).setValue(cp.getLong(idx));
+								statics.setLong(staticsIdx, cp.getLong(idx));
 								break;
 							case 'S' :
-								 ((VmStaticShort) staticData).setValue((short) cp.getInt(idx));
+								statics.setInt(staticsIdx, cp.getInt(idx));
 								break;
 							case 'Z' :
-								 ((VmStaticBoolean) staticData).setValue(cp.getInt(idx) != 0);
+								statics.setInt(staticsIdx, cp.getInt(idx));
 								break;
 							default :
-								 ((VmStaticObject) staticData).setValue(cp.getString(idx));
+								//throw new IllegalArgumentException("signature " + signature);
+								statics.setObject(staticsIdx, cp.getString(idx), resolver);
 								break;
 						}
 					} else {
@@ -410,6 +425,7 @@ public final class ClassDecoder {
 
 	/**
 	 * Decode the data of a code-attribute
+	 * 
 	 * @param data
 	 * @param pos
 	 * @param cls
@@ -453,6 +469,7 @@ public final class ClassDecoder {
 
 	/**
 	 * Decode the data of a Exceptions attribute
+	 * 
 	 * @param data
 	 * @param pos
 	 * @param cls
@@ -474,6 +491,7 @@ public final class ClassDecoder {
 
 	/**
 	 * Decode the data of a LineNumberTable-attribute
+	 * 
 	 * @param data
 	 * @param pos
 	 * @return The line number map

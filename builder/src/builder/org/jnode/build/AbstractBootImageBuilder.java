@@ -60,6 +60,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 	private VmClassLoader clsMgr;
 	private URL classesURL = null;
 	private Set legalInstanceClasses;
+	/** Set of jbects that should not yet be emitted */
+	private final Set blockedObjects = new HashSet();
 
 	protected static boolean debug = true;
 
@@ -109,12 +111,18 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			testPluginPrerequisites(piRegistry);
 
 			/* Now create the processor */
-			final VmProcessor proc = createProcessor();
-			final VmArchitecture arch = proc.getArchitecture();
+			final VmArchitecture arch = getArchitecture();
+			clsMgr = new VmClassLoader(classesURL, arch);
+			blockedObjects.add(clsMgr);
+			blockedObjects.add(clsMgr.getStatics());
+			blockedObjects.add(clsMgr.getStatics().getTable());
+			
+			final VmProcessor proc = createProcessor(clsMgr.getStatics());
 			log("Building for " + proc.getCPUID());
 			
-			clsMgr = new VmClassLoader(classesURL, proc.getArchitecture());
 			final NativeStream os = createNativeStream();
+			clsMgr.setResolver(new BuildObjectResolver(os, this));
+			
 			final Label clInitCaller = new Label("$$clInitCaller");
 			VmType systemClasses[] = VmType.initializeForBootImage(clsMgr);
 			for (int i = 0; i < systemClasses.length; i++) {
@@ -159,12 +167,12 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			copyJarFile(os);
 
 			// Now emit all object images to the actual image
-			emitObjects(os, arch, clsMgr);
+			emitObjects(os, arch, blockedObjects);
 
 			/* Set the bootclasses */
 			VmType bootClasses[] = clsMgr.prepareAfterBootstrap();
 			os.getObjectRef(bootClasses);
-			emitObjects(os, arch, clsMgr);
+			emitObjects(os, arch, blockedObjects);
 
 			// Disallow the loading of new classes
 			clsMgr.setFailOnNewLoad(true);
@@ -224,7 +232,15 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 	 * @return The processor
 	 * @throws BuildException
 	 */
-	protected abstract VmProcessor createProcessor() throws BuildException;
+	protected abstract VmProcessor createProcessor(VmStatics statics) throws BuildException;
+
+	/**
+	 * Gets the target architecture.
+	 * 
+	 * @return The target architecture
+	 * @throws BuildException
+	 */
+	protected abstract VmArchitecture getArchitecture() throws BuildException;
 
 	/**
 	 * Copy the kernel native code into the native stream.
@@ -305,6 +321,15 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
 	protected abstract void emitStaticInitializerCalls(NativeStream os, VmType[] bootClasses, Object clInitCaller) throws ClassNotFoundException;
 
+	public final void emitObject(NativeStream os, Object object) 
+	throws ClassNotFoundException {
+		if (blockedObjects.contains(object)) {
+			throw new IllegalStateException("Cannot emit a blocked object here");
+		}
+		final ObjectEmitter emitter = new ObjectEmitter(clsMgr, os, null, legalInstanceClasses);
+		emitter.emitObject(object);
+	}
+	
 	/**
 	 * Emit all objects to the native stream that have not yet been emitted to this stream.
 	 * 
@@ -312,7 +337,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 	 * @param skipMe
 	 * @throws BuildException
 	 */
-	private final void emitObjects(NativeStream os, VmArchitecture arch, Object skipMe) throws BuildException {
+	private final void emitObjects(NativeStream os, VmArchitecture arch, Set blockObjects) throws BuildException {
 		log("Emitting objects", Project.MSG_DEBUG);
 		PrintWriter debugOut = null;
 		try {
@@ -339,8 +364,16 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 							if (obj instanceof VmType) {
 								((VmType) obj).link();
 							}
+							
+							final boolean skip;
+							if (blockObjects == null) {
+								skip = false;
+							} else {
+								skip = blockObjects.contains(obj);
+							}
 
-							if (obj != skipMe) {
+							if (!skip) {
+							//if (obj != skipMe) {
 								emitter.emitObject(obj);
 								emitted++;
 								X86Stream.ObjectRef newRef = os.getObjectRef(obj);
@@ -355,7 +388,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 					}
 				}
 				if (unresolved == lastUnresolved) {
-					if ((unresolved == 0) || (skipMe != null)) {
+					if ((unresolved == 0) || (blockObjects != null)) {
 						break;
 					}
 				}

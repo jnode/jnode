@@ -30,12 +30,30 @@ public final class Unsafe {
 		}
 
 		/**
+		 * @param object
+		 * @see org.jnode.assembler.ObjectResolver#addressOf64(Object)
+		 * @return long
+		 */
+		public long addressOf64(Object object) {
+			return Unsafe.addressToLong(Unsafe.addressOf(object));
+		}
+
+		/**
 		 * @param ptr
 		 * @see org.jnode.assembler.ObjectResolver#objectAt32(int)
 		 * @return Object
 		 */
 		public Object objectAt32(int ptr) {
 			return Unsafe.objectAt(Unsafe.intToAddress(ptr));
+		}
+
+		/**
+		 * @param ptr
+		 * @see org.jnode.assembler.ObjectResolver#objectAt64(int)
+		 * @return Object
+		 */
+		public Object objectAt64(long ptr) {
+			return Unsafe.objectAt(Unsafe.longToAddress(ptr));
 		}
 
 		/**

@@ -118,6 +118,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	 */
 	private VmType(String name, VmNormalClass superClass, String superClassName, AbstractVmClassLoader loader, boolean primitive, int accessFlags, int typeSize) {
 
+		VmStatics.typeCount++;
 		if (superClassName == null) {
 			if (!name.equals("java.lang.Object")) {
 				throw new IllegalArgumentException("superClassName cannot be null in class " + name);
