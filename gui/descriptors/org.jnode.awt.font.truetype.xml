@@ -15,9 +15,6 @@
     <library name="jnode-gui.jar">
       <export name="org.jnode.awt.font.truetype.*"/>
     </library>
-    <library name="jnode-fonts.jar">
-      <export name="*"/>
-    </library>
   </runtime>
 
   <extension-point id="fonts" name="JNode TrueType Font URLs"/>

@@ -174,7 +174,7 @@ public class DefaultPluginManager implements PluginManager {
 
 			}
 			if (additions == 0) {
-				throw new PluginException("Cycle in plugin prerequisites remaining: " + all.keySet() + ", nameSet: " + nameSet);
+				throw new PluginException("Cycle in plugin prerequisites remaining: " + all.keySet());
 			}
 		}
 

@@ -80,6 +80,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Construct a new VmClass
+	 * 
 	 * @param name
 	 * @param superClassName
 	 * @param loader
@@ -91,6 +92,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Construct a new VmClass with a given name and superclass
+	 * 
 	 * @param name
 	 * @param superClass
 	 * @param loader
@@ -103,6 +105,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Construct a new VmClass with a given name and superclass
+	 * 
 	 * @param name
 	 * @param superClass
 	 * @param superClassName
@@ -186,7 +189,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 		FloatArrayClass = FloatClass.getArrayClass("[F");
 		LongArrayClass = LongClass.getArrayClass("[J");
 		DoubleArrayClass = DoubleClass.getArrayClass("[D");
-		ObjectArrayClass = ObjectClass.getArrayClass(); 
+		ObjectArrayClass = ObjectClass.getArrayClass();
 
 		BooleanArrayClass.link();
 		ByteArrayClass.link();
@@ -313,6 +316,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Gets the array class with this class as its component type
+	 * 
 	 * @param arrayClassName
 	 * @return The array class
 	 */
@@ -327,6 +331,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Gets the array class with this class as its component type
+	 * 
 	 * @return The array class
 	 */
 	public final VmArrayClass getArrayClass() {
@@ -335,6 +340,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Gets the array class with this class as its component type
+	 * 
 	 * @param link
 	 * @return The array class
 	 */
@@ -369,6 +375,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Gets the VmClass of java.lang.Object.
+	 * 
 	 * @return The class
 	 */
 	public final static VmNormalClass getObjectClass() {
@@ -476,6 +483,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	/**
 	 * Return the corresponding java.lang.Class for this VmClass. During build environment the
 	 * Class will be loaded by Class.forName
+	 * 
 	 * @return The class
 	 */
 	public final Class asClass() {
@@ -485,6 +493,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	/**
 	 * Return the corresponding java.lang.Class for this VmClass. During build environment the
 	 * Class will be loaded by Class.forName
+	 * 
 	 * @return The class
 	 */
 	public final Class asClassDuringBootstrap() {
@@ -494,6 +503,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	/**
 	 * Return the corresponding java.lang.Class for this VmClass. During build environment the
 	 * Class will be loaded by Class.forName
+	 * 
 	 * @param isBuildEnv
 	 * @return The class
 	 */
@@ -513,6 +523,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Return the super class of this class or return null for java.lang.Object
+	 * 
 	 * @return The class
 	 */
 	public final VmNormalClass getSuperClass() {
@@ -528,6 +539,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Return the name of this class
+	 * 
 	 * @return The name of this class
 	 */
 	public final String getName() {
@@ -579,6 +591,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Return the number of fields declared in this class
+	 * 
 	 * @return int
 	 */
 	public final int getNoDeclaredFields() {
@@ -587,6 +600,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Return the declared field with a given index (0..getNoFields()-1)
+	 * 
 	 * @param index
 	 * @return The field
 	 */
@@ -670,6 +684,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Get the number of interfaces implemented by this class, or its super-classes.
+	 * 
 	 * @return int
 	 */
 	public final int getNoInterfaces() {
@@ -678,6 +693,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Get on of the list of interfaces implemented by this class, or its super-classes.
+	 * 
 	 * @param index
 	 * @return class
 	 */
@@ -687,6 +703,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Get the number of implementing interfaces declared in this class
+	 * 
 	 * @return int
 	 */
 	public final int getNoDeclaredInterfaces() {
@@ -695,6 +712,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Get the number of methods declared in this class
+	 * 
 	 * @return int
 	 */
 	public final int getNoDeclaredMethods() {
@@ -703,6 +721,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Return the declared method with a given index (0..getNoMethods()-1)
+	 * 
 	 * @param index
 	 * @return The method
 	 */
@@ -728,6 +747,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Return the constants pool of this class
+	 * 
 	 * @return The constant pool
 	 */
 	public final VmCP getCP() {
@@ -736,6 +756,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Return the loader of this class
+	 * 
 	 * @return The loader
 	 */
 	public final AbstractVmClassLoader getLoader() {
@@ -744,6 +765,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Return the accessflags of this class
+	 * 
 	 * @return The modifiers
 	 */
 	public final int getAccessFlags() {
@@ -752,6 +774,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Find the field within the given class that has the given name and signature.
+	 * 
 	 * @param name
 	 * @param signature
 	 * @return The field
@@ -773,6 +796,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Find the field within the given class that has the given name and signature.
+	 * 
 	 * @param name
 	 * @return The field
 	 */
@@ -783,6 +807,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	/**
 	 * Find the field within the given class (or super-classes) that has the given name and
 	 * signature.
+	 * 
 	 * @param name
 	 * @param signature
 	 * @return The field
@@ -800,6 +825,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Find the field within the given class (or super-classes) that has the given name.
+	 * 
 	 * @param name
 	 * @return The field
 	 */
@@ -809,6 +835,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Find the field within the given class (or super-classes) that matches the given fieldRef.
+	 * 
 	 * @param fieldRef
 	 * @return The field
 	 */
@@ -819,6 +846,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	/**
 	 * Find the method within the given class (or super-classes) that has the given name and
 	 * signature.
+	 * 
 	 * @param name
 	 * @param signature
 	 * @param onlyThisClass
@@ -895,6 +923,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	/**
 	 * Find the method within the given class (or super-classes) that has the given name and list
 	 * of argument types.
+	 * 
 	 * @param name
 	 * @param argTypes
 	 * @param declaredOnly
@@ -942,6 +971,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Find the method within the given class that has the given name and list of argument types.
+	 * 
 	 * @param name
 	 * @param argTypes
 	 * @return The method
@@ -953,6 +983,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	/**
 	 * Find the method within the given class and its super-classes that has the given name and
 	 * list of argument types.
+	 * 
 	 * @param name
 	 * @param argTypes
 	 * @return The method
@@ -964,6 +995,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	/**
 	 * Find the method within the given class (or super-classes) that has the given name and
 	 * signature.
+	 * 
 	 * @param name
 	 * @param signature
 	 * @param onlyThisClass
@@ -976,6 +1008,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Find the method within this class that has the given name and signature.
+	 * 
 	 * @param name
 	 * @param signature
 	 * @return The method
@@ -987,6 +1020,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	/**
 	 * Find the method within the given class (or super-classes) that has the given name and
 	 * signature.
+	 * 
 	 * @param name
 	 * @param signature
 	 * @return The method
@@ -997,6 +1031,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Find the method within the given class (or super-classes) that matches the given methodRef.
+	 * 
 	 * @param methodRef
 	 * @return The method
 	 */
@@ -1017,6 +1052,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	 * Prepare this class. This method is not synchronized since it is called frequently. A simple
 	 * test is done to see if the class has already been prepared, if not a synchronized helper
 	 * method is called to do the actual prepare.
+	 * 
 	 * @return The type
 	 */
 	public VmType prepare() {
@@ -1036,6 +1072,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	 * <li>Fix the offset for all declared non-static fields
 	 * <li>Create the VMT
 	 * </ul>
+	 * 
 	 * @return The type
 	 */
 	private synchronized VmType doPrepare() {
@@ -1132,7 +1169,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 		if (loader.isCompileRequired()) {
 			compile();
 		}
-		
+
 		// Notify all threads that are waiting for me
 		notifyAll();
 
@@ -1146,6 +1183,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Prepare the virtual method table
+	 * 
 	 * @param allInterfaces
 	 * @return The tib
 	 */
@@ -1153,6 +1191,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Prepare the interface method table
+	 * 
 	 * @param allInterfaces
 	 * @return The imt builder
 	 */
@@ -1211,6 +1250,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Resolve all constant references in the constants pool
+	 * 
 	 * @param clc
 	 */
 	public final void resolveCpRefs(AbstractVmClassLoader clc) {
@@ -1260,7 +1300,8 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	 * 
 	 * @param compiler
 	 * @param os
-	 * @param level The optimization level
+	 * @param level
+	 *            The optimization level
 	 */
 	public final synchronized void compile(org.jnode.vm.compiler.Compiler compiler, NativeStream os, int level) {
 		if (!isCompiled()) {
@@ -1290,25 +1331,36 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	 * 
 	 * @return The number of compiled methods
 	 */
-	public final synchronized int compile() {
+	public final int compile() {
+		return compile(0);
+	}
+
+	/**
+	 * Compile all the methods in this class during runtime.
+	 * 
+	 * @param optLevel
+	 *            The optimization level
+	 * @return The number of compiled methods
+	 */
+	public final synchronized int compile(int optLevel) {
 		int compileCount = 0;
-		if (!isCompiled()) {
-			prepare();
-			final VmMethod[] mt = methodTable;
-			if (mt != null) {
-				final int count = mt.length;
-				for (int i = 0; i < count; i++) {
-					VmMethod method = mt[i];
+		prepare();
+		final VmMethod[] mt = methodTable;
+		if (mt != null) {
+			final int count = mt.length;
+			for (int i = 0; i < count; i++) {
+				final VmMethod method = mt[i];
+				if (optLevel > method.getNativeCodeOptLevel()) {
 					if (!method.isAbstract()) {
-						loader.compile(method);
+						loader.compile(method, optLevel);
 						method.setModifier(true, Modifier.ACC_COMPILED);
 						method.setProfile(false);
 						compileCount++;
 					}
 				}
 			}
-			modifiers |= Modifier.ACC_COMPILED;
 		}
+		modifiers |= Modifier.ACC_COMPILED;
 		return compileCount;
 	}
 
@@ -1394,6 +1446,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Is this class a reference type. A reference type is an array of a non-primitive class.
+	 * 
 	 * @return boolean
 	 */
 	public final boolean isReferenceType() {
@@ -1515,6 +1568,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	/**
 	 * Gets the number of super classes until (and including) Object. E.g. this is 0 for Object and
 	 * 1 for an interface.
+	 * 
 	 * @return int
 	 */
 	public final int getSuperClassDepth() {
@@ -1523,6 +1577,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
 	/**
 	 * Gets the super classes array of this type
+	 * 
 	 * @return The super classes array
 	 */
 	protected final VmType[] getSuperClassesArray() {

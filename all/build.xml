@@ -68,6 +68,14 @@
   <target name="all" depends="arch-x86">
   </target>
 
+<!-- Create a bootable CDROM image -->
+  <target name="cdrom" depends="assemble">
+    <ant antfile="build-x86.xml"
+         inheritall="true"
+         inheritrefs="true"
+         target="cdrom"/>
+  </target>
+
 <!-- Clean everything files -->
   <target name="clean">
     <ant target="clean" dir="${root.dir}/core" inheritall="on" inheritrefs="on"/>
