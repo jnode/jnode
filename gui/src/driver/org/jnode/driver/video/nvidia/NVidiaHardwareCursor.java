@@ -85,6 +85,16 @@ public class NVidiaHardwareCursor implements NVidiaConstants, HardwareCursorAPI 
 			vgaIO.getVideoMem().setShorts(cur, 0, CURSOR_ADDRESS, 1024);
 		}
 	}
+	
+	/**
+	 * Close the hw cursor.
+	 */
+	public void closeCursor(){
+		/* clear cursor */
+		vgaIO.getVideoMem().setShort(CURSOR_ADDRESS, (short) 0x7fff, 1024);
+		// Hide the cursor
+		setCursorVisible(false);
+	}
 
 	private short[] getCursor(HardwareCursor cursor) {
 		final HardwareCursorImage img = cursor.getImage(32, 32);
