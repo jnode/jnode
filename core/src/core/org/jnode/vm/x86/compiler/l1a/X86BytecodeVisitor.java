@@ -497,6 +497,11 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         final Label notInstanceOfLabel = new Label(this.curInstrLabel
                 + "notInstanceOf");
 
+        if (!type.isInitialized()) {
+        	helper.writeGetStaticsEntry(curInstrLabel, tmpr, type);
+        	helper.writeClassInitialize(curInstrLabel, tmpr, type);
+        }
+        
     	// Clear result (means !instanceof)
         if (resultr != null) {
         	os.writeXOR(resultr, resultr);
@@ -1047,6 +1052,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     		
     		// Resolve the class
     		writeResolveAndLoadClassToReg(classRef, classr);
+    		helper.writeClassInitialize(curInstrLabel, classr, resolvedType);
     		
     		final Label okLabel = new Label(this.curInstrLabel + "cc-ok");
     		
@@ -2196,7 +2202,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     		
     		/* Objectref is already on the stack */
     		writeResolveAndLoadClassToReg(classRef, classr);
-    		
+    		helper.writeClassInitialize(curInstrLabel, classr, resolvedType);
+
     		final Label trueLabel = new Label(this.curInstrLabel + "io-true");
     		final Label endLabel = new Label(this.curInstrLabel + "io-end");
     		
