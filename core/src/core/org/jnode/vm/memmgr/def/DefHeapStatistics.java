@@ -21,6 +21,7 @@
 
 package org.jnode.vm.memmgr.def;
 
+import org.jnode.util.Counter;
 import org.jnode.vm.memmgr.HeapStatistics;
 
 import java.util.Collection;
@@ -49,32 +50,6 @@ final class DefHeapStatistics extends HeapStatistics
     count.inc();
   }
 
-  private class Counter
-  {
-    private int classCount = 0;
-    private String className;
-    protected final static String de = ": ";
-
-    public Counter(String className)
-    {
-      this.className = className;
-    }
-
-    public void inc()
-    {
-      classCount++;
-    }
-
-
-    public String toString()
-    {
-      StringBuffer stringBuffer = new StringBuffer(className);
-      stringBuffer.append(de);
-      stringBuffer.append(classCount);
-
-      return stringBuffer.toString();
-    }
-  }
 
   public String toString()
   {
