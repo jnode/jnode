@@ -13,6 +13,8 @@
 %define RESUME_ERROR	dword[fs:VmX86Processor_RESUME_ERROR_OFFSET*4]
 %define RESUME_HANDLER	dword[fs:VmX86Processor_RESUME_HANDLER_OFFSET*4]
     
+int_die_halted:	dd 0    
+    
 ; -------------------------------------
 ; Stack for inthandler & irqhandler
 ; -------------------------------------
@@ -53,6 +55,8 @@ OLD_GS      equ 0
 		inc byte [0xb8000+0*2]
 	%endif
     cld
+	test dword [int_die_halted],0xffffffff
+	jnz near int_die_halt
 %endmacro
 
 %macro int_exit 0
@@ -120,6 +124,7 @@ int_die:
 	;ret
 int_die_halt:
 	cli
+	mov dword [int_die_halted],1
 	mov eax,int_die_halt_msg
 	call sys_print_str
 	hlt

@@ -35,6 +35,7 @@ kernel_begin:
 %include "i386.h"
 %include "cmos.h"
 %include "syscall.h"
+%include "lock.h"
 %include "java.inc"
 
 %macro LOOPDIE 0
@@ -148,6 +149,7 @@ Luser_esp:
 extern Luser_esp
 
 scr_ofs:		dd 0
+SPINLOCK		console_lock
 jnodeFinished:	dd 0
 
 		align 4096

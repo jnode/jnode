@@ -12,6 +12,7 @@ import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeUtils;
 import org.jnode.vm.Address;
 import org.jnode.vm.CpuID;
+import org.jnode.vm.PragmaLoadStatics;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmProcessor;
@@ -156,13 +157,13 @@ public final class VmX86Processor extends VmProcessor {
             apic.clearErrors();
             apic.sendStartupIPI(getId(), bootCode.getAddress());
             apic.loopUntilNotBusy();
-            BootLog.info("Not busy");
+            //BootLog.info("Not busy");
             TimeUtils.loop(100);
             apic.clearErrors();
         }
         
-        BootLog.info("loop 5000");
-        TimeUtils.loop(5000);
+        //BootLog.info("loop 5000");
+        //TimeUtils.loop(5000);
     }
     
     /**
@@ -186,7 +187,7 @@ public final class VmX86Processor extends VmProcessor {
         tss.setUserStack(userStack);
         this.currentThread = new VmX86Thread(userStack);
         
-        gdt.dump(System.out);
+        //gdt.dump(System.out);
         
     }
     
@@ -209,7 +210,7 @@ public final class VmX86Processor extends VmProcessor {
     /**
      * Entry point for starting Application processors.
      */
-    static final void applicationProcessorMain() {
+    static final void applicationProcessorMain() throws PragmaLoadStatics {
         final VmX86Processor cpu = (VmX86Processor)Unsafe.getCurrentProcessor();
         BootLog.info("Starting Application Processor " + cpu.getId());
 

@@ -65,6 +65,7 @@ hide_cursor:
 
 ; Clear the screen
 sys_clrscr:
+	SPINLOCK_ENTER console_lock
 	push eax
 	push ecx
 	push edi
@@ -78,10 +79,12 @@ sys_clrscr:
 	pop edi
 	pop ecx
 	pop eax
+	SPINLOCK_EXIT console_lock
 	ret
 
 ; Print a character in al
 sys_print_char:
+	SPINLOCK_ENTER console_lock
 	cmp al,LF
 	je pc_nextline
 	cmp al,CR
@@ -136,6 +139,7 @@ pc_check_eos:
 	mov dword [scr_ofs],(scr_width*(scr_height-1))
 pc_ok:
 	call set_cursor
+	SPINLOCK_EXIT console_lock
 	ret
 
 %macro digit 1
