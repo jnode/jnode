@@ -36,8 +36,7 @@ public class ThreadListState extends DebugState {
     public ThreadListState(DebugState parent, int threadState) {
         super(STATE_NAMES[threadState], parent);
         threads = getAllThreads(threadState);
-        threadIterator = threads.values().iterator();
-        index = 1;
+        reset();
     }
 
     public void print(PrintStream out) {
@@ -71,14 +70,16 @@ public class ThreadListState extends DebugState {
 
         switch (event.getKeyChar()) {
         case 'n':
+            if (!threadIterator.hasNext()) {
+                reset();
+            }
             if (threadIterator.hasNext()) {
                 final Thread t = (Thread) threadIterator.next();
                 newState = new ThreadState(this, t, index++);
             }
             break;
         case 'r':
-            threadIterator = threads.values().iterator();
-            index = 1;
+            reset();
             break;
         default:
             return this;
@@ -87,6 +88,11 @@ public class ThreadListState extends DebugState {
         return newState;
     }
 
+    private void reset() {
+        threadIterator = threads.values().iterator();
+        index = 1;        
+    }
+    
     private TreeMap getAllThreads(int state) {
         final TreeMap map = new TreeMap();
         ThreadGroup grp = Thread.currentThread().getThreadGroup();
