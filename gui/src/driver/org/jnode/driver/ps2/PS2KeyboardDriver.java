@@ -49,7 +49,7 @@ public class PS2KeyboardDriver extends AbstractKeyboardDriver implements PS2Cons
 		// Start the rest
 		super.startDevice();
 		// Make sure all queues are empty
-		bus.processQueues();
+		bus.flush();
 	}
 
 	/**

@@ -11,7 +11,6 @@
  */
 package org.jnode.driver.ps2;
 
-import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
 
 import javax.naming.NameNotFoundException;
@@ -29,7 +28,6 @@ import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.AccessControllerUtils;
 import org.jnode.util.NumberUtils;
-import org.jnode.util.TimeoutException;
 
 /**
  * Provides common functionality shared by the drivers (read/write data/status)
@@ -45,8 +43,6 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	private int activeCount = 0;
 	private final PS2ByteChannel kbChannel = new PS2ByteChannel();
 	private final PS2ByteChannel mouseChannel = new PS2ByteChannel();
-	/** If true, the interrupt handler will read and process the input queue */
-	private boolean irqReadQueue = true;
 
 	/**
 	 * Create a PS2 object.
@@ -76,7 +72,7 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 			}
 			final IRQResource irqRes = rm.claimIRQ(owner, irq, this, true);
 			if (activeCount == 0) {
-				processQueues();
+				flush();
 			}
 			activeCount++;
 			return irqRes;
@@ -105,18 +101,19 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	 * @see org.jnode.system.IRQHandler#handleInterrupt(int)
 	 */
 	public synchronized final void handleInterrupt(int irq) {
-		if (irqReadQueue) {
-			processQueues();
-		}
+		processQueues();
 	}
 
 	/**
 	 * Read the queue until it is empty and process the read data.
 	 */
-	final void processQueues() {
-		int status;
-		//System.out.print('<');
-		while (((status = readStatus()) & AUX_STAT_OBF) != 0) {
+	private final void processQueues() {
+	    int status;
+	    int loops = 0;
+		while (((status = readStatus()) & STAT_OBF) != 0) {
+		    if (++loops > 1000) {
+		        log.error("A lot of PS2 data, probably wrong");
+		    }
 			final int data = readData();
 
 			// determine which driver shall handle the scancode
@@ -134,7 +131,15 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 				channel.handleScancode(data);
 			}
 		}
-		//System.out.print('>');
+	}
+
+	/**
+	 * Flush the PS2 output buffer.
+	 */
+	final synchronized void flush() {
+		while ((readStatus() & STAT_OBF) != 0) {
+			readData();
+		}
 	}
 
 	/**
@@ -167,6 +172,22 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	}
 
 	/**
+	 * Wait for a data available in outputbuffer.
+	 */
+	private final boolean waitRead() {
+		int count = 0;
+		while (count < 1000) {
+			if ((readStatus() & STAT_OBF) != 0) {
+				return true;
+			} else {
+				count++;
+				Thread.yield();
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Wait for a non-ready inputbuffer.
 	 */
 	private final void waitWrite() throws DeviceException {
@@ -196,9 +217,17 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	 * 
 	 * @return int
 	 */
-	final int getMode() throws DeviceException {
-		writeController(CCMD_READ_MODE);
-		return readData();
+	final synchronized int getMode() throws DeviceException {
+	    try {
+	        writeController(CCMD_READ_MODE);
+	        if (waitRead()) {
+	            return readData();
+	        } else {
+	            throw new DeviceException("Not return data from READ_MODE");
+	        }
+	    } finally {
+	        processQueues();
+	    }
 	}
 
 	/**
@@ -214,16 +243,19 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	 * 
 	 * @return true if a mouse is present, false if not
 	 */
-	final boolean testMouse() throws DeviceException {
-		irqReadQueue = false;
-		try {
+	final synchronized boolean testMouse() throws DeviceException {
+	    try {
 			writeController(CCMD_TEST_MOUSE);
-			final int status = readStatus();
-			final int rc = readData();
-			log.debug("testMouse rc=0x" + NumberUtils.hex(rc, 2) + ", status 0x" + NumberUtils.hex(status, 2));
-			return (rc != 0xFF);
+			if (waitRead()) {
+			    final int status = readStatus();
+			    final int rc = readData();
+			    log.debug("testMouse rc=0x" + NumberUtils.hex(rc, 2) + ", status 0x" + NumberUtils.hex(status, 2));
+			    return (rc != 0xFF);
+			} else {
+			    log.debug("No return from TEST_MOUSE");
+			    return false;
+			}
 		} finally {
-			irqReadQueue = true;
 			processQueues();
 		}
 	}
@@ -233,6 +265,13 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	 */
 	final void setMouseEnabled(boolean enable) throws DeviceException {
 		writeController(enable ? CCMD_MOUSE_ENABLE : CCMD_MOUSE_DISABLE);
+		int mode = getMode();
+		if (enable) {
+		    mode |= MODE_MOUSE_INT;
+		} else {
+		    mode &= ~MODE_MOUSE_INT;
+		}
+		setMode(mode);
 	}
 
 	/**
@@ -240,59 +279,81 @@ public class PS2Bus extends Bus implements IRQHandler, PS2Constants {
 	 */
 	final void setKeyboardEnabled(boolean enable) throws DeviceException {
 		writeController(enable ? CCMD_KB_ENABLE : CCMD_KB_DISABLE);
+		int mode = getMode();
+		if (enable) {
+		    mode |= MODE_INT;
+		} else {
+		    mode &= ~MODE_INT;
+		}
+		setMode(mode);
 	}
-
+	
 	/**
-	 * Write a command to the mouse
-	 * 
-	 * @param cmd
+	 * Read an ACK and cnt bytes. The bytes (except the ACK) are added
+	 * to the given channel.
+	 * @param channel
+	 * @param cnt
 	 * @return
 	 */
-	final boolean writeMouseCommand(int cmd) throws DeviceException {
-		// First clear the mouse channel, otherwise we might read
-		// old data back
-		mouseChannel.clear();
+	private final boolean readAckAndData(PS2ByteChannel channel, int cnt) {
+	    if (!waitRead()) { return false; }
+	    int data = readData();
+        switch (data) {
+        case REPLY_ACK:
+            break;
+        case REPLY_RESEND:
+	        log.error("Mouse replied with RESEND");
+            return false;
+        default:
+            // Not an ACK, consider it data
+            channel.handleScancode(data);
+        	cnt--;
+        	break;
+        }
+        while (cnt > 0) {
+    	    if (!waitRead()) { return false; }
+    	    data = readData();
+    	    channel.handleScancode(data);
+    	    cnt--;
+        }
+        return true;
+	}
+	
+	/**
+	 * Send a single byte command to the mouse
+	 * 
+	 * @param cmd
+	 * @return Success (true / false)
+	 */
+	private final boolean sendMouseCommand(int cmd, int returnCnt) throws DeviceException {
 		// Transmit the command
 		writeController(CCMD_WRITE_MOUSE);
 		writeData(cmd);
-
-		int data;
-		try {
-			data = mouseChannel.read(COMMAND_TIMEOUT);
-		} catch (IOException ex) {
-			log.debug("IOException in readMouse", ex);
-			return false;
-		} catch (TimeoutException ex) {
-			log.debug("Timeout in readMouse");
-			return false;
-		} catch (InterruptedException ex) {
-			log.debug("Interrupted in readMouse");
-			return false;
-		}
-
-		if (data == REPLY_ACK) {
-			return true; // command acknowledged
-		} else if (data == REPLY_RESEND) {
-			log.debug("Mouse replied with RESEND");
-		} else {
-			log.debug("Invalid reply 0x" + Integer.toHexString(data));
-		}
-
-		return false; // on error
+		return readAckAndData(mouseChannel, returnCnt);
 	}
 
 	/**
 	 * Write a series of commands to the mouse
 	 * 
-	 * @param cmds
+	 * @param cmd The command
+	 * @param params The command parameters
 	 * @return
 	 */
-	final boolean writeMouseCommands(int[] cmds) throws DeviceException {
-		boolean ok = true;
-		for (int i = 0; i < cmds.length; i++) {
-			ok &= writeMouseCommand(cmds[i]);
-		}
-		return ok;
+	final synchronized boolean writeMouseCommands(int cmd, int[] params, int returnCnt) throws DeviceException {
+		// First clear the mouse channel, otherwise we might read
+		// old data back
+		mouseChannel.clear();
+
+		if (params == null) {
+		    return sendMouseCommand(cmd, returnCnt);
+		} else {
+		    if (!sendMouseCommand(cmd, 0)) { return false; }
+		    final int cnt = params.length;
+		    for (int i = 0; i < cnt - 1; i++) {
+		        if (!sendMouseCommand(params[i], 0)) { return false; }
+		    }
+		    return sendMouseCommand(params[cnt-1], returnCnt);
+		} 
 	}
 
 	/**

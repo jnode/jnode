@@ -48,8 +48,6 @@ public interface PS2Constants {
 	int STAT_GTO = 0x40; /* General receive/xmit timeout */
 	int STAT_PERR = 0x80; /* Parity error */
 
-	int AUX_STAT_OBF = (STAT_OBF | STAT_MOUSE_OBF);
-
 	/*
 	 *	Controller Mode Register Bits
 	 */

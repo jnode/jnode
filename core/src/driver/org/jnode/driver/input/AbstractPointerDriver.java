@@ -50,7 +50,7 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 	 */
 	protected synchronized void startDevice() throws DriverException {
 		final Device dev = getDevice();
-		log.info("Starting " + dev.getId());
+		log.debug("Starting " + dev.getId());
 		this.channel = getChannel();
 		this.interpreter = createInterpreter();
 		try {
@@ -66,6 +66,7 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 	}
 
 	protected PointerInterpreter createInterpreter() {
+	    log.debug("createInterpreter");
 		try {
 			initPointer(); // bring mouse into stable state
 		} catch (DeviceException ex) {
@@ -78,6 +79,10 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 			log.info("Found " + i.getName());
 			return i;
 		} else {
+		    try {
+                Thread.sleep(20000);
+            } catch (InterruptedException ex1) {
+            }
 			// here goes the tablet stuff
 			return null;
 		}

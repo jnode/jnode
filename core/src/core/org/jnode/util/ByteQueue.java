@@ -79,6 +79,25 @@ public class ByteQueue {
 		return r;
 	}
 	
+	/**
+	 * Wait until there is data in the queue and return the first
+	 * element, without removing it.
+	 * @param timeout
+	 * @return
+	 * @throws TimeoutException
+	 * @throws InterruptedException
+	 */
+	public synchronized byte peek(long timeout) 
+	throws TimeoutException, InterruptedException {
+		while (top == bottom) { /* Q is empty */
+			wait(timeout);
+			if ((timeout > 0) && (top == bottom)) {
+				throw new TimeoutException();
+			}
+		} /* wait for push to fill Q */
+		return data[top];
+	}
+	
 	public boolean isEmpty() {
 		return (top == bottom);
 	}

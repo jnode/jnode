@@ -49,17 +49,17 @@ public class PS2PointerDriver extends AbstractPointerDriver implements PS2Consta
 
 	protected boolean enablePointer() throws DeviceException {
 		log.debug("enablePointer");
-		return bus.writeMouseCommand(CMD_ENABLE);
+		return bus.writeMouseCommands(CMD_ENABLE, null, 0);
 	}
 
 	protected boolean disablePointer() throws DeviceException {
 		log.debug("disablePointer");
-		return bus.writeMouseCommand(CMD_DISABLE);
+		return bus.writeMouseCommands(CMD_DISABLE, null, 0);
 	}
 
 	protected int getPointerId() throws DriverException {
 		try {
-			if (!bus.writeMouseCommand(CMD_GET_ID)) {
+			if (!bus.writeMouseCommands(CMD_GET_ID, null, 1)) {
 				throw new DriverException("Cannot request Pointer ID");
 			}
 			return channel.read(50);
@@ -75,7 +75,7 @@ public class PS2PointerDriver extends AbstractPointerDriver implements PS2Consta
 	}
 
 	protected boolean setRate(int samples) throws DeviceException {
-		return bus.writeMouseCommands(new int[] { CMD_SET_RATE, samples });
+		return bus.writeMouseCommands(CMD_SET_RATE, new int[] { samples }, 0);
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class PS2PointerDriver extends AbstractPointerDriver implements PS2Consta
 		}
 		super.startDevice();
 		// Make sure all queues are empty
-		bus.processQueues();
+		bus.flush();
 		final PointerInterpreter interpreter = getPointerInterpreter();
 		if (interpreter != null) {
 			interpreter.reset();
@@ -123,7 +123,7 @@ public class PS2PointerDriver extends AbstractPointerDriver implements PS2Consta
 
 	private final void setEnabled(boolean on) throws DeviceException {
 		log.debug("Old mode 0x" + NumberUtils.hex(bus.getMode(), 2));
-		bus.setMouseEnabled(on);
+		bus.setMouseEnabled(on);		
 		log.debug("New mode 0x" + NumberUtils.hex(bus.getMode(), 2));
 	}
 }
