@@ -195,7 +195,7 @@ public class SoftByteCodes implements Uninterruptible {
 
 		VmHeapManager hm = heapManager;
 		if (hm == null) {
-			heapManager = hm = Vm.getVm().getHeapManager();
+			heapManager = hm = Vm.getHeapManager();
 		}
 		Object result;
 		if (size < 0) {
@@ -290,7 +290,7 @@ public class SoftByteCodes implements Uninterruptible {
 
 		VmHeapManager hm = heapManager;
 		if (hm == null) {
-			heapManager = hm = Vm.getVm().getHeapManager();
+			heapManager = hm = Vm.getHeapManager();
 		}
 		final Object result = hm.newArray((VmArrayClass) arrCls, elements);
 
@@ -311,7 +311,7 @@ public class SoftByteCodes implements Uninterruptible {
 			throws UninterruptiblePragma {
 		VmHeapManager hm = heapManager;
 		if (hm == null) {
-			heapManager = hm = Vm.getVm().getHeapManager();
+			heapManager = hm = Vm.getHeapManager();
 		}
 		final Object result = hm.newArray(VmType.getPrimitiveArrayClass(atype),
 				elements);
@@ -330,7 +330,7 @@ public class SoftByteCodes implements Uninterruptible {
 			throws UninterruptiblePragma {
 		VmHeapManager hm = heapManager;
 		if (hm == null) {
-			heapManager = hm = Vm.getVm().getHeapManager();
+			heapManager = hm = Vm.getHeapManager();
 		}
 		final Object result = hm.newArray((VmArrayClass) vmClass, elements);
 		return result;

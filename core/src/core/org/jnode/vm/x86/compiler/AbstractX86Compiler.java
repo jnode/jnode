@@ -36,7 +36,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements 
 	 */
 	public final void initialize(VmClassLoader loader) {
 		if (context == null) {
-			context = new X86CompilerContext(loader, Vm.getVm().getHeapManager(), getMagic());
+			context = new X86CompilerContext(loader, Vm.getHeapManager(), getMagic());
 		}
 	}
 

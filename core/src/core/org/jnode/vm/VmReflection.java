@@ -123,7 +123,7 @@ public class VmReflection {
             final VmStaticField sf = (VmStaticField) field;
             initialize(sf);
             Unsafe.setObject(getStaticFieldAddress(sf), value);
-            final VmWriteBarrier wb = Vm.getVm().getHeapManager()
+            final VmWriteBarrier wb = Vm.getHeapManager()
                     .getWriteBarrier();
             if (wb != null) {
                 wb.putstaticWriteBarrier(sf.getStaticsIndex(), value);
@@ -132,7 +132,7 @@ public class VmReflection {
             final VmInstanceField inf = (VmInstanceField) field;
             final int offset = inf.getOffset();
             Unsafe.setObject(o, offset, value);
-            final VmWriteBarrier wb = Vm.getVm().getHeapManager()
+            final VmWriteBarrier wb = Vm.getHeapManager()
                     .getWriteBarrier();
             if (wb != null) {
                 wb.putfieldWriteBarrier(o, offset, value);
@@ -379,7 +379,7 @@ public class VmReflection {
     public static Object newInstance(VmMethod constructor, Object[] args)
             throws InstantiationException, IllegalAccessException,
             InvocationTargetException {
-        final VmHeapManager hm = Vm.getVm().getHeapManager();
+        final VmHeapManager hm = Vm.getHeapManager();
         final Object obj = hm.newInstance(constructor.getDeclaringClass());
         invoke(constructor, obj, args);
         return obj;
@@ -397,7 +397,7 @@ public class VmReflection {
     public static Object newInstance(VmMethod constructor)
             throws InstantiationException, IllegalAccessException,
             InvocationTargetException {
-        final VmHeapManager hm = Vm.getVm().getHeapManager();
+        final VmHeapManager hm = Vm.getHeapManager();
         final Object obj = hm.newInstance(constructor.getDeclaringClass());
         Unsafe.pushObject(obj);
         Unsafe.invokeVoid(constructor);

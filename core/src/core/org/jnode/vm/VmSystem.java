@@ -101,7 +101,7 @@ public final class VmSystem {
             final Vm vm = Vm.getVm();
 
             // Initialize the monitors for the heap manager
-            vm.getHeapManager().start();
+            Vm.getHeapManager().start();
 
             // Find & start all processors
             vm.initializeProcessors(rm);
@@ -286,7 +286,7 @@ public final class VmSystem {
      * @return Object
      */
     public static Object clone(Cloneable obj) {
-        return Vm.getVm().getHeapManager().clone(obj);
+        return Vm.getHeapManager().clone(obj);
     }
 
     /**
@@ -368,7 +368,7 @@ public final class VmSystem {
 
     protected static Object allocStack(int size) {
         try {
-            return Vm.getVm().getHeapManager()
+            return Vm.getHeapManager()
                     .newInstance(
                             systemLoader.loadClass(
                                     "org.jnode.vm.VmSystemObject", true), size);
@@ -393,7 +393,7 @@ public final class VmSystem {
             current.inException = true;
         }
 
-        if (Vm.getVm().getHeapManager().isLowOnMemory()) { return null; }
+        if (Vm.getHeapManager().isLowOnMemory()) { return null; }
 
         final VmProcessor proc = Unsafe.getCurrentProcessor();
         final VmStackReader reader = proc.getArchitecture().getStackReader();
@@ -710,7 +710,7 @@ public final class VmSystem {
         Unsafe.copy(srcPtr, dstPtr, length * elemsize);
 
         if (isObjectArray) {
-            final VmWriteBarrier wb = Vm.getVm().getHeapManager()
+            final VmWriteBarrier wb = Vm.getHeapManager()
                     .getWriteBarrier();
             if (wb != null) {
                 wb.arrayCopyWriteBarrier(src, srcPos, srcPos + length);
@@ -777,15 +777,15 @@ public final class VmSystem {
     }
 
     public static long freeMemory() {
-        return Vm.getVm().getHeapManager().getFreeMemory();
+        return Vm.getHeapManager().getFreeMemory();
     }
 
     public static long totalMemory() {
-        return Vm.getVm().getHeapManager().getTotalMemory();
+        return Vm.getHeapManager().getTotalMemory();
     }
 
     public static void gc() {
-        Vm.getVm().getHeapManager().gc();
+        Vm.getHeapManager().gc();
     }
 
     static class SystemOutputStream extends OutputStream {

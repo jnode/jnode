@@ -359,7 +359,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			loadClass(VmDefaultHeap.class);
 			loadClass(VmHeapManager.class);
 			loadClass(VmStatics.class);
-			loadClass(vm.getHeapManager().getClass());
+			loadClass(Vm.getHeapManager().getClass());
 			loadClass(HeapHelper.class);
 			loadClass(HeapHelperImpl.class);
 

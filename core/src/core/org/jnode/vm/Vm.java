@@ -12,6 +12,7 @@ import org.jnode.util.BootableArrayList;
 import org.jnode.util.Counter;
 import org.jnode.util.Statistic;
 import org.jnode.util.Statistics;
+import org.jnode.vm.classmgr.VmAtom;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.compiler.HotMethodManager;
 import org.jnode.vm.memmgr.VmHeapManager;
@@ -44,8 +45,13 @@ public class Vm extends VmSystemObject implements Statistics {
 	private final List processors;
 	/** All statistics */
 	private transient HashMap statistics;
+	/** The atom manager */
+	private final VmAtom.Manager atomManager;
+	
 	/** Should assertions be verified? */
 	public static final boolean VerifyAssertions = true;
+	/** For assertion checking things that should never happen. */
+	public static final boolean NOT_REACHED = false;
 
 	/**
 	 * Initialize a new instance
@@ -61,6 +67,7 @@ public class Vm extends VmSystemObject implements Statistics {
 		this.heapManager = heapManager;
 		this.statics = statics;
 		this.processors = new BootableArrayList();
+		this.atomManager = new VmAtom.Manager();
 	}
 
 	/**
@@ -70,6 +77,32 @@ public class Vm extends VmSystemObject implements Statistics {
 		return this.bootstrap;
 	}
 
+	/**
+	 * Is JNode currently running.
+	 * @return true or false
+	 */
+	public static final boolean isRunningVm() {
+		return ((instance != null) && !instance.bootstrap);
+	}
+
+	/**
+	 * Is the bootimage being written?
+	 * @return true or false.
+	 */
+	public static final boolean isWritingImage() {
+		return ((instance == null) || instance.bootstrap);
+	}
+
+	/**
+	 * Causes JNode to stop working with a given message.
+	 * @param msg
+	 */
+	public static final void sysFail(String msg) {
+		if (isRunningVm()) {
+			Unsafe.die(msg);
+		}
+	}
+	
 	/**
 	 * @return Returns the arch.
 	 */
@@ -87,8 +120,8 @@ public class Vm extends VmSystemObject implements Statistics {
 	/**
 	 * @return Returns the heapManager.
 	 */
-	public final VmHeapManager getHeapManager() {
-		return this.heapManager;
+	public static final VmHeapManager getHeapManager() {
+		return instance.heapManager;
 	}
 
 	/**
@@ -276,4 +309,11 @@ public class Vm extends VmSystemObject implements Statistics {
         }
         throw new AssertionError(msg);
     }
+    
+	/**
+	 * @return Returns the atomManager.
+	 */
+	public static final VmAtom.Manager getAtomManager() {
+		return instance.atomManager;
+	}
 }
