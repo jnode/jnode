@@ -81,5 +81,7 @@ public interface PS2Constants {
 	int REPLY_POR = 0xAA; /* Power on reset */
 	int REPLY_ACK = 0xFA; /* Command ACK */
 	int REPLY_RESEND = 0xFE; /* Command NACK, send the cmd again */
+	
+	int COMMAND_TIMEOUT = 750;
 
 }
