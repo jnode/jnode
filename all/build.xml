@@ -1,4 +1,4 @@
-<project name="JNode" default="all" basedir=".">
+<project name="JNode" default="help" basedir=".">
 
 	<!-- JNode version -->
 	<property name="jnode-ver" value="0.1.10-dev" />
@@ -89,10 +89,10 @@
 		<include name="**/*.properties" />
 		<include name="**/*.xml" />
 	</patternset>
-
-	<!-- Initialize all project directories -->
+	
 	<target name="prepare">
-		<property file="${root.dir}/jnode.properties"/>
+     	<!-- Initialize all project directories -->
+		<property file="${root.dir}/jnode.properties" />
 		<tstamp />
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${cdroms.dir}" />
@@ -100,7 +100,7 @@
 		<mkdir dir="${plugins.dir}" />
 		<mkdir dir="${initjars.dir}" />
 	</target>
-
+    
 	<!-- Assemble all subproject jar files -->
 	<target name="assemble" depends="prepare">
 		<ant target="assemble" dir="${root.dir}/core" inheritall="on" inheritrefs="on" />
@@ -163,28 +163,81 @@
 		</initjar>
 	</target>
 
-	<!-- Create the X86 boot image-->
-	<target name="arch-x86" depends="assemble">
-		<ant antfile="build-x86.xml" inheritall="on" inheritrefs="on" />
+	<!-- Give help on possible targets -->
+	<target name="help">
+		<echo>
+Welcome to the JNode build system.
+			
+You can use this build system to perform various tasks, 
+by specifying one or more targets on the command line. 
+See the list below for an explanation of all targets.
+			
+x86            Build the JNode bootable image for the X86 32-bit
+               architecture.			
+x86_64         Build the JNode bootable image for the X86 64-bit
+               architecture (AMD64).
+			
+cd-x86         Build the JNode bootable CD-ROM for the X86
+               architecture 32 and 64-bit. The CD-ROM also contains
+               the JNode sources.
+cd-x86-lite    Build the JNode bootable CD-ROM for the X86 32-bit
+               architecture. 
+cd-x86_64-lite Build the JNode bootable CD-ROM for the X86 32-bit
+               architecture. 
+			
+encoding-test  Verify the file encoding of all java source files.
+encoding-fix   Correct the file encoding of all java source files.
+			
+javadoc        Generate documentation of all java source files.
+javadoc-small  Generate documentation of the basic JNode api's.
+			
+clean          Remove all intermediate build results.			
+		</echo>
 	</target>
 
-	<!-- Build all -->
-	<target name="all" depends="arch-x86">
+	<!-- Macro used to call the x86 build script -->
+	<macrodef name="x86-build">
+		<attribute name="bits"/>
+		<attribute name="target" default="all"/>
+		<sequential>
+			<ant antfile="build-x86.xml" inheritall="on" inheritrefs="on" target="@{target}">
+				<property name="jnode.bits" value="@{bits}"/>
+			</ant>
+		</sequential>
+	</macrodef>
+	
+	<!-- Create the X86 32-bit boot image -->
+	<target name="x86" depends="assemble">
+		<x86-build bits="32"/>
+	</target>
+
+	<!-- Create the X86 64-bit boot image-->
+	<target name="x86_64" depends="assemble">
+		<x86-build bits="64"/>
 	</target>
 
 	<!-- Build the boot files for windows NT/2K/XP (with NTLDR) -->
 	<target name="boot-files-winNT" depends="assemble">
-		<ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="boot-files-winNT" />
+		<x86-build bits="32" target="boot-files-winNT"/>
 	</target>
 
-	<!-- Create a bootable CDROM image -->
-	<target name="cdrom" depends="assemble">
+	<!-- Create a bootable CDROM image containing all x86 bootable images and the sources -->
+	<target name="cd-x86" depends="assemble">
 		<tar destfile="${sources.dist.tar.gz}" compression="gzip" basedir="${root.dir}" excludes="*/build/**" />
+		<x86-build bits="32" target="java-image"/>
+		<x86-build bits="64" target="java-image"/>
 		<ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom" />
 	</target>
 
-	<!-- Create a bootable CDROM image -->
-	<target name="cdrom-lite" depends="assemble">
+	<!-- Create a bootable CDROM image for x86 32-bits -->
+	<target name="cd-x86-lite" depends="assemble">
+		<x86-build bits="32" target="java-image"/>
+		<ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom-lite" />
+	</target>
+
+	<!-- Create a bootable CDROM image for x86 64-bits -->
+	<target name="cd-x86_64-lite" depends="assemble">
+		<x86-build bits="64" target="java-image"/>
 		<ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom-lite" />
 	</target>
 
@@ -212,7 +265,7 @@
 		<delete dir="${build.dir}" quiet="on" />
 	</target>
 
-	<!-- javadoc-small -->
+	<!-- Generate only the basic api javadoc files -->
 	<target name="javadoc-small">
 		<mkdir dir="${build.dir}/javadoc/small" />
 		<javadoc destdir="${build.dir}/javadoc/small" author="true" version="true" use="true" windowtitle="JNode Key Packages">
@@ -238,8 +291,8 @@
 		</javadoc>
 	</target>
 
-	<!-- javadoc-full -->
-	<target name="javadoc-full">
+	<!-- Generate all javadoc files -->
+	<target name="javadoc">
 		<mkdir dir="${build.dir}/javadoc/full" />
 		<javadoc destdir="${build.dir}/javadoc/full" author="true" version="true" use="true" windowtitle="All JNode Packages">
 
@@ -280,7 +333,7 @@
 	</target>
 
 	<!-- Compare classpath version of jnode with real classpath version -->
-	<target name="classpath-compare" depends="assemble">
+	<target name="cp-compare" depends="assemble">
 		<taskdef name="cp-compare" classname="org.jnode.ant.taskdefs.classpath.CompareTask" classpathref="cp-jnode" />
 
 		<delete dir="${build.dir}/classpath-compare" />
@@ -309,36 +362,32 @@
 				</fileset>
 			</classpathsources>
 		</cp-compare>
-
-
 	</target>
 
 	<!-- Compare classpath version of jnode with real classpath version -->
 	<target name="header-fix" depends="assemble">
 		<taskdef name="header" classname="org.jnode.ant.taskdefs.HeaderTask" classpathref="cp-jnode" />
 
-		<header 
-			update="on"
-			headerFile="${root.dir}/all/template/header.txt">
-			<fileset dir="${root.dir}/builder/src/builder" includes="**/*.java"/>
-			<fileset dir="${root.dir}/core/src/classpath/vm" includes="**/*.java"/>
-			<fileset dir="${root.dir}/core/src/core" includes="**/*.java"/>
-			<fileset dir="${root.dir}/core/src/vmmagic" includes="**/*.java"/>
-			<fileset dir="${root.dir}/core/src/driver" includes="**/*.java"/>
-			<fileset dir="${root.dir}/core/src/test" includes="**/*.java"/>
-			<fileset dir="${root.dir}/distr/src/install" includes="**/*.java"/>
-			<fileset dir="${root.dir}/distr/src/apps" includes="**/*.java"/>
-			<fileset dir="${root.dir}/fs/src/fs" includes="**/*.java"/>
-			<fileset dir="${root.dir}/fs/src/driver" includes="**/*.java"/>
-			<fileset dir="${root.dir}/fs/src/test" includes="**/*.java"/>
-			<fileset dir="${root.dir}/gui/src/awt" includes="**/*.java"/>
-			<fileset dir="${root.dir}/gui/src/desktop" includes="**/*.java"/>
-			<fileset dir="${root.dir}/gui/src/driver" includes="**/*.java"/>
-			<fileset dir="${root.dir}/gui/src/test" includes="**/*.java"/>
-			<fileset dir="${root.dir}/net/src/net" includes="**/*.java"/>
-			<fileset dir="${root.dir}/net/src/driver" includes="**/*.java"/>
-			<fileset dir="${root.dir}/net/src/test" includes="**/*.java"/>
-			<fileset dir="${root.dir}/shell/src/shell" includes="**/*.java"/>
+		<header update="on" headerFile="${root.dir}/all/template/header.txt">
+			<fileset dir="${root.dir}/builder/src/builder" includes="**/*.java" />
+			<fileset dir="${root.dir}/core/src/classpath/vm" includes="**/*.java" />
+			<fileset dir="${root.dir}/core/src/core" includes="**/*.java" />
+			<fileset dir="${root.dir}/core/src/vmmagic" includes="**/*.java" />
+			<fileset dir="${root.dir}/core/src/driver" includes="**/*.java" />
+			<fileset dir="${root.dir}/core/src/test" includes="**/*.java" />
+			<fileset dir="${root.dir}/distr/src/install" includes="**/*.java" />
+			<fileset dir="${root.dir}/distr/src/apps" includes="**/*.java" />
+			<fileset dir="${root.dir}/fs/src/fs" includes="**/*.java" />
+			<fileset dir="${root.dir}/fs/src/driver" includes="**/*.java" />
+			<fileset dir="${root.dir}/fs/src/test" includes="**/*.java" />
+			<fileset dir="${root.dir}/gui/src/awt" includes="**/*.java" />
+			<fileset dir="${root.dir}/gui/src/desktop" includes="**/*.java" />
+			<fileset dir="${root.dir}/gui/src/driver" includes="**/*.java" />
+			<fileset dir="${root.dir}/gui/src/test" includes="**/*.java" />
+			<fileset dir="${root.dir}/net/src/net" includes="**/*.java" />
+			<fileset dir="${root.dir}/net/src/driver" includes="**/*.java" />
+			<fileset dir="${root.dir}/net/src/test" includes="**/*.java" />
+			<fileset dir="${root.dir}/shell/src/shell" includes="**/*.java" />
 		</header>
 	</target>
 
@@ -352,7 +401,7 @@
 		<taskdef name="n2a" classname="org.jnode.ant.taskdefs.Native2AsciiTask" classpathref="cp-jnode" />
 
 		<n2a update="off">
-			<fileset dir="${root.dir}" includes="**/*.java"/>
+			<fileset dir="${root.dir}" includes="**/*.java" />
 		</n2a>
 	</target>
 
@@ -361,7 +410,7 @@
 		<taskdef name="n2a" classname="org.jnode.ant.taskdefs.Native2AsciiTask" classpathref="cp-jnode" />
 
 		<n2a update="on">
-			<fileset dir="${root.dir}" includes="**/*.java"/>
+			<fileset dir="${root.dir}" includes="**/*.java" />
 		</n2a>
 	</target>
 </project>
