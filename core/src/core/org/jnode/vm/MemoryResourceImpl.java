@@ -383,7 +383,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			throw new SecurityException("Cannot get an Object from a byte-array");
 		}
 		testMemPtr(memPtr, 4);
-		return start.loadObjectReference(Offset.fromIntSignExtend(memPtr)).toObject();
+		return start.loadObjectReference(Offset.fromIntSignExtend(memPtr));
 	}
 
 	/**
@@ -496,7 +496,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 */
 	public void setInt(int memPtr, int value) {
 		testMemPtr(memPtr, 4);
-		start.store(value, Offset.fromIntSignExtend(value));
+		start.store(value, Offset.fromIntSignExtend(memPtr));
 	}
 
 	/**
@@ -650,7 +650,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 */
 	public void clear(int memPtr, int size) {
 		testMemPtr(memPtr, size);
-		Unsafe.clear(start.add(Offset.fromIntZeroExtend(memPtr)), Extent.fromIntZeroExtend(size));
+		Unsafe.clear(start.add(Offset.fromIntZeroExtend(memPtr)), Extent.fromIntSignExtend(size));
 	}
 
 	public void copy(int srcMemPtr, int destMemPtr, int size) {
@@ -735,7 +735,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			// this < other
 			return -1;
 		}
-		if (this.start.GT(other.end)) {
+		if (this.start.GE(other.end)) {
 			// this > other
 			return 1;
 		}
@@ -756,7 +756,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			// this < address
 			return -1;
 		}
-		if (this.start.GT(addr)) {
+		if (this.start.GE(addr)) {
 			// this > other
 			return 1;
 		}
