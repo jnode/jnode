@@ -3,6 +3,8 @@
  */
 package org.jnode.vm.x86.compiler.l1a;
 
+import org.jnode.assembler.x86.Register;
+
 
 /**
  * This class is the base of all virtual stack items.
@@ -100,6 +102,7 @@ abstract class Item {
 	 * Return the current item's computational type category
 	 * (JVM Spec, p. 83). In practice, this is the number of
 	 * double words needed by the item (1 or 2)
+         *
 	 * @return computational type category
 	 */
 	int getCategory() {
@@ -127,6 +130,8 @@ abstract class Item {
 	/**
 	 * Load item into a register / two registers / an FPU register
 	 * depending on its type
+	 *
+	 * @param ec the EmitterContext
 	 */
 	abstract void load(EmitterContext ec);
 	
@@ -227,18 +232,27 @@ abstract class Item {
 	/**
 	 * Push item onto the stack
 	 *
+	 * @param ec the EmitterContext
 	 */
 	abstract void push(EmitterContext ec);
 	
 	/**
 	 * Release the registers associated to this item
 	 *
+	 * @param ec the EmitterContext
 	 */
 	abstract void release(EmitterContext ec);
-	
+
+	/**
+	 * enquire whether the item uses this register
+	 * @param reg
+	 * @return true, when reg is used by this item
+	 */
+	abstract boolean uses(Register reg);
+
 	/**
 	 * @param type
-	 * @return
+	 * @return the internal type value
 	 */
 	 static int SignatureToType(char type) {
 		switch (type) {
@@ -258,7 +272,8 @@ abstract class Item {
 			case 'D' : // Double
 				return DOUBLE;
 			default :
-				throw new IllegalArgumentException("Unknown type");
+				throw new IllegalArgumentException("Unknown type"+type);
 		}
 	}
+
 }

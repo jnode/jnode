@@ -32,7 +32,7 @@ final class EmitterContext {
 
 	/**
 	 * Return the current emitter's stream
-	 * @return
+	 * @return the current emitter's stream
 	 */
 	AbstractX86Stream getStream() {
 		return os;
@@ -41,7 +41,7 @@ final class EmitterContext {
 	/**
 	 * return the current emitter's helper
 	 * 
-	 * @return
+	 * @return the current compiler helper object
 	 */
 	X86CompilerHelper getHelper() {
 		return helper;
@@ -50,7 +50,7 @@ final class EmitterContext {
 	/**
 	 * return the current emitter's register pool
 	 * 
-	 * @return
+	 * @return the current emitter's register pool
 	 */
 	X86RegisterPool getPool() {
 		return pool;

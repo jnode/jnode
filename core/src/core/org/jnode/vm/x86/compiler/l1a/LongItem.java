@@ -125,8 +125,8 @@ final class LongItem extends Item  implements X86CompilerConstants {
 		if (kind != REGISTER) {
 			X86RegisterPool pool = ec.getPool();
 			
-			final Register l = (Register)pool.request(INT);
-			final Register r = (Register)pool.request(INT);
+			final Register l = (Register)pool.request(INT, this);
+			final Register r = (Register)pool.request(INT, this);
 	
 			loadTo(ec, l, r);
 		}
@@ -208,6 +208,13 @@ final class LongItem extends Item  implements X86CompilerConstants {
 				// nothing to do
 				break;
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
+	 */
+	boolean uses(Register reg) {
+		return ((kind == REGISTER) && (msb.equals(reg) || lsb.equals(reg)));
 	}
 
 	static LongItem createStack() {

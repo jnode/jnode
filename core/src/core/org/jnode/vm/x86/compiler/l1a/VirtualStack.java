@@ -61,10 +61,11 @@ final class VirtualStack {
 	}
 
 	/**
-	 * Pop top item from stack, check its type also.
+	 * Pop top item from stack, check its type also. If none
+         * is present, create a new stack item with the given type
 	 * 
 	 * @param type
-	 * @return
+	 * @return pop the top of stack item
 	 * @exception VerifyError if the type does not correspond
 	 */
 	Item popItem(int type) {
@@ -140,24 +141,6 @@ final class VirtualStack {
 			item.push(ec);
 			i++;
 		}
-	}
-
-	/**
-	 * Allocate register. If not free, then free it (it must be somewhere in the stack!)
-	 * 
-	 * @param context
-	 * @param reg
-	 */
-	 void requestRegister(EmitterContext context, Register reg) {
-	 	final X86RegisterPool pool = context.getPool();
-	 	if (!pool.isFree(reg)) {
-			// TODO Auto-generated method stub
-	 		Item.notImplemented();
-	 	}
-	 	if (!pool.request(reg)) {
-	 		Item.notImplemented();
-	 	}
-	 	
 	}
 
 }

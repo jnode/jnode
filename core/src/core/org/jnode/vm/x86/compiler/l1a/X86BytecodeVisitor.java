@@ -146,6 +146,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         helper.reset();
         startOfBB = true;
         this.vstack = new VirtualStack();
+        eContext.getPool().reset(os);
     }
 
     /**
@@ -175,7 +176,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * The started basic block has finished.
      */
     public void endBasicBlock() {
-        //TODO: flush vstack
+        vstack.push(eContext);
         if (log) {
             os.log("End of basic block");
         }
@@ -201,14 +202,35 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         if (!cond) throw new Error("assert failed");
     }
 
-    //	private void NotImplemented() {
-    //		throw new Error("NotImplemented");
-    //	}
+    	private void notImplemented() {
+    		throw new Error("NotImplemented");
+    	}
 
     private void OpcodeNotImplemented(String name) {
         System.out.println(name + " not implemented");
     }
 
+    /**
+     * reserve a register for an item. The item is not loaded with the register.
+     * The register is spilled if another item holds it.
+     * 
+     * @param reg the register to reserve
+     * @param it the item requiring the register
+     */
+    private void requestRegister(Register reg, Item it) {
+    	X86RegisterPool pool = eContext.getPool();
+    	
+    	// check item doesn't already use register
+    	if (!it.uses(reg)) {
+    		if (!pool.isFree(reg)) {
+    			notImplemented();
+    			//TODO: spill register; make sure that the stack items 
+    			// and floating items are handled correctly
+    		}
+    		pool.request(reg, it);
+    	}
+    }
+    
     private void PrepareForOperation(Item destAndSource, Item source) {
         // WARNING: source was on top of the virtual stack (thus higher than
         // destAndSource)
@@ -357,12 +379,12 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_areturn()
      */
     public final void visit_areturn() {
-        vstack.requestRegister(eContext, EAX);
-        RefItem i = vstack.popRef();
-        i.loadTo(eContext, EAX);
-
-        //		helper.writePOP(T0);
-        visit_return();
+    	RefItem i = vstack.popRef();
+    	requestRegister(EAX, i);
+    	i.loadTo(eContext, EAX);
+    	
+    	//		helper.writePOP(T0);
+    	visit_return();
     }
 
     /**
@@ -407,8 +429,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_athrow()
      */
     public final void visit_athrow() {
-        vstack.requestRegister(eContext, EAX);
         RefItem ref = vstack.popRef();
+		requestRegister(EAX, ref);
         ref.loadTo(eContext, EAX);
 
         //		helper.writePOP(T0); // Exception
@@ -1569,7 +1591,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             os.writeADD(v1.getRegister(), v2.getRegister());
             break;
         case Item.LOCAL:
-            os.writeADD(v1.getRegister(), v2.getOffsetToFP(), FP);
+            os.writeADD(v1.getRegister(), FP, v2.getOffsetToFP());
             break;
         case Item.CONSTANT:
             //IMPROVE: implement ADD(reg, imm32)
@@ -1987,6 +2009,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     }
 
     private void pushReturnValue(String signature) {
+	os.log("return from: "+signature);
         char t = signature.charAt(signature.length() - 1);
         if (t != 'V') {
             int type = Item.SignatureToType(t);
@@ -2271,8 +2294,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ireturn()
      */
     public final void visit_ireturn() {
-        vstack.requestRegister(eContext, EAX);
         IntItem v = vstack.popInt();
+		requestRegister(EAX, v);
         v.loadTo(eContext, EAX);
 
         //		helper.writePOP(T0);
@@ -2283,8 +2306,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ishl()
      */
     public final void visit_ishl() {
-        vstack.requestRegister(eContext, ECX);
         IntItem shift = vstack.popInt();
+		requestRegister(ECX, shift);
         IntItem value = vstack.popInt();
 
         shift.loadToIf(eContext, ~Item.CONSTANT, ECX);
@@ -2310,8 +2333,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ishr()
      */
     public final void visit_ishr() {
-        vstack.requestRegister(eContext, ECX);
         IntItem shift = vstack.popInt();
+		requestRegister(ECX, shift);
         IntItem value = vstack.popInt();
 
         shift.loadToIf(eContext, ~Item.CONSTANT, ECX);
@@ -2345,7 +2368,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         if (i.getKind() == Item.CONSTANT) {
             //TODO: check whether constant is different from NULL (loaded with
             // ldc)
-            os.writeMOV_Const(FP, disp, 0);
+            os.writeMOV_Const(FP, disp, i.getValue());
         } else {
             os.writeMOV(INTSIZE, FP, disp, i.getRegister());
             i.release(eContext);
@@ -2391,8 +2414,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iushr()
      */
     public final void visit_iushr() {
-        vstack.requestRegister(eContext, ECX);
         IntItem shift = vstack.popInt();
+		requestRegister(ECX, shift);
         IntItem value = vstack.popInt();
 
         shift.loadToIf(eContext, ~Item.CONSTANT, ECX);

@@ -4,6 +4,7 @@
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
+import org.jnode.assembler.x86.Register;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
@@ -92,6 +93,13 @@ final class FloatItem extends Item implements X86CompilerConstants  {
 				notImplemented();
 				break;
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
+	 */
+	boolean uses(Register reg) {
+		return false;
 	}
 
 	static FloatItem createStack() {
