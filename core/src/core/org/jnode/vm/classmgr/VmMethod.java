@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.vm.classmgr;
 
 import java.lang.reflect.Constructor;
@@ -47,12 +47,6 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
     /** Resolved return type of this method */
     private VmType returnType;
 
-    /** Does this method return void? */
-    private final boolean returnVoid;
-
-    /** Does this method return an object? */
-    private final boolean returnObject;
-
     /** java.lang.reflect.Method for this method */
     private Member javaMember;
 
@@ -80,8 +74,6 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
     /** The index in the statics table */
     private final int staticsIndex;
 
-    private int lastInvocationCount;
-
     /** The mangled name of this method */
     private String mangledName;
 
@@ -98,14 +90,11 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
         super(
                 name,
                 signature,
-                modifiers /* | (declaringClass.isFinal() ? Modifier.ACC_FINAL : 0) */,
+                modifiers | (returnsObject(signature) ? Modifier.ACC_OBJECTREF : 0),
                 declaringClass);
-        this.argSlotCount = Signature.getArgSlotCount(declaringClass.getLoader().getArchitecture().getTypeSizeInfo(), signature)
+        this.argSlotCount = Signature.getArgSlotCount(declaringClass
+                .getLoader().getArchitecture().getTypeSizeInfo(), signature)
                 + (isStatic() ? 0 : 1);
-        this.returnVoid = (signature.endsWith("V"));
-        char firstReturnSignatureChar = signature
-                .charAt(signature.indexOf(')') + 1);
-        this.returnObject = (firstReturnSignatureChar == '[' || firstReturnSignatureChar == 'L');
         final VmClassLoader cl = declaringClass.getLoader();
         if (isStatic()) {
             this.selector = 0;
@@ -113,6 +102,12 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
             this.selector = cl.getSelectorMap().get(name, signature);
         }
         this.staticsIndex = cl.getStatics().allocMethodCode();
+    }
+    
+    private static final boolean returnsObject(String signature) {
+        final char firstReturnSignatureChar = signature.charAt(signature
+                .indexOf(')') + 1);
+        return (firstReturnSignatureChar == '[' || firstReturnSignatureChar == 'L');        
     }
 
     /**
@@ -124,8 +119,6 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
     protected VmMethod(VmMethod src) {
         super(src.name, src.signature, src.getModifiers(), src.declaringClass);
         this.argSlotCount = src.argSlotCount;
-        this.returnVoid = src.returnVoid;
-        this.returnObject = src.returnObject;
         this.selector = src.selector;
         this.staticsIndex = src.staticsIndex;
     }
@@ -184,8 +177,8 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
     }
 
     /**
-     * Gets myself as java.lang.reflect.Method or
-     * java.lang.reflect.Constructor, depending on isConstructor().
+     * Gets myself as java.lang.reflect.Method or java.lang.reflect.Constructor,
+     * depending on isConstructor().
      * 
      * @return Method
      */
@@ -230,15 +223,17 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
         doCompile(nativeCodeOptLevel + 1);
         invocationCount = 0;
     }
-    
+
     /**
      * Recompile a method declaring in the type given by its statics table index
-     * and the index of the method within the type. 
+     * and the index of the method within the type.
+     * 
      * @param typeStaticsIndex
      * @param methodIndex
      */
     static final void recompileMethod(int typeStaticsIndex, int methodIndex) {
-        final VmType type = Vm.getVm().getStatics().getTypeEntry(typeStaticsIndex);
+        final VmType type = Vm.getVm().getStatics().getTypeEntry(
+                typeStaticsIndex);
         type.initialize();
         final VmMethod method = type.getDeclaredMethod(methodIndex);
         method.recompile();
@@ -251,10 +246,12 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      *            The optimization level
      */
     private synchronized void doCompile(int optLevel) {
-        if (!declaringClass.isPrepared()) { throw new IllegalStateException(
-                "Declaring class must have been prepared"); }
+        if (!declaringClass.isPrepared()) {
+            throw new IllegalStateException(
+                    "Declaring class must have been prepared");
+        }
         declaringClass.getLoader().compileRuntime(this, optLevel, false);
-        //setModifier(true, Modifier.ACC_COMPILED);
+        // setModifier(true, Modifier.ACC_COMPILED);
     }
 
     public final boolean isAbstract() {
@@ -302,9 +299,9 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
                         .getLoader());
                 returnType = sig.getReturnType();
                 int count = sig.getParamCount();
-                paramTypes = new VmType[ count];
+                paramTypes = new VmType[count];
                 for (int i = 0; i < count; i++) {
-                    paramTypes[ i] = sig.getParamType(i);
+                    paramTypes[i] = sig.getParamType(i);
                 }
             } catch (ClassNotFoundException ex) {
                 throw (Error) new NoClassDefFoundError("In method "
@@ -320,7 +317,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
 
     public VmType getArgumentType(int index) {
         resolveTypes();
-        return paramTypes[ index];
+        return paramTypes[index];
     }
 
     /**
@@ -332,9 +329,13 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
     protected boolean matchArgumentTypes(VmType[] argTypes) {
         resolveTypes();
         int argTypesLength = (argTypes == null) ? 0 : argTypes.length;
-        if (paramTypes.length != argTypesLength) { return false; }
+        if (paramTypes.length != argTypesLength) {
+            return false;
+        }
         for (int i = 0; i < argTypesLength; i++) {
-            if (argTypes[ i] != paramTypes[ i]) { return false; }
+            if (argTypes[i] != paramTypes[i]) {
+                return false;
+            }
         }
         return true;
     }
@@ -352,8 +353,8 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      * 
      * @return boolean
      */
-    public boolean isReturnVoid() {
-        return returnVoid;
+    public final boolean isReturnVoid() {
+        return (signature.endsWith("V"));
     }
 
     /**
@@ -366,10 +367,12 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
     }
 
     /**
+     * Does this method return an object reference.
+     * 
      * @return boolean
      */
-    public boolean isReturnObject() {
-        return returnObject;
+    public final boolean isReturnObject() {
+        return ((this.getModifiers() & Modifier.ACC_OBJECTREF) != 0);
     }
 
     /**
@@ -448,13 +451,15 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      *            The optimization level of the generated code.
      */
     public final void addCompiledCode(VmCompiledCode code, int optLevel) {
-        if ((this.nativeCode != null) && (optLevel <= nativeCodeOptLevel)) { throw new RuntimeException(
-                "Cannot set code twice"); }
+        if ((this.nativeCode != null) && (optLevel <= nativeCodeOptLevel)) {
+            throw new RuntimeException("Cannot set code twice");
+        }
         code.setNext(this.compiledCode);
         this.compiledCode = code;
         this.nativeCode = code.getNativeCode();
         this.compiledCode = code;
-        Vm.getVm().getStatics().setMethodCode(getStaticsIndex(), code.getNativeCode());
+        Vm.getVm().getStatics().setMethodCode(getStaticsIndex(),
+                code.getNativeCode());
         this.nativeCodeOptLevel = optLevel;
     }
 
@@ -468,8 +473,8 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
     }
 
     /**
-     * Gets the number of stack slots used by the arguments of this method.
-     * This number included the slot for "this" on non-static fields.
+     * Gets the number of stack slots used by the arguments of this method. This
+     * number included the slot for "this" on non-static fields.
      * 
      * @return int
      */
@@ -495,7 +500,6 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
 
     /**
      * Mark this method as uninterruptable.
-     *  
      */
     final void setUninterruptible() {
         this.threadSwitchIndicatorMask = 0;
@@ -520,20 +524,6 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
         return this.staticsIndex;
     }
 
-    /**
-     * @return Returns the lastInvocationCount.
-     */
-    public final int getLastInvocationCount() {
-        return this.lastInvocationCount;
-    }
-
-    /**
-     * Set the last invocation count to the current invocation count.
-     */
-    public final void setLastInvocationCount() {
-        this.lastInvocationCount = invocationCount;
-    }
-
     public boolean hasNativeCode() {
         if (nativeCode == null) {
             return false;
@@ -543,7 +533,9 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
     }
 
     public void testNativeCode() {
-        if (declaringClass.isInterface()) { return; }
+        if (declaringClass.isInterface()) {
+            return;
+        }
         if (nativeCode == null) {
             System.err.println("nativeCode == null in " + this);
         } else {
@@ -561,10 +553,11 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
     public void verifyBeforeEmit() {
         super.verifyBeforeEmit();
         if (nativeCode == null) {
-            if (!declaringClass.isInterface()) { throw new RuntimeException(
-                    "nativeCode of " + this
-                            + " is null; declaringclass compiled? "
-                            + getDeclaringClass().isCompiled()); }
+            if (!declaringClass.isInterface()) {
+                throw new RuntimeException("nativeCode of " + this
+                        + " is null; declaringclass compiled? "
+                        + getDeclaringClass().isCompiled());
+            }
         }
     }
 }
