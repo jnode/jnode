@@ -107,7 +107,7 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
               outputStream = System.out;
             }
 
-            cr = new CommandRunner(cmdInfo.getCommandClass(), method, new Object[]{cmdLine,inputStream,outputStream,errStream});
+            cr = new CommandRunner(cmdInfo.getCommandClass(), method, new Object[]{cmdLine.getRemainder(),inputStream,outputStream,errStream});
           }
           catch (Exception e)
           {
