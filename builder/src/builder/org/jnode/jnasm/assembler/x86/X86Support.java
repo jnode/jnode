@@ -10,6 +10,7 @@ import org.jnode.jnasm.assembler.Assembler;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;
+import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.vm.x86.X86CpuID;
@@ -115,5 +116,9 @@ public class X86Support extends HardwareSupport {
         } else {
             throw new IllegalArgumentException("Unknown operand size: " + size);
         }
+    }
+
+    public boolean isRegister(String str) {
+        return X86Register.isGPR(str);
     }
 }

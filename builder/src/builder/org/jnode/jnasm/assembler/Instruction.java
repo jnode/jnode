@@ -37,6 +37,10 @@ public class Instruction {
         return operands;
     }
 
+    public void setOperands(List operands) {
+        this.operands = operands;
+    }
+
     public String getLabel(){
         return label;
     }
