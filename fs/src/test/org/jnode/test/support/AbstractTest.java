@@ -30,19 +30,21 @@ import org.apache.log4j.Logger;
  * @author Fabien DUMINY
  */
 public abstract class AbstractTest extends TestCase {
-	public AbstractTest()
+	public AbstractTest(Class configClazz)
     {
         super();
         ConfigManager.initLog4j();
+        this.configClazz = configClazz;
     }
 
     /**
 	 * 
 	 */
-	protected AbstractTest(String name)
+	protected AbstractTest(Class configClazz, String name)
 	{
         super(name);
         ConfigManager.initLog4j();
+        this.configClazz = configClazz;
 	}
 	
 	/**
@@ -85,7 +87,7 @@ public abstract class AbstractTest extends TestCase {
 	{
         if(testConfig == null)
         {
-            testConfig = ConfigManager.getInstance().getConfig(getClass(), getName());
+            testConfig = ConfigManager.getInstance().getConfig(configClazz, getClass(), getName());
         }
         
 		return testConfig;
@@ -113,6 +115,7 @@ public abstract class AbstractTest extends TestCase {
     }
     
     private TestConfig testConfig;
+    private Class configClazz;
 	    
 	protected final Logger log = Logger.getLogger(getTestName());	
 }
