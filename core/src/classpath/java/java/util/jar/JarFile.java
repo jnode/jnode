@@ -1,5 +1,5 @@
 /* JarFile.java - Representation of a jar file
-   Copyright (C) 2000 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2003, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,15 +37,14 @@ exception statement from your version. */
 
 package java.util.jar;
 
-import java.util.zip.RandomAccessBuffer;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.IOException;
-import java.util.Enumeration;
 
 /**
  * Representation of a jar file.
@@ -59,7 +58,8 @@ import java.util.Enumeration;
  * @since 1.2
  * @author Mark Wielaard (mark@klomp.org)
  */
-public class JarFile extends ZipFile {
+public class JarFile extends ZipFile
+{
 	// Fields
 
 	/** The name of the manifest entry: META-INF/MANIFEST.MF */
@@ -71,10 +71,10 @@ public class JarFile extends ZipFile {
 	 */
 	private Manifest manifest;
 
-	/** Wether to verify the manifest and all entries. */
+  /** Whether to verify the manifest and all entries. */
 	private boolean verify;
 
-	/** Wether the has already been loaded. */
+  /** Whether the has already been loaded. */
 	private boolean manifestRead = false;
 
 	// Constructors
@@ -88,7 +88,8 @@ public class JarFile extends ZipFile {
 	 * @exception FileNotFoundException if the fileName cannot be found
 	 * @exception IOException if another IO exception occurs while reading
 	 */
-	public JarFile(String fileName) throws FileNotFoundException, IOException {
+  public JarFile(String fileName) throws FileNotFoundException, IOException
+  {
 		this(fileName, true);
 	}
 
@@ -104,9 +105,15 @@ public class JarFile extends ZipFile {
 	 * @exception FileNotFoundException if the fileName cannot be found
 	 * @exception IOException if another IO exception occurs while reading
 	 */
-	public JarFile(String fileName, boolean verify)
-		throws FileNotFoundException, IOException {
+  public JarFile(String fileName, boolean verify) throws
+    FileNotFoundException, IOException
+  {
 		super(fileName);
+    if (verify)
+      {
+	manifest = readManifest();
+	verify();
+	}
 	}
 
 	/**
@@ -118,34 +125,9 @@ public class JarFile extends ZipFile {
 	 * @exception FileNotFoundException if the file does not exits
 	 * @exception IOException if another IO exception occurs while reading
 	 */
-	public JarFile(File file) throws FileNotFoundException, IOException {
-		this(file, true);
-	}
-
-	/**
-	 * Creates a new JarFile. All jar entries are verified (when a Manifest file
-	 * for this JarFile exists). You need to actually open and read the complete
-	 * jar entry (with <code>getInputStream()</code>) to check its signature.
-	 *
-	 * @param file the file to open as a jar file
-	 * @exception FileNotFoundException if the file does not exits
-	 * @exception IOException if another IO exception occurs while reading
-	 */
-	public JarFile(RandomAccessBuffer raf, String name) throws IOException {
-		super(raf, name);
-	}
-
-	/**
-	 * Creates a new JarFile. All jar entries are verified (when a Manifest file
-	 * for this JarFile exists). You need to actually open and read the complete
-	 * jar entry (with <code>getInputStream()</code>) to check its signature.
-	 *
-	 * @param file the file to open as a jar file
-	 * @exception FileNotFoundException if the file does not exits
-	 * @exception IOException if another IO exception occurs while reading
-	 */
-	public JarFile(byte[] data) throws IOException {
-		super(data);
+  public JarFile(File file) throws FileNotFoundException, IOException
+  {
+    this(file, true);
 	}
 
 	/**
@@ -160,9 +142,15 @@ public class JarFile extends ZipFile {
 	 * @exception FileNotFoundException if file does not exist
 	 * @exception IOException if another IO exception occurs while reading
 	 */
-	public JarFile(File file, boolean verify)
-		throws FileNotFoundException, IOException {
+  public JarFile(File file, boolean verify) throws FileNotFoundException,
+    IOException
+  {
 		super(file);
+    if (verify)
+      {
+	manifest = readManifest();
+	verify();
+      }
 	}
 
 	/**
@@ -183,9 +171,15 @@ public class JarFile extends ZipFile {
 	 * 
 	 * @since 1.3
 	 */
-	public JarFile(File file, boolean verify, int mode)
-		throws FileNotFoundException, IOException, IllegalArgumentException {
+  public JarFile(File file, boolean verify, int mode) throws
+    FileNotFoundException, IOException, IllegalArgumentException
+  {
 		super(file, mode);
+    if (verify)
+      {
+	manifest = readManifest();
+	verify();
+      }
 	}
 
 	// Methods
@@ -193,9 +187,11 @@ public class JarFile extends ZipFile {
 	/**
 	 * XXX - should verify the manifest file
 	 */
-	private void verify() {
+  private void verify()
+  {
 		// only check if manifest is not null
-		if (manifest == null) {
+    if (manifest == null)
+      {
 			verify = false;
 			return;
 		}
@@ -207,16 +203,26 @@ public class JarFile extends ZipFile {
 	/**
 	 * Parses and returns the manifest if it exists, otherwise returns null.
 	 */
-	private Manifest readManifest() {
-		try {
+  private Manifest readManifest()
+  {
+    try
+      {
 			ZipEntry manEntry = super.getEntry(MANIFEST_NAME);
-			if (manEntry != null) {
+	if (manEntry != null)
+	  {
 				InputStream in = super.getInputStream(manEntry);
+	    manifestRead = true;
 				return new Manifest(in);
-			} else {
+	  }
+	else
+	  {
+	    manifestRead = true;
 				return null;
 			}
-		} catch (IOException ioe) {
+      }
+    catch (IOException ioe)
+      {
+	manifestRead = true;
 			return null;
 		}
 	}
@@ -227,7 +233,8 @@ public class JarFile extends ZipFile {
 	 *
 	 * @exception IllegalStateException when the JarFile is already closed
 	 */
-	public Enumeration entries() throws IllegalStateException {
+  public Enumeration entries() throws IllegalStateException
+  {
 		return new JarEnumeration(super.entries());
 	}
 
@@ -236,29 +243,37 @@ public class JarFile extends ZipFile {
 	 * JarEntry is created and the corresponding Attributes are looked up.
 	 * XXX - Should also look up the certificates.
 	 */
-	private class JarEnumeration implements Enumeration {
+  private class JarEnumeration implements Enumeration
+  {
 
 		private final Enumeration entries;
 
-		JarEnumeration(Enumeration e) {
+    JarEnumeration(Enumeration e)
+    {
 			entries = e;
 		}
 
-		public boolean hasMoreElements() {
+    public boolean hasMoreElements()
+    {
 			return entries.hasMoreElements();
 		}
 
-		public Object nextElement() {
-			ZipEntry zip = (ZipEntry)entries.nextElement();
+    public Object nextElement()
+    {
+      ZipEntry zip = (ZipEntry) entries.nextElement();
 			JarEntry jar = new JarEntry(zip);
 			Manifest manifest;
-			try {
+      try
+	{
 				manifest = getManifest();
-			} catch (IOException ioe) {
+	}
+      catch (IOException ioe)
+	{
 				manifest = null;
 			}
 
-			if (manifest != null) {
+      if (manifest != null)
+	{
 				jar.attr = manifest.getAttributes(jar.getName());
 			}
 			// XXX jar.certs
@@ -271,18 +286,24 @@ public class JarFile extends ZipFile {
 	 * It actually returns a JarEntry not a zipEntry
 	 * @param name XXX
 	 */
-	public ZipEntry getEntry(String name) {
+  public ZipEntry getEntry(String name)
+  {
 		ZipEntry entry = super.getEntry(name);
-		if (entry != null) {
+    if (entry != null)
+      {
 			JarEntry jarEntry = new JarEntry(entry);
 			Manifest manifest;
-			try {
+	try
+	  {
 				manifest = getManifest();
-			} catch (IOException ioe) {
+	  }
+	catch (IOException ioe)
+	  {
 				manifest = null;
 			}
 
-			if (manifest != null) {
+	if (manifest != null)
+	  {
 				jarEntry.attr = manifest.getAttributes(name);
 				// XXX jarEntry.certs
 			}
@@ -297,8 +318,9 @@ public class JarFile extends ZipFile {
 	 * @exception ZipException XXX
 	 * @exception IOException XXX
 	 */
-	public synchronized InputStream getInputStream(ZipEntry entry)
-		throws ZipException, IOException {
+  public synchronized InputStream getInputStream(ZipEntry entry) throws
+    ZipException, IOException
+  {
 		return super.getInputStream(entry); // XXX verify
 	}
 
@@ -311,15 +333,17 @@ public class JarFile extends ZipFile {
 	 * @param name the jar entry name to look up
 	 * @return the JarEntry if it exists, null otherwise
 	 */
-	public JarEntry getJarEntry(String name) {
-		return (JarEntry)getEntry(name);
+  public JarEntry getJarEntry(String name)
+  {
+    return (JarEntry) getEntry(name);
 	}
 
 	/**
 	 * Returns the manifest for this JarFile or null when the JarFile does not
 	 * contain a manifest file.
 	 */
-	public Manifest getManifest() throws IOException {
+  public Manifest getManifest() throws IOException
+  {
 		if (!manifestRead)
 			manifest = readManifest();
 
