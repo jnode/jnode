@@ -61,6 +61,28 @@ CR4_OSFXSR		equ 1 << 9	; Operating system FXSAVE/FXRSTOR support
 CR4_OSXMMEXCPT	equ 1 << 10	; Operating system unmasked exception support
 
 ; ------------------
+; MXCSR flags
+; SSE control flags
+; ------------------
+
+MXCSR_IE		equ 1 << 0	; Invalid operation exception
+MXCSR_DE		equ 1 << 1	; Denormalized operand exception
+MXCSR_ZE		equ 1 << 2	; Zero-divide exception
+MXCSR_OE		equ 1 << 3	; Overflow exception
+MXCSR_UE		equ 1 << 4	; Underflow exception
+MXCSR_PE		equ 1 << 5	; Precision exception
+MXCSR_DAZ		equ 1 << 6	; Denormals all zero's
+MXCSR_IM		equ 1 << 7	; Invalid operation exception mask
+MXCSR_DM		equ 1 << 8	; Denormalized operand exception mask
+MXCSR_ZM		equ 1 << 9	; Zero-divide exception mask
+MXCSR_OM		equ 1 << 10	; Overflow exception mask
+MXCSR_UM		equ 1 << 11	; Underflow exception mask
+MXCSR_PM		equ 1 << 12	; Precision exception mask
+MXCSR_RC1		equ 1 << 13	; Floating point rounding control bit 1
+MXCSR_RC2		equ 1 << 14	; Floating point rounding control bit 2
+MXCSR_FZ		equ 1 << 15	; Flush to zero for masked underflow
+
+; ------------------
 ; Page flags
 ; ------------------
 

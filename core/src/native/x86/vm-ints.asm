@@ -89,6 +89,13 @@ yieldPointHandler_reschedule:
 	
 	; Save FPU / XMM state
 yieldPointHandler_fxSave:
+	; Is the FX used since the last thread switch?
+	test dword [edi+VmX86Thread_FXFLAGS_OFFSET*4],VmX86Thread_FXF_USED
+	jz yieldPointHandler_restore	; No... do not save anything
+	; Clear FXF_USED flag
+	and dword [edi+VmX86Thread_FXFLAGS_OFFSET*4],~VmX86Thread_FXF_USED
+	; Load fxStatePtr	
+yieldPointHandler_loadFxStatePtr:
 	mov ebx, [edi+VmX86Thread_FXSTATEPTR_OFFSET*4]
 	test ebx,ebx
 	jz yieldPointHandler_fxSaveInit
@@ -103,7 +110,7 @@ yieldPointHandler_fpuSave:
 
 yieldPointHandler_fxSaveInit:
 	call fixFxStatePtr
-	jmp yieldPointHandler_fxSave
+	jmp yieldPointHandler_loadFxStatePtr
 
 	; Restore the next thread
 yieldPointHandler_restore:
@@ -119,16 +126,11 @@ yieldPointHandler_restore:
 	RESTOREREG VmX86Thread_EIP_OFFSET, OLD_EIP
 	RESTOREREG VmX86Thread_EFLAGS_OFFSET, OLD_EFLAGS
 	
-	; Restore FPU / XMM state
-	mov ebx, [edi+VmX86Thread_FXSTATEPTR_OFFSET*4]
-	test ebx,ebx
-	jz yieldPointHandler_fixStackOverflow		; No valid fxStatePtr yet, do not restore
-	test dword [cpu_features],FEAT_FXSR
-	jz yieldPointHandler_fpuRestore
-	fxrstor [ebx]
-	jmp yieldPointHandler_fixOldStackOverflow
-yieldPointHandler_fpuRestore:
-	frstor [ebx]
+	; Restore FPU / XMM state is delayed until actual use
+	; We do set the CR0.TS flag.
+	mov eax,cr0
+	or eax,CR0_TS
+	mov cr0,eax
 	
 	; Fix old stack overflows
 yieldPointHandler_fixOldStackOverflow:
@@ -168,6 +170,33 @@ fixFxStatePtr:
 	mov [edi+VmX86Thread_FXSTATEPTR_OFFSET*4],ebx
 	ret	
 	
+; -----------------------------------------------
+; Device not available
+; An FPU / MMX / SSE instruction is executed
+; while CR0.TS is active.
+; Restore the fx state of the current thread
+; and clear CR0.TS
+; -----------------------------------------------
+int_dev_na:
+	mov edi,CURRENTTHREAD
+	; Mark FX as being used since last thread switch
+	or dword [edi+VmX86Thread_FXFLAGS_OFFSET*4],VmX86Thread_FXF_USED;
+	; Clear CR0.TS
+	clts
+	; Restore fx state (if any)
+	mov ebx, [edi+VmX86Thread_FXSTATEPTR_OFFSET*4]
+	test ebx,ebx
+	jz int_dev_na_ret		; No valid fxStatePtr yet, do not restore
+	test dword [cpu_features],FEAT_FXSR
+	jz int_dev_na_fpuRestore
+	fxrstor [ebx]
+	ret
+int_dev_na_fpuRestore:
+	frstor [ebx]
+int_dev_na_ret:
+	ret
+
+
 ; -----------------------------------------------
 ; Handle a timer interrupt
 ; -----------------------------------------------
