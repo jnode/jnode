@@ -3,7 +3,6 @@
  */
 package org.jnode.vm.x86.compiler.l1a;
 
-import org.jnode.assembler.x86.Register;
 
 /**
  * @author Patrik Reali
