@@ -337,7 +337,6 @@
 			<fileset dir="${root.dir}/net/src/driver" includes="**/*.java"/>
 			<fileset dir="${root.dir}/net/src/test" includes="**/*.java"/>
 			<fileset dir="${root.dir}/shell/src/shell" includes="**/*.java"/>
-			<fileset dir="${root.dir}/textui/src/textui" includes="**/*.java"/>
 		</header>
 	</target>
 
