@@ -165,7 +165,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @param context
      */
     public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
-            boolean isBootstrap, X86CompilerContext context, MagicHelper magicHelper) {
+            boolean isBootstrap, X86CompilerContext context, MagicHelper magicHelper, int slotSize) {
         this.os = (X86Assembler) outputStream;
         this.context = context;
         this.magicHelper = magicHelper;
@@ -175,7 +175,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         this.helper = new X86CompilerHelper(os, vstack.createStackMgr(pool, ifac),
                 context, isBootstrap);
         this.cm = cm;
-        this.slotSize = VmX86Architecture.SLOT_SIZE;
+        this.slotSize = slotSize;
         this.arrayLengthOffset = VmArray.LENGTH_OFFSET * slotSize;
         this.arrayDataOffset = VmArray.DATA_OFFSET * slotSize;
         this.tibOffset = ObjectLayout.TIB_SLOT * slotSize;

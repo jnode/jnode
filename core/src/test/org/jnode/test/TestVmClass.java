@@ -31,7 +31,7 @@ import org.jnode.util.NumberUtils;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.x86.VmX86Architecture;
+import org.jnode.vm.x86.VmX86Architecture32;
 
 /**
  * <description>
@@ -47,7 +47,7 @@ public class TestVmClass extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		VmSystemClassLoader bib = new VmSystemClassLoader(new URL("file:///" + System.getProperty("classes.dir") + "/"), new VmX86Architecture());
+		VmSystemClassLoader bib = new VmSystemClassLoader(new URL("file:///" + System.getProperty("classes.dir") + "/"), new VmX86Architecture32());
 		VmType.initializeForBootImage(bib);
 		clc = bib;
 	}

@@ -21,31 +21,26 @@
  
 package org.jnode.vm.compiler.ir;
 
-import org.jnode.vm.x86.X86CpuID;
-import org.jnode.vm.x86.VmX86Architecture;
-import org.jnode.vm.x86.compiler.l2.X86CodeGenerator;
-import org.jnode.vm.classmgr.VmByteCode;
-import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.classmgr.VmMethod;
-import org.jnode.vm.bytecode.BytecodeParser;
-import org.jnode.vm.bytecode.BytecodeViewer;
-import org.jnode.vm.compiler.ir.quad.Quad;
-import org.jnode.vm.VmSystemClassLoader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
+
+import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86TextAssembler;
-import org.jnode.assembler.x86.X86Assembler;
-import org.jnode.util.BootableArrayList;
-import org.jnode.util.BootableHashMap;
-
-import java.io.IOException;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.File;
-import java.io.ByteArrayOutputStream;
-import java.net.MalformedURLException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Arrays;
+import org.jnode.vm.VmSystemClassLoader;
+import org.jnode.vm.bytecode.BytecodeParser;
+import org.jnode.vm.bytecode.BytecodeViewer;
+import org.jnode.vm.classmgr.VmByteCode;
+import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.compiler.ir.quad.Quad;
+import org.jnode.vm.x86.VmX86Architecture32;
+import org.jnode.vm.x86.X86CpuID;
+import org.jnode.vm.x86.compiler.l2.X86CodeGenerator;
 
 /**
  * @author Levente S?ntha
@@ -223,7 +218,7 @@ public class NativeTest {
 
         private static VmByteCode loadByteCode(String className)
             throws MalformedURLException, ClassNotFoundException {
-            VmSystemClassLoader vmc = new VmSystemClassLoader(new File(".").toURL(), new VmX86Architecture());
+            VmSystemClassLoader vmc = new VmSystemClassLoader(new File(".").toURL(), new VmX86Architecture32());
             VmType type = vmc.loadClass(className, true);
             VmMethod arithMethod = null;
             int nMethods = type.getNoDeclaredMethods();

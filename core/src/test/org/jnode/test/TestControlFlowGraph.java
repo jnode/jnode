@@ -30,7 +30,7 @@ import org.jnode.vm.bytecode.ControlFlowGraph;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.x86.VmX86Architecture;
+import org.jnode.vm.x86.VmX86Architecture32;
 
 /**
  * @author epr
@@ -41,7 +41,7 @@ public class TestControlFlowGraph {
 	throws Exception {
 
 		final String className = (args.length > 0) ? args[0] : "java.lang.Object";
-		final VmSystemClassLoader loader = new VmSystemClassLoader(new File(".").toURL(), new VmX86Architecture());
+		final VmSystemClassLoader loader = new VmSystemClassLoader(new File(".").toURL(), new VmX86Architecture32());
 		final VmType vmClass = loader.loadClass(className, true);
 		
 		for (int i = 0; i < vmClass.getNoDeclaredMethods(); i++) {

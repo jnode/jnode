@@ -168,7 +168,7 @@ go_user_cs:
 	mov ebp,esp
 
 	mov eax,vm_start
-	add eax,BootImageBuilder_JUMP_MAIN_OFFSET
+	add eax,BootImageBuilder_JUMP_MAIN_OFFSET32
 	call eax
 
 	mov edx, eax	; Save return code in EDX
