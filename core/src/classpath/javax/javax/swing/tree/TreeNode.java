@@ -35,13 +35,13 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing.tree;
 
-// Imports
-import java.util.*;
+import java.util.Enumeration;
 
 /**
- * TreeNode interface
+ * TreeNode public interface
  * @author Andrew Selkirk
  */
 public interface TreeNode {
@@ -54,45 +54,45 @@ public interface TreeNode {
 	 * getParent
 	 * @returns TreeNode
 	 */
-	public TreeNode getParent();
+	TreeNode getParent();
 
 	/**
 	 * getIndex
 	 * @param node TODO
 	 * @returns int
 	 */
-	public int getIndex(TreeNode node);
+	int getIndex(TreeNode node);
 
 	/**
 	 * getChildAt
 	 * @param index TODO
 	 * @returns TreeNode
 	 */
-	public TreeNode getChildAt(int index);
+	TreeNode getChildAt(int index);
 
 	/**
 	 * getChildCount
 	 * @returns int
 	 */
-	public int getChildCount();
+	int getChildCount();
 
 	/**
 	 * getAllowsChildren
 	 * @returns boolean
 	 */
-	public abstract boolean getAllowsChildren();
+	boolean getAllowsChildren();
 
 	/**
 	 * isLeaf
 	 * @returns boolean
 	 */
-	public boolean isLeaf();
+	boolean isLeaf();
 
 	/**
 	 * children
 	 * @returns Enumeration
 	 */
-	public Enumeration children();
+	Enumeration children();
 
 
 } // TreeNode

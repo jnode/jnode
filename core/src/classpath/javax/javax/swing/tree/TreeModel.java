@@ -35,13 +35,13 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing.tree;
 
-// Imports
-import javax.swing.event.*;
+import javax.swing.event.TreeModelListener;
 
 /**
- * TreeModel interface
+ * TreeModel public interface
  * @author Andrew Selkirk
  */
 public interface TreeModel {
@@ -54,7 +54,7 @@ public interface TreeModel {
 	 * getRoot
 	 * @returns Object
 	 */
-	public abstract Object getRoot();
+	Object getRoot();
 
 	/**
 	 * getChild
@@ -62,28 +62,28 @@ public interface TreeModel {
 	 * @param index TODO
 	 * @returns Object
 	 */
-	public abstract Object getChild(Object parent, int index);
+	Object getChild(Object parent, int index);
 
 	/**
 	 * getChildCount
 	 * @param parent TODO
 	 * @returns int
 	 */
-	public abstract int getChildCount(Object parent);
+	int getChildCount(Object parent);
 
 	/**
 	 * isLeaf
 	 * @param node TODO
 	 * @returns boolean
 	 */
-	public abstract boolean isLeaf(Object node);
+	boolean isLeaf(Object node);
 
 	/**
 	 * valueForPathChanged
 	 * @param path TODO
 	 * @param newvalue TODO
 	 */
-	public abstract void valueForPathChanged(TreePath path, Object newvalue);
+	void valueForPathChanged(TreePath path, Object newvalue);
 
 	/**
 	 * getIndexOfChild
@@ -91,19 +91,19 @@ public interface TreeModel {
 	 * @param ild TODO
 	 * @returns int
 	 */
-	public abstract int getIndexOfChild(Object parent, Object child);
+	int getIndexOfChild(Object parent, Object child);
 
 	/**
 	 * addTreeModelListener
 	 * @param listener TODO
 	 */
-	public abstract void addTreeModelListener(TreeModelListener listener);
+	void addTreeModelListener(TreeModelListener listener);
 
 	/**
 	 * removeTreeModelListener
 	 * @param listener TODO
 	 */
-	public abstract void removeTreeModelListener(TreeModelListener listener);
+	void removeTreeModelListener(TreeModelListener listener);
 
 
 } // TreeModel

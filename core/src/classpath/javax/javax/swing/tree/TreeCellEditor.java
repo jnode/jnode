@@ -35,14 +35,14 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing.tree;
 
-// Imports
 import java.awt.Component;
 import javax.swing.JTree;
 
 /**
- * TreeCellEditor interface
+ * TreeCellEditor public interface
  * @author Andrew Selkirk
  */
 public interface TreeCellEditor {
@@ -57,7 +57,7 @@ public interface TreeCellEditor {
 	 * @param row TODO
 	 * @returns TODO
 	 */
-	public Component getTreeCellEditorComponent(JTree tree,
+	Component getTreeCellEditorComponent(JTree tree,
 			Object value, boolean isSelected, boolean expanded,
 			boolean leaf, int row);
 
