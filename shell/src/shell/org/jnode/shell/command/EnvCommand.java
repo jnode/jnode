@@ -27,7 +27,9 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.security.AccessController;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
@@ -58,9 +60,11 @@ public class EnvCommand {
 		throws Exception {
 
 	    final Properties ps = (Properties)AccessController.doPrivileged(new GetPropertiesAction());
-		for (Iterator i = ps.keySet().iterator(); i.hasNext(); ) {
-			String key = (String)i.next();
-			String value = ps.getProperty(key);
+	    final TreeMap sortedPs = new TreeMap(ps);
+		for (Iterator i = sortedPs.entrySet().iterator(); i.hasNext(); ) {
+			final Map.Entry entry = (Map.Entry)i.next();
+			final String key = entry.getKey().toString();
+			final String value = entry.getValue().toString();
 
 			out.print(key);
 			out.print('=');
