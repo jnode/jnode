@@ -58,7 +58,7 @@ public class ThreadListState extends DebugState {
      */
     public void fillHelp(Map map) {
         super.fillHelp(map);
-        map.put("n", "Next threads");
+        map.put("n", "Next thread");
         map.put("r", "Reset the list");
     }
 
