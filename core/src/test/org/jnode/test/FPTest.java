@@ -30,13 +30,26 @@ import java.io.PrintStream;
  */
 public class FPTest {
 
-	public static void main(String[] args) {
-		
-		final PrintStream out = System.out;
+	public static void main(String[] args) throws InterruptedException {
 
-		testFloat(out);	
-		testDouble(out);
-		testTan(out);	
+		Runnable r = new Runnable() {
+			public void run() {
+				final PrintStream out = System.out;
+
+				testFloat(out);
+				Thread.yield();
+				testDouble(out);
+				Thread.yield();
+				testTan(out);					
+				Thread.yield();
+			}
+		};
+		Thread t1 = new Thread(r);
+		Thread t2 = new Thread(r);
+		t1.start();
+		t2.start();
+		t1.join();
+		t2.join();
 	}
 	
 	private static void testTan(PrintStream out) {
