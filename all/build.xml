@@ -225,6 +225,7 @@ clean          Remove all intermediate build results.
 	<target name="cd-x86" depends="assemble">
 		<tar destfile="${sources.dist.tar.gz}" compression="gzip" basedir="${root.dir}" excludes="*/build/**" />
 		<x86-build bits="32" target="java-image"/>
+		<x86-build bits="64" target="java-image"/>
 		<ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom" />
 	</target>
 
