@@ -5,8 +5,6 @@
   <property name="my-conf.dir"      value="${basedir}/conf/x86"/>
 
   <property name="src.native.dir"   value="${root.dir}/core/src/native"/>
-  <property name="build.native.dir" value="${my-build.dir}/native"/>
-  <property name="build.bootimage.dir" value="${my-build.dir}/bootimage"/>
   <property name="build.netboot.dir" value="${my-build.dir}/netboot"/>
   <property name="jnode.disk"     value="${my-build.dir}/jnodedisk.dat"/>
   <property name="jnode.disk.pln" value="${my-build.dir}/jnodedisk.pln"/>
@@ -67,9 +65,12 @@
   </target>
 
   <target name="prepare-props" depends="test-properties,load-properties,default-properties">
-    <property name="jnode.kernel"   value="${jnodedrive.dir}/jnodesys.gz"/>
-    <property name="jnode.initjar"  value="${jnodedrive.dir}/jnodeinit.jar"/>
+    <property name="jnode.bits"     value="32"/>
+    <property name="jnode.kernel"   value="${jnodedrive.dir}/jnode${jnode.bits}.gz"/>
     <property name="jnode.compiler"  value="default"/>
+    
+    <property name="build.native.dir" value="${my-build.dir}/${jnode.bits}bits/native"/>
+    <property name="build.bootimage.dir" value="${my-build.dir}/${jnode.bits}bits/bootimage"/>
   </target>
 
 <!-- Initialize all project directories -->
@@ -160,6 +161,7 @@
          destdir="${build.native.dir}/output"
          outputFormat="elf"
          extension="o"
+         bits="${jnode.bits}"
          listfile="${build.native.dir}/jnodenative.lst">
       <includedir dir="${src.native.dir}/x86"/>
       <includedir dir="${build.native.dir}/src"/>
@@ -167,18 +169,7 @@
     </asm>
   </target>
 
-  <target name="shell-usage" depends="prepare">
-    <mkdir dir="${root.dir}/docs/build/website-xml"/>
-    <taskdef name="exportusage" classname="org.jnode.shell.help.ant.ExportUsageTask" classpathref="cp-x86"/>
-    <exportusage destfile="${root.dir}/docs/build/website-xml/shell-commands.xml"
-             pluginList="${full-plugin-list}"
-             pluginDir="${plugins.dir}"
-             targetArch="x86">
-      <classpath refid="cp-x86"/>
-    </exportusage>
-  </target>
-
-<!-- Build the java object file  -->
+  <!-- Build the java object file  -->
   <target name="java-image" depends="asm-native">
     <taskdef name="bootimage" classname="org.jnode.build.x86.BootImageBuilder" classpathref="cp-x86"/>
     <taskdef name="bootjar" classname="org.jnode.build.BootJarBuilder" classpathref="cp-x86"/>
@@ -201,22 +192,25 @@
 	           cpu="${cpu}"
 	           version="${jnode-ver}"
     		   jnodeCompiler="${jnode.compiler}" 	
+    		   bits="${jnode.bits}"
                />
 
     <gzip src="${build.bootimage.dir}/bootimage.bin" zipfile="${jnode.kernel}"/>
   </target>
 
-<!-- Build the boot disk -->
+  <!-- Build the boot disk -->
   <target name="boot-disk" depends="java-image">
     <taskdef name="bootdisk"
              classname="org.jnode.build.BootDiskBuilder"
              classpathref="cp-x86"/>
              
-    <mkdir dir="${my-build.dir}/bootdisk"/>
-    <mkdir dir="${my-build.dir}/bootdisk/boot/grub"/>
-    <copy file="${jnode.kernel}" todir="${my-build.dir}/bootdisk"/>
-    <copy file="${grub.menu}" todir="${my-build.dir}/bootdisk/boot/grub"/>
-    <copy todir="${my-build.dir}/bootdisk">
+    <property name="bootdisk.dir" value="${my-build.dir}/bootdisk"/>
+             
+    <mkdir dir="${bootdisk.dir}"/>
+    <mkdir dir="${bootdisk.dir}/boot/grub"/>
+    <copy file="${jnode.kernel}" todir="${bootdisk.dir}"/>
+    <copy file="${grub.menu}" todir="${bootdisk.dir}/boot/grub"/>
+    <copy todir="${bootdisk.dir}">
       <fileset dir="${initjars.dir}"/>
     </copy>
              
@@ -225,7 +219,7 @@
               stage2ResourceName="${grub.stage2.name}"
               plnfile="${jnode.disk.pln}"
               geometry="${jnode.disk.geometry}">
-      <fileset dir="${my-build.dir}/bootdisk"/>
+      <fileset dir="${bootdisk.dir}"/>
     </bootdisk>
   </target>
 
