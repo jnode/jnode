@@ -5,6 +5,7 @@
 package org.jnode.vm;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Locale;
@@ -33,6 +34,7 @@ import org.jnode.vm.classmgr.VmCompiledExceptionHandler;
 import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmInterpretedExceptionHandler;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.VmWriteBarrier;
 
@@ -62,6 +64,7 @@ public final class VmSystem {
     private static RTCService rtcService;
 
     private static SystemOutputStream bootOut;
+    private static PrintStream bootOutStream;
 
     private static MemoryResource initJar;
 
@@ -79,14 +82,7 @@ public final class VmSystem {
             // Initialize resource manager
             final ResourceManager rm = ResourceManagerImpl.initialize();
 
-            /* Set System.err, System.out */
-            bootOut = new SystemOutputStream();
-            //final ScreenOutputStream os = new
-            // ScreenOutputStream(Screen.getInstance());
-            final PrintStream ps = new PrintStream(bootOut, true);
-            VmSystem.out = ps;
-            System.setOut(ps);
-            System.setErr(ps);
+            VmSystem.out = getSystemOut();
 
             /* Initialize the system classloader */
             VmSystemClassLoader loader = (VmSystemClassLoader) (getVmClass(Unsafe
@@ -136,6 +132,18 @@ public final class VmSystem {
     		root.addAppender(infoApp);
         }
     }
+    
+    /**
+     * Gets the system output stream.
+     * @return
+     */
+    public static PrintStream getSystemOut() {
+        if (bootOut == null) {
+            bootOut = new SystemOutputStream();
+            bootOutStream = new PrintStream(bootOut, true);
+        }
+        return bootOutStream;
+    }
 
     /**
      * Load the initial jarfile.
@@ -169,13 +177,12 @@ public final class VmSystem {
     // Information
     // ------------------------------------------
 
-    public static Properties getInitProperties() {
+    public static void insertSystemProperties(Properties res) {
 
         final String arch;
         final Vm vm = Vm.getVm();
         arch = vm.getArch().getName();
 
-        final Properties res = new Properties();
         // Java properties
         res.put("java.version", "1.1.0");
         res.put("java.vendor", "JNode.org");
@@ -210,8 +217,6 @@ public final class VmSystem {
         res.put("gnu.java.io.encoding_scheme_alias.US-ASCII", "ISO8859-1");
         res.put("gnu.java.io.encoding_scheme_alias.UTF-16LE", "UTF16LE");
         res.put("gnu.java.io.encoding_scheme_alias.UTF-16BE", "UTF16BE");
-
-        return res;
     }
 
     public static String getCmdLine() {
@@ -883,5 +888,47 @@ public final class VmSystem {
 		} catch (NameNotFoundException ex) {
 			System.err.println("Cannot find ServiceManager");
 		}
+    }
+    
+    /**
+     * Set {@link #in}to a new InputStream.
+     * 
+     * @param in
+     *            the new InputStream
+     * @see #setIn(InputStream)
+     */
+    public static void setIn(InputStream in) {
+        setStaticField(System.class, "in", in);
+    }
+
+    /**
+     * Set {@link #out}to a new PrintStream.
+     * 
+     * @param out
+     *            the new PrintStream
+     * @see #setOut(PrintStream)
+     */
+    public static void setOut(PrintStream out) {
+        setStaticField(System.class, "out", out);     
+    }
+
+    /**
+     * Set {@link #err}to a new PrintStream.
+     * 
+     * @param err
+     *            the new PrintStream
+     * @see #setErr(PrintStream)
+     */
+    public static void setErr(PrintStream err) {
+        setStaticField(System.class, "err", err);        
+    }
+    
+    private static void setStaticField(Class clazz, String fieldName, Object value) {
+        final VmStaticField f = (VmStaticField)clazz.getVmClass().getField(fieldName);
+        final Vm vm = Vm.getVm();
+        final int ptrSize = vm.getArch().getReferenceSize();
+        final Object staticsTable = Unsafe.getCurrentProcessor().getStaticsTable();
+        final Address ptr = Address.addressOfArrayData(staticsTable);
+        Unsafe.setObject(ptr, f.getStaticsIndex() * ptrSize, value);
     }
 }

@@ -69,6 +69,7 @@ public class Main {
 
 		} catch (Throwable ex) {
 			BootLog.error("Error in bootstrap", ex);
+			ex.printStackTrace();
 			sleepForever();
 			return -2;
 		}

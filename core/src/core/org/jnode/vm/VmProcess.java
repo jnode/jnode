@@ -57,15 +57,15 @@ public class VmProcess extends Process {
 		
 		if (System.in == null) {
 			Unsafe.debug("Set System.in.");
-			System.in = in;
+			System.setIn(in);
 		}
 		if (System.out == null) {
 			Unsafe.debug("Set System.out.");
-			System.out = out;
+			System.setOut(out);
 		}
 		if (System.err == null) {
 			Unsafe.debug("Set System.err.");
-			System.err = err;
+			System.setErr(err);
 		}
 		
 		final Thread mainThread = new Thread(threadGroup, new ProcessRunner());
