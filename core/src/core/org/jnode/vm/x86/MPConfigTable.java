@@ -11,7 +11,8 @@ import java.util.List;
 import org.jnode.system.BootLog;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceNotFreeException;
-import org.jnode.vm.VmAddress;
+import org.jnode.util.NumberUtils;
+import org.vmmagic.unboxed.Address;
 
 
 /**
@@ -80,8 +81,8 @@ public class MPConfigTable {
     /**
      * Gets the physical address of the local APIC.
      */
-    public VmAddress getLocalApicAddress() {
-        return VmAddress.valueOf(mem.getInt(36));
+    public Address getLocalApicAddress() {
+        return Address.fromIntZeroExtend(mem.getInt(36));
     }
     
     /**
@@ -126,11 +127,11 @@ public class MPConfigTable {
     
     public void dump(PrintStream out) {
         out.println("MPConfigTable");       
-        out.println("Address        0x" + VmAddress.toString(mem.getAddress()));
+        out.println("Address        0x" + NumberUtils.hex(mem.getAddress().toInt()));
         out.println("Size           " + mem.getSize());
         out.println("Manufacturer   " + getOemID());
         out.println("Product        " + getProductID());
-        out.println("Local APIC ptr 0x" + VmAddress.toString(getLocalApicAddress()));
+        out.println("Local APIC ptr 0x" + NumberUtils.hex(getLocalApicAddress().toInt()));
         out.println("Entries");
         for (Iterator i = entries.iterator(); i.hasNext(); ) {
             final MPEntry e = (MPEntry)i.next();
@@ -142,7 +143,7 @@ public class MPConfigTable {
         final int cnt = getEntryCount();
         final ArrayList list = new ArrayList(cnt);
         int offset = 0x2C;
-        final int size = (int)mem.getSize();
+        final int size = (int)mem.getSize().toInt();
         try {
             while (offset < size) {
                 final int type = mem.getByte(offset);

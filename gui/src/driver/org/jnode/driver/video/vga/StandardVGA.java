@@ -15,7 +15,7 @@ import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
-import org.jnode.vm.VmAddress;
+import org.vmmagic.unboxed.Address;
 
 /**
  * @author epr
@@ -37,7 +37,7 @@ public class StandardVGA {
 	public StandardVGA(ResourceOwner owner, IndexColorModel cm) throws ResourceNotFreeException {
 		try {
 			ResourceManager rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
-			vgaMem = rm.claimMemoryResource(owner, VmAddress.valueOf(0xa0000), 0x9600, ResourceManager.MEMMODE_NORMAL);
+			vgaMem = rm.claimMemoryResource(owner, Address.fromIntZeroExtend(0xa0000), 0x9600, ResourceManager.MEMMODE_NORMAL);
 			state640x480x16 = new VgaState(seq, crt, gra, att, 0xe3, cm);
 			oldState = new VgaState();
 		} catch (NameNotFoundException ex) {
@@ -68,7 +68,7 @@ public class StandardVGA {
 
 	private final void cls(VgaIO io) {
 		io.setGRAF(0x08, 0xFF);
-		vgaMem.clear(0, (int) vgaMem.getSize());
+		vgaMem.clear(0, (int) vgaMem.getSize().toInt());
 	} 
 
 	/**

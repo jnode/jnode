@@ -593,6 +593,14 @@ final class MagicHelper extends BaseX86MagicHelper {
             flags.release(ec);
             obj.release(ec);
         } break;
+        case mGETARRAYDATA: {
+            if (Vm.VerifyAssertions) Vm._assert(isstatic);
+            final RefItem obj = vstack.popRef();
+            obj.load(ec);
+            final Register r = obj.getRegister();
+            os.writeADD(r, VmArray.DATA_OFFSET * 4);
+            vstack.push(obj);
+        } break;
         case mGETOBJECTCOLOR: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem obj = vstack.popRef();

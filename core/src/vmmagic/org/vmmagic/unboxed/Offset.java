@@ -50,6 +50,10 @@ public final class Offset {
     return null;
   }
 
+  public Offset add (Extent byteSize) {
+    return null;
+  }
+
   public Offset sub (int byteSize) {
     return null;
   }

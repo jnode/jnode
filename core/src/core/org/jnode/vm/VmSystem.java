@@ -55,6 +55,8 @@ import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.VmWriteBarrier;
 import org.vmmagic.pragma.PrivilegedActionPragma;
 import org.vmmagic.pragma.UninterruptiblePragma;
+import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Extent;
 
 /**
  * System support for the Virtual Machine
@@ -173,15 +175,15 @@ public final class VmSystem {
      *         available.
      */
     private static MemoryResource loadInitJar(ResourceManager rm) {
-        final VmAddress start = Unsafe.getInitJarStart();
-        final VmAddress end = Unsafe.getInitJarEnd();
-        final long size = VmAddress.distance(end, start);
-        if (size == 0L) {
+        final Address start = Address.fromAddress(Unsafe.getInitJarStart());
+        final Address end = Address.fromAddress(Unsafe.getInitJarEnd());
+        final Extent size = end.toWord().sub(start.toWord()).toExtent();
+        if (size.toWord().isZero()) {
             // No initial jarfile
             BootLog.info("No initial jarfile found");
             return null;
         } else {
-            BootLog.info("Found initial jarfile of " + size + "b");
+            BootLog.info("Found initial jarfile of " + size.toInt() + "b");
             try {
                 final ResourceOwner owner = new SimpleResourceOwner("System");
                 return rm.claimMemoryResource(owner, start, size,
@@ -952,7 +954,7 @@ public final class VmSystem {
         final Vm vm = Vm.getVm();
         final int ptrSize = vm.getArch().getReferenceSize();
         final Object staticsTable = Unsafe.getCurrentProcessor().getStaticsTable();
-        final VmAddress ptr = VmAddress.addressOfArrayData(staticsTable);
+        final VmAddress ptr = VmMagic.getArrayData(staticsTable).toAddress();
         Unsafe.setObject(ptr, f.getStaticsIndex() * ptrSize, value);
     }
 }

@@ -33,6 +33,8 @@ import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.ResourcePermission;
 import org.jnode.system.SimpleResourceOwner;
+import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Extent;
 
 /**
  * Default implementation of ResourceManager.
@@ -54,14 +56,14 @@ final class ResourceManagerImpl implements ResourceManager {
 	
 	protected static ResourceManager initialize() {
 		try {
-			final VmAddress kernelStart = Unsafe.getKernelStart(); 
-			final VmAddress kernelEnd = Unsafe.getKernelEnd();
-			final long kernelSize = VmAddress.distance(kernelStart, kernelEnd); 
+			final Address kernelStart = Address.fromAddress(Unsafe.getKernelStart()); 
+			final Address kernelEnd = Address.fromAddress(Unsafe.getKernelEnd());
+			final Extent kernelSize = kernelEnd.toWord().sub(kernelStart.toWord()).toExtent();
 			MemoryResourceImpl.claimMemoryResource(new SimpleResourceOwner("kernel"), kernelStart, kernelSize, MEMMODE_NORMAL);
 
-			final VmAddress bootHeapStart = Unsafe.getBootHeapStart(); 
-			final VmAddress bootHeapEnd = Unsafe.getBootHeapEnd();
-			final long bootHeapSize = VmAddress.distance(bootHeapStart, bootHeapEnd); 
+			final Address bootHeapStart = Address.fromAddress(Unsafe.getBootHeapStart()); 
+			final Address bootHeapEnd = Address.fromAddress(Unsafe.getBootHeapEnd());
+			final Extent bootHeapSize = bootHeapEnd.toWord().sub(bootHeapStart.toWord()).toExtent(); 
 			MemoryResourceImpl.claimMemoryResource(new SimpleResourceOwner("bootheap"), bootHeapStart, bootHeapSize, MEMMODE_NORMAL);
 
 			ResourceManager rm = new ResourceManagerImpl();
@@ -100,9 +102,23 @@ final class ResourceManagerImpl implements ResourceManager {
 	 * @return The claimed resource
 	 * @throws ResourceNotFreeException
 	 */
-	public MemoryResource claimMemoryResource(ResourceOwner owner, VmAddress start, long size, int mode) 
+	public MemoryResource claimMemoryResource(ResourceOwner owner, Address start, Extent size, int mode) 
 	throws ResourceNotFreeException {
 		return MemoryResourceImpl.claimMemoryResource(owner, start, size, mode);
+	}
+	
+	/**
+	 * Claim a memory region
+	 * @param owner
+	 * @param start
+	 * @param size
+	 * @param mode
+	 * @return The claimed resource
+	 * @throws ResourceNotFreeException
+	 */
+	public MemoryResource claimMemoryResource(ResourceOwner owner, Address start, int size, int mode) 
+	throws ResourceNotFreeException {
+		return MemoryResourceImpl.claimMemoryResource(owner, start, Extent.fromIntZeroExtend(size), mode);
 	}
 	
 	/**

@@ -21,7 +21,6 @@
 package org.jnode.vm;
 
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.classmgr.VmArray;
 
 /**
  * Address is not a normal Java object. Instead it is used as a reference
@@ -72,17 +71,6 @@ public abstract class VmAddress extends VmSystemObject {
 	    } else {
 	        return NumberUtils.hex(Unsafe.addressToLong(addr));	        
 	    }
-	}
-	
-	/**
-	 * Gets the address of the start of the data of a given array.
-	 * @param arrayObject
-	 * @return Address
-	 */
-	public static VmAddress addressOfArrayData(Object arrayObject) {
-		final int slotSize = Unsafe.getCurrentProcessor().getArchitecture().getReferenceSize();
-		final VmAddress objAddr = Unsafe.addressOf(arrayObject);
-		return Unsafe.add(objAddr, (VmArray.DATA_OFFSET * slotSize));
 	}
 	
 	/**

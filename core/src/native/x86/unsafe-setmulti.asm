@@ -7,8 +7,8 @@
 ; Author       : E. Prangsma
 ; -----------------------------------------------
 
-; void setBytes(VmAddress memPtr, byte value, int count);
-Q43org5jnode2vm6Unsafe23setBytes2e28Lorg2fjnode2fvm2fVmAddress3bBI29V:
+; void setBytes(Address memPtr, byte value, int count);
+Q43org5jnode2vm6Unsafe23setBytes2e28Lorg2fvmmagic2funboxed2fAddress3bBI29V:
 	push edi
 	mov edi,[esp+16]	; memPtr
 	mov eax,[esp+12] 	; value
@@ -17,10 +17,10 @@ Q43org5jnode2vm6Unsafe23setBytes2e28Lorg2fjnode2fvm2fVmAddress3bBI29V:
 	pop edi
 	ret 12
 
-; void setShorts(VmAddress memPtr, short value, int count);
-; void setChars(VmAddress memPtr, char value, int count);
-Q43org5jnode2vm6Unsafe23setShorts2e28Lorg2fjnode2fvm2fVmAddress3bSI29V:
-Q43org5jnode2vm6Unsafe23setChars2e28Lorg2fjnode2fvm2fVmAddress3bCI29V:
+; void setShorts(Address memPtr, short value, int count);
+; void setChars(Address memPtr, char value, int count);
+Q43org5jnode2vm6Unsafe23setShorts2e28Lorg2fvmmagic2funboxed2fAddress3bSI29V:
+Q43org5jnode2vm6Unsafe23setChars2e28Lorg2fvmmagic2funboxed2fAddress3bCI29V:
 	push edi
 	mov edi,[esp+16]	; memPtr
 	mov eax,[esp+12] 	; value
@@ -29,12 +29,12 @@ Q43org5jnode2vm6Unsafe23setChars2e28Lorg2fjnode2fvm2fVmAddress3bCI29V:
 	pop edi
 	ret 12
 
-; void setInts(VmAddress memPtr, int value, int count);
-; void setFloats(VmAddress memPtr, float value, int count);
-; void setObjects(VmAddress memPtr, Object value, int count);
-Q43org5jnode2vm6Unsafe23setInts2e28Lorg2fjnode2fvm2fVmAddress3bII29V:
-Q43org5jnode2vm6Unsafe23setFloats2e28Lorg2fjnode2fvm2fVmAddress3bFI29V:
-Q43org5jnode2vm6Unsafe23setObjects2e28Lorg2fjnode2fvm2fVmAddress3bLjava2flang2fObject3bI29V:
+; void setInts(Address memPtr, int value, int count);
+; void setFloats(Address memPtr, float value, int count);
+; void setObjects(Address memPtr, Object value, int count);
+Q43org5jnode2vm6Unsafe23setInts2e28Lorg2fvmmagic2funboxed2fAddress3bII29V:
+Q43org5jnode2vm6Unsafe23setFloats2e28Lorg2fvmmagic2funboxed2fAddress3bFI29V:
+Q43org5jnode2vm6Unsafe23setObjects2e28Lorg2fvmmagic2funboxed2fAddress3bLjava2flang2fObject3bI29V:
 	push edi
 	mov edi,[esp+16]	; memPtr
 	mov eax,[esp+12] 	; value
@@ -43,8 +43,8 @@ Q43org5jnode2vm6Unsafe23setObjects2e28Lorg2fjnode2fvm2fVmAddress3bLjava2flang2fO
 	pop edi
 	ret 12
 
-; void setInts24(VmAddress memPtr, int value, int count);
-Q43org5jnode2vm6Unsafe23setInts242e28Lorg2fjnode2fvm2fVmAddress3bII29V:
+; void setInts24(Address memPtr, int value, int count);
+Q43org5jnode2vm6Unsafe23setInts242e28Lorg2fvmmagic2funboxed2fAddress3bII29V:
 	push edi
 	mov edi,[esp+16]	; memPtr
 	mov eax,[esp+12] 	; value
@@ -60,10 +60,10 @@ set24_loop:
 	pop edi
 	ret 12
 
-; void setLongs(VmAddress memPtr, long value, int count);
-; void setDoubles(VmAddress memPtr, double value, int count);
-Q43org5jnode2vm6Unsafe23setLongs2e28Lorg2fjnode2fvm2fVmAddress3bJI29V:
-Q43org5jnode2vm6Unsafe23setDoubles2e28Lorg2fjnode2fvm2fVmAddress3bDI29V:
+; void setLongs(Address memPtr, long value, int count);
+; void setDoubles(Address memPtr, double value, int count);
+Q43org5jnode2vm6Unsafe23setLongs2e28Lorg2fvmmagic2funboxed2fAddress3bJI29V:
+Q43org5jnode2vm6Unsafe23setDoubles2e28Lorg2fvmmagic2funboxed2fAddress3bDI29V:
 	push edi
 	mov edi,[esp+20]	; memPtr
 	mov edx,[esp+16] 	; value MSB

@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import org.jnode.net.ethernet.EthernetAddress;
 import org.jnode.system.MemoryResource;
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.VmAddress;
 
 /**
  * @author Chris Cole
@@ -62,7 +61,7 @@ public class InitializationBlock32Bit {
 			out.debug(
 				"0x"
 					+ NumberUtils.hex(
-						VmAddress.as32bit(mem.getAddress()) + offset + i)
+						mem.getAddress().toInt() + offset + i)
 					+ " : 0x"
 					+ NumberUtils.hex((byte) i)
 					+ " : 0x"

@@ -3,7 +3,7 @@
  */
 package org.jnode.system;
 
-import org.jnode.vm.VmAddress;
+import org.vmmagic.unboxed.Address;
 
 /**
  * Interface for searching data in a memory region.
@@ -22,7 +22,7 @@ public interface MemoryScanner {
      * @param stepSize The size of of step.
      * @return The address of the first match, or null if not found.
      */
-    public VmAddress findInt8(VmAddress start, int size, int match, int stepSize);
+    public Address findInt8(Address start, int size, int match, int stepSize);
 
     /**
      * Find a given 16-bit int (match) withing a given region.
@@ -34,7 +34,7 @@ public interface MemoryScanner {
      * @param stepSize The size of of step.
      * @return The address of the first match, or null if not found.
      */
-    public VmAddress findInt16(VmAddress start, int size, int match, int stepSize);
+    public Address findInt16(Address start, int size, int match, int stepSize);
 
     /**
      * Find a given 32-bit int (match) withing a given region.
@@ -46,7 +46,7 @@ public interface MemoryScanner {
      * @param stepSize The size of of step.
      * @return The address of the first match, or null if not found.
      */
-    public VmAddress findInt32(VmAddress start, int size, int match, int stepSize);
+    public Address findInt32(Address start, int size, int match, int stepSize);
     
     /**
      * Find a given 64-bit int (match) withing a given region.
@@ -58,7 +58,7 @@ public interface MemoryScanner {
      * @param stepSize The size of of step.
      * @return The address of the first match, or null if not found.
      */
-    public VmAddress findInt64(VmAddress start, int size, long match, int stepSize);
+    public Address findInt64(Address start, int size, long match, int stepSize);
 
     /**
      * Find a given 8-bit int array (match) withing a given region.
@@ -72,7 +72,7 @@ public interface MemoryScanner {
      * @param stepSize The size of of step.
      * @return The address of the first match, or null if not found.
      */
-    public VmAddress findInt8Array(VmAddress start, int size, byte[] match, int matchOffset, int matchLength, int stepSize);
+    public Address findInt8Array(Address start, int size, byte[] match, int matchOffset, int matchLength, int stepSize);
 
     /**
      * Find a given 16-bit int array (match) withing a given region.
@@ -86,7 +86,7 @@ public interface MemoryScanner {
      * @param stepSize The size of of step.
      * @return The address of the first match, or null if not found.
      */
-    public VmAddress findInt16Array(VmAddress start, int size, char[] match, int matchOffset, int matchLength, int stepSize);
+    public Address findInt16Array(Address start, int size, char[] match, int matchOffset, int matchLength, int stepSize);
     
     /**
      * Find a given 16-bit int array (match) withing a given region.
@@ -100,7 +100,7 @@ public interface MemoryScanner {
      * @param stepSize The size of of step.
      * @return The address of the first match, or null if not found.
      */
-    public VmAddress findInt16Array(VmAddress start, int size, short[] match, int matchOffset, int matchLength, int stepSize);
+    public Address findInt16Array(Address start, int size, short[] match, int matchOffset, int matchLength, int stepSize);
     
     /**
      * Find a given 32-bit int array (match) withing a given region.
@@ -114,7 +114,7 @@ public interface MemoryScanner {
      * @param stepSize The size of of step.
      * @return The address of the first match, or null if not found.
      */
-    public VmAddress findInt32Array(VmAddress start, int size, int[] match, int matchOffset, int matchLength, int stepSize);
+    public Address findInt32Array(Address start, int size, int[] match, int matchOffset, int matchLength, int stepSize);
     
     /**
      * Find a given 64-bit int array (match) withing a given region.
@@ -128,5 +128,5 @@ public interface MemoryScanner {
      * @param stepSize The size of of step.
      * @return The address of the first match, or null if not found.
      */
-    public VmAddress findInt64Array(VmAddress start, int size, long[] match, int matchOffset, int matchLength, int stepSize);
+    public Address findInt64Array(Address start, int size, long[] match, int matchOffset, int matchLength, int stepSize);
 }

@@ -30,7 +30,6 @@ import org.jnode.system.ResourceOwner;
 import org.jnode.util.AccessControllerUtils;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
-import org.jnode.vm.VmAddress;
 
 /**
  * @author flesire
@@ -202,8 +201,8 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
         /* Perform a system self-test. */
         byte[] data = new byte[32];
         MemoryResource selfTest = rm.asMemoryResource(data);
-        log.debug("self test: " + Integer.toHexString(VmAddress.as32bit(selfTest.getAddress())));
-        regs.setReg32(SCBPort, VmAddress.as32bit(selfTest.getAddress()) | PortSelfTest);
+        log.debug("self test: " + Integer.toHexString(selfTest.getAddress().toInt()));
+        regs.setReg32(SCBPort, selfTest.getAddress().toInt() | PortSelfTest);
         /* rom signature */
         selfTest.setShort(2, (short) 0);
         /* Status */

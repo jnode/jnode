@@ -7,143 +7,131 @@ package org.jnode.driver.net.rtl8139;
 import org.jnode.net.SocketBuffer;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
-import org.jnode.vm.VmAddress;
+import org.vmmagic.unboxed.Address;
 
 /**
  * @author Martin Husted Hartvig
  */
 
-public class RTL8139RxRing implements RTL8139Constants
-{
+public class RTL8139RxRing implements RTL8139Constants {
 
-  private static final int UPD_SIZE = 16;
-  //private static final int FRAME_SIZE = MAX_ETH_FRAME_LEN;
+	private static final int UPD_SIZE = 16;
 
-  /** The #frames in this ring */
-  private final int nrFrames;
+	// private static final int FRAME_SIZE = MAX_ETH_FRAME_LEN;
 
-  /** The actual data */
-  private final byte[] data;
+	/** The #frames in this ring */
+	private final int nrFrames;
 
-  /** MemoryResource mapper around data */
-  private final MemoryResource mem;
+	/** The actual data */
+	private final byte[] data;
 
-  /** Offset within mem of first UDP */
-  private final int firstUPDOffset;
+	/** MemoryResource mapper around data */
+	private final MemoryResource mem;
 
-  /** 32-bit address first UDP */
-  private final VmAddress firstUPDAddress;
+	/** Offset within mem of first UDP */
+	private final int firstUPDOffset;
 
-  private int index;
+	/** 32-bit address first UDP */
+	private final Address firstUPDAddress;
 
+	private int index;
 
-  /**
-   * Create a new instance
-   * 
-   * @param nrFrames The number of complete ethernet frames in this ring.
-   * @param rm       
-   */
+	/**
+	 * Create a new instance
+	 * 
+	 * @param nrFrames
+	 *            The number of complete ethernet frames in this ring.
+	 * @param rm
+	 */
 
-  public RTL8139RxRing(int nrFrames, ResourceManager rm)
-  {
+	public RTL8139RxRing(int nrFrames, ResourceManager rm) {
 
-    // Create a large enough buffer
-    final int size = TOTAL_RX_BUF_SIZE;//(nrFrames * (UPD_SIZE + FRAME_SIZE)) + 16/*alignment*/;
-    this.data = new byte[size];
-    this.nrFrames = nrFrames;
-    this.mem = rm.asMemoryResource(data);
+		// Create a large enough buffer
+		final int size = TOTAL_RX_BUF_SIZE;// (nrFrames * (UPD_SIZE +
+											// FRAME_SIZE)) + 16/*alignment*/;
+		this.data = new byte[size];
+		this.nrFrames = nrFrames;
+		this.mem = rm.asMemoryResource(data);
 
-    final VmAddress memAddr = mem.getAddress();
-    int offset = 0;
+		final Address memAddr = mem.getAddress();
+		int offset = 0;
 
-    this.firstUPDOffset = offset;
-    this.firstUPDAddress = VmAddress.add(memAddr, firstUPDOffset);
-  }
+		this.firstUPDOffset = offset;
+		this.firstUPDAddress = memAddr.add(firstUPDOffset);
+	}
 
-  /**
-   * Initialize this ring to its default (empty) state
-   */
+	/**
+	 * Initialize this ring to its default (empty) state
+	 */
 
-  public void initialize()
-  {
-    index = 0;
-  }
+	public void initialize() {
+		index = 0;
+	}
 
-  /**
-   * Gets the packet status of the UPD at the given index
-   */
-  public int getPktStatus()
-  {
-    final int updOffset = firstUPDOffset + index;
+	/**
+	 * Gets the packet status of the UPD at the given index
+	 */
+	public int getPktStatus() {
+		final int updOffset = firstUPDOffset + index;
 
-    return mem.getInt(updOffset);
-  }
+		return mem.getInt(updOffset);
+	}
 
+	/**
+	 * Sets the packet status of the UPD at the given index
+	 * 
+	 * @param index
+	 * @param value
+	 *            The new pkt status value
+	 */
+	public void setPktStatus(int index, int value) {
+		final int updOffset = firstUPDOffset + (index * UPD_SIZE) - 4;
 
-  /**
-   * Sets the packet status of the UPD at the given index
-   * 
-   * @param index 
-   * @param value The new pkt status value
-   */
-  public void setPktStatus(int index, int value)
-  {
-    final int updOffset = firstUPDOffset + (index * UPD_SIZE) - 4;
+		mem.setInt(updOffset + 4, value);
 
-    mem.setInt(updOffset + 4, value);
+		this.index = index;
+	}
 
-    this.index = index;
-  }
+	public void setIndex(int index) {
+		this.index = index;
+	}
 
+	public int getIndex() {
+		return index;
+	}
 
-  public void setIndex(int index)
-  {
-    this.index = index;
-  }
+	/**
+	 * Gets the packet data of UPD with the current index into a SocketBuffer
+	 */
 
+	public SocketBuffer getPacket(int _length) {
 
-  public int getIndex()
-  {
-    return index;
-  }
+		final int updOffset = firstUPDOffset + index;
+		final SocketBuffer skbuf = new SocketBuffer();
 
+		if (_length > 0) {
+			skbuf.append(data, updOffset + 4, _length - 4);
+		}
 
-  /**
-   * Gets the packet data of UPD with the current index into a SocketBuffer
-   */
+		index = (index + _length + 4 + 3) & ~3;
+		index &= (RX_BUF_SIZE - 1);
 
-  public SocketBuffer getPacket(int _length)
-  {
+		return skbuf;
+	}
 
-    final int updOffset = firstUPDOffset + index;
-    final SocketBuffer skbuf = new SocketBuffer();
+	/**
+	 * Gets the address of the first UPD of this ring.
+	 */
 
-    if (_length > 0)
-    {
-      skbuf.append(data, updOffset + 4, _length - 4);
-    }
+	public Address getFirstUPDAddress() {
+		return firstUPDAddress;
+	}
 
-    index = (index + _length + 4 + 3) & ~3;
-    index &= (RX_BUF_SIZE - 1);
+	/**
+	 * Gets the number of frames of this ring
+	 */
 
-    return skbuf;
-  }
-
-  /**
-   * Gets the address of the first UPD of this ring.
-   */
-
-  public VmAddress getFirstUPDAddress()
-  {
-    return firstUPDAddress;
-  }
-
-  /**
-   * Gets the number of frames of this ring
-   */
-
-  public int getNrFrames()
-  {
-    return nrFrames;
-  }
+	public int getNrFrames() {
+		return nrFrames;
+	}
 }

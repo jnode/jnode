@@ -5,7 +5,7 @@ package org.jnode.vm.x86;
 
 import org.jnode.system.MemoryResource;
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.VmAddress;
+import org.vmmagic.unboxed.Address;
 
 
 /**
@@ -32,8 +32,8 @@ public class MPIOAPICEntry extends MPEntry {
         return mem.getByte(3) & 0xFF;
     }
     
-    public VmAddress getAddress() {
-        return VmAddress.valueOf(mem.getInt(4));
+    public Address getAddress() {
+        return Address.fromIntZeroExtend(mem.getInt(4));
     }
     
     
@@ -44,7 +44,7 @@ public class MPIOAPICEntry extends MPEntry {
         return super.toString() + " ID 0x" + NumberUtils.hex(getApicID(), 2) +
         	", version " + getApicVersion() +
         	", flags 0x" + NumberUtils.hex(getFlags(), 2) +
-        	", addr 0x" + VmAddress.toString(getAddress());
+        	", addr 0x" + NumberUtils.hex(getAddress().toInt());
     }
     
     /**

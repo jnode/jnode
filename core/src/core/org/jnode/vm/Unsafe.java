@@ -22,10 +22,10 @@ package org.jnode.vm;
 
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.security.JNodePermission;
-import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.vmmagic.pragma.UninterruptiblePragma;
+import org.vmmagic.unboxed.Address;
 
 /**
  * Class that allows directy hardware access.
@@ -115,7 +115,7 @@ public final class Unsafe {
 		 * @return The address of the array data.
 		 */
 		public VmAddress addressOfArrayData(Object array) {
-			return VmAddress.addressOfArrayData(array);
+			return VmMagic.getArrayData(array).toAddress();
 		}
 	}
 
@@ -366,7 +366,7 @@ public final class Unsafe {
 	 * @param value
 	 * @param count
 	 */
-	protected static native void setBytes(VmAddress memPtr, byte value, int count);
+	protected static native void setBytes(Address memPtr, byte value, int count);
 
 	/**
 	 * Perform a bitwise AND of the byte at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
@@ -376,7 +376,7 @@ public final class Unsafe {
 	 * @param count
 	 *            The number of times to repeat this operation
 	 */
-	protected static native void andByte(VmAddress memPtr, byte value, int count);
+	protected static native void andByte(Address memPtr, byte value, int count);
 
 	/**
 	 * Perform a bitwise OR of the byte at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
@@ -386,7 +386,7 @@ public final class Unsafe {
 	 * @param count
 	 *            The number of times to repeat this operation
 	 */
-	protected static native void orByte(VmAddress memPtr, byte value, int count);
+	protected static native void orByte(Address memPtr, byte value, int count);
 
 	/**
 	 * Perform a bitwise XOR of the byte at the given address and the given value While count is greater then 1, the address is incremented and the process repeats.
@@ -396,7 +396,7 @@ public final class Unsafe {
 	 * @param count
 	 *            The number of times to repeat this operation
 	 */
-	protected static native void xorByte(VmAddress memPtr, byte value, int count);
+	protected static native void xorByte(Address memPtr, byte value, int count);
 
 	/**
 	 * Sets a byte at a given memory address
@@ -422,7 +422,7 @@ public final class Unsafe {
 	 * @param value
 	 * @param count
 	 */
-	protected static native void setShorts(VmAddress memPtr, short value, int count);
+	protected static native void setShorts(Address memPtr, short value, int count);
 
 	/**
 	 * Perform a bitwise AND of the short at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
@@ -432,7 +432,7 @@ public final class Unsafe {
 	 * @param count
 	 *            The number of times to repeat this operation
 	 */
-	protected static native void andShort(VmAddress memPtr, short value, int count);
+	protected static native void andShort(Address memPtr, short value, int count);
 
 	/**
 	 * Perform a bitwise OR of the short at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
@@ -442,7 +442,7 @@ public final class Unsafe {
 	 * @param count
 	 *            The number of times to repeat this operation
 	 */
-	protected static native void orShort(VmAddress memPtr, short value, int count);
+	protected static native void orShort(Address memPtr, short value, int count);
 
 	/**
 	 * Perform a bitwise XOR of the short at the given address and the given value While count is greater then 1, the address is incremented and the process repeats.
@@ -452,7 +452,7 @@ public final class Unsafe {
 	 * @param count
 	 *            The number of times to repeat this operation
 	 */
-	protected static native void xorShort(VmAddress memPtr, short value, int count);
+	protected static native void xorShort(Address memPtr, short value, int count);
 
 	/**
 	 * Sets a short at a given memory address
@@ -478,7 +478,7 @@ public final class Unsafe {
 	 * @param value
 	 * @param count
 	 */
-	protected static native void setChars(VmAddress memPtr, char value, int count);
+	protected static native void setChars(Address memPtr, char value, int count);
 
 	/**
 	 * Perform a bitwise AND of the char at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
@@ -488,7 +488,7 @@ public final class Unsafe {
 	 * @param count
 	 *            The number of times to repeat this operation
 	 */
-	protected static native void andChar(VmAddress memPtr, char value, int count);
+	protected static native void andChar(Address memPtr, char value, int count);
 
 	/**
 	 * Perform a bitwise OR of the char at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
@@ -498,7 +498,7 @@ public final class Unsafe {
 	 * @param count
 	 *            The number of times to repeat this operation
 	 */
-	protected static native void orChar(VmAddress memPtr, char value, int count);
+	protected static native void orChar(Address memPtr, char value, int count);
 
 	/**
 	 * Perform a bitwise XOR of the char at the given address and the given value While count is greater then 1, the address is incremented and the process repeats.
@@ -508,7 +508,7 @@ public final class Unsafe {
 	 * @param count
 	 *            The number of times to repeat this operation
 	 */
-	protected static native void xorChar(VmAddress memPtr, char value, int count);
+	protected static native void xorChar(Address memPtr, char value, int count);
 
 	/**
 	 * Sets a char at a given memory address
@@ -534,7 +534,7 @@ public final class Unsafe {
 	 * @param value
 	 * @param count
 	 */
-	protected static native void setInts(VmAddress memPtr, int value, int count);
+	protected static native void setInts(Address memPtr, int value, int count);
 
 	/**
 	 * Perform a bitwise AND of the int at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
@@ -544,7 +544,7 @@ public final class Unsafe {
 	 * @param count
 	 *            The number of times to repeat this operation
 	 */
-	protected static native void andInt(VmAddress memPtr, int value, int count);
+	protected static native void andInt(Address memPtr, int value, int count);
 
 	/**
 	 * Perform a bitwise OR of the int at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
@@ -554,7 +554,7 @@ public final class Unsafe {
 	 * @param count
 	 *            The number of times to repeat this operation
 	 */
-	protected static native void orInt(VmAddress memPtr, int value, int count);
+	protected static native void orInt(Address memPtr, int value, int count);
 
 	/**
 	 * Perform a bitwise XOR of the int at the given address and the given value While count is greater then 1, the address is incremented and the process repeats.
@@ -564,7 +564,7 @@ public final class Unsafe {
 	 * @param count
 	 *            The number of times to repeat this operation
 	 */
-	protected static native void xorInt(VmAddress memPtr, int value, int count);
+	protected static native void xorInt(Address memPtr, int value, int count);
 
 	/**
 	 * Sets a 24-bit int at a given memory address While count is greater then 1, the address is incremented and the process repeats.
@@ -573,7 +573,7 @@ public final class Unsafe {
 	 * @param value
 	 * @param count
 	 */
-	protected static native void setInts24(VmAddress memPtr, int value, int count);
+	protected static native void setInts24(Address memPtr, int value, int count);
 
 	/**
 	 * Perform a bitwise AND of the 24-bit int at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
@@ -583,7 +583,7 @@ public final class Unsafe {
 	 * @param count
 	 *            The number of times to repeat this operation
 	 */
-	protected static native void andInt24(VmAddress memPtr, int value, int count);
+	protected static native void andInt24(Address memPtr, int value, int count);
 
 	/**
 	 * Perform a bitwise OR of the 24-bit int at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
@@ -593,7 +593,7 @@ public final class Unsafe {
 	 * @param count
 	 *            The number of times to repeat this operation
 	 */
-	protected static native void orInt24(VmAddress memPtr, int value, int count);
+	protected static native void orInt24(Address memPtr, int value, int count);
 
 	/**
 	 * Perform a bitwise XOR of the 24-bit int at the given address and the given value While count is greater then 1, the address is incremented and the process repeats.
@@ -603,7 +603,7 @@ public final class Unsafe {
 	 * @param count
 	 *            The number of times to repeat this operation
 	 */
-	protected static native void xorInt24(VmAddress memPtr, int value, int count);
+	protected static native void xorInt24(Address memPtr, int value, int count);
 
 	/**
 	 * Sets an int at a given memory address
@@ -629,7 +629,7 @@ public final class Unsafe {
 	 * @param value
 	 * @param count
 	 */
-	protected static native void setLongs(VmAddress memPtr, long value, int count);
+	protected static native void setLongs(Address memPtr, long value, int count);
 
 	/**
 	 * Perform a bitwise AND of the long at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
@@ -639,7 +639,7 @@ public final class Unsafe {
 	 * @param count
 	 *            The number of times to repeat this operation
 	 */
-	protected static native void andLong(VmAddress memPtr, long value, int count);
+	protected static native void andLong(Address memPtr, long value, int count);
 
 	/**
 	 * Perform a bitwise OR of the long at the given address and the given value. While count is greater then 1, the address is incremented and the process repeats.
@@ -649,7 +649,7 @@ public final class Unsafe {
 	 * @param count
 	 *            The number of times to repeat this operation
 	 */
-	protected static native void orLong(VmAddress memPtr, long value, int count);
+	protected static native void orLong(Address memPtr, long value, int count);
 
 	/**
 	 * Perform a bitwise XOR of the long at the given address and the given value While count is greater then 1, the address is incremented and the process repeats.
@@ -659,7 +659,7 @@ public final class Unsafe {
 	 * @param count
 	 *            The number of times to repeat this operation
 	 */
-	protected static native void xorLong(VmAddress memPtr, long value, int count);
+	protected static native void xorLong(Address memPtr, long value, int count);
 
 	/**
 	 * Sets a long at a given memory address
@@ -685,7 +685,7 @@ public final class Unsafe {
 	 * @param value
 	 * @param count
 	 */
-	protected static native void setFloats(VmAddress memPtr, float value, int count);
+	protected static native void setFloats(Address memPtr, float value, int count);
 
 	/**
 	 * Sets a float at a given memory address
@@ -711,7 +711,7 @@ public final class Unsafe {
 	 * @param value
 	 * @param count
 	 */
-	protected static native void setDoubles(VmAddress memPtr, double value, int count);
+	protected static native void setDoubles(Address memPtr, double value, int count);
 
 	/**
 	 * Sets a double at a given memory address
@@ -737,7 +737,7 @@ public final class Unsafe {
 	 * @param value
 	 * @param count
 	 */
-	protected static native void setObjects(VmAddress memPtr, Object value, int count);
+	protected static native void setObjects(Address memPtr, Object value, int count);
 
 	/**
 	 * Sets a Object at a given memory address
@@ -758,7 +758,21 @@ public final class Unsafe {
 	 * @param memPtr
 	 * @param size
 	 */
-	protected static native void clear(VmAddress memPtr, int size);
+	protected static native void clear(Address memPtr, int size);
+
+	/**
+	 * Fill the memory at the given memory address with size times 0 bytes.
+	 * 
+	 * memPtr must be VmObject.SLOT_SIZE aligned
+	 * 
+	 * size % VmObject.SLOT_SIZE must be 0
+	 * 
+	 * @param memPtr
+	 * @param size
+	 */
+	protected static final void clear(VmAddress memPtr, int size) {
+		clear(Address.fromAddress(memPtr), size);
+	}
 
 	/**
 	 * Copy size bytes of memory from srcMemPtr to destMemPtr. The memory areas must not overlap.
@@ -767,7 +781,18 @@ public final class Unsafe {
 	 * @param destMemPtr
 	 * @param size
 	 */
-	protected static native void copy(VmAddress srcMemPtr, VmAddress destMemPtr, int size);
+	protected static native void copy(Address srcMemPtr, Address destMemPtr, int size);
+
+	/**
+	 * Copy size bytes of memory from srcMemPtr to destMemPtr. The memory areas must not overlap.
+	 * 
+	 * @param srcMemPtr
+	 * @param destMemPtr
+	 * @param size
+	 */
+	protected static void copy(VmAddress srcMemPtr, VmAddress destMemPtr, int size) {
+		copy(Address.fromAddress(srcMemPtr), Address.fromAddress(destMemPtr), size); 
+	}
 
 	/**
 	 * Push an integer onto the execution stack

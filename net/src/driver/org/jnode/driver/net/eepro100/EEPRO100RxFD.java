@@ -6,7 +6,6 @@ package org.jnode.driver.net.eepro100;
 
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
-import org.jnode.vm.VmAddress;
 
 /**
  * @author flesire
@@ -29,7 +28,7 @@ public class EEPRO100RxFD {
 		this.data = new byte[size];
 		this.mem = rm.asMemoryResource(data);
 		
-		bufferAddress = VmAddress.as32bit(mem.getAddress());
+		bufferAddress = mem.getAddress().toInt();
 		setRxBufferAddress(0xffffffff);
     }
 

@@ -323,7 +323,7 @@ Q43org5jnode2vm6Unsafe23doubleToRawLongBits2e28D29J:
 	mov eax,[esp+4] ; LSB
 	ret 8
 
-Q43org5jnode2vm6Unsafe23clear2e28Lorg2fjnode2fvm2fVmAddress3bI29V:
+Q43org5jnode2vm6Unsafe23clear2e28Lorg2fvmmagic2funboxed2fAddress3bI29V:
 	mov edx,[esp+8] ; memPtr
 	mov eax,[esp+4] ; Size
 	push edi
@@ -338,7 +338,7 @@ Q43org5jnode2vm6Unsafe23clear2e28Lorg2fjnode2fvm2fVmAddress3bI29V:
 	pop edi
 	ret 8
 
-Q43org5jnode2vm6Unsafe23copy2e28Lorg2fjnode2fvm2fVmAddress3bLorg2fjnode2fvm2fVmAddress3bI29V:
+Q43org5jnode2vm6Unsafe23copy2e28Lorg2fvmmagic2funboxed2fAddress3bLorg2fvmmagic2funboxed2fAddress3bI29V:
 	push ebx
 	mov ebx,esp
 	push edi
