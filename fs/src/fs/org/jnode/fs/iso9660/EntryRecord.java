@@ -4,102 +4,135 @@
 package org.jnode.fs.iso9660;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import org.jnode.util.LittleEndian;
 
-
 /**
  * @author Chira
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class EntryRecord
-{
-	private byte[] buff = null;
-	private ISO9660Volume volume = null; 
-	
-	public EntryRecord(byte[] buff)
-	{
-		this.buff = buff;
-	}
-	public EntryRecord(ISO9660Volume volume, byte[] buff, int offset)
-	{
-		this.volume = volume;
-		this.buff = new byte[LittleEndian.getUInt8(buff, offset)]; 
-		System.arraycopy(buff,offset,this.buff,0,LittleEndian.getUInt8(buff, offset));
-	}
-	public void readFileData(long offset,byte[] buffer,int bufferOffset, int size) throws IOException
-	{
-		volume.readFromLBN(this.getLocationOfExtent(),offset,buffer,bufferOffset,size);
-	}
-	public byte[] getExtentData() throws IOException
-	{
-		byte[] buffer = new byte[this.getDataLength()];
-		volume.readFromLBN(this.getLocationOfExtent(),0,buffer,0,this.getDataLength());
-		return buffer;
-	}
+public class EntryRecord {
 
-	public int getLengthOfDirectoryEntry()
-	{
-		return LittleEndian.getUInt8(buff, 0);
-	}
-	public int getLengthOfExtendedAttribute()
-	{
-		return buff[1];
-	}
-	public int getLocationOfExtent()
-	{
-		return (int)LittleEndian.getUInt32(buff,2);
-	}
-	public int getDataLength()
-	{
-		return (int)LittleEndian.getUInt32(buff,10);
-	}
-	public boolean isDirectory()
-	{
-		return (buff[25] & 0x03) != 0;
-	}
-	public boolean isLastEntry()
-	{
-		return (buff[25] & 0x40) == 0;
-	}
-	public int getFlags()
-	{
-		return buff[25];
-	}
-	public int getLengthOfFileIdentifier()
-	{
-		return buff[32];
-	}
-	public int getFileUnitSize()
-	{
-		return buff[26];
-	}
-	public int getInterleaveSize()
-	{
-		return buff[27];
-	}
-	public String getFileIdentifier()
-	{
-		if(this.isDirectory())
-		{
-			if(this.getLengthOfFileIdentifier() == 1 && buff[33]== 0x00)
-				return ".";
-			if(this.getLengthOfFileIdentifier() == 1 && buff[33]== 0x01)
-				return "..";
-			return new String(buff, 33 , this.getLengthOfFileIdentifier());
-		}
-		return new String(buff, 33 , this.getLengthOfFileIdentifier() - 2);
+    private final int entryLength;
+    private final int extAttributeLength;
+    private final long extentLocation;
+    private final int dataLength;
+    private final int fileUnitSize;
+    private final int flags;
+    private final int interleaveSize;
+    private final String identifier;
+    
+    private final ISO9660Volume volume;
+    private final String encoding;
 
-	}
-	/**
-	 * @return Returns the volume.
-	 */
-	public ISO9660Volume getVolume() {
-		return volume;
-	}
-	/**
-	 * @param volume The volume to set.
-	 */
-	public void setVolume(ISO9660Volume volume) {
-		this.volume = volume;
-	}
+    /**
+     * Initialize this instance.
+     * @param volume
+     * @param buff
+     * @param offset
+     */
+    public EntryRecord(ISO9660Volume volume, byte[] buff, int offset, String encoding) {
+        this.volume = volume;
+        this.encoding = encoding;
+        this.entryLength = LittleEndian.getUInt8(buff, offset+0);
+        this.extAttributeLength = LittleEndian.getUInt8(buff, offset+1);
+        this.extentLocation = LittleEndian.getUInt32(buff, offset+2);
+        this.dataLength = (int)LittleEndian.getUInt32(buff, offset+10);
+        this.fileUnitSize = LittleEndian.getUInt8(buff, offset+26);
+        this.interleaveSize = LittleEndian.getUInt8(buff, offset+27);
+       	this.flags = LittleEndian.getUInt8(buff, offset + 25);
+       	// This must be after flags, because of isDirectory.
+       	this.identifier = getFileIdentifier(buff, offset, isDirectory(), encoding);
+    }
+
+    public void readFileData(long offset, byte[] buffer, int bufferOffset,
+            int size) throws IOException {
+        volume.readFromLBN(this.getLocationOfExtent(), offset, buffer,
+                bufferOffset, size);
+    }
+
+    public byte[] getExtentData() throws IOException {
+        byte[] buffer = new byte[ this.getDataLength()];
+        volume.readFromLBN(this.getLocationOfExtent(), 0, buffer, 0, this
+                .getDataLength());
+        return buffer;
+    }
+
+    public int getLengthOfDirectoryEntry() {
+        return entryLength;
+    }
+
+    public int getLengthOfExtendedAttribute() {
+        return extAttributeLength;
+    }
+
+    public long getLocationOfExtent() {
+        return extentLocation;
+    }
+
+    public int getDataLength() {
+        return dataLength;
+    }
+
+    public final boolean isDirectory() {
+        return (flags & 0x03) != 0;
+    }
+
+    public final boolean isLastEntry() {
+        return (flags & 0x40) == 0;
+    }
+
+    public final int getFlags() {
+        return flags;
+    }
+
+    public final int getFileUnitSize() {
+        return fileUnitSize;
+    }
+
+    public final int getInterleaveSize() {
+        return interleaveSize;
+    }
+
+    public String getFileIdentifier() {
+        return identifier;
+    }
+
+    /**
+     * @return Returns the volume.
+     */
+    public final ISO9660Volume getVolume() {
+        return volume;
+    }
+
+    private final String getFileIdentifier(byte[] buff, int offset, boolean isDir, String encoding) {
+        final int fidLength = LittleEndian.getUInt8(buff, offset+32);
+        //BootLog.info("offset=" + offset + ", fidLength=" + fidLength + ", buff.length=" + buff.length);
+        final int idLength;
+        if (isDir) {
+            final int buff33 = LittleEndian.getUInt8(buff, offset+33);
+            if ((fidLength == 1) && (buff33 == 0x00)) {
+                return ".";
+            } else if ((fidLength == 1) && (buff33 == 0x01)) {
+                return "..";
+            } else {
+                idLength = fidLength;
+            }
+        } else {
+            idLength = Math.max(0, fidLength - 2);
+        }
+        try {
+            return new String(buff, offset+33, idLength, encoding);
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
+    /**
+     * @return Returns the encoding.
+     */
+    public final String getEncoding() {
+        return this.encoding;
+    }
 }
