@@ -68,7 +68,7 @@ public class Ext2Utils {
 		data[offset] = (byte)(value & 0xFF);
 		data[offset+1] = (byte)((value >> 8) & 0xFF);
 		data[offset+2] = (byte)((value >> 16) & 0xFF);
-		data[offset+3] = (byte)((value >> 32) & 0xFF);
+		data[offset+3] = (byte)((value >> 24) & 0xFF);
 	}
 
 }
