@@ -318,7 +318,7 @@ public class SoftByteCodes implements Uninterruptible {
 	public static Throwable systemException(int nr, int address) 
 	throws PragmaUninterruptible {
 		//Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
-		Unsafe.die();
+		//Unsafe.die();
 		String hexAddress = NumberUtils.hex(address, 8);
 		switch (nr) {
 			case EX_NULLPOINTER: return new NullPointerException("NPE at address " + hexAddress);
