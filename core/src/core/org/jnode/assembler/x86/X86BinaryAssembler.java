@@ -1063,6 +1063,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		if (!code64) {
 			throw new InvalidOpcodeException();
 		}
+        write8(REX_W_PREFIX);
 		write8(0x98);
 	}
 
