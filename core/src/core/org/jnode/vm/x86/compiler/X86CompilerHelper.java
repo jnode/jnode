@@ -316,7 +316,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 *            called.
 	 * @return true if code was written, false otherwise
 	 */
-	public final boolean writeClassInitialize(VmMethod method, GPR methodReg) {
+	public final boolean writeClassInitialize(VmMethod method) {
 		// Only for static methods (non <clinit>)
 		if (method.isStatic() && !method.isInitializer()) {
 			// Only when class is not initialize
@@ -329,8 +329,8 @@ public class X86CompilerHelper implements X86CompilerConstants {
 				os.writePUSH(aax);
 				// Do the is initialized test
 				// Move method.declaringClass -> EAX
-				os.writeMOV(size, aax, methodReg, entryPoints
-						.getVmMemberDeclaringClassField().getOffset());
+                final int typeOfs = getStaticsOffset(method.getDeclaringClass());
+				os.writeMOV(size, aax, STATICS, typeOfs);
 				// Test declaringClass.modifiers
 				os.writeTEST(BITS32, aax, entryPoints.getVmTypeState().getOffset(),
 						VmTypeState.ST_INITIALIZED);
@@ -399,19 +399,6 @@ public class X86CompilerHelper implements X86CompilerConstants {
 			// Set label
 			os.setObjectRef(afterInit);
 		}
-	}
-
-	/**
-	 * Write method counter increment code.
-	 * 
-	 * @param methodReg
-	 *            Register that holds the method reference before this method is
-	 *            called.
-	 */
-	public final void writeIncInvocationCount(GPR methodReg) {
-		final int offset = entryPoints.getVmMethodInvocationCountField()
-				.getOffset();
-		os.writeINC(BITS32, methodReg, offset);
 	}
 
 	/**

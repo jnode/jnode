@@ -54,7 +54,7 @@ class X86StackFrame implements X86CompilerConstants {
 
 	private final X86CompilerHelper helper;
 
-	private final EntryPoints context;
+	private final EntryPoints entryPoints;
 
 	private final CompiledMethod cm;
 
@@ -73,7 +73,7 @@ class X86StackFrame implements X86CompilerConstants {
 
 	private final int EbpFrameRefOffset;
 
-	private static final int EbpMethodRefOffset = 0;
+	//private static final int EbpMethodRefOffset = 0;
 	
 	/** Size of an address */
 	private final int slotSize;
@@ -97,7 +97,7 @@ class X86StackFrame implements X86CompilerConstants {
 		this.os = os;
 		this.helper = helper;
 		this.method = method;
-		this.context = context;
+		this.entryPoints = context;
 		this.cm = cm;
 		this.bc = method.getBytecode();
 		this.initLabel = helper.genLabel("$$init");
@@ -116,7 +116,7 @@ class X86StackFrame implements X86CompilerConstants {
 
 		final VmMethodCode code = new VmMethodCode();
 		final Label startLabel = helper.genLabel("$$start");
-		codeObject = os.startObject(context.getVmMethodCodeClass());
+		codeObject = os.startObject(entryPoints.getVmMethodCodeClass());
 		os.setObjectRef(code);
 		cm.setCodeStart(os.setObjectRef(startLabel));
 		final int rc = os.getLength();
@@ -167,7 +167,7 @@ class X86StackFrame implements X86CompilerConstants {
 		os.setObjectRef(footerLabel);
 
 		/* Go restore the previous current frame */
-		emitSynchronizationCode(typeSizeInfo, context.getMonitorExitMethod());
+		emitSynchronizationCode(typeSizeInfo, entryPoints.getMonitorExitMethod());
 		os.writeLEA(asp, abp, EbpFrameRefOffset);
 		os.writePOP(abp);
 		restoreRegisters();
@@ -184,7 +184,7 @@ class X86StackFrame implements X86CompilerConstants {
         os.setObjectRef(initLabel);
         
         // Test stack overflow        
-        final int stackEndOffset = context.getVmProcessorStackEnd().getOffset();
+        final int stackEndOffset = entryPoints.getVmProcessorStackEnd().getOffset();
         if (os.isCode32()) {
             os.writePrefix(X86Constants.FS_PREFIX);
             os.writeCMP_MEM(X86Register.ESP, stackEndOffset);
@@ -198,25 +198,21 @@ class X86StackFrame implements X86CompilerConstants {
             helper.writeLoadSTATICS(helper.genLabel("$$edi"), "init", false);
         }
 
-        // Load method address into AAX
-        final int methodOffset = helper.getStaticsOffset(method);
-        os.writeMOV(size, aax, helper.STATICS, methodOffset);        
-        
         // Test stack alignment
         writeStackAlignmentTest(helper.genLabel("$$stackAlignment"));
         
         // Create class initialization code (if needed)
-		helper.writeClassInitialize(method, aax);
+		helper.writeClassInitialize(method);
 
 		// Increment the invocation count
-		helper.writeIncInvocationCount(aax);
+		//helper.writeIncInvocationCount(aax); (NOT USED for now, aax is also invalid now)
 
 		// Fixed framelayout
 		saveRegisters();
 		os.writePUSH(abp);
-		os.writePUSH(context.getMagic());
+		os.writePUSH(entryPoints.getMagic());
 		//os.writePUSH(0); // PC, which is only used in interpreted methods
-		os.writePUSH(aax);
+		os.writePUSH(helper.STATICS, helper.getStaticsOffset(method));
 		os.writeMOV(size, abp, asp);
 
 		// Emit the code to create the locals
@@ -230,7 +226,7 @@ class X86StackFrame implements X86CompilerConstants {
 		}
 
 		// Create the synchronization enter code
-		emitSynchronizationCode(typeSizeInfo, context.getMonitorEnterMethod());
+		emitSynchronizationCode(typeSizeInfo, entryPoints.getMonitorEnterMethod());
 		
 		// And jump back to the actual code start
 		os.writeJMP(startCodeLabel);
@@ -276,7 +272,7 @@ class X86StackFrame implements X86CompilerConstants {
 		// Now create the default exception handler
 		Label handlerLabel = helper.genLabel("$$def-ex-handler");
 		cm.setDefExceptionHandler(os.setObjectRef(handlerLabel));
-		emitSynchronizationCode(typeSizeInfo, context.getMonitorExitMethod());
+		emitSynchronizationCode(typeSizeInfo, entryPoints.getMonitorExitMethod());
 		os.writeLEA(asp, abp, EbpFrameRefOffset);
 		os.writePOP(abp);
 		restoreRegisters();
@@ -345,11 +341,8 @@ class X86StackFrame implements X86CompilerConstants {
 			//System.out.println("synchr. " + method);
 			if (method.isStatic()) {
 				// Get declaring class
-				final int declaringClassOffset = context
-						.getVmMemberDeclaringClassField().getOffset();
-				writeGetMethodRef(aax);
-				os.writePUSH(aax, declaringClassOffset);
-				//os.writePUSH(method.getDeclaringClass());
+                final int typeOfs = helper.getStaticsOffset(method.getDeclaringClass());
+				os.writePUSH(helper.STATICS, typeOfs);
 			} else {
 				os.writePUSH(helper.BP, getEbpOffset(typeSizeInfo, 0));
 			}
@@ -357,20 +350,6 @@ class X86StackFrame implements X86CompilerConstants {
 			os.writePOP(adx);
 			os.writePOP(aax);
 		}
-	}
-
-	/**
-	 * Push the method reference in the current stackframe onto the stack
-	 */
-	public final void writePushMethodRef() {
-		os.writePUSH(helper.BP, EbpMethodRefOffset);
-	}
-
-	/**
-	 * Write code to copy the method reference into the dst register.
-	 */
-	public final void writeGetMethodRef(GPR dst) {
-		os.writeMOV(os.getMode().getSize(), dst, helper.BP, EbpMethodRefOffset);
 	}
 
 	/**

@@ -1077,7 +1077,6 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		// Release EAX so it can be used by invokeJavaMethod
 		L1AHelper.releaseRegister(eContext, helper.AAX);
 
-		stackFrame.writePushMethodRef();
 		os.writePUSH(classr); /* Class */
 		os.writePUSH(cntr); /* Count */
 		invokeJavaMethod(context.getAnewarrayMethod());
