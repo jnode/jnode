@@ -1,6 +1,5 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-<!-- package.html - describes classes in javax.swing.text.html package.
-   Copyright (C) 2002 Free Software Foundation, Inc.
+/* DomHTMLBodyElement.java -- 
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -34,17 +33,87 @@ module.  An independent module is a module which is not derived from
 or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version. -->
+exception statement from your version. */
 
-<html>
-<head><title>GNU Classpath - javax.swing.text.html.parser</title></head>
+package gnu.xml.dom.html2;
 
-<body>
-<p> Provides the DTD driven for web browsers,
- web robots, web page content analysers, web editors and
- other applications applications working with Hypertext
- Markup Language (HTML).
-</p>
+import org.w3c.dom.html2.HTMLBodyElement;
 
-</body>
-</html>
+/**
+ * An HTML 'BODY' element node.
+ *
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ */
+public class DomHTMLBodyElement
+  extends DomHTMLElement
+  implements HTMLBodyElement
+{
+
+  protected DomHTMLBodyElement(DomHTMLDocument owner, String namespaceURI,
+                               String name)
+  {
+    super(owner, namespaceURI, name);
+  }
+
+  public String getALink()
+  {
+    return getHTMLAttribute("alink");
+  }
+
+  public void setALink(String alink)
+  {
+    setHTMLAttribute("alink", alink);
+  }
+  
+  public String getBackground()
+  {
+    return getHTMLAttribute("background");
+  }
+
+  public void setBackground(String background)
+  {
+    setHTMLAttribute("background", background);
+  }
+  
+  public String getBgColor()
+  {
+    return getHTMLAttribute("bgcolor");
+  }
+
+  public void setBgColor(String bgcolor)
+  {
+    setHTMLAttribute("bgcolor", bgcolor);
+  }
+  
+  public String getLink()
+  {
+    return getHTMLAttribute("link");
+  }
+
+  public void setLink(String link)
+  {
+    setHTMLAttribute("link", link);
+  }
+  
+  public String getText()
+  {
+    return getHTMLAttribute("text");
+  }
+
+  public void setText(String text)
+  {
+    setHTMLAttribute("text", text);
+  }
+  
+  public String getVLink()
+  {
+    return getHTMLAttribute("vlink");
+  }
+
+  public void setVLink(String vlink)
+  {
+    setHTMLAttribute("vlink", vlink);
+  }
+  
+}
+

@@ -1,5 +1,5 @@
-/* java.beans.beancontext.BeanContextServicesSupport
-   Copyright (C) 2003 Free Software Foundation, Inc.
+/* BeanContextServicesSupport.java --
+   Copyright (C) 2003, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -120,34 +120,36 @@ public class BeanContextServicesSupport
 
   public BeanContextServicesSupport ()
   {
-    this (null, null, true, true);
+    super();
   }
 
   public BeanContextServicesSupport (BeanContextServices peer)
   {
-    this (peer, null, true, true);
+    super(peer);
   }
 
-  public BeanContextServicesSupport (BeanContextServices peer, Locale lcle)
+  public BeanContextServicesSupport(BeanContextServices peer, Locale locale)
   {
-    this (peer, lcle, true, true);
+    super(peer, locale);
   }
 
-  public BeanContextServicesSupport (BeanContextServices peer, Locale lcle,
+  public BeanContextServicesSupport(BeanContextServices peer, Locale locale,
                                      boolean dtime)
   {
-    this (peer, lcle, dtime, true);
+    super(peer, locale, dtime);
   }
 
-  public BeanContextServicesSupport (BeanContextServices peer, Locale lcle,
+  public BeanContextServicesSupport(BeanContextServices peer, Locale locale,
                                      boolean dtime, boolean visible)
   {
-    throw new Error ("Not implemented");
+    super(peer, locale, dtime, visible);
   }
 
-  public void addBeanContextServicesListener (BeanContextServicesListener bcsl)
+  public void addBeanContextServicesListener
+    (BeanContextServicesListener listener)
   {
-    throw new Error ("Not implemented");
+    if (! bcsListeners.contains(listener))
+      bcsListeners.add(listener);
   }
 
   public boolean addService (Class serviceClass, BeanContextServiceProvider bcsp)
@@ -202,8 +204,7 @@ public class BeanContextServicesSupport
     throw new Error ("Not implemented");
   }
 
-  protected final void
-  fireServiceRevoked (BeanContextServiceRevokedEvent bcsre)
+  protected final void fireServiceRevoked(BeanContextServiceRevokedEvent event)
   {
     throw new Error ("Not implemented");
   }
@@ -250,7 +251,10 @@ public class BeanContextServicesSupport
 
   public void initialize ()
   {
-    throw new Error ("Not implemented");
+    super.initialize();
+
+    bcsListeners = new ArrayList();
+    services = new HashMap();
   }
 
   protected  void initializeBeanContextResources () 
@@ -269,10 +273,13 @@ public class BeanContextServicesSupport
     throw new Error ("Not implemented");
   }
 
-  public void
-  removeBeanContextServicesListener (BeanContextServicesListener bcsl)
+  public void removeBeanContextServicesListener
+    (BeanContextServicesListener listener)
   {
-    throw new Error ("Not implemented");
+    int index = bcsListeners.indexOf(listener);
+
+    if (index > -1)
+      bcsListeners.remove(index);
   }
 
   public void revokeService (Class serviceClass, BeanContextServiceProvider bcsp,

@@ -1,6 +1,5 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-<!-- package.html - describes classes in javax.swing.text.html package.
-   Copyright (C) 2002 Free Software Foundation, Inc.
+/* DomHTMLDivElement.java -- 
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -34,17 +33,37 @@ module.  An independent module is a module which is not derived from
 or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version. -->
+exception statement from your version. */
 
-<html>
-<head><title>GNU Classpath - javax.swing.text.html.parser</title></head>
+package gnu.xml.dom.html2;
 
-<body>
-<p> Provides the DTD driven for web browsers,
- web robots, web page content analysers, web editors and
- other applications applications working with Hypertext
- Markup Language (HTML).
-</p>
+import org.w3c.dom.html2.HTMLDivElement;
 
-</body>
-</html>
+/**
+ * An HTML 'DIV' element node.
+ *
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ */
+public class DomHTMLDivElement
+  extends DomHTMLElement
+  implements HTMLDivElement
+{
+
+  protected DomHTMLDivElement(DomHTMLDocument owner, String namespaceURI,
+                              String name)
+  {
+    super(owner, namespaceURI, name);
+  }
+
+  public String getAlign()
+  {
+    return getHTMLAttribute("align");
+  }
+
+  public void setAlign(String align)
+  {
+    setHTMLAttribute("align", align);
+  }
+  
+}
+
