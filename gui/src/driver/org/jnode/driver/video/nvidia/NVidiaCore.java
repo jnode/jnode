@@ -224,7 +224,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 	 *      int, int)
 	 */
 	protected final void drawPixel(int x, int y, int color, int mode) {
-		bitmapGraphics.drawPixel(x, y, color, mode);
+		bitmapGraphics.drawPixels(x, y, 1, color, mode);
 	}
 
 	/**
@@ -598,4 +598,16 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 	public NVidiaHardwareCursor getHardwareCursor() {
 		return hwCursor;
 	}
+	/**
+	 * @see org.jnode.driver.video.util.AbstractSurface#fillRect(int, int, int, int, int, int)
+	 */
+	protected void fillRect(int x, int y, int w, int h, int color, int mode) {
+		final int screenWidth = config.getScreenWidth();
+		if ((x == 0) && (w == screenWidth)) {
+			bitmapGraphics.drawPixels(0, y, screenWidth * height, color, mode);
+		} else {
+			super.fillRect(x, y, w, h, color, mode);
+		}
+	}
+
 }

@@ -100,7 +100,7 @@ public class VGASurface extends AbstractSurface implements Surface, VgaConstants
 	 * @see org.jnode.driver.video.util.AbstractSurface#drawPixel(int, int, int, int)
 	 */
 	protected void drawPixel(int x, int y, int color, int mode) {
-		bitmapGraphics.drawPixel(x, y, color, mode);
+		bitmapGraphics.drawPixels(x, y, 1, color, mode);
 	}
 	/**
 	 * @see org.jnode.driver.video.util.AbstractSurface#drawLine(int, int, int, int, int, int)

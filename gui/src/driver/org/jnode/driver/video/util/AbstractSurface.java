@@ -9,6 +9,7 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
+import java.awt.geom.RectangularShape;
 
 import org.jnode.awt.geom.Curves;
 import org.jnode.driver.video.Surface;
@@ -44,6 +45,7 @@ public abstract class AbstractSurface implements Surface {
 
 	/**
 	 * Fill the given shape with the given color
+	 * 
 	 * @param shape
 	 * @param color
 	 * @param mode
@@ -59,7 +61,7 @@ public abstract class AbstractSurface implements Surface {
 			tx = 0.0;
 			ty = 0.0;
 			txShape = shape;
-		} else if (trans.getType() == AffineTransform.TYPE_IDENTITY){
+		} else if (trans.getType() == AffineTransform.TYPE_IDENTITY) {
 			tx = 0.0;
 			ty = 0.0;
 			txShape = shape;
@@ -76,20 +78,31 @@ public abstract class AbstractSurface implements Surface {
 		}
 
 		final Rectangle bounds = txShape.getBounds();
-		//log.debug("Fill " + shape + ", bounds " + bounds);
-		for (int row = 0; row < bounds.height; row++) {
-			final int y = (int)(ty + bounds.y + row);
-			for (int col = 0; col < bounds.width; col++) {
-				final int x = (int)(tx + bounds.x + col);
-				if (txShape.contains(x, y)) {
-					drawPixel(x, y, c, mode);
+		if (txShape instanceof RectangularShape) {
+			fillRect((int)(tx + bounds.x), (int)(ty + bounds.y), bounds.width, bounds.height, c, mode);
+		} else {
+			//log.debug("Fill " + shape + ", bounds " + bounds);
+			for (int row = 0; row < bounds.height; row++) {
+				final int y = (int) (ty + bounds.y + row);
+				for (int col = 0; col < bounds.width; col++) {
+					final int x = (int) (tx + bounds.x + col);
+					if (txShape.contains(x, y)) {
+						drawPixel(x, y, c, mode);
+					}
 				}
 			}
 		}
 	}
 
+	protected void fillRect(int x, int y, int w, int h, int color, int mode) {
+		for (int row = 0; row < h; row++) {
+			drawLine(x, y + row, x + w, y + row, color, mode);
+		}
+	}
+	
 	/**
 	 * Set a pixel at the given location
+	 * 
 	 * @param x
 	 * @param y
 	 * @param color
@@ -98,7 +111,8 @@ public abstract class AbstractSurface implements Surface {
 	protected abstract void drawPixel(int x, int y, int color, int mode);
 
 	/**
-	 * Draw a line between (x1,y1) and (x2,y2) 
+	 * Draw a line between (x1,y1) and (x2,y2)
+	 * 
 	 * @param x1
 	 * @param y1
 	 * @param x2
@@ -109,7 +123,7 @@ public abstract class AbstractSurface implements Surface {
 	protected void drawLine(int x1, int y1, int x2, int y2, int color, int mode) {
 		final int incx, incy;
 		int countx, county;
-		
+
 		//log.debug("AS.drawLine " + x1 + "," + y1 + "," + x2 + ","+ y2);
 
 		final int sizex = Math.abs(x2 - x1);
@@ -157,6 +171,7 @@ public abstract class AbstractSurface implements Surface {
 
 	/**
 	 * Draw a bezier curve
+	 * 
 	 * @param x0
 	 * @param y0
 	 * @param x1
@@ -171,13 +186,14 @@ public abstract class AbstractSurface implements Surface {
 	protected void drawCurve(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3, int color, int mode) {
 		final double[] points = new double[42];
 		Curves.calculateCubicCurve(x0, y0, x1, y1, x2, y2, x3, y3, points);
-		for (int i = 0; i < points.length-2; i+= 2) {		
-			drawLine((int)points[i], (int)points[i+1], (int)points[i+2], (int)points[i+3], color, mode);
+		for (int i = 0; i < points.length - 2; i += 2) {
+			drawLine((int) points[i], (int) points[i + 1], (int) points[i + 2], (int) points[i + 3], color, mode);
 		}
 	}
 
 	/**
 	 * Draw a quadratic parametric curve
+	 * 
 	 * @param x0
 	 * @param y0
 	 * @param x1
@@ -190,27 +206,28 @@ public abstract class AbstractSurface implements Surface {
 	protected void drawQuadCurve(double x0, double y0, double x1, double y1, double x2, double y2, int color, int mode) {
 		final double[] points = new double[42];
 		Curves.calculateQuadCurve(x0, y0, x1, y1, x2, y2, points);
-		for (int i = 0; i < points.length-2; i+= 2) {		
-			drawLine((int)points[i], (int)points[i+1], (int)points[i+2], (int)points[i+3], color, mode);
+		for (int i = 0; i < points.length - 2; i += 2) {
+			drawLine((int) points[i], (int) points[i + 1], (int) points[i + 2], (int) points[i + 3], color, mode);
 		}
 	}
 
 	/**
 	 * Draw the given shape
+	 * 
 	 * @param shape
 	 * @param color
 	 * @param mode
 	 */
 	protected final void draw(Shape shape, AffineTransform trans, int color, int mode) {
-		
+
 		//log.debug("Draw " + shape + ", " + trans);
-		
+
 		final double[] coords = new double[6];
 		double moveX = 0;
 		double moveY = 0;
 		double curX = 0;
 		double curY = 0;
-		
+
 		final double tx;
 		final double ty;
 
@@ -219,20 +236,20 @@ public abstract class AbstractSurface implements Surface {
 			tx = 0.0;
 			ty = 0.0;
 			i = shape.getPathIterator(null);
-		} else if (trans.getType() == AffineTransform.TYPE_IDENTITY){
+		} else if (trans.getType() == AffineTransform.TYPE_IDENTITY) {
 			tx = 0.0;
 			ty = 0.0;
 			i = shape.getPathIterator(null);
 		} else if (trans.getType() == AffineTransform.TYPE_TRANSLATION) {
 			tx = trans.getTranslateX();
 			ty = trans.getTranslateY();
-			i = shape.getPathIterator(null);			
+			i = shape.getPathIterator(null);
 		} else {
 			tx = 0.0;
 			ty = 0.0;
 			i = shape.getPathIterator(trans);
 		}
-		
+
 		//log.debug("Draw");
 
 		while (!i.isDone()) {
@@ -248,21 +265,21 @@ public abstract class AbstractSurface implements Surface {
 				case PathIterator.SEG_LINETO :
 					x = (int) coords[0];
 					y = (int) coords[1];
-					drawLine((int)(curX + tx), (int)(curY + ty), (int)(x + tx), (int)(y + ty), color, mode);
+					drawLine((int) (curX + tx), (int) (curY + ty), (int) (x + tx), (int) (y + ty), color, mode);
 					curX = x;
 					curY = y;
 					break;
 				case PathIterator.SEG_CLOSE :
-					drawLine((int)(moveX + tx), (int)(moveY + ty), (int)(curX + tx), (int)(curY + ty), color, mode);
+					drawLine((int) (moveX + tx), (int) (moveY + ty), (int) (curX + tx), (int) (curY + ty), color, mode);
 					break;
 				case PathIterator.SEG_CUBICTO :
 					//log.debug("CUBICTO ");
-					drawCurve(curX + tx, curY + ty, coords[0] + tx, coords[1] + ty, coords[2]+tx, coords[3]+ty, coords[4]+tx, coords[5]+ty, color, mode);
+					drawCurve(curX + tx, curY + ty, coords[0] + tx, coords[1] + ty, coords[2] + tx, coords[3] + ty, coords[4] + tx, coords[5] + ty, color, mode);
 					curX = (int) coords[4];
 					curY = (int) coords[5];
 					break;
 				case PathIterator.SEG_QUADTO :
-					drawQuadCurve(curX+tx, curY+ty, coords[0]+tx, coords[1]+ty, coords[2]+tx, coords[3]+ty, color, mode);
+					drawQuadCurve(curX + tx, curY + ty, coords[0] + tx, coords[1] + ty, coords[2] + tx, coords[3] + ty, color, mode);
 					curX = (int) coords[2];
 					curY = (int) coords[3];
 					break;
@@ -274,15 +291,16 @@ public abstract class AbstractSurface implements Surface {
 
 	/**
 	 * Convert the given color to an int representation
+	 * 
 	 * @param color
 	 */
 	protected abstract int convertColor(Color color);
-	
+
 	protected void setSize(int width, int height) {
 		this.width = width;
 		this.height = height;
 	}
-	
+
 	/**
 	 * @return The height of this surface
 	 */
@@ -296,11 +314,11 @@ public abstract class AbstractSurface implements Surface {
 	protected final int getWidth() {
 		return this.width;
 	}
-	
+
 	protected final Rectangle getBounds(Shape shape, AffineTransform trans) {
 		if (trans == null) {
 			return shape.getBounds();
-		} else if (trans.getType() == AffineTransform.TYPE_IDENTITY){
+		} else if (trans.getType() == AffineTransform.TYPE_IDENTITY) {
 			return shape.getBounds();
 		} else if (trans.getType() == AffineTransform.TYPE_TRANSLATION) {
 			Rectangle b = shape.getBounds();
