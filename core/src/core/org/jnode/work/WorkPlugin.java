@@ -43,7 +43,7 @@ import org.jnode.util.QueueProcessorThread;
 public class WorkPlugin extends Plugin implements WorkManager {
 
     /** My logger */
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(WorkPlugin.class);
     
     /** Queue of work items */
     private final Queue queue = new Queue();

@@ -36,7 +36,7 @@ import org.jnode.util.NumberUtils;
 public class MouseInterpreter implements PointerInterpreter {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(MouseInterpreter.class);
 	/** List of valid protocol handlers */
 	private static final List protocolsHandlers = new ArrayList();
 
