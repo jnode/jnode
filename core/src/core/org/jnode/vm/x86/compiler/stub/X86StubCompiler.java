@@ -125,4 +125,12 @@ public class X86StubCompiler extends AbstractX86Compiler {
     public final int getMagic() {
         return STUB_COMPILER_MAGIC;
     }
+    
+    /**
+     * Gets the name of this compiler.
+     * @return
+     */
+    public String getName() {
+        return "X86-Stub";
+    }
 }

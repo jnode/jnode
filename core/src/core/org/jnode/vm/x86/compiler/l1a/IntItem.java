@@ -19,18 +19,18 @@ final class IntItem extends Item implements X86CompilerConstants {
 	private Register reg;
 	
 	private IntItem(int kind, Register reg, int value, int local) {
-		super(kind, INT, local);
+		super(kind, JvmType.INT, local);
 		this.value = value;
 		this.reg = reg;
 	}
 	
 	Register getRegister() {
-		myAssert(kind == REGISTER);
+		myAssert(kind == Kind.REGISTER);
 		return reg;
 	}
 	
 	int getValue() {
-		myAssert(kind == CONSTANT);
+		myAssert(kind == Kind.CONSTANT);
 		return value;
 	}
 	
@@ -47,18 +47,18 @@ final class IntItem extends Item implements X86CompilerConstants {
 		myAssert(!pool.isFree(reg));
 		
 		switch (kind) {
-			case REGISTER:
+			case Kind.REGISTER:
 				if (this.reg != reg) {
 					release(ec);
 					os.writeMOV(INTSIZE, reg, this.reg);
 				}
 				break;
 				
-			case LOCAL:
+			case Kind.LOCAL:
 				os.writeMOV(INTSIZE, reg, FP, getOffsetToFP());
 				break;
 				
-			case CONSTANT:
+			case Kind.CONSTANT:
 				if (value != 0) {
 					os.writeMOV_Const(reg, value);
 				} else {
@@ -66,12 +66,12 @@ final class IntItem extends Item implements X86CompilerConstants {
 				}
 				break;
 				
-			case FREGISTER:
+			case Kind.FREGISTER:
 				//TODO
 				notImplemented();
 				break;
 
-			case STACK:
+			case Kind.STACK:
 				//TODO: make sure this is on top os stack
 				if (VirtualStack.checkOperandStack) {
 					final VirtualStack stack = ec.getVStack();
@@ -79,7 +79,7 @@ final class IntItem extends Item implements X86CompilerConstants {
 				}
 				os.writePOP(reg);
 		}
-		kind = REGISTER;
+		kind = Kind.REGISTER;
 		this.reg = reg;
 	}
 
@@ -103,13 +103,13 @@ final class IntItem extends Item implements X86CompilerConstants {
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#load()
 	 */
 	void load(EmitterContext ec) {
-		if (kind != REGISTER) {
+		if (kind != Kind.REGISTER) {
 			final X86RegisterPool pool = ec.getPool();
-			Register r = (Register)pool.request(INT, this);
+			Register r = (Register)pool.request(JvmType.INT, this);
 			if (r == null) {
 				final VirtualStack vstack = ec.getVStack();
 				vstack.push(ec);
-				r = (Register)pool.request(INT, this);
+				r = (Register)pool.request(JvmType.INT, this);
 			}
 			myAssert(r != null);
 			loadTo(ec, r);			
@@ -133,27 +133,27 @@ final class IntItem extends Item implements X86CompilerConstants {
 	Item clone(EmitterContext ec) {
 		Item res = null;
 		switch (getKind()) {
-			case REGISTER:
+			case Kind.REGISTER:
 				final X86RegisterPool pool = ec.getPool();
-				final Register r = (Register)pool.request(INT);
+				final Register r = (Register)pool.request(JvmType.INT);
 				res = createRegister(r);
 				pool.transferOwnerTo(r, res);
 				break;
 				
-			case LOCAL:
+			case Kind.LOCAL:
 				res = createLocal(getOffsetToFP());
 				break;
 				
-			case CONSTANT:
+			case Kind.CONSTANT:
 				res = createConst(value);
 				break;
 				
-			case FREGISTER:
+			case Kind.FREGISTER:
 				//TODO
 				notImplemented();
 				break;
 			
-			case STACK:
+			case Kind.STACK:
 				AbstractX86Stream os = ec.getStream();
 				os.writePUSH(Register.SP, 0);
 				res = createStack();
@@ -174,29 +174,29 @@ final class IntItem extends Item implements X86CompilerConstants {
 		final AbstractX86Stream os = ec.getStream();
 		
 		switch (getKind()) {
-			case REGISTER:
+			case Kind.REGISTER:
 				os.writePUSH(reg);
 				break;
 				
-			case LOCAL:
+			case Kind.LOCAL:
 				os.writePUSH(FP, offsetToFP);
 				break;
 				
-			case CONSTANT:
+			case Kind.CONSTANT:
 				os.writePUSH(value);
 				break;
 				
-			case FREGISTER:
+			case Kind.FREGISTER:
 				//TODO
 				notImplemented();
 				break;
 			
-			case STACK:
+			case Kind.STACK:
 				//nothing to do
 				if (VirtualStack.checkOperandStack) {
 					final VirtualStack stack = ec.getVStack();
 				
-					if (kind == STACK) {
+					if (kind == Kind.STACK) {
 						// the item is not really pushed and popped
 						// but this checks that it is really the top
 						// element
@@ -207,7 +207,7 @@ final class IntItem extends Item implements X86CompilerConstants {
 
 		}
 		release(ec);
-		kind = STACK;
+		kind = Kind.STACK;
 		
 		if (VirtualStack.checkOperandStack) {
 			final VirtualStack stack = ec.getVStack();
@@ -222,23 +222,23 @@ final class IntItem extends Item implements X86CompilerConstants {
 		final X86RegisterPool pool = ec.getPool();
 
 		switch (getKind()) {
-			case REGISTER:
+			case Kind.REGISTER:
 				pool.release(reg);
 				break;
 				
-			case LOCAL:
+			case Kind.LOCAL:
 				// nothing to do
 				break;
 				
-			case CONSTANT:
+			case Kind.CONSTANT:
 				// nothing to do
 				break;
 				
-			case FREGISTER:
+			case Kind.FREGISTER:
 				notImplemented();
 				break;
 
-			case STACK:
+			case Kind.STACK:
 				//nothing to do
 				break;
 		}
@@ -249,9 +249,9 @@ final class IntItem extends Item implements X86CompilerConstants {
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#spill(EmitterContext, Register)
 	 */
 	void spill(EmitterContext ec, Register reg) {
-		myAssert((getKind() == REGISTER) && (this.reg == reg));
+		myAssert((getKind() == Kind.REGISTER) && (this.reg == reg));
 		X86RegisterPool pool = ec.getPool();
-		Register r = (Register)pool.request(INT);
+		Register r = (Register)pool.request(JvmType.INT);
 		myAssert(r != null);
 		loadTo(ec, r);
 		pool.transferOwnerTo(r, this);
@@ -261,23 +261,23 @@ final class IntItem extends Item implements X86CompilerConstants {
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
 	 */
 	boolean uses(Register reg) {
-		return ((kind == REGISTER) && this.reg.equals(reg));
+		return ((kind == Kind.REGISTER) && this.reg.equals(reg));
 	}
 	
 	static IntItem createRegister(Register reg) {
-		return new IntItem(REGISTER, reg, 0, 0);
+		return new IntItem(Kind.REGISTER, reg, 0, 0);
 	}
 	
 	static IntItem createConst(int value) {
-		return new IntItem(CONSTANT, null, value, 0);
+		return new IntItem(Kind.CONSTANT, null, value, 0);
 	}
 
 	static IntItem createLocal(int offsetToFP) {
-		return new IntItem(LOCAL, null, 0, offsetToFP);
+		return new IntItem(Kind.LOCAL, null, 0, offsetToFP);
 	}
 	
 	static IntItem createStack() {
-		return new IntItem(STACK, null, 0, 0);
+		return new IntItem(Kind.STACK, null, 0, 0);
 	}
 
 }

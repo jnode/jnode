@@ -20,7 +20,7 @@ final class DoubleItem extends Item implements X86CompilerConstants  {
 	 * @param value
 	 */
 	public DoubleItem(int kind,  int offsetToFP, double value) {
-		super(kind, DOUBLE, offsetToFP);
+		super(kind, JvmType.DOUBLE, offsetToFP);
 		
 		this.value = value;
 	}
@@ -48,27 +48,27 @@ final class DoubleItem extends Item implements X86CompilerConstants  {
 	Item clone(EmitterContext ec) {
 		Item res = null;
 		switch (getKind()) {
-			case REGISTER:
+			case Kind.REGISTER:
 				//TODO
 				notImplemented();
 				break;
 				
-			case LOCAL:
+			case Kind.LOCAL:
 				//TODO
 				notImplemented();
 				break;
 				
-			case CONSTANT:
+			case Kind.CONSTANT:
 				//TODO
 				notImplemented();
 				break;
 				
-			case FREGISTER:
+			case Kind.FREGISTER:
 				//TODO
 				notImplemented();
 				break;
 			
-			case STACK:
+			case Kind.STACK:
 				//TODO
 				notImplemented();
 				break;
@@ -83,17 +83,17 @@ final class DoubleItem extends Item implements X86CompilerConstants  {
 		final AbstractX86Stream os = ec.getStream();
 		
 		switch (getKind()) {
-			case REGISTER:
+			case Kind.REGISTER:
 				//TODO
 				notImplemented();
 				break;
 				
-			case LOCAL:
+			case Kind.LOCAL:
 				os.writePUSH(FP, offsetToFP+4);
 				os.writePUSH(FP, offsetToFP);
 				break;
 				
-			case CONSTANT:
+			case Kind.CONSTANT:
 				final long v = Double.doubleToLongBits(value);
 			    final int lsb = (int) (v & 0xFFFFFFFFL);
 			    final int msb = (int) ((v >>> 32) & 0xFFFFFFFFL);
@@ -102,17 +102,17 @@ final class DoubleItem extends Item implements X86CompilerConstants  {
 			    os.writePUSH(msb);
 				break;
 				
-			case FREGISTER:
+			case Kind.FREGISTER:
 				//TODO
 				notImplemented();
 				break;
 
-			case STACK:
+			case Kind.STACK:
 				// nothing to do
 				if (VirtualStack.checkOperandStack) {
 					final VirtualStack stack = ec.getVStack();
 			
-					if (kind == STACK) {
+					if (kind == Kind.STACK) {
 						// the item is not really pushed and popped
 						// but this checks that it is really the top
 						// element
@@ -123,7 +123,7 @@ final class DoubleItem extends Item implements X86CompilerConstants  {
 				
 		}
 		release(ec);
-		kind = STACK;
+		kind = Kind.STACK;
 		
 		if (VirtualStack.checkOperandStack) {
 			final VirtualStack stack = ec.getVStack();
@@ -136,20 +136,20 @@ final class DoubleItem extends Item implements X86CompilerConstants  {
 	 */
 	void release(EmitterContext ec) {
 		switch (getKind()) {
-			case REGISTER:
+			case Kind.REGISTER:
 				//TODO
 				notImplemented();
 				break;
 				
-			case LOCAL:
+			case Kind.LOCAL:
 				// nothing to do
 				break;
 				
-			case CONSTANT:
+			case Kind.CONSTANT:
 				// nothing to do
 				break;
 				
-			case FREGISTER:
+			case Kind.FREGISTER:
 				//TODO
 				notImplemented();
 				break;
@@ -171,19 +171,19 @@ final class DoubleItem extends Item implements X86CompilerConstants  {
 	}
 
 	static DoubleItem createStack() {
-		return new DoubleItem(STACK, 0, 0);
+		return new DoubleItem(Kind.STACK, 0, 0);
 	}
 	
 	static DoubleItem createLocal(int offsetToFP) {
-		return new DoubleItem(LOCAL, offsetToFP, 0);
+		return new DoubleItem(Kind.LOCAL, offsetToFP, 0);
 	}
 	
 	static DoubleItem createConst(double val) {
-		return new DoubleItem(CONSTANT, 0, val);
+		return new DoubleItem(Kind.CONSTANT, 0, val);
 	}
 	
 	static DoubleItem createFReg() {
-		return new DoubleItem(FREGISTER, 0, 0);
+		return new DoubleItem(Kind.FREGISTER, 0, 0);
 	}
 
 }

@@ -78,4 +78,12 @@ public class X86Level1ACompiler extends AbstractX86Compiler {
     public final int getMagic() {
         return L1A_COMPILER_MAGIC;
     }
+    
+    /**
+     * Gets the name of this compiler.
+     * @return
+     */
+    public String getName() {
+        return "X86-L1A";
+    }
 }

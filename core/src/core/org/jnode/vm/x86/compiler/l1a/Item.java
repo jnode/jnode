@@ -35,24 +35,28 @@ abstract class Item {
 	 * An item has only one kind; flags are used for masking purposes
 	 * (detect multiple kinds in one operation)
 	 */
-	static final int STACK = 0x1;
-	static final int REGISTER = 0x2;
-	static final int FREGISTER = 0x4;
-	static final int LOCAL = 0x8;
-	static final int CONSTANT = 0x10;
+    static class Kind {
+        static final int STACK = 0x1;
+        static final int REGISTER = 0x2;
+        static final int FREGISTER = 0x4;
+        static final int LOCAL = 0x8;
+        static final int CONSTANT = 0x10;
+    }
 	
 	/*
 	 * JVM types
 	 */
-	static final int UNKNOWN = 0;
-	static final int BYTE = 1;
-	static final int SHORT = 2;
-	static final int CHAR = 3;
-	static final int INT = 4;
-	static final int LONG = 5;
-	static final int FLOAT = 6;
-	static final int DOUBLE = 7;
-	static final int REFERENCE = 8;
+    static class JvmType {
+        static final int UNKNOWN = 0;
+        static final int BYTE = 1;
+        static final int SHORT = 2;
+        static final int CHAR = 3;
+        static final int INT = 4;
+        static final int LONG = 5;
+        static final int FLOAT = 6;
+        static final int DOUBLE = 7;
+        static final int REFERENCE = 8;
+    }
 
 	/*
 	 * Virtual Stack Item
@@ -102,14 +106,15 @@ abstract class Item {
 	 * @return computational type category
 	 */
 	final int getCategory() {
-		if ((type == LONG)||(type == DOUBLE))
-			return 2;
-		else
-			return 1;
-	}
+        if ((type == JvmType.LONG) || (type == JvmType.DOUBLE)) {
+            return 2;
+        } else {
+            return 1;
+        }
+    }
 	
 	final int getOffsetToFP() {
-		myAssert(kind == LOCAL);
+		myAssert(kind == Kind.LOCAL);
 		return offsetToFP;
 	}
 
@@ -244,21 +249,21 @@ abstract class Item {
 			case 'C' : // Character
 			case 'S' : // Short
 			case 'I' : // Integer
-				res = INT;
+				res = JvmType.INT;
 				break;
 			case 'F' : // Float
-				res = FLOAT;
+				res = JvmType.FLOAT;
 				break;
 			case 'L' : // Object
 			case ';' : // Object
 			case '[' : // Array
-				res = REFERENCE;
+				res = JvmType.REFERENCE;
 				break;
 			case 'J' : // Long
-				res = LONG;
+				res = JvmType.LONG;
 				break;
 			case 'D' : // Double
-				res = DOUBLE;
+				res = JvmType.DOUBLE;
 				break;
 			default :
 				throw new IllegalArgumentException("Unknown type"+type);

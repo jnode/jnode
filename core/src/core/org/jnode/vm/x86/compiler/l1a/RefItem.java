@@ -28,18 +28,18 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
 	 * @param offsetToFP
 	 */
 	private RefItem(int kind, Register reg, VmConstString val, int offsetToFP) {
-		super(kind, REFERENCE, offsetToFP);
+		super(kind, JvmType.REFERENCE, offsetToFP);
 		this.reg = reg;
 		this.value = val;
 	}
 
 	Register getRegister() {
-		myAssert(getKind() == REGISTER);
+		myAssert(getKind() == Kind.REGISTER);
 		return reg;
 	}
 	
 	VmConstString getValue() {
-		myAssert(getKind() == CONSTANT);
+		myAssert(getKind() == Kind.CONSTANT);
 		return value;
 	}
 	
@@ -56,18 +56,18 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
 		myAssert(!pool.isFree(reg));
 
 		switch (getKind()) {
-			case REGISTER:
+			case Kind.REGISTER:
 				if (this.reg != reg) {
 					release(ec);
 					os.writeMOV(INTSIZE, reg, this.reg);
 				}
 				break;
 				
-			case LOCAL:
+			case Kind.LOCAL:
 				os.writeMOV(INTSIZE, reg, FP, getOffsetToFP());
 				break;
 				
-			case CONSTANT:
+			case Kind.CONSTANT:
 				if (value == null) {
 					os.writeMOV_Const(reg, value);
 				} else {
@@ -77,11 +77,11 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
 				}
 				break;
 				
-			case FREGISTER:
+			case Kind.FREGISTER:
 				notImplemented();
 				break;
 				
-			case STACK:
+			case Kind.STACK:
 				if (VirtualStack.checkOperandStack) {
 					final VirtualStack stack = ec.getVStack();
 					stack.popFromOperandStack(this);
@@ -90,7 +90,7 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
 				break;
 
 		}
-		kind = REGISTER;
+		kind = Kind.REGISTER;
 		this.reg = reg;
 	}
 	
@@ -98,13 +98,13 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#load()
 	 */
 	void load(EmitterContext ec) {
-		if (kind != REGISTER) {
+		if (kind != Kind.REGISTER) {
 			final X86RegisterPool pool = ec.getPool();
-			Register r = (Register)pool.request(INT, this);
+			Register r = (Register)pool.request(JvmType.INT, this);
 			if (r == null) {
 				final VirtualStack vstack = ec.getVStack();
 				vstack.push(ec);
-				r = (Register)pool.request(INT, this);
+				r = (Register)pool.request(JvmType.INT, this);
 			}
 			myAssert(r != null);
 			loadTo(ec, r);	
@@ -137,27 +137,27 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
 	Item clone(EmitterContext ec) {
 		Item res = null;
 		switch (getKind()) {
-			case REGISTER:
+			case Kind.REGISTER:
 				final X86RegisterPool pool = ec.getPool();
-				final Register r = (Register)pool.request(INT);
+				final Register r = (Register)pool.request(JvmType.INT);
 				res = createRegister(r);
 				pool.transferOwnerTo(r, res);
 				break;
 				
-			case LOCAL:
+			case Kind.LOCAL:
 				res = createLocal(getOffsetToFP());
 				break;
 				
-			case CONSTANT:
+			case Kind.CONSTANT:
 				res = createConst(value);
 				break;
 				
-			case FREGISTER:
+			case Kind.FREGISTER:
 				//TODO
 				notImplemented();
 				break;
 			
-			case STACK:
+			case Kind.STACK:
 				AbstractX86Stream os = ec.getStream();
 				os.writePUSH(Register.SP, 0);
 				res = createStack();
@@ -177,15 +177,15 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
 		final AbstractX86Stream os = ec.getStream();
 		
 		switch (getKind()) {
-			case REGISTER:
+			case Kind.REGISTER:
 				os.writePUSH(reg);
 				break;
 				
-			case LOCAL:
+			case Kind.LOCAL:
 				os.writePUSH(FP, offsetToFP);
 				break;
 				
-			case CONSTANT:
+			case Kind.CONSTANT:
 				if (value == null) {
 					os.writePUSH_Const(null);
 				} else {
@@ -195,17 +195,17 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
 				}
 				break;
 				
-			case FREGISTER:
+			case Kind.FREGISTER:
 				//TODO
 				notImplemented();
 				break;
 				
-			case STACK:
+			case Kind.STACK:
 				//nothing to do
 				if (VirtualStack.checkOperandStack) {
 					final VirtualStack stack = ec.getVStack();
 				
-					if (kind == STACK) {
+					if (kind == Kind.STACK) {
 						// the item is not really pushed and popped
 						// but this checks that it is really the top
 						// element
@@ -216,7 +216,7 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
 
 		}
 		release(ec);
-		kind = STACK;
+		kind = Kind.STACK;
 		
 		if (VirtualStack.checkOperandStack) {
 			final VirtualStack stack = ec.getVStack();
@@ -231,23 +231,23 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
 		final X86RegisterPool pool = ec.getPool();
 
 		switch (getKind()) {
-			case REGISTER:
+			case Kind.REGISTER:
 				pool.release(reg);
 				break;
 				
-			case LOCAL:
+			case Kind.LOCAL:
 				// nothing to do
 				break;
 				
-			case CONSTANT:
+			case Kind.CONSTANT:
 				// nothing to do
 				break;
 				
-			case FREGISTER:
+			case Kind.FREGISTER:
 				notImplemented();
 				break;
 				
-			case STACK:
+			case Kind.STACK:
 				//nothing to do
 				break;
 
@@ -258,9 +258,9 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#spill(EmitterContext, Register)
 	 */
 	void spill(EmitterContext ec, Register reg) {
-		myAssert((getKind() == REGISTER) && (this.reg == reg));
+		myAssert((getKind() == Kind.REGISTER) && (this.reg == reg));
 		X86RegisterPool pool = ec.getPool();
-		Register r = (Register)pool.request(REFERENCE);
+		Register r = (Register)pool.request(JvmType.REFERENCE);
 		myAssert(r != null);
 		loadTo(ec, r);
 		pool.transferOwnerTo(r, this);
@@ -270,23 +270,23 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
 	 */
 	boolean uses(Register reg) {
-		return ((kind == REGISTER) && this.reg.equals(reg));
+		return ((kind == Kind.REGISTER) && this.reg.equals(reg));
 	}
 
 	static RefItem createRegister(Register reg) {
-		return new RefItem(REGISTER, reg, null, 0);
+		return new RefItem(Kind.REGISTER, reg, null, 0);
 	}
 	
 	static RefItem createConst(VmConstString value) {
-		return new RefItem(CONSTANT, null, value, 0);
+		return new RefItem(Kind.CONSTANT, null, value, 0);
 	}
 
 	static RefItem createLocal(int offsetToFP) {
-		return new RefItem(LOCAL, null, null, offsetToFP);
+		return new RefItem(Kind.LOCAL, null, null, offsetToFP);
 	}
 	
 	static RefItem createStack() {
-		return new RefItem(STACK, null, null, 0);
+		return new RefItem(Kind.STACK, null, null, 0);
 	}
 
 
