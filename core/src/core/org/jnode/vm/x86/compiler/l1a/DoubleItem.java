@@ -106,9 +106,29 @@ final class DoubleItem extends Item implements X86CompilerConstants  {
 				//TODO
 				notImplemented();
 				break;
+
+			case STACK:
+				// nothing to do
+				if (VirtualStack.checkOperandStack) {
+					final VirtualStack stack = ec.getVStack();
+			
+					if (kind == STACK) {
+						// the item is not really pushed and popped
+						// but this checks that it is really the top
+						// element
+						stack.popFromOperandStack(this);
+					}
+				}
+				break;
+				
 		}
 		release(ec);
 		kind = STACK;
+		
+		if (VirtualStack.checkOperandStack) {
+			final VirtualStack stack = ec.getVStack();
+			stack.pushOnOperandStack(this);
+		}
 	}
 
 	/**

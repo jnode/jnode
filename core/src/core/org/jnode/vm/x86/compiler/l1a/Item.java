@@ -82,7 +82,7 @@ abstract class Item {
 	 * Get the JVM type of this item
 	 * @return the JVM type
 	 */
-	int getType() {
+	final int getType() {
 		return type;
 	}
 	
@@ -90,7 +90,7 @@ abstract class Item {
 	 * Get the item kind (STACK, REGISTER, ....)
 	 * @return the item kind
 	 */
-	int getKind() {
+	final int getKind() {
 		return kind;
 	}
 	
@@ -101,14 +101,14 @@ abstract class Item {
          *
 	 * @return computational type category
 	 */
-	int getCategory() {
+	final int getCategory() {
 		if ((type == LONG)||(type == DOUBLE))
 			return 2;
 		else
 			return 1;
 	}
 	
-	int getOffsetToFP() {
+	final int getOffsetToFP() {
 		myAssert(kind == LOCAL);
 		return offsetToFP;
 	}
@@ -208,6 +208,14 @@ abstract class Item {
 	 * @param ec the EmitterContext
 	 */
 	abstract void release(EmitterContext ec);
+
+	void release1(EmitterContext ec) {
+		if (VirtualStack.checkOperandStack) {
+			VirtualStack vs = ec.getVStack();
+			vs.popFromOperandStack(this);
+		}
+		release(ec);
+	}
 
 	/**
 	 * Spill the registers associated to this item

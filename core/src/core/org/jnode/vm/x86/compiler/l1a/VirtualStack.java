@@ -3,6 +3,7 @@
  */
 package org.jnode.vm.x86.compiler.l1a;
 
+import org.jnode.assembler.x86.AbstractX86Stream;
 
 /**
  * @author Patrik Reali
@@ -11,18 +12,40 @@ package org.jnode.vm.x86.compiler.l1a;
 // TODO: work with Items to keep track of each item's stack level until popped and ensure consistency and correctness
 
 final class VirtualStack {
+	// explicitely check that elements on the operant stack
+	// are popped in the appropriate order
+	//
+	static final boolean	checkOperandStack = true;
+
+	// the virtual stack
 	Item[] stack;
 	
 	// top of stack; stack[tos] is not part of the stack!
 	int	tos;
 	
+	// the real stack (only if checkStackOrder == true)
+	private Item[]  operandStack;
+	private int	operandTos;
+
+
+	private AbstractX86Stream os;
+
 	/**
 	 * 
 	 * Constructor; create and initialize stack with default size 
 	 */
-	VirtualStack() {
+	VirtualStack(AbstractX86Stream os) {
+		this.os = os;
+		reset();
+	}
+
+	void reset() {
 		stack = new Item[8];
 		tos = 0;
+		if (checkOperandStack) {
+			operandStack = new Item[8];
+			operandTos = 0;
+		}
 	}
 	
 	int TOS() {
@@ -47,16 +70,18 @@ final class VirtualStack {
 	 * If no item on the stack, return UNKNOWN item (avoiding
 	 * this requires knowing the stack contents across basic blocks)
 	 * 
-	 * Use popItem as far as possible, but the brain-dead implementation
+	 * Use pop as far as possible, but the brain-dead implementation
 	 * of all dup opcodes (from the 2nd edition of the spec) allows popping
 	 * elements without knowing their type.
 	 * 
 	 * @return top item
 	 */
-	Item popItem() {
-		if (tos == 0)
-			//TODO: support items across basic blocks
-			pushStack(Item.UNKNOWN);
+	Item pop() {
+// do not autocreate item: if no type available, just fail; avoid this
+// case in the bytecode visitor
+//		if (tos == 0)
+//			//TODO: support items across basic blocks
+//			pushStack(Item.UNKNOWN);
 		tos--;
 		Item i = stack[tos];
 		stack[tos] = null;
@@ -71,9 +96,23 @@ final class VirtualStack {
 	 * @return pop the top of stack item
 	 * @exception VerifyError if the type does not correspond
 	 */
-	Item popItem(int type) {
-		if (tos == 0)
-			pushStack(type);
+	Item pop(int type) {
+		if (tos == 0) {
+			// the item requested in not on the virtual stack
+			// but already on the operand stack (it was pushed
+			// outside the current basic block)
+			// thus create a new stack item
+			Item it = createStack(type);
+			if (checkOperandStack) {
+				// insert at the begin of stack
+				// even if the vstack is empty, there
+				// may still be items popped from vstack
+				// that are not popped from operand stack
+				prependToOperandStack(it);
+			}
+			return it;
+			// pushStack(type);
+		}
 		tos--;
 		Item i = stack[tos];
 		stack[tos] =null;
@@ -83,25 +122,41 @@ final class VirtualStack {
 	}
 	
 	IntItem popInt() {
-		return (IntItem)popItem(Item.INT);
+		// testing in pop and casting here: test is just redundant
+		return (IntItem)pop(Item.INT);
 	}
 	
 	RefItem popRef() {
-		return (RefItem)popItem(Item.REFERENCE);
+		// testing in pop and casting here: test is just redundant
+		return (RefItem)pop(Item.REFERENCE);
 	}
 
-	void pushItem(Item item) {
-		if ((item.getType() == Item.STACK) && (tos > 0))
-			Item.myAssert(stack[tos-1].getType() == Item.STACK);
+	/**
+	 * Push item on stack.
+	 */
+	void push(Item item) {
+		if ((item.getKind() == Item.STACK) && (tos > 0))
+			Item.myAssert(stack[tos-1].getKind() == Item.STACK);
 
 		if (tos == stack.length) 
 			growStack();
 
 		stack[tos++] = item;		
 	}
+
+	/**
+	 * Push on vstack and operand stack (special case for
+	 * old-style code, to be eventually removed)
+	 */
+	void push1(Item item) {
+		push(item);
+		if (checkOperandStack && (item.getKind() == Item.STACK)) {
+			pushOnOperandStack(item);
+		}
+	}
 	
 	//TODO: deprecated
-	void pushStack(int type) {
+	Item createStack(int type) {
 		Item res = null;
 		switch (type) {
 			case Item.INT:
@@ -119,8 +174,16 @@ final class VirtualStack {
 			case Item.DOUBLE:
 				res = DoubleItem.createStack();
 				break;			
+			default:
+				throw new VerifyError("No type " + Integer.toString(type));
 		}
-		pushItem(res);
+		return res;
+	}
+	
+	//TODO: deprecated
+	void pushStack(int type) {
+		Item res = createStack(type);
+		push(res);
 	}
 	
 	/**
@@ -150,4 +213,53 @@ final class VirtualStack {
 		}
 	}
 
+
+	// operations on the operand stack
+	// used to check sanity
+	private void growOperandStack() {
+		Item[] tmp = new Item[operandStack.length * 2];
+		System.arraycopy(operandStack, 0, tmp, 0, operandStack.length);
+		operandStack = tmp;
+	}
+
+	private void prependToOperandStack(Item item) {
+		os.log("prepend");
+		Item.myAssert(item.getKind() == Item.STACK);
+
+		if (operandTos == operandStack.length) 
+			growOperandStack();
+
+		for (int i = operandTos; i > 0; i--)
+			operandStack[i] = operandStack[i-1];
+
+		operandTos++;
+		operandStack[0] = item;
+	}
+
+	void pushOnOperandStack(Item item) {
+		Item.myAssert(item.getKind() == Item.STACK);
+
+		if (operandTos == operandStack.length) 
+			growOperandStack();
+
+		os.log("push "+Integer.toString(item.getType()));
+		operandStack[operandTos++] = item;		
+	}
+		
+	void popFromOperandStack(Item item) {
+		if (operandTos <= 0) {
+			throw new Error("OperandStack is empty");
+		}
+		if (operandStack[--operandTos] != item) {
+			int i = operandTos-1;
+			while ((i >= 0) && (operandStack[i] != item))
+				i--;
+
+			throw new Error("OperandStack["+Integer.toString(operandTos)+
+					"] is not the expected element (found at"+
+					Integer.toString(i));
+		}
+		os.log("pop");
+		operandStack[operandTos] = null;
+	}
 }

@@ -18,8 +18,13 @@ final class EmitterContext {
 	
 	/** Helper class */
 	private final X86CompilerHelper helper;
-	
+
+	/** Register Pool */
 	private X86RegisterPool pool;
+
+	/** Virtual Stack */
+	private VirtualStack	vstack;
+
 
 	/**
 	 * Create a new context
@@ -27,6 +32,7 @@ final class EmitterContext {
 	EmitterContext(AbstractX86Stream os, X86CompilerHelper helper) {
 		this.os = os;
 		this.helper = helper;
+		this.vstack = new VirtualStack(os);
 		pool = new X86RegisterPool();
 	}
 
@@ -54,5 +60,14 @@ final class EmitterContext {
 	 */
 	X86RegisterPool getPool() {
 		return pool;
+	}
+	
+	/**
+	 * return the current emitter's virtual stack
+	 * 
+	 * @return the current emitter's virtual stack
+	 */
+	VirtualStack getVStack() {
+		return vstack;
 	}
 }

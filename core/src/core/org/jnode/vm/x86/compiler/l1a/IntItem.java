@@ -41,6 +41,7 @@ final class IntItem extends Item implements X86CompilerConstants {
 	 * @param reg register to load the item to
 	 */
 	void loadTo(EmitterContext ec, Register reg) {
+		myAssert(reg != null);
 		AbstractX86Stream os = ec.getStream();
 		X86RegisterPool pool = ec.getPool();
 		myAssert(!pool.isFree(reg));
@@ -69,8 +70,13 @@ final class IntItem extends Item implements X86CompilerConstants {
 				//TODO
 				notImplemented();
 				break;
+
 			case STACK:
 				//TODO: make sure this is on top os stack
+				if (VirtualStack.checkOperandStack) {
+					final VirtualStack stack = ec.getVStack();
+					stack.popFromOperandStack(this);
+				}
 				os.writePOP(reg);
 		}
 		kind = REGISTER;
@@ -99,7 +105,13 @@ final class IntItem extends Item implements X86CompilerConstants {
 	void load(EmitterContext ec) {
 		if (kind != REGISTER) {
 			final X86RegisterPool pool = ec.getPool();
-			final Register r = (Register)pool.request(INT, this);
+			Register r = (Register)pool.request(INT, this);
+			if (r == null) {
+				final VirtualStack vstack = ec.getVStack();
+				vstack.push(ec);
+				r = (Register)pool.request(INT, this);
+			}
+			myAssert(r != null);
 			loadTo(ec, r);			
 		}
 	}
@@ -145,6 +157,10 @@ final class IntItem extends Item implements X86CompilerConstants {
 				AbstractX86Stream os = ec.getStream();
 				os.writePUSH(Register.SP, 0);
 				res = createStack();
+				if (VirtualStack.checkOperandStack) {
+					final VirtualStack stack = ec.getVStack();
+					stack.pushOnOperandStack(res);
+				}
 				break;
 		}
 		return res;
@@ -177,10 +193,26 @@ final class IntItem extends Item implements X86CompilerConstants {
 			
 			case STACK:
 				//nothing to do
+				if (VirtualStack.checkOperandStack) {
+					final VirtualStack stack = ec.getVStack();
+				
+					if (kind == STACK) {
+						// the item is not really pushed and popped
+						// but this checks that it is really the top
+						// element
+						stack.popFromOperandStack(this);
+					}
+				}
 				break;
+
 		}
 		release(ec);
 		kind = STACK;
+		
+		if (VirtualStack.checkOperandStack) {
+			final VirtualStack stack = ec.getVStack();
+			stack.pushOnOperandStack(this);
+		}
 	}
 
 	/* (non-Javadoc)
