@@ -158,11 +158,17 @@ public class DeviceCommand {
 			out.println(prefix + prefix + api.getName());
 		}
 		out.println();
+        final PrintWriter pw = new PrintWriter(out);
 		try {
             final DeviceInfoAPI infoApi = (DeviceInfoAPI)dev.getAPI(DeviceInfoAPI.class);
-            infoApi.showInfo(new PrintWriter(out));
+            if (infoApi != dev) {
+                infoApi.showInfo(pw);
+            }
         } catch (ApiNotFoundException ex) {
             // Ignore
+        }
+        if (dev instanceof DeviceInfoAPI) {
+            ((DeviceInfoAPI)dev).showInfo(pw);
         }
 	}
 
