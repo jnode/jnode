@@ -151,7 +151,7 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
 
           cr = new CommandRunner(cmdInfo.getCommandClass(), method, new Object[]{commandLine, inputStream, outputStream, errStream});
         }
-        catch (Exception e)
+        catch (NoSuchMethodException e)
         {
           method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD, MAIN_ARG_TYPES);
           cr = new CommandRunner(cmdInfo.getCommandClass(), method, new Object[]{cmdLine.getRemainder().toStringArray()});
