@@ -58,6 +58,7 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 import org.jnode.vm.x86.compiler.X86CompilerContext;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 import org.jnode.vm.x86.compiler.X86IMTCompiler32;
+import org.jnode.vm.x86.compiler.X86IMTCompiler64;
 import org.jnode.vm.x86.compiler.X86JumpTable;
 
 /**
@@ -175,8 +176,15 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		this.context = context;
 		this.magicHelper = magicHelper;
 		this.vstack = new VirtualStack(os);
-		final X86RegisterPool.GPRs gprPool = new X86RegisterPool.GPRs();
-		final X86RegisterPool.XMMs xmmPool = new X86RegisterPool.XMMs();
+		final X86RegisterPool gprPool;
+		final X86RegisterPool xmmPool;
+		if (os.isCode32()) {
+			gprPool = new X86RegisterPool.GPRs32();
+			xmmPool = new X86RegisterPool.XMMs32();
+		} else {
+			gprPool = new X86RegisterPool.GPRs64();
+			xmmPool = new X86RegisterPool.XMMs64();			
+		}
 		this.ifac = ItemFactory.getFactory();
 		this.helper = new X86CompilerHelper(os, vstack.createStackMgr(gprPool,
 				ifac), context, isBootstrap);
@@ -553,7 +561,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		// Get superClassesArray[depth] -> objectr
 		os.writeMOV(INTSIZE, tmpr, tmpr, arrayDataOffset + (depth << 2));
 		// Compare objectr with classtype
-		os.writeCMP(STATICS, staticsOfs, tmpr);
+		os.writeCMP(context.STATICS, staticsOfs, tmpr);
 		if (resultr != null) {
 			os.writeSETCC(resultr, X86Constants.JE);
 		} else {
@@ -2309,7 +2317,11 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		os.writeMOV(INTSIZE, X86Register.EAX, X86Register.ESP, argSlotCount
 				* slotSize);
 		// Write the actual invokeinterface
-		X86IMTCompiler32.emitInvokeInterface(os, method);
+		if (os.isCode32()) {
+			X86IMTCompiler32.emitInvokeInterface(os, method);
+		} else {
+			X86IMTCompiler64.emitInvokeInterface(os, method);
+		}
 		// Write the push result
 		helper.pushReturnValue(method.getSignature());
 	}

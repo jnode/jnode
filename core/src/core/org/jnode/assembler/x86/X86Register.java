@@ -80,21 +80,21 @@ public class X86Register extends VmSystemObject implements X86Constants {
 
     public static final GPR64 R15 = new GPR64("r15", 15);
 
-    public static final GPR32 R8d = new GPR32("r8d", 8);
+    public static final GPR32 R8d = new GPR32("r8d", 8, true);
 
-    public static final GPR32 R9d = new GPR32("r9d", 9);
+    public static final GPR32 R9d = new GPR32("r9d", 9, true);
 
-    public static final GPR32 R10d = new GPR32("r10d", 10);
+    public static final GPR32 R10d = new GPR32("r10d", 10, true);
 
-    public static final GPR32 R11d = new GPR32("r11d", 11);
+    public static final GPR32 R11d = new GPR32("r11d", 11, true);
 
-    public static final GPR32 R12d = new GPR32("r12d", 12);
+    public static final GPR32 R12d = new GPR32("r12d", 12, true);
 
-    public static final GPR32 R13d = new GPR32("r13d", 13);
+    public static final GPR32 R13d = new GPR32("r13d", 13, true);
 
-    public static final GPR32 R14d = new GPR32("r14d", 14);
+    public static final GPR32 R14d = new GPR32("r14d", 14, true);
 
-    public static final GPR32 R15d = new GPR32("r15d", 15);
+    public static final GPR32 R15d = new GPR32("r15d", 15, true);
 
     /* Floating-point registers */
     public static final FPU ST0 = new FPU("st0", 0);
@@ -146,7 +146,17 @@ public class X86Register extends VmSystemObject implements X86Constants {
     public static final XMM XMM6 = new XMM("xmm6", 6);
 
     public static final XMM XMM7 = new XMM("xmm7", 7);
+    
+    public static final XMM XMM8 = new XMM("xmm8", 8);
+    public static final XMM XMM9 = new XMM("xmm9", 9);
+    public static final XMM XMM10 = new XMM("xmm10", 10);
+    public static final XMM XMM11 = new XMM("xmm11", 11);
+    public static final XMM XMM12 = new XMM("xmm12", 12);
+    public static final XMM XMM13 = new XMM("xmm13", 13);
+    public static final XMM XMM14 = new XMM("xmm14", 14);
+    public static final XMM XMM15 = new XMM("xmm15", 15);
 
+    
     private final String name;
 
     private final int nr;

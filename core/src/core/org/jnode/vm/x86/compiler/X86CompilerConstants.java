@@ -31,10 +31,16 @@ import org.jnode.vm.VmStackFrame;
 public interface X86CompilerConstants extends X86Constants {
 
 	/** 
-	 * Statics table register
+	 * Statics table register in 32-bit mode.
 	 * Do not change this constant!
 	 */
-	public static final X86Register.GPR STATICS = X86Register.EDI;
+	public static final X86Register.GPR32 STATICS32 = X86Register.EDI;
+
+	/** 
+	 * Statics table register in 64-bit mode.
+	 * Do not change this constant!
+	 */
+	public static final X86Register.GPR64 STATICS64 = X86Register.RDI;
 
     /** 
      * VmProcessor register in 64-bit mode.

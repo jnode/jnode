@@ -657,8 +657,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
      */
     private void testSuitableForBits8(X86Register dst) {
         if (!dst.isSuitableForBits8()) {
-            throw new RuntimeException(
-                    "Register is not suitable for BITS8 datasize");
+            throw new IllegalArgumentException(
+                    "Register " + dst + " is not suitable for BITS8 datasize");
         }
     }
 

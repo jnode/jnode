@@ -26,6 +26,7 @@ import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
+import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
@@ -227,7 +228,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
     public final void invokeJavaMethod(VmMethod method) {
         if (false) {
             final int staticsIdx = (VmArray.DATA_OFFSET + method.getStaticsIndex()) << 2;
-            os.writeMOV(INTSIZE, X86Register.EAX, STATICS, staticsIdx);
+            os.writeMOV(INTSIZE, X86Register.EAX, context.STATICS, staticsIdx);
         } else {
             os.writeMOV_Const(X86Register.EAX, method);
         }
@@ -374,9 +375,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
                         + "$$ediok");
                 if (os.isCode32()) {
                 os.writePrefix(X86Constants.FS_PREFIX);
-                os.writeCMP_MEM(STATICS, offset);
+                os.writeCMP_MEM(context.STATICS, offset);
                 } else {
-                    os.writeCMP(STATICS, PROCESSOR64, offset);
+                    os.writeCMP(context.STATICS, PROCESSOR64, offset);
                 }
                 os.writeJCC(ok, X86Constants.JE);
                 os.writeINT(0x88);
@@ -384,11 +385,11 @@ public class X86CompilerHelper implements X86CompilerConstants {
             }
         } else {
             if (os.isCode32()) {
-                os.writeXOR(STATICS, STATICS);
+                os.writeXOR(context.STATICS, context.STATICS);
                 os.writePrefix(X86Constants.FS_PREFIX);
-                os.writeMOV(INTSIZE, STATICS, STATICS, offset);
+                os.writeMOV(INTSIZE, context.STATICS, context.STATICS, offset);
             } else {
-                os.writeMOV(BITS64, STATICS, PROCESSOR64, offset);
+                os.writeMOV(BITS64, context.STATICS, PROCESSOR64, offset);
             }
         }
     }
@@ -502,7 +503,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
             VmStaticsEntry entry) {
         writeLoadSTATICS(curInstrLabel, "gs", true);
         final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
-        os.writeMOV(INTSIZE, dst, STATICS, staticsIdx);
+        os.writeMOV(INTSIZE, dst, context.STATICS, staticsIdx);
     }
 
     /**
@@ -518,9 +519,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
         writeLoadSTATICS(curInstrLabel, "gs", true);
         final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
         if (is32bit) {
-            os.writeFLD32(STATICS, staticsIdx);
+            os.writeFLD32(context.STATICS, staticsIdx);
         } else {
-            os.writeFLD64(STATICS, staticsIdx);
+            os.writeFLD64(context.STATICS, staticsIdx);
         }
     }
 
@@ -535,12 +536,12 @@ public class X86CompilerHelper implements X86CompilerConstants {
             VmStaticsEntry entry) {
         writeLoadSTATICS(curInstrLabel, "gs", true);
         final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
-        os.writePUSH(STATICS, staticsIdx);
+        os.writePUSH(context.STATICS, staticsIdx);
     }
 
     /**
      * Write code to load the given 64-bit statics table entry into the given
-     * registers.
+     * 32-bit registers.
      * 
      * @param curInstrLabel
      * @param lsbDst
@@ -551,8 +552,23 @@ public class X86CompilerHelper implements X86CompilerConstants {
     		GPR lsbDst, GPR msbReg, VmStaticsEntry entry) {
         writeLoadSTATICS(curInstrLabel, "gs64", true);
         final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
-        os.writeMOV(INTSIZE, msbReg, STATICS, staticsIdx + 4); // MSB
-        os.writeMOV(INTSIZE, lsbDst, STATICS, staticsIdx + 0); // LSB
+        os.writeMOV(INTSIZE, msbReg, context.STATICS, staticsIdx + 4); // MSB
+        os.writeMOV(INTSIZE, lsbDst, context.STATICS, staticsIdx + 0); // LSB
+    }
+
+    /**
+     * Write code to load the given 64-bit statics table entry into the given
+     * 64-bit register.
+     * 
+     * @param curInstrLabel
+     * @param dstReg
+     * @param entry
+     */
+    public final void writeGetStaticsEntry64(Label curInstrLabel,
+    		GPR64 dstReg, VmStaticsEntry entry) {
+        writeLoadSTATICS(curInstrLabel, "gs64", true);
+        final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
+        os.writeMOV(BITS64, dstReg, context.STATICS, staticsIdx); 
     }
 
     /**
@@ -567,12 +583,12 @@ public class X86CompilerHelper implements X86CompilerConstants {
             VmStaticsEntry entry) {
         writeLoadSTATICS(curInstrLabel, "ps", true);
         final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
-        os.writeMOV(INTSIZE, STATICS, staticsIdx, src);
+        os.writeMOV(INTSIZE, context.STATICS, staticsIdx, src);
     }
 
     /**
      * Write code to store the given 64-bit statics table entry into the given
-     * registers.
+     * 32-bit registers.
      * 
      * @param curInstrLabel
      * @param lsbSrc
@@ -583,8 +599,23 @@ public class X86CompilerHelper implements X86CompilerConstants {
     		GPR lsbSrc, GPR msbSrc, VmStaticsEntry entry) {
         writeLoadSTATICS(curInstrLabel, "ps64", true);
         final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
-        os.writeMOV(INTSIZE, STATICS, staticsIdx + 4, msbSrc); // MSB
-        os.writeMOV(INTSIZE, STATICS, staticsIdx + 0, lsbSrc); // LSB
+        os.writeMOV(BITS32, context.STATICS, staticsIdx + 4, msbSrc); // MSB
+        os.writeMOV(BITS32, context.STATICS, staticsIdx + 0, lsbSrc); // LSB
+    }
+
+    /**
+     * Write code to store the given 64-bit statics table entry into the given
+     * 64-bit register.
+     * 
+     * @param curInstrLabel
+     * @param srcReg
+     * @param entry
+     */
+    public final void writePutStaticsEntry64(Label curInstrLabel,
+    		GPR64 srcReg, VmStaticsEntry entry) {
+        writeLoadSTATICS(curInstrLabel, "ps64", true);
+        final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
+        os.writeMOV(BITS64, context.STATICS, staticsIdx, srcReg); 
     }
 
     public static void assertCondition(boolean condition, String msg) {

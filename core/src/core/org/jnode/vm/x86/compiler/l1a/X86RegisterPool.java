@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Assembler;
@@ -38,7 +38,7 @@ import org.jnode.vm.JvmType;
 abstract class X86RegisterPool {
 
 	/** All available registers and their current usage */
-	private final RegisterUsage[] registers;
+	private final RegisterGroupUsage[] registers;
 
 	/** Length of registers */
 	private final int regCount;
@@ -52,11 +52,11 @@ abstract class X86RegisterPool {
 	}
 
 	/**
-	 * Initialize register pool
-	 * The order of this array determines the cost of using the register.
-	 * The cost of a register is lower when its index in this array is higher.
+	 * Initialize register pool The order of this array determines the cost of
+	 * using the register. The cost of a register is lower when its index in
+	 * this array is higher.
 	 */
-	protected abstract RegisterUsage[] initialize();
+	protected abstract RegisterGroupUsage[] initialize();
 
 	/**
 	 * require a register from the pool
@@ -67,7 +67,7 @@ abstract class X86RegisterPool {
 	 *            the register owner
 	 * @return the allocated register or null
 	 */
-	public X86Register request(int type, Object owner) {
+	public final X86Register request(int type, Object owner) {
 		return request(type, owner, false);
 	}
 
@@ -80,17 +80,12 @@ abstract class X86RegisterPool {
 	 *            the register owner
 	 * @return the allocated register or null
 	 */
-	public X86Register request(int type, Object owner, boolean supportBits8) {
-		if (type == JvmType.LONG || type == JvmType.DOUBLE) {
-			return null;
-		}
-
+	public final X86Register request(int type, Object owner, boolean supportBits8) {
 		for (int i = regCount - 1; i >= 0; i--) {
-			final RegisterUsage ru = registers[i];
-			if (!supportBits8 || ru.reg.isSuitableForBits8()) {
-				if (ru.request(owner)) {
-					return ru.reg;
-				}
+			final RegisterGroupUsage ru = registers[i];
+			final X86Register reg = ru.request(owner, type, supportBits8);
+			if (reg != null) {
+				return reg;
 			}
 		}
 		return null;
@@ -99,14 +94,14 @@ abstract class X86RegisterPool {
 	/**
 	 * @see org.jnode.vm.compiler.ir.RegisterPool#request(int)
 	 */
-	public X86Register request(int type) {
+	public final X86Register request(int type) {
 		return request(type, null, false);
 	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.RegisterPool#request(int)
 	 */
-	public X86Register request(int type, boolean supportsBits8) {
+	public final X86Register request(int type, boolean supportsBits8) {
 		return request(type, null, supportsBits8);
 	}
 
@@ -116,7 +111,7 @@ abstract class X86RegisterPool {
 	 * @param register
 	 * @return true, when register is free
 	 */
-	public boolean isFree(X86Register register) {
+	public final boolean isFree(X86Register register) {
 		return get(register).isFree();
 	}
 
@@ -126,7 +121,7 @@ abstract class X86RegisterPool {
 	 * @param register
 	 * @return true, when register is to be saved by a called method
 	 */
-	public boolean isCallerSaved(X86Register register) {
+	public final boolean isCallerSaved(X86Register register) {
 		return get(register).isCallerSaved();
 	}
 
@@ -136,11 +131,11 @@ abstract class X86RegisterPool {
 	 * @param register
 	 * @return false, if the register is already in use
 	 */
-	public boolean request(X86Register register, Object owner) {
-		final RegisterUsage ru = get(register);
+	public final boolean request(X86Register register, Object owner) {
+		final RegisterGroupUsage ru = get(register);
 		final boolean free = ru.isFree();
 		if (free) {
-			ru.request(owner);
+			ru.request(owner, register);
 		}
 		return free;
 	}
@@ -151,7 +146,7 @@ abstract class X86RegisterPool {
 	 * @param register
 	 * @return false, if the register is already in use
 	 */
-	public boolean request(X86Register register) {
+	public final boolean request(X86Register register) {
 		return request(register, null);
 	}
 
@@ -161,7 +156,7 @@ abstract class X86RegisterPool {
 	 * @param register
 	 * @return the owner (may be null if not set or when register not allocated)
 	 */
-	public Object getOwner(X86Register register) {
+	public final Object getOwner(X86Register register) {
 		return get(register).getOwner();
 	}
 
@@ -173,14 +168,14 @@ abstract class X86RegisterPool {
 	 * @param newOwner
 	 *            the register's new owner
 	 */
-	public void transferOwnerTo(X86Register register, Object newOwner) {
+	public final void transferOwnerTo(X86Register register, Object newOwner) {
 		get(register).setOwner(newOwner);
 	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.RegisterPool#release(java.lang.Object)
 	 */
-	public void release(X86Register register) {
+	public final void release(X86Register register) {
 		get(register).release();
 	}
 
@@ -190,11 +185,12 @@ abstract class X86RegisterPool {
 	 * @param os
 	 *            stream for issuing warning messages
 	 */
-	public void reset(X86Assembler os) {
+	public final void reset(X86Assembler os) {
 		boolean inuse = false;
 		for (int i = regCount - 1; i >= 0; i--) {
 			if (!registers[i].isFree()) {
-				os.log("Warning: register in use" + registers[i].reg);
+				os.log("Warning: register in use"
+						+ registers[i].getUsedRegister());
 				inuse = true;
 			}
 		}
@@ -209,10 +205,10 @@ abstract class X86RegisterPool {
 	 * @param reg
 	 * @return
 	 */
-	private RegisterUsage get(X86Register reg) {
+	private final RegisterGroupUsage get(X86Register reg) {
 		for (int i = regCount - 1; i >= 0; i--) {
-			final RegisterUsage ru = registers[i];
-			if (ru.reg == reg) {
+			final RegisterGroupUsage ru = registers[i];
+			if (ru.contains(reg)) {
 				return ru;
 			}
 		}
@@ -224,11 +220,11 @@ abstract class X86RegisterPool {
 	 * 
 	 * @param visitor
 	 */
-	public void visitUsedRegisters(RegisterVisitor visitor) {
+	public final void visitUsedRegisters(RegisterVisitor visitor) {
 		for (int i = 0; i < regCount; i++) {
-			final RegisterUsage ru = registers[i];
+			final RegisterGroupUsage ru = registers[i];
 			if (!ru.isFree()) {
-				visitor.visit(ru.reg);
+				visitor.visit(ru.getUsedRegister());
 			}
 		}
 	}
@@ -238,7 +234,7 @@ abstract class X86RegisterPool {
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString() {
+	public final String toString() {
 		final StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < regCount; i++) {
 			buf.append(registers[i].toString());
@@ -248,60 +244,266 @@ abstract class X86RegisterPool {
 	}
 
 	/**
-	 * Pool of GPR registers.
-	 * @author Ewout Prangsma (epr@users.sourceforge.net)
-	 */
-	public static final class GPRs extends X86RegisterPool {
-
-		/**
-		 * Initialize register pool
-		 */
-		protected RegisterUsage[] initialize() {
-			// The order of this array determines the cost of using the register.
-			// The cost of a register is lower when its index in this
-			// array is higher.
-			return new RegisterUsage[] { new RegisterUsage(X86Register.EAX, false),
-					new RegisterUsage(X86Register.EDX, false),
-					new RegisterUsage(X86Register.ECX, false),
-					new RegisterUsage(X86Register.EBX, false),
-					new RegisterUsage(X86Register.ESI, false) };
-			// EDI always points to the statics, do not use
-		}
-		
-	}
-	
-	/**
-	 * Pool of XMM registers.
-	 * @author Ewout Prangsma (epr@users.sourceforge.net)
-	 */
-	public static final class XMMs extends X86RegisterPool {
-
-		/**
-		 * Initialize register pool
-		 */
-		protected RegisterUsage[] initialize() {
-			// The order of this array determines the cost of using the register.
-			// The cost of a register is lower when its index in this
-			// array is higher.
-			return new RegisterUsage[] { 
-					new RegisterUsage(X86Register.XMM0, false),
-					new RegisterUsage(X86Register.XMM1, false),
-					new RegisterUsage(X86Register.XMM2, false),
-					new RegisterUsage(X86Register.XMM3, false),
-					new RegisterUsage(X86Register.XMM4, false),
-					new RegisterUsage(X86Register.XMM5, false),
-					new RegisterUsage(X86Register.XMM6, false),
-					new RegisterUsage(X86Register.XMM7, false) };
-		}		
-	}
-	
-	/**
-	 * Register usage information for a single register.
+	 * Pool of GPR registers in 32-bit mode.
 	 * 
 	 * @author Ewout Prangsma (epr@users.sourceforge.net)
 	 */
-	private static final class RegisterUsage {
+	public static final class GPRs32 extends X86RegisterPool {
+
+		/**
+		 * Initialize register pool
+		 */
+		protected RegisterGroupUsage[] initialize() {
+			// The order of this array determines the cost of using the
+			// register.
+			// The cost of a register is lower when its index in this
+			// array is higher.
+			return new RegisterGroupUsage[] {
+					new RegisterGroupUsage(new RegisterEntry(X86Register.EAX,
+							JvmType.INT), new RegisterEntry(X86Register.EAX,
+							JvmType.REFERENCE), new RegisterEntry(
+							X86Register.EAX, JvmType.FLOAT), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.EDX,
+							JvmType.INT), new RegisterEntry(X86Register.EDX,
+							JvmType.REFERENCE), new RegisterEntry(
+							X86Register.EDX, JvmType.FLOAT), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.ECX,
+							JvmType.INT), new RegisterEntry(X86Register.ECX,
+							JvmType.REFERENCE), new RegisterEntry(
+							X86Register.ECX, JvmType.FLOAT), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.EBX,
+							JvmType.INT), new RegisterEntry(X86Register.EBX,
+							JvmType.REFERENCE), new RegisterEntry(
+							X86Register.EBX, JvmType.FLOAT), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.ESI,
+							JvmType.INT), new RegisterEntry(X86Register.ESI,
+							JvmType.REFERENCE), new RegisterEntry(
+							X86Register.ESI, JvmType.FLOAT), false) };
+			// EDI always points to the statics, do not use
+		}
+
+	}
+
+	/**
+	 * Pool of GPR registers in 64-bit mode.
+	 * 
+	 * @author Ewout Prangsma (epr@users.sourceforge.net)
+	 */
+	public static final class GPRs64 extends X86RegisterPool {
+
+		/**
+		 * Initialize register pool
+		 */
+		protected RegisterGroupUsage[] initialize() {
+			// The order of this array determines the cost of using the
+			// register.
+			// The cost of a register is lower when its index in this
+			// array is higher.
+			return new RegisterGroupUsage[] {
+					new RegisterGroupUsage(new RegisterEntry(X86Register.EAX,
+							JvmType.INT), new RegisterEntry(X86Register.EAX,
+							JvmType.FLOAT), new RegisterEntry(X86Register.RAX,
+							JvmType.REFERENCE), new RegisterEntry(
+							X86Register.RAX, JvmType.LONG), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.EDX,
+							JvmType.INT), new RegisterEntry(X86Register.EDX,
+							JvmType.FLOAT), new RegisterEntry(X86Register.RDX,
+							JvmType.REFERENCE), new RegisterEntry(
+							X86Register.RDX, JvmType.LONG), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.ECX,
+							JvmType.INT), new RegisterEntry(X86Register.ECX,
+							JvmType.FLOAT), new RegisterEntry(X86Register.RCX,
+							JvmType.REFERENCE), new RegisterEntry(
+							X86Register.RCX, JvmType.LONG), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.EBX,
+							JvmType.INT), new RegisterEntry(X86Register.EBX,
+							JvmType.FLOAT), new RegisterEntry(X86Register.RBX,
+							JvmType.REFERENCE), new RegisterEntry(
+							X86Register.RBX, JvmType.LONG), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.ESI,
+							JvmType.INT), new RegisterEntry(X86Register.ESI,
+							JvmType.FLOAT), new RegisterEntry(X86Register.RSI,
+							JvmType.REFERENCE), new RegisterEntry(
+							X86Register.RSI, JvmType.LONG), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.R8d,
+							JvmType.INT), new RegisterEntry(X86Register.R8d,
+							JvmType.FLOAT), new RegisterEntry(X86Register.R8,
+							JvmType.REFERENCE), new RegisterEntry(
+							X86Register.R8, JvmType.LONG), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.R9d,
+							JvmType.INT), new RegisterEntry(X86Register.R9d,
+							JvmType.FLOAT), new RegisterEntry(X86Register.R9,
+							JvmType.REFERENCE), new RegisterEntry(
+							X86Register.R9, JvmType.LONG), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.R10d,
+							JvmType.INT), new RegisterEntry(X86Register.R10d,
+							JvmType.FLOAT), new RegisterEntry(X86Register.R10,
+							JvmType.REFERENCE), new RegisterEntry(
+							X86Register.R10, JvmType.LONG), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.R11d,
+							JvmType.INT), new RegisterEntry(X86Register.R11d,
+							JvmType.FLOAT), new RegisterEntry(X86Register.R11,
+							JvmType.REFERENCE), new RegisterEntry(
+							X86Register.R11, JvmType.LONG), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.R12d,
+							JvmType.INT), new RegisterEntry(X86Register.R12d,
+							JvmType.FLOAT), new RegisterEntry(X86Register.R12,
+							JvmType.REFERENCE), new RegisterEntry(
+							X86Register.R12, JvmType.LONG), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.R13d,
+							JvmType.INT), new RegisterEntry(X86Register.R13d,
+							JvmType.FLOAT), new RegisterEntry(X86Register.R13,
+							JvmType.REFERENCE), new RegisterEntry(
+							X86Register.R13, JvmType.LONG), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.R14d,
+							JvmType.INT), new RegisterEntry(X86Register.R14d,
+							JvmType.FLOAT), new RegisterEntry(X86Register.R14,
+							JvmType.REFERENCE), new RegisterEntry(
+							X86Register.R14, JvmType.LONG), false), };
+			// RDI always points to the statics, do not use
+			// R15 always points to the VmProcessor, do not use
+		}
+
+	}
+
+	/**
+	 * Pool of XMM registers in 32-bit mode.
+	 * 
+	 * @author Ewout Prangsma (epr@users.sourceforge.net)
+	 */
+	public static final class XMMs32 extends X86RegisterPool {
+
+		/**
+		 * Initialize register pool
+		 */
+		protected RegisterGroupUsage[] initialize() {
+			// The order of this array determines the cost of using the
+			// register.
+			// The cost of a register is lower when its index in this
+			// array is higher.
+			return new RegisterGroupUsage[] {
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM0,
+							JvmType.FLOAT), new RegisterEntry(X86Register.XMM0,
+							JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM1,
+							JvmType.FLOAT), new RegisterEntry(X86Register.XMM1,
+							JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM2,
+							JvmType.FLOAT), new RegisterEntry(X86Register.XMM2,
+							JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM3,
+							JvmType.FLOAT), new RegisterEntry(X86Register.XMM3,
+							JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM4,
+							JvmType.FLOAT), new RegisterEntry(X86Register.XMM4,
+							JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM5,
+							JvmType.FLOAT), new RegisterEntry(X86Register.XMM5,
+							JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM6,
+							JvmType.FLOAT), new RegisterEntry(X86Register.XMM6,
+							JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM7,
+							JvmType.FLOAT), new RegisterEntry(X86Register.XMM7,
+							JvmType.DOUBLE), false) };
+		}
+	}
+
+	/**
+	 * Pool of XMM registers in 64-bit mode.
+	 * 
+	 * @author Ewout Prangsma (epr@users.sourceforge.net)
+	 */
+	public static final class XMMs64 extends X86RegisterPool {
+
+		/**
+		 * Initialize register pool
+		 */
+		protected RegisterGroupUsage[] initialize() {
+			// The order of this array determines the cost of using the
+			// register.
+			// The cost of a register is lower when its index in this
+			// array is higher.
+			return new RegisterGroupUsage[] {
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM0,
+							JvmType.FLOAT), new RegisterEntry(X86Register.XMM0,
+							JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM1,
+							JvmType.FLOAT), new RegisterEntry(X86Register.XMM1,
+							JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM2,
+							JvmType.FLOAT), new RegisterEntry(X86Register.XMM2,
+							JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM3,
+							JvmType.FLOAT), new RegisterEntry(X86Register.XMM3,
+							JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM4,
+							JvmType.FLOAT), new RegisterEntry(X86Register.XMM4,
+							JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM5,
+							JvmType.FLOAT), new RegisterEntry(X86Register.XMM5,
+							JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM6,
+							JvmType.FLOAT), new RegisterEntry(X86Register.XMM6,
+							JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM7,
+							JvmType.FLOAT), new RegisterEntry(X86Register.XMM7,
+							JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM8,
+							JvmType.FLOAT), new RegisterEntry(X86Register.XMM8,
+							JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM9,
+							JvmType.FLOAT), new RegisterEntry(X86Register.XMM9,
+							JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM10,
+							JvmType.FLOAT), new RegisterEntry(
+							X86Register.XMM10, JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM11,
+							JvmType.FLOAT), new RegisterEntry(
+							X86Register.XMM11, JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM12,
+							JvmType.FLOAT), new RegisterEntry(
+							X86Register.XMM12, JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM13,
+							JvmType.FLOAT), new RegisterEntry(
+							X86Register.XMM13, JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM14,
+							JvmType.FLOAT), new RegisterEntry(
+							X86Register.XMM14, JvmType.DOUBLE), false),
+					new RegisterGroupUsage(new RegisterEntry(X86Register.XMM15,
+							JvmType.FLOAT), new RegisterEntry(
+							X86Register.XMM15, JvmType.DOUBLE), false) };
+		}
+	}
+
+	/**
+	 * Register & type information.
+	 * 
+	 * @author Ewout Prangsma (epr@users.sourceforge.net)
+	 */
+	private static final class RegisterEntry {
 		final X86Register reg;
+
+		final int jvmType;
+
+		/**
+		 * @param reg
+		 * @param jvmType
+		 */
+		public RegisterEntry(X86Register reg, int jvmType) {
+			this.reg = reg;
+			this.jvmType = jvmType;
+		}
+	}
+
+	/**
+	 * Register usage information for a group of registers that shared bits.
+	 * 
+	 * @author Ewout Prangsma (epr@users.sourceforge.net)
+	 */
+	private static final class RegisterGroupUsage {
+		/** The registers in this group */
+		private final RegisterEntry[] regs;
 
 		private Object owner;
 
@@ -309,13 +511,61 @@ abstract class X86RegisterPool {
 
 		private final boolean callerSaved;
 
+		/** The register in this group that is actually in use */
+		private X86Register usedReg;
+
 		/**
 		 * Initialize this instance.
 		 * 
 		 * @param reg
 		 */
-		public RegisterUsage(X86Register reg, boolean callerSaved) {
-			this.reg = reg;
+		public RegisterGroupUsage(RegisterEntry reg, boolean callerSaved) {
+			this(new RegisterEntry[] { reg }, callerSaved);
+		}
+
+		/**
+		 * Initialize this instance.
+		 * 
+		 * @param reg1
+		 * @param reg2
+		 */
+		public RegisterGroupUsage(RegisterEntry reg1, RegisterEntry reg2,
+				boolean callerSaved) {
+			this(new RegisterEntry[] { reg1, reg2 }, callerSaved);
+		}
+
+		/**
+		 * Initialize this instance.
+		 * 
+		 * @param reg1
+		 * @param reg2
+		 * @param reg3
+		 */
+		public RegisterGroupUsage(RegisterEntry reg1, RegisterEntry reg2,
+				RegisterEntry reg3, boolean callerSaved) {
+			this(new RegisterEntry[] { reg1, reg2, reg3 }, callerSaved);
+		}
+
+		/**
+		 * Initialize this instance.
+		 * 
+		 * @param reg1
+		 * @param reg2
+		 * @param reg3
+		 * @param reg4
+		 */
+		public RegisterGroupUsage(RegisterEntry reg1, RegisterEntry reg2,
+				RegisterEntry reg3, RegisterEntry reg4, boolean callerSaved) {
+			this(new RegisterEntry[] { reg1, reg2, reg3, reg4 }, callerSaved);
+		}
+
+		/**
+		 * Initialize this instance.
+		 * 
+		 * @param reg
+		 */
+		public RegisterGroupUsage(RegisterEntry[] regs, boolean callerSaved) {
+			this.regs = regs;
 			this.inuse = false;
 			this.callerSaved = callerSaved;
 		}
@@ -324,16 +574,38 @@ abstract class X86RegisterPool {
 		 * Register this register for the given owner.
 		 * 
 		 * @param owner
-		 * @return True if request succeeds, false if this register is already
-		 *         used.
+		 * @return The register if request succeeds, null if this register group
+		 *         is already used.
 		 */
-		public boolean request(Object owner) {
+		public X86Register request(Object owner, int jvmType,
+				boolean supportBits8) {
+			final int cnt = regs.length;
+			for (int i = 0; i < cnt; i++) {
+				final RegisterEntry re = regs[i];
+				if (re.jvmType == jvmType) {
+					if (!supportBits8 || re.reg.isSuitableForBits8()) {
+						return request(owner, re.reg);
+					}
+				}
+			}
+			return null;
+		}
+
+		/**
+		 * Register this register for the given owner.
+		 * 
+		 * @param owner
+		 * @return The register if request succeeds, null if this register group
+		 *         is already used.
+		 */
+		public X86Register request(Object owner, X86Register reg) {
 			if (this.inuse) {
-				return false;
+				return null;
 			} else {
 				this.owner = owner;
 				this.inuse = true;
-				return true;
+				this.usedReg = reg;
+				return reg;
 			}
 		}
 
@@ -343,6 +615,7 @@ abstract class X86RegisterPool {
 		public void release() {
 			this.owner = null;
 			this.inuse = false;
+			this.usedReg = null;
 		}
 
 		/**
@@ -383,15 +656,41 @@ abstract class X86RegisterPool {
 		}
 
 		/**
+		 * Is the given register contains in this instance.
+		 * 
+		 * @param reg
+		 * @return true / false
+		 */
+		public boolean contains(X86Register reg) {
+			final int cnt = regs.length;
+			for (int i = 0; i < cnt; i++) {
+				final RegisterEntry re = regs[i];
+				if (re.reg == reg) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/**
+		 * Gets the register in this group that is actually in use.
+		 * 
+		 * @return
+		 */
+		public X86Register getUsedRegister() {
+			return usedReg;
+		}
+
+		/**
 		 * Convert to a string representation.
 		 * 
 		 * @see java.lang.Object#toString()
 		 */
 		public String toString() {
 			if (inuse) {
-				return reg + " used by " + owner;
+				return usedReg + " used by " + owner;
 			} else {
-				return reg + " free";
+				return "free";
 			}
 		}
 	}
