@@ -11,6 +11,7 @@ import org.jnode.driver.net.NetworkException;
 import org.jnode.naming.InitialNaming;
 import org.jnode.net.NetPermission;
 import org.jnode.net.ipv4.IPv4Address;
+import org.jnode.net.ipv4.IPv4Constants;
 import org.jnode.net.ipv4.config.IPv4ConfigurationService;
 
 import javax.naming.NameNotFoundException;
@@ -26,6 +27,7 @@ import java.security.PrivilegedExceptionAction;
 /**
  * @author epr
  * @author markhale
+ * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 public class BOOTPClient
 {
@@ -183,15 +185,37 @@ public class BOOTPClient
     cfg.configureDeviceStatic(device, new IPv4Address(hdr.getYourIPAddress()),
         null, false);
 
+    IPv4Address network_address;
+
+    if (hdr.getServerIPAddress().getAddress()[0] < IPv4Constants.NETWORK_CLASSA)
+    {
+      network_address = new IPv4Address(hdr.getServerIPAddress().getAddress()[0] + "." +
+          hdr.getServerIPAddress().getAddress()[1] + "." +
+          hdr.getServerIPAddress().getAddress()[2] + ".0");
+    }
+    else if (hdr.getServerIPAddress().getAddress()[0] < IPv4Constants.NETWORK_CLASSB)
+    {
+      network_address = new IPv4Address(hdr.getServerIPAddress().getAddress()[0] + "." +
+          hdr.getServerIPAddress().getAddress()[1] + ".0.0");
+    }
+    else if (hdr.getServerIPAddress().getAddress()[0] < IPv4Constants.NETWORK_CLASSC)
+    {
+      network_address = new IPv4Address(hdr.getServerIPAddress().getAddress()[0] + ".0.0.0");
+    }
+    else
+      network_address = new IPv4Address(hdr.getServerIPAddress());
+
+
     if (hdr.getGatewayIPAddress().isAnyLocalAddress())
     {
-      cfg.addRoute(new IPv4Address(hdr.getServerIPAddress()), null,
-          device, false);
+//      cfg.addRoute(new IPv4Address(hdr.getServerIPAddress()), null, device, false);
+      cfg.addRoute(network_address, null, device, false);
+
     }
     else
     {
-      cfg.addRoute(new IPv4Address(hdr.getServerIPAddress()),
-          new IPv4Address(hdr.getGatewayIPAddress()), device, false);
+//      cfg.addRoute(new IPv4Address(hdr.getServerIPAddress()), new IPv4Address(hdr.getGatewayIPAddress()), device, false);
+      cfg.addRoute(network_address, new IPv4Address(hdr.getGatewayIPAddress()), device, false);
     }
   }
 }
