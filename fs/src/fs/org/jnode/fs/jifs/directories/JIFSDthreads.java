@@ -47,6 +47,7 @@ public class JIFSDthreads extends JIFSDirectory {
 	}
 	
 	public void refresh(){
+		super.refresh();
 		ThreadGroup grp = Thread.currentThread().getThreadGroup();
 		while (grp.getParent() != null) {
 			grp = grp.getParent();
