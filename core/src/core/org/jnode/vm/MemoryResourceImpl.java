@@ -251,7 +251,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 * @param dstOfs
 	 * @param length
 	 */
-	public void getInts(int memPtr, char[] dst, int dstOfs, int length) {
+	public void getInts(int memPtr, int[] dst, int dstOfs, int length) {
 		if (dstOfs < 0) {
 			throw new IndexOutOfBoundsException("dstOfs < 0");
 		}

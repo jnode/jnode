@@ -75,7 +75,7 @@ public interface MemoryResource extends Resource {
 	 * @param dstOfs
 	 * @param length
 	 */
-	public abstract void getInts(int memPtr, char[] dst, int dstOfs, int length);
+	public abstract void getInts(int memPtr, int[] dst, int dstOfs, int length);
 	
 	/**
 	 * Gets a 64-bit signed long at the given memory address
