@@ -21,6 +21,7 @@ import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.jnode.vm.memmgr.VmWriteBarrier;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Extent;
 
 public final class DefaultHeapManager extends VmHeapManager {
 
@@ -185,12 +186,12 @@ public final class DefaultHeapManager extends VmHeapManager {
                 slotSize);
 
         // Initialize the first normal heap
-        final Address ptr = helper.allocateBlock(DEFAULT_HEAP_SIZE);
+        final Address ptr = helper.allocateBlock(Extent.fromIntZeroExtend(DEFAULT_HEAP_SIZE));
         firstNormalHeap.initialize(ptr, ptr.add(DEFAULT_HEAP_SIZE),
                 slotSize);
 
         // Initialize the GC heap
-        gcHeap = allocHeap(DEFAULT_HEAP_SIZE, false);
+        gcHeap = allocHeap(Extent.fromIntZeroExtend(DEFAULT_HEAP_SIZE), false);
         gcHeap.append(firstNormalHeap);
 
         // Initialize the total heap list.
@@ -268,7 +269,7 @@ public final class DefaultHeapManager extends VmHeapManager {
                             // only for it
                             newHeapSize = size;
                         }
-                        if ((heap = allocHeap(newHeapSize, true)) == null) {
+                        if ((heap = allocHeap(Extent.fromIntZeroExtend(newHeapSize), true)) == null) {
                             lowOnMemory = true;
                             // It was not possible to allocate another heap.
                             // First try to GC, if we've done that before
@@ -331,7 +332,7 @@ public final class DefaultHeapManager extends VmHeapManager {
      * @param size
      * @return The heap
      */
-    private VmAbstractHeap allocHeap(int size, boolean addToHeapList) {
+    private VmAbstractHeap allocHeap(Extent size, boolean addToHeapList) {
         //Unsafe.debug("allocHeap");
         final Address start = helper.allocateBlock(size);
         //final Address start = MemoryBlockManager.allocateBlock(size);

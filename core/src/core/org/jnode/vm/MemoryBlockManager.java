@@ -21,6 +21,9 @@
 package org.jnode.vm;
 
 import org.vmmagic.pragma.Uninterruptible;
+import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Extent;
+import org.vmmagic.unboxed.Word;
 
 /**
  * This class is used to allocate and free fixed size blocks of memory. This
@@ -39,28 +42,28 @@ public final class MemoryBlockManager extends VmSystemObject implements
 	static final int BLOCK_SIZEa = (1 << BLOCK_SIZE_SHIFT);
 
 	/** Inclusive start address of first block */
-	private static long startPtr;
+	private static Address startPtr;
 
 	/** Exclusive end address of last block */
-	private static long endPtr;
+	private static Address endPtr;
 
 	/** Address of lock to my structures */
-	private static VmAddress lockPtr;
+	private static Address lockPtr;
 
 	/** Address of usage bitmap */
-	private static VmAddress bitmapPtr;
+	private static Address bitmapPtr;
 
 	/** Total number of blocks */
-	private static long blockCount;
+	private static Word blockCount;
 
 	/** Has this class be initialized yet */
 	private static boolean initialized;
 
 	/** Number of allocated blocks */
-	private static long allocatedBlocks;
+	private static Word allocatedBlocks;
 
 	/** Number of next allocatable block */
-	private static long nextBlockNr;
+	private static Word nextBlockNr;
 
 	/**
 	 * Allocate a new block of memory at blockSize large. The actual size is
@@ -70,37 +73,37 @@ public final class MemoryBlockManager extends VmSystemObject implements
 	 * @return The address of the start of the block, or null when no memory is
 	 *         available.
 	 */
-	static final VmAddress allocateBlock(int blockSize) {
+	static final Address allocateBlock(Extent blockSize) {
 		if (!initialized) {
 			initialize();
 		}
 		if (false) {
 			Unsafe.debug("allocateBlock");
-			Unsafe.debug(Unsafe.addressToInt(lockPtr));
+			Unsafe.debug(lockPtr.toInt());
 		}
 		enter();
 		try {
 			// Calculate the number of blocks needed
-			final int reqBlockCount = (int) (blockAlign(blockSize, true) >>> BLOCK_SIZE_SHIFT);
+			final Word reqBlockCount = blockAlign(blockSize.toWord(), true).rshl(BLOCK_SIZE_SHIFT);
 			// Find a large enough series of blocks
-			final long nr = findFreeBlocks(reqBlockCount);
-			if (nr == -1L) {
-				//Unsafe.debug("ret null."); Unsafe.debug(blockSize);
-				//Unsafe.debug("allocated blocks");
+			final Word nr = findFreeBlocks(reqBlockCount);
+			if (nr.isMax()) {
+				Unsafe.debug("ret null."); Unsafe.debug(blockSize.toInt());
+				// Unsafe.debug("allocated blocks");
 				// Unsafe.debug(allocatedBlocks);
-				//Unsafe.debug("total blocks"); Unsafe.debug(blockCount);
-				//Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
-				//Unsafe.die("allocateBlock");
+				// Unsafe.debug("total blocks"); Unsafe.debug(blockCount);
+				// Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
+				// Unsafe.die("allocateBlock");
 				return null;
 			}
 			// Mark all blocks as in use
-			for (int i = 0; i < reqBlockCount; i++) {
-				setInUse(nr + i, true);
+			for (Word i = Word.zero(); i.LT(reqBlockCount); i = i.add(1)) {
+				setInUse(nr.add(i), true);
 			}
 			// Return the address of block "nr".
-			allocatedBlocks += reqBlockCount;
-			nextBlockNr = nr + reqBlockCount;
-			return Unsafe.longToAddress(startPtr + (nr << BLOCK_SIZE_SHIFT));
+			allocatedBlocks = allocatedBlocks.add(reqBlockCount);
+			nextBlockNr = nr.add(reqBlockCount);
+			return startPtr.add(nr.lsh(BLOCK_SIZE_SHIFT));
 		} finally {
 			exit();
 		}
@@ -115,19 +118,21 @@ public final class MemoryBlockManager extends VmSystemObject implements
 	 * @param blockSize
 	 *            The size of the block as given to allocateBlock.
 	 */
-	static final void freeBlock(VmAddress ptr, int blockSize) {
+	static final void freeBlock(Address ptr, Extent blockSize) {
 		enter();
 		try {
 			// Calculate the block number
-			final long nr = (Unsafe.addressToLong(ptr) - startPtr) >>> BLOCK_SIZE_SHIFT;
+			final Word nr = ptr.toWord().sub(startPtr.toWord()).rshl(BLOCK_SIZE_SHIFT);
 			// Calculate the number of blocks
-			final long reqBlockCount = blockAlign(blockSize, true) >>> BLOCK_SIZE_SHIFT;
+			final Word reqBlockCount = blockAlign(blockSize.toWord(), true).rshl(BLOCK_SIZE_SHIFT);
 			// Mark all blocks as free
-			for (long i = 0; i < reqBlockCount; i++) {
-				setInUse(nr + i, false);
+			for (Word i = Word.zero(); i.LT(reqBlockCount); i = i.add(1)) {
+				setInUse(nr.add(i), false);
 			}
-			allocatedBlocks -= reqBlockCount;
-			nextBlockNr = Math.min(nextBlockNr, nr);
+			allocatedBlocks = allocatedBlocks.sub(reqBlockCount);
+			if (nr.LT(nextBlockNr)) {
+				nextBlockNr = nr;
+			}
 		} finally {
 			exit();
 		}
@@ -139,7 +144,7 @@ public final class MemoryBlockManager extends VmSystemObject implements
 	 * @return The free size in bytes
 	 */
 	public static long getFreeMemory() {
-		return (blockCount - allocatedBlocks) << BLOCK_SIZE_SHIFT;
+		return blockCount.sub(allocatedBlocks).lsh(BLOCK_SIZE_SHIFT).toLong();
 	}
 
 	/**
@@ -147,29 +152,29 @@ public final class MemoryBlockManager extends VmSystemObject implements
 	 * free memory blocks.
 	 * 
 	 * @param freeBlockCount
-	 * @return The block number of the first block, or -1 if not found.
+	 * @return The block number of the first block, or Word.max() if not found.
 	 */
-	private static long findFreeBlocks(int freeBlockCount) {
-		final long max = blockCount;
-		long nr = nextBlockNr;
-		while (nr < max) {
+	private static Word findFreeBlocks(Word freeBlockCount) {
+		final Word max = blockCount;
+		Word nr = nextBlockNr;
+		while (nr.LT(max)) {
 			boolean inUse = false;
-			int i;
-			for (i = 0; (i < freeBlockCount) && (!inUse); i++) {
-				inUse |= isInUse(nr + i);
+			Word i;
+			for (i = Word.zero(); i.LT(freeBlockCount) && (!inUse); i = i.add(1)) {
+				inUse |= isInUse(nr.add(i));
 			}
 			if (!inUse) {
 				// We found it
 				return nr;
 			} else {
-				//Unsafe.debug("nr"); Unsafe.debug(nr);
-				//Unsafe.debug("i"); Unsafe.debug(i);
+				// Unsafe.debug("nr"); Unsafe.debug(nr);
+				// Unsafe.debug("i"); Unsafe.debug(i);
 				// We came across an used block
-				nr += (i + 1);
+				nr = nr.add(i).add(1);
 			}
 		}
-		//Unsafe.debug("ret -1"); Unsafe.die();
-		return -1;
+		// Unsafe.debug("ret -1"); Unsafe.die();
+		return Word.max();
 	}
 
 	/**
@@ -178,11 +183,11 @@ public final class MemoryBlockManager extends VmSystemObject implements
 	 * @param blockNr
 	 * @return boolean
 	 */
-	private static final boolean isInUse(long blockNr) {
-		final long offset = blockNr >>> 3; // we still need a byte offset
-		final int mask = (1 << (blockNr & 7));
-		final VmAddress ptr = Unsafe.add(bitmapPtr, Unsafe.longToAddress(offset));
-		final int v = Unsafe.getByte(ptr) & 0xFF;
+	private static final boolean isInUse(Word blockNr) {
+		final Word offset = blockNr.rshl(3); // we still need a byte offset
+		final int mask = (1 << blockNr.and(Word.fromIntZeroExtend(7)).toInt());
+		final Address ptr = bitmapPtr.add(offset);
+		final int v = ptr.loadByte() & 0xFF;
 		return ((v & mask) == mask);
 	}
 
@@ -191,18 +196,18 @@ public final class MemoryBlockManager extends VmSystemObject implements
 	 * 
 	 * @param blockNr
 	 */
-	private static final void setInUse(long blockNr, boolean inUse) {
-		final long offset = blockNr >>> 3; // we still need a byte offset
-		final int mask = (1 << (blockNr & 7));
-		//final int mask = (1 << blockNr);
-		final VmAddress ptr = Unsafe.add(bitmapPtr, Unsafe.longToAddress(offset));
-		int v = Unsafe.getByte(ptr);
+	private static final void setInUse(Word blockNr, boolean inUse) {
+		final Word offset = blockNr.rshl(3); // we still need a byte offset
+		final int mask = (1 << blockNr.and(Word.fromIntZeroExtend(7)).toInt());
+		// final int mask = (1 << blockNr);
+		final Address ptr = bitmapPtr.add(offset);
+		int v = ptr.loadByte();
 		if (inUse) {
 			v |= mask;
 		} else {
 			v &= ~mask;
 		}
-		Unsafe.setByte(ptr, (byte) v);
+		ptr.store((byte) v);
 	}
 
 	/**
@@ -211,44 +216,49 @@ public final class MemoryBlockManager extends VmSystemObject implements
 	private final static void initialize() {
 		Unsafe.debug("initialize.");
 
-		startPtr = blockAlign(Unsafe.addressToLong(Unsafe.getMemoryStart()),
-				true);
-		endPtr = blockAlign(Unsafe.addressToLong(Unsafe.getMemoryEnd()), false);
-		final long size = endPtr - startPtr;
-		Unsafe.debug(size);
-		blockCount = (size >>> BLOCK_SIZE_SHIFT);
+		startPtr = blockAlign(Unsafe.getMemoryStart().toWord(), true).toAddress();
+		endPtr = blockAlign(Unsafe.getMemoryEnd().toWord(), false).toAddress();
+		
+		Unsafe.debug(startPtr.toInt());
+		Unsafe.debug(endPtr.toInt());
+		
+		final Extent size = endPtr.toWord().sub(startPtr.toWord()).toExtent();
+		Unsafe.debug(size.toInt());
+		blockCount = size.toWord().rshl(BLOCK_SIZE_SHIFT);
 		// Create a lock (4 bytes) and usage bitmap at the front of the memory
 		// region
-		final long rawBitmapSize = (blockCount >>> 3);
-		//final long rawBitmapSize = blockCount;
-		final long bitmapSize = blockAlign(4 + rawBitmapSize, true);
+		final Extent rawBitmapSize = blockCount.rshl(3).toExtent();
+		// final long rawBitmapSize = blockCount;
+		final Extent bitmapSize = blockAlign(rawBitmapSize.toWord().add(4), true).toExtent();
 		if (false) {
 			Unsafe.debug("startPtr:");
-			Unsafe.debug(startPtr);
+			Unsafe.debug(startPtr.toInt());
 		}
-		lockPtr = Unsafe.longToAddress(startPtr);
+		lockPtr = startPtr;
 		if (false) {
 			Unsafe.debug("lockPtr:");
-			Unsafe.debug(Unsafe.addressToInt(lockPtr));
+			Unsafe.debug(lockPtr.toInt());
+			Unsafe.debug("bitmapSize:");
+			Unsafe.debug(bitmapSize.toInt());
 		}
-		bitmapPtr = Unsafe.longToAddress(startPtr + 4);
+		bitmapPtr = startPtr.add(4);
 		// Clear the lock & bitmap size
 		clear(lockPtr, bitmapSize);
 		// Now shift the startptr.
-		startPtr += bitmapSize;
-		blockCount -= bitmapSize >>> BLOCK_SIZE_SHIFT;
-		allocatedBlocks = 0;
+		startPtr = startPtr.add(bitmapSize);
+		blockCount = blockCount.sub(bitmapSize.toWord().rshl(BLOCK_SIZE_SHIFT));
+		allocatedBlocks = Word.zero();
 		// Mark as initialized
 		initialized = true;
 
-		//Unsafe.debug("BitmapPtr ");
+		// Unsafe.debug("BitmapPtr ");
 		// Unsafe.debug(Unsafe.addressToLong(bitmapPtr));
-		//Unsafe.debug("LockPtr ");
+		// Unsafe.debug("LockPtr ");
 		// Unsafe.debug(Unsafe.addressToLong(lockPtr));
-		//Unsafe.debug("StartPtr "); Unsafe.debug(startPtr);
-		//Unsafe.debug("BitmapSize "); Unsafe.debug(bitmapSize);
-		//Unsafe.debug("Block count "); Unsafe.debug(blockCount);
-		//Unsafe.die();
+		// Unsafe.debug("StartPtr "); Unsafe.debug(startPtr);
+		// Unsafe.debug("BitmapSize "); Unsafe.debug(bitmapSize);
+		// Unsafe.debug("Block count "); Unsafe.debug(blockCount);
+		// Unsafe.die();
 		if (false) {
 			Unsafe.debug("end of initialize.");
 		}
@@ -259,8 +269,8 @@ public final class MemoryBlockManager extends VmSystemObject implements
 	 * monitorenter/exit instructions, since they may need a memory allocation.
 	 */
 	private static final void enter() {
-		while (!Unsafe.atomicCompareAndSwap(lockPtr, 0, 1)) {
-			Unsafe.debug(Unsafe.getInt(lockPtr));
+		while (!lockPtr.attempt(0, 1)) {
+			Unsafe.debug(lockPtr.loadInt());
 			VmThread.yield();
 		}
 	}
@@ -269,7 +279,7 @@ public final class MemoryBlockManager extends VmSystemObject implements
 	 * Release access to my structures.
 	 */
 	private static final void exit() {
-		Unsafe.setInt(lockPtr, 0);
+		lockPtr.store((int)0);
 	}
 
 	/**
@@ -279,12 +289,12 @@ public final class MemoryBlockManager extends VmSystemObject implements
 	 * @param roundup
 	 * @return The aligned address as long
 	 */
-	private static long blockAlign(long ptr, boolean roundup) {
-		final long blockSizeM1 = BLOCK_SIZEa - 1;
+	private static Word blockAlign(Word ptr, boolean roundup) {
+		final Word blockSizeM1 = Word.fromIntSignExtend(BLOCK_SIZEa - 1);
 		if (roundup) {
-			ptr += blockSizeM1;
+			ptr = ptr.add(blockSizeM1);
 		}
-		return ptr & ~blockSizeM1;
+		return ptr.and(blockSizeM1.not());
 	}
 
 	/**
@@ -293,15 +303,7 @@ public final class MemoryBlockManager extends VmSystemObject implements
 	 * @param ptr
 	 * @param size
 	 */
-	private static void clear(VmAddress ptr, long size) {
-		//Unsafe.debug("clear");
-		//Unsafe.debug(size);
-		while (size != 0) {
-			final int part = (int) Math.min(size, 0x7fffffffL);
-			//Unsafe.debug(size);
-			Unsafe.clear(ptr, part);
-			ptr = Unsafe.add(ptr, part);
-			size -= part;
-		}
+	private static void clear(Address ptr, Extent size) {
+		Unsafe.clear(ptr, size);
 	}
 }

@@ -20,7 +20,6 @@
  */
 package org.jnode.vm;
 
-import org.jnode.assembler.ObjectResolver;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmMethod;
@@ -28,6 +27,7 @@ import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.vmmagic.pragma.Uninterruptible;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
 
 /**
@@ -52,38 +52,38 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
     }
 
     /**
-     * @see org.jnode.vm.memmgr.HeapHelper#allocateBlock(int)
+     * @see org.jnode.vm.memmgr.HeapHelper#allocateBlock(Extent)
      */
-    public final Address allocateBlock(int size) {
-        return Address.fromAddress(MemoryBlockManager.allocateBlock(size));
+    public final Address allocateBlock(Extent size) {
+        return MemoryBlockManager.allocateBlock(size);
     }
 
     /**
      * @see org.jnode.vm.memmgr.HeapHelper#clear(Address, int)
      */
     public final void clear(Address dst, int size) {
-        Unsafe.clear(dst.toAddress(), size);
+        Unsafe.clear(dst, Extent.fromIntSignExtend(size));
     }
 
     /**
      * @see org.jnode.vm.memmgr.HeapHelper#copy(Address, Address, int)
      */
     public final void copy(Address src, Address dst, int size) {
-        Unsafe.copy(src.toAddress(), dst.toAddress(), size);
+        Unsafe.copy(src, dst, size);
     }
 
     /**
      * @see org.jnode.vm.memmgr.HeapHelper#getBootHeapEnd()
      */
     public final Address getBootHeapEnd() {
-        return Address.fromAddress(Unsafe.getBootHeapEnd());
+        return Unsafe.getBootHeapEnd();
     }
 
     /**
      * @see org.jnode.vm.memmgr.HeapHelper#getBootHeapStart()
      */
     public final Address getBootHeapStart() {
-        return Address.fromAddress(Unsafe.getBootHeapStart());
+        return Unsafe.getBootHeapStart();
     }
 
     /**
@@ -174,8 +174,8 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
      * Visit all roots of the object tree.
      * @param visitor
      */
-    public void visitAllRoots(ObjectVisitor visitor, VmHeapManager heapManager, ObjectResolver resolver) {
-        if (!Vm.getVm().getStatics().walk(visitor, resolver)) {
+    public void visitAllRoots(ObjectVisitor visitor, VmHeapManager heapManager) {
+        if (!Vm.getVm().getStatics().walk(visitor)) {
             return;
         }
         threadRootVisitor.initialize(visitor, heapManager);

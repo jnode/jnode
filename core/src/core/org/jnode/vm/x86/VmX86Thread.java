@@ -5,7 +5,6 @@ package org.jnode.vm.x86;
 
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.ObjectVisitor;
-import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmThread;
 import org.jnode.vm.memmgr.VmHeapManager;
@@ -104,8 +103,8 @@ public final class VmX86Thread extends VmThread {
 	 * @param stackSize
 	 * @return End address of the stack
 	 */
-	protected VmAddress getStackEnd(Object stack, int stackSize) {
-		return VmAddress.add(VmAddress.valueOf(stack), STACK_OVERFLOW_LIMIT);
+	protected Address getStackEnd(Object stack, int stackSize) {
+		return ObjectReference.fromObject(stack).toAddress().add(STACK_OVERFLOW_LIMIT);
 	}
 	
 	/**
@@ -114,8 +113,8 @@ public final class VmX86Thread extends VmThread {
 	 * @param stackSize
 	 * @return End address of the stack
 	 */
-	private static VmAddress getStackEnd(byte[] stack, int stackSize) {
-		return VmMagic.getArrayData(stack).add(STACK_OVERFLOW_LIMIT).toAddress();
+	private static Address getStackEnd(byte[] stack, int stackSize) {
+		return VmMagic.getArrayData(stack).add(STACK_OVERFLOW_LIMIT);
 	}
 	
 	/**

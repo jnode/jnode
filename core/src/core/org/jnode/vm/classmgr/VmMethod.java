@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 
 import org.jnode.vm.VmAddress;
 import org.vmmagic.pragma.UninterruptiblePragma;
+import org.vmmagic.unboxed.Address;
 
 public abstract class VmMethod extends VmMember implements VmStaticsEntry {
 
@@ -514,7 +515,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
         if (nativeCode == null) {
             System.err.println("nativeCode == null in " + this);
         } else {
-            final int ptr = VmAddress.as32bit(nativeCode);
+            final int ptr = Address.fromAddress(nativeCode).toInt();
             if ((ptr < 0) || (Math.abs(ptr) < 4096)) {
                 System.err.println("nativeCode has low address " + ptr + " in "
                         + this);

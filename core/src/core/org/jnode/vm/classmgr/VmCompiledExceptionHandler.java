@@ -4,6 +4,7 @@
 package org.jnode.vm.classmgr;
 
 import org.jnode.vm.VmAddress;
+import org.vmmagic.unboxed.Address;
 
 /**
  * @author epr
@@ -57,9 +58,10 @@ public class VmCompiledExceptionHandler extends AbstractExceptionHandler {
 	 * @param address
 	 * @return True if address is between start and end, false otherwise
 	 */
-	public boolean isInScope(VmAddress address) {
-		final int cmpStart = VmAddress.compare(address, startPtr);
-		final int cmpEnd = VmAddress.compare(address, endPtr);
-		return ((cmpStart >= 0) && (cmpEnd < 0));
+	public boolean isInScope(Address address) {
+		final Address start = Address.fromAddress(startPtr);
+		final Address end = Address.fromAddress(endPtr);
+		
+		return address.GE(start) && address.LT(end);
 	}
 }

@@ -3,27 +3,29 @@
  */
 package org.jnode.vm.compiler;
 
-import java.util.Iterator;
 import java.io.Writer;
+import java.util.Iterator;
 
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.assembler.x86.TextX86Stream;
-import org.jnode.vm.VmAddress;
-import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.Unsafe;
-import org.jnode.vm.x86.X86CpuID;
+import org.jnode.vm.VmAddress;
+import org.jnode.vm.VmMagic;
+import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.bytecode.BasicBlock;
 import org.jnode.vm.bytecode.ControlFlowGraph;
-import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmAddressMap;
 import org.jnode.vm.classmgr.VmByteCode;
+import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmCompiledExceptionHandler;
 import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.x86.X86CpuID;
+import org.vmmagic.unboxed.Address;
 
 /**
  * Abstract native code compiler.
@@ -135,13 +137,13 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
             final int size = cm.getCodeEnd().getOffset() - startOffset;
             final byte[] code = new byte[ size];
             System.arraycopy(os.getBytes(), startOffset, code, 0, size);
-            final VmAddress codePtr = resolver.addressOfArrayData(code);
+            final Address codePtr = VmMagic.getArrayData(code);
 
             final NativeStream.ObjectRef defExHRef = cm
                     .getDefExceptionHandler();
-            final VmAddress defExHandler;
+            final Address defExHandler;
             if (defExHRef != null) {
-                defExHandler = resolver.add(codePtr, cm
+                defExHandler = codePtr.add(cm
                         .getDefExceptionHandler().getOffset()
                         - startOffset);
             } else {
@@ -158,25 +160,25 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
 
                     final VmConstClass catchType = bc.getExceptionHandler(i)
                             .getCatchType();
-                    final VmAddress startPtr = VmAddress.add(codePtr, ceh[ i]
+                    final Address startPtr = codePtr.add(ceh[ i]
                             .getStartPc().getOffset()
                             - startOffset);
-                    final VmAddress endPtr = VmAddress.add(codePtr, ceh[ i]
+                    final Address endPtr = codePtr.add(ceh[ i]
                             .getEndPc().getOffset()
                             - startOffset);
-                    final VmAddress handler = VmAddress.add(codePtr, ceh[ i]
+                    final Address handler = codePtr.add(ceh[ i]
                             .getHandler().getOffset()
                             - startOffset);
 
                     eTable[ i] = new VmCompiledExceptionHandler(catchType,
-                            startPtr, endPtr, handler);
+                            startPtr.toAddress(), endPtr.toAddress(), handler.toAddress());
                 }
             } else {
                 eTable = null;
             }
 
-            method.addCompiledCode(new VmCompiledCode(this, bc, codePtr, code,
-                    size, eTable, defExHandler, aTable), level);
+            method.addCompiledCode(new VmCompiledCode(this, bc, codePtr.toAddress(), code,
+                    size, eTable, defExHandler.toAddress(), aTable), level);
 
             // For debugging only
             //System.out.println("Code: " + NumberUtils.hex(code));

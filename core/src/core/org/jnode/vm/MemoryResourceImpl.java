@@ -28,6 +28,7 @@ import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
+import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Offset;
 import org.vmmagic.unboxed.Word;
 
@@ -121,7 +122,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			if (mode == ResourceManager.MEMMODE_ALLOC_DMA) {
 				ptr = Address.fromAddress(Unsafe.getMinAddress());
 			} else {
-				ptr = Address.fromAddress(Unsafe.getMemoryEnd());
+				ptr = Unsafe.getMemoryEnd();
 			}
 			MemoryResourceImpl res = new MemoryResourceImpl(null, owner, ptr, size);
 			while (!isFree(resources, res)) {
@@ -382,7 +383,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			throw new SecurityException("Cannot get an Object from a byte-array");
 		}
 		testMemPtr(memPtr, 4);
-		return Unsafe.getObject(start, memPtr);
+		return start.loadObjectReference(Offset.fromIntSignExtend(memPtr)).toObject();
 	}
 
 	/**
@@ -393,7 +394,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 */
 	public void setByte(int memPtr, byte value) {
 		testMemPtr(memPtr, 1);
-		Unsafe.setByte(start, memPtr, value);
+		start.store(value, Offset.fromIntSignExtend(memPtr));
 	}
 
 	/**
@@ -427,7 +428,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 */
 	public void setChar(int memPtr, char value) {
 		testMemPtr(memPtr, 2);
-		Unsafe.setChar(start, memPtr, value);
+		start.store(value, Offset.fromIntSignExtend(memPtr));
 	}
 
 	/**
@@ -461,7 +462,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 */
 	public void setShort(int memPtr, short value) {
 		testMemPtr(memPtr, 2);
-		Unsafe.setShort(start, memPtr, value);
+		start.store(value, Offset.fromIntSignExtend(memPtr));
 	}
 
 	/**
@@ -495,7 +496,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 */
 	public void setInt(int memPtr, int value) {
 		testMemPtr(memPtr, 4);
-		Unsafe.setInt(start, memPtr, value);
+		start.store(value, Offset.fromIntSignExtend(value));
 	}
 
 	/**
@@ -529,7 +530,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 */
 	public void setFloat(int memPtr, float value) {
 		testMemPtr(memPtr, 4);
-		Unsafe.setFloat(start, memPtr, value);
+		start.store(value, Offset.fromIntSignExtend(memPtr));
 	}
 
 	/**
@@ -563,7 +564,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 */
 	public void setLong(int memPtr, long value) {
 		testMemPtr(memPtr, 8);
-		Unsafe.setLong(start, memPtr, value);
+		start.store(value, Offset.fromIntSignExtend(memPtr));
 	}
 
 	/**
@@ -597,7 +598,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 */
 	public void setDouble(int memPtr, double value) {
 		testMemPtr(memPtr, 8);
-		Unsafe.setDouble(start, memPtr, value);
+		start.store(value, Offset.fromIntSignExtend(memPtr));
 	}
 
 	/**
@@ -634,7 +635,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 			throw new SecurityException("Cannot set an Object in a byte-array");
 		}
 		testMemPtr(memPtr, 4);
-		Unsafe.setObject(start, memPtr, value);
+		start.store(ObjectReference.fromObject(value), Offset.fromIntSignExtend(memPtr));
 	}
 
 	/**
@@ -649,7 +650,7 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 	 */
 	public void clear(int memPtr, int size) {
 		testMemPtr(memPtr, size);
-		Unsafe.clear(start.add(Offset.fromIntZeroExtend(memPtr)), size);
+		Unsafe.clear(start.add(Offset.fromIntZeroExtend(memPtr)), Extent.fromIntZeroExtend(size));
 	}
 
 	public void copy(int srcMemPtr, int destMemPtr, int size) {

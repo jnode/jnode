@@ -66,11 +66,19 @@ public final class Address {
         return null;
     }
 
+    public Address add(Word offset) {
+        return null;
+    }
+
     public Address add(Offset offset) {
         return null;
     }
 
     public Address add(Extent extent) {
+        return null;
+    }
+
+    public Address sub(Word extent) {
         return null;
     }
 

@@ -323,7 +323,7 @@ Q43org5jnode2vm6Unsafe23doubleToRawLongBits2e28D29J:
 	mov eax,[esp+4] ; LSB
 	ret 8
 
-Q43org5jnode2vm6Unsafe23clear2e28Lorg2fvmmagic2funboxed2fAddress3bI29V:
+Q43org5jnode2vm6Unsafe23clear2e28Lorg2fvmmagic2funboxed2fAddress3bLorg2fvmmagic2funboxed2fExtent3b29V:
 	mov edx,[esp+8] ; memPtr
 	mov eax,[esp+4] ; Size
 	push edi
@@ -555,44 +555,44 @@ Q43org5jnode2vm6Unsafe23getMinAddress2e2829Lorg2fjnode2fvm2fVmAddress3b:
 	mov eax,free_paddr
 	ret
 	
-; public static native VmAddress getMemoryStart()
-Q43org5jnode2vm6Unsafe23getMemoryStart2e2829Lorg2fjnode2fvm2fVmAddress3b:
+; public static native Address getMemoryStart()
+Q43org5jnode2vm6Unsafe23getMemoryStart2e2829Lorg2fvmmagic2funboxed2fAddress3b:
 	mov eax,[free_mem_start]
 	;; mov eax,freeMemoryStart
 	ret
 	
-; public static native VmAddress getMemoryEnd()
-Q43org5jnode2vm6Unsafe23getMemoryEnd2e2829Lorg2fjnode2fvm2fVmAddress3b:
+; public static native Address getMemoryEnd()
+Q43org5jnode2vm6Unsafe23getMemoryEnd2e2829Lorg2fvmmagic2funboxed2fAddress3b:
 	mov eax,[mem_size]
 	ret
 	
-; public static native VmAddress getKernelStart()
-Q43org5jnode2vm6Unsafe23getKernelStart2e2829Lorg2fjnode2fvm2fVmAddress3b:
+; public static native Address getKernelStart()
+Q43org5jnode2vm6Unsafe23getKernelStart2e2829Lorg2fvmmagic2funboxed2fAddress3b:
 	mov eax,kernel_begin
 	ret
 	
-; public static native VmAddress getKernelEnd()
-Q43org5jnode2vm6Unsafe23getKernelEnd2e2829Lorg2fjnode2fvm2fVmAddress3b:
+; public static native Address getKernelEnd()
+Q43org5jnode2vm6Unsafe23getKernelEnd2e2829Lorg2fvmmagic2funboxed2fAddress3b:
 	mov eax,vm_start
 	ret
 	
-; public static native VmAddress getInitJarStart()
-Q43org5jnode2vm6Unsafe23getInitJarStart2e2829Lorg2fjnode2fvm2fVmAddress3b:
+; public static native Address getInitJarStart()
+Q43org5jnode2vm6Unsafe23getInitJarStart2e2829Lorg2fvmmagic2funboxed2fAddress3b:
 	mov eax,[initJar_start]
 	ret
 	
-; public static native VmAddress getInitJarEnd()
-Q43org5jnode2vm6Unsafe23getInitJarEnd2e2829Lorg2fjnode2fvm2fVmAddress3b:
+; public static native Address getInitJarEnd()
+Q43org5jnode2vm6Unsafe23getInitJarEnd2e2829Lorg2fvmmagic2funboxed2fAddress3b:
 	mov eax,[initJar_end]
 	ret
 	
-; public static native VmAddress getBootHeapStart()
-Q43org5jnode2vm6Unsafe23getBootHeapStart2e2829Lorg2fjnode2fvm2fVmAddress3b:
+; public static native Address getBootHeapStart()
+Q43org5jnode2vm6Unsafe23getBootHeapStart2e2829Lorg2fvmmagic2funboxed2fAddress3b:
 	mov eax,bootHeapStart
 	ret
 	
-; public static native VmAddress getBootHeapEnd()
-Q43org5jnode2vm6Unsafe23getBootHeapEnd2e2829Lorg2fjnode2fvm2fVmAddress3b:
+; public static native Address getBootHeapEnd()
+Q43org5jnode2vm6Unsafe23getBootHeapEnd2e2829Lorg2fvmmagic2funboxed2fAddress3b:
 	mov eax,bootHeapEnd
 	ret
 	
@@ -633,8 +633,8 @@ Q43org5jnode2vm6Unsafe23yieldPoint2e2829V:
 	UNCOND_YIELDPOINT
 	ret	
 
-; VmAddress getJumpTable0()	
-Q43org5jnode2vm6Unsafe23getJumpTable02e2829Lorg2fjnode2fvm2fVmAddress3b:
+; Address getJumpTable0()	
+Q43org5jnode2vm6Unsafe23getJumpTable02e2829Lorg2fvmmagic2funboxed2fAddress3b:
 	mov eax,vm_jumpTable
 	ret
 	

@@ -23,7 +23,8 @@ public final class Extent {
     }
 
     public static Extent fromIntZeroExtend(int address) {
-        return null;
+    	throw new Error("No magic");
+        //return null;
     }
 
     public static Extent zero() {
@@ -36,6 +37,10 @@ public final class Extent {
 
     public static Extent max() {
         return null;
+    }
+    
+    public boolean isZero() {
+    	return false;
     }
 
     public int toInt() {

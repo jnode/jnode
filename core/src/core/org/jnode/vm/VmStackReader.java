@@ -189,7 +189,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * Show the current stacktrace using Screen.debug.
 	 */	
 	public final void debugStackTrace() {
-		Address f = Unsafe.getCurrentFrame();
+		Address f = VmMagic.getCurrentFrame();
 		Unsafe.debug("Debug stacktrace: ");
 		boolean first = true;
 		int max = 20;
