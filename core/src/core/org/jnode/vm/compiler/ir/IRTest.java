@@ -104,9 +104,11 @@ public class IRTest {
 	}
 
     private static void generateCode(AbstractX86Stream os, String className) throws MalformedURLException, ClassNotFoundException {
-        X86CodeGenerator x86cg = new X86CodeGenerator(os);
+
 
         VmByteCode code = loadByteCode(className);
+
+        X86CodeGenerator x86cg = new X86CodeGenerator(os, code.getLength());
 
         IRControlFlowGraph cfg = new IRControlFlowGraph(code);
 
@@ -200,7 +202,36 @@ public class IRTest {
 		return -l0;
 	}
 
+
     public static int const1(int a0, int a1) {
+        int l0 = 1;
+        for(;;){
+            l0 = a0 + a1 + l0;
+            if(l0 > 10)
+                break;
+        }
+        return l0;
+	}
+
+    //compile it with no optimisation (see kjc -O0 - the kopi compiler)
+    public static int unconditionalJump(int a0, int a1) {
+        int l0 = 1;
+        for(;;){
+            l0 = a0 + a1 + l0;
+            for(;;){
+                l0 = a0 + a1 + l0;
+                for(;;){
+                    l0 = a0 + a1 + l0;
+                    break;
+                }
+                break;
+            }
+            break;
+        }
+        return l0;
+	}
+
+    public static int const6(int a0, int a1) {
         int l1 = a1 | a0;
         int l2 = a0 & a1;
         return l1 ^ l1 + l2 ^ l2 - 2  * l1 * l2;
