@@ -1,5 +1,5 @@
-/* PasswordAuthentication.java -- Container class for username/password pairs
-   Copyright (C) 1998, 2000, 2003 Free Software Foundation, Inc.
+/* IntersectingDomainCombiner.java --
+   Copyright (C) 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -7,7 +7,7 @@ GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
- 
+
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -35,73 +35,48 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.net;
 
+package java.security;
+
+import java.util.HashSet;
 
 /**
-  * This class serves a container for username/password pairs.
-  *
-  * @author Aaron M. Renn (arenn@urbanophile.com)
-  * @since 1.2
-  */
-public final class PasswordAuthentication
+ * A trivial implementation of {@link DomainCombiner} that produces the
+ * intersection of the supplied {@link ProtectionDomain} objects.
+ */
+final class IntersectingDomainCombiner implements DomainCombiner
 {
-  /*
- * Instance Variables
- */
 
-  /**
-  * The username 
-  */
-  private String username;
+  // Contstant.
+  // -------------------------------------------------------------------------
 
-  /**
-  * The password
-  */
-  private char[] password;
+  static final IntersectingDomainCombiner SINGLETON = new IntersectingDomainCombiner();
 
-  /*************************************************************************/
+  // Constructor.
+  // -------------------------------------------------------------------------
 
-  /*
- * Constructors
- */
-
-  /**
-    * Creates a new <code>PasswordAuthentication</code> object from the
-    * specified username and password.
-  *
-  * @param username The username for this object
-  * @param password The password for this object
-  */
-  public PasswordAuthentication(String username, char[] password)
+  private IntersectingDomainCombiner()
   {
-  this.username = username;
-  this.password = password;
   }
 
-  /*************************************************************************/
+  // Methods.
+  // -------------------------------------------------------------------------
 
-  /*
- * Instance Methods
- */
-
-  /**
-  * Returns the username associated with this object
-  *
-  * @return The username
-  */
-  public String getUserName()
+  public ProtectionDomain[] combine (ProtectionDomain[] currentDomains,
+                                     ProtectionDomain[] assignedDomains)
   {
-    return (username);
+    HashSet newDomains = new HashSet ();
+    for (int i = 0; i < currentDomains.length; i++)
+      {
+        if (currentDomains[i] == null)
+          continue;
+        for (int j = 0; j < assignedDomains.length; j++)
+          {
+            if (currentDomains[i].equals (assignedDomains[j]))
+              newDomains.add (currentDomains[i]);
+          }
+      }
+    return (ProtectionDomain[])
+      newDomains.toArray(new ProtectionDomain[newDomains.size()]);
   }
- 
-  /**
-  * Returns the password associated with this object
-  *
-  * @return The password
-  */
-  public char[] getPassword()
-  {
-    return (password);
-  }
-} // class PasswordAuthentication
+}

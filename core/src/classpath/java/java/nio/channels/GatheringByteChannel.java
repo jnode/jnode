@@ -37,11 +37,11 @@ exception statement from your version. */
 
 package java.nio.channels;
 
-import java.nio.ByteBuffer;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
-public interface GatheringByteChannel
-  extends WritableByteChannel
+
+public interface GatheringByteChannel extends WritableByteChannel
 {
   /**
    * Writes a sequence of bytes to this channel from a subsequence of
@@ -59,7 +59,7 @@ public interface GatheringByteChannel
    * @exception NonWritableChannelException If this channel was not opened for
    * writing
    */
-  public long write(ByteBuffer[] srcs, int offset, int length)
+  long write(ByteBuffer[] srcs, int offset, int length)
     throws IOException;
   
   /**
@@ -75,5 +75,5 @@ public interface GatheringByteChannel
    * @exception NonWritableChannelException If this channel was not opened for
    * writing
    */
-  public long write(ByteBuffer[] srcs) throws IOException;
+  long write(ByteBuffer[] srcs) throws IOException;
 }

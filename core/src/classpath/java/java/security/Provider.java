@@ -45,7 +45,7 @@ import java.util.Properties;
  * The services provided by a such a provider can range from security
  * algorithms to key generation.
  * <p>
- * Providers are installed by name and verion number.  There is one
+ * Providers are installed by name and version number.  There is one
  * standard provider supplied with the class library.  This is the
  * "GNU" provider, which can also be accessed by the alias "SUN" for
  * compatibility with the JDK.
@@ -56,7 +56,7 @@ import java.util.Properties;
  */
 public abstract class Provider extends Properties implements Serializable
 {
-  static final long serialVersionUID = -4298000515446427739L;
+  private static final long serialVersionUID = -4298000515446427739L;
 
   /**
    * This is a textual description of the provider

@@ -1,5 +1,5 @@
-/* SecureRandom.java --- Secure Random class implmentation
-   Copyright (C) 1999, 2001, 2002 Free Software Foundation, Inc.
+/* SecureRandom.java --- Secure Random class implementation
+   Copyright (C) 1999, 2001, 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -36,19 +36,32 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 package java.security;
+
+import gnu.java.security.Engine;
+
 import java.util.Enumeration;
 import java.util.Random;
 
 /**
-   SecureRandom is the class interface for using SecureRandom
-   providers. It provides an interface to the SecureRandomSpi
-   engine so that programmers can generate pseudo-random numbers.
-
-   @author Mark Benvenuto <ivymccough@worldnet.att.net>
+ * An interface to a cryptographically secure pseudo-random number
+ * generator (PRNG). Random (or at least unguessable) numbers are used
+ * in all areas of security and cryptography, from the generation of
+ * keys and initialization vectors to the generation of random padding
+ * bytes.
+ *
+ * @author Mark Benvenuto <ivymccough@worldnet.att.net>
+ * @author Casey Marshall
  */
 public class SecureRandom extends Random
 {
-  static final long serialVersionUID = 4940670005562187L;
+
+  // Constants and fields.
+  // ------------------------------------------------------------------------
+
+  /** Service name for PRNGs. */
+  private static final String SECURE_RANDOM = "SecureRandom";
+
+  private static final long serialVersionUID = 4940670005562187L;
 
   //Serialized Field
   long counter = 0;		//Serialized
@@ -57,6 +70,9 @@ public class SecureRandom extends Random
   int randomBytesUsed = 0;
   SecureRandomSpi secureRandomSpi = null;
   byte[] state = null;
+
+  // Constructors.
+  // ------------------------------------------------------------------------
 
   /**
      Default constructor for SecureRandom. It constructs a 
@@ -67,7 +83,7 @@ public class SecureRandom extends Random
      on the first call to getnextBytes it will force a seed.
 
      It is maintained for backwards compatibility and programs
-     should use getInstance.
+     should use {@link #getInstance(java.lang.String)}.
    */
   public SecureRandom()
   {
@@ -77,7 +93,7 @@ public class SecureRandom extends Random
     String key;
 
     String classname = null;
-    int i, flag = 0;
+    int i;
     Enumeration e;
     for (i = 0; i < p.length; i++)
       {
@@ -139,15 +155,17 @@ public class SecureRandom extends Random
     this.provider = provider;
   }
 
+  // Class methods.
+  // ------------------------------------------------------------------------
+
   /**
-     Returns an instance of a SecureRandom. It creates the class
-     for the specified algorithm if it exists from a provider.
-
-     @param algorithm A SecureRandom algorithm to use
-
-     @return Returns a new SecureRandom implmenting the chosen algorithm
-
-     @throws NoSuchAlgorithmException if the algorithm cannot be found
+   * Returns an instance of a SecureRandom. It creates the class from
+   * the first provider that implements it.
+   *
+   * @param algorithm The algorithm name.
+   * @return A new SecureRandom implementing the given algorithm.
+   * @throws NoSuchAlgorithmException If no installed provider implements
+   *         the given algorithm.
    */
   public static SecureRandom getInstance(String algorithm) throws
     NoSuchAlgorithmException
@@ -159,7 +177,9 @@ public class SecureRandom extends Random
 	  {
 	    return getInstance(algorithm, p[i]);
 	  }
-	catch (NoSuchAlgorithmException ignored) { }
+        catch (NoSuchAlgorithmException ignored)
+          {
+          }
       }
 
     // None found.
@@ -167,21 +187,26 @@ public class SecureRandom extends Random
   }
 
   /**
-     Returns an instance of a SecureRandom. It creates the class
-     for the specified algorithm from the specified provider.
-
-     @param algorithm A SecureRandom algorithm to use
-     @param provider A security provider to use
-
-     @return Returns a new SecureRandom implmenting the chosen algorithm
-
-     @throws NoSuchAlgorithmException if the algorithm cannot be found
-     @throws NoSuchProviderException if the provider cannot be found
+   * Returns an instance of a SecureRandom. It creates the class
+   * for the specified algorithm from the named provider.
+   *
+   * @param algorithm The algorithm name.
+   * @param provider  The provider name.
+   * @return A new SecureRandom implementing the chosen algorithm.
+   * @throws NoSuchAlgorithmException If the named provider does not implement
+   *         the algorithm, or if the implementation cannot be
+   *         instantiated.
+   * @throws NoSuchProviderException If no provider named
+   *         <code>provider</code> is currently installed.
+   * @throws IllegalArgumentException If <code>provider</code> is null
+   *         or is empty.
    */
-  public static SecureRandom getInstance(String algorithm,
-					 String provider) throws
-    NoSuchAlgorithmException, NoSuchProviderException
+  public static SecureRandom getInstance(String algorithm, String provider)
+  throws NoSuchAlgorithmException, NoSuchProviderException
   {
+    if (provider == null || provider.length() == 0)
+      throw new IllegalArgumentException("Illegal provider");
+
     Provider p = Security.getProvider(provider);
     if (p == null)
       throw new NoSuchProviderException();
@@ -190,87 +215,38 @@ public class SecureRandom extends Random
   }
 
   /**
-     Returns an instance of a SecureRandom. It creates the class for
-     the specified algorithm from the given provider.
-
-     @param algorithm The SecureRandom algorithm to create.
-     @param provider  The provider to get the instance from.
-
-     @throws NoSuchAlgorithmException If the algorithm cannot be found, or
-             if the class cannot be instantiated.
+   * Returns an instance of a SecureRandom. It creates the class for
+   * the specified algorithm from the given provider.
+   *
+   * @param algorithm The SecureRandom algorithm to create.
+   * @param provider  The provider to get the instance from.
+   * @throws NoSuchAlgorithmException If the algorithm cannot be found, or
+   *         if the class cannot be instantiated.
+   * @throws IllegalArgumentException If <code>provider</code> is null.
    */
-  public static SecureRandom getInstance(String algorithm,
-                                         Provider provider) throws
-    NoSuchAlgorithmException
-  {
-    return getInstance(algorithm, provider, true);
-  }
-
-  /**
-     Creates the instance of SecureRandom, recursing to resolve aliases.
-
-     @param algorithm The SecureRandom algorithm to create.
-     @param provider  The provider to get the implementation from.
-     @param recurse   Whether or not to recurse to resolve aliases.
-
-     @throws NoSuchAlgorithmException If the algorithm cannot be found,
-             if there are too many aliases, or if the class cannot be
-             instantiated.
-   */
-  private static SecureRandom getInstance(String algorithm,
-                                          Provider provider,
-                                          boolean recurse)
+  public static SecureRandom getInstance(String algorithm, Provider provider)
     throws NoSuchAlgorithmException
   {
-    String msg = algorithm;
-    for (Enumeration e = provider.propertyNames(); e.hasMoreElements(); )
-      {
-        // We could replace the boolean with an integer, incrementing it
-        // every
-        String key = (String) e.nextElement();
-        if (key.startsWith("SECURERANDOM.")
-            && key.substring(13).equalsIgnoreCase(algorithm))
-	  {
+    if (provider == null)
+      throw new IllegalArgumentException("Illegal provider");
 	    try
 	      {
-		Class c = Class.forName(provider.getProperty(key));
-		return new SecureRandom((SecureRandomSpi) c.newInstance(),
+        return new SecureRandom((SecureRandomSpi)
+          Engine.getInstance(SECURE_RANDOM, algorithm, provider),
 					provider);
 	      }
-	    catch (Throwable ignored) { }
-	  }
-	else if (key.startsWith("ALG.ALIAS.SECURERANDOM.")
-		 && key.substring(23).equalsIgnoreCase(algorithm) && recurse)
-	  {
-	    try
+    catch (java.lang.reflect.InvocationTargetException ite)
 	      {
-		// First see if this alias refers to a class in this
-		// provider.
-		return getInstance(provider.getProperty(key), provider, false);
-	      }
-	    catch (NoSuchAlgorithmException nsae)
-	      {
-		Provider[] provs = Security.getProviders();
-		for (int i = 0; i < provs.length; i++)
-		  {
-		    if (provs[i] == provider)
-		      continue;
-		    // Now try other providers for the implementation
-		    try
-		      {
-			return getInstance(provider.getProperty(key),
-					   provs[i], false);
+	throw new NoSuchAlgorithmException(algorithm);
 		      }
-		    catch (NoSuchAlgorithmException nsae2)
+    catch (ClassCastException cce)
 		      {
-			msg = nsae2.getMessage();
-		      }
-		  }
-	      }
-	  }
-      }
     throw new NoSuchAlgorithmException(algorithm);
   }
+  }
+
+  // Instance methods.
+  // ------------------------------------------------------------------------
 
   /**
      Returns the provider being used by the current SecureRandom class.
@@ -357,9 +333,10 @@ public class SecureRandom extends Random
     int ret = 0;
 
     for (int i = 0; i < tmp.length; i++)
-      ret |= tmp[i] << (8 * i);
+      ret |= (tmp[i] & 0xFF) << (8 * i);
 
-    return ret;
+    long mask = (1L << numBits) - 1;
+    return (int) (ret & mask);
   }
 
   /**

@@ -1,5 +1,5 @@
-/* java.util.zip.GZIPInputStream
-   Copyright (C) 2001 Free Software Foundation, Inc.
+/* GZIPInputStream.java - Input filter for reading gzip file
+   Copyright (C) 1999, 2000, 2001, 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -41,12 +41,12 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.EOFException;
 
-
 /**
  * This filter stream is used to decompress a "GZIP" format stream. 
  * The "GZIP" format is described in RFC 1952.
  *
  * @author John Leuner
+ * @author Tom Tromey
  * @since JDK 1.1
  */
 public class GZIPInputStream
@@ -57,54 +57,45 @@ public class GZIPInputStream
    */
   public static final int GZIP_MAGIC = 0x1f8b;
 
-
   /**
    * The mask for bit 0 of the flag byte.
    */
   static final int FTEXT = 0x1;
-
 
   /**
    * The mask for bit 1 of the flag byte.
    */
   static final int FHCRC = 0x2;
 
-
   /**
    * The mask for bit 2 of the flag byte.
    */
   static final int FEXTRA = 0x4;
-
 
   /**
    * The mask for bit 3 of the flag byte.
    */
   static final int FNAME = 0x8;
 
-
   /**
    * The mask for bit 4 of the flag byte.
    */
   static final int FCOMMENT = 0x10;
-
 
   /**
    * The CRC-32 checksum value for uncompressed data.
    */
   protected CRC32 crc; 
 
-
   /**
    * Indicates whether or not the end of the stream has been reached.
    */  
   protected boolean eos;
 
-
   /**
    * Indicates whether or not the GZIP header has been read in.
    */
   private boolean readGZIPHeader;
-
 
   /**
    * Creates a GZIPInputStream with the default buffer size.
@@ -120,18 +111,15 @@ public class GZIPInputStream
     this(in, 4096);
   }
 
-
   /**
    * Creates a GZIPInputStream with the specified buffer size.
    *
    * @param in The stream to read compressed data from 
    *           (in GZIP format).
-   *
    * @param size The size of the buffer to use.
    *
    * @throws IOException if an error occurs during an I/O operation.
-   *
-   * @throws java.lang.IllegalArgumentException if <code>size</code>
+   * @throws IllegalArgumentException if <code>size</code>
    *         is less than or equal to 0.
    */
   public GZIPInputStream(InputStream in, int size)
@@ -141,7 +129,6 @@ public class GZIPInputStream
     crc = new CRC32();
   }
 
-
   /**
    * Closes the input stream.
    *
@@ -150,9 +137,9 @@ public class GZIPInputStream
   public void close()
     throws IOException
   {
+    // Nothing to do here.
     super.close();
   }
-
 
   /**
    * Reads in GZIP-compressed data and stores it in uncompressed form
@@ -162,10 +149,8 @@ public class GZIPInputStream
    *
    * @param buf the buffer into which the uncompressed data will
    *            be stored.
-   *
    * @param offset the offset indicating where in <code>buf</code>
    *               the uncompressed data should be placed.
-   *
    * @param len the number of uncompressed bytes to be read.
    */
   public int read(byte[] buf, int offset, int len) throws IOException
@@ -333,7 +318,6 @@ public class GZIPInputStream
     readGZIPHeader = true;
     //System.err.println("Read GZIP header");
   }
-
 
   private void readFooter() throws IOException
   {

@@ -1,5 +1,5 @@
 /* JarURLConnection.java -- Class for manipulating remote jar files
-   Copyright (C) 1998 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,19 +35,22 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package java.net;
 
 import java.io.IOException;
 import java.security.cert.Certificate;
-import java.util.jar.*;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
+
 
 /**
   * This abstract class represents a common superclass for implementations
   * of jar URL's.  A jar URL is a special type of URL that allows JAR
   * files on remote systems to be accessed.  It has the form:
   * <p>
-  * jar:<standard URL pointing to jar file>!/file/within/jarfile
+ * jar:&lt;standard URL pointing to jar filei&gt;!/file/within/jarfile
   * <p> for example:
   * <p>
   * jar:http://www.urbanophile.com/java/foo.jar!/com/urbanophile/bar.class
@@ -61,196 +64,165 @@ import java.util.jar.*;
   * local cache file, then performing standard jar operations on it.
   * (At least this is true for the default protocol implementation).
   *
-  * @version 0.1
+ * @author Aaron M. Renn <arenn@urbanophile.com>
+ * @author Kresten Krab Thorup <krab@gnu.org>
+ * @date Aug 10, 1999.
   *
-  * @author Aaron M. Renn (arenn@urbanophile.com)
+ * @since 1.2
   */
 public abstract class JarURLConnection extends URLConnection
 {
-
-/*************************************************************************/
-
-/*
- * Instance Variables
- */
-
-/**
+  /**
   * This is the actual URL that points the remote jar file.  This is parsed
   * out of the jar URL by the constructor.
   */
-private URL real_url;
+  private final URL jarFileURL;
 
-/**
-  * This is the jar file "entry name" or portion after the "!/" in the
-  * URL which represents the pathname inside the actual jar file
+  /**
+   * The connection to the jar file itself. A JarURLConnection
+   * can represent an entry in a jar file or an entire jar file.  In
+   * either case this describes just the jar file itself.
   */
-private String entry_name;
+  protected URLConnection jarFileURLConnection;
 
-/**
-  * The JarFile object for the jar file pointed to by the real URL
-  */
-private JarFile jar_file;
-
-/*************************************************************************/
-
-/*
- * Constructors
+  /**
+   * This is the jar file "entry name" or portion after the "!/" in the
+   * URL which represents the pathname inside the actual jar file.
  */
+  private final String entryName;
 
-/**
-  * Creates a JarURLConnection from a URL objects
+  /**
+   * Creates a JarURLConnection from an URL object
   *
-  * @param URL url The URL object for this connection.
+   * @param url The URL object for this connection.
+   *
+   * @exception MalformedURLException If url is invalid
+   *
+   * @specnote This constructor is protected since JDK 1.4
   */
-protected
-JarURLConnection(URL url) throws MalformedURLException
-{
+  protected JarURLConnection(URL url) throws MalformedURLException
+  {
   super(url);
 
-  // Now, strip off the "jar:" and everything from the "!/" to the end
-  // to get the "real" URL inside
-  String url_string = url.toExternalForm();
+    if (! url.getProtocol().equals("jar"))
+      throw new MalformedURLException(url + ": Not jar protocol.");
 
-  if (!url_string.startsWith("jar:"))
-    throw new MalformedURLException(url_string);
+    String spec = url.getFile();
+    int bang = spec.indexOf("!/");
+    if (bang == -1)
+      throw new MalformedURLException(url + ": No `!/' in spec.");
 
-  if (url_string.indexOf("!/") == -1)
-    throw new MalformedURLException(url_string);
+    // Extract the url for the jar itself.
+    jarFileURL = new URL(spec.substring(0, bang));
 
-  String real_url_string = url_string.substring(4, url_string.indexOf("!/"));
+    // Get the name of the entry, if any.
+    entryName = spec.length() == (bang + 2) ? null : spec.substring(bang + 2);
+  }
 
-  real_url = new URL(real_url_string);
-  if (url_string.length() == (url_string.indexOf("!/") + 1))
-    entry_name = "";
-  else
-    entry_name = url_string.substring(url_string.indexOf("!/") + 2);
-}
-
-/*************************************************************************/
-
-/**
+  /**
   * This method returns the "real" URL where the JarFile is located.
   * //****Is this right?*****
   *
   * @return The remote URL
   */ 
-public URL
-getJarFileURL()
-{
-  return(real_url);
-}
+  public URL getJarFileURL()
+  {
+    return jarFileURL;
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns the "entry name" portion of the jar URL.  This is the portion
   * after the "!/" in the jar URL that represents the pathname inside the
   * actual jar file.
   *
   * @return The entry name.
   */
-public String
-getEntryName()
-{
-  return(entry_name);
-}
+  public String getEntryName()
+  {
+    return entryName;
+  }
 
-/*************************************************************************/
-
-/**
-  * Returns a read-only JarFile object for the remote jar file
+  /**
+   * Returns the entry in this jar file specified by the URL.
   *
-  * @return The JarFile object
+   * @return The jar entry
   *
   * @exception IOException If an error occurs
   */
-public abstract JarFile
-getJarFile() throws IOException;
+  public JarEntry getJarEntry() throws IOException
+  {
+    JarFile jarFile = getJarFile();
 
-/*************************************************************************/
+    return jarFile != null ? jarFile.getJarEntry(entryName) : null;
+  }
 
-/**
-  * Returns a Manifest object for this jar file, or null if there is no
-  * manifest.
+  /**
+   * Returns a read-only JarFile object for the remote jar file
   *
-  * @return The Manifest
+   * @return The JarFile object
   *
   * @exception IOException If an error occurs
   */
-public Manifest
-getManifest() throws IOException
-{
-  if (jar_file == null)
-    jar_file = getJarFile();
+  public abstract JarFile getJarFile() throws IOException;
 
-  return(jar_file.getManifest());
-}
-
-/*************************************************************************/
-
-/**
-  * Returns the entry in this jar file specified by the URL.  
+  /**
+   * Returns an array of Certificate objects for the jar file entry specified
+   * by this URL or null if there are none
   * 
-  * @return The jar entry
+   * @return A Certificate array
   *
   * @exception IOException If an error occurs
   */
-public JarEntry
-getJarEntry() throws IOException
-{
-  if (jar_file == null)
-    jar_file = getJarFile();
+  public Certificate[] getCertificates() throws IOException
+  {
+    JarEntry entry = getJarEntry();
 
-  return(jar_file.getJarEntry(entry_name));
-}
+    return entry != null ? entry.getCertificates() : null;
+  }
 
-/*************************************************************************/
-
-/**
-  * Returns the Attributes for the Jar entry specified by the URL or null
-  * if none
+  /**
+   * Returns the main Attributes for the jar file specified in the URL or
+   * null if there are none
   *
-  * @return The Attributes
+   * @return The main Attributes for the JAR file for this connection
   *
   * @exception IOException If an error occurs
   */
-public Attributes
-getAttributes() throws IOException
-{
-  return(getJarEntry().getAttributes());
-}
+  public Attributes getMainAttributes() throws IOException
+  {
+    Manifest manifest = getManifest();
 
-/*************************************************************************/
+    return manifest != null ? manifest.getMainAttributes() : null;
+  }
 
-/**
-  * Returns the main Attributes for the jar file specified in the URL or
-  * null if there are none
+  /**
+   * Returns the Attributes for the Jar entry specified by the URL or null
+   * if none
   *
-  * @return The main Attributes
-  *
-  * @exception IOException If an error occurs
-  */
-public Attributes
-getMainAttributes() throws IOException
-{
-  return(getManifest().getMainAttributes());
-}
-
-/*************************************************************************/
-
-/**
-  * Returns an array of Certificate objects for the jar file entry specified
-  * by this URL or null if there are none
-  *
-  * @return A Certificate array
+   * @return The Attributes object for this connection if the URL for it points
+   * to a JAR file entry, null otherwise
   *
   * @exception IOException If an error occurs
   */
-public Certificate[]
-getCertificates() throws IOException
-{
-  return(getJarEntry().getCertificates());
+  public Attributes getAttributes() throws IOException
+  {
+    JarEntry entry = getJarEntry();
+
+    return entry != null ? entry.getAttributes() : null;
+  }
+
+  /**
+   * Returns a Manifest object for this jar file, or null if there is no
+   * manifest.
+  *
+   * @return The Manifest for this connection, or null if none
+  *
+  * @exception IOException If an error occurs
+  */
+  public Manifest getManifest() throws IOException
+  {
+    JarFile file = getJarFile();
+
+    return file != null ? file.getManifest() : null;
+  }
 }
-
-} // class JarURLConnection
-

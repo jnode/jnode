@@ -39,6 +39,7 @@ package java.net;
 
 import java.io.UnsupportedEncodingException;
 
+
 /**
  * This utility class contains static methods that converts a 
  * string encoded in the x-www-form-urlencoded format to the original
@@ -65,7 +66,7 @@ public class URLDecoder
   /**
    * Public contructor. Note that this class has only static methods.
    */
-  public URLDecoder ()
+  public URLDecoder()
   {
   }
 
@@ -77,6 +78,8 @@ public class URLDecoder
    * @param s the String to convert
    *
    * @return the converted String
+   *
+   * @deprecated
    */
   public static String decode(String s)
   {
@@ -132,12 +135,12 @@ public class URLDecoder
 	start = i;
 
 	// Get all consecutive encoded bytes
-	while ((i+2 < length) && (str.charAt(i) == '%'))
+	while ((i + 2 < length) && (str.charAt(i) == '%'))
 	  i += 3;
 
 	// Decode all these bytes
-	if ((bytes == null) || (bytes.length < ((i-start)/3)))
-	  bytes = new byte[((i-start)/3)];
+	if ((bytes == null) || (bytes.length < ((i - start) / 3)))
+	  bytes = new byte[((i - start) / 3)];
 
 	int index = 0;
 	try
@@ -145,7 +148,7 @@ public class URLDecoder
 	    while (start < i)
 	      {
 		String sub = str.substring(start + 1, start + 3);
-		bytes[index] = (byte)Integer.parseInt(sub, 16);
+		bytes[index] = (byte) Integer.parseInt(sub, 16);
 		index++;
 		start += 3;
 	      }
@@ -174,5 +177,4 @@ public class URLDecoder
 
     return result.toString();
   }
-
 } // class URLDecoder

@@ -38,23 +38,36 @@ exception statement from your version. */
 package java.nio.charset;
 
 /**
+ * @author Michael Koch
  * @since 1.4
  */
 public class IllegalCharsetNameException extends IllegalArgumentException
 {
   /**
+   * Compatible with JDK 1.4+
+   */
+  private static final long serialVersionUID = 1457525358470002989L;
+  
+  private String charsetName;
+  
+  /**
    * Creates the exception
+   *
+   * @param charsetName name of the illegal charset
    */
   public IllegalCharsetNameException (String charsetName)
   {
-    super (charsetName);
+    super ();
+    this.charsetName = charsetName;
   }
 
   /**
    * Retrieves the illegal charset name
+   *
+   * @return the illegal charset name
    */
   public String getCharsetName ()
   {
-    return getMessage ();
+    return charsetName;
   }
 }

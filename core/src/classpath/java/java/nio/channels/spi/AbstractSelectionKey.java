@@ -1,5 +1,5 @@
 /* AbstractSelectionKey.java -- 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -39,37 +39,40 @@ package java.nio.channels.spi;
 
 import java.nio.channels.SelectionKey;
 
+
 /**
  * @since 1.4
  */
-public abstract class AbstractSelectionKey
-  extends SelectionKey
+public abstract class AbstractSelectionKey extends SelectionKey
 {
-  boolean ok = true;
+  private boolean cancelled;
 
   /**
    * Initializes the key.
    */
-  protected AbstractSelectionKey ()
+  protected AbstractSelectionKey()
   {
   }
 
   /**
    * Cancels this key.
    */
-  public final void cancel ()
+  public final void cancel()
   {
-    if (ok)
-      selector ().selectedKeys ().add (this);
-    
-    ok = false;
+    if (isValid())
+      {
+	((AbstractSelector) selector()).cancelKey(this);
+	cancelled = true;
+      }
   }
 
   /**
    * Tells whether this key is valid or not.
+   *
+   * @return true if this key is valid, false otherwise
    */
-  public final boolean isValid ()
+  public final boolean isValid()
   {
-    return ok;
+    return ! cancelled;
   }
 }

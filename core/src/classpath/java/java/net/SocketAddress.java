@@ -39,6 +39,7 @@ package java.net;
 
 import java.io.Serializable;
 
+
 /** 
  * Abstract base class for InetSocketAddress.
  * InetSocketAddress is to my knowledge the only derived
