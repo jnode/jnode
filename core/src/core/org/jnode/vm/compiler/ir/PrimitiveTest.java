@@ -88,18 +88,18 @@ public class PrimitiveTest {
     }
 
     public static int const3(int a0, int a1) {
-        int l1 = -134;
-        int l2 = 2;
-        int l3 = 3;
+        //int l1 = -134;
+        //int l2 = 2;
+        //int l3 = 3;
         //return (int)(1 + 2 * 3.5 + 1) % 6  ;
         //return  - ((l1 + l2 + l3 + l1* l2* l3) / l2);
         return a1 + a1 + a0;
     }
 
     public static int const2(int a0, int a1) {
-        int l1 = -134;
-        int l2 = 2;
-        int l3 = 3;
+        //int l1 = -134;
+        //int l2 = 2;
+        //int l3 = 3;
         //return (int)(1 + 2 * 3.5 + 1) % 6  ;
         //return  - ((l1 + l2 + l3 + l1* l2* l3) / l2);
         return (byte) 2 + a1;

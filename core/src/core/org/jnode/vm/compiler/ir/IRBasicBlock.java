@@ -146,7 +146,7 @@ public class IRBasicBlock extends BasicBlock {
 	}
 
 	/**
-	 * @param i
+	 * @param initialOffset
 	 */
 	public void setStackOffset(int initialOffset) {
 		stackOffset = initialOffset;

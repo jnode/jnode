@@ -148,7 +148,7 @@ public class Editor extends JFrame {
             public Object run() {
                 try {
                     FileInputStream fis = new FileInputStream(file);
-                    byte[] data = new byte[(int) fis.available()];
+                    byte[] data = new byte[fis.available()];
                     fis.read(data);
                     textArea.setText(new String(data));
                     fis.close();
