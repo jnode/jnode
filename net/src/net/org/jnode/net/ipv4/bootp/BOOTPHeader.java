@@ -45,8 +45,10 @@ public class BOOTPHeader
   private final Inet4Address yourIPAddress;
   private final Inet4Address serverIPAddress;
   private final Inet4Address gatewayIPAddress;
+/*
   private final Inet4Address dns1IPAddress;
   private final Inet4Address dns2IPAddress;
+*/
   private String serverHostName;
   private String bootFileName;
 
@@ -95,8 +97,10 @@ public class BOOTPHeader
       throw new RuntimeException(ex);
     }
 
+/*
     dns1IPAddress = IPv4Address.readFrom(skbuf, 269);
     dns2IPAddress = IPv4Address.readFrom(skbuf, 273);
+*/
   }
 
   /**
@@ -130,8 +134,10 @@ public class BOOTPHeader
     this.serverIPAddress = null;
     this.gatewayIPAddress = null;
     this.clientHwAddress = clientHwAddress;
+/*
     dns1IPAddress = null;
     dns2IPAddress = null;
+*/
   }
 
   /**
@@ -157,8 +163,10 @@ public class BOOTPHeader
     this.serverIPAddress = serverIPAddress;
     this.gatewayIPAddress = null;
     this.clientHwAddress = clientHwAddress;
+/*
     dns1IPAddress = null;
     dns2IPAddress = null;
+*/
   }
 
   /**
@@ -219,6 +227,7 @@ public class BOOTPHeader
       }
     }
 
+/*
     if (dns1IPAddress != null)
     {
       IPv4Address.writeTo(skbuf, 269, dns1IPAddress);
@@ -227,6 +236,7 @@ public class BOOTPHeader
     {
       IPv4Address.writeTo(skbuf, 273, dns2IPAddress);
     }
+*/
 
 
   }
@@ -333,6 +343,7 @@ public class BOOTPHeader
     return yourIPAddress;
   }
 
+/*
   public Inet4Address getDns1IPAddress()
   {
     return dns1IPAddress;
@@ -342,4 +353,5 @@ public class BOOTPHeader
   {
     return dns2IPAddress;
   }
+*/
 }
