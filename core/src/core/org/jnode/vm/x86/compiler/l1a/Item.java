@@ -89,7 +89,7 @@ abstract class Item {
 	 * @param offsetToFP
 	 */
 	protected final void initialize(int kind, int offsetToFP) {
-		assertCondition(kind > 0, "Invalid kind");
+	    if (Vm.VerifyAssertions) Vm._assert(kind > 0, "Invalid kind");
 		this.kind = kind;
 		this.offsetToFP = offsetToFP;		
 	}
@@ -99,17 +99,6 @@ abstract class Item {
 	 */
 	static void notImplemented() {
 		throw new Error("NotImplemented");
-	}
-
-	/**
-	 * Assert.
-	 * 
-	 * @param cond
-	 */
-	static void assertCondition(boolean cond, String message) {
-		if (!cond) {
-			throw new Error("Assertion failure: " + message);
-		}
 	}
 
 	/**
@@ -166,7 +155,7 @@ abstract class Item {
 	 * @return
 	 */
 	int getOffsetToFP() {
-		assertCondition(kind == Kind.LOCAL, "kind == Kind.LOCAL");
+	    if (Vm.VerifyAssertions) Vm._assert(kind == Kind.LOCAL, "kind == Kind.LOCAL");
 		return offsetToFP;
 	}
 
@@ -176,7 +165,7 @@ abstract class Item {
 	 * @return
 	 */
 	boolean isAtOffset(int offset) {
-		assertCondition(kind == Kind.LOCAL, "kind == Kind.LOCAL");
+	    if (Vm.VerifyAssertions) Vm._assert(kind == Kind.LOCAL, "kind == Kind.LOCAL");
 		return (offsetToFP == offset);
 	}
 

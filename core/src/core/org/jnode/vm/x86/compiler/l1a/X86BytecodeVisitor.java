@@ -517,15 +517,9 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         /* TIB -> tmp */
         os.writeMOV(INTSIZE, tmpr, objectr, tibOffset);
         /* SuperClassesArray -> tmp */
-        if (false && currentMethod.getName().equals("getMethod")) {
-            os.writeINT(3);
-        }
         os.writeMOV(INTSIZE, tmpr, tmpr, arrayDataOffset
                 + (TIBLayout.SUPERCLASSES_INDEX * slotSize));
         /* SuperClassesArray.length -> ECX */
-        if (false && currentMethod.getName().equals("getMethod")) {
-            os.writeINT(3);
-        }
         os.writeMOV(INTSIZE, ECX, tmpr, arrayLengthOffset);
         /* &superClassesArray[0] -> esi */
         os.writeLEA(tmpr, tmpr, arrayDataOffset);
@@ -2096,6 +2090,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 
         // Push result
         os.setObjectRef(endLabel);
+        ref.release(eContext);
+        L1AHelper.requestRegister(eContext, refr);
         final IntItem result = (IntItem)ifac.createReg(JvmType.INT, refr);
         pool.transferOwnerTo(refr, result);
         vstack.push(result);

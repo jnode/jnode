@@ -6,6 +6,7 @@ package org.jnode.vm.x86.compiler.l1a;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
 import org.jnode.vm.JvmType;
+import org.jnode.vm.Vm;
 
 /**
  * @author Patrik Reali
@@ -53,7 +54,7 @@ final class FloatItem extends WordItem {
 	 * @return
 	 */
 	float getValue() {
-		assertCondition(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
+	    if (Vm.VerifyAssertions) Vm._assert(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
 		return value;
 	}
 
