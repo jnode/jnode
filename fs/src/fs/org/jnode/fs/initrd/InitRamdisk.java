@@ -8,7 +8,7 @@ import javax.naming.NameNotFoundException;
 import org.apache.log4j.Logger;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.DeviceManager;
-import org.jnode.driver.DeviceStarter;
+import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.block.ramdisk.RamDiskDevice;
@@ -22,7 +22,6 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
-import org.jnode.util.TimeoutException;
 
 /**
  * Dummy plugin that just mount an initial ramdisk on /Jnode
@@ -62,8 +61,8 @@ public class InitRamdisk extends Plugin {
 
             // restart the device
             log.info("Restart initrd ramdisk");
-            dev.stop();
-            new DeviceStarter(dev).start(dm.getDefaultStartTimeout());
+            dm.stop(dev);
+            dm.start(dev);
 
             log.info("/jnode ready.");
         } catch (NameNotFoundException e) {
@@ -74,10 +73,9 @@ public class InitRamdisk extends Plugin {
             throw new PluginException(e);
         } catch (FileSystemException e) {
             throw new PluginException(e);
-        } catch (TimeoutException ex) {
+        } catch (DeviceNotFoundException ex) {
             throw new PluginException(ex);
         }
-
     }
 
     /**

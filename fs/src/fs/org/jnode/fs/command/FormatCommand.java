@@ -8,7 +8,6 @@ import javax.naming.NameNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
-import org.jnode.driver.DeviceStarter;
 import org.jnode.driver.DriverException;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
@@ -22,87 +21,84 @@ import org.jnode.shell.help.OptionArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
-import org.jnode.util.TimeoutException;
 
 /**
  * @author gbin
  */
 public class FormatCommand {
-	static final OptionArgument TYPE =
-		new OptionArgument(
-			"action",
-			"Type parameter",
-			new OptionArgument.Option[] { new OptionArgument.Option("-t", "Specify fs type")});
 
-	static final OptionArgument FS =
-		new OptionArgument(
-			"fstype",
-			"File system type",
-			new OptionArgument.Option[] {
-				new OptionArgument.Option("fat16", "FAT 16 filesystem"),
-				new OptionArgument.Option("fat12", "FAT 12 filesystem")});
+    static final OptionArgument TYPE = new OptionArgument("action",
+            "Type parameter",
+            new OptionArgument.Option[] { new OptionArgument.Option("-t",
+                    "Specify fs type")});
 
-	static final DeviceArgument ARG_DEVICE = new DeviceArgument("device-id", "the device to print informations about");
+    static final OptionArgument FS = new OptionArgument("fstype",
+            "File system type", new OptionArgument.Option[] {
+                    new OptionArgument.Option("fat16", "FAT 16 filesystem"),
+                    new OptionArgument.Option("fat12", "FAT 12 filesystem")});
 
-	static final Parameter PARAM_TYPE = new Parameter(TYPE, Parameter.MANDATORY);
-	static final Parameter PARAM_FS = new Parameter(FS, Parameter.MANDATORY);
-	static final Parameter PARAM_DEVICE = new Parameter(ARG_DEVICE, Parameter.MANDATORY);
+    static final DeviceArgument ARG_DEVICE = new DeviceArgument("device-id",
+            "the device to print informations about");
 
-	public static Help.Info HELP_INFO =
-		new Help.Info(
-			"format",
-			new Syntax[] {
-				 new Syntax(
-					"Format a block device with a specified type",
-					new Parameter[] { PARAM_TYPE, PARAM_FS, PARAM_DEVICE })
-	});
+    static final Parameter PARAM_TYPE = new Parameter(TYPE, Parameter.MANDATORY);
 
-	public static void main(String[] args) {
-		try {
-			ParsedArguments cmdLine = HELP_INFO.parse(args);
+    static final Parameter PARAM_FS = new Parameter(FS, Parameter.MANDATORY);
 
-			String device = ARG_DEVICE.getValue(cmdLine);
-			String FSType = FS.getValue(cmdLine).intern();
-			String fsTypeName;
-			Object params;
+    static final Parameter PARAM_DEVICE = new Parameter(ARG_DEVICE,
+            Parameter.MANDATORY);
 
-			int fatSize = 0;
-			if (FSType == "fat16") {
-				fatSize = Fat.FAT16;
-				fsTypeName = FatFileSystemType.NAME;
-				params = new Integer(fatSize);
-			} else if (FSType == "fat12") {
-				fatSize = Fat.FAT12;
-				fsTypeName = FatFileSystemType.NAME;
-				params = new Integer(fatSize);
-			} else
-				throw new FileSystemException("Unsupported FS by format command");
+    public static Help.Info HELP_INFO = new Help.Info("format",
+            new Syntax[] { new Syntax(
+                    "Format a block device with a specified type",
+                    new Parameter[] { PARAM_TYPE, PARAM_FS, PARAM_DEVICE})});
 
-			DeviceManager dm;
+    public static void main(String[] args) {
+        try {
+            ParsedArguments cmdLine = HELP_INFO.parse(args);
 
-			dm = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);
+            String device = ARG_DEVICE.getValue(cmdLine);
+            String FSType = FS.getValue(cmdLine).intern();
+            String fsTypeName;
+            Object params;
 
-         Device dev = dm.getDevice(device);
-			FileSystemService fileSystemService = (FileSystemService)InitialNaming.lookup(FileSystemService.NAME);
-			FileSystemType type = fileSystemService.getFileSystemTypeForNameSystemTypes(fsTypeName);
-			type.format(dev, params);
-	
-         // restart the device
-			dev.stop();
-			new DeviceStarter(dev).start(dm.getDefaultStartTimeout());
+            int fatSize = 0;
+            if (FSType == "fat16") {
+                fatSize = Fat.FAT16;
+                fsTypeName = FatFileSystemType.NAME;
+                params = new Integer(fatSize);
+            } else if (FSType == "fat12") {
+                fatSize = Fat.FAT12;
+                fsTypeName = FatFileSystemType.NAME;
+                params = new Integer(fatSize);
+            } else
+                throw new FileSystemException(
+                        "Unsupported FS by format command");
 
-		} catch (NameNotFoundException e) {
-			e.printStackTrace();
-		} catch (DeviceNotFoundException e) {
-			e.printStackTrace();
-		} catch (DriverException e) {
-			e.printStackTrace();
-		} catch (FileSystemException e) {
-			// 
-			e.printStackTrace();
-		} catch (TimeoutException ex) {
-            ex.printStackTrace();
+            DeviceManager dm;
+
+            dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+
+            Device dev = dm.getDevice(device);
+            FileSystemService fileSystemService = (FileSystemService) InitialNaming
+                    .lookup(FileSystemService.NAME);
+            FileSystemType type = fileSystemService
+                    .getFileSystemTypeForNameSystemTypes(fsTypeName);
+            type.format(dev, params);
+
+            // restart the device
+            dm.stop(dev);
+            dm.start(dev);
+
+        } catch (NameNotFoundException e) {
+            e.printStackTrace();
+        } catch (DeviceNotFoundException e) {
+            e.printStackTrace();
+        } catch (DriverException e) {
+            e.printStackTrace();
+        } catch (FileSystemException e) {
+            // 
+            e.printStackTrace();
         }
-	}
+    }
 
 }

@@ -8,7 +8,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.jnode.system.BootLog;
 import org.jnode.system.ResourceOwner;
+import org.jnode.util.StopWatch;
 
 /**
  * A software representation of a hardware device.
@@ -106,7 +108,7 @@ public class Device implements ResourceOwner {
 	 * 
 	 * @param newId
 	 */
-	void setId(String newId) {
+	final void setId(String newId) {
 		this.id = newId;
 	}
 
@@ -137,7 +139,7 @@ public class Device implements ResourceOwner {
 	 * 
 	 * @throws DriverException
 	 */
-	public final void stop() throws DriverException {
+	final void stop() throws DriverException {
 		if (driver == null) {
 			throw new DriverException("Cannot stop without a driver");
 		} else if (manager == null) {
@@ -169,7 +171,7 @@ public class Device implements ResourceOwner {
 	 * @param apiInterface
 	 * @param apiImplementation
 	 */
-	public void registerAPI(Class apiInterface, DeviceAPI apiImplementation) {
+	public final void registerAPI(Class apiInterface, DeviceAPI apiImplementation) {
 		if (!apiInterface.isInstance(apiImplementation)) {
 			throw new IllegalArgumentException("API implementation does not implement API interface");
 		}
@@ -193,7 +195,7 @@ public class Device implements ResourceOwner {
 	 * 
 	 * @param apiInterface
 	 */
-	public void unregisterAPI(Class apiInterface) {
+	public final void unregisterAPI(Class apiInterface) {
 		apis.remove(apiInterface);
 	}
 
@@ -203,7 +205,7 @@ public class Device implements ResourceOwner {
 	 * @param apiInterface
 	 * @return boolean
 	 */
-	public boolean implementsAPI(Class apiInterface) {
+	public final boolean implementsAPI(Class apiInterface) {
 		return apis.containsKey(apiInterface);
 	}
 
@@ -212,7 +214,7 @@ public class Device implements ResourceOwner {
 	 * 
 	 * @return A set of Class instances
 	 */
-	public Set implementedAPIs() {
+	public final Set implementedAPIs() {
 		return apis.keySet();
 	}
 
@@ -224,7 +226,7 @@ public class Device implements ResourceOwner {
 	 * @throws ApiNotFoundException
 	 *             The given api has not been found
 	 */
-	public DeviceAPI getAPI(Class apiInterface) throws ApiNotFoundException {
+	public final DeviceAPI getAPI(Class apiInterface) throws ApiNotFoundException {
 		DeviceAPI impl = (DeviceAPI) apis.get(apiInterface);
 		if (impl == null) {
 			throw new ApiNotFoundException(apiInterface.getName());
@@ -237,7 +239,7 @@ public class Device implements ResourceOwner {
 	 * 
 	 * @param listener
 	 */
-	public void addListener(DeviceListener listener) {
+	public final void addListener(DeviceListener listener) {
 		listeners.add(listener);
 	}
 
@@ -246,7 +248,7 @@ public class Device implements ResourceOwner {
 	 * 
 	 * @param listener
 	 */
-	public void removeListener(DeviceListener listener) {
+	public final void removeListener(DeviceListener listener) {
 		listeners.remove(listener);
 	}
 
@@ -271,10 +273,15 @@ public class Device implements ResourceOwner {
 	/**
 	 * Fire a deviceStarted event to all my listeners
 	 */
-	protected void fireStartedEvent() {
+	protected final void fireStartedEvent() {
+		final StopWatch sw = new StopWatch();
 		for (Iterator i = listeners.iterator(); i.hasNext();) {
 			final DeviceListener l = (DeviceListener) i.next();
+			sw.start();
 			l.deviceStarted(this);
+			if (sw.isElapsedLongerThen(100)) {
+			    BootLog.error("DeviceListener took " + sw + " in deviceStarted: " + l.getClass().getName());
+			}
 		}
 		manager.fireStartedEvent(this);
 	}
@@ -282,11 +289,16 @@ public class Device implements ResourceOwner {
 	/**
 	 * Fire a deviceStop event to all my listeners
 	 */
-	protected void fireStopEvent() {
+	protected final void fireStopEvent() {
 		manager.fireStopEvent(this);
+		final StopWatch sw = new StopWatch();
 		for (Iterator i = listeners.iterator(); i.hasNext();) {
 			final DeviceListener l = (DeviceListener) i.next();
+			sw.start();
 			l.deviceStop(this);
+			if (sw.isElapsedLongerThen(100)) {
+			    BootLog.error("DeviceListener took " + sw + " in deviceStop: " + l.getClass().getName());
+			}
 		}
 	}
 
