@@ -11,4 +11,8 @@
     <import plugin="org.jnode.shell"/>
   </requires>
         
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.io.FilePermission" name="*" actions="read"/>
+  </extension>
+  
 </plugin>
