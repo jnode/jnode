@@ -18,7 +18,7 @@ import org.jnode.vm.VmSystem;
 
 public class Throwable {
 
-    private static final int MAX_ELEMENTS = 8;
+    private static final int MAX_ELEMENTS = 20;
     
 	private String detailMessage;
 	private Object[] backtrace;
