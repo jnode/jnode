@@ -34,6 +34,9 @@ public class Modifier {
 	/** Class has a finalizer other then java.lang.Object#finalizer */
 	public static final int ACC_FINALIZER   = 0x00100000;
 
+	/** Is this a magic class */
+	public static final int ACC_MAGIC = 0x20000000; // C
+
 	/** gather profile information for this method */
 	public static final int ACC_PROFILE     = 0x40000000; // M
 	public static final int ACC_SPECIAL     = 0x80000000;
@@ -125,6 +128,11 @@ public class Modifier {
 
 	public static boolean isConstructor(int modifier) {
 		int mask = ACC_CONSTRUCTOR;
+		return ((modifier & mask) == mask);
+	}
+
+	public static boolean isMagic(int modifier) {
+		int mask = ACC_MAGIC;
 		return ((modifier & mask) == mask);
 	}
 

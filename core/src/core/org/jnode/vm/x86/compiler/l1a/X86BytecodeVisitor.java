@@ -123,6 +123,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     
     /** Item factory */
     private final ItemFactory ifac;
+    
+    private final MagicHelper magicHelper;
 
     /**
      * Virtual Stack: this stack contains values that have been computed but not
@@ -147,9 +149,10 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @param context
      */
     public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
-            boolean isBootstrap, X86CompilerContext context) {
+            boolean isBootstrap, X86CompilerContext context, MagicHelper magicHelper) {
         this.os = (AbstractX86Stream) outputStream;
         this.context = context;
+        this.magicHelper = magicHelper;
         this.vstack = new VirtualStack(os);
         final X86RegisterPool pool = new X86RegisterPool();
         this.ifac = ItemFactory.getFactory();
@@ -2242,19 +2245,23 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokestatic(org.jnode.vm.classmgr.VmConstMethodRef)
      */
     public final void visit_invokestatic(VmConstMethodRef methodRef) {
-        // Flush the stack before an invoke
-        vstack.push(eContext);
-
         methodRef.resolve(loader);
-        final VmStaticMethod sm = (VmStaticMethod) methodRef
+        final VmStaticMethod method = (VmStaticMethod) methodRef
                 .getResolvedVmMethod();
 
-        dropParameters(sm, false);
+        if (method.getDeclaringClass().isMagicType()) {
+            magicHelper.emitMagic(eContext, method, true);
+        } else {
+            // Flush the stack before an invoke
+            vstack.push(eContext);
 
-        // Get static field object
-        helper.writeGetStaticsEntry(curInstrLabel, EAX, sm);
-        invokeJavaMethod(methodRef.getSignature());
-        // Result is already on the stack.
+            dropParameters(method, false);
+            
+            // Get static field object
+            helper.writeGetStaticsEntry(curInstrLabel, EAX, method);
+            invokeJavaMethod(methodRef.getSignature());
+            // Result is already on the stack.
+        }
     }
 
     /**
@@ -2262,32 +2269,36 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokevirtual(org.jnode.vm.classmgr.VmConstMethodRef)
      */
     public final void visit_invokevirtual(VmConstMethodRef methodRef) {
-        //TODO: port to orp-style
-        vstack.push(eContext);
-
         methodRef.resolve(loader);
         final VmMethod mts = methodRef.getResolvedVmMethod();
-
-        dropParameters(mts, true);
 
         if (mts.isStatic()) {
             throw new IncompatibleClassChangeError(
                     "Static method in invokevirtual");
         }
         final VmInstanceMethod method = (VmInstanceMethod) mts;
-        final int tibIndex = method.getTibOffset();
-        final int argSlotCount = Signature.getArgSlotCount(methodRef
-                .getSignature());
+        if (method.getDeclaringClass().isMagicType()) {
+            magicHelper.emitMagic(eContext, method, false);
+        } else {
+            //TODO: port to orp-style
+            vstack.push(eContext);
 
-        /* Get objectref -> EAX */
-        os.writeMOV(INTSIZE, EAX, SP, argSlotCount * slotSize);
-        /* Get VMT of objectef -> EAX */
-        os.writeMOV(INTSIZE, EAX, EAX, tibOffset);
-        /* Get entry in VMT -> EAX */
-        os.writeMOV(INTSIZE, EAX, EAX, arrayDataOffset + (tibIndex * slotSize));
-        /* Now invoke the method */
-        invokeJavaMethod(methodRef.getSignature());
-        // Result is already on the stack.
+            dropParameters(mts, true);
+
+            final int tibIndex = method.getTibOffset();
+            final int argSlotCount = Signature.getArgSlotCount(methodRef
+                    .getSignature());
+            
+            /* Get objectref -> EAX */
+            os.writeMOV(INTSIZE, EAX, SP, argSlotCount * slotSize);
+            /* Get VMT of objectef -> EAX */
+            os.writeMOV(INTSIZE, EAX, EAX, tibOffset);
+            /* Get entry in VMT -> EAX */
+            os.writeMOV(INTSIZE, EAX, EAX, arrayDataOffset + (tibIndex * slotSize));
+            /* Now invoke the method */
+            invokeJavaMethod(methodRef.getSignature());
+            // Result is already on the stack.
+        }
     }
 
     /**
