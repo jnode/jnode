@@ -26,13 +26,15 @@ public class Ext2DirectoryRecord {
 	private int offset;
 	private byte[] data;
 	private long fileOffset;
+	private Ext2FileSystem fs;
 	
 	/**
 	 * @param data:	the data that makes up the directory block
 	 * @param offset: the offset where the current DirectoryRecord begins within the block
 	 * @param fileOffset: the offset from the beginning of the directory file
 	 */
-	public Ext2DirectoryRecord(byte[] data, int offset, int fileOffset) {
+	public Ext2DirectoryRecord(Ext2FileSystem fs, byte[] data, int offset, int fileOffset) {
+		this.fs=fs;
 		this.data = data;
 		this.offset = offset;
 		this.fileOffset = fileOffset;
@@ -52,8 +54,9 @@ public class Ext2DirectoryRecord {
 	 * @param type
 	 * @param name
 	 */
-	public Ext2DirectoryRecord(long iNodeNr, int type, String name) {
+	public Ext2DirectoryRecord(Ext2FileSystem fs, long iNodeNr, int type, String name) {
 		this.offset=0;
+		this.fs=fs;
 		data = new byte[8+name.length()];
 		setName(name);
 		setINodeNr(iNodeNr);
@@ -91,7 +94,9 @@ public class Ext2DirectoryRecord {
 		return Ext2Utils.get8(data, offset+7);
 	}
 
-	private void setType(int type) {
+	private void setType(int type) { 
+		if(!fs.hasIncompatFeature(Ext2Constants.EXT2_FEATURE_INCOMPAT_FILETYPE))
+			return;
 		Ext2Utils.set8(data, offset+7, type);
 	}
 	/**

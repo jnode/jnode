@@ -67,7 +67,13 @@ public class Ext2Constants {
 	public static final long EXT2_FEATURE_RO_COMPAT_BTREE_DIR      	= 0x0004;
 	public static final long EXT2_FEATURE_RO_COMPAT_ANY            	= 0xffffffff;
 
-	
+	//S_FEATURE_INCOMPAT constants
+	public static final long EXT2_FEATURE_INCOMPAT_COMPRESSION		= 0x0001;
+	public static final long EXT2_FEATURE_INCOMPAT_FILETYPE        	= 0x0002;
+	public static final long EXT3_FEATURE_INCOMPAT_RECOVER          = 0x0004;
+	public static final long EXT3_FEATURE_INCOMPAT_JOURNAL_DEV      = 0x0008;
+	public static final long EXT2_FEATURE_INCOMPAT_META_BG          = 0x0010;
+
 	//constants specific to this (JNode) implementation
 	/**
 	 * When searching for free blocks, block groups that have at least 

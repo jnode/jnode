@@ -62,7 +62,7 @@ public class Ext2Directory implements FSDirectory {
 			int rights = 0xFFFF & (Ext2Constants.EXT2_S_IRWXU | Ext2Constants.EXT2_S_IRWXG | Ext2Constants.EXT2_S_IRWXO);
 			newINode = fs.createINode((int)iNode.getGroup(), Ext2Constants.EXT2_S_IFDIR, rights, 0, 0);
 			
-			dr = new Ext2DirectoryRecord(newINode.getINodeNr(), Ext2Constants.EXT2_FT_DIR, name);
+			dr = new Ext2DirectoryRecord(fs, newINode.getINodeNr(), Ext2Constants.EXT2_FT_DIR, name);
 
 			addDirectoryRecord(dr);
 
@@ -71,13 +71,13 @@ public class Ext2Directory implements FSDirectory {
 			//add "."
 			
 			Ext2Directory newDir = new Ext2Directory(newINode, fs, newEntry);
-			Ext2DirectoryRecord drThis = new Ext2DirectoryRecord( newINode.getINodeNr(), Ext2Constants.EXT2_FT_DIR, "." );
+			Ext2DirectoryRecord drThis = new Ext2DirectoryRecord( fs, newINode.getINodeNr(), Ext2Constants.EXT2_FT_DIR, "." );
 			newDir.addDirectoryRecord( drThis );
 			newINode.setLinksCount( 2 );
 						
 			//add ".."
 			long parentINodeNr = ((Ext2Directory)entry.getDirectory()).getINode().getINodeNr();
-			Ext2DirectoryRecord drParent=new Ext2DirectoryRecord(parentINodeNr, Ext2Constants.EXT2_FT_DIR, ".." );
+			Ext2DirectoryRecord drParent=new Ext2DirectoryRecord( fs, parentINodeNr, Ext2Constants.EXT2_FT_DIR, ".." );
 			newDir.addDirectoryRecord( drParent );
 			
 			//increase the reference count for the parent directory
@@ -117,7 +117,7 @@ public class Ext2Directory implements FSDirectory {
 			int rights = 0xFFFF & (Ext2Constants.EXT2_S_IRWXU | Ext2Constants.EXT2_S_IRWXG | Ext2Constants.EXT2_S_IRWXO);
 			newINode = fs.createINode((int)iNode.getGroup(), Ext2Constants.EXT2_S_IFREG, rights, 0, 0);
 			
-			dr = new Ext2DirectoryRecord(newINode.getINodeNr(), Ext2Constants.EXT2_FT_REG_FILE, name);
+			dr = new Ext2DirectoryRecord(fs, newINode.getINodeNr(), Ext2Constants.EXT2_FT_REG_FILE, name);
 
 			addDirectoryRecord(dr);
 			
@@ -234,7 +234,7 @@ public class Ext2Directory implements FSDirectory {
 				if(index>=iNode.getSize())
 					return false;
 				
-				dr = new Ext2DirectoryRecord(data, index, index);
+				dr = new Ext2DirectoryRecord(fs, data, index, index);
 				index+=dr.getRecLen();	
 			} while(dr.getINodeNr()==0);			//inode nr=0 means the entry is unused
 
