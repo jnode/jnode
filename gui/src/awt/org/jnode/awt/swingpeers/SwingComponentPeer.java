@@ -17,7 +17,6 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.PaintEvent;
-import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
@@ -25,7 +24,7 @@ import java.awt.image.VolatileImage;
 import java.awt.peer.ComponentPeer;
 
 import org.apache.log4j.Logger;
-import org.jnode.awt.image.JNodeBufferedImage;
+import org.jnode.awt.JNodeToolkit;
 
 /**
  * Base class for virtual component peers. Satisfies the requirements for AWT
@@ -47,7 +46,7 @@ class SwingComponentPeer implements ComponentPeer {
 
     protected Dimension size = new Dimension();
 
-    private final Toolkit toolkit;
+    private final JNodeToolkit toolkit;
 
     /**
      * Initialize this instance.
@@ -55,7 +54,7 @@ class SwingComponentPeer implements ComponentPeer {
      * @param toolkit
      * @param component
      */
-    public SwingComponentPeer(Toolkit toolkit, Component component) {
+    public SwingComponentPeer(JNodeToolkit toolkit, Component component) {
         this.toolkit = toolkit;
         this.component = component;
         setBounds(component.getX(), component.getY(), component.getWidth(),
@@ -85,16 +84,16 @@ class SwingComponentPeer implements ComponentPeer {
 
     // Image
 
-    public Image createImage(ImageProducer producer) {
+    public final Image createImage(ImageProducer producer) {
         return toolkit.createImage(producer);
     }
 
-    public Image createImage(int width, int height) {
-		return new JNodeBufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    public final Image createImage(int width, int height) {
+    	return toolkit.createCompatibleImage(width, height);
     }
 
-    public VolatileImage createVolatileImage(int width, int height) {
-	    throw new RuntimeException("Not implemented");
+    public final VolatileImage createVolatileImage(int width, int height) {
+    	return toolkit.createVolatileImage(width, height);
     }
 
     public void destroyBuffers() {
