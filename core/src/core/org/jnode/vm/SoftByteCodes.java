@@ -339,8 +339,12 @@ public class SoftByteCodes implements Uninterruptible {
 	/**
 	 * Throw a classcast exception.
 	 */
-	public static void classCastFailed() {
-		throw new ClassCastException();
+	public static void classCastFailed(Object object) {
+		if (object == null) {
+			throw new ClassCastException("Object is null");
+		} else {
+			throw new ClassCastException(object.getClass().getName());			
+		}
 	}
 
 	/**

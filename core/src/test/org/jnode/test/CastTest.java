@@ -10,6 +10,7 @@ public class CastTest {
 
 	public static void main(String[] args) {
 		test(args);
+		test2("Hello world");
 	}
 
 	public static void test(Object args) {
@@ -21,6 +22,14 @@ public class CastTest {
 			System.out.println("Instanceof");
 		} else {
 			System.out.println("Not instanceof: " + args.getClass().getName());
+		}
+	}
+	
+	public static void test2(Object arg) {
+		try {
+			((Integer)arg).intValue();
+		} catch (ClassCastException ex) {
+			ex.printStackTrace();
 		}
 	}
 }
