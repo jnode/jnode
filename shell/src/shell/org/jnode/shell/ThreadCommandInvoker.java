@@ -56,6 +56,7 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
     private boolean blocking;
 
     private Thread blockingThread;
+    private Thread threadProcess = null;
 
     private String cmdName;
 
@@ -149,6 +150,8 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
           else
             commandLine = cmdLine.getRemainder();
 
+          commandLine.setOutFileName(cmdLine.getOutFileName());
+
           cr = new CommandRunner(cmdInfo.getCommandClass(), method, new Object[]{commandLine, inputStream, outputStream, errStream});
         }
         catch (NoSuchMethodException e)
@@ -165,7 +168,7 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
           }
           else
           {
-            Thread threadProcess = new Thread(cr, cmdName);
+            threadProcess = new Thread(cr, cmdName);
             threadProcess.start();
 
             this.blocking = true;
@@ -236,12 +239,26 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
         if (ke.isControlDown() && ke.getKeyCode() == KeyEvent.VK_C) {
             doCtrlC();
         }
+        if (ke.isControlDown() && ke.getKeyCode() == KeyEvent.VK_Z) {
+            doCtrlZ();
+        }
     }
 
-    private void doCtrlC() {
-        System.err.println("ctrl-c: Returning focus to console. (" + cmdName
-                + " is still running.)");
+    private void doCtrlZ()
+    {
+      System.err.println("ctrl-z: Returning focus to console. (" + cmdName + " is still running)");
+      unblock();
+    }
+
+    private void doCtrlC()
+    {
+      System.err.println("ctrl-c: Returning focus to console. (" + cmdName + " has been killed)");
+
+      if (threadProcess != null)
+      {
         unblock();
+        threadProcess.stop(new ThreadDeath());
+      }
     }
 
     final void unblock() {
