@@ -45,9 +45,10 @@ public interface FileSystemService {
 	/**
 	 * Unregister a mounted filesystem
 	 * 
-	 * @param fs
+	 * @param device
+	 * @return The filesystem that was registered for the device, or null if not found.
 	 */
-	public void unregisterFileSystem(FileSystem fs);
+	public FileSystem unregisterFileSystem(Device device);
 
 	/**
 	 * Gets the filesystem registered on the given device.

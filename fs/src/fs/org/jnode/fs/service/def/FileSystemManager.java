@@ -3,10 +3,11 @@
  */
 package org.jnode.fs.service.def;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystem;
@@ -14,23 +15,17 @@ import org.jnode.fs.FileSystem;
 /**
  * @author epr
  */
-public class FileSystemManager {
+final class FileSystemManager {
 
 	/** All registed filesystems (device, fs) */
 	private final HashMap filesystems = new HashMap();
-
-	/**
-	 * Create a new instance
-	 */
-	//protected FileSystemManager() {
-	//}
 
 	/**
 	 * Register a mounted filesystem
 	 * 
 	 * @param fs
 	 */
-	public void registerFileSystem(FileSystem fs) {
+	public synchronized void registerFileSystem(FileSystem fs) {
 		String idToMount = fs.getDevice().getId();
 		filesystems.put(idToMount, fs);
 	}
@@ -38,10 +33,10 @@ public class FileSystemManager {
 	/**
 	 * Unregister a mounted filesystem
 	 * 
-	 * @param fs
+	 * @param device
 	 */
-	public void unregisterFileSystem(FileSystem fs) {
-		filesystems.remove(fs.getDevice().getId());
+	public synchronized FileSystem unregisterFileSystem(Device device) {
+		return (FileSystem)filesystems.remove(device.getId());
 	}
 
 	/**
@@ -50,7 +45,7 @@ public class FileSystemManager {
 	 * @param device
 	 * @return null if no filesystem was found.
 	 */
-	public FileSystem getFileSystem(Device device) {
+	public synchronized FileSystem getFileSystem(Device device) {
 		return (FileSystem)filesystems.get(device.getId());
 	}
 
@@ -60,7 +55,7 @@ public class FileSystemManager {
 	 * @param rootName
 	 * @return null if no filesystem was found.
 	 */
-	public FileSystem getFileSystem(String rootName) {
+	public synchronized FileSystem getFileSystem(String rootName) {
 		return (FileSystem)filesystems.get(rootName);
 	}
 
@@ -68,19 +63,11 @@ public class FileSystemManager {
 	 * Gets all registered filesystems. All instances of the returned collection
 	 * are instanceof FileSystem.
 	 */
-	public Collection fileSystems() {
-		return Collections.unmodifiableCollection(filesystems.values());
+	public synchronized Collection fileSystems() {
+		return new ArrayList(filesystems.values());
 	}
 
-	public Set fileSystemRoots() {
-		return filesystems.keySet();
+	public synchronized Set fileSystemRoots() {
+		return new TreeSet(filesystems.keySet());
 	}
-
-	/**
-	 * Initialize this manager
-	 */
-	protected void initialize() {
-		// Do nothing
-	}
-
 }

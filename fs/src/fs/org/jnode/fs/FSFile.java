@@ -56,4 +56,11 @@ public interface FSFile extends FSObject {
 	 */	
 	public void write(long fileOffset, byte[] src, int off, int len)
 	throws IOException;
+	
+	/**
+	 * Flush any cached data to the disk.
+	 * @throws IOException
+	 */
+	public void flush()
+	throws IOException;
 }

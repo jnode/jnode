@@ -13,7 +13,7 @@ import org.jnode.fs.FSEntry;
 /**
  * @author epr
  */
-public class FSEntryCache {
+final class FSEntryCache {
 
 	/** My filesystem manager */
 	//private final FileSystemManager fsm;
