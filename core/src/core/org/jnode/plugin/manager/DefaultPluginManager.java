@@ -3,6 +3,9 @@
  */
 package org.jnode.plugin.manager;
 
+import gnu.java.security.actions.GetPropertyAction;
+
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -69,7 +72,7 @@ public class DefaultPluginManager extends PluginManager {
                 registry.getPluginsClassLoader());
 
         // Start the plugins
-        final String cmdLine = System.getProperty("jnode.cmdline", "");
+        final String cmdLine = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.cmdline", ""));
         final boolean debug = (cmdLine.indexOf("debug") > 0);
         final List descrList = createPluginDescriptorList();
         final ArrayList errors = new ArrayList(descrList.size());
