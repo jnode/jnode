@@ -70,7 +70,9 @@ public class Runtime {
 				return p;
 			}
 		} catch (Exception ex) {
-			throw new IOException("Exec error", ex);
+			final IOException ioe = new IOException("Exec error");
+			ioe.initCause(ex);
+			throw ioe;
 		}
 	}
 
