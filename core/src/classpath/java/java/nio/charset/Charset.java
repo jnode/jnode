@@ -40,6 +40,8 @@ package java.nio.charset;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.spi.CharsetProvider;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -131,7 +133,10 @@ public abstract class Charset implements Comparable {
 	// java.nio.charset.spi.CharsetProvider in the resource directory
 	// META-INF/services
 	private static final CharsetProvider provider() {
-		return Provider.provider();
+	    return (CharsetProvider)AccessController.doPrivileged(new PrivilegedAction() {
+	        public Object run() {
+	    		return Provider.provider();
+	        }});
 	}
 
 	public final String name() {
