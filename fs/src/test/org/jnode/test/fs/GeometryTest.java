@@ -8,8 +8,8 @@ package org.jnode.test.fs;
 
 import junit.framework.TestCase;
 
-import org.jnode.util.CHS;
-import org.jnode.util.Geometry;
+import org.jnode.fs.util.CHS;
+import org.jnode.fs.util.Geometry;
 
 /**
  * @author epr
