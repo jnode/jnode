@@ -10,6 +10,8 @@ import org.jnode.jnasm.assembler.Assembler;
 import org.jnode.jnasm.assembler.InstructionUtils;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.x86.X86Register.CRX;
+import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.UnresolvedObjectRefException;
@@ -506,7 +508,17 @@ public class X86Core extends AssemblerModule {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
-                stream.writeMOV(operandSize, getReg(0), getReg(1));
+                X86Register r1 = X86Register.getRegister(((Token) args[0]).image);
+                X86Register r2 = X86Register.getRegister(((Token) args[1]).image);
+                if(r1 instanceof CRX && r2 instanceof GPR){
+                    stream.writeMOV((CRX) r1, (GPR) r2);
+                } else if(r1 instanceof GPR && r2 instanceof CRX){
+                    stream.writeMOV((GPR) r1, (CRX) r2);
+                } else if(r1 instanceof GPR && r2 instanceof GPR){
+                    stream.writeMOV(operandSize, getReg(0), getReg(1));
+                } else {
+                    throw new IllegalArgumentException("Invalid register usage: mov " + r1 + "," + r2); 
+                }
                 break;
             case RC_ADDR:
                 stream.writeMOV_Const(getReg(0), getInt(1));

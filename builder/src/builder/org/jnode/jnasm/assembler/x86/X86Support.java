@@ -119,6 +119,6 @@ public class X86Support extends HardwareSupport {
     }
 
     public boolean isRegister(String str) {
-        return X86Register.isGPR(str);
+        return X86Register.isRegister(str);
     }
 }

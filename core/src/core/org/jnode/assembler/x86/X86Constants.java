@@ -25,6 +25,7 @@ package org.jnode.assembler.x86;
  * <description>
  * 
  * @author epr
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public interface X86Constants {
 
@@ -40,7 +41,10 @@ public interface X86Constants {
 
 	/** Lock prefix */
 	public static final int LOCK_PREFIX = 0xF0;
-    
+
+    /** CRX prefix */
+    public static final int CRX_PREFIX = 0x0F;
+
     /** high bit extension for SIB base */
     public static final int REX_B_PREFIX = 0x41;
 

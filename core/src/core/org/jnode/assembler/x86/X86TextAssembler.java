@@ -34,6 +34,7 @@ import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
+import org.jnode.assembler.x86.X86Register.CRX;
 import org.jnode.assembler.x86.X86Register.XMM;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.classmgr.VmType;
@@ -1210,6 +1211,19 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     public void writeMOV(int operandSize, GPR dstReg, int dstDisp, GPR srcReg) {
         println("\tmov " + size(operandSize) + "[" + dstReg + disp(dstDisp)
                 + "]," + srcReg);
+    }
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeMOV(CRX, GPR)
+     */
+    public void writeMOV(CRX dstReg, GPR srcReg) {
+        println("\tmov " + dstReg + "," + size(BITS32) + " " + srcReg);
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeMOV(GPR, CRX)
+     */
+    public void writeMOV(GPR dstReg, CRX srcReg) {
+        println("\tmov " + dstReg + "," + size(BITS32) + " " + srcReg);
     }
 
     /**

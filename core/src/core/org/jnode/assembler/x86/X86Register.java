@@ -136,6 +136,15 @@ public class X86Register extends VmSystemObject implements X86Constants {
 
     public static final GPR32 R15d = new GPR32("r15d", 15, true);
 
+    /*Control registers*/
+    public static final CRX CR0 = new CRX("cr0", 0);
+
+    public static final CRX CR2 = new CRX("cr2", 2);
+
+    public static final CRX CR3 = new CRX("cr3", 3);
+
+    public static final CRX CR4 = new CRX("cr4", 4);
+
     /* Floating-point registers */
     public static final FPU ST0 = new FPU("st0", 0);
 
@@ -273,6 +282,18 @@ public class X86Register extends VmSystemObject implements X86Constants {
         return (obj != null) && (obj instanceof GPR);
     }
 
+    public static X86Register getRegister(String name){
+        Object obj =  registerMap.get(name);
+        if( obj == null) throw new IllegalArgumentException("Unknown register: " + name);
+        if( !(obj instanceof X86Register)) throw new IllegalArgumentException("Not a X86Register: " + name);
+        return (X86Register) obj;
+    }
+
+    public static boolean isRegister(String name){
+        Object obj =  registerMap.get(name);
+        return (obj != null) && (obj instanceof X86Register);
+    }
+
     public abstract static class GPR extends X86Register {
 
         /**
@@ -387,6 +408,16 @@ public class X86Register extends VmSystemObject implements X86Constants {
          */
         public XMM(String name, int nr) {
             super(name, X86Constants.BITS128, nr);
+        }
+    }
+
+    public static final class CRX extends X86Register {
+        /**
+         * @param name
+         * @param nr
+         */
+        public CRX(String name, int nr) {
+            super(name, X86Constants.BITS32, nr, false);
         }
     }
 }
