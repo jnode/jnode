@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import org.jnode.vm.bytecode.BasicBlockFinder;
+import org.jnode.vm.bytecode.BytecodeFlags;
 import org.jnode.vm.bytecode.BytecodeVisitorSupport;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmInterpretedExceptionHandler;
@@ -349,7 +349,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 */
 	public void startInstruction(int address) {
 		super.startInstruction(address);
-		opcodeFlags[address] |= BasicBlockFinder.F_START_OF_INSTRUCTION;
+		opcodeFlags[address] |= BytecodeFlags.F_START_OF_INSTRUCTION;
 		if (nextIsStartOfBB) {
 			IRBasicBlock pred = this.currentBlock;
 			this.currentBlock = startBB(address);
@@ -360,7 +360,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 			nextIsSuccessor = true;
 			nextIsStartOfBB = false;
 		} else if (address != currentBlock.getStartPC() &&
-			(opcodeFlags[address] & BasicBlockFinder.F_START_OF_BASICBLOCK) != 0 && nextIsSuccessor) {
+			(opcodeFlags[address] & BytecodeFlags.F_START_OF_BASICBLOCK) != 0 && nextIsSuccessor) {
 
 			int n = blocks.size();
 			for (int i=0; i<n; i+=1) {
@@ -383,8 +383,8 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 */
 	private final IRBasicBlock startBB(int address) {
 		IRBasicBlock next = null;
-		if ((opcodeFlags[address] & BasicBlockFinder.F_START_OF_BASICBLOCK) == 0) {
-			opcodeFlags[address] |= BasicBlockFinder.F_START_OF_BASICBLOCK;
+		if ((opcodeFlags[address] & BytecodeFlags.F_START_OF_BASICBLOCK) == 0) {
+			opcodeFlags[address] |= BytecodeFlags.F_START_OF_BASICBLOCK;
 			next = new IRBasicBlock(address);
 			blocks.add(next);
 		} else {
@@ -401,11 +401,11 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	}
 
 	private final boolean isStartOfBB(int address) {
-		return ((opcodeFlags[address] & BasicBlockFinder.F_START_OF_BASICBLOCK) != 0);
+		return ((opcodeFlags[address] & BytecodeFlags.F_START_OF_BASICBLOCK) != 0);
 	}
 
 	private final boolean isStartOfException(int address) {
-		return ((opcodeFlags[address] & BasicBlockFinder.F_START_OF_EXCEPTIONHANDLER) != 0);
+		return ((opcodeFlags[address] & BytecodeFlags.F_START_OF_EXCEPTIONHANDLER) != 0);
 	}
 
 	/**
@@ -414,7 +414,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @param address
 	 */
 	private final void startException(int address) {
-		opcodeFlags[address] |= BasicBlockFinder.F_START_OF_EXCEPTIONHANDLER;
+		opcodeFlags[address] |= BytecodeFlags.F_START_OF_EXCEPTIONHANDLER;
 		startBB(address);
 	}
 
@@ -424,7 +424,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @param address
 	 */
 	private final void startTryBlock(int address) {
-		opcodeFlags[address] |= BasicBlockFinder.F_START_OF_TRYBLOCK;
+		opcodeFlags[address] |= BytecodeFlags.F_START_OF_TRYBLOCK;
 		startBB(address);
 	}
 
@@ -434,7 +434,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * @param address
 	 */
 	private final void startTryBlockEnd(int address) {
-		opcodeFlags[address] |= BasicBlockFinder.F_START_OF_TRYBLOCKEND;
+		opcodeFlags[address] |= BytecodeFlags.F_START_OF_TRYBLOCKEND;
 		startBB(address);
 	}
 
