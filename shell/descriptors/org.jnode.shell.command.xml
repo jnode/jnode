@@ -39,4 +39,8 @@
 	    <alias name="loadkeys" class="org.jnode.shell.command.LoadkeysCommand"/>
     </extension>
 
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
+  </extension>
+        
 </plugin>

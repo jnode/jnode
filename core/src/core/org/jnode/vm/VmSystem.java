@@ -7,6 +7,7 @@ package org.jnode.vm;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Locale;
 import java.util.Properties;
 
 import org.jnode.system.BootLog;
@@ -62,9 +63,7 @@ public final class VmSystem {
     public static void initialize() {
         if (!inited) {
             // Initialize resource manager
-            Unsafe.debug("1");
             final ResourceManager rm = ResourceManagerImpl.initialize();
-            Unsafe.debug("2");
 
             /* Set System.err, System.out */
             bootOut = new SystemOutputStream();
@@ -74,54 +73,41 @@ public final class VmSystem {
             System.setOut(ps);
             System.setErr(ps);
 
-            Unsafe.debug("3");
-
             /* Initialize the system classloader */
             VmSystemClassLoader loader = (VmSystemClassLoader) (getVmClass(Unsafe
                     .getCurrentProcessor()).getLoader());
             systemLoader = loader;
             loader.initialize();
 
-            Unsafe.debug("4");
-
             // Initialize VmThread
             VmThread.initialize();
 
-            Unsafe.debug("5");
-
             /* Initialize the monitor system */
             MonitorManager.initialize();
-
-            Unsafe.debug("6");
 
             final Vm vm = Vm.getVm();
 
             // Initialize the monitors for the heap manager
             vm.getHeapManager().start();
 
-            Unsafe.debug("7");
-
             /* We're done initializing */
             inited = true;
             Unsafe.getCurrentProcessor().systemReadyForThreadSwitch();
-
-            Unsafe.debug("8");
 
             // Load the command line
             final Properties props = System.getProperties();
             props.setProperty("jnode.cmdline", getCmdLine());
 
-            Unsafe.debug("9");
+            // Make sure that we have the default locale,
+            // otherwise String.toLowerCase fails because it needs itself
+            // via Locale.getDefault.
+            Locale.getDefault();
 
             // Load the initial jarfile
             initJar = loadInitJar(rm);
 
-            Unsafe.debug("A");
-
             // Start the compilation manager
             vm.startHotMethodManager();
-
-            Unsafe.debug("B");
         }
     }
 
@@ -183,6 +169,7 @@ public final class VmSystem {
         res.put("os.name", "JNode");
         res.put("os.arch", arch);
         res.put("os.version", vm.getVersion());
+        //res.put("policy.provider", "org.jnode.security.JNodePolicy");
         res.put("file.separator", "/");
         res.put("path.separator", ":");
         res.put("line.separator", "\n");
@@ -442,7 +429,7 @@ public final class VmSystem {
      * @return Object
      */
     public static Address findThrowableHandler(Throwable ex, Address frame,
-            Address address) {
+            Address address) throws PragmaPrivilegedAction {
 
         try {
             if (ex == null) {
@@ -557,7 +544,11 @@ public final class VmSystem {
             }
         } catch (Throwable ex2) {
             Unsafe.debug("Exception in findThrowableHandler");
-            Unsafe.die("findThrowableHandler");
+            try {
+                ex2.printStackTrace();
+            } finally {
+                Unsafe.die("findThrowableHandler");
+            }
             return null;
         }
     }

@@ -27,4 +27,9 @@
     <alias name="del" class="org.jnode.fs.command.DeleteCommand"/>
   </extension>
 
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+    <permission class="java.util.PropertyPermission" name="user.dir" actions="read,write"/>
+  </extension>
+        
 </plugin>

@@ -56,7 +56,7 @@ public final class VmAccessControlContext {
             final int count = domains.length;
             for (int i = 0; i < count; i++) {
                 if (!domains[ i].implies(perm)) { throw new AccessControlException(
-                        "Permission not granted"); }
+                        "Permission \"" + perm + "\" not granted"); }
             }
         }
     }

@@ -28,6 +28,14 @@
     </library>
   </runtime>
   
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.lang.RuntimePermission" name="setFactory"/>
+    <!-- Bootp -->
+    <permission class="java.net.SocketPermission" name="*:67" actions="connect,resolve"/>
+    <permission class="java.net.SocketPermission" name="localhost:68" actions="listen"/>
+    <permission class="org.jnode.net.NetPermission" name="*"/>
+  </extension>
+        
   <extension point="org.jnode.net.networkLayers">
     <layer class="org.jnode.net.ipv4.layer.IPv4NetworkLayer"/>
   </extension>

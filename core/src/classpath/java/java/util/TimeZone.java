@@ -36,6 +36,9 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 package java.util;
+import gnu.java.security.actions.GetPropertyAction;
+
+import java.security.AccessController;
 import java.text.DateFormatSymbols;
 
 /**
@@ -1165,13 +1168,15 @@ public abstract class TimeZone implements java.io.Serializable, Cloneable {
 
 	/* Look up default timezone */
 	static {
-		String tzid = System.getProperty("user.timezone");
+		String tzid = (String)AccessController.doPrivileged(new GetPropertyAction("user.timezone"));
 
-		if (tzid == null)
+		if (tzid == null) {
 			tzid = getDefaultTimeZoneId();
+		}
 
-		if (tzid == null)
+		if (tzid == null) {
 			tzid = "GMT";
+		}
 
 		defaultZone = getTimeZone(tzid);
 	}

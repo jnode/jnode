@@ -129,7 +129,7 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @return VmClass
 	 * @throws PragmaUninterruptible
 	 */
-	public static VmType resolveClass(VmConstClass classRef) throws PragmaUninterruptible {
+	public static VmType resolveClass(VmConstClass classRef) throws PragmaUninterruptible, PragmaPrivilegedAction {
 		if (classRef.isResolved()) {
 			return classRef.getResolvedVmClass();
 		} else {
@@ -305,7 +305,7 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @return Throwable
 	 * @throws PragmaUninterruptible
 	 */
-	public static Throwable systemException(int nr, int address) throws PragmaUninterruptible, PragmaLoadStatics {
+	public static Throwable systemException(int nr, int address) throws PragmaUninterruptible, PragmaLoadStatics, PragmaPrivilegedAction {
 		//Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
 		//Unsafe.die();
 	    Unsafe.debug(nr); Unsafe.debug(address);
@@ -331,7 +331,7 @@ public class SoftByteCodes implements Uninterruptible {
 		}
 	}
 
-	public static void unknownOpcode(int opcode, int pc) throws PragmaUninterruptible, PragmaLoadStatics {
+	public static void unknownOpcode(int opcode, int pc) throws PragmaUninterruptible, PragmaLoadStatics, PragmaPrivilegedAction {
 		throw new Error("Unknown opcode " + opcode + " at pc " + pc);
 	}
 }

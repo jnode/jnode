@@ -3,6 +3,8 @@
  */
 package org.jnode.vm;
 
+import java.security.AccessControlException;
+import java.security.Permission;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
@@ -15,7 +17,70 @@ import org.jnode.vm.classmgr.VmMethod;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class VmAccessController {
+public final class VmAccessController {
+
+    /**
+     * Checks wether the access control context of the current thread allows
+     * the given Permission. Throws an <code>AccessControlException</code>
+     * when the permission is not allowed in the current context. Otherwise
+     * returns silently without throwing an exception.
+     * 
+     * @param perm
+     *            the permission to be checked.
+     * @exception AccessControlException
+     *                thrown if the current context does not allow the given
+     *                permission.
+     */
+
+    public static void checkPermission(Permission perm)
+            throws AccessControlException, PragmaCheckPermission {
+        if (!Unsafe.getCurrentProcessor().isThreadSwitchActive()) {
+            //getContext().checkPermission(perm);
+
+            // This is an optimized version of
+            // getContext().checkPermission()
+            // that does not require any memory allocations.
+            final VmStackReader reader = Unsafe.getCurrentProcessor()
+                    .getArchitecture().getStackReader();
+            Address sf = Unsafe.getCurrentFrame();
+            int recursionCount = 0;
+            while (reader.isValid(sf)) {
+                final VmMethod method = reader.getMethod(sf);
+                if (method.canThrow(PragmaDoPrivileged.class)) {
+                    // Stop here with the current thread's stacktrace.
+                    break;
+                } else if (method.canThrow(PragmaPrivilegedAction.class)) {
+                    // Break here, do not include inherited thread context
+                    return;
+                } else if (method.canThrow(PragmaCheckPermission.class)) {
+                    // Be paranoia for now, let's check for recursive
+                    // checkPermission calls.
+                    recursionCount++;
+                    if (recursionCount > 2) {
+                        reader.debugStackTrace();
+                        Unsafe.die("Recursive checkPermission");
+                    }
+                } else {
+                    final ProtectionDomain pd = method.getDeclaringClass()
+                            .getProtectionDomain();
+                    if (pd != null) {
+                        //Unsafe.debug(":pd");
+                        if (!pd.implies(perm)) { 
+                        //Unsafe.debug("Permission denied");
+                        throw new AccessControlException("Permission \""
+                                + perm + "\" not granted"); }
+                    }
+                }
+                sf = reader.getPrevious(sf);
+            }
+
+            final VmThread thread = VmThread.currentThread();
+            final VmAccessControlContext inheritedCtx = thread.getContext();
+            if (inheritedCtx != null) {
+                inheritedCtx.checkPermission(perm);
+            }
+        }
+    }
 
     /**
      * This method takes a "snapshot" of the current calling context, which
@@ -38,30 +103,15 @@ public class VmAccessController {
             if (method.canThrow(PragmaDoPrivileged.class)) {
                 // Stop here
                 break;
+            } else if (method.canThrow(PragmaPrivilegedAction.class)) {
+                // Break here, do not include inherited thread context
+                return new VmAccessControlContext(domains, null);
             } else {
                 domains[ i] = method.getDeclaringClass().getProtectionDomain();
             }
         }
         final VmThread thread = VmThread.currentThread();
         return new VmAccessControlContext(domains, thread.getContext());
-    }
-
-    /**
-     * Calls the <code>run()</code> method of the given action with as
-     * (initial) access control context only the protection domain of the
-     * calling class. Calls to <code>checkPermission()</code> in the <code>run()</code>
-     * method ignore all earlier protection domains of classes in the call
-     * chain. Note that the protection domains of classes called by the code in
-     * the <code>run()</code> method are not ignored.
-     * 
-     * @param action
-     *            the <code>PrivilegedAction</code> whose <code>run()</code>
-     *            should be be called. @returns the result of the <code>action.run()</code>
-     *            method.
-     */
-    public static Object doPrivileged(PrivilegedAction action)
-            throws PragmaDoPrivileged {
-        return action.run();
     }
 
     /**
@@ -95,33 +145,6 @@ public class VmAccessController {
 
     /**
      * Calls the <code>run()</code> method of the given action with as
-     * (initial) access control context only the protection domain of the
-     * calling class. Calls to <code>checkPermission()</code> in the <code>run()</code>
-     * method ignore all earlier protection domains of classes in the call
-     * chain. Note that the protection domains of classes called by the code in
-     * the <code>run()</code> method are not ignored. If the <code>run()</code>
-     * method throws an exception then this method will wrap that exception in
-     * an <code>PrivilegedActionException</code>.
-     * 
-     * @param action
-     *            the <code>PrivilegedExceptionAction</code> whose <code>run()</code>
-     *            should be be called. @returns the result of the <code>action.run()</code>
-     *            method.
-     * @exception PrivilegedActionException
-     *                wrapped around any exception that is thrown in the <code>run()</code>
-     *                method.
-     */
-    public static Object doPrivileged(PrivilegedExceptionAction action)
-            throws PrivilegedActionException, PragmaDoPrivileged {
-        try {
-            return action.run();
-        } catch (Exception e) {
-            throw new PrivilegedActionException(e);
-        }
-    }
-
-    /**
-     * Calls the <code>run()</code> method of the given action with as
      * (initial) access control context the given context combined with the
      * protection domain of the calling class. Calls to <code>checkPermission()</code>
      * in the <code>run()</code> method ignore all earlier protection domains
@@ -149,6 +172,8 @@ public class VmAccessController {
         thread.setContext(context);
         try {
             return action.run();
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             throw new PrivilegedActionException(e);
         } finally {

@@ -736,6 +736,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("java.lang.ref");
         addCompileHighOptLevel("java.lang.reflect");
         addCompileHighOptLevel("java.net");
+        addCompileHighOptLevel("java.security");
         addCompileHighOptLevel("java.util");
         addCompileHighOptLevel("java.util.jar");
         addCompileHighOptLevel("java.util.zip");
@@ -755,6 +756,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("org.jnode.plugin.model");
         addCompileHighOptLevel("org.jnode.protocol.plugin");
         addCompileHighOptLevel("org.jnode.protocol.system");
+        addCompileHighOptLevel("org.jnode.security");
         addCompileHighOptLevel("org.jnode.system");
         addCompileHighOptLevel("org.jnode.system.event");
         addCompileHighOptLevel("org.jnode.system.util");

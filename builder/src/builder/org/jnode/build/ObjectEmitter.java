@@ -172,6 +172,8 @@ public class ObjectEmitter {
 				bis.writeObjectRef(null);
 				// interfaces;
 				bis.writeObjectRef(null);
+				// constructors;
+				bis.writeObjectRef(null);
 				// defaultConstructor;
 				bis.writeObjectRef(null);
 				// name

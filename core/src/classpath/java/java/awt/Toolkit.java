@@ -23,6 +23,8 @@
 
 package java.awt;
 
+import gnu.java.security.actions.GetPropertyAction;
+
 import java.awt.datatransfer.Clipboard;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
@@ -60,6 +62,7 @@ import java.awt.peer.WindowPeer;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.net.URL;
+import java.security.AccessController;
 import java.util.Map;
 import java.util.Properties;
 
@@ -465,7 +468,7 @@ public abstract class Toolkit {
 	public static Toolkit getDefaultToolkit() {
 		if (toolkit != null)
 			return toolkit;
-		String toolkit_name = System.getProperty("awt.toolkit", default_toolkit_name);
+		final String toolkit_name = (String)AccessController.doPrivileged(new GetPropertyAction("awt.toolkit", default_toolkit_name));
 		try {
 			final ClassLoader cl = Thread.currentThread().getContextClassLoader();
 			final Class cls = cl.loadClass(toolkit_name);

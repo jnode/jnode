@@ -63,9 +63,20 @@ public class Main {
 
 		} catch (Throwable ex) {
 			BootLog.error("Error in bootstrap", ex);
+			sleepForever();
 			return -2;
 		}
 		Unsafe.debug("System has finished");
 		return 0;
+	}
+	
+	private static void sleepForever() {
+	    while (true) {
+	        try {
+                Thread.sleep(Long.MAX_VALUE);
+            } catch (InterruptedException ex) {
+                // Ignore
+            }
+	    }
 	}
 }

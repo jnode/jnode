@@ -10,6 +10,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketImplFactory;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.net.NetworkException;
@@ -26,172 +29,195 @@ import org.jnode.util.Statistics;
  */
 public class TCPProtocol implements IPv4Protocol, IPv4Constants, TCPConstants {
 
-	/** The IP service I'm a part of */
-	private final IPv4Service ipService;
-	/** The ICMP service */
-	//private final ICMPUtils icmp;
-	/** My statistics */
-	private final TCPStatistics stat = new TCPStatistics();
-	/** The SocketImpl factory for TCP */
-	private final TCPSocketImplFactory socketImplFactory;
-	/** My control blocks */
-	private final TCPControlBlockList controlBlocks;
-	/** The timer */
-	private final TCPTimer timer;
-	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+    /** The IP service I'm a part of */
+    private final IPv4Service ipService;
 
-	/**
-	 * Initialize a new instance
-	 * 
-	 * @param ipService
-	 */
-	public TCPProtocol(IPv4Service ipService) throws NetworkException {
-		this.ipService = ipService;
-		//this.icmp = new ICMPUtils(ipService);
-		this.controlBlocks = new TCPControlBlockList(this);
-		this.timer = new TCPTimer(controlBlocks);
-		try {
-			socketImplFactory = new TCPSocketImplFactory(this);
-			Socket.setSocketImplFactory(socketImplFactory);
-			ServerSocket.setSocketFactory(socketImplFactory);
-		} catch (IOException ex) {
-			throw new NetworkException(ex);
-		}
-		timer.start();
-	}
+    /** The ICMP service */
+    //private final ICMPUtils icmp;
+    /** My statistics */
+    private final TCPStatistics stat = new TCPStatistics();
 
-	/**
-	 * @see org.jnode.net.TransportLayer#getDatagramSocketImplFactory()
-	 */
-	public DatagramSocketImplFactory getDatagramSocketImplFactory() throws SocketException {
-		throw new SocketException("TCP is socket based");
-	}
+    /** The SocketImpl factory for TCP */
+    private final TCPSocketImplFactory socketImplFactory;
 
-	/**
-	 * @see org.jnode.net.TransportLayer#getName()
-	 */
-	public String getName() {
-		return "tcp";
-	}
+    /** My control blocks */
+    private final TCPControlBlockList controlBlocks;
 
-	/**
-	 * @see org.jnode.net.TransportLayer#getProtocolID()
-	 */
-	public int getProtocolID() {
-		return IPPROTO_TCP;
-	}
+    /** The timer */
+    private final TCPTimer timer;
 
-	/**
-	 * @see org.jnode.net.TransportLayer#getSocketImplFactory()
-	 */
-	public SocketImplFactory getSocketImplFactory() throws SocketException {
-		return socketImplFactory;
-	}
+    /** My logger */
+    private final Logger log = Logger.getLogger(getClass());
 
-	/**
-	 * @see org.jnode.net.TransportLayer#getStatistics()
-	 */
-	public Statistics getStatistics() {
-		return stat;
-	}
+    /**
+     * Initialize a new instance
+     * 
+     * @param ipService
+     */
+    public TCPProtocol(IPv4Service ipService) throws NetworkException {
+        this.ipService = ipService;
+        //this.icmp = new ICMPUtils(ipService);
+        this.controlBlocks = new TCPControlBlockList(this);
+        this.timer = new TCPTimer(controlBlocks);
+        try {
+            socketImplFactory = new TCPSocketImplFactory(this);
+            try {
+                AccessController.doPrivileged(new PrivilegedExceptionAction() {
+                   public Object run() throws IOException {
+                       Socket.setSocketImplFactory(socketImplFactory);
+                       ServerSocket.setSocketFactory(socketImplFactory);
+                       return null;
+                   }
+                });
+            } catch (SecurityException ex) {
+                log.error("No permission for set socket factory.", ex);
+            } catch (PrivilegedActionException ex) {
+                throw new NetworkException(ex.getException());
+            }
+        } catch (IOException ex) {
+            throw new NetworkException(ex);
+        }
+        timer.start();
+    }
 
-	/**
-	 * @see org.jnode.net.TransportLayer#receive(org.jnode.net.SocketBuffer)
-	 */
-	public void receive(SocketBuffer skbuf) throws SocketException {
+    /**
+     * @see org.jnode.net.TransportLayer#getDatagramSocketImplFactory()
+     */
+    public DatagramSocketImplFactory getDatagramSocketImplFactory()
+            throws SocketException {
+        throw new SocketException("TCP is socket based");
+    }
 
-		// Increment stats
-		stat.ipackets.inc();
+    /**
+     * @see org.jnode.net.TransportLayer#getName()
+     */
+    public String getName() {
+        return "tcp";
+    }
 
-		// Get the IP header
-		final IPv4Header ipHdr = (IPv4Header) skbuf.getNetworkLayerHeader();
+    /**
+     * @see org.jnode.net.TransportLayer#getProtocolID()
+     */
+    public int getProtocolID() {
+        return IPPROTO_TCP;
+    }
 
-		// Read the TCP header
-		final TCPHeader hdr = new TCPHeader(skbuf);
+    /**
+     * @see org.jnode.net.TransportLayer#getSocketImplFactory()
+     */
+    public SocketImplFactory getSocketImplFactory() throws SocketException {
+        return socketImplFactory;
+    }
 
-		// Set the TCP header in the buffer-field
-		skbuf.setTransportLayerHeader(hdr);
-		// Remove the TCP header from the head of the buffer
-		skbuf.pull(hdr.getLength());
-		// Trim the buffer up to the length in the TCP header
-		skbuf.trim(hdr.getDataLength());
+    /**
+     * @see org.jnode.net.TransportLayer#getStatistics()
+     */
+    public Statistics getStatistics() {
+        return stat;
+    }
 
-		if (!hdr.isChecksumOk()) {
-			if (log.isDebugEnabled()) {
-				log.debug("Receive: badsum: " + hdr);
-			}
-			stat.badsum.inc();
-		} else {
-			if (log.isDebugEnabled()) {
-				log.debug("Receive: " + hdr);
-			}
+    /**
+     * @see org.jnode.net.TransportLayer#receive(org.jnode.net.SocketBuffer)
+     */
+    public void receive(SocketBuffer skbuf) throws SocketException {
 
-			// Find the corresponding control block
-			final TCPControlBlock cb = (TCPControlBlock) controlBlocks.lookup(ipHdr.getSource(), hdr.getSrcPort(), ipHdr.getDestination(), hdr.getDstPort(), true);
-			if (cb == null) {
-				// Port unreachable
-				log.debug("Port unreachable");
-				stat.noport.inc();
-				processPortUnreachable(ipHdr, hdr);
-			} else {
-				// Let the cb handle the receive
-				cb.receive(hdr, skbuf);
-			}
-		}
-	}
+        // Increment stats
+        stat.ipackets.inc();
 
-	/**
-	 * @see org.jnode.net.ipv4.IPv4Protocol#receiveError(org.jnode.net.SocketBuffer)
-	 */
-	public void receiveError(SocketBuffer skbuf) throws SocketException {
-		// TODO Auto-generated method stub
+        // Get the IP header
+        final IPv4Header ipHdr = (IPv4Header) skbuf.getNetworkLayerHeader();
 
-	}
+        // Read the TCP header
+        final TCPHeader hdr = new TCPHeader(skbuf);
 
-	/**
-	 * Process a segment whose destination port is unreachable
-	 * 
-	 * @param hdr
-	 */
-	private void processPortUnreachable(IPv4Header ipHdr, TCPHeader hdr) throws SocketException {
-		final TCPHeader replyHdr = new TCPHeader(hdr.getDstPort(), hdr.getSrcPort(), 0, 0, hdr.getSequenceNr() + 1, 0, 0);
-		replyHdr.setFlags(TCPF_ACK | TCPF_RST);
-		final IPv4Header replyIpHdr = new IPv4Header(ipHdr);
-		replyIpHdr.swapAddresses();
-		send(replyIpHdr, replyHdr, new SocketBuffer());
-	}
+        // Set the TCP header in the buffer-field
+        skbuf.setTransportLayerHeader(hdr);
+        // Remove the TCP header from the head of the buffer
+        skbuf.pull(hdr.getLength());
+        // Trim the buffer up to the length in the TCP header
+        skbuf.trim(hdr.getDataLength());
 
-	/**
-	 * Create a binding for a local address
-	 * 
-	 * @param lAddr
-	 * @param lPort
-	 */
-	public TCPControlBlock bind(IPv4Address lAddr, int lPort) throws BindException {
-		return (TCPControlBlock) controlBlocks.bind(lAddr, lPort);
-	}
+        if (!hdr.isChecksumOk()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Receive: badsum: " + hdr);
+            }
+            stat.badsum.inc();
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Receive: " + hdr);
+            }
 
-	/**
-	 * Send an TCP packet
-	 * 
-	 * @param skbuf
-	 */
-	protected void send(IPv4Header ipHdr, TCPHeader tcpHdr, SocketBuffer skbuf) throws SocketException {
-		if (log.isDebugEnabled()) {
-			log.debug("send(ipHdr, " + tcpHdr + ")");
-		}
-		skbuf.setTransportLayerHeader(tcpHdr);
-		tcpHdr.prefixTo(skbuf);
-		ipHdr.setDataLength(skbuf.getSize());
-		ipService.transmit(ipHdr, skbuf);
-		stat.opackets.inc();
-	}
+            // Find the corresponding control block
+            final TCPControlBlock cb = (TCPControlBlock) controlBlocks.lookup(
+                    ipHdr.getSource(), hdr.getSrcPort(),
+                    ipHdr.getDestination(), hdr.getDstPort(), true);
+            if (cb == null) {
+                // Port unreachable
+                log.debug("Port unreachable");
+                stat.noport.inc();
+                processPortUnreachable(ipHdr, hdr);
+            } else {
+                // Let the cb handle the receive
+                cb.receive(hdr, skbuf);
+            }
+        }
+    }
 
-	/**
-	 * Get the current time counter
-	 */
-	protected long getTimeCounter() {
-		return timer.getCounter();
-	}
+    /**
+     * @see org.jnode.net.ipv4.IPv4Protocol#receiveError(org.jnode.net.SocketBuffer)
+     */
+    public void receiveError(SocketBuffer skbuf) throws SocketException {
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     * Process a segment whose destination port is unreachable
+     * 
+     * @param hdr
+     */
+    private void processPortUnreachable(IPv4Header ipHdr, TCPHeader hdr)
+            throws SocketException {
+        final TCPHeader replyHdr = new TCPHeader(hdr.getDstPort(), hdr
+                .getSrcPort(), 0, 0, hdr.getSequenceNr() + 1, 0, 0);
+        replyHdr.setFlags(TCPF_ACK | TCPF_RST);
+        final IPv4Header replyIpHdr = new IPv4Header(ipHdr);
+        replyIpHdr.swapAddresses();
+        send(replyIpHdr, replyHdr, new SocketBuffer());
+    }
+
+    /**
+     * Create a binding for a local address
+     * 
+     * @param lAddr
+     * @param lPort
+     */
+    public TCPControlBlock bind(IPv4Address lAddr, int lPort)
+            throws BindException {
+        return (TCPControlBlock) controlBlocks.bind(lAddr, lPort);
+    }
+
+    /**
+     * Send an TCP packet
+     * 
+     * @param skbuf
+     */
+    protected void send(IPv4Header ipHdr, TCPHeader tcpHdr, SocketBuffer skbuf)
+            throws SocketException {
+        if (log.isDebugEnabled()) {
+            log.debug("send(ipHdr, " + tcpHdr + ")");
+        }
+        skbuf.setTransportLayerHeader(tcpHdr);
+        tcpHdr.prefixTo(skbuf);
+        ipHdr.setDataLength(skbuf.getSize());
+        ipService.transmit(ipHdr, skbuf);
+        stat.opackets.inc();
+    }
+
+    /**
+     * Get the current time counter
+     */
+    protected long getTimeCounter() {
+        return timer.getCounter();
+    }
 }

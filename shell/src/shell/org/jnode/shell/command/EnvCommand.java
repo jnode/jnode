@@ -6,13 +6,16 @@
  */
 package org.jnode.shell.command;
 
+import gnu.java.security.actions.GetPropertiesAction;
+
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.security.AccessController;
 import java.util.Iterator;
 import java.util.Properties;
 
 import org.jnode.shell.CommandLine;
-import org.jnode.shell.help.*;
+import org.jnode.shell.help.Help;
 
 /**
  * @author epr
@@ -39,7 +42,7 @@ public class EnvCommand {
 		PrintStream err)
 		throws Exception {
 
-		Properties ps = System.getProperties();
+	    final Properties ps = (Properties)AccessController.doPrivileged(new GetPropertiesAction());
 		for (Iterator i = ps.keySet().iterator(); i.hasNext(); ) {
 			String key = (String)i.next();
 			String value = ps.getProperty(key);

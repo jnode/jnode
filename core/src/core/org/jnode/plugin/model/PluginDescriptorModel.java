@@ -5,6 +5,8 @@ package org.jnode.plugin.model;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -337,7 +339,13 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 						preLoaders[i] = (PluginClassLoader) cl;
 					}
 				}
-				classLoader = new PluginClassLoader(jarFile, preLoaders);
+				final PrivilegedAction a = new PrivilegedAction() {
+				    public Object run() {
+						return new PluginClassLoader(jarFile, preLoaders);				        
+				    }
+				};
+				classLoader = (PluginClassLoader)AccessController.doPrivileged(a);
+				//new PluginClassLoader(jarFile, preLoaders);
 			}
 		}
 		return classLoader;

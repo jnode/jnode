@@ -3,6 +3,10 @@
  */
 package org.jnode.net.command;
 
+import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedExceptionAction;
+
 import org.jnode.driver.Device;
 import org.jnode.net.ipv4.bootp.BOOTPClient;
 import org.jnode.shell.help.DeviceArgument;
@@ -29,11 +33,16 @@ public class BootpCommand {
 	throws Exception {
 		ParsedArguments cmdLine = HELP_INFO.parse(args);
 
-		Device dev = ARG_DEVICE.getDevice(cmdLine);
+		final Device dev = ARG_DEVICE.getDevice(cmdLine);
 
 		System.out.println("Trying to configure " + dev.getId() + "...");
 		final BOOTPClient client = new BOOTPClient();
-		client.configureDevice(dev);
+		AccessController.doPrivileged(new PrivilegedExceptionAction() {
+		    public Object run() throws IOException {
+				client.configureDevice(dev);
+				return null;
+		    }
+		});
 	}
 
 }

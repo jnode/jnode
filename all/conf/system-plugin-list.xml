@@ -8,6 +8,7 @@
  
     <plugin id="org.jnode.runtime"/>
     <plugin id="org.jnode.runtime.core"/>
+    <plugin id="org.jnode.security"/>
     <plugin id="org.jnode.util"/>
     <plugin id="org.jnode.vm"/>
     <plugin id="org.jnode.vm.core"/>

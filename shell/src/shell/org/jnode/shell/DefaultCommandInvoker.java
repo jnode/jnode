@@ -1,46 +1,62 @@
-/*Copyright, Sam Reid, 2003.*/
+/*
+ * $Id$
+ * 
+ * Copyright, Sam Reid, 2003.
+ */
 package org.jnode.shell;
 
-import org.jnode.shell.help.Help;
-import org.jnode.shell.help.SyntaxError;
+import gnu.java.security.actions.InvokeAction;
 
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+
+import org.jnode.shell.help.Help;
+import org.jnode.shell.help.SyntaxError;
 
 /**
- * User: Sam Reid
- * Date: Dec 20, 2003
- * Time: 1:20:33 AM
- * Copyright (c) Dec 20, 2003 by Sam Reid
+ * User: Sam Reid Date: Dec 20, 2003 Time: 1:20:33 AM Copyright (c) Dec 20,
+ * 2003 by Sam Reid
  */
 public class DefaultCommandInvoker implements CommandInvoker {
+
     PrintStream err;
+
     CommandShell commandShell;
-    private static final Class[] MAIN_ARG_TYPES = new Class[]{String[].class};
+
+    private static final Class[] MAIN_ARG_TYPES = new Class[] { String[].class};
 
     public DefaultCommandInvoker(CommandShell commandShell) {
         this.commandShell = commandShell;
-        this.err=commandShell.getErrorStream();
+        this.err = commandShell.getErrorStream();
     }
 
     public void invoke(String cmdLineStr) {
         final CommandLine cmdLine = new CommandLine(cmdLineStr);
-        if (!cmdLine.hasNext())
-            return;
+        if (!cmdLine.hasNext()) return;
         String cmdName = cmdLine.next();
 
         commandShell.addCommandToHistory(cmdLineStr);
-//        System.err.println("Got command: "+cmdLineStr+", name="+cmdName);
+        //        System.err.println("Got command: "+cmdLineStr+", name="+cmdName);
         try {
             Class cmdClass = commandShell.getCommandClass(cmdName);
-//            System.err.println("CmdClass="+cmdClass);
+            //            System.err.println("CmdClass="+cmdClass);
             final Method main = cmdClass.getMethod("main", MAIN_ARG_TYPES);
-//            System.err.println("main="+main);
+            //            System.err.println("main="+main);
             try {
-//                System.err.println("Invoking...");
-                main.invoke(null, new Object[]{cmdLine.getRemainder().toStringArray()});
-//                System.err.println("Finished invoke.");
+                //                System.err.println("Invoking...");
+                try {
+                    final Object[] args = new Object[] { cmdLine.getRemainder()
+                            .toStringArray()};
+                    AccessController.doPrivileged(new InvokeAction(main, null, args));
+                } catch (PrivilegedActionException ex) {
+                    throw ex.getException();
+                }
+                
+                //main.invoke(null, );
+                //                System.err.println("Finished invoke.");
             } catch (InvocationTargetException ex) {
                 Throwable tex = ex.getTargetException();
                 if (tex instanceof SyntaxError) {

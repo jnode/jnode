@@ -5,7 +5,7 @@ package java.util;
 
 //import kore.util.DateParser;
 
-public class Date {
+public class Date implements Cloneable {
 	// Constants
 
 	private final static String[] days = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
@@ -681,5 +681,12 @@ public class Date {
 			this.string = string;
 		}
 	}
-
+	
+	public Object clone() {
+	    try {
+            return super.clone();
+        } catch (CloneNotSupportedException ex) {
+            return null;
+        }
+	}
 }

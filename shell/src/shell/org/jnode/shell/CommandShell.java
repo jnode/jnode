@@ -3,10 +3,14 @@
  */
 package org.jnode.shell;
 
+import gnu.java.security.actions.GetPropertyAction;
+import gnu.java.security.actions.SetPropertyAction;
+
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.PrintStream;
 import java.io.StringReader;
+import java.security.AccessController;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.StringTokenizer;
@@ -109,7 +113,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 			threadCommandInvoker = new ThreadCommandInvoker(this);
 			this.commandInvoker = threadCommandInvoker; //default to separate threads for commands.
 			aliasMgr = ((AliasManager) InitialNaming.lookup(AliasManager.NAME)).createAliasManager();
-			System.getProperties().setProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
+			AccessController.doPrivileged(new SetPropertyAction(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT));
 			ShellUtils.getShellManager().registerShell(this);
 		} catch (NameNotFoundException ex) {
 			throw new ShellException("Cannot find required resource", ex);
@@ -255,7 +259,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 				if (commandMode) {
 					switch (c) {
 						case 'P' :
-							result.append(new File(System.getProperty("user.dir")));
+							result.append(new File((String)AccessController.doPrivileged(new GetPropertyAction("user.dir"))));
 							break;
 						case 'G' :
 							result.append("> ");
