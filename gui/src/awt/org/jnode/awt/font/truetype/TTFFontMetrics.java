@@ -14,6 +14,7 @@ public class TTFFontMetrics extends FontMetrics {
 
 	private final TTFFontData fontData;
 	private final double scale;
+	private final int fontSize;
 
 	/**
 	 * @param font
@@ -30,7 +31,10 @@ public class TTFFontMetrics extends FontMetrics {
 			throw new IllegalArgumentException("fontData cannot be null");
 		}
 		this.fontData = fontData;
-		this.scale = font.getSize() / fontData.getHorizontalHeaderTable().getAscent();
+		this.fontSize = font.getSize();
+		final double ascent = fontData.getHorizontalHeaderTable().getAscent();
+		this.scale = fontSize / ascent;
+		//System.out.println("Font=" + font.getName() + ", size=" + fontSize + ", scale=" + scale + ", ascent=" + ascent);
 	}
 
 	/**
@@ -56,7 +60,8 @@ public class TTFFontMetrics extends FontMetrics {
 	 */
 	public int getAscent() {
 		try {
-			return (int)(fontData.getHorizontalHeaderTable().getAscent() * scale);
+			final int ascent = (int)(fontData.getHorizontalHeaderTable().getAscent() * scale);
+			return ascent;
 		} catch (IOException ex) {
 			return 0;
 		}
@@ -68,28 +73,11 @@ public class TTFFontMetrics extends FontMetrics {
 	 */
 	public int getDescent() {
 		try {
-			return Math.abs((int)(fontData.getHorizontalHeaderTable().getDescent() * scale));
+			final int descent = Math.abs((int)(fontData.getHorizontalHeaderTable().getDescent() * scale));
+			return descent;
 		} catch (IOException ex) {
 			return 0;
 		}
-	}
-
-	/**
-	 * @see java.awt.FontMetrics#getHeight()
-	 * @return The height
-	 */
-	public int getHeight() {
-		// TODO Auto-generated method stub
-		return super.getHeight();
-	}
-
-	/**
-	 * @see java.awt.FontMetrics#getLeading()
-	 * @return The leading
-	 */
-	public int getLeading() {
-		return super.getLeading();
-		// TODO Implement me
 	}
 
 	/**
@@ -118,14 +106,5 @@ public class TTFFontMetrics extends FontMetrics {
 	 */
 	public int getMaxDescent() {
 		return getDescent();
-	}
-
-	/**
-	 * @see java.awt.FontMetrics#getWidths()
-	 * @return The widths
-	 */
-	public int[] getWidths() {
-		// TODO Auto-generated method stub
-		return super.getWidths();
 	}
 }
