@@ -29,6 +29,9 @@ public class X86StreamTest {
 		os.writeCMPXCHG_EAX(Register.EDX, 4, Register.ECX, false);
 		os.writeLEA(Register.ESI, Register.ESI, Register.EBX, 8, 4);
 		os.writeCMPXCHG_EAX(Register.EDX, 4, Register.ECX, true);
+		os.writeJMP(label, 2, false);
+		os.writeCALL(label, 4, false);
+		os.writeTEST(Register.ECX, Register.EBX);
 		
 		FileOutputStream fos = new FileOutputStream("test.bin");
 		os.writeTo(fos);

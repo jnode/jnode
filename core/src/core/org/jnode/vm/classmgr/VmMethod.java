@@ -206,7 +206,7 @@ public abstract class VmMethod extends VmMember {
 	 * Compile this method with n optimization level 1 higher then the
 	 * current optimization level.
 	 */
-	public final void compile() {
+	public final void recompile() {
 		doCompile(nativeCodeOptLevel + 1);
 	}
 
@@ -216,25 +216,13 @@ public abstract class VmMethod extends VmMember {
 	 * @param optLevel
 	 *            The optimization level
 	 */
-	public final void compile(int optLevel) {
-		if (!isCompiled() || (optLevel > nativeCodeOptLevel)) {
-			doCompile(optLevel);
-		}
-	}
-
-	/**
-	 * Compile all the methods in this class during runtime.
-	 * 
-	 * @param optLevel
-	 *            The optimization level
-	 */
 	private synchronized void doCompile(int optLevel) {
-		declaringClass.prepare();
-		if (!isAbstract()) {
-			declaringClass.getLoader().compile(this, optLevel);
-			setModifier(true, Modifier.ACC_COMPILED);
-			setProfile(false);
+		if (!declaringClass.isPrepared()) {
+			throw new IllegalStateException("Declaring class must have been prepared");
 		}
+		declaringClass.getLoader().compileRuntime(this, optLevel);
+		setModifier(true, Modifier.ACC_COMPILED);
+		setProfile(false);
 	}
 
 	public boolean isAbstract() {

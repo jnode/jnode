@@ -149,7 +149,7 @@ def_irq_kernel:
 ; EBP Old register block
 ; -----------------------------------------------
 int_system_exception:
-	;jmp int_die
+	jmp int_die
 	; Setup the user stack to add a return address to the current EIP
 	; and change the current EIP to doSystemException, which will 
 	; save the registers and call SoftByteCodes.systemException
@@ -175,8 +175,8 @@ doSystemException:
 ; -----------------------------------------------
 int_stack_overflow:
 	mov eax,CURRENTTHREAD
-	test dword [eax+VmThread_STACKOVERFLOW_OFFSET*4],0xFFFFFFFF
-	jz int_stack_first_overflow
+	mov ecx,[eax+VmThread_STACKOVERFLOW_OFFSET*4]
+	jecxz int_stack_first_overflow
 	jmp doFatal_stack_overflow
 		
 int_stack_first_overflow:

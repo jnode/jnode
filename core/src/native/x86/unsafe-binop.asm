@@ -13,8 +13,7 @@
 	mov edi,[esp+12]	; memPtr
 	mov eax,[esp+8] 	; value
 	mov ecx,[esp+4]		; count
-	test ecx,0xFFFFFFFF	; (Count == 0) ?
-	jz %%end
+	jecxz %%end			; (Count == 0) ?
 	%2 eax,%3	     	; Apply Mask 
 %%loop:
     %1 dword [edi],eax
@@ -30,8 +29,7 @@
 	mov eax,[esp+12]	; memPtr
 	mov edx,[esp+8] 	; value
 	mov ecx,[esp+4]		; count
-	test ecx,0xFFFFFFFF	; (Count == 0) ?
-	jz %%end
+	jecxz %%end			; (Count == 0) ?
 %%loop:
 	%1 %2 [eax],%4
 	add eax,%3
@@ -47,8 +45,7 @@
 	mov edx,[esp+12] 	; value MSB
 	mov eax,[esp+8] 	; value LSB
 	mov ecx,[esp+4]		; count
-	test ecx,0xFFFFFFFF	; (Count == 0) ?
-	jz %%end
+	jecxz %%end			; (Count == 0) ?
 %%loop:
 	%1 dword [edi],eax	; LSB
 	%1 dword [edi+4],edx; MSB

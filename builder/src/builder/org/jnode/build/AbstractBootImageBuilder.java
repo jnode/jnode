@@ -37,8 +37,7 @@ import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmMethodCode;
 import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.compiler.Compiler;
-import org.jnode.vm.compiler.SymbolResolver;
+import org.jnode.vm.compiler.NativeCodeCompiler;
 
 /**
  * Build the boot image from an assembler compiled bootstrap (in ELF format) combined with the
@@ -140,16 +139,10 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			os.getObjectRef(proc);
 
 			/* Let the compilers load its native symbol offsets */
-			final Compiler[] cmps = arch.getCompilers();
+			final NativeCodeCompiler[] cmps = arch.getCompilers();
 			for (int i = 0; i < cmps.length; i++) {
-				final Compiler cmp = cmps[i];
+				final NativeCodeCompiler cmp = cmps[i];
 				cmp.initialize(clsMgr);
-				cmp.loadNativeSymbols(new SymbolResolver() {
-					public int getSymbolAddress(String symbol) throws UnresolvedObjectRefException {
-						final NativeStream.ObjectRef ref = os.getObjectRef(new Label(symbol));
-						return ref.getOffset() + (int) os.getBaseAddr();
-					}
-				});
 				os.getObjectRef(cmp);
 			}
 
@@ -174,7 +167,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			// Disallow the loading of new classes
 			clsMgr.setFailOnNewLoad(true);
 			// Turn auto-compilation on
-			//clsMgr.setCompileRequired();
+			clsMgr.setCompileRequired();
 			// Emit the remaining objects
 			emitObjects(os, arch, null);
 
@@ -436,10 +429,10 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 	 * @throws ClassNotFoundException
 	 */
 	private final void compileClasses(NativeStream os, VmArchitecture arch) throws ClassNotFoundException {
-		final Compiler[] compilers = arch.getCompilers();
+		final NativeCodeCompiler[] compilers = arch.getCompilers();
 		final int optLevel = compilers.length - 1;
 		// Use the most optimizing compiler here
-		final Compiler compiler = compilers[optLevel];
+		final NativeCodeCompiler compiler = compilers[optLevel];
 
 		int count = 0;
 		do {
@@ -455,9 +448,9 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 				if (!vmClass.isCompiled()) {
 					if (bci.mustCompile()) {
 						//log("Compiling " + vmClass.getName(), Project.MSG_VERBOSE);
-						vmClass.compile(compiler, os, optLevel);
+						vmClass.compileBootstrap(compiler, os, optLevel);
 					} else if (optLevel != 0) {
-						vmClass.compile(compilers[0], os, 0);
+						vmClass.compileBootstrap(compilers[0], os, 0);
 					}
 				}
 			}

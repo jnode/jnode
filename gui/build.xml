@@ -38,9 +38,9 @@
 
 <!-- Assemble the jarfile -->
   <target name="assemble" depends="compile">
-    <jar jarfile="${my.jar}">
+    <!-- jar jarfile="${my.jar}">
       <fileset dir="${my-classes.dir}"/>
-    </jar>
+    </jar -->
     <jar jarfile="${jnode-fonts.jar}">
       <fileset dir="${basedir}/fonts">
       </fileset>

@@ -3,7 +3,7 @@
  */
 package org.jnode.vm;
 
-import org.jnode.vm.compiler.Compiler;
+import org.jnode.vm.compiler.NativeCodeCompiler;
 
 /**
  * Class describing a specific system architecture.
@@ -39,5 +39,5 @@ public abstract class VmArchitecture extends VmSystemObject {
 	 * @return The compilers, sorted by optimization level, from least optimizations to most
 	 *         optimizations.
 	 */
-	public abstract Compiler[] getCompilers();
+	public abstract NativeCodeCompiler[] getCompilers();
 }

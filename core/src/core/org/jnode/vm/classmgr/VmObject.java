@@ -33,11 +33,6 @@ public class VmObject {
 	 */
 	public static final int OBJECT_ALIGN = 8;
 	
-	/**
-	 * The number of bytes a single slot (Object reference) takes.
-	 */
-	public static final int SLOT_SIZE = 4;
-	
 	public static final int SIZE_MASK = 0xFFFFFFFC;
 	
 	/**

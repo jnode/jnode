@@ -24,9 +24,10 @@ public final class VmCompiledCode extends AbstractCode {
 	private final VmCompiledExceptionHandler[] eTable;
 	/** Mapping between PC's and addresses */
 	private final VmAddressMap addressTable;
-	
+
 	/**
 	 * Create a new instance
+	 * 
 	 * @param bytecode
 	 * @param nativeCode
 	 * @param compiledCode
@@ -35,7 +36,14 @@ public final class VmCompiledCode extends AbstractCode {
 	 * @param defaultExceptionHandler
 	 * @param addressTable
 	 */
-	public VmCompiledCode(VmByteCode bytecode, Address nativeCode, Object compiledCode, int size, VmCompiledExceptionHandler[] eTable, Address defaultExceptionHandler, VmAddressMap addressTable) {
+	public VmCompiledCode(
+		VmByteCode bytecode,
+		Address nativeCode,
+		Object compiledCode,
+		int size,
+		VmCompiledExceptionHandler[] eTable,
+		Address defaultExceptionHandler,
+		VmAddressMap addressTable) {
 		this.bytecode = bytecode;
 		this.nativeCode = nativeCode;
 		this.compiledCode1 = compiledCode;
@@ -46,19 +54,23 @@ public final class VmCompiledCode extends AbstractCode {
 		if (bytecode != null) {
 			bytecode.lock();
 		}
-		addressTable.lock();
+		if (addressTable != null) {
+			addressTable.lock();
+		}
 	}
-	
+
 	/**
 	 * Returns the defaultExceptionHandler.
+	 * 
 	 * @return Object
 	 */
 	public Address getDefaultExceptionHandler() {
 		return defaultExceptionHandler;
 	}
-	
+
 	/**
 	 * Gets the length of the native code in bytes.
+	 * 
 	 * @return the length
 	 */
 	public int getSize() {
@@ -67,6 +79,7 @@ public final class VmCompiledCode extends AbstractCode {
 
 	/**
 	 * Get the number of exception handlers
+	 * 
 	 * @return the number of exception handlers
 	 */
 	public int getNoExceptionHandlers() {
@@ -75,6 +88,7 @@ public final class VmCompiledCode extends AbstractCode {
 
 	/**
 	 * Get the handler PC of the exception handler at a given index
+	 * 
 	 * @param index
 	 * @return The handler
 	 */
@@ -85,36 +99,39 @@ public final class VmCompiledCode extends AbstractCode {
 			throw new IndexOutOfBoundsException("eTable is null; index " + index);
 		}
 	}
-	
+
 	/**
 	 * Gets the linenumber of a given address.
+	 * 
 	 * @param address
 	 * @return The linenumber for the given pc, or -1 is not found.
 	 */
 	public int getLineNr(Address address) {
 		if (this.bytecode != null) {
-			final int offset = (int)Address.distance(nativeCode, address);
+			final int offset = (int) Address.distance(nativeCode, address);
 			final int pc = addressTable.findPC(offset);
 			return bytecode.getLineNr(pc);
 			//return offset;
 		}
 		return -1;
 	}
-	
+
 	/**
 	 * Gets the address of the start of the native code.
+	 * 
 	 * @return The address
 	 */
 	final Address getNativeCode() {
 		return nativeCode;
 	}
-	
+
 	final Object getCompiledCode() {
 		return compiledCode1;
 	}
-	
+
 	/**
 	 * Does this method contain the given address?
+	 * 
 	 * @param codePtr
 	 * @return boolean
 	 */
