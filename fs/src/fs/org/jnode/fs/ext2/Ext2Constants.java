@@ -60,12 +60,15 @@ public class Ext2Constants {
 	
 	//behaviour control flags in the inode
 	public static final long EXT2_INDEX_FL		=	0x00010000;	//hash indexed directory
+
+	//Filesystem state constants
+	public static final int EXT2_VALID_FS		=	0x0001;  // cleanly unmounted 
+	public static final int EXT2_ERROR_FS		=	0x0002; 
 	
 	//S_FEATURE_RO_COMPAT constants
 	public static final long EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER	= 0x0001;
 	public static final long EXT2_FEATURE_RO_COMPAT_LARGE_FILE     	= 0x0002;
 	public static final long EXT2_FEATURE_RO_COMPAT_BTREE_DIR      	= 0x0004;
-	public static final long EXT2_FEATURE_RO_COMPAT_ANY            	= 0xffffffff;
 
 	//S_FEATURE_INCOMPAT constants
 	public static final long EXT2_FEATURE_INCOMPAT_COMPRESSION		= 0x0001;
