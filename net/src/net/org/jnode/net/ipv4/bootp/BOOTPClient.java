@@ -5,6 +5,7 @@ package org.jnode.net.ipv4.bootp;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.Inet4Address;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 
@@ -56,13 +57,13 @@ public class BOOTPClient {
 			socket.setSoTimeout(RECEIVE_TIMEOUT);
 
 			// Create the BOOTP header
-			final IPv4Address myIp = IPv4Address.ANY;
+			final Inet4Address myIP = null; // any address
 			final int transactionID = (int)(System.currentTimeMillis() & 0xFFFFFFFF);
-			BOOTPHeader hdr = new BOOTPHeader(BOOTPHeader.BOOTREQUEST, transactionID, myIp, api.getAddress());
+			BOOTPHeader hdr = new BOOTPHeader(BOOTPHeader.BOOTREQUEST, transactionID, myIP, api.getAddress());
 
 			// Send the packet
 			final DatagramPacket packet = createRequestPacket(hdr);
-			packet.setAddress(IPv4Address.BROADCAST.toInetAddress());
+			packet.setAddress(IPv4Address.BROADCAST_ADDRESS);
 			packet.setPort(SERVER_PORT);
 			socket.send(packet);
 
@@ -120,11 +121,11 @@ public class BOOTPClient {
 		log.info("Got Server IP address  : " + hdr.getServerIPAddress());
 		log.info("Got Gateway IP address : " + hdr.getGatewayIPAddress());
 
-		Ifconfig.setDefault(device, hdr.getYourIPAddress(), null);
-		if (hdr.getGatewayIPAddress().isAny()) {
-			Route.addRoute(hdr.getServerIPAddress(), null, device); 
+		Ifconfig.setDefault(device, new IPv4Address(hdr.getYourIPAddress()), null);
+		if (hdr.getGatewayIPAddress().isAnyLocalAddress()) {
+			Route.addRoute(new IPv4Address(hdr.getServerIPAddress()), null, device); 
 		} else {
-			Route.addRoute(hdr.getServerIPAddress(), hdr.getGatewayIPAddress(), device); 
+			Route.addRoute(new IPv4Address(hdr.getServerIPAddress()), new IPv4Address(hdr.getGatewayIPAddress()), device); 
 		}
 	}
 }

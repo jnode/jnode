@@ -5,6 +5,7 @@ package org.jnode.net.ipv4;
 
 import java.io.Serializable;
 import java.net.InetAddress;
+import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.util.StringTokenizer;
 
@@ -30,6 +31,34 @@ public class IPv4Address implements ProtocolAddress, Serializable {
 	private static final IPv4Address DEFAULT_CLASS_C_SUBNETMASK = new IPv4Address("255.255.255.0");
 	private static final IPv4Address DEFAULT_CLASS_D_SUBNETMASK = new IPv4Address("255.255.255.0");
 	
+	/** Useful Inet4Address broadcast address constant */
+	public static final Inet4Address BROADCAST_ADDRESS = (Inet4Address) BROADCAST.toInetAddress();
+
+	/**
+	 * Reads an address at a given offset from the given buffer
+	 * @param skbuf
+	 * @param skbufOffset
+	 */
+	public static Inet4Address readFrom(SocketBuffer skbuf, int offset) {
+		byte[] address = new byte[length];
+		skbuf.get(address, 0, offset, length);
+		try {
+			return (Inet4Address) InetAddress.getByAddress(address);
+		} catch(UnknownHostException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	/**
+	 * Writes an address to a given offset in the given buffer
+	 * @param skbuf
+	 * @param skbufOffset
+	 * @param address
+	 */
+	public static void writeTo(SocketBuffer skbuf, int skbufOffset, Inet4Address address) {
+		skbuf.set(skbufOffset, address.getAddress(), 0, length);
+	}
+
 	/**
 	 * Create a new instance
 	 * @param src

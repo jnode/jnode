@@ -4,6 +4,7 @@
 package org.jnode.net.ipv4.bootp;
 
 import java.net.DatagramPacket;
+import java.net.Inet4Address;
 
 import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
@@ -30,10 +31,10 @@ public class BOOTPHeader {
 	private final int secondsElapsed;
 	private final int flags;
 	private final HardwareAddress clientHwAddress;
-	private final IPv4Address clientIPAddress;
-	private final IPv4Address yourIPAddress;
-	private final IPv4Address serverIPAddress;
-	private final IPv4Address gatewayIPAddress;
+	private final Inet4Address clientIPAddress;
+	private final Inet4Address yourIPAddress;
+	private final Inet4Address serverIPAddress;
+	private final Inet4Address gatewayIPAddress;
 	
 	/**
 	 * Create a new header and read it from the given buffer
@@ -46,10 +47,10 @@ public class BOOTPHeader {
 		this.transactionID = skbuf.get32(4);
 		this.secondsElapsed = skbuf.get16(8);
 		this.flags = skbuf.get16(10);
-		this.clientIPAddress = new IPv4Address(skbuf, 12);
-		this.yourIPAddress = new IPv4Address(skbuf, 16);
-		this.serverIPAddress = new IPv4Address(skbuf, 20);
-		this.gatewayIPAddress = new IPv4Address(skbuf, 24);
+		this.clientIPAddress = IPv4Address.readFrom(skbuf, 12);
+		this.yourIPAddress = IPv4Address.readFrom(skbuf, 16);
+		this.serverIPAddress = IPv4Address.readFrom(skbuf, 20);
+		this.gatewayIPAddress = IPv4Address.readFrom(skbuf, 24);
 		if (hwType == 1) {
 			clientHwAddress = new EthernetAddress(skbuf, 28);
 		} else {
@@ -66,13 +67,13 @@ public class BOOTPHeader {
 	}
 	
 	/**
-	 * Create a new header
+	 * Create a new header (for client usage)
 	 * @param opcode
 	 * @param transactionID
 	 * @param clientIPAddress
 	 * @param clientHwAddress
 	 */
-	public BOOTPHeader(int opcode, int transactionID, IPv4Address clientIPAddress, HardwareAddress clientHwAddress) {
+	public BOOTPHeader(int opcode, int transactionID, Inet4Address clientIPAddress, HardwareAddress clientHwAddress) {
 		this.opcode = opcode;
 		this.hwType = clientHwAddress.getType();
 		this.hopCount = 0;
@@ -82,6 +83,28 @@ public class BOOTPHeader {
 		this.clientIPAddress = clientIPAddress;
 		this.yourIPAddress = null;
 		this.serverIPAddress = null;
+		this.gatewayIPAddress = null;
+		this.clientHwAddress = clientHwAddress;
+	}
+	/**
+	 * Create a new header (for server usage)
+	 * @param opcode
+	 * @param transactionID
+	 * @param clientIPAddress
+	 * @param yourIPAddress
+	 * @param serverIPAddress
+	 * @param clientHwAddress
+	 */
+	public BOOTPHeader(int opcode, int transactionID, Inet4Address clientIPAddress, Inet4Address yourIPAddress, Inet4Address serverIPAddress, HardwareAddress clientHwAddress) {
+		this.opcode = opcode;
+		this.hwType = clientHwAddress.getType();
+		this.hopCount = 0;
+		this.transactionID = transactionID;
+		this.secondsElapsed = 0;
+		this.flags = 0;
+		this.clientIPAddress = clientIPAddress;
+		this.yourIPAddress = yourIPAddress;
+		this.serverIPAddress = serverIPAddress;
 		this.gatewayIPAddress = null;
 		this.clientHwAddress = clientHwAddress;
 	}
@@ -100,16 +123,16 @@ public class BOOTPHeader {
 		skbuf.set16(8, secondsElapsed);
 		skbuf.set16(10, flags);
 		if (clientIPAddress != null) {
-			clientIPAddress.writeTo(skbuf, 12);
+			IPv4Address.writeTo(skbuf, 12, clientIPAddress);
 		}
 		if (yourIPAddress != null) {
-			yourIPAddress.writeTo(skbuf, 16);
+			IPv4Address.writeTo(skbuf, 16, yourIPAddress);
 		}
 		if (serverIPAddress != null) {
-			serverIPAddress.writeTo(skbuf, 20);
+			IPv4Address.writeTo(skbuf, 20, serverIPAddress);
 		}
 		if (gatewayIPAddress != null) {
-			gatewayIPAddress.writeTo(skbuf, 24);
+			IPv4Address.writeTo(skbuf, 24, gatewayIPAddress);
 		}
 		if (clientHwAddress != null) {
 			clientHwAddress.writeTo(skbuf, 28);
@@ -137,14 +160,14 @@ public class BOOTPHeader {
 	/**
 	 * Gets the client IP address
 	 */
-	public IPv4Address getClientIPAddress() {
+	public Inet4Address getClientIPAddress() {
 		return clientIPAddress;
 	}
 
 	/**
 	 * Gets the gateway IP address
 	 */
-	public IPv4Address getGatewayIPAddress() {
+	public Inet4Address getGatewayIPAddress() {
 		return gatewayIPAddress;
 	}
 
@@ -172,7 +195,7 @@ public class BOOTPHeader {
 	/**
 	 * Gets the server IP address
 	 */
-	public IPv4Address getServerIPAddress() {
+	public Inet4Address getServerIPAddress() {
 		return serverIPAddress;
 	}
 
@@ -186,7 +209,7 @@ public class BOOTPHeader {
 	/**
 	 * Gets your IP address
 	 */
-	public IPv4Address getYourIPAddress() {
+	public Inet4Address getYourIPAddress() {
 		return yourIPAddress;
 	}
 
