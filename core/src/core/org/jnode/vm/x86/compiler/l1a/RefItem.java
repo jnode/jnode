@@ -17,35 +17,20 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
  */
 final class RefItem extends WordItem implements X86CompilerConstants {
 
-	static RefItem createConst(VmConstString value) {
-		return new RefItem(Kind.CONSTANT, null, value, 0);
-	}
-
-	static RefItem createLocal(int offsetToFP) {
-		return new RefItem(Kind.LOCAL, null, null, offsetToFP);
-	}
-
-	static RefItem createRegister(Register reg) {
-		return new RefItem(Kind.REGISTER, reg, null, 0);
-	}
-
-	static RefItem createStack() {
-		return new RefItem(Kind.STACK, null, null, 0);
-	}
-
 	// generate unique labels for writeStatics (should use current label)
 	private long labelCounter;
 
-	private final VmConstString value;
+	private VmConstString value;
 
 	/**
-	 * @param kind
-	 * @param reg
-	 * @param val
-	 * @param offsetToFP
+	 * Initialize a blank item
 	 */
-	private RefItem(int kind, Register reg, VmConstString val, int offsetToFP) {
-		super(kind, reg, offsetToFP);
+	RefItem(ItemFactory factory) {
+	    super(factory);
+	}
+
+	final void initialize(int kind, int offsetToFP, Register reg, VmConstString val) {
+		super.initialize(kind, reg, offsetToFP);
 		this.value = val;
 	}
 
@@ -53,7 +38,7 @@ final class RefItem extends WordItem implements X86CompilerConstants {
 	 * @see org.jnode.vm.x86.compiler.l1a.WordItem#cloneConstant()
 	 */
 	protected WordItem cloneConstant() {
-		return createConst(getValue());
+		return factory.createAConst(getValue());
 	}
 
 	/**

@@ -10,63 +10,48 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
  * @author Patrik Reali
- *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * 
+ * To change the template for this generated type comment go to Window -
+ * Preferences - Java - Code Generation - Code and Comments
  */
-final class LongItem extends DoubleWordItem  implements X86CompilerConstants {
-	
-	static LongItem createConst(long value) {
-		return new LongItem(Kind.CONSTANT, 0, null, null, value);
-	}
-	
+final class LongItem extends DoubleWordItem implements X86CompilerConstants {
+
+    private long value;
+
     /**
-     * Create an item that is on the FPU stack.
-     * 
-     * @return
+     * Initialize a blank item.
      */
-    static LongItem createFPUStack() {
-        return new LongItem(Kind.FPUSTACK, 0, null, null, 0);
+    LongItem(ItemFactory factory) {
+        super(factory);
     }
 
-	static LongItem createLocal(int offsetToFP) {
-		return new LongItem(Kind.LOCAL, offsetToFP, null, null, 0);
-	}
-	
-	static LongItem createReg(Register lsb, Register msb) {
-		return new LongItem(Kind.REGISTER, 0, lsb, msb, 0);
-	}
-	
-	static LongItem createStack() {
-		return new LongItem(Kind.STACK, 0, null, null, 0);
-	}
+    /**
+     * @param kind
+     * @param offsetToFP
+     * @param lsb
+     * @param msb
+     * @param val
+     */
+    final void initialize(int kind, int offsetToFP, Register lsb, Register msb,
+            long val) {
+        super.initialize(kind, offsetToFP, lsb, msb);
+        this.value = val;
+    }
 
-	private final long value;
-
-	/**
-	 * @param kind
-	 * @param offsetToFP
-	 * @param lsb
-	 * @param msb
-	 * @param val
-	 */
-	private LongItem(int kind, int offsetToFP, Register lsb, Register msb, long val) {
-		super(kind, offsetToFP, lsb, msb);
-		this.value = val;
-	}
-    
     /**
      * Load my constant to the given os.
+     * 
      * @param os
      * @param lsb
      * @param msb
      */
-    protected final void loadToConstant(EmitterContext ec, AbstractX86Stream os, Register lsb, Register msb) {
-	    final int lsbv = (int) (value & 0xFFFFFFFFL);
-	    final int msbv = (int) ((value >>> 32) & 0xFFFFFFFFL);
+    protected final void loadToConstant(EmitterContext ec,
+            AbstractX86Stream os, Register lsb, Register msb) {
+        final int lsbv = (int) (value & 0xFFFFFFFFL);
+        final int msbv = (int) ((value >>> 32) & 0xFFFFFFFFL);
 
-		os.writeMOV_Const(lsb, lsbv);
-		os.writeMOV_Const(msb, msbv);        
+        os.writeMOV_Const(lsb, lsbv);
+        os.writeMOV_Const(msb, msbv);
     }
 
     /**
@@ -77,16 +62,17 @@ final class LongItem extends DoubleWordItem  implements X86CompilerConstants {
      * @param disp
      */
     protected void popFromFPU(AbstractX86Stream os, Register reg, int disp) {
-        os.writeFISTP64(reg, disp);        
+        os.writeFISTP64(reg, disp);
     }
 
     /**
      * Push my constant on the stack using the given os.
+     * 
      * @param os
      */
     protected final void pushConstant(EmitterContext ec, AbstractX86Stream os) {
-	    os.writePUSH(getMsbValue());
-	    os.writePUSH(getLsbValue());        
+        os.writePUSH(getMsbValue());
+        os.writePUSH(getLsbValue());
     }
 
     /**
@@ -100,43 +86,49 @@ final class LongItem extends DoubleWordItem  implements X86CompilerConstants {
         os.writeFILD64(reg, disp);
     }
 
-	/**
+    /**
      * Gets the LSB part of the constant value of this item.
+     * 
      * @return
      */
     final int getLsbValue() {
         assertCondition(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
-        return (int)(value & 0xFFFFFFFFL);
+        return (int) (value & 0xFFFFFFFFL);
     }
 
     /**
      * Gets the MSB part of the constant value of this item.
+     * 
      * @return
      */
     final int getMsbValue() {
         assertCondition(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
-        return (int)((value >>> 32) & 0xFFFFFFFFL);
+        return (int) ((value >>> 32) & 0xFFFFFFFFL);
     }
 
+    /**
+     * Get the JVM type of this item
+     * 
+     * @return the JVM type
+     */
+    final int getType() {
+        return JvmType.LONG;
+    }
 
-	/**
-	 * Get the JVM type of this item
-	 * @return the JVM type
-	 */
-	final int getType() { return JvmType.LONG; }
-	
     /**
      * Gets the constant value of this item.
+     * 
      * @return
      */
     final long getValue() {
         assertCondition(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
         return value;
     }
-	/**
-	 * @see org.jnode.vm.x86.compiler.l1a.DoubleWordItem#cloneConstant()
-	 */
-	protected DoubleWordItem cloneConstant() {
-		return createConst(getValue());
-	}
+
+    /**
+     * @see org.jnode.vm.x86.compiler.l1a.DoubleWordItem#cloneConstant()
+     */
+    protected DoubleWordItem cloneConstant() {
+        return factory.createLConst(getValue());
+    }
 }

@@ -13,72 +13,14 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
  */
 public abstract class WordItem extends Item implements X86CompilerConstants {
 
-	/**
-	 * Create a WordItem in a local variable.
-	 * 
-	 * @param jvmType
-	 *            INT, REFERENCE, FLOAT
-	 * @param offset
-	 * @return
-	 */
-	static final WordItem createLocal(int jvmType, int offset) {
-		switch (jvmType) {
-		case JvmType.INT:
-			return IntItem.createLocal(offset);
-		case JvmType.REFERENCE:
-			return RefItem.createLocal(offset);
-		case JvmType.FLOAT:
-			return FloatItem.createLocal(offset);
-		default:
-			throw new IllegalArgumentException("Invalid type " + jvmType);
-		}
-	}
-
-	/**
-	 * Create a WordItem in on the stack.
-	 * 
-	 * @param jvmType
-	 *            INT, REFERENCE, FLOAT
-	 * @return
-	 */
-	static final WordItem createStack(int jvmType) {
-		switch (jvmType) {
-		case JvmType.INT:
-			return IntItem.createStack();
-		case JvmType.REFERENCE:
-			return RefItem.createStack();
-		case JvmType.FLOAT:
-			return FloatItem.createStack();
-		default:
-			throw new IllegalArgumentException("Invalid type " + jvmType);
-		}
-	}
-
-	/**
-	 * Create a WordItem in a register.
-	 * 
-	 * @param jvmType
-	 *            INT, REFERENCE, FLOAT
-	 * @param reg
-	 * @return
-	 */
-	static final WordItem createReg(int jvmType, Register reg) {
-		switch (jvmType) {
-		case JvmType.INT:
-			return IntItem.createReg(reg);
-		case JvmType.REFERENCE:
-			return RefItem.createRegister(reg);
-		case JvmType.FLOAT:
-			return FloatItem.createReg(reg);
-		default:
-			throw new IllegalArgumentException("Invalid type " + jvmType);
-		}
-	}
-
 	private Register reg;
 
-	protected WordItem(int kind, Register reg, int local) {
-		super(kind, local);
+	protected WordItem(ItemFactory factory) {
+	    super(factory);
+	}
+
+	protected final void initialize(int kind, Register reg, int local) {
+		super.initialize(kind, local);
 		this.reg = reg;
 		assertCondition((kind != Kind.REGISTER) || (reg != null),
 				"kind == register implies that reg != null");
@@ -99,7 +41,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			break;
 
 		case Kind.LOCAL:
-			res = createLocal(getType(), getOffsetToFP());
+			res = (WordItem)factory.createLocal(getType(), getOffsetToFP());
 			break;
 
 		case Kind.CONSTANT:
@@ -114,10 +56,12 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 
 		case Kind.STACK:
 			os.writePUSH(Register.SP, 0);
-			res = createStack(getType());
+			res = (WordItem)factory.createStack(getType());
 			if (VirtualStack.checkOperandStack) {
-				final VirtualStack stack = ec.getVStack();
-				stack.operandStack.push(res);
+				final ItemStack operandStack = ec.getVStack().operandStack;
+				operandStack.pop(this);
+				operandStack.push(this);
+				operandStack.push(res);
 			}
 			break;
 
@@ -180,7 +124,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 		case Kind.REGISTER:
 			if (this.reg != reg) {
 				os.writeMOV(INTSIZE, reg, this.reg);
-				release(ec);
+				cleanup(ec);
 			}
 			break;
 
@@ -326,7 +270,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 		default:
 			throw new IllegalArgumentException("Invalid item kind");
 		}
-		release(ec);
+		cleanup(ec);
 		kind = Kind.STACK;
 
 		if (VirtualStack.checkOperandStack) {
@@ -394,7 +338,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			throw new IllegalArgumentException("Invalid item kind");
 		}
 
-		release(ec);
+		cleanup(ec);
 		kind = Kind.FPUSTACK;
 		stack.fpuStack.push(this);
 	}
@@ -403,6 +347,14 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#release(EmitterContext)
 	 */
 	final void release(EmitterContext ec) {
+	    cleanup(ec);
+		ec.getItemFactory().release(this);
+	}
+
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#release(EmitterContext)
+	 */
+	private final void cleanup(EmitterContext ec) {
 		//assertCondition(!ec.getVStack().contains(this), "Cannot release while
 		// on vstack");
 		final X86RegisterPool pool = ec.getPool();

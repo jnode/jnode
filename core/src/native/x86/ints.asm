@@ -186,16 +186,25 @@ sys_print_intregs:
 	jne sys_print_intregs_code
 	mov ebx,[ebp+OLD_ESP]
 	mov ebx,[ebx+0]
-	sub ebx,16
 sys_print_intregs_code:
+	sub ebx,16
 	idm_print_reg  ipaddr, ebx
 	idm_print_byte ip0,	   [ebx+0]
 	push ecx
-	mov ecx,32
-sys_print_intregs_loop:
+	mov ecx,15
+sys_print_intregs_loop1:
 	inc ebx
 	idm_print_byte ip1, [ebx]
-	loop sys_print_intregs_loop
+	loop sys_print_intregs_loop1
+	
+	inc ebx
+	idm_print_reg  ipaddr, ebx
+	idm_print_byte ip0,	   [ebx+0]
+	mov ecx,15
+sys_print_intregs_loop2:
+	inc ebx
+	idm_print_byte ip1, [ebx]
+	loop sys_print_intregs_loop2
 	pop ecx
 	ret
 

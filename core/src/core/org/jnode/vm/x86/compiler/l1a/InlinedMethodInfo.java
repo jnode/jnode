@@ -46,8 +46,8 @@ public class InlinedMethodInfo {
 	 * 
 	 * @param vstack
 	 */
-	final void pushOuterMethodStack(VirtualStack vstack) {
-		vstack.pushAll(outerMethodStack);
+	final void pushOuterMethodStack(ItemFactory ifac, VirtualStack vstack) {
+		vstack.pushAll(ifac, outerMethodStack);
 	}
 
 	/**
@@ -55,10 +55,10 @@ public class InlinedMethodInfo {
 	 * 
 	 * @param vstack
 	 */
-	final void pushExitStack(VirtualStack vstack) {
+	final void pushExitStack(ItemFactory ifac, VirtualStack vstack) {
 		vstack.reset();
 		//vstack.pushAll(outerMethodStack);
-		vstack.pushAll(exitStack);
+		vstack.pushAll(ifac, exitStack);
 	}
 
 	/**

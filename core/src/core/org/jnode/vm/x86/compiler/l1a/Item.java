@@ -4,6 +4,8 @@
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.Register;
+import org.jnode.util.Counter;
+import org.jnode.vm.Vm;
 
 /**
  * This class is the base of all virtual stack items. To improve performance and
@@ -63,7 +65,22 @@ abstract class Item {
 	 */
 	protected int kind; // entry kind
 
-	int offsetToFP; // kind == local only
+	protected int offsetToFP; // kind == local only
+
+	protected final ItemFactory factory;
+	
+	/**
+	 * Initialize a blank item.
+	 */
+	protected Item(ItemFactory factory) {
+	    this.factory = factory;
+		if (true) {
+		    final Vm vm = Vm.getVm();
+		    final String name = getClass().getName();
+		    final Counter cnt = vm.getCounter(name);
+		    cnt.inc();
+		}
+	}
 
 	/**
 	 * Initialize this instance.
@@ -71,10 +88,10 @@ abstract class Item {
 	 * @param kind
 	 * @param offsetToFP
 	 */
-	Item(int kind, int offsetToFP) {
+	protected final void initialize(int kind, int offsetToFP) {
 		assertCondition(kind > 0, "Invalid kind");
 		this.kind = kind;
-		this.offsetToFP = offsetToFP;
+		this.offsetToFP = offsetToFP;		
 	}
 
 	/**

@@ -4,10 +4,14 @@
 package org.jnode.vm;
 
 import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.List;
 
 import org.jnode.system.ResourceManager;
 import org.jnode.util.BootableArrayList;
+import org.jnode.util.Counter;
+import org.jnode.util.Statistic;
+import org.jnode.util.Statistics;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.compiler.HotMethodManager;
 import org.jnode.vm.memmgr.VmHeapManager;
@@ -15,7 +19,7 @@ import org.jnode.vm.memmgr.VmHeapManager;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class Vm extends VmSystemObject {
+public class Vm extends VmSystemObject implements Statistics {
 
 	/** The single instance */
 	private static Vm instance;
@@ -37,6 +41,8 @@ public class Vm extends VmSystemObject {
 	private final VmStatics statics;
 	/** The list of all system processors */
 	private final List processors;
+	/** All statistics */
+	private transient HashMap statistics;
 
 	/**
 	 * Initialize a new instance
@@ -114,6 +120,7 @@ public class Vm extends VmSystemObject {
 		if ((vm != null) && !vm.isBootstrap()) {
 			final PrintStream out = System.out;
 			out.println("JNode VM " + vm.getVersion());
+			vm.dumpStatistics(out);
 			vm.getStatics().dumpStatistics(out);
 			if (vm.hotMethodManager != null) {
 				vm.hotMethodManager.dumpStatistics(out);
@@ -170,5 +177,54 @@ public class Vm extends VmSystemObject {
      */
     final void addProcessor(VmProcessor cpu) {
         processors.add(cpu);
+    }
+
+    /**
+     * Gets of create a counter with a given name.
+     * @param name
+     * @return The counter
+     */
+    public synchronized Counter getCounter(String name) {
+        Counter cnt = (Counter)getStatistic(name);
+        if (cnt == null) {
+            cnt = new Counter(name, name);
+            addStatistic(name, cnt);
+        }
+        return cnt;
+    }
+    
+    private Statistic getStatistic(String name) {        
+        if (statistics != null) {
+            return (Statistic)statistics.get(name);
+        } else {
+            return null;
+        }
+    }
+    
+    private void addStatistic(String name, Statistic stat) {
+        if (statistics == null) {
+            statistics = new HashMap();
+        }
+        statistics.put(name, stat);
+    }
+    
+    /**
+     * @see org.jnode.util.Statistics#getStatistics()
+     */
+    public synchronized Statistic[] getStatistics() {
+        if (statistics != null) {
+            return (Statistic[])statistics.values().toArray(new Statistic[statistics.size()]);
+        } else {
+            return new Statistic[0];
+        }
+    }
+    
+    public void dumpStatistics(PrintStream out) {
+        if (statistics != null) {
+            final Statistic[] stats = getStatistics();
+            for (int i = 0; i < stats.length; i++) {
+                out.println(stats[i]);
+            }        
+        }
     }
 }

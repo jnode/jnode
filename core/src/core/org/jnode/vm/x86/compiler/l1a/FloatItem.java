@@ -12,36 +12,22 @@ import org.jnode.vm.JvmType;
  */
 final class FloatItem extends WordItem {
 
-	static FloatItem createConst(float val) {
-		return new FloatItem(Kind.CONSTANT, null, 0, val);
+	private float value;
+
+	/**
+	 * Initialize a blank item.
+	 */
+	FloatItem(ItemFactory factory) {
+	    super(factory);
 	}
-
-	static FloatItem createFPUStack() {
-		return new FloatItem(Kind.FPUSTACK, null, 0, 0.0f);
-	}
-
-	static FloatItem createLocal(int offsetToFP) {
-		return new FloatItem(Kind.LOCAL, null, offsetToFP, 0.0f);
-	}
-
-	static FloatItem createReg(Register reg) {
-		return new FloatItem(Kind.REGISTER, reg, 0, 0.0f);
-	}
-
-	static FloatItem createStack() {
-		return new FloatItem(Kind.STACK, null, 0, 0.0f);
-	}
-
-	private final float value;
-
+	
 	/**
 	 * @param kind
 	 * @param offsetToFP
 	 * @param value
 	 */
-	private FloatItem(int kind, Register reg, int offsetToFP, float value) {
-		super(kind, reg, offsetToFP);
-
+	final void initialize(int kind, int offsetToFP, Register reg, float value) {
+		super.initialize(kind, reg, offsetToFP);
 		this.value = value;
 	}
 
@@ -49,7 +35,7 @@ final class FloatItem extends WordItem {
 	 * @see org.jnode.vm.x86.compiler.l1a.WordItem#cloneConstant()
 	 */
 	protected WordItem cloneConstant() {
-		return createConst(getValue());
+		return factory.createFConst(getValue());
 	}
 
 	/**

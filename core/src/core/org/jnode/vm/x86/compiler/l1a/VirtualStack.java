@@ -225,31 +225,6 @@ final class VirtualStack {
 		return false;
 	}
 
-	//TODO: deprecated
-	static Item createStack(int type) {
-		Item res = null;
-		switch (type) {
-		case JvmType.INT:
-			res = IntItem.createStack();
-			break;
-		case JvmType.REFERENCE:
-			res = RefItem.createStack();
-			break;
-		case JvmType.LONG:
-			res = LongItem.createStack();
-			break;
-		case JvmType.FLOAT:
-			res = FloatItem.createStack();
-			break;
-		case JvmType.DOUBLE:
-			res = DoubleItem.createStack();
-			break;
-		default:
-			throw new VerifyError("No type " + Integer.toString(type));
-		}
-		return res;
-	}
-
 	/**
 	 * load every instance of local with given index into a register (used to
 	 * avoid aliasing problems)
@@ -366,12 +341,12 @@ final class VirtualStack {
 	 * @param tstack
 	 *            May be null or empty
 	 */
-	final void pushAll(TypeStack tstack) {
+	final void pushAll(ItemFactory ifac, TypeStack tstack) {
 		if ((tstack != null) && !tstack.isEmpty()) {
 			final int size = tstack.size();
 			for (int i = 0; i < size; i++) {
 				final int type = tstack.getType(i);
-				final Item item = VirtualStack.createStack(type);
+				final Item item = ifac.createStack(type);
 				push(item);
 				if (VirtualStack.checkOperandStack) {
 					operandStack.push(item);
@@ -380,8 +355,8 @@ final class VirtualStack {
 		}
 	}
 
-	final AbstractX86StackManager createStackMgr(X86RegisterPool pool) {
-		return new StackManagerImpl(pool);
+	final AbstractX86StackManager createStackMgr(X86RegisterPool pool, ItemFactory ifac) {
+		return new StackManagerImpl(pool, ifac);
 	}
 
 	public String toString() {
@@ -412,9 +387,11 @@ final class VirtualStack {
 	final class StackManagerImpl implements AbstractX86StackManager {
 
 		private final X86RegisterPool pool;
+		private final ItemFactory ifac;
 
-		public StackManagerImpl(X86RegisterPool pool) {
+		public StackManagerImpl(X86RegisterPool pool, ItemFactory ifac) {
 			this.pool = pool;
+			this.ifac = ifac;
 		}
 
 		/**
@@ -422,7 +399,7 @@ final class VirtualStack {
 		 *      org.jnode.assembler.x86.Register)
 		 */
 		public void writePUSH(int jvmType, Register reg) {
-			final Item item = WordItem.createReg(jvmType, reg);
+			final Item item = ifac.createReg(jvmType, reg);
 			Item.assertCondition(pool.request(reg, item), "request");
 			push(item);
 		}
@@ -433,17 +410,7 @@ final class VirtualStack {
 		 *      org.jnode.assembler.x86.Register)
 		 */
 		public void writePUSH64(int jvmType, Register lsbReg, Register msbReg) {
-			final Item item;
-			switch (jvmType) {
-			case JvmType.LONG:
-				item = LongItem.createReg(lsbReg, msbReg);
-				break;
-			case JvmType.DOUBLE:
-				item = DoubleItem.createReg(lsbReg, msbReg);
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown JvmType " + jvmType);
-			}
+			final Item item = ifac.createReg(jvmType, lsbReg, msbReg); 
 			Item.assertCondition(pool.request(lsbReg, item), "request-lsb");
 			Item.assertCondition(pool.request(msbReg, item), "request-msb");
 			push(item);

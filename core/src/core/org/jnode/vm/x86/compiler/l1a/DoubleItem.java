@@ -12,36 +12,23 @@ import org.jnode.vm.JvmType;
  */
 final class DoubleItem extends DoubleWordItem {
 
-	static DoubleItem createConst(double val) {
-		return new DoubleItem(Kind.CONSTANT, 0, null, null, val);
+	private double value;
+
+	/**
+	 * Initialize a blank item.
+	 */
+	DoubleItem(ItemFactory factory) {
+	    super(factory);
 	}
-
-	static DoubleItem createFPUStack() {
-		return new DoubleItem(Kind.FPUSTACK, 0, null, null, 0.0);
-	}
-
-	static DoubleItem createLocal(int offsetToFP) {
-		return new DoubleItem(Kind.LOCAL, offsetToFP, null, null, 0.0);
-	}
-
-	static DoubleItem createReg(Register lsb, Register msb) {
-		return new DoubleItem(Kind.REGISTER, 0, lsb, msb, 0.0);
-	}
-
-	static DoubleItem createStack() {
-		return new DoubleItem(Kind.STACK, 0, null, null, 0.0);
-	}
-
-	private final double value;
-
+	
 	/**
 	 * @param kind
 	 * @param offsetToFP
 	 * @param value
 	 */
-	public DoubleItem(int kind, int offsetToFP, Register lsb, Register msb,
+	final void initialize(int kind, int offsetToFP, Register lsb, Register msb,
 			double value) {
-		super(kind, offsetToFP, lsb, msb);
+		super.initialize(kind, offsetToFP, lsb, msb);
 		this.value = value;
 	}
 
@@ -49,7 +36,7 @@ final class DoubleItem extends DoubleWordItem {
 	 * @see org.jnode.vm.x86.compiler.l1a.DoubleWordItem#cloneConstant()
 	 */
 	protected DoubleWordItem cloneConstant() {
-		return createConst(getValue());
+		return factory.createDConst(getValue());
 	}
 
 	/**
