@@ -37,12 +37,14 @@ exception statement from your version. */
 
 package java.security;
 
+// All uses of Certificate in this file refer to the one in the listed
+// package, not this one.
 import java.security.cert.Certificate;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.NoSuchElementException;
 import java.util.Vector;
+import java.util.Enumeration;
+import java.util.NoSuchElementException;
 
 /**
  * This class is used to hold instances of all permissions that cannot

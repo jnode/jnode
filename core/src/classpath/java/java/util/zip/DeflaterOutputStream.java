@@ -1,5 +1,5 @@
-/* java.util.zip.DeflaterOutputStream
-   Copyright (C) 2001 Free Software Foundation, Inc.
+/* DeflaterOutputStream.java - Output filter for compressing.
+   Copyright (C) 1999, 2000, 2001, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -164,7 +164,7 @@ public class DeflaterOutputStream extends FilterOutputStream
   }
 
   /**
-   * Calls finish () and closes the stream. 
+   * Calls finish() and closes the stream. 
    */
   public void close() throws IOException
   {
@@ -191,7 +191,6 @@ public class DeflaterOutputStream extends FilterOutputStream
    */
   public void write(byte[] buf, int off, int len) throws IOException
   {
-    //    System.err.println("DOS with off " + off + " and len " + len);
     def.setInput(buf, off, len);
     deflate();
   }

@@ -42,15 +42,18 @@ import java.net.ServerSocket;
 import java.nio.channels.spi.AbstractSelectableChannel;
 import java.nio.channels.spi.SelectorProvider;
 
+
 /**
  * @author Michael Koch
  * @since 1.4
  */
-public abstract class ServerSocketChannel extends AbstractSelectableChannel {
+public abstract class ServerSocketChannel extends AbstractSelectableChannel
+{
 	/**
 	 * Initializes this channel.
 	 */
-	public ServerSocketChannel(SelectorProvider provider) {
+  protected ServerSocketChannel(SelectorProvider provider)
+  {
 		super(provider);
 	}
 
@@ -80,14 +83,16 @@ public abstract class ServerSocketChannel extends AbstractSelectableChannel {
 	 *
 	 * @exception IOException If an error occurs
 	 */
-	public static ServerSocketChannel open() throws IOException {
+  public static ServerSocketChannel open() throws IOException
+  {
 		return SelectorProvider.provider().openServerSocketChannel();
 	}
 
 	/**
 	 * Retrieves the valid operations for this channel.
 	 */
-	public final int validOps() {
+  public final int validOps()
+  {
 		return SelectionKey.OP_ACCEPT;
 	}
 }

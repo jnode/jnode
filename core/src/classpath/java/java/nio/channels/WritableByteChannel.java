@@ -40,8 +40,8 @@ package java.nio.channels;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public interface WritableByteChannel
-  extends Channel
+
+public interface WritableByteChannel extends Channel
 {
   /**
    * Writes a sequence of bytes to this channel from the given buffer
@@ -56,5 +56,5 @@ public interface WritableByteChannel
    * @exception NonWritableChannelException If this channel was not opened for
    * writing
    */
-  public int write(ByteBuffer src) throws IOException;
+  int write(ByteBuffer src) throws IOException;
 }

@@ -1,5 +1,5 @@
 /* Inet4Address.java
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,6 +38,8 @@ exception statement from your version. */
 package java.net;
 
 import java.io.ObjectStreamException;
+import java.util.Arrays;
+
 
 /**
  * @author Michael Koch
@@ -51,15 +53,28 @@ import java.io.ObjectStreamException;
  * RFC 2365 (http://www.ietf.org/rfc/rfc2365.txt)
  * Status: Believed complete and correct.
  */
-
-public final class Inet4Address extends InetAddress {
-	static final long serialVersionUID = 7615067291688066509L;
+public final class Inet4Address extends InetAddress
+{
+  static final long serialVersionUID = 3286316764910316507L;
 
 	/**
 	 * needed for serialization
 	 */
-	private Object writeReplace() throws ObjectStreamException {
-		return new InetAddress(addr, hostName);
+  private Object writeReplace() throws ObjectStreamException
+  {
+    return new InetAddress(addr, hostName, null);
+  }
+  
+  /**
+   * Initializes this object's addr instance variable from the passed in
+   * byte array. Note that this constructor is package-private and is called
+   * only by static methods in InetAddress.
+   * 
+   * @param addr
+   */
+  Inet4Address(byte[] addr)
+  {
+    this(addr, null, null);
 	}
 
 	/**
@@ -68,11 +83,24 @@ public final class Inet4Address extends InetAddress {
 	 * @param addr The IP address
 	 * @param host The Hostname
 	 */
-	protected Inet4Address(byte[] addr, String host) {
-		super(addr, host);
+  Inet4Address(byte[] addr, String host)
+  {
+    this(addr, host, null);
 	}
-	protected Inet4Address(byte[] addr) {
-		this(addr, null);
+
+  /**
+   * Initializes this object's addr instance variable from the passed in
+   * byte array.  Note that this constructor is protected and is called
+   * only by static methods in this class.
+   *
+   * @param addr The IP number of this address as an array of bytes
+   * @param hostname The hostname of this IP address.
+   * @param hostname_alias A backup hostname to use if hostname is null to
+   * prevent reverse lookup failures
+   */
+  Inet4Address(byte[] addr, String hostname, String hostname_alias)
+  {
+    super(addr, hostname, hostname_alias);
 	}
 
 	/**
@@ -80,14 +108,16 @@ public final class Inet4Address extends InetAddress {
 	 *
 	 * @since 1.1
 	 */
-	public boolean isMulticastAddress() {
+  public boolean isMulticastAddress()
+  {
 		return (addr[0] & 0xF0) == 0xE0;
 	}
 
 	/**
 	 * Checks if this address is a loopback address
 	 */
-	public boolean isLoopbackAddress() {
+  public boolean isLoopbackAddress()
+  {
 		return addr[0] == 0x7F;
 	}
 
@@ -96,8 +126,11 @@ public final class Inet4Address extends InetAddress {
 	 *
 	 * @since 1.4
 	 */
-	public boolean isAnyLocalAddress() {
-		return (addr[0] == 0) && (addr[1] == 0) && (addr[2] == 0) && (addr[3] == 0);
+  public boolean isAnyLocalAddress()
+  {
+    byte[] anylocal = { 0, 0, 0, 0 };
+
+    return Arrays.equals(addr, anylocal);
 	}
 
 	/**
@@ -105,7 +138,8 @@ public final class Inet4Address extends InetAddress {
 	 * 
 	 * @since 1.4
 	 */
-	public boolean isLinkLocalAddress() {
+  public boolean isLinkLocalAddress()
+  {
 		// XXX: This seems to not exist with IPv4 addresses
 		return false;
 	}
@@ -115,7 +149,8 @@ public final class Inet4Address extends InetAddress {
 	 * 
 	 * @since 1.4
 	 */
-	public boolean isSiteLocalAddress() {
+  public boolean isSiteLocalAddress()
+  {
 		// 10.0.0.0/8
 		if (addr[0] == 0x0A)
 			return true;
@@ -140,7 +175,8 @@ public final class Inet4Address extends InetAddress {
 	 * 
 	 * @since 1.4
 	 */
-	public boolean isMCGlobal() {
+  public boolean isMCGlobal()
+  {
 		// XXX: This seems to net exist with IPv4 addresses
 		return false;
 	}
@@ -150,7 +186,8 @@ public final class Inet4Address extends InetAddress {
 	 * 
 	 * @since 1.4
 	 */
-	public boolean isMCNodeLocal() {
+  public boolean isMCNodeLocal()
+  {
 		// XXX: This seems to net exist with IPv4 addresses
 		return false;
 	}
@@ -160,8 +197,9 @@ public final class Inet4Address extends InetAddress {
 	 * 
 	 * @since 1.4
 	 */
-	public boolean isMCLinkLocal() {
-		if (!isMulticastAddress())
+  public boolean isMCLinkLocal()
+  {
+    if (! isMulticastAddress())
 			return false;
 
 		return (addr[0] == 0xE0) && (addr[1] == 0x00) && (addr[2] == 0x00);
@@ -172,7 +210,8 @@ public final class Inet4Address extends InetAddress {
 	 * 
 	 * @since 1.4
 	 */
-	public boolean isMCSiteLocal() {
+  public boolean isMCSiteLocal()
+  {
 		// XXX: This seems to net exist with IPv4 addresses
 		return false;
 	}
@@ -182,7 +221,8 @@ public final class Inet4Address extends InetAddress {
 	 * 
 	 * @since 1.4
 	 */
-	public boolean isMCOrgLocal() {
+  public boolean isMCOrgLocal()
+  {
 		// XXX: This seems to net exist with IPv4 addresses
 		return false;
 	}
@@ -190,7 +230,8 @@ public final class Inet4Address extends InetAddress {
 	/**
 	 * Returns the address of the current instance
 	 */
-	public byte[] getAddress() {
+  public byte[] getAddress()
+  {
 		return addr;
 	}
 
@@ -199,12 +240,14 @@ public final class Inet4Address extends InetAddress {
 	 * 
 	 * @since 1.0.2
 	 */
-	public String getHostAddress() {
+  public String getHostAddress()
+  {
 		StringBuffer sbuf = new StringBuffer(40);
 		int len = addr.length;
 		int i = 0;
 
-		for (;;) {
+    for (;;)
+      {
 			sbuf.append(addr[i] & 0xFF);
 			i++;
 
@@ -220,7 +263,8 @@ public final class Inet4Address extends InetAddress {
 	/**
 	 * Computes the hashcode of the instance
 	 */
-	public int hashCode() {
+  public int hashCode()
+  {
 		int hash = 0;
 		int len = addr.length;
 		int i = len > 4 ? len - 4 : 0;
@@ -236,8 +280,9 @@ public final class Inet4Address extends InetAddress {
 	 * 
 	 * @param obj Object to compare with
 	 */
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof InetAddress))
+  public boolean equals(Object obj)
+  {
+    if (! (obj instanceof InetAddress))
 			return false;
 
 		byte[] addr1 = addr;

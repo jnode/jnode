@@ -40,8 +40,6 @@ package java.nio.charset;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.spi.CharsetProvider;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -55,19 +53,31 @@ import gnu.java.nio.charset.Provider;
  * @author Jesse Rosenstock
  * @since 1.4
  */
-public abstract class Charset implements Comparable {
-	private static final ThreadLocal cachedEncoder = new ThreadLocal();
-	private static final ThreadLocal cachedDecoder = new ThreadLocal();
+public abstract class Charset implements Comparable
+{
+  private static CharsetEncoder cachedEncoder;
+  private static CharsetDecoder cachedDecoder;
+ 
+  static
+  {
+    synchronized (Charset.class)
+      {
+        cachedEncoder = null;
+        cachedDecoder = null;
+      }
+  }
 
 	private final String canonicalName;
 	private final String[] aliases;
 
-	protected Charset(String canonicalName, String[] aliases) {
-		checkName(canonicalName);
-		if (aliases != null) {
+  protected Charset (String canonicalName, String[] aliases)
+  {
+    checkName (canonicalName);
+    if (aliases != null)
+      {
 			int n = aliases.length;
 			for (int i = 0; i < n; ++i)
-				checkName(aliases[i]);
+            checkName (aliases[i]);
 		}
 
 		this.canonicalName = canonicalName;
@@ -77,31 +87,40 @@ public abstract class Charset implements Comparable {
 	/**
 	 * @throws IllegalCharsetNameException  if the name is illegal
 	 */
-	private static void checkName(String name) {
-		int n = name.length();
+  private static void checkName (String name)
+  {
+    int n = name.length ();
 
 		if (n == 0)
-			throw new IllegalCharsetNameException(name);
+      throw new IllegalCharsetNameException (name);
 
-		char ch = name.charAt(0);
-		if (!(('A' <= ch && ch <= 'Z') || ('a' <= ch && ch <= 'z') || ('0' <= ch && ch <= '9')))
-			throw new IllegalCharsetNameException(name);
+    char ch = name.charAt (0);
+    if (!(('A' <= ch && ch <= 'Z')
+          || ('a' <= ch && ch <= 'z')
+          || ('0' <= ch && ch <= '9')))
+      throw new IllegalCharsetNameException (name);
 
-		for (int i = 1; i < n; ++i) {
-			ch = name.charAt(i);
-			if (!(('A' <= ch && ch <= 'Z') || ('a' <= ch && ch <= 'z') || ('0' <= ch && ch <= '9') || ch == '-' || ch == '.' || ch == ':' || ch == '_'))
-				throw new IllegalCharsetNameException(name);
+    for (int i = 1; i < n; ++i)
+      {
+        ch = name.charAt (i);
+        if (!(('A' <= ch && ch <= 'Z')
+              || ('a' <= ch && ch <= 'z')
+              || ('0' <= ch && ch <= '9')
+              || ch == '-' || ch == '.' || ch == ':' || ch == '_'))
+          throw new IllegalCharsetNameException (name);
 		}
 	}
 
-	public static boolean isSupported(String charsetName) {
-		return charsetForName(charsetName) != null;
+  public static boolean isSupported (String charsetName)
+  {
+    return charsetForName (charsetName) != null;
 	}
 
-	public static Charset forName(String charsetName) {
-		Charset cs = charsetForName(charsetName);
+  public static Charset forName (String charsetName)
+  {
+    Charset cs = charsetForName (charsetName);
 		if (cs == null)
-			throw new UnsupportedCharsetException(charsetName);
+      throw new UnsupportedCharsetException (charsetName);
 		return cs;
 	}
 
@@ -113,121 +132,155 @@ public abstract class Charset implements Comparable {
 	 *
 	 * @throws IllegalCharsetNameException  if the name is illegal
 	 */
-	private static Charset charsetForName(String charsetName) {
-		checkName(charsetName);
-		return provider().charsetForName(charsetName);
+  private static Charset charsetForName (String charsetName)
+  {
+    checkName (charsetName);
+    return provider ().charsetForName (charsetName);
 	}
 
-	public static SortedMap availableCharsets() {
-		TreeMap charsets = new TreeMap(String.CASE_INSENSITIVE_ORDER);
+  public static SortedMap availableCharsets ()
+  {
+    TreeMap charsets = new TreeMap (String.CASE_INSENSITIVE_ORDER);
 
-		for (Iterator i = provider().charsets(); i.hasNext();) {
-			Charset cs = (Charset) i.next();
-			charsets.put(cs.name(), cs);
+    for (Iterator i = provider ().charsets (); i.hasNext (); )
+      {
+        Charset cs = (Charset) i.next ();
+        charsets.put (cs.name (), cs);
 		}
 
-		return Collections.unmodifiableSortedMap(charsets);
+    return Collections.unmodifiableSortedMap (charsets);
 	}
 
 	// XXX: we need to support multiple providers, reading them from
 	// java.nio.charset.spi.CharsetProvider in the resource directory
 	// META-INF/services
-	private static final CharsetProvider provider() {
-	    return (CharsetProvider)AccessController.doPrivileged(new PrivilegedAction() {
-	        public Object run() {
-	    		return Provider.provider();
-	        }});
+  private static final CharsetProvider provider ()
+  {
+    return Provider.provider ();
 	}
 
-	public final String name() {
+  public final String name ()
+  {
 		return canonicalName;
 	}
 
-	public final Set aliases() {
-		if (aliases == null) {
+  public final Set aliases ()
+  {
+    if (aliases == null)
 			return Collections.EMPTY_SET;
-		}
 
 		// should we cache the aliasSet instead?
 		int n = aliases.length;
-		if (n == 0) {
-			return Collections.EMPTY_SET;
-		}
-		HashSet aliasSet = new HashSet(n);
+    HashSet aliasSet = new HashSet (n);
 		for (int i = 0; i < n; ++i)
-			aliasSet.add(aliases[i]);
-		return Collections.unmodifiableSet(aliasSet);
+        aliasSet.add (aliases[i]);
+    return Collections.unmodifiableSet (aliasSet);
 	}
 
-	public String displayName() {
+  public String displayName ()
+  {
 		return canonicalName;
 	}
 
-	public String displayName(Locale locale) {
+  public String displayName (Locale locale)
+  {
 		return canonicalName;
 	}
 
-	public final boolean isRegistered(String name) {
-		return !name.startsWith("x-") && !name.startsWith("X-");
+  public final boolean isRegistered ()
+  {
+    return (!canonicalName.startsWith ("x-")
+            && !canonicalName.startsWith ("X-"));
 	}
 
-	public abstract boolean contains(Charset cs);
+  public abstract boolean contains (Charset cs);
 
-	public abstract CharsetDecoder newDecoder();
+  public abstract CharsetDecoder newDecoder ();
 
-	public abstract CharsetEncoder newEncoder();
+  public abstract CharsetEncoder newEncoder ();
 
-	public boolean canEncode() {
+  public boolean canEncode ()
+  {
 		return true;
 	}
 
-	public final ByteBuffer encode(CharBuffer cb) {
-		try {
-			CharsetEncoder encoder = (CharsetEncoder) cachedEncoder.get();
-			if (encoder == null) {
-				encoder = newEncoder().onMalformedInput(CodingErrorAction.REPLACE).onUnmappableCharacter(CodingErrorAction.REPLACE);
-				cachedEncoder.set(encoder);
+  public final ByteBuffer encode (CharBuffer cb)
+  {
+    try
+      {
+        // NB: This implementation serializes different threads calling
+        // Charset.encode(), a potential performance problem.  It might
+        // be better to remove the cache, or use ThreadLocal to cache on
+        // a per-thread basis.
+        synchronized (Charset.class)
+          {
+            if (cachedEncoder == null)
+              {
+                cachedEncoder = newEncoder ()
+                  .onMalformedInput (CodingErrorAction.REPLACE)
+                  .onUnmappableCharacter (CodingErrorAction.REPLACE);
 			}
-			return encoder.encode(cb);
-		} catch (CharacterCodingException e) {
-			throw new AssertionError(e);
+
+            return cachedEncoder.encode (cb);
+          }
+      }
+    catch (CharacterCodingException e)
+      {
+        throw new AssertionError (e);
 		}
 	}
 
-	public final ByteBuffer encode(String str) {
-		return encode(CharBuffer.wrap(str));
+  public final ByteBuffer encode (String str)
+  {
+    return encode (CharBuffer.wrap (str));
 	}
 
-	public CharBuffer decode(ByteBuffer bb) {
-		try {
-			CharsetDecoder decoder = (CharsetDecoder) cachedDecoder.get();
-			if (decoder == null) {
-				decoder = newDecoder().onMalformedInput(CodingErrorAction.REPLACE).onUnmappableCharacter(CodingErrorAction.REPLACE);
-				cachedDecoder.set(decoder);
+  public final CharBuffer decode (ByteBuffer bb)
+  {
+    try
+      {
+        // NB: This implementation serializes different threads calling
+        // Charset.decode(), a potential performance problem.  It might
+        // be better to remove the cache, or use ThreadLocal to cache on
+        // a per-thread basis.
+        synchronized (Charset.class)
+          {
+            if (cachedDecoder == null)
+              {
+                cachedDecoder = newDecoder ()
+                  .onMalformedInput (CodingErrorAction.REPLACE)
+                  .onUnmappableCharacter (CodingErrorAction.REPLACE);
+              }
+
+            return cachedDecoder.decode (bb);
+          }
 			}
-			decoder.reset();
-			return decoder.decode(bb);
-		} catch (CharacterCodingException e) {
-			throw new AssertionError(e);
+    catch (CharacterCodingException e)
+      {
+        throw new AssertionError (e);
 		}
 	}
 
-	public final int compareTo(Object ob) {
-		return canonicalName.compareToIgnoreCase(((Charset) ob).canonicalName);
+  public final int compareTo (Object ob)
+  {
+    return canonicalName.compareToIgnoreCase (((Charset) ob).canonicalName);
 	}
 
-	public final int hashCode() {
-		return canonicalName.hashCode();
+  public final int hashCode ()
+  {
+    return canonicalName.hashCode ();
 	}
 
-	public final boolean equals(Object ob) {
+  public final boolean equals (Object ob)
+  {
 		if (ob instanceof Charset)
-			return canonicalName.equalsIgnoreCase(((Charset) ob).canonicalName);
+      return canonicalName.equalsIgnoreCase (((Charset) ob).canonicalName);
 		else
 			return false;
 	}
 
-	public final String toString() {
+  public final String toString ()
+  {
 		return canonicalName;
 	}
 }

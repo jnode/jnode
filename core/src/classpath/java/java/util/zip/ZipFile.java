@@ -58,6 +58,8 @@ import java.util.NoSuchElementException;
  *
  * @author Jochen Hoenicke
  * @author Artur Biesiadowski
+ * 
+ * @vm-specific RandomAccessBuffer is used instead of RandomAccessFile.
  */
 public class ZipFile implements ZipConstants {
 

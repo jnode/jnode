@@ -1,5 +1,5 @@
 /* Inet6Address.java
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,6 +37,9 @@ exception statement from your version. */
 
 package java.net;
 
+import java.util.Arrays;
+
+
 /**
  * @author Michael Koch
  * @date August 3, 2002.
@@ -47,8 +50,8 @@ package java.net;
  * RFC 1884 (http://www.ietf.org/rfc/rfc1884.txt)
  * Status: Believed complete and correct.
  */
-
-public final class Inet6Address extends InetAddress {
+public final class Inet6Address extends InetAddress
+{
 	static final long serialVersionUID = 6880410070516793377L;
 
 	/**
@@ -62,8 +65,9 @@ public final class Inet6Address extends InetAddress {
 	 * @param addr The IP address
 	 * @param host The hostname
 	 */
-	protected Inet6Address(byte[] addr, String host) {
-		super(addr, host);
+  Inet6Address(byte[] addr, String host)
+  {
+    super(addr, host, null);
 		this.ipaddress = addr;
 	}
 
@@ -72,7 +76,8 @@ public final class Inet6Address extends InetAddress {
 	 * 
 	 * @since 1.1
 	 */
-	public boolean isMulticastAddress() {
+  public boolean isMulticastAddress()
+  {
 		return ipaddress[0] == 0xFF;
 	}
 
@@ -81,10 +86,11 @@ public final class Inet6Address extends InetAddress {
 	 * 
 	 * @since 1.4
 	 */
-	public boolean isAnyLocalAddress() {
+  public boolean isAnyLocalAddress()
+  {
 		byte[] anylocal = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-		return ipaddress == anylocal;
+    return Arrays.equals(ipaddress, anylocal);
 	}
 
 	/**
@@ -92,10 +98,11 @@ public final class Inet6Address extends InetAddress {
 	 * 
 	 * @since 1.4
 	 */
-	public boolean isLoopbackAddress() {
+  public boolean isLoopbackAddress()
+  {
 		byte[] loopback = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
 
-		return ipaddress == loopback;
+    return Arrays.equals(ipaddress, loopback);
 	}
 
 	/**
@@ -103,7 +110,8 @@ public final class Inet6Address extends InetAddress {
 	 * 
 	 * @since 1.4
 	 */
-	public boolean isLinkLocalAddress() {
+  public boolean isLinkLocalAddress()
+  {
 		return ipaddress[0] == 0xFA;
 	}
 
@@ -112,7 +120,8 @@ public final class Inet6Address extends InetAddress {
 	 * 
 	 * @since 1.4
 	 */
-	public boolean isSiteLocalAddress() {
+  public boolean isSiteLocalAddress()
+  {
 		return ipaddress[0] == 0xFB;
 	}
 
@@ -121,8 +130,9 @@ public final class Inet6Address extends InetAddress {
 	 * 
 	 * @since 1.4
 	 */
-	public boolean isMCGlobal() {
-		if (!isMulticastAddress())
+  public boolean isMCGlobal()
+  {
+    if (! isMulticastAddress())
 			return false;
 
 		return (ipaddress[1] & 0x0F) == 0xE;
@@ -133,8 +143,9 @@ public final class Inet6Address extends InetAddress {
 	 * 
 	 * @since 1.4
 	 */
-	public boolean isMCNodeLocal() {
-		if (!isMulticastAddress())
+  public boolean isMCNodeLocal()
+  {
+    if (! isMulticastAddress())
 			return false;
 
 		return (ipaddress[1] & 0x0F) == 0x1;
@@ -145,8 +156,9 @@ public final class Inet6Address extends InetAddress {
 	 * 
 	 * @since 1.4
 	 */
-	public boolean isMCLinkLocal() {
-		if (!isMulticastAddress())
+  public boolean isMCLinkLocal()
+  {
+    if (! isMulticastAddress())
 			return false;
 
 		return (ipaddress[1] & 0x0F) == 0x2;
@@ -157,8 +169,9 @@ public final class Inet6Address extends InetAddress {
 	 * 
 	 * @since 1.4
 	 */
-	public boolean isMCSiteLocal() {
-		if (!isMulticastAddress())
+  public boolean isMCSiteLocal()
+  {
+    if (! isMulticastAddress())
 			return false;
 
 		return (ipaddress[1] & 0x0F) == 0x5;
@@ -169,8 +182,9 @@ public final class Inet6Address extends InetAddress {
 	 * 
 	 * @since 1.4
 	 */
-	public boolean isMCOrgLocal() {
-		if (!isMulticastAddress())
+  public boolean isMCOrgLocal()
+  {
+    if (! isMulticastAddress())
 			return false;
 
 		return (ipaddress[1] & 0x0F) == 0x8;
@@ -181,24 +195,29 @@ public final class Inet6Address extends InetAddress {
 	 * network byte order: the highest order byte of the address is i
 	 * n getAddress()[0]
 	 */
-	public byte[] getAddress() {
+  public byte[] getAddress()
+  {
 		return ipaddress;
 	}
 
 	/**
 	 * Returns the IP address string in textual presentation
 	 */
-	public String getHostAddress() {
+  public String getHostAddress()
+  {
 		StringBuffer sbuf = new StringBuffer(40);
 
-		for (int i = 0; i < 16; i += 2) {
+    for (int i = 0; i < 16; i += 2)
+      {
 			int x = ((ipaddress[i] & 0xFF) << 8) | (ipaddress[i + 1] & 0xFF);
 			boolean empty = sbuf.length() == 0;
 
-			if (empty) {
+	if (empty)
+	  {
 				if (i > 0)
 					sbuf.append("::");
-			} else
+	  }
+	else
 				sbuf.append(':');
 
 			if (x != 0 || i >= 14)
@@ -211,15 +230,17 @@ public final class Inet6Address extends InetAddress {
 	/**
 	 * Returns a hashcode for this IP address
 	 */
-	public int hashCode() {
+  public int hashCode()
+  {
 		return super.hashCode();
 	}
 
 	/**
 	 * Compares this object against the specified object
 	 */
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof Inet6Address))
+  public boolean equals(Object obj)
+  {
+    if (! (obj instanceof Inet6Address))
 			return false;
 
 		Inet6Address tmp = (Inet6Address) obj;
@@ -233,18 +254,13 @@ public final class Inet6Address extends InetAddress {
 	 *
 	 * @since 1.4
 	 */
-	public boolean isIPv4CompatibleAddress() {
-		if (ipaddress[0] != 0x00
-			|| ipaddress[1] != 0x00
-			|| ipaddress[2] != 0x00
-			|| ipaddress[3] != 0x00
-			|| ipaddress[4] != 0x00
-			|| ipaddress[5] != 0x00
-			|| ipaddress[6] != 0x00
-			|| ipaddress[7] != 0x00
-			|| ipaddress[8] != 0x00
-			|| ipaddress[9] != 0x00
-			|| ipaddress[10] != 0x00
+  public boolean isIPv4CompatibleAddress()
+  {
+    if (ipaddress[0] != 0x00 || ipaddress[1] != 0x00 || ipaddress[2] != 0x00
+        || ipaddress[3] != 0x00 || ipaddress[4] != 0x00
+        || ipaddress[5] != 0x00 || ipaddress[6] != 0x00
+        || ipaddress[7] != 0x00 || ipaddress[8] != 0x00
+        || ipaddress[9] != 0x00 || ipaddress[10] != 0x00
 			|| ipaddress[11] != 0x00)
 			return false;
 

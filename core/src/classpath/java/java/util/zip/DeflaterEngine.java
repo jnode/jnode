@@ -41,7 +41,6 @@ class DeflaterEngine implements DeflaterConstants {
   private final static int TOO_FAR = 4096;
 
   private int ins_h;
-  private byte[] buffer;
 
   /**
    * Hashtable, hashing three characters to an index for window, so

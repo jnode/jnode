@@ -1,5 +1,5 @@
 /* java.util.SimpleTimeZone
-   Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2003, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,7 +37,6 @@ exception statement from your version. */
 
 
 package java.util;
-
 
 /**
  * This class represents a simple time zone offset and handles
@@ -87,6 +86,7 @@ public class SimpleTimeZone extends TimeZone
   private static final int DOW_IN_MONTH_MODE = 2;
   private static final int DOW_GE_DOM_MODE = 3;
   private static final int DOW_LE_DOM_MODE = 4;
+  
   /**
    * The mode of the start rule. This takes one of the following values:
    * <dl>
@@ -148,6 +148,14 @@ public class SimpleTimeZone extends TimeZone
   private int startTime;
    
   /**
+   * This variable specifies the mode that startTime is specified in.  By
+   * default it is WALL_TIME, but can also be STANDARD_TIME or UTC_TIME.  For
+   * startTime, STANDARD_TIME and WALL_TIME are equivalent.
+   * @serial
+   */
+  private int startTimeMode = WALL_TIME;
+
+  /**
    * The month in which daylight savings ends.  This is one of the
    * constants Calendar.JANUARY, ..., Calendar.DECEMBER.  
    * @serial
@@ -186,6 +194,13 @@ public class SimpleTimeZone extends TimeZone
   private int endTime;
 
   /**
+   * This variable specifies the mode that endTime is specified in.  By
+   * default it is WALL_TIME, but can also be STANDARD_TIME or UTC_TIME.
+   * @serial
+   */
+  private int endTimeMode = WALL_TIME;
+
+  /**
    * This variable points to a deprecated array from JDK 1.1.  It is
    * ignored in JDK 1.2 but streamed out for compatibility with JDK 1.1.
    * The array contains the lengths of the months in the year and is
@@ -219,9 +234,26 @@ public class SimpleTimeZone extends TimeZone
    * @serial
    * @since JDK1.1.4 
    */
-  private int serialVersionOnStream = 1;
+  private int serialVersionOnStream = 2;
 
   private static final long serialVersionUID = -403250971215465050L;
+
+  /**
+   * Constant to indicate that start and end times are specified in standard
+   * time, without adjusting for daylight savings.
+   */
+  public static final int STANDARD_TIME = 1;
+
+  /**
+   * Constant to indicate that start and end times are specified in wall
+   * time, adjusting for daylight savings.  This is the default.
+   */
+  public static final int WALL_TIME = 0;
+
+  /**
+   * Constant to indicate that start and end times are specified in UTC.
+   */
+  public static final int UTC_TIME = 2;
 
   /**
    * Create a <code>SimpleTimeZone</code> with the given time offset
@@ -283,7 +315,10 @@ public class SimpleTimeZone extends TimeZone
    * @param endday A day in month or a day of week number, as 
    * described above.
    * @param endDayOfWeek The end rule day of week; see above.
-   * @param endTime A time in millis in standard time.  */
+   * @param endTime A time in millis in standard time.
+   * @throws IllegalArgumentException if parameters are invalid or out of
+   * range.
+   */
   public SimpleTimeZone(int rawOffset, String id,
 			int startMonth, int startDayOfWeekInMonth,
 			int startDayOfWeek, int startTime,
@@ -310,6 +345,7 @@ public class SimpleTimeZone extends TimeZone
    *
    * @param dstSavings the amount of savings for daylight savings
    * time in milliseconds.  This must be positive.
+   * @since 1.2
    */
   public SimpleTimeZone(int rawOffset, String id,
 			int startMonth, int startDayOfWeekInMonth,
@@ -320,6 +356,51 @@ public class SimpleTimeZone extends TimeZone
     this(rawOffset, id,
 	 startMonth, startDayOfWeekInMonth, startDayOfWeek, startTime,
 	 endMonth, endDayOfWeekInMonth, endDayOfWeek, endTime);
+
+    this.dstSavings = dstSavings;
+  }
+
+  /**
+   * This constructs a new SimpleTimeZone that supports a daylight savings
+   * rule.  The parameter are the same as for the constructor above, except
+   * there are the additional startTimeMode, endTimeMode, and dstSavings
+   * parameters.
+   *
+   * @param startTimeMode the mode that start times are specified in.  One of
+   * WALL_TIME, STANDARD_TIME, or UTC_TIME.
+   * @param endTimeMode the mode that end times are specified in.  One of
+   * WALL_TIME, STANDARD_TIME, or UTC_TIME.
+   * @param dstSavings the amount of savings for daylight savings
+   * time in milliseconds.  This must be positive.
+   * @throws IllegalArgumentException if parameters are invalid or out of
+   * range.
+   * @since 1.4
+   */
+  public SimpleTimeZone(int rawOffset, String id,
+			int startMonth, int startDayOfWeekInMonth,
+			int startDayOfWeek, int startTime, int startTimeMode,
+			int endMonth, int endDayOfWeekInMonth,
+			int endDayOfWeek, int endTime, int endTimeMode,
+			int dstSavings)
+  {
+    this.rawOffset = rawOffset;
+    setID(id);
+    useDaylight = true;
+
+    if (startTimeMode < WALL_TIME || startTimeMode > UTC_TIME)
+      throw new IllegalArgumentException("startTimeMode must be one of WALL_TIME, STANDARD_TIME, or UTC_TIME");
+    if (endTimeMode < WALL_TIME || endTimeMode > UTC_TIME)
+      throw new IllegalArgumentException("endTimeMode must be one of WALL_TIME, STANDARD_TIME, or UTC_TIME");
+    this.startTimeMode = startTimeMode;
+    this.endTimeMode = endTimeMode;
+
+    setStartRule(startMonth, startDayOfWeekInMonth,
+		 startDayOfWeek, startTime);
+    setEndRule(endMonth, endDayOfWeekInMonth, endDayOfWeek, endTime);
+    if (startMonth == endMonth)
+      throw new IllegalArgumentException
+	("startMonth and endMonth must be different");
+    this.startYear = 0;
 
     this.dstSavings = dstSavings;
   }
@@ -390,16 +471,113 @@ public class SimpleTimeZone extends TimeZone
    * @param dayOfWeek The day of week where daylight savings start.
    * @param time The time in milliseconds standard time where daylight
    * savings start.
-   * @see SimpleTimeZone */
+   * @see SimpleTimeZone
+   */
   public void setStartRule(int month, int day, int dayOfWeek, int time)
   {
     this.startMode = checkRule(month, day, dayOfWeek);
     this.startMonth = month;
-    // FIXME: XXX: JDK 1.2 allows negative values and has 2 new variations
-    // of this method.
-    this.startDay = Math.abs(day);
+    this.startDay = day;
     this.startDayOfWeek = Math.abs(dayOfWeek);
+    if (this.startTimeMode == WALL_TIME || this.startTimeMode == STANDARD_TIME)
+      this.startTime = time;
+    else
+      // Convert from UTC to STANDARD
+      this.startTime = time + this.rawOffset;
+    useDaylight = true;
+  }
+
+  /**
+   * Sets the daylight savings start rule.  You must also set the
+   * end rule with <code>setEndRule</code> or the result of
+   * getOffset is undefined.  For the parameters see the ten-argument
+   * constructor above.
+   *
+   * Note that this API isn't incredibly well specified.  It appears that the
+   * after flag must override the parameters, since normally, the day and
+   * dayofweek can select this.  I.e., if day < 0 and dayOfWeek < 0, on or
+   * before mode is chosen.  But if after == true, this implementation
+   * overrides the signs of the other arguments.  And if dayOfWeek == 0, it
+   * falls back to the behavior in the other APIs.  I guess this should be
+   * checked against Sun's implementation.
+   *
+   * @param month The month where daylight savings start, zero
+   * based.  You should use the constants in Calendar.
+   * @param day A day of month or day of week in month.
+   * @param dayOfWeek The day of week where daylight savings start.
+   * @param time The time in milliseconds standard time where daylight
+   * savings start.
+   * @param after If true, day and dayOfWeek specify first day of week on or
+   * after day, else first day of week on or before.
+   * @since 1.2
+   * @see SimpleTimeZone
+   */
+  public void setStartRule(int month, int day, int dayOfWeek, int time, boolean after)
+  {
+    // FIXME: XXX: Validate that checkRule and offset processing work with on
+    // or before mode.
+    this.startDay = after ? Math.abs(day) : -Math.abs(day);
+    this.startDayOfWeek = after ? Math.abs(dayOfWeek) : -Math.abs(dayOfWeek);
+    this.startMode = (dayOfWeek != 0) ? (after ? DOW_GE_DOM_MODE : DOW_LE_DOM_MODE)
+      : checkRule(month, day, dayOfWeek);
+    this.startDay = Math.abs(this.startDay);
+    this.startDayOfWeek = Math.abs(this.startDayOfWeek);
+
+    this.startMonth = month;
+
+    if (this.startTimeMode == WALL_TIME || this.startTimeMode == STANDARD_TIME)
     this.startTime = time;
+    else
+      // Convert from UTC to STANDARD
+      this.startTime = time + this.rawOffset;
+    useDaylight = true;
+  }
+
+  /**
+   * Sets the daylight savings start rule.  You must also set the
+   * end rule with <code>setEndRule</code> or the result of
+   * getOffset is undefined.  For the parameters see the ten-argument
+   * constructor above.
+   *
+   * @param month The month where daylight savings start, zero
+   * based.  You should use the constants in Calendar.
+   * @param day A day of month or day of week in month.
+   * @param time The time in milliseconds standard time where daylight
+   * savings start.
+   * @see SimpleTimeZone
+   * @since 1.2
+   */
+  public void setStartRule(int month, int day, int time)
+  {
+    setStartRule(month, day, 0, time);
+  }
+
+  /**
+   * Sets the daylight savings end rule.  You must also set the
+   * start rule with <code>setStartRule</code> or the result of
+   * getOffset is undefined. For the parameters see the ten-argument
+   * constructor above.
+   *
+   * @param month The end month of daylight savings.
+   * @param day A day in month, or a day of week in month.
+   * @param dayOfWeek A day of week, when daylight savings ends.
+   * @param time A time in millis in standard time.
+   * @see #setStartRule
+   */
+  public void setEndRule(int month, int day, int dayOfWeek, int time)
+  {
+    this.endMode = checkRule(month, day, dayOfWeek);
+    this.endMonth = month;
+    this.endDay = day;
+    this.endDayOfWeek = Math.abs(dayOfWeek);
+    if (this.endTimeMode == WALL_TIME)
+    this.endTime = time;
+    else if (this.endTimeMode == STANDARD_TIME)
+      // Convert from STANDARD to DST
+      this.endTime = time + this.dstSavings;
+    else
+      // Convert from UTC to DST
+      this.endTime = time + this.rawOffset + this.dstSavings;
     useDaylight = true;
   }
 
@@ -409,23 +587,62 @@ public class SimpleTimeZone extends TimeZone
    * getOffset is undefined. For the parameters see the ten-argument
    * constructor above.
    *
-   * @param rawOffset The time offset from GMT.
-   * @param id  The identifier of this time zone.
-   * @param Month The end month of daylight savings.
+   * Note that this API isn't incredibly well specified.  It appears that the
+   * after flag must override the parameters, since normally, the day and
+   * dayofweek can select this.  I.e., if day < 0 and dayOfWeek < 0, on or
+   * before mode is chosen.  But if after == true, this implementation
+   * overrides the signs of the other arguments.  And if dayOfWeek == 0, it
+   * falls back to the behavior in the other APIs.  I guess this should be
+   * checked against Sun's implementation.
+   *
+   * @param month The end month of daylight savings.
    * @param day A day in month, or a day of week in month.
-   * @param DayOfWeek A day of week, when daylight savings ends.
-   * @param Time A time in millis in standard time.
-   * @see #setStartRule */
-  public void setEndRule(int month, int day, int dayOfWeek, int time)
+   * @param dayOfWeek A day of week, when daylight savings ends.
+   * @param time A time in millis in standard time.
+   * @param after If true, day and dayOfWeek specify first day of week on or
+   * after day, else first day of week on or before.
+   * @since 1.2
+   * @see #setStartRule
+   */
+  public void setEndRule(int month, int day, int dayOfWeek, int time, boolean after)
   {
-    this.endMode = checkRule(month, day, dayOfWeek);
+    // FIXME: XXX: Validate that checkRule and offset processing work with on
+    // or before mode.
+    this.endDay = after ? Math.abs(day) : -Math.abs(day);
+    this.endDayOfWeek = after ? Math.abs(dayOfWeek) : -Math.abs(dayOfWeek);
+    this.endMode = (dayOfWeek != 0) ? (after ? DOW_GE_DOM_MODE : DOW_LE_DOM_MODE)
+      : checkRule(month, day, dayOfWeek);
+    this.endDay = Math.abs(this.endDay);
+    this.endDayOfWeek = Math.abs(endDayOfWeek);
+
     this.endMonth = month;
-    // FIXME: XXX: JDK 1.2 allows negative values and has 2 new variations
-    // of this method.
-    this.endDay = Math.abs(day);
-    this.endDayOfWeek = Math.abs(dayOfWeek);
-    this.endTime = time;
+
+    if (this.endTimeMode == WALL_TIME)
+      this.endTime = time;
+    else if (this.endTimeMode == STANDARD_TIME)
+      // Convert from STANDARD to DST
+      this.endTime = time + this.dstSavings;
+    else
+      // Convert from UTC to DST
+      this.endTime = time + this.rawOffset + this.dstSavings;
     useDaylight = true;
+  }
+
+  /**
+   * Sets the daylight savings end rule.  You must also set the
+   * start rule with <code>setStartRule</code> or the result of
+   * getOffset is undefined. For the parameters see the ten-argument
+   * constructor above.
+   *
+   * @param month The end month of daylight savings.
+   * @param day A day in month, or a day of week in month.
+   * @param dayOfWeek A day of week, when daylight savings ends.
+   * @param time A time in millis in standard time.
+   * @see #setStartRule
+   */
+  public void setEndRule(int month, int day, int time)
+  {
+    setEndRule(month, day, 0, time);
   }
 
   /**
@@ -439,21 +656,33 @@ public class SimpleTimeZone extends TimeZone
    * <code>offset = cal.get(Calendar.ZONE_OFFSET)
    * + cal.get(Calendar.DST_OFFSET);</code>
    *
-   * You could also use in
-   *
    * This version doesn't suffer this inaccuracy.
+   *
+   * The arguments don't follow the approach for setting start and end rules.
+   * The day must be a positive number and dayOfWeek must be a positive value
+   * from Calendar.  dayOfWeek is redundant, but must match the other values
+   * or an inaccurate result may be returned.
    *
    * @param era the era of the given date
    * @param year the year of the given date
    * @param month the month of the given date, 0 for January.
    * @param day the day of month
-   * @param dayOfWeek the day of week; this must be matching the
-   * other fields.
+   * @param dayOfWeek the day of week; this must match the other fields.
    * @param millis the millis in the day (in local standard time)
-   * @return the time zone offset in milliseconds.  */
+   * @return the time zone offset in milliseconds.
+   * @throws IllegalArgumentException if arguments are incorrect.
+   */
   public int getOffset(int era, int year, int month,
 		       int day, int dayOfWeek, int millis)
   {
+    int daysInMonth = getDaysInMonth(month, year);
+    if (day < 1 || day > daysInMonth)
+      throw new IllegalArgumentException("day out of range");
+    if (dayOfWeek < Calendar.SUNDAY || dayOfWeek > Calendar.SATURDAY)
+      throw new IllegalArgumentException("dayOfWeek out of range");
+    if (month < Calendar.JANUARY || month > Calendar.DECEMBER)
+      throw new IllegalArgumentException("month out of range");
+
     // This method is called by Calendar, so we mustn't use that class.
     int daylightSavings = 0;
     if (useDaylight && era == GregorianCalendar.AD && year >= startYear)
@@ -487,7 +716,8 @@ public class SimpleTimeZone extends TimeZone
   /**
    * Returns the time zone offset to GMT in milliseconds, ignoring
    * day light savings.
-   * @return the time zone offset.  */
+   * @return the time zone offset.
+   */
   public int getRawOffset()
   {
     return rawOffset;
@@ -507,11 +737,28 @@ public class SimpleTimeZone extends TimeZone
    * milliseconds with respect to standard time.  Typically this
    * is one hour, but for some time zones this may be half an our.
    * @return the daylight savings offset in milliseconds.
-   * @since JDK1.1.4?
+   * 
+   * @since 1.2
    */
   public int getDSTSavings()
   {
     return dstSavings;
+  }
+
+  /**
+   * Sets the daylight savings offset.  This is a positive offset in
+   * milliseconds with respect to standard time.
+   *
+   * @param dstSavings the daylight savings offset in milliseconds.
+   *
+   * @since 1.2
+   */
+  public void setDSTSavings(int dstSavings)
+  {
+    if (dstSavings <= 0)
+      throw new IllegalArgumentException("illegal value for dstSavings");
+    
+    this.dstSavings = dstSavings;
   }
 
   /**
@@ -546,7 +793,7 @@ public class SimpleTimeZone extends TimeZone
   /**
    * Checks if the date given in calXXXX, is before the change between
    * dst and standard time.
-   * @param calYear the year of the date to check (for leap day cheking).
+   * @param calYear the year of the date to check (for leap day checking).
    * @param calMonth the month of the date to check.
    * @param calDay the day of month of the date to check.
    * @param calDayOfWeek the day of week of the date to check.
@@ -631,7 +878,7 @@ public class SimpleTimeZone extends TimeZone
       case DOW_LE_DOM_MODE:
 	// The greatest sunday before or equal December, 12
 	// is the same as smallest sunday after or equal December, 6.
-	day -= 6;
+	day = Math.abs(day) - 6;
 
       case DOW_GE_DOM_MODE:
 
@@ -692,10 +939,12 @@ public class SimpleTimeZone extends TimeZone
 	    && startDay == zone.startDay
 	    && startDayOfWeek == zone.startDayOfWeek
 	    && startTime == zone.startTime
+	    && startTimeMode == zone.startTimeMode
 	    && endMonth == zone.endMonth
 	    && endDay == zone.endDay
 	    && endDayOfWeek == zone.endDayOfWeek
-	    && endTime == zone.endTime);
+	    && endTime == zone.endTime
+	    && endTimeMode == zone.endTimeMode);
   }
 
   /**
@@ -723,9 +972,12 @@ public class SimpleTimeZone extends TimeZone
 	    && startDay == zone.startDay
 	    && startDayOfWeek == zone.startDayOfWeek
 	    && startTime == zone.startTime
+	    && startTimeMode == zone.startTimeMode
 	    && endMonth == zone.endMonth
 	    && endDay == zone.endDay
-	    && endDayOfWeek == zone.endDayOfWeek && endTime == zone.endTime);
+	    && endDayOfWeek == zone.endDayOfWeek
+	    && endTime == zone.endTime
+	    && endTimeMode == zone.endTimeMode);
   }
 
   /**
@@ -748,11 +1000,14 @@ public class SimpleTimeZone extends TimeZone
 	 + ",startDay=" + startDay
 	 + ",startDayOfWeek=" + startDayOfWeek
 	 + ",startTime=" + startTime
+	 + ",startTimeMode=" + startTimeMode
 	 + ",endMode=" + endMode
 	 + ",endMonth=" + endMonth
 	 + ",endDay=" + endDay
 	 + ",endDayOfWeek=" + endDayOfWeek
-	 + ",endTime=" + endTime : "") + "]";
+	 + ",endTime=" + endTime
+	 + ",endTimeMode=" + endTimeMode
+	 : "") + "]";
   }
 
   /**
@@ -769,8 +1024,9 @@ public class SimpleTimeZone extends TimeZone
 	dstSavings = 60 * 60 * 1000;
 	endMode = DOW_IN_MONTH_MODE;
 	startMode = DOW_IN_MONTH_MODE;
-	serialVersionOnStream = 1;
-      }
+	startTimeMode = WALL_TIME;
+	endTimeMode = WALL_TIME;
+	serialVersionOnStream = 2;      }
     else
       {
 	int length = input.readInt();

@@ -1,5 +1,5 @@
-/* java.util.zip.Deflater
-   Copyright (C) 2001 Free Software Foundation, Inc.
+/* Deflater.java - Compress a data stream
+   Copyright (C) 1999, 2000, 2001, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -46,7 +46,7 @@ package java.util.zip;
  * to the split of deflate and setInput.
  *
  * @author Jochen Hoenicke
- * @date Jan 5, 2000 
+ * @author Tom Tromey
  */
 public class Deflater
 {
@@ -145,9 +145,6 @@ public class Deflater
 
   /** should we include a header. */
   private boolean noHeader;
-
-  /** Compression strategy. */
-  private int strategy;
 
   /** The current state. */
   private int state;

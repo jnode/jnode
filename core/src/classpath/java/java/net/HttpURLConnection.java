@@ -1,7 +1,6 @@
-// HttpURLConnection.java - Subclass of communications links using
-//			Hypertext Transfer Protocol.
-
-/* Copyright (C) 1998, 1999, 2000, 2002 Free Software Foundation
+/* HttpURLConnection.java - Subclass of communications links using
+                            Hypertext Transfer Protocol.
+   Copyright (C) 1998, 1999, 2000, 2002, 2003  Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -39,8 +38,11 @@ exception statement from your version. */
 
 package java.net;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.security.Permission;
+
 
 /*
  * Written using on-line Java Platform 1.2 API Specification, as well
@@ -114,7 +116,6 @@ public abstract class HttpURLConnection extends URLConnection
    */
   public static final int HTTP_PARTIAL		= 206;
 
-
   /* HTTP Redirection Response Codes */
 
   /**
@@ -147,7 +148,6 @@ public abstract class HttpURLConnection extends URLConnection
    * The requested resource needs to be accessed through a proxy.
    */
   public static final int HTTP_USE_PROXY = 305;
-  
   
   /* HTTP Client Error Response Codes */
 
@@ -237,11 +237,12 @@ public abstract class HttpURLConnection extends URLConnection
    */
   public static final int HTTP_UNSUPPORTED_TYPE = 415;
 
-
   /* HTTP Server Error Response Codes */
 
   /**
    * This error code indicates that some sort of server error occurred.
+   *
+   * @deprecated
    */
   public static final int HTTP_SERVER_ERROR    = 500;
 
@@ -290,8 +291,8 @@ public abstract class HttpURLConnection extends URLConnection
   /**
    * This is a list of valid request methods, separated by "|" characters.
    */
-  private static String valid_methods
-      = "|GET|POST|HEAD|OPTIONS|PUT|DELETE|TRACE|";
+  private static String valid_methods =
+    "|GET|POST|HEAD|OPTIONS|PUT|DELETE|TRACE|";
 
   // Instance Variables
 
@@ -308,7 +309,7 @@ public abstract class HttpURLConnection extends URLConnection
   /**
    * The response message string received from the server.
    */
-  protected String responseMessage = null;
+  protected String responseMessage;
 
   /**
    * If this instance should follow redirect requests.
@@ -316,11 +317,11 @@ public abstract class HttpURLConnection extends URLConnection
   protected boolean instanceFollowRedirects = followRedirects;
 
   /**
-   * Whether we alreadt got a valid response code for this connection.
-   * Used by <code>getResponceCode()</code> and
+   * Whether we already got a valid response code for this connection.
+   * Used by <code>getResponseCode()</code> and
    * <code>getResponseMessage()</code>.
    */
-  private boolean gotResponseVals = false;
+  private boolean gotResponseVals;
 
   /**
    * Create an HttpURLConnection for the specified URL
@@ -379,16 +380,20 @@ public abstract class HttpURLConnection extends URLConnection
   /**
    * Returns the value of this HttpURLConnection's instanceFollowRedirects
    * field
+   * 
+   * @return true if following redirects is enabled, false otherwise
    */
-  public boolean getInstanceFollowRedirects ()
+  public boolean getInstanceFollowRedirects()
   {
     return instanceFollowRedirects;
   }
 
   /**
    * Sets the value of this HttpURLConnection's instanceFollowRedirects field
+   *
+   * @param follow true to enable following redirects, false otherwise
    */
-  public void setInstanceFollowRedirects (boolean follow)
+  public void setInstanceFollowRedirects(boolean follow)
   {
     instanceFollowRedirects = follow;
   }
@@ -396,6 +401,8 @@ public abstract class HttpURLConnection extends URLConnection
   /**
    * Set the method for the URL request, one of:
    * GET POST HEAD OPTIONS PUT DELETE TRACE are legal
+   *
+   * @param method the method to use
    *
    * @exception ProtocolException If the method cannot be reset or if the
    * requested method isn't valid for HTTP
@@ -410,7 +417,6 @@ public abstract class HttpURLConnection extends URLConnection
       this.method = method;
     else
       throw new ProtocolException("Invalid HTTP request method: " + method);
-
   }
 
   /**
@@ -435,7 +441,7 @@ public abstract class HttpURLConnection extends URLConnection
    */
   public int getResponseCode() throws IOException
   {
-    if (!gotResponseVals)
+    if (! gotResponseVals)
       getResponseVals();
     return responseCode;
   }
@@ -451,7 +457,7 @@ public abstract class HttpURLConnection extends URLConnection
    */
   public String getResponseMessage() throws IOException
   {
-    if (!gotResponseVals)
+    if (! gotResponseVals)
       getResponseVals();
     return responseMessage;
   }
@@ -460,7 +466,7 @@ public abstract class HttpURLConnection extends URLConnection
   {
     // getHeaderField() will connect for us, but do it here first in
     // order to pick up IOExceptions.
-    if (!connected)
+    if (! connected)
       connect();
       
     gotResponseVals = true;
@@ -479,7 +485,8 @@ public abstract class HttpURLConnection extends URLConnection
 	    return;
 	  }
 
-	int firstSpc, nextSpc;
+	int firstSpc;
+	int nextSpc;
 	firstSpc = respField.indexOf(' ');
 	nextSpc = respField.indexOf(' ', firstSpc + 1);
 	responseMessage = respField.substring(nextSpc + 1);
@@ -500,6 +507,8 @@ public abstract class HttpURLConnection extends URLConnection
   /**
    * Returns a permission object representing the permission necessary to make
    * the connection represented by this object
+   *
+   * @return the permission necessary for this connection
    *
    * @exception IOException If an error occurs
    */
@@ -525,26 +534,26 @@ public abstract class HttpURLConnection extends URLConnection
    *
    * @return An <code>InputStream</code> for reading error data.
    */
-  public InputStream getErrorStream ()
+  public InputStream getErrorStream()
   {
-    if (!connected)
-      return(null);
+    if (! connected)
+      return (null);
     
     int code;
     try 
       {
 	code = getResponseCode();
       }
-    catch(IOException e)
+    catch (IOException e)
       {
 	code = -1;
       }
     
     if (code == -1)
-      return(null);
+      return (null);
     
-    if (((code/100) != 4) || ((code/100) != 5))
-      return(null); 
+    if (((code / 100) != 4) || ((code / 100) != 5))
+      return (null);
     
     try
       {
@@ -552,25 +561,29 @@ public abstract class HttpURLConnection extends URLConnection
 	
 	int i = pbis.read();
 	if (i == -1)
-	  return(null);
+	  return (null);
 	
 	pbis.unread(i);
-	return(pbis);
+	return (pbis);
       }
-    catch(IOException e)
+    catch (IOException e)
       {
-	return(null);
+	return (null);
       }
   }
 
   /**
    * Returns the value of the named field parsed as date
+   *
+   * @param key the key of the header field
+   * @param value the default value if the header field is not present
+   *
+   * @return the value of the header field
    */
-  public long getHeaderFieldDate (String key, long value)
+  public long getHeaderFieldDate(String key, long value)
   {
     // FIXME: implement this correctly
     // http://www.w3.org/Protocols/HTTP-NG/ng-notes.txt
-    
-    return super.getHeaderFieldDate (key, value);
+    return super.getHeaderFieldDate(key, value);
   }
 }

@@ -115,7 +115,6 @@ class DeflaterHuffman
     }
 
     public void buildCodes() {
-      int numSymbols = freqs.length;
       int[] nextCode = new int[maxLength];
       int code = 0;
       codes = new short[freqs.length];

@@ -1,5 +1,5 @@
 /* AbstractInterruptibleChannel.java -- 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -42,6 +42,7 @@ import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.Channel;
 import java.nio.channels.InterruptibleChannel;
 
+
 /**
  * @author Michael Koch
  * @since 1.4
@@ -49,19 +50,19 @@ import java.nio.channels.InterruptibleChannel;
 public abstract class AbstractInterruptibleChannel
   implements Channel, InterruptibleChannel
 {
-  boolean opened = true;
+  private boolean closed;
 
   /**
    * Initializes the channel.
    */
-  protected AbstractInterruptibleChannel ()
+  protected AbstractInterruptibleChannel()
   {
   }
 
   /**
    * Marks the beginning of an I/O operation that might block indefinitely.
    */
-  protected final void begin ()
+  protected final void begin()
   {
   }
     
@@ -70,23 +71,33 @@ public abstract class AbstractInterruptibleChannel
    * 
    * @exception IOException If an error occurs
    */
-  public final void close () throws IOException
+  public final void close() throws IOException
   {
-    opened = false;
-    implCloseChannel ();
+    if (! closed)
+  {
+	closed = true;
+	implCloseChannel();
+      }
   }
 
   /**
    * Marks the end of an I/O operation that might block indefinitely.
    * 
+   * @param completed true if the task completed successfully,
+   * false otherwise
+   *
+   * @exception IOException if an error occurs
    * @exception AsynchronousCloseException If the channel was asynchronously
    * closed.
    * @exception ClosedByInterruptException If the thread blocked in the
    * I/O operation was interrupted.
    */
-  protected final void end (boolean completed)
+  protected final void end(boolean completed)
     throws AsynchronousCloseException
   {
+    // FIXME: check more here.
+    
+    if (closed) throw new AsynchronousCloseException();
   }   
 
   /**
@@ -94,13 +105,15 @@ public abstract class AbstractInterruptibleChannel
    * 
    * @exception IOException If an error occurs
    */
-  protected abstract void implCloseChannel () throws IOException;
+  protected abstract void implCloseChannel() throws IOException;
 
   /**
    * Tells whether or not this channel is open.
+   * 
+   * @return true if the channel is open, false otherwise 
    */
-  public final boolean isOpen ()
+  public final boolean isOpen()
   {
-    return opened;
+    return ! closed;
   }
 }
