@@ -74,7 +74,7 @@ public class ThreadCommand {
 			if (t != null) {
 				if ((threadName == null) || threadName.equals(t.getName())) {
 					out.print("\t");
-					out.println(t.getName() + ", " + t.getPriority() + ", " + t.getVmThread().getThreadStateName());
+					out.println("" + t.getId() + ", " + t.getName() + ", " + t.getPriority() + ", " + t.getVmThread().getThreadStateName());
 					if (threadName != null) {
 						final Object[] trace = VmSystem.getStackTrace(t.getVmThread());
 						final int traceLen = trace.length;
