@@ -10,10 +10,13 @@ import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.List;
+import java.awt.Panel;
 import java.awt.Scrollbar;
 import java.awt.Shape;
+import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Ellipse2D;
@@ -230,8 +233,15 @@ public class AWTTest {
             
             wnd.add(cb1, BorderLayout.EAST);
             cb1.setBackground(Color.WHITE);
+                    
+            final TextField tf = new TextField();
+            tf.setText("Let's type here");
+            wnd.add(tf, BorderLayout.SOUTH);
             
-            wnd.add(sb, BorderLayout.SOUTH);
+            System.out.println(wnd.getFont().getName());
+            System.out.println(wnd.getFont().getClass().getName());
+            System.out.println(wnd.getFontMetrics(wnd.getFont()).getClass().getName());
+            
             wnd.show();
 
             while (wnd.isVisible()) {

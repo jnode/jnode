@@ -96,11 +96,17 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      * @return The font metrics for the given font
      */
     public FontMetrics getFontMetrics(Font font) {
-        final FontProvider prv = getProvider(font);
+        FontProvider prv = getProvider(font);
+        Font txFont = font;
+        if (prv == null) {
+        	txFont = getTranslatedFont(font);
+            prv = getProvider(txFont);
+        }
         if (prv != null) {
-            return prv.getFontMetrics(font);
+            return prv.getFontMetrics(txFont);
         } else {
-            return new EmptyFontMetrics(font);
+        	log.error("No provider found for font " + txFont);
+            return new EmptyFontMetrics(txFont);
         }
     }
 
@@ -116,14 +122,17 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      */
     public void drawText(Graphics2D g, String text, Font font, int x, int y) {
         FontProvider prv = getProvider(font);
-        Font l_font = font;
+        Font txFont = font;
         if (prv == null) {
-            l_font = new Font("Luxi Sans", Font.PLAIN, 10);
-        	//log.error("No FontProvider for font=" + font + " using " + l_font + " instead.");
-            prv = getProvider(l_font);
+        	txFont = getTranslatedFont(font);
+            prv = getProvider(txFont);
         }
-      	final TextRenderer renderer = prv.getTextRenderer(l_font);
-       	renderer.render(g, text, x, y);
+        if (prv != null) {
+        	final TextRenderer renderer = prv.getTextRenderer(txFont);
+        	renderer.render(g, text, x, y);
+        } else {
+        	log.error("No provider found for font " + txFont);
+        }
     }
 
     /**
@@ -164,6 +173,15 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
             }
         }
         return null;
+    }
+    
+    /**
+     * Translated the font into a font that is provided by a provider.
+     * @param font
+     * @return
+     */
+    private Font getTranslatedFont(Font font) {
+    	return new Font("Luxi Sans", Font.PLAIN, font.getSize());        	
     }
 
     private synchronized void updateFontProviders() {
