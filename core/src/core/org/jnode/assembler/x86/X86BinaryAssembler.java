@@ -37,6 +37,7 @@ import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
+import org.jnode.assembler.x86.X86Register.CRX;
 import org.jnode.assembler.x86.X86Register.XMM;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
@@ -2168,6 +2169,32 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 					+ operandSize);
 		}
 		write1bOpcodeModRM(opcode, operandSize, dstReg, dstDisp, srcReg.getNr());
+	}
+
+    /**
+	 * Create a mov <dstReg>, <srcReg>
+	 *
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public final void writeMOV(CRX dstReg, GPR srcReg) {
+        testSize(srcReg, mode.getSize());
+        write8(CRX_PREFIX);
+        write8(0x22);
+		writeModRR(srcReg.getNr() & 7, dstReg.getNr() & 7);
+	}
+
+    /**
+	 * Create a mov <dstReg>, <srcReg>
+	 *
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public final void writeMOV(GPR dstReg, CRX srcReg) {
+        testSize(srcReg, mode.getSize());
+        write8(CRX_PREFIX);
+        write8(0x20);
+		writeModRR(dstReg.getNr() & 7, srcReg.getNr() & 7);
 	}
 
 	/**

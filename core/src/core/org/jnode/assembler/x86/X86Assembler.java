@@ -32,6 +32,7 @@ import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
+import org.jnode.assembler.x86.X86Register.CRX;
 import org.jnode.vm.CpuID;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.x86.X86CpuID;
@@ -1215,6 +1216,22 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeLOOP(Label label)
 			throws UnresolvedObjectRefException;
+
+    /**
+	 * Create a mov <dstReg>, <srcReg>
+	 *
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public abstract void writeMOV(GPR dstReg, CRX srcReg);
+
+    /**
+	 * Create a mov <dstReg>, <srcReg>
+	 *
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public abstract void writeMOV(CRX dstReg, GPR srcReg);
 
 	/**
 	 * Create a mov <dstReg>, <srcReg>
