@@ -109,7 +109,7 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter
     keys.setKey(27, key);
 */
     keys.setKey(28, new Key('\n', KeyEvent.VK_ENTER));
-
+    keys.setKey(29, new Key((char) 0, KeyEvent.VK_CONTROL));
     keys.setKey(30, new Key('q', KeyEvent.VK_Q, 'Q', KeyEvent.VK_Q, '@', KeyEvent.VK_AT));
     keys.setKey(31, new Key('s', 'S', 'ß', KeyEvent.VK_S));
     keys.setKey(32, new Key('d', 'D', 'ð', KeyEvent.VK_D));
