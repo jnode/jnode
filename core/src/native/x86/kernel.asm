@@ -121,34 +121,41 @@ start64:
 	PRINT_STR before_start_vm_msg
 
 	; Go into userspace
-	push dword USER_DS	; old SS
-	push Luser_esp		; old ESP
+	mov ABX,Luser_esp
+	mov ACX,go_user_cs
+	mov ASI,USER_DS
+	mov ADI,USER_CS
+	push ASI			; old SS
+	push ABX			; old ESP
 	pushf				; old EFLAGS
-	push dword USER_CS	; old CS
-	push go_user_cs		; old EIP
+	push ADI			; old CS
+	push ACX			; old EIP
 	pushf
-	pop eax
+	pop AAX
 	and eax,~F_NT
-	push eax
+	push AAX
 	popf
 	iret
-;	db 0xea
-;	dd go_user_cs
-;	dw USER_CS
 
 no_multiboot_loader:
     PRINT_STR no_multiboot_loader_msg
     jmp _halt
 
 go_user_cs:
+%ifdef BITS32
 	mov eax,USER_DS
 	mov ss,ax
-	mov esp,Luser_esp
 	mov ds,ax
 	mov es,ax
 	mov gs,ax
 	mov eax,CURPROC_FS
 	mov fs,ax
+%endif	
+	mov ASP,Luser_esp
+%ifdef BITS64
+	; Setup current processor
+	mov r15, vmCurProcessor
+%endif	
 	sti
 
 	; Set tracing on
@@ -163,21 +170,21 @@ go_user_cs:
 	call sys_clrscr
 
 	; Now start the virtual machine
-	xor ebp,ebp ; Clear the frame ptr
-	push ebp    ; previous EBP
-	push ebp    ; MAGIC    (here invalid ON PURPOSE!)
-	push ebp    ; PC           (here invalid ON PURPOSE!)
-	push ebp    ; VmMethod (here invalid ON PURPOSE!)
-	mov ebp,esp
+	xor ABP,ABP	; Clear the frame ptr
+	push ABP    ; previous EBP
+	push ABP    ; MAGIC    (here invalid ON PURPOSE!)
+	push ABP    ; PC           (here invalid ON PURPOSE!)
+	push ABP    ; VmMethod (here invalid ON PURPOSE!)
+	mov ABP,ASP
 
-	mov eax,vm_start
-	add eax,BootImageBuilder_JUMP_MAIN_OFFSET32
-	call eax
+	mov AAX,vm_start
+	add AAX,BootImageBuilder_JUMP_MAIN_OFFSET32
+	call AAX
 
-	mov edx, eax	; Save return code in EDX
-	inc dword [jnodeFinished]
+	mov ADX, AAX	; Save return code in EDX
+	inc WORD [jnodeFinished]
 
-	test edx,edx
+	test ADX,ADX
 	jz _halt
 	
 	; Reset the system

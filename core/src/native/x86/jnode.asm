@@ -103,7 +103,9 @@ CURPROC_FS  equ 0x33
 %include "vm-ints.asm"
 %include "vm-compile.asm"
 %include "vm-jumptable.asm"
+%ifdef BITS32
 %include "ap-boot.asm"
+%endif
 
 		align 4096
 kernel_end:
