@@ -1314,6 +1314,7 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
         frame.setSize(400, 400);
         frame.setLocation(40, 40);
         frame.show();
+        bw.requestFocus();
         //        frame.setVisible(true);
     }
 

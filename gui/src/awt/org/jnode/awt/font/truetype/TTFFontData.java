@@ -57,7 +57,7 @@ public abstract class TTFFontData {
 				}
 			}
 		}
-		System.err.println("Table '" + name + "' ignored.");
+		//System.err.println("Table '" + name + "' ignored.");
 		return null;
 	}
 

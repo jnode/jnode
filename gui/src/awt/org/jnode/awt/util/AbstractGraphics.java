@@ -325,7 +325,8 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @see java.awt.Graphics2D#setBackground(java.awt.Color)
 	 */
 	public void setBackground(Color color) {
-		this.bgColor = color;
+        if(color != null)
+		    this.bgColor = color;
 	}
 
 	/**
@@ -802,7 +803,8 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @see java.awt.Graphics#setColor(java.awt.Color)
 	 */
 	public void setColor(Color color) {
-		this.fgColor = color;
+        if(color != null)
+    		this.fgColor = color;
 	}
 
 	/**
@@ -810,7 +812,8 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @see java.awt.Graphics#setFont(java.awt.Font)
 	 */
 	public void setFont(Font font) {
-		this.font = font;
+        if(font != null)
+		    this.font = font;
 	}
 
 	/**
