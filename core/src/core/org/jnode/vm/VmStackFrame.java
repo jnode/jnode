@@ -4,7 +4,10 @@
 
 package org.jnode.vm;
 
+import org.jnode.vm.classmgr.VmByteCode;
+import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.classmgr.VmType;
 
 /**
  * A VmFrame is the execution frame (locals & stack) for a method during
@@ -28,22 +31,20 @@ public final class VmStackFrame extends VmSystemObject {
 	private final int sfMagic;
 	/** A reference to the return address */
 	private final Address sfReturnAddress;
-
+	/** A reference to instruction pointer of this frame */
+	private final Address sfInstructionPointer;
+	
 	/**
 	 * Initialize this instance.
 	 * @param src
 	 * @param reader
 	 */
-	protected VmStackFrame(Address src, VmStackReader reader) {
+	VmStackFrame(Address src, VmStackReader reader, Address ip) {
 		this.sfMethod = reader.getMethod(src);
 		this.sfPc = reader.getPC(src);
 		this.sfMagic = reader.getMagic(src);
 		this.sfReturnAddress = reader.getReturnAddress(src);
-		/**
-		 * Do no clone previousFrame!
-		 * This is because they are actually addresses and not references
-		 * to objects.
-		 */
+		this.sfInstructionPointer = ip;
 	}
 
 	/**
@@ -81,5 +82,52 @@ public final class VmStackFrame extends VmSystemObject {
 	public final Address getReturnAddress() {
 		return this.sfReturnAddress;
 	}
+	
+	/**
+	 * Gets the line number of the current instruction of this frame.
+	 * @return The line number, or -1 if not found.
+	 */
+	public final int getLineNr() {
+		if (isInterpreted()) {
+			final VmByteCode bc = sfMethod.getBytecode();
+			if (bc != null) {
+				return bc.getLineNr(sfPc - 1);
+			} else {
+				return -1;
+			}
+		} else {
+			final VmCompiledCode cc = sfMethod.getCompiledCode();
+			if ((cc != null) && (sfInstructionPointer != null)) {
+				return cc.getLineNr(sfInstructionPointer);
+			} else {
+				return -1;
+			}
+		}
+	}
 
+	/**
+	 * Convert to a String representation.
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString() {
+		final VmMethod method = sfMethod;
+		final VmType vmClass = (method == null) ? null : method.getDeclaringClass();
+		final String cname = (vmClass == null) ? "<unknown class>" : vmClass.getName();
+		final String mname = (method == null) ? "<unknown method>" : method.getName();
+		final int lineNr = getLineNr();
+		final String linePrefix;
+		final String line;
+		if (isInterpreted()) {
+			linePrefix = "";
+		} else {
+			linePrefix = "*";
+		}
+		if (lineNr < 0) {
+			line = "?";
+		} else {
+			line = String.valueOf(lineNr);
+		}
+
+		return cname + "!" + mname + " (" + linePrefix + line + ")";
+	}
 }
