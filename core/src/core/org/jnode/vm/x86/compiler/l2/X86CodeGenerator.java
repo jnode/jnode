@@ -26,7 +26,8 @@ import org.jnode.vm.compiler.ir.quad.VoidReturnQuad;
 
 /**
  * @author Madhu Siddalingaiah
- * 
+ * @author Levente Sántha
+ *
  */
 public class X86CodeGenerator extends CodeGenerator {
 	private Variable[] spilledVariables;
@@ -100,11 +101,11 @@ public class X86CodeGenerator extends CodeGenerator {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void emitHeader() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**
@@ -407,10 +408,12 @@ public class X86CodeGenerator extends CodeGenerator {
 				os.writeMOV_Const((Register) reg1, iconst2.getValue());
 				os.writeADD((Register)reg1, Register.EBP, disp3);
 				break;
+//addressing mode not suported
 //            case BinaryQuad.IAND:
             case BinaryQuad.IDIV:
             case BinaryQuad.IMUL:
                 throw new IllegalArgumentException("Unknown operation");
+//addressing mode not suported
 //            case BinaryQuad.IOR:
             case BinaryQuad.IREM:
             case BinaryQuad.ISHL:
@@ -418,6 +421,7 @@ public class X86CodeGenerator extends CodeGenerator {
             case BinaryQuad.ISUB:
             case BinaryQuad.IUSHR:
                 throw new IllegalArgumentException("Unknown operation");
+//addressing mode not suported
 //            case BinaryQuad.IXOR:
             case BinaryQuad.DADD:
             case BinaryQuad.DDIV:
@@ -450,7 +454,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateBinaryOP(Object reg1, Object reg2, int operation, Constant c3) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**
@@ -458,7 +462,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateBinaryOP(Object reg1, Object reg2, int operation, Object reg3) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**
@@ -466,7 +470,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateBinaryOP(Object reg1, Object reg2, int operation, int disp3) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**
@@ -474,7 +478,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateBinaryOP(Object reg1, int disp2, int operation, Constant c3) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**
@@ -482,7 +486,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateBinaryOP(Object reg1, int disp2, int operation, Object reg3) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**
@@ -490,7 +494,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateBinaryOP(Object reg1, int disp2, int operation, int disp3) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**
@@ -498,7 +502,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateBinaryOP(int disp1, Constant c2, int operation, Constant c3) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**
@@ -506,7 +510,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateBinaryOP(int disp1, Constant c2, int operation, Object reg3) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**
@@ -514,7 +518,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateBinaryOP(int disp1, Constant c2, int operation, int disp3) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**
@@ -522,7 +526,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateBinaryOP(int disp1, Object reg2, int operation, Constant c3) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**
@@ -530,7 +534,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateBinaryOP(int disp1, Object reg2, int operation, Object reg3) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**
@@ -538,7 +542,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateBinaryOP(int disp1, Object reg2, int operation, int disp3) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**
@@ -546,7 +550,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateBinaryOP(int disp1, int disp2, int operation, Constant c3) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**
@@ -554,7 +558,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateBinaryOP(int disp1, int disp2, int operation, Object reg3) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**
@@ -562,6 +566,6 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateBinaryOP(int disp1, int disp2, int operation, int disp3) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

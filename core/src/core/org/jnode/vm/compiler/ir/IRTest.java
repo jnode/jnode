@@ -26,7 +26,7 @@ import org.jnode.vm.x86.compiler.l2.X86CodeGenerator;
 
 /**
  * @author Madhu Siddalingaiah
- * 
+ * @author Levente Sántha
  */
 public class IRTest {
 	public static void main(String args[]) throws SecurityException, IOException, ClassNotFoundException {
@@ -68,7 +68,7 @@ public class IRTest {
 		BytecodeParser.parse(code, bv);
 
 		// System.out.println(cfg.toString());
-		// System.out.println();		
+		// System.out.println();
 
 		boolean printDeadCode = false;
 		boolean printDetail = false;
