@@ -1035,8 +1035,10 @@ public class SecurityManager
     if (packageName == null)
 	throw new NullPointerException();
 
-    String list = (String)AccessController.doPrivileged(new PrivilegedAction() {
-	public Object run() {
+    String list = (String)AccessController.doPrivileged(new PrivilegedAction()
+      {
+	public Object run()
+        {
 	    return Security.getProperty(restriction);
 	}
     });
@@ -1057,4 +1059,4 @@ public class SecurityManager
                 }
             }
     }
-} // class SecurityManager
+}
