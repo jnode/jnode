@@ -3,8 +3,6 @@
  */
 package org.jnode.driver.net.lance;
 
-import java.io.PrintStream;
-
 import org.apache.log4j.Logger;
 import org.jnode.net.SocketBuffer;
 import org.jnode.system.MemoryResource;
@@ -60,10 +58,10 @@ public class TxDescriptorRing extends DescriptorRing {
 		return null;
 	}*/
 
-	public void dumpData(PrintStream out) {
-		out.println("Transmit Ring Descriptors - 16 bit mode");
+	public void dumpData(Logger out) {
+		out.debug("Transmit Ring Descriptors - Software Style 2");
 		for (int i = 0; i < length; i++) {
-			out.println("Descriptor " + i);
+			out.debug("Descriptor " + i);
 			txDescriptors[i].dumpData(out);
 		}
 	}
