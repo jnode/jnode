@@ -28,22 +28,23 @@ import org.jnode.vm.VmThread;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
+import org.vmmagic.unboxed.Word;
 
 /**
  * Thread implementation for Intel X86 processor.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class VmX86Thread extends VmThread {
+public abstract class VmX86Thread extends VmThread {
 
 	// State when not running
-	volatile int eax;
-	volatile int ebx;
-	volatile int ecx;
-	volatile int edx;
-	volatile int esi;
-	volatile int edi;
-	volatile int eflags;
+	volatile Word eax;
+	volatile Word ebx;
+	volatile Word ecx;
+	volatile Word edx;
+	volatile Word esi;
+	volatile Word edi;
+	volatile Word eflags;
 	volatile Address eip;
 	volatile Address esp;
 	volatile Address ebp;
@@ -57,17 +58,17 @@ public final class VmX86Thread extends VmThread {
 	private volatile int fxFlags;
 	
 	// State upon last system exception
-	volatile int exEax;
-	volatile int exEbx;
-	volatile int exEcx;
-	volatile int exEdx;
-	volatile int exEsi;
-	volatile int exEdi;
-	volatile int exEflags;
-	volatile int exEip;
-	volatile int exEsp;
-	volatile int exEbp;
-	volatile int exCr2;
+	volatile Word exEax;
+	volatile Word exEbx;
+	volatile Word exEcx;
+	volatile Word exEdx;
+	volatile Word exEsi;
+	volatile Word exEdi;
+	volatile Word exEflags;
+	volatile Address exEip;
+	volatile Address exEsp;
+	volatile Address exEbp;
+	volatile Word exCr2;
 	
 	/**
 	 * Initialize this instance 
@@ -115,14 +116,14 @@ public final class VmX86Thread extends VmThread {
      * Gets the stackframe of the last system exception of this thread. 
      */
     protected Address getExceptionStackFrame() {
-        return Address.fromIntZeroExtend(exEbp);
+        return exEbp;
     }
 
     /**
      * Gets the instruction pointer of the last system exception of this thread. 
      */
     protected Address getExceptionInstructionPointer() {
-        return Address.fromIntZeroExtend(exEip);
+        return exEip;
     }
 
 	/**
@@ -144,24 +145,12 @@ public final class VmX86Thread extends VmThread {
 	private static Address getStackEnd(byte[] stack, int stackSize) {
 		return VmMagic.getArrayData(stack).add(STACK_OVERFLOW_LIMIT);
 	}
+    
+    /**
+     * Gets the size of an object reference (pointer).
+     */
+    protected abstract int getReferenceSize();
 	
-	/**
-	 * Gets a human readable representation of the system exception state.
-	 * @return String
-	 */
-	public String getReadableErrorState() {
-		return "EAX " +NumberUtils.hex(exEax) +
-			" EBX " +NumberUtils.hex(exEbx) +
-			" ECX " +NumberUtils.hex(exEcx) +
-			" EDX " +NumberUtils.hex(exEdx) +
-			" ESI " +NumberUtils.hex(exEsi) +
-			" EDI " +NumberUtils.hex(exEdi) +
-			" ESP " +NumberUtils.hex(exEsp) +
-			" EIP " +NumberUtils.hex(exEip) +
-			" CR2 " +NumberUtils.hex(exCr2) +
-			" EFLAGS " +NumberUtils.hex(exEflags);
-	}
-
     /**
      * Visit all objects on the stack and register state of this thread.
      * @param visitor
@@ -182,7 +171,7 @@ public final class VmX86Thread extends VmThread {
             }
             
             Address ptr = stackTop;
-            final int slotSize = VmX86Architecture.SLOT_SIZE;
+            final int slotSize = getReferenceSize();
             while (ptr.GE(stackEnd)) {
                 final Address child = ptr.loadAddress();
                 if (child != null) {
@@ -196,37 +185,37 @@ public final class VmX86Thread extends VmThread {
             }
         }
         // Scan registers
-        Address addr = Address.fromIntZeroExtend(eax);
+        Address addr = eax.toAddress();
         if (heapManager.isObject(addr)) {
             if (!visitor.visit(addr)) {
                 return false;
             }
         }
-        addr = Address.fromIntZeroExtend(ebx);
+        addr = ebx.toAddress();
         if (heapManager.isObject(addr)) {
             if (!visitor.visit(addr)) {
                 return false;
             }
         }
-        addr = Address.fromIntZeroExtend(ecx);
+        addr = ecx.toAddress();
         if (heapManager.isObject(addr)) {
             if (!visitor.visit(addr)) {
                 return false;
             }
         }
-        addr = Address.fromIntZeroExtend(edx);
+        addr = edx.toAddress();
         if (heapManager.isObject(addr)) {
             if (!visitor.visit(addr)) {
                 return false;
             }
         }
-        addr = Address.fromIntZeroExtend(esi);
+        addr = esi.toAddress();
         if (heapManager.isObject(addr)) {
             if (!visitor.visit(addr)) {
                 return false;
             }
         }
-        addr = Address.fromIntZeroExtend(edi);
+        addr = edi.toAddress();
         if (heapManager.isObject(addr)) {
             if (!visitor.visit(addr)) {
                 return false;

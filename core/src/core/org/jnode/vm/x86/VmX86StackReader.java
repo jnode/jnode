@@ -46,27 +46,29 @@ import org.vmmagic.unboxed.Offset;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class VmX86StackReader extends VmStackReader {
+public final class VmX86StackReader extends VmStackReader {
 
 	// Locals are before this object.
 	// ...
 	public static final int METHOD_OFFSET = 0;
-	//public static final int PC_OFFSET = 4;
-	public static final int MAGIC_OFFSET = 4;
-	public static final int PREVIOUS_OFFSET = 8;
-	//public static final int ESI_OFFSET = 16;
-	//public static final int EDI_OFFSET = 20;
-	//public static final int EBX_OFFSET = 20;
-	public static final int RETURNADDRESS_OFFSET = 12;
+	public static final int MAGIC_OFFSET = 1;
+	public static final int PREVIOUS_OFFSET = 2;
+	public static final int RETURNADDRESS_OFFSET = 3;
 	// Stack follows here
 	// ...
 
+    private final int slotSize;
+    
+    public VmX86StackReader(int slotSize) {
+        this.slotSize = slotSize;
+    }
+    
 	/**
 	 * @param sf
 	 * @return The offset of he magic in the given stackframe
 	 */
 	protected Offset getMagicOffset(Address sf) {
-		return Offset.fromIntSignExtend(MAGIC_OFFSET);
+		return Offset.fromIntSignExtend(MAGIC_OFFSET * slotSize);
 	}
 
 	/**
@@ -74,7 +76,7 @@ public class VmX86StackReader extends VmStackReader {
 	 * @return int
 	 */
 	protected Offset getMethodOffset(Address sf) {
-		return Offset.fromIntSignExtend(METHOD_OFFSET);
+		return Offset.fromIntSignExtend(METHOD_OFFSET * slotSize);
 	}
 
 	/**
@@ -90,7 +92,7 @@ public class VmX86StackReader extends VmStackReader {
 	 * @return int
 	 */
 	protected Offset getPreviousOffset(Address sf) {
-		return Offset.fromIntSignExtend(PREVIOUS_OFFSET);
+		return Offset.fromIntSignExtend(PREVIOUS_OFFSET * slotSize);
 	}
 
 	/**
@@ -98,7 +100,7 @@ public class VmX86StackReader extends VmStackReader {
 	 * @return int
 	 */
 	protected Offset getReturnAddressOffset(Address sf) {
-		return Offset.fromIntSignExtend(RETURNADDRESS_OFFSET);
+		return Offset.fromIntSignExtend(RETURNADDRESS_OFFSET * slotSize);
 	}
 
 }

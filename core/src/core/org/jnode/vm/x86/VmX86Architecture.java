@@ -46,10 +46,7 @@ import org.jnode.vm.x86.compiler.stub.X86StubCompiler;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class VmX86Architecture extends VmArchitecture {
-
-	/** Size of an object reference */
-	public static final int SLOT_SIZE = 4;
+public abstract class VmX86Architecture extends VmArchitecture {
 
 	/** The compilers */
 	private final NativeCodeCompiler[] compilers;
@@ -67,7 +64,7 @@ public final class VmX86Architecture extends VmArchitecture {
 	private MPConfigTable mpConfigTable;
 
 	/** The stackreader of this architecture */
-	private final VmX86StackReader stackReader = new VmX86StackReader();
+	private final VmX86StackReader stackReader;
 
 	/**
 	 * Initialize this instance using the default compiler.
@@ -81,22 +78,14 @@ public final class VmX86Architecture extends VmArchitecture {
 	 * @param compiler L1a to use L1A compiler, L1 compiler otherwise.
 	 */
 	public VmX86Architecture(String compiler) {
-		imtCompiler = new X86IMTCompiler();
-		compilers = new NativeCodeCompiler[2];
-		compilers[0] = new X86StubCompiler();
-		compilers[1] = new X86Level1ACompiler();
-		testCompilers = null;
+        this.stackReader = new VmX86StackReader(getReferenceSize());
+		this.imtCompiler = new X86IMTCompiler();
+		this.compilers = new NativeCodeCompiler[2];
+		this.compilers[0] = new X86StubCompiler();
+		this.compilers[1] = new X86Level1ACompiler(getReferenceSize());
+		this.testCompilers = null;
 	}
 	
-	/**
-	 * Create a processor instance for this architecture.
-	 * 
-	 * @return The processor
-	 */
-	public VmProcessor createProcessor(int id, VmStatics statics) {
-		return new VmX86Processor(id, this, statics, null);
-	}
-
 	/**
 	 * Gets the byte ordering of this architecture.
 	 * 
@@ -128,30 +117,12 @@ public final class VmX86Architecture extends VmArchitecture {
 
 	/**
 	 * Gets the compiler of IMT's.
-	 * @return
+	 * @return The IMT compiler
 	 */
 	public final IMTCompiler getIMTCompiler() {
 		return imtCompiler;
 	}
 	
-	/**
-	 * Gets the name of this architecture.
-	 * 
-	 * @return name
-	 */
-	public final String getName() {
-		return "x86";
-	}
-
-	/**
-	 * Gets the size in bytes of an object reference.
-	 * 
-	 * @return Size of reference, always 4 here
-	 */
-	public final int getReferenceSize() {
-		return SLOT_SIZE;
-	}
-
 	/**
 	 * Gets the stackreader for this architecture.
 	 * 
@@ -257,7 +228,15 @@ public final class VmX86Architecture extends VmArchitecture {
 		}
 	}
 
-	/**
+
+    /**
+     * Create a processor instance for this architecture.
+     * 
+     * @return The processor
+     */
+    public abstract VmProcessor createProcessor(int id, VmStatics statics);
+
+    /**
 	 * Initialize a processor wrt. APIC and add it to the list of processors.
 	 * 
 	 * @param cpu

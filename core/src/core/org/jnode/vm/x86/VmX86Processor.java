@@ -44,7 +44,7 @@ import org.vmmagic.unboxed.ObjectReference;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class VmX86Processor extends VmProcessor {
+public abstract class VmX86Processor extends VmProcessor {
 
 	/** The IRQ counters */
 	private final int[] irqCount = new int[16];
@@ -109,25 +109,6 @@ public final class VmX86Processor extends VmProcessor {
 	 */
 	protected final int[] getIrqCounters() {
 		return irqCount;
-	}
-
-	/**
-	 * Create a new thread
-	 * 
-	 * @return The new thread
-	 */
-	protected VmThread createThread() {
-		return new VmX86Thread();
-	}
-
-	/**
-	 * Create a new thread
-	 * 
-	 * @param javaThread
-	 * @return The new thread
-	 */
-	public VmThread createThread(Thread javaThread) {
-		return new VmX86Thread(javaThread);
 	}
 
 	/**
@@ -215,7 +196,15 @@ public final class VmX86Processor extends VmProcessor {
 		// TimeUtils.loop(5000);
 	}
 
-	/**
+    /**
+     * Create a new thread
+     * 
+     * @param stack
+     * @return The new thread
+     */
+    protected abstract VmX86Thread createThread(byte[] stack);
+
+    /**
 	 * Setup the required CPU structures. GDT, TSS, kernel stack, user stack,
 	 * initial thread.
 	 */
@@ -235,7 +224,7 @@ public final class VmX86Processor extends VmProcessor {
 		// Create user stack
 		final byte[] userStack = new byte[VmThread.DEFAULT_STACK_SIZE];
 		tss.setUserStack(userStack);
-		this.currentThread = new VmX86Thread(userStack);
+		this.currentThread = createThread(userStack);
 
 		// gdt.dump(System.out);
 
