@@ -5,6 +5,7 @@ package org.jnode.net.ipv4.dhcp;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.InetAddress;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
@@ -27,7 +28,8 @@ public class DHCPClient extends BOOTPClient {
 	 * Create a DHCP discovery packet
 	 */
 	protected DatagramPacket createRequestPacket(BOOTPHeader hdr) throws IOException {
-		return new DHCPMessage(hdr, DHCPMessage.DHCPDISCOVER).toDatagramPacket();
+		DHCPMessage msg = new DHCPMessage(hdr, DHCPMessage.DHCPDISCOVER);
+		return msg.toDatagramPacket();
 	}
 
 	protected boolean processResponse(Device device, NetDeviceAPI api, int transactionID, DatagramPacket packet) throws IOException {
@@ -53,8 +55,10 @@ public class DHCPClient extends BOOTPClient {
 				if(value != null) {
 					if(value.length == 1)
 						log.debug("Option "+n+" : " + (int)(value[0]));
+					else if(value.length == 2)
+						log.debug("Option "+n+" : " + (int)((value[0] << 8) | value[1]));
 					else if(value.length == 4)
-						log.debug("Option "+n+" : " + new IPv4Address(value, 0).toString());
+						log.debug("Option "+n+" : " + InetAddress.getByAddress(value).toString());
 					else
 						log.debug("Option "+n+" : " + new String(value));
 				}
@@ -70,7 +74,7 @@ public class DHCPClient extends BOOTPClient {
 				msg.setOption(DHCPMessage.REQUESTED_IP_ADDRESS_OPTION, requestedIP);
 				msg.setOption(DHCPMessage.SERVER_IDENTIFIER_OPTION, serverID);
 				packet = msg.toDatagramPacket();
-				packet.setAddress(IPv4Address.BROADCAST.toInetAddress());
+				packet.setAddress(IPv4Address.BROADCAST_ADDRESS);
 				packet.setPort(SERVER_PORT);
 				socket.send(packet);
 				break;
