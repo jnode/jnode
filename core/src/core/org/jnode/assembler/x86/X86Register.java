@@ -22,6 +22,7 @@
 package org.jnode.assembler.x86;
 
 import org.jnode.vm.VmSystemObject;
+import org.jnode.util.BootableHashMap;
 
 /**
  * Registers of the x86 architecture.
@@ -29,6 +30,10 @@ import org.jnode.vm.VmSystemObject;
  * @author epr
  */
 public class X86Register extends VmSystemObject implements X86Constants {
+
+    //Register map, it should stand in front of any register constant !!!
+
+    private static final BootableHashMap registerMap = new BootableHashMap();
 
     /* 32-bit GPR registers */
     public static final GPR32 EAX = new GPR32("eax", 0, true);
@@ -156,7 +161,6 @@ public class X86Register extends VmSystemObject implements X86Constants {
     public static final XMM XMM14 = new XMM("xmm14", 14);
     public static final XMM XMM15 = new XMM("xmm15", 15);
 
-    
     private final String name;
 
     private final int nr;
@@ -174,6 +178,7 @@ public class X86Register extends VmSystemObject implements X86Constants {
         this.nr = nr;
         this.size = size;
         this.suitableFor8Bit = suitableFor8Bit;
+        registerMap.put(name, this);
     }
 
     /**
@@ -219,6 +224,13 @@ public class X86Register extends VmSystemObject implements X86Constants {
      */
     public final boolean isSuitableForBits8() {
         return suitableFor8Bit;
+    }
+
+    public static GPR getGPR(String name){
+        Object obj =  registerMap.get(name);
+        if( obj == null) throw new IllegalArgumentException("Unknown register: " + name);
+        if( ! (obj instanceof GPR)) throw new IllegalArgumentException("Not a GPR: " + name);
+        return (GPR) obj;
     }
 
     public abstract static class GPR extends X86Register {
