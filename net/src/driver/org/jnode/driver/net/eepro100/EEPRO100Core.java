@@ -29,31 +29,31 @@ import org.jnode.system.ResourceOwner;
 import org.jnode.util.AccessControllerUtils;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
+import org.jnode.vm.Address;
 
 /**
  * @author flesire
  *  
  */
 public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPRO100Constants, EthernetConstants {
-
     /** Device Driver */
     private final EEPRO100Driver driver;
-
     /** Start of IO address space */
     private final int iobase;
-
     /** IO address space resource */
     private final IOResource io;
-
     /** IRQ resource */
     private final IRQResource irq;
-
     /** My ethernet address */
     private EthernetAddress hwAddress;
-
+    /** Registers */
+    private final EEPRO100Registers regs;
     /** Flags for the specific device found */
     private final EEPRO100Flags flags;
-
+    /** Statistical counters */
+    private final EEPRO100Stats stats;
+    /** RX/TX */
+    EEPRO100Buffer RxTxBuffer;
     /** */
     private int eeReadCmd;
 
@@ -66,18 +66,19 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
     /** Enable congestion control in the DP83840. */
     final static boolean congenb = false;
 
+    
+
     /**
      * Create a new instance and allocate all resources
      * 
      * @throws ResourceNotFreeException
      */
-public EEPRO100Core(EEPRO100Driver driver, ResourceOwner owner, PCIDevice device, Flags flags) throws ResourceNotFreeException, DriverException {
+    public EEPRO100Core(EEPRO100Driver driver, ResourceOwner owner, PCIDevice device, Flags flags) throws ResourceNotFreeException, DriverException {
         this.driver = driver;
         this.flags = (EEPRO100Flags) flags;
 
         final PCIDeviceConfig config = device.getConfig();
         final int irq = config.getInterruptLine();
-
         final PCIBaseAddress[] addrs = config.getBaseAddresses();
         if (addrs.length < 1) { throw new DriverException("Cannot find iobase: not base addresses"); }
         if (!addrs[1].isIOSpace()) { throw new DriverException("Cannot find iobase: first address is not I/O"); }
@@ -99,6 +100,12 @@ public EEPRO100Core(EEPRO100Driver driver, ResourceOwner owner, PCIDevice device
             this.irq.release();
             throw ex;
         }
+        // Initialize registers.
+        regs = new EEPRO100Registers(iobase, io);
+        // Initialize statistical counters.
+        stats = new EEPRO100Stats(rm,regs);
+        // Initialize RX/TX Buffers.
+        RxTxBuffer = new EEPRO100Buffer(rm);
 
         int i, option = 0;
         int[] eeprom = new int[0x100];
@@ -131,7 +138,7 @@ public EEPRO100Core(EEPRO100Driver driver, ResourceOwner owner, PCIDevice device
          * Reset the chip: stop Tx and Rx processes and clear counters. This
          * takes less than 10usec and will easily finish before the next action.
          */
-        setReg32(SCBPort, PortReset);
+        regs.setReg32(SCBPort, PortReset);
         eepromDelay();
 
         log.debug("Found " + flags.getName() + " IRQ=" + irq + ", IOBase=0x" + NumberUtils.hex(iobase) + ", MAC Address=" + hwAddress);
@@ -182,37 +189,39 @@ public EEPRO100Core(EEPRO100Driver driver, ResourceOwner owner, PCIDevice device
 
         byte[] data = new byte[32];
         MemoryResource selfTest = rm.asMemoryResource(data);
-        
-        /* Perform a system self-test. */
-       log.debug("self test: " + Integer.toHexString(selfTest.getAddress().as32bit(selfTest.getAddress())));
 
-        setReg32(SCBPort, selfTest.getAddress().as32bit(selfTest.getAddress()) | PortSelfTest);
-        selfTest.setInt(2, 0);  // rom signature
+        /* Perform a system self-test. */
+        log.debug("self test: " + Integer.toHexString(Address.as32bit(selfTest.getAddress())));
+
+        regs.setReg32(SCBPort, Address.as32bit(selfTest.getAddress()) | PortSelfTest);
+        selfTest.setInt(2, 0); // rom signature
         selfTest.setInt(0, -1); //status
         int boguscnt = 16000; // Timeout for set-test.
         do {
             systemDelay(10);
-            int i0=100;
-            while(i0-->0) ; 
-        }while(selfTest.getInt(0) ==-1 && --boguscnt >=0);
-        
+            int i0 = 100;
+            while (i0-- > 0)
+                ;
+        } while (selfTest.getInt(0) == -1 && --boguscnt >= 0);
+
         StringBuffer sb = new StringBuffer();
-        
+
         if (boguscnt < 0) {
             /* Test optimized out. */
-            log.debug("Self test failed, status"+ Long.toHexString(selfTest.getLong(4))+ "Failure to initialize the i82557.");
+            log.debug("Self test failed, status" + Long.toHexString(selfTest.getLong(4)) + "Failure to initialize the i82557.");
             log.debug("Verify that the card is a bus-master capable slot.");
-        } else { 
+        } else {
             int results = selfTest.getInt(0);
-            log.debug("General self-test:"+ ((results &0x1000) == 0 ? "failed" : "passed"));
-            log.debug("Serial sub-system self-test: "+((results &0x0020) == 0 ? "failed" : "passed"));
-            log.debug("Internal registers self-test:"+((results &0x0008) == 0 ? "failed" : "passed"));
-            log.debug(" ROM checksum self-test:"+((results & 0x0004) == 0 ? "failed" : "passed") + "(" +Integer.toHexString(selfTest.getInt(2)) + ")");
+            log.debug("General self-test:" + ((results & 0x1000) == 0 ? "failed" : "passed"));
+            log.debug("Serial sub-system self-test: " + ((results & 0x0020) == 0 ? "failed" : "passed"));
+            log.debug("Internal registers self-test:" + ((results & 0x0008) == 0 ? "failed" : "passed"));
+            log.debug(" ROM checksum self-test:" + ((results & 0x0004) == 0 ? "failed" : "passed") + "(" + Integer.toHexString(selfTest.getInt(2)) + ")");
             log.debug(sb.toString());
-            sb.setLength(0); 
-        }                                                              
-        /* reset adapter to default state*/
-        setReg32(SCBPort, PortReset);
+            sb.setLength(0);
+        }
+
+        /* reset adapter to default state */
+        regs.setReg32(SCBPort, PortReset);
         systemDelay(100);
         // 	pci_dev = pdev;
         // 	chip_id = chip_idx;
@@ -230,11 +239,11 @@ public EEPRO100Core(EEPRO100Driver driver, ResourceOwner owner, PCIDevice device
         // 		rxBug = (eeprom[3] & 0x03) == 3;
         // 		if (rxBug)
         // 			System.out.println("Receiver lock-up workaround activated.");
-    }    /*
-          * (non-Javadoc)
-          * 
-          * @see org.jnode.driver.net.AbstractDeviceCore#getHwAddress()
-          */
+    } /*
+       * (non-Javadoc)
+       * 
+       * @see org.jnode.driver.net.AbstractDeviceCore#getHwAddress()
+       */
     public HardwareAddress getHwAddress() {
         return hwAddress;
     }
@@ -245,6 +254,22 @@ public EEPRO100Core(EEPRO100Driver driver, ResourceOwner owner, PCIDevice device
      * @see org.jnode.driver.net.AbstractDeviceCore#initialize()
      */
     public void initialize() {
+
+        //RxTxBuffer.initRxRing();
+        //RxTxBuffer.initTxRing();
+
+        /*
+         * We can safely take handler calls during init. Doing this after
+         * initRxRing() results in a memory leak.
+         */
+        //setupInterrupt();
+        /* Fire up the hardware. */
+        //resume();
+
+        //rx_mode = -1; /* Invalid -> always reset the mode. */
+
+        //setRxMode();
+
         log.debug(this.flags.getName() + ": Done open(), status ");
     }
 
@@ -279,7 +304,6 @@ public EEPRO100Core(EEPRO100Driver driver, ResourceOwner owner, PCIDevice device
         // TODO Auto-generated method stub
         // Set the source address
         hwAddress.writeTo(buf, 6);
-
     }
 
     public void handleInterrupt(int irq) {
@@ -319,18 +343,18 @@ public EEPRO100Core(EEPRO100Driver driver, ResourceOwner owner, PCIDevice device
 
     final void sizeEeprom() {
 
-        setReg16(SCBeeprom, EE_CS);
+        regs.setReg16(SCBeeprom, EE_CS);
         int cmd = EE_READ_CMD << 8;
         int addressBits = 0;
         for (int i = 10; i >= 0; i--, addressBits++) {
             int data = (cmd & 1 << i) == 0 ? EE_WRITE_0 : EE_WRITE_1;
-            setReg16(SCBeeprom, data);
-            setReg16(SCBeeprom, data | EE_SHIFT_CLK);
+            regs.setReg16(SCBeeprom, data);
+            regs.setReg16(SCBeeprom, data | EE_SHIFT_CLK);
             eepromDelay();
-            setReg16(SCBeeprom, data);
+            regs.setReg16(SCBeeprom, data);
             eepromDelay();
 
-            int ee = getReg16(SCBeeprom);
+            int ee = regs.getReg16(SCBeeprom);
             if ((ee & EE_DATA_READ) == 0) {
                 if (addressBits == 8) {
                     // 64 registers
@@ -348,109 +372,46 @@ public EEPRO100Core(EEPRO100Driver driver, ResourceOwner owner, PCIDevice device
         }
         // read but discard
         for (int i = 0; i < 16; i++) {
-            setReg16(SCBeeprom, EE_CS);
-            setReg16(SCBeeprom, EE_CS | EE_SHIFT_CLK);
+            regs.setReg16(SCBeeprom, EE_CS);
+            regs.setReg16(SCBeeprom, EE_CS | EE_SHIFT_CLK);
             eepromDelay();
-            setReg16(SCBeeprom, EE_CS);
+            regs.setReg16(SCBeeprom, EE_CS);
             eepromDelay();
         }
         // disable the eeprom
-        setReg16(SCBeeprom, 0);
+        regs.setReg16(SCBeeprom, 0);
     }
 
     final int doEepromCmd(int cmd) {
         int data = 0;
 
-        setReg16(SCBeeprom, EE_CS);
+        regs.setReg16(SCBeeprom, EE_CS);
         cmd |= eeReadCmd;
 
         for (int i = eeAddress; true; i--) {
             data = (cmd & 1 << i) == 0 ? EE_WRITE_0 : EE_WRITE_1;
-            setReg16(SCBeeprom, data);
-            setReg16(SCBeeprom, data | EE_SHIFT_CLK);
+            regs.setReg16(SCBeeprom, data);
+            regs.setReg16(SCBeeprom, data | EE_SHIFT_CLK);
             eepromDelay();
-            setReg16(SCBeeprom, data);
+            regs.setReg16(SCBeeprom, data);
             eepromDelay();
-            if ((getReg16(SCBeeprom) & EE_DATA_READ) == 0) break;
+            if ((regs.getReg16(SCBeeprom) & EE_DATA_READ) == 0) break;
         }
         data = 0;
         // read value
         for (int i = 0; i < 16; i++) {
-            setReg16(SCBeeprom, EE_CS);
-            setReg16(SCBeeprom, EE_CS | EE_SHIFT_CLK);
+            regs.setReg16(SCBeeprom, EE_CS);
+            regs.setReg16(SCBeeprom, EE_CS | EE_SHIFT_CLK);
             eepromDelay();
             data <<= 1;
-            if ((getReg16(SCBeeprom) & EE_DATA_READ) != 0) data |= 1;
+            if ((regs.getReg16(SCBeeprom) & EE_DATA_READ) != 0) data |= 1;
 
-            setReg16(SCBeeprom, EE_CS);
+            regs.setReg16(SCBeeprom, EE_CS);
             eepromDelay();
         }
         // disable the eeprom
-        setReg16(SCBeeprom, 0);
+        regs.setReg16(SCBeeprom, 0);
         return data;
-    }
-
-    //--- REGISTER METHODS
-
-    /**
-     * Reads a 8-bit NIC register
-     * 
-     * @param reg
-     */
-    protected final int getReg8(int reg) {
-        return io.inPortByte(iobase + reg);
-    }
-
-    /**
-     * Reads a 16-bit NIC register
-     * 
-     * @param reg
-     */
-    protected final int getReg16(int reg) {
-        return io.inPortWord(iobase + reg);
-    }
-
-    /**
-     * Reads a 32-bit NIC register
-     * 
-     * @param reg
-     */
-
-    protected final int getReg32(int reg) {
-        return io.inPortDword(iobase + reg);
-    }
-
-    /**
-     * Writes a 8-bit NIC register
-     * 
-     * @param reg
-     * @param value
-     */
-
-    protected final void setReg8(int reg, int value) {
-        io.outPortByte(iobase + reg, value);
-    }
-
-    /**
-     * Writes a 16-bit NIC register
-     * 
-     * @param reg
-     * @param value
-     */
-
-    protected final void setReg16(int reg, int value) {
-        io.outPortWord(iobase + reg, value);
-    }
-
-    /**
-     * Writes a 32-bit NIC register
-     * 
-     * @param reg
-     * @param value
-     */
-
-    protected final void setReg32(int reg, int value) {
-        io.outPortDword(iobase + reg, value);
     }
 
     //--- OTHER METHODS
@@ -465,10 +426,10 @@ public EEPRO100Core(EEPRO100Driver driver, ResourceOwner owner, PCIDevice device
 
     final int mdioRead(int phy_id, int location) {
         int val, boguscnt = 7; /* <64 usec. to complete, typ 27 ticks */
-        setReg32(SCBCtrlMDI, 0x08000000 | (location << 16) | (phy_id << 21));
+        regs.setReg32(SCBCtrlMDI, 0x08000000 | (location << 16) | (phy_id << 21));
         do {
             systemDelay(10);
-            val = getReg32(SCBCtrlMDI);
+            val = regs.getReg32(SCBCtrlMDI);
             if (--boguscnt < 0) {
                 log.debug(this.flags.getName() + ": mdioRead() timed out with val = " + Integer.toHexString(val));
                 break;
@@ -479,10 +440,10 @@ public EEPRO100Core(EEPRO100Driver driver, ResourceOwner owner, PCIDevice device
 
     final int mdioWrite(int phy_id, int location, int value) {
         int val, boguscnt = 7; /* <64 usec. to complete, typ 27 ticks */
-        setReg32(SCBCtrlMDI, 0x04000000 | (location << 16) | (phy_id << 21) | value);
+        regs.setReg32(SCBCtrlMDI, 0x04000000 | (location << 16) | (phy_id << 21) | value);
         do {
             systemDelay(10);
-            val = getReg32(SCBCtrlMDI);
+            val = regs.getReg32(SCBCtrlMDI);
             if (--boguscnt < 0) {
                 StringBuffer sb = new StringBuffer();
                 log.debug("eepro100: mdioWrite() timed out with val =" + Integer.toHexString(val));
@@ -491,4 +452,63 @@ public EEPRO100Core(EEPRO100Driver driver, ResourceOwner owner, PCIDevice device
         } while ((val & 0x10000000) == 0);
         return val & 0xffff;
     }
+
+    /* Start the chip hardware after a full reset. */
+    final void resume() {
+        regs.setReg16(SCBCmd, SCBMaskAll);
+
+        /* Start with a Tx threshold of 256 (0x..20.... 8 byte units). */
+        //tx_threshold = 0x01200000;
+        /* Set the segment registers to '0'. */
+        EEPRO100Utils.waitForCmdDone(regs);
+        regs.setReg32(SCBPointer, 0);
+        //		csr.read32(SCBPointer); /* Flush to PCI. */
+        systemDelay(10); /* Bogus, but it avoids the bug. */
+        /* Note: these next two operations can take a while. */
+        regs.setReg8(SCBCmd, RxAddrLoad);
+        EEPRO100Utils.waitForCmdDone(regs);
+        regs.setReg8(SCBCmd, CUCmdBase);
+        EEPRO100Utils.waitForCmdDone(regs);
+
+        /* Load the statistics block and rx ring addresses. */
+        stats.loadBlock();
+        EEPRO100Utils.waitForCmdDone(regs);
+
+        int rxRingAddress = (RxTxBuffer.rxRing[RxTxBuffer.getCurRx() & RX_RING_SIZE - 1]).getBufferAddress();
+        regs.setReg32(SCBPointer, rxRingAddress);
+        regs.setReg8(SCBCmd, RxStart);
+        EEPRO100Utils.waitForCmdDone(regs);
+        regs.setReg8(SCBCmd, CUDumpStats);
+        systemDelay(30);
+
+        /* Fill the first command with our physical address. */
+        //int entry = RxTxBuffer.getCurTx++ & TX_RING_SIZE-1;
+        //TxFD cur_cmd = RxTxBuffer.txRing[entry];
+        /* Avoid a bug(?!) here by marking the command already completed. */
+        /*
+         * cur_cmd.status((CmdSuspend | CmdIASetup) | 0xa000);
+         * cur_cmd.link(txRing[cur_tx & TX_RING_SIZE-1].bufferAddress);
+         * cur_cmd.params(deviceAddress); if (lastCmd != null)
+         * lastCmd.clearSuspend(); lastCmd = cur_cmd;
+         */
+        EEPRO100Utils.waitForCmdDone(regs);
+
+        /* Start the chip's Tx process and unmask interrupts. */
+        //int txRingAddress = (RxTxBuffer.txRing[RxTxBuffer.getDirtyTx() &
+        // TX_RING_SIZE-1]).getBufferAddress();
+        //regs.setReg32(SCBPointer, txRingAddress);
+        regs.setReg16(SCBCmd, CUStart | SCBMaskEarlyRx | SCBMaskFlowCtl);
+    }
+
+    final void waitForCmdDone() {
+        int wait = 0;
+        do {
+            if (regs.getReg8(SCBCmd) == 0) return;
+        } while (++wait <= 100);
+        do {
+            if (regs.getReg8(SCBCmd) == 0) break;
+        } while (++wait <= 10000);
+        System.out.println("Command was not immediately accepted, " + wait + " ticks!");
+    }
+
 }
