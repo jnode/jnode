@@ -12,7 +12,7 @@
   <property name="jnode-shell.jar"     value="${build.dir}/descriptors/jnode-shell.jar"/>
   <property name="jnode-fonts.jar"     value="${build.dir}/descriptors/jnode-fonts.jar"/>
 
-  <property name="ant.jar"             value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
+  <property name="ant.jar"             value="${root.dir}/core/lib/ant.jar"/>
   <property name="commons-net.jar"     value="${root.dir}/net/lib/commons-net-1.1.0.jar"/>
   <property name="junit.jar"           value="${root.dir}/core/lib/junit.jar"/>
   <property name="dom4j.jar"           value="${root.dir}/builder/lib/dom4j.jar"/>
