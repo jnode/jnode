@@ -313,7 +313,8 @@ public class JMenuItem extends AbstractButton implements Accessible,
                                 MenuSelectionManager manager)
   {
     // Fire MenuDragMouseEvents if mouse is being dragged.
-    boolean dragged = (event.getModifiers() & InputEvent.BUTTON1_MASK) != 0;
+    boolean dragged
+      = (event.getModifiersEx() & InputEvent.BUTTON1_DOWN_MASK) != 0;
     if (dragged)
       processMenuDragMouseEvent(createMenuDragMouseEvent(event, path, manager));
 
@@ -335,7 +336,7 @@ public class JMenuItem extends AbstractButton implements Accessible,
 	  setArmed(false);
 	break;
       case MouseEvent.MOUSE_PRESSED:
-	    if ((event.getModifiers() & InputEvent.BUTTON1_MASK) != 0)
+	if ((event.getModifiersEx() & InputEvent.BUTTON1_DOWN_MASK) != 0)
 	      {
 		model.setArmed(true);
 		model.setPressed(true);

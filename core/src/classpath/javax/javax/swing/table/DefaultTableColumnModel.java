@@ -1,5 +1,5 @@
 /* DefaultTableColumnModel.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -61,7 +61,7 @@ public class DefaultTableColumnModel
   implements TableColumnModel, PropertyChangeListener, ListSelectionListener,
              Serializable
 {
-  static final long serialVersionUID = 6580012493508960512L;
+  private static final long serialVersionUID = 6580012493508960512L;
 
 	/**
 	 * tableColumns
@@ -81,12 +81,12 @@ public class DefaultTableColumnModel
 	/**
 	 * listenerList
 	 */
-	protected EventListenerList listenerList;
+  protected EventListenerList listenerList = new EventListenerList();
 
 	/**
 	 * changeEvent
 	 */
-	protected transient ChangeEvent changeEvent;
+  protected transient ChangeEvent changeEvent = new ChangeEvent(this);
 
 	/**
 	 * columnSelectionAllowed
@@ -211,11 +211,16 @@ public class DefaultTableColumnModel
 
 	/**
 	 * setSelectionModel
-	 * @param value0 TODO
+   * @param model TODO
+   * @exception IllegalArgumentException if model is null
 	 */
-  public void setSelectionModel(ListSelectionModel value0)
+  public void setSelectionModel(ListSelectionModel model)
   {
-		// TODO
+    if (model == null)
+      throw new IllegalArgumentException();
+    
+    selectionModel = model;
+    selectionModel.addListSelectionListener(this);
   }
 
 	/**
@@ -224,7 +229,7 @@ public class DefaultTableColumnModel
 	 */
   public ListSelectionModel getSelectionModel()
   {
-		return null; // TODO
+    return selectionModel;
   }
 
 	/**

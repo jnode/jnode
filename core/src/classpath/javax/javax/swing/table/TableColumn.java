@@ -289,19 +289,15 @@ public class TableColumn
 	 * setHeaderRenderer
 	 * @param headerRenderer TODO
 	 */
-  public void setHeaderRenderer(TableCellRenderer headerRenderer)
+  public void setHeaderRenderer(TableCellRenderer renderer)
   {
-		// Variables
-		TableCellRenderer	oldRenderer;
+    if (headerRenderer == renderer)
+      return;
 
-		// Get Old Renderer
-		oldRenderer = this.headerRenderer;
-
-		// Set Property
-		this.headerRenderer = headerRenderer;
-
-		// Notify Listeners of change
-    firePropertyChange(HEADER_RENDERER_PROPERTY, oldRenderer, headerRenderer);
+    TableCellRenderer oldRenderer = headerRenderer;
+    headerRenderer = renderer;
+    firePropertyChange(HEADER_RENDERER_PROPERTY, 
+		       oldRenderer, headerRenderer);
   }
 
 	/**
@@ -317,19 +313,15 @@ public class TableColumn
 	 * setCellRenderer
 	 * @param cellRenderer TODO
 	 */
-  public void setCellRenderer(TableCellRenderer cellRenderer)
+  public void setCellRenderer(TableCellRenderer renderer)
   {
-		// Variables
-		TableCellRenderer	oldRenderer;
+    if (cellRenderer == renderer)
+      return;
 
-		// Get Old Renderer
-		oldRenderer = this.cellRenderer;
-
-		// Set Property
-		this.cellRenderer = cellRenderer;
-
-		// Notify Listeners of change
-    firePropertyChange(CELL_RENDERER_PROPERTY, oldRenderer, cellRenderer);
+    TableCellRenderer oldRenderer = cellRenderer;
+    cellRenderer = renderer;
+    firePropertyChange(CELL_RENDERER_PROPERTY, 
+		       oldRenderer, cellRenderer);
   }
 
 	/**
@@ -361,25 +353,23 @@ public class TableColumn
 
 	/**
 	 * setWidth
-	 * @param width TODO
+   * @param newWidth TODO
 	 */
-  public void setWidth(int width)
+  public void setWidth(int newWidth)
   {
-		// Variables
-		int	oldWidth;
+    int	oldWidth = width;
 
-		// Get Old Width
-		oldWidth = this.width;
-
-		// Adjust Width within Limits
-    if (width < minWidth)
-			this.width = minWidth;
-    else if (width > maxWidth)
-			this.width = maxWidth;
+    if (newWidth < minWidth)
+      width = minWidth;
+    else if (newWidth > maxWidth)
+      width = maxWidth;
     else
-			this.width = width;
+      width = newWidth;
 
-		firePropertyChange(COLUMN_WIDTH_PROPERTY, oldWidth, this.width);
+    if (width == oldWidth)
+      return;
+
+    firePropertyChange(COLUMN_WIDTH_PROPERTY, oldWidth, width);
   }
 
 	/**

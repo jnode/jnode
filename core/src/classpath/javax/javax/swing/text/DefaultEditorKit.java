@@ -37,6 +37,8 @@ exception statement from your version. */
 
 package javax.swing.text;
 
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -48,7 +50,22 @@ import javax.swing.JEditorPane;
 
 public class DefaultEditorKit extends EditorKit
 {
+  public static class BeepAction
+    extends TextAction
+  {
+    public BeepAction()
+    {
+      super(beepAction);
+    }
+
+    public void actionPerformed(ActionEvent event)
+    {
+      Toolkit.getDefaultToolkit().beep();
+    }
+  }
+
   private static final long serialVersionUID = 9017245433028523428L;
+  
   public static final String backwardAction = "caret-backward";
   public static final String beepAction = "beep";
   public static final String beginAction = "caret-begin";
