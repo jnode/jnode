@@ -5,6 +5,7 @@
         name="JNode core runtime classes specific to X86"
         version="@VERSION@"
         provider-name="JNode.org"
+        system="true"
         class="org.jnode.system.x86.DMAPlugin">
         
   <requires>

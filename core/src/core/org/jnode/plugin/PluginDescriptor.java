@@ -84,4 +84,17 @@ public interface PluginDescriptor {
 	 */
 	public Plugin getPlugin()
 	throws PluginException;
+	
+	/**
+	 * Is this a descriptor of a system plugin.
+	 * System plugins are not reloadable.
+	 * @return boolean
+	 */
+	public boolean isSystemPlugin();
+	
+	/**
+	 * Gets the classloader of this plugin descriptor.
+	 * @return ClassLoader
+	 */
+	public ClassLoader getPluginClassLoader();
 }

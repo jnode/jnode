@@ -4,9 +4,11 @@
 <plugin id="org.jnode.runtime.core" 
         name="JNode core runtime classes"
         version="@VERSION@"
+        system="true"
         provider-name="JNode.org">
         
   <requires>
+    <import plugin="nanoxml"/>
     <import plugin="org.jnode.util"/>
     <import plugin="org.jnode.vm"/>
   </requires>

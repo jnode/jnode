@@ -8,6 +8,7 @@
         
   <requires>
     <import plugin="org.jnode.driver"/>
+    <import plugin="org.jnode.driver.input"/>
   </requires>
         
   <runtime>

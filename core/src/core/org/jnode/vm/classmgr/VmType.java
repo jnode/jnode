@@ -40,7 +40,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	/** All interface implemented by this class and its superclasses */
 	private VmInterfaceClass[] allInterfaceTable;
 	/** Loaded of this class */
-	private final AbstractVmClassLoader loader;
+	private final VmClassLoader loader;
 	/** The corresponding java.lang.Class of this class */
 	private Class javaClass;
 	/** Is this class primitive? */
@@ -88,7 +88,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	 * @param loader
 	 * @param accessFlags
 	 */
-	protected VmType(String name, String superClassName, AbstractVmClassLoader loader, int accessFlags) {
+	protected VmType(String name, String superClassName, VmClassLoader loader, int accessFlags) {
 		this(name, null, superClassName, loader, false, accessFlags, -1);
 	}
 
@@ -101,7 +101,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	 * @param primitive
 	 * @param typeSize
 	 */
-	VmType(String name, VmNormalClass superClass, AbstractVmClassLoader loader, boolean primitive, int typeSize) {
+	VmType(String name, VmNormalClass superClass, VmClassLoader loader, boolean primitive, int typeSize) {
 		this(name, superClass, superClass.getName(), loader, primitive, Modifier.ACC_PUBLIC, typeSize);
 	}
 
@@ -116,7 +116,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	 * @param accessFlags
 	 * @param typeSize
 	 */
-	private VmType(String name, VmNormalClass superClass, String superClassName, AbstractVmClassLoader loader, boolean primitive, int accessFlags, int typeSize) {
+	private VmType(String name, VmNormalClass superClass, String superClassName, VmClassLoader loader, boolean primitive, int accessFlags, int typeSize) {
 
 		VmStatics.typeCount++;
 		if (superClassName == null) {
@@ -155,7 +155,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	 * @return VmClass[]
 	 * @throws ClassNotFoundException
 	 */
-	public final static VmType[] initializeForBootImage(AbstractVmClassLoader clc) throws ClassNotFoundException {
+	public final static VmType[] initializeForBootImage(VmClassLoader clc) throws ClassNotFoundException {
 		ObjectClass = (VmNormalClass) clc.loadClass("java.lang.Object", false);
 		CloneableClass = (VmInterfaceClass) clc.loadClass("java.lang.Cloneable", false);
 		SerializableClass = (VmInterfaceClass) clc.loadClass("java.io.Serializable", false);
@@ -755,7 +755,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	 * 
 	 * @return The loader
 	 */
-	public final AbstractVmClassLoader getLoader() {
+	public final VmClassLoader getLoader() {
 		return loader;
 	}
 
@@ -1149,14 +1149,14 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 			modifiers |= Modifier.ACC_INITIALIZED;
 		}
 
+		// Compile the methods with the least optimizing compiler
+		if (loader.isCompileRequired()) {
+			doCompileRuntime(0);
+		}
+
 		// Now we're in the PREPARED state
 		modifiers |= Modifier.ACC_PREPARED;
 		modifiers &= ~Modifier.ACC_PREPARING;
-
-		// Compile the methods with the least optimizing compiler
-		if (loader.isCompileRequired()) {
-			compileRuntime(0);
-		}
 
 		// Notify all threads that are waiting for me
 		notifyAll();
@@ -1241,7 +1241,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	 * 
 	 * @param clc
 	 */
-	public final void resolveCpRefs(AbstractVmClassLoader clc) {
+	public final void resolveCpRefs(VmClassLoader clc) {
 		if (!resolvedCpRefs) {
 			prepare();
 			if (superClass != null) {
@@ -1320,6 +1320,17 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 		if (!isPrepared()) {
 			throw new IllegalStateException("VmType must have been prepared");
 		}
+		return doCompileRuntime(optLevel);
+	}
+
+	/**
+	 * Compile all the methods in this class during runtime.
+	 * 
+	 * @param optLevel
+	 *            The optimization level
+	 * @return The number of compiled methods
+	 */
+	private final int doCompileRuntime(int optLevel) {
 		final VmMethod[] mt = this.methodTable;
 		int compileCount = 0;
 		if (mt != null) {
@@ -1344,6 +1355,9 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	 *            The superClass to set
 	 */
 	protected void setSuperClass(VmNormalClass superClass) {
+		if (superClass == null) {
+			throw new IllegalArgumentException("superClass cannot be null");
+		}
 		if (this.superClass == null) {
 			this.superClass = superClass;
 		} else {
@@ -1444,6 +1458,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	 * synchronized helper method is called to do the actual initialization.
 	 */
 	public void initialize() {
+		link();
 		if (!Modifier.isInitialized(modifiers)) {
 			doInitialize();
 		}

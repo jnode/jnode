@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.fs.partitions.ibm.IBMPartitionTableEntry;
+import org.jnode.fs.util.*;
 import org.jnode.util.NumberUtils;
 
 /**

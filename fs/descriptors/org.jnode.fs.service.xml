@@ -6,6 +6,11 @@
         version="@VERSION@"
         provider-name="JNode.org">
         
+  <requires>
+    <import plugin="org.jnode.driver"/>
+    <import plugin="org.jnode.driver.block"/>
+  </requires>
+        
   <runtime>
     <library name="jnode-fs.jar">
       <export name="org.jnode.fs.service.*"/>

@@ -868,6 +868,11 @@ public final class Unsafe {
 	/**
 	 * Print the given value on the screen.
 	 */
+	public static native void debug(char value);
+
+	/**
+	 * Print the given value on the screen.
+	 */
 	public static native void debug(int value);
 
 	/**

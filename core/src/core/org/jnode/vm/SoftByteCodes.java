@@ -4,7 +4,7 @@
 package org.jnode.vm;
 
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.classmgr.AbstractVmClassLoader;
+import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmConstFieldRef;
@@ -109,7 +109,7 @@ public class SoftByteCodes implements Uninterruptible {
 			vmClass.prepare();
 
 			// NEW
-			AbstractVmClassLoader curLoader = currentMethod.getDeclaringClass().getLoader();
+			VmClassLoader curLoader = currentMethod.getDeclaringClass().getLoader();
 			methodRef.resolve(curLoader);
 			return methodRef.getResolvedVmMethod();
 			// END NEW
@@ -133,7 +133,7 @@ public class SoftByteCodes implements Uninterruptible {
 		if (classRef.isResolved()) {
 			return classRef.getResolvedVmClass();
 		} else {
-			AbstractVmClassLoader curLoader = VmSystem.getContextClassLoader();
+			VmClassLoader curLoader = VmSystem.getContextClassLoader();
 			String cname = classRef.getClassName();
 			try {
 				Class cls = curLoader.asClassLoader().loadClass(cname);
@@ -239,17 +239,18 @@ public class SoftByteCodes implements Uninterruptible {
 	 */
 	public static Object anewarray(VmMethod currentMethod, VmType vmClass, int elements) throws PragmaUninterruptible {
 
-		VmType arrCls;
+		final String arrClsName = vmClass.getArrayClassName();
+		final VmType arrCls;
 		try {
-			AbstractVmClassLoader curLoader = currentMethod.getDeclaringClass().getLoader();
-			arrCls = curLoader.loadClass(vmClass.getArrayClassName(), true);
+			final VmClassLoader curLoader = currentMethod.getDeclaringClass().getLoader();
+			arrCls = curLoader.loadClass(arrClsName, true);
 			//Screen.debug("an cls{");
 			//Screen.debug(vmClass.getName());
 			if (arrCls == null) {
-				throw new NoClassDefFoundError();
+				throw new NoClassDefFoundError(arrClsName);
 			}
 		} catch (ClassNotFoundException ex) {
-			throw new NoClassDefFoundError();
+			throw new NoClassDefFoundError(arrClsName);
 		}
 
 		VmHeapManager hm = heapManager;

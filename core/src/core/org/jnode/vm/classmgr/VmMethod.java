@@ -231,7 +231,7 @@ public abstract class VmMethod extends VmMember {
 	 * 
 	 * @param cl
 	 */
-	protected synchronized void resolve(AbstractVmClassLoader cl) {
+	protected synchronized void resolve(VmClassLoader cl) {
 		resolveTypes();
 	}
 

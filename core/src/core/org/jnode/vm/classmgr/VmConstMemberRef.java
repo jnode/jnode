@@ -65,7 +65,7 @@ public abstract class VmConstMemberRef extends VmConstObject {
 	 * Resolve the references of this constant to loaded VmXxx objects.
 	 * @param clc
 	 */
-	protected void doResolve(AbstractVmClassLoader clc) {
+	protected void doResolve(VmClassLoader clc) {
 		getConstClass().resolve(clc);
 		doResolveMember(clc);
 		cachedHashCode = VmMember.calcHashCode(getName(), getSignature());
@@ -75,7 +75,7 @@ public abstract class VmConstMemberRef extends VmConstObject {
 	 * Resolve the references of this constant to loaded VmXxx objects.
 	 * @param clc
 	 */
-	protected abstract void doResolveMember(AbstractVmClassLoader clc);
+	protected abstract void doResolveMember(VmClassLoader clc);
 
 	/**
 	 * Convert myself into a String representation 

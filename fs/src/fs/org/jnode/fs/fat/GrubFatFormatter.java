@@ -9,6 +9,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.jnode.driver.block.BlockDeviceAPI;
+import org.jnode.fs.util.*;
 import org.jnode.fs.util.Geometry;
 import org.jnode.util.FileUtils;
 

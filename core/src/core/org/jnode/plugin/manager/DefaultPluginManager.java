@@ -56,7 +56,12 @@ public class DefaultPluginManager implements PluginManager {
 	 * @throws PluginException
 	 */
 	public void startPlugins() throws PluginException {
+		// Set the context classloader
+		Thread.currentThread().setContextClassLoader(registry.getPluginsClassLoader());
 
+		// Start the plugins
+		final String cmdLine = System.getProperty("jnode.cmdline", "");
+		final boolean debug = (cmdLine.indexOf("debug") > 0);
 		final List descrList = createPluginDescriptorList();
 		final ArrayList errors = new ArrayList(descrList.size());
 		for (Iterator i = descrList.iterator(); i.hasNext();) {
@@ -70,17 +75,22 @@ public class DefaultPluginManager implements PluginManager {
 				//	Syslog.warn("Skipping start of " + descr.getId() + " due to depencies.");
 				//}
 
+				if (debug) {
+					Thread.sleep(250);
+				}
+
 				startPlugin(descr);
 
 			} catch (Throwable ex) {
-				errors.add(ex);
+				errors.add(new StartError(ex, descr.getId()));
 			}
 		}
 
 		// Show all errors
 		for (Iterator i = errors.iterator(); i.hasNext();) {
-			final Throwable ex = (Throwable) i.next();
-			BootLog.error("Error starting plugins", ex);
+			final StartError error = (StartError) i.next();
+			BootLog.error("Error starting plugin " + error.getPluginId(), error.getException());
+			//break;
 		}
 	}
 
@@ -93,11 +103,19 @@ public class DefaultPluginManager implements PluginManager {
 	 *             if the plugin fails to start.
 	 */
 	public void startPlugin(PluginDescriptor d) throws PluginException {
-		if (canStart(d)) {
-			BootLog.debug("Starting " + d.getId());
-			d.getPlugin().start();
-		} else {
-			BootLog.warn("Skipping start of " + d.getId() + " due to to depencies.");
+		try {
+			if (canStart(d)) {
+				BootLog.debug("Starting " + d.getId());
+				d.getPlugin().start();
+			} else {
+				BootLog.warn("Skipping start of " + d.getId() + " due to to depencies.");
+			}
+		} catch (PluginException ex) {
+			BootLog.error("Error starting " + d.getId());
+			throw ex;
+		} catch (Throwable ex) {
+			BootLog.error("Error starting " + d.getId());
+			throw new PluginException(ex);
 		}
 	}
 
@@ -234,4 +252,31 @@ public class DefaultPluginManager implements PluginManager {
 		return true;
 	}
 
+	static class StartError {
+		private final Throwable exception;
+		private final String pluginId;
+		/**
+		 * @param exception
+		 * @param pluginId
+		 */
+		public StartError(final Throwable exception, final String pluginId) {
+			super();
+			this.exception = exception;
+			this.pluginId = pluginId;
+		}
+
+		/**
+		 * @return Returns the exception.
+		 */
+		public final Throwable getException() {
+			return this.exception;
+		}
+
+		/**
+		 * @return Returns the pluginId.
+		 */
+		public final String getPluginId() {
+			return this.pluginId;
+		}
+	}
 }

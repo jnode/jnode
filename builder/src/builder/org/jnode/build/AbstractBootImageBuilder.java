@@ -35,7 +35,7 @@ import org.jnode.vm.HeapHelperImpl;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
-import org.jnode.vm.VmClassLoader;
+import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.ObjectLayout;
@@ -67,7 +67,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 	private File listFile;
 	private File debugFile;
 	private File jarFile;
-	private VmClassLoader clsMgr;
+	private VmSystemClassLoader clsMgr;
 	private URL classesURL = null;
 	private Set legalInstanceClasses;
 	/** Set of jbects that should not yet be emitted */
@@ -117,13 +117,14 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
 			// Load the plugin descriptors
 			final PluginRegistry piRegistry;
-			piRegistry = new PluginRegistryModel(piList.getDescriptorUrlList());
+			piRegistry = new PluginRegistryModel(piList.getPluginList());
+			//piRegistry = new PluginRegistryModel(piList.getDescriptorUrlList());
 			testPluginPrerequisites(piRegistry);
 
 			/* Now create the processor */
 			final VmArchitecture arch = getArchitecture();
 			final NativeStream os = createNativeStream();
-			clsMgr = new VmClassLoader(classesURL, arch, new BuildObjectResolver(os, this));
+			clsMgr = new VmSystemClassLoader(classesURL, arch, new BuildObjectResolver(os, this));
 			blockedObjects.add(clsMgr);
 			blockedObjects.add(clsMgr.getStatics());
 			blockedObjects.add(clsMgr.getStatics().getTable());
@@ -155,7 +156,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			/* Now load the classes */
 			loadClass(VmMethodCode.class);
 			loadClass(Unsafe.class);
-			loadClass(VmClassLoader.class);
+			loadClass(VmSystemClassLoader.class);
 			loadClass(VmType[].class);
 			loadClass(Vm.class);
 			loadClass(VmBootHeap.class);
@@ -867,7 +868,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 	   * 
 	   * @return The class loader
 	   */
-	public VmClassLoader getClsMgr() {
+	public VmSystemClassLoader getClsMgr() {
 		return clsMgr;
 	}
 	

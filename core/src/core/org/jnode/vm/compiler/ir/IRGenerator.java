@@ -13,7 +13,7 @@ import java.util.Iterator;
 
 import org.jnode.util.BootableArrayList;
 import org.jnode.util.BootableHashMap;
-import org.jnode.vm.VmClassLoader;
+import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.bytecode.BytecodeViewer;
 import org.jnode.vm.bytecode.BytecodeVisitor;
@@ -25,9 +25,7 @@ import org.jnode.vm.classmgr.VmConstMethodRef;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.x86.VmX86Architecture;
-
-/**
- * @author Madhu Siddalingaiah
+/*
  *
  */
 public class IRGenerator extends BytecodeVisitor {
@@ -1404,7 +1402,7 @@ public class IRGenerator extends BytecodeVisitor {
 		if (args.length > 0) {
 			className = args[0];
 		}
-		VmClassLoader vmc = new VmClassLoader(new File(".").toURL(), new VmX86Architecture());
+		VmSystemClassLoader vmc = new VmSystemClassLoader(new File(".").toURL(), new VmX86Architecture());
 		VmType type = vmc.loadClass(className, true);
 		VmMethod arithMethod = null;
 		int nMethods = type.getNoDeclaredMethods();

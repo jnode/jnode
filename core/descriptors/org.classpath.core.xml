@@ -4,6 +4,7 @@
 <plugin id="org.classpath.core"
         name="Core java classes"
         version="@VERSION@"
+	    system="true"
         provider-name="Classpath.org">
 
   <runtime>

@@ -20,12 +20,7 @@ public final class VmNormalClass extends VmClassType {
 	 * @param primitive
 	 * @param typeSize
 	 */
-	protected VmNormalClass(
-		String name,
-		VmNormalClass superClass,
-		AbstractVmClassLoader loader,
-		boolean primitive,
-		int typeSize) {
+	protected VmNormalClass(String name, VmNormalClass superClass, VmClassLoader loader, boolean primitive, int typeSize) {
 		super(name, superClass, loader, primitive, typeSize);
 		testClassType();
 	}
@@ -36,28 +31,30 @@ public final class VmNormalClass extends VmClassType {
 	 * @param loader
 	 * @param accessFlags
 	 */
-	public VmNormalClass(
-		String name,
-		String superClassName,
-		AbstractVmClassLoader loader,
-		int accessFlags) {
+	public VmNormalClass(String name, String superClassName, VmClassLoader loader, int accessFlags) {
 		super(name, superClassName, loader, accessFlags);
 		testClassType();
 	}
 
 	/**
 	 * Return the size in bytes of instantiations of this class
+	 * 
 	 * @return The object size
 	 */
-	public final int getObjSize() {
+	public final int getObjectSize() {
+		if (!isPrepared()) {
+			throw new IllegalStateException("Not initialized yet");
+		}
 		return objectSize;
 	}
-	
+
 	/**
 	 * Sets the objectSize.
-	 * @param objectSize The objectSize to set
+	 * 
+	 * @param objectSize
+	 *            The objectSize to set
 	 */
-	protected void setObjectSize(int objectSize) {
+	protected final void setObjectSize(int objectSize) {
 		if (this.objectSize == 0) {
 			this.objectSize = objectSize;
 		} else {
@@ -66,11 +63,14 @@ public final class VmNormalClass extends VmClassType {
 	}
 
 	/**
-	 * Gets the offsets within an instance of this class of all
-	 * reference non-static member variables.
+	 * Gets the offsets within an instance of this class of all reference non-static member variables.
+	 * 
 	 * @return The reference offsets
 	 */
 	public final int[] getReferenceOffsets() {
+		if (!isPrepared()) {
+			throw new IllegalStateException("Not initialized yet");
+		}
 		return referenceOffsets;
 	}
 
@@ -80,18 +80,21 @@ public final class VmNormalClass extends VmClassType {
 	protected void prepareForInstantiation() {
 		// Step 3: Calculate the object size
 		final VmNormalClass superCls = getSuperClass();
-		int sc_size = (superCls != null) ? superCls.objectSize : 0;
+		int sc_size = (superCls != null) ? superCls.getObjectSize() : 0;
 		objectSize += sc_size;
+
+		//System.out.println(getName() + " objsz:" + objectSize + " sc_size:" + sc_size);
 
 		// Step 4a: Fix the offset for all declared non-static fields
 		final int cnt = getNoDeclaredFields();
-		int refOffsetsSize = (superCls != null) ? superCls.referenceOffsets.length : 0;
-		int startRefIdx = refOffsetsSize; 
+		final int[] superRefOffsets = (superCls != null) ? superCls.getReferenceOffsets() : null;
+		int refOffsetsSize = (superCls != null) ? superRefOffsets.length : 0;
+		int startRefIdx = refOffsetsSize;
 		for (int i = 0; i < cnt; i++) {
 			final VmField field = getDeclaredField(i);
 			//fs.resolve(loader);
 			if (!field.isStatic()) {
-				final VmInstanceField inf = (VmInstanceField)field;
+				final VmInstanceField inf = (VmInstanceField) field;
 				inf.resolveOffset(sc_size);
 				if (!field.isPrimitive()) {
 					if (!field.isAddressType()) {
@@ -102,32 +105,36 @@ public final class VmNormalClass extends VmClassType {
 				}
 			}
 		}
-		
+
 		// Step 4b: Create the referenceOffsets field
 		referenceOffsets = new int[refOffsetsSize];
 		if (superCls != null) {
-			System.arraycopy(superCls.referenceOffsets, 0, referenceOffsets, 0, startRefIdx);
+			System.arraycopy(superRefOffsets, 0, referenceOffsets, 0, startRefIdx);
 		}
 		for (int i = 0; i < cnt; i++) {
 			final VmField field = getDeclaredField(i);
 			if (!field.isStatic()) {
-				final VmInstanceField inf = (VmInstanceField)field;
+				final VmInstanceField inf = (VmInstanceField) field;
 				if (!field.isPrimitive()) {
 					if (!field.isAddressType()) {
 						referenceOffsets[startRefIdx++] = inf.getOffset();
 					}
 				}
+				final int off = inf.getOffset();
+				if (off + 4 > objectSize) {
+					throw new Error("Invalid offset in class " + getName() + " ofs " + off + " size " + objectSize);
+				}
 			}
-		}		 
+		}
 
 	}
 
 	/**
 	 * Test if this class is using the right modifiers
+	 * 
 	 * @throws RuntimeException
 	 */
-	private final void testClassType() 
-	throws RuntimeException {
+	private final void testClassType() throws RuntimeException {
 		if (isArray()) {
 			throw new RuntimeException("Not a normal class (array-class)");
 		}

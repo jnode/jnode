@@ -19,7 +19,7 @@ public final class VmInterfaceClass extends VmType {
 	public VmInterfaceClass(
 		String name,
 		String superClassName,
-		AbstractVmClassLoader loader,
+		VmClassLoader loader,
 		int accessFlags) {
 		super(name, superClassName, loader, accessFlags);
 		if (!superClassName.equals("java.lang.Object")) {

@@ -10,8 +10,8 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.VmClassLoader;
-import org.jnode.vm.classmgr.AbstractVmClassLoader;
+import org.jnode.vm.VmSystemClassLoader;
+import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.x86.VmX86Architecture;
 
@@ -22,14 +22,14 @@ import org.jnode.vm.x86.VmX86Architecture;
  */
 public class TestVmClass extends TestCase {
 	
-	private AbstractVmClassLoader clc;
+	private VmClassLoader clc;
 
 	/**
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		VmClassLoader bib = new VmClassLoader(new URL("file:///" + System.getProperty("classes.dir") + "/"), new VmX86Architecture());
+		VmSystemClassLoader bib = new VmSystemClassLoader(new URL("file:///" + System.getProperty("classes.dir") + "/"), new VmX86Architecture());
 		VmType.initializeForBootImage(bib);
 		clc = bib;
 	}

@@ -5,6 +5,7 @@
         name="Log4j classes"
         version="1.2.8"
         provider-name="jakarta.apache.org"
+        system="true"
         class="org.jnode.log4j.Log4jPlugin">
         
   <runtime>

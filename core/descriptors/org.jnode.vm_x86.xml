@@ -4,6 +4,7 @@
 <plugin id="org.jnode.vm" 
         name="JNode VM-X86 classes"
         version="@VERSION@"
+        system="true"
         provider-name="JNode.org">
         
   <requires>

@@ -28,7 +28,7 @@ public class VmConstFieldRef extends VmConstMemberRef  {
 	 * Resolve the references of this constant to loaded VmXxx objects.
 	 * @param clc
 	 */
-	protected void doResolveMember(AbstractVmClassLoader clc) {
+	protected void doResolveMember(VmClassLoader clc) {
 		VmType vmClass = getConstClass().getResolvedVmClass();
 		vmResolvedField = vmClass.getField(getName());	
 		if (vmResolvedField == null) {

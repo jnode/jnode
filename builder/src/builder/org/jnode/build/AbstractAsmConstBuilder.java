@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.Iterator;
 
 import org.jnode.vm.VmArchitecture;
-import org.jnode.vm.VmClassLoader;
+import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmNormalClass;
@@ -58,7 +58,7 @@ public abstract class AbstractAsmConstBuilder {
 
 		final VmArchitecture arch = getArchitecture();
 		final int slotSize = arch.getReferenceSize();
-		VmClassLoader cl = new VmClassLoader(classesURL, arch);
+		VmSystemClassLoader cl = new VmSystemClassLoader(classesURL, arch);
 		VmType.initializeForBootImage(cl);
 
 		FileWriter fw = new FileWriter(destFile);
@@ -112,7 +112,7 @@ public abstract class AbstractAsmConstBuilder {
 				// The size
 				if (vmClass instanceof VmNormalClass) {
 					final VmNormalClass cls = (VmNormalClass) vmClass;
-					out.println(cname + "_SIZE equ " + cls.getObjSize());
+					out.println(cname + "_SIZE equ " + cls.getObjectSize());
 				}
 				//
 				out.println();

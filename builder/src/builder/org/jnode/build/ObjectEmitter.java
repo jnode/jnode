@@ -16,13 +16,13 @@ import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.x86.X86Stream;
 import org.jnode.vm.BootableObject;
 import org.jnode.vm.VmSystemObject;
-import org.jnode.vm.classmgr.AbstractVmClassLoader;
+import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmType;
 
 public class ObjectEmitter {
 
-	private final AbstractVmClassLoader loaderContext;
+	private final VmClassLoader loaderContext;
 	private final NativeStream os;
 	private final BootImageNativeStream bis;
 	private final PrintWriter debugWriter;
@@ -36,7 +36,7 @@ public class ObjectEmitter {
 	 * @param debug
 	 * @param legalInstanceClasses
 	 */
-	public ObjectEmitter(AbstractVmClassLoader b, NativeStream os, PrintWriter debug, Set legalInstanceClasses) {
+	public ObjectEmitter(VmClassLoader b, NativeStream os, PrintWriter debug, Set legalInstanceClasses) {
 		this.loaderContext = b;
 		this.os = os;
 		this.bis = (BootImageNativeStream)os;

@@ -26,7 +26,7 @@ public abstract class VmConstObject extends VmSystemObject implements Uninterrup
 	 * Resolve the references of this constant to loaded VmXxx objects.
 	 * @param clc
 	 */
-	public void resolve(AbstractVmClassLoader clc) {
+	public void resolve(VmClassLoader clc) {
 		if (!resolved) {
 			doResolve(clc);
 			resolved = true;
@@ -45,7 +45,7 @@ public abstract class VmConstObject extends VmSystemObject implements Uninterrup
 	 * Resolve the references of this constant to loaded VmXxx objects.
 	 * @param clc
 	 */
-	protected abstract void doResolve(AbstractVmClassLoader clc);
+	protected abstract void doResolve(VmClassLoader clc);
 	
 	/**
 	 * Gets the index of this object in the constantpool it is in.

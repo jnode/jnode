@@ -5,7 +5,7 @@ package org.jnode.test;
 
 import java.io.File;
 
-import org.jnode.vm.VmClassLoader;
+import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.bytecode.BytecodeViewer;
 import org.jnode.vm.bytecode.ControlFlowGraph;
@@ -23,7 +23,7 @@ public class TestControlFlowGraph {
 	throws Exception {
 
 		final String className = (args.length > 0) ? args[0] : "java.lang.Object";
-		final VmClassLoader loader = new VmClassLoader(new File(".").toURL(), new VmX86Architecture());
+		final VmSystemClassLoader loader = new VmSystemClassLoader(new File(".").toURL(), new VmX86Architecture());
 		final VmType vmClass = loader.loadClass(className, true);
 		
 		for (int i = 0; i < vmClass.getNoDeclaredMethods(); i++) {

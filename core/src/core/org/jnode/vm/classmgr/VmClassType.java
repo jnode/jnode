@@ -36,7 +36,7 @@ public abstract class VmClassType extends VmType {
 	public VmClassType(
 		String name,
 		String superClassName,
-		AbstractVmClassLoader loader,
+		VmClassLoader loader,
 		int accessFlags) {
 		super(name, superClassName, loader, accessFlags);
 	}
@@ -51,7 +51,7 @@ public abstract class VmClassType extends VmType {
 	public VmClassType(
 		String name,
 		VmNormalClass superClass,
-		AbstractVmClassLoader loader,
+		VmClassLoader loader,
 		boolean primitive,
 		int typeSize) {
 		super(name, superClass, loader, primitive, typeSize);

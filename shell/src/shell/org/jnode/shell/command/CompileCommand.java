@@ -8,7 +8,6 @@ import org.jnode.shell.help.Help;
 import org.jnode.shell.help.IntegerArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
-import org.jnode.vm.VmSystem;
 import org.jnode.vm.classmgr.VmType;
 
 /**
@@ -25,9 +24,11 @@ public class CompileCommand {
 	public static void main(String[] args) throws Exception {
 		ParsedArguments cmdLine = HELP_INFO.parse(args);
 
-		final String filename = ARG_CLASS.getValue(cmdLine);
+		final String className = ARG_CLASS.getValue(cmdLine);
 		final int level = PARAM_LEVEL.isSet(cmdLine) ? ARG_LEVEL.getInteger(cmdLine) : 0;
-		final VmType type = VmSystem.getSystemClassLoader().loadClass(filename, true);
+		final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		final Class cls = cl.loadClass(className);
+		final VmType type = cls.getVmClass();
 		final long start = System.currentTimeMillis();
 		final int count = type.compileRuntime(level);
 		final long end = System.currentTimeMillis();

@@ -32,7 +32,7 @@ public class PhiOperand extends Operand {
 		int type = getType();
 		if (type == UNKNOWN) {
 			setType(source.getType());
-			Variable v = (Variable) source;
+			Variable v = source;
 			varIndex = v.getIndex();
 		} else if (type != source.getType()) {
 			throw new AssertionError("phi operand source types don't match");

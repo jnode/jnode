@@ -10,6 +10,7 @@ import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
+import org.jnode.fs.util.*;
 import org.jnode.util.NumberUtils;
 
 /**

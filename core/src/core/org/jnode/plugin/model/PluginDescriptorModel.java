@@ -29,12 +29,15 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	private final String name;
 	private final String version;
 	private final String className;
+	private final boolean system;
 	private final PluginPrerequisiteModel[] requires;
 	private final ExtensionModel[] extensions;
 	private final ExtensionPointModel[] extensionPoints;
 	private final RuntimeModel runtime;
 	private final PluginRegistryModel registry;
 	private Plugin plugin;
+	private final PluginJar jarFile;
+	private transient ClassLoader classLoader;
 
 	/**
 	 * Load a plugin-descriptor without a registry.
@@ -42,7 +45,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	 * @param e
 	 */
 	public PluginDescriptorModel(XMLElement e) throws PluginException {
-		this(null, e);
+		this(null, null, e);
 	}
 
 	/**
@@ -50,13 +53,19 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	 * 
 	 * @param e
 	 */
-	public PluginDescriptorModel(PluginRegistryModel registry, XMLElement e) throws PluginException {
+	public PluginDescriptorModel(PluginRegistryModel registry, PluginJar jarFile, XMLElement e) throws PluginException {
 		this.registry = registry;
+		this.jarFile = jarFile;
 		id = getAttribute(e, "id", true);
 		name = getAttribute(e, "name", true);
 		providerName = getAttribute(e, "provider-name", false);
 		version = getAttribute(e, "version", true);
 		className = getAttribute(e, "class", false);
+		system = getBooleanAttribute(e, "system", false);
+
+		if (registry != null) {
+			registry.registerPlugin(this);
+		}
 
 		final ArrayList epList = new ArrayList();
 		final ArrayList exList = new ArrayList();
@@ -181,8 +190,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	}
 
 	/**
-	 * Returns the extension point with the given simple identifier declared in this plug-in, or
-	 * null if there is no such extension point.
+	 * Returns the extension point with the given simple identifier declared in this plug-in, or null if there is no such extension point.
 	 * 
 	 * @param extensionPointId
 	 *            the simple identifier of the extension point (e.g. "wizard").
@@ -225,9 +233,8 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	}
 
 	/**
-	 * Gets the plugin that is described by this descriptor. If no plugin class is given in the
-	 * descriptor, an empty plugin is returned. This method will always returns the same plugin
-	 * instance for a given descriptor.
+	 * Gets the plugin that is described by this descriptor. If no plugin class is given in the descriptor, an empty plugin is returned. This method will always returns the same plugin instance for a
+	 * given descriptor.
 	 */
 	public Plugin getPlugin() throws PluginException {
 		if (plugin == null) {
@@ -241,6 +248,15 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	}
 
 	/**
+	 * Is this a descriptor of a system plugin. System plugins are not reloadable.
+	 * 
+	 * @return boolean
+	 */
+	public boolean isSystemPlugin() {
+		return system;
+	}
+
+	/**
 	 * Create the plugin describe by this descriptor
 	 */
 	private Plugin createPlugin() throws PluginException {
@@ -248,7 +264,10 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 			return new EmptyPlugin(this);
 		} else {
 			try {
-				final Class cls = Thread.currentThread().getContextClassLoader().loadClass(className);
+				//final Class cls = Thread.currentThread().getContextClassLoader().loadClass(className);
+				final ClassLoader cl = getPluginClassLoader();
+				//System.out.println("cl=" + cl.getClass().getName());
+				final Class cls = cl.loadClass(className);
 				final Constructor cons = cls.getConstructor(new Class[] { PluginDescriptor.class });
 				return (Plugin) cons.newInstance(new Object[] { this });
 			} catch (ClassNotFoundException ex) {
@@ -263,5 +282,41 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 				throw new PluginException(ex);
 			}
 		}
+	}
+
+	/**
+	 * @return Returns the jarFile.
+	 */
+	public final PluginJar getJarFile() {
+		return this.jarFile;
+	}
+
+	/**
+	 * Gets the classloader of this plugin descriptor.
+	 * 
+	 * @return ClassLoader
+	 */
+	public ClassLoader getPluginClassLoader() {
+		if (classLoader == null) {
+			if (system) {
+				classLoader = ClassLoader.getSystemClassLoader();
+			} else {
+				if (jarFile == null) {
+					throw new RuntimeException("Cannot create classloader without a jarfile");
+				}
+				final int reqMax = requires.length;
+				final PluginClassLoader[] preLoaders = new PluginClassLoader[reqMax];
+				for (int i = 0; i < reqMax; i++) {
+					final String reqId = requires[i].getPluginId();
+					final PluginDescriptor reqDescr = registry.getPluginDescriptor(reqId);
+					final ClassLoader cl = reqDescr.getPluginClassLoader();
+					if (cl instanceof PluginClassLoader) {
+						preLoaders[i] = (PluginClassLoader) cl;
+					}
+				}
+				classLoader = new PluginClassLoader(jarFile, preLoaders);
+			}
+		}
+		return classLoader;
 	}
 }

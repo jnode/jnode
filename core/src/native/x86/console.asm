@@ -107,7 +107,7 @@ pc_normal:
 	mov edi,[scr_ofs]
 	shl edi,1
 	add edi,scr_addr
-	mov ah,0x70 ; Color: black on white background
+	mov ah,0x08 ; Color: gray on black background
 	mov [edi],ax
 	inc dword [scr_ofs]
 	pop edi

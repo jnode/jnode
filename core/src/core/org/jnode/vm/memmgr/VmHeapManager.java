@@ -50,7 +50,8 @@ public abstract class VmHeapManager extends VmSystemObject {
 	 * @return The new instance
 	 */
 	public final Object newInstance(VmType cls) {
-		return newInstance(cls, ((VmNormalClass)cls).getObjSize());
+		cls.link();
+		return newInstance(cls, ((VmNormalClass)cls).getObjectSize());
 	}
 
 	/**
@@ -160,7 +161,7 @@ public abstract class VmHeapManager extends VmSystemObject {
 			size = (VmArray.DATA_OFFSET * slotSize) * (length * elemSize);
 		} else {
 			final VmNormalClass normalClass = (VmNormalClass) objectClass;
-			size = normalClass.getObjSize();
+			size = normalClass.getObjectSize();
 		}
 		final Object newObj = allocObject(objectClass, size);
 		helper.copy(objectAddr, helper.addressOf(newObj), size);

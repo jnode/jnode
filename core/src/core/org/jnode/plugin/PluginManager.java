@@ -3,6 +3,7 @@
  */
 package org.jnode.plugin;
 
+
 /**
  * Interface of manager of all plugins in the system.
  * 
@@ -55,5 +56,4 @@ public interface PluginManager {
 	 *             if an error was encountered and the plugin is unable to stop.
 	 */
 	public void stopPlugin(PluginDescriptor d) throws PluginException;
-
 }

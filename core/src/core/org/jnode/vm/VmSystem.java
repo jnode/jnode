@@ -4,14 +4,13 @@
 
 package org.jnode.vm;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Properties;
 
-import org.jnode.driver.cmos.RTCUtils;
-import org.jnode.driver.console.Screen;
-import org.jnode.driver.console.ScreenOutputStream;
 import org.jnode.vm.classmgr.AbstractExceptionHandler;
-import org.jnode.vm.classmgr.AbstractVmClassLoader;
+import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmCompiledCode;
@@ -32,12 +31,14 @@ public final class VmSystem {
 	public static final int RC_DEFHANDLER = 0xFFFFFFF1;
 
 	private static final int STACKTRACE_LIMIT = 256;
-	
+
 	private static boolean inited;
-	private static VmClassLoader systemLoader;
+	private static VmSystemClassLoader systemLoader;
 	private static String cmdLine;
 	private static volatile long currentTimeMillis;
 	private static long rtcIncrement;
+	private static RTCService rtcService;
+	private static SystemOutputStream bootOut;
 
 	/**
 	 * Initialize the Virtual Machine
@@ -50,16 +51,16 @@ public final class VmSystem {
 			Unsafe.debug("2");
 
 			/* Set System.err, System.out */
-			//final SystemOutputStream os = new SystemOutputStream();
-			final ScreenOutputStream os = new ScreenOutputStream(Screen.getInstance());
-			final PrintStream ps = new PrintStream(os, true);
+			bootOut = new SystemOutputStream();
+			//final ScreenOutputStream os = new ScreenOutputStream(Screen.getInstance());
+			final PrintStream ps = new PrintStream(bootOut, true);
 			System.setOut(ps);
 			System.setErr(ps);
-			
+
 			Unsafe.debug("3");
-			
+
 			/* Initialize the system classloader */
-			VmClassLoader loader = (VmClassLoader) (getVmClass(Unsafe.getCurrentProcessor()).getLoader());
+			VmSystemClassLoader loader = (VmSystemClassLoader) (getVmClass(Unsafe.getCurrentProcessor()).getLoader());
 			systemLoader = loader;
 			loader.initialize();
 
@@ -70,10 +71,10 @@ public final class VmSystem {
 			MonitorManager.initialize();
 
 			final Vm vm = Vm.getVm();
-			
+
 			// Initialize the monitors for the heap manager
 			vm.getHeapManager().start();
-			
+
 			/* We're done initializing */
 			inited = true;
 			Unsafe.getCurrentProcessor().systemReadyForThreadSwitch();
@@ -138,12 +139,22 @@ public final class VmSystem {
 		return cmdLine;
 	}
 
+	/**
+	 * Gets the log of the bootstrap phase.
+	 * 
+	 * @return String
+	 */
+	public static String getBootLog() {
+		return bootOut.getData();
+	}
+
 	// ------------------------------------------
 	// java.lang.Object support
 	// ------------------------------------------
 
 	/**
 	 * Gets the class of the given object
+	 * 
 	 * @param obj
 	 * @return The class
 	 */
@@ -205,21 +216,21 @@ public final class VmSystem {
 	// ------------------------------------------
 
 	public static Class forName(String className) throws ClassNotFoundException {
-		return getContextClassLoader().loadClass(className, true).asClass();
+		return getContextClassLoader().asClassLoader().loadClass(className);
 	}
 
 	/**
-	 * Gets the first non-system classloader out of the current stacktrace, or the system
-	 * classloader if no other classloader is found in the current stacktrace.
+	 * Gets the first non-system classloader out of the current stacktrace, or the system classloader if no other classloader is found in the current stacktrace.
+	 * 
 	 * @return The classloader
 	 */
-	protected static AbstractVmClassLoader getContextClassLoader() {
+	protected static VmClassLoader getContextClassLoader() {
 		final VmStackReader reader = Unsafe.getCurrentProcessor().getArchitecture().getStackReader();
-		final VmClassLoader systemLoader = VmSystem.systemLoader;
+		final VmSystemClassLoader systemLoader = VmSystem.systemLoader;
 		Address f = Unsafe.getCurrentFrame();
 		while (reader.isValid(f)) {
 			final VmMethod method = reader.getMethod(f);
-			final AbstractVmClassLoader loader = method.getDeclaringClass().getLoader();
+			final VmClassLoader loader = method.getDeclaringClass().getLoader();
 			if ((loader != null) && (loader != systemLoader)) {
 				return loader;
 			} else {
@@ -268,6 +279,7 @@ public final class VmSystem {
 
 	/**
 	 * Gets the stacktrace of a given thread.
+	 * 
 	 * @param current
 	 * @return The stacktrace
 	 */
@@ -345,8 +357,7 @@ public final class VmSystem {
 	}
 
 	/**
-	 * Find an exception handler to handle the given exception in the given frame at the given
-	 * address.
+	 * Find an exception handler to handle the given exception in the given frame at the given address.
 	 * 
 	 * @param ex
 	 * @param frame
@@ -384,8 +395,7 @@ public final class VmSystem {
 
 			//if (interpreted) {
 			/*
-			 * Screen.debug("{ex at pc:"); Screen.debug(pc); Screen.debug(" of " +
-			 * method.getBytecodeSize()); Screen.debug(method.getName());
+			 * Screen.debug("{ex at pc:"); Screen.debug(pc); Screen.debug(" of " + method.getBytecodeSize()); Screen.debug(method.getName());
 			 */
 			//}
 
@@ -567,28 +577,27 @@ public final class VmSystem {
 	}
 
 	/**
-	 * Returns the current time in milliseconds. Note that while the unit of time of the return
-	 * value is a millisecond, the granularity of the value depends on the underlying operating
-	 * system and may be larger. For example, many operating systems measure time in units of tens
-	 * of milliseconds. See the description of the class Date for a discussion of slight
-	 * discrepancies that may arise between "computer time" and coordinated universal time (UTC).
+	 * Returns the current time in milliseconds. Note that while the unit of time of the return value is a millisecond, the granularity of the value depends on the underlying operating system and may
+	 * be larger. For example, many operating systems measure time in units of tens of milliseconds. See the description of the class Date for a discussion of slight discrepancies that may arise
+	 * between "computer time" and coordinated universal time (UTC).
 	 * 
-	 * This method does call other methods and CANNOT be used in the low-level system environment,
-	 * where synchronization cannot be used.
-	 *  *
-	 * @return the difference, measured in milliseconds, between the current time and midnight,
-	 *         January 1, 1970 UTC
+	 * This method does call other methods and CANNOT be used in the low-level system environment, where synchronization cannot be used. *
+	 * 
+	 * @return the difference, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC
 	 */
 	public static long currentTimeMillis() {
 
 		if (rtcIncrement == 0) {
-			final long rtcTime = RTCUtils.getTime();
-			if (rtcTime == 0L) {
-				// We don't have an RTC service yet, return an invalid,
-				// but for now good enough value
-				return currentTimeMillis;
-			} else {
-				rtcIncrement = rtcTime - currentTimeMillis;
+			final RTCService rtcService = VmSystem.rtcService;
+			if (rtcService != null) {
+				final long rtcTime = rtcService.getTime();
+				if (rtcTime == 0L) {
+					// We don't have an RTC service yet, return an invalid,
+					// but for now good enough value
+					return currentTimeMillis;
+				} else {
+					rtcIncrement = rtcTime - currentTimeMillis;
+				}
 			}
 		}
 		return currentTimeMillis + rtcIncrement;
@@ -597,8 +606,8 @@ public final class VmSystem {
 	/**
 	 * Returns the number of milliseconds since booting the kernel of JNode.
 	 * 
-	 * This method does not call any other method and CAN be used in the low-level system
-	 * environment, where synchronization cannot be used.
+	 * This method does not call any other method and CAN be used in the low-level system environment, where synchronization cannot be used.
+	 * 
 	 * @return The current time of the kernel
 	 * @throws PragmaUninterruptible
 	 */
@@ -609,19 +618,57 @@ public final class VmSystem {
 	/**
 	 * @return VmClassLoader
 	 */
-	public static VmClassLoader getSystemClassLoader() {
+	public static VmSystemClassLoader getSystemClassLoader() {
 		return systemLoader;
 	}
-	
+
 	public static long freeMemory() {
 		return Vm.getVm().getHeapManager().getFreeMemory();
 	}
-	
+
 	public static long totalMemory() {
 		return Vm.getVm().getHeapManager().getTotalMemory();
 	}
-	
+
 	public static void gc() {
 		Vm.getVm().getHeapManager().gc();
+	}
+
+	static class SystemOutputStream extends OutputStream {
+
+		private final StringBuffer data = new StringBuffer();
+
+		/**
+		 * @see java.io.OutputStream#write(int)
+		 */
+		public void write(int b) throws IOException {
+			final char ch = (char) (b & 0xFF);
+			Unsafe.debug(ch);
+			data.append(ch);
+		}
+
+		public String getData() {
+			return data.toString();
+		}
+	}
+
+	/**
+	 * @param rtcService
+	 *            The rtcService to set.
+	 */
+	public static final void setRtcService(RTCService rtcService) {
+		if (VmSystem.rtcService == null) {
+			VmSystem.rtcService = rtcService;
+		}
+	}
+
+	/**
+	 * @param rtcService
+	 *            The rtcService previously set.
+	 */
+	public static final void resetRtcService(RTCService rtcService) {
+		if (VmSystem.rtcService == rtcService) {
+			VmSystem.rtcService = null;
+		}
 	}
 }

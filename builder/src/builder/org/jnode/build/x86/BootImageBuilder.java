@@ -51,7 +51,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 
 	public static final int LOAD_ADDR = 1024 * 1024;
 	public static final int INITIAL_OBJREFS_CAPACITY = 200000;
-	public static final int INITIAL_SIZE = 16*1024*1024;
+	public static final int INITIAL_SIZE = 17*1024*1024;
 	
 	private VmX86Processor processor;
 	private String processorId;

@@ -13,7 +13,7 @@ import org.jnode.vm.Address;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.bytecode.BasicBlock;
 import org.jnode.vm.bytecode.ControlFlowGraph;
-import org.jnode.vm.classmgr.AbstractVmClassLoader;
+import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmAddressMap;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmCompiledCode;
@@ -253,7 +253,7 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
 	 * 
 	 * @param loader
 	 */
-	public abstract void initialize(AbstractVmClassLoader loader);
+	public abstract void initialize(VmClassLoader loader);
 
 	/**
 	 * Dump compiler statistics to System.out

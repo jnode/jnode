@@ -53,7 +53,7 @@ public final class ClassDecoder {
 		int offset,
 		int class_image_length,
 		boolean rejectNatives,
-		AbstractVmClassLoader clc,
+		VmClassLoader clc,
 		SelectorMap selectorMap,
 		VmStatics statics) {
 		cl_init();
@@ -78,7 +78,7 @@ public final class ClassDecoder {
 		int offset,
 		int class_image_length,
 		boolean rejectNatives,
-		AbstractVmClassLoader clc,
+		VmClassLoader clc,
 		SelectorMap selectorMap,
 		VmStatics statics)
 		throws ClassFormatError {

@@ -46,7 +46,8 @@ public class Main {
 			final long end = VmSystem.currentKernelMillis();
 			System.out.println("JNode initialization finished in " + (end - start) + "ms.");
 
-			Class shellClass = Class.forName("org.jnode.shell.CommandShell");
+			final ClassLoader loader = pluginRegistry.getPluginsClassLoader();
+			Class shellClass = loader.loadClass("org.jnode.shell.CommandShell");
 			Runnable shell = (Runnable) shellClass.newInstance();
 			shell.run();
 
