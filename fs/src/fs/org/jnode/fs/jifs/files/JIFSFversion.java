@@ -8,7 +8,7 @@
 * For a new version of jifs see jifs.org.
 * To contact me mail to : mail@jifs.org
 *
-* Copyright (C) 2004  Andreas Hänel
+* Copyright (C) 2004  Andreas Haenel
 *
 * This library is free software; you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
