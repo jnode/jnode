@@ -20,9 +20,8 @@ import org.jnode.vm.x86.X86CpuID;
  * 
  * @author epr
  */
-public class X86CompilerHelper implements X86CompilerConstants {
+public class X86CompilerHelper extends X86StackManager implements X86CompilerConstants {
 
-	private final AbstractX86Stream os;
 	private VmMethod method;
 	private final boolean isBootstrap;
 	private final Label jumpTableLabel;
@@ -35,7 +34,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 * @param context
 	 */
 	public X86CompilerHelper(AbstractX86Stream os, X86CompilerContext context, boolean isBootstrap) {
-		this.os = os;
+		super(os);
 		this.isBootstrap = isBootstrap;
 		if (isBootstrap) {
 			jumpTableLabel = new Label(X86JumpTable.JUMPTABLE_NAME);
@@ -128,11 +127,11 @@ public class X86CompilerHelper implements X86CompilerConstants {
 			/** No return value */
 		} else if ((ch == 'J') || (ch == 'D')) {
 			/** Wide return value */
-			os.writePUSH(Register.EDX);
-			os.writePUSH(Register.EAX);
+			writePUSH(Register.EDX);
+			writePUSH(Register.EAX);
 		} else {
 			/** Normal return value */
-			os.writePUSH(Register.EAX);
+			writePUSH(Register.EAX);
 		}
 	}
 
@@ -175,7 +174,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 			final VmType cls = method.getDeclaringClass();
 			if (!cls.isInitialized()) {
 				// Save eax
-				os.writePUSH(Register.EAX);
+				writePUSH(Register.EAX);
 				// Do the is initialized test
 				//os.writeMOV_Const(Register.EAX, cls);
 				os.writeMOV(INTSIZE, Register.EAX, methodReg, context.getVmMemberDeclaringClassField().getOffset());
@@ -185,11 +184,11 @@ public class X86CompilerHelper implements X86CompilerConstants {
 				final Label afterInit = new Label(method.getMangledName() + "$$after-classinit");
 				os.writeJCC(afterInit, X86Constants.JNZ);
 				// Call cls.initialize
-				os.writePUSH(cls);
+				writePUSH(cls);
 				invokeJavaMethod(context.getVmTypeInitialize(), context);
 				os.setObjectRef(afterInit);
 				// Restore eax
-				os.writePOP(Register.EAX);
+				writePOP(Register.EAX);
 				return true;
 			}
 		}
