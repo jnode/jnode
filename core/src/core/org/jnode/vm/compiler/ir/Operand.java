@@ -31,6 +31,7 @@ public abstract class Operand {
 	public int getType() {
 		return type;
 	}
+
 	/**
 	 * @param type
 	 */

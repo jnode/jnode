@@ -15,6 +15,7 @@ import org.jnode.vm.compiler.ir.quad.VariableRefAssignQuad;
 public abstract class Variable extends Operand implements Cloneable {
 	private int index;
 	private int ssaValue;
+	private Location location;
 
 	/*
 	 * The operation where this variable is assigned
@@ -125,5 +126,19 @@ public abstract class Variable extends Operand implements Cloneable {
 		}
 		assignQuad.setDeadCode(false);
 		return this;
+	}
+
+	/**
+	 * @return
+	 */
+	public Location getLocation() {
+		return this.location;
+	}
+
+	/**
+	 * @param loc
+	 */
+	public void setLocation(Location loc) {
+		this.location = loc;
 	}
 }

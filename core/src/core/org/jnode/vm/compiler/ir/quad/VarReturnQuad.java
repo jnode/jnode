@@ -41,6 +41,10 @@ public class VarReturnQuad extends Quad {
 	public Operand[] getReferencedOps() {
 		return refs;
 	}
+	
+	public Operand getOperand() {
+		return operand;
+	}
 
 	public String toString() {
 		return getAddress() + ": return " + operand;

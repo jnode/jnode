@@ -5,11 +5,13 @@ package org.jnode.vm.compiler.ir;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.jnode.assembler.x86.TextX86Stream;
 import org.jnode.util.BootableArrayList;
 import org.jnode.util.BootableHashMap;
 import org.jnode.vm.VmSystemClassLoader;
@@ -20,6 +22,7 @@ import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.ir.quad.*;
 import org.jnode.vm.x86.VmX86Architecture;
+import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.x86.compiler.l2.X86CodeGenerator;
 
 /**
@@ -28,7 +31,9 @@ import org.jnode.vm.x86.compiler.l2.X86CodeGenerator;
  */
 public class IRTest {
 	public static void main(String args[]) throws SecurityException, IOException, ClassNotFoundException {
-		X86CodeGenerator x86cg = new X86CodeGenerator();
+		X86CpuID cpuId = X86CpuID.createID("p5");
+		TextX86Stream os = new TextX86Stream(new OutputStreamWriter(System.out), cpuId);
+		X86CodeGenerator x86cg = new X86CodeGenerator(os);
 		VmByteCode code = loadByteCode(args);
 
 		IRControlFlowGraph cfg = new IRControlFlowGraph(code);
@@ -55,7 +60,10 @@ public class IRTest {
 		LinearScanAllocator lsa = new LinearScanAllocator(liveRanges);
 		lsa.allocate();
 
-		x86cg.setVariableMap(lsa.getVariableMap());
+		x86cg.setArgumentVariables(irg.getVariables(), irg.getNoArgs());
+		x86cg.setSpilledVariables(lsa.getSpilledVariables());
+		x86cg.emitHeader();
+
 		n = quads.size();
 		for (int i=0; i<n; i+=1) {
 			Quad quad = (Quad) quads.get(i);
@@ -63,7 +71,9 @@ public class IRTest {
 				quad.generateCode(x86cg);
 			}
 		}
+		os.flush();
 
+/*
 		BytecodeViewer bv = new BytecodeViewer();
 		BytecodeParser.parse(code, bv);
 
@@ -100,6 +110,7 @@ public class IRTest {
 		for (int i=0; i<n; i+=1) {
 			System.out.println(liveRanges[i]);
 		}
+*/
 	}
 
 	private static VmByteCode loadByteCode(String[] args)
@@ -114,7 +125,7 @@ public class IRTest {
 		int nMethods = type.getNoDeclaredMethods();
 		for (int i=0; i<nMethods; i+=1) {
 			VmMethod method = type.getDeclaredMethod(i);
-			if ("arithOptLoop".equals(method.getName())) {
+			if ("simple".equals(method.getName())) {
 				arithMethod = method;
 				break;
 			}
@@ -150,5 +161,13 @@ public class IRTest {
 
 	public static int arithOptIntx(int a0, int a1, int a2) {
 		return a0 + a1;
+	}
+
+	public static int discriminant(int a0, int a1, int a2) {
+		return a1*a1 - 4*a0*a2;
+	}
+
+	public static int simple(int a0, int a1) {
+		return -10;
 	}
 }

@@ -40,6 +40,16 @@ public abstract class CodeGenerator {
 	public abstract boolean supports3AddrOps();
 
 	/**
+	 * @param variables
+	 */
+	public abstract void setSpilledVariables(Variable[] variables);
+
+	/**
+	 * 
+	 */
+	public abstract void emitHeader();
+
+	/**
 	 * @param quad
 	 */
 	public abstract void generateCodeFor(ConditionalBranchQuad quad);
@@ -48,11 +58,6 @@ public abstract class CodeGenerator {
 	 * @param quad
 	 */
 	public abstract void generateCodeFor(ConstantRefAssignQuad quad);
-
-	/**
-	 * @param quad
-	 */
-	public abstract void generateCodeFor(UnaryQuad quad);
 
 	/**
 	 * @param quad
@@ -78,4 +83,58 @@ public abstract class CodeGenerator {
 	 * @param quad
 	 */
 	public abstract void generateCodeFor(BinaryQuad quad);
+
+	/**
+	 * @param quad
+	 * @param object
+	 * @param operation
+	 * @param con
+	 */
+	public abstract void generateCodeFor(UnaryQuad quad, Object lhsReg,
+		int operation, Constant con);
+
+	/**
+	 * @param quad
+	 * @param object
+	 * @param operation
+	 * @param object2
+	 */
+	public abstract void generateCodeFor(UnaryQuad quad, Object lhsReg,
+		int operation, Object rhsReg);
+
+	/**
+	 * @param quad
+	 * @param object
+	 * @param operation
+	 * @param i
+	 */
+	public abstract void generateCodeFor(UnaryQuad quad, Object lhsReg,
+		int operation, int rhsDisp);
+
+	/**
+	 * @param quad
+	 * @param lhsDisp
+	 * @param operation
+	 * @param object
+	 */
+	public abstract void generateCodeFor(UnaryQuad quad, int lhsDisp,
+		int operation, Object rhsReg);
+
+	/**
+	 * @param quad
+	 * @param lhsDisp
+	 * @param operation
+	 * @param i
+	 */
+	public abstract void generateCodeFor(UnaryQuad quad, int lhsDisp,
+		int operation, int rhsDisp);
+
+	/**
+	 * @param quad
+	 * @param lhsDisp
+	 * @param operation
+	 * @param con
+	 */
+	public abstract void generateCodeFor(UnaryQuad quad, int lhsDisp,
+		int operation, Constant con);
 }

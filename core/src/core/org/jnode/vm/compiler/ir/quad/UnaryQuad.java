@@ -7,8 +7,12 @@ package org.jnode.vm.compiler.ir.quad;
 
 import org.jnode.util.BootableHashMap;
 import org.jnode.vm.compiler.ir.CodeGenerator;
+import org.jnode.vm.compiler.ir.Constant;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
+import org.jnode.vm.compiler.ir.Location;
 import org.jnode.vm.compiler.ir.Operand;
+import org.jnode.vm.compiler.ir.RegisterLocation;
+import org.jnode.vm.compiler.ir.StackLocation;
 import org.jnode.vm.compiler.ir.Variable;
 
 /**
@@ -111,7 +115,54 @@ public class UnaryQuad extends AssignQuad {
 	 * @see org.jnode.vm.compiler.ir.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
 	 */
 	public void generateCode(CodeGenerator cg) {
-		cg.generateCodeFor(this);
+		Variable lhs = getLHS();
+		Location lhsLoc = lhs.getLocation();
+		if (lhsLoc instanceof RegisterLocation) {
+			RegisterLocation regLoc = (RegisterLocation) lhsLoc;
+			Object lhsReg = regLoc.getRegister();
+			if (operand instanceof Variable) {
+				Variable var = (Variable) operand;
+				Location varLoc = var.getLocation();
+				if (varLoc instanceof RegisterLocation) {
+					RegisterLocation vregLoc = (RegisterLocation) varLoc;
+					cg.generateCodeFor(this, lhsReg, operation, vregLoc.getRegister());
+				} else if (varLoc instanceof StackLocation) {
+					StackLocation stackLoc = (StackLocation) varLoc;
+					cg.generateCodeFor(this, lhsReg, operation, stackLoc.getDisplacement());
+				} else {
+					throw new IllegalArgumentException("Unknown location: " + varLoc);
+				}
+			} else if (operand instanceof Constant) {
+				// this probably won't happen, is should be folded earlier
+				Constant con = (Constant) operand;
+				cg.generateCodeFor(this, lhsReg, operation, con);
+			} else {
+				throw new IllegalArgumentException("Unknown operand: " + operand);
+			}
+		} else if (lhsLoc instanceof StackLocation) {
+			StackLocation lhsStackLoc = (StackLocation) lhsLoc;
+			int lhsDisp = lhsStackLoc.getDisplacement();
+			if (operand instanceof Variable) {
+				Variable var = (Variable) operand;
+				Location varLoc = var.getLocation();
+				if (varLoc instanceof RegisterLocation) {
+					RegisterLocation vregLoc = (RegisterLocation) varLoc;
+					cg.generateCodeFor(this, lhsDisp, operation, vregLoc.getRegister());
+				} else if (varLoc instanceof StackLocation) {
+					StackLocation stackLoc = (StackLocation) varLoc;
+					cg.generateCodeFor(this, lhsDisp, operation, stackLoc.getDisplacement());
+				} else {
+					throw new IllegalArgumentException("Unknown location: " + varLoc);
+				}
+			} else if (operand instanceof Constant) {
+				Constant con = (Constant) operand;
+				cg.generateCodeFor(this, lhsDisp, operation, con);
+			} else {
+				throw new IllegalArgumentException("Unknown operand: " + operand);
+			}
+		} else {
+			throw new IllegalArgumentException("Unknown location: " + lhsLoc);
+		}
 	}
 
 	/* (non-Javadoc)
