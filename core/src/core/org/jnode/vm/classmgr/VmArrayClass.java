@@ -16,6 +16,8 @@ public final class VmArrayClass extends VmClassType {
 
 	/** The type of elements in an array class */
 	private final VmType componentType;
+	
+	private long totalLength;
 
 	/**
 	 * @param name
@@ -125,5 +127,13 @@ public final class VmArrayClass extends VmClassType {
 
 	public final boolean isArray() {
 		return true;
+	}
+	
+	public final synchronized void incTotalLength(int len) {
+	    this.totalLength += len;
+	}
+	
+	public long getTotalLength() {
+	    return totalLength;
 	}
 }

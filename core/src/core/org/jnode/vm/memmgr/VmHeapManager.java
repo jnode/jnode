@@ -125,6 +125,7 @@ public abstract class VmHeapManager extends VmSystemObject {
 			elemSize = slotSize;
 		}
 
+		arrayCls.incTotalLength(elements);
 		final Object obj = newArray0(arrayCls, elemSize, elements, slotSize);
 		if (obj == null) {
 			Unsafe.debug("Out of memory");
