@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.shell;
 
 import gnu.java.security.action.InvokeAction;
@@ -38,6 +38,7 @@ import java.security.PrivilegedActionException;
 /**
  * User: Sam Reid Date: Dec 20, 2003 Time: 1:20:33 AM Copyright (c) Dec 20,
  * 2003 by Sam Reid
+ * @author Sam Reid
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
@@ -65,104 +66,162 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
         // ctrl-c
     }
 
-    public void invoke(String cmdLineStr) {
-        final CommandLine cmdLine = new CommandLine(cmdLineStr);
-        if (!cmdLine.hasNext()) return;
-        cmdName = cmdLine.next();
+  public void invoke(String cmdLineStr)
+  {
+    commandShell.addCommandToHistory(cmdLineStr);
 
-        commandShell.addCommandToHistory(cmdLineStr);
-        try {
-            CommandInfo cmdInfo = commandShell.getCommandClass(cmdName);
-          Method method;
-          CommandRunner cr;
+    InputStream inputStream = System.in;  // will also be dynamic later
+    InputStream nextInputStream = null;
+    PrintStream errStream = System.err;   // will also be dynamic later
+    PrintStream outputStream = null;
 
-          InputStream inputStream = System.in;  // will also be dynamic later
-          PrintStream errStream = System.err;   // will also be dynamic later
-          PrintStream outputStream = null;
+    CommandLine cmdLine;
+    Method method;
+    CommandRunner cr;
+    CommandInfo cmdInfo;
 
-          try
+    String[] commands = cmdLineStr.split("\\|");
+    String command;
+    ByteArrayOutputStream byteArrayOutputStream = null;
+
+
+    for (int i=0;i<commands.length;i++)
+    {
+      command = commands[i].trim();
+      cmdLine = new CommandLine(command);
+
+      if (!cmdLine.hasNext()) continue;
+
+      cmdName = cmdLine.next();
+
+      try
+      {
+        cmdInfo = commandShell.getCommandClass(cmdName);
+
+        try
+        {
+          method = cmdInfo.getCommandClass().getMethod(EXECUTE_METHOD, EXECUTE_ARG_TYPES);
+
+          if (cmdLine.sendToOutFile())
           {
-            method = cmdInfo.getCommandClass().getMethod(EXECUTE_METHOD, EXECUTE_ARG_TYPES);
+            File file = new File(cmdLine.getOutFileName());
 
-            if (cmdLine.sendToOutFile())
+            try
             {
-              File file = new File(cmdLine.getOutFileName());
+              FileOutputStream fileOutputStream = new FileOutputStream(file);
+              outputStream = new PrintStream(fileOutputStream);
+            }
+            catch (SecurityException e)
+            {
+              e.printStackTrace();
+            }
+            catch (FileNotFoundException e)
+            {
+              e.printStackTrace();
+            }
+          }
+          else if(i+1 < commands.length)
+          {
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            outputStream = new PrintStream(byteArrayOutputStream);
+          }
+          else
+          {
+            outputStream = System.out;
+          }
 
+
+          if (byteArrayOutputStream != null)
+          {
+            nextInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+          }
+
+
+          if (nextInputStream != null)
+            inputStream = nextInputStream;
+
+          cr = new CommandRunner(cmdInfo.getCommandClass(), method, new Object[]{cmdLine.getRemainder(), inputStream, outputStream, errStream});
+        }
+        catch (Exception e)
+        {
+          method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD, MAIN_ARG_TYPES);
+          cr = new CommandRunner(cmdInfo.getCommandClass(), method, new Object[]{cmdLine.getRemainder().toStringArray()});
+        }
+        try
+        {
+
+          if (cmdInfo.isInternal())
+          {
+            cr.run();
+          }
+          else
+          {
+            Thread threadProcess = new Thread(cr, cmdName);
+            threadProcess.start();
+
+            this.blocking = true;
+            this.blockingThread = Thread.currentThread();
+            while (blocking)
+            {
               try
               {
-                FileOutputStream fileOutputStream = new FileOutputStream(file);
-                outputStream = new PrintStream(fileOutputStream);
+                Thread.sleep(6000);
               }
-              catch (SecurityException e)
+              catch (InterruptedException interrupted)
               {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-              }
-              catch (FileNotFoundException e)
-              {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-              }
-            }
-            else
-            {
-              outputStream = System.out;
-            }
-
-            cr = new CommandRunner(cmdInfo.getCommandClass(), method, new Object[]{cmdLine.getRemainder(),inputStream,outputStream,errStream});
-          }
-          catch (Exception e)
-          {
-            method = cmdInfo.getCommandClass().getMethod(MAIN_METHOD, MAIN_ARG_TYPES);
-            cr = new CommandRunner(cmdInfo.getCommandClass(), method, new Object[]{cmdLine.getRemainder().toStringArray()});
-          }
-            try {
-
-                if (cmdInfo.isInternal()) {
-                	cr.run();
-                } else {
-                	Thread threadProcess = new Thread(cr, cmdName);
-                	threadProcess.start();
-                	//                cr.run();
-                	this.blocking = true;
-                	this.blockingThread = Thread.currentThread();
-                	while (blocking) {
-                		try {
-                			Thread.sleep(6000);
-                		} catch (InterruptedException interrupted) {
-                			if (!blocking) {
-                				//interruption was okay, break normally.
-                			} else {
-                				//abnormal interruption
-                				interrupted.printStackTrace();
-                			}
-                		}
-                	}
-
-
-                }
-
-                if (outputStream != null && outputStream != System.out)
+                if (!blocking)
                 {
-                  outputStream.close();
+                  //interruption was okay, break normally.
                 }
-                //                System.err.println("Finished invoke.");
-            } catch (Exception ex) {
-                err.println("Exception in command");
-                ex.printStackTrace(err);
-            } catch (Error ex) {
-                err.println("Fatal error in command");
-                ex.printStackTrace(err);
+                else
+                {
+                  //abnormal interruption
+                  interrupted.printStackTrace();
+                }
+              }
             }
-        } catch (NoSuchMethodException ex) {
-            err.println("Alias class has no main method " + cmdName);
-        } catch (ClassNotFoundException ex) {
-            err.println("Unknown alias class " + ex.getMessage());
-        } catch (ClassCastException ex) {
-            err.println("Invalid command " + cmdName);
-        } catch (Exception ex) {
-            err.println("Unknown error: " + ex.getMessage());
-            ex.printStackTrace(err);
+
+
+          }
+
+          if (outputStream != null && outputStream != System.out)
+          {
+            outputStream.close();
+          }
+          //                System.err.println("Finished invoke.");
         }
+        catch (Exception ex)
+        {
+          err.println("Exception in command");
+          ex.printStackTrace(err);
+        }
+        catch (Error ex)
+        {
+          err.println("Fatal error in command");
+          ex.printStackTrace(err);
+        }
+      }
+      catch (NoSuchMethodException ex)
+      {
+        err.println("Alias class has no main method " + cmdName);
+      }
+      catch (ClassNotFoundException ex)
+      {
+        err.println("Unknown alias class " + ex.getMessage());
+      }
+      catch (ClassCastException ex)
+      {
+        err.println("Invalid command " + cmdName);
+      }
+      catch (Exception ex)
+      {
+        err.println("Unknown error: " + ex.getMessage());
+        ex.printStackTrace(err);
+      }
     }
+
+    nextInputStream = null;
+  }
 
     public void keyPressed(KeyboardEvent ke) {
         if (ke.isControlDown() && ke.getKeyCode() == KeyEvent.VK_C) {

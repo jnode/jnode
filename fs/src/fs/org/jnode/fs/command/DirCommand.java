@@ -35,6 +35,7 @@ import org.jnode.shell.help.ParsedArguments;
 /**
  * @author epr
  * @author Andreas H\u00e4nel
+ * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 public class DirCommand implements Command{
 
@@ -50,8 +51,14 @@ public class DirCommand implements Command{
 	}
 	
 	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
-		ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
-		String dir_str = ARG_DIR.getValue(cmdLine);
+		ParsedArguments cmdLine;
+
+    if (in.available()>0)
+      cmdLine = HELP_INFO.parse((new CommandLine(in)).toStringArray());
+    else
+      cmdLine = HELP_INFO.parse(commandLine.toStringArray());
+
+    String dir_str = ARG_DIR.getValue(cmdLine);
 		
 		if (((dir_str == null)&&(System.getProperty("user.dir").equals("/")))||((dir_str != null)&&(dir_str.equals("/")))){
 			File[] roots = File.listRoots();
