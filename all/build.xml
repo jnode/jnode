@@ -11,6 +11,7 @@
   <property name="jnode-core.jar"      value="${root.dir}/core/build/classes"/>
   <property name="jnode-fs.jar"        value="${root.dir}/fs/build/classes"/>
   <property name="jnode-gui.jar"       value="${root.dir}/gui/build/classes"/>
+  <property name="jnode-textgui.jar"   value="${root.dir}/gui/build/classes"/>
   <property name="jnode-net.jar"       value="${root.dir}/net/build/classes"/>
   <property name="jnode-shell.jar"     value="${root.dir}/shell/build/classes"/>
   <property name="jnode-fonts.jar"     value="${build.dir}/descriptors/jnode-fonts.jar"/>
@@ -44,6 +45,7 @@
     <pathelement location="${jnode-shell.jar}"/>
     <pathelement location="${jnode-net.jar}"/>
     <pathelement location="${jnode-gui.jar}"/>
+    <pathelement location="${jnode-textgui.jar}"/>
     <path refid="cp"/>
   </path>
   
@@ -86,6 +88,7 @@
       <libalias name="jnode-core.jar" alias="${jnode-core.jar}"/>
       <libalias name="jnode-fs.jar" alias="${jnode-fs.jar}"/>
       <libalias name="jnode-gui.jar" alias="${jnode-gui.jar}"/>
+      <libalias name="jnode-textgui.jar" alias="${jnode-textgui.jar}"/>
       <libalias name="jnode-net.jar" alias="${jnode-net.jar}"/>
       <libalias name="jnode-shell.jar" alias="${jnode-shell.jar}"/>
 
