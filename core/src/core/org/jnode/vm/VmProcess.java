@@ -64,7 +64,7 @@ public class VmProcess extends Process {
 			this.id = lastId++;
 		}
 		this.running = true;
-		this.threadGroup = new ThreadGroup("Process-" + id, this);
+		this.threadGroup = new ThreadGroup("Process-" + id);
 		this.mainClassName = mainClassName;
 		if (args == null) {
 			this.args = new String[0]; 
