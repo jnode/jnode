@@ -158,12 +158,14 @@ public class MouseHandler implements PointerListener {
 		}
 		//log.debug("Source: " + source.getClass().getName());
 		//TODO full support for modifiers
-        final Point p = source.getLocationOnScreen();
-        final boolean popupTrigger = (button == MouseEvent.BUTTON2);
-        
-		final MouseEvent me = new MouseEvent(source, id, System.currentTimeMillis(),
-				0, x - p.x, y - p.y, 1, popupTrigger, button);
-		JNodeGenericPeer.eventQueue.postEvent(me);
+		if (source.isVisible()) {
+			final Point p = source.getLocationOnScreen();
+			final boolean popupTrigger = (button == MouseEvent.BUTTON2);
+			
+			final MouseEvent me = new MouseEvent(source, id, System.currentTimeMillis(),
+					0, x - p.x, y - p.y, 1, popupTrigger, button);
+			JNodeGenericPeer.eventQueue.postEvent(me);
+		}
 		return source;
 	}
 }
