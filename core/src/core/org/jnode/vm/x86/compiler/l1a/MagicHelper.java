@@ -70,7 +70,15 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem addr = vstack.popRef();
             ofs.load(ec);
             addr.load(ec);
-            os.writeADD(addr.getRegister(), ofs.getRegister());
+            GPR ofsr = ofs.getRegister();
+            final GPR addrr = addr.getRegister();
+            if (ofsr.getSize() != addrr.getSize()) {
+                // Sign-extend offset 
+                final GPR64 ofsr64 = (GPR64)pool.getRegisterInSameGroup(ofsr, JvmType.REFERENCE);
+                os.writeMOVSXD(ofsr64, (GPR32)ofsr);
+                ofsr = ofsr64;
+            }
+            os.writeADD(addrr, ofsr);
             ofs.release(ec);
             vstack.push(addr);
         }
@@ -82,7 +90,15 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem addr = vstack.popRef();
             ofs.load(ec);
             addr.load(ec);
-            os.writeAND(addr.getRegister(), ofs.getRegister());
+            GPR ofsr = ofs.getRegister();
+            final GPR addrr = addr.getRegister();
+            if (ofsr.getSize() != addrr.getSize()) {
+                // Sign-extend offset 
+                final GPR64 ofsr64 = (GPR64)pool.getRegisterInSameGroup(ofsr, JvmType.REFERENCE);
+                os.writeMOVSXD(ofsr64, (GPR32)ofsr);
+                ofsr = ofsr64;
+            }
+            os.writeAND(addrr, ofsr);
             ofs.release(ec);
             vstack.push(addr);
         }
@@ -94,7 +110,15 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem addr = vstack.popRef();
             ofs.load(ec);
             addr.load(ec);
-            os.writeOR(addr.getRegister(), ofs.getRegister());
+            GPR ofsr = ofs.getRegister();
+            final GPR addrr = addr.getRegister();
+            if (ofsr.getSize() != addrr.getSize()) {
+                // Sign-extend offset 
+                final GPR64 ofsr64 = (GPR64)pool.getRegisterInSameGroup(ofsr, JvmType.REFERENCE);
+                os.writeMOVSXD(ofsr64, (GPR32)ofsr);
+                ofsr = ofsr64;
+            }
+            os.writeOR(addrr, ofsr);
             ofs.release(ec);
             vstack.push(addr);
         }
@@ -106,7 +130,15 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem addr = vstack.popRef();
             ofs.load(ec);
             addr.load(ec);
-            os.writeSUB(addr.getRegister(), ofs.getRegister());
+            GPR ofsr = ofs.getRegister();
+            final GPR addrr = addr.getRegister();
+            if (ofsr.getSize() != addrr.getSize()) {
+                // Sign-extend offset 
+                final GPR64 ofsr64 = (GPR64)pool.getRegisterInSameGroup(ofsr, JvmType.REFERENCE);
+                os.writeMOVSXD(ofsr64, (GPR32)ofsr);
+                ofsr = ofsr64;
+            }
+            os.writeSUB(addrr, ofsr);
             ofs.release(ec);
             vstack.push(addr);
         }
@@ -118,7 +150,15 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem addr = vstack.popRef();
             ofs.load(ec);
             addr.load(ec);
-            os.writeXOR(addr.getRegister(), ofs.getRegister());
+            GPR ofsr = ofs.getRegister();
+            final GPR addrr = addr.getRegister();
+            if (ofsr.getSize() != addrr.getSize()) {
+                // Sign-extend offset 
+                final GPR64 ofsr64 = (GPR64)pool.getRegisterInSameGroup(ofsr, JvmType.REFERENCE);
+                os.writeMOVSXD(ofsr64, (GPR32)ofsr);
+                ofsr = ofsr64;
+            }
+            os.writeXOR(addrr, ofsr);
             ofs.release(ec);
             vstack.push(addr);
         }

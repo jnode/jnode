@@ -1686,7 +1686,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			} else {
 				final WordItem iw = L1AHelper.requestWordRegister(eContext,
 						type, false);
-				os.writeMOV(INTSIZE, iw.getRegister(), refr, fieldOffset);
+                final GPR iwr = iw.getRegister();
+				os.writeMOV(iwr.getSize(), iwr, refr, fieldOffset);
 				result = iw;
 			}
 		} else {
@@ -1700,8 +1701,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 				if (os.isCode32()) {
 					final GPR lsb = idw.getLsbRegister(eContext);
 					final GPR msb = idw.getMsbRegister(eContext);
-					os.writeMOV(INTSIZE, lsb, refr, fieldOffset + LSB);
-					os.writeMOV(INTSIZE, msb, refr, fieldOffset + MSB);
+					os.writeMOV(BITS32, lsb, refr, fieldOffset + LSB);
+					os.writeMOV(BITS32, msb, refr, fieldOffset + MSB);
 				} else {
 					final GPR64 reg = idw.getRegister(eContext);
 					os.writeMOV(BITS64, reg, refr, fieldOffset);
@@ -3375,20 +3376,20 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			final GPR valr = wval.getRegister();
 
 			// Store field
-			os.writeMOV(INTSIZE, refr, offset, valr);
+			os.writeMOV(valr.getSize(), refr, offset, valr);
 			// Writebarrier
 			if (!inf.isPrimitive() && helper.needsWriteBarrier()) {
 				final GPR tmp = (GPR) L1AHelper.requestRegister(eContext,
-						JvmType.INT, false);
+						JvmType.REFERENCE, false);
 				helper.writePutfieldWriteBarrier(inf, refr, valr, tmp);
 				L1AHelper.releaseRegister(eContext, tmp);
 			}
 		} else {
 			final DoubleWordItem dval = (DoubleWordItem) val;
 			if (os.isCode32()) {
-				os.writeMOV(INTSIZE, refr, offset + MSB, dval
+				os.writeMOV(BITS32, refr, offset + MSB, dval
 						.getMsbRegister(eContext));
-				os.writeMOV(INTSIZE, refr, offset + LSB, dval
+				os.writeMOV(BITS32, refr, offset + LSB, dval
 						.getLsbRegister(eContext));
 			} else {
 				os.writeMOV(BITS64, refr, offset, dval.getRegister(eContext));
@@ -3425,7 +3426,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			final WordItem wval = (WordItem) val;
 			final GPR valr = wval.getRegister();
 
-			helper.writePutStaticsEntry(curInstrLabel, valr, sf);
+            if (os.isCode32() || (wval.getType() != JvmType.REFERENCE)) {
+                helper.writePutStaticsEntry(curInstrLabel, valr, sf);
+            } else {
+                helper.writePutStaticsEntry64(curInstrLabel, (GPR64)valr, sf);                
+            }
 			if (!sf.isPrimitive() && helper.needsWriteBarrier()) {
 				final GPR tmp = (GPR) L1AHelper.requestRegister(eContext,
 						JvmType.INT, false);
