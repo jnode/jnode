@@ -148,7 +148,7 @@ final class UTF_16Decoder extends CharsetDecoder
    * Writes <code>c</code> to <code>out</code> in the byte order
    * specified by <code>byteOrder</code>.
    **/
-  private void put (ByteBuffer out, char c)
+  /*private void put (ByteBuffer out, char c)
   {
     if (byteOrder == BIG_ENDIAN)
       {
@@ -160,7 +160,7 @@ final class UTF_16Decoder extends CharsetDecoder
         out.put ((byte) (c & 0xFF));
         out.put ((byte) (c >> 8));
       }
-  }
+  }*/
 
   protected void implReset ()
   {
