@@ -15,6 +15,7 @@ import org.apache.log4j.PatternLayout;
 import org.jnode.driver.console.Console;
 import org.jnode.driver.console.ConsoleException;
 import org.jnode.driver.console.ConsoleManager;
+import org.jnode.driver.console.x86.TextConsole;
 import org.jnode.log4j.Log4jPlugin;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
@@ -46,7 +47,8 @@ public class Log4jConfigurePlugin extends Plugin {
 		root.addAppender(infoApp);
 		try {
 			final ConsoleManager conMgr = (ConsoleManager)InitialNaming.lookup(ConsoleManager.NAME);
-			final Console console = conMgr.createConsole(Log4jPlugin.Log4jConsoleName);
+			final TextConsole console = new TextConsole(conMgr,Log4jPlugin.Log4jConsoleName);
+			conMgr.registerConsole(console);
 			console.setAcceleratorKeyCode(KeyEvent.VK_F7);
 			final VirtualConsoleAppender debugApp = new VirtualConsoleAppender(console, new PatternLayout(LAYOUT));
 			debugApp.setThreshold(Level.DEBUG);

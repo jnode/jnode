@@ -14,6 +14,7 @@
   <runtime>
     <library name="jnode-core.jar">
       <export name="org.jnode.driver.console.*"/>
+      <export name="org.jnode.driver.console.x86.*"/>
     </library>
   </runtime>
         
