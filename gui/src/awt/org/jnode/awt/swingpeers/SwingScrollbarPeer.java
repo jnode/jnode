@@ -104,7 +104,7 @@ class SwingScrollbarPeer extends JScrollBar implements ScrollbarPeer {
      * @see java.awt.peer.ScrollbarPeer#setValues(int, int, int, int)
      */
     public void setValues(int value, int visible, int min, int max) {
-        this.setValue(value, visible, min, max);
+        this.setValues(value, visible, min, max);
     }
 
     /**
