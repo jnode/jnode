@@ -48,13 +48,15 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	public Ext2FileSystem(Device device, boolean readOnly)  throws FileSystemException {
 		super(device, readOnly);
 			
-		byte data[];
-		
 		blockCache = new BlockCache(50,(float)0.75);
 		inodeCache = new INodeCache(50,(float)0.75);
-		
+
 		groupDescriptorLock = new Object();
 		superblockLock = new Object();
+	}
+	
+	public void read() throws FileSystemException {
+		byte data[];
 
 		try {
 			data = new byte[Superblock.SUPERBLOCK_LENGTH];
@@ -62,14 +64,18 @@ public class Ext2FileSystem extends AbstractFileSystem {
 			//skip the first 1024 bytes (bootsector) and read the superblock 
 			//TODO: the superblock should read itself
 			getApi().read(1024, data, 0, Superblock.SUPERBLOCK_LENGTH);
-			superblock = new Superblock(data, this);
+			//superblock = new Superblock(data, this);
+			superblock = new Superblock();
+			superblock.read(data, this);
 			
 			//read the group descriptors
 			groupCount = (int)Math.ceil((double)superblock.getBlocksCount() / (double)superblock.getBlocksPerGroup());
 			groupDescriptors = new GroupDescriptor[groupCount];
 						
 			for(int i=0; i<groupCount; i++) {
-				groupDescriptors[i]=new GroupDescriptor(i, this);
+				//groupDescriptors[i]=new GroupDescriptor(i, this);
+				groupDescriptors[i]=new GroupDescriptor();
+				groupDescriptors[i].read(i, this);
 			}
 				
 		} catch (FileSystemException e) {
@@ -81,33 +87,33 @@ public class Ext2FileSystem extends AbstractFileSystem {
 		//check for unsupported filesystem options 
 		//(an unsupported INCOMPAT feature means that the fs may not be mounted at all)
 		if( hasIncompatFeature(Ext2Constants.EXT2_FEATURE_INCOMPAT_COMPRESSION) )
-			throw new FileSystemException(device.getId()+" Unsupported filesystem feature (COMPRESSION) disallows mounting");
+			throw new FileSystemException(getDevice().getId()+" Unsupported filesystem feature (COMPRESSION) disallows mounting");
 		if( hasIncompatFeature(Ext2Constants.EXT2_FEATURE_INCOMPAT_META_BG) )
-			throw new FileSystemException(device.getId()+" Unsupported filesystem feature (META_BG) disallows mounting");
+			throw new FileSystemException(getDevice().getId()+" Unsupported filesystem feature (META_BG) disallows mounting");
 		if( hasIncompatFeature(Ext2Constants.EXT3_FEATURE_INCOMPAT_JOURNAL_DEV) )
-			throw new FileSystemException(device.getId()+" Unsupported filesystem feature (JOURNAL_DEV) disallows mounting");
+			throw new FileSystemException(getDevice().getId()+" Unsupported filesystem feature (JOURNAL_DEV) disallows mounting");
 		if( hasIncompatFeature(Ext2Constants.EXT3_FEATURE_INCOMPAT_RECOVER) )
-			throw new FileSystemException(device.getId()+" Unsupported filesystem feature (RECOVER) disallows mounting");
+			throw new FileSystemException(getDevice().getId()+" Unsupported filesystem feature (RECOVER) disallows mounting");
 
 		//an unsupported RO_COMPAT feature means that the filesystem can only be mounted readonly
 		if( hasROFeature(Ext2Constants.EXT2_FEATURE_RO_COMPAT_LARGE_FILE)) {
-			log.info(device.getId()+" Unsupported filesystem feature (LARGE_FILE) forces readonly mode");
+			log.info(getDevice().getId()+" Unsupported filesystem feature (LARGE_FILE) forces readonly mode");
 			setReadOnly(true);
 		}		
 		if( hasROFeature(Ext2Constants.EXT2_FEATURE_RO_COMPAT_BTREE_DIR)) {
-			log.info(device.getId()+" Unsupported filesystem feature (BTREE_DIR) forces readonly mode");
+			log.info(getDevice().getId()+" Unsupported filesystem feature (BTREE_DIR) forces readonly mode");
 			setReadOnly(true);
 		}
 		
 		//if the filesystem has not been cleanly unmounted, mount it readonly
 		if(superblock.getState()==Ext2Constants.EXT2_ERROR_FS) {
-			log.info(device.getId()+" Filesystem has not been cleanly unmounted, mounting it readonly");
+			log.info(getDevice().getId()+" Filesystem has not been cleanly unmounted, mounting it readonly");
 			setReadOnly(true);
 		}
 		
 		//if the filesystem has been mounted R/W, set it to "unclean"
 		if(!isReadOnly()) {
-			log.info(device.getId()+" mounting fs r/w");
+			log.info(getDevice().getId()+" mounting fs r/w");
 			superblock.setState(Ext2Constants.EXT2_ERROR_FS);
 		}
 		
@@ -120,6 +126,74 @@ public class Ext2FileSystem extends AbstractFileSystem {
 					"				#inodes/group:	"+superblock.getINodesPerGroup());
 	}
 
+	public void create(int blockSize) throws FileSystemException {
+		try{
+			//create the superblock
+			superblock = new Superblock();
+			superblock.create(blockSize, this);
+			
+			//create the group descriptors
+			groupCount = (int)Math.ceil((double)superblock.getBlocksCount() / (double)superblock.getBlocksPerGroup());
+			groupDescriptors = new GroupDescriptor[groupCount];
+						
+			for(int i=0; i<groupCount; i++) {
+				groupDescriptors[i]=new GroupDescriptor();
+				groupDescriptors[i].create(i, this);
+			}
+			
+			//create each block group:
+			//	create the block bitmap
+			//	create the inode bitmap
+			//	fill the inode table with zeroes
+			for(int i=0; i<groupCount; i++) {
+				log.debug("creating gropup "+i);
+				
+				byte[] blockBitmap = new byte[blockSize];
+				byte[] inodeBitmap = new byte[blockSize];
+			
+				//update the block bitmap: mark the metadata blocks allocated
+				long iNodeTableBlock = 	groupDescriptors[i].getInodeTable();
+				long firstNonMetadataBlock = iNodeTableBlock + INodeTable.getSizeInBlocks(this);
+				int  metadataLength  = (int)(firstNonMetadataBlock - 
+										(superblock.getFirstDataBlock() + i*superblock.getBlocksPerGroup()));
+				for(int j=0; j<metadataLength; j++)
+					BlockBitmap.setBit(blockBitmap, j);
+				
+				//set the padding at the end of the last block group
+				if(i == groupCount-1) {
+					for(long k=superblock.getBlocksCount(); k<groupCount*superblock.getBlocksPerGroup(); k++)
+						BlockBitmap.setBit(blockBitmap,(int) (k % superblock.getBlocksPerGroup()));
+				}
+					
+				//update the inode bitmap: mark the special inodes allocated in the first block group
+				if(i==0)
+					for(int j=0; j<superblock.getFirstInode()-1; j++)
+						INodeBitmap.setBit(inodeBitmap, j);
+				
+				//create an empty inode table
+				byte[] emptyBlock = new byte[blockSize];
+				for(long j=iNodeTableBlock; j<firstNonMetadataBlock; j++)
+					writeBlock(j, emptyBlock, false);
+					
+
+				writeBlock(groupDescriptors[i].getBlockBitmap(), blockBitmap, false);
+				writeBlock(groupDescriptors[i].getInodeBitmap(), inodeBitmap, false);			
+			}
+			
+			log.info("superblock.getBlockSize(): "+superblock.getBlockSize());
+
+			//TODO: create the root inode
+			createRootEntry();
+			
+			//write everything to disk
+			flush();
+
+		}catch (IOException ioe) {
+			throw new FileSystemException("Unable to create filesystem", ioe);
+		}
+		
+	}
+	
 	/**
 	 * Flush all changed structures to the device.
 	 * @throws IOException
@@ -165,6 +239,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 
 	public void close() throws IOException {
         //mark the filesystem clean
+
 		superblock.setState(Ext2Constants.EXT2_VALID_FS);
 
 		super.close();
@@ -205,7 +280,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	 */
 	public byte[] getBlock(long nr) throws IOException{
 		if(isClosed())
-			throw new IOException("FS closed");
+			throw new IOException("FS closed (fs instance: "+this+")");
 		//log.debug("blockCache size: "+blockCache.size());
 		
 		int blockSize = superblock.getBlockSize();
@@ -369,9 +444,8 @@ public class Ext2FileSystem extends AbstractFileSystem {
 				//get the part of the inode table that contains the inode
 				long iNodeTableBlock  = groupDescriptors[group].getInodeTable();	//the first block of the inode table
 				INodeTable iNodeTable = new INodeTable(this, (int)iNodeTableBlock);
-				INode result = new INode(this, 
-										 new INodeDescriptor(iNodeTable, iNodeNr, group, index),
-										 iNodeTable.getInodeData(index));		
+				INode result = new INode(this, new INodeDescriptor(iNodeTable, iNodeNr, group, index));
+				result.read(iNodeTable.getInodeData(index));		
 				
 				inodeCache.put(key, result);
 				
@@ -459,10 +533,8 @@ public class Ext2FileSystem extends AbstractFileSystem {
 		INodeTable iNodeTable = new INodeTable(this, (int)iNodeTableBlock);
 		//byte[] iNodeData = new byte[INode.INODE_LENGTH];
 		int iNodeNr = res.getINodeNr((int)superblock.getINodesPerGroup());
-		INode iNode = new INode(this, 
-								new INodeDescriptor(iNodeTable, iNodeNr, groupNr, res.getIndex()),
-								fileFormat, accessRights,
-								uid, gid);		
+		INode iNode = new INode(this, new INodeDescriptor(iNodeTable, iNodeNr, groupNr, res.getIndex()));
+		iNode.create( fileFormat, accessRights, uid, gid);		
 		//trigger a write to disk
 		iNode.update();
 
@@ -720,6 +792,8 @@ public class Ext2FileSystem extends AbstractFileSystem {
         }
 	}
 
+	
+	
 	/**
 	 * With the sparse_super option set, a filesystem does not have a superblock
 	 * and group descriptor copy in every block group.
@@ -754,7 +828,28 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	 * 
 	 */
 	protected FSEntry createRootEntry() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		//a free inode has been found: create the inode and write it into the inode table			
+		long iNodeTableBlock  = groupDescriptors[0].getInodeTable();	//the first block of the inode table
+		INodeTable iNodeTable = new INodeTable(this, (int)iNodeTableBlock);
+		//byte[] iNodeData = new byte[INode.INODE_LENGTH];
+		int iNodeNr = Ext2Constants.EXT2_ROOT_INO;
+		INode iNode = new INode(this, new INodeDescriptor(iNodeTable, iNodeNr, 0, iNodeNr-1));
+		int rights = 0xFFFF & (Ext2Constants.EXT2_S_IRWXU | Ext2Constants.EXT2_S_IRWXG | Ext2Constants.EXT2_S_IRWXO);
+		iNode.create( Ext2Constants.EXT2_S_IFDIR, rights, 0, 0);		
+		//trigger a write to disk
+		iNode.update();
+		
+		//add the inode to the inode cache
+		synchronized(inodeCache) {
+			inodeCache.put(new Integer(Ext2Constants.EXT2_ROOT_INO), iNode);
+		}
+
+		modifyUsedDirsCount(0, 1);
+		
+		Ext2Entry rootEntry = new Ext2Entry(iNode,"/",Ext2Constants.EXT2_FT_DIR, this, null);
+		((Ext2Directory)rootEntry.getDirectory()).addINode(Ext2Constants.EXT2_ROOT_INO, ".",  Ext2Constants.EXT2_FT_DIR);
+		((Ext2Directory)rootEntry.getDirectory()).addINode(Ext2Constants.EXT2_ROOT_INO, "..", Ext2Constants.EXT2_FT_DIR);
+		rootEntry.getDirectory().addDirectory("lost+found");
+		return rootEntry;
 	}
 }

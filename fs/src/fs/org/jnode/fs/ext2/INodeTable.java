@@ -13,6 +13,8 @@ import org.jnode.fs.FileSystemException;
  * 
  * It provides methods for reading and writing the (already allocated) inodes.
  * 
+ * An inode table contains just the inodes, with no extra metadata.
+ * 
  * @author Andras Nagy
  */
 public class INodeTable {
@@ -21,7 +23,7 @@ public class INodeTable {
 	Ext2FileSystem fs;
 	int firstBlock;		//the first block of the inode table
 	
-	public INodeTable(Ext2FileSystem fs, int firstBlock) throws IOException {
+	public INodeTable(Ext2FileSystem fs, int firstBlock) {
 		this.fs = fs;
 		this.firstBlock = firstBlock;
 		blockSize=fs.getBlockSize();
