@@ -698,6 +698,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			os.log("VStack: " + vstack + ", method: " + signature);
 		}
 		helper.invokeJavaMethod(signature);
+        // Test the stack alignment
+        stackFrame.writeStackAlignmentTest(curInstrLabel);
 	}
 
 	/**
@@ -710,6 +712,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			os.log("VStack: " + vstack + ", method: " + method);
 		}
 		helper.invokeJavaMethod(method);
+        // Test the stack alignment
+        stackFrame.writeStackAlignmentTest(curInstrLabel);
 	}
 
 	/**
@@ -2434,6 +2438,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		} else {
 			X86IMTCompiler64.emitInvokeInterface(os, method);
 		}
+        // Test the stack alignment
+        stackFrame.writeStackAlignmentTest(curInstrLabel);
 		// Write the push result
 		helper.pushReturnValue(method.getSignature());
 	}

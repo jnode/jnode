@@ -298,7 +298,7 @@ GLABEL Q43org5jnode2vm6Unsafe23debug2e28C29V
 %else
 	call sys_print_char64
 %endif	
-	ret 4
+	ret SLOT_SIZE
 
 ; public static native void debug(int value);
 GLABEL Q43org5jnode2vm6Unsafe23debug2e28I29V
@@ -308,7 +308,7 @@ GLABEL Q43org5jnode2vm6Unsafe23debug2e28I29V
 %else
 	call sys_print_eax64
 %endif	
-	ret 4
+	ret SLOT_SIZE
 
 ; public static native void debug(long value);
 GLABEL Q43org5jnode2vm6Unsafe23debug2e28J29V

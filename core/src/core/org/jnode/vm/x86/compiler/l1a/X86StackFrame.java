@@ -133,6 +133,23 @@ class X86StackFrame implements X86CompilerConstants {
 
 		return rc;
 	}
+    
+    /**
+     * Write code to test the alignment of the stack pointer.
+     */
+    public void writeStackAlignmentTest(Label curInstrLabel) {
+        if (os.isCode64()) {
+            final int idx = os.getLength();
+            final Label test = new Label(curInstrLabel + "$$stackAlignTest" + idx);
+            final Label failed = new Label(curInstrLabel + "$$stackAlign" + idx);
+            os.writeJMP(test);
+            os.setObjectRef(failed);
+            os.writeINT(0x41);
+            os.setObjectRef(test);
+            os.writeTEST(X86Register.RSP, 7);
+            os.writeJCC(failed, X86Constants.JNZ);            
+        }   
+    }
 
 	/**
 	 * Emit code to end the stack frame
@@ -175,8 +192,8 @@ class X86StackFrame implements X86CompilerConstants {
             os.writeCMP(X86Register.RSP, PROCESSOR64, stackEndOffset);
         }
         os.writeJCC(stackOverflowLabel, X86Constants.JLE);
-		
-		// Create class initialization code (if needed)
+        
+        // Create class initialization code (if needed)
 		helper.writeClassInitialize(method, aax);
 
 		// Increment the invocation count
@@ -215,6 +232,7 @@ class X86StackFrame implements X86CompilerConstants {
 		// Write stack overflow code
 		os.setObjectRef(stackOverflowLabel);
         os.writeINT(0x31);
+
         // End header       
 
 		// No set the exception start&endPtr's
