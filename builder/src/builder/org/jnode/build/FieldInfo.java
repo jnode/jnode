@@ -4,6 +4,7 @@
 package org.jnode.build;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,6 +101,11 @@ public final class FieldInfo {
             try {
                 jdkFields[i] = jdkType.getDeclaredField(f.getName());
                 jdkFields[i].setAccessible(true);
+                final boolean jdkStatic = ((jdkFields[i].getModifiers() & Modifier.STATIC) != 0);
+                if (f.isStatic() != jdkStatic) {
+                	jdkFields[i] = null;
+                	exact = false;
+                }
             } catch (SecurityException ex) {
                 if (!f.isTransient()) {
                     exact = false;
