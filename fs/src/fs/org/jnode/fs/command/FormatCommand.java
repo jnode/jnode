@@ -46,7 +46,6 @@ public class FormatCommand {
     			new OptionArgument.Option("1","1Kb"),
     			new OptionArgument.Option("2","2Kb"),
     			new OptionArgument.Option("4","4Kb"),				
-    			new OptionArgument.Option("8","8Kb")
 				});
 
     static final DeviceArgument ARG_DEVICE = new DeviceArgument("device-id",
