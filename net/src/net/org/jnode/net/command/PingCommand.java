@@ -65,6 +65,7 @@ public class PingCommand implements ICMPListener{
 		ICMPProtocol icmpProtocol = (ICMPProtocol)netLayer.getProtocol(ICMPProtocol.IPPROTO_ICMP);
 		icmpProtocol.addListener(tthis);
 		
+//		Statistics stat = new Statistics();
 		int id_count = 0;
 		int seq_count = 0;
 		while(tthis.count != 0){
@@ -76,13 +77,14 @@ public class PingCommand implements ICMPListener{
 			ICMPEchoHeader transportHeader = new ICMPEchoHeader(8, id_count, seq_count);
 			transportHeader.prefixTo(packet);
 			
+//			Request r = new Request(stat, System.currentTimeMillis(), id_count, seq_count);
 			Request r = new Request(System.currentTimeMillis(), id_count, seq_count);
 			Request.registerRequest(r);
 			netLayer.transmit(netHeader, packet);
 			tthis.timer.schedule(r, tthis.timeout);
 			
 			while(tthis.wait){
-				long time = System.currentTimeMillis() - r.timestamp;
+				long time = System.currentTimeMillis() - r.getTimestamp();
 				if (time > tthis.interval){
 					tthis.wait = false;
 				}
@@ -91,13 +93,18 @@ public class PingCommand implements ICMPListener{
 			seq_count++;
 		}
 		
+		while (!Request.isEmpty()){
+		}
 		icmpProtocol.removeListener(tthis);
+		
+//		System.out.println("-> Packet statistics");
+//		System.out.println(stat.getStatistics());
 	}
 	
 	private long match(int id, int seq){
 		Request r = Request.getRequest(seq);
-		if ((r != null) && (id == r.id))
-		return r.timestamp;
+		if ((r != null) && (id == r.getId()))
+		return r.getTimestamp();
 		else
 		return -1;
 	}
@@ -110,7 +117,7 @@ public class PingCommand implements ICMPListener{
 		long timestamp = match(hdr2.getIdentifier() ,hdr2.getSeqNumber());
 		
 		if (timestamp != -1){
-			System.out.print("Reply from 127.0.0.1: ");
+			System.out.print("Reply from "+ dst.toString() +": ");
 			System.out.print(hdr1.getDataLength()-8 +"bytes of data ");
 			System.out.print("ttl="+ hdr1.getTtl()+" ");
 			System.out.print("seq="+ hdr2.getSeqNumber()+" ");
@@ -123,23 +130,72 @@ public class PingCommand implements ICMPListener{
 
 class Request extends TimerTask{
 	private static Hashtable requests = new Hashtable();
-	long timestamp;
-	int id, seq;
+	private long timestamp;
+	private int id, seq;
 	
-	public Request(long timestamp, int id, int seq){
+//	Request(Statistics s, long timestamp, int id, int seq){
+	Request(long timestamp, int id, int seq){
 		this.timestamp = timestamp;
 		this.id = id;
 		this.seq = seq;
 	}
 	
-	public static void registerRequest(Request r){
+	static void registerRequest(Request r){
 		requests.put(new Integer(r.seq), r);
 	}
-	public static Request getRequest(int seq){
+	static Request getRequest(int seq){
 		return (Request)requests.get(new Integer(seq));
+	}
+	
+	static boolean isEmpty(){
+		return requests.isEmpty();
 	}
 	
 	public void run() {
 		requests.remove(new Integer(this.seq));
 	}
+	
+	long getTimestamp() {
+		return timestamp;
+	}
+	int getId() {
+		return id;
+	}
+	int getSeq() {
+		return seq;
+	}
 }
+/*
+class Statistics{
+	private long  received=0, lost=0;
+	private long min=0, max=Integer.MAX_VALUE;
+	private long sum;
+	
+	void recordPacket(long roundtrip){
+		received++;
+		
+		if (roundtrip < min)
+		min = roundtrip;
+		if (roundtrip > max)
+		max = roundtrip;
+		
+		sum += roundtrip;
+	}
+	void recordLost(){
+		lost++;
+	}
+	
+	String getStatistics(){
+		long packets = received+lost;
+		if (packets != 0){
+			long percent = (lost/packets)*100;
+		}
+		long avg = sum/packets;
+		return new String(
+			packets +" packets transmitted, "+ 
+			received +" packets received, "+ 
+			percent +"% packet loss\n"+
+			"round-trip min/avg/max = "+ min +"/"+ avg +"/"+ max +" ms"
+		);
+	}
+}*/
