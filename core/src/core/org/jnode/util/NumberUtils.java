@@ -8,6 +8,23 @@ package org.jnode.util;
  */
 public class NumberUtils {
 	
+    /**
+     * Convert a float to a string with a given maximum number of fraction digits.
+     * @param value
+     * @param maxFractionLength
+     * @return The string 
+     */
+    public static String toString(float value, int maxFractionLength) {
+        String s = Float.toString(value);
+        final int idx = s.indexOf('.');
+        if (idx >= 0) {
+            final int len = Math.min(s.length(), idx + maxFractionLength +  1);
+            return s.substring(0, len);
+        } else {
+            return s;
+        }
+    }
+    
 	/**
 	 * Gets the hexadecimal representation of the given number. The result is 
 	 * prefixed with '0' until the given length is reached.
