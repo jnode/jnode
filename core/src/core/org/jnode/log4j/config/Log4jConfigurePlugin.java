@@ -62,8 +62,8 @@ public class Log4jConfigurePlugin extends Plugin {
     		root.addAppender(infoApp);
 
     		// Remove the existing appenders.
-			for (Enumeration enum = root.getAllAppenders(); enum.hasMoreElements(); ) {
-			    final Appender appender = (Appender)enum.nextElement();
+			for (Enumeration appEnum = root.getAllAppenders(); appEnum.hasMoreElements(); ) {
+			    final Appender appender = (Appender)appEnum.nextElement();
 			    if ((appender != debugApp) && (appender != infoApp)) {
 			        root.removeAppender(appender);
 			    }
