@@ -24,6 +24,7 @@
     <alias name="AWTTest"      class="org.jnode.test.gui.AWTTest"/>
     <alias name="FBTest"       class="org.jnode.test.gui.FBTest"/>
     <alias name="WTTest"       class="org.jnode.test.gui.JNodeWTTest"/>
+    <alias name="SwingTest"    class="org.jnode.test.gui.SwingTest"/>
   </extension>
 
 </plugin>
