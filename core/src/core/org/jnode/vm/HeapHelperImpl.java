@@ -24,9 +24,8 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
      * @param arch
      */
     public HeapHelperImpl(VmArchitecture arch) {
-        if (Vm.getVm() != null) {
-            throw new SecurityException("Cannot instantiate HeapHelpImpl at runtime");
-        }
+        if (Vm.getVm() != null) { throw new SecurityException(
+                "Cannot instantiate HeapHelpImpl at runtime"); }
         final int refSize = arch.getReferenceSize();
         flagsOffset = ObjectLayout.FLAGS_SLOT * refSize;
         tibOffset = ObjectLayout.TIB_SLOT * refSize;
@@ -123,20 +122,22 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
         return Unsafe.getObjectFlags(src);
     }
 
-	/**
-	 * Has the given object been finalized.
-	 * @param src
-	 * @return
-	 */
-	public final boolean isFinalized(Object src) {
-        return ((Unsafe.getObjectFlags(src) & ObjectFlags.STATUS_FINALIZED) != 0);	    
-	}
-	
-	/**
-	 * Mark the given object as finalized.
-	 * @param dst
-	 */
-	public final void setFinalized(Object dst) {
+    /**
+     * Has the given object been finalized.
+     * 
+     * @param src
+     * @return
+     */
+    public final boolean isFinalized(Object src) {
+        return ((Unsafe.getObjectFlags(src) & ObjectFlags.STATUS_FINALIZED) != 0);
+    }
+
+    /**
+     * Mark the given object as finalized.
+     * 
+     * @param dst
+     */
+    public final void setFinalized(Object dst) {
         final Address addr = Unsafe.add(Unsafe.addressOf(dst), flagsOffset);
         int oldValue;
         int newValue;
@@ -145,8 +146,8 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
             if ((oldValue & ObjectFlags.STATUS_FINALIZED) != 0) { return; }
             newValue = oldValue | ObjectFlags.STATUS_FINALIZED;
         } while (!Unsafe.atomicCompareAndSwap(addr, oldValue, newValue));
-	}
-	
+    }
+
     /**
      * @see org.jnode.vm.memmgr.HeapHelper#getStack(org.jnode.vm.VmThread)
      */
@@ -296,7 +297,12 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
      * @see org.jnode.vm.memmgr.HeapHelper#die(java.lang.String)
      */
     public final void die(String msg) {
-        Unsafe.die(msg);
+        try {
+            Unsafe.getCurrentProcessor().getArchitecture().getStackReader()
+                    .debugStackTrace();
+        } finally {
+            Unsafe.die(msg);
+        }
     }
 
     /**
