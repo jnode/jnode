@@ -11,6 +11,7 @@ import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
 
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.classmgr.VmType;
 
 /**
  * JNode VM implementation of the java AccessControl system.
@@ -58,14 +59,14 @@ public final class VmAccessController {
                         Unsafe.die("Recursive checkPermission");
                     }
                 } else {
-                    final ProtectionDomain pd = method.getDeclaringClass()
-                            .getProtectionDomain();
+                    final VmType declClass = method.getDeclaringClass();
+                    final ProtectionDomain pd = declClass.getProtectionDomain();
                     if (pd != null) {
                         //Unsafe.debug(":pd");
                         if (!pd.implies(perm)) { 
                         //Unsafe.debug("Permission denied");
                         throw new AccessControlException("Permission \"" + perm
-                                + "\" not granted"); }
+                                + "\" not granted due to " + declClass.getName() + " [" + pd.getPermissions() + "]"); }
                     }
                 }
                 if (method.canThrow(PragmaPrivilegedAction.class)) { 

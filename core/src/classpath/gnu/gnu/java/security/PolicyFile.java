@@ -154,13 +154,11 @@ public class PolicyFile extends Policy {
         }
     }
 
-    private static void debug(Throwable t) {
-        if (DEBUG) {
-            System.err.println(">> PolicyFile");
-            t.printStackTrace(System.err);
-        }
+    private static void error(Throwable t) {
+        System.err.println(">> PolicyFile");
+        t.printStackTrace(System.err);
     }
-    
+
     private final URL defaultPolicy;
 
     private final Map cs2pc;
@@ -170,12 +168,13 @@ public class PolicyFile extends Policy {
 
     /**
      * Initialize this instance.
-     * @param defaultPolicy URL of default policy
+     * 
+     * @param defaultPolicy
+     *            URL of default policy
      */
     public PolicyFile(URL defaultPolicy) {
-        if (defaultPolicy == null) {
-            throw new IllegalArgumentException("defaultPolicy cannot be null");
-        }
+        if (defaultPolicy == null) { throw new IllegalArgumentException(
+                "defaultPolicy cannot be null"); }
         this.defaultPolicy = defaultPolicy;
         cs2pc = new HashMap();
         refresh();
@@ -191,7 +190,8 @@ public class PolicyFile extends Policy {
             final CodeSource cs = (CodeSource) e.getKey();
             if (cs.implies(codeSource)) {
                 debug(cs + " -> " + codeSource);
-                final PermissionCollection pc = (PermissionCollection) e.getValue();
+                final PermissionCollection pc = (PermissionCollection) e
+                        .getValue();
                 for (Enumeration ee = pc.elements(); ee.hasMoreElements();) {
                     perms.add((Permission) ee.nextElement());
                 }
@@ -206,15 +206,16 @@ public class PolicyFile extends Policy {
     }
 
     /**
-     * Allow extended classes to add permissions before the permissions collection
-     * is set to read-only.
+     * Allow extended classes to add permissions before the permissions
+     * collection is set to read-only.
+     * 
      * @param codeSource
      * @param perms
      */
     protected void addPermissions(CodeSource codeSource, Permissions perms) {
         // Nothing here
     }
-    
+
     public void refresh() {
         cs2pc.clear();
         final List policyFiles = new ArrayList();
@@ -240,14 +241,14 @@ public class PolicyFile extends Policy {
                         }
                     }));
         } catch (PrivilegedActionException pae) {
-            debug(pae.getException());
+            error(pae.getException());
         }
         for (Iterator it = policyFiles.iterator(); it.hasNext();) {
             try {
                 URL url = (URL) it.next();
                 parse(url);
             } catch (IOException ioe) {
-                debug(ioe);
+                error(ioe);
             }
         }
     }

@@ -37,13 +37,14 @@ final class JNodePolicy extends PolicyFile {
      * Mapping between a codesource (derived from plugin id) and a set of
      * permissions
      */
-    private final HashMap codeSource2Permissions = new HashMap();
+    private final HashMap codeSource2Permissions;
 
     /**
      * Initialize this instance.
      */
     public JNodePolicy(ExtensionPoint permissionsEp) {
         super(ClassLoader.getSystemResource("/org/jnode/security/jnode.policy"));
+        this.codeSource2Permissions = new HashMap();
         this.permissionsEp = permissionsEp;
         loadExtensions();
     }
