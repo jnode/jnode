@@ -169,6 +169,7 @@ public interface Mach64Constants {
 	public static final int CRTC_VSYNC_DIS		= 0x00000008;
 	public static final int CRTC_CSYNC_EN		= 0x00000010;
 	public static final int CRTC_PIX_BY_2_EN	= 0x00000020;
+	public static final int CRTC_DISPLAY_DIS	= 0x00000040;
 
 	public static final int CRTC_PIX_WIDTH		= 0x00000700;
 	public static final int CRTC_PIX_WIDTH_4BPP	= 0x00000100;

@@ -8,51 +8,75 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
 
+import org.jnode.awt.util.BitmapGraphics;
 import org.jnode.driver.video.util.AbstractSurface;
+import org.jnode.system.MemoryResource;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class Mach64Surface extends AbstractSurface {
-	
+
+	private final Mach64Core kernel;
+
+	private final BitmapGraphics bitmapGraphics;
+
+	private final ColorModel colorModel;
+
+	private final MemoryResource screen;
+
 	/**
 	 * @param width
 	 * @param height
 	 */
-	public Mach64Surface(int width, int height) {
-		super(width, height);
-		// TODO Auto-generated constructor stub
+	public Mach64Surface(Mach64Core kernel, Mach64Configuration config,
+			BitmapGraphics bitmapGraphics, MemoryResource screen) {
+		super(config.getScreenWidth(), config.getScreenHeight());
+		this.kernel = kernel;
+		this.bitmapGraphics = bitmapGraphics;
+		this.colorModel = config.getColorModel();
+		this.screen = screen;
 	}
-	
+
+	/**
+	 * @see org.jnode.driver.video.Surface#close()
+	 */
+	public void close() {
+		kernel.close();
+		screen.release();
+		super.close();
+	}
+
 	protected int convertColor(Color color) {
-		// TODO Auto-generated method stub
-		return 0;
+		return color.getRGB();
 	}
 
 	protected void drawPixel(int x, int y, int color, int mode) {
-		// TODO Auto-generated method stub
-
+		bitmapGraphics.drawPixels(x, y, 1, color, mode);
 	}
 
 	public void copyArea(int x, int y, int width, int height, int dx, int dy) {
-		// TODO Auto-generated method stub
-
+		bitmapGraphics.copyArea(x, y, width, height, dx, dy);
 	}
 
 	public void drawAlphaRaster(Raster raster, AffineTransform tx, int srcX,
 			int srcY, int dstX, int dstY, int width, int height, Color color) {
-		// TODO Auto-generated method stub
-
+		bitmapGraphics.drawAlphaRaster(raster, tx, srcX, srcY, dstX, dstY,
+				width, height, convertColor(color));
 	}
 
 	public void drawCompatibleRaster(Raster raster, int srcX, int srcY,
 			int dstX, int dstY, int width, int height, Color bgColor) {
-		// TODO Auto-generated method stub
-
+		if (bgColor == null) {
+			bitmapGraphics.drawImage(raster, srcX, srcY, dstX, dstY, width,
+					height);
+		} else {
+			bitmapGraphics.drawImage(raster, srcX, srcY, dstX, dstY, width,
+					height, convertColor(bgColor));
+		}
 	}
 
 	public ColorModel getColorModel() {
-		// TODO Auto-generated method stub
-		return null;
+		return colorModel;
 	}
 }

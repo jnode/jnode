@@ -6,12 +6,15 @@ package org.jnode.driver.video.ati.mach64;
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
+import org.jnode.awt.util.BitmapGraphics;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.pci.PCIBaseAddress;
 import org.jnode.driver.pci.PCIConstants;
 import org.jnode.driver.pci.PCIDevice;
 import org.jnode.driver.pci.PCIDeviceConfig;
 import org.jnode.driver.video.HardwareCursorAPI;
+import org.jnode.driver.video.spi.DpmsState;
+import org.jnode.driver.video.vgahw.DisplayMode;
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
@@ -40,7 +43,14 @@ final class Mach64Core implements Mach64Constants  {
 	
 	/** I/O utility */
 	private final Mach64VgaIO vgaIO;
-	
+
+	/** Register state before opening a surface */
+	private final Mach64VgaState oldVgaState;
+
+	/** Register state after opening a surface */
+	private final Mach64VgaState currentState;
+
+
 	/**
 	 * Initialize this instance.
 	 * @param driver
@@ -100,7 +110,8 @@ final class Mach64Core implements Mach64Constants  {
 			throw new ResourceNotFreeException(ex);
 		}
 
-		
+		this.oldVgaState = new Mach64VgaState();
+		this.currentState = new Mach64VgaState();		
 	}
 	
 	/**
@@ -111,7 +122,66 @@ final class Mach64Core implements Mach64Constants  {
 	 */
 	final Mach64Surface open(Mach64Configuration config) 
 	throws ResourceNotFreeException {
-		return null;
+		
+		
+		// Calculate new configuration
+		final DisplayMode mode = config.getDisplayMode();
+		final int width = mode.getWidth();
+		final int height = mode.getHeight();
+		final int pixels = width * height;
+		final int bitsPerPixel = config.getBitsPerPixel();
+		final int bytesPerLine = config.getBytesPerLine();
+		final int bytesPerScreen = bytesPerLine * height;
+		currentState.calcForConfiguration(config, vgaIO);
+
+		// Allocate the screen memory
+		final MemoryResource screen = claimDeviceMemory(bytesPerScreen, 4 * 1024);
+
+		// Block all interrupts.
+		vgaIO.disableIRQ();
+		
+		// Save the current state
+		oldVgaState.saveFromVGA(vgaIO);
+
+		// Turn off the screen
+		final DpmsState dpmsState = getDpms();
+		setDpms(DpmsState.OFF);
+		
+		try {
+			// Set new configuration
+			
+			// Create the graphics helper & clear the screen
+			final BitmapGraphics bitmapGraphics;
+			switch (config.getBitsPerPixel()) {
+			case 8:
+				bitmapGraphics = BitmapGraphics.create8bppInstance(screen,
+						width, height, bytesPerLine, 0);
+				screen.setByte(0, (byte) 0, pixels);
+				break;
+			case 16:
+				bitmapGraphics = BitmapGraphics.create16bppInstance(screen,
+						width, height, bytesPerLine, 0);
+				screen.setShort(0, (byte) 0, pixels);
+				break;
+			case 24:
+				bitmapGraphics = BitmapGraphics.create24bppInstance(screen,
+						width, height, bytesPerLine, 0);
+				screen.setInt24(0, 0, pixels);
+				break;
+			case 32:
+				bitmapGraphics = BitmapGraphics.create32bppInstance(screen,
+						width, height, bytesPerLine, 0);
+				screen.setInt(0, 0, pixels);
+				break;
+			default:
+				throw new IllegalArgumentException("Invalid bits per pixel "
+						+ bitsPerPixel);
+			}
+			return new Mach64Surface(this, config, bitmapGraphics, screen);
+		} finally {
+			// Restore screen
+			setDpms(dpmsState);
+		}
 	}
 	
 	/**
@@ -135,5 +205,51 @@ final class Mach64Core implements Mach64Constants  {
 	 */
 	final HardwareCursorAPI getHardwareCursor() {
 		return null;
+	}
+
+	/**
+	 * Claim a portion of RAM on the device.
+	 * 
+	 * @param size
+	 * @param align
+	 * @return
+	 * @throws IndexOutOfBoundsException
+	 * @throws ResourceNotFreeException
+	 */
+	final MemoryResource claimDeviceMemory(int size, int align)
+			throws IndexOutOfBoundsException, ResourceNotFreeException {
+		return deviceRam.claimChildResource(size, align);
+	}
+	/**
+	 * Gets the monitor power state.
+	 */
+	final DpmsState getDpms() {
+		final int val = vgaIO.getReg32(CRTC_GEN_CNTL);
+		final boolean display = ((val & CRTC_DISPLAY_DIS) == 0);
+		final boolean hsync = ((val & CRTC_HSYNC_DIS) == 0);
+		final boolean vsync = ((val & CRTC_VSYNC_DIS) == 0);
+		return new DpmsState(display, hsync, vsync);
+	}
+
+	/**
+	 * Sets the monitor power state.
+	 */
+	final void setDpms(DpmsState state) {
+		int crtc_ext_cntl = vgaIO.getReg32(CRTC_GEN_CNTL);
+
+		crtc_ext_cntl &= ~(CRTC_DISPLAY_DIS | CRTC_HSYNC_DIS | CRTC_VSYNC_DIS);
+
+		if (!state.isDisplay()) {
+			crtc_ext_cntl |= CRTC_DISPLAY_DIS;			
+		}
+		if (!state.isHsync()) {
+			crtc_ext_cntl |= CRTC_HSYNC_DIS;
+		}
+		if (!state.isVsync()) {
+			crtc_ext_cntl |= CRTC_VSYNC_DIS;
+		}
+		
+		vgaIO.setReg32(CRTC_GEN_CNTL, crtc_ext_cntl);			
+		log.debug("Set CRTC_GEN_CNTL to 0x" + NumberUtils.hex(crtc_ext_cntl));
 	}
 }
