@@ -7,7 +7,9 @@ import java.io.IOException;
 
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
+import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.spi.AbstractFileSystem;
 
@@ -63,4 +65,28 @@ public class ISO9660FileSystem extends AbstractFileSystem {
             // TODO not implemented yet
         }
     }
+
+    /**
+     * 
+     */
+	protected FSFile createFile(FSEntry entry) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * 
+	 */
+	protected FSDirectory createDirectory(FSEntry entry) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * 
+	 */
+	protected FSEntry createRootEntry() throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
