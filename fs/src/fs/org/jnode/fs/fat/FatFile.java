@@ -25,6 +25,8 @@ import java.io.IOException;
 
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.fs.FSFile;
+import org.jnode.fs.ReadOnlyFileSystemException;
+
 
 /**
  * A File instance is the in-memory representation of a single file (chain of
@@ -82,6 +84,11 @@ public class FatFile extends FatObject implements FSFile {
 
 	public synchronized void write(long fileOffset, byte[] src, int srcOfs, int len) throws IOException {
 
+		if(getFileSystem().isReadOnly())
+		{
+			throw new ReadOnlyFileSystemException("write in readonly filesystem");
+		}
+				
 		final long max = (isDir) ? getLengthOnDisk() : getLength();
 		if (fileOffset > max) {
 			throw new IOException("Cannot write beyond the EOF");
@@ -121,6 +128,11 @@ public class FatFile extends FatObject implements FSFile {
 	public synchronized void setLength(long length) 
 	throws IOException {
 		
+		if(getFileSystem().isReadOnly())
+		{
+			throw new ReadOnlyFileSystemException("setLength in readonly filesystem");
+		}
+				
 		if (this.length == length) {
 			// Do nothing
 			return;

@@ -29,6 +29,8 @@ import java.util.Vector;
 
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSEntryIterator;
+import org.jnode.fs.ReadOnlyFileSystemException;
+
 
 /**
  * @author gbin
@@ -53,6 +55,11 @@ public class FatLfnDirectory extends FatDirectory {
 	}
 
 	public FSEntry addFile(String name) throws IOException {
+		if(getFileSystem().isReadOnly())
+		{
+			throw new ReadOnlyFileSystemException("addFile in readonly filesystem");
+		}
+						
 		name = name.trim();
 		String shortName = generateShortNameFor(name);
 		FatDirEntry realEntry = new FatDirEntry(this, splitName(shortName), splitExt(shortName));
@@ -65,6 +72,11 @@ public class FatLfnDirectory extends FatDirectory {
 	}
 
 	public FSEntry addDirectory(String name) throws IOException {
+		if(getFileSystem().isReadOnly())
+		{
+			throw new ReadOnlyFileSystemException("addDirectory in readonly filesystem");
+		}
+						
 		name = name.trim();
 		String shortName = generateShortNameFor(name);
 		FatDirEntry realEntry = new FatDirEntry(this, splitName(shortName), splitExt(shortName));

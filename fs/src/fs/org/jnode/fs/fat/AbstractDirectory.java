@@ -30,6 +30,7 @@ import java.util.Vector;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSEntryIterator;
+import org.jnode.fs.ReadOnlyFileSystemException;
 
 /**
  * @author epr
@@ -73,6 +74,11 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 	 * @throws IOException
 	 */
 	protected synchronized FatDirEntry addFatFile(String nameExt) throws IOException {
+		if(getFileSystem().isReadOnly())
+		{
+			throw new ReadOnlyFileSystemException("addFile in readonly filesystem");
+		}
+				
 		if (getFatEntry(nameExt) != null) {
 			throw new IOException("File already exists" + nameExt);
 		}
@@ -136,6 +142,11 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 	 * @throws IOException
 	 */
 	public FSEntry addDirectory(String name) throws IOException {
+		if(getFileSystem().isReadOnly())
+		{
+			throw new ReadOnlyFileSystemException("addDirectory in readonly filesystem");
+		}
+		
 		final long parentCluster;
 		if (file == null) {
 			parentCluster = 0;

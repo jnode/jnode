@@ -237,6 +237,12 @@ public class Ext2File extends AbstractFSFile {
      */
     public void write(long fileOffset, byte[] src, int off, int len)
             throws IOException {
+		
+		if(getFileSystem().isReadOnly())
+		{
+			throw new ReadOnlyFileSystemException("write in readonly filesystem");
+		}		
+		
         //synchronize to the inode cache to make sure that the inode does not
         // get
         //flushed between reading it and locking it
