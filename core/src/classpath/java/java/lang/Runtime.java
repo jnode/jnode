@@ -54,7 +54,7 @@ import java.util.StringTokenizer;
  * Runtime represents the Virtual Machine.
  *
  * @author John Keiser
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
  * @author Jeroen Frijters
  */
 // No idea why this class isn't final, since you can't build a subclass!

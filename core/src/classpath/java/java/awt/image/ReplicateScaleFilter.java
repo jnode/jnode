@@ -201,7 +201,7 @@ public class ReplicateScaleFilter extends ImageFilter
                            model, destPixels, 0, destScansize);
     }
 
-    protected byte[] replicatePixels(int srcx, int srcy, int srcw, int srch,
+    private byte[] replicatePixels(int srcx, int srcy, int srcw, int srch,
                                     ColorModel model, byte[] srcPixels,
                                     int srcOffset, int srcScansize,
                                     double rx, double ry, int destScansize)
@@ -221,7 +221,7 @@ public class ReplicateScaleFilter extends ImageFilter
 	return destPixels;
     }
 
-    protected int[] replicatePixels(int srcx, int srcy, int srcw, int srch,
+    private int[] replicatePixels(int srcx, int srcy, int srcw, int srch,
                                     ColorModel model, int[] srcPixels,
                                     int srcOffset, int srcScansize,
                                     double rx, double ry, int destScansize)

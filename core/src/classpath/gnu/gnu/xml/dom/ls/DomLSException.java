@@ -37,8 +37,6 @@ exception statement from your version. */
 
 package gnu.xml.dom.ls;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
 import org.w3c.dom.ls.LSException;
 
 /**
