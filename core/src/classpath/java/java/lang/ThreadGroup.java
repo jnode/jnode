@@ -173,6 +173,14 @@ public class ThreadGroup {
 		parent.remove(this);
 		destroyed = true;
 	}
+	
+	/**
+	 * Is this object destroyed?
+	 * @return
+	 */
+	public boolean isDestroyed() {
+		return destroyed;
+	}
 
 	public int enumerate(Thread[] list) {
 		return enumerate(list, false);
@@ -269,6 +277,10 @@ public class ThreadGroup {
 			destroy();
 	}
 
+	/**
+	 * Resume this group of threads
+	 * @deprecated
+	 */
 	public final void resume() {
 		checkAccess();
 
@@ -308,6 +320,10 @@ public class ThreadGroup {
 		}
 	}
 
+	/**
+	 * Stop this group of threads.
+	 * @deprecated
+	 */
 	public final void stop() {
 		checkAccess();
 
@@ -324,6 +340,21 @@ public class ThreadGroup {
 		}
 	}
 
+	/**
+	 * Used by the VM, ignored here.
+	 * @param b
+	 * @return
+	 * @deprecated
+	 */
+	public boolean allowThreadSuspension(boolean b) {
+		// Ignore
+		return true;
+	}
+	
+	/**
+	 * Suspend this group of threads.
+	 * @deprecated
+	 */
 	public final void suspend() {
 		checkAccess();
 
