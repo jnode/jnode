@@ -4,13 +4,13 @@
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSEntryIterator;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 
@@ -134,7 +134,7 @@ public class Ext2Directory implements FSDirectory {
 		Ext2File dir = new Ext2File(iNode);		//read itself as a file
 
 		//find the last directory record (if any)
-		FSEntryIterator iterator = (FSEntryIterator)iterator();
+		Ext2FSEntryIterator iterator = (Ext2FSEntryIterator)iterator();
 		Ext2DirectoryRecord rec=null;
 		while(iterator.hasNext()) {
 			rec = iterator.nextDirectoryRecord();
@@ -200,7 +200,7 @@ public class Ext2Directory implements FSDirectory {
 	 */
 	public FSEntry getEntry(String name) throws IOException{
 		//parse the directory and search for the file
-		Iterator iterator=iterator();
+		FSEntryIterator iterator=iterator();
 		while(iterator.hasNext()) {
 			FSEntry entry = (FSEntry)iterator.next();
 			if(entry.getName().equals(name))
@@ -213,13 +213,13 @@ public class Ext2Directory implements FSDirectory {
 		return iNode;
 	}
 	
-	class FSEntryIterator implements Iterator {
+	class Ext2FSEntryIterator implements org.jnode.fs.FSEntryIterator {
 		byte data[];
 		int index;
 		
 		Ext2DirectoryRecord current;
 		
-		public FSEntryIterator(INode iNode)throws IOException {
+		public Ext2FSEntryIterator(INode iNode)throws IOException {
 			//read itself as a file
 			Ext2File directoryFile = new Ext2File(iNode);
 			//read the whole directory
@@ -242,7 +242,7 @@ public class Ext2Directory implements FSDirectory {
 			return true;
 		}
 		
-		public Object next() {
+		public FSEntry next() {
 			
 			if(current == null) {
 				//hasNext actually reads the next element
@@ -277,21 +277,14 @@ public class Ext2Directory implements FSDirectory {
 			current = null;
 			return dr;
 		}
-
-		/**
-		 * @see java.util.Iterator#remove()
-		 */
-		public void remove() {
-			throw new UnsupportedOperationException("No remove operation!");
-		}
 	}
 
 	/**
 	 * @see org.jnode.fs.FSDirectory#iterator()
 	 */
-	public Iterator iterator() throws IOException {
+	public org.jnode.fs.FSEntryIterator iterator() throws IOException {
 		log.debug("Ext2Directory.Iterator()");
-		return new FSEntryIterator(iNode);				
+		return new Ext2FSEntryIterator(iNode);				
 	}
 
 	/**
@@ -320,4 +313,13 @@ public class Ext2Directory implements FSDirectory {
 	private boolean isReadOnly() {
 		return readOnly;
 	}
+	
+	/**
+	 * Save all dirty (unsaved) data to the device 
+	 * @throws IOException
+	 */
+	public void flush() throws IOException
+	{
+		//TODO
+	}	
 }

@@ -4,7 +4,6 @@
 package org.jnode.fs;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 /**
  * @author epr
@@ -16,7 +15,7 @@ public interface FSDirectory extends FSObject {
 	 * directory.
 	 * All elements returned by the iterator must be instanceof FSEntry.
 	 */
-	public Iterator/*<FSEntry>*/ iterator()
+	public FSEntryIterator iterator()
 	throws IOException;
 	
 	/**
@@ -50,5 +49,11 @@ public interface FSDirectory extends FSObject {
 	 */
 	public void remove(String name)
 	throws IOException; 
+	
+	/**
+	 * Save all dirty (unsaved) data to the device 
+	 * @throws IOException
+	 */
+	public void flush() throws IOException;
 
 }
