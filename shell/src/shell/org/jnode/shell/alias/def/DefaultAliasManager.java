@@ -20,7 +20,7 @@ import org.jnode.shell.alias.NoSuchAliasException;
  * @author epr
  */
 public class DefaultAliasManager implements AliasManager, ExtensionPointListener {
-
+	
 	private final DefaultAliasManager parent;
 	private final HashMap aliases = new HashMap();
 	private final ExtensionPoint aliasesEP;
@@ -54,6 +54,11 @@ public class DefaultAliasManager implements AliasManager, ExtensionPointListener
 		if (parent == null) {
 			throw new UnsupportedOperationException("Cannot modify the system alias manager");
 		} else {
+			try {
+				if(getAliasClassName(className) != null) {
+					className = getAliasClassName(className);
+				}
+			} catch (NoSuchAliasException e) {}
 			aliases.put(alias, new Alias(alias, className));
 		}
 	}
@@ -76,19 +81,19 @@ public class DefaultAliasManager implements AliasManager, ExtensionPointListener
 	 * @return the class of the given alias
 	 * @throws ClassNotFoundException
 	 */
-	public Class getAliasClass(String alias) 
-	throws ClassNotFoundException, NoSuchAliasException {
-		return getAlias(alias).getAliasClass();		
+	public Class getAliasClass(String alias)
+		throws ClassNotFoundException, NoSuchAliasException {
+		return getAlias(alias).getAliasClass();
 	}
-
+	
 	/**
 	 * Gets the classname of a given alias
 	 * @param alias
 	 * @return the classname of the given alias
 	 */
-	public String getAliasClassName(String alias) 
-	throws NoSuchAliasException {
-		return getAlias(alias).getClassName();		
+	public String getAliasClassName(String alias)
+		throws NoSuchAliasException {
+		return getAlias(alias).getClassName();
 	}
 	
 	
@@ -96,7 +101,7 @@ public class DefaultAliasManager implements AliasManager, ExtensionPointListener
 	 * Create a new alias manager that has this alias manager as parent.
 	 */
 	public AliasManager createAliasManager() {
-		return new DefaultAliasManager(this);		
+		return new DefaultAliasManager(this);
 	}
 	
 	
@@ -110,7 +115,7 @@ public class DefaultAliasManager implements AliasManager, ExtensionPointListener
 		} else {
 			final HashSet all = new HashSet();
 			for (Iterator i = parent.aliasIterator(); i.hasNext(); ) {
-				all.add(i.next());		
+				all.add(i.next());
 			}
 			all.addAll(aliases.keySet());
 			return all.iterator();
@@ -121,8 +126,8 @@ public class DefaultAliasManager implements AliasManager, ExtensionPointListener
 	 * Gets the alias with the given name
 	 * @param alias
 	 */
-	protected Alias getAlias(String alias) 
-	throws NoSuchAliasException {
+	protected Alias getAlias(String alias)
+		throws NoSuchAliasException {
 		final Alias a = (Alias)aliases.get(alias);
 		if (a != null) {
 			return a;
@@ -132,7 +137,7 @@ public class DefaultAliasManager implements AliasManager, ExtensionPointListener
 			throw new NoSuchAliasException(alias);
 		}
 	}
-
+	
 	/**
 	 * Reload the alias list from the extension-point
 	 *
@@ -155,7 +160,7 @@ public class DefaultAliasManager implements AliasManager, ExtensionPointListener
 		final String name = element.getAttribute("name");
 		final String className = element.getAttribute("class");
 		if ((name != null) && (className != null)) {
-			aliases.put(name, new Alias(name, className));			
+			aliases.put(name, new Alias(name, className));
 		}
 	}
 	
@@ -165,14 +170,14 @@ public class DefaultAliasManager implements AliasManager, ExtensionPointListener
 	public void extensionAdded(ExtensionPoint point, Extension extension) {
 		refreshAliases();
 	}
-
+	
 	/**
 	 * @see org.jnode.plugin.ExtensionPointListener#extensionRemoved(org.jnode.plugin.ExtensionPoint, org.jnode.plugin.Extension)
 	 */
 	public void extensionRemoved(ExtensionPoint point, Extension extension) {
 		refreshAliases();
 	}
-
+	
 	static class Alias {
 		private final String alias;
 		private final String className;
@@ -189,7 +194,7 @@ public class DefaultAliasManager implements AliasManager, ExtensionPointListener
 		public String getAlias() {
 			return alias;
 		}
-
+		
 		/**
 		 * Gets the name of the class of this alias
 		 */
@@ -200,12 +205,12 @@ public class DefaultAliasManager implements AliasManager, ExtensionPointListener
 		/**
 		 * Gets the class of this alias
 		 */
-		public Class getAliasClass() 
-		throws ClassNotFoundException {
+		public Class getAliasClass()
+			throws ClassNotFoundException {
 			if (aliasClass == null) {
 				aliasClass = Thread.currentThread().getContextClassLoader().loadClass(className);
 			}
 			return aliasClass;
 		}
-	}	
+	}
 }
