@@ -10,6 +10,7 @@ import org.jnode.driver.net.ethernet.spi.BasicEthernetDriver;
 import org.jnode.driver.net.ethernet.spi.Flags;
 import org.jnode.driver.net.spi.AbstractDeviceCore;
 import org.jnode.driver.pci.PCIDevice;
+import org.jnode.plugin.ConfigurationElement;
 import org.jnode.system.ResourceNotFreeException;
 
 
@@ -19,6 +20,13 @@ import org.jnode.system.ResourceNotFreeException;
  *  
  */
 public class EEPRO100Driver extends BasicEthernetDriver {
+    
+    /**
+     * Create a new instance
+     */
+    public EEPRO100Driver(ConfigurationElement config) {
+        this(new EEPRO100Flags(config));
+    }
 
     public EEPRO100Driver(EEPRO100Flags flags) {
         this.flags = flags;

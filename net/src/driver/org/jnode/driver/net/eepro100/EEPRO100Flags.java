@@ -5,6 +5,7 @@
 package org.jnode.driver.net.eepro100;
 
 import org.jnode.driver.net.ethernet.spi.Flags;
+import org.jnode.plugin.ConfigurationElement;
 
 
 
@@ -15,6 +16,13 @@ import org.jnode.driver.net.ethernet.spi.Flags;
 public class EEPRO100Flags implements Flags {
     
     private final String name;
+    
+    /**
+	 * Create a new instance
+	 */
+	public EEPRO100Flags(ConfigurationElement config) {
+		this(config.getAttribute("name")); 
+	}
     
     public EEPRO100Flags(String name){
         this.name = name;
