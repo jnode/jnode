@@ -12,11 +12,7 @@
 vm_invoke_abstract:
 	%if TRACE_ABSTRACT
 	    PRINT_STR vm_invoke_abstract_msg1
-		push eax
-	    call sys_print_eax
-	    ;mov eax,[eax+VmMember_NAME_OFFSET*4]
-	    ;call vm_print_string
-	    pop eax
+	    PRINT_WORD eax
     %endif
 	%if FAIL_ON_ABSTRACT
 	    int 0x50
