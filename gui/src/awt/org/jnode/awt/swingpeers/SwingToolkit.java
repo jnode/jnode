@@ -47,9 +47,6 @@ import java.awt.peer.TextAreaPeer;
 import java.awt.peer.TextFieldPeer;
 import java.awt.peer.WindowPeer;
 
-import javax.swing.JDesktopPane;
-import javax.swing.JFrame;
-
 import org.jnode.awt.JNodeToolkit;
 
 /**
@@ -59,11 +56,7 @@ import org.jnode.awt.JNodeToolkit;
 
 public class SwingToolkit extends JNodeToolkit {
 
-    private JFrame desktopFrame = null;
-
-    private JDesktopPane desktop = null;
-
-    private boolean initialized = false;
+    private DesktopFrame desktopFrame;
 
     /**
      * Initialize this instance.
@@ -116,16 +109,14 @@ public class SwingToolkit extends JNodeToolkit {
     protected FramePeer createFrame(Frame target) {
     	setTop(target);
         final int rc = incRefCount();
-        if (!initialized) {
+        if (target instanceof DesktopFrame) {
             log.debug("createFrame:desktopFramePeer(" + target + ")");
             // Only desktop is real frame
-            initialized = true;
-            //decRefCount(false);
             return new DesktopFramePeer(this, target);
         } else {
             log.debug("createFrame:normal(" + target + ")");
             // Other frames are emulated
-            return new SwingFramePeer(this, desktop, target);
+            return new SwingFramePeer(this, desktopFrame.getDesktop(), target);
         }
     }
 
@@ -191,8 +182,6 @@ public class SwingToolkit extends JNodeToolkit {
         log.debug("onClose");
         desktopFrame.dispose();
         desktopFrame = null;
-        desktop = null;
-        initialized = false;
     }
 
     /**
@@ -200,10 +189,7 @@ public class SwingToolkit extends JNodeToolkit {
      */
     protected void onInitialize() {
         log.debug("onInitialize");
-        desktopFrame = new JFrame("");
-        desktopFrame.setSize(getScreenSize().width, getScreenSize().height);
-        desktop = new JDesktopPane();
-        desktopFrame.getContentPane().add(desktop);
+        desktopFrame = new DesktopFrame(getScreenSize());
         desktopFrame.show();
     }
 }
