@@ -1,167 +1,93 @@
 /*
- * $Id$
+ * (C) Copyright Australian National University. 2004
  */
-package org.vmmagic.unboxed; 
-
-import org.jnode.vm.Vm;
-import org.vmmagic.pragma.Uninterruptible;
-import org.vmmagic.pragma.UninterruptibleNoWarnPragma;
+//$Id$
+package org.vmmagic.unboxed;
 
 /**
- * The extent type is used by the runtime system and collector to denote the 
- * undirected distance between two machine addresses. It is most similar 
- * to an unsigned int and as such, comparison are unsigned.
- * <p>
- * For efficiency and to avoid meta-circularity, the class is intercepted like
- * magic and converted into the base type so no objects are created run-time.
- *
- * @author Perry Cheng
- * @see Address Word Offset
+ * Commenting required
+ * 
+ * @author Daniel Frampton
  */
-public final class Extent implements Uninterruptible {
+public final class Extent {
 
-  // Do not try to create a static field containing special offset values.
-  //   Suboptimal code will be generated.
+    /**
+     * @deprecated
+     */
+    public static Extent fromInt(int address) {
+        return null;
+    }
 
-  //-#if RVM_FOR_32_ADDR
-  //private int value;
-  //-#elif RVM_FOR_64_ADDR
-  private long value;
-  //-#endif
+    public static Extent fromIntSignExtend(int address) {
+        return null;
+    }
 
-  //-#if RVM_FOR_32_ADDR
-  Extent(int offset) {  
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);  // call site should have been hijacked by magic in compiler
-    value = offset;
-  }
-  //-#elif RVM_FOR_64_ADDR
-  Extent(long offset) {  
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);  // call site should have been hijacked by magic in compiler
-    value = offset;
-  }
-  //-#endif
+    public static Extent fromIntZeroExtend(int address) {
+        return null;
+    }
 
+    public static Extent zero() {
+        return null;
+    }
 
-  public boolean equals(Object o) {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return (o instanceof Extent) && ((Extent) o).value == value;
-  }
+    public static Extent one() {
+        return null;
+    }
 
-  /**
-   * @deprecated
-   */
-  public static Extent fromInt(int address) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Extent(address);
-  }
+    public static Extent max() {
+        return null;
+    }
 
-  public static Extent fromIntSignExtend(int address) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Extent(address);
-  }
+    public int toInt() {
+        return 0;
+    }
 
-  public static Extent fromIntZeroExtend(int address) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    //-#if RVM_FOR_32_ADDR
-    //return new Extent(address);
-    //-#elif RVM_FOR_64_ADDR
-    long val = ((long)address) & 0x00000000ffffffffL;
-    return new Extent(val);
-    //-#endif
-  }
+    public long toLong() {
+        return 0L;
+    }
 
-  //-#if RVM_FOR_64_ADDR
-  public static Extent fromLong (long offset) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Extent(offset);
-  }
-  //-#endif
+    public Word toWord() {
+        return null;
+    }
 
-  public static Extent zero () throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Extent(0);
-  }
+    public Extent add(int byteSize) {
+        return null;
+    }
 
-  public static Extent one () throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Extent(1);
-  }
+    public Extent sub(int byteSize) {
+        return null;
+    }
 
-  public static Extent max() throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return fromIntSignExtend(-1);
-  }
+    public Extent add(Extent byteSize) {
+        return null;
+    }
 
-  public int toInt () {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return (int)value;
-  }
+    public Extent sub(Extent byteSize) {
+        return null;
+    }
 
-  public long toLong () {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-//    if (Vm.BuildFor64Addr) {
-      return value;
-//    } else {
-//      return 0x00000000ffffffffL & ((long) value);
-//    }
-  }
+    public boolean LT(Extent extent2) {
+        return false;
+    }
 
-  public Word toWord() throws UninterruptibleNoWarnPragma {
-    return new Word(value);
-  }
+    public boolean LE(Extent extent2) {
+        return false;
+    }
 
-  public Extent add (int byteSize) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Extent(value + byteSize);
-  }
+    public boolean GT(Extent extent2) {
+        return false;
+    }
 
-  public Extent sub (int byteSize) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Extent(value - byteSize);
-  }
+    public boolean GE(Extent extent2) {
+        return false;
+    }
 
-  public Extent add (Extent byteSize) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Extent(value + byteSize.value);
-  }
+    public boolean EQ(Extent extent2) {
+        return false;
+    }
 
-  public Extent sub (Extent byteSize) throws UninterruptibleNoWarnPragma {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);
-    return new Extent(value - byteSize.value);
-  }
-
-  public boolean LT (Extent extent2) {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);  // call site should have been hijacked by magic in compiler
-    if (value >= 0 && extent2.value >= 0) return value < extent2.value;
-    if (value < 0 && extent2.value < 0) return value < extent2.value;
-    if (value < 0) return false; 
-    return true;
-  }
-
-  public boolean LE (Extent extent2) {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);  // call site should have been hijacked by magic in compiler
-    return (value == extent2.value) || LT(extent2);
-  }
-
-  public boolean GT (Extent extent2) {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);  // call site should have been hijacked by magic in compiler
-    return extent2.LT(this);
-  }
-
-  public boolean GE (Extent extent2) {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);  // call site should have been hijacked by magic in compiler
-    return extent2.LE(this);
-  }
-
-  public boolean EQ (Extent extent2) {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);  // call site should have been hijacked by magic in compiler
-    return value == extent2.value;
-  }
-
-  public boolean NE (Extent extent2) {
-    if (Vm.VerifyAssertions && Vm.isRunningVm()) Vm._assert(Vm.NOT_REACHED);  // call site should have been hijacked by magic in compiler
-    return !EQ(extent2);
-  }
-
+    public boolean NE(Extent extent2) {
+        return false;
+    }
 }
 
