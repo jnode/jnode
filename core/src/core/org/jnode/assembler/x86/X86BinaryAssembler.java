@@ -651,7 +651,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	private void testDst(X86Register dst, int dstDisp) {
 		if ((dst == X86Register.EBP) && (dstDisp == 0)) {
-			throw new RuntimeException("Write to [EBP+0]");
+			throw new IllegalArgumentException("Write to [EBP+0]");
 		}
 	}
 
