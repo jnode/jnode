@@ -39,7 +39,7 @@ exception statement from your version. */
 
 package java.lang;
 
-import gnu.classpath.Configuration;
+import gnu.classpath.SystemProperties;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -59,190 +59,6 @@ public final class System
 {
   // WARNING: System is a CORE class in the bootstrap cycle. See the comments
   // in vm/reference/java/lang/Runtime for implications of this fact.
-
-  /**
-   * Add to the default properties. The field is stored in Runtime, because
-   * of the bootstrap sequence; but this adds several useful properties to
-   * the defaults. Once the default is stabilized, it should not be modified;
-   * instead it is passed as a parent properties for fast setup of the
-   * defaults when calling <code>setProperties(null)</code>.
-   */
-  static
-  {
-    // Note that this loadLibrary() takes precedence over the one in Object,
-    // since Object.<clinit> is waiting for System.<clinit> to complete
-    // first; but loading a library twice is harmless.
-    if (Configuration.INIT_LOAD_LIBRARY)
-      loadLibrary("javalang");
-
-    Properties defaultProperties = Runtime.defaultProperties;
-    defaultProperties.put("gnu.classpath.home",
-		    Configuration.CLASSPATH_HOME);
-    defaultProperties.put("gnu.classpath.version",
-		    Configuration.CLASSPATH_VERSION);
-
-    // Set base URL if not already set.
-    if (defaultProperties.get("gnu.classpath.home.url") == null)
-      defaultProperties.put("gnu.classpath.home.url",
-			    "file://" + Configuration.CLASSPATH_HOME + "/lib");
-
-    // Set short name if not already set.
-    if (defaultProperties.get("gnu.classpath.vm.shortname") == null)
-      {
-	String value = defaultProperties.getProperty("java.vm.name");
-	int index = value.lastIndexOf(' ');
-	if (index != -1)
-	  value = value.substring(index + 1);
-	defaultProperties.put("gnu.classpath.vm.shortname", value);
-      }
-
-    // Network properties
-    if (defaultProperties.get("http.agent") == null)
-      {
-	String userAgent
-	  = ("gnu-classpath/"
-	     + defaultProperties.getProperty("gnu.classpath.version")
-	     + " ("
-	     + defaultProperties.getProperty("gnu.classpath.vm.shortname")
-	     + "/"
-	     + defaultProperties.getProperty("java.vm.version")
-	     + ")");
-	defaultProperties.put("http.agent", userAgent);
-      }
-
-    defaultProperties.put("gnu.cpu.endian",
-                          VMSystem.isWordsBigEndian() ? "big" : "little");
-
-    // Common encoding aliases. See gnu.java.io.EncodingManager.
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.ISO8859_1",
-                          "8859_1");
-
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.ISO-8859-1",
-                          "8859_1");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.ISO-8859-2",
-                          "8859_2");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.ISO-8859-3",
-                          "8859_3");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.ISO-8859-4",
-                          "8859_4");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.ISO-8859-5",
-                          "8859_5");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.ISO-8859-6",
-                          "8859_6");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.ISO-8859-7",
-                          "8859_7");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.ISO-8859-8",
-                          "8859_8");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.ISO-8859-9",
-                          "8859_9");
-
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso-8859-1",
-                          "8859_1");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso-8859-2",
-                          "8859_2");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso-8859-3",
-                          "8859_3");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso-8859-4",
-                          "8859_4");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso-8859-5",
-                          "8859_5");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso-8859-6",
-                          "8859_6");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso-8859-7",
-                          "8859_7");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso-8859-8",
-                          "8859_8");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso-8859-9",
-                          "8859_9");
-
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso8859_1",
-                          "8859_1");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso8859_2",
-                          "8859_2");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso8859_3",
-                          "8859_3");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso8859_4",
-                          "8859_4");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso8859_5",
-                          "8859_5");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso8859_6",
-                          "8859_6");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso8859_7",
-                          "8859_7");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso8859_8",
-                          "8859_8");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso8859_9",
-                          "8859_9");
-
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso-latin-1",
-                          "8859_1");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso-latin-2",
-                          "8859_2");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso-latin-3",
-                          "8859_3");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso-latin-4",
-                          "8859_4");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso-latin-5",
-                          "8859_5");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso-latin-6",
-                          "8859_6");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso-latin-7",
-                          "8859_7");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso-latin-8",
-                          "8859_8");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.iso-latin-9",
-                          "8859_9");
-
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.latin1",
-                          "8859_1");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.latin2",
-                          "8859_2");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.latin3",
-                          "8859_3");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.latin4",
-                          "8859_4");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.latin5",
-                          "8859_5");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.latin6",
-                          "8859_6");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.latin7",
-                          "8859_7");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.latin8",
-                          "8859_8");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.latin9",
-                          "8859_9");
-
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.UTF-8", "UTF8");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.utf-8", "UTF8");
-
-    // XXX FIXME - Cheat a little for ASCII.
-    // Remove when we get a real "ASCII En/Decoder"
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.ASCII", "8859_1");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.ascii", "8859_1");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.US-ASCII",
-			  "8859_1");
-    defaultProperties.put("gnu.java.io.encoding_scheme_alias.us-ascii",
-			  "8859_1");
-
-    // 8859_1 is a safe default encoding to use when not explicitly set
-    if (defaultProperties.get("file.encoding") == null)
-      defaultProperties.put("file.encoding", "8859_1");
-
-    // XXX FIXME - Temp hack for old systems that set the wrong property
-    if (defaultProperties.get("java.io.tmpdir") == null)
-      defaultProperties.put("java.io.tmpdir",
-                            defaultProperties.get("java.tmpdir"));
-  }
-
-  /**
-   * Stores the current system properties. This can be modified by
-   * {@link #setProperties(Properties)}, but will never be null, because
-   * setProperties(null) sucks in the default properties.
-   */
-  // Note that we use clone here and not new.  Some programs assume
-  // that the system properties do not have a parent.
-  static Properties properties
-    = (Properties) Runtime.defaultProperties.clone();
 
   /**
    * The standard InputStream. This is assigned at startup and starts its
@@ -298,7 +114,7 @@ public final class System
      */
   public static void setIn(InputStream in)
   {
-    SecurityManager sm = Runtime.securityManager; // Be thread-safe.
+    SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPermission(new RuntimePermission("setIO"));
     VMSystem.setIn(in);
@@ -315,7 +131,7 @@ public final class System
    */
   public static void setOut(PrintStream out)
   {
-    SecurityManager sm = Runtime.securityManager; // Be thread-safe.
+    SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPermission(new RuntimePermission("setIO"));
 
@@ -333,7 +149,7 @@ public final class System
    */
   public static void setErr(PrintStream err)
   {
-    SecurityManager sm = Runtime.securityManager; // Be thread-safe.
+    SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPermission(new RuntimePermission("setIO"));
     VMSystem.setErr(err);
@@ -355,13 +171,13 @@ public final class System
    */
   public static synchronized void setSecurityManager(SecurityManager sm)
   {
-    // Implementation note: the field lives in Runtime because of bootstrap
-    // initialization issues. This method is synchronized so that no other
-    // thread changes it to null before this thread makes the change.
-    if (Runtime.securityManager != null)
-      Runtime.securityManager.checkPermission
+    // Implementation note: the field lives in SecurityManager because of
+    // bootstrap initialization issues. This method is synchronized so that
+    // no other thread changes it to null before this thread makes the change.
+    if (SecurityManager.current != null)
+      SecurityManager.current.checkPermission
         (new RuntimePermission("setSecurityManager"));
-    Runtime.securityManager = sm;
+    SecurityManager.current = sm;
         }
 
   /**
@@ -372,9 +188,7 @@ public final class System
    */
   public static SecurityManager getSecurityManager()
   {
-    // Implementation note: the field lives in Runtime because of bootstrap
-    // initialization issues.
-    return Runtime.securityManager;
+    return SecurityManager.current;
         }
 
   /**
@@ -496,10 +310,10 @@ public final class System
      */
   public static Properties getProperties()
   {
-    SecurityManager sm = Runtime.securityManager; // Be thread-safe.
+    SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPropertiesAccess();
-    return properties;
+    return SystemProperties.getProperties();
         }
 
   /**
@@ -513,16 +327,10 @@ public final class System
    */
   public static void setProperties(Properties properties)
   {
-    SecurityManager sm = Runtime.securityManager; // Be thread-safe.
+    SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPropertiesAccess();
-    if (properties == null)
-      {
-	// Note that we use clone here and not new.  Some programs
-	// assume that the system properties do not have a parent.
-	properties = (Properties) Runtime.defaultProperties.clone();
-      }
-    System.properties = properties;
+    SystemProperties.setProperties(properties);
     }
 
   /**
@@ -537,12 +345,12 @@ public final class System
    */
   public static String getProperty(String key)
   {
-    SecurityManager sm = Runtime.securityManager; // Be thread-safe.
+    SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPropertyAccess(key);
     else if (key.length() == 0)
       throw new IllegalArgumentException("key can't be empty");
-    return properties.getProperty(key);
+    return SystemProperties.getProperty(key);
     }
 
   /**
@@ -558,10 +366,10 @@ public final class System
    */
   public static String getProperty(String key, String def)
   {
-    SecurityManager sm = Runtime.securityManager; // Be thread-safe.
+    SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPropertyAccess(key);
-    return properties.getProperty(key, def);
+    return SystemProperties.getProperty(key, def);
     }
 
   /**
@@ -578,10 +386,10 @@ public final class System
    */
   public static String setProperty(String key, String value)
   {
-    SecurityManager sm = Runtime.securityManager; // Be thread-safe.
+    SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPermission(new PropertyPermission(key, "write"));
-    return (String) properties.setProperty(key, value);
+    return SystemProperties.setProperty(key, value);
     }
 
   /**
@@ -600,7 +408,7 @@ public final class System
   {
     if (name == null)
       throw new NullPointerException();
-    SecurityManager sm = Runtime.securityManager; // Be thread-safe.
+    SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPermission(new RuntimePermission("getenv." + name));
     return VMSystem.getenv(name);
@@ -706,8 +514,7 @@ public final class System
      */
   public static String mapLibraryName(String libname)
   {
-        // XXX Fix this!!!!
-        return VMRuntime.nativeGetLibname("", libname);
+    return VMRuntime.mapLibraryName(libname);
     }
 
 } // class System
