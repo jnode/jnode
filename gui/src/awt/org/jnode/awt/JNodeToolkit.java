@@ -19,6 +19,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.PrintJob;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.font.FontRenderContext;
 import java.awt.im.InputMethodHighlight;
@@ -91,6 +92,20 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 		refCount = 0;
 		this.focusHandler = new FocusHandler(this);
 		JNodeGenericPeer.enableQueue(eventQueue);
+	}
+	
+	/**
+	 * Gets the default toolkit casted to JNodeToolkit.
+	 * @throws AWTError If the default toolkit is not instanceof JNodeToolkit.
+	 * @return
+	 */
+	public static JNodeToolkit getJNodeToolkit() {
+		final Toolkit tk = Toolkit.getDefaultToolkit();
+		if (tk instanceof JNodeToolkit) {
+			return (JNodeToolkit)tk;
+		} else {
+			throw new AWTError("Toolkit is not a JNodeToolkit");
+		}
 	}
 
 	/**
@@ -194,7 +209,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	/**
 	 * Decrement the peer reference count
 	 */
-	public final synchronized int decRefCount(boolean forceClose) {
+	private final synchronized int decRefCount(boolean forceClose) {
 		refCount--;
 		log.debug("refCount.dec=" + refCount);
 		if ((refCount == 0) || forceClose) {
@@ -213,6 +228,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 			this.keyboardHandler = null;
 			this.mouseHandler = null;
 			this.refCount = 0;
+			notifyAll();
 		}
 		return refCount;
 	}
@@ -465,10 +481,52 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 		return eventQueue;
 	}
 
+	public static boolean isGuiActive() {
+		final Toolkit tk = getDefaultToolkit();
+		if (!(tk instanceof JNodeToolkit)) {
+			throw new AWTError("Toolkit is not a JNodeToolkit");
+		}
+		return (((JNodeToolkit)tk).graphics != null);
+	}
+	
+	public static void startGui() {
+		final Toolkit tk = getDefaultToolkit();
+		if (!(tk instanceof JNodeToolkit)) {
+			throw new AWTError("Toolkit is not a JNodeToolkit");
+		}
+		((JNodeToolkit)tk).incRefCount();
+	}
+	
+	public static void stopGui() {
+		final Toolkit tk = getDefaultToolkit();
+		if (!(tk instanceof JNodeToolkit)) {
+			throw new AWTError("Toolkit is not a JNodeToolkit");
+		}
+		((JNodeToolkit)tk).decRefCount(true);		
+	}
+	
+	public static void waitUntilStopped() {
+		final Toolkit tk = getDefaultToolkit();
+		if (!(tk instanceof JNodeToolkit)) {
+			throw new AWTError("Toolkit is not a JNodeToolkit");
+		}
+		((JNodeToolkit)tk).doWaitUntilStopped();
+	}
+	
+	private final synchronized void doWaitUntilStopped() {
+		while (graphics != null) {
+			try {
+				wait();
+			} catch (InterruptedException ex) {
+				// Ignore
+			}
+		}
+	}
+	
 	/**
 	 * Increment the peer reference count
 	 */
-	protected final int incRefCount() {
+	private final int incRefCount() {
 		final boolean initialize;
 		final int rc;
 		synchronized (this) {
@@ -568,6 +626,12 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 		}
 		return c;
 	}
+	
+	/**
+	 * Gets the AWT context.
+	 * @return
+	 */
+	public abstract JNodeAwtContext getAwtContext();
 	
 	protected void setTop(Frame frame) {
 		this.top = frame;

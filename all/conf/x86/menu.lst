@@ -20,6 +20,11 @@ kernel (hd0,0)/jnodesys.gz
 module (hd0,0)/full.jgz
 
 # ---------------------------
+title JNode GUI (all plugins)
+kernel (hd0,0)/jnodesys.gz
+module (hd0,0)/fullgui.jgz
+
+# ---------------------------
 title JNode via dhcp (default)
 dhcp
 kernel (nd)/jnodesys.gz
@@ -30,6 +35,12 @@ title JNode via dhcp (all plugins)
 dhcp
 kernel (nd)/jnodesys.gz
 module (nd)/full.jgz
+
+# ---------------------------
+title JNode GUI via dhcp (all plugins)
+dhcp
+kernel (nd)/jnodesys.gz
+module (nd)/fullgui.jgz
 
 # ---------------------------
 title JNode Install

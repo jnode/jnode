@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.desktop" 
+        name="JNode Desktop Implementation"
+        version="@VERSION@"
+        provider-name="JNode.org"
+        class="org.jnode.desktop.DesktopPlugin">
+        
+  <requires>
+    <import plugin="org.jnode.awt"/>
+  </requires>
+  
+  <runtime>
+    <library name="jnode-gui.jar">
+      <export name="org.jnode.desktop.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="jnode.desktop" actions="read,write"/>
+  </extension>
+        
+</plugin>
