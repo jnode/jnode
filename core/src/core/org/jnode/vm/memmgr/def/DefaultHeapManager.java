@@ -11,6 +11,7 @@ import org.jnode.vm.Monitor;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.VmMagic;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassLoader;
@@ -319,7 +320,7 @@ public final class DefaultHeapManager extends VmHeapManager {
             }
             vmClass.incInstanceCount();
             // Allocated objects are initially black.
-            helper.unsafeSetObjectFlags(result, ObjectFlags.GC_DEFAULT_COLOR);
+            VmMagic.setObjectFlags(result, ObjectFlags.GC_DEFAULT_COLOR);
         } finally {
             if (m != null) {
                 m.exit();

@@ -16,6 +16,8 @@ import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.def.VmBootHeap;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.ObjectReference;
+import org.vmmagic.unboxed.Offset;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -164,7 +166,8 @@ public abstract class VmHeapManager extends VmSystemObject {
 		if (objectClass.isArray()) {
 			final int slotSize = Unsafe.getCurrentProcessor().getArchitecture().getReferenceSize();
 			final VmArrayClass arrayClass = (VmArrayClass) objectClass;
-			final int length = helper.getInt(object, VmArray.LENGTH_OFFSET * slotSize);
+            final Address objectPtr = ObjectReference.fromObject(object).toAddress();
+			final int length = objectPtr.loadInt(Offset.fromIntSignExtend(VmArray.LENGTH_OFFSET * slotSize));
 			final int elemSize = arrayClass.getComponentType().getTypeSize();
 			size = (VmArray.DATA_OFFSET * slotSize) * (length * elemSize);
 		} else {
@@ -215,8 +218,8 @@ public abstract class VmHeapManager extends VmSystemObject {
 	private final Object newArray0(VmClassType vmClass, int elemSize, int elements, int slotSize) {
 		final int size = (VmArray.DATA_OFFSET * slotSize) + (elemSize * elements);
 		final Object array = allocObject(vmClass, size);
-		final VmAddress arrayPtr = helper.addressOf(array);
-		helper.setInt(arrayPtr, (VmArray.LENGTH_OFFSET * slotSize), elements);
+		final Address arrayPtr = ObjectReference.fromObject(array).toAddress();
+		arrayPtr.store(elements, Offset.fromIntSignExtend(VmArray.LENGTH_OFFSET * slotSize));
 		return array;
 	}
 	

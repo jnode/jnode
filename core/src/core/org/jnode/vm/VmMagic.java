@@ -61,6 +61,16 @@ public final class VmMagic {
     }
 
     /**
+     * Gets the GC color flags of the given object.
+     * 
+     * @param object
+     * @return int
+     */
+    public static int getObjectColor(Object object) {
+        return 0;
+    }
+
+    /**
      * Sets all of the flags of the given object.
      * 
      * @param object
@@ -70,6 +80,14 @@ public final class VmMagic {
         
     }
 
+    /**
+     * Has the given object been finalized.
+     * @param src
+     */
+    public static boolean isFinalized(Object src) {
+        return false;
+    }
+    
     /**
      * Do not instantiate this class.
      */

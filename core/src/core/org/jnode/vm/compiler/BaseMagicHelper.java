@@ -218,6 +218,8 @@ public class BaseMagicHelper {
     protected static final int mGETOBJECTFLAGS = 100;
     protected static final int mSETOBJECTFLAGS = 101;
     protected static final int mTOOBJECT = 102;
+    protected static final int mGETOBJECTCOLOR = 103;
+    protected static final int mISFINALIZED = 104;
 
 
     private static final int mLOAD_MIN = mLOADBYTE;
@@ -290,6 +292,8 @@ public class BaseMagicHelper {
         addMethod("getTIB", mGETTIB);
         addMethod("getObjectFlags", mGETOBJECTFLAGS);
         addMethod("setObjectFlags", mSETOBJECTFLAGS);
+        addMethod("getObjectColor", mGETOBJECTCOLOR);
+        addMethod("isFinalized", mISFINALIZED);
     }
 
     protected static final int getClass(VmMethod method) {

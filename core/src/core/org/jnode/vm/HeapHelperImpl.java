@@ -121,26 +121,6 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
     }
 
     /**
-     * Gets the color of the given object.
-     * 
-     * @param src
-     * @return @see org.jnode.vm.classmgr.ObjectFlags#GC_BLACK
-     * @see org.jnode.vm.classmgr.ObjectFlags#GC_GREY
-     * @see org.jnode.vm.classmgr.ObjectFlags#GC_WHITE
-     * @see org.jnode.vm.classmgr.ObjectFlags#GC_YELLOW
-     */
-    public final int getObjectColor(Object src) {
-        return VmMagic.getObjectFlags(src) & ObjectFlags.GC_COLOUR_MASK;
-    }
-
-    /**
-     * Gets the flags of the given object.
-     */
-    public final int getObjectFlags(Object src) {
-        return VmMagic.getObjectFlags(src);
-    }
-
-    /**
      * Has the given object been finalized.
      * 
      * @param src

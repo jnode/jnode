@@ -8,6 +8,7 @@ import org.jnode.assembler.x86.Register;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
+import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.TIBLayout;
 import org.jnode.vm.classmgr.VmArray;
@@ -591,6 +592,28 @@ final class MagicHelper extends BaseX86MagicHelper {
             os.writeMOV(X86CompilerConstants.INTSIZE, r, ObjectLayout.FLAGS_SLOT * 4, flagsr);
             flags.release(ec);
             obj.release(ec);
+        } break;
+        case mGETOBJECTCOLOR: {
+            if (Vm.VerifyAssertions) Vm._assert(isstatic);
+            final RefItem obj = vstack.popRef();
+            obj.load(ec);
+            final Register r = obj.getRegister();
+            // Get flags
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ObjectLayout.FLAGS_SLOT * 4);
+            os.writeAND(r, ObjectFlags.GC_COLOUR_MASK);
+            obj.release(ec);
+            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, r));
+        } break;
+        case mISFINALIZED: {
+            if (Vm.VerifyAssertions) Vm._assert(isstatic);
+            final RefItem obj = vstack.popRef();
+            obj.load(ec);
+            final Register r = obj.getRegister();
+            // Get flags
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ObjectLayout.FLAGS_SLOT * 4);
+            os.writeAND(r, ObjectFlags.STATUS_FINALIZED);
+            obj.release(ec);
+            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, r));
         } break;
             
         default:

@@ -10,6 +10,8 @@ import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.pragma.UninterruptiblePragma;
+import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Offset;
 
 /**
  * @author epr
@@ -80,9 +82,9 @@ public class VmBootHeap extends VmAbstractHeap {
         // Go through the heap and mark all objects in the allocation bitmap.
         int offset = headerSize;
         while (offset < heapSize) {
-            VmAddress ptr = VmAddress.add(start, offset);
+            final Address ptr = Address.fromAddress(start).add(offset);
             setAllocationBit(ptr, true);
-            int objSize = helper.getInt(ptr, sizeOffset);
+            final int objSize = ptr.loadInt(Offset.fromIntSignExtend(sizeOffset));
             offset += objSize + headerSize;
         }
         //Unsafe.debug("end of bootheap.initialize");
@@ -121,12 +123,12 @@ public class VmBootHeap extends VmAbstractHeap {
         final int size = getSize();
         int offset = headerSize;
         while (offset < size) {
-            final VmAddress ptr = VmAddress.add(start, offset);
-            final Object object = helper.objectAt(ptr);
+            final Address ptr = Address.fromAddress(start).add(offset);
+            final Object object = ptr.toObjectReference().toObject();
             final int flags = VmMagic.getObjectFlags(object) & flagsMask;
             if ((flags != flagsValue) || visitor.visit(object)) {
                 // Continue
-                int objSize = helper.getInt(ptr, sizeOffset);
+                final int objSize = ptr.loadInt(Offset.fromIntSignExtend(sizeOffset));
                 offset += objSize + headerSize;
             } else {
                 // Stop

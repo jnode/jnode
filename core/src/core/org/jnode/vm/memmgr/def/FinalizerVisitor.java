@@ -31,7 +31,7 @@ final class FinalizerVisitor extends ObjectVisitor implements ObjectFlags {
      * @see org.jnode.vm.ObjectVisitor#visit(java.lang.Object)
      */
     public boolean visit(Object object) {
-        final int color = helper.getObjectColor(object);
+        final int color = VmMagic.getObjectColor(object);
         if (color == GC_YELLOW) {
             final VmClassType type = VmMagic.getObjectType(object);
             final VmMethod fm = type.getFinalizeMethod();

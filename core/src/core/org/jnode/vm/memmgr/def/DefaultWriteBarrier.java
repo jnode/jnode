@@ -3,6 +3,7 @@
  */
 package org.jnode.vm.memmgr.def;
 
+import org.jnode.vm.VmMagic;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmWriteBarrier;
@@ -96,7 +97,7 @@ public class DefaultWriteBarrier extends VmWriteBarrier {
     private final void shade(Object value) throws UninterruptiblePragma {
         if (value != null) {
             while (true) {
-                final int gcColor = helper.getObjectColor(value);
+                final int gcColor = VmMagic.getObjectColor(value);
                 if (gcColor > ObjectFlags.GC_WHITE) { 
                 // Not white or yellow, we're done
                 return; }

@@ -32,10 +32,10 @@ final class GCSweepVisitor extends ObjectVisitor implements ObjectFlags,
      * @return boolean
      */
     public final boolean visit(Object object) {
-        final int gcColor = helper.getObjectColor(object);
+        final int gcColor = VmMagic.getObjectColor(object);
 
         if (gcColor == GC_WHITE) {
-            final boolean finalized = helper.isFinalized(object);
+            final boolean finalized = VmMagic.isFinalized(object);
             if (finalized) {
                 // Already finalized, we can free it now
                 currentHeap.free(object);
