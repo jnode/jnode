@@ -2012,6 +2012,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 */
 	private final void write1bOpcodeModRMSib(int opcode, int operandSize,
 			GPR base, int disp, int reg, int scale, GPR index) {
+        testSize(base, mode.getSize());
+        testSize(index, mode.getSize());
 		writeModRMSibREXPrefix(operandSize, base, reg, index);
 		write8(opcode);
 		writeModRMSib(base.getNr() & 7, disp, reg & 7, scale, index.getNr() & 7);

@@ -23,6 +23,7 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.compiler.IllegalModeException;
@@ -41,6 +42,15 @@ final class L1AHelper {
 		if (!cond)
 			throw new Error("assert failed: " + message + param);
 	}
+    
+    /**
+     * Gets the 64-bit equivalent of the given 32-bit register. 
+     * @param src
+     * @return the 64-bit register.
+     */
+    static final GPR64 get64BitReg(EmitterContext eContext, GPR src) {
+        return (GPR64)eContext.getGPRPool().getRegisterInSameGroup(src, JvmType.LONG);
+    }
 
 	/**
 	 * Release a register.
