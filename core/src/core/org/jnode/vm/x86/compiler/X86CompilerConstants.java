@@ -70,6 +70,12 @@ public interface X86CompilerConstants {
 	/** Size of a int */
 	public static final int INTSIZE = X86Constants.BITS32;
 	
+	/** Offset of LSB part of a long entry */
+	public static final int LSB = 0;
+	
+	/** Offset of MSB part of a long entry */
+	public static final int MSB = 4;
+	
 	/** Interrupt number for yieldpoints */
 	public static final int YIELDPOINT_INTNO = 0x30;
 

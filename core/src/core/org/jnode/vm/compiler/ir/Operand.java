@@ -5,6 +5,8 @@
  */
 package org.jnode.vm.compiler.ir;
 
+import org.jnode.vm.JvmType;
+
 /**
  * @author Madhu Siddalingaiah
  *
@@ -17,14 +19,14 @@ public abstract class Operand {
 	 * @see #getAddressingMode() below
 	 */
 	public static final int UNKNOWN = 0;
-	public static final int BYTE = 1;
-	public static final int SHORT = 2;
-	public static final int CHAR = 3;
-	public static final int INT = 4;
-	public static final int LONG = 5;
-	public static final int FLOAT = 6;
-	public static final int DOUBLE = 7;
-	public static final int REFERENCE = 8;
+	public static final int BYTE = JvmType.BYTE;
+	public static final int SHORT = JvmType.SHORT;
+	public static final int CHAR = JvmType.CHAR;
+	public static final int INT = JvmType.INT;
+	public static final int LONG = JvmType.LONG;
+	public static final int FLOAT = JvmType.FLOAT;
+	public static final int DOUBLE = JvmType.DOUBLE;
+	public static final int REFERENCE = JvmType.REFERENCE;
 	
 	/*
 	 * Addressing mode bits

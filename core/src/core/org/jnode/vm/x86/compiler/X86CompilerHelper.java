@@ -424,6 +424,23 @@ public class X86CompilerHelper implements X86CompilerConstants {
     }
 
     /**
+     * Write code to load the given statics table entry onto the FPU stack.
+     * 
+     * @param curInstrLabel
+     * @param entry
+     * @param is32bit If true, a 32-bit load is performed, otherwise a 64-bit load.
+     */
+    public final void writeGetStaticsEntryToFPU(Label curInstrLabel, VmStaticsEntry entry, boolean is32bit) {
+        writeLoadSTATICS(curInstrLabel, "gs", true);
+        final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
+        if (is32bit) {
+        	os.writeFLD32(STATICS, staticsIdx);
+        } else {
+        	os.writeFLD64(STATICS, staticsIdx);        	
+        }
+    }
+
+    /**
      * Write code to push the given statics table entry to the stack
      * 
      * @param curInstrLabel

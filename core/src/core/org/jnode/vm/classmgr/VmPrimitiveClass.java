@@ -17,6 +17,9 @@ public final class VmPrimitiveClass extends VmNormalClass {
     /** Is this a wide type? */
     private final boolean wide;
     
+    /** JvmType of this type */
+    private final int jvmType;
+    
      /**
      * @param name
      * @param superClass
@@ -24,8 +27,9 @@ public final class VmPrimitiveClass extends VmNormalClass {
      * @param typeSize
      */
     public VmPrimitiveClass(String name, VmNormalClass superClass,
-            VmClassLoader loader, int typeSize, boolean floatingPoint, ProtectionDomain protectionDomain) {
+            VmClassLoader loader, int jvmType, int typeSize, boolean floatingPoint, ProtectionDomain protectionDomain) {
         super(name, superClass, loader, typeSize, protectionDomain);
+        this.jvmType = jvmType;
         this.floatingPoint = floatingPoint;
         this.wide = (typeSize == 8);
     }
@@ -52,5 +56,13 @@ public final class VmPrimitiveClass extends VmNormalClass {
     public final boolean isFloatingPoint() {
         return floatingPoint;
     }
-    
+       
+    /**
+     * Gets the JvmType of this type.
+     * @see org.jnode.vm.JvmType
+     * @return
+     */
+    public int getJvmType() {
+    	return jvmType;
+    }
 }
