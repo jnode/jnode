@@ -1,10 +1,6 @@
 
 /*
- * Created on Nov 25, 2004 4:16:36 PM
- *
- * Copyright (c) 2004 Madhu Siddalingaiah
- * All rights reserved
- * mailto:madhu@madhu.com
+ * $Id$
  */
 package org.jnode.vm.compiler.ir;
 
