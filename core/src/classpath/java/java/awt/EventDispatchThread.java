@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package java.awt;
 
+
 /**
  * @author Bryce McKinlay
  * @status believed complete, but untested.
@@ -53,48 +54,41 @@ class EventDispatchThread extends Thread
     setName("AWT-EventQueue-" + ++dispatchThreadNum);
 		this.queue = queue;
 		setPriority(NORM_PRIORITY + 1);
-		start();
 	}
 
   public void run()
   {
-    while (true)
-      {
-        try
-	{
-				AWTEvent evt = queue.getNextEvent();
-	  if (isInterrupted ())
-	    {
-	      // We are interrupted when we should finish executing
-	      return;
-	    }
+      System.out.println("run of dispatch thread");
+    while (true) {
+            try {
+                AWTEvent evt = queue.getNextEvent();
+                //Unsafe.debug("@@dispatch "); Unsafe.debug(evt.toString());
 
-          KeyboardFocusManager manager;
-          manager = KeyboardFocusManager.getCurrentKeyboardFocusManager ();
+                KeyboardFocusManager manager;
+                manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
 
-          // Try to dispatch this event to the current keyboard focus
-          // manager.  It will dispatch all FocusEvents, all
-          // WindowEvents related to focus, and all KeyEvents,
-          // returning true.  Otherwise, it returns false and we
-          // dispatch the event normally.
-          if (!manager.dispatchEvent (evt))
-				queue.dispatchEvent(evt);
-	}
-        catch (ThreadDeath death)
-        {
-          // If someone wants to kill us, let them.
-          return;
+                // Try to dispatch this event to the current keyboard focus
+                // manager. It will dispatch all FocusEvents, all
+                // WindowEvents related to focus, and all KeyEvents,
+                // returning true. Otherwise, it returns false and we
+                // dispatch the event normally.
+                if (!manager.dispatchEvent(evt)) {
+                    queue.dispatchEvent(evt);
+                }
+            } catch (ThreadDeath death) {
+                // If someone wants to kill us, let them.
+                System.out.println("dispatch thread:threaddeath");
+                return;
+            } catch (InterruptedException ie) {
+                // We are interrupted when we should finish executing
+                System.out.println("dispatch thread:interrupted");
+                return;
+            } catch (Throwable x) {
+                System.out.println("dispatch thread:exception");
+                x.printStackTrace();
+                System.err.println("Exception during event dispatch:");
+                x.printStackTrace(System.err);
+            }
         }
-	catch (InterruptedException ie)
-	{
-	  // We are interrupted when we should finish executing
-	  return;
-	}
-	catch (Throwable x)
-	{
-				System.err.println("Exception during event dispatch:");
-				x.printStackTrace(System.err);
-			}
-		}
-	}
+    }
 }
