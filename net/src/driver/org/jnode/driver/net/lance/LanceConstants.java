@@ -16,11 +16,10 @@ public interface LanceConstants {
 	public static final int RW_BDATA_OFFSET = 0x16; // Bus data (BDP)
 
 	// I/O port offsets from iobase.
-	/*public static final int R_ETH_ADDR_OFFSET = 0x00;
-	public static final int RW_RDATA_OFFSET = 0x10; // Register data (RDP)
-	public static final int RW_ADDR_OFFSET = 0x14; // RAP
-	public static final int RW_RESET_OFFSET = 0x18; // RESET
-	public static final int RW_BDATA_OFFSET = 0x1c; // Bus data (BDP) */
+	public static final int RDW_RDATA_OFFSET = 0x10; // Register data (RDP)
+	public static final int RDW_ADDR_OFFSET = 0x14; // RAP
+	public static final int RDW_RESET_OFFSET = 0x18; // RESET
+	public static final int RDW_BDATA_OFFSET = 0x1c; // Bus data (BDP) 
 
 	// CSR0 bits
 	public static final int CSR0_INIT = 0x0001;
