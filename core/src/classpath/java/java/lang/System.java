@@ -1,5 +1,5 @@
 /* System.java -- useful methods to interface with the system
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -40,6 +40,7 @@ exception statement from your version. */
 package java.lang;
 
 import gnu.classpath.SystemProperties;
+import gnu.classpath.VMStackWalker;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -296,12 +297,10 @@ public final class System
    * <dt>gnu.classpath.home.url</dt>     <dd> Base URL; used for finding
    *     property files in file system</dd>
    * <dt>gnu.cpu.endian</dt>             <dd>big or little</dd>
-   * <dt>gnu.java.io.encoding_scheme_alias.ISO-8859-?</dt>   <dd>8859_?</dd>
    * <dt>gnu.java.io.encoding_scheme_alias.iso-8859-?</dt>   <dd>8859_?</dd>
    * <dt>gnu.java.io.encoding_scheme_alias.iso8859_?</dt>    <dd>8859_?</dd>
    * <dt>gnu.java.io.encoding_scheme_alias.iso-latin-_?</dt> <dd>8859_?</dd>
    * <dt>gnu.java.io.encoding_scheme_alias.latin?</dt>       <dd>8859_?</dd>
-   * <dt>gnu.java.io.encoding_scheme_alias.UTF-8</dt>        <dd>UTF8</dd>
    * <dt>gnu.java.io.encoding_scheme_alias.utf-8</dt>        <dd>UTF8</dd>
    * </dl>
      * 
@@ -480,6 +479,10 @@ public final class System
    * check may be performed, <code>checkLink</code>. This just calls
    * <code>Runtime.getRuntime().load(filename)</code>.
      * 
+   * <p>
+   * The library is loaded using the class loader associated with the
+   * class associated with the invoking method.
+   *
    * @param filename the code file to load
    * @throws SecurityException if permission is denied
    * @throws UnsatisfiedLinkError if the file cannot be loaded
@@ -487,7 +490,7 @@ public final class System
      */
   public static void load(String filename)
   {
-    Runtime.getRuntime().load(filename);
+    Runtime.getRuntime().load(filename, VMStackWalker.getCallingClassLoader());
     }
 
     /**
@@ -495,6 +498,10 @@ public final class System
    * check may be performed, <code>checkLink</code>. This just calls
    * <code>Runtime.getRuntime().load(filename)</code>.
      * 
+   * <p>
+   * The library is loaded using the class loader associated with the
+   * class associated with the invoking method.
+   *
    * @param libname the library file to load
    * @throws SecurityException if permission is denied
    * @throws UnsatisfiedLinkError if the file cannot be loaded
@@ -502,7 +509,8 @@ public final class System
      */
   public static void loadLibrary(String libname)
   {
-    Runtime.getRuntime().loadLibrary(libname);
+    Runtime.getRuntime().loadLibrary(libname,
+      VMStackWalker.getCallingClassLoader());
     }
 
     /**
