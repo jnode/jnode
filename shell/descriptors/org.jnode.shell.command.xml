@@ -2,51 +2,54 @@
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
 <plugin id="org.jnode.shell.command"
-    name="JNode System Commands"
-    version="@VERSION@"
-    provider-name="JNode.org">
+  name="JNode System Commands"
+  version="@VERSION@"
+  provider-name="JNode.org">
 
-    <requires>
+  <requires>
     <import plugin="org.jnode.shell.help"/>
-    </requires>
+  </requires>
 
-    <runtime>
-        <library name="jnode-shell.jar">
-            <export name="org.jnode.shell.command.*"/>
-        </library>
-    </runtime>
+  <runtime>
+    <library name="jnode-shell.jar">
+      <export name="org.jnode.shell.command.*"/>
+    </library>
+  </runtime>
 
-    <extension point="org.jnode.shell.aliases">
-        <alias name="alias" class="org.jnode.shell.command.AliasCommand"/>
-        <alias name="class" class="org.jnode.shell.command.ClassCommand"/>
-        <alias name="classpath" class="org.jnode.shell.command.ClasspathCommand" internal="yes"/>
-        <alias name="compile" class="org.jnode.shell.command.CompileCommand"/>
-        <alias name="disasm" class="org.jnode.shell.command.DisassembleCommand"/>
-        <alias name="date" class="org.jnode.shell.command.DateCommand"/>
-        <alias name="echo" class="org.jnode.shell.command.EchoCommand"/>
-        <alias name="env" class="org.jnode.shell.command.EnvCommand"/>
-        <alias name="set" class="org.jnode.shell.command.SetCommand"/>
-        <alias name="exec" class="org.jnode.shell.command.ExecCommand"/>
-        <alias name="gc" class="org.jnode.shell.command.GcCommand"/>
-        <alias name="help" class="org.jnode.shell.command.HelpCommand"/>
-        <alias name="history" class="org.jnode.shell.command.HistoryCommand"/>
-        <alias name="java" class="org.jnode.shell.command.JavaCommand"/>
-        <alias name="memory" class="org.jnode.shell.command.MemoryCommand"/>
-        <alias name="namespace" class="org.jnode.shell.command.NamespaceCommand"/>
-        <alias name="thread" class="org.jnode.shell.command.ThreadCommand"/>
-        <alias name="bsh" class="org.jnode.shell.command.BeanshellCommand"/>
-	    <alias name="loadkeys" class="org.jnode.shell.command.LoadkeysCommand"/>
-	    <alias name="locale" class="org.jnode.shell.command.LocaleCommand"/>	    
-    </extension>
+  <extension point="org.jnode.shell.aliases">
+    <alias name="alias" class="org.jnode.shell.command.AliasCommand"/>
+    <alias name="class" class="org.jnode.shell.command.ClassCommand"/>
+    <alias name="classpath" class="org.jnode.shell.command.ClasspathCommand" internal="yes"/>
+    <alias name="compile" class="org.jnode.shell.command.CompileCommand"/>
+    <alias name="disasm" class="org.jnode.shell.command.DisassembleCommand"/>
+    <alias name="date" class="org.jnode.shell.command.DateCommand"/>
+    <alias name="echo" class="org.jnode.shell.command.EchoCommand"/>
+    <alias name="env" class="org.jnode.shell.command.EnvCommand"/>
+    <alias name="set" class="org.jnode.shell.command.SetCommand"/>
+    <alias name="exec" class="org.jnode.shell.command.ExecCommand"/>
+    <alias name="gc" class="org.jnode.shell.command.GcCommand"/>
+    <alias name="help" class="org.jnode.shell.command.HelpCommand"/>
+    <alias name="history" class="org.jnode.shell.command.HistoryCommand"/>
+    <alias name="java" class="org.jnode.shell.command.JavaCommand"/>
+    <alias name="memory" class="org.jnode.shell.command.MemoryCommand"/>
+    <alias name="namespace" class="org.jnode.shell.command.NamespaceCommand"/>
+    <alias name="thread" class="org.jnode.shell.command.ThreadCommand"/>
+    <alias name="bsh" class="org.jnode.shell.command.BeanshellCommand"/>
+    <alias name="loadkeys" class="org.jnode.shell.command.LoadkeysCommand"/>
+    <alias name="locale" class="org.jnode.shell.command.LocaleCommand"/>
+    <alias name="onheap" class="org.jnode.shell.command.OnHeapCommand"/>
+  </extension>
 
   <extension point="org.jnode.security.permissions">
     <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
     <permission class="java.lang.RuntimePermission" name="getProtectionDomain"/>
     <permission class="java.lang.RuntimePermission" name="createClassLoader"/>
     <permission class="java.lang.RuntimePermission" name="setContextClassLoader"/>
-    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
+    <permission class="java.io.FilePermission" name="
+    <
+    <ALL FILES>>" actions="read,write"/>
     <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
     <permission class="org.jnode.security.JNodePermission" name="getVmClass"/>
-  </extension>       
-        
+  </extension>
+
 </plugin>
