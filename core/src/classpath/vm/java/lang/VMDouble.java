@@ -146,6 +146,12 @@ final class VMDouble {
             return value;
 
         switch (chars[index]) {
+        case 'f':
+        case 'F':
+        case 'd':
+        case 'D':
+                return value;
+
         case 'e':
         case 'E':
             index++;
@@ -157,7 +163,8 @@ final class VMDouble {
 
         int exponent = parseSignedInt();
 
-        if (index < chars.length)
+        char ch = 0;
+        if (index < chars.length && ((ch = chars[index]) != 'f' && ch != 'F' && ch != 'd' && ch != 'D'))
             throw new NumberFormatException();
 
         return value * Math.pow(10.0, exponent);
@@ -184,7 +191,7 @@ final class VMDouble {
         if (index >= chars.length)
             throw new NumberFormatException();
 
-        double value;
+        double value = 0;
 
         if (chars[index] == '.') {
             index++;
@@ -193,14 +200,14 @@ final class VMDouble {
         } else {
             value = parseUnsignedInt();
 
-            if (index >= chars.length)
-                throw new NumberFormatException();
-            if (chars[index] != '.')
-                throw new NumberFormatException();
+            if (index < chars.length){
+                if(chars[index] == '.'){
+                    index++;
+                    value += parseFractionalPart(false);
+                }
+            }
 
-            index++;
 
-            value += parseFractionalPart(false);
             value = parseExponent(value);
         }
 
