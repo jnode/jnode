@@ -363,6 +363,7 @@ public class BinaryQuad extends AssignQuad {
 	 * @see org.jnode.vm.compiler.ir.quad.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
 	 */
 	public void generateCode(CodeGenerator cg) {
+        cg.checkLabel(getAddress());
 		Variable lhs = getLHS();
 		int lhsMode = lhs.getAddressingMode();
 		int op1Mode = operand1.getAddressingMode();

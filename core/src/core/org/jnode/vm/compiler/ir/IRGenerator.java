@@ -45,7 +45,7 @@ public class IRGenerator extends BytecodeVisitor {
 	private IRBasicBlock currentBlock;
 
 	/**
-	 * 
+	 *
 	 */
 	public IRGenerator(IRControlFlowGraph cfg) {
 		basicBlockIterator = cfg.basicBlockIterator();

@@ -6,6 +6,7 @@ package org.jnode.vm.x86.compiler.l2;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
 import org.jnode.assembler.x86.X86Constants;
+import org.jnode.assembler.Label;
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.Constant;
 import org.jnode.vm.compiler.ir.IntConstant;
@@ -33,17 +34,33 @@ public class X86CodeGenerator extends CodeGenerator {
 	private Variable[] spilledVariables;
 	private AbstractX86Stream os;
 	private int displacement;
+    private String labelPrefix;
+    private String instrLabelPrefix;
+    private Label[] addressLabels;
 
 	private final RegisterPool registerPool;
 
 	/**
 	 * Initialize this instance
 	 */
-	public X86CodeGenerator(AbstractX86Stream x86Stream) {
+	public X86CodeGenerator(AbstractX86Stream x86Stream, int lenght) {
 		CodeGenerator.setCodeGenerator(this);
 		this.registerPool = new X86RegisterPool();
 		this.os = x86Stream;
+
+        labelPrefix = "label";
+        instrLabelPrefix = labelPrefix + "_bci_";
+        addressLabels = new Label[lenght];
 	}
+
+    public final Label getInstrLabel(int address) {
+        Label l = addressLabels[ address];
+        if (l == null) {
+            l = new Label(instrLabelPrefix + address);
+            addressLabels[ address] = l;
+        }
+        return l;
+    }
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#getRegisterPool()
@@ -124,12 +141,24 @@ public class X86CodeGenerator extends CodeGenerator {
 
 	}
 
+    private int prev_addr = 0;
+    public void checkLabel(int address){
+        for(int i = prev_addr + 1; i<= address; i++){
+            Label l = addressLabels[i];
+            if(l == null){
+                l = getInstrLabel(i);
+            }
+            os.setObjectRef(l);
+        }
+        prev_addr = address;
+    }
+
 	/**
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnconditionalBranchQuad)
 	 */
 	public void generateCodeFor(UnconditionalBranchQuad quad) {
-		// TODO Auto-generated method stub
-
+        checkLabel(quad.getAddress());
+		os.writeJMP(getInstrLabel(quad.getTargetAddress()));
 	}
 
 	/**
@@ -142,6 +171,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.VarReturnQuad)
 	 */
 	public void generateCodeFor(VarReturnQuad quad) {
+        checkLabel(quad.getAddress());
 		Operand op = quad.getOperand();
 		// TODO must deal with other types, see else case also
 		if (op instanceof IntConstant) {
@@ -169,6 +199,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.VoidReturnQuad)
 	 */
 	public void generateCodeFor(VoidReturnQuad quad) {
+        checkLabel(quad.getAddress());
 		os.writeRET();
 	}
 
@@ -177,6 +208,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateCodeFor(UnaryQuad quad, Object lhsReg, int operation,
 		Constant con) {
+        checkLabel(quad.getAddress());
 		switch(operation) {
 			case UnaryQuad.INEG:
 				IntConstant iconst = (IntConstant) con;
@@ -194,6 +226,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateCodeFor(UnaryQuad quad, Object lhsReg, int operation,
 		Object rhsReg) {
+        checkLabel(quad.getAddress());
 		switch(operation) {
             case UnaryQuad.I2L:
             case UnaryQuad.I2F:
@@ -231,6 +264,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateCodeFor(UnaryQuad quad, Object lhsReg, int operation,
 		int rhsDisp) {
+        checkLabel(quad.getAddress());
 		switch(operation) {
             case UnaryQuad.I2L:
             case UnaryQuad.I2F:
@@ -267,6 +301,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 */
 	public void generateCodeFor(UnaryQuad quad, int lhsDisp, int operation,
 		Object rhsReg) {
+        checkLabel(quad.getAddress());
 		switch(operation) {
             case UnaryQuad.I2L:
             case UnaryQuad.I2F:
@@ -309,6 +344,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.UnaryQuad, int, int, org.jnode.vm.compiler.ir.Constant)
 	 */
 	public void generateCodeFor(UnaryQuad quad, int lhsDisp, int operation, Constant con) {
+        checkLabel(quad.getAddress());
 		switch(operation) {
 			case UnaryQuad.INEG:
 				IntConstant iconst = (IntConstant) con;

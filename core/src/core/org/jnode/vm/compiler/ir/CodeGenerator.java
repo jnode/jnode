@@ -27,6 +27,8 @@ public abstract class CodeGenerator {
 		return cgInstance;
 	}
 
+    public abstract void checkLabel(int address);
+
 	/**
 	 * @return
 	 */
