@@ -55,13 +55,13 @@ public class X86StreamTest implements X86Constants {
 		os.writeTEST(X86Register.ECX, X86Register.EBX);
 		os.writeCMOVcc(X86Constants.JLE, X86Register.EAX, X86Register.EBX);
 		os.writeCMOVcc(X86Constants.JE, X86Register.EAX, X86Register.EBX, 5);
-		os.writeADD(X86Register.EAX, 28, 11);
+		os.writeADD(BITS32, X86Register.EAX, 28, 11);
 		os.writeCALL(X86Register.EAX, 28);
 		os.writeCMP(X86Register.EAX, X86Register.ECX, 4);
 		os.writeCMP(X86Register.EAX, 4, X86Register.ECX);
 		os.writePrefix(X86Constants.FS_PREFIX);
 		os.writeCMP_MEM(X86Register.ESP, 24);
-		os.writeMOV_Const(X86Register.ESP, 4, 24);
+		os.writeMOV_Const(BITS32, X86Register.ESP, 4, 24);
 		os.writeSBB(X86Register.EDX, 5);
 		os.writeSBB(X86Register.EDX, 305);
 		
@@ -76,23 +76,23 @@ public class X86StreamTest implements X86Constants {
 		os.writeJMP(X86Register.EDX, 15);
 		os.writeADD(X86Register.EDX, X86Register.EBX, 5);
 		os.writeSUB(X86Register.EDX, 3);
-		os.writeINC(X86Register.EBX, 67); // INC [reg+67]
-		os.writeCMP_Const(X86Register.ECX, 0xF, 0x12);
-		os.writeCMP_Const(X86Register.ECX, 0x4, 0x1234);
-		os.writeMOV_Const(X86Register.EDI, X86Register.EAX, 4, 0x09, 0x1234);
+		os.writeINC(BITS32, X86Register.EBX, 67); // INC [reg+67]
+		os.writeCMP_Const(BITS32, X86Register.ECX, 0xF, 0x12);
+		os.writeCMP_Const(BITS32, X86Register.ECX, 0x4, 0x1234);
+		os.writeMOV_Const(BITS32, X86Register.EDI, X86Register.EAX, 4, 0x09, 0x1234);
 
 		os.writeSETCC(X86Register.EDX, X86Constants.JA);
 
-		os.writeADD(X86Register.EAX, 28, 11);
-		os.writeADD(X86Register.EAX, 28, 255);
+		os.writeADD(BITS32, X86Register.EAX, 28, 11);
+		os.writeADD(BITS32, X86Register.EAX, 28, 255);
 		
 		os.writeSUB(X86Register.EAX, 11);
 		os.writeSUB(X86Register.EAX, 255);
 
-		os.writeSUB(X86Register.EAX, 28, 11);
-		os.writeSUB(X86Register.EAX, 28, 255);
+		os.writeSUB(BITS32, X86Register.EAX, 28, 11);
+		os.writeSUB(BITS32, X86Register.EAX, 28, 255);
 
-		os.writeTEST(X86Register.EDI, 0x40, 0xFFFFFFFF);
+		os.writeTEST(BITS32, X86Register.EDI, 0x40, 0xFFFFFFFF);
 		
 		os.writeFLD32(X86Register.EAX, X86Register.ESI, 4, 15);
 		os.writeFLD64(X86Register.EAX, X86Register.ESI, 8, 15);
@@ -112,8 +112,8 @@ public class X86StreamTest implements X86Constants {
 		os.writeMOV(X86Constants.BITS8, X86Register.EDX, X86Register.ECX, X86Register.EBX, 1, 4);
 		os.writeMOVSX(X86Register.EDX, X86Register.EDX, X86Constants.BITS8);
 
-		os.writeSAR(X86Register.EBP, 16, 16);
-		os.writeSAR(X86Register.EBP, 16, 24);
+		os.writeSAR(BITS32, X86Register.EBP, 16, 16);
+		os.writeSAR(BITS32, X86Register.EBP, 16, 24);
 		
 		os.writeMOVZX(X86Register.EBX, X86Register.EBX, X86Constants.BITS16);
 		os.writeAND(X86Register.EBX, 0x0000FFFF);

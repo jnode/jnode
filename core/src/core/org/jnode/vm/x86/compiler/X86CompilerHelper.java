@@ -241,7 +241,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
         if (method.getThreadSwitchIndicatorMask() != 0) {
             final Label doneLabel = new Label(curInstrLabel + "noYP");
             os.writePrefix(X86Constants.FS_PREFIX);
-            os.writeCMP_MEM(context.getVmThreadSwitchIndicatorOffset(),
+            os.writeCMP_MEM(context.getMode().getSize(), context.getVmThreadSwitchIndicatorOffset(),
                     VmProcessor.TSI_SWITCH_REQUESTED);
             os.writeJCC(doneLabel, X86Constants.JNE);
             os.writeINT(X86CompilerConstants.YIELDPOINT_INTNO);
@@ -265,24 +265,26 @@ public class X86CompilerHelper implements X86CompilerConstants {
             // Only when class is not initialize
             final VmType cls = method.getDeclaringClass();
             if (!cls.isInitialized()) {
+            	final GPR eax = X86Register.EAX;
+            	
                 // Save eax
-                os.writePUSH(X86Register.EAX);
+                os.writePUSH(eax);
                 // Do the is initialized test
                 // Move method.declaringClass -> EAX
-                os.writeMOV(INTSIZE, X86Register.EAX, methodReg, context
+                os.writeMOV(INTSIZE, eax, methodReg, context
                         .getVmMemberDeclaringClassField().getOffset());
                 // Test declaringClass.modifiers
-                os.writeTEST(X86Register.EAX, context.getVmTypeState().getOffset(),
+                os.writeTEST(BITS32, eax, context.getVmTypeState().getOffset(),
                         VmTypeState.ST_INITIALIZED);
                 final Label afterInit = new Label(method.getMangledName()
                         + "$$after-classinit");
                 os.writeJCC(afterInit, X86Constants.JNZ);
                 // Call cls.initialize
-                os.writePUSH(X86Register.EAX);
+                os.writePUSH(eax);
                 invokeJavaMethod(context.getVmTypeInitialize());
                 os.setObjectRef(afterInit);
                 // Restore eax
-                os.writePOP(X86Register.EAX);
+                os.writePOP(eax);
                 return true;
             }
         }
@@ -292,7 +294,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
     public final void writeClassInitialize(Label curInstrLabel, GPR classReg, VmType cls) {
         if (!cls.isInitialized()) {
             // Test declaringClass.modifiers
-            os.writeTEST(classReg, context.getVmTypeState().getOffset(),
+            os.writeTEST(BITS32, classReg, context.getVmTypeState().getOffset(),
                     VmTypeState.ST_INITIALIZED);
             final Label afterInit = new Label(curInstrLabel
                     + "$$after-classinit-ex");
@@ -317,7 +319,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
     public final void writeIncInvocationCount(GPR methodReg) {
         final int offset = context.getVmMethodInvocationCountField()
                 .getOffset();
-        os.writeINC(methodReg, offset);
+        os.writeINC(BITS32, methodReg, offset);
     }
 
     /**

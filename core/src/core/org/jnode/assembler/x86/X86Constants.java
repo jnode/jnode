@@ -121,24 +121,32 @@ public interface X86Constants {
     public static final int BITS128 = 0x00000020; /* XMM only */
 
 	public static final class Mode {
-		private final int bits;
+		private final int operandSize;
 
 		/** Use 32-bit code */
-		public static Mode CODE32 = new Mode(32);
+		public static Mode CODE32 = new Mode(BITS32);
 
 		/** Use 64-bit code */
-		public static Mode CODE64 = new Mode(64);
+		public static Mode CODE64 = new Mode(BITS64);
 
-		private Mode(int bits) {
-			this.bits = bits;
+		private Mode(int operandSize) {
+			this.operandSize = operandSize;
 		}
 
 		public boolean is32() {
-			return (bits == 32);
+			return (operandSize == BITS32);
 		}
 
 		public boolean is64() {
-			return (bits == 64);
+			return (operandSize == BITS64);
+		}
+		
+		/**
+		 * Gets the size of this mode.
+		 * @return BITS32 or BITS64
+		 */
+		public int getSize() {
+			return operandSize;
 		}
 	}
 

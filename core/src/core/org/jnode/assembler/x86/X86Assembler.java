@@ -252,7 +252,7 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeADC(GPR dstReg, int imm32);
 
 	/**
-	 * Create a ADC [dstReg+dstDisp], <srcReg>
+	 * Create a ADC [dstReg+dstDisp], srcReg
 	 * 
 	 * @param dstReg
 	 * @param dstDisp
@@ -267,7 +267,7 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param dstDisp
 	 * @param imm32
 	 */
-	public abstract void writeADC(GPR dstReg, int dstDisp, int imm32);
+	public abstract void writeADC(int operandSize, GPR dstReg, int dstDisp, int imm32);
 
 	/**
 	 * Create a ADD dstReg, srcReg
@@ -286,7 +286,6 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeADD(GPR dstReg, GPR srcReg, int srcDisp);
 
-	// LS
 	/**
 	 * @param dstReg
 	 * @param imm32
@@ -309,7 +308,7 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param dstDisp
 	 * @param imm32
 	 */
-	public abstract void writeADD(GPR dstReg, int dstDisp, int imm32);
+	public abstract void writeADD(int operandSize, GPR dstReg, int dstDisp, int imm32);
 
 	/**
 	 * Create a AND dstReg, srcReg
@@ -343,13 +342,12 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeAND(GPR dstReg, int dstDisp, GPR srcReg);
 
-	// LS
 	/**
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param imm32
 	 */
-	public abstract void writeAND(GPR dstReg, int dstDisp, int imm32);
+	public abstract void writeAND(int operandSize, GPR dstReg, int dstDisp, int imm32);
 
 	/**
 	 * Create a OPERATION dstReg, srcReg
@@ -496,29 +494,30 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param dstDisp
 	 * @param imm32
 	 */
-	public final void writeArithOp(int operation, GPR dstReg, int dstDisp,
+	public final void writeArithOp(int operation, int operandSize, GPR dstReg, int dstDisp,
 			int imm32) {
+		testOperandSize(operandSize, BITS32 | BITS64);
 		switch (operation) {
 		case X86Operation.ADD:
-			writeADD(dstReg, dstDisp, imm32);
+			writeADD(operandSize, dstReg, dstDisp, imm32);
 			break;
 		case X86Operation.ADC:
-			writeADC(dstReg, dstDisp, imm32);
+			writeADC(operandSize, dstReg, dstDisp, imm32);
 			break;
 		case X86Operation.SUB:
-			writeSUB(dstReg, dstDisp, imm32);
+			writeSUB(operandSize, dstReg, dstDisp, imm32);
 			break;
 		case X86Operation.SBB:
-			writeSBB(dstReg, dstDisp, imm32);
+			writeSBB(operandSize, dstReg, dstDisp, imm32);
 			break;
 		case X86Operation.AND:
-			writeAND(dstReg, dstDisp, imm32);
+			writeAND(operandSize, dstReg, dstDisp, imm32);
 			break;
 		case X86Operation.OR:
-			writeOR(dstReg, dstDisp, imm32);
+			writeOR(operandSize, dstReg, dstDisp, imm32);
 			break;
 		case X86Operation.XOR:
-			writeXOR(dstReg, dstDisp, imm32);
+			writeXOR(operandSize, dstReg, dstDisp, imm32);
 			break;
 		default:
 			throw new IllegalArgumentException("Invalid operation " + operation);
@@ -695,14 +694,15 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param disp
 	 * @param imm32
 	 */
-	public abstract void writeCMP_Const(GPR reg, int disp, int imm32);
+	public abstract void writeCMP_Const(int operandSize, GPR reg, int disp, int imm32);
 
 	/**
-	 * Create a CMP EAX, imm32
+	 * Create a CMP EAX, imm32 or CMP rax, imm32
 	 * 
+	 * @param operandSize BITS32 or BITS64
 	 * @param imm32
 	 */
-	public abstract void writeCMP_EAX(int imm32);
+	public abstract void writeCMP_EAX(int operandSize, int imm32);
 
 	/**
 	 * Create a CMP reg,[memPtr]
@@ -713,12 +713,13 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeCMP_MEM(GPR reg, int memPtr);
 
 	/**
-	 * Create a CMP [memPtr], imm32
+	 * Create a CMP size [memPtr], imm32
 	 * 
+	 * @param operandSize BITS32 or BITS64
 	 * @param memPtr
 	 * @param imm32
 	 */
-	public abstract void writeCMP_MEM(int memPtr, int imm32);
+	public abstract void writeCMP_MEM(int operandSize, int memPtr, int imm32);
 
 	/**
 	 * Create a CMPXCHG dword [dstReg], srcReg
@@ -739,12 +740,13 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeDEC(GPR dstReg);
 
 	/**
-	 * Create a dec dword [dstReg+dstDisp]
+	 * Create a dec size [dstReg+dstDisp]
 	 * 
+	 * @param operandSize BITS32 or BITS64
 	 * @param dstReg
 	 * @param dstDisp
 	 */
-	public abstract void writeDEC(GPR dstReg, int dstDisp);
+	public abstract void writeDEC(int operandSize, GPR dstReg, int dstDisp);
 
 	/**
 	 * Create a fadd dword [srcReg+srcDisp]
@@ -971,10 +973,12 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeIDIV_EAX(GPR srcReg);
 
 	/**
-	 * @param register
-	 * @param disp
+	 * Create a idiv eax, [src+srcDisp] or idiv rax, [src+srcDisp]
+	 * @param operandSize BITS32 or BITS64
+	 * @param src
+	 * @param srcDisp
 	 */
-	public abstract void writeIDIV_EAX(GPR register, int disp);
+	public abstract void writeIDIV_EAX(int operandSize, GPR src, int srcDisp);
 
 	/**
 	 * @param dstReg
@@ -1015,18 +1019,20 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeIMUL_EAX(GPR srcReg);
 
 	/**
-	 * Create a inc reg32
+	 * Create a inc dstReg
 	 * 
 	 * @param dstReg
 	 */
 	public abstract void writeINC(GPR dstReg);
 
 	/**
-	 * Create a inc [reg32+disp]
+	 * Create a inc size [dstReg+disp]
 	 * 
+	 * @param operandSize BITS32 or BITS64
 	 * @param dstReg
+	 * @param disp
 	 */
-	public abstract void writeINC(GPR dstReg, int disp);
+	public abstract void writeINC(int operandSize, GPR dstReg, int disp);
 
 	/**
 	 * Create a int vector
@@ -1188,13 +1194,13 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeMOV_Const(GPR destReg, int imm32);
 
 	/**
-	 * Create a mov [destReg+destDisp], <imm32>
+	 * Create a mov size [destReg+destDisp], imm32
 	 * 
 	 * @param destReg
 	 * @param destDisp
 	 * @param imm32
 	 */
-	public abstract void writeMOV_Const(GPR destReg, int destDisp, int imm32);
+	public abstract void writeMOV_Const(int operandSize, GPR destReg, int destDisp, int imm32);
 
 	/**
 	 * Create a mov <reg>, <label>
@@ -1205,13 +1211,13 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeMOV_Const(GPR dstReg, Object label);
 
 	/**
-	 * Create a mov [destReg+dstIdxReg*scale+destDisp], <imm32>
+	 * Create a mov size [destReg+dstIdxReg*scale+destDisp], imm32
 	 * 
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param imm32
 	 */
-	public abstract void writeMOV_Const(GPR dstReg, GPR dstIdxReg, int scale,
+	public abstract void writeMOV_Const(int operandSize, GPR dstReg, GPR dstIdxReg, int scale,
 			int dstDisp, int imm32);
 
 	/**
@@ -1305,12 +1311,13 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeNEG(GPR dstReg);
 
 	/**
-	 * Create a neg dword [dstReg+dstDisp]
+	 * Create a neg size [dstReg+dstDisp]
 	 * 
+	 * @param operandSize BITS32 or BITS64
 	 * @param dstReg
 	 * @param dstDisp
 	 */
-	public abstract void writeNEG(GPR dstReg, int dstDisp);
+	public abstract void writeNEG(int operandSize, GPR dstReg, int dstDisp);
 
 	/**
 	 * Create a nop
@@ -1325,12 +1332,13 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeNOT(GPR dstReg);
 
 	/**
-	 * Create a not dword [dstReg+dstDisp]
+	 * Create a not size [dstReg+dstDisp]
 	 * 
+	 * @param operandSize BITS32 or BITS64
 	 * @param dstReg
 	 * @param dstDisp
 	 */
-	public abstract void writeNOT(GPR dstReg, int dstDisp);
+	public abstract void writeNOT(int operandSize, GPR dstReg, int dstDisp);
 
 	/**
 	 * Create a OR dstReg, srcReg
@@ -1364,13 +1372,12 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeOR(GPR dstReg, int dstDisp, GPR srcReg);
 
-	// LS
 	/**
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param imm32
 	 */
-	public abstract void writeOR(GPR dstReg, int dstDisp, int imm32);
+	public abstract void writeOR(int operandSize, GPR dstReg, int dstDisp, int imm32);
 
 	/**
 	 * Create a pop reg32
@@ -1488,11 +1495,13 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeSAL(GPR dstReg, int imm8);
 
 	/**
-	 * @param register
-	 * @param disp1
-	 * @param imm32
+	 * Create a SAL size [dstReg+dstDisp], imm8
+	 * @param operandSize BITS32 or BITS64
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param imm8
 	 */
-	public abstract void writeSAL(GPR register, int disp1, int imm32);
+	public abstract void writeSAL(int operandSize, GPR dstReg, int dstDisp, int imm8);
 
 	/**
 	 * Create a SAL dstReg,cl
@@ -1502,10 +1511,12 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeSAL_CL(GPR dstReg);
 
 	/**
-	 * @param register
-	 * @param disp
+	 * Create a SAL size [dstReg+dstDisp], CL
+	 * @param operandSize BITS32 or BITS64
+	 * @param dstReg
+	 * @param dstDisp
 	 */
-	public abstract void writeSAL_CL(GPR register, int disp);
+	public abstract void writeSAL_CL(int operandSize, GPR dstReg, int dstDisp);
 
 	/**
 	 * Create a SAR dstReg,imm8
@@ -1516,11 +1527,13 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeSAR(GPR dstReg, int imm8);
 
 	/**
-	 * @param register
-	 * @param disp
-	 * @param imm32
+	 * Create a SAR size [dstReg+dstDisp], imm8
+	 * @param operandSize BITS32 or BITS64
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param imm8
 	 */
-	public abstract void writeSAR(GPR register, int disp, int imm32);
+	public abstract void writeSAR(int operandSize, GPR dstReg, int dstDisp, int imm8);
 
 	/**
 	 * Create a SAR dstReg,cl
@@ -1530,10 +1543,12 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeSAR_CL(GPR dstReg);
 
 	/**
-	 * @param register
-	 * @param disp
+	 * Create a SAL size [dstReg+dstDisp], CL
+	 * @param operandSize BITS32 or BITS64
+	 * @param dstReg
+	 * @param dstDisp
 	 */
-	public abstract void writeSAR_CL(GPR register, int disp);
+	public abstract void writeSAR_CL(int operandSize, GPR dstReg, int dstDisp);
 
 	/**
 	 * Create a SBB dstReg, srcReg
@@ -1574,7 +1589,7 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param dstDisp
 	 * @param imm32
 	 */
-	public abstract void writeSBB(GPR dstReg, int dstDisp, int imm32);
+	public abstract void writeSBB(int operandSize, GPR dstReg, int dstDisp, int imm32);
 
 	/**
 	 * Create a SETcc dstReg. Sets the given 8-bit operand to zero if its
@@ -1618,19 +1633,20 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param dst
 	 * @param imm8
 	 */
-	public final void writeShift(int operation, GPR dst, int dstDisp, int imm8) {
+	public final void writeShift(int operation, int operandSize, GPR dst, int dstDisp, int imm8) {
+		testOperandSize(operandSize, BITS32 | BITS64);
 		switch (operation) {
 		case X86Operation.SAL:
-			writeSAL(dst, dstDisp, imm8);
+			writeSAL(operandSize, dst, dstDisp, imm8);
 			break;
 		case X86Operation.SAR:
-			writeSAR(dst, dstDisp, imm8);
+			writeSAR(operandSize, dst, dstDisp, imm8);
 			break;
 		case X86Operation.SHL:
-			writeSHL(dst, dstDisp, imm8);
+			writeSHL(operandSize, dst, dstDisp, imm8);
 			break;
 		case X86Operation.SHR:
-			writeSHR(dst, dstDisp, imm8);
+			writeSHR(operandSize, dst, dstDisp, imm8);
 			break;
 		default:
 			throw new IllegalArgumentException("Invalid operation " + operation);
@@ -1669,19 +1685,20 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param dst
 	 * @param dstDisp
 	 */
-	public final void writeShift_CL(int operation, GPR dst, int dstDisp) {
+	public final void writeShift_CL(int operation, int operandSize, GPR dst, int dstDisp) {
+		testOperandSize(operandSize, BITS32 | BITS64);
 		switch (operation) {
 		case X86Operation.SAL:
-			writeSAL_CL(dst, dstDisp);
+			writeSAL_CL(operandSize, dst, dstDisp);
 			break;
 		case X86Operation.SAR:
-			writeSAR_CL(dst, dstDisp);
+			writeSAR_CL(operandSize, dst, dstDisp);
 			break;
 		case X86Operation.SHL:
-			writeSHL_CL(dst, dstDisp);
+			writeSHL_CL(operandSize, dst, dstDisp);
 			break;
 		case X86Operation.SHR:
-			writeSHR_CL(dst, dstDisp);
+			writeSHR_CL(operandSize, dst, dstDisp);
 			break;
 		default:
 			throw new IllegalArgumentException("Invalid operation " + operation);
@@ -1697,12 +1714,14 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeSHL(GPR dstReg, int imm8);
 
 	/**
-	 * Create a SHL [dstReg+dstDisp],imm8
+	 * Create a SHL size [dstReg+dstDisp],imm8
 	 * 
+	 * @param operandSize BITS32 or BITS64
 	 * @param dstReg
+	 * @param dstDisp
 	 * @param imm8
 	 */
-	public abstract void writeSHL(GPR dstReg, int dstDisp, int imm8);
+	public abstract void writeSHL(int operandSize, GPR dstReg, int dstDisp, int imm8);
 
 	/**
 	 * Create a SHL dstReg,cl
@@ -1712,11 +1731,13 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeSHL_CL(GPR dstReg);
 
 	/**
-	 * Create a SHL [dstReg+dstDisp],cl
+	 * Create a SHL size [dstReg+dstDisp],cl
 	 * 
+	 * @param operandSize BITS32 or BITS64
 	 * @param dstReg
+	 * @param dstDisp
 	 */
-	public abstract void writeSHL_CL(GPR dstReg, int dstDisp);
+	public abstract void writeSHL_CL(int operandSize, GPR dstReg, int dstDisp);
 
 	/**
 	 * Create a SHLD dstReg,srcReg,cl
@@ -1735,11 +1756,13 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeSHR(GPR dstReg, int imm8);
 
 	/**
-	 * @param register
-	 * @param disp
-	 * @param imm32
+	 * Create a SHR size [dstReg+dstDisp], imm8
+	 * @param operandSize BITS32 or BITS64
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param imm8
 	 */
-	public abstract void writeSHR(GPR register, int disp, int imm32);
+	public abstract void writeSHR(int operandSize, GPR dstReg, int dstDisp, int imm8);
 
 	/**
 	 * Create a SHR dstReg,cl
@@ -1749,10 +1772,12 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeSHR_CL(GPR dstReg);
 
 	/**
-	 * @param register
-	 * @param disp1
+	 * Create a SHR size [dstReg+dstDisp], CL
+	 * @param operandSize BITS32 or BITS64
+	 * @param dstReg
+	 * @param dstDisp
 	 */
-	public abstract void writeSHR_CL(GPR register, int disp1);
+	public abstract void writeSHR_CL(int operandSize, GPR dstReg, int dstDisp);
 
 	/**
 	 * Create a SHRD dstReg,srcReg,cl
@@ -1801,7 +1826,7 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param dstDisp
 	 * @param imm32
 	 */
-	public abstract void writeSUB(GPR dstReg, int dstDisp, int imm32);
+	public abstract void writeSUB(int operandSize, GPR dstReg, int dstDisp, int imm32);
 
 	/**
 	 * Create a TEST reg1, reg2
@@ -1820,13 +1845,14 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeTEST(GPR reg, int imm32);
 
 	/**
-	 * Create a TEST [reg+disp], imm32
+	 * Create a TEST size [reg+disp], imm32
 	 * 
+	 * @param operandSize BITS32 or BITS64
 	 * @param reg
 	 * @param disp
 	 * @param imm32
 	 */
-	public abstract void writeTEST(GPR reg, int disp, int imm32);
+	public abstract void writeTEST(int operandSize, GPR reg, int disp, int imm32);
 
 	/**
 	 * Create a TEST al, imm8
@@ -1836,11 +1862,12 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeTEST_AL(int value);
 
 	/**
-	 * Create a TEST eax, imm32
+	 * Create a TEST eax, imm32, TEST rax, imm32
 	 * 
+	 * @param operandSize BITS32 or BITS64
 	 * @param value
 	 */
-	public abstract void writeTEST_EAX(int value);
+	public abstract void writeTEST_EAX(int operandSize, int value);
 
 	/**
 	 * Write my contents to the given stream.
@@ -1904,5 +1931,17 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param dstDisp
 	 * @param imm32
 	 */
-	public abstract void writeXOR(GPR dstReg, int dstDisp, int imm32);
+	public abstract void writeXOR(int operandSize, GPR dstReg, int dstDisp, int imm32);
+
+	/**
+	 * Test for a valid operand size.
+	 * 
+	 * @param operandSize The given operand size.
+	 * @param allowedMask The allowed operand sizes.
+	 */
+	protected final void testOperandSize(int operandSize, int allowedMask) {
+		if ((operandSize & allowedMask) != operandSize) {
+			throw new IllegalArgumentException("Invalid operand size " + operandSize);
+		}
+	}
 }
