@@ -206,6 +206,29 @@ public final class Address implements Uninterruptible {
   }
 
   /** 
+   * Loads a reference from the memory location pointed to by the
+   * current instance.
+   *
+   * @return the read value
+   */
+  public ObjectReference loadObjectReference() {
+    if (Vm.VerifyAssertions) Vm._assert(Vm.NOT_REACHED);
+    return null;
+  }
+
+  /**
+   * Loads a reference from the memory location pointed to by the
+   * current instance.
+   *
+   * @param offset the offset to the value.
+   * @return the read value
+   */
+  public ObjectReference loadObjectReference(Offset offset) {
+    if (Vm.VerifyAssertions) Vm._assert(Vm.NOT_REACHED);
+    return null;
+  }
+
+  /** 
    * Loads a byte from the memory location pointed to by the
    * current instance.
    *
@@ -565,6 +588,27 @@ public final class Address implements Uninterruptible {
     return false;
   }
 
+ 
+  /**
+   * Stores the address value in the memory location pointed to by the
+   * current instance.
+   *
+   * @param value The address value to store.
+   */
+  public void store(ObjectReference ref) {
+    if (Vm.VerifyAssertions) Vm._assert(Vm.NOT_REACHED);
+  }
+
+  /**
+   * Stores the address value in the memory location pointed to by the
+   * current instance.
+   *
+   * @param value The address value to store.
+   * @param offset the offset to the value.
+   */
+  public void store(ObjectReference ref, Offset offset) {
+    if (Vm.VerifyAssertions) Vm._assert(Vm.NOT_REACHED);
+  }
  
   /**
    * Stores the address value in the memory location pointed to by the 
