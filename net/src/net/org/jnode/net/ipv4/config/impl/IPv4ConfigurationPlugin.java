@@ -56,7 +56,9 @@ public class IPv4ConfigurationPlugin extends Plugin {
      */
     protected void startPlugin() throws PluginException {
         this.processor = new ConfigurationProcessor();
-        this.config = (NetConfigurationData)getDescriptor().getConfiguration();
+        System.out.println("Before getPreferences");
+        this.config = new NetConfigurationData(getPreferences());
+        System.out.println("After getPreferences");
         this.service = new ConfigurationServiceImpl(processor, config);
         this.monitor = new NetDeviceMonitor(processor, config);
         try {

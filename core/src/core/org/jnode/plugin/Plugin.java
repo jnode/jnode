@@ -21,6 +21,10 @@
  
 package org.jnode.plugin;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.prefs.Preferences;
+
 import org.jnode.plugin.model.PluginDescriptorModel;
 import org.jnode.system.BootLog;
 
@@ -36,6 +40,8 @@ public abstract class Plugin {
 	private final PluginDescriptor descriptor;
 	/** Has this plugin been started? */
 	private boolean started;
+    /** Preferences root for plugins */
+    private static transient Preferences pluginPrefs;
 	
 	/**
 	 * Initialize a new instance
@@ -59,6 +65,24 @@ public abstract class Plugin {
 		return descriptor;
 	}
 
+    /**
+     * Gets the configuration data of this plugin.
+     * @return The persistent configuration data.
+     */
+    public final Preferences getPreferences() {
+        if (pluginPrefs == null) {
+            final Preferences root;
+            root = (Preferences) AccessController
+                    .doPrivileged(new PrivilegedAction() {
+                        public Object run() {
+                            return Preferences.systemRoot();
+                        }
+                    });
+            pluginPrefs = root.node("plugins");
+        }
+        return pluginPrefs.node(getDescriptor().getId());
+    }
+    
 	/**
 	 * Start this plugin
 	 * To invoke this method, a JNodePermission("startPlugin") is required. 

@@ -18,10 +18,11 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.net.ipv4.config.impl;
 
 import java.io.IOException;
+import java.util.prefs.Preferences;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.net.NetworkException;
@@ -42,5 +43,19 @@ public class NetDhcpConfig extends NetDeviceConfig {
         } catch (IOException ex) {
             throw new NetworkException(ex);
         }
+    }
+
+    /**
+     * @see org.jnode.net.ipv4.config.impl.NetDeviceConfig#load(java.util.prefs.Preferences)
+     */
+    public void load(Preferences prefs) {
+        // Do nothing
+    }
+
+    /**
+     * @see org.jnode.net.ipv4.config.impl.NetDeviceConfig#store(java.util.prefs.Preferences)
+     */
+    public void store(Preferences prefs) {
+        // Do nothing
     }
 }
