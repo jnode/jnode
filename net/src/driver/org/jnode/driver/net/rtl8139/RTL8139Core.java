@@ -242,7 +242,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
 			}
 
 			bogusCount++;
-			if (bogusCount > 100) {
+			if (bogusCount >= AUTO_NEGOTIATE_TIMEOUT) {
 				log.debug("Bogus count: autonegotiating taking too long: " + Integer.toHexString(status));
 				break;
 			}
