@@ -350,13 +350,15 @@
           <exclude name="gnu/java/awt/peer/gtk/**/*"/>
           <exclude name="gnu/javax/swing/plaf/gtk/**/*"/>
           <exclude name="gnu/test/**/*"/>
+          <exclude name="gnu/xml/libxmlj/**/*"/>
           <exclude name="test/**/*"/>
           <exclude name="testsuite/**/*"/>
           <exclude name="vm/reference/**/*"/>
         </fileset>
-        <!-- fileset dir="${root.dir}/../classpath/external/jaxp/source" includes="**/*.java">
-          <exclude name="gnu/xml/**/*"/>
-        </fileset -->
+        <fileset dir="${root.dir}/../classpath/external/w3c_dom" includes="**/*.java">
+        </fileset>
+        <fileset dir="${root.dir}/../classpath/external/sax" includes="**/*.java">
+        </fileset>
       </classpathsources>
     </cp-compare>
 
