@@ -192,7 +192,7 @@ public class NTFSVolume
 			/*
 			 * check the fixup
 			 */
-			// calculate the Update sequence number
+			/*// calculate the Update sequence number
 			int usn = NTFSUTIL.READ16_INT(
 						buf[fileRecord.getUpdateSequenceOffset()],
 						buf[fileRecord.getUpdateSequenceOffset() + 1]);
@@ -211,7 +211,7 @@ public class NTFSVolume
 					buf[(i * this.getBootRecord().BytesPerSector)-2] = buf[fileRecord.getUpdateSequenceOffset() + (i * 2)]; 
 					buf[(i * this.getBootRecord().BytesPerSector)-1] = buf[fileRecord.getUpdateSequenceOffset() + (i * 2) + 1]; 
 				}
-			}
+			}*/
 			
 			outer: for(;;)
 			{
