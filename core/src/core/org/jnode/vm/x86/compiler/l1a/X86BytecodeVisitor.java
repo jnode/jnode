@@ -732,7 +732,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dload(int)
      */
     public final void visit_dload(int index) {
-        vstack.push(DoubleItem.createLocal(stackFrame.getEbpOffset(index)));
+        vstack.push(DoubleItem.createLocal(stackFrame.getWideEbpOffset(index)));
     }
 
     /**
@@ -2698,7 +2698,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lload(int)
      */
     public final void visit_lload(int index) {
-        vstack.push(LongItem.createLocal(stackFrame.getEbpOffset(index)));
+        vstack.push(LongItem.createLocal(stackFrame.getWideEbpOffset(index)));
     }
 
     /**
