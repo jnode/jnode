@@ -243,6 +243,15 @@ int_div:
 	ret
 
 ; ---------------------------
+; Bounds check
+; ---------------------------
+int_bc:
+	cmp GET_OLD_CS, USER_CS
+	jne int_die
+	SYSTEM_EXCEPTION SoftByteCodes_EX_INDEXOUTOFBOUNDS, GET_OLD_EIP
+	ret
+
+; ---------------------------
 ; Coprocessor overrun
 ; ---------------------------
 int_copro_or:

@@ -36,6 +36,7 @@ import org.jnode.vm.VmThread;
 import org.jnode.vm.classmgr.VmStatics;
 import org.vmmagic.pragma.LoadStaticsPragma;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Word;
 
 /**
  * Processor implementation for the X86 architecture.
@@ -60,16 +61,16 @@ public abstract class VmX86Processor extends VmProcessor {
     private ResourceManager rm;
 
     /** Kernel variable (ints.asm) */
-    volatile int resume_int;
+    volatile Word resume_int;
 
     /** Kernel variable (ints.asm) */
-    volatile int resume_intno;
+    volatile Word resume_intno;
 
     /** Kernel variable (ints.asm) */
-    volatile int resume_error;
+    volatile Word resume_error;
 
     /** Kernel variable (ints.asm) */
-    volatile int resume_handler;
+    volatile Address resume_handler;
 
     /** Kernel variable (vm-ints.asm) */
     volatile int deadLockCounter;

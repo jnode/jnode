@@ -63,6 +63,8 @@ CURPROC_FS  equ 0x33
 %include "cpu.asm"
 %ifdef BITS32
   %include "ints32.asm"
+%else  
+  %include "ints64.asm"
 %endif
 %include "ints.asm"
 %ifdef BITS32

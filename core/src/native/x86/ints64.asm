@@ -1,62 +1,55 @@
 ; -----------------------------------------------
 ; $Id$
 ;
-; 32-bit specific interrupt code
+; 64-bit specific interrupt code
 ;
 ; Author       : E.. Prangsma
 ; -----------------------------------------------
 
-%define RESUME_INT		dword[fs:VmX86Processor_RESUME_INT_OFS]
-%define RESUME_INTNO	dword[fs:VmX86Processor_RESUME_INTNO_OFS]
-%define RESUME_ERROR	dword[fs:VmX86Processor_RESUME_ERROR_OFS]
-%define RESUME_HANDLER	dword[fs:VmX86Processor_RESUME_HANDLER_OFS]
+%define RESUME_INT		qword[fs:VmX86Processor_RESUME_INT_OFS]
+%define RESUME_INTNO	qword[fs:VmX86Processor_RESUME_INTNO_OFS]
+%define RESUME_ERROR	qword[fs:VmX86Processor_RESUME_ERROR_OFS]
+%define RESUME_HANDLER	qword[fs:VmX86Processor_RESUME_HANDLER_OFS]
     
-int_die_halted:	dd 0    
+int_die_halted:	DA 0    
     
 ; -------------------------------------
 ; Stack for inthandler & irqhandler
 ; -------------------------------------
 
-OLD_SS      equ 76
-OLD_ESP     equ 72
-OLD_EFLAGS  equ 68
-OLD_CS      equ 64
-OLD_EIP     equ 60
-ERROR       equ 56
-INTNO   	equ 52
-HANDLER     equ 48 
-OLD_EAX     equ 44
+OLD_SS      equ 112
+OLD_ESP     equ 104
+OLD_EFLAGS  equ 96
+OLD_CS      equ 88
+OLD_EIP     equ 80
+ERROR       equ 72
+INTNO   	equ 64
+HANDLER     equ 56 
+OLD_EAX     equ 48
 OLD_ECX     equ 40
-OLD_EDX     equ 36
-OLD_EBX     equ 32
-;OLD_ESP     equ 28
-OLD_EBP     equ 24
-OLD_ESI     equ 20
-OLD_EDI     equ 16
-OLD_DS      equ 12
-OLD_ES      equ 8
-OLD_FS      equ 4
-OLD_GS      equ 0
+OLD_EDX     equ 32
+OLD_EBX     equ 24
+OLD_EBP     equ 16
+OLD_ESI     equ 8
+OLD_EDI     equ 0
 
-%define GET_OLD_CS		dword [ebp+OLD_CS]
-%define GET_OLD_EIP		dword [ebp+OLD_EIP]
-%define GET_OLD_ESP		dword [ebp+OLD_ESP]
-%define GET_OLD_EFLAGS	dword [ebp+OLD_EFLAGS]
-%define GET_OLD_EAX		dword [ebp+OLD_EAX]
-%define GET_OLD_EBX		dword [ebp+OLD_EBX]
-%define GET_OLD_ECX		dword [ebp+OLD_ECX]
-%define GET_OLD_EDX		dword [ebp+OLD_EDX]
+%define GET_OLD_CS		qword [rbp+OLD_CS]
+%define GET_OLD_EIP		qword [rbp+OLD_EIP]
+%define GET_OLD_ESP		qword [rbp+OLD_ESP]
+%define GET_OLD_EFLAGS	qword [rbp+OLD_EFLAGS]
+%define GET_OLD_EAX		qword [rbp+OLD_EAX]
+%define GET_OLD_EBX		qword [rbp+OLD_EBX]
+%define GET_OLD_ECX		qword [rbp+OLD_ECX]
+%define GET_OLD_EDX		qword [rbp+OLD_EDX]
 
 %macro int_entry 0
-    pusha 
-    push ds
-    push es
-    push fs
-    push gs
-    mov eax,KERNEL_DS
-    mov ds,ax
-    mov es,ax
-    mov gs,ax
+	push rax
+	push rcx
+	push rdx
+	push rbx
+	push rbp
+	push rsi
+	push rdi
     ; Do not overwrite FS here, since it will always contain the current processor selector
     %if TRACE_INTERRUPTS
 		inc byte [0xb8000+0*2]
@@ -67,15 +60,16 @@ OLD_GS      equ 0
 %endmacro
 
 %macro int_exit 0
-    mov eax,esp
-    and dword [esp+OLD_EFLAGS],~F_NT ; Clear NT flag
-    and byte [gdt_tss+5],~0x02       ; Clear busy bit in TSS descriptor
-    pop gs
-    pop fs
-    pop es
-    pop ds
-    popa
-    add esp,12 ; Remove HANDLER & INTNO & ERRORCODE 
+    mov rax,rsp
+    and qword [rsp+OLD_EFLAGS],~F_NT ; Clear NT flag
+    pop rdi
+    pop rsi
+    pop rbp
+    pop rbx
+    pop rdx
+    pop rcx
+    pop rax
+    add rsp,24 ; Remove HANDLER & INTNO & ERRORCODE 
     iret
 %endmacro
 
@@ -84,24 +78,24 @@ OLD_GS      equ 0
 ; -------------------------
 inthandler:
     int_entry
-	mov eax,esp
-	mov ebp,esp
+	mov rax,rsp
+	mov rbp,rsp
 	cmp GET_OLD_CS,USER_CS
 	jne near kernel_panic
-	mov ebx,[esp+HANDLER]
-	call ebx
-	test dword RESUME_INT,0xFFFFFFFF
+	mov rbx,[rsp+HANDLER]
+	call rbx
+	test RESUME_INT,0xFFFFFFFF
 	jz inthandler_ret
 	; Resume the interrupt (caused by an an IRQ)
 	;jmp int_die
-	mov ebp,esp
-	mov eax,RESUME_INTNO
-	mov [ebp+INTNO],eax
-	mov eax,RESUME_ERROR
-	mov [ebp+ERROR],eax
-	mov eax,RESUME_HANDLER
-	mov [ebp+HANDLER],eax
-	mov dword RESUME_INT,0
+	mov rbp,rsp
+	mov rax,RESUME_INTNO
+	mov [rbp+INTNO],rax
+	mov rax,RESUME_ERROR
+	mov [rbp+ERROR],rax
+	mov rax,RESUME_HANDLER
+	mov [rbp+HANDLER],rax
+	mov RESUME_INT,0
 	jmp irqhandler_resume
 inthandler_ret:
     int_exit
@@ -113,12 +107,12 @@ inthandler_ret:
 
 int_die:
 	cli
-	mov ebx,ebp
+	mov rbx,rbp
 	call sys_print_intregs
 	;ret
 int_die_halt:
 	cli
-	mov dword [int_die_halted],1
+	mov WORD [int_die_halted],1
 	PRINT_STR int_die_halt_msg
 	hlt
 
@@ -126,8 +120,8 @@ int_die_halt_msg: db 'Real panic: int_die_halt!',0
 
 %macro idm_print_reg 2
 	PRINT_STR idm_%1
-	mov eax,%2
-	call sys_print_eax
+	mov rax,%2
+	call sys_print_rax
 %endmacro
 
 %macro idm_print_byte 2
@@ -137,63 +131,59 @@ int_die_halt_msg: db 'Real panic: int_die_halt!',0
 %endmacro
 
 sys_print_intregs:
-	idm_print_reg intno, [ebp+INTNO]
-	idm_print_reg error, [ebp+ERROR]
+	idm_print_reg intno, [rbp+INTNO]
+	idm_print_reg error, [rbp+ERROR]
 	idm_print_reg cr2, cr2
 	idm_print_reg cr3, cr3
-	idm_print_reg eip, [ebp+OLD_EIP]
-	idm_print_reg cs,  [ebp+OLD_CS]
-	idm_print_reg eflags, [ebp+OLD_EFLAGS]
+	idm_print_reg eip, [rbp+OLD_EIP]
+	idm_print_reg cs,  [rbp+OLD_CS]
+	idm_print_reg eflags, [rbp+OLD_EFLAGS]
 	idm_print_reg cr0, cr0
-	idm_print_reg eax, [ebp+OLD_EAX]
-	idm_print_reg ebx, [ebp+OLD_EBX]
-	idm_print_reg ecx, [ebp+OLD_ECX]
-	idm_print_reg edx, [ebp+OLD_EDX]
-	idm_print_reg ebp, [ebp+OLD_EBP]
-	idm_print_reg esp, [ebp+OLD_ESP]
-	idm_print_reg edi, [ebp+OLD_EDI]
-	idm_print_reg esi, [ebp+OLD_ESI]
-	idm_print_reg ds,  [ebp+OLD_DS]
-	idm_print_reg es,  [ebp+OLD_ES]
-	idm_print_reg fs,  [ebp+OLD_FS]
-	idm_print_reg gs,  [ebp+OLD_GS]
-	mov ebx,[ebp+OLD_ESP]
+	idm_print_reg rax, [rbp+OLD_EAX]
+	idm_print_reg rbx, [rbp+OLD_EBX]
+	idm_print_reg rcx, [rbp+OLD_ECX]
+	idm_print_reg rdx, [rbp+OLD_EDX]
+	idm_print_reg rbp, [rbp+OLD_EBP]
+	idm_print_reg rsp, [rbp+OLD_ESP]
+	idm_print_reg rdi, [rbp+OLD_EDI]
+	idm_print_reg rsi, [rbp+OLD_ESI]
+	mov ebx,[rbp+OLD_ESP]
 	idm_print_reg stack0,  [ebx+0]
 	idm_print_reg stack1,  [ebx+4]
 	idm_print_reg stack1,  [ebx+8]
 	idm_print_reg stack1,  [ebx+12]
 	idm_print_reg stack1,  [ebx+16]
 	idm_print_reg stack1,  [ebx+20]
-	mov ebx,[ebp+OLD_EIP]
+	mov rbx,[rbp+OLD_EIP]
 	; If EIP == CR2, then we print the code as the address of the Top of
 	; the stack.
-	push eax
-	mov eax,cr2
-	cmp ebx,eax
-	pop eax
+	push rax
+	mov rax,cr2
+	cmp rbx,rax
+	pop rax
 	jne sys_print_intregs_code
-	mov ebx,[ebp+OLD_ESP]
-	mov ebx,[ebx+0]
+	mov rbx,[rbp+OLD_ESP]
+	mov rbx,[rbx+0]
 sys_print_intregs_code:
-	sub ebx,16
-	idm_print_reg  ipaddr, ebx
-	idm_print_byte ip0,	   [ebx+0]
+	sub rbx,16
+	idm_print_reg  ipaddr, rbx
+	idm_print_byte ip0,	   [rbx+0]
 	push ecx
 	mov ecx,15
 sys_print_intregs_loop1:
 	inc ebx
-	idm_print_byte ip1, [ebx]
+	idm_print_byte ip1, [rbx]
 	loop sys_print_intregs_loop1
 	
-	inc ebx
-	idm_print_reg  ipaddr, ebx
-	idm_print_byte ip0,	   [ebx+0]
-	mov ecx,15
+	inc rbx
+	idm_print_reg  ipaddr, rbx
+	idm_print_byte ip0,	   [rbx+0]
+	mov rcx,15
 sys_print_intregs_loop2:
-	inc ebx
-	idm_print_byte ip1, [ebx]
+	inc rbx
+	idm_print_byte ip1, [rbx]
 	loop sys_print_intregs_loop2
-	pop ecx
+	pop rcx
 	ret
 
 idm_intno:  db 0xd,0xa,'int  : ',0
@@ -204,18 +194,14 @@ idm_eip:    db 0xd,0xa,'EIP  : ',0
 idm_cs:     db        ' CS   : ',0
 idm_eflags: db        ' FLAGS: ',0
 idm_cr0:	db        ' CR0  : ',0
-idm_eax:    db 0xd,0xa,'EAX  : ',0
-idm_ebx:    db        ' EBX  : ',0
-idm_ecx:    db        ' ECX  : ',0
-idm_edx:    db        ' EDX  : ',0
-idm_ebp:    db 0xd,0xa,'EBP  : ',0
-idm_esp:    db        ' ESP  : ',0
-idm_edi:    db        ' EDI  : ',0
-idm_esi:    db        ' ESI  : ',0
-idm_ds:     db 0xd,0xa,'DS   : ',0
-idm_es:     db        ' ES   : ',0
-idm_fs:     db        ' FS   : ',0
-idm_gs:     db        ' GS   : ',0
+idm_eax:    db 0xd,0xa,'RAX  : ',0
+idm_ebx:    db        ' RBX  : ',0
+idm_ecx:    db        ' RCX  : ',0
+idm_edx:    db        ' RDX  : ',0
+idm_ebp:    db 0xd,0xa,'RBP  : ',0
+idm_esp:    db        ' RSP  : ',0
+idm_edi:    db        ' RDI  : ',0
+idm_esi:    db        ' RSI  : ',0
 idm_stack0: db 0xd,0xa,'STACK: ',0
 idm_stack1: db        0
 idm_ipaddr: db 0xd,0xa,'CODE(',0
@@ -228,12 +214,12 @@ idm_ip1:    db        0
 
 irqhandler:
     int_entry
-	mov eax,esp
-	mov ebp,esp
-	cmp dword [esp+OLD_CS],USER_CS
+	mov rax,rsp
+	mov rbp,rsp
+	cmp GET_OLD_CS,USER_CS
 	jne irqhandler_suspend
 irqhandler_resume:
-	call dword [esp+HANDLER]
+	call qword [rsp+HANDLER]
 irqhandler_ret:
 	%if TRACE_INTERRUPTS
 		inc byte [0xb8000+79*2]
@@ -241,17 +227,17 @@ irqhandler_ret:
 	int_exit
 irqhandler_suspend:
 	;jmp int_die
-	and dword [esp+OLD_EFLAGS],~F_IF
-	mov eax,[esp+INTNO]
-	mov RESUME_INTNO,eax
-	mov eax,[esp+ERROR]
-	mov RESUME_ERROR,eax
-	mov eax,[esp+HANDLER]
-	mov RESUME_HANDLER,eax
-	mov eax,1
-	xchg RESUME_INT,eax
+	and qword [rsp+OLD_EFLAGS],~F_IF
+	mov rax,[rsp+INTNO]
+	mov RESUME_INTNO,rax
+	mov rax,[rsp+ERROR]
+	mov RESUME_ERROR,rax
+	mov rax,[rsp+HANDLER]
+	mov RESUME_HANDLER,rax
+	mov rax,1
+	xchg RESUME_INT,rax
 	; Test for resume overruns
-	test eax,eax
+	test rax,rax
 	jz inthandler_ret ; No overrun, finish int handler
 	PRINT_STR irq_resume_overrun_msg
 	jmp inthandler_ret
@@ -290,35 +276,37 @@ stub_irq%1:
 
 ; intport <index> <offset> [<dpl>]
 %macro intport 2-3 0
-	mov eax,stub_%2
-	mov edi,idtstart+((%1)*8)
+	mov rax,stub_%2
+	mov rdi,idtstart+((%1)*16)
 	mov ebx,0x8e00 | (%3 << 13)
 	call setup_idtentry
 %endmacro
 
 ; trapport <index> <offset> [<dpl>]
 %macro trapport 2-3 0
-	mov eax,stub_%2
-	mov edi,idtstart+((%1)*8)
+	mov rax,stub_%2
+	mov rdi,idtstart+((%1)*16)
 	mov ebx,0x8f00 | (%3 << 13)
 	call setup_idtentry
 %endmacro
 
 ; Setup and IDT entry
 ; Parameters
-;   EDI offset of IDT entry
-;   EAX offset of handler
+;   RDI offset of IDT entry
+;   RAX offset of handler
 ;   EBX type of IDT entry
 ;	0x8e00 = interrupt port (dpl=0)
 ;	0xee00 = interrupt port (dpl=3)
 ;	0x8f00 = trap port (dpl=0)
 ;	0xef00 = trap port (dpl=3)
 setup_idtentry:
-	mov word [edi+0],ax
-	shr eax,16
-	mov word [edi+2],KERNEL_CS
-	mov word [edi+4],bx
-	mov word [edi+6],ax
+	mov word [rdi+0],ax			; Target offset 15-0
+	shr rax,16
+	mov word [rdi+2],KERNEL_CS	; Target selector
+	mov word [rdi+4],bx			; Flags
+	mov word [rdi+6],ax			; Target offset 31-16
+	shr rax,16
+	mov dword [rdi+8],eax		; Target offset 63-32
 	ret
 
 ; ---------------------------
@@ -326,10 +314,10 @@ setup_idtentry:
 ; ---------------------------
 idt:
 	dw idtend-idtstart
-	dd idtstart
+	dq idtstart
 
 idtstart:
-	times (0x40)*8 db 0
+	times (0x40)*16 db 0
 idtend:
 
 ; ---------------------------
@@ -339,8 +327,8 @@ idtend:
 ;   2) Error address
 ; ---------------------------
 %macro SYSTEM_EXCEPTION 2
-	mov eax,%1
-	mov ebx,%2
+	mov rax,%1
+	mov rbx,%2
 	call int_system_exception
 %endmacro
 
@@ -352,12 +340,12 @@ idtend:
 ; General protected fault
 ; ---------------------------
 int_gpf:
-	mov eax,GET_OLD_EIP
-	cmp byte [eax],0xf4 ; Get the instruction that caused the GPF
+	mov rax,GET_OLD_EIP
+	cmp byte [rax],0xf4 ; Get the instruction that caused the GPF
 	jne int_gpf_2
 	; A hlt was called, do a hlt
 int_gpf_hlt:
-	cmp eax,_halt
+	cmp rax,_halt
 	je int_gpf_halt
 	inc GET_OLD_EIP 			; Return past the hlt instruction
 	test GET_OLD_EFLAGS,F_IF
@@ -380,16 +368,15 @@ int_gpf_halt:
 int_pf:
 	cmp GET_OLD_CS,USER_CS
 	jne int_pf_kernel
-	mov eax,cr2
-	test eax,0xFFFFF000 ; Error in first (null) page?
+	mov rax,cr2
+	test rax,0xFFFFF000 ; Error in first (null) page?
 	jz int_pf_npe
-	neg eax
-	test eax,0xFFFFF000 ; Error in last (null) page?
+	neg rax
+	test rax,0xFFFFF000 ; Error in last (null) page?
 	jz int_pf_npe
 	SYSTEM_EXCEPTION SoftByteCodes_EX_PAGEFAULT, cr2
 	ret
 int_pf_npe:
-	;jmp int_die
 	SYSTEM_EXCEPTION SoftByteCodes_EX_NULLPOINTER, GET_OLD_EIP
 	ret
 	

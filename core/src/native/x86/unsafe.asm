@@ -148,9 +148,9 @@ Q43org5jnode2vm6Unsafe23invokeVoid2e28Lorg2fjnode2fvm2fclassmgr2fVmMethod3b29V:
 Q43org5jnode2vm6Unsafe23invokeInt2e28Lorg2fjnode2fvm2fclassmgr2fVmMethod3b29I:	
 Q43org5jnode2vm6Unsafe23invokeLong2e28Lorg2fjnode2fvm2fclassmgr2fVmMethod3b29J:	
 Q43org5jnode2vm6Unsafe23invokeObject2e28Lorg2fjnode2fvm2fclassmgr2fVmMethod3b29Ljava2flang2fObject3b:
-	pop eax 			; Get return address
-	xchg eax,[esp+0]	; EAX now contains method argument, Top of stack now contains return address
-	jmp [eax+VmMethod_NATIVECODE_OFS]
+	pop AAX 			; Get return address
+	xchg AAX,[ASP+0]	; EAX now contains method argument, Top of stack now contains return address
+	jmp [AAX+VmMethod_NATIVECODE_OFS]
 
 ; int Unsafe.initThread(VmThread thread, Object newStack, int stackSize)
 ; Initialize the new Thread.
@@ -205,53 +205,53 @@ initThread_msg1: db 'New esp=',0
 
 ; public static native Address getMaxAddress()
 Q43org5jnode2vm6Unsafe23getMaxAddress2e2829Lorg2fvmmagic2funboxed2fAddress3b:
-	mov eax,0xFFC00000	; 4Gb - 4Mb
+	mov AAX,0xFFC00000	; 4Gb - 4Mb
 	ret
 	
 ; public static native VmAddress getMinAddress()
 Q43org5jnode2vm6Unsafe23getMinAddress2e2829Lorg2fvmmagic2funboxed2fAddress3b:
-	mov eax,free_paddr
+	mov AAX,free_paddr
 	ret
 	
 ; public static native Address getMemoryStart()
 Q43org5jnode2vm6Unsafe23getMemoryStart2e2829Lorg2fvmmagic2funboxed2fAddress3b:
-	mov eax,[free_mem_start]
+	mov AAX,[free_mem_start]
 	;; mov eax,freeMemoryStart
 	ret
 	
 ; public static native Address getMemoryEnd()
 Q43org5jnode2vm6Unsafe23getMemoryEnd2e2829Lorg2fvmmagic2funboxed2fAddress3b:
-	mov eax,[mem_size]
+	mov AAX,[mem_size]
 	ret
 	
 ; public static native Address getKernelStart()
 Q43org5jnode2vm6Unsafe23getKernelStart2e2829Lorg2fvmmagic2funboxed2fAddress3b:
-	mov eax,kernel_begin
+	mov AAX,kernel_begin
 	ret
 	
 ; public static native Address getKernelEnd()
 Q43org5jnode2vm6Unsafe23getKernelEnd2e2829Lorg2fvmmagic2funboxed2fAddress3b:
-	mov eax,vm_start
+	mov AAX,vm_start
 	ret
 	
 ; public static native Address getInitJarStart()
 Q43org5jnode2vm6Unsafe23getInitJarStart2e2829Lorg2fvmmagic2funboxed2fAddress3b:
-	mov eax,[initJar_start]
+	mov AAX,[initJar_start]
 	ret
 	
 ; public static native Address getInitJarEnd()
 Q43org5jnode2vm6Unsafe23getInitJarEnd2e2829Lorg2fvmmagic2funboxed2fAddress3b:
-	mov eax,[initJar_end]
+	mov AAX,[initJar_end]
 	ret
 	
 ; public static native Address getBootHeapStart()
 Q43org5jnode2vm6Unsafe23getBootHeapStart2e2829Lorg2fvmmagic2funboxed2fAddress3b:
-	mov eax,bootHeapStart
+	mov AAX,bootHeapStart
 	ret
 	
 ; public static native Address getBootHeapEnd()
 Q43org5jnode2vm6Unsafe23getBootHeapEnd2e2829Lorg2fvmmagic2funboxed2fAddress3b:
-	mov eax,bootHeapEnd
+	mov AAX,bootHeapEnd
 	ret
 	
 ; Gets information of the JNode kernel command line.
@@ -277,8 +277,7 @@ after_copyCmdLine:
 	
 ; Gets the current processor
 Q43org5jnode2vm6Unsafe23getCurrentProcessor2e2829Lorg2fjnode2fvm2fVmProcessor3b:
-	;mov eax,vmCurProcessor
-	mov eax,CURRENTPROCESSOR
+	mov AAX,CURRENTPROCESSOR
 	ret	
 
 ; Force a yieldpoint
@@ -292,33 +291,38 @@ noYieldPoint:
 
 ; Address getJumpTable0()	
 Q43org5jnode2vm6Unsafe23getJumpTable02e2829Lorg2fvmmagic2funboxed2fAddress3b:
-	mov eax,vm_jumpTable
+	mov AAX,vm_jumpTable
 	ret
 	
 ; public static native void debug(String str);
 Q43org5jnode2vm6Unsafe23debug2e28Ljava2flang2fString3b29V:
-	mov eax,[esp+4]
+	mov AAX,[ASP+SLOT_SIZE]
 	call vm_print_string
-	ret 4
+	ret SLOT_SIZE
 	
 ; public static native void debug(char value);
 Q43org5jnode2vm6Unsafe23debug2e28C29V:
-	mov eax,[esp+4]
+	mov eax,[ASP+SLOT_SIZE]
 	call sys_print_char
 	ret 4
 
 ; public static native void debug(int value);
 Q43org5jnode2vm6Unsafe23debug2e28I29V:
-	mov eax,[esp+4]
+	mov eax,[ASP+SLOT_SIZE]
 	call sys_print_eax
 	ret 4
 
 ; public static native void debug(long value);
 Q43org5jnode2vm6Unsafe23debug2e28J29V:
+%ifdef BITS32
 	mov eax,[esp+8]		; MSB
 	call sys_print_eax
 	mov eax,[esp+4]		; LSB
 	call sys_print_eax
+%else
+	mov rax,[rsp+SLOT_SIZE]
+	call sys_print_rax
+%endif	
 	ret 8
 		
 	

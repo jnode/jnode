@@ -8,55 +8,55 @@
 
 ; int getGDT(int[])
 Q53org5jnode2vm3x869UnsafeX8623getGDT2e285bI29I:
-	mov eax,[esp+4]		; Get gdt
-	test eax,eax		
+	mov AAX,[ASP+SLOT_SIZE]		; Get gdt
+	test AAX,AAX
 	jz getGDT_ret
 
-	push esi	
-	push edi
-	push ecx
+	push ASI
+	push ADI
+	push ACX
 	cld
 	
-	mov ecx,[eax+VmArray_LENGTH_OFFSET*4]
-	lea edi,[eax+VmArray_DATA_OFFSET*4]
-	mov esi,gdtstart
+	mov ecx,[AAX+VmArray_LENGTH_OFFSET*4]
+	lea ADI,[AAX+VmArray_DATA_OFFSET*4]
+	mov ASI,gdtstart
 	rep movsd
 	
-	pop ecx
-	pop edi
-	pop esi
+	pop ACX
+	pop ADI
+	pop ASI
 	
 getGDT_ret:
 	; Calculate GDT length in int's
 	mov eax,gdtend-gdtstart
 	shr eax,2
-	ret 4
+	ret SLOT_SIZE
 
 ; int getTSS(int[])
 Q53org5jnode2vm3x869UnsafeX8623getTSS2e285bI29I:
-	mov eax,[esp+4]		; Get tss
-	test eax,eax		
+	mov AAX,[ASP+SLOT_SIZE]		; Get tss
+	test AAX,AAX		
 	jz getTSS_ret
 
-	push esi	
-	push edi
-	push ecx
+	push ASI	
+	push ADI
+	push ACX
 	cld
 	
-	mov ecx,[eax+VmArray_LENGTH_OFFSET*4]
-	lea edi,[eax+VmArray_DATA_OFFSET*4]
-	mov esi,tss
+	mov ecx,[AAX+VmArray_LENGTH_OFFSET*4]
+	lea ADI,[AAX+VmArray_DATA_OFFSET*4]
+	mov ASI,tss
 	rep movsd
 	
-	pop ecx
-	pop edi
-	pop esi
+	pop ACX
+	pop ADI
+	pop ASI
 	
 getTSS_ret:
 	; Calculate TSS length in int's
 	mov eax,tss_e-tss
 	shr eax,2
-	ret 4
+	ret SLOT_SIZE
 	
 ; int getAPBootCodeSize();
 Q53org5jnode2vm3x869UnsafeX8623getAPBootCodeSize2e2829I:

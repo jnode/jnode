@@ -18,31 +18,31 @@
 ;	 * @return The required length of id.
 ;	public static native int getCPUID(int[] id);
 Q43org5jnode2vm6Unsafe23getCPUID2e285bI29I:
-	mov eax,[esp+4]		; Get id
-	push edi
-	push ebx
-	push ecx
-	push edx
+	mov AAX,[ASP+SLOT_SIZE]		; Get id
+	push ADI
+	push ABX
+	push ACX
+	push ADX
 	
-	mov edi,eax			; edi = id
-	mov eax,0
+	mov ADI,AAX			; edi = id
+	xor eax,eax
 	cpuid				; eax contains maximum input value
 	lea ecx,[eax+1]		; Store maximum+1 for later 
 	lea eax,[eax*4+4]	; Calculate id.length (4 registers * (maximum input value+1))
 	
-	cmp edi,0			; is id null?
+	test ADI,ADI		; is id null?
 	je cpuid_ret
-	cmp eax,[edi+VmArray_LENGTH_OFFSET*4]
+	cmp eax,[ADI+VmArray_LENGTH_OFFSET*4]
 	ja cpuid_ret		; id is not large enough?
 	
-	lea edi,[edi+VmArray_DATA_OFFSET*4]		; Load &id[0] into edi
-	push eax
+	lea ADI,[ADI+VmArray_DATA_OFFSET*4]		; Load &id[0] into edi
+	push AAX
 	pushf
 	cld
-	mov eax,0
+	xor eax,eax
 cpuid_loop:
-	push eax
-	push ecx
+	push AAX
+	push ACX
 	cpuid
 	stosd				; store eax
 	mov eax,ebx
@@ -51,16 +51,16 @@ cpuid_loop:
 	stosd				; store ecx
 	mov eax,edx
 	stosd				; store edx
-	pop ecx
-	pop eax
+	pop ACX
+	pop AAX
 	inc eax
 	loop cpuid_loop
 	popf
-	pop eax
+	pop AAX
 	
 cpuid_ret:
-	pop edx
-	pop ecx
-	pop ebx
-	pop edi
-	ret 4
+	pop ADX
+	pop ACX
+	pop ABX
+	pop ADI
+	ret SLOT_SIZE

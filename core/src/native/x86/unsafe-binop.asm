@@ -9,42 +9,43 @@
 
 ; BINOP24_VALUES opcode, mask-opcode, mask
 %macro BINOP24_VALUES 3
-    push edi
-	mov edi,[esp+12]	; memPtr
-	mov eax,[esp+8] 	; value
-	mov ecx,[esp+4]		; count
+    push ADI
+	mov ADI,[ASP+(2*SLOT_SIZE)+8]	; memPtr
+	mov eax,[ASP+(2*SLOT_SIZE)+4] 	; value
+	mov ecx,[ASP+(2*SLOT_SIZE)+0]	; count
 	jecxz %%end			; (Count == 0) ?
 	%2 eax,%3	     	; Apply Mask 
 %%loop:
-    %1 dword [edi],eax
-    lea edi,[edi+3]
+    %1 dword [ADI],eax
+    lea ADI,[ADI+3]
 	loop %%loop
 %%end:
-	pop edi
-	ret 12
+	pop ADI
+	ret SLOT_SIZE+(2*4)
 %endmacro
 
 ; BINOP32_VALUES opcode, type, size, reg
 %macro BINOP32_VALUES 4
-	mov eax,[esp+12]	; memPtr
-	mov edx,[esp+8] 	; value
-	mov ecx,[esp+4]		; count
+	mov AAX,[ASP+SLOT_SIZE+8]	; memPtr
+	mov edx,[ASP+SLOT_SIZE+4] 	; value
+	mov ecx,[ASP+SLOT_SIZE+0]	; count
 	jecxz %%end			; (Count == 0) ?
 %%loop:
-	%1 %2 [eax],%4
-	add eax,%3
+	%1 %2 [AAX],%4
+	add AAX,%3
 	loop %%loop
 %%end:
-	ret 12
+	ret SLOT_SIZE+(2*4)
 %endmacro
 
 ; BINOP64_VALUES opcode
 %macro BINOP64_VALUES 1
+%ifdef BITS32
 	push edi
-	mov eax,[esp+16]	; memPtr
-	mov edx,[esp+12] 	; value MSB
-	mov eax,[esp+8] 	; value LSB
-	mov ecx,[esp+4]		; count
+	mov edi,[esp+20]	; memPtr
+	mov edx,[esp+16] 	; value MSB
+	mov eax,[esp+12] 	; value LSB
+	mov ecx,[esp+8]		; count
 	jecxz %%end			; (Count == 0) ?
 %%loop:
 	%1 dword [edi],eax	; LSB
@@ -54,6 +55,20 @@
 %%end:
 	pop edi
 	ret 16
+%else
+	push rdi
+	mov rdi,[rsp+(2*SLOT_SIZE)+12]	; memPtr
+	mov rax,[rsp+(2*SLOT_SIZE)+4] 	; value (long)
+	mov ecx,[rsp+(2*SLOT_SIZE)+0]	; count
+	jecxz %%end			; (Count == 0) ?
+%%loop:
+	%1 qword [rdi],rax	; LSB
+	add rdi,8
+	loop %%loop
+%%end:
+	pop rdi
+	ret SLOT_SIZE+8+4
+%endif	
 %endmacro
 
 ; -----------------------------------------------
