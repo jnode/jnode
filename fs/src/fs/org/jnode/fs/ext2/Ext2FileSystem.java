@@ -5,8 +5,8 @@ package org.jnode.fs.ext2;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.Timer;
-import java.util.TimerTask;
+//import java.util.Timer;
+//import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
@@ -241,6 +241,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	 * Helper class for timedWrite
 	 * @author blind
 	 */
+	/*
 	class TimeoutWatcher extends TimerTask {
 			Thread mainThread;
 			public TimeoutWatcher(Thread mainThread) {
@@ -251,8 +252,9 @@ public class Ext2FileSystem extends AbstractFileSystem {
 			}
 	}
 	
-	//private static final long TIMEOUT = 100;
-	/**
+	private static final long TIMEOUT = 100;
+	*/
+	/*
 	 * timedWrite writes to disk and waits for timeout, if the operation does not finish
 	 * in time, restart it.
 	 *  DO NOT CALL THIS DIRECTLY! ONLY TO BE CALLED FROM writeBlock()!
@@ -304,8 +306,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 		}
 	}
 	*/
-	
-	
+
 	public Superblock getSuperblock() {
 		return superblock;
 	}	
@@ -483,7 +484,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	 * @param group
 	 * @param diff can be positive or negative
 	 */
-	protected void modifyFreeBlocksCount(int group, int diff) throws IOException {
+	protected void modifyFreeBlocksCount(int group, int diff) {
 		GroupDescriptor gdesc = groupDescriptors[group];
 		synchronized(gdesc) {
 			gdesc.setFreeBlocksCount( gdesc.getFreeBlocksCount()+diff );
@@ -499,7 +500,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	 * @param group
 	 * @param diff can be positive or negative
 	 */
-	protected void modifyFreeInodesCount(int group, int diff) throws IOException {
+	protected void modifyFreeInodesCount(int group, int diff) {
 		GroupDescriptor gdesc = groupDescriptors[group];
 		synchronized(gdesc) {
 			gdesc.setFreeInodesCount( gdesc.getFreeInodesCount()+diff );
@@ -643,15 +644,48 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	protected Object getSuperblockLock() {
 		return superblockLock;
 	}
+	
+	/**
+	 * Check whether the filesystem uses the given RO feature (S_FEATURE_RO_COMPAT)
+	 * @param mask
+	 * @return
+	 */
+	protected boolean hasROFeature(long mask){
+		return (mask & superblock.getFeatureROCompat()) != 0;		
+	}
+	
+	/**
+	 * utility function for determining if a given block group has 
+	 * superblock and group descriptor copies
+	 * @param a positive integer
+	 * @param b positive integer > 1
+	 * @return true if an n integer exists such that a=b^n; false otherwise
+	 */
+	private boolean checkPow(int a, int b) {
+		if(a<=1)
+			return true;
+        while (true) {
+        	if(a==b)
+        		return true;
+        	if(a%b==0) {
+        		a=a/b;
+        		continue;
+        	}
+        	return false;
+        }
+	}
 
 	/**
 	 * With the sparse_super option set, a filesystem does not have a superblock
-	 * copy in every block group.
+	 * and group descriptor copy in every block group.
 	 * @param groupNr
-	 * @return true if the block group <code>groupNr</code> has a superblock
+	 * @return true if the block group <code>groupNr</code> has a superblock and a group
+	 * 			descriptor copy, otherwise false
 	 */
-	protected boolean groupHasSuperblock(int groupNr){
-		//TODO: support filesystems with the sparse_super option
-		return true; 
-	}	
+	protected boolean groupHasDescriptors(int groupNr){
+		if(hasROFeature(Ext2Constants.EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER))
+			return (checkPow(groupNr, 3)||checkPow(groupNr, 5)||checkPow(groupNr, 7));
+		else
+			return true;
+	}
 }

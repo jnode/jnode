@@ -58,6 +58,10 @@ public class Superblock {
 			
 			//update the other copies
 			for(int i=1; i<fs.getGroupCount(); i++) {
+				//check if there is a superblock copy in the block group
+				if(!fs.groupHasDescriptors(i))
+					continue;
+
 				long blockNr=getFirstDataBlock() + i*getBlocksPerGroup();
 				oldData = fs.getBlock(blockNr);
 				//update the old contents with the new superblock

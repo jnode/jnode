@@ -51,7 +51,7 @@ public class GroupDescriptor {
 	//OLD VERSION
 
 	/**
-	 * GroupDescriptors are duplicated in every block group: if a GroupDescriptor changes,
+	 * GroupDescriptors are duplicated in some (or all) block groups: if a GroupDescriptor changes,
 	 * all copies have to be changed.
 	 */
 	protected void updateGroupDescriptors() throws IOException{
@@ -60,8 +60,12 @@ public class GroupDescriptor {
 			log.debug("Updating groupdescriptor copies");
 			synchronized(fs.getGroupDescriptorLock()) {
 				for(int i=0; i<fs.getGroupCount(); i++) {
+					//check if there is a group descriptor table copy in the block group
+					if(!fs.groupHasDescriptors(i))
+						continue;
+					
 					long block  = 	fs.getSuperblock().getFirstDataBlock() + 1 +
-									fs.getSuperblock().getBlocksPerGroup() * i;
+									fs.getSuperblock().getBlocksPerGroup() * i;	//<- for the ith block group
 					long pos = groupNr*GROUPDESCRIPTOR_LENGTH;
 					block      += pos / fs.getBlockSize();			
 					long offset = pos % fs.getBlockSize();
@@ -96,7 +100,7 @@ public class GroupDescriptor {
 		return Ext2Utils.get16(data, 12);
 	}
 
-	public void setFreeBlocksCount(int count) throws IOException {
+	public void setFreeBlocksCount(int count) {
 		Ext2Utils.set16(data, 12, count);
 		setDirty(true);
 	}
@@ -105,7 +109,7 @@ public class GroupDescriptor {
 		return Ext2Utils.get16(data, 14);		
 	}
 	
-	public void setFreeInodesCount(int count) throws IOException {
+	public void setFreeInodesCount(int count) {
 		Ext2Utils.set16(data, 14, count);
 		setDirty(true);
 	}
@@ -131,5 +135,4 @@ public class GroupDescriptor {
 	public void setDirty(boolean b) {
 		dirty = b;
 	}
-
 }
