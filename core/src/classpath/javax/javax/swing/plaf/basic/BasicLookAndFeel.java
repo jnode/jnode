@@ -205,15 +205,15 @@ public abstract class BasicLookAndFeel extends LookAndFeel
   private void loadResourceBundle(UIDefaults defaults)
   {
     ResourceBundle bundle;
-    Enumeration enum;
+    Enumeration e;
     String key;
     String value;
     bundle = ResourceBundle.getBundle("resources/basic");
     // Process Resources
-    enum = bundle.getKeys();
-    while (enum.hasMoreElements())
+    e = bundle.getKeys();
+    while (e.hasMoreElements())
       {
-        key = (String) enum.nextElement();
+        key = (String) e.nextElement();
         value = bundle.getString(key);
         defaults.put(key, value);
       }
