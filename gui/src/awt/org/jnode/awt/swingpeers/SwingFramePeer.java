@@ -260,10 +260,11 @@ final class SwingFramePeer extends SwingWindowPeer implements FramePeer, ISwingC
 		}
 
         public void reshape(int x, int y, int width, int height) {
-            int oldWidth = awtFrame.getWidth();
-            int oldHight = awtFrame.getHeight();
             super.reshape(x, y, width, height);
-            swingPeer.fireComponentEvent(oldWidth, oldHight, width, height);
+            //TODO fix it
+            Point p = awtFrame.getLocationOnScreen();
+            Insets ins = swingPeer.getInsets();
+            awtFrame.reshape(p.x + x, p.y + y, width + ins.left + ins.right, height + ins.top + ins.bottom);
         }
 
 
