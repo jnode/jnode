@@ -1,5 +1,5 @@
-/* java.util.zip.DeflaterEngine
-   Copyright (C) 2001 Free Software Foundation, Inc.
+/* DeflaterEngine.java --
+   Copyright (C) 2001, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,8 +37,9 @@ exception statement from your version. */
 
 package java.util.zip;
 
-class DeflaterEngine implements DeflaterConstants {
-  private final static int TOO_FAR = 4096;
+class DeflaterEngine implements DeflaterConstants
+{
+  private static final int TOO_FAR = 4096;
 
   private int ins_h;
 
@@ -220,7 +221,7 @@ class DeflaterEngine implements DeflaterConstants {
       }
   }
 
-  private final void updateHash() {
+  private void updateHash() {
     if (DEBUGGING)
       System.err.println("updateHash: "+strstart);
     ins_h = (window[strstart] << HASH_SHIFT) ^ window[strstart + 1];
@@ -230,7 +231,7 @@ class DeflaterEngine implements DeflaterConstants {
    * Inserts the current string in the head hash and returns the previous
    * value for this hash.
    */
-  private final int insertString() {
+  private int insertString() {
     short match;
     int hash = ((ins_h << HASH_SHIFT) ^ window[strstart + (MIN_MATCH -1)])
       & HASH_MASK;

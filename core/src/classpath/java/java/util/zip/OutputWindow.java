@@ -1,5 +1,5 @@
-/* java.util.zip.OutputWindow
-   Copyright (C) 2001 Free Software Foundation, Inc.
+/* OutputWindow.java --
+   Copyright (C) 2001, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -63,8 +63,7 @@ class OutputWindow
     window_end &= WINDOW_MASK;
   }
 
-
-  private final void slowRepeat(int rep_start, int len, int dist)
+  private void slowRepeat(int rep_start, int len, int dist)
   {
     while (len-- > 0)
       {
