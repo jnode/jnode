@@ -353,7 +353,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param index
 	 */
 	private final void dwstore(int jvmType, int index) {
-		final int disp = stackFrame.getWideEbpOffset(index);
+		final int disp = stackFrame.getWideEbpOffset(typeSizeInfo, index);
 
 		// Pin down (load) other references to this local
 		vstack.loadLocal(eContext, disp);
@@ -537,7 +537,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#endMethod()
 	 */
 	public void endMethod() {
-		stackFrame.emitTrailer(maxLocals);
+		stackFrame.emitTrailer(typeSizeInfo, maxLocals);
 	}
 
 	/**
@@ -1025,7 +1025,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	public final void visit_aload(int index) {
 		vstack.push(ifac.createLocal(JvmType.REFERENCE, stackFrame
-				.getEbpOffset(index)));
+				.getEbpOffset(typeSizeInfo, index)));
 	}
 
 	/**
@@ -1324,7 +1324,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	public final void visit_dload(int index) {
 		vstack.push(ifac.createLocal(JvmType.DOUBLE, stackFrame
-				.getWideEbpOffset(index)));
+				.getWideEbpOffset(typeSizeInfo, index)));
 	}
 
 	/**
@@ -1604,7 +1604,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	public final void visit_fload(int index) {
 		vstack.push(ifac.createLocal(JvmType.FLOAT, stackFrame
-				.getEbpOffset(index)));
+				.getEbpOffset(typeSizeInfo, index)));
 	}
 
 	/**
@@ -2204,7 +2204,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iinc(int, int)
 	 */
 	public final void visit_iinc(int index, int incValue) {
-		final int ebpOfs = stackFrame.getEbpOffset(index);
+		final int ebpOfs = stackFrame.getEbpOffset(typeSizeInfo, index);
 
 		// pin down other references to this local
 		vstack.loadLocal(eContext, ebpOfs);
@@ -2222,7 +2222,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	public final void visit_iload(int index) {
 		vstack.push(ifac.createLocal(JvmType.INT, stackFrame
-				.getEbpOffset(index)));
+				.getEbpOffset(typeSizeInfo, index)));
 	}
 
 	/**
@@ -2857,7 +2857,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	public final void visit_lload(int index) {
 		vstack.push(ifac.createLocal(JvmType.LONG, stackFrame
-				.getWideEbpOffset(index)));
+				.getWideEbpOffset(typeSizeInfo, index)));
 	}
 
 	/**
@@ -3446,7 +3446,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	public final void visit_ret(int index) {
 		// Calc EBP offset
-		final int ebpOfs = stackFrame.getEbpOffset(index);
+		final int ebpOfs = stackFrame.getEbpOffset(typeSizeInfo, index);
 
 		// Load ret & jmp
 		os.writeJMP(helper.BP, ebpOfs);
@@ -3810,7 +3810,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param index
 	 */
 	private final void wstore(int jvmType, int index) {
-		final int disp = stackFrame.getEbpOffset(index);
+		final int disp = stackFrame.getEbpOffset(typeSizeInfo, index);
 
 		// Pin down (load) other references to this local
 		vstack.loadLocal(eContext, disp);
