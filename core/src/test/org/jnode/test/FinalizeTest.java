@@ -14,6 +14,7 @@ public class FinalizeTest {
             new FinalizeTest(i);
         }
         Runtime.getRuntime().gc();
+        System.out.println("Done");
     }
     
     private final int i;

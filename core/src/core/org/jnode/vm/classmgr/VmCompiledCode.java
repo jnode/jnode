@@ -5,6 +5,7 @@ package org.jnode.vm.classmgr;
 
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.Address;
+import org.jnode.vm.compiler.NativeCodeCompiler;
 
 /**
  * @author epr
@@ -25,6 +26,8 @@ public final class VmCompiledCode extends AbstractCode {
 	private final VmCompiledExceptionHandler[] eTable;
 	/** Mapping between PC's and addresses */
 	private final VmAddressMap addressTable;
+	/** The compiler used to generate this code */
+	private final NativeCodeCompiler compiler;
 
 	/**
 	 * Create a new instance
@@ -38,6 +41,7 @@ public final class VmCompiledCode extends AbstractCode {
 	 * @param addressTable
 	 */
 	public VmCompiledCode(
+	        NativeCodeCompiler compiler,
 		VmByteCode bytecode,
 		Address nativeCode,
 		Object compiledCode,
@@ -45,6 +49,7 @@ public final class VmCompiledCode extends AbstractCode {
 		VmCompiledExceptionHandler[] eTable,
 		Address defaultExceptionHandler,
 		VmAddressMap addressTable) {
+	    this.compiler = compiler;
 		this.bytecode = bytecode;
 		this.nativeCode = nativeCode;
 		this.compiledCode1 = compiledCode;
@@ -149,4 +154,12 @@ public final class VmCompiledCode extends AbstractCode {
 	        return super.toString();
 	    }
 	}
+	
+    /**
+     * Gets the compiler that generated this code.
+     * @return Returns the compiler.
+     */
+    public final NativeCodeCompiler getCompiler() {
+        return this.compiler;
+    }
 }

@@ -72,7 +72,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements 
 		} else {
 			// Set the address of the abstract method code
 			final Address errorAddr = X86JumpTable.getJumpTableEntry(X86JumpTable.VM_INVOKE_ABSTRACT_OFS);
-			final VmCompiledCode code = new VmCompiledCode(null, errorAddr, null, 0, null, null, null);
+			final VmCompiledCode code = new VmCompiledCode(this, null, errorAddr, null, 0, null, null, null);
 			method.setCompiledCode(code, level);
 			return null;
 		}

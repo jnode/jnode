@@ -6,7 +6,7 @@ package org.jnode.vm.classmgr;
 /**
  * @author epr
  */
-public final class VmNormalClass extends VmClassType {
+public class VmNormalClass extends VmClassType {
 
 	/** The offsets of all reference variables in this class */
 	private int[] referenceOffsets;
@@ -17,11 +17,10 @@ public final class VmNormalClass extends VmClassType {
 	 * @param name
 	 * @param superClass
 	 * @param loader
-	 * @param primitive
 	 * @param typeSize
 	 */
-	protected VmNormalClass(String name, VmNormalClass superClass, VmClassLoader loader, boolean primitive, int typeSize) {
-		super(name, superClass, loader, primitive, typeSize);
+	protected VmNormalClass(String name, VmNormalClass superClass, VmClassLoader loader, int typeSize) {
+		super(name, superClass, loader, typeSize);
 		testClassType();
 	}
 

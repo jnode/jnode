@@ -45,16 +45,14 @@ public abstract class VmClassType extends VmType {
 	 * @param name
 	 * @param superClass
 	 * @param loader
-	 * @param primitive
 	 * @param typeSize
 	 */
 	public VmClassType(
 		String name,
 		VmNormalClass superClass,
 		VmClassLoader loader,
-		boolean primitive,
 		int typeSize) {
-		super(name, superClass, loader, primitive, typeSize);
+		super(name, superClass, loader, typeSize);
 	}
 
 	/**

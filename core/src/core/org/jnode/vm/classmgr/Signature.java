@@ -247,6 +247,9 @@ public class Signature {
 					throw new ClassFormatError(
 						"Unknown signature character " + ch);
 			}
+			if (vmClass == null) {
+			    throw new RuntimeException("vmClass is null for signature character " + ch);
+			}
 			list.add(vmClass);
 		}
 		return (VmType[])list.toArray(new VmType[list.size()]);
