@@ -1,5 +1,5 @@
-/* java.util.zip.DeflaterHuffman
-   Copyright (C) 2001 Free Software Foundation, Inc.
+/* DeflaterHuffman.java --
+   Copyright (C) 2001, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -59,7 +59,7 @@ class DeflaterHuffman
   private static final int[] BL_ORDER =
   { 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 };
 
-  private final static String bit4Reverse =
+  private static String bit4Reverse =
     "\000\010\004\014\002\012\006\016\001\011\005\015\003\013\007\017";
 
   class Tree {
@@ -571,7 +571,7 @@ class DeflaterHuffman
     blTree.reset();
   }
 
-  private final int l_code(int len) {
+  private int l_code(int len) {
     if (len == 255)
       return 285;
 
@@ -584,7 +584,7 @@ class DeflaterHuffman
     return code + len;
   }
 
-  private final int d_code(int distance) {
+  private int d_code(int distance) {
     int code = 0;
     while (distance >= 4)
       {

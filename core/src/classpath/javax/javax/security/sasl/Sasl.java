@@ -1,5 +1,5 @@
-/* Sasl.java
-   Copyright (C) 2003, Free Software Foundation, Inc.
+/* Sasl.java -- 
+   Copyright (C) 2003, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
-02111-1307 USA
+Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+02111-1307 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -38,13 +38,13 @@ exception statement from your version.  */
 
 package javax.security.sasl;
 
+import java.security.Provider;
+import java.security.Security;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
-import java.security.Security;
-import java.security.Provider;
 
 import javax.security.auth.callback.CallbackHandler;
 

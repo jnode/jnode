@@ -1,5 +1,5 @@
-/* java.util.zip.InflaterHuffmanTree
-   Copyright (C) 2001 Free Software Foundation, Inc.
+/* InflaterHuffmanTree.java --
+   Copyright (C) 2001, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,8 +37,10 @@ exception statement from your version. */
 
 package java.util.zip;
 
-public class InflaterHuffmanTree {
-  private final static int MAX_BITLEN = 15;
+public class InflaterHuffmanTree
+{
+  private static final int MAX_BITLEN = 15;
+  
   private short[] tree;
 
   public static InflaterHuffmanTree defLitLenTree, defDistTree;

@@ -1,4 +1,4 @@
-/* java.util.zip.ZipEntry
+/* ZipEntry.java --
    Copyright (C) 2001, 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -51,10 +51,10 @@ import java.util.Date;
  */
 public class ZipEntry implements ZipConstants, Cloneable
 {
-	private static int KNOWN_SIZE = 1;
-	private static int KNOWN_CSIZE = 2;
-	private static int KNOWN_CRC = 4;
-	private static int KNOWN_TIME = 8;
+  private static final int KNOWN_SIZE   = 1;
+  private static final int KNOWN_CSIZE  = 2;
+  private static final int KNOWN_CRC    = 4;
+  private static final int KNOWN_TIME   = 8;
 
 	private static Calendar cal;
 
@@ -71,15 +71,14 @@ public class ZipEntry implements ZipConstants, Cloneable
 	int flags; /* used by ZipOutputStream */
 	int offset; /* used by ZipFile and ZipOutputStream */
 
-
 	/**
 	 * Compression method.  This method doesn't compress at all.
 	 */
-	public final static int STORED = 0;
+  public static final int STORED = 0;
 	/**
 	 * Compression method.  This method uses the Deflater.
 	 */
-	public final static int DEFLATED = 8;
+  public static final int DEFLATED = 8;
 
 	/**
 	 * Creates a zip entry with the given name.
