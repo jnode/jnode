@@ -4,11 +4,13 @@
 package org.jnode.boot;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.jnode.plugin.PluginException;
+import org.jnode.plugin.PluginLoader;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.system.BootLog;
 import org.jnode.system.MemoryResource;
@@ -48,12 +50,14 @@ public class InitJarProcessor {
 			return;
 		}
 
+		final InitJarPluginLoader loader = new InitJarPluginLoader();
 		for (Enumeration e = jarFile.entries(); e.hasMoreElements();) {
 			final JarEntry entry = (JarEntry) e.nextElement();
 			if (entry.getName().endsWith(".jar")) {
 				try {
 					// Load it
-					piRegistry.loadPlugin(jarFile.getInputStream(entry));
+				    loader.setIs(jarFile.getInputStream(entry));
+					piRegistry.loadPlugin(loader, "", "", false);
 				} catch (IOException ex) {
 					BootLog.error("Cannot load " + entry.getName(), ex);
 				} catch (PluginException ex) {
@@ -61,6 +65,27 @@ public class InitJarProcessor {
 				}
 			}
 		}
+	}
+	
+	static class InitJarPluginLoader extends PluginLoader {
+	    private InputStream is;
+	    public InitJarPluginLoader() {
+	    }
+	    
+	    
+	    
+        /**
+         * @see org.jnode.plugin.PluginLoader#getPluginStream(java.lang.String, java.lang.String)
+         */
+        public InputStream getPluginStream(String pluginId, String pluginVersion) {
+            return is;
+        }
+        /**
+         * @param is The is to set.
+         */
+        final void setIs(InputStream is) {
+            this.is = is;
+        }
 	}
 	
 	/**

@@ -19,6 +19,7 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
+import org.jnode.plugin.PluginLoaderManager;
 import org.jnode.plugin.PluginManager;
 import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.PluginRegistry;
@@ -29,10 +30,12 @@ import org.jnode.system.BootLog;
  * @author epr
  * @author Matt Paine.
  */
-public class DefaultPluginManager extends PluginManager {
+public final class DefaultPluginManager extends PluginManager {
 
     /** The registry of plugins */
     private final PluginRegistry registry;
+    /** The loader manager */
+    private final DefaultPluginLoaderManager loaderMgr;
 
     private static final int START_TIMEOUT = 10000;
 
@@ -43,6 +46,7 @@ public class DefaultPluginManager extends PluginManager {
      * @param registry
      */
     public DefaultPluginManager(PluginRegistry registry) throws PluginException {
+        this.loaderMgr = new DefaultPluginLoaderManager();
         this.registry = registry;
         try {
             InitialNaming.bind(NAME, this);
@@ -50,6 +54,14 @@ public class DefaultPluginManager extends PluginManager {
             throw new PluginException("Cannot register name", ex);
         }
     }
+
+    /**
+	 * Gets the plugin loader manager.
+	 */
+	public final PluginLoaderManager getLoaderManager() {
+	    return loaderMgr;
+	}
+
 
     /**
      * Gets the plugin registry

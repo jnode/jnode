@@ -28,7 +28,7 @@ import org.jnode.vm.BootableObject;
 public class PluginJar implements BootableObject {
 
     /** The descriptor of this file */
-    private final PluginDescriptor descriptor;
+    private final PluginDescriptorModel descriptor;
 
     /** The bytes of the plugin jar file */
     private final byte[] pluginJarData;
@@ -159,6 +159,15 @@ public class PluginJar implements BootableObject {
             System.out.println("ioex: " + ex.getMessage());
             return null;
         }
+    }
+
+    /**
+     * Gets the descriptor of this plugin-jar file.
+     * 
+     * @return Returns the descriptor.
+     */
+    final PluginDescriptorModel getDescriptorModel() {
+        return this.descriptor;
     }
 
     /**

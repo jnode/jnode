@@ -579,7 +579,7 @@ public final class VmSystem {
     // ------------------------------------------
 
     public static void arrayCopy(Object src, int srcPos, Object dst,
-            int dstPos, int length) {
+            int dstPos, int length) throws PragmaPrivilegedAction {
         Class src_class = src.getClass();
         Class dst_class = dst.getClass();
 
