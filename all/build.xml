@@ -3,7 +3,8 @@
   <property name="root.dir"            value="${basedir}/.."/>
   <property name="build.dir"           value="${basedir}/build"/>
   <property name="descriptors.dir"     value="${build.dir}/descriptors"/>
-   
+  <property	name="backup.dir"          value="${build.dir}/backup"/>
+     
   <property name="jnode-builder.jar"   value="${build.dir}/descriptors/jnode-builder.jar"/>
   <property name="jnode-core.jar"      value="${root.dir}/core/build/classes"/>
   <property name="jnode-fs.jar"        value="${root.dir}/fs/build/classes"/>
@@ -185,6 +186,18 @@
     <ant target="wsupload" dir="${root.dir}/docs" inheritall="on" inheritrefs="on"/>
   </target>
 
-</project>
+<!-- Backup CVS files -->
+ <target name="backup">
+    <mkdir dir="${backup.dir}"/>
+    <tstamp>
+      <format property="date" pattern="dd-MM-yyyy"/>
+    </tstamp>
+    <get src="http://cvs.sourceforge.net/cvstarballs/jnode-cvsroot.tar.bz2" 
+         dest="${backup.dir}/jnode-cvsroot-${date}.tar.bz2" 
+         usetimestamp="true"
+         verbose="true"/>  
+  </target>
+  
+ </project>
 
 
