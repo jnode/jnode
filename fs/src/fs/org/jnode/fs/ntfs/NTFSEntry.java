@@ -3,15 +3,11 @@
  */
 package org.jnode.fs.ntfs;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.jnode.fs.FSAccessRights;
-import org.jnode.fs.FSDirectory;
-import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSFile;
+import org.jnode.fs.*;
 import org.jnode.fs.FileSystem;
-import org.jnode.fs.ntfs.attributes.NTFSFileNameAttribute;
-import org.jnode.fs.ntfs.attributes.NTFSIndexEntry;
+import org.jnode.fs.ntfs.attributes.*;
 
 /**
  * @author vali
@@ -21,18 +17,13 @@ import org.jnode.fs.ntfs.attributes.NTFSIndexEntry;
  */
 public class NTFSEntry implements FSEntry {
 
+	private FSObject cachedFSObject = null;
 	private NTFSIndexEntry indexEntry = null;
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FSEntry#getName()
 	 */
 	public NTFSEntry(NTFSFileRecord fileRecord)
 	{
-		this.indexEntry = new NTFSIndexEntry(fileRecord);
-		
-		NTFSFileNameAttribute att = (NTFSFileNameAttribute) fileRecord.getAttribute(NTFSFileRecord.$FILE_NAME);
-		
-		indexEntry.setFileName(att.getFileName());
-		indexEntry.setFileNameFlags(att.getFileNameFlags());
 	}
 	
 	public NTFSEntry(NTFSIndexEntry indexEntry)
@@ -98,8 +89,15 @@ public class NTFSEntry implements FSEntry {
 	 * @see org.jnode.fs.FSEntry#getFile()
 	 */
 	public FSFile getFile() throws IOException {
-		// TODO Auto-generated method stub
-		return new NTFSFile(indexEntry);
+		if(this.isFile())
+		{	
+			if(cachedFSObject == null)
+				cachedFSObject = new NTFSFile(indexEntry);
+			return (FSFile) cachedFSObject;
+		}
+		else
+			return null;
+		
 	}
 
 	/* (non-Javadoc)
@@ -107,7 +105,11 @@ public class NTFSEntry implements FSEntry {
 	 */
 	public FSDirectory getDirectory() throws IOException {
 		if(this.isDirectory())
-			return new NTFSDirectory(this.indexEntry.getFileRecord());
+		{	
+			if(cachedFSObject == null)
+				cachedFSObject = new NTFSDirectory(this.getFileRecord().getVolume().getIndexedFileRecord(indexEntry));
+			return (FSDirectory) cachedFSObject;
+		}
 		else
 			return null;
 	}
@@ -139,9 +141,23 @@ public class NTFSEntry implements FSEntry {
 	/**
 	 * @return Returns the fileRecord.
 	 */
-	public NTFSFileRecord getFileRecord() {
-		return this.indexEntry.getFileRecord();
+	public NTFSFileRecord getFileRecord() throws IOException {
+		return indexEntry.getParentFileRecord().getVolume().getIndexedFileRecord(indexEntry);
 	}
 
 
+	/**
+	 * @return Returns the indexEntry.
+	 */
+	public NTFSIndexEntry getIndexEntry()
+	{
+		return indexEntry;
+	}
+	/**
+	 * @param indexEntry The indexEntry to set.
+	 */
+	public void setIndexEntry(NTFSIndexEntry indexEntry)
+	{
+		this.indexEntry = indexEntry;
+	}
 }

@@ -4,9 +4,10 @@
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.jnode.driver.block.BlockDeviceAPI;
+import org.jnode.fs.ntfs.attributes.NTFSIndexEntry;
+import org.jnode.fs.ntfs.attributes.NTFSNonResidentAttribute;
 
 
 /**
@@ -17,6 +18,12 @@ import org.jnode.driver.block.BlockDeviceAPI;
  */
 public class NTFSVolume
 {
+
+	public static byte LONG_FILE_NAMES = 0x01;
+	public static byte DOS_8_3 = 0x02;
+	
+	private byte currentNameSpace = LONG_FILE_NAMES;
+	
 	private NTFSBootRecord bootRecord = null;
 	private BlockDeviceAPI api = null;
 	/**
@@ -104,115 +111,108 @@ public class NTFSVolume
 		);
 		
 	}
-	public Iterator getNTFSIterator() throws IOException
+	
+	public NTFSFileRecord getIndexedFileRecord(NTFSIndexEntry indexEntry) throws IOException
 	{
-		if(this.getBootRecord().getBytesPerFileRecord() < this.getClusterSize())
-			// loop over bytes from sector
-			return new Iterator()
-			{
-	
-				int offset = 0;
-				int clusterOffset = 0;
-				NTFSFileRecord fileRecord = NTFSVolume.this.getMFTRecord();
-				
-			    byte[] buffer = NTFSVolume.this.getMFTRecord().getAttribute(NTFSFileRecord.$DATA).readVCN(0,1,NTFSVolume.this.getClusterSize()); 
-				
-				public boolean hasNext() 
-				{
-					return new String(buffer,offset,4).equals("FILE");
-				}
-	
-				public Object next() {
-					try {
-						fileRecord = new NTFSFileRecord(
-											NTFSVolume.this,
-											NTFSUTIL.extractSubBuffer(
-														buffer
-														,offset,
-														NTFSVolume.this.getBootRecord().getBytesPerFileRecord())
-						);
-						
-						offset += NTFSVolume.this.getBootRecord().getBytesPerFileRecord();
-						
-						if(offset >= NTFSVolume.this.getClusterSize())
-						{	
-							clusterOffset++;
-							offset = 0;
-							buffer = NTFSVolume.this.getMFTRecord().getAttribute(NTFSFileRecord.$DATA).readVCN(clusterOffset,1,NTFSVolume.this.getClusterSize());
-						}
-						
-					} catch (IOException e) {
-						throw new RuntimeException(e);
-					}
-				
-					return fileRecord;
-				}
-	
-				public void remove() {
-					throw new UnsupportedOperationException("not yet implemented");
-				}
-			
-			};
-		else
-			return new Iterator()
-			{
-	
-				int clusterOffset = 0;
-				
-				NTFSFileRecord fileRecord = NTFSVolume.this.getMFTRecord();
-				//number of VCNS
-				int VCNNumber = fileRecord.getAttribute(NTFSFileRecord.$DATA).getNumberOfVCN();
-				
-				byte[] buffer = NTFSVolume.this.getMFTRecord().getAttribute(NTFSFileRecord.$DATA).readVCN(
-						clusterOffset,
-						NTFSVolume.this.getBootRecord().getBytesPerFileRecord() / NTFSVolume.this.getClusterSize(),
-						NTFSVolume.this.getClusterSize());
-				
-				
-				public boolean hasNext() 
-				{
-					if(clusterOffset < VCNNumber && new String(buffer,0,4).equals(NTFSFileRecord.MAGIC_NUMBER)) 
-					 	return true;
-					else
-						return false;
-				}
-	
-				public Object next() {
-					try {
-							fileRecord = new NTFSFileRecord(
-												NTFSVolume.this,
-															buffer
-							);
-						clusterOffset+= NTFSVolume.this.getBootRecord().getBytesPerFileRecord() / NTFSVolume.this.getClusterSize();
-						buffer = NTFSVolume.this.getMFTRecord().getAttribute(NTFSFileRecord.$DATA).readVCN(
-								clusterOffset,
-								NTFSVolume.this.getBootRecord().getBytesPerFileRecord() / NTFSVolume.this.getClusterSize(),
-								NTFSVolume.this.getClusterSize());
-					} catch (IOException e) {
-						throw new RuntimeException(e);
-					}
-				
-					return fileRecord;
-				}
-	
-				public void remove() {
-					throw new UnsupportedOperationException("not yet implemented");
-				}
-			
-			};
-}
+		// read the MFTdatathis
+		NTFSNonResidentAttribute dataAttribute = (NTFSNonResidentAttribute) this.getMFTRecord().getAttribute(NTFSFileRecord.$DATA);
+		// find out the VCN
+		
+		int offset = this.getBootRecord().getBytesPerFileRecord() * (indexEntry.getFileReferenceNumber());
+		
+		// read the buffer
+		byte [] buffer = null;
+		
+		buffer = dataAttribute.readVCN(
+				offset / this.getClusterSize(),
+				this.getBootRecord().getBytesPerFileRecord() < this.getClusterSize() ? 1 :  this.getBootRecord().getBytesPerFileRecord() / this.getClusterSize() 
+		);
+		return 
+			new NTFSFileRecord(
+					this,
+					NTFSUTIL.extractSubBuffer(
+								buffer,
+								offset % this.getClusterSize(),
+								this.getBootRecord().getBytesPerFileRecord())
+			); 
+		
+	}
 	public NTFSFileRecord getRootDirectory() throws IOException
 	{
-		NTFSFileRecord  fileRecord = null;
-		for(Iterator itr = this.getNTFSIterator();itr.hasNext();)
+		// first find the filerecord for root 
+		NTFSNonResidentAttribute dataAttribute = ((NTFSNonResidentAttribute)getMFTRecord().getAttribute(NTFSFileRecord.$DATA));
+		
+		int bytesPerFileRecord = this.getBootRecord().getBytesPerFileRecord();
+		int clusterSize = this.getClusterSize();
+		
+		int howmanyToRead = 1;
+		
+		if( bytesPerFileRecord > clusterSize)
 		{
-			fileRecord = (NTFSFileRecord) itr.next();	
-			String fileName = fileRecord.getFileName();
-			if(fileName.equals("."))
+			howmanyToRead = bytesPerFileRecord / clusterSize; 
+		}
+		
+		int vcn = 0;
+		
+		byte[] data = dataAttribute.readVCN(
+					vcn,
+					howmanyToRead
+			);	
+
+		int offset = 0;
+		
+		while(true)
+		{
+			
+			NTFSFileRecord record = new NTFSFileRecord(
+					this,
+					NTFSUTIL.extractSubBuffer(
+						data,
+						offset,
+						bytesPerFileRecord
+					)
+				);
+			
+			if(record.isDirectory() && record.getFileName().equals("."))
 			{
-				return fileRecord; 
+				return record;
 			}
-		}	
-		return null;
+			
+			if(bytesPerFileRecord < clusterSize)
+			{	
+				offset += bytesPerFileRecord;
+				if(offset == clusterSize)
+				{
+					vcn += howmanyToRead;
+					data = dataAttribute.readVCN(
+							vcn,
+							howmanyToRead
+					);
+					offset=0;
+				}
+			}
+			else
+			{
+				vcn += howmanyToRead;
+				data = dataAttribute.readVCN(
+						vcn,
+						howmanyToRead
+				);
+			}
+		}
+	}
+	/**
+	 * @return Returns the currentNameSpace.
+	 */
+	public byte getCurrentNameSpace()
+	{
+		return currentNameSpace;
+	}
+	/**
+	 * @param currentNameSpace The currentNameSpace to set.
+	 */
+	public void setCurrentNameSpace(byte currentNameSpace)
+	{
+		this.currentNameSpace = currentNameSpace;
 	}
 }

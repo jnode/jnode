@@ -53,7 +53,10 @@ public class NTFSFileSystem implements FileSystem
 	 */
 	public FSEntry getRootEntry() throws IOException
 	{
-		return new NTFSEntry(volume.getRootDirectory());
+		return new NTFSDirectory(
+				volume.getRootDirectory()
+		).getEntry(".");
+		
 	}
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FileSystem#close()

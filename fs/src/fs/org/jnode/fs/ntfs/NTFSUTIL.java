@@ -37,7 +37,7 @@ public class NTFSUTIL {
 		int b7 = abArray[offset + 1] & 0xFF;
 		int b8 = abArray[offset + 0] & 0xFF;
 		
-		return Math.abs(
+		return 
 				(b1 << 56) | 
 				(b2 << 48) | 
 				(b3 << 40) | 
@@ -45,7 +45,7 @@ public class NTFSUTIL {
 				(b5 << 24) | 
 				(b6 << 16) | 
 				(b7 << 8) | 
-				b8);
+				b8;
 	}
 
 	public static byte[] extractSubBuffer(byte[] buffer , int offset,int length)
@@ -67,6 +67,23 @@ public class NTFSUTIL {
 				(b2 << 16) | 
 				(b3 << 8) | 
 				b4) & 0xFFFFFFFF;
+	}
+	public static int LE_READ_U48_INT (byte[] abArray, int offset)
+	{
+		int b1 = abArray[offset + 5] & 0x000000FF;
+		int b2 = abArray[offset + 4] & 0x000000FF;
+		int b3 = abArray[offset + 3] & 0x000000FF;
+		int b4 = abArray[offset + 2] & 0x000000FF;
+		int b5 = abArray[offset + 1] & 0x000000FF;
+		int b6 = abArray[offset + 0] & 0x000000FF;
+		
+		return (
+				(b1 << 40) | 
+				(b2 << 32) | 
+				(b3 << 24) | 
+				(b4 << 16) | 
+				(b5 << 8) | 
+				b6) & 0xFFFFFFFF;
 	}
 	public static int LE_READ_32_INT (byte[] abArray, int offset)
 	{

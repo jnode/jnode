@@ -20,30 +20,19 @@ public class NTFSFile implements FSFile {
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FSFile#getLength()
 	 */
-	private NTFSIndexEntry indexEntry = null;
 	private NTFSFileRecord fileRecord = null;
 	
-	public NTFSFile(NTFSIndexEntry indexEntry)
+	public NTFSFile(NTFSIndexEntry indexEntry) throws IOException
 	{
-		this.indexEntry = indexEntry;
+		fileRecord = indexEntry.getParentFileRecord().getVolume().getIndexedFileRecord(indexEntry);
 	}
 	
 	public long getLength() {
-		// TODO Auto-generated method stub
-		if(indexEntry != null)
-			return indexEntry.getRealFileSize();
-		if(fileRecord == null)
-				fillRecordSet();
 		if(fileRecord!= null)
 			return fileRecord.getRealSize();
 		return 0;
 	}
 
-	private void fillRecordSet()
-	{
-		if (indexEntry!= null)
-			this.fileRecord = indexEntry.getIndexedNTFSFileRecord();
-	}
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FSFile#setLength(long)
 	 */
