@@ -428,11 +428,11 @@ public class Tetris extends Panel implements KeyListener {
 			wnd.show();
 			tetris.requestFocus();
 			tetris.newGame();
-			Thread.sleep(sleep * 1000);
+//			Thread.sleep(sleep * 1000);
 
-			wnd.hide();
+//			wnd.hide();
 		} finally {
-			wnd.dispose();
+//			wnd.dispose();
 		}
 	}
 }

@@ -244,9 +244,9 @@ public class AWTTest {
             
             wnd.show();
 
-            while (wnd.isVisible()) {
-            	Thread.sleep(500);
-            }
+//            while (wnd.isVisible()) {
+//            	Thread.sleep(500);
+//            }
             
 
 //            Font f = wnd.getFont();
@@ -267,13 +267,13 @@ public class AWTTest {
 //            	}
 //            }
             
-            Thread.sleep(5000);
+//            Thread.sleep(5000);
 
-            wnd.hide();
+//            wnd.hide();
         }catch(Throwable t){
             t.printStackTrace();
         } finally {
-            wnd.dispose();
+//            wnd.dispose();
         }
     }
 }
