@@ -31,6 +31,7 @@ import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.system.BootLog;
 import org.jnode.vm.JvmType;
+import org.jnode.vm.Vm;
 import org.jnode.vm.bytecode.BasicBlock;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.bytecode.TypeStack;
@@ -578,7 +579,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 				+ "notInstanceOf");
 
 		if (!type.isInitialized()) {
-			helper.writeGetStaticsEntry(curInstrLabel, tmpr, type);
+            if (os.isCode32()) {
+                helper.writeGetStaticsEntry(curInstrLabel, tmpr, type);
+            } else {
+                helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)tmpr, type);                
+            }
 			helper.writeClassInitialize(curInstrLabel, tmpr, type);
 		}
 
@@ -593,15 +598,15 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			os.writeJCC(notInstanceOfLabel, X86Constants.JZ);
 		}
 		// TIB -> tmp
-		os.writeMOV(INTSIZE, tmpr, objectr, tibOffset);
+		os.writeMOV(helper.ADDRSIZE, tmpr, objectr, tibOffset);
 		// SuperClassesArray -> tmp
-		os.writeMOV(INTSIZE, tmpr, tmpr, arrayDataOffset
+		os.writeMOV(helper.ADDRSIZE, tmpr, tmpr, arrayDataOffset
 				+ (TIBLayout.SUPERCLASSES_INDEX * slotSize));
 		// Length of superclassarray must be >= depth
 		os.writeCMP_Const(BITS32, tmpr, arrayLengthOffset, depth);
 		os.writeJCC(notInstanceOfLabel, X86Constants.JNA);
 		// Get superClassesArray[depth] -> objectr
-		os.writeMOV(INTSIZE, tmpr, tmpr, arrayDataOffset + (depth << 2));
+		os.writeMOV(helper.ADDRSIZE, tmpr, tmpr, arrayDataOffset + (depth * slotSize));
 		// Compare objectr with classtype
 		os.writeCMP(helper.STATICS, staticsOfs, tmpr);
 		if (resultr != null) {
@@ -633,20 +638,27 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		final Label notInstanceOfLabel = new Label(this.curInstrLabel
 				+ "notInstanceOf");
 
+        if (Vm.VerifyAssertions) {
+            Vm._assert(objectr.getSize() == helper.ADDRSIZE, "objectr size");
+            Vm._assert(typer.getSize() == helper.ADDRSIZE, "typer size");
+            Vm._assert(tmpr.getSize() == helper.ADDRSIZE, "tmpr size");
+            Vm._assert(cntr.getSize() == BITS32, "cntr size");
+        }
+        
 		if (!skipNullTest) {
 			/* Is objectref null? */
 			os.writeTEST(objectr, objectr);
 			os.writeJCC(notInstanceOfLabel, X86Constants.JZ);
 		}
 		/* TIB -> tmp */
-		os.writeMOV(INTSIZE, tmpr, objectr, tibOffset);
+		os.writeMOV(helper.ADDRSIZE, tmpr, objectr, tibOffset);
 		/* SuperClassesArray -> tmp */
-		os.writeMOV(INTSIZE, tmpr, tmpr, arrayDataOffset
+		os.writeMOV(helper.ADDRSIZE, tmpr, tmpr, arrayDataOffset
 				+ (TIBLayout.SUPERCLASSES_INDEX * slotSize));
 		/* SuperClassesArray.length -> cntr */
-		os.writeMOV(INTSIZE, cntr, tmpr, arrayLengthOffset);
+		os.writeMOV(helper.ADDRSIZE, cntr, tmpr, arrayLengthOffset);
 		/* &superClassesArray[cnt-1] -> tmpr */
-		os.writeLEA(tmpr, tmpr, cntr, 4, arrayDataOffset - 4);
+		os.writeLEA(tmpr, tmpr, cntr, slotSize, arrayDataOffset - slotSize);
 
 		os.setObjectRef(loopLabel);
 		// cmp superClassesArray[index],type
@@ -1019,11 +1031,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		// Push all, since we're going to call other methods
 		vstack.push(eContext);
 
-		// Claim EAX, we're going to use it later
-		L1AHelper.requestRegister(eContext, X86Register.EAX);
+		// Claim EAX/RAX, we're going to use it later
+		L1AHelper.requestRegister(eContext, helper.AAX);
 		// Request tmp register
 		final GPR classr = (GPR) L1AHelper.requestRegister(eContext,
-				JvmType.INT, false);
+				JvmType.REFERENCE, false);
 
 		// Pop
 		final IntItem cnt = vstack.popInt();
@@ -1036,7 +1048,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		writeResolveAndLoadClassToReg(classRef, classr);
 
 		// Release EAX so it can be used by invokeJavaMethod
-		L1AHelper.releaseRegister(eContext, X86Register.EAX);
+		L1AHelper.releaseRegister(eContext, helper.AAX);
 
 		stackFrame.writePushMethodRef();
 		os.writePUSH(classr); /* Class */
@@ -1147,7 +1159,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			// ClassRef is an interface or array, do the slow test
 
 			// Pre-claim ECX
-			L1AHelper.requestRegister(eContext, X86Register.EAX);
+			L1AHelper.requestRegister(eContext, helper.AAX);
 
 			// check that top item is a reference
 			final RefItem ref = vstack.popRef();
@@ -1155,11 +1167,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			// Load the ref
 			ref.load(eContext);
 			final GPR refr = ref.getRegister();
-			final GPR classr = X86Register.EAX;
+			final GPR classr = helper.AAX;
 			final GPR cntr = (GPR) L1AHelper.requestRegister(eContext,
 					JvmType.INT, false);
 			final GPR tmpr = (GPR) L1AHelper.requestRegister(eContext,
-					JvmType.INT, false);
+					JvmType.REFERENCE, false);
 
 			// Resolve the class
 			writeResolveAndLoadClassToReg(classRef, classr);
@@ -1191,8 +1203,8 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		} else {
 			// classRef is a class, do the fast test
 
-			// Pre-claim EAX
-			L1AHelper.requestRegister(eContext, X86Register.EAX);
+			// Pre-claim EAX/RAX
+			L1AHelper.requestRegister(eContext, helper.AAX);
 
 			// check that top item is a reference
 			final RefItem ref = vstack.popRef();
@@ -1201,7 +1213,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			ref.load(eContext);
 			final GPR refr = ref.getRegister();
 			final GPR tmpr = (GPR) L1AHelper.requestRegister(eContext,
-					JvmType.INT, false);
+					JvmType.REFERENCE, false);
 
 			final Label okLabel = new Label(this.curInstrLabel + "cc-ok");
 
@@ -1214,7 +1226,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			// Not instanceof
 
 			// Release temp registers here, so invokeJavaMethod can use it
-			L1AHelper.releaseRegister(eContext, X86Register.EAX);
+			L1AHelper.releaseRegister(eContext, helper.AAX);
 			L1AHelper.releaseRegister(eContext, tmpr);
 
 			// Call SoftByteCodes.systemException
@@ -3697,11 +3709,17 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	private final void wreturn(int jvmType) {
 		final WordItem val = (WordItem) vstack.pop(jvmType);
-
+		final GPR reg;
+        if (os.isCode32() || (jvmType != JvmType.REFERENCE)) {
+            reg = X86Register.EAX;
+        } else {
+            reg = X86Register.RAX;
+        }
+        
 		// Return value must be in EAX
-		if (!val.uses(X86Register.EAX)) {
-			L1AHelper.requestRegister(eContext, X86Register.EAX, val);
-			val.loadTo(eContext, X86Register.EAX);
+		if (!val.uses(reg)) {
+			L1AHelper.requestRegister(eContext, reg, val);
+			val.loadTo(eContext, reg);
 		}
 
 		// Release
