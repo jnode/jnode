@@ -27,7 +27,8 @@ public class HelpCommand {
 			new Parameter[] { PARAM_COMMAND });
 
 	public static void main(String[] args)
-	throws NameNotFoundException {
+	throws NameNotFoundException,
+            HelpException {
 		Help.Info info = HELP_INFO; // defaults to print own help
 
                 ParsedArguments cmdLine = HELP_INFO.parse(args);

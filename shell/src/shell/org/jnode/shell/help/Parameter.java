@@ -36,6 +36,14 @@ public class Parameter extends CommandLineElement {
 		this(ANONYMOUS, NO_DESCRIPTION, argument, optional);
 	}
 
+	/**
+	 * A non-optional parameter
+	 * @param argument
+	 */
+	public Parameter(Argument argument) {
+		this(ANONYMOUS, NO_DESCRIPTION, argument, MANDATORY);
+	}
+
 	public final boolean isAnonymous() {
 		return ANONYMOUS.equals(getName());
 	}

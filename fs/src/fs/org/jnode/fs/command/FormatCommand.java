@@ -21,6 +21,7 @@ import org.jnode.shell.help.OptionArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
+import org.jnode.shell.help.SyntaxErrorException;
 
 /**
  * @author gbin
@@ -52,7 +53,7 @@ public class FormatCommand {
                     "Format a block device with a specified type",
                     new Parameter[] { PARAM_TYPE, PARAM_FS, PARAM_DEVICE})});
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SyntaxErrorException {
         try {
             ParsedArguments cmdLine = HELP_INFO.parse(args);
 
