@@ -4,8 +4,8 @@
 package org.jnode.fs.ext2;
 
 /**
- * @author Andras Nagy
- * every method copied from DosUtils
+ * @author epr
+ * (every method copied from DosUtils)
  */
 public class Ext2Utils {
 	/**
@@ -50,7 +50,7 @@ public class Ext2Utils {
 	 * Can't read from blocks bigger in size than 2GB (32bit signed int)
 	 * 
 	 * @param offset
-	 * @return int
+	 * @return long
 	 */	
 	public static long get32(byte[] data, int offset) {
 		int b1 = data[offset] & 0xFF;
@@ -64,7 +64,7 @@ public class Ext2Utils {
 	 * Sets an unsigned 32-bit word at a given offset
 	 * @param offset
 	 */
-	public static void set32(byte[] data, int offset, int value) {
+	public static void set32(byte[] data, int offset, long value) {
 		data[offset] = (byte)(value & 0xFF);
 		data[offset+1] = (byte)((value >> 8) & 0xFF);
 		data[offset+2] = (byte)((value >> 16) & 0xFF);

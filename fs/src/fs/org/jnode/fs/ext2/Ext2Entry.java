@@ -5,6 +5,7 @@ package org.jnode.fs.ext2;
 
 import java.io.IOException;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
@@ -25,17 +26,21 @@ import org.jnode.fs.FileSystem;
  */
 public class Ext2Entry implements FSEntry{
 
+	private final Logger log = Logger.getLogger(getClass());
 	private INode iNode=null;
 	private String name=null;
 	private int type;
 	private boolean valid;
-	private static final Logger log = Logger.getLogger(Ext2Entry.class);
-	
-	public Ext2Entry(INode iNode, String name, int type) {
+	private Ext2FileSystem fs;
+
+	public Ext2Entry(INode iNode, String name, int type, Ext2FileSystem fs) {
 		this.iNode = iNode;
 		this.name  = name;
 		this.type  = type;
 		this.valid = true;
+		this.fs    = fs;
+		
+		log.setLevel(Level.INFO);
 		
 		log.debug("Ext2Entry(iNode, name): name="+name+
 			(isDirectory()?" is a directory ":"")+
@@ -55,7 +60,7 @@ public class Ext2Entry implements FSEntry{
 	 */
 	public FSDirectory getDirectory() throws IOException {
 		if(isDirectory())
-			return new Ext2Directory( iNode );
+			return new Ext2Directory( iNode, fs );
 		else
 			throw new IOException("Not a directory");
 	}
@@ -73,7 +78,7 @@ public class Ext2Entry implements FSEntry{
 	/**
 	 * @see org.jnode.fs.FSEntry#getLastModified()
 	 */
-	public long getLastModified() {
+	public long getLastModified() throws IOException {
 		return 0;
 	}
 
