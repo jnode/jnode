@@ -22,7 +22,6 @@
 package org.jnode.driver.chipset.i440BX;
 
 import org.jnode.driver.Driver;
-import org.jnode.driver.acpi.ACPI;
 import org.jnode.driver.pci.PCIDevice;
 import org.jnode.driver.smbus.SMBus;
 import org.jnode.driver.smbus.SMBusControler;
@@ -51,7 +50,6 @@ public class i82371AB_ACPI extends Driver {
 	PCIDevice device = null;
 	SMBus smbus = null;
 	SMBusControler smbControler = null;
-	ACPI acpi;
 
 	public i82371AB_ACPI() {
 	}
