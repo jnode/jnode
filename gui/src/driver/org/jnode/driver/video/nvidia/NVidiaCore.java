@@ -198,12 +198,15 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 	 * @see org.jnode.driver.video.Surface#close()
 	 */
 	public synchronized void close() {
+	    log.debug("close");
 		hwCursor.closeCursor();
 		final DpmsState dpmsState = getDpms();
-		//log.debug("Old DPMS state: " + dpmsState);
+		log.debug("Old DPMS state: " + dpmsState);
 		setDpms(DpmsState.OFF);
 		vgaIO.unlock();
+	    log.debug("restore old VGA state");
 		oldVgaState.restoreToVGA(vgaIO);
+	    log.debug("restore DPMS state");
 		setDpms(dpmsState);
 
 		// For debugging purposes
@@ -214,6 +217,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 
 		driver.close(this);
 		super.close();
+		log.debug("End of close");
 	}
 
 	/**

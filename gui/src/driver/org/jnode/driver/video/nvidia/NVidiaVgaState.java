@@ -3,8 +3,6 @@
  */
 package org.jnode.driver.video.nvidia;
 
-import java.awt.image.IndexColorModel;
-
 import org.jnode.driver.video.vgahw.VgaIO;
 import org.jnode.driver.video.vgahw.VgaState;
 import org.jnode.util.NumberUtils;
@@ -48,10 +46,9 @@ public class NVidiaVgaState extends VgaState implements NVidiaConstants {
 	 * @param gra
 	 * @param att
 	 * @param misc
-	 * @param cm
 	 */
-	public NVidiaVgaState(int[] seq, int[] crt, int[] gra, int[] att, int misc, IndexColorModel cm) {
-		super(seq, crt, gra, att, misc, cm);
+	public NVidiaVgaState(int[] seq, int[] crt, int[] gra, int[] att, int misc) {
+		super(seq, crt, gra, att, misc, null);
 	}
 
 	/**
@@ -145,6 +142,7 @@ public class NVidiaVgaState extends VgaState implements NVidiaConstants {
 	 */
 	public void restoreToVGA(VgaIO vgaIO) {
 		final NVidiaVgaIO io = (NVidiaVgaIO) vgaIO;
+		io.unlock();
 		super.restoreToVGA(io);
 		io.unlock();
 		if (loaded) {

@@ -5,6 +5,7 @@ package org.jnode.driver.video.vgahw;
 
 import java.awt.image.IndexColorModel;
 
+import org.apache.log4j.Logger;
 import org.jnode.system.MemoryResource;
 import org.jnode.util.NumberUtils;
 
@@ -13,6 +14,7 @@ import org.jnode.util.NumberUtils;
  */
 public class VgaState {
 
+    private final Logger log = Logger.getLogger(getClass());
 	private final int[] seq;
 	private final int[] crt;
 	private final int[] gra;
@@ -223,6 +225,7 @@ public class VgaState {
 	}
 
 	protected void savePalette(VgaIO io) {
+	    log.debug("savePalette", new Exception("Trace"));
 		final int size = getPaletteSize(io);
 		final byte[] r = new byte[size];
 		final byte[] g = new byte[size];
@@ -231,7 +234,7 @@ public class VgaState {
 			getPaletteEntry(io, i, r, g, b);
 		}
 		//log.debug("Save-Size:" + size + ", R=" + NumberUtils.hex(r));
-		palette = new IndexColorModel(32/*6*/, size, r, g, b);
+		palette = new IndexColorModel(8/*32*//*6*/, size, r, g, b);
 	}
 
 	/**
@@ -243,9 +246,11 @@ public class VgaState {
 		return 256;
 	}
 
-	protected void restorePalette(VgaIO io) {
+	protected void restorePalette(VgaIO io) {	    
 		if (palette != null) {
+		    log.debug("restorePalette", new Exception("Trace"));
 			final int size = Math.min(256, palette.getMapSize());
+			log.debug("size=" + size + ", pal.mapsize=" + palette.getMapSize());
 			final byte[] r = new byte[size];
 			final byte[] g = new byte[size];
 			final byte[] b = new byte[size];
