@@ -31,6 +31,7 @@ import java.security.CodeSource;
 import java.security.Permission;
 import java.security.PermissionCollection;
 import java.security.Permissions;
+import java.security.Policy;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -46,10 +47,13 @@ import org.jnode.system.BootLog;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class JNodePolicy extends PolicyFile {
+final class JNodePolicy extends Policy {
 
     /** The permissions extension point */
     private final ExtensionPoint permissionsEp;
+    
+    /** The configured policies */
+    private final PolicyFile policyFile;
 
     /**
      * Mapping between a codesource (derived from plugin id) and a set of
@@ -61,12 +65,21 @@ final class JNodePolicy extends PolicyFile {
      * Initialize this instance.
      */
     public JNodePolicy(ExtensionPoint permissionsEp) {
-        super(ClassLoader.getSystemResource("/org/jnode/security/jnode.policy"));
+        this.policyFile = new PolicyFile(ClassLoader.getSystemResource("/org/jnode/security/jnode.policy"));
         this.codeSource2Permissions = new HashMap();
         this.permissionsEp = permissionsEp;
         loadExtensions();
     }
 
+    /**
+     * Gets the permissions for a given code source.
+     * @see java.security.Policy#getPermissions(java.security.CodeSource)
+     */
+	public PermissionCollection getPermissions(CodeSource codesource) {
+		PermissionCollection coll = policyFile.getPermissions(codesource);
+		addPermissions(codesource, coll);
+		return coll;
+	}
     /**
      * Allow extended classes to add permissions before the permissions
      * collection is set to read-only.
@@ -74,7 +87,7 @@ final class JNodePolicy extends PolicyFile {
      * @param codeSource
      * @param perms
      */
-    protected void addPermissions(CodeSource codeSource, Permissions perms) {
+    protected void addPermissions(CodeSource codeSource, PermissionCollection perms) {
         for (Iterator it = codeSource2Permissions.entrySet().iterator(); it
                 .hasNext();) {
             final Map.Entry e = (Map.Entry) it.next();
@@ -94,7 +107,7 @@ final class JNodePolicy extends PolicyFile {
      * @see java.security.Policy#refresh()
      */
     public synchronized void refresh() {
-        super.refresh();
+        policyFile.refresh();
         loadExtensions();
     }
 
