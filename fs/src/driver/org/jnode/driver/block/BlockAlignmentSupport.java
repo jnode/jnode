@@ -45,6 +45,8 @@ public class BlockAlignmentSupport implements BlockDeviceAPI {
 	public void read(long devOffset, byte[] dest, int destOffset, int length)
 	throws IOException {
 		
+      //log.info("Original: devOffset="+ devOffset + " destOffset=" + destOffset + " length=" + length);
+      //log.info("Original: alignment=" + alignment);
 		if (length == 0) {
 			return;
 		}
@@ -52,21 +54,22 @@ public class BlockAlignmentSupport implements BlockDeviceAPI {
 		final int ofsMisAlign = (int)(devOffset % alignment);
 		final int lenMisAlign = (length % alignment);
 		
-		/*log.debug("devOffset  =" + devOffset);
-		log.debug("length     =" + length);
-		log.debug("ofsMisAlign=" + ofsMisAlign);
-		log.debug("lenMisAlign=" + lenMisAlign);*/
-		
+      //log.info("ofsMisAlign="+ ofsMisAlign + " lenMisAlign=" + lenMisAlign);
+        
+        
 		if ((ofsMisAlign != 0) || (lenMisAlign != 0)) {
-			final byte[] buf = new byte[length + ofsMisAlign + (alignment - lenMisAlign)];
+			// final byte[] buf = new byte[length + ofsMisAlign + (alignment - lenMisAlign)];
+         final byte[] buf = new byte[(length / alignment)  + alignment];
+        // log.info("temp buf =" + buf.length);
 			parentApi.read(devOffset - ofsMisAlign, buf, 0, buf.length);
 			if (ofsMisAlign != 0) {
-				System.arraycopy(buf, alignment - ofsMisAlign, dest, destOffset, length);
+            System.arraycopy(buf, alignment - ofsMisAlign, dest, destOffset, length);
 			} else {
 				System.arraycopy(buf, 0, dest, destOffset, length);
 			}
 		} else {
 			// Aligned call, pass on
+         //log.info("aligned call");
 			parentApi.read(devOffset, dest, destOffset, length);
 		}
 	}
