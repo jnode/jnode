@@ -1017,6 +1017,6 @@ public final class Unsafe {
 	 * @param id 
 	 * @return The required length of id.
 	 */
-	public static native int getCPUID(int[] id);
+	static native int getCPUID(int[] id);
 	
 }

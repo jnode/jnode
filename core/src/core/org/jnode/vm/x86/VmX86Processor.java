@@ -3,6 +3,7 @@
  */
 package org.jnode.vm.x86;
 
+import org.jnode.vm.CpuID;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmThread;
 
@@ -45,5 +46,13 @@ public final class VmX86Processor extends VmProcessor {
 	 */
 	public VmThread createThread(Thread javaThread) {
 		return new VmX86Thread(javaThread);
+	}
+	
+	/**
+	 * Load the CPU id.
+	 * @return CpuID
+	 */
+	protected CpuID loadCPUID(int[] id) {
+		return new X86CpuID(id);
 	}
 }
