@@ -265,6 +265,7 @@ abstract class Item {
 			case 'F' : // Float
 				return FLOAT;
 			case 'L' : // Object
+			case ';' : // Object
 			case '[' : // Array
 				return REFERENCE;
 			case 'J' : // Long
