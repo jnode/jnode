@@ -305,7 +305,7 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
         beep.setActionCommand("beep");
         menu.add(beep);
 
-        //add(menu);
+        add(menu);
     }
 
     //start applet
@@ -1089,10 +1089,9 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
     private Image iBuff = null;
 
     public void paint(Graphics gr) {
+         //if (iBuff == null) { iBuff = createImage(BW_WIDTH, BW_HEIGHT);}
 
-         if (iBuff == null) { iBuff = createImage(BW_WIDTH, BW_HEIGHT);}
-
-        Graphics g = iBuff.getGraphics();
+        Graphics g = gr;//iBuff.getGraphics();
         g.setColor(Color.black);
         g.fillRect(0, 0, BW_WIDTH, BW_HEIGHT);
         switch (gameMode) {
@@ -1122,7 +1121,7 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
             }
         }
         g.dispose();
-        gr.drawImage(iBuff, 0, 0, this);
+        //gr.drawImage(iBuff, 0, 0, this);
     }
 
     public void update(Graphics g) {

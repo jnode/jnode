@@ -26,10 +26,10 @@ public class JDPTest {
             jif.setMaximizable(true);
             jif.setSelected(true);
             jdtp.add(jif);
-            jif.setVisible(true);
             wnd.add(jdtp, BorderLayout.CENTER);
 
             wnd.show();
+            jif.setVisible(true);
 
             Thread.sleep(5000);
 

@@ -139,7 +139,7 @@ public class MouseHandler implements PointerListener {
 	private void postEvent(int id, int button) {
 		final JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
 		Component source = tk.getTopComponentAt(x, y);
-		log.debug("Source: " + source.getClass().getName());
+		//log.debug("Source: " + source.getClass().getName());
 		//TODO full support for modifiers
 		final MouseEvent me = new MouseEvent(source, id, System.currentTimeMillis(),
 				EventModifier.OLD_MASK | button, x, y, 1, false, button);
