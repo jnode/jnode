@@ -50,12 +50,12 @@ public class BoxLayout implements LayoutManager2
 {
     GridLayout      gridbag;
     
-    final static int X_AXIS = 0;
-    final static int Y_AXIS = 1;
+    public final static int X_AXIS = 0;
+    public final static int Y_AXIS = 1;
 
     int way = X_AXIS;
 
-    BoxLayout(JComponent p,
+    public BoxLayout(JComponent p,
 	      int way)
     {
 	int width = 0;

@@ -141,11 +141,11 @@ public class JFrame extends Frame {
 		return new JRootPane();
 	}
 
-	Container getContentPane() {
+	public Container getContentPane() {
 		return getRootPane().getContentPane();
 	}
 
-	void setContentPane(Container contentPane) {
+	public void setContentPane(Container contentPane) {
 		getRootPane().setContentPane(contentPane);
 	}
 
@@ -153,7 +153,7 @@ public class JFrame extends Frame {
 		return getRootPane().getGlassPane();
 	}
 
-	void setGlassPane(Component glassPane) {
+	public void setGlassPane(Component glassPane) {
 		getRootPane().setGlassPane(glassPane);
 	}
 
@@ -236,7 +236,7 @@ public class JFrame extends Frame {
 		}
 	}
 
-	void setDefaultCloseOperation(int operation) {
+	public void setDefaultCloseOperation(int operation) {
 		close_action = operation;
 	}
 
