@@ -76,19 +76,16 @@ public abstract class DoubleWordItem extends Item implements
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#clone()
 	 */
 	protected final Item clone(EmitterContext ec) {
-		final Item res;
+		final DoubleWordItem res;
 		final AbstractX86Stream os = ec.getStream();
 
 		switch (getKind()) {
 		case Kind.REGISTER:
-			final X86RegisterPool pool = ec.getPool();
-			final Register lsb = pool.request(JvmType.INT);
-			final Register msb = pool.request(JvmType.INT);
+			res = L1AHelper.requestDoubleWordRegisters(ec, getType());
+			final Register lsb = res.getLsbRegister();
+			final Register msb = res.getMsbRegister();
 			os.writeMOV(INTSIZE, lsb, this.lsb);
 			os.writeMOV(INTSIZE, msb, this.msb);
-			res = createReg(getType(), lsb, msb);
-			pool.transferOwnerTo(lsb, res);
-			pool.transferOwnerTo(msb, res);
 			break;
 
 		case Kind.LOCAL:
@@ -122,7 +119,7 @@ public abstract class DoubleWordItem extends Item implements
 	 * 
 	 * @return
 	 */
-	protected abstract Item cloneConstant();
+	protected abstract DoubleWordItem cloneConstant();
 
 	/**
 	 * Return the current item's computational type category (JVM Spec, p. 83).

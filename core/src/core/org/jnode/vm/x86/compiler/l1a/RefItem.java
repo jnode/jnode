@@ -52,7 +52,7 @@ final class RefItem extends WordItem implements X86CompilerConstants {
 	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.WordItem#cloneConstant()
 	 */
-	protected Item cloneConstant() {
+	protected WordItem cloneConstant() {
 		return createConst(getValue());
 	}
 

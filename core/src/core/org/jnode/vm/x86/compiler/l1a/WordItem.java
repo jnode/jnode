@@ -88,16 +88,14 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#clone()
 	 */
 	protected Item clone(EmitterContext ec) {
-		final Item res;
+		final WordItem res;
 		final AbstractX86Stream os = ec.getStream();
 
 		switch (getKind()) {
 		case Kind.REGISTER:
-			final X86RegisterPool pool = ec.getPool();
-			final Register r = pool.request(JvmType.INT);
+			res = L1AHelper.requestWordRegister(ec, getType(), false);
+			final Register r = res.getRegister();
 			os.writeMOV(INTSIZE, r, reg);
-			res = createReg(getType(), r);
-			pool.transferOwnerTo(r, res);
 			break;
 
 		case Kind.LOCAL:
@@ -134,7 +132,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	 * 
 	 * @return
 	 */
-	protected abstract Item cloneConstant();
+	protected abstract WordItem cloneConstant();
 
 	/**
 	 * Gets the register the is used by this item.
@@ -370,7 +368,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 		case Kind.LOCAL:
 			pushToFPU(os, FP, offsetToFP);
 			break;
- 
+
 		case Kind.CONSTANT:
 			pushConstant(ec, os);
 			pushToFPU(os, SP, 0);

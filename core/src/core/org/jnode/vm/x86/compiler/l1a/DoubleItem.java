@@ -48,7 +48,7 @@ final class DoubleItem extends DoubleWordItem {
 	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.DoubleWordItem#cloneConstant()
 	 */
-	protected Item cloneConstant() {
+	protected DoubleWordItem cloneConstant() {
 		return createConst(getValue());
 	}
 

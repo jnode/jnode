@@ -91,7 +91,7 @@ final class X86RegisterPool {
 	 * @see org.jnode.vm.compiler.ir.RegisterPool#request(int)
 	 */
 	public Register request(int type) {
-		return request(type, null);
+		return request(type, null, false);
 	}
 
 	/**
