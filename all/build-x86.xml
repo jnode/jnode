@@ -98,7 +98,7 @@
              classpathref="cp-x86"/>
     
     <genconst destfile="${build.native.dir}/src/java.inc" 
-              classesURL="jar:file:///${jnode-core.jar}!/">
+              classesURL="file:///${jnode-core.jar}/">
       <!-- class classname="org.jnode.arch.x86.SoftByteCodes"/ -->
       <class classname="org.jnode.vm.classmgr.TIBLayout" static="on"/>
       <class classname="org.jnode.vm.classmgr.VmByteCode"/>
@@ -167,7 +167,12 @@
     <plugin todir="${my-build.dir}/plugins"
             tmpdir="${my-build.dir}/tmp/plugins"
             pluginDir="${descriptors.dir}">
-      <libalias name="jnode.jar" alias="${classes.dir}"/>
+      <libalias name="jnode-core.jar" alias="${jnode-core.jar}"/>
+      <libalias name="jnode-fs.jar" alias="${jnode-fs.jar}"/>
+      <libalias name="jnode-gui.jar" alias="${jnode-gui.jar}"/>
+      <libalias name="jnode-net.jar" alias="${jnode-net.jar}"/>
+      <libalias name="jnode-shell.jar" alias="${jnode-shell.jar}"/>
+
       <libalias name="commons-net-1.1.0.jar" alias="${commons-net.jar}"/>
       <libalias name="nanoxml.jar" alias="${nanoxml.jar}"/>
       <libalias name="log4j.jar" alias="${log4j.jar}"/>
