@@ -21,4 +21,8 @@
         <alias name="test" class="org.jnode.shell.command.test.TestCommand"/>
     </extension>
 
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="user.home" actions="read"/>
+  </extension>
+
 </plugin>

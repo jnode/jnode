@@ -22,6 +22,9 @@
 
   <extension point="org.jnode.security.permissions">
     <permission class="org.jnode.security.JNodePermission" name="createPluginLoader"/>
+    <permission class="org.jnode.security.JNodePermission" name="loadPlugin"/>
+    <permission class="org.jnode.security.JNodePermission" name="unloadPlugin"/>
+    <permission class="org.jnode.security.JNodePermission" name="stopPlugin"/>
   </extension>
         
 </plugin>

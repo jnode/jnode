@@ -168,6 +168,9 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	 * @throws PluginException
 	 */
 	protected void unresolve(PluginRegistryModel registry) throws PluginException {
+		if (plugin != null) {
+			plugin.stop();
+		}
 	    if (runtime != null) {
 	        runtime.unresolve(registry);
 	    }
@@ -180,6 +183,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	    for (int i = 0; i < extensions.length; i++) {
 	        extensions[i].unresolve(registry);
 	    }
+	    registry.unregisterPlugin(this);
 	    resolved = false;
 	}
 	
