@@ -7,8 +7,8 @@ import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
@@ -28,13 +28,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.apache.log4j.Logger;
+import org.jnode.awt.JNodeAwtContext;
 import org.jnode.awt.JNodeToolkit;
-import org.jnode.test.gui.BoxWorld;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class DesktopFrame extends JFrame {
+final class DesktopFrame extends JFrame implements JNodeAwtContext {
     private static final Color DESKTOP_BACKGROUND_COLOR = new Color(70, 130, 180);
     private static final String FRAME_ATTRIBUTE_NAME = "JNODE_DESKTOP_FRAME_ATTRIBUTE";
 	private final JDesktopPane desktop;
@@ -134,8 +134,7 @@ final class DesktopFrame extends JFrame {
         mi = new JMenuItem("Close");
         mi.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
-                tk.decRefCount(true);
+                JNodeToolkit.stopGui();
             }
         });
         mainPopup.add(mi);
@@ -166,8 +165,12 @@ final class DesktopFrame extends JFrame {
     /**
 	 * @return Returns the desktop.
 	 */
-	final JDesktopPane getDesktop() {
+	public final JDesktopPane getDesktop() {
 		return desktop;
+	}
+	
+	public final Container getAwtRoot() {
+		return getContentPane();
 	}
 
 	/**

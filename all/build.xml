@@ -155,6 +155,11 @@
       pluginList="${basedir}/conf/full-plugin-list.xml"
       pluginDir="${plugins.dir}">
     </initjar>
+    <!-- All plugins, gui boot -->
+    <initjar destfile="${initjars.dir}/fullgui.jgz"
+      pluginList="${basedir}/conf/gui-plugin-list.xml"
+      pluginDir="${plugins.dir}">
+    </initjar>
     <!-- Install boot -->
     <initjar destfile="${initjars.dir}/install.jgz"
       pluginList="${basedir}/conf/install-plugin-list.xml"

@@ -21,7 +21,6 @@ public class JNodeGenericPeer {
 	public JNodeGenericPeer(JNodeToolkit toolkit, Object component) {
 		this.toolkit = toolkit;
 		this.component = component;
-		toolkit.incRefCount();
 	}
 
 	static void enableQueue(EventQueue sq) {
@@ -57,6 +56,6 @@ public class JNodeGenericPeer {
 	 * Destroy the peer and release all resource
 	 */
 	public void dispose() {
-		toolkit.decRefCount(false);
+		// Nothing to do
 	}
 }

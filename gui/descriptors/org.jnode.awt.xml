@@ -18,7 +18,6 @@
       <export name="org.jnode.awt.font.*"/>
       <export name="org.jnode.awt.geom.*"/>
       <export name="org.jnode.awt.image.*"/>
-      <export name="org.jnode.awt.peer.*"/>
       <export name="org.jnode.awt.swingpeers.*"/>
       <export name="org.jnode.awt.swingpeers.event.*"/>
       <export name="org.jnode.awt.util.*"/>
@@ -29,6 +28,7 @@
     <permission class="java.security.AllPermission"/>
     <permission class="java.util.PropertyPermission" name="awt.toolkit" actions="read,write"/>
     <permission class="java.util.PropertyPermission" name="jnode.awt.device" actions="read,write"/>
+    <permission class="java.util.PropertyPermission" name="jnode.desktop" actions="read"/>
   </extension>
         
 </plugin>

@@ -43,8 +43,7 @@ public class KeyboardHandler implements KeyboardListener {
         final int key_code = event.getKeyCode();
         if(event.isAltDown() &&  key_code == KeyEvent.VK_F12){
             event.consume();
-            JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
-            tk.decRefCount(true);
+            JNodeToolkit.stopGui();
         }else{
             postEvent(KeyEvent.KEY_PRESSED, event.getTime(), event.getModifiers(), key_code, event.getKeyChar());
         }
