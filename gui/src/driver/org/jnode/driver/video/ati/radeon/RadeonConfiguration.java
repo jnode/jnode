@@ -15,7 +15,7 @@ import org.jnode.driver.video.vgahw.DisplayMode;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class RadeonConfiguration extends FrameBufferConfiguration {
+final class RadeonConfiguration extends FrameBufferConfiguration {
 
     private final int bitsPerPixel;
     private final DisplayMode displayMode;
@@ -74,5 +74,9 @@ public class RadeonConfiguration extends FrameBufferConfiguration {
      */
     public final DisplayMode getDisplayMode() {
         return this.displayMode;
+    }
+    
+    public String toString() {
+    	return "bpp=" + bitsPerPixel + ", mode={" + displayMode + "}";
     }
 }

@@ -55,11 +55,17 @@ public class RadeonVgaIO implements VgaIO, VgaConstants, RadeonConstants {
     }
     
     /**
-     * Sets a 32-bit register at a given (byte) offset
+     * Patches a 32-bit register at a given (byte) offset.
+     * [addr] = ([addr] &amp; mask) | value.
      * @param addr
+     * @param value
+     * @param mask
      */
     final void setRegP32(int addr, int value, int mask) {
-        mmio.setInt(addr, (mmio.getInt(addr) & mask) | value);
+    	int tmp = mmio.getInt(addr);
+		tmp &= mask;                                                    
+		tmp |= value & ~mask;                                           
+        mmio.setInt(addr, tmp);
     }
     
     /**
@@ -88,8 +94,10 @@ public class RadeonVgaIO implements VgaIO, VgaConstants, RadeonConstants {
      * @param mask
      */
     final void setPLLP(int addr, int value, int mask) {
-    	final int tmp = (getPLL(addr) & mask) | value;
-    	setPLL(addr, tmp);
+    	int tmp = getPLL(addr);
+		tmp &= mask;                                                    
+		tmp |= value & ~mask;                                           
+        setPLL(addr, tmp);
     }
     
     /**
@@ -234,7 +242,11 @@ public class RadeonVgaIO implements VgaIO, VgaConstants, RadeonConstants {
      * This method assumes 8-bit palette entries.
      */
     final void setPaletteEntry(int colorIndex, int r, int g, int b) {
-        setReg32(PALETTE_INDEX, colorIndex);
+        setReg8(PALETTE_INDEX, colorIndex);
         setReg32(PALETTE_DATA, ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF));
+    }
+    
+    final void disableIRQ() {
+    	setReg32(GEN_INT_CNTL, 0);
     }
 }

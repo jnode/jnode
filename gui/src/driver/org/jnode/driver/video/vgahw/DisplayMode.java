@@ -49,6 +49,32 @@ public class DisplayMode {
 	}
 
 	/**
+	 * @param freq
+	 * @param width
+	 * @param hsyncStart
+	 * @param hsyncEnd
+	 * @param total
+	 * @param height
+	 * @param vsyncStart
+	 * @param vsyncEnd
+	 * @param total2
+	 */
+	public DisplayMode(int freq, int width, int hsyncStart,
+			int hsyncEnd, int hTotal, int height,
+			int vsyncStart, int vsyncEnd, int vTotal) {
+		super();
+		this.freq = freq;
+		this.width = width;
+		this.hsyncStart = hsyncStart;
+		this.hsyncEnd = hsyncEnd;
+		this.hTotal = hTotal;
+		this.height = height;
+		this.vsyncStart = vsyncStart;
+		this.vsyncEnd = vsyncEnd;
+		this.vTotal = vTotal;
+	}
+	
+	/**
 	 * Gets the pixel frequency in kHz
 	 */
 	public final int getFreq() {
