@@ -25,6 +25,22 @@ public interface Console extends FocusListener {
 	public void setChar(int x, int y, char ch, int bgColor);
 
 	/**
+	 * Get the character at a given location.
+	 * 
+	 * @param x
+	 * @param y
+	 */
+	public char getChar(int x, int y);
+	
+	/**
+	 * Get the bg color at a given location.
+	 * 
+	 * @param x
+	 * @param y
+	 */
+	public char getBgColor(int x, int y);
+
+	/**
 	 * Put a character on the console, using the console as stream
 	 * 
 	 * @param ch
