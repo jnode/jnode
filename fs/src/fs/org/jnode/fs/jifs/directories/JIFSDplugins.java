@@ -55,6 +55,7 @@ public class JIFSDplugins extends JIFSDirectory {
 	}
 	
 	public void refresh(){
+		super.refresh();
 		// this has to be improved
 		// just add new ones and delete old ones
 		// now it does delete all files and (re)create all ones
