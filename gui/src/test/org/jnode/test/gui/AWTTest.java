@@ -14,6 +14,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Shape;
+import java.awt.Font;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
@@ -168,6 +169,9 @@ public class AWTTest {
             wnd.add(b, BorderLayout.NORTH);
             wnd.add(new TestComponent(useDoubleBuffer), BorderLayout.CENTER);
             wnd.show();
+            Font f = wnd.getFont();
+            System.out.println(f.getName());
+            wnd.getFontMetrics(f);
 
             Thread.sleep(5000);
 

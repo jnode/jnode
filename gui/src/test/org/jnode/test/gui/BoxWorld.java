@@ -225,7 +225,7 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
     private int gameMode = PLAY_MODE;
 
     //current world ID
-    private int worldId = 14;
+    private int worldId = 0;
 
     //current world data
     private int[] vec = vecs[ worldId];
