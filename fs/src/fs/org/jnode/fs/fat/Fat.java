@@ -5,6 +5,7 @@ package org.jnode.fs.fat;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 
 import org.jnode.driver.block.BlockDeviceAPI;
 
@@ -346,18 +347,13 @@ public class Fat {
 		out.println("Nr free entries " + freeCount);
 	}
 
+	/**
+	 * Compare this Fat with another Fat.
+	 */
 	public boolean equals(Object other) {
 		if (other instanceof Fat) {
 			Fat of = (Fat)other;
-			if (entries.length != of.entries.length) {
-				return false;
-			}
-			for (int i = 0; i < entries.length; i++) {
-				if (of.entries[i] != entries[i]) {
-					return false;
-				}
-			}
-			return true;
+			return Arrays.equals(entries, of.entries);
 		} else {
 			return false;
 		}
