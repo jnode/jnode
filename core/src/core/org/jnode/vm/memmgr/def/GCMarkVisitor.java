@@ -6,7 +6,6 @@ package org.jnode.vm.memmgr.def;
 import org.jnode.vm.Address;
 import org.jnode.vm.Monitor;
 import org.jnode.vm.ObjectVisitor;
-import org.jnode.vm.Uninterruptible;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmThread;
@@ -15,6 +14,7 @@ import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.HeapHelper;
+import org.vmmagic.pragma.Uninterruptible;
 
 /**
  * @author epr

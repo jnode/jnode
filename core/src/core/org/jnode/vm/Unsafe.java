@@ -8,6 +8,7 @@ import org.jnode.security.JNodePermission;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * Class that allows directy hardware access.
@@ -942,14 +943,14 @@ public final class Unsafe {
 	public static native double longBitsToDouble(long value);
 	public static native long doubleToRawLongBits(double value);
 
-	protected static native int compare(Address a1, Address a2) throws PragmaUninterruptible;
-	protected static native Address add(Address addr, int incValue) throws PragmaUninterruptible;
-	protected static native Address add(Address a1, Address a2) throws PragmaUninterruptible;
+	protected static native int compare(Address a1, Address a2) throws UninterruptiblePragma;
+	protected static native Address add(Address addr, int incValue) throws UninterruptiblePragma;
+	protected static native Address add(Address a1, Address a2) throws UninterruptiblePragma;
 
-	protected static native Address intToAddress(int addr32) throws PragmaUninterruptible;
-	protected static native Address longToAddress(long addr64) throws PragmaUninterruptible;
-	protected static native int addressToInt(Address addr) throws PragmaUninterruptible;
-	protected static native long addressToLong(Address addr) throws PragmaUninterruptible;
+	protected static native Address intToAddress(int addr32) throws UninterruptiblePragma;
+	protected static native Address longToAddress(long addr64) throws UninterruptiblePragma;
+	protected static native int addressToInt(Address addr) throws UninterruptiblePragma;
+	protected static native long addressToLong(Address addr) throws UninterruptiblePragma;
 
 	/**
 	 * Gets the minimum valid address in the addressspace of the current architecture.
@@ -1036,9 +1037,9 @@ public final class Unsafe {
 	 * Gets the processor that currently runs the active thread.
 	 * 
 	 * @return The current processor.
-	 * @throws PragmaUninterruptible
+	 * @throws UninterruptiblePragma
 	 */
-	public static native VmProcessor getCurrentProcessor() throws PragmaUninterruptible;
+	public static native VmProcessor getCurrentProcessor() throws UninterruptiblePragma;
 
 	/**
 	 * Trigger a yieldpoint

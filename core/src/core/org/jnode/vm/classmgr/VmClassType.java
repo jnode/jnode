@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.jnode.vm.PragmaUninterruptible;
+import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * Abstract class for VmType classes that represent classes.
@@ -65,7 +65,7 @@ public abstract class VmClassType extends VmType {
 	}
 
 	public final void incInstanceCount() 
-	throws PragmaUninterruptible {
+	throws UninterruptiblePragma {
 		instanceCount++;
 	}
 

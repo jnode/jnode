@@ -8,7 +8,6 @@ import org.jnode.assembler.NativeStream.ObjectRef;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
 import org.jnode.assembler.x86.X86Stream;
-import org.jnode.vm.PragmaLoadStatics;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmInterpretedExceptionHandler;
 import org.jnode.vm.classmgr.VmMethod;
@@ -19,6 +18,7 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 import org.jnode.vm.x86.compiler.X86CompilerContext;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 import org.jnode.vm.x86.compiler.X86JumpTable;
+import org.vmmagic.pragma.LoadStaticsPragma;
 
 /**
  * Utility class for generating the X86 method stack frame
@@ -131,7 +131,7 @@ class X86StackFrame implements X86CompilerConstants {
 		 */
 
 		// Load the statics table reference
-		if (method.canThrow(PragmaLoadStatics.class)) {
+		if (method.canThrow(LoadStaticsPragma.class)) {
 			helper.writeLoadSTATICS(helper.genLabel("$$edi"), "init", false);
 		}
 

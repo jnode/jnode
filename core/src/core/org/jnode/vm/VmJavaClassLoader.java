@@ -11,6 +11,7 @@ import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.CompiledIMT;
+import org.vmmagic.pragma.PrivilegedActionPragma;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -94,7 +95,7 @@ public final class VmJavaClassLoader extends VmAbstractClassLoader {
      *      boolean)
      */
     public final VmType loadClass(String className, boolean resolve)
-            throws ClassNotFoundException, PragmaPrivilegedAction {
+            throws ClassNotFoundException, PrivilegedActionPragma {
         final VmType cls;
         if (className.charAt(0) == '[') {
             cls = loadArrayClass(className, resolve);

@@ -3,8 +3,8 @@
  */
 package org.jnode.vm.memmgr;
 
-import org.jnode.vm.PragmaUninterruptible;
 import org.jnode.vm.VmSystemObject;
+import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -19,7 +19,7 @@ public abstract class VmWriteBarrier extends VmSystemObject {
 	 * @param value The value being stored
 	 */
 	public abstract void arrayStoreWriteBarrier(Object ref, int index, Object value) 
-	throws PragmaUninterruptible;
+	throws UninterruptiblePragma;
 
 	/**
 	 * This method implements the write barrier for putfields of references
@@ -29,7 +29,7 @@ public abstract class VmWriteBarrier extends VmSystemObject {
 	 * @param value  The value being stored
 	 */
 	public abstract void putfieldWriteBarrier(Object ref, int offset, Object value) 
-	throws PragmaUninterruptible;
+	throws UninterruptiblePragma;
 
 	/**
 	 * This method is inlined to implement the write barrier for putstatics of references
@@ -38,7 +38,7 @@ public abstract class VmWriteBarrier extends VmSystemObject {
 	 * @param value        The value being stored
 	 */
 	public abstract void putstaticWriteBarrier(int staticsIndex, Object value) 
-	throws PragmaUninterruptible;
+	throws UninterruptiblePragma;
 
 	/**
 	 * This method generates write barrier entries needed as a consequence of
@@ -50,5 +50,5 @@ public abstract class VmWriteBarrier extends VmSystemObject {
 	 * @param end The last "natural" index into the array
 	 */
 	public abstract void arrayCopyWriteBarrier(Object array, int start, int end) 
-	throws PragmaUninterruptible;
+	throws UninterruptiblePragma;
 }

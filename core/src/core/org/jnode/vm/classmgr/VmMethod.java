@@ -9,7 +9,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
 import org.jnode.vm.Address;
-import org.jnode.vm.PragmaUninterruptible;
+import org.vmmagic.pragma.UninterruptiblePragma;
 
 public abstract class VmMethod extends VmMember implements VmStaticsEntry {
 
@@ -361,7 +361,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
     final void setExceptions(VmExceptions exceptions) throws ClassFormatError {
         if (this.exceptions == null) {
             this.exceptions = exceptions;
-            if (exceptions.contains(PragmaUninterruptible.class)) {
+            if (exceptions.contains(UninterruptiblePragma.class)) {
                 setUninterruptible();
             }
         } else {

@@ -3,10 +3,10 @@
  */
 package org.jnode.vm.memmgr.def;
 
-import org.jnode.vm.PragmaUninterruptible;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmWriteBarrier;
+import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -45,7 +45,7 @@ public class DefaultWriteBarrier extends VmWriteBarrier {
      *      int, int)
      */
     public final void arrayCopyWriteBarrier(Object array, int start, int end)
-            throws PragmaUninterruptible {
+            throws UninterruptiblePragma {
         // The source array is already reachable, so by definition, all
         // entries will be reachable.
         // So we do nothing here
@@ -57,7 +57,7 @@ public class DefaultWriteBarrier extends VmWriteBarrier {
      *      int, java.lang.Object)
      */
     public final void arrayStoreWriteBarrier(Object ref, int index, Object value)
-            throws PragmaUninterruptible {
+            throws UninterruptiblePragma {
         if (active) {
             shade(value);
         }
@@ -69,7 +69,7 @@ public class DefaultWriteBarrier extends VmWriteBarrier {
      *      int, java.lang.Object)
      */
     public final void putfieldWriteBarrier(Object ref, int offset, Object value)
-            throws PragmaUninterruptible {
+            throws UninterruptiblePragma {
         if (active) {
             shade(value);
         }
@@ -81,7 +81,7 @@ public class DefaultWriteBarrier extends VmWriteBarrier {
      *      java.lang.Object)
      */
     public final void putstaticWriteBarrier(int staticsIndex, Object value)
-            throws PragmaUninterruptible {
+            throws UninterruptiblePragma {
         if (active) {
             shade(value);
         }
@@ -93,7 +93,7 @@ public class DefaultWriteBarrier extends VmWriteBarrier {
      * 
      * @param value
      */
-    private final void shade(Object value) throws PragmaUninterruptible {
+    private final void shade(Object value) throws UninterruptiblePragma {
         if (value != null) {
             while (true) {
                 final int gcColor = helper.getObjectColor(value);

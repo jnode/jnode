@@ -4,7 +4,6 @@
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.assembler.ObjectResolver;
-import org.jnode.vm.Uninterruptible;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
@@ -12,6 +11,7 @@ import org.jnode.vm.VmSystem;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.memmgr.HeapHelper;
+import org.vmmagic.pragma.Uninterruptible;
 
 /**
  * @author epr

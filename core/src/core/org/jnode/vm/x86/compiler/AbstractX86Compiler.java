@@ -9,7 +9,6 @@ import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.X86Stream;
 import org.jnode.vm.Address;
-import org.jnode.vm.PragmaPrivilegedAction;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.classmgr.VmClassLoader;
@@ -19,6 +18,7 @@ import org.jnode.vm.compiler.CompiledMethod;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.x86.compiler.l1.X86StackManager;
+import org.vmmagic.pragma.PrivilegedActionPragma;
 
 /**
  * Abstract native code compiler for the Intel X86 architecture.
@@ -52,7 +52,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements 
 	/**
 	 * @see org.jnode.vm.compiler.NativeCodeCompiler#doCompileAbstract(org.jnode.vm.classmgr.VmMethod, org.jnode.assembler.NativeStream, int, boolean)
 	 */
-	protected final CompiledMethod doCompileAbstract(VmMethod method, NativeStream nos, int level, boolean isBootstrap) throws PragmaPrivilegedAction {
+	protected final CompiledMethod doCompileAbstract(VmMethod method, NativeStream nos, int level, boolean isBootstrap) throws PrivilegedActionPragma {
 		if (isBootstrap) {
 			//System.out.println("Abstraxct method " + method);
 			final CompiledMethod cm = new CompiledMethod(level);

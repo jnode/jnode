@@ -12,12 +12,12 @@ import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeUtils;
 import org.jnode.vm.Address;
 import org.jnode.vm.CpuID;
-import org.jnode.vm.PragmaLoadStatics;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmThread;
 import org.jnode.vm.classmgr.VmStatics;
+import org.vmmagic.pragma.LoadStaticsPragma;
 
 /**
  * Processor implementation for the X86 architecture.
@@ -210,7 +210,7 @@ public final class VmX86Processor extends VmProcessor {
     /**
      * Entry point for starting Application processors.
      */
-    static final void applicationProcessorMain() throws PragmaLoadStatics {
+    static final void applicationProcessorMain() throws LoadStaticsPragma {
         final VmX86Processor cpu = (VmX86Processor)Unsafe.getCurrentProcessor();
         BootLog.info("Starting Application Processor " + cpu.getId());
 

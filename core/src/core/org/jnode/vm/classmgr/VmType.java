@@ -13,8 +13,6 @@ import java.util.Iterator;
 
 import org.jnode.assembler.NativeStream;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.PragmaLoadStatics;
-import org.jnode.vm.Uninterruptible;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmReflection;
 import org.jnode.vm.VmSystemClassLoader;
@@ -22,6 +20,8 @@ import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.compiler.CompileError;
 import org.jnode.vm.compiler.CompiledIMT;
 import org.jnode.vm.compiler.NativeCodeCompiler;
+import org.vmmagic.pragma.LoadStaticsPragma;
+import org.vmmagic.pragma.Uninterruptible;
 
 public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 		Uninterruptible {
@@ -300,7 +300,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 * @param bootClasses
 	 */
 	protected static void loadFromBootClassArray(VmType[] bootClasses)
-			throws PragmaLoadStatics {
+			throws LoadStaticsPragma {
 		Unsafe.debug("loadFromBootClassArray");
 		final int count = bootClasses.length;
 		for (int i = 0; i < count; i++) {

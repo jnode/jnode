@@ -9,7 +9,6 @@ import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.X86Stream;
 import org.jnode.vm.Address;
-import org.jnode.vm.PragmaPrivilegedAction;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
@@ -20,6 +19,7 @@ import org.jnode.vm.x86.compiler.AbstractX86Compiler;
 import org.jnode.vm.x86.compiler.X86CompilerContext;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 import org.jnode.vm.x86.compiler.X86JumpTable;
+import org.vmmagic.pragma.PrivilegedActionPragma;
 
 
 /**
@@ -37,7 +37,7 @@ public class X86StubCompiler extends AbstractX86Compiler {
 	 * @param os
 	 *            The native stream, can be null
 	 */
-	public void compileRuntime(VmMethod method, ObjectResolver resolver, int level, NativeStream os) throws PragmaPrivilegedAction {
+	public void compileRuntime(VmMethod method, ObjectResolver resolver, int level, NativeStream os) throws PrivilegedActionPragma {
 		if (method.isAbstract()) {
 			super.compileRuntime(method, resolver, level, os);
 		} else if (X86CompilerHelper.isClassInitializeNeeded(method)) {

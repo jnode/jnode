@@ -3,6 +3,8 @@
  */
 package org.jnode.vm;
 
+import org.vmmagic.pragma.Uninterruptible;
+
 /**
  * This class is used to allocate and free fixed size blocks of memory. This
  * memory is not garbage collected, nor is each block addressable as a java

@@ -3,7 +3,7 @@
  */
 package org.jnode.test;
 
-import org.jnode.vm.Uninterruptible;
+import org.vmmagic.pragma.Uninterruptible;
 
 
 /**

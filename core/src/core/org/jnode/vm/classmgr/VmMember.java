@@ -3,8 +3,8 @@
  */
 package org.jnode.vm.classmgr;
 
-import org.jnode.vm.Uninterruptible;
 import org.jnode.vm.VmSystemObject;
+import org.vmmagic.pragma.Uninterruptible;
 
 /**
  * @author epr
