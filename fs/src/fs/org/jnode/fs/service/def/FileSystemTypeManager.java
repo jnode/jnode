@@ -18,7 +18,7 @@ import org.jnode.plugin.ExtensionPointListener;
 /**
  * @author epr
  */
-public class FileSystemTypeManager implements ExtensionPointListener {
+final class FileSystemTypeManager implements ExtensionPointListener {
 
 	/** My logger */
 	private final Logger log = Logger.getLogger(getClass());

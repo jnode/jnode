@@ -24,7 +24,7 @@ import org.jnode.fs.FileSystem;
 /**
  * @author epr
  */
-public class FileSystemAPIImpl implements VMFileSystemAPI {
+final class FileSystemAPIImpl implements VMFileSystemAPI {
 
 	/** My logger */
 	private final Logger log = Logger.getLogger(getClass());

@@ -91,4 +91,12 @@ public class NTFSFile implements FSFile {
 		this.fileRecord = fileRecord;
 	}
 
+	/**
+	 * Flush any cached data to the disk.
+	 * @throws IOException
+	 */
+	public void flush()
+	throws IOException {
+	    // TODO implement me
+	}
 }

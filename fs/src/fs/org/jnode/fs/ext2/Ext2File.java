@@ -217,4 +217,12 @@ public class Ext2File implements FSFile {
 		this.valid = valid;
 	}
 
+	/**
+	 * Flush any cached data to the disk.
+	 * @throws IOException
+	 */
+	public void flush()
+	throws IOException {
+	    // TOTO Andras, please implement this
+	}
 }

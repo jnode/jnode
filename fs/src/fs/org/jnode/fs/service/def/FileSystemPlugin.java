@@ -42,7 +42,6 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
 		this.fsTypeManager = new FileSystemTypeManager(descriptor.getExtensionPoint("types"));
 		this.fsm = new FileSystemManager();
 		this.api = new FileSystemAPIImpl(fsm);
-		fsm.initialize();
 	}
 
 	/**
@@ -65,10 +64,10 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
 	/**
 	 * Unregister a mounted filesystem
 	 * 
-	 * @param fs
+	 * @param device
 	 */
-	public void unregisterFileSystem(FileSystem fs) {
-		fsm.unregisterFileSystem(fs);
+	public FileSystem unregisterFileSystem(Device device) {
+		return fsm.unregisterFileSystem(device);
 	}
 
 	/**

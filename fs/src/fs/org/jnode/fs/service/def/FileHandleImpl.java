@@ -12,7 +12,7 @@ import org.jnode.fs.FSFile;
 /**
  * @author epr
  */
-public class FileHandleImpl implements VMFileHandle {
+final class FileHandleImpl implements VMFileHandle {
 
 	/** The open mode of this filehandle */
 	private final VMOpenMode mode;
@@ -140,7 +140,9 @@ public class FileHandleImpl implements VMFileHandle {
 	/**
 	 * Close this file.
 	 */
-	public synchronized void close() {
+	public synchronized void close() 
+	throws IOException {
+	    file.flush();
 		closed = true;
 		fhm.close(this);
 	}

@@ -201,7 +201,7 @@ public class FatFile extends FatObject implements FSFile {
 	 * Flush any changes in this file to persistent storage
 	 * @throws IOException
 	 */
-	protected void flush()
+	public void flush()
 	throws IOException {
 		if (dir != null) {
 			dir.flush();
