@@ -1,5 +1,6 @@
 /* StringBuffer.java -- Growable strings
-   Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -205,10 +206,26 @@ public final class StringBuffer implements Serializable, CharSequence
     if (newLength < 0)
       throw new StringIndexOutOfBoundsException(newLength);
 
+    int valueLength = value.length;
+
+    /* Always call ensureCapacity_unsynchronized in order to preserve
+       copy-on-write semantics.  */
     ensureCapacity_unsynchronized(newLength);
+
+    if (newLength < valueLength)
+      {
+        /* If the StringBuffer's value just grew, then we know that
+           value is newly allocated and the region between count and
+           newLength is filled with '\0'.  */
+	count = newLength;
+      }
+    else
+      {
+	/* The StringBuffer's value doesn't need to grow.  However,
+	   we should clear out any cruft that may exist.  */
     while (count < newLength)
       value[count++] = '\0';
-    count = newLength;
+      }
   }
 
   /**
@@ -244,10 +261,9 @@ public final class StringBuffer implements Serializable, CharSequence
   public synchronized void getChars(int srcOffset, int srcEnd,
                                     char[] dst, int dstOffset)
   {
-    int todo = srcEnd - srcOffset;
-    if (srcOffset < 0 || srcEnd > count || todo < 0)
+    if (srcOffset < 0 || srcEnd > count || srcEnd < srcOffset)
       throw new StringIndexOutOfBoundsException();
-    System.arraycopy(value, srcOffset, dst, dstOffset, todo);
+    System.arraycopy(value, srcOffset, dst, dstOffset, srcEnd - srcOffset);
   }
 
   /**
@@ -355,6 +371,8 @@ public final class StringBuffer implements Serializable, CharSequence
    */
   public synchronized StringBuffer append(char[] data, int offset, int count)
   {
+    if (offset < 0 || count < 0 || offset > data.length - count)
+      throw new StringIndexOutOfBoundsException();
     ensureCapacity_unsynchronized(this.count + count);
     System.arraycopy(data, offset, value, this.count, count);
     this.count += count;
@@ -378,7 +396,7 @@ public final class StringBuffer implements Serializable, CharSequence
   /**
    * Append the <code>char</code> to this <code>StringBuffer</code>.
    *
-   * @param c the <code>char</code> to append
+   * @param ch the <code>char</code> to append
    * @return this <code>StringBuffer</code>
    */
   public synchronized StringBuffer append(char ch)
@@ -563,14 +581,16 @@ public final class StringBuffer implements Serializable, CharSequence
   public synchronized String substring(int beginIndex, int endIndex)
   {
     int len = endIndex - beginIndex;
-    if (beginIndex < 0 || endIndex > count || len < 0)
+    if (beginIndex < 0 || endIndex > count || endIndex < beginIndex)
       throw new StringIndexOutOfBoundsException();
     if (len == 0)
       return "";
-    // Share the char[] unless 3/4 empty.
-    shared = (len << 2) >= value.length;
+    // Don't copy unless substring is smaller than 1/4 of the buffer.
+    boolean share_buffer = ((len << 2) >= value.length);
+    if (share_buffer)
+      this.shared = true;
     // Package constructor avoids an array copy.
-    return new String(value, beginIndex, len, shared);
+    return new String(value, beginIndex, len, share_buffer);
   }
 
   /**
@@ -590,7 +610,7 @@ public final class StringBuffer implements Serializable, CharSequence
                                           char[] str, int str_offset, int len)
   {
     if (offset < 0 || offset > count || len < 0
-        || str_offset < 0 || str_offset + len > str.length)
+        || str_offset < 0 || str_offset > str.length - len)
       throw new StringIndexOutOfBoundsException();
     ensureCapacity_unsynchronized(count + len);
     System.arraycopy(value, offset, value, offset + len, count - offset);

@@ -132,7 +132,7 @@ public class VmAddressMap extends VmSystemObject {
             table[ i + 0] = methods.indexOf(p.method);
             table[ i + 1] = p.pc;
             table[ i + 2] = p.offset;
-            if (p.offset < lastOffset) { throw new VirtualMachineError(
+            if (p.offset < lastOffset) { throw new InternalError(
                     "unordered offset found"); }
             lastOffset = p.offset;
             i += 3;

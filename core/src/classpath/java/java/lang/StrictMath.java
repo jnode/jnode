@@ -1,5 +1,5 @@
 /* java.lang.StrictMath -- common mathematical functions, strict Java
-   Copyright (C) 1998, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2001, 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -52,6 +52,7 @@ exception statement from your version. */
 package java.lang;
 
 import java.util.Random;
+import gnu.classpath.Configuration;
 
 /**
  * Helper class containing useful mathematical functions and constants.
@@ -71,11 +72,13 @@ import java.util.Random;
  * @author Eric Blake <ebb9@email.byu.edu>
  * @since 1.3
  */
-public final strictfp class StrictMath {
+public final strictfp class StrictMath
+{
 	/**
 	 * StrictMath is non-instantiable.
 	 */
-	private StrictMath() {
+  private StrictMath()
+  {
 	}
 
 	/**
@@ -92,14 +95,16 @@ public final strictfp class StrictMath {
 	 * @see #log(double)
 	 * @see #exp(double)
 	 */
-	public static final double E = 2.718281828459045; // Long bits 0x4005bf0z8b145769L.
+  public static final double E
+    = 2.718281828459045; // Long bits 0x4005bf0z8b145769L.
 
 	/**
 	 * The most accurate approximation to the mathematical constant <em>pi</em>:
 	 * <code>3.141592653589793</code>. This is the ratio of a circle's diameter
 	 * to its circumference.
 	 */
-	public static final double PI = 3.141592653589793; // Long bits 0x400921fb54442d18L.
+  public static final double PI
+    = 3.141592653589793; // Long bits 0x400921fb54442d18L.
 
 	/**
 	 * Take the absolute value of the argument. (Absolute value means make
@@ -114,7 +119,8 @@ public final strictfp class StrictMath {
 	 * @return the absolute value
 	 * @see Integer#MIN_VALUE
 	 */
-	public static int abs(int i) {
+  public static int abs(int i)
+  {
 		return (i < 0) ? -i : i;
 	}
 
@@ -131,7 +137,8 @@ public final strictfp class StrictMath {
 	 * @return the absolute value
 	 * @see Long#MIN_VALUE
 	 */
-	public static long abs(long l) {
+  public static long abs(long l)
+  {
 		return (l < 0) ? -l : l;
 	}
 
@@ -142,7 +149,8 @@ public final strictfp class StrictMath {
 	 * @param f the number to take the absolute value of
 	 * @return the absolute value
 	 */
-	public static float abs(float f) {
+  public static float abs(float f)
+  {
 		return (f <= 0) ? 0 - f : f;
 	}
 
@@ -153,7 +161,8 @@ public final strictfp class StrictMath {
 	 * @param d the number to take the absolute value of
 	 * @return the absolute value
 	 */
-	public static double abs(double d) {
+  public static double abs(double d)
+  {
 		return (d <= 0) ? 0 - d : d;
 	}
 
@@ -164,7 +173,8 @@ public final strictfp class StrictMath {
 	 * @param b a second number
 	 * @return the smaller of the two numbers
 	 */
-	public static int min(int a, int b) {
+  public static int min(int a, int b)
+  {
 		return (a < b) ? a : b;
 	}
 
@@ -175,7 +185,8 @@ public final strictfp class StrictMath {
 	 * @param b a second number
 	 * @return the smaller of the two numbers
 	 */
-	public static long min(long a, long b) {
+  public static long min(long a, long b)
+  {
 		return (a < b) ? a : b;
 	}
 
@@ -187,14 +198,15 @@ public final strictfp class StrictMath {
 	 * @param b a second number
 	 * @return the smaller of the two numbers
 	 */
-	public static float min(float a, float b) {
+  public static float min(float a, float b)
+  {
 		// this check for NaN, from JLS 15.21.1, saves a method call
 		if (a != a)
 			return a;
 		// no need to check if b is NaN; < will work correctly
 		// recall that -0.0 == 0.0, but [+-]0.0 - [+-]0.0 behaves special
 		if (a == 0 && b == 0)
-			return - (-a - b);
+      return -(-a - b);
 		return (a < b) ? a : b;
 	}
 
@@ -206,14 +218,15 @@ public final strictfp class StrictMath {
 	 * @param b a second number
 	 * @return the smaller of the two numbers
 	 */
-	public static double min(double a, double b) {
+  public static double min(double a, double b)
+  {
 		// this check for NaN, from JLS 15.21.1, saves a method call
 		if (a != a)
 			return a;
 		// no need to check if b is NaN; < will work correctly
 		// recall that -0.0 == 0.0, but [+-]0.0 - [+-]0.0 behaves special
 		if (a == 0 && b == 0)
-			return - (-a - b);
+      return -(-a - b);
 		return (a < b) ? a : b;
 	}
 
@@ -224,7 +237,8 @@ public final strictfp class StrictMath {
 	 * @param b a second number
 	 * @return the larger of the two numbers
 	 */
-	public static int max(int a, int b) {
+  public static int max(int a, int b)
+  {
 		return (a > b) ? a : b;
 	}
 
@@ -235,7 +249,8 @@ public final strictfp class StrictMath {
 	 * @param b a second number
 	 * @return the larger of the two numbers
 	 */
-	public static long max(long a, long b) {
+  public static long max(long a, long b)
+  {
 		return (a > b) ? a : b;
 	}
 
@@ -247,7 +262,8 @@ public final strictfp class StrictMath {
 	 * @param b a second number
 	 * @return the larger of the two numbers
 	 */
-	public static float max(float a, float b) {
+  public static float max(float a, float b)
+  {
 		// this check for NaN, from JLS 15.21.1, saves a method call
 		if (a != a)
 			return a;
@@ -266,7 +282,8 @@ public final strictfp class StrictMath {
 	 * @param b a second number
 	 * @return the larger of the two numbers
 	 */
-	public static double max(double a, double b) {
+  public static double max(double a, double b)
+  {
 		// this check for NaN, from JLS 15.21.1, saves a method call
 		if (a != a)
 			return a;
@@ -284,8 +301,9 @@ public final strictfp class StrictMath {
 	 * @param a the angle (in radians)
 	 * @return sin(a)
 	 */
-	public static double sin(double a) {
-		if (a == Double.NEGATIVE_INFINITY || !(a < Double.POSITIVE_INFINITY))
+  public static double sin(double a)
+  {
+    if (a == Double.NEGATIVE_INFINITY || ! (a < Double.POSITIVE_INFINITY))
 			return Double.NaN;
 
 		if (abs(a) <= PI / 4)
@@ -294,14 +312,15 @@ public final strictfp class StrictMath {
 		// Argument reduction needed.
 		double[] y = new double[2];
 		int n = remPiOver2(a, y);
-		switch (n & 3) {
-			case 0 :
+    switch (n & 3)
+      {
+      case 0:
 				return sin(y[0], y[1]);
-			case 1 :
+      case 1:
 				return cos(y[0], y[1]);
-			case 2 :
+      case 2:
 				return -sin(y[0], y[1]);
-			default :
+      default:
 				return -cos(y[0], y[1]);
 		}
 	}
@@ -313,8 +332,9 @@ public final strictfp class StrictMath {
 	 * @param a the angle (in radians).
 	 * @return cos(a).
 	 */
-	public static double cos(double a) {
-		if (a == Double.NEGATIVE_INFINITY || !(a < Double.POSITIVE_INFINITY))
+  public static double cos(double a)
+  {
+    if (a == Double.NEGATIVE_INFINITY || ! (a < Double.POSITIVE_INFINITY))
 			return Double.NaN;
 
 		if (abs(a) <= PI / 4)
@@ -323,14 +343,15 @@ public final strictfp class StrictMath {
 		// Argument reduction needed.
 		double[] y = new double[2];
 		int n = remPiOver2(a, y);
-		switch (n & 3) {
-			case 0 :
+    switch (n & 3)
+      {
+      case 0:
 				return cos(y[0], y[1]);
-			case 1 :
+      case 1:
 				return -sin(y[0], y[1]);
-			case 2 :
+      case 2:
 				return -cos(y[0], y[1]);
-			default :
+      default:
 				return sin(y[0], y[1]);
 		}
 	}
@@ -342,8 +363,9 @@ public final strictfp class StrictMath {
 	 * @param a the angle (in radians)
 	 * @return tan(a)
 	 */
-	public static double tan(double a) {
-		if (a == Double.NEGATIVE_INFINITY || !(a < Double.POSITIVE_INFINITY))
+  public static double tan(double a)
+  {
+    if (a == Double.NEGATIVE_INFINITY || ! (a < Double.POSITIVE_INFINITY))
 			return Double.NaN;
 
 		if (abs(a) <= PI / 4)
@@ -364,31 +386,38 @@ public final strictfp class StrictMath {
 	 * @param x the sin to turn back into an angle
 	 * @return arcsin(x)
 	 */
-	public static double asin(double x) {
+  public static double asin(double x)
+  {
 		boolean negative = x < 0;
 		if (negative)
 			x = -x;
-		if (!(x <= 1))
+    if (! (x <= 1))
 			return Double.NaN;
 		if (x == 1)
 			return negative ? -PI / 2 : PI / 2;
-		if (x < 0.5) {
+    if (x < 0.5)
+      {
 			if (x < 1 / TWO_27)
 				return negative ? -x : x;
 			double t = x * x;
-			double p = t * (PS0 + t * (PS1 + t * (PS2 + t * (PS3 + t * (PS4 + t * PS5)))));
+        double p = t * (PS0 + t * (PS1 + t * (PS2 + t * (PS3 + t
+                                                         * (PS4 + t * PS5)))));
 			double q = 1 + t * (QS1 + t * (QS2 + t * (QS3 + t * QS4)));
 			return negative ? -x - x * (p / q) : x + x * (p / q);
 		}
 		double w = 1 - x; // 1>|x|>=0.5.
 		double t = w * 0.5;
-		double p = t * (PS0 + t * (PS1 + t * (PS2 + t * (PS3 + t * (PS4 + t * PS5)))));
+    double p = t * (PS0 + t * (PS1 + t * (PS2 + t * (PS3 + t
+                                                     * (PS4 + t * PS5)))));
 		double q = 1 + t * (QS1 + t * (QS2 + t * (QS3 + t * QS4)));
 		double s = sqrt(t);
-		if (x >= 0.975) {
+    if (x >= 0.975)
+      {
 			w = p / q;
 			t = PI / 2 - (2 * (s + s * w) - PI_L / 2);
-		} else {
+      }
+    else
+      {
 			w = (float) s;
 			double c = (t - w * w) / (s + w);
 			p = 2 * s * (p / q) - (PI_L / 2 - 2 * c);
@@ -406,19 +435,22 @@ public final strictfp class StrictMath {
 	 * @param x the cos to turn back into an angle
 	 * @return arccos(x)
 	 */
-	public static double acos(double x) {
+  public static double acos(double x)
+  {
 		boolean negative = x < 0;
 		if (negative)
 			x = -x;
-		if (!(x <= 1))
+    if (! (x <= 1))
 			return Double.NaN;
 		if (x == 1)
 			return negative ? PI : 0;
-		if (x < 0.5) {
+    if (x < 0.5)
+      {
 			if (x < 1 / TWO_57)
 				return PI / 2;
 			double z = x * x;
-			double p = z * (PS0 + z * (PS1 + z * (PS2 + z * (PS3 + z * (PS4 + z * PS5)))));
+        double p = z * (PS0 + z * (PS1 + z * (PS2 + z * (PS3 + z
+                                                         * (PS4 + z * PS5)))));
 			double q = 1 + z * (QS1 + z * (QS2 + z * (QS3 + z * QS4)));
 			double r = x - (PI_L / 2 - x * (p / q));
 			return negative ? PI / 2 + r : PI / 2 - r;
@@ -426,7 +458,8 @@ public final strictfp class StrictMath {
 		if (negative) // x<=-0.5.
 			{
 			double z = (1 + x) * 0.5;
-			double p = z * (PS0 + z * (PS1 + z * (PS2 + z * (PS3 + z * (PS4 + z * PS5)))));
+        double p = z * (PS0 + z * (PS1 + z * (PS2 + z * (PS3 + z
+                                                         * (PS4 + z * PS5)))));
 			double q = 1 + z * (QS1 + z * (QS2 + z * (QS3 + z * QS4)));
 			double s = sqrt(z);
 			double w = p / q * s - PI_L / 2;
@@ -436,7 +469,8 @@ public final strictfp class StrictMath {
 		double s = sqrt(z);
 		double df = (float) s;
 		double c = (z - df * df) / (s + df);
-		double p = z * (PS0 + z * (PS1 + z * (PS2 + z * (PS3 + z * (PS4 + z * PS5)))));
+    double p = z * (PS0 + z * (PS1 + z * (PS2 + z * (PS3 + z
+                                                     * (PS4 + z * PS5)))));
 		double q = 1 + z * (QS1 + z * (QS2 + z * (QS3 + z * QS4)));
 		double w = p / q * s + c;
 		return 2 * (df + w);
@@ -451,7 +485,8 @@ public final strictfp class StrictMath {
 	 * @return arcsin(x)
 	 * @see #atan2(double, double)
 	 */
-	public static double atan(double x) {
+  public static double atan(double x)
+  {
 		double lo;
 		double hi;
 		boolean negative = x < 0;
@@ -459,29 +494,34 @@ public final strictfp class StrictMath {
 			x = -x;
 		if (x >= TWO_66)
 			return negative ? -PI / 2 : PI / 2;
-		if (!(x >= 0.4375)) // |x|<7/16, or NaN.
+    if (! (x >= 0.4375)) // |x|<7/16, or NaN.
 			{
-			if (!(x >= 1 / TWO_29)) // Small, or NaN.
+        if (! (x >= 1 / TWO_29)) // Small, or NaN.
 				return negative ? -x : x;
 			lo = hi = 0;
-		} else if (x < 1.1875) {
+      }
+    else if (x < 1.1875)
+      {
 			if (x < 0.6875) // 7/16<=|x|<11/16.
 				{
 				x = (2 * x - 1) / (2 + x);
 				hi = ATAN_0_5H;
 				lo = ATAN_0_5L;
-			} else // 11/16<=|x|<19/16.
+          }
+        else // 11/16<=|x|<19/16.
 				{
 				x = (x - 1) / (x + 1);
 				hi = PI / 4;
 				lo = PI_L / 4;
 			}
-		} else if (x < 2.4375) // 19/16<=|x|<39/16.
+      }
+    else if (x < 2.4375) // 19/16<=|x|<39/16.
 			{
 			x = (x - 1.5) / (1 + 1.5 * x);
 			hi = ATAN_1_5H;
 			lo = ATAN_1_5L;
-		} else // 39/16<=|x|<2**66.
+      }
+    else // 39/16<=|x|<2**66.
 			{
 			x = -1 / x;
 			hi = PI / 2;
@@ -491,7 +531,8 @@ public final strictfp class StrictMath {
 		// Break sum from i=0 to 10 ATi*z**(i+1) into odd and even poly.
 		double z = x * x;
 		double w = z * z;
-		double s1 = z * (AT0 + w * (AT2 + w * (AT4 + w * (AT6 + w * (AT8 + w * AT10)))));
+    double s1 = z * (AT0 + w * (AT2 + w * (AT4 + w * (AT6 + w
+                                                      * (AT8 + w * AT10)))));
 		double s2 = w * (AT1 + w * (AT3 + w * (AT5 + w * (AT7 + w * AT9))));
 		if (hi == 0)
 			return negative ? x * (s1 + s2) - x : x - x * (s1 + s2);
@@ -546,31 +587,36 @@ public final strictfp class StrictMath {
 	 * @return <em>theta</em> in the conversion of (x, y) to (r, theta)
 	 * @see #atan(double)
 	 */
-	public static double atan2(double y, double x) {
+  public static double atan2(double y, double x)
+  {
 		if (x != x || y != y)
 			return Double.NaN;
 		if (x == 1)
 			return atan(y);
-		if (x == Double.POSITIVE_INFINITY) {
+    if (x == Double.POSITIVE_INFINITY)
+      {
 			if (y == Double.POSITIVE_INFINITY)
 				return PI / 4;
 			if (y == Double.NEGATIVE_INFINITY)
 				return -PI / 4;
 			return 0 * y;
 		}
-		if (x == Double.NEGATIVE_INFINITY) {
+    if (x == Double.NEGATIVE_INFINITY)
+      {
 			if (y == Double.POSITIVE_INFINITY)
 				return 3 * PI / 4;
 			if (y == Double.NEGATIVE_INFINITY)
 				return -3 * PI / 4;
 			return (1 / (0 * y) == Double.POSITIVE_INFINITY) ? PI : -PI;
 		}
-		if (y == 0) {
+    if (y == 0)
+      {
 			if (1 / (0 * x) == Double.POSITIVE_INFINITY)
 				return y;
 			return (1 / y == Double.POSITIVE_INFINITY) ? PI : -PI;
 		}
-		if (y == Double.POSITIVE_INFINITY || y == Double.NEGATIVE_INFINITY || x == 0)
+    if (y == Double.POSITIVE_INFINITY || y == Double.NEGATIVE_INFINITY
+        || x == 0)
 			return y < 0 ? -PI / 2 : PI / 2;
 
 		double z = abs(y / x); // Safe to do y/x.
@@ -596,7 +642,8 @@ public final strictfp class StrictMath {
 	 * @see #log(double)
 	 * @see #pow(double, double)
 	 */
-	public static double exp(double x) {
+  public static double exp(double x)
+  {
 		if (x != x)
 			return x;
 		if (x > EXP_LIMIT_H)
@@ -609,23 +656,29 @@ public final strictfp class StrictMath {
 		double lo;
 		int k;
 		double t = abs(x);
-		if (t > 0.5 * LN2) {
-			if (t < 1.5 * LN2) {
+    if (t > 0.5 * LN2)
+      {
+        if (t < 1.5 * LN2)
+          {
 				hi = t - LN2_H;
 				lo = LN2_L;
 				k = 1;
-			} else {
+          }
+        else
+          {
 				k = (int) (INV_LN2 * t + 0.5);
 				hi = t - k * LN2_H;
 				lo = k * LN2_L;
 			}
-			if (x < 0) {
+        if (x < 0)
+          {
 				hi = -hi;
 				lo = -lo;
 				k = -k;
 			}
 			x = hi - lo;
-		} else if (t < 1 / TWO_28)
+      }
+    else if (t < 1 / TWO_28)
 			return 1;
 		else
 			lo = hi = k = 0;
@@ -652,12 +705,13 @@ public final strictfp class StrictMath {
 	 * @return the natural log of <code>a</code>
 	 * @see #exp(double)
 	 */
-	public static double log(double x) {
+  public static double log(double x)
+  {
 		if (x == 0)
 			return Double.NEGATIVE_INFINITY;
 		if (x < 0)
 			return Double.NaN;
-		if (!(x < Double.POSITIVE_INFINITY))
+    if (! (x < Double.POSITIVE_INFINITY))
 			return x;
 
 		// Normalize x.
@@ -672,12 +726,14 @@ public final strictfp class StrictMath {
 		exp -= 1023; // Unbias exponent.
 		bits = (bits & 0x000fffffffffffffL) | 0x3ff0000000000000L;
 		x = Double.longBitsToDouble(bits);
-		if (x >= SQRT_2) {
+    if (x >= SQRT_2)
+      {
 			x *= 0.5;
 			exp++;
 		}
 		x--;
-		if (abs(x) < 1 / TWO_20) {
+    if (abs(x) < 1 / TWO_20)
+      {
 			if (x == 0)
 				return exp * LN2_H + exp * LN2_L;
 			double r = x * x * (0.5 - 1 / 3.0 * x);
@@ -691,7 +747,8 @@ public final strictfp class StrictMath {
 		double t1 = w * (LG2 + w * (LG4 + w * LG6));
 		double t2 = z * (LG1 + w * (LG3 + w * (LG5 + w * LG7)));
 		double r = t2 + t1;
-		if (bits >= 0x3ff6174a00000000L && bits < 0x3ff6b85200000000L) {
+    if (bits >= 0x3ff6174a00000000L && bits < 0x3ff6b85200000000L)
+      {
 			double h = 0.5 * x * x; // Need more accuracy for x near sqrt(2).
 			if (exp == 0)
 				return x - (h - s * (h + r));
@@ -713,10 +770,11 @@ public final strictfp class StrictMath {
 	 * @return the square root of the argument
 	 * @see #pow(double, double)
 	 */
-	public static double sqrt(double x) {
+  public static double sqrt(double x)
+  {
 		if (x < 0)
 			return Double.NaN;
-		if (x == 0 || !(x < Double.POSITIVE_INFINITY))
+    if (x == 0 || ! (x < Double.POSITIVE_INFINITY))
 			return x;
 
 		// Normalize x.
@@ -739,9 +797,11 @@ public final strictfp class StrictMath {
 		long q = 0;
 		long s = 0;
 		long r = 0x0020000000000000L; // Move r right to left.
-		while (r != 0) {
+    while (r != 0)
+      {
 			long t = s + r;
-			if (t <= bits) {
+        if (t <= bits)
+          {
 				s = t + r;
 				bits -= t;
 				q += r;
@@ -824,7 +884,8 @@ public final strictfp class StrictMath {
 	 * @param y the power to raise it to
 	 * @return x<sup>y</sup>
 	 */
-	public static double pow(double x, double y) {
+  public static double pow(double x, double y)
+  {
 		// Special cases first.
 		if (y == 0)
 			return 1;
@@ -844,7 +905,8 @@ public final strictfp class StrictMath {
 		double ay = abs(y);
 
 		// More special cases, of y.
-		if (ay == Double.POSITIVE_INFINITY) {
+    if (ay == Double.POSITIVE_INFINITY)
+      {
 			if (ax == 1)
 				return Double.NaN;
 			if (ax > 1)
@@ -857,10 +919,12 @@ public final strictfp class StrictMath {
 			return sqrt(x);
 
 		// More special cases, of x.
-		if (x == 0 || ax == Double.POSITIVE_INFINITY || ax == 1) {
+    if (x == 0 || ax == Double.POSITIVE_INFINITY || ax == 1)
+      {
 			if (y < 0)
 				ax = 1 / ax;
-			if (x < 0) {
+        if (x < 0)
+          {
 				if (x == -1 && yisint == 0)
 					ax = Double.NaN;
 				else if (yisint == 1)
@@ -878,7 +942,8 @@ public final strictfp class StrictMath {
 		double u;
 		double v;
 		double w;
-		if (ay > TWO_31) {
+    if (ay > TWO_31)
+      {
 			if (ay > TWO_64) // Automatic over/underflow.
 				return ((ax < 1) ? y < 0 : y > 0) ? Double.POSITIVE_INFINITY : 0;
 			// Over/underflow if x is not close to one.
@@ -894,7 +959,9 @@ public final strictfp class StrictMath {
 			v = t * INV_LN2_L - w * INV_LN2;
 			t1 = (float) (u + v);
 			t2 = v - (t1 - u);
-		} else {
+      }
+    else
+    {
 			long bits = Double.doubleToLongBits(ax);
 			int exp = (int) (bits >> 52);
 			if (exp == 0) // Subnormal x.
@@ -904,13 +971,15 @@ public final strictfp class StrictMath {
 				exp = (int) (bits >> 52) - 54;
 			}
 			exp -= 1023; // Unbias exponent.
-			ax = Double.longBitsToDouble((bits & 0x000fffffffffffffL) | 0x3ff0000000000000L);
+      ax = Double.longBitsToDouble((bits & 0x000fffffffffffffL)
+                                   | 0x3ff0000000000000L);
 			boolean k;
 			if (ax < SQRT_1_5) // |x|<sqrt(3/2).
 				k = false;
 			else if (ax < SQRT_3) // |x|<sqrt(3).
 				k = true;
-			else {
+      else
+        {
 				k = false;
 				ax *= 0.5;
 				exp++;
@@ -926,7 +995,8 @@ public final strictfp class StrictMath {
 			double s_l = v * ((u - s_h * t_h) - s_h * t_l);
 			// Compute log(ax).
 			double s2 = s * s;
-			double r = s_l * (s_h + s) + s2 * s2 * (L1 + s2 * (L2 + s2 * (L3 + s2 * (L4 + s2 * (L5 + s2 * L6)))));
+      double r = s_l * (s_h + s) + s2 * s2
+        * (L1 + s2 * (L2 + s2 * (L3 + s2 * (L4 + s2 * (L5 + s2 * L6)))));
 			s2 = s_h * s_h;
 			t_h = (float) (3.0 + s2 + r);
 			t_l = r - (t_h - 3.0 - s2);
@@ -953,8 +1023,10 @@ public final strictfp class StrictMath {
 		if (z >= 1024) // Detect overflow.
 			{
 			if (z > 1024 || p_l + OVT > z - p_h)
-				return negative ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
-		} else if (z <= -1075) // Detect underflow.
+          return negative ? Double.NEGATIVE_INFINITY
+            : Double.POSITIVE_INFINITY;
+      }
+    else if (z <= -1075) // Detect underflow.
 			{
 			if (z < -1075 || p_l <= z - p_h)
 				return negative ? -0.0 : 0;
@@ -981,16 +1053,18 @@ public final strictfp class StrictMath {
 	 * double to <code>x / y</code> (ties go to the even n); for a zero
 	 * remainder, the sign is that of <code>x</code>. If either argument is NaN,
 	 * the first argument is infinite, or the second argument is zero, the result
-	 * is NaN; if x is finite but y is infinte, the result is x.
+   * is NaN; if x is finite but y is infinite, the result is x.
 	 *
 	 * @param x the dividend (the top half)
 	 * @param y the divisor (the bottom half)
 	 * @return the IEEE 754-defined floating point remainder of x/y
 	 * @see #rint(double)
 	 */
-	public static double IEEEremainder(double x, double y) {
+  public static double IEEEremainder(double x, double y)
+  {
 		// Purge off exception values.
-		if (x == Double.NEGATIVE_INFINITY || !(x < Double.POSITIVE_INFINITY) || y == 0 || y != y)
+    if (x == Double.NEGATIVE_INFINITY || ! (x < Double.POSITIVE_INFINITY)
+        || y == 0 || y != y)
 			return Double.NaN;
 
 		boolean negative = x < 0;
@@ -1004,15 +1078,20 @@ public final strictfp class StrictMath {
 			x %= y + y;
 
 		// Now adjust x to get correct precision.
-		if (y < 4 / TWO_1023) {
-			if (x + x > y) {
+    if (y < 4 / TWO_1023)
+      {
+        if (x + x > y)
+          {
 				x -= y;
 				if (x + x >= y)
 					x -= y;
 			}
-		} else {
+      }
+    else
+      {
 			y *= 0.5;
-			if (x > y) {
+        if (x > y)
+          {
 				x -= y;
 				if (x >= y)
 					x -= y;
@@ -1030,7 +1109,8 @@ public final strictfp class StrictMath {
 	 * @param a the value to act upon
 	 * @return the nearest integer &gt;= <code>a</code>
 	 */
-	public static double ceil(double a) {
+  public static double ceil(double a)
+  {
 		return -floor(-a);
 	}
 
@@ -1042,9 +1122,10 @@ public final strictfp class StrictMath {
 	 * @param a the value to act upon
 	 * @return the nearest integer &lt;= <code>a</code>
 	 */
-	public static double floor(double a) {
+  public static double floor(double a)
+  {
 		double x = abs(a);
-		if (!(x < TWO_52) || (long) a == a)
+    if (! (x < TWO_52) || (long) a == a)
 			return a; // No fraction bits; includes NaN and infinity.
 		if (x < 1)
 			return a >= 0 ? 0 * a : -1; // Worry about signed zero.
@@ -1059,9 +1140,10 @@ public final strictfp class StrictMath {
 	 * @param a the value to act upon
 	 * @return the nearest integer to <code>a</code>
 	 */
-	public static double rint(double a) {
+  public static double rint(double a)
+  {
 		double x = abs(a);
-		if (!(x < TWO_52))
+    if (! (x < TWO_52))
 			return a; // No fraction bits; includes NaN and infinity.
 		if (x <= 0.5)
 			return 0 * a; // Worry about signed zero.
@@ -1081,7 +1163,8 @@ public final strictfp class StrictMath {
 	 * @see Integer#MIN_VALUE
 	 * @see Integer#MAX_VALUE
 	 */
-	public static int round(float f) {
+  public static int round(float f)
+  {
 		return (int) floor(f + 0.5f);
 	}
 
@@ -1096,7 +1179,8 @@ public final strictfp class StrictMath {
 	 * @see Long#MIN_VALUE
 	 * @see Long#MAX_VALUE
 	 */
-	public static long round(double d) {
+  public static long round(double d)
+  {
 		return (long) floor(d + 0.5);
 	}
 
@@ -1112,7 +1196,8 @@ public final strictfp class StrictMath {
 	 * @see Random#nextDouble()
 	 * @see System#currentTimeMillis()
 	 */
-	public static synchronized double random() {
+  public static synchronized double random()
+  {
 		if (rand == null)
 			rand = new Random();
 		return rand.nextDouble();
@@ -1126,8 +1211,9 @@ public final strictfp class StrictMath {
 	 * @param degrees an angle in degrees
 	 * @return the angle in radians
 	 */
-	public static double toRadians(double degrees) {
-		return degrees * (PI / 180);
+  public static double toRadians(double degrees)
+  {
+    return (degrees * PI) / 180;
 	}
 
 	/**
@@ -1138,8 +1224,9 @@ public final strictfp class StrictMath {
 	 * @param rads an angle in radians
 	 * @return the angle in degrees
 	 */
-	public static double toDegrees(double rads) {
-		return rads * (180 / PI);
+  public static double toDegrees(double rads)
+  {
+    return (rads * 180) / PI;
 	}
 
 	/**
@@ -1147,7 +1234,8 @@ public final strictfp class StrictMath {
 	 * must automatically inline constructs like (1/TWO_54), so we don't list
 	 * negative powers of two here.
 	 */
-		private static final double TWO_16 = 0x10000, // Long bits 0x40f0000000000000L.
+  private static final double
+    TWO_16 = 0x10000, // Long bits 0x40f0000000000000L.
 		TWO_20 = 0x100000, // Long bits 0x4130000000000000L.
 		TWO_24 = 0x1000000, // Long bits 0x4170000000000000L.
 		TWO_27 = 0x8000000, // Long bits 0x41a0000000000000L.
@@ -1167,81 +1255,26 @@ public final strictfp class StrictMath {
 	 * Super precision for 2/pi in 24-bit chunks, for use in
 	 * {@link #remPiOver2()}.
 	 */
-	private static final int TWO_OVER_PI[] =
-		{
-			0xa2f983,
-			0x6e4e44,
-			0x1529fc,
-			0x2757d1,
-			0xf534dd,
-			0xc0db62,
-			0x95993c,
-			0x439041,
-			0xfe5163,
-			0xabdebb,
-			0xc561b7,
-			0x246e3a,
-			0x424dd2,
-			0xe00649,
-			0x2eea09,
-			0xd1921c,
-			0xfe1deb,
-			0x1cb129,
-			0xa73ee8,
-			0x8235f5,
-			0x2ebb44,
-			0x84e99c,
-			0x7026b4,
-			0x5f7e41,
-			0x3991d6,
-			0x398353,
-			0x39f49c,
-			0x845f8b,
-			0xbdf928,
-			0x3b1ff8,
-			0x97ffde,
-			0x05980f,
-			0xef2f11,
-			0x8b5a0a,
-			0x6d1f6d,
-			0x367ecf,
-			0x27cb09,
-			0xb74f46,
-			0x3f669e,
-			0x5fea2d,
-			0x7527ba,
-			0xc7ebe5,
-			0xf17b3d,
-			0x0739f7,
-			0x8a5292,
-			0xea6bfb,
-			0x5fb11f,
-			0x8d5d08,
-			0x560330,
-			0x46fc7b,
-			0x6babf0,
-			0xcfbc20,
-			0x9af436,
-			0x1da9e3,
-			0x91615e,
-			0xe61b08,
-			0x659985,
-			0x5f14a0,
-			0x68408d,
-			0xffd880,
-			0x4d7327,
-			0x310606,
-			0x1556ca,
-			0x73a8c9,
-			0x60e27b,
-			0xc08c6b,
+  private static final int TWO_OVER_PI[] = {
+    0xa2f983, 0x6e4e44, 0x1529fc, 0x2757d1, 0xf534dd, 0xc0db62,
+    0x95993c, 0x439041, 0xfe5163, 0xabdebb, 0xc561b7, 0x246e3a,
+    0x424dd2, 0xe00649, 0x2eea09, 0xd1921c, 0xfe1deb, 0x1cb129,
+    0xa73ee8, 0x8235f5, 0x2ebb44, 0x84e99c, 0x7026b4, 0x5f7e41,
+    0x3991d6, 0x398353, 0x39f49c, 0x845f8b, 0xbdf928, 0x3b1ff8,
+    0x97ffde, 0x05980f, 0xef2f11, 0x8b5a0a, 0x6d1f6d, 0x367ecf,
+    0x27cb09, 0xb74f46, 0x3f669e, 0x5fea2d, 0x7527ba, 0xc7ebe5,
+    0xf17b3d, 0x0739f7, 0x8a5292, 0xea6bfb, 0x5fb11f, 0x8d5d08,
+    0x560330, 0x46fc7b, 0x6babf0, 0xcfbc20, 0x9af436, 0x1da9e3,
+    0x91615e, 0xe61b08, 0x659985, 0x5f14a0, 0x68408d, 0xffd880,
+    0x4d7327, 0x310606, 0x1556ca, 0x73a8c9, 0x60e27b, 0xc08c6b,
 			};
 
 	/**
 	 * Super precision for pi/2 in 24-bit chunks, for use in
 	 * {@link #remPiOver2()}.
 	 */
-	private static final double PI_OVER_TWO[] = { 1.570796251296997, // Long bits 0x3ff921fb40000000L.
+  private static final double PI_OVER_TWO[] = {
+    1.570796251296997, // Long bits 0x3ff921fb40000000L.
 		7.549789415861596e-8, // Long bits 0x3e74442d00000000L.
 		5.390302529957765e-15, // Long bits 0x3cf8469880000000L.
 		3.282003415807913e-22, // Long bits 0x3b78cc5160000000L.
@@ -1255,7 +1288,8 @@ public final strictfp class StrictMath {
 	 * More constants related to pi, used in {@link #remPiOver2()} and
 	 * elsewhere.
 	 */
-		private static final double PI_L = 1.2246467991473532e-16, // Long bits 0x3ca1a62633145c07L.
+  private static final double
+    PI_L = 1.2246467991473532e-16, // Long bits 0x3ca1a62633145c07L.
 		PIO2_1 = 1.5707963267341256, // Long bits 0x3ff921fb54400000L.
 		PIO2_1L = 6.077100506506192e-11, // Long bits 0x3dd0b4611a626331L.
 		PIO2_2 = 6.077100506303966e-11, // Long bits 0x3dd0b4611a600000L.
@@ -1268,7 +1302,8 @@ public final strictfp class StrictMath {
 	 * {@link #exp(double)}, {@link #log(double)} and
 	 * {@link #power(double, double)}. CP is 2/(3*ln(2)).
 	 */
-		private static final double SQRT_1_5 = 1.224744871391589, // Long bits 0x3ff3988e1409212eL.
+  private static final double
+    SQRT_1_5 = 1.224744871391589, // Long bits 0x3ff3988e1409212eL.
 		SQRT_2 = 1.4142135623730951, // Long bits 0x3ff6a09e667f3bcdL.
 		SQRT_3 = 1.7320508075688772, // Long bits 0x3ffbb67ae8584caaL.
 		EXP_LIMIT_H = 709.782712893384, // Long bits 0x40862e42fefa39efL.
@@ -1286,7 +1321,8 @@ public final strictfp class StrictMath {
 	/**
 	 * Constants for computing {@link #log(double)}.
 	 */
-		private static final double LG1 = 0.6666666666666735, // Long bits 0x3fe5555555555593L.
+  private static final double
+    LG1 = 0.6666666666666735, // Long bits 0x3fe5555555555593L.
 		LG2 = 0.3999999999940942, // Long bits 0x3fd999999997fa04L.
 		LG3 = 0.2857142874366239, // Long bits 0x3fd2492494229359L.
 		LG4 = 0.22222198432149784, // Long bits 0x3fcc71c51d8e78afL.
@@ -1299,7 +1335,8 @@ public final strictfp class StrictMath {
 	 * coefficients for series; OVT is -(1024-log2(ovfl+.5ulp)); and DP is ???.
 	 * The P coefficients also calculate {@link #exp(double)}.
 	 */
-		private static final double L1 = 0.5999999999999946, // Long bits 0x3fe3333333333303L.
+  private static final double
+    L1 = 0.5999999999999946, // Long bits 0x3fe3333333333303L.
 		L2 = 0.4285714285785502, // Long bits 0x3fdb6db6db6fabffL.
 		L3 = 0.33333332981837743, // Long bits 0x3fd55555518f264dL.
 		L4 = 0.272728123808534, // Long bits 0x3fd17460a91d4101L.
@@ -1317,7 +1354,8 @@ public final strictfp class StrictMath {
 	/**
 	 * Coefficients for computing {@link #sin(double)}.
 	 */
-		private static final double S1 = -0.16666666666666632, // Long bits 0xbfc5555555555549L.
+  private static final double
+    S1 = -0.16666666666666632, // Long bits 0xbfc5555555555549L.
 		S2 = 8.33333333332249e-3, // Long bits 0x3f8111111110f8a6L.
 		S3 = -1.984126982985795e-4, // Long bits 0xbf2a01a019c161d5L.
 		S4 = 2.7557313707070068e-6, // Long bits 0x3ec71de357b1fe7dL.
@@ -1327,7 +1365,8 @@ public final strictfp class StrictMath {
 	/**
 	 * Coefficients for computing {@link #cos(double)}.
 	 */
-		private static final double C1 = 0.0416666666666666, // Long bits 0x3fa555555555554cL.
+  private static final double
+    C1 = 0.0416666666666666, // Long bits 0x3fa555555555554cL.
 		C2 = -1.388888888887411e-3, // Long bits 0xbf56c16c16c15177L.
 		C3 = 2.480158728947673e-5, // Long bits 0x3efa01a019cb1590L.
 		C4 = -2.7557314351390663e-7, // Long bits 0xbe927e4f809c52adL.
@@ -1337,7 +1376,8 @@ public final strictfp class StrictMath {
 	/**
 	 * Coefficients for computing {@link #tan(double)}.
 	 */
-		private static final double T0 = 0.3333333333333341, // Long bits 0x3fd5555555555563L.
+  private static final double
+    T0 = 0.3333333333333341, // Long bits 0x3fd5555555555563L.
 		T1 = 0.13333333333320124, // Long bits 0x3fc111111110fe7aL.
 		T2 = 0.05396825397622605, // Long bits 0x3faba1ba1bb341feL.
 		T3 = 0.021869488294859542, // Long bits 0x3f9664f48406d637L.
@@ -1355,7 +1395,8 @@ public final strictfp class StrictMath {
 	 * Coefficients for computing {@link #asin(double)} and
 	 * {@link #acos(double)}.
 	 */
-		private static final double PS0 = 0.16666666666666666, // Long bits 0x3fc5555555555555L.
+  private static final double
+    PS0 = 0.16666666666666666, // Long bits 0x3fc5555555555555L.
 		PS1 = -0.3255658186224009, // Long bits 0xbfd4d61203eb6f7dL.
 		PS2 = 0.20121253213486293, // Long bits 0x3fc9c1550e884455L.
 		PS3 = -0.04005553450067941, // Long bits 0xbfa48228b5688f3bL.
@@ -1369,7 +1410,8 @@ public final strictfp class StrictMath {
 	/**
 	 * Coefficients for computing {@link #atan(double)}.
 	 */
-		private static final double ATAN_0_5H = 0.4636476090008061, // Long bits 0x3fddac670561bb4fL.
+  private static final double
+    ATAN_0_5H = 0.4636476090008061, // Long bits 0x3fddac670561bb4fL.
 		ATAN_0_5L = 2.2698777452961687e-17, // Long bits 0x3c7a2b7f222f65e2L.
 		ATAN_1_5H = 0.982793723247329, // Long bits 0x3fef730bd281f69bL.
 		ATAN_1_5L = 1.3903311031230998e-17, // Long bits 0x3c7007887af0cbbdL.
@@ -1394,11 +1436,15 @@ public final strictfp class StrictMath {
 	 * @return the quadrant of the result, mod 4: 0: [-pi/4, pi/4],
 	 *         1: [pi/4, 3*pi/4], 2: [3*pi/4, 5*pi/4], 3: [-3*pi/4, -pi/4]
 	 */
-	private static int remPiOver2(double x, double[] y) {
+  private static int remPiOver2(double x, double[] y)
+  {
 		boolean negative = x < 0;
 		x = abs(x);
 		double z;
 		int n;
+    if (Configuration.DEBUG && (x <= PI / 4 || x != x
+                                || x == Double.POSITIVE_INFINITY))
+      throw new InternalError("Assertion failure");
 		if (x < 3 * PI / 4) // If |x| is small.
 			{
 			z = x - PIO2_1;
@@ -1406,20 +1452,23 @@ public final strictfp class StrictMath {
 				{
 				y[0] = z - PIO2_1L;
 				y[1] = z - y[0] - PIO2_1L;
-			} else // Near pi/2, use 33+33+53 bit pi.
+          }
+        else // Near pi/2, use 33+33+53 bit pi.
 				{
 				z -= PIO2_2;
 				y[0] = z - PIO2_2L;
 				y[1] = z - y[0] - PIO2_2L;
 			}
 			n = 1;
-		} else if (x <= TWO_20 * PI / 2) // Medium size.
+      }
+    else if (x <= TWO_20 * PI / 2) // Medium size.
 			{
 			n = (int) (2 / PI * x + 0.5);
 			z = x - n * PIO2_1;
 			double w = n * PIO2_1L; // First round good to 85 bits.
 			y[0] = z - w;
-			if (n >= 32 || (float) x == (float) (w)) {
+        if (n >= 32 || (float) x == (float) (w))
+          {
 				if (x / y[0] >= TWO_16) // Second iteration, good to 118 bits.
 					{
 					double t = z;
@@ -1438,12 +1487,15 @@ public final strictfp class StrictMath {
 				}
 			}
 			y[1] = z - y[0] - w;
-		} else {
+      }
+    else
+      {
 			// All other (large) arguments.
 			int e0 = (int) (Double.doubleToLongBits(x) >> 52) - 1046;
 			z = scale(x, -e0); // e0 = ilogb(z) - 23.
 			double[] tx = new double[3];
-			for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 2; i++)
+          {
 				tx[i] = (int) z;
 				z = (z - tx[i]) * TWO_24;
 			}
@@ -1453,7 +1505,8 @@ public final strictfp class StrictMath {
 				nx--;
 			n = remPiOver2(tx, y, e0, nx);
 		}
-		if (negative) {
+    if (negative)
+      {
 			y[0] = -y[0];
 			y[1] = -y[1];
 			return -n;
@@ -1472,7 +1525,8 @@ public final strictfp class StrictMath {
 	 * @return the quadrant of the result, mod 4: 0: [-pi/4, pi/4],
 	 *         1: [pi/4, 3*pi/4], 2: [3*pi/4, 5*pi/4], 3: [-3*pi/4, -pi/4]
 	 */
-	private static int remPiOver2(double[] x, double[] y, int e0, int nx) {
+  private static int remPiOver2(double[] x, double[] y, int e0, int nx)
+  {
 		int i;
 		int ih;
 		int n;
@@ -1496,15 +1550,18 @@ public final strictfp class StrictMath {
 			f[i] = (j < 0) ? 0 : TWO_OVER_PI[j];
 
 		// Compute q[0],q[1],...q[jk].
-		for (i = 0; i <= jk; i++) {
+    for (i = 0; i <= jk; i++)
+      {
 			for (j = 0, fw = 0; j <= nx; j++)
 				fw += x[j] * f[nx + i - j];
 			q[i] = fw;
 		}
 
-		do {
+    do
+      {
 			// Distill q[] into iq[] reversingly.
-			for (i = 0, j = jz, z = q[jz]; j > 0; i++, j--) {
+        for (i = 0, j = jz, z = q[jz]; j > 0; i++, j--)
+          {
 				fw = (int) (1 / TWO_24 * z);
 				iq[i] = (int) (z - TWO_24 * fw);
 				z = q[j - 1] + fw;
@@ -1522,7 +1579,8 @@ public final strictfp class StrictMath {
 				n += i;
 				iq[jz - 1] -= i << (24 - q0);
 				ih = iq[jz - 1] >> (23 - q0);
-			} else if (q0 == 0)
+          }
+        else if (q0 == 0)
 				ih = iq[jz - 1] >> 23;
 			else if (z >= 0.5)
 				ih = 2;
@@ -1534,22 +1592,27 @@ public final strictfp class StrictMath {
 				for (i = 0; i < jz; i++) // Compute 1-q.
 					{
 					j = iq[i];
-					if (carry == 0) {
-						if (j != 0) {
+                if (carry == 0)
+                  {
+                    if (j != 0)
+                      {
 							carry = 1;
 							iq[i] = 0x1000000 - j;
 						}
-					} else
+                  }
+                else
 						iq[i] = 0xffffff - j;
 				}
-				switch (q0) {
-					case 1 : // Rare case: chance is 1 in 12 for non-default.
+            switch (q0)
+              {
+              case 1: // Rare case: chance is 1 in 12 for non-default.
 						iq[jz - 1] &= 0x7fffff;
 						break;
-					case 2 :
+              case 2:
 						iq[jz - 1] &= 0x3fffff;
 				}
-				if (ih == 2) {
+            if (ih == 2)
+              {
 					z = 1 - z;
 					if (carry != 0)
 						z -= scale(1, q0);
@@ -1557,7 +1620,8 @@ public final strictfp class StrictMath {
 			}
 
 			// Check if recomputation is needed.
-			if (z == 0) {
+        if (z == 0)
+          {
 				j = 0;
 				for (i = jz - 1; i >= jk; i--)
 					j |= iq[i];
@@ -1577,39 +1641,47 @@ public final strictfp class StrictMath {
 					recompute = true;
 				}
 			}
-		} while (recompute);
+      }
+    while (recompute);
 
 		// Chop off zero terms.
-		if (z == 0) {
+    if (z == 0)
+      {
 			jz--;
 			q0 -= 24;
-			while (iq[jz] == 0) {
+        while (iq[jz] == 0)
+          {
 				jz--;
 				q0 -= 24;
 			}
-		} else // Break z into 24-bit if necessary.
+      }
+    else // Break z into 24-bit if necessary.
 			{
 			z = scale(z, -q0);
-			if (z >= TWO_24) {
+        if (z >= TWO_24)
+          {
 				fw = (int) (1 / TWO_24 * z);
 				iq[jz] = (int) (z - TWO_24 * fw);
 				jz++;
 				q0 += 24;
 				iq[jz] = (int) fw;
-			} else
+          }
+        else
 				iq[jz] = (int) z;
 		}
 
 		// Convert integer "bit" chunk to floating-point value.
 		fw = scale(1, q0);
-		for (i = jz; i >= 0; i--) {
+    for (i = jz; i >= 0; i--)
+      {
 			q[i] = fw * iq[i];
 			fw *= 1 / TWO_24;
 		}
 
 		// Compute PI_OVER_TWO[0,...,jk]*q[jz,...,0].
 		double[] fq = new double[20];
-		for (i = jz; i >= 0; i--) {
+    for (i = jz; i >= 0; i--)
+      {
 			fw = 0;
 			for (int k = 0; k <= jk && k <= jz - i; k++)
 				fw += PI_OVER_TWO[k] * q[i + k];
@@ -1635,8 +1707,12 @@ public final strictfp class StrictMath {
 	 * @param n the scale; |n| < 2048
 	 * @return x * 2**n
 	 */
-	private static double scale(double x, int n) {
-		if (x == 0 || x == Double.NEGATIVE_INFINITY || !(x < Double.POSITIVE_INFINITY) || n == 0)
+  private static double scale(double x, int n)
+  {
+    if (Configuration.DEBUG && abs(n) >= 2048)
+      throw new InternalError("Assertion failure");
+    if (x == 0 || x == Double.NEGATIVE_INFINITY
+        || ! (x < Double.POSITIVE_INFINITY) || n == 0)
 			return x;
 		long bits = Double.doubleToLongBits(x);
 		int exp = (int) (bits >> 52) & 0x7ff;
@@ -1649,11 +1725,13 @@ public final strictfp class StrictMath {
 		if (exp > 0x7fe) // Overflow.
 			return Double.POSITIVE_INFINITY * x;
 		if (exp > 0) // Normal.
-			return Double.longBitsToDouble((bits & 0x800fffffffffffffL) | ((long) exp << 52));
+      return Double.longBitsToDouble((bits & 0x800fffffffffffffL)
+                                     | ((long) exp << 52));
 		if (exp <= -54)
 			return 0 * x; // Underflow.
 		exp += 54; // Subnormal result.
-		x = Double.longBitsToDouble((bits & 0x800fffffffffffffL) | ((long) exp << 52));
+    x = Double.longBitsToDouble((bits & 0x800fffffffffffffL)
+                                | ((long) exp << 52));
 		return x * (1 / TWO_54);
 	}
 
@@ -1664,7 +1742,10 @@ public final strictfp class StrictMath {
 	 * @param y tail of x, created by remPiOver2
 	 * @return sin(x+y)
 	 */
-	private static double sin(double x, double y) {
+  private static double sin(double x, double y)
+  {
+    if (Configuration.DEBUG && abs(x + y) > 0.7854)
+      throw new InternalError("Assertion failure");
 		if (abs(x) < 1 / TWO_27)
 			return x; // If |x| ~< 2**-27, already know answer.
 
@@ -1683,7 +1764,10 @@ public final strictfp class StrictMath {
 	 * @param y tail of x, created by remPiOver2
 	 * @return cos(x+y)
 	 */
-	private static double cos(double x, double y) {
+  private static double cos(double x, double y)
+  {
+    if (Configuration.DEBUG && abs(x + y) > 0.7854)
+      throw new InternalError("Assertion failure");
 		x = abs(x);
 		if (x < 1 / TWO_27)
 			return 1; // If |x| ~< 2**-27, already know answer.
@@ -1706,10 +1790,14 @@ public final strictfp class StrictMath {
 	 * @param invert true iff -1/tan should be returned instead
 	 * @return tan(x+y)
 	 */
-	private static double tan(double x, double y, boolean invert) {
+  private static double tan(double x, double y, boolean invert)
+  {
 		// PI/2 is irrational, so no double is a perfect multiple of it.
+    if (Configuration.DEBUG && (abs(x + y) > 0.7854 || (x == 0 && invert)))
+      throw new InternalError("Assertion failure");
 		boolean negative = x < 0;
-		if (negative) {
+    if (negative)
+      {
 			x = -x;
 			y = -y;
 		}
@@ -1719,7 +1807,8 @@ public final strictfp class StrictMath {
 		double z;
 		double w;
 		boolean large = x >= 0.6744;
-		if (large) {
+    if (large)
+      {
 			z = PI / 4 - x;
 			w = PI_L / 4 - y;
 			x = z + w;
@@ -1736,11 +1825,12 @@ public final strictfp class StrictMath {
 		r = y + z * (s * (r + v) + y);
 		r += T0 * s;
 		w = x + r;
-		if (large) {
+    if (large)
+      {
 			v = invert ? -1 : 1;
 			return (negative ? -1 : 1) * (v - 2 * (x - (w * w / (w + v) - r)));
 		}
-		if (!invert)
+    if (! invert)
 			return w;
 
 		// Compute -1.0/(x+r) accurately.

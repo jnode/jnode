@@ -1460,7 +1460,9 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
                     state |= VmTypeState.ST_INVALID;
                     state &= ~VmTypeState.ST_COMPILING;
                     errorMsg = ex.toString();
-                    throw new LinkageError("Failed to compile " + name, ex);
+                    final LinkageError le = new LinkageError("Failed to compile " + name);
+                    le.initCause(ex);
+                    throw le;
                 }
                 final int declared = getNoDeclaredMethods();
                 if (count != declared) {

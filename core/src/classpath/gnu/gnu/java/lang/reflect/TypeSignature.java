@@ -139,7 +139,10 @@ public class TypeSignature
    * accepts both object and descriptor formats, but must know which style
    * of string is being passed in (usually, descriptor should be true). In
    * descriptor format, "I" is treated as int.class, in object format, it
-   * is treated as a class named I in the unnamed package.
+   * is treated as a class named I in the unnamed package. This method is
+   * strictly equivalent to {@link #getClassForEncoding(java.lang.String, boolean, java.lang.ClassLoader)}
+   * with a class loader equal to <code>null</code>. In that case, it
+   * uses the default class loader on the calling stack.
    *
    * @param type_code the class name to decode
    * @param descriptor if the string is in descriptor format
@@ -148,6 +151,30 @@ public class TypeSignature
    * @see #getEncodingOfClass(Class, boolean)
    */
   public static Class getClassForEncoding(String type_code, boolean descriptor)
+    throws ClassNotFoundException
+  {
+    return getClassForEncoding(type_code, descriptor, null);
+  }
+
+  /**
+   * This function is the inverse of <code>getEncodingOfClass</code>. This
+   * accepts both object and descriptor formats, but must know which style
+   * of string is being passed in (usually, descriptor should be true). In
+   * descriptor format, "I" is treated as int.class, in object format, it
+   * is treated as a class named I in the unnamed package.
+   *
+   * @param type_code The class name to decode.
+   * @param descriptor If the string is in descriptor format.
+   * @param loader The class loader when resolving generic object name. If
+   * <code>loader</code> is null then it uses the default class loader on the
+   * calling stack.
+   * @return the corresponding Class object.
+   * @throws ClassNotFoundException if the class cannot be located.
+   * @see #getEncodingOfClass(Class, boolean)
+   * @see #getClassForEncoding(String, boolean)
+   */
+  public static Class getClassForEncoding(String type_code, boolean descriptor,
+		 			  ClassLoader loader)
     throws ClassNotFoundException
   {
     if (descriptor)
@@ -181,7 +208,7 @@ public class TypeSignature
           case '[':
           }
       }
-    return Class.forName(type_code.replace('/', '.'));
+    return Class.forName(type_code.replace('/', '.'), true, loader);
   }
 
   /**

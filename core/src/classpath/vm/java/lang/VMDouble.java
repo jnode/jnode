@@ -3,152 +3,315 @@
  */
 package java.lang;
 
+import org.jnode.vm.Unsafe;
+
 /**
  * VM specific double routines.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class VMDouble {
-	private char[] chars;
-	private int length;
-	private int index;
+    private char[] chars;
 
-	private int parseUnsignedInt() throws NumberFormatException {
-		if (index >= length)
-			throw new NumberFormatException();
+    private int length;
 
-		int start = index;
-		int value = 0;
+    private int index;
 
-		for (; index < length; index++) {
-			int d = Character.digit(chars[index], 10);
-			if (d < 0)
-				break;
-			value *= 10;
-			value += d;
-		}
+    /**
+     * Convert the double to the IEEE 754 floating-point "double format" bit
+     * layout. Bit 63 (the most significant) is the sign bit, bits 62-52 (masked
+     * by 0x7ff0000000000000L) represent the exponent, and bits 51-0 (masked by
+     * 0x000fffffffffffffL) are the mantissa. This function collapses all
+     * versions of NaN to 0x7ff8000000000000L. The result of this function can
+     * be used as the argument to <code>Double.longBitsToDouble(long)</code>
+     * to obtain the original <code>double</code> value.
+     * 
+     * @param value
+     *            the <code>double</code> to convert
+     * @return the bits of the <code>double</code>
+     * @see #longBitsToDouble(long)
+     */
+    public static long doubleToLongBits(double value) {
+        if (Double.isNaN(value)) {
+            return 0x7ff8000000000000L;
+        } else {
+            return Unsafe.doubleToRawLongBits(value);
+        }
+    }
 
-		if (index == start)
-			throw new NumberFormatException();
+    /**
+     * Convert the double to the IEEE 754 floating-point "double format" bit
+     * layout. Bit 63 (the most significant) is the sign bit, bits 62-52 (masked
+     * by 0x7ff0000000000000L) represent the exponent, and bits 51-0 (masked by
+     * 0x000fffffffffffffL) are the mantissa. This function leaves NaN alone,
+     * rather than collapsing to a canonical value. The result of this function
+     * can be used as the argument to <code>Double.longBitsToDouble(long)</code>
+     * to obtain the original <code>double</code> value.
+     * 
+     * @param value
+     *            the <code>double</code> to convert
+     * @return the bits of the <code>double</code>
+     * @see #longBitsToDouble(long)
+     */
+    public static long doubleToRawLongBits(double value) {
+        return Unsafe.doubleToRawLongBits(value);
+    }
 
-		return value;
-	}
+    /**
+     * Convert the argument in IEEE 754 floating-point "double format" bit
+     * layout to the corresponding float. Bit 63 (the most significant) is the
+     * sign bit, bits 62-52 (masked by 0x7ff0000000000000L) represent the
+     * exponent, and bits 51-0 (masked by 0x000fffffffffffffL) are the mantissa.
+     * This function leaves NaN alone, so that you can recover the bit pattern
+     * with <code>Double.doubleToRawLongBits(double)</code>.
+     * 
+     * @param bits
+     *            the bits to convert
+     * @return the <code>double</code> represented by the bits
+     * @see #doubleToLongBits(double)
+     * @see #doubleToRawLongBits(double)
+     */
+    public static double longBitsToDouble(long bits) {
+        return Unsafe.longBitsToDouble(bits);
+    }
 
-	private int parseSignedInt() throws NumberFormatException {
-		if (index >= length)
-			throw new NumberFormatException();
+    private int parseUnsignedInt() throws NumberFormatException {
+        if (index >= length)
+            throw new NumberFormatException();
 
-		char sign = ' ';
+        int start = index;
+        int value = 0;
 
-		switch (chars[index]) {
-			case '-' :
-				sign = '-';
-				index++;
-				break;
+        for (; index < length; index++) {
+            int d = Character.digit(chars[index], 10);
+            if (d < 0)
+                break;
+            value *= 10;
+            value += d;
+        }
 
-			case '+' :
-				sign = '+';
-				index++;
-				break;
-		}
+        if (index == start)
+            throw new NumberFormatException();
 
-		int value = parseUnsignedInt();
+        return value;
+    }
 
-		return (sign == '-') ? -value : value;
-	}
+    private int parseSignedInt() throws NumberFormatException {
+        if (index >= length)
+            throw new NumberFormatException();
 
-	private double parseFractionalPart(boolean nonEmpty)
-		throws NumberFormatException {
-		if (index >= length)
-			throw new NumberFormatException();
+        char sign = ' ';
 
-		int start = index;
-		double value = 0.0d;
+        switch (chars[index]) {
+        case '-':
+            sign = '-';
+            index++;
+            break;
 
-		for (; index < length; index++) {
-			int d = Character.digit(chars[index], 10);
-			if (d < 0)
-				break;
-			value += d;
-			value /= 10;
-		}
+        case '+':
+            sign = '+';
+            index++;
+            break;
+        }
 
-		if (nonEmpty && (index == start))
-			throw new NumberFormatException();
+        int value = parseUnsignedInt();
 
-		return value;
-	}
+        return (sign == '-') ? -value : value;
+    }
 
-	private double parseExponent(double value)
-		throws NumberFormatException {
-		if (index >= chars.length)
-			return value;
+    private double parseFractionalPart(boolean nonEmpty)
+            throws NumberFormatException {
+        if (index >= length)
+            throw new NumberFormatException();
 
-		switch (chars[index]) {
-			case 'e' :
-			case 'E' :
-				index++;
-				break;
+        int start = index;
+        double value = 0.0d;
 
-			default :
-				throw new NumberFormatException();
-		}
+        for (; index < length; index++) {
+            int d = Character.digit(chars[index], 10);
+            if (d < 0)
+                break;
+            value += d;
+            value /= 10;
+        }
 
-		int exponent = parseSignedInt();
+        if (nonEmpty && (index == start))
+            throw new NumberFormatException();
 
-		if (index < chars.length)
-			throw new NumberFormatException();
+        return value;
+    }
 
-		return value * Math.pow(10.0, exponent);
-	}
+    private double parseExponent(double value) throws NumberFormatException {
+        if (index >= chars.length)
+            return value;
 
-	public double parse() throws NumberFormatException {
-		if (index >= chars.length)
-			throw new NumberFormatException();
+        switch (chars[index]) {
+        case 'e':
+        case 'E':
+            index++;
+            break;
 
-		char sign = '+';
+        default:
+            throw new NumberFormatException();
+        }
 
-		switch (chars[index]) {
-			case '-' :
-				sign = '-';
-				index++;
-				break;
+        int exponent = parseSignedInt();
 
-			case '+' :
-				sign = '+';
-				index++;
-				break;
-		}
+        if (index < chars.length)
+            throw new NumberFormatException();
 
-		if (index >= chars.length)
-			throw new NumberFormatException();
+        return value * Math.pow(10.0, exponent);
+    }
 
-		double value;
+    public double parse() throws NumberFormatException {
+        if (index >= chars.length)
+            throw new NumberFormatException();
 
-		if (chars[index] == '.') {
-			index++;
-			value = parseFractionalPart(true);
-			value = parseExponent(value);
-		} else {
-			value = parseUnsignedInt();
+        char sign = '+';
 
-			if (index >= chars.length)
-				throw new NumberFormatException();
-			if (chars[index] != '.')
-				throw new NumberFormatException();
+        switch (chars[index]) {
+        case '-':
+            sign = '-';
+            index++;
+            break;
 
-			index++;
+        case '+':
+            sign = '+';
+            index++;
+            break;
+        }
 
-			value += parseFractionalPart(false);
-			value = parseExponent(value);
-		}
+        if (index >= chars.length)
+            throw new NumberFormatException();
 
-		return (sign == '-') ? -value : value;
-	}
+        double value;
 
-	public VMDouble(String s) {
-		chars = s.toCharArray();
-		length = chars.length;
-		index = 0;
-	}
+        if (chars[index] == '.') {
+            index++;
+            value = parseFractionalPart(true);
+            value = parseExponent(value);
+        } else {
+            value = parseUnsignedInt();
+
+            if (index >= chars.length)
+                throw new NumberFormatException();
+            if (chars[index] != '.')
+                throw new NumberFormatException();
+
+            index++;
+
+            value += parseFractionalPart(false);
+            value = parseExponent(value);
+        }
+
+        return (sign == '-') ? -value : value;
+    }
+
+    public VMDouble(String s) {
+        chars = s.toCharArray();
+        length = chars.length;
+        index = 0;
+    }
+
+    /**
+     * Convert the <code>double</code> to a <code>String</code>.
+     * Floating-point string representation is fairly complex: here is a rundown
+     * of the possible values. "<code>[-]</code>" indicates that a negative
+     * sign will be printed if the value (or exponent) is negative. "
+     * <code>&lt;number&gt;</code>" means a string of digits ('0' to '9'). "
+     * <code>&lt;digit&gt;</code>" means a single digit ('0' to '9'). <br>
+     * 
+     * <table border=1>
+     * <tr>
+     * <th>Value of Double</th>
+     * <th>String Representation</th>
+     * </tr>
+     * <tr>
+     * <td>[+-] 0</td>
+     * <td><code>[-]0.0</code></td>
+     * </tr>
+     * <tr>
+     * <td>Between [+-] 10 <sup>-3 </sup> and 10 <sup>7 </sup>, exclusive</td>
+     * <td><code>[-]number.number</code></td>
+     * </tr>
+     * <tr>
+     * <td>Other numeric value</td>
+     * <td><code>[-]&lt;digit&gt;.&lt;number&gt;
+     *          E[-]&lt;number&gt;</code>
+     * </td>
+     * </tr>
+     * <tr>
+     * <td>[+-] infinity</td>
+     * <td><code>[-]Infinity</code></td>
+     * </tr>
+     * <tr>
+     * <td>NaN</td>
+     * <td><code>NaN</code></td>
+     * </tr>
+     * </table>
+     * 
+     * Yes, negative zero <em>is</em> a possible value. Note that there is
+     * <em>always</em> a <code>.</code> and at least one digit printed after
+     * it: even if the number is 3, it will be printed as <code>3.0</code>.
+     * After the ".", all digits will be printed except trailing zeros. The
+     * result is rounded to the shortest decimal number which will parse back to
+     * the same double.
+     * 
+     * <p>
+     * To create other output formats, use {@link java.text.NumberFormat}.
+     * 
+     * @XXX specify where we are not in accord with the spec.
+     * 
+     * @param v
+     *            the <code>double</code> to convert
+     * @return the <code>String</code> representing the <code>double</code>
+     */
+    public static String toString(double v, boolean isFloat) {
+        
+        final int MAX_DIGITS = isFloat ? 10 : 19;
+        
+        if (Double.isNaN(v))
+            return "NaN";
+        if (v == Double.POSITIVE_INFINITY)
+            return "Infinity";
+        if (v == Double.NEGATIVE_INFINITY)
+            return "-Infinity";
+
+        boolean negative = (doubleToLongBits(v) & (1L << 63)) != 0;
+        double m = negative ? -v : v;
+
+        if (m == 0.0d)
+            return negative ? "-0.0" : "0.0";
+
+        StringBuffer result = new StringBuffer(MAX_DIGITS * 2);
+        if (negative) {
+            result.append('-');
+        }
+
+        if (m >= 1e-3 && m < 1e7) {
+            int digits = 0;
+            long digit = (long) (m - 0.5d);
+            result.append(digit);
+            result.append('.');
+            m -= digit;
+            while ((m > 0.0d) && (digits < MAX_DIGITS)) {
+                m *= 10.0d;
+                digit = (long) (m - 0.5d);
+                m -= digit;
+                result.append(digit);
+                digits++;
+            }
+            if (digits == 0) {
+                result.append('0');
+            }
+        } else {
+            int exponent = (int) (Math.log(m) / Math.log(10.0d));
+            double mantissa = m / Math.pow(10.0d, exponent);
+            result.append(toString(mantissa, isFloat));
+            result.append('E');
+            result.append(Integer.toString(exponent));
+        }
+
+        return result.toString();
+    }
 }

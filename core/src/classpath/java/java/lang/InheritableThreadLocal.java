@@ -1,5 +1,5 @@
 /* InheritableThreadLocal -- a ThreadLocal which inherits values across threads
-   Copyright (C) 2000, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,9 +37,11 @@ exception statement from your version. */
 
 package java.lang;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
@@ -59,25 +61,29 @@ import java.util.WeakHashMap;
  * @since 1.2
  * @status updated to 1.4
  */
-public class InheritableThreadLocal extends ThreadLocal {
+public class InheritableThreadLocal extends ThreadLocal
+{
 	/**
 	 * Maps Threads to a List of InheritableThreadLocals (the heritage of that
 	 * Thread). Uses a WeakHashMap so if the Thread is garbage collected the
 	 * List can be collected, too. Maps to a list in case the user overrides
 	 * equals.
 	 */
-	private static final WeakHashMap threadMap = new WeakHashMap();
+  private static final Map threadMap
+	  = Collections.synchronizedMap(new WeakHashMap());
 
 	/**
 	 * Creates a new InheritableThreadLocal that has no values associated
 	 * with it yet.
 	 */
-	public InheritableThreadLocal() {
+  public InheritableThreadLocal()
+  {
 		Thread currentThread = Thread.currentThread();
 		// Note that we don't have to synchronize, as only this thread will
-		// ever modify the returned heritage.
-		List heritage = (List)threadMap.get(currentThread);
-		if (heritage == null) {
+    // ever modify the returned heritage and threadMap is a synchronizedMap.
+    List heritage = (List) threadMap.get(currentThread);
+    if (heritage == null)
+      {
 			heritage = new ArrayList();
 			threadMap.put(currentThread, heritage);
 		}
@@ -93,7 +99,8 @@ public class InheritableThreadLocal extends ThreadLocal {
 	 *        the moment of creation of the child
 	 * @return the initial value for the child thread
 	 */
-	protected Object childValue(Object parentValue) {
+  protected Object childValue(Object parentValue)
+  {
 		return parentValue;
 	}
 
@@ -105,23 +112,29 @@ public class InheritableThreadLocal extends ThreadLocal {
 	 * @param childThread the newly created thread, to inherit from this thread
 	 * @see Thread#Thread(ThreadGroup, Runnable, String)
 	 */
-	static void newChildThread(Thread childThread) {
+  static void newChildThread(Thread childThread)
+  {
 		// The currentThread is the parent of the new thread.
 		Thread parentThread = Thread.currentThread();
 		// Note that we don't have to synchronize, as only this thread will
-		// ever modify the returned heritage.
-		ArrayList heritage = (ArrayList)threadMap.get(parentThread);
-		if (heritage != null) {
+    // ever modify the returned heritage and threadMap is a synchronizedMap. 
+    ArrayList heritage = (ArrayList) threadMap.get(parentThread);
+    if (heritage != null)
+      {
 			threadMap.put(childThread, heritage.clone());
 			// Perform the inheritance.
 			Iterator it = heritage.iterator();
 			int i = heritage.size();
-			while (--i >= 0) {
-				InheritableThreadLocal local = (InheritableThreadLocal)it.next();
+        while (--i >= 0)
+          {
+            InheritableThreadLocal local = (InheritableThreadLocal) it.next();
 				Object parentValue = local.valueMap.get(parentThread);
-				if (parentValue != null) {
-					Object childValue = local.childValue(parentValue == NULL ? null : parentValue);
-					local.valueMap.put(childThread, (childValue == null ? NULL : parentValue));
+            if (parentValue != null)
+              {
+                Object childValue = local.childValue(parentValue == NULL
+                                                     ? null : parentValue);
+                local.valueMap.put(childThread, (childValue == null
+                                                 ? NULL : parentValue));
 				}
 			}
 		}

@@ -1,5 +1,5 @@
 /* Package.java -- information about a package
-   Copyright (C) 2000, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -69,8 +69,8 @@ import java.util.StringTokenizer;
  * @since 1.2
  * @status updated to 1.4
  */
-public class Package {
-	
+public class Package
+{
 	/** The name of the Package */
 	final private String name;
 
@@ -101,26 +101,22 @@ public class Package {
 	 * There are no public constructors defined for Package; this is a package
 	 * local constructor that is used by java.lang.Classloader.definePackage().
 	 *
-	 * @param name the name of the Package
-	 * @param specTitle the name of the specification
-	 * @param specVendor the name of the specification designer
-	 * @param specVersion the version of this specification
-	 * @param implTitle the name of the implementation
-	 * @param implVendor the vendor that wrote this implementation
-	 * @param implVersion the version of this implementation
-	 * @param sealed if sealed the origin of the package classes
-	 */
-	Package(
-		String name,
-		String specTitle,
-		String specVendor,
-		String specVersion,
-		String implTitle,
-		String implVendor,
-		String implVersion,
-		URL sealed) {
+   * @param name The name of the Package
+   * @param specTitle The name of the specification
+   * @param specVendor The name of the specification designer
+   * @param specVersion The version of this specification
+   * @param implTitle The name of the implementation
+   * @param implVendor The vendor that wrote this implementation
+   * @param implVersion The version of this implementation
+   * @param sealed If sealed the origin of the package classes
+   */
+  Package(String name,
+	  String specTitle, String specVendor, String specVersion,
+	  String implTitle, String implVendor, String implVersion, URL sealed)
+  {
 		if (name == null)
 			throw new IllegalArgumentException("null Package name");
+
 		this.name = name;
 		this.implTitle = implTitle;
 		this.implVendor = implVendor;
@@ -136,7 +132,8 @@ public class Package {
 	 *
 	 * @return the non-null package name
 	 */
-	public String getName() {
+  public String getName()
+  {
 		return name;
 	}
 
@@ -145,7 +142,8 @@ public class Package {
 	 *
 	 * @return the specification title
 	 */
-	public String getSpecificationTitle() {
+  public String getSpecificationTitle()
+  {
 		return specTitle;
 	}
 
@@ -154,7 +152,8 @@ public class Package {
 	 *
 	 * @return the specification version
 	 */
-	public String getSpecificationVersion() {
+  public String getSpecificationVersion()
+  {
 		return specVersion;
 	}
 
@@ -163,7 +162,8 @@ public class Package {
 	 *
 	 * @return the specification vendor
 	 */
-	public String getSpecificationVendor() {
+  public String getSpecificationVendor()
+  {
 		return specVendor;
 	}
 
@@ -172,7 +172,8 @@ public class Package {
 	 *
 	 * @return the implementation title
 	 */
-	public String getImplementationTitle() {
+  public String getImplementationTitle()
+  {
 		return implTitle;
 	}
 
@@ -181,7 +182,8 @@ public class Package {
 	 *
 	 * @return the implementation version
 	 */
-	public String getImplementationVersion() {
+  public String getImplementationVersion()
+  {
 		return implVersion;
 	}
 
@@ -190,7 +192,8 @@ public class Package {
 	 *
 	 * @return the implementation vendor
 	 */
-	public String getImplementationVendor() {
+  public String getImplementationVendor()
+  {
 		return implVendor;
 	}
 
@@ -199,7 +202,8 @@ public class Package {
 	 *
 	 * @return true if the package is sealed
 	 */
-	public boolean isSealed() {
+  public boolean isSealed()
+  {
 		return sealed != null;
 	}
 
@@ -211,7 +215,8 @@ public class Package {
 	 * @return true if the package is sealed by this URL
 	 * @throws NullPointerException if url is null
 	 */
-	public boolean isSealed(URL url) {
+  public boolean isSealed(URL url)
+  {
 		return url.equals(sealed);
 	}
 
@@ -222,14 +227,20 @@ public class Package {
 	 * <code>getSpecificationVersion</code>.
 	 *
 	 * @param version the (minimal) desired version of the specification
-	 * @throws NumberFormatException if either version string is invalid
+   *
+   * @return true if the version is compatible, false otherwise
+   *
+   * @Throws NumberFormatException if either version string is invalid
 	 * @throws NullPointerException if either version string is null
 	 */
-	public boolean isCompatibleWith(String version) {
+  public boolean isCompatibleWith(String version)
+  {
 		StringTokenizer versionTokens = new StringTokenizer(version, ".");
 		StringTokenizer specTokens = new StringTokenizer(specVersion, ".");
-		try {
-			while (versionTokens.hasMoreElements()) {
+    try
+      {
+        while (versionTokens.hasMoreElements())
+          {
 				int vers = Integer.parseInt(versionTokens.nextToken());
 				int spec = Integer.parseInt(specTokens.nextToken());
 				if (spec < vers)
@@ -238,7 +249,9 @@ public class Package {
 					return true;
 				// They must be equal, next Token please!
 			}
-		} catch (NoSuchElementException e) {
+      }
+    catch (NoSuchElementException e)
+      {
 			// This must have been thrown by spec.nextToken() so return false.
 			return false;
 		}
@@ -256,12 +269,11 @@ public class Package {
 	 * @param name the name of the desired package
 	 * @return the package by that name in the current ClassLoader
 	 */
-	public static Package getPackage(String name) {
+  public static Package getPackage(String name)
+  {
 		// Get the caller's classloader
-/*		Class c = VMSecurityManager.getClassContext()[1];
-		ClassLoader cl = c.getClassLoader();
-		return cl != null ? cl.getPackage(name) : null;*/
-		return null;
+    ClassLoader cl = VMSecurityManager.currentClassLoader();
+    return cl != null ? cl.getPackage(name) : null;
 	}
 
 	/**
@@ -270,16 +282,15 @@ public class Package {
 	 *
 	 * @return an array of all known packages
 	 */
-	public static Package[] getPackages() {
+  public static Package[] getPackages()
+  {
 		// Get the caller's classloader
-		/*Class c = VMSecurityManager.getClassContext()[1];
+    Class c = VMSecurityManager.getClassContext()[1];
 		ClassLoader cl = c.getClassLoader();
 		// Sun's implementation returns the packages loaded by the bootstrap
 		// classloader if cl is null, but right now our bootstrap classloader
 		// does not create any Packages.
 		return cl != null ? cl.getPackages() : new Package[0];
-		*/
-		return null;
 	}
 
 	/**
@@ -287,7 +298,8 @@ public class Package {
 	 *
 	 * @return the hash code
 	 */
-	public int hashCode() {
+  public int hashCode()
+  {
 		return name.hashCode();
 	}
 
@@ -299,10 +311,9 @@ public class Package {
 	 *
 	 * @return the string representation of the package
 	 */
-	public String toString() {
-		return "package "
-			+ name
-			+ (specTitle == null ? "" : ", " + specTitle)
-			+ (specVersion == null ? "" : ", version " + specVersion);
+  public String toString()
+  {
+    return ("package " + name + (specTitle == null ? "" : ", " + specTitle)
+	    + (specVersion == null ? "" : ", version " + specVersion));
 	}
 } // class Package
