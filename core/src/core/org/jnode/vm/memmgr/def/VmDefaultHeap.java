@@ -32,7 +32,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
     private int freeSize;
 
     /** Offset (in bytes) from the start of an object to the size of an object */
-    private int sizeOffset;
+    private Offset sizeOffset;
 
     /**
      * Initialize this instance
@@ -51,7 +51,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
      * @param slotSize
      * @return the heap
      */
-    protected static VmAbstractHeap setupHeap(HeapHelper helper, VmAddress start,
+    protected static VmAbstractHeap setupHeap(HeapHelper helper, Address start,
             VmNormalClass heapClass, int slotSize) {
         final int headerSize = ObjectLayout
                 .objectAlign((ObjectLayout.HEADER_SLOTS + 1) * slotSize);
@@ -60,13 +60,13 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         final Offset flagsOffset = Offset.fromIntSignExtend(ObjectLayout.FLAGS_SLOT * slotSize);
 
         // Setup a heap object, so the heap can initialize itself.
-        Address heapPtr = Address.fromAddress(start).add(headerSize);
+        final Address heapPtr = start.add(headerSize);
         final int heapObjSize = ObjectLayout.objectAlign(heapClass
                 .getObjectSize());
         heapPtr.store(heapObjSize, sizeOffset);
         heapPtr.store(ObjectFlags.GC_DEFAULT_COLOR, flagsOffset);
         heapPtr.store(ObjectReference.fromObject(heapClass.getTIB()), vmtOffset);
-        helper.clear(heapPtr.toAddress(), heapObjSize);
+        helper.clear(heapPtr, heapObjSize);
 
         VmDefaultHeap heap = (VmDefaultHeap) heapPtr.toObjectReference().toObject();
         heap.helper = helper;
@@ -82,38 +82,38 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
      *            End address of this heap (first address after this heap)
      * @param slotSize
      */
-    protected void initialize(VmAddress start, VmAddress end, int slotSize) {
+    protected void initialize(Address start, Address end, int slotSize) {
 
         // Set my variables
         this.start = start;
         this.end = end;
         initializeAbstract(slotSize);
-        this.sizeOffset = -((ObjectLayout.HEADER_SLOTS + 1) * slotSize);
+        this.sizeOffset = Offset.fromIntSignExtend(-((ObjectLayout.HEADER_SLOTS + 1) * slotSize));
         this.headerSize = ObjectLayout.objectAlign(this.headerSize + slotSize);
         final int size = getSize();
 
         final Address myAddr = ObjectReference.fromObject(this).toAddress();
-        final int mySize = myAddr.loadInt(Offset.fromIntSignExtend(sizeOffset));
+        final int mySize = myAddr.loadInt(sizeOffset);
         Address firstObject;
         if (inHeap(myAddr)) {
             firstObject = myAddr.add(mySize + headerSize);
         } else {
-            firstObject = Address.fromAddress(start).add(headerSize);
+            firstObject = start.add(headerSize);
         }
 
         // Initialize an allocation bitmap
         final int allocationBits = size / ObjectLayout.OBJECT_ALIGN;
         final int allocationBitmapSize = ObjectLayout
                 .objectAlign((allocationBits + 7) / 8);
-        this.allocationBitmapPtr = firstObject.toAddress();
-        final Address bitmapPtr = Address.fromAddress(this.allocationBitmapPtr);
+        this.allocationBitmapPtr = firstObject;
+        final Address bitmapPtr = this.allocationBitmapPtr;
         // Make the bitmap an object, so it is easy to manipulate.
-        bitmapPtr.store(allocationBitmapSize, Offset.fromIntSignExtend(sizeOffset));
-        bitmapPtr.store(GC_DEFAULT_COLOR, Offset.fromIntSignExtend(flagsOffset));
-        bitmapPtr.store(ObjectReference.fromObject(VmType.getObjectClass().getTIB()), Offset.fromIntSignExtend(tibOffset));
+        bitmapPtr.store(allocationBitmapSize, sizeOffset);
+        bitmapPtr.store(GC_DEFAULT_COLOR, flagsOffset);
+        bitmapPtr.store(ObjectReference.fromObject(VmType.getObjectClass().getTIB()), tibOffset);
         firstObject = firstObject.add(allocationBitmapSize + headerSize);
         helper.clear(allocationBitmapPtr, allocationBitmapSize);
-        this.allocationBitmap = helper.objectAt(allocationBitmapPtr);
+        this.allocationBitmap = allocationBitmapPtr.toObjectReference().toObject();
 
         // Mark this heap in the allocation bitmap
         setAllocationBit(this, true);
@@ -121,10 +121,10 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         setAllocationBit(allocationBitmap, true);
 
         // Initialize the remaining space as free object.
-        final int remainingSize = (int) VmAddress.distance(end, firstObject.toAddress());
+        final int remainingSize = (int) VmAddress.distance(end.toAddress(), firstObject.toAddress());
         final Address ptr = firstObject;
-        ptr.store(remainingSize, Offset.fromIntSignExtend(sizeOffset));
-        ptr.store(ObjectReference.fromObject(FREE), Offset.fromIntSignExtend(tibOffset));
+        ptr.store(remainingSize, sizeOffset);
+        ptr.store(ObjectReference.fromObject(FREE), tibOffset);
         this.nextFreePtr = ptr;
         this.freeSize = remainingSize;
     }
@@ -148,10 +148,10 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
             throw new IllegalArgumentException("vmClass.TIB is null");
         }
         //final int size = getSize();
-        final Offset tibOffset = Offset.fromIntZeroExtend(this.tibOffset);
+        final Offset tibOffset = this.tibOffset;
         final int headerSize = this.headerSize;
-        final Offset flagsOffset = Offset.fromIntZeroExtend(this.flagsOffset);
-        final Offset sizeOffset = Offset.fromIntZeroExtend(this.sizeOffset);
+        final Offset flagsOffset = this.flagsOffset;
+        final Offset sizeOffset = this.sizeOffset;
 
         Address objectPtr = null;
         lock();
@@ -219,7 +219,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         }
 
         // Clear the contents of the object.
-        helper.clear(objectPtr.toAddress(), alignedSize);
+        helper.clear(objectPtr, alignedSize);
 
         return objectPtr.toObjectReference().toObject();
     }
@@ -233,8 +233,8 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         lock();
         try {
         	final Address ptr = ObjectReference.fromObject(object).toAddress();
-            final int objSize = ptr.loadInt(Offset.fromIntSignExtend(sizeOffset));
-            ptr.store(ObjectReference.fromObject(FREE), Offset.fromIntSignExtend(tibOffset));
+            final int objSize = ptr.loadInt(sizeOffset);
+            ptr.store(ObjectReference.fromObject(FREE), tibOffset);
             setAllocationBit(object, false);
             freeSize += objSize;
         } finally {
@@ -258,14 +258,14 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
     protected final void defragment() throws UninterruptiblePragma {
         final int size = getSize();
         int offset = headerSize;
-        final Offset sizeOffset = Offset.fromIntZeroExtend(this.sizeOffset);
-        final Offset tibOffset = Offset.fromIntZeroExtend(this.tibOffset);
+        final Offset sizeOffset = this.sizeOffset;
+        final Offset tibOffset = this.tibOffset;
 
         lock();
         try {
             Address firstFreePtr = null;
             while (offset < size) {
-                final Address ptr = Address.fromAddress(start).add(offset);
+                final Address ptr = start.add(offset);
                 final int objSize = ptr.loadInt(sizeOffset);
                 final int nextOffset = offset + objSize + headerSize;
                 final Object vmt = ptr.loadObjectReference(tibOffset);
@@ -274,7 +274,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
                 }
                 if ((vmt == FREE) && (nextOffset < size)) {
                     final Object nextVmt;
-                    final Address nextObjectPtr = Address.fromAddress(start).add(nextOffset);
+                    final Address nextObjectPtr = start.add(nextOffset);
                     nextVmt = nextObjectPtr.loadObjectReference(tibOffset);
                     if (nextVmt == FREE) {
                         // Combine two free spaces
@@ -309,8 +309,8 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
             int flagsMask, int flagsValue) {
         // Go through the heap and call visit on each object
         final int headerSize = this.headerSize;
-        final Offset sizeOffset = Offset.fromIntZeroExtend(this.sizeOffset);
-        final Offset tibOffset = Offset.fromIntZeroExtend(this.tibOffset);
+        final Offset sizeOffset = this.sizeOffset;
+        final Offset tibOffset = this.tibOffset;
         final Object FREE = this.FREE;
         int offset = headerSize;
         final int size = getSize();
@@ -324,7 +324,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 
                 lock();
                 try {
-                    final Address ptr = Address.fromAddress(start).add(offset);
+                    final Address ptr = start.add(offset);
                     object = ptr.toObjectReference().toObject();
                     tib = ptr.loadObjectReference(tibOffset);
                     objSize = ptr.loadInt(sizeOffset);
@@ -344,7 +344,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
             }
         } else {
             while (offset < size) {
-                final Address ptr = Address.fromAddress(start).add(offset);
+                final Address ptr = start.add(offset);
                 final Object object = ptr.toObjectReference().toObject();
                 final Object tib = ptr.loadObjectReference(tibOffset);
                 final int objSize = ptr.loadInt(sizeOffset);

@@ -9,7 +9,6 @@ import java.io.PrintStream;
 import org.jnode.vm.MemoryBlockManager;
 import org.jnode.vm.Monitor;
 import org.jnode.vm.Unsafe;
-import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.classmgr.ObjectFlags;
@@ -17,7 +16,6 @@ import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmNormalClass;
-import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.memmgr.GCStatistics;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
@@ -65,9 +63,6 @@ public final class DefaultHeapManager extends VmHeapManager {
     /** The class of the default heap type. Set by initialize */
     private final VmNormalClass defaultHeapClass;
 
-    /** The statics table */
-    private final VmStatics statics;
-
     /** The number of allocated bytes since the last GC trigger */
     private int allocatedSinceGcTrigger;
 
@@ -80,8 +75,7 @@ public final class DefaultHeapManager extends VmHeapManager {
     /**
      * Make this private, so we cannot be instantiated
      */
-    public DefaultHeapManager(VmClassLoader loader, HeapHelper helper,
-            VmStatics statics) throws ClassNotFoundException {
+    public DefaultHeapManager(VmClassLoader loader, HeapHelper helper) throws ClassNotFoundException {
         super(helper);
         //this.writeBarrier = new DefaultWriteBarrier(helper);
         this.writeBarrier = null;
@@ -90,7 +84,6 @@ public final class DefaultHeapManager extends VmHeapManager {
         this.heapList = firstNormalHeap;
         this.defaultHeapClass = (VmNormalClass) loader.loadClass(
                 VmDefaultHeap.class.getName(), true);
-        this.statics = statics;
     }
 
     /**
@@ -192,8 +185,8 @@ public final class DefaultHeapManager extends VmHeapManager {
                 slotSize);
 
         // Initialize the first normal heap
-        VmAddress ptr = helper.allocateBlock(DEFAULT_HEAP_SIZE);
-        firstNormalHeap.initialize(ptr, VmAddress.add(ptr, DEFAULT_HEAP_SIZE),
+        final Address ptr = helper.allocateBlock(DEFAULT_HEAP_SIZE);
+        firstNormalHeap.initialize(ptr, ptr.add(DEFAULT_HEAP_SIZE),
                 slotSize);
 
         // Initialize the GC heap
@@ -209,7 +202,7 @@ public final class DefaultHeapManager extends VmHeapManager {
         heapMonitor = new Monitor();
         final VmArchitecture arch = Unsafe.getCurrentProcessor()
                 .getArchitecture();
-        this.gcManager = new GCManager(this, arch, statics);
+        this.gcManager = new GCManager(this, arch);
         this.gcThread = new GCThread(gcManager, heapMonitor);
         this.finalizerThread = new FinalizerThread(this);
         gcThread.start();
@@ -340,10 +333,10 @@ public final class DefaultHeapManager extends VmHeapManager {
      */
     private VmAbstractHeap allocHeap(int size, boolean addToHeapList) {
         //Unsafe.debug("allocHeap");
-        final VmAddress start = helper.allocateBlock(size);
+        final Address start = helper.allocateBlock(size);
         //final Address start = MemoryBlockManager.allocateBlock(size);
         if (start == null) { return null; }
-        final VmAddress end = VmAddress.add(start, size);
+        final Address end = start.add(size);
         final int slotSize = Unsafe.getCurrentProcessor().getArchitecture()
                 .getReferenceSize();
         final VmAbstractHeap heap = VmDefaultHeap.setupHeap(helper, start,

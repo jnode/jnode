@@ -218,9 +218,9 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
                 stack.push(child);
             } catch (NullPointerException ex) {
                 Unsafe.debug("\nObject address ");
-                Unsafe.debug(helper.addressOf32(child));
+                Unsafe.debug(ObjectReference.fromObject(child).toAddress().toInt());
                 Unsafe.debug("\nObject TIB ");
-                Unsafe.debug(helper.addressOf32(VmMagic.getTIB(child)));
+                Unsafe.debug(ObjectReference.fromObject(VmMagic.getTIB(child)).toAddress().toInt());
                 helper.die("NPE in processChild; probably corrupted heap");
             }
         }
