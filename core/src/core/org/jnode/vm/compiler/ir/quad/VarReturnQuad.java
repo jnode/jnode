@@ -29,14 +29,14 @@ public class VarReturnQuad extends Quad {
 	}
 
 	/**
-	 * @see org.jnode.vm.compiler.ir.Quad#getDefinedOp()
+	 * @see org.jnode.vm.compiler.ir.quad.Quad#getDefinedOp()
 	 */
 	public Operand getDefinedOp() {
 		return null;
 	}
 
 	/**
-	 * @see org.jnode.vm.compiler.ir.Quad#getReferencedOps()
+	 * @see org.jnode.vm.compiler.ir.quad.Quad#getReferencedOps()
 	 */
 	public Operand[] getReferencedOps() {
 		return refs;

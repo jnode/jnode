@@ -49,7 +49,7 @@ public abstract class AssignQuad extends Quad {
 	}
 
 	/**
-	 * @see org.jnode.vm.compiler.ir.Quad#getDefinedOp()
+	 * @see org.jnode.vm.compiler.ir.quad.Quad#getDefinedOp()
 	 */
 	public Operand getDefinedOp() {
 		return lhs;

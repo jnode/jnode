@@ -46,7 +46,7 @@ public class VariableRefAssignQuad extends AssignQuad {
 	}
 
 	/**
-	 * @see org.jnode.vm.compiler.ir.Quad#getReferencedOps()
+	 * @see org.jnode.vm.compiler.ir.quad.Quad#getReferencedOps()
 	 */
 	public Operand[] getReferencedOps() {
 		return refs;
