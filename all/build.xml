@@ -129,7 +129,7 @@
     <tar destfile="${sources.dist.tar.gz}" 
          compression="gzip"
          basedir="${root.dir}"
-         excludes="**/build/**"/>
+         excludes="*/build/**"/>
     <ant antfile="build-x86.xml"
          inheritall="true"
          inheritrefs="true"

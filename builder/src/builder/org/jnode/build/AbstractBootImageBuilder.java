@@ -77,6 +77,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     private File debugFile;
 
     private File jarFile;
+    
+    private String version;
 
     private VmSystemClassLoader clsMgr;
 
@@ -134,6 +136,10 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         final long lmDest = destFile.lastModified();
         final long lmPIL = getPluginListFile().lastModified();
 
+        if (version == null) {
+            throw new BuildException("Version property must be set");
+        }
+        
         final PluginList piList;
         final long lmPI;
         try {
@@ -180,7 +186,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
             // Create the VM
             final HeapHelper helper = new HeapHelperImpl(arch);
-            final Vm vm = new Vm(arch, new DefaultHeapManager(clsMgr, helper,
+            final Vm vm = new Vm(version, arch, new DefaultHeapManager(clsMgr, helper,
                     clsMgr.getStatics()), clsMgr.getStatics(), debug);
             blockedObjects.add(vm);
 
@@ -1085,5 +1091,18 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     protected void cleanup() {
         clsMgr = null;
         blockedObjects.clear();
+    }
+    
+    /**
+     * @return Returns the version.
+     */
+    public final String getVersion() {
+        return this.version;
+    }
+    /**
+     * @param version The version to set.
+     */
+    public final void setVersion(String version) {
+        this.version = version;
     }
 }

@@ -12,7 +12,7 @@
   <property name="jnode.disk.pln" value="${build.dir}/jnodedisk.pln"/>
   <!-- property name="jnode.floppy"   value="${build.dir}/jnodefloppy.img"/ -->
 
-  <property name="grub-ver"     value="grub-0.94-i386-pc"/>
+  <property name="grub-ver"     value="grub-0.93-i386-pc"/>
   <property name="grub.dir"     value="${my-build.dir}/${grub-ver}/boot/grub"/>
   <property name="grub.dist"    value="${my-lib.dir}/${grub-ver}.tar.gz"/>
 
@@ -177,6 +177,7 @@
                pluginDir="${plugins.dir}"
 	           targetArch="x86"
 	           cpu="${cpu}"
+	           version="${jnode-ver}"
                />
 
     <gzip src="${build.bootimage.dir}/bootimage.bin" zipfile="${jnode.kernel}"/>
