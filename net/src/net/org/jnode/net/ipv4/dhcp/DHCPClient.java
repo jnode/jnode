@@ -64,7 +64,7 @@ public class DHCPClient extends BOOTPClient {
 		switch(msg.getMessageType()) {
 			case DHCPMessage.DHCPOFFER:
 				byte[] serverID = msg.getOption(DHCPMessage.SERVER_IDENTIFIER_OPTION);
-				byte[] requestedIP = hdr.getYourIPAddress().toInetAddress().getAddress();
+				byte[] requestedIP = hdr.getYourIPAddress().getAddress();
 				hdr = new BOOTPHeader(BOOTPHeader.BOOTREQUEST, transactionID, hdr.getClientIPAddress(), hdr.getClientHwAddress());
 				msg = new DHCPMessage(hdr, DHCPMessage.DHCPREQUEST);
 				msg.setOption(DHCPMessage.REQUESTED_IP_ADDRESS_OPTION, requestedIP);
