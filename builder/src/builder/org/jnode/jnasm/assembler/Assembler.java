@@ -30,6 +30,7 @@ public abstract class Assembler {
     private int pass = 0;
     private final HardwareSupport hwSupport;
     private final PseudoInstructions pseudo;
+    protected Instruction crtIns;
 
     public static void main(String[] argv) throws Exception {
         Assembler jnasm = newInstance(System.in);
@@ -180,5 +181,9 @@ public abstract class Assembler {
             }
         }
         return i.intValue();
+    }
+
+    protected final void setSizeInfo(String size){
+        crtIns.setSizeInfo(size);
     }
 }

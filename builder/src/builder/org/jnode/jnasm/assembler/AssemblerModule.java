@@ -18,6 +18,6 @@ public abstract class AssemblerModule {
         this.labels = labels;
     }
 
-    public abstract boolean emmit(String mnemonic, List operands);
+    public abstract boolean emmit(String mnemonic, List operands, int oprandSize);
     public abstract void setNativeStream(NativeStream stream);
 }

@@ -38,7 +38,7 @@ public class PseudoInstructions extends AssemblerModule {
         this.stream = stream;
     }
 
-    public boolean emmit(String mnemonic, List operands) {
+    public boolean emmit(String mnemonic, List operands, int operandSize) {
         this.operands = operands;
 
         Integer key = (Integer) INSTRUCTION_MAP.get(mnemonic);
