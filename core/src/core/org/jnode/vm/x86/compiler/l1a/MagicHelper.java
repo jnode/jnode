@@ -200,23 +200,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             break;
         case mEQUALS: 
         case mEQ: 
-        case mNE: {
-            // addr !/== other
-            if (Vm.VerifyAssertions) Vm._assert(!isstatic);
-            final RefItem other = vstack.popRef();
-            final RefItem addr = vstack.popRef();
-            other.load(ec);
-            addr.load(ec);
-            final Register addrr = addr.getRegister();
-            os.writeXOR(addrr, other.getRegister());
-            if (mcode != mNE) {
-                os.writeNOT(addrr);
-            }
-            other.release(ec);
-            addr.release(ec);
-            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, addrr));
-        }
-            break;
+        case mNE: 
         case mLT:
         case mLE:
         case mGE:

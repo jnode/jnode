@@ -126,7 +126,7 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * @param object
 	 * @param on
 	 */	
-	protected void setAllocationBit(Object object, boolean on) {
+	protected final void setAllocationBit(Object object, boolean on) {
 		VmAddress addr = helper.addressOf(object);
 		long addrL = helper.addressToLong(addr);
 		if ((addrL < startL) || (addrL >= endL)) {
