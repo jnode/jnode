@@ -551,7 +551,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 */
 	private final void generic_pop(int size) {
 		final Item v = vstack.pop();
-		assertCondition(v.getCategory() == (size >> 2), "category mismatch");
+		assertCondition(v.getCategory() == (size / helper.SLOTSIZE), "category mismatch");
 		if (v.getKind() == Item.Kind.STACK) {
 			// sanity check
 			if (VirtualStack.checkOperandStack) {
@@ -1486,16 +1486,16 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		final int c2 = v2.getCategory();
 
 		// Perform a stack swap independent of the actual form
-		os.writePOP(X86Register.EAX); // Value1
-		os.writePOP(X86Register.EBX); // Value2
-		os.writePOP(X86Register.ECX); // Value3
-		os.writePOP(X86Register.EDX); // Value4
-		os.writePUSH(X86Register.EBX); // Value2
-		os.writePUSH(X86Register.EAX); // Value1
-		os.writePUSH(X86Register.EDX); // Value4
-		os.writePUSH(X86Register.ECX); // Value3
-		os.writePUSH(X86Register.EBX); // Value2
-		os.writePUSH(X86Register.EAX); // Value1
+		os.writePOP(helper.AAX); // Value1
+		os.writePOP(helper.ABX); // Value2
+		os.writePOP(helper.ACX); // Value3
+		os.writePOP(helper.ADX); // Value4
+		os.writePUSH(helper.ABX); // Value2
+		os.writePUSH(helper.AAX); // Value1
+		os.writePUSH(helper.ADX); // Value4
+		os.writePUSH(helper.ACX); // Value3
+		os.writePUSH(helper.ABX); // Value2
+		os.writePUSH(helper.AAX); // Value1
 
 		// Now update the operandstack
 		// cope with brain-dead definition from Sun (look-like somebody there
@@ -3341,14 +3341,14 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_pop()
 	 */
 	public final void visit_pop() {
-		generic_pop(4);
+		generic_pop(helper.SLOTSIZE);
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_pop2()
 	 */
 	public final void visit_pop2() {
-		generic_pop(8);
+		generic_pop(helper.SLOTSIZE * 2);
 	}
 
 	/**
