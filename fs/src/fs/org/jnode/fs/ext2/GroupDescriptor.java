@@ -45,10 +45,6 @@ public class GroupDescriptor {
 		setDirty(false);
 	}
 	
-	private long divCeil(long a, long b) {
-		return (long)Math.ceil((double)a/(double)b);
-	}
-	
 	/*
 	 * create() and read() precedes any access to the inners of the group descriptor, 
 	 * so no synchronization is needed
@@ -62,7 +58,7 @@ public class GroupDescriptor {
 			desc = 0; 
 		else
 			desc =	1 + 				/* superblock */
-					divCeil(fs.getGroupCount()*GroupDescriptor.GROUPDESCRIPTOR_LENGTH, fs.getBlockSize());	/* GDT */
+				Ext2Utils.ceilDiv(fs.getGroupCount()*GroupDescriptor.GROUPDESCRIPTOR_LENGTH, fs.getBlockSize());	/* GDT */
 
 		setBlockBitmap( fs.getSuperblock().getFirstDataBlock() +  
 						groupNr*fs.getSuperblock().getBlocksPerGroup() +
@@ -71,7 +67,7 @@ public class GroupDescriptor {
 		setInodeBitmap( getBlockBitmap() + 1 );
 		setInodeTable( getBlockBitmap() + 2);
 		
-		long inodeTableSize = divCeil( fs.getSuperblock().getINodesPerGroup()*INode.INODE_LENGTH, fs.getBlockSize());	
+		long inodeTableSize = Ext2Utils.ceilDiv( fs.getSuperblock().getINodesPerGroup()*INode.INODE_LENGTH, fs.getBlockSize());	
 		long blockCount;
 		if(groupNr == fs.getGroupCount()-1)
 			blockCount =  fs.getSuperblock().getBlocksCount() 

@@ -47,10 +47,6 @@ public class Superblock {
 		setDirty(false);
 	}
 	
-	private long divCeil(long a, long b) {
-		return (long)Math.ceil((double)a/(double)b);
-	}
-	
 	public void create(int blockSize, Ext2FileSystem fs) throws IOException {
 		this.fs = fs;
 		setRevLevel(Ext2Constants.EXT2_DYNAMIC_REV);
@@ -77,9 +73,9 @@ public class Superblock {
 		long blocksPerGroup = blockSize << 3;
 		setBlocksPerGroup(blocksPerGroup);
 		setFragsPerGroup(blocksPerGroup);
-		long groupCount = divCeil(blocks, blocksPerGroup);
+		long groupCount = Ext2Utils.ceilDiv(blocks, blocksPerGroup);
 
-		long inodesPerGroup = divCeil(inodes, groupCount);
+		long inodesPerGroup = Ext2Utils.ceilDiv(inodes, groupCount);
 		setINodesPerGroup(inodesPerGroup);	
 		
 		//calculate the number of blocks reserved for metadata
@@ -87,10 +83,10 @@ public class Superblock {
 		if(CREATE_WITH_SPARSE_SUPER)
 			setFeatureROCompat(getFeatureROCompat() | Ext2Constants.EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER);
 		long sbSize  = 1;		//superblock is 1 block fixed	
-		long gdtSize = divCeil(groupCount*GroupDescriptor.GROUPDESCRIPTOR_LENGTH, blockSize); 
+		long gdtSize = Ext2Utils.ceilDiv(groupCount*GroupDescriptor.GROUPDESCRIPTOR_LENGTH, blockSize); 
 		long bbSize  = 1;		//block bitmap is 1 block fixed
 		long ibSize	 = 1;		//inode bitmap is 1 block fixed
-		long inodeTableSize = divCeil( inodesPerGroup*INode.INODE_LENGTH, blockSize);
+		long inodeTableSize = Ext2Utils.ceilDiv( inodesPerGroup*INode.INODE_LENGTH, blockSize);
 		int groupsWithMetadata = 0;
 		for(int i=0; i<groupCount; i++)
 			if(fs.groupHasDescriptors(i))

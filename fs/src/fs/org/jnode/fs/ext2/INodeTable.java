@@ -27,15 +27,15 @@ public class INodeTable {
 		this.fs = fs;
 		this.firstBlock = firstBlock;
 		blockSize=fs.getBlockSize();
-		blockCount = (int)Math.ceil(
-			(double)(fs.getSuperblock().getINodesPerGroup()*INode.INODE_LENGTH) / 
-			(double) blockSize);
+		blockCount = (int)Ext2Utils.ceilDiv(
+				fs.getSuperblock().getINodesPerGroup()*INode.INODE_LENGTH, 
+				blockSize);
 	}
 	
 	public static int getSizeInBlocks(Ext2FileSystem fs) {
-		int count = (int)Math.ceil(
-			(double)(fs.getSuperblock().getINodesPerGroup()*INode.INODE_LENGTH) / 
-			(double) fs.getBlockSize());		
+		int count = (int)Ext2Utils.ceilDiv(
+				fs.getSuperblock().getINodesPerGroup()*INode.INODE_LENGTH, 
+				fs.getBlockSize());		
 		return count;
 	}
 	

@@ -690,9 +690,8 @@ public class INode {
             if (i == desc.getGroup())
                 continue;
 
-            long threshold = (long) Math.ceil(getExt2FileSystem()
-                    .getSuperblock().getBlocksPerGroup()
-                    * Ext2Constants.EXT2_BLOCK_THRESHOLD_RATIO);
+            long threshold =(getExt2FileSystem().getSuperblock().getBlocksPerGroup() * 
+            				Ext2Constants.EXT2_BLOCK_THRESHOLD_PERCENT)/100;
             reservation = getExt2FileSystem().findFreeBlocks(i, threshold);
             if (reservation.isSuccessful()) {
                 desc.setPreallocBlock(reservation.getBlock() + 1);
@@ -772,8 +771,7 @@ public class INode {
      * @return
      */
     public long getSizeInBlocks() {
-        return (long) Math.ceil((double) getSize()
-                / (double) getExt2FileSystem().getBlockSize());
+        return Ext2Utils.ceilDiv(getSize(), getExt2FileSystem().getBlockSize());
     }
 
     public synchronized long getAtime() {

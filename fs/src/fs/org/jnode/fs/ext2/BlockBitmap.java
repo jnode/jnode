@@ -48,7 +48,7 @@ public class BlockBitmap extends FSBitmap {
 		int nonfullBitmap=-1;	//points to a nonfull byte in the bitmap
 		
 		//skip the metadata (superblock copy?, groupgrescriptor copies?, inode table)
-		int first = (int)Math.ceil(metadataLength/8.0);
+		int first = (int)Ext2Utils.ceilDiv(metadataLength, 8);
 		
 		for(int i=first; i<data.length; i++) {
 			if(data[i]==0x00) {

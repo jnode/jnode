@@ -57,7 +57,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
     public Ext2FileSystem(Device device, boolean readOnly)
             throws FileSystemException {
         super(device, readOnly);
-        log.setLevel(Level.INFO);
+        log.setLevel(Level.DEBUG);
 
         blockCache = new BlockCache(50, (float) 0.75);
         inodeCache = new INodeCache(50, (float) 0.75);
@@ -80,8 +80,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
             superblock.read(data, this);
 
             //read the group descriptors
-            groupCount = (int) Math.ceil((double) superblock.getBlocksCount()
-                    / (double) superblock.getBlocksPerGroup());
+            groupCount = (int)Ext2Utils.ceilDiv(superblock.getBlocksCount(), superblock.getBlocksPerGroup());
             groupDescriptors = new GroupDescriptor[groupCount];
             iNodeTables = new INodeTable[groupCount];
 
@@ -155,9 +154,9 @@ public class Ext2FileSystem extends AbstractFileSystem {
                 + "\n" + "				#block groups:	" + groupCount + "\n"
                 + "				block size:		" + superblock.getBlockSize() + "\n"
                 + "				#inodes:		" + superblock.getINodesCount() + "\n"
-                + "				#inodes/group:	" + superblock.getINodesPerGroup());
+                + "				#inodes/group:	" + superblock.getINodesPerGroup());        
     }
-
+    
     public void create(int blockSize) throws FileSystemException {
         try {
             //create the superblock
@@ -165,8 +164,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
             superblock.create(blockSize, this);
 
             //create the group descriptors
-            groupCount = (int) Math.ceil((double) superblock.getBlocksCount()
-                    / (double) superblock.getBlocksPerGroup());
+            groupCount = (int) Ext2Utils.ceilDiv(superblock.getBlocksCount(), superblock.getBlocksPerGroup());
             groupDescriptors = new GroupDescriptor[groupCount];
 
             iNodeTables = new INodeTable[groupCount];
