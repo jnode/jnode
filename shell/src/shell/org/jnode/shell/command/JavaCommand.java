@@ -5,8 +5,15 @@ package org.jnode.shell.command;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.ClassNotFoundException;
+import java.lang.System;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.ClassNameArgument;
@@ -39,7 +46,7 @@ public class JavaCommand {
 	/**
 	 * Execute this command
 	 */
-	public void execute(
+/*	public void execute(
 		ParsedArguments cmdLine,
 		InputStream in,
 		PrintStream out,
@@ -59,6 +66,96 @@ public class JavaCommand {
 		} catch (InvocationTargetException ex) {
 			ex.getTargetException().printStackTrace(err);
 		}
+	}*/
+
+    public void execute(
+		ParsedArguments cmdLine,
+		InputStream in,
+		PrintStream out,
+		PrintStream err)
+		throws Exception {
+
+        final ClassLoader parent_cl = Thread.currentThread().getContextClassLoader();
+        JCClassLoader cl = new JCClassLoader(parent_cl, new String[]{"./"});
+
+		Class cls = cl.loadClass(ARG_CLASS.getValue(cmdLine));
+
+		Method mainMethod = cls.getMethod("main", new Class[] { String[].class });
+
+		String[] clsArgs = ARG_ARGS.getValues(cmdLine);
+		if (clsArgs == null) {
+			clsArgs = new String[0];
+		}
+
+		try {
+			mainMethod.invoke(null, new Object[] { clsArgs });
+		} catch (InvocationTargetException ex) {
+			ex.getTargetException().printStackTrace(err);
+		}
 	}
 
+    private static class JCClassLoader extends ClassLoader {
+         private String dirs[];
+
+        public JCClassLoader(ClassLoader parent, String[] dir) {
+            super(parent);
+            this.dirs = dir;
+        }
+
+        public Class findClass(String name) throws ClassNotFoundException{
+            byte[] b = loadClassData(name);
+            return defineClass(name, b, 0, b.length);
+        }
+
+        protected URL findResource(String name) {
+            try{
+                System.out.println("Find res: " + name);
+                return findResource(name, dirs);
+            }catch(Exception e){
+
+            }
+            return null;
+        }
+
+        private URL findResource(String name, String[] dirs) throws Exception{
+
+            for(int i = 0; i < dirs.length; i++){
+                File d = new File(dirs[i]);
+                if(d.isDirectory()){
+                    System.out.println("Find res: " + name + " in " + d);
+                    return findResource(name, d.list());
+                }else{
+                    System.out.println("Find res: " + name + " as " + d);
+                    if(d.getName().equals(name)){
+                        return d.toURL();
+                    }
+                }
+            }
+
+            return null;
+        }
+
+         private byte[] loadClassData(String name) throws ClassNotFoundException{
+             String fn = name.replace('.','/');
+             File f = null;
+             for(int i = 0; i < dirs.length; i++){
+                 f = new File(dirs[i] + fn + ".class");
+                 if(f.exists()) break;
+                 f = null;
+             }
+             if(f == null){
+                 throw new ClassNotFoundException(name);
+             }else{
+                 byte[] data = new byte[(int) f.length()];
+                 try{
+                     FileInputStream fis = new FileInputStream(f);
+                     fis.read(data);
+                     return data;
+                 }catch(Exception fnfe){
+                     throw new ClassNotFoundException(name);
+                 }
+             }
+         }
+     }
 }
+
