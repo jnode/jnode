@@ -33,7 +33,17 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @return The method
 	 */
 	final VmMethod getMethod(Address sf) {
-		return (VmMethod)Unsafe.getObject(sf, getMethodOffset(sf));
+		final Object obj = Unsafe.getObject(sf, getMethodOffset(sf));
+		if (obj instanceof VmMethod) {
+			return (VmMethod)obj;
+		} else if (obj == null) {
+			return null;			
+		} else {
+			Unsafe.debug("Method on stacktrace is not instanceof VmMethod but ");
+			Unsafe.debug(obj.getClass().getName());
+			Unsafe.die("Fatal stack error");
+			return null;
+		}
 	}
 
 	/**

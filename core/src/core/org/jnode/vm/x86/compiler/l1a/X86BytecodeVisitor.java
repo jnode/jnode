@@ -11,8 +11,6 @@ import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Operation;
 import org.jnode.system.BootLog;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.SoftByteCodes;
-import org.jnode.vm.Vm;
 import org.jnode.vm.bytecode.BasicBlock;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.bytecode.TypeStack;
@@ -1064,17 +1062,9 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     		L1AHelper.releaseRegister(eContext, classr);
     		L1AHelper.releaseRegister(eContext, tmpr);
     		
-    		// Call SoftByteCodes.systemException
-    		os.writePUSH(SoftByteCodes.EX_CLASSCAST);
-    		os.writePUSH(0);
-    		invokeJavaMethod(context.getSystemExceptionMethod());
-    		final RefItem exi = vstack.popRef();
-    		assertCondition(exi.uses(EAX), "item must be in eax");
-    		exi.release(eContext);
-    		
-    		/* Exception in EAX, throw it */
-    		helper.writeJumpTableCALL(X86JumpTable.VM_ATHROW_OFS);
-    		
+    		// Call classCastFailed
+    		invokeJavaMethod(context.getClassCastFailedMethod());
+
     		/* Normal exit */
     		os.setObjectRef(okLabel);
     		
@@ -1109,15 +1099,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     		L1AHelper.releaseRegister(eContext, tmpr);
     		
     		// Call SoftByteCodes.systemException
-    		os.writePUSH(SoftByteCodes.EX_CLASSCAST);
-    		os.writePUSH(0);
-    		invokeJavaMethod(context.getSystemExceptionMethod());
-    		final RefItem exi = vstack.popRef();
-    		assertCondition(exi.uses(EAX), "item must be in eax");
-    		exi.release(eContext);
-    		
-    		/* Exception in EAX, throw it */
-    		helper.writeJumpTableCALL(X86JumpTable.VM_ATHROW_OFS);
+    		invokeJavaMethod(context.getClassCastFailedMethod());
     		
     		/* Normal exit */
     		os.setObjectRef(okLabel);
