@@ -33,9 +33,9 @@ public class PluginPrerequisiteModel extends PluginModelObject implements Plugin
 	 * Resolve all references to (elements of) other plugin descriptors
 	 * @throws PluginException
 	 */
-	protected void resolve() 
+	protected void resolve(PluginRegistryModel registry) 
 	throws PluginException {
-		if (getDeclaringPluginDescriptor().getPluginRegistry().getPluginDescriptor(plugin) == null) {
+		if (registry.getPluginDescriptor(plugin) == null) {
 			throw new PluginException("Unknown plugin " + plugin + " in import of " + getDeclaringPluginDescriptor().getId()); 
 		}
 	}
@@ -45,7 +45,7 @@ public class PluginPrerequisiteModel extends PluginModelObject implements Plugin
 	 * 
 	 * @throws PluginException
 	 */
-	protected void unresolve() throws PluginException {
+	protected void unresolve(PluginRegistryModel registry) throws PluginException {
 	    // Nothing to do
 	}
 }

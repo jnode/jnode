@@ -43,17 +43,16 @@ public class LibraryModel extends PluginModelObject implements Library {
 	 * 
 	 * @throws PluginException
 	 */
-	protected void resolve() throws PluginException {
+	protected void resolve(PluginRegistryModel registry) throws PluginException {
 		// Do nothing
 	}
-
 
 	/**
 	 * Remove all references to (elements of) other plugin descriptors
 	 * 
 	 * @throws PluginException
 	 */
-	protected void unresolve() throws PluginException {
+	protected void unresolve(PluginRegistryModel registry) throws PluginException {
 	    // Do nothing
 	}
 	

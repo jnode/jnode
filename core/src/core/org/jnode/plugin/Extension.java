@@ -48,4 +48,7 @@ public interface Extension {
 	 * @return The descriptor
 	 */
 	public PluginDescriptor getDeclaringPluginDescriptor();
+	
+	public String getExtensionPointPluginId();
+
 }

@@ -49,9 +49,9 @@ public class RuntimeModel extends PluginModelObject implements Runtime {
 	 * 
 	 * @throws PluginException
 	 */
-	protected void resolve() throws PluginException {
+	protected void resolve(PluginRegistryModel registry) throws PluginException {
 		for (int i = 0; i < libraries.length; i++) {
-			libraries[i].resolve();
+			libraries[i].resolve(registry);
 		}
 	}
 
@@ -60,9 +60,9 @@ public class RuntimeModel extends PluginModelObject implements Runtime {
 	 * 
 	 * @throws PluginException
 	 */
-	protected void unresolve() throws PluginException {	    
+	protected void unresolve(PluginRegistryModel registry) throws PluginException {	    
 		for (int i = 0; i < libraries.length; i++) {
-			libraries[i].unresolve();
+			libraries[i].unresolve(registry);
 		}
 	}
 }

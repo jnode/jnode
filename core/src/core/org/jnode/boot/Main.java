@@ -3,6 +3,8 @@
  */
 package org.jnode.boot;
 
+import java.util.List;
+
 import org.jnode.plugin.PluginManager;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.manager.DefaultPluginManager;
@@ -42,11 +44,11 @@ public class Main {
 			// Load the plugins from the initjar
 			BootLog.info("Loading initjar plugins");
 			final InitJarProcessor proc = new InitJarProcessor(VmSystem.getInitJar());
-			proc.loadPlugins(pluginRegistry);
+			List descriptors = proc.loadPlugins(pluginRegistry);
 
 			BootLog.info("Starting PluginManager");
 			final PluginManager piMgr = new DefaultPluginManager(pluginRegistry);
-			piMgr.startSystemPlugins();
+			piMgr.startSystemPlugins(descriptors);
 
 			final ClassLoader loader = pluginRegistry.getPluginsClassLoader();
 			final String mainClassName = proc.getMainClassName();

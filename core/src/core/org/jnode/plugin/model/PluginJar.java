@@ -91,7 +91,7 @@ public class PluginJar implements BootableObject {
         }
         if (!root.getName().equals("plugin")) { throw new PluginException(
                 "plugin element expected"); }
-        this.descriptor = new PluginDescriptorModel(registry, this, root);
+        this.descriptor = new PluginDescriptorModel(this, root);
         if (this.descriptor.isSystemPlugin()) {
             this.pluginJarData = null;
         } else {

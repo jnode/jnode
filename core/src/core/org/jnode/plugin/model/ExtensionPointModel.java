@@ -46,8 +46,8 @@ public class ExtensionPointModel extends PluginModelObject implements
      * 
      * @throws PluginException
      */
-    protected void resolve() throws PluginException {
-        // Do nothing
+    protected void resolve(PluginRegistryModel registry) throws PluginException {
+        registry.registerExtensionPoint(this);
     }
 
 	/**
@@ -55,8 +55,8 @@ public class ExtensionPointModel extends PluginModelObject implements
 	 * 
 	 * @throws PluginException
 	 */
-	protected void unresolve() throws PluginException {
-	    // Do nothing
+	protected void unresolve(PluginRegistryModel registry) throws PluginException {
+        registry.unregisterExtensionPoint(this);
 	}
 	
     /**
