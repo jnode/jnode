@@ -37,6 +37,8 @@ import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.VmWriteBarrier;
+import org.vmmagic.pragma.PrivilegedActionPragma;
+import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * System support for the Virtual Machine
@@ -476,7 +478,7 @@ public final class VmSystem {
      * @return Object
      */
     public static Address findThrowableHandler(Throwable ex, Address frame,
-            Address address) throws PragmaPrivilegedAction {
+            Address address) throws PrivilegedActionPragma {
 
         try {
             if (ex == null) {
@@ -605,7 +607,7 @@ public final class VmSystem {
     // ------------------------------------------
 
     public static void arrayCopy(Object src, int srcPos, Object dst,
-            int dstPos, int length) throws PragmaPrivilegedAction {
+            int dstPos, int length) throws PrivilegedActionPragma {
         Class src_class = src.getClass();
         Class dst_class = dst.getClass();
 
@@ -761,9 +763,9 @@ public final class VmSystem {
      * low-level system environment, where synchronization cannot be used.
      * 
      * @return The current time of the kernel
-     * @throws PragmaUninterruptible
+     * @throws UninterruptiblePragma
      */
-    public static long currentKernelMillis() throws PragmaUninterruptible {
+    public static long currentKernelMillis() throws UninterruptiblePragma {
         return currentTimeMillis;
     }
 
@@ -842,7 +844,7 @@ public final class VmSystem {
      * Calculate the speed of the current processor.
      * @return
      */
-    final static float calculateJNodeMips() throws PragmaUninterruptible {
+    final static float calculateJNodeMips() throws UninterruptiblePragma {
         final long millis = currentTimeMillis % 1000;
         while (millis == (currentTimeMillis % 1000)) {
             // Wait
@@ -875,7 +877,7 @@ public final class VmSystem {
      * This method requires a JNodePermission("halt").
      * @param reset
      */
-    public static void halt(boolean reset) throws PragmaPrivilegedAction {
+    public static void halt(boolean reset) throws PrivilegedActionPragma {
         final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(new JNodePermission("halt"));

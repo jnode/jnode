@@ -5,6 +5,7 @@ package org.jnode.vm;
 
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * Abstract class for reading information from stack frames.
@@ -188,7 +189,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	/**
 	 * Show the stacktrace of the given thread using Screen.debug.
 	 */	
-	public final void debugStackTrace(VmThread thread) throws PragmaUninterruptible {
+	public final void debugStackTrace(VmThread thread) throws UninterruptiblePragma {
 		Address f = thread.getStackFrame();
 		Unsafe.debug("Debug stacktrace: ");
 		boolean first = true;

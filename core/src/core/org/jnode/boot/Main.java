@@ -9,10 +9,10 @@ import org.jnode.plugin.PluginManager;
 import org.jnode.plugin.manager.DefaultPluginManager;
 import org.jnode.plugin.model.PluginRegistryModel;
 import org.jnode.system.BootLog;
-import org.jnode.vm.PragmaLoadStatics;
-import org.jnode.vm.PragmaUninterruptible;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmSystem;
+import org.vmmagic.pragma.LoadStaticsPragma;
+import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * First class that is executed when JNode boots.
@@ -32,7 +32,7 @@ public class Main {
 	 * 
 	 * @return int
 	 */
-	public static int vmMain() throws PragmaUninterruptible, PragmaLoadStatics {
+	public static int vmMain() throws UninterruptiblePragma, LoadStaticsPragma {
 		//return 15;
 		try {
 			Unsafe.debug("Starting JNode\n");

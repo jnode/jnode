@@ -5,13 +5,13 @@ package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.Address;
 import org.jnode.vm.ObjectVisitor;
-import org.jnode.vm.PragmaUninterruptible;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.HeapHelper;
+import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * @author epr
@@ -248,9 +248,9 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
     /**
      * Join all adjacent free spaces.
      * 
-     * @throws PragmaUninterruptible
+     * @throws UninterruptiblePragma
      */
-    protected final void defragment() throws PragmaUninterruptible {
+    protected final void defragment() throws UninterruptiblePragma {
         final int size = getSize();
         int offset = headerSize;
 

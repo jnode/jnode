@@ -4,9 +4,9 @@
 package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
-import org.jnode.vm.Uninterruptible;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.memmgr.HeapHelper;
+import org.vmmagic.pragma.Uninterruptible;
 
 /**
  * @author epr

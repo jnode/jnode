@@ -8,6 +8,7 @@ import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.memmgr.HeapHelper;
+import org.vmmagic.pragma.Uninterruptible;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

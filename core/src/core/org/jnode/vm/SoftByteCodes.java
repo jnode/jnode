@@ -13,6 +13,10 @@ import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.VmHeapManager;
+import org.vmmagic.pragma.LoadStaticsPragma;
+import org.vmmagic.pragma.PrivilegedActionPragma;
+import org.vmmagic.pragma.Uninterruptible;
+import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * Class with software implementations of "difficult" java bytecodes.
@@ -43,10 +47,10 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @param object
 	 * @param T
 	 * @return boolean
-	 * @throws PragmaUninterruptible
+	 * @throws UninterruptiblePragma
 	 */
 	public static boolean isInstanceof(Object object, VmType T)
-			throws PragmaUninterruptible {
+			throws UninterruptiblePragma {
 		if (object == null) {
 			return false;
 		} else {
@@ -69,11 +73,11 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @param fieldRef
 	 * @param isStatic
 	 * @return VmField
-	 * @throws PragmaUninterruptible
+	 * @throws UninterruptiblePragma
 	 */
 	public static VmField resolveField(VmMethod currentMethod,
 			VmConstFieldRef fieldRef, boolean isStatic)
-			throws PragmaUninterruptible {
+			throws UninterruptiblePragma {
 		if (!fieldRef.getConstClass().isResolved()) {
 			resolveClass(fieldRef.getConstClass());
 		}
@@ -107,10 +111,10 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @param currentMethod
 	 * @param methodRef
 	 * @return VmMethod
-	 * @throws PragmaUninterruptible
+	 * @throws UninterruptiblePragma
 	 */
 	public static VmMethod resolveMethod(VmMethod currentMethod,
-			VmConstMethodRef methodRef) throws PragmaUninterruptible {
+			VmConstMethodRef methodRef) throws UninterruptiblePragma {
 		if (!methodRef.getConstClass().isResolved()) {
 			resolveClass(methodRef.getConstClass());
 		}
@@ -144,10 +148,10 @@ public class SoftByteCodes implements Uninterruptible {
 	 * 
 	 * @param classRef
 	 * @return VmClass
-	 * @throws PragmaUninterruptible
+	 * @throws UninterruptiblePragma
 	 */
 	public static VmType resolveClass(VmConstClass classRef)
-			throws PragmaUninterruptible, PragmaPrivilegedAction {
+			throws UninterruptiblePragma, PrivilegedActionPragma {
 		if (classRef.isResolved()) {
 			return classRef.getResolvedVmClass();
 		} else {
@@ -180,10 +184,10 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @param vmClass
 	 * @param size
 	 * @return Object The new object
-	 * @throws PragmaUninterruptible
+	 * @throws UninterruptiblePragma
 	 */
 	public static Object allocObject(VmType vmClass, int size)
-			throws PragmaUninterruptible {
+			throws UninterruptiblePragma {
 		vmClass.link();
 
 		//Screen.debug("ao cls{");
@@ -210,10 +214,10 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @param vmClass
 	 * @param dimensions
 	 * @return The allocated array
-	 * @throws PragmaUninterruptible
+	 * @throws UninterruptiblePragma
 	 */
 	public static Object allocMultiArray(VmType vmClass, int[] dimensions)
-			throws PragmaUninterruptible {
+			throws UninterruptiblePragma {
 		//Syslog.debug("allocMultiArray "); // + vmClass);
 		return multinewarray_helper(dimensions, dimensions.length - 1,
 				(VmArrayClass) vmClass);
@@ -235,11 +239,11 @@ public class SoftByteCodes implements Uninterruptible {
 	 *             if one of the array sizes in dims is negative
 	 * @throws OutOfMemoryError
 	 *             if there is not enough memory to perform operation
-	 * @throws PragmaUninterruptible
+	 * @throws UninterruptiblePragma
 	 */
 	public static Object multinewarray_helper(int[] dims, int ind,
 			VmArrayClass a) throws OutOfMemoryError,
-			NegativeArraySizeException, PragmaUninterruptible {
+			NegativeArraySizeException, UninterruptiblePragma {
 		//Syslog.debug("multinewarray_helper "); //+ " cls=" + a);
 		a.initialize();
 		final int length = dims[ind];
@@ -264,10 +268,10 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @param vmClass
 	 * @param elements
 	 * @return Object The new array
-	 * @throws PragmaUninterruptible
+	 * @throws UninterruptiblePragma
 	 */
 	public static Object anewarray(VmMethod currentMethod, VmType vmClass,
-			int elements) throws PragmaUninterruptible {
+			int elements) throws UninterruptiblePragma {
 
 		final String arrClsName = vmClass.getArrayClassName();
 		final VmType arrCls;
@@ -301,10 +305,10 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @param atype
 	 * @param elements
 	 * @return Object The new array
-	 * @throws PragmaUninterruptible
+	 * @throws UninterruptiblePragma
 	 */
 	public static Object allocPrimitiveArray(int atype, int elements)
-			throws PragmaUninterruptible {
+			throws UninterruptiblePragma {
 		VmHeapManager hm = heapManager;
 		if (hm == null) {
 			heapManager = hm = Vm.getVm().getHeapManager();
@@ -320,10 +324,10 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @param vmClass
 	 * @param elements
 	 * @return Object The new array
-	 * @throws PragmaUninterruptible
+	 * @throws UninterruptiblePragma
 	 */
 	public static Object allocArray(VmType vmClass, int elements)
-			throws PragmaUninterruptible {
+			throws UninterruptiblePragma {
 		VmHeapManager hm = heapManager;
 		if (hm == null) {
 			heapManager = hm = Vm.getVm().getHeapManager();
@@ -338,11 +342,11 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @param nr
 	 * @param address
 	 * @return Throwable
-	 * @throws PragmaUninterruptible
+	 * @throws UninterruptiblePragma
 	 */
 	public static Throwable systemException(int nr, int address)
-			throws PragmaUninterruptible, PragmaLoadStatics,
-			PragmaPrivilegedAction {
+			throws UninterruptiblePragma, LoadStaticsPragma,
+			PrivilegedActionPragma {
 		//Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
 		if (false) {
 			Unsafe.debug(nr);
@@ -388,13 +392,13 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @param array
 	 * @param index
 	 */
-	public static void throwArrayOutOfBounds(Object array, int index) throws PragmaUninterruptible {
+	public static void throwArrayOutOfBounds(Object array, int index) throws UninterruptiblePragma {
 		throw new ArrayIndexOutOfBoundsException(index);
 	}
 
 	public static void unknownOpcode(int opcode, int pc)
-			throws PragmaUninterruptible, PragmaLoadStatics,
-			PragmaPrivilegedAction {
+			throws UninterruptiblePragma, LoadStaticsPragma,
+			PrivilegedActionPragma {
 		throw new Error("Unknown opcode " + opcode + " at pc " + pc);
 	}
 }

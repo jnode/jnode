@@ -5,12 +5,12 @@ package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.Address;
 import org.jnode.vm.ObjectVisitor;
-import org.jnode.vm.PragmaUninterruptible;
 import org.jnode.vm.SpinLock;
-import org.jnode.vm.Uninterruptible;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.memmgr.HeapHelper;
+import org.vmmagic.pragma.Uninterruptible;
+import org.vmmagic.pragma.UninterruptiblePragma;
 
 /**
  * An abstract heap class.
@@ -190,10 +190,10 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	
 	/**
 	 * Join all adjacent free spaces.
-	 * @throws PragmaUninterruptible
+	 * @throws UninterruptiblePragma
 	 */
 	protected abstract void defragment()
-	throws PragmaUninterruptible;
+	throws UninterruptiblePragma;
 	
 	/**
 	 * Let a selected set of objects in this heap make a visit to the given visitor.
@@ -205,10 +205,10 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * @param locking If true, use lock/unlock while proceeding to the next object.
 	 * @param flagsMask 
 	 * @param flagsValue 	 
-	 * @throws PragmaUninterruptible
+	 * @throws UninterruptiblePragma
 	 */
 	protected abstract void walk(ObjectVisitor visitor, boolean locking, int flagsMask, int flagsValue)
-	throws PragmaUninterruptible;
+	throws UninterruptiblePragma;
 	
 	/**
 	 * Mark the given object as free space.

@@ -12,6 +12,7 @@ import java.security.ProtectionDomain;
 
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.vmmagic.pragma.PrivilegedActionPragma;
 
 /**
  * JNode VM implementation of the java AccessControl system.
@@ -69,7 +70,7 @@ public final class VmAccessController {
                                 + "\" not granted due to " + declClass.getName()); }
                     }
                 }
-                if (method.canThrow(PragmaPrivilegedAction.class)) { 
+                if (method.canThrow(PrivilegedActionPragma.class)) { 
                     // Break here, do not include inherited thread context
                     return; }
                 sf = reader.getPrevious(sf);
@@ -104,7 +105,7 @@ public final class VmAccessController {
             if (method.canThrow(PragmaDoPrivileged.class)) {
                 // Stop here
                 break;
-            } else if (method.canThrow(PragmaPrivilegedAction.class)) {
+            } else if (method.canThrow(PrivilegedActionPragma.class)) {
                 // Break here, do not include inherited thread context
                 return new VmAccessControlContext(domains, null);
             } else {

@@ -15,6 +15,7 @@ import org.jnode.util.Statistics;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.compiler.HotMethodManager;
 import org.jnode.vm.memmgr.VmHeapManager;
+import org.vmmagic.pragma.NoInlinePragma;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -264,10 +265,10 @@ public class Vm extends VmSystemObject implements Statistics {
      * Throw an AssertionError with the given messages.
      * @param msg
      * @param msg2
-     * @throws PragmaNoInline
+     * @throws NoInlinePragma
      */
     private static void assertionFailed(String msg, String msg2) 
-    throws PragmaNoInline {
+    throws NoInlinePragma {
         if ((msg == null) && (msg2 == null)) {
             msg = "Assertion failed";
         } else if (msg2 != null) {

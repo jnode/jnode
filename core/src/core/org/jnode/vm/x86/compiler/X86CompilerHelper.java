@@ -9,7 +9,6 @@ import org.jnode.assembler.x86.Register;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.vm.Address;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.PragmaPrivilegedAction;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmProcessor;
@@ -22,6 +21,7 @@ import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmTypeState;
 import org.jnode.vm.memmgr.VmWriteBarrier;
 import org.jnode.vm.x86.X86CpuID;
+import org.vmmagic.pragma.PrivilegedActionPragma;
 
 /**
  * Helpers class used by the X86 compilers.
@@ -62,7 +62,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
      */
     public X86CompilerHelper(AbstractX86Stream os,
             AbstractX86StackManager stackMgr, X86CompilerContext context,
-            boolean isBootstrap) throws PragmaPrivilegedAction {
+            boolean isBootstrap) throws PrivilegedActionPragma {
         this.os = os;
         this.context = context;
         this.stackMgr = stackMgr;
