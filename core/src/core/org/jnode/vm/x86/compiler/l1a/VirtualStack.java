@@ -3,9 +3,14 @@
  */
 package org.jnode.vm.x86.compiler.l1a;
 
+import org.jnode.assembler.x86.Register;
+
 /**
  * @author Patrik Reali
  */
+
+// TODO: work with Items to keep track of each item's stack level until popped and ensure consistency and correctness
+
 final class VirtualStack {
 	Item[] stack;
 	
@@ -92,19 +97,19 @@ final class VirtualStack {
 		Item res = null;
 		switch (type) {
 			case Item.INT:
-				res = IntItem.CreateStack();
+				res = IntItem.createStack();
 				break;
 			case Item.REFERENCE:
-				res = RefItem.CreateStack();
+				res = RefItem.createStack();
 				break;
 			case Item.LONG:
-				res = LongItem.CreateStack();
+				res = LongItem.createStack();
 				break;
 			case Item.FLOAT:
-				res = FloatItem.CreateStack();
+				res = FloatItem.createStack();
 				break;
 			case Item.DOUBLE:
-				res = DoubleItem.CreateStack();
+				res = DoubleItem.createStack();
 				break;			
 		}
 		pushItem(res);
@@ -116,25 +121,43 @@ final class VirtualStack {
 	 * 
 	 * @param index
 	 */
-	void loadLocal(int index) {
+	void loadLocal(EmitterContext ec, int index) {
 		for (int i = 0; i < tos; i++) {
 			final Item item = stack[i];
-			if ((item.getKind() == Item.LOCAL) && (item.getLocal() == index))
-					item.load();
+			if ((item.getKind() == Item.LOCAL) && (item.getOffsetToFP() == index))
+					item.load(ec);
 		}
 		
 	}
 	
-	void push() {
+	void push(EmitterContext ec) {
 		int i = 0;
 		while ((i < tos) && (stack[i].getKind() == Item.STACK))
 			i++;
 		while (i < tos) {
 			Item item = stack[i];
 			Item.myAssert (item.getKind() != Item.STACK);
-			item.push();
+			item.push(ec);
 			i++;
 		}
+	}
+
+	/**
+	 * Allocate register. If not free, then free it (it must be somewhere in the stack!)
+	 * 
+	 * @param context
+	 * @param eax
+	 */
+	 void requestRegister(EmitterContext context, Register reg) {
+	 	final X86RegisterPool pool = context.getPool();
+	 	if (!pool.isFree(reg)) {
+			// TODO Auto-generated method stub
+	 		Item.notImplemented();
+	 	}
+	 	if (!pool.request(reg)) {
+	 		Item.notImplemented();
+	 	}
+	 	
 	}
 
 }

@@ -17,6 +17,8 @@ package org.jnode.vm.x86.compiler.l1a;
  * @author Patrik Reali
  *
  */
+
+//TODO: make Item a subclass of operand
 abstract class Item {
 	/*
 	 * Description of the virtual stack entry kind
@@ -51,18 +53,20 @@ abstract class Item {
 	/*
 	 * Virtual Stack Item
 	 */
-	private int kind;			// entry kind
+	protected int kind;			// entry kind
 	private int type;			// entry type
 //	Register reg;	// kind == REGISTER only
-	int	local;		// kind == local only
+	
+	//
+	int	offsetToFP;		// kind == local only
 //	Constant con;	// kind == CONSTANT only
 	
 //	Item(int kind, int type, Register reg, int local, Constant con) {
-	Item(int kind, int type, int local) {
+	Item(int kind, int type, int offsetToFP) {
 		this.kind = kind;
 		this.type = type;
 //		this.reg = reg;
-		this.local = local;
+		this.offsetToFP = offsetToFP;
 //		this.con = con;
 	}
 	
@@ -115,16 +119,16 @@ abstract class Item {
 //		return con;
 //	}
 	
-	int getLocal() {
+	int getOffsetToFP() {
 		myAssert(kind == LOCAL);
-		return local;
+		return offsetToFP;
 	}
 
 	/**
 	 * Load item into a register / two registers / an FPU register
 	 * depending on its type
 	 */
-	abstract void load();
+	abstract void load(EmitterContext ec);
 	
 	/**
 	 * Load item into the given register (only for Category 1 items).
@@ -146,15 +150,15 @@ abstract class Item {
 	 * Load item into ST(0) FPU register (push on FPU stack)
 	 *
 	 */
-	abstract void loadToFPU();
+//	abstract void loadToFPU(EmitterContext ec);
 	
 	/**
 	 * Load item into a register / two registers / an FPU register
 	 * depending on its type, if its kind matches the mask
 	 */
-	void loadIf(int mask) {
+	void loadIf(EmitterContext eContext, int mask) {
 		if ((kind & mask) > 0)
-			load();
+			load(eContext);
 	}
 	
 	/**
@@ -187,10 +191,10 @@ abstract class Item {
 	 * kind matches the mask
 	 *
 	 */
-	void loadToFPUIf(int mask) {
-		if ((kind & mask) > 0)
-			loadToFPU();
-	}
+//	void loadToFPUIf(EmitterContext ec, int mask) {
+//		if ((kind & mask) > 0)
+//			loadToFPU(ec);
+//	}
 	
 	/**
 	 * return the register containing a 32 bit value
@@ -224,13 +228,13 @@ abstract class Item {
 	 * Push item onto the stack
 	 *
 	 */
-	abstract void push();
+	abstract void push(EmitterContext ec);
 	
 	/**
 	 * Release the registers associated to this item
 	 *
 	 */
-	abstract void release();
+	abstract void release(EmitterContext ec);
 	
 	/**
 	 * @param type

@@ -3,23 +3,26 @@
  */
 package org.jnode.vm.x86.compiler.l1a;
 
+import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
+import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
  * @author Patrik Reali
  */
-public final class RefItem extends Item {
+ final class RefItem extends Item implements X86CompilerConstants {
 
 	private Register reg;
 	private Object value;
 
 	/**
 	 * @param kind
+	 * @param reg
 	 * @param val
-	 * @param local
+	 * @param offsetToFP
 	 */
-	private RefItem(int kind, Register reg, Object val, int local) {
-		super(kind, REFERENCE, local);
+	private RefItem(int kind, Register reg, Object val, int offsetToFP) {
+		super(kind, REFERENCE, offsetToFP);
 		this.reg = reg;
 		this.value = val;
 	}
@@ -34,15 +37,27 @@ public final class RefItem extends Item {
 		return value;
 	}
 	
+	/**
+	 * load item with register reg. Assumes that reg is properly allocated
+	 * 
+	 * @param ec current emitter context
+	 * @param reg register to load the item to
+	 */
+	void loadTo(EmitterContext ec, Register reg) {
+		AbstractX86Stream os = ec.getStream();
+		X86RegisterPool pool = ec.getPool();
+		myAssert(!pool.isFree(reg));
 
-	void loadTo(Register reg) {
 		switch (getKind()) {
 			case REGISTER:
-				// nothing to do
+				if (this.reg != reg) {
+					release(ec);
+					os.writeMOV(INTSIZE, reg, this.reg);
+				}
 				break;
 				
 			case LOCAL:
-				notImplemented();
+				os.writeMOV(INTSIZE, reg, FP, getOffsetToFP());
 				break;
 				
 			case CONSTANT:
@@ -52,21 +67,31 @@ public final class RefItem extends Item {
 			case FREGISTER:
 				notImplemented();
 				break;
-		}		
+				
+			case STACK:
+				os.writePOP(reg);
+				break;
+
+		}
+		kind = REGISTER;
+		this.reg = reg;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#load()
 	 */
-	void load() {
-		// TODO Auto-generated method stub
-		notImplemented();
+	void load(EmitterContext ec) {
+		if (kind != REGISTER) {
+			final X86RegisterPool pool = ec.getPool();
+			final Register r = (Register)pool.request(INT);
+			loadTo(ec, r);	
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#loadToFPU()
 	 */
-	void loadToFPU() {
+	void loadToFPU(EmitterContext ec) {
 		// TODO Auto-generated method stub
 		notImplemented();
 
@@ -79,42 +104,54 @@ public final class RefItem extends Item {
 	 * 
 	 * @param t0 the destination register
 	 */
-	void loadToIf(int mask, Register t0) {
+	void loadToIf(EmitterContext ec, int mask, Register t0) {
 		if ((getKind() & mask) > 0)
-			loadTo(t0);
+			loadTo(ec, t0);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#push()
 	 */
-	void push() {
+	void push(EmitterContext ec) {
+		final AbstractX86Stream os = ec.getStream();
+		
 		switch (getKind()) {
 			case REGISTER:
-				notImplemented();
+				os.writePUSH(reg);
 				break;
 				
 			case LOCAL:
-				notImplemented();
+				os.writePUSH(FP, offsetToFP);
 				break;
 				
 			case CONSTANT:
-				// nothing to do
+				//TODO
+				notImplemented();
 				break;
 				
 			case FREGISTER:
+				//TODO
 				notImplemented();
 				break;
-		}
+				
+			case STACK:
+				//nothing to do
+				break;
 
+		}
+		release(ec);
+		kind = STACK;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#release()
 	 */
-	void release() {
+	void release(EmitterContext ec) {
+		final X86RegisterPool pool = ec.getPool();
+
 		switch (getKind()) {
 			case REGISTER:
-				notImplemented();
+				pool.release(reg);
 				break;
 				
 			case LOCAL:
@@ -128,22 +165,27 @@ public final class RefItem extends Item {
 			case FREGISTER:
 				notImplemented();
 				break;
+				
+			case STACK:
+				//nothing to do
+				break;
+
 		}
 	}
 
-	static RefItem CreateRegister(Register reg) {
+	static RefItem createRegister(Register reg) {
 		return new RefItem(REGISTER, reg, null, 0);
 	}
 	
-	static RefItem CreateConst(Object value) {
+	static RefItem createConst(Object value) {
 		return new RefItem(CONSTANT, null, value, 0);
 	}
 
-	static RefItem CreateLocal(int index) {
-		return new RefItem(LOCAL, null, null, index);
+	static RefItem createLocal(int offsetToFP) {
+		return new RefItem(LOCAL, null, null, offsetToFP);
 	}
 	
-	static RefItem CreateStack() {
+	static RefItem createStack() {
 		return new RefItem(STACK, null, null, 0);
 	}
 }
