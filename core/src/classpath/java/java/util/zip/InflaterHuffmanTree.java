@@ -37,13 +37,13 @@ exception statement from your version. */
 
 package java.util.zip;
 
-public class InflaterHuffmanTree
+class InflaterHuffmanTree
 {
   private static final int MAX_BITLEN = 15;
   
   private short[] tree;
 
-  public static InflaterHuffmanTree defLitLenTree, defDistTree;
+  static InflaterHuffmanTree defLitLenTree, defDistTree;
 
   static
   {
@@ -79,7 +79,7 @@ public class InflaterHuffmanTree
    *
    * @param codeLengths the array of code lengths
    */
-  public InflaterHuffmanTree(byte[] codeLengths) throws DataFormatException
+  InflaterHuffmanTree(byte[] codeLengths) throws DataFormatException
   {
     buildTree(codeLengths);
   }
@@ -168,7 +168,7 @@ public class InflaterHuffmanTree
    * @param input the input source.
    * @return the next symbol, or -1 if not enough input is available.
    */
-  public int getSymbol(StreamManipulator input) throws DataFormatException
+  int getSymbol(StreamManipulator input) throws DataFormatException
   {
     int lookahead, symbol;
     if ((lookahead = input.peekBits(9)) >= 0)

@@ -32,9 +32,6 @@
       <export name="gnu.java.lang.*"/>
       <export name="gnu.java.lang.reflect.*"/>
       <export name="gnu.java.locale.*"/>
-      <export name="gnu.java.text.*"/>
-      <export name="gnu.java.util.*"/>
-      <export name="gnu.java.util.prefs.*"/>
       <export name="gnu.java.security.*"/>
       <export name="gnu.java.security.action.*"/>
       <export name="gnu.java.security.ber.*"/>
@@ -44,6 +41,10 @@
       <export name="gnu.java.security.util.*"/>
       <export name="gnu.java.security.x509.*"/>
       <export name="gnu.java.security.x509.ext.*"/>
+      <export name="gnu.java.text.*"/>
+      <export name="gnu.java.util.*"/>
+      <export name="gnu.java.util.prefs.*"/>
+      <export name="gnu.regexp.*"/>
 
       <export name="java.applet.*"/>
       <export name="java.awt.*"/>

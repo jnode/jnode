@@ -51,13 +51,17 @@ import java.util.Arrays;
  * This class performs affine transformation between two images or 
  * rasters in 2 dimensions. 
  *
- * @author Olga Rodimina <rodimina@redhat.com> 
+ * @author Olga Rodimina (rodimina@redhat.com) 
  */
- 
 public class AffineTransformOp implements BufferedImageOp, RasterOp
 {
     public static final int TYPE_NEAREST_NEIGHBOR = 1;
+    
     public static final int TYPE_BILINEAR = 2;
+    
+    /**
+     * @since 1.5.0
+     */
     public static final int TYPE_BICUBIC = 3;
 
     private AffineTransform transform;
@@ -164,7 +168,7 @@ public class AffineTransformOp implements BufferedImageOp, RasterOp
      * @param dst destination image
      * @return transformed source image
      */
-    public BufferedImage filter (BufferedImage src, BufferedImage dst)
+    public final BufferedImage filter (BufferedImage src, BufferedImage dst)
     {
 
       if (dst == src)
@@ -195,7 +199,7 @@ public class AffineTransformOp implements BufferedImageOp, RasterOp
      * @param dst destination raster
      * @return transformed raster
      */
-    public WritableRaster filter (Raster src, WritableRaster dst)
+    public final WritableRaster filter (Raster src, WritableRaster dst)
     {
       if (dst == src)
         throw new IllegalArgumentException("src image cannot be the same as"
@@ -297,7 +301,7 @@ public class AffineTransformOp implements BufferedImageOp, RasterOp
      * @param src image to be transformed
      * @return bounds of the transformed image.
      */
-    public Rectangle2D getBounds2D (BufferedImage src)
+    public final Rectangle2D getBounds2D (BufferedImage src)
     {
       return getBounds2D (src.getRaster());
     }
@@ -308,7 +312,7 @@ public class AffineTransformOp implements BufferedImageOp, RasterOp
      * @param src raster to be transformed
      * @return bounds of the transformed raster.
      */
-    public Rectangle2D getBounds2D (Raster src)
+    public final Rectangle2D getBounds2D (Raster src)
     {
       // determine new size for the transformed raster.
       // Need to calculate transformed coordinates of the lower right
@@ -327,7 +331,7 @@ public class AffineTransformOp implements BufferedImageOp, RasterOp
      *
      * @return interpolation type
      */
-    public int getInterpolationType ()
+    public final int getInterpolationType ()
     {
       if(hints.containsValue (RenderingHints.VALUE_INTERPOLATION_BILINEAR))
         return TYPE_BILINEAR;
@@ -348,21 +352,23 @@ public class AffineTransformOp implements BufferedImageOp, RasterOp
       return transform.transform (srcPt, dstPt);
     }
 
-    /** Returns rendering hints that are used during transformation.
+    /**
+     * Returns rendering hints that are used during transformation.
      *
      * @return rendering hints
      */
-    public RenderingHints getRenderingHints ()
+    public final RenderingHints getRenderingHints ()
     {
       return hints;
     }
 
-    /** Returns transform used in transformation between source and destination
+    /**
+     * Returns transform used in transformation between source and destination
      * image.
      *
      * @return transform
      */
-    public AffineTransform getTransform ()
+    public final AffineTransform getTransform ()
     {
       return transform;
     }

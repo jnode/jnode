@@ -401,7 +401,8 @@ public class MessageFormat extends Format
     return formatInternal(arguments, appendBuf, fp, null);
   }
 
-  protected final StringBuffer formatInternal (Object arguments[], StringBuffer appendBuf,
+  private StringBuffer formatInternal (Object arguments[],
+                                       StringBuffer appendBuf,
 					       FieldPosition fp,
 					       FormatCharacterIterator output_iterator)
   {
