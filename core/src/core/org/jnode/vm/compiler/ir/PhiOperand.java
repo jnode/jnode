@@ -68,13 +68,14 @@ public class PhiOperand extends Operand {
 	public Operand simplify() {
 		int n = sources.size();
 		Variable first = (Variable) sources.get(0);
+        Variable ret;
 		if (n == 1) {
-			return first.simplify();
+			ret = (Variable) first.simplify();
 		} else {
 			// We can't use var.simplify() here because the result might
 			// be a constant, which complicates code generation.
 			// sources should contain only Variable instances.
-			first = first.simplifyCopy();
+			ret = first = first.simplifyCopy();
 			for (int i=1; i<n; i+=1) {
 				Variable var = (Variable) sources.get(i);
 				var = var.simplifyCopy();
@@ -90,18 +91,27 @@ public class PhiOperand extends Operand {
 					// at least until the end of the loop. This looks tricky, but I
 					// think it's correct.
 					IRBasicBlock block = assignQuad.getBasicBlock().getLastPredecessor();
-					first.setLastUseAddress(block.getEndPC()-1);
+                    if(block == null)
+                        first.setLastUseAddress(0);
+                    else
+					    first.setLastUseAddress(block.getEndPC()-1);
 				} else {
-					// TODO revisit this case
+                    // TODO revisit this case
 					// I'm really not sure what to do!
 					// This is the case where var was an argument, so it was
 					// not assigned.
+                    //LS
+                    if(!var.equals(first)){
+                        ((Variable)sources.get(i)).getAssignQuad().setDeadCode(false);
+                        if(ret == first)
+                            ret = (Variable) sources.get(i);
+                    }
 				}
 			}
 			// This is bold assumption that the first phi source was assigned
 			// before any others. I'm not sure if this is always true...
-			return first;
 		}
+        return ret;
 	}
 
 	/* (non-Javadoc)
