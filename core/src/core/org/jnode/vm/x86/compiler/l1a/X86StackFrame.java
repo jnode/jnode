@@ -196,7 +196,11 @@ class X86StackFrame implements X86CompilerConstants {
 			final ObjectRef handlerRef = os.setObjectRef(handlerLabel);
 
 			/** Clear the calculation stack (only locals are left) */
-			os.writeLEA(Register.ESP, Register.EBP, -(noLocalVars * 4));
+			if (noLocalVars < 0) {
+				System.out.println("@#@#@#@# noLocalVars = " + noLocalVars);
+			}
+			final int ofs = Math.max(0, noLocalVars) * 4;
+			os.writeLEA(Register.ESP, Register.EBP, -ofs);
 			/** Push the exception in EAX */
 			os.writePUSH(Register.EAX);
 			/** Goto the real handler */

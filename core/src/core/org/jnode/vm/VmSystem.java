@@ -75,6 +75,8 @@ public final class VmSystem {
     private static final String LAYOUT = "%-5p [%c{1}]: %m%n";
     private static boolean inShutdown = false;
     private static int exitCode = 0;
+    
+    static int debug = 0;
 
     /**
      * Initialize the Virtual Machine
@@ -481,6 +483,8 @@ public final class VmSystem {
             Address address) throws PrivilegedActionPragma {
 
         try {
+        	debug++;
+        	
             if (ex == null) {
                 Unsafe.debug("NPE");
                 throw new NullPointerException();
@@ -599,6 +603,8 @@ public final class VmSystem {
                 Unsafe.die("findThrowableHandler");
             }
             return null;
+        } finally {
+        	debug--;
         }
     }
 
@@ -910,7 +916,7 @@ public final class VmSystem {
      *            the new PrintStream
      * @see #setOut(PrintStream)
      */
-    public static void setOut(PrintStream out) {
+    public static void setOut(PrintStream out) throws PrivilegedActionPragma {
         setStaticField(System.class, "out", out);     
     }
 
@@ -921,7 +927,7 @@ public final class VmSystem {
      *            the new PrintStream
      * @see #setErr(PrintStream)
      */
-    public static void setErr(PrintStream err) {
+    public static void setErr(PrintStream err) throws PrivilegedActionPragma {
         setStaticField(System.class, "err", err);        
     }
     

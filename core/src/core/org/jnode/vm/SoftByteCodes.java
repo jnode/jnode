@@ -37,7 +37,7 @@ public class SoftByteCodes implements Uninterruptible {
 
 	public static final int EX_STACKOVERFLOW = 5;
 
-	public static final int EX_CLASSCAST = 6;
+	//public static final int EX_CLASSCAST = 6;
 
 	private static VmHeapManager heapManager;
 
@@ -335,6 +335,13 @@ public class SoftByteCodes implements Uninterruptible {
 		final Object result = hm.newArray((VmArrayClass) vmClass, elements);
 		return result;
 	}
+	
+	/**
+	 * Throw a classcast exception.
+	 */
+	public static void classCastFailed() {
+		throw new ClassCastException();
+	}
 
 	/**
 	 * Create an exception for a system-trapped situation.
@@ -347,7 +354,9 @@ public class SoftByteCodes implements Uninterruptible {
 	public static Throwable systemException(int nr, int address)
 			throws UninterruptiblePragma, LoadStaticsPragma,
 			PrivilegedActionPragma {
-		//Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
+//		if (VmSystem.debug > 0) {
+//			Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
+//		} 
 		if (false) {
 			Unsafe.debug(nr);
 			Unsafe.debug(address);
@@ -379,8 +388,12 @@ public class SoftByteCodes implements Uninterruptible {
 					+ state);
 		case EX_STACKOVERFLOW:
 			return new StackOverflowError();
-		case EX_CLASSCAST:
-			return new ClassCastException();
+//		case EX_CLASSCAST:
+//			if (false) {
+//				Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
+//				Unsafe.die("Classcast failed");				
+//			}
+//			return new ClassCastException();
 		default:
 			return new UnknownError("Unknown system-exception at " + hexAddress
 					+ state);
