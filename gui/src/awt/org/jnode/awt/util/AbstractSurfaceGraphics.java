@@ -61,8 +61,7 @@ public abstract class AbstractSurfaceGraphics extends AbstractGraphics {
 	 * @see java.awt.Graphics#copyArea(int, int, int, int, int, int)
 	 */
 	public void copyArea(int x, int y, int width, int height, int dx, int dy) {
-		// TODO Auto-generated method stub
-
+		surface.copyArea(x, y, width, height, dx, dy);
 	}
 
 	/**

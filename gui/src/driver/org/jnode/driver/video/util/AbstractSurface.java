@@ -9,7 +9,6 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
-import java.awt.geom.RectangularShape;
 import java.awt.geom.Rectangle2D;
 
 import org.jnode.driver.video.Surface;

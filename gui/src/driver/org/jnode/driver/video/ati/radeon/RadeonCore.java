@@ -62,6 +62,9 @@ final class RadeonCore implements RadeonConstants {
 	/** General Radeon Framebuffer info */
 	private final FBInfo fbinfo;
 	
+	/** The acceleration functions */
+	private final RadeonAcceleration accel;
+	
 	/**
 	 * @param driver
 	 * @param architecture
@@ -92,6 +95,7 @@ final class RadeonCore implements RadeonConstants {
 			this.vgaIO = new RadeonVgaIO(mmio);
 			final int memSize = readMemorySize();
 			log.info("Memory size " + NumberUtils.size(memSize));
+			this.accel = new RadeonAcceleration(vgaIO);
 
 			// Map Device RAM
 			this.deviceRam = rm.claimMemoryResource(device, Address
@@ -230,7 +234,7 @@ final class RadeonCore implements RadeonConstants {
 				throw new IllegalArgumentException("Invalid bits per pixel "
 						+ bitsPerPixel);
 			}
-			return new RadeonSurface(this, config, bitmapGraphics, screen);
+			return new RadeonSurface(this, config, bitmapGraphics, screen, accel);
 		} finally {
 			// Turn the screen back on
 			setDpms(dpmsState);

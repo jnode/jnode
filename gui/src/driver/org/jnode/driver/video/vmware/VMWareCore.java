@@ -166,7 +166,7 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 		final int h = config.getScreenHeight();
 		setMode(w, h, config.getColorModel());
 		fillRect(0, 0, w, h, 0, PAINT_MODE);
-		//dumpState(); // For debugging purposes
+		dumpState(); // For debugging purposes
 		defineCursor();
 	}
 
@@ -273,6 +273,14 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	}
 
 	/**
+	 * @see org.jnode.driver.video.Surface#copyArea(int, int, int, int, int, int)
+	 */
+	public void copyArea(int x, int y, int width, int height, int dx, int dy) {
+		bitmapGraphics.copyArea(x, y, width, height, dx, dy);
+		updateScreen(dx, dy, width, height);
+	}
+
+	/**
 	 * Draw an image to this surface
 	 * 
 	 * @param src
@@ -367,6 +375,8 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 		log.debug("Green mask      0x" + NumberUtils.hex(getReg32(SVGA_REG_GREEN_MASK)));
 		log.debug("Blue mask       0x" + NumberUtils.hex(getReg32(SVGA_REG_BLUE_MASK)));
 		log.debug("Capabilities    0x" + NumberUtils.hex(capabilities));
+		log.debug("FB.size         0x" + NumberUtils.hex(getReg32(SVGA_REG_FB_SIZE)));
+		log.debug("FB.maxsize      0x" + NumberUtils.hex(getReg32(SVGA_REG_FB_MAX_SIZE)));
 	}
 
 	/**
