@@ -75,7 +75,10 @@ public abstract class PluginManager {
 	 */
 	protected final void stopSinglePlugin(Plugin plugin) throws PluginException {
 	    try {
-	        plugin.stop();
+	        if (plugin.isActive()) {
+	            BootLog.info("Stopping " + plugin.getDescriptor().getId());
+	            plugin.stop();
+	        }
 	    } catch (PluginException ex) {
 	        BootLog.error("Error stopping " + plugin.getDescriptor().getId());
 	        throw ex;
