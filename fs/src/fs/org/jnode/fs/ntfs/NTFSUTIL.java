@@ -17,8 +17,16 @@ public class NTFSUTIL {
 	{
 		int word = low;
 		word = (word << 8) | (up & 0xff);
+		return word & 0xFFFFFFFF;
+	}
+	
+	public static int LE_READ_16_INT(byte up, byte low)
+	{
+		int word = low;
+		word = (word << 8) | (up & 0xff);
 		return word;
 	}
+	
 	public static char READ16_CHAR(byte up, byte low)
 	{
 		char word = (char) low;
@@ -98,6 +106,18 @@ public class NTFSUTIL {
 				(b3 << 8) | 
 				 b4;
 	}
+	public static int LE_READ_24_INT (byte[] abArray, int offset)
+	{
+		int b1 = abArray[offset + 2] & 0x000000FF;
+		int b2 = abArray[offset + 1] & 0x000000FF;
+		int b3 = abArray[offset + 0] & 0x000000FF;
+		
+		return (
+				(b1 << 16) | 
+				(b2 << 8) | 
+				b3);
+	}
+	
 	public static int LE_READ_U24_INT (byte[] abArray, int offset)
 	{
 		int b1 = abArray[offset + 2] & 0x000000FF;
