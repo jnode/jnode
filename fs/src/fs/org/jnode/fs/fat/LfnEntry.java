@@ -20,7 +20,7 @@ class LfnEntry implements FSEntry {
 	// decompacted LFN entry
 	private String fileName;
 	// TODO: Make them available
-   private Date creationTime;
+	private Date creationTime;
 	private Date lastAccessed;
 	private FatLfnDirectory parent;
 	private FatDirEntry realEntry;
@@ -72,19 +72,26 @@ class LfnEntry implements FSEntry {
 
 	}
 
-	private int calculateCheckSum() {
-		int sum = 0;
+	private byte calculateCheckSum() {
+
 		char[] fullName = new char[] { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
 		char[] name = realEntry.getNameOnly().toCharArray();
 		char[] ext = realEntry.getExt().toCharArray();
-
 		System.arraycopy(name, 0, fullName, 0, name.length);
 		System.arraycopy(ext, 0, fullName, 8, ext.length);
 
-		for (int i = 0; i < 11; i++) {
-			sum = (((sum & 1) << 7) | ((sum & 0xfe >> 1)) + fullName[i]);
+		//System.out.println("Compute checksum on : '" + new String(fullName) + "'");
+		byte[] dest = new byte[11];
+		for (int i = 0; i < 11; i++)
+			dest[i] = (byte)fullName[i];
+
+		int sum = dest[0];
+		for (int i = 1; i < 11; i++) {
+			sum = dest[i] + (((sum & 1) << 7) + ((sum & 0xfe) >> 1));
 		}
-		return sum;
+
+		//System.out.println("result = " + (byte) (sum & 0xff));
+		return (byte) (sum & 0xff);
 	}
 
 	public String getName() {
