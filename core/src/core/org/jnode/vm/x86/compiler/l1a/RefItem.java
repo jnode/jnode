@@ -83,7 +83,7 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 	void load(EmitterContext ec) {
 		if (kind != REGISTER) {
 			final X86RegisterPool pool = ec.getPool();
-			final Register r = (Register)pool.request(INT);
+			final Register r = (Register)pool.request(INT, this);
 			loadTo(ec, r);	
 		}
 	}
@@ -100,7 +100,6 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 	/**
 	 * Load item into the given register (only for Category 1 items), if its kind
 	 * matches the mask.
-	 * Also allocate the register t0.
 	 * 
 	 * @param t0 the destination register
 	 */
@@ -172,6 +171,13 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
+	 */
+	boolean uses(Register reg) {
+		return ((kind == REGISTER) && this.reg.equals(reg));
+	}
 
 	static RefItem createRegister(Register reg) {
 		return new RefItem(REGISTER, reg, null, 0);
@@ -188,4 +194,6 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 	static RefItem createStack() {
 		return new RefItem(STACK, null, null, 0);
 	}
+
+
 }
