@@ -5,7 +5,6 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
-import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
 import org.jnode.assembler.x86.X86Constants;
@@ -35,7 +34,6 @@ import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmStaticMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmTypeState;
-import org.jnode.vm.compiler.CompileError;
 import org.jnode.vm.compiler.CompiledMethod;
 import org.jnode.vm.compiler.InlineBytecodeVisitor;
 import org.jnode.vm.x86.VmX86Architecture;
@@ -546,8 +544,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      *            destroyed.
      */
     private final void instanceOf(Register objectr, Register typer,
-            Register tmpr, Label trueLabel, boolean skipNullTest) {
-        //TODO: port to orp-style
+            Register tmpr, Register cntr, Label trueLabel, boolean skipNullTest) {
         final Label loopLabel = new Label(this.curInstrLabel + "loop");
         final Label notInstanceOfLabel = new Label(this.curInstrLabel
                 + "notInstanceOf");
@@ -562,23 +559,26 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         /* SuperClassesArray -> tmp */
         os.writeMOV(INTSIZE, tmpr, tmpr, arrayDataOffset
                 + (TIBLayout.SUPERCLASSES_INDEX * slotSize));
-        /* SuperClassesArray.length -> ECX */
-        os.writeMOV(INTSIZE, ECX, tmpr, arrayLengthOffset);
-        /* &superClassesArray[0] -> esi */
-        os.writeLEA(tmpr, tmpr, arrayDataOffset);
+        /* SuperClassesArray.length -> cntr */
+        os.writeMOV(INTSIZE, cntr, tmpr, arrayLengthOffset);
+        /* &superClassesArray[cnt-1] -> tmpr */
+        os.writeLEA(tmpr, tmpr, cntr, 4, arrayDataOffset - 4);
 
         os.setObjectRef(loopLabel);
-        /* cmp superClassesArray[index++],type */
+        // cmp superClassesArray[index],type
         os.writeCMP(tmpr, 0, typer);
-        /* Is equal? */
+        // Is equal? 
         os.writeJCC(trueLabel, X86Constants.JE);
-        // index++
-        os.writeLEA(tmpr, tmpr, slotSize);
-        try {
-            os.writeLOOP(loopLabel);
-        } catch (UnresolvedObjectRefException ex) {
-            throw new CompileError(ex);
-        }
+        // index--
+        os.writeLEA(tmpr, tmpr, -slotSize);
+        // cnt--
+        os.writeDEC(cntr);
+        // if (cnt == 0)
+        os.writeJCC(notInstanceOfLabel, X86Constants.JZ);
+        // Goto loop
+        os.writeJMP(loopLabel);
+
+        // Not instanceof
         os.setObjectRef(notInstanceOfLabel);
     }
 
@@ -1032,7 +1032,6 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     		// ClassRef is an interface or array, do the slow test
     		
     		// Pre-claim ECX
-    		L1AHelper.requestRegister(eContext, ECX);
     		L1AHelper.requestRegister(eContext, EAX);
     		
     		// check that top item is a reference
@@ -1042,6 +1041,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     		ref.load(eContext);
     		final Register refr = ref.getRegister();
     		final Register classr = EAX;
+    		final Register cntr = L1AHelper.requestRegister(eContext, JvmType.INT,
+    				false);
     		final Register tmpr = L1AHelper.requestRegister(eContext, JvmType.INT,
     				false);
     		
@@ -1054,11 +1055,11 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     		os.writeTEST(refr, refr);
     		os.writeJCC(okLabel, X86Constants.JZ);
     		/* Is instanceof? */
-    		instanceOf(refr, classr, tmpr, okLabel, true);
+    		instanceOf(refr, classr, tmpr, cntr, okLabel, true);
     		/* Not instanceof */
     		
     		// Release temp registers here, so invokeJavaMethod can use it
-    		L1AHelper.releaseRegister(eContext, ECX);
+    		L1AHelper.releaseRegister(eContext, cntr);
     		L1AHelper.releaseRegister(eContext, classr);
     		L1AHelper.releaseRegister(eContext, tmpr);
     		
@@ -2161,9 +2162,6 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 		if (resolvedType.isInterface() || resolvedType.isArray()) {    
     		// It is an interface, do it the hard way
     		
-    		// Pre-claim ECX
-    		L1AHelper.requestRegister(eContext, ECX);
-    		
     		// Load reference
     		final RefItem ref = vstack.popRef();
     		ref.load(eContext);
@@ -2172,6 +2170,8 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     		// Allocate tmp registers
     		final Register classr = L1AHelper.requestRegister(eContext,
     				JvmType.INT, false);
+    		final Register cntr = L1AHelper.requestRegister(eContext, JvmType.INT,
+    				false);
     		final Register tmpr = L1AHelper.requestRegister(eContext, JvmType.INT,
     				false);
     		
@@ -2182,7 +2182,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     		final Label endLabel = new Label(this.curInstrLabel + "io-end");
     		
     		/* Is instanceof? */
-    		instanceOf(refr, classr, tmpr, trueLabel, false);
+    		instanceOf(refr, classr, tmpr, cntr, trueLabel, false);
     		/* Not instanceof */
     		//TODO: use setcc instead of jumps
     		os.writeXOR(refr, refr);
@@ -2202,7 +2202,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     		// Release
     		pool.release(classr);
     		pool.release(tmpr);
-    		pool.release(ECX);
+    		pool.release(cntr);
     	} else {
     		// It is a class, do the fast way
     		
