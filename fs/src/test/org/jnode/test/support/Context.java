@@ -18,22 +18,13 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.test.support;
 
+import org.jmock.MockObjectTestCase;
 
-import org.jmock.cglib.MockObjectTestCase;
-
-/**
- * 
- * @author Fabien DUMINY
- */
-public interface TestConfig 
+abstract public class Context
 {
-    public Class getContextClass();
-    
-    /**
-     * 
-     */
-	public String toString();
+    abstract public void init(TestConfig config, MockObjectTestCase testCase) throws Exception;
+    abstract public void destroy() throws Exception;
 }

@@ -18,22 +18,24 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
-package org.jnode.test.support;
 
+package org.jnode.test.fs.driver.factories;
 
-import org.jmock.cglib.MockObjectTestCase;
+import org.apache.log4j.Logger;
+import org.jmock.MockObjectTestCase;
 
-/**
- * 
- * @author Fabien DUMINY
- */
-public interface TestConfig 
+public abstract class AbstractMockDeviceFactory
 {
-    public Class getContextClass();
+    protected final Logger log = Logger.getLogger(getClass());
     
-    /**
-     * 
-     */
-	public String toString();
+    protected MockObjectTestCase testCase;
+    
+    public AbstractMockDeviceFactory()
+    {   
+    }
+    
+    final public void setTestCase(MockObjectTestCase testCase)
+    {
+        this.testCase = testCase;        
+    }
 }

@@ -19,21 +19,47 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
  
-package org.jnode.test.support;
+package org.jnode.test.fs.filesystem.config;
 
-
-import org.jmock.cglib.MockObjectTestCase;
+import org.jnode.driver.Device;
 
 /**
- * 
  * @author Fabien DUMINY
  */
-public interface TestConfig 
-{
-    public Class getContextClass();
-    
-    /**
-     * 
-     */
-	public String toString();
+public abstract class DeviceParam {
+	private boolean input;
+	
+	/**
+	 * 
+	 *  
+	 */
+	protected DeviceParam()
+	{
+		
+	}
+	
+	/**
+	 * @return @throws
+	 *         Exception
+	 */
+	abstract public Device getDevice() throws Exception;
+		
+	/**
+	 * @param device
+	 * @throws Exception
+	 */
+	abstract public void tearDown(Device device) throws Exception;
+	
+	/**
+	 * @return Returns the input.
+	 */
+	public boolean isInput() {
+		return input;
+	}
+	/**
+	 * @param input The input to set.
+	 */
+	final public void setInput(boolean input) {
+		this.input = input;
+	}
 }

@@ -41,8 +41,6 @@ abstract public class AbstractTestSuite extends TestSuite
      */
     final public void init()
     {
-        try
-        {
         List configs = getConfigs();
         Class[] testSuites = getTestSuites();
         log.info(configs.size()+" configs, "+
@@ -62,14 +60,6 @@ abstract public class AbstractTestSuite extends TestSuite
                 addTestSuite(testSuites[j]);
             }
         }
-    }
-    catch(OutOfMemoryError oome)
-    {
-        oome.printStackTrace();
-        System.err.println("freeMemory:"+Runtime.getRuntime().freeMemory());
-        System.err.println("maxMemory:"+Runtime.getRuntime().maxMemory());
-        System.err.println("totalMemory:"+Runtime.getRuntime().totalMemory());
-    }        
     }
     
     /**

@@ -18,22 +18,23 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
-package org.jnode.test.support;
 
+package org.jnode.test.fs.driver.context;
 
-import org.jmock.cglib.MockObjectTestCase;
+import org.jmock.MockObjectTestCase;
+import org.jnode.driver.block.ramdisk.RamDiskDevice;
+import org.jnode.driver.block.ramdisk.RamDiskDriver;
+import org.jnode.test.fs.driver.BlockDeviceAPIContext;
+import org.jnode.test.fs.driver.stubs.StubDeviceManager;
+import org.jnode.test.support.TestConfig;
 
-/**
- * 
- * @author Fabien DUMINY
- */
-public interface TestConfig 
+public class RamDiskDriverContext extends BlockDeviceAPIContext
 {
-    public Class getContextClass();
-    
-    /**
-     * 
-     */
-	public String toString();
+    public void init(TestConfig config, MockObjectTestCase testCase)
+    {
+        String name = "RamDiskDevice-Tests";
+        final RamDiskDevice device = new RamDiskDevice(StubDeviceManager.INSTANCE.getSystemBus(), name, (int) DEVICE_SIZE);
+        final RamDiskDriver driver = new RamDiskDriver(name);
+        init(null, driver, device);       
+    }
 }
