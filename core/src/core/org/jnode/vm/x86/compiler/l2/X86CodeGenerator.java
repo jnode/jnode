@@ -19,10 +19,10 @@ import org.jnode.vm.compiler.ir.VoidReturnQuad;
  * 
  */
 public class X86CodeGenerator extends CodeGenerator {
-	private BootableHashMap variableMap;
+	private final BootableHashMap variableMap;
 
 	/**
-	 * @param map
+	 * @param variableMap
 	 */
 	public X86CodeGenerator(BootableHashMap variableMap) {
 		this.variableMap = variableMap;

@@ -45,11 +45,11 @@ import org.jnode.vm.classmgr.VmMethodCode;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.NativeCodeCompiler;
-import org.jnode.vm.memmgr.DefaultHeapManager;
 import org.jnode.vm.memmgr.HeapHelper;
-import org.jnode.vm.memmgr.VmBootHeap;
-import org.jnode.vm.memmgr.VmDefaultHeap;
 import org.jnode.vm.memmgr.VmHeapManager;
+import org.jnode.vm.memmgr.def.DefaultHeapManager;
+import org.jnode.vm.memmgr.def.VmBootHeap;
+import org.jnode.vm.memmgr.def.VmDefaultHeap;
 
 /**
  * Build the boot image from an assembler compiled bootstrap (in ELF format) combined with the
@@ -590,6 +590,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 		add(new BootClassInfo("org.jnode.vm.classmgr", true, core));
 		add(new BootClassInfo("org.jnode.vm.compiler", true, nonCore));
 		add(new BootClassInfo("org.jnode.vm.memmgr", true, core));
+		add(new BootClassInfo("org.jnode.vm.memmgr.def", true, core));
 		add(new BootClassInfo("org.jnode.util", true, nonCore));
 		add(new BootClassInfo("java.io", true, nonCore));
 		add(new BootClassInfo("java.util", true, nonCore));

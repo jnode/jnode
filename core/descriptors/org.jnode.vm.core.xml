@@ -22,6 +22,7 @@
       <export name="org.jnode.vm.compiler.*"/>
       <export name="org.jnode.vm.compiler.ir.*"/>
       <export name="org.jnode.vm.memmgr.*"/>
+      <export name="org.jnode.vm.memmgr.def.*"/>
     </library>
   </runtime>
         
