@@ -337,7 +337,7 @@
         <fileset dir="${root.dir}/../classpath" includes="**/*.java">
           <exclude name="compat/**/*"/>
           <exclude name="external/**/*"/>
-          <exclude name="gnu/java/awt/peer/**/*"/>
+          <exclude name="gnu/java/awt/peer/gtk/**/*"/>
           <exclude name="gnu/javax/swing/plaf/gtk/**/*"/>
           <exclude name="gnu/test/**/*"/>
           <exclude name="test/**/*"/>
