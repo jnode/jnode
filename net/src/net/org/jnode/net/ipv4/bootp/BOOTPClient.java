@@ -3,6 +3,17 @@
  */
 package org.jnode.net.ipv4.bootp;
 
+import org.apache.log4j.Logger;
+import org.jnode.driver.ApiNotFoundException;
+import org.jnode.driver.Device;
+import org.jnode.driver.net.NetDeviceAPI;
+import org.jnode.driver.net.NetworkException;
+import org.jnode.net.NetPermission;
+import org.jnode.net.ipv4.IPv4Address;
+import org.jnode.net.ipv4.util.Ifconfig;
+import org.jnode.net.ipv4.util.ResolverImpl;
+import org.jnode.net.ipv4.util.Route;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.Inet4Address;
@@ -12,136 +23,163 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
-import org.apache.log4j.Logger;
-import org.jnode.driver.ApiNotFoundException;
-import org.jnode.driver.Device;
-import org.jnode.driver.net.NetDeviceAPI;
-import org.jnode.driver.net.NetworkException;
-import org.jnode.net.NetPermission;
-import org.jnode.net.ipv4.IPv4Address;
-import org.jnode.net.ipv4.util.Ifconfig;
-import org.jnode.net.ipv4.util.Route;
-
 /**
  * @author epr
  * @author markhale
+ * @author Martin Hartvig
  */
-public class BOOTPClient {
-	
-	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+public class BOOTPClient
+{
 
-	private static final int RECEIVE_TIMEOUT = 10*1000; // 10 seconds
-	public static final int SERVER_PORT = 67;
-	public static final int CLIENT_PORT = 68;
-	
-	protected MulticastSocket socket;
+  /**
+   * My logger
+   */
+  private final Logger log = Logger.getLogger(getClass());
 
-	/**
-	 * Configure the given device using BOOTP
-	 * @param device
-	 */
-	public final void configureDevice(final Device device) 
-	throws IOException {
-	    final SecurityManager sm = System.getSecurityManager();
-	    if (sm != null) {
-	        sm.checkPermission(new NetPermission("bootpClient"));
-	    }
-	    
-	    try {
-            AccessController.doPrivileged(new PrivilegedExceptionAction() {
-               public Object run() throws IOException {
-            	// Get the API.
-            	final NetDeviceAPI api;
-            	try {
-            		api = (NetDeviceAPI)device.getAPI(NetDeviceAPI.class);
-            	} catch (ApiNotFoundException ex) {
-            		throw new NetworkException("Device is not a network device", ex);
-            	}
-            	
-            	// Open a socket
-            	socket = new MulticastSocket(CLIENT_PORT);
-            	try {
-            		// Prepare the socket			
-            		socket.setBroadcast(true);
-            		socket.setNetworkInterface(NetworkInterface.getByName(device.getId()));
-            		socket.setSoTimeout(RECEIVE_TIMEOUT);
+  private static final int RECEIVE_TIMEOUT = 10 * 1000; // 10 seconds
+  public static final int SERVER_PORT = 67;
+  public static final int CLIENT_PORT = 68;
 
-            		// Create the BOOTP header
-            		final Inet4Address myIP = null; // any address
-            		final int transactionID = (int)(System.currentTimeMillis() & 0xFFFFFFFF);
-            		BOOTPHeader hdr = new BOOTPHeader(BOOTPHeader.BOOTREQUEST, transactionID, myIP, api.getAddress());
+  protected MulticastSocket socket;
 
-            		// Send the packet
-            		final DatagramPacket packet = createRequestPacket(hdr);
-            		packet.setAddress(IPv4Address.BROADCAST_ADDRESS);
-            		packet.setPort(SERVER_PORT);
-            		socket.send(packet);
+  /**
+   * Configure the given device using BOOTP
+   *
+   * @param device
+   */
+  public final void configureDevice(final Device device)
+      throws IOException
+  {
+    final SecurityManager sm = System.getSecurityManager();
+    if (sm != null)
+    {
+      sm.checkPermission(new NetPermission("bootpClient"));
+    }
 
-            		boolean configured;
-            		do {
-            			// Wait for a response
-            			socket.receive(packet);
+    try
+    {
+      AccessController.doPrivileged(new PrivilegedExceptionAction()
+      {
+        public Object run() throws IOException
+        {
+          // Get the API.
+          final NetDeviceAPI api;
+          try
+          {
+            api = (NetDeviceAPI) device.getAPI(NetDeviceAPI.class);
+          }
+          catch (ApiNotFoundException ex)
+          {
+            throw new NetworkException("Device is not a network device", ex);
+          }
 
-            			// Process the response
-            			configured = processResponse(device, api, transactionID, packet);
-            		} while (!configured);
-            					
-            	} finally {
-            		socket.close();
-            	}				
-                   return null;
-               }
-            });
-        } catch (PrivilegedActionException ex) {
-            throw (IOException)ex.getException();
-        }		
-	}
+          // Open a socket
+          socket = new MulticastSocket(CLIENT_PORT);
+          try
+          {
+            // Prepare the socket
+            socket.setBroadcast(true);
+            socket.setNetworkInterface(NetworkInterface.getByName(device.getId()));
+            socket.setSoTimeout(RECEIVE_TIMEOUT);
 
-	/**
-	 * Create a BOOTP request packet
-	 */
-	protected DatagramPacket createRequestPacket(BOOTPHeader hdr) throws IOException {
-		return new BOOTPMessage(hdr).toDatagramPacket();
-	}
+            // Create the BOOTP header
+            final Inet4Address myIP = null; // any address
+            final int transactionID = (int) (System.currentTimeMillis() & 0xFFFFFFFF);
+            BOOTPHeader hdr = new BOOTPHeader(BOOTPHeader.BOOTREQUEST, transactionID, myIP, api.getAddress());
 
-	/**
-	 * Process a BOOTP response
-	 * @param packet
-	 * @return true if the device has been configured, false otherwise
-	 */
-	protected boolean processResponse(Device device, NetDeviceAPI api, int transactionID, DatagramPacket packet) 
-	throws IOException {
-		
-		final BOOTPHeader hdr = new BOOTPHeader(packet);
-		if (hdr.getOpcode() != BOOTPHeader.BOOTREPLY) {
-			// Not a response
-			return false;
-		}
-		if (hdr.getTransactionID() != transactionID) {
-			// Not for me
-			return false;
-		}
-		
-		configureNetwork(device, hdr);
+            // Send the packet
+            final DatagramPacket packet = createRequestPacket(hdr);
+            packet.setAddress(IPv4Address.BROADCAST_ADDRESS);
+            packet.setPort(SERVER_PORT);
+            socket.send(packet);
 
-		return true;
-	}
+            boolean configured;
+            do
+            {
+              // Wait for a response
+              socket.receive(packet);
 
-	/**
-	 * Performs the actual configuration of a network device based on the settings in a BOOTP header.
-	 */
-	protected void configureNetwork(Device device, BOOTPHeader hdr) throws NetworkException {
-		log.info("Got Client IP address  : " + hdr.getClientIPAddress());
-		log.info("Got Your IP address    : " + hdr.getYourIPAddress());
-		log.info("Got Server IP address  : " + hdr.getServerIPAddress());
-		log.info("Got Gateway IP address : " + hdr.getGatewayIPAddress());
+              // Process the response
+              configured = processResponse(device, api, transactionID, packet);
+            }
+            while (!configured);
 
-		Ifconfig.setDefault(device, new IPv4Address(hdr.getYourIPAddress()), null);
-		if (hdr.getGatewayIPAddress().isAnyLocalAddress()) {
-			Route.addRoute(new IPv4Address(hdr.getServerIPAddress()), null, device); 
-		} else {
-			Route.addRoute(new IPv4Address(hdr.getServerIPAddress()), new IPv4Address(hdr.getGatewayIPAddress()), device); 
-		}
-	}
+          }
+          finally
+          {
+            socket.close();
+          }
+          return null;
+        }
+      });
+    }
+    catch (PrivilegedActionException ex)
+    {
+      throw (IOException) ex.getException();
+    }
+  }
+
+  /**
+   * Create a BOOTP request packet
+   */
+  protected DatagramPacket createRequestPacket(BOOTPHeader hdr) throws IOException
+  {
+    return new BOOTPMessage(hdr).toDatagramPacket();
+  }
+
+  /**
+   * Process a BOOTP response
+   *
+   * @param packet
+   * @return true if the device has been configured, false otherwise
+   */
+  protected boolean processResponse(Device device, NetDeviceAPI api, int transactionID, DatagramPacket packet)
+      throws IOException
+  {
+
+    final BOOTPHeader hdr = new BOOTPHeader(packet);
+    if (hdr.getOpcode() != BOOTPHeader.BOOTREPLY)
+    {
+      // Not a response
+      return false;
+    }
+    if (hdr.getTransactionID() != transactionID)
+    {
+      // Not for me
+      return false;
+    }
+
+    configureNetwork(device, hdr);
+
+    return true;
+  }
+
+  /**
+   * Performs the actual configuration of a network device based on the settings in a BOOTP header.
+   */
+  protected void configureNetwork(Device device, BOOTPHeader hdr) throws NetworkException
+  {
+    log.info("Got Client IP address  : " + hdr.getClientIPAddress());
+    log.info("Got Your IP address    : " + hdr.getYourIPAddress());
+    log.info("Got Server IP address  : " + hdr.getServerIPAddress());
+    log.info("Got Gateway IP address : " + hdr.getGatewayIPAddress());
+    log.info("Got Dns1 IP address    : " + hdr.getDns1IPAddress());
+    log.info("Got Dns2 IP address    : " + hdr.getDns2IPAddress());
+
+    Ifconfig.setDefault(device, new IPv4Address(hdr.getYourIPAddress()), null);
+    if (hdr.getGatewayIPAddress().isAnyLocalAddress())
+    {
+      Route.addRoute(new IPv4Address(hdr.getServerIPAddress()), null, device);
+    }
+    else
+    {
+      Route.addRoute(new IPv4Address(hdr.getServerIPAddress()), new IPv4Address(hdr.getGatewayIPAddress()), device);
+    }
+
+    if (hdr.getDns1IPAddress() != null)
+    {
+      ResolverImpl.addDnsServer(new IPv4Address(hdr.getDns1IPAddress()));
+      ResolverImpl.addDnsServer(new IPv4Address(hdr.getDns2IPAddress()));
+    }
+  }
 }
