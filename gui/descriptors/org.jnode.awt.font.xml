@@ -23,4 +23,7 @@
 
   <extension-point id="providers" name="JNode Font Providers"/>
 
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="jnode.font.renderer" actions="read"/>
+  </extension>
 </plugin>
