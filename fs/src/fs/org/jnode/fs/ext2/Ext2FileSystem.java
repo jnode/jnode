@@ -143,7 +143,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 		try{
 			if(!isClosed()) {
 				return new Ext2Entry( getINode(Ext2Constants.EXT2_ROOT_INO), 
-									  "/", Ext2Constants.EXT2_FT_DIR, this );
+									  "/", Ext2Constants.EXT2_FT_DIR, this, null );
 			}
 		}catch(FileSystemException e) {
 			throw new IOException(e);
@@ -479,9 +479,13 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	 */
 	protected void modifyFreeBlocksCount(int group, int diff) throws IOException {
 		GroupDescriptor gdesc = groupDescriptors[group];
-		gdesc.setFreeBlocksCount( gdesc.getFreeBlocksCount()+diff );
+		synchronized(gdesc) {
+			gdesc.setFreeBlocksCount( gdesc.getFreeBlocksCount()+diff );
+		}
 		
-		superblock.setFreeBlocksCount( superblock.getFreeBlocksCount()+diff );
+		synchronized(superblock) {
+			superblock.setFreeBlocksCount( superblock.getFreeBlocksCount()+diff );
+		}
 	}
 	
 	/**
@@ -491,9 +495,26 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	 */
 	protected void modifyFreeInodesCount(int group, int diff) throws IOException {
 		GroupDescriptor gdesc = groupDescriptors[group];
-		gdesc.setFreeInodesCount( gdesc.getFreeInodesCount()+diff );
+		synchronized(gdesc) {
+			gdesc.setFreeInodesCount( gdesc.getFreeInodesCount()+diff );
+		}
 		
-		superblock.setFreeInodesCount( superblock.getFreeInodesCount()+diff );
+		synchronized(superblock) {
+			superblock.setFreeInodesCount( superblock.getFreeInodesCount()+diff );
+		}
+	}
+	
+	/**
+	 * Modify the number of used directories in a block group
+	 * @param group
+	 * @param diff
+	 * @throws IOException
+	 */
+	protected void modifyUsedDirsCount(int group, int diff) throws IOException  {
+		GroupDescriptor gdesc = groupDescriptors[group];
+		synchronized(gdesc) {
+			gdesc.setUsedDirsCount( gdesc.getUsedDirsCount()+diff );
+		}
 	}
 	
 	/**

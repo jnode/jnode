@@ -64,7 +64,9 @@ public class Ext2File implements FSFile {
 				
 			}
 			iNode.setSize(length);
-			
+
+			iNode.setMtime(System.currentTimeMillis()/1000);
+
 			/*
 			try{
 				iNode.update();
@@ -105,6 +107,9 @@ public class Ext2File implements FSFile {
 				bytesCovered += newSection;
 			}
 		iNode.setSize(length);
+
+		iNode.setMtime(System.currentTimeMillis()/1000);
+		
 		return;
 		}		
 	}
@@ -184,6 +189,9 @@ public class Ext2File implements FSFile {
 		}
 		iNode.setSize( fileOffset+len );
 		
+		iNode.setMtime(System.currentTimeMillis()/1000);
+
+
 		/*
 		try{
 			iNode.update();

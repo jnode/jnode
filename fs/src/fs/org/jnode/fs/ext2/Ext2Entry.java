@@ -16,8 +16,7 @@ import org.jnode.fs.FileSystem;
 /**
  * @author Andras Nagy
  * 
- * This class reads the actual data from the disk.
- * In case of a directory, this data will be parsed to get the file-list by
+ * In case of a directory, the data will be parsed to get the file-list by
  * Ext2Directory. In case of a regular file, no more processing is needed.
  * 
  * TODO: besides getFile() and getDirectory(), we will need 
@@ -32,13 +31,15 @@ public class Ext2Entry implements FSEntry{
 	private int type;
 	private boolean valid;
 	private Ext2FileSystem fs;
+	private Ext2Entry parentEntry;
 
-	public Ext2Entry(INode iNode, String name, int type, Ext2FileSystem fs) {
+	public Ext2Entry(INode iNode, String name, int type, Ext2FileSystem fs, Ext2Entry parentEntry) {
 		this.iNode = iNode;
 		this.name  = name;
 		this.type  = type;
 		this.valid = true;
 		this.fs    = fs;
+		this.parentEntry = parentEntry;
 		
 		log.setLevel(Level.INFO);
 		
@@ -60,7 +61,7 @@ public class Ext2Entry implements FSEntry{
 	 */
 	public FSDirectory getDirectory() throws IOException {
 		if(isDirectory())
-			return new Ext2Directory( iNode, fs );
+			return new Ext2Directory( iNode, fs, this );
 		else
 			throw new IOException("Not a directory");
 	}
@@ -79,7 +80,7 @@ public class Ext2Entry implements FSEntry{
 	 * @see org.jnode.fs.FSEntry#getLastModified()
 	 */
 	public long getLastModified() throws IOException {
-		return 0;
+		return iNode.getMtime();
 	}
 
 	/**
@@ -93,7 +94,15 @@ public class Ext2Entry implements FSEntry{
 	 * @see org.jnode.fs.FSEntry#getParent()
 	 */
 	public FSDirectory getParent() {
-		return null;
+		try{
+		if(parentEntry!=null)
+			return parentEntry.getDirectory();
+		else
+			return fs.getRootEntry().getDirectory();
+		}catch(IOException ioe) {
+			log.error(ioe);
+			return null;
+		}
 	}
 
 	/**

@@ -106,6 +106,11 @@ public class GroupDescriptor {
 	public int getUsedDirsCount() {
 		return Ext2Utils.get16(data, 16);
 	}
+	public void setUsedDirsCount(int count) {
+		Ext2Utils.set16(data, 16, count);
+		setDirty(true);
+	}
+	
 	/**
 	 * @return
 	 */
