@@ -3,12 +3,10 @@
  */
 package org.jnode.net.ipv4.tftp;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.DataInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
