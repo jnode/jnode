@@ -789,6 +789,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         final HashSet set = new HashSet();
         set.add("java.lang.Integer");
         set.add("java.lang.Long");
+        set.add("java.lang.Float");
+        set.add("java.lang.Double");
         set.add("java.lang.String");
         set.add("org.jnode.util.Logger");
         return set;
