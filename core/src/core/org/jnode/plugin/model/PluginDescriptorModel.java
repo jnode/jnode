@@ -36,7 +36,6 @@ import nanoxml.XMLElement;
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.Plugin;
-import org.jnode.plugin.PluginConfiguration;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginDescriptorListener;
 import org.jnode.plugin.PluginException;
@@ -56,7 +55,6 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	private final String name;
 	private final String version;
 	private final String className;
-	private final String configClassName;
 	private final boolean autoStart;
 	private final boolean system;
 	private final PluginPrerequisiteModel[] requires;
@@ -71,7 +69,6 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	private boolean started = false;
 	private boolean starting = false;
 	private List listeners;
-	private transient PluginConfiguration configuration;
 
 	/**
 	 * Load a plugin-descriptor without a registry.
@@ -96,7 +93,6 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 		className = getAttribute(e, "class", false);
 		system = getBooleanAttribute(e, "system", false);
 		autoStart = getBooleanAttribute(e, "auto-start", false);
-		configClassName = getAttribute(e, "configuration-class", false);
 
 		//if (registry != null) {
 //			registry.registerPlugin(this);
@@ -431,34 +427,6 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 		}
 		return classLoader;
 	}
-	
-	/**
-	 * Gets the configuration data of this plugin.
-	 * @return The persistent configuration data.
-	 */
-	public PluginConfiguration getConfiguration() throws PluginException {
-	    if (configClassName == null) {
-	        return null;
-	    }
-	    if (configuration == null) {
-	        // Instantiate the configuration.
-	        try {
-	            final Class cfgClass = getPluginClassLoader().loadClass(configClassName);
-	            configuration = (PluginConfiguration)cfgClass.newInstance();
-	        } catch (ClassNotFoundException ex) {
-	            throw new PluginException(ex);
-	        } catch (InstantiationException ex) {
-	            throw new PluginException(ex);
-            } catch (IllegalAccessException ex) {
-	            throw new PluginException(ex);
-            }
-            
-            // Load the stored data
-            // TODO implement me
-	    }
-	    return configuration;
-	}
-	
 	
 	/**
 	 * Start this plugin.

@@ -5,8 +5,7 @@
   name="JNode IPv4 Configuration Service"
   version="@VERSION@"
   provider-name="JNode.org"
-  class="org.jnode.net.ipv4.config.impl.IPv4ConfigurationPlugin"
-  configuration-class="org.jnode.net.ipv4.config.impl.NetConfigurationData">
+  class="org.jnode.net.ipv4.config.impl.IPv4ConfigurationPlugin">
 
   <requires>
     <import plugin="org.jnode.net.ipv4"/>

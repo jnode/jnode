@@ -21,29 +21,51 @@
  
 package org.jnode.net.ipv4.config.impl;
 
-import java.util.HashMap;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
+import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
-import org.jnode.plugin.PluginConfiguration;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class NetConfigurationData extends PluginConfiguration {
+final class NetConfigurationData {
     
-    /** Map bewteen device id and NetDeviceConfig */
-    private final HashMap deviceConfigs = new HashMap();
+    /** My logger */
+    final static Logger log = Logger.getLogger(NetConfigurationData.class);
     
-    /** Is no configuration is set, use DHCP automatically? */
-    private boolean autoConfigureUsingDhcp = false;
+    /** The preferences that contain my data */
+    private final Preferences prefs;
 
+    /** The preferences that contain the per device data*/
+    private final Preferences devConfigsPrefs;
+
+    // Preference keys
+    private static final String AUTO_CONFIGURE_DHCP_KEY = "auto-configure-dhcp";
+    private static final String DEVICE_CONFIG_NODE = "device-configs";
+    private static final String CONFIG_CLASS_NAME_KEY = "class-name";
+    
+    /**
+     * Initialize this instance.
+     * @param prefs
+     */
+    public NetConfigurationData(Preferences prefs) {
+        this.prefs = prefs;
+        this.devConfigsPrefs = prefs.node(DEVICE_CONFIG_NODE);
+    }
+    
     /**
      * Set the configuration data for the given device.
      * @param device
      * @param config
      */
     public void setConfiguration(Device device, NetDeviceConfig config) {
-        deviceConfigs.put(device.getId(), config);
+        final Preferences devPrefs = devConfigsPrefs.node(device.getId());
+        devPrefs.put(CONFIG_CLASS_NAME_KEY, config.getClass().getName());
+        config.store(devPrefs);
     }
     
     /**
@@ -51,8 +73,38 @@ public class NetConfigurationData extends PluginConfiguration {
      * @return
      */
     public NetDeviceConfig getConfiguration(Device device) {
-        final NetDeviceConfig cfg = (NetDeviceConfig)deviceConfigs.get(device.getId());
-        if ((cfg == null) && autoConfigureUsingDhcp) {
+        NetDeviceConfig cfg = null;
+        try {
+            if (devConfigsPrefs.nodeExists(device.getId())) {
+                final Preferences devPrefs = devConfigsPrefs.node(device.getId());
+                final String clsName = devPrefs.get(CONFIG_CLASS_NAME_KEY, null);
+                if (clsName != null) {
+                    final PrivilegedAction action = new PrivilegedAction() {
+                        public Object run() {
+                            try {
+                                final Class cls = Thread.currentThread().getContextClassLoader().loadClass(clsName);
+                                return cls.newInstance();
+                            } catch (ClassNotFoundException ex) {
+                                log.warn("NetDeviceConfig class not found", ex);
+                                return null;
+                            } catch (InstantiationException ex) {
+                                log.warn("Cannot instantiate NetDeviceConfig class", ex);
+                                return null;
+                            } catch (IllegalAccessException ex) {
+                                log.warn("Cannot access NetDeviceConfig class", ex);
+                                return null;
+                            }
+                        }
+                    };
+                    cfg = (NetDeviceConfig)AccessController.doPrivileged(action);
+                }
+            }
+        } catch (BackingStoreException ex) {
+            log.warn("BackingStore error while loading NetDeviceConfig preferences", ex);
+            // Ignore
+        }
+
+        if ((cfg == null) && isAutoConfigureUsingDhcp()) {
             return new NetDhcpConfig();
         } else {
             return cfg;
@@ -63,13 +115,13 @@ public class NetConfigurationData extends PluginConfiguration {
      * @return Returns the autoConfigureUsingDhcp.
      */
     public boolean isAutoConfigureUsingDhcp() {
-        return this.autoConfigureUsingDhcp;
+        return prefs.getBoolean(AUTO_CONFIGURE_DHCP_KEY, false);
     }
     
     /**
      * @param autoConfigureUsingDhcp The autoConfigureUsingDhcp to set.
      */
     public void setAutoConfigureUsingDhcp(boolean autoConfigureUsingDhcp) {
-        this.autoConfigureUsingDhcp = autoConfigureUsingDhcp;
+        prefs.putBoolean(AUTO_CONFIGURE_DHCP_KEY, autoConfigureUsingDhcp);
     }
 }
