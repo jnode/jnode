@@ -86,6 +86,20 @@ public class Ext2FileSystem extends AbstractFileSystem {
 			throw new FileSystemException(e);
 		}		
 		
+		//check for unsupported filesystem options 
+		//(an unsupported INCOMPAT feature means that the fs may not be mounted at all)
+		if( hasIncompatFeature(Ext2Constants.EXT2_FEATURE_INCOMPAT_COMPRESSION) )
+			throw new FileSystemException("Unsupported filesystem feature (COMPRESSION) disallows mounting");
+		if( hasIncompatFeature(Ext2Constants.EXT2_FEATURE_INCOMPAT_META_BG) )
+			throw new FileSystemException("Unsupported filesystem feature (META_BG) disallows mounting");
+		if( hasIncompatFeature(Ext2Constants.EXT3_FEATURE_INCOMPAT_JOURNAL_DEV) )
+			throw new FileSystemException("Unsupported filesystem feature (JOURNAL_DEV) disallows mounting");
+		if( hasIncompatFeature(Ext2Constants.EXT3_FEATURE_INCOMPAT_RECOVER) )
+			throw new FileSystemException("Unsupported filesystem feature (RECOVER) disallows mounting");
+
+		//an unsupported RO_COMPAT feature means that the filesystem can only be mounted readonly
+		//...
+		
 		log.info(  "Ext2fs filesystem constructed sucessfully");
 		log.debug( "	superblock:	#blocks:		"+superblock.getBlocksCount()+"\n"+
 					"				#blocks/group:	"+superblock.getBlocksPerGroup()+"\n"+
