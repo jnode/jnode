@@ -20,6 +20,7 @@ public class NTFSFileSystem implements FileSystem
 	
 	private Device device = null;
 	private final BlockDeviceAPI api;
+	private NTFSVolume volume = null;
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FileSystem#getDevice()
 	 */
@@ -34,6 +35,13 @@ public class NTFSFileSystem implements FileSystem
 		} catch (ApiNotFoundException ex) {
 			throw new FileSystemException(ex);
 		}
+		
+		try {
+			// initialize the NTFE volume
+			volume = new NTFSVolume(api);
+		} catch (IOException e) {
+			throw new FileSystemException(e);
+		}
 	}
 	
 	public Device getDevice()
@@ -45,7 +53,6 @@ public class NTFSFileSystem implements FileSystem
 	 */
 	public FSEntry getRootEntry() throws IOException
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 	/* (non-Javadoc)
