@@ -67,11 +67,10 @@ public class PhiOperand extends Operand {
 
 	public Operand simplify() {
 		int n = sources.size();
+		Variable first = (Variable) sources.get(0);
 		if (n == 1) {
-			Variable var = (Variable) sources.get(0);
-			return var.simplify();
+			return first.simplify();
 		} else {
-			Variable first = (Variable) sources.get(0);
 			// We can't use var.simplify() here because the result might
 			// be a constant, which complicates code generation.
 			// sources should contain only Variable instances.
@@ -83,13 +82,21 @@ public class PhiOperand extends Operand {
 				// This is more efficient than generating phi moves at the end
 				// of the block. Basically all phi sources are merged into the
 				// first.
-				assignQuad.setLHS(first);
 				
-				// This might be in a loop, in which case this variable is live
-				// at least until the end of the loop. This looks tricky, but I
-				// think it's correct.
-				IRBasicBlock block = assignQuad.getBasicBlock().getLastPredecessor();
-				first.setLastUseAddress(block.getEndPC()-1);
+				if (assignQuad != null) {
+					assignQuad.setLHS(first);
+				
+					// This might be in a loop, in which case this variable is live
+					// at least until the end of the loop. This looks tricky, but I
+					// think it's correct.
+					IRBasicBlock block = assignQuad.getBasicBlock().getLastPredecessor();
+					first.setLastUseAddress(block.getEndPC()-1);
+				} else {
+					// TODO revisit this case
+					// I'm really not sure what to do!
+					// This is the case where var was an argument, so it was
+					// not assigned.
+				}
 			}
 			// This is bold assumption that the first phi source was assigned
 			// before any others. I'm not sure if this is always true...

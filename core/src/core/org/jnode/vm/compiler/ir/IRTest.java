@@ -112,6 +112,12 @@ public class IRTest {
 
         IRControlFlowGraph cfg = new IRControlFlowGraph(code);
 
+		//BytecodeViewer bv = new BytecodeViewer();
+		//BytecodeParser.parse(code, bv);
+
+		//System.out.println(cfg.toString());
+		//System.out.println();
+
         IRGenerator irg = new IRGenerator(cfg);
         BytecodeParser.parse(code, irg);
 
@@ -120,6 +126,7 @@ public class IRTest {
         BootableHashMap liveVariables = new BootableHashMap();
         for (int i=0; i<n; i+=1) {
             Quad quad = (Quad) quads.get(i);
+            //System.out.println(quad);
             quad.doPass2(liveVariables);
         }
 
@@ -130,6 +137,7 @@ public class IRTest {
         for (int i=0; i<n; i+=1) {
             Variable v = (Variable) it.next();
             liveRanges[i] = new LiveRange(v);
+            // System.out.println("Live range: " + liveRanges[i]);
         }
         Arrays.sort(liveRanges);
         LinearScanAllocator lsa = new LinearScanAllocator(liveRanges);
@@ -156,7 +164,7 @@ public class IRTest {
 		int nMethods = type.getNoDeclaredMethods();
 		for (int i=0; i<nMethods; i+=1) {
 			VmMethod method = type.getDeclaredMethod(i);
-			if ("const1".equals(method.getName())) {
+			if ("terniary".equals(method.getName())) {
 				arithMethod = method;
 				break;
 			}
@@ -203,10 +211,13 @@ public class IRTest {
 		return -l0;
 	}
 
+	public static int terniary(int a0, int a1) {
+		return a0 < 0 ? a0 : a1;
+	}
 
     public static int const0(int a0, int a1) {
         int l0 = 0;
-        if (a0 < 0) {
+        if (a0 == 0) {
             l0 = -1;
         }
         if (a0 > 0) {
