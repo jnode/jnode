@@ -271,7 +271,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	public int getBlockSize() {
 		return superblock.getBlockSize();	
 	}
-
+		
 	/** 
 	 * Read a data block and put it in the cache if it is not yet cached,
 	 * otherwise get it from the cache.
@@ -283,7 +283,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	 * 
 	 * @return data block nr
 	 */
-	public byte[] getBlock(long nr) throws IOException{
+	protected byte[] getBlock(long nr) throws IOException{
 		if(isClosed())
 			throw new IOException("FS closed (fs instance: "+this+")");
 		//log.debug("blockCache size: "+blockCache.size());
@@ -461,7 +461,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 			
 		Integer key=new Integer(iNodeNr);
 		
-		//log.debug("iNodeCache size: "+inodeCache.size());
+		log.debug("iNodeCache size: "+inodeCache.size());
 		
 		synchronized(inodeCache) {
 			//check if the inode is already in the cache
@@ -520,20 +520,21 @@ public class Ext2FileSystem extends AbstractFileSystem {
 		if(blockNr<firstNonMetadataBlock)
 			return new BlockReservation(false, -1, -1);
 
-		byte[] bitmap = getBlock(groupDescriptors[group].getBlockBitmap());
-		
-		//at any time, only one copy of the Block exists in the cache, so it is
-		//safe to synchronize to the bitmapBlock object (it's part of Block)
-		synchronized( bitmap ) {
-			BlockReservation result = BlockBitmap.testAndSetBlock( bitmap, index );
-			//update the block bitmap
-			if(result.isSuccessful()) {
-				writeBlock(groupDescriptors[group].getBlockBitmap(), bitmap, false);
-				modifyFreeBlocksCount(group, -1-result.getPreallocCount());
-				//result.setBlock( result.getBlock()+superblock.getFirstDataBlock() );
-				result.setBlock(blockNr);
+		//synchronize to the blockCache to avoid flushing the block between reading it
+		//and synchronizing to it
+		synchronized(blockCache) {
+			byte[] bitmap= getBlock(groupDescriptors[group].getBlockBitmap()); 
+			synchronized( bitmap) {
+				BlockReservation result = BlockBitmap.testAndSetBlock( bitmap, index );
+				//update the block bitmap
+				if(result.isSuccessful()) {
+					writeBlock(groupDescriptors[group].getBlockBitmap(), bitmap, false);
+					modifyFreeBlocksCount(group, -1-result.getPreallocCount());
+					//result.setBlock( result.getBlock()+superblock.getFirstDataBlock() );
+					result.setBlock(blockNr);
+				}
+				return result;
 			}
-			return result;
 		}
 
 	}
@@ -599,18 +600,23 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	protected INodeReservation findFreeINode(int blockGroup) throws IOException{
 		GroupDescriptor gdesc = groupDescriptors[blockGroup];
 		if(gdesc.getFreeInodesCount()> 0) {
-			byte[] bitmap = getBlock( gdesc.getInodeBitmap() );
-			synchronized(bitmap) {
-				INodeReservation result = INodeBitmap.findFreeINode(bitmap);
+			//synchronize to the blockCache to avoid flushing the block between reading it
+			//and synchronizing to it
+			synchronized(blockCache) {
+				byte[] bitmap= getBlock( gdesc.getInodeBitmap() );
 				
-				if(result.isSuccessful()){
-					//update the inode bitmap
-					writeBlock( gdesc.getInodeBitmap(), bitmap, true);
-					modifyFreeInodesCount(blockGroup, -1);
+				synchronized(bitmap) {
+					INodeReservation result = INodeBitmap.findFreeINode(bitmap);
 					
-					result.setGroup(blockGroup);
-															
-					return result;
+					if(result.isSuccessful()){
+						//update the inode bitmap
+						writeBlock( gdesc.getInodeBitmap(), bitmap, true);
+						modifyFreeInodesCount(blockGroup, -1);
+						
+						result.setGroup(blockGroup);
+																
+						return result;
+					}
 				}
 			}
 		}
@@ -687,16 +693,20 @@ public class Ext2FileSystem extends AbstractFileSystem {
 		if(blockNr<firstNonMetadataBlock)
 			throw new FileSystemException("Attempt to free a filesystem metadata block!");
 
-		byte[] bitmap = getBlock(gdesc.getBlockBitmap());
-		
-		//at any time, only one copy of the Block exists in the cache, so it is
-		//safe to synchronize to the bitmapBlock object (it's part of Block)
-		synchronized( bitmap ) {
-			BlockBitmap.freeBit( bitmap, index );
-			//update the bitmap block
-			writeBlock(groupDescriptors[group].getBlockBitmap(), bitmap, false);
-			//gdesc.setFreeBlocksCount(gdesc.getFreeBlocksCount()+1);
-			modifyFreeBlocksCount(group, 1);
+		//synchronize to the blockCache to avoid flushing the block between reading it
+		//and synchronizing to it
+		synchronized(blockCache) {
+			byte[] bitmap = getBlock(gdesc.getBlockBitmap());
+			
+			//at any time, only one copy of the Block exists in the cache, so it is
+			//safe to synchronize to the bitmapBlock object (it's part of Block)
+			synchronized( bitmap ) {
+				BlockBitmap.freeBit( bitmap, index );
+				//update the bitmap block
+				writeBlock(groupDescriptors[group].getBlockBitmap(), bitmap, false);
+				//gdesc.setFreeBlocksCount(gdesc.getFreeBlocksCount()+1);
+				modifyFreeBlocksCount(group, 1);
+			}
 		}
 	}
 	
@@ -732,20 +742,26 @@ public class Ext2FileSystem extends AbstractFileSystem {
 								(superblock.getFirstDataBlock() + group*superblock.getBlocksPerGroup()));
 		log.debug("group["+group+"].getInodeTable()="+iNodeTableBlock+", iNodeTable.getSizeInBlocks()="+INodeTable.getSizeInBlocks(this));
 		log.debug("metadata length for block group("+group+"): "+metadataLength); 
-		byte[] bitmapBlock = getBlock(gdesc.getBlockBitmap());
 
-		//at any time, only one copy of the Block exists in the cache, so it is
-		//safe to synchronize to the bitmapBlock object (it's part of Block)
 		BlockReservation result;
-		synchronized( bitmapBlock ) {
-			result=BlockBitmap.findFreeBlocks( bitmapBlock, metadataLength );
+
+		//synchronize to the blockCache to avoid flushing the block between reading it
+		//and synchronizing to it
+		synchronized(blockCache) {		
+			byte[] bitmapBlock = getBlock(gdesc.getBlockBitmap());
 		
-			//if the reservation was successful, write the bitmap data to disk
-			//within the same synchronized block
-			if(result.isSuccessful()) {
-				writeBlock(groupDescriptors[group].getBlockBitmap(), bitmapBlock, true);
-				//gdesc.setFreeBlocksCount(gdesc.getFreeBlocksCount()-1-result.getPreallocCount());
-				modifyFreeBlocksCount( group, -1-result.getPreallocCount() );
+			//at any time, only one copy of the Block exists in the cache, so it is
+			//safe to synchronize to the bitmapBlock object (it's part of Block)
+			synchronized( bitmapBlock ) {
+				result=BlockBitmap.findFreeBlocks( bitmapBlock, metadataLength );
+			
+				//if the reservation was successful, write the bitmap data to disk
+				//within the same synchronized block
+				if(result.isSuccessful()) {
+					writeBlock(groupDescriptors[group].getBlockBitmap(), bitmapBlock, true);
+					//gdesc.setFreeBlocksCount(gdesc.getFreeBlocksCount()-1-result.getPreallocCount());
+					modifyFreeBlocksCount( group, -1-result.getPreallocCount() );
+				}
 			}
 		}
 			
@@ -860,5 +876,28 @@ public class Ext2FileSystem extends AbstractFileSystem {
 		((Ext2Directory)rootEntry.getDirectory()).addINode(Ext2Constants.EXT2_ROOT_INO, "..", Ext2Constants.EXT2_FT_DIR);
 		rootEntry.getDirectory().addDirectory("lost+found");
 		return rootEntry;
+	}
+	
+	protected void handleFSError(Exception e) {
+		//mark the fs as having errors
+		superblock.setState(Ext2Constants.EXT2_ERROR_FS);
+		if(superblock.getErrors()==Ext2Constants.EXT2_ERRORS_RO)
+			setReadOnly(true);		//remount readonly
+			
+		if(superblock.getErrors()==Ext2Constants.EXT2_ERRORS_PANIC)
+			throw new RuntimeException("EXT2 FileSystem exception", e);
+	}
+	
+	/**
+	 * @return Returns the blockCache (outside of this class only used to synchronize to)
+	 */
+	protected synchronized BlockCache getBlockCache() {
+		return blockCache;
+	}
+	/**
+	 * @return Returns the inodeCache (outside of this class only used to syncronized to)
+	 */
+	protected synchronized INodeCache getInodeCache() {
+		return inodeCache;
 	}
 }

@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  */
 public class BlockCache extends LinkedHashMap{
 	//at most MAX_SIZE blocks fit in the cache
-	static final int MAX_SIZE = 50;
+	static final int MAX_SIZE = 10;
 	private final Logger log = Logger.getLogger(getClass());
 	private Vector cacheListeners;
 	
 	public BlockCache(int initialCapacity, float loadFactor) {
-		super(initialCapacity, loadFactor, true);
+		super(Math.min(MAX_SIZE, initialCapacity), loadFactor, true);
 		cacheListeners = new Vector();
 	}
 	
@@ -38,7 +38,8 @@ public class BlockCache extends LinkedHashMap{
 		return result;
 	}*/
 	
-	protected boolean removeEldestEntry(Map.Entry eldest) {
+	protected synchronized boolean removeEldestEntry(Map.Entry eldest) {
+		log.debug("BlockCache size: "+size());
 		if(size()>MAX_SIZE) {
 			try{
 				((Block)eldest.getValue()).flush();
