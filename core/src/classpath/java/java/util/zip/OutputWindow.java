@@ -37,20 +37,19 @@ exception statement from your version. */
 
 package java.util.zip;
 
-/*
+/**
  * Contains the output from the Inflation process.
  *
  * We need to have a window so that we can refer backwards into the output stream
  * to repeat stuff.
  *
  * @author John Leuner
- * @since JDK 1.1
+ * @since 1.1
  */
-
 class OutputWindow
 {
-  private final int WINDOW_SIZE = 1 << 15;
-  private final int WINDOW_MASK = WINDOW_SIZE - 1;
+  private static final int WINDOW_SIZE = 1 << 15;
+  private static final int WINDOW_MASK = WINDOW_SIZE - 1;
 
   private byte[] window = new byte[WINDOW_SIZE]; //The window is 2^15 bytes
   private int window_end  = 0;
