@@ -52,10 +52,10 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
 	 * @param msb
 	 * @param val
 	 */
-	final void initialize(int kind, int offsetToFP, X86Register.GPR lsb,
+	final void initialize(EmitterContext ec, int kind, int offsetToFP, X86Register.GPR lsb,
 			X86Register.GPR msb, X86Register.GPR64 reg, X86Register.XMM xmm,
 			long val) {
-		super.initialize(kind, offsetToFP, lsb, msb, reg, xmm);
+		super.initialize(ec, kind, offsetToFP, lsb, msb, reg, xmm);
 		this.value = val;
 	}
 
@@ -174,7 +174,7 @@ final class LongItem extends DoubleWordItem implements X86CompilerConstants {
 	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.DoubleWordItem#cloneConstant()
 	 */
-	protected DoubleWordItem cloneConstant() {
-		return factory.createLConst(getValue());
+	protected DoubleWordItem cloneConstant(EmitterContext ec) {
+		return factory.createLConst(ec, getValue());
 	}
 }

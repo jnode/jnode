@@ -38,8 +38,8 @@ final class IntItem extends WordItem implements X86CompilerConstants {
 
 	private int value;
 
-	final void initialize(int kind, int offsetToFP, X86Register reg, int value) {
-		super.initialize(kind, reg, offsetToFP);
+	final void initialize(EmitterContext ec, int kind, int offsetToFP, X86Register reg, int value) {
+		super.initialize(ec, kind, reg, offsetToFP);
 		this.value = value;
 	}
 
@@ -50,8 +50,8 @@ final class IntItem extends WordItem implements X86CompilerConstants {
 	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.WordItem#cloneConstant()
 	 */
-	protected WordItem cloneConstant() {
-		return factory.createIConst(getValue());
+	protected WordItem cloneConstant(EmitterContext ec) {
+		return factory.createIConst(ec, getValue());
 	}
 
 	/**

@@ -198,7 +198,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		this.tibOffset = ObjectLayout.TIB_SLOT * slotSize;
 		this.log = os.isLogEnabled();
 		this.eContext = new EmitterContext(os, helper, vstack, gprPool,
-				xmmPool, ifac);
+				xmmPool, ifac, context);
 		vstack.initializeStackMgr(stackMgr, eContext);
 		// TODO check for SSE support and switch to SSE compiler if available
 		this.fpCompiler = new FPCompilerFPU(this, os, eContext, vstack,
@@ -999,7 +999,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_aconst_null()
 	 */
 	public final void visit_aconst_null() {
-		vstack.push(ifac.createAConst(null));
+		vstack.push(ifac.createAConst(eContext, null));
 	}
 
 	/**
@@ -1291,7 +1291,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dconst(double)
 	 */
 	public final void visit_dconst(double value) {
-		vstack.push(ifac.createDConst(value));
+		vstack.push(ifac.createDConst(eContext, value));
 	}
 
 	/**
@@ -1571,7 +1571,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fconst(float)
 	 */
 	public final void visit_fconst(float value) {
-		vstack.push(ifac.createFConst(value));
+		vstack.push(ifac.createFConst(eContext, value));
 	}
 
 	/**
@@ -1756,7 +1756,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	public final void visit_i2b() {
 		final IntItem v = vstack.popInt();
 		if (v.isConstant()) {
-			vstack.push(ifac.createIConst((byte) v.getValue()));
+			vstack.push(ifac.createIConst(eContext, (byte) v.getValue()));
 		} else {
 			v.loadToBITS8GPR(eContext);
 			final GPR r = v.getRegister();
@@ -1771,7 +1771,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	public final void visit_i2c() {
 		final IntItem v = vstack.popInt();
 		if (v.isConstant()) {
-			vstack.push(ifac.createIConst((char) v.getValue()));
+			vstack.push(ifac.createIConst(eContext, (char) v.getValue()));
 		} else {
 			v.load(eContext);
 			final GPR r = v.getRegister();
@@ -1800,7 +1800,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	public final void visit_i2l() {
 		final IntItem v = vstack.popInt();
 		if (v.isConstant()) {
-			vstack.push(ifac.createLConst(v.getValue()));
+			vstack.push(ifac.createLConst(eContext, v.getValue()));
 		} else {
 			final X86RegisterPool pool = eContext.getGPRPool();
 			final LongItem result;
@@ -1820,7 +1820,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			} else {
 				v.release(eContext);
 				L1AHelper.requestRegister(eContext, X86Register.RAX);
-				result = (LongItem) ifac.createReg(JvmType.LONG,
+				result = (LongItem) ifac.createReg(eContext, JvmType.LONG,
 						X86Register.RAX);
 				os.writeCDQE(); // Sign extend EAX -> RAX
 				pool.transferOwnerTo(X86Register.RAX, result);
@@ -1837,7 +1837,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	public final void visit_i2s() {
 		final IntItem v = vstack.popInt();
 		if (v.isConstant()) {
-			vstack.push(ifac.createIConst((short) v.getValue()));
+			vstack.push(ifac.createIConst(eContext, (short) v.getValue()));
 		} else {
 			v.load(eContext);
 			final GPR r = v.getRegister();
@@ -1879,7 +1879,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iconst(int)
 	 */
 	public final void visit_iconst(int value) {
-		vstack.push(ifac.createIConst(value));
+		vstack.push(ifac.createIConst(eContext, value));
 	}
 
 	/**
@@ -2276,7 +2276,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		final IntItem val = vstack.popInt();
 		val.loadIf(eContext, ~Item.Kind.CONSTANT);
 		if (val.isConstant()) {
-			vstack.push(ifac.createIConst(-val.getValue()));
+			vstack.push(ifac.createIConst(eContext, -val.getValue()));
 		} else {
 			os.writeNEG(val.getRegister());
 			vstack.push(val);
@@ -2332,20 +2332,22 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 
 			/* Is instanceof? */
 			instanceOf(refr, classr, tmpr, cntr, trueLabel, false);
+
+			final IntItem result = (IntItem) L1AHelper.requestWordRegister(eContext, JvmType.INT, false);
+			final GPR resultr = result.getRegister();
+
 			/* Not instanceof */
 			// TODO: use setcc instead of jumps
-			os.writeXOR(refr, refr);
+			os.writeXOR(resultr, resultr);
 			os.writeJMP(endLabel);
 
 			os.setObjectRef(trueLabel);
-			os.writeMOV_Const(refr, 1);
+			os.writeMOV_Const(resultr, 1);
 
 			// Push result
 			os.setObjectRef(endLabel);
 			ref.release(eContext);
-			L1AHelper.requestRegister(eContext, refr);
-			final IntItem result = (IntItem) ifac.createReg(JvmType.INT, refr);
-			pool.transferOwnerTo(refr, result);
+
 			vstack.push(result);
 
 			// Release
@@ -2510,7 +2512,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	public final void visit_irem() {
 		// Pre-claim result in EDX
 		L1AHelper.requestRegister(eContext, X86Register.EDX);
-		final IntItem result = (IntItem) ifac.createReg(JvmType.INT,
+		final IntItem result = (IntItem) ifac.createReg(eContext, JvmType.INT,
 				X86Register.EDX);
 		eContext.getGPRPool().transferOwnerTo(X86Register.EDX, result);
 
@@ -2618,7 +2620,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	public final void visit_l2i() {
 		final LongItem v = vstack.popLong();
 		if (v.isConstant()) {
-			vstack.push(ifac.createIConst((int) v.getValue()));
+			vstack.push(ifac.createIConst(eContext, (int) v.getValue()));
 		} else {
 			final X86RegisterPool pool = eContext.getGPRPool();
 			final IntItem result;
@@ -2627,7 +2629,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 				final X86Register lsb = v.getLsbRegister(eContext);
 				v.release(eContext);
 				pool.request(lsb);
-				result = (IntItem) ifac.createReg(JvmType.INT, lsb);
+				result = (IntItem) ifac.createReg(eContext, JvmType.INT, lsb);
 				pool.transferOwnerTo(lsb, result);
 			} else {
 				final X86Register reg = v.getRegister(eContext);
@@ -2635,7 +2637,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 						JvmType.INT);
 				v.release(eContext);
 				pool.request(intReg);
-				result = (IntItem) ifac.createReg(JvmType.INT, intReg);
+				result = (IntItem) ifac.createReg(eContext, JvmType.INT, intReg);
 				pool.transferOwnerTo(intReg, result);
 			}
 			vstack.push(result);
@@ -2756,7 +2758,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lconst(long)
 	 */
 	public final void visit_lconst(long v) {
-		vstack.push(ifac.createLConst(v));
+		vstack.push(ifac.createLConst(eContext, v));
 	}
 
 	/**
@@ -2772,7 +2774,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(VmConstString)
 	 */
 	public final void visit_ldc(VmConstString value) {
-		vstack.push(ifac.createAConst(value));
+		vstack.push(ifac.createAConst(eContext, value));
 	}
 
 	/**
@@ -2895,7 +2897,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		final LongItem v = vstack.popLong();
 
 		if (v.isConstant()) {
-			vstack.push(ifac.createLConst(-v.getValue()));
+			vstack.push(ifac.createLConst(eContext, -v.getValue()));
 		} else {
 			// Load val
 			v.load(eContext);
@@ -2968,7 +2970,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		} else {
 			// Pre-claim result in RDX
 			L1AHelper.requestRegister(eContext, X86Register.RDX);
-			final LongItem result = (LongItem) ifac.createReg(JvmType.LONG,
+			final LongItem result = (LongItem) ifac.createReg(eContext, JvmType.LONG,
 					X86Register.RDX);
 			eContext.getGPRPool().transferOwnerTo(X86Register.RDX, result);
 

@@ -28,16 +28,16 @@ abstract class FPCompiler {
 	 * @param value
 	 * @return The new constant item
 	 */
-	protected static final Item createConst(ItemFactory ifac, int type, double value) {
+	protected final Item createConst(ItemFactory ifac, int type, double value) {
 		switch (type) {
 		case JvmType.DOUBLE:
-			return ifac.createDConst(value);
+			return ifac.createDConst(ec, value);
 		case JvmType.FLOAT:
-			return ifac.createFConst((float) value);
+			return ifac.createFConst(ec, (float) value);
 		case JvmType.INT:
-			return ifac.createIConst((int) value);
+			return ifac.createIConst(ec, (int) value);
 		case JvmType.LONG:
-			return ifac.createLConst((long) value);
+			return ifac.createLConst(ec, (long) value);
 		default:
 			throw new IllegalArgumentException("Invalid type " + type);
 		}

@@ -444,7 +444,7 @@ final class VirtualStack {
 		 *      org.jnode.assembler.x86.Register)
 		 */
 		public void writePUSH(int jvmType, X86Register.GPR reg) {
-			final Item item = ifac.createReg(jvmType, reg);
+			final Item item = ifac.createReg(ec, jvmType, reg);
 			if (Vm.VerifyAssertions)
 				Vm._assert(pool.request(reg, item), "request");
 			push(item);
@@ -470,7 +470,7 @@ final class VirtualStack {
 		 *      GPR64)
 		 */
 		public void writePUSH64(int jvmType, X86Register.GPR64 reg) {
-			final Item item = ifac.createReg(jvmType, reg);
+			final Item item = ifac.createReg(ec, jvmType, reg);
 			if (Vm.VerifyAssertions)
 				Vm._assert(pool.request(reg, item), "request");
 			push(item);

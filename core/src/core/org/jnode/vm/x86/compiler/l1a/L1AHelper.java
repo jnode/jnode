@@ -70,7 +70,7 @@ final class L1AHelper {
 			pool.transferOwnerTo(msb, result);
 		} else {
 			final GPR64 reg = (GPR64)requestRegister(eContext, jvmType, false);
-			result = ifac.createReg(jvmType, reg);
+			result = ifac.createReg(eContext, jvmType, reg);
 			pool.transferOwnerTo(reg, result);
 		}
 		return result;
@@ -106,7 +106,7 @@ final class L1AHelper {
 		final X86RegisterPool pool = eContext.getGPRPool();
 		final ItemFactory ifac = eContext.getItemFactory();
 		requestRegister(eContext, reg);
-		final DoubleWordItem result = ifac.createReg(jvmType, reg);
+		final DoubleWordItem result = ifac.createReg(eContext, jvmType, reg);
 		pool.transferOwnerTo(reg, result);
 		return result;
 	}
@@ -178,9 +178,9 @@ final class L1AHelper {
 			int jvmType, boolean supportsBits8) {
 		final X86RegisterPool pool = eContext.getGPRPool();
 		final ItemFactory ifac = eContext.getItemFactory();
-		final X86Register reg = requestRegister(eContext, JvmType.INT,
+		final X86Register reg = requestRegister(eContext, jvmType,
 				supportsBits8);
-		final WordItem result = ifac.createReg(jvmType, reg);
+		final WordItem result = ifac.createReg(eContext, jvmType, reg);
 		pool.transferOwnerTo(reg, result);
 		return result;
 	}
@@ -193,7 +193,7 @@ final class L1AHelper {
 		final X86RegisterPool pool = eContext.getGPRPool();
 		final ItemFactory ifac = eContext.getItemFactory();
 		pool.request(reg);
-		final WordItem result = ifac.createReg(jvmType, reg);
+		final WordItem result = ifac.createReg(eContext, jvmType, reg);
 		pool.transferOwnerTo(reg, result);
 		return result;
 	}

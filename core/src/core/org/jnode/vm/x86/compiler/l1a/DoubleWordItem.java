@@ -58,7 +58,7 @@ public abstract class DoubleWordItem extends Item implements
 	 * @param lsb
 	 * @param msb
 	 */
-	protected final void initialize(int kind, int offsetToFP,
+	protected final void initialize(EmitterContext ec, int kind, int offsetToFP,
 			X86Register.GPR lsb, X86Register.GPR msb, X86Register.GPR64 reg,
 			X86Register.XMM xmm) {
 		super.initialize(kind, offsetToFP, xmm);
@@ -69,6 +69,7 @@ public abstract class DoubleWordItem extends Item implements
 			if (isGPR()) {
 				Vm._assert(((lsb != null) && (msb != null)) || (reg != null));
 			}
+			verifyState(ec);
 		}
 	}
 
@@ -99,7 +100,7 @@ public abstract class DoubleWordItem extends Item implements
 			break;
 
 		case Kind.CONSTANT:
-			res = cloneConstant();
+			res = cloneConstant(ec);
 			break;
 
 		case Kind.FPUSTACK:
@@ -125,7 +126,7 @@ public abstract class DoubleWordItem extends Item implements
 	 * 
 	 * @return
 	 */
-	protected abstract DoubleWordItem cloneConstant();
+	protected abstract DoubleWordItem cloneConstant(EmitterContext ec);
 
 	/**
 	 * Return the current item's computational type category (JVM Spec, p. 83).
@@ -201,7 +202,8 @@ public abstract class DoubleWordItem extends Item implements
 		}
 		if (Vm.VerifyAssertions) {
 			Vm._assert(kind == Kind.GPR, "kind == Kind.REGISTER");
-			Vm._assert(reg != null, "reg != null reg=" + reg + " lsb=" + lsb + " msb=" + msb);
+			Vm._assert(reg != null, "reg != null reg=" + reg + " lsb=" + lsb
+					+ " msb=" + msb);
 		}
 		return reg;
 	}
@@ -210,8 +212,8 @@ public abstract class DoubleWordItem extends Item implements
 	 * Gets the offset from this item to the FramePointer register. This is only
 	 * valid if this item has a LOCAL kind.
 	 * 
-	 * @return In 32-bit mode, use {@link #getLsbOffsetToFP()} or
-	 *         {@link #getMsbOffsetToFP()} instead.
+	 * @return In 32-bit mode, use {@link #getLsbOffsetToFP()}or
+	 *         {@link #getMsbOffsetToFP()}instead.
 	 */
 	final int getOffsetToFP(EmitterContext ec) {
 		if (ec.getStream().isCode32()) {
@@ -261,6 +263,9 @@ public abstract class DoubleWordItem extends Item implements
 				}
 				loadTo64(ec, r);
 			}
+		}
+		if (Vm.VerifyAssertions) {
+			verifyState(ec);
 		}
 	}
 
@@ -750,6 +755,9 @@ public abstract class DoubleWordItem extends Item implements
 			loadTo64(ec, newReg);
 			pool.transferOwnerTo(newReg, this);
 		}
+		if (Vm.VerifyAssertions) {
+			verifyState(ec);
+		}
 	}
 
 	/**
@@ -776,5 +784,37 @@ public abstract class DoubleWordItem extends Item implements
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Verify the consistency of the state of this item. Throw an exception is
+	 * the state is inconsistent.
+	 */
+	protected void verifyState(EmitterContext ec) {
+		switch (kind) {
+		case Kind.GPR:
+			if (ec.getStream().isCode32()) {
+				if (lsb == null) {
+					throw new IllegalStateException("lsb cannot be null");
+				}
+				if (msb == null) {
+					throw new IllegalStateException("msb cannot be null");
+				}
+				if (!(lsb instanceof GPR32)) {
+					throw new IllegalStateException("lsb must be GPR32");
+				}
+				if (!(msb instanceof GPR32)) {
+					throw new IllegalStateException("msb must be GPR32");
+				}
+			} else {
+				if (reg == null) {
+					throw new IllegalStateException("reg cannot be null");
+				}
+				if (!(reg instanceof GPR64)) {
+					throw new IllegalStateException("reg must be GPR64");
+				}
+			}
+			break;
+		}
 	}
 }

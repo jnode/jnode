@@ -54,9 +54,9 @@ final class ItemFactory {
      * 
      * @param val
      */
-    final IntItem createIConst(int val) {
+    final IntItem createIConst(EmitterContext ec, int val) {
         final IntItem item = (IntItem) getOrCreate(JvmType.INT);
-        item.initialize(Item.Kind.CONSTANT, 0, null, val);
+        item.initialize(ec, Item.Kind.CONSTANT, 0, null, val);
         return item;
     }
 
@@ -65,9 +65,9 @@ final class ItemFactory {
      * 
      * @param val
      */
-    final FloatItem createFConst(float val) {
+    final FloatItem createFConst(EmitterContext ec, float val) {
         final FloatItem item = (FloatItem) getOrCreate(JvmType.FLOAT);
-        item.initialize(Item.Kind.CONSTANT, 0, null, val);
+        item.initialize(ec, Item.Kind.CONSTANT, 0, null, val);
         return item;
     }
 
@@ -76,9 +76,9 @@ final class ItemFactory {
      * 
      * @param val
      */
-    final RefItem createAConst(VmConstString val) {
+    final RefItem createAConst(EmitterContext ec, VmConstString val) {
         final RefItem item = (RefItem) getOrCreate(JvmType.REFERENCE);
-        item.initialize(Item.Kind.CONSTANT, 0, null, val);
+        item.initialize(ec, Item.Kind.CONSTANT, 0, null, val);
         return item;
     }
 
@@ -87,9 +87,9 @@ final class ItemFactory {
      * 
      * @param val
      */
-    final LongItem createLConst(long val) {
+    final LongItem createLConst(EmitterContext ec, long val) {
         final LongItem item = (LongItem) getOrCreate(JvmType.LONG);
-        item.initialize(Item.Kind.CONSTANT, 0, null, null, null, null, val);
+        item.initialize(ec, Item.Kind.CONSTANT, 0, null, null, null, null, val);
         return item;
     }
 
@@ -98,9 +98,9 @@ final class ItemFactory {
      * 
      * @param val
      */
-    final DoubleItem createDConst(double val) {
+    final DoubleItem createDConst(EmitterContext ec, double val) {
         final DoubleItem item = (DoubleItem) getOrCreate(JvmType.DOUBLE);
-        item.initialize(Item.Kind.CONSTANT, 0, null, null, null, null, val);
+        item.initialize(ec, Item.Kind.CONSTANT, 0, null, null, null, null, val);
         return item;
     }
 
@@ -154,9 +154,9 @@ final class ItemFactory {
      * @param jvmType
      * @param reg
      */
-    public WordItem createReg(int jvmType, X86Register reg) {
+    public WordItem createReg(EmitterContext ec, int jvmType, X86Register reg) {
         final WordItem item = (WordItem) getOrCreate(jvmType);
-        item.initialize(Item.Kind.GPR, reg, 0);
+        item.initialize(ec, Item.Kind.GPR, reg, 0);
         return item;
     }
 
@@ -172,7 +172,7 @@ final class ItemFactory {
     		throw new IllegalModeException("Only supported in 32-bit mode");
     	}
         final DoubleWordItem item = (DoubleWordItem) getOrCreate(jvmType);
-        item.initialize(Item.Kind.GPR, 0, lsb, msb, null, null);
+        item.initialize(ec, Item.Kind.GPR, 0, lsb, msb, null, null);
         return item;
     }
 
@@ -183,9 +183,9 @@ final class ItemFactory {
      * @param lsb
      * @param msb
      */
-    public DoubleWordItem createReg(int jvmType, X86Register.GPR64 reg) {
+    public DoubleWordItem createReg(EmitterContext ec, int jvmType, X86Register.GPR64 reg) {
         final DoubleWordItem item = (DoubleWordItem) getOrCreate(jvmType);
-        item.initialize(Item.Kind.GPR, 0, null, null, reg, null);
+        item.initialize(ec, Item.Kind.GPR, 0, null, null, reg, null);
         return item;
     }
 

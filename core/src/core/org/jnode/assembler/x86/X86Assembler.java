@@ -30,6 +30,8 @@ import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.assembler.x86.X86Register.GPR;
+import org.jnode.assembler.x86.X86Register.GPR32;
+import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.CpuID;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.x86.X86CpuID;
@@ -1373,6 +1375,17 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 
 	public abstract void writeMOVSX(GPR dstReg, GPR srcReg, int srcDisp,
 			int size);
+
+	/**
+	 * Create a movsxd dstReg, srcReg.
+	 * Sign extends the srcReg to dstReg.
+	 * Only valid in 64-bit mode.
+	 * 
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public abstract void writeMOVSXD(GPR64 dstReg, GPR32 srcReg)
+	throws InvalidOpcodeException;
 
 	/**
 	 * Create a movzx <dstReg>, <srcReg>
