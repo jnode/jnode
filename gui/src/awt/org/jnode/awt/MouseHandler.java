@@ -7,6 +7,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 
@@ -18,6 +19,8 @@ import org.jnode.driver.input.PointerAPI;
 import org.jnode.driver.input.PointerEvent;
 import org.jnode.driver.input.PointerListener;
 import org.jnode.driver.video.HardwareCursorAPI;
+
+import javax.swing.SwingUtilities;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -157,16 +160,28 @@ public class MouseHandler implements PointerListener {
 		}
 		//log.debug("Source: " + source.getClass().getName());
 		//TODO full support for modifiers
-		if (source.isVisible()) {
+		if (source.isShowing()) {
+            Window w = (Window) SwingUtilities.getAncestorOfClass(Window.class, source);
+            Point pw = new Point(-1,-1);
+            Point pwo = pw;
+            if(w != null){
+//                pw = w.getLocation();
+                pwo = w.getLocationOnScreen();
+            }
 			final Point p = source.getLocationOnScreen();
 			final boolean popupTrigger = (button == MouseEvent.BUTTON2);
 			
-			final int ex = x - p.x;
-			final int ey = y - p.y;
+			final int ex = x - p.x - pwo.x;
+			final int ey = y - p.y - pwo.y;
 			final int modifiers = buttonToModifiers(button);
 			
 			final MouseEvent me = new MouseEvent(source, id, System.currentTimeMillis(),
 					modifiers, ex, ey, 1, popupTrigger, button);
+
+            if (id == MouseEvent.MOUSE_CLICKED) {
+//				log.info("MouseClicked to " + source + " at " + ex + "," + ey + " ("+x+","+y+")("+p.x+","+p.y+")("+pw.x+","+pw.y+")("+pwo.x+","+pwo.y+")");
+			}
+
 			JNodeGenericPeer.eventQueue.postEvent(me);
 //			if (id == MouseEvent.MOUSE_CLICKED) {
 //				log.info("MouseClicked to " + source + " at " + ex + "," + ey);
