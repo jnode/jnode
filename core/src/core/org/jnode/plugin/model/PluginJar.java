@@ -3,22 +3,23 @@
  */
 package org.jnode.plugin.model;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 
 import nanoxml.XMLElement;
 
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
+import org.jnode.util.BootableHashMap;
 import org.jnode.util.FileUtils;
 import org.jnode.vm.BootableObject;
 
@@ -30,13 +31,8 @@ public class PluginJar implements BootableObject {
     /** The descriptor of this file */
     private final PluginDescriptorModel descriptor;
 
-    /** The bytes of the plugin jar file */
-    private final byte[] pluginJarData;
-
-    /** The cached JarFile instance */
-    private transient JarFile pluginJar;
-
-    private transient File pluginTmpFile;
+    /** The resources in the jar file */
+    private final Map resources;
 
     /**
      * Initialize this instance
@@ -58,13 +54,9 @@ public class PluginJar implements BootableObject {
     public PluginJar(PluginRegistryModel registry, InputStream pluginIs,
             URL pluginUrl) throws PluginException {
 
-        // Load the plugin into memory
-        final byte[] pluginJarData;
         try {
-            final byte[] buf = new byte[ 4096];
-            final ByteArrayOutputStream pluginOs = new ByteArrayOutputStream();
-            FileUtils.copy(pluginIs, pluginOs, buf, true);
-            pluginJarData = pluginOs.toByteArray();
+            // Load the plugin into memory
+            resources = loadResources(pluginIs);
         } catch (IOException ex) {
             throw new PluginException("Error loading jarfile", ex);
         }
@@ -72,15 +64,13 @@ public class PluginJar implements BootableObject {
         final XMLElement root;
         try {
             // Not find the plugin.xml
-            final JarFile jarFile = getJar(pluginUrl, pluginJarData);
-            JarEntry entry = jarFile.getJarEntry("plugin.xml");
-            if (entry == null) { throw new PluginException(
+            final InputStream pluginXmlRes = getResourceAsStream("plugin.xml");
+            if (pluginXmlRes == null) { throw new PluginException(
                     "plugin.xml not found in jar file"); }
 
             // Now parse plugin.xml
             root = new XMLElement(new Hashtable(), true, false);
-            final Reader r = new InputStreamReader(jarFile
-                    .getInputStream(entry));
+            final Reader r = new InputStreamReader(pluginXmlRes);
             try {
                 root.parseFromReader(r);
             } finally {
@@ -92,10 +82,8 @@ public class PluginJar implements BootableObject {
         if (!root.getName().equals("plugin")) { throw new PluginException(
                 "plugin element expected"); }
         this.descriptor = new PluginDescriptorModel(this, root);
-        if (this.descriptor.isSystemPlugin()) {
-            this.pluginJarData = null;
-        } else {
-            this.pluginJarData = pluginJarData;
+        if (descriptor.isSystemPlugin()) {
+            resources.clear();
         }
     }
 
@@ -106,16 +94,11 @@ public class PluginJar implements BootableObject {
      * @return boolean
      */
     public final InputStream getResourceAsStream(String resourceName) {
-        try {
-            final JarFile jarFile = getJar(null, pluginJarData);
-            final JarEntry entry = jarFile.getJarEntry(resourceName);
-            if (entry == null) {
-                return null;
-            } else {
-                return jarFile.getInputStream(entry);
-            }
-        } catch (IOException ex) {
+        final byte[] data = (byte[]) resources.get(resourceName);
+        if (data == null) {
             return null;
+        } else {
+            return new ByteArrayInputStream(data);
         }
     }
 
@@ -126,13 +109,7 @@ public class PluginJar implements BootableObject {
      * @return boolean
      */
     public final boolean containsResource(String resourceName) {
-        try {
-            final JarFile jarFile = getJar(null, pluginJarData);
-            final JarEntry entry = jarFile.getJarEntry(resourceName);
-            return (entry != null);
-        } catch (IOException ex) {
-            return false;
-        }
+        return resources.containsKey(resourceName);
     }
 
     /**
@@ -147,12 +124,10 @@ public class PluginJar implements BootableObject {
         }
         try {
             if (resourceName.length() > 0) {
-                final JarFile jarFile = getJar(null, pluginJarData);
-                final JarEntry entry = jarFile.getJarEntry(resourceName);
-                if (entry == null) {
+                if (!resources.containsKey(resourceName)) {
                     return null;
                 }
-            } 
+            }
             final String id = descriptor.getId();
             return new URL("plugin:" + id + "!/" + resourceName);
         } catch (IOException ex) {
@@ -179,50 +154,21 @@ public class PluginJar implements BootableObject {
         return this.descriptor;
     }
 
-    /**
-     * Gets the JarFile of this pluginjar.
-     * 
-     * @param pluginUrl
-     *            Can be null
-     * @return The plugin jarfile.
-     * @throws IOException
-     */
-    private JarFile getJar(URL pluginUrl, byte[] pluginJarData)
-            throws IOException {
-        if (pluginJar == null) {
-            final String protocol = (pluginUrl != null) ? pluginUrl
-                    .getProtocol() : "";
-            if (protocol.equals("file")) {
-                pluginJar = new JarFile(pluginUrl.getFile());
-            } else {
-                try {
-                    pluginJar = new JarFile(pluginJarData);
-                } catch (NoSuchMethodError ex) {
-                    pluginTmpFile = File.createTempFile("jnode", "jartmp");
-                    final FileOutputStream fos = new FileOutputStream(
-                            pluginTmpFile);
-                    fos.write(pluginJarData);
-                    fos.close();
-                    pluginJar = new JarFile(pluginTmpFile);
-                    pluginTmpFile.deleteOnExit();
-                }
+    private Map loadResources(InputStream is) throws IOException {
+        final BootableHashMap map = new BootableHashMap();
+        final JarInputStream jis = new JarInputStream(is);
+        try {
+            JarEntry entry;
+            final byte[] buf = new byte[ 4096];
+            final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            while ((entry = jis.getNextJarEntry()) != null) {
+                FileUtils.copy(jis, bos, buf, false);
+                map.put(entry.getName(), bos.toByteArray());
+                bos.reset();
             }
-        }
-        return pluginJar;
-    }
-
-    public void finalize() {
-        if (pluginJar != null) {
-            try {
-                pluginJar.close();
-            } catch (IOException ex) {
-                // Ignore
-            }
-            pluginJar = null;
-        }
-        if (pluginTmpFile != null) {
-            pluginTmpFile.delete();
-            pluginTmpFile = null;
+            return map;
+        } finally {
+            jis.close();
         }
     }
 }
