@@ -42,7 +42,7 @@ public class FatFileSystemType implements FileSystemType {
 	 *           partition table entry.
 	 * @param firstSector
 	 */
-	public boolean supports(PartitionTableEntry pte, byte[] firstSector) {
+	public boolean supports(PartitionTableEntry pte, byte[] firstSector, FSBlockDeviceAPI devApi) {
 		if (pte != null) {
 			if (!pte.isValid()) {
 				return false;
