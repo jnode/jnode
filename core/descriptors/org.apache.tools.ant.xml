@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.apache.tools.ant" 
+        name="Ant classes"
+        version="1.6.1"
+        provider-name="jakarta.apache.org">
+        
+  <runtime>
+    <library name="ant.jar">
+      <export name="*"/>
+      <export name="org.apache.tools.ant.filters.*"/>
+      <export name="org.apache.tools.ant.helper.*"/>
+      <export name="org.apache.tools.ant.input.*"/>
+      <export name="org.apache.tools.ant.launch.*"/>
+      <export name="org.apache.tools.ant.listener.*"/>
+      <export name="org.apache.tools.ant.loader.*"/>
+      <export name="org.apache.tools.ant.taskdefs.*"/>
+      <export name="org.apache.tools.ant.types.*"/>
+      <export name="org.apache.tools.ant.util.*"/>            
+    </library>
+  </runtime>
+        
+</plugin>
