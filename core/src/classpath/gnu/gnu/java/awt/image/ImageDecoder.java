@@ -1,5 +1,5 @@
 /* ImageDecoder.java
-   Copyright (C) 1999, 2000 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2000, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,65 +37,100 @@ exception statement from your version. */
 
 package gnu.java.awt.image;
 
-import java.awt.image.ColorModel;
 import java.awt.image.ImageConsumer;
 import java.awt.image.ImageProducer;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Vector;
 
-public abstract class ImageDecoder implements ImageProducer {
-	Vector consumers = new Vector();
-	String filename;
-	URL url;
+public abstract class ImageDecoder implements ImageProducer 
+{
+  Vector consumers = new Vector ();
+  String filename;
+  URL url;
+  byte[] data;
+  int offset;
+  int length;
+  InputStream input;
 
-	public static ColorModel cm;
+  static
+  {
+    // FIXME: there was some broken code here that looked like
+    // it wanted to rely on this property.  I don't have any idea
+    // what it was intended to do.
+    // String endian = System.getProperties ().getProperty ("gnu.cpu.endian");
+  }
 
-	static {
-		// FIXME: there was some broken code here that looked like
-		// it wanted to rely on this property.  I don't have any idea
-		// what it was intended to do.
-		// String endian = System.getProperties ().getProperty ("gnu.cpu.endian");
-	}
+  public ImageDecoder (String filename)
+  {
+    this.filename = filename;
+  }
 
-	public ImageDecoder(String filename) {
-		this.filename = filename;
-	}
+  public ImageDecoder (URL url)
+  {
+    this.url = url;
+  }
 
-	public ImageDecoder(URL url) {
-		this.url = url;
-	}
+  public ImageDecoder (byte[] imagedata, int imageoffset, int imagelength)
+  {
+    data = imagedata;
+    offset = imageoffset;
+    length = imagelength;
+  }
 
-	public void addConsumer(ImageConsumer ic) {
-		consumers.addElement(ic);
-	}
+  public void addConsumer (ImageConsumer ic) 
+  {
+    consumers.addElement (ic);
+  }
 
-	public boolean isConsumer(ImageConsumer ic) {
-		return consumers.contains(ic);
-	}
+  public boolean isConsumer (ImageConsumer ic)
+  {
+    return consumers.contains (ic);
+  }
+  
+  public void removeConsumer (ImageConsumer ic)
+  {
+    consumers.removeElement (ic);
+  }
 
-	public void removeConsumer(ImageConsumer ic) {
-		consumers.removeElement(ic);
-	}
+  public void startProduction (ImageConsumer ic)
+  {
+    addConsumer (ic);
+    Vector list = (Vector) consumers.clone ();
+    try 
+      {
+	// Create the input stream here rather than in the
+	// ImageDecoder constructors so that exceptions cause
+	// imageComplete to be called with an appropriate error
+	// status.
+	if (url != null)
+	  input = url.openStream();
+	else
+	  {
+	    if (filename != null)
+	      input = new FileInputStream (filename);
+	    else
+	      input = new ByteArrayInputStream (data, offset, length);
+	  }
 
-	public void startProduction(ImageConsumer ic) {
-		addConsumer(ic);
-		Vector list = (Vector) consumers.clone();
-		try {
-			FileInputStream is = (url == null) ? new FileInputStream(filename) : (FileInputStream) url.openStream();
+	produce (list, input);
+      }
+    catch (Exception e)
+      {
+	for (int i = 0; i < list.size (); i++)
+	  {
+	    ImageConsumer ic2 = (ImageConsumer) list.elementAt (i);
+	    ic2.imageComplete (ImageConsumer.IMAGEERROR);
+	  }
+      }
+  }
 
-			produce(list, is);
-		} catch (Exception e) {
-			for (int i = 0; i < list.size(); i++) {
-				ImageConsumer ic2 = (ImageConsumer) list.elementAt(i);
-				ic2.imageComplete(ImageConsumer.IMAGEERROR);
-			}
-		}
-	}
+  public void requestTopDownLeftRightResend (ImageConsumer ic) 
+  { 
+  }
 
-	public void requestTopDownLeftRightResend(ImageConsumer ic) {
-	}
-
-	abstract void produce(Vector v, FileInputStream is) throws IOException;
+  public abstract void produce (Vector v, InputStream is) throws IOException;
 }

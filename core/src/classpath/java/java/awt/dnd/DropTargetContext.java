@@ -1,5 +1,5 @@
 /* DropTargetContext.java --
-   Copyright (C) 2002 Free Software Foundation
+   Copyright (C) 2002, 2003 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -37,117 +37,153 @@ exception statement from your version. */
 
 package java.awt.dnd;
 
+import java.awt.dnd.peer.DropTargetContextPeer;
+import java.io.Serializable;
+import java.io.IOException;
 import java.awt.Component;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
-import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 
-public class DropTargetContext implements Serializable {
-	static final long serialVersionUID = -634158968993743371L;
+/**
+ * @author Michael Koch <konqueror@gmx.de>
+ * @since 1.2
+ */
+public class DropTargetContext implements Serializable
+{
+  static final long serialVersionUID = -634158968993743371L;
 
-	protected class TransferableProxy implements Transferable {
-		protected boolean isLocal;
-		protected Transferable transferable;
+  /** @specnote According to the online documentation, this is
+   * protected, but in reality it is public.  */
+  public class TransferableProxy implements Transferable
+  {
+    protected boolean isLocal;
+    protected Transferable transferable;
 
-		public DataFlavor[] getTransferDataFlavors() {
-			// FIXME: implement this
-			return null;
-		}
+    TransferableProxy (Transferable t, boolean local)
+    {
+      this.transferable = t;
+      this.isLocal = local;
+    }
+    
+    public DataFlavor[] getTransferDataFlavors ()
+    {
+      return transferable.getTransferDataFlavors ();
+    }
 
-		public boolean isDataFlavorSupported(DataFlavor flavor) {
-			// FIXME: implement this
-			return false;
-		}
+    public boolean isDataFlavorSupported (DataFlavor flavor)
+    {
+      return transferable.isDataFlavorSupported (flavor);
+    }
 
-		public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-			// FIXME: implement this
-			return null;
-		}
-	}
+    public Object getTransferData (DataFlavor flavor)
+      throws UnsupportedFlavorException, IOException
+    {
+      return transferable.getTransferData (flavor);
+    }
+  }
 
-	private int targetActions;
+  private DropTarget dropTarget;
+  private int targetActions;
+  private java.awt.dnd.peer.DropTargetContextPeer dtcp;
 
-	public DropTarget getDropTarget() {
-		// FIXME: implement this
-		return null;
-	}
+  // package private
+  DropTargetContext (DropTarget dropTarget)
+  {
+    this.dropTarget = dropTarget;
+  }
 
-	public Component getComponent() {
-		// FIXME: implement this
-		return null;
-	}
+  public DropTarget getDropTarget ()
+  {
+    return dropTarget;
+  }
 
-	public void addNotify(java.awt.dnd.peer.DropTargetContextPeer dtcp) {
-		// FIXME: implement this
-	}
+  public Component getComponent ()
+  {
+    return dropTarget.getComponent ();
+  }
 
-	public void removeNotify() {
-		// FIXME: implement this
-	}
+  public void addNotify (java.awt.dnd.peer.DropTargetContextPeer dtcp)
+  {
+    this.dtcp = dtcp;
+  }
 
-	protected void setTargetActions(int actions) {
-		targetActions = actions;
-	}
+  public void removeNotify ()
+  {
+    this.dtcp = null;
+  }
 
-	protected int getTargetActions() {
-		return targetActions;
-	}
+  protected void setTargetActions (int actions)
+  {
+    targetActions = actions;
+  }
 
-	/**
-	 * FIXME
-	 *
-	 * @exception InvalidDnDOperationException FIXME
-	 */
-	public void dropComplete(boolean success) {
-		// FIXME: implement this
-	}
+  protected int getTargetActions()
+  {
+    return targetActions;
+  }
 
-	protected void acceptDrag(int dragOperation) {
-		// FIXME: implement this
-	}
+  /**
+   * Signals that the drop is completed.
+   *
+   * @exception InvalidDnDOperationException If a drop is not outstanding.
+   */
+  public void dropComplete (boolean success)
+  {
+    // FIXME: implement this
+  }
 
-	protected void rejectDrag() {
-		// FIXME: implement this
-	}
+  protected void acceptDrag (int dragOperation)
+  {
+    // FIXME: implement this
+  }
 
-	protected void acceptDrop(int dropOperation) {
-		// FIXME: implement this
-	}
+  protected void rejectDrag ()
+  {
+    // FIXME: implement this
+  }
 
-	protected void rejectDrop() {
-		// FIXME: implement this
-	}
+  protected void acceptDrop (int dropOperation)
+  {
+    // FIXME: implement this
+  }
 
-	protected DataFlavor[] getCurrentDataFlavors() {
-		// FIXME: implement this
-		return null;
-	}
+  protected void rejectDrop ()
+  {
+    // FIXME: implement this
+  }
 
-	protected List getCurrentDataFlavorsAsList() {
-		// FIXME: implement this
-		return null;
-	}
+  protected DataFlavor[] getCurrentDataFlavors ()
+  {
+    // FIXME: implement this
+    return null;
+  }
 
-	protected boolean isDataFlavorSupported(DataFlavor flavor) {
-		// FIXME: implement this
-		return false;
-	}
+  protected List getCurrentDataFlavorsAsList ()
+  {
+    return Arrays.asList (getCurrentDataFlavors ());
+  }
 
-	/**
-	 * FIXME
-	 *
-	 * @exception InvalidDnDOperationException FIXME
-	 */
-	protected Transferable getTransferable() throws InvalidDnDOperationException {
-		// FIXME: implement this
-		return null;
-	}
+  protected boolean isDataFlavorSupported (DataFlavor flavor)
+  {
+    return getCurrentDataFlavorsAsList ().contains (flavor);
+  }
 
-	protected Transferable createTransferableProxy(Transferable t, boolean local) {
-		// FIXME: implement this
-		return null;
-	}
+  /**
+   * Return the <code>Transferable</code> operandof this operation.
+   *
+   * @exception InvalidDnDOperationException If a drag is not outstanding.
+   */
+  protected Transferable getTransferable() throws InvalidDnDOperationException
+  {
+    // FIXME: implement this
+    return null;
+  }
+
+  protected Transferable createTransferableProxy(Transferable t, boolean local)
+  {
+    return new TransferableProxy (t, local);
+  }
 } // class DropTargetContext

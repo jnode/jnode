@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.beans;
 
 /**
@@ -55,7 +56,7 @@ public class BeanDescriptor extends FeatureDescriptor {
 	 ** @param beanClass the class of the Bean.
 	 **/
 	public BeanDescriptor(Class beanClass) {
-		this(beanClass, null);
+		this(beanClass,null);
 	}
 
 	/** Create a new BeanDescriptor with the given bean class and
