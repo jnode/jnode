@@ -9,24 +9,19 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
-import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
-import org.jnode.driver.block.FSBlockDeviceAPI;
+import org.jnode.fs.AbstractFileSystem;
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
-import org.jnode.fs.ext2.cache.*;
 import org.jnode.fs.ext2.cache.Block;
 import org.jnode.fs.ext2.cache.BlockCache;
+import org.jnode.fs.ext2.cache.INodeCache;
 
 /**
  * @author Andras Nagy
  * 
  */
-public class Ext2FileSystem implements FileSystem {
-	private final Device device;
-	private FSBlockDeviceAPI api;
-	private boolean closed;
+public class Ext2FileSystem extends AbstractFileSystem {
 	private Superblock superblock;
 	private GroupDescriptor groupDescriptors[];
 	private int groupCount;
@@ -34,28 +29,22 @@ public class Ext2FileSystem implements FileSystem {
 	private INodeCache inodeCache;
 	private final Logger log = Logger.getLogger(getClass());
 	
-	private final Object groupDescriptorLock;
-	private final Object superblockLock;
+	private Object groupDescriptorLock;
+	private Object superblockLock;
 	
 	//private final boolean DEBUG=true;
 	
-	private int mode;
-	public static final int RO = 0;	//read-only mode
-	public static final int RW = 1;	//read-write mode
-		
 	//TODO: SYNC_WRITE should be made a parameter
 	/** if true, writeBlock() does not return until the block is written to disk */
 	private boolean SYNC_WRITE = true;
+
 	/**
-	 * Constructor for Ext2FileSystem.
+	 * Constructor for Ext2FileSystem in specified readOnly mode
+	 * @throws FileSystemException 
 	 */
-	public Ext2FileSystem(Device device) throws FileSystemException{
-		if(device==null)
-			throw new FileSystemException("null device!");
+	public Ext2FileSystem(Device device, boolean readOnly)  throws FileSystemException {
+		super(device, readOnly);
 			
-		this.device = device;
-		this.api=null;
-		closed = false;
 		byte data[];
 		
 		blockCache = new BlockCache(50,(float)0.75);
@@ -64,21 +53,12 @@ public class Ext2FileSystem implements FileSystem {
 		groupDescriptorLock = new Object();
 		superblockLock = new Object();
 
-		//set default mount mode
-		setMode(RW);
-
-		try{
-			api = (FSBlockDeviceAPI) device.getAPI(FSBlockDeviceAPI.class);
-		}catch(ApiNotFoundException e) {
-			throw new FileSystemException("Device is not a partition!");
-		}
-
 		try {
 			data = new byte[Superblock.SUPERBLOCK_LENGTH];
 
 			//skip the first 1024 bytes (bootsector) and read the superblock 
 			//TODO: the superblock should read itself
-			api.read(1024, data, 0, Superblock.SUPERBLOCK_LENGTH);
+			getApi().read(1024, data, 0, Superblock.SUPERBLOCK_LENGTH);
 			superblock = new Superblock(data, this);
 			
 			//read the group descriptors
@@ -110,14 +90,6 @@ public class Ext2FileSystem implements FileSystem {
 					"				block size:		"+superblock.getBlockSize()+"\n"+
 					"				#inodes:		"+superblock.getINodesCount()+"\n"+
 					"				#inodes/group:	"+superblock.getINodesPerGroup());
-	}
-
-	/**
-	 * @see org.jnode.fs.FileSystem#close()
-	 */
-	public void close() throws IOException {
-		closed = true;
-		flush();
 	}
 
 	/**
@@ -164,18 +136,11 @@ public class Ext2FileSystem implements FileSystem {
 	}
 
 	/**
-	 * @see org.jnode.fs.FileSystem#getDevice()
-	 */
-	public Device getDevice() {
-		return device;
-	}
-
-	/**
 	 * @see org.jnode.fs.FileSystem#getRootEntry()
 	 */
 	public FSEntry getRootEntry() throws IOException {
 		try{
-			if(!closed) {
+			if(!isClosed()) {
 				return new Ext2Entry( getINode(Ext2Constants.EXT2_ROOT_INO), 
 									  "/", Ext2Constants.EXT2_FT_DIR, this );
 			}
@@ -237,7 +202,7 @@ public class Ext2FileSystem implements FileSystem {
 	 * @throws IOException
 	 */
 	public void writeBlock(long nr, byte[] data, boolean forceWrite) throws IOException {
-		if(mode==RO)
+		if(isReadOnly())
 			throw new IOException("Filesystem is mounted read-only!"); 
 			
 		Block block;
@@ -298,7 +263,7 @@ public class Ext2FileSystem implements FileSystem {
 			writeTimer = new Timer();
 			writeTimer.schedule(new TimeoutWatcher(Thread.currentThread()), TIMEOUT);
 			try{
-				api.write(nr*getBlockSize(), data, 0, (int)getBlockSize());
+				getApi().write(nr*getBlockSize(), data, 0, (int)getBlockSize());
 				writeTimer.cancel();
 			}catch(IOException ioe) {
 				//IDEDiskDriver will throw an IOException with a cause of an InterruptedException
@@ -320,7 +285,7 @@ public class Ext2FileSystem implements FileSystem {
 			readTimer = new Timer();
 			readTimer.schedule(new TimeoutWatcher(Thread.currentThread()), TIMEOUT);
 			try{
-				api.read( nr*getBlockSize(), data, 0, (int)getBlockSize());
+				getApi().read( nr*getBlockSize(), data, 0, (int)getBlockSize());
 				readTimer.cancel();
 			}catch(IOException ioe) {
 				//IDEDiskDriver will throw an IOException with a cause of an InterruptedException
@@ -661,21 +626,5 @@ public class Ext2FileSystem implements FileSystem {
 	protected boolean groupHasSuperblock(int groupNr){
 		//TODO: support filesystems with the sparse_super option
 		return true; 
-	}
-	
-	/**
-	 * Returns if the filesystem is mounted read-only or read-write.
-	 * @return mode: either RO or RW
-	 */
-	public int getMode(){
-		return mode;
-	}
-	
-	/**
-	 * Sets the filesystem mount mode: read-only or read-write.
-	 * @param mode: either RO or RW
-	 */
-	public void setMode(int mode) {
-		this.mode = mode;
-	}
+	}	
 }
