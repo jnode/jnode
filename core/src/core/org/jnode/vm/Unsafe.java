@@ -17,7 +17,7 @@ public final class Unsafe {
 
 	public static class UnsafeObjectResolver extends ObjectResolver {
 
-		protected UnsafeObjectResolver() {
+		public UnsafeObjectResolver() {
 		}
 
 		/**

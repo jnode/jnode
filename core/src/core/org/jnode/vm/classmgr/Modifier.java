@@ -4,152 +4,156 @@
 
 package org.jnode.vm.classmgr;
 
-public class Modifier
-{
-    public static final int ACC_PUBLIC       = 0x00000001;
-    public static final int ACC_PRIVATE      = 0x00000002;
-    public static final int ACC_PROTECTED    = 0x00000004;
-    public static final int ACC_STATIC       = 0x00000008;
-    public static final int ACC_FINAL        = 0x00000010;
-    public static final int ACC_SYNCHRONIZED = 0x00000020;
-    public static final int ACC_SUPER        = 0x00000020;
-    public static final int ACC_VOLATILE     = 0x00000040;
-    public static final int ACC_TRANSIENT    = 0x00000080;
-    public static final int ACC_NATIVE       = 0x00000100;
-    public static final int ACC_INTERFACE    = 0x00000200;
-    public static final int ACC_ABSTRACT     = 0x00000400;
-	public static final int ACC_STRICT       = 0x00000800; // F  Declared strictfp; floating-point mode is FP-strict
+public class Modifier {
+	public static final int ACC_PUBLIC = 0x00000001;
+	public static final int ACC_PRIVATE = 0x00000002;
+	public static final int ACC_PROTECTED = 0x00000004;
+	public static final int ACC_STATIC = 0x00000008;
+	public static final int ACC_FINAL = 0x00000010;
+	public static final int ACC_SYNCHRONIZED = 0x00000020;
+	public static final int ACC_SUPER = 0x00000020;
+	public static final int ACC_VOLATILE = 0x00000040;
+	public static final int ACC_TRANSIENT = 0x00000080;
+	public static final int ACC_NATIVE = 0x00000100;
+	public static final int ACC_INTERFACE = 0x00000200;
+	public static final int ACC_ABSTRACT = 0x00000400;
+	public static final int ACC_STRICT = 0x00000800; // F Declared strictfp; floating-point mode is
+													 // FP-strict
 
-    public static final int ACC_WIDE         = 0x00010000;
-	public static final int ACC_ARRAY        = 0x00020000;
-	public static final int ACC_COMPILED     = 0x00040000;
-	public static final int ACC_INITIALIZER  = 0x00080000;
-	public static final int ACC_CONSTRUCTOR  = 0x00100000;
-	
-	public static final int ACC_LOADED       = 0x00200000;
-	public static final int ACC_DEFINED      = 0x00400000;
-	public static final int ACC_VERIFYING    = 0x00800000;
-	public static final int ACC_VERIFIED     = 0x01000000;
-	public static final int ACC_PREPARING    = 0x02000000;
-	public static final int ACC_PREPARED     = 0x04000000;
-	public static final int ACC_INITIALIZED  = 0x08000000;
+	public static final int ACC_WIDE = 0x00010000;
+	public static final int ACC_ARRAY = 0x00020000;
+	public static final int ACC_COMPILED = 0x00040000;
+	public static final int ACC_INITIALIZER = 0x00080000;
+	public static final int ACC_CONSTRUCTOR = 0x00100000;
+
+	public static final int ACC_LOADED = 0x00200000;
+	public static final int ACC_DEFINED = 0x00400000;
+	public static final int ACC_VERIFYING = 0x00800000;
+	public static final int ACC_VERIFIED = 0x01000000;
+	public static final int ACC_PREPARING = 0x02000000;
+	public static final int ACC_PREPARED = 0x04000000;
+	public static final int ACC_INITIALIZED = 0x08000000;
 	public static final int ACC_INITIALIZING = 0x10000000;
-	public static final int ACC_INVALID      = 0x20000000;
-
+	public static final int ACC_INVALID = 0x20000000;
 	/** gather profile information for this method */
-	public static final int ACC_PROFILE      = 0x40000000; // M
-	
+	public static final int ACC_PROFILE = 0x40000000; // M
+	public static final int ACC_SPECIAL = 0x80000000;
 	
 	public static boolean isPublic(int modifier) {
 		int mask = ACC_PUBLIC;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isPrivate(int modifier) {
 		int mask = ACC_PRIVATE;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isProtected(int modifier) {
 		int mask = ACC_PROTECTED;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isStatic(int modifier) {
 		int mask = ACC_STATIC;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isFinal(int modifier) {
 		int mask = ACC_FINAL;
 		return ((modifier & mask) == mask);
 	}
-	
+
+	public static boolean isSpecial(int modifier) {
+		int mask = ACC_SPECIAL;
+		return ((modifier & mask) == mask);
+	}
+
 	public static boolean isSynchronized(int modifier) {
 		int mask = ACC_SYNCHRONIZED;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isSuper(int modifier) {
 		int mask = ACC_SUPER;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isVolatile(int modifier) {
 		int mask = ACC_VOLATILE;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isTransient(int modifier) {
 		int mask = ACC_TRANSIENT;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isNative(int modifier) {
 		int mask = ACC_NATIVE;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isInterface(int modifier) {
 		int mask = ACC_INTERFACE;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isAbstract(int modifier) {
 		int mask = ACC_ABSTRACT;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isStrict(int modifier) {
 		int mask = ACC_STRICT;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isCompiled(int modifier) {
 		int mask = ACC_COMPILED;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isArray(int modifier) {
 		int mask = ACC_ARRAY;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isInitializer(int modifier) {
 		int mask = ACC_INITIALIZER;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isConstructor(int modifier) {
 		int mask = ACC_CONSTRUCTOR;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isLoaded(int modifier) {
 		int mask = ACC_LOADED;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isDefined(int modifier) {
 		int mask = ACC_DEFINED;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isVerifying(int modifier) {
 		int mask = ACC_VERIFYING;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isVerified(int modifier) {
 		int mask = ACC_VERIFIED;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isPreparing(int modifier) {
 		int mask = ACC_PREPARING;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isPrepared(int modifier) {
 		int mask = ACC_PREPARED;
 		return ((modifier & mask) == mask);
@@ -159,14 +163,15 @@ public class Modifier
 		int mask = ACC_INITIALIZED;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isInitializing(int modifier) {
 		int mask = ACC_INITIALIZING;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	/**
 	 * Should profile information be gathered?
+	 * 
 	 * @param modifier
 	 * @return boolean
 	 */
@@ -174,19 +179,19 @@ public class Modifier
 		int mask = ACC_PROFILE;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isInvalid(int modifier) {
 		int mask = ACC_INVALID;
 		return ((modifier & mask) == mask);
 	}
-	
+
 	public static boolean isWide(String signature) {
 		final int len = signature.length();
-		final boolean arr = (len > 1) && (signature.charAt(len-2) == '[');
+		final boolean arr = (len > 1) && (signature.charAt(len - 2) == '[');
 		if (arr) {
 			return false;
 		} else {
-			final char ch = signature.charAt(len-1);
+			final char ch = signature.charAt(len - 1);
 			return ((ch == 'J') || (ch == 'D'));
 		}
 	}
@@ -197,42 +202,41 @@ public class Modifier
 	}
 
 	public static boolean isAddressType(String signature) {
-		return "Lorg/jnode/vm/Address;".equals(signature) ||
-		        "Lorg/jnode/vm/PhysicalAddress".equals(signature);
+		return "Lorg/jnode/vm/Address;".equals(signature) || "Lorg/jnode/vm/PhysicalAddress".equals(signature);
 	}
-	
+
 	/**
-	 * Gets the size in bytes of the given type. 
-	 * This will return the following values: 
+	 * Gets the size in bytes of the given type. This will return the following values:
 	 * <ul>
-	 *   <li><code>boolean</code> 1
-	 *   <li><code>byte</code> 1
-	 *   <li><code>char</code> 2
-	 *   <li><code>short</code> 2
-	 *   <li><code>int</code> 4
-	 *   <li><code>long</code> 8
-	 *   <li><code>float</code> 4
-	 *   <li><code>double</code> 8
-	 *   <li><code>reference</code> SLOT_SIZE
+	 * <li><code>boolean</code> 1
+	 * <li><code>byte</code> 1
+	 * <li><code>char</code> 2
+	 * <li><code>short</code> 2
+	 * <li><code>int</code> 4
+	 * <li><code>long</code> 8
+	 * <li><code>float</code> 4
+	 * <li><code>double</code> 8
+	 * <li><code>reference</code> SLOT_SIZE
 	 * </ul>
+	 * 
 	 * @param signature
 	 * @param slotSize
 	 * @return byte
 	 */
 	public static byte getTypeSize(String signature, int slotSize) {
 		switch (signature.charAt(0)) {
-			case 'Z': // Boolean
-			case 'B': // Byte
+			case 'Z' : // Boolean
+			case 'B' : // Byte
 				return 1;
-			case 'C': // Character
-			case 'S': // Short
+			case 'C' : // Character
+			case 'S' : // Short
 				return 2;
-			case 'I': // Integer
-			case 'F': // Float
+			case 'I' : // Integer
+			case 'F' : // Float
 				return 4;
-			case 'L': // Object
-			case '[': // Array 
-				return (byte)slotSize;
+			case 'L' : // Object
+			case '[' : // Array
+				return (byte) slotSize;
 			case 'J' : // Long
 			case 'D' : // Double
 				return 8;
@@ -240,15 +244,16 @@ public class Modifier
 				throw new IllegalArgumentException("Unknown type");
 		}
 	}
-	
+
 	/**
 	 * Convert a modifiers int to a readable string of modifier names
+	 * 
 	 * @param modifiers
 	 * @return String
 	 */
 	public static String toString(int modifiers) {
 		final StringBuffer b = new StringBuffer();
-		
+
 		if (isPublic(modifiers)) {
 			b.append("public ");
 		}
@@ -304,7 +309,7 @@ public class Modifier
 		if ((modifiers & ACC_CONSTRUCTOR) != 0) {
 			b.append("constructor ");
 		}
-		
+
 		if ((modifiers & ACC_LOADED) != 0) {
 			b.append("loaded ");
 		}
@@ -335,8 +340,7 @@ public class Modifier
 		if ((modifiers & ACC_PROFILE) != 0) {
 			b.append("profile ");
 		}
-		
+
 		return b.toString().trim();
 	}
 }
-

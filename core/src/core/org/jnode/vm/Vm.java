@@ -67,4 +67,10 @@ public class Vm extends VmSystemObject {
 		return this.heapManager;
 	}
 
+	public static void main(String[] args) {
+		final Vm vm = getVm();
+		if ((vm != null) && !vm.isBootstrap()) {
+			Unsafe.getCurrentProcessor().getStatics().dumpStatistics();
+		}
+	}
 }

@@ -4,7 +4,6 @@
 
 package org.jnode.vm.classmgr;
 
-import org.jnode.assembler.ObjectResolver;
 import org.jnode.system.BootLog;
 
 public final class ClassDecoder {
@@ -56,10 +55,9 @@ public final class ClassDecoder {
 		boolean rejectNatives,
 		AbstractVmClassLoader clc,
 		SelectorMap selectorMap,
-		VmStatics statics,
-		ObjectResolver resolver) {
+		VmStatics statics) {
 		cl_init();
-		VmType cls = decodeClass(data, offset, class_image_length, rejectNatives, clc, selectorMap, statics, resolver);
+		VmType cls = decodeClass(data, offset, class_image_length, rejectNatives, clc, selectorMap, statics);
 		return cls;
 	}
 
@@ -82,8 +80,7 @@ public final class ClassDecoder {
 		boolean rejectNatives,
 		AbstractVmClassLoader clc,
 		SelectorMap selectorMap,
-		VmStatics statics,
-		ObjectResolver resolver)
+		VmStatics statics)
 		throws ClassFormatError {
 		if (data == null) {
 			throw new ClassFormatError("ClassDecoder.decodeClass: data==null");
@@ -203,10 +200,10 @@ public final class ClassDecoder {
 		readInterfaces(data, pos, cls, cp);
 
 		// Field table
-		readFields(data, pos, cls, cp, statics, slotSize, resolver);
+		readFields(data, pos, cls, cp, statics, slotSize);
 
 		// Method Table
-		readMethods(data, rejectNatives, pos, cls, cp, selectorMap);
+		readMethods(data, rejectNatives, pos, cls, cp, selectorMap, statics);
 
 		return cls;
 	}
@@ -240,7 +237,7 @@ public final class ClassDecoder {
 	 * @param cp
 	 * @param slotSize
 	 */
-	private static void readFields(byte[] data, int[] pos, VmType cls, VmCP cp, VmStatics statics, int slotSize, ObjectResolver resolver) {
+	private static void readFields(byte[] data, int[] pos, VmType cls, VmCP cp, VmStatics statics, int slotSize) {
 		final int fcount = cl_readu2(data, pos);
 		if (fcount > 0) {
 			final VmField[] ftable = new VmField[fcount];
@@ -351,7 +348,7 @@ public final class ClassDecoder {
 								break;
 							default :
 								//throw new IllegalArgumentException("signature " + signature);
-								statics.setObject(staticsIdx, cp.getString(idx), resolver);
+								statics.setObject(staticsIdx, cp.getString(idx));
 								break;
 						}
 					} else {
@@ -376,7 +373,7 @@ public final class ClassDecoder {
 	 * @param cp
 	 * @param selectorMap
 	 */
-	private static void readMethods(byte[] data, boolean rejectNatives, int[] pos, VmType cls, VmCP cp, SelectorMap selectorMap) {
+	private static void readMethods(byte[] data, boolean rejectNatives, int[] pos, VmType cls, VmCP cp, SelectorMap selectorMap, VmStatics statics) {
 		final int mcount = cl_readu2(data, pos);
 		if (mcount > 0) {
 			final VmMethod[] mtable = new VmMethod[mcount];
@@ -393,11 +390,18 @@ public final class ClassDecoder {
 				}
 
 				final VmMethod mts;
-				if (isStatic) {
-					mts = new VmStaticMethod(name, signature, modifiers, cls, argSlotCount);
+				final boolean isSpecial = name.equals("<init>");
+				final int staticsIdx = statics.allocMethod();
+				if (isStatic || isSpecial) {
+					if (isSpecial) {
+						mts = new VmSpecialMethod(name, signature, modifiers, cls, argSlotCount, staticsIdx);
+					} else {
+						mts = new VmStaticMethod(name, signature, modifiers, cls, argSlotCount, staticsIdx);
+					}
 				} else {
-					mts = new VmInstanceMethod(name, signature, modifiers, cls, argSlotCount, selectorMap);
+					mts = new VmInstanceMethod(name, signature, modifiers, cls, argSlotCount, selectorMap, staticsIdx);
 				}
+				statics.setMethod(staticsIdx, mts);
 				mtable[i] = mts;
 
 				// Read methods attributes
