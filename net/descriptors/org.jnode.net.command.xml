@@ -26,6 +26,7 @@
     <alias name="netstat" class="org.jnode.net.command.NetstatCommand"/>
     <alias name="route" class="org.jnode.net.command.RouteCommand"/>
     <alias name="resolver" class="org.jnode.net.command.ResolverCommand"/>
+    <alias name="tftp" class="org.jnode.net.command.TftpCommand"/>
   </extension>
 
 </plugin>
