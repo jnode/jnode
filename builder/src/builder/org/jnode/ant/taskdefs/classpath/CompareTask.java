@@ -139,7 +139,7 @@ public class CompareTask extends Task {
         final String[] cmd = {
               "diff",
               "-au",
-              "-I", ".*$Id$.*",
+              "-I", ".*$" + "Id:.*$.*", // Avoid cvs keyword expansion in this string
               vmFile.getFileName(),
               cpFile.getFile().getAbsolutePath()
         };

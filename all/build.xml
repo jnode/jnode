@@ -302,12 +302,12 @@
 	 		  <exclude name="gnu/java/awt/peer/**/*"/>
 	 		  <exclude name="gnu/javax/swing/plaf/gtk/**/*"/>
 	 		  <exclude name="gnu/test/**/*"/>
-	 		  <exclude name="gnu/xml/**/*"/>
 	 		  <exclude name="test/**/*"/>
 	 		  <exclude name="testsuite/**/*"/>
 	 		  <exclude name="vm/reference/**/*"/>
 	 		</fileset>
 	 		<fileset dir="${root.dir}/../classpath/external/jaxp/source" includes="**/*.java">
+	 		  <exclude name="gnu/xml/**/*"/>
 	 		</fileset>
   		</classpathsources>
   	</cp-compare>
