@@ -36,6 +36,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.lang;
 
 /**
@@ -52,7 +53,8 @@ package java.lang;
  * @since 1.1
  * @status updated to 1.4
  */
-public class ExceptionInInitializerError extends LinkageError {
+public class ExceptionInInitializerError extends LinkageError
+{
 	/**
 	 * Compatible with JDK 1.1+.
 	 */
@@ -68,7 +70,8 @@ public class ExceptionInInitializerError extends LinkageError {
 	/**
 	 * Create an error without a message. The cause is initialized as null.
 	 */
-	public ExceptionInInitializerError() {
+  public ExceptionInInitializerError()
+  {
 		this((String) null);
 	}
 
@@ -77,7 +80,8 @@ public class ExceptionInInitializerError extends LinkageError {
 	 *
 	 * @param s the message
 	 */
-	public ExceptionInInitializerError(String s) {
+  public ExceptionInInitializerError(String s)
+  {
 		super(s);
 		exception = null;
 	}
@@ -88,8 +92,9 @@ public class ExceptionInInitializerError extends LinkageError {
 	 *
 	 * @param t the exception thrown
 	 */
-	public ExceptionInInitializerError(Throwable t) {
-		super();
+  public ExceptionInInitializerError(Throwable t)
+  {
+    super(null);
 		initCause(t);
 		exception = t;
 	}
@@ -100,8 +105,9 @@ public class ExceptionInInitializerError extends LinkageError {
 	 *
 	 * @return the cause, or null if unknown
 	 */
-	public Throwable getException() {
-		return getCause();
+  public Throwable getException()
+  {
+    return exception;
 	}
 
 	/**
@@ -110,7 +116,8 @@ public class ExceptionInInitializerError extends LinkageError {
 	 * @return the cause, or null if unknown
 	 * @since 1.4
 	 */
-	public Throwable getCause() {
+  public Throwable getCause()
+  {
 		return exception;
 	}
 }

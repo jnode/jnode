@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.lang;
 
 /**
@@ -50,16 +51,16 @@ package java.lang;
  * @since 1.1
  * @status updated to 1.4
  */
-public final class Void {
+public final class Void
+{
 	/**
 	 * The return type <code>void</code> is represented by this
 	 * <code>Class</code> object.
 	 */
-	public static final Class TYPE = Class.getPrimitiveClass('V');
+  public static final Class TYPE = VMClassLoader.getPrimitiveClass('V');
 
 	/**
 	 * Void is non-instantiable.
 	 */
-	private Void() {
-	}
+  private Void() { }
 }

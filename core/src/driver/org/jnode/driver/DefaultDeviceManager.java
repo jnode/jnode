@@ -742,7 +742,9 @@ public class DefaultDeviceManager implements DeviceManager,
             try {
                 return (DeviceToDriverMapper)c.newInstance(new Object[] { element });
             } catch (InvocationTargetException ex1) {
-                throw new InstantiationException(ex1.getTargetException());
+                final InstantiationException ie = new InstantiationException();
+                ie.initCause(ex1.getTargetException());
+                throw ie;
             }
         } catch (NoSuchMethodException ex) {
             return (DeviceToDriverMapper) cls.newInstance();

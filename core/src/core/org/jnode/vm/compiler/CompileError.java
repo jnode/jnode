@@ -23,14 +23,16 @@ public class CompileError extends LinkageError {
 	 * @param cause
 	 */
 	public CompileError(String message, Throwable cause) {
-		super(message, cause);
+		super(message);
+		initCause(cause);
 	}
 
 	/**
 	 * @param cause
 	 */
 	public CompileError(Throwable cause) {
-		super(cause);
+		super();
+		initCause(cause);
 	}
 
 	/**
