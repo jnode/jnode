@@ -14,6 +14,8 @@ import org.jnode.vm.classmgr.VmByteCode;
  * @author Madhu Siddalingaiah
  * 
  */
+//TODO simpify to use existing CFG from l1
+
 public class IRControlFlowGraph {
 	private final IRBasicBlock[] bblocks;
 
