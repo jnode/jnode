@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
+import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.classmgr.VmField;
@@ -60,6 +61,8 @@ public abstract class AbstractAsmConstBuilder {
 		final VmArchitecture arch = getArchitecture();
 		final int slotSize = arch.getReferenceSize();
 		VmSystemClassLoader cl = new VmSystemClassLoader(classesURL, arch);
+		final Vm vm = new Vm(arch, null, cl.getStatics(), false);
+		vm.toString(); // Just to avoid compiler warnings
 		VmType.initializeForBootImage(cl);
 		long lastModified = 0;
 

@@ -8,7 +8,6 @@ import java.security.ProtectionDomain;
 import org.jnode.vm.classmgr.ClassDecoder;
 import org.jnode.vm.classmgr.SelectorMap;
 import org.jnode.vm.classmgr.VmClassLoader;
-import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.classmgr.VmType;
 
 /**
@@ -55,7 +54,6 @@ abstract class VmAbstractClassLoader extends VmClassLoader {
 	}
 
 	protected abstract SelectorMap getSelectorMap();
-	protected abstract VmStatics getStatics();
 
 	/**
 	 * Add a class that has been loaded.

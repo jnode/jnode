@@ -9,6 +9,7 @@ import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmConstFieldRef;
 import org.jnode.vm.classmgr.VmConstIMethodRef;
 import org.jnode.vm.classmgr.VmConstMethodRef;
+import org.jnode.vm.classmgr.VmConstString;
 import org.jnode.vm.classmgr.VmMethod;
 
 
@@ -774,11 +775,10 @@ public class DelegatingCompilerBytecodeVisitor extends CompilerBytecodeVisitor {
         delegate.visit_lconst(value);
     }
     /**
-     * @param cpIdx
      * @param value
      */
-    public void visit_ldc(int cpIdx, String value) {
-        delegate.visit_ldc(cpIdx, value);
+    public void visit_ldc(VmConstString value) {
+        delegate.visit_ldc(value);
     }
     /**
      * 

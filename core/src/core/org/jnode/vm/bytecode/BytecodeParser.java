@@ -12,6 +12,7 @@ import org.jnode.vm.classmgr.VmCP;
 import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmConstFieldRef;
 import org.jnode.vm.classmgr.VmConstIMethodRef;
+import org.jnode.vm.classmgr.VmConstString;
 import org.jnode.vm.classmgr.VmMethod;
 
 /**
@@ -227,7 +228,7 @@ public class BytecodeParser {
                     } else if (o instanceof Float) {
                         handler.visit_fconst(((Float) o).floatValue());
                     } else {
-                        handler.visit_ldc(cpIdx, (String)o);
+                        handler.visit_ldc((VmConstString)o);
                     }
                 }
                 break;
@@ -240,7 +241,7 @@ public class BytecodeParser {
                     } else if (o instanceof Float) {
                         handler.visit_fconst(((Float) o).floatValue());
                     } else {
-                        handler.visit_ldc(cpIdx, (String)o);
+                        handler.visit_ldc((VmConstString)o);
                     }
                 }
                 break;

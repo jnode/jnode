@@ -11,7 +11,6 @@ import org.jnode.vm.Address;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmProcessor;
-import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmStaticField;
@@ -302,37 +301,6 @@ public class X86CompilerHelper extends X86StackManager implements
             os.writePrefix(X86Constants.FS_PREFIX);
             os.writeMOV(INTSIZE, STATICS, STATICS, offset);
         }
-    }
-
-    /**
-     * Write code to get an entry out of the constant pool of the declaring
-     * class of the current method.
-     * 
-     * @param dst
-     *            Destination register
-     * @param methodReg
-     *            Register that holds a reference to the current method
-     * @param cpIdx
-     *            Index in the constant pool
-     * @param context
-     *            The compiler context
-     */
-    public final void writeGetCPEntry(Register dst, Register methodReg,
-            int cpIdx, X86CompilerContext context, int slotSize) {
-        // First get the declaring class
-        final int declaringClassOffset = context
-                .getVmMemberDeclaringClassField().getOffset();
-        os.writeMOV(INTSIZE, dst, methodReg, declaringClassOffset);
-        // Now get VmType.cp
-        final int vmTypeCpOffset = context.getVmTypeCp().getOffset();
-        os.writeMOV(INTSIZE, dst, dst, vmTypeCpOffset);
-        // Now get the VmCP.cp
-        final int vmCPCpOffset = context.getVmCPCp().getOffset();
-        os.writeMOV(INTSIZE, dst, dst, vmCPCpOffset);
-        // Now get the cp[cpIdx]
-        os
-                .writeMOV(INTSIZE, dst, dst, (VmArray.DATA_OFFSET + cpIdx)
-                        * slotSize);
     }
 
     /**

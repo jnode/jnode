@@ -83,4 +83,11 @@ public abstract class VmClassLoader extends VmSystemObject {
 	 * @return boolean
 	 */
 	public abstract boolean resourceExists(String resName);
+
+    /**
+     * Gets the statics table.
+     * 
+     * @return The statics table
+     */
+    public abstract VmStatics getStatics();
 }
