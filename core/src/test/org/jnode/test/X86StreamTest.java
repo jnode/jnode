@@ -57,6 +57,10 @@ public class X86StreamTest {
 		os.writeJMP(Register.EDX, 15);
 		os.writeADD(Register.EDX, Register.EBX, 5);
 		os.writeSUB(Register.EDX, 3);
+		os.writeINC(Register.EBX, 67); // INC [reg+67]
+		os.writeCMP_Const(Register.ECX, 0xF, 0x12);
+		os.writeCMP_Const(Register.ECX, 0x4, 0x1234);
+		os.writeMOV_Const(Register.EDI, Register.EAX, 4, 0x09, 0x1234);
 		
 		
 		FileOutputStream fos = new FileOutputStream("test.bin");
