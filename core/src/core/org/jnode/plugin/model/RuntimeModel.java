@@ -47,7 +47,7 @@ public class RuntimeModel extends PluginModelObject implements Runtime {
 	/**
 	 * Resolve all references to (elements of) other plugin descriptors
 	 * 
-	 * @throws DocumentException
+	 * @throws PluginException
 	 */
 	protected void resolve() throws PluginException {
 		for (int i = 0; i < libraries.length; i++) {

@@ -279,7 +279,6 @@ public class BootSector {
 	 * Sets an unsigned 8-bit byte at a given offset
 	 * 
 	 * @param offset
-	 * @return int
 	 */
 	protected void set8(int offset, int value) {
 		DosUtils.set8(data, offset, value);
@@ -300,7 +299,6 @@ public class BootSector {
 	 * Sets an unsigned 16-bit word at a given offset
 	 * 
 	 * @param offset
-	 * @return int
 	 */
 	protected void set16(int offset, int value) {
 		DosUtils.set16(data, offset, value);
@@ -321,7 +319,6 @@ public class BootSector {
 	 * Sets an unsigned 32-bit word at a given offset
 	 * 
 	 * @param offset
-	 * @return int
 	 */
 	protected void set32(int offset, long value) {
 		DosUtils.set32(data, offset, value);

@@ -82,7 +82,7 @@ public class IPv4ControlBlock {
 	
 	/**
 	 * Match this control block against the given parameters
-	 * @param fAdd
+	 * @param fAddr
 	 * @param fPort
 	 * @param lAddr
 	 * @param lPort

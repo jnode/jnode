@@ -89,7 +89,6 @@ public class ConfigurationElementModel extends PluginModelObject implements Conf
 	
 	/**
 	 * Resolve all references to (elements of) other plugin descriptors
-	 * @throws DocumentException
 	 */
 	protected void resolve() {
 		// Do nothing 

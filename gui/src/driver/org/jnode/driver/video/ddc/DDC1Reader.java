@@ -128,7 +128,7 @@ public class DDC1Reader implements EDIDConstants {
 
 	/**
 	 * Test for the presence of a DDC1 signal
-	 * @throws DDC1NotFoundException
+	 * @throws DDC1NoSignalException
 	 */
 	private void testSignal() throws DDC1NoSignalException {
 		final boolean old = api.getDDC1Bit();

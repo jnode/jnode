@@ -77,9 +77,9 @@ public class NVidiaConfiguration extends FrameBufferConfiguration {
 			new DisplayMode("65000 1024 1048 1184 1344 768 771 777 806"));
 
 	/**
-	 * @param width
-	 * @param height
-	 * @param colorModel
+	 * @param bpp
+	 * @param screen
+	 * @param horiz
 	 */
 	private NVidiaConfiguration(int bpp, int screen, int horiz, int arb0, int arb1, int vpll, NVidiaVgaState vgaState, DisplayMode mode) {
 		super(mode.getWidth(), mode.getHeight(), createColorModel(bpp));

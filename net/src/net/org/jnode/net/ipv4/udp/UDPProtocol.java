@@ -128,7 +128,6 @@ public class UDPProtocol implements IPv4Protocol, IPv4Constants {
 
 	/**
 	 * Gets the DatagramSocketImplFactory of this protocol.
-	 * @throws SocketException If this protocol is not DatagramSocket based.
 	 */
 	public DatagramSocketImplFactory getDatagramSocketImplFactory() {
 		return dsiFactory;

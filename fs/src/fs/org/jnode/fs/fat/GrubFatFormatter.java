@@ -62,7 +62,9 @@ public class GrubFatFormatter {
 	/**
 	 * Constructor for GrubFatFormatter.
 	 * 
-	 * @param mediumDescriptor
+	 * @param bootSectorOffset
+	 * @param stage1ResourceName
+	 * @param stage2ResourceName
 	 */
 	public GrubFatFormatter(int bootSectorOffset, String stage1ResourceName, String stage2ResourceName) {
 		GrubBootSector bs = (GrubBootSector)createBootSector(stage1ResourceName, stage2ResourceName);
@@ -72,7 +74,7 @@ public class GrubFatFormatter {
 	}
 
 	/**
-	 * @see org.jnode.fs.fat.FatFormatter#createBootSector(Object)
+	 * Create the actual bootsector.
 	 */
 	private BootSector createBootSector(String stage1Name, String stage2Name) {
 		if (stage1Name == null) {

@@ -39,8 +39,6 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 
 	/**
 	 * Stop the device
-	 * 
-	 * @throws DriverException
 	 */
 	protected void stopDevice() {
 		this.device.unregisterAPI(FSBlockDeviceAPI.class);
@@ -65,7 +63,6 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 
 	/**
 	 * @see org.jnode.driver.block.BlockDeviceAPI#flush()
-	 * @throws IOException
 	 */
 	public void flush() {
 		// Do nothing
@@ -74,7 +71,6 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 	/**
 	 * @see org.jnode.driver.block.BlockDeviceAPI#getLength()
 	 * @return The length
-	 * @throws IOException
 	 */
 	public long getLength() {
 		return data.length;
@@ -86,7 +82,6 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 	 * @param destOffset
 	 * @param length
 	 * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
-	 * @throws IOException
 	 */
 	public void read(long devOffset, byte[] dest, int destOffset, int length) {
 		System.arraycopy(this.data, (int)devOffset, dest, destOffset, length);
@@ -98,7 +93,6 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 	 * @param srcOffset
 	 * @param length
 	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
-	 * @throws IOException
 	 */
 	public void write(long devOffset, byte[] src, int srcOffset, int length) {
 		System.arraycopy(src, srcOffset, this.data, (int)devOffset, length);

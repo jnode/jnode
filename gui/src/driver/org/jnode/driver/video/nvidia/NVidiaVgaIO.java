@@ -214,7 +214,6 @@ public class NVidiaVgaIO implements VgaIO, VgaConstants, NVidiaConstants {
 	/**
 	 * Sets an 8-bit MMIO value
 	 * @param index
-	 * @return
 	 */
 	final void setReg8(int index, int value) {
 		mmio.setByte(index, (byte) value);
@@ -223,7 +222,6 @@ public class NVidiaVgaIO implements VgaIO, VgaConstants, NVidiaConstants {
 	/**
 	 * Gets an 16-bit MMIO value
 	 * @param index
-	 * @return
 	 */
 	final void setReg16(int index, int value) {
 		mmio.setShort(index, (short) value);
@@ -232,7 +230,6 @@ public class NVidiaVgaIO implements VgaIO, VgaConstants, NVidiaConstants {
 	/**
 	 * Gets an 32-bit MMIO value
 	 * @param index
-	 * @return
 	 */
 	final void setReg32(int index, int value) {
 		mmio.setInt(index, value);

@@ -125,9 +125,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 
 		/* power-up all nvidia hardware function blocks */
 		/*
-		 * bit 28: OVERLAY ENGINE (BES), bit 25: CRTC2, (> NV04A) bit 24:
-		 * CRTC1, bit 20: framebuffer, bit 16: PPMI, bit 12: PGRAPH, bit 8:
-		 * PFIFO, bit 4: PMEDIA, bit 0: TVOUT. (> NV04A)
+		 * bit 28: OVERLAY ENGINE (BES), bit 25: CRTC2, (> NV04A) bit 24: CRTC1, bit 20: framebuffer, bit 16: PPMI, bit 12: PGRAPH, bit 8: PFIFO, bit 4: PMEDIA, bit 0: TVOUT. (> NV04A)
 		 */
 		//log.debug("PWRUPCTRL=0x" +
 		// NumberUtils.hex(mmio.getInt(NV32_PWRUPCTRL)));
@@ -220,16 +218,14 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 	}
 
 	/**
-	 * @see org.jnode.driver.video.util.AbstractSurface#drawPixel(int, int,
-	 *      int, int)
+	 * @see org.jnode.driver.video.util.AbstractSurface#drawPixel(int, int, int, int)
 	 */
 	protected final void drawPixel(int x, int y, int color, int mode) {
 		bitmapGraphics.drawPixels(x, y, 1, color, mode);
 	}
 
 	/**
-	 * @see org.jnode.driver.video.Surface#drawCompatibleRaster(java.awt.image.Raster,
-	 *      int, int, int, int, int, int, java.awt.Color)
+	 * @see org.jnode.driver.video.Surface#drawCompatibleRaster(java.awt.image.Raster, int, int, int, int, int, int, java.awt.Color)
 	 */
 	public final void drawCompatibleRaster(Raster raster, int srcX, int srcY, int dstX, int dstY, int width, int height, Color bgColor) {
 		if (bgColor == null) {
@@ -259,7 +255,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 	/**
 	 * Sets the start address of the video memory
 	 * 
-	 * @param address
+	 * @param startadd
 	 */
 	private void setVideoStartAddress(int startadd) {
 		if (architecture < NV10A) {
@@ -282,8 +278,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 		} else {
 			/* upto 4Gb RAM adressing: must be used on NV10 and later! */
 			/*
-			 * NOTE: While this register also exists on pre-NV10 cards, it will
-			 * wrap-around at 16Mb boundaries!!
+			 * NOTE: While this register also exists on pre-NV10 cards, it will wrap-around at 16Mb boundaries!!
 			 */
 
 			/* 30bit adress in 32bit words */
@@ -317,8 +312,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 		} else {
 			/* upto 4Gb RAM adressing: must be used on NV10 and later! */
 			/*
-			 * NOTE: While this register also exists on pre-NV10 cards, it will
-			 * wrap-around at 16Mb boundaries!!
+			 * NOTE: While this register also exists on pre-NV10 cards, it will wrap-around at 16Mb boundaries!!
 			 */
 
 			/* 30bit adress in 32bit words */
@@ -488,8 +482,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 		log.info("VER:" + vtotal + " " + vdisp_e + " " + vblnk_s + " " + vblnk_e + " " + vsync_s + " " + vsync_e);
 
 		/*
-		 * prevent memory adress counter from being reset (linecomp may not
-		 * occur)
+		 * prevent memory adress counter from being reset (linecomp may not occur)
 		 */
 		final int linecomp = 0x3ff; // mode.getHeight();
 
@@ -568,12 +561,8 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 
 			/* setup HSYNC & VSYNC polarity */
 			/*
-			 * LOG(2, ("CRTC: sync polarity: ")); int temp =
-			 * vgaIO.getReg8(NV8_MISCR); if (target.timing.flags &
-			 * B_POSITIVE_HSYNC) { LOG(2, ("H:pos ")); temp &= ~0x40; } else {
-			 * LOG(2, ("H:neg ")); temp |= 0x40; } if (target.timing.flags &
-			 * B_POSITIVE_VSYNC) { LOG(2, ("V:pos ")); temp &= ~0x80; } else {
-			 * LOG(2, ("V:neg ")); temp |= 0x80; }
+			 * LOG(2, ("CRTC: sync polarity: ")); int temp = vgaIO.getReg8(NV8_MISCR); if (target.timing.flags & B_POSITIVE_HSYNC) { LOG(2, ("H:pos ")); temp &= ~0x40; } else { LOG(2, ("H:neg "));
+			 * temp |= 0x40; } if (target.timing.flags & B_POSITIVE_VSYNC) { LOG(2, ("V:pos ")); temp &= ~0x80; } else { LOG(2, ("V:neg ")); temp |= 0x80; }
 			 */
 		}
 	}
@@ -591,7 +580,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 			vgaIO.setDACData(v); // b
 		}
 	}
-	
+
 	/**
 	 * Gets the hardware cursor implementation
 	 */

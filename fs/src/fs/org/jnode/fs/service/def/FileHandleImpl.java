@@ -33,7 +33,6 @@ public class FileHandleImpl implements VMFileHandle {
 	 * @param file
 	 * @param mode
 	 * @param fhm
-	 * @throws IOException
 	 */
 	public FileHandleImpl(FSFile file, VMOpenMode mode, FileHandleManager fhm) {
 		this.mode = mode;

@@ -21,6 +21,7 @@ public abstract class AbstractFrameBufferDriver extends Driver implements FrameB
 	/** My logger */
 	private final Logger log = Logger.getLogger(getClass());
 
+	/**Device name prefix of framebuffer devices */
 	public static final String FB_DEVICE_PREFIX = "fb";
 
 	/**

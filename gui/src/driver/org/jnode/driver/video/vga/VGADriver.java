@@ -12,7 +12,7 @@ import org.jnode.driver.video.AlreadyOpenException;
 import org.jnode.driver.video.FrameBufferConfiguration;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.UnknownConfigurationException;
-import org.jnode.driver.video.vgahw.*;
+import org.jnode.driver.video.vgahw.VgaConstants;
 import org.jnode.system.ResourceNotFreeException;
 
 /**
@@ -22,9 +22,7 @@ public class VGADriver extends AbstractFrameBufferDriver implements VgaConstants
 
 	static final IndexColorModel COLOR_MODEL = new IndexColorModel(4, 16, REDS, GREENS, BLUES);
 
-	private static final FrameBufferConfiguration[] CONFIGS = {
-		new VGAConfiguration(640, 480, COLOR_MODEL)
-	};
+	private static final FrameBufferConfiguration[] CONFIGS = { new VGAConfiguration(640, 480, COLOR_MODEL)};
 
 	private FrameBufferConfiguration currentConfig;
 	private VGASurface vga;
@@ -56,8 +54,7 @@ public class VGADriver extends AbstractFrameBufferDriver implements VgaConstants
 	/**
 	 * @see org.jnode.driver.video.FrameBufferAPI#open(org.jnode.driver.video.FrameBufferConfiguration)
 	 */
-	public synchronized Surface open(FrameBufferConfiguration config) 
-	throws UnknownConfigurationException, AlreadyOpenException, DeviceException {
+	public synchronized Surface open(FrameBufferConfiguration config) throws UnknownConfigurationException, AlreadyOpenException, DeviceException {
 		if (currentConfig != null) {
 			throw new AlreadyOpenException();
 		} else if (config.equals(CONFIGS[0])) {
@@ -75,7 +72,7 @@ public class VGADriver extends AbstractFrameBufferDriver implements VgaConstants
 	}
 
 	/**
-	 * @see org.jnode.driver.video.FrameBufferGraphics#close()
+	 * The given surface is closed.
 	 */
 	synchronized void close(VGASurface vga) {
 		vga = null;

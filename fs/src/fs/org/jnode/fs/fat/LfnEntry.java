@@ -4,7 +4,6 @@
 package org.jnode.fs.fat;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Vector;
 
 import org.jnode.fs.FSAccessRights;
@@ -20,8 +19,8 @@ class LfnEntry implements FSEntry {
 	// decompacted LFN entry
 	private String fileName;
 	// TODO: Make them available
-	private Date creationTime;
-	private Date lastAccessed;
+	//private Date creationTime;
+	//private Date lastAccessed;
 	private FatLfnDirectory parent;
 	private FatDirEntry realEntry;
 

@@ -20,7 +20,7 @@ public abstract class AbstractModelObject extends VmSystemObject {
 	 * @param name
 	 * @param required
 	 * @return The attribute
-	 * @throws DocumentException required is true, but the attribute was not found
+	 * @throws PluginException required is true, but the attribute was not found
 	 */
 	protected final String getAttribute(XMLElement e, String name, boolean required) 
 	throws PluginException { 

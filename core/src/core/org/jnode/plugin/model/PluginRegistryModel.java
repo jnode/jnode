@@ -115,8 +115,6 @@ public class PluginRegistryModel extends VmSystemObject implements PluginRegistr
 
 	/**
 	 * Resolve all plugin descriptors.
-	 * 
-	 * @param pluginFiles
 	 */
 	private void resolveDescriptors() throws PluginException {
 

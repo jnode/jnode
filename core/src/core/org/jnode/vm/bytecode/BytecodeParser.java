@@ -1034,7 +1034,7 @@ public class BytecodeParser {
 	
 	/**
 	 * Call the startInstruction method of the handler.
-	 * @param address
+	 * @param method
 	 */
 	protected void fireStartMethod(VmMethod method) {
 		handler.startMethod(method);

@@ -96,7 +96,7 @@ public interface ContentHandler
      *
      * @exception org.xml.sax.SAXException Any SAX exception, possibly
      *            wrapping another exception.
-     * @see #endDocument
+     * @see #endDocument()
      */
     public void startDocument ()
 	throws SAXException;
@@ -113,7 +113,7 @@ public interface ContentHandler
      *
      * @exception org.xml.sax.SAXException Any SAX exception, possibly
      *            wrapping another exception.
-     * @see #startDocument
+     * @see #startDocument()
      */
     public void endDocument()
 	throws SAXException;
@@ -154,8 +154,8 @@ public interface ContentHandler
      * @param uri The Namespace URI the prefix is mapped to.
      * @exception org.xml.sax.SAXException The client may throw
      *            an exception during processing.
-     * @see #endPrefixMapping
-     * @see #startElement
+     * @see #endPrefixMapping(String)
+     * @see #startElement(String, String, String, Attributes)
      */
     public void startPrefixMapping (String prefix, String uri)
 	throws SAXException;
@@ -174,8 +174,8 @@ public interface ContentHandler
      *	This is the empty string when a default mapping scope ends.
      * @exception org.xml.sax.SAXException The client may throw
      *            an exception during processing.
-     * @see #startPrefixMapping
-     * @see #endElement
+     * @see #startPrefixMapping(String, String)
+     * @see #endElement(String, String, String)
      */
     public void endPrefixMapping (String prefix)
 	throws SAXException;
@@ -240,7 +240,7 @@ public interface ContentHandler
      *        Attributes object.
      * @exception org.xml.sax.SAXException Any SAX exception, possibly
      *            wrapping another exception.
-     * @see #endElement
+     * @see #endElement(String, String, String)
      * @see org.xml.sax.Attributes
      */
     public void startElement (String uri, String localName,
@@ -314,7 +314,7 @@ public interface ContentHandler
      * @param length The number of characters to read from the array.
      * @exception org.xml.sax.SAXException Any SAX exception, possibly
      *            wrapping another exception.
-     * @see #ignorableWhitespace 
+     * @see #ignorableWhitespace(char[], int, int) 
      * @see org.xml.sax.Locator
      */
     public void characters (char ch[], int start, int length)
@@ -343,7 +343,7 @@ public interface ContentHandler
      * @param length The number of characters to read from the array.
      * @exception org.xml.sax.SAXException Any SAX exception, possibly
      *            wrapping another exception.
-     * @see #characters
+     * @see #characters(char[], int, int)
      */
     public void ignorableWhitespace (char ch[], int start, int length)
 	throws SAXException;

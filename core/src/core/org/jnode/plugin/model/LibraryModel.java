@@ -41,7 +41,7 @@ public class LibraryModel extends PluginModelObject implements Library {
 	/**
 	 * Resolve all references to (elements of) other plugin descriptors
 	 * 
-	 * @throws DocumentException
+	 * @throws PluginException
 	 */
 	protected void resolve() throws PluginException {
 		// Do nothing

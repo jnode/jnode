@@ -117,7 +117,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	/**
 	 * Resolve all references to (elements of) other plugin descriptors
 	 * 
-	 * @throws DocumentException
+	 * @throws PluginException
 	 */
 	protected void resolve() throws PluginException {
 		for (int i = 0; i < extensions.length; i++) {

@@ -38,17 +38,16 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements 
 	}
 
 	/**
-	 * @see org.jnode.vm.compiler.Compiler#createNativeStream(org.jnode.assembler.ObjectResolver)
+	 * @see org.jnode.vm.compiler.NativeCodeCompiler#createNativeStream(org.jnode.assembler.ObjectResolver)
 	 */
 	public NativeStream createNativeStream(ObjectResolver resolver) {
-		final X86Stream os = new X86Stream((X86CpuID)Unsafe.getCurrentProcessor().getCPUID(), 0);
+		final X86Stream os = new X86Stream((X86CpuID) Unsafe.getCurrentProcessor().getCPUID(), 0);
 		os.setResolver(resolver);
 		return os;
 	}
 
 	/**
-	 * @see org.jnode.vm.compiler.Compiler#doCompileAbstract(org.jnode.vm.classmgr.VmMethod,
-	 *      org.jnode.assembler.NativeStream, int, boolean)
+	 * @see org.jnode.vm.compiler.NativeCodeCompiler#doCompileAbstract(org.jnode.vm.classmgr.VmMethod, org.jnode.assembler.NativeStream, int, boolean)
 	 */
 	protected final CompiledMethod doCompileAbstract(VmMethod method, NativeStream nos, int level, boolean isBootstrap) {
 		if (isBootstrap) {
@@ -84,7 +83,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements 
 	protected final X86CompilerContext getContext() {
 		return this.context;
 	}
-	
+
 	/**
 	 * @see org.jnode.vm.compiler.NativeCodeCompiler#dumpStatistics()
 	 */

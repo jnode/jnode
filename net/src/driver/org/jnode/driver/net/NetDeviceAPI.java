@@ -49,7 +49,7 @@ public interface NetDeviceAPI extends DeviceAPI {
 	 * @param packet The network packet to transmit. No linklayer header has
 	 * been added yet.
 	 * @param destination The destination address, or null for a broadcast. 
-	 * @throws IOException
+	 * @throws NetworkException
 	 */
 	public void transmit(SocketBuffer packet, HardwareAddress destination)
 	throws NetworkException;
