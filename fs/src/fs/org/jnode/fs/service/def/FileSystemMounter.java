@@ -119,7 +119,7 @@ final class FileSystemMounter implements DeviceListener, QueueProcessor {
      * @param api
      */
     protected void tryToMount(Device device, FSBlockDeviceAPI api,
-            boolean removable) {
+            boolean removable, boolean readOnly) {
 
         if (fileSystemService.getFileSystem(device) != null) {
             log.info("device already mounted...");
@@ -143,7 +143,7 @@ final class FileSystemMounter implements DeviceListener, QueueProcessor {
                 final FileSystemType fst = (FileSystemType) i.next();
                 if (fst.supports(ptEntry, bs, api)) {
                     try {
-                        final FileSystem fs = fst.create(device);
+                        final FileSystem fs = fst.create(device, readOnly);
                         fileSystemService.registerFileSystem(fs);
                         log.info("Mounted " + fst.getName() + " on "
                                 + device.getId());
@@ -168,10 +168,11 @@ final class FileSystemMounter implements DeviceListener, QueueProcessor {
         try {
             final FSBlockDeviceAPI api = (FSBlockDeviceAPI) device
                     .getAPI(FSBlockDeviceAPI.class);
+            final boolean readOnly = false; //TODO: read from config
             if (device.implementsAPI(RemovableDeviceAPI.class)) {
-                tryToMount(device, api, true);
+                tryToMount(device, api, true, readOnly);
             } else {
-                tryToMount(device, api, false);
+                tryToMount(device, api, false, readOnly);
             }
         } catch (ApiNotFoundException ex) {
             // Just ignore this device.
