@@ -13,7 +13,7 @@
         
   <runtime>
     <library name="jnode-net.jar">
-      <export name="org.jnode.driver.net.ethernet.*"/>
+      <export name="org.jnode.driver.net.ethernet.spi.*"/>
       <export name="org.jnode.net.ethernet.*"/>
     </library>
   </runtime>

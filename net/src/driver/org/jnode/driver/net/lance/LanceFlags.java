@@ -3,7 +3,7 @@
  */
 package org.jnode.driver.net.lance;
 
-import org.jnode.driver.net.ethernet.Flags;
+import org.jnode.driver.net.ethernet.spi.Flags;
 
 /**
  * @author epr

@@ -8,9 +8,9 @@ import java.security.PrivilegedExceptionAction;
 import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.DriverException;
-import org.jnode.driver.net.AbstractDeviceCore;
 import org.jnode.driver.net.NetworkException;
-import org.jnode.driver.net.ethernet.Flags;
+import org.jnode.driver.net.ethernet.spi.Flags;
+import org.jnode.driver.net.spi.AbstractDeviceCore;
 import org.jnode.driver.pci.PCIBaseAddress;
 import org.jnode.driver.pci.PCIConstants;
 import org.jnode.driver.pci.PCIDevice;

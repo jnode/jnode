@@ -16,6 +16,7 @@
   <runtime>
     <library name="jnode-net.jar">
       <export name="org.jnode.driver.net.*"/>
+      <export name="org.jnode.driver.net.spi.*"/>
       <export name="org.jnode.net.*"/>
       <export name="org.jnode.net.ethernet.*"/>
       <export name="org.jnode.net.service.*"/>

@@ -4,7 +4,7 @@
 
 package org.jnode.driver.net.rtl8139;
 
-import org.jnode.driver.net.ethernet.Flags;
+import org.jnode.driver.net.ethernet.spi.Flags;
 
 
 /**

@@ -3,8 +3,8 @@
  */
 package org.jnode.driver.net.loopback;
 
-import org.jnode.driver.net.AbstractNetDriver;
 import org.jnode.driver.net.NetworkException;
+import org.jnode.driver.net.spi.AbstractNetDriver;
 import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
 import org.jnode.net.ethernet.EthernetAddress;
@@ -37,7 +37,7 @@ public class LoopbackDriver extends AbstractNetDriver implements EthernetConstan
 	}
 
 	/**
-	 * @see org.jnode.driver.net.AbstractNetDriver#doTransmit(SocketBuffer, HardwareAddress)
+	 * @see org.jnode.driver.net.spi.AbstractNetDriver#doTransmit(SocketBuffer, HardwareAddress)
 	 */
 	protected void doTransmit(SocketBuffer skbuf, HardwareAddress destination) throws NetworkException {
 		skbuf.setDevice(getDevice());
@@ -45,7 +45,7 @@ public class LoopbackDriver extends AbstractNetDriver implements EthernetConstan
 	}
 	
 	/**
-	 * @see org.jnode.driver.net.AbstractNetDriver#getDevicePrefix()
+	 * @see org.jnode.driver.net.spi.AbstractNetDriver#getDevicePrefix()
 	 */
 	protected String getDevicePrefix() {
 		return LOOPBACK_DEVICE_PREFIX;
