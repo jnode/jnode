@@ -101,7 +101,7 @@ final class FinalizerThread extends Thread {
      * are unreachable and still need finalization.
      */
     private final void runFinalization() {
-        VmAbstractHeap heap = heapManager.getFirstHeap();
+        VmAbstractHeap heap = heapManager.getHeapList();
         while (heap != null) {
             visitor.setCurrentHeap(heap);
             heap.walk(visitor, true, ObjectFlags.GC_COLOUR_MASK, ObjectFlags.GC_YELLOW);

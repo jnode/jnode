@@ -142,6 +142,9 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 
         final int totalSize = alignedSize + headerSize;
         final Object tib = vmClass.getTIB();
+        if (tib == null) {
+            throw new IllegalArgumentException("vmClass.TIB is null");
+        }
         //final int size = getSize();
         final int tibOffset = this.tibOffset;
         final int headerSize = this.headerSize;
@@ -177,6 +180,14 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
             if (curFreeSize > totalSize) {
                 // Block is larger then we need, split it up.
                 final int newFreeSize = curFreeSize - totalSize;
+                /*if (newFreeSize <= headerSize) {
+                    Unsafe.debug("Block splitup failed");
+                    Unsafe.debug("\ncurFreeSize "); Unsafe.debug(curFreeSize);
+                    Unsafe.debug("\ntotalSize   "); Unsafe.debug(totalSize);
+                    Unsafe.debug("\nnewFreeSize "); Unsafe.debug(newFreeSize);
+                    Unsafe.debug("\nheaderSize  "); Unsafe.debug(headerSize);
+                    throw new Error("Block splitup failed");
+                }*/
                 final Address newFreePtr = Address.add(objectPtr, totalSize);
                 // Set the header for the remaining free block
                 helper.setInt(newFreePtr, sizeOffset, newFreeSize);
