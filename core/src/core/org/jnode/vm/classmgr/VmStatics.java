@@ -101,8 +101,10 @@ public final class VmStatics extends VmSystemObject {
 	 * 
 	 * @return the index of the allocated entry.
 	 */
-	final int allocMethod() {
-		return alloc(TYPE_METHOD, slotLength);
+	final int allocMethod(VmMethod method) {
+		final int idx = alloc(TYPE_METHOD, slotLength);
+		setRawObject(idx, method);
+		return idx;
 	}
 
 	/**
@@ -136,7 +138,7 @@ public final class VmStatics extends VmSystemObject {
 		setRawObject(idx, value);
 	}
 
-	final void setMethod(int idx, VmMethod value) {
+	/*final void setMethod(int idx, VmMethod value) {
 		if (locked) {
 			throw new RuntimeException("Locked");
 		}
@@ -144,7 +146,7 @@ public final class VmStatics extends VmSystemObject {
 			throw new IllegalArgumentException("Type error " + types[idx]);
 		}
 		setRawObject(idx, value);
-	}
+	}*/
 
 	private final void setRawObject(int idx, Object value) {
 		if (objects != null) {

@@ -16,10 +16,7 @@ public abstract class VmMethod extends VmMember {
     /** Address of native code of this method */
     private Address nativeCode;
 
-    /** #Arguments of this method */
-    private final int noArgs;
-
-    /** #Slots taken by arguments of this method */
+    /** #Slots taken by arguments of this method (including this pointer) */
     private final int argSlotCount;
 
     /** #Invocations of this method */
@@ -76,37 +73,38 @@ public abstract class VmMethod extends VmMember {
      * @param signature
      * @param modifiers
      * @param declaringClass
-     * @param noArgs
-     * @param selectorMap
      */
     protected VmMethod(String name, String signature, int modifiers,
-            VmType declaringClass, int noArgs, SelectorMap selectorMap,
-            int staticsIdx) {
-        this(name, signature, modifiers, declaringClass, noArgs, selectorMap
-                .get(name, signature), staticsIdx);
-    }
-
-    /**
-     * Constructor for VmMethod.
-     * 
-     * @param name
-     * @param signature
-     * @param modifiers
-     * @param declaringClass
-     * @param noArgs
-     * @param selector
-     */
-    protected VmMethod(String name, String signature, int modifiers,
-            VmType declaringClass, int noArgs, int selector, int staticsIdx) {
-        super(name, signature, modifiers, declaringClass);
-        this.noArgs = noArgs;
-        this.argSlotCount = Signature.getArgSlotCount(signature);
+            VmType declaringClass) {
+        super(name, signature, modifiers /*| (declaringClass.isFinal() ? Modifier.ACC_FINAL : 0)*/, declaringClass);
+        this.argSlotCount = Signature.getArgSlotCount(signature)
+                + (isStatic() ? 0 : 1);
         this.returnVoid = (signature.endsWith("V"));
         char firstReturnSignatureChar = signature
                 .charAt(signature.indexOf(')') + 1);
         this.returnObject = (firstReturnSignatureChar == '[' || firstReturnSignatureChar == 'L');
-        this.selector = selector;
-        this.staticsIndex = staticsIdx;
+        final VmClassLoader cl = declaringClass.getLoader();
+        if (isStatic()) {
+            this.selector = 0;
+        } else {
+            this.selector = cl.getSelectorMap().get(name, signature);
+        }
+        this.staticsIndex = cl.getStatics().allocMethod(this);
+    }
+
+    /**
+     * Initialize this instance, copy the given method.
+     * 
+     * @param src
+     *            The method that is copied.
+     */
+    protected VmMethod(VmMethod src) {
+        super(src.name, src.signature, src.getModifiers(), src.declaringClass);
+        this.argSlotCount = src.argSlotCount;
+        this.returnVoid = src.returnVoid;
+        this.returnObject = src.returnObject;
+        this.selector = src.selector;
+        this.staticsIndex = src.staticsIndex;
     }
 
     /**
@@ -160,15 +158,6 @@ public abstract class VmMethod extends VmMember {
      */
     public int getBytecodeSize() {
         return (bytecode == null) ? 0 : bytecode.getLength();
-    }
-
-    /**
-     * Get the number of arguments
-     * 
-     * @return Number of arguments
-     */
-    public int getNoArgs() {
-        return noArgs;
     }
 
     /**
@@ -411,7 +400,8 @@ public abstract class VmMethod extends VmMember {
     }
 
     /**
-     * Gets the number of argument slots.
+     * Gets the number of stack slots used by the arguments of this method.
+     * This number included the slot for "this" on non-static fields.
      * 
      * @return int
      */
@@ -485,9 +475,7 @@ public abstract class VmMethod extends VmMember {
     }
 
     public void testNativeCode() {
-        if (declaringClass.isInterface()) {
-            return;
-        }
+        if (declaringClass.isInterface()) { return; }
         if (nativeCode == null) {
             System.err.println("nativeCode == null in " + this);
         } else {

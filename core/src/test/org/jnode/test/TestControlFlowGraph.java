@@ -33,10 +33,10 @@ public class TestControlFlowGraph {
 	
 	private static void TestCFG(VmMethod method) {
 		final VmByteCode bc = method.getBytecode();
-		System.out.println("Method " + method);
-		System.out.println("MaxStack " + bc.getMaxStack());
-		System.out.println("#Locals  " + bc.getNoLocals());
-		System.out.println("#Args    " + method.getNoArgs());
+		System.out.println("Method     " + method);
+		System.out.println("MaxStack   " + bc.getMaxStack());
+		System.out.println("#Locals    " + bc.getNoLocals());
+		System.out.println("#Arg slots " + method.getArgSlotCount());
 		final ControlFlowGraph cfg = new ControlFlowGraph(method.getBytecode());
 		BytecodeParser.parse(method.getBytecode(), new BytecodeViewer(cfg));
 

@@ -29,7 +29,7 @@ public class InlineTestClass {
         int y = virtualFinalGetX();
         y += virtualNonFinalGetXa(this);
         //y += privateGetXai(this, 5);
-        //y += staticGetXai(this, 3);
+        y += staticGetXai(this, 3);
         //y += staticRecursiveGetXai(this, 3);
     }
 
