@@ -198,11 +198,11 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         // Nothing to do here
     }
 
-    private void assertCondition(boolean cond) {
+    private final void assertCondition(boolean cond) {
         if (!cond) throw new Error("assert failed");
     }
 
-    private void notImplemented() {
+    private final void notImplemented() {
         throw new Error("NotImplemented");
     }
 
@@ -217,7 +217,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @param reg the register to reserve
      * @param it the item requiring the register
      */
-    private void requestRegister(Register reg, Item it) {
+    private final void requestRegister(Register reg, Item it) {
         X86RegisterPool pool = eContext.getPool();
         
         // check item doesn't already use register
@@ -231,7 +231,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         }
     }
     
-    private void prepareForOperation(Item destAndSource, Item source) {
+    private final void prepareForOperation(Item destAndSource, Item source) {
         // WARNING: source was on top of the virtual stack (thus higher than
         // destAndSource)
         // x86 can only deal with one complex argument
@@ -894,12 +894,15 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dup()
      */
     public final void visit_dup() {
-        Item v1 = vstack.popItem();
-        vstack.pushItem(v1.clone(eContext));
-        vstack.pushItem(v1);
-
-//        os.writeMOV(INTSIZE, T0, SP, 0); // Value1, leave on stack
-//        helper.writePUSH(T0);
+        if (vstack.isEmpty()) {
+	    // do not use vstack here because no item type is available
+            os.writeMOV(INTSIZE, T0, SP, 0); // Value1, leave on stack
+            helper.writePUSH(T0);
+	} else {
+            Item v1 = vstack.popItem();
+            vstack.pushItem(v1.clone(eContext));
+            vstack.pushItem(v1);
+	}
     }
 
     /**
@@ -1965,11 +1968,20 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
 	vstack.pushItem(res);
     }
 
-    private void pushReturnValue(String signature) {
-        char t = signature.charAt(signature.length() - 1);
+    private final void pushReturnValue(String signature) {
+        char t = signature.charAt(signature.indexOf(')') + 1);
         if (t != 'V') {
             int type = Item.SignatureToType(t);
             vstack.pushStack(type);
+        }
+    }
+
+    private final void dropParameters(VmMethod method, boolean hasSelf) {
+        //TODO: check parameter types
+	final int count = method.getNoArguments() + ((hasSelf) ? 1 : 0);
+        for (int i = 0; (!vstack.isEmpty() && (i < count)); i++) {
+            Item v = vstack.popItem();
+            v.release(eContext);
         }
     }
 
@@ -2006,13 +2018,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         final Label endLabel = new Label(this.curInstrLabel + "End");
 
         // remove parameters from vstack
-        final int nofArgs = method.getNoArguments();
-        for (int i = 0; i < nofArgs; i++) {
-            //TODO: check parameter type
-            Item v = vstack.popItem();
-            v.release(eContext);
-        }
-        //TODO: guess: self is part of the parameters
+	dropParameters(method, true);
 
         // Get objectref -> EBX
         os.writeMOV(INTSIZE, Register.EBX, SP, argSlotCount * slotSize);
@@ -2103,12 +2109,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         try {
             final VmMethod sm = methodRef.getResolvedVmMethod();
 
-            final int nofArgs = sm.getNoArguments();
-            for (int i = 0; i < nofArgs; i++) {
-                //TODO: check parameter type
-                Item v = vstack.popItem();
-                v.release(eContext);
-            }
+	    dropParameters(sm, true);
 
             // Get method from statics table
             helper.writeGetStaticsEntry(curInstrLabel, EAX, sm);
@@ -2142,12 +2143,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         final VmStaticMethod sm = (VmStaticMethod) methodRef
                 .getResolvedVmMethod();
 
-        final int nofArgs = sm.getNoArguments();
-        for (int i = 0; i < nofArgs; i++) {
-            //TODO: check parameter type
-            Item v = vstack.popItem();
-            v.release(eContext);
-        }
+	dropParameters(sm, false);
 
         // Get static field object
         helper.writeGetStaticsEntry(curInstrLabel, EAX, sm);
@@ -2167,12 +2163,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         methodRef.resolve(loader);
         final VmMethod mts = methodRef.getResolvedVmMethod();
 
-        final int nofArgs = mts.getNoArguments();
-        for (int i = 0; (!vstack.isEmpty() && (i < nofArgs)); i++) {
-            //TODO: check parameter type
-            Item v = vstack.popItem();
-            v.release(eContext);
-        }
+	dropParameters(mts, true);
 
         if (mts.isStatic()) { throw new IncompatibleClassChangeError(
                 "Static method in invokevirtual"); }
@@ -2758,7 +2749,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     public final void visit_lshl() {
         //TODO: port to orp-style
         vstack.push(eContext);
-        Item v2 = vstack.popItem(Item.LONG);
+        Item v2 = vstack.popItem(Item.INT);
         Item v1 = vstack.popItem(Item.LONG);
         v2.release(eContext);
         v1.release(eContext);
@@ -2790,7 +2781,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     public final void visit_lshr() {
         //TODO: port to orp-style
         vstack.push(eContext);
-        Item v2 = vstack.popItem(Item.LONG);
+        Item v2 = vstack.popItem(Item.INT);
         Item v1 = vstack.popItem(Item.LONG);
         v2.release(eContext);
         v1.release(eContext);
@@ -3005,30 +2996,32 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         os.writeNOP();
     }
 
+    private final void generic_pop(int size) {
+        if (vstack.isEmpty()) {
+            os.writeLEA(SP, SP, size);
+	} else {
+            Item v = vstack.popItem();
+            assertCondition(v.getCategory() == (size >> 2));
+            if (v.getKind() == Item.STACK) {
+                os.writeLEA(SP, SP, size);
+            } else {
+                v.release(eContext);
+            }
+	}
+    }
+
     /**
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_pop()
      */
     public final void visit_pop() {
-        Item v = vstack.popItem();
-        assertCondition(v.getCategory() == 1);
-        if (v.getKind() == Item.STACK) {
-            os.writeLEA(SP, SP, 4);
-        } else {
-            v.release(eContext);
-        }
+        generic_pop(4);
     }
 
     /**
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_pop2()
      */
     public final void visit_pop2() {
-        Item v = vstack.popItem();
-        assertCondition(v.getCategory() == 2);
-        if (v.getKind() == Item.STACK) {
-            os.writeLEA(SP, SP, 8);
-        } else {
-            v.release(eContext);
-        }
+        generic_pop(8);
     }
 
     /**
@@ -3045,13 +3038,21 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         final int offset = inf.getOffset();
         final boolean wide = fieldRef.isWide();
 
-        if (!wide) {
-            vstack.push(eContext);
+        vstack.push(eContext);
+	if (!vstack.isEmpty()) {
             Item val = vstack.popItem();
-            RefItem ref = vstack.popRef();
+	    assertCondition(val.getCategory() == ((wide) ? 2 : 1));
+	    if (!vstack.isEmpty()) {
+                RefItem ref = vstack.popRef();
+		// in fact, should release val first, in case they are on
+		// stack, but the invariant allows this (if ref is on stack,
+		// then so is val)
+                ref.release(eContext);
+	    }
             val.release(eContext);
-            ref.release(eContext);
+	}
 
+        if (!wide) {
             // Decide whether to use a big switch on the type of to
             // implement this in the item (putStatic and putField)
 
@@ -3075,13 +3076,6 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             //            ref.release();
 
         } else {
-            //IMPROVE: 64bit operations
-            vstack.push(eContext);
-            Item val = vstack.popItem();
-            RefItem ref = vstack.popRef();
-            val.release(eContext);
-            ref.release(eContext);
-
             /* Value LSB -> T0 */
             helper.writePOP(T0);
             /* Value MSB -> T1 */
@@ -3139,6 +3133,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      */
     public final void visit_return() {
         stackFrame.emitReturn();
+        assertCondition(vstack.isEmpty());
     }
 
     /**
