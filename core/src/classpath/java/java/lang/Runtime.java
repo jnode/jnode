@@ -342,15 +342,15 @@ public class Runtime
     if (sm != null)
       sm.checkPermission(new RuntimePermission("shutdownHooks"));
     if (hook.isAlive() || hook.getThreadGroup() == null)
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("The hook thread " + hook + " must not have been already run or started");
     synchronized (libpath)
       {
         if (exitSequence != null)
-          throw new IllegalStateException();
+          throw new IllegalStateException("The Virtual Machine is exiting. It is not possible anymore to add any hooks");
         if (shutdownHooks == null)
           shutdownHooks = new HashSet(); // Lazy initialization.
         if (! shutdownHooks.add(hook))
-          throw new IllegalArgumentException();
+          throw new IllegalArgumentException(hook.toString() + " had already been inserted");
       }
 	}
 

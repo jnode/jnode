@@ -18,6 +18,7 @@ import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.DeviceUtils;
 import org.jnode.net.SocketBuffer;
 import org.jnode.net.ethernet.EthernetConstants;
+import org.jnode.system.BootLog;
 import org.jnode.util.Queue;
 
 /**
@@ -160,6 +161,9 @@ public abstract class AbstractDatagramSocketImpl
 				case SO_TIMEOUT :
 					timeout = ((Integer)val).intValue();
 					break;
+				case SO_REUSEADDR:
+				    // Ignored for now
+				    break;
 				default :
 					doSetOption(option_id, val);
 			}
@@ -172,7 +176,7 @@ public abstract class AbstractDatagramSocketImpl
 
 	protected void doSetOption(int option_id, Object val) 
 	throws SocketException {
-		throw new SocketException("Unknown option " + option_id);
+		BootLog.error("Unknown option " + option_id);
 	}
 
 	/**

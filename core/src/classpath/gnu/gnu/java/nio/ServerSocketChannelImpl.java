@@ -1,5 +1,5 @@
 /* ServerSocketChannelImpl.java -- 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,67 +35,100 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package gnu.java.nio;
 
+import gnu.java.net.PlainSocketImpl;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.nio.channels.ClosedChannelException;
+import java.nio.channels.NotYetBoundException;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
 
-class ServerSocketChannelImpl extends ServerSocketChannel {
-	ServerSocket sock_object;
-	int fd;
-	int local_port;
-	boolean blocking = true;
-	boolean connected = false;
-	InetSocketAddress sa;
+public final class ServerSocketChannelImpl extends ServerSocketChannel
+{
+  private NIOServerSocket serverSocket;
+  private boolean connected;
 
-	//   private static native int NioSocketAccept (ServerSocketChannelImpl server, 
-	//                                              SocketChannelImpl s);
-
-	private static int NioSocketAccept(ServerSocketChannelImpl server, SocketChannelImpl s) {
-		return 0;
+  protected ServerSocketChannelImpl (SelectorProvider provider)
+    throws IOException
+  {
+    super (provider);
+    serverSocket = new NIOServerSocket (this);
+    configureBlocking(true);
 	}
 
-	protected ServerSocketChannelImpl(SelectorProvider provider) {
-		super(provider);
-		fd = SocketChannelImpl.SocketCreate();
-
-		try {
-			sock_object = new ServerSocket();
-		} catch (IOException e) {
-			System.err.println("ServerSocket could not be created.");
-		}
+  public int getNativeFD()
+  {
+    return serverSocket.getPlainSocketImpl().getNativeFD();
 	}
 
-	public void finalizer() {
-		if (connected) {
-			try {
-				close();
-			} catch (Exception e) {
+  public void finalizer()
+  {
+    if (connected)
+      {
+        try
+          {
+            close ();
+          }
+        catch (Exception e)
+          {
 			}
 		}
 	}
 
-	protected void implCloseSelectableChannel() {
+  protected void implCloseSelectableChannel () throws IOException
+  {
 		connected = false;
-		SocketChannelImpl.SocketClose(fd);
-		fd = SocketChannelImpl.SocketCreate();
+    serverSocket.close();
 	}
 
-	protected void implConfigureBlocking(boolean block) {
+  protected void implConfigureBlocking (boolean blocking) throws IOException
+  {
+    serverSocket.setSoTimeout (blocking ? 0 : NIOConstants.DEFAULT_TIMEOUT);
 	}
 
-	public SocketChannel accept() {
-		SocketChannelImpl result = new SocketChannelImpl(provider());
-		result.sa = new InetSocketAddress(0);
-		int res = NioSocketAccept(this, result);
-		return result;
+  public SocketChannel accept () throws IOException
+  {
+    if (!isOpen())
+      throw new ClosedChannelException();
+
+    if (!serverSocket.isBound())
+      throw new NotYetBoundException();
+
+    boolean completed = false;
+    
+    try
+      {
+        begin();
+        serverSocket.getPlainSocketImpl().setInChannelOperation(true);
+          // indicate that a channel is initiating the accept operation
+          // so that the socket ignores the fact that we might be in
+          // non-blocking mode.
+        NIOSocket socket = (NIOSocket) serverSocket.accept();
+        completed = true;
+        return socket.getChannel();
+      }
+    catch (SocketTimeoutException e)
+      {
+        return null;
+      }
+    finally
+      {
+        serverSocket.getPlainSocketImpl().setInChannelOperation(false);
+        end (completed);
+      }
 	}
 
-	public ServerSocket socket() {
-		return sock_object;
+  public ServerSocket socket ()
+  {
+    return serverSocket;
 	}
 }

@@ -37,7 +37,7 @@ exception statement from your version. */
 
 package java.nio.channels;
 
-public interface ByteChannel
-  extends ReadableByteChannel, WritableByteChannel
+public interface ByteChannel extends ReadableByteChannel,
+                                     WritableByteChannel
 {
 }

@@ -1,5 +1,5 @@
 /* StubDelegateImpl.java -- 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -52,7 +52,6 @@ import java.rmi.RemoteException;
 import javax.rmi.CORBA.Stub;
 import javax.rmi.CORBA.StubDelegate;
 import javax.rmi.CORBA.Tie;
-import javax.rmi.CORBA.StubDelegate;
 
 public class StubDelegateImpl
   implements StubDelegate

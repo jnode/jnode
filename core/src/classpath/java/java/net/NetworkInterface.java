@@ -79,6 +79,7 @@ public final class NetworkInterface {
      * @return An enumeration of all addresses.
      */
     public Enumeration getInetAddresses() {
+        // @vm-specific
         final Vector list = new Vector(VMNetUtils.getAPI().getInetAddresses(
                 device));
         return list.elements();

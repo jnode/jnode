@@ -739,7 +739,7 @@ finalize()
 public String
 toString()
 {
-  return(super.toString());
+  return getClass ().getName () + "[font=" + getFont () + ",color=" + getColor () + "]";
 }
 
 public boolean
