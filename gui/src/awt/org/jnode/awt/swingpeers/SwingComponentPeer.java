@@ -193,7 +193,7 @@ class SwingComponentPeer implements ComponentPeer {
 
     // Events
     public void handleEvent(AWTEvent e) {
-    	log.debug("handleEvent(" + e + ")");
+    	//log.debug("handleEvent(" + e + ")");
         //System.err.println(e);
     }
 

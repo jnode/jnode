@@ -167,7 +167,7 @@ public class AWTTest {
     public static void main(String[] args) throws InterruptedException {
         boolean useDoubleBuffer = (args.length > 0) && args[0].equals("buffer");
         
-        final Frame wnd = new Frame();
+        final Frame wnd = new Frame("AWTTest");
         try {
         	//wnd.setSize(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getSize());
             wnd.setSize(600, 400);
@@ -179,7 +179,7 @@ public class AWTTest {
             l.add("Item 1");
             l.add("Item 2");
             l.add("Item 3");
-            wnd.add(l, BorderLayout.CENTER);
+            wnd.add(l, BorderLayout.NORTH);
             
             final Button b = new Button("Hello world");
             b.addActionListener(new ActionListener() {
@@ -201,52 +201,62 @@ public class AWTTest {
                     }
                     default:
                         b.setLabel(String.valueOf(i));
+                    	wnd.setVisible(false);
                     }
                     i++;
                     wnd.validate();
                 }
             });
-            wnd.add(b, BorderLayout.NORTH);
+            wnd.add(b, BorderLayout.CENTER);
             b.setBackground(Color.YELLOW);
             
             final Button b2 = new Button("Left");
+            final Scrollbar sb = new Scrollbar(Scrollbar.HORIZONTAL);
+            final Checkbox cb1 = new Checkbox("Right");
+
             wnd.add(b2, BorderLayout.WEST);
             b2.setBackground(Color.RED);
+            b2.addActionListener(new ActionListener() {
+            	public void actionPerformed(ActionEvent e) {
+            		System.out.println("Action on b2");
+            		if (sb.getValue() + sb.getBlockIncrement() <= sb.getMaximum()) {
+            			sb.setValue(sb.getValue() + sb.getBlockIncrement());
+            		} else {
+            			Frame f2 = new Frame("New frame");
+            			f2.setSize(200, 100);
+            			f2.show();
+            		}
+            	}
+            });
             
-            final Checkbox cb1 = new Checkbox("Right");
             wnd.add(cb1, BorderLayout.EAST);
             cb1.setBackground(Color.WHITE);
             
-            wnd.add(new Scrollbar(Scrollbar.HORIZONTAL), BorderLayout.SOUTH);
-            //wnd.add(new TestComponent(useDoubleBuffer), BorderLayout.CENTER);
-            //wnd.add(new TestComponent(useDoubleBuffer), BorderLayout.CENTER);
-            b.requestFocus();
+            wnd.add(sb, BorderLayout.SOUTH);
             wnd.show();
-            Font f = wnd.getFont();
-            System.out.println(f.getName());
-            wnd.getFontMetrics(f);
 
-            Thread.sleep(5000);
-            b2.setBackground(Color.RED);
-
+            while (wnd.isVisible()) {
+            	Thread.sleep(500);
+            }
+            
 
 //            Font f = wnd.getFont();
 //            System.out.println(f.getName());
 //            wnd.getFontMetrics(f);
 
-            for (int i = 0; i < 30; i++) {
-            	wnd.setLocation(wnd.getX() + 5, wnd.getY() + 4);
-            	if ((i % 10) == 0) {
-            		cb1.setState(!cb1.getState());
-            		Thread.sleep(2500);
-            	} else {
-            		if ((i % 5) == 0) {
-            			// Intended mixing of width & height, just for the fun of the test
-            			wnd.setSize(wnd.getHeight(), wnd.getWidth());
-            		}
-            		Thread.sleep(100);
-            	}
-            }
+//            for (int i = 0; i < 30; i++) {
+//            	wnd.setLocation(wnd.getX() + 5, wnd.getY() + 4);
+//            	if ((i % 10) == 0) {
+//            		cb1.setState(!cb1.getState());
+//            		Thread.sleep(2500);
+//            	} else {
+//            		if ((i % 5) == 0) {
+//            			// Intended mixing of width & height, just for the fun of the test
+//            			wnd.setSize(wnd.getHeight(), wnd.getWidth());
+//            		}
+//            		Thread.sleep(100);
+//            	}
+//            }
             
             Thread.sleep(5000);
 
