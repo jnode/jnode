@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package java.lang;
 
 import org.jnode.vm.VmSystem;
@@ -32,6 +32,30 @@ import org.jnode.vm.classmgr.VmType;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 final class VMClassLoader {
+
+	/**
+	 * Helper to get a package from the bootstrap class loader. The default
+	 * implementation of returning null may be adequate, or you may decide that
+	 * this needs some native help.
+	 * 
+	 * @param name
+	 *            the name to find
+	 * @return the named package, if it exists
+	 */
+	static Package getPackage(String name) {
+		return null;
+	}
+
+	/**
+	 * Helper to get all packages from the bootstrap class loader. The default
+	 * implementation of returning an empty array may be adequate, or you may
+	 * decide that this needs some native help.
+	 * 
+	 * @return all named packages, if any exist
+	 */
+	static Package[] getPackages() {
+		return new Package[0];
+	}
 
 	/**
 	 * Gets a primitive class of a given type.

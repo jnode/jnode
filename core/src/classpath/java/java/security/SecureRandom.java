@@ -112,6 +112,10 @@ public class SecureRandom extends Random
 			provider = p[i];
 			return;
 		      }
+                    catch (ThreadDeath death)
+                      {
+                        throw death;
+                      }
                     catch (Throwable t)
 		      {
 			// Ignore.
@@ -214,7 +218,7 @@ public class SecureRandom extends Random
 
     Provider p = Security.getProvider(provider);
     if (p == null)
-      throw new NoSuchProviderException();
+      throw new NoSuchProviderException(provider);
     
     return getInstance(algorithm, p);
   }

@@ -39,6 +39,7 @@ exception statement from your version. */
 package java.lang;
 
 import gnu.classpath.SystemProperties;
+import gnu.classpath.VMStackWalker;
 
 import java.io.File;
 import java.io.IOException;
@@ -628,16 +629,33 @@ public class Runtime
    * before the final ".so" if the VM was invoked by the name "java_g". There
    * may be a security check, of <code>checkLink</code>.
 	 * 
+   * <p>
+   * The library is loaded using the class loader associated with the
+   * class associated with the invoking method.
+   *
    * @param filename the file to load
    * @throws SecurityException if permission is denied
    * @throws UnsatisfiedLinkError if the library is not found
 	 */
   public void load(String filename)
   {
+    load(filename, VMStackWalker.getCallingClassLoader());
+  }
+
+  /**
+   * Same as <code>load(String)</code> but using the given loader.
+   *
+   * @param filename the file to load
+   * @param loader class loader, or <code>null</code> for the boot loader
+   * @throws SecurityException if permission is denied
+   * @throws UnsatisfiedLinkError if the library is not found
+   */
+  void load(String filename, ClassLoader loader)
+  {
     SecurityManager sm = SecurityManager.current; // Be thread-safe!
     if (sm != null)
       sm.checkLink(filename);
-    if (loadLib(filename) == 0)
+    if (loadLib(filename, loader) == 0)
       throw new UnsatisfiedLinkError("Could not load library " + filename);
   }
 
@@ -645,15 +663,16 @@ public class Runtime
    * Do a security check on the filename and then load the native library.
    *
    * @param filename the file to load
+   * @param loader class loader, or <code>null</code> for the boot loader
    * @return 0 on failure, nonzero on success
    * @throws SecurityException if file read permission is denied
    */
-  private static int loadLib(String filename)
+  private static int loadLib(String filename, ClassLoader loader)
   {
     SecurityManager sm = SecurityManager.current; // Be thread-safe!
     if (sm != null)
       sm.checkRead(filename);
-    return VMRuntime.nativeLoad(filename);
+    return VMRuntime.nativeLoad(filename, loader);
 	}
 
   /**
@@ -668,6 +687,10 @@ public class Runtime
    * <code>System.mapLibraryName(libname)</code>. There may be a security
    * check, of <code>checkLink</code>.
    *
+   * <p>
+   * The library is loaded using the class loader associated with the
+   * class associated with the invoking method.
+   *
    * @param libname the library to load
    *
    * @throws SecurityException if permission is denied
@@ -678,30 +701,37 @@ public class Runtime
    */
   public void loadLibrary(String libname)
   {
+    loadLibrary(libname, VMStackWalker.getCallingClassLoader());
+  }
+
+  /**
+   * Same as <code>loadLibrary(String)</code> but using the given loader.
+   *
+   * @param libname the library to load
+   * @param loader class loader, or <code>null</code> for the boot loader
+   * @throws SecurityException if permission is denied
+   * @throws UnsatisfiedLinkError if the library is not found
+   */
+  void loadLibrary(String libname, ClassLoader loader)
+  {
     SecurityManager sm = SecurityManager.current; // Be thread-safe!
     if (sm != null)
       sm.checkLink(libname);
-
     String filename;
-    ClassLoader cl = VMSecurityManager.currentClassLoader();
-    if (cl != null)
+    if (loader != null && (filename = loader.findLibrary(libname)) != null)
       {
-        filename = cl.findLibrary(libname);
-        if (filename != null)
-          {
-            if (loadLib(filename) != 0)
+	if (loadLib(filename, loader) != 0)
 	      return;
-	    else
-	      throw new UnsatisfiedLinkError("Could not load library " + filename);
-          }
       }
-
+    else
+      {
     filename = VMRuntime.mapLibraryName(libname);
     for (int i = 0; i < libpath.length; i++)
-      if (loadLib(libpath[i] + filename) != 0)
+	  if (loadLib(libpath[i] + filename, loader) != 0)
 	return;
-
-    throw new UnsatisfiedLinkError("Could not find library " + libname + ".");
+      }
+    throw new UnsatisfiedLinkError("Native library `" + libname
+      + "' not found (as file `" + filename + "')");
 	}
 
   /**

@@ -1,5 +1,5 @@
 /* Currency.java -- Representation of a currency
-   Copyright (C) 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,11 +35,14 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.util;
 
+import gnu.java.locale.LocaleInformation;
+
+import java.io.IOException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
-import java.text.NumberFormat;
 
 /**
  * Representation of a currency for a particular locale.  Each currency
@@ -49,10 +52,10 @@ import java.text.NumberFormat;
  * a constructor.
  *
  * @see java.util.Locale
- * @author Guilhem Lavaux  <guilhem.lavaux@free.fr>
- * @author Dalibor Topic <robilad@kaffe.org>
- * @author Bryce McKinlay <mckinlay@redhat.com>
- * @author Andrew John Hughes <gnu_andrew@member.fsf.org>
+ * @author Guilhem Lavaux  (guilhem.lavaux@free.fr)
+ * @author Dalibor Topic (robilad@kaffe.org)
+ * @author Bryce McKinlay (mckinlay@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.4
  */
 public final class Currency 
@@ -64,23 +67,14 @@ public final class Currency
   static final long serialVersionUID = -158308464356906721L;
 
   /**
-   * The locale associated with this currency.
-   *
-   * @see #Currency(java.util.Locale)
-   * @see #getInstance(java.util.Locale)
-   * @see #getSymbol(java.util.Locale)
-   * @serial ignored.
-   */
-  private transient Locale locale;
-
-  /**
-   * The resource bundle which maps the currency to
-   * a ISO 4217 currency code.
+   * The set of properties which map a currency to
+   * the currency information such as the ISO 4217
+   * currency code and the number of decimal points.
    *
    * @see #getCurrencyCode()
    * @serial ignored.
    */
-  private transient ResourceBundle res;
+  private static transient Properties properties;
 
   /**
    * The ISO 4217 currency code associated with this
@@ -92,28 +86,76 @@ public final class Currency
   private String currencyCode;
 
   /**
-   * A cache of <code>Currency</code> instances to
-   * ensure the singleton nature of this class.  The key
-   * is the locale of the currency.
+   * The number of fraction digits associated with this
+   * particular instance.
+   *
+   * @see #getDefaultFractionDigits()
+   * @serial the number of fraction digits
+   */
+  private transient int fractionDigits;
+
+  /**
+   * The currency symbol used when formatting currency strings.
+   * When this field is <code>null</code> the <code>currencyCode</code>
+   * has to be used instead.
+   *
+   * @see #getSymbol()
+   * @see #getSymbol(java.util.Locale)
+   * @serial the currency symbol, or <code>null</code>
+   */
+  private transient String currencySymbol;
+  
+  /**
+   * A cached map of country codes
+   * instances to international currency code
+   * <code>String</code>s.  Seperating this
+   * from the <code>Currency</code> instances
+   * ensures we have a common lookup between
+   * the two <code>getInstance()</code> methods.
    *
    * @see #getInstance(java.util.Locale)
+   * @serial ignored.
+   */
+  private static transient Map countryMap;
+
+  /**
+   * A cache of <code>Currency</code> instances to
+   * ensure the singleton nature of this class.  The key
+   * is the international currency code.
+   *
+   * @see #getInstance(java.util.Locale)
+   * @see #getInstance(java.lang.String) 
    * @see #readResolve()
    * @serial ignored.
    */
   private static transient Map cache;
 
   /**
-   * Instantiates the cache.
+   * Instantiates the cache and reads in the properties.
    */
   static
   {
+    /* Create a hash map for the locale mappings */
+    countryMap = new HashMap();
+    /* Create a hash map for the cache */
     cache = new HashMap();
+    /* Create the properties object */
+    properties = new Properties();
+    /* Try and load the properties from our iso4217.properties resource */
+    try 
+      {
+        properties.load(Currency.class.getResourceAsStream("iso4217.properties"));
+      }
+    catch (IOException exception)
+      {
+        System.out.println("Failed to load currency resource: " + exception);
+      }
   }
 
   /**
    * Default constructor for deserialization
    */
-  private Currency ()
+  private Currency()
   {
   }
 
@@ -126,22 +168,48 @@ public final class Currency
    * a particular country changes.  For countries without
    * a given currency (e.g. Antarctica), the result is null. 
    *
-   * @param loc the locale for the new currency.
+   * @param loc the locale for the new currency, or null if
+   *        there is no country code specified or a currency
+   *        for this country.
    */
-  private Currency (Locale loc)
+  private Currency(Locale loc)
   {
-    this.locale = loc;
-    this.res = ResourceBundle.getBundle ("gnu.java.locale.LocaleInformation", 
-      locale, ClassLoader.getSystemClassLoader());
-    /* Retrieve the ISO4217 currency code */
-    try
+    String countryCode;
+    String currencyKey;
+    String fractionDigitsKey;
+    int commaPosition;
+
+    /* Retrieve the country code from the locale */
+    countryCode = loc.getCountry();
+    /* If there is no country code, return */
+    if (countryCode.equals(""))
       {
-	currencyCode = res.getString ("intlCurrencySymbol");
+        throw new
+	  IllegalArgumentException("Invalid (empty) country code for locale:"
+			  	   + loc);
       }
-    catch (Exception _)
+    /* Construct the key for the currency */
+    currencyKey = countryCode + ".currency";
+    /* Construct the key for the fraction digits */
+    fractionDigitsKey = countryCode + ".fractionDigits";
+    /* Retrieve the currency */
+    currencyCode = properties.getProperty(currencyKey);
+    /* Return if the currency code is null */
+    if (currencyCode == null)
       {
-	currencyCode = null;
+        return;
       }
+    /* Split off the first currency code (we only use the first for now) */
+    commaPosition = currencyCode.indexOf(",");
+    if (commaPosition != -1)
+      {
+        currencyCode = currencyCode.substring(0, commaPosition);
+      }
+    /* Retrieve the fraction digits */
+    fractionDigits = Integer.parseInt(properties.getProperty(fractionDigitsKey));
+    /* Get currency symbol */
+    currencySymbol =
+      (String) LocaleInformation.getCurrencySymbols().get(currencyCode);
   }
 
   /**
@@ -149,7 +217,7 @@ public final class Currency
    *
    * @return a <code>String</code> containing currency code.
    */
-  public String getCurrencyCode ()
+  public String getCurrencyCode()
   {
     return currencyCode;
   }
@@ -166,11 +234,9 @@ public final class Currency
    *
    * @return the number of digits after the decimal separator for this currency.
    */   
-  public int getDefaultFractionDigits ()
+  public int getDefaultFractionDigits()
   {
-    NumberFormat currency = NumberFormat.getCurrencyInstance (locale);
-    
-    return currency.getMaximumFractionDigits();
+    return fractionDigits;
   }
     
   /**
@@ -188,7 +254,7 @@ public final class Currency
    * @throws IllegalArgumentException if the country of
    *         the given locale is not a supported ISO3166 code.
    */ 
-  public static Currency getInstance (Locale locale)
+  public static Currency getInstance(Locale locale)
   {
     /**
      * The new instance must be the only available instance
@@ -200,14 +266,37 @@ public final class Currency
      */
     Currency newCurrency;
 
+    String country = locale.getCountry();
+    if (locale == null || country == null)
+      {
+	throw new
+	  NullPointerException("The locale or its country is null.");
+      }
     /* Attempt to get the currency from the cache */
-    newCurrency = (Currency) cache.get(locale);
-    if (newCurrency == null)
+    String code = (String) countryMap.get(country);
+    if (code == null)
       {
         /* Create the currency for this locale */
-        newCurrency = new Currency (locale);
+        newCurrency = new Currency(locale);
+        /* 
+         * If the currency code is null, then creation failed
+         * and we return null.
+         */
+	code = newCurrency.getCurrencyCode();
+        if (code == null)
+          {
+            return null;
+          }
+        else 
+          {
         /* Cache it */
-        cache.put(locale, newCurrency);
+            countryMap.put(country, code);
+	    cache.put(code, newCurrency);
+          }
+      }
+    else
+      {
+	newCurrency = (Currency) cache.get(code);
       }
     /* Return the instance */
     return newCurrency;
@@ -222,24 +311,51 @@ public final class Currency
    * @throws IllegalArgumentException if the supplied currency code
    *         is not a supported ISO 4217 code.
    */
-  public static Currency getInstance (String currencyCode)
+  public static Currency getInstance(String currencyCode)
   {
-    Locale[] allLocales = Locale.getAvailableLocales ();
+    Locale[] allLocales;
     
+    /* 
+     * Throw a null pointer exception explicitly if currencyCode is null.
+     * One is not thrown otherwise.  It results in an IllegalArgumentException. 
+     */
+    if (currencyCode == null)
+      {
+        throw new NullPointerException("The supplied currency code is null.");
+      }
+    Currency newCurrency = (Currency) cache.get(currencyCode);
+    if (newCurrency == null)
+      {
+	/* Get all locales */
+	allLocales = Locale.getAvailableLocales();
+	/* Loop through each locale, looking for the code */
     for (int i = 0;i < allLocales.length; i++)
       {
+	    try
+	      {
 	Currency testCurrency = getInstance (allLocales[i]);
-	
-	if (testCurrency.getCurrencyCode() != null &&
+		if (testCurrency != null &&
 	    testCurrency.getCurrencyCode().equals(currencyCode))
+		  {
 	  return testCurrency;
       }
+	      }
+	    catch (IllegalArgumentException exception)
+	      {
+		/* Ignore locales without valid countries */
+	      }
+	  }
     /* 
      * If we get this far, the code is not supported by any of
      * our locales.
      */
     throw new IllegalArgumentException("The currency code, " + currencyCode +
                                        ", is not supported.");
+  }
+    else
+      {
+	return newCurrency;
+      }
   }
 
   /**
@@ -253,15 +369,7 @@ public final class Currency
    */
   public String getSymbol()
   {
-    try
-      {
-        /* What does this return if there is no mapping? */
-	return res.getString ("currencySymbol");
-      }
-    catch (Exception _)
-      {
-	return null;
-      }
+    return currencySymbol == null ? getCurrencyCode() : currencySymbol;
   }
 
   /**
@@ -291,37 +399,11 @@ public final class Currency
    */
   public String getSymbol(Locale locale)
   {
-    // TODO. The behaviour is unclear if locale != this.locale.
-    // First we need to implement fully LocaleInformation*.java
-
     /* 
-     * FIXME: My reading of how this method works has this implementation
-     * as wrong.  It should return a value relating to how the specified
-     * locale handles the symbol for this currency.  This implementation
-     * seems to just do a variation of getInstance(locale).
+       We don't currently have the currency symbols, so we always
+       return the currency code.
      */
-    try
-      {
-	ResourceBundle localeResource = 
-	  ResourceBundle.getBundle ("gnu.java.locale.LocaleInformation", 
-				    locale, Currency.class.getClassLoader());
-
-	if (localeResource.equals(res))
-	  return localeResource.getString ("currencySymbol");
-	else
-	  return localeResource.getString ("intlCurrencySymbol");
-      }
-    catch (Exception e1)
-      {
-	try
-	  {
-	    return res.getString ("intlCurrencySymbol");
-	  }
-	catch (Exception e2)
-	  {
-	    return null;
-	  }
-      }
+    return getCurrencyCode();
   }
 
   /**
