@@ -49,9 +49,11 @@ import java.security.AccessControlContext;
 import java.security.AccessController;
 import java.security.AllPermission;
 import java.security.Permission;
+import java.security.PrivilegedAction;
 import java.security.Security;
 import java.security.SecurityPermission;
 import java.util.PropertyPermission;
+import java.util.StringTokenizer;
 
 /**
  * SecurityManager is a class you can extend to create your own Java
@@ -888,7 +890,7 @@ public class SecurityManager
      */
   public void checkPackageAccess(String packageName)
   {
-        checkPackageList(packageName, "access", "accessClassInPackage.");
+    checkPackageList(packageName, "package.access", "accessClassInPackage.");
     }
 
     /**
@@ -910,7 +912,7 @@ public class SecurityManager
      */
   public void checkPackageDefinition(String packageName)
   {
-        checkPackageList(packageName, "definition", "defineClassInPackage.");
+    checkPackageList(packageName, "package.definition", "defineClassInPackage.");
     }
 
     /**
@@ -1006,38 +1008,40 @@ public class SecurityManager
    * <code>RuntimePermission(permission + packageName)</code>.
    *
    * @param packageName the package name to check access to
-   * @param restriction the list of restrictions, after "package."
+   * @param restriction "package.access" or "package.definition"
    * @param permission the base permission, including the '.'
    * @throws SecurityException if permission is denied
    * @throws NullPointerException if packageName is null
      * @see #checkPackageAccess(String)
      * @see #checkPackageDefinition(String)
      */
-    void checkPackageList(String packageName, String restriction,
+  void checkPackageList(String packageName, final String restriction,
                         String permission)
   {
-        // Use the toString() hack to do the null check.
-    Permission p = new RuntimePermission(permission + packageName.toString());
-        String list = Security.getProperty("package." + restriction);
-    if (list == null)
+    if (packageName == null)
+	throw new NullPointerException();
+
+    String list = (String)AccessController.doPrivileged(new PrivilegedAction() {
+	public Object run() {
+	    return Security.getProperty(restriction);
+	}
+    });
+
+    if (list == null || list.equals(""))
       return;
-    while (! "".equals(packageName))
-      {
-        for (int index = list.indexOf(packageName);
-             index != -1; index = list.indexOf(packageName, index + 1))
+
+    String packageNamePlusDot = packageName + ".";
+
+    StringTokenizer st = new StringTokenizer(list, ",");
+    while (st.hasMoreTokens())
           {
-                // Exploit package visibility for speed.
-                int packageNameCount = packageName.length();
-                if (index + packageNameCount == list.length()
-                || list.charAt(index + packageNameCount) == ',')
+	if (packageNamePlusDot.startsWith(st.nextToken()))
               {
+	    Permission p = new RuntimePermission(permission + packageName);
                     checkPermission(p);
                     return;
                 }
             }
-            int index = packageName.lastIndexOf('.');
-            packageName = index < 0 ? "" : packageName.substring(0, index);
-        }
     }
 } // class SecurityManager
 

@@ -302,8 +302,7 @@ public abstract class NumberFormat extends Format implements Cloneable
     return list;
   }
 
-  private static final NumberFormat computeInstance (Locale loc,
-						     String resource,
+  private static NumberFormat computeInstance(Locale loc, String resource,
 						     String def)
   {
     ResourceBundle res;

@@ -1,5 +1,5 @@
 /* PortableRemoteObjectDelegateImpl.java -- 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,10 +38,13 @@ exception statement from your version. */
 
 package gnu.javax.rmi.CORBA;
 
-import java.rmi.*;
-import java.rmi.server.*;
-import gnu.javax.rmi.*;
-import javax.rmi.CORBA.*;
+import gnu.javax.rmi.PortableServer;
+
+import java.rmi.NoSuchObjectException;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+import javax.rmi.CORBA.PortableRemoteObjectDelegate;
 
 public class PortableRemoteObjectDelegateImpl
   implements PortableRemoteObjectDelegate

@@ -1,8 +1,6 @@
-/* LogManager.java
-   -- a class for maintaining Loggers and managing configuration
-      properties
-
-Copyright (C) 2002 Free Software Foundation, Inc.
+/* LogManager.java -- a class for maintaining Loggers and managing
+   configuration properties
+   Copyright (C) 2002 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -36,9 +34,8 @@ module.  An independent module is a module which is not derived from
 or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version.
+exception statement from your version. */
 
-*/
 
 package java.util.logging;
 
@@ -46,14 +43,14 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.Collections;
-import java.util.Properties;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.StringTokenizer;
-import java.lang.ref.WeakReference;
 
 /**
  * The <code>LogManager</code> maintains a hierarchical namespace
@@ -351,6 +348,7 @@ public class LogManager
   private synchronized Logger findAncestor(Logger child)
   {
     String childName = child.getName();
+    int    childNameLength = childName.length();
     Logger best = rootLogger;
     int    bestNameLength = 0;
 
@@ -366,9 +364,10 @@ public class LogManager
       candName = (String) iter.next();
       candNameLength = candName.length();
 
-      if ((candNameLength > bestNameLength)
+      if (candNameLength > bestNameLength
+	  && childNameLength > candNameLength
 	  && childName.startsWith(candName)
-	  && (childName.charAt(candNameLength) == '.'))
+	  && childName.charAt(candNameLength) == '.')
       {
         cand = (Logger) ((WeakReference) loggers.get(candName)).get();
 	if ((cand == null) || (cand == child))

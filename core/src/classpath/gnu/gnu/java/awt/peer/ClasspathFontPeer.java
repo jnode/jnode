@@ -243,7 +243,13 @@ public abstract class ClasspathFontPeer
       {
         Float sz = (Float) attribs.get (TextAttribute.SIZE);
         size = sz.floatValue ();
+
+        // Pango doesn't accept 0 as a font size.
+        if (size < 1)
+          size = 1;
       }
+    else
+      size = 12;
 
     if (attribs.containsKey (TextAttribute.TRANSFORM))
       {
