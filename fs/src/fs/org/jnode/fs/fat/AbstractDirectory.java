@@ -12,6 +12,7 @@ import java.util.Vector;
 
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSEntryIterator;
 
 /**
  * @author epr
@@ -44,7 +45,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 	 * 
 	 * @return Iterator
 	 */
-	public Iterator iterator() {
+	public FSEntryIterator iterator() {
 		return new DirIterator();
 	}
 
@@ -214,7 +215,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 		out.println("Unused entries " + freeCount);
 	}
 
-	class DirIterator implements Iterator {
+	class DirIterator implements FSEntryIterator {
 
 		private int offset = 0;
 
@@ -237,27 +238,19 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 		/**
 		 * @see java.util.Iterator#next()
 		 */
-		public Object next() {
+		public FSEntry next() {
 			int size = entries.size();
 			while (offset < size) {
 				FatBasicDirEntry e = (FatBasicDirEntry)entries.get(offset);
 				if ((e != null) && (e instanceof FatDirEntry) && !((FatDirEntry)e).isDeleted()) {
 					offset++;
-					return e;
+					return (FSEntry) e;
 				} else {
 					offset++;
 				}
 			}
 			throw new NoSuchElementException();
 		}
-
-		/**
-		 * @see java.util.Iterator#remove()
-		 */
-		public void remove() {
-			throw new UnsupportedOperationException("remove");
-		}
-
 	}
 
 	/**
@@ -341,7 +334,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 	/**
 	 * Flush the contents of this directory to the persistent storage
 	 */
-	protected abstract void flush() throws IOException;
+	public abstract void flush() throws IOException;
 
 	/**
 	 * Read the contents of this directory from the given byte array

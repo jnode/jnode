@@ -4,9 +4,9 @@
 package org.jnode.fs.fat;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.jnode.driver.block.BlockDeviceAPI;
+import org.jnode.fs.FSEntryIterator;
 
 /**
  * <description>
@@ -85,7 +85,7 @@ public class FatDirectory extends AbstractDirectory {
 	/**
 	 * Flush the contents of this directory to the persistent storage
 	 */
-	protected void flush() throws IOException {
+	public void flush() throws IOException {
 		if (root) {
 			final FatFileSystem fs = (FatFileSystem)getFileSystem();
 			if (fs != null) {
@@ -117,7 +117,7 @@ public class FatDirectory extends AbstractDirectory {
 
 	private void applyLabel() throws IOException {
 		FatDirEntry labelEntry = null;
-		Iterator i = iterator();
+		FSEntryIterator i = iterator();
 		FatDirEntry current;
 		while (labelEntry == null && i.hasNext()) {
 			current = (FatDirEntry)i.next();
