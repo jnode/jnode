@@ -574,7 +574,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 		final int core = BootClassInfo.F_ALL;
 		//final int core = BootClassInfo.F_RESOLVEALL;
 		final int nonCore = BootClassInfo.F_RESOLVEALL;
-		//int nonCore = BootClassInfo.F_ALL;
+		//final int nonCore = BootClassInfo.F_ALL;
 		add(new BootClassInfo("java.lang.Class", true, core));
 		add(new BootClassInfo("java.lang.Object", true, core));
 		add(new BootClassInfo("java.lang.String", true, core));

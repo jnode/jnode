@@ -263,7 +263,7 @@ public final class VmStatics extends VmSystemObject {
 	 * @see org.jnode.vm.VmSystemObject#verifyBeforeEmit()
 	 */
 	public void verifyBeforeEmit() {
-		System.out.println("VmStatics#verifyBeforeEmit " + slotLength + ", " + resolver);
+		//System.out.println("VmStatics#verifyBeforeEmit " + slotLength + ", " + resolver);
 		final int max = statics.length;
 		int count = 0;
 		for (int i = 0; i < max; i++) {
@@ -294,6 +294,6 @@ public final class VmStatics extends VmSystemObject {
 		}
 		objects = null;
 		locked = true;
-		System.out.println("VmStatics#verifyBeforeEmit count=" + count);
+		//System.out.println("VmStatics#verifyBeforeEmit count=" + count);
 	}
 }

@@ -7,6 +7,5 @@
 	<classpathentry kind="src" path="/JNode-Core"/>
 	<classpathentry kind="lib" path="/JNode-Core/lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="src" path="/JNode-Shell"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
