@@ -10,6 +10,7 @@ import org.jnode.jnasm.assembler.Assembler;
 import org.jnode.jnasm.assembler.InstructionUtils;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register.CRX;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.Label;
@@ -41,6 +42,7 @@ public class X86Core extends AssemblerModule {
     private static final int RC_ADDR = REG_ARG | CON_ARG << DISP;
     private static final int RE_ADDR = REG_ARG | REL_ARG << DISP;
     private static final int RA_ADDR = REG_ARG | ABS_ARG << DISP;
+    private static final int CR_ADDR = CON_ARG | REG_ARG << DISP;
     private static final int E_ADDR = REL_ARG;
     private static final int ER_ADDR = REL_ARG | REG_ARG << DISP;
     private static final int EC_ADDR = REL_ARG | CON_ARG << DISP;
@@ -119,7 +121,8 @@ public class X86Core extends AssemblerModule {
     public static final int CPUID_ISN = CMP_ISN + 1;
     public static final int DEC_ISN = CPUID_ISN + 1;
     public static final int HLT_ISN = DEC_ISN + 1;
-    public static final int INC_ISN = HLT_ISN + 1;
+    public static final int IN_ISN = HLT_ISN + 1;
+    public static final int INC_ISN = IN_ISN + 1;
     public static final int INT_ISN = INC_ISN + 1;
     public static final int IRET_ISN = INT_ISN + 1;
     public static final int JA_ISN = IRET_ISN + 1;
@@ -138,7 +141,8 @@ public class X86Core extends AssemblerModule {
     public static final int NEG_ISN = MOV_ISN + 1;
     public static final int NOP_ISN = NEG_ISN + 1;
     public static final int OR_ISN = NOP_ISN + 1;
-    public static final int POP_ISN = OR_ISN + 1;
+    public static final int OUT_ISN = OR_ISN + 1;
+    public static final int POP_ISN = OUT_ISN + 1;
     public static final int POPA_ISN = POP_ISN + 1;
     public static final int POPF_ISN = POPA_ISN + 1;
     public static final int PUSH_ISN = POPF_ISN + 1;
@@ -219,6 +223,9 @@ public class X86Core extends AssemblerModule {
             case HLT_ISN:
                 emmitHLT();
                 break;
+            case IN_ISN:
+                emmitIN();
+                break;
             case INC_ISN:
                 emmitINC();
                 break;
@@ -273,6 +280,9 @@ public class X86Core extends AssemblerModule {
                 break;
             case OR_ISN:
                 emmitOR();
+                break;
+            case OUT_ISN:
+                emmitOUT();
                 break;
             case POP_ISN:
                 emmitPOP();
@@ -489,6 +499,42 @@ public class X86Core extends AssemblerModule {
         stream.writeHLT();
     }
 
+    private final void emmitIN() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RR_ADDR:
+                GPR reg2 = getReg(1);
+                if(reg2 != X86Register.DX){
+                    throw new IllegalArgumentException("Invalid second operand for IN: " + reg2);
+                }
+                GPR reg1 = getReg(0);
+                if(reg1 == X86Register.AL){
+                    stream.writeIN(X86Constants.BITS8);
+                } else if(reg1 == X86Register.AX){
+                    stream.writeIN(X86Constants.BITS16);
+                } else if(reg1 == X86Register.EAX){
+                    stream.writeIN(X86Constants.BITS32);
+                } else {
+                    throw new IllegalArgumentException("Invalid first operand for IN: " + reg1);
+                }
+                break;
+            case RC_ADDR:
+                reg1 = getReg(0);
+                if(reg1 == X86Register.AL){
+                    stream.writeIN(X86Constants.BITS8, getInt(1));
+                } else if(reg1 == X86Register.AX){
+                    stream.writeIN(X86Constants.BITS16, getInt(1));
+                } else if(reg1 == X86Register.EAX){
+                    stream.writeIN(X86Constants.BITS32, getInt(1));
+                } else {
+                    throw new IllegalArgumentException("Invalid first operand for IN: " + reg1);
+                }
+                break;
+            default:
+                reportAddressingError(IN_ISN, addr);
+        }
+    }
+
     private final void emmitINC() {
         int addr = getAddressingMode(1);
         switch (addr) {
@@ -661,6 +707,42 @@ public class X86Core extends AssemblerModule {
                 break;
             default:
                 reportAddressingError(OR_ISN, addr);
+        }
+    }
+
+    private final void emmitOUT() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RR_ADDR:
+                GPR reg1 = getReg(0);
+                if(reg1 != X86Register.DX){
+                    throw new IllegalArgumentException("Invalid second operand for OUT: " + reg1);
+                }
+                GPR reg2 = getReg(1);
+                if(reg2 == X86Register.AL){
+                    stream.writeOUT(X86Constants.BITS8);
+                } else if(reg2 == X86Register.AX){
+                    stream.writeOUT(X86Constants.BITS16);
+                } else if(reg2 == X86Register.EAX){
+                    stream.writeOUT(X86Constants.BITS32);
+                } else {
+                    throw new IllegalArgumentException("Invalid first operand for OUT: " + reg2);
+                }
+                break;
+            case CR_ADDR:
+                reg2 = getReg(1);
+                if(reg2 == X86Register.AL){
+                    stream.writeOUT(X86Constants.BITS8, getInt(0));
+                } else if(reg2 == X86Register.AX){
+                    stream.writeOUT(X86Constants.BITS16, getInt(0));
+                } else if(reg2 == X86Register.EAX){
+                    stream.writeOUT(X86Constants.BITS32, getInt(0));
+                } else {
+                    throw new IllegalArgumentException("Invalid first operand for OUT: " + reg2);
+                }
+                break;
+            default:
+                reportAddressingError(OUT_ISN, addr);
         }
     }
 

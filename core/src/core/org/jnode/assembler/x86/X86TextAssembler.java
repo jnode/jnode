@@ -1125,6 +1125,30 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         println("\timul " + srcReg);
     }
 
+    public void writeIN(int operandSize) {
+        if(operandSize == X86Constants.BITS8){
+            println("\tin " + X86Register.AL + "," + X86Register.DX);
+        } else if(operandSize == X86Constants.BITS16){
+            println("\tin " + X86Register.AX + "," + X86Register.DX);
+        } else if(operandSize == X86Constants.BITS32){
+            println("\tin " + X86Register.EAX + "," + X86Register.DX);
+        } else {
+            throw new IllegalArgumentException("Invalid operand size for IN: " + operandSize);
+        }
+    }
+
+    public void writeIN(int operandSize, int imm8) {
+        if(operandSize == X86Constants.BITS8){
+            println("\tin " + X86Register.AL + "," + imm8);
+        } else if(operandSize == X86Constants.BITS16){
+            println("\tin " + X86Register.AX + "," + imm8);
+        } else if(operandSize == X86Constants.BITS32){
+            println("\tin " + X86Register.EAX + "," + imm8);
+        } else {
+            throw new IllegalArgumentException("Invalid operand size for IN: " + operandSize);
+        }
+    }
+
     /**
      * @see org.jnode.assembler.x86.X86Assembler#writeINC(GPR)
      */
@@ -1495,7 +1519,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         println("\tor " + dstReg + "," + srcReg);
     }
 
-    // LS
     /**
      * 
      * @param dstReg
@@ -1504,6 +1527,30 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      */
     public void writeOR(GPR dstReg, GPR srcReg, int srcDisp) {
         println("\tor " + dstReg + ",[" + srcReg + disp(srcDisp) + "]");
+    }
+
+    public void writeOUT(int operandSize) {
+        if(operandSize == X86Constants.BITS8){
+            println("\tout " + X86Register.DX + "," + X86Register.AL);
+        } else if(operandSize == X86Constants.BITS16){
+            println("\tout " + X86Register.DX + "," + X86Register.AX);
+        } else if(operandSize == X86Constants.BITS32){
+            println("\tout " + X86Register.DX + "," + X86Register.EAX);
+        } else {
+            throw new IllegalArgumentException("Invalid operand size for OUT: " + operandSize);
+        }
+    }
+
+    public void writeOUT(int operandSize, int imm8) {
+        if(operandSize == X86Constants.BITS8){
+            println("\tout " + imm8 + "," + X86Register.AL);
+        } else if(operandSize == X86Constants.BITS16){
+            println("\tout " + imm8 + "," + X86Register.AX);
+        } else if(operandSize == X86Constants.BITS32){
+            println("\tout " + imm8 + "," + X86Register.EAX);
+        } else {
+            throw new IllegalArgumentException("Invalid operand size for OUT: " + operandSize);
+        }
     }
 
     /**

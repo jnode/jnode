@@ -1129,6 +1129,21 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeIMUL_EAX(GPR srcReg);
 
+    /**
+	 * Create an in
+	 *
+	 * @param operandSize
+     * @param imm8
+	 */
+	public abstract void writeIN(int operandSize, int imm8);
+
+    /**
+	 * Create an in
+	 *
+	 * @param operandSize
+	 */
+	public abstract void writeIN(int operandSize);
+
 	/**
 	 * Create a inc dstReg
 	 * 
@@ -1506,7 +1521,21 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeOR(GPR dstReg, GPR srcReg);
 
-	// LS
+    /**
+	 * Create an out
+	 *
+	 * @param operandSize
+     * @param imm8
+	 */
+	public abstract void writeOUT(int operandSize, int imm8);
+
+    /**
+	 * Create an out
+	 *
+	 * @param operandSize
+	 */
+	public abstract void writeOUT(int operandSize);
+
 	/**
 	 * @param dstReg
 	 * @param srcReg
@@ -1514,7 +1543,6 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeOR(GPR dstReg, GPR srcReg, int srcDisp);
 
-	// LS
 	/**
 	 * @param dstReg
 	 * @param imm32
