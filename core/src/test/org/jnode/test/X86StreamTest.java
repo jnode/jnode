@@ -24,6 +24,7 @@ package org.jnode.test;
 import java.io.FileOutputStream;
 
 import org.jnode.assembler.Label;
+import org.jnode.assembler.x86.X86Operation;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86BinaryAssembler;
@@ -117,6 +118,25 @@ public class X86StreamTest {
 		os.writeMOVZX(X86Register.EBX, X86Register.EBX, X86Constants.BITS16);
 		os.writeAND(X86Register.EBX, 0x0000FFFF);
 		
+		// SSE tests
+		os.writeArithSSEDOp(X86Operation.SSE_ADD, X86Register.XMM0, X86Register.XMM1);
+		os.writeArithSSEDOp(X86Operation.SSE_ADD, X86Register.XMM0, X86Register.EBX, 5);
+		os.writeArithSSEDOp(X86Operation.SSE_SUB, X86Register.XMM1, X86Register.XMM2);
+		os.writeArithSSEDOp(X86Operation.SSE_SUB, X86Register.XMM1, X86Register.EBX, 5);
+		os.writeArithSSEDOp(X86Operation.SSE_MUL, X86Register.XMM2, X86Register.XMM3);
+		os.writeArithSSEDOp(X86Operation.SSE_MUL, X86Register.XMM2, X86Register.EBX, 5);
+		os.writeArithSSEDOp(X86Operation.SSE_DIV, X86Register.XMM3, X86Register.XMM4);
+		os.writeArithSSEDOp(X86Operation.SSE_DIV, X86Register.XMM3, X86Register.EBX, 5);
+
+		os.writeArithSSESOp(X86Operation.SSE_ADD, X86Register.XMM0, X86Register.XMM1);
+		os.writeArithSSESOp(X86Operation.SSE_ADD, X86Register.XMM0, X86Register.EBX, 5);
+		os.writeArithSSESOp(X86Operation.SSE_SUB, X86Register.XMM1, X86Register.XMM2);
+		os.writeArithSSESOp(X86Operation.SSE_SUB, X86Register.XMM1, X86Register.EBX, 5);
+		os.writeArithSSESOp(X86Operation.SSE_MUL, X86Register.XMM2, X86Register.XMM3);
+		os.writeArithSSESOp(X86Operation.SSE_MUL, X86Register.XMM2, X86Register.EBX, 5);
+		os.writeArithSSESOp(X86Operation.SSE_DIV, X86Register.XMM3, X86Register.XMM4);
+		os.writeArithSSESOp(X86Operation.SSE_DIV, X86Register.XMM3, X86Register.EBX, 5);
+
 		FileOutputStream fos = new FileOutputStream("test.bin");
 		os.writeTo(fos);
 		fos.close();
