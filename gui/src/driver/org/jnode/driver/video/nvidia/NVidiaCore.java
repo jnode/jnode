@@ -43,10 +43,17 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 	private final NVidiaVgaIO vgaIO;
 	private final NVidiaVgaState oldVgaState = new NVidiaVgaState();
 	private final int architecture;
+	/** Size of card memory in MB */
+	private final int memSize;
 	private final int DDCBase = 0x3e;
 	private final int CrystalFreqKHz;
 	private final int MaxVClockFreqKHz;
+	/** Hardware cursor implementation */
 	private final NVidiaHardwareCursor hwCursor;
+	/** Acceleration functions */
+	private final NVidiaAcceleration acc;
+	/** Should acceleration be used */
+	private final boolean useAcc = true;
 
 	/**
 	 * @param driver
@@ -79,6 +86,8 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 			throw new ResourceNotFreeException(ex);
 		}
 		this.hwCursor = new NVidiaHardwareCursor(vgaIO, architecture);
+		this.acc = new NVidiaAcceleration(vgaIO, architecture);
+		this.memSize = getMemorySize();
 
 		switch (architecture) {
 			case NV04A :
@@ -98,6 +107,7 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 			default :
 				throw new DriverException("Unknown architecture " + architecture);
 		}
+		log.debug("Memory size     =" + memSize + "MB");
 		log.debug("CrystalFreqKHz  =" + CrystalFreqKHz);
 		log.debug("MaxVClockFreqKHz=" + MaxVClockFreqKHz);
 	}
@@ -150,6 +160,8 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 			setVideoStartAddress(startAddress);
 			setTiming(config.getMode());
 			hwCursor.initCursor();
+			// Setup accelration
+			acc.accInit(startAddress, bytesPerLine, memSize, bitsPerPixel);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -593,11 +605,97 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 	 */
 	protected void fillRect(int x, int y, int w, int h, int color, int mode) {
 		final int screenWidth = config.getScreenWidth();
-		if ((x == 0) && (w == screenWidth)) {
-			bitmapGraphics.drawPixels(0, y, screenWidth * height, color, mode);
-		} else {
-			super.fillRect(x, y, w, h, color, mode);
+		if (x + w >= screenWidth) {
+			w = screenWidth - x;				
 		}
+		if (useAcc && (mode == PAINT_MODE)) {
+			acc.setupRectangle(color);
+			acc.fillRectangle(x, y, w, h);
+		} else {
+			if ((x == 0) && (w == screenWidth)) {
+				bitmapGraphics.drawPixels(0, y, screenWidth * height, color, mode);
+			} else {
+				super.fillRect(x, y, w, h, color, mode);
+			}
+		}
+	}
+
+	/**
+	 * Detect the size of installed memory.
+	 * 
+	 * @return Size in MB.
+	 */
+	private final int getMemorySize() {
+		final int size;
+		if (architecture == NV04A) {
+			final int strapinfo = vgaIO.getReg32(NV32_NV4STRAPINFO);
+
+			if ((strapinfo & 0x00000100) != 0) {
+				/* Unified memory architecture used */
+				log.info("INFO: NV4 architecture chip with UMA detected");
+				size = ((((strapinfo & 0x0000f000) >> 12) * 2) + 2);
+
+			} else {
+				/* private memory architecture used */
+				switch (strapinfo & 0x00000003) {
+					case 0 :
+						size = 32;
+						break;
+					case 1 :
+						size = 4;
+						break;
+					case 2 :
+						size = 8;
+						break;
+					case 3 :
+						size = 16;
+						break;
+					default :
+						// Cannot get here, but just to keep the compiler silent.
+						size = 8;
+				}
+			}
+		} else {
+			// NV10, NV20
+			//final int dev_manID = CFGR(DEVID);
+			final int strapinfo = vgaIO.getReg32(NV32_NV10STRAPINFO);
+
+			//case 0x01a010de: /* Nvidia GeForce2 Integrated GPU */
+			//	size = (((CFGR(GF2IGPU) & 0x000007c0) >> 6) + 1);
+			//	break;
+			//case 0x01f010de: /* Nvidia GeForce4 MX Integrated GPU */
+			//	size = (((CFGR(GF4MXIGPU) & 0x000007f0) >> 4) + 1);
+			//remove this line if det. is OK: int amt = pciReadLong(pciTag(0, 0, 1), 0x84);
+			//	break;
+			switch ((strapinfo & 0x0ff00000) >> 20) {
+				case 2 :
+					size = 2;
+					break;
+				case 4 :
+					size = 4;
+					break;
+				case 8 :
+					size = 8;
+					break;
+				case 16 :
+					size = 16;
+					break;
+				case 32 :
+					size = 32;
+					break;
+				case 64 :
+					size = 64;
+					break;
+				case 128 :
+					size = 128;
+					break;
+				default :
+					size = 16;
+					log.info("NV10/20 architecture chip with unknown RAM amount detected, setting 16Mb");
+					break;
+			}
+		}
+		return size;
 	}
 
 }
