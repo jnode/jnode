@@ -471,6 +471,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 
                             // perform completion
                             result = cmd + " " + info.complete(cl); // prepend
+                            completion.setCompleted(result);
                             // command
                             // name and
                             // space
@@ -514,8 +515,8 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 		
 		if(completion.needNewPrompt())
 		{			
-	        out.print(currentPrompt);
-	        currentLine.start(console);				
+	        out.print(currentPrompt + currentLine.getContent());
+	        currentLine.start(console, true);				
 		}
 		
         return completion;
@@ -566,9 +567,24 @@ class Line
     
     public void start(ScrollableShellConsole console)
     {
-    	consoleX = console.getCursorX();
-    	consoleY = console.getCursorY();
-    	setContent("");
+    	start(console, false);
+    }
+    
+    public void start(ScrollableShellConsole console, boolean keepContent)
+    {
+    	if(keepContent)
+    	{
+    		// we stay at the same position in X coordinate
+    		// only Y may have changed
+        	consoleY = console.getCursorY();
+    	}
+    	else
+    	{
+        	consoleX = console.getCursorX();
+        	consoleY = console.getCursorY();
+        	    		
+    		setContent("");
+    	}    		
     }
     
     public String getContent()
@@ -736,7 +752,6 @@ class CompletionInfo
 	 * @param completed The completed to set.
 	 */
 	public void setCompleted(String completed) {
-		this.items = null;
 		this.completed = completed;
 	}
 	/**
