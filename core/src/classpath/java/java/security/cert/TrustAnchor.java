@@ -140,7 +140,7 @@ public class TrustAnchor
   public final String getCAName()
   {
     if (caName != null)
-      return caName.toRFC2253();
+      return caName.toString();
     return null;
   }
 
@@ -179,7 +179,7 @@ public class TrustAnchor
   {
     if (trustedCert == null)
       return "[ Trusted CA Public Key=" + caKey + ", Trusted CA Issuer Name="
-        + caName.toRFC2253() + " ]";
+        + caName.toString() + " ]";
     return "[ Trusted CA Certificate=" + trustedCert + " ]";
   }
 }

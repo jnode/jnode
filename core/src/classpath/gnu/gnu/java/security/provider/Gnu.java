@@ -37,14 +37,21 @@ exception statement from your version. */
 
 
 package gnu.java.security.provider;
+
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.Provider;
 
 public final class Gnu extends Provider
 {
   public Gnu()
   {
-    super("GNU", 1.0, "GNU provider v1.0 implementing SHA-1, MD5, DSA, X.509 Certificates");
+    super("GNU", 1.0, "GNU provider v1.0 implementing SHA-1, MD5, DSA, RSA, X.509 Certificates and CRLs, PKIX certificate path validators, Collection cert stores");
 
+    AccessController.doPrivileged (new PrivilegedAction()
+    {
+      public Object run()
+      {
     // Note that all implementation class names are referenced by using
     // Class.getName(). That way when we staticly link the Gnu provider
     // we automatically get all the implementation classes.
@@ -66,6 +73,30 @@ public final class Gnu extends Provider
     put("Alg.Alias.Signature.1.3.14.3.2.13", "SHA1withDSA");
     put("Alg.Alias.Signature.1.3.14.3.2.27", "SHA1withDSA");
 
+        put("Signature.MD2withRSA", MD2withRSA.class.getName());
+        put("Signature.MD2withRSA ImplementedIn", "Software");
+        put("Alg.Alias.Signature.md2WithRSAEncryption", "MD2withRSA");
+        put("Alg.Alias.Signature.OID.1.2.840.113549.1.1.2", "MD2withRSA");
+        put("Alg.Alias.Signature.1.2.840.113549.1.1.2", "MD2withRSA");
+
+        put("Signature.MD4withRSA", MD4withRSA.class.getName());
+        put("Signature.MD4withRSA ImplementedIn", "Software");
+        put("Alg.Alias.Signature.md4WithRSAEncryption", "MD4withRSA");
+        put("Alg.Alias.Signature.OID.1.2.840.113549.1.1.3", "MD4withRSA");
+        put("Alg.Alias.Signature.1.2.840.113549.1.1.3", "MD4withRSA");
+
+        put("Signature.MD5withRSA", MD5withRSA.class.getName());
+        put("Signature.MD5withRSA ImplementedIn", "Software");
+        put("Alg.Alias.Signature.md5WithRSAEncryption", "MD5withRSA");
+        put("Alg.Alias.Signature.OID.1.2.840.113549.1.1.4", "MD5withRSA");
+        put("Alg.Alias.Signature.1.2.840.113549.1.1.4", "MD5withRSA");
+
+        put("Signature.SHA1withRSA", SHA1withRSA.class.getName());
+        put("Signature.SHA1withRSA ImplementedIn", "Software");
+        put("Alg.Alias.Signature.sha-1WithRSAEncryption", "SHA1withRSA");
+        put("Alg.Alias.Signature.OID.1.2.840.113549.1.1.5", "SHA1withRSA");
+        put("Alg.Alias.Signature.1.2.840.113549.1.1.5", "SHA1withRSA");
+
     // Key Pair Generator
     put("KeyPairGenerator.DSA",
         gnu.java.security.provider.DSAKeyPairGenerator.class.getName());
@@ -77,6 +108,15 @@ public final class Gnu extends Provider
     // Key Factory
     put("KeyFactory.DSA",
         gnu.java.security.provider.DSAKeyFactory.class.getName());
+
+        put("KeyFactory.Encoded", EncodedKeyFactory.class.getName());
+        put("KeyFactory.Encoded ImplementedIn", "Software");
+        put("Alg.Alias.KeyFactory.X.509", "Encoded");
+        put("Alg.Alias.KeyFactory.X509", "Encoded");
+        put("Alg.Alias.KeyFactory.PKCS#8", "Encoded");
+        put("Alg.Alias.KeyFactory.PKCS8", "Encoded");
+
+        put("KeyFactory.RSA", RSAKeyFactory.class.getName());
 
     put("Alg.Alias.KeyFactory.OID.1.2.840.10040.4.1", "DSA");
     put("Alg.Alias.KeyFactory.1.2.840.10040.4.1", "DSA");
@@ -94,6 +134,11 @@ public final class Gnu extends Provider
     put("AlgorithmParameters.DSA",
         gnu.java.security.provider.DSAParameters.class.getName());
 
+        put("Alg.Alias.AlgorithmParameters.DSS", "DSA");
+        put("Alg.Alias.AlgorithmParameters.SHAwithDSA", "DSA");
+        put("Alg.Alias.AlgorithmParameters.OID.1.2.840.10040.4.3", "DSA");
+        put("Alg.Alias.AlgorithmParameters.1.2.840.10040.4.3", "DSA");
+
     // Algorithm Parameter Generator
     put("AlgorithmParameterGenerator.DSA",
         gnu.java.security.provider.DSAParameterGenerator.class.getName());
@@ -103,9 +148,20 @@ public final class Gnu extends Provider
         gnu.java.security.provider.SHA1PRNG.class.getName());
 
     // CertificateFactory
-    put("CertificateFactory.X.509",
-        gnu.java.security.provider.X509CertificateFactory.class.getName());
+        put("CertificateFactory.X509", X509CertificateFactory.class.getName());
 
-    put("Alg.Alias.CertificateFactory.X509", "X.509");
+        put("CertificateFactory.X509 ImplementedIn", "Software");
+        put("Alg.Alias.CertificateFactory.X.509", "X509");
+
+        // CertPathValidator
+        put("CertPathValidator.PKIX", PKIXCertPathValidatorImpl.class.getName());
+        put("CertPathValidator.PKIX ImplementedIn", "Software");
+
+        // CertStore
+        put("CertStore.Collection", CollectionCertStoreImpl.class.getName());
+
+        return null;
+      }
+    });
   }
 }
