@@ -10,7 +10,7 @@
     <import plugin="org.jnode.net"/>
     <import plugin="org.jnode.net.arp"/>
     <import plugin="org.jnode.net.ipv4.core"/>
-    <import plugin="org.xbill.DNS"/>
+    <import plugin="org.xbill.dns"/>
     <import plugin="org.apache.jakarta.commons.net"/>
   </requires>
 

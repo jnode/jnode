@@ -6,7 +6,7 @@
   <!-- Java target and source version -->
   <property name="java.target" value="1.4"/>
   <property name="java.source" value="1.4"/>
- 
+
   <property name="root.dir" value="${basedir}/.."/>
   <property name="build.dir" value="${basedir}/build"/>
   <property name="cdroms.dir" value="${build.dir}/cdroms"/>
