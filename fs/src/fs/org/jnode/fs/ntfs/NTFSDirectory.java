@@ -3,14 +3,12 @@
  */
 package org.jnode.fs.ntfs;
 
-import java.io.IOException;
-import java.util.Iterator;
+import java.io.*;
+import java.util.*;
 
-import org.jnode.fs.FSDirectory;
-import org.jnode.fs.FSEntry;
+import org.jnode.fs.*;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.ntfs.attributes.*;
-import org.jnode.fs.ntfs.attributes.NTFSIndexAllocationAttribute;
 
 /**
  * @author vali
@@ -23,28 +21,48 @@ public class NTFSDirectory implements FSDirectory {
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FSDirectory#iterator()
 	 */
-	private NTFSFileRecord fileRecord = null;
+	NTFSIndex index = null;
 	
 	public NTFSDirectory(NTFSFileRecord record)
 	{
-		this.fileRecord = record;
+		this.index = new NTFSIndex(record);
 	}
 	
-	public Iterator iterator() throws IOException {
-		return new NTFSDirIterator(this);
+	public Iterator iterator() throws IOException 
+	{
+		return new Iterator()
+		{
+
+			Iterator it = index.iterator();
+			
+			public boolean hasNext()
+			{
+				return it.hasNext();
+			}
+
+			public Object next()
+			{
+				return  new NTFSEntry((NTFSIndexEntry)it.next());
+			}
+
+			public void remove()
+			{
+				it.remove();
+			}
+		};
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FSDirectory#getEntry(java.lang.String)
 	 */
 	public FSEntry getEntry(String name) throws IOException {
-		// TODO Auto-generated method stub
-		if(fileRecord != null)
+		for(Iterator it = this.iterator();it.hasNext();)
 		{
-			NTFSIndexEntry indexEntry = ((NTFSIndexAllocationAttribute)fileRecord.getAttribute(NTFSFileRecord.$INDEX_ALLOCATION)).getFileIndexByName(name);
-			if(indexEntry != null )
-				return new NTFSEntry(indexEntry);
+			NTFSEntry entry = (NTFSEntry) it.next();
+			if(entry.getName().equals(name))
+				return entry;
 		}
+			
 		return null;
 	}
 
@@ -87,19 +105,4 @@ public class NTFSDirectory implements FSDirectory {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	/**
-	 * @return Returns the fileRecord.
-	 */
-	public NTFSFileRecord getFileRecord() {
-		return this.fileRecord;
-	}
-
-	/**
-	 * @param fileRecord The fileRecord to set.
-	 */
-	public void setFileRecord(NTFSFileRecord fileRecord) {
-		this.fileRecord = fileRecord;
-	}
-
 }
