@@ -3,14 +3,15 @@
  */
 package org.jnode.util;
 
+import org.jnode.vm.VmSystemObject;
+
 /**
  * @author epr
  */
-public class Statistic {
+public abstract class Statistic extends VmSystemObject {
 	
 	private final String name;
 	private final String description;
-	private int counter;
 	
 	public Statistic(String name) {
 		this(name, null);
@@ -21,14 +22,8 @@ public class Statistic {
 		this.description = description;
 	}
 
-	/**
-	 * Gets the counter of this statistic
-	 * @return the counter
-	 */
-	public int get() {
-		return counter;
-	}
-
+	public abstract Object getValue();
+	
 	/**
 	 * Gets the name of this statistic
 	 * @return The name
@@ -38,19 +33,12 @@ public class Statistic {
 	}
 
 	/**
-	 * Increment the counter of this statistic by 1.
-	 */
-	public void inc() {
-		counter++;
-	}
-	
-	/**
 	 * Convert to a String representation
 	 * @see java.lang.Object#toString()
 	 * @return String
 	 */
 	public String toString() {
-		return name + "=" + counter;
+		return name;
 	}
 	
 	/**

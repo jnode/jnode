@@ -80,7 +80,7 @@ public class NetstatCommand {
 			int width = 0;
 			for (int i = 0; i < list.length; i++) {
 				final Statistic st = list[i];
-				String msg = st.getName() + " " + st.get();
+				String msg = st.getName() + " " + st.getValue();
 				if (i+1 < list.length) {
 					msg = msg + ", ";
 				}
