@@ -151,7 +151,7 @@ yieldPointHandler_done:
 yieldPointHandler_fixStackOverflow:
 	; Is the stack overflow resolved?
 	mov ACX,[ADI+VmThread_STACKEND_OFS]
-	add ACX,VmThread_STACK_OVERFLOW_LIMIT
+	add ACX,(VmThread_STACK_OVERFLOW_LIMIT_SLOTS * SLOT_SIZE)
 	; Is current ESP not beyond limit anymore
 	cmp [ADI+VmX86Thread_ESP_OFS],ACX
 	jle yieldPointHandler_afterStackOverflow		; No still below limit
@@ -313,7 +313,7 @@ int_stack_first_overflow:
 	inc dword [AAX+VmThread_STACKOVERFLOW_OFS]
 	; Remove the stackoverflow limit
 	mov ADX,[AAX+VmThread_STACKEND_OFS]
-	sub ADX,VmThread_STACK_OVERFLOW_LIMIT
+	sub ADX,(VmThread_STACK_OVERFLOW_LIMIT_SLOTS * SLOT_SIZE)
 	mov [AAX+VmThread_STACKEND_OFS],ADX
 	mov STACKEND,ADX
 	mov AAX,SoftByteCodes_EX_STACKOVERFLOW

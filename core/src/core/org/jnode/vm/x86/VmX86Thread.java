@@ -72,7 +72,8 @@ public abstract class VmX86Thread extends VmThread {
 	/**
 	 * Initialize this instance 
 	 */
-	VmX86Thread() {
+	VmX86Thread(int slotSize) {
+        super(slotSize);
 		fxState = new byte[FXSTATE_SIZE];
 	}
 
@@ -80,8 +81,8 @@ public abstract class VmX86Thread extends VmThread {
      * Create a new instance. This constructor can only be called during the
      * bootstrap phase.
      */
-    VmX86Thread(byte[] stack) {
-        super(stack, getStackEnd(stack, stack.length), stack.length);
+    VmX86Thread(byte[] stack, int slotSize) {
+        super(stack, getStackEnd(stack, stack.length, slotSize), stack.length);
 		fxState = new byte[FXSTATE_SIZE];
     }
     
@@ -132,7 +133,7 @@ public abstract class VmX86Thread extends VmThread {
 	 * @return End address of the stack
 	 */
 	protected Address getStackEnd(Object stack, int stackSize) {
-		return ObjectReference.fromObject(stack).toAddress().add(STACK_OVERFLOW_LIMIT);
+		return ObjectReference.fromObject(stack).toAddress().add(STACK_OVERFLOW_LIMIT_SLOTS * getReferenceSize());
 	}
 	
 	/**
@@ -141,8 +142,8 @@ public abstract class VmX86Thread extends VmThread {
 	 * @param stackSize
 	 * @return End address of the stack
 	 */
-	private static Address getStackEnd(byte[] stack, int stackSize) {
-		return VmMagic.getArrayData(stack).add(STACK_OVERFLOW_LIMIT);
+	private static Address getStackEnd(byte[] stack, int stackSize, int slotSize) {
+		return VmMagic.getArrayData(stack).add(STACK_OVERFLOW_LIMIT_SLOTS * slotSize);
 	}
     
     /**

@@ -408,6 +408,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 
 		final GPR abx = os.isCode32() ? (GPR) X86Register.EBX : X86Register.RBX;
 		final GPR adx = os.isCode32() ? (GPR) X86Register.EDX : X86Register.RDX;
+        final int slotSize = arch.getReferenceSize();
 
 		os.setObjectRef(new Label("$$Setup initial thread"));
 		os.writeMOV_Const(abx, initialThread);
@@ -416,7 +417,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 		os.writeMOV_Const(adx, initialStack);
 		os.writeMOV(adx.getSize(), abx, threadStackField.getOffset(), adx);
 		// Calculate and set stackEnd
-		os.writeLEA(adx, adx, VmThread.STACK_OVERFLOW_LIMIT);
+		os.writeLEA(adx, adx, VmThread.STACK_OVERFLOW_LIMIT_SLOTS * slotSize);
 		os.writeMOV(adx.getSize(), abx, threadStackEndField.getOffset(), adx);
 
 		// Set stackend in current processor
@@ -443,13 +444,15 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 				.startObject(loadClass(VmSystemObject.class));
 		final int stackOffset = os.setObjectRef(stackLabel).getOffset();
 		final int stackAddr = stackOffset + (int) os.getBaseAddr();
+        final int slotSize = arch.getReferenceSize();
+        
 		// Low stack address
-		os.writeWord(stackAddr + VmThread.STACK_OVERFLOW_LIMIT);
+		os.writeWord(stackAddr + VmThread.STACK_OVERFLOW_LIMIT_SLOTS * slotSize);
 		// High stack address
-		os.writeWord(stackAddr + VmThread.DEFAULT_STACK_SIZE);
+		os.writeWord(stackAddr + VmThread.DEFAULT_STACK_SLOTS * slotSize);
 		// The actual stack space
-		for (int i = 8; i < VmThread.DEFAULT_STACK_SIZE; i++) {
-			os.write8(0);
+		for (int i = 2; i < VmThread.DEFAULT_STACK_SLOTS; i++) {
+			os.writeWord(0);
 		}
 		os.setObjectRef(stackPtrLabel);
 		objectInfo.markEnd();
