@@ -133,6 +133,15 @@ public abstract class Assembler {
                     }
                     break;
 
+                case JNAsmConstants.STRING:
+                    s = s.substring(1, s.length() - 1);
+                    byte[] buf = s.getBytes();
+                    ret = 0;
+                    int ln = Math.min(buf.length, 4);
+                    for(int i = 0; i < ln; i++){
+                        ret |= buf[i] << (i << 3);
+                    }
+                    break;
                 default:
                     throw new IllegalArgumentException("Unkown number type: " + t.kind);
 
