@@ -32,7 +32,7 @@ import org.jnode.driver.pci.PCIDevice;
 public class Via8363_0 extends Driver {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(Via8363_0.class);
 	
 	/**
 	 * Start the device

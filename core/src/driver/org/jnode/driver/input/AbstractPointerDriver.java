@@ -39,7 +39,7 @@ import org.jnode.driver.DriverException;
 public abstract class AbstractPointerDriver extends Driver implements PointerAPI {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(AbstractPointerDriver.class);
 	private ByteChannel channel;
 	private PointerInterpreter interpreter;
 	private PointerDaemon daemon;

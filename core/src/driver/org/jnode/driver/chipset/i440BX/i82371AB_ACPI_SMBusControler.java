@@ -62,7 +62,7 @@ import org.jnode.util.NumberUtils;
 
 public class i82371AB_ACPI_SMBusControler extends SMBusControler {
 
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(i82371AB_ACPI_SMBusControler.class);
 	PCIDevice device;
 	int hostStatusIORegister = 0;
 	int slaveStatusIORegister = 0;

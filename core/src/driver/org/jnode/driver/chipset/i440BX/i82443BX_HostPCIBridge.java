@@ -50,7 +50,7 @@ import org.jnode.driver.ram.RAMModuleCollection;
 
 public class i82443BX_HostPCIBridge extends Driver implements RAMControler {
 
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(i82443BX_HostPCIBridge.class);
 	PCIDevice device = null;
 	RAMModuleCollection ramModules = null;
 

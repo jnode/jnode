@@ -33,7 +33,7 @@ import org.jnode.util.NumberUtils;
 public class Via82C686 extends Driver {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(Via82C686.class);
 	
 	/**
 	 * Start the device

@@ -35,7 +35,7 @@ import org.jnode.driver.DriverException;
 public class SerialPortFinder implements DeviceFinder {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(SerialPortFinder.class);
 
 	/**
 	 * @see org.jnode.driver.DeviceFinder#findDevices(DeviceManager, Bus)
