@@ -168,11 +168,11 @@ public class MouseHandler implements PointerListener {
 			final MouseEvent me = new MouseEvent(source, id, System.currentTimeMillis(),
 					modifiers, ex, ey, 1, popupTrigger, button);
 			JNodeGenericPeer.eventQueue.postEvent(me);
-			if (id == MouseEvent.MOUSE_CLICKED) {
-				log.info("MouseClicked to " + source + " at " + ex + "," + ey);
-			}
-		} else {
-			log.info("NO MouseEvent, " + source + " not visible");
+//			if (id == MouseEvent.MOUSE_CLICKED) {
+//				log.info("MouseClicked to " + source + " at " + ex + "," + ey);
+//			}
+//		} else {
+//			log.info("NO MouseEvent, " + source + " not visible");
 		}
 		return source;
 	}
