@@ -157,6 +157,7 @@ sys_print_intregs:
 	idm_print_reg eip, [ebp+OLD_EIP]
 	idm_print_reg cs,  [ebp+OLD_CS]
 	idm_print_reg eflags, [ebp+OLD_EFLAGS]
+	idm_print_reg cr0, cr0
 	idm_print_reg eax, [ebp+OLD_EAX]
 	idm_print_reg ebx, [ebp+OLD_EBX]
 	idm_print_reg ecx, [ebp+OLD_ECX]
@@ -215,6 +216,7 @@ idm_cr3:    db        ' CR3  : ',0
 idm_eip:    db 0xd,0xa,'EIP  : ',0
 idm_cs:     db        ' CS   : ',0
 idm_eflags: db        ' FLAGS: ',0
+idm_cr0:	db        ' CR0  : ',0
 idm_eax:    db 0xd,0xa,'EAX  : ',0
 idm_ebx:    db        ' EBX  : ',0
 idm_ecx:    db        ' ECX  : ',0

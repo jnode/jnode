@@ -48,6 +48,12 @@ public final class VmX86Thread extends VmThread {
 	volatile Address esp;
 	volatile Address ebp;
 	
+	private static final int FXSTATE_SIZE = 512+16;
+	
+	// Saved state of FPU & XMM
+	private final byte[] fxState;
+	private volatile Address fxStatePtr;	// This value is set in assembler code
+	
 	// State upon last system exception
 	volatile int exEax;
 	volatile int exEbx;
@@ -65,7 +71,7 @@ public final class VmX86Thread extends VmThread {
 	 * Initialize this instance 
 	 */
 	VmX86Thread() {
-		super();
+		fxState = new byte[FXSTATE_SIZE];
 	}
 
     /**
@@ -74,6 +80,7 @@ public final class VmX86Thread extends VmThread {
      */
     VmX86Thread(byte[] stack) {
         super(stack, getStackEnd(stack, stack.length), stack.length);
+		fxState = new byte[FXSTATE_SIZE];
     }
     
 	/**
@@ -81,6 +88,7 @@ public final class VmX86Thread extends VmThread {
 	 */
 	public VmX86Thread(Thread javaThread) {
 		super(javaThread);
+		fxState = new byte[FXSTATE_SIZE];
 	}
 
 	

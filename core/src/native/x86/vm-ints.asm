@@ -86,6 +86,27 @@ yieldPointHandler_reschedule:
 	SAVEREG VmX86Thread_ESP_OFFSET, OLD_ESP
 	SAVEREG VmX86Thread_EIP_OFFSET, OLD_EIP
 	SAVEREG VmX86Thread_EFLAGS_OFFSET, OLD_EFLAGS
+	
+	; Save FPU / XMM state
+yieldPointHandler_fxSave:
+	mov ebx, [edi+VmX86Thread_FXSTATEPTR_OFFSET*4]
+	test ebx,ebx
+	jz yieldPointHandler_fxSaveInit
+	; We have a valid fxState address in ebx
+	test dword [cpu_features],FEAT_FXSR
+	jz yieldPointHandler_fpuSave
+	fxsave [ebx]
+	jmp yieldPointHandler_restore
+yieldPointHandler_fpuSave:
+	fnsave [ebx]
+	jmp yieldPointHandler_restore
+
+yieldPointHandler_fxSaveInit:
+	call fixFxStatePtr
+	jmp yieldPointHandler_fxSave
+
+	; Restore the next thread
+yieldPointHandler_restore:
 	mov edi,NEXTTHREAD
 	RESTOREREG VmX86Thread_EAX_OFFSET, OLD_EAX
 	RESTOREREG VmX86Thread_EBX_OFFSET, OLD_EBX
@@ -97,7 +118,20 @@ yieldPointHandler_reschedule:
 	RESTOREREG VmX86Thread_ESP_OFFSET, OLD_ESP
 	RESTOREREG VmX86Thread_EIP_OFFSET, OLD_EIP
 	RESTOREREG VmX86Thread_EFLAGS_OFFSET, OLD_EFLAGS
+	
+	; Restore FPU / XMM state
+	mov ebx, [edi+VmX86Thread_FXSTATEPTR_OFFSET*4]
+	test ebx,ebx
+	jz yieldPointHandler_fixStackOverflow		; No valid fxStatePtr yet, do not restore
+	test dword [cpu_features],FEAT_FXSR
+	jz yieldPointHandler_fpuRestore
+	fxrstor [ebx]
+	jmp yieldPointHandler_fixOldStackOverflow
+yieldPointHandler_fpuRestore:
+	frstor [ebx]
+	
 	; Fix old stack overflows
+yieldPointHandler_fixOldStackOverflow:
 	mov ecx,[edi+VmThread_STACKOVERFLOW_OFFSET*4]
 	test ecx,ecx
 	jnz yieldPointHandler_fixStackOverflow
@@ -125,7 +159,14 @@ yieldPointHandler_fixStackOverflow:
 	mov dword [edi+VmThread_STACKOVERFLOW_OFFSET*4],0
 	jmp yieldPointHandler_afterStackOverflow
 
-
+; Set the fxStatePtr in the thread given in edi.
+; The fxStatePtr must be 16-byte aligned
+fixFxStatePtr:
+	mov ebx,[edi+VmX86Thread_FXSTATE_OFFSET*4]
+	add ebx,(VmArray_DATA_OFFSET*4) + 15
+	and ebx,~0xF;
+	mov [edi+VmX86Thread_FXSTATEPTR_OFFSET*4],ebx
+	ret	
 	
 ; -----------------------------------------------
 ; Handle a timer interrupt
