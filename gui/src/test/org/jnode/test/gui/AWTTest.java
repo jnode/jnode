@@ -191,6 +191,8 @@ public class AWTTest {
                     default:
                         b.setText(String.valueOf(i));
                     }
+                    i++;
+                    wnd.validate();
                 }
             });
             wnd.add(b, BorderLayout.NORTH);
