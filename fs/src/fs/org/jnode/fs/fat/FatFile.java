@@ -41,7 +41,7 @@ public class FatFile extends FatObject implements FSFile {
 
 		final FatFileSystem fs = getFatFileSystem();
 		final long[] chain = fs.getFat().getChain(startCluster);
-		final BlockDeviceAPI api = fs.getBlockDeviceAPI();
+		final BlockDeviceAPI api = fs.getApi();
 		
 		int chainIdx = (int)(fileOffset / clusterSize);
 		if (fileOffset % clusterSize != 0) {
@@ -75,7 +75,7 @@ public class FatFile extends FatObject implements FSFile {
 		
 		final FatFileSystem fs = getFatFileSystem();
 		final long[] chain = fs.getFat().getChain(getStartCluster());
-		final BlockDeviceAPI api = fs.getBlockDeviceAPI();
+		final BlockDeviceAPI api = fs.getApi();
 
 		int chainIdx = (int)(fileOffset / clusterSize);
 		if (fileOffset % clusterSize != 0) {
