@@ -11,8 +11,6 @@ import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSEntryIterator;
-import org.jnode.fs.FSEntryTable;
-import org.jnode.fs.FileSystem;
 import org.jnode.fs.ReadOnlyFileSystemException;
 
 /**
@@ -113,7 +111,7 @@ public abstract class AbstractFSDirectory extends AbstractFSObject
 	/**
 	 * Remove a file or directory with a given name
 	 * 
-	 * @param nameExt
+	 * @param name
 	 */
 	final public synchronized void remove(String name) throws IOException {
 		if(!canWrite())

@@ -202,7 +202,7 @@ public class Ext2Directory implements FSDirectory {
 		//parse the directory and search for the file
 		FSEntryIterator iterator=iterator();
 		while(iterator.hasNext()) {
-			FSEntry entry = (FSEntry)iterator.next();
+			FSEntry entry = iterator.next();
 			if(entry.getName().equals(name))
 				return entry;
 		}

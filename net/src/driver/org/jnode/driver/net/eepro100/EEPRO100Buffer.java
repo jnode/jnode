@@ -21,7 +21,7 @@ public class EEPRO100Buffer implements EEPRO100Constants {
     public EEPRO100TxFD[] txRing = new EEPRO100TxFD[TX_RING_SIZE];
     public EEPRO100RxFD[] rxRing = new EEPRO100RxFD[RX_RING_SIZE];
     EEPRO100RxFD[] rxPackets = new EEPRO100RxFD[128];
-    private int tx_threshold;
+    //private int tx_threshold;
     private int curTx;
     private int curRx;
     private int dirtyTx;

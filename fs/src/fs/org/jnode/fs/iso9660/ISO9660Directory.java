@@ -4,7 +4,6 @@
 package org.jnode.fs.iso9660;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;

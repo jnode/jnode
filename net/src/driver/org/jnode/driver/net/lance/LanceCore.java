@@ -426,7 +426,7 @@ public class LanceCore
 
 	}
 	
-	private void dumpDebugInfo() {
+	final void dumpDebugInfo() {
 		log.debug("Debug Dump");
 		log.debug("CSR0 = " + io.getCSR(0));
 		

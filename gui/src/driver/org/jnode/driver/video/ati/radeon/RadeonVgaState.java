@@ -19,7 +19,7 @@ public class RadeonVgaState extends VgaState implements RadeonConstants {
 
     /* PLL regs */
     private final RadeonPllRegs pll;
-    private final RadeonPllRegs pll2;
+    //private final RadeonPllRegs pll2;
     
     /* Flatpanel regs */
     private final RadeonFpRegs fp;
@@ -34,7 +34,7 @@ public class RadeonVgaState extends VgaState implements RadeonConstants {
         this.crtc = new RadeonCrtcRegs();
         this.fp = new RadeonFpRegs();
         this.pll = new RadeonPllRegs(false);
-        this.pll2 = hasCRTC2 ? new RadeonPllRegs(true) : null;
+        //this.pll2 = hasCRTC2 ? new RadeonPllRegs(true) : null;
         saveFromVGA(io);
     }
 
