@@ -124,7 +124,7 @@ public class BootFloppyBuilder extends Task {
      */
     protected void copySystemFiles(Device device) throws IOException,
             FileSystemException {
-        final FatFileSystem fs = new FatFileSystem(device);
+        final FatFileSystem fs = new FatFileSystem(device, false);
 
         for (Iterator i = fileSets.iterator(); i.hasNext();) {
             final FileSet fset = (FileSet) i.next();
