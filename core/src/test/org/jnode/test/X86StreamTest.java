@@ -60,11 +60,41 @@ public class X86StreamTest implements X86Constants {
 	}
 	
 	private final static void testCode64(X86Assembler os) throws UnresolvedObjectRefException {
+        os.writePUSH(X86Register.RAX);
+        os.writePUSH(X86Register.R8);
+        os.writeMOV_Const(X86Register.R14d, 0x80000000);
 		os.writeNOP();
 		final Label label = new Label("label");
 		os.writeMOV_Const(X86Register.RDI, label);
 		os.writeNOP();
 		os.setObjectRef(label);
+        os.writePUSH(X86Register.RBX);
+        os.writePUSH(X86Register.RCX);
+        os.writePUSH(X86Register.RDX);
+        os.writePUSH(X86Register.RSI);
+        os.writePUSH(X86Register.R8);
+        os.writePUSH(X86Register.R9);
+        os.writePUSH(X86Register.R10);
+        os.writePUSH(X86Register.R11);
+        os.writePUSH(X86Register.R12);
+        os.writePUSH(X86Register.R13);
+        os.writePUSH(X86Register.R14);
+        os.writeNOP();
+        os.writePOP(X86Register.R14);
+        os.writePOP(X86Register.R13);
+        os.writePOP(X86Register.R12);
+        os.writePOP(X86Register.R11);
+        os.writePOP(X86Register.R10);
+        os.writePOP(X86Register.R9);
+        os.writePOP(X86Register.R8);
+        os.writePOP(X86Register.RSI);
+        os.writePOP(X86Register.RDX);
+        os.writePOP(X86Register.RCX);
+        os.writePOP(X86Register.RBX);
+        os.writePOP(X86Register.RAX);
+        os.writeNOP();
+        os.writePUSH(X86Register.RBP);
+        os.writePOP(X86Register.RBP);
 	}
 	
 	private final static void testCode32(X86Assembler os) throws UnresolvedObjectRefException {

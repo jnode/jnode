@@ -379,6 +379,13 @@ public class X86CompilerHelper implements X86CompilerConstants {
 				os.writePUSH(X86Register.RCX);
 				os.writePUSH(X86Register.RDX);
 				os.writePUSH(X86Register.RSI);
+                os.writePUSH(X86Register.R8);
+                os.writePUSH(X86Register.R9);
+                os.writePUSH(X86Register.R10);
+                os.writePUSH(X86Register.R11);
+                os.writePUSH(X86Register.R12);
+                os.writePUSH(X86Register.R13);
+                os.writePUSH(X86Register.R14);
 			}
 			// Call cls.initialize
 			os.writePUSH(classReg);
@@ -386,6 +393,13 @@ public class X86CompilerHelper implements X86CompilerConstants {
 			if (os.isCode32()) {
 				os.writePOPA();
 			} else {
+                os.writePOP(X86Register.R14);
+                os.writePOP(X86Register.R13);
+                os.writePOP(X86Register.R12);
+                os.writePOP(X86Register.R11);
+                os.writePOP(X86Register.R10);
+                os.writePOP(X86Register.R9);
+                os.writePOP(X86Register.R8);
 				os.writePOP(X86Register.RSI);
 				os.writePOP(X86Register.RDX);
 				os.writePOP(X86Register.RCX);

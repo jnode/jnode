@@ -1160,7 +1160,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param imm32
 	 */
 	public final void writeCMP_EAX(int operandSize, int imm32) {
-		testOperandSize(operandSize, BITS32 | BITS64);
+		testOperandSize(operandSize, BITS32 | BITS64);        
 		write1bOpcodeREXPrefix(operandSize, 0);
 		write8(0x3d);
 		write32(imm32);
@@ -1191,7 +1191,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		if (code64) {
 			throw new InvalidOpcodeException("Not implemented");
 		}
-		// TODO fix for 64-bit mode
 		write8(0x3b); // opcode
 		write8((reg.getNr() << 3) | 5); // disp32
 		write32(memPtr);
@@ -1670,8 +1669,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param offsetReg
 	 */
 	public void writeJMP(Object tablePtr, GPR offsetReg) {
-		write8(0xFF); // Opcode
-		write8(0xA0 | offsetReg.getNr()); // effective address == disp32[reg]
+        write2bOpcodeReg(0xFF, 0xA0, offsetReg);
+        // effective address == disp32[reg]
 		writeObjectRef(tablePtr, 0, false);
 	}
 
@@ -1688,13 +1687,12 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	}
 
 	/**
-	 * Create a absolute jump to [reg32+disp]
+	 * Create a absolute jump to [reg+disp]
 	 * 
 	 * @param reg32
 	 */
-	public final void writeJMP(GPR reg32, int disp) {
-		write8(0xFF); // Opcode
-		write8(0xA0 | reg32.getNr()); // effective address == disp32[reg]
+	public final void writeJMP(GPR reg, int disp) {
+        write2bOpcodeReg(0xFF, 0xA0, reg);
 		write32(disp);
 	}
 
@@ -1775,6 +1773,28 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			write8(rex);
 		}
 	}
+    
+    /**
+     * Write a 1 byte opcode that has the register encoded in the single byte.
+     * @param opcode1
+     * @param reg
+     */
+    private final void write1bOpcodeReg(int opcode1, X86Register reg) {
+        write1bOpcodeREXPrefix(reg.getSize(), reg.getNr());
+        write8(opcode1 + (reg.getNr() & 7));
+    }
+
+    /**
+     * Write a 2 byte opcode that has the register encoded in the single byte.
+     * @param opcode1
+     * @param opcode2
+     * @param reg
+     */
+    private final void write2bOpcodeReg(int opcode1, int opcode2, X86Register reg) {
+        write1bOpcodeREXPrefix(reg.getSize(), reg.getNr());
+        write8(opcode1);
+        write8(opcode2 + (reg.getNr() & 7));
+    }
 
 	/**
 	 * Write a REX prefix byte if needed for ModRM and ModRR encoded opcodes.
@@ -2218,7 +2238,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	public final void writeMOV_Const(GPR dstReg, int imm32) {
 		testSize(dstReg, BITS32 | BITS64);
 		if (dstReg.getSize() == BITS32) {
-			write8(0xb8 + dstReg.getNr()); // MOV reg32,imm32
+            write1bOpcodeReg(0xB8, dstReg);
 			write32(imm32);
 		} else {
 			writeMOV_Const(dstReg, (long) imm32);
@@ -2240,8 +2260,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			throw new InvalidOpcodeException();
 		}
 		testSize(dstReg, BITS64);
-		write1bOpcodeREXPrefix(dstReg.getSize(), dstReg.getNr());
-		write8(0xb8 + (dstReg.getNr() & 7)); // MOV reg64,imm64
+        write1bOpcodeReg(0xB8, dstReg);
 		write64(imm64);
 	}
 
@@ -2267,8 +2286,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 */
 	public final void writeMOV_Const(GPR dstReg, Object label) {
 		testOperandSize(dstReg.getSize(), mode.getSize());
-		write1bOpcodeREXPrefix(dstReg.getSize(), dstReg.getNr());
-		write8(0xb8 + (dstReg.getNr() & 7));
+        write1bOpcodeReg(0xB8, dstReg);
 		writeObjectRef(label, 0, false);
 	}
 
@@ -2604,7 +2622,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param dstReg
 	 */
 	public final void writePOP(GPR dstReg) {
-		write8(0x58 + dstReg.getNr()); // POP reg32
+        write1bOpcodeReg(0x58, dstReg);
 	}
 
 	/**
@@ -2656,9 +2674,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @return The ofset of the start of the instruction.
 	 */
 	public final int writePUSH(GPR srcReg) {
-		// TODO fix for REX prefix
-		final int rc = m_used;
-		write8(0x50 + srcReg.getNr());
+        final int rc = m_used;
+        write1bOpcodeReg(0x50, srcReg);
 		return rc;
 	}
 
@@ -3131,13 +3148,13 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	}
 
 	/**
-	 * Create a TEST eax, imm32
+	 * Create a TEST eax,imm32 or TEST rax,imm32
 	 * 
 	 * @param value
 	 */
 	public final void writeTEST_EAX(int operandSize, int value) {
 		testOperandSize(operandSize, BITS32 | BITS64);
-		// TODO fix for REX prefix
+        write1bOpcodeREXPrefix(operandSize, 0);
 		write8(0xa9);
 		write32(value);
 	}
