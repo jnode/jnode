@@ -664,19 +664,25 @@ public class Runtime
 	 */
   public void load(String filename)
   {
+    SecurityManager sm = securityManager; // Be thread-safe!
+    if (sm != null)
+      sm.checkLink(filename);
     if (loadLib(filename) == 0)
       throw new UnsatisfiedLinkError("Could not load library " + filename);
   }
 
-  // Private version of load(String) that doesn't throw Exception on
-  // load error, but it does do security checks (which can throw
-  // SecurityExceptions). Convenience method for early bootstrap
-  // process.
-  private int loadLib(String filename)
+  /**
+   * Do a security check on the filename and then load the native library.
+   *
+   * @param filename the file to load
+   * @return 0 on failure, nonzero on success
+   * @throws SecurityException if file read permission is denied
+   */
+  private static int loadLib(String filename)
   {
     SecurityManager sm = securityManager; // Be thread-safe!
     if (sm != null)
-      sm.checkLink(filename);
+      sm.checkRead(filename);
     return VMRuntime.nativeLoad(filename);
 	}
 
@@ -702,6 +708,10 @@ public class Runtime
    */
   public void loadLibrary(String libname)
   {
+    SecurityManager sm = securityManager; // Be thread-safe!
+    if (sm != null)
+      sm.checkLink(libname);
+
     String filename;
     ClassLoader cl = VMSecurityManager.currentClassLoader();
     if (cl != null)
@@ -709,15 +719,15 @@ public class Runtime
         filename = cl.findLibrary(libname);
         if (filename != null)
           {
-	    // Use loadLib so no UnsatisfiedLinkError are thrown.
             if (loadLib(filename) != 0)
 	      return;
+	    else
+	      throw new UnsatisfiedLinkError("Could not load library " + filename);
           }
       }
 
     filename = System.mapLibraryName(libname);
     for (int i = 0; i < libpath.length; i++)
-      // Use loadLib so no UnsatisfiedLinkError are thrown.
       if (loadLib(libpath[i] + filename) != 0)
 	return;
 
