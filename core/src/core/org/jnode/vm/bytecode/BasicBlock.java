@@ -19,6 +19,7 @@ import org.jnode.vm.compiler.ir.Variable;
  * @author Madhu Siddalingaiah
  */
 public class BasicBlock extends VmSystemObject {
+
 	private final int startPC;
 	private int endPC;
 	private boolean startOfExceptionHandler;
@@ -116,13 +117,13 @@ public class BasicBlock extends VmSystemObject {
 	}
 
 	/**
-	 * @return an ArrayList containing BasicBlocks that may succeed this block
+	 * @return a List containing BasicBlocks that may succeed this block
 	 */
 	public List getSuccessors() {
 		return successors;
 	}
 
-	public void addPredecessor(BasicBlock block) {
+	final void addPredecessor(BasicBlock block) {
 		if (!this.predecessors.contains(block)) {
 			this.predecessors.add(block);
 		}
@@ -139,7 +140,7 @@ public class BasicBlock extends VmSystemObject {
 	}
 
 	// This isn't complete, but it's good enough for now...
-	public void addSuccessor(BasicBlock block) {
+	final void addSuccessor(BasicBlock block) {
 		if (!this.successors.contains(block)) {
 			this.successors.add(block);
 		}

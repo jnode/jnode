@@ -84,4 +84,11 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements 
 	protected final X86CompilerContext getContext() {
 		return this.context;
 	}
+	
+	/**
+	 * @see org.jnode.vm.compiler.NativeCodeCompiler#dumpStatistics()
+	 */
+	public final void dumpStatistics() {
+		X86StackManager.dumpStatistics();
+	}
 }
