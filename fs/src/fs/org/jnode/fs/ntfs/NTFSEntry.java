@@ -39,6 +39,7 @@ public class NTFSEntry implements FSEntry {
 	{
 		this.indexEntry = indexEntry;
 	}
+	
 	public String getName() {
 		if(indexEntry != null)
 			return indexEntry.getFileName();
