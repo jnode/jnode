@@ -5,7 +5,6 @@
  */
 package org.jnode.vm.compiler.ir.quad;
 
-import org.jnode.util.BootableHashMap;
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
 import org.jnode.vm.compiler.ir.Operand;
@@ -43,7 +42,7 @@ public class VoidReturnQuad extends Quad {
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
 	 */
-	public void doPass2(BootableHashMap liveVariables) {
+	public void doPass2() {
 	}
 
 	/* (non-Javadoc)

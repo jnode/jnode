@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.jnode.util.BootableArrayList;
+import org.jnode.vm.compiler.ir.quad.BranchQuad;
 import org.jnode.vm.compiler.ir.quad.PhiAssignQuad;
 import org.jnode.vm.compiler.ir.quad.Quad;
 
@@ -138,6 +139,9 @@ public class IRBasicBlock {
 		if (stackOffset < 0) {
 			stackOffset = idominator.getStackOffset();
 		}
+		if (stackOffset < 0) {
+			throw new AssertionError("stack offset is invalid!");
+		}
 		return stackOffset;
 	}
 
@@ -153,7 +157,12 @@ public class IRBasicBlock {
 	 */
 	public void add(Quad q) {
 		addDef(q);
-		quads.add(q);
+		int n = quads.size();
+		if (n < 1 || q instanceof BranchQuad || !(quads.get(n-1) instanceof BranchQuad)) {
+			quads.add(q);
+		} else {
+			quads.add(n-1, q);
+		}
 	}
 
 	public void add(PhiAssignQuad paq) {

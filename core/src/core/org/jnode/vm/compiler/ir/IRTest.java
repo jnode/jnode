@@ -105,14 +105,13 @@ public class IRTest {
 	}
 
     private static void generateCode(AbstractX86Stream os, String className) throws MalformedURLException, ClassNotFoundException {
-		
+		//VmByteCode code = loadByteCode(className, "discriminant");
 		//VmByteCode code = loadByteCode(className, "arithOptIntx");
 		//VmByteCode code = loadByteCode(className, "simpleWhile");
 		VmByteCode code = loadByteCode(className, "terniary2");
 
-        X86CodeGenerator x86cg = new X86CodeGenerator(os, code.getLength());
-
         IRControlFlowGraph cfg = new IRControlFlowGraph(code);
+		X86CodeGenerator x86cg = new X86CodeGenerator(os, code.getLength());
 
 		//BytecodeViewer bv = new BytecodeViewer();
 		//BytecodeParser.parse(code, bv);
@@ -120,12 +119,18 @@ public class IRTest {
 		//System.out.println(cfg.toString());
 		//System.out.println();
 
-        System.out.println(cfg);
+        //System.out.println(cfg);
         IRGenerator irg = new IRGenerator(cfg);
         BytecodeParser.parse(code, irg);
 
 		cfg.constructSSA();
-        
+        cfg.optimize();
+
+		cfg.deconstrucSSA();
+		cfg.fixupAddresses();
+		
+		BootableHashMap liveVariables = new BootableHashMap();
+
         Iterator it = cfg.basicBlockIterator();
         while (it.hasNext()) {
         	IRBasicBlock b = (IRBasicBlock) it.next();
@@ -133,14 +138,54 @@ public class IRTest {
         	System.out.println(b + ", stackOffset = " + b.getStackOffset());
         	Iterator qi = b.getQuads().iterator();
         	while (qi.hasNext()) {
-        		System.out.println(qi.next());
+				Quad q = (Quad) qi.next();
+				if (!q.isDeadCode()) {
+					q.computeLiveness(liveVariables);
+					System.out.println(q);
+				}
         	}
         }
 		System.out.println();
 
-		// TODO constant folding, copy propagation, deconstruct SSA
-		// reorder addresses, compute liveness, allocate regs, and then...
-		// generate code ;-)
+		System.out.println("Live ranges:");
+		Collection lv = liveVariables.values();
+		LiveRange[] liveRanges = new LiveRange[lv.size()];
+		it = lv.iterator();
+		for (int i=0; i<liveRanges.length; i+=1) {
+			Variable var = (Variable) it.next();
+			LiveRange range = new LiveRange(var);
+			liveRanges[i] = range;
+		}
+
+		LinearScanAllocator lsa = new LinearScanAllocator(liveRanges);
+		lsa.allocate();
+
+		for (int i=0; i<liveRanges.length; i+=1) {
+			LiveRange range = liveRanges[i];
+			System.out.println(range);
+		}
+
+		x86cg.setArgumentVariables(irg.getVariables(), irg.getNoArgs());
+		x86cg.setSpilledVariables(lsa.getSpilledVariables());
+		x86cg.emitHeader();
+		it = cfg.basicBlockIterator();
+		while (it.hasNext()) {
+			IRBasicBlock b = (IRBasicBlock) it.next();
+			System.out.println();
+			System.out.println(b);
+			Iterator qi = b.getQuads().iterator();
+			while (qi.hasNext()) {
+				Quad q = (Quad) qi.next();
+				if (!q.isDeadCode()) {
+					q.generateCode(x86cg);
+				}
+			}
+		}
+
+		// TODO
+		// 1. Fix method argument location, allocator leaves it null and breaks
+		// 2. Many necessary operations are not implemented in the code generator
+		// 3. Do something about unused phi nodes, they just waste space right now
 
 
 //        BootableArrayList quads = irg.getQuadList();

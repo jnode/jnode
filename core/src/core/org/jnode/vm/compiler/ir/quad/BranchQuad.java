@@ -3,6 +3,8 @@
  */
 package org.jnode.vm.compiler.ir.quad;
 
+import java.util.Iterator;
+
 import org.jnode.vm.compiler.ir.IRBasicBlock;
 
 /**
@@ -10,20 +12,37 @@ import org.jnode.vm.compiler.ir.IRBasicBlock;
  * 
  */
 public abstract class BranchQuad extends Quad {
-	private int targetAddress;
+	private IRBasicBlock targetBlock;
 
 	/**
 	 * @param address
 	 */
 	public BranchQuad(int address, IRBasicBlock block, int targetAddress) {
 		super(address, block);
-		this.targetAddress = targetAddress;
+		Iterator it = block.getSuccessors().iterator();
+		while (it.hasNext()) {
+			IRBasicBlock succ = (IRBasicBlock) it.next();
+			if (succ.getStartPC() == targetAddress) {
+				targetBlock = succ;
+				break;
+			}
+		}
+		if (targetBlock == null) {
+			throw new AssertionError("unable to find target block!");
+		}
 	}
 
 	/**
 	 * @return
 	 */
 	public int getTargetAddress() {
-		return targetAddress;
+		return targetBlock.getStartPC();
+	}
+
+	/**
+	 * @return
+	 */
+	public IRBasicBlock getTargetBlock() {
+		return targetBlock;
 	}
 }

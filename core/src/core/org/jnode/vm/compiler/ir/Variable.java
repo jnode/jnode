@@ -6,7 +6,6 @@
 package org.jnode.vm.compiler.ir;
 
 import org.jnode.vm.compiler.ir.quad.AssignQuad;
-import org.jnode.vm.compiler.ir.quad.VariableRefAssignQuad;
 
 /**
  * @author Madhu Siddalingaiah
@@ -84,7 +83,7 @@ public abstract class Variable extends Operand implements Cloneable {
 		}
 		// Add one so this live range starts just after this operation.
 		// This way live range interference computation is simplified.
-		return this.assignQuad.getLHSLiveAddress();
+		return assignQuad.getLHSLiveAddress();
 	}
 
 	/**
@@ -97,21 +96,10 @@ public abstract class Variable extends Operand implements Cloneable {
 	}
 
 	public Operand simplify() {
-		return assignQuad.propagate(this);
+		Operand op = assignQuad.propagate(this);
+		return op;
 	}
 	
-	public Variable simplifyCopy() {
-		if (assignQuad instanceof VariableRefAssignQuad) {
-			VariableRefAssignQuad va = (VariableRefAssignQuad) assignQuad;
-			Operand rhs = va.getRHS();
-			if (rhs instanceof Variable) {
-				return (Variable) rhs;
-			}
-		}
-		assignQuad.setDeadCode(false);
-		return this;
-	}
-
 	/**
 	 * @return
 	 */
@@ -135,7 +123,7 @@ public abstract class Variable extends Operand implements Cloneable {
 		} else if (location instanceof RegisterLocation) {
 			return Operand.MODE_REGISTER;
 		} else {
-			throw new IllegalArgumentException("Undefined location");
+			throw new IllegalArgumentException("Undefined location: " + toString());
 		}
 	}
 

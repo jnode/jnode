@@ -5,11 +5,9 @@
  */
 package org.jnode.vm.compiler.ir.quad;
 
-import org.jnode.util.BootableHashMap;
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
 import org.jnode.vm.compiler.ir.Operand;
-import org.jnode.vm.compiler.ir.Variable;
 
 /**
  * @author Madhu Siddalingaiah
@@ -51,13 +49,8 @@ public class VarReturnQuad extends Quad {
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
 	 */
-	public void doPass2(BootableHashMap liveVariables) {
+	public void doPass2() {
 		refs[0] = refs[0].simplify();
-		if (refs[0] instanceof Variable) {
-			Variable v = (Variable) refs[0];
-			v.setLastUseAddress(this.getAddress());
-			liveVariables.put(v, v);
-		}
 	}
 
 	/* (non-Javadoc)
