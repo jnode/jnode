@@ -20,7 +20,8 @@
   </runtime>
   
   <extension point="org.jnode.driver.mappers">
-    <mapper class="org.jnode.driver.net.lance.LanceDeviceToDriverMapper"/>
+    <!-- mapper class="org.jnode.driver.net.lance.LanceDeviceToDriverMapper"/ -->
+    <mapper id="1022:2000" name="AMD PCnet32 LANCE" driver-class="org.jnode.driver.net.lance.LanceDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
   </extension>
         
   <extension point="org.jnode.security.permissions">

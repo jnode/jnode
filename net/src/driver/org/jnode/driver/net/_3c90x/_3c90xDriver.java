@@ -13,6 +13,7 @@ import org.jnode.driver.net.ethernet.spi.AbstractEthernetDriver;
 import org.jnode.driver.pci.PCIDevice;
 import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
+import org.jnode.plugin.ConfigurationElement;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.util.TimeoutException;
 import org.jnode.util.AccessControllerUtils;
@@ -30,6 +31,13 @@ public class _3c90xDriver extends AbstractEthernetDriver {
 
     /** The device flags */
     private final _3c90xFlags flags;
+
+    /**
+     * Create a new instance
+     */
+    public _3c90xDriver(ConfigurationElement config) {
+        this(new _3c90xFlags(config));
+    }
 
     /**
      * Create a new instance

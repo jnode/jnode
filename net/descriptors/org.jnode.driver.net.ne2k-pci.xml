@@ -21,7 +21,8 @@
   </runtime>
   
   <extension point="org.jnode.driver.mappers">
-    <mapper class="org.jnode.driver.net.ne2000.pci.Ne2000PCIDeviceToDriverMapper"/>
+    <!-- mapper class="org.jnode.driver.net.ne2000.pci.Ne2000PCIDeviceToDriverMapper"/ -->
+    <mapper id="10ec:8029" name="Realtek 8029" driver-class="org.jnode.driver.net.ne2000.pci.Ne2000PCIDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
   </extension>
         
   <extension point="org.jnode.security.permissions">

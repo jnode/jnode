@@ -9,12 +9,17 @@ import org.jnode.driver.net.ethernet.spi.BasicEthernetDriver;
 import org.jnode.driver.net.ethernet.spi.Flags;
 import org.jnode.driver.net.spi.AbstractDeviceCore;
 import org.jnode.driver.pci.PCIDevice;
+import org.jnode.plugin.ConfigurationElement;
 import org.jnode.system.ResourceNotFreeException;
 
 /**
  * @author epr
  */
 public class LanceDriver extends BasicEthernetDriver {
+	
+	public LanceDriver(ConfigurationElement config) {
+		this(new LanceFlags(config));
+	}
 	
 	public LanceDriver(LanceFlags flags) {
 		this.flags = flags;

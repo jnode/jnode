@@ -4,6 +4,7 @@
 package org.jnode.driver.net.lance;
 
 import org.jnode.driver.net.ethernet.spi.Flags;
+import org.jnode.plugin.ConfigurationElement;
 
 /**
  * @author epr
@@ -16,6 +17,10 @@ public class LanceFlags implements Flags {
 	private boolean autoSelectEnabled;
 	private boolean mustUnreset;
 
+	public LanceFlags(ConfigurationElement config) {
+	    this(config.getAttribute("name"));
+	}
+	
 	/**
 	 * Create a new instance
 	 */
