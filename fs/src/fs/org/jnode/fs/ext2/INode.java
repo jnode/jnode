@@ -186,8 +186,8 @@ public class INode {
 					fs.writeBlock( dataBlockNr, data, false);	
 
 					//need to blank the block so that e2fsck does not complain
-					byte[] zeroes=new byte[(int)fs.getBlockSize()];	//blank the block
-					Arrays.fill(zeroes, 0, (int)fs.getBlockSize(), (byte)0);
+					byte[] zeroes=new byte[fs.getBlockSize()];	//blank the block
+					Arrays.fill(zeroes, 0, fs.getBlockSize(), (byte)0);
 					fs.writeBlock(blockNr, zeroes, false);
 			} else
 					blockNr = Ext2Utils.get32(data, (int)blockIndex*4);
@@ -326,8 +326,8 @@ public class INode {
 				Ext2Utils.set32(data, 40+12*4, indirectBlockNr);
 
 				//need to blank the block so that e2fsck does not complain
-				byte[] zeroes=new byte[(int)fs.getBlockSize()];	//blank the block
-				Arrays.fill(zeroes, 0, (int)fs.getBlockSize(), (byte)0);
+				byte[] zeroes=new byte[fs.getBlockSize()];	//blank the block
+				Arrays.fill(zeroes, 0, fs.getBlockSize(), (byte)0);
 				fs.writeBlock(indirectBlockNr, zeroes, false);
 			} else
 				//the indirect block has already been used
@@ -350,8 +350,8 @@ public class INode {
 				Ext2Utils.set32(data, 40+13*4, doubleIndirectBlockNr);
 
 				//need to blank the block so that e2fsck does not complain
-				byte[] zeroes=new byte[(int)fs.getBlockSize()];	//blank the block
-				Arrays.fill(zeroes, 0, (int)fs.getBlockSize(), (byte)0);
+				byte[] zeroes=new byte[fs.getBlockSize()];	//blank the block
+				Arrays.fill(zeroes, 0, fs.getBlockSize(), (byte)0);
 				fs.writeBlock(doubleIndirectBlockNr, zeroes, false);
 			} else
 				doubleIndirectBlockNr = Ext2Utils.get32(data, 40+13*4);
@@ -373,8 +373,8 @@ public class INode {
 				Ext2Utils.set32(data, 40+13*4, tripleIndirectBlockNr);
 
 				//need to blank the block so that e2fsck does not complain
-				byte[] zeroes=new byte[(int)fs.getBlockSize()];	//blank the block
-				Arrays.fill(zeroes, 0, (int)fs.getBlockSize(), (byte)0);
+				byte[] zeroes=new byte[fs.getBlockSize()];	//blank the block
+				Arrays.fill(zeroes, 0, fs.getBlockSize(), (byte)0);
 				fs.writeBlock(tripleIndirectBlockNr, zeroes, false);
 			} else
 				tripleIndirectBlockNr = Ext2Utils.get32(data, 40+14*4);
