@@ -101,7 +101,14 @@ public class PcBufferTextScreen extends AbstractPcTextScreen implements TextScre
             if( cursorVisible&&cursorIndex<buffer.length&&cursorIndex>=0 ) {
                 System.arraycopy( buffer, 0, screenBuffer, 0, buffer.length );
                 char origValue = buffer[cursorIndex];
-                origValue |= 0x7000;//from december 2003 jnode code.
+                //origValue |= 0x7000;//from december 2003 jnode code.
+
+                //exchange the background with the foreground
+                int color = (origValue >>8) & 0xFF;
+                color = ((color >> 4) & 0xF) | ((color << 4) & 0xF0);
+                origValue &= 0x00FF;
+                origValue |= (color << 8) & 0xFF00;
+                
                 screenBuffer[cursorIndex] = origValue;
                 toScreen = screenBuffer;
             }
