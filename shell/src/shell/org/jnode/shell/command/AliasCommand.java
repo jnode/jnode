@@ -38,7 +38,7 @@ public class AliasCommand {
 			)
 		});
 
-	public static void main(String[] args) throws NoSuchAliasException, NameNotFoundException {
+	public static void main(String[] args) throws NoSuchAliasException, NameNotFoundException, SyntaxErrorException {
 		ParsedArguments cmdLine = HELP_INFO.parse(args);
 
 		final Shell shell = ShellUtils.getShellManager().getCurrentShell();

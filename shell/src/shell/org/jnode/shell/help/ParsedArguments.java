@@ -9,21 +9,22 @@ import java.util.Map;
  * @author qades
  */
 public class ParsedArguments {
-	Map args;
 
-	ParsedArguments(Map args) {
-		this.args = args;
-	}
+    private final Map args;
 
-	public int size() {
-		return args.size();
-	}
+    ParsedArguments(Map args) {
+        this.args = args;
+    }
 
-	String[] getValues(Argument arg) {
-		return (String[])args.get(arg);
-	}
+    public final int size() {
+        return args.size();
+    }
 
-	boolean isSet(Parameter param) {
-		return args.containsKey(param);
-	}
+    final String[] getValues(Argument arg) {
+        return (String[]) args.get(arg);
+    }
+
+    final boolean isSet(Parameter param) {
+        return args.containsKey(param);
+    }
 }

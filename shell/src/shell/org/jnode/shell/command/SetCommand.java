@@ -20,7 +20,7 @@ public class SetCommand {
 		}
 	);
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SyntaxErrorException {
 		ParsedArguments cmdLine = HELP_INFO.parse(args);
 
                 String key = ARG_KEY.getValue(cmdLine);

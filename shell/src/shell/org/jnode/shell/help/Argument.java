@@ -13,114 +13,128 @@ import org.jnode.shell.ShellUtils;
  */
 public class Argument extends CommandLineElement {
 
-	public static final boolean SINGLE = false;
-	public static final boolean MULTI = true;
+    public static final boolean SINGLE = false;
 
-	private final boolean multi;
+    public static final boolean MULTI = true;
 
-	public Argument(String name, String description, boolean multi) {
-		super(name, description);
-		this.multi = multi;
-	}
+    private final boolean multi;
 
-	public Argument(String name, String description) {
-		this(name, description, SINGLE);
-	}
+    public Argument(String name, String description, boolean multi) {
+        super(name, description);
+        this.multi = multi;
+    }
 
-	public boolean isMulti() {
-		return multi;
-	}
+    public Argument(String name, String description) {
+        this(name, description, SINGLE);
+    }
 
-	public String format() {
-		return "<" + getName() + ">" + (isMulti() ? " ..." : "");
-	}
+    public boolean isMulti() {
+        return multi;
+    }
 
-	public void describe(Help help) {
-		help.describeArgument(this);
-	}
+    public String format() {
+        return "<" + getName() + ">" + (isMulti() ? " ..." : "");
+    }
 
-	// Command line completion
-	private String[] values = new String[0];
-	private boolean satisfied = false;
+    public void describe(Help help) {
+        help.describeArgument(this);
+    }
 
-	public String complete(String partial) {
-		// No completion per default
-		return partial;
-	}
+    // Command line completion
+    private String[] values = new String[ 0];
 
-	protected String complete(String partial, List list) {
-		if( list.size() == 0 )	// none found
-			return partial;
+    private boolean satisfied = false;
 
-		if( list.size() == 1 )
-			return (String)list.get(0) + " ";
+    public String complete(String partial) {
+        // No completion per default
+        return partial;
+    }
 
-		// list matching
-		String[] result = (String[]) list.toArray(new String[list.size()/*ToDo: remove this ugly workaround*/]);
-		list(result);
+    protected String complete(String partial, List list) {
+        if (list.size() == 0) // none found
+                return partial;
 
-		// return the common part, i.e. complete as much as possible
-		return common(result);
-	}
+        if (list.size() == 1) return (String) list.get(0) + " ";
 
-	protected final void setValue(String value) {
-		if (isMulti()) {
-			String[] values = new String[this.values.length + 1];
-			System.arraycopy(this.values, 0, values, 0, this.values.length);
-			values[this.values.length] = value;
-			this.values = values;
-		} else {
-			this.values = new String[] { value };
-		}
-		setSatisfied(!isMulti());
-	}
+        // list matching
+        String[] result = (String[]) list
+                .toArray(new String[ list.size()/*
+                                                 * ToDo: remove this ugly
+                                                 * workaround
+                                                 */]);
+        list(result);
 
-	public final String getValue(ParsedArguments args) {
-		String[] result = getValues(args);
-		if( (result == null) || (result.length == 0) )
-			return null;
-		return result[0];
-	}
+        // return the common part, i.e. complete as much as possible
+        return common(result);
+    }
 
-        public final String[] getValues(ParsedArguments args) {
-		return args.getValues(this);
-	}
+    protected final void setValue(String value) {
+        if (isMulti()) {
+            String[] values = new String[ this.values.length + 1];
+            System.arraycopy(this.values, 0, values, 0, this.values.length);
+            values[ this.values.length] = value;
+            this.values = values;
+        } else {
+            this.values = new String[] { value};
+        }
+        setSatisfied(!isMulti());
+    }
 
-	final String[] getValues() {
-		return values;
-	}
+    /**
+     * Override this method to check if a given value "fits" this argument.
+     * 
+     * @param value
+     * @return true if value, false otherwise.
+     */
+    protected boolean isValidValue(String value) {
+        return true;
+    }
 
-	protected final void clear() {
-		this.values = new String[0];
-		setSatisfied(false);
-	}
+    public final String getValue(ParsedArguments args) {
+        String[] result = getValues(args);
+        if ((result == null) || (result.length == 0)) return null;
+        return result[ 0];
+    }
 
-	protected final void setSatisfied(boolean satisfied) {
-		this.satisfied = satisfied;
-	}
+    public final String[] getValues(ParsedArguments args) {
+        return args.getValues(this);
+    }
 
-	public final boolean isSatisfied() {
-		return satisfied;
-	}
+    final String[] getValues() {
+        return values;
+    }
 
-	protected String common(String[] items) {
-		if (items.length == 0)
-			return "";
-		String result = items[0];
-		for (int i = 1; i < items.length; i++) {
-			while (!items[i].startsWith(result)) // shorten the result until it matches
-				result = result.substring(0, result.length() - 1);
-		}
-		return result;
-	}
+    protected final void clear() {
+        this.values = new String[ 0];
+        setSatisfied(false);
+    }
 
-	public void list(String[] items) {
-		try {
-			ShellUtils.getShellManager().getCurrentShell().list(items);
-		} catch (NameNotFoundException ex) {
-			// should not happen!
-			System.err.println("No list available");
-		}
-	}
+    protected final void setSatisfied(boolean satisfied) {
+        this.satisfied = satisfied;
+    }
+
+    public final boolean isSatisfied() {
+        return satisfied;
+    }
+
+    protected String common(String[] items) {
+        if (items.length == 0) return "";
+        String result = items[ 0];
+        for (int i = 1; i < items.length; i++) {
+            while (!items[ i].startsWith(result))
+                // shorten the result until it matches
+                result = result.substring(0, result.length() - 1);
+        }
+        return result;
+    }
+
+    public void list(String[] items) {
+        try {
+            ShellUtils.getShellManager().getCurrentShell().list(items);
+        } catch (NameNotFoundException ex) {
+            // should not happen!
+            System.err.println("No list available");
+        }
+    }
 
 }

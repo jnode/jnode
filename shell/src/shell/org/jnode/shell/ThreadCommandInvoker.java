@@ -8,7 +8,8 @@ package org.jnode.shell;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardListener;
 import org.jnode.shell.help.Help;
-import org.jnode.shell.help.SyntaxError;
+import org.jnode.shell.help.HelpException;
+import org.jnode.shell.help.SyntaxErrorException;
 
 import gnu.java.security.actions.InvokeAction;
 
@@ -176,8 +177,13 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
                 }
             } catch (InvocationTargetException ex) {
                 Throwable tex = ex.getTargetException();
-                if (tex instanceof SyntaxError) {
-                    Help.getInfo(cx).usage();
+                if (tex instanceof SyntaxErrorException) {
+                    try {
+                        Help.getInfo(cx).usage();
+                    } catch (HelpException ex1) {
+                        // Don't care
+                        ex1.printStackTrace();
+                    }
                     err.println(tex.getMessage());
                     unblock();
                 } else {

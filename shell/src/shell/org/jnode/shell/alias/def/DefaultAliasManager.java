@@ -31,6 +31,7 @@ public class DefaultAliasManager implements AliasManager, ExtensionPointListener
 	public DefaultAliasManager(ExtensionPoint aliasesEP) {
 		this.parent = null;
 		this.aliasesEP = aliasesEP;
+		aliasesEP.addListener(this);
 		refreshAliases();
 	}
 	
@@ -143,6 +144,7 @@ public class DefaultAliasManager implements AliasManager, ExtensionPointListener
 	 *
 	 */
 	protected void refreshAliases() {
+	    System.out.println("Refreshing alias list");
 		if (aliasesEP != null) {
 			aliases.clear();
 			final Extension[] extensions = aliasesEP.getExtensions();

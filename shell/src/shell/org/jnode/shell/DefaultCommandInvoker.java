@@ -14,7 +14,7 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 
 import org.jnode.shell.help.Help;
-import org.jnode.shell.help.SyntaxError;
+import org.jnode.shell.help.SyntaxErrorException;
 
 /**
  * User: Sam Reid Date: Dec 20, 2003 Time: 1:20:33 AM Copyright (c) Dec 20,
@@ -59,7 +59,7 @@ public class DefaultCommandInvoker implements CommandInvoker {
                 //                System.err.println("Finished invoke.");
             } catch (InvocationTargetException ex) {
                 Throwable tex = ex.getTargetException();
-                if (tex instanceof SyntaxError) {
+                if (tex instanceof SyntaxErrorException) {
                     Help.getInfo(cmdClass).usage();
                     err.println(tex.getMessage());
                 } else {

@@ -28,14 +28,14 @@ public class DeviceArgument extends Argument {
 		super(name, description);
 	}
 
-	public Device getDevice(ParsedArguments args) throws SyntaxError {
+	public Device getDevice(ParsedArguments args) throws SyntaxErrorException {
 		String value = getValue(args);
 		try {
 			return ((DeviceManager)InitialNaming.lookup(DeviceManager.NAME)).getDevice(value);
 		} catch(NameNotFoundException ex) {
-			throw new SyntaxError("DeviceManager not found. Check your system setup");
+			throw new SyntaxErrorException("DeviceManager not found. Check your system setup");
 		} catch(DeviceNotFoundException ex) {
-			throw new SyntaxError("Device " + value + " not found");
+			throw new SyntaxErrorException("Device " + value + " not found");
 		}
 	}
 
