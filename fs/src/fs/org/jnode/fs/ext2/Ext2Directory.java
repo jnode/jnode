@@ -297,16 +297,14 @@ public class Ext2Directory extends AbstractFSDirectory {
                 // update the directory inode
                 iNode.update();
 
-                //unlock the inode from the cache
-                iNode.decLocked();
                 return;
             } catch (Throwable ex) {
-                //could not fininsh the operation, unlock the inode from the
-                // cache
-                iNode.decLocked();
     			final IOException ioe = new IOException();
     			ioe.initCause(ex);
     			throw ioe;
+            } finally {
+                //unlock the inode from the cache
+                iNode.decLocked();
             }
         }
     }
