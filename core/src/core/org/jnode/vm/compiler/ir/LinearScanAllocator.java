@@ -24,7 +24,7 @@ public class LinearScanAllocator {
 
 	public LinearScanAllocator(LiveRange[] liveRanges) {
 		this.liveRanges = liveRanges;
-		this.registerPool = RegisterPool.getInstance();
+		this.registerPool = CodeGenerator.getInstance().getRegisterPool();
 		this.active = new BootableArrayList();
 		this.endPointComparator = new EndPointComparator();
 	}
