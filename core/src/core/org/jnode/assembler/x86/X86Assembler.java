@@ -790,7 +790,7 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeCMP_MEM(int operandSize, int memPtr, int imm32);
 
 	/**
-	 * Create a CMPXCHG dword [dstReg], srcReg
+	 * Create a CMPXCHG [dstReg], srcReg
 	 * 
 	 * @param dstReg
 	 * @param dstDisp
