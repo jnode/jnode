@@ -860,7 +860,7 @@ public class JInternalFrame extends JComponent implements Accessible,
   {
     JDesktopPane pane = getDesktopPane();
     if (pane != null)
-      return pane.getLayer(this).intValue();
+      return pane.getLayer(this);
     return -1;
   }
 
@@ -1272,8 +1272,9 @@ public class JInternalFrame extends JComponent implements Accessible,
    */
   public void setDefaultCloseOperation(int operation)
   {
-    if (operation != DO_NOTHING_ON_CLOSE || operation != HIDE_ON_CLOSE
-        || operation != DISPOSE_ON_CLOSE)
+    if (operation != DO_NOTHING_ON_CLOSE
+	&& operation != HIDE_ON_CLOSE
+        && operation != DISPOSE_ON_CLOSE)
       throw new Error("Close operation must be one of DO_NOTHING_ON_CLOSE, HIDE_ON_CLOSE, or DISPOSE_ON_CLOSE");
     defaultCloseOperation = operation;
   }

@@ -57,7 +57,7 @@ import javax.swing.border.Border;
 public class ScrollPaneLayout
   implements LayoutManager, ScrollPaneConstants, Serializable
 {
-  static final long serialVersionUID = -4480022884523193743L;
+  private static final long serialVersionUID = -4480022884523193743L;
 
   public static class UIResource extends ScrollPaneLayout 
     implements javax.swing.plaf.UIResource {
@@ -321,7 +321,6 @@ public class ScrollPaneLayout
               insetsSize.setSize(insets.left + insets.right,
                                  insets.top + insets.bottom);
 
-            maybeSetMinimumSize(viewport, viewportSize);
             maybeSetMinimumSize(colHead, columnHeaderSize);
             maybeSetMinimumSize(rowHead, rowHeaderSize);
 

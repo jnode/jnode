@@ -1,5 +1,5 @@
-/* TreeCellEditor.java --
-   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
+/* BasicEditorPaneUI.java -- 
+   Copyright (C) 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -36,30 +36,33 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package javax.swing.tree;
+package javax.swing.plaf.basic;
 
-import java.awt.Component;
+import javax.swing.JComponent;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.text.Element;
+import javax.swing.text.PlainView;
+import javax.swing.text.View;
 
-import javax.swing.CellEditor;
-import javax.swing.JTree;
-
-/**
- * TreeCellEditor public interface
- * @author Andrew Selkirk
- */
-public interface TreeCellEditor extends CellEditor
+public class BasicEditorPaneUI extends BasicTextUI
 {
-	/**
-	 * getTreeCellEditorComponent
-	 * @param tree TODO
-	 * @param value TODO
-	 * @param isSelected TODO
-	 * @param expanded TODO
-	 * @param leaf TODO
-	 * @param row TODO
-   * @return TODO
-	 */
-  Component getTreeCellEditorComponent(JTree tree, Object value,
-				       boolean isSelected, boolean expanded,
-			boolean leaf, int row);
+  public static ComponentUI createUI(JComponent comp)
+  {
+    return new BasicEditorPaneUI();
+  }
+
+  public BasicEditorPaneUI()
+  {
+    // Do nothing here.
+  }
+
+  public View create(Element elem)
+  {
+    return new PlainView(elem);
+  }
+
+  protected String getPropertyPrefix()
+  {
+    return "EditorPane";
+  }
 }

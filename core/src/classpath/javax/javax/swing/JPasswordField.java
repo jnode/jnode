@@ -47,7 +47,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 /**
- * JPasswordField
+ * class JPasswordField
+ * 
  * @author	Andrew Selkirk
  * @version	1.0
  */
@@ -69,6 +70,7 @@ public class JPasswordField extends JTextField
 
 		/**
 		 * getAccessibleRole
+     * 
      * @return AccessibleRole
 		 */
     public AccessibleRole getAccessibleRole()
@@ -83,7 +85,7 @@ public class JPasswordField extends JTextField
 	private char echoChar = 0;
 
 	/**
-	 * Constructor JPasswordField
+   * Creates a <code>JPasswordField</code> object.
 	 */
   public JPasswordField()
   {
@@ -91,8 +93,9 @@ public class JPasswordField extends JTextField
   }
 
 	/**
-	 * Constructor JPasswordField
-	 * @param text TODO
+   * Creates a <code>JPasswordField</code> object.
+   * 
+   * @param text the initial text
 	 */
   public JPasswordField(String text)
   {
@@ -100,8 +103,9 @@ public class JPasswordField extends JTextField
   }
 
 	/**
-	 * Constructor JPasswordField
-	 * @param columns TODO
+   * Creates a <code>JPasswordField</code> object.
+   * 
+   * @param columns the number of columns
 	 */
   public JPasswordField(int columns)
   {
@@ -109,9 +113,10 @@ public class JPasswordField extends JTextField
   }
 
 	/**
-	 * Constructor JPasswordField
-	 * @param text TODO
-	 * @param columns TODO
+   * Creates a <code>JPasswordField</code> object.
+   * 
+   * @param text the initial text
+   * @param columns the number of columns
 	 */
   public JPasswordField(String text, int columns)
   {
@@ -119,10 +124,11 @@ public class JPasswordField extends JTextField
   }
 
 	/**
-	 * Constructor JPasswordField
-	 * @param document TODO
-	 * @param text TODO
-	 * @param columns TODO
+   * Creates a <code>JPasswordField</code> object.
+   * 
+   * @param document the document to use
+   * @param text the initial text
+   * @param columns the number of columns
 	 */
   public JPasswordField(Document document, String text, int columns)
   {
@@ -131,17 +137,20 @@ public class JPasswordField extends JTextField
 
 	/**
 	 * writeObject
-	 * @param stream TODO
-	 * @exception IOException TODO
+   * 
+   * @param stream the stream to write to
+   * 
+   * @exception IOException if an error occurs
 	 */
   private void writeObject(ObjectOutputStream stream) throws IOException
   {
-		// TODO
+    // TODO: Implement me.
   }
 
 	/**
-	 * getUIClassID
-   * @return String
+   * Returns the <code>UIClassID</code>
+   * 
+   * @return the string "PasswordFieldUI"
 	 */
   public String getUIClassID()
   {
@@ -150,7 +159,8 @@ public class JPasswordField extends JTextField
 
 	/**
 	 * getEchoChar
-   * @return char
+   * 
+   * @return the echo char
 	 */
   public char getEchoChar()
   {
@@ -159,7 +169,8 @@ public class JPasswordField extends JTextField
 
 	/**
 	 * setEchoChar
-	 * @param echo TODO
+   * 
+   * @param echo the echo char
 	 */
   public void setEchoChar(char echo)
   {
@@ -168,7 +179,9 @@ public class JPasswordField extends JTextField
 
 	/**
 	 * echoCharIsSet
-   * @return boolean
+   * 
+   * @return <code>true</code> if the echo char is set,
+   * <code>false</code> otherwise.
    */
   public boolean echoCharIsSet()
   {
@@ -176,7 +189,8 @@ public class JPasswordField extends JTextField
   }
 
   /**
-   * copy
+   * Copies the selected text into the clipboard. This operation is not
+   * allowed in a password input field.
 	 */
   public void copy()
   {
@@ -184,7 +198,8 @@ public class JPasswordField extends JTextField
   }
 
 	/**
-	 * cut
+   * Cuts the selected text and puts it into the clipboard. This operation
+   * is not allowed in a password input field.
 	 */
   public void cut()
   {
@@ -193,7 +208,9 @@ public class JPasswordField extends JTextField
 
 	/**
 	 * getText
+   * 
    * @return String
+   * 
          * @deprecated
 	 */
   public String getText()
@@ -203,10 +220,14 @@ public class JPasswordField extends JTextField
 
 	/**
 	 * getText
+   * 
 	 * @param offset TODO
 	 * @param length TODO
+   * 
    * @return String
+   * 
 	 * @exception BadLocationException TODO
+   *
          * @deprecated
 	 */
   public String getText(int offset, int length) throws BadLocationException
@@ -216,15 +237,17 @@ public class JPasswordField extends JTextField
 
 	/**
 	 * getPassword
+   * 
    * @return char[]
 	 */
   public char[] getPassword()
   {
-		return null; // TODO
+    return new char[0]; // TODO
   }
 
 	/**
 	 * paramString
+   * 
    * @return String
 	 */
   protected String paramString()
@@ -234,7 +257,8 @@ public class JPasswordField extends JTextField
 
 	/**
 	 * getAccessibleContext
-   * @return AccessibleContext
+   * 
+   * @return the <code>AccessibleContext</code> object
 	 */
   public AccessibleContext getAccessibleContext()
   {
