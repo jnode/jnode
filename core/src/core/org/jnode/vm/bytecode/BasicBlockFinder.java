@@ -268,6 +268,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport implements Bytecode
 	    tstack.push(JvmType.RETURN_ADDRESS);
 		addBranch(address, false);
 		condYieldPoint(address);
+		tstack.pop();
 	}
 
 	/**

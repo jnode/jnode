@@ -7,8 +7,8 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
 import org.jnode.assembler.x86.X86Constants;
-import org.jnode.vm.*;
 import org.jnode.vm.Address;
+import org.jnode.vm.JvmType;
 import org.jnode.vm.PragmaPrivilegedAction;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
@@ -171,15 +171,21 @@ public class X86CompilerHelper implements X86CompilerConstants {
         os.writeCALL(Register.EAX, context.getVmMethodNativeCodeField()
                 .getOffset());
         //writeJumpTableCALL(X86JumpTable.VM_INVOKE_OFS);
-        final char ch = signature.charAt(signature.length() - 1);
-        if (ch == 'V') {
-            /** No return value */
-        } else if ((ch == 'J') || (ch == 'D')) {
-            /** Wide return value */
-            stackMgr.writePUSH64(JvmType.SignatureToType(ch), Register.EAX, Register.EDX);
-        } else {
-            /** Normal return value */
-            stackMgr.writePUSH(JvmType.SignatureToType(ch), Register.EAX);
+        final int returnType = JvmType.getReturnType(signature);
+        assertCondition(signature.endsWith("V") == (returnType == JvmType.VOID), "Return type");
+        //System.out.println("Return type: " + returnType + "\t" + signature);
+        switch (returnType) {
+        case JvmType.VOID:
+            // No return value
+            break;
+        case JvmType.DOUBLE:
+        case JvmType.LONG:
+            // Wide return value 
+            stackMgr.writePUSH64(returnType, Register.EAX, Register.EDX);
+        	break;
+        default:
+            // Normal return value
+            stackMgr.writePUSH(returnType, Register.EAX);        
         }
     }
 
@@ -478,5 +484,11 @@ public class X86CompilerHelper implements X86CompilerConstants {
         final int staticsIdx = (VmArray.DATA_OFFSET + entry.getStaticsIndex()) << 2;
         os.writeMOV(INTSIZE, STATICS, staticsIdx + 4, msbSrc); // MSB
         os.writeMOV(INTSIZE, STATICS, staticsIdx + 0, lsbSrc); // LSB
+    }
+    
+    public static void assertCondition(boolean condition, String msg) {
+        if (!condition) {
+            throw new InternalError("Assertion failed: " + msg);
+        }
     }
 }

@@ -29,11 +29,11 @@ final class EmitterContext {
      * Create a new context
      */
     EmitterContext(AbstractX86Stream os, X86CompilerHelper helper,
-            VirtualStack vstack) {
+            VirtualStack vstack, X86RegisterPool pool) {
         this.os = os;
         this.helper = helper;
         this.vstack = vstack;
-        pool = new X86RegisterPool();
+        this.pool = pool;
     }
 
     /**

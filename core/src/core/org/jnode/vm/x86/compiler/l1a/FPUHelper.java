@@ -7,6 +7,7 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
 import org.jnode.assembler.x86.X86Constants;
+import org.jnode.system.BootLog;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.bytecode.StackException;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
@@ -29,8 +30,8 @@ final class FPUHelper implements X86CompilerConstants {
         final Item v1 = vstack.pop(type);
 
         if (v1.isConstant() && v2.isConstant()) {
-            final double fpv1 = ((FPItem) v1).getFPValue();
-            final double fpv2 = ((FPItem) v2).getFPValue();
+            final double fpv1 = getFPValue(v1);
+            final double fpv2 = getFPValue(v2);
             vstack.push(createConst(type, fpv1 + fpv2));
         } else {
             // Prepare stack
@@ -131,11 +132,13 @@ final class FPUHelper implements X86CompilerConstants {
             int fromType, int toType) {
         final Item v = vstack.pop(fromType);
         if (v.isConstant()) {
-            vstack.push(createConst(toType, ((FPItem) v).getFPValue()));
+            vstack.push(createConst(toType, getFPValue(v)));
         } else {
             v.pushToFPU(ec);
             vstack.fpuStack.pop(v);
-            vstack.push(createFPUStack(toType));
+            final Item result = createFPUStack(toType);
+            vstack.push(result);
+            vstack.fpuStack.push(result);
         }
     }
 
@@ -152,8 +155,8 @@ final class FPUHelper implements X86CompilerConstants {
         final Item v1 = vstack.pop(type);
 
         if (v1.isConstant() && v2.isConstant()) {
-            final double fpv1 = ((FPItem) v1).getFPValue();
-            final double fpv2 = ((FPItem) v2).getFPValue();
+            final double fpv1 = getFPValue(v1);
+            final double fpv2 = getFPValue(v2);
             vstack.push(createConst(type, fpv1 / fpv2));
         } else {
             // Prepare stack
@@ -184,8 +187,8 @@ final class FPUHelper implements X86CompilerConstants {
         final Item v1 = vstack.pop(type);
 
         if (v1.isConstant() && v2.isConstant()) {
-            final double fpv1 = ((FPItem) v1).getFPValue();
-            final double fpv2 = ((FPItem) v2).getFPValue();
+            final double fpv1 = getFPValue(v1);
+            final double fpv2 = getFPValue(v2);
             vstack.push(createConst(type, fpv1 / fpv2));
         } else {
             // Prepare stack
@@ -221,8 +224,8 @@ final class FPUHelper implements X86CompilerConstants {
         final Item v1 = vstack.pop(type);
 
         if (v1.isConstant() && v2.isConstant()) {
-            final double fpv1 = ((FPItem) v1).getFPValue();
-            final double fpv2 = ((FPItem) v2).getFPValue();
+            final double fpv1 = getFPValue(v1);
+            final double fpv2 = getFPValue(v2);
             vstack.push(createConst(type, fpv1 - fpv2));
         } else {
             // Prepare stack
@@ -297,8 +300,8 @@ final class FPUHelper implements X86CompilerConstants {
         final Item v1 = vstack.pop(type);
 
         if (v1.isConstant() && v2.isConstant()) {
-            final double fpv1 = ((FPItem) v1).getFPValue();
-            final double fpv2 = ((FPItem) v2).getFPValue();
+            final double fpv1 = getFPValue(v1);
+            final double fpv2 = getFPValue(v2);
             vstack.push(createConst(type, fpv1 * fpv2));
         } else {
             // Prepare stack
@@ -327,7 +330,7 @@ final class FPUHelper implements X86CompilerConstants {
             VirtualStack vstack, int type) {
         final Item v = vstack.pop(type);
         if (v.isConstant()) {
-            final double fpv = ((FPItem) v).getFPValue();
+            final double fpv = getFPValue(v);
             vstack.push(createConst(type, -fpv));
         } else {
             // Prepare
@@ -349,6 +352,10 @@ final class FPUHelper implements X86CompilerConstants {
             EmitterContext ec, VirtualStack vstack, FPUStack fpuStack, Item left) {
         final boolean onFpu = left.isFPUStack();
 
+        // If the FPU stack will be full in this operation, we flush the vstack first.
+        int extraItems = onFpu ? 0 : 1;
+        ensureStackCapacity(os, ec, vstack, extraItems);
+        
         if (onFpu) {
             // Operand is on the FPU stack
             if (!fpuStack.isTos(left)) {
@@ -380,6 +387,12 @@ final class FPUHelper implements X86CompilerConstants {
         final boolean lOnFpu = left.isFPUStack();
         final boolean rOnFpu = right.isFPUStack();
         final Register reg;
+        
+        // If the FPU stack will be full in this operation, we flush the vstack first.
+        int extraItems = 0;
+        extraItems += lOnFpu ? 0 : 1;
+        extraItems += rOnFpu ? 0 : 1;
+        ensureStackCapacity(os, ec, vstack, extraItems);
 
         if (lOnFpu && rOnFpu) {
             // Both operand are on the FPU stack
@@ -394,7 +407,7 @@ final class FPUHelper implements X86CompilerConstants {
                 } else {
                     // Non-commutative, so swap left-right and return left
                     // register
-                    System.out.println("stack: " + fpuStack + "\nleft:  " + left + "\nright: " + right + "\nreg:   " + reg);
+                    //System.out.println("stack: " + fpuStack + "\nleft:  " + left + "\nright: " + right + "\nreg:   " + reg);
                     fxch(os, fpuStack, reg);
                 }
             } else {
@@ -415,6 +428,7 @@ final class FPUHelper implements X86CompilerConstants {
         } else if (lOnFpu) {
             // Left operand is on FPU stack, right is not
             right.pushToFPU(ec); // Now right is on top
+            //BootLog.debug("left.kind=" + left.getKind());
             reg = fpuStack.getRegister(left);
             if (!commutative) {
                 fxch(os, fpuStack, reg);
@@ -435,13 +449,30 @@ final class FPUHelper implements X86CompilerConstants {
      * @param fpuStack
      * @param fpuReg
      */
-    private static final void fxch(AbstractX86Stream os, FPUStack fpuStack,
+    static final void fxch(AbstractX86Stream os, FPUStack fpuStack,
             Register fpuReg) {
         if (fpuReg == Register.ST0) {
             throw new StackException("Cannot fxch ST0");
         }
         os.writeFXCH(fpuReg);
         fpuStack.fxch(fpuReg);
+    }
+    
+    /**
+     * Ensure that there are at least items registers left on the FPU stack.
+     * If the number of items is not free, the stack is flushed onto the CPU stack.
+     * @param os
+     * @param ec
+     * @param vstack
+     * @param items
+     */
+    static final void ensureStackCapacity(AbstractX86Stream os, EmitterContext ec, VirtualStack vstack, int items) {
+    	final FPUStack fpuStack = vstack.fpuStack;
+    	if (!fpuStack.hasCapacity(items)) {
+        	BootLog.debug("Flush FPU stack;\n  fpuStack=" + fpuStack + ",\n  vstack  =" + vstack);
+        	vstack.push(ec);
+        	Item.assertCondition(fpuStack.hasCapacity(items), "Out of FPU stack");
+    	}
     }
     
     /**
@@ -460,7 +491,16 @@ final class FPUHelper implements X86CompilerConstants {
             fxch(os, fpuStack, Register.ST1);
             fxch(os, fpuStack, fpuReg);
         }
-
+    }
+    
+    private static double getFPValue(Item item) {
+    	switch (item.getType()) {
+    	case JvmType.INT: return ((IntItem)item).getValue();
+    	case JvmType.LONG: return ((LongItem)item).getValue();
+    	case JvmType.FLOAT: return ((FloatItem)item).getValue();
+    	case JvmType.DOUBLE: return ((DoubleItem)item).getValue();
+    	default: throw new InternalError(" Cannot get FP value of item with type " + item.getType());
+    	}
     }
 
 }

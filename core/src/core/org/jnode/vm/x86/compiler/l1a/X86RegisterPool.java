@@ -61,8 +61,7 @@ final class X86RegisterPool {
      * @return the allocated register or null
      */
     public Register request(int type, Object owner) {
-        if (type == Operand.LONG) { return null; }
-        if (type == Operand.FLOAT || type == Operand.DOUBLE) { return null; }
+        if (type == Operand.LONG || type == Operand.DOUBLE) { return null; }
         
         for (int i = regCount-1; i >= 0; i--) {
             final RegisterUsage ru = registers[i];

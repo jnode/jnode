@@ -54,6 +54,7 @@ abstract class Item {
      * @param offsetToFP
      */
     Item(int kind, int offsetToFP) {
+    	assertCondition(kind > 0, "Invalid kind");
         this.kind = kind;
         this.offsetToFP = offsetToFP;
     }
@@ -115,6 +116,16 @@ abstract class Item {
     int getOffsetToFP() {
         assertCondition(kind == Kind.LOCAL, "kind == Kind.LOCAL");
         return offsetToFP;
+    }
+
+    /**
+     * Is this item located at the given FP offset.
+     * 
+     * @return
+     */
+    boolean isAtOffset(int offset) {
+        assertCondition(kind == Kind.LOCAL, "kind == Kind.LOCAL");
+        return (offsetToFP == offset);
     }
 
     /**
