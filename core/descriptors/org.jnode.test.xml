@@ -10,6 +10,7 @@
     <library name="jnode-core.jar">
       <export name="org.jnode.test.*"/>
       <export name="org.jnode.test.bugs.*"/>
+      <export name="org.jnode.test.security.*"/>
     </library>
   </runtime>
         

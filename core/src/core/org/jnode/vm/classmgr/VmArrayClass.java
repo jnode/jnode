@@ -3,6 +3,7 @@
  */
 package org.jnode.vm.classmgr;
 
+import java.security.ProtectionDomain;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -22,8 +23,8 @@ public final class VmArrayClass extends VmClassType {
 	 * @param componentType
 	 * @param typeSize
 	 */
-	VmArrayClass(String name, VmClassLoader loader, VmType componentType, int typeSize) {
-		super(name, getObjectClass(), loader, typeSize);
+	VmArrayClass(String name, VmClassLoader loader, VmType componentType, int typeSize, ProtectionDomain protectionDomain) {
+		super(name, getObjectClass(), loader, typeSize, protectionDomain);
 		this.componentType = componentType;
 		testClassType();
 	}

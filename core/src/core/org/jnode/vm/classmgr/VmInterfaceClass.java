@@ -3,6 +3,7 @@
  */
 package org.jnode.vm.classmgr;
 
+import java.security.ProtectionDomain;
 import java.util.HashSet;
 
 /**
@@ -20,8 +21,8 @@ public final class VmInterfaceClass extends VmType {
 		String name,
 		String superClassName,
 		VmClassLoader loader,
-		int accessFlags) {
-		super(name, superClassName, loader, accessFlags);
+		int accessFlags, ProtectionDomain protectionDomain) {
+		super(name, superClassName, loader, accessFlags, protectionDomain);
 		if (!superClassName.equals("java.lang.Object")) {
 			throw new RuntimeException("Not a valid interface class, super class must be java.lang.Object");
 		}

@@ -62,7 +62,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     private boolean requiresCompile = false;
 
     private final VmStatics statics;
-
+    
     /**
      * Constructor for VmClassLoader.
      * 
@@ -322,12 +322,12 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
                 "Cannot load a new class when failOnNewLoad is set (" + name
                         + ")"); }
 
-        boolean rejectNatives = (!name.equals("org.jnode.vm.Unsafe"));
+        final boolean rejectNatives = (!name.equals("org.jnode.vm.Unsafe"));
 
         //System.out.println("bvi.loadClass: " +name);
         byte[] image = getClassStream(name);
         return ClassDecoder.defineClass(name, image, 0, image.length,
-                rejectNatives, this);
+                rejectNatives, this, null);
     }
 
     /**
@@ -690,5 +690,4 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     public void setCompileRequired() {
         requiresCompile = true;
     }
-
 }

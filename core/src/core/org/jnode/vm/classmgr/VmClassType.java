@@ -3,6 +3,7 @@
  */
 package org.jnode.vm.classmgr;
 
+import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -37,8 +38,8 @@ public abstract class VmClassType extends VmType {
 		String name,
 		String superClassName,
 		VmClassLoader loader,
-		int accessFlags) {
-		super(name, superClassName, loader, accessFlags);
+		int accessFlags, ProtectionDomain protectionDomain) {
+		super(name, superClassName, loader, accessFlags, protectionDomain);
 	}
 
 	/**
@@ -51,8 +52,8 @@ public abstract class VmClassType extends VmType {
 		String name,
 		VmNormalClass superClass,
 		VmClassLoader loader,
-		int typeSize) {
-		super(name, superClass, loader, typeSize);
+		int typeSize, ProtectionDomain protectionDomain) {
+		super(name, superClass, loader, typeSize, protectionDomain);
 	}
 
 	/**
