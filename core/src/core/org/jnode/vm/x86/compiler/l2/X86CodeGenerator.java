@@ -1164,7 +1164,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	 * @see org.jnode.vm.compiler.ir.CodeGenerator#generateBinaryOP(int, int, int, org.jnode.vm.compiler.ir.Constant)
 	 */
 	public void generateBinaryOP(int disp1, int disp2, int operation, Constant c3) {
-        IntConstant iconst3 = (IntConstant) c3;
+        //IntConstant iconst3 = (IntConstant) c3;
         switch(operation) {
 
             case BinaryQuad.IADD:   //not supported due to the move bellow

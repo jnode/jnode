@@ -210,7 +210,7 @@ class Statistics{
 	
 	String getStatistics(){
 		int packets = received+lost;
-		float percent = 0;
+		//float percent = 0;
 //		if (packets != 0){
 //			percent = lost/packets;
 //			percent *= 100;

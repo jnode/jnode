@@ -146,7 +146,7 @@ final class VirtualStack {
 	 * Allocate register. If not free, then free it (it must be somewhere in the stack!)
 	 * 
 	 * @param context
-	 * @param eax
+	 * @param reg
 	 */
 	 void requestRegister(EmitterContext context, Register reg) {
 	 	final X86RegisterPool pool = context.getPool();
