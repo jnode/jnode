@@ -18,8 +18,10 @@ import java.util.StringTokenizer;
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
+import org.apache.tools.ant.taskdefs.UpToDate;
 import org.jnode.driver.console.Console;
 import org.jnode.driver.console.ConsoleManager;
+import org.jnode.driver.console.ConsoleOutputStream;
 import org.jnode.driver.console.x86.ScrollableShellConsole;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardListener;
@@ -35,6 +37,7 @@ import org.jnode.vm.VmSystem;
 
 /**
  * @author epr
+ * @author Fabien DUMINY
  */
 public class CommandShell implements Runnable, Shell, KeyboardListener {
 
@@ -61,13 +64,8 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
      */
     private int historyIndex = -1;
 
-    /**
-     * Contains the current position of the cursor on the currentLine
-     */
-    private int posOnCurrentLine = 0;
-
     /** Contains the current line * */
-    private String currentLine = "";
+    private Line currentLine = new Line();
 
     /** Contains the newest command being typed in * */
     private String newestLine = "";
@@ -171,13 +169,17 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
                     isActive = true;
                     currentPrompt = prompt();
                     out.print(currentPrompt);
+                    currentLine.start(console);
+                    
                     //  wait until enter is hit
                     threadSuspended = true;
                     while (threadSuspended) {
                         wait();
                     }
-                    if (currentLine.length() > 0) {
-                        processCommand(currentLine.trim());
+                    
+                    String line = currentLine.getContent().trim();
+                    if (line.length() > 0) {
+                        processCommand(line);
                     }
 
                     if (VmSystem.isShuttingDown()) {
@@ -185,7 +187,6 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
                     }
 
                     //if (currentLine.trim().equals("halt")) halt = true;
-                    currentLine = "";
                     historyIndex = -1;
                 }
 
@@ -325,8 +326,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
     /**
      * Method keyPressed
      * 
-     * @param ke
-     *            a KeyboardEvent
+     * @param ke a KeyboardEvent
      * 
      * @version 2/5/2004
      */
@@ -339,7 +339,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
         case KeyEvent.VK_UP:
             ke.consume();
             if (historyIndex == -1) {
-                newestLine = currentLine;
+                newestLine = currentLine.getContent();
                 historyIndex = history.size();
             }
             historyIndex--;
@@ -349,48 +349,41 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
             ke.consume();
             if (historyIndex == history.size() - 1)
                 historyIndex = -2;
-            else if (historyIndex == -1) newestLine = currentLine;
+            else if (historyIndex == -1) newestLine = currentLine.getContent();
             historyIndex++;
             redisplay();
             break;
         case KeyEvent.VK_LEFT:
             //Left the cursor goes left
             ke.consume();
-            if (posOnCurrentLine > 0) {
-                posOnCurrentLine--;
+            if (currentLine.moveLeft()) {
                 refreshCurrentLine();
             }
             break;
         case KeyEvent.VK_RIGHT:
             // Right the cursor goes right
             ke.consume();
-            if (posOnCurrentLine < currentLine.length()) {
-                posOnCurrentLine++;
+            if (currentLine.moveRight()) {
                 refreshCurrentLine();
             }
             break;
         case KeyEvent.VK_HOME:
             // The cursor goes at the start
             ke.consume();
-            posOnCurrentLine = 0;
+            currentLine.moveBegin();
             refreshCurrentLine();
             break;
         case KeyEvent.VK_END:
             // the cursor goes at the end of line
             ke.consume();
-            posOnCurrentLine = currentLine.length();
+        	currentLine.moveEnd();            
             refreshCurrentLine();
             break;
         //  if its a backspace we want to remove one from the end of our current
         // line
         case KeyEvent.VK_BACK_SPACE:
             ke.consume();
-            if (currentLine.length() != 0 && posOnCurrentLine > 0) {
-                posOnCurrentLine--;
-                currentLine = currentLine.substring(0, posOnCurrentLine)
-                        + currentLine.substring(posOnCurrentLine + 1,
-                                currentLine.length());
-
+            if (currentLine.backspace()) {
                 refreshCurrentLine();
             }
             break;
@@ -398,13 +391,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
         //  if its a delete we want to remove one under the cursor
         case KeyEvent.VK_DELETE:
             ke.consume();
-            if (posOnCurrentLine == 0 && currentLine.length() > 0) {
-                currentLine = currentLine.substring(1);
-            } else if (posOnCurrentLine < currentLine.length()) {
-                currentLine = currentLine.substring(0, posOnCurrentLine)
-                        + currentLine.substring(posOnCurrentLine + 1,
-                                currentLine.length());
-            }
+        	currentLine.delete();
             refreshCurrentLine();
             break;
 
@@ -413,7 +400,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
         case KeyEvent.VK_ENTER:
             out.print(ke.getKeyChar());
             ke.consume();
-            posOnCurrentLine = 0;
+            currentLine.moveBegin();			
             synchronized (this) {
                 isActive = false;
                 threadSuspended = false;
@@ -424,50 +411,23 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
         // if it's the tab key, we want to trigger command line completion
         case KeyEvent.VK_TAB:
             ke.consume();
-            if (posOnCurrentLine != currentLine.length()) {
-                String ending = currentLine.substring(posOnCurrentLine);
-                currentLine = complete(currentLine.substring(0,
-                        posOnCurrentLine))
-                        + ending;
-                posOnCurrentLine = currentLine.length() - ending.length();
-            } else {
-                currentLine = complete(currentLine);
-                posOnCurrentLine = currentLine.length();
-            }
+        	if(currentLine.complete(console, this))
+        		refreshCurrentLine();
             break;
 
         default:
             //  if its a useful key we want to add it to our current line
-            if (!Character.isISOControl(ke.getKeyChar())) {
+        	char ch = ke.getKeyChar();
+            if (!Character.isISOControl(ch)) {
                 ke.consume();
-                if (posOnCurrentLine == currentLine.length()) {
-                    currentLine += ke.getKeyChar();
-                } else {
-                    currentLine = currentLine.substring(0, posOnCurrentLine)
-                            + ke.getKeyChar()
-                            + currentLine.substring(posOnCurrentLine);
-                }
-                posOnCurrentLine++;
+                currentLine.appendChar(ch);
                 refreshCurrentLine();
             }
         }
     }
 
     private void refreshCurrentLine() {
-        try {
-            int y = console.getCursorY();
-            console.clearLine(y);
-            /*
-             * Uncomment this to display cursor position
-             * console.clearLine(y-25); console.setCursor(0, y-1);
-             * err.print("Cursor pos : x = "+currentPrompt.length() +
-             * posOnCurrentLine+", y = "+y); console.setCursor(0, y);
-             */
-            out.print(currentPrompt + currentLine + " ");
-            console.setCursor(currentPrompt.length() + posOnCurrentLine,
-                    console.getCursorY());
-        } catch (Exception e) {
-        }
+    	currentLine.refreshCurrentLine(console, currentPrompt, out);
     }
 
     public void keyReleased(KeyboardEvent ke) {
@@ -475,19 +435,13 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
     }
 
     private void redisplay() {
-        //  clear the line
-        if (console != null) {
-            console.clearLine(console.getCursorY());
-        }
-        //  display the prompt
-        out.print(currentPrompt);
-        //  display the required history/current line
         if (historyIndex == -1)
-            currentLine = newestLine;
+            currentLine.setContent(newestLine);
         else
-            currentLine = history.getCommand(historyIndex);
-        out.print(currentLine);
-        posOnCurrentLine = currentLine.length();
+            currentLine.setContent(history.getCommand(historyIndex));
+        
+        refreshCurrentLine();
+        currentLine.moveEnd();
     }
 
     // Command line completion
@@ -495,16 +449,16 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
     private final Argument defaultArg = new AliasArgument("command",
             "the command to be called");
 
-    private boolean dirty = false;
-
-    private String complete(String partial) {
+    private CompletionInfo completion;
+    
+    CompletionInfo complete(String partial) {
         // workaround to set the currentShell to this shell
         try {
             ShellUtils.getShellManager().registerShell(this);
         } catch (NameNotFoundException ex) {
         }
 
-        dirty = false;
+        completion = new CompletionInfo();
         String result = null;
         try {
             CommandLine cl = new CommandLine(partial);
@@ -535,36 +489,42 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
             if (result == null) // assume this is the alias to be called
                     result = defaultArg.complete(cmd);
 
-            if (!partial.equals(result) && !dirty) { // performed direct
-                // completion without
-                // listing
-                dirty = true; // indicate we want to have a new prompt
-                for (int i = 0; i < partial.length() + currentPrompt.length(); i++)
-                    System.out.print("\b"); // clear line (cheap approach)
+            if (!partial.equals(result) && !completion.hasItems())
+            { 
+            	// performed direct
+                // completion without listing
+            	completion.setCompleted(result);
+				completion.setNewPrompt(false);            	
             }
         } catch (CompletionException ex) {
-            System.out.println(); // next line
-            System.err.println(ex.getMessage()); // print the error (optional)
+            out.println(); // next line
+            err.println(ex.getMessage()); // print the error (optional)
             // this debug output is to trace where the Exception came from
-            //ex.printStackTrace(System.err);
-            result = partial; // restore old value
-            dirty = true; // we need a new prompt
+            //ex.printStackTrace(err);
+            // restore old value and need a new prompt 
+            completion.setCompleted(partial);
+            completion.setNewPrompt(true);
         }
 
-        if (dirty) {
-            dirty = false;
-            System.out.print(currentPrompt + result); // print the prompt and go
-            // on with normal
-            // operation
-        }
-        return result;
+		if(completion.hasItems())
+		{
+			out.println();
+			String[] list = completion.getItems();
+			for(int i = 0 ; i < list.length ; i++)
+				out.println(list[i]);
+		}
+		
+		if(completion.needNewPrompt())
+		{			
+	        out.print(currentPrompt);
+	        currentLine.start(console);				
+		}
+		
+        return completion;
     }
 
     public void list(String[] items) {
-        System.out.println();
-        for (int i = 0; i < items.length; i++)
-            System.out.println(items[ i]);
-        dirty = true;
+    	completion.setItems(items);
     }
 
     public void addCommandToHistory(String cmdLineStr) {
@@ -575,4 +535,262 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
     public PrintStream getErrorStream() {
         return err;
     }
+}
+
+/**
+ * A class that handles the content of the current command line in the shell.
+ * That can be :
+ * - a new command that the user is beeing editing
+ * - an existing command (from the command history)
+ * 
+ * This class also handles the current cursor position in the command line and
+ * keep trace of the position (consoleX, consoleY) of the first character of the 
+ * command line (to handle commands that are multilines).  
+ * 
+ * @author Fabien DUMINY
+ */
+class Line
+{
+	private int consoleX;
+	private int consoleY;
+	
+    /**
+     * Contains the current position of the cursor on the currentLine
+     */
+    private int posOnCurrentLine = 0;    
+
+    /** Contains the current line * */
+    private String currentLine = "";
+    
+    private boolean shortened = true;
+    private int oldLength = 0;
+    private int maxLength = 0;    
+    
+    public void start(ScrollableShellConsole console)
+    {
+    	consoleX = console.getCursorX();
+    	consoleY = console.getCursorY();
+    	setContent("");
+    }
+    
+    public String getContent()
+    {
+    	return currentLine;
+    }
+    
+    public void setContent(String content)
+    {
+    	startModif();
+    	currentLine = content;
+    	moveEnd();
+    	endModif();
+    }
+    
+    public boolean moveLeft()
+    {
+        if (posOnCurrentLine > 0) {
+            posOnCurrentLine--;
+            return true;
+        }    	
+        return false;
+    }
+    
+    public boolean moveRight()
+    {
+        if (posOnCurrentLine < currentLine.length()) {
+            posOnCurrentLine++;
+            return true;
+        }
+        return false;
+    }
+
+    public void moveEnd()
+    {
+        posOnCurrentLine = currentLine.length();
+    }
+    
+    public void moveBegin()
+    {
+        posOnCurrentLine = 0;
+    }
+    
+    public boolean backspace()
+    {
+        if (currentLine.length() != 0 && posOnCurrentLine > 0) {
+        	startModif();
+            posOnCurrentLine--;
+            currentLine = currentLine.substring(0, posOnCurrentLine)
+                    + currentLine.substring(posOnCurrentLine + 1,
+                            currentLine.length());
+        	endModif();
+            return true;
+        }    	
+        return false;
+    }
+    
+    public void delete()
+    {
+    	startModif();
+        if (posOnCurrentLine == 0 && currentLine.length() > 0) {
+            currentLine = currentLine.substring(1);
+        	endModif();
+        } else if (posOnCurrentLine < currentLine.length()) {
+            currentLine = currentLine.substring(0, posOnCurrentLine)
+                    + currentLine.substring(posOnCurrentLine + 1,
+                            currentLine.length());
+            endModif();
+        }    	
+    }
+    
+    public boolean complete(ScrollableShellConsole console, CommandShell shell)
+    {
+    	CompletionInfo info;
+		boolean completed = false;
+        if (posOnCurrentLine != currentLine.length()) {
+            String ending = currentLine.substring(posOnCurrentLine);
+            info = shell.complete(currentLine.substring(0,
+                    posOnCurrentLine)); 
+            if(info.getCompleted() != null)
+            {
+	            currentLine = info.getCompleted() + ending;
+				setContent(currentLine);
+	            posOnCurrentLine = currentLine.length() - ending.length();
+				completed = true;	            
+	        }
+        } else {
+        	info = shell.complete(currentLine);
+        	if(info.getCompleted() != null)
+        	{ 
+	            currentLine = info.getCompleted();
+				setContent(currentLine);
+	            posOnCurrentLine = currentLine.length();
+				completed = true;	            
+			}
+        }
+            	
+		return completed;  
+	}
+    
+    public void appendChar(char c)
+    {
+    	startModif();
+        if (posOnCurrentLine == currentLine.length()) {
+            currentLine += c;
+        } else {
+            currentLine = currentLine.substring(0, posOnCurrentLine)
+                    + c
+                    + currentLine.substring(posOnCurrentLine);
+        }
+        posOnCurrentLine++;    	
+    	endModif();
+    }
+
+    protected void startModif()
+    {
+    	shortened = false;
+    	oldLength = currentLine.length();
+    }
+
+    protected void endModif()
+    {
+    	maxLength = Math.max(oldLength, currentLine.length());
+    	shortened = oldLength > currentLine.length();
+    	oldLength = 0;
+    }
+
+    public void refreshCurrentLine(ScrollableShellConsole console, 
+    		String currentPrompt, PrintStream out) {
+        try {
+        	int x = consoleX;
+        	int width = console.getWidth();
+        	int nbLines = ((x + maxLength) / width);
+        	
+        	if(((x + maxLength) % width) != 0)
+        		nbLines++;
+        	
+        	// if the line has not been shortened (delete, backspace...)
+        	if(!shortened)
+            	// scroll up the buffer if necessary, and get the new y
+        		consoleY = console.ensureFreeLines(consoleY, nbLines, 0);
+        		
+        	for(int i = 0 ; i < nbLines ; i++)
+        		console.clearLine(consoleY + i);
+        	
+        	// print the prompt and the command line
+        	console.setCursor(0, consoleY);
+        	out.print(currentPrompt + currentLine);
+        	
+        	int posCurX = x + posOnCurrentLine;
+        	int posCurY = consoleY;
+        	if(posCurX >= width)
+        	{        		
+        		posCurY += posCurX / width;        		
+        		posCurX = (posCurX % width); 
+        	}
+        	console.setCursor(posCurX, posCurY);
+        } catch (Exception e) {
+        }        
+    }
+}
+
+class CompletionInfo
+{
+	private String[] items = null;  
+	private String completed = null;
+	private boolean newPrompt = false;
+
+	/**
+	 * @return Returns the completed.
+	 */
+	public String getCompleted() {
+		return completed;
+	}
+	/**
+	 * @param completed The completed to set.
+	 */
+	public void setCompleted(String completed) {
+		this.items = null;
+		this.completed = completed;
+	}
+	/**
+	 * get the possible completions
+	 * @return Returns the items.
+	 */
+	public String[] getItems() {
+		return items;
+	}
+	/**
+     * Specify the possible completions
+	 * @param items The items to set.
+	 */
+	public void setItems(String[] items) {
+		this.items = items;
+		this.completed = null;
+		this.newPrompt = true;
+	}
+	/**
+	 * Do we have more than one possible completion ?
+     * @return
+	 */
+	public boolean hasItems()
+	{
+		return items != null;
+	}
+
+	/**
+     * Specify if we need a new prompt or not 
+	 * @param newPrompt
+     */
+	public void setNewPrompt(boolean newPrompt)
+	{
+		this.newPrompt = newPrompt;
+	}
+
+	/**
+     * @return true if we need to display a new prompt
+     */	
+	public boolean needNewPrompt()
+	{
+		return newPrompt;
+	}
 }
