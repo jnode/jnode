@@ -1,21 +1,19 @@
 package org.jnode.fs.ext2.cache;
 
-import org.apache.log4j.Logger;
+import org.jnode.fs.ext2.Ext2Debugger;
 
 /**
  * @author Andras Nagy
  */
 public class Block {
-	private static final Logger log = Logger.getLogger(Block.class);
 	byte[] data;
-	boolean dirty = false;
-
+	boolean dirty=false;
+	
 	public Block(byte[] data) {
-		this.data = data;
+		this.data=data;
 	}
 	/**
 	 * Returns the data.
-	 * 
 	 * @return byte[]
 	 */
 	public byte[] getData() {
@@ -24,23 +22,21 @@ public class Block {
 
 	/**
 	 * Sets the data.
-	 * 
-	 * @param data
-	 *           The data to set
+	 * @param data The data to set
 	 */
 	public void setData(byte[] data) {
 		this.data = data;
-		dirty = true;
+		dirty=true;
 	}
-
+	
 	/**
 	 * flush is called when the block is removed from the cache
 	 */
 	public void flush() {
-		if (!dirty)
+		if(!dirty)
 			return;
-		//XXX...
-		log.error("BLOCK FLUSHED FROM CACHE");
+		//XXX...	
+		Ext2Debugger.error("BLOCK FLUSHED FROM CACHE",1);
 	}
 
 }
