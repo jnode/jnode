@@ -17,6 +17,7 @@
   <runtime>
     <library name="jnode-net.jar">
       <export name="org.jnode.net.command.*"/>
+      <export name="fi.iki.elonen.*"/>
     </library>
   </runtime>
 
@@ -25,6 +26,7 @@
     <alias name="bootp" class="org.jnode.net.command.BootpCommand"/>
     <alias name="dhcp" class="org.jnode.net.command.DhcpCommand"/>
     <alias name="ifconfig" class="org.jnode.net.command.IfconfigCommand"/>
+    <alias name="nanohttpd" class="org.jnode.net.command.NanoHTTPDCommand"/>
     <alias name="netstat" class="org.jnode.net.command.NetstatCommand"/>
     <alias name="ping" class="org.jnode.net.command.PingCommand"/>
     <alias name="route" class="org.jnode.net.command.RouteCommand"/>
@@ -33,9 +35,13 @@
   </extension>
 
   <extension point="org.jnode.security.permissions">
-    <permission class="java.net.SocketPermission" name="*:53" actions="resolve,listen,connect"/>    
+    <permission class="java.net.SocketPermission" name="*:53" actions="resolve,listen,connect"/>
     <permission class="java.util.PropertyPermission" name="dns.server" actions="read"/>
     <permission class="java.util.PropertyPermission" name="dns.search" actions="read"/>
     <permission class="org.jnode.net.NetPermission" name="bootpClient"/>
+    <permission class="java.io.FilePermission" name="
+    <
+    <ALL FILES>>" actions="read,write"/>
+    <permission class="java.net.SocketPermission" name="*:80" actions="resolve,listen"/>
   </extension>
 </plugin>
