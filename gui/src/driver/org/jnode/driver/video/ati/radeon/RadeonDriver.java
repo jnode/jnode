@@ -60,9 +60,14 @@ public class RadeonDriver extends AbstractFrameBufferDriver implements RadeonCon
             DeviceException {
 		for (int i = 0; i < CONFIGS.length; i++) {
 			if (config.equals(CONFIGS[i])) {
-				kernel.open((RadeonConfiguration) config);
-				this.currentConfig = config;
-				return kernel;
+				try {
+					final RadeonSurface surface;
+                    surface = kernel.open((RadeonConfiguration) config);
+    				this.currentConfig = config;
+    				return surface;
+                } catch (ResourceNotFreeException ex) {
+                    throw new DeviceException(ex);
+                }
 			}
 		}
 		throw new UnknownConfigurationException();
