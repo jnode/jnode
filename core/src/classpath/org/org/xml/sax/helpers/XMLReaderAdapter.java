@@ -119,7 +119,7 @@ public class XMLReaderAdapter implements Parser, ContentHandler
      * <p>This is not supported in SAX2, and will always throw
      * an exception.</p>
      *
-     * @param The locale for error reporting.
+     * @param locale the locale for error reporting.
      * @see org.xml.sax.Parser#setLocale
      * @exception org.xml.sax.SAXException Thrown unless overridden.
      */

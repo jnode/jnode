@@ -52,7 +52,7 @@ import java.io.IOException;
  *
  * @since SAX 2.0
  * @author David Megginson
- * @version 2.0.1 (sax2r2)
+ * @version 2.0.1+ (sax2r3pre1)
  * @see org.xml.sax.XMLFilter
  * @see org.xml.sax.helpers.ParserAdapter
  * @see org.xml.sax.helpers.XMLReaderAdapter 
@@ -341,7 +341,14 @@ public interface XMLReader
      * progress (they should create a new XMLReader instead for each
      * nested XML document).  Once a parse is complete, an
      * application may reuse the same XMLReader object, possibly with a
-     * different input source.</p>
+     * different input source.
+     * Configuration of the XMLReader object (such as handler bindings and
+     * values established for feature flags and properties) is unchanged
+     * by completion of a parse, unless the definition of that aspect of
+     * the configuration explicitly specifies other behavior.
+     * (For example, feature flags or properties exposing
+     * characteristics of the document being parsed.)
+     * </p>
      *
      * <p>During the parse, the XMLReader will provide information
      * about the XML document through the registered event
@@ -351,7 +358,7 @@ public interface XMLReader
      * has ended.  If a client application wants to terminate 
      * parsing early, it should throw an exception.</p>
      *
-     * @param source The input source for the top-level of the
+     * @param input The input source for the top-level of the
      *        XML document.
      * @exception org.xml.sax.SAXException Any SAX exception, possibly
      *            wrapping another exception.

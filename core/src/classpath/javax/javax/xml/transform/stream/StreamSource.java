@@ -1,163 +1,210 @@
-/*
- * $Id$
- * Copyright (C) 2001 Andrew Selkirk
- * Copyright (C) 2001 David Brownell
- * 
- * This file is part of GNU JAXP, a library.
- *
- * GNU JAXP is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * GNU JAXP is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * As a special exception, if you link this library with other files to
- * produce an executable, this library does not by itself cause the
- * resulting executable to be covered by the GNU General Public License.
- * This exception does not however invalidate any other reasons why the
- * executable file might be covered by the GNU General Public License. 
- */
+/* StreamSource.java -- 
+   Copyright (C) 2004 Free Software Foundation, Inc.
+
+This file is part of GNU Classpath.
+
+GNU Classpath is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+GNU Classpath is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GNU Classpath; see the file COPYING.  If not, write to the
+Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+02111-1307 USA.
+
+Linking this library statically or dynamically with other modules is
+making a combined work based on this library.  Thus, the terms and
+conditions of the GNU General Public License cover the whole
+combination.
+
+As a special exception, the copyright holders of this library give you
+permission to link this library with independent modules to produce an
+executable, regardless of the license terms of these independent
+modules, and to copy and distribute the resulting executable under
+terms of your choice, provided that you also meet, for each linked
+independent module, the terms and conditions of the license of that
+module.  An independent module is a module which is not derived from
+or based on this library.  If you modify this library, you may extend
+this exception to your version of the library, but you are not
+obligated to do so.  If you do not wish to do so, delete this
+exception statement from your version. */
+
 package javax.xml.transform.stream;
 
-import java.io.InputStream;
-import java.io.Reader;
 import java.io.File;
+import java.io.InputStream;
 import java.io.IOException;
+import java.io.Reader;
 import javax.xml.transform.Source;
 
-
 /**
- * Stream Source
- * @author	Andrew Selkirk
- * @version	1.0
+ * Specifies a stream from which to read the source XML data.
+ *
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class StreamSource implements Source {
+public class StreamSource
+  implements Source
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
-
+  /**
+   * Factory feature indicating that stream sources are supported.
+   */
 	public static final String FEATURE =
 		"http://javax.xml.transform.stream.StreamSource/feature";
 
-	private String		publicId	= null;
-	private String		systemId	= null;
-	private InputStream	inputStream	= null;
-	private Reader		reader		= null;
+  private String publicId;
+  private String systemId;
+  private InputStream inputStream;
+  private Reader reader;
 
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
-	public StreamSource() {
+  /**
+   * Default constructor.
+   */
+  public StreamSource()
+  {
 	}
 
-	public StreamSource(File file) {
-	    setSystemId (file);
-	}
-
-	public StreamSource(InputStream stream) {
+  /**
+   * Constructor with an input stream.
+   */
+  public StreamSource(InputStream stream)
+  {
 		this.inputStream = stream;
 	}
 
-	public StreamSource(InputStream stream, String systemID) {
+  /**
+   * Constructor with an input stream and system ID.
+   */
+  public StreamSource(InputStream stream, String systemId)
+  {
 		this.inputStream = stream;
-		this.systemId = systemID;
+    this.systemId = systemId;
 	}
 
-	public StreamSource(Reader reader) {
+  /**
+   * Constructor with a reader.
+   * Prefer an input stream to a reader, so that the parser can use the
+   * character encoding specified in the XML.
+   */
+  public StreamSource(Reader reader)
+  {
 		this.reader = reader;
 	}
 
-	public StreamSource(Reader reader, String systemID) {
+  /**
+   * Constructor with a reader and system ID.
+   * Prefer an input stream to a reader, so that the parser can use the
+   * character encoding specified in the XML.
+   */
+  public StreamSource(Reader reader, String systemId)
+  {
 		this.reader = reader;
-		this.systemId = systemID;
+    this.systemId = systemId;
 	}
 
-	public StreamSource(String systemID) {
-		this.systemId = systemID;
+  /**
+   * Constructor with a system ID.
+   */
+  public StreamSource(String systemId)
+  {
+    this.systemId = systemId;
 	}
 
+  /**
+   * Constructor with a system ID specified as a File reference.
+   */
+  public StreamSource(File file)
+  {
+    setSystemId(file);
+  }
 
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Sets the source input stream.
+   */
+  public void setInputStream(InputStream stream)
+  {
+    this.inputStream = stream;
+  }
 
-	public InputStream getInputStream() {
+  /**
+   * Returns the source input stream.
+   */
+  public InputStream getInputStream()
+  {
 		return inputStream;
 	}
 
-	public String getPublicId() {
-		return publicId;
+  /**
+   * Sets the source reader.
+   * Prefer an input stream to a reader, so that the parser can use the
+   * character encoding specified in the XML.
+   */
+  public void setReader(Reader reader)
+  {
+    this.reader = reader;
 	}
 
-	public Reader getReader() {
+  /**
+   * Returns the source reader.
+   */
+  public Reader getReader()
+  {
 		return reader;
 	}
 
-	public String getSystemId() {
-		return systemId;
+  /**
+   * Sets the public ID for this source.
+   */
+  public void setPublicId(String publicId)
+  {
+    this.publicId = publicId;
 	}
 
-
-	public void setInputStream(InputStream stream) {
-		this.inputStream = stream;
+  /**
+   * Returns the public ID for this source.
+   */
+  public String getPublicId()
+  {
+    return publicId;
 	}
 
-	public void setPublicId(String publicID) {
-		this.publicId = publicID;
+  /**
+   * Sets the system ID for this source.
+   * If the input stream and reader are absent, the system ID will be used
+   * as a readable URL to locate the source data.
+   */
+  public void setSystemId(String systemId)
+  {
+    this.systemId = systemId;
 	}
 
-	public void setReader(Reader reader) {
-		this.reader = reader;
+  /**
+   * Returns the system ID for this source.
+   */
+  public String getSystemId()
+  {
+    return systemId;
 	}
 
-	public void setSystemId(File file) {
-	    try {
-		this.systemId = fileToURL (file).toString ();
-	    } catch (IOException e) {
-		// can't happen
-		throw new RuntimeException (e.getMessage ());
+  /**
+   * Sets the system ID using a File reference.
+   */
+  public void setSystemId(File f)
+  {
+    try
+      {
+        this.systemId = f.toURL().toString();
 	    }
+    catch (IOException e)
+      {
+        throw new RuntimeException(e.getMessage(), e);
+	}
 	}
 
-	public void setSystemId(String systemID) {
-		this.systemId = systemID;
-	}
-
-	// we don't demand jdk 1.2 File.toURL() in the runtime
-	// keep in sync with gnu.xml.util.Resolver
-	// and javax.xml.parsers.DocumentBuilder
-	static String fileToURL (File f)
-	throws IOException
-	{
-	    String	temp;
-
-	    // FIXME: getAbsolutePath() seems buggy; I'm seeing components
-	    // like "/foo/../" which are clearly not "absolute"
-	    // and should have been resolved with the filesystem.
-
-	    // Substituting "/" would be wrong, "foo" may have been
-	    // symlinked ... the URL code will make that change
-	    // later, so that things can get _really_ broken!
-
-	    temp = f.getAbsolutePath ();
-
-	    if (File.separatorChar != '/')
-		temp = temp.replace (File.separatorChar, '/');
-	    if (!temp.startsWith ("/"))
-		temp = "/" + temp;
-	    if (!temp.endsWith ("/") && f.isDirectory ())
-		temp = temp + "/";
-	    return "file:" + temp;
-	}
 }
