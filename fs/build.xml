@@ -4,7 +4,7 @@
   <property name="my-classes.dir" value="${my-build.dir}/classes"/>
   <property name="my-src.dir"     value="${basedir}/src"/>
   <property name="my.jar"         value="${jnode-fs.jar}"/>
-
+	
 <!-- Subproject specific classpath -->
   <path id="my-cp">
     <pathelement location="${jnode-core.jar}"/>
@@ -65,6 +65,56 @@
     <delete dir="${my-build.dir}" quiet="true"/>
   </target>
 
+<!-- tests FileSystems -->
+  <target name="tests">
+    <taskdef name="suites" classname="org.june.ant.JuneTask">
+        <classpath>
+        	<pathelement location="${jnode-builder.jar}"/>
+		    <pathelement location="${jnode-builder.jar}"/>
+		    <pathelement location="${jnode-core.jar}"/>
+		    <pathelement location="${jnode-distr.jar}"/>
+		    <pathelement location="${jnode-fs.jar}"/>
+		    <pathelement location="${jnode-shell.jar}"/>
+		    <pathelement location="${jnode-net.jar}"/>
+		    <pathelement location="${jnode-gui.jar}"/>
+		    <pathelement location="${jnode-textgui.jar}"/>
+		    <pathelement location="${jnode-distr.jar}"/>
+		    <path refid="cp"/>
+		</classpath>
+    </taskdef>
+	<property name="config.class" value="org.jnode.test.fs.unit.config.TestConfig"/>  	
+  	<property name="config.processor" value="org.jnode.test.fs.unit.config.TestConfigProcessor"/>
+  	  	  	  	
+  	<suites>
+		<suite class="org.jnode.test.fs.unit.tests.BasicFSTest" />
+		<suite class="org.jnode.test.fs.unit.tests.FileFSTest"/>
+		<suite class="org.jnode.test.fs.unit.tests.TreeFSTest"/>
+		<suite class="org.jnode.test.fs.unit.tests.ConcurrentAccessFSTest"/>
+
+  		<config os="other">
+		    <fileSystem type="ext2" readOnly="true" readWrite="true"
+		    	options="1" format="true"/>
+		    <workFile size="1M" file="ext2.img.WORK" />
+		</config>
+
+		<config os="jnode">
+		    <fileSystem type="ext2" readOnly="true" readWrite="true" 
+		    	options="1" format="true"/>
+		    <workDevice name="hdb5" />
+		</config>
+		<config os="jnode">
+		    <fileSystem type="ext2" readOnly="true" readWrite="true"/>
+		    <workRamdisk size="1M" />
+		</config>
+  	</suites>
+<!--  	
+	<checkdisk>
+	    <fileSystem type="ext2" format="true"/>
+	    <work device="hdb5" />
+	</checkdisk>
+-->	
+  </target>
+			
 </project>
 
 
