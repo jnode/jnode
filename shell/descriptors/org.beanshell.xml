@@ -2,14 +2,14 @@
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
 <plugin id="org.beanshell"
-        name="Beanshell classes"
-        version="1.0"
-        provider-name="beanshell.org">
+    name="Beanshell classes"
+    version="1.0"
+    provider-name="beanshell.org">
 
-  <runtime>
-    <library name="beanshell.jar">
-      <export name="*"/>
-    </library>
-  </runtime>
+    <runtime>
+        <library name="beanshell.jar">
+            <export name="*"/>
+        </library>
+    </runtime>
 
 </plugin>
