@@ -106,6 +106,7 @@
   <plugin id="org.beanshell"/>
   <plugin id="org.jnode.apps.edit"/>
   <plugin id="org.jnode.apps.charvabsh"/>
+  <plugin id="org.jnode.apps.debug"/>
   <!-- plugin id="org.zaval.lw"/ -->
 
   <plugin id="org.junit"/>
