@@ -61,21 +61,31 @@ CURPROC_FS  equ 0x33
 
 %include "kernel.asm"
 %include "cpu.asm"
+%ifdef BITS32
+  %include "ints32.asm"
+%endif
 %include "ints.asm"
-%include "mm.asm"
+%ifdef BITS32
+  %include "mm32.asm"
+%endif
 %include "console.asm"
 %include "version.asm"
 %include "syscall.asm" 
 
-%define THREADSWITCHINDICATOR	dword[fs:VmProcessor_THREADSWITCHINDICATOR_OFFSET*4]
-%define CURRENTPROCESSOR		dword[fs:VmProcessor_ME_OFFSET*4]
-%define CURRENTTHREAD			dword[fs:VmProcessor_CURRENTTHREAD_OFFSET*4]
-%define NEXTTHREAD				dword[fs:VmProcessor_NEXTTHREAD_OFFSET*4]
-%define STACKEND 				dword[fs:VmProcessor_STACKEND_OFFSET*4]
+%define THREADSWITCHINDICATOR	dword[fs:VmProcessor_THREADSWITCHINDICATOR_OFS]
+%define CURRENTPROCESSOR		dword[fs:VmProcessor_ME_OFS]
+%define CURRENTTHREAD			dword[fs:VmProcessor_CURRENTTHREAD_OFS]
+%define NEXTTHREAD				dword[fs:VmProcessor_NEXTTHREAD_OFS]
+%define STACKEND 				dword[fs:VmProcessor_STACKEND_OFS]
 
 ; Invoke the method in EAX
 %macro INVOKE_JAVA_METHOD 0
-	call [eax+VmMethod_NATIVECODE_OFFSET*4]
+	%ifdef BITS32
+		call [eax+VmMethod_NATIVECODE_OFS]
+	%endif
+	%ifdef BITS64
+		call [rax+VmMethod_NATIVECODE_OFS]
+	%endif
 %endmacro
 
 %include "unsafe.asm"
@@ -92,19 +102,6 @@ CURPROC_FS  equ 0x33
 
 		align 4096
 kernel_end:
-
-%if 0
-	times VmObject_HEADER_SIZE dd 0
-Luser_stack:
-	; Bound area for stack overflow checking
-	dd Luser_stack_low + VmThread_STACK_OVERFLOW_LIMIT
-	dd Luser_esp
-	; End of bound area
-Luser_stack_low:
-	times VmThread_DEFAULT_STACK_SIZE db 0
-Luser_esp:
-	dd 0
-%endif
 
 extern Luser_esp
 

@@ -10,10 +10,10 @@
 	extern SoftByteCodes_systemException
 	extern VmProcessor_reschedule
 	
-%define DEADLOCKCOUNTER		dword[fs:VmX86Processor_DEADLOCKCOUNTER_OFFSET*4]
-%define DEVICENACOUNTER		dword[fs:VmX86Processor_DEVICENACOUNTER_OFFSET*4]
-%define FXSAVECOUNTER		dword[fs:VmX86Processor_FXSAVECOUNTER_OFFSET*4]
-%define FXRESTORECOUNTER	dword[fs:VmX86Processor_FXRESTORECOUNTER_OFFSET*4]
+%define DEADLOCKCOUNTER		dword[fs:VmX86Processor_DEADLOCKCOUNTER_OFS]
+%define DEVICENACOUNTER		dword[fs:VmX86Processor_DEVICENACOUNTER_OFS]
+%define FXSAVECOUNTER		dword[fs:VmX86Processor_FXSAVECOUNTER_OFS]
+%define FXRESTORECOUNTER	dword[fs:VmX86Processor_FXRESTORECOUNTER_OFS]
 
 ;deadLockCounter				dd 0
 currentTimeMillisStaticsIdx	dd -1
@@ -41,13 +41,13 @@ stub_yieldPointHandler:
 ; Usage: SAVEREG VmX86Thread-offset, ebp-offset
 %macro SAVEREG 2
 	mov ecx,[ebp+%2]
-	mov [edi+%1*4],ecx
+	mov [edi+%1],ecx
 %endmacro
 
 ; Restore a register
 ; Usage: RESTOREREG VmX86Thread-offset, ebp-offset
 %macro RESTOREREG 2
-	mov ecx,[edi+%1*4]
+	mov ecx,[edi+%1]
 	mov [ebp+%2],ecx
 %endmacro
 
@@ -78,29 +78,29 @@ yieldPointHandler_reschedule:
 	mov edi,CURRENTTHREAD
 	cmp edi,NEXTTHREAD
 	je near yieldPointHandler_done
-	SAVEREG VmX86Thread_EAX_OFFSET, OLD_EAX
-	SAVEREG VmX86Thread_EBX_OFFSET, OLD_EBX
-	SAVEREG VmX86Thread_ECX_OFFSET, OLD_ECX
-	SAVEREG VmX86Thread_EDX_OFFSET, OLD_EDX
-	SAVEREG VmX86Thread_EDI_OFFSET, OLD_EDI
-	SAVEREG VmX86Thread_ESI_OFFSET, OLD_ESI
-	SAVEREG VmX86Thread_EBP_OFFSET, OLD_EBP
-	SAVEREG VmX86Thread_ESP_OFFSET, OLD_ESP
-	SAVEREG VmX86Thread_EIP_OFFSET, OLD_EIP
-	SAVEREG VmX86Thread_EFLAGS_OFFSET, OLD_EFLAGS
+	SAVEREG VmX86Thread_EAX_OFS, OLD_EAX
+	SAVEREG VmX86Thread_EBX_OFS, OLD_EBX
+	SAVEREG VmX86Thread_ECX_OFS, OLD_ECX
+	SAVEREG VmX86Thread_EDX_OFS, OLD_EDX
+	SAVEREG VmX86Thread_EDI_OFS, OLD_EDI
+	SAVEREG VmX86Thread_ESI_OFS, OLD_ESI
+	SAVEREG VmX86Thread_EBP_OFS, OLD_EBP
+	SAVEREG VmX86Thread_ESP_OFS, OLD_ESP
+	SAVEREG VmX86Thread_EIP_OFS, OLD_EIP
+	SAVEREG VmX86Thread_EFLAGS_OFS, OLD_EFLAGS
 	
 	; Save FPU / XMM state
 yieldPointHandler_fxSave:
 	; Is the FX used since the last thread switch?
-	test dword [edi+VmX86Thread_FXFLAGS_OFFSET*4],VmX86Thread_FXF_USED
+	test dword [edi+VmX86Thread_FXFLAGS_OFS],VmX86Thread_FXF_USED
 	jz yieldPointHandler_restore	; No... do not save anything
 	; Increment counter
 	inc FXSAVECOUNTER
 	; Clear FXF_USED flag
-	and dword [edi+VmX86Thread_FXFLAGS_OFFSET*4],~VmX86Thread_FXF_USED
+	and dword [edi+VmX86Thread_FXFLAGS_OFS],~VmX86Thread_FXF_USED
 	; Load fxStatePtr	
 yieldPointHandler_loadFxStatePtr:
-	mov ebx, [edi+VmX86Thread_FXSTATEPTR_OFFSET*4]
+	mov ebx, [edi+VmX86Thread_FXSTATEPTR_OFS]
 	test ebx,ebx
 	jz yieldPointHandler_fxSaveInit
 	; We have a valid fxState address in ebx
@@ -119,16 +119,16 @@ yieldPointHandler_fxSaveInit:
 	; Restore the next thread
 yieldPointHandler_restore:
 	mov edi,NEXTTHREAD
-	RESTOREREG VmX86Thread_EAX_OFFSET, OLD_EAX
-	RESTOREREG VmX86Thread_EBX_OFFSET, OLD_EBX
-	RESTOREREG VmX86Thread_ECX_OFFSET, OLD_ECX
-	RESTOREREG VmX86Thread_EDX_OFFSET, OLD_EDX
-	RESTOREREG VmX86Thread_EDI_OFFSET, OLD_EDI
-	RESTOREREG VmX86Thread_ESI_OFFSET, OLD_ESI
-	RESTOREREG VmX86Thread_EBP_OFFSET, OLD_EBP
-	RESTOREREG VmX86Thread_ESP_OFFSET, OLD_ESP
-	RESTOREREG VmX86Thread_EIP_OFFSET, OLD_EIP
-	RESTOREREG VmX86Thread_EFLAGS_OFFSET, OLD_EFLAGS
+	RESTOREREG VmX86Thread_EAX_OFS, OLD_EAX
+	RESTOREREG VmX86Thread_EBX_OFS, OLD_EBX
+	RESTOREREG VmX86Thread_ECX_OFS, OLD_ECX
+	RESTOREREG VmX86Thread_EDX_OFS, OLD_EDX
+	RESTOREREG VmX86Thread_EDI_OFS, OLD_EDI
+	RESTOREREG VmX86Thread_ESI_OFS, OLD_ESI
+	RESTOREREG VmX86Thread_EBP_OFS, OLD_EBP
+	RESTOREREG VmX86Thread_ESP_OFS, OLD_ESP
+	RESTOREREG VmX86Thread_EIP_OFS, OLD_EIP
+	RESTOREREG VmX86Thread_EFLAGS_OFS, OLD_EFLAGS
 	
 	; Restore FPU / XMM state is delayed until actual use
 	; We do set the CR0.TS flag.
@@ -138,14 +138,14 @@ yieldPointHandler_restore:
 	
 	; Fix old stack overflows
 yieldPointHandler_fixOldStackOverflow:
-	mov ecx,[edi+VmThread_STACKOVERFLOW_OFFSET*4]
+	mov ecx,[edi+VmThread_STACKOVERFLOW_OFS]
 	test ecx,ecx
 	jnz yieldPointHandler_fixStackOverflow
 yieldPointHandler_afterStackOverflow:
 	; Set the new thread parameters
 	mov CURRENTTHREAD,edi
 	; Reload stackend
-	mov ebx,[edi+VmThread_STACKEND_OFFSET*4]
+	mov ebx,[edi+VmThread_STACKEND_OFS]
 	mov STACKEND,ebx
 yieldPointHandler_done:
 	and THREADSWITCHINDICATOR,~VmProcessor_TSI_SWITCH_ACTIVE
@@ -155,23 +155,23 @@ yieldPointHandler_done:
 ; EDI contains reference the VmThread
 yieldPointHandler_fixStackOverflow:
 	; Is the stack overflow resolved?
-	mov ecx,[edi+VmThread_STACKEND_OFFSET*4]
+	mov ecx,[edi+VmThread_STACKEND_OFS]
 	add ecx,VmThread_STACK_OVERFLOW_LIMIT
 	; Is current ESP not beyond limit anymore
-	cmp dword [edi+VmX86Thread_ESP_OFFSET*4],ecx
+	cmp dword [edi+VmX86Thread_ESP_OFS],ecx
 	jle yieldPointHandler_afterStackOverflow		; No still below limit
 	; Reset stackoverflow flag
-	mov [edi+VmThread_STACKEND_OFFSET*4],ecx
-	mov dword [edi+VmThread_STACKOVERFLOW_OFFSET*4],0
+	mov [edi+VmThread_STACKEND_OFS],ecx
+	mov dword [edi+VmThread_STACKOVERFLOW_OFS],0
 	jmp yieldPointHandler_afterStackOverflow
 
 ; Set the fxStatePtr in the thread given in edi.
 ; The fxStatePtr must be 16-byte aligned
 fixFxStatePtr:
-	mov ebx,[edi+VmX86Thread_FXSTATE_OFFSET*4]
+	mov ebx,[edi+VmX86Thread_FXSTATE_OFS]
 	add ebx,(VmArray_DATA_OFFSET*4) + 15
 	and ebx,~0xF;
-	mov [edi+VmX86Thread_FXSTATEPTR_OFFSET*4],ebx
+	mov [edi+VmX86Thread_FXSTATEPTR_OFS],ebx
 	ret	
 	
 ; -----------------------------------------------
@@ -186,11 +186,11 @@ int_dev_na:
 	inc DEVICENACOUNTER
 	mov edi,CURRENTTHREAD
 	; Mark FX as being used since last thread switch
-	or dword [edi+VmX86Thread_FXFLAGS_OFFSET*4],VmX86Thread_FXF_USED;
+	or dword [edi+VmX86Thread_FXFLAGS_OFS],VmX86Thread_FXF_USED;
 	; Clear CR0.TS
 	clts
 	; Restore fx state (if any)
-	mov ebx, [edi+VmX86Thread_FXSTATEPTR_OFFSET*4]
+	mov ebx, [edi+VmX86Thread_FXSTATEPTR_OFS]
 	test ebx,ebx
 	jz int_dev_na_ret		; No valid fxStatePtr yet, do not restore
 	; Increment counter
@@ -209,7 +209,7 @@ int_dev_na_ret:
 ; Handle a timer interrupt
 ; -----------------------------------------------
 timer_handler:
-	mov edi,[fs:VmProcessor_STATICSTABLE_OFFSET*4]
+	mov edi,[fs:VmProcessor_STATICSTABLE_OFS]
 	mov eax,[currentTimeMillisStaticsIdx]
 	lea edi,[edi+eax*4+(VmArray_DATA_OFFSET*4)]
 	inc dword [edi+0]
@@ -241,7 +241,7 @@ def_irq_handler:
 	jne def_irq_kernel
 	; Increment the appropriate IRQ counter and set threadSwitch indicator.
 	mov eax,[ebp+INTNO]
-	mov edi,dword [fs:VmX86Processor_IRQCOUNT_OFFSET*4]
+	mov edi,dword [fs:VmX86Processor_IRQCOUNT_OFS]
 	inc dword [edi+(VmArray_DATA_OFFSET*4)+eax*4]
 	; Set thread switch indicator
 	or THREADSWITCHINDICATOR, VmProcessor_TSI_SWITCH_NEEDED
@@ -265,18 +265,18 @@ int_system_exception:
 	;jmp int_die
 	; Save the exception state
 	mov edi,CURRENTTHREAD
-	SAVEREG VmX86Thread_EXEAX_OFFSET, OLD_EAX
-	SAVEREG VmX86Thread_EXEBX_OFFSET, OLD_EBX
-	SAVEREG VmX86Thread_EXECX_OFFSET, OLD_ECX
-	SAVEREG VmX86Thread_EXEDX_OFFSET, OLD_EDX
-	SAVEREG VmX86Thread_EXEDI_OFFSET, OLD_EDI
-	SAVEREG VmX86Thread_EXESI_OFFSET, OLD_ESI
-	SAVEREG VmX86Thread_EXEBP_OFFSET, OLD_EBP
-	SAVEREG VmX86Thread_EXESP_OFFSET, OLD_ESP
-	SAVEREG VmX86Thread_EXEIP_OFFSET, OLD_EIP
-	SAVEREG VmX86Thread_EXEFLAGS_OFFSET, OLD_EFLAGS
+	SAVEREG VmX86Thread_EXEAX_OFS, OLD_EAX
+	SAVEREG VmX86Thread_EXEBX_OFS, OLD_EBX
+	SAVEREG VmX86Thread_EXECX_OFS, OLD_ECX
+	SAVEREG VmX86Thread_EXEDX_OFS, OLD_EDX
+	SAVEREG VmX86Thread_EXEDI_OFS, OLD_EDI
+	SAVEREG VmX86Thread_EXESI_OFS, OLD_ESI
+	SAVEREG VmX86Thread_EXEBP_OFS, OLD_EBP
+	SAVEREG VmX86Thread_EXESP_OFS, OLD_ESP
+	SAVEREG VmX86Thread_EXEIP_OFS, OLD_EIP
+	SAVEREG VmX86Thread_EXEFLAGS_OFS, OLD_EFLAGS
 	mov ecx,cr2
-	mov [edi+VmX86Thread_EXCR2_OFFSET*4],ecx
+	mov [edi+VmX86Thread_EXCR2_OFS],ecx
 	
 	; Setup the user stack to add a return address to the current EIP
 	; and change the current EIP to doSystemException, which will 
@@ -305,16 +305,16 @@ int_stack_overflow:
 	cmp dword [ebp+OLD_CS],USER_CS
 	jne doFatal_stack_overflow
 	mov eax,CURRENTTHREAD
-	mov ecx,[eax+VmThread_STACKOVERFLOW_OFFSET*4]
+	mov ecx,[eax+VmThread_STACKOVERFLOW_OFS]
 	jecxz int_stack_first_overflow
 	jmp doFatal_stack_overflow
 		
 int_stack_first_overflow:
-	inc dword [eax+VmThread_STACKOVERFLOW_OFFSET*4]
+	inc dword [eax+VmThread_STACKOVERFLOW_OFS]
 	; Remove the stackoverflow limit
-	mov edx,[eax+VmThread_STACKEND_OFFSET*4]
+	mov edx,[eax+VmThread_STACKEND_OFS]
 	sub edx,VmThread_STACK_OVERFLOW_LIMIT
-	mov [eax+VmThread_STACKEND_OFFSET*4],edx
+	mov [eax+VmThread_STACKEND_OFS],edx
 	mov STACKEND,edx
 	mov eax,SoftByteCodes_EX_STACKOVERFLOW
 	mov dword [ebp+OLD_EIP],doSystemException

@@ -24,12 +24,12 @@ vm_athrow:
 		
 		mov eax,[ebx+ObjectLayout_TIB_SLOT*4] ; get TIB of exception
 		mov eax,[eax+VmArray_DATA_OFFSET*4] ; get class (vmt[0])
-		mov eax,[eax+VmType_NAME_OFFSET*4] ; get classname of exception
+		mov eax,[eax+VmType_NAME_OFS] ; get classname of exception
 		call vm_print_string
 		
 		PRINT_STR vm_athrow_msg2
 		
-		mov eax,[ebx+Throwable_DETAILMESSAGE_OFFSET*4] ; get message of exception
+		mov eax,[ebx+Throwable_DETAILMESSAGE_OFS] ; get message of exception
 		call vm_print_string
 
 		pop ebx
@@ -80,9 +80,9 @@ vm_athrow_unhandled:
 	mov ebx,eax
 	mov eax,[ebx+ObjectLayout_TIB_SLOT*4]
 	mov eax,[eax+VmArray_DATA_OFFSET*4]
-	mov eax,[eax+VmType_NAME_OFFSET*4]
+	mov eax,[eax+VmType_NAME_OFS]
 	call vm_print_string
-	mov eax,[ebx+Throwable_DETAILMESSAGE_OFFSET*4] ; get message of exception
+	mov eax,[ebx+Throwable_DETAILMESSAGE_OFS] ; get message of exception
 	call vm_print_string
 	cli
 	hlt
@@ -152,14 +152,14 @@ vmint_print_stack_loop:
 	mov ebx,[ebp+VmX86StackReader_METHOD_OFFSET] ; Note do not '*4'here, since it is a java constants
 
 	; Print the classname
-    mov eax,[ebx+VmMember_DECLARINGCLASS_OFFSET*4]
-    mov eax,[eax+VmType_NAME_OFFSET*4]
+    mov eax,[ebx+VmMember_DECLARINGCLASS_OFS]
+    mov eax,[eax+VmType_NAME_OFS]
     call vm_print_string
 
     PRINT_STR double_colon_msg
 
 	; Print the methodname	
-    mov eax,[ebx+VmMember_NAME_OFFSET*4]
+    mov eax,[ebx+VmMember_NAME_OFS]
     call vm_print_string
     
     ; Println

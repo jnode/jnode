@@ -245,6 +245,11 @@ public class BaseMagicHelper {
     protected static final int mATOMICSUB = 109;
     protected static final int mGETCURRENTFRAME = 110;
     protected static final int mGETTIMESTAMP = 111;
+    protected static final int mINTBITSTOFLOAT = 112;
+    protected static final int mFLOATTORAWINTBITS = 113;
+    protected static final int mLONGBITSTODOUBLE = 114;
+    protected static final int mDOUBLETORAWLONGBITS = 115;
+    protected static final int mBREAKPOINT = 116;
 
     private static final int mLOAD_MIN = mLOADBYTE;
 
@@ -325,6 +330,11 @@ public class BaseMagicHelper {
         addMethod("isFinalized", mISFINALIZED);
         addMethod("getCurrentFrame", mGETCURRENTFRAME);
         addMethod("getTimeStamp", mGETTIMESTAMP);
+        addMethod("intBitsToFloat", mINTBITSTOFLOAT);
+        addMethod("floatToRawIntBits", mFLOATTORAWINTBITS);
+        addMethod("longBitsToDouble", mLONGBITSTODOUBLE);
+        addMethod("doubleToRawLongBits", mDOUBLETORAWLONGBITS);
+        addMethod("breakPoint", mBREAKPOINT);
     }
 
     protected static final int getClass(VmMethod method) {

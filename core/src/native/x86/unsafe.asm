@@ -22,24 +22,6 @@ Q43org5jnode2vm6Unsafe23getSuperClasses2e28Ljava2flang2fObject3b295bLorg2fjnode2
 	mov eax,[eax+(TIBLayout_SUPERCLASSES_INDEX+VmArray_DATA_OFFSET)*4] 
 	ret 4
 
-Q43org5jnode2vm6Unsafe23intBitsToFloat2e28I29F:
-	mov eax,[esp+4]
-	ret 4
-
-Q43org5jnode2vm6Unsafe23floatToRawIntBits2e28F29I:
-	mov eax,[esp+4]
-	ret 4
-
-Q43org5jnode2vm6Unsafe23longBitsToDouble2e28J29D:
-	mov edx,[esp+8] ; MSB
-	mov eax,[esp+4] ; LSB
-	ret 8
-
-Q43org5jnode2vm6Unsafe23doubleToRawLongBits2e28D29J:
-	mov edx,[esp+8] ; MSB
-	mov eax,[esp+4] ; LSB
-	ret 8
-
 Q43org5jnode2vm6Unsafe23clear2e28Lorg2fvmmagic2funboxed2fAddress3bLorg2fvmmagic2funboxed2fExtent3b29V:
 	mov edx,[esp+8] ; memPtr
 	mov eax,[esp+4] ; Size
@@ -168,7 +150,7 @@ Q43org5jnode2vm6Unsafe23invokeLong2e28Lorg2fjnode2fvm2fclassmgr2fVmMethod3b29J:
 Q43org5jnode2vm6Unsafe23invokeObject2e28Lorg2fjnode2fvm2fclassmgr2fVmMethod3b29Ljava2flang2fObject3b:
 	pop eax 			; Get return address
 	xchg eax,[esp+0]	; EAX now contains method argument, Top of stack now contains return address
-	jmp [eax+VmMethod_NATIVECODE_OFFSET*4]
+	jmp [eax+VmMethod_NATIVECODE_OFS]
 
 ; int Unsafe.initThread(VmThread thread, Object newStack, int stackSize)
 ; Initialize the new Thread.
@@ -203,15 +185,15 @@ Q43org5jnode2vm6Unsafe23initThread2e28Lorg2fjnode2fvm2fVmThread3bLjava2flang2fOb
 	push ebx ; Dummy		; method "return address"
 	
 	mov eax,VmThread_runThread
-	mov [ecx+VmX86Thread_EAX_OFFSET*4],eax ; runThread method
-	mov [ecx+VmX86Thread_EBP_OFFSET*4],ebp
-	mov eax,[eax+VmMethod_NATIVECODE_OFFSET*4]
-	mov [ecx+VmX86Thread_EIP_OFFSET*4],eax
-	mov [ecx+VmX86Thread_ESP_OFFSET*4], esp		; Save current esp
+	mov [ecx+VmX86Thread_EAX_OFS],eax 		; runThread method
+	mov [ecx+VmX86Thread_EBP_OFS],ebp
+	mov eax,[eax+VmMethod_NATIVECODE_OFS]
+	mov [ecx+VmX86Thread_EIP_OFS],eax
+	mov [ecx+VmX86Thread_ESP_OFS], esp		; Save current esp
 	pushf
 	pop eax
 	or eax,F_IF
-	mov [ecx+VmX86Thread_EFLAGS_OFFSET*4],eax	; Setup EFLAGS
+	mov [ecx+VmX86Thread_EFLAGS_OFS],eax	; Setup EFLAGS
 	
 	mov esp,edx ; Restore esp
 	popf		; Re-enable interrupts
@@ -339,9 +321,5 @@ Q43org5jnode2vm6Unsafe23debug2e28J29V:
 	call sys_print_eax
 	ret 8
 		
-; public static native void breakPoint();
-Q43org5jnode2vm6Unsafe23breakPoint2e2829V:
-	int3
-	ret
 	
 	
