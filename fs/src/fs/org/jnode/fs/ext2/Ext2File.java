@@ -109,19 +109,24 @@ public class Ext2File extends AbstractFSFile {
 	 * @see org.jnode.fs.FSFile#read(long, byte[], int, int)
 	 */
 	public void read(long fileOffset, byte[] dest, int off, int len) throws IOException {
-		if(len+off>getLength())
-			throw new IOException("Can't read past the file!");
-		long blockSize = iNode.getExt2FileSystem().getBlockSize();
-		long bytesRead=0;
-		while( bytesRead < len ) {
-			long blockNr = (fileOffset+bytesRead) / blockSize;
-			long blockOffset = (fileOffset+bytesRead) % blockSize;
-			long copyLength = Math.min(len-bytesRead, blockSize - blockOffset);
-			
-			System.arraycopy( 	iNode.getDataBlock(blockNr), (int)blockOffset,
-								dest, off+(int)bytesRead, (int)copyLength);
-								
-			bytesRead += copyLength;
+		//a single inode may be represented by more than one Ext2Directory instances, 
+		//but each will use the same instance of the underlying inode (see Ext2FileSystem.getINode()),
+		//so synchronize to the inode
+		synchronized(iNode) {	 
+			if(len+off>getLength())
+				throw new IOException("Can't read past the file!");
+			long blockSize = iNode.getExt2FileSystem().getBlockSize();
+			long bytesRead=0;
+			while( bytesRead < len ) {
+				long blockNr = (fileOffset+bytesRead) / blockSize;
+				long blockOffset = (fileOffset+bytesRead) % blockSize;
+				long copyLength = Math.min(len-bytesRead, blockSize - blockOffset);
+				
+				System.arraycopy( 	iNode.getDataBlock(blockNr), (int)blockOffset,
+									dest, off+(int)bytesRead, (int)copyLength);
+									
+				bytesRead += copyLength;
+			}
 		}
 	}
 				
@@ -135,52 +140,58 @@ public class Ext2File extends AbstractFSFile {
 	 */
 	public void write(long fileOffset, byte[] src, int off, int len) throws IOException {
 		//throw new IOException("EXT2 implementation is currently readonly");
-		if(fileOffset > getLength())
-			throw new IOException("Can't write beyond the end of the file! (fileOffset: "+
-			fileOffset+", getLength()"+getLength());
-		if(off+len>src.length)
-			throw new IOException("src is shorter than what you want to write");
-		
-		log.debug("write(fileOffset="+fileOffset+", src, off, len="+len+")");
-		
-		final long blockSize = iNode.getExt2FileSystem().getBlockSize();
-		long blocksAllocated = iNode.getAllocatedBlockCount();
-		long bytesWritten=0;
-		while( bytesWritten < len ) {
-			long blockIndex  = (fileOffset+bytesWritten) / blockSize;
-			long blockOffset = (fileOffset+bytesWritten) % blockSize;
-			long copyLength = Math.min(len-bytesWritten, blockSize - blockOffset);
-			
-			//If only a part of the block is written, then read the block 
-			//and update its contents with the data in src. If the whole block
-			//is overwritten, then skip reading it.
-			byte[] dest;
-			if( !( (blockOffset==0)&&(copyLength==blockSize) ) &&
-				 (blockIndex < blocksAllocated)) 
-				dest = iNode.getDataBlock(blockIndex);
-			else 
-				dest = new byte[(int)blockSize];
-			
-			System.arraycopy( src, (int)(off+bytesWritten), dest, (int)blockOffset, (int)copyLength);
-						
-			//allocate a new block if needed
-			if(blockIndex >= blocksAllocated) {
-				try{
-					iNode.allocateDataBlock(blockIndex);
-				}catch(FileSystemException fe) {
-					throw new IOException("Internal filesystem exception",fe);
-				}
-				blocksAllocated++;
-			}
 
-			//write the block
-			iNode.writeDataBlock(blockIndex, dest);
+		//a single inode may be represented by more than one Ext2File instances, 
+		//but each will use the same instance of the underlying inode (see Ext2FileSystem.getINode()),
+		//so synchronize to the inode
+		synchronized(iNode) {
+			if(fileOffset > getLength())
+				throw new IOException("Can't write beyond the end of the file! (fileOffset: "+
+				fileOffset+", getLength()"+getLength());
+			if(off+len>src.length)
+				throw new IOException("src is shorter than what you want to write");
 			
-			bytesWritten += copyLength;
+			log.debug("write(fileOffset="+fileOffset+", src, off, len="+len+")");
+			
+			final long blockSize = iNode.getExt2FileSystem().getBlockSize();
+			long blocksAllocated = iNode.getAllocatedBlockCount();
+			long bytesWritten=0;
+			while( bytesWritten < len ) {
+				long blockIndex  = (fileOffset+bytesWritten) / blockSize;
+				long blockOffset = (fileOffset+bytesWritten) % blockSize;
+				long copyLength = Math.min(len-bytesWritten, blockSize - blockOffset);
+				
+				//If only a part of the block is written, then read the block 
+				//and update its contents with the data in src. If the whole block
+				//is overwritten, then skip reading it.
+				byte[] dest;
+				if( !( (blockOffset==0)&&(copyLength==blockSize) ) &&
+					 (blockIndex < blocksAllocated)) 
+					dest = iNode.getDataBlock(blockIndex);
+				else 
+					dest = new byte[(int)blockSize];
+				
+				System.arraycopy( src, (int)(off+bytesWritten), dest, (int)blockOffset, (int)copyLength);
+							
+				//allocate a new block if needed
+				if(blockIndex >= blocksAllocated) {
+					try{
+						iNode.allocateDataBlock(blockIndex);
+					}catch(FileSystemException fe) {
+						throw new IOException("Internal filesystem exception",fe);
+					}
+					blocksAllocated++;
+				}
+	
+				//write the block
+				iNode.writeDataBlock(blockIndex, dest);
+				
+				bytesWritten += copyLength;
+			}
+			iNode.setSize( fileOffset+len );
+			
+			iNode.setMtime(System.currentTimeMillis()/1000);
 		}
-		iNode.setSize( fileOffset+len );
-		
-		iNode.setMtime(System.currentTimeMillis()/1000);
 	}
 
 	/**

@@ -42,7 +42,7 @@ public class INode {
 		this.fs = fs;
 		this.desc = desc;
 		this.data = new byte[INODE_LENGTH];
-		log.setLevel(Level.DEBUG);
+		log.setLevel(Level.INFO);
 	}
 	
 	public void read(byte[] data){
@@ -95,8 +95,10 @@ public class INode {
 	/**
 	 * write an inode back to disk
 	 * @throws IOException
+	 * 
+	 * synchronize to avoid that half-set fields get written to the inode 
 	 */
-	protected void update() throws IOException{
+	protected synchronized void update() throws IOException{
 		try{
 			if(dirty) {
 				log.debug("  ** updating inode **");
@@ -162,6 +164,7 @@ public class INode {
 	 */
 	private final void indirectWrite(long dataBlockNr, long offset, long allocatedBlocks, long value, int indirectionLevel) 
 		throws IOException, FileSystemException {
+			log.debug("indirectWrite(blockNr="+dataBlockNr+", offset="+offset+"...)");
 			byte[] data = fs.getBlock( dataBlockNr );
 			if(indirectionLevel==1) {
 					//data is a (simple) indirect block
@@ -301,6 +304,8 @@ public class INode {
 			throw new FileSystemException(	"Trying to register block "+i+" (counts from 0), when"+
 					" INode contains only "+blockCount+" blocks");
 		
+		log.debug("registering block #"+blockNr);
+		
 		setDirty(true);
 		
 		//the direct blocks (0; 11)
@@ -319,7 +324,9 @@ public class INode {
 				//first time it is used
 				indirectBlockNr = findFreeBlock(allocatedBlocks++);
 				Ext2Utils.set32(data, 40+12*4, indirectBlockNr);
-
+				
+				//log.debug("reserved indirect block: "+indirectBlockNr);
+					
 				//need to blank the block so that e2fsck does not complain
 				byte[] zeroes=new byte[fs.getBlockSize()];	//blank the block
 				Arrays.fill(zeroes, 0, fs.getBlockSize(), (byte)0);
@@ -344,6 +351,8 @@ public class INode {
 				doubleIndirectBlockNr = findFreeBlock(allocatedBlocks++);
 				Ext2Utils.set32(data, 40+13*4, doubleIndirectBlockNr);
 
+				//log.debug("reserved double indirect block: "+doubleIndirectBlockNr);
+
 				//need to blank the block so that e2fsck does not complain
 				byte[] zeroes=new byte[fs.getBlockSize()];	//blank the block
 				Arrays.fill(zeroes, 0, fs.getBlockSize(), (byte)0);
@@ -366,6 +375,8 @@ public class INode {
 				//need to reserve the triple indirect block itself
 				tripleIndirectBlockNr = findFreeBlock(allocatedBlocks++);
 				Ext2Utils.set32(data, 40+13*4, tripleIndirectBlockNr);
+
+log.info("reserved triple indirect block: "+tripleIndirectBlockNr);
 
 				//need to blank the block so that e2fsck does not complain
 				byte[] zeroes=new byte[fs.getBlockSize()];	//blank the block

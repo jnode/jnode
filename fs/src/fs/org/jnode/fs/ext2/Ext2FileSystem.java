@@ -8,6 +8,7 @@ import java.util.Iterator;
 //import java.util.Timer;
 //import java.util.TimerTask;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.fs.FSDirectory;
@@ -27,6 +28,7 @@ import org.jnode.fs.spi.AbstractFileSystem;
 public class Ext2FileSystem extends AbstractFileSystem {
 	private Superblock superblock;
 	private GroupDescriptor groupDescriptors[];
+	private INodeTable iNodeTables[];
 	private int groupCount;
 	private BlockCache blockCache;
 	private INodeCache inodeCache;
@@ -47,7 +49,8 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	 */
 	public Ext2FileSystem(Device device, boolean readOnly)  throws FileSystemException {
 		super(device, readOnly);
-			
+		log.setLevel(Level.INFO);
+		
 		blockCache = new BlockCache(50,(float)0.75);
 		inodeCache = new INodeCache(50,(float)0.75);
 
@@ -71,11 +74,14 @@ public class Ext2FileSystem extends AbstractFileSystem {
 			//read the group descriptors
 			groupCount = (int)Math.ceil((double)superblock.getBlocksCount() / (double)superblock.getBlocksPerGroup());
 			groupDescriptors = new GroupDescriptor[groupCount];
+			iNodeTables = new INodeTable[groupCount];
 						
 			for(int i=0; i<groupCount; i++) {
 				//groupDescriptors[i]=new GroupDescriptor(i, this);
 				groupDescriptors[i]=new GroupDescriptor();
 				groupDescriptors[i].read(i, this);
+				
+				iNodeTables[i] = new INodeTable(this, (int)groupDescriptors[i].getInodeTable());
 			}
 				
 		} catch (FileSystemException e) {
@@ -135,6 +141,8 @@ public class Ext2FileSystem extends AbstractFileSystem {
 			//create the group descriptors
 			groupCount = (int)Math.ceil((double)superblock.getBlocksCount() / (double)superblock.getBlocksPerGroup());
 			groupDescriptors = new GroupDescriptor[groupCount];
+
+			iNodeTables = new INodeTable[groupCount];
 						
 			for(int i=0; i<groupCount; i++) {
 				groupDescriptors[i]=new GroupDescriptor();
@@ -174,7 +182,8 @@ public class Ext2FileSystem extends AbstractFileSystem {
 				byte[] emptyBlock = new byte[blockSize];
 				for(long j=iNodeTableBlock; j<firstNonMetadataBlock; j++)
 					writeBlock(j, emptyBlock, false);
-					
+									
+				iNodeTables[i] = new INodeTable(this, (int)iNodeTableBlock);
 
 				writeBlock(groupDescriptors[i].getBlockBitmap(), blockBitmap, false);
 				writeBlock(groupDescriptors[i].getInodeBitmap(), inodeBitmap, false);			
@@ -301,6 +310,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
         //		 the block will be put in the cache only once in the second 
         //		 synchronized block
 	    byte[] data = new byte[blockSize];
+	    log.debug("Reading block "+nr+" (offset: "+nr*blockSize+") from disk");
 	    getApi().read( nr*blockSize, data, 0, blockSize );
 	
 	    //synchronize again
@@ -440,6 +450,10 @@ public class Ext2FileSystem extends AbstractFileSystem {
 
 	/** 
 	 * Return the inode numbered inodeNr (the first inode is #1)
+	 * 
+	 * Synchronized access to the inodeCache is important as the file/directory 
+	 * operations are synchronized to the inodes, so at any point in time it has 
+	 * to be sure that only one instance of any inode is present in the filesystem.
 	 */
 	public INode getINode(int iNodeNr) throws IOException, FileSystemException{
 		if((iNodeNr<1)||(iNodeNr>superblock.getINodesCount()))
@@ -453,20 +467,27 @@ public class Ext2FileSystem extends AbstractFileSystem {
 			//check if the inode is already in the cache
 			if(inodeCache.containsKey(key)) 
 				return (INode)inodeCache.get(key);
-			else{
-				int group = (int) ((iNodeNr - 1) / superblock.getINodesPerGroup());
-				int index = (int) ((iNodeNr - 1) % superblock.getINodesPerGroup());
+		}
 		
-				//get the part of the inode table that contains the inode
-				long iNodeTableBlock  = groupDescriptors[group].getInodeTable();	//the first block of the inode table
-				INodeTable iNodeTable = new INodeTable(this, (int)iNodeTableBlock);
-				INode result = new INode(this, new INodeDescriptor(iNodeTable, iNodeNr, group, index));
-				result.read(iNodeTable.getInodeData(index));		
+		//move the time consuming disk read out of the synchronized block
+		//(see comments at getBlock())
+
+		int group = (int) ((iNodeNr - 1) / superblock.getINodesPerGroup());
+		int index = (int) ((iNodeNr - 1) % superblock.getINodesPerGroup());
+
+		//get the part of the inode table that contains the inode
+		INodeTable iNodeTable = iNodeTables[group];
+		INode result = new INode(this, new INodeDescriptor(iNodeTable, iNodeNr, group, index));
+		result.read(iNodeTable.getInodeData(index));		
 				
+		synchronized(inodeCache) {
+			//check if the inode is still not in the cache
+			if(!inodeCache.containsKey(key)) { 
 				inodeCache.put(key, result);
-				
 				return result;
-			}
+				}
+			else
+				return (INode)inodeCache.get(key);				
 		}
 	}
 
@@ -545,8 +566,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 			throw new FileSystemException("No free inodes found!");	
 		
 		//a free inode has been found: create the inode and write it into the inode table			
-		long iNodeTableBlock  = groupDescriptors[preferredBlockBroup].getInodeTable();	//the first block of the inode table
-		INodeTable iNodeTable = new INodeTable(this, (int)iNodeTableBlock);
+		INodeTable iNodeTable = iNodeTables[preferredBlockBroup];
 		//byte[] iNodeData = new byte[INode.INODE_LENGTH];
 		int iNodeNr = res.getINodeNr((int)superblock.getINodesPerGroup());
 		INode iNode = new INode(this, new INodeDescriptor(iNodeTable, iNodeNr, groupNr, res.getIndex()));
@@ -745,15 +765,6 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	protected int getGroupCount() {
 		return groupCount;
 	}
-
-	/*
-	protected Object getGroupDescriptorLock() {
-		return groupDescriptorLock;
-	}
-	protected Object getSuperblockLock() {
-		return superblockLock;
-	}
-	*/
 	
 	/**
 	 * Check whether the filesystem uses the given RO feature (S_FEATURE_RO_COMPAT)
@@ -793,8 +804,6 @@ public class Ext2FileSystem extends AbstractFileSystem {
         	return false;
         }
 	}
-
-	
 	
 	/**
 	 * With the sparse_super option set, a filesystem does not have a superblock
@@ -826,13 +835,9 @@ public class Ext2FileSystem extends AbstractFileSystem {
 		return new Ext2Directory(e);
 	}
 
-	/**
-	 * 
-	 */
 	protected FSEntry buildRootEntry() throws IOException {
 		//a free inode has been found: create the inode and write it into the inode table			
-		long iNodeTableBlock  = groupDescriptors[0].getInodeTable();	//the first block of the inode table
-		INodeTable iNodeTable = new INodeTable(this, (int)iNodeTableBlock);
+		INodeTable iNodeTable = iNodeTables[0];
 		//byte[] iNodeData = new byte[INode.INODE_LENGTH];
 		int iNodeNr = Ext2Constants.EXT2_ROOT_INO;
 		INode iNode = new INode(this, new INodeDescriptor(iNodeTable, iNodeNr, 0, iNodeNr-1));

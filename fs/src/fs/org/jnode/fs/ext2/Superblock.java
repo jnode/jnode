@@ -32,7 +32,7 @@ public class Superblock {
 
 	public Superblock() {		
 		data = new byte[SUPERBLOCK_LENGTH];
-		log.setLevel(Level.DEBUG);		
+		log.setLevel(Level.INFO);		
 	}
 	
 	public void read(byte src[], Ext2FileSystem fs) throws FileSystemException {
