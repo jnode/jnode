@@ -8,6 +8,10 @@ package org.jnode.util;
  */
 public class NumberUtils {
 	
+    public static final int K = 1024;
+    public static final int M = 1024*1024;
+    public static final int G = 1024*1024*1024;
+    
     /**
      * Convert a float to a string with a given maximum number of fraction digits.
      * @param value
@@ -167,6 +171,31 @@ public class NumberUtils {
 			}
 			return v;
 		}
+	}
+	
+	/** 
+	 * Convert the given value to a size string like 64K
+	 * @param v
+	 * @return
+	 */
+	public static String size(long v) {
+	    // Is < 1Kb?
+	    if ((v & (K-1)) != 0) {
+	        return String.valueOf(v) + "b";
+	    }
+	    // Is < 1Mb?
+	    v = v >>> 10;
+	    if ((v & (K-1)) != 0) {
+	        return String.valueOf(v) + "K";
+	    }
+	    // Is < 1Gb?
+	    v = v >>> 10;
+	    if ((v & (K-1)) != 0) {
+	        return String.valueOf(v) + "M";
+	    }
+	    // Large...
+	    v = v >>> 10;
+        return String.valueOf(v) + "G";
 	}
 	
 	/**
