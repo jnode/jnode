@@ -199,6 +199,10 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
         commandInvoker.invoke(cmdLineStr);
     }
 
+    public void invokeCommand(String command){
+        processCommand( command );
+    }
+
     //	/**
     //	 * Execute a single command line.
     //	 *
@@ -327,7 +331,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
      * 
      * @param ke a KeyboardEvent
      * 
-     * @version 2/5/2004
+     * 2/5/2004
      */
     public void keyPressed(KeyboardEvent ke) {
         //  make sure we are ready to intercept the keyboard
@@ -535,6 +539,10 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 
     public PrintStream getErrorStream() {
         return err;
+    }
+
+    public DefaultCommandInvoker getDefaultCommandInvoker() {
+        return defaultCommandInvoker;
     }
 }
 
