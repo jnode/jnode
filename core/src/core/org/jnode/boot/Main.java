@@ -6,8 +6,8 @@ package org.jnode.boot;
 import java.util.List;
 
 import org.jnode.plugin.PluginManager;
-import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.manager.DefaultPluginManager;
+import org.jnode.plugin.model.PluginRegistryModel;
 import org.jnode.system.BootLog;
 import org.jnode.vm.PragmaLoadStatics;
 import org.jnode.vm.PragmaUninterruptible;
@@ -25,7 +25,7 @@ public class Main {
 	public static final String MAIN_METHOD_SIGNATURE = "()I";
 	public static final String REGISTRY_FIELD_NAME = "pluginRegistry";
 
-	protected static PluginRegistry pluginRegistry;
+	protected static PluginRegistryModel pluginRegistry;
 
 	/**
 	 * First java entry point after the assembler kernel has booted.

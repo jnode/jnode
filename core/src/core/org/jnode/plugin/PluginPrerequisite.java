@@ -17,6 +17,14 @@ public interface PluginPrerequisite {
 	public String getPluginId();
 
 	/**
+	 * Gets the version of the plugin that is required.
+	 * If not specified, this version is equal to the version of the
+	 * declaring plugin.
+	 * @return The version
+	 */
+	public String getPluginVersion();
+
+	/**
 	 * Gets the descriptor of the plugin in which this element was declared.
 	 * @return The descriptor
 	 */

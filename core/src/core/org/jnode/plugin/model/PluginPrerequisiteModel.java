@@ -14,11 +14,18 @@ import org.jnode.plugin.PluginPrerequisite;
 public class PluginPrerequisiteModel extends PluginModelObject implements PluginPrerequisite {
 	
 	private final String plugin;
+	private final String version;
 	
 	public PluginPrerequisiteModel(PluginDescriptorModel plugin, XMLElement e) 
 	throws PluginException {
 		super(plugin);
 		this.plugin = getAttribute(e, "plugin", true);
+		final String version = getAttribute(e, "version", false);
+		if (version != null) {
+			this.version = version;
+		} else {
+			this.version = plugin.getVersion();
+		}
 	}
 
 	/**
@@ -29,6 +36,16 @@ public class PluginPrerequisiteModel extends PluginModelObject implements Plugin
 	}
 
 	
+	/**
+	 * Gets the version of the plugin that is required.
+	 * If not specified, this version is equal to the version of the
+	 * declaring plugin.
+	 * @return The version
+	 */
+	public String getPluginVersion() {
+		return version;
+	}
+
 	/**
 	 * Resolve all references to (elements of) other plugin descriptors
 	 * @throws PluginException

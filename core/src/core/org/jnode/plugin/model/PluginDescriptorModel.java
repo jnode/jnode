@@ -143,7 +143,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	        throw new SecurityException("Cannot overwrite the registry");
 	    }
 		if (!resolved) {
-			BootLog.info("Resolve " + id);
+			//BootLog.info("Resolve " + id);
 		    this.registry = registry;
 		    registry.registerPlugin(this);
 			for (int i = 0; i < extensionPoints.length; i++) {

@@ -34,7 +34,6 @@ public interface PluginRegistry {
 
 	/**
 	 * Load a plugin from a given loader.
-	 * This will not activate the plugin.
 	 * 
 	 * @param loader
 	 * @param pluginId
@@ -42,7 +41,7 @@ public interface PluginRegistry {
 	 * @return The descriptor of the loaded plugin.
 	 * @throws PluginException
 	 */
-	public PluginDescriptor loadPlugin(PluginLoader loader, String pluginId, String pluginVersion, boolean resolve) throws PluginException;
+	public PluginDescriptor loadPlugin(PluginLoader loader, String pluginId, String pluginVersion) throws PluginException;
 
 	/**
 	 * Remove the plugin with the given id from this registry.
