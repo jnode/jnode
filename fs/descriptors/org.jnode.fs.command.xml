@@ -26,6 +26,7 @@
     <alias name="eject" class="org.jnode.fs.command.EjectCommand"/>
     <alias name="format" class="org.jnode.fs.command.FormatCommand"/>
     <alias name="mkdir" class="org.jnode.fs.command.MkdirCommand"/>
+    <alias name="touch" class="org.jnode.fs.command.TouchCommand"/>
   </extension>
 
   <extension point="org.jnode.security.permissions">

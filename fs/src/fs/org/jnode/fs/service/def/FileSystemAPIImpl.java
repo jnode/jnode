@@ -22,6 +22,8 @@ import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 
 /**
+ * 
+ * @modif  add mkDir mkFile   Yves Galante (yves.galante@jmob.net) 01.04.2004
  * @author epr
  */
 final class FileSystemAPIImpl implements VMFileSystemAPI {
@@ -305,8 +307,69 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 			}
 		}
 		return fhm.open(entry.getFile(), mode);
+		// TODO open need not create the file but throw FileNotFoundException
 	}
 
+	/**
+	 * Make a directory
+	 * 
+	 * @param file
+	 * @throws IOException
+	 */
+	public boolean mkDir(File file, VMOpenMode mode) throws IOException {
+		FSEntry entry = getEntry(file);
+		if ((entry != null) || !mode.canWrite()) {
+		    return false;
+		}
+		FSDirectory directory = getParentDirectoryEntry(file);		
+		if(directory == null)
+			return false;
+		// Ok, add the dir
+		entry = directory.addDirectory(file.getName());
+		return true;
+	}
+	
+	
+	/**
+	 * Make a file
+	 * 
+	 * @param file
+	 * @throws IOException
+	 */
+	public boolean mkFile(File file, VMOpenMode mode) throws IOException {
+		FSEntry entry = getEntry(file);
+		if ((entry != null) || !mode.canWrite()) {
+			return false; 
+		}
+		FSDirectory directory = getParentDirectoryEntry(file);		
+		if(directory == null)
+			return false;
+        // Ok, make the file
+	    entry = directory.addFile(file.getName());
+		return true;
+	}
+	
+	/**
+	 * Get the parent entry of a file
+	 * 
+	 * @param file
+	 * @return the directory entry, null if not exite or not a directory
+	 * @throws IOException
+	 */
+	private  FSDirectory getParentDirectoryEntry(File file) throws IOException{
+		if(file==null){
+			return null;
+		}
+		final FSEntry dirEntry = getEntry(file.getAbsoluteFile().getParentFile());
+		if (dirEntry == null) {
+			return null;
+		}
+		if (!dirEntry.isDirectory()) {
+			return null;
+		}
+		return dirEntry.getDirectory();
+	}
+	
 	class VirtualRoot implements FSEntry {
 
 		public String getName() {
@@ -467,4 +530,9 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 		}
 
 	}
+	
+
+
+
+
 }
