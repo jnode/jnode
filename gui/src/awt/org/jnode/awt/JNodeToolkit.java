@@ -81,6 +81,9 @@ import org.jnode.naming.InitialNaming;
  */
 public abstract class JNodeToolkit extends ClasspathToolkit {
 
+    private final Object initCloseLock = new Object();
+    private EventQueue waitingNativeQueue;
+    
 	private class LRUCache extends java.util.LinkedHashMap {
 		int max_entries;
 
@@ -275,38 +278,54 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	/**
 	 * Decrement the peer reference count
 	 */
-	private final synchronized int decRefCount(boolean forceClose) {
-		refCount--;
-		log.debug("refCount.dec=" + refCount);
-		if ((refCount == 0) || forceClose) {
+	private final int decRefCount(boolean forceClose) {
+        final int rc;
+        synchronized (initCloseLock) {
+            refCount--;
+            rc = refCount;
+        }
+		log.debug("refCount.dec=" + rc);
+		if ((rc == 0) || forceClose) {
 			onClose();
+            final KeyboardHandler keyboardHandler = this.keyboardHandler;
+            final MouseHandler mouseHandler = this.mouseHandler;
+            final Surface graphics = this.graphics;
+            
 			if (keyboardHandler != null) {
-				this.keyboardHandler.close();
+				keyboardHandler.close();
 			}
 			if (mouseHandler != null) {
-				this.mouseHandler.close();
+				mouseHandler.close();
 			}
 			if (graphics != null) {
-				this.graphics.close();
+				graphics.close();
 			}
+            
 			this.api = null;
 			this.graphics = null;
 			this.keyboardHandler = null;
 			this.mouseHandler = null;
-			this.refCount = 0;
-			notifyAll();
-		}
-		return refCount;
+            
+            synchronized (initCloseLock) {
+                this.refCount = 0;
+                initCloseLock.notifyAll();
+            }
+            return 0;
+		} else {
+		    return rc;
+        }
 	}
-
-	private final synchronized void doWaitUntilStopped() {
-		while (graphics != null) {
-			try {
-				wait();
-			} catch (InterruptedException ex) {
-				// Ignore
-			}
-		}
+	
+	private final void doWaitUntilStopped() {
+	    synchronized (initCloseLock) {
+	        while (graphics != null) {
+	            try {
+	                initCloseLock.wait();
+	            } catch (InterruptedException ex) {
+	                // Ignore
+	            }
+	        }
+	    }
 	}
 
 	/**
@@ -593,7 +612,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	private final int incRefCount() {
 		final boolean initialize;
 		final int rc;
-		synchronized (this) {
+		synchronized (initCloseLock) {
 			refCount++;
 			rc = refCount;
 			initialize = (refCount == 1);
@@ -641,8 +660,17 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	}
 
 	public void iterateNativeQueue(EventQueue locked, boolean block) {
-		// TODO Auto-generated method stub
-
+        if (block) {
+            this.waitingNativeQueue = locked;
+            synchronized (locked) {
+                try {
+                    locked.wait();
+                } catch (InterruptedException e) {
+                    // Ignore
+                }
+                this.waitingNativeQueue = null;
+            }
+        }
 	}
 
 	/**
@@ -691,6 +719,11 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	}
 
 	public void wakeNativeQueue() {
-		// Do nothing
+        final EventQueue q = this.waitingNativeQueue;
+        if (q != null) {
+            synchronized (q) {
+                q.notifyAll();
+            }
+        }
 	}
 }
