@@ -30,6 +30,8 @@ public class SoftByteCodes implements Uninterruptible {
 	public static final int EX_CLASSCAST = 6;
 
 	private static VmHeapManager heapManager;
+	private static boolean writeBarrierLoaded;
+	private static VmWriteBarrier writeBarrier;
 
 	/**
 	 * Is the given object instance of the given class.
@@ -332,5 +334,71 @@ public class SoftByteCodes implements Uninterruptible {
 
 	public static void unknownOpcode(int opcode, int pc) throws PragmaUninterruptible {
 		throw new Error("Unknown opcode " + opcode + " at pc " + pc);
+	}
+	
+	/**
+	 * This method implements the write barrier for aastores
+	 *
+	 * @param ref The base pointer of the array
+	 * @param index The array index being stored into.  NOTE: This is the "natural" index; a[3] will pass 3.
+	 * @param value The value being stored
+	 */
+	public static void arrayStoreWriteBarrier(Object ref, int index, Object value) 
+	throws PragmaUninterruptible {
+		if (!writeBarrierLoaded) {
+			loadWriteBarrier();
+		}
+		final VmWriteBarrier wb = writeBarrier;
+		if (wb != null) {
+			wb.arrayStoreWriteBarrier(ref, index, value);
+		}
+	}
+
+	/**
+	 * This method implements the write barrier for putfields of references
+	 *
+	 * @param ref    The base pointer of the array
+	 * @param offset The offset being stored into.  NOTE: This is in bytes.
+	 * @param value  The value being stored
+	 */
+	public static void putfieldWriteBarrier(Object ref, int offset, Object value) 
+	throws PragmaUninterruptible {
+		if (!writeBarrierLoaded) {
+			loadWriteBarrier();
+		}
+		final VmWriteBarrier wb = writeBarrier;
+		if (wb != null) {
+			wb.putfieldWriteBarrier(ref, offset, value);
+		}
+	}
+
+	/**
+	 * This method is inlined to implement the write barrier for putstatics of references
+	 *
+	 * @param staticsIndex The offset of static field ( from VmStatics)
+	 * @param value        The value being stored
+	 */
+	public static void putstaticWriteBarrier(int staticsIndex, Object value) 
+	throws PragmaUninterruptible {
+		if (!writeBarrierLoaded) {
+			loadWriteBarrier();
+		}
+		final VmWriteBarrier wb = writeBarrier;
+		if (wb != null) {
+			wb.putstaticWriteBarrier(staticsIndex, value);
+		}
+	}
+
+	/**
+	 * Load the write barrier field.
+	 */
+	private static final void loadWriteBarrier() {
+		final VmHeapManager hm = Vm.getVm().getHeapManager();
+		final VmWriteBarrier wb = hm.getWriteBarrier();
+		// The following order seems wrong, but it IS correct.
+		// If the order is swapped, storing into the writeBarrier field
+		// would trigger a recursive invocation of this method.
+		writeBarrierLoaded = true;
+		writeBarrier = wb;
 	}
 }

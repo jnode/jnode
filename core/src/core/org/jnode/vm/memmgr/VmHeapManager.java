@@ -230,5 +230,11 @@ public abstract class VmHeapManager extends VmSystemObject {
 	public final HeapHelper getHelper() {
 		return this.helper;
 	}
+	
+	/**
+	 * Gets the write barrier used by this heap manager (if any).
+	 * @return The write barrier, or null if no write barrier is used.
+	 */
+	public abstract VmWriteBarrier getWriteBarrier();
 
 }
