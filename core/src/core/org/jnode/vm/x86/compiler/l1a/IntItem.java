@@ -58,7 +58,11 @@ final class IntItem extends Item implements X86CompilerConstants {
 				break;
 				
 			case CONSTANT:
-				os.writeMOV_Const(reg, value);
+				if (value != 0) {
+					os.writeMOV_Const(reg, value);
+				} else {
+					os.writeXOR(reg, reg);
+				}
 				break;
 				
 			case FREGISTER:
