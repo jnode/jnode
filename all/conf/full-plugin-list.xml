@@ -92,6 +92,7 @@
     <plugin id="org.jnode.test.gui"/>
     <plugin id="org.jnode.test.net"/>
 
+    <plugin id="charva"/>
     <plugin id="org.jnode.wt"/>
     <plugin id="org.beanshell"/>
 
