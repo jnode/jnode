@@ -22,7 +22,6 @@ package org.jnode.vm;
 
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
-import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.pragma.Uninterruptible;
@@ -34,8 +33,6 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
 
     private final int flagsOffset;
 
-    private final int tibOffset;
-
     /**
      * Initialize this instance.
      * 
@@ -46,7 +43,6 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
                 "Cannot instantiate HeapHelpImpl at runtime"); }
         final int refSize = arch.getReferenceSize();
         flagsOffset = ObjectLayout.FLAGS_SLOT * refSize;
-        tibOffset = ObjectLayout.TIB_SLOT * refSize;
     }
 
     /**
@@ -171,20 +167,6 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
      */
     public final Object getStack(VmThread thread) {
         return thread.getStack();
-    }
-
-    /**
-     * @see org.jnode.vm.memmgr.HeapHelper#getTib(java.lang.Object)
-     */
-    public final Object getTib(Object object) {
-        return Unsafe.getObject(object, tibOffset);
-    }
-
-    /**
-     * @see org.jnode.vm.memmgr.HeapHelper#getVmClass(java.lang.Object)
-     */
-    public final VmClassType getVmClass(Object object) {
-        return VmMagic.getObjectType(object);
     }
 
     /**

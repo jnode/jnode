@@ -43,6 +43,7 @@ final class FinalizerVisitor extends ObjectVisitor implements ObjectFlags {
                 }
             }
             helper.setFinalized(object);
+            helper.atomicChangeObjectColor(object, color, GC_WHITE);
         }
         return true;
     }

@@ -26,7 +26,9 @@ final class GCSetWhiteVisitor extends ObjectVisitor implements ObjectFlags, Unin
 	 */
 	public boolean visit(Object object) {
 		final int gcColor = helper.getObjectColor(object);
-		helper.atomicChangeObjectColor(object, gcColor, GC_WHITE);
+        if (gcColor != GC_YELLOW) {
+            helper.atomicChangeObjectColor(object, gcColor, GC_WHITE);
+        }
 		return true;
 	}
 
