@@ -120,6 +120,30 @@ public interface X86Constants {
 	public static final int BITS80 = 0x00000010; /* FPU only */
     public static final int BITS128 = 0x00000020; /* XMM only */
 
+    // Flags
+    public static final int F_CF        = 0x00000001;
+    public static final int F_1         = 0x00000002;
+    public static final int F_PF        = 0x00000004;
+    public static final int F_01        = 0x00000008;
+    public static final int F_AF        = 0x00000010;
+    public static final int F_02        = 0x00000020;
+    public static final int F_ZF        = 0x00000040;
+    public static final int F_SF        = 0x00000080;
+    public static final int F_TF        = 0x00000100;
+    public static final int F_IF        = 0x00000200;
+    public static final int F_DF        = 0x00000400;
+    public static final int F_OF        = 0x00000800;
+    public static final int F_IOPL1     = 0x00001000;
+    public static final int F_IOPL2     = 0x00002000;
+    public static final int F_NT        = 0x00004000;  // Nested task
+    public static final int F_03        = 0x00008000;
+    public static final int F_RF        = 0x00010000;  // Resume flag
+    public static final int F_VM        = 0x00020000;  // Virtual 8086 mode
+    public static final int F_AC        = 0x00040000;  // Alignment check
+    public static final int F_VIF       = 0x00080000;  // Virtual interrupt flag
+    public static final int F_VIP       = 0x00100000;  // Virtual interrupt pending
+    public static final int F_ID        = 0x00200000;  // ID flag
+    
 	public static final class Mode {
 		private final int operandSize;
 

@@ -66,6 +66,7 @@ import org.jnode.vm.x86.VmX86Processor32;
 import org.jnode.vm.x86.VmX86Processor64;
 import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
+import org.jnode.vm.x86.compiler.X86JumpTable;
 
 /**
  * @author epr
@@ -210,6 +211,13 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 		} catch (IOException ex) {
 			throw new BuildException(ex);
 		}
+        
+        // Link the jump table entries
+        for (int i = 0; i < X86JumpTable.TABLE_LENGTH; i++) {
+            final Label lbl = new Label(X86JumpTable.TABLE_ENTRY_LABELS[i]);
+            final int idx = (arch.getMode().is32()) ? i : i * 2;
+            statics.setAddress(idx, lbl);
+        }
 	}
 
 	/**
@@ -708,4 +716,23 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 		}
 		this.bits = bits;
 	}
+    
+    /**
+     * Initialize the statics table.
+     * @see org.jnode.build.AbstractBootImageBuilder#initializeStatics(org.jnode.vm.classmgr.VmStatics)
+     */
+    protected void initializeStatics(VmStatics statics) throws BuildException {
+        for (int i = 0; i < X86JumpTable.TABLE_LENGTH; i++) {
+            final int idx = statics.allocAddressField();
+            if (getArchitecture().getReferenceSize() == 4) {
+                if (i != idx) {
+                    throw new BuildException("JumpTable entry " + i + " must be at index " + i + " not " + idx);
+                }
+            } else {
+                if ((i * 2) != idx) {
+                    throw new BuildException("JumpTable entry " + i + " must be at index " + (i * 2) + " not " + idx);
+                }                
+            }
+        }
+    }
 }

@@ -95,7 +95,9 @@ final class FPCompilerFPU extends FPCompiler {
 		}
 		os.writeFUCOMPP(); // Compare, Pop twice
 		os.writeFNSTSW_AX(); // Store fp status word in AX
-		os.writeSAHF(); // Store AH to Flags
+        if (os.isCode32()) {
+            os.writeSAHF(); // Store AH to Flags
+        }
 
 		// Pop fpu stack twice (FUCOMPP)
 		fpuStack.pop();
@@ -104,8 +106,17 @@ final class FPCompilerFPU extends FPCompiler {
 		final Label gtLabel = new Label(curInstrLabel + "gt");
 		final Label ltLabel = new Label(curInstrLabel + "lt");
 		final Label endLabel = new Label(curInstrLabel + "end");
-		os.writeJCC(gtLabel, X86Constants.JA);
-		os.writeJCC(ltLabel, X86Constants.JB);
+        if (os.isCode32()) {
+            os.writeJCC(gtLabel, X86Constants.JA);
+            os.writeJCC(ltLabel, X86Constants.JB);
+        } else {
+            // Emulate JA
+            os.writeTEST(X86Register.EAX, X86Constants.F_CF | X86Constants.F_ZF);
+            os.writeJCC(gtLabel, X86Constants.JZ);
+            // Emulate JB
+            os.writeTEST(X86Register.EAX, X86Constants.F_CF);
+            os.writeJCC(ltLabel, X86Constants.JNZ);            
+        }
 		os.writeJMP(endLabel); // equal
 		// Greater
 		os.setObjectRef(gtLabel);

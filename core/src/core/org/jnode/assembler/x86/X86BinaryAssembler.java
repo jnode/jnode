@@ -1010,6 +1010,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 *            If true, tablePtr is a raw address
 	 */
 	public final void writeCALL(Object tablePtr, int offset, boolean rawAddress) {
+        if (code64) {
+            throw new InvalidOpcodeException();
+        }
 		write8(0xFF); // Opcode
 		write8(0x15); // effective address == disp32
 		writeObjectRef(tablePtr, offset, rawAddress);
@@ -1660,6 +1663,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 *            If true, tablePtr is a raw address
 	 */
 	public void writeJMP(Object tablePtr, int offset, boolean rawAddress) {
+        if (code64) {
+            throw new InvalidOpcodeException();
+        }
 		write8(0xFF); // Opcode
 		write8(0x25); // effective address == disp32
 		writeObjectRef(tablePtr, offset, rawAddress);
@@ -2794,6 +2800,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * Create a sahf
 	 */
 	public final void writeSAHF() {
+        if (code64) {
+            throw new InvalidOpcodeException();
+        }
 		write8(0x9e);
 	}
 

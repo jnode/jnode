@@ -662,14 +662,15 @@ public final class Unsafe {
 	/**
 	 * Gets a jumptable entry. This method can only be called at runtime.
 	 * 
-	 * @param offset
+	 * @param index
 	 * @return The jumptable entry.
 	 */
-	public static final Address getJumpTableEntry(int offset) {
+	public static final Address getJumpTableEntry(int index) {
 		final SecurityManager sm = System.getSecurityManager();
 		if (sm != null) {
 			sm.checkPermission(GET_JUMP_TABLE_PERM);
 		}
+        final int offset = index * Vm.getVm().getArch().getReferenceSize();
 		return getJumpTable0().loadAddress(Offset.fromIntSignExtend(offset));
 	}
 

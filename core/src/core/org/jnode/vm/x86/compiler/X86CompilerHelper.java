@@ -28,7 +28,6 @@ import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
-import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.classmgr.VmArray;
@@ -41,7 +40,6 @@ import org.jnode.vm.classmgr.VmTypeState;
 import org.jnode.vm.memmgr.VmWriteBarrier;
 import org.jnode.vm.x86.X86CpuID;
 import org.vmmagic.pragma.PrivilegedActionPragma;
-import org.vmmagic.unboxed.Address;
 
 /**
  * Helpers class used by the X86 compilers.
@@ -88,10 +86,6 @@ public class X86CompilerHelper implements X86CompilerConstants {
 
 	private final boolean isBootstrap;
 
-	private final Label jumpTableLabel;
-
-	private final Address jumpTableAddress;
-
 	private final boolean haveCMOV;
 
 	private Label[] addressLabels;
@@ -135,13 +129,6 @@ public class X86CompilerHelper implements X86CompilerConstants {
 		this.context = context;
 		this.stackMgr = stackMgr;
 		this.isBootstrap = isBootstrap;
-		if (isBootstrap) {
-			jumpTableLabel = new Label(X86JumpTable.JUMPTABLE_NAME);
-			jumpTableAddress = null;
-		} else {
-			jumpTableLabel = null;
-			jumpTableAddress = Unsafe.getJumpTable();
-		}
 		final X86CpuID cpuId = (X86CpuID) os.getCPUID();
 		haveCMOV = cpuId.hasFeature(X86CpuID.FEAT_CMOV);
 	}
@@ -201,33 +188,33 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	}
 
 	/**
-	 * Write code to call the address found at the given offset in the system
+	 * Write code to call the address found at the given index in the system
 	 * jumptable.
 	 * 
-	 * @param offset
+	 * @param index
 	 * @see X86JumpTable
 	 */
-	public final void writeJumpTableCALL(int offset) {
-		if (isBootstrap) {
-			os.writeCALL(jumpTableLabel, offset, false);
-		} else {
-			os.writeCALL(jumpTableAddress, offset, true);
-		}
+	public final void writeJumpTableCALL(int index) {
+        if (os.isCode64()) {
+            index *= 2;
+        } 
+        final int offset = (VmArray.DATA_OFFSET * SLOTSIZE) + (index << 2);          
+        os.writeCALL(STATICS, offset);
 	}
 
 	/**
-	 * Write code to jump to the address found at the given offset in the system
+	 * Write code to jump to the address found at the given index in the system
 	 * jumptable.
 	 * 
-	 * @param offset
+	 * @param index
 	 * @see X86JumpTable
 	 */
-	public final void writeJumpTableJMP(int offset) {
-		if (isBootstrap) {
-			os.writeJMP(jumpTableLabel, offset, false);
-		} else {
-			os.writeJMP(jumpTableAddress, offset, true);
-		}
+	public final void writeJumpTableJMP(int index) {
+        if (os.isCode64()) {
+            index *= 2;
+        } 
+        final int offset = (VmArray.DATA_OFFSET * SLOTSIZE) + (index << 2);          
+        os.writeJMP(STATICS, offset);
 	}
 
 	/**
@@ -383,9 +370,10 @@ public class X86CompilerHelper implements X86CompilerConstants {
                 os.writePUSH(X86Register.R9);
                 os.writePUSH(X86Register.R10);
                 os.writePUSH(X86Register.R11);
-                os.writePUSH(X86Register.R12);
+                // R12 contains processor and is preserved
                 os.writePUSH(X86Register.R13);
                 os.writePUSH(X86Register.R14);
+                os.writePUSH(X86Register.R15);
 			}
 			// Call cls.initialize
 			os.writePUSH(classReg);
@@ -393,9 +381,10 @@ public class X86CompilerHelper implements X86CompilerConstants {
 			if (os.isCode32()) {
 				os.writePOPA();
 			} else {
+                os.writePOP(X86Register.R15);
                 os.writePOP(X86Register.R14);
                 os.writePOP(X86Register.R13);
-                os.writePOP(X86Register.R12);
+                // R12 contains processor and is preserved
                 os.writePOP(X86Register.R11);
                 os.writePOP(X86Register.R10);
                 os.writePOP(X86Register.R9);

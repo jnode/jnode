@@ -346,6 +346,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             blockedObjects.add(clsMgr);
             blockedObjects.add(clsMgr.getStatics());
             blockedObjects.add(clsMgr.getStatics().getTable());
+            // Initialize the statics table.
+            initializeStatics(clsMgr.getStatics());
 
             if (debug) {
                 log("Building in DEBUG mode", Project.MSG_WARN);
@@ -1332,4 +1334,11 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             }
         }
     }
+    
+    /**
+     * Initialize the statics table.
+     * @param statics
+     */
+    protected abstract void initializeStatics(VmStatics statics)
+    throws BuildException;
 }

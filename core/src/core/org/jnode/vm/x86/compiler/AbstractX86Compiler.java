@@ -98,7 +98,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
             cm.setCodeStart(os.setObjectRef(new Label(method.getMangledName()
                     + "$$abstract-start")));
             // Call abstract method error method
-            helper.writeJumpTableJMP(X86JumpTable.VM_INVOKE_ABSTRACT_OFS);
+            helper.writeJumpTableJMP(X86JumpTable.VM_INVOKE_ABSTRACT_IDX);
             // Close the "object"
             objectInfo.markEnd();
             // The end
@@ -109,7 +109,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
         } else {
             // Set the address of the abstract method code
             final Address errorAddr = Unsafe
-                    .getJumpTableEntry(X86JumpTable.VM_INVOKE_ABSTRACT_OFS);
+                    .getJumpTableEntry(X86JumpTable.VM_INVOKE_ABSTRACT_IDX);
             final VmCompiledCode code = new VmCompiledCode(this, null,
                     errorAddr.toAddress(), null, 0, null, null, null);
             method.addCompiledCode(code, level);

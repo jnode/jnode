@@ -31,17 +31,25 @@ package org.jnode.vm.x86.compiler;
  */
 public class X86JumpTable {
 
-    /** Jumptable offset of vm_athrow */
-    public static final int VM_ATHROW_OFS = 0;
+    /** Jumptable index of vm_athrow */
+    public static final int VM_ATHROW_IDX = 0;
 
-    /** Jumptable offset of vm_athrow_notrace */
-    public static final int VM_ATHROW_NOTRACE_OFS = 4;
+    /** Jumptable index of vm_athrow_notrace */
+    public static final int VM_ATHROW_NOTRACE_IDX = 1;
 
-    /** Jumptable offset of vm_invoke_abstract */
-    public static final int VM_INVOKE_ABSTRACT_OFS = 8;
+    /** Jumptable index of vm_invoke_abstract */
+    public static final int VM_INVOKE_ABSTRACT_IDX = 2;
 
-    /** Jumptable offset of vm_invoke_method_after_recompile */
-    public static final int VM_INVOKE_METHOD_AFTER_RECOMPILE_OFS = 12;
+    /** Jumptable index of vm_invoke_method_after_recompile */
+    public static final int VM_INVOKE_METHOD_AFTER_RECOMPILE_IDX = 3;
+    
+    /** Number of entries in the table */
+    public static final int TABLE_LENGTH = 4;
+
+    /** Number of entries in the table */
+    public static final String TABLE_ENTRY_LABELS[] = {
+        "vm_athrow", "vm_athrow_notrace", "vm_invoke_abstract", "vm_invoke_method_after_recompile"
+    };
 
     /** Label name of the jumptable */
     public static final String JUMPTABLE_NAME = "vm_jumpTable";
