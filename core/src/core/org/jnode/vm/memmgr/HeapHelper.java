@@ -8,6 +8,7 @@ import org.jnode.vm.VmAddress;
 import org.jnode.vm.Monitor;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmThread;
+import org.jnode.vm.VmThreadVisitor;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmMethod;
 
@@ -114,5 +115,11 @@ public abstract class HeapHelper extends ObjectResolver {
 	 * Unblock all threads (on all processors).
 	 * This method is called after a call a call to {@link #stopThreadsAtSafePoint()}.
 	 */
-	public abstract void restartThreads(); 
+	public abstract void restartThreads();
+    
+    /**
+     * Visit all live threads.
+     * @param visitor
+     */
+    public abstract void visitAllThreads(VmThreadVisitor visitor); 
 }

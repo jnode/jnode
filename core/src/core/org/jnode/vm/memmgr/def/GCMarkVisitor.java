@@ -8,9 +8,7 @@ import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmMagic;
-import org.jnode.vm.VmThread;
 import org.jnode.vm.classmgr.ObjectFlags;
-import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.HeapHelper;
@@ -41,11 +39,11 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
 
 //    private final int slotSize;
 
-    private final DefaultHeapManager heapManager;
+//    private final DefaultHeapManager heapManager;
 
     private final HeapHelper helper;
     
-    private final ProcessChildVisitor processChildVisitor = new ProcessChildVisitor();
+//    private final ProcessChildVisitor processChildVisitor = new ProcessChildVisitor();
 
     /**
      * Create a new instance
@@ -54,7 +52,7 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      */
     public GCMarkVisitor(DefaultHeapManager heapManager, VmArchitecture arch,
             GCStack stack) {
-        this.heapManager = heapManager;
+//        this.heapManager = heapManager;
         this.stack = stack;
         this.markedObjects = 0;
         this.rootSet = false;
@@ -136,20 +134,11 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
                 Unsafe.debug(")");
                 helper.die("vmClass == null in mark()");
             } else if (vmClass.isArray()) {
-                if (!((VmArrayClass) vmClass).isPrimitiveArray()) {
+                if (!vmClass.isPrimitiveArray()) {            
                     markArray(object);
                 }
             } else {
                 markObject(object, (VmNormalClass) vmClass);
-                if (object instanceof VmThread) {
-                    try {
-                        markThreadStack((VmThread) object);
-                    } catch (ClassCastException ex) {
-                        Unsafe.debug("VmThread");
-                        Unsafe.debug(object.getClass().getName());
-                        helper.die("GCMarkVisitor.mark");
-                    }
-                }
             }
             processChild(VmMagic.getTIB(object));
             final Monitor monitor = helper.getInflatedMonitor(object, arch);
@@ -215,15 +204,6 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
     }
 
     /**
-     * Mark all objects on the stack of the given thread
-     * 
-     * @param thread
-     */
-    private void markThreadStack(VmThread thread) {
-        thread.visit(processChildVisitor, heapManager, helper);
-    }
-
-    /**
      * Process a child of an object (this child is a reference).
      * 
      * @param child
@@ -273,13 +253,5 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
      */
     public void setRootSet(boolean b) {
         rootSet = b;
-    }
-    
-    private class ProcessChildVisitor extends ObjectVisitor implements Uninterruptible {
-        
-            public boolean visit(Object object) {
-                processChild(object);
-                return true;
-            }
     }
 }

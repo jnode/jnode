@@ -64,6 +64,8 @@ public class Vm extends VmSystemObject implements Statistics {
 	private transient HashMap statistics;
 	/** The atom manager */
 	private final VmAtom.Manager atomManager;
+    /** List of all threads */
+    private final VmThreadQueue allThreads;
 	
 	/** Should assertions be verified? */
 	public static final boolean VerifyAssertions = true;
@@ -85,6 +87,7 @@ public class Vm extends VmSystemObject implements Statistics {
 		this.statics = statics;
 		this.processors = new BootableArrayList();
 		this.atomManager = new VmAtom.Manager();
+        this.allThreads = new VmThreadQueue("all", false, true);
 	}
 
 	/**
@@ -333,4 +336,28 @@ public class Vm extends VmSystemObject implements Statistics {
 	public static final VmAtom.Manager getAtomManager() {
 		return instance.atomManager;
 	}
+    
+    /**
+     * Register a thread in the list of all live threads.
+     * @param thread
+     */
+    static final void registerThread(VmThread thread) {
+        getVm().allThreads.add(thread, true, "Vm");
+    }
+    
+    /**
+     * Remove the given thread from the list of all threads.
+     * @param thread
+     */
+    static final void unregisterThread(VmThread thread) {
+        getVm().allThreads.remove(thread);
+    }
+    
+    /**
+     * Call the visitor for all live threads.
+     * @param visitor
+     */
+    static final void visitAllThreads(VmThreadVisitor visitor) {
+        getVm().allThreads.visit(visitor);
+    }
 }

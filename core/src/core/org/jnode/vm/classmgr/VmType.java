@@ -921,6 +921,14 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	public boolean isArray() {
 		return false;
 	}
+    
+    /**
+     * Is this class an array of primitive types
+     * @return boolean
+     */
+    public boolean isPrimitiveArray() {
+        return false;
+    }
 
 	/**
 	 * Does this class have a finalize method other then in java.lang.Object.

@@ -320,4 +320,11 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
     public void restartThreads() {
         Unsafe.getCurrentProcessor().enableReschedule();
     }
+    
+    /**
+     * @see org.jnode.vm.memmgr.HeapHelper#visitAllThreads(org.jnode.vm.VmThreadVisitor)
+     */
+    public void visitAllThreads(VmThreadVisitor visitor) {
+        Vm.visitAllThreads(visitor);
+    }
 }

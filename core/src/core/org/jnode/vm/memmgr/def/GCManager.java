@@ -28,6 +28,8 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
     /** An object visitor used for marking */
     private final GCMarkVisitor markVisitor;
 
+    private final GCThreadMarkVisitor threadMarkVisitor;
+    
     /** An object visitor used for sweeping */
     private final GCSweepVisitor sweepVisitor;
 
@@ -66,6 +68,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
         this.helper = heapManager.getHelper();
         this.markStack = new GCStack();
         this.markVisitor = new GCMarkVisitor(heapManager, arch, markStack);
+        this.threadMarkVisitor = new GCThreadMarkVisitor(heapManager, helper, markVisitor);
         this.setWhiteVisitor = new GCSetWhiteVisitor(heapManager);
         this.verifyVisitor = new GCVerifyVisitor(heapManager, arch);
         this.sweepVisitor = new GCSweepVisitor(heapManager);
@@ -157,14 +160,16 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
             markVisitor.reset();
             markVisitor.setRootSet(true);
             statics.walk(markVisitor, resolver);
+            helper.visitAllThreads(threadMarkVisitor);
             // Mark every object in the rootset
-            bootHeap.walk(markVisitor, locking, 0, 0);
+//            bootHeap.walk(markVisitor, locking, 0, 0);
             if (!firstIteration) {
                 // If there was an overflow in the last iteration,
                 // we must also walk through the other heap to visit
                 // all grey objects, since we must still mark
                 // their children.
                 markVisitor.setRootSet(false);
+                bootHeap.walk(markVisitor, locking, 0, 0);
                 VmAbstractHeap heap = firstHeap;
                 while ((heap != null) && (!markStack.isOverflow())) {
                     heap.walk(markVisitor, locking, 0, 0);
