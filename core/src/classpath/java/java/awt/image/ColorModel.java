@@ -324,7 +324,7 @@ public abstract class ColorModel implements Transparency
 	 * This method is typically overriden in subclasses to provide a
 	 * more efficient implementation.
 	 * 
-	 * @param array of transferType containing a single pixel.  The
+   * @param inData array of transferType containing a single pixel.  The
 	 * pixel should be encoded in the natural way of the color model.
 	 */
   public int getRed(Object inData)

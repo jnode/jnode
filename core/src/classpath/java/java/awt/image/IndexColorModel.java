@@ -125,7 +125,9 @@ public class IndexColorModel extends ColorModel
   public IndexColorModel(int bits, int size, byte[] reds, byte[] greens,
                          byte[] blues, byte[] alphas)
   {
-    super (bits);
+    // FIXME: This super() constructor should not be used since it can give
+    // the wrong value for hasAlpha() which is final and cannot be overloaded
+    super(bits); 
 		map_size = size;
     opaque = (alphas == null);
 
@@ -416,10 +418,10 @@ public class IndexColorModel extends ColorModel
 	 */
   public final int getAlpha (int pixel)
   {
-    if (pixel < map_size)
-	    return (int) ((generateMask (3) & rgb[pixel]) >> (3 * pixel_bits));
+    if (opaque || pixel >= map_size)
+      return 255;
     
-			return 0;
+    return (int) ((generateMask (3) & rgb[pixel]) >> (3 * pixel_bits));
 		}
 
 	/**
@@ -510,45 +512,5 @@ public class IndexColorModel extends ColorModel
 
     return im;
   }
-
-    //TODO The following operations need to be implemented
-    //  throws UnsupportedOperationException
-    //needs to be fixed.
-    public SampleModel createCompatibleSampleModel( int w, int h ) {
-        return new MultiPixelPackedSampleModel( transferType, w, h, pixel_bits );
-    }
-
-    //TODO The parent implementation of this throws UnsupportedOperationException,
-    //this needs to be fixed.
-    public Object getDataElements( int rgb, Object pixel ) {
-        throw new UnsupportedOperationException();
-    }
-
-    public int[] getComponents( int pixel, int[] components, int offset ) {
-        // subclasses has to implement this method.
-        throw new UnsupportedOperationException();
-    }
-
-    public int[] getComponents( Object pixel, int[] components, int offset ) {
-        // subclasses has to implement this method.
-        throw new UnsupportedOperationException();
-    }
-
-    public float[] getNormalizedComponents( Object pixel,
-                                            float[] normComponents,
-                                            int normOffset ) {
-        // subclasses has to implement this method.
-        throw new UnsupportedOperationException();
-    }
-
-    public int getDataElement( int[] components, int offset ) {
-        // subclasses have to implement this method.
-        throw new UnsupportedOperationException();
-    }
-
-    public Object getDataElements( int[] components, int offset, Object obj ) {
-        // subclasses have to implement this method.
-        throw new UnsupportedOperationException();
-    }
 }
 

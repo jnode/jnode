@@ -1,5 +1,5 @@
-/* gnu.java.lang.MainThread
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
+/* MainThread.java --
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -39,7 +39,8 @@ exception statement from your version. */
 
 package gnu.java.lang;
 
-import java.lang.reflect.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * MainThread is a Thread which uses the main() method of some class.

@@ -223,6 +223,7 @@ public class BasicStroke implements Stroke
     hash ^= join;
     hash ^= Float.floatToIntBits(limit);
     
+    if (dash != null)
     for (int i = 0; i < dash.length; i++)
       hash ^=  Float.floatToIntBits(dash[i]);
 

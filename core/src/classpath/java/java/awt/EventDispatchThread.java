@@ -52,7 +52,7 @@ class EventDispatchThread extends Thread
 		super();
     setName("AWT-EventQueue-" + ++dispatchThreadNum);
 		this.queue = queue;
-//		setPriority(NORM_PRIORITY + 1);
+    setPriority(NORM_PRIORITY + 1);
 	}
 
   public void run()

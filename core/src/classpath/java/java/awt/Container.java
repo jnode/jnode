@@ -67,7 +67,7 @@ import javax.swing.SwingUtilities;
  * list or bottom of the stacking order.
  *
  * @author original author unknown
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
  *
  * @since 1.0
  *
@@ -1686,32 +1686,48 @@ public class Container extends Component
 
   static class GfxPaintVisitor extends GfxVisitor
   {
-    public void visit(Component c, Graphics gfx) { c.paint(gfx); }
     public static final GfxVisitor INSTANCE = new GfxPaintVisitor();
+    
+    public void visit(Component c, Graphics gfx)
+    {
+      c.paint(gfx);
+    }
   }
 
   static class GfxPrintVisitor extends GfxVisitor
   {
-    public void visit(Component c, Graphics gfx) { c.print(gfx); }
     public static final GfxVisitor INSTANCE = new GfxPrintVisitor();
+    
+    public void visit(Component c, Graphics gfx)
+    {
+      c.print(gfx);
+    }
   }
 
   static class GfxPaintAllVisitor extends GfxVisitor
   {
-    public void visit(Component c, Graphics gfx) { c.paintAll(gfx); }
     public static final GfxVisitor INSTANCE = new GfxPaintAllVisitor();
+
+    public void visit(Component c, Graphics gfx)
+    {
+      c.paintAll(gfx);
+    }
   }
 
   static class GfxPrintAllVisitor extends GfxVisitor
   {
-    public void visit(Component c, Graphics gfx) { c.printAll(gfx); }
     public static final GfxVisitor INSTANCE = new GfxPrintAllVisitor();
+
+    public void visit(Component c, Graphics gfx)
+    {
+      c.printAll(gfx);
+    }
   }
 
   /**
    * This class provides accessibility support for subclasses of container.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    *
    * @since 1.3
    */
@@ -1800,7 +1816,7 @@ public class Container extends Component
      * This class fires a <code>PropertyChange</code> listener, if registered,
      * when children are added or removed from the enclosing accessible object.
      *
-     * @author Eric Blake <ebb9@email.byu.edu>
+     * @author Eric Blake (ebb9@email.byu.edu)
      *
      * @since 1.3
      */
