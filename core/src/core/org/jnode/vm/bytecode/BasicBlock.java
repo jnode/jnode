@@ -3,7 +3,10 @@
  */
 package org.jnode.vm.bytecode;
 
+import java.util.ArrayList;
+
 import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.compiler.ir.Variable;
 
 /**
  * A Basic block of instructions.
@@ -12,12 +15,15 @@ import org.jnode.vm.VmSystemObject;
  * of a basic block is the last instruction.
  *  
  * @author epr
+ * @author Madhu Siddalingaiah
  */
 public class BasicBlock extends VmSystemObject {
-	
 	private final int startPC;
 	private int endPC;
 	private boolean startOfExceptionHandler;
+	private ArrayList predecessors;
+	private ArrayList successors;
+	private Variable[] variables;
 	
 	/**
 	 * Create a new instance
@@ -29,6 +35,8 @@ public class BasicBlock extends VmSystemObject {
 		this.startPC = startPC;
 		this.endPC = endPC;
 		this.startOfExceptionHandler = startOfExceptionHandler;
+		this.predecessors = new ArrayList();
+		this.successors = new ArrayList();
 	}
 
 	/**
@@ -36,9 +44,7 @@ public class BasicBlock extends VmSystemObject {
 	 * @param startPC The first bytecode address of this block
 	 */
 	public BasicBlock(int startPC) {
-		this.startPC = startPC;
-		this.endPC = -1;
-		this.startOfExceptionHandler = false;
+		this(startPC, -1, false);
 	}
 
 	/**
@@ -101,4 +107,54 @@ public class BasicBlock extends VmSystemObject {
 		return startOfExceptionHandler;
 	}
 
+	/**
+	 * @return an ArrayList containing BasicBlocks that may precede this block
+	 */
+	public ArrayList getPredecessors() {
+		return predecessors;
+	}
+
+	/**
+	 * @return an ArrayList containing BasicBlocks that may succeed this block
+	 */
+	public ArrayList getSuccessors() {
+		return successors;
+	}
+
+	public void addPredecessor(BasicBlock block) {
+		if (!this.predecessors.contains(block)) {
+			this.predecessors.add(block);
+		}
+		// Closure
+		ArrayList preds = block.getPredecessors();
+		int n = preds.size();
+		for (int i=0; i<n; i+=1) {
+			BasicBlock pred = (BasicBlock) preds.get(i);
+			if (!predecessors.contains(pred)) {
+				addPredecessor(pred);
+			}
+			pred.addSuccessor(this);
+		}
+	}
+
+	// This isn't complete, but it's good enough for now...
+	public void addSuccessor(BasicBlock block) {
+		if (!this.successors.contains(block)) {
+			this.successors.add(block);
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	public Variable[] getVariables() {
+		return variables;
+	}
+
+	/**
+	 * @param variables
+	 */
+	public void setVariables(Variable[] variables) {
+		this.variables = variables;
+	}
 }
