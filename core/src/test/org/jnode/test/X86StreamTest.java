@@ -96,6 +96,9 @@ public class X86StreamTest {
 		os.writeSAR(Register.EBP, 16, 16);
 		os.writeSAR(Register.EBP, 16, 24);
 		
+		os.writeMOVZX(Register.EBX, Register.EBX, X86Constants.BITS16);
+		os.writeAND(Register.EBX, 0x0000FFFF);
+		
 		FileOutputStream fos = new FileOutputStream("test.bin");
 		os.writeTo(fos);
 		fos.close();
