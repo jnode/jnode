@@ -1,6 +1,6 @@
 <project name="JNode" default="all" basedir=".">
 
-  <property name="jnode-ver"           value="0.1.7"/>
+  <property name="jnode-ver"           value="0.1.8-dev"/>
 
   <property name="root.dir"            value="${basedir}/.."/>
   <property name="build.dir"           value="${basedir}/build"/>
