@@ -24,8 +24,8 @@ import org.jnode.vm.memmgr.VmWriteBarrier;
 public final class DefaultHeapManager extends VmHeapManager {
 
 	/** Default size in bytes of a new heap */
-	public static final int DEFAULT_HEAP_SIZE = 8 * 1024 * 1024;
-	
+	public static final int DEFAULT_HEAP_SIZE = 4 * 1024 * 1024;
+
 	/** When this percentage of the free memory has been allocated, a GC is triggered (0..1.0) */
 	public static float GC_TRIGGER_PERCENTAGE = 0.75f;
 	
@@ -198,9 +198,6 @@ public final class DefaultHeapManager extends VmHeapManager {
 	 * @return Object
 	 */
 	protected Object allocObject(VmClassType vmClass, int size) {
-		if (size > DEFAULT_HEAP_SIZE) {
-			throw new OutOfMemoryError("Object too large (" + size + ")");
-		}
 		if (gcActive) {
 		    Unsafe.debug("allocObject(");
 		    Unsafe.debug(vmClass.getName());
@@ -233,7 +230,13 @@ public final class DefaultHeapManager extends VmHeapManager {
 				if (heap == null) {
 					//Unsafe.debug("allocHeap in allocObject("); Unsafe.debug(alignedSize);
 					//Unsafe.debug(") ");
-					if ((heap = allocHeap(DEFAULT_HEAP_SIZE)) == null) {
+					int newHeapSize = DEFAULT_HEAP_SIZE;  
+					if (size > newHeapSize) {
+						// this is a BIG object, try to allocate a new heap 
+						// only for it
+						newHeapSize = size;
+					}
+					if ((heap = allocHeap(newHeapSize)) == null) {
 						lowOnMemory = true;
 						// It was not possible to allocate another heap.
 						// First try to GC, if we've done that before
