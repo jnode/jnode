@@ -16,6 +16,10 @@ public class IRBasicBlock extends BasicBlock {
 	private BootableArrayList predecessors;
 	private BootableArrayList successors;
 	private Variable[] variables;
+	private BootableArrayList phiReferences;
+
+	// This is useful for finding the bottom of a loop.
+	private IRBasicBlock lastPredecessor;
 
 	/**
 	 * @param startPC
@@ -29,6 +33,7 @@ public class IRBasicBlock extends BasicBlock {
 		super(startPC, endPC, startOfExceptionHandler);
 		this.predecessors = new BootableArrayList();
 		this.successors = new BootableArrayList();
+		this.phiReferences = new BootableArrayList();
 	}
 
 	/**
@@ -39,7 +44,7 @@ public class IRBasicBlock extends BasicBlock {
 	}
 
 	/**
-	 * @return an ArrayList containing BasicBlocks that may precede this block
+	 * @return a List containing BasicBlocks that may precede this block
 	 */
 	public List getPredecessors() {
 		return predecessors;
@@ -55,6 +60,10 @@ public class IRBasicBlock extends BasicBlock {
 	final void addPredecessor(IRBasicBlock block) {
 		if (!this.predecessors.contains(block)) {
 			this.predecessors.add(block);
+			if (lastPredecessor == null ||
+				block.getEndPC() > lastPredecessor.getEndPC()) {
+				lastPredecessor = block;
+			}
 		}
 		// Closure
 		List preds = block.getPredecessors();
@@ -68,7 +77,7 @@ public class IRBasicBlock extends BasicBlock {
 		}
 	}
 
-	// This isn't complete, but it's good enough for now...
+	// TODO This isn't complete, but it's good enough for now...
 	final void addSuccessor(IRBasicBlock block) {
 		if (!this.successors.contains(block)) {
 			this.successors.add(block);
@@ -87,5 +96,36 @@ public class IRBasicBlock extends BasicBlock {
 	 */
 	public void setVariables(Variable[] variables) {
 		this.variables = variables;
+	}
+
+	/**
+	 * @param phi
+	 */
+	public void addPhiReference(PhiOperand phi) {
+		phiReferences.add(phi);
+	}
+
+	/**
+	 * 
+	 */
+	public void resolvePhiReferences() {
+		int n = phiReferences.size();
+		for (int i=0; i<n; i+=1) {
+			PhiOperand phi = (PhiOperand) phiReferences.get(i);
+			Variable op = variables[phi.getIndex()];
+			AssignOP assignOP = op.getAssignOP();
+			IRBasicBlock block = assignOP.getBasicBlock();
+			if (block == this) {
+				assignOP.setDeadCode(false);
+				phi.addSource(op);
+			}
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	public IRBasicBlock getLastPredecessor() {
+		return lastPredecessor;
 	}
 }

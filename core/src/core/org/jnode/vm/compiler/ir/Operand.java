@@ -11,7 +11,7 @@ package org.jnode.vm.compiler.ir;
  * An operand of an intermediate operation
  * This could be a constant, local variable, or stack entry
  */
-public class Operand {
+public abstract class Operand {
 	public static final int UNKNOWN = 0;
 	public static final int BYTE = 1;
 	public static final int SHORT = 2;
@@ -37,4 +37,6 @@ public class Operand {
 	public void setType(int type) {
 		this.type = type;
 	}
+
+	public abstract Operand simplify();
 }

@@ -14,18 +14,6 @@ public abstract class Constant extends Operand {
 		super(type);
 	}
 	
-	public static Constant getInstance(byte value) {
-		throw new IllegalArgumentException("constant not yet defined");
-	}
-	
-	public static Constant getInstance(short value) {
-		throw new IllegalArgumentException("constant not yet defined");
-	}
-	
-	public static Constant getInstance(char value) {
-		throw new IllegalArgumentException("constant not yet defined");
-	}
-
 	public static Constant getInstance(int value) {
 		return new IntConstant(value);
 	}
@@ -80,5 +68,12 @@ public abstract class Constant extends Operand {
 		int i1 = ((IntConstant) this).getValue();
 		int i2 = ((IntConstant) c2).getValue();
 		return new IntConstant(i1 / i2);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.Operand#simplify()
+	 */
+	public Operand simplify() {
+		return this;
 	}
 }

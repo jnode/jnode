@@ -36,4 +36,12 @@ public class MethodArgument extends Variable {
 	public Object clone() {
 		return new MethodArgument(this);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.Operand#simplify()
+	 */
+	public Operand simplify() {
+		// Can't do much with this...
+		return this;
+	}
 }

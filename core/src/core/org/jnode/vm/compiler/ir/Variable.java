@@ -12,18 +12,16 @@ package org.jnode.vm.compiler.ir;
 public abstract class Variable extends Operand implements Cloneable {
 	private int index;
 	private int ssaValue;
-	
+
 	/*
 	 * The operation where this variable is assigned
 	 */
 	private AssignOP assignOP;
 
-	// TODO compute liveness by updating lastUseOP when it is used by
-	// later instructions
 	/*
-	 * The operation where this variable is last used
+	 * The address where this variable is last used
 	 */
-	private IOP lastUseOP;
+	private int lastUseAddress;
 
 	public Variable(int type, int index, int ssaValue) {
 		super(type);
@@ -70,6 +68,8 @@ public abstract class Variable extends Operand implements Cloneable {
 	public abstract Object clone();
 
 	/**
+	 * Returns the AssignOP where this variable was last assigned.
+	 * 
 	 * @return
 	 */
 	public AssignOP getAssignOP() {
@@ -79,8 +79,8 @@ public abstract class Variable extends Operand implements Cloneable {
 	/**
 	 * @return
 	 */
-	public IOP getLastUseOP() {
-		return lastUseOP;
+	public int getLastUseAddress() {
+		return lastUseAddress;
 	}
 
 	/**
@@ -90,10 +90,37 @@ public abstract class Variable extends Operand implements Cloneable {
 		this.assignOP = assignOP;
 	}
 
+	public int getAssignAddress() {
+		if (assignOP == null) {
+			return 0;
+		}
+		// Add one so this live range starts just after this operation.
+		// This way live range interference computation is simplified.
+		return this.assignOP.getAddress() + 1;
+	}
+
 	/**
 	 * @param iop
 	 */
-	public void setLastUseOP(IOP iop) {
-		lastUseOP = iop;
+	public void setLastUseAddress(int address) {
+		if (address > lastUseAddress) {
+			lastUseAddress = address;
+		}
+	}
+
+	public Operand simplify() {
+		return assignOP.propagate(this);
+	}
+	
+	public Variable simplifyCopy() {
+		if (assignOP instanceof VariableRefAssignOP) {
+			VariableRefAssignOP va = (VariableRefAssignOP) assignOP;
+			Operand rhs = va.getRHS();
+			if (rhs instanceof Variable) {
+				return (Variable) rhs;
+			}
+		}
+		assignOP.setDeadCode(false);
+		return this;
 	}
 }
