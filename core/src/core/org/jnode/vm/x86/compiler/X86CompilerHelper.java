@@ -269,6 +269,24 @@ public class X86CompilerHelper implements X86CompilerConstants {
         }
         return false;
     }
+    
+    public final void writeClassInitialize(Label curInstrLabel, Register classReg, VmType cls) {
+        if (!cls.isInitialized()) {
+            // Test declaringClass.modifiers
+            os.writeTEST(classReg, context.getVmTypeState().getOffset(),
+                    VmTypeState.ST_INITIALIZED);
+            final Label afterInit = new Label(curInstrLabel
+                    + "$$after-classinit-ex");
+            os.writeJCC(afterInit, X86Constants.JNZ);
+            os.writePUSHA();
+            // Call cls.initialize
+            os.writePUSH(classReg);
+            invokeJavaMethod(context.getVmTypeInitialize());
+            os.writePOPA();
+            // Set label
+            os.setObjectRef(afterInit);
+        }
+    }
 
     /**
      * Write method counter increment code.
