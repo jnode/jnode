@@ -1,15 +1,16 @@
+/*
+ * $Id$
+ */
+
 package org.jnode.driver.input;
 
 import java.awt.event.KeyEvent;
-import java.util.HashMap;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mh
- * Date: 06-04-2004
- * Time: 13:00:06
- * To change this template use File | Settings | File Templates.
+ * @author Martin Husted Hartvig
+ * @since 0.1.6
  */
+
 public class Key
 {
   private char lowerChar = KeyEvent.CHAR_UNDEFINED;
