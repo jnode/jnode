@@ -28,6 +28,7 @@ import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.jmock.MockObjectTestCase;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.cmos.CMOSConstants;
 import org.jnode.driver.cmos.CMOSService;
@@ -38,11 +39,11 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.naming.InitialNaming.NameSpace;
 import org.jnode.plugin.PluginException;
 import org.jnode.system.BootLog;
-import org.jnode.test.fs.unit.config.OsType;
-import org.jnode.test.fs.unit.config.StubNameSpace;
-import org.jnode.test.fs.unit.config.factories.MockFloppyDeviceFactory;
-import org.jnode.test.fs.unit.config.factories.MockIDEDeviceFactory;
-import org.jnode.test.fs.unit.stubs.StubDeviceManager;
+import org.jnode.test.fs.driver.factories.MockFloppyDeviceFactory;
+import org.jnode.test.fs.driver.factories.MockIDEDeviceFactory;
+import org.jnode.test.fs.driver.stubs.StubDeviceManager;
+import org.jnode.test.fs.driver.stubs.StubNameSpace;
+import org.jnode.test.fs.filesystem.config.OsType;
 
 
 public class ContextManager
@@ -51,6 +52,7 @@ public class ContextManager
     private static ContextManager instance;
     
     private boolean initialized = false; 
+    private Context context;
     
     static public ContextManager getInstance()
     {
@@ -124,19 +126,19 @@ public class ContextManager
             namespace.bind(IDEDeviceFactory.NAME, new MockIDEDeviceFactory());
             namespace.bind(DeviceManager.NAME, StubDeviceManager.INSTANCE);
             
-            CMOSService cmos = new CMOSService()
-            {
-                public int getRegister(int regnr)
-                {
-                    switch(regnr)
-                    {
-                    case CMOSConstants.CMOS_FLOPPY_DRIVES: return 0x11;
-                    default: return 0;
-                    }
-                }
-                
-            };
-            namespace.bind(CMOSService.NAME, cmos);                        
+//            CMOSService cmos = new CMOSService()
+//            {
+//                public int getRegister(int regnr)
+//                {
+//                    switch(regnr)
+//                    {
+//                    case CMOSConstants.CMOS_FLOPPY_DRIVES: return 0x11;
+//                    default: return 0;
+//                    }
+//                }
+//                
+//            };
+//            namespace.bind(CMOSService.NAME, cmos);                        
         }
         catch (NameAlreadyBoundException e)
         {
@@ -151,5 +153,32 @@ public class ContextManager
     private ContextManager()
     {        
         initLog4j();
-    }        
+    }
+
+    public Context getContext()
+    {
+        log.debug("getContext: "+context);        
+        return context;
+    }    
+
+    public void setContext(Class contextClass, TestConfig config, MockObjectTestCase testCase) throws Exception
+    {
+        // first remove previous context
+        clearContext();
+        
+        // create a new context from the test config
+        context = (Context) contextClass.newInstance();
+        context.init(config, testCase);
+        log.debug("setContext: "+context);
+    }
+
+    public void clearContext() throws Exception
+    {
+        if(context != null)
+        {
+            context.destroy();
+            context = null;
+            log.debug("clearContext");            
+        }
+    }    
 }

@@ -18,22 +18,21 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
-package org.jnode.test.support;
 
+package org.jnode.test.fs.driver.context;
 
-import org.jmock.cglib.MockObjectTestCase;
+import org.jmock.MockObjectTestCase;
+import org.jnode.driver.block.BlockAlignmentSupport;
+import org.jnode.driver.block.BlockDeviceAPI;
+import org.jnode.test.fs.driver.BlockDeviceAPIContext;
+import org.jnode.test.support.TestConfig;
 
-/**
- * 
- * @author Fabien DUMINY
- */
-public interface TestConfig 
+public class BlockAlignmentSupportContext extends BlockDeviceAPIContext
 {
-    public Class getContextClass();
-    
-    /**
-     * 
-     */
-	public String toString();
+    public void init(TestConfig config, MockObjectTestCase testCase)
+    {
+        BlockDeviceAPIContext parentCtx = createParentBlockDeviceAPI();
+        BlockDeviceAPI api = new BlockAlignmentSupport(parentCtx.getApi(), 512);
+        init(parentCtx, api, null);
+    }
 }

@@ -18,22 +18,23 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
-package org.jnode.test.support;
 
+package org.jnode.test.fs.driver.context;
 
-import org.jmock.cglib.MockObjectTestCase;
+import java.io.IOException;
 
-/**
- * 
- * @author Fabien DUMINY
- */
-public interface TestConfig 
+import org.jmock.MockObjectTestCase;
+import org.jnode.driver.Device;
+import org.jnode.driver.block.MappedBlockDeviceSupport;
+import org.jnode.test.fs.driver.BlockDeviceAPIContext;
+import org.jnode.test.support.TestConfig;
+
+public class MappedBlockDeviceSupportContext extends BlockDeviceAPIContext
 {
-    public Class getContextClass();
-    
-    /**
-     * 
-     */
-	public String toString();
+    public void init(TestConfig config, MockObjectTestCase testCase) throws IOException
+    {
+        Device parent = createParentDevice(DEVICE_SIZE);
+        MappedBlockDeviceSupport api = new MappedBlockDeviceSupport(parent, 0L, DEVICE_SIZE);
+        init(null, api, null);
+    }
 }

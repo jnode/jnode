@@ -19,21 +19,49 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
  
-package org.jnode.test.support;
+package org.jnode.test.fs.filesystem.config;
 
+import org.jnode.test.support.TestUtils;
 
-import org.jmock.cglib.MockObjectTestCase;
 
 /**
- * 
- * @author Fabien DUMINY
+ * @author Fabien DUMINY 
+ *
  */
-public interface TestConfig 
+public class RamDiskParam extends JNodeDeviceParam 
 {
-    public Class getContextClass();
-    
-    /**
-     * 
-     */
-	public String toString();
+	/**
+	 * 
+	 *
+	 */
+	public RamDiskParam()
+	{
+	}
+	
+	/**
+	 * 
+	 * @param size
+	 */
+	public void setSize(String size)
+	{
+		ramdiskSize = TestUtils.getSize(size);
+	}
+	
+	/**
+	 * 
+	 */
+	public long getSize()
+	{
+		return ramdiskSize;
+	}
+
+	/**
+	 * 
+	 */
+	public String toString()
+	{
+		return "Ramdisk[name="+getDeviceName()+" size=" + ramdiskSize + "]";
+	}
+			
+	private long ramdiskSize;
 }

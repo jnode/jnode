@@ -18,22 +18,10 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
-package org.jnode.test.support;
 
+package org.jnode.test.fs.driver.context;
 
-import org.jmock.cglib.MockObjectTestCase;
-
-/**
- * 
- * @author Fabien DUMINY
- */
-public interface TestConfig 
+public class SCSICDROMDriverContext
 {
-    public Class getContextClass();
-    
-    /**
-     * 
-     */
-	public String toString();
+//  TODO: create context
 }

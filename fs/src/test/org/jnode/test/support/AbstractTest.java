@@ -31,11 +31,16 @@ import org.jmock.cglib.MockObjectTestCase;
  * @author Fabien DUMINY
  */
 public abstract class AbstractTest extends /*TestCase*/ MockObjectTestCase {
+    private TestConfig testConfig;
+    private Class configClazz;
+        
+    protected final Logger log; 
+    
 	public AbstractTest(Class configClazz)
     {
         super();
         init(configClazz, null);              
-        log = null; // should never be used
+        log = Logger.getLogger(getTestName());
     }
 
     /**
@@ -60,19 +65,24 @@ public abstract class AbstractTest extends /*TestCase*/ MockObjectTestCase {
 	 */
 	public void setUp() throws Exception
 	{
-        System.gc();
 		log.info("BEGIN "+getTestName()); // marker for log4j traces
         
         TestConfig tc = getTestConfig();
         if(tc == null)
         {
             log.warn("NO CONFIGURATION");
+            ContextManager.getInstance().clearContext();
         }
         else
         {
-            tc.setUp(this);
+            Class contextClass = tc.getContextClass();
+            if(!Context.class.isAssignableFrom(contextClass))
+                throw new IllegalArgumentException("contextClass("+contextClass.getName()+") must implements Context");                    
+            
+            // create a new context from the test config
+            // and apply it
+            ContextManager.getInstance().setContext(contextClass, tc, this);
         }
-        System.gc();
 	}
 	
 	/**
@@ -80,15 +90,9 @@ public abstract class AbstractTest extends /*TestCase*/ MockObjectTestCase {
 	 */
 	public void tearDown() throws Exception
 	{
-        System.gc();
-        
-        if(testConfig != null)
-        {
-            testConfig.tearDown();
-        }
+        ContextManager.getInstance().clearContext();
         
         log.info("END "+getTestName()); // marker for log4j traces
-        System.gc();        
 	}
 
     final protected TestConfig getTestConfig()
@@ -120,10 +124,5 @@ public abstract class AbstractTest extends /*TestCase*/ MockObjectTestCase {
     final protected String getTestName()
     {
         return getClass().getName()+"."+getName(); // className.methodName
-    }
-    
-    private TestConfig testConfig;
-    private Class configClazz;
-	    
-	protected final Logger log;	
+    }    
 }

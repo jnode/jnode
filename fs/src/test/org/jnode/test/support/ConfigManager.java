@@ -32,9 +32,9 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginException;
-import org.jnode.test.fs.unit.config.OsType;
-import org.jnode.test.fs.unit.config.StubNameSpace;
-import org.jnode.test.fs.unit.stubs.StubDeviceManager;
+import org.jnode.test.fs.driver.stubs.StubDeviceManager;
+import org.jnode.test.fs.driver.stubs.StubNameSpace;
+import org.jnode.test.fs.filesystem.config.OsType;
 
 
 public class ConfigManager
