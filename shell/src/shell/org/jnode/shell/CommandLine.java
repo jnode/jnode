@@ -41,6 +41,7 @@ public class CommandLine {
 	public static final char FULL_ESCAPE_CHAR = '\'';
 	public static final char QUOTE_CHAR = '"';
 	public static final char SPACE_CHAR = ' ';
+	public static final char SEND_OUTPUT_TO_CHAR = '>';
 	public static final char COMMENT_CHAR = '#';
 
 	private final String s;
@@ -51,11 +52,32 @@ public class CommandLine {
 	private boolean inFullEscape = false;
 	private boolean inQuote = false;
 
+  private String outFileName = null;
+
 	/**
 	* Creates a new instance.
 	*/
-	public CommandLine(String s) {
-		this.s = s;
+	public CommandLine(String s)
+  {
+    int send_to_file = s.indexOf(SEND_OUTPUT_TO_CHAR);
+
+    if (send_to_file != -1)
+    {
+      if (send_to_file < s.length())
+      {
+        setOutFileName((s.substring(send_to_file+1)).trim());
+
+        this.s = s.substring(0,send_to_file);
+      }
+      else
+      {
+        this.s = s.substring(send_to_file);
+      }
+    }
+    else
+    {
+      this.s = s;
+    }
 	}
 
 	/**
@@ -101,17 +123,24 @@ public class CommandLine {
 			throw new NoSuchElementException();
 
 		type = LITERAL;
-		String t = "";
+
+    StringBuffer token = new StringBuffer();
+    char currentChar;
+
 		boolean finished = false;
+
+
 		while (!finished && pos < s.length()) {
-			char c = s.charAt(pos++);
-			switch (c) {
+      currentChar = s.charAt(pos++);
+
+      switch (currentChar) {
 				case ESCAPE_CHAR :
-					t += CommandLine.unescape(s.charAt(pos++));
+					token.append(CommandLine.unescape(s.charAt(pos++)));
 					break;
+
 				case FULL_ESCAPE_CHAR :
 					if (inQuote) {
-						t += c;
+						token.append(currentChar);
 					} else {
 						inFullEscape = !inFullEscape; // just a toggle
 						type = STRING;
@@ -121,7 +150,7 @@ public class CommandLine {
 					break;
 				case QUOTE_CHAR :
 					if (inFullEscape) {
-						t += c;
+						token.append(currentChar);
 					} else {
 						inQuote = !inQuote;
 						type = STRING;
@@ -131,9 +160,9 @@ public class CommandLine {
 					break;
 				case SPACE_CHAR :
 					if (inFullEscape || inQuote) {
-						t += c;
+						token.append(currentChar);
 					} else {
-						if (t.length() != 0) { // don't return an empty token
+						if (token.length() != 0) { // don't return an empty token
 							finished = true;
 							pos--; // to return trailing space as empty last token
 						}
@@ -141,17 +170,26 @@ public class CommandLine {
 					break;
 				case COMMENT_CHAR :
 					if (inFullEscape || inQuote) {
-						t += c;
+						token.append(currentChar);
 					} else {
 						finished = true;
 						pos = s.length(); // ignore EVERYTHING
 					}
 					break;
+/*
+        case SEND_OUTPUT_TO_CHAR:
+          next();
+          break;
+*/
 				default :
-					t += c;
+					token.append(currentChar);
 			}
 		}
-		return t;
+
+    String collectedToken = token.toString();
+    token = null;
+
+		return collectedToken;
 	}
 
 	/**
@@ -296,6 +334,21 @@ public class CommandLine {
 		}
 		return s;
 	}
+
+  public boolean sendToOutFile()
+  {
+    return outFileName != null;
+  }
+
+  public String getOutFileName()
+  {
+    return outFileName;
+  }
+
+  private void setOutFileName(String outFileName)
+  {
+    this.outFileName = outFileName;
+  }
 
 	/**
 	* Unescape a single character
