@@ -229,7 +229,7 @@ public abstract class AbstractFSDirectory extends AbstractFSObject
 			throw new ReadOnlyFileSystemException("Filesystem or directory is mounted read-only!");
 		
 		if (getEntry(name) != null) {
-			throw new IOException("File or directory already exists" + name);
+			throw new IOException("File or directory already exists: " + name);
 		}
 		FSEntry newEntry = createFileEntry(name); 
 		setFreeEntry(newEntry);
