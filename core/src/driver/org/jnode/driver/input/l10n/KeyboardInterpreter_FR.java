@@ -18,7 +18,16 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 	
 	/**
 	 * Initialize the mapping between scancode and virtual key code.
-	 * @param vkMap
+	 * <p> To implement new variants of a KeyboardInterpreter simply
+	 * overload this method and redefine the keys and characters of your
+	 * keyboard.</p>
+	 * <p>I do not know how other keyborards are made, I think Kanji,
+	 * Japanese variants can be implemented this way. You'll need to add some arrays.</p>
+	 *
+	 * @param vkMap 	virtual bindings array
+	 * @param lcharMap 	lowercase chars
+	 * @param ucharMap 	uppercase chars
+	 * @param altGrCharMap 	chars obtained with AltGr combination
 	 */
 	protected void initVkMap(int[] vkMap, char[] lcharMap, char[] ucharMap, char[] altGrCharMap) {
 		vkMap[0] = KeyEvent.VK_UNDEFINED;
@@ -327,4 +336,5 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 		altGrCharMap[86]   = '|';
 	}
 }
+
 
