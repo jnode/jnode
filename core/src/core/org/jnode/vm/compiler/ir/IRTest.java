@@ -204,16 +204,17 @@ public class IRTest {
 	}
 
 
-	public static int const0(int a0, int a1) {
-		int l0 = 0;
-		if (a0 < 0) {
-			l0 = -1;
-		}
-		if (a0 > 0) {
-			l0 = 1;
-		}
-		return l0;
-	}
+    public static int const0(int a0, int a1) {
+        int l0 = 0;
+        if (a0 < 0) {
+            l0 = -1;
+        }
+        if (a0 > 0) {
+            l0 = 1;
+        }
+        return l0;
+    }
+
 
     public static int const1(int a0, int a1) {
         int l0 = 1;
@@ -224,6 +225,24 @@ public class IRTest {
         }
         return l0;
 	}
+
+    public static int ifTest(int a0, int a1) {
+        int l0;
+        if(a0 > a1)
+            l0 = a0;
+        else
+            l0 = a1;
+        return l0;        
+    }
+
+    public static int const12(int a0, int a1) {
+        int l0 = 10, l1 = 0;
+        while(l0 > 0){
+            l1 = a1 * l1 + a0;
+            l0 = l0 - 1;
+        }
+        return l1;
+    }
 
     //compile it with no optimisation (see kjc -O0 - the kopi compiler)
     public static int unconditionalJump(int a0, int a1) {

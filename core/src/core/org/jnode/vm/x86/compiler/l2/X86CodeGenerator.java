@@ -28,7 +28,6 @@ import org.jnode.vm.compiler.ir.quad.VoidReturnQuad;
 /**
  * @author Madhu Siddalingaiah
  * @author Levente Sántha
- *
  */
 public class X86CodeGenerator extends CodeGenerator {
 	private Variable[] spilledVariables;
@@ -1447,4 +1446,268 @@ public class X86CodeGenerator extends CodeGenerator {
                 throw new IllegalArgumentException("Unknown operation");
         }
 	}
+
+    /**
+     * @param quad
+     * @param condition
+     * @param reg
+     */
+    public void generateCodeFor(ConditionalBranchQuad quad, int condition, Object reg) {
+        checkLabel(quad.getAddress());
+        os.writeTEST((Register) reg, (Register) reg);
+        generateJumpForUnaryCondition(quad, condition);
+    }
+
+    /**
+     * @param quad
+     * @param condition
+     * @param disp
+     */
+    public void generateCodeFor(ConditionalBranchQuad quad, int condition, int disp) {
+        checkLabel(quad.getAddress());
+        os.writeCMP_Const(Register.EBP, disp, 0);
+        generateJumpForUnaryCondition(quad, condition);
+    }
+
+    private void generateJumpForUnaryCondition(ConditionalBranchQuad quad, int condition) {
+        switch(condition){
+            case ConditionalBranchQuad.IFEQ:
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JE);
+                break;
+
+            case ConditionalBranchQuad.IFNE:
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JNE);
+                break;
+
+            case ConditionalBranchQuad.IFGT:
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JG);
+                break;
+
+            case ConditionalBranchQuad.IFGE:
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JGE);
+                break;
+
+            case ConditionalBranchQuad.IFLT:
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JL);
+                break;
+
+            case ConditionalBranchQuad.IFLE:
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JLE);
+                break;
+
+            case ConditionalBranchQuad.IFNULL:
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JE);
+                break;
+
+            case ConditionalBranchQuad.IFNONNULL:
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JNE);
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unknown condition " + condition);
+        }
+    }
+
+    /**
+     * @param quad
+     * @param condition
+     * @param cons
+     */
+    public void generateCodeFor(ConditionalBranchQuad quad, int condition, Constant cons) {
+        switch(condition){
+            case ConditionalBranchQuad.IFEQ:
+            case ConditionalBranchQuad.IFNE:
+            case ConditionalBranchQuad.IFGT:
+            case ConditionalBranchQuad.IFGE:
+            case ConditionalBranchQuad.IFLT:
+            case ConditionalBranchQuad.IFLE:
+            case ConditionalBranchQuad.IFNULL:
+            case ConditionalBranchQuad.IFNONNULL:
+            default:
+                throw new IllegalArgumentException("Unknown condition " + condition);
+        }
+    }
+
+    /**
+     * @param quad
+     * @param c1
+     * @param condition
+     * @param c2
+     */
+    public void generateCodeFor(ConditionalBranchQuad quad, Constant c1, int condition, Constant c2) {
+        switch(condition){
+            case ConditionalBranchQuad.IF_ICMPEQ:
+            case ConditionalBranchQuad.IF_ICMPNE:
+            case ConditionalBranchQuad.IF_ICMPGT:
+            case ConditionalBranchQuad.IF_ICMPGE:
+            case ConditionalBranchQuad.IF_ICMPLT:
+            case ConditionalBranchQuad.IF_ICMPLE:
+            case ConditionalBranchQuad.IF_ACMPEQ:
+            case ConditionalBranchQuad.IF_ACMPNE:
+            default:
+                throw new IllegalArgumentException("Unknown condition " + condition);
+        }
+    }
+
+    /**
+     * @param quad
+     * @param c1
+     * @param condition
+     * @param disp2
+     */
+    public void generateCodeFor(ConditionalBranchQuad quad, Constant c1, int condition, int disp2) {
+        switch(condition){
+            case ConditionalBranchQuad.IF_ICMPEQ:
+            case ConditionalBranchQuad.IF_ICMPNE:
+            case ConditionalBranchQuad.IF_ICMPGT:
+            case ConditionalBranchQuad.IF_ICMPGE:
+            case ConditionalBranchQuad.IF_ICMPLT:
+            case ConditionalBranchQuad.IF_ICMPLE:
+            case ConditionalBranchQuad.IF_ACMPEQ:
+            case ConditionalBranchQuad.IF_ACMPNE:
+            default:
+                throw new IllegalArgumentException("Unknown condition " + condition);
+        }
+    }
+
+    /**
+     * @param quad
+     * @param c1
+     * @param condition
+     * @param reg2
+     */
+    public void generateCodeFor(ConditionalBranchQuad quad, Constant c1, int condition, Object reg2) {
+        switch(condition){
+            case ConditionalBranchQuad.IF_ICMPEQ:
+            case ConditionalBranchQuad.IF_ICMPNE:
+            case ConditionalBranchQuad.IF_ICMPGT:
+            case ConditionalBranchQuad.IF_ICMPGE:
+            case ConditionalBranchQuad.IF_ICMPLT:
+            case ConditionalBranchQuad.IF_ICMPLE:
+            case ConditionalBranchQuad.IF_ACMPEQ:
+            case ConditionalBranchQuad.IF_ACMPNE:
+            default:
+                throw new IllegalArgumentException("Unknown condition " + condition);
+        }
+    }
+
+    /**
+     * @param quad
+     * @param disp1
+     * @param condition
+     * @param c2
+     */
+    public void generateCodeFor(ConditionalBranchQuad quad, int disp1, int condition, Constant c2) {
+        checkLabel(quad.getAddress());
+        os.writeCMP_Const(Register.EBP, disp1, ((IntConstant)c2).getValue());
+        generateJumpForBinaryCondition(quad, condition);
+    }
+
+    /**
+     * @param quad
+     * @param disp1
+     * @param condition
+     * @param disp2
+     */
+    public void generateCodeFor(ConditionalBranchQuad quad, int disp1, int condition, int disp2) {
+        switch(condition){
+            case ConditionalBranchQuad.IF_ICMPEQ:
+            case ConditionalBranchQuad.IF_ICMPNE:
+            case ConditionalBranchQuad.IF_ICMPGT:
+            case ConditionalBranchQuad.IF_ICMPGE:
+            case ConditionalBranchQuad.IF_ICMPLT:
+            case ConditionalBranchQuad.IF_ICMPLE:
+            case ConditionalBranchQuad.IF_ACMPEQ:
+            case ConditionalBranchQuad.IF_ACMPNE:
+            default:
+                throw new IllegalArgumentException("Unknown condition " + condition);
+        }
+    }
+
+    /**
+     * @param quad
+     * @param disp1
+     * @param condition
+     * @param reg2
+     */
+    public void generateCodeFor(ConditionalBranchQuad quad, int disp1, int condition, Object reg2) {
+        checkLabel(quad.getAddress());
+        os.writeCMP(Register.EBP, disp1, (Register) reg2);
+        generateJumpForBinaryCondition(quad, condition);
+    }
+
+    /**
+     * @param quad
+     * @param reg1
+     * @param condition
+     * @param c2
+     */
+    public void generateCodeFor(ConditionalBranchQuad quad, Object reg1, int condition, Constant c2) {
+        checkLabel(quad.getAddress());
+        os.writeCMP_Const((Register) reg1, ((IntConstant)c2).getValue());
+        generateJumpForBinaryCondition(quad, condition);
+    }
+
+    /**
+     * @param quad
+     * @param reg1
+     * @param condition
+     * @param disp2
+     */
+    public void generateCodeFor(ConditionalBranchQuad quad, Object reg1, int condition, int disp2) {
+        checkLabel(quad.getAddress());
+        os.writeCMP((Register) reg1, Register.EBP, disp2 );
+        generateJumpForBinaryCondition(quad, condition);
+    }
+
+    /**
+     * @param quad
+     * @param reg1
+     * @param condition
+     * @param reg2
+     */
+    public void generateCodeFor(ConditionalBranchQuad quad, Object reg1, int condition, Object reg2) {
+        checkLabel(quad.getAddress());
+        os.writeCMP((Register) reg1, (Register) reg2);
+        generateJumpForBinaryCondition(quad, condition);
+    }
+
+    private void generateJumpForBinaryCondition(ConditionalBranchQuad quad, int condition) {
+        switch(condition){
+            case ConditionalBranchQuad.IF_ICMPEQ:
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JE);
+                break;
+
+            case ConditionalBranchQuad.IF_ICMPNE:
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JNE);
+                break;
+
+            case ConditionalBranchQuad.IF_ICMPGT:
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JG);
+                break;
+
+            case ConditionalBranchQuad.IF_ICMPGE:
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JGE);
+                break;
+
+            case ConditionalBranchQuad.IF_ICMPLT:
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JL);
+                break;
+
+            case ConditionalBranchQuad.IF_ICMPLE:
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JLE);
+                break;
+
+            case ConditionalBranchQuad.IF_ACMPEQ:
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JE);
+                break;
+
+            case ConditionalBranchQuad.IF_ACMPNE:
+                os.writeJCC(getInstrLabel(quad.getTargetAddress()), X86Constants.JNE);
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unknown condition " + condition);
+        }
+    }
 }

@@ -14,7 +14,7 @@ import org.jnode.vm.compiler.ir.quad.VoidReturnQuad;
 
 /**
  * @author Madhu Siddalingaiah
- * 
+ * @author Levente Sántha 
  */
 public abstract class CodeGenerator {
 	private static CodeGenerator cgInstance;
@@ -296,4 +296,109 @@ public abstract class CodeGenerator {
 	 */
 	public abstract void generateBinaryOP(int disp1, int disp2,
 		int operation, int disp3);
+
+    /**
+     *
+     * @param quad
+     * @param condition
+     * @param reg
+     */
+    public abstract void generateCodeFor(ConditionalBranchQuad quad, int condition, Object reg);
+
+    /**
+     *
+     * @param quad
+     * @param condition
+     * @param disp
+     */
+    public abstract void generateCodeFor(ConditionalBranchQuad quad, int condition, int disp);
+
+    /**
+     *
+     * @param quad
+     * @param condition
+     * @param reg
+     */
+    public abstract void generateCodeFor(ConditionalBranchQuad quad, int condition, Constant reg);
+
+    /**
+     *
+     * @param quad
+     * @param c1
+     * @param condition
+     * @param c2
+     */
+    public abstract void generateCodeFor(ConditionalBranchQuad quad, Constant c1, int condition, Constant c2);
+
+    /**
+     *
+     * @param quad
+     * @param reg1
+     * @param condition
+     * @param c2
+     */
+    public abstract void generateCodeFor(ConditionalBranchQuad quad, Object reg1, int condition, Constant c2);
+
+    /**
+     *
+     * @param quad
+     * @param c1
+     * @param condition
+     * @param reg2
+     */
+    public abstract void generateCodeFor(ConditionalBranchQuad quad, Constant c1, int condition, Object reg2);
+
+    /**
+     *
+     * @param quad
+     * @param c1
+     * @param condition
+     * @param disp2
+     */
+    public abstract void generateCodeFor(ConditionalBranchQuad quad, Constant c1, int condition, int disp2);
+
+    /**
+     *
+     * @param quad
+     * @param reg1
+     * @param condition
+     * @param reg2
+     */
+    public abstract void generateCodeFor(ConditionalBranchQuad quad, Object reg1, int condition, Object reg2);
+
+    /**
+     *
+     * @param quad
+     * @param reg1
+     * @param condition
+     * @param disp2
+     */
+    public abstract void generateCodeFor(ConditionalBranchQuad quad, Object reg1, int condition, int disp2);
+
+    /**
+     *
+     * @param quad
+     * @param disp1
+     * @param condition
+     * @param c2
+     */
+    public abstract void generateCodeFor(ConditionalBranchQuad quad, int disp1, int condition, Constant c2);
+
+    /**
+     *
+     * @param quad
+     * @param disp1
+     * @param condition
+     * @param reg2
+     */
+    public abstract void generateCodeFor(ConditionalBranchQuad quad, int disp1, int condition, Object reg2);
+
+    /**
+     *
+     * @param quad
+     * @param disp1
+     * @param condition
+     * @param disp2
+     */
+    public abstract void generateCodeFor(ConditionalBranchQuad quad, int disp1, int condition, int disp2);
 }
