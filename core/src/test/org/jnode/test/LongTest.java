@@ -20,7 +20,7 @@ public class LongTest {
         System.out.println(a[0]);
     }
     
-    public long allocNew() {
+    public synchronized long allocNew() {
         int i = 5;
         i++;
         return i;
