@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystem;
@@ -19,6 +20,7 @@ public class Ext2Directory implements FSDirectory {
 	
 	INode iNode;
 	boolean valid;
+	static final Logger log = Logger.getLogger(Ext2Directory.class);
 		
 	public Ext2Directory(INode iNode) {
 		this.iNode=iNode;
@@ -87,7 +89,7 @@ public class Ext2Directory implements FSDirectory {
 			//the Ext2DirectoryRecord that has been read last
 			current = null;
 			
-			Ext2Debugger.debug("FSEntryIterator()",2);
+			log.debug("FSEntryIterator()");
 		}
 		
 		/**
@@ -96,7 +98,7 @@ public class Ext2Directory implements FSDirectory {
 		 * it is a real entry or a not
 		 */
 		public boolean hasNext() {
-			Ext2Debugger.debug("FSEntryIterator.hasNext()",3);
+			log.debug("FSEntryIterator.hasNext()");
 			if(noMoreEntries)
 				return false;
 			
@@ -124,7 +126,7 @@ public class Ext2Directory implements FSDirectory {
 					return true;
 				}
 				else {
-					Ext2Debugger.debug("FSEntryIterator.hasNext(): null inode",2);
+					log.debug("FSEntryIterator.hasNext(): null inode");
 					current = null;
 					noMoreEntries=true;
 					return false;
@@ -138,7 +140,7 @@ public class Ext2Directory implements FSDirectory {
 		 * @see java.util.Iterator#next()
 		 */
 		public Object next() {
-			Ext2Debugger.debug("FSEntryIterator.next()",2);
+			log.debug("FSEntryIterator.next()");
 			
 			if(current == null) {
 				//hasNext actually reads the next element
@@ -171,7 +173,7 @@ public class Ext2Directory implements FSDirectory {
 	 * @see org.jnode.fs.FSDirectory#iterator()
 	 */
 	public Iterator iterator() {
-		Ext2Debugger.debug("Ext2Directory.Iterator()",2);
+		log.debug("Ext2Directory.Iterator()");
 		return new FSEntryIterator(iNode);				
 	}
 

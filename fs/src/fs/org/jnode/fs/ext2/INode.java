@@ -5,12 +5,16 @@ package org.jnode.fs.ext2;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
+import org.jnode.util.NumberUtils;
+
 /**
  * @author Andras Nagy
  */
 public class INode {
 	
 	public static final int INODE_LENGTH = 128;
+	private static final Logger log = Logger.getLogger(Ext2DirectoryRecord.class);
 	
 	//the data constituting the inode itself
 	private byte[] data;
@@ -29,7 +33,7 @@ public class INode {
 	
 	public int getMode() {
 		int iMode=Ext2Utils.get16(data, 0);
-		Ext2Debugger.debug("INode.getIMode(): "+Ext2Debugger.hexFormat(iMode), 3);
+		log.debug("INode.getIMode(): "+NumberUtils.hex(iMode));
 		return iMode;
 	}
 	

@@ -5,6 +5,7 @@ package org.jnode.fs.ext2;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -28,16 +29,17 @@ public class Ext2Entry implements FSEntry{
 	private String name=null;
 	private int type;
 	private boolean valid;
-
+	private static final Logger log = Logger.getLogger(Ext2Entry.class);
+	
 	public Ext2Entry(INode iNode, String name, int type) {
 		this.iNode = iNode;
 		this.name  = name;
 		this.type  = type;
 		this.valid = true;
 		
-		Ext2Debugger.debug("Ext2Entry(iNode, name): name="+name+
+		log.debug("Ext2Entry(iNode, name): name="+name+
 			(isDirectory()?" is a directory ":"")+
-			(isFile()?" is a file ":""), 2);
+			(isFile()?" is a file ":""));
 		
 	}
 	/**
