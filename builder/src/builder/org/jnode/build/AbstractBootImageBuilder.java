@@ -165,11 +165,11 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             if (debug) {
                 log("Building in DEBUG mode", Project.MSG_WARN);
             }
-            
+
             // Create the VM
             final HeapHelper helper = new HeapHelperImpl(arch);
             final Vm vm = new Vm(arch, new DefaultHeapManager(clsMgr, helper,
-                    clsMgr.getStatics()), debug);
+                    clsMgr.getStatics()), clsMgr.getStatics(), debug);
             blockedObjects.add(vm);
 
             final VmProcessor proc = createProcessor(clsMgr.getStatics());
@@ -525,6 +525,9 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                             // blockObjects.size());
                             break;
                         }
+                        if ((emitted == 0) && !blockObjects.isEmpty()) {
+                            break;
+                        }
                     }
                 }
                 lastUnresolved = unresolvedFound;
@@ -629,7 +632,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 final boolean compHigh = isCompileHighOptLevel(vmClass);
                 if (!vmClass.isCpRefsResolved() && compHigh) {
                     //log("Resolving CP of " + vmClass.getName(),
-                    // Project.MSG_VERBOSE);
+                    //Project.MSG_VERBOSE);
                     vmClass.resolveCpRefs(clsMgr);
                     again = true;
                 }
@@ -659,6 +662,10 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
             }
             newCount = clsMgr.getLoadedClassCount();
+            if (false) {
+                log("oldCount " + oldCount + ", newCount " + newCount,
+                        Project.MSG_INFO);
+            }
         } while ((oldCount != newCount) || again);
     }
 

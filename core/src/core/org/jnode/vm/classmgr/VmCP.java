@@ -120,21 +120,21 @@ public final class VmCP extends VmSystemObject {
 		return add(data.intern(), TYPE_UTF8);
 	}
 
-	public String getString(int index) {
-		return (String) get(index);
+	public VmConstString getString(int index) {
+		return (VmConstString) get(index);
 	}
 
-	protected void setString(int index, String value) {
+	protected void setString(int index, VmConstString value) {
 		set(index, value);
 	}
 
 	/**
 	 * Add a String to this CP
-	 * @param data
+	 * @param value
 	 * @return The index of the new entry
 	 */	
-	public int addString(String data) {
-		return add(data, TYPE_STRING);
+	public int addString(VmConstString value) {
+		return add(value, TYPE_STRING);
 	}
 
 	public VmConstClass getConstClass(int index) {

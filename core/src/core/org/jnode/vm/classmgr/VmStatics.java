@@ -23,20 +23,19 @@ public final class VmStatics extends VmSystemObject {
 	private static final byte TYPE_OBJECT = 0x03;
 	private static final byte TYPE_ADDRESS = 0x04;
 	private static final byte TYPE_METHOD = 0x05;
+	private static final byte TYPE_STRING = 0x06;
+	private static final byte TYPE_CLASS = 0x07;
+	private static final byte MAX_TYPE = TYPE_CLASS;
 
 	private int[] statics;
 	private byte[] types;
+	private final int[] typeCounter = new int[MAX_TYPE + 1];
 	private transient Object[] objects;
 	private int next;
 	private final int slotLength;
 	private final boolean lsbFirst;
 	private transient ObjectResolver resolver;
 	private transient boolean locked;
-
-	static int staticFieldCount;
-	static int staticMethodCount;
-	static int methodCount;
-	static int typeCount;
 
 	/**
 	 * Initialize this instance
@@ -78,6 +77,17 @@ public final class VmStatics extends VmSystemObject {
 	}
 
 	/**
+	 * Allocate an String type entry.
+	 * 
+	 * @return the index of the allocated entry.
+	 */
+	final int allocConstantStringField(String value) {
+		final int idx = alloc(TYPE_STRING, slotLength);
+		setRawObject(idx, value);
+		return idx;
+	}
+
+	/**
 	 * Allocate an org.jnode.vm.Address type entry.
 	 * 
 	 * @return the index of the allocated entry.
@@ -87,12 +97,23 @@ public final class VmStatics extends VmSystemObject {
 	}
 
 	/**
-	 * Allocate an org.jnode.vm.classmgr.VmMethod type entry.
+	 * Allocate an {@link org.jnode.vm.classmgr.VmMethod} type entry.
 	 * 
 	 * @return the index of the allocated entry.
 	 */
 	final int allocMethod() {
 		return alloc(TYPE_METHOD, slotLength);
+	}
+
+	/**
+	 * Allocate an {@link org.jnode.vm.classmgr.VmType} type entry.
+	 * 
+	 * @return the index of the allocated entry.
+	 */
+	final int allocClass(VmType type) {
+		final int idx = alloc(TYPE_CLASS, slotLength);
+		setRawObject(idx, type);
+		return idx;
 	}
 
 	final void setInt(int idx, int value) {
@@ -174,6 +195,7 @@ public final class VmStatics extends VmSystemObject {
 		}
 		final int idx = next;
 		types[idx] = type;
+		typeCounter[type]++;
 		next += length;
 		return idx;
 	}
@@ -253,11 +275,11 @@ public final class VmStatics extends VmSystemObject {
 	}
 
 	public final void dumpStatistics(PrintStream out) {
-		out.println("#static fields  " + staticFieldCount);
-		out.println("#static methods " + staticMethodCount);
-		out.println("#methods        " + methodCount);
-		out.println("#types          " + typeCount);
-		out.println("table.length    " + next);
+		out.println("#static int fields  " + typeCounter[TYPE_INT]);
+		out.println("#static long fields " + typeCounter[TYPE_LONG]);
+		out.println("#methods            " + typeCounter[TYPE_METHOD]);
+		out.println("#types              " + typeCounter[TYPE_CLASS]);
+		out.println("table.length        " + next);
 	}
 
 	/**

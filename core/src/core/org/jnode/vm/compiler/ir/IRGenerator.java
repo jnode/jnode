@@ -15,6 +15,7 @@ import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmConstFieldRef;
 import org.jnode.vm.classmgr.VmConstIMethodRef;
 import org.jnode.vm.classmgr.VmConstMethodRef;
+import org.jnode.vm.classmgr.VmConstString;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.compiler.ir.quad.BinaryQuad;
 import org.jnode.vm.compiler.ir.quad.ConditionalBranchQuad;
@@ -207,9 +208,9 @@ public class IRGenerator extends BytecodeVisitor {
 	}
 
 	/**
-	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(int, java.lang.String)
+	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(VmConstString)
 	 */
-	public void visit_ldc(int cpIdx, String value) {
+	public void visit_ldc(VmConstString value) {
 		throw new IllegalArgumentException("byte code not yet supported");
 	}
 

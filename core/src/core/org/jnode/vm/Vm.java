@@ -28,19 +28,21 @@ public class Vm extends VmSystemObject {
 	private final boolean runHotMethodManager = false;
 	/** Should this VM run in debug mode? */
 	private final boolean debugMode;
-	
+	/** The statics table */
+	private final VmStatics statics;
 
 	/**
 	 * Initialize a new instance
 	 * 
 	 * @param arch
 	 */
-	public Vm(VmArchitecture arch, VmHeapManager heapManager, boolean debugMode) {
+	public Vm(VmArchitecture arch, VmHeapManager heapManager, VmStatics statics, boolean debugMode) {
 		instance = this;
 		this.debugMode = debugMode;
 		this.bootstrap = true;
 		this.arch = arch;
 		this.heapManager = heapManager;
+		this.statics = statics;
 	}
 
 	/**
@@ -77,7 +79,6 @@ public class Vm extends VmSystemObject {
 	 */
 	final void startHotMethodManager() {
 		if (runHotMethodManager) {
-			final VmStatics statics = Unsafe.getCurrentProcessor().getStatics();
 			this.hotMethodManager = new HotMethodManager(arch, statics);
 			hotMethodManager.start();
 		}
@@ -92,7 +93,7 @@ public class Vm extends VmSystemObject {
 		final Vm vm = getVm();
 		if ((vm != null) && !vm.isBootstrap()) {
 			final PrintStream out = System.out;
-			Unsafe.getCurrentProcessor().getStatics().dumpStatistics(out);
+			vm.getStatics().dumpStatistics(out);
 			if (vm.hotMethodManager != null) {
 				vm.hotMethodManager.dumpStatistics(out);
 			}
@@ -106,5 +107,12 @@ public class Vm extends VmSystemObject {
      */
     public final boolean isDebugMode() {
         return this.debugMode;
+    }
+    
+    /**
+     * @return Returns the statics.
+     */
+    public final VmStatics getStatics() {
+        return this.statics;
     }
 }

@@ -84,6 +84,9 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 
     /** Error message during linkage */
     private String errorMsg;
+    
+    /** Index of this type in the statics index */
+    private final int staticsIndex;
 
     private static VmNormalClass ObjectClass;
 
@@ -167,8 +170,6 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
     private VmType(String name, VmNormalClass superClass,
             String superClassName, VmClassLoader loader, int accessFlags,
             int typeSize) {
-
-        VmStatics.typeCount++;
         if (superClassName == null) {
             if (!name.equals("java.lang.Object")) { throw new IllegalArgumentException(
                     "superClassName cannot be null in class " + name); }
@@ -183,6 +184,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
         this.modifiers = accessFlags;
         this.state = VmTypeState.ST_LOADED;
         this.loader = loader;
+        this.staticsIndex = loader.getStatics().allocClass(this);
         if (name.charAt(0) == '[') {
             this.interfaceTable = new VmImplementedInterface[] {
                     new VmImplementedInterface(CloneableClass),
@@ -1901,5 +1903,13 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
      */
     protected final VmType[] getSuperClassesArray() {
         return superClassesArray;
+    }
+    
+    /**
+     * Gets the index of this type in the statics table.
+     * @return Returns the staticsIndex.
+     */
+    public final int getStaticsIndex() {
+        return this.staticsIndex;
     }
 }

@@ -116,7 +116,7 @@ public final class VmJavaClassLoader extends VmAbstractClassLoader {
     /**
      * @see org.jnode.vm.VmAbstractClassLoader#getStatics()
      */
-    protected final VmStatics getStatics() {
+    public final VmStatics getStatics() {
         return systemLoader.getStatics();
     }
 

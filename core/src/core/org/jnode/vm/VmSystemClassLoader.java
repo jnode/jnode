@@ -264,7 +264,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         //Unsafe.debug("classInfos==null");
         throw new ClassNotFoundException(name); }
 
-        //Screen.debug("load class" + name);
+        //BootLog.debug("load class" + name);
 
         if (name.indexOf('/') >= 0) { throw new IllegalArgumentException(
                 "name contains '/'"); }

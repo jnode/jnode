@@ -107,7 +107,6 @@ public abstract class VmMethod extends VmMember {
         this.returnObject = (firstReturnSignatureChar == '[' || firstReturnSignatureChar == 'L');
         this.selector = selector;
         this.staticsIndex = staticsIdx;
-        VmStatics.methodCount++;
     }
 
     /**

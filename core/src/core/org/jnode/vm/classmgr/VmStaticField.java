@@ -30,7 +30,6 @@ public final class VmStaticField extends VmField {
 		if (!Modifier.isStatic(modifiers)) {
 			throw new IllegalArgumentException("Instance field in VmStaticField");
 		}
-		VmStatics.staticFieldCount++;
 		this.staticsIndex = staticsIndex;
 	}
 
