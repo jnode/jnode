@@ -15,13 +15,15 @@ import org.jnode.vm.compiler.ir.StackLocation;
 import org.jnode.vm.compiler.ir.Variable;
 
 /**
- * @author Madhu Siddalingaiah
  *
  * This class represents binary operations of the form:
- * 
+ *
  *   lhs = operand1 operation operand2, where operation is +, -, <<, |, && etc.
- * 
+ *
  * The left hand side (lhs) is a Variable inherited from AssignQuad.
+ *
+ * @author Madhu Siddalingaiah
+ * @author Levente Sántha
  */
 public class BinaryQuad extends AssignQuad {
 	private static final String[] OP_MAP = {
@@ -176,8 +178,7 @@ public class BinaryQuad extends AssignQuad {
 
 	/**
 	 * If operand1 and operand2 are both Constants, then fold them.
-	 * TODO: this only supports int +, -, *, / right now.
-	 * 
+	 *
 	 * @return resulting Quad after folding
 	 */
 	public Quad foldConstants() {
@@ -200,6 +201,118 @@ public class BinaryQuad extends AssignQuad {
 				case IDIV:
 					return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
 						this.getLHS().getIndex(), c1.iDiv(c2));
+
+                case IREM:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.iRem(c2));
+
+                case IAND:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.iAnd(c2));
+
+                case IOR:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.iOr(c2));
+
+                case IXOR:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.iXor(c2));
+
+                case ISHL:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.iShl(c2));
+
+                case ISHR:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.iShr(c2));
+
+                case IUSHR:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.iUshr(c2));
+
+                case LADD:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.lAdd(c2));
+
+                case LSUB:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.lSub(c2));
+
+                case LMUL:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.lMul(c2));
+
+                case LDIV:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.lDiv(c2));
+
+                case LREM:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.lRem(c2));
+
+                case LAND:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.lAnd(c2));
+
+                case LOR:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.lOr(c2));
+
+                case LXOR:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.lXor(c2));
+
+                case LSHL:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.lShl(c2));
+
+                case LSHR:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.lShr(c2));
+
+                case LUSHR:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.lUshr(c2));
+
+                case FADD:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.fAdd(c2));
+
+                case FSUB:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.fSub(c2));
+
+                case FMUL:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.fMul(c2));
+
+                case FDIV:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.fDiv(c2));
+
+                case FREM:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.fRem(c2));
+
+                case DADD:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.dAdd(c2));
+
+                case DSUB:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.dSub(c2));
+
+                case DMUL:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.dMul(c2));
+
+                case DDIV:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.dDiv(c2));
+
+                case DREM:
+                    return new ConstantRefAssignQuad(this.getAddress(), this.getBasicBlock(),
+                        this.getLHS().getIndex(), c1.dRem(c2));
 
 				default:
 					throw new IllegalArgumentException("Don't know how to fold those yet...");
@@ -225,7 +338,7 @@ public class BinaryQuad extends AssignQuad {
 	 * Simplifies operands by calling operand.simplify().
 	 * simplify will combine phi references and propagate copies
 	 * This method will also update liveness of operands by setting last use addr
-	 * 
+	 *
 	 * @see org.jnode.vm.compiler.ir.quad.Quad#doPass2(org.jnode.util.BootableHashMap)
 	 */
 	public void doPass2(BootableHashMap liveVariables) {
@@ -246,7 +359,7 @@ public class BinaryQuad extends AssignQuad {
 	/**
 	 * Code generation is complicated by the permutations of addressing modes.
 	 * This is not as nice as it could be, but it could be worse!
-	 * 
+	 *
 	 * @see org.jnode.vm.compiler.ir.quad.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
 	 */
 	public void generateCode(CodeGenerator cg) {
@@ -254,7 +367,7 @@ public class BinaryQuad extends AssignQuad {
 		int lhsMode = lhs.getAddressingMode();
 		int op1Mode = operand1.getAddressingMode();
 		int op2Mode = operand2.getAddressingMode();
-		
+
 		Object reg1 = null;
 		if (lhsMode == Operand.MODE_REGISTER) {
 			RegisterLocation regLoc = (RegisterLocation) lhs.getLocation();
