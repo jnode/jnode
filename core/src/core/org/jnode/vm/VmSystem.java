@@ -56,7 +56,7 @@ public final class VmSystem {
     private static SystemOutputStream bootOut;
 
     private static MemoryResource initJar;
-    
+
     private static PrintStream out;
 
     /**
@@ -179,11 +179,11 @@ public final class VmSystem {
         res.put("user.name", "System");
         res.put("user.home", "/");
         res.put("user.dir", "/");
-        
+
         // GNU properties
-        res.put("gnu.java.io.encoding_scheme_alias.US-ASCII", "ISO8859-1"); 
-        res.put("gnu.java.io.encoding_scheme_alias.UTF-16LE", "UTF16LE"); 
-        res.put("gnu.java.io.encoding_scheme_alias.UTF-16BE", "UTF16BE"); 
+        res.put("gnu.java.io.encoding_scheme_alias.US-ASCII", "ISO8859-1");
+        res.put("gnu.java.io.encoding_scheme_alias.UTF-16LE", "UTF16LE");
+        res.put("gnu.java.io.encoding_scheme_alias.UTF-16BE", "UTF16BE");
 
         return res;
     }
@@ -367,7 +367,16 @@ public final class VmSystem {
         final VmStackReader reader = proc.getArchitecture().getStackReader();
         final VmStackFrame[] mt;
         //Address lastIP = null;
-        if (current == proc.getCurrentThread()) {
+        if (current.isInSystemException()) {
+            proc.disableReschedule();
+            try {
+                mt = reader.getVmStackTrace(current.getExceptionStackFrame(),
+                        current.getExceptionInstructionPointer(),
+                        STACKTRACE_LIMIT);
+            } finally {
+                proc.enableReschedule();
+            }
+        } else if (current == proc.getCurrentThread()) {
             final Address curFrame = Unsafe.getCurrentFrame();
             mt = reader.getVmStackTrace(reader.getPrevious(curFrame), reader
                     .getReturnAddress(curFrame), STACKTRACE_LIMIT);

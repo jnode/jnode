@@ -11,13 +11,13 @@ package org.jnode.test;
 public class TestNPE {
 
 	public static void main(String[] args) {
-		try {
+		//try {
 			String s = null;
 			s.length();
 			System.out.println("No throw of NPE: NOK!");
-		} catch (NullPointerException ex) {
-			System.out.println("catch of NPE: OK! (" + ex + ")");
-		}
+		//} catch (NullPointerException ex) {
+//			System.out.println("catch of NPE: OK! (" + ex + ")");
+		//}
 	}
 
 }

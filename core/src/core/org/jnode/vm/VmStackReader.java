@@ -132,7 +132,9 @@ public abstract class VmStackReader extends VmSystemObject {
 		f = frame;
 		for (int i = 0; i < count; i++) {
 			stack[i] = new VmStackFrame(f, this, ip);
-			ip = stack[i].getReturnAddress();
+			// Subtract 1, because the return address is directly after
+			// the location where the previous frame was executing.
+			ip = Address.add(stack[i].getReturnAddress(), -1);
 			f = getPrevious(f);
 		}
 
