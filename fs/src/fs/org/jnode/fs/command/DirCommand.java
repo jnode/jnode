@@ -16,7 +16,11 @@ import org.jnode.shell.help.ParsedArguments;
 public class DirCommand {
 
 	static final FileArgument ARG_DIR = new FileArgument("directory", "the directory to list contents of");
-	public static Help.Info HELP_INFO = new Help.Info("dir", "List the entries of the given directory", new Parameter[] { new Parameter(ARG_DIR, Parameter.OPTIONAL)});
+	public static Help.Info HELP_INFO =
+		new Help.Info(
+			"dir",
+			"List the entries of the given directory",
+			new Parameter[] { new Parameter(ARG_DIR, Parameter.OPTIONAL)});
 
 	public static void main(String[] args) throws Exception {
 		ParsedArguments cmdLine = HELP_INFO.parse(args);
@@ -25,7 +29,6 @@ public class DirCommand {
 		if (dir == null) {
 			dir = new File(".");
 		}
-
 		if (dir.exists() && dir.isDirectory()) {
 			final File[] list = dir.listFiles();
 			if (list != null) {
