@@ -30,6 +30,7 @@ import java.util.NoSuchElementException;
  * A trailing space leads to an empty token to be appended.
  * @author epr
  * @author qades
+ * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 public class CommandLine {
 
