@@ -20,8 +20,8 @@ public class VmStaticMethod extends VmMethod {
 		String signature,
 		int modifiers,
 		VmType declaringClass,
-		int noArgs) {
-		super(name, signature, modifiers, declaringClass, noArgs, 0);
+		int noArgs, int staticsIdx) {
+		super(name, signature, modifiers, declaringClass, noArgs, 0, staticsIdx);
 		VmStatics.staticMethodCount++;
 	}
 

@@ -48,7 +48,9 @@ public abstract class VmMethod extends VmMember {
 	private int threadSwitchIndicatorMask = 0xFFFFFFFF;
 	/** Optimization level of native code */
 	private int nativeCodeOptLevel = -1;
-
+	/** The index in the statics table */
+	private final int staticsIndex;
+	
 	/**
 	 * Constructor for VmMethod.
 	 * 
@@ -59,8 +61,8 @@ public abstract class VmMethod extends VmMember {
 	 * @param noArgs
 	 * @param selectorMap
 	 */
-	protected VmMethod(String name, String signature, int modifiers, VmType declaringClass, int noArgs, SelectorMap selectorMap) {
-		this(name, signature, modifiers, declaringClass, noArgs, selectorMap.get(name, signature));
+	protected VmMethod(String name, String signature, int modifiers, VmType declaringClass, int noArgs, SelectorMap selectorMap, int staticsIdx) {
+		this(name, signature, modifiers, declaringClass, noArgs, selectorMap.get(name, signature), staticsIdx);
 	}
 
 	/**
@@ -73,7 +75,7 @@ public abstract class VmMethod extends VmMember {
 	 * @param noArgs
 	 * @param selector
 	 */
-	protected VmMethod(String name, String signature, int modifiers, VmType declaringClass, int noArgs, int selector) {
+	protected VmMethod(String name, String signature, int modifiers, VmType declaringClass, int noArgs, int selector, int staticsIdx) {
 		super(name, signature, modifiers, declaringClass);
 		this.noArgs = noArgs;
 		this.argSlotCount = Signature.getArgSlotCount(signature);
@@ -81,7 +83,9 @@ public abstract class VmMethod extends VmMember {
 		char firstReturnSignatureChar = signature.charAt(signature.indexOf(')') + 1);
 		this.returnObject = (firstReturnSignatureChar == '[' || firstReturnSignatureChar == 'L');
 		this.selector = selector;
+		this.staticsIndex = staticsIdx;
 		setProfile(!(isAbstract() | isNative()));
+		VmStatics.methodCount++;
 	}
 
 	/**
@@ -225,23 +229,26 @@ public abstract class VmMethod extends VmMember {
 		setProfile(false);
 	}
 
-	public boolean isAbstract() {
+	public final boolean isAbstract() {
 		return Modifier.isAbstract(getModifiers());
 	}
-	public boolean isNative() {
+	public final boolean isNative() {
 		return Modifier.isNative(getModifiers());
 	}
-	public boolean isSynchronized() {
+	public final boolean isSpecial() {
+		return Modifier.isSpecial(getModifiers());
+	}
+	public final boolean isSynchronized() {
 		return Modifier.isSynchronized(getModifiers());
 	}
-	public boolean isConstructor() {
+	public final boolean isConstructor() {
 		return Modifier.isConstructor(getModifiers());
 	}
-	public boolean isInitializer() {
+	public final boolean isInitializer() {
 		return Modifier.isInitializer(getModifiers());
 	}
 
-	public boolean isCompiled() {
+	public final boolean isCompiled() {
 		return Modifier.isCompiled(getModifiers());
 	}
 
@@ -452,4 +459,11 @@ public abstract class VmMethod extends VmMember {
 		return this.nativeCodeOptLevel;
 	}
 
+	/**
+	 * Gets the indexe of this field in the statics table.
+	 * @return Returns the staticsIndex.
+	 */
+	public final int getStaticsIndex() {
+		return this.staticsIndex;
+	}
 }

@@ -119,7 +119,7 @@ public abstract class VmClassType extends VmType {
 		// of the super class.
 		for (int i = 0; i < tc_mtable_length; i++) {
 			final VmMethod mts = getDeclaredMethod(i);
-			if (!mts.isStatic()) {
+			if (!(mts.isStatic() || mts.isSpecial())) {
 				final VmInstanceMethod method = (VmInstanceMethod)mts;
 				final String name = mts.getName();
 				final String signature = mts.getSignature();
