@@ -28,7 +28,7 @@
 	       optimize="on"
            compiler="modern"
 	       includeJavaRuntime="false"
-    	target="${java.target}" source="${java.source}">
+    	target="${java.target}" source="${java.source}" encoding="${java.encoding}">
 	  <bootclasspath path="${jnode-core.jar}"/>
 	  <src path="${my-src.dir}/awt"/>
 	  <src path="${my-src.dir}/desktop"/>
