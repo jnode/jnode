@@ -8,6 +8,7 @@ import org.jnode.vm.compiler.ir.BinaryQuad;
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.ConditionalBranchQuad;
 import org.jnode.vm.compiler.ir.ConstantRefAssignQuad;
+import org.jnode.vm.compiler.ir.RegisterPool;
 import org.jnode.vm.compiler.ir.UnaryQuad;
 import org.jnode.vm.compiler.ir.UnconditionalBranchQuad;
 import org.jnode.vm.compiler.ir.VarReturnQuad;
@@ -19,13 +20,33 @@ import org.jnode.vm.compiler.ir.VoidReturnQuad;
  * 
  */
 public class X86CodeGenerator extends CodeGenerator {
-	private final BootableHashMap variableMap;
+	private BootableHashMap variableMap;
+	private final RegisterPool registerPool;
 
 	/**
 	 * @param variableMap
 	 */
-	public X86CodeGenerator(BootableHashMap variableMap) {
+	public X86CodeGenerator() {
+		CodeGenerator.setCodeGenerator(this);
+		this.registerPool = new X86RegisterPool();
+	}
+
+	public void setVariableMap(BootableHashMap variableMap) {
 		this.variableMap = variableMap;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#getRegisterPool()
+	 */
+	public RegisterPool getRegisterPool() {
+		return registerPool;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.CodeGenerator#supports3AddrOps()
+	 */
+	public boolean supports3AddrOps() {
+		return false;
 	}
 
 	/* (non-Javadoc)
@@ -91,5 +112,4 @@ public class X86CodeGenerator extends CodeGenerator {
 		// TODO Auto-generated method stub
 
 	}
-
 }

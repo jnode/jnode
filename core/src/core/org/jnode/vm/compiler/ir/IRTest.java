@@ -20,7 +20,6 @@ import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.x86.VmX86Architecture;
 import org.jnode.vm.x86.compiler.l2.X86CodeGenerator;
-import org.jnode.vm.x86.compiler.l2.X86RegisterPool;
 
 /**
  * @author Madhu Siddalingaiah
@@ -28,10 +27,7 @@ import org.jnode.vm.x86.compiler.l2.X86RegisterPool;
  */
 public class IRTest {
 	public static void main(String args[]) throws SecurityException, IOException, ClassNotFoundException {
-		X86RegisterPool x86regs = new X86RegisterPool();
-		// This is a hack, this info should come from a config file...
-		RegisterPool.instance = x86regs;
-
+		X86CodeGenerator x86cg = new X86CodeGenerator();
 		VmByteCode code = loadByteCode(args);
 
 		IRControlFlowGraph cfg = new IRControlFlowGraph(code);
@@ -58,7 +54,7 @@ public class IRTest {
 		LinearScanAllocator lsa = new LinearScanAllocator(liveRanges);
 		lsa.allocate();
 
-		X86CodeGenerator x86cg = new X86CodeGenerator(lsa.getVariableMap());
+		x86cg.setVariableMap(lsa.getVariableMap());
 		n = quads.size();
 		for (int i=0; i<n; i+=1) {
 			Quad quad = (Quad) quads.get(i);
@@ -117,7 +113,7 @@ public class IRTest {
 		int nMethods = type.getNoDeclaredMethods();
 		for (int i=0; i<nMethods; i+=1) {
 			VmMethod method = type.getDeclaredMethod(i);
-			if ("arithOptIntx".equals(method.getName())) {
+			if ("arithOptLoop".equals(method.getName())) {
 				arithMethod = method;
 				break;
 			}

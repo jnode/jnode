@@ -9,6 +9,27 @@ package org.jnode.vm.compiler.ir;
  * 
  */
 public abstract class CodeGenerator {
+	private static CodeGenerator cgInstance;
+
+	public static void setCodeGenerator(CodeGenerator cg) {
+		cgInstance = cg;
+	}
+
+	public static CodeGenerator getInstance() {
+		return cgInstance;
+	}
+
+	/**
+	 * @return
+	 */
+	public abstract RegisterPool getRegisterPool();
+
+	/**
+	 * Returns true of this CPU supports 3 address operands
+	 * 
+	 * @return
+	 */
+	public abstract boolean supports3AddrOps();
 
 	/**
 	 * @param quad
