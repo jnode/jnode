@@ -71,12 +71,12 @@ public final class VmCompiledCode extends AbstractCode {
         }
         if (addressTable != null) {
             addressTable.lock();
-            if (bytecode != null) {
+            /*if (bytecode != null) {
                 if (bytecode.getMethod().getDeclaringClass().getName().equals(
                         "org.jnode.vm.TryCatchNPETest")) {
                     addressTable.writeTo(System.out);
                 }
-            }
+            }*/
         }
     }
 
@@ -132,8 +132,8 @@ public final class VmCompiledCode extends AbstractCode {
         if (this.bytecode != null) {
             final int offset = (int) Address.distance(nativeCode, address);
             final int pc = addressTable.findPC(offset);
-            return String.valueOf(bytecode.getLineNr(pc)) + ";" + pc + ";0x"
-                    + NumberUtils.hex(offset);
+            return String.valueOf(bytecode.getLineNr(pc))/* + ";" + pc + ";0x"
+                    + NumberUtils.hex(offset)*/;
             //return offset;
         }
         return "?";

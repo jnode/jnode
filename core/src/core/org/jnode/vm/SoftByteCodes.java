@@ -311,7 +311,8 @@ public class SoftByteCodes implements Uninterruptible {
 	    //Unsafe.debug(nr); Unsafe.debug(address);
 		final String hexAddress = NumberUtils.hex(address, 8);
 		final VmThread current = Unsafe.getCurrentProcessor().getCurrentThread();
-		final String state = " (" + current.getReadableErrorState() + ")";
+		//final String state = " (" + current.getReadableErrorState() + ")";
+		final String state = "";
 		// Mark a system exception, so the stacktrace uses the exception frame
 		// instead of the current frame.
 		current.setInSystemException();
