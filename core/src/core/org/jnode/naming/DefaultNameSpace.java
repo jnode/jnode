@@ -18,38 +18,21 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
-
 package org.jnode.naming;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
-/**
- * This class provides a namespace that is used by the JNode system. Various
- * services are bound into this namespace. <p/>A service bound into this
- * namespace can be any object. Is does not have to implement any particular
- * interface. It is up to the user of this namespace to cast the objects as
- * needed. <p/>Only a single service can be bound under each name. There is no
- * restriction on the syntax of a name. Nor is there any interpretation of a
- * name by this namespace.
- * 
- * @author epr
- */
-public class InitialNaming {
+public class DefaultNameSpace implements NameSpace {
 
     /** All bound names+services */
-    static NameSpace namespace;
-
-    public static void setNameSpace(NameSpace namespace) {
-        if (InitialNaming.namespace != null) {
-            throw new SecurityException(
-                    "namespace can't be modified after first initialization");
-        }
-        InitialNaming.namespace = namespace;
-    }
+    protected final Map namespace = new HashMap();
 
     /**
      * Bind a given service in the namespace under a given name.
@@ -59,9 +42,17 @@ public class InitialNaming {
      * @throws NameAlreadyBoundException
      *             if the name already exists within this namespace
      */
-    public static void bind(Class name, Object service) throws NamingException,
+    public void bind(Class name, Object service) throws NamingException,
             NameAlreadyBoundException {
-        getNameSpace().bind(name, service);
+        if (name == null) {
+            throw new IllegalArgumentException("name == null");
+        }
+        synchronized (namespace) {
+            if (namespace.containsKey(name)) {
+                throw new NameAlreadyBoundException(name.getName());
+            }
+            namespace.put(name, service);
+        }
     }
 
     /**
@@ -70,8 +61,10 @@ public class InitialNaming {
      * 
      * @param name
      */
-    public static void unbind(Class name) {
-        getNameSpace().unbind(name);
+    public void unbind(Class name) {
+        synchronized (namespace) {
+            namespace.remove(name);
+        }
     }
 
     /**
@@ -81,21 +74,22 @@ public class InitialNaming {
      * @throws NameNotFoundException
      *             if the name was not found in this namespace
      */
-    public static Object lookup(Class name) throws NameNotFoundException {
-        return getNameSpace().lookup(name);
+    public Object lookup(Class name) throws NameNotFoundException {
+        final Object result = namespace.get(name);
+        if (result == null) {
+            throw new NameNotFoundException(name.getName());
+        }
+        return result;
     }
 
     /**
      * Gets a set containing all names (Class) of the bound services.
      */
-    public static Set nameSet() {
-        return getNameSpace().nameSet();
-    }
-
-    static NameSpace getNameSpace() {
-        if (namespace == null) {
-            namespace = new DefaultNameSpace();
+    public Set nameSet() {
+        final Set result;
+        synchronized (namespace) {
+            result = new HashSet(namespace.keySet());
         }
-        return namespace;
+        return result;
     }
 }
