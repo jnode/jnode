@@ -59,7 +59,8 @@ final class FPCompilerSSE extends FPCompiler {
 	}
 
 	final void rem(int type) {
-		arithOperation(type, X86Operation.SSE_REM, false);
+		// TODO implement me
+		//arithOperation(type, X86Operation.SSE_REM, false);
 	}
 
 	final void sub(int type) {
