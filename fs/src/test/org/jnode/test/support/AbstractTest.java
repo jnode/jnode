@@ -21,24 +21,9 @@
  
 package org.jnode.test.support;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.naming.NameNotFoundException;
-
 import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
-import org.jnode.driver.Device;
-import org.jnode.fs.FSDirectory;
-import org.jnode.fs.FSEntryIterator;
-import org.jnode.fs.FSFile;
-import org.jnode.fs.FileSystem;
-import org.jnode.fs.FileSystemException;
-import org.jnode.test.fs.unit.config.FSTestConfig;
-import org.june.TestFailedException;
 
 /**
  * 
