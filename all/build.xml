@@ -33,6 +33,12 @@
 	<property name="dnsjava.jar" value="${root.dir}/net/lib/dnsjava-1.5.0.jar" />
 	<property name="jsch.jar" value="${root.dir}/net/lib/jsch-0.1.15.jar" />
 	<property name="junit.jar" value="${root.dir}/core/lib/junit.jar" />
+	
+	<property name="jmock-cglib.jar" value="${root.dir}/core/lib/jmock-cglib-1.0.1.jar" />
+	<property name="jmock.jar" value="${root.dir}/core/lib/jmock-1.0.1.jar" />
+	<property name="cglib.jar" value="${root.dir}/core/lib/cglib-2.1.jar" />	
+	<property name="asm.jar" value="${root.dir}/core/lib/asm.jar" />	
+	
 	<property name="dom4j.jar" value="${root.dir}/builder/lib/dom4j.jar" />
 	<property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar" />
 	<property name="nanoxml.jar" value="${root.dir}/core/lib/nanoxml-lite-2.2.3.jar" />
@@ -52,6 +58,10 @@
 	<path id="cp">
 		<pathelement location="${ant.jar}" />
 		<pathelement location="${junit.jar}" />
+		<pathelement location="${jmock.jar}" />
+		<pathelement location="${jmock-cglib.jar}" />
+		<pathelement location="${asm.jar}" />
+		<pathelement location="${cglib.jar}" />		
 		<pathelement location="${log4j.jar}" />
 		<pathelement location="${nanoxml.jar}" />
 		<pathelement location="${gnu-crypto.jar}" />
