@@ -208,14 +208,9 @@
         <include name="jnodedisk.dat"/>
       </fileset>
     </copy>
-    <zip zipfile="${build.dir}/cdrom/jnodesource.zip">
-      <fileset dir="${root.dir}">
-        <exclude name="**/build/**"/>
-
-      </fileset>
-    </zip>
+    <!-- copy todir="${build.dir}/cdrom" file="${sources.dist.tar.gz}"/ -->
     <exec executable="mkisofs">
-      <arg line="-o ${build.dir}/jnode.iso -r -hard-disk-boot -b jnodedisk.dat ${build.dir}/cdrom"/>
+      <arg line="-o ${jnode.iso} -r -hard-disk-boot -b jnodedisk.dat ${build.dir}/cdrom"/>
     </exec>
   </target>
 
