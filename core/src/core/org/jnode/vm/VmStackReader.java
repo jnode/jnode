@@ -186,6 +186,36 @@ public abstract class VmStackReader extends VmSystemObject {
 	}
 	
 	/**
+	 * Show the stacktrace of the given thread using Screen.debug.
+	 */	
+	public final void debugStackTrace(VmThread thread) throws PragmaUninterruptible {
+		Address f = thread.getStackFrame();
+		Unsafe.debug("Debug stacktrace: ");
+		boolean first = true;
+		int max = 20;
+		while (isValid(f) && (max > 0)) {
+			if (first) {
+				first = false;
+			} else {
+				Unsafe.debug(", ");
+			}
+			final VmMethod method = getMethod(f);
+			final int pc = getPC(f);
+			final int lineNr = method.getBytecode().getLineNr(pc);
+			final VmType vmClass = method.getDeclaringClass();
+			Unsafe.debug(vmClass.getName());
+			Unsafe.debug("::");
+			Unsafe.debug(method.getName()); 
+			Unsafe.debug(lineNr);
+			f = getPrevious(f);
+			max--;
+		}
+		if (isValid(f)) {
+		    Unsafe.debug("...");
+		}
+	}
+	
+	/**
 	 * Gets the offset within the frame of previous frame (if any)
 	 * @param sf The stackframe to get the previous frame from.
 	 * @return The previous frame or null.
