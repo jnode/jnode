@@ -9,15 +9,14 @@ import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
 import org.jnode.net.ethernet.EthernetAddress;
 import org.jnode.net.ethernet.EthernetConstants;
-
-/**
- * @author epr
- */
+import org.jnode.net.ethernet.EthernetHeader;
+import org.jnode.net.ethernet.EthernetUtils;
 
 /**
  * Driver for loopback device.
  *
  * @author epr
+ * @author Martin Husted Hartvig
  */
 public class LoopbackDriver extends AbstractNetDriver implements EthernetConstants
 {
@@ -44,9 +43,39 @@ public class LoopbackDriver extends AbstractNetDriver implements EthernetConstan
   /**
    * @see org.jnode.driver.net.spi.AbstractNetDriver#doTransmit(SocketBuffer, HardwareAddress)
    */
-  protected void doTransmit(SocketBuffer skbuf, HardwareAddress destination) throws NetworkException
+  protected final void doTransmit(SocketBuffer skbuf, HardwareAddress destination)
+      throws NetworkException
   {
+    skbuf.insert(ETH_HLEN);
+    if (destination != null)
+    {
+      destination.writeTo(skbuf, 0);
+    }
+    else
+    {
+      EthernetAddress.BROADCAST.writeTo(skbuf, 0);
+    }
+    getAddress().writeTo(skbuf, 6);
+    skbuf.set16(12, skbuf.getProtocolID());
+
     onReceive(skbuf);
+  }
+
+
+  /**
+   * @see org.jnode.driver.net.spi.AbstractNetDriver#onReceive(org.jnode.net.SocketBuffer)
+   */
+  public void onReceive(SocketBuffer skbuf) throws NetworkException
+  {
+
+    // Extract ethernet header
+    final EthernetHeader hdr = new EthernetHeader(skbuf);
+    skbuf.setLinkLayerHeader(hdr);
+    skbuf.setProtocolID(EthernetUtils.getProtocol(hdr));
+    skbuf.pull(hdr.getLength());
+
+    // Send to PM
+    super.onReceive(skbuf);
   }
 
   /**
