@@ -77,6 +77,23 @@
          target="cdrom"/>
   </target>
 
+  <!-- Upload a distribution -->
+  <target name="upload" depends="cdrom">
+    <gzip src="${build.dir}/jnode.iso"
+          zipfile="${build.dir}/jnode-${jnode-ver}.iso.gz"/>
+    <ftp server="upload.sourceforge.net"
+         remotedir="incoming"
+         passive="yes"
+         newer="yes"
+         verbose="yes"
+         userid="ftp"
+         password="ftp">
+      <fileset dir="${build.dir}">
+        <include name="jnode-${jnode-ver}.iso.gz"/>
+      </fileset>
+    </ftp>
+  </target>
+  
 <!-- Clean everything files -->
   <target name="clean">
     <ant target="clean" dir="${root.dir}/core" inheritall="on" inheritrefs="on"/>
