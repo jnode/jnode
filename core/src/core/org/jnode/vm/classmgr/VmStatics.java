@@ -138,6 +138,18 @@ public final class VmStatics extends VmSystemObject {
 		setRawObject(idx, type);
 		return idx;
 	}
+    
+    /**
+     * Gets the type at the given index.
+     * @param idx
+     * @return
+     */
+    final VmType getTypeEntry(int idx) {
+        if (types[idx] != TYPE_CLASS) {
+            throw new IllegalArgumentException("Type error " + types[idx]);
+        }
+        return (VmType)getRawObject(idx);
+    }
 
 	public final void setInt(int idx, int value) {
 		if (types[idx] != TYPE_INT) {
@@ -211,6 +223,29 @@ public final class VmStatics extends VmSystemObject {
 			return true;
 		}
 	}
+
+    private final Object getRawObject(int idx) {
+        if (objects != null) {
+            return objects[idx];
+        } else {
+            final Address ptr;
+            if (slotLength == 1) {
+                ptr = Address.fromIntZeroExtend(statics[idx]);
+            } else {
+                final long lsb;
+                final long msb;
+                if (lsbFirst) {
+                    lsb = statics[idx+0] & 0xFFFFFFFFL;
+                    msb = statics[idx+1] & 0xFFFFFFFFL;
+                } else {
+                    lsb = statics[idx+1] & 0xFFFFFFFFL;
+                    msb = statics[idx+0] & 0xFFFFFFFFL;                    
+                }
+                ptr = Address.fromLong(lsb | (msb << 32));
+            }
+            return ptr.toObjectReference().toObject();
+        }
+    }
 
 	public final void setLong(int idx, long value) {
 		if (locked) {

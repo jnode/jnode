@@ -40,15 +40,12 @@ public class X86JumpTable {
     /** Jumptable index of vm_invoke_abstract */
     public static final int VM_INVOKE_ABSTRACT_IDX = 2;
 
-    /** Jumptable index of vm_invoke_method_after_recompile */
-    public static final int VM_INVOKE_METHOD_AFTER_RECOMPILE_IDX = 3;
-    
     /** Number of entries in the table */
-    public static final int TABLE_LENGTH = 4;
+    public static final int TABLE_LENGTH = 3;
 
     /** Number of entries in the table */
     public static final String TABLE_ENTRY_LABELS[] = {
-        "vm_athrow", "vm_athrow_notrace", "vm_invoke_abstract", "vm_invoke_method_after_recompile"
+        "vm_athrow", "vm_athrow_notrace", "vm_invoke_abstract"
     };
 
     /** Label name of the jumptable */

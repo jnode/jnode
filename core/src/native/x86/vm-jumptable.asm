@@ -17,7 +17,6 @@ GLABEL vm_jumpTable
 	DA vm_athrow
 	DA vm_athrow_notrace
 	DA vm_invoke_abstract
-	DA vm_invoke_method_after_recompile
 	
 	
 	
