@@ -254,7 +254,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	}
 	
 	/**
-	 * @see org.jnode.fs.AbstractFileSystem#createRootEntry()
+	 * @see org.jnode.fs.spi.AbstractFileSystem#createRootEntry()
 	 */
 	public FSEntry createRootEntry() throws IOException {
 		try{

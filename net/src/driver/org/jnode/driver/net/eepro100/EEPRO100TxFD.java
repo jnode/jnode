@@ -22,11 +22,11 @@ public class EEPRO100TxFD {
     /** Offset within mem of first DPD */
     private final int firstDPDOffset;
     /** Offset within mem of first ethernet frame */
-    private final int firstFrameOffset;
+    //private final int firstFrameOffset;
     /** 32-bit address first DPD */
     private final Address firstDPDAddress;
     /** 32-bit address of first ethernet frame */
-    private final Address firstFrameAddress;
+    //private final Address firstFrameAddress;
     /** */
     private int bufferAddress;
 
@@ -50,8 +50,8 @@ public class EEPRO100TxFD {
 
         this.firstDPDOffset = offset;
         this.firstDPDAddress = Address.add(memAddr, firstDPDOffset);
-        this.firstFrameOffset = firstDPDOffset + TxFDSize;
-        this.firstFrameAddress = Address.add(memAddr, firstFrameOffset);
+        //this.firstFrameOffset = firstDPDOffset + TxFDSize;
+        //this.firstFrameAddress = Address.add(memAddr, firstFrameOffset);
     }
 
 

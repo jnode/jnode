@@ -157,10 +157,10 @@ public class CharvaBsh {
 //            int mode=TFTP.BINARY_MODE;
 //            InputStream instream;
 //            StringReader sr=new StringReader( text );
-            InputStream instream=new ByteArrayInputStream( text.getBytes( ));
+            //InputStream instream=new ByteArrayInputStream( text.getBytes( ));
 //            InputStream instream=new BufferedInputStream( sr);
 //            StringBufferInputStream instream=new StringInputStream( text);
-            String serverAddress="192.168.2.100";//wow, hard coded.
+            //String serverAddress="192.168.2.100";//wow, hard coded.
 //            client.sendFile( filename,mode,instream,serverAddress);
             try {
                 for( int i = 0; i < text.length(); i++ ) {
@@ -269,11 +269,11 @@ public class CharvaBsh {
             JMenuItem exit = new JMenuItem( "Exit" );
             exit.addActionListener( new ActionListener() {
                 public void actionPerformed( ActionEvent ae_ ) {
-                    Thread t = new Thread( new Runnable() {
+                    /*Thread t = new Thread( new Runnable() {
                         public void run() {
                             done();
                         }
-                    } );
+                    } );*/
 //                    t.start();
                     done();
                 }

@@ -81,8 +81,8 @@ public class NativeTest {
                     System.out.println("J: " + icode[i]);
                 }*/
 
-                int a0 = 149;
-                int a1 = 100;
+                //int a0 = 149;
+                //int a1 = 100;
 //                System.out.println("result: " + execIntIntInt(a0, a1, b, b.length) + " " + PrimitiveTest.terniary(a0, a1));
 //                System.out.println("result: " + execFloatFloatFloat(5, 3, b, b.length) + " " + PrimitiveTest.terniary(5, 3));
 
