@@ -9,6 +9,8 @@ import java.io.PrintStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
+import org.apache.log4j.Logger;
+import org.jnode.debug.UDPAppender;
 import org.jnode.debug.UDPOutputStream;
 
 /**
@@ -25,6 +27,10 @@ public class UDPOutputCommand {
 		PrintStream ps = new PrintStream(dupOut);
 		System.setOut(ps);		
 		System.setErr(ps);		
+		
+		final Logger root = Logger.getRootLogger();
+		root.addAppender(new UDPAppender(udpOut, null));
+		
 	}
 	
 	static class DupOutputStream extends OutputStream {

@@ -20,7 +20,7 @@ import javax.naming.NameNotFoundException;
 import org.apache.log4j.Logger;
 import org.jnode.driver.console.Console;
 import org.jnode.driver.console.ConsoleManager;
-import org.jnode.driver.console.x86.ScrollableShellConsole;
+import org.jnode.driver.console.TextConsole;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardListener;
 import org.jnode.naming.InitialNaming;
@@ -51,7 +51,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
     private AliasManager aliasMgr;
 
     /** Keeps a reference to the console this CommandShell is using * */
-    private ScrollableShellConsole console = null;
+    private final TextConsole console;
 
     /** Contains the archive of commands. * */
     private CommandHistory history = new CommandHistory();
@@ -108,11 +108,11 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
      * @see java.lang.Object
      */
     public CommandShell() throws NameNotFoundException, ShellException {
-        this((ScrollableShellConsole) ((ConsoleManager) InitialNaming
+        this((TextConsole) ((ConsoleManager) InitialNaming
                 .lookup(ConsoleManager.NAME)).getFocus());
     }
 
-    public CommandShell(ScrollableShellConsole cons) throws ShellException {
+    public CommandShell(TextConsole cons) throws ShellException {
         try {        	
             this.console = cons;
             this.out = this.console.getOut();
@@ -543,283 +543,3 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
  * 
  * @author Fabien DUMINY
  */
-class Line
-{
-	private int consoleX;
-	private int consoleY;
-	
-    /**
-     * Contains the current position of the cursor on the currentLine
-     */
-    private int posOnCurrentLine = 0;    
-
-    /** Contains the current line * */
-    private StringBuffer currentLine = new StringBuffer(80);
-    
-    private boolean shortened = true;
-    private int oldLength = 0;
-    private int maxLength = 0;
-    
-    private ScrollableShellConsole console;
-    private CommandShell shell;
-    private PrintStream out;
-    
-    public Line(ScrollableShellConsole console, CommandShell shell, PrintStream out)
-    {
-    	this.console = console;
-    	this.shell = shell;
-    	this.out = out;
-    }
-    
-    public void start()
-    {
-    	start(false);
-    }
-    
-    public boolean isEmpty()
-    {
-    	return currentLine.toString().trim().length() == 0;
-    }
-    
-    public void start(boolean keepContent)
-    {
-    	if(keepContent)
-    	{
-    		// we stay at the same position in X coordinate
-    		// only Y may have changed
-        	consoleY = console.getCursorY();
-    	}
-    	else
-    	{
-        	consoleX = console.getCursorX();
-        	consoleY = console.getCursorY();
-        	    		
-    		setContent("");
-    	}    		
-    }
-    
-    public String getContent()
-    {
-    	return currentLine.toString();
-    }
-    
-    public void setContent(String content)
-    {
-    	startModif();
-    	currentLine.setLength(0);
-    	currentLine.append(content);
-    	moveEnd();
-    	endModif();
-    }
-    
-    public boolean moveLeft()
-    {
-        if (posOnCurrentLine > 0) {
-            posOnCurrentLine--;
-            return true;
-        }    	
-        return false;
-    }
-    
-    public boolean moveRight()
-    {
-        if (posOnCurrentLine < currentLine.length()) {
-            posOnCurrentLine++;
-            return true;
-        }
-        return false;
-    }
-
-    public void moveEnd()
-    {
-        posOnCurrentLine = currentLine.length();
-    }
-    
-    public void moveBegin()
-    {
-        posOnCurrentLine = 0;
-    }
-    
-    public boolean backspace()
-    {
-        if (posOnCurrentLine > 0) {
-        	moveLeft();
-        	delete();
-            return true;
-        }    	
-        return false;
-    }
-    
-    public void delete()
-    {
-        if ((posOnCurrentLine >= 0) && (posOnCurrentLine < currentLine.length())) 
-        {
-        	startModif();
-            currentLine.deleteCharAt(posOnCurrentLine);
-            endModif();
-        }    	
-    }
-    
-    public CompletionInfo complete(String currentPrompt)
-    {
-    	CompletionInfo info = null;
-    	//int oldPosOnCurrentLine = posOnCurrentLine;
-        if (posOnCurrentLine != currentLine.length()) {
-            String ending = currentLine.substring(posOnCurrentLine);
-            info = shell.complete(currentLine.substring(0,
-                    posOnCurrentLine)); 
-            printList(info, currentPrompt);
-            if(info.getCompleted() != null)
-            {
-				setContent(info.getCompleted() + ending);
-	            posOnCurrentLine = currentLine.length() - ending.length();
-	        }
-        } else {
-        	info = shell.complete(currentLine.toString());
-        	printList(info, currentPrompt);        	
-        	if(info.getCompleted() != null)
-        	{ 
-				setContent(info.getCompleted());
-	            posOnCurrentLine = currentLine.length();
-			}
-        }
-         
-		return info;  
-	}
-
-    protected void printList(CompletionInfo info, String currentPrompt)
-    {
-		if((info != null) && info.hasItems())
-		{
-			int oldPosOnCurrentLine = posOnCurrentLine;
-			moveEnd();
-			refreshCurrentLine(currentPrompt);			
-			
-			out.println();
-			String[] list = info.getItems();
-			for(int i = 0 ; i < list.length ; i++)
-				out.println(list[i]);
-			
-			posOnCurrentLine = oldPosOnCurrentLine;
-		}		            	
-    }
-    
-    public void appendChar(char c)
-    {
-    	startModif();
-        if (posOnCurrentLine == currentLine.length()) {
-            currentLine.append(c);
-        } else {
-            currentLine.insert(posOnCurrentLine, c);
-        }
-        posOnCurrentLine++;    	
-    	endModif();
-    }
-
-    protected void startModif()
-    {
-    	shortened = false;
-    	oldLength = currentLine.length();
-    }
-
-    protected void endModif()
-    {
-    	maxLength = Math.max(oldLength, currentLine.length());
-    	shortened = oldLength > currentLine.length();
-    	oldLength = 0;
-    }
-
-    public void refreshCurrentLine(String currentPrompt) {
-        try {
-        	int x = consoleX;
-        	int width = console.getWidth();
-        	int nbLines = ((x + maxLength) / width);
-        	
-        	if(((x + maxLength) % width) != 0)
-        		nbLines++;
-        	
-        	// if the line has not been shortened (delete, backspace...)
-        	if(!shortened)
-            	// scroll up the buffer if necessary, and get the new y
-        		consoleY = console.ensureFreeLines(consoleY, nbLines, 0);
-        		
-        	for(int i = 0 ; i < nbLines ; i++)
-        		console.clearLine(consoleY + i);
-        	
-        	// print the prompt and the command line
-        	console.setCursor(0, consoleY);
-        	out.print(currentPrompt + currentLine);
-        	
-        	int posCurX = x + posOnCurrentLine;
-        	int posCurY = consoleY;
-        	if(posCurX >= width)
-        	{        		
-        		posCurY += posCurX / width;        		
-        		posCurX = (posCurX % width); 
-        	}
-        	console.setCursor(posCurX, posCurY);
-        } catch (Exception e) {
-        }        
-    }
-}
-
-class CompletionInfo
-{
-	private String[] items = null;  
-	private String completed = null;
-	private boolean newPrompt = false;
-
-	/**
-	 * @return Returns the completed.
-	 */
-	public String getCompleted() {
-		return completed;
-	}
-	/**
-	 * @param completed The completed to set.
-	 */
-	public void setCompleted(String completed) {
-		this.completed = completed;
-	}
-	/**
-	 * get the possible completions
-	 * @return Returns the items.
-	 */
-	public String[] getItems() {
-		return items;
-	}
-	/**
-     * Specify the possible completions
-	 * @param items The items to set.
-	 */
-	public void setItems(String[] items) {
-		this.items = items;
-		this.completed = null;
-		this.newPrompt = true;
-	}
-	/**
-	 * Do we have more than one possible completion ?
-     * @return
-	 */
-	public boolean hasItems()
-	{
-		return items != null;
-	}
-
-	/**
-     * Specify if we need a new prompt or not 
-	 * @param newPrompt
-     */
-	public void setNewPrompt(boolean newPrompt)
-	{
-		this.newPrompt = newPrompt;
-	}
-
-	/**
-     * @return true if we need to display a new prompt
-     */	
-	public boolean needNewPrompt()
-	{
-		return newPrompt;
-	}
-}

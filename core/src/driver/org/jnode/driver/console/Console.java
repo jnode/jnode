@@ -10,107 +10,69 @@ import org.jnode.system.event.FocusListener;
 /**
  * @author epr
  */
-public interface Console extends FocusListener , KeyboardListener, PointerListener {
+public interface Console extends FocusListener, KeyboardListener,
+        PointerListener {
 
-	public static char MOUSE_CURSOR_CHAR = 'X'; 
-	
-	/**
-	* Sets the cursor at the given location.
-	* 
-	* @param x
-	* @param y
-	*/
-	public void setCursor(int x, int y);
-	
-	/**
-	* Gets the X position of the cursor
-	* 
-	* @return The position
-	*/
-	public int getCursorX();
-	
-	/**
-	* Gets the Y position of the cursor
-	* 
-	* @return The Y position
-	*/
-	public int getCursorY();
-	/**
-	 * Set a character at a given location.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param ch
-	 * @param bgColor
-	 */
-	public void setChar(int x, int y, char ch, int bgColor);
+    /**
+     * Has this control the focus.
+     * @return
+     */
+    public boolean isFocused();
+    
+    /**
+     * Close this console
+     */
+    public void close();
 
-	/**
-	 * Set a character at the cursor location.
-	 * 
-	 * @param ch
-	 * @param bgColor
-	 */
-	public void setChar(char ch, int bgColor);
-	
-	/**
-	 * Get the character at a given location.
-	 * 
-	 * @param x
-	 * @param y
-	 */
-	public char getChar(int x, int y);
-	
-	/**
-	 * Get the bg color at a given location.
-	 * 
-	 * @param x
-	 * @param y
-	 */
-	public char getBgColor(int x, int y);
+    /**
+     * returns the registered name for this console
+     * 
+     * @return registered name for this console
+     */
+    public String getConsoleName();
 
-	/**
-	 * Gets the width of the console.
-	 * 
-	 * @return int
-	 */
-	public int getWidth();
+    /**
+     * Sets the keycode of the accelerator that will focus this console.
+     * 
+     * @param keyCode
+     */
+    public void setAcceleratorKeyCode(int keyCode);
 
-	/**
-	 * Gets the height of the console.
-	 * 
-	 * @return int
-	 */
-	public int getHeight();
+    /**
+     * Gets the keycode of the accelerator that will focus this console.
+     */
+    public int getAcceleratorKeyCode();
+    /**
+     * Add a keyboard listener
+     * 
+     * @param l
+     */
+    public void addKeyboardListener(KeyboardListener l);
 
-	/**
-	 * Add a keyboard listener
-	 * 
-	 * @param l
-	 */
-	public void addKeyboardListener(KeyboardListener l);
+    /**
+     * Remove a keyboard listener
+     * 
+     * @param l
+     */
+    public void removeKeyboardListener(KeyboardListener l);
 
-	/**
-	 * Remove a keyboard listener
-	 * 
-	 * @param l
-	 */
-	public void removeKeyboardListener(KeyboardListener l);
-	
-	/**
-	 * Close this console
-	 */
-	public void close();
+    /**
+     * Add a pointer listener
+     * 
+     * @param l
+     */
+    public void addPointerListener(PointerListener l);
 
-	/**
-	 * returns the registered name for this console
-	 * 
-	 * @return registered name for this console
-	 */
-	public String getConsoleName();
-	
-	public void setAcceleratorKeyCode(int keyCode);
-	
-	public int getAcceleratorKeyCode();
-
+    /**
+     * Remove a pointer listener
+     * 
+     * @param l
+     */
+    public void removePointerListener(PointerListener l);
+    
+    /**
+     * Gets the manager this console is registered with.
+     * @return
+     */
+    public ConsoleManager getManager();
 }

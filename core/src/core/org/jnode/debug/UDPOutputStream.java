@@ -18,69 +18,80 @@ import java.security.PrivilegedExceptionAction;
  */
 public class UDPOutputStream extends OutputStream {
 
-	private final DatagramSocket socket;
-	private final SocketAddress address;
+    private final DatagramSocket socket;
 
-	/**
-	 * Create a new instance
-	 * @param address
-	 * @throws SocketException
-	 */
-	public UDPOutputStream(SocketAddress address) throws SocketException {
-		socket = new DatagramSocket();
-		this.address = address;
-	}
+    private final SocketAddress address;
 
-	/**
-	 * @see java.io.OutputStream#close()
-	 * @throws IOException
-	 */
-	public void close() throws IOException {
-		super.close();
-	}
+    private boolean inWrite = false;
 
-	/**
-	 * @param b
-	 * @param off
-	 * @param len
-	 * @see java.io.OutputStream#write(byte[], int, int)
-	 * @throws IOException
-	 * @throws NullPointerException
-	 * @throws IndexOutOfBoundsException
-	 */
-	public void write(final byte[] b, final int off, final int len) throws IOException, NullPointerException, IndexOutOfBoundsException {
-	    try {
-	    AccessController.doPrivileged(new PrivilegedExceptionAction() {
-	        public Object run() throws IOException {
-	    		final DatagramPacket p = new DatagramPacket(b, off, len);
-	    		p.setSocketAddress(address);
-	    		socket.send(p);
-	    		return null;
-	            }});
-	    } catch (PrivilegedActionException ex) {
-	        final IOException ioe = new IOException();
-	        ioe.initCause(ex.getException());
-	        throw ioe;
-	    }
-	}
+    /**
+     * Create a new instance
+     * 
+     * @param address
+     * @throws SocketException
+     */
+    public UDPOutputStream(SocketAddress address) throws SocketException {
+        socket = new DatagramSocket();
+        this.address = address;
+    }
 
-	/**
-	 * @param b
-	 * @see java.io.OutputStream#write(byte[])
-	 * @throws IOException
-	 * @throws NullPointerException
-	 */
-	public void write(byte[] b) throws IOException, NullPointerException {
-		write(b, 0, b.length);
-	}
+    /**
+     * @see java.io.OutputStream#close()
+     * @throws IOException
+     */
+    public void close() throws IOException {
+        super.close();
+    }
 
-	/**
-	 * @param b
-	 * @see java.io.OutputStream#write(int)
-	 * @throws IOException
-	 */
-	public void write(int b) throws IOException {
-		write(new byte[] {(byte) b }, 0, 1);
-	}
+    /**
+     * @param b
+     * @param off
+     * @param len
+     * @see java.io.OutputStream#write(byte[], int, int)
+     * @throws IOException
+     * @throws NullPointerException
+     * @throws IndexOutOfBoundsException
+     */
+    public void write(final byte[] b, final int off, final int len)
+            throws IOException, NullPointerException, IndexOutOfBoundsException {
+        if (!inWrite) {
+            inWrite = true;
+            try {
+                AccessController.doPrivileged(new PrivilegedExceptionAction() {
+                    public Object run() throws IOException {
+                        final DatagramPacket p = new DatagramPacket(b, off, len);
+                        p.setSocketAddress(address);
+                        socket.send(p);
+                        return null;
+                    }
+                });
+            } catch (PrivilegedActionException ex) {
+                final IOException ioe = new IOException();
+                ioe.initCause(ex.getException());
+                throw ioe;
+            } finally {
+                inWrite = false;
+            }
+        }
+    }
+
+    /**
+     * @param b
+     * @see java.io.OutputStream#write(byte[])
+     * @throws IOException
+     * @throws NullPointerException
+     */
+    public void write(byte[] b) throws IOException, NullPointerException {
+        write(b, 0, b.length);
+    }
+
+    /**
+     * @param b
+     * @see java.io.OutputStream#write(int)
+     * @throws IOException
+     */
+    public void write(int b) throws IOException {
+        write(new byte[] { (byte) b }, 0, 1);
+    }
 
 }

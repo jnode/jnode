@@ -4,17 +4,10 @@
 <plugin id="org.jnode.driver.console" 
         name="JNode X86 Console driver"
         version="@VERSION@"
-        provider-name="JNode.org"
-        class="org.jnode.driver.console.x86.ConsoleManager">
+        provider-name="JNode.org">
         
   <requires>
-    <import plugin="org.jnode.driver.console.core"/>
+    <import plugin="org.jnode.driver.console.textscreen"/>
   </requires>
-        
-  <runtime>
-    <library name="jnode-core.jar">
-      <export name="org.jnode.driver.console.x86.*"/>
-    </library>
-  </runtime>
         
 </plugin>
