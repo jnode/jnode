@@ -20,7 +20,6 @@
         <alias name="alias" class="org.jnode.shell.command.AliasCommand"/>
         <alias name="class" class="org.jnode.shell.command.ClassCommand"/>
         <alias name="compile" class="org.jnode.shell.command.CompileCommand"/>
-        <alias name="cpuid" class="org.jnode.shell.command.CpuIDCommand"/>
         <alias name="date" class="org.jnode.shell.command.DateCommand"/>
         <alias name="echo" class="org.jnode.shell.command.EchoCommand"/>
         <alias name="env" class="org.jnode.shell.command.EnvCommand"/>
