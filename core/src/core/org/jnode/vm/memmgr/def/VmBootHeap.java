@@ -30,6 +30,7 @@ import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.Offset;
+import org.vmmagic.unboxed.Word;
 
 /**
  * @author epr
@@ -134,7 +135,7 @@ public class VmBootHeap extends VmAbstractHeap {
      *            This parameter is irrelevant here, since the structure of
      *            this heap never changes.
      */
-    protected void walk(ObjectVisitor visitor, boolean locking, int flagsMask, int flagsValue) {
+    protected void walk(ObjectVisitor visitor, boolean locking, Word flagsMask, Word flagsValue) {
         // Go through the heap and mark all objects in the allocation bitmap.
         final int headerSize = this.headerSize;
         final int sizeOffset = this.sizeOffset;
@@ -143,8 +144,8 @@ public class VmBootHeap extends VmAbstractHeap {
         while (offset < size) {
             final Address ptr = start.add(offset);
             final Object object = ptr.toObjectReference().toObject();
-            final int flags = VmMagic.getObjectFlags(object) & flagsMask;
-            if ((flags != flagsValue) || visitor.visit(object)) {
+            final Word flags = VmMagic.getObjectFlags(object).and(flagsMask);
+            if (!flags.EQ(flagsValue) || visitor.visit(object)) {
                 // Continue
                 final int objSize = ptr.loadInt(Offset.fromIntSignExtend(sizeOffset));
                 offset += objSize + headerSize;

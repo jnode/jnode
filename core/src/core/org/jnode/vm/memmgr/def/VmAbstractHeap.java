@@ -31,6 +31,7 @@ import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Offset;
+import org.vmmagic.unboxed.Word;
 
 /**
  * An abstract heap class.
@@ -206,7 +207,7 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * @param flagsValue 	 
 	 * @throws UninterruptiblePragma
 	 */
-	protected abstract void walk(ObjectVisitor visitor, boolean locking, int flagsMask, int flagsValue)
+	protected abstract void walk(ObjectVisitor visitor, boolean locking, Word flagsMask, Word flagsValue)
 	throws UninterruptiblePragma;
 	
 	/**

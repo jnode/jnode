@@ -39,6 +39,7 @@ import org.jnode.vm.memmgr.VmHeapManager;
 import org.jnode.vm.memmgr.VmWriteBarrier;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
+import org.vmmagic.unboxed.Word;
 
 public final class DefaultHeapManager extends VmHeapManager {
 
@@ -331,7 +332,7 @@ public final class DefaultHeapManager extends VmHeapManager {
             }
             vmClass.incInstanceCount();
             // Allocated objects are initially black.
-            VmMagic.setObjectFlags(result, ObjectFlags.GC_DEFAULT_COLOR);
+            VmMagic.setObjectFlags(result, Word.fromIntZeroExtend(ObjectFlags.GC_DEFAULT_COLOR));
         } finally {
             if (m != null) {
                 m.exit();

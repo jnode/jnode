@@ -36,6 +36,7 @@ import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.x86.compiler.BaseX86MagicHelper;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
+import org.jnode.vm.x86.compiler.X86CompilerContext;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -56,6 +57,8 @@ final class MagicHelper extends BaseX86MagicHelper {
         final X86Assembler os = ec.getStream();
         final ItemFactory ifac = ec.getItemFactory();
         final X86RegisterPool pool = ec.getGPRPool();
+        final X86CompilerContext context = ec.getContext();    
+        final int slotSize = os.isCode32() ? 4 : 8;
 
         switch (mcode) {
         case mADD: {
@@ -131,7 +134,11 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem addr = vstack.popRef();
             addr.load(ec);
-            final X86Register r = addr.getRegister();
+            X86Register r = addr.getRegister();
+            if (os.isCode64()) {
+            	r = pool.getRegisterInSameGroup(r, JvmType.INT);
+            	// We just take the lower 32-bit, so no actual mov's needed.
+            }
             addr.release(ec);
             L1AHelper.requestRegister(ec, r);
             final IntItem result = (IntItem) ifac.createReg(ec, JvmType.INT, r);
@@ -329,12 +336,14 @@ final class MagicHelper extends BaseX86MagicHelper {
             addr.loadToBITS8GPR(ec);
             final GPR r = addr.getRegister();
             addr.release(ec);
+            final WordItem result = L1AHelper.requestWordRegister(ec, methodToType(mcode), true);
+            final GPR resultr = result.getRegister();
             if (mcode == mLOADCHAR) {
-                os.writeMOVZX(r, r, 0, methodToSize(mcode));                
+                os.writeMOVZX(resultr, r, 0, methodToSize(mcode));                
             } else {
-                os.writeMOVSX(r, r, 0, methodToSize(mcode));
+                os.writeMOVSX(resultr, r, 0, methodToSize(mcode));
             }
-            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, r));
+            vstack.push(result);
         } break;
         case mLOADINT:
         case mLOADFLOAT: 
@@ -350,8 +359,10 @@ final class MagicHelper extends BaseX86MagicHelper {
             addr.load(ec);
             final GPR r = addr.getRegister();
             addr.release(ec);
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, 0);
-            vstack.push(L1AHelper.requestWordRegister(ec, methodToType(mcode), r));
+            final WordItem result = L1AHelper.requestWordRegister(ec, methodToType(mcode), false);
+            final GPR resultr = result.getRegister();
+            os.writeMOV(resultr.getSize(), resultr, r, 0);
+            vstack.push(result);
         } break;
         case mLOADLONG:
         case mLOADDOUBLE: {
@@ -359,12 +370,19 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem addr = vstack.popRef();
             addr.load(ec);
             final X86Register.GPR r = addr.getRegister();
-            final X86Register.GPR msb = (X86Register.GPR)L1AHelper.requestRegister(ec, JvmType.INT, false);
-            addr.release(ec);
-            L1AHelper.releaseRegister(ec, msb);
-            os.writeMOV(X86CompilerConstants.INTSIZE, msb, r, X86CompilerConstants.MSB);
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, X86CompilerConstants.LSB);
-            vstack.push(L1AHelper.requestDoubleWordRegisters(ec, methodToType(mcode), r, msb));
+            if (os.isCode32()) {
+            	final X86Register.GPR msb = (X86Register.GPR)L1AHelper.requestRegister(ec, JvmType.INT, false);
+            	addr.release(ec);
+            	L1AHelper.releaseRegister(ec, msb);
+            	os.writeMOV(X86CompilerConstants.INTSIZE, msb, r, X86CompilerConstants.MSB);
+            	os.writeMOV(X86CompilerConstants.INTSIZE, r, r, X86CompilerConstants.LSB);
+            	vstack.push(L1AHelper.requestDoubleWordRegisters(ec, methodToType(mcode), r, msb));
+            } else {
+            	final DoubleWordItem result = L1AHelper.requestDoubleWordRegisters(ec, methodToType(mcode));
+            	os.writeMOV(BITS64, result.getRegister(ec), r, 0);
+            	addr.release(ec);
+            	vstack.push(result);
+            }            	
         } break;
         case mLOADBYTE_OFS: 
         case mLOADCHAR_OFS:
@@ -379,12 +397,14 @@ final class MagicHelper extends BaseX86MagicHelper {
             ofs.release(ec);
             addr.release(ec);
             os.writeLEA(r, r, ofsr, 1, 0);
+            final WordItem result = L1AHelper.requestWordRegister(ec, methodToType(mcode), true);
+            final GPR resultr = result.getRegister();
             if (mcode == mLOADCHAR_OFS) {
-                os.writeMOVZX(r, r, 0, methodToSize(mcode));
+                os.writeMOVZX(resultr, r, 0, methodToSize(mcode));
             } else {
-                os.writeMOVSX(r, r, 0, methodToSize(mcode));
+                os.writeMOVSX(resultr, r, 0, methodToSize(mcode));
             }
-            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, r));
+            vstack.push(result);
         } break;
         case mLOADINT_OFS: 
         case mLOADFLOAT_OFS: 
@@ -404,8 +424,10 @@ final class MagicHelper extends BaseX86MagicHelper {
             final GPR r = addr.getRegister();
             ofs.release(ec);
             addr.release(ec);
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ofsr, 1, 0);
-            vstack.push(L1AHelper.requestWordRegister(ec, methodToType(mcode), r));
+            final WordItem result = L1AHelper.requestWordRegister(ec, methodToType(mcode), false);
+            final GPR resultr = result.getRegister();
+            os.writeMOV(resultr.getSize(), resultr, r, ofsr, 1, 0);
+            vstack.push(result);
         } break;
         case mLOADLONG_OFS: 
         case mLOADDOUBLE_OFS: {
@@ -416,13 +438,21 @@ final class MagicHelper extends BaseX86MagicHelper {
             addr.load(ec);
             final GPR ofsr = ofs.getRegister();
             final GPR r = addr.getRegister();
-            final GPR msb = (GPR)L1AHelper.requestRegister(ec, JvmType.INT, false);
-            os.writeMOV(X86CompilerConstants.INTSIZE, msb, r, ofsr, 1, X86CompilerConstants.MSB);
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ofsr, 1, X86CompilerConstants.LSB);
-            ofs.release(ec);
-            addr.release(ec);
-            L1AHelper.releaseRegister(ec, msb);
-            vstack.push(L1AHelper.requestDoubleWordRegisters(ec, methodToType(mcode), r, msb));
+            if (os.isCode32()) {
+            	final GPR msb = (GPR)L1AHelper.requestRegister(ec, JvmType.INT, false);
+            	os.writeMOV(X86CompilerConstants.INTSIZE, msb, r, ofsr, 1, X86CompilerConstants.MSB);
+            	os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ofsr, 1, X86CompilerConstants.LSB);
+            	ofs.release(ec);
+            	addr.release(ec);
+            	L1AHelper.releaseRegister(ec, msb);
+            	vstack.push(L1AHelper.requestDoubleWordRegisters(ec, methodToType(mcode), r, msb));
+            } else {
+            	final DoubleWordItem result = L1AHelper.requestDoubleWordRegisters(ec, methodToType(mcode));
+            	os.writeMOV(BITS64, result.getRegister(ec), r, ofsr, 1, 0);
+            	addr.release(ec);
+            	ofs.release(ec);
+            	vstack.push(result);
+            }
         } break;
         case mSTOREBYTE: 
         case mSTORECHAR:
@@ -450,7 +480,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             addr.load(ec);
             final GPR r = addr.getRegister();
             final GPR valr = val.getRegister();
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, 0, valr);
+            os.writeMOV(valr.getSize(), r, 0, valr);
             val.release(ec);
             addr.release(ec);
         } break;
@@ -507,7 +537,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             final GPR r = addr.getRegister();
             final GPR ofsr = ofs.getRegister();            
             final GPR valr = val.getRegister();
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, ofsr, 1, 0, valr);
+            os.writeMOV(valr.getSize(), r, ofsr, 1, 0, valr);
             ofs.release(ec);
             val.release(ec);
             addr.release(ec);
@@ -545,26 +575,33 @@ final class MagicHelper extends BaseX86MagicHelper {
             final WordItem val = (WordItem)vstack.pop();
             final WordItem old = (WordItem)vstack.pop();
             final RefItem addr = vstack.popRef();
-            final X86Register.GPR eax = X86Register.EAX;
-            if (!old.uses(eax)) {
-                L1AHelper.requestRegister(ec, eax, old);
+            final X86Register.GPR aax;
+            if ((mcode == mATTEMPTINT) || os.isCode32()) {
+            	aax = X86Register.EAX;
+            } else {
+            	aax = X86Register.RAX;
+            }
+            if (!old.uses(aax)) {
+                L1AHelper.requestRegister(ec, aax, old);
                 val.load(ec);
-                old.loadTo(ec, eax);
+                old.loadTo(ec, aax);
             } else {
                 val.load(ec);
             }
             addr.load(ec);
+            final IntItem result = (IntItem)L1AHelper.requestWordRegister(ec, JvmType.INT, true);
+            final GPR resultr = result.getRegister();
 
             final GPR r = addr.getRegister();
             final GPR valr = val.getRegister();
             os.writeCMPXCHG_EAX(r, 0, valr, true);
-            os.writeSETCC(eax, X86Constants.JZ);
-            os.writeAND(eax, 0xFF);
+            os.writeSETCC(resultr, X86Constants.JZ);
+            os.writeAND(resultr, 0xFF);
 
             val.release(ec);
             old.release(ec);
             addr.release(ec);
-            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, eax));
+            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, resultr));
         } break;
 
         case mATTEMPTINT_OFS:
@@ -576,31 +613,38 @@ final class MagicHelper extends BaseX86MagicHelper {
             final WordItem val = (WordItem)vstack.pop();
             final WordItem old = (WordItem)vstack.pop();
             final RefItem addr = vstack.popRef();
-            final X86Register.GPR eax = X86Register.EAX;
-            if (!old.uses(eax)) {
-                L1AHelper.requestRegister(ec, eax, old);
+            final X86Register.GPR aax;
+            if ((mcode == mATTEMPTINT) || os.isCode32()) {
+            	aax = X86Register.EAX;
+            } else {
+            	aax = X86Register.RAX;
+            }
+            if (!old.uses(aax)) {
+                L1AHelper.requestRegister(ec, aax, old);
                 ofs.load(ec);
                 val.load(ec);
-                old.loadTo(ec, eax);
+                old.loadTo(ec, aax);
             } else {
                 ofs.load(ec);
                 val.load(ec);
             }
             addr.load(ec);
+            final IntItem result = (IntItem)L1AHelper.requestWordRegister(ec, JvmType.INT, true);
+            final GPR resultr = result.getRegister();
 
             final GPR r = addr.getRegister();
             final GPR valr = val.getRegister();
             final GPR ofsr = ofs.getRegister();
             os.writeLEA(r, r, ofsr, 1, 0);
             os.writeCMPXCHG_EAX(r, 0, valr, true);
-            os.writeSETCC(eax, X86Constants.JZ);
-            os.writeAND(eax, 0xFF);
+            os.writeSETCC(resultr, X86Constants.JZ);
+            os.writeAND(resultr, 0xFF);
 
             ofs.release(ec);
             val.release(ec);
             old.release(ec);
             addr.release(ec);
-            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, eax));
+            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, resultr));
         } break;
 
         case mGETOBJECTTYPE: {
@@ -609,9 +653,9 @@ final class MagicHelper extends BaseX86MagicHelper {
             obj.load(ec);
             final GPR r = obj.getRegister();
             // Get TIB
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ObjectLayout.TIB_SLOT * 4);
+            os.writeMOV(context.ADDRSIZE, r, r, ObjectLayout.TIB_SLOT * slotSize);
             // Get VmType
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, (TIBLayout.VMTYPE_INDEX + VmArray.DATA_OFFSET) * 4);
+            os.writeMOV(context.ADDRSIZE, r, r, (TIBLayout.VMTYPE_INDEX + VmArray.DATA_OFFSET) * slotSize);
             vstack.push(obj);
         } break;
         case mGETTIB: {
@@ -620,7 +664,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             obj.load(ec);
             final GPR r = obj.getRegister();
             // Get TIB
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ObjectLayout.TIB_SLOT * 4);
+            os.writeMOV(context.ADDRSIZE, r, r, ObjectLayout.TIB_SLOT * slotSize);
             vstack.push(obj);
         } break;
         case mGETOBJECTFLAGS: {
@@ -629,20 +673,20 @@ final class MagicHelper extends BaseX86MagicHelper {
             obj.load(ec);
             final GPR r = obj.getRegister();
             // Get flags
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ObjectLayout.FLAGS_SLOT * 4);
+            os.writeMOV(context.ADDRSIZE, r, r, ObjectLayout.FLAGS_SLOT * slotSize);
             obj.release(ec);
-            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, r));
+            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, r));
         } break;
         case mSETOBJECTFLAGS: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
-            final IntItem flags = vstack.popInt();
+            final RefItem flags = vstack.popRef();
             final RefItem obj = vstack.popRef();
             flags.load(ec);
             obj.load(ec);
             final GPR flagsr = flags.getRegister();
             final GPR r = obj.getRegister();
             // Set flags
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, ObjectLayout.FLAGS_SLOT * 4, flagsr);
+            os.writeMOV(context.ADDRSIZE, r, ObjectLayout.FLAGS_SLOT * slotSize, flagsr);
             flags.release(ec);
             obj.release(ec);
         } break;
@@ -651,7 +695,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem obj = vstack.popRef();
             obj.load(ec);
             final GPR r = obj.getRegister();
-            os.writeADD(r, VmArray.DATA_OFFSET * 4);
+            os.writeADD(r, VmArray.DATA_OFFSET * slotSize);
             vstack.push(obj);
         } break;
         case mGETOBJECTCOLOR: {
@@ -659,22 +703,26 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem obj = vstack.popRef();
             obj.load(ec);
             final GPR r = obj.getRegister();
+            final IntItem result = (IntItem)L1AHelper.requestWordRegister(ec, JvmType.INT, false);
+            final GPR resultr = result.getRegister();
             // Get flags
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ObjectLayout.FLAGS_SLOT * 4);
-            os.writeAND(r, ObjectFlags.GC_COLOUR_MASK);
+            os.writeMOV(BITS32, resultr, r, ObjectLayout.FLAGS_SLOT * slotSize);
+            os.writeAND(resultr, ObjectFlags.GC_COLOUR_MASK);
             obj.release(ec);
-            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, r));
+            vstack.push(result);
         } break;
         case mISFINALIZED: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem obj = vstack.popRef();
             obj.load(ec);
             final GPR r = obj.getRegister();
+            final IntItem result = (IntItem)L1AHelper.requestWordRegister(ec, JvmType.INT, false);
+            final GPR resultr = result.getRegister();
             // Get flags
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ObjectLayout.FLAGS_SLOT * 4);
-            os.writeAND(r, ObjectFlags.STATUS_FINALIZED);
+            os.writeMOV(BITS32, resultr, r, ObjectLayout.FLAGS_SLOT * slotSize);
+            os.writeAND(resultr, ObjectFlags.STATUS_FINALIZED);
             obj.release(ec);
-            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, r));
+            vstack.push(result);
         } break;
         case mATOMICADD: 
         case mATOMICAND: 
@@ -696,14 +744,28 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final WordItem result = L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, false);
             final GPR r = result.getRegister();
-            os.writeMOV(X86CompilerConstants.INTSIZE, r, X86Register.EBP);
+            os.writeMOV(context.ADDRSIZE, r, context.BP);
             vstack.push(result);
         } break;
         case mGETTIMESTAMP: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
-            final DoubleWordItem result = L1AHelper.requestDoubleWordRegisters(ec, JvmType.LONG, X86Register.EAX, X86Register.EDX);
-            os.writeRDTSC();
-            vstack.push(result);
+            if (os.isCode32()) {
+            	final DoubleWordItem result = L1AHelper.requestDoubleWordRegisters(ec, JvmType.LONG, X86Register.EAX, X86Register.EDX);
+            	os.writeRDTSC();
+            	vstack.push(result);
+            } else {
+            	final DoubleWordItem result = L1AHelper.requestDoubleWordRegister(ec, JvmType.LONG, X86Register.RAX);
+            	L1AHelper.requestRegister(ec, X86Register.RDX);
+            	os.writeRDTSC();
+            	// Move MSB to upper 32-bit of RDX
+            	os.writeSHL(X86Register.RDX, 32);
+            	// RAX is zero extended by RDTSC, so an OR of RAX,RDX will combine
+            	// the upper 32-bits of RDX and the lower 32-bits of RAX.
+            	os.writeOR(X86Register.RAX, X86Register.RDX);
+            	// Now free RDX
+            	L1AHelper.releaseRegister(ec, X86Register.RDX);
+            	vstack.push(result);            	
+            }
         } break;
         case mINTBITSTOFLOAT:
         case mFLOATTORAWINTBITS: {

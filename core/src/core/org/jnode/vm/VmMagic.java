@@ -23,6 +23,7 @@ package org.jnode.vm;
 
 import org.jnode.vm.classmgr.VmClassType;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Word;
 
 /**
  * Class containing "magic" methods that are interpreted by the VM itself,
@@ -59,8 +60,8 @@ public final class VmMagic {
 	 * @param object
 	 * @return int
 	 */
-	public static int getObjectFlags(Object object) {
-		return 0;
+	public static Word getObjectFlags(Object object) {
+		return Word.zero();
 	}
 
 	/**
@@ -79,7 +80,7 @@ public final class VmMagic {
 	 * @param object
 	 * @param flags
 	 */
-	public static void setObjectFlags(Object object, int flags) {
+	public static void setObjectFlags(Object object, Word flags) {
 
 	}
 

@@ -24,6 +24,7 @@ package org.jnode.vm.memmgr.def;
 import org.jnode.system.BootLog;
 import org.jnode.vm.Monitor;
 import org.jnode.vm.classmgr.ObjectFlags;
+import org.vmmagic.unboxed.Word;
 
 /**
  * Thread used to invoke the {@link java.lang.Object#finalize()}method of all
@@ -120,9 +121,11 @@ final class FinalizerThread extends Thread {
      */
     private final void runFinalization() {
         VmAbstractHeap heap = heapManager.getHeapList();
+        final Word colorMask = Word.fromIntZeroExtend(ObjectFlags.GC_COLOUR_MASK);
+        final Word yellow = Word.fromIntZeroExtend(ObjectFlags.GC_YELLOW);
         while (heap != null) {
             visitor.setCurrentHeap(heap);
-            heap.walk(visitor, true, ObjectFlags.GC_COLOUR_MASK, ObjectFlags.GC_YELLOW);
+            heap.walk(visitor, true, colorMask, yellow);
             heap = heap.getNext();
         }
     }

@@ -29,6 +29,7 @@ import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.memmgr.GCStatistics;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.pragma.Uninterruptible;
+import org.vmmagic.unboxed.Word;
 
 /**
  * @author epr
@@ -175,10 +176,11 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
                 // all grey objects, since we must still mark
                 // their children.
                 markVisitor.setRootSet(false);
-                bootHeap.walk(markVisitor, locking, 0, 0);
+                final Word zero = Word.zero();
+                bootHeap.walk(markVisitor, locking, zero, zero);
                 VmAbstractHeap heap = firstHeap;
                 while ((heap != null) && (!markStack.isOverflow())) {
-                    heap.walk(markVisitor, locking, 0, 0);
+                    heap.walk(markVisitor, locking, zero, zero);
                     heap = heap.getNext();
                 }
             }
@@ -212,10 +214,11 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
     private void sweep(VmAbstractHeap firstHeap) {
         final long startTime = VmSystem.currentKernelMillis();
         VmAbstractHeap heap = firstHeap;
+        final Word zero = Word.zero();
         while (heap != null) {
             //freedBytes += heap.collect();
             sweepVisitor.setCurrentHeap(heap);
-            heap.walk(sweepVisitor, true, 0, 0);
+            heap.walk(sweepVisitor, true, zero, zero);
             heap = heap.getNext();
         }
         final long endTime = VmSystem.currentKernelMillis();
@@ -230,7 +233,8 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
      */
     private void cleanup(VmBootHeap bootHeap, VmAbstractHeap firstHeap) {
         final long startTime = VmSystem.currentKernelMillis();
-        bootHeap.walk(setWhiteVisitor, true, 0, 0);
+        final Word zero = Word.zero();
+        bootHeap.walk(setWhiteVisitor, true, zero, zero);
         VmAbstractHeap heap = firstHeap;
         while (heap != null) {
             heap.defragment();
@@ -249,11 +253,12 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
      */
     private void verify(VmBootHeap bootHeap, VmAbstractHeap firstHeap) {
         final long startTime = VmSystem.currentKernelMillis();
+        final Word zero = Word.zero();
         verifyVisitor.reset();
-        bootHeap.walk(verifyVisitor, true, 0, 0);
+        bootHeap.walk(verifyVisitor, true, zero, zero);
         VmAbstractHeap heap = firstHeap;
         while (heap != null) {
-            heap.walk(verifyVisitor, true, 0, 0);
+            heap.walk(verifyVisitor, true, zero, zero);
             heap = heap.getNext();
         }
         final int errorCount = verifyVisitor.getErrorCount();
