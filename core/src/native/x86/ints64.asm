@@ -168,10 +168,10 @@ sys_print_intregs_code:
 	sub rbx,16
 	idm_print_reg  ipaddr, rbx
 	idm_print_byte ip0,	   [rbx+0]
-	push ecx
-	mov ecx,15
+	push rcx
+	mov rcx,15
 sys_print_intregs_loop1:
-	inc ebx
+	inc rbx
 	idm_print_byte ip1, [rbx]
 	loop sys_print_intregs_loop1
 	
