@@ -3,19 +3,19 @@
  */
 package org.jnode.fs.initrd;
 
-import java.io.IOException;
-
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
-import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.block.ramdisk.RamDiskDevice;
 import org.jnode.driver.block.ramdisk.RamDiskDriver;
-import org.jnode.fs.command.FormatCommand;
+import org.jnode.fs.FileSystemException;
+import org.jnode.fs.FileSystemType;
 import org.jnode.fs.fat.Fat;
+import org.jnode.fs.fat.FatFileSystemType;
+import org.jnode.fs.service.FileSystemService;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
@@ -47,11 +47,19 @@ public class InitRamdisk extends Plugin {
 			RamDiskDevice dev = new RamDiskDevice(null, "dummy", 100000);
 			dev.setDriver(new RamDiskDriver("jnode"));
 			dm.register(dev);
-            
+
 			log.info("Format initrd ramdisk");
-			FormatCommand.format(dev, Fat.FAT16, dm);
+
+			FileSystemService fileSystemService = (FileSystemService)InitialNaming.lookup(FileSystemService.NAME);
+			FileSystemType type = fileSystemService.getFileSystemTypeForNameSystemTypes(FatFileSystemType.NAME);
+			type.format(dev, new Integer(Fat.FAT16));
+
+			// restart the device
+			dev.stop();
+			dev.start();
+
 			log.info("/jnode ready.");
-			
+
 			// restart the device
 			dev.stop();
 			dev.start();
@@ -61,9 +69,7 @@ public class InitRamdisk extends Plugin {
 			throw new PluginException(e);
 		} catch (DeviceAlreadyRegisteredException e) {
 			throw new PluginException(e);
-		} catch (ApiNotFoundException e) {
-			throw new PluginException(e);
-		} catch (IOException e) {
+		} catch (FileSystemException e) {
 			throw new PluginException(e);
 		}
 
