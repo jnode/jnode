@@ -62,6 +62,14 @@ public class RadeonConfiguration extends FrameBufferConfiguration {
     }
     
     /**
+     * Gets the number of bytes per line
+     * @return
+     */
+    public final int getBytesPerLine() {
+        return (displayMode.getWidth() * bitsPerPixel) >> 3;
+    }
+    
+    /**
      * @return Returns the displayMode.
      */
     public final DisplayMode getDisplayMode() {

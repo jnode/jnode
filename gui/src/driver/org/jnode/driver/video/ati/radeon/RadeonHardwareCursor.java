@@ -8,6 +8,9 @@ import java.util.HashMap;
 import org.jnode.driver.video.HardwareCursor;
 import org.jnode.driver.video.HardwareCursorAPI;
 import org.jnode.driver.video.HardwareCursorImage;
+import org.jnode.system.MemoryResource;
+import org.jnode.system.ResourceNotFreeException;
+import org.jnode.util.NumberUtils;
 
 
 /**
@@ -18,15 +21,17 @@ public class RadeonHardwareCursor implements RadeonConstants, HardwareCursorAPI 
     private final RadeonVgaIO io;
 	/** Map between HardwareCursorImage and short[] */
 	private final HashMap cursorCache = new HashMap();
-
-    // cursor bitmap will be stored at the start of the framebuffer
-	private static final int CURSOR_ADDRESS = 0;
+	/** Memory reserved for cursor images */
+	private final MemoryResource cursorMem;
 
     /**
+     * Initialize this instance.
      * @param io
      */
-    public RadeonHardwareCursor(final RadeonVgaIO io) {
+    public RadeonHardwareCursor(RadeonCore kernel, RadeonVgaIO io) throws IndexOutOfBoundsException, ResourceNotFreeException {
         this.io = io;
+        this.cursorMem = kernel.claimDeviceMemory(4096, 16);
+        kernel.log.info("Cursor memory at offset 0x" + NumberUtils.hex(cursorMem.getOffset()));
     }
     
     /**
@@ -42,7 +47,7 @@ public class RadeonHardwareCursor implements RadeonConstants, HardwareCursorAPI 
     	// Set shape
 		final short[] cur = getCursor(cursor);
 		if (cur != null) {
-			io.getVideoMem().setShorts(cur, 0, CURSOR_ADDRESS, 1024);
+			cursorMem.setShorts(cur, 0, 0, 1024);
 		}
     }
     
@@ -71,7 +76,7 @@ public class RadeonHardwareCursor implements RadeonConstants, HardwareCursorAPI 
     	io.setReg32(CUR_HORZ_VERT_POSN, CUR_LOCK
     			| (((xorigin != 0) ? 0 : x) << 16)
     			| ((yorigin != 0) ? 0 : y) );
-    	io.setReg32(CUR_OFFSET, CURSOR_ADDRESS + xorigin + yorigin * 16 );
+    	io.setReg32(CUR_OFFSET, (int)cursorMem.getOffset() + xorigin + yorigin * 16 );
     }
     
     /**
@@ -87,6 +92,13 @@ public class RadeonHardwareCursor implements RadeonConstants, HardwareCursorAPI 
 		io.setReg32(CRTC_GEN_CNTL, tmp);
     }
 
+    /**
+     * Close this hw cursor
+     */
+    final void close() {
+        setCursorVisible(false);
+    }
+    
     private short[] getCursor(HardwareCursor cursor) {
 		final HardwareCursorImage img = cursor.getImage(32, 32);
 		if (img == null) {

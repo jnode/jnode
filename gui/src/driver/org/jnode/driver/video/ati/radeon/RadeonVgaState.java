@@ -44,6 +44,7 @@ public class RadeonVgaState extends VgaState implements RadeonConstants {
      * @param io
      */
     final void calcForConfiguration(RadeonConfiguration config, RadeonPLLInfo pllInfo, RadeonVgaIO io) {
+        saveFromVGA(io);
         crtc.calcForConfiguration(config, pllInfo, io);
         pll.calcForConfiguration(config.getDisplayMode().getFreq() / 10, pllInfo);
     }
