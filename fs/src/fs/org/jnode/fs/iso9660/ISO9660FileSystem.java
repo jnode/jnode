@@ -1,8 +1,5 @@
 /*
- * Created on 25.03.2004
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * $Id$
  */
 package org.jnode.fs.iso9660;
 
@@ -29,7 +26,7 @@ public class ISO9660FileSystem implements FileSystem
 
 	private Device device = null;
 	private final BlockDeviceAPI api;
-	private PrimaryVolume volume = null;
+	private ISO9660Volume volume = null;
 	/* (non-Javadoc)
 	 * @see org.jnode.fs.FileSystem#getDevice()
 	 */
@@ -47,7 +44,7 @@ public class ISO9660FileSystem implements FileSystem
 		byte[] buff = new byte[ISO9660FileSystem.DefaultLBNSize];
 		try
 		{
-			volume = new PrimaryVolume(api);
+			volume = new ISO9660Volume(api);
 		} catch (IOException e)
 		{
 			throw new FileSystemException(e);
@@ -63,7 +60,7 @@ public class ISO9660FileSystem implements FileSystem
 	 */
 	public FSEntry getRootEntry() throws IOException
 	{
-		return new ISO9660Entry(volume.getRootDirectoryEntry());
+		return new ISO9660Entry(volume.getVolumeDescriptor().getRootDirectoryEntry());
 		
 	}
 	/* (non-Javadoc)
@@ -76,7 +73,7 @@ public class ISO9660FileSystem implements FileSystem
 	/**
 	 * @return Returns the volume.
 	 */
-	public PrimaryVolume getCDFSVolume() {
+	public ISO9660Volume getVolume() {
 		return this.volume;
 	}
 

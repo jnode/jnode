@@ -1,8 +1,5 @@
 /*
- * Created on 25.03.2004
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * $Id$
  */
 package org.jnode.fs.iso9660;
 
