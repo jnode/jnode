@@ -54,7 +54,7 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
 
     private final JNodeToolkit toolkit;
 
-    protected JComponent jComponent = new JComponent(){};
+    protected final JComponent jComponent;
 
     /**
      * Initialize this instance.
@@ -62,9 +62,10 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
      * @param toolkit
      * @param component
      */
-    public SwingComponentPeer(JNodeToolkit toolkit, Component component) {
+    public SwingComponentPeer(JNodeToolkit toolkit, Component component, JComponent peer) {
         super(toolkit, component);
         this.toolkit = toolkit;
+        this.jComponent = peer;
         this.component = component;
         setBounds(component.getX(), component.getY(), component.getWidth(),
                 component.getHeight());

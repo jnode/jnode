@@ -3,12 +3,8 @@
  */
 package org.jnode.awt.swingpeers;
 
-import java.awt.AWTEvent;
-import java.awt.BufferCapabilities;
 import java.awt.Button;
 import java.awt.Component;
-import java.awt.Image;
-import java.awt.event.PaintEvent;
 import java.awt.peer.ButtonPeer;
 
 import javax.swing.JButton;
@@ -28,10 +24,9 @@ class SwingButtonPeer extends SwingComponentPeer implements ButtonPeer, SwingPee
 	//
 
 	public SwingButtonPeer(SwingToolkit toolkit, Button button) {
-        super(toolkit, button);
+        super(toolkit, button, new JButton());
 		this.button = button;
-        JButton jButton = new JButton();
-        jComponent = jButton;
+        final JButton jButton = (JButton)jComponent;
 		SwingToolkit.add(button, jButton);
 		SwingToolkit.copyAwtProperties(button, jButton);
 		jButton.setText(button.getLabel());

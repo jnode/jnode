@@ -8,6 +8,8 @@ import java.awt.Insets;
 import java.awt.peer.ContainerPeer;
 import java.awt.peer.LightweightPeer;
 
+import javax.swing.JComponent;
+
 /**
  * AWT lightweight component peers that does nothing.
  */
@@ -21,7 +23,7 @@ final class SwingLightweightPeer extends SwingComponentPeer implements
 	//
 
 	public SwingLightweightPeer(SwingToolkit toolkit, Component component) {
-		super(toolkit, component);
+		super(toolkit, component, new JLightweightComponent());
 	}
 
 	//
@@ -89,5 +91,9 @@ final class SwingLightweightPeer extends SwingComponentPeer implements
 	public boolean isPaintPending() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	private static class JLightweightComponent extends JComponent {
+		
 	}
 }
