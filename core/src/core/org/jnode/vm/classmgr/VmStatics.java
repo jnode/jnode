@@ -24,8 +24,10 @@ package org.jnode.vm.classmgr;
 import java.io.PrintStream;
 import java.nio.ByteOrder;
 
+import org.jnode.assembler.Label;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.vm.ObjectVisitor;
+import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmSystemObject;
 import org.vmmagic.unboxed.Address;
@@ -111,7 +113,7 @@ public final class VmStatics extends VmSystemObject {
 	 * 
 	 * @return the index of the allocated entry.
 	 */
-	final int allocAddressField() {
+	public final int allocAddressField() {
 		return alloc(TYPE_ADDRESS, slotLength);
 	}
 
@@ -159,6 +161,20 @@ public final class VmStatics extends VmSystemObject {
 			}		    
 		}
 	}
+
+    public final void setAddress(int idx, Label value) {
+        if (!Vm.isWritingImage()) {
+            throw new IllegalStateException("Only allowed during bootimage creation.");
+        }
+        if (types[idx] != TYPE_ADDRESS) {
+            throw new IllegalArgumentException("Type error " + types[idx]);
+        }
+        if (setRawObject(idx, value)) {
+            if (locked) {
+                throw new RuntimeException("Locked");
+            }           
+        }
+    }
 
 	/*final void setMethod(int idx, VmMethod value) {
 		if (locked) {

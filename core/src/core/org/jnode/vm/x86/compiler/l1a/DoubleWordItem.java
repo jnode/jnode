@@ -423,6 +423,7 @@ public abstract class DoubleWordItem extends Item implements
 				stack.operandStack.pop(this);
 			}
 			os.writePOP(reg);
+            os.writeLEA(X86Register.RSP, X86Register.RSP, 8); // garbage
 			break;
 
 		}
@@ -524,6 +525,7 @@ public abstract class DoubleWordItem extends Item implements
 				os.writePUSH(msb);
 				os.writePUSH(lsb);
 			} else {
+                os.writeLEA(X86Register.RSP, X86Register.RSP, -8); // garbage
 				os.writePUSH(reg);
 			}
 			break;
@@ -533,6 +535,7 @@ public abstract class DoubleWordItem extends Item implements
 				os.writePUSH(X86Register.EBP, getMsbOffsetToFP(ec));
 				os.writePUSH(X86Register.EBP, getLsbOffsetToFP(ec));
 			} else {
+                os.writeLEA(X86Register.RSP, X86Register.RSP, -8); // garbage
 				os.writePUSH(X86Register.RBP, getOffsetToFP(ec));
 			}
 			break;
@@ -553,6 +556,7 @@ public abstract class DoubleWordItem extends Item implements
 				os.writeLEA(X86Register.ESP, X86Register.ESP, -8);
 				popFromFPU(os, X86Register.ESP, 0);
 			} else {
+                os.writeLEA(X86Register.RSP, X86Register.RSP, -8); // garbage
 				os.writeLEA(X86Register.RSP, X86Register.RSP, -8); // Still 8
 				// bytes
 				popFromFPU(os, X86Register.RSP, 0);

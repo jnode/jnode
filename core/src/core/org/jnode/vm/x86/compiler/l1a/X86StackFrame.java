@@ -28,7 +28,6 @@ import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
-import org.jnode.vm.classmgr.Signature;
 import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmInterpretedExceptionHandler;
@@ -261,7 +260,7 @@ class X86StackFrame implements X86CompilerConstants {
 		 * Do not do a ret here, this way the return address will be used by
 		 * vm_athrow as its return address
 		 */
-		helper.writeJumpTableJMP(X86JumpTable.VM_ATHROW_NOTRACE_OFS);
+		helper.writeJumpTableJMP(X86JumpTable.VM_ATHROW_NOTRACE_IDX);
 		//os.writeJMP(helper.VM_ATHROW_NOTRACE);
 
 		codeObject.markEnd();
@@ -284,7 +283,8 @@ class X86StackFrame implements X86CompilerConstants {
 	 */
 	public final int getEbpOffset(TypeSizeInfo typeSizeInfo, int index) {
 		final int noArgs = method.getArgSlotCount();
-		final int stackSlot = Signature.getStackSlotForJavaArgNumber(typeSizeInfo, method, index);
+		final int stackSlot = index;
+//        final int stackSlot = Signature.getStackSlotForJavaArgNumber(typeSizeInfo, method, index);
 		if (stackSlot < noArgs) {
 			// Index refers to a method argument
 			return ((noArgs - stackSlot + 1) * slotSize) + EbpFrameRefOffset
@@ -303,11 +303,12 @@ class X86StackFrame implements X86CompilerConstants {
 	 * @return int
 	 */
 	public final int getWideEbpOffset(TypeSizeInfo typeSizeInfo, int index) {
-        if (os.isCode32()) {
-            return getEbpOffset(typeSizeInfo, index + 1);
-        } else {
-            return getEbpOffset(typeSizeInfo, index);            
-        }
+      return getEbpOffset(typeSizeInfo, index + 1);
+//        if (os.isCode32()) {
+//            return getEbpOffset(typeSizeInfo, index + 1);
+//        } else {
+//            return getEbpOffset(typeSizeInfo, index);            
+//        }
 	}
 
 	private void emitSynchronizationCode(TypeSizeInfo typeSizeInfo, VmMethod monitorMethod) {

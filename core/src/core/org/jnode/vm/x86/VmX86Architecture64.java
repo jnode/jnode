@@ -38,7 +38,7 @@ public final class VmX86Architecture64 extends VmX86Architecture {
 	public VmX86Architecture64(String compiler) {
 		super(compiler);
 		this.imtCompiler = new X86IMTCompiler64();
-        this.typeSizeInfo = new TypeSizeInfo(1, 1, 1, 1, 1);
+        this.typeSizeInfo = new TypeSizeInfo(1, 1, 2, 2, 1);
 	}
 
 	/**

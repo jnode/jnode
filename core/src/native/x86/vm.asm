@@ -36,7 +36,7 @@ GLABEL vm_athrow
 		pop AAX
 	%endif
 	
-vm_athrow_notrace:
+GLABEL vm_athrow_notrace
 	%if TRACE_ATHROW
 		; Show location of exception
 		PRINT_WORD [ASP+SLOT_SIZE]

@@ -1122,7 +1122,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		}
 
 		// Jump
-		helper.writeJumpTableCALL(X86JumpTable.VM_ATHROW_OFS);
+		helper.writeJumpTableCALL(X86JumpTable.VM_ATHROW_IDX);
 
 		// Release
 		ref.release(eContext);
