@@ -171,4 +171,8 @@ public class Throwable {
 		this.cause = cause;
 		return this;
 	}
+	
+	public StackTraceElement[] getStackTrace() {
+	    throw new RuntimeException("Not implemented yet");
+	}
 }

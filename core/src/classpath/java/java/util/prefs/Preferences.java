@@ -45,7 +45,7 @@ import java.security.AccessController;
 import java.security.Permission;
 import java.security.PrivilegedAction;
 
-import gnu.java.util.prefs.*;
+import gnu.java.util.prefs.NodeReader;
 
 /**
  * Preference node containing key value entries and subnodes.
@@ -92,11 +92,11 @@ public abstract class Preferences {
      * Default PreferencesFactory class used when the system property
      * "java.util.prefs.PreferencesFactory" is not set.
 	 * <p>
-	 * XXX - Currently set to MemoryBasedPreferencesFactory, should be changed
+	 * XXX - Currently set to MemoryBasedFactory, should be changed
 	 * when FileBasedPreferences backend works.
      */
     private static final String defaultFactoryClass
-        = "gnu.java.util.prefs.MemoryBasedPreferencesFactory";
+        = "gnu.java.util.prefs.MemoryBasedFactory";
 
     /** Permission needed to access system or user root. */
     private static final Permission prefsPermission
@@ -210,18 +210,23 @@ public abstract class Preferences {
                         });
 
             // Still no factory? Use our default.
-            if (factory == null) {
-                try {
-                    Object o = Class.forName(defaultFactoryClass);
-                    factory = (PreferencesFactory) o;
-                } catch (ClassNotFoundException cnfe) {
-                    throw new RuntimeException("Couldn't load default factory"
+            if (factory == null)
+	      {
+                try
+		  {
+                    Class cls = Class.forName (defaultFactoryClass);
+                    factory = (PreferencesFactory) cls.newInstance();
+                  }
+		catch (Exception e)
+		  {
+                    throw new RuntimeException ("Couldn't load default factory"
                         + " '"+ defaultFactoryClass +"'");
                     // XXX - when using 1.4 compatible throwables add cause
                 }
             }
 
         }
+	
         return factory;
     }
 
@@ -238,10 +243,10 @@ public abstract class Preferences {
      * @exception SecurityException when a security manager is installed and
      * the caller does not have <code>RuntimePermission("preferences")</code>.
      */
-    public static Preferences systemNodeForPackage(Object o)
+    public static Preferences systemNodeForPackage(Class c)
             throws SecurityException
     {
-        return nodeForPackage(o, systemRoot());
+        return nodeForPackage(c, systemRoot());
     }
 
     /**
@@ -257,10 +262,10 @@ public abstract class Preferences {
      * @exception SecurityException when a security manager is installed and
      * the caller does not have <code>RuntimePermission("preferences")</code>.
      */
-    public static Preferences userNodeForPackage(Object o)
+    public static Preferences userNodeForPackage(Class c)
             throws SecurityException
     {
-        return nodeForPackage(o, userRoot());
+        return nodeForPackage(c, userRoot());
     }
 
     /**
@@ -269,9 +274,9 @@ public abstract class Preferences {
      * root it returns the correct Preference node for the package node name
      * of the given object.
      */
-    private static Preferences nodeForPackage(Object o, Preferences root) {
+    private static Preferences nodeForPackage(Class c, Preferences root) {
         // Get the package path
-        String className = o.getClass().getName();
+        String className = c.getName();
         String packagePath;
         int index = className.lastIndexOf('.');
         if(index == -1) {

@@ -39,9 +39,11 @@ exception statement from your version.
 
 */
 
+
 package java.util.logging;
 
 import java.io.UnsupportedEncodingException;
+import java.security.AccessController;
 
 /**
  * A <code>Handler</code> publishes <code>LogRecords</code> to
@@ -56,7 +58,8 @@ import java.io.UnsupportedEncodingException;
  *
  * @author Sascha Brawer (brawer@acm.org)
  */
-public abstract class Handler {
+public abstract class Handler
+{
 	Formatter formatter;
 	Filter filter;
 	Level level;
@@ -81,7 +84,7 @@ public abstract class Handler {
 	 * code will throw a <code>java.lang.NullPointerException</code>:
 	 *
 	 * <p><pre>Handler h = new MyConcreteSubclassOfHandler();
-	h.setFormatter(h.getFormatter());</pre>
+h.setFormatter(h.getFormatter());</pre>
 	 *
 	 * It seems strange that a freshly constructed Handler is not
 	 * supposed to provide a Formatter, but this is what the specification
@@ -90,6 +93,7 @@ public abstract class Handler {
 	{
 		level = Level.ALL;
 	}
+
 
 	/**
 	 * Publishes a <code>LogRecord</code> to an appropriate sink,
@@ -109,6 +113,7 @@ public abstract class Handler {
 	 */
 	public abstract void publish(LogRecord record);
 
+
 	/**
 	 * Forces any data that may have been buffered to the underlying
 	 * output device.
@@ -118,6 +123,7 @@ public abstract class Handler {
 	 * of this method will not receive an exception.
 	 */
 	public abstract void flush();
+
 
 	/**
 	 * Closes this <code>Handler</code> after having flushed
@@ -135,7 +141,9 @@ public abstract class Handler {
 	 *         the caller is not granted the permission to control
 	 *         the logging infrastructure.
 	 */
-	public abstract void close() throws SecurityException;
+  public abstract void close()
+    throws SecurityException;
+
 
 	/**
 	 * Returns the <code>Formatter</code> which will be used to
@@ -149,9 +157,11 @@ public abstract class Handler {
 	 *         does not use formatters and no formatter has
 	 *         ever been set by calling <code>setFormatter</code>.
 	 */
-	public Formatter getFormatter() {
+  public Formatter getFormatter()
+  {
 		return formatter;
 	}
+
 
 	/**
 	 * Sets the <code>Formatter</code> which will be used to
@@ -169,7 +179,9 @@ public abstract class Handler {
 	 * @throws NullPointerException if <code>formatter</code> is
 	 *         <code>null</code>.
 	 */
-	public void setFormatter(Formatter formatter) throws SecurityException {
+  public void setFormatter(Formatter formatter)
+    throws SecurityException
+  {
 		LogManager.getLogManager().checkAccess();
 
 		/* Throws a NullPointerException if formatter is null. */
@@ -178,6 +190,7 @@ public abstract class Handler {
 		this.formatter = formatter;
 	}
 
+
 	/**
 	 * Returns the character encoding which this handler uses for publishing
 	 * log records.
@@ -185,9 +198,11 @@ public abstract class Handler {
 	 * @param encoding the name of a character encoding, or <code>null</code>
 	 *            for the default platform encoding.
 	 */
-	public String getEncoding() {
+  public String getEncoding()
+  {
 		return encoding;
 	}
+
 
 	/**
 	 * Sets the character encoding which this handler uses for publishing
@@ -202,7 +217,9 @@ public abstract class Handler {
 	 *            the logging infrastructure.
 	 *
 	 */
-	public void setEncoding(String encoding) throws SecurityException, UnsupportedEncodingException {
+  public void setEncoding(String encoding)
+    throws SecurityException, UnsupportedEncodingException
+  {
 		/* Should any developer ever change this implementation, they are
 		 * advised to have a look at StreamHandler.setEncoding(String),
 		 * which overrides this method without calling super.setEncoding.
@@ -219,6 +236,7 @@ public abstract class Handler {
 		this.encoding = encoding;
 	}
 
+
 	/**
 	 * Returns the <code>Filter</code> that currently controls which
 	 * log records are being published by this <code>Handler</code>.
@@ -228,9 +246,11 @@ public abstract class Handler {
 	 *         In the latter case, log records are filtered purely
 	 *         based on their severity level.
 	 */
-	public Filter getFilter() {
+  public Filter getFilter()
+  {
 		return filter;
 	}
+
 
 	/**
 	 * Sets the <code>Filter</code> for controlling which
@@ -240,10 +260,13 @@ public abstract class Handler {
 	 *         <code>null</code> to filter log records purely based
 	 *         on their severity level.
 	 */
-	public void setFilter(Filter filter) throws SecurityException {
+  public void setFilter(Filter filter)
+    throws SecurityException
+  {
 		LogManager.getLogManager().checkAccess();
 		this.filter = filter;
 	}
+
 
 	/**
 	 * Returns the <code>ErrorManager</code> that currently deals
@@ -253,7 +276,8 @@ public abstract class Handler {
 	 *            the caller is not granted the permission to control
 	 *            the logging infrastructure.
 	 */
-	public ErrorManager getErrorManager() {
+  public ErrorManager getErrorManager()
+  {
 		LogManager.getLogManager().checkAccess();
 
 		/* Developers wanting to change the subsequent code should
@@ -267,7 +291,9 @@ public abstract class Handler {
 		return errorManager;
 	}
 
-	public void setErrorManager(ErrorManager manager) {
+
+  public void setErrorManager(ErrorManager manager)
+  {
 		LogManager.getLogManager().checkAccess();
 
 		/* Make sure manager is not null. */
@@ -276,12 +302,15 @@ public abstract class Handler {
 		this.errorManager = manager;
 	}
 
-	protected void reportError(String message, Exception ex, int code) {
+
+  protected void reportError(String message, Exception ex, int code)
+  {
 		if (errorManager == null)
 			errorManager = new ErrorManager();
 
 		errorManager.error(message, ex, code);
 	}
+
 
 	/**
 	 * Returns the severity level threshold for this <code>Handler</code>
@@ -292,9 +321,11 @@ public abstract class Handler {
 	 * @return the severity level below which all log messages
 	 *         will be discarded.
 	 */
-	public Level getLevel() {
+  public Level getLevel()
+  {
 		return level;
 	}
+
 
 	/**
 	 * Sets the severity level threshold for this <code>Handler</code>.
@@ -312,13 +343,15 @@ public abstract class Handler {
 	 * @exception NullPointerException if <code>level</code> is
 	 *            <code>null</code>.
 	 */
-	public void setLevel(Level level) {
+  public void setLevel(Level level)
+  {
 		LogManager.getLogManager().checkAccess();
 
 		/* Throw NullPointerException if level is null.  */
 		level.getClass();
 		this.level = level;
 	}
+
 
 	/**
 	 * Checks whether a <code>LogRecord</code> would be logged
@@ -344,8 +377,9 @@ public abstract class Handler {
 	 * @throws NullPointerException if <code>record</code>
 	 *         is <code>null</code>.
 	 */
-	public boolean isLoggable(LogRecord record) {
-		if (record.getLevel().intValue() < level.intValue())
+  public boolean isLoggable(LogRecord record)
+  {
+    if (record.getLevel().intValue() <= level.intValue())
 			return false;
 
 		if (filter != null)
