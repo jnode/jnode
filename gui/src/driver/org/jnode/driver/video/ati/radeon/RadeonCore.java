@@ -159,7 +159,7 @@ final class RadeonCore implements RadeonConstants {
 		
 		// Get the best matching config
 		config = fbinfo.getBestConfiguration(config);
-		log.info("BestConfig:" + config);
+		log.debug("BestConfig:" + config);
 		
 		// Calculate new configuration
 		final DisplayMode mode = config.getDisplayMode();
