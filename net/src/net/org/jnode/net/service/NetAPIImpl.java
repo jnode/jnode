@@ -156,12 +156,15 @@ public class NetAPIImpl implements VMNetAPI {
             final NetworkLayer layer = (NetworkLayer)i.next();
             final ProtocolAddress[] addrs = layer.getHostByName(hostname);
             if (addrs != null) {
-                if (list != null) {
+                if (list == null) {
                     list = new ArrayList();
                 }
                 final int cnt = addrs.length;
                 for (int j = 0; j < cnt; j++) {
-                    list.add(addrs[j].toInetAddress());
+                    final ProtocolAddress pa = addrs[j];
+                    if (pa != null) {
+                        list.add(pa.toInetAddress());
+                    }
                 }
             }
         }
