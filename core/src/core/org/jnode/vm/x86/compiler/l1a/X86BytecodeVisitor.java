@@ -190,36 +190,24 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         assertCondition(ref.isRegister(), "ref must be in a register");
         final Register refr = ref.getRegister();
         if (index.isConstant()) {
-//            Vm.getVm().getCounter("l1a:const-index").inc();
             os.writeCMP_Const(refr, arrayLengthOffset, index.getValue());
         } else {
-//            Vm.getVm().getCounter("l1a:register-index").inc();
-            //BootLog.debug("index.kind=" + index.getKind());
             os.writeCMP(refr, arrayLengthOffset, index.getRegister());
         }
         os.writeJCC(ok, X86Constants.JA);
         // Signal ArrayIndexOutOfBounds
-        os.writeINT(5);
-        os.setObjectRef(ok);
-    }
-
-    /**
-     * Emit code to validate an index of a given array
-     * 
-     * @param arrayRef
-     * @param index
-     * @deprecated
-     */
-    // TODO REFACTOR: remove this method
-    private final void checkBounds(Register arrayRef, Register index) {
-//        Vm.getVm().getCounter("l1a:old-register-index").inc();
-
-        final Label ok = new Label(curInstrLabel + "$$cbok");
-        // CMP length, index
-        os.writeCMP(arrayRef, arrayLengthOffset, index);
-        os.writeJCC(ok, X86Constants.JA);
-        // Signal ArrayIndexOutOfBounds
-        os.writeINT(5);
+        if (false) {
+        	os.writeINT(5); 
+        } else {
+        	// Call SoftByteCodes.throwArrayOutOfBounds
+        	os.writePUSH(refr);
+        	if (index.isConstant()) {
+        		os.writePUSH(index.getValue());
+        	} else {
+        		os.writePUSH(index.getRegister());
+        	}
+        	invokeJavaMethod(context.getThrowArrayOutOfBounds());
+        }
         os.setObjectRef(ok);
     }
 
@@ -2456,7 +2444,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         final Register refr = ref.getRegister();
 
         // Verify
-        checkBounds(refr, idxr);
+        checkBounds(ref, idx);
 
         // Get data
         final DoubleWordItem result = L1AHelper.requestDoubleWordRegisters(
