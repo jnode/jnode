@@ -8,6 +8,7 @@ import gnu.java.awt.EventModifier;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 
@@ -22,6 +23,7 @@ import org.jnode.driver.video.HardwareCursorAPI;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author Levente Sántha
  */
 public class MouseHandler implements PointerListener {
 
@@ -141,8 +143,9 @@ public class MouseHandler implements PointerListener {
 		Component source = tk.getTopComponentAt(x, y);
 		//log.debug("Source: " + source.getClass().getName());
 		//TODO full support for modifiers
+        Point p = source.getLocationOnScreen();
 		final MouseEvent me = new MouseEvent(source, id, System.currentTimeMillis(),
-				EventModifier.OLD_MASK | button, x, y, 1, false, button);
+				EventModifier.OLD_MASK | button, x - p.x, y - p.y, 1, button == MouseEvent.BUTTON2, button);
 		JNodeGenericPeer.eventQueue.postEvent(me);
 	}
 

@@ -3,17 +3,17 @@
  */
 package org.jnode.awt.swingpeers;
 
+import javax.swing.AbstractListModel;
+import javax.swing.JList;
+import javax.swing.ListModel;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.List;
 import java.awt.peer.ListPeer;
 
-import javax.swing.AbstractListModel;
-import javax.swing.JList;
-import javax.swing.ListModel;
-
 /**
  * AWT list peer implemented as a {@link javax.swing.JList}.
+ * @author Levente Sántha
  */
 
 class SwingListPeer extends SwingComponentPeer implements ListPeer {

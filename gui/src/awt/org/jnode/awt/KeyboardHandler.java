@@ -17,7 +17,7 @@ import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardListener;
 
 /**
- * @author Levente S?ntha
+ * @author Levente Sántha
  */
 public class KeyboardHandler implements KeyboardListener {
     private final Logger log = Logger.getLogger(KeyboardHandler.class);

@@ -3,10 +3,9 @@
  */
 package org.jnode.awt.swingpeers;
 
+import javax.swing.JComponent;
 import java.awt.Component;
 import java.awt.peer.ContainerPeer;
-
-import javax.swing.JComponent;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

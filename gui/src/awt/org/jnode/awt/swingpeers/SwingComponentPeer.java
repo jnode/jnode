@@ -3,6 +3,15 @@
  */
 package org.jnode.awt.swingpeers;
 
+import org.apache.log4j.Logger;
+import org.jnode.awt.JNodeGenericPeer;
+import org.jnode.awt.JNodeToolkit;
+import org.jnode.awt.swingpeers.event.ComponentListenerDelegate;
+import org.jnode.awt.swingpeers.event.KeyListenerDelegate;
+import org.jnode.awt.swingpeers.event.MouseListenerDelegate;
+import org.jnode.awt.swingpeers.event.MouseMotionListenerDelegate;
+
+import javax.swing.JComponent;
 import java.awt.AWTEvent;
 import java.awt.BufferCapabilities;
 import java.awt.Color;
@@ -10,38 +19,27 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.EventQueue;
-import java.awt.Rectangle;
-import java.awt.Frame;
-import java.awt.event.PaintEvent;
 import java.awt.event.ComponentEvent;
+import java.awt.event.PaintEvent;
 import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.VolatileImage;
 import java.awt.peer.ComponentPeer;
 
-import org.apache.log4j.Logger;
-import org.jnode.awt.JNodeToolkit;
-import org.jnode.awt.JNodeGenericPeer;
-import org.jnode.awt.swingpeers.event.MouseListenerDelegate;
-import org.jnode.awt.swingpeers.event.MouseMotionListenerDelegate;
-import org.jnode.awt.swingpeers.event.KeyListenerDelegate;
-import org.jnode.awt.swingpeers.event.ComponentListenerDelegate;
-
-import javax.swing.JComponent;
-
 /**
  * Base class for virtual component peers. Satisfies the requirements for AWT
  * peers without actually displaying anything (hence, they are virtual) or by
  * delegating to the parent component, under the assumption is that somewhere up
  * in the hierarchy there is a parent who can produce a display.
+ * @author Levente Sántha
  */
 
 class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
@@ -138,10 +136,9 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
     }
 
     public Graphics getGraphics() {
-    	log.debug("getGraphics");
+    	//log.debug("getGraphics");
         final Component parent = ((Component)component).getParent();
         if (parent != null) {
-            //System.out.println("creating graphics");
         	final int x = jComponent.getX();
         	final int y = jComponent.getY();
         	final int width = jComponent.getWidth();

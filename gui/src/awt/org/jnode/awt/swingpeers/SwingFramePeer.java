@@ -3,50 +3,31 @@
  */
 package org.jnode.awt.swingpeers;
 
+import org.apache.log4j.Logger;
+
+import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
+import javax.swing.JMenuBar;
+import javax.swing.JRootPane;
 import java.awt.AWTEvent;
-import java.awt.AWTException;
-import java.awt.BufferCapabilities;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Frame;
 import java.awt.Graphics;
-import java.awt.GraphicsConfiguration;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.MenuBar;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.BufferCapabilities.FlipContents;
-import java.awt.event.PaintEvent;
-import java.awt.image.ColorModel;
-import java.awt.image.ImageObserver;
-import java.awt.image.ImageProducer;
-import java.awt.image.VolatileImage;
 import java.awt.peer.FramePeer;
 import java.beans.PropertyVetoException;
 
-import javax.swing.JComponent;
-import javax.swing.JDesktopPane;
-import javax.swing.JInternalFrame;
-import javax.swing.JRootPane;
-
-import org.apache.log4j.Logger;
-import org.jnode.awt.swingpeers.event.MouseListenerDelegate;
-import org.jnode.awt.swingpeers.event.MouseMotionListenerDelegate;
-import org.jnode.awt.swingpeers.event.KeyListenerDelegate;
-import org.jnode.awt.swingpeers.event.ComponentListenerDelegate;
-import org.jnode.awt.JNodeToolkit;
-
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
+ * @author Levente Sántha
  */
-final class SwingFramePeer extends SwingComponentPeer implements FramePeer, ISwingContainerPeer {
+final class SwingFramePeer extends SwingWindowPeer implements FramePeer, ISwingContainerPeer {
 
 	private final Logger log = Logger.getLogger(getClass());
 	private final SwingFrame frame;
@@ -99,7 +80,8 @@ final class SwingFramePeer extends SwingComponentPeer implements FramePeer, ISwi
 	 * @see java.awt.peer.FramePeer#setMenuBar(java.awt.MenuBar)
 	 */
 	public void setMenuBar(MenuBar mb) {
-		frame.setMenuBar(new SwingMenuBarPeer(mb));
+        SwingMenuBarPeer mb_peer = new SwingMenuBarPeer((SwingToolkit) toolkit, mb);
+		frame.setJMenuBar((JMenuBar) mb_peer.jComponent);
 	}
 
 	/**
@@ -131,44 +113,6 @@ final class SwingFramePeer extends SwingComponentPeer implements FramePeer, ISwi
 	}
 
 	/**
-	 * @see java.awt.peer.WindowPeer#toBack()
-	 */
-	public void toBack() {
-		frame.toBack();
-	}
-
-	/**
-	 * @see java.awt.peer.WindowPeer#toFront()
-	 */
-	public void toFront() {
-		frame.toFront();
-	}
-
-	/**
-	 * @see java.awt.peer.ContainerPeer#beginLayout()
-	 */
-	public void beginLayout() {
-	}
-
-	/**
-	 * @see java.awt.peer.ContainerPeer#beginValidate()
-	 */
-	public void beginValidate() {
-	}
-
-	/**
-	 * @see java.awt.peer.ContainerPeer#endLayout()
-	 */
-	public void endLayout() {
-	}
-
-	/**
-	 * @see java.awt.peer.ContainerPeer#endValidate()
-	 */
-	public void endValidate() {
-	}
-
-	/**
 	 * @see java.awt.peer.ContainerPeer#getInsets()
 	 */
 	public Insets getInsets() {
@@ -197,20 +141,6 @@ final class SwingFramePeer extends SwingComponentPeer implements FramePeer, ISwi
     public Point getLocationOnScreen() {
         return frame.getLocation();
     }
-
-	/**
-	 * @see java.awt.peer.ContainerPeer#insets()
-	 */
-	public Insets insets() {
-		return getInsets();
-	}
-
-	/**
-	 * @see java.awt.peer.ContainerPeer#isPaintPending()
-	 */
-	public boolean isPaintPending() {
-		return false;
-	}
 
 	/**
 	 * @see java.awt.peer.ComponentPeer#dispose()

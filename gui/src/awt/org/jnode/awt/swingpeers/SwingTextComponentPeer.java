@@ -3,11 +3,10 @@
  */
 package org.jnode.awt.swingpeers;
 
+import javax.swing.text.JTextComponent;
 import java.awt.Rectangle;
 import java.awt.TextComponent;
 import java.awt.peer.TextComponentPeer;
-
-import javax.swing.text.JTextComponent;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
