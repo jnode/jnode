@@ -91,6 +91,11 @@ public interface Console extends FocusListener {
 	 * @param l
 	 */
 	public void removeKeyboardListener(KeyboardListener l);
+	
+	/**
+	 * returns true if the console is userConsole
+	 */
+	public boolean isUserConsole(); 
 
 	/**
 	 * Close this console
@@ -117,4 +122,12 @@ public interface Console extends FocusListener {
 	 * @return PrintStream
 	 */
 	public PrintStream getOut();
+	
+	/**
+	 * returns the registered name for this console
+	 * 
+	 * @return registered name for this console
+	 */
+	public void setAcceleratorKeyCode(int keyCode); 
+	public int getAcceleratorKeyCode(); 
 }

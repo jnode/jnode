@@ -3,6 +3,8 @@
  */
 package org.jnode.log4j.config;
 
+import java.awt.event.KeyEvent;
+
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.ConsoleAppender;
@@ -11,7 +13,9 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.jnode.driver.console.Console;
+import org.jnode.driver.console.ConsoleException;
 import org.jnode.driver.console.ConsoleManager;
+import org.jnode.log4j.Log4jPlugin;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
@@ -42,13 +46,16 @@ public class Log4jConfigurePlugin extends Plugin {
 		root.addAppender(infoApp);
 		try {
 			final ConsoleManager conMgr = (ConsoleManager)InitialNaming.lookup(ConsoleManager.NAME);
-			final Console console2 = conMgr.getConsole(1);
-			final VirtualConsoleAppender debugApp = new VirtualConsoleAppender(console2, new PatternLayout(LAYOUT));
+			final Console console = conMgr.createConsole(Log4jPlugin.Log4jConsoleName);
+			console.setAcceleratorKeyCode(KeyEvent.VK_F7);
+			final VirtualConsoleAppender debugApp = new VirtualConsoleAppender(console, new PatternLayout(LAYOUT));
 			debugApp.setThreshold(Level.DEBUG);
 			root.addAppender(debugApp);
-			BootLog.setDebugOut(console2.getOut());
+			BootLog.setDebugOut(console.getOut());
 		} catch (NameNotFoundException ex) {
 			root.error("ConsoleManager not found", ex);
+		} catch (ConsoleException e) {
+			root.error("Log4J console can not be created", e);
 		}
 	}
 
