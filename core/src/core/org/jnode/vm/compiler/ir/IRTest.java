@@ -108,7 +108,9 @@ public class IRTest {
 		//VmByteCode code = loadByteCode(className, "discriminant");
 		//VmByteCode code = loadByteCode(className, "arithOptIntx");
 		//VmByteCode code = loadByteCode(className, "simpleWhile");
-		VmByteCode code = loadByteCode(className, "terniary2");
+		//VmByteCode code = loadByteCode(className, "terniary2");
+		VmByteCode code = loadByteCode(className, "trivial");
+		//VmByteCode code = loadByteCode(className, "appel");
 
         IRControlFlowGraph cfg = new IRControlFlowGraph(code);
 		X86CodeGenerator x86cg = new X86CodeGenerator(os, code.getLength());
