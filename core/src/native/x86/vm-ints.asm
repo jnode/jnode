@@ -11,7 +11,7 @@
 	extern VmProcessor_reschedule
 	global currentTimeMillisStaticsIdx
 	
-currentTimeMillisStaticsIdx	DA -1
+currentTimeMillisStaticsIdx	DA 0
 	
 ; -----------------------------------------------
 ; Low level Yield Point Handler
