@@ -9,16 +9,18 @@ package org.jnode.vm.classmgr;
  * 
  * @author epr
  */
-public abstract class VmConstMemberRef extends VmConstObject {
+abstract class VmConstMemberRef extends VmConstObject {
 	
-	private int classIndex;
-	private int nameTypeIndex;
-	private int cachedHashCode;
+	private final int cachedHashCode;
+	private final VmConstClass constClass;
+	private final String name;
+	private final String descriptor;
 	
-	public VmConstMemberRef(VmCP cp, int classIndex, int nameTypeIndex) {
-		super(cp);
-		this.classIndex = classIndex;
-		this.nameTypeIndex = nameTypeIndex;
+	public VmConstMemberRef(VmConstClass constClass, String name, String descriptor) {
+		this.constClass = constClass;
+		this.name = name;
+		this.descriptor = descriptor;
+		this.cachedHashCode = VmMember.calcHashCode(name, descriptor);
 	}
 	
 	/**
@@ -26,15 +28,7 @@ public abstract class VmConstMemberRef extends VmConstObject {
 	 * @return VmConstClass
 	 */
 	public final VmConstClass getConstClass() {
-		return cp.getConstClass(classIndex);
-	}
-	
-	/**
-	 * Gets the ConstNameType this member constants refers to.
-	 * @return VmConstNameAndType
-	 */
-	private final VmConstNameAndType getNameAndType() {
-		return cp.getConstNameAndType(nameTypeIndex);
+		return constClass;
 	}
 	
 	/**
@@ -50,7 +44,7 @@ public abstract class VmConstMemberRef extends VmConstObject {
 	 * @return String
 	 */
 	public final String getName() {
-		return getNameAndType().getName();
+		return name;
 	}
 	
 	/**
@@ -58,7 +52,7 @@ public abstract class VmConstMemberRef extends VmConstObject {
 	 * @return String
 	 */
 	public final String getSignature() {
-		return getNameAndType().getDescriptor();
+		return descriptor;
 	}
 	
 	/**
@@ -68,7 +62,6 @@ public abstract class VmConstMemberRef extends VmConstObject {
 	protected final void doResolve(VmClassLoader clc) {
 		getConstClass().resolve(clc);
 		doResolveMember(clc);
-		cachedHashCode = VmMember.calcHashCode(getName(), getSignature());
 	}
 
 	/**
@@ -93,9 +86,6 @@ public abstract class VmConstMemberRef extends VmConstObject {
 	 * @return int
 	 */
 	public final int getMemberHashCode() {
-		if (cachedHashCode == 0) {
-			cachedHashCode = VmMember.calcHashCode(getName(), getSignature());
-		}
 		return cachedHashCode;
 	}
 }

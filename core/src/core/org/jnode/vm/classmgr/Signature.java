@@ -228,7 +228,7 @@ public class Signature {
 							}
 						}
 						ofs++;
-						String sig = new String(signature, start, ofs - start).replace('/', '.');
+						String sig = new String(signature, start, ofs - start).intern().replace('/', '.');
 						vmClass = loader.loadClass(sig, true);
 					}
 					break;
@@ -238,7 +238,7 @@ public class Signature {
 						while (signature[ofs] != ';') {
 							ofs++;
 						}
-						String sig = new String(signature, start, ofs - start).replace('/', '.');
+						String sig = new String(signature, start, ofs - start).intern().replace('/', '.');
 						ofs++;
 						vmClass = loader.loadClass(sig, true);
 					}

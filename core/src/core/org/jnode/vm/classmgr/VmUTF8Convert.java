@@ -111,7 +111,7 @@ public abstract class VmUTF8Convert {
                         + i);
             }
         }
-        return new String(result, 0, result_index);
+        return new String(result, 0, result_index).intern();
     }
 
     /**

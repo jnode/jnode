@@ -19,8 +19,8 @@ public class VmConstMethodRef extends VmConstMemberRef {
 	 * @param classIndex
 	 * @param nameTypeIndex
 	 */
-	public VmConstMethodRef(VmCP cp, int classIndex, int nameTypeIndex) {
-		super(cp, classIndex, nameTypeIndex);
+	public VmConstMethodRef(VmConstClass constClass, String name, String descriptor) {
+		super(constClass, name, descriptor);
 	}
 
 	/**
