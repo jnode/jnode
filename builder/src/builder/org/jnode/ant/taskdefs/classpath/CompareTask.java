@@ -3,9 +3,11 @@
  */
 package org.jnode.ant.taskdefs.classpath;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -41,12 +43,12 @@ public class CompareTask extends Task {
     
     private static final int NO_CHANGE = 0x01;
     private static final int NEEDS_MERGE = 0x02;
-    private static final int VM_SPECIFIC = 0x03;
-    private static final int CLASSPATH_BUGFIX = 0x04;
 
     private static final int FLAGS_MASK = 0xFF00;
-    private static final int FLAGS_NATIVE = 0x0100;
-    
+    private static final int FLAG_NATIVE = 0x0100;
+    private static final int FLAG_VM_SPECIFIC = 0x0200;
+    private static final int FLAG_CLASSPATH_BUGFIX = 0x0400;
+    private static final int FLAG_JNODE = 0x0800;    
     
     public void execute() {
         if (destDir == null) {
@@ -69,6 +71,8 @@ public class CompareTask extends Task {
             int needsMerge = 0;
             int diffVmSpecific = 0;
             int diffClasspathBugfix = 0;
+            int diffNative = 0;
+            int diffJNode = 0;
             
             for (Iterator i = allFiles.iterator(); i.hasNext(); ) {
                 final String name = (String)i.next();
@@ -76,10 +80,10 @@ public class CompareTask extends Task {
                 final JavaFile vmFile = (JavaFile)vmFiles.get(name);
                 
                 if (!vmFiles.containsKey(name)) {
-                    reportMissing(out, cpFile.getClassName(), "classpath");
+                    reportMissing(out, cpFile.getClassName(), "classpath", getFlags(cpFile));
                     missingInCp++;
                 } else if (!classpathFiles.containsKey(name)) {
-                    reportMissing(out, vmFile.getClassName(), "vm");
+                    reportMissing(out, vmFile.getClassName(), "vm", 0);
                     missingInVm++;
                 } else {                    
                     final String diffFileName = vmFile.getClassName() + ".diff";
@@ -90,16 +94,20 @@ public class CompareTask extends Task {
                         reportNeedsMerge(out, vmFile.getClassName(), diffFileName, rc & FLAGS_MASK);
                         needsMerge++;
                         break;
-                    case VM_SPECIFIC:
-                        reportDiffVmSpecific(out, vmFile.getClassName(), diffFileName, rc & FLAGS_MASK);
-                        diffVmSpecific++;
-                        break;
-                    case CLASSPATH_BUGFIX:
-                        reportDiffClasspathBugfix(out, vmFile.getClassName(), diffFileName, rc & FLAGS_MASK);
-                        diffClasspathBugfix++;
-                        break;
                     default:
                         throw new RuntimeException("Invalid rc " + rc);
+                    }
+                    if ((rc & FLAG_VM_SPECIFIC) != 0) {
+                        diffVmSpecific++;
+                    }
+                    if ((rc & FLAG_CLASSPATH_BUGFIX) != 0) {
+                        diffClasspathBugfix++;
+                    }
+                    if ((rc & FLAG_NATIVE) != 0) {
+                        diffNative++;
+                    }
+                    if ((rc & FLAG_JNODE) != 0) {
+                        diffJNode++;
                     }
                     // Let's compare them
                 }
@@ -138,6 +146,14 @@ public class CompareTask extends Task {
             if (diffClasspathBugfix > 0) {
             	out.println("Found " + diffClasspathBugfix + " local classpath bugfixes<br/>");
             	log("Found " + diffClasspathBugfix + " local classpath bugfixes");
+			}            
+            if (diffNative > 0) {
+            	out.println("Found " + diffNative + " changes with native in it<br/>");
+            	log("Found " + diffNative + " changes with native in it");
+			}            
+            if (diffJNode > 0) {
+            	out.println("Found " + diffJNode + " changes with JNode in it<br/>");
+            	log("Found " + diffJNode + " changes with JNode in it");
 			}            
             
             reportFooter(out);
@@ -186,13 +202,7 @@ public class CompareTask extends Task {
                 packageDiffs.put(pkg, pkgDiff);
                 
                 final int flags = getFlags(diffStr);
-                if (diffStr.indexOf(vmSpecificTag) >= 0) {
-                    return flags | VM_SPECIFIC;
-                } else if (diffStr.indexOf(classpathBugfixTag) >= 0) {
-                    return flags | CLASSPATH_BUGFIX;
-                } else {
-                    return flags | NEEDS_MERGE;
-                }
+                return flags | NEEDS_MERGE;
             } finally {
                 os.close();
             }
@@ -232,36 +242,19 @@ public class CompareTask extends Task {
         out.println("</tr>");
     }
     
-    protected void reportMissing(PrintWriter out, String fname, String existsIn) {
+    protected void reportMissing(PrintWriter out, String fname, String existsIn, int flags) {
         out.println("<tr class='" + existsIn + "-only'>");
         out.println("<td>" + fname + "</td>");
         out.println("<td>Exists only in " + existsIn);
+        reportFlags(out, flags);
         out.println("</td>");
         out.println("</tr>");
     }
     
     protected void reportNeedsMerge(PrintWriter out, String fname, String diffFileName, int flags) {
-        out.println("<tr class='needsmerge'>");
+        out.println("<tr class='" + flagsToStyleClass(flags) + "'>");
         out.println("<td>" + fname + "</td>");
         out.println("<td><a href='" + diffFileName + "'>Diff</a>");
-        reportFlags(out, flags);
-        out.println("</td>");
-        out.println("</tr>");
-    }
-    
-    protected void reportDiffVmSpecific(PrintWriter out, String fname, String diffFileName, int flags) {
-        out.println("<tr class='vm-specific'>");
-        out.println("<td>" + fname + "</td>");
-        out.println("<td>VM specific change. (<a href='" + diffFileName + "'>diff</a>)");
-        reportFlags(out, flags);
-        out.println("</td>");
-        out.println("</tr>");
-    }
-    
-    protected void reportDiffClasspathBugfix(PrintWriter out, String fname, String diffFileName, int flags) {
-        out.println("<tr class='classpath-bugfix'>");
-        out.println("<td>" + fname + "</td>");
-        out.println("<td>Local classpath bugfix. (<a href='" + diffFileName + "'>diff</a>)");
         reportFlags(out, flags);
         out.println("</td>");
         out.println("</tr>");
@@ -280,18 +273,78 @@ public class CompareTask extends Task {
         out.println("</body></html>");
     }
     
+    protected String flagsToStyleClass(int flags) {
+        if ((flags & FLAG_VM_SPECIFIC) != 0) {
+            return "vm-specific";
+        } else if ((flags & FLAG_CLASSPATH_BUGFIX) != 0) {
+            return "classpath-bugfix";
+        } else {
+            return "needsmerge";
+        }
+    }
+
     protected void reportFlags(PrintWriter out, int flags) {
-        if ((flags & FLAGS_NATIVE) != 0) {
-            out.println(" *NATIVE*");
+        final StringBuffer b = new StringBuffer();
+        if ((flags & FLAG_VM_SPECIFIC) != 0) {
+            b.append("vm-specific");
+        }
+        if ((flags & FLAG_CLASSPATH_BUGFIX) != 0) {
+            if (b.length() > 0) {
+                b.append(", ");
+            }
+            b.append("cp-bugfix");
+        }
+        if ((flags & FLAG_NATIVE) != 0) {
+            if (b.length() > 0) {
+                b.append(", ");
+            }
+            b.append("native");
+        }
+        if ((flags & FLAG_JNODE) != 0) {
+            if (b.length() > 0) {
+                b.append(", ");
+            }
+            b.append("jnode");
+        }
+        
+        if (b.length() > 0) {
+            out.println(" <i>(");
+            out.println(b.toString());
+            out.println(")</i>");
         }
     }
 
     protected int getFlags(String code) {
         int flags = 0;
         if (code.indexOf("native") >= 0) {
-            flags |= FLAGS_NATIVE;
+            flags |= FLAG_NATIVE;
+        }
+        if (code.toLowerCase().indexOf("jnode") >= 0) {
+            flags |= FLAG_JNODE;
+        }
+        if (code.indexOf(vmSpecificTag) >= 0) {
+            flags |= FLAG_VM_SPECIFIC;
+        }
+        if (code.indexOf(classpathBugfixTag) >= 0) {
+            flags |= FLAG_CLASSPATH_BUGFIX;
         }
         return flags;
+    }
+    
+    protected int getFlags(JavaFile file) throws IOException {
+        final FileReader fr = new FileReader(file.getFile());
+        try {
+            final BufferedReader in = new BufferedReader(fr);
+            final StringBuffer b = new StringBuffer();
+            String line;
+            while ((line = in.readLine()) != null) {
+                b.append(line);
+                b.append('\n');
+            }
+            return getFlags(b.toString());
+        } finally {
+            fr.close();
+        }
     }
     
     public BaseDirs createVmsources() {
