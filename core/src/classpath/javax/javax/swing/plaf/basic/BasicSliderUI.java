@@ -390,7 +390,7 @@ public class BasicSliderUI extends SliderUI
 	value = findClosestTick(value);
 
       // If the thumb is hit, then we don't need to set the timers to move it. 
-      if (!thumbRect.contains(e.getPoint()))
+      if (! thumbRect.contains(e.getPoint()))
         {
 	  // The mouse has hit some other part of the slider.
 	  // The value moves no matter where in the slider you hit.

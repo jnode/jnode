@@ -161,8 +161,18 @@ public abstract class View implements SwingConstants
 
   public View createFragment(int p0, int p1)
   {
-    // The default implementation doesnt support fragmentation.
+    // The default implementation doesn't support fragmentation.
     return this;
     }
+
+  public int getStartOffset()
+  {
+    return elt.getStartOffset();
+  }
+
+  public int getEndOffset()
+  {
+    return elt.getEndOffset();
+  }
 }
 

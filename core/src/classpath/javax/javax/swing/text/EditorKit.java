@@ -77,7 +77,7 @@ public abstract class EditorKit
 
   public void install(JEditorPane c)
   {
-}
+  }
 
   public abstract Caret createCaret();
   public abstract Document createDefaultDocument();
