@@ -28,7 +28,7 @@ import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 /**
  * @author epr
@@ -219,7 +219,7 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
 		issueCommand(cmdSetRxFilter, 0x01 + 0x04, 0);
 		//issueCommand(cmdSetRxFilter, 0x1F, 0);
 		issueCommand(cmdRxEnable, 0, 0);
-		setReg32(regUpListPtr_l, Address.as32bit(rxRing.getFirstUPDAddress()));
+		setReg32(regUpListPtr_l, VmAddress.as32bit(rxRing.getFirstUPDAddress()));
 
 		/**
 		 ** set Indication and Interrupt flags , acknowledge any IRQ's
@@ -282,7 +282,7 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
 		issueCommand(cmdStallCtl, 2, 1);
 		
 		// Set the address of the txBuffer
-		setReg32(regDnListPtr_l, Address.as32bit(txBuffer.getFirstDPDAddress()));
+		setReg32(regDnListPtr_l, VmAddress.as32bit(txBuffer.getFirstDPDAddress()));
 
 		// UnStall the download engine
 		issueCommand(cmdStallCtl, 3, 1);

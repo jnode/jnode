@@ -52,21 +52,21 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
     /**
      * @see org.jnode.vm.memmgr.HeapHelper#addressToLong(org.jnode.vm.Address)
      */
-    public final long addressToLong(Address a) {
+    public final long addressToLong(VmAddress a) {
         return Unsafe.addressToLong(a);
     }
 
     /**
      * @see org.jnode.vm.memmgr.HeapHelper#allocateBlock(int)
      */
-    public final Address allocateBlock(int size) {
+    public final VmAddress allocateBlock(int size) {
         return MemoryBlockManager.allocateBlock(size);
     }
 
     /**
      * @see org.jnode.vm.memmgr.HeapHelper#clear(org.jnode.vm.Address, int)
      */
-    public final void clear(Address dst, int size) {
+    public final void clear(VmAddress dst, int size) {
         Unsafe.clear(dst, size);
     }
 
@@ -74,21 +74,21 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
      * @see org.jnode.vm.memmgr.HeapHelper#copy(org.jnode.vm.Address,
      *      org.jnode.vm.Address, int)
      */
-    public final void copy(Address src, Address dst, int size) {
+    public final void copy(VmAddress src, VmAddress dst, int size) {
         Unsafe.copy(src, dst, size);
     }
 
     /**
      * @see org.jnode.vm.memmgr.HeapHelper#getBootHeapEnd()
      */
-    public final Address getBootHeapEnd() {
+    public final VmAddress getBootHeapEnd() {
         return Unsafe.getBootHeapEnd();
     }
 
     /**
      * @see org.jnode.vm.memmgr.HeapHelper#getBootHeapStart()
      */
-    public final Address getBootHeapStart() {
+    public final VmAddress getBootHeapStart() {
         return Unsafe.getBootHeapStart();
     }
 
@@ -116,7 +116,7 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
     /**
      * @see org.jnode.vm.memmgr.HeapHelper#getAddress(Object, int)
      */
-    public final Address getAddress(Object src, int offset) {
+    public final VmAddress getAddress(Object src, int offset) {
         return Unsafe.getAddress(src, offset);
     }
 
@@ -156,7 +156,7 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
      * @param dst
      */
     public final void setFinalized(Object dst) {
-        final Address addr = Unsafe.add(Unsafe.addressOf(dst), flagsOffset);
+        final VmAddress addr = Unsafe.add(Unsafe.addressOf(dst), flagsOffset);
         int oldValue;
         int newValue;
         do {
@@ -227,7 +227,7 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
      */
     public boolean atomicChangeObjectColor(Object dst, int oldColor,
             int newColor) {
-        final Address addr = Unsafe.add(Unsafe.addressOf(dst), flagsOffset);
+        final VmAddress addr = Unsafe.add(Unsafe.addressOf(dst), flagsOffset);
         int oldValue;
         int newValue;
         do {
@@ -241,14 +241,14 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
     /**
      * @see org.jnode.assembler.ObjectResolver#add(org.jnode.vm.Address, int)
      */
-    public final Address add(Address address, int offset) {
+    public final VmAddress add(VmAddress address, int offset) {
         return Unsafe.add(address, offset);
     }
 
     /**
      * @see org.jnode.assembler.ObjectResolver#addressOf(java.lang.Object)
      */
-    public final Address addressOf(Object object) {
+    public final VmAddress addressOf(Object object) {
         return Unsafe.addressOf(object);
     }
 
@@ -269,14 +269,14 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
     /**
      * @see org.jnode.assembler.ObjectResolver#addressOfArrayData(java.lang.Object)
      */
-    public final Address addressOfArrayData(Object array) {
-        return Address.addressOfArrayData(array);
+    public final VmAddress addressOfArrayData(Object array) {
+        return VmAddress.addressOfArrayData(array);
     }
 
     /**
      * @see org.jnode.assembler.ObjectResolver#objectAt(org.jnode.vm.Address)
      */
-    public final Object objectAt(Address ptr) {
+    public final Object objectAt(VmAddress ptr) {
         return Unsafe.objectAt(ptr);
     }
 

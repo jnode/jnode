@@ -46,16 +46,16 @@ public final class VmStackFrame extends VmSystemObject {
 	/** A magic value used to detect stack errors */
 	private final int sfMagic;
 	/** A reference to the return address */
-	private final Address sfReturnAddress;
+	private final VmAddress sfReturnAddress;
 	/** A reference to instruction pointer of this frame */
-	private final Address sfInstructionPointer;
+	private final VmAddress sfInstructionPointer;
 	
 	/**
 	 * Initialize this instance.
 	 * @param src
 	 * @param reader
 	 */
-	VmStackFrame(Address src, VmStackReader reader, Address ip) {
+	VmStackFrame(VmAddress src, VmStackReader reader, VmAddress ip) {
 		this.sfMethod = reader.getMethod(src);
 		this.sfPc = reader.getPC(src);
 		this.sfMagic = reader.getMagic(src);
@@ -95,7 +95,7 @@ public final class VmStackFrame extends VmSystemObject {
 	/**
 	 * @return Returns the returnAddress.
 	 */
-	public final Address getReturnAddress() {
+	public final VmAddress getReturnAddress() {
 		return this.sfReturnAddress;
 	}
 	

@@ -26,7 +26,7 @@ import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -79,8 +79,8 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 
 			log.debug("Found NVidia, FB at 0x" + NumberUtils.hex(fbBase) + "s0x" + NumberUtils.hex(fbSize) + ", MMIO at 0x" + NumberUtils.hex(ioBase));
 
-			this.mmio = rm.claimMemoryResource(device, Address.valueOf(ioBase), ioSize, ResourceManager.MEMMODE_NORMAL);
-			this.videoRam = rm.claimMemoryResource(device, Address.valueOf(fbBase), fbSize, ResourceManager.MEMMODE_NORMAL);
+			this.mmio = rm.claimMemoryResource(device, VmAddress.valueOf(ioBase), ioSize, ResourceManager.MEMMODE_NORMAL);
+			this.videoRam = rm.claimMemoryResource(device, VmAddress.valueOf(fbBase), fbSize, ResourceManager.MEMMODE_NORMAL);
 			this.vgaIO = new NVidiaVgaIO(mmio, videoRam);
 
 		} catch (NameNotFoundException ex) {

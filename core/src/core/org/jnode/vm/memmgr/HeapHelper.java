@@ -4,7 +4,7 @@
 package org.jnode.vm.memmgr;
 
 import org.jnode.assembler.ObjectResolver;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.Monitor;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmThread;
@@ -26,7 +26,7 @@ public abstract class HeapHelper extends ObjectResolver {
 
 	public abstract Object getObject(Object src, int offset);
 
-	public abstract Address getAddress(Object src, int offset);
+	public abstract VmAddress getAddress(Object src, int offset);
 
 	/**
 	 * Gets the color of the given object.
@@ -76,19 +76,19 @@ public abstract class HeapHelper extends ObjectResolver {
 	 */
 	public abstract boolean atomicChangeObjectColor(Object dst, int oldColor, int newColor);
 
-	public abstract void copy(Address src, Address dst, int size);
+	public abstract void copy(VmAddress src, VmAddress dst, int size);
 
-	public abstract void clear(Address dst, int size);
+	public abstract void clear(VmAddress dst, int size);
 
-	public abstract long addressToLong(Address a);
+	public abstract long addressToLong(VmAddress a);
 
 	public abstract Object getStack(VmThread thread);
 
-	public abstract Address allocateBlock(int size);
+	public abstract VmAddress allocateBlock(int size);
 
-	public abstract Address getBootHeapStart();
+	public abstract VmAddress getBootHeapStart();
 
-	public abstract Address getBootHeapEnd();
+	public abstract VmAddress getBootHeapEnd();
 
 	public abstract void invokeFinalizer(VmMethod finalizer, Object object);
 	

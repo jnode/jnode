@@ -10,7 +10,7 @@ import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeUtils;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.CpuID;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
@@ -173,7 +173,7 @@ public final class VmX86Processor extends VmProcessor {
     private final void setupStructures() {
         // Clone GDT
         this.gdt = new GDT();
-        gdt.setBase(GDT.PROCESSOR_ENTRY, Address.valueOf(this));
+        gdt.setBase(GDT.PROCESSOR_ENTRY, VmAddress.valueOf(this));
         
         // Clone TSS
         this.tss = new TSS();

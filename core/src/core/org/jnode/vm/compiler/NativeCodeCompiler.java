@@ -11,7 +11,7 @@ import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.assembler.x86.TextX86Stream;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.x86.X86CpuID;
@@ -55,9 +55,9 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
         }
         int end = os.getLength();
 
-        final Address nativeCode = (Address) cm.getCodeStart().getObject();
+        final VmAddress nativeCode = (VmAddress) cm.getCodeStart().getObject();
         final VmCompiledExceptionHandler[] eTable;
-        final Address defExHandler;
+        final VmAddress defExHandler;
         final VmByteCode bc;
         final VmAddressMap aTable = cm.getAddressTable();
 
@@ -65,7 +65,7 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
             final NativeStream.ObjectRef defExHRef = cm
                     .getDefExceptionHandler();
             if (defExHRef != null) {
-                defExHandler = (Address) defExHRef.getObject();
+                defExHandler = (VmAddress) defExHRef.getObject();
             } else {
                 defExHandler = null;
             }
@@ -77,11 +77,11 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
 
                     final VmConstClass catchType = bc.getExceptionHandler(i)
                             .getCatchType();
-                    final Address startPtr = (Address) ceh[ i].getStartPc()
+                    final VmAddress startPtr = (VmAddress) ceh[ i].getStartPc()
                             .getObject();
-                    final Address endPtr = (Address) ceh[ i].getEndPc()
+                    final VmAddress endPtr = (VmAddress) ceh[ i].getEndPc()
                             .getObject();
-                    final Address handler = (Address) ceh[ i].getHandler()
+                    final VmAddress handler = (VmAddress) ceh[ i].getHandler()
                             .getObject();
                     eTable[ i] = new VmCompiledExceptionHandler(catchType,
                             startPtr, endPtr, handler);
@@ -135,11 +135,11 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
             final int size = cm.getCodeEnd().getOffset() - startOffset;
             final byte[] code = new byte[ size];
             System.arraycopy(os.getBytes(), startOffset, code, 0, size);
-            final Address codePtr = resolver.addressOfArrayData(code);
+            final VmAddress codePtr = resolver.addressOfArrayData(code);
 
             final NativeStream.ObjectRef defExHRef = cm
                     .getDefExceptionHandler();
-            final Address defExHandler;
+            final VmAddress defExHandler;
             if (defExHRef != null) {
                 defExHandler = resolver.add(codePtr, cm
                         .getDefExceptionHandler().getOffset()
@@ -158,13 +158,13 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
 
                     final VmConstClass catchType = bc.getExceptionHandler(i)
                             .getCatchType();
-                    final Address startPtr = Address.add(codePtr, ceh[ i]
+                    final VmAddress startPtr = VmAddress.add(codePtr, ceh[ i]
                             .getStartPc().getOffset()
                             - startOffset);
-                    final Address endPtr = Address.add(codePtr, ceh[ i]
+                    final VmAddress endPtr = VmAddress.add(codePtr, ceh[ i]
                             .getEndPc().getOffset()
                             - startOffset);
-                    final Address handler = Address.add(codePtr, ceh[ i]
+                    final VmAddress handler = VmAddress.add(codePtr, ceh[ i]
                             .getHandler().getOffset()
                             - startOffset);
 

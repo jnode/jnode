@@ -16,7 +16,7 @@ import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 /**
  * DMA service for X86 architecture.
@@ -74,7 +74,7 @@ public class DMAPlugin extends Plugin implements DMAManager {
 		if (length > memory.getSize()) {
 			throw new IllegalArgumentException("Length > memory.size");
 		}
-		final Address addr = memory.getAddress();
+		final VmAddress addr = memory.getAddress();
 		dma.test(dmanr, addr, length);
 		
 		// Mask the channel

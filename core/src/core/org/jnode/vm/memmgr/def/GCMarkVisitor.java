@@ -3,7 +3,6 @@
  */
 package org.jnode.vm.memmgr.def;
 
-import org.jnode.vm.Address;
 import org.jnode.vm.Monitor;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.Unsafe;
@@ -15,6 +14,9 @@ import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.pragma.Uninterruptible;
+import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.ObjectReference;
+import org.vmmagic.unboxed.Offset;
 
 /**
  * @author epr
@@ -199,15 +201,22 @@ final class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
     private void markObject(Object object, VmNormalClass vmClass) {
         final int[] referenceOffsets = vmClass.getReferenceOffsets();
         final int cnt = referenceOffsets.length;
+        if (cnt == 0) {
+            return;
+        }
+
         final int size = vmClass.getObjectSize();
+        final Address objAddr = ObjectReference.fromObject(object).toAddress();
+        
         for (int i = 0; i < cnt; i++) {
-            int offset = referenceOffsets[ i];
+            final int offset = referenceOffsets[ i];
             if ((offset < 0) || (offset >= size)) {
                 Unsafe.debug("reference offset out of range!");
                 Unsafe.debug(vmClass.getName());
                 helper.die("Class internal error");
             } else {
-                final Object child = helper.getObject(object, offset);
+                final Object child = objAddr.loadObjectReference(Offset.fromIntZeroExtend(offset));
+                //final Object child = helper.getObject(object, offset);
                 if (child != null) {
                     try {
                         // TEST for a valid vmclass.

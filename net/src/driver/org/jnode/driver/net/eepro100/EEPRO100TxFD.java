@@ -6,7 +6,7 @@ package org.jnode.driver.net.eepro100;
 
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 /**
  * @author flesire
@@ -24,7 +24,7 @@ public class EEPRO100TxFD {
     /** Offset within mem of first ethernet frame */
     //private final int firstFrameOffset;
     /** 32-bit address first DPD */
-    private final Address firstDPDAddress;
+    private final VmAddress firstDPDAddress;
     /** 32-bit address of first ethernet frame */
     //private final Address firstFrameAddress;
     /** */
@@ -39,8 +39,8 @@ public class EEPRO100TxFD {
         this.data = new byte[size];
         this.mem = rm.asMemoryResource(data);
 
-        final Address memAddr = mem.getAddress();
-        this.bufferAddress = Address.as32bit(memAddr);
+        final VmAddress memAddr = mem.getAddress();
+        this.bufferAddress = VmAddress.as32bit(memAddr);
         int offset = 0;
         // Align on 16-byte boundary
         while ((bufferAddress & 15) != 0) {
@@ -49,7 +49,7 @@ public class EEPRO100TxFD {
         }
 
         this.firstDPDOffset = offset;
-        this.firstDPDAddress = Address.add(memAddr, firstDPDOffset);
+        this.firstDPDAddress = VmAddress.add(memAddr, firstDPDOffset);
         //this.firstFrameOffset = firstDPDOffset + TxFDSize;
         //this.firstFrameAddress = Address.add(memAddr, firstFrameOffset);
     }
@@ -57,7 +57,7 @@ public class EEPRO100TxFD {
     /**
      * Gets the address of the first DPD in this buffer.
      */
-    public Address getFirstDPDAddress() {
+    public VmAddress getFirstDPDAddress() {
         return firstDPDAddress;
     }
 

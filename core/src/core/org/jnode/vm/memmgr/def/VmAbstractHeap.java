@@ -3,7 +3,7 @@
  */
 package org.jnode.vm.memmgr.def;
 
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.SpinLock;
 import org.jnode.vm.classmgr.ObjectLayout;
@@ -23,9 +23,9 @@ import org.vmmagic.pragma.UninterruptiblePragma;
 public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible {
 
 	/** Start address of this heap (inclusive) */
-	protected Address start;
+	protected VmAddress start;
 	/** End address of this heap (exclusive) */
-	protected Address end;
+	protected VmAddress end;
 	/** Start address of this heap (inclusive) */
 	private long startL;
 	/** End address of this heap (exclusive) */
@@ -39,7 +39,7 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	/** Offset of the type information block field in an object header */
 	protected int tibOffset;
 	/** Start address of allocation bitmap */
-	protected Address allocationBitmapPtr;
+	protected VmAddress allocationBitmapPtr;
 	/** The next heap (linked list) */
 	private VmAbstractHeap next;
 	
@@ -70,7 +70,7 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * Gets the starting address of this heap.
 	 * @return Address
 	 */
-	public final Address getStart() {
+	public final VmAddress getStart() {
 		return start;
 	}
 	
@@ -78,7 +78,7 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * Gets the (exclusive) ending address of this heap.
 	 * @return Address
 	 */
-	public final Address getEnd() {
+	public final VmAddress getEnd() {
 		return end;
 	}
 	
@@ -95,7 +95,7 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * @param addr
 	 * @return boolean
 	 */
-	protected boolean isObject(Address addr) {
+	protected boolean isObject(VmAddress addr) {
 		long addrL = helper.addressToLong(addr);
 		if ((addrL < startL) || (addrL >= endL)) {
 			// The object if not within this heap
@@ -115,7 +115,7 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * @param addr
 	 * @return boolean
 	 */
-	protected boolean inHeap(Address addr) {
+	protected boolean inHeap(VmAddress addr) {
 		long addrL = helper.addressToLong(addr);
 		return ((addrL >= startL) && (addrL < endL));
 	}
@@ -126,7 +126,7 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * @param on
 	 */	
 	protected void setAllocationBit(Object object, boolean on) {
-		Address addr = helper.addressOf(object);
+		VmAddress addr = helper.addressOf(object);
 		long addrL = helper.addressToLong(addr);
 		if ((addrL < startL) || (addrL >= endL)) {
 			return;
@@ -170,7 +170,7 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * @param end End address of this heap (first address after this heap)
 	 * @param slotSize
 	 */
-	protected abstract void initialize(Address start, Address end, int slotSize);
+	protected abstract void initialize(VmAddress start, VmAddress end, int slotSize);
 	
 	/**
 	 * Allocate a new instance for the given class.

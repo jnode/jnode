@@ -15,7 +15,7 @@ import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
 import org.jnode.util.AccessControllerUtils;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 /*
  * NOTES about DMA transfers:
@@ -169,8 +169,8 @@ public class DMA implements DMAConstants {
 	 * @param address
 	 * @throws DMAException
 	 */
-	public void setAddress(int dmanr, Address address) throws DMAException {
-		final int a32 = Address.as32bit(address);
+	public void setAddress(int dmanr, VmAddress address) throws DMAException {
+		final int a32 = VmAddress.as32bit(address);
 		final int page = (a32 >> 16);
 		
 		setPage(dmanr, page);
@@ -282,7 +282,7 @@ public class DMA implements DMAConstants {
 	 * @param length
 	 * @throws IllegalArgumentException
 	 */
-	protected final void test(int dmanr, Address address, int length) 
+	protected final void test(int dmanr, VmAddress address, int length) 
 	throws IllegalArgumentException {
 		final int maxLength;
 		final int pageMask;
@@ -300,7 +300,7 @@ public class DMA implements DMAConstants {
 			throw new IllegalArgumentException("Invalid length: " + length);
 		}
 		
-		final int a32 = Address.as32bit(address);
+		final int a32 = VmAddress.as32bit(address);
 		final int pageStart = (a32 >> 16) & pageMask;
 		final int pageEnd = ((a32 + length-1) >> 16) & pageMask;
 		if (pageStart != pageEnd) {

@@ -10,7 +10,7 @@ import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 /**
  * 
@@ -103,7 +103,7 @@ public class BufferManager {
 	 * Gets the address of the initdata structure as a 32-bit int
 	 */
 	public final int getInitDataAddressAs32Bit() {
-		return Address.as32bit(mem.getAddress());
+		return VmAddress.as32bit(mem.getAddress());
 	}
 
 	public void transmit(SocketBuffer buf) {

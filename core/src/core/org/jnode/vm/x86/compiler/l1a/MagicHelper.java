@@ -247,6 +247,13 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, r));
         }
             break;
+        case mFROMOBJECT: {
+            if (Vm.VerifyAssertions) Vm._assert(isstatic);
+            final RefItem obj = vstack.popRef();
+            // Do nothing
+            vstack.push(obj);
+        }
+            break;
         case mFROMLONG: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final LongItem addr = vstack.popLong();

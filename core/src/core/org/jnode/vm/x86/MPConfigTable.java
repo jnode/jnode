@@ -11,7 +11,7 @@ import java.util.List;
 import org.jnode.system.BootLog;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceNotFreeException;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 
 /**
@@ -80,8 +80,8 @@ public class MPConfigTable {
     /**
      * Gets the physical address of the local APIC.
      */
-    public Address getLocalApicAddress() {
-        return Address.valueOf(mem.getInt(36));
+    public VmAddress getLocalApicAddress() {
+        return VmAddress.valueOf(mem.getInt(36));
     }
     
     /**
@@ -126,11 +126,11 @@ public class MPConfigTable {
     
     public void dump(PrintStream out) {
         out.println("MPConfigTable");       
-        out.println("Address        0x" + Address.toString(mem.getAddress()));
+        out.println("Address        0x" + VmAddress.toString(mem.getAddress()));
         out.println("Size           " + mem.getSize());
         out.println("Manufacturer   " + getOemID());
         out.println("Product        " + getProductID());
-        out.println("Local APIC ptr 0x" + Address.toString(getLocalApicAddress()));
+        out.println("Local APIC ptr 0x" + VmAddress.toString(getLocalApicAddress()));
         out.println("Entries");
         for (Iterator i = entries.iterator(); i.hasNext(); ) {
             final MPEntry e = (MPEntry)i.next();

@@ -3,7 +3,7 @@
  */
 package org.jnode.vm.memmgr.def;
 
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
@@ -55,7 +55,7 @@ public class VmBootHeap extends VmAbstractHeap {
      * @see VmAbstractHeap#initialize(Address, Address, int) For this class,
      *      the parameters are always null, so ignore them!
      */
-    protected void initialize(Address start, Address end, int slotSize) {
+    protected void initialize(VmAddress start, VmAddress end, int slotSize) {
         //Unsafe.debug("bootheap.initialize");
         //Unsafe.debug("start"); Unsafe.debug(Unsafe.addressToInt(start));
         //Unsafe.debug("end"); Unsafe.debug(Unsafe.addressToInt(end));
@@ -79,7 +79,7 @@ public class VmBootHeap extends VmAbstractHeap {
         // Go through the heap and mark all objects in the allocation bitmap.
         int offset = headerSize;
         while (offset < heapSize) {
-            Address ptr = Address.add(start, offset);
+            VmAddress ptr = VmAddress.add(start, offset);
             setAllocationBit(ptr, true);
             int objSize = helper.getInt(ptr, sizeOffset);
             offset += objSize + headerSize;
@@ -120,7 +120,7 @@ public class VmBootHeap extends VmAbstractHeap {
         final int size = getSize();
         int offset = headerSize;
         while (offset < size) {
-            final Address ptr = Address.add(start, offset);
+            final VmAddress ptr = VmAddress.add(start, offset);
             final Object object = helper.objectAt(ptr);
             final int flags = helper.getObjectFlags(object) & flagsMask;
             if ((flags != flagsValue) || visitor.visit(object)) {

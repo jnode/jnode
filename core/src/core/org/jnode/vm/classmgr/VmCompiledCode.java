@@ -4,7 +4,7 @@
 package org.jnode.vm.classmgr;
 
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 
 /**
@@ -13,13 +13,13 @@ import org.jnode.vm.compiler.NativeCodeCompiler;
 public final class VmCompiledCode extends AbstractCode {
 
     /** Address of native code of this method */
-    private final Address nativeCode;
+    private final VmAddress nativeCode;
 
     /** Size in bytes of native code */
     private int nativeCodeSize1;
 
     /** Address of the default exception handler (only for compiled methods) */
-    private final Address defaultExceptionHandler;
+    private final VmAddress defaultExceptionHandler;
 
     /** Compiled code of this method */
     private final Object compiledCode1;
@@ -51,9 +51,9 @@ public final class VmCompiledCode extends AbstractCode {
      * @param addressTable
      */
     public VmCompiledCode(NativeCodeCompiler compiler, VmByteCode bytecode,
-            Address nativeCode, Object compiledCode, int size,
+            VmAddress nativeCode, Object compiledCode, int size,
             VmCompiledExceptionHandler[] eTable,
-            Address defaultExceptionHandler, VmAddressMap addressTable) {
+            VmAddress defaultExceptionHandler, VmAddressMap addressTable) {
         this.compiler = compiler;
         this.magic = compiler.getMagic();
         this.nativeCode = nativeCode;
@@ -81,7 +81,7 @@ public final class VmCompiledCode extends AbstractCode {
      * 
      * @return Object
      */
-    public Address getDefaultExceptionHandler() {
+    public VmAddress getDefaultExceptionHandler() {
         return defaultExceptionHandler;
     }
 
@@ -124,8 +124,8 @@ public final class VmCompiledCode extends AbstractCode {
      * @param address
      * @return The linenumber for the given pc, or -1 is not found.
      */
-    public String getLocationInfo(VmMethod expectedMethod, Address address) {
-        final int offset = (int) Address.distance(nativeCode, address);
+    public String getLocationInfo(VmMethod expectedMethod, VmAddress address) {
+        final int offset = (int) VmAddress.distance(nativeCode, address);
         return addressTable.getLocationInfo(expectedMethod, offset);
     }
 
@@ -134,7 +134,7 @@ public final class VmCompiledCode extends AbstractCode {
      * 
      * @return The address
      */
-    final Address getNativeCode() {
+    final VmAddress getNativeCode() {
         return nativeCode;
     }
 
@@ -148,9 +148,9 @@ public final class VmCompiledCode extends AbstractCode {
      * @param codePtr
      * @return boolean
      */
-    public boolean contains(Address codePtr) {
-        final int cmpStart = Address.compare(codePtr, nativeCode);
-        final int cmpEnd = Address.compare(codePtr, Address.add(nativeCode,
+    public boolean contains(VmAddress codePtr) {
+        final int cmpStart = VmAddress.compare(codePtr, nativeCode);
+        final int cmpEnd = VmAddress.compare(codePtr, VmAddress.add(nativeCode,
                 nativeCodeSize1));
         return ((cmpStart >= 0) && (cmpEnd < 0));
     }

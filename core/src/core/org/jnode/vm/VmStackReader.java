@@ -36,7 +36,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf The stackframe to get the previous frame from.
 	 * @return The previous frame or null.
 	 */
-	final Address getPrevious(Address sf) {
+	final VmAddress getPrevious(VmAddress sf) {
 		if (isValid(sf)) {
 			return Unsafe.getAddress(sf, getPreviousOffset(sf));
 		} else {
@@ -49,7 +49,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf Stackframe pointer
 	 * @return The method
 	 */
-	final VmMethod getMethod(Address sf) {
+	final VmMethod getMethod(VmAddress sf) {
 		final Object obj = Unsafe.getObject(sf, getMethodOffset(sf));
 		if (obj instanceof VmMethod) {
 			return (VmMethod)obj;
@@ -68,7 +68,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf Stackframe pointer
 	 * @return the pc
 	 */
-	final int getPC(Address sf) {
+	final int getPC(VmAddress sf) {
 		return Unsafe.getInt(sf, getPCOffset(sf));
 	}
 
@@ -77,7 +77,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf Stackframe pointer
 	 * @param pc
 	 */
-	final void setPC(Address sf, int pc) {
+	final void setPC(VmAddress sf, int pc) {
 		Unsafe.setInt(sf, getPCOffset(sf), pc);
 	}
 
@@ -86,7 +86,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf Stackframe pointer
 	 * @return The magic
 	 */
-	final int getMagic(Address sf) {
+	final int getMagic(VmAddress sf) {
 		return Unsafe.getInt(sf, getMagicOffset(sf));
 	}
 
@@ -95,7 +95,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf Stackframe pointer
 	 * @return The address
 	 */
-	final Address getReturnAddress(Address sf) {
+	final VmAddress getReturnAddress(VmAddress sf) {
 		return Unsafe.getAddress(sf, getReturnAddressOffset(sf));
 	}
 
@@ -104,7 +104,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf
 	 * @return boolean
 	 */
-	final boolean isValid(Address sf) {
+	final boolean isValid(VmAddress sf) {
 		if (sf == null) {
 			return false;
 		}
@@ -123,7 +123,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf
 	 * @return boolean
 	 */
-	final boolean isStackBottom(Address sf) {
+	final boolean isStackBottom(VmAddress sf) {
 		if (sf == null) {
 			return true;
 		}
@@ -139,10 +139,10 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param limit Maximum length of returned array.
 	 * @return VmStackFrame[]
 	 */
-	final VmStackFrame[] getVmStackTrace(Address argFrame, Address ip, int limit) {
+	final VmStackFrame[] getVmStackTrace(VmAddress argFrame, VmAddress ip, int limit) {
 
-		final Address frame = argFrame;
-		Address f = frame;
+		final VmAddress frame = argFrame;
+		VmAddress f = frame;
 		int count = 0;
 		while (isValid(f) && (count < limit)) {
 			count++;
@@ -162,7 +162,7 @@ public abstract class VmStackReader extends VmSystemObject {
 			stack[i] = new VmStackFrame(f, this, ip);
 			// Subtract 1, because the return address is directly after
 			// the location where the previous frame was executing.
-			ip = Address.add(stack[i].getReturnAddress(), -1);
+			ip = VmAddress.add(stack[i].getReturnAddress(), -1);
 			f = getPrevious(f);
 		}
 
@@ -174,7 +174,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf
 	 * @return int
 	 */
-	final int countStackFrames(Address sf) {
+	final int countStackFrames(VmAddress sf) {
 		int count = 0;
 		while (isValid(sf)) {
 			count++;
@@ -187,7 +187,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * Show the current stacktrace using Screen.debug.
 	 */	
 	public final void debugStackTrace() {
-		Address f = Unsafe.getCurrentFrame();
+		VmAddress f = Unsafe.getCurrentFrame();
 		Unsafe.debug("Debug stacktrace: ");
 		boolean first = true;
 		int max = 20;
@@ -217,7 +217,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * Show the stacktrace of the given thread using Screen.debug.
 	 */	
 	public final void debugStackTrace(VmThread thread) throws UninterruptiblePragma {
-		Address f = thread.getStackFrame();
+		VmAddress f = thread.getStackFrame();
 		Unsafe.debug("Debug stacktrace: ");
 		boolean first = true;
 		int max = 20;
@@ -248,33 +248,33 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf The stackframe to get the previous frame from.
 	 * @return The previous frame or null.
 	 */
-	protected abstract int getPreviousOffset(Address sf);
+	protected abstract int getPreviousOffset(VmAddress sf);
 
 	/**
 	 * Gets the offset within the stackframe of method.
 	 * @param sf Stackframe pointer
 	 * @return The method offset
 	 */
-	protected abstract int getMethodOffset(Address sf);
+	protected abstract int getMethodOffset(VmAddress sf);
 
 	/**
 	 * Gets the offset within the stackframe of java program counter.
 	 * @param sf Stackframe pointer
 	 * @return The pc offset
 	 */
-	protected abstract int getPCOffset(Address sf);
+	protected abstract int getPCOffset(VmAddress sf);
 
 	/**
 	 * Gets the offset within the stackframe of the magic constant.
 	 * @param sf Stackframe pointer
 	 * @return The magic offset
 	 */
-	protected abstract int getMagicOffset(Address sf);
+	protected abstract int getMagicOffset(VmAddress sf);
 
 	/**
 	 * Gets the offset within the stackframe of the return address.
 	 * @param sf Stackframe pointer
 	 * @return The return address offset
 	 */
-	protected abstract int getReturnAddressOffset(Address sf);
+	protected abstract int getReturnAddressOffset(VmAddress sf);
 }

@@ -7,7 +7,7 @@ import org.jnode.net.SocketBuffer;
 import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 /**
  * @author epr
@@ -26,9 +26,9 @@ public class _3c90xTxBuffer implements _3c90xConstants {
 	/** Offset within mem of first ethernet frame */
 	private final int firstFrameOffset;
 	/** 32-bit address first DPD */
-	private final Address firstDPDAddress;
+	private final VmAddress firstDPDAddress;
 	/** 32-bit address of first ethernet frame */
-	private final Address firstFrameAddress;
+	private final VmAddress firstFrameAddress;
 
 	/**
 	 * Create a new instance
@@ -41,8 +41,8 @@ public class _3c90xTxBuffer implements _3c90xConstants {
 		this.data = new byte[size];
 		this.mem = rm.asMemoryResource(data);
 
-		final Address memAddr = mem.getAddress();
-		int addr = Address.as32bit(memAddr);
+		final VmAddress memAddr = mem.getAddress();
+		int addr = VmAddress.as32bit(memAddr);
 		int offset = 0;
 		// Align on 16-byte boundary
 		while ((addr & 15) != 0) {
@@ -51,9 +51,9 @@ public class _3c90xTxBuffer implements _3c90xConstants {
 		}
 
 		this.firstDPDOffset = offset;
-		this.firstDPDAddress = Address.add(memAddr, firstDPDOffset);
+		this.firstDPDAddress = VmAddress.add(memAddr, firstDPDOffset);
 		this.firstFrameOffset = firstDPDOffset + DPD_SIZE;
-		this.firstFrameAddress = Address.add(memAddr, firstFrameOffset);
+		this.firstFrameAddress = VmAddress.add(memAddr, firstFrameOffset);
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class _3c90xTxBuffer implements _3c90xConstants {
 		// Set frame start header
 		mem.setInt(dpdOffset + 4, 0x8000); // txIndicate
 		// Set fragment address
-		mem.setInt(dpdOffset + 8, Address.as32bit(firstFrameAddress));
+		mem.setInt(dpdOffset + 8, VmAddress.as32bit(firstFrameAddress));
 		// Set fragment size
 		mem.setInt(dpdOffset + 12, len | (1 << 31));
 	}
@@ -83,7 +83,7 @@ public class _3c90xTxBuffer implements _3c90xConstants {
 	/**
 	 * Gets the address of the first DPD in this buffer.
 	 */
-	public Address getFirstDPDAddress() {
+	public VmAddress getFirstDPDAddress() {
 		return firstDPDAddress;
 	}
 }

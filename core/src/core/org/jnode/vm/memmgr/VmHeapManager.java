@@ -5,7 +5,7 @@ package org.jnode.vm.memmgr;
 
 import java.io.PrintStream;
 
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.VmArray;
@@ -157,7 +157,7 @@ public abstract class VmHeapManager extends VmSystemObject {
 	public final Object clone(Cloneable object) {
 		testInited();
 		final VmClassType objectClass = helper.getVmClass(object);
-		final Address objectAddr = helper.addressOf(object);
+		final VmAddress objectAddr = helper.addressOf(object);
 		final int size;
 		if (objectClass.isArray()) {
 			final int slotSize = Unsafe.getCurrentProcessor().getArchitecture().getReferenceSize();
@@ -213,7 +213,7 @@ public abstract class VmHeapManager extends VmSystemObject {
 	private final Object newArray0(VmClassType vmClass, int elemSize, int elements, int slotSize) {
 		final int size = (VmArray.DATA_OFFSET * slotSize) + (elemSize * elements);
 		final Object array = allocObject(vmClass, size);
-		final Address arrayPtr = helper.addressOf(array);
+		final VmAddress arrayPtr = helper.addressOf(array);
 		helper.setInt(arrayPtr, (VmArray.LENGTH_OFFSET * slotSize), elements);
 		return array;
 	}
@@ -226,7 +226,7 @@ public abstract class VmHeapManager extends VmSystemObject {
      * @return True if the given address if a valid starting address of an
      *         object, false otherwise.
      */
-    public abstract boolean isObject(Address ptr);
+    public abstract boolean isObject(VmAddress ptr);
 
     private final void testInited() {
 		if (!inited) {

@@ -3,7 +3,7 @@
  */
 package org.jnode.vm.x86;
 
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 
 /**
@@ -38,5 +38,5 @@ final class UnsafeX86 {
      * @param memory
      * @param gdt
      */
-    static final native void setupBootCode(Address memory, int[] gdt, int[] tss);
+    static final native void setupBootCode(VmAddress memory, int[] gdt, int[] tss);
 }

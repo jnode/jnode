@@ -45,10 +45,10 @@ public final class MemoryBlockManager extends VmSystemObject implements
 	private static long endPtr;
 
 	/** Address of lock to my structures */
-	private static Address lockPtr;
+	private static VmAddress lockPtr;
 
 	/** Address of usage bitmap */
-	private static Address bitmapPtr;
+	private static VmAddress bitmapPtr;
 
 	/** Total number of blocks */
 	private static long blockCount;
@@ -70,7 +70,7 @@ public final class MemoryBlockManager extends VmSystemObject implements
 	 * @return The address of the start of the block, or null when no memory is
 	 *         available.
 	 */
-	static final Address allocateBlock(int blockSize) {
+	static final VmAddress allocateBlock(int blockSize) {
 		if (!initialized) {
 			initialize();
 		}
@@ -115,7 +115,7 @@ public final class MemoryBlockManager extends VmSystemObject implements
 	 * @param blockSize
 	 *            The size of the block as given to allocateBlock.
 	 */
-	static final void freeBlock(Address ptr, int blockSize) {
+	static final void freeBlock(VmAddress ptr, int blockSize) {
 		enter();
 		try {
 			// Calculate the block number
@@ -181,7 +181,7 @@ public final class MemoryBlockManager extends VmSystemObject implements
 	private static final boolean isInUse(long blockNr) {
 		final long offset = blockNr >>> 3; // we still need a byte offset
 		final int mask = (1 << (blockNr & 7));
-		final Address ptr = Unsafe.add(bitmapPtr, Unsafe.longToAddress(offset));
+		final VmAddress ptr = Unsafe.add(bitmapPtr, Unsafe.longToAddress(offset));
 		final int v = Unsafe.getByte(ptr) & 0xFF;
 		return ((v & mask) == mask);
 	}
@@ -195,7 +195,7 @@ public final class MemoryBlockManager extends VmSystemObject implements
 		final long offset = blockNr >>> 3; // we still need a byte offset
 		final int mask = (1 << (blockNr & 7));
 		//final int mask = (1 << blockNr);
-		final Address ptr = Unsafe.add(bitmapPtr, Unsafe.longToAddress(offset));
+		final VmAddress ptr = Unsafe.add(bitmapPtr, Unsafe.longToAddress(offset));
 		int v = Unsafe.getByte(ptr);
 		if (inUse) {
 			v |= mask;
@@ -293,7 +293,7 @@ public final class MemoryBlockManager extends VmSystemObject implements
 	 * @param ptr
 	 * @param size
 	 */
-	private static void clear(Address ptr, long size) {
+	private static void clear(VmAddress ptr, long size) {
 		//Unsafe.debug("clear");
 		//Unsafe.debug(size);
 		while (size != 0) {

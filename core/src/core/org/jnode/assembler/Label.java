@@ -3,14 +3,14 @@
  */
 package org.jnode.assembler;
 
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 /**
  * A Label is a reference to an address in the native code.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class Label extends Address implements Comparable {
+public class Label extends VmAddress implements Comparable {
 	
 	private final String label;
 

@@ -6,7 +6,7 @@
  */
 package org.jnode.assembler;
 
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmSystemObject;
 
 
@@ -48,14 +48,14 @@ public abstract class ObjectResolver extends VmSystemObject {
 	 * @param object
 	 * @return Address
 	 */
-	public abstract Address addressOf(Object object);
+	public abstract VmAddress addressOf(Object object);
 	
 	/**
 	 * Gets the object at a given address.
 	 * @param ptr
 	 * @return Object
 	 */	
-	public abstract Object objectAt(Address ptr);
+	public abstract Object objectAt(VmAddress ptr);
 	
 	/**
 	 * Gets the given address incremented by the given offset.
@@ -63,12 +63,12 @@ public abstract class ObjectResolver extends VmSystemObject {
 	 * @param offset
 	 * @return Address
 	 */
-	public abstract Address add(Address address, int offset);
+	public abstract VmAddress add(VmAddress address, int offset);
 
 	/**
 	 * Gets the address of the first element of the given array.
 	 * @param array
 	 * @return The address of the array data.
 	 */
-	public abstract Address addressOfArrayData(Object array);
+	public abstract VmAddress addressOfArrayData(Object array);
 }

@@ -6,7 +6,7 @@ package org.jnode.vm.memmgr.def;
 
 import java.io.PrintStream;
 
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.MemoryBlockManager;
 import org.jnode.vm.Monitor;
 import org.jnode.vm.Unsafe;
@@ -96,7 +96,7 @@ public final class DefaultHeapManager extends VmHeapManager {
      * @return True if the given address if a valid starting address of an
      *         object, false otherwise.
      */
-    public final boolean isObject(Address ptr) {
+    public final boolean isObject(VmAddress ptr) {
         long addrL = helper.addressToLong(ptr);
         if ((addrL & (ObjectLayout.OBJECT_ALIGN - 1)) != 0) {
         // The object is not at an object aligned boundary
@@ -187,8 +187,8 @@ public final class DefaultHeapManager extends VmHeapManager {
                 slotSize);
 
         // Initialize the first normal heap
-        Address ptr = helper.allocateBlock(DEFAULT_HEAP_SIZE);
-        firstNormalHeap.initialize(ptr, Address.add(ptr, DEFAULT_HEAP_SIZE),
+        VmAddress ptr = helper.allocateBlock(DEFAULT_HEAP_SIZE);
+        firstNormalHeap.initialize(ptr, VmAddress.add(ptr, DEFAULT_HEAP_SIZE),
                 slotSize);
 
         // Initialize the GC heap
@@ -335,10 +335,10 @@ public final class DefaultHeapManager extends VmHeapManager {
      */
     private VmAbstractHeap allocHeap(int size, boolean addToHeapList) {
         //Unsafe.debug("allocHeap");
-        final Address start = helper.allocateBlock(size);
+        final VmAddress start = helper.allocateBlock(size);
         //final Address start = MemoryBlockManager.allocateBlock(size);
         if (start == null) { return null; }
-        final Address end = Address.add(start, size);
+        final VmAddress end = VmAddress.add(start, size);
         final int slotSize = Unsafe.getCurrentProcessor().getArchitecture()
                 .getReferenceSize();
         final VmAbstractHeap heap = VmDefaultHeap.setupHeap(helper, start,

@@ -54,14 +54,14 @@ final class ResourceManagerImpl implements ResourceManager {
 	
 	protected static ResourceManager initialize() {
 		try {
-			final Address kernelStart = Unsafe.getKernelStart(); 
-			final Address kernelEnd = Unsafe.getKernelEnd();
-			final long kernelSize = Address.distance(kernelStart, kernelEnd); 
+			final VmAddress kernelStart = Unsafe.getKernelStart(); 
+			final VmAddress kernelEnd = Unsafe.getKernelEnd();
+			final long kernelSize = VmAddress.distance(kernelStart, kernelEnd); 
 			MemoryResourceImpl.claimMemoryResource(new SimpleResourceOwner("kernel"), kernelStart, kernelSize, MEMMODE_NORMAL);
 
-			final Address bootHeapStart = Unsafe.getBootHeapStart(); 
-			final Address bootHeapEnd = Unsafe.getBootHeapEnd();
-			final long bootHeapSize = Address.distance(bootHeapStart, bootHeapEnd); 
+			final VmAddress bootHeapStart = Unsafe.getBootHeapStart(); 
+			final VmAddress bootHeapEnd = Unsafe.getBootHeapEnd();
+			final long bootHeapSize = VmAddress.distance(bootHeapStart, bootHeapEnd); 
 			MemoryResourceImpl.claimMemoryResource(new SimpleResourceOwner("bootheap"), bootHeapStart, bootHeapSize, MEMMODE_NORMAL);
 
 			ResourceManager rm = new ResourceManagerImpl();
@@ -100,7 +100,7 @@ final class ResourceManagerImpl implements ResourceManager {
 	 * @return The claimed resource
 	 * @throws ResourceNotFreeException
 	 */
-	public MemoryResource claimMemoryResource(ResourceOwner owner, Address start, long size, int mode) 
+	public MemoryResource claimMemoryResource(ResourceOwner owner, VmAddress start, long size, int mode) 
 	throws ResourceNotFreeException {
 		return MemoryResourceImpl.claimMemoryResource(owner, start, size, mode);
 	}

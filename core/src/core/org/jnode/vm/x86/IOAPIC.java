@@ -13,7 +13,7 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.Address;
+import org.jnode.vm.VmAddress;
 
 
 /**
@@ -38,7 +38,7 @@ final class IOAPIC {
      * @param ptr
      * @throws ResourceNotFreeException
      */
-    public IOAPIC(ResourceManager rm, ResourceOwner owner, Address ptr) throws ResourceNotFreeException {
+    public IOAPIC(ResourceManager rm, ResourceOwner owner, VmAddress ptr) throws ResourceNotFreeException {
         this.mem = rm.claimMemoryResource(owner, ptr, 0x20, ResourceManager.MEMMODE_NORMAL);
         final int cnt = getMaximumRedirectionEntryIndex() + 1;
         this.entries = new ArrayList(cnt);
