@@ -40,7 +40,7 @@ public class VmBootHeap extends VmAbstractHeap {
     //public static final String START_FIELD_NAME = "start";
     //public static final String END_FIELD_NAME = "end";
     /** Offset (in bytes) from the start of an object to the size of an object */
-    private int sizeOffset;
+    private Offset sizeOffset;
 
     /**
      * Initialize this instance
@@ -85,7 +85,7 @@ public class VmBootHeap extends VmAbstractHeap {
         this.start = start;
         this.end = end;
         initializeAbstract(slotSize);
-        this.sizeOffset = -((ObjectLayout.HEADER_SLOTS + 1) * slotSize);
+        this.sizeOffset = Offset.fromIntSignExtend(-((ObjectLayout.HEADER_SLOTS + 1) * slotSize));
         this.headerSize = ObjectLayout.objectAlign(this.headerSize + slotSize);
 
         // Create an allocation bitmap
@@ -99,12 +99,14 @@ public class VmBootHeap extends VmAbstractHeap {
         // Initialize the allocation bitmap
         helper.clear(allocationBitmapPtr, bitmapSize);
         // Go through the heap and mark all objects in the allocation bitmap.
-        int offset = headerSize;
-        while (offset < heapSize) {
+        final Word heapSizeW = Word.fromIntZeroExtend(heapSize);
+        final Word headerSizeW = Word.fromIntZeroExtend(headerSize);
+        Word offset = Word.fromIntZeroExtend(headerSize);
+        while (offset.LT(heapSizeW)) {
             final Address ptr = start.add(offset);
             setAllocationBit(ptr, true);
-            final int objSize = ptr.loadInt(Offset.fromIntSignExtend(sizeOffset));
-            offset += objSize + headerSize;
+            final Word objSize = ptr.loadWord(sizeOffset);
+            offset = offset.add(objSize).add(headerSizeW);
         }
         //Unsafe.debug("end of bootheap.initialize");
     }
@@ -113,8 +115,8 @@ public class VmBootHeap extends VmAbstractHeap {
      * @see VmAbstractHeap#getFreeSize()
      * @return the free size
      */
-    protected int getFreeSize() {
-        return 0;
+    protected Extent getFreeSize() {
+        return Extent.zero();
     }
 
     /**
@@ -137,18 +139,18 @@ public class VmBootHeap extends VmAbstractHeap {
      */
     protected void walk(ObjectVisitor visitor, boolean locking, Word flagsMask, Word flagsValue) {
         // Go through the heap and mark all objects in the allocation bitmap.
-        final int headerSize = this.headerSize;
-        final int sizeOffset = this.sizeOffset;
-        final int size = getSize();
-        int offset = headerSize;
-        while (offset < size) {
+        final Word headerSize = Word.fromIntZeroExtend(this.headerSize);
+        final Offset sizeOffset = this.sizeOffset;
+        final Word size = Word.fromIntZeroExtend(getSize());
+        Word offset = headerSize;
+        while (offset.LT(size)) {
             final Address ptr = start.add(offset);
             final Object object = ptr.toObjectReference().toObject();
             final Word flags = VmMagic.getObjectFlags(object).and(flagsMask);
             if (!flags.EQ(flagsValue) || visitor.visit(object)) {
                 // Continue
-                final int objSize = ptr.loadInt(Offset.fromIntSignExtend(sizeOffset));
-                offset += objSize + headerSize;
+                final Word objSize = ptr.loadWord(sizeOffset);
+                offset = offset.add(objSize).add(headerSize);
             } else {
                 // Stop
                 offset = size;

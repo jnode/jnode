@@ -67,6 +67,10 @@ public final class Offset {
     return null;
   }
 
+  public Offset add (Word byteSize) {
+      return null;
+    }
+
   public Offset add (Extent byteSize) {
     return null;
   }

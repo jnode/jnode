@@ -31,15 +31,19 @@ public final class Extent {
     /**
      * @deprecated
      */
-    public static Extent fromInt(int address) {
+    public static Extent fromInt(int extent) {
         return null;
     }
 
-    public static Extent fromIntSignExtend(int address) {
+    public static Extent fromLong(long extent) {
         return null;
     }
 
-    public static Extent fromIntZeroExtend(int address) {
+    public static Extent fromIntSignExtend(int extent) {
+        return null;
+    }
+
+    public static Extent fromIntZeroExtend(int extent) {
     	throw new Error("No magic");
         //return null;
     }
@@ -85,6 +89,14 @@ public final class Extent {
     }
 
     public Extent sub(Extent byteSize) {
+        return null;
+    }
+
+    public Extent add(Word byteSize) {
+        return null;
+    }
+
+    public Extent sub(Word byteSize) {
         return null;
     }
 

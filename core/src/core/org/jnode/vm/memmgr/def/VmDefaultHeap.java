@@ -31,6 +31,7 @@ import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Offset;
 import org.vmmagic.unboxed.Word;
@@ -47,7 +48,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
     private Object allocationBitmap;
 
     /** The total size of free space */
-    private int freeSize;
+    private Extent freeSize;
 
     /** Offset (in bytes) from the start of an object to the size of an object */
     private Offset sizeOffset;
@@ -114,7 +115,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         final int mySize = myAddr.loadInt(sizeOffset);
         Address firstObject;
         if (inHeap(myAddr)) {
-            firstObject = myAddr.add(mySize + headerSize);
+            firstObject = myAddr.add(mySize).add(headerSize);
         } else {
             firstObject = start.add(headerSize);
         }
@@ -126,8 +127,8 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         this.allocationBitmapPtr = firstObject;
         final Address bitmapPtr = this.allocationBitmapPtr;
         // Make the bitmap an object, so it is easy to manipulate.
-        bitmapPtr.store(allocationBitmapSize, sizeOffset);
-        bitmapPtr.store(GC_DEFAULT_COLOR, flagsOffset);
+        bitmapPtr.store(Word.fromIntZeroExtend(allocationBitmapSize), sizeOffset);
+        bitmapPtr.store(Word.fromIntZeroExtend(GC_DEFAULT_COLOR), flagsOffset);
         bitmapPtr.store(ObjectReference.fromObject(VmType.getObjectClass().getTIB()), tibOffset);
         firstObject = firstObject.add(allocationBitmapSize + headerSize);
         helper.clear(allocationBitmapPtr, allocationBitmapSize);
@@ -144,7 +145,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         ptr.store(remainingSize, sizeOffset);
         ptr.store(ObjectReference.fromObject(FREE), tibOffset);
         this.nextFreePtr = ptr;
-        this.freeSize = remainingSize.toInt();
+        this.freeSize = remainingSize.toExtent();
     }
 
     /**
@@ -160,17 +161,18 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         if (nextFreePtr == null) { /* This heap is full */
         return null; }
 
-        final int totalSize = alignedSize + headerSize;
+        final Offset tibOffset = this.tibOffset;
+        final Word headerSize = Word.fromIntZeroExtend(this.headerSize);
+        final Offset flagsOffset = this.flagsOffset;
+        final Offset sizeOffset = this.sizeOffset;
+
+        Word alignedSizeW = Word.fromIntZeroExtend(alignedSize);
+        final Word totalSize = alignedSizeW.add(headerSize);
         final Object tib = vmClass.getTIB();
         if (tib == null) {
             throw new IllegalArgumentException("vmClass.TIB is null");
         }
         //final int size = getSize();
-        final Offset tibOffset = this.tibOffset;
-        final int headerSize = this.headerSize;
-        final Offset flagsOffset = this.flagsOffset;
-        final Offset sizeOffset = this.sizeOffset;
-
         Address objectPtr = null;
         lock();
         try {
@@ -178,10 +180,10 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
             //Screen.debug("a");
             while (objectPtr == null) {
                 final Address ptr = nextFreePtr;
-                final int objSize = ptr.loadInt(sizeOffset);
+                final Word objSize = ptr.loadWord(sizeOffset);
                 final Object objVmt = ptr.loadObjectReference(tibOffset);
-                final Address nextPtr = ptr.add(objSize + headerSize);
-                if ((objVmt == FREE) && (alignedSize <= objSize)) {
+                final Address nextPtr = ptr.add(objSize.add(headerSize));
+                if ((objVmt == FREE) && alignedSizeW.LE(objSize)) {
                     objectPtr = ptr;
                 } else {
                     if (!inHeap(nextPtr)) {
@@ -198,10 +200,10 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
             }
             //Screen.debug("A");
 
-            final int curFreeSize = objectPtr.loadInt(sizeOffset);
-            if (curFreeSize > totalSize) {
+            final Word curFreeSize = objectPtr.loadWord(sizeOffset);
+            if (curFreeSize.GT(totalSize)) {
                 // Block is larger then we need, split it up.
-                final int newFreeSize = curFreeSize - totalSize;
+                final Word newFreeSize = curFreeSize.sub(totalSize);
                 /*if (newFreeSize <= headerSize) {
                     Unsafe.debug("Block splitup failed");
                     Unsafe.debug("\ncurFreeSize "); Unsafe.debug(curFreeSize);
@@ -220,18 +222,18 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
             } else {
                 // The block is not large enough to split up, make the
                 // new object the size of the free block.
-                alignedSize = curFreeSize;
+                alignedSizeW = curFreeSize;
             }
 
             // Create the object header
-            objectPtr.store(alignedSize, sizeOffset);
+            objectPtr.store(alignedSizeW, sizeOffset);
             objectPtr.store(0, flagsOffset);
             objectPtr.store(ObjectReference.fromObject(tib), tibOffset);
             // Mark the object in the allocation bitmap
             setAllocationBit(objectPtr, true);
 
             // Fix the freeSize
-            freeSize -= alignedSize;
+            freeSize  = freeSize.sub(alignedSizeW);
         } finally {
             unlock();
         }
@@ -251,10 +253,10 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
         lock();
         try {
         	final Address ptr = ObjectReference.fromObject(object).toAddress();
-            final int objSize = ptr.loadInt(sizeOffset);
+            final Word objSize = ptr.loadWord(sizeOffset);
             ptr.store(ObjectReference.fromObject(FREE), tibOffset);
             setAllocationBit(object, false);
-            freeSize += objSize;
+            freeSize = freeSize.add(objSize);
         } finally {
             unlock();
         }
@@ -264,7 +266,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
      * @see VmAbstractHeap#getFreeSize()
      * @return The free size
      */
-    protected int getFreeSize() {
+    protected Extent getFreeSize() {
         return freeSize;
     }
 

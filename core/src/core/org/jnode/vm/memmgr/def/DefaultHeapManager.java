@@ -149,16 +149,16 @@ public final class DefaultHeapManager extends VmHeapManager {
      * @return long
      */
     public long getFreeMemory() {
-        long size = bootHeap.getFreeSize();
+        Extent size = bootHeap.getFreeSize();
         VmAbstractHeap h = firstNormalHeap;
         while (h != null) {
-            size += h.getFreeSize();
+            size = size.add(h.getFreeSize());
             h = h.getNext();
         }
         //size += (Unsafe.addressToLong(heapEnd) -
         // Unsafe.addressToLong(nextHeapPtr));
-        size += MemoryBlockManager.getFreeMemory();
-        return size;
+        size = size.add(Extent.fromLong(MemoryBlockManager.getFreeMemory()));
+        return size.toLong();
     }
 
     /**
