@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
 <plugin id="org.jnode.fs.ntfs" 
@@ -17,9 +18,9 @@
       <export name="org.jnode.fs.ntfs.attributes.*"/>
     </library>
   </runtime>
-        
+  
   <extension point="org.jnode.fs.types">
     <type class="org.jnode.fs.ntfs.NTFSFileSystemType"/>
   </extension>
-        
+  
 </plugin>
