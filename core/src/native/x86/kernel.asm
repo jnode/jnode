@@ -178,9 +178,6 @@ go_user_cs:
 	mov edx, eax	; Save return code in EDX
 	inc dword [jnodeFinished]
 
-	mov eax,after_vm_msg
-	call sys_print_str
-	
 	test edx,edx
 	jz _halt
 	
