@@ -125,6 +125,9 @@ final class FloatItem extends WordItem implements FPItem {
             //TODO
             notImplemented();
             break;
+            
+        default:
+        	throw new IllegalArgumentException("Invalid item kind");
         }
         return res;
     }

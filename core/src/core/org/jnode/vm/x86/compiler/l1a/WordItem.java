@@ -18,6 +18,8 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
     protected WordItem(int kind, Register reg, int local) {
         super(kind, local);
         this.reg = reg;
+        
+        assertCondition((kind != Kind.REGISTER) || (reg != null), "kind == register implies that reg != null");
     }
 
     /**
@@ -48,8 +50,8 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
         switch (kind) {
         case Kind.REGISTER:
             if (this.reg != reg) {
-                release(ec);
                 os.writeMOV(INTSIZE, reg, this.reg);
+                release(ec);
             }
             break;
 
@@ -76,6 +78,10 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
                 stack.operandStack.pop(this);
             }
             os.writePOP(reg);
+            break;
+            
+        default:
+        	throw new IllegalArgumentException("Invalid item kind");
         }
         kind = Kind.REGISTER;
         this.reg = reg;
@@ -172,7 +178,9 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
                 stack.operandStack.pop(this);
             }
             break;
-
+            
+        default:
+        	throw new IllegalArgumentException("Invalid item kind");
         }
         release(ec);
         kind = Kind.STACK;
@@ -219,6 +227,9 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
             pushToFPU(os, SP, 0);
             os.writeLEA(SP, SP, 4);
             break;
+            
+        default:
+        	throw new IllegalArgumentException("Invalid item kind");
         }
 
         release(ec);
@@ -278,9 +289,13 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
         case Kind.STACK:
             //nothing to do
             break;
+        
+        default:
+        	throw new IllegalArgumentException("Invalid item kind");
         }
 
         this.reg = null;
+        this.kind = 0;
     }
 
     /**
