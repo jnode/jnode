@@ -366,7 +366,7 @@ Lsetup_idt:
 	intport 2, int_nmi		; NMI
 	intport 3, int_bp		; Breakpoint
 	intport 4, int_of		; Overflow
-	intport 5, int_bc		; Bounds check
+	intport 5, int_bc, 3	; Bounds check
 	intport 6, int_inv_oc	; Invalid opcode
 	intport 7, int_copro_na	; Coprocessor not available
 	intport 8, int_df		; Double fault
