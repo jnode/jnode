@@ -62,7 +62,7 @@ final class SwingChoicePeer extends SwingComponentPeer implements ChoicePeer {
 		((JComboBox) jComponent).setSelectedIndex(index);
 	}
 
-	private static class SwingChoice extends JComboBox implements SwingPeer {
+	private static class SwingChoice extends JComboBox implements ISwingPeer {
 		private final Choice awtComponent;
 
 		public SwingChoice(Choice awtComponent) {
@@ -70,7 +70,7 @@ final class SwingChoicePeer extends SwingComponentPeer implements ChoicePeer {
 		}
 
 		/**
-		 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
 		 */
 		public Component getAWTComponent() {
 			return awtComponent;

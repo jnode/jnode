@@ -154,19 +154,19 @@ public class SwingToolkit extends JNodeToolkit {
     }
 
     protected ScrollbarPeer createScrollbar(Scrollbar target) {
-        return new SwingScrollbarPeer(target);
+        return new SwingScrollbarPeer(this, target);
     }
 
     protected ScrollPanePeer createScrollPane(ScrollPane target) {
-        return new SwingScrollPanePeer(target);
+        return new SwingScrollPanePeer(this, target);
     }
 
     protected TextAreaPeer createTextArea(TextArea target) {
-        return new SwingTextAreaPeer(target);
+        return new SwingTextAreaPeer(this, target);
     }
 
     protected TextFieldPeer createTextField(TextField target) {
-        return new SwingTextFieldPeer(target);
+        return new SwingTextFieldPeer(this, target);
     }
 
     protected WindowPeer createWindow(Window target) {
@@ -218,20 +218,20 @@ public class SwingToolkit extends JNodeToolkit {
     }
 
 	public static void add(Component component, JComponent peer) {
-		final SwingContainerPeer containerPeer = getContainerPeer(component);
+		final ISwingContainerPeer containerPeer = getContainerPeer(component);
 		if (containerPeer != null) {
 			containerPeer.addAWTComponent(component, peer);
 		}
 	}
 
-	private static SwingContainerPeer getContainerPeer(Component component) {
+	private static ISwingContainerPeer getContainerPeer(Component component) {
 		final Component parent = component.getParent();
 		if (parent == null) {
 			return null;
 		} else {
 			final ComponentPeer parentPeer = parent.getPeer();
-			if (parentPeer instanceof SwingContainerPeer) {
-				return (SwingContainerPeer) parentPeer;
+			if (parentPeer instanceof ISwingContainerPeer) {
+				return (ISwingContainerPeer) parentPeer;
 			} else {
 				return getContainerPeer(parent);
 			}

@@ -15,7 +15,7 @@ import javax.swing.JComponent;
  */
 
 final class SwingLightweightPeer extends SwingComponentPeer implements
-		LightweightPeer, ContainerPeer, SwingPeer {
+		LightweightPeer, ContainerPeer, ISwingPeer {
 	private Insets containerInsets;
 
 	//
@@ -62,7 +62,7 @@ final class SwingLightweightPeer extends SwingComponentPeer implements
 	}
 
 	/**
-	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+	 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
 	 */
 	public Component getAWTComponent() {
 		return component;

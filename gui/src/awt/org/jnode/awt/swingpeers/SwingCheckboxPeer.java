@@ -40,7 +40,7 @@ class SwingCheckboxPeer extends SwingComponentPeer implements CheckboxPeer {
 		((JCheckBox) jComponent).setText(label);
 	}
 
-	private static class SwingCheckBox extends JCheckBox implements SwingPeer {
+	private static class SwingCheckBox extends JCheckBox implements ISwingPeer {
 		private final Checkbox awtComponent;
 
 		public SwingCheckBox(Checkbox awtComponent) {
@@ -48,7 +48,7 @@ class SwingCheckboxPeer extends SwingComponentPeer implements CheckboxPeer {
 		}
 
 		/**
-		 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
 		 */
 		public Component getAWTComponent() {
 			return awtComponent;

@@ -3,162 +3,93 @@
  */
 package org.jnode.awt.swingpeers;
 
-import java.awt.AWTEvent;
 import java.awt.Adjustable;
-import java.awt.BufferCapabilities;
 import java.awt.Component;
-import java.awt.Image;
 import java.awt.ScrollPane;
-import java.awt.event.PaintEvent;
 import java.awt.peer.ScrollPanePeer;
 
-import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
 /**
  * AWT scroll pane peer implemented as a {@link javax.swing.JScrollPane}.
  */
 
-class SwingScrollPanePeer extends JScrollPane implements ScrollPanePeer,
-		SwingContainerPeer, SwingPeer {
-	private final ScrollPane scrollPane;
+final class SwingScrollPanePeer extends SwingContainerPeer implements
+		ScrollPanePeer {
 
 	//
 	// Construction
 	//
 
-	public SwingScrollPanePeer(ScrollPane scrollPane) {
-		this.scrollPane = scrollPane;
-		SwingToolkit.add(scrollPane, this);
-		SwingToolkit.copyAwtProperties(scrollPane, this);
+	public SwingScrollPanePeer(SwingToolkit toolkit, ScrollPane scrollPane) {
+		super(toolkit, scrollPane, new SwingScrollPane(scrollPane));
+
+		SwingToolkit.add(scrollPane, jComponent);
+		SwingToolkit.copyAwtProperties(scrollPane, jComponent);
 	}
 
 	/**
-	 * @see org.jnode.awt.swingpeers.SwingContainerPeer#addAWTComponent(java.awt.Component,
-	 *      javax.swing.JComponent)
+	 * @see java.awt.peer.ScrollPanePeer#childResized(int, int)
 	 */
-	public void addAWTComponent(Component awtComponent, JComponent peer) {
-		add(peer);
-	}
-
-	public void beginLayout() {
-	}
-
-	//
-	// ContainerPeer
-	//
-
-	public void beginValidate() {
-	}
-
-	public boolean canDetermineObscurity() {
-		return false;
-	}
-
-	public void childResized(int w, int h) {
-	}
-
-	public void coalescePaintEvent(PaintEvent e) {
-		System.err.println(e);
-	}
-
-	// Buffer
-
-	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-	}
-
-	public void destroyBuffers() {
-	}
-
-	// Misc
-
-	public void dispose() {
-	}
-
-	public void endLayout() {
-	}
-
-	public void endValidate() {
-	}
-
-	public void flip(BufferCapabilities.FlipContents flipContents) {
-	}
-
-	/**
-	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
-	 */
-	public Component getAWTComponent() {
-		return scrollPane;
-	}
-
-	public Image getBackBuffer() {
-		return null;
-	}
-
-	//
-	// ScrollPanePeer
-	//
-
-	public int getHScrollbarHeight() {
-		return 0;
-	}
-
-	public int getVScrollbarWidth() {
-		return 0;
-	}
-
-	//
-	// ComponentPeer
-	//
-
-	// Events
-
-	public void handleEvent(AWTEvent e) {
-		//System.err.println(e);
-	}
-
-	public boolean handlesWheelScrolling() {
-		return false;
-	}
-
-	// Obscurity
-
-	public boolean isObscured() {
-		return false;
-	}
-
-	public boolean isPaintPending() {
-		return false;
-	}
-
-	// Focus
-
-	public boolean requestFocus(Component lightweightChild, boolean temporary,
-			boolean focusedWindowChangeAllowed, long time) {
-		return true;
-	}
-
-	///////////////////////////////////////////////////////////////////////////////////////
-	// Private
-	/**
-	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
-	 */
-	public void setEventMask(long mask) {
+	public void childResized(int width, int height) {
 		// TODO Auto-generated method stub
 
 	}
 
-	public void setScrollPosition(int x, int y) {
+	/**
+	 * @see java.awt.peer.ScrollPanePeer#getHScrollbarHeight()
+	 */
+	public int getHScrollbarHeight() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
-	public void setUnitIncrement(Adjustable adj, int u) {
+	/**
+	 * @see java.awt.peer.ScrollPanePeer#getVScrollbarWidth()
+	 */
+	public int getVScrollbarWidth() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
-	public void setValue(Adjustable adj, int v) {
+	/**
+	 * @see java.awt.peer.ScrollPanePeer#setScrollPosition(int, int)
+	 */
+	public void setScrollPosition(int h, int v) {
+		// TODO Auto-generated method stub
+
 	}
 
-	// Cursor
+	/**
+	 * @see java.awt.peer.ScrollPanePeer#setUnitIncrement(java.awt.Adjustable,
+	 *      int)
+	 */
+	public void setUnitIncrement(Adjustable item, int inc) {
+		// TODO Auto-generated method stub
 
-	public void updateCursorImmediately() {
+	}
+
+	/**
+	 * @see java.awt.peer.ScrollPanePeer#setValue(java.awt.Adjustable, int)
+	 */
+	public void setValue(Adjustable item, int value) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private static class SwingScrollPane extends JScrollPane implements
+			ISwingPeer {
+		private final ScrollPane awtComponent;
+
+		public SwingScrollPane(ScrollPane awtComponent) {
+			this.awtComponent = awtComponent;
+		}
+
+		/**
+		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+		 */
+		public Component getAWTComponent() {
+			return awtComponent;
+		}
 	}
 }
