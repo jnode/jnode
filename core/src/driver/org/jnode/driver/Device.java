@@ -139,7 +139,7 @@ public class Device implements ResourceOwner {
 	 * 
 	 * @throws DriverException
 	 */
-	final void stop() throws DriverException {
+	final void stop(boolean unsetDriver) throws DriverException {
 		if (driver == null) {
 			throw new DriverException("Cannot stop without a driver");
 		} else if (manager == null) {
@@ -151,6 +151,10 @@ public class Device implements ResourceOwner {
 			driver.stopDevice();
 			// Let extensions do their stop work
 			onStopDevice();
+			// Remove the driver connection if requested
+			if (unsetDriver) {
+			    this.driver = null;
+			}
 			// I'm stopped now.
 			started = false;
 		}
