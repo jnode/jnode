@@ -70,7 +70,7 @@ public class X86StubCompiler extends AbstractX86Compiler {
 			final AbstractX86Stream os = (AbstractX86Stream) nos;
 			final X86CompilerContext context = getContext();
 			// Create the helper
-			final CCompilerHelper ih = new CCompilerHelper(os, context, isBootstrap);
+			final CCompilerHelper ih = new CCompilerHelper(os, null, context, isBootstrap);
 			// Start an "object"
 			final NativeStream.ObjectInfo objectInfo = os.startObject(context.getVmMethodCodeClass());
 			// Start the code creation

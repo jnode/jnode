@@ -34,37 +34,11 @@ abstract class Item {
 
         static final int REGISTER = 0x2;
 
-        static final int FREGISTER = 0x4;
+        static final int FPUSTACK = 0x4;
 
         static final int LOCAL = 0x8;
 
         static final int CONSTANT = 0x10;
-        
-        static final int RELEASED = 0x8000;
-    }
-
-    /**
-     * JVM types
-     */
-    static class JvmType {
-
-        static final int UNKNOWN = 0;
-
-        static final int BYTE = 1;
-
-        static final int SHORT = 2;
-
-        static final int CHAR = 3;
-
-        static final int INT = 4;
-
-        static final int LONG = 5;
-
-        static final int FLOAT = 6;
-
-        static final int DOUBLE = 7;
-
-        static final int REFERENCE = 8;
     }
 
     /*
@@ -114,6 +88,12 @@ abstract class Item {
     final int getKind() {
         return kind;
     }
+    
+    final boolean isStack() { return (kind == Kind.STACK); }
+    final boolean isRegister() { return (kind == Kind.REGISTER); }
+    final boolean isFPUStack() { return (kind == Kind.FPUSTACK); }
+    final boolean isLocal() { return (kind == Kind.LOCAL); }
+    final boolean isConstant() { return (kind == Kind.CONSTANT); }
 
     /**
      * Return the current item's computational type category (JVM Spec, p. 83).
@@ -132,7 +112,7 @@ abstract class Item {
      * 
      * @return
      */
-    final int getOffsetToFP() {
+    int getOffsetToFP() {
         myAssert(kind == Kind.LOCAL);
         return offsetToFP;
     }
@@ -146,6 +126,12 @@ abstract class Item {
      */
     abstract void load(EmitterContext ec);
 
+    /**
+     * Load this item to a general purpose register(s).
+     * @param ec
+     */
+    abstract void loadToGPR(EmitterContext ec);
+    
     /**
      * Load item into a register / two registers / an FPU register depending on
      * its type, if its kind matches the mask
@@ -172,6 +158,12 @@ abstract class Item {
     abstract void push(EmitterContext ec);
 
     /**
+     * Push the value of this item on the FPU stack.
+     * The item itself is not changed in any way.
+     */
+    abstract void pushToFPU(EmitterContext ec);
+
+    /**
      * Release the registers associated to this item
      * 
      * @param ec
@@ -186,7 +178,7 @@ abstract class Item {
     final void release1(EmitterContext ec) {
         if (VirtualStack.checkOperandStack) {
             VirtualStack vs = ec.getVStack();
-            vs.popFromOperandStack(this);
+            vs.operandStack.pop(this);
         }
         release(ec);
     }
@@ -218,49 +210,5 @@ abstract class Item {
      */
     abstract boolean uses(Register reg);
 
-    /**
-     * @param type
-     * @return the internal type value
-     */
-    static int SignatureToType(char type) {
-        int res;
-        switch (type) {
-        case 'Z':
-        // Boolean
-        case 'B':
-        // Byte
-        case 'C':
-        // Character
-        case 'S':
-        // Short
-        case 'I':
-            // Integer
-            res = JvmType.INT;
-            break;
-        case 'F':
-            // Float
-            res = JvmType.FLOAT;
-            break;
-        case 'L':
-        // Object
-        case ';':
-        // Object
-        case '[':
-            // Array
-            res = JvmType.REFERENCE;
-            break;
-        case 'J':
-            // Long
-            res = JvmType.LONG;
-            break;
-        case 'D':
-            // Double
-            res = JvmType.DOUBLE;
-            break;
-        default:
-            throw new IllegalArgumentException("Unknown type" + type);
-        }
-        return res;
-    }
 
 }

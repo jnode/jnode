@@ -5,173 +5,107 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
+import org.jnode.vm.x86.compiler.*;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
  * @author Patrik Reali
  */
-final class FloatItem extends Item implements X86CompilerConstants  {
+final class FloatItem extends WordItem implements X86CompilerConstants {
 
-	private float value;
-	/**
-	 * @param kind
-	 * @param offsetToFP
-	 * @param value
-	 */
-	private FloatItem(int kind,  int offsetToFP, float value) {
-		super(kind, offsetToFP);
-		
-		this.value = value;
-	}
+    private final float value;
 
+    /**
+     * @param kind
+     * @param offsetToFP
+     * @param value
+     */
+    private FloatItem(int kind, Register reg, int offsetToFP, float value) {
+        super(kind, reg, offsetToFP);
 
-	/**
-	 * Get the JVM type of this item
-	 * @return the JVM type
-	 */
-	int getType() { return JvmType.FLOAT; }
-	
-	/**
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#load(EmitterContext)
-	 */
-	void load(EmitterContext ec) {
-		// TODO Auto-generated method stub
-		notImplemented();
+        this.value = value;
+    }
 
-	}
+    /**
+     * Get the JVM type of this item
+     * 
+     * @return the JVM type
+     */
+    final int getType() {
+        return JvmType.FLOAT;
+    }
 
-	/**
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#clone()
-	 */
-	Item clone(EmitterContext ec) {
-		Item res = null;
-		switch (getKind()) {
-			case Kind.REGISTER:
-				//TODO
-				notImplemented();
-				break;
-				
-			case Kind.LOCAL:
-				//TODO
-				notImplemented();
-				break;
-				
-			case Kind.CONSTANT:
-				//TODO
-				notImplemented();
-				break;
-				
-			case Kind.FREGISTER:
-				//TODO
-				notImplemented();
-				break;
-			
-			case Kind.STACK:
-				//TODO
-				notImplemented();
-				break;
-		}
-		return res;
-	}
+    /**
+     * Load my constant to the given os.
+     * 
+     * @param os
+     * @param reg
+     */
+    protected void loadToConstant(EmitterContext ec, AbstractX86Stream os,
+            Register reg) {
+        os.writeMOV_Const(reg, Float.floatToIntBits(value));
+    }
 
-	/**
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#push(EmitterContext)
-	 */
-	void push(EmitterContext ec) {
-		final AbstractX86Stream os = ec.getStream();
-		
-		switch (getKind()) {
-			case Kind.REGISTER:
-				//TODO
-				notImplemented();
-				break;
-				
-			case Kind.LOCAL:
-				os.writePUSH(FP, offsetToFP);
-				break;
-				
-			case Kind.CONSTANT:
-				os.writePUSH(Float.floatToRawIntBits(value));
-				break;
-				
-			case Kind.FREGISTER:
-				//TODO
-				notImplemented();
-				break;
+    /**
+     * Push my constant on the stack using the given os.
+     * 
+     * @param os
+     */
+    protected void pushConstant(EmitterContext ec, AbstractX86Stream os) {
+        os.writePUSH(Float.floatToIntBits(value));
+    }
+    
+    /**
+     * @see org.jnode.vm.x86.compiler.l1a.Item#clone()
+     */
+    final Item clone(EmitterContext ec) {
+        Item res = null;
+        switch (getKind()) {
+        case Kind.REGISTER:
+            //TODO
+            notImplemented();
+            break;
 
-			case Kind.STACK:
-				if (VirtualStack.checkOperandStack) {
-					final VirtualStack stack = ec.getVStack();
-			
-					if (kind == Kind.STACK) {
-						// the item is not really pushed and popped
-						// but this checks that it is really the top
-						// element
-						stack.popFromOperandStack(this);
-					}
-				}
-				break;
-		}
-		release(ec);
-		kind = Kind.STACK;
-		if (VirtualStack.checkOperandStack) {
-			final VirtualStack stack = ec.getVStack();
-			stack.pushOnOperandStack(this);
-		}
-	}
+        case Kind.LOCAL:
+            //TODO
+            notImplemented();
+            break;
 
-	/**
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#release(EmitterContext)
-	 */
-	void release(EmitterContext ec) {
-		switch (getKind()) {
-			case Kind.REGISTER:
-				//TODO
-				notImplemented();
-				break;
-				
-			case Kind.LOCAL:
-				// nothing to do
-				break;
-				
-			case Kind.CONSTANT:
-				// nothing to do
-				break;
-				
-			case Kind.FREGISTER:
-				//TODO
-				notImplemented();
-				break;
-		}
-	}
+        case Kind.CONSTANT:
+            //TODO
+            notImplemented();
+            break;
 
-	/**
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#spill(EmitterContext, Register)
-	 */
-	void spill(EmitterContext ec, Register reg) {
-		notImplemented();
-	}
+        case Kind.FPUSTACK:
+            //TODO
+            notImplemented();
+            break;
 
-	/**
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
-	 */
-	boolean uses(Register reg) {
-		return false;
-	}
+        case Kind.STACK:
+            //TODO
+            notImplemented();
+            break;
+        }
+        return res;
+    }
 
-	static FloatItem createStack() {
-		return new FloatItem(Kind.STACK, 0, 0);
-	}
-	
-	static FloatItem createLocal(int offsetToFP) {
-		return new FloatItem(Kind.LOCAL, offsetToFP, 0);
-	}
-	
-	static FloatItem createConst(float val) {
-		return new FloatItem(Kind.CONSTANT, 0, val);
-	}
-	
-	static FloatItem createFReg() {
-		return new FloatItem(Kind.FREGISTER, 0, 0);
-	}
+    static FloatItem createStack() {
+        return new FloatItem(Kind.STACK, null, 0, 0.0f);
+    }
+
+    static FloatItem createLocal(int offsetToFP) {
+        return new FloatItem(Kind.LOCAL, null, offsetToFP, 0.0f);
+    }
+
+    static FloatItem createConst(float val) {
+        return new FloatItem(Kind.CONSTANT, null, 0, val);
+    }
+
+    static FloatItem createReg(Register reg) {
+        return new FloatItem(Kind.REGISTER, reg, 0, 0.0f);
+    }
+
+    static FloatItem createFPUStack() {
+        return new FloatItem(Kind.FPUSTACK, null, 0, 0.0f);
+    }
 }

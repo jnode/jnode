@@ -7,6 +7,7 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
 import org.jnode.vm.classmgr.VmConstString;
+import org.jnode.vm.x86.compiler.*;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 
@@ -102,7 +103,7 @@ final class RefItem extends WordItem implements X86CompilerConstants {
             res = createConst(value);
             break;
 
-        case Kind.FREGISTER:
+        case Kind.FPUSTACK:
             //TODO
             notImplemented();
             break;
@@ -113,7 +114,7 @@ final class RefItem extends WordItem implements X86CompilerConstants {
             res = createStack();
             if (VirtualStack.checkOperandStack) {
                 final VirtualStack stack = ec.getVStack();
-                stack.pushOnOperandStack(res);
+                stack.operandStack.push(res);
             }
             break;
         }
