@@ -36,15 +36,14 @@ exception statement from your version. */
 
 package java.awt;
 
+import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
-import java.awt.image.RenderedImage;
 import java.awt.image.ImageObserver;
+import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
-
 import java.text.AttributedCharacterIterator;
-
 import java.util.Map;
 
 /**
@@ -143,6 +142,8 @@ public abstract class Graphics2D extends Graphics
 
   public abstract Composite getComposite();
 
+  public abstract FontRenderContext getFontRenderContext();
+  
   public abstract void setBackground(Color color);
 
   public abstract Color getBackground();

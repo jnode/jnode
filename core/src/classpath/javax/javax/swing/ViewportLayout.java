@@ -52,64 +52,26 @@ public class ViewportLayout implements LayoutManager, Serializable
 {
   static final long serialVersionUID = -788225906076097229L;
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Constructor ViewportLayout
-	 */
 	public ViewportLayout() {
-		// TODO
-	} // ViewportLayout()
-
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * addLayoutComponent
-	 * @param name TODO
-	 * @param c TODO
-	 */
+	}
 	public void addLayoutComponent(String name, Component c) {
-		// TODO
-	} // addLayoutComponent()
-
-	/**
-	 * removeLayoutComponent
-	 * @param c TODO
-	 */
+          // ignore
+	}
 	public void removeLayoutComponent(Component c) {
-		// TODO
-	} // removeLayoutComponent()
-
-	/**
-	 * preferredLayoutSize
-	 * @param parent TODO
-	 * @returns Dimension
-	 */
+          // ignore
+	}
 	public Dimension preferredLayoutSize(Container parent) {
-		return null; // TODO
-	} // preferredLayoutSize()
-
-	/**
-	 * minimumLayoutSize
-	 * @param parent TODO
-	 * @returns Dimension
-	 */
+          return null;
+	}
 	public Dimension minimumLayoutSize(Container parent) {
-		return null; // TODO
-	} // minimumLayoutSize()
-
-	/**
-	 * layoutContainer
-	 * @param parent TODO
-	 */
+          return null;
+	}
 	public void layoutContainer(Container parent) {
-		// TODO
-	} // layoutContainer()
-
-
-} // ViewportLayout
+          if (parent.countComponents() == 1)
+            {
+              // This should usually be true, but if it's not it is
+              // probably nicer if we do not panic.
+              Component c = parent.getComponent(0);
+            }
+	}
+}

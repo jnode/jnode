@@ -35,47 +35,61 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package javax.naming.directory;
-import javax.naming.Binding;
 
+package javax.naming.directory;
+
+import java.io.Serializable;
+import javax.naming.Binding;
+ 
 /**
  * @author Warren Levy <warrenl@redhat.com>
  * @date June 13, 2001
  */
 
-public class SearchResult extends Binding {
-	// Serialized fields.
-	private Attributes attrs;
+public class SearchResult extends Binding
+{
+  // Serialized fields.
+  private Attributes attrs;
 
-	public SearchResult(String name, Object obj, Attributes attrs) {
-		super(name, obj);
-		this.attrs = attrs;
-	}
+  public SearchResult(String name, Object obj, Attributes attrs)
+  {
+    super(name, obj);
+    this.attrs = attrs;
+  }
 
-	public SearchResult(String name, Object obj, Attributes attrs, boolean isRelative) {
-		super(name, obj, isRelative);
-		this.attrs = attrs;
-	}
+  public SearchResult(String name, Object obj, Attributes attrs,
+  		      boolean isRelative)
+  {
+    super(name, obj, isRelative);
+    this.attrs = attrs;
+  }
 
-	public SearchResult(String name, String className, Object obj, Attributes attrs) {
-		super(name, className, obj);
-		this.attrs = attrs;
-	}
+  public SearchResult(String name, String className, Object obj,
+  		      Attributes attrs)
+  {
+    super(name, className, obj);
+    this.attrs = attrs;
+  }
 
-	public SearchResult(String name, String className, Object obj, Attributes attrs, boolean isRelative) {
-		super(name, className, obj, isRelative);
-		this.attrs = attrs;
-	}
+  public SearchResult(String name, String className, Object obj,
+  		      Attributes attrs, boolean isRelative)
+  {
+    super(name, className, obj, isRelative);
+    this.attrs = attrs;
+  }
 
-	public Attributes getAttributes() {
-		return attrs;
-	}
+  public Attributes getAttributes()
+  {
+    return attrs;
+  }
 
-	public void setAttributes(Attributes attrs) {
-		this.attrs = attrs;
-	}
+  public void setAttributes(Attributes attrs)
+  {
+    this.attrs = attrs;
+  }
 
-	public String toString() {
-		return super.toString() + ":" + attrs.toString();
-	}
+  public String toString()
+  {
+    return super.toString() + ":" + attrs.toString();
+  }
 }

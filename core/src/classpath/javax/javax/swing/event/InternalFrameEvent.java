@@ -35,80 +35,80 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing.event;
 
-// Imports
 import java.awt.AWTEvent;
 import javax.swing.JInternalFrame;
 
 /**
- * InternalFrameEvent
  * @author Andrew Selkirk
  */
-public class InternalFrameEvent extends AWTEvent {
+public class InternalFrameEvent extends AWTEvent
+{
+  private static final long serialVersionUID = -5204823611874873183L;
 
-	//-------------------------------------------------------------
-	// Constants --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Internal frame activated event
+   */
+  public static final int INTERNAL_FRAME_ACTIVATED = 25554;
 
-	/**
-	 * Internal frame activated event
-	 */
-	public static	int	INTERNAL_FRAME_ACTIVATED	= 25554;
+  /**
+   * Internal frame closed event
+   */
+  public static final int INTERNAL_FRAME_CLOSED = 25551;
 
-	/**
-	 * Internal frame closed event
-	 */
-	public static	int	INTERNAL_FRAME_CLOSED		= 25551;
+  /**
+   * Internal frame closing event
+   */
+  public static final int INTERNAL_FRAME_CLOSING = 25550;
 
-	/**
-	 * Internal frame closing event
-	 */
-	public static	int	INTERNAL_FRAME_CLOSING		= 25550;
+  /**
+   * Internal frame deactivated event
+   */
+  public static final int INTERNAL_FRAME_DEACTIVATED = 25555;
 
-	/**
-	 * Internal frame deactivated event
-	 */
-	public static	int	INTERNAL_FRAME_DEACTIVATED	= 25555;
+  /**
+   * Internal frame deiconifed event
+   */
+  public static final int INTERNAL_FRAME_DEICONIFIED = 25553;
 
-	/**
-	 * Internal frame deiconifed event
-	 */
-	public static	int	INTERNAL_FRAME_DEICONIFIED	= 25553;
+  /**
+   * Internal frame frame first event
+   */
+  public static final int INTERNAL_FRAME_FIRST = 25549;
 
-	/**
-	 * Internal frame frame first event
-	 */
-	public static	int	INTERNAL_FRAME_FIRST		= 25549;
+  /**
+   * Internal frame iconified event
+   */
+  public static final int INTERNAL_FRAME_ICONIFIED = 25552;
 
-	/**
-	 * Internal frame iconified event
-	 */
-	public static	int	INTERNAL_FRAME_ICONIFIED	= 2552;
+  /**
+   * Internal frame last event
+   */
+  public static final int INTERNAL_FRAME_LAST = 25555;
 
-	/**
-	 * Internal frame last event
-	 */
-	public static	int	INTERNAL_FRAME_LAST			= 25555;
+  /**
+   * Internal frame opened event
+   */
+  public static final int INTERNAL_FRAME_OPENED = 25549;
 
-	/**
-	 * Internal frame opened event
-	 */
-	public static	int	INTERNAL_FRAME_OPENED		= 25550;
+  /**
+   * Creates a <code>JInternalFrameEvent</code> object.
+   * 
+   * @param source The source of this event.
+   * @param id Then event ID of this event.
+   */
+  public InternalFrameEvent(JInternalFrame source, int id)
+  {
+    super(source, id);
+  }
 
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Constructor InternalFrameEvent
-	 * @param source JInternalFrame
-	 * @param id Event ID
-	 */
-	public InternalFrameEvent(JInternalFrame source, int id) {
-		super(source, id);
-	} // InternalFrameEvent()
-
-
-} // InternalFrameEvent
+  /**
+   * Returns the <code>JInternalFrame</code> object stored in this event.
+   */
+  public JInternalFrame getInternalFrame()
+  {
+    return (JInternalFrame) source;
+  }
+}

@@ -1,5 +1,5 @@
 /* SeparatorUI.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,22 +38,21 @@ exception statement from your version. */
 package javax.swing.plaf;
 
 /**
- * SeparatorUI
- * @author	Andrew Selkirk
- * @version	1.0
+ * An abstract base class for delegates that implement the pluggable
+ * look and feel for a <code>JSeparator</code>.
+ *
+ * @see javax.swing.JSeparator
+ *
+ * @author Andrew Selkirk (aselkirk@sympatico.ca)
+ * @author Sascha Brawer (brawer@dandelis.ch)
  */
-public abstract class SeparatorUI extends ComponentUI {
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Constructor SeparatorUI
-	 */
-	public SeparatorUI() {
-		// TODO
-	} // SeparatorUI()
-
-
-} // SeparatorUI
+public abstract class SeparatorUI
+  extends ComponentUI
+{
+  /**
+   * Constructs a new <code>SeparatorUI</code>.
+   */
+  public SeparatorUI()
+  {
+  }
+}

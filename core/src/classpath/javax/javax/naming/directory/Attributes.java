@@ -38,8 +38,10 @@ exception statement from your version. */
 
 package javax.naming.directory;
 
-import javax.naming.*;
 import java.io.Serializable;
+import javax.naming.Context;
+import javax.naming.Name;
+import javax.naming.NamingEnumeration;
 
 /**
  * @author Warren Levy <warrenl@redhat.com>
@@ -48,14 +50,14 @@ import java.io.Serializable;
 
 public interface Attributes extends Cloneable, Serializable
 {
-  public boolean isCaseIgnored();
-  public int size();
-  public Attribute get(String attrID);
-  public NamingEnumeration getAll();
-  public NamingEnumeration getIDs();
-  public Attribute put(String attrID, Object val);
-  public Attribute put(Attribute attr);
-  public Attribute remove(String attrID);
-  public Object clone();
+  boolean isCaseIgnored();
+  int size();
+  Attribute get(String attrID);
+  NamingEnumeration getAll();
+  NamingEnumeration getIDs();
+  Attribute put(String attrID, Object val);
+  Attribute put(Attribute attr);
+  Attribute remove(String attrID);
+  Object clone();
 }
 

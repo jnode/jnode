@@ -473,13 +473,13 @@ public abstract class JTextComponent extends JComponent
     }
 
     public TextUI getUI()
-    {	return (TextUI) ui;
+  {
+    return (TextUI) UIManager.getUI(this);
     }
 
     public void updateUI()
     {
-	TextUI b = (TextUI)UIManager.getUI(this);
-	setUI(b);
+    setUI(getUI());
     }
 
   public Dimension getPreferredScrollableViewportSize()

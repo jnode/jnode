@@ -1,5 +1,5 @@
 /* UndoableEditEvent.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,9 +37,8 @@ exception statement from your version. */
 
 package javax.swing.event;
 
-// Imports
-import java.util.*;
-import javax.swing.undo.*;
+import java.util.EventObject;
+import javax.swing.undo.UndoableEdit;
 
 /**
  * UndoableEditEvent
@@ -47,6 +46,8 @@ import javax.swing.undo.*;
  * @author Ronald Veldema
  */
 public class UndoableEditEvent extends EventObject {
+
+  private static final long serialVersionUID = 4418044561759134484L;
 
 	//-------------------------------------------------------------
 	// Variables --------------------------------------------------

@@ -35,68 +35,84 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+ 
 package javax.naming;
 
+import java.lang.Exception;
+ 
 /**
  * @author Warren Levy <warrenl@redhat.com>
  * @date June 14, 2001
  */
 
-public class LinkException extends NamingException {
-	// Serialized fields.
-	protected Name linkResolvedName;
-	protected Object linkResolvedObj;
-	protected Name linkRemainingName;
-	protected String linkExplanation;
+public class LinkException extends NamingException
+{
+  // Serialized fields.
+  protected Name linkResolvedName;
+  protected Object linkResolvedObj;
+  protected Name linkRemainingName;
+  protected String linkExplanation;
 
-	public LinkException() {
-		super();
-	}
+  public LinkException ()
+  {
+    super ();
+  }
 
-	public LinkException(String msg) {
-		super(msg);
-	}
+  public LinkException (String msg)
+  {
+    super (msg);
+  }
 
-	public Name getLinkResolvedName() {
-		return linkResolvedName;
-	}
+  public Name getLinkResolvedName()
+  {
+    return linkResolvedName;
+  }
 
-	public Name getLinkRemainingName() {
-		return linkRemainingName;
-	}
+  public Name getLinkRemainingName()
+  {
+    return linkRemainingName;
+  }
 
-	public Object getLinkResolvedObj() {
-		return linkResolvedObj;
-	}
+  public Object getLinkResolvedObj()
+  {
+    return linkResolvedObj;
+  }
 
-	public String getLinkExplanation() {
-		return linkExplanation;
-	}
+  public String getLinkExplanation()
+  {
+    return linkExplanation;
+  }
 
-	public void setLinkExplanation(String msg) {
-		linkExplanation = msg;
-	}
+  public void setLinkExplanation(String msg)
+  {
+    linkExplanation = msg;
+  }
 
-	public void setLinkResolvedName(Name name) {
-		linkResolvedName = (Name) name.clone();
-	}
+  public void setLinkResolvedName(Name name)
+  {
+    linkResolvedName = (Name) name.clone();
+  }
 
-	public void setLinkRemainingName(Name name) {
-		linkRemainingName = (Name) name.clone();
-	}
+  public void setLinkRemainingName(Name name)
+  {
+    linkRemainingName = (Name) name.clone();
+  }
 
-	public void setLinkResolvedObj(Object obj) {
-		linkResolvedObj = obj;
-	}
+  public void setLinkResolvedObj(Object obj)
+  {
+    linkResolvedObj = obj;
+  }
 
-	public String toString() {
-		return super.toString() + "; " + linkRemainingName.toString();
-	}
+  public String toString ()
+  {
+    return super.toString () + "; " + linkRemainingName.toString ();
+  }
 
-	public String toString(boolean detail) {
-		String r = super.toString(detail) + "; " + linkRemainingName.toString();
-		if (detail)
-			r += "; " + linkResolvedObj.toString();
-		return r;
-	}
+  public String toString (boolean detail)
+  {
+    String r = super.toString (detail) + "; " + linkRemainingName.toString ();
+    if (detail)
+      r += "; " + linkResolvedObj.toString ();
+    return r;
+  }
 }

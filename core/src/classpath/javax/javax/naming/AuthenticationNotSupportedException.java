@@ -35,14 +35,21 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+ 
 package javax.naming;
 
-public class AuthenticationNotSupportedException extends NamingSecurityException {
-	public AuthenticationNotSupportedException() {
-		super();
-	}
+import java.lang.Exception;
+ 
+public class AuthenticationNotSupportedException
+  extends NamingSecurityException
+{
+  public AuthenticationNotSupportedException ()
+  {
+    super ();
+  }
 
-	public AuthenticationNotSupportedException(String msg) {
-		super(msg);
-	}
+  public AuthenticationNotSupportedException (String msg)
+  {
+    super (msg);
+  }
 }

@@ -1,5 +1,5 @@
 /* InitialContext.java --
-   Copyright (C) 2000, 2002 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,282 +35,360 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.naming;
 
+import java.applet.Applet;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
-
 import javax.naming.spi.NamingManager;
 
-public class InitialContext implements Context {
-	protected Context defaultInitCtx;
-	protected boolean gotDefault = false;
-	protected Hashtable myProps;
+public class InitialContext implements Context
+{
+  protected Context defaultInitCtx;
+  protected boolean gotDefault = false;
+  protected Hashtable myProps;
+  
+  public InitialContext (Hashtable environment)
+    throws NamingException
+  {
+    init (environment);
+  }
+  
+  protected InitialContext (boolean lazy)
+    throws NamingException
+  {
+    if (! lazy)
+      init (null);
+  }
+  
+  public InitialContext ()
+    throws NamingException
+  {
+    init (null);
+  }
+ 
+  /** @since 1.3 */
+  protected void init (Hashtable environment)
+    throws NamingException
+  {
+    // FIXME: Is this enough?
+    final String[] properties = {
+      Context.DNS_URL,
+      Context.INITIAL_CONTEXT_FACTORY,
+      Context.OBJECT_FACTORIES,
+      Context.PROVIDER_URL,
+      Context.STATE_FACTORIES,
+      Context.URL_PKG_PREFIXES,
+    };
+      
+    // Create myProps, cloning environment if needed.
+    if (environment != null)
+      myProps = (Hashtable) environment.clone ();
+    else
+      myProps = new Hashtable ();
+      
+    Applet napplet = (Applet) myProps.get (Context.APPLET);
+      
+    for (int i = properties.length - 1; i >= 0; i--)
+      {
+	Object o = myProps.get (properties[i]);
+	  
+	if (o == null)
+	  {
+	    if (napplet != null)
+	      o = napplet.getParameter (properties[i]);
+	    if (o == null)
+	      o = System.getProperty (properties[i]);
+	    if (o != null)
+	      myProps.put (properties[i], o);
+	  }
+      }
 
-	public InitialContext(Hashtable environment) {
-		init(environment);
+    try
+      {
+	Enumeration ep = Thread.currentThread().getContextClassLoader().getResources("jndi.naming");
+	while (ep.hasMoreElements ())
+	  {
+	    URL url = (URL) ep.nextElement ();
+	    Properties p = new Properties ();
+		    
+	    try
+	      {
+		InputStream is = url.openStream ();
+		p.load (is);
+		is.close ();
+	      }
+	    catch (IOException e)
+	      {
+	      }
+
+	    merge (myProps, p);
+	  }
+      }
+    catch (IOException e)
+      {
+      }
+
+    String home = System.getProperty("gnu.classpath.home.url");
+    if (home != null)
+      {
+	String url = home + "/jndi.properties";
+	Properties p = new Properties ();
+	
+	try
+	  {
+	    InputStream is = new URL(url).openStream();
+	    p.load (is);
+	    is.close ();
+	  }
+	catch (IOException e)
+	  {
+	    // Ignore.
+	  }
+
+	merge (myProps, p);
+      }
+  }
+
+  // FIXME: Is this enough?
+  private static final String[] colon_list = 
+    {
+      Context.OBJECT_FACTORIES,
+      Context.URL_PKG_PREFIXES,
+      Context.STATE_FACTORIES
+    };
+
+  private static void merge (Hashtable h1, Hashtable h2)
+  {
+    Enumeration e2 = h2.keys();
+    
+    while (e2.hasMoreElements())
+      {
+	String key2 = (String) e2.nextElement();
+	Object value1 = h1.get(key2);
+	if (value1 == null)
+	  h1.put(key2, h2.get(key2));
+	else if (key2.compareTo(colon_list[0]) == 0
+		 || key2.compareTo(colon_list[1]) == 0
+		 || key2.compareTo(colon_list[2]) == 0
+		 || key2.compareTo(colon_list[3]) == 0)
+	  {
+	    String value2 = (String) h2.get(key2);
+	    h1.put(key2, (String) value1 + ":" + value2);
+	  }
+      }
+  }
+
+  protected Context getDefaultInitCtx () throws NamingException
+  {
+    if (! gotDefault)
+      {
+	defaultInitCtx = NamingManager.getInitialContext (myProps);
+	gotDefault = true;
+      }
+    return defaultInitCtx;
+  }
+
+
+  protected Context getURLOrDefaultInitCtx (Name name) 
+    throws NamingException
+  {
+    if (name.size () > 0)
+      return getURLOrDefaultInitCtx (name.get (0));
+    else
+      return getDefaultInitCtx ();
+  }
+
+  protected Context getURLOrDefaultInitCtx (String name) 
+    throws NamingException
+  {
+    String scheme = null;
+
+    if (NamingManager.hasInitialContextFactoryBuilder())
+      return getDefaultInitCtx();
+    int colon = name.indexOf(':');
+    int slash = name.indexOf('/');
+    if (colon > 0 && (slash == -1 || colon < slash))
+      scheme = name.substring(0, colon);
+    if (scheme != null) 
+      {
+	Context context = 
+	  NamingManager.getURLContext(scheme, myProps);
+	if (context != null)
+	  return context;
+      }
+	
+    return getDefaultInitCtx();
+  }
+
+  public void bind (Name name, Object obj) throws NamingException
+  {
+    getURLOrDefaultInitCtx (name).bind (name, obj);
+  }
+
+  public void bind (String name, Object obj) throws NamingException
+  {
+    getURLOrDefaultInitCtx (name).bind (name, obj);
+  }
+
+  public Object lookup (Name name) throws NamingException
+  {
+    try
+      {
+	return getURLOrDefaultInitCtx (name).lookup (name);
+      }
+    catch (CannotProceedException cpe)
+      {
+	Context ctx = NamingManager.getContinuationContext (cpe);
+	return ctx.lookup (cpe.getRemainingName());
+      }
+  }
+
+  public Object lookup (String name) throws NamingException
+  {
+      try
+	{
+	  return getURLOrDefaultInitCtx (name).lookup (name);
 	}
-
-	protected InitialContext(boolean lazy) {
-		if (!lazy)
-			init(null);
+      catch (CannotProceedException cpe)
+	{
+	  Context ctx = NamingManager.getContinuationContext (cpe);
+	  return ctx.lookup (cpe.getRemainingName());
 	}
+  }
 
-	public InitialContext() {
-		init(null);
-	}
+  public void rebind (Name name, Object obj) throws NamingException
+  {
+    getURLOrDefaultInitCtx (name).rebind (name, obj);
+  }
 
-	protected void init(Hashtable environment) {
-		// FIXME: Is this enough?
-		final String[] properties =
-			{
-				Context.DNS_URL,
-				Context.INITIAL_CONTEXT_FACTORY,
-				Context.OBJECT_FACTORIES,
-				Context.PROVIDER_URL,
-				Context.STATE_FACTORIES,
-				Context.URL_PKG_PREFIXES,
-				};
+  public void rebind (String name, Object obj) throws NamingException
+  {
+    getURLOrDefaultInitCtx (name).rebind (name, obj);
+  }
 
-		// Create myProps, cloning environment if needed.
-		if (environment != null)
-			myProps = (Hashtable)environment.clone();
-		else
-			myProps = new Hashtable();
+  public void unbind (Name name) throws NamingException
+  {
+    getURLOrDefaultInitCtx (name).unbind (name);
+  }
 
-		/*Applet napplet = (Applet)myProps.get(Context.APPLET);
+  public void unbind (String name) throws NamingException
+  {
+    getURLOrDefaultInitCtx (name).unbind (name);
+  }
 
-		for (int i = properties.length - 1; i >= 0; i--) {
-			Object o = myProps.get(properties[i]);
+  public void rename (Name oldName, Name newName) throws NamingException
+  {
+    getURLOrDefaultInitCtx (oldName).rename (oldName, newName);
+  }
 
-			if (o == null) {
-				if (napplet != null)
-					o = napplet.getParameter(properties[i]);
-				if (o == null)
-					o = System.getProperty(properties[i]);
-				if (o != null)
-					myProps.put(properties[i], o);
-			}
-		}*/
+  public void rename (String oldName, String newName) throws NamingException
+  {
+    getURLOrDefaultInitCtx (oldName).rename (oldName, newName);
+  }
 
-		try {
-			Enumeration ep =
-				Thread.currentThread().getContextClassLoader().getResources(
-					"jndi.naming");
-			while (ep.hasMoreElements()) {
-				URL url = (URL)ep.nextElement();
-				Properties p = new Properties();
+  public NamingEnumeration list (Name name) throws NamingException
+  {
+    return getURLOrDefaultInitCtx (name).list (name);
+  }
 
-				try {
-					InputStream is = url.openStream();
-					p.load(is);
-					is.close();
-				} catch (IOException e) {
-				}
+  public NamingEnumeration list (String name) throws NamingException
+  {
+    return getURLOrDefaultInitCtx (name).list (name);
+  }
 
-				merge(myProps, p);
-			}
-		} catch (IOException e) {
-		}
+  public NamingEnumeration listBindings (Name name) throws NamingException
+  {
+    return getURLOrDefaultInitCtx (name).listBindings (name);
+  }
 
-		String home = System.getProperty("gnu.classpath.home.url");
-		if (home != null) {
-			String url = home + "/jndi.properties";
-			Properties p = new Properties();
+  public NamingEnumeration listBindings (String name) throws NamingException
+  {
+    return getURLOrDefaultInitCtx (name).listBindings (name);
+  }
 
-			try {
-				InputStream is = new URL(url).openStream();
-				p.load(is);
-				is.close();
-			} catch (IOException e) {
-				// Ignore.
-			}
+  public void destroySubcontext (Name name) throws NamingException
+  {
+    getURLOrDefaultInitCtx (name).destroySubcontext (name);
+  }
 
-			merge(myProps, p);
-		}
-	}
+  public void destroySubcontext (String name) throws NamingException
+  {
+    getURLOrDefaultInitCtx (name).destroySubcontext (name);
+  }
 
-	// FIXME: Is this enough?
-	private static final String[] colon_list =
-		{
-			Context.OBJECT_FACTORIES,
-			Context.URL_PKG_PREFIXES,
-			Context.STATE_FACTORIES };
+  public Context createSubcontext (Name name) throws NamingException
+  {
+    return getURLOrDefaultInitCtx (name).createSubcontext (name);
+  }
 
-	private static void merge(Hashtable h1, Hashtable h2) {
-		Enumeration e2 = h2.keys();
+  public Context createSubcontext (String name) throws NamingException
+  {
+    return getURLOrDefaultInitCtx (name).createSubcontext (name);
+  }
 
-		while (e2.hasMoreElements()) {
-			String key2 = (String)e2.nextElement();
-			Object value1 = h1.get(key2);
-			if (value1 == null)
-				h1.put(key2, h2.get(key2));
-			else if (
-				key2.compareTo(colon_list[0]) == 0
-					|| key2.compareTo(colon_list[1]) == 0
-					|| key2.compareTo(colon_list[2]) == 0
-					|| key2.compareTo(colon_list[3]) == 0) {
-				String value2 = (String)h2.get(key2);
-				h1.put(key2, (String)value1 + ":" + value2);
-			}
-		}
-	}
+  public Object lookupLink (Name name) throws NamingException
+  {
+    return getURLOrDefaultInitCtx (name).lookupLink (name);
+  }
 
-	protected Context getDefaultInitCtx() throws NamingException {
-		if (!gotDefault) {
-			defaultInitCtx = NamingManager.getInitialContext(myProps);
-			gotDefault = true;
-		}
-		return defaultInitCtx;
-	}
+  public Object lookupLink (String name) throws NamingException
+  {
+    return getURLOrDefaultInitCtx (name).lookupLink (name);
+  }
 
-	protected Context getURLOrDefaultInitCtx(Name name)
-		throws NamingException {
-		if (name.size() > 0)
-			return getURLOrDefaultInitCtx(name.get(0));
-		else
-			return getDefaultInitCtx();
-	}
+  public NameParser getNameParser (Name name) throws NamingException
+  {
+    return getURLOrDefaultInitCtx (name).getNameParser (name);
+  }
 
-	protected Context getURLOrDefaultInitCtx(String name)
-		throws NamingException {
-		String scheme = null;
+  public NameParser getNameParser (String name) throws NamingException
+  {
+    return getURLOrDefaultInitCtx (name).getNameParser (name);
+  }
 
-		if (NamingManager.hasInitialContextFactoryBuilder())
-			return getDefaultInitCtx();
-		int colon = name.indexOf(':');
-		int slash = name.indexOf('/');
-		if (colon > 0 && (slash == -1 || colon < slash))
-			scheme = name.substring(0, colon);
-		if (scheme != null) {
-			Context context = NamingManager.getURLContext(scheme, myProps);
-			if (context != null)
-				return context;
-		}
+  public Name composeName (Name name, Name prefix) throws NamingException
+  {
+    return getURLOrDefaultInitCtx (name).composeName (name, prefix);
+  }
 
-		return getDefaultInitCtx();
-	}
+  public String composeName (String name, 
+			     String prefix) throws NamingException
+  {
+    return getURLOrDefaultInitCtx (name).composeName (name, prefix);
+  }
 
-	public void bind(Name name, Object obj) throws NamingException {
-		getURLOrDefaultInitCtx(name).bind(name, obj);
-	}
+  public Object addToEnvironment (String propName, 
+				  Object propVal) throws NamingException
+  {
+    return myProps.put (propName, propVal);
+  }
 
-	public void bind(String name, Object obj) throws NamingException {
-		getURLOrDefaultInitCtx(name).bind(name, obj);
-	}
+  public Object removeFromEnvironment (String propName) throws NamingException
+  {
+    return myProps.remove (propName);
+  }
 
-	public Object lookup(Name name) throws NamingException {
-		return getURLOrDefaultInitCtx(name).lookup(name);
-	}
+  public Hashtable getEnvironment () throws NamingException
+  {
+    return myProps;
+  }
 
-	public Object lookup(String name) throws NamingException {
-		return getURLOrDefaultInitCtx(name).lookup(name);
-	}
+  public void close () throws NamingException
+  {
+    myProps = null;
+    defaultInitCtx = null;
+  }
 
-	public void rebind(Name name, Object obj) throws NamingException {
-		getURLOrDefaultInitCtx(name).rebind(name, obj);
-	}
-
-	public void rebind(String name, Object obj) throws NamingException {
-		getURLOrDefaultInitCtx(name).rebind(name, obj);
-	}
-
-	public void unbind(Name name) throws NamingException {
-		getURLOrDefaultInitCtx(name).unbind(name);
-	}
-
-	public void unbind(String name) throws NamingException {
-		getURLOrDefaultInitCtx(name).unbind(name);
-	}
-
-	public void rename(Name oldName, Name newName) throws NamingException {
-		getURLOrDefaultInitCtx(oldName).rename(oldName, newName);
-	}
-
-	public void rename(String oldName, String newName) throws NamingException {
-		getURLOrDefaultInitCtx(oldName).rename(oldName, newName);
-	}
-
-	public NamingEnumeration list(Name name) throws NamingException {
-		return getURLOrDefaultInitCtx(name).list(name);
-	}
-
-	public NamingEnumeration list(String name) throws NamingException {
-		return getURLOrDefaultInitCtx(name).list(name);
-	}
-
-	public NamingEnumeration listBindings(Name name) throws NamingException {
-		return getURLOrDefaultInitCtx(name).listBindings(name);
-	}
-
-	public NamingEnumeration listBindings(String name) throws NamingException {
-		return getURLOrDefaultInitCtx(name).listBindings(name);
-	}
-
-	public void destroySubcontext(Name name) throws NamingException {
-		getURLOrDefaultInitCtx(name).destroySubcontext(name);
-	}
-
-	public void destroySubcontext(String name) throws NamingException {
-		getURLOrDefaultInitCtx(name).destroySubcontext(name);
-	}
-
-	public Context createSubcontext(Name name) throws NamingException {
-		return getURLOrDefaultInitCtx(name).createSubcontext(name);
-	}
-
-	public Context createSubcontext(String name) throws NamingException {
-		return getURLOrDefaultInitCtx(name).createSubcontext(name);
-	}
-
-	public Object lookupLink(Name name) throws NamingException {
-		return getURLOrDefaultInitCtx(name).lookupLink(name);
-	}
-
-	public Object lookupLink(String name) throws NamingException {
-		return getURLOrDefaultInitCtx(name).lookupLink(name);
-	}
-
-	public NameParser getNameParser(Name name) throws NamingException {
-		return getURLOrDefaultInitCtx(name).getNameParser(name);
-	}
-
-	public NameParser getNameParser(String name) throws NamingException {
-		return getURLOrDefaultInitCtx(name).getNameParser(name);
-	}
-
-	public Name composeName(Name name, Name prefix) throws NamingException {
-		return getURLOrDefaultInitCtx(name).composeName(name, prefix);
-	}
-
-	public String composeName(String name, String prefix)
-		throws NamingException {
-		return getURLOrDefaultInitCtx(name).composeName(name, prefix);
-	}
-
-	public Object addToEnvironment(String propName, Object propVal)
-		throws NamingException {
-		return myProps.put(propName, propVal);
-	}
-
-	public Object removeFromEnvironment(String propName)
-		throws NamingException {
-		return myProps.remove(propName);
-	}
-
-	public Hashtable getEnvironment() throws NamingException {
-		return myProps;
-	}
-
-	public void close() throws NamingException {
-		throw new OperationNotSupportedException();
-	}
-
-	public String getNameInNamespace() throws NamingException {
-		throw new OperationNotSupportedException();
-	}
+  public String getNameInNamespace () throws NamingException
+  {
+    throw new OperationNotSupportedException ();
+  }
 }
