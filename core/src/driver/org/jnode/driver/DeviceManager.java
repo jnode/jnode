@@ -165,4 +165,18 @@ public interface DeviceManager {
      * @param defaultStartTimeout The defaultStartTimeout to set.
      */
     public void setDefaultStartTimeout(long defaultStartTimeout);
+
+    /**
+     * Fire a device started event to all the device listeners
+     * 
+     * @param device
+     */    
+    public void fireStartedEvent(Device device);
+
+    /**
+     * Fire a device stop event to all the device listeners
+     * 
+     * @param device
+     */
+    public void fireStopEvent(Device device);
 }
