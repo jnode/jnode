@@ -47,17 +47,26 @@ public abstract class AbstractGraphics extends Graphics2D {
 	private static final Stroke DEFAULT_STROKE = new BasicStroke();
 
 	private Color bgColor = Color.WHITE;
+
 	private Color fgColor = Color.BLACK;
+
 	private Color xorColor = null;
+
 	private Font font = new Font("Luxi Sans", Font.PLAIN, 10);
+
 	Shape clip;
+
 	private Stroke stroke = DEFAULT_STROKE;
+
 	AffineTransform transform = new AffineTransform();
+
 	private Paint paint = Color.WHITE;
+
 	private Composite composite;
 
 	/**
 	 * Initialize this instance
+	 * 
 	 * @param width
 	 * @param height
 	 */
@@ -67,6 +76,7 @@ public abstract class AbstractGraphics extends Graphics2D {
 
 	/**
 	 * Initialize this instance as a copy of the given instance
+	 * 
 	 * @param src
 	 */
 	public AbstractGraphics(AbstractGraphics src) {
@@ -109,7 +119,8 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @param op
 	 * @param x
 	 * @param y
-	 * @see java.awt.Graphics2D#drawImage(java.awt.image.BufferedImage, java.awt.image.BufferedImageOp, int, int)
+	 * @see java.awt.Graphics2D#drawImage(java.awt.image.BufferedImage,
+	 *      java.awt.image.BufferedImageOp, int, int)
 	 */
 	public void drawImage(BufferedImage image, BufferedImageOp op, int x, int y) {
 		final Image img1 = op.filter(image, null);
@@ -120,10 +131,12 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @param image
 	 * @param xform
 	 * @param obs
-	 * @see java.awt.Graphics2D#drawImage(java.awt.Image, java.awt.geom.AffineTransform, java.awt.image.ImageObserver)
+	 * @see java.awt.Graphics2D#drawImage(java.awt.Image,
+	 *      java.awt.geom.AffineTransform, java.awt.image.ImageObserver)
 	 * @return boolean
 	 */
-	public boolean drawImage(Image image, AffineTransform xform, ImageObserver obs) {
+	public boolean drawImage(Image image, AffineTransform xform,
+			ImageObserver obs) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -131,7 +144,8 @@ public abstract class AbstractGraphics extends Graphics2D {
 	/**
 	 * @param image
 	 * @param xform
-	 * @see java.awt.Graphics2D#drawRenderableImage(java.awt.image.renderable.RenderableImage, java.awt.geom.AffineTransform)
+	 * @see java.awt.Graphics2D#drawRenderableImage(java.awt.image.renderable.RenderableImage,
+	 *      java.awt.geom.AffineTransform)
 	 */
 	public void drawRenderableImage(RenderableImage image, AffineTransform xform) {
 		// TODO Auto-generated method stub
@@ -141,7 +155,8 @@ public abstract class AbstractGraphics extends Graphics2D {
 	/**
 	 * @param image
 	 * @param xform
-	 * @see java.awt.Graphics2D#drawRenderedImage(java.awt.image.RenderedImage, java.awt.geom.AffineTransform)
+	 * @see java.awt.Graphics2D#drawRenderedImage(java.awt.image.RenderedImage,
+	 *      java.awt.geom.AffineTransform)
 	 */
 	public void drawRenderedImage(RenderedImage image, AffineTransform xform) {
 		// TODO Auto-generated method stub
@@ -152,9 +167,11 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @param iterator
 	 * @param x
 	 * @param y
-	 * @see java.awt.Graphics2D#drawString(java.text.AttributedCharacterIterator, float, float)
+	 * @see java.awt.Graphics2D#drawString(java.text.AttributedCharacterIterator,
+	 *      float, float)
 	 */
-	public void drawString(AttributedCharacterIterator iterator, float x, float y) {
+	public void drawString(AttributedCharacterIterator iterator, float x,
+			float y) {
 		// TODO Auto-generated method stub
 
 	}
@@ -163,7 +180,8 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @param iterator
 	 * @param x
 	 * @param y
-	 * @see java.awt.Graphics2D#drawString(java.text.AttributedCharacterIterator, int, int)
+	 * @see java.awt.Graphics2D#drawString(java.text.AttributedCharacterIterator,
+	 *      int, int)
 	 */
 	public void drawString(AttributedCharacterIterator iterator, int x, int y) {
 		drawString(iterator, (float) x, (float) y);
@@ -175,9 +193,8 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @param y
 	 * @see java.awt.Graphics2D#drawString(java.lang.String, float, float)
 	 */
-	public void drawString(String text, float x, float y) 
-	{
-		this.drawString(text,Math.round(x),Math.round(y));
+	public void drawString(String text, float x, float y) {
+		this.drawString(text, Math.round(x), Math.round(y));
 	}
 
 	/**
@@ -187,9 +204,10 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @see java.awt.Graphics#drawString(java.lang.String, int, int)
 	 */
 	public void drawString(String text, int x, int y) {
-//		System.out.println("drawText():" + text);
-		if(this.font != null)
-			((JNodeToolkit)Toolkit.getDefaultToolkit()).getFontManager().drawText(this,text,font,x,y);
+		//		System.out.println("drawText():" + text);
+		if (this.font != null)
+			((JNodeToolkit) Toolkit.getDefaultToolkit()).getFontManager()
+					.drawText(this, text, font, x, y);
 	}
 
 	/**
@@ -331,7 +349,8 @@ public abstract class AbstractGraphics extends Graphics2D {
 	/**
 	 * @param hintKey
 	 * @param hintValue
-	 * @see java.awt.Graphics2D#setRenderingHint(java.awt.RenderingHints.Key, java.lang.Object)
+	 * @see java.awt.Graphics2D#setRenderingHint(java.awt.RenderingHints.Key,
+	 *      java.lang.Object)
 	 */
 	public void setRenderingHint(Key hintKey, Object hintValue) {
 		// TODO Auto-generated method stub
@@ -376,8 +395,19 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @param Tx
 	 * @see java.awt.Graphics2D#transform(java.awt.geom.AffineTransform)
 	 */
-	public void transform(AffineTransform Tx) {
-		transform.concatenate(Tx);
+	public void transform(AffineTransform tx) {
+		transform.concatenate(tx);
+		// Adjust clip
+		Rectangle2D r = clip.getBounds2D();
+		double[] coords = new double[] { r.getX(), r.getY(),
+				r.getX() + r.getWidth(), r.getY() + r.getHeight() };
+		try {
+			tx.createInverse().transform(coords, 0, coords, 0, 2);
+			r.setRect(coords[0], coords[1], coords[2] - coords[0], coords[3]
+					- coords[1]);
+			clip = r;
+		} catch (java.awt.geom.NoninvertibleTransformException e) {
+		}
 	}
 
 	/**
@@ -432,7 +462,8 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @param dy
 	 * @see java.awt.Graphics#copyArea(int, int, int, int, int, int)
 	 */
-	public abstract void copyArea(int x, int y, int width, int height, int dx, int dy);
+	public abstract void copyArea(int x, int y, int width, int height, int dx,
+			int dy);
 
 	/**
 	 * @see java.awt.Graphics#create()
@@ -456,8 +487,10 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @param arcAngle
 	 * @see java.awt.Graphics#drawArc(int, int, int, int, int, int)
 	 */
-	public void drawArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
-		draw(new Arc2D.Float(x, y, width, height, startAngle, arcAngle, Arc2D.OPEN));
+	public void drawArc(int x, int y, int width, int height, int startAngle,
+			int arcAngle) {
+		draw(new Arc2D.Float(x, y, width, height, startAngle, arcAngle,
+				Arc2D.OPEN));
 	}
 
 	/**
@@ -466,10 +499,12 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @param y
 	 * @param bgcolor
 	 * @param observer
-	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, java.awt.Color, java.awt.image.ImageObserver)
+	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int,
+	 *      java.awt.Color, java.awt.image.ImageObserver)
 	 * @return boolean
 	 */
-	public boolean drawImage(Image image, int x, int y, Color bgcolor, ImageObserver observer) {
+	public boolean drawImage(Image image, int x, int y, Color bgcolor,
+			ImageObserver observer) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -479,7 +514,8 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @param x
 	 * @param y
 	 * @param observer
-	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, java.awt.image.ImageObserver)
+	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int,
+	 *      java.awt.image.ImageObserver)
 	 * @return boolean
 	 */
 	public boolean drawImage(Image image, int x, int y, ImageObserver observer) {
@@ -495,10 +531,12 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @param height
 	 * @param bgcolor
 	 * @param observer
-	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int, java.awt.Color, java.awt.image.ImageObserver)
+	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int,
+	 *      java.awt.Color, java.awt.image.ImageObserver)
 	 * @return boolean
 	 */
-	public boolean drawImage(Image image, int x, int y, int width, int height, Color bgcolor, ImageObserver observer) {
+	public boolean drawImage(Image image, int x, int y, int width, int height,
+			Color bgcolor, ImageObserver observer) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -510,10 +548,12 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @param width
 	 * @param height
 	 * @param observer
-	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int, java.awt.image.ImageObserver)
+	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int,
+	 *      java.awt.image.ImageObserver)
 	 * @return boolean
 	 */
-	public boolean drawImage(Image image, int x, int y, int width, int height, ImageObserver observer) {
+	public boolean drawImage(Image image, int x, int y, int width, int height,
+			ImageObserver observer) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -530,10 +570,13 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @param sy2
 	 * @param bgcolor
 	 * @param observer
-	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int, int, int, int, int, java.awt.Color, java.awt.image.ImageObserver)
+	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int, int,
+	 *      int, int, int, java.awt.Color, java.awt.image.ImageObserver)
 	 * @return boolean
 	 */
-	public boolean drawImage(Image image, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, Color bgcolor, ImageObserver observer) {
+	public boolean drawImage(Image image, int dx1, int dy1, int dx2, int dy2,
+			int sx1, int sy1, int sx2, int sy2, Color bgcolor,
+			ImageObserver observer) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -549,10 +592,12 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @param sx2
 	 * @param sy2
 	 * @param observer
-	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int, int, int, int, int, java.awt.image.ImageObserver)
+	 * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int, int,
+	 *      int, int, int, java.awt.image.ImageObserver)
 	 * @return boolean
 	 */
-	public boolean drawImage(Image image, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, ImageObserver observer) {
+	public boolean drawImage(Image image, int dx1, int dy1, int dx2, int dy2,
+			int sx1, int sy1, int sx2, int sy2, ImageObserver observer) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -596,7 +641,8 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @see java.awt.Graphics#drawPolyline(int[], int[], int)
 	 */
 	public final void drawPolyline(int[] xPoints, int[] yPoints, int npoints) {
-		final GeneralPath path = new GeneralPath(GeneralPath.WIND_NON_ZERO, npoints * 2);
+		final GeneralPath path = new GeneralPath(GeneralPath.WIND_NON_ZERO,
+				npoints * 2);
 		path.moveTo(xPoints[0], yPoints[0]);
 		for (int i = 1; i < npoints; i++) {
 			path.lineTo(xPoints[i], yPoints[i]);
@@ -613,8 +659,10 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @param arcHeight
 	 * @see java.awt.Graphics#drawRoundRect(int, int, int, int, int, int)
 	 */
-	public final void drawRoundRect(int x, int y, int width, int height, int arcWidth, int arcHeight) {
-		draw(new RoundRectangle2D.Float(x, y, width, height, arcWidth, arcHeight));
+	public final void drawRoundRect(int x, int y, int width, int height,
+			int arcWidth, int arcHeight) {
+		draw(new RoundRectangle2D.Float(x, y, width, height, arcWidth,
+				arcHeight));
 	}
 
 	/**
@@ -626,8 +674,10 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @param arcAngle
 	 * @see java.awt.Graphics#fillArc(int, int, int, int, int, int)
 	 */
-	public final void fillArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
-		fill(new Arc2D.Float(x, y, width, height, startAngle, arcAngle, Arc2D.OPEN));
+	public final void fillArc(int x, int y, int width, int height,
+			int startAngle, int arcAngle) {
+		fill(new Arc2D.Float(x, y, width, height, startAngle, arcAngle,
+				Arc2D.OPEN));
 	}
 
 	/**
@@ -671,8 +721,10 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @param arcHeight
 	 * @see java.awt.Graphics#fillRoundRect(int, int, int, int, int, int)
 	 */
-	public final void fillRoundRect(int x, int y, int width, int height, int arcWidth, int arcHeight) {
-		fill(new RoundRectangle2D.Float(x, y, width, height, arcWidth, arcHeight));
+	public final void fillRoundRect(int x, int y, int width, int height,
+			int arcWidth, int arcHeight) {
+		fill(new RoundRectangle2D.Float(x, y, width, height, arcWidth,
+				arcHeight));
 	}
 
 	/**
@@ -700,8 +752,9 @@ public abstract class AbstractGraphics extends Graphics2D {
 	}
 
 	/**
-	 * Gets the color set by setXORColor, or null when this Graphics
-	 * is in Paint mode. 
+	 * Gets the color set by setXORColor, or null when this Graphics is in Paint
+	 * mode.
+	 * 
 	 * @return The XOR mode color
 	 */
 	public Color getXORColor() {
@@ -774,33 +827,38 @@ public abstract class AbstractGraphics extends Graphics2D {
 	public void setXORMode(Color color) {
 		this.xorColor = color;
 	}
-	
-	protected final void transform(double[] srcPts, int srcOff, double[] dstPts, int dstOff, int num) {
+
+	protected final void transform(double[] srcPts, int srcOff,
+			double[] dstPts, int dstOff, int num) {
 		transform.transform(srcPts, srcOff, dstPts, dstOff, num);
 	}
 
-	protected final void transform(float[] srcPts, int srcOff, float[] dstPts, int dstOff, int num) {
+	protected final void transform(float[] srcPts, int srcOff, float[] dstPts,
+			int dstOff, int num) {
 		transform.transform(srcPts, srcOff, dstPts, dstOff, num);
 	}
 
-	protected final void transform(double[] srcPts, int srcOff, float[] dstPts, int dstOff, int num) {
+	protected final void transform(double[] srcPts, int srcOff, float[] dstPts,
+			int dstOff, int num) {
 		transform.transform(srcPts, srcOff, dstPts, dstOff, num);
 	}
 
-	protected final void transform(float[] srcPts, int srcOff, double[] dstPts, int dstOff, int num) {
+	protected final void transform(float[] srcPts, int srcOff, double[] dstPts,
+			int dstOff, int num) {
 		transform.transform(srcPts, srcOff, dstPts, dstOff, num);
 	}
 
 	public FontRenderContext getFontRenderContext() {
-	    throw new RuntimeException("Not implemented yet");
+		throw new RuntimeException("Not implemented yet");
 	}
 
-    /**
-     * @see java.awt.Graphics2D#drawGlyphVector(java.awt.font.GlyphVector, float, float)
-     */
-    public void drawGlyphVector(GlyphVector g, float x, float y) {
-        // TODO Auto-generated method stub
-    
-    }
-	  
+	/**
+	 * @see java.awt.Graphics2D#drawGlyphVector(java.awt.font.GlyphVector,
+	 *      float, float)
+	 */
+	public void drawGlyphVector(GlyphVector g, float x, float y) {
+		// TODO Auto-generated method stub
+
+	}
+
 }
