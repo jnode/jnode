@@ -39,9 +39,7 @@
     <permission class="java.util.PropertyPermission" name="dns.server" actions="read"/>
     <permission class="java.util.PropertyPermission" name="dns.search" actions="read"/>
     <permission class="org.jnode.net.NetPermission" name="bootpClient"/>
-    <permission class="java.io.FilePermission" name="
-    <
-    <ALL FILES>>" actions="read,write"/>
+    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read,write"/>
     <permission class="java.net.SocketPermission" name="*:80" actions="resolve,listen"/>
   </extension>
 </plugin>
