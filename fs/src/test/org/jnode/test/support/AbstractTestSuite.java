@@ -31,7 +31,7 @@ abstract public class AbstractTestSuite extends TestSuite
 {
     public AbstractTestSuite()
     {
-        ConfigManager.initLog4j();        
+        ContextManager.getInstance().init();     
         init();
     }
     
