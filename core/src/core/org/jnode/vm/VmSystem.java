@@ -214,7 +214,7 @@ public final class VmSystem {
         return res;
     }
 
-    private static String getCmdLine() {
+    public static String getCmdLine() {
         if (cmdLine == null) {
             /* Load the command line */
             final int cmdLineSize = Unsafe.getCmdLine(null);

@@ -15,6 +15,7 @@ import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmStackReader;
+import org.jnode.vm.VmSystem;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.x86.compiler.l1.X86Level1Compiler;
@@ -101,6 +102,13 @@ public final class VmX86Architecture extends VmArchitecture {
      * @see org.jnode.vm.VmArchitecture#initializeProcessors(ResourceManager)
      */
     protected void initializeProcessors(ResourceManager rm) {
+        
+        final String cmdLine = VmSystem.getCmdLine();
+        if (cmdLine.indexOf("mp=no") >= 0) {
+            return;
+        }
+        //
+        
         final MPFloatingPointerStructure mp = MPFloatingPointerStructure.find(
                 rm, ResourceOwner.SYSTEM);
         if (mp == null) {
@@ -118,9 +126,10 @@ public final class VmX86Architecture extends VmArchitecture {
         if (mpConfigTable == null) { return; }
 
         mpConfigTable.dump(System.out);
+        final ResourceOwner owner = ResourceOwner.SYSTEM;
         try {
             // Create the local APIC accessor
-            localAPIC = new LocalAPIC(rm, ResourceOwner.SYSTEM, mpConfigTable
+            localAPIC = new LocalAPIC(rm, owner, mpConfigTable
                     .getLocalApicAddress());
         } catch (ResourceNotFreeException ex) {
             BootLog.error("Cannot claim APIC region");
@@ -132,6 +141,24 @@ public final class VmX86Architecture extends VmArchitecture {
                 .getCurrentProcessor();
         cpu.setApic(localAPIC);
         cpu.loadAndSetApicID();
+        
+        // Find & initialize this I/O APIC.
+        for (Iterator i = mpConfigTable.entries().iterator(); i.hasNext(); ) {
+            final MPEntry entry = (MPEntry)i.next();
+            if (entry instanceof MPIOAPICEntry) {
+                final MPIOAPICEntry apicEntry = (MPIOAPICEntry)entry;
+                if (apicEntry.getFlags() != 0) {
+                    try {
+                        // We found an enabled I/O APIC.
+                        final IOAPIC apic = new IOAPIC(rm, owner, apicEntry.getAddress());
+                        apic.dump(System.out);
+                        break;
+                    } catch (ResourceNotFreeException ex) {
+                        BootLog.error("Cannot claim I/O APIC region ", ex);
+                    }
+                }
+            }
+        }
 
         try {
             // Detect Hyper threading on current (bootstrap) processor
