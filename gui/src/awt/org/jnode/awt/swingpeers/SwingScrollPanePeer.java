@@ -3,12 +3,11 @@
  */
 package org.jnode.awt.swingpeers;
 
+import javax.swing.JScrollPane;
 import java.awt.Adjustable;
 import java.awt.Component;
 import java.awt.ScrollPane;
 import java.awt.peer.ScrollPanePeer;
-
-import javax.swing.JScrollPane;
 
 /**
  * AWT scroll pane peer implemented as a {@link javax.swing.JScrollPane}.

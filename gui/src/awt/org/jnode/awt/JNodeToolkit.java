@@ -194,7 +194,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	/**
 	 * Decrement the peer reference count
 	 */
-	protected final synchronized int decRefCount(boolean forceClose) {
+	public final synchronized int decRefCount(boolean forceClose) {
 		refCount--;
 		log.debug("refCount.dec=" + refCount);
 		if ((refCount == 0) || forceClose) {

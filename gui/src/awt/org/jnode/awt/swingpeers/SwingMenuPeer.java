@@ -3,57 +3,41 @@
  */
 package org.jnode.awt.swingpeers;
 
-import java.awt.AWTEvent;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.JMenu;
 import java.awt.Menu;
 import java.awt.MenuItem;
-import java.awt.event.PaintEvent;
+import java.awt.event.ActionEvent;
 import java.awt.peer.MenuPeer;
-
-import javax.swing.JMenu;
 
 /**
  * AWT menu peer implemented as a {@link javax.swing.JMenu}.
+ * @author Levente Sántha
  */
 
-class SwingMenuPeer extends JMenu implements MenuPeer {
+class SwingMenuPeer extends SwingMenuItemPeer implements MenuPeer {
 
-    //
-    // Construction
-    //
-
-    public SwingMenuPeer(Menu menu) {
-        super();
+    public SwingMenuPeer(SwingToolkit toolkit, Menu menu) {
+        super(toolkit, menu, new JMenu());
     }
 
-    //
-    // MenuPeer
-    //
+    public SwingMenuPeer(SwingToolkit toolkit, Menu menu, JComponent jComponent) {
+        super(toolkit, menu, jComponent);
+    }
 
     public void addItem(MenuItem item) {
+        Action action = new AbstractAction(){
+            public void actionPerformed(ActionEvent e) {
+                //TODO implement it
+            }
+        };
+        action.putValue(Action.NAME, item.getLabel());
+        ((JMenu)jComponent).add(action);
     }
 
     public void delItem(int index) {
+        ((JMenu)jComponent).remove(index);
     }
-
-    //
-    // ComponentPeer
-    //
-
-    // Events
-
-    public void handleEvent(AWTEvent e) {
-        //System.err.println(e);
-    }
-
-    public void coalescePaintEvent(PaintEvent e) {
-        System.err.println(e);
-    }
-
-    // Misc
-
-    public void dispose() {
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // Private
 }

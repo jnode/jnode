@@ -3,11 +3,10 @@
  */
 package org.jnode.awt.swingpeers;
 
+import javax.swing.JScrollBar;
 import java.awt.Component;
 import java.awt.Scrollbar;
 import java.awt.peer.ScrollbarPeer;
-
-import javax.swing.JScrollBar;
 
 /**
  * AWT scrollbar peer implemented as a {@link javax.swing.JScrollBar}.

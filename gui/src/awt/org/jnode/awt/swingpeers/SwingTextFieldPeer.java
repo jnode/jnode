@@ -3,12 +3,11 @@
  */
 package org.jnode.awt.swingpeers;
 
+import javax.swing.JTextField;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.TextField;
 import java.awt.peer.TextFieldPeer;
-
-import javax.swing.JTextField;
 
 /**
  * AWT text field peer implemented as a {@link javax.swing.JTextField}.

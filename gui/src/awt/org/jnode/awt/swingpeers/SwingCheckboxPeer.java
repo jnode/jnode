@@ -3,12 +3,11 @@
  */
 package org.jnode.awt.swingpeers;
 
+import javax.swing.JCheckBox;
 import java.awt.Checkbox;
 import java.awt.CheckboxGroup;
 import java.awt.Component;
 import java.awt.peer.CheckboxPeer;
-
-import javax.swing.JCheckBox;
 
 /**
  * AWT checkbox peer implemented as a {@link javax.swing.JCheckBox}.

@@ -3,14 +3,13 @@
  */
 package org.jnode.awt.swingpeers;
 
+import org.jnode.awt.JNodeToolkit;
+
+import javax.swing.JComponent;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Insets;
 import java.awt.peer.ContainerPeer;
-
-import javax.swing.JComponent;
-
-import org.jnode.awt.JNodeToolkit;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -70,7 +69,7 @@ class SwingContainerPeer extends SwingComponentPeer implements ContainerPeer, IS
 	 * @see java.awt.peer.ContainerPeer#insets()
 	 */
 	public Insets insets() {
-		return jComponent.getInsets();
+		return getInsets();
 	}
 
 	/**

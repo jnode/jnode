@@ -3,15 +3,15 @@
  */
 package org.jnode.awt.swingpeers;
 
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import java.awt.Choice;
 import java.awt.Component;
 import java.awt.peer.ChoicePeer;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-
 /**
  * AWT choice peer implemented as a {@link javax.swing.JButton}.
+ * @author Levente Sántha
  */
 
 final class SwingChoicePeer extends SwingComponentPeer implements ChoicePeer {
@@ -23,13 +23,14 @@ final class SwingChoicePeer extends SwingComponentPeer implements ChoicePeer {
 	public SwingChoicePeer(SwingToolkit toolkit, Choice choice) {
 		super(toolkit, choice, new SwingChoice(choice));
 		final JComboBox combo = (JComboBox) jComponent;
-		combo.setModel(new DefaultComboBoxModel());
+        DefaultComboBoxModel model = new DefaultComboBoxModel();
+        final int cnt = choice.getItemCount();
+        for (int i = 0; i < cnt; i++) {
+			model.addElement(choice.getItem(i));
+		}
+		combo.setModel(model);
 		SwingToolkit.add(choice, combo);
 		SwingToolkit.copyAwtProperties(choice, combo);
-		final int cnt = choice.getItemCount();
-		for (int i = 0; i < cnt; i++) {
-			addItem(choice.getItem(i), i);
-		}
 	}
 
 	//

@@ -3,11 +3,10 @@
  */
 package org.jnode.awt.swingpeers;
 
+import javax.swing.JLabel;
 import java.awt.Component;
 import java.awt.Label;
 import java.awt.peer.LabelPeer;
-
-import javax.swing.JLabel;
 
 /**
  * AWT label peer implemented as a {@link javax.swing.JLabel}.

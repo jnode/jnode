@@ -87,6 +87,7 @@ public class Tetris extends Panel implements KeyListener {
     private static final Dimension DIM = new Dimension((WIDTH_C + 2) * CELL, (HEIGHT_C + 5 + 2) * CELL);
     private Random si_rnd = new Random();
     private Random bi_rnd = new Random();
+    private long delay = 500;
 
     public Tetris(){
         for (int i = 0; i < WIDTH_C + 2; i++) {
@@ -128,10 +129,10 @@ public class Tetris extends Panel implements KeyListener {
     }
 
     public void paint(Graphics g) {
-        if (img == null) {
-            img = createImage(DIM.width, DIM.height);
-        }
-        Graphics g2 = img.getGraphics();
+        //if (img == null) {
+        //    img = createImage(DIM.width, DIM.height);
+        //}
+        Graphics g2 = g;//img.getGraphics();
         g2.setColor(COLORS[0]);
         g2.fillRect(0, 0, DIM.width, DIM.height);
         for (int i = 0; i < WIDTH_C + 2; i++) {
@@ -174,8 +175,8 @@ public class Tetris extends Panel implements KeyListener {
             g2.drawRect(2 * CELL, 9 * CELL, 8 * CELL, 4 * CELL);
             g2.drawString("GAME OVER! SCORE: " + score, (WIDTH_C - 6) * CELL / 2 + 2, (HEIGHT_C + 2) * CELL / 2);
         }
-        g2.dispose();
-        g.drawImage(img, 0, 0, this);
+        //g2.dispose();
+        //g.drawImage(img, 0, 0, this);
     }
 
     private void rot(int i) {
@@ -264,7 +265,6 @@ public class Tetris extends Panel implements KeyListener {
         next_bi = bi_rnd.nextInt(4);
         x = 1 + bi_rnd.nextInt((WIDTH_C - DIMS[si * 4 + bi][0]));
         y = 0;
-        final long delay = 50;
         thread = new Thread(new Runnable() {
             public void run() {
                 up = true;
@@ -372,8 +372,10 @@ public class Tetris extends Panel implements KeyListener {
 
     public static void main(String[] argv) throws InterruptedException{
         int sleep = 5;
+        int delay = 500;
         try{
             sleep = Integer.parseInt(argv[0]);
+            delay = Integer.parseInt(argv[1]);
         }catch(Exception e){
             //ignore
         }
@@ -381,8 +383,9 @@ public class Tetris extends Panel implements KeyListener {
         try {
 
             Tetris tetris = new Tetris();
+            tetris.delay = delay;
             wnd.add(tetris, BorderLayout.CENTER);
-            wnd.setSize(DIM.width, DIM.height + 3*CELL);
+            wnd.setSize(DIM.width + 7, DIM.height + 2*CELL);
             wnd.show();
             tetris.requestFocus();
             tetris.newGame();

@@ -3,47 +3,23 @@
  */
 package org.jnode.awt.swingpeers;
 
-import java.awt.AWTEvent;
-import java.awt.CheckboxMenuItem;
-import java.awt.event.PaintEvent;
-import java.awt.peer.CheckboxMenuItemPeer;
-
 import javax.swing.JCheckBoxMenuItem;
+import java.awt.CheckboxMenuItem;
+import java.awt.peer.CheckboxMenuItemPeer;
 
 /**
  * AWT checkbox menu item peer implemented as a
  * {@link javax.swing.JCheckBoxMenuItem}.
+ * @author Levente Sántha
  */
 
-class SwingCheckboxMenuItemPeer extends JCheckBoxMenuItem implements
-		CheckboxMenuItemPeer {
+class SwingCheckboxMenuItemPeer extends SwingMenuItemPeer implements CheckboxMenuItemPeer {
 
-	//
-	// Construction
-	//
-
-	public SwingCheckboxMenuItemPeer(CheckboxMenuItem checkBoxMenuItem) {
+	public SwingCheckboxMenuItemPeer(SwingToolkit toolkit, CheckboxMenuItem checkBoxMenuItem) {
+        super(toolkit, checkBoxMenuItem, new JCheckBoxMenuItem());
 	}
 
-	//
-	// ComponentPeer
-	//
-
-	// Events
-
-	public void handleEvent(AWTEvent e) {
-		//System.err.println(e);
-	}
-
-	public void coalescePaintEvent(PaintEvent e) {
-		System.err.println(e);
-	}
-
-	// Misc
-
-	public void dispose() {
-	}
-
-	///////////////////////////////////////////////////////////////////////////////////////
-	// Private
+    public void setState(boolean state) {
+        ((JCheckBoxMenuItem)jComponent).setState(state);
+    }
 }

@@ -3,23 +3,18 @@
  */
 package org.jnode.awt.swingpeers;
 
+import javax.swing.JPanel;
 import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.Insets;
 import java.awt.Panel;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.peer.PanelPeer;
-
-import javax.swing.JComponent;
-import javax.swing.JPanel;
 
 /**
  * AWT panel peer implemented as a {@link javax.swing.JPanel}.
+ * @author Levente Sántha
  */
 
-final class SwingPanelPeer extends SwingComponentPeer implements PanelPeer,
-		ISwingContainerPeer {
+final class SwingPanelPeer extends SwingContainerPeer implements PanelPeer, ISwingContainerPeer {
 
 	//
 	// Construction
@@ -31,42 +26,6 @@ final class SwingPanelPeer extends SwingComponentPeer implements PanelPeer,
         jPanel.swingPeer = this;
 		SwingToolkit.add(panel, jPanel);
 		SwingToolkit.copyAwtProperties(panel, jPanel);
-	}
-
-	/**
-	 * @see org.jnode.awt.swingpeers.ISwingContainerPeer#addAWTComponent(java.awt.Component,
-	 *      javax.swing.JComponent)
-	 */
-	public void addAWTComponent(Component awtComponent, JComponent peer) {
-		((JPanel) jComponent).add(peer);
-	}
-
-	public void beginLayout() {
-	}
-
-	//
-	// ContainerPeer
-	//
-
-	public void beginValidate() {
-	}
-
-	public void endLayout() {
-	}
-
-	public void endValidate() {
-	}
-
-	public boolean isPaintPending() {
-		return false;
-	}
-
-	public Insets getInsets() {
-		return ((JPanel) jComponent).getInsets();
-	}
-
-	public Insets insets() {
-		return getInsets();
 	}
 
 	private static class SwingPanel extends JPanel implements ISwingPeer {

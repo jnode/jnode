@@ -3,15 +3,12 @@
  */
 package org.jnode.awt.swingpeers;
 
+import org.jnode.awt.swingpeers.event.ActionListenerDelegate;
+
+import javax.swing.JButton;
 import java.awt.Button;
 import java.awt.Component;
 import java.awt.peer.ButtonPeer;
-
-import javax.swing.JButton;
-
-import org.jnode.awt.swingpeers.event.ActionListenerDelegate;
-import org.jnode.awt.swingpeers.event.MouseListenerDelegate;
-import org.jnode.awt.swingpeers.event.MouseMotionListenerDelegate;
 
 /**
  * AWT button peer implemented as a {@link javax.swing.JButton}.

@@ -3,6 +3,9 @@
  */
 package org.jnode.awt.swingpeers;
 
+import org.jnode.awt.JNodeToolkit;
+
+import javax.swing.JComponent;
 import java.awt.Button;
 import java.awt.Canvas;
 import java.awt.Checkbox;
@@ -53,13 +56,10 @@ import java.awt.peer.TextAreaPeer;
 import java.awt.peer.TextFieldPeer;
 import java.awt.peer.WindowPeer;
 
-import javax.swing.JComponent;
-
-import org.jnode.awt.JNodeToolkit;
-
 /**
  * AWT toolkit implemented entirely with JFC peers, thus allowing a lightweight
  * simulation of the operating system desktop.
+ * @author Levente Sántha
  */
 
 public class SwingToolkit extends JNodeToolkit {
@@ -90,7 +90,7 @@ public class SwingToolkit extends JNodeToolkit {
 
     protected CheckboxMenuItemPeer createCheckboxMenuItem(
             CheckboxMenuItem target) {
-        return new SwingCheckboxMenuItemPeer(target);
+        return new SwingCheckboxMenuItemPeer(this, target);
     }
 
     protected ChoicePeer createChoice(Choice target) {
@@ -98,11 +98,14 @@ public class SwingToolkit extends JNodeToolkit {
     }
 
     protected LightweightPeer createComponent(Component target) {
-        return new SwingLightweightPeer(this, target);
+        if(target instanceof Container)
+            return new SwingLightweightContainerPeer(this, (Container) target);
+        else
+            return new SwingLightweightPeer(this, target);
     }
 
     protected DialogPeer createDialog(Dialog target) {
-        return new SwingDialogPeer(target);
+        return new SwingDialogPeer(this, target);
     }
 
     public DragSourceContextPeer createDragSourceContextPeer(
@@ -137,15 +140,15 @@ public class SwingToolkit extends JNodeToolkit {
     }
 
     protected MenuPeer createMenu(Menu target) {
-        return new SwingMenuPeer(target);
+        return new SwingMenuPeer(this, target);
     }
 
     protected MenuBarPeer createMenuBar(MenuBar target) {
-        return new SwingMenuBarPeer(target);
+        return new SwingMenuBarPeer(this, target);
     }
 
     protected MenuItemPeer createMenuItem(MenuItem target) {
-        return new SwingMenuItemPeer(target);
+        return new SwingMenuItemPeer(this, target);
     }
 
     protected PanelPeer createPanel(Panel target) {
@@ -153,7 +156,7 @@ public class SwingToolkit extends JNodeToolkit {
     }
 
     protected PopupMenuPeer createPopupMenu(PopupMenu target) {
-        return new SwingPopupMenuPeer(target);
+        return new SwingPopupMenuPeer(this, target);
     }
 
     protected ScrollbarPeer createScrollbar(Scrollbar target) {
@@ -173,7 +176,7 @@ public class SwingToolkit extends JNodeToolkit {
     }
 
     protected WindowPeer createWindow(Window target) {
-        return new SwingWindowPeer(target);
+        return new SwingWindowPeer(this, target);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////

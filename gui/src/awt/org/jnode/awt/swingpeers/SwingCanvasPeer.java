@@ -3,21 +3,16 @@
  */
 package org.jnode.awt.swingpeers;
 
+import javax.swing.JComponent;
 import java.awt.Canvas;
 import java.awt.Component;
 import java.awt.peer.CanvasPeer;
-
-import javax.swing.JComponent;
 
 /**
  * AWT canvas peer implemented as a {@link javax.swing.JComponent}.
  */
 
 class SwingCanvasPeer extends SwingComponentPeer implements CanvasPeer {
-
-	//
-	// Construction
-	//
 
 	public SwingCanvasPeer(SwingToolkit toolkit, Canvas canvas) {
         super(toolkit, canvas, new SwingCanvas(canvas));

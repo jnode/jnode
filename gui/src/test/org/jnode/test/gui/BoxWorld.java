@@ -35,6 +35,9 @@ import java.util.Hashtable;
 import java.util.Stack;
 import java.util.Vector;
 
+/**
+ * * @author Levente Sántha
+ */
 public class BoxWorld extends Panel implements WindowListener, KeyListener,
         MouseListener, MouseMotionListener, ActionListener, ItemListener {
 
