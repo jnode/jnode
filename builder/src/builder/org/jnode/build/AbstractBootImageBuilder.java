@@ -131,7 +131,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			blockedObjects.add(clsMgr.getStatics().getTable());
 
 			// Create the VM
-			final HeapHelper helper = new HeapHelperImpl();
+			final HeapHelper helper = new HeapHelperImpl(arch);
 			final Vm vm = new Vm(arch, new DefaultHeapManager(clsMgr, helper, clsMgr.getStatics()));
 			blockedObjects.add(vm);
 
@@ -260,7 +260,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			final int bootHeapSize = os.getObjectRef(bootHeapEnd).getOffset() - os.getObjectRef(bootHeapStart).getOffset();
 			final int bootHeapBitmapSize = (bootHeapSize / ObjectLayout.OBJECT_ALIGN) >> 3;
 			log("Boot heap size " + (bootHeapSize >>> 10) + "K bitmap size " + (bootHeapBitmapSize >>> 10) + "K");
-			clsMgr.getStatics().dumpStatistics();
+			clsMgr.getStatics().dumpStatistics(System.out);
 			
 			logStatistics(os);
 

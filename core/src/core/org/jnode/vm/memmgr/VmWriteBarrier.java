@@ -49,6 +49,6 @@ public abstract class VmWriteBarrier extends VmSystemObject {
 	 * <code>a[1]</code>, index = 1).
 	 * @param end The last "natural" index into the array
 	 */
-	public abstract void arrayCopyWriteBarrier(Object[] array, int start, int end) 
+	public abstract void arrayCopyWriteBarrier(Object array, int start, int end) 
 	throws PragmaUninterruptible;
 }

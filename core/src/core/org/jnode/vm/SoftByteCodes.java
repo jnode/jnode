@@ -4,15 +4,16 @@
 package org.jnode.vm;
 
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmArrayClass;
+import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmConstFieldRef;
 import org.jnode.vm.classmgr.VmConstMethodRef;
 import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
-import org.jnode.vm.memmgr.*;
+import org.jnode.vm.memmgr.VmHeapManager;
+import org.jnode.vm.memmgr.VmWriteBarrier;
 
 /**
  * Class with software implementations of "difficult" java bytecodes.

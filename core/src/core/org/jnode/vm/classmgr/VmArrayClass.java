@@ -107,4 +107,8 @@ public final class VmArrayClass extends VmClassType {
 		componentType.prepare();
 		return super.prepare();
 	}
+
+	public final boolean isArray() {
+		return true;
+	}
 }

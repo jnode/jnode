@@ -137,7 +137,6 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 		this.primitive = primitive;
 		this.loader = loader;
 		if (name.charAt(0) == '[') {
-			this.modifiers |= Modifier.ACC_ARRAY;
 			this.interfaceTable = new VmImplementedInterface[] { new VmImplementedInterface(CloneableClass), new VmImplementedInterface(SerializableClass)};
 			this.typeSize = loader.getArchitecture().getReferenceSize();
 		} else if (primitive) {
@@ -674,8 +673,8 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
 	public final boolean isInitialized() {
 		return Modifier.isInitialized(modifiers);
 	}
-	public final boolean isArray() {
-		return Modifier.isArray(modifiers);
+	public boolean isArray() {
+		return false;
 	}
 
 	/**

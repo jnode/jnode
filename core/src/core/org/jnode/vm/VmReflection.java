@@ -123,9 +123,12 @@ public class VmReflection {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
 			Unsafe.setObject(getStaticFieldAddress(sf), value);
+			SoftByteCodes.putstaticWriteBarrier(sf.getStaticsIndex(), value);
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
-			Unsafe.setObject(o, inf.getOffset(), value);
+			final int offset = inf.getOffset();
+			Unsafe.setObject(o, offset, value);
+			SoftByteCodes.putfieldWriteBarrier(o, offset, value);
 		}
 	}
 	
