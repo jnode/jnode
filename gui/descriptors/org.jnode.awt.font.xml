@@ -14,6 +14,7 @@
   <runtime>
     <library name="jnode-gui.jar">
       <export name="org.jnode.awt.font.def.*"/>
+      <export name="org.jnode.awt.font.renderer.*"/>
     </library>
     <library name="jnode-fonts.jar">
       <export name="*"/>
