@@ -104,7 +104,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
 				this.out = System.out;
 				this.err = System.err;
 			}
-			aliasMgr = ((AliasManager) InitialNaming.lookup(AliasManager.SYSTEM_ALIAS_MGR_NAME)).createAliasManager();
+			aliasMgr = ((AliasManager) InitialNaming.lookup(AliasManager.NAME)).createAliasManager();
 			System.getProperties().setProperty(PROMPT_PROPERTY_NAME, DEFAULT_PROMPT);
 			ShellUtils.getShellManager().registerShell(this);
 		} catch (NameNotFoundException ex) {

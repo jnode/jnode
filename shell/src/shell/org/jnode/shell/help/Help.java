@@ -15,12 +15,12 @@ import org.jnode.shell.CommandLine;
  */
 public abstract class Help {
 
-	public static final String SYSTEM_HELP_NAME = "system/help";
+	public static final Class NAME = Help.class;//"system/help";
 	public static final String INFO_FIELD_NAME = "HELP_INFO";
 
 	public static Help getHelp() throws HelpException {
 		try {
-			return (Help) InitialNaming.lookup(SYSTEM_HELP_NAME);
+			return (Help) InitialNaming.lookup(NAME);
 		} catch (NamingException ex) {
 			throw new HelpException("Help application not found");
 		}

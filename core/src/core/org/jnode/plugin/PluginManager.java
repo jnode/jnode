@@ -15,7 +15,7 @@ public abstract class PluginManager {
 	 * 
 	 * @see org.jnode.naming.InitialNaming
 	 */
-	public static final String NAME = "system/PluginManager";
+	public static final Class NAME = PluginManager.class;//"system/PluginManager";
 
 	/**
 	 * Gets the plugin registry

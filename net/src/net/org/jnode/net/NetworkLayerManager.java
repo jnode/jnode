@@ -21,7 +21,7 @@ import org.jnode.driver.net.NetworkException;
 public interface NetworkLayerManager {
 
 	/** Name used to bind the ptm in the InitialNaming namespace */	
-	public static final String NAME = "system/net/networklayermanager";
+	public static final Class NAME = NetworkLayerManager.class;//"system/net/networklayermanager";
 
 	/**
 	 * Get all register packet types.

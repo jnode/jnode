@@ -9,7 +9,7 @@ package org.jnode.driver.console;
  */
 public interface ConsoleManager {
 	
-	public static final String NAME = "ConsoleManager";
+	public static final Class NAME = ConsoleManager.class;//"ConsoleManager";
 
 	/**
 	 * Create and return a new console.

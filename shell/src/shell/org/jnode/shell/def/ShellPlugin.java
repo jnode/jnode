@@ -34,7 +34,7 @@ public class ShellPlugin extends Plugin {
 		try {
 			final AliasManager aliasMgr = new DefaultAliasManager(getDescriptor().getExtensionPoint("aliases"));
 			final ShellManager shellMgr = new DefaultShellManager();
-			InitialNaming.bind(AliasManager.SYSTEM_ALIAS_MGR_NAME, aliasMgr);
+			InitialNaming.bind(AliasManager.NAME, aliasMgr);
 			InitialNaming.bind(ShellManager.NAME, shellMgr);
 		} catch (NamingException ex) {
 			throw new PluginException("Cannot bind shell component", ex);
@@ -46,6 +46,6 @@ public class ShellPlugin extends Plugin {
 	 */
 	protected void stopPlugin() throws PluginException {
 		InitialNaming.unbind(ShellManager.NAME);
-		InitialNaming.unbind(AliasManager.SYSTEM_ALIAS_MGR_NAME);
+		InitialNaming.unbind(AliasManager.NAME);
 	}
 }
