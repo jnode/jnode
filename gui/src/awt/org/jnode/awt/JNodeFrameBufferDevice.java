@@ -8,20 +8,23 @@ import java.awt.GraphicsDevice;
 
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
+import org.jnode.driver.DeviceListener;
 import org.jnode.driver.video.FrameBufferAPI;
 import org.jnode.driver.video.FrameBufferConfiguration;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class JNodeFrameBufferDevice extends GraphicsDevice {
+public class JNodeFrameBufferDevice extends GraphicsDevice implements DeviceListener {
 
 	private final FrameBufferAPI api;
 	private final Device device;
 	private final JNodeGraphicsConfiguration[] configs;
+	private boolean stopped = false;
 
 	public JNodeFrameBufferDevice(Device device) {
 		this.device = device;
+		device.addListener(this);
 		try {
 			this.api = (FrameBufferAPI)device.getAPI(FrameBufferAPI.class);
 		} catch (ApiNotFoundException ex) {
@@ -73,4 +76,25 @@ public class JNodeFrameBufferDevice extends GraphicsDevice {
 	public Device getDevice() {
 		return device;
 	}
+	
+	/**
+	 * Is this device active?
+	 * @return
+	 */
+	public final boolean isActive() {
+	    return !stopped;
+	}
+	
+    /**
+     * @see org.jnode.driver.DeviceListener#deviceStarted(org.jnode.driver.Device)
+     */
+    public void deviceStarted(Device device) {
+    }
+    
+    /**
+     * @see org.jnode.driver.DeviceListener#deviceStop(org.jnode.driver.Device)
+     */
+    public void deviceStop(Device device) {
+        stopped = true;
+    }
 }

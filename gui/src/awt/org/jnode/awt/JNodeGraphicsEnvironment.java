@@ -35,7 +35,7 @@ public class JNodeGraphicsEnvironment extends GraphicsEnvironment {
 
 	/** My logger */
 	private final Logger log = Logger.getLogger(getClass());
-	private GraphicsDevice[] devices;
+	private JNodeFrameBufferDevice[] devices;
 	private GraphicsDevice defaultDevice;
 
 	/**
@@ -92,6 +92,7 @@ public class JNodeGraphicsEnvironment extends GraphicsEnvironment {
 	 * @return The default screen device
 	 */
 	public GraphicsDevice getDefaultScreenDevice() {
+	    verifyCache();
 		final String devId = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.awt.device", "fb0"));
 		if ((defaultDevice == null) || !devId.equals(defaultDevice.getIDstring())){
 			final GraphicsDevice[] devs = getScreenDevices();
@@ -118,9 +119,10 @@ public class JNodeGraphicsEnvironment extends GraphicsEnvironment {
 	 * @return All screen devices
 	 */
 	public GraphicsDevice[] getScreenDevices() {
+	    verifyCache();
 		if (devices == null) {
 			final Collection devs = DeviceUtils.getDevicesByAPI(FrameBufferAPI.class);
-			devices = new GraphicsDevice[devs.size()];
+			devices = new JNodeFrameBufferDevice[devs.size()];
 			int idx = 0;
 			for (Iterator i = devs.iterator(); i.hasNext(); idx++) {
 				devices[idx] = new JNodeFrameBufferDevice((Device) i.next());
@@ -141,4 +143,17 @@ public class JNodeGraphicsEnvironment extends GraphicsEnvironment {
 		}
 	}
 
+	private final void verifyCache() {
+	    if (devices != null) {
+	        for (int i = 0; i < devices.length; i++) {
+	            if (!devices[i].isActive()) {
+	                // Reload the devices array
+	                log.debug("Flushing AWT device cache");
+	                devices = null;
+	                defaultDevice = null;
+	                return;
+	            }
+	        }
+	    }
+	}
 }
