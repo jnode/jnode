@@ -31,23 +31,36 @@ public class KeyboardInterpreterFactory {
 			try {
 				rb = ResourceBundle.getBundle("org.jnode.driver.input.KeyboardLayout", Locale.getDefault(), Thread.currentThread().getContextClassLoader());
 				defaultCountry = rb.getString("defaultCountry");
+				if(defaultCountry.trim().length() == 0) {
+					defaultCountry = null;
+				}
 			} catch(Exception e) {
-				System.err.println("Cannot load default keyboard layout");
+				System.err.println("Cannot load default keyboard layout, loading US layout instead");
 				return getKeyboardInterpreter("US", null);
 			}
 			try {
 				defaultRegion = rb.getString("defaultRegion");
+				if(defaultRegion.trim().length() == 0) {
+					defaultRegion = null;
+				}
 			} catch(Exception e) {
 			}
 			
-			return getKeyboardInterpreter(defaultCountry, defaultRegion);
+			KeyboardInterpreter ki = getKeyboardInterpreter(defaultCountry, defaultRegion);
+			if(ki == null) {
+				throw new NullPointerException("KeyboardInterpreter for "+defaultCountry+" not found");
+			} else {
+				return ki;
+			}
 		} catch (Exception e) {
 			try {
 				return getKeyboardInterpreter("US", null);
 			} catch(Exception err) {
-				return new KeyboardInterpreter();
+				//FIXME : this should never happen
+				return null;
 			} catch(Error err) {
-				return new KeyboardInterpreter();
+				//FIXME : this should never happen
+				return null;
 			}
 		}
 	}
