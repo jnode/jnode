@@ -176,6 +176,7 @@ public final class DefaultPluginManager extends PluginManager {
                 } catch (PluginException ex) {
                 }
             }
+            BootLog.info("Stopped all plugins");
         } catch (PluginException ex) {
             BootLog.error("Cannot stop plugins", ex);
         }
@@ -191,6 +192,7 @@ public final class DefaultPluginManager extends PluginManager {
      */
     public final void stopPlugin(PluginDescriptor d) throws PluginException {
         final String id = d.getId();
+        //BootLog.info("__Stopping " + id);
         for (Iterator i = registry.getDescriptorIterator(); i.hasNext();) {
             final PluginDescriptor descr = (PluginDescriptor) i.next();
             if (descr.depends(id)) {
