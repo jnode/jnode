@@ -70,7 +70,7 @@ public class KeyboardInterpreter_DV extends KeyboardInterpreter
     keys.setKey(48, new Key('x', 'X', KeyEvent.VK_X));
     keys.setKey(49, new Key('b', 'B', KeyEvent.VK_B));
     keys.setKey(50, new Key('m', 'M', KeyEvent.VK_M));
-    keys.setKey(51, new Key('w', 'M',KeyEvent.VK_M));//KeyEvent.VK_COMMA, '<', KeyEvent.VK_LESS));
+    keys.setKey(51, new Key('w', 'W',KeyEvent.VK_M));//KeyEvent.VK_COMMA, '<', KeyEvent.VK_LESS));
     keys.setKey(52, new Key('v', 'V',KeyEvent.VK_V));//KeyEvent.VK_PERIOD, '>', KeyEvent.VK_GREATER));
     keys.setKey(53, new Key('z', 'Z', KeyEvent.VK_Z));
     keys.setKey(55, new Key('*', KeyEvent.VK_MULTIPLY));
