@@ -37,8 +37,7 @@
     <plugin id="org.jnode.driver.net.3c90x"/>
     <plugin id="org.jnode.driver.net.ethernet"/>
 
-    <!-- Lance driver is far from stable and (at least with me) crashes VMWare -->
-    <!-- plugin id="org.jnode.driver.net.lance"/ -->
+    <plugin id="org.jnode.driver.net.lance"/>
     <plugin id="org.jnode.driver.net.loopback"/>
     <plugin id="org.jnode.driver.net.ne2k-pci"/>
     <plugin id="org.jnode.driver.net.rtl8139"/>
