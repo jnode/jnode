@@ -263,4 +263,9 @@ public class PrimitiveTest {
 //        float f3 = f0 * f1;
         return (int)(f0 / f1);
     }
+
+    public static int terniary25(int a0, int a1){
+        return a0 / a1;
+    }
+
 }
