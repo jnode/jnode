@@ -1,0 +1,529 @@
+/**
+ * $Id$  
+ */
+package org.jnode.jnasm.assembler.x86;
+
+import org.jnode.jnasm.assembler.AssemblerModule;
+import org.jnode.jnasm.assembler.Token;
+import org.jnode.jnasm.assembler.Indirect;
+import org.jnode.jnasm.assembler.Assembler;
+import org.jnode.jnasm.assembler.InstructionUtils;
+import org.jnode.assembler.x86.X86Assembler;
+import org.jnode.assembler.x86.X86Constants;
+import org.jnode.assembler.x86.X86Register;
+import org.jnode.assembler.Label;
+import org.jnode.assembler.NativeStream;
+
+import java.util.Map;
+import java.util.List;
+
+/**
+ * @author Levente S\u00e1ntha
+ */
+public class X86Core extends AssemblerModule {
+    private static final int NUL_ARG = 0;
+    private static final int CON_ARG = 1;
+    private static final int REG_ARG = 2;
+    private static final int IND_ARG = 3;
+    private static final int DISP = 2;
+
+    private static final int N_ADDR = NUL_ARG;
+    private static final int C_ADDR = CON_ARG;
+    private static final int R_ADDR = REG_ARG;
+    private static final int RR_ADDR = REG_ARG | REG_ARG << DISP;
+    private static final int RC_ADDR = REG_ARG | CON_ARG << DISP;
+    private static final int RI_ADDR = REG_ARG | IND_ARG << DISP;
+    private static final int I_ADDR = IND_ARG;
+    private static final int IR_ADDR = IND_ARG | REG_ARG << DISP;
+    private static final int IC_ADDR = IND_ARG | CON_ARG << DISP;
+
+    private static final String[] ARG_TYPES = {"noargument","constant","register","indirect"};
+
+    private final Object[] args = new Object[3];
+
+
+
+    private int getAddressingMode(int maxArgs) {
+        int ret = N_ADDR;
+        if (maxArgs > 3) {
+            throw new Error("Invalid number of arguments: " + maxArgs);
+        }
+
+        for (int i = 0; i < maxArgs; i++) {
+            try {
+                if(operands == null) break;
+                
+                Object o = operands.get(i);
+                if (o == null) break;
+
+                if (o instanceof Integer) {
+                    ret |= CON_ARG << 2 * i;
+                } else if (o instanceof Token && Assembler.isIdent((Token) o)) {
+                    ret |= REG_ARG << 2 * i;
+                } else if (o instanceof Indirect) {
+                    ret |= IND_ARG << 2 * i;
+                } else {
+                    System.out.println("unkown operand: " + o);
+                }
+
+                args[i] = o;
+
+            } catch (IndexOutOfBoundsException x) {
+                break;
+            }
+        }
+        return ret;
+    }
+
+    private final int getInt(int i) {
+        return ((Integer) args[i]).intValue();
+    }
+
+    private final X86Register.GPR getReg(int i) {
+        return getRegister((Token) args[i]);
+    }
+
+    private final Indirect getInd(int i) {
+        return (Indirect) args[i];
+    }
+
+
+    public static final int ADD_ISN = 0;
+    public static final int AND_ISN = ADD_ISN + 1;
+    public static final int CMP_ISN = AND_ISN + 1;
+    public static final int DEC_ISN = CMP_ISN + 1;
+    public static final int INC_ISN = DEC_ISN + 1;
+    public static final int JMP_ISN = INC_ISN + 1;
+    public static final int LEA_ISN = JMP_ISN + 1;
+    public static final int MOV_ISN = LEA_ISN + 1;
+    public static final int NOP_ISN = MOV_ISN + 1;
+    public static final int OR_ISN = NOP_ISN + 1;
+    public static final int POP_ISN = OR_ISN + 1;
+    public static final int PUSH_ISN = POP_ISN + 1;
+    public static final int RET_ISN = PUSH_ISN + 1;
+    public static final int SHR_ISN = RET_ISN + 1;
+    public static final int TEST_ISN = SHR_ISN + 1;
+    public static final int XCHG_ISN = TEST_ISN + 1;
+    public static final int XOR_ISN = XCHG_ISN + 1;
+
+
+    protected static final Map INSTRUCTION_MAP;
+    private static final String[] MNEMONICS;
+
+    static {
+        Map map = InstructionUtils.getInstructionMap(X86Core.class);
+        String[] mnemonics = InstructionUtils.getMnemonicArray(map);
+        INSTRUCTION_MAP = map;
+        MNEMONICS = mnemonics;
+    }
+
+    private List operands;
+    private X86Assembler stream;
+
+    public X86Core(final Map labels) {
+        super(labels);
+    }
+
+    public void setNativeStream(NativeStream stream) {
+        this.stream = (X86Assembler) stream;
+    }
+
+    public boolean emmit(String mnemonic, List operands) {
+        this.operands = operands;
+
+        Integer key = (Integer) INSTRUCTION_MAP.get(mnemonic);
+
+        if (key == null) return false;
+
+        switch (key.intValue()) {
+            case ADD_ISN:
+                emmitADD();
+                break;
+            case AND_ISN:
+                emmitAND();
+                break;
+            case CMP_ISN:
+                emmitCMP();
+                break;
+            case DEC_ISN:
+                emmitDEC();
+                break;
+            case INC_ISN:
+                emmitINC();
+                break;
+            case JMP_ISN:
+                emmitJMP();
+                break;
+            case LEA_ISN:
+                emmitLEA();
+                break;
+            case MOV_ISN:
+                emmitMOV();
+                break;
+            case NOP_ISN:
+                emmitNOP();
+                break;
+            case OR_ISN:
+                emmitOR();
+                break;
+            case POP_ISN:
+                emmitPOP();
+                break;
+            case PUSH_ISN:
+                emmitPUSH();
+                break;
+            case RET_ISN:
+                emmitRET();
+                break;
+            case SHR_ISN:
+                emmitSHR();
+                break;
+            case TEST_ISN:
+                emmitTEST();
+                break;
+            case XCHG_ISN:
+                emmitXCHG();
+                break;
+            case XOR_ISN:
+                emmitXOR();
+                break;
+            default:
+                throw new Error("Invalid instruction binding " + key.intValue() + " for " + mnemonic);
+        }
+
+        return true;
+    }
+
+    private void emmitADD() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RR_ADDR:
+                stream.writeADD(getReg(0), getReg(1));
+                break;
+            case RC_ADDR:
+                stream.writeADD(getReg(0), getInt(1));
+                break;
+            case RI_ADDR:
+                Indirect ind = getInd(1);
+                stream.writeADD(getReg(0), getRegister(ind.reg), ind.disp);
+                break;
+            case IR_ADDR:
+                ind = getInd(0);
+                stream.writeADD(getRegister(ind.reg), ind.disp, getReg(1));
+                break;
+            case IC_ADDR:
+                ind = getInd(0);
+                stream.writeADD(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                break;
+            default:
+                reportAddressingError(ADD_ISN, addr);
+        }
+    }
+
+    private void emmitAND() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RR_ADDR:
+                stream.writeAND(getReg(0), getReg(1));
+                break;
+            case RC_ADDR:
+                stream.writeAND(getReg(0), getInt(1));
+                break;
+            case RI_ADDR:
+                Indirect ind = getInd(1);
+                stream.writeAND(getReg(0), getRegister(ind.reg), ind.disp);
+                break;
+            case IR_ADDR:
+                ind = getInd(0);
+                stream.writeAND(getRegister(ind.reg), ind.disp, getReg(1));
+                break;
+            case IC_ADDR:
+                ind = getInd(0);
+                stream.writeAND(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                break;
+            default:
+                reportAddressingError(AND_ISN, addr);
+        }
+    }
+
+    private void emmitCMP() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RR_ADDR:
+                stream.writeCMP(getReg(0), getReg(1));
+                break;
+            case RC_ADDR:
+                stream.writeCMP_Const(getReg(0), getInt(1));
+                break;
+            case RI_ADDR:
+                Indirect ind = getInd(1);
+                stream.writeCMP(getReg(0), getRegister(ind.reg), ind.disp);
+                break;
+            case IR_ADDR:
+                ind = getInd(0);
+                stream.writeCMP(getRegister(ind.reg), ind.disp, getReg(1));
+                break;
+            case IC_ADDR:
+                ind = getInd(0);
+                stream.writeCMP_Const(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                break;
+            default:
+                reportAddressingError(CMP_ISN, addr);
+        }
+    }
+
+    private void emmitDEC() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case R_ADDR:
+                stream.writeDEC(getReg(0));
+                break;
+            case I_ADDR:
+                Indirect ind = getInd(0);
+                stream.writeDEC(X86Constants.BITS32, getRegister(ind.reg), ind.disp);
+                break;
+            default:
+                reportAddressingError(DEC_ISN, addr);
+        }
+    }
+
+    private void emmitINC() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case R_ADDR:
+                stream.writeINC(getReg(0));
+                break;
+            case I_ADDR:
+                Indirect ind = getInd(0);
+                stream.writeINC(X86Constants.BITS32, getRegister(ind.reg), ind.disp);
+                break;
+            default:
+                reportAddressingError(INC_ISN, addr);
+        }
+    }
+
+    private void emmitJMP() {
+        Object o1 = operands.get(0);
+        if (o1 instanceof Token) {
+            Token t1 = (Token) o1;
+            if (Assembler.isIdent(t1)) {
+                Label lab = (Label) labels.get(t1.image);
+                lab = (lab == null) ? new Label(t1.image) : lab;
+                stream.writeJMP(lab);
+            } else {
+                System.out.println("unkown operand: " + t1.image);
+            }
+        } else {
+            System.out.println("unkown operand: " + o1);
+        }
+    }
+
+    private void emmitLEA() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RI_ADDR:
+                Indirect ind = getInd(1);
+                stream.writeLEA(getReg(0), getRegister(ind.reg), ind.disp);
+                break;
+            default:
+                reportAddressingError(LEA_ISN, addr);
+        }
+    }
+
+    private void emmitMOV() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RR_ADDR:
+                stream.writeMOV(X86Constants.BITS32, getReg(0), getReg(1));
+                break;
+            case RC_ADDR:
+                stream.writeMOV_Const(getReg(0), getInt(1));
+                break;
+            case RI_ADDR:
+                Indirect ind = getInd(1);
+                stream.writeMOV(X86Constants.BITS32, getReg(0), getRegister(ind.reg), ind.disp);
+                break;
+            case IR_ADDR:
+                ind = getInd(0);
+                stream.writeMOV(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getReg(1));
+                break;
+            case IC_ADDR:
+                ind = getInd(0);
+                stream.writeMOV_Const(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                break;
+            default:
+                reportAddressingError(MOV_ISN, addr);
+        }
+    }
+
+    private void emmitNOP() {
+        stream.writeNOP();
+    }
+
+    private void emmitOR() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RR_ADDR:
+                stream.writeOR(getReg(0), getReg(1));
+                break;
+            case RC_ADDR:
+                stream.writeOR(getReg(0), getInt(1));
+                break;
+            case RI_ADDR:
+                Indirect ind = getInd(1);
+                stream.writeOR(getReg(0), getRegister(ind.reg), ind.disp);
+                break;
+            case IR_ADDR:
+                ind = getInd(0);
+                stream.writeOR(getRegister(ind.reg), ind.disp, getReg(1));
+                break;
+            case IC_ADDR:
+                ind = getInd(0);
+                stream.writeOR(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                break;
+            default:
+                reportAddressingError(OR_ISN, addr);
+        }
+    }
+
+    private void emmitPOP() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case R_ADDR:
+                stream.writePOP(getReg(0));
+                break;
+            case I_ADDR:
+                Indirect ind = getInd(0);
+                stream.writePOP(getRegister(ind.reg), ind.disp);
+                break;
+            default:
+                reportAddressingError(POP_ISN, addr);
+        }
+    }
+
+    private void emmitPUSH() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case C_ADDR:
+                stream.writePUSH(getInt(0));
+                break;
+            case R_ADDR:
+                stream.writePUSH(getReg(0));
+                break;
+            case I_ADDR:
+                Indirect ind = getInd(0);
+                stream.writePUSH(getRegister(ind.reg), ind.disp);
+                break;
+            default:
+                reportAddressingError(PUSH_ISN, addr);
+        }
+    }
+
+    private void emmitRET() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case N_ADDR:
+                stream.writeRET();
+                break;
+            case C_ADDR:
+                stream.writeRET(getInt(0));
+                break;
+            default:
+                reportAddressingError(RET_ISN, addr);
+        }
+    }
+
+    private void emmitSHR() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RC_ADDR:
+                stream.writeSHR(getReg(0), getInt(1));
+                break;
+            case IC_ADDR:
+                Indirect ind = getInd(0);
+                stream.writeSHR(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                break;
+            default:
+                reportAddressingError(SHR_ISN, addr);
+        }
+    }
+
+    private void emmitTEST() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RR_ADDR:
+                stream.writeTEST(getReg(0), getReg(1));
+                break;
+            case RC_ADDR:
+                stream.writeTEST(getReg(0), getInt(1));
+                break;
+            case IC_ADDR:
+                Indirect ind = getInd(0);
+                stream.writeTEST(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                break;
+            default:
+                reportAddressingError(TEST_ISN, addr);
+        }
+    }
+
+    private void emmitXCHG() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RR_ADDR:
+                stream.writeXCHG(getReg(0), getReg(1));
+                break;
+            case IR_ADDR:
+                Indirect ind = getInd(0);
+                stream.writeXCHG(getRegister(ind.reg), ind.disp, getReg(1));
+                break;
+            default:
+                reportAddressingError(XCHG_ISN, addr);
+        }
+    }
+
+    private void emmitXOR() {
+        int addr = getAddressingMode(2);
+        switch (addr) {
+            case RR_ADDR:
+                stream.writeXOR(getReg(0), getReg(1));
+                break;
+            case RC_ADDR:
+                stream.writeXOR(getReg(0), getInt(1));
+                break;
+            case RI_ADDR:
+                Indirect ind = getInd(1);
+                stream.writeXOR(getReg(0), getRegister(ind.reg), ind.disp);
+                break;
+            case IR_ADDR:
+                ind = getInd(0);
+                stream.writeXOR(getRegister(ind.reg), ind.disp, getReg(1));
+                break;
+            case IC_ADDR:
+                ind = getInd(0);
+                stream.writeXOR(X86Constants.BITS32, getRegister(ind.reg), ind.disp, getInt(1));
+                break;
+            default:
+                reportAddressingError(XOR_ISN, addr);
+        }
+    }
+
+    private void reportAddressingError(int instruction, int addressing){
+        String err = "";
+        int ad = addressing;
+        do {
+            err += " " + ARG_TYPES[ad & 3];
+            ad >>= DISP;
+        } while(ad != 0);
+
+        System.out.println("Unkown addressing mode (" + err + " ) for " + MNEMONICS[instruction]);
+    }
+
+    static final X86Register.GPR getRegister(Token t) {
+        try {
+            return X86Register.getGPR(t.image);
+        } catch (IllegalArgumentException x) {
+            System.err.println(x.getMessage());
+            return X86Register.EAX;
+        }
+    }
+}
