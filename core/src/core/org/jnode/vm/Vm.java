@@ -5,7 +5,7 @@ package org.jnode.vm;
 
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.compiler.HotMethodManager;
-import org.jnode.vm.memmgr.*;
+import org.jnode.vm.memmgr.VmHeapManager;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -22,6 +22,8 @@ public class Vm extends VmSystemObject {
 	private final VmHeapManager heapManager;
 	/** The hot method manager */
 	private HotMethodManager hotMethodManager;
+	/** Set this boolean to turn the hot method manager on/off */
+	private final boolean runHotMethodManager = false;
 
 	/**
 	 * Initialize a new instance
@@ -29,7 +31,7 @@ public class Vm extends VmSystemObject {
 	 * @param arch
 	 */
 	public Vm(VmArchitecture arch, VmHeapManager heapManager) {
-		instance = this; 
+		instance = this;
 		this.bootstrap = true;
 		this.arch = arch;
 		this.heapManager = heapManager;
@@ -62,13 +64,24 @@ public class Vm extends VmSystemObject {
 	public final VmHeapManager getHeapManager() {
 		return this.heapManager;
 	}
-	
+
+	/**
+	 * Start the hot method compiler.
+	 *  
+	 */
 	final void startHotMethodManager() {
-		final VmStatics statics = Unsafe.getCurrentProcessor().getStatics();
-		this.hotMethodManager = new HotMethodManager(arch, statics);
-		hotMethodManager.start();
+		if (runHotMethodManager) {
+			final VmStatics statics = Unsafe.getCurrentProcessor().getStatics();
+			this.hotMethodManager = new HotMethodManager(arch, statics);
+			hotMethodManager.start();
+		}
 	}
 
+	/**
+	 * Show VM info.
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		final Vm vm = getVm();
 		if ((vm != null) && !vm.isBootstrap()) {

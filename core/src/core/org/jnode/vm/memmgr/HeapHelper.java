@@ -50,6 +50,8 @@ public abstract class HeapHelper extends ObjectResolver {
 
 	public abstract void invokeFinalizer(VmMethod finalizer, Object object);
 	
+	public abstract void die(String msg);
+	
 	/**
 	 * Gets the inflated monitor of an object (if any).
 	 * 
