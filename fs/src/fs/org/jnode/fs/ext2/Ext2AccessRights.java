@@ -3,7 +3,6 @@
  */
 package org.jnode.fs.ext2;
 
-import java.io.IOException;
 import java.security.Principal;
 
 import org.jnode.fs.FSAccessRights;
@@ -17,7 +16,7 @@ public class Ext2AccessRights implements FSAccessRights {
 	/**
 	 * @see org.jnode.fs.FSAccessRights#getOwner()
 	 */
-	public Principal getOwner() throws IOException {
+	public Principal getOwner() {
 		return null;
 	}
 
