@@ -121,6 +121,10 @@ start64:
 
 	PRINT_STR before_start_vm_msg
 
+%ifdef BITS64
+LOOPDIE
+%endif
+
 	; Go into userspace
 	mov ABX,Luser_esp
 	mov ACX,go_user_cs

@@ -46,9 +46,13 @@ KERNEL_CS   equ 0x08
 KERNEL_DS   equ 0x10
 USER_CS     equ 0x1B
 USER_DS     equ 0x23
-TSS_DS      equ 0x28
 %ifdef BITS32
+TSS_DS      equ 0x28
 CURPROC_FS  equ 0x33
+%else
+KERNEL32_CS	equ 0x28
+KERNEL32_DS	equ 0x30
+TSS_DS		equ 0x38
 %endif
 
 %macro LOOPDIE 0
