@@ -19,7 +19,7 @@
   <extension point="org.jnode.shell.aliases">
     <alias name="halt" class="org.jnode.shell.command.plugin.HaltCommand"/>
     <alias name="plugin"  class="org.jnode.shell.command.plugin.PluginCommand"/>
-    <alias name="reset" class="org.jnode.shell.command.plugin.ResetCommand"/>
+    <alias name="reboot" class="org.jnode.shell.command.plugin.RebootCommand"/>
   </extension>
 
   <extension point="org.jnode.security.permissions">
