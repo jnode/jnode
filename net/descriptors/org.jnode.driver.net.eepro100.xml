@@ -20,7 +20,12 @@
   </runtime>
   
   <extension point="org.jnode.driver.mappers">
-    <mapper class="org.jnode.driver.net.eepro100.EEPRO100DeviceToDriverMapper"/>
+    <!-- <mapper class="org.jnode.driver.net.eepro100.EEPRO100DeviceToDriverMapper"/> -->
+    <mapper id="1229:8086" name="Intel PCI EtherExpress Pro100" driver-class="org.jnode.driver.net.eepro100.EEPRO100Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1209:8086" name="Intel EtherExpress Pro/100+ i82559ER" driver-class="org.jnode.driver.net.eepro100.EEPRO100Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1029:8086" name="Intel EtherExpress Pro/100 type 1029" driver-class="org.jnode.driver.net.eepro100.EEPRO100Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="1030:8086" name="Intel EtherExpress Pro/100 type 1030" driver-class="org.jnode.driver.net.eepro100.EEPRO100Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="2449:8086" name="Intel Pro/100 V Network" driver-class="org.jnode.driver.net.eepro100.EEPRO100Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
   </extension>
         
   <extension point="org.jnode.security.permissions">
