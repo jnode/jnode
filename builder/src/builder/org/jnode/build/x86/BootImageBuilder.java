@@ -54,7 +54,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	
 	private VmX86Processor processor;
 	private String processorId;
-	private final VmX86Architecture arch = new VmX86Architecture();
+	private VmX86Architecture arch;
 	private VmStatics statics;
 
 	/** The offset in our (java) image file to the initial jump to our main-method */
@@ -93,7 +93,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	protected VmProcessor createProcessor(VmStatics statics) throws BuildException {
 		this.statics = statics;
 		if (processor == null) {
-			processor = new VmX86Processor(0, arch, statics, getCPUID());
+			processor = new VmX86Processor(0, (VmX86Architecture)getArchitecture(), statics, getCPUID());
 		}
 		return processor;
 	}
@@ -104,7 +104,10 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	 * @return The target architecture
 	 * @throws BuildException
 	 */
-	protected VmArchitecture getArchitecture() throws BuildException {
+	protected final VmArchitecture getArchitecture() throws BuildException {
+		if (arch == null) {
+			arch = new VmX86Architecture(getJnodeCompiler());
+		}
 		return arch;
 	}
 

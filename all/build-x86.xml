@@ -68,6 +68,7 @@
   <target name="prepare-props" depends="test-properties,load-properties,default-properties">
     <property name="jnode.kernel"   value="${jnodedrive.dir}/jnodesys.gz"/>
     <property name="jnode.initjar"  value="${jnodedrive.dir}/jnodeinit.jar"/>
+    <property name="jnode.compiler"  value="default"/>
   </target>
 
 <!-- Initialize all project directories -->
@@ -197,6 +198,7 @@
 	           targetArch="x86"
 	           cpu="${cpu}"
 	           version="${jnode-ver}"
+    		   jnodeCompiler="${jnode.compiler}" 	
                />
 
     <gzip src="${build.bootimage.dir}/bootimage.bin" zipfile="${jnode.kernel}"/>
