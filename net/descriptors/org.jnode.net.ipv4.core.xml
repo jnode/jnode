@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.net.ipv4.core" 
-        name="JNode IPv4 Core classes"
-        version="@VERSION@"
-        provider-name="JNode.org">
-        
+<plugin id="org.jnode.net.ipv4.core"
+  name="JNode IPv4 Core classes"
+  version="@VERSION@"
+  provider-name="JNode.org">
+
   <requires>
     <import plugin="org.jnode.net"/>
   </requires>
-        
+
   <runtime>
     <library name="jnode-net.jar">
       <export name="org.jnode.net.ipv4.*"/>
     </library>
   </runtime>
-  
+
+
 </plugin>
