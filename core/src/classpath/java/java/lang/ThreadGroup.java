@@ -372,13 +372,7 @@ public class ThreadGroup {
 	}
 
 	public Thread[] threads() {
-		Thread[] result = new Thread[threadsCount()];
-
-		Enumeration e = threads.elements();
-		for (int n = 0; e.hasMoreElements(); n++)
-			result[n] = (Thread) e.nextElement();
-
-		return result;
+        return (Thread[])threads.toArray(new Thread[threads.size()]);
 	}
 
 	public int threadsCount() {
