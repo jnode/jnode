@@ -22,6 +22,7 @@
   <extension point="org.jnode.shell.aliases">
     <alias name="arp" class="org.jnode.net.command.ArpCommand"/>
     <alias name="bootp" class="org.jnode.net.command.BootpCommand"/>
+    <alias name="dhcp" class="org.jnode.net.command.DhcpCommand"/>
     <alias name="ifconfig" class="org.jnode.net.command.IfconfigCommand"/>
     <alias name="netstat" class="org.jnode.net.command.NetstatCommand"/>
     <alias name="route" class="org.jnode.net.command.RouteCommand"/>
