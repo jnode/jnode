@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.assembler.x86;
 
 import java.io.IOException;
@@ -48,7 +48,7 @@ import org.jnode.vm.x86.X86CpuID;
  * @author Patrik Reali (patrik_reali@users.sourceforge.net)
  */
 public class X86BinaryAssembler extends X86Assembler implements X86Constants,
-		BootImageNativeStream {
+		BootImageNativeStream, X86Operation {
 	public static final class Key {
 
 		private final Object key;
@@ -227,6 +227,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	private final int baseAddr;
 
 	private int dataLength;
+
 	private int growCount;
 
 	private final int growSize;
@@ -299,7 +300,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			m_data = newArr;
 			dataLength = newLen;
 			growCount++;
-			//System.out.println("Growing stream buffer to " + newLen);
+			// System.out.println("Growing stream buffer to " + newLen);
 		}
 	}
 
@@ -512,7 +513,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			write32(0);
 			alignSlack += 4;
 		}
-		//System.out.println("alignSlack=" + alignSlack);
+		// System.out.println("alignSlack=" + alignSlack);
 
 		write32(0); // Size
 		write32(ObjectFlags.GC_DEFAULT_COLOR); // Flags
@@ -542,7 +543,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 */
 	private void testSuitableForBits8(X86Register dst) {
 		if (!dst.isSuitableForBits8()) {
-			throw new RuntimeException("Register is not suitable for BITS8 datasize");
+			throw new RuntimeException(
+					"Register is not suitable for BITS8 datasize");
 		}
 	}
 
@@ -644,7 +646,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param dstDisp
 	 * @param srcReg
 	 */
-	public final void writeADC(X86Register dstReg, int dstDisp, X86Register srcReg) {
+	public final void writeADC(X86Register dstReg, int dstDisp,
+			X86Register srcReg) {
 		writeModRM(0x11, dstReg.getNr(), dstDisp, srcReg.getNr());
 	}
 
@@ -669,7 +672,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		writeModRM(0x13, srcReg.getNr(), srcDisp, dstReg.getNr());
 	}
 
-	//LS
+	// LS
 	/**
 	 * 
 	 * @param dstReg
@@ -709,7 +712,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param dstDisp
 	 * @param srcReg
 	 */
-	public final void writeADD(X86Register dstReg, int dstDisp, X86Register srcReg) {
+	public final void writeADD(X86Register dstReg, int dstDisp,
+			X86Register srcReg) {
 		writeModRM(0x01, dstReg.getNr(), dstDisp, srcReg.getNr());
 	}
 
@@ -730,7 +734,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param srcReg
 	 * @param srcDisp
 	 */
-	public final void writeADD(X86Register dstReg, X86Register srcReg, int srcDisp) {
+	public final void writeADD(X86Register dstReg, X86Register srcReg,
+			int srcDisp) {
 		writeModRM(0x03, srcReg.getNr(), srcDisp, dstReg.getNr());
 	}
 
@@ -750,7 +755,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 	}
 
-	//LS, PR
+	// LS, PR
 	/**
 	 * 
 	 * @param dstReg
@@ -774,7 +779,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param dstDisp
 	 * @param srcReg
 	 */
-	public final void writeAND(X86Register dstReg, int dstDisp, X86Register srcReg) {
+	public final void writeAND(X86Register dstReg, int dstDisp,
+			X86Register srcReg) {
 		writeModRM(0x21, dstReg.getNr(), dstDisp, srcReg.getNr());
 	}
 
@@ -788,7 +794,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		writeModRR(0x21, dstReg.getNr(), srcReg.getNr());
 	}
 
-	//LS, PR
+	// LS, PR
 	/**
 	 * 
 	 * @param dstReg
@@ -797,6 +803,88 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 */
 	public void writeAND(X86Register dstReg, X86Register srcReg, int srcDisp) {
 		writeModRM(0x23, srcReg.getNr(), srcDisp, dstReg.getNr());
+	}
+
+	public void writeArithSSEDOp(int operation, X86Register dst, X86Register src) {
+		write8(0xF2);
+		write8(0x0F);
+		switch (operation) {
+		case SSE_ADD:
+			write8(0x58);
+			break;
+		case SSE_SUB:
+			write8(0x5C);
+			break;
+		case SSE_MUL:
+			write8(0x59);
+			break;
+		case SSE_DIV:
+			write8(0x5E);
+			break;
+		}
+		writeModRR(src.getNr(), dst.getNr());
+	}
+
+	public void writeArithSSEDOp(int operation, X86Register dst,
+			X86Register src, int srcDisp) {
+		write8(0xF2);
+		write8(0x0F);
+		switch (operation) {
+		case SSE_ADD:
+			write8(0x58);
+			break;
+		case SSE_SUB:
+			write8(0x5C);
+			break;
+		case SSE_MUL:
+			write8(0x59);
+			break;
+		case SSE_DIV:
+			write8(0x5E);
+			break;
+		}
+		writeModRM(src.getNr(), srcDisp, dst.getNr());
+	}
+
+	public void writeArithSSESOp(int operation, X86Register dst, X86Register src) {
+		write8(0xF3);
+		write8(0x0F);
+		switch (operation) {
+		case SSE_ADD:
+			write8(0x58);
+			break;
+		case SSE_SUB:
+			write8(0x5C);
+			break;
+		case SSE_MUL:
+			write8(0x59);
+			break;
+		case SSE_DIV:
+			write8(0x5E);
+			break;
+		}
+		writeModRR(src.getNr(), dst.getNr());
+	}
+
+	public void writeArithSSESOp(int operation, X86Register dst,
+			X86Register src, int srcDisp) {
+		write8(0xF3);
+		write8(0x0F);
+		switch (operation) {
+		case SSE_ADD:
+			write8(0x58);
+			break;
+		case SSE_SUB:
+			write8(0x5C);
+			break;
+		case SSE_MUL:
+			write8(0x59);
+			break;
+		case SSE_DIV:
+			write8(0x5E);
+			break;
+		}
+		writeModRM(src.getNr(), srcDisp, dst.getNr());
 	}
 
 	/**
@@ -1331,7 +1419,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		writeModRR(0xF7, srcReg.getNr(), 7);
 	}
 
-	//LS
+	// LS
 	/**
 	 * @param srcReg
 	 * @param srcDisp
@@ -1340,7 +1428,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		writeModRM(0xF7, srcReg.getNr(), srcDisp, 7);
 	}
 
-	//LS
+	// LS
 	/**
 	 * 
 	 * @param dstReg
@@ -1351,7 +1439,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		writeModRR(0xAF, srcReg.getNr(), dstReg.getNr());
 	}
 
-	//LS
+	// LS
 	/**
 	 * 
 	 * @param dstReg
@@ -1363,7 +1451,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		writeModRM(0xAF, srcReg.getNr(), srcDisp, dstReg.getNr());
 	}
 
-	//LS
+	// LS
 	/**
 	 * 
 	 * @param dstReg
@@ -1375,7 +1463,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write32(imm32);
 	}
 
-	//LS
+	// LS
 	/**
 	 * 
 	 * @param dstReg
@@ -1383,8 +1471,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param srcDisp
 	 * @param imm32
 	 */
-	public void writeIMUL_3(X86Register dstReg, X86Register srcReg, int srcDisp,
-			int imm32) {
+	public void writeIMUL_3(X86Register dstReg, X86Register srcReg,
+			int srcDisp, int imm32) {
 		writeModRM(0x69, srcReg.getNr(), srcDisp, dstReg.getNr());
 		write32(imm32);
 	}
@@ -1715,8 +1803,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param dstDisp
 	 * @param srcReg
 	 */
-	public final void writeMOV(int operandSize, X86Register dstReg, int dstDisp,
-			X86Register srcReg) {
+	public final void writeMOV(int operandSize, X86Register dstReg,
+			int dstDisp, X86Register srcReg) {
 		testDst(dstReg, dstDisp);
 		final int opcode;
 		switch (operandSize) {
@@ -1744,7 +1832,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param dstReg
 	 * @param srcReg
 	 */
-	public final void writeMOV(int operandSize, X86Register dstReg, X86Register srcReg) {
+	public final void writeMOV(int operandSize, X86Register dstReg,
+			X86Register srcReg) {
 		final int opcode;
 		switch (operandSize) {
 		case X86Constants.BITS8:
@@ -1878,7 +1967,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param destDisp
 	 * @param imm32
 	 */
-	public final void writeMOV_Const(X86Register destReg, int destDisp, int imm32) {
+	public final void writeMOV_Const(X86Register destReg, int destDisp,
+			int imm32) {
 		writeModRM(0xC7, destReg.getNr(), destDisp, 0);
 		write32(imm32);
 	}
@@ -1901,8 +1991,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param dstDisp
 	 * @param imm32
 	 */
-	public void writeMOV_Const(X86Register dstReg, X86Register dstIdxReg, int scale,
-			int dstDisp, int imm32) {
+	public void writeMOV_Const(X86Register dstReg, X86Register dstIdxReg,
+			int scale, int dstDisp, int imm32) {
 		writeModRMSib(0xC7, dstReg.getNr(), dstDisp, 0, scale, dstIdxReg
 				.getNr());
 		write32(imm32);
@@ -1915,7 +2005,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param srcReg
 	 * @param srcSize
 	 */
-	public final void writeMOVSX(X86Register dstReg, X86Register srcReg, int srcSize) {
+	public final void writeMOVSX(X86Register dstReg, X86Register srcReg,
+			int srcSize) {
 		write8(0x0f);
 		if (srcSize == X86Constants.BITS8) {
 			testSuitableForBits8(dstReg);
@@ -1947,7 +2038,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param srcReg
 	 * @param srcSize
 	 */
-	public final void writeMOVZX(X86Register dstReg, X86Register srcReg, int srcSize) {
+	public final void writeMOVZX(X86Register dstReg, X86Register srcReg,
+			int srcSize) {
 		write8(0x0f);
 		if (srcSize == X86Constants.BITS8) {
 			testSuitableForBits8(dstReg);
@@ -2050,7 +2142,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		} else if (rawAddress) {
 			write32(resolver.addressOf32(object) + offset);
 		} else if ((resolver != null) && (!(object instanceof Label))) {
-			//System.out.println("Using resolver for " + object);
+			// System.out.println("Using resolver for " + object);
 			write32(resolver.addressOf32(object) + offset);
 		} else {
 			final X86ObjectRef ref = (X86ObjectRef) getObjectRef(object);
@@ -2063,7 +2155,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 	}
 
-	//LS, PR
+	// LS, PR
 	/**
 	 * 
 	 * @param dstReg
@@ -2079,7 +2171,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 	}
 
-	//LS, PR
+	// LS, PR
 	/**
 	 * 
 	 * @param dstReg
@@ -2103,7 +2195,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param dstDisp
 	 * @param srcReg
 	 */
-	public final void writeOR(X86Register dstReg, int dstDisp, X86Register srcReg) {
+	public final void writeOR(X86Register dstReg, int dstDisp,
+			X86Register srcReg) {
 		writeModRM(0x09, dstReg.getNr(), dstDisp, srcReg.getNr());
 	}
 
@@ -2117,7 +2210,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		writeModRR(0x09, dstReg.getNr(), srcReg.getNr());
 	}
 
-	//LS, PR
+	// LS, PR
 	/**
 	 * 
 	 * @param dstReg
@@ -2216,7 +2309,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		return rc;
 	}
 
-	//PR
+	// PR
 	/**
 	 * Create a push dword <object>
 	 * 
@@ -2229,12 +2322,14 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		writeObjectRef(objRef, 0, false);
 		return rc;
 	}
+
 	/**
 	 * @see org.jnode.assembler.x86.X86Assembler#writePUSHA()
 	 */
 	public void writePUSHA() {
 		write8(0x60);
 	}
+
 	public void writeRDTSC() {
 		write8(0x0F);
 		write8(0x31);
@@ -2296,7 +2391,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write8(imm8);
 	}
 
-	//LS
+	// LS
 	/**
 	 * @param dstReg
 	 * @param dstDisp
@@ -2316,7 +2411,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		writeModRR(0xd3, dstReg.getNr(), 4);
 	}
 
-	//LS
+	// LS
 	/**
 	 * @param dstReg
 	 * @param dstDisp
@@ -2336,7 +2431,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write8(imm8);
 	}
 
-	//LS
+	// LS
 	/**
 	 * @param dstReg
 	 * @param dstDisp
@@ -2356,7 +2451,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		writeModRR(0xd3, dstReg.getNr(), 7);
 	}
 
-	//LS
+	// LS
 	/**
 	 * @param dstReg
 	 * @param dstDisp
@@ -2405,7 +2500,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param dstDisp
 	 * @param srcReg
 	 */
-	public final void writeSBB(X86Register dstReg, int dstDisp, X86Register srcReg) {
+	public final void writeSBB(X86Register dstReg, int dstDisp,
+			X86Register srcReg) {
 		writeModRM(0x19, dstReg.getNr(), dstDisp, srcReg.getNr());
 	}
 
@@ -2552,7 +2648,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 	}
 
-	//LS, PR
+	// LS, PR
 	/**
 	 * 
 	 * @param dstReg
@@ -2576,7 +2672,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param dstDisp
 	 * @param srcReg
 	 */
-	public final void writeSUB(X86Register dstReg, int dstDisp, X86Register srcReg) {
+	public final void writeSUB(X86Register dstReg, int dstDisp,
+			X86Register srcReg) {
 		writeModRM(0x29, dstReg.getNr(), dstDisp, srcReg.getNr());
 	}
 
@@ -2590,7 +2687,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		writeModRR(0x29, dstReg.getNr(), srcReg.getNr());
 	}
 
-	//LS, PR
+	// LS, PR
 	/**
 	 * Create a SUB dstReg, [srcReg+srcDisp]
 	 * 
@@ -2687,7 +2784,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 	}
 
-	//LS, PR
+	// LS, PR
 	/**
 	 * 
 	 * @param dstReg
@@ -2703,7 +2800,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 	}
 
-	//LS, PR
+	// LS, PR
 	/**
 	 * 
 	 * @param dstReg
@@ -2727,7 +2824,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param dstDisp
 	 * @param srcReg
 	 */
-	public final void writeXOR(X86Register dstReg, int dstDisp, X86Register srcReg) {
+	public final void writeXOR(X86Register dstReg, int dstDisp,
+			X86Register srcReg) {
 		writeModRM(0x31, dstReg.getNr(), dstDisp, srcReg.getNr());
 	}
 
@@ -2741,7 +2839,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		writeModRR(0x31, dstReg.getNr(), srcReg.getNr());
 	}
 
-	//LS, PR
+	// LS, PR
 	/**
 	 * 
 	 * @param dstReg
@@ -2751,4 +2849,5 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	public void writeXOR(X86Register dstReg, X86Register srcReg, int srcDisp) {
 		writeModRM(0x33, srcReg.getNr(), srcDisp, dstReg.getNr());
 	}
+
 }

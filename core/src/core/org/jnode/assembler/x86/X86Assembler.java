@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.assembler.x86;
 
 import java.io.IOException;
@@ -37,8 +37,7 @@ import org.jnode.vm.x86.X86CpuID;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Levente Sántha
  */
-public abstract class X86Assembler extends NativeStream implements
-		X86Constants {
+public abstract class X86Assembler extends NativeStream implements X86Constants {
 
 	protected final X86CpuID cpuId;
 
@@ -49,22 +48,6 @@ public abstract class X86Assembler extends NativeStream implements
 	 */
 	public X86Assembler(X86CpuID cpuId) {
 		this.cpuId = cpuId;
-	}
-
-	/**
-	 * Gets the identification of the CPU for which this stream will produce
-	 * data.
-	 */
-	public final CpuID getCPUID() {
-		return cpuId;
-	}
-
-	/**
-	 * Gets the identification of the CPU for which this stream will produce
-	 * data.
-	 */
-	public final X86CpuID getX86CPUID() {
-		return cpuId;
 	}
 
 	/**
@@ -94,18 +77,19 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract byte[] getBytes();
 
 	/**
+	 * Gets the identification of the CPU for which this stream will produce
+	 * data.
+	 */
+	public final CpuID getCPUID() {
+		return cpuId;
+	}
+
+	/**
 	 * Get the length in bytes of valid data
 	 * 
 	 * @return the length of valid data
 	 */
 	public abstract int getLength();
-
-	/**
-	 * Remove count bytes from the end of the generated stream.
-	 * 
-	 * @param count
-	 */
-	public abstract void trim(int count);
 
 	/**
 	 * Gets an objectref for a given object.
@@ -135,11 +119,43 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract Collection getUnresolvedObjectRefs();
 
 	/**
+	 * Gets the identification of the CPU for which this stream will produce
+	 * data.
+	 */
+	public final X86CpuID getX86CPUID() {
+		return cpuId;
+	}
+
+	/**
 	 * Are there unresolved references?
 	 * 
 	 * @return True if there are unresolved references, false otherwise
 	 */
 	public abstract boolean hasUnresolvedObjectRefs();
+
+	/**
+	 * Is logging enabled. This method will only return true on on debug like
+	 * implementations.
+	 * 
+	 * @return boolean
+	 */
+	public abstract boolean isLogEnabled();
+
+	/**
+	 * Is this a text stream. In that case there is not actual generated code,
+	 * so length calculations are invalid.
+	 * 
+	 * @return true or false
+	 */
+	public abstract boolean isTextStream();
+
+	/**
+	 * Write a log message. This method is only implemented on debug like
+	 * implementations.
+	 * 
+	 * @param msg
+	 */
+	public abstract void log(Object msg);
 
 	public abstract void set32(int offset, int v32);
 
@@ -154,6 +170,24 @@ public abstract class X86Assembler extends NativeStream implements
 	 *            The resolver to set
 	 */
 	public abstract void setResolver(ObjectResolver resolver);
+
+	/**
+	 * Start a new object and write its header. An ObjectInfo object is
+	 * returned, on which the <code>markEnd</code> mehod must be called after
+	 * all data has been written into the object.
+	 * 
+	 * @param cls
+	 * @see ObjectInfo
+	 * @return The info for the started object
+	 */
+	public abstract ObjectInfo startObject(VmType cls);
+
+	/**
+	 * Remove count bytes from the end of the generated stream.
+	 * 
+	 * @param count
+	 */
+	public abstract void trim(int count);
 
 	public abstract void write(byte[] data, int ofs, int len);
 
@@ -171,61 +205,12 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract void write8(int v8);
 
 	/**
-	 * Write an prefix byte
+	 * Create a ADC dstReg, imm32
 	 * 
-	 * @param prefix
-	 */
-	public abstract void writePrefix(int prefix);
-
-	/**
-	 * Create a ADD dstReg, srcReg
-	 * 
-	 * @param dstReg
-	 * @param srcReg
-	 */
-	public abstract void writeADD(X86Register dstReg, X86Register srcReg);
-
-	/**
-	 * Create a ADD [dstReg+dstDisp], <srcReg>
-	 * 
-	 * @param dstReg
-	 * @param dstDisp
-	 * @param srcReg
-	 */
-	public abstract void writeADD(X86Register dstReg, int dstDisp, X86Register srcReg);
-
-	/**
-	 * Create a ADD dstReg, [srcReg+srcDisp]
-	 * 
-	 * @param dstReg
-	 * @param srcReg
-	 * @param srcDisp
-	 */
-	public abstract void writeADD(X86Register dstReg, X86Register srcReg, int srcDisp);
-
-	/**
-	 * Create a ADD [dstReg+dstDisp], imm32
-	 * 
-	 * @param dstReg
-	 * @param dstDisp
-	 * @param imm32
-	 */
-	public abstract void writeADD(X86Register dstReg, int dstDisp, int imm32);
-
-	//LS
-	/**
 	 * @param dstReg
 	 * @param imm32
 	 */
-	public abstract void writeADD(X86Register dstReg, int imm32);
-
-	/**
-	 * Create a ADC dstReg, srcReg
-	 * 
-	 * @param dstReg
-	 * @param srcReg
-	 */
-	public abstract void writeADC(X86Register dstReg, X86Register srcReg);
+	public abstract void writeADC(X86Register dstReg, int imm32);
 
 	/**
 	 * Create a ADC [dstReg+dstDisp], imm32
@@ -237,12 +222,22 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract void writeADC(X86Register dstReg, int dstDisp, int imm32);
 
 	/**
-	 * Create a ADC dstReg, imm32
+	 * Create a ADC [dstReg+dstDisp], <srcReg>
 	 * 
 	 * @param dstReg
-	 * @param imm32
+	 * @param dstDisp
+	 * @param srcReg
 	 */
-	public abstract void writeADC(X86Register dstReg, int imm32);
+	public abstract void writeADC(X86Register dstReg, int dstDisp,
+			X86Register srcReg);
+
+	/**
+	 * Create a ADC dstReg, srcReg
+	 * 
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public abstract void writeADC(X86Register dstReg, X86Register srcReg);
 
 	/**
 	 * Create a ADC dstReg, [srcReg+srcDisp]
@@ -251,16 +246,52 @@ public abstract class X86Assembler extends NativeStream implements
 	 * @param srcReg
 	 * @param srcDisp
 	 */
-	public abstract void writeADC(X86Register dstReg, X86Register srcReg, int srcDisp);
+	public abstract void writeADC(X86Register dstReg, X86Register srcReg,
+			int srcDisp);
+
+	// LS
+	/**
+	 * @param dstReg
+	 * @param imm32
+	 */
+	public abstract void writeADD(X86Register dstReg, int imm32);
 
 	/**
-	 * Create a ADC [dstReg+dstDisp], <srcReg>
+	 * Create a ADD [dstReg+dstDisp], imm32
+	 * 
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param imm32
+	 */
+	public abstract void writeADD(X86Register dstReg, int dstDisp, int imm32);
+
+	/**
+	 * Create a ADD [dstReg+dstDisp], <srcReg>
 	 * 
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param srcReg
 	 */
-	public abstract void writeADC(X86Register dstReg, int dstDisp, X86Register srcReg);
+	public abstract void writeADD(X86Register dstReg, int dstDisp,
+			X86Register srcReg);
+
+	/**
+	 * Create a ADD dstReg, srcReg
+	 * 
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public abstract void writeADD(X86Register dstReg, X86Register srcReg);
+
+	/**
+	 * Create a ADD dstReg, [srcReg+srcDisp]
+	 * 
+	 * @param dstReg
+	 * @param srcReg
+	 * @param srcDisp
+	 */
+	public abstract void writeADD(X86Register dstReg, X86Register srcReg,
+			int srcDisp);
 
 	/**
 	 * Create a AND reg, imm32
@@ -270,32 +301,7 @@ public abstract class X86Assembler extends NativeStream implements
 	 */
 	public abstract void writeAND(X86Register reg, int imm32);
 
-	/**
-	 * Create a AND dstReg, srcReg
-	 * 
-	 * @param dstReg
-	 * @param srcReg
-	 */
-	public abstract void writeAND(X86Register dstReg, X86Register srcReg);
-
-	/**
-	 * Create a AND [dstReg+dstDisp], srcReg
-	 * 
-	 * @param dstReg
-	 * @param dstDisp
-	 * @param srcReg
-	 */
-	public abstract void writeAND(X86Register dstReg, int dstDisp, X86Register srcReg);
-
-	//LS
-	/**
-	 * @param dstReg
-	 * @param srcReg
-	 * @param srcDisp
-	 */
-	public abstract void writeAND(X86Register dstReg, X86Register srcReg, int srcDisp);
-
-	//LS
+	// LS
 	/**
 	 * @param dstReg
 	 * @param dstDisp
@@ -304,13 +310,221 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract void writeAND(X86Register dstReg, int dstDisp, int imm32);
 
 	/**
+	 * Create a AND [dstReg+dstDisp], srcReg
+	 * 
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param srcReg
+	 */
+	public abstract void writeAND(X86Register dstReg, int dstDisp,
+			X86Register srcReg);
+
+	/**
+	 * Create a AND dstReg, srcReg
+	 * 
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public abstract void writeAND(X86Register dstReg, X86Register srcReg);
+
+	// LS
+	/**
+	 * @param dstReg
+	 * @param srcReg
+	 * @param srcDisp
+	 */
+	public abstract void writeAND(X86Register dstReg, X86Register srcReg,
+			int srcDisp);
+
+	/**
+	 * @param dstReg
+	 * @param imm32
+	 */
+	public final void writeArithOp(int operation, X86Register dstReg, int imm32) {
+		switch (operation) {
+		case X86Operation.ADD:
+			writeADD(dstReg, imm32);
+			break;
+		case X86Operation.ADC:
+			writeADC(dstReg, imm32);
+			break;
+		case X86Operation.SUB:
+			writeSUB(dstReg, imm32);
+			break;
+		case X86Operation.SBB:
+			writeSBB(dstReg, imm32);
+			break;
+		case X86Operation.AND:
+			writeAND(dstReg, imm32);
+			break;
+		case X86Operation.OR:
+			writeOR(dstReg, imm32);
+			break;
+		case X86Operation.XOR:
+			writeXOR(dstReg, imm32);
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid operation " + operation);
+		}
+	}
+
+	/**
+	 * Create a OPERATION [dstReg+dstDisp], imm32
+	 * 
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param imm32
+	 */
+	public final void writeArithOp(int operation, X86Register dstReg,
+			int dstDisp, int imm32) {
+		switch (operation) {
+		case X86Operation.ADD:
+			writeADD(dstReg, dstDisp, imm32);
+			break;
+		case X86Operation.ADC:
+			writeADC(dstReg, dstDisp, imm32);
+			break;
+		case X86Operation.SUB:
+			writeSUB(dstReg, dstDisp, imm32);
+			break;
+		case X86Operation.SBB:
+			writeSBB(dstReg, dstDisp, imm32);
+			break;
+		case X86Operation.AND:
+			writeAND(dstReg, dstDisp, imm32);
+			break;
+		case X86Operation.OR:
+			writeOR(dstReg, dstDisp, imm32);
+			break;
+		case X86Operation.XOR:
+			writeXOR(dstReg, dstDisp, imm32);
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid operation " + operation);
+		}
+	}
+
+	/**
+	 * Create a OPERATION [dstReg+dstDisp], <srcReg>
+	 * 
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param srcReg
+	 */
+	public final void writeArithOp(int operation, X86Register dstReg,
+			int dstDisp, X86Register srcReg) {
+		switch (operation) {
+		case X86Operation.ADD:
+			writeADD(dstReg, dstDisp, srcReg);
+			break;
+		case X86Operation.ADC:
+			writeADC(dstReg, dstDisp, srcReg);
+			break;
+		case X86Operation.SUB:
+			writeSUB(dstReg, dstDisp, srcReg);
+			break;
+		case X86Operation.SBB:
+			writeSBB(dstReg, dstDisp, srcReg);
+			break;
+		case X86Operation.AND:
+			writeAND(dstReg, dstDisp, srcReg);
+			break;
+		case X86Operation.OR:
+			writeOR(dstReg, dstDisp, srcReg);
+			break;
+		case X86Operation.XOR:
+			writeXOR(dstReg, dstDisp, srcReg);
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid operation " + operation);
+		}
+	}
+
+	/**
+	 * Create a OPERATION dstReg, srcReg
+	 * 
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public final void writeArithOp(int operation, X86Register dstReg,
+			X86Register srcReg) {
+		switch (operation) {
+		case X86Operation.ADD:
+			writeADD(dstReg, srcReg);
+			break;
+		case X86Operation.ADC:
+			writeADC(dstReg, srcReg);
+			break;
+		case X86Operation.SUB:
+			writeSUB(dstReg, srcReg);
+			break;
+		case X86Operation.SBB:
+			writeSBB(dstReg, srcReg);
+			break;
+		case X86Operation.AND:
+			writeAND(dstReg, srcReg);
+			break;
+		case X86Operation.OR:
+			writeOR(dstReg, srcReg);
+			break;
+		case X86Operation.XOR:
+			writeXOR(dstReg, srcReg);
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid operation " + operation);
+		}
+	}
+
+	/**
+	 * Create a OPERATION dstReg, [srcReg+srcDisp]
+	 * 
+	 * @param dstReg
+	 * @param srcReg
+	 * @param srcDisp
+	 */
+	public final void writeArithOp(int operation, X86Register dstReg,
+			X86Register srcReg, int srcDisp) {
+		switch (operation) {
+		case X86Operation.ADD:
+			writeADD(dstReg, srcReg, srcDisp);
+			break;
+		case X86Operation.ADC:
+			writeADC(dstReg, srcReg, srcDisp);
+			break;
+		case X86Operation.SUB:
+			writeSUB(dstReg, srcReg, srcDisp);
+			break;
+		case X86Operation.SBB:
+			writeSBB(dstReg, srcReg, srcDisp);
+			break;
+		case X86Operation.AND:
+			writeAND(dstReg, srcReg, srcDisp);
+			break;
+		case X86Operation.OR:
+			writeOR(dstReg, srcReg, srcDisp);
+			break;
+		case X86Operation.XOR:
+			writeXOR(dstReg, srcReg, srcDisp);
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid operation " + operation);
+		}
+	}
+
+	/**
 	 * Create a bound lReg, [rReg+rDisp]
 	 * 
 	 * @param lReg
 	 * @param rReg
 	 * @param rDisp
 	 */
-	public abstract void writeBOUND(X86Register lReg, X86Register rReg, int rDisp);
+	public abstract void writeBOUND(X86Register lReg, X86Register rReg,
+			int rDisp);
+
+	/**
+	 * Create a int3
+	 */
+	public abstract void writeBreakPoint();
 
 	/**
 	 * Create a relative call to a given label
@@ -347,14 +561,16 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract void writeCALL(X86Register reg, int offset);
 
 	/**
-	 * Create a call to address stored at the given [regBase+regIndex*scale+disp].
+	 * Create a call to address stored at the given
+	 * [regBase+regIndex*scale+disp].
 	 * 
 	 * @param regBase
 	 * @param regIndex
 	 * @param scale
 	 * @param disp
 	 */
-	public abstract void writeCALL(X86Register regBase, X86Register regIndex, int scale, int disp);
+	public abstract void writeCALL(X86Register regBase, X86Register regIndex,
+			int scale, int disp);
 
 	/**
 	 * Create a cdq
@@ -366,7 +582,8 @@ public abstract class X86Assembler extends NativeStream implements
 	 * 
 	 * @param dst,src
 	 */
-	public abstract void writeCMOVcc(int ccOpcode, X86Register dst, X86Register src);
+	public abstract void writeCMOVcc(int ccOpcode, X86Register dst,
+			X86Register src);
 
 	/**
 	 * Create a CMOVcc dst,[src+srcDisp]
@@ -375,15 +592,34 @@ public abstract class X86Assembler extends NativeStream implements
 	 * @param src
 	 * @param srcDisp
 	 */
-	public abstract void writeCMOVcc(int ccOpcode, X86Register dst, X86Register src,
-			int srcDisp);
+	public abstract void writeCMOVcc(int ccOpcode, X86Register dst,
+			X86Register src, int srcDisp);
 
 	/**
-	 * Create a CMP EAX, imm32
+	 * Create a CMP [reg1+disp], reg2
 	 * 
-	 * @param imm32
+	 * @param reg1
+	 * @param disp
+	 * @param reg2
 	 */
-	public abstract void writeCMP_EAX(int imm32);
+	public abstract void writeCMP(X86Register reg1, int disp, X86Register reg2);
+
+	/**
+	 * Create a CMP reg1, reg2
+	 * 
+	 * @param reg1
+	 * @param reg2
+	 */
+	public abstract void writeCMP(X86Register reg1, X86Register reg2);
+
+	/**
+	 * Create a CMP reg1, [reg2+disp]
+	 * 
+	 * @param reg1
+	 * @param reg2
+	 * @param disp
+	 */
+	public abstract void writeCMP(X86Register reg1, X86Register reg2, int disp);
 
 	/**
 	 * Create a CMP reg, imm32
@@ -403,22 +639,11 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract void writeCMP_Const(X86Register reg, int disp, int imm32);
 
 	/**
-	 * Create a CMP reg1, [reg2+disp]
+	 * Create a CMP EAX, imm32
 	 * 
-	 * @param reg1
-	 * @param reg2
-	 * @param disp
+	 * @param imm32
 	 */
-	public abstract void writeCMP(X86Register reg1, X86Register reg2, int disp);
-
-	/**
-	 * Create a CMP [reg1+disp], reg2
-	 * 
-	 * @param reg1
-	 * @param disp
-	 * @param reg2
-	 */
-	public abstract void writeCMP(X86Register reg1, int disp, X86Register reg2);
+	public abstract void writeCMP_EAX(int imm32);
 
 	/**
 	 * Create a CMP [memPtr], imm32
@@ -435,14 +660,6 @@ public abstract class X86Assembler extends NativeStream implements
 	 * @param memPtr
 	 */
 	public abstract void writeCMP_MEM(X86Register reg, int memPtr);
-
-	/**
-	 * Create a CMP reg1, reg2
-	 * 
-	 * @param reg1
-	 * @param reg2
-	 */
-	public abstract void writeCMP(X86Register reg1, X86Register reg2);
 
 	/**
 	 * Create a CMPXCHG dword [dstReg], srcReg
@@ -471,13 +688,6 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract void writeDEC(X86Register dstReg, int dstDisp);
 
 	/**
-	 * Create a faddp fpuReg fpuReg + ST0 to fpuReg and pop ST0
-	 * 
-	 * @param fpuReg
-	 */
-	public abstract void writeFADDP(X86Register fpuReg);
-
-	/**
 	 * Create a fadd dword [srcReg+srcDisp]
 	 * 
 	 * @param srcReg
@@ -494,16 +704,16 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract void writeFADD64(X86Register srcReg, int srcDisp);
 
 	/**
-	 * Create a fchs
-	 */
-	public abstract void writeFCHS();
-
-	/**
-	 * Create a fdivp fpuReg fpuReg / ST0 to fpuReg ; pop ST0
+	 * Create a faddp fpuReg fpuReg + ST0 to fpuReg and pop ST0
 	 * 
 	 * @param fpuReg
 	 */
-	public abstract void writeFDIVP(X86Register fpuReg);
+	public abstract void writeFADDP(X86Register fpuReg);
+
+	/**
+	 * Create a fchs
+	 */
+	public abstract void writeFCHS();
 
 	/**
 	 * Create a fdiv dword [srcReg+srcDisp]
@@ -520,6 +730,13 @@ public abstract class X86Assembler extends NativeStream implements
 	 * @param srcDisp
 	 */
 	public abstract void writeFDIV64(X86Register srcReg, int srcDisp);
+
+	/**
+	 * Create a fdivp fpuReg fpuReg / ST0 to fpuReg ; pop ST0
+	 * 
+	 * @param fpuReg
+	 */
+	public abstract void writeFDIVP(X86Register fpuReg);
 
 	/**
 	 * Create a ffree
@@ -576,8 +793,8 @@ public abstract class X86Assembler extends NativeStream implements
 	 * @param srcScale
 	 * @param srcDisp
 	 */
-	public abstract void writeFLD32(X86Register srcBaseReg, X86Register srcIndexReg,
-			int srcScale, int srcDisp);
+	public abstract void writeFLD32(X86Register srcBaseReg,
+			X86Register srcIndexReg, int srcScale, int srcDisp);
 
 	/**
 	 * Create a fld qword [srcReg+srcDisp]
@@ -595,15 +812,8 @@ public abstract class X86Assembler extends NativeStream implements
 	 * @param srcScale
 	 * @param srcDisp
 	 */
-	public abstract void writeFLD64(X86Register srcBaseReg, X86Register srcIndexReg,
-			int srcScale, int srcDisp);
-
-	/**
-	 * Create a fmulp fpuReg fpuReg * ST0 to fpuReg ; pop ST0
-	 * 
-	 * @param fpuReg
-	 */
-	public abstract void writeFMULP(X86Register fpuReg);
+	public abstract void writeFLD64(X86Register srcBaseReg,
+			X86Register srcIndexReg, int srcScale, int srcDisp);
 
 	/**
 	 * Create a fmul dword [srcReg+srcDisp]
@@ -620,6 +830,13 @@ public abstract class X86Assembler extends NativeStream implements
 	 * @param srcDisp
 	 */
 	public abstract void writeFMUL64(X86Register srcReg, int srcDisp);
+
+	/**
+	 * Create a fmulp fpuReg fpuReg * ST0 to fpuReg ; pop ST0
+	 * 
+	 * @param fpuReg
+	 */
+	public abstract void writeFMULP(X86Register fpuReg);
 
 	/**
 	 * Create a fnstsw, Store fp status word in AX
@@ -655,13 +872,6 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract void writeFSTP64(X86Register dstReg, int dstDisp);
 
 	/**
-	 * Create a fsubp fpuReg fpuReg - ST0 to fpuReg & pop ST0
-	 * 
-	 * @param fpuReg
-	 */
-	public abstract void writeFSUBP(X86Register fpuReg);
-
-	/**
 	 * Create a fsub dword [srcReg+srcDisp]
 	 * 
 	 * @param srcReg
@@ -676,6 +886,13 @@ public abstract class X86Assembler extends NativeStream implements
 	 * @param srcDisp
 	 */
 	public abstract void writeFSUB64(X86Register srcReg, int srcDisp);
+
+	/**
+	 * Create a fsubp fpuReg fpuReg - ST0 to fpuReg & pop ST0
+	 * 
+	 * @param fpuReg
+	 */
+	public abstract void writeFSUBP(X86Register fpuReg);
 
 	/**
 	 * Create a fucompp, Compare - Pop twice
@@ -711,14 +928,16 @@ public abstract class X86Assembler extends NativeStream implements
 	 * @param srcReg
 	 * @param srcDisp
 	 */
-	public abstract void writeIMUL(X86Register dstReg, X86Register srcReg, int srcDisp);
+	public abstract void writeIMUL(X86Register dstReg, X86Register srcReg,
+			int srcDisp);
 
 	/**
-	 * Create a imul eax, srcReg
-	 * 
+	 * @param dstReg
 	 * @param srcReg
+	 * @param imm32
 	 */
-	public abstract void writeIMUL_EAX(X86Register srcReg);
+	public abstract void writeIMUL_3(X86Register dstReg, X86Register srcReg,
+			int imm32);
 
 	/**
 	 * Create a three operand imul.
@@ -732,11 +951,11 @@ public abstract class X86Assembler extends NativeStream implements
 			int srcDisp, int imm32);
 
 	/**
-	 * @param dstReg
+	 * Create a imul eax, srcReg
+	 * 
 	 * @param srcReg
-	 * @param imm32
 	 */
-	public abstract void writeIMUL_3(X86Register dstReg, X86Register srcReg, int imm32);
+	public abstract void writeIMUL_EAX(X86Register srcReg);
 
 	/**
 	 * Create a inc reg32
@@ -760,11 +979,6 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract void writeINT(int vector);
 
 	/**
-	 * Create a int3
-	 */
-	public abstract void writeBreakPoint();
-
-	/**
 	 * Create a conditional jump to a label The opcode sequence is: 0x0f
 	 * <jumpOpcode><rel32>
 	 * 
@@ -779,20 +993,6 @@ public abstract class X86Assembler extends NativeStream implements
 	 * @param label
 	 */
 	public abstract void writeJMP(Label label);
-
-	/**
-	 * Create a absolute jump to address in register
-	 * 
-	 * @param reg32
-	 */
-	public abstract void writeJMP(X86Register reg32);
-
-	/**
-	 * Create a absolute jump to [reg32+disp]
-	 * 
-	 * @param reg32
-	 */
-	public abstract void writeJMP(X86Register reg32, int disp);
 
 	/**
 	 * Create a absolute jump to address stored at the given offset in the given
@@ -816,14 +1016,18 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract void writeJMP(Object tablePtr, X86Register offsetReg);
 
 	/**
-	 * Create a LOOP label instruction. The given label must have be resolved
-	 * before!
+	 * Create a absolute jump to address in register
 	 * 
-	 * @param label
-	 * @throws UnresolvedObjectRefException
+	 * @param reg32
 	 */
-	public abstract void writeLOOP(Label label)
-			throws UnresolvedObjectRefException;
+	public abstract void writeJMP(X86Register reg32);
+
+	/**
+	 * Create a absolute jump to [reg32+disp]
+	 * 
+	 * @param reg32
+	 */
+	public abstract void writeJMP(X86Register reg32, int disp);
 
 	/**
 	 * Create a lea dstReg,[srcReg+disp]
@@ -832,7 +1036,8 @@ public abstract class X86Assembler extends NativeStream implements
 	 * @param srcReg
 	 * @param disp
 	 */
-	public abstract void writeLEA(X86Register dstReg, X86Register srcReg, int disp);
+	public abstract void writeLEA(X86Register dstReg, X86Register srcReg,
+			int disp);
 
 	/**
 	 * Create a lea dstReg,[srcReg+srcIdxReg*scale+disp]
@@ -850,6 +1055,74 @@ public abstract class X86Assembler extends NativeStream implements
 	 * Create a LODSD
 	 */
 	public abstract void writeLODSD();
+
+	/**
+	 * Create a LOOP label instruction. The given label must have be resolved
+	 * before!
+	 * 
+	 * @param label
+	 * @throws UnresolvedObjectRefException
+	 */
+	public abstract void writeLOOP(Label label)
+			throws UnresolvedObjectRefException;
+
+	/**
+	 * Create a mov [dstReg+dstDisp], <srcReg>
+	 * 
+	 * @param operandSize
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param srcReg
+	 */
+	public abstract void writeMOV(int operandSize, X86Register dstReg,
+			int dstDisp, X86Register srcReg);
+
+	/**
+	 * Create a mov <dstReg>, <srcReg>
+	 * 
+	 * @param operandSize
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public abstract void writeMOV(int operandSize, X86Register dstReg,
+			X86Register srcReg);
+
+	/**
+	 * Create a mov dstReg, [srcReg+srcDisp]
+	 * 
+	 * @param operandSize
+	 * @param dstReg
+	 * @param srcReg
+	 * @param srcDisp
+	 */
+	public abstract void writeMOV(int operandSize, X86Register dstReg,
+			X86Register srcReg, int srcDisp);
+
+	/**
+	 * Create a mov [dstReg+dstIdxReg*scale+dstDisp], <srcReg>
+	 * 
+	 * @param operandSize
+	 * @param dstReg
+	 * @param dstIdxReg
+	 * @param scale
+	 * @param dstDisp
+	 * @param srcReg
+	 */
+	public abstract void writeMOV(int operandSize, X86Register dstReg,
+			X86Register dstIdxReg, int scale, int dstDisp, X86Register srcReg);
+
+	/**
+	 * Create a mov dstReg, [srcReg+srcIdxReg*scale+srcDisp]
+	 * 
+	 * @param operandSize
+	 * @param dstReg
+	 * @param srcReg
+	 * @param srcIdxReg
+	 * @param scale
+	 * @param srcDisp
+	 */
+	public abstract void writeMOV(int operandSize, X86Register dstReg,
+			X86Register srcReg, X86Register srcIdxReg, int scale, int srcDisp);
 
 	/**
 	 * Create a mov <reg>, <imm32>
@@ -870,80 +1143,22 @@ public abstract class X86Assembler extends NativeStream implements
 			int imm32);
 
 	/**
-	 * Create a mov [destReg+dstIdxReg*scale+destDisp], <imm32>
-	 * 
-	 * @param dstReg
-	 * @param dstDisp
-	 * @param imm32
-	 */
-	public abstract void writeMOV_Const(X86Register dstReg, X86Register dstIdxReg,
-			int scale, int dstDisp, int imm32);
-
-	/**
-	 * Create a mov <dstReg>, <srcReg>
-	 * 
-	 * @param operandSize
-	 * @param dstReg
-	 * @param srcReg
-	 */
-	public abstract void writeMOV(int operandSize, X86Register dstReg,
-			X86Register srcReg);
-
-	/**
-	 * Create a mov [dstReg+dstDisp], <srcReg>
-	 * 
-	 * @param operandSize
-	 * @param dstReg
-	 * @param dstDisp
-	 * @param srcReg
-	 */
-	public abstract void writeMOV(int operandSize, X86Register dstReg,
-			int dstDisp, X86Register srcReg);
-
-	/**
-	 * Create a mov [dstReg+dstIdxReg*scale+dstDisp], <srcReg>
-	 * 
-	 * @param operandSize
-	 * @param dstReg
-	 * @param dstIdxReg
-	 * @param scale
-	 * @param dstDisp
-	 * @param srcReg
-	 */
-	public abstract void writeMOV(int operandSize, X86Register dstReg,
-			X86Register dstIdxReg, int scale, int dstDisp, X86Register srcReg);
-
-	/**
-	 * Create a mov dstReg, [srcReg+srcDisp]
-	 * 
-	 * @param operandSize
-	 * @param dstReg
-	 * @param srcReg
-	 * @param srcDisp
-	 */
-	public abstract void writeMOV(int operandSize, X86Register dstReg,
-			X86Register srcReg, int srcDisp);
-
-	/**
-	 * Create a mov dstReg, [srcReg+srcIdxReg*scale+srcDisp]
-	 * 
-	 * @param operandSize
-	 * @param dstReg
-	 * @param srcReg
-	 * @param srcIdxReg
-	 * @param scale
-	 * @param srcDisp
-	 */
-	public abstract void writeMOV(int operandSize, X86Register dstReg,
-			X86Register srcReg, X86Register srcIdxReg, int scale, int srcDisp);
-
-	/**
 	 * Create a mov <reg>, <label>
 	 * 
 	 * @param dstReg
 	 * @param label
 	 */
 	public abstract void writeMOV_Const(X86Register dstReg, Object label);
+
+	/**
+	 * Create a mov [destReg+dstIdxReg*scale+destDisp], <imm32>
+	 * 
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param imm32
+	 */
+	public abstract void writeMOV_Const(X86Register dstReg,
+			X86Register dstIdxReg, int scale, int dstDisp, int imm32);
 
 	/**
 	 * Create a movsx <dstReg>, <srcReg>
@@ -979,6 +1194,13 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract void writeMUL_EAX(X86Register srcReg);
 
 	/**
+	 * Create a neg dstReg
+	 * 
+	 * @param dstReg
+	 */
+	public abstract void writeNEG(X86Register dstReg);
+
+	/**
 	 * Create a neg dword [dstReg+dstDisp]
 	 * 
 	 * @param dstReg
@@ -987,19 +1209,9 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract void writeNEG(X86Register dstReg, int dstDisp);
 
 	/**
-	 * Create a neg dstReg
-	 * 
-	 * @param dstReg
+	 * Create a nop
 	 */
-	public abstract void writeNEG(X86Register dstReg);
-
-	/**
-	 * Create a not dword [dstReg+dstDisp]
-	 * 
-	 * @param dstReg
-	 * @param dstDisp
-	 */
-	public abstract void writeNOT(X86Register dstReg, int dstDisp);
+	public abstract void writeNOP();
 
 	/**
 	 * Create a not dstReg
@@ -1009,9 +1221,37 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract void writeNOT(X86Register dstReg);
 
 	/**
-	 * Create a nop
+	 * Create a not dword [dstReg+dstDisp]
+	 * 
+	 * @param dstReg
+	 * @param dstDisp
 	 */
-	public abstract void writeNOP();
+	public abstract void writeNOT(X86Register dstReg, int dstDisp);
+
+	// LS
+	/**
+	 * @param dstReg
+	 * @param imm32
+	 */
+	public abstract void writeOR(X86Register dstReg, int imm32);
+
+	// LS
+	/**
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param imm32
+	 */
+	public abstract void writeOR(X86Register dstReg, int dstDisp, int imm32);
+
+	/**
+	 * Create a OR [dstReg+dstDisp], srcReg
+	 * 
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param srcReg
+	 */
+	public abstract void writeOR(X86Register dstReg, int dstDisp,
+			X86Register srcReg);
 
 	/**
 	 * Create a OR dstReg, srcReg
@@ -1021,328 +1261,14 @@ public abstract class X86Assembler extends NativeStream implements
 	 */
 	public abstract void writeOR(X86Register dstReg, X86Register srcReg);
 
-	/**
-	 * Create a OR [dstReg+dstDisp], srcReg
-	 * 
-	 * @param dstReg
-	 * @param dstDisp
-	 * @param srcReg
-	 */
-	public abstract void writeOR(X86Register dstReg, int dstDisp, X86Register srcReg);
-
-	//LS
-	/**
-	 * @param dstReg
-	 * @param dstDisp
-	 * @param imm32
-	 */
-	public abstract void writeOR(X86Register dstReg, int dstDisp, int imm32);
-
-	//LS
-	/**
-	 * @param dstReg
-	 * @param imm32
-	 */
-	public abstract void writeOR(X86Register dstReg, int imm32);
-
-	//LS
+	// LS
 	/**
 	 * @param dstReg
 	 * @param srcReg
 	 * @param srcDisp
 	 */
-	public abstract void writeOR(X86Register dstReg, X86Register srcReg, int srcDisp);
-
-	/**
-	 * Create a sahf
-	 */
-	public abstract void writeSAHF();
-
-	/**
-	 * Create a SAL dstReg,cl
-	 * 
-	 * @param dstReg
-	 */
-	public abstract void writeSAL_CL(X86Register dstReg);
-
-	/**
-	 * Create a SAL dstReg,imm8
-	 * 
-	 * @param dstReg
-	 * @param imm8
-	 */
-	public abstract void writeSAL(X86Register dstReg, int imm8);
-
-	/**
-	 * Create a SAR dstReg,cl
-	 * 
-	 * @param dstReg
-	 */
-	public abstract void writeSAR_CL(X86Register dstReg);
-
-	/**
-	 * Create a SAR dstReg,imm8
-	 * 
-	 * @param dstReg
-	 * @param imm8
-	 */
-	public abstract void writeSAR(X86Register dstReg, int imm8);
-
-	/**
-	 * @param register
-	 * @param disp
-	 */
-	public abstract void writeSAL_CL(X86Register register, int disp);
-
-	/**
-	 * @param register
-	 * @param disp
-	 */
-	public abstract void writeSAR_CL(X86Register register, int disp);
-
-	/**
-	 * @param register
-	 * @param disp1
-	 */
-	public abstract void writeSHR_CL(X86Register register, int disp1);
-
-	/**
-	 * @param register
-	 * @param disp1
-	 * @param imm32
-	 */
-	public abstract void writeSAL(X86Register register, int disp1, int imm32);
-
-	/**
-	 * @param register
-	 * @param disp
-	 * @param imm32
-	 */
-	public abstract void writeSAR(X86Register register, int disp, int imm32);
-
-	/**
-	 * @param register
-	 * @param disp
-	 * @param imm32
-	 */
-	public abstract void writeSHR(X86Register register, int disp, int imm32);
-
-	/**
-	 * Create a SETcc dstReg. Sets the given 8-bit operand to zero if its
-	 * condition is not satisfied, and to 1 if it is.
-	 * 
-	 * @param dstReg
-	 * @param cc
-	 */
-	public abstract void writeSETCC(X86Register dstReg, int cc);
-
-	/**
-	 * Create a SHL dstReg,cl
-	 * 
-	 * @param dstReg
-	 */
-	public abstract void writeSHL_CL(X86Register dstReg);
-
-	/**
-	 * Create a SHL [dstReg+dstDisp],cl
-	 * 
-	 * @param dstReg
-	 */
-	public abstract void writeSHL_CL(X86Register dstReg, int dstDisp);
-
-	/**
-	 * Create a SHLD dstReg,srcReg,cl
-	 * 
-	 * @param dstReg
-	 * @param srcReg
-	 */
-	public abstract void writeSHLD_CL(X86Register dstReg, X86Register srcReg);
-
-	/**
-	 * Create a SHL dstReg,imm8
-	 * 
-	 * @param dstReg
-	 * @param imm8
-	 */
-	public abstract void writeSHL(X86Register dstReg, int imm8);
-
-	/**
-	 * Create a SHL [dstReg+dstDisp],imm8
-	 * 
-	 * @param dstReg
-	 * @param imm8
-	 */
-	public abstract void writeSHL(X86Register dstReg, int dstDisp, int imm8);
-
-	/**
-	 * Create a SHR dstReg,cl
-	 * 
-	 * @param dstReg
-	 */
-	public abstract void writeSHR_CL(X86Register dstReg);
-
-	/**
-	 * Create a SHRD dstReg,srcReg,cl
-	 * 
-	 * @param dstReg
-	 * @param srcReg
-	 */
-	public abstract void writeSHRD_CL(X86Register dstReg, X86Register srcReg);
-
-	/**
-	 * Create a SHL dstReg,imm8
-	 * 
-	 * @param dstReg
-	 * @param imm8
-	 */
-	public abstract void writeSHR(X86Register dstReg, int imm8);
-
-	/**
-	 * Create a SBB dstReg, srcReg
-	 * 
-	 * @param dstReg
-	 * @param srcReg
-	 */
-	public abstract void writeSBB(X86Register dstReg, X86Register srcReg);
-
-	/**
-	 * Create a SBB dstReg, imm32
-	 * 
-	 * @param dstReg
-	 * @param imm32
-	 */
-	public abstract void writeSBB(X86Register dstReg, int imm32);
-
-	/**
-	 * Create a SBB dword [dstReg+dstDisp], <imm32>
-	 * 
-	 * @param dstReg
-	 * @param dstDisp
-	 * @param imm32
-	 */
-	public abstract void writeSBB(X86Register dstReg, int dstDisp, int imm32);
-
-	/**
-	 * Create a SBB [dstReg+dstDisp], <srcReg>
-	 * 
-	 * @param dstReg
-	 * @param dstDisp
-	 * @param srcReg
-	 */
-	public abstract void writeSBB(X86Register dstReg, int dstDisp, X86Register srcReg);
-
-	/**
-	 * @param dstReg
-	 * @param srcReg
-	 * @param srcDisp
-	 */
-	public abstract void writeSBB(X86Register dstReg, X86Register srcReg, int srcDisp);
-
-	/**
-	 * Create a SUB dstReg, srcReg
-	 * 
-	 * @param dstReg
-	 * @param srcReg
-	 */
-	public abstract void writeSUB(X86Register dstReg, X86Register srcReg);
-
-	/**
-	 * Create a SUB reg, imm32
-	 * 
-	 * @param reg
-	 * @param imm32
-	 */
-	public abstract void writeSUB(X86Register reg, int imm32);
-
-	/**
-	 * Create a SUB [dstReg+dstDisp], <srcReg>
-	 * 
-	 * @param dstReg
-	 * @param dstDisp
-	 * @param srcReg
-	 */
-	public abstract void writeSUB(X86Register dstReg, int dstDisp, X86Register srcReg);
-
-	//LS
-	/**
-	 * @param dstReg
-	 * @param srcReg
-	 * @param srcDisp
-	 */
-	public abstract void writeSUB(X86Register dstReg, X86Register srcReg, int srcDisp);
-
-	//LS
-	/**
-	 * @param dstReg
-	 * @param dstDisp
-	 * @param imm32
-	 */
-	public abstract void writeSUB(X86Register dstReg, int dstDisp, int imm32);
-
-	/**
-	 * Create a XOR dstReg, srcReg
-	 * 
-	 * @param dstReg
-	 * @param srcReg
-	 */
-	public abstract void writeXOR(X86Register dstReg, X86Register srcReg);
-
-	/**
-	 * Create a XOR [dstReg+dstDisp], srcReg
-	 * 
-	 * @param dstReg
-	 * @param dstDisp
-	 * @param srcReg
-	 */
-	public abstract void writeXOR(X86Register dstReg, int dstDisp, X86Register srcReg);
-
-	//LS
-	/**
-	 * @param dstReg
-	 * @param srcReg
-	 * @param srcDisp
-	 */
-	public abstract void writeXOR(X86Register dstReg, X86Register srcReg, int srcDisp);
-
-	//LS
-	/**
-	 * @param dstReg
-	 * @param imm32
-	 */
-	public abstract void writeXOR(X86Register dstReg, int imm32);
-
-	/**
-	 * @param dstReg
-	 * @param dstDisp
-	 * @param imm32
-	 */
-	public abstract void writeXOR(X86Register dstReg, int dstDisp, int imm32);
-
-	/**
-	 * Write XCHG dstReg, srcReg
-	 * @param dstReg
-	 * @param srcReg
-	 */
-	public abstract void writeXCHG(X86Register dstReg, X86Register srcReg);
-
-	/**
-	 * Write XCHG [dstReg+dstDisp], srcReg
-	 * @param dstReg
-	 * @param dstDisp
-	 * @param srcReg
-	 */
-	public abstract void writeXCHG(X86Register dstReg, int dstDisp, X86Register srcReg);
-
-	/**
-	 * Start a new object and write its header. An ObjectInfo object is
-	 * returned, on which the <code>markEnd</code> mehod must be called after
-	 * all data has been written into the object.
-	 * 
-	 * @param cls
-	 * @see ObjectInfo
-	 * @return The info for the started object
-	 */
-	public abstract ObjectInfo startObject(VmType cls);
+	public abstract void writeOR(X86Register dstReg, X86Register srcReg,
+			int srcDisp);
 
 	/**
 	 * Create a pop reg32
@@ -1365,9 +1291,11 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract void writePOPA();
 
 	/**
-	 * Create a pusha
+	 * Write an prefix byte
+	 * 
+	 * @param prefix
 	 */
-	public abstract void writePUSHA();
+	public abstract void writePrefix(int prefix);
 
 	/**
 	 * Create a push dword <imm32>
@@ -1403,10 +1331,10 @@ public abstract class X86Assembler extends NativeStream implements
 	 * @param srcDisp
 	 * @return The ofset of the start of the instruction.
 	 */
-	public abstract int writePUSH(X86Register srcBaseReg, X86Register srcIndexReg,
-			int srcScale, int srcDisp);
+	public abstract int writePUSH(X86Register srcBaseReg,
+			X86Register srcIndexReg, int srcScale, int srcDisp);
 
-	//PR
+	// PR
 	/**
 	 * Create a push dword <object>
 	 * 
@@ -1414,6 +1342,23 @@ public abstract class X86Assembler extends NativeStream implements
 	 * @return The offset of the start of the instruction.
 	 */
 	public abstract int writePUSH_Const(Object objRef);
+
+	/**
+	 * Create a pusha
+	 */
+	public abstract void writePUSHA();
+
+	/**
+	 * Create a RDTSC (get timestamp into edx:eax
+	 */
+	public abstract void writeRDTSC();
+
+	/**
+	 * Create 32-bit offset relative to the current (after this offset) offset.
+	 * 
+	 * @param label
+	 */
+	public abstract void writeRelativeObjectRef(Label label);
 
 	/**
 	 * Create a ret near to caller
@@ -1428,23 +1373,384 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract void writeRET(int imm16);
 
 	/**
-	 * Create a RDTSC (get timestamp into edx:eax
+	 * Create a sahf
 	 */
-	public abstract void writeRDTSC();
+	public abstract void writeSAHF();
 
 	/**
-	 * Create a TEST al, imm8
+	 * Create a SAL dstReg,imm8
 	 * 
-	 * @param value
+	 * @param dstReg
+	 * @param imm8
 	 */
-	public abstract void writeTEST_AL(int value);
+	public abstract void writeSAL(X86Register dstReg, int imm8);
 
 	/**
-	 * Create a TEST eax, imm32
-	 * 
-	 * @param value
+	 * @param register
+	 * @param disp1
+	 * @param imm32
 	 */
-	public abstract void writeTEST_EAX(int value);
+	public abstract void writeSAL(X86Register register, int disp1, int imm32);
+
+	/**
+	 * Create a SAL dstReg,cl
+	 * 
+	 * @param dstReg
+	 */
+	public abstract void writeSAL_CL(X86Register dstReg);
+
+	/**
+	 * @param register
+	 * @param disp
+	 */
+	public abstract void writeSAL_CL(X86Register register, int disp);
+
+	/**
+	 * Create a SAR dstReg,imm8
+	 * 
+	 * @param dstReg
+	 * @param imm8
+	 */
+	public abstract void writeSAR(X86Register dstReg, int imm8);
+
+	/**
+	 * @param register
+	 * @param disp
+	 * @param imm32
+	 */
+	public abstract void writeSAR(X86Register register, int disp, int imm32);
+
+	/**
+	 * Create a SAR dstReg,cl
+	 * 
+	 * @param dstReg
+	 */
+	public abstract void writeSAR_CL(X86Register dstReg);
+
+	/**
+	 * @param register
+	 * @param disp
+	 */
+	public abstract void writeSAR_CL(X86Register register, int disp);
+
+	/**
+	 * Create a SBB dstReg, imm32
+	 * 
+	 * @param dstReg
+	 * @param imm32
+	 */
+	public abstract void writeSBB(X86Register dstReg, int imm32);
+
+	/**
+	 * Create a SBB dword [dstReg+dstDisp], <imm32>
+	 * 
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param imm32
+	 */
+	public abstract void writeSBB(X86Register dstReg, int dstDisp, int imm32);
+
+	/**
+	 * Create a SBB [dstReg+dstDisp], <srcReg>
+	 * 
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param srcReg
+	 */
+	public abstract void writeSBB(X86Register dstReg, int dstDisp,
+			X86Register srcReg);
+
+	/**
+	 * Create a SBB dstReg, srcReg
+	 * 
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public abstract void writeSBB(X86Register dstReg, X86Register srcReg);
+
+	/**
+	 * @param dstReg
+	 * @param srcReg
+	 * @param srcDisp
+	 */
+	public abstract void writeSBB(X86Register dstReg, X86Register srcReg,
+			int srcDisp);
+
+	/**
+	 * Create a SETcc dstReg. Sets the given 8-bit operand to zero if its
+	 * condition is not satisfied, and to 1 if it is.
+	 * 
+	 * @param dstReg
+	 * @param cc
+	 */
+	public abstract void writeSETCC(X86Register dstReg, int cc);
+
+	/**
+	 * Write a shift operation. OPERATION dst,imm8
+	 * 
+	 * @param operation
+	 * @param dst
+	 * @param imm8
+	 */
+	public final void writeShift(int operation, X86Register dst, int imm8) {
+		switch (operation) {
+		case X86Operation.SAL:
+			writeSAL(dst, imm8);
+			break;
+		case X86Operation.SAR:
+			writeSAR(dst, imm8);
+			break;
+		case X86Operation.SHL:
+			writeSHL(dst, imm8);
+			break;
+		case X86Operation.SHR:
+			writeSHR(dst, imm8);
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid operation " + operation);
+		}
+	}
+
+	/**
+	 * Write a shift operation. OPERATION [dst+dstDisp],imm8
+	 * 
+	 * @param operation
+	 * @param dst
+	 * @param imm8
+	 */
+	public final void writeShift(int operation, X86Register dst, int dstDisp,
+			int imm8) {
+		switch (operation) {
+		case X86Operation.SAL:
+			writeSAL(dst, dstDisp, imm8);
+			break;
+		case X86Operation.SAR:
+			writeSAR(dst, dstDisp, imm8);
+			break;
+		case X86Operation.SHL:
+			writeSHL(dst, dstDisp, imm8);
+			break;
+		case X86Operation.SHR:
+			writeSHR(dst, dstDisp, imm8);
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid operation " + operation);
+		}
+	}
+
+	/**
+	 * Write a shift operation. OPERATION dst,CL
+	 * 
+	 * @param operation
+	 * @param dst
+	 */
+	public final void writeShift_CL(int operation, X86Register dst) {
+		switch (operation) {
+		case X86Operation.SAL:
+			writeSAL_CL(dst);
+			break;
+		case X86Operation.SAR:
+			writeSAR_CL(dst);
+			break;
+		case X86Operation.SHL:
+			writeSHL_CL(dst);
+			break;
+		case X86Operation.SHR:
+			writeSHR_CL(dst);
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid operation " + operation);
+		}
+	}
+
+	/**
+	 * Write a shift operation. OPERATION [dst+dstDisp],CL
+	 * 
+	 * @param operation
+	 * @param dst
+	 * @param dstDisp
+	 */
+	public final void writeShift_CL(int operation, X86Register dst, int dstDisp) {
+		switch (operation) {
+		case X86Operation.SAL:
+			writeSAL_CL(dst, dstDisp);
+			break;
+		case X86Operation.SAR:
+			writeSAR_CL(dst, dstDisp);
+			break;
+		case X86Operation.SHL:
+			writeSHL_CL(dst, dstDisp);
+			break;
+		case X86Operation.SHR:
+			writeSHR_CL(dst, dstDisp);
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid operation " + operation);
+		}
+	}
+
+	/**
+	 * Create a SHL dstReg,imm8
+	 * 
+	 * @param dstReg
+	 * @param imm8
+	 */
+	public abstract void writeSHL(X86Register dstReg, int imm8);
+
+	/**
+	 * Create a SHL [dstReg+dstDisp],imm8
+	 * 
+	 * @param dstReg
+	 * @param imm8
+	 */
+	public abstract void writeSHL(X86Register dstReg, int dstDisp, int imm8);
+
+	/**
+	 * Create a SHL dstReg,cl
+	 * 
+	 * @param dstReg
+	 */
+	public abstract void writeSHL_CL(X86Register dstReg);
+
+	/**
+	 * Create a SHL [dstReg+dstDisp],cl
+	 * 
+	 * @param dstReg
+	 */
+	public abstract void writeSHL_CL(X86Register dstReg, int dstDisp);
+
+	/**
+	 * Create a SHLD dstReg,srcReg,cl
+	 * 
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public abstract void writeSHLD_CL(X86Register dstReg, X86Register srcReg);
+
+	/**
+	 * Create a SHL dstReg,imm8
+	 * 
+	 * @param dstReg
+	 * @param imm8
+	 */
+	public abstract void writeSHR(X86Register dstReg, int imm8);
+
+	/**
+	 * @param register
+	 * @param disp
+	 * @param imm32
+	 */
+	public abstract void writeSHR(X86Register register, int disp, int imm32);
+
+	/**
+	 * Create a SHR dstReg,cl
+	 * 
+	 * @param dstReg
+	 */
+	public abstract void writeSHR_CL(X86Register dstReg);
+
+	/**
+	 * @param register
+	 * @param disp1
+	 */
+	public abstract void writeSHR_CL(X86Register register, int disp1);
+
+	/**
+	 * Create a SHRD dstReg,srcReg,cl
+	 * 
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public abstract void writeSHRD_CL(X86Register dstReg, X86Register srcReg);
+
+	/**
+	 * Write an sseSD dst, src operation for 64-bit fp operations.
+	 * 
+	 * @param dst
+	 *            Must be an xmm register
+	 * @param src
+	 *            Must be an xmm register
+	 */
+	public abstract void writeArithSSEDOp(int operation, X86Register dst,
+			X86Register src);
+
+	/**
+	 * Write an sseSD dst, [src+srcDisp] operation for 64-bit fp operations.
+	 * 
+	 * @param dst
+	 *            Must be an xmm register
+	 * @param src
+	 *            Must be an gpr register
+	 * @param srcDisp
+	 */
+	public abstract void writeArithSSEDOp(int operation, X86Register dst,
+			X86Register src, int srcDisp);
+
+	/**
+	 * Write an sseSD dst, src operation for 32-bit fp operations.
+	 * 
+	 * @param dst
+	 *            Must be an xmm register
+	 * @param src
+	 *            Must be an xmm register
+	 */
+	public abstract void writeArithSSESOp(int operation, X86Register dst,
+			X86Register src);
+
+	/**
+	 * Write an sseSS dst, [src+srcDisp] operation for 32-bit fp operations.
+	 * 
+	 * @param dst
+	 *            Must be an xmm register
+	 * @param src
+	 *            Must be an gpr register
+	 * @param srcDisp
+	 */
+	public abstract void writeArithSSESOp(int operation, X86Register dst,
+			X86Register src, int srcDisp);
+
+	/**
+	 * Create a SUB reg, imm32
+	 * 
+	 * @param reg
+	 * @param imm32
+	 */
+	public abstract void writeSUB(X86Register reg, int imm32);
+
+	// LS
+	/**
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param imm32
+	 */
+	public abstract void writeSUB(X86Register dstReg, int dstDisp, int imm32);
+
+	/**
+	 * Create a SUB [dstReg+dstDisp], <srcReg>
+	 * 
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param srcReg
+	 */
+	public abstract void writeSUB(X86Register dstReg, int dstDisp,
+			X86Register srcReg);
+
+	/**
+	 * Create a SUB dstReg, srcReg
+	 * 
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public abstract void writeSUB(X86Register dstReg, X86Register srcReg);
+
+	// LS
+	/**
+	 * @param dstReg
+	 * @param srcReg
+	 * @param srcDisp
+	 */
+	public abstract void writeSUB(X86Register dstReg, X86Register srcReg,
+			int srcDisp);
 
 	/**
 	 * Create a TEST reg, imm32
@@ -1472,11 +1778,18 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract void writeTEST(X86Register reg1, X86Register reg2);
 
 	/**
-	 * Create 32-bit offset relative to the current (after this offset) offset.
+	 * Create a TEST al, imm8
 	 * 
-	 * @param label
+	 * @param value
 	 */
-	public abstract void writeRelativeObjectRef(Label label);
+	public abstract void writeTEST_AL(int value);
+
+	/**
+	 * Create a TEST eax, imm32
+	 * 
+	 * @param value
+	 */
+	public abstract void writeTEST_EAX(int value);
 
 	/**
 	 * Write my contents to the given stream.
@@ -1487,300 +1800,62 @@ public abstract class X86Assembler extends NativeStream implements
 	public abstract void writeTo(OutputStream os) throws IOException;
 
 	/**
-	 * Is logging enabled. This method will only return true on on debug like
-	 * implementations.
-	 * 
-	 * @return boolean
-	 */
-	public abstract boolean isLogEnabled();
-
-	/**
-	 * Is this a text stream. In that case there is not actual generated code,
-	 * so length calculations are invalid.
-	 * 
-	 * @return true or false
-	 */
-	public abstract boolean isTextStream();
-
-	/**
-	 * Write a log message. This method is only implemented on debug like
-	 * implementations.
-	 * 
-	 * @param msg
-	 */
-	public abstract void log(Object msg);
-
-	/**
-	 * Create a OPERATION dstReg, srcReg
-	 * 
-	 * @param dstReg
-	 * @param srcReg
-	 */
-	public final void writeArithOp(int operation, X86Register dstReg,
-			X86Register srcReg) {
-		switch (operation) {
-		case X86Operation.ADD:
-			writeADD(dstReg, srcReg);
-			break;
-		case X86Operation.ADC:
-			writeADC(dstReg, srcReg);
-			break;
-		case X86Operation.SUB:
-			writeSUB(dstReg, srcReg);
-			break;
-		case X86Operation.SBB:
-			writeSBB(dstReg, srcReg);
-			break;
-		case X86Operation.AND:
-			writeAND(dstReg, srcReg);
-			break;
-		case X86Operation.OR:
-			writeOR(dstReg, srcReg);
-			break;
-		case X86Operation.XOR:
-			writeXOR(dstReg, srcReg);
-			break;
-		default:
-			throw new IllegalArgumentException("Invalid operation " + operation);
-		}
-	}
-
-	/**
-	 * Create a OPERATION [dstReg+dstDisp], <srcReg>
+	 * Write XCHG [dstReg+dstDisp], srcReg
 	 * 
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param srcReg
 	 */
-	public final void writeArithOp(int operation, X86Register dstReg, int dstDisp,
-			X86Register srcReg) {
-		switch (operation) {
-		case X86Operation.ADD:
-			writeADD(dstReg, dstDisp, srcReg);
-			break;
-		case X86Operation.ADC:
-			writeADC(dstReg, dstDisp, srcReg);
-			break;
-		case X86Operation.SUB:
-			writeSUB(dstReg, dstDisp, srcReg);
-			break;
-		case X86Operation.SBB:
-			writeSBB(dstReg, dstDisp, srcReg);
-			break;
-		case X86Operation.AND:
-			writeAND(dstReg, dstDisp, srcReg);
-			break;
-		case X86Operation.OR:
-			writeOR(dstReg, dstDisp, srcReg);
-			break;
-		case X86Operation.XOR:
-			writeXOR(dstReg, dstDisp, srcReg);
-			break;
-		default:
-			throw new IllegalArgumentException("Invalid operation " + operation);
-		}
-	}
+	public abstract void writeXCHG(X86Register dstReg, int dstDisp,
+			X86Register srcReg);
 
 	/**
-	 * Create a OPERATION dstReg, [srcReg+srcDisp]
+	 * Write XCHG dstReg, srcReg
 	 * 
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public abstract void writeXCHG(X86Register dstReg, X86Register srcReg);
+
+	// LS
+	/**
+	 * @param dstReg
+	 * @param imm32
+	 */
+	public abstract void writeXOR(X86Register dstReg, int imm32);
+
+	/**
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param imm32
+	 */
+	public abstract void writeXOR(X86Register dstReg, int dstDisp, int imm32);
+
+	/**
+	 * Create a XOR [dstReg+dstDisp], srcReg
+	 * 
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param srcReg
+	 */
+	public abstract void writeXOR(X86Register dstReg, int dstDisp,
+			X86Register srcReg);
+
+	/**
+	 * Create a XOR dstReg, srcReg
+	 * 
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public abstract void writeXOR(X86Register dstReg, X86Register srcReg);
+
+	// LS
+	/**
 	 * @param dstReg
 	 * @param srcReg
 	 * @param srcDisp
 	 */
-	public final void writeArithOp(int operation, X86Register dstReg,
-			X86Register srcReg, int srcDisp) {
-		switch (operation) {
-		case X86Operation.ADD:
-			writeADD(dstReg, srcReg, srcDisp);
-			break;
-		case X86Operation.ADC:
-			writeADC(dstReg, srcReg, srcDisp);
-			break;
-		case X86Operation.SUB:
-			writeSUB(dstReg, srcReg, srcDisp);
-			break;
-		case X86Operation.SBB:
-			writeSBB(dstReg, srcReg, srcDisp);
-			break;
-		case X86Operation.AND:
-			writeAND(dstReg, srcReg, srcDisp);
-			break;
-		case X86Operation.OR:
-			writeOR(dstReg, srcReg, srcDisp);
-			break;
-		case X86Operation.XOR:
-			writeXOR(dstReg, srcReg, srcDisp);
-			break;
-		default:
-			throw new IllegalArgumentException("Invalid operation " + operation);
-		}
-	}
+	public abstract void writeXOR(X86Register dstReg, X86Register srcReg,
+			int srcDisp);
 
-	/**
-	 * Create a OPERATION [dstReg+dstDisp], imm32
-	 * 
-	 * @param dstReg
-	 * @param dstDisp
-	 * @param imm32
-	 */
-	public final void writeArithOp(int operation, X86Register dstReg, int dstDisp,
-			int imm32) {
-		switch (operation) {
-		case X86Operation.ADD:
-			writeADD(dstReg, dstDisp, imm32);
-			break;
-		case X86Operation.ADC:
-			writeADC(dstReg, dstDisp, imm32);
-			break;
-		case X86Operation.SUB:
-			writeSUB(dstReg, dstDisp, imm32);
-			break;
-		case X86Operation.SBB:
-			writeSBB(dstReg, dstDisp, imm32);
-			break;
-		case X86Operation.AND:
-			writeAND(dstReg, dstDisp, imm32);
-			break;
-		case X86Operation.OR:
-			writeOR(dstReg, dstDisp, imm32);
-			break;
-		case X86Operation.XOR:
-			writeXOR(dstReg, dstDisp, imm32);
-			break;
-		default:
-			throw new IllegalArgumentException("Invalid operation " + operation);
-		}
-	}
-
-	/**
-	 * @param dstReg
-	 * @param imm32
-	 */
-	public final void writeArithOp(int operation, X86Register dstReg, int imm32) {
-		switch (operation) {
-		case X86Operation.ADD:
-			writeADD(dstReg, imm32);
-			break;
-		case X86Operation.ADC:
-			writeADC(dstReg, imm32);
-			break;
-		case X86Operation.SUB:
-			writeSUB(dstReg, imm32);
-			break;
-		case X86Operation.SBB:
-			writeSBB(dstReg, imm32);
-			break;
-		case X86Operation.AND:
-			writeAND(dstReg, imm32);
-			break;
-		case X86Operation.OR:
-			writeOR(dstReg, imm32);
-			break;
-		case X86Operation.XOR:
-			writeXOR(dstReg, imm32);
-			break;
-		default:
-			throw new IllegalArgumentException("Invalid operation " + operation);
-		}
-	}
-	
-	/**
-	 * Write a shift operation. OPERATION dst,imm8
-	 * @param operation
-	 * @param dst
-	 * @param imm8
-	 */
-	public final void writeShift(int operation, X86Register dst, int imm8) {
-		switch (operation) {
-		case X86Operation.SAL:
-			writeSAL(dst, imm8);
-			break;
-		case X86Operation.SAR:
-			writeSAR(dst, imm8);
-			break;
-		case X86Operation.SHL:
-			writeSHL(dst, imm8);
-			break;
-		case X86Operation.SHR:
-			writeSHR(dst, imm8);
-			break;
-		default:
-			throw new IllegalArgumentException("Invalid operation " + operation);
-		}		
-	}
-	
-	/**
-	 * Write a shift operation. OPERATION [dst+dstDisp],imm8
-	 * @param operation
-	 * @param dst
-	 * @param imm8
-	 */
-	public final void writeShift(int operation, X86Register dst, int dstDisp, int imm8) {
-		switch (operation) {
-		case X86Operation.SAL:
-			writeSAL(dst, dstDisp, imm8);
-			break;
-		case X86Operation.SAR:
-			writeSAR(dst, dstDisp, imm8);
-			break;
-		case X86Operation.SHL:
-			writeSHL(dst, dstDisp, imm8);
-			break;
-		case X86Operation.SHR:
-			writeSHR(dst, dstDisp, imm8);
-			break;
-		default:
-			throw new IllegalArgumentException("Invalid operation " + operation);
-		}		
-	}
-	
-	/**
-	 * Write a shift operation. OPERATION dst,CL
-	 * @param operation
-	 * @param dst
-	 */
-	public final void writeShift_CL(int operation, X86Register dst) {
-		switch (operation) {
-		case X86Operation.SAL:
-			writeSAL_CL(dst);
-			break;
-		case X86Operation.SAR:
-			writeSAR_CL(dst);
-			break;
-		case X86Operation.SHL:
-			writeSHL_CL(dst);
-			break;
-		case X86Operation.SHR:
-			writeSHR_CL(dst);
-			break;
-		default:
-			throw new IllegalArgumentException("Invalid operation " + operation);
-		}		
-	}
-
-	/**
-	 * Write a shift operation. OPERATION [dst+dstDisp],CL
-	 * @param operation
-	 * @param dst
-	 * @param dstDisp
-	 */
-	public final void writeShift_CL(int operation, X86Register dst, int dstDisp) {
-		switch (operation) {
-		case X86Operation.SAL:
-			writeSAL_CL(dst, dstDisp);
-			break;
-		case X86Operation.SAR:
-			writeSAR_CL(dst, dstDisp);
-			break;
-		case X86Operation.SHL:
-			writeSHL_CL(dst, dstDisp);
-			break;
-		case X86Operation.SHR:
-			writeSHR_CL(dst, dstDisp);
-			break;
-		default:
-			throw new IllegalArgumentException("Invalid operation " + operation);
-		}		
-	}
 }
