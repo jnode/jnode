@@ -308,9 +308,13 @@ public class SoftByteCodes implements Uninterruptible {
 	public static Throwable systemException(int nr, int address) throws PragmaUninterruptible, PragmaLoadStatics, PragmaPrivilegedAction {
 		//Unsafe.getCurrentProcessor().getArchitecture().getStackReader().debugStackTrace();
 		//Unsafe.die();
-	    Unsafe.debug(nr); Unsafe.debug(address);
+	    //Unsafe.debug(nr); Unsafe.debug(address);
 		final String hexAddress = NumberUtils.hex(address, 8);
-		final String state = " (" + Unsafe.getCurrentProcessor().getCurrentThread().getReadableErrorState() + ")";
+		final VmThread current = Unsafe.getCurrentProcessor().getCurrentThread();
+		final String state = " (" + current.getReadableErrorState() + ")";
+		// Mark a system exception, so the stacktrace uses the exception frame
+		// instead of the current frame.
+		current.setInSystemException();
 		switch (nr) {
 			case EX_NULLPOINTER :
 				return new NullPointerException("NPE at address " + hexAddress + state);

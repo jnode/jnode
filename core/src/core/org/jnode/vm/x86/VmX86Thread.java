@@ -71,6 +71,20 @@ public class VmX86Thread extends VmThread {
 		return eip;
 	}
 
+    /**
+     * Gets the stackframe of the last system exception of this thread. 
+     */
+    protected Address getExceptionStackFrame() {
+        return Address.valueOf(exEbp);
+    }
+
+    /**
+     * Gets the instruction pointer of the last system exception of this thread. 
+     */
+    protected Address getExceptionInstructionPointer() {
+        return Address.valueOf(exEip);
+    }
+
 	/**
 	 * Calculate the end of the stack. 
 	 * @param stack
