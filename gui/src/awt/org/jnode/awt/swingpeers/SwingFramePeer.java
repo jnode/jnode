@@ -41,28 +41,20 @@ import org.jnode.awt.swingpeers.event.MouseListenerDelegate;
 import org.jnode.awt.swingpeers.event.MouseMotionListenerDelegate;
 import org.jnode.awt.swingpeers.event.KeyListenerDelegate;
 import org.jnode.awt.swingpeers.event.ComponentListenerDelegate;
+import org.jnode.awt.JNodeToolkit;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
+final class SwingFramePeer extends SwingComponentPeer implements FramePeer, ISwingContainerPeer {
 
 	private final Logger log = Logger.getLogger(getClass());
-
-	private final SwingToolkit toolkit;
-
-	final Frame awtFrame;
-
 	private final SwingFrame frame;
 
-	public SwingFramePeer(SwingToolkit toolkit, JDesktopPane desktopPane,
-			Frame awtFrame) {
-
-		this.awtFrame = awtFrame;
-		this.toolkit = toolkit;
-		this.frame = new SwingFrame(awtFrame, this);
-		desktopPane.add(frame);
-
+	public SwingFramePeer(SwingToolkit toolkit, JDesktopPane desktopPane, Frame awtFrame) {
+        super(toolkit, awtFrame, new SwingFrame());
+		frame = (SwingFrame) jComponent;
+        frame.initialize(awtFrame, this);
 		SwingToolkit.copyAwtProperties(awtFrame, this.frame);
 		frame.getContentPane().setLayout(new SwingFrameLayout(this));
 		frame.setLocation(awtFrame.getLocation());
@@ -79,11 +71,9 @@ final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
 		frame.setTitle(awtFrame.getTitle());
 		//frame.setIconImage(awtFrame.getIconImage());
 		setMenuBar(awtFrame.getMenuBar());
-
-        frame.addMouseListener(new MouseListenerDelegate(awtFrame));
-		frame.addMouseMotionListener(new MouseMotionListenerDelegate(awtFrame));
-        frame.addKeyListener(new KeyListenerDelegate(awtFrame));
-        frame.addComponentListener(new ComponentListenerDelegate(awtFrame));
+        desktopPane.add(frame);
+        desktopPane.setSelectedFrame(frame);
+        frame.toFront();
 	}
 
 	/**
@@ -204,6 +194,10 @@ final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
 		return insets;
 	}
 
+    public Point getLocationOnScreen() {
+        return frame.getLocation();
+    }
+
 	/**
 	 * @see java.awt.peer.ContainerPeer#insets()
 	 */
@@ -219,107 +213,11 @@ final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
 	}
 
 	/**
-	 * @see java.awt.peer.ComponentPeer#canDetermineObscurity()
-	 */
-	public boolean canDetermineObscurity() {
-		return false;
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#checkImage(java.awt.Image, int, int,
-	 *      java.awt.image.ImageObserver)
-	 */
-	public int checkImage(Image img, int width, int height, ImageObserver ob) {
-		return frame.checkImage(img, width, height, ob);
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#coalescePaintEvent(java.awt.event.PaintEvent)
-	 */
-	public void coalescePaintEvent(PaintEvent e) {
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#createBuffers(int,
-	 *      java.awt.BufferCapabilities)
-	 */
-	public void createBuffers(int x, BufferCapabilities capabilities)
-			throws AWTException {
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#createImage(java.awt.image.ImageProducer)
-	 */
-	public Image createImage(ImageProducer prod) {
-		return createImage(prod);
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#createImage(int, int)
-	 */
-	public Image createImage(int width, int height) {
-		return createImage(width, height);
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#createVolatileImage(int, int)
-	 */
-	public VolatileImage createVolatileImage(int width, int height) {
-		return createVolatileImage(width, height);
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#destroyBuffers()
-	 */
-	public void destroyBuffers() {
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#disable()
-	 */
-	public void disable() {
-		setEnabled(false);
-	}
-
-	/**
 	 * @see java.awt.peer.ComponentPeer#dispose()
 	 */
 	public void dispose() {
-		toolkit.onDisposeFrame();
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#enable()
-	 */
-	public void enable() {
-		setEnabled(true);
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#flip(java.awt.BufferCapabilities.FlipContents)
-	 */
-	public void flip(FlipContents contents) {
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#getBackBuffer()
-	 */
-	public Image getBackBuffer() {
-		return null;
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#getColorModel()
-	 */
-	public ColorModel getColorModel() {
-		return frame.getColorModel();
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#getFontMetrics(java.awt.Font)
-	 */
-	public FontMetrics getFontMetrics(Font f) {
-		return frame.getFontMetrics(f);
+        frame.dispose();
+		((SwingToolkit)toolkit).onDisposeFrame();
 	}
 
 	/**
@@ -333,224 +231,24 @@ final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
 	}
 
 	/**
-	 * @see java.awt.peer.ComponentPeer#getGraphicsConfiguration()
-	 */
-	public GraphicsConfiguration getGraphicsConfiguration() {
-		return frame.getGraphicsConfiguration();
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#getLocationOnScreen()
-	 */
-	public Point getLocationOnScreen() {
-		return frame.getLocationOnScreen();
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#getMinimumSize()
-	 */
-	public Dimension getMinimumSize() {
-		return frame.getMinimumSize();
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#getPreferredSize()
-	 */
-	public Dimension getPreferredSize() {
-		return frame.getPreferredSize();
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#getToolkit()
-	 */
-	public Toolkit getToolkit() {
-		return frame.getToolkit();
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#handleEvent(java.awt.AWTEvent)
-	 */
-	public void handleEvent(AWTEvent e) {
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#handlesWheelScrolling()
-	 */
-	public boolean handlesWheelScrolling() {
-		return false;
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#hide()
-	 */
-	public void hide() {
-		setVisible(false);
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#isFocusable()
-	 */
-	public boolean isFocusable() {
-		return frame.isFocusable();
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#isFocusTraversable()
-	 */
-	public boolean isFocusTraversable() {
-		return frame.isFocusTraversable();
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#isObscured()
-	 */
-	public boolean isObscured() {
-		return false;
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#minimumSize()
-	 */
-	public Dimension minimumSize() {
-		return getMinimumSize();
-	}
-
-	/**
 	 * @see java.awt.peer.ComponentPeer#paint(java.awt.Graphics)
 	 */
 	public void paint(Graphics graphics) {
 		frame.paint(graphics);
 	}
 
-	/**
-	 * @see java.awt.peer.ComponentPeer#preferredSize()
-	 */
-	public Dimension preferredSize() {
-		return getPreferredSize();
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#prepareImage(java.awt.Image, int, int,
-	 *      java.awt.image.ImageObserver)
-	 */
-	public boolean prepareImage(Image img, int width, int height,
-			ImageObserver ob) {
-		return frame.prepareImage(img, width, height, ob);
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#print(java.awt.Graphics)
-	 */
-	public void print(Graphics graphics) {
-		frame.print(graphics);
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#repaint(long, int, int, int, int)
-	 */
-	public void repaint(long tm, int x, int y, int width, int height) {
-		frame.repaint(tm, x, y, width, height);
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#requestFocus()
-	 */
-	public void requestFocus() {
-		frame.requestFocus();
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#requestFocus(java.awt.Component,
-	 *      boolean, boolean, long)
-	 */
-	public boolean requestFocus(Component source, boolean bool1, boolean bool2,
-			long x) {
-		return true;
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#reshape(int, int, int, int)
-	 */
-	public void reshape(int x, int y, int width, int height) {
-		frame.reshape(x, y, width, height);
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#setBackground(java.awt.Color)
-	 */
-	public void setBackground(Color color) {
-		frame.setBackground(color);
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#setBounds(int, int, int, int)
-	 */
-	public void setBounds(int x, int y, int width, int height) {
-		frame.setBounds(x, y, width, height);
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#setCursor(java.awt.Cursor)
-	 */
-	public void setCursor(Cursor cursor) {
-		frame.setCursor(cursor);
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#setEnabled(boolean)
-	 */
-	public void setEnabled(boolean enabled) {
-		frame.setEnabled(enabled);
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
-	 */
-	public void setEventMask(long mask) {
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#setFont(java.awt.Font)
-	 */
-	public void setFont(Font font) {
-		frame.setFont(font);
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#setForeground(java.awt.Color)
-	 */
-	public void setForeground(Color color) {
-		frame.setForeground(color);
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#setVisible(boolean)
-	 */
-	public void setVisible(boolean visible) {
-		frame.setVisible(visible);
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#show()
-	 */
-	public void show() {
-		setVisible(true);
-	}
-
-	/**
-	 * @see java.awt.peer.ComponentPeer#updateCursorImmediately()
-	 */
-	public void updateCursorImmediately() {
-	}
+    // Events
+    public void handleEvent(AWTEvent event) {
+        //super.handleEvent(event);
+    }
 
 	private static final class SwingFrame extends JInternalFrame {
-
 		private Frame awtFrame;
 
-		public SwingFrame(Frame awtFrame, SwingFramePeer peer) {
-			this.awtFrame = awtFrame;
+        private void initialize(Frame awtFrame, SwingFramePeer peer) {
+            this.awtFrame = awtFrame;
 			((SwingFrameContentPane) getContentPane()).initialize(awtFrame, peer);
-		}
+        }
 
 		/**
 		 * @see javax.swing.JInternalFrame#createRootPane()
@@ -592,12 +290,12 @@ final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
 
 	private static final class SwingFrameContentPane extends JComponent {
 
-		private Frame awtComponent;
-		private SwingFramePeer peer;
+		private Frame awtFrame;
+		private SwingFramePeer swingPeer;
 
 		public void initialize(Frame awtComponent, SwingFramePeer peer) {
-			this.awtComponent = awtComponent;
-			this.peer = peer;
+			this.awtFrame = awtComponent;
+			this.swingPeer = peer;
 			awtComponent.invalidate();
 		}
 
@@ -606,8 +304,8 @@ final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
 		 */
 		public void invalidate() {
 			super.invalidate();
-			if (awtComponent != null) {
-				awtComponent.invalidate();
+			if (awtFrame != null) {
+				awtFrame.invalidate();
 			}
 		}
 
@@ -615,8 +313,8 @@ final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
 		 * @see java.awt.Component#doLayout()
 		 */
 		public void doLayout() {
-			if (awtComponent != null) {
-				awtComponent.doLayout();
+			if (awtFrame != null) {
+				awtFrame.doLayout();
 			}
 			super.doLayout();
 		}
@@ -625,19 +323,27 @@ final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
 		 * @see java.awt.Component#validate()
 		 */
 		public void validate() {
-			if (awtComponent != null) {
-				awtComponent.validate();
+			if (awtFrame != null) {
+				awtFrame.validate();
 			}
 			super.validate();
 		}
+
+        public void reshape(int x, int y, int width, int height) {
+            int oldWidth = awtFrame.getWidth();
+            int oldHight = awtFrame.getHeight();
+            super.reshape(x, y, width, height);
+            swingPeer.fireComponentEvent(oldWidth, oldHight, width, height);
+        }
+
 
 		/**
 		 * @see javax.swing.JComponent#paintChildren(java.awt.Graphics)
 		 */
 		protected void paintChildren(Graphics g) {
 			super.paintChildren(g);
-			final Insets insets = peer.getInsets();
-			SwingToolkit.paintLightWeightChildren(awtComponent, g, insets.left, insets.top);
+			final Insets insets = swingPeer.getInsets();
+			SwingToolkit.paintLightWeightChildren(awtFrame, g, insets.left, insets.top);
 		}
 	}
 }

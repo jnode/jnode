@@ -24,7 +24,7 @@ public class JNodeGraphics extends AbstractSurfaceGraphics {
 	 * @param component
 	 */
 	public JNodeGraphics(JNodeGenericPeer component) {
-		super(component.getToolkitImpl().getGraphics(), ((Component)component.getAwtObject()).getWidth(), ((Component)component.getAwtObject()).getHeight());
+		super(component.getToolkitImpl().getGraphics(), ((Component)component.getComponent()).getWidth(), ((Component)component.getComponent()).getHeight());
 		this.component = component;
 		this.toolkit = component.getToolkitImpl();
 	}
