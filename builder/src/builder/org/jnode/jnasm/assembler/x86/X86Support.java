@@ -37,7 +37,8 @@ public class X86Support extends HardwareSupport {
         this.assembler = assembler;
         this.instructions = instructions;
         this.labels = labels;
-        modules.add(new Core(labels));
+        modules.add(new X86Core(labels));
+        modules.add(assembler.getPseudo());
     }
 
     public void assemble() {

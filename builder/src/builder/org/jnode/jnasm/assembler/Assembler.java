@@ -28,7 +28,8 @@ public abstract class Assembler {
     private final Map constants = new HashMap();
     private final Map labels = new HashMap();
     private int pass = 0;
-    private HardwareSupport hwSupport;
+    private final HardwareSupport hwSupport;
+    private final PseudoInstructions pseudo;
 
     public static void main(String[] argv) throws Exception {
         Assembler jnasm = newInstance(System.in);
@@ -39,7 +40,12 @@ public abstract class Assembler {
     }
 
     protected Assembler() {
+        pseudo = new PseudoInstructions(labels);
         hwSupport = new X86Support(this, instructions, labels);
+    }
+
+    public PseudoInstructions getPseudo() {
+        return pseudo;
     }
 
     public void performTwoPasses(Reader reader, OutputStream out) throws Exception{
