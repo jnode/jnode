@@ -22,11 +22,25 @@ public abstract class ObjectResolver {
 	public abstract int addressOf32(Object object);
 	
 	/**
+	 * Gets the address of the given object.
+	 * @param object
+	 * @return long
+	 */
+	public abstract long addressOf64(Object object);
+	
+	/**
 	 * Gets the object at a given address.
 	 * @param ptr
 	 * @return Object
 	 */	
 	public abstract Object objectAt32(int ptr);
+
+	/**
+	 * Gets the object at a given address.
+	 * @param ptr
+	 * @return Object
+	 */	
+	public abstract Object objectAt64(long ptr);
 
 	/**
 	 * Gets the address of the given object.

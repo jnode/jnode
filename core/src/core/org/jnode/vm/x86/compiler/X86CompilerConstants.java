@@ -45,6 +45,12 @@ public interface X86CompilerConstants {
 	 */
 	public static final Register FP = Register.EBP;
 
+	/** 
+	 * Statics table register
+	 * Do not change this constant!
+	 */
+	public static final Register STATICS = Register.EDI;
+
 	/** EAX register */
 	public static final Register EAX = Register.EAX;
 

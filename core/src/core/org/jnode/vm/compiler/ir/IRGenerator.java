@@ -6,9 +6,7 @@
 package org.jnode.vm.compiler.ir;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -18,7 +16,6 @@ import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.bytecode.BytecodeViewer;
 import org.jnode.vm.bytecode.BytecodeVisitor;
 import org.jnode.vm.bytecode.ControlFlowGraph;
-import org.jnode.vm.classmgr.ClassDecoder;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmConstClass;
 import org.jnode.vm.classmgr.VmConstFieldRef;
@@ -1443,21 +1440,13 @@ public class IRGenerator extends BytecodeVisitor {
 		throw new IllegalArgumentException("byte code not yet supported");
 	}
 	
-	public static void main(String args[]) throws SecurityException, IOException {
+	public static void main(String args[]) throws SecurityException, IOException, ClassNotFoundException {
 		String className = "org.jnode.vm.compiler.ir.IRGenerator";
 		if (args.length > 0) {
 			className = args[0];
 		}
-		String fileName = className.replace('.', '/') + ".class";
-		File f = new File(fileName);
-		int length = (int) f.length();
-		byte[] data = new byte[length];
-		FileInputStream fis = new FileInputStream(fileName);
-		fis.read(data);
-		fis.close();
-		VmClassLoader vmc = new VmClassLoader(new URL("file://."), new VmX86Architecture());
-		VmType type = ClassDecoder.defineClass(className, data, 0, length, true,
-			vmc, vmc.getSelectorMap());
+		VmClassLoader vmc = new VmClassLoader(new File(".").toURL(), new VmX86Architecture());
+		VmType type = vmc.loadClass(className, true);
 		VmMethod arithMethod = null;
 		int nMethods = type.getNoDeclaredMethods();
 		for (int i=0; i<nMethods; i+=1) {

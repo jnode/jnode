@@ -5,20 +5,11 @@ package org.jnode.vm;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmMethod;
-import org.jnode.vm.classmgr.VmStaticBoolean;
-import org.jnode.vm.classmgr.VmStaticByte;
-import org.jnode.vm.classmgr.VmStaticChar;
-import org.jnode.vm.classmgr.VmStaticDouble;
 import org.jnode.vm.classmgr.VmStaticField;
-import org.jnode.vm.classmgr.VmStaticFloat;
-import org.jnode.vm.classmgr.VmStaticInt;
-import org.jnode.vm.classmgr.VmStaticLong;
-import org.jnode.vm.classmgr.VmStaticObject;
-import org.jnode.vm.classmgr.VmStaticShort;
+import org.jnode.vm.classmgr.VmType;
 
 /**
  * <description>
@@ -31,7 +22,7 @@ public class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
-			return ((VmStaticObject)sf.getStaticData()).get();
+			return Unsafe.getObject(getStaticFieldAddress(sf));
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
 			return Unsafe.getObject(o, inf.getOffset());
@@ -42,7 +33,7 @@ public class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
-			return ((VmStaticBoolean)sf.getStaticData()).getValue();
+			return (Unsafe.getInt(getStaticFieldAddress(sf)) != 0);
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
 			return Unsafe.getBoolean(o, inf.getOffset());
@@ -53,7 +44,7 @@ public class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
-			return ((VmStaticByte)sf.getStaticData()).getValue();
+			return (byte)Unsafe.getInt(getStaticFieldAddress(sf));
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
 			return Unsafe.getByte(o, inf.getOffset());
@@ -64,7 +55,7 @@ public class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
-			return ((VmStaticChar)sf.getStaticData()).getValue();
+			return (char)Unsafe.getInt(getStaticFieldAddress(sf));
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
 			return Unsafe.getChar(o, inf.getOffset());
@@ -75,7 +66,7 @@ public class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
-			return ((VmStaticShort)sf.getStaticData()).getValue();
+			return (short)Unsafe.getInt(getStaticFieldAddress(sf));
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
 			return Unsafe.getShort(o, inf.getOffset());
@@ -86,7 +77,7 @@ public class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
-			return ((VmStaticInt)sf.getStaticData()).getValue();
+			return Unsafe.getInt(getStaticFieldAddress(sf));
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
 			return Unsafe.getInt(o, inf.getOffset());
@@ -97,7 +88,7 @@ public class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
-			return ((VmStaticFloat)sf.getStaticData()).getValue();
+			return Unsafe.getFloat(getStaticFieldAddress(sf));
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
 			return Unsafe.getFloat(o, inf.getOffset());
@@ -108,7 +99,7 @@ public class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
-			return ((VmStaticLong)sf.getStaticData()).getValue();
+			return Unsafe.getLong(getStaticFieldAddress(sf));
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
 			return Unsafe.getLong(o, inf.getOffset());
@@ -119,7 +110,7 @@ public class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
-			return ((VmStaticDouble)sf.getStaticData()).getValue();
+			return Unsafe.getDouble(getStaticFieldAddress(sf));
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
 			return Unsafe.getDouble(o, inf.getOffset());
@@ -130,7 +121,7 @@ public class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
-			((VmStaticObject)sf.getStaticData()).setValue(value);
+			Unsafe.setObject(getStaticFieldAddress(sf), value);
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
 			Unsafe.setObject(o, inf.getOffset(), value);
@@ -141,7 +132,7 @@ public class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
-			((VmStaticBoolean)sf.getStaticData()).setValue(value);
+			Unsafe.setInt(getStaticFieldAddress(sf), value ? 1 : 0);
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
 			Unsafe.setBoolean(o, inf.getOffset(), value);
@@ -152,7 +143,7 @@ public class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
-			((VmStaticByte)sf.getStaticData()).setValue(value);
+			Unsafe.setInt(getStaticFieldAddress(sf), value);
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
 			Unsafe.setByte(o, inf.getOffset(), value);
@@ -163,7 +154,7 @@ public class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
-			((VmStaticChar)sf.getStaticData()).setValue(value);
+			Unsafe.setInt(getStaticFieldAddress(sf), value);
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
 			Unsafe.setChar(o, inf.getOffset(), value);
@@ -174,7 +165,7 @@ public class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
-			((VmStaticShort)sf.getStaticData()).setValue(value);
+			Unsafe.setInt(getStaticFieldAddress(sf), value);
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
 			Unsafe.setShort(o, inf.getOffset(), value);
@@ -185,7 +176,7 @@ public class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
-			((VmStaticInt)sf.getStaticData()).setValue(value);
+			Unsafe.setInt(getStaticFieldAddress(sf), value);
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
 			Unsafe.setInt(o, inf.getOffset(), value);
@@ -196,7 +187,7 @@ public class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
-			((VmStaticFloat)sf.getStaticData()).setValue(value);
+			Unsafe.setFloat(getStaticFieldAddress(sf), value);
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
 			Unsafe.setFloat(o, inf.getOffset(), value);
@@ -207,7 +198,7 @@ public class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
-			((VmStaticLong)sf.getStaticData()).setValue(value);
+			Unsafe.setLong(getStaticFieldAddress(sf), value);
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
 			Unsafe.setLong(o, inf.getOffset(), value);
@@ -218,11 +209,23 @@ public class VmReflection {
 		if (field.isStatic()) {
 			final VmStaticField sf = (VmStaticField)field;
 			initialize(sf);
-			((VmStaticDouble)sf.getStaticData()).setValue(value);
+			Unsafe.setDouble(getStaticFieldAddress(sf), value);
 		} else {
 			final VmInstanceField inf = (VmInstanceField)field;
 			Unsafe.setDouble(o, inf.getOffset(), value);
 		}
+	}
+	
+	/**
+	 * Gets the address of the static field data (in the statics table)
+	 * @param sf
+	 * @return The address of the static field data
+	 */
+	private static final Address getStaticFieldAddress(VmStaticField sf) {
+		final VmProcessor proc = Unsafe.getCurrentProcessor();
+		final Address tablePtr = Address.addressOfArrayData(proc.getStaticsTable());
+		final int offset = sf.getStaticsIndex() << 2;
+		return Unsafe.add(tablePtr, offset);
 	}
 	
 	/**

@@ -19,12 +19,14 @@ import org.jnode.vm.classmgr.VmMethod;
  */
 class BasicBlockFinder extends BytecodeVisitorSupport {
 
-	public static final short F_START_OF_BASICBLOCK = 0x0001;
-	public static final short F_START_OF_EXCEPTION = 0x0002;
-	public static final short F_START_OF_INSTRUCTION = 0x0004;
+	public static final byte F_START_OF_BASICBLOCK = 0x0001;
+	public static final byte F_START_OF_TRYBLOCK = 0x0002;
+	public static final byte F_START_OF_TRYBLOCKEND = 0x0004;
+	public static final byte F_START_OF_EXCEPTIONHANDLER = 0x0008;
+	public static final byte F_START_OF_INSTRUCTION = 0x0010;
 
 	private final ArrayList blocks = new ArrayList();
-	private short[] opcodeFlags;
+	private byte[] opcodeFlags;
 	private boolean nextIsStartOfBB;
 	private BasicBlock currentBlock;
 	private boolean nextIsSuccessor = true;
@@ -40,7 +42,7 @@ class BasicBlockFinder extends BytecodeVisitorSupport {
 		// Create the array
 		final BasicBlock[] list = (BasicBlock[])blocks.toArray(new BasicBlock[blocks.size()]);
 		// Set the EndPC's and flags
-		final short[] opcodeFlags = this.opcodeFlags;
+		final byte[] opcodeFlags = this.opcodeFlags;
 		final int len = opcodeFlags.length;
 		int bbIndex = 0;
 		for (int i = 0; i < len; i++) {
@@ -74,12 +76,14 @@ class BasicBlockFinder extends BytecodeVisitorSupport {
 	public void startMethod(VmMethod method) {
 		final VmByteCode bc = method.getBytecode();
 		final int length = bc.getLength();
-		opcodeFlags = new short[length];
+		opcodeFlags = new byte[length];
 		// The first instruction is always the start of a BB.
 		this.currentBlock = startBB(0);
 		// The exception handler also start a basic block
 		for (int i = 0; i < bc.getNoExceptionHandlers(); i++) {
 			VmInterpretedExceptionHandler eh = bc.getExceptionHandler(i);
+			startTryBlock(eh.getStartPC());
+			startTryBlockEnd(eh.getEndPC());
 			startException(eh.getHandlerPC());
 		}
 	}
@@ -403,7 +407,7 @@ class BasicBlockFinder extends BytecodeVisitorSupport {
 	}
 
 	private final boolean isStartOfException(int address) {
-		return ((opcodeFlags[address] & F_START_OF_EXCEPTION) != 0);
+		return ((opcodeFlags[address] & F_START_OF_EXCEPTIONHANDLER) != 0);
 	}
 
 	/**
@@ -412,9 +416,27 @@ class BasicBlockFinder extends BytecodeVisitorSupport {
 	 * @param address
 	 */
 	private final void startException(int address) {
-		if ((opcodeFlags[address] & F_START_OF_EXCEPTION) == 0) {
-			opcodeFlags[address] |= F_START_OF_EXCEPTION;
-		}
+		opcodeFlags[address] |= F_START_OF_EXCEPTIONHANDLER;
+		startBB(address);
+	}
+
+	/**
+	 * Mark the start of a try-catch block
+	 * 
+	 * @param address
+	 */
+	private final void startTryBlock(int address) {
+		opcodeFlags[address] |= F_START_OF_TRYBLOCK;
+		startBB(address);
+	}
+
+	/**
+	 * Mark the end of a try-catch block
+	 * 
+	 * @param address
+	 */
+	private final void startTryBlockEnd(int address) {
+		opcodeFlags[address] |= F_START_OF_TRYBLOCKEND;
 		startBB(address);
 	}
 

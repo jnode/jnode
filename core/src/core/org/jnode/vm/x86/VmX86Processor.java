@@ -6,6 +6,7 @@ package org.jnode.vm.x86;
 import org.jnode.vm.CpuID;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmThread;
+import org.jnode.vm.classmgr.VmStatics;
 
 /**
  * Processor implementation for the X86 architecture.
@@ -19,8 +20,8 @@ public final class VmX86Processor extends VmProcessor {
 	/**
 	 * @param id
 	 */
-	public VmX86Processor(int id, X86CpuID cpuId) {
-		super(id, VmX86Architecture.INSTANCE);
+	public VmX86Processor(int id, VmX86Architecture arch, VmStatics statics, X86CpuID cpuId) {
+		super(id, arch, statics);
 		if (cpuId != null) {
 			setCPUID(cpuId);
 		}

@@ -3,6 +3,9 @@
  */
 package org.jnode.vm;
 
+import java.nio.ByteOrder;
+
+import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 
 /**
@@ -19,6 +22,12 @@ public abstract class VmArchitecture extends VmSystemObject {
 	 */
 	public abstract String getName();
 
+	/**
+	 * Gets the byte ordering of this architecture.
+	 * @return ByteOrder
+	 */
+	public abstract ByteOrder getByteOrder();
+	
 	/**
 	 * Gets the size in bytes of an object reference.
 	 * 
@@ -40,4 +49,12 @@ public abstract class VmArchitecture extends VmSystemObject {
 	 *         optimizations.
 	 */
 	public abstract NativeCodeCompiler[] getCompilers();
+
+	/**
+	 * Create a processor instance for this architecture.
+	 * 
+	 * @return The processor
+	 */
+	protected abstract VmProcessor createProcessor(int id, VmStatics statics);
+
 }

@@ -6,12 +6,12 @@
 ; Author       : E. Prangsma
 ; -----------------------------------------------
 
-	extern VmSystem_currentTimeMillis
 	extern VmSystem_initialized
 	extern SoftByteCodes_systemException
 	extern VmProcessor_reschedule
 	
 deadLockCounter dd 0
+currentTimeMillisStaticsIdx	dd -1
 	
 ; -----------------------------------------------
 ; Low level Yield Point Handler
@@ -127,9 +127,12 @@ yieldPointHandler_fixStackOverflow:
 ; Handle a timer interrupt
 ; -----------------------------------------------
 timer_handler:
-	inc dword [VmSystem_currentTimeMillis+0]
-	adc dword [VmSystem_currentTimeMillis+4],0
-	test dword [VmSystem_currentTimeMillis+0],0x07
+	mov edi,[fs:VmProcessor_STATICSTABLE_OFFSET*4]
+	mov eax,[currentTimeMillisStaticsIdx]
+	lea edi,[edi+eax*4+(VmArray_DATA_OFFSET*4)]
+	inc dword [edi+0]
+	adc dword [edi+4],0
+	test dword [edi+0],0x07
 	jnz timer_ret
 	; Set a thread switch needed indicator
 	or THREADSWITCHINDICATOR, VmProcessor_TSI_SWITCH_NEEDED
