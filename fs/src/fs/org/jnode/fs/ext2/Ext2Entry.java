@@ -1,8 +1,15 @@
+/*
+ * $Id$
+ */
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
 
-import org.jnode.fs.*;
+import org.jnode.fs.FSAccessRights;
+import org.jnode.fs.FSDirectory;
+import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSFile;
+import org.jnode.fs.FileSystem;
 
 /**
  * @author Andras Nagy
