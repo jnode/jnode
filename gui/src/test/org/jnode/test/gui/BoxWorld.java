@@ -225,7 +225,7 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
     private int gameMode = PLAY_MODE;
 
     //current world ID
-    private int worldId = 0;
+    private int worldId = 14;
 
     //current world data
     private int[] vec = vecs[ worldId];
@@ -243,7 +243,7 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
     //private boolean endState = false;
 
     //controlls the speed of animation
-    private int SLEEP = 50;
+    private int SLEEP = 5;
 
     //current and previous position of the man
     private int x, y, xo, yo;
@@ -401,7 +401,10 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
                 return;
             }
 
-            if ((e.getModifiers() & InputEvent.BUTTON1_MASK) == 0) { return; }
+
+            if ((e.getModifiers() & InputEvent.BUTTON1_MASK) == 0) {
+                return;
+            }
 
             moveTo(e.getX(), e.getY());
         }
@@ -451,8 +454,7 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
     }
 
     //*************************************************************************************
-    //****************GAME CONTROL WITH
-    // MOUSE**********************************************
+    //****************GAME CONTROL WITH MOUSE**********************************************
     //*************************************************************************************
     private void moveTo(int xpos, int ypos) {
         repeat = true;
@@ -574,11 +576,8 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
                 Point cpnt, opnt;
                 opnt = (Point) path.elementAt(0);
                 int psize = path.size();
-                //System.out.println();
                 for (int i = 1; i < psize && repeat; i++) {
                     cpnt = (Point) path.elementAt(i);
-                    //System.out.println("("+opnt.x+","+opnt.y+")->("+cpnt.x+","+
-                    // cpnt.y+")");
                     moveOne(cpnt.y, cpnt.x, opnt.y, opnt.x);
                     opnt = cpnt;
                     try {
@@ -597,16 +596,12 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
         if (Math.abs(dx) + Math.abs(dy) != 1) { return; }
 
         if (dx == -1) {
-            //System.out.println("DOWN");
             changeState(DOWN_MOVE);
         } else if (dx == 1) {
-            //System.out.println("UP");
             changeState(UP_MOVE);
         } else if (dy == -1) {
-            //System.out.println("RIGHT");
             changeState(RIGHT_MOVE);
         } else if (dy == 1) {
-            //System.out.println("LEFT");
             changeState(LEFT_MOVE);
         }
     }
@@ -1296,7 +1291,7 @@ public class BoxWorld extends Panel implements WindowListener, KeyListener,
     private boolean beepOn = true;
 
     private void beep() {
-        if (beepOn) getToolkit().beep();
+        //if (beepOn) getToolkit().beep();
     }
 
     public Dimension getPreferredSize() {
