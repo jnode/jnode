@@ -25,6 +25,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
+import org.jnode.vm.Vm;
 import org.jnode.vm.VmAddress;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
@@ -228,6 +229,19 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
     public final synchronized void recompile() {
         doCompile(nativeCodeOptLevel + 1);
         invocationCount = 0;
+    }
+    
+    /**
+     * Recompile a method declaring in the type given by its statics table index
+     * and the index of the method within the type. 
+     * @param typeStaticsIndex
+     * @param methodIndex
+     */
+    static final void recompileMethod(int typeStaticsIndex, int methodIndex) {
+        final VmType type = Vm.getVm().getStatics().getTypeEntry(typeStaticsIndex);
+        type.initialize();
+        final VmMethod method = type.getDeclaredMethod(methodIndex);
+        method.recompile();
     }
 
     /**

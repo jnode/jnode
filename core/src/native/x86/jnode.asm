@@ -124,7 +124,6 @@ TSS_DS		equ 0x38
 %include "vm.asm"
 %include "vm-invoke.asm"
 %include "vm-ints.asm"
-%include "vm-compile.asm"
 %include "vm-jumptable.asm"
 %include "ap-boot.asm"
 

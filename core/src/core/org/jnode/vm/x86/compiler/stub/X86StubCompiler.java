@@ -27,48 +27,20 @@ import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.vm.Unsafe;
-import org.jnode.vm.Vm;
-import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.CompiledMethod;
 import org.jnode.vm.compiler.CompilerBytecodeVisitor;
 import org.jnode.vm.compiler.EntryPoints;
 import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.x86.compiler.AbstractX86Compiler;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
-import org.jnode.vm.x86.compiler.X86JumpTable;
-import org.vmmagic.pragma.PrivilegedActionPragma;
-import org.vmmagic.unboxed.Address;
 
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class X86StubCompiler extends AbstractX86Compiler {
-
-	/**
-	 * Compile the given method during runtime.
-	 * 
-	 * @param method
-	 * @param resolver
-	 * @param level
-	 *            Optimization level
-	 * @param os
-	 *            The native stream, can be null
-	 */
-	public void compileRuntime(VmMethod method, ObjectResolver resolver, int level, NativeStream os) throws PrivilegedActionPragma {
-		if (method.isAbstract()) {
-			super.compileRuntime(method, resolver, level, os);
-		} else if (X86CompilerHelper.isClassInitializeNeeded(method)) {
-			// Create the code to initialize and call the interpreter
-			super.compileRuntime(method, resolver, level, os);
-		} else {
-			// Only set the code address of the interpreter
-			final Address intrAddr = Unsafe.getJumpTableEntry(X86JumpTable.VM_INVOKE_METHOD_AFTER_RECOMPILE_IDX);
-			final VmCompiledCode code = Vm.getCompiledMethods().createCompiledCode(null, method, this, null, intrAddr.toAddress(), null, 0, null, null, null);
-			method.addCompiledCode(code, level);
-		}
-	}
 
 	/**
 	 * Compile the given method into the given stream.
@@ -89,15 +61,25 @@ public class X86StubCompiler extends AbstractX86Compiler {
 			final X86Assembler os = (X86Assembler) nos;
 			final EntryPoints context = getEntryPoints();
 			// Create the helper
-			final CCompilerHelper ih = new CCompilerHelper(os, null, context, isBootstrap);
+			final X86CompilerHelper ih = new X86CompilerHelper(os, null, context, isBootstrap);
 			// Start an "object"
 			final NativeStream.ObjectInfo objectInfo = os.startObject(context.getVmMethodCodeClass());
 			// Start the code creation
 			cm.setCodeStart(os.setObjectRef(new Label(method.getMangledName() + "$$start")));
-			// Initialize the class
-			ih.writeClassInitialize(method);
-			// Call the interpreter
-			ih.emitInvokeMethodAtferRecompile();
+            
+            // Setup call to {@link VmMethod#recompileMethod(int, int)}
+            final VmType declClass = method.getDeclaringClass();
+            os.writePUSH(declClass.getStaticsIndex());
+            os.writePUSH(declClass.indexOf(method));
+            final int recompileStatOfs = ih.getStaticsOffset(context.getRecompileMethod());
+            os.writeMOV(ih.ADDRSIZE, ih.AAX, ih.STATICS, recompileStatOfs);
+            os.writeCALL(ih.AAX, context.getVmMethodNativeCodeField().getOffset());
+            
+            // Emit jump to the newly compiled code.
+            final int methodStatOfs = ih.getStaticsOffset(method);
+            os.writeMOV(ih.ADDRSIZE, ih.AAX, ih.STATICS, methodStatOfs);
+            os.writeJMP(ih.AAX, context.getVmMethodNativeCodeField().getOffset());
+
 			// Close the "object"
 			objectInfo.markEnd();
 			// The end

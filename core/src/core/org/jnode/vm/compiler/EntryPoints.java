@@ -125,6 +125,8 @@ public class EntryPoints extends VmSystemObject {
 
     private final VmMethod yieldPoint;
 
+    private final VmMethod recompileMethod;
+
     private final int magic;
 
     /**
@@ -294,6 +296,10 @@ public class EntryPoints extends VmSystemObject {
                     "org.jnode.vm.classmgr.VmConstMethodRef", true);
             vmConstMethodResolvedMethod = (VmInstanceField) testField(constMethodClass
                     .getField("vmMethod"));
+            
+            // VmMethod
+            final VmType vmMethodClass = loader.loadClass("org.jnode.vm.classmgr.VmMethod", true);
+            recompileMethod = testMethod(vmMethodClass.getDeclaredMethod("recompileMethod", "(II)V"));
 
         } catch (ClassNotFoundException ex) {
             throw new NoClassDefFoundError(ex.getMessage());
@@ -672,9 +678,18 @@ public class EntryPoints extends VmSystemObject {
     }
 
     /**
+     * @see org.jnode.vm.VmProcessor#yieldPoint()
      * @return Returns the yieldPoint.
      */
     public final VmMethod getYieldPoint() {
         return yieldPoint;
+    }
+    
+    /**
+     * @see VmMethod#recompileMethod(int, int)
+     * @return Returns the recompileMethod.
+     */
+    public final VmMethod getRecompileMethod() {
+        return recompileMethod;
     }
 }
