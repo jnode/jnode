@@ -10,6 +10,8 @@ import org.jnode.driver.net.NetworkException;
 import org.jnode.net.*;
 import org.jnode.net.arp.ARPNetworkLayer;
 import org.jnode.net.ethernet.EthernetConstants;
+import org.jnode.net.ethernet.EthernetHeader;
+import org.jnode.net.ethernet.EthernetUtils;
 import org.jnode.net.ipv4.*;
 import org.jnode.net.ipv4.icmp.ICMPProtocol;
 import org.jnode.net.ipv4.raw.RAWProtocol;
@@ -129,6 +131,12 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
     }
     // Set the header object in the buffer-field
     skbuf.setNetworkLayerHeader(hdr);
+
+    // Set the Link header
+    final EthernetHeader hdrLink = new EthernetHeader(skbuf);
+    skbuf.setLinkLayerHeader(hdrLink);
+    skbuf.setProtocolID(EthernetUtils.getProtocol(hdrLink));
+
     // Remove header from skbuf-data
     skbuf.pull(hdr.getLength());
     // Trim the end of the message, to we have a valid length
@@ -145,10 +153,7 @@ public class IPv4NetworkLayer implements NetworkLayer, IPv4Constants,
     }
 
     // Update the ARP cache for the source address
-    if (skbuf.getLinkLayerHeader() != null)
-    {
-      updateARPCache(skbuf.getLinkLayerHeader().getSourceAddress(), hdr.getSourceAddress());
-    }
+    updateARPCache(skbuf.getLinkLayerHeader().getSourceAddress(), hdr.getSourceAddress());
 
     // Get my IP address
     final IPv4ProtocolAddressInfo myAddrInfo = (IPv4ProtocolAddressInfo) deviceAPI
