@@ -234,8 +234,8 @@ public final class VmStatics extends VmSystemObject {
 	 * 
 	 * @param visitor
 	 */
-	public void walk(ObjectVisitor visitor, ObjectResolver resolver) {
-		walk(TYPE_OBJECT, visitor, resolver);
+	public boolean walk(ObjectVisitor visitor, ObjectResolver resolver) {
+		return walk(TYPE_OBJECT, visitor, resolver);
 	}
 
 	/**
@@ -251,8 +251,9 @@ public final class VmStatics extends VmSystemObject {
 	 * Let all objects in this statics-table make a visit to the given visitor.
 	 * 
 	 * @param visitor
+     * @return false if the last visit returned false, true otherwise.
 	 */
-	private void walk(int visitType, ObjectVisitor visitor, ObjectResolver resolver) {
+	private boolean walk(int visitType, ObjectVisitor visitor, ObjectResolver resolver) {
 		final int[] table;
 		final byte[] types;
 		final int length;
@@ -268,7 +269,7 @@ public final class VmStatics extends VmSystemObject {
 					if (object != null) {
 						final boolean rc = visitor.visit(object);
 						if (!rc) {
-							i = length;
+                            return false;
 						}
 					}
 				}
@@ -276,6 +277,7 @@ public final class VmStatics extends VmSystemObject {
 		} else {
 			throw new RuntimeException("SlotSize != 1 not implemented yet");
 		}
+        return true;
 	}
 
 	private final ObjectResolver getResolver() {

@@ -68,7 +68,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
         this.helper = heapManager.getHelper();
         this.markStack = new GCStack();
         this.markVisitor = new GCMarkVisitor(heapManager, arch, markStack);
-        this.threadMarkVisitor = new GCThreadMarkVisitor(heapManager, helper, markVisitor);
+        this.threadMarkVisitor = new GCThreadMarkVisitor(heapManager, markVisitor);
         this.setWhiteVisitor = new GCSetWhiteVisitor(heapManager);
         this.verifyVisitor = new GCVerifyVisitor(heapManager, arch);
         this.sweepVisitor = new GCSweepVisitor(heapManager);
@@ -159,8 +159,10 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
             }
             markVisitor.reset();
             markVisitor.setRootSet(true);
-            statics.walk(markVisitor, resolver);
-            helper.visitAllThreads(threadMarkVisitor);
+            // Mark all roots
+            helper.visitAllRoots(markVisitor, heapManager, resolver);            
+//            statics.walk(markVisitor, resolver);
+//            helper.visitAllThreads(threadMarkVisitor);
             // Mark every object in the rootset
 //            bootHeap.walk(markVisitor, locking, 0, 0);
             if (!firstIteration) {

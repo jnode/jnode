@@ -20,10 +20,12 @@
  */
 package org.jnode.vm;
 
+import org.jnode.assembler.ObjectResolver;
 import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.memmgr.HeapHelper;
+import org.jnode.vm.memmgr.VmHeapManager;
 import org.vmmagic.pragma.Uninterruptible;
 
 /**
@@ -32,6 +34,7 @@ import org.vmmagic.pragma.Uninterruptible;
 public final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
 
     private final int flagsOffset;
+    private final ThreadRootVisitor threadRootVisitor;
 
     /**
      * Initialize this instance.
@@ -43,6 +46,7 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
                 "Cannot instantiate HeapHelpImpl at runtime"); }
         final int refSize = arch.getReferenceSize();
         flagsOffset = ObjectLayout.FLAGS_SLOT * refSize;
+        this.threadRootVisitor = new ThreadRootVisitor();
     }
 
     /**
@@ -322,9 +326,29 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
     }
     
     /**
-     * @see org.jnode.vm.memmgr.HeapHelper#visitAllThreads(org.jnode.vm.VmThreadVisitor)
+     * Visit all roots of the object tree.
+     * @param visitor
      */
-    public void visitAllThreads(VmThreadVisitor visitor) {
-        Vm.visitAllThreads(visitor);
+    public void visitAllRoots(ObjectVisitor visitor, VmHeapManager heapManager, ObjectResolver resolver) {
+        if (!Vm.getVm().getStatics().walk(visitor, resolver)) {
+            return;
+        }
+        threadRootVisitor.initialize(visitor, heapManager);
+        Vm.visitAllThreads(threadRootVisitor);
+    }
+    
+    private static final class ThreadRootVisitor extends VmThreadVisitor {
+ 
+        private ObjectVisitor visitor;
+        private VmHeapManager heapManager;
+        
+        public final void initialize(ObjectVisitor visitor, VmHeapManager heapManager) {
+            this.visitor = visitor;
+            this.heapManager = heapManager;
+        }
+        
+        public boolean visit(VmThread thread) {
+            return thread.visit(visitor, heapManager);
+        }
     }
 }

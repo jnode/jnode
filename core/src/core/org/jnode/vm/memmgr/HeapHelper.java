@@ -4,12 +4,11 @@
 package org.jnode.vm.memmgr;
 
 import org.jnode.assembler.ObjectResolver;
-import org.jnode.vm.VmAddress;
 import org.jnode.vm.Monitor;
+import org.jnode.vm.ObjectVisitor;
+import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmThread;
-import org.jnode.vm.VmThreadVisitor;
-import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmMethod;
 
 /**
@@ -118,8 +117,8 @@ public abstract class HeapHelper extends ObjectResolver {
 	public abstract void restartThreads();
     
     /**
-     * Visit all live threads.
+     * Visit all roots of the object tree.
      * @param visitor
      */
-    public abstract void visitAllThreads(VmThreadVisitor visitor); 
+    public abstract void visitAllRoots(ObjectVisitor visitor, VmHeapManager heapManager, ObjectResolver resolver); 
 }
