@@ -3,6 +3,7 @@
  */
 package org.jnode.net.arp;
 
+import org.jnode.util.Counter;
 import org.jnode.util.Statistic;
 import org.jnode.util.Statistics;
 
@@ -11,13 +12,13 @@ import org.jnode.util.Statistics;
  */
 public class ARPStatistics implements Statistics {
 
-	protected final Statistic badlen = new Statistic("badlen", "#received packets with datalength larger then packet");
-	protected final Statistic ipackets = new Statistic("ipackets", "total #received packets");
-	protected final Statistic arpreq = new Statistic("arpreq", "#received ARP requests");
-	protected final Statistic arpreply = new Statistic("arpreply", "#ARP replies send");
-	protected final Statistic rarpreq = new Statistic("rarpreq", "#received RARP requests");
-	protected final Statistic rarpreply = new Statistic("rarpreply", "#RARP replies send");
-	protected final Statistic opackets = new Statistic("opackets", "total #output packets");
+	protected final Counter badlen = new Counter("badlen", "#received packets with datalength larger then packet");
+	protected final Counter ipackets = new Counter("ipackets", "total #received packets");
+	protected final Counter arpreq = new Counter("arpreq", "#received ARP requests");
+	protected final Counter arpreply = new Counter("arpreply", "#ARP replies send");
+	protected final Counter rarpreq = new Counter("rarpreq", "#received RARP requests");
+	protected final Counter rarpreply = new Counter("rarpreply", "#RARP replies send");
+	protected final Counter opackets = new Counter("opackets", "total #output packets");
 
 	private final Statistic[] list = new Statistic[] {
 		badlen,

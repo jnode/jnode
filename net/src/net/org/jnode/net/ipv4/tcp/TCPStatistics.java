@@ -3,6 +3,7 @@
  */
 package org.jnode.net.ipv4.tcp;
 
+import org.jnode.util.Counter;
 import org.jnode.util.Statistic;
 import org.jnode.util.Statistics;
 
@@ -12,21 +13,21 @@ import org.jnode.util.Statistics;
 public class TCPStatistics implements Statistics {
 
 	/** #received datagrams with datalength larger then packet */
-	protected final Statistic badlen = new Statistic("badlen");
+	protected final Counter badlen = new Counter("badlen");
 	/** #received datagrams with checksum error */
-	protected final Statistic badsum = new Statistic("badsum");
+	protected final Counter badsum = new Counter("badsum");
 	/** #received datagrams not delivered because input socket full */
-	protected final Statistic fullsock = new Statistic("fullsock");
+	protected final Counter fullsock = new Counter("fullsock");
 	/** #received datagrams with packet shorted then header */
-	protected final Statistic hdrops = new Statistic("hdrops");
+	protected final Counter hdrops = new Counter("hdrops");
 	/** total #received datagrams */
-	protected final Statistic ipackets = new Statistic("ipackets");
+	protected final Counter ipackets = new Counter("ipackets");
 	/** #received datagrams with no process on destination port */
-	protected final Statistic noport = new Statistic("noport");
+	protected final Counter noport = new Counter("noport");
 	/** #received broadcast/multicast datagrams with no process on destination port */
-	protected final Statistic noportbcast = new Statistic("nopoartbcast");
+	protected final Counter noportbcast = new Counter("nopoartbcast");
 	/** total #output datagrams */
-	protected final Statistic opackets = new Statistic("opackets");
+	protected final Counter opackets = new Counter("opackets");
 
 	/** The list of statistics */
 	protected final Statistic[] list = new Statistic[] { 

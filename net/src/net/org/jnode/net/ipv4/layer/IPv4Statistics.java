@@ -3,6 +3,7 @@
  */
 package org.jnode.net.ipv4.layer;
 
+import org.jnode.util.Counter;
 import org.jnode.util.Statistic;
 import org.jnode.util.Statistics;
 
@@ -11,18 +12,18 @@ import org.jnode.util.Statistics;
  */
 public class IPv4Statistics implements Statistics {
 
-	protected final Statistic badhlen = new Statistic("badhlen", "#received packets with invalid IP header length");
-	protected final Statistic badlen = new Statistic("badlen", "#received packets with datalength larger then packet");
-	protected final Statistic badsum = new Statistic("badsum", "#received packets with checksum error");
-	protected final Statistic badvers = new Statistic("badvers", "#received packets with an IP version other then 4");
-	protected final Statistic fragments = new Statistic("fragments", "total #received fragments");
-	protected final Statistic ipackets = new Statistic("ipackets", "total #received packets");
-	protected final Statistic noproto = new Statistic("noproto", "#received packets with an unknown or unsupported protocol");
-	protected final Statistic nodevaddr = new Statistic("nodevaddr", "#received packets not delivered because device address was not set");
-	protected final Statistic opackets = new Statistic("opackets", "total #output packets");
-	protected final Statistic reassembled = new Statistic("reassembled", "#datagrams reassembled");
+	protected final Counter badhlen = new Counter("badhlen", "#received packets with invalid IP header length");
+	protected final Counter badlen = new Counter("badlen", "#received packets with datalength larger then packet");
+	protected final Counter badsum = new Counter("badsum", "#received packets with checksum error");
+	protected final Counter badvers = new Counter("badvers", "#received packets with an IP version other then 4");
+	protected final Counter fragments = new Counter("fragments", "total #received fragments");
+	protected final Counter ipackets = new Counter("ipackets", "total #received packets");
+	protected final Counter noproto = new Counter("noproto", "#received packets with an unknown or unsupported protocol");
+	protected final Counter nodevaddr = new Counter("nodevaddr", "#received packets not delivered because device address was not set");
+	protected final Counter opackets = new Counter("opackets", "total #output packets");
+	protected final Counter reassembled = new Counter("reassembled", "#datagrams reassembled");
 
-	private final Statistic[] list = new Statistic[] {
+	private final Counter[] list = new Counter[] {
 		badhlen,
 		badlen,
 		badsum,
