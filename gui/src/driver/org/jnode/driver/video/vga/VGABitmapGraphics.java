@@ -159,4 +159,13 @@ public class VGABitmapGraphics extends BitmapGraphics {
 			x++;
 		}
 	}
+	
+	
+    /**
+     * @see org.jnode.awt.util.BitmapGraphics#doDrawAlphaRaster(java.awt.image.Raster, int, int, int, int, int, int, int)
+     */
+    protected void doDrawAlphaRaster(Raster raster, int srcX, int srcY,
+            int dstX, int dstY, int width, int height, int color) {
+        // TODO Implement me
+    }
 }

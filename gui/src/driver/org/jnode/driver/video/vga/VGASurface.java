@@ -128,4 +128,11 @@ public class VGASurface extends AbstractSurface implements Surface, VgaConstants
 		return model;
 	}
 
+    /**
+     * @see org.jnode.driver.video.Surface#drawAlphaRaster(java.awt.image.Raster, int, int, int, int, int, int, java.awt.Color)
+     */
+    public void drawAlphaRaster(Raster raster, AffineTransform tx, int srcX, int srcY, int dstX,
+            int dstY, int width, int height, Color color) {
+        bitmapGraphics.drawAlphaRaster(raster, tx, srcX, srcY, dstX, dstY, width, height, convertColor(color));
+    }
 }

@@ -4,6 +4,7 @@
 package org.jnode.driver.video.nvidia;
 
 import java.awt.Color;
+import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
 
@@ -709,4 +710,11 @@ public class NVidiaCore extends AbstractSurface implements NVidiaConstants, Disp
 		vgaIO.setATT(NVATBX_HORPIXPAN, temp | ((startadd & 3) << 1));
 	}
 
+    /**
+     * @see org.jnode.driver.video.Surface#drawAlphaRaster(java.awt.image.Raster, int, int, int, int, int, int, java.awt.Color)
+     */
+    public void drawAlphaRaster(Raster raster, AffineTransform tx, int srcX, int srcY, int dstX,
+            int dstY, int width, int height, Color color) {
+        bitmapGraphics.drawAlphaRaster(raster, tx, srcX, srcY, dstX, dstY, width, height, convertColor(color));
+    }
 }

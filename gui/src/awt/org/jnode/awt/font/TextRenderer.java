@@ -3,7 +3,10 @@
  */
 package org.jnode.awt.font;
 
-import java.awt.Graphics2D;
+import java.awt.Color;
+import java.awt.geom.AffineTransform;
+
+import org.jnode.driver.video.Surface;
 
 /**
  * @author epr
@@ -17,6 +20,6 @@ public interface TextRenderer {
 	 * @param x
 	 * @param y
 	 */
-	public void render(Graphics2D g, String text, int x, int y);
+	public void render(Surface g, AffineTransform tx, String text, int x, int y, Color color);
 
 }

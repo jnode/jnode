@@ -7,16 +7,20 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+import java.util.BitSet;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class GlyphRenderer {
 
+    private final double MASTER_HEIGHT = 128.0;
 	private final SummedAreaTable sumAreaTable;
 	
 	/**
@@ -24,8 +28,8 @@ public class GlyphRenderer {
 	 * @param shape
 	 */
 	public GlyphRenderer(Shape shape) {
-		final Raster master = createMaster(shape);
-		this.sumAreaTable = new SummedAreaTable(master);		
+		final Master master = createMaster(shape);
+		this.sumAreaTable = new SummedAreaTable(master.bits, master.width, master.height);		
 	}
 	
 	/**
@@ -50,7 +54,7 @@ public class GlyphRenderer {
 				final int xpos = (int)(x * scale);
 				final float v = sumAreaTable.getIntensity(xpos, ypos, si, si) * 255;
 				
-				System.out.println("(" + x + "," + y + ") " + v + ", si " + si);
+				//System.out.println("(" + x + "," + y + ") " + v + ", si " + si);
 				raster.setSample(x, y, 0, v);
 			}
 		}
@@ -62,22 +66,48 @@ public class GlyphRenderer {
 	 * @param shape
 	 * @return
 	 */
-	private final Raster createMaster(Shape shape) {
-		final Rectangle bounds = shape.getBounds();
+	private final Master createMaster(Shape shape) {
+		final Area area = new Area(shape);
+		final double scale = MASTER_HEIGHT / area.getBounds().getHeight();
+
+		area.transform(AffineTransform.getScaleInstance(scale, scale));
+		Rectangle bounds = area.getBounds();
+		area.transform(AffineTransform.getTranslateInstance(-bounds.getMinX(), -bounds.getMinY()));
+		bounds = area.getBounds();
+		
 		final int width = (int)(bounds.getMaxX() + 0.5);
 		final int height = (int)(bounds.getMaxY() + 0.5);
 		
-        final WritableRaster raster;
-        raster = Raster.createPackedRaster(DataBuffer.TYPE_BYTE,
-                                           width, height, 1, 1, null);
-	
+		System.out.println("width=" + width + ", height=" + height);
+		
+		final BitSet bits = new BitSet(width * height);
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				if (shape.contains(x, y)) {
-					raster.setSample(x, y, 0, 1);
+				if (area.contains(x, y)) {
+					bits.set(y * width + x);
 				}
 			}
 		}
-		return raster;
+
+		return new Master(bits, width, height);
+	}
+	
+	private static class Master {
+	    public BitSet bits;
+	    public int width;
+	    public int height;
+	    
+	    
+        /**
+         * @param bits
+         * @param width
+         * @param height
+         */
+        public Master(BitSet bits, int width, int height) {
+            super();
+            this.bits = bits;
+            this.width = width;
+            this.height = height;
+        }
 	}
 }
