@@ -1,5 +1,5 @@
-/* RSAPrivateCrtKey.java -- An RSA private key in CRT format
-   Copyright (C) 1998 Free Software Foundation, Inc.
+/* Chromaticity.java --
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,61 +35,52 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.security.interfaces;
 
-import java.math.BigInteger;
+package javax.print.attribute.standard;
+
+import javax.print.attribute.DocAttribute;
+import javax.print.attribute.EnumSyntax;
+import javax.print.attribute.PrintJobAttribute;
+import javax.print.attribute.PrintRequestAttribute;
 
 /**
- * This interface provides access to information about an RSA private
- * key in Chinese Remainder Theorem (CRT) format.
- *
- * @version 0.0
- *
- * @author Aaron M. Renn (arenn@urbanophile.com)
+ * @author Michael Koch (konqueror@gmx.de)
  */
-public interface RSAPrivateCrtKey extends RSAPrivateKey
+public final class Chromaticity extends EnumSyntax
+  implements DocAttribute, PrintRequestAttribute, PrintJobAttribute
 {
-  long serialVersionUID = -5682214253527700368L;
+  private static final long serialVersionUID = -6890309414893262822L;
+
+  public static final Chromaticity MONOCHROME = new Chromaticity(0);
+  public static final Chromaticity COLOR = new Chromaticity(1);
 
   /**
-   * Returns the public exponent for this key
+   * Creates a <code>Chromaticity</code> object.
    *
-   * @return The public exponent for this key
+   * @param value the enum value
    */
-  BigInteger getPublicExponent();
+  protected Chromaticity(int value)
+  {
+    super(value);
+  }
 
   /**
-   * Returns the primeP value
+   * Returns category of this class.
    *
-   * @return The primeP value
+   * @return the class <code>Sides</code> itself
    */
-  BigInteger getPrimeP();
+  public Class getCategory()
+  {
+    return Chromaticity.class;
+  }
 
   /**
-   * Returns the primeQ value
+   * Returns the name of this attribute.
    *
-   * @return The primeQ value
+   * @return the name
    */
-  BigInteger getPrimeQ();
-
-  /**
-   * Returns the primeExponentP
-   *
-   * @return The primeExponentP
-   */
-  BigInteger getPrimeExponentP();
-
-  /**
-   * Returns the primeExponentQ
-   *
-   * @return The primeExponentQ
-   */
-  BigInteger getPrimeExponentQ();
-
-  /**
-   * Returns the CRT coefficient
-   *
-   * @return The CRT coefficient
-   */
-  BigInteger getCrtCoefficient();
+  public String getName()
+  {
+    return "chromaticity";
+  }
 }

@@ -57,8 +57,6 @@ abstract class DirectByteBufferImpl extends ByteBuffer
     */
   private final Object owner;
   
-  final RawData address;
-
   static final class ReadOnly extends DirectByteBufferImpl
   {
     ReadOnly(Object owner, RawData address,

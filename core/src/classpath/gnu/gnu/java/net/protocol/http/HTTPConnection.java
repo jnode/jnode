@@ -366,10 +366,18 @@ public class HTTPConnection
       }
     if (path == null || path.length() == 0)
       {
-        throw new IllegalArgumentException("path must have non-zero length");
+        path = "/";
       }
     Request ret = new Request(this, method, path);
+    if ((secure && port != HTTPS_PORT) ||
+        (!secure && port != HTTP_PORT))
+      {
+        ret.setHeader("Host", hostname + ":" + port);
+      }
+    else
+      {
     ret.setHeader("Host", hostname);
+      }
     ret.setHeader("User-Agent", userAgent);
     ret.setHeader("Connection", "keep-alive");
     ret.setHeader("Accept-Encoding",

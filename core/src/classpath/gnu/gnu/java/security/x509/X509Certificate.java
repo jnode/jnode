@@ -624,9 +624,8 @@ public class X509Certificate extends java.security.cert.X509Certificate
         else
           {
           algVal = val.getEncoded();
-          }
+	    
         if (val.isConstructed())
-          {
           encoded.skip(val.getLength());
       }
         debug("read algorithm parameters == " + algVal);
