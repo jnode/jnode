@@ -129,10 +129,10 @@ public class Tetris extends Panel implements KeyListener {
     }
 
     public void paint(Graphics g) {
-        //if (img == null) {
-        //    img = createImage(DIM.width, DIM.height);
-        //}
-        Graphics g2 = g;//img.getGraphics();
+        if (img == null) {
+            img = createImage(DIM.width, DIM.height);
+        }
+        Graphics g2 = img.getGraphics();
         g2.setColor(COLORS[0]);
         g2.fillRect(0, 0, DIM.width, DIM.height);
         for (int i = 0; i < WIDTH_C + 2; i++) {
@@ -175,8 +175,8 @@ public class Tetris extends Panel implements KeyListener {
             g2.drawRect(2 * CELL, 9 * CELL, 8 * CELL, 4 * CELL);
             g2.drawString("GAME OVER! SCORE: " + score, (WIDTH_C - 6) * CELL / 2 + 2, (HEIGHT_C + 2) * CELL / 2);
         }
-        //g2.dispose();
-        //g.drawImage(img, 0, 0, this);
+        g2.dispose();
+        g.drawImage(img, 0, 0, this);
     }
 
     private void rot(int i) {
