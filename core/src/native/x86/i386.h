@@ -83,6 +83,7 @@ KERNEL_CS   equ 0x08
 KERNEL_DS   equ 0x10
 USER_CS     equ 0x1B
 USER_DS     equ 0x23
+TSS_DS      equ 0x28
 CURPROC_FS  equ 0x33
 
 ; ----------------------

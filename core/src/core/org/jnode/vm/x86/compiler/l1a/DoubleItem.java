@@ -35,7 +35,7 @@ final class DoubleItem extends Item implements X86CompilerConstants  {
 	}
 
 	/**
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#loadToFPU()
+	 * @//see org.jnode.vm.x86.compiler.l1a.Item#loadToFPU()
 	 */
 //	void loadToFPU(EmitterContext ec) {
 //		// TODO Auto-generated method stub

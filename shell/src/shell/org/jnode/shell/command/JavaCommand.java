@@ -3,17 +3,13 @@
  */
 package org.jnode.shell.command;
 
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.ClassNotFoundException;
-import java.lang.System;
 import java.net.URL;
-import java.net.URLClassLoader;
 
 import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.ClassNameArgument;

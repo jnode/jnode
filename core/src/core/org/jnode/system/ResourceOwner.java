@@ -9,6 +9,8 @@ package org.jnode.system;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface ResourceOwner {
+    
+    public static final ResourceOwner SYSTEM = new SimpleResourceOwner("SYSTEM");
 	
 	/**
 	 * Gets a short description of this owner.

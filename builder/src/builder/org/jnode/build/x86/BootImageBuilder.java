@@ -311,6 +311,11 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		// Link bootHeapEnd
 		refJava = os.getObjectRef(bootHeapEnd);
 		os.getObjectRef(new Label("bootHeapEnd")).link(refJava);
+		
+		// Link VmX86Processor_applicationProcessorMain
+		final VmType x86ProcessorClass = loadClass(VmX86Processor.class);
+		refJava = os.getObjectRef(x86ProcessorClass.getMethod("applicationProcessorMain", "()V"));
+		os.getObjectRef(new Label("VmX86Processor_applicationProcessorMain")).link(refJava);
 
 	}
 

@@ -18,10 +18,8 @@ import java.util.StringTokenizer;
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
-import org.apache.tools.ant.taskdefs.UpToDate;
 import org.jnode.driver.console.Console;
 import org.jnode.driver.console.ConsoleManager;
-import org.jnode.driver.console.ConsoleOutputStream;
 import org.jnode.driver.console.x86.ScrollableShellConsole;
 import org.jnode.driver.input.KeyboardEvent;
 import org.jnode.driver.input.KeyboardListener;

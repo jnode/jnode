@@ -4,7 +4,10 @@
 package org.jnode.vm;
 
 import java.io.PrintStream;
+import java.util.List;
 
+import org.jnode.system.ResourceManager;
+import org.jnode.util.BootableArrayList;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.compiler.HotMethodManager;
 import org.jnode.vm.memmgr.VmHeapManager;
@@ -32,6 +35,8 @@ public class Vm extends VmSystemObject {
 	private final String version;
 	/** The statics table */
 	private final VmStatics statics;
+	/** The list of all system processors */
+	private final List processors;
 
 	/**
 	 * Initialize a new instance
@@ -46,6 +51,7 @@ public class Vm extends VmSystemObject {
 		this.arch = arch;
 		this.heapManager = heapManager;
 		this.statics = statics;
+		this.processors = new BootableArrayList();
 	}
 
 	/**
@@ -128,5 +134,30 @@ public class Vm extends VmSystemObject {
      */
     public final String getVersion() {
         return this.version;
+    }
+    
+    /**
+     * Find all processors in the system and start them.
+     */
+    final void initializeProcessors(ResourceManager rm) {
+        // Add the current (bootstrap) processor
+        addProcessor(Unsafe.getCurrentProcessor());
+        // Let the architecture find the processors
+        arch.initializeProcessors(rm);
+        // Show some info
+        final int cnt = processors.size();
+        if (cnt == 1) {
+            System.out.println("Detected 1 processor");
+        } else {
+            System.out.println("Detected " + cnt + " processors");            
+        }
+    }
+    
+    /**
+     * Add a discovered CPU.
+     * @param cpu
+     */
+    final void addProcessor(VmProcessor cpu) {
+        processors.add(cpu);
     }
 }

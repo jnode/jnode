@@ -667,7 +667,8 @@ after_copyCmdLine:
 	
 ; Gets the current processor
 Q43org5jnode2vm6Unsafe23getCurrentProcessor2e2829Lorg2fjnode2fvm2fVmProcessor3b:
-	mov eax,vmCurProcessor
+	;mov eax,vmCurProcessor
+	mov eax,CURRENTPROCESSOR
 	ret	
 
 ; Force a yieldpoint
