@@ -42,6 +42,7 @@ import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmArray;
+import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmMethodCode;
 import org.jnode.vm.classmgr.VmStatics;
@@ -833,6 +834,16 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                         w.print(", ");
                         w.print(cnt);
                         w.print(" instances");
+                    }
+                }
+                if (vmClass.isArray()) {
+                    final long len = ((VmArrayClass) vmClass).getTotalLength();
+                    if (len > 0) {
+                        w.print(", ");
+                        w.print(len);
+                        w.print(" total length ");
+                        w.print(len / ((VmArrayClass)vmClass).getInstanceCount());
+                        w.print(" avg length ");
                     }
                 }
                 int cnt = vmClass.getNoInterfaces();
