@@ -92,7 +92,7 @@ public class X86Support extends HardwareSupport {
         if (Assembler.THROW) {
             throw new RuntimeException("Unknown instruction: " + mnemonic);
         } else {
-            //System.err.println("Unknown instruction: " + mnemonic);
+            System.err.println("Unknown instruction: " + mnemonic);
         }
     }
 }
