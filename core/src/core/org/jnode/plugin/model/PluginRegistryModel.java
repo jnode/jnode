@@ -14,6 +14,7 @@ import java.util.Iterator;
 import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
+import org.jnode.plugin.PluginLoader;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.util.BootableHashMap;
 import org.jnode.vm.VmSystemObject;
@@ -86,7 +87,7 @@ public class PluginRegistryModel extends VmSystemObject implements
 
         for (int i = 0; i < max; i++) {
             //System.out.println(pluginUrls[i]);
-            loadPlugin(pluginUrls[ i]);
+            loadPlugin(pluginUrls[ i], false);
         }
     }
 
@@ -136,6 +137,18 @@ public class PluginRegistryModel extends VmSystemObject implements
      */
     public PluginDescriptor loadPlugin(final URL pluginUrl)
             throws PluginException {
+        return loadPlugin(pluginUrl, true);
+    }
+
+    /**
+     * Load a plugin from a given URL. This will not activate the plugin.
+     * 
+     * @param pluginUrl
+     * @return The descriptor of the loaded plugin.
+     * @throws PluginException
+     */
+    private PluginDescriptor loadPlugin(final URL pluginUrl, boolean resolve)
+            throws PluginException {
         final PluginRegistryModel registry = this;
         final PluginJar pluginJar;
         try {
@@ -154,9 +167,53 @@ public class PluginRegistryModel extends VmSystemObject implements
                 throw new PluginException(ex);
             }
         }
-        return pluginJar.getDescriptor();
+        final PluginDescriptorModel descr = pluginJar.getDescriptorModel();
+        if (resolve) {
+            descr.resolve();
+        }
+        return descr;
     }
 
+	/**
+	 * Load a plugin from a given loader.
+	 * This will not activate the plugin.
+	 * 
+	 * @param loader
+	 * @param pluginId
+	 * @param pluginVersion 
+	 * @return The descriptor of the loaded plugin.
+	 * @throws PluginException
+	 */
+	public PluginDescriptor loadPlugin(final PluginLoader loader, final String pluginId, final String pluginVersion, boolean resolve) throws PluginException {
+        final PluginRegistryModel registry = this;
+        final PluginJar pluginJar;
+        try {
+            pluginJar = (PluginJar) AccessController
+                    .doPrivileged(new PrivilegedExceptionAction() {
+
+                        public Object run() throws PluginException, IOException {
+                            final InputStream is = loader.getPluginStream(pluginId, pluginVersion);
+                            if (is == null) {
+                                throw new PluginException("Plugin " + pluginId + ", version " + pluginVersion + " not found");
+                            }
+                            return new PluginJar(registry, is, null);
+                        }
+                    });
+        } catch (PrivilegedActionException pax) {
+            final Throwable ex = pax.getException();
+            if (ex instanceof PluginException) {
+                throw (PluginException) ex;
+            } else {
+                throw new PluginException(ex);
+            }
+        }
+        final PluginDescriptorModel descr = pluginJar.getDescriptorModel();
+        if (resolve) {
+            descr.resolve();
+        }
+        return descr;
+	}
+	
     /**
      * Load a plugin from a given InputStream. This will not activate the
      * plugin.

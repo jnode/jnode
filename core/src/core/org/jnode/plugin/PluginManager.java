@@ -23,6 +23,11 @@ public abstract class PluginManager {
 	 * @return The registry
 	 */
 	public abstract PluginRegistry getRegistry();
+	
+	/**
+	 * Gets the plugin loader manager.
+	 */
+	public abstract PluginLoaderManager getLoaderManager();
 
 	/**
 	 * Start all plugins that can be started, but have not been started yet

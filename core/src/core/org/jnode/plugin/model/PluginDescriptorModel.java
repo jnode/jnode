@@ -133,7 +133,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	 * 
 	 * @throws PluginException
 	 */
-	protected void resolve() throws PluginException {
+	public final void resolve() throws PluginException {
 		if (!resolved) {
 			for (int i = 0; i < extensions.length; i++) {
 				extensions[i].resolve();

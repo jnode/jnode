@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.GZip;
@@ -75,20 +76,26 @@ public class InitJarBuilder extends AbstractPluginsTask {
 			final ArrayList pluginJars = new ArrayList(pluginList.length);
 			for (int i = 0; i < pluginList.length; i++) {
 				final URL url = pluginList[i];
-				final PluginJar piJar = new PluginJar(null, url);
-				pluginJars.add(piJar);
+				final BuildPluginJar piJar = new BuildPluginJar(url);
 				if (piJar.getDescriptor().isSystemPlugin()) {
 					log("System plugin " + piJar.getDescriptor().getId() +" in plugin-list will be ignored", Project.MSG_WARN);
 				} else {
-					final File f = new File(url.getPath());
-					final FileSet fs = new FileSet();
-					fs.setDir(f.getParentFile());
-					fs.setIncludes(f.getName());
-					jarTask.addFileset(fs);
+					pluginJars.add(piJar);				    
 				}
 			}
 			testPluginPrerequisites(pluginJars);
-
+			final List sortedPluginJars = sortPlugins(pluginJars);
+			
+			for (Iterator i = sortedPluginJars.iterator(); i.hasNext(); ) {
+				final BuildPluginJar piJar = (BuildPluginJar)i.next();
+				pluginJars.add(piJar);
+				final File f = new File(piJar.getPluginUrl().getPath());
+				final FileSet fs = new FileSet();
+				fs.setDir(f.getParentFile());
+				fs.setIncludes(f.getName());
+				jarTask.addFileset(fs);
+			}
+			
 			/*
 			 * for (Iterator i = piRegistry.getDescriptorIterator(); i.hasNext(); ) { final PluginDescriptor descr = (PluginDescriptor)i.next(); final Runtime rt = descr.getRuntime(); if (rt != null) {
 			 * final Library[] libs = rt.getLibraries(); for (int l = 0; l < libs.length; l++) { processLibrary(jarTask, libs[l], fileSets, getPluginDir()); } }
@@ -144,5 +151,59 @@ public class InitJarBuilder extends AbstractPluginsTask {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Sort the plugins based on dependencies.
+	 * @param pluginJars
+	 */
+	protected List sortPlugins(List pluginJars) {
+	    final ArrayList result = new ArrayList(pluginJars.size());
+	    final HashSet ids = new HashSet();
+	    while (!pluginJars.isEmpty()) {
+	        for (Iterator i = pluginJars.iterator(); i.hasNext(); ) {
+	            final BuildPluginJar piJar = (BuildPluginJar)i.next();
+	            if (piJar.hasAllPrerequisitesInSet(ids)) {
+	                log(piJar.getDescriptor().getId(), Project.MSG_VERBOSE);
+	                result.add(piJar);
+	                ids.add(piJar.getDescriptor().getId());
+	                i.remove();
+	            }
+	        }
+	    }
+	    return result;
+	}
+	
+	static class BuildPluginJar extends PluginJar {
+	    
+	    private final URL pluginUrl;
+	    
+	    /**
+         * @param pluginUrl
+         * @throws PluginException
+         * @throws IOException
+         */
+        BuildPluginJar(URL pluginUrl)
+                throws PluginException, IOException {
+            super(null, pluginUrl);
+            this.pluginUrl = pluginUrl;
+        }
+        /**
+         * @return Returns the pluginUrl.
+         */
+        final URL getPluginUrl() {
+            return this.pluginUrl;
+        }
+        
+        public boolean hasAllPrerequisitesInSet(Set ids) {
+			final PluginDescriptor descr = getDescriptor();
+			final PluginPrerequisite[] prereqs = descr.getPrerequisites();
+			for (int j = 0; j < prereqs.length; j++) {
+			    if (!ids.contains(prereqs[j].getPluginId())) {
+			        return false;
+				}
+			}
+			return true;
+        }
 	}
 }
