@@ -402,6 +402,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      */
     public final void visit_astore(int index) {
         int disp = stackFrame.getEbpOffset(index);
+        vstack.loadLocal(eContext, disp); // avoid aliasing throubles
         RefItem i = vstack.popRef();
         //TODO: implement writeMOV_Const(reg, disp, object);
         i.load(eContext);
@@ -806,6 +807,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         val.release(eContext);
 
         int ebpOfs = stackFrame.getWideEbpOffset(index);
+        vstack.loadLocal(eContext, ebpOfs); // avoid aliasing throubles
         helper.writePOP64(Register.EAX, Register.EDX);
         os.writeMOV(INTSIZE, FP, ebpOfs, Register.EAX);
         os.writeMOV(INTSIZE, FP, ebpOfs + 4, Register.EDX);
@@ -1338,6 +1340,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         v1.release(eContext);
 
         int ebpOfs = stackFrame.getEbpOffset(index);
+        vstack.loadLocal(eContext, ebpOfs); // avoid aliasing throubles
         helper.writePOP(FP, ebpOfs);
     }
 
@@ -1883,9 +1886,10 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iinc(int, int)
      */
     public final void visit_iinc(int index, int incValue) {
-        vstack.loadLocal(eContext, index); // avoid aliasing throubles
-
         final int ebpOfs = stackFrame.getEbpOffset(index);
+
+        vstack.loadLocal(eContext, ebpOfs); // avoid aliasing throubles
+
         X86RegisterPool pool = eContext.getPool();
         final Register r = (Register)pool.request(Item.INT);
         //IMPROVE: use INC or ADD reg, 1
@@ -2306,6 +2310,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      */
     public final void visit_istore(int index) {
         final int disp = stackFrame.getEbpOffset(index);
+        vstack.loadLocal(eContext, disp); // avoid aliasing throubles
         IntItem i = vstack.popInt();
         i.loadIf(eContext, ~Item.CONSTANT);
 
@@ -2839,6 +2844,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         v.release(eContext);
 
         int ebpOfs = stackFrame.getWideEbpOffset(index);
+        vstack.loadLocal(eContext, ebpOfs); // avoid aliasing throubles
         helper.writePOP64(T0, T1);
         os.writeMOV(INTSIZE, FP, ebpOfs, T0);
         os.writeMOV(INTSIZE, FP, ebpOfs + 4, T1);

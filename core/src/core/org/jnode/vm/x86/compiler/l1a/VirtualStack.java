@@ -127,12 +127,12 @@ final class VirtualStack {
 	 * load every instance of local with given index into a register
 	 * (used to avoid aliasing problems) 
 	 * 
-	 * @param index
+	 * @param offsetToFP
 	 */
-	void loadLocal(EmitterContext ec, int index) {
+	void loadLocal(EmitterContext ec, int offsetToFP) {
 		for (int i = 0; i < tos; i++) {
 			final Item item = stack[i];
-			if ((item.getKind() == Item.LOCAL) && (item.getOffsetToFP() == index))
+			if ((item.getKind() == Item.LOCAL) && (item.getOffsetToFP() == offsetToFP))
 					item.load(ec);
 		}
 		
