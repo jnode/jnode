@@ -19,6 +19,7 @@ public class BaseX86MagicHelper extends BaseMagicHelper {
      */
     protected final int methodToCC(int mcode) {
         switch (mcode) {
+        case mEQUALS:
         case mEQ: return X86Constants.JE;
         case mNE: return X86Constants.JNE;
         case mLT: return X86Constants.JB;

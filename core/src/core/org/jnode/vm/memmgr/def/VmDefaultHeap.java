@@ -234,8 +234,9 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
     protected final void free(Object object) {
         lock();
         try {
-            final int objSize = helper.getInt(object, sizeOffset);
-            helper.setObject(object, tibOffset, FREE);
+        	final Address ptr = ObjectReference.fromObject(object).toAddress();
+            final int objSize = ptr.loadInt(Offset.fromIntSignExtend(sizeOffset));
+            ptr.store(ObjectReference.fromObject(FREE), Offset.fromIntSignExtend(tibOffset));
             setAllocationBit(object, false);
             freeSize += objSize;
         } finally {
