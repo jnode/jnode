@@ -1,5 +1,5 @@
 /* java.beans.Introspector
-   Copyright (C) 1998, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,15 +35,15 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.beans;
 
 import gnu.java.beans.BeanInfoEmbryo;
 import gnu.java.beans.ExplicitBeanInfo;
 import gnu.java.beans.IntrospectionIncubator;
-import gnu.java.lang.ClassHelper;
-
 import java.util.Hashtable;
 import java.util.Vector;
+import gnu.java.lang.ClassHelper;
 
 /**
  * Introspector is the class that does the bulk of the
@@ -175,304 +175,399 @@ import java.util.Vector;
  * @see java.beans.BeanInfo
  */
 public class Introspector {
+  
+  public static final int USE_ALL_BEANINFO = 1;
+  public static final int IGNORE_IMMEDIATE_BEANINFO = 2;
+  public static final int IGNORE_ALL_BEANINFO = 3;
 
-	public static final int USE_ALL_BEANINFO = 1;
-	public static final int IGNORE_IMMEDIATE_BEANINFO = 2;
-	public static final int IGNORE_ALL_BEANINFO = 3;
+  static String[] beanInfoSearchPath = {"gnu.java.beans.info"};
+  static Hashtable beanInfoCache = new Hashtable();
+  
+  private Introspector() {}
+  
+  /** 
+   * Get the BeanInfo for class <CODE>beanClass</CODE>,
+   * first by looking for explicit information, next by
+   * using standard design patterns to determine
+   * information about the class.
+   *
+   * @param beanClass the class to get BeanInfo about.
+   * @return the BeanInfo object representing the class.
+   */
+  public static BeanInfo getBeanInfo(Class beanClass) 
+    throws IntrospectionException 
+  {
+    BeanInfo cachedInfo;
+    synchronized(beanClass) 
+      {
+	cachedInfo = (BeanInfo)beanInfoCache.get(beanClass);
+	if(cachedInfo != null) 
+	  {
+	    return cachedInfo;
+	  }
+	cachedInfo = getBeanInfo(beanClass,null);
+	beanInfoCache.put(beanClass,cachedInfo);
+	return cachedInfo;
+      }
+  }
 
-	static String[] beanInfoSearchPath = { "gnu.java.beans.info" };
-	static Hashtable beanInfoCache = new Hashtable();
+  /**
+   * Flush all of the Introspector's internal caches.
+   *
+   * @since 1.2
+   */
+  public static void flushCaches()
+  {
+    beanInfoCache.clear();
+  }
 
-	private Introspector() {
+  /**
+   * Flush the Introspector's internal cached information for a given
+   * class.
+   *
+   * @param clz the class to be flushed.
+   * @throws NullPointerException if clz is null.
+   * @since 1.2
+   */
+  public static void flushFromCaches(Class clz)
+  {
+    synchronized (clz)
+      {
+	beanInfoCache.remove(clz);
+      }
+  }
+
+  /** 
+   * Get the BeanInfo for class <CODE>beanClass</CODE>,
+   * first by looking for explicit information, next by
+   * using standard design patterns to determine
+   * information about the class.  It crawls up the
+   * inheritance tree until it hits <CODE>topClass</CODE>.
+   *
+   * @param beanClass the Bean class.
+   * @param stopClass the class to stop at.
+   * @return the BeanInfo object representing the class.
+   */
+  public static BeanInfo getBeanInfo(Class beanClass, Class stopClass) 
+    throws IntrospectionException 
+  {
+    ExplicitInfo explicit = new ExplicitInfo(beanClass,stopClass);
+    
+    IntrospectionIncubator ii = new IntrospectionIncubator();
+    ii.setPropertyStopClass(explicit.propertyStopClass);
+    ii.setEventStopClass(explicit.eventStopClass);
+    ii.setMethodStopClass(explicit.methodStopClass);
+    ii.addMethods(beanClass.getMethods());
+    
+    BeanInfoEmbryo currentInfo = ii.getBeanInfoEmbryo();
+    PropertyDescriptor[] p = explicit.explicitPropertyDescriptors;
+    if(p!=null) 
+      {
+	for(int i=0;i<p.length;i++) 
+	  {
+	    if(!currentInfo.hasProperty(p[i])) 
+	      {
+		currentInfo.addProperty(p[i]);
+	      }
+	  }
+	if(explicit.defaultProperty != -1) 
+	  {
+	    currentInfo.setDefaultPropertyName(p[explicit.defaultProperty].getName());
+	  }
+      }
+    EventSetDescriptor[] e = explicit.explicitEventSetDescriptors;
+    if(e!=null) 
+      {
+	for(int i=0;i<e.length;i++) 
+	  {
+	    if(!currentInfo.hasEvent(e[i])) 
+	      {
+		currentInfo.addEvent(e[i]);
+	      }
+	  }
+	if(explicit.defaultEvent != -1) 
+	  {
+	    currentInfo.setDefaultEventName(e[explicit.defaultEvent].getName());
+	  }
+      }
+    MethodDescriptor[] m = explicit.explicitMethodDescriptors;
+    if(m!=null) 
+      {
+	for(int i=0;i<m.length;i++) 
+	  {
+	    if(!currentInfo.hasMethod(m[i])) 
+	      {
+		currentInfo.addMethod(m[i]);
+	      }
+	  }
+      }
+    
+    if(explicit.explicitBeanDescriptor != null) 
+      {
+	currentInfo.setBeanDescriptor(new BeanDescriptor(beanClass,explicit.explicitBeanDescriptor.getCustomizerClass()));
+      } 
+    else 
+      {
+	currentInfo.setBeanDescriptor(new BeanDescriptor(beanClass,null));
+      }
+    
+    currentInfo.setAdditionalBeanInfo(explicit.explicitBeanInfo);
+    currentInfo.setIcons(explicit.im);
+    
+    return currentInfo.getBeanInfo();
+  }
+  
+  /** 
+   * Get the search path for BeanInfo classes.
+   *
+   * @return the BeanInfo search path.
+   */
+  public static String[] getBeanInfoSearchPath() 
+  {
+    return beanInfoSearchPath;
+  }
+  
+  /** 
+   * Set the search path for BeanInfo classes.
+   * @param beanInfoSearchPath the new BeanInfo search
+   *        path.
+   */
+  public static void setBeanInfoSearchPath(String[] beanInfoSearchPath) 
+  {
+    Introspector.beanInfoSearchPath = beanInfoSearchPath;
+  }
+  
+  /** 
+   * A helper method to convert a name to standard Java
+   * naming conventions: anything with two capitals as the
+   * first two letters remains the same, otherwise the
+   * first letter is decapitalized.  URL = URL, I = i,
+   * MyMethod = myMethod.
+   *
+   * @param name the name to decapitalize.
+   * @return the decapitalized name.
+   */
+  public static String decapitalize(String name) 
+  {
+    try 
+      {
+      if(!Character.isUpperCase(name.charAt(0))) 
+	{
+	  return name;
+	} 
+      else 
+	{
+	try 
+	  {
+	  if(Character.isUpperCase(name.charAt(1))) 
+	    {
+	      return name;
+	    } 
+	  else 
+	    {
+	      char[] c = name.toCharArray();
+	      c[0] = Character.toLowerCase(c[0]);
+	      return new String(c);
+	    }
+	  } 
+	catch(StringIndexOutOfBoundsException E) 
+	  {
+	    char[] c = new char[1];
+	    c[0] = Character.toLowerCase(name.charAt(0));
+	    return new String(c);
+	  }
 	}
-
-	/** 
-	 * Get the BeanInfo for class <CODE>beanClass</CODE>,
-	 * first by looking for explicit information, next by
-	 * using standard design patterns to determine
-	 * information about the class.
-	 *
-	 * @param beanClass the class to get BeanInfo about.
-	 * @return the BeanInfo object representing the class.
-	 */
-	public static BeanInfo getBeanInfo(Class beanClass) throws IntrospectionException {
-		BeanInfo cachedInfo;
-		synchronized (beanClass) {
-			cachedInfo = (BeanInfo) beanInfoCache.get(beanClass);
-			if (cachedInfo != null) {
-				return cachedInfo;
-			}
-			cachedInfo = getBeanInfo(beanClass, null);
-			beanInfoCache.put(beanClass, cachedInfo);
-			return cachedInfo;
-		}
-	}
-
-	/**
-	 * Flush all of the Introspector's internal caches.
-	 *
-	 * @since 1.2
-	 */
-	public static void flushCaches() {
-		beanInfoCache.clear();
-	}
-
-	/**
-	 * Flush the Introspector's internal cached information for a given
-	 * class.
-	 *
-	 * @param clz the class to be flushed.
-	 * @throws NullPointerException if clz is null.
-	 * @since 1.2
-	 */
-	public static void flushFromCaches(Class clz) {
-		synchronized (clz) {
-			beanInfoCache.remove(clz);
-		}
-	}
-
-	/** 
-	 * Get the BeanInfo for class <CODE>beanClass</CODE>,
-	 * first by looking for explicit information, next by
-	 * using standard design patterns to determine
-	 * information about the class.  It crawls up the
-	 * inheritance tree until it hits <CODE>topClass</CODE>.
-	 *
-	 * @param beanClass the Bean class.
-	 * @param stopClass the class to stop at.
-	 * @return the BeanInfo object representing the class.
-	 */
-	public static BeanInfo getBeanInfo(Class beanClass, Class stopClass) throws IntrospectionException {
-		ExplicitInfo explicit = new ExplicitInfo(beanClass, stopClass);
-
-		IntrospectionIncubator ii = new IntrospectionIncubator();
-		ii.setPropertyStopClass(explicit.propertyStopClass);
-		ii.setEventStopClass(explicit.eventStopClass);
-		ii.setMethodStopClass(explicit.methodStopClass);
-		ii.addMethods(beanClass.getMethods());
-
-		BeanInfoEmbryo currentInfo = ii.getBeanInfoEmbryo();
-		PropertyDescriptor[] p = explicit.explicitPropertyDescriptors;
-		if (p != null) {
-			for (int i = 0; i < p.length; i++) {
-				if (!currentInfo.hasProperty(p[i])) {
-					currentInfo.addProperty(p[i]);
-				}
-			}
-			if (explicit.defaultProperty != -1) {
-				currentInfo.setDefaultPropertyName(p[explicit.defaultProperty].getName());
-			}
-		}
-		EventSetDescriptor[] e = explicit.explicitEventSetDescriptors;
-		if (e != null) {
-			for (int i = 0; i < e.length; i++) {
-				if (!currentInfo.hasEvent(e[i])) {
-					currentInfo.addEvent(e[i]);
-				}
-			}
-			if (explicit.defaultEvent != -1) {
-				currentInfo.setDefaultEventName(e[explicit.defaultEvent].getName());
-			}
-		}
-		MethodDescriptor[] m = explicit.explicitMethodDescriptors;
-		if (m != null) {
-			for (int i = 0; i < m.length; i++) {
-				if (!currentInfo.hasMethod(m[i])) {
-					currentInfo.addMethod(m[i]);
-				}
-			}
-		}
-
-		if (explicit.explicitBeanDescriptor != null) {
-			currentInfo.setBeanDescriptor(new BeanDescriptor(beanClass, explicit.explicitBeanDescriptor.getCustomizerClass()));
-		} else {
-			currentInfo.setBeanDescriptor(new BeanDescriptor(beanClass, null));
-		}
-
-		currentInfo.setAdditionalBeanInfo(explicit.explicitBeanInfo);
-		currentInfo.setIcons(explicit.im);
-
-		return currentInfo.getBeanInfo();
-	}
-
-	/** 
-	 * Get the search path for BeanInfo classes.
-	 *
-	 * @return the BeanInfo search path.
-	 */
-	public static String[] getBeanInfoSearchPath() {
-		return beanInfoSearchPath;
-	}
-
-	/** 
-	 * Set the search path for BeanInfo classes.
-	 * @param beanInfoSearchPath the new BeanInfo search
-	 *        path.
-	 */
-	public static void setBeanInfoSearchPath(String[] beanInfoSearchPath) {
-		Introspector.beanInfoSearchPath = beanInfoSearchPath;
-	}
-
-	/** 
-	 * A helper method to convert a name to standard Java
-	 * naming conventions: anything with two capitals as the
-	 * first two letters remains the same, otherwise the
-	 * first letter is decapitalized.  URL = URL, I = i,
-	 * MyMethod = myMethod.
-	 *
-	 * @param name the name to decapitalize.
-	 * @return the decapitalized name.
-	 */
-	public static String decapitalize(String name) {
-		try {
-			if (!Character.isUpperCase(name.charAt(0))) {
-				return name;
-			} else {
-				try {
-					if (Character.isUpperCase(name.charAt(1))) {
-						return name;
-					} else {
-						char[] c = name.toCharArray();
-						c[0] = Character.toLowerCase(c[0]);
-						return new String(c);
-					}
-				} catch (StringIndexOutOfBoundsException E) {
-					char[] c = new char[1];
-					c[0] = Character.toLowerCase(name.charAt(0));
-					return new String(c);
-				}
-			}
-		} catch (StringIndexOutOfBoundsException E) {
-			return name;
-		} catch (NullPointerException E) {
-			return null;
-		}
-	}
-
-	static BeanInfo copyBeanInfo(BeanInfo b) {
-		java.awt.Image[] icons = new java.awt.Image[4];
-		for (int i = 1; i <= 4; i++) {
-			icons[i - 1] = b.getIcon(i);
-		}
-		return new ExplicitBeanInfo(
-			b.getBeanDescriptor(),
-			b.getAdditionalBeanInfo(),
-			b.getPropertyDescriptors(),
-			b.getDefaultPropertyIndex(),
-			b.getEventSetDescriptors(),
-			b.getDefaultEventIndex(),
-			b.getMethodDescriptors(),
-			icons);
-	}
+      } 
+    catch(StringIndexOutOfBoundsException E) 
+      {
+	return name;
+      } 
+    catch(NullPointerException E) 
+      {
+	return null;
+      }
+  }
+  
+  static BeanInfo copyBeanInfo(BeanInfo b) 
+  {
+    java.awt.Image[] icons = new java.awt.Image[4];
+    for(int i=1;i<=4;i++) 
+      {
+	icons[i-1] = b.getIcon(i);
+      }
+    return new ExplicitBeanInfo(b.getBeanDescriptor(),
+				b.getAdditionalBeanInfo(),
+				b.getPropertyDescriptors(),
+				b.getDefaultPropertyIndex(),
+				b.getEventSetDescriptors(),
+				b.getDefaultEventIndex(),
+				b.getMethodDescriptors(),icons);
+  }
 }
 
-class ExplicitInfo {
-	BeanDescriptor explicitBeanDescriptor;
-	BeanInfo[] explicitBeanInfo;
+class ExplicitInfo 
+{
+  BeanDescriptor explicitBeanDescriptor;
+  BeanInfo[] explicitBeanInfo;
+  
+  PropertyDescriptor[] explicitPropertyDescriptors;
+  EventSetDescriptor[] explicitEventSetDescriptors;
+  MethodDescriptor[] explicitMethodDescriptors;
+  
+  int defaultProperty;
+  int defaultEvent;
+  
+  java.awt.Image[] im = new java.awt.Image[4];
+  
+  Class propertyStopClass;
+  Class eventStopClass;
+  Class methodStopClass;
+  
+  ExplicitInfo(Class beanClass, Class stopClass) 
+  {
+    while(beanClass != null && !beanClass.equals(stopClass)) 
+      {
+	BeanInfo explicit = findExplicitBeanInfo(beanClass);
+	if(explicit != null) 
+	  {
+	    if(explicitBeanDescriptor == null) 
+	      {
+		explicitBeanDescriptor = explicit.getBeanDescriptor();
+	      }
+	    if(explicitBeanInfo == null) 
+	      {
+		explicitBeanInfo = explicit.getAdditionalBeanInfo();
+	      }
+	    if(explicitPropertyDescriptors == null) 
+	      {
+		if(explicit.getPropertyDescriptors() != null) 
+		  {
+		    explicitPropertyDescriptors = explicit.getPropertyDescriptors();
+		    defaultProperty = explicit.getDefaultPropertyIndex();
+		    propertyStopClass = beanClass;
+		  }
+	      }
+	    if(explicitEventSetDescriptors == null) 
+	      {
+		if(explicit.getEventSetDescriptors() != null) 
+		  {
+		    explicitEventSetDescriptors = explicit.getEventSetDescriptors();
+		    defaultEvent = explicit.getDefaultEventIndex();
+		    eventStopClass = beanClass;
+		  }
+	      }
+	    if(explicitMethodDescriptors == null) 
+	      {
+		if(explicit.getMethodDescriptors() != null) 
+		  {
+		    explicitMethodDescriptors = explicit.getMethodDescriptors();
+		    methodStopClass = beanClass;
+		  }
+	      }
+	    if(im[0] == null && im[1] == null 
+	       && im[2] == null && im[3] == null) 
+	      {
+		im[0] = explicit.getIcon(0);
+		im[1] = explicit.getIcon(1);
+		im[2] = explicit.getIcon(2);
+		im[3] = explicit.getIcon(3);
+	      }
+	  }
+	beanClass = beanClass.getSuperclass();
+      }
+    if(propertyStopClass == null) 
+      {
+	propertyStopClass = stopClass;
+      }
+    if(eventStopClass == null) 
+      {
+	eventStopClass = stopClass;
+      }
+    if(methodStopClass == null) 
+      {
+	methodStopClass = stopClass;
+      }
+  }
+  
+  static Hashtable explicitBeanInfos = new Hashtable();
+  static Vector emptyBeanInfos = new Vector();
+  
+  static BeanInfo findExplicitBeanInfo(Class beanClass) 
+  {
+    BeanInfo retval = (BeanInfo)explicitBeanInfos.get(beanClass);
+    if(retval != null) 
+      {
+	return retval;
+      } 
+    else if(emptyBeanInfos.indexOf(beanClass) != -1) 
+      {
+	return null;
+      } 
+    else 
+      {
+	retval = reallyFindExplicitBeanInfo(beanClass);
+	if(retval != null) 
+	  {
+	    explicitBeanInfos.put(beanClass,retval);
+	  } 
+	else 
+	  {
+	    emptyBeanInfos.addElement(beanClass);
+	  }
+	return retval;
+      }
+  }
+  
+  static BeanInfo reallyFindExplicitBeanInfo(Class beanClass) 
+  {
+    ClassLoader beanClassLoader = beanClass.getClassLoader();
+    BeanInfo beanInfo;
 
-	PropertyDescriptor[] explicitPropertyDescriptors;
-	EventSetDescriptor[] explicitEventSetDescriptors;
-	MethodDescriptor[] explicitMethodDescriptors;
+    beanInfo = getBeanInfo(beanClassLoader, beanClass.getName() + "BeanInfo");
+    if (beanInfo == null)
+      {
+	String newName;
+	newName = ClassHelper.getTruncatedClassName(beanClass) + "BeanInfo";
 
-	int defaultProperty;
-	int defaultEvent;
+	for(int i = 0; i < Introspector.beanInfoSearchPath.length; i++) 
+	  {
+	    if (Introspector.beanInfoSearchPath[i].equals("")) 
+	      beanInfo = getBeanInfo(beanClassLoader, newName);
+	    else 
+	      beanInfo = getBeanInfo(beanClassLoader,
+				     Introspector.beanInfoSearchPath[i] + "."
+				     + newName);
 
-	java.awt.Image[] im = new java.awt.Image[4];
+	    if (beanInfo != null)
+	      return beanInfo;
+	  } 
+      }
 
-	Class propertyStopClass;
-	Class eventStopClass;
-	Class methodStopClass;
+    return beanInfo;
+  }
 
-	ExplicitInfo(Class beanClass, Class stopClass) {
-		while (beanClass != null && !beanClass.equals(stopClass)) {
-			BeanInfo explicit = findExplicitBeanInfo(beanClass);
-			if (explicit != null) {
-				if (explicitBeanDescriptor == null) {
-					explicitBeanDescriptor = explicit.getBeanDescriptor();
-				}
-				if (explicitBeanInfo == null) {
-					explicitBeanInfo = explicit.getAdditionalBeanInfo();
-				}
-				if (explicitPropertyDescriptors == null) {
-					if (explicit.getPropertyDescriptors() != null) {
-						explicitPropertyDescriptors = explicit.getPropertyDescriptors();
-						defaultProperty = explicit.getDefaultPropertyIndex();
-						propertyStopClass = beanClass;
-					}
-				}
-				if (explicitEventSetDescriptors == null) {
-					if (explicit.getEventSetDescriptors() != null) {
-						explicitEventSetDescriptors = explicit.getEventSetDescriptors();
-						defaultEvent = explicit.getDefaultEventIndex();
-						eventStopClass = beanClass;
-					}
-				}
-				if (explicitMethodDescriptors == null) {
-					if (explicit.getMethodDescriptors() != null) {
-						explicitMethodDescriptors = explicit.getMethodDescriptors();
-						methodStopClass = beanClass;
-					}
-				}
-				if (im[0] == null && im[1] == null && im[2] == null && im[3] == null) {
-					im[0] = explicit.getIcon(0);
-					im[1] = explicit.getIcon(1);
-					im[2] = explicit.getIcon(2);
-					im[3] = explicit.getIcon(3);
-				}
-			}
-			beanClass = beanClass.getSuperclass();
-		}
-		if (propertyStopClass == null) {
-			propertyStopClass = stopClass;
-		}
-		if (eventStopClass == null) {
-			eventStopClass = stopClass;
-		}
-		if (methodStopClass == null) {
-			methodStopClass = stopClass;
-		}
-	}
-
-	static Hashtable explicitBeanInfos = new Hashtable();
-	static Vector emptyBeanInfos = new Vector();
-
-	static BeanInfo findExplicitBeanInfo(Class beanClass) {
-		BeanInfo retval = (BeanInfo) explicitBeanInfos.get(beanClass);
-		if (retval != null) {
-			return retval;
-		} else if (emptyBeanInfos.indexOf(beanClass) != -1) {
-			return null;
-		} else {
-			retval = reallyFindExplicitBeanInfo(beanClass);
-			if (retval != null) {
-				explicitBeanInfos.put(beanClass, retval);
-			} else {
-				emptyBeanInfos.addElement(beanClass);
-			}
-			return retval;
-		}
-	}
-
-	static BeanInfo reallyFindExplicitBeanInfo(Class beanClass) {
-		try {
-			try {
-				return (BeanInfo) Class.forName(beanClass.getName() + "BeanInfo").newInstance();
-			} catch (ClassNotFoundException E) {
-			}
-			String newName = ClassHelper.getTruncatedClassName(beanClass) + "BeanInfo";
-			for (int i = 0; i < Introspector.beanInfoSearchPath.length; i++) {
-				try {
-					if (Introspector.beanInfoSearchPath[i].equals("")) {
-						return (BeanInfo) Class.forName(newName).newInstance();
-					} else {
-						return (BeanInfo) Class.forName(Introspector.beanInfoSearchPath[i] + "." + newName).newInstance();
-					}
-				} catch (ClassNotFoundException E) {
-				}
-			}
-		} catch (IllegalAccessException E) {
-		} catch (InstantiationException E) {
-		}
-		return null;
-	}
+  /**
+   * Returns an instance of the given class name when it can be loaded
+   * through the given class loader, or null otherwise.
+   */
+  private static BeanInfo getBeanInfo(ClassLoader cl, String infoName)
+  {
+    try
+      {
+	return (BeanInfo) Class.forName(infoName, true, cl).newInstance();
+      }
+    catch (ClassNotFoundException cnfe)
+      {
+	return null;
+      }
+    catch (IllegalAccessException iae)
+      {
+	return null;
+      }
+    catch (InstantiationException ie)
+      {
+	return null;
+      }
+  }
+  
 }

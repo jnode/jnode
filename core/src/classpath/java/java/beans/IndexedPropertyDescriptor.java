@@ -1,5 +1,5 @@
 /* java.beans.IndexedPropertyDescriptor
-   Copyright (C) 1998 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -34,6 +34,7 @@ or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
+
 
 package java.beans;
 
@@ -114,7 +115,7 @@ public class IndexedPropertyDescriptor extends PropertyDescriptor {
 		String capitalized;
 		try {
 			capitalized = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-		} catch (StringIndexOutOfBoundsException e) {
+		} catch(StringIndexOutOfBoundsException e) {
 			capitalized = "";
 		}
 		findMethods(beanClass, "get" + capitalized, "set" + capitalized, "get" + capitalized, "set" + capitalized);
@@ -149,8 +150,7 @@ public class IndexedPropertyDescriptor extends PropertyDescriptor {
 	 ** @param setIndexName the name of the set index method.
 	 ** @exception IntrospectionException if the methods are not found or invalid.
 	 **/
-	public IndexedPropertyDescriptor(String name, Class beanClass, String getMethodName, String setMethodName, String getIndexName, String setIndexName)
-		throws IntrospectionException {
+	public IndexedPropertyDescriptor(String name, Class beanClass, String getMethodName, String setMethodName, String getIndexName, String setIndexName) throws IntrospectionException {
 		super(name);
 		findMethods(beanClass, getMethodName, setMethodName, getIndexName, setIndexName);
 	}
@@ -170,58 +170,55 @@ public class IndexedPropertyDescriptor extends PropertyDescriptor {
 	 **/
 	public IndexedPropertyDescriptor(String name, Method getMethod, Method setMethod, Method getIndex, Method setIndex) throws IntrospectionException {
 		super(name);
-		if (getMethod != null && getMethod.getParameterTypes().length > 0) {
+		if(getMethod != null && getMethod.getParameterTypes().length > 0) {
 			throw new IntrospectionException("get method has parameters");
 		}
-		if (getMethod != null && setMethod.getParameterTypes().length != 1) {
+		if(getMethod != null && setMethod.getParameterTypes().length != 1) {
 			throw new IntrospectionException("set method does not have exactly one parameter");
 		}
-		if (getMethod != null && setMethod != null) {
-			if (!getMethod.getReturnType().equals(setMethod.getParameterTypes()[0])) {
+		if(getMethod != null && setMethod != null) {
+			if(!getMethod.getReturnType().equals(setMethod.getParameterTypes()[0])) {
 				throw new IntrospectionException("set and get methods do not share the same type");
 			}
-			if (!getMethod.getDeclaringClass().isAssignableFrom(setMethod.getDeclaringClass())
-				&& !setMethod.getDeclaringClass().isAssignableFrom(getMethod.getDeclaringClass())) {
+			if(!getMethod.getDeclaringClass().isAssignableFrom(setMethod.getDeclaringClass())
+			   && !setMethod.getDeclaringClass().isAssignableFrom(getMethod.getDeclaringClass())) {
 				throw new IntrospectionException("set and get methods are not in the same class.");
 			}
 		}
 
-		if (getIndex != null && (getIndex.getParameterTypes().length != 1 || !(getIndex.getParameterTypes()[0]).equals(java.lang.Integer.TYPE))) {
+		if(getIndex != null && (getIndex.getParameterTypes().length != 1
+		   || !(getIndex.getParameterTypes()[0]).equals(java.lang.Integer.TYPE))) {
 			throw new IntrospectionException("get index method has wrong parameters");
 		}
-		if (setIndex != null && (setIndex.getParameterTypes().length != 2 || !(setIndex.getParameterTypes()[0]).equals(java.lang.Integer.TYPE))) {
+		if(setIndex != null && (setIndex.getParameterTypes().length != 2
+		   || !(setIndex.getParameterTypes()[0]).equals(java.lang.Integer.TYPE))) {
 			throw new IntrospectionException("set index method has wrong parameters");
 		}
-		if (getIndex != null && setIndex != null) {
-			if (!getIndex.getReturnType().equals(setIndex.getParameterTypes()[1])) {
+		if(getIndex != null && setIndex != null) {
+			if(!getIndex.getReturnType().equals(setIndex.getParameterTypes()[1])) {
 				throw new IntrospectionException("set index methods do not share the same type");
 			}
-			if (!getIndex.getDeclaringClass().isAssignableFrom(setIndex.getDeclaringClass())
-				&& !setIndex.getDeclaringClass().isAssignableFrom(getIndex.getDeclaringClass())) {
+			if(!getIndex.getDeclaringClass().isAssignableFrom(setIndex.getDeclaringClass())
+			   && !setIndex.getDeclaringClass().isAssignableFrom(getIndex.getDeclaringClass())) {
 				throw new IntrospectionException("get and set index methods are not in the same class.");
 			}
 		}
 
-		if (getIndex != null
-			&& getMethod != null
-			&& !getIndex.getDeclaringClass().isAssignableFrom(getMethod.getDeclaringClass())
-			&& !getMethod.getDeclaringClass().isAssignableFrom(getIndex.getDeclaringClass())) {
+		if(getIndex != null && getMethod != null && !getIndex.getDeclaringClass().isAssignableFrom(getMethod.getDeclaringClass())
+		   && !getMethod.getDeclaringClass().isAssignableFrom(getIndex.getDeclaringClass())) {
 			throw new IntrospectionException("methods are not in the same class.");
 		}
 
-		if (getIndex != null && getMethod != null && !Array.newInstance(getIndex.getReturnType(), 0).getClass().equals(getMethod.getReturnType())) {
+		if(getIndex != null && getMethod != null && !Array.newInstance(getIndex.getReturnType(),0).getClass().equals(getMethod.getReturnType())) {
 			throw new IntrospectionException("array methods do not match index methods.");
 		}
 
 		this.getMethod = getMethod;
 		this.setMethod = setMethod;
 		this.getIndex = getIndex;
-		this.setIndex = getIndex;
+		this.setIndex = setIndex;
 		this.indexedPropertyType = getIndex != null ? getIndex.getReturnType() : setIndex.getParameterTypes()[1];
-		this.propertyType =
-			getMethod != null
-				? getMethod.getReturnType()
-				: (setMethod != null ? setMethod.getParameterTypes()[0] : Array.newInstance(this.indexedPropertyType, 0).getClass());
+		this.propertyType = getMethod != null ? getMethod.getReturnType() : (setMethod != null ? setMethod.getParameterTypes()[0] : Array.newInstance(this.indexedPropertyType,0).getClass());
 	}
 
 	public Class getIndexedPropertyType() {
@@ -236,40 +233,39 @@ public class IndexedPropertyDescriptor extends PropertyDescriptor {
 		return setIndex;
 	}
 
-	private void findMethods(Class beanClass, String getMethodName, String setMethodName, String getIndexName, String setIndexName)
-		throws IntrospectionException {
+	private void findMethods(Class beanClass, String getMethodName, String setMethodName, String getIndexName, String setIndexName) throws IntrospectionException {
 		try {
-			if (getIndexName != null) {
+			if(getIndexName != null) {
 				try {
 					Class[] getArgs = new Class[1];
 					getArgs[0] = java.lang.Integer.TYPE;
-					getIndex = beanClass.getMethod(getIndexName, getArgs);
+					getIndex = beanClass.getMethod(getIndexName,getArgs);
 					indexedPropertyType = getIndex.getReturnType();
-				} catch (NoSuchMethodException E) {
+				} catch(NoSuchMethodException E) {
 				}
 			}
-			if (getIndex != null) {
-				if (setIndexName != null) {
+			if(getIndex != null) {
+				if(setIndexName != null) {
 					try {
 						Class[] setArgs = new Class[2];
 						setArgs[0] = java.lang.Integer.TYPE;
 						setArgs[1] = indexedPropertyType;
-						setIndex = beanClass.getMethod(setIndexName, setArgs);
-						if (!setIndex.getReturnType().equals(java.lang.Void.TYPE)) {
+						setIndex = beanClass.getMethod(setIndexName,setArgs);
+						if(!setIndex.getReturnType().equals(java.lang.Void.TYPE)) {
 							throw new IntrospectionException(setIndexName + " has non-void return type");
 						}
-					} catch (NoSuchMethodException E) {
+					} catch(NoSuchMethodException E) {
 					}
 				}
-			} else if (setIndexName != null) {
+			} else if(setIndexName != null) {
 				Method[] m = beanClass.getMethods();
-				for (int i = 0; i < m.length; i++) {
+				for(int i=0;i<m.length;i++) {
 					Method current = m[i];
-					if (current.getName().equals(setIndexName)
-						&& current.getParameterTypes().length == 2
-						&& (current.getParameterTypes()[0]).equals(java.lang.Integer.TYPE)
-						&& current.getReturnType().equals(java.lang.Void.TYPE)) {
-						if (setIndex != null) {
+					if(current.getName().equals(setIndexName)
+					   && current.getParameterTypes().length == 2
+					   && (current.getParameterTypes()[0]).equals(java.lang.Integer.TYPE)
+					   && current.getReturnType().equals(java.lang.Void.TYPE)) {
+						if(setIndex != null) {
 							throw new IntrospectionException("Multiple, different set methods found that fit the bill!");
 						} else {
 							setIndex = current;
@@ -277,34 +273,34 @@ public class IndexedPropertyDescriptor extends PropertyDescriptor {
 						}
 					}
 				}
-				if (setIndex == null) {
+				if(setIndex == null) {
 					throw new IntrospectionException("Cannot find get or set methods.");
 				}
 			} else {
 				throw new IntrospectionException("Cannot find get or set methods.");
 			}
 
-			Class arrayType = Array.newInstance(indexedPropertyType, 0).getClass();
+			Class arrayType = Array.newInstance(indexedPropertyType,0).getClass();
 
 			Class[] setArgs = new Class[1];
 			setArgs[0] = arrayType;
 			try {
-				setMethod = beanClass.getMethod(setMethodName, setArgs);
-				if (!setMethod.getReturnType().equals(java.lang.Void.TYPE)) {
+				setMethod = beanClass.getMethod(setMethodName,setArgs);
+				if(!setMethod.getReturnType().equals(java.lang.Void.TYPE)) {
 					setMethod = null;
 				}
-			} catch (NoSuchMethodException E) {
+			} catch(NoSuchMethodException E) {
 			}
 
 			Class[] getArgs = new Class[0];
 			try {
-				getMethod = beanClass.getMethod(getMethodName, getArgs);
-				if (!getMethod.getReturnType().equals(arrayType)) {
+				getMethod = beanClass.getMethod(getMethodName,getArgs);
+				if(!getMethod.getReturnType().equals(arrayType)) {
 					getMethod = null;
 				}
-			} catch (NoSuchMethodException E) {
+			} catch(NoSuchMethodException E) {
 			}
-		} catch (SecurityException E) {
+		} catch(SecurityException E) {
 			throw new IntrospectionException("SecurityException while trying to find methods.");
 		}
 	}

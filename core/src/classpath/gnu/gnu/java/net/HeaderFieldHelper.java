@@ -1,5 +1,5 @@
 /* HeaderFieldHelper.java -- Helps manage headers fields 
-   Copyright (C) 1998 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,96 +38,101 @@ exception statement from your version. */
 
 package gnu.java.net;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 /**
-  * This class manages header field keys and values.
-  *
-  * @author Aaron M. Renn (arenn@urbanophile.com)
-  */
+ * This class manages header field keys and values.
+ *
+ * @author Aaron M. Renn <arenn@urbanophile.com>
+ */
 public class HeaderFieldHelper
 {
+  private Vector headerFieldKeys;
+  private Vector headerFieldValues;
 
-/*
- * Instance Variables
- */
+  public HeaderFieldHelper()
+  {
+    this (10);
+  }
 
-private Vector headerFieldKeys;
-private Vector headerFieldValues;
+  public HeaderFieldHelper (int size)
+  {
+    headerFieldKeys = new Vector (size);
+    headerFieldValues = new Vector (size);
+  }
 
-/*************************************************************************/
+  public void addHeaderField (String key, String value)
+  {
+    headerFieldKeys.addElement (key);
+    headerFieldValues.addElement (value);
+  }
 
-/*
- * Constructors
- */
+  public String getHeaderFieldKeyByIndex (int index)
+  {
+    String key = null;
 
-public 
-HeaderFieldHelper()
-{
-  this(10);
-}
+    try
+      {
+        key = (String) headerFieldKeys.elementAt (index);
+      }
+    catch (ArrayIndexOutOfBoundsException e)
+      {
+      }
 
-/*************************************************************************/
+    return key;
+  }
 
-public
-HeaderFieldHelper(int size)
-{
-  headerFieldKeys = new Vector(size);
-  headerFieldValues = new Vector(size);
-}
+  public String getHeaderFieldValueByIndex(int index)
+  {
+    String value = null;
 
-/*************************************************************************/
+    try
+      {
+        value = (String) headerFieldValues.elementAt (index);
+      }
+    catch (ArrayIndexOutOfBoundsException e)
+      {
+      }
 
-/*
- * Instance Variables
- */
+    return value;
+  }
 
-public void
-addHeaderField(String key, String value)
-{
-  headerFieldKeys.addElement(key);
-  headerFieldValues.addElement(value);
-}
+  public String getHeaderFieldValueByKey(String key)
+  {
+    String value = null;
 
-/*************************************************************************/
+    try
+      {
+	value = (String) headerFieldValues.elementAt
+			   (headerFieldKeys.indexOf(key));
+      }
+    catch (ArrayIndexOutOfBoundsException e)
+      {
+      }
+    
+    return value;
+  }
 
-public String
-getHeaderFieldKeyByIndex(int index)
-{
-  String key = null;
+  public Map getHeaderFields()
+  {
+    HashMap headers = new HashMap();
+    int max = headerFieldKeys.size();
 
-  try
-    {
-      key = (String)headerFieldKeys.elementAt(index);
-    }
-  catch(ArrayIndexOutOfBoundsException e) {  }
+    for (int index = 0; index < max; index++)
+      {
+	headers.put(headerFieldKeys.elementAt(index),
+		    headerFieldValues.elementAt(index));
+      }
 
-  return(key);
-}
+    return headers;
+  }
 
-/*************************************************************************/
-
-public String
-getHeaderFieldValueByIndex(int index)
-{
-  String value = null;
-
-  try
-    {
-      value = (String)headerFieldValues.elementAt(index);
-    }
-  catch(ArrayIndexOutOfBoundsException e) {  }
-
-  return(value);
-}
-
-/*************************************************************************/
-
-public int
-getNumberOfEntries()
-{
-  return(headerFieldKeys.size());
-}
+  public int getNumberOfEntries()
+  {
+    return headerFieldKeys.size();
+  }
 
 } // class HeaderFieldHelper
 

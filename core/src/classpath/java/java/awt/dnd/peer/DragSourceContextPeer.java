@@ -42,14 +42,16 @@ import java.awt.Cursor;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.dnd.DragSourceContext;
+import java.awt.dnd.InvalidDnDOperationException;
 
 /**
  * STUBBED
  */
 public interface DragSourceContextPeer
 {
-  void startDrag(DragSourceContext context, Cursor c, Image i, Point p);
+  void startDrag(DragSourceContext context, Cursor c, Image i, Point p)
+    throws InvalidDnDOperationException;
   Cursor getCursor();
-  void setCursor(Cursor c);
+  void setCursor(Cursor c) throws InvalidDnDOperationException;
   void transferablesFlavorsChanged();
 } // interface DragSourceContextPeer
