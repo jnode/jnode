@@ -6,8 +6,8 @@ package org.jnode.vm.x86.compiler.l1a;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
+import org.jnode.vm.JvmType;
 import org.jnode.vm.classmgr.VmConstString;
-import org.jnode.vm.x86.compiler.*;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 
@@ -47,7 +47,7 @@ final class RefItem extends WordItem implements X86CompilerConstants {
      * @return
      */
     VmConstString getValue() {
-        myAssert(getKind() == Kind.CONSTANT);
+        assertCondition(getKind() == Kind.CONSTANT, "kind == Kind.CONSTANT");
         return value;
     }
 

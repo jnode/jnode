@@ -23,6 +23,16 @@ public abstract class CompilerBytecodeVisitor extends BytecodeVisitor {
 	public abstract void endBasicBlock();
 	
 	/**
+	 * A try block is about to start
+	 */
+	public abstract void startTryBlock();
+	
+	/**
+	 * A try block has finished
+	 */
+	public abstract void endTryBlock();
+	
+	/**
 	 * Emit a yieldpoint.
 	 */
 	public abstract void yieldPoint();

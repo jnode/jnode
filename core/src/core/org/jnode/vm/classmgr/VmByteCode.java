@@ -30,7 +30,7 @@ public final class VmByteCode extends AbstractCode {
 	/** Is this object in use bye a method? If so, no modifications are allowed. */
 	//private boolean locked;
 	/** Data used by the native code compilers */
-	private Object compilerData;
+	private transient Object compilerData;
 	
 	/**
 	 * Create a new instance

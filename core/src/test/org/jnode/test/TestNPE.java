@@ -19,5 +19,12 @@ public class TestNPE {
 //			System.out.println("catch of NPE: OK! (" + ex + ")");
 		//}
 	}
+	
+	public void test() {
+	    if (System.currentTimeMillis() > 100) {
+	        throw new RuntimeException();
+	    }
+	    System.out.println("Hoi");
+	}
 
 }

@@ -34,11 +34,19 @@ public class CompilerBytecodeViewer extends InlineBytecodeVisitor {
     }
     
     /**
-     * @see org.jnode.vm.compiler.InlineBytecodeVisitor#startInlinedMethod(VmMethod, int)
+     * @see org.jnode.vm.compiler.InlineBytecodeVisitor#startInlinedMethodHeader(VmMethod, int)
      */
-    public void startInlinedMethod(VmMethod inlinedMethod, int newMaxLocals) {
+    public void startInlinedMethodHeader(VmMethod inlinedMethod, int newMaxLocals) {
         viewer.indent();
-        viewer.out("-- start of inlined method " + inlinedMethod.getName() + ", #locals " + inlinedMethod.getBytecode().getNoLocals() + ", #newlocals " + newMaxLocals);
+        viewer.out("-- start of inlined method header " + inlinedMethod.getName() + ", #locals " + inlinedMethod.getBytecode().getNoLocals() + ", #newlocals " + newMaxLocals);
+    }
+    
+    /**
+     * @see org.jnode.vm.compiler.InlineBytecodeVisitor#startInlinedMethodCode(VmMethod, int)
+     */
+    public void startInlinedMethodCode(VmMethod inlinedMethod, int newMaxLocals) {
+        viewer.indent();
+        viewer.out("-- start of inlined method code " + inlinedMethod.getName() + ", #locals " + inlinedMethod.getBytecode().getNoLocals() + ", #newlocals " + newMaxLocals);
     }
     
     /**
@@ -55,6 +63,20 @@ public class CompilerBytecodeViewer extends InlineBytecodeVisitor {
         viewer.out("-- start of basic block");
     }
     
+	/**
+	 * A try block is about to start
+	 */
+	public void startTryBlock() {
+	    viewer.out("-- start of try block");
+	}
+	
+	/**
+	 * A try block has finished
+	 */
+	public void endTryBlock() {
+	    viewer.out("-- end of try block");
+	}
+	
     /**
      * @see org.jnode.vm.compiler.CompilerBytecodeVisitor#yieldPoint()
      */

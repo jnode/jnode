@@ -18,6 +18,7 @@ import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmReflection;
 import org.jnode.vm.VmSystemClassLoader;
 import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.compiler.CompileError;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 
 public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
@@ -688,16 +689,15 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 
     /**
      * Determines if the class or interface represented by this Class object is
-     * either the same as, or is a superclass or superinterface of, the class
-     * or interface represented by the specified Class parameter. It returns
-     * true if so; otherwise it returns false. If this Class object represents
-     * a primitive type, this method returns true if the specified Class
-     * parameter is exactly this Class object; otherwise it returns false.
-     * Specifically, this method tests whether the type represented by the
-     * specified Class parameter can be converted to the type represented by
-     * this Class object via an identity conversion or via a widening reference
-     * conversion. See The Java Language Specification, sections 5.1.1 and
-     * 5.1.4, for details.
+     * either the same as, or is a superclass or superinterface of, the class or
+     * interface represented by the specified Class parameter. It returns true
+     * if so; otherwise it returns false. If this Class object represents a
+     * primitive type, this method returns true if the specified Class parameter
+     * is exactly this Class object; otherwise it returns false. Specifically,
+     * this method tests whether the type represented by the specified Class
+     * parameter can be converted to the type represented by this Class object
+     * via an identity conversion or via a widening reference conversion. See
+     * The Java Language Specification, sections 5.1.1 and 5.1.4, for details.
      * 
      * @param S
      * @return boolean
@@ -1049,8 +1049,8 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
     }
 
     /**
-     * Find the field within the given class (or super-classes) that matches
-     * the given fieldRef.
+     * Find the field within the given class (or super-classes) that matches the
+     * given fieldRef.
      * 
      * @param fieldRef
      * @return The field
@@ -1128,9 +1128,9 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
     }
 
     /**
-     * Search for an synthetic abstract class, that is not in this class, but
-     * is a method of one of the implemented interfaces. Synthetic abstract
-     * methods are added when the VMT is created.
+     * Search for an synthetic abstract class, that is not in this class, but is
+     * a method of one of the implemented interfaces. Synthetic abstract methods
+     * are added when the VMT is created.
      * 
      * @param name
      * @param signature
@@ -1178,7 +1178,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
             }
         }
 
-        if ((superClass != null) && (!declaredOnly)) { 
+        if ((superClass != null) && (!declaredOnly)) {
         // Look in the superclass
         return superClass.getMethod(name, argTypes, false); }
 
@@ -1199,8 +1199,8 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
     }
 
     /**
-     * Find the method within the given class and its super-classes that has
-     * the given name and list of argument types.
+     * Find the method within the given class and its super-classes that has the
+     * given name and list of argument types.
      * 
      * @param name
      * @param argTypes
@@ -1460,7 +1460,8 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
                     state |= VmTypeState.ST_INVALID;
                     state &= ~VmTypeState.ST_COMPILING;
                     errorMsg = ex.toString();
-                    final LinkageError le = new LinkageError("Failed to compile " + name);
+                    final LinkageError le = new LinkageError(
+                            "Failed to compile " + name);
                     le.initCause(ex);
                     throw le;
                 }
@@ -1550,7 +1551,8 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
     }
 
     /**
-     * Fill the given hashset with all interface implemented by the given type C.
+     * Fill the given hashset with all interface implemented by the given type
+     * C.
      * 
      * @param all
      *            A HashSet of VmInterfaceClass instances.
@@ -1640,11 +1642,16 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
                 final int count = mt.length;
                 for (int i = 0; i < count; i++) {
                     final VmMethod method = mt[ i];
-                    //if (optLevel > method.getNativeCodeOptLevel()) {
-                    compiler.compileBootstrap(method, os, optLevel);
-                    rc++;
-                    //method.setModifier(true, Modifier.ACC_COMPILED);
-                    //}
+                    try {
+                        //if (optLevel > method.getNativeCodeOptLevel()) {
+                        compiler.compileBootstrap(method, os, optLevel);
+                        rc++;
+                        //method.setModifier(true, Modifier.ACC_COMPILED);
+                        //}
+                    } catch (Throwable ex) {
+                        throw new CompileError("Compile of " + method
+                                + " failed", ex);
+                    }
                 }
             }
             state |= VmTypeState.ST_COMPILED;
@@ -1881,8 +1888,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
         /**
          * @param o1
          * @param o2
-         * @see java.util.Comparator#compare(java.lang.Object,
-         *      java.lang.Object)
+         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
          * @return int
          */
         public int compare(Object o1, Object o2) {
@@ -1944,5 +1950,5 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
      */
     public final ProtectionDomain getProtectionDomain() {
         return protectionDomain;
-    } 
+    }
 }

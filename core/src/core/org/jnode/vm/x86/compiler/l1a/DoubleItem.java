@@ -5,7 +5,7 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
-import org.jnode.vm.x86.compiler.JvmType;
+import org.jnode.vm.JvmType;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
@@ -31,6 +31,15 @@ final class DoubleItem extends DoubleWordItem implements X86CompilerConstants  {
 	 */
 	final int getType() { return JvmType.DOUBLE; }
 	
+    /**
+     * Gets the constant value.
+     * @return
+     */
+    double getValue() {
+        assertCondition(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
+        return value;
+    }
+
     /**
      * Load my constant to the given os.
      * @param os

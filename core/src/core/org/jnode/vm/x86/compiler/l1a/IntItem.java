@@ -5,7 +5,7 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
-import org.jnode.vm.x86.compiler.*;
+import org.jnode.vm.JvmType;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
@@ -33,7 +33,7 @@ final class IntItem extends WordItem implements X86CompilerConstants {
     }
 
     int getValue() {
-        myAssert(kind == Kind.CONSTANT);
+        assertCondition(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
         return value;
     }
 

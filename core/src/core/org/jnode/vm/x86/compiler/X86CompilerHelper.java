@@ -7,6 +7,7 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
 import org.jnode.assembler.x86.X86Constants;
+import org.jnode.vm.*;
 import org.jnode.vm.Address;
 import org.jnode.vm.PragmaPrivilegedAction;
 import org.jnode.vm.Unsafe;
@@ -321,6 +322,14 @@ public class X86CompilerHelper implements X86CompilerConstants {
             if (!cls.isInitialized()) { return true; }
         }
         return false;
+    }
+    
+    /**
+     * Do we need a write barrier
+     * @return
+     */
+    public final boolean needsWriteBarrier() {
+        return (context.getWriteBarrier() != null);
     }
 
     /**

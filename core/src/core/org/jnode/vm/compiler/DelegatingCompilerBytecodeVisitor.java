@@ -28,6 +28,20 @@ public class DelegatingCompilerBytecodeVisitor extends CompilerBytecodeVisitor {
         return delegate;
     }
     
+	/**
+	 * A try block is about to start
+	 */
+	public void startTryBlock() {
+	    delegate.startTryBlock();
+	}
+	
+	/**
+	 * A try block has finished
+	 */
+	public void endTryBlock() {
+	    delegate.endTryBlock();
+	}
+	
     /**
      * 
      */
