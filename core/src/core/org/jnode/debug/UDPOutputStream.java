@@ -9,6 +9,9 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -45,10 +48,18 @@ public class UDPOutputStream extends OutputStream {
 	 * @throws NullPointerException
 	 * @throws IndexOutOfBoundsException
 	 */
-	public void write(byte[] b, int off, int len) throws IOException, NullPointerException, IndexOutOfBoundsException {
-		final DatagramPacket p = new DatagramPacket(b, off, len);
-		p.setSocketAddress(address);
-		socket.send(p);
+	public void write(final byte[] b, final int off, final int len) throws IOException, NullPointerException, IndexOutOfBoundsException {
+	    try {
+	    AccessController.doPrivileged(new PrivilegedExceptionAction() {
+	        public Object run() throws IOException {
+	    		final DatagramPacket p = new DatagramPacket(b, off, len);
+	    		p.setSocketAddress(address);
+	    		socket.send(p);
+	    		return null;
+	            }});
+	    } catch (PrivilegedActionException ex) {
+	        throw new IOException(ex.getException());
+	    }
 	}
 
 	/**

@@ -31,7 +31,7 @@ public class UDPReceiver {
 	
 	public void run() 
 	throws IOException {
-		final byte[] buf = new byte[4096];
+		final byte[] buf = new byte[2*4096];
 		final DatagramPacket p = new DatagramPacket(buf, buf.length);
 		while (true) {
 			socket.receive(p);
