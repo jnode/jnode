@@ -33,6 +33,7 @@ import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.assembler.x86.X86Register.CRX;
+import org.jnode.assembler.x86.X86Register.SR;
 import org.jnode.vm.CpuID;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.x86.X86CpuID;
@@ -1243,6 +1244,14 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeJCC(Label label, int jumpOpcode);
 
+    /**
+     * Create a conditional jump to a label. 
+     *
+     * @param label
+     */
+    public abstract void writeJECXZ(Label label);
+
+
 	/**
 	 * Create a absolute jump to address in register
 	 * 
@@ -1364,9 +1373,43 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeMOV(CRX dstReg, GPR srcReg);
 
+    /**
+	 * Create a mov <dstReg>, <srcReg>
+	 *
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public abstract void writeMOV(GPR dstReg, SR srcReg);
+
+    /**
+	 * Create a mov <dstReg>, <srcReg>
+	 *
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public abstract void writeMOV(SR dstReg, GPR srcReg);
+
+    /**
+	 * Create a mov dstReg, [srcReg+srcDisp]
+	 *
+	 * @param dstReg
+	 * @param srcReg
+	 * @param srcDisp
+	 */
+//	public abstract void writeMOV(SR dstReg, GPR srcReg, int srcDisp);
+
+    /**
+	 * Create a mov [dstReg+dstDisp], <srcReg>
+	 *
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param srcReg
+	 */
+//	public abstract void writeMOV(GPR dstReg, int dstDisp, SR srcReg);
+
 	/**
 	 * Create a mov <dstReg>, <srcReg>
-	 * 
+	 *
 	 * @param operandSize
 	 * @param dstReg
 	 * @param srcReg
@@ -1674,6 +1717,13 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writePOP(GPR dstReg);
 
+    /**
+	 * Create a pop sreg
+	 *
+	 * @param dstReg
+	 */
+	public abstract void writePOP(SR dstReg);
+
 	/**
 	 * Create a pop dword [reg32+disp]
 	 * 
@@ -1708,6 +1758,14 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @return The ofset of the start of the instruction.
 	 */
 	public abstract int writePUSH(GPR srcReg);
+
+    /**
+	 * Create a push sreg
+	 *
+	 * @param srcReg
+	 * @return The ofset of the start of the instruction.
+	 */
+	public abstract int writePUSH(SR srcReg);
 
 	/**
 	 * Create a push dword [baseReg+indexReg*scale+disp]

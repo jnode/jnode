@@ -32,7 +32,7 @@ import org.jnode.util.BootableHashMap;
  */
 public class X86Register extends VmSystemObject implements X86Constants {
 
-    //Register map, it should stand in front of any register constant !!!
+    //Register map, it should stand ahead of any register constant !!!
 
     private static final BootableHashMap registerMap = new BootableHashMap();
 
@@ -135,6 +135,19 @@ public class X86Register extends VmSystemObject implements X86Constants {
     public static final GPR32 R14d = new GPR32("r14d", 14, true);
 
     public static final GPR32 R15d = new GPR32("r15d", 15, true);
+
+    /*Segment registers*/
+    public static final SR ES = new SR("es", 0);
+
+    public static final SR CS = new SR("cs", 1);
+
+    public static final SR SS = new SR("ss", 2);
+
+    public static final SR DS = new SR("ds", 3);
+
+    public static final SR FS = new SR("fs", 4);
+
+    public static final SR GS = new SR("gs", 5);
 
     /*Control registers*/
     public static final CRX CR0 = new CRX("cr0", 0);
@@ -418,6 +431,16 @@ public class X86Register extends VmSystemObject implements X86Constants {
          */
         public CRX(String name, int nr) {
             super(name, X86Constants.BITS32, nr, false);
+        }
+    }
+
+    public static final class SR extends X86Register {
+        /**
+         * @param name
+         * @param nr
+         */
+        public SR(String name, int nr) {
+            super(name, X86Constants.BITS16, nr, false);
         }
     }
 }
