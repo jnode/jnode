@@ -68,7 +68,9 @@ public class BOOTPServer {
 				XMLElement child = (XMLElement) children.get(i);
 				try {
 					table.put(child.getStringAttribute("ethernetAddress"), new TableEntry(child));
-				} catch(IllegalArgumentException ex) {}
+				} catch(IllegalArgumentException ex) {
+					log.debug("Invalid IP address", ex);
+				}
 			}
 		} finally {
 			reader.close();
@@ -99,6 +101,7 @@ public class BOOTPServer {
 	}
 
 	private void processRequest(DatagramPacket packet) throws IOException {
+		log.debug("Received packet: "+packet.getAddress()+":"+packet.getPort()+" "+new String(packet.getData()));
 		BOOTPHeader hdr = new BOOTPHeader(packet);
 		if (hdr.getOpcode() != BOOTPHeader.BOOTREQUEST) {
 			// Not a request
