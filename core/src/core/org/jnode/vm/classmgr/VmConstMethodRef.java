@@ -48,7 +48,7 @@ public class VmConstMethodRef extends VmConstMemberRef {
 	 */
 	public VmMethod getResolvedVmMethod() {
 		if (vmMethod == null) {
-			throw new RuntimeException("vmMethod is not yet resolved");
+			throw new NotResolvedYetException("vmMethod is not yet resolved");
 		} else {
 			return vmMethod;
 		}
