@@ -28,6 +28,10 @@ final class VirtualStack {
 	int TOS() {
 		return tos;
 	}
+
+	boolean isEmpty() {
+		return (tos == 0);
+	}
 	
 	/**
 	 * Increase stack size
@@ -87,8 +91,12 @@ final class VirtualStack {
 	}
 
 	void pushItem(Item item) {
+		if ((item.getType() == Item.STACK) && (tos > 0))
+			Item.myAssert(stack[tos-1].getType() == Item.STACK);
+
 		if (tos == stack.length) 
 			growStack();
+
 		stack[tos++] = item;		
 	}
 	

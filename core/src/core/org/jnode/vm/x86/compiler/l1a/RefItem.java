@@ -61,7 +61,7 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 				break;
 				
 			case CONSTANT:
-				notImplemented();
+				os.writeMOV_Const(reg, value);
 				break;
 				
 			case FREGISTER:
