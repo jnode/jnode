@@ -71,7 +71,7 @@ public class Ext2Entry implements FSEntry{
 	/**
 	 * @see org.jnode.fs.FSEntry#getLastModified()
 	 */
-	public long getLastModified() throws IOException {
+	public long getLastModified() {
 		return 0;
 	}
 

@@ -16,7 +16,7 @@ public class INodeTable {
 	Ext2FileSystem fs;
 	int firstBlock;
 	
-	public INodeTable(Ext2FileSystem fs, int firstBlock) throws IOException {
+	public INodeTable(Ext2FileSystem fs, int firstBlock) {
 		this.fs = fs;
 		this.firstBlock = firstBlock;
 		blockSize=fs.getSuperblock().getBlockSize();

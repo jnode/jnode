@@ -9,5 +9,5 @@ package org.jnode.fs.ext2;
  * @author Andras Nagy
  */
 public interface FSBitmap {
-
+// empty
 }

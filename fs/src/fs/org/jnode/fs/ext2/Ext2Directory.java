@@ -55,7 +55,7 @@ public class Ext2Directory implements FSDirectory {
 	/**
 	 * @see org.jnode.fs.FSDirectory#getEntry(String)
 	 */
-	public FSEntry getEntry(String name) throws IOException {
+	public FSEntry getEntry(String name) {
 		//parse the directory and search for the file
 		Iterator iterator=iterator();
 		while(iterator.hasNext()) {
@@ -170,7 +170,7 @@ public class Ext2Directory implements FSDirectory {
 	/**
 	 * @see org.jnode.fs.FSDirectory#iterator()
 	 */
-	public Iterator iterator() throws IOException {
+	public Iterator iterator() {
 		Ext2Debugger.debug("Ext2Directory.Iterator()",2);
 		return new FSEntryIterator(iNode);				
 	}
