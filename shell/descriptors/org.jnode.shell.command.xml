@@ -36,6 +36,7 @@
         <alias name="test" class="org.jnode.shell.command.TestCommand"/>
         <alias name="thread" class="org.jnode.shell.command.ThreadCommand"/>
         <alias name="bsh" class="org.jnode.shell.command.BeanshellCommand"/>
+	    <alias name="loadkeys" class="org.jnode.shell.command.LoadkeysCommand"/>
     </extension>
 
 </plugin>
