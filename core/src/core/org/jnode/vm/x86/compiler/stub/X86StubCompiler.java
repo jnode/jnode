@@ -72,13 +72,11 @@ public class X86StubCompiler extends AbstractX86Compiler {
             os.writePUSH(declClass.getStaticsIndex());
             os.writePUSH(declClass.indexOf(method));
             final int recompileStatOfs = ih.getStaticsOffset(context.getRecompileMethod());
-            os.writeMOV(ih.ADDRSIZE, ih.AAX, ih.STATICS, recompileStatOfs);
-            os.writeCALL(ih.AAX, context.getVmMethodNativeCodeField().getOffset());
+            os.writeCALL(ih.STATICS, recompileStatOfs);
             
             // Emit jump to the newly compiled code.
             final int methodStatOfs = ih.getStaticsOffset(method);
-            os.writeMOV(ih.ADDRSIZE, ih.AAX, ih.STATICS, methodStatOfs);
-            os.writeJMP(ih.AAX, context.getVmMethodNativeCodeField().getOffset());
+            os.writeJMP(ih.STATICS, methodStatOfs);
 
 			// Close the "object"
 			objectInfo.markEnd();
