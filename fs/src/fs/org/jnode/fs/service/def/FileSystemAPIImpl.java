@@ -197,6 +197,15 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	}
 
 	/**
+	 * When the filesystem is unregistered, the entries belonging to that filesystem are removed 
+	 * from the entry cache.
+	 */
+	public void rootRemoved(File root) {
+		entryCache.removeEntries(root);
+	}
+
+	
+	/**
 	 * Gets an array of names of all entries of the given directory. All names
 	 * are relative to the given directory.
 	 * 
