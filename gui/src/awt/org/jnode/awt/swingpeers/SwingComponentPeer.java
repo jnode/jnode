@@ -18,6 +18,7 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.EventQueue;
 import java.awt.Rectangle;
+import java.awt.Frame;
 import java.awt.event.PaintEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.image.ColorModel;
@@ -164,6 +165,9 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
 	}
 
     private Point computeLocationOnScreen(Component component) {
+//        if(component instanceof Frame)
+//            return component.getLocationOnScreen();
+
         Container parent = component.getParent();
         if(parent == null)
             return component.getLocation();
@@ -281,10 +285,10 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
 		// Note that Window derived classes can also request
 		// focus, but are not traversable to focus.
 		if (oldFocusPeer != null && oldFocusPeer.isFocusTraversable()) {
-			oldFocusPeer.paintAWTComponent();
+//			oldFocusPeer.paintAWTComponent();
 		}
 		if (isFocusTraversable()) {
-			paintAWTComponent();
+//			paintAWTComponent();
 		}
     }
 
