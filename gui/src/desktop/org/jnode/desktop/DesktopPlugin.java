@@ -3,6 +3,7 @@
  */
 package org.jnode.desktop;
 
+import org.jnode.plugin.ExtensionPoint;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
@@ -19,6 +20,14 @@ public class DesktopPlugin extends Plugin {
 		super(descriptor);
 	}
 
+	/**
+	 * Gets the applications (apps) extensions point
+	 * @return
+	 */
+	public ExtensionPoint getAppsExtensionPoint() {
+		return getDescriptor().getExtensionPoint("apps");
+	}
+	
 	/**
 	 * @see org.jnode.plugin.Plugin#startPlugin()
 	 */

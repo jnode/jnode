@@ -45,8 +45,9 @@ public class MouseHandler implements PointerListener {
 	private final Dimension screenSize;
 
 	private Component lastSource;
-	
+
 	private int x;
+
 	private int y;
 
 	/**
@@ -136,62 +137,92 @@ public class MouseHandler implements PointerListener {
 		/* Must have been a drag or move. */
 		if (!eventFired) {
 			if (buttonState[0]) {
-				postEvent(lastSource, MouseEvent.MOUSE_DRAGGED, MouseEvent.BUTTON1);
+				postEvent(lastSource, MouseEvent.MOUSE_DRAGGED,
+						MouseEvent.BUTTON1);
 			} else if (buttonState[1]) {
-				postEvent(lastSource, MouseEvent.MOUSE_DRAGGED, MouseEvent.BUTTON2);
+				postEvent(lastSource, MouseEvent.MOUSE_DRAGGED,
+						MouseEvent.BUTTON2);
 			} else if (buttonState[2]) {
-				postEvent(lastSource, MouseEvent.MOUSE_DRAGGED, MouseEvent.BUTTON3);
+				postEvent(lastSource, MouseEvent.MOUSE_DRAGGED,
+						MouseEvent.BUTTON3);
 			} else {
-				postEvent(lastSource, MouseEvent.MOUSE_MOVED, MouseEvent.NOBUTTON);
+				final Component c = findSource();
+				if (c != lastSource) {
+					if (lastSource != null) {
+						// Notify mouse exited
+						postEvent(lastSource, MouseEvent.MOUSE_EXITED,
+								MouseEvent.NOBUTTON);
+					}
+					if (c != null) {
+						// Notify mouse entered
+						postEvent(c, MouseEvent.MOUSE_ENTERED,
+								MouseEvent.NOBUTTON);
+					}
+				}
+				postEvent(c, MouseEvent.MOUSE_MOVED, MouseEvent.NOBUTTON);
 			}
 		}
 	}
 
 	/**
 	 * Post a mouse event with the given id and button.
+	 * 
 	 * @param id
 	 * @param button
 	 * @return The source component used to send the event to.
 	 */
 	private Component postEvent(Component source, int id, int button) {
 		if (source == null) {
-			final JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
-			source = tk.getTopComponentAt(x, y);
+			source = findSource();
 		}
-		//log.debug("Source: " + source.getClass().getName());
-		//TODO full support for modifiers
+		// log.debug("Source: " + source.getClass().getName());
+		// TODO full support for modifiers
 		if (source.isShowing()) {
-            Window w = (Window) SwingUtilities.getAncestorOfClass(Window.class, source);
-            Point pw = new Point(-1,-1);
-            Point pwo = pw;
-            if(w != null){
-//                pw = w.getLocation();
-                pwo = w.getLocationOnScreen();
-            }
+			final Window w = (Window) SwingUtilities.getAncestorOfClass(Window.class,
+					source);
+			Point pw = new Point(-1, -1);
+			Point pwo = pw;
+			if (w != null) {
+				// pw = w.getLocation();
+				pwo = w.getLocationOnScreen();
+			}
 			final Point p = source.getLocationOnScreen();
 			final boolean popupTrigger = (button == MouseEvent.BUTTON2);
-			
+
 			final int ex = x - p.x - pwo.x;
 			final int ey = y - p.y - pwo.y;
 			final int modifiers = buttonToModifiers(button);
-			
-			final MouseEvent me = new MouseEvent(source, id, System.currentTimeMillis(),
-					modifiers, ex, ey, 1, popupTrigger, button);
 
-            if (id == MouseEvent.MOUSE_CLICKED) {
-//				log.info("MouseClicked to " + source + " at " + ex + "," + ey + " ("+x+","+y+")("+p.x+","+p.y+")("+pw.x+","+pw.y+")("+pwo.x+","+pwo.y+")");
+			final MouseEvent me = new MouseEvent(source, id, System
+					.currentTimeMillis(), modifiers, ex, ey, 1, popupTrigger,
+					button);
+
+			if (id == MouseEvent.MOUSE_CLICKED) {
+				log.info("MouseClicked to " + source + " at " + ex + "," + ey
+						+ " (" + x + "," + y + ")(" + p.x + "," + p.y + ")("
+						+ pw.x + "," + pw.y + ")(" + pwo.x + "," + pwo.y + ")");
 			}
 
 			JNodeGenericPeer.eventQueue.postEvent(me);
-//			if (id == MouseEvent.MOUSE_CLICKED) {
-//				log.info("MouseClicked to " + source + " at " + ex + "," + ey);
-//			}
-//		} else {
-//			log.info("NO MouseEvent, " + source + " not visible");
+			// if (id == MouseEvent.MOUSE_CLICKED) {
+			// log.info("MouseClicked to " + source + " at " + ex + "," + ey);
+			// }
+			// } else {
+			// log.info("NO MouseEvent, " + source + " not visible");
 		}
 		return source;
 	}
-	
+
+	private final Component findSource() {
+		final JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
+		Component source = tk.getTopComponentAt(x, y);
+		if ((source != null) && source.isShowing()) {
+			return source;
+		} else {
+			return null;
+		}
+	}
+
 	private final int buttonToModifiers(int button) {
 		switch (button) {
 		case MouseEvent.BUTTON1:
