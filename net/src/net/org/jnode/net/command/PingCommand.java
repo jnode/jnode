@@ -86,12 +86,14 @@ public class PingCommand implements ICMPListener{
 				if (time > tthis.interval){
 					tthis.wait = false;
 				}
+				Thread.sleep(500);
 			}
 			tthis.count--;
 			seq_count++;
 		}
 		
 		while (!Request.isEmpty()){
+			Thread.sleep(100);
 		}
 		icmpProtocol.removeListener(tthis);
 		
