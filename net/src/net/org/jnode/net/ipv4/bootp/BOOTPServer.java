@@ -67,7 +67,7 @@ public class BOOTPServer {
 			for(int i=0; i<children.size(); i++) {
 				XMLElement child = (XMLElement) children.get(i);
 				try {
-					table.put(child.getStringAttribute("ethernetAddress"), new TableEntry(child));
+					table.put(child.getStringAttribute("ethernetAddress").toUpperCase(), new TableEntry(child));
 				} catch(IllegalArgumentException ex) {
 					log.debug("Invalid IP address", ex);
 				}
@@ -101,7 +101,7 @@ public class BOOTPServer {
 	}
 
 	private void processRequest(DatagramPacket packet) throws IOException {
-		log.debug("Received packet: "+packet.getAddress()+":"+packet.getPort()+" "+new String(packet.getData()));
+		log.debug("Received packet: "+packet.getAddress()+":"+packet.getPort()+" "+new String(packet.getData(), packet.getOffset(), packet.getLength()));
 		BOOTPHeader hdr = new BOOTPHeader(packet);
 		if (hdr.getOpcode() != BOOTPHeader.BOOTREQUEST) {
 			// Not a request
@@ -112,14 +112,16 @@ public class BOOTPServer {
 		log.debug("Got Your IP address    : " + hdr.getYourIPAddress());
 		log.debug("Got Server IP address  : " + hdr.getServerIPAddress());
 		log.debug("Got Gateway IP address : " + hdr.getGatewayIPAddress());
+		log.debug("Got Hardware address   : " + hdr.getClientHwAddress());
 
-		TableEntry entry = (TableEntry) table.get(hdr.getClientHwAddress().toString());
+		TableEntry entry = (TableEntry) table.get(hdr.getClientHwAddress().toString().toUpperCase());
 		if(entry == null) {
 			// no entry in table
+			log.debug("No match for hardware address found in table");
 			return;
 		}
 		Inet4Address yourIP = entry.address;
-		hdr = new BOOTPHeader(BOOTPHeader.BOOTREPLY, hdr.getTransactionID(), hdr.getClientIPAddress(), yourIP, (Inet4Address) InetAddress.getLocalHost(), hdr.getClientHwAddress());
+		hdr = new BOOTPHeader(BOOTPHeader.BOOTREPLY, hdr.getTransactionID(), hdr.getTimeElapsedSecs(), hdr.getClientIPAddress(), yourIP, (Inet4Address) InetAddress.getLocalHost(), hdr.getClientHwAddress());
 		hdr.setBootFileName(entry.bootFileName);
 		BOOTPMessage msg = new BOOTPMessage(hdr);
 		packet = msg.toDatagramPacket();

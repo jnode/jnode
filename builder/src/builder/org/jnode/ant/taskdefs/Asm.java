@@ -110,14 +110,14 @@ public class Asm extends MatchingTask {
 			File aFile = new File(srcdir, files[c]);
 
 			// get the path within the uriroot
-			String fileDirString = aFile.getParentFile().getCanonicalPath();
-			String rootDirString = srcdir.getCanonicalPath();
+			String fileDirString = aFile.getParentFile().toString();
+			String rootDirString = srcdir.toString();
 
 			int diff = fileDirString.compareTo(rootDirString);
 			String destSubDir = fileDirString.substring(fileDirString.length() - diff, fileDirString.length()).replace('\\', '/');
 
 			//				  log(destSubDir);
-			File fileDir = new File(destDir.getCanonicalPath() + destSubDir);
+			File fileDir = new File(destDir.toString() + destSubDir);
 
 			String objName = aFile.getName().substring(0, aFile.getName().indexOf(".asm")) + "." + ext;
 			File objFile = new File(fileDir, objName);
@@ -135,7 +135,7 @@ public class Asm extends MatchingTask {
 				}
 
 				compileMap.put(aFile, objFile);
-				log(aFile.getCanonicalPath(), Project.MSG_VERBOSE);
+				log(aFile.toString(), Project.MSG_VERBOSE);
 			}
 		}
 	}
@@ -159,7 +159,7 @@ public class Asm extends MatchingTask {
 		}
 
 		cmdLine.add("-o");
-		cmdLine.add(dstFile.getCanonicalPath());
+		cmdLine.add(dstFile.toString());
 
 		if (outputFormat != null) {
 			cmdLine.add("-f");
@@ -168,15 +168,15 @@ public class Asm extends MatchingTask {
 
 		if (listFile != null) {
 			cmdLine.add("-l");
-			cmdLine.add(listFile.getCanonicalPath());
+			cmdLine.add(listFile.toString());
 		}
 
 		for (Iterator i = includeDirs.iterator(); i.hasNext();) {
 			IncludeDir dir = (IncludeDir) i.next();
-			cmdLine.add("-I" + postFixSlash(dir.getDir().getCanonicalPath()));
+			cmdLine.add("-I" + postFixSlash(dir.getDir().toString()));
 		}
 
-		cmdLine.add(srcFile.getCanonicalPath());
+		cmdLine.add(srcFile.toString());
 
 		log("cmdLine=" + cmdLine, Project.MSG_VERBOSE);
 

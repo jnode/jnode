@@ -88,8 +88,8 @@ public class DHCPClient extends BOOTPClient
         byte[] serverID = msg
             .getOption(DHCPMessage.SERVER_IDENTIFIER_OPTION);
         byte[] requestedIP = hdr.getYourIPAddress().getAddress();
-        hdr = new BOOTPHeader(BOOTPHeader.BOOTREQUEST, transactionID, hdr
-            .getClientIPAddress(), hdr.getClientHwAddress());
+        hdr = new BOOTPHeader(BOOTPHeader.BOOTREQUEST, transactionID, 0,
+            hdr.getClientIPAddress(), hdr.getClientHwAddress());
         msg = new DHCPMessage(hdr, DHCPMessage.DHCPREQUEST);
         msg.setOption(DHCPMessage.REQUESTED_IP_ADDRESS_OPTION, requestedIP);
         msg.setOption(DHCPMessage.SERVER_IDENTIFIER_OPTION, serverID);
