@@ -175,19 +175,36 @@ go_user_cs:
 	add eax,BootImageBuilder_JUMP_MAIN_OFFSET
 	call eax
 
-	push eax
+	mov edx, eax	; Save return code in EDX
+	inc dword [jnodeFinished]
+
 	mov eax,after_vm_msg
 	call sys_print_str
-	pop eax
-	call sys_print_eax
-	mov eax,esp
-	call sys_print_eax
-	inc dword [jnodeFinished]
-	jmp _halt
+	
+	test edx,edx
+	jz _halt
+	
+	; Reset the system
+	mov bl,0xfe				; Reset system
+	call _kbcmd
 
 _halt:
+	cli
 	hlt
 	jmp _halt
+	
+; Send command in bl to keyboard controller
+_kbcmd:
+	in al, 0x64
+	test al, 0x02
+	jnz _kbcmd
+	mov al, bl
+	out 0x64, al
+_kbcmd_accept:	
+	in al, 0x64
+	test al, 0x02
+	jz _kbcmd_accept
+	ret
 
 no_multiboot_loader_msg: db 'No multiboot loader. halt...',0;
 before_sti_msg:          db 'Before STI',0xd,0xa,0

@@ -1619,4 +1619,6 @@ public interface RadeonConstants {
 
     public static final int GUI_ACTIVE = 0x80000000;
 
+    public static final byte[] BIOS_ROM_SIGNATURE = { 0x55, (byte)0xAA };
+    public static final byte[] ATI_ROM_SIGNATURE = { '7', '6', '1', '2', '9', '5', '5', '2', '0' };
 }

@@ -10,9 +10,14 @@ import java.io.PrintStream;
 import java.util.Locale;
 import java.util.Properties;
 
+import javax.naming.NameNotFoundException;
+
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.jnode.naming.InitialNaming;
+import org.jnode.plugin.PluginManager;
+import org.jnode.security.JNodePermission;
 import org.jnode.system.BootLog;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
@@ -63,6 +68,8 @@ public final class VmSystem {
     private static PrintStream out;
 
     private static final String LAYOUT = "%-5p [%c{1}]: %m%n";
+    private static boolean inShutdown = false;
+    private static int exitCode = 0;
 
     /**
      * Initialize the Virtual Machine
@@ -840,5 +847,39 @@ public final class VmSystem {
             dummy += 0.5f;
         }
         return count / 100000.0f;
+    }
+    
+    /**
+     * Is the system shutting down.
+     */
+    public static boolean isShuttingDown() {
+        return inShutdown;
+    }
+    
+    /**
+     * Gets the system exit code.
+     */
+    public static int getExitCode() {
+        return exitCode;
+    }
+    
+    /** 
+     * Halt the system.
+     * This method requires a JNodePermission("halt").
+     * @param reset
+     */
+    public static void halt(boolean reset) throws PragmaPrivilegedAction {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkPermission(new JNodePermission("halt"));
+        }
+        exitCode = (reset ? 1 : 0);
+        inShutdown = true;
+		try {
+			final PluginManager pm = (PluginManager)InitialNaming.lookup(PluginManager.NAME);
+			pm.stopPlugins();
+		} catch (NameNotFoundException ex) {
+			System.err.println("Cannot find ServiceManager");
+		}
     }
 }
