@@ -63,11 +63,11 @@ class SwingListPeer extends JList implements ListPeer {
 	}
 
 	public Dimension getPreferredSize(int rows) {
-		return null;
+		return getPreferredSize();
 	}
 
 	public Dimension getMinimumSize(int rows) {
-		return null;
+		return getMinimumSize();
 	}
 
 	// Deprecated
