@@ -1,39 +1,37 @@
-/* URL.java -- Uniform Resource Locator Class
- Copyright (C) 1998, 1999, 2000, 2002 Free Software Foundation, Inc.
-
- This file is part of GNU Classpath.
-
- GNU Classpath is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2, or (at your option)
- any later version.
- 
- GNU Classpath is distributed in the hope that it will be useful, but
- WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with GNU Classpath; see the file COPYING.  If not, write to the
- Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
- 02111-1307 USA.
-
- Linking this library statically or dynamically with other modules is
- making a combined work based on this library.  Thus, the terms and
- conditions of the GNU General Public License cover the whole
- combination.
-
- As a special exception, the copyright holders of this library give you
- permission to link this library with independent modules to produce an
- executable, regardless of the license terms of these independent
- modules, and to copy and distribute the resulting executable under
- terms of your choice, provided that you also meet, for each linked
- independent module, the terms and conditions of the license of that
- module.  An independent module is a module which is not derived from
- or based on this library.  If you modify this library, you may extend
- this exception to your version of the library, but you are not
- obligated to do so.  If you do not wish to do so, delete this
- exception statement from your version. */
+/*
+ * URL.java -- Uniform Resource Locator Class Copyright (C) 1998, 1999, 2000,
+ * 2002 Free Software Foundation, Inc.
+ * 
+ * This file is part of GNU Classpath.
+ * 
+ * GNU Classpath is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2, or (at your option) any later version.
+ * 
+ * GNU Classpath is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * GNU Classpath; see the file COPYING. If not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+ * 
+ * Linking this library statically or dynamically with other modules is making a
+ * combined work based on this library. Thus, the terms and conditions of the
+ * GNU General Public License cover the whole combination.
+ * 
+ * As a special exception, the copyright holders of this library give you
+ * permission to link this library with independent modules to produce an
+ * executable, regardless of the license terms of these independent modules, and
+ * to copy and distribute the resulting executable under terms of your choice,
+ * provided that you also meet, for each linked independent module, the terms
+ * and conditions of the license of that module. An independent module is a
+ * module which is not derived from or based on this library. If you modify this
+ * library, you may extend this exception to your version of the library, but
+ * you are not obligated to do so. If you do not wish to do so, delete this
+ * exception statement from your version.
+ */
 
 package java.net;
 
@@ -65,20 +63,20 @@ import java.util.StringTokenizer;
  * and "file". This object can handle any arbitrary URL for which a
  * URLStreamHandler object can be written. Default protocol handlers are
  * provided for the "http" and "ftp" protocols. Additional protocols handler
- * implementations may be provided in the future. In any case, an application
- * or applet can install its own protocol handlers that can be "chained" with
- * other protocol hanlders in the system to extend the base functionality
- * provided with this class. (Note, however, that unsigned applets cannot
- * access properties by default or install their own protocol handlers).
+ * implementations may be provided in the future. In any case, an application or
+ * applet can install its own protocol handlers that can be "chained" with other
+ * protocol hanlders in the system to extend the base functionality provided
+ * with this class. (Note, however, that unsigned applets cannot access
+ * properties by default or install their own protocol handlers).
  * <p>
  * This chaining is done via the system property java.protocol.handler.pkgs If
  * this property is set, it is assumed to be a "|" separated list of package
- * names in which to attempt locating protocol handlers. The protocol handler
- * is searched for by appending the string ". <protocol>.Handler" to each
- * packed in the list until a hander is found. If a protocol handler is not
- * found in this list of packages, or if the property does not exist, then the
- * default protocol handler of "gnu.java.net. <protocol>.Handler" is tried. If
- * this is unsuccessful, a MalformedURLException is thrown.
+ * names in which to attempt locating protocol handlers. The protocol handler is
+ * searched for by appending the string ". <protocol>.Handler" to each packed in
+ * the list until a hander is found. If a protocol handler is not found in this
+ * list of packages, or if the property does not exist, then the default
+ * protocol handler of "gnu.java.net. <protocol>.Handler" is tried. If this is
+ * unsuccessful, a MalformedURLException is thrown.
  * <p>
  * All of the constructor methods of URL attempt to load a protocol handler and
  * so any needed protocol handlers must be installed when the URL is
@@ -91,9 +89,11 @@ import java.util.StringTokenizer;
  * <p>
  * 
  * <pre>
- *  com.foo.news.Handler
- *  com.bar.news.Handler
- *  gnu.java.net.news.Handler
+ * 
+ *   com.foo.news.Handler
+ *   com.bar.news.Handler
+ *   gnu.java.net.news.Handler
+ *  
  * </pre>
  * 
  * <p>
@@ -110,9 +110,9 @@ import java.util.StringTokenizer;
  * certainly does not examine this property.
  * <p>
  * Please also note that an application can install its own factory for loading
- * protocol handlers (see setURLStreamHandlerFactory). If this is done, then
- * the above information is superseded and the behavior of this class in
- * loading protocol handlers is dependent on that factory.
+ * protocol handlers (see setURLStreamHandlerFactory). If this is done, then the
+ * above information is superseded and the behavior of this class in loading
+ * protocol handlers is dependent on that factory.
  * 
  * @author Aaron M. Renn (arenn@urbanophile.com)
  * @author Warren Levy <warrenl@cygnus.com>
@@ -303,8 +303,8 @@ public final class URL implements Serializable {
     }
 
     /**
-     * Constructs a URL and loads a protocol handler for the values passed in
-     * as arugments. Uses the default port for the protocol.
+     * Constructs a URL and loads a protocol handler for the values passed in as
+     * arugments. Uses the default port for the protocol.
      * 
      * @param protocol
      *            The protocol for this URL ("http", "ftp", etc)
@@ -390,28 +390,28 @@ public final class URL implements Serializable {
      * Initializes a URL from a complete string specification such as
      * "http://www.urbanophile.com/arenn/". First the protocol name is parsed
      * out of the string. Then a handler is located for that protocol and the
-     * parseURL() method of that protocol handler is used to parse the
-     * remaining fields.
+     * parseURL() method of that protocol handler is used to parse the remaining
+     * fields.
      * 
      * @param spec
      *            The complete String representation of a URL
      * 
      * @exception MalformedURLException
-     *                If a protocol handler cannot be found or the URL cannot
-     *                be parsed
+     *                If a protocol handler cannot be found or the URL cannot be
+     *                parsed
      */
     public URL(String spec) throws MalformedURLException {
         this((URL) null, spec, (URLStreamHandler) null);
     }
 
     /*
-     * This method parses a String representation of a URL within the context
-     * of an existing URL. Principally this means that any fields not present
-     * the URL are inheritied from the context URL. This allows relative URL's
-     * to be easily constructed. If the context argument is null, then a
-     * complete URL must be specified in the URL string. If the protocol parsed
-     * out of the URL is different from the context URL's protocol, then then
-     * URL String is also expected to be a complete URL.
+     * This method parses a String representation of a URL within the context of
+     * an existing URL. Principally this means that any fields not present the
+     * URL are inheritied from the context URL. This allows relative URL's to be
+     * easily constructed. If the context argument is null, then a complete URL
+     * must be specified in the URL string. If the protocol parsed out of the
+     * URL is different from the context URL's protocol, then then URL String is
+     * also expected to be a complete URL.
      * 
      * @param context The context on which to parse the specification @param
      * spec The string to parse an URL
@@ -426,17 +426,18 @@ public final class URL implements Serializable {
     /**
      * Creates an URL from given arguments This method parses a String
      * representation of a URL within the context of an existing URL.
-     * Principally this means that any fields not present the URL are
-     * inheritied from the context URL. This allows relative URL's to be easily
-     * constructed. If the context argument is null, then a complete URL must
-     * be specified in the URL string. If the protocol parsed out of the URL is
+     * Principally this means that any fields not present the URL are inheritied
+     * from the context URL. This allows relative URL's to be easily
+     * constructed. If the context argument is null, then a complete URL must be
+     * specified in the URL string. If the protocol parsed out of the URL is
      * different from the context URL's protocol, then then URL String is also
      * expected to be a complete URL.
      * <p>
-     * Additionally, this method allows the caller to specify a protocol
-     * handler to use instead of the default. If this handler is specified, the
-     * caller must have the "specifyStreamHandler" permission (see <code>NetPermission</code>)
-     * or a <code>SecurityException</code> will be thrown.
+     * Additionally, this method allows the caller to specify a protocol handler
+     * to use instead of the default. If this handler is specified, the caller
+     * must have the "specifyStreamHandler" permission (see
+     * <code>NetPermission</code>) or a <code>SecurityException</code> will
+     * be thrown.
      * 
      * @param context
      *            The context in which to parse the specification
@@ -446,8 +447,8 @@ public final class URL implements Serializable {
      *            The stream handler for the URL
      * 
      * @exception MalformedURLException
-     *                If a protocol handler cannot be found or the URL cannot
-     *                be parsed
+     *                If a protocol handler cannot be found or the URL cannot be
+     *                parsed
      * @exception SecurityException
      *                If the <code>SecurityManager</code> exists and does not
      *                allow the caller to specify its own protocol handler.
@@ -462,8 +463,8 @@ public final class URL implements Serializable {
          * 
          * If context is null, then spec must be an absolute URL.
          * 
-         * The relative URL need not specify all the components of a URL. If
-         * the protocol, host name, or port number is missing, the value is
+         * The relative URL need not specify all the components of a URL. If the
+         * protocol, host name, or port number is missing, the value is
          * inherited from the context. A bare file component is appended to the
          * context's file. The optional anchor is not inherited.
          */
@@ -534,10 +535,9 @@ public final class URL implements Serializable {
 
     /**
      * Test another URL for equality with this one. This will be true only if
-     * the argument is non-null and all of the fields in the URL's match
-     * exactly (ie, protocol, host, port, file, and ref). Overrides
-     * Object.equals(), implemented by calling the equals method of the
-     * handler.
+     * the argument is non-null and all of the fields in the URL's match exactly
+     * (ie, protocol, host, port, file, and ref). Overrides Object.equals(),
+     * implemented by calling the equals method of the handler.
      * 
      * @param obj
      *            The URL to compare with
@@ -682,9 +682,9 @@ public final class URL implements Serializable {
     }
 
     /**
-     * Returns a URLConnection object that represents a connection to the
-     * remote object referred to by the URL. The URLConnection is created by
-     * calling the openConnection() method of the protocol handler
+     * Returns a URLConnection object that represents a connection to the remote
+     * object referred to by the URL. The URLConnection is created by calling
+     * the openConnection() method of the protocol handler
      * 
      * @return A URLConnection for this URL
      * @exception IOException
@@ -707,9 +707,8 @@ public final class URL implements Serializable {
 
     /**
      * Tests whether or not another URL refers to the same "file" as this one.
-     * This will be true if and only if the passed object is not null, is a
-     * URL, and matches all fields but the ref (ie, protocol, host, port, and
-     * file);
+     * This will be true if and only if the passed object is not null, is a URL,
+     * and matches all fields but the ref (ie, protocol, host, port, and file);
      * 
      * @param other
      *            The URL object to test with
@@ -721,10 +720,10 @@ public final class URL implements Serializable {
     }
 
     /**
-     * Sets the specified fields of the URL. This is not a public method so
-     * that only URLStreamHandlers can modify URL fields. This might be called
-     * by the <code>parseURL()</code> method in that class. URLs are
-     * otherwise constant.
+     * Sets the specified fields of the URL. This is not a public method so that
+     * only URLStreamHandlers can modify URL fields. This might be called by the
+     * <code>parseURL()</code> method in that class. URLs are otherwise
+     * constant.
      * 
      * @param protocol
      *            The protocol name for this URL
@@ -754,8 +753,8 @@ public final class URL implements Serializable {
     }
 
     /**
-     * Sets the specified fields of the URL. This is not a public method so
-     * that only URLStreamHandlers can modify URL fields. URLs are otherwise
+     * Sets the specified fields of the URL. This is not a public method so that
+     * only URLStreamHandlers can modify URL fields. URLs are otherwise
      * constant.
      * 
      * @since 1.3
@@ -798,8 +797,9 @@ public final class URL implements Serializable {
      */
     public static synchronized void setURLStreamHandlerFactory(
             URLStreamHandlerFactory fac) {
-        if (factory != null)
-                throw new Error("URLStreamHandlerFactory already set");
+        if ((factory != null) && (fac != null)) { 
+            throw new Error("URLStreamHandlerFactory already set"); 
+        }
 
         // Throw an exception if an extant security mgr precludes
         // setting the factory.
@@ -811,8 +811,8 @@ public final class URL implements Serializable {
     }
 
     /**
-     * Returns a String representing this URL. The String returned is created
-     * by calling the protocol handler's toExternalForm() method.
+     * Returns a String representing this URL. The String returned is created by
+     * calling the protocol handler's toExternalForm() method.
      * 
      * @return A string for this URL
      */
