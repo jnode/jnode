@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.jnode.vm.bytecode.BytecodeFlags;
 import org.jnode.vm.bytecode.BytecodeVisitorSupport;
@@ -27,6 +28,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	private byte[] branchFlags;
 
 	private final ArrayList blocks = new ArrayList();
+	private final HashMap branchTargets = new HashMap();
 	private VmByteCode byteCode;
 	private static final byte CONDITIONAL_BRANCH = 1;
 	private static final byte UNCONDITIONAL_BRANCH = 2;
@@ -74,10 +76,25 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 				i--;
 			}
 		}
+		Iterator it = branchTargets.keySet().iterator();
+		while (it.hasNext()) {
+			Integer from = (Integer) it.next();
+			Integer to = (Integer) branchTargets.get(from);
+			findBB(list, from.intValue()).addSuccessor(findBB(list, to.intValue()));
+		}
 		if (bbIndex != list.length) {
 			throw new AssertionError("bbIndex != list.length");
 		}
 		return list;
+	}
+
+	private IRBasicBlock findBB(IRBasicBlock[] blocks, int address) {
+		for (int i=0; i<blocks.length; i+=1) {
+			if (blocks[i].contains(address)) {
+				return blocks[i];
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -357,7 +374,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	private final void addBranch(int target, byte flags) {
 		IRBasicBlock pred = this.currentBlock;
 		IRBasicBlock succ = startBB(target);
-		pred.addSuccessor(succ);
+		branchTargets.put(new Integer(getInstructionAddress()), new Integer(target));
 		endBB(flags);
 	}
 
