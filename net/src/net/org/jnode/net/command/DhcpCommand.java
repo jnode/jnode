@@ -4,7 +4,8 @@
 package org.jnode.net.command;
 
 import org.jnode.driver.Device;
-import org.jnode.net.ipv4.dhcp.DHCPClient;
+import org.jnode.naming.InitialNaming;
+import org.jnode.net.ipv4.config.IPv4ConfigurationService;
 import org.jnode.shell.help.DeviceArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -29,11 +30,10 @@ public class DhcpCommand {
 	throws Exception {
 		ParsedArguments cmdLine = HELP_INFO.parse(args);
 
-		Device dev = ARG_DEVICE.getDevice(cmdLine);
-
+		final Device dev = ARG_DEVICE.getDevice(cmdLine);
 		System.out.println("Trying to configure " + dev.getId() + "...");
-		final DHCPClient client = new DHCPClient();
-		client.configureDevice(dev);
+		final IPv4ConfigurationService cfg = (IPv4ConfigurationService)InitialNaming.lookup(IPv4ConfigurationService.NAME);
+		cfg.configureDeviceDhcp(dev, true);
 	}
 
 }

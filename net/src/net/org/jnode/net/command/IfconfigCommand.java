@@ -11,7 +11,7 @@ import org.jnode.driver.net.NetDeviceAPI;
 import org.jnode.naming.InitialNaming;
 import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.net.ipv4.IPv4Address;
-import org.jnode.net.ipv4.util.Ifconfig;
+import org.jnode.net.ipv4.config.IPv4ConfigurationService;
 import org.jnode.shell.help.DeviceArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
@@ -70,7 +70,8 @@ public class IfconfigCommand {
 				// Set IP address
 				IPv4Address ip = ARG_IP_ADDRESS.getAddress(cmdLine);
 				IPv4Address mask = ARG_SUBNET_MASK.getAddress(cmdLine);
-				Ifconfig.setDefault(dev, ip, mask);
+				final IPv4ConfigurationService cfg = (IPv4ConfigurationService)InitialNaming.lookup(IPv4ConfigurationService.NAME);
+				cfg.configureDeviceStatic(dev, ip, mask, true);
 				System.out.println("IP address for " + dev.getId() + " set to " + api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP));
 			}
 		}

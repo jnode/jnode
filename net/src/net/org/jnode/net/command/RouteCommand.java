@@ -4,10 +4,11 @@
 package org.jnode.net.command;
 
 import org.jnode.driver.Device;
+import org.jnode.naming.InitialNaming;
 import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.net.ipv4.IPv4Address;
+import org.jnode.net.ipv4.config.IPv4ConfigurationService;
 import org.jnode.net.ipv4.layer.IPv4NetworkLayer;
-import org.jnode.net.ipv4.util.Route;
 import org.jnode.net.util.NetUtils;
 import org.jnode.shell.help.DeviceArgument;
 import org.jnode.shell.help.Help;
@@ -61,10 +62,12 @@ public class RouteCommand implements EthernetConstants {
 			IPv4Address gateway = ARG_GATEWAY.getAddress(cmdLine);
 			Device device = ARG_DEVICE.getDevice(cmdLine);
 
+			final IPv4ConfigurationService cfg = (IPv4ConfigurationService)InitialNaming.lookup(IPv4ConfigurationService.NAME);
+			
 			if (FUNC_ADD.equals(func)) {
-				Route.addRoute(target, gateway, device);
+				cfg.addRoute(target, gateway, device, true);
 			} else if (FUNC_DEL.equals(func)) {
-				Route.delRoute(target, gateway, device);
+				cfg.deleteRoute(target, gateway, device);
 			}
 		}
 
