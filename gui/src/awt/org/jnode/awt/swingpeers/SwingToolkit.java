@@ -124,7 +124,7 @@ public class SwingToolkit extends JNodeToolkit {
 	}
 
 	protected FramePeer createFrame(Frame target) {
-        if (!isGuiActive()){ //Automatically starts the gui if not yet started.
+        if (!isGuiActive()){ //Automatically starts the gui if not yet started.  This may be a bad idea.
             System.err.println( "<SwingToolkit.createFrame> gui was not yet active.  Starting..." );
             System.err.println( "Manually starting the gui..." );
             startGui();
