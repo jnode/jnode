@@ -1,5 +1,5 @@
-/* Permission.java -- Information about an ACL permission
-   Copyright (C) 1998 Free Software Foundation, Inc.
+/* CertPathParameters.java -- parameters for CertPathBuilder.
+   Copyright (C) 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,33 +35,24 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.security.acl;
+package java.security.cert;
 
 /**
- * This interface provides information about a permission that can be
- * granted.  Note that this is <em>not</em> the same as the class
- * <code>java.security.Permission</code>.
+ * Parameters for generating and validating certificate paths. This
+ * class does not define any methods (except a required cloneable
+ * interface) and is provided only to provide type safety for
+ * implementations. Concrete implementations implement this interface
+ * in accord with thier own needs.
  *
- * @version 0.0
- *
- * @author Aaron M. Renn (arenn@urbanophile.com)
+ * @see CertPathBuilder
+ * @see CertPathValidator
  */
-public interface Permission
-{
-  /**
-   * This method tests whether or not a specified <code>Permission</code>
-   * (passed as an <code>Object</code>) is the same as this permission.
-   *
-   * @param perm The permission to check for equality
-   *
-   * @return <code>true</code> if the specified permission is the same as this one, <code>false</code> otherwise
-   */
-  boolean equals (Object perm);
+public interface CertPathParameters extends Cloneable {
 
-  /**
-   * This method returns this <code>Permission</code> as a <code>String</code>.
-   *
-   * @return A <code>String</code> representing this permission.
-   */
-  String toString();
+   /**
+    * Makes a copy of this CertPathParameters instance.
+    *
+    * @return The copy.
+    */
+   Object clone();
 }

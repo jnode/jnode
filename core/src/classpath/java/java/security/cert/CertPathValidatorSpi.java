@@ -1,5 +1,5 @@
-/* Group.java -- Represents a group of Principals
-   Copyright (C) 1998, 2001 Free Software Foundation, Inc.
+/* CertPathValidatorSpi -- cert path validator service provider interface
+   Copyright (C) 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -7,7 +7,7 @@ GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
-
+ 
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -35,56 +35,45 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.security.acl;
 
-import java.security.Principal;
-import java.util.Enumeration;
+package java.security.cert;
 
 /**
- * This interface represents a group of <code>Principals</code>.  Note that
- * since this interface extends <code>Principal</code>, a <code>Group</code>
- * can be used where ever a <code>Principal</code> is requested.  This
- * includes arguments to the methods in this interface.
- *
- * @version 0.0
- *
- * @author Aaron M. Renn (arenn@urbanophile.com)
+ * The <i>service provider interface</i> (<b>SPI</b>) for the {@link
+ * CertPathValidator} class. Providers implementing certificate path
+ * validators must subclass this class and implement its abstract
+ * methods.
  */
-public interface Group extends Principal
+public abstract class CertPathValidatorSpi
 {
-  /**
-   * This method adds a new <code>Principal</code> to this group.
-   *
-   * @param user The new <code>Principal</code> to add
-   *
-   * @return <code>true</code> if the user was successfully added or <code>false</code> if the user is already a member
-   */
-  boolean addMember(Principal user);
+
+  // Constructor.
+  // ------------------------------------------------------------------------
 
   /**
-   * This method deletes a member from the group.
-   *
-   * @param user The <code>Principal</code> to delete
-   *
-   * @return <code>true</code> if the user was successfully deleted or <code>false</code> if the user is not a member of the group
+   * Default constructor.
    */
-  boolean removeMember(Principal user);
+  public CertPathValidatorSpi()
+  {
+    super();
+  }
+
+  // Abstract methods.
+  // ------------------------------------------------------------------------
 
   /**
-   * This method tests whether or not a given <code>Principal</code> is a
-   * member of this group.
+   * Attempt to validate a certificate path.
    *
-   * @param user The <code>Principal</code> to test for membership
-   *
-   * @return <code>true</code> if the user is member, <code>false</code> otherwise
+   * @param certPath The path to validate.
+   * @param params   The algorithm-specific parameters.
+   * @return The result of this validation attempt.
+   * @throws CertPathValidatorException If the certificate path cannot
+   * be validated.
+   * @throws InvalidAlgorithmParameterException If this implementation
+   * rejects the specified parameters.
    */
-  boolean isMember(Principal member);
-
-  /**
-   * This method returns a list of all members of the group as an 
-   * <code>Enumeration</code>.
-   *
-   * @return The list of all members of the group
-   */
-  Enumeration members();
+  public abstract CertPathValidatorResult
+  engineValidate(CertPath certPath, CertPathParameters params)
+  throws CertPathValidatorException,
+         java.security.InvalidAlgorithmParameterException;
 }

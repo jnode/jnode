@@ -1,5 +1,5 @@
-/* Group.java -- Represents a group of Principals
-   Copyright (C) 1998, 2001 Free Software Foundation, Inc.
+/* PolicyNode.java -- a single node in a policy tree
+   Copyright (C) 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -7,7 +7,7 @@ GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
-
+ 
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -35,56 +35,68 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.security.acl;
 
-import java.security.Principal;
-import java.util.Enumeration;
+package java.security.cert;
 
-/**
- * This interface represents a group of <code>Principals</code>.  Note that
- * since this interface extends <code>Principal</code>, a <code>Group</code>
- * can be used where ever a <code>Principal</code> is requested.  This
- * includes arguments to the methods in this interface.
- *
- * @version 0.0
- *
- * @author Aaron M. Renn (arenn@urbanophile.com)
- */
-public interface Group extends Principal
+public interface PolicyNode
 {
-  /**
-   * This method adds a new <code>Principal</code> to this group.
-   *
-   * @param user The new <code>Principal</code> to add
-   *
-   * @return <code>true</code> if the user was successfully added or <code>false</code> if the user is already a member
-   */
-  boolean addMember(Principal user);
 
   /**
-   * This method deletes a member from the group.
+   * Get the iterator of the child nodes of this node. The returned
+   * iterator is (naturally) unmodifiable.
    *
-   * @param user The <code>Principal</code> to delete
-   *
-   * @return <code>true</code> if the user was successfully deleted or <code>false</code> if the user is not a member of the group
+   * @return An iterator over the child nodes.
    */
-  boolean removeMember(Principal user);
+  java.util.Iterator getChildren();
 
   /**
-   * This method tests whether or not a given <code>Principal</code> is a
-   * member of this group.
+   * Get the depth of this node within the tree, starting at 0 for the
+   * root node.
    *
-   * @param user The <code>Principal</code> to test for membership
-   *
-   * @return <code>true</code> if the user is member, <code>false</code> otherwise
+   * @return The depth of this node.
    */
-  boolean isMember(Principal member);
+  int getDepth();
 
   /**
-   * This method returns a list of all members of the group as an 
-   * <code>Enumeration</code>.
+   * Returns a set of policies (string OIDs) that will satisfy this
+   * node's policy. The root node should always return the singleton set
+   * with the element "any-policy".
    *
-   * @return The list of all members of the group
+   * @return The set of expected policies.
    */
-  Enumeration members();
+  java.util.Set getExpectedPolicies();
+
+  /**
+   * Returns the parent node of this node, or null if this is the root
+   * node.
+   *
+   * @return The parent node, or null.
+   */
+  PolicyNode getParent();
+
+  /**
+   * Returns a set of {@link PolicyQualifierInfo} objects that qualify
+   * the valid policy of this node. The root node should always return
+   * the empty set.
+   *
+   * @return The set of {@link PolicyQualifierInfo} objects.
+   */
+  java.util.Set getPolicyQualifiers();
+
+  /**
+   * Get the policy OID this node represents. The root node should return
+   * the special value "any-policy".
+   *
+   * @return The policy of this node.
+   */
+  String getValidPolicy();
+
+  /**
+   * Return the criticality flag of this policy node. Nodes who return
+   * true for this method should be considered critical. The root node
+   * is never critical.
+   *
+   * @return The criticality flag.
+   */
+  boolean isCritical();
 }

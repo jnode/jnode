@@ -1,5 +1,5 @@
-/* Group.java -- Represents a group of Principals
-   Copyright (C) 1998, 2001 Free Software Foundation, Inc.
+/* CertPathBuilderSpi -- CertPathBuilder service provider interface.
+   Copyright (C) 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,56 +35,40 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.security.acl;
-
-import java.security.Principal;
-import java.util.Enumeration;
+package java.security.cert;
 
 /**
- * This interface represents a group of <code>Principals</code>.  Note that
- * since this interface extends <code>Principal</code>, a <code>Group</code>
- * can be used where ever a <code>Principal</code> is requested.  This
- * includes arguments to the methods in this interface.
+ * The {@link CertPathBuilder} <i>Service Provider Interface</i>
+ * (<b>SPI</b>).
  *
- * @version 0.0
- *
- * @author Aaron M. Renn (arenn@urbanophile.com)
+ * @see CertPathBuilder
  */
-public interface Group extends Principal
-{
-  /**
-   * This method adds a new <code>Principal</code> to this group.
-   *
-   * @param user The new <code>Principal</code> to add
-   *
-   * @return <code>true</code> if the user was successfully added or <code>false</code> if the user is already a member
-   */
-  boolean addMember(Principal user);
+public abstract class CertPathBuilderSpi {
+
+  // Constructors.
+  // ------------------------------------------------------------------------
 
   /**
-   * This method deletes a member from the group.
-   *
-   * @param user The <code>Principal</code> to delete
-   *
-   * @return <code>true</code> if the user was successfully deleted or <code>false</code> if the user is not a member of the group
+   * Creates a new CertPathBuilderSpi.
    */
-  boolean removeMember(Principal user);
+  public CertPathBuilderSpi() {
+    super();
+  }
+
+  // Abstract methods.
+  // ------------------------------------------------------------------------
 
   /**
-   * This method tests whether or not a given <code>Principal</code> is a
-   * member of this group.
+   * Creates a certificate path from the specified parameters.
    *
-   * @param user The <code>Principal</code> to test for membership
-   *
-   * @return <code>true</code> if the user is member, <code>false</code> otherwise
+   * @param params The parameters to use.
+   * @return The certificate path result.
+   * @throws CertPathBuilderException If the certificate path cannot be
+   *   built.
+   * @throws java.security.InvalidAlgorithmParameterException If the
+   *   implementation rejects the specified parameters.
    */
-  boolean isMember(Principal member);
-
-  /**
-   * This method returns a list of all members of the group as an 
-   * <code>Enumeration</code>.
-   *
-   * @return The list of all members of the group
-   */
-  Enumeration members();
+  public abstract CertPathBuilderResult engineBuild(CertPathParameters params)
+  throws CertPathBuilderException,
+         java.security.InvalidAlgorithmParameterException;
 }
