@@ -25,6 +25,7 @@ import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
+import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
@@ -133,7 +134,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             final X86Register r = addr.getRegister();
             addr.release(ec);
             L1AHelper.requestRegister(ec, r);
-            final IntItem result = (IntItem) ifac.createReg(JvmType.INT, r);
+            final IntItem result = (IntItem) ifac.createReg(ec, JvmType.INT, r);
             pool.transferOwnerTo(r, result);
             vstack.push(result);
         }
@@ -156,13 +157,18 @@ final class MagicHelper extends BaseX86MagicHelper {
             final X86Register.GPR r = addr.getRegister();
             addr.release(ec);
             L1AHelper.requestRegister(ec, r);
-            final X86Register.GPR msb = (X86Register.GPR)L1AHelper.requestRegister(ec, JvmType.INT,
-                    false);
-            final LongItem result = (LongItem) ifac.createReg(ec, JvmType.LONG, r,
-                    msb);
-            os.writeXOR(msb, msb);
+            final LongItem result;
+            if (os.isCode32()) {
+            	final X86Register.GPR msb = (X86Register.GPR)L1AHelper.requestRegister(ec, JvmType.INT,
+            			false);
+            	result = (LongItem) ifac.createReg(ec, JvmType.LONG, r,
+            			msb);
+            	os.writeXOR(msb, msb);
+            	pool.transferOwnerTo(msb, result);
+            } else {
+            	result = (LongItem) ifac.createReg(ec, JvmType.LONG, (GPR64)r);
+            }
             pool.transferOwnerTo(r, result);
-            pool.transferOwnerTo(msb, result);
             vstack.push(result);
         }
             break;
@@ -171,7 +177,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem result = (RefItem) L1AHelper.requestWordRegister(ec,
                     JvmType.REFERENCE, false);
             final GPR r = result.getRegister();
-            os.writeMOV_Const(r, 0xFFFFFFFF);
+            os.writeMOV_Const(r, -1);
             vstack.push(result);
         }
             break;
@@ -186,7 +192,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             break;
         case mZERO: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
-            final RefItem result = ifac.createAConst(null);
+            final RefItem result = ifac.createAConst(ec, null);
             vstack.push(result);
         }
             break;
@@ -198,7 +204,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             final GPR addrr = addr.getRegister();
             final GPR resultr = result.getRegister();
             os.writeXOR(resultr, resultr);
-            os.writeCMP_Const(addrr, 0xFFFFFFFF);
+            os.writeCMP_Const(addrr, -1);
             os.writeSETCC(resultr, X86Constants.JE);
             addr.release(ec);
             vstack.push(result);
@@ -253,7 +259,19 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final WordItem addr = vstack.popInt();
             addr.load(ec);
-            final X86Register r = addr.getRegister();
+            GPR r = addr.getRegister();
+            if (os.isCode64()) {
+            	final GPR64 newR = (GPR64)pool.getRegisterInSameGroup(r, JvmType.REFERENCE);
+            	if (mcode == mFROMINTZEROEXTEND) {
+            		// Moving the register to itself in 32-bit mode, will
+            		// zero extend the top 32-bits.
+            		os.writeMOV(BITS32, r, r);
+            	} else {
+            		// Sign extend
+            		os.writeMOVSXD(newR, (GPR32)r);            		
+            	}
+            	r = newR;
+            }
             addr.release(ec);
             vstack.push(L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, r));
         }
@@ -270,7 +288,12 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final LongItem addr = vstack.popLong();
             addr.load(ec);
-            final X86Register r = addr.getLsbRegister(ec);
+            final X86Register r;
+            if (os.isCode32()) {
+            	r = addr.getLsbRegister(ec);
+            } else {
+            	r = addr.getRegister(ec);
+            }
             addr.release(ec);
             vstack.push(L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, r));
         }

@@ -48,18 +48,18 @@ final class DoubleItem extends DoubleWordItem {
 	 * @param offsetToFP
 	 * @param value
 	 */
-	final void initialize(int kind, int offsetToFP, X86Register.GPR lsb,
+	final void initialize(EmitterContext ec, int kind, int offsetToFP, X86Register.GPR lsb,
 			X86Register.GPR msb, X86Register.GPR64 reg, X86Register.XMM xmm,
 			double value) {
-		super.initialize(kind, offsetToFP, lsb, msb, reg, xmm);
+		super.initialize(ec, kind, offsetToFP, lsb, msb, reg, xmm);
 		this.value = value;
 	}
 
 	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.DoubleWordItem#cloneConstant()
 	 */
-	protected DoubleWordItem cloneConstant() {
-		return factory.createDConst(getValue());
+	protected DoubleWordItem cloneConstant(EmitterContext ec) {
+		return factory.createDConst(ec, getValue());
 	}
 
 	/**

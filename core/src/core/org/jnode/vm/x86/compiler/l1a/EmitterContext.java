@@ -18,10 +18,11 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.X86Assembler;
+import org.jnode.vm.x86.compiler.X86CompilerContext;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 
 /**
@@ -31,86 +32,100 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
  */
 final class EmitterContext {
 
-    /** The output stream */
-    private final X86Assembler os;
+	/** The output stream */
+	private final X86Assembler os;
 
-    /** Helper class */
-    private final X86CompilerHelper helper;
+	/** Helper class */
+	private final X86CompilerHelper helper;
 
-    /** GPR Register Pool */
-    private final X86RegisterPool gprPool;
+	/** GPR Register Pool */
+	private final X86RegisterPool gprPool;
 
-    /** XMM Register Pool */
-    private final X86RegisterPool xmmPool;
+	/** XMM Register Pool */
+	private final X86RegisterPool xmmPool;
 
-    /** Virtual Stack */
-    private final VirtualStack vstack;
+	/** Virtual Stack */
+	private final VirtualStack vstack;
 
-    /** Item factory */
-    private final ItemFactory itemfac;
+	/** Item factory */
+	private final ItemFactory itemfac;
 
-    /**
-     * Create a new context
-     */
-    EmitterContext(X86Assembler os, X86CompilerHelper helper,
-            VirtualStack vstack, X86RegisterPool gprPool, X86RegisterPool xmmPool, ItemFactory ifac) {
-        this.os = os;
-        this.helper = helper;
-        this.vstack = vstack;
-        this.gprPool = gprPool;
-        this.xmmPool = xmmPool;
-        this.itemfac = ifac;
-    }
+	/** The compiler context */
+	private final X86CompilerContext context;
 
-    /**
-     * Return the current emitter's stream
-     * 
-     * @return the current emitter's stream
-     */
-    final X86Assembler getStream() {
-        return os;
-    }
+	/**
+	 * Create a new context
+	 */
+	EmitterContext(X86Assembler os, X86CompilerHelper helper,
+			VirtualStack vstack, X86RegisterPool gprPool,
+			X86RegisterPool xmmPool, ItemFactory ifac,
+			X86CompilerContext context) {
+		this.os = os;
+		this.helper = helper;
+		this.vstack = vstack;
+		this.gprPool = gprPool;
+		this.xmmPool = xmmPool;
+		this.itemfac = ifac;
+		this.context = context;
+	}
 
-    /**
-     * return the current emitter's helper
-     * 
-     * @return the current compiler helper object
-     */
-    final X86CompilerHelper getHelper() {
-        return helper;
-    }
+	/**
+	 * Return the current emitter's stream
+	 * 
+	 * @return the current emitter's stream
+	 */
+	final X86Assembler getStream() {
+		return os;
+	}
 
-    /**
-     * Gets the current emitter's GPR register pool
-     * 
-     * @return the current emitter's GPR register pool
-     */
-    final X86RegisterPool getGPRPool() {
-        return gprPool;
-    }
+	/**
+	 * return the current emitter's helper
+	 * 
+	 * @return the current compiler helper object
+	 */
+	final X86CompilerHelper getHelper() {
+		return helper;
+	}
 
-    /**
-     * Gets the current emitter's XMM register pool
-     * 
-     * @return the current emitter's XMM register pool
-     */
-    final X86RegisterPool getXMMPool() {
-        return xmmPool;
-    }
+	/**
+	 * Gets the current emitter's GPR register pool
+	 * 
+	 * @return the current emitter's GPR register pool
+	 */
+	final X86RegisterPool getGPRPool() {
+		return gprPool;
+	}
 
-    /**
-     * return the current emitter's virtual stack
-     * 
-     * @return the current emitter's virtual stack
-     */
-    final VirtualStack getVStack() {
-        return vstack;
-    }
+	/**
+	 * Gets the current emitter's XMM register pool
+	 * 
+	 * @return the current emitter's XMM register pool
+	 */
+	final X86RegisterPool getXMMPool() {
+		return xmmPool;
+	}
 
-    /**
-     * @return Returns the itemfac.
-     */
-    final ItemFactory getItemFactory() {
-        return this.itemfac;
-    }
+	/**
+	 * return the current emitter's virtual stack
+	 * 
+	 * @return the current emitter's virtual stack
+	 */
+	final VirtualStack getVStack() {
+		return vstack;
+	}
+
+	/**
+	 * @return Returns the itemfac.
+	 */
+	final ItemFactory getItemFactory() {
+		return this.itemfac;
+	}
+	
+	/**
+	 * Gets the compiler context.
+	 * @return
+	 */
+	final X86CompilerContext getContext() {
+		return context;
+	}
 }

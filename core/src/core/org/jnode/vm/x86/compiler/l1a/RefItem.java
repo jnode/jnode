@@ -49,16 +49,16 @@ final class RefItem extends WordItem implements X86CompilerConstants {
 	    super(factory);
 	}
 
-	final void initialize(int kind, int offsetToFP, X86Register reg, VmConstString val) {
-		super.initialize(kind, reg, offsetToFP);
+	final void initialize(EmitterContext ec, int kind, int offsetToFP, X86Register reg, VmConstString val) {
+		super.initialize(ec, kind, reg, offsetToFP);
 		this.value = val;
 	}
 
 	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.WordItem#cloneConstant()
 	 */
-	protected WordItem cloneConstant() {
-		return factory.createAConst(getValue());
+	protected WordItem cloneConstant(EmitterContext ec) {
+		return factory.createAConst(ec, getValue());
 	}
 
 	/**

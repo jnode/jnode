@@ -223,13 +223,16 @@ public class X86CompilerHelper implements X86CompilerConstants {
 				stackMgr.writePUSH64(returnType, X86Register.RAX);
 			}
 			break;
-		default:
-			// Normal return value
+		case JvmType.REFERENCE:
 			if (os.isCode32()) {
 				stackMgr.writePUSH(returnType, X86Register.EAX);
 			} else {
 				stackMgr.writePUSH(returnType, X86Register.RAX);
 			}
+			break;
+		default:
+			// int/float return value
+			stackMgr.writePUSH(returnType, X86Register.EAX);
 		}
 	}
 

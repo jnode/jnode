@@ -32,6 +32,8 @@ import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.assembler.x86.X86Register.GPR;
+import org.jnode.assembler.x86.X86Register.GPR32;
+import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.assembler.x86.X86Register.XMM;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.classmgr.VmType;
@@ -1324,6 +1326,21 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         println("\tmovsx " + dstReg + "," + size(srcSize) + " " + "[" + srcReg
                 + disp(srcDisp) + "]");
     }
+
+	/**
+	 * Create a movsxd dstReg, srcReg. Sign extends the srcReg to dstReg. Only
+	 * valid in 64-bit mode.
+	 * 
+	 * @param dstReg
+	 * @param srcReg
+	 */
+	public void writeMOVSXD(GPR64 dstReg, GPR32 srcReg)
+			throws InvalidOpcodeException {
+		if (!code64) {
+			throw new InvalidOpcodeException();
+		}
+        println("\tmovsxd " + dstReg + "," + srcReg);
+	}
 
     /**
      * @see org.jnode.assembler.x86.X86Assembler#writeMOVZX(GPR, GPR, int)

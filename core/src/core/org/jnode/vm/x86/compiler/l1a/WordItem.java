@@ -24,9 +24,12 @@ package org.jnode.vm.x86.compiler.l1a;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
+import org.jnode.assembler.x86.X86Register.GPR32;
+import org.jnode.assembler.x86.X86Register.GPR64;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
+import org.jnode.vm.x86.compiler.X86CompilerContext;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -39,7 +42,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 		super(factory);
 	}
 
-	protected final void initialize(int kind, X86Register reg, int local) {
+	protected final void initialize(EmitterContext ec, int kind, X86Register reg, int local) {
 		super.initialize(kind, local,
 				((reg instanceof X86Register.XMM) ? (X86Register.XMM) reg
 						: null));
@@ -52,6 +55,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 						"kind == register implies that reg != null");
 				break;
 			}
+			verifyState(ec);
 		}
 	}
 
@@ -74,7 +78,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			break;
 
 		case Kind.CONSTANT:
-			res = cloneConstant();
+			res = cloneConstant(ec);
 			break;
 
 		case Kind.FPUSTACK:
@@ -105,7 +109,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	 * 
 	 * @return The cloned item
 	 */
-	protected abstract WordItem cloneConstant();
+	protected abstract WordItem cloneConstant(EmitterContext ec);
 
 	/**
 	 * Gets the register the is used by this item.
@@ -134,6 +138,9 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 				Vm._assert(r != null, "r != null");
 			loadTo(ec, (X86Register.GPR) r);
 		}
+		if (Vm.VerifyAssertions) {
+			verifyState(ec);
+		}
 	}
 
 	/**
@@ -150,19 +157,21 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 		final X86Assembler os = ec.getStream();
 		final X86RegisterPool pool = ec.getGPRPool();
 		final VirtualStack stack = ec.getVStack();
-		if (Vm.VerifyAssertions)
+		final X86CompilerContext context = ec.getContext();
+		if (Vm.VerifyAssertions) {
 			Vm._assert(!pool.isFree(reg), "reg not free");
+		}
 
 		switch (kind) {
 		case Kind.GPR:
 			if (this.gpr != reg) {
-				os.writeMOV(INTSIZE, reg, this.gpr);
+				os.writeMOV(reg.getSize(), reg, this.gpr);
 				cleanup(ec);
 			}
 			break;
 
 		case Kind.LOCAL:
-			os.writeMOV(INTSIZE, reg, X86Register.EBP, getOffsetToFP(ec));
+			os.writeMOV(reg.getSize(), reg, context.BP, getOffsetToFP(ec));
 			break;
 
 		case Kind.CONSTANT:
@@ -174,8 +183,8 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			FPUHelper.fxch(os, stack.fpuStack, this);
 			stack.fpuStack.pop(this);
 			// Convert & move to new space on normal stack
-			os.writeLEA(X86Register.ESP, X86Register.ESP, -4);
-			popFromFPU(os, X86Register.ESP, 0);
+			os.writeLEA(context.SP, context.SP, -4);
+			popFromFPU(os, context.SP, 0);
 			os.writePOP(reg);
 			break;
 
@@ -276,6 +285,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	final void push(EmitterContext ec) {
 		final X86Assembler os = ec.getStream();
 		final VirtualStack stack = ec.getVStack();
+		final X86CompilerContext context = ec.getContext();
 
 		switch (getKind()) {
 		case Kind.GPR:
@@ -283,7 +293,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			break;
 
 		case Kind.LOCAL:
-			os.writePUSH(X86Register.EBP, offsetToFP);
+			os.writePUSH(context.BP, offsetToFP);
 			break;
 
 		case Kind.CONSTANT:
@@ -296,8 +306,8 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			FPUHelper.fxch(os, fpuStack, this);
 			stack.fpuStack.pop(this);
 			// Convert & move to new space on normal stack
-			os.writeLEA(X86Register.ESP, X86Register.ESP, -4);
-			popFromFPU(os, X86Register.ESP, 0);
+			os.writeLEA(context.SP, context.SP, -4);
+			popFromFPU(os, context.SP, 0);
 			break;
 
 		case Kind.STACK:
@@ -343,22 +353,23 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	final void pushToFPU(EmitterContext ec) {
 		final X86Assembler os = ec.getStream();
 		final VirtualStack stack = ec.getVStack();
+		final X86CompilerContext context = ec.getContext();
 
 		switch (getKind()) {
 		case Kind.GPR:
 			os.writePUSH(gpr);
-			pushToFPU(os, X86Register.ESP, 0);
-			os.writeLEA(X86Register.ESP, X86Register.ESP, 4);
+			pushToFPU(os, context.SP, 0);
+			os.writeLEA(context.SP, context.SP, 4);
 			break;
 
 		case Kind.LOCAL:
-			pushToFPU(os, X86Register.EBP, offsetToFP);
+			pushToFPU(os, context.BP, offsetToFP);
 			break;
 
 		case Kind.CONSTANT:
 			pushConstant(ec, os);
-			pushToFPU(os, X86Register.ESP, 0);
-			os.writeLEA(X86Register.ESP, X86Register.ESP, 4);
+			pushToFPU(os, context.SP, 0);
+			os.writeLEA(context.SP, context.SP, 4);
 			break;
 
 		case Kind.FPUSTACK:
@@ -372,8 +383,8 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			if (VirtualStack.checkOperandStack) {
 				stack.operandStack.pop(this);
 			}
-			pushToFPU(os, X86Register.ESP, 0);
-			os.writeLEA(X86Register.ESP, X86Register.ESP, 4);
+			pushToFPU(os, context.SP, 0);
+			os.writeLEA(context.SP, context.SP, 4);
 			break;
 
 		default:
@@ -454,6 +465,9 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 		}
 		loadTo(ec, (X86Register.GPR) r);
 		pool.transferOwnerTo(r, this);
+		if (Vm.VerifyAssertions) {
+			verifyState(ec);
+		}
 	}
 
 	/**
@@ -473,4 +487,32 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 		return ((kind == Kind.GPR) && !pool.isCallerSaved(gpr));
 	}
 
+	/**
+	 * Verify the consistency of the state of this item.
+	 * Throw an exception is the state is inconsistent.
+	 */
+	protected void verifyState(EmitterContext ec) {
+		switch (kind) {
+		case Kind.GPR:
+			if (gpr == null) {
+				throw new IllegalStateException("gpr cannot not be null");
+			}
+			if (ec.getStream().isCode32()) {
+				if (!(gpr instanceof GPR32)) {
+					throw new IllegalStateException("gpr must be GPR32");					
+				}
+			} else {
+				if (getType() == JvmType.REFERENCE) {
+					if (!(gpr instanceof GPR64)) {
+						throw new IllegalStateException("gpr must be GPR64");					
+					}
+				} else {
+					if (!(gpr instanceof GPR32)) {
+						throw new IllegalStateException("gpr must be GPR32");					
+					}
+				}
+			}
+			break;
+		}
+	}	
 }

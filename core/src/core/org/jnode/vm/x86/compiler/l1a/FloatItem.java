@@ -46,17 +46,17 @@ final class FloatItem extends WordItem {
 	 * @param offsetToFP
 	 * @param value
 	 */
-	final void initialize(int kind, int offsetToFP, X86Register.GPR reg,
+	final void initialize(EmitterContext ec, int kind, int offsetToFP, X86Register.GPR reg,
 			float value) {
-		super.initialize(kind, reg, offsetToFP);
+		super.initialize(ec, kind, reg, offsetToFP);
 		this.value = value;
 	}
 
 	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.WordItem#cloneConstant()
 	 */
-	protected WordItem cloneConstant() {
-		return factory.createFConst(getValue());
+	protected WordItem cloneConstant(EmitterContext ec) {
+		return factory.createFConst(ec, getValue());
 	}
 
 	/**

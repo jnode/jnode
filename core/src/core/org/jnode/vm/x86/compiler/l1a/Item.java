@@ -342,6 +342,12 @@ abstract class Item {
 	 */
 	abstract boolean usesVolatileRegister(X86RegisterPool pool);
 
+	/**
+	 * Verify the consistency of the state of this item.
+	 * Throw an exception is the state is inconsistent.
+	 */
+	protected abstract void verifyState(EmitterContext ec);
+	
 	public String toString() {
 		return getType() + "," + getKind() + " ("
 				+ System.identityHashCode(this) + ")";
