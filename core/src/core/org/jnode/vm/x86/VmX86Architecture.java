@@ -19,6 +19,7 @@ import org.jnode.vm.VmSystem;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.x86.compiler.l1.X86Level1Compiler;
+import org.jnode.vm.x86.compiler.l1a.X86Level1ACompiler;
 import org.jnode.vm.x86.compiler.stub.X86StubCompiler;
 
 /**
@@ -28,14 +29,11 @@ import org.jnode.vm.x86.compiler.stub.X86StubCompiler;
  */
 public final class VmX86Architecture extends VmArchitecture {
 
+	/** Size of an object reference */
 	public static final int SLOT_SIZE = 4;
 
-	/** The stackreader of this architecture */
-	private final VmX86StackReader stackReader = new VmX86StackReader();
-
 	/** The compilers */
-	private final NativeCodeCompiler[] compilers = { new X86StubCompiler(),
-			new X86Level1Compiler() };
+	private final NativeCodeCompiler[] compilers;
 
 	/** The local APIC accessor, if any */
 	private LocalAPIC localAPIC;
@@ -43,13 +41,38 @@ public final class VmX86Architecture extends VmArchitecture {
 	/** The MP configuration table */
 	private MPConfigTable mpConfigTable;
 
+	/** The stackreader of this architecture */
+	private final VmX86StackReader stackReader = new VmX86StackReader();
+
 	/**
-	 * Gets the name of this architecture.
-	 * 
-	 * @return name
+	 * Initialize this instance using the default compiler.
 	 */
-	public final String getName() {
-		return "x86";
+	public VmX86Architecture() {
+		this("L1");
+	}
+	
+	/**
+	 * Initialize this instance.
+	 * @param compiler L1a to use L1A compiler, L1 compiler otherwise.
+	 */
+	public VmX86Architecture(String compiler) {
+		final boolean useL1A = ((compiler != null) && compiler.equalsIgnoreCase("L1A"));
+		compilers = new NativeCodeCompiler[2];
+		compilers[0] = new X86StubCompiler();
+		if (useL1A) {
+			compilers[1] = new X86Level1ACompiler();
+		} else {
+			compilers[1] = new X86Level1Compiler();			
+		}
+	}
+	
+	/**
+	 * Create a processor instance for this architecture.
+	 * 
+	 * @return The processor
+	 */
+	public VmProcessor createProcessor(int id, VmStatics statics) {
+		return new VmX86Processor(id, this, statics, null);
 	}
 
 	/**
@@ -59,6 +82,25 @@ public final class VmX86Architecture extends VmArchitecture {
 	 */
 	public final ByteOrder getByteOrder() {
 		return ByteOrder.LITTLE_ENDIAN;
+	}
+
+	/**
+	 * Gets all compilers for this architecture.
+	 * 
+	 * @return The compilers, sorted by optimization level, from least
+	 *         optimizations to most optimizations.
+	 */
+	public final NativeCodeCompiler[] getCompilers() {
+		return compilers;
+	}
+
+	/**
+	 * Gets the name of this architecture.
+	 * 
+	 * @return name
+	 */
+	public final String getName() {
+		return "x86";
 	}
 
 	/**
@@ -77,25 +119,6 @@ public final class VmX86Architecture extends VmArchitecture {
 	 */
 	public final VmStackReader getStackReader() {
 		return stackReader;
-	}
-
-	/**
-	 * Gets all compilers for this architecture.
-	 * 
-	 * @return The compilers, sorted by optimization level, from least
-	 *         optimizations to most optimizations.
-	 */
-	public final NativeCodeCompiler[] getCompilers() {
-		return compilers;
-	}
-
-	/**
-	 * Create a processor instance for this architecture.
-	 * 
-	 * @return The processor
-	 */
-	public VmProcessor createProcessor(int id, VmStatics statics) {
-		return new VmX86Processor(id, this, statics, null);
 	}
 
 	/**
