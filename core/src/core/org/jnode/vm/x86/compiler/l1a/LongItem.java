@@ -15,6 +15,31 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
 final class LongItem extends DoubleWordItem  implements X86CompilerConstants {
+	
+	static LongItem createConst(long value) {
+		return new LongItem(Kind.CONSTANT, 0, null, null, value);
+	}
+	
+    /**
+     * Create an item that is on the FPU stack.
+     * 
+     * @return
+     */
+    static LongItem createFPUStack() {
+        return new LongItem(Kind.FPUSTACK, 0, null, null, 0);
+    }
+
+	static LongItem createLocal(int offsetToFP) {
+		return new LongItem(Kind.LOCAL, offsetToFP, null, null, 0);
+	}
+	
+	static LongItem createReg(Register lsb, Register msb) {
+		return new LongItem(Kind.REGISTER, 0, lsb, msb, 0);
+	}
+	
+	static LongItem createStack() {
+		return new LongItem(Kind.STACK, 0, null, null, 0);
+	}
 
 	private final long value;
 
@@ -29,40 +54,6 @@ final class LongItem extends DoubleWordItem  implements X86CompilerConstants {
 		super(kind, offsetToFP, lsb, msb);
 		this.value = val;
 	}
-
-
-	/**
-	 * Get the JVM type of this item
-	 * @return the JVM type
-	 */
-	final int getType() { return JvmType.LONG; }
-	
-    /**
-     * Gets the constant value of this item.
-     * @return
-     */
-    final long getValue() {
-        assertCondition(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
-        return value;
-    }
-
-    /**
-     * Gets the LSB part of the constant value of this item.
-     * @return
-     */
-    final int getLsbValue() {
-        assertCondition(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
-        return (int)(value & 0xFFFFFFFFL);
-    }
-
-    /**
-     * Gets the MSB part of the constant value of this item.
-     * @return
-     */
-    final int getMsbValue() {
-        assertCondition(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
-        return (int)((value >>> 32) & 0xFFFFFFFFL);
-    }
     
     /**
      * Load my constant to the given os.
@@ -76,6 +67,37 @@ final class LongItem extends DoubleWordItem  implements X86CompilerConstants {
 
 		os.writeMOV_Const(lsb, lsbv);
 		os.writeMOV_Const(msb, msbv);        
+    }
+
+    /**
+     * Pop the top of the FPU stack into the given memory location.
+     * 
+     * @param os
+     * @param reg
+     * @param disp
+     */
+    protected void popFromFPU(AbstractX86Stream os, Register reg, int disp) {
+        os.writeFISTP64(reg, disp);        
+    }
+
+    /**
+     * Push my constant on the stack using the given os.
+     * @param os
+     */
+    protected final void pushConstant(EmitterContext ec, AbstractX86Stream os) {
+	    os.writePUSH(getMsbValue());
+	    os.writePUSH(getLsbValue());        
+    }
+
+    /**
+     * Push the given memory location on the FPU stack.
+     * 
+     * @param os
+     * @param reg
+     * @param disp
+     */
+    protected void pushToFPU(AbstractX86Stream os, Register reg, int disp) {
+        os.writeFILD64(reg, disp);
     }
 
 	/**
@@ -113,28 +135,36 @@ final class LongItem extends DoubleWordItem  implements X86CompilerConstants {
 	}
 
     /**
-     * Push my constant on the stack using the given os.
-     * @param os
+     * Gets the LSB part of the constant value of this item.
+     * @return
      */
-    protected final void pushConstant(EmitterContext ec, AbstractX86Stream os) {
-	    os.writePUSH(getMsbValue());
-	    os.writePUSH(getLsbValue());        
+    final int getLsbValue() {
+        assertCondition(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
+        return (int)(value & 0xFFFFFFFFL);
     }
 
+    /**
+     * Gets the MSB part of the constant value of this item.
+     * @return
+     */
+    final int getMsbValue() {
+        assertCondition(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
+        return (int)((value >>> 32) & 0xFFFFFFFFL);
+    }
+
+
+	/**
+	 * Get the JVM type of this item
+	 * @return the JVM type
+	 */
+	final int getType() { return JvmType.LONG; }
 	
-	static LongItem createStack() {
-		return new LongItem(Kind.STACK, 0, null, null, 0);
-	}
-	
-	static LongItem createConst(long value) {
-		return new LongItem(Kind.CONSTANT, 0, null, null, value);
-	}
-	
-	static LongItem createReg(Register lsb, Register msb) {
-		return new LongItem(Kind.REGISTER, 0, lsb, msb, 0);
-	}
-	
-	static LongItem createLocal(int offsetToFP) {
-		return new LongItem(Kind.LOCAL, offsetToFP, null, null, 0);
-	}
+    /**
+     * Gets the constant value of this item.
+     * @return
+     */
+    final long getValue() {
+        assertCondition(kind == Kind.CONSTANT, "kind == Kind.CONSTANT");
+        return value;
+    }
 }

@@ -195,7 +195,7 @@ public final class ClassDecoder {
                 final int idx = cp.getInt(i);
                 final int staticsIdx = statics.allocConstantStringField(cp
                         .getUTF8(idx));
-                cp.setString(i, new VmConstString(staticsIdx));
+                cp.setString(i, new VmConstString(cp, staticsIdx));
                 break;
             }
         }

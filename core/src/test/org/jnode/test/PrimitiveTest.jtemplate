@@ -1,0 +1,115 @@
+/*
+ * $Id: PrimitiveTest.jtemplate,v 1.1 2003/11/25 11:41:41 epr Exp $
+ */
+package org.jnode.test;
+
+/**
+ * @author epr
+ */
+public class @classname@ {
+
+	public static @type@ add(@type@ a1, @type@ a2) {
+		return a1 + a2;
+	}
+
+	public static @type@ sub(@type@ a1, @type@ a2) {
+		return a1 - a2;
+	}
+
+	public static @type@ mul(@type@ a1, @type@ a2) {
+		return a1 * a2;
+	}
+
+	public static @type@ div(@type@ a1, @type@ a2) {
+		return a1 / a2;
+	}
+
+	public static @type@ rem(@type@ a1, @type@ a2) {
+		return a1 % a2;
+	}
+
+	public static @type@ neg(@type@ a1) {
+		return -a1;
+	}
+
+	public static @type@ addAdd(@type@ a1, @type@ a2, @type@ a3) {
+		return (a1 + a2) + a3;
+	}
+
+	public static @type@ addSub(@type@ a1, @type@ a2, @type@ a3) {
+		return (a1 + a2) - a3;
+	}
+
+	public static @type@ addMul(@type@ a1, @type@ a2, @type@ a3) {
+		return (a1 + a2) * a3;
+	}
+
+	public static @type@ addDiv(@type@ a1, @type@ a2, @type@ a3) {
+		return (a1 + a2) / a3;
+	}
+
+	public static @type@ addRem(@type@ a1, @type@ a2, @type@ a3) {
+		return (a1 + a2) % a3;
+	}
+
+	public static @type@ addAddAdd(@type@ a1, @type@ a2, @type@ a3, @type@ a4) {
+		return ((a1 + a2) + a3) + a4;
+	}
+
+	public static @type@ addAddSub(@type@ a1, @type@ a2, @type@ a3, @type@ a4) {
+		return ((a1 + a2) + a3) - a4;
+	}
+
+	public static @type@ addAddMul(@type@ a1, @type@ a2, @type@ a3, @type@ a4) {
+		return ((a1 + a2) + a3) * a4;
+	}
+
+	public static @type@ addAddDiv(@type@ a1, @type@ a2, @type@ a3, @type@ a4) {
+		return ((a1 + a2) + a3) / a4;
+	}
+
+	public static @type@ addAadRem(@type@ a1, @type@ a2, @type@ a3, @type@ a4) {
+		return ((a1 + a2) + a3) % a4;
+	}
+
+	public static @type@ addSubSub(@type@ a1, @type@ a2, @type@ a3, @type@ a4) {
+		return (a1 + a2) - (a3 - a4);
+	}
+
+	public static @type@ addMulSub(@type@ a1, @type@ a2, @type@ a3, @type@ a4) {
+		return (a1 + a2) * (a3 - a4);
+	}
+
+	public static @type@ addDivSub(@type@ a1, @type@ a2, @type@ a3, @type@ a4) {
+		return (a1 + a2) / (a3 - a4);
+	}
+
+	public static @type@ addRemSub(@type@ a1, @type@ a2, @type@ a3, @type@ a4) {
+		return (a1 + a2) % (a3 - a4);
+	}
+
+	public static boolean lt(@type@ a1, @type@ a2) {
+		return (a1 < a2);
+	}
+
+	public static boolean le(@type@ a1, @type@ a2) {
+		return (a1 <= a2);
+	}
+
+	public static boolean gt(@type@ a1, @type@ a2) {
+		return (a1 > a2);
+	}
+
+	public static boolean ge(@type@ a1, @type@ a2) {
+		return (a1 >= a2);
+	}
+
+	public static boolean eq(@type@ a1, @type@ a2) {
+		return (a1 == a2);
+	}
+
+	public static boolean ne(@type@ a1, @type@ a2) {
+		return (a1 != a2);
+	}
+
+}

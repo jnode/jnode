@@ -209,6 +209,8 @@ abstract class Item {
      * @return true, when reg is used by this item
      */
     abstract boolean uses(Register reg);
-
-
+    
+    public String toString() {
+        return getType() + "," + getKind() + " (" + System.identityHashCode(this) + ")";
+    }
 }

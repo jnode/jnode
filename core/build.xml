@@ -1,69 +1,86 @@
 <project name="JNode-Builder" default="all" basedir=".">
 
-  <property name="my-build.dir"   value="${basedir}/build"/>
-  <property name="my-classes.dir" value="${my-build.dir}/classes"/>
-  <property name="my-src.dir"     value="${basedir}/src"/>
-  <property name="my.jar"         value="${jnode-core.jar}"/>
+	<property name="my-build.dir" value="${basedir}/build" />
+	<property name="my-gen.dir" value="${my-build.dir}/gen" />
+	<property name="my-classes.dir" value="${my-build.dir}/classes" />
+	<property name="my-src.dir" value="${basedir}/src" />
+	<property name="my.jar" value="${jnode-core.jar}" />
 
-<!-- Subproject specific classpath -->
-  <path id="my-cp">
-    <path refid="cp"/>
-  </path>
+	<!-- Subproject specific classpath -->
+	<path id="my-cp">
+		<path refid="cp" />
+	</path>
 
-<!-- Initialize all subproject directories -->
-  <target name="prepare">
-    <mkdir dir="${my-classes.dir}"/>
-    <copy todir="${descriptors.dir}">
-      <fileset dir="${basedir}/descriptors"/>
-	  <filterset refid="descriptors-filter"/>
-    </copy>
-  </target>
+	<macrodef name="ExpandTest">
+		<attribute name="classname" />
+		<attribute name="type" />
+		<attribute name="template" default="${my-src.dir}/test/org/jnode/test/PrimitiveTest.jtemplate" />
+		<sequential>
+			<copy tofile="${my-gen.dir}/org/jnode/test/@{classname}.java" file="@{template}">
+				<filterset>
+					<filter token="classname" value="@{classname}" />
+					<filter token="type" value="@{type}" />
+				</filterset>
+			</copy>
+		</sequential>
+	</macrodef>
 
-<!-- Compile all subproject java files -->
-  <target name="compile" depends="prepare">
-    <javac destdir="${my-classes.dir}"
-	       debug="on"
-	       optimize="on"
-           compiler="modern"
-	       includeJavaRuntime="false">
-	  <bootclasspath>
-	    <pathelement location="${my-src.dir}/classpath/gnu"/>
-	    <pathelement location="${my-src.dir}/classpath/java"/>
-	    <pathelement location="${my-src.dir}/classpath/javax"/>
-	    <pathelement location="${my-src.dir}/classpath/org"/>
-	    <pathelement location="${my-src.dir}/classpath/vm"/>
-	  </bootclasspath>
-	  <src path="${my-src.dir}/classpath/gnu"/>
-	  <src path="${my-src.dir}/classpath/java"/>
-	  <src path="${my-src.dir}/classpath/javax"/>
-	  <src path="${my-src.dir}/classpath/org"/>
-	  <src path="${my-src.dir}/classpath/vm"/>
-	  <src path="${my-src.dir}/core"/>
-	  <src path="${my-src.dir}/driver"/>
-	  <src path="${my-src.dir}/test"/>
-      <classpath refid="my-cp"/>
-    </javac>
-    <!-- Copy all non java files to class dir -->
-    <copy todir="${my-classes.dir}">
-      <fileset dir="${my-src.dir}/core" excludes="**/*.java,**/package.html"/>
-      <fileset dir="${my-src.dir}/driver" excludes="**/*.java,**/package.html"/>
-    </copy> 
-  </target>
+	<!-- Initialize all subproject directories -->
+	<target name="prepare">
+		<mkdir dir="${my-classes.dir}" />
+		<mkdir dir="${my-gen.dir}" />
+		<copy todir="${descriptors.dir}">
+			<fileset dir="${basedir}/descriptors" />
+			<filterset refid="descriptors-filter" />
+		</copy>
+		<ExpandTest classname="PrimitiveIntTest" type="int" />
+		<ExpandTest classname="PrimitiveLongTest" type="long" />
+		<ExpandTest classname="PrimitiveFloatTest" type="float" />
+		<ExpandTest classname="PrimitiveDoubleTest" type="double" />
+	</target>
 
-<!-- Assemble the jarfile -->
-  <target name="assemble" depends="compile">
-    <!-- jar jarfile="${my.jar}">
+	<!-- Compile all subproject java files -->
+	<target name="compile" depends="prepare">
+		<javac destdir="${my-classes.dir}" debug="on" optimize="on" compiler="modern" includeJavaRuntime="false">
+			<bootclasspath>
+				<pathelement location="${my-src.dir}/classpath/gnu" />
+				<pathelement location="${my-src.dir}/classpath/java" />
+				<pathelement location="${my-src.dir}/classpath/javax" />
+				<pathelement location="${my-src.dir}/classpath/org" />
+				<pathelement location="${my-src.dir}/classpath/vm" />
+			</bootclasspath>
+			<src path="${my-src.dir}/classpath/gnu" />
+			<src path="${my-src.dir}/classpath/java" />
+			<src path="${my-src.dir}/classpath/javax" />
+			<src path="${my-src.dir}/classpath/org" />
+			<src path="${my-src.dir}/classpath/vm" />
+			<src path="${my-src.dir}/core" />
+			<src path="${my-src.dir}/driver" />
+			<src path="${my-src.dir}/test" />
+			<src path="${my-gen.dir}" />
+			<classpath refid="my-cp" />
+		</javac>
+		<!-- Copy all non java files to class dir -->
+		<copy todir="${my-classes.dir}">
+			<fileset dir="${my-src.dir}/core" excludes="**/*.java,**/package.html" />
+			<fileset dir="${my-src.dir}/driver" excludes="**/*.java,**/package.html" />
+		</copy>
+	</target>
+
+	<!-- Assemble the jarfile -->
+	<target name="assemble" depends="compile">
+		<!-- jar jarfile="${my.jar}">
       <fileset dir="${my-classes.dir}"/>
     </jar -->
-  </target>
+	</target>
 
-<!-- Do it all -->
-  <target name="all" depends="assemble"/>
+	<!-- Do it all -->
+	<target name="all" depends="assemble" />
 
-<!-- Clean everything -->
-  <target name="clean">
-    <delete dir="${my-build.dir}" quiet="true"/>
-  </target>
+	<!-- Clean everything -->
+	<target name="clean">
+		<delete dir="${my-build.dir}" quiet="true" />
+	</target>
 
 </project>
 

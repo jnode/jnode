@@ -83,6 +83,28 @@ final class RefItem extends WordItem implements X86CompilerConstants {
     }
 
     /**
+     * Push the given memory location on the FPU stack.
+     * 
+     * @param os
+     * @param reg
+     * @param disp
+     */
+    protected void pushToFPU(AbstractX86Stream os, Register reg, int disp) {
+        notImplemented();
+    }
+
+    /**
+     * Pop the top of the FPU stack into the given memory location.
+     * 
+     * @param os
+     * @param reg
+     * @param disp
+     */
+    protected void popFromFPU(AbstractX86Stream os, Register reg, int disp) {
+        notImplemented();
+    }
+
+    /**
      * @see org.jnode.vm.x86.compiler.l1a.Item#clone()
      */
     Item clone(EmitterContext ec) {
