@@ -3,7 +3,6 @@
  */
 package org.jnode.vm;
 
-import org.jnode.driver.console.Screen;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.classmgr.AbstractVmClassLoader;
 import org.jnode.vm.classmgr.VmArrayClass;
@@ -156,8 +155,8 @@ public class SoftByteCodes implements Uninterruptible {
 				classRef.setResolvedVmClass(vmClass);
 				return vmClass;
 			} catch (ClassNotFoundException ex) {
-				ex.printStackTrace();
-				Screen.debug("resolve::CLASSNOTFOUND");
+				//ex.printStackTrace();
+				//Unsafe.debug("resolve::CLASSNOTFOUND");
 				throw new NoClassDefFoundError(cname);
 			}
 		}

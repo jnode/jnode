@@ -3,7 +3,6 @@
  */
 package org.jnode.vm;
 
-import org.jnode.driver.console.Screen;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 
@@ -121,10 +120,10 @@ public abstract class VmStackReader extends VmSystemObject {
 			f = getPrevious(f);
 		}
 		if ((f != null) && !isStackBottom(f) && (count < limit)) {
-			Screen.debug("Corrupted stack!, st.length=");
-			Screen.debug(count);
-			Screen.debug(" f.magic=");
-			Screen.debug(getMagic(f));
+			Unsafe.debug("Corrupted stack!, st.length=");
+			Unsafe.debug(count);
+			Unsafe.debug(" f.magic=");
+			Unsafe.debug(getMagic(f));
 			//Unsafe.die();
 		}
 
@@ -157,19 +156,19 @@ public abstract class VmStackReader extends VmSystemObject {
 	 */	
 	public final void debugStackTrace() {
 		Address f = Unsafe.getCurrentFrame();
-		Screen.debug("Debug stacktrace: ");
+		Unsafe.debug("Debug stacktrace: ");
 		boolean first = true;
 		while (isValid(f)) {
 			if (first) {
 				first = false;
 			} else {
-				Screen.debug(", ");
+				Unsafe.debug(", ");
 			}
 			final VmMethod method = getMethod(f);
 			final VmType vmClass = method.getDeclaringClass();
-			Screen.debug(vmClass.getName());
-			Screen.debug("::");
-			Screen.debug(method.getName()); 
+			Unsafe.debug(vmClass.getName());
+			Unsafe.debug("::");
+			Unsafe.debug(method.getName()); 
 			f = getPrevious(f);
 		}
 	}

@@ -3,11 +3,11 @@
  */
 package org.jnode.boot;
 
-import org.jnode.driver.console.Screen;
 import org.jnode.plugin.PluginManager;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.manager.DefaultPluginManager;
 import org.jnode.system.BootLog;
+import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmSystem;
 
 /**
@@ -33,7 +33,7 @@ public class Main {
 			final long start = VmSystem.currentKernelMillis();
 
 			VmSystem.initialize();
-			Screen.debug("Starting JNode\n");
+			Unsafe.debug("Starting JNode\n");
 
 			final PluginManager piMgr = new DefaultPluginManager(pluginRegistry);
 			piMgr.startPlugins();
@@ -49,7 +49,7 @@ public class Main {
 			BootLog.error("Error in bootstrap", ex);
 			return -2;
 		}
-		Screen.debug("System has finished");
+		Unsafe.debug("System has finished");
 		return 0;
 	}
 }
