@@ -526,7 +526,7 @@ public class TCPControlBlock extends IPv4ControlBlock implements TCPConstants {
 				throw new TimeoutException();
 			}
 			try {
-				wait(timeout - (now - start));
+				wait(Math.max(1, timeout - (now - start)));
 			} catch (InterruptedException ex) {
 				// Ignore
 			}
