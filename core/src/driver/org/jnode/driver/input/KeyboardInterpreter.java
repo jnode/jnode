@@ -68,8 +68,16 @@ public abstract class KeyboardInterpreter
     // debug output to find new keycodes
 //    System.out.println("[" + (extendedMode ? "E" : "N") + scancode + "," + vk + "] " /*+ KeyEvent.getKeyText(vk)*/);
 
-    if (!extendedMode)
-      vk = keys.getKey(scancode).getLowerVirtuelKey();
+    if (!extendedMode){
+    	if((flags & InputEvent.ALT_GRAPH_DOWN_MASK) != 0){
+			vk = keys.getKey(scancode).getAltGrVirtuelKey();	
+    	}else if((flags & InputEvent.SHIFT_DOWN_MASK) != 0){
+			vk = keys.getKey(scancode).getUpperVirtuelKey();		
+    	}else{
+			vk = keys.getKey(scancode).getLowerVirtuelKey();
+    	}
+    }
+      
 
     adjustFlags(vk, released);
 

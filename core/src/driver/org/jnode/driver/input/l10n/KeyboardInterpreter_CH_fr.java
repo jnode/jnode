@@ -72,8 +72,8 @@ public class KeyboardInterpreter_CH_fr extends KeyboardInterpreter {
 	  keys.setKey( 27,new Key('¨' ,KeyEvent.VK_DEAD_DIAERESIS, '!', KeyEvent.VK_EXCLAMATION_MARK,']' ,KeyEvent.VK_CLOSE_BRACKET));	  
 	  
 	  keys.setKey(  28,new Key('\n'  ,KeyEvent.VK_ENTER));
-	  keys.setKey(  29,new Key(KeyEvent.VK_CONTROL ));
-	  
+	  keys.setKey(29, new Key((char) 0, KeyEvent.VK_CONTROL));
+   
 	  keys.setKey( 30,new Key('a' ,'A' ,'a' ,KeyEvent.VK_A));
 	  key = keys.getKey(30);
 	  key.addDeadKeyChar(KeyEvent.VK_DEAD_DIAERESIS ,new char[]{'ä' ,'Ä'});
