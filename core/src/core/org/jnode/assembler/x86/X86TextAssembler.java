@@ -832,6 +832,14 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeDIV_EAX(GPR)
+     */
+    public void writeDIV_EAX(GPR srcReg) {
+
+        println("\tdiv " + srcReg);
+    }
+
+    /**
      * @see org.jnode.assembler.x86.X86Assembler#writeFADD32(GPR, int)
      */
     public void writeFADD32(GPR srcReg, int srcDisp) {
@@ -956,6 +964,13 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeFLDCW(GPR, int)
+     */
+    public void writeFLDCW(GPR srcReg, int srcDisp) {
+        println("\tfldcw word [" + srcReg + disp(srcDisp) + "]");
+    }
+
+    /**
      * @see org.jnode.assembler.x86.X86Assembler#writeFMUL32(GPR, int)
      */
     public void writeFMUL32(GPR srcReg, int srcDisp) {
@@ -978,6 +993,21 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeFNINIT()
+     */
+    public void writeFNINIT() {
+
+        println("\tfninit");
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeFNSAVE(GPR, int)
+     */
+    public void writeFNSAVE(GPR srcReg, int srcDisp) {
+        println("\tfnsave [" + srcReg + disp(srcDisp) + "]");
+    }
+
+    /**
      * @see org.jnode.assembler.x86.X86Assembler#writeFNSTSW_AX()
      */
     public void writeFNSTSW_AX() {
@@ -990,6 +1020,20 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      */
     public void writeFPREM() {
         println("\tfprem");
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeFRSTOR(GPR, int)
+     */
+    public void writeFRSTOR(GPR srcReg, int srcDisp) {
+        println("\tfrstor [" + srcReg + disp(srcDisp) + "]");
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeFSTCW(GPR, int)
+     */
+    public void writeFSTCW(GPR srcReg, int srcDisp) {
+        println("\tfstcw word [" + srcReg + disp(srcDisp) + "]");
     }
 
     /**
@@ -1049,6 +1093,20 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      */
     public void writeFXCH(X86Register fpuReg) {
         println("\tfxch " + fpuReg);
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeFXRSTOR(GPR, int)
+     */
+    public void writeFXRSTOR(GPR srcReg, int srcDisp) {
+        println("\tfxrstor [" + srcReg + disp(srcDisp) + "]");
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeFXSAVE(GPR, int)
+     */
+    public void writeFXSAVE(GPR srcReg, int srcDisp) {
+        println("\tfxsave [" + srcReg + disp(srcDisp) + "]");
     }
 
     /**
@@ -1236,6 +1294,13 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeLDMXCSR(GPR, int)
+     */
+    public void writeLDMXCSR(GPR srcReg, int disp) {
+        println("\tldmxcsr dword [" + srcReg + disp(disp) + "]");
+    }
+
+    /**
      * @see org.jnode.assembler.x86.X86Assembler#writeLEA(GPR, GPR, int)
      */
     public void writeLEA(GPR dstReg, GPR srcReg, int disp) {
@@ -1253,6 +1318,13 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeLMSW(GPR)
+     */
+    public void writeLMSW(GPR srcReg) {
+        println("\tlmsw " + srcReg);
+    }
+
+    /**
      * @see org.jnode.assembler.x86.X86Assembler#writeLODSD()
      */
     public void writeLODSD() {
@@ -1261,11 +1333,26 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeLODSW()
+     */
+    public void writeLODSW() {
+
+        println("\tlodsw");
+    }
+
+    /**
      * @see org.jnode.assembler.x86.X86Assembler#writeLOOP(Label)
      */
     public void writeLOOP(Label label) throws UnresolvedObjectRefException {
 
         println("\tloop " + label(label));
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeLTR(GPR)
+     */
+    public void writeLTR(GPR srcReg) {
+        println("\tltr " + srcReg);
     }
 
     /**
@@ -1376,6 +1463,14 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
                 + "*" + scale + disp(dstDisp) + "],0x" + NumberUtils.hex(imm32));
     }
 
+    public void writeMOVSB() {
+        println("\tmovsb");
+    }
+
+    public void writeMOVSD() {
+        println("\tmovsd");
+    }
+
     public void writeMOVSD(GPR dst, int dstDisp, XMM src) {
         println("\tmovsd qword [" + dst + disp(dstDisp) + "]," + src);
     }
@@ -1426,6 +1521,10 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
 		}
         println("\tmovsxd " + dstReg + "," + srcReg);
 	}
+
+    public void writeMOVSW() {
+        println("\tmovsw");
+    }
 
     /**
      * @see org.jnode.assembler.x86.X86Assembler#writeMOVZX(GPR, GPR, int)
@@ -1896,6 +1995,34 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      */
     public void writeSTI() {
         println("\tsti");
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeSTMXCSR(GPR, int)
+     */
+    public void writeSTMXCSR(GPR srcReg, int disp) {
+        println("\tstmxcsr dword [" + srcReg + disp(disp) + "]");
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeSTOSB()
+     */
+    public void writeSTOSB() {
+        println("\tstosb");
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeSTOSD()
+     */
+    public void writeSTOSD() {
+        println("\tstosd");
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#writeSTOSW()
+     */
+    public void writeSTOSW() {
+        println("\tstosw");
     }
 
     /**

@@ -52,6 +52,13 @@ public class X86Support extends HardwareSupport {
 
         for (Iterator it = instructions.iterator(); it.hasNext();) {
             Instruction ins = (Instruction) it.next();
+            //handle prefixes
+            int prefix = ins.getPrefix();
+            if((prefix & Instruction.LOCK_PREFIX) != 0){
+                nativeStream.write8(X86Constants.LOCK_PREFIX);
+            } else if ((prefix & Instruction.REP_PREFIX) != 0){
+                nativeStream.write8(X86Constants.REP_PREFIX);
+            }
             String label = ins.getLabel();
             if (label != null) {
                 if (labels.get(label) != null && pass == 1)

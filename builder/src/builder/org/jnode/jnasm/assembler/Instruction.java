@@ -9,6 +9,9 @@ import java.util.List;
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public class Instruction {
+    public static final int LOCK_PREFIX = 1;
+    public static final int REP_PREFIX = 2;
+    private int prefix;
     private int lineNumber;
     private String sizeInfo;
     private String label;
@@ -63,5 +66,21 @@ public class Instruction {
 
     public void setSizeInfo(String sizeInfo) {
         this.sizeInfo = sizeInfo;
+    }
+
+    public int getPrefix() {
+        return prefix;
+    }
+
+    public void addPrefix(int prefix) {
+        if(prefix == LOCK_PREFIX || prefix == REP_PREFIX){
+            this.prefix |= prefix;
+        } else {
+            throw new RuntimeException("Invalid prefix: " + prefix);
+        }
+    }
+
+    public void setPrefix(int prefix) {
+        this.prefix = prefix;
     }
 }
