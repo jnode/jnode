@@ -26,6 +26,8 @@ class SwingLabelPeer extends JLabel implements LabelPeer {
     public SwingLabelPeer(Label label) {
         super();
         SwingFramePeer.add(label, this);
+        SwingToolkit.copyAwtProperties(label, this);
+        setText(label.getText());
     }
 
     //

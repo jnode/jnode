@@ -25,7 +25,7 @@ class SwingWindowPeer extends JInternalFrame implements WindowPeer {
     //
 
     public SwingWindowPeer(Window window) {
-        super();
+        SwingToolkit.copyAwtProperties(window, this);
     }
 
     //

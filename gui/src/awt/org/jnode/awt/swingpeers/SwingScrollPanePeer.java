@@ -27,6 +27,7 @@ class SwingScrollPanePeer extends JScrollPane implements ScrollPanePeer {
     public SwingScrollPanePeer(ScrollPane scrollPane) {
         super();
         SwingFramePeer.add(scrollPane, this);
+        SwingToolkit.copyAwtProperties(scrollPane, this);
     }
 
     //

@@ -16,35 +16,34 @@ import javax.swing.JCheckBoxMenuItem;
  */
 
 class SwingCheckboxMenuItemPeer extends JCheckBoxMenuItem implements
-        CheckboxMenuItemPeer {
+		CheckboxMenuItemPeer {
 
-    //
-    // Construction
-    //
+	//
+	// Construction
+	//
 
-    public SwingCheckboxMenuItemPeer(CheckboxMenuItem checkBoxMenuItem) {
-        super();
-    }
+	public SwingCheckboxMenuItemPeer(CheckboxMenuItem checkBoxMenuItem) {
+	}
 
-    //
-    // ComponentPeer
-    //
+	//
+	// ComponentPeer
+	//
 
-    // Events
+	// Events
 
-    public void handleEvent(AWTEvent e) {
-        //System.err.println(e);
-    }
+	public void handleEvent(AWTEvent e) {
+		//System.err.println(e);
+	}
 
-    public void coalescePaintEvent(PaintEvent e) {
-        System.err.println(e);
-    }
+	public void coalescePaintEvent(PaintEvent e) {
+		System.err.println(e);
+	}
 
-    // Misc
+	// Misc
 
-    public void dispose() {
-    }
+	public void dispose() {
+	}
 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // Private
+	///////////////////////////////////////////////////////////////////////////////////////
+	// Private
 }

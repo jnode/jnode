@@ -24,8 +24,8 @@ class SwingCanvasPeer extends JComponent implements CanvasPeer {
     //
 
     public SwingCanvasPeer(Canvas canvas) {
-        super();
         SwingFramePeer.add(canvas, this);
+        SwingToolkit.copyAwtProperties(canvas, this);
     }
 
     //

@@ -130,6 +130,7 @@ class SwingComponentPeer implements ComponentPeer {
     }
 
     public Graphics getGraphics() {
+    	log.debug("getGraphics");
         final Component parent = component.getParent();
         if (parent != null) {
             System.out.println("creating graphics");
@@ -182,6 +183,7 @@ class SwingComponentPeer implements ComponentPeer {
 
     // Events
     public void handleEvent(AWTEvent e) {
+    	log.debug("handleEvent(" + e + ")");
         //System.err.println(e);
     }
 

@@ -25,7 +25,8 @@ class SwingDialogPeer extends JInternalFrame implements DialogPeer {
     //
 
     public SwingDialogPeer(Dialog dialog) {
-        super();
+        SwingToolkit.copyAwtProperties(dialog, this);
+        setTitle(dialog.getTitle());
     }
 
     //

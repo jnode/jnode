@@ -26,6 +26,7 @@ class SwingPanelPeer extends JPanel implements PanelPeer {
     public SwingPanelPeer(Panel panel) {
         super();
         SwingFramePeer.add(panel, this);
+        SwingToolkit.copyAwtProperties(panel, this);
     }
 
     //

@@ -8,9 +8,11 @@ import java.awt.Canvas;
 import java.awt.Checkbox;
 import java.awt.CheckboxMenuItem;
 import java.awt.Choice;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.FileDialog;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Label;
 import java.awt.Menu;
@@ -46,6 +48,8 @@ import java.awt.peer.ScrollbarPeer;
 import java.awt.peer.TextAreaPeer;
 import java.awt.peer.TextFieldPeer;
 import java.awt.peer.WindowPeer;
+
+import javax.swing.JComponent;
 
 import org.jnode.awt.JNodeToolkit;
 
@@ -191,5 +195,24 @@ public class SwingToolkit extends JNodeToolkit {
         log.debug("onInitialize");
         desktopFrame = new DesktopFrame(getScreenSize());
         desktopFrame.show();
+    }
+    
+    /**
+     * Copies the generic component properties from the AWT component into the peer.
+     * @param awtComponent
+     * @param peer
+     */
+    final static void copyAwtProperties(Component awtComponent, JComponent peer) {
+    	Color c;
+    	Font f;
+    	if ((c = awtComponent.getForeground()) != null) {
+    		peer.setForeground(c);
+    	}
+    	if ((c = awtComponent.getBackground()) != null) {
+    		peer.setBackground(c);
+    	}
+    	if ((f = awtComponent.getFont()) != null) {
+    		peer.setFont(f);
+    	}
     }
 }
