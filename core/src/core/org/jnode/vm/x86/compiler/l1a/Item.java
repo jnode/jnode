@@ -21,6 +21,8 @@ import org.jnode.assembler.x86.Register;
  */
 
 //TODO: make Item a subclass of operand
+//TODO: open question: shall move the type information, getType, getCategory
+//      to each Item implementation?
 abstract class Item {
 	/*
 	 * Description of the virtual stack entry kind
@@ -100,7 +102,7 @@ abstract class Item {
 	 * @return computational type category
 	 */
 	int getCategory() {
-		if ((kind == LONG)||(kind == DOUBLE))
+		if ((type == LONG)||(type == DOUBLE))
 			return 2;
 		else
 			return 1;
@@ -206,6 +208,14 @@ abstract class Item {
 	 * @param ec the EmitterContext
 	 */
 	abstract void release(EmitterContext ec);
+
+	/**
+	 * Spill the registers associated to this item
+	 *
+	 * @param ec the EmitterContext
+	 * @param reg the register to be spilled
+	 */
+	abstract void spill(EmitterContext ec, Register reg);
 
 	/**
 	 * enquire whether the item uses this register

@@ -3,9 +3,12 @@
  */
 package org.jnode.vm.x86.compiler.l1a;
 
+import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
+import org.jnode.vm.classmgr.VmConstString;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
+import org.jnode.vm.x86.compiler.X86CompilerHelper;
 
 /**
  * @author Patrik Reali
@@ -13,7 +16,10 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
  final class RefItem extends Item implements X86CompilerConstants {
 
 	private Register reg;
-	private Object value;
+	private VmConstString value;
+
+	// generate unique labels for writeStatics (should use current label)
+	private long labelCounter;
 
 	/**
 	 * @param kind
@@ -21,7 +27,7 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 	 * @param val
 	 * @param offsetToFP
 	 */
-	private RefItem(int kind, Register reg, Object val, int offsetToFP) {
+	private RefItem(int kind, Register reg, VmConstString val, int offsetToFP) {
 		super(kind, REFERENCE, offsetToFP);
 		this.reg = reg;
 		this.value = val;
@@ -32,7 +38,7 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 		return reg;
 	}
 	
-	Object getValue() {
+	VmConstString getValue() {
 		myAssert(getKind() == CONSTANT);
 		return value;
 	}
@@ -61,7 +67,13 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 				break;
 				
 			case CONSTANT:
-				os.writeMOV_Const(reg, value);
+				if (value == null) {
+					os.writeMOV_Const(reg, value);
+				} else {
+					X86CompilerHelper helper = ec.getHelper();
+					Label l = new Label(Long.toString(labelCounter++));
+					helper.writeGetStaticsEntry(l, reg, value);
+				}
 				break;
 				
 			case FREGISTER:
@@ -159,7 +171,13 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 				break;
 				
 			case CONSTANT:
-				os.writePUSH_Const(value);
+				if (value == null) {
+					os.writePUSH_Const(null);
+				} else {
+					X86CompilerHelper helper = ec.getHelper();
+					Label l = new Label(Long.toString(labelCounter++));
+					helper.writePushStaticsEntry(l, value);
+				}
 				break;
 				
 			case FREGISTER:
@@ -205,6 +223,18 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 		}
 	}
+
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#spill(EmitterContext, Register)
+	 */
+	void spill(EmitterContext ec, Register reg) {
+		myAssert((getKind() == REGISTER) && (this.reg == reg));
+		X86RegisterPool pool = ec.getPool();
+		Register r = (Register)pool.request(REFERENCE);
+		myAssert(r != null);
+		loadTo(ec, r);
+		pool.transferOwnerTo(r, this);
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
@@ -217,7 +247,7 @@ import org.jnode.vm.x86.compiler.X86CompilerConstants;
 		return new RefItem(REGISTER, reg, null, 0);
 	}
 	
-	static RefItem createConst(Object value) {
+	static RefItem createConst(VmConstString value) {
 		return new RefItem(CONSTANT, null, value, 0);
 	}
 

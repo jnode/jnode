@@ -208,6 +208,18 @@ final class IntItem extends Item implements X86CompilerConstants {
 		}
 
 	}
+
+	/**
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#spill(EmitterContext, Register)
+	 */
+	void spill(EmitterContext ec, Register reg) {
+		myAssert((getKind() == REGISTER) && (this.reg == reg));
+		X86RegisterPool pool = ec.getPool();
+		Register r = (Register)pool.request(INT);
+		myAssert(r != null);
+		loadTo(ec, r);
+		pool.transferOwnerTo(r, this);
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#uses(org.jnode.assembler.x86.Register)
