@@ -65,17 +65,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 			//read the group descriptors
 			groupCount = (int)Math.ceil((double)superblock.getBlocksCount() / (double)superblock.getBlocksPerGroup());
 			groupDescriptors = new GroupDescriptor[groupCount];
-			
-			//OLD VERSION
-			/*
-			data=getBlock(superblock.getFirstDataBlock()+1);    
-			for(int i=0; i<groupCount; i++) {
-			   groupDescriptors[i] = new GroupDescriptor(data, this, i);
-			} 
-			*/
-			//OLD VERSION
-			       
-			
+						
 			for(int i=0; i<groupCount; i++) {
 				groupDescriptors[i]=new GroupDescriptor(i, this);
 			}
@@ -89,18 +79,37 @@ public class Ext2FileSystem extends AbstractFileSystem {
 		//check for unsupported filesystem options 
 		//(an unsupported INCOMPAT feature means that the fs may not be mounted at all)
 		if( hasIncompatFeature(Ext2Constants.EXT2_FEATURE_INCOMPAT_COMPRESSION) )
-			throw new FileSystemException("Unsupported filesystem feature (COMPRESSION) disallows mounting");
+			throw new FileSystemException(device.getId()+" Unsupported filesystem feature (COMPRESSION) disallows mounting");
 		if( hasIncompatFeature(Ext2Constants.EXT2_FEATURE_INCOMPAT_META_BG) )
-			throw new FileSystemException("Unsupported filesystem feature (META_BG) disallows mounting");
+			throw new FileSystemException(device.getId()+" Unsupported filesystem feature (META_BG) disallows mounting");
 		if( hasIncompatFeature(Ext2Constants.EXT3_FEATURE_INCOMPAT_JOURNAL_DEV) )
-			throw new FileSystemException("Unsupported filesystem feature (JOURNAL_DEV) disallows mounting");
+			throw new FileSystemException(device.getId()+" Unsupported filesystem feature (JOURNAL_DEV) disallows mounting");
 		if( hasIncompatFeature(Ext2Constants.EXT3_FEATURE_INCOMPAT_RECOVER) )
-			throw new FileSystemException("Unsupported filesystem feature (RECOVER) disallows mounting");
+			throw new FileSystemException(device.getId()+" Unsupported filesystem feature (RECOVER) disallows mounting");
 
 		//an unsupported RO_COMPAT feature means that the filesystem can only be mounted readonly
-		//...
+		if( hasROFeature(Ext2Constants.EXT2_FEATURE_RO_COMPAT_LARGE_FILE)) {
+			log.info(device.getId()+" Unsupported filesystem feature (LARGE_FILE) forces readonly mode");
+			setReadOnly(true);
+		}		
+		if( hasROFeature(Ext2Constants.EXT2_FEATURE_RO_COMPAT_BTREE_DIR)) {
+			log.info(device.getId()+" Unsupported filesystem feature (BTREE_DIR) forces readonly mode");
+			setReadOnly(true);
+		}
 		
-		log.info(  "Ext2fs filesystem constructed sucessfully");
+		//if the filesystem has not been cleanly unmounted, mount it readonly
+		if(superblock.getState()==Ext2Constants.EXT2_ERROR_FS) {
+			log.info(device.getId()+" Filesystem has not been cleanly unmounted, mounting it readonly");
+			setReadOnly(true);
+		}
+		
+		//if the filesystem has been mounted R/W, set it to "unclean"
+		if(!isReadOnly()) {
+			log.info(device.getId()+" mounting fs r/w");
+			superblock.setState(Ext2Constants.EXT2_ERROR_FS);
+		}
+		
+		//log.info(  "Ext2fs filesystem constructed sucessfully");
 		log.debug( "	superblock:	#blocks:		"+superblock.getBlocksCount()+"\n"+
 					"				#blocks/group:	"+superblock.getBlocksPerGroup()+"\n"+
 					"				#block groups:	"+groupCount+"\n"+
@@ -141,7 +150,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 				block.flush();
 			}		
 		}
-
+				
 		log.info("Filesystem flushed");
 	}
 	
@@ -152,6 +161,13 @@ public class Ext2FileSystem extends AbstractFileSystem {
 		superblock.update();
 	}
 
+	public void close() throws IOException {
+		super.close();
+		
+		//mark the filesystem clean
+		superblock.setState(Ext2Constants.EXT2_VALID_FS);
+	}
+	
 	/**
 	 * @see org.jnode.fs.FileSystem#getRootEntry()
 	 */

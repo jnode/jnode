@@ -160,6 +160,10 @@ public class Superblock {
 	public int getState() {
 		return Ext2Utils.get16(data, 58);
 	}
+	public void setState(int state) {
+		Ext2Utils.set16(data, 58, state);
+		setDirty(true);
+	}
 
 	public int getErrors() {
 		return Ext2Utils.get16(data, 60);
