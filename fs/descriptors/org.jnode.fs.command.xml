@@ -21,10 +21,11 @@
   <extension point="org.jnode.shell.aliases">
     <alias name="cat" class="org.jnode.fs.command.CatCommand"/>
     <alias name="cd"  class="org.jnode.fs.command.CdCommand"/>
+    <alias name="del" class="org.jnode.fs.command.DeleteCommand"/>
     <alias name="dir" class="org.jnode.fs.command.DirCommand"/>
+    <alias name="eject" class="org.jnode.fs.command.EjectCommand"/>
     <alias name="format" class="org.jnode.fs.command.FormatCommand"/>
     <alias name="mkdir" class="org.jnode.fs.command.MkdirCommand"/>
-    <alias name="del" class="org.jnode.fs.command.DeleteCommand"/>
   </extension>
 
   <extension point="org.jnode.security.permissions">
