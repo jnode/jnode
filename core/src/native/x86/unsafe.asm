@@ -600,7 +600,8 @@ Q43org5jnode2vm6Unsafe23getMinAddress2e2829Lorg2fjnode2fvm2fAddress3b:
 	
 ; public static native Address getMemoryStart()
 Q43org5jnode2vm6Unsafe23getMemoryStart2e2829Lorg2fjnode2fvm2fAddress3b:
-	mov eax,freeMemoryStart
+	mov eax,[free_mem_start]
+	;; mov eax,freeMemoryStart
 	ret
 	
 ; public static native Address getMemoryEnd()
@@ -616,6 +617,16 @@ Q43org5jnode2vm6Unsafe23getKernelStart2e2829Lorg2fjnode2fvm2fAddress3b:
 ; public static native Address getKernelEnd()
 Q43org5jnode2vm6Unsafe23getKernelEnd2e2829Lorg2fjnode2fvm2fAddress3b:
 	mov eax,vm_start
+	ret
+	
+; public static native Address getInitJarStart()
+Q43org5jnode2vm6Unsafe23getInitJarStart2e2829Lorg2fjnode2fvm2fAddress3b:
+	mov eax,[initJar_start]
+	ret
+	
+; public static native Address getInitJarEnd()
+Q43org5jnode2vm6Unsafe23getInitJarEnd2e2829Lorg2fjnode2fvm2fAddress3b:
+	mov eax,[initJar_end]
 	ret
 	
 ; public static native Address getBootHeapStart()

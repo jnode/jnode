@@ -1,0 +1,115 @@
+/*
+ * $Id$
+ */
+package org.jnode.build;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.taskdefs.GZip;
+import org.apache.tools.ant.taskdefs.Jar;
+import org.apache.tools.ant.taskdefs.Manifest;
+import org.apache.tools.ant.types.FileSet;
+import org.jnode.plugin.PluginException;
+import org.jnode.plugin.model.PluginJar;
+
+/**
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
+ */
+public class InitJarBuilder extends AbstractPluginsTask {
+
+	private File destFile;
+
+	public void execute() throws BuildException {
+
+		final long start = System.currentTimeMillis();
+
+		final long lmDest = destFile.lastModified();
+		final long lmPIL = getPluginListFile().lastModified();
+
+		final PluginList piList;
+		final long lmPI;
+		try {
+			piList = getPluginList();
+			lmPI = piList.lastModified();
+		} catch (PluginException ex) {
+			throw new BuildException(ex);
+		} catch (IOException ex) {
+			throw new BuildException(ex);
+		}
+
+		if ((lmPIL < lmDest) && (lmPI < lmDest)) {
+			// No need to do anything, skip
+			return;
+		}
+		destFile.delete();
+		final File tmpFile = new File(destFile + ".tmp");
+		tmpFile.delete();
+
+		try {
+			// Load the plugin descriptors
+			/*
+			 * final PluginRegistry piRegistry; piRegistry = new PluginRegistryModel(piList.getDescriptorUrlList());
+			 */
+
+			final Jar jarTask = new Jar();
+			jarTask.setProject(getProject());
+			jarTask.setTaskName(getTaskName());
+			jarTask.setDestFile(tmpFile);
+			jarTask.setCompress(false);
+
+			final Manifest mf = piList.getManifest();
+			if (mf != null) {
+				jarTask.addConfiguredManifest(mf);
+			}
+			
+			final URL[] pluginList = piList.getPluginList();
+			for (int i = 0; i < pluginList.length; i++) {
+				final URL url = pluginList[i];
+				final PluginJar piJar = new PluginJar(null, url);
+				if (piJar.getDescriptor().isSystemPlugin()) {
+					log("System plugin " + piJar.getDescriptor().getId() +" in plugin-list will be ignored", Project.MSG_WARN);
+				} else {
+					final File f = new File(url.getPath());
+					final FileSet fs = new FileSet();
+					fs.setDir(f.getParentFile());
+					fs.setIncludes(f.getName());
+					jarTask.addFileset(fs);
+				}
+			}
+
+			/*
+			 * for (Iterator i = piRegistry.getDescriptorIterator(); i.hasNext(); ) { final PluginDescriptor descr = (PluginDescriptor)i.next(); final Runtime rt = descr.getRuntime(); if (rt != null) {
+			 * final Library[] libs = rt.getLibraries(); for (int l = 0; l < libs.length; l++) { processLibrary(jarTask, libs[l], fileSets, getPluginDir()); } }
+			 */
+
+			// Now create the jar file
+			jarTask.execute();
+
+			// Now zip it
+			final GZip gzipTask = new GZip();
+			gzipTask.setProject(getProject());
+			gzipTask.setTaskName(getTaskName());
+			gzipTask.setSrc(tmpFile);
+			gzipTask.setZipfile(destFile);
+			gzipTask.execute();
+			tmpFile.delete();
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new BuildException(ex);
+		}
+		final long end = System.currentTimeMillis();
+		log("Building initjar took " + (end - start) + "ms");
+	}
+
+	/**
+	 * @param file
+	 */
+	public void setDestFile(File file) {
+		destFile = file;
+	}
+
+}

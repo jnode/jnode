@@ -31,6 +31,7 @@ public class BootFloppyBuilder {
 	private File destFile;
 	private File kernelFile;
 	private File menuFile;
+	private File initJarFile;
 	private final Logger log = Logger.getLogger(getClass());
 	private String stage1ResourceName;
 	private String stage2ResourceName;
@@ -44,7 +45,7 @@ public class BootFloppyBuilder {
 
 		try {
 			if (isExecuteNeeded()) {
-				createImage(destFile, kernelFile, menuFile);
+				createImage();
 			}
 		} catch (Throwable ex) {
 			ex.printStackTrace(System.err);
@@ -63,14 +64,11 @@ public class BootFloppyBuilder {
 	/**
 	 * Create the actual bootfloppy
 	 * 
-	 * @param destFile
-	 * @param kernelFile
-	 * @param menuFile
 	 * @throws IOException
 	 * @throws DriverException
 	 * @throws FileSystemException
 	 */
-	public void createImage(File destFile, File kernelFile, File menuFile) throws IOException, DriverException, FileSystemException {
+	public void createImage() throws IOException, DriverException, FileSystemException {
 
 		final FileDevice newFd = new FileDevice(destFile, "rw");
 		try {
@@ -133,7 +131,10 @@ public class BootFloppyBuilder {
 		if (menuFile != null) {
 			addFile(bgDir, menuFile, "menu.lst");
 		}
-
+		if (initJarFile != null) {
+			addFile(dir, initJarFile, "full.jgz");
+		}
+		
 		fs.close();
 	}
 
@@ -256,6 +257,20 @@ public class BootFloppyBuilder {
 	 */
 	public final void setStage2ResourceName(String stage2ResourceName) {
 		this.stage2ResourceName = stage2ResourceName;
+	}
+
+	/**
+	 * @return Returns the initJarFile.
+	 */
+	public final File getInitJarFile() {
+		return this.initJarFile;
+	}
+
+	/**
+	 * @param initJarFile The initJarFile to set.
+	 */
+	public final void setInitJarFile(File initJarFile) {
+		this.initJarFile = initJarFile;
 	}
 
 }

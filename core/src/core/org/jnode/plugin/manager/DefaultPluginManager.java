@@ -18,6 +18,7 @@ import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginManager;
 import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.PluginRegistry;
+import org.jnode.plugin.model.PluginRegistryModel;
 import org.jnode.system.BootLog;
 
 /**
@@ -56,6 +57,9 @@ public class DefaultPluginManager extends PluginManager {
 	 * @throws PluginException
 	 */
 	public void startPlugins() throws PluginException {
+		// Resolve all plugins
+		((PluginRegistryModel)registry).resolveDescriptors();
+		
 		// Set the context classloader
 		Thread.currentThread().setContextClassLoader(registry.getPluginsClassLoader());
 

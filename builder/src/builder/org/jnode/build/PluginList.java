@@ -17,6 +17,8 @@ import java.util.Iterator;
 
 import nanoxml.XMLElement;
 
+import org.apache.tools.ant.taskdefs.Manifest;
+import org.apache.tools.ant.taskdefs.ManifestException;
 import org.jnode.plugin.PluginException;
 
 /**
@@ -26,6 +28,7 @@ public class PluginList {
 
 	private final URL[] descrList;
 	private final URL[] pluginList;
+	private Manifest manifest;
 
 	public PluginList(File file, File defaultDir, String targetArch) throws PluginException, MalformedURLException {
 
@@ -63,6 +66,10 @@ public class PluginList {
 				}
 				descrList.add(descrUrl);
 				pluginList.add(pluginUrl);
+			} else if (e.getName().equals("manifest")) {
+				manifest = parseManifest(e);
+			} else {
+				throw new PluginException("Unknown element " + e.getName());
 			}
 		}
 		this.descrList = (URL[]) descrList.toArray(new URL[descrList.size()]);
@@ -91,6 +98,25 @@ public class PluginList {
 		}
 	}
 
+	private Manifest parseManifest(XMLElement me) throws PluginException {
+		Manifest mf = new Manifest();
+		for (Iterator i = me.getChildren().iterator(); i.hasNext();) {
+			final XMLElement e = (XMLElement) i.next();
+			if (e.getName().equals("attribute")) {
+				final String k = e.getStringAttribute("key");
+				final String v = e.getStringAttribute("value");
+				try {
+					mf.addConfiguredAttribute(new Manifest.Attribute(k, v));
+				} catch (ManifestException ex) {
+					throw new PluginException("Error in manifest", ex);
+				}
+			} else {
+				throw new PluginException("Unknown element " + e.getName());
+			}
+		}
+		return mf;
+	}
+	
 	/**
 	 * Gets the maximum last modification date of all URL's
 	 * @return last modification date
@@ -119,5 +145,12 @@ public class PluginList {
 	 */
 	public URL[] getPluginList() {
 		return pluginList;
+	}
+	
+	/**
+	 * @return Returns the manifest.
+	 */
+	public final Manifest getManifest() {
+		return this.manifest;
 	}
 }

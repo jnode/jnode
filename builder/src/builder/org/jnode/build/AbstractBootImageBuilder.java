@@ -99,6 +99,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 		final PluginList piList;
 		final long lmPI;
 		try {
+			log("plugin-list: " + getPluginListFile(), Project.MSG_DEBUG);
 			piList = getPluginList();
 			lmPI = piList.lastModified();
 		} catch (PluginException ex) {

@@ -991,6 +991,20 @@ public final class Unsafe {
 	protected static native Address getKernelEnd();
 
 	/**
+	 * Gets the (inclusive) start address of the initial jarfile.
+	 * 
+	 * @return Address
+	 */
+	protected static native Address getInitJarStart();
+
+	/**
+	 * Gets the (exclusive) end address of the initial jarfile.
+	 * 
+	 * @return Address
+	 */
+	protected static native Address getInitJarEnd();
+
+	/**
 	 * Gets the (inclusive) start address of the boot heap.
 	 * 
 	 * @return Address

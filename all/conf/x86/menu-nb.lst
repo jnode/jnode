@@ -3,8 +3,9 @@ default 0
 timeout 2
 
 # JNode
-title JNode
+title JNode (all plugins)
 kernel (nd)/jnodesys.gz
+module (nd)/full.jgz
 
 
 

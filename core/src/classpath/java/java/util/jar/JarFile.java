@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package java.util.jar;
 
+import java.util.zip.RandomAccessBuffer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -119,6 +120,19 @@ public class JarFile extends ZipFile {
 	 */
 	public JarFile(File file) throws FileNotFoundException, IOException {
 		this(file, true);
+	}
+
+	/**
+	 * Creates a new JarFile. All jar entries are verified (when a Manifest file
+	 * for this JarFile exists). You need to actually open and read the complete
+	 * jar entry (with <code>getInputStream()</code>) to check its signature.
+	 *
+	 * @param file the file to open as a jar file
+	 * @exception FileNotFoundException if the file does not exits
+	 * @exception IOException if another IO exception occurs while reading
+	 */
+	public JarFile(RandomAccessBuffer raf, String name) throws IOException {
+		super(raf, name);
 	}
 
 	/**

@@ -37,15 +37,12 @@ public class BootDiskBuilder extends BootFloppyBuilder {
 
 	/**
 	 * Create the actual bootfloppy
-	 * @param destFile
-	 * @param kernelFile
-	 * @param menuFile
 	 * @throws IOException
 	 * @throws DriverException
 	 * @throws FileSystemException
 	 */
-	public void createImage(File destFile, File kernelFile, File menuFile) throws IOException, DriverException, FileSystemException {
-		super.createImage(destFile, kernelFile, menuFile);
+	public void createImage() throws IOException, DriverException, FileSystemException {
+		super.createImage();
 		
 		FileWriter fw = new FileWriter(plnFile);
 		PrintWriter pw = new PrintWriter(fw);
@@ -54,7 +51,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
 		pw.println("HEADS     " + geom.getHeads());
 		pw.println("SECTORS   " + geom.getSectors());
 		pw.println("CAPACITY  " + geom.getTotalSectors());
-		pw.println("ACCESS    \"" + destFile.getCanonicalPath() + "\" 0 102400");
+		pw.println("ACCESS    \"" + getDestFile().getCanonicalPath() + "\" 0 102400");
 		pw.flush();
 		fw.flush();
 		pw.close();

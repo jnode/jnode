@@ -24,6 +24,7 @@
       <export name="org.jnode.protocol.system.*"/>
       <export name="org.jnode.system.*"/>
       <export name="org.jnode.system.event.*"/>
+      <export name="org.jnode.system.util.*"/>
     </library>
   </runtime>
         

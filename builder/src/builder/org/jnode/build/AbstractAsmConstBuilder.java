@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,6 +61,7 @@ public abstract class AbstractAsmConstBuilder {
 		final int slotSize = arch.getReferenceSize();
 		VmSystemClassLoader cl = new VmSystemClassLoader(classesURL, arch);
 		VmType.initializeForBootImage(cl);
+		long lastModified = 0;
 
 		FileWriter fw = new FileWriter(destFile);
 		PrintWriter out = new PrintWriter(fw);
@@ -68,7 +70,9 @@ public abstract class AbstractAsmConstBuilder {
 		out.println();
 
 		for (Iterator j = classes.iterator(); j.hasNext();) {
-			ClassName cn = (ClassName) j.next();
+			final ClassName cn = (ClassName) j.next();
+			final URL classUrl = cn.getURL(classesURL);
+			lastModified = Math.max(lastModified, classUrl.openConnection().getLastModified());
 			out.println("; Constants for " + cn.getClassName());
 
 			if (cn.isStatic()) {
@@ -123,6 +127,7 @@ public abstract class AbstractAsmConstBuilder {
 		fw.flush();
 		out.close();
 		fw.close();
+		destFile.setLastModified(lastModified);
 	}
 
 	public void addClass(ClassName cn) {
@@ -192,6 +197,9 @@ public abstract class AbstractAsmConstBuilder {
 			this._static = _static;
 		}
 
+		public URL getURL(URL root) throws MalformedURLException{
+			return new URL(root.toExternalForm() +"/" +className.replace('.', '/') +".class");
+		}
 	}
 
 	/**

@@ -28,7 +28,7 @@ final class ResourceManagerImpl implements ResourceManager {
 	private ResourceManagerImpl() {
 	}
 	
-	protected static void initialize() {
+	protected static ResourceManager initialize() {
 		try {
 			final Address kernelStart = Unsafe.getKernelStart(); 
 			final Address kernelEnd = Unsafe.getKernelEnd();
@@ -40,7 +40,9 @@ final class ResourceManagerImpl implements ResourceManager {
 			final long bootHeapSize = Address.distance(bootHeapStart, bootHeapEnd); 
 			MemoryResourceImpl.claimMemoryResource(new SimpleResourceOwner("bootheap"), bootHeapStart, bootHeapSize, MEMMODE_NORMAL);
 
-			InitialNaming.bind(NAME, new ResourceManagerImpl());
+			ResourceManager rm = new ResourceManagerImpl();
+			InitialNaming.bind(NAME, rm);
+			return rm;
 		} catch (NamingException ex) {
 			throw new Error("Cannot initialize ResourceManager");
 		} catch (ResourceNotFreeException ex) {

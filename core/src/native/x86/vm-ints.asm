@@ -10,7 +10,7 @@
 	extern SoftByteCodes_systemException
 	extern VmProcessor_reschedule
 	
-deadLockCounter dd 0
+deadLockCounter				dd 0
 currentTimeMillisStaticsIdx	dd -1
 	
 ; -----------------------------------------------
@@ -147,6 +147,9 @@ timer_ret:
 	ret
 	
 timer_deadlock:
+	mov eax,dword [jnodeFinished]
+	test eax,eax
+	jnz timer_ret
 	mov eax,deadLock_msg
 	call sys_print_str
 	jmp int_die
