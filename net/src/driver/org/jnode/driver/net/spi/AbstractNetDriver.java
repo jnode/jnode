@@ -73,7 +73,11 @@ public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, 
 		final Device device = getDevice();
 		try {
 			final DeviceManager dm = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);
-			dm.rename(device, getDevicePrefix(), true);
+            if (renameToDevicePrefixOnly()) {
+                dm.rename(device, getDevicePrefix(), true);                
+            } else {
+                dm.rename(device, getDevicePrefix() + "-" + device.getId(), false);
+            }
 		} catch (DeviceAlreadyRegisteredException ex) {
 			log.error("Cannot rename device", ex);
 		} catch (NameNotFoundException ex) {
@@ -146,6 +150,16 @@ public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, 
 	 */
 	protected abstract String getDevicePrefix();
 	
+    /**
+     * If this method returns true, the rename of the device id will be set
+     * to a devicePrefix with an auto-number, if false, the device id will be renamed
+     * to devicePrefix "-" old-deviceid.
+     * @see #getDevicePrefix()
+     */
+    protected boolean renameToDevicePrefixOnly() {
+        return false;
+    }
+    
 	/**
 	 * Pass a received frame onto the PacketTypeManager.
 	 * @param skbuf
