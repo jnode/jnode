@@ -1,257 +1,227 @@
+/* java.util.Date
+   Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
 
-// (C) 1996 Glynn Clements <glynn@sensei.co.uk> - Freely Redistributable
+This file is part of GNU Classpath.
+
+GNU Classpath is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+GNU Classpath is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GNU Classpath; see the file COPYING.  If not, write to the
+Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+02111-1307 USA.
+
+Linking this library statically or dynamically with other modules is
+making a combined work based on this library.  Thus, the terms and
+conditions of the GNU General Public License cover the whole
+combination.
+
+As a special exception, the copyright holders of this library give you
+permission to link this library with independent modules to produce an
+executable, regardless of the license terms of these independent
+modules, and to copy and distribute the resulting executable under
+terms of your choice, provided that you also meet, for each linked
+independent module, the terms and conditions of the license of that
+module.  An independent module is a module which is not derived from
+or based on this library.  If you modify this library, you may extend
+this exception to your version of the library, but you are not
+obligated to do so.  If you do not wish to do so, delete this
+exception statement from your version. */
+
 
 package java.util;
 
-//import kore.util.DateParser;
+/**
+ * This class represents a specific time in milliseconds since the epoch.
+ * The epoch is 1970, January 1 00:00:00.0000 UTC.  
+ *
+ * Date is intended to reflect universal time coordinate (UTC), but doesn't
+ * handle the leap seconds.
+ *
+ * Prior to jdk 1.1 this class was the sole Time class and had also 
+ * calendar functionality.  But this can't be localized, so a new Calendar
+ * class was created, that you should use instead.  The functions which
+ * get or return a year, month, day etc. are all deprecated and shouldn't be
+ * used.  Use Calendar instead.
+ * 
+ * @see Calendar
+ * @see GregorianCalendar
+ * @see java.text.DateFormat
+ * @author Jochen Hoenicke
+ * @author Per Bothner <bothner@cygnus.com>
+ */
+public class Date implements Cloneable, Comparable, java.io.Serializable
+{
+  /**
+   * This is the serialization UID for this class
+   */
+  private static final long serialVersionUID = 7523967970034938905L;
 
-public class Date implements Cloneable {
-	// Constants
+  /**
+   * The time in milliseconds since the epoch.
+   */
+  private transient long time;
 
-	private final static String[] days = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
-
-	private final static String[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-
-	// Private Class Methods
-
-	private static String fixed_int(int i) {
-		return (i > 10) ? ("" + i) : ("0" + i);
+  /**
+   * Creates a new Date Object representing the current time.
+   */
+  public Date()
+  {
+    time = System.currentTimeMillis();
 	}
 
-	// Static Fields
-
-	private static int timezone; // timezone offset (excluding DST)
-	private static String[] tzname; // timezone names
-
-	static {
-		timezone = 0;
-		tzname = new String[2];
+  /**
+   * Creates a new Date Object representing the given time.
+   * @param time the time in milliseconds since the epoch.
+   */
+  public Date(long time)
+  {
+    this.time = time;
 	}
 
-	// Fields
-
-	private long millis; // milliseconds since 1970-1-1
-	private boolean isGMT; // true if this Date represents GMT
-
-	private int year; // tm_year
-	private int month; // tm_mon
-	private int date; // tm_mday
-	private int hrs; // tm_hour
-	private int min; // tm_min
-	private int sec; // tm_sec
-	private int day; // tm_wday
-	private int yday; // tm_yday
-	private boolean isdst; // tm_isdst
-
-	private boolean valid; // broken-down time is valid
-	private boolean mvalid; // millisecond count is valid
-
-	// Private Methods
-
-	private final static int daysIn1970Years = 719528;
-	private final static int daysIn400Years = 146097;
-	private final static int daysIn100Years = 36524;
-	private final static int daysIn4Years = 1460;
-	private final static int daysInYear = 365;
-
-	private final static int[] daysInMonth = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-
-	private void refresh_millis() {
-		if (mvalid)
-			return;
-
-		int year = this.year + 1900;
-
-		int c400 = year / 400;
-		int c100 = (year % 400) / 100;
-		int c4 = (year % 100) / 4;
-		int c1 = year % 4;
-
-		boolean isLeapCentury = (c100 == 0);
-		boolean isLeapCycle = (isLeapCentury || c4 > 0);
-		boolean isLeapYear = (isLeapCycle && c1 == 0);
-
-		int days =
-			c400 * daysIn400Years
-				+ c100 * daysIn100Years
-				+ (!isLeapCentury ? 1 : 0)
-				+ c4 * (daysIn4Years + 1)
-				- ((!isLeapCentury && c4 > 0) ? 1 : 0)
-				+ c1 * daysInYear
-				+ ((isLeapCycle && c1 > 0) ? 1 : 0);
-
-		for (int i = 0; i < this.month; i++)
-			days += daysInMonth[i] + (isLeapYear && i == 1 ? 1 : 0);
-
-		days += this.date - 1;
-
-		this.yday = days;
-
-		this.day = (days + 6) % 7;
-
-		int hours = days * 24 + this.hrs;
-		int minutes = hours * 60 + this.min;
-		int seconds = minutes * 60 + this.sec;
-
-		this.isdst = !isGMT /*&& NativeUtil.getTZIsDST(seconds)*/;
-
-		seconds -= timezone * 60 + (isdst ? 60 * 60 : 0);
-
-		this.millis = seconds * 1000;
-
-		mvalid = true;
+  /**
+   * Creates a new Date Object representing the given time.
+   * @deprecated use <code>new GregorianCalendar(year+1900, month,
+   * day)</code> instead.  
+   */
+  public Date(int year, int month, int day)
+  {
+    time = new GregorianCalendar(year + 1900, month, day).getTimeInMillis();
 	}
 
-	private void refresh_components() {
-		if (valid)
-			return;
-
-		refresh_millis();
-
-		int n = (int) (this.millis / 1000) + (getTimezoneOffset() * 60);
-
-		this.sec = n % 60;
-		n /= 60;
-
-		this.min = n % 60;
-		n /= 60;
-
-		this.hrs = n % 24;
-		n /= 24;
-
-		// n == days since 1970-01-01
-
-		int days = n + daysIn1970Years;
-		// days == days since 0000-01-01
-
-		this.day = (days + 6) % 7;
-		// 0000-01-01 is a Saturday => 6
-
-		int c400 = days / daysIn400Years;
-		// c400 == 400YrCycle
-
-		days -= c400 * daysIn400Years;
-		// days == days % 400 years ( == leap year cycle)
-
-		int c100 = (days == 0) ? 0 : ((days - 1) / daysIn100Years);
-		// c100 == century % 4
-
-		boolean isLeapCentury = (c100 == 0);
-
-		days -= (c100 * daysIn100Years + (isLeapCentury ? 0 : 1));
-		// days == days % 100 years
-
-		int c4 = (days + (isLeapCentury ? 0 : 1)) / (daysIn4Years + 1);
-		// c4 == 4YrCycles % 25
-
-		boolean isLeapCycle = (isLeapCentury || c4 > 0);
-
-		days -= (c4 * (daysIn4Years + 1) - (isLeapCycle ? 0 : 1));
-		// days == days % 4 years
-
-		int c1 = (days == 0) ? 0 : ((days - (isLeapCycle ? 1 : 0)) / daysInYear);
-		// c1 == Years % 4
-
-		boolean isLeapYear = (isLeapCycle && c1 == 0);
-
-		days -= (c1 * daysInYear + ((isLeapCycle && c1 > 0) ? 1 : 0));
-		// days == days % 365/366
-
-		this.year = (400 * c400) + (c100 * 100) + (c4 * 4) + c1 - 1900;
-
-		this.yday = days;
-
-		for (int i = 0; i < 12; i++) {
-			n = daysInMonth[i];
-			if (isLeapYear && i == 1)
-				n++;
-			if (days < n) {
-				this.month = i;
-				break;
-			}
-			days -= n;
+  /**
+   * Creates a new Date Object representing the given time.
+   * @deprecated use <code>new GregorianCalendar(year+1900, month,
+   * day, hour, min)</code> instead.  
+   */
+  public Date(int year, int month, int day, int hour, int min)
+  {
+    time =
+      new GregorianCalendar(year + 1900, month, day, hour,
+			    min).getTimeInMillis();
 		}
 
-		this.date = ++days;
-
-		valid = true;
+  /**
+   * Creates a new Date Object representing the given time.
+   * @deprecated use <code>new GregorianCalendar(year+1900, month,
+   * day)</code> instead.  
+   */
+  public Date(int year, int month, int day, int hour, int min, int sec)
+  {
+    time =
+      new GregorianCalendar(year + 1900, month, day, hour, min,
+			    sec).getTimeInMillis();
 	}
 
-	private void invalidate() {
-		mvalid = false;
-		valid = false;
+  /**
+   * Creates a new Date from the given string representation.  This
+   * does the same as <code>new Date(Date.parse(s))</code>
+   * @see #parse
+   * @deprecated use <code>java.text.DateFormat.parse(s)</code> instead.  
+   */
+  public Date(String s)
+  {
+    time = parse(s);
 	}
 
-	// Public Class Methods
-
-	public synchronized static long parse(String string) {
-		return new DateParser(string).parse();
+  public Object clone()
+  {
+    try
+      {
+	return super.clone();
+	}
+    catch (CloneNotSupportedException ex)
+      {
+	return null;
+	}
 	}
 
-	public static long UTC(int year, int month, int date, int hrs, int min, int sec) {
-		Date d = new Date(year, month, date, hrs, min, sec);
-		d.isGMT = true;
-		return d.getTime();
+  /**
+   * @deprecated Use Calendar with a UTC TimeZone instead.
+   * @return the time in millis since the epoch.
+   */
+  public static long UTC(int year, int month, int date,
+			 int hrs, int min, int sec)
+  {
+    GregorianCalendar cal =
+      new GregorianCalendar(year + 1900, month, date, hrs, min, sec);
+    cal.set(Calendar.ZONE_OFFSET, 0);
+    cal.set(Calendar.DST_OFFSET, 0);
+    return cal.getTimeInMillis();
 	}
 
-	// Public Instance Methods
-
-	public int hashCode() {
-		refresh_millis();
-		return (int) (millis ^ (millis >>> 32));
+  /**
+   * Gets the time represented by this Object
+   * @return the time in milliseconds since the epoch.
+   */
+  public long getTime()
+  {
+    return time;
 	}
 
-	public int getTimezoneOffset() {
-		if (isGMT)
-			return 0;
-
-		refresh_millis();
-
-		return timezone + (isdst ? 60 : 0);
-	}
-
-	public String toString() {
-		refresh_components();
-
-		return days[day]
-			+ " "
-			+ months[month]
-			+ " "
-			+ fixed_int(date)
-			+ " "
-			+ fixed_int(hrs)
-			+ ":"
-			+ fixed_int(min)
-			+ ":"
-			+ fixed_int(sec)
-			+ " "
-			+ tzname[isdst
-			? 1
-			: 0] + " " + (1900 + year);
-	}
-
-	public String toGMTString() {
-		if (!isGMT) {
-			Date d = new Date(this.millis);
-			d.isGMT = true;
-			return d.toGMTString();
+  /**
+   * @deprecated use
+   * Calendar.get(Calendar.ZONE_OFFSET)+Calendar.get(Calendar.DST_OFFSET)
+   * instead.
+   * @return The time zone offset in minutes of the local time zone
+   * relative to UTC.  The time represented by this object is used to
+   * determine if we should use daylight savings.
+   */
+  public int getTimezoneOffset()
+  {
+    Calendar cal = Calendar.getInstance();
+    cal.setTimeInMillis(time);
+    return (cal.get(Calendar.ZONE_OFFSET)
+	    + cal.get(Calendar.DST_OFFSET)) / (60 * 1000);
 		}
 
-		refresh_components();
-
-		return (date) + " " + months[month] + " " + (1900 + year) + " " + fixed_int(hrs) + ":" + fixed_int(min) + ":" + fixed_int(sec) + " " + "GMT";
+  /**
+   * Sets the time which this Object should represented.
+   * @param time the time in milliseconds since the epoch.  */
+  public void setTime(long time)
+  {
+    this.time = time;
 	}
 
-	public String toLocaleString() {
-		return toString();
+  /**
+   * Tests if this date is after the specified date.
+   * @param when the other date
+   * @return true, if the date represented by this Object is
+   * strictly later than the time represented by when.  
+   */
+  public boolean after(Date when)
+  {
+    return time > when.time;
 	}
 
-	public boolean after(Date when) {
-		return getTime() > when.getTime();
+  /**
+   * Tests if this date is before the specified date.
+   * @param when the other date
+   * @return true, if the date represented by when is strictly later
+   * than the time represented by this object.
+   */
+  public boolean before(Date when)
+  {
+    return time < when.time;
 	}
 
-	public boolean before(Date when) {
-		return getTime() < when.getTime();
+  /**
+   * Compares two dates for equality.
+   * @param obj the object to compare.
+   * @return true, if obj is a Date object and the date represented
+   * by obj is exactly the same as the time represented by this
+   * object.  
+   */
+  public boolean equals(Object obj)
+  {
+    return (obj instanceof Date && time == ((Date) obj).time);
 	}
 
 	/**
@@ -262,8 +232,9 @@ public class Date implements Cloneable {
 	 * object, a negative if this Date is before the other Date, and
 	 * a positive value otherwise.  
 	 */
-	public int compareTo(Date when) {
-		return (getTime() < when.getTime()) ? -1 : (getTime() == when.getTime()) ? 0 : 1;
+  public int compareTo(Date when)
+  {
+    return (time < when.time) ? -1 : (time == when.time) ? 0 : 1;
 	}
 
 	/**
@@ -277,416 +248,525 @@ public class Date implements Cloneable {
 	 * a positive value otherwise.  
 	 * @exception ClassCastException if obj is not of type Date.
 	 */
-	public int compareTo(Object obj) {
+  public int compareTo(Object obj)
+  {
 		return compareTo((Date) obj);
 	}
 
-	public boolean equals(Object obj) {
-		return getTime() == ((Date) obj).getTime();
+  public int hashCode()
+  {
+    return (int) time ^ (int) (time >>> 32);
+  }
+
+  private static final String[] weekNames = { "Sun", "Mon", "Tue", "Wed",
+					      "Thu", "Fri", "Sat" };
+
+  private static final String[] monthNames = { "Jan", "Feb", "Mar", "Apr",
+					       "May", "Jun", "Jul", "Aug",
+					       "Sep", "Oct", "Nov", "Dec" };
+
+  public String toString()
+  {
+    Calendar cal = Calendar.getInstance();
+    cal.setTimeInMillis(time);
+    String day = "0" + cal.get(Calendar.DATE);
+    String hour = "0" + cal.get(Calendar.HOUR_OF_DAY);
+    String min = "0" + cal.get(Calendar.MINUTE);
+    String sec = "0" + cal.get(Calendar.SECOND);
+    String year = "000" + cal.get(Calendar.YEAR);
+    return weekNames[cal.get(Calendar.DAY_OF_WEEK) - 1] + " "
+      + monthNames[cal.get(Calendar.MONTH)] + " "
+      + day.substring(day.length() - 2) + " "
+      + hour.substring(hour.length() - 2) + ":"
+      + min.substring(min.length() - 2) + ":"
+      + sec.substring(sec.length() - 2) + " "
+      +
+      cal.getTimeZone().getDisplayName(cal.getTimeZone().inDaylightTime(this),
+				       TimeZone.SHORT) + " " +
+      year.substring(year.length() - 4);
 	}
 
-	public long getTime() {
-		refresh_millis();
-		return millis;
+  /** Format this object in a locale-specific way.
+   * @deprecated Use DateFormat.format(Date)
+   */
+  public String toLocaleString()
+  {
+    return java.text.DateFormat.getInstance().format(this);
 	}
 
-	public int getYear() {
-		refresh_components();
-		return year;
+  /** Format this object in a standard format in the GMT timezone.
+   * @deprecated Use DateFormat.format(Date) with a GMT TimeZone.
+   */
+  public String toGMTString()
+  {
+    java.text.DateFormat format = java.text.DateFormat.getInstance();
+    format.setTimeZone(TimeZone.getTimeZone("GMT"));
+    return format.format(this);
+  }
+
+  private static int parseTz(String tok, char sign)
+    throws IllegalArgumentException
+  {
+    int num;
+
+    try
+      {
+	// parseInt doesn't handle '+' so strip off sign.
+	num = Integer.parseInt(tok.substring(1));
+      }
+    catch (NumberFormatException ex)
+      {
+	throw new IllegalArgumentException(tok);
+      }
+
+    // Convert hours to minutes.
+    if (num < 24)
+      num *= 60;
+    else
+      num = (num / 100) * 60 + num % 100;
+
+    return sign == '-' ? -num : num;
 	}
 
-	public int getMonth() {
-		refresh_components();
-		return month;
+  private static int parseMonth(String tok)
+  {
+    // Initialize strings for month names.
+    // We could possibly use the fields of DateFormatSymbols but that is
+    // localized and thus might not match the English words specified.
+    String months[] = { "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY",
+			"JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER",
+			"NOVEMBER", "DECEMBER" };
+
+    int i;
+    for (i = 0; i < 12; i++)
+      if (months[i].startsWith(tok))
+        return i;
+
+    // Return -1 if not found.
+    return -1;
 	}
 
-	public int getDate() {
-		refresh_components();
-		return date;
+  private static boolean parseDayOfWeek(String tok)
+  {
+    // Initialize strings for days of the week names.
+    // We could possibly use the fields of DateFormatSymbols but that is
+    // localized and thus might not match the English words specified.
+    String daysOfWeek[] = { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY",
+			    "THURSDAY", "FRIDAY", "SATURDAY" };
+
+    int i;
+    for (i = 0; i < 7; i++)
+      if (daysOfWeek[i].startsWith(tok))
+        return true;
+
+    return false;
 	}
 
-	public int getHours() {
-		refresh_components();
-		return hrs;
+  /** Parse a String and return the time it represents.
+   * @param s The String to parse.
+   * @deprecated Use DateFormat.parse(String)
+   */
+  public static long parse(String string)
+  {
+    // Initialize date/time fields before parsing begins.
+    int year = -1;
+    int month = -1;
+    int day = -1;
+    int hour = -1;
+    int minute = -1;
+    int second = -1;
+    int timezone = 0;
+    boolean localTimezone = true;
+
+    // Trim out any nested stuff in parentheses now to make parsing easier.
+    StringBuffer buf = new StringBuffer();
+    int parenNesting = 0;
+    int len = string.length();
+    for (int i = 0;  i < len;  i++)
+      {
+	char ch = string.charAt(i);
+	if (ch >= 'a' && ch <= 'z')
+	  ch -= 'a' - 'A';
+	if (ch == '(')
+	  parenNesting++;
+	else if (parenNesting == 0)
+	  buf.append(ch);
+	else if (ch == ')')
+	  parenNesting--;
+      }
+    int tmpMonth;
+
+    // Make all chars upper case to simplify comparisons later.
+    // Also ignore commas; treat them as delimiters.
+    StringTokenizer strtok = new StringTokenizer(buf.toString(), " \t\n\r,");
+
+    while (strtok.hasMoreTokens())
+      {
+	String tok = strtok.nextToken();
+	char firstch = tok.charAt(0);
+	if ((firstch == '+' || firstch == '-') && year >= 0)
+	  {
+	    timezone = parseTz(tok, firstch);
+	    localTimezone = false;
+	  }
+	else if (firstch >= '0' && firstch <= '9')
+	  {
+	    while (tok != null && tok.length() > 0)
+	      {
+		int punctOffset = tok.length();
+		int num = 0;
+		int punct;
+		for (int i = 0;  ;  i++)
+		  {
+		    if (i >= punctOffset)
+		      {
+			punct = -1;
+			break;
+	}
+		    else
+		      {
+			punct = tok.charAt(i);
+			if (punct >= '0' && punct <= '9')
+			  {
+			    if (num > 999999999) // in case of overflow
+			      throw new IllegalArgumentException(tok);
+			    num = 10 * num + (punct - '0');
+	}
+			else
+			  {
+			    punctOffset = i;
+			    break;
+	}
 	}
 
-	public int getMinutes() {
-		refresh_components();
-		return min;
 	}
 
-	public int getSeconds() {
-		refresh_components();
-		return sec;
-	}
-
-	public int getDay() {
-		refresh_components();
-		return day;
-	}
-
-	public void setTime(long millis) {
-		this.millis = millis;
-		valid = false;
-		mvalid = true;
-	}
-
-	public void setYear(int year) {
-		this.year = year;
-		invalidate();
-	}
-
-	public void setMonth(int month) {
-		this.month = month;
-		invalidate();
-	}
-
-	public void setDate(int date) {
-		this.date = date;
-		invalidate();
-	}
-
-	public void setHours(int hours) {
-		this.hrs = hours;
-		invalidate();
-	}
-
-	public void setMinutes(int minutes) {
-		this.min = minutes;
-		invalidate();
-	}
-
-	public void setSeconds(int seconds) {
-		this.sec = seconds;
-		invalidate();
-	}
-
-	// Constructors
-
-	public Date(int year, int month, int date, int hrs, int min, int sec) {
-		this.year = year;
-		this.month = month;
-		this.date = date;
-		this.hrs = hrs;
-		this.min = min;
-		this.sec = sec;
-	}
-
-	public Date(int year, int month, int date, int hrs, int min) {
-		this(year, month, date, hrs, min, 0);
-	}
-
-	public Date(int year, int month, int date) {
-		this(year, month, date, 0, 0, 0);
-	}
-
-	public Date(long millis) {
-		this.millis = millis;
-		this.mvalid = true;
-	}
-
-	public Date(String s) {
-		this(parse(s));
-	}
-
-	public Date() {
-		this(System.currentTimeMillis());
-	}
-
-	final static class DateParser {
-		private final static String EOF = "EOF".intern();
-		private final static String space = " ".intern();
-		private final static String plus = "+".intern();
-		private final static String minus = "-".intern();
-		private final static String comma = ",".intern();
-		private final static String slash = "/".intern();
-		private final static String colon = ":".intern();
-
-		private final static String GMT = "GMT".intern();
-		private final static String UTC = "UTC".intern();
-		private final static String UT = "UT".intern();
-
-		private final static String EST = "EST".intern();
-		private final static String CST = "CST".intern();
-		private final static String MST = "MST".intern();
-		private final static String PST = "PST".intern();
-
-		private final static String EDT = "EST".intern();
-		private final static String CDT = "CST".intern();
-		private final static String MDT = "MST".intern();
-		private final static String PDT = "PST".intern();
-
-		private final static String AM = "AM".intern();
-		private final static String PM = "PM".intern();
-
-		private final static int TZ_UNKNOWN = Integer.MAX_VALUE;
-
-		private String string;
-		private int length;
-		private int index = 0;
-
-		private int tz = TZ_UNKNOWN;
-		private int year = -1;
-		private int month = -1;
-		private int day = -1;
-		private int hour = -1;
-		private int minute = -1;
-		private int second = -1;
-
-		private int read0() {
-			return (index >= length) ? -1 : (int) string.charAt(index++);
+		if (punct == ':')
+		  {
+		    if (hour < 0)
+		      hour = num;
+		    else
+		      minute = num;
 		}
-
-		private void unread0() {
-			index--;
+	        else if ((num >= 70
+			  && (punct == ' ' || punct == ','
+			      || punct == '/' || punct < 0))
+			 || (num < 70 && day >= 0 && month >= 0 && year < 0))
+		  {
+		    if (num >= 100)
+		      year = num;
+		    else
+		      {
+			int curYear = 1900 + new Date().getYear();
+			int firstYear = curYear - 80;
+			year = firstYear / 100 * 100 + num;
+			if (year < firstYear)
+			  year += 100;
 		}
-
-		private String getParentheses() {
-			while (true) {
-				int c = read0();
-				if (c == -1)
-					return EOF;
-				if (c == ')')
-					return space;
-				if (c == '(')
-					getParentheses();
 			}
+		else if (punct == '/')
+		  {
+		    if (month < 0)
+		      month = num - 1;
+		    else
+		      day = num;
 		}
+		else if (hour >= 0 && minute < 0)
+		  minute = num;
+		else if (minute >= 0 && second < 0)
+		  second = num;
+		else if (day < 0)
+		  day = num;
+		else
+		  throw new IllegalArgumentException(tok);
 
-		private String getSpace() {
-			while (Character.isSpaceChar((char) read0()));
-			unread0();
-			return space;
+		// Advance string if there's more to process in this token.
+		if (punct < 0 || punctOffset + 1 >= tok.length())
+		  tok = null;
+		else
+		  tok = tok.substring(punctOffset + 1);
 		}
-
-		private Integer getInt(int initial) {
-			int value = initial - '0';
-
-			while (true) {
-				int c = read0();
-				if (c < '0' || c > '9') {
-					unread0();
-					return new Integer(value);
 				}
-				value *= 10;
-				value += c - '0';
+	else if (firstch >= 'A' && firstch <= 'Z')
+	  {
+	    if (tok.equals("AM"))
+	      {
+		if (hour < 1 || hour > 12)
+		  throw new IllegalArgumentException(tok);
+		if (hour == 12)
+		  hour = 0;
 			}
+	    else if (tok.equals("PM"))
+	      {
+		if (hour < 1 || hour > 12)
+		  throw new IllegalArgumentException(tok);
+		if (hour < 12)
+		  hour += 12;
 		}
+	    else if (parseDayOfWeek(tok))
+	      ; // Ignore it; throw the token away.
+	    else if (tok.equals("UT") || tok.equals("UTC") || tok.equals("GMT"))
+	      localTimezone = false;
+	    else if (tok.startsWith("UT") || tok.startsWith("GMT"))
+	      {
+		int signOffset = 3;
+		if (tok.charAt(1) == 'T' && tok.charAt(2) != 'C')
+		  signOffset = 2;
 
-		private String getWord(int initial) {
-			StringBuffer buff = new StringBuffer();
-			buff.append((char) initial);
+	        char sign = tok.charAt(signOffset);
+		if (sign != '+' && sign != '-')
+		  throw new IllegalArgumentException(tok);
 
-			while (true) {
-				int c = read0();
-				if ((c < 'A' || c > 'Z') && (c < 'a' || c > 'z')) {
-					unread0();
-					return buff.toString().toUpperCase().intern();
+	        timezone = parseTz(tok.substring(signOffset), sign);
+	        localTimezone = false;
+	      }
+	    else if ((tmpMonth = parseMonth(tok)) >= 0)
+	      month = tmpMonth;
+	    else if (tok.length() == 3 && tok.charAt(2) == 'T')
+	      {
+		// Convert timezone offset from hours to minutes.
+		char ch = tok.charAt(0);
+		if (ch == 'E')
+		  timezone = -5 * 60;
+		else if (ch == 'C')
+		  timezone = -6 * 60;
+		else if (ch == 'M')
+		  timezone = -7 * 60;
+		else if (ch == 'P')
+		  timezone = -8 * 60;
+		else
+		  throw new IllegalArgumentException(tok);
+
+		// Shift 60 minutes for Daylight Savings Time.
+		if (tok.charAt(1) == 'D')
+		  timezone += 60;
+		else if (tok.charAt(1) != 'S')
+		  throw new IllegalArgumentException(tok);
+
+	        localTimezone = false;
 				}
-				buff.append((char) c);
+	    else
+	      throw new IllegalArgumentException(tok);
 			}
+	else
+	  throw new IllegalArgumentException(tok);
 		}
 
-		private Object getToken() {
-			while (true) {
-				int c = read0();
-				switch (c) {
-					case -1 :
-						return EOF;
-					case '+' :
-						return plus;
-					case '-' :
-						return minus;
-					case ',' :
-						return comma;
-					case '/' :
-						return slash;
-					case ':' :
-						return colon;
-					case '(' :
-						return getParentheses();
-					default :
-						if (c >= '0' && c <= '9')
-							return getInt(c);
-						if (c >= 'A' && c <= 'Z')
-							return getWord(c);
-						if (c >= 'a' && c <= 'z')
-							return getWord(c);
-						if (Character.isSpaceChar((char) c))
-							return getSpace();
-						throw new IllegalArgumentException("Invalid character in date:" + new Character((char) c));
-				}
-			}
+    // Unspecified hours, minutes, or seconds should default to 0.
+    if (hour < 0)
+      hour = 0;
+    if (minute < 0)
+      minute = 0;
+    if (second < 0)
+      second = 0;
+
+    // Throw exception if any other fields have not been recognized and set.
+    if (year < 0 || month < 0 || day < 0)
+      throw new IllegalArgumentException("Missing field");
+
+    // Return the time in either local time or relative to GMT as parsed.
+    // If no time-zone was specified, get the local one (in minutes) and
+    // convert to milliseconds before adding to the UTC.
+    GregorianCalendar cal
+      = new GregorianCalendar(year, month, day, hour, minute, second);
+    if (!localTimezone)
+      {
+	cal.set(Calendar.ZONE_OFFSET, timezone * 60 * 1000);
+	cal.set(Calendar.DST_OFFSET, 0);
+		}
+    return cal.getTimeInMillis();
 		}
 
-		private String[] days = { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", };
-
-		private boolean isDay(String s) {
-			for (int i = 0; i < 7; i++)
-				if (days[i].startsWith(s))
-					return true;
-			return false;
-		}
-
-		private String[] months = { "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER" };
-
-		private int parseMonth(String s) {
-			for (int i = 0; i < 12; i++)
-				if (months[i].startsWith(s))
-					return i;
-			return -1;
-		}
-
-		public long parse() {
-			Vector tokens = new Vector();
-			while (true) {
-				Object token = getToken();
-				tokens.addElement(token);
-				if (token == EOF)
-					break;
-			}
-
-			int length = tokens.size();
-			for (int i = 0; i < length; i++) {
-				Object token = tokens.elementAt(i);
-				if (token == EOF)
-					break;
-
-				Object next = tokens.elementAt(i + 1);
-
-				if (token == GMT || token == UTC || token == UT) {
-					tz = 0;
-					continue;
-				}
-
-				if (token == plus || token == minus) {
-					if (next instanceof Integer) {
-						int n = ((Integer) next).intValue();
-						tz = n;
-						if (tz < 24)
-							tz *= 60;
-						else
-							tz = (tz / 100) * 60 + (tz % 100);
-						if (token == minus)
-							tz = -tz;
-						i++;
-					}
-					continue;
-				}
-
-				if (token instanceof Integer) {
-					int n = ((Integer) token).intValue();
-
-					if (n > 70 && next == space || next == comma || next == slash || next == EOF) {
-						if (n > 1900)
-							n -= 1900;
-						year = n;
-					} else if (next == colon) {
-						if (hour < 0)
-							hour = n;
-						else
-							minute = n;
-						i++;
-					} else if (next == slash) {
-						if (month < 0)
-							month = n - 1;
-						else
-							day = n;
-						i++;
-					} else if (next == space || next == comma || next == minus || next == EOF) {
-						if (hour >= 0 && minute < 0)
-							minute = n;
-						else if (minute >= 0 && second < 0)
-							second = n;
-						else
-							day = n;
-					}
-					continue;
-				}
-
-				if (token instanceof String) {
-					String word = (String) token;
-
-					if (word == AM) {
-						if (hour < 1 || hour > 12)
-							throw new IllegalArgumentException("AM with invalid hour in date");
-						continue;
-					}
-
-					if (word == PM) {
-						if (hour < 1 || hour > 12)
-							throw new IllegalArgumentException("PM with invalid hour in date");
-						hour += 12;
-						continue;
-					}
-
-					if (word == EDT) {
-						tz = -240;
-						continue;
-					}
-
-					if (word == EST || word == CDT) {
-						tz = -300;
-						continue;
-					}
-
-					if (word == CST || word == MDT) {
-						tz = -360;
-						continue;
-					}
-
-					if (word == MST || word == PDT) {
-						tz = -420;
-						continue;
-					}
-
-					if (word == PST) {
-						tz = -480;
-						continue;
-					}
-
-					if (isDay(word))
-						continue;
-
-					int m = parseMonth(word);
-					if (m >= 0)
-						month = m;
-				}
+  /**
+   * @return the year minus 1900 represented by this date object.
+   * @deprecated Use Calendar instead of Date, and use get(Calendar.YEAR)
+   * instead.  Note about the 1900 difference in year.
+   */
+  public int getYear()
+  {
+    Calendar cal = Calendar.getInstance();
+    cal.setTimeInMillis(time);
+    return cal.get(Calendar.YEAR) - 1900;
 			}
 
-			if (year < 0)
-				throw new IllegalArgumentException("no year in date");
+  /**
+   * Sets the year to year minus 1900, not changing the other fields.
+   * @param year the year minus 1900.
+   * @deprecated Use Calendar instead of Date, and use
+   * set(Calendar.YEAR, year) instead.  Note about the 1900
+   * difference in year.  
+   */
+  public void setYear(int year)
+  {
+    Calendar cal = Calendar.getInstance();
+    cal.setTimeInMillis(time);
+    cal.set(Calendar.YEAR, 1900 + year);
+    time = cal.getTimeInMillis();
+				}
 
-			if (month < 0)
-				throw new IllegalArgumentException("no month in date");
+  /**
+   * @return the month represented by this date object (zero based).
+   * @deprecated Use Calendar instead of Date, and use get(Calendar.MONTH)
+   * instead.
+   */
+  public int getMonth()
+  {
+    Calendar cal = Calendar.getInstance();
+    cal.setTimeInMillis(time);
+    return cal.get(Calendar.MONTH);
+				}
 
-			if (day < 0)
-				throw new IllegalArgumentException("no day of month in date");
+  /**
+   * Sets the month to the given value, not changing the other fields.
+   * @param month the month, zero based.
+   * @deprecated Use Calendar instead of Date, and use
+   * set(Calendar.MONTH, month) instead. 
+   */
+  public void setMonth(int month)
+  {
+    Calendar cal = Calendar.getInstance();
+    cal.setTimeInMillis(time);
+    cal.set(Calendar.MONTH, month);
+    time = cal.getTimeInMillis();
+				}
 
-			if (hour < 0)
-				hour = 0;
+  /**
+   * @return the day of month represented by this date object.
+   * @deprecated Use Calendar instead of Date, and use get(Calendar.DATE)
+   * instead.
+   */
+  public int getDate()
+  {
+    Calendar cal = Calendar.getInstance();
+    cal.setTimeInMillis(time);
+    return cal.get(Calendar.DATE);
+					}
 
-			if (minute < 0)
-				minute = 0;
+  /**
+   * Sets the date to the given value, not changing the other fields.
+   * @param date the date.
+   * @deprecated Use Calendar instead of Date, and use
+   * set(Calendar.DATE, date) instead. 
+   */
+  public void setDate(int date)
+  {
+    Calendar cal = Calendar.getInstance();
+    cal.setTimeInMillis(time);
+    cal.set(Calendar.DATE, date);
+    time = cal.getTimeInMillis();
+					}
 
-			if (second < 0)
-				second = 0;
+  /**
+   * @return the day represented by this date object.
+   * @deprecated Use Calendar instead of Date, and use get(Calendar.DAY_OF_WEEK)
+   * instead.
+   */
+  public int getDay()
+  {
+    Calendar cal = Calendar.getInstance();
+    cal.setTimeInMillis(time);
+    // For Calendar, Sunday is 1.  For Date, Sunday is 0.
+    return cal.get(Calendar.DAY_OF_WEEK) - 1;
+					}
 
-			return (tz == TZ_UNKNOWN)
-				? new Date(year, month, day, hour, minute, second).getTime()
-				: (Date.UTC(year, month, day, hour, minute, second) - 60000 * tz);
+  /**
+   * @return the hours represented by this date object.
+   * @deprecated Use Calendar instead of Date, and use get(Calendar.HOUR_OF_DAY)
+   * instead.
+   */
+  public int getHours()
+  {
+    Calendar cal = Calendar.getInstance();
+    cal.setTimeInMillis(time);
+    return cal.get(Calendar.HOUR_OF_DAY);
+					}
+
+  /**
+   * Sets the hours to the given value, not changing the other fields.
+   * @param hours the hours.
+   * @deprecated Use Calendar instead of Date, and use
+   * set(Calendar.HOUR_OF_DAY, hours) instead. 
+   */
+  public void setHours(int hours)
+  {
+    Calendar cal = Calendar.getInstance();
+    cal.setTimeInMillis(time);
+    cal.set(Calendar.HOUR_OF_DAY, hours);
+    time = cal.getTimeInMillis();
+					}
+
+  /**
+   * @return the minutes represented by this date object.
+   * @deprecated Use Calendar instead of Date, and use get(Calendar.MINUTE)
+   * instead.
+   */
+  public int getMinutes()
+  {
+    Calendar cal = Calendar.getInstance();
+    cal.setTimeInMillis(time);
+    return cal.get(Calendar.MINUTE);
+					}
+
+  /**
+   * Sets the minutes to the given value, not changing the other fields.
+   * @param minutes the minutes.
+   * @deprecated Use Calendar instead of Date, and use
+   * set(Calendar.MINUTE, minutes) instead. 
+   */
+  public void setMinutes(int minutes)
+  {
+    Calendar cal = Calendar.getInstance();
+    cal.setTimeInMillis(time);
+    cal.set(Calendar.MINUTE, minutes);
+    time = cal.getTimeInMillis();
+					}
+
+  /**
+   * @return the seconds represented by this date object.
+   * @deprecated Use Calendar instead of Date, and use get(Calendar.SECOND)
+   * instead.
+   */
+  public int getSeconds()
+  {
+    Calendar cal = Calendar.getInstance();
+    cal.setTimeInMillis(time);
+    return cal.get(Calendar.SECOND);
+			}
+
+  /**
+   * Sets the seconds to the given value, not changing the other fields.
+   * @param seconds the seconds.
+   * @deprecated Use Calendar instead of Date, and use
+   * set(Calendar.SECOND, seconds) instead. 
+   */
+  public void setSeconds(int seconds)
+  {
+    Calendar cal = Calendar.getInstance();
+    cal.setTimeInMillis(time);
+    cal.set(Calendar.SECOND, seconds);
+    time = cal.getTimeInMillis();
 		}
 
-		public DateParser(String string) {
-			this.string = string;
-		}
+  /**
+   * Reads an Object from the stream.
+   */
+  private void readObject(java.io.ObjectInputStream input)
+    throws java.io.IOException, ClassNotFoundException
+  {
+    input.defaultReadObject();
+    time = input.readLong();
 	}
 	
-	public Object clone() {
-	    try {
-            return super.clone();
-        } catch (CloneNotSupportedException ex) {
-            return null;
-        }
+  /**
+   * Writes an Object to the stream.
+   * @serialdata A long value representing the offset from the epoch
+   * in milliseconds.  This is the same value that is returned by the
+   * method getTime().
+   */
+  private void writeObject(java.io.ObjectOutputStream output)
+    throws java.io.IOException
+  {
+    output.defaultWriteObject();
+    output.writeLong(time);
 	}
 }

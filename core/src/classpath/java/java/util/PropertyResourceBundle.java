@@ -54,15 +54,15 @@ import java.io.InputStream;
  *
  * If there is also a class for this resource and the same locale, the
  * class will be chosen. The properties file should have the name of the
- * resource bundle, appended with the locale (e.g. <code>_de</code) and the
+ * resource bundle, appended with the locale (e.g. <code>_de</code> and the
  * extension <code>.properties</code>. The file should have the same format
  * as for <code>Properties.load()</code>
  *
  * An example of a properties file for the german language is given
  * here. This extends the example given in ListResourceBundle.
  * Create a file MyResource_de.properties with the following contents
- * and put it in the CLASSPATH. (The char <code>\u00e4<char> is the
- * german &auml;)
+ * and put it in the CLASSPATH. (The char <code>\u00e4</code> is the
+ * german umlaut)
  *
  *
 <pre>

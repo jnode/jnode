@@ -1,5 +1,5 @@
 /* Currency.java -- Representation of a currency
-   Copyright (C) 2003 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,8 +37,6 @@ exception statement from your version. */
 package java.util;
 
 import java.io.Serializable;
-import java.util.ResourceBundle;
-import java.util.Locale;
 import java.text.NumberFormat;
 
 public final class Currency implements Serializable
@@ -56,7 +54,8 @@ public final class Currency implements Serializable
   private Currency (Locale loc)
   {
     this.locale = loc;
-    this.res = ResourceBundle.getBundle ("gnu.java.locale.LocaleInformation", locale);
+    this.res = ResourceBundle.getBundle ("gnu.java.locale.LocaleInformation", 
+      locale, ClassLoader.getSystemClassLoader());
   }
 
   /**
@@ -150,7 +149,9 @@ public final class Currency implements Serializable
     // First we need to implement fully LocaleInformation*.java
     try
       {
-	ResourceBundle res = ResourceBundle.getBundle ("gnu.java.locale.LocaleInformation", locale);
+	ResourceBundle res = 
+	  ResourceBundle.getBundle ("gnu.java.locale.LocaleInformation", 
+				    locale, Currency.class.getClassLoader());
 
 	if (res.equals(this.res))
 	  return res.getString ("currencySymbol");

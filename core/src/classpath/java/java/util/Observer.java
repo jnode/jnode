@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.util;
 
 /**
@@ -45,7 +46,8 @@ package java.util;
  * @see Observable
  * @status updated to 1.4
  */
-public interface Observer {
+public interface Observer
+{
 	/**
 	 * This method is called whenever the observable object changes, and has
 	 * called <code>notifyObservers</code>. The Observable object can pass
@@ -54,5 +56,5 @@ public interface Observer {
 	 * @param observable the Observable object that changed
 	 * @param arg arbitrary information, usually relating to the change
 	 */
-	public void update(Observable observable, Object arg);
+  void update(Observable observable, Object arg);
 }
