@@ -7,12 +7,13 @@
 package org.jnode.assembler;
 
 import org.jnode.vm.Address;
+import org.jnode.vm.VmSystemObject;
 
 
 /**
  * @author epr
  */
-public abstract class ObjectResolver {
+public abstract class ObjectResolver extends VmSystemObject {
 	
 	/**
 	 * Gets the address of the given object.

@@ -31,14 +31,11 @@ import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.model.PluginRegistryModel;
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.DefaultHeapManager;
+import org.jnode.vm.HeapHelperImpl;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
-import org.jnode.vm.VmBootHeap;
 import org.jnode.vm.VmClassLoader;
-import org.jnode.vm.VmDefaultHeap;
-import org.jnode.vm.VmHeapManager;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.ObjectLayout;
@@ -48,6 +45,11 @@ import org.jnode.vm.classmgr.VmMethodCode;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.NativeCodeCompiler;
+import org.jnode.vm.memmgr.DefaultHeapManager;
+import org.jnode.vm.memmgr.HeapHelper;
+import org.jnode.vm.memmgr.VmBootHeap;
+import org.jnode.vm.memmgr.VmDefaultHeap;
+import org.jnode.vm.memmgr.VmHeapManager;
 
 /**
  * Build the boot image from an assembler compiled bootstrap (in ELF format) combined with the
@@ -127,7 +129,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			blockedObjects.add(clsMgr.getStatics().getTable());
 
 			// Create the VM
-			final Vm vm = new Vm(arch, new DefaultHeapManager(clsMgr));
+			final HeapHelper helper = new HeapHelperImpl();
+			final Vm vm = new Vm(arch, new DefaultHeapManager(clsMgr, helper, clsMgr.getStatics()));
 			blockedObjects.add(vm);
 
 			final VmProcessor proc = createProcessor(clsMgr.getStatics());
@@ -160,7 +163,9 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			loadClass(VmHeapManager.class);
 			loadClass(VmStatics.class);
 			loadClass(vm.getHeapManager().getClass());
-
+			loadClass(HeapHelper.class);
+			loadClass(HeapHelperImpl.class);
+			
 			/* Now emit the processor */
 			os.getObjectRef(proc);
 
@@ -582,6 +587,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 		add(new BootClassInfo("org.jnode.vm", true, core));
 		add(new BootClassInfo("org.jnode.vm.classmgr", true, core));
 		add(new BootClassInfo("org.jnode.vm.compiler", true, nonCore));
+		add(new BootClassInfo("org.jnode.vm.memmgr", true, core));
 		add(new BootClassInfo("org.jnode.util", true, nonCore));
 		add(new BootClassInfo("java.io", true, nonCore));
 		add(new BootClassInfo("java.util", true, nonCore));

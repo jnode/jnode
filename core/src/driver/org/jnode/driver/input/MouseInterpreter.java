@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jnode.driver.DeviceException;
 import org.jnode.driver.DriverException;
 
 /**
@@ -75,6 +76,9 @@ public class MouseInterpreter implements PointerInterpreter {
 
 			return result;
 		} catch (DriverException ex) {
+			log.error("Error probing for mouse", ex);
+			return false;
+		} catch (DeviceException ex) {
 			log.error("Error probing for mouse", ex);
 			return false;
 		}
