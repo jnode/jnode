@@ -41,6 +41,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
+
 /**
  * This class models an Internet address.  It does not have a public
  * constructor.  Instead, new instances of this objects are created 
@@ -360,7 +361,10 @@ public class InetAddress implements Serializable {
 	  * @exception UnknownHostException If an error occurs
 	  */
 	public static InetAddress getLocalHost() throws UnknownHostException {
-		return VMNetUtils.getAPI().getLocalAddress();
+    return VMNetUtils.getAPI().getLocalAddress();
+//		return Ifconfig.getLocalAddress().toInetAddress();
+		/*String hostname = getLocalHostName();
+		return getByName(hostname);*/
 	}
 
 	/*************************************************************************/
@@ -609,10 +613,32 @@ public class InetAddress implements Serializable {
 			throw new UnknownHostException("IP address has illegal length");
 
 		if (addr.length == 4)
+//      return new Inet4Address(null,addr);
 			return new Inet4Address(addr, null);
 
 		return new Inet6Address(addr, null);
+//    return new Inet6Address(null,addr);
 	}
+
+	/*************************************************************************/
+
+	/*
+	 * Native Methods
+	 */
+
+	/**
+	  * This native method looks up the hostname of the local machine
+	  * we are on.  If the actual hostname cannot be determined, then the
+	  * value "localhost" we be used.  This native method wrappers the
+	  * "gethostname" function.
+	  *
+	  * @return The local hostname.
+	  */
+	private static String getLocalHostName() {
+		return "localhost";
+	}
+
+	/*************************************************************************/
 
 	/**
 	  * This method returns the hostname for a given IP address.  It will
@@ -636,7 +662,7 @@ public class InetAddress implements Serializable {
 	  */
 	private static byte[][] getHostByName(String hostname) 
 	throws UnknownHostException {
-		
+
 		try {
 			StringTokenizer tok = new StringTokenizer(hostname, ".");
 			if (tok.countTokens() == 4) {
@@ -649,8 +675,8 @@ public class InetAddress implements Serializable {
 		} catch (NumberFormatException ex) {
 			// Not an IP number
 		}
-		
-		return null;
+
+    return VMNetUtils.getAPI().getHostByName(hostname);
 	}
 
 } // class InetAddress

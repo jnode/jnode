@@ -20,6 +20,8 @@ import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.net.ipv4.IPv4Address;
 import org.jnode.net.ipv4.IPv4ProtocolAddressInfo;
 import org.jnode.net.ipv4.util.Ifconfig;
+import org.jnode.net.ipv4.util.ResolverImpl;
+import org.jnode.net.ProtocolAddress;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -107,4 +109,39 @@ public class NetAPIImpl implements VMNetAPI {
 	public InetAddress getLocalAddress() throws UnknownHostException {
 		return Ifconfig.getLocalAddress().toInetAddress();
 	}
+
+
+  public byte[][] getHostByName(String hostname) throws UnknownHostException {
+    System.out.println("aa1");
+
+    // guess this have to been changes to over come ipv4 and ipv6
+    ProtocolAddress[] protocolAddresses = ResolverImpl.getInstance().getByName(hostname);
+    System.out.println("aa2");
+
+    int ipv_length = 0;
+
+    if (protocolAddresses != null && protocolAddresses.length != 0)
+      ipv_length = protocolAddresses[0].getLength();
+    else
+      return null;
+
+    byte[][] addresses = new byte[protocolAddresses.length][ipv_length];
+
+    ProtocolAddress protocolAddress;
+
+
+    for (int i = 0; i < protocolAddresses.length; i++)
+    {
+      protocolAddress = protocolAddresses[i];
+
+      for (int j = 0; j<ipv_length; j++)
+      {
+        addresses[i][j] = protocolAddress.get(j);
+      }
+    }
+    System.out.println("aa3");
+
+    return addresses;
+  }
+
 }
