@@ -51,6 +51,7 @@
     <plugin id="org.jnode.driver.pnp"/>
     <plugin id="org.jnode.driver.ps2"/>
     <plugin id="org.jnode.driver.scsi"/>
+    <plugin id="org.jnode.driver.scsi.mmc"/>
     <plugin id="org.jnode.driver.serial"/>
     <plugin id="org.jnode.driver.sound.speaker"/>
     <plugin id="org.jnode.driver.sound.speaker.pc"/>

@@ -3,6 +3,8 @@
  */
 package org.jnode.driver.block;
 
+import java.io.IOException;
+
 import org.jnode.fs.partitions.PartitionTableEntry;
 
 /**
@@ -15,7 +17,7 @@ public interface FSBlockDeviceAPI extends BlockDeviceAPI {
 	 * Gets the sector size for this device.
  	 * @return The sector size in bytes
 	 */
-	public int getSectorSize();
+	public int getSectorSize() throws IOException;
 	
 	/**
 	 * Gets the partition table entry specifying this device.
