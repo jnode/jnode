@@ -29,7 +29,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
 	private File plnFile;
 	int bytesPerSector = 512;
 	int spc = 1;
-	private Geometry geom = new Geometry(16, 64, 32);
+	private Geometry geom = new Geometry(64, 16, 32);
 	private MappedBlockDeviceSupport part0;
 	
 	public BootDiskBuilder() {
