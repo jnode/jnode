@@ -31,6 +31,7 @@ public final class VmX86Thread32 extends VmX86Thread {
      * Initialize this instance.
      */
     public VmX86Thread32() {
+        super(VmX86Architecture32.SLOT_SIZE);
     }
 
     /**
@@ -39,7 +40,7 @@ public final class VmX86Thread32 extends VmX86Thread {
      * @param stack
      */
     public VmX86Thread32(byte[] stack) {
-        super(stack);
+        super(stack, VmX86Architecture32.SLOT_SIZE);
     }
 
     /**

@@ -93,7 +93,7 @@ public final class VmX86Processor32 extends VmX86Processor {
         gdt.setBase(GDT.TSS_ENTRY, tss.getAddress());
 
         // Create kernel stack
-        tss.setKernelStack(new byte[VmThread.DEFAULT_STACK_SIZE]);
+        tss.setKernelStack(new byte[VmThread.DEFAULT_STACK_SLOTS * VmX86Architecture32.SLOT_SIZE]);
     }
 
     /**

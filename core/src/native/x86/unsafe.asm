@@ -152,7 +152,7 @@ GLABEL Q43org5jnode2vm6Unsafe23initThread2e28Lorg2fjnode2fvm2fVmThread3bLjava2fl
 
 	; Setup bound stackoverflow check area
 	mov [ADX+0], ADX	; Low == stack + (sizeof bound area) + STACK_OVERFLOW_LIMIT
-	add WORD [ADX+0],(VmThread_STACK_OVERFLOW_LIMIT+8)
+	add WORD [ADX+0],((VmThread_STACK_OVERFLOW_LIMIT_SLOTS * SLOT_SIZE)+8)
 	mov [ADX+SLOT_SIZE], ADX	; High == stack + stacksize
 	add [ADX+SLOT_SIZE], ABX
 

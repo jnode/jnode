@@ -207,7 +207,7 @@ public abstract class VmX86Processor extends VmProcessor {
         setupGDT(gdt);
 
         // Create user stack
-        final byte[] userStack = new byte[VmThread.DEFAULT_STACK_SIZE];
+        final byte[] userStack = new byte[VmThread.DEFAULT_STACK_SLOTS * getArchitecture().getReferenceSize()];
         setupUserStack(userStack);
         this.currentThread = createThread(userStack);
 

@@ -20,8 +20,6 @@ bits 32
  
 %include "rmconfig.h"
  
-%define KERNEL_STACKEND		(kernel_stack + VmThread_STACK_OVERFLOW_LIMIT)
- 
 	section .text
 
 kernel_begin:
@@ -69,6 +67,8 @@ TSS_DS		equ 0x38
 	global %1
 %1:
 %endmacro
+
+%define KERNEL_STACKEND		(kernel_stack + (VmThread_STACK_OVERFLOW_LIMIT_SLOTS * SLOT_SIZE))
 
 %include "kernel.asm"
 %include "cpu.asm"

@@ -25,14 +25,14 @@ public final class VmX86Thread64 extends VmX86Thread {
 	 * 
 	 */
 	public VmX86Thread64() {
-		super();
+		super(VmX86Architecture64.SLOT_SIZE);
 	}
 
 	/**
 	 * @param stack
 	 */
 	public VmX86Thread64(byte[] stack) {
-		super(stack);
+		super(stack, VmX86Architecture64.SLOT_SIZE);
 	}
 
 	/**
