@@ -1,8 +1,5 @@
 /*
- * Created on 15.01.2004
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * $Id$
  */
 package org.jnode.fs.ntfs;
 
