@@ -350,7 +350,9 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 	protected void initVmThread(X86Stream os) throws BuildException, ClassNotFoundException {
 		final VmType vmThreadClass = loadClass(VmThread.class);
 		final VmInstanceField threadStackField = (VmInstanceField) vmThreadClass.getField("stack");
-		final VmInstanceField stackEndField = (VmInstanceField) vmThreadClass.getField("stackEnd");
+		final VmInstanceField threadStackEndField = (VmInstanceField) vmThreadClass.getField("stackEnd");
+		final VmType vmProcessorClass = loadClass(VmProcessor.class);
+		final VmInstanceField procStackEndField = (VmInstanceField) vmProcessorClass.getField("stackEnd");
 		final VmThread initialThread = processor.getCurrentThread();
 
 		os.setObjectRef(new Label("$$Setup initial thread"));
@@ -362,7 +364,11 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
 		os.writeMOV(INTSIZE, Register.EBX, threadStackField.getOffset(), Register.EDX);
 		// Calculate and set stackEnd
 		os.writeLEA(Register.EDX, Register.EDX, VmThread.STACK_OVERFLOW_LIMIT);
-		os.writeMOV(INTSIZE, Register.EBX, stackEndField.getOffset(), Register.EDX);
+		os.writeMOV(INTSIZE, Register.EBX, threadStackEndField.getOffset(), Register.EDX);
+		
+		// Set stackend in current processor
+		os.writeMOV_Const(Register.EBX, processor);
+		os.writeMOV(INTSIZE, Register.EBX, procStackEndField.getOffset(), Register.EDX);
 	}
 
 	/**
@@ -575,6 +581,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements X86Com
         addCompileHighOptLevel("org.jnode.vm.x86.compiler");
         addCompileHighOptLevel("org.jnode.vm.x86.compiler.l0c");
         addCompileHighOptLevel("org.jnode.vm.x86.compiler.l1");
+        addCompileHighOptLevel("org.jnode.vm.x86.compiler.l1a");
         addCompileHighOptLevel("org.jnode.vm.x86.compiler.l2");
     }
     
