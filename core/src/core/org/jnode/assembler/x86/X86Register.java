@@ -268,6 +268,11 @@ public class X86Register extends VmSystemObject implements X86Constants {
         return (GPR) obj;
     }
 
+    public static boolean isGPR(String name){
+        Object obj =  registerMap.get(name);
+        return (obj != null) && (obj instanceof GPR);
+    }
+
     public abstract static class GPR extends X86Register {
 
         /**
