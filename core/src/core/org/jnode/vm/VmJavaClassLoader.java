@@ -113,4 +113,11 @@ public final class VmJavaClassLoader extends VmAbstractClassLoader {
 		return systemLoader.getStatics();
 	}
 
+	/**
+	 * @see org.jnode.vm.classmgr.VmClassLoader#resourceExists(java.lang.String)
+	 */
+	public final boolean resourceExists(String resName) {
+		return false;
+	}
+
 }

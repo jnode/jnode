@@ -52,15 +52,17 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
 	/**
 	 * Constructor for VmClassLoader.
+	 * 
 	 * @param classesURL
 	 * @param arch
 	 */
 	public VmSystemClassLoader(URL classesURL, VmArchitecture arch) {
 		this(classesURL, arch, null);
 	}
-	
+
 	/**
 	 * Constructor for VmClassLoader.
+	 * 
 	 * @param classesURL
 	 * @param arch
 	 */
@@ -76,6 +78,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
 	/**
 	 * Constructor for VmClassLoader.
+	 * 
 	 * @param classLoader
 	 */
 	public VmSystemClassLoader(ClassLoader classLoader) {
@@ -89,8 +92,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 	}
 
 	/**
-	 * Gets the collection with all currently loaded classes. All collection elements are
-	 * instanceof VmClass.
+	 * Gets the collection with all currently loaded classes. All collection elements are instanceof VmClass.
 	 * 
 	 * @return Collection
 	 */
@@ -187,8 +189,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 	}
 
 	/**
-	 * Gets the ClassInfo for the given name. If not found and create is True, a new ClassInfo is
-	 * created, added to the list and returned. If not found and create is False, null is returned.
+	 * Gets the ClassInfo for the given name. If not found and create is True, a new ClassInfo is created, added to the list and returned. If not found and create is False, null is returned.
 	 * 
 	 * @param name
 	 * @param create
@@ -340,6 +341,17 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 	}
 
 	/**
+	 * @see org.jnode.vm.classmgr.VmClassLoader#resourceExists(java.lang.String)
+	 */
+	public final boolean resourceExists(String resName) {
+		try {
+			return (getResourceAsStream(resName) != null);
+		} catch (IOException ex) {
+			return false;
+		}
+	}
+
+	/**
 	 * Gets an inputstream for a resource with the given name.
 	 * 
 	 * @param name
@@ -416,8 +428,10 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 	/**
 	 * Compile the given method
 	 * 
-	 * @param vmMethod The method to compile
-	 * @param optLevel The optimization level
+	 * @param vmMethod
+	 *            The method to compile
+	 * @param optLevel
+	 *            The optimization level
 	 */
 	public void compileRuntime(VmMethod vmMethod, int optLevel) {
 		final NativeCodeCompiler cmps[] = arch.getCompilers();
@@ -425,15 +439,14 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 		if (optLevel < 0) {
 			optLevel = 0;
 		} else if (optLevel >= cmps.length) {
-			optLevel = cmps.length-1;
+			optLevel = cmps.length - 1;
 		}
 		cmp = cmps[optLevel];
 		cmp.compileRuntime(vmMethod, getResolver(), optLevel, null);
 	}
 
 	/**
-	 * Initialize this classloader during the initialization of the VM. If needed, the tree of
-	 * classes is generated from the boot class list.
+	 * Initialize this classloader during the initialization of the VM. If needed, the tree of classes is generated from the boot class list.
 	 */
 	protected void initialize() {
 		if (classInfos == null) {
@@ -460,8 +473,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 	}
 
 	/**
-	 * Set the object resolver.
-	 * This can be called only once.
+	 * Set the object resolver. This can be called only once.
 	 */
 	public void setResolver(ObjectResolver resolver) {
 		if (this.resolver == null) {
@@ -573,8 +585,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 		}
 
 		/**
-		 * Signal a class loading error. This will release other threads waiting for this class
-		 * with a ClassNotFoundException.
+		 * Signal a class loading error. This will release other threads waiting for this class with a ClassNotFoundException.
 		 */
 		public final synchronized void setLoadError() {
 			this.error = true;
@@ -593,6 +604,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
 	/**
 	 * Gets the mapping between method name&types and selectors.
+	 * 
 	 * @return The map
 	 */
 	public final SelectorMap getSelectorMap() {
@@ -601,6 +613,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
 	/**
 	 * Gets the statics table.
+	 * 
 	 * @return The statics table
 	 */
 	public final VmStatics getStatics() {
@@ -609,24 +622,27 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
 	/**
 	 * Gets the architecture used by this loader.
+	 * 
 	 * @return The architecture
 	 */
 	public final VmArchitecture getArchitecture() {
 		return arch;
 	}
-	
+
 	/**
 	 * Should prepared classes be compiled.
+	 * 
 	 * @return boolean
 	 */
 	public boolean isCompileRequired() {
 		return requiresCompile;
 	}
-	
+
 	/**
 	 * Should prepared classes be compiled.
 	 */
 	public void setCompileRequired() {
 		requiresCompile = true;
 	}
+
 }

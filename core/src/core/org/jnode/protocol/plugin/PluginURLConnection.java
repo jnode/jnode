@@ -56,7 +56,7 @@ public class PluginURLConnection extends URLConnection {
 			if (descr == null) {
 				throw new IOException("Plugin " + pluginId + " not found");
 			}
-			this.jarFile = ((PluginDescriptorModel)descr).getJarFile();
+			this.jarFile = ((PluginDescriptorModel) descr).getJarFile();
 			if (this.jarFile == null) {
 				throw new IOException("Plugin jarfile not found");
 			}
@@ -69,6 +69,9 @@ public class PluginURLConnection extends URLConnection {
 	 * @see java.net.URLConnection#getInputStream()
 	 */
 	public InputStream getInputStream() throws IOException {
+		if (jarFile == null) {
+			connect();
+		}
 		return jarFile.getResourceAsStream(path);
 	}
 }
