@@ -208,8 +208,8 @@ public class BinaryQuad extends AssignQuad {
 		return this;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.jnode.vm.compiler.ir.AssignQuad#propagate(org.jnode.vm.compiler.ir.Variable)
+	/**
+	 * @see org.jnode.vm.compiler.ir.quad.AssignQuad#propagate(org.jnode.vm.compiler.ir.Variable)
 	 */
 	public Operand propagate(Variable operand) {
 		Quad quad = foldConstants();
@@ -385,8 +385,8 @@ public class BinaryQuad extends AssignQuad {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.jnode.vm.compiler.ir.AssignQuad#getLHSLiveAddress()
+	/**
+	 * @see org.jnode.vm.compiler.ir.quad.AssignQuad#getLHSLiveAddress()
 	 */
 	public int getLHSLiveAddress() {
 		CodeGenerator cg = CodeGenerator.getInstance();

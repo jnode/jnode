@@ -6,7 +6,7 @@ package org.jnode.vm.compiler.ir;
 import java.util.List;
 
 import org.jnode.util.BootableArrayList;
-import org.jnode.vm.compiler.ir.quad.*;
+import org.jnode.vm.compiler.ir.quad.AssignQuad;
 
 /**
  * @author Madhu Siddalingaiah
