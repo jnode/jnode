@@ -19,6 +19,7 @@
   <property name="dom4j.jar"           value="${root.dir}/builder/lib/dom4j.jar"/>
   <property name="log4j.jar"           value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
   <property name="nanoxml.jar"         value="${root.dir}/core/lib/nanoxml-lite-2.2.3.jar"/>
+  <property name="beanshell.jar"         value="${root.dir}/shell/lib/bsh-1.2b6.jar"/>
 
   <property name="plugin-list"         value="${basedir}/conf/plugin-list.xml"/>
   <property name="jnode-ver"           value="0.1.5"/>
@@ -29,6 +30,7 @@
     <pathelement location="${log4j.jar}"/>
     <pathelement location="${nanoxml.jar}"/>
     <pathelement location="${basedir}/conf"/>
+    <pathelement location="${beanshell.jar}"/>
   </path>
   
   <filterset id="descriptors-filter">
