@@ -46,11 +46,7 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
 
     protected final Component component;
 
-    private Point location = new Point();
-
-    private final Logger log = Logger.getLogger(getClass());
-
-    protected Dimension size = new Dimension();
+    protected final Logger log = Logger.getLogger(getClass());
 
     private final JNodeToolkit toolkit;
 
@@ -145,8 +141,11 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
         final Component parent = component.getParent();
         if (parent != null) {
             //System.out.println("creating graphics");
-            return parent.getGraphics().create(location.x, location.y,
-                    size.width, size.height);
+        	final int x = jComponent.getX();
+        	final int y = jComponent.getY();
+        	final int width = jComponent.getWidth();
+        	final int height = jComponent.getHeight();
+            return parent.getGraphics().create(x, y, width, height);
         } else {
             throw new Error();
         }
@@ -212,7 +211,7 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
         return false;
     }
 
-    public void hide() {
+    public final void hide() {
         setVisible(false);
     }
 
@@ -235,7 +234,7 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
         return false;
     }
 
-    public Dimension minimumSize() {
+    public final Dimension minimumSize() {
         return jComponent.getMinimumSize();
     }
 
@@ -246,7 +245,7 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
 
     // Deprecated
 
-    public Dimension preferredSize() {
+    public final Dimension preferredSize() {
         return jComponent.getPreferredSize();
     }
 
@@ -254,11 +253,11 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
         return toolkit.prepareImage(img, width, height, o);
     }
 
-    public void print(Graphics g) {
+    public final void print(Graphics g) {
         jComponent.print(g);
     }
 
-    public void repaint(long tm, int x, int y, int width, int height) {
+    public final void repaint(long tm, int x, int y, int width, int height) {
         jComponent.repaint(tm, x, y, width, height);
         paintAWTComponent();
     }
@@ -266,58 +265,58 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
     /**
      * @see java.awt.peer.ComponentPeer#requestFocus()
      */
-    public void requestFocus() {
+    public final void requestFocus() {
         jComponent.requestFocus();
     }
 
-    public boolean requestFocus(Component lightweightChild, boolean temporary,
+    public final boolean requestFocus(Component lightweightChild, boolean temporary,
             boolean focusedWindowChangeAllowed, long time) {
         return true;
     }
 
-    public void reshape(int x, int y, int width, int height) {
+    public final void reshape(int x, int y, int width, int height) {
         setBounds(x, y, width, height);
     }
 
-    public void setBackground(Color c) {
+    public final void setBackground(Color c) {
         jComponent.setBackground(c);
         paintAWTComponent();
     }
 
     // Bounds
 
-    public void setBounds(int x, int y, int width, int height) {
-        Rectangle b = jComponent.getBounds();
+    public final void setBounds(int x, int y, int width, int height) {
+    	final int oldWidth = jComponent.getWidth();
+    	final int oldHeight = jComponent.getHeight();
         jComponent.setBounds(x, y, width, height);
-        if (b.width != width || b.height != height) {
+        if ((oldWidth != width) || (oldHeight != height)) {
             sendComponentEvent(ComponentEvent.COMPONENT_RESIZED);
         } else {
             sendComponentEvent(ComponentEvent.COMPONENT_MOVED);
         }
-
     }
 
     /**
      * @see java.awt.peer.ComponentPeer#setCursor(java.awt.Cursor)
      */
-    public void setCursor(Cursor cursor) {
+    public final void setCursor(Cursor cursor) {
         jComponent.setCursor(cursor);
 
     }
 
-    public void setEnabled(boolean b) {
+    public final void setEnabled(boolean b) {
         jComponent.setEnabled(b);
     }
 
     /**
      * @see java.awt.peer.ComponentPeer#setEventMask(long)
      */
-    public void setEventMask(long mask) {
+    public final void setEventMask(long mask) {
         // TODO Auto-generated method stub
 
     }
 
-    public void setFont(Font f) {
+    public final void setFont(Font f) {
         jComponent.setFont(f);
         paintAWTComponent();
     }
@@ -329,12 +328,12 @@ class SwingComponentPeer extends JNodeGenericPeer implements ComponentPeer {
 
     // State
 
-    public void setVisible(boolean b) {
+    public final void setVisible(boolean b) {
         jComponent.setVisible(b);
         paintAWTComponent();
     }
 
-    public void show() {
+    public final void show() {
         setVisible(true);
     }
 

@@ -16,17 +16,14 @@ import javax.swing.ListModel;
  * AWT list peer implemented as a {@link javax.swing.JList}.
  */
 
-class SwingListPeer extends SwingComponentPeer implements ListPeer, SwingPeer {
-
-	private final List list;
+class SwingListPeer extends SwingComponentPeer implements ListPeer {
 
 	//
 	// Construction
 	//
 
 	public SwingListPeer(SwingToolkit toolkit, final List list) {
-        super(toolkit, list, new JList());
-		this.list = list;
+        super(toolkit, list, new SwingList(list));
         final JList jList = (JList)jComponent;
 		SwingToolkit.add(list, jList);
 		SwingToolkit.copyAwtProperties(list, jList);
@@ -58,13 +55,6 @@ class SwingListPeer extends SwingComponentPeer implements ListPeer, SwingPeer {
     public void removeAll() {
 
     }
-
-	/**
-	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
-	 */
-	public Component getAWTComponent() {
-		return list;
-	}
 
 	public int[] getSelectedIndexes() {
 		return null;
@@ -106,4 +96,21 @@ class SwingListPeer extends SwingComponentPeer implements ListPeer, SwingPeer {
     public Dimension getPreferredSize(int s) {
         return getPreferredSize();
     }
+    
+
+	private static class SwingList extends JList implements SwingPeer {
+		private final List awtComponent;
+
+		public SwingList(List awtComponent) {
+			this.awtComponent = awtComponent;
+		}
+
+		/**
+		 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+		 */
+		public Component getAWTComponent() {
+			return awtComponent;
+		}
+	}
+
 }

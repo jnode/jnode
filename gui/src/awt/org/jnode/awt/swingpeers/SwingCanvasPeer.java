@@ -13,26 +13,30 @@ import javax.swing.JComponent;
  * AWT canvas peer implemented as a {@link javax.swing.JComponent}.
  */
 
-class SwingCanvasPeer extends SwingComponentPeer implements CanvasPeer, SwingPeer {
-
-	private final Canvas canvas;
+class SwingCanvasPeer extends SwingComponentPeer implements CanvasPeer {
 
 	//
 	// Construction
 	//
 
 	public SwingCanvasPeer(SwingToolkit toolkit, Canvas canvas) {
-        super(toolkit, canvas, new JCanvas());
-		this.canvas = canvas;
+        super(toolkit, canvas, new SwingCanvas(canvas));
 		SwingToolkit.add(canvas, jComponent);
 		SwingToolkit.copyAwtProperties(canvas, jComponent);
 	}
 
-    public Component getAWTComponent() {
-        return canvas;
-    }
-    
-    private static class JCanvas extends JComponent {
-    	
-    }
+	private static class SwingCanvas extends JComponent implements SwingPeer {
+		private final Canvas awtComponent;
+
+		public SwingCanvas(Canvas awtComponent) {
+			this.awtComponent = awtComponent;
+		}
+
+		/**
+		 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+		 */
+		public Component getAWTComponent() {
+			return awtComponent;
+		}
+	}
 }

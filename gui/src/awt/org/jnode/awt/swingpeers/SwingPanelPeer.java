@@ -15,19 +15,16 @@ import javax.swing.JPanel;
  * AWT panel peer implemented as a {@link javax.swing.JPanel}.
  */
 
-class SwingPanelPeer extends SwingComponentPeer implements PanelPeer, SwingContainerPeer,
-		SwingPeer {
-
-	private final Panel panel;
+final class SwingPanelPeer extends SwingComponentPeer implements PanelPeer,
+		SwingContainerPeer {
 
 	//
 	// Construction
 	//
 
 	public SwingPanelPeer(SwingToolkit toolkit, Panel panel) {
-        super(toolkit, panel, new JPanel());
-        final JPanel jPanel = (JPanel)jComponent;
-		this.panel = panel;
+		super(toolkit, panel, new SwingPanel(panel));
+		final SwingPanel jPanel = (SwingPanel) jComponent;
 		SwingToolkit.add(panel, jPanel);
 		SwingToolkit.copyAwtProperties(panel, jPanel);
 	}
@@ -37,7 +34,7 @@ class SwingPanelPeer extends SwingComponentPeer implements PanelPeer, SwingConta
 	 *      javax.swing.JComponent)
 	 */
 	public void addAWTComponent(Component awtComponent, JComponent peer) {
-		((JPanel)jComponent).add(peer);
+		((JPanel) jComponent).add(peer);
 	}
 
 	public void beginLayout() {
@@ -50,28 +47,36 @@ class SwingPanelPeer extends SwingComponentPeer implements PanelPeer, SwingConta
 	public void beginValidate() {
 	}
 
-
 	public void endLayout() {
 	}
 
 	public void endValidate() {
-	}
-	/**
-	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
-	 */
-	public Component getAWTComponent() {
-		return panel;
 	}
 
 	public boolean isPaintPending() {
 		return false;
 	}
 
-    public Insets getInsets() {
-        return ((JPanel)jComponent).getInsets();
-    }
+	public Insets getInsets() {
+		return ((JPanel) jComponent).getInsets();
+	}
 
-    public Insets insets() {
-        return getInsets();
-    }
+	public Insets insets() {
+		return getInsets();
+	}
+
+	private static class SwingPanel extends JPanel implements SwingPeer {
+		private final Panel awtComponent;
+
+		public SwingPanel(Panel awtComponent) {
+			this.awtComponent = awtComponent;
+		}
+
+		/**
+		 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+		 */
+		public Component getAWTComponent() {
+			return awtComponent;
+		}
+	}
 }

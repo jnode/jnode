@@ -14,19 +14,16 @@ import javax.swing.JComboBox;
  * AWT choice peer implemented as a {@link javax.swing.JButton}.
  */
 
-class SwingChoicePeer extends SwingComponentPeer implements ChoicePeer, SwingPeer {
-
-	private final Choice choice;
+final class SwingChoicePeer extends SwingComponentPeer implements ChoicePeer {
 
 	//
 	// Construction
 	//
 
 	public SwingChoicePeer(SwingToolkit toolkit, Choice choice) {
-        super(toolkit, choice, new JComboBox());
-		this.choice = choice;
-        final JComboBox combo = (JComboBox)jComponent;
-        combo.setModel(new DefaultComboBoxModel());
+		super(toolkit, choice, new SwingChoice(choice));
+		final JComboBox combo = (JComboBox) jComponent;
+		combo.setModel(new DefaultComboBoxModel());
 		SwingToolkit.add(choice, combo);
 		SwingToolkit.copyAwtProperties(choice, combo);
 		final int cnt = choice.getItemCount();
@@ -39,35 +36,45 @@ class SwingChoicePeer extends SwingComponentPeer implements ChoicePeer, SwingPee
 	// ChoicePeer
 	//
 
-    public void remove(int index) {
-        model().removeElementAt(index);
-    }
-
-    public void removeAll() {
-        model().removeAllElements();
-    }
-
-	public void add(String item, int index) {
-        model().insertElementAt(item, index);
+	public void remove(int index) {
+		model().removeElementAt(index);
 	}
 
-    private DefaultComboBoxModel model() {
-        return ((DefaultComboBoxModel)((JComboBox)jComponent).getModel());
-    }
+	public void removeAll() {
+		model().removeAllElements();
+	}
 
-    // Deprecated
+	public void add(String item, int index) {
+		model().insertElementAt(item, index);
+	}
+
+	private DefaultComboBoxModel model() {
+		return ((DefaultComboBoxModel) ((JComboBox) jComponent).getModel());
+	}
+
+	// Deprecated
 
 	public void addItem(String item, int index) {
 		add(item, index);
 	}
 
-	/**
-	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
-	 */
-	public Component getAWTComponent() {
-		return choice;
-	}
 	public void select(int index) {
-        ((JComboBox)jComponent).setSelectedIndex(index);
+		((JComboBox) jComponent).setSelectedIndex(index);
 	}
+
+	private static class SwingChoice extends JComboBox implements SwingPeer {
+		private final Choice awtComponent;
+
+		public SwingChoice(Choice awtComponent) {
+			this.awtComponent = awtComponent;
+		}
+
+		/**
+		 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+		 */
+		public Component getAWTComponent() {
+			return awtComponent;
+		}
+	}
+
 }

@@ -17,15 +17,13 @@ import org.jnode.awt.swingpeers.event.MouseMotionListenerDelegate;
  * AWT button peer implemented as a {@link javax.swing.JButton}.
  */
 
-class SwingButtonPeer extends SwingComponentPeer implements ButtonPeer, SwingPeer {
-	private final Button button;
+class SwingButtonPeer extends SwingComponentPeer implements ButtonPeer {
 
 	// Construction
 	//
 
 	public SwingButtonPeer(SwingToolkit toolkit, Button button) {
-        super(toolkit, button, new JButton());
-		this.button = button;
+        super(toolkit, button, new SwingButton(button));
         final JButton jButton = (JButton)jComponent;
 		SwingToolkit.add(button, jButton);
 		SwingToolkit.copyAwtProperties(button, jButton);
@@ -40,10 +38,17 @@ class SwingButtonPeer extends SwingComponentPeer implements ButtonPeer, SwingPee
         ((JButton)jComponent).setText(label);
     }
 
-	/**
-	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
-	 */
-	public Component getAWTComponent() {
-		return button;
-	}
+    private static class SwingButton extends JButton implements SwingPeer {
+    	private final Button awtComponent;
+
+    	public SwingButton(Button awtComponent) {
+    		this.awtComponent = awtComponent;
+    	}
+    	/**
+    	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+    	 */
+    	public Component getAWTComponent() {
+    		return awtComponent;
+    	}    	
+    }
 }

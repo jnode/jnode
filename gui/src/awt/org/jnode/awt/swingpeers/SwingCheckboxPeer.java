@@ -13,18 +13,15 @@ import javax.swing.JCheckBox;
 /**
  * AWT checkbox peer implemented as a {@link javax.swing.JCheckBox}.
  */
-class SwingCheckboxPeer extends SwingComponentPeer implements CheckboxPeer, SwingPeer {
-
-	private final Checkbox checkBox;
+class SwingCheckboxPeer extends SwingComponentPeer implements CheckboxPeer {
 
 	//
 	// Construction
 	//
 
 	public SwingCheckboxPeer(SwingToolkit toolkit, Checkbox checkBox) {
-        super(toolkit, checkBox, new JCheckBox());
-		this.checkBox = checkBox;
-		final JCheckBox jcb = (JCheckBox)jComponent;
+		super(toolkit, checkBox, new SwingCheckBox(checkBox));
+		final JCheckBox jcb = (JCheckBox) jComponent;
 		SwingToolkit.add(checkBox, jcb);
 		SwingToolkit.copyAwtProperties(checkBox, jcb);
 		jcb.setText(checkBox.getLabel());
@@ -32,21 +29,29 @@ class SwingCheckboxPeer extends SwingComponentPeer implements CheckboxPeer, Swin
 
 	}
 
-	/**
-	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
-	 */
-	public Component getAWTComponent() {
-		return checkBox;
-	}
-
 	public void setCheckboxGroup(CheckboxGroup g) {
 	}
 
 	public void setState(boolean state) {
-		((JCheckBox)jComponent).setSelected(state);
+		((JCheckBox) jComponent).setSelected(state);
 	}
 
-    public void setLabel(String label) {
-        ((JCheckBox)jComponent).setText(label);
-    }
+	public void setLabel(String label) {
+		((JCheckBox) jComponent).setText(label);
+	}
+
+	private static class SwingCheckBox extends JCheckBox implements SwingPeer {
+		private final Checkbox awtComponent;
+
+		public SwingCheckBox(Checkbox awtComponent) {
+			this.awtComponent = awtComponent;
+		}
+
+		/**
+		 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+		 */
+		public Component getAWTComponent() {
+			return awtComponent;
+		}
+	}
 }
