@@ -72,6 +72,7 @@
     <plugin id="org.jnode.fs.fat"/>
     <plugin id="org.jnode.fs.ext2"/>
     <plugin id="org.jnode.fs.ntfs"/>
+    <plugin id="org.jnode.fs.iso9660"/>
     <plugin id="org.jnode.fs.partitions.ibm"/>
     <plugin id="org.jnode.fs.partitions.command"/>
     <plugin id="org.jnode.fs.service"/>
