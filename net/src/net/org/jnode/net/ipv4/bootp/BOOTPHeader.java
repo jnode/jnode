@@ -116,16 +116,16 @@ public class BOOTPHeader {
 		}
 	}
 
-	private void setServerHostName(String sname) {
+	/*private void setServerHostName(String sname) {
 		final int len = sname.length();
 		if(sname != null && len > 63)
 			throw new IllegalArgumentException("Server host name is too long, "+len+" > 127.");
-	}
-	private void setBootFileName(String file) {
+	}*/
+	/*private void setBootFileName(String file) {
 		final int len = file.length();
 		if(file != null && len > 127)
 			throw new IllegalArgumentException("Boot file name is too long, "+len+" > 127.");
-	}
+	}*/
 
 	/**
 	 * Gets the client hardware address
