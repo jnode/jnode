@@ -150,9 +150,6 @@ public abstract class MessageDigestSpi
    */
   public Object clone() throws CloneNotSupportedException
   {
-    if (this instanceof Cloneable)
       return super.clone();
-    else
-      throw new CloneNotSupportedException();
   }
 }

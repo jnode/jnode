@@ -51,9 +51,6 @@ final class DummyKeyPairGenerator extends KeyPairGenerator
 
   public Object clone() throws CloneNotSupportedException
   {
-    if (!(kpgSpi instanceof Cloneable))
-      throw new CloneNotSupportedException();
-
     KeyPairGenerator result = new DummyKeyPairGenerator
 	    ((KeyPairGeneratorSpi) kpgSpi.clone(), this.getAlgorithm());
     result.provider = this.getProvider();

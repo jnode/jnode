@@ -95,6 +95,7 @@ public class ImageIcon
 
   public ImageIcon(Image image, String description)
   {
+  	// @classpath-bugfix Solves NPE when image not found
   	this.image = image;
     //this.image = Toolkit.getDefaultToolkit().createImage(image.getSource());
     this.description = description;

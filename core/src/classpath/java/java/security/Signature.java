@@ -627,6 +627,6 @@ public abstract class Signature extends SignatureSpi
    */
   public Object clone() throws CloneNotSupportedException
   {
-    throw new CloneNotSupportedException();
+    return super.clone();
   }
 }
