@@ -200,7 +200,7 @@ public class PolicyFile extends Policy {
             }
         }
         addPermissions(codeSource, perms);
-        perms.setReadOnly();
+        //perms.setReadOnly();
         //debug("return from getPermissions");
         return perms;
     }
