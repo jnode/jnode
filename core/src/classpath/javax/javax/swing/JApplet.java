@@ -35,7 +35,6 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package javax.swing;
 
 import java.applet.Applet;
@@ -49,18 +48,21 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import javax.accessibility.AccessibleContext;
 
-public class JApplet extends Applet implements RootPaneContainer
+
+public class JApplet extends Applet
+  implements RootPaneContainer
 {
   private static final long serialVersionUID = 7269359214497372587L;
 
-    public final static int HIDE_ON_CLOSE        = 0;
-    public final static int EXIT_ON_CLOSE        = 1;
-    public final static int DISPOSE_ON_CLOSE     = 2;
-    public final static int DO_NOTHING_ON_CLOSE  = 3;
+  public static final int HIDE_ON_CLOSE = 0;
+  public static final int EXIT_ON_CLOSE = 1;
+  public static final int DISPOSE_ON_CLOSE = 2;
+  public static final int DO_NOTHING_ON_CLOSE = 3;
 
     private int close_action = EXIT_ON_CLOSE;
-    private boolean checking;  
+
     protected  JRootPane         rootPane;
+  protected boolean rootPaneCheckingEnabled;
 
     public JApplet()
     {
@@ -81,18 +83,25 @@ public class JApplet extends Applet implements RootPaneContainer
   public Dimension getPreferredSize()
   {
     Dimension d = super.getPreferredSize();
-    System.out.println("JFrame.getPrefSize(): " + d + " , comp="+ getComponentCount () + ", layout=" + getLayout());
+    System.out.println("JFrame.getPrefSize(): " + d + " , comp="
+                       + getComponentCount() + ", layout=" + getLayout());
     return d;
   }
 
   public  void setLayout(LayoutManager manager)
-  {    super.setLayout(manager);  }
+  {
+    super.setLayout(manager);
+  }
 
    public void setLayeredPane(JLayeredPane layeredPane) 
-    {   getRootPane().setLayeredPane(layeredPane);   }
+  {
+    getRootPane().setLayeredPane(layeredPane);
+  }
   
    public JLayeredPane getLayeredPane()
-    {   return getRootPane().getLayeredPane();     }
+  {
+    return getRootPane().getLayeredPane();
+  }
   
    public JRootPane getRootPane()
     {
@@ -111,57 +120,75 @@ public class JApplet extends Applet implements RootPaneContainer
     }
 
    public JRootPane createRootPane()
-    {   return new JRootPane();    }
+  {
+    return new JRootPane();
+  }
 
    public Container getContentPane()
-    {    return getRootPane().getContentPane();     }
+  {
+    return getRootPane().getContentPane();
+  }
 
    public void setContentPane(Container contentPane)
-    {    getRootPane().setContentPane(contentPane);    }
+  {
+    getRootPane().setContentPane(contentPane);
+  }
   
    public  Component getGlassPane()
-    {    return getRootPane().getGlassPane();   }
+  {
+    return getRootPane().getGlassPane();
+  }
   
    public void setGlassPane(Component glassPane)
-    {   getRootPane().setGlassPane(glassPane);   }
+  {
+    getRootPane().setGlassPane(glassPane);
+  }
 
-
-    /////////////////////////////////////////////////////////////////////////////////
     protected  void addImpl(Component comp, Object constraints, int index)
-    {   super.addImpl(comp, constraints, index);    }
+  {
+    super.addImpl(comp, constraints, index);
+  }
   
     public AccessibleContext getAccessibleContext()
-    {    return null;  }
+  {
+    return null;
+  }
   
     int getDefaultCloseOperation()
-    {    return close_action;   }
-
+  {
+    return close_action;
+  }
     
     public JMenuBar getJMenuBar()
-    {    return getRootPane().getJMenuBar();   }
+  {
+    return getRootPane().getJMenuBar();
+  }
     
     public void setJMenuBar(JMenuBar menubar)
-    {    getRootPane().setJMenuBar(menubar); }
-    
+  {
+    getRootPane().setJMenuBar(menubar);
+  }
     
     protected  String paramString()
-    {   return "JFrame";     }
+  {
+    return "JFrame";
+  }
 
     protected  void processKeyEvent(KeyEvent e)
-    {   super.processKeyEvent(e);    }
+  {
+    super.processKeyEvent(e);
+  }
 
     protected  void processWindowEvent(WindowEvent e)
     {
         //      System.out.println("PROCESS_WIN_EV-1: " + e);
-
 	//        super.processWindowEvent(e); 
-
         //      System.out.println("PROCESS_WIN_EV-2: " + e);
         switch (e.getID())
             {
             case WindowEvent.WINDOW_CLOSING:
                 {
-                    switch(close_action)
+	  switch (close_action)
                         {
                         case EXIT_ON_CLOSE:
                             {
@@ -176,13 +203,11 @@ public class JApplet extends Applet implements RootPaneContainer
                                 break;
                             }
                         case HIDE_ON_CLOSE:
-
                         case DO_NOTHING_ON_CLOSE:
                             break;
                         }
                     break;
                 }
-                
             case WindowEvent.WINDOW_CLOSED:
             case WindowEvent.WINDOW_OPENED:
             case WindowEvent.WINDOW_ICONIFIED:
@@ -193,23 +218,28 @@ public class JApplet extends Applet implements RootPaneContainer
             }
     }
     
-
     public void remove(Component comp)
-    {   getContentPane().remove(comp);  }
-  
+  {
+    getContentPane().remove(comp);
+  }
 
     void setDefaultCloseOperation(int operation)
-    {  close_action = operation;   }
-
-
+  {
+    close_action = operation;
+  }
 
     protected  boolean isRootPaneCheckingEnabled()
-    {    return checking;        }
-
+  {
+    return rootPaneCheckingEnabled;
+  }
 
     protected  void setRootPaneCheckingEnabled(boolean enabled)
-    { checking = enabled;  }
+  {
+    rootPaneCheckingEnabled = enabled;
+  }
 
     public void update(Graphics g)
-    {   paint(g);  }
+  {
+    paint(g);
+  }
 }

@@ -41,7 +41,7 @@ package gnu.java.security.der;
 /**
  * The set of tags for DER types.
  *
- * @author Casey Marshall (rsdio@metastatic.org)
+ * @author Casey Marshall (csm@gnu.org)
  */
 public interface DER
 {

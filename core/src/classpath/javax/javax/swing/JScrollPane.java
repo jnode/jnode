@@ -509,7 +509,8 @@ public class JScrollPane
           else
             {
               // otherwise we got a change update from either the VSB or
-              // HSB model, and we need to update the viewport position to
+              // HSB model, and we need to update the viewport positions of
+              // both the main viewport and any row or column headers to
               // match.
 
               int xpos = 0;
@@ -526,6 +527,20 @@ public class JScrollPane
               if (vp != null
                   && vp.getViewPosition() != pt)
                 vp.setViewPosition(pt);
+
+              pt.x = 0;
+
+              if (rowHeader != null 
+                  && rowHeader.getViewPosition() != pt)
+                rowHeader.setViewPosition(pt);
+              
+              pt.x = xpos;
+              pt.y = 0;
+
+              if (columnHeader != null 
+                  && columnHeader.getViewPosition() != pt)
+                columnHeader.setViewPosition(pt);
+
             }
         }
       };
@@ -578,7 +593,6 @@ public class JScrollPane
     return new JViewport();
   }
 
-
   public String getUIClassID()
   {
     return "ScrollPaneUI";
@@ -590,6 +604,25 @@ public class JScrollPane
     setUI(b);
   }  
 
+  /**
+   * This method returns the scrollpane's UI delegate.
+   *
+   * @return The scrollpane's UI delegate.
+   */
+  public ScrollPaneUI getUI()
+  {
+    return (ScrollPaneUI) ui;
+  }
+
+  /**
+   * This method sets the scrollpane's UI delegate.
+   *
+   * @param ui The scrollpane's UI delegate.
+   */
+  public void setUI(ScrollPaneUI ui)
+  {
+    super.setUI(ui);
+  }
 
   class ScrollBar 
     extends JScrollBar

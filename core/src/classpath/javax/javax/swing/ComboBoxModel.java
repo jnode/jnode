@@ -37,28 +37,32 @@ exception statement from your version. */
 
 package javax.swing;
 
+
 /**
- * ComboBoxModel
+ * ComboBoxModel is a data model for JComboBox. This model keeps
+ * track of elements contained in the JComboBox as well as the current
+ * combo box selection. Whenever selection in the JComboBox changes, the
+ * ComboBoxModel should fire ListDataEvents to ComboBox's ListDataListeners.
+ *
  * @author	Andrew Selkirk
  * @version	1.0
  */
-public interface ComboBoxModel extends ListModel {
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
+public interface ComboBoxModel extends ListModel
+{
 	/**
-	 * setSelectedItem
-	 * @param item TODO
+   * This method sets the selected item in the combo box. Class
+   * implementing this interface should fire ListDataEvents to
+   * all registered ListDataListeners to indicated that the
+   * selection has changed.
+   *
+   * @param item item in the combo box that should be selected
 	 */
 	void setSelectedItem(Object item);
 
 	/**
-	 * getSelectedItem
-	 * @returns Object
+   * The method returns currently selected item in the combo box
+   *
+   * @returns item that is currently selected in the combo box.
 	 */
 	Object getSelectedItem();
-
-
 } // ComboBoxModel

@@ -172,7 +172,7 @@ public class Timer implements Serializable
       } 
       catch (Exception e) 
         {
-	System.out.println("swing.Timer::" + e);
+//	  System.out.println("swing.Timer::" + e);
       }
     }
   }
@@ -394,6 +394,7 @@ public class Timer implements Serializable
   public void stop()
   {
     running = false;
+    if (waker != null)
     waker.interrupt();
     synchronized (queueLock)
       {

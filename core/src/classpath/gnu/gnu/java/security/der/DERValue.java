@@ -48,15 +48,10 @@ public class DERValue implements DER
   // ------------------------------------------------------------------------
 
   private final int tagClass;
-
   private final boolean constructed;
-
   private final int tag;
-
   private int length;
-
   private final Object value;
-
   private byte[] encoded;
 
   // Constructor.

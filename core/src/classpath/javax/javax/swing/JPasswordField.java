@@ -44,6 +44,7 @@ import javax.accessibility.AccessibleRole;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
+
 /**
  * JPasswordField
  * @author	Andrew Selkirk
@@ -76,51 +77,45 @@ public class JPasswordField extends JTextField
   }
 
 	/**
-	 * uiClassID
-	 */
-	private static final String uiClassID = "PasswordFieldUI";
-
-	/**
-	 * echoChar.  Default is 0
+   * echoChar.  Default is 0.
 	 */
 	private char echoChar = 0;
 
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
 	/**
 	 * Constructor JPasswordField
 	 */
-	public JPasswordField() {
-		// TODO
-	} // JPasswordField()
+  public JPasswordField()
+  {
+    this(null, null, 0);
+  }
 
 	/**
 	 * Constructor JPasswordField
 	 * @param text TODO
 	 */
-	public JPasswordField(String text) {
-		// TODO
-	} // JPasswordField()
+  public JPasswordField(String text)
+  {
+    this(null, text, 0);
+  }
 
 	/**
 	 * Constructor JPasswordField
 	 * @param columns TODO
 	 */
-	public JPasswordField(int columns) {
-		// TODO
-	} // JPasswordField()
+  public JPasswordField(int columns)
+  {
+    this(null, null, columns);
+  }
 
 	/**
 	 * Constructor JPasswordField
 	 * @param text TODO
 	 * @param columns TODO
 	 */
-	public JPasswordField(String text, int columns) {
-		// TODO
-	} // JPasswordField()
+  public JPasswordField(String text, int columns)
+  {
+    this(null, text, columns);
+  }
 
 	/**
 	 * Constructor JPasswordField
@@ -128,107 +123,113 @@ public class JPasswordField extends JTextField
 	 * @param text TODO
 	 * @param columns TODO
 	 */
-	public JPasswordField(Document document, String text, int columns) {
-		// TODO
-	} // JPasswordField()
-
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+  public JPasswordField(Document document, String text, int columns)
+  {
+    super(document, text, columns);
+  }
 
 	/**
 	 * writeObject
 	 * @param stream TODO
 	 * @exception IOException TODO
 	 */
-	private void writeObject(ObjectOutputStream stream) throws IOException {
+  private void writeObject(ObjectOutputStream stream) throws IOException
+  {
 		// TODO
-	} // writeObject()
-
-	/**
-	 * copy
-	 */
-	public void copy() {
-		// TODO
-	} // copy()
+  }
 
 	/**
 	 * getUIClassID
-	 * @returns String
+   * @return String
 	 */
-	public String getUIClassID() {
-		return uiClassID;
-	} // getUIClassID()
+  public String getUIClassID()
+  {
+    return "PasswordFieldUI";
+  }
 
 	/**
 	 * getEchoChar
-	 * @returns char
+   * @return char
 	 */
-	public char getEchoChar() {
+  public char getEchoChar()
+  {
 		return echoChar;
-	} // getEchoChar()
+  }
 
 	/**
 	 * setEchoChar
 	 * @param echo TODO
 	 */
-	public void setEchoChar(char echo) {
+  public void setEchoChar(char echo)
+  {
 		this.echoChar = echo;
-		// TODO
-	} // setEchoChar()
+  }
 
 	/**
 	 * echoCharIsSet
-	 * @returns boolean
+   * @return boolean
+   */
+  public boolean echoCharIsSet()
+  {
+    return echoChar == 0;
+  }
+
+  /**
+   * copy
 	 */
-	public boolean echoCharIsSet() {
-		return (echoChar == 0);
-	} // echoCharIsSet()
+  public void copy()
+  {
+    UIManager.getLookAndFeel().provideErrorFeedback(this);
+  }
 
 	/**
 	 * cut
 	 */
-	public void cut() {
-		// TODO
-	} // cut()
+  public void cut()
+  {
+    UIManager.getLookAndFeel().provideErrorFeedback(this);
+  }
 
 	/**
 	 * getText
-	 * @returns String
+   * @return String
          * @deprecated
 	 */
-	public String getText() {
+  public String getText()
+  {
 		return null; // TODO
-	} // getText()
+  }
 
 	/**
 	 * getText
 	 * @param offset TODO
 	 * @param length TODO
+   * @return String
 	 * @exception BadLocationException TODO
-	 * @returns String
          * @deprecated
 	 */
-	public String getText(int offset, int length) throws BadLocationException {
+  public String getText(int offset, int length) throws BadLocationException
+  {
 		return null; // TODO
-	} // getText()
+  }
 
 	/**
 	 * getPassword
-	 * @returns char[]
+   * @return char[]
 	 */
-	public char[] getPassword() {
+  public char[] getPassword()
+  {
 		return null; // TODO
-	} // getPassword()
+  }
 
 	/**
 	 * paramString
-	 * @returns String
+   * @return String
 	 */
-	protected String paramString() {
+  protected String paramString()
+  {
 		return null; // TODO
-	} // paramString()
+  }
 
 	/**
 	 * getAccessibleContext

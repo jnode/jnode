@@ -51,7 +51,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.EventListener;
 
 import javax.accessibility.AccessibleAction;
 import javax.accessibility.AccessibleIcon;
@@ -214,30 +213,34 @@ public abstract class AbstractButton extends JComponent
   Action action;
 
   /** The button's current state. */
-  ButtonModel model;
+  protected ButtonModel model;
 
   /** The margin between the button's border and its label. */
   Insets margin;
 
-  /** a hint to the look and feel class, suggesting which character in the
+  /** A hint to the look and feel class, suggesting which character in the
    * button's label should be underlined when drawing the label. */
   int mnemonicIndex;
 
   /** Listener the button uses to receive ActionEvents from its model.  */
-  ActionListener actionListener;
+  protected ActionListener actionListener;
 
   /** Listener the button uses to receive ItemEvents from its model.  */
-  ItemListener itemListener;
+  protected ItemListener itemListener;
 
   /** Listener the button uses to receive ChangeEvents from its model.  */  
-  ChangeListener changeListener;
+  protected ChangeListener changeListener;
+
+  /** The time in miliseconds in which clicks get coalesced into a single
+   * <code>ActionEvent</code>. */
+  long multiClickThreshhold;
 
   /** Listener the button uses to receive PropertyChangeEvents from its
       Action. */
   PropertyChangeListener actionPropertyChangeListener;
   
   /** ChangeEvent that is fired to button's ChangeEventListeners  */  
-  private ChangeEvent changeEvent = new ChangeEvent(this);
+  protected ChangeEvent changeEvent = new ChangeEvent(this);
   
   /** Fired in a PropertyChangeEvent when the "borderPainted" property changes. */
   public static final String BORDER_PAINTED_CHANGED_PROPERTY = "borderPainted";
@@ -441,34 +444,6 @@ public abstract class AbstractButton extends JComponent
     }
 
   /**
-   * Helper class used to subscribe to FocusEvents received by the button.
-   */
-  private class ButtonFocusListener implements FocusListener
-    {
-    /**
-     * Possibly repaint the model in response to loss of focus.
-     *
-     * @param event The loss-of-focus event
-     */
-    public void focusLost(FocusEvent event)
-        {
-      if (AbstractButton.this.isFocusPainted())
-        AbstractButton.this.repaint();
-    }
-
-    /**
-     * Possibly repaint the button in response to acquisition of focus.
-     *
-     * @param event The gained-focus event
-     */
-    public void focusGained(FocusEvent event)
-    {
-      if (AbstractButton.this.isFocusPainted())
-        AbstractButton.this.repaint();
-    }
-  }
-
-  /**
    * Creates a new AbstractButton object.
    */
   public AbstractButton()
@@ -549,12 +524,12 @@ public abstract class AbstractButton extends JComponent
     borderPainted = true;
     contentAreaFilled = true;
 
-    iconTextGap = 4;
+    focusPainted = true;
+    setFocusable(true);
 
     setAlignmentX(LEFT_ALIGNMENT);
     setAlignmentY(CENTER_ALIGNMENT);
 
-    addFocusListener(new ButtonFocusListener());
     setDisplayedMnemonicIndex(-1);    
  }
  
@@ -602,6 +577,18 @@ public abstract class AbstractButton extends JComponent
   }
 
   /**
+   * Returns all added <code>ActionListener</code> objects.
+   * 
+   * @return an array of listeners
+   * 
+   * @since 1.4
+   */
+  public ActionListener[] getActionListeners()
+  {
+    return (ActionListener[]) listenerList.getListeners(ActionListener.class);
+  }
+
+  /**
    * Adds an ItemListener to the button's listener list. When the button's
    * model changes state (between any of ARMED, ENABLED, PRESSED, ROLLOVER
    * or SELECTED) it fires an ItemEvent, and these listeners will be
@@ -622,6 +609,18 @@ public abstract class AbstractButton extends JComponent
   public void removeItemListener(ItemListener l)
   {
     listenerList.remove(ItemListener.class, l);
+  }
+
+  /**
+   * Returns all added <code>ItemListener</code> objects.
+   * 
+   * @return an array of listeners
+   * 
+   * @since 1.4
+   */
+  public ItemListener[] getItemListeners()
+  {
+    return (ItemListener[]) listenerList.getListeners(ItemListener.class);
   }
 
   /**
@@ -647,6 +646,18 @@ public abstract class AbstractButton extends JComponent
   }
 
   /**
+   * Returns all added <code>ChangeListener</code> objects.
+   * 
+   * @return an array of listeners
+   * 
+   * @since 1.4
+   */
+  public ChangeListener[] getChangeListeners()
+  {
+    return (ChangeListener[]) listenerList.getListeners(ChangeListener.class);
+  }
+
+  /**
    * Calls {@link ItemListener.itemStateChanged} on each ItemListener in
    * the button's listener list.
    *
@@ -655,9 +666,10 @@ public abstract class AbstractButton extends JComponent
   public void fireItemStateChanged(ItemEvent e)
   {
     e.setSource(this);
-    EventListener[] ll = listenerList.getListeners(ItemListener.class);
-    for (int i = 0; i < ll.length; i++)
-      ((ItemListener)ll[i]).itemStateChanged(e);
+    ItemListener[] listeners = getItemListeners();
+ 
+    for (int i = 0; i < listeners.length; i++)
+      listeners[i].itemStateChanged(e);
   }
 
   /**
@@ -669,23 +681,22 @@ public abstract class AbstractButton extends JComponent
   public void fireActionPerformed(ActionEvent e)
   {
     e.setSource(this);
-    EventListener[] ll = listenerList.getListeners(ActionListener.class);
-    for (int i = 0; i < ll.length; i++)
-      ((ActionListener)ll[i]).actionPerformed(e);
+    ActionListener[] listeners = getActionListeners();
+    
+    for (int i = 0; i < listeners.length; i++)
+      listeners[i].actionPerformed(e);
   }
 
   /**
    * Calls {@link ChangeEvent.stateChanged} on each {@link ChangeListener}
    * in the button's listener list.
-   *
-   * @param e The event signifying a change in one of the (non-bound)
-   * properties of the button's model.
    */
-  public void fireStateChanged(ChangeEvent e)
+  public void fireStateChanged()
   {
-    EventListener[] ll = listenerList.getListeners(ChangeListener.class);
-    for (int i = 0; i < ll.length; i++)
-      ((ChangeListener)ll[i]).stateChanged(changeEvent);
+    ChangeListener[] listeners = getChangeListeners();
+
+    for (int i = 0; i < listeners.length; i++)
+      listeners[i].stateChanged(changeEvent);
   }
 
   /**
@@ -770,7 +781,7 @@ public abstract class AbstractButton extends JComponent
   {
     if (index < -1 || (text != null && index >= text.length()))
       throw new IllegalArgumentException();
-    else
+  
       mnemonicIndex = index;
   }
   
@@ -877,15 +888,15 @@ public abstract class AbstractButton extends JComponent
    */
   public void setHorizontalAlignment(int a)
   {
+    if (horizontalAlignment == a)
+      return;
+
     int old = horizontalAlignment;
     horizontalAlignment = a;
-    if (old != a)
-      {
         firePropertyChange(HORIZONTAL_ALIGNMENT_CHANGED_PROPERTY, old, a);
         revalidate();
         repaint();
       }
-  }
 
   /**
    * Get the horizontal position of the button's text relative to its
@@ -914,15 +925,15 @@ public abstract class AbstractButton extends JComponent
    */
   public void setHorizontalTextPosition(int t)
   {
+    if (horizontalTextPosition == t)
+      return;
+
     int old = horizontalTextPosition;
     horizontalTextPosition = t;
-    if (old != t)
-      {
         firePropertyChange(HORIZONTAL_TEXT_POSITION_CHANGED_PROPERTY, old, t);
         revalidate();
         repaint();
       }
-  }
 
   /**
    * Get the vertical alignment of the button's text and icon. The
@@ -949,15 +960,15 @@ public abstract class AbstractButton extends JComponent
    */
   public void setVerticalAlignment(int a)
   {
+    if (verticalAlignment == a)
+      return;
+    
     int old = verticalAlignment;
     verticalAlignment = a;
-    if (old != a)
-      {
         firePropertyChange(VERTICAL_ALIGNMENT_CHANGED_PROPERTY, old, a);
         revalidate();
         repaint();
       }
-  }
 
   /**
    * Get the vertical position of the button's text relative to its
@@ -986,15 +997,15 @@ public abstract class AbstractButton extends JComponent
    */
   public void setVerticalTextPosition(int t)
   {
+    if (verticalTextPosition == t)
+      return;
+    
     int old = verticalTextPosition;
     verticalTextPosition = t;
-    if (old != t)
-      {
         firePropertyChange(VERTICAL_TEXT_POSITION_CHANGED_PROPERTY, old, t);
         revalidate();
         repaint();
       }
-  }
 
   /**
    * Set the value of the "borderPainted" property. If set to
@@ -1017,15 +1028,15 @@ public abstract class AbstractButton extends JComponent
    */
   public void setBorderPainted(boolean b)
   {
+    if (borderPainted == b)
+      return;
+    
     boolean old = borderPainted;
         borderPainted = b;
-    if (b != old)
-      {
         firePropertyChange(BORDER_PAINTED_CHANGED_PROPERTY, old, b);
         revalidate();
         repaint();
       }
-  }
 
   /**
    * Get the value of the "action" property. 
@@ -1063,10 +1074,7 @@ public abstract class AbstractButton extends JComponent
             action.removePropertyChangeListener(actionPropertyChangeListener);
             actionPropertyChangeListener = null;
           }
-
-
   }
-
 
     Action old = action;
     action = a;
@@ -1097,14 +1105,14 @@ public abstract class AbstractButton extends JComponent
    */
   public void setIcon(Icon i)
       {
-    if (default_icon != i)
-      {
+    if (default_icon == i)
+      return;
+    
     Icon old = default_icon;
     default_icon = i;
         firePropertyChange(ICON_CHANGED_PROPERTY, old, i);
     revalidate();
     repaint();
-  }
   }
 
   /**
@@ -1148,14 +1156,14 @@ public abstract class AbstractButton extends JComponent
    */
   public void setText(String t)
   {
+    if (text == t)
+      return;
+    
     String old = text;
     text = t;
-    if (t != old)
-      {
         firePropertyChange(TEXT_CHANGED_PROPERTY, old, t);
     revalidate();
     repaint();
-  }
   }
 
   /**
@@ -1165,15 +1173,15 @@ public abstract class AbstractButton extends JComponent
    */
   public void setIconTextGap(int i)
   {
+    if (iconTextGap == i)
+      return;
+    
     int old = iconTextGap;
     iconTextGap = i;
-    if (old != i)
-      {
-        fireStateChanged(new ChangeEvent(this));
+    fireStateChanged();
         revalidate();
         repaint();
       }
-  }
 
   /**
    * Get the value of the {@link #iconTextGap} property.
@@ -1206,14 +1214,14 @@ public abstract class AbstractButton extends JComponent
    */
   public void setMargin(Insets m)
   {
+    if (margin == m)
+      return;
+    
     Insets old = margin;
     margin = m;
-    if (m != old)
-      {
         firePropertyChange(MARGIN_CHANGED_PROPERTY, old, m);
         revalidate();
     repaint();
-  }
   }
 
   /**
@@ -1239,14 +1247,14 @@ public abstract class AbstractButton extends JComponent
    */
   public void setPressedIcon(Icon pressedIcon)
   {
+    if (pressed_icon == pressedIcon)
+      return;
+    
     Icon old = pressed_icon;
     pressed_icon = pressedIcon;
-    if (pressed_icon != old)
-      {
         firePropertyChange(PRESSED_ICON_CHANGED_PROPERTY, old, pressed_icon);
     revalidate();
     repaint();
-  }
   }
 
   /**
@@ -1308,16 +1316,15 @@ public abstract class AbstractButton extends JComponent
    */
   public void setFocusPainted(boolean p)
   {
+    if (focusPainted == p)
+      return;
+    
     boolean old = focusPainted;
     focusPainted = p;
-
-    if (old != focusPainted)
-      {
         firePropertyChange(FOCUS_PAINTED_CHANGED_PROPERTY, old, p);
         revalidate();
         repaint();
       }
-  }
 
   /**
    * Return the button's "focusTraversable" property. This property controls
@@ -1539,7 +1546,7 @@ public abstract class AbstractButton extends JComponent
       {
         public void stateChanged(ChangeEvent e)
         {
-          AbstractButton.this.fireStateChanged(e);
+          AbstractButton.this.fireStateChanged();
           AbstractButton.this.repaint();          
         }
       };
@@ -1629,21 +1636,19 @@ public abstract class AbstractButton extends JComponent
    * <code>true</code>. This icon can be <code>null</code>, in which case
    * it is synthesized from the button's selected icon.
    *
-   * @param disabledSelectedIcon The new disabled selected icon
+   * @param icon The new disabled selected icon
    */
-  public void setDisabledSelectedIcon(Icon disabledSelectedIcon)
+  public void setDisabledSelectedIcon(Icon icon)
   {
+    if (disabledSelectedIcon == icon)
+      return;
+    
     Icon old = disabledSelectedIcon;
-    disabledSelectedIcon = disabledSelectedIcon;
-    if (old != disabledSelectedIcon)
-  {
-        firePropertyChange(DISABLED_SELECTED_ICON_CHANGED_PROPERTY, old, 
-                           disabledSelectedIcon);
+    disabledSelectedIcon = icon;
+    firePropertyChange(DISABLED_SELECTED_ICON_CHANGED_PROPERTY, old, icon);
         revalidate();
         repaint();        
   }
-  }
-
 
   /**
    * Return the button's rollover icon. The look and feel class should
@@ -1666,16 +1671,15 @@ public abstract class AbstractButton extends JComponent
    */
   public void setRolloverIcon(Icon r)
   {
+    if (rolloverIcon == r)
+      return;
+    
     Icon old = rolloverIcon;
     rolloverIcon = r;
-    if (old != rolloverIcon)
-  {
-        firePropertyChange(ROLLOVER_ICON_CHANGED_PROPERTY, old, 
-                           rolloverIcon);
+    firePropertyChange(ROLLOVER_ICON_CHANGED_PROPERTY, old, rolloverIcon);
         revalidate();
         repaint();
       }
-  }
 
   /**
    * Return the button's rollover selected icon. The look and feel class
@@ -1700,17 +1704,15 @@ public abstract class AbstractButton extends JComponent
    */
   public void setRolloverSelectedIcon(Icon r)
   {
+    if (rolloverSelectedIcon == r)
+      return;
+    
     Icon old = rolloverSelectedIcon;
     rolloverSelectedIcon = r;
-    if (old != rolloverSelectedIcon)
-  {
-        firePropertyChange(ROLLOVER_SELECTED_ICON_CHANGED_PROPERTY, old, 
-                           rolloverSelectedIcon);
+    firePropertyChange(ROLLOVER_SELECTED_ICON_CHANGED_PROPERTY, old, r);
         revalidate();
         repaint();
   }
-  }
-
 
   /**
    * Return the button's selected icon. The look and feel class should
@@ -1737,16 +1739,15 @@ public abstract class AbstractButton extends JComponent
    */
   public void setSelectedIcon(Icon s)
   {
+    if (selectedIcon == s)
+      return;
+    
     Icon old = selectedIcon;
     selectedIcon = s;
-    if (old != selectedIcon)
-    {
-        firePropertyChange(SELECTED_ICON_CHANGED_PROPERTY, old, 
-                           selectedIcon);
+    firePropertyChange(SELECTED_ICON_CHANGED_PROPERTY, old, s);
         revalidate();
         repaint();
     }
-  }
 
   /**
    * Returns an single-element array containing the "text" property of the
@@ -1814,15 +1815,15 @@ public abstract class AbstractButton extends JComponent
    */
   public void setContentAreaFilled(boolean b)
             {
+    if (contentAreaFilled == b)
+      return;
+    
     boolean old = contentAreaFilled;
     contentAreaFilled = b;
-    if (b != old)
-      {
         firePropertyChange(CONTENT_AREA_FILLED_CHANGED_PROPERTY, old, b);
         revalidate();
               repaint();
             }
-        }
 
   /**
    * Paints the button's border, if the button's "borderPainted" property is
@@ -1846,7 +1847,6 @@ public abstract class AbstractButton extends JComponent
   {
     return "AbstractButton";
   }
-
 
   /**
    * Set the "UI" property of the button, which is a look and feel class
@@ -1878,5 +1878,34 @@ public abstract class AbstractButton extends JComponent
    */
   public void updateUI()
   {
+  }
+
+  /**
+   * Returns the current time in milliseconds in which clicks gets coalesced
+   * into a single <code>ActionEvent</code>.
+   *
+   * @return the time in milliseconds
+   * 
+   * @since 1.4
+   */
+  public long getMultiClickThreshhold()
+  {
+    return multiClickThreshhold;
+  }
+
+  /**
+   * Sets the time in milliseconds in which clicks gets coalesced into a single
+   * <code>ActionEvent</code>.
+   *
+   * @param threshhold the time in milliseconds
+   * 
+   * @since 1.4
+   */
+  public void setMultiClickThreshhold(long threshhold)
+  {
+    if (threshhold < 0)
+      throw new IllegalArgumentException();
+
+    multiClickThreshhold = threshhold;
   }
 }
