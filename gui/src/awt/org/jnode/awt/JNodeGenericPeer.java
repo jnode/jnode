@@ -11,13 +11,13 @@ import java.awt.Toolkit;
  */
 public class JNodeGenericPeer {
 
-	protected final AbstractJNodeToolkit toolkit;
+	protected final JNodeToolkit toolkit;
 	private final Object awtObject;
 
 	// Global event queue.
 	protected static EventQueue q;
 
-	public JNodeGenericPeer(AbstractJNodeToolkit toolkit, Object awtObject) {
+	public JNodeGenericPeer(JNodeToolkit toolkit, Object awtObject) {
 		this.toolkit = toolkit;
 		this.awtObject = awtObject;
 		toolkit.incRefCount();
@@ -48,7 +48,7 @@ public class JNodeGenericPeer {
 	 * Gets the implementation toolkit
 	 * @return The toolkit
 	 */
-	public final AbstractJNodeToolkit getToolkitImpl() {
+	public final JNodeToolkit getToolkitImpl() {
 		return toolkit;
 	}
 

@@ -131,6 +131,13 @@ public class Kernel implements Cloneable
    */
   public Object clone()
   {
-    return new Kernel(width, height, data);
+    try
+      {
+	return super.clone();
+      }
+    catch (CloneNotSupportedException e)
+      {
+        throw (Error) new InternalError().initCause(e); // Impossible
+      }
   }
 }

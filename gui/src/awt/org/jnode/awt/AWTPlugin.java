@@ -5,7 +5,6 @@ package org.jnode.awt;
 
 import gnu.java.security.action.SetPropertyAction;
 
-import java.awt.GraphicsEnvironment;
 import java.awt.image.VMImageUtils;
 import java.security.AccessController;
 
@@ -18,8 +17,8 @@ import org.jnode.plugin.PluginException;
  */
 public class AWTPlugin extends Plugin {
 
-    //private static final String TOOLKIT = "org.jnode.awt.peer.JNodeToolkit";
-    private static final String TOOLKIT = "org.jnode.awt.swingpeers.SwingToolkit";
+    private static final String TOOLKIT = "org.jnode.awt.peer.RawJNodeToolkit";
+    //private static final String TOOLKIT = "org.jnode.awt.swingpeers.SwingToolkit";
     
 	/**
 	 * @param descriptor
@@ -35,7 +34,6 @@ public class AWTPlugin extends Plugin {
 	protected void startPlugin() throws PluginException {
 	    AccessController.doPrivileged(new SetPropertyAction("awt.toolkit", TOOLKIT));
 		VMImageUtils.setAPI(new VMImageAPIImpl(), this);
-		GraphicsEnvironment.setLocalGraphicsEnvironment(new JNodeGraphicsEnvironment());
 	}
 
 	/**

@@ -37,7 +37,7 @@ import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.Map;
 
-import org.jnode.awt.peer.JNodeToolkit;
+import org.jnode.awt.peer.RawJNodeToolkit;
 
 /**
  * @author epr
@@ -189,7 +189,7 @@ public abstract class AbstractGraphics extends Graphics2D {
 	public void drawString(String text, int x, int y) {
 //		System.out.println("drawText():" + text);
 		if(this.font != null)
-			((JNodeToolkit)Toolkit.getDefaultToolkit()).getFontManager().drawText(this,text,font,x,y);
+			((RawJNodeToolkit)Toolkit.getDefaultToolkit()).getFontManager().drawText(this,text,font,x,y);
 	}
 
 	/**

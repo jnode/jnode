@@ -17,7 +17,7 @@ import org.jnode.awt.util.AbstractSurfaceGraphics;
 public class JNodeGraphics extends AbstractSurfaceGraphics {
 
 	private final JNodeGenericPeer component;
-	private final AbstractJNodeToolkit toolkit;
+	private final JNodeToolkit toolkit;
 
 	/**
 	 * Initialize a graphics for the given component

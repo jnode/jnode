@@ -46,75 +46,51 @@ package java.awt.datatransfer;
   */
 public class Clipboard
 {
-
-/*
- * Instance Variables
- */
-
-/**
+  /**
   * The data being transferred.
   */
-protected Transferable contents;
+  protected Transferable contents;
 
-/**
+  /**
   * The owner of this clipboard.
   */
-protected ClipboardOwner owner;
+  protected ClipboardOwner owner;
 
-// The clipboard name
-private String name;
+  // The clipboard name
+  private String name;
 
-/*************************************************************************/
-
-/*
- * Constructors
- */
-
-/**
+  /**
   * Initializes a new instance of <code>Clipboard</code> with the
   * specified name.
   *
   * @param name The clipboard name.
   */
-public 
-Clipboard(String name)
-{
+  public Clipboard(String name)
+  {
   this.name = name;
-}
+  }
 
-/*************************************************************************/
-
-/*
- * Instance Methods
- */
-
-/**
+  /**
   * Returns the name of the clipboard.
   */
-public String
-getName()
-{
-  return(name);
-}
+  public String getName()
+  {
+    return name;
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Returns the contents of the clipboard.
   *
   * @param requestor The object requesting the contents.
   *
   * @exception IllegalStateException If the clipboard is currently unavailable
   */
-public synchronized Transferable
-getContents(Object requestor)
-{
-  return(contents);
-}
+  public synchronized Transferable getContents(Object requestor)
+  {
+    return contents;
+  }
 
-/*************************************************************************/
-
-/**
+  /**
   * Sets the content and owner of this clipboard.
   * If the given owner is different from the current owner
   * then lostOwnership is called on the current owner.
@@ -125,16 +101,14 @@ getContents(Object requestor)
   *
   * @exception IllegalStateException If the clipboard is currently unavailable
   */
-public synchronized void
-setContents(Transferable contents, ClipboardOwner owner)
-{
+  public synchronized void setContents(Transferable contents, ClipboardOwner owner)
+  {
   if (this.owner != owner)
     if (this.owner != null)
       this.owner.lostOwnership(this, contents);
  
   this.owner = owner;
   this.contents = contents;
+  }
 }
-
-} // class Clipboard
 

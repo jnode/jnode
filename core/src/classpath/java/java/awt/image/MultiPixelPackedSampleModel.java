@@ -1,597 +1,387 @@
-/*
- * $Id$
- */
+/* Copyright (C) 2004  Free Software Foundation
+
+This file is part of GNU Classpath.
+
+GNU Classpath is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+GNU Classpath is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GNU Classpath; see the file COPYING.  If not, write to the
+Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+02111-1307 USA.
+
+Linking this library statically or dynamically with other modules is
+making a combined work based on this library.  Thus, the terms and
+conditions of the GNU General Public License cover the whole
+combination.
+
+As a special exception, the copyright holders of this library give you
+permission to link this library with independent modules to produce an
+executable, regardless of the license terms of these independent
+modules, and to copy and distribute the resulting executable under
+terms of your choice, provided that you also meet, for each linked
+independent module, the terms and conditions of the license of that
+module.  An independent module is a module which is not derived from
+or based on this library.  If you modify this library, you may extend
+this exception to your version of the library, but you are not
+obligated to do so.  If you do not wish to do so, delete this
+exception statement from your version. */
+
 package java.awt.image;
 
+import gnu.java.awt.Buffers;
+
 /**
- * @author epr
- */
-public class MultiPixelPackedSampleModel extends SampleModel {
-
-	/** The number of bits from one pixel to the next. */
-	private int pixelBitStride;
-
-	/** Bitmask that extracts the rightmost pixel of a data element. */
-	private int bitMask;
-
-	/**
-	  * The number of pixels that fit in a data element.  Also used
-	  * as the number of bits per pixel.
-	  */
-	private int pixelsPerDataElement;
-
-	/** The size of a data element in bits. */
-	private int dataElementSize;
-
-	/** The bit offset into the data array where the first pixel begins.
+ * MultiPixelPackedSampleModel provides a single band model that supports
+ * multiple pixels in a single unit.  Pixels have 2^n bits and 2^k pixels fit
+ * per data element.
+ *
+ * @author Jerry Quinn <jlquinn@optonline.net>
 	 */
-	private int dataBitOffset;
-
-	/** ScanlineStride of the data buffer described in data array elements. */
+public class MultiPixelPackedSampleModel extends SampleModel
+{
 	private int scanlineStride;
+  private int[] bitMasks;
+  private int[] bitOffsets;
+  private int[] sampleSize;
+  private int dataBitOffset;
+  private int elemBits;
+  private int numberOfBits;
+  private int numElems;
 
-	/**
-	 * Constructs a <code>MultiPixelPackedSampleModel</code> with the
-	 * specified data type, width, height and number of bits per pixel.
-	 * @param dataType  the data type for storing samples
-	 * @param w 	the width, in pixels, of the region of
-	 *                  image data described
-	 * @param h 	the height, in pixels, of the region of
-	 *                  image data described
-	 * @param numberOfBits the number of bits per pixel
-	 * @throws IllegalArgumentException if <code>dataType</code> is not
-	 *         either <code>DataBuffer.TYPE_BYTE</code>,
-	 *         <code>DataBuffer.TYPE_USHORT</code>, or
-	 *         <code>DataBuffer.TYPE_INT</code>
-	 */
-	public MultiPixelPackedSampleModel(int dataType, int w, int h, int numberOfBits) {
-		this(dataType, w, h, numberOfBits, (w * numberOfBits + DataBuffer.getDataTypeSize(dataType) - 1) / DataBuffer.getDataTypeSize(dataType), 0);
-		if (dataType != DataBuffer.TYPE_BYTE && dataType != DataBuffer.TYPE_USHORT && dataType != DataBuffer.TYPE_INT) {
-			throw new IllegalArgumentException("Unsupported data type " + dataType);
-		}
+  public MultiPixelPackedSampleModel(int dataType, int w, int h,
+				     int numberOfBits)
+  {
+    this(dataType, w, h, 0, numberOfBits, 0);
 	}
 
-	/**
-	 * Constructs a <code>MultiPixelPackedSampleModel</code> with 
-	 * specified data type, width, height, number of bits per pixel,
-	 * scanline stride and data bit offset.
-	 * @param dataType  the data type for storing samples
-	 * @param w 	the width, in pixels, of the region of
-	 *                  image data described
-	 * @param h 	the height, in pixels, of the region of
-	 *                  image data described
-	 * @param numberOfBits the number of bits per pixel
-	 * @param scanlineStride the line stride of the image data
-	 * @param dataBitOffset the data bit offset for the region of image
-	 *                  data described
-	 * @exception RasterFormatException if the number of bits per pixel
-	 *                  is not a power of 2 or if a power of 2 number of
-	 *			pixels do not fit in one data element.
-	 * @throws IllegalArgumentException if <code>w</code> or
-	 *         <code>h</code> is not greater than 0
-	 * @throws IllegalArgumentException if <code>dataType</code> is not
-	 *         either <code>DataBuffer.TYPE_BYTE</code>,
-	 *         <code>DataBuffer.TYPE_USHORT</code>, or
-	 *         <code>DataBuffer.TYPE_INT</code>
-	 */
-	public MultiPixelPackedSampleModel(int dataType, int w, int h, int numberOfBits, int scanlineStride, int dataBitOffset) {
+  public MultiPixelPackedSampleModel(int dataType, int w, int h,
+				     int numberOfBits, int scanlineStride,
+				     int dataBitOffset)
+  {
 		super(dataType, w, h, 1);
-		if (dataType != DataBuffer.TYPE_BYTE && dataType != DataBuffer.TYPE_USHORT && dataType != DataBuffer.TYPE_INT) {
-			throw new IllegalArgumentException("Unsupported data type " + dataType);
+
+    switch (dataType)
+      {
+      case DataBuffer.TYPE_BYTE:
+	elemBits = 8;
+				break;
+      case DataBuffer.TYPE_USHORT:
+	elemBits = 16;
+				break;
+      case DataBuffer.TYPE_INT:
+	elemBits = 32;
+				break;
+      default:
+	throw new IllegalArgumentException("MultiPixelPackedSampleModel"
+					   + " unsupported dataType");
+	}
+
+    this.dataBitOffset = dataBitOffset;
+
+    this.numberOfBits = numberOfBits;
+    if (numberOfBits > elemBits)
+      throw new RasterFormatException("MultiPixelPackedSampleModel pixel size"
+				      + " larger than dataType");
+    switch (numberOfBits)
+      {
+      case 1: case 2: case 4: case 8: case 16: case 32: break;
+      default:
+	throw new RasterFormatException("MultiPixelPackedSampleModel pixel"
+					+ " size not 2^n bits");
+      }
+    numElems = elemBits / numberOfBits;
+
+    // Compute scan line large enough for w pixels.
+    if (scanlineStride == 0)
+      scanlineStride = ((dataBitOffset + w * numberOfBits) / elemBits) + 1;
+    this.scanlineStride = scanlineStride;
+
+
+    sampleSize = new int[1];
+    sampleSize[0] = numberOfBits;
+
+    bitMasks = new int[numElems];
+    bitOffsets = new int[numElems];
+    for (int i=0; i < numElems; i++)
+      {
+	bitOffsets[i] = numberOfBits * i;
+	bitMasks[i] = ((1 << numberOfBits) - 1) << bitOffsets[i];
+	}
+	}
+
+  public SampleModel createCompatibleSampleModel(int w, int h)
+  {
+    /* FIXME: We can avoid recalculation of bit offsets and sample
+       sizes here by passing these from the current instance to a
+       special private constructor. */
+    return new MultiPixelPackedSampleModel(dataType, w, h, numberOfBits);
+	}
+
+
+	/** 
+   * Creates a DataBuffer for holding pixel data in the format and
+   * layout described by this SampleModel. The returned buffer will
+   * consist of one single bank.
+	 */
+  public DataBuffer createDataBuffer()
+  {
+    int size;
+
+    // FIXME:  The comment refers to SinglePixelPackedSampleModel.  See if the
+    // same can be done for MultiPixelPackedSampleModel.
+    // We can save (scanlineStride - width) pixels at the very end of
+    // the buffer. The Sun reference implementation (J2SE 1.3.1 and
+    // 1.4.1_01) seems to do this; tested with Mauve test code.
+    size = scanlineStride * height;
+
+    return Buffers.createBuffer(getDataType(), size);
+	}
+
+
+  public int getNumDataElements()
+  {
+    return 1;
 		}
-		this.dataType = dataType;
-		this.pixelBitStride = numberOfBits;
-		this.scanlineStride = scanlineStride;
-		this.dataBitOffset = dataBitOffset;
-		this.dataElementSize = DataBuffer.getDataTypeSize(dataType);
-		this.pixelsPerDataElement = dataElementSize / numberOfBits;
-		if (pixelsPerDataElement * numberOfBits != dataElementSize) {
-			throw new RasterFormatException("MultiPixelPackedSampleModel " + "does not allow pixels to " + "span data element boundaries");
+
+  public int[] getSampleSize()
+  {
+    return sampleSize;
 		}
-		this.bitMask = (1 << numberOfBits) - 1;
+
+  public int getSampleSize(int band)
+  {
+    return sampleSize[0];
+	}
+
+  public int getOffset(int x, int y)
+  {
+    return scanlineStride * y + ((dataBitOffset + x*numberOfBits) / elemBits);
+	}
+
+  public int getBitOffset(int x)
+  {
+    return (dataBitOffset + x*numberOfBits) % elemBits;
+		}
+
+  public int getDataBitOffset()
+  {
+    return dataBitOffset;
+  }
+
+  public int getScanlineStride()
+  {
+    return scanlineStride;
+  }
+
+  public int getPixelBitStride()
+  {
+    return numberOfBits;
+  }
+
+
+  public SampleModel createSubsetSampleModel(int[] bands)
+  {
+    int numBands = bands.length;
+    if (numBands != 1)
+      throw new RasterFormatException("MultiPixelPackedSampleModel only"
+				      + " supports one band");
+    
+    return new MultiPixelPackedSampleModel(dataType, width, height,
+					   numberOfBits, scanlineStride,
+					   dataBitOffset);
 	}
 
 	/**
-	 * Creates a new <code>MultiPixelPackedSampleModel</code> with the
-	 * specified width and height.  The new 
-	 * <code>MultiPixelPackedSampleModel</code> has the
-	 * same storage data type and number of bits per pixel as this
-	 * <code>MultiPixelPackedSampleModel</code>.
-	 * @param w the specified width
-	 * @param h the specified height
-	 * @return a {@link SampleModel} with the specified width and height
-	 * and with the same storage data type and number of bits per pixel
-	 * as this <code>MultiPixelPackedSampleModel</code>.
-	 * @throws IllegalArgumentException if <code>w</code> or
-	 *         <code>h</code> is not greater than 0
-	 */
-	public SampleModel createCompatibleSampleModel(int w, int h) {
-		SampleModel sampleModel = new MultiPixelPackedSampleModel(dataType, w, h, pixelBitStride);
-		return sampleModel;
-	}
+   * Extract one pixel and return in an array of transfer type.
+   *
+   * Extracts the pixel at x, y from data and stores into the 0th index of the
+   * array obj, since there is only one band.  If obj is null, a new array of
+   * getTransferType() is created.
+   *
+   * @param x The x-coordinate of the pixel rectangle to store in <code>obj</code>.
+   * @param y The y-coordinate of the pixel rectangle to store in <code>obj</code>.
+   * @param obj The primitive array to store the pixels into or null to force creation.
+   * @param data The DataBuffer that is the source of the pixel data.
+   * @return The primitive array containing the pixel data.
+   * @see java.awt.image.SampleModel#getDataElements(int, int, java.lang.Object, java.awt.image.DataBuffer)
+   */
+  public Object getDataElements(int x, int y, Object obj,
+				DataBuffer data)
+  {
+    int pixel = getSample(x, y, 0, data);
+    switch (getTransferType())
+    {
+    case DataBuffer.TYPE_BYTE:
+      if (obj == null) obj = new byte[1];
+      ((byte[])obj)[0] = (byte)pixel;
+      return obj;
+    case DataBuffer.TYPE_USHORT:
+      if (obj == null) obj = new short[1];
+      ((short[])obj)[0] = (short)pixel;
+      return obj;
+    case DataBuffer.TYPE_INT:
+      if (obj == null) obj = new int[1];
+      ((int[])obj)[0] = pixel;
+      return obj;
+    default:
+      // Seems like the only sensible thing to do.
+      throw new ClassCastException();
+    }
+  }
 
-	/** 
-	 * Creates a <code>DataBuffer</code> that corresponds to this
-	 * <code>MultiPixelPackedSampleModel</code>.  The
-	 * <code>DataBuffer</code> object's data type and size
-	 * is consistent with this <code>MultiPixelPackedSampleModel</code>.
-	 * The <code>DataBuffer</code> has a single bank.
-	 * @return a <code>DataBuffer</code> with the same data type and
-	 * size as this <code>MultiPixelPackedSampleModel</code>.
-	 */
-	public DataBuffer createDataBuffer() {
-		DataBuffer dataBuffer = null;
+  public int[] getPixel(int x, int y, int[] iArray, DataBuffer data)
+  {
+    if (iArray == null) iArray = new int[1];
+    iArray[0] = getSample(x, y, 0, data);
+	
+    return iArray;
+  }
 
-		int size = scanlineStride * height;
-		switch (dataType) {
-			case DataBuffer.TYPE_BYTE :
-				dataBuffer = new DataBufferByte(size + (dataBitOffset + 7) / 8);
-				break;
-			case DataBuffer.TYPE_USHORT :
-				dataBuffer = new DataBufferUShort(size + (dataBitOffset + 15) / 16);
-				break;
-			case DataBuffer.TYPE_INT :
-				dataBuffer = new DataBufferInt(size + (dataBitOffset + 31) / 32);
-				break;
-		}
-		return dataBuffer;
-	}
+  public int[] getPixels(int x, int y, int w, int h, int[] iArray,
+			 DataBuffer data)
+  {
+    int offset = getOffset(x, y);
+    if (iArray == null) iArray = new int[w*h];
+    int outOffset = 0;
+    for (y=0; y<h; y++)
+      {
+	int lineOffset = offset;
+	for (x=0; x<w;)
+	  {
+	    int samples = data.getElem(lineOffset++);
+	    for (int b=0; b<numElems && x<w; b++)
+	      {
+		iArray[outOffset++] = (samples & bitMasks[b]) >>> bitOffsets[b];
+		x++;
+	      }
+	  }
+	offset += scanlineStride;
+      }
+    return iArray;	
+  }
 
-	/** 
-	 * Returns the number of data elements needed to transfer one pixel
-	 * via the {@link #getDataElements} and {@link #setDataElements}
-	 * methods.  For a <code>MultiPixelPackedSampleModel</code>, this is
-	 * one.
-	 * @return the number of data elements.
-	 */
-	public int getNumDataElements() {
-		return 1;
-	}
+  public int getSample(int x, int y, int b, DataBuffer data)
+  {
+    int pos =
+      ((dataBitOffset + x * numberOfBits) % elemBits) / numberOfBits;
+    int offset = getOffset(x, y);
+    int samples = data.getElem(offset);
+    return (samples & bitMasks[pos]) >>> bitOffsets[pos];
+  }
+  
+  /**
+   * Set the pixel at x, y to the value in the first element of the primitive
+   * array obj.
+   *
+   * @param x The x-coordinate of the data elements in <code>obj</code>.
+   * @param y The y-coordinate of the data elements in <code>obj</code>.
+   * @param obj The primitive array containing the data elements to set.
+   * @param data The DataBuffer to store the data elements into.
+   * @see java.awt.image.SampleModel#setDataElements(int, int, int, int, java.lang.Object, java.awt.image.DataBuffer)
+   */
+  public void setDataElements(int x, int y, Object obj, DataBuffer data)
+  {
+    int transferType = getTransferType();
+    if (getTransferType() != data.getDataType())
+      {
+	throw new IllegalArgumentException("transfer type ("+
+					   getTransferType()+"), "+
+					   "does not match data "+
+					   "buffer type (" +
+					   data.getDataType() +
+					   ").");
+      }
 
-	/** 
-	 * Returns the number of bits per sample for all bands. 
-	 * @return the number of bits per sample.
-	 */
-	public int[] getSampleSize() {
-		int sampleSize[] = { pixelBitStride };
-		return sampleSize;
-	}
+    int offset = getOffset(x, y);
+    
+    try
+      {
+	switch (transferType)
+	  {
+	  case DataBuffer.TYPE_BYTE:
+	    {
+	      DataBufferByte out = (DataBufferByte) data;
+	      byte[] in = (byte[]) obj;
+	      out.getData()[offset] = in[0];
+	      return;
+	    }
+	  case DataBuffer.TYPE_USHORT:
+	    {
+	      DataBufferUShort out = (DataBufferUShort) data;
+	      short[] in = (short[]) obj;
+	      out.getData()[offset] = in[0];
+	      return;
+	    }
+	  case DataBuffer.TYPE_INT:
+	    {
+	      DataBufferInt out = (DataBufferInt) data;
+	      int[] in = (int[]) obj;
+	      out.getData()[offset] = in[0];
+	      return;
+	    }
+	  default:
+	    throw new ClassCastException("Unsupported data type");
+	  }
+      }
+    catch (ArrayIndexOutOfBoundsException aioobe)
+      {
+	String msg = "While writing data elements" +
+	  ", x="+x+", y="+y+
+	  ", width="+width+", height="+height+
+	  ", scanlineStride="+scanlineStride+
+	  ", offset="+offset+
+	  ", data.getSize()="+data.getSize()+
+	  ", data.getOffset()="+data.getOffset()+
+	  ": " +
+	  aioobe;
+	throw new ArrayIndexOutOfBoundsException(msg);
+      }
+    }
 
-	/** 
-	 * Returns the number of bits per sample for the specified band. 
-	 * @param band the specified band
-	 * @return the number of bits per sample for the specified band.
-	 */
-	public int getSampleSize(int band) {
-		return pixelBitStride;
-	}
+  public void setPixel(int x, int y, int[] iArray, DataBuffer data)
+  {
+    setSample(x, y, 0, iArray[0], data);
+  }
 
-	/** 
-	 * Returns the offset of pixel (x,&nbsp;y) in data array elements.
-	 * @param x,&nbsp;y the specified pixel
-	 * @return the offset of the specified pixel.
-	 */
-	public int getOffset(int x, int y) {
-		int offset = y * scanlineStride;
-		offset += (x * pixelBitStride + dataBitOffset) / dataElementSize;
-		return offset;
-	}
+  public void setSample(int x, int y, int b, int s, DataBuffer data)
+  {
+    int bitpos =
+      ((dataBitOffset + x * numberOfBits) % elemBits) / numberOfBits;
+    int offset = getOffset(x, y);
 
-	/**
-	 *  Returns the offset, in bits, into the data element in which it is
-	 *  stored for the <code>x</code>th pixel of a scanline.
-	 *  This offset is the same for all scanlines.
-	 *  @param x the specified pixel
-	 *  @return the bit offset of the specified pixel.
-	 */
-	public int getBitOffset(int x) {
-		return (x * pixelBitStride + dataBitOffset) % dataElementSize;
-	}
+    s = s << bitOffsets[bitpos];
+    s = s & bitMasks[bitpos];
 
-	/** 
-	 * Returns the scanline stride. 
-	 * @return the scanline stride of this
-	 * <code>MultiPixelPackedSampleModel</code>.
-	 */
-	public int getScanlineStride() {
-		return scanlineStride;
-	}
-
-	/** 
-	 * Returns the pixel bit stride in bits.  This value is the same as
-	 * the number of bits per pixel.
-	 * @return the <code>pixelBitStride</code> of this 
-	 * <code>MultiPixelPackedSampleModel</code>.
-	 */
-	public int getPixelBitStride() {
-		return pixelBitStride;
-	}
-
-	/** 
-	 * Returns the data bit offset in bits. 
-	 * @return the <code>dataBitOffset</code> of this
-	 * <code>MultiPixelPackedSampleModel</code>.
-	 */
-	public int getDataBitOffset() {
-		return dataBitOffset;
-	}
-
-	/** 
-	 *  Returns the TransferType used to transfer pixels by way of the
-	 *  <code>getDataElements</code> and <code>setDataElements</code> 
-	 *  methods. The TransferType might or might not be the same as the
-	 *  storage DataType.  The TransferType is one of
-	 *  DataBuffer.TYPE_BYTE, DataBuffer.TYPE_USHORT,
-	 *  or DataBuffer.TYPE_INT.
-	 *  @return the transfertype.
-	 */
-	public int getTransferType() {
-		if (pixelBitStride > 16)
-			return DataBuffer.TYPE_INT;
-		else if (pixelBitStride > 8)
-			return DataBuffer.TYPE_USHORT;
-		else
-			return DataBuffer.TYPE_BYTE;
-	}
-
-	/**
-	 * Creates a new <code>MultiPixelPackedSampleModel</code> with a
-	 * subset of the bands of this 
-	 * <code>MultiPixelPackedSampleModel</code>.  Since a
-	 * <code>MultiPixelPackedSampleModel</code> only has one band, the
-	 * bands argument must have a length of one and indicate the zeroth
-	 * band.
-	 * @param bands the specified bands
-	 * @return a new <code>SampleModel</code> with a subset of bands of
-	 * this <code>MultiPixelPackedSampleModel</code>.
-	 * @exception RasterFormatException if the number of bands requested
-	 * is not one.
-	 * @throws IllegalArgumentException if <code>w</code> or
-	 *         <code>h</code> is not greater than 0
-	 */
-	public SampleModel createSubsetSampleModel(int bands[]) {
-		if (bands != null) {
-			if (bands.length != 1)
-				throw new RasterFormatException("MultiPixelPackedSampleModel has " + "only one band.");
-		}
-		SampleModel sm = createCompatibleSampleModel(width, height);
-		return sm;
-	}
-
-	/** 
-	 * Returns as <code>int</code> the sample in a specified band for the
-	 * pixel located at (x,&nbsp;y).  An 
-	 * <code>ArrayIndexOutOfBoundsException</code> is thrown if the
-	 * coordinates are not in bounds.
-	 * @param x,&nbsp;y the coordinates of the specified pixel
-	 * @param b 	the band to return, which is assumed to be 0
-	 * @param data      the <code>DataBuffer</code> containing the image
-	 *			data
-	 * @return the specified band containing the sample of the specified
-	 * pixel.
-	 * @exception ArrayIndexOutOfBoundException if the specified
-	 *		coordinates are not in bounds.
-	 * @see #setSample(int, int, int, int, DataBuffer)
-	 */
-	public int getSample(int x, int y, int b, DataBuffer data) {
-		// 'b' must be 0
-		if ((x < 0) || (y < 0) || (x >= width) || (y >= height) || (b != 0)) {
-			throw new ArrayIndexOutOfBoundsException("Coordinate out of bounds!");
-		}
-		int bitnum = dataBitOffset + x * pixelBitStride;
-		int element = data.getElem(y * scanlineStride + bitnum / dataElementSize);
-		int shift = dataElementSize - (bitnum & (dataElementSize - 1)) - pixelBitStride;
-		return (element >> shift) & bitMask;
-	}
-
-	/** 
-	 * Sets a sample in the specified band for the pixel located at 
-	 * (x,&nbsp;y) in the <code>DataBuffer</code> using an
-	 * <code>int</code> for input.
-	 * An <code>ArrayIndexOutOfBoundsException</code> is thrown if the
-	 * coordinates are not in bounds.
-	 * @param x,&nbsp;y the coordinates of the specified pixel
-	 * @param b the band to return, which is assumed to be 0
-	 * @param s the input sample as an <code>int</code>
-	 * @param data the <code>DataBuffer</code> where image data is stored
-	 * @exception ArrayIndexOutOfBoundsException if the coordinates are 
-	 * not in bounds.
-	 * @see #getSample(int, int, int, DataBuffer)
-	 */
-	public void setSample(int x, int y, int b, int s, DataBuffer data) {
-		// 'b' must be 0
-		if ((x < 0) || (y < 0) || (x >= width) || (y >= height) || (b != 0)) {
-			throw new ArrayIndexOutOfBoundsException("Coordinate out of bounds!");
-		}
-		int bitnum = dataBitOffset + x * pixelBitStride;
-		int index = y * scanlineStride + (bitnum / dataElementSize);
-		int shift = dataElementSize - (bitnum & (dataElementSize - 1)) - pixelBitStride;
-		int element = data.getElem(index);
-		element &= ~(bitMask << shift);
-		element |= (s & bitMask) << shift;
-		data.setElem(index, element);
-	}
-
-	/** 
-	 * Returns data for a single pixel in a primitive array of type
-	 * TransferType.  For a <code>MultiPixelPackedSampleModel</code>, 
-	 * the array has one element, and the type is the smallest of
-	 * DataBuffer.TYPE_BYTE, DataBuffer.TYPE_USHORT, or DataBuffer.TYPE_INT
-	 * that can hold a single pixel.  Generally, <code>obj</code>
-	 * should be passed in as <code>null</code>, so that the 
-	 * <code>Object</code> is created automatically and is the
-	 * correct primitive data type.
-	 * <p>
-	 * The following code illustrates transferring data for one pixel from
-	 * <code>DataBuffer</code> <code>db1</code>, whose storage layout is
-	 * described by <code>MultiPixelPackedSampleModel</code> 
-	 * <code>mppsm1</code>, to <code>DataBuffer</code> <code>db2</code>,
-	 * whose storage layout is described by
-	 * <code>MultiPixelPackedSampleModel</code> <code>mppsm2</code>.
-	 * The transfer is generally more efficient than using
-	 * <code>getPixel</code> or <code>setPixel</code>.
-	 * <pre>
-	 * 	     MultiPixelPackedSampleModel mppsm1, mppsm2;
-	 *	     DataBufferInt db1, db2;
-	 * 	     mppsm2.setDataElements(x, y, mppsm1.getDataElements(x, y, null,
-	 *                              db1), db2);
-	 * </pre>
-	 * Using <code>getDataElements</code> or <code>setDataElements</code> 
-	 * to transfer between two <code>DataBuffer/SampleModel</code> pairs
-	 * is legitimate if the <code>SampleModels</code> have the same number
-	 * of bands, corresponding bands have the same number of
-	 * bits per sample, and the TransferTypes are the same.
-	 * <p>
-	 * If <code>obj</code> is not <code>null</code>, it should be a
-	 * primitive array of type TransferType.  Otherwise, a 
-	 * <code>ClassCastException</code> is thrown.  An
-	 * <code>ArrayIndexOutOfBoundsException</code> is thrown if the
-	 * coordinates are not in bounds, or if <code>obj</code> is not 
-	 * <code>null</code> and is not large enough to hold the pixel data.
-	 * @param x,&nbsp;y coordinates of the pixel location.
-	 * @param obj a primitive array in which to return the pixel data or
-	 *		<code>null</code>.
-	 * @param data the <code>DataBuffer</code> containing the image data.
-	 * @return an <code>Object</code> containing data for the specified
-	 *	pixel.
-	 * @exception ClassCastException if <code>obj</code> is not a 
-	 *	primitive array of type TransferType or is not <code>null</code>
-	 * @exception ArrayIndexOutOfBoundsException if the coordinates are
-	 * not in bounds, or if <code>obj</code> is not <code>null</code> or 
-	 * not large enough to hold the pixel data
-	 * @see #setDataElements(int, int, Object, DataBuffer)
-	 */
-	public Object getDataElements(int x, int y, Object obj, DataBuffer data) {
-		if ((x < 0) || (y < 0) || (x >= width) || (y >= height)) {
-			throw new ArrayIndexOutOfBoundsException("Coordinate out of bounds!");
-		}
-
-		int type = getTransferType();
-		int bitnum = dataBitOffset + x * pixelBitStride;
-		int shift = dataElementSize - (bitnum & (dataElementSize - 1)) - pixelBitStride;
-		int element = 0;
-
-		switch (type) {
-
-			case DataBuffer.TYPE_BYTE :
-
-				byte[] bdata;
-
-				if (obj == null)
-					bdata = new byte[1];
-				else
-					bdata = (byte[]) obj;
-
-				element = data.getElem(y * scanlineStride + bitnum / dataElementSize);
-				bdata[0] = (byte) ((element >> shift) & bitMask);
-
-				obj = bdata;
-				break;
-
-			case DataBuffer.TYPE_USHORT :
-
-				short[] sdata;
-
-				if (obj == null)
-					sdata = new short[1];
-				else
-					sdata = (short[]) obj;
-
-				element = data.getElem(y * scanlineStride + bitnum / dataElementSize);
-				sdata[0] = (short) ((element >> shift) & bitMask);
-
-				obj = sdata;
-				break;
-
-			case DataBuffer.TYPE_INT :
-
-				int[] idata;
-
-				if (obj == null)
-					idata = new int[1];
-				else
-					idata = (int[]) obj;
-
-				element = data.getElem(y * scanlineStride + bitnum / dataElementSize);
-				idata[0] = (element >> shift) & bitMask;
-
-				obj = idata;
-				break;
-		}
-
-		return obj;
-	}
-
-	/**
-	 * Returns the specified single band pixel in the first element
-	 * of an <code>int</code> array.
-	 * <code>ArrayIndexOutOfBoundsException</code> is thrown if the
-	 * coordinates are not in bounds.
-	 * @param x,&nbsp;y the coordinates of the pixel location
-	 * @param iArray the array containing the pixel to be returned or
-	 * 	<code>null</code>
-	 * @param data the <code>DataBuffer</code> where image data is stored
-	 * @return an array containing the specified pixel.
-	 * @exception ArrayIndexOutOfBoundsException if the coordinates
-	 *	are not in bounds
-	 * @see #setPixel(int, int, int[], DataBuffer)
-	 */
-	public int[] getPixel(int x, int y, int iArray[], DataBuffer data) {
-		if ((x < 0) || (y < 0) || (x >= width) || (y >= height)) {
-			throw new ArrayIndexOutOfBoundsException("Coordinate out of bounds!");
-		}
-		int pixels[];
-		if (iArray != null) {
-			pixels = iArray;
-		} else {
-			pixels = new int[numBands];
-		}
-		int bitnum = dataBitOffset + x * pixelBitStride;
-		int element = data.getElem(y * scanlineStride + bitnum / dataElementSize);
-		int shift = dataElementSize - (bitnum & (dataElementSize - 1)) - pixelBitStride;
-		pixels[0] = (element >> shift) & bitMask;
-		return pixels;
-	}
-
-	/** 
-	 * Sets the data for a single pixel in the specified 
-	 * <code>DataBuffer</code> from a primitive array of type
-	 * TransferType.  For a <code>MultiPixelPackedSampleModel</code>,
-	 * only the first element of the array holds valid data,
-	 * and the type must be the smallest of
-	 * DataBuffer.TYPE_BYTE, DataBuffer.TYPE_USHORT, or DataBuffer.TYPE_INT
-	 * that can hold a single pixel.
-	 * <p>
-	 * The following code illustrates transferring data for one pixel from
-	 * <code>DataBuffer</code> <code>db1</code>, whose storage layout is
-	 * described by <code>MultiPixelPackedSampleModel</code> 
-	 * <code>mppsm1</code>, to <code>DataBuffer</code> <code>db2</code>,
-	 * whose storage layout is described by
-	 * <code>MultiPixelPackedSampleModel</code> <code>mppsm2</code>.
-	 * The transfer is generally more efficient than using
-	 * <code>getPixel</code> or <code>setPixel</code>.
-	 * <pre>
-	 * 	     MultiPixelPackedSampleModel mppsm1, mppsm2;
-	 *	     DataBufferInt db1, db2;
-	 * 	     mppsm2.setDataElements(x, y, mppsm1.getDataElements(x, y, null,
-	 *                              db1), db2);
-	 * </pre>
-	 * Using <code>getDataElements</code> or <code>setDataElements</code> to
-	 * transfer between two <code>DataBuffer/SampleModel</code> pairs is
-	 * legitimate if the <code>SampleModel</code> objects have
-	 * the same number of bands, corresponding bands have the same number of
-	 * bits per sample, and the TransferTypes are the same.
-	 * <p>
-	 * <code>obj</code> must be a primitive array of type TransferType.
-	 * Otherwise, a <code>ClassCastException</code> is thrown.  An
-	 * <code>ArrayIndexOutOfBoundsException</code> is thrown if the
-	 * coordinates are not in bounds, or if <code>obj</code> is not large
-	 * enough to hold the pixel data.
-	 * @param x,&nbsp;y the coordinates of the pixel location
-	 * @param obj a primitive array containing pixel data
-	 * @param data the <code>DataBuffer</code> containing the image data
-	 * @see #getDataElements(int, int, Object, DataBuffer)
-	 */
-	public void setDataElements(int x, int y, Object obj, DataBuffer data) {
-		if ((x < 0) || (y < 0) || (x >= width) || (y >= height)) {
-			throw new ArrayIndexOutOfBoundsException("Coordinate out of bounds!");
-		}
-
-		int type = getTransferType();
-		int bitnum = dataBitOffset + x * pixelBitStride;
-		int index = y * scanlineStride + (bitnum / dataElementSize);
-		int shift = dataElementSize - (bitnum & (dataElementSize - 1)) - pixelBitStride;
-		int element = data.getElem(index);
-		element &= ~(bitMask << shift);
-
-		switch (type) {
-
-			case DataBuffer.TYPE_BYTE :
-
-				byte[] barray = (byte[]) obj;
-				element |= (((barray[0]) & 0xff) & bitMask) << shift;
-				data.setElem(index, element);
-				break;
-
-			case DataBuffer.TYPE_USHORT :
-
-				short[] sarray = (short[]) obj;
-				element |= (((sarray[0]) & 0xffff) & bitMask) << shift;
-				data.setElem(index, element);
-				break;
-
-			case DataBuffer.TYPE_INT :
-
-				int[] iarray = (int[]) obj;
-				element |= (iarray[0] & bitMask) << shift;
-				data.setElem(index, element);
-				break;
-		}
-	}
-
-	/**
-	 * Sets a pixel in the <code>DataBuffer</code> using an
-	 * <code>int</code> array for input.
-	 * <code>ArrayIndexOutOfBoundsException</code> is thrown if
-	 * the coordinates are not in bounds.
-	 * @param x,&nbsp;y the coordinates of the pixel location
-	 * @param iArray the input pixel in an <code>int</code> array
-	 * @param data the <code>DataBuffer</code> containing the image data
-	 * @see #getPixel(int, int, int[], DataBuffer)
-	 */
-	public void setPixel(int x, int y, int[] iArray, DataBuffer data) {
-		if ((x < 0) || (y < 0) || (x >= width) || (y >= height)) {
-			throw new ArrayIndexOutOfBoundsException("Coordinate out of bounds!");
-		}
-		int bitnum = dataBitOffset + x * pixelBitStride;
-		int index = y * scanlineStride + (bitnum / dataElementSize);
-		int shift = dataElementSize - (bitnum & (dataElementSize - 1)) - pixelBitStride;
-		int element = data.getElem(index);
-		element &= ~(bitMask << shift);
-		element |= (iArray[0] & bitMask) << shift;
-		data.setElem(index, element);
-	}
-
-	public boolean equals(Object o) {
-		if ((o == null) || !(o instanceof MultiPixelPackedSampleModel)) {
-			return false;
-		}
-
-		MultiPixelPackedSampleModel that = (MultiPixelPackedSampleModel) o;
-		return this.width == that.width
-			&& this.height == that.height
-			&& this.numBands == that.numBands
-			&& this.dataType == that.dataType
-			&& this.pixelBitStride == that.pixelBitStride
-			&& this.bitMask == that.bitMask
-			&& this.pixelsPerDataElement == that.pixelsPerDataElement
-			&& this.dataElementSize == that.dataElementSize
-			&& this.dataBitOffset == that.dataBitOffset
-			&& this.scanlineStride == that.scanlineStride;
-	}
-
-	// If we implement equals() we must also implement hashCode
-	public int hashCode() {
-		int hash = 0;
-		hash = width;
-		hash <<= 8;
-		hash ^= height;
-		hash <<= 8;
-		hash ^= numBands;
-		hash <<= 8;
-		hash ^= dataType;
-		hash <<= 8;
-		hash ^= pixelBitStride;
-		hash <<= 8;
-		hash ^= bitMask;
-		hash <<= 8;
-		hash ^= pixelsPerDataElement;
-		hash <<= 8;
-		hash ^= dataElementSize;
-		hash <<= 8;
-		hash ^= dataBitOffset;
-		hash <<= 8;
-		hash ^= scanlineStride;
-		return hash;
+    int sample = data.getElem(offset);
+    sample |= s;
+    data.setElem(offset, sample);
+  }
+  
+  /**
+   * Creates a String with some information about this SampleModel.
+   * @return A String describing this SampleModel.
+   * @see java.lang.Object#toString()
+   */
+  public String toString()
+  {
+    StringBuffer result = new StringBuffer();
+    result.append(getClass().getName());
+    result.append("[");
+    result.append("scanlineStride=").append(scanlineStride);
+    for(int i=0; i < bitMasks.length; i+=1)
+    {
+      result.append(", mask[").append(i).append("]=0x").append(Integer.toHexString(bitMasks[i]));
+    }
+    
+    result.append("]");
+    return result.toString();
 	}
 }

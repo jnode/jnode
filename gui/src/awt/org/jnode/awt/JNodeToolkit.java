@@ -1,0 +1,539 @@
+/*
+ * $Id$
+ */
+package org.jnode.awt;
+
+import gnu.java.awt.ClasspathToolkit;
+import gnu.java.awt.peer.ClasspathFontPeer;
+import gnu.java.awt.peer.ClasspathTextLayoutPeer;
+import gnu.java.security.action.GetPropertyAction;
+
+import java.awt.AWTError;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Frame;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.PrintJob;
+import java.awt.datatransfer.Clipboard;
+import java.awt.font.FontRenderContext;
+import java.awt.im.InputMethodHighlight;
+import java.awt.image.ColorModel;
+import java.awt.image.ImageObserver;
+import java.awt.image.ImageProducer;
+import java.awt.peer.FontPeer;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.text.AttributedString;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.naming.NamingException;
+
+import org.apache.log4j.Logger;
+import org.jnode.awt.font.FontManager;
+import org.jnode.awt.font.JNodeFontPeer;
+import org.jnode.awt.image.GIFDecoder;
+import org.jnode.awt.image.JNodeImage;
+import org.jnode.driver.DeviceException;
+import org.jnode.driver.sound.speaker.SpeakerUtils;
+import org.jnode.driver.video.AlreadyOpenException;
+import org.jnode.driver.video.FrameBufferAPI;
+import org.jnode.driver.video.Surface;
+import org.jnode.driver.video.UnknownConfigurationException;
+import org.jnode.naming.InitialNaming;
+
+/**
+ * @author epr
+ */
+public abstract class JNodeToolkit extends ClasspathToolkit {
+
+	private FrameBufferAPI api;
+
+	private JNodeGraphicsConfiguration config;
+
+	private final EventQueue eventQueue = new EventQueue();
+
+	private final FocusHandler focusHandler;
+
+	private Surface graphics;
+
+	private KeyboardHandler keyboardHandler;
+
+	/** My logger */
+	protected final Logger log = Logger.getLogger(getClass());
+
+	private MouseHandler mouseHandler;
+
+	private int refCount = 0;
+
+	private final Dimension screenSize = new Dimension(640, 480);
+
+	private LRUCache fontCache = new LRUCache(50);
+
+	public JNodeToolkit() {
+		refCount = 0;
+		this.focusHandler = new FocusHandler(this);
+		JNodeGenericPeer.enableQueue(eventQueue);
+	}
+
+	/**
+	 * @see java.awt.Toolkit#beep()
+	 */
+	public void beep() {
+		SpeakerUtils.beep();
+	}
+
+	/**
+	 * @param image
+	 * @param width
+	 * @param height
+	 * @param observer
+	 * @return int
+	 */
+	public int checkImage(Image image, int width, int height,
+			ImageObserver observer) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/**
+	 * @see gnu.java.awt.ClasspathToolkit#createFont(int, java.io.InputStream)
+	 */
+	public Font createFont(int format, InputStream stream) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * @param data
+	 * @param offset
+	 * @param len
+	 * @see java.awt.Toolkit#createImage(byte[], int, int)
+	 * @return The image
+	 */
+	public Image createImage(byte[] data, int offset, int len) {
+		if (len >= 4 && data[offset + 0] == 'G' && data[offset + 1] == 'I'
+				&& data[offset + 2] == 'F' && data[offset + 3] == '8') {
+			try {
+				return createImage(new GIFDecoder(new ByteArrayInputStream(
+						data, offset, len)));
+			} catch (LinkageError err) {
+			} // let it fall through to default code
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param producer
+	 * @see java.awt.Toolkit#createImage(java.awt.image.ImageProducer)
+	 * @return The image
+	 */
+	public Image createImage(ImageProducer producer) {
+		return new JNodeImage(producer);
+	}
+
+	/**
+	 * @param filename
+	 * @see java.awt.Toolkit#createImage(java.lang.String)
+	 * @return The image
+	 */
+	public Image createImage(String filename) {
+		return getImage(filename);
+	}
+
+	/**
+	 * @param url
+	 * @see java.awt.Toolkit#createImage(java.net.URL)
+	 * @return The image
+	 */
+	public Image createImage(URL url) {
+		return getImage(url);
+	}
+
+	/**
+	 * @see gnu.java.awt.ClasspathToolkit#createImageProducer(java.net.URL)
+	 */
+	public ImageProducer createImageProducer(URL url) {
+		// TODO Auto-generated method stub
+		return super.createImageProducer(url);
+	}
+
+	/**
+	 * Decrement the peer reference count
+	 */
+	protected final synchronized int decRefCount(boolean forceClose) {
+		refCount--;
+		if ((refCount == 0) || forceClose) {
+			onClose();
+			if (keyboardHandler != null) {
+				this.keyboardHandler.close();
+			}
+			if (mouseHandler != null) {
+				this.mouseHandler.close();
+			}
+			if (graphics != null) {
+				this.graphics.close();
+			}
+			this.api = null;
+			this.graphics = null;
+			this.keyboardHandler = null;
+			this.mouseHandler = null;
+		}
+		return refCount;
+	}
+
+	/**
+	 * @see gnu.java.awt.ClasspathToolkit#getClasspathTextLayoutPeer(java.text.AttributedString,
+	 *      java.awt.font.FontRenderContext)
+	 */
+	public ClasspathTextLayoutPeer getClasspathTextLayoutPeer(
+			AttributedString str, FontRenderContext frc) {
+		throw new UnsupportedOperationException();
+		// TODO Auto-generated method stub
+		//return super.getClasspathTextLayoutPeer(str, frc);
+	}
+
+	/**
+	 * @see java.awt.Toolkit#getColorModel()
+	 * @return The model
+	 */
+	public ColorModel getColorModel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * Gets the focus handler
+	 * 
+	 * @return The focus handler
+	 */
+	public final FocusHandler getFocusHandler() {
+		return this.focusHandler;
+	}
+
+	/**
+	 * @see gnu.java.awt.ClasspathToolkit#getFont(java.lang.String,
+	 *      java.util.Map)
+	 */
+	public Font getFont(String name, Map attrs) {
+		// TODO Auto-generated method stub
+		return super.getFont(name, attrs);
+	}
+
+	/**
+	 * @see java.awt.Toolkit#getFontList()
+	 * @return The fonts
+	 */
+	public String[] getFontList() {
+		Font[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment()
+				.getAllFonts();
+		String[] names = new String[fonts.length];
+		for (int i = 0; i < fonts.length; i++) {
+			names[i] = fonts[i].getName();
+		}
+		return names;
+	}
+
+	/**
+	 * Gets the font manager, or null if not found.
+	 * 
+	 * @return
+	 */
+	public FontManager getFontManager() {
+		try {
+			return (FontManager) InitialNaming.lookup(FontManager.NAME);
+		} catch (NamingException ex) {
+			return null;
+		}
+	}
+
+	/**
+	 * @param font
+	 * @see java.awt.Toolkit#getFontMetrics(java.awt.Font)
+	 * @return The metrics
+	 */
+	public FontMetrics getFontMetrics(Font font) {
+		final FontManager fm = getFontManager();
+		if (fm != null) {
+			return fm.getFontMetrics(font);
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * @param name
+	 * @param style
+	 * @return The peer
+	 */
+	protected final FontPeer getFontPeer(String name, int style) {
+		// All fonts get a default size of 12 if size is not specified.
+		return getFontPeer(name, style, 12);
+	}
+
+	/**
+	 * Private method that allows size to be set at initialization time.
+	 */
+	private FontPeer getFontPeer(String name, int style, int size) {
+		Map attrs = new HashMap();
+		ClasspathFontPeer.copyStyleToAttrs(style, attrs);
+		ClasspathFontPeer.copySizeToAttrs(size, attrs);
+		return getClasspathFontPeer(name, attrs);
+	}
+
+	/**
+	 * Newer method to produce a peer for a Font object, even though Sun's
+	 * design claims Font should now be peerless, we do not agree with this
+	 * model, hence "ClasspathFontPeer".
+	 */
+
+	public ClasspathFontPeer getClasspathFontPeer(String name, Map attrs) {
+		Map keyMap = new HashMap(attrs);
+		// We don't know what kind of "name" the user requested (logical, face,
+		// family), and we don't actually *need* to know here. The worst case
+		// involves failure to consolidate fonts with the same backend in our
+		// cache. This is harmless.
+		keyMap.put("JNodeToolkit.RequestedFontName", name);
+		if (fontCache.containsKey(keyMap))
+			return (ClasspathFontPeer) fontCache.get(keyMap);
+		else {
+			ClasspathFontPeer newPeer = new JNodeFontPeer(name, attrs);
+			fontCache.put(keyMap, newPeer);
+			return newPeer;
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	public final Surface getGraphics() {
+		return this.graphics;
+	}
+
+	/**
+	 * @see java.awt.peer.ComponentPeer#getGraphicsConfiguration()
+	 * @return The configuration
+	 */
+	public GraphicsConfiguration getGraphicsConfiguration() {
+		return config;
+	}
+
+	/**
+	 * @param filename
+	 * @see java.awt.Toolkit#getImage(java.lang.String)
+	 * @return The image
+	 */
+	public Image getImage(final String filename) {
+		System.out.println("getImage(" + filename + ")");
+		return (Image) AccessController.doPrivileged(new PrivilegedAction() {
+
+			public Object run() {
+				try {
+					final String userDir = (String) AccessController
+							.doPrivileged(new GetPropertyAction("user.dir"));
+					Image image = getImage(new URL("file:"
+							+ new File(userDir, filename)));
+					return image != null ? image : getImage(new URL("file:"
+							+ new File(filename).getAbsolutePath()));
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+					// Ignore
+				}
+				System.out.println("Image not found");
+				return null;
+			}
+		});
+	}
+
+	/**
+	 * @param url
+	 * @see java.awt.Toolkit#getImage(java.net.URL)
+	 * @return The image
+	 */
+	public Image getImage(final URL url) {
+		return (Image) AccessController.doPrivileged(new PrivilegedAction() {
+
+			public Object run() {
+				try {
+					final URLConnection conn = url.openConnection();
+					final String type = conn.getContentType();
+					if ("image/gif".equals(type)
+							|| url.getFile().toLowerCase().endsWith(".gif")) {
+						try {
+							return createImage(new GIFDecoder(conn
+									.getInputStream(), true));
+						} catch (LinkageError e) {
+							// If GIFDecoder not available try default loader
+							return createImage((ImageProducer) (conn
+									.getContent()));
+						}
+					} else
+						return createImage((ImageProducer) (conn.getContent()));
+				} catch (IOException ex) {
+					log.debug("IOException during getImage", ex);
+				}
+				return null;
+			}
+		});
+	}
+
+	/**
+	 * @see gnu.java.awt.ClasspathToolkit#getLocalGraphicsEnvironment()
+	 */
+	public GraphicsEnvironment getLocalGraphicsEnvironment() {
+		return new JNodeGraphicsEnvironment();
+	}
+
+	/**
+	 * @param frame
+	 * @param title
+	 * @param props
+	 * @see java.awt.Toolkit#getPrintJob(java.awt.Frame, java.lang.String,
+	 *      java.util.Properties)
+	 * @return The print job
+	 */
+	public PrintJob getPrintJob(Frame frame, String title, Properties props) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * @see java.awt.Toolkit#getScreenResolution()
+	 * @return int
+	 */
+	public int getScreenResolution() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/**
+	 * @see java.awt.Toolkit#getScreenSize()
+	 * @return The screen size
+	 */
+	public Dimension getScreenSize() {
+		return new Dimension(screenSize);
+	}
+
+	/**
+	 * @see java.awt.Toolkit#getSystemClipboard()
+	 * @return The clipboard
+	 */
+	public Clipboard getSystemClipboard() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * @return The event queue
+	 */
+	protected EventQueue getSystemEventQueueImpl() {
+		return eventQueue;
+	}
+
+	/**
+	 * Increment the peer reference count
+	 */
+	protected final int incRefCount() {
+		final boolean initialize;
+		final int rc;
+		synchronized (this) {
+			refCount++;
+			rc = refCount;
+			initialize = (refCount == 1);
+		}
+		if (initialize) {
+			final JNodeFrameBufferDevice dev = (JNodeFrameBufferDevice) GraphicsEnvironment
+					.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+			config = (JNodeGraphicsConfiguration) dev.getDefaultConfiguration();
+			this.api = dev.getAPI();
+			try {
+				log.debug("Opening AWT: Using device " + dev.getIDstring());
+				this.graphics = api.open(config.getConfig());
+				screenSize.width = config.getConfig().getScreenWidth();
+				screenSize.height = config.getConfig().getScreenHeight();
+				this.keyboardHandler = new KeyboardHandler();
+				this.mouseHandler = new MouseHandler(dev.getDevice(),
+						screenSize);
+
+				onInitialize();
+			} catch (DeviceException ex) {
+				decRefCount(true);
+				throw (AWTError) new AWTError(ex.getMessage()).initCause(ex);
+			} catch (UnknownConfigurationException ex) {
+				decRefCount(true);
+				throw (AWTError) new AWTError(ex.getMessage()).initCause(ex);
+			} catch (AlreadyOpenException ex) {
+				decRefCount(true);
+				throw (AWTError) new AWTError(ex.getMessage()).initCause(ex);
+			} catch (Throwable ex) {
+				decRefCount(true);
+				log.error("Unknown exception", ex);
+				throw (AWTError) new AWTError(ex.getMessage()).initCause(ex);
+			}
+		}
+		return rc;
+	}
+
+	/**
+	 * @param highlight
+	 * @see java.awt.Toolkit#mapInputMethodHighlight(java.awt.im.InputMethodHighlight)
+	 * @return Map
+	 */
+	public Map mapInputMethodHighlight(InputMethodHighlight highlight) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	protected abstract void onClose();
+
+	protected abstract void onInitialize();
+
+	/**
+	 * @param image
+	 * @param width
+	 * @param height
+	 * @param observer
+	 * @see java.awt.Toolkit#prepareImage(java.awt.Image, int, int,
+	 *      java.awt.image.ImageObserver)
+	 * @return boolean
+	 */
+	public boolean prepareImage(Image image, int width, int height,
+			ImageObserver observer) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/**
+	 * @see java.awt.Toolkit#sync()
+	 */
+	public void sync() {
+		// TODO Auto-generated method stub
+
+	}
+
+	private class LRUCache extends java.util.LinkedHashMap {
+		int max_entries;
+
+		public LRUCache(int max) {
+			super(max, 0.75f, true);
+			max_entries = max;
+		}
+
+		protected boolean removeEldestEntry(Map.Entry eldest) {
+			return size() > max_entries;
+		}
+	}
+}

@@ -35,28 +35,31 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.awt;
 
-import java.awt.event.AWTEventListener;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.KeyEvent;
+import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
 import java.awt.peer.LightweightPeer;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.ObjectInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.EventListener;
-import java.util.Iterator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+
 import javax.accessibility.Accessible;
 import javax.swing.SwingUtilities;
 
@@ -339,8 +342,6 @@ public class Container extends Component
         comp.parent = this;
         if (peer != null)
           {
-            comp.addNotify();
-            
             if (comp.isLightweight ())
 	      {
 		enableEvents (comp.eventMask);
@@ -527,7 +528,7 @@ public class Container extends Component
   /**
    * Recursively invalidates the container tree.
    */
-  private void invalidateTree()
+  void invalidateTree()
   {
     for (int i = 0; i < ncomponents; i++)
       {
@@ -554,10 +555,19 @@ public class Container extends Component
         cPeer.beginValidate();
       }
 
-    doLayout();
     for (int i = 0; i < ncomponents; ++i)
       {
         Component comp = component[i];
+
+        if (comp.getPeer () == null)
+          comp.addNotify();
+      }
+
+    doLayout ();
+    for (int i = 0; i < ncomponents; ++i)
+      {
+        Component comp = component[i];
+
         if (! comp.isValid())
           {
             if (comp instanceof Container)
@@ -572,8 +582,8 @@ public class Container extends Component
       }
 
     /* children will call invalidate() when they are layed out. It
-       is therefore imporant that valid is not set to true
-       before after the children has been layed out. */
+       is therefore important that valid is not set to true
+       until after the children have been layed out. */
     valid = true;
 
     if (cPeer != null)
@@ -704,6 +714,8 @@ public class Container extends Component
   {
     if (!isShowing())
       return;
+    // Paint self first.
+    super.paint(g);
     // Visit heavyweights as well, in case they were
     // erased when we cleared the background for this container.
     visitChildren(g, GfxPaintVisitor.INSTANCE, false);
@@ -1505,7 +1517,8 @@ public class Container extends Component
   void dispatchEventImpl(AWTEvent e)
   {
     // Give lightweight dispatcher a chance to handle it.
-    if (dispatcher != null 
+    if (eventTypeEnabled (e.id)
+        && dispatcher != null 
         && dispatcher.handleEvent (e))
       return;
 
@@ -1586,7 +1599,6 @@ public class Container extends Component
                   {
                     if (dispatcher == null)
                     dispatcher = new LightweightDispatcher (this);
-                    dispatcher.enableEvents (component[i].eventMask);
                   }	
 	  
 
@@ -1831,7 +1843,6 @@ class LightweightDispatcher implements Serializable
 {
   private static final long serialVersionUID = 5184291520170872969L;
   private Container nativeContainer;
-  private Component focus;
   private Cursor nativeCursor;
   private long eventMask;
   
@@ -1843,11 +1854,6 @@ class LightweightDispatcher implements Serializable
   LightweightDispatcher(Container c)
   {
     nativeContainer = c;
-  }
-
-  void enableEvents(long l)
-  {
-    eventMask |= l;
   }
 
   void acquireComponentForMouseEvent(MouseEvent me)
@@ -1882,6 +1888,10 @@ class LightweightDispatcher implements Serializable
         && lastComponentEntered.isShowing()
         && lastComponentEntered != candidate)
       {
+        // Old candidate could have been removed from 
+        // the nativeContainer so we check first.
+        if (SwingUtilities.isDescendingFrom(lastComponentEntered, nativeContainer))
+        {
         Point tp = 
           SwingUtilities.convertPoint(nativeContainer, 
                                       x, y, lastComponentEntered);
@@ -1894,9 +1904,9 @@ class LightweightDispatcher implements Serializable
                                             me.isPopupTrigger (),
                                             me.getButton ());
         lastComponentEntered.dispatchEvent (exited); 
+        }
         lastComponentEntered = null;
       }
-
     // If we have a candidate, maybe enter it.
     if (candidate != null)
       {
@@ -1930,6 +1940,7 @@ class LightweightDispatcher implements Serializable
       //   - MOUSE_RELEASED
       //   - MOUSE_PRESSED: another button pressed while the first is held down
       //   - MOUSE_DRAGGED
+      if (SwingUtilities.isDescendingFrom(pressedComponent, nativeContainer))
       mouseEventTarget = pressedComponent;
     else if (me.getID() == MouseEvent.MOUSE_CLICKED)
       {
@@ -1944,9 +1955,6 @@ class LightweightDispatcher implements Serializable
 
   boolean handleEvent(AWTEvent e)
   {
-    if ((eventMask & e.getID()) == 0)
-      return false;
-
     if (e instanceof MouseEvent)
       {
         MouseEvent me = (MouseEvent) e;
@@ -1980,11 +1988,9 @@ class LightweightDispatcher implements Serializable
                     pressedComponent = null;
                   break;
               }
+              if (newEvt.isConsumed())
+                e.consume();
           }
-      }
-    else if (e instanceof KeyEvent && focus != null)
-      {
-        focus.processKeyEvent((KeyEvent) e);
       }
     
     return e.isConsumed();

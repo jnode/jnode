@@ -44,6 +44,10 @@ grant {
 	// GNU specific standard properties
 	permission java.util.PropertyPermission "gnu.java.io.*", "read";
 	
+	// Hacks to fix classpath's lack of security
+	permission java.util.PropertyPermission "awt.toolkit", "read";
+	permission java.awt.AWTPermission "accessEventQueue";
+	
 	// JNode specific standard properties
 
 	// Log4j specific standard properties

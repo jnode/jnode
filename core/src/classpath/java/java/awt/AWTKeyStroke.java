@@ -452,9 +452,16 @@ public class AWTKeyStroke implements Serializable
       }
     while (t.hasMoreTokens());
     // Now token contains the VK name we must parse.
-    Integer code = (Integer) vktable.get(token);
-    if (code == null || t.hasMoreTokens())
-      throw new IllegalArgumentException();
+    Integer code = null;
+    try {
+    	code = (Integer) vktable.get(token);
+    } catch (NullPointerException ex) {
+    	System.out.println("token   = " + token);
+    	System.out.println("vktable = " + ((vktable != null) ? "not null" : " null"));
+    }
+    if (code == null || t.hasMoreTokens()) {
+    	throw new IllegalArgumentException("code=" + code + ", vktable.size=" + vktable.size());
+    }
     return getAWTKeyStroke(KeyEvent.CHAR_UNDEFINED, code.intValue(),
                            modifiers, released);
   }
