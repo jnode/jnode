@@ -18,40 +18,39 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.vm.x86.compiler;
 
 import org.jnode.assembler.x86.X86Register;
-import org.jnode.vm.*;
-
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface AbstractX86StackManager {
 
-	/**
-	 * Write code to push the contents of the given register on the stack
-	 * 
-	 * @param reg
-	 * @see JvmType
-	 */
-	public void writePUSH(int jvmType, X86Register.GPR reg);
+    /**
+     * Write code to push the contents of the given register on the stack
+     * 
+     * @param reg
+     * @see JvmType
+     */
+    public void writePUSH(int jvmType, X86Register.GPR reg);
 
-	/**
-	 * Write code to push a 64-bit word on the stack
-	 * 
-	 * @param lsbReg
-	 * @param msbReg
-	 * @see JvmType
-	 */
-	public void writePUSH64(int jvmType, X86Register.GPR lsbReg, X86Register.GPR msbReg);
+    /**
+     * Write code to push a 64-bit word on the stack
+     * 
+     * @param lsbReg
+     * @param msbReg
+     * @see JvmType
+     */
+    public void writePUSH64(int jvmType, X86Register.GPR lsbReg,
+            X86Register.GPR msbReg);
 
-	/**
-	 * Write code to push a 64-bit word on the stack
-	 * 
-	 * @param reg
-	 * @see JvmType
-	 */
-	public void writePUSH64(int jvmType, X86Register.GPR64 reg);
+    /**
+     * Write code to push a 64-bit word on the stack
+     * 
+     * @param reg
+     * @see JvmType
+     */
+    public void writePUSH64(int jvmType, X86Register.GPR64 reg);
 }
