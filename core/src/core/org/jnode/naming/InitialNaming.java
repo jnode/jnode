@@ -143,7 +143,7 @@ public class InitialNaming {
         return namespace;
     }
     
-    public interface NameSpace {
+    static public interface NameSpace {
         /**
          * Bind a given service in the namespace under a given name.
          * @param name
