@@ -118,7 +118,7 @@ public class CompareTask extends Task {
                 final Map.Entry entry = (Map.Entry)i.next();
                 final String pkg = (String)entry.getKey();
                 final String diff = (String)entry.getValue();
-                final String diffFileName = pkg + ".diff";
+                final String diffFileName = pkg + ".pkgdiff";
                 processPackageDiff(diffFileName, pkg, diff);
                 reportPackageDiff(out, pkg, diffFileName, getFlags(diff));
             }
