@@ -3547,29 +3547,29 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		final int resultType;
 		switch (jvmType) {
 		case JvmType.BYTE:
-			valSize = BYTESIZE;
+			valSize = BITS8;
 			scale = 1;
 			resultType = JvmType.INT;
 			break;
 		case JvmType.CHAR:
 		case JvmType.SHORT:
-			valSize = WORDSIZE;
+			valSize = BITS16;
 			scale = 2;
 			resultType = JvmType.INT;
 			break;
 		case JvmType.INT:
-			valSize = INTSIZE;
+			valSize = BITS32;
 			scale = 4;
 			resultType = JvmType.INT;
 			break;
 		case JvmType.FLOAT:
-			valSize = INTSIZE;
+			valSize = BITS32;
 			scale = 4;
 			resultType = JvmType.FLOAT;
 			break;
 		case JvmType.REFERENCE:
-			valSize = INTSIZE;
-			scale = 4;
+			valSize = helper.ADDRSIZE;
+			scale = helper.SLOTSIZE;
 			resultType = JvmType.REFERENCE;
 			break;
 		default:
@@ -3640,29 +3640,29 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		int extraLoadIdxMask = 0;
 		switch (jvmType) {
 		case JvmType.BYTE:
-			valSize = BYTESIZE;
+			valSize = BITS8;
 			scale = 1;
 			valType = JvmType.INT;
 			break;
 		case JvmType.CHAR:
 		case JvmType.SHORT:
-			valSize = WORDSIZE;
+			valSize = BITS16;
 			scale = 2;
 			valType = JvmType.INT;
 			break;
 		case JvmType.INT:
-			valSize = INTSIZE;
+			valSize = BITS32;
 			scale = 4;
 			valType = JvmType.INT;
 			break;
 		case JvmType.FLOAT:
-			valSize = INTSIZE;
+			valSize = BITS32;
 			scale = 4;
 			valType = JvmType.FLOAT;
 			break;
 		case JvmType.REFERENCE:
-			valSize = INTSIZE;
-			scale = 4;
+			valSize = helper.ADDRSIZE;
+			scale = helper.SLOTSIZE;
 			valType = JvmType.REFERENCE;
 			extraLoadIdxMask = useBarrier ? ~Item.Kind.GPR : 0;
 			break;
@@ -3855,7 +3855,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			val.load(eContext);
 			final GPR valr = val.getRegister();
 			// Store
-			os.writeMOV(INTSIZE, helper.BP, disp, valr);
+			os.writeMOV(valr.getSize(), helper.BP, disp, valr);
 		}
 
 		// Release

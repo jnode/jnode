@@ -30,6 +30,7 @@ import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Offset;
+import org.vmmagic.unboxed.Word;
 
 /**
  * Class that allows directy hardware access.
@@ -498,6 +499,26 @@ public final class Unsafe {
 	 * Print the given value on the screen.
 	 */
 	public static native void debug(long value);
+
+    /**
+     * Print the given value on the screen.
+     */
+    public static native void debug(Address value);
+
+    /**
+     * Print the given value on the screen.
+     */
+    public static native void debug(Word value);
+
+    /**
+     * Print the given value on the screen.
+     */
+    public static native void debug(Extent value);
+
+    /**
+     * Print the given value on the screen.
+     */
+    public static native void debug(Offset value);
 
 	/**
 	 * Initialize the new Thread.

@@ -192,14 +192,14 @@ public class Signature {
      */
     public static final int getStackSlotForJavaArgNumber(
             TypeSizeInfo typeSizeInfo, VmMethod method, int javaArgIndex) {
-        final int argCount = method.getNoArguments();
+        final int[] argTypes = JvmType.getArgumentTypes(method.getSignature());
+        final int argCount = argTypes.length;
         int stackSlot = 0;
         for (int i = 0; i < argCount; i++) {
             if (javaArgIndex == 0) {
                 return stackSlot;
             }
-            final VmType argType = method.getArgumentType(i);
-            final int argJvmType = argType.getJvmType();
+            final int argJvmType = argTypes[i];
             stackSlot += typeSizeInfo.getStackSlots(argJvmType);
             if ((argJvmType == JvmType.LONG) || (argJvmType == JvmType.DOUBLE)) {
                 javaArgIndex -= 2;

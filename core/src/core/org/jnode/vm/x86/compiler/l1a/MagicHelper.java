@@ -337,7 +337,6 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem addr = vstack.popRef();
             addr.loadToBITS8GPR(ec);
             final GPR r = addr.getRegister();
-            addr.release(ec);
             final WordItem result = L1AHelper.requestWordRegister(ec, methodToType(mcode), true);
             final GPR resultr = result.getRegister();
             if (mcode == mLOADCHAR) {
@@ -345,6 +344,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             } else {
                 os.writeMOVSX(resultr, r, 0, methodToSize(mcode));
             }
+            addr.release(ec);
             vstack.push(result);
         } break;
         case mLOADINT:
@@ -360,10 +360,10 @@ final class MagicHelper extends BaseX86MagicHelper {
             final RefItem addr = vstack.popRef();
             addr.load(ec);
             final GPR r = addr.getRegister();
-            addr.release(ec);
             final WordItem result = L1AHelper.requestWordRegister(ec, methodToType(mcode), false);
             final GPR resultr = result.getRegister();
             os.writeMOV(resultr.getSize(), resultr, r, 0);
+            addr.release(ec);
             vstack.push(result);
         } break;
         case mLOADLONG:
@@ -396,8 +396,6 @@ final class MagicHelper extends BaseX86MagicHelper {
             addr.load(ec);
             final GPR ofsr = ofs.getRegister();
             final GPR r = addr.getRegister();
-            ofs.release(ec);
-            addr.release(ec);
             os.writeLEA(r, r, ofsr, 1, 0);
             final WordItem result = L1AHelper.requestWordRegister(ec, methodToType(mcode), true);
             final GPR resultr = result.getRegister();
@@ -406,6 +404,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             } else {
                 os.writeMOVSX(resultr, r, 0, methodToSize(mcode));
             }
+            ofs.release(ec);
+            addr.release(ec);
             vstack.push(result);
         } break;
         case mLOADINT_OFS: 
@@ -424,11 +424,11 @@ final class MagicHelper extends BaseX86MagicHelper {
             addr.load(ec);
             final GPR ofsr = ofs.getRegister();
             final GPR r = addr.getRegister();
-            ofs.release(ec);
-            addr.release(ec);
             final WordItem result = L1AHelper.requestWordRegister(ec, methodToType(mcode), false);
             final GPR resultr = result.getRegister();
             os.writeMOV(resultr.getSize(), resultr, r, ofsr, 1, 0);
+            ofs.release(ec);
+            addr.release(ec);
             vstack.push(result);
         } break;
         case mLOADLONG_OFS: 

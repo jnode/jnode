@@ -388,6 +388,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 				}
 			}
 		}
+        Unsafe.debug('\n');
 	}
 
 	/**

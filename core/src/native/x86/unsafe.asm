@@ -323,5 +323,21 @@ GLABEL Q43org5jnode2vm6Unsafe23debug2e28J29V
 %endif	
 	ret 8
 		
+; public static native void debug(Address value);
+; public static native void debug(Word value);
+; public static native void debug(Extent value);
+; public static native void debug(Offset value);
+GLABEL Q43org5jnode2vm6Unsafe23debug2e28Lorg2fvmmagic2funboxed2fAddress3b29V
+GLABEL Q43org5jnode2vm6Unsafe23debug2e28Lorg2fvmmagic2funboxed2fWord3b29V
+GLABEL Q43org5jnode2vm6Unsafe23debug2e28Lorg2fvmmagic2funboxed2fExtent3b29V
+GLABEL Q43org5jnode2vm6Unsafe23debug2e28Lorg2fvmmagic2funboxed2fOffset3b29V
+	mov AAX,[ASP+SLOT_SIZE]
+%ifdef BITS32	
+	call sys_print_eax32
+%else
+	call sys_print_rax64
+%endif	
+	ret SLOT_SIZE
+		
 	
 	

@@ -215,17 +215,22 @@ public final class MemoryBlockManager extends VmSystemObject implements
 	 * Initialize this manager.
 	 */
 	private final static void initialize() {
-		Unsafe.debug("initialize.");
+		Unsafe.debug("Initialize MemoryBlockManager\n");
 
 		startPtr = blockAlign(Unsafe.getMemoryStart().toWord(), true).toAddress();
 		endPtr = blockAlign(Unsafe.getMemoryEnd().toWord(), false).toAddress();
 		
-		Unsafe.debug(startPtr.toInt());
-		Unsafe.debug(endPtr.toInt());
+        Unsafe.debug("Start end: ");
+		Unsafe.debug(startPtr);
+		Unsafe.debug(endPtr);
+        Unsafe.debug('\n');
 		
 		final Extent size = endPtr.toWord().sub(startPtr.toWord()).toExtent();
-		Unsafe.debug(size.toInt());
-		blockCount = size.toWord().rshl(BLOCK_SIZE_SHIFT);
+        Unsafe.debug("Size     : ");
+		Unsafe.debug(size);
+        Unsafe.debug('\n');
+
+        blockCount = size.toWord().rshl(BLOCK_SIZE_SHIFT);
 		// Create a lock (4 bytes) and usage bitmap at the front of the memory
 		// region
 		final Extent rawBitmapSize = blockCount.rshl(3).toExtent();
@@ -233,14 +238,14 @@ public final class MemoryBlockManager extends VmSystemObject implements
 		final Extent bitmapSize = blockAlign(rawBitmapSize.toWord().add(4), true).toExtent();
 		if (false) {
 			Unsafe.debug("startPtr:");
-			Unsafe.debug(startPtr.toInt());
+			Unsafe.debug(startPtr);
 		}
 		lockPtr = startPtr;
 		if (false) {
 			Unsafe.debug("lockPtr:");
-			Unsafe.debug(lockPtr.toInt());
+			Unsafe.debug(lockPtr);
 			Unsafe.debug("bitmapSize:");
-			Unsafe.debug(bitmapSize.toInt());
+			Unsafe.debug(bitmapSize);
 		}
 		bitmapPtr = startPtr.add(4);
 		// Clear the lock & bitmap size
@@ -260,9 +265,10 @@ public final class MemoryBlockManager extends VmSystemObject implements
 		// Unsafe.debug("BitmapSize "); Unsafe.debug(bitmapSize);
 		// Unsafe.debug("Block count "); Unsafe.debug(blockCount);
 		// Unsafe.die();
-		if (false) {
+		if (true) {
 			Unsafe.debug("end of initialize.");
 		}
+        Unsafe.debug('\n');
 	}
 
 	/**
