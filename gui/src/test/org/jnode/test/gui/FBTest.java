@@ -133,7 +133,7 @@ public class FBTest {
 			final int y1 = randomY();
 			final int x2 = randomX();
 			final int y2 = randomY();
-			g.draw(new Line2D.Double(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2-x1), Math.abs(y2-y1)), tx, randomColor(), paintMode);
+			g.draw(new Line2D.Double(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2-x1), Math.abs(y2-y1)), null, tx, randomColor(), paintMode);
 		}
 	}
 
@@ -143,7 +143,7 @@ public class FBTest {
 			final int y1 = randomY();
 			final int x2 = randomX();
 			final int y2 = randomY();
-			g.draw(new Rectangle(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2-x1), Math.abs(y2-y1)), tx, randomColor(), paintMode);
+			g.draw(new Rectangle(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2-x1), Math.abs(y2-y1)), null, tx, randomColor(), paintMode);
 		}
 	}
 
@@ -153,7 +153,7 @@ public class FBTest {
 			final int y1 = randomY();
 			final int x2 = randomX();
 			final int y2 = randomY();
-			g.draw(new Ellipse2D.Double(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2-x1), Math.abs(y2-y1)), tx, randomColor(), paintMode);
+			g.draw(new Ellipse2D.Double(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2-x1), Math.abs(y2-y1)), null, tx, randomColor(), paintMode);
 		}
 	}
 
@@ -165,7 +165,7 @@ public class FBTest {
 			final int y2 = randomY();
 			final int cx = randomX();
 			final int cy = randomY();
-			g.draw(new QuadCurve2D.Double(x1, y1, cx, cy, x2, y2), tx, randomColor(), paintMode);
+			g.draw(new QuadCurve2D.Double(x1, y1, cx, cy, x2, y2), null, tx, randomColor(), paintMode);
 		}
 	}
 
@@ -175,7 +175,7 @@ public class FBTest {
 			final int y1 = randomY();
 			final int x2 = randomX();
 			final int y2 = randomY();
-			g.draw(new Arc2D.Double(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2-x1), Math.abs(y2-y1), 40, 300, Arc2D.PIE), tx, randomColor(), paintMode);
+			g.draw(new Arc2D.Double(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2-x1), Math.abs(y2-y1), 40, 300, Arc2D.PIE), null, tx, randomColor(), paintMode);
 		}
 	}
 

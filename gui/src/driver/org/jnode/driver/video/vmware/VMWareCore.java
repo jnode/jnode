@@ -262,9 +262,9 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	 * @param color
 	 * @param mode
 	 */
-	public final synchronized void draw(Shape shape, AffineTransform tx, Color color, int mode) {
+	public final synchronized void draw(Shape shape, Shape clip, AffineTransform tx, Color color, int mode) {
 		syncFIFO();
-		super.draw(shape, tx, color, mode);
+		super.draw(shape, clip, tx, color, mode);
 		final Rectangle r = getBounds(shape, tx);
 		updateScreen(r.x - 1, r.y - 1, r.width + 2, r.height + 2);
 	}
@@ -295,11 +295,11 @@ public class VMWareCore extends AbstractSurface implements VMWareConstants, PCI_
 	}
 
 	/**
-	 * @see org.jnode.driver.video.Surface#fill(Shape, AffineTransform, Color, int)
+	 * @see org.jnode.driver.video.Surface#fill(Shape, Shape, AffineTransform, Color, int)
 	 */
-	public final synchronized void fill(Shape shape, AffineTransform tx, Color color, int mode) {
+	public final synchronized void fill(Shape shape, Shape clip, AffineTransform tx, Color color, int mode) {
 		syncFIFO();
-		super.fill(shape, tx, color, mode);
+		super.fill(shape, clip, tx, color, mode);
 		final Rectangle b = getBounds(shape, tx);
 		updateScreen(b.x, b.y, b.width, b.height);
 	}
