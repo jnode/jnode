@@ -775,6 +775,12 @@ public class DelegatingCompilerBytecodeVisitor extends CompilerBytecodeVisitor {
         delegate.visit_ldc(value);
     }
     /**
+     * @param value
+     */
+    public void visit_ldc(VmConstClass value) {
+        delegate.visit_ldc(value);
+    }
+    /**
      * 
      */
     public void visit_ldiv() {

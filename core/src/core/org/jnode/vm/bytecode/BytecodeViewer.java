@@ -134,6 +134,14 @@ public class BytecodeViewer extends BytecodeVisitor {
 	}
 
 	/**
+	 * @param value
+	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(VmConstClass)
+	 */
+	public void visit_ldc(VmConstClass value) {
+		out("ldc " + value);
+	}
+
+	/**
 	 * @param index
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iload(int)
 	 */

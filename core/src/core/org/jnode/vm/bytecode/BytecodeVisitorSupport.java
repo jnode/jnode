@@ -893,6 +893,14 @@ public abstract class BytecodeVisitorSupport extends BytecodeVisitor {
 	}
 
 	/**
+	 * @param value
+	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(VmConstClass)
+	 */
+	public void visit_ldc(VmConstClass value) {
+
+	}
+
+	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldiv()
 	 */
 	public void visit_ldiv() {

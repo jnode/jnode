@@ -33,6 +33,7 @@ public abstract class BytecodeVisitor {
 	/** @deprecated */
 	public final void visit_sipush(short value) {}
 	public abstract void visit_ldc(VmConstString value);
+	public abstract void visit_ldc(VmConstClass value);
 	// -- 20 --
 	public abstract void visit_iload(int index);
 	public abstract void visit_lload(int index);

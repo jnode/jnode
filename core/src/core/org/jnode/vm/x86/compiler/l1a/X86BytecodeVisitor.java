@@ -2588,6 +2588,14 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     }
 
     /**
+     * @param value
+     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(VmConstClass)
+     */
+    public final void visit_ldc(VmConstClass value) {
+        throw new Error("Not implemented yet");
+    }
+
+    /**
      * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldiv()
      */
     public final void visit_ldiv() {
