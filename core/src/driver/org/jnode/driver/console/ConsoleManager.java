@@ -27,6 +27,7 @@ public interface ConsoleManager {
 	public String[] listConsoleNames();
 	
 	public void registerConsole(Console console);
+	public void unregisterConsole(Console console);
 	/**
 	 * Gets the currently focused console.
 	 * @return Console
