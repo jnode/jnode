@@ -3,18 +3,17 @@
  */
 package org.jnode.vm.x86.compiler.l1a;
 
+import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
+import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
  * @author Patrik Reali
  *
- * IntItems are stored in a register and have type INT
+ * IntItems are items with type INT
  */
 
-//TODO: maybe split in a class for each kind? It would be a nices OO design, but would create tons of classes.... could use internal classes for this
-// backdraw of this is that every operation would require to generate a new item: I don't like this!
-
-final class IntItem extends Item {
+final class IntItem extends Item implements X86CompilerConstants {
 
 	private int value;
 	private Register reg;
@@ -26,36 +25,52 @@ final class IntItem extends Item {
 	}
 	
 	Register getRegister() {
-		myAssert(getKind() == REGISTER);
+		myAssert(kind == REGISTER);
 		return reg;
 	}
 	
 	int getValue() {
-		myAssert(getKind() == CONSTANT);
+		myAssert(kind == CONSTANT);
 		return value;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.jnode.vm.x86.compiler.l1a.Item#loadTo(org.jnode.assembler.x86.Register)
+	/**
+	 * load item with register reg. Assumes that reg is properly allocated
+	 * 
+	 * @param ec current emitter context
+	 * @param reg register to load the item to
 	 */
-	void loadTo(Register t0) {
-		switch (getKind()) {
+	void loadTo(EmitterContext ec, Register reg) {
+		AbstractX86Stream os = ec.getStream();
+		X86RegisterPool pool = ec.getPool();
+		myAssert(!pool.isFree(reg));
+		
+		switch (kind) {
 			case REGISTER:
-				// nothing to do
+				if (this.reg != reg) {
+					release(ec);
+					os.writeMOV(INTSIZE, reg, this.reg);
+				}
 				break;
 				
 			case LOCAL:
-				notImplemented();
+				os.writeMOV(INTSIZE, reg, FP, getOffsetToFP());
 				break;
 				
 			case CONSTANT:
-				notImplemented();
+				os.writeMOV_Const(reg, value);
 				break;
 				
 			case FREGISTER:
+				//TODO
 				notImplemented();
 				break;
+			case STACK:
+				//TODO: make sure this is on top os stack
+				os.writePOP(reg);
 		}
+		kind = REGISTER;
+		this.reg = reg;
 	}
 
 	/* (non-Javadoc)
@@ -68,7 +83,7 @@ final class IntItem extends Item {
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#loadToFPU()
 	 */
-	void loadToFPU() {
+	void loadToFPU(EmitterContext ec) {
 		// TODO Auto-generated method stub
 		notImplemented();
 
@@ -77,10 +92,12 @@ final class IntItem extends Item {
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#load()
 	 */
-	void load() {
-		// TODO Auto-generated method stub
-		notImplemented();
-
+	void load(EmitterContext ec) {
+		if (kind != REGISTER) {
+			final X86RegisterPool pool = ec.getPool();
+			final Register r = (Register)pool.request(INT);
+			loadTo(ec, r);			
+		}
 	}
 
 	/**
@@ -90,43 +107,53 @@ final class IntItem extends Item {
 	 * 
 	 * @param t0 the destination register
 	 */
-	void loadToIf(int mask, Register t0) {
+	void loadToIf(EmitterContext ec, int mask, Register t0) {
 		if ((getKind() & mask) > 0)
-			loadTo(t0);
+			loadTo(ec, t0);
 	}
 	
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#push()
 	 */
-	void push() {
+	void push(EmitterContext ec) {
+		final AbstractX86Stream os = ec.getStream();
+		
 		switch (getKind()) {
 			case REGISTER:
-				notImplemented();
+				os.writePUSH(reg);
 				break;
 				
 			case LOCAL:
-				notImplemented();
+				os.writePUSH(FP, offsetToFP);
 				break;
 				
 			case CONSTANT:
-				// nothing to do
+				os.writePUSH(value);
 				break;
 				
 			case FREGISTER:
+				//TODO
 				notImplemented();
 				break;
+			
+			case STACK:
+				//nothing to do
+				break;
 		}
-
+		release(ec);
+		kind = STACK;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#release()
 	 */
-	void release() {
+	void release(EmitterContext ec) {
+		final X86RegisterPool pool = ec.getPool();
+
 		switch (getKind()) {
 			case REGISTER:
-				notImplemented();
+				pool.release(reg);
 				break;
 				
 			case LOCAL:
@@ -140,23 +167,27 @@ final class IntItem extends Item {
 			case FREGISTER:
 				notImplemented();
 				break;
+
+			case STACK:
+				//nothing to do
+				break;
 		}
 
 	}
 	
-	static IntItem CreateRegister(Register reg) {
+	static IntItem createRegister(Register reg) {
 		return new IntItem(REGISTER, reg, 0, 0);
 	}
 	
-	static IntItem CreateConst(int value) {
+	static IntItem createConst(int value) {
 		return new IntItem(CONSTANT, null, value, 0);
 	}
 
-	static IntItem CreateLocal(int index) {
-		return new IntItem(LOCAL, null, 0, index);
+	static IntItem createLocal(int offsetToFP) {
+		return new IntItem(LOCAL, null, 0, offsetToFP);
 	}
 	
-	static IntItem CreateStack() {
+	static IntItem createStack() {
 		return new IntItem(STACK, null, 0, 0);
 	}
 }
