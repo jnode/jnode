@@ -94,6 +94,9 @@ check_a20:
     cmp eax, dword [0x100000]
     je check_a20 ; Just loop if this is not good.
 
+	; Initialize serial port communication
+	call serial_init
+
 	PRINT_STR sys_version
 
 	; Test for a valid cpu

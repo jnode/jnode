@@ -519,6 +519,12 @@ public final class Unsafe {
      * Print the given value on the screen.
      */
     public static native void debug(Offset value);
+    
+    /** 
+     * Enable/Disable the kernel debugger.
+     * @return the previous enabled state.
+     */
+    public static native boolean setKdbEnabled(boolean on);
 
 	/**
 	 * Initialize the new Thread.

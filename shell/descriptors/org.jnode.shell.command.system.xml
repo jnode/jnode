@@ -18,6 +18,7 @@
         
   <extension point="org.jnode.shell.aliases">
   	<alias name="cpuid"        class="org.jnode.shell.command.system.CpuIDCommand"/>
+	<alias name="kdb"          class="org.jnode.shell.command.system.KdbCommand"/>
 	<alias name="lsirq"        class="org.jnode.shell.command.system.LsIRQ"/>
 	<alias name="vminfo"       class="org.jnode.vm.Vm"/>
   </extension>

@@ -339,5 +339,15 @@ GLABEL Q43org5jnode2vm6Unsafe23debug2e28Lorg2fvmmagic2funboxed2fOffset3b29V
 %endif	
 	ret SLOT_SIZE
 		
+
+; public static native boolean setKdbEnabled(boolean on);
+GLABEL Q43org5jnode2vm6Unsafe23setKdbEnabled2e28Z29Z
+	mov AAX,[ASP+SLOT_SIZE]
+	push ADX
+	mov ADX,AAX
+	mov eax,[serial_enabled]
+	mov [serial_enabled],edx
+	pop ADX
+	ret SLOT_SIZE
 	
 	
