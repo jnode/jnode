@@ -135,16 +135,15 @@ public final class AllPermission extends Permission
   {
     return new AllPermissionCollection();
   }
-} // class AllPermission
 
-/**
+  /**
  * Implements AllPermission.newPermissionCollection, and obeys serialization
  * of JDK.
  *
  * @author Eric Blake <ebb9@email.byu.edu>
  */
-final class AllPermissionCollection extends PermissionCollection
-{
+  private static final class AllPermissionCollection extends PermissionCollection
+  {
   /**
    * Compatible with JDK 1.1+.
    */
@@ -195,4 +194,5 @@ final class AllPermissionCollection extends PermissionCollection
       ? Collections.enumeration(Collections.singleton(new AllPermission()))
       : EmptyEnumeration.getInstance();
   }
-} // class AllPermissionCollection
+  } // class AllPermissionCollection
+} // class AllPermission

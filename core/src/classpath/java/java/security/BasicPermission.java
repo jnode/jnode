@@ -198,16 +198,15 @@ public abstract class BasicPermission extends java.security.Permission
   {
         return new BasicPermissionCollection(getClass());
     }
-} // class BasicPermission
 
-/**
+  /**
  * Implements AllPermission.newPermissionCollection, and obeys serialization
  * of JDK.
  * 
  * @author Eric Blake <ebb9@email.byu.edu>
  */
-final class BasicPermissionCollection extends PermissionCollection
-{
+  private static final class BasicPermissionCollection extends PermissionCollection
+  {
     /**
      * Compatible with JDK 1.1+.
      */
@@ -305,4 +304,5 @@ final class BasicPermissionCollection extends PermissionCollection
   {
         return permissions.elements();
     }
-} // class BasicPermissionCollection
+  } // class BasicPermissionCollection
+} // class BasicPermission
