@@ -158,7 +158,6 @@ public class IRBasicBlock {
 
 	public void add(PhiAssignQuad paq) {
 		if (!quads.contains(paq)) {
-			System.out.println("adding PhiAssignQuad " + paq + " to " + this);
 			addDef(paq);
 			quads.add(0, paq);
 		}

@@ -214,7 +214,6 @@ public class IRControlFlowGraph {
 	}
 
 	private void placePhiFunctions() {
-		System.out.println("\nplacePhiFunctions");
 		for (int i=0; i<bblocks.length; i+=1) {
 			IRBasicBlock b = bblocks[i];
 			BootableArrayList defList = b.getDefList();
@@ -234,7 +233,6 @@ public class IRControlFlowGraph {
 	 * @param block
 	 */
 	private void renameVariables(IRBasicBlock block) {
-		System.out.println("\nrenameVariables block: " + block);
 		doRenameVariables(block);
 		Iterator it = block.getSuccessors().iterator();
 		while (it.hasNext()) {
@@ -256,7 +254,6 @@ public class IRControlFlowGraph {
 	 * @param block
 	 */
 	private void doRenameVariables(IRBasicBlock block) {
-		System.out.println("\ndoRenameVariables block: " + block);
 		Iterator it = block.getQuads().iterator();
 		while (it.hasNext()) {
 			Quad q = (Quad) it.next();
@@ -285,17 +282,21 @@ public class IRControlFlowGraph {
 		if (block == null) {
 			return;
 		}
-		System.out.println("\nrewritePhiParams block: " + block);
 		Iterator it = block.getQuads().iterator();
 		while (it.hasNext()) {
 			Quad q = (Quad) it.next();
 			if (q instanceof PhiAssignQuad) {
 				PhiAssignQuad aq = (PhiAssignQuad) q;
-				SSAStack st = getStack(aq.getLHS());
-				Variable var = st.peek();
-				if (var != null) {
-					PhiOperand phi = (PhiOperand) aq.getPhiOperand();
-					phi.addSource(var);
+				if (!aq.isDeadCode()) {
+					SSAStack st = getStack(aq.getLHS());
+					Variable var = st.peek();
+					// If there was no incoming branch to this phi, I think it's dead...
+					if (var != null) {
+						PhiOperand phi = (PhiOperand) aq.getPhiOperand();
+						phi.addSource(var);
+					} else {
+						aq.setDeadCode(true);
+					}
 				}
 			}
 		}
@@ -305,7 +306,6 @@ public class IRControlFlowGraph {
 	 * @param block
 	 */
 	private void popVariables(IRBasicBlock block) {
-		System.out.println("\npopVariables block: " + block);
 		Iterator it = block.getQuads().iterator();
 		while (it.hasNext()) {
 			Quad q = (Quad) it.next();
@@ -332,7 +332,6 @@ public class IRControlFlowGraph {
 		int index = var.getIndex();
 		SSAStack st = renumberArray[index];
 		if (st == null) {
-			System.out.println("new SSAStack for " + var);
 			st = new SSAStack(var);
 			renumberArray[index] = st;
 		}

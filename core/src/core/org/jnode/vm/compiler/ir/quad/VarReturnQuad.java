@@ -16,7 +16,6 @@ import org.jnode.vm.compiler.ir.Variable;
  *
  */
 public class VarReturnQuad extends Quad {
-	private Operand operand;
 	private Operand refs[];
 
 	/**
@@ -24,8 +23,7 @@ public class VarReturnQuad extends Quad {
 	 */
 	public VarReturnQuad(int address, IRBasicBlock block, int varIndex) {
 		super(address, block);
-		this.operand = getOperand(varIndex);
-		refs = new Operand[] { operand };
+		refs = new Operand[] { getOperand(varIndex) };
 	}
 
 	/**
@@ -43,20 +41,20 @@ public class VarReturnQuad extends Quad {
 	}
 	
 	public Operand getOperand() {
-		return operand;
+		return refs[0];
 	}
 
 	public String toString() {
-		return getAddress() + ": return " + operand;
+		return getAddress() + ": return " + refs[0];
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
 	 */
 	public void doPass2(BootableHashMap liveVariables) {
-		operand = operand.simplify();
-		if (operand instanceof Variable) {
-			Variable v = (Variable) operand;
+		refs[0] = refs[0].simplify();
+		if (refs[0] instanceof Variable) {
+			Variable v = (Variable) refs[0];
 			v.setLastUseAddress(this.getAddress());
 			liveVariables.put(v, v);
 		}

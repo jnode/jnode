@@ -19,7 +19,6 @@ public class VariableRefAssignQuad extends AssignQuad {
 	/**
 	 * Right hand side of assignment
 	 */
-	private Operand rhs;
 	private Operand refs[];
 
 	/**
@@ -27,8 +26,7 @@ public class VariableRefAssignQuad extends AssignQuad {
 	 */
 	public VariableRefAssignQuad(int address, IRBasicBlock block, int lhsIndex, int rhsIndex) {
 		super(address, block, lhsIndex);
-		this.rhs = getOperand(rhsIndex);
-		refs = new Operand[] { rhs };
+		refs = new Operand[] { getOperand(rhsIndex) };
 		setDeadCode(true);
 	}
 
@@ -52,14 +50,14 @@ public class VariableRefAssignQuad extends AssignQuad {
 	}
 
 	public String toString() {
-		return getAddress() + ": " + getLHS().toString() + " = " + rhs.toString();
+		return getAddress() + ": " + getLHS().toString() + " = " + refs[0];
 	}
 
 	/**
 	 * @return
 	 */
 	public Operand getRHS() {
-		return rhs;
+		return refs[0];
 	}
 
 	/**
@@ -67,7 +65,7 @@ public class VariableRefAssignQuad extends AssignQuad {
 	 * @return
 	 */
 	public Operand propagate(Variable operand) {
-		return rhs;
+		return refs[0];
 	}
 
 	/* (non-Javadoc)
@@ -77,8 +75,8 @@ public class VariableRefAssignQuad extends AssignQuad {
 	// safe and compute liveness assuming it might survive.
 	public void doPass2(BootableHashMap liveVariables) {
 		setDeadCode(true);
-		if (rhs instanceof Variable) {
-			Variable v = (Variable) rhs;
+		if (refs[0] instanceof Variable) {
+			Variable v = (Variable) refs[0];
 			v.setLastUseAddress(this.getAddress());
 			liveVariables.put(v, v);
 		}

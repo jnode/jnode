@@ -18,17 +18,15 @@ public abstract class AssignQuad extends Quad {
 	 * Left hand side of assignment
 	 */
 	private Variable lhs;
-	
-	// TODO these two need to go!
-	private int lhsIndex;
-	private Variable[] variables;
+
+	public AssignQuad(int address, IRBasicBlock block, Variable lhs) {
+		super(address, block);
+		this.lhs = lhs;
+		lhs.setAssignQuad(this);
+	}
 
 	public AssignQuad(int address, IRBasicBlock block, int lhsIndex) {
-		super(address, block);
-		this.variables = block.getVariables();
-		this.lhsIndex = lhsIndex;
-		this.lhs = (Variable) variables[lhsIndex].clone();
-		lhs.setAssignQuad(this);
+		this(address, block, block.getVariables()[lhsIndex]);
 	}
 
 	/**
@@ -40,13 +38,6 @@ public abstract class AssignQuad extends Quad {
 	
 	public Variable getLHS() {
 		return lhs;
-	}
-
-	/**
-	 * @return
-	 */
-	public Variable[] getVariables() {
-		return variables;
 	}
 
 	/**
