@@ -63,7 +63,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
     private int historyIndex = -1;
 
     /** Contains the current line * */
-    private Line currentLine = new Line();
+    private Line currentLine;
 
     /** Contains the newest command being typed in * */
     private String newestLine = "";
@@ -113,11 +113,12 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
     }
 
     public CommandShell(ScrollableShellConsole cons) throws ShellException {
-        try {
+        try {        	
             this.console = cons;
             this.out = this.console.getOut();
             this.err = this.console.getErr();
-
+            this.currentLine = new Line(console, this, out);
+            
             //  listen to the keyboard
             this.console.addKeyboardListener(this);
             defaultCommandInvoker = new DefaultCommandInvoker(this);
@@ -167,7 +168,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
                     isActive = true;
                     currentPrompt = prompt();
                     out.print(currentPrompt);
-                    currentLine.start(console);
+                    currentLine.start();
                     
                     //  wait until enter is hit
                     threadSuspended = true;
@@ -396,9 +397,11 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
         //  if its an enter key we want to process the command, and then resume
         // the thread
         case KeyEvent.VK_ENTER:
-            out.print(ke.getKeyChar());
             ke.consume();
-            currentLine.moveBegin();			
+        
+            currentLine.moveEnd();
+        	refreshCurrentLine();
+            out.print(ke.getKeyChar());
             synchronized (this) {
                 isActive = false;
                 threadSuspended = false;
@@ -409,8 +412,14 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
         // if it's the tab key, we want to trigger command line completion
         case KeyEvent.VK_TAB:
             ke.consume();
-        	if(currentLine.complete(console, this))
-        		refreshCurrentLine();
+        	CompletionInfo info = currentLine.complete(currentPrompt);
+
+    		if(completion.needNewPrompt())
+    		{			
+    	        currentLine.start(true);
+    		}
+    		refreshCurrentLine();
+    		        
             break;
 
         default:
@@ -425,7 +434,7 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
     }
 
     private void refreshCurrentLine() {
-    	currentLine.refreshCurrentLine(console, currentPrompt, out);
+    	currentLine.refreshCurrentLine(currentPrompt);
     }
 
     public void keyReleased(KeyboardEvent ke) {
@@ -505,20 +514,6 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
             completion.setNewPrompt(true);
         }
 
-		if(completion.hasItems())
-		{
-			out.println();
-			String[] list = completion.getItems();
-			for(int i = 0 ; i < list.length ; i++)
-				out.println(list[i]);
-		}
-		
-		if(completion.needNewPrompt())
-		{			
-	        out.print(currentPrompt + currentLine.getContent());
-	        currentLine.start(console, true);				
-		}
-		
         return completion;
     }
 
@@ -563,14 +558,30 @@ class Line
     
     private boolean shortened = true;
     private int oldLength = 0;
-    private int maxLength = 0;    
+    private int maxLength = 0;
     
-    public void start(ScrollableShellConsole console)
+    private ScrollableShellConsole console;
+    private CommandShell shell;
+    private PrintStream out;
+    
+    public Line(ScrollableShellConsole console, CommandShell shell, PrintStream out)
     {
-    	start(console, false);
+    	this.console = console;
+    	this.shell = shell;
+    	this.out = out;
     }
     
-    public void start(ScrollableShellConsole console, boolean keepContent)
+    public void start()
+    {
+    	start(false);
+    }
+    
+    public boolean isEmpty()
+    {
+    	return currentLine.toString().trim().length() == 0;
+    }
+    
+    public void start(boolean keepContent)
     {
     	if(keepContent)
     	{
@@ -649,32 +660,49 @@ class Line
         }    	
     }
     
-    public boolean complete(ScrollableShellConsole console, CommandShell shell)
+    public CompletionInfo complete(String currentPrompt)
     {
-    	CompletionInfo info;
-		boolean completed = false;
+    	CompletionInfo info = null;
+    	int oldPosOnCurrentLine = posOnCurrentLine;
         if (posOnCurrentLine != currentLine.length()) {
             String ending = currentLine.substring(posOnCurrentLine);
             info = shell.complete(currentLine.substring(0,
                     posOnCurrentLine)); 
+            printList(info, currentPrompt);
             if(info.getCompleted() != null)
             {
 				setContent(info.getCompleted() + ending);
 	            posOnCurrentLine = currentLine.length() - ending.length();
-				completed = true;	            
 	        }
         } else {
         	info = shell.complete(currentLine.toString());
+        	printList(info, currentPrompt);        	
         	if(info.getCompleted() != null)
         	{ 
 				setContent(info.getCompleted());
 	            posOnCurrentLine = currentLine.length();
-				completed = true;	            
 			}
         }
-            	
-		return completed;  
+         
+		return info;  
 	}
+
+    protected void printList(CompletionInfo info, String currentPrompt)
+    {
+		if((info != null) && info.hasItems())
+		{
+			int oldPosOnCurrentLine = posOnCurrentLine;
+			moveEnd();
+			refreshCurrentLine(currentPrompt);			
+			
+			out.println();
+			String[] list = info.getItems();
+			for(int i = 0 ; i < list.length ; i++)
+				out.println(list[i]);
+			
+			posOnCurrentLine = oldPosOnCurrentLine;
+		}		            	
+    }
     
     public void appendChar(char c)
     {
@@ -701,8 +729,7 @@ class Line
     	oldLength = 0;
     }
 
-    public void refreshCurrentLine(ScrollableShellConsole console, 
-    		String currentPrompt, PrintStream out) {
+    public void refreshCurrentLine(String currentPrompt) {
         try {
         	int x = consoleX;
         	int width = console.getWidth();
