@@ -33,7 +33,7 @@ public class FatTest {
 
 		PrintWriter out = new PrintWriter(System.out, true);
 
-		String fn;
+		/*String fn;
 		if (args.length == 0) {
 			fn = "lib/floppy.img";
 		} else {
@@ -41,7 +41,7 @@ public class FatTest {
 		}
 		printInfo(new File(fn), out);
 		
-		System.out.println("\nGenerating new floppy");
+		System.out.println("\nGenerating new floppy");*/
 
 		File f = new File("build/testfloppy.img");
 
@@ -97,8 +97,7 @@ public class FatTest {
 
 	public static void createFloppy(File f) throws Exception {
 
-		FatFormatter ff = new GrubFatFormatter(0xf0, 0, null, null);
-		ff.setLabel("Testfloppy");
+      GrubFatFormatter ff = new GrubFatFormatter(0, null, null);
 		FileDevice newFd = new FileDevice(f, "rw");
 		newFd.setLength(1440 * 1024);
 		ff.format(newFd);

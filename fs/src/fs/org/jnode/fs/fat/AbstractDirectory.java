@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Vector;
 
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
@@ -15,24 +16,32 @@ import org.jnode.fs.FSEntry;
 /**
  * @author epr
  */
-public abstract class AbstractDirectory
-	extends FatObject
-	implements FSDirectory {
+public abstract class AbstractDirectory extends FatObject implements FSDirectory {
 
-	protected FatDirEntry[] entries;
+	protected Vector entries = new Vector();
 	private boolean _dirty;
-	private final FatFile myFile;
+	protected FatFile file;
 
-	public AbstractDirectory(FatFileSystem fs, int nrEntries, FatFile myFile) {
+	// for root
+	protected AbstractDirectory(FatFileSystem fs, int nrEntries) {
 		super(fs);
-		entries = new FatDirEntry[nrEntries];
+		entries.setSize(nrEntries);
 		_dirty = false;
-		this.myFile = myFile;
+	}
+
+	protected AbstractDirectory(FatFileSystem fs, int nrEntries, FatFile file) {
+		this(fs, nrEntries);
+		this.file = file;
+	}
+
+	protected AbstractDirectory(FatFileSystem fs, FatFile myFile) {
+		this(fs, (int)myFile.getLength() / 32, myFile);
 	}
 
 	/**
-	 * Gets an iterator to iterate over all entries. The iterated objects
-	 * are all instance DirEntry.
+	 * Gets an iterator to iterate over all entries. The iterated objects are
+	 * all instance DirEntry.
+	 * 
 	 * @return Iterator
 	 */
 	public Iterator iterator() {
@@ -41,41 +50,38 @@ public abstract class AbstractDirectory
 
 	/**
 	 * Add a directory entry.
+	 * 
 	 * @param nameExt
 	 * @throws IOException
 	 */
-	public synchronized FatDirEntry addFatFile(String nameExt)
-		throws IOException {
+	protected synchronized FatDirEntry addFatFile(String nameExt) throws IOException {
 		if (getFatEntry(nameExt) != null) {
 			throw new IOException("File already exists" + nameExt);
 		}
-		final FatDirEntry newEntry =
-			new FatDirEntry(this, splitName(nameExt), splitExt(nameExt));
-		for (int i = 0; i < entries.length; i++) {
-			FatDirEntry e = entries[i];
+		final FatDirEntry newEntry = new FatDirEntry(this, splitName(nameExt), splitExt(nameExt));
+		int size = entries.size();
+		for (int i = 0; i < size; i++) {
+			FatBasicDirEntry e = (FatBasicDirEntry)entries.get(i);
 			if (e == null) {
-				entries[i] = newEntry;
+				entries.set(i, newEntry);
 				setDirty();
 				flush();
 				return newEntry;
 			}
 		}
-		int newSize = entries.length + 512 / 32;
+		int newSize = size + 512 / 32;
 		if (canChangeSize(newSize)) {
-			FatDirEntry[] newEntries = new FatDirEntry[newSize];
-			int idx = entries.length;
-			System.arraycopy(entries, 0, newEntries, 0, entries.length);
-			entries = newEntries;
-			entries[idx] = newEntry;
+			entries.ensureCapacity(newSize);
 			setDirty();
 			flush();
 			return newEntry;
 		}
-		throw new IOException("Directory is full (" + entries.length + ")");
+		throw new IOException("Directory is full");
 	}
 
 	/**
 	 * Add a new file with a given name to this directory.
+	 * 
 	 * @param name
 	 * @throws IOException
 	 */
@@ -85,14 +91,12 @@ public abstract class AbstractDirectory
 
 	/**
 	 * Add a directory entry of the type directory.
+	 * 
 	 * @param nameExt
 	 * @param parentCluster
 	 * @throws IOException
 	 */
-	public synchronized FatDirEntry addFatDirectory(
-		String nameExt,
-		long parentCluster)
-		throws IOException {
+	protected synchronized FatDirEntry addFatDirectory(String nameExt, long parentCluster) throws IOException {
 		final FatDirEntry entry = addFatFile(nameExt);
 		final int clusterSize = getFatFileSystem().getClusterSize();
 		entry.setFlags(FatConstants.F_DIRECTORY);
@@ -109,43 +113,46 @@ public abstract class AbstractDirectory
 
 	/**
 	 * Add a new (sub-)directory with a given name to this directory.
+	 * 
 	 * @param name
 	 * @throws IOException
 	 */
 	public FSEntry addDirectory(String name) throws IOException {
 		final long parentCluster;
-		if (myFile == null) {
+		if (file == null) {
 			parentCluster = 0;
 		} else {
-			parentCluster = myFile.getStartCluster();
+			parentCluster = file.getStartCluster();
 		}
 		return addFatDirectory(name, parentCluster);
 	}
 
 	/**
 	 * Gets the number of directory entries in this directory
+	 * 
 	 * @return int
 	 */
 	public int getSize() {
-		return entries.length;
+		return entries.size();
 	}
 
 	/**
 	 * Search for an entry with a given name.ext
+	 * 
 	 * @param nameExt
 	 * @return FatDirEntry null == not found
 	 */
-	public FatDirEntry getFatEntry(String nameExt) {
+	protected FatDirEntry getFatEntry(String nameExt) {
 
 		final String name = splitName(nameExt);
 		final String ext = splitExt(nameExt);
-
-		for (int i = 0; i < entries.length; i++) {
-			final FatDirEntry entry = entries[i];
-			if (entry != null) {
-				if (name.equalsIgnoreCase(entry.getNameOnly())
-					&& ext.equalsIgnoreCase(entry.getExt())) {
-					return entry;
+		int size = entries.size();
+		for (int i = 0; i < size; i++) {
+			final FatBasicDirEntry entry = (FatBasicDirEntry)entries.get(i);
+			if (entry != null && entry instanceof FatDirEntry) {
+				if (name.equalsIgnoreCase(((FatDirEntry)entry).getNameOnly())
+					&& ext.equalsIgnoreCase(((FatDirEntry)entry).getExt())) {
+					return (FatDirEntry)entry;
 				}
 			}
 		}
@@ -154,6 +161,7 @@ public abstract class AbstractDirectory
 
 	/**
 	 * Gets the entry with the given name.
+	 * 
 	 * @param name
 	 * @throws IOException
 	 */
@@ -168,6 +176,7 @@ public abstract class AbstractDirectory
 
 	/**
 	 * Remove a file or directory with a given name
+	 * 
 	 * @param nameExt
 	 */
 	public synchronized void remove(String nameExt) throws IOException {
@@ -175,9 +184,9 @@ public abstract class AbstractDirectory
 		if (entry == null) {
 			throw new FileNotFoundException(nameExt);
 		}
-		for (int i = 0; i < entries.length; i++) {
-			if (entries[i] == entry) {
-				entries[i] = null;
+		for (int i = 0; i < entries.size(); i++) {
+			if (entries.get(i) == entry) {
+				entries.set(i, null);
 				setDirty();
 				flush();
 				return;
@@ -188,14 +197,16 @@ public abstract class AbstractDirectory
 	/**
 	 * Print the contents of this directory to the given writer. Used for
 	 * debugging purposes.
+	 * 
 	 * @param out
 	 */
 	public void printTo(PrintWriter out) {
 		int freeCount = 0;
-		for (int i = 0; i < entries.length; i++) {
-			FatDirEntry entry = entries[i];
+		int size = entries.size();
+		for (int i = 0; i < size; i++) {
+			FatBasicDirEntry entry = (FatBasicDirEntry)entries.get(i);
 			if (entry != null) {
-				out.println("0x" + Integer.toHexString(i) + " " + entries[i]);
+				out.println("0x" + Integer.toHexString(i) + " " + entries.get(i));
 			} else {
 				freeCount++;
 			}
@@ -211,9 +222,10 @@ public abstract class AbstractDirectory
 		 * @see java.util.Iterator#hasNext()
 		 */
 		public boolean hasNext() {
-			while (offset < entries.length) {
-				FatDirEntry e = entries[offset];
-				if ((e != null) && !e.isDeleted()) {
+			int size = entries.size();
+			while (offset < size) {
+				FatBasicDirEntry e = (FatBasicDirEntry)entries.get(offset);
+				if ((e != null) && e instanceof FatDirEntry && !((FatDirEntry)e).isDeleted()) {
 					return true;
 				} else {
 					offset++;
@@ -226,9 +238,10 @@ public abstract class AbstractDirectory
 		 * @see java.util.Iterator#next()
 		 */
 		public Object next() {
-			while (offset < entries.length) {
-				FatDirEntry e = entries[offset];
-				if ((e != null) && !e.isDeleted()) {
+			int size = entries.size();
+			while (offset < size) {
+				FatBasicDirEntry e = (FatBasicDirEntry)entries.get(offset);
+				if ((e != null) && (e instanceof FatDirEntry) && !((FatDirEntry)e).isDeleted()) {
 					offset++;
 					return e;
 				} else {
@@ -249,23 +262,25 @@ public abstract class AbstractDirectory
 
 	/**
 	 * Returns the dirty.
+	 * 
 	 * @return boolean
 	 */
 	public boolean isDirty() {
 		if (_dirty) {
 			return true;
 		}
-		for (int i = 0; i < entries.length; i++) {
-			FatDirEntry entry = entries[i];
-			if (entry != null) {
-				if (entry.isDirty()) {
+		int size = entries.size();
+		for (int i = 0; i < size; i++) {
+			FatBasicDirEntry entry = (FatBasicDirEntry)entries.get(i);
+			if ((entry != null) && (entry instanceof FatDirEntry)) {
+				if (((FatDirEntry)entry).isDirty()) {
 					return true;
 				}
 			}
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Mark this directory as dirty.
 	 */
@@ -281,13 +296,15 @@ public abstract class AbstractDirectory
 	}
 
 	/**
-	 * Can this directory change size of <code>newSize</code> directory entries?
+	 * Can this directory change size of <code>newSize</code> directory
+	 * entries?
+	 * 
 	 * @param newSize
 	 * @return boolean
 	 */
 	protected abstract boolean canChangeSize(int newSize);
 
-	private String splitName(String nameExt) {
+	protected String splitName(String nameExt) {
 		int i = nameExt.indexOf('.');
 		if (i < 0) {
 			return nameExt;
@@ -296,7 +313,7 @@ public abstract class AbstractDirectory
 		}
 	}
 
-	private String splitExt(String nameExt) {
+	protected String splitExt(String nameExt) {
 		int i = nameExt.indexOf('.');
 		if (i < 0) {
 			return "";
@@ -307,51 +324,68 @@ public abstract class AbstractDirectory
 
 	/**
 	 * Sets the first two entries '.' and '..' in the directory
+	 * 
 	 * @param parentCluster
 	 */
 	protected void initialize(long myCluster, long parentCluster) {
-		FatDirEntry e = entries[0] = new FatDirEntry(this, ".", "");
+		FatDirEntry e = new FatDirEntry(this, ".", "");
+		entries.set(0, e);
 		e.setFlags(FatConstants.F_DIRECTORY);
 		e.setStartCluster((int)myCluster);
-
-		e = entries[1] = new FatDirEntry(this, "..", "");
+		e = new FatDirEntry(this, "..", "");
+		entries.set(1, e);
 		e.setFlags(FatConstants.F_DIRECTORY);
 		e.setStartCluster((int)parentCluster);
 	}
 
-	/** 
-	 * Flush the contents of this directory to the persistent storage 
+	/**
+	 * Flush the contents of this directory to the persistent storage
 	 */
 	protected abstract void flush() throws IOException;
 
-	/** 
+	/**
 	 * Read the contents of this directory from the given byte array
+	 * 
 	 * @param src
 	 */
 	protected synchronized void read(byte[] src) throws IOException {
-		for (int i = 0; i < entries.length; i++) {
-			if (src[i * 32] != 0) {
-				FatDirEntry entry = new FatDirEntry(this, src, i * 32);
-				entries[i] = entry;
+		int size = entries.size();
+      System.out.println("Abstract read --> dir size = " + size);
+		for (int i = 0; i < size; i++) {
+			int index = i * 32;
+			if (src[index] == 0) {
+				entries.set(i, null);
+				//System.out.print("E" + i + " ");
 			} else {
-				break;
+				FatBasicDirEntry entry = FatDirEntry.fatDirEntryFactory(this, src, index);
+				entries.set(i, entry);
+				//System.out.println("Entry : " + entry);
 			}
 		}
+		//System.out.println("End of abstract read -------------");
 	}
 
-	/** 
+	/**
 	 * Write the contents of this directory to the given device at the given
 	 * offset.
+	 * 
 	 * @param dest
 	 */
 	protected synchronized void write(byte[] dest) throws IOException {
-		for (int i = 0; i < entries.length; i++) {
-			FatDirEntry entry = entries[i];
+		//System.out.println("abstract write ---------------");
+		int size = entries.size();
+		byte[] empty = new byte[32];
+		for (int i = 0; i < size; i++) {
+			FatBasicDirEntry entry = (FatBasicDirEntry)entries.get(i);
 			if (entry != null) {
+				//System.out.println("Write entry : " + entry);
 				entry.write(dest, i * 32);
 			} else {
-				break;
+				System.arraycopy(empty, 0, dest, i * 32, 32);
+				//System.out.print("E" + i + " ");
 			}
 		}
+		//System.out.println("\nEnd of abstract write ---------------");
 	}
+
 }

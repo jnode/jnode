@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.test.fs" 
+        name="JNode File System Test classes"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.fs"/>
+    <import plugin="org.jnode.shell"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.test.fs.*"/>
+    </library>
+  </runtime>
+        
+  <extension point="org.jnode.shell.aliases">
+    <alias name="FileTest"      class="org.jnode.test.fs.FileTest"/>
+    <alias name="LfnTest"      class="org.jnode.test.fs.LfnTest"/>
+  </extension>
+
+</plugin>

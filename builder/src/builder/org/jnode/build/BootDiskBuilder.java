@@ -18,7 +18,6 @@ import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.MappedBlockDeviceSupport;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.fat.Fat;
-import org.jnode.fs.fat.FatFormatter;
 import org.jnode.fs.fat.GrubBootSector;
 import org.jnode.fs.fat.GrubFatFormatter;
 import org.jnode.fs.partitions.ibm.IBMPartitionTableEntry;
@@ -98,7 +97,6 @@ public class BootDiskBuilder extends BootFloppyBuilder {
 		part0 = new MappedBlockDeviceSupport(device, pte.getStartLba() * bytesPerSector, pte.getNrSectors() * bytesPerSector);
 		GrubFatFormatter ff = (GrubFatFormatter)createFormatter();
 		ff.setInstallPartition(0x0000FFFF);
-		ff.setLabel("JNode Boot");
 		ff.format(part0);
 		GrubBootSector part0bs = (GrubBootSector)ff.getBootSector();  
 		
@@ -117,7 +115,7 @@ public class BootDiskBuilder extends BootFloppyBuilder {
  	 * @return The formatter
 	 * @throws IOException
 	 */
-	protected FatFormatter createFormatter() throws IOException {
+	protected GrubFatFormatter createFormatter() throws IOException {
 		return new GrubFatFormatter(bytesPerSector, spc, geom, Fat.FAT16, 1, getStage1ResourceName(), getStage2ResourceName());
 	}
 
