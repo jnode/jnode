@@ -40,6 +40,11 @@ import org.jnode.vm.x86.X86CpuID;
  */
 public abstract class X86Assembler extends NativeStream implements X86Constants {
 
+    /** Current mode is 32-bit */
+    protected final boolean code32;
+    /** Current mode is 64-bit */
+    protected final boolean code64;
+
 	protected final X86CpuID cpuId;
 
 	protected final Mode mode;
@@ -52,6 +57,8 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public X86Assembler(X86CpuID cpuId, Mode mode) {
 		this.cpuId = cpuId;
 		this.mode = mode;
+        this.code32 = mode.is32();
+        this.code64 = mode.is64();
 	}
 
 	/**
@@ -62,8 +69,18 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract int align(int value);
 
+    /**
+     * Gets a 32-bit integer from a given offset.
+     * @param offset
+     * @return int
+     */
 	public abstract int get32(int offset);
 
+    /**
+     * Gets an 8-bit integer from a given offset.
+     * @param offset
+     * @return int
+     */
 	public abstract int get8(int offset);
 
 	/**
@@ -155,6 +172,19 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract boolean hasUnresolvedObjectRefs();
 
+    /**
+     * @return Returns the code32.
+     */
+    public final boolean isCode32() {
+        return this.code32;
+    }
+    /**
+     * @return Returns the code64.
+     */
+    public final boolean isCode64() {
+        return this.code64;
+    }
+
 	/**
 	 * Is logging enabled. This method will only return true on on debug like
 	 * implementations.
@@ -179,10 +209,24 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void log(Object msg);
 
+    /**
+     * Sets a 32-bit integer at a given offset.
+     * @param offset
+     * @param v32
+     */
 	public abstract void set32(int offset, int v32);
 
+    /**
+     * Sets an 8-bit integer at a given offset.
+     * @param offset
+     * @param v8
+     */
 	public abstract void set8(int offset, int v8);
 
+    /**
+     * Sets the target offset of a given label to the current position.
+     * @param label
+     */
 	public abstract ObjectRef setObjectRef(Object label);
 
 	/**
@@ -211,19 +255,36 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void trim(int count);
 
+    /**
+     * Append a series of bytes from the current position. 
+     * @param data
+     * @param ofs
+     * @param len
+     */
 	public abstract void write(byte[] data, int ofs, int len);
 
+    /**
+     * Append a 16-bit int from the current position. 
+     * @param v16
+     */
 	public abstract void write16(int v16);
 
+    /**
+     * Append a 32-bit int from the current position. 
+     * @param v32
+     */
 	public abstract void write32(int v32);
 
+    /**
+     * Append a 64-bit int from the current position. 
+     * @param v64
+     */
 	public abstract void write64(long v64);
 
-	/**
-	 * Write an 8-bit unsigned byte.
-	 * 
-	 * @param v8
-	 */
+    /**
+     * Append a 8-bit int from the current position. 
+     * @param v8
+     */
 	public abstract void write8(int v8);
 
 	/**
@@ -572,12 +633,15 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 
 	/**
 	 * Create a bound lReg, [rReg+rDisp]
+     * Only valid in 32-bit mode.
 	 * 
 	 * @param lReg
 	 * @param rReg
 	 * @param rDisp
+     * @throws InvalidOpcodeException in 64-bit mode.
 	 */
-	public abstract void writeBOUND(GPR lReg, GPR rReg, int rDisp);
+	public abstract void writeBOUND(GPR lReg, GPR rReg, int rDisp)
+    throws InvalidOpcodeException;
 
 	/**
 	 * Create a int3
@@ -641,8 +705,10 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param ccOpcode
 	 * @param dst
 	 * @param src
+     * @throws InvalidOpcodeException If no CMOV feature.
 	 */
-	public abstract void writeCMOVcc(int ccOpcode, GPR dst, GPR src);
+	public abstract void writeCMOVcc(int ccOpcode, GPR dst, GPR src)
+    throws InvalidOpcodeException;
 
 	/**
 	 * Create a CMOVcc dst,[src+srcDisp]
@@ -650,8 +716,10 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param dst
 	 * @param src
 	 * @param srcDisp
+     * @throws InvalidOpcodeException If no CMOV feature.
 	 */
-	public abstract void writeCMOVcc(int ccOpcode, GPR dst, GPR src, int srcDisp);
+	public abstract void writeCMOVcc(int ccOpcode, GPR dst, GPR src, int srcDisp)
+    throws InvalidOpcodeException;
 
 	/**
 	 * Create a CMP reg1, reg2
@@ -1129,17 +1197,6 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 			throws UnresolvedObjectRefException;
 
 	/**
-	 * Create a mov [dstReg+dstDisp], <srcReg>
-	 * 
-	 * @param operandSize
-	 * @param dstReg
-	 * @param dstDisp
-	 * @param srcReg
-	 */
-	public abstract void writeMOV(int operandSize, GPR dstReg, int dstDisp,
-			GPR srcReg);
-
-	/**
 	 * Create a mov <dstReg>, <srcReg>
 	 * 
 	 * @param operandSize
@@ -1147,6 +1204,19 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param srcReg
 	 */
 	public abstract void writeMOV(int operandSize, GPR dstReg, GPR srcReg);
+
+	/**
+	 * Create a mov dstReg, [srcReg+srcIdxReg*scale+srcDisp]
+	 * 
+	 * @param operandSize
+	 * @param dstReg
+	 * @param srcReg
+	 * @param srcIdxReg
+	 * @param scale
+	 * @param srcDisp
+	 */
+	public abstract void writeMOV(int operandSize, GPR dstReg, GPR srcReg,
+			GPR srcIdxReg, int scale, int srcDisp);
 
 	/**
 	 * Create a mov dstReg, [srcReg+srcDisp]
@@ -1173,17 +1243,15 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 			int scale, int dstDisp, GPR srcReg);
 
 	/**
-	 * Create a mov dstReg, [srcReg+srcIdxReg*scale+srcDisp]
+	 * Create a mov [dstReg+dstDisp], <srcReg>
 	 * 
 	 * @param operandSize
 	 * @param dstReg
+	 * @param dstDisp
 	 * @param srcReg
-	 * @param srcIdxReg
-	 * @param scale
-	 * @param srcDisp
 	 */
-	public abstract void writeMOV(int operandSize, GPR dstReg, GPR srcReg,
-			GPR srcIdxReg, int scale, int srcDisp);
+	public abstract void writeMOV(int operandSize, GPR dstReg, int dstDisp,
+			GPR srcReg);
 
 	/**
 	 * Create a mov <reg>, <imm32>
@@ -1211,6 +1279,8 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeMOV_Const(GPR dstReg, Object label);
 
 	/**
+<<<<<<< X86Assembler.java
+=======
 	 * Create a mov size [destReg+dstIdxReg*scale+destDisp], imm32
 	 * 
 	 * @param dstReg
@@ -1221,6 +1291,7 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 			int dstDisp, int imm32);
 
 	/**
+>>>>>>> 1.10
 	 * Create a movsd [dst+dstDisp],src
 	 * 
 	 * @param dst
@@ -1396,8 +1467,10 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 
 	/**
 	 * Create a popa
+     * @throws InvalidOpcodeException In 64-bit mode.
 	 */
-	public abstract void writePOPA();
+	public abstract void writePOPA()
+    throws InvalidOpcodeException;
 
 	/**
 	 * Write an prefix byte
@@ -1454,8 +1527,10 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 
 	/**
 	 * Create a pusha
+     * @throws InvalidOpcodeException In 64-bit mode.
 	 */
-	public abstract void writePUSHA();
+	public abstract void writePUSHA()
+    throws InvalidOpcodeException;
 
 	/**
 	 * Create a RDTSC (get timestamp into edx:eax
