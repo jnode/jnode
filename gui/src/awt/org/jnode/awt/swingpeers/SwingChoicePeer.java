@@ -19,98 +19,103 @@ import javax.swing.JButton;
 
 class SwingChoicePeer extends JButton implements ChoicePeer {
 
-    //
-    // Construction
-    //
+	//
+	// Construction
+	//
 
-    public SwingChoicePeer(Choice choice) {
-        super();
-        SwingFramePeer.add(choice, this);
-    }
+	public SwingChoicePeer(Choice choice) {
+		super();
+		SwingFramePeer.add(choice, this);
+		SwingToolkit.copyAwtProperties(choice, this);
+		final int cnt = choice.getItemCount();
+		for (int i = 0; i < cnt; i++) {
+			addItem(choice.getItem(i), i);
+		}
+	}
 
-    //
-    // ChoicePeer
-    //
+	//
+	// ChoicePeer
+	//
 
-    public void add(String item, int index) {
-    }
+	public void add(String item, int index) {
+	}
 
-    public void select(int index) {
-    }
+	public void select(int index) {
+	}
 
-    // Deprecated
+	// Deprecated
 
-    public void addItem(String item, int index) {
-        add(item, index);
-    }
+	public void addItem(String item, int index) {
+		add(item, index);
+	}
 
-    //
-    // ComponentPeer
-    //
+	//
+	// ComponentPeer
+	//
 
-    // Events
+	// Events
 
-    public void handleEvent(AWTEvent e) {
-        //System.err.println(e);
-    }
+	public void handleEvent(AWTEvent e) {
+		//System.err.println(e);
+	}
 
-    public void coalescePaintEvent(PaintEvent e) {
-        System.err.println(e);
-    }
+	public void coalescePaintEvent(PaintEvent e) {
+		System.err.println(e);
+	}
 
-    public boolean handlesWheelScrolling() {
-        return false;
-    }
+	public boolean handlesWheelScrolling() {
+		return false;
+	}
 
-    // Obscurity
+	// Obscurity
 
-    public boolean isObscured() {
-        return false;
-    }
+	public boolean isObscured() {
+		return false;
+	}
 
-    public boolean canDetermineObscurity() {
-        return false;
-    }
+	public boolean canDetermineObscurity() {
+		return false;
+	}
 
-    // Focus
+	// Focus
 
-    public boolean requestFocus(Component lightweightChild, boolean temporary,
-            boolean focusedWindowChangeAllowed, long time) {
-        return true;
-    }
+	public boolean requestFocus(Component lightweightChild, boolean temporary,
+			boolean focusedWindowChangeAllowed, long time) {
+		return true;
+	}
 
-    // Buffer
+	// Buffer
 
-    public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-    }
+	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
+	}
 
-    public void destroyBuffers() {
-    }
+	public void destroyBuffers() {
+	}
 
-    public void flip(BufferCapabilities.FlipContents flipContents) {
-    }
+	public void flip(BufferCapabilities.FlipContents flipContents) {
+	}
 
-    public Image getBackBuffer() {
-        return null;
-    }
+	public Image getBackBuffer() {
+		return null;
+	}
 
-    // Cursor
+	// Cursor
 
-    public void updateCursorImmediately() {
-    }
+	public void updateCursorImmediately() {
+	}
 
-    // Misc
+	// Misc
 
-    public void dispose() {
-    }
+	public void dispose() {
+	}
 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // Private
-    /**
-     * @see java.awt.peer.ComponentPeer#setEventMask(long)
-     */
-    public void setEventMask(long mask) {
-        // TODO Auto-generated method stub
+	///////////////////////////////////////////////////////////////////////////////////////
+	// Private
+	/**
+	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
+	 */
+	public void setEventMask(long mask) {
+		// TODO Auto-generated method stub
 
-    }
+	}
 }

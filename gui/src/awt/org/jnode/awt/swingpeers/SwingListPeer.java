@@ -12,7 +12,9 @@ import java.awt.List;
 import java.awt.event.PaintEvent;
 import java.awt.peer.ListPeer;
 
+import javax.swing.AbstractListModel;
 import javax.swing.JList;
+import javax.swing.ListModel;
 
 /**
  * AWT list peer implemented as a {@link javax.swing.JList}.
@@ -20,138 +22,143 @@ import javax.swing.JList;
 
 class SwingListPeer extends JList implements ListPeer {
 
-    //
-    // Construction
-    //
+	//
+	// Construction
+	//
 
-    public SwingListPeer(List list) {
-        super();
-        SwingFramePeer.add(list, this);
-    }
+	public SwingListPeer(final List list) {
+		super();
+		SwingFramePeer.add(list, this);
+		SwingToolkit.copyAwtProperties(list, this);
+		final ListModel model = new AbstractListModel() {
+			public int getSize() { return list.getItemCount(); }
+			public Object getElementAt(int idx) { return list.getItem(idx); }
+		};		
+	}
 
-    //
-    // ListPeer
-    //
+	//
+	// ListPeer
+	//
 
-    public int[] getSelectedIndexes() {
-        return null;
-    }
+	public int[] getSelectedIndexes() {
+		return null;
+	}
 
-    public void add(String item, int index) {
-    }
+	public void add(String item, int index) {
+	}
 
-    public void delItems(int start, int end) {
-    }
+	public void delItems(int start, int end) {
+	}
 
-    public void select(int index) {
-    }
+	public void select(int index) {
+	}
 
-    public void deselect(int index) {
-    }
+	public void deselect(int index) {
+	}
 
-    public void makeVisible(int index) {
-    }
+	public void makeVisible(int index) {
+	}
 
-    public void setMultipleMode(boolean b) {
-    }
+	public void setMultipleMode(boolean b) {
+	}
 
-    public Dimension getPreferredSize(int rows) {
-        return null;
-    }
+	public Dimension getPreferredSize(int rows) {
+		return null;
+	}
 
-    public Dimension getMinimumSize(int rows) {
-        return null;
-    }
+	public Dimension getMinimumSize(int rows) {
+		return null;
+	}
 
-    // Deprecated
+	// Deprecated
 
-    public void addItem(String item, int index) {
-        add(item, index);
-    }
+	public void addItem(String item, int index) {
+		add(item, index);
+	}
 
-    public void clear() {
-        removeAll();
-    }
+	public void clear() {
+		removeAll();
+	}
 
-    public void setMultipleSelections(boolean v) {
-        setMultipleMode(v);
-    }
+	public void setMultipleSelections(boolean v) {
+		setMultipleMode(v);
+	}
 
-    public Dimension preferredSize(int rows) {
-        return getPreferredSize(rows);
-    }
+	public Dimension preferredSize(int rows) {
+		return getPreferredSize(rows);
+	}
 
-    public Dimension minimumSize(int rows) {
-        return getMinimumSize(rows);
-    }
+	public Dimension minimumSize(int rows) {
+		return getMinimumSize(rows);
+	}
 
-    //
-    // ComponentPeer
-    //
+	//
+	// ComponentPeer
+	//
 
-    // Events
+	// Events
 
-    public void handleEvent(AWTEvent e) {
-        //System.err.println(e);
-    }
+	public void handleEvent(AWTEvent e) {
+		//System.err.println(e);
+	}
 
-    public void coalescePaintEvent(PaintEvent e) {
-        System.err.println(e);
-    }
+	public void coalescePaintEvent(PaintEvent e) {
+		System.err.println(e);
+	}
 
-    public boolean handlesWheelScrolling() {
-        return false;
-    }
+	public boolean handlesWheelScrolling() {
+		return false;
+	}
 
-    // Obscurity
+	// Obscurity
 
-    public boolean isObscured() {
-        return false;
-    }
+	public boolean isObscured() {
+		return false;
+	}
 
-    public boolean canDetermineObscurity() {
-        return false;
-    }
+	public boolean canDetermineObscurity() {
+		return false;
+	}
 
-    // Focus
+	// Focus
 
-    public boolean requestFocus(Component lightweightChild, boolean temporary,
-            boolean focusedWindowChangeAllowed, long time) {
-        return true;
-    }
+	public boolean requestFocus(Component lightweightChild, boolean temporary,
+			boolean focusedWindowChangeAllowed, long time) {
+		return true;
+	}
 
-    // Buffer
+	// Buffer
 
-    public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-    }
+	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
+	}
 
-    public void destroyBuffers() {
-    }
+	public void destroyBuffers() {
+	}
 
-    public void flip(BufferCapabilities.FlipContents flipContents) {
-    }
+	public void flip(BufferCapabilities.FlipContents flipContents) {
+	}
 
-    public Image getBackBuffer() {
-        return null;
-    }
+	public Image getBackBuffer() {
+		return null;
+	}
 
-    // Cursor
+	// Cursor
 
-    public void updateCursorImmediately() {
-    }
+	public void updateCursorImmediately() {
+	}
 
-    // Misc
+	// Misc
 
-    public void dispose() {
-    }
+	public void dispose() {
+	}
 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // Private
-    /**
-     * @see java.awt.peer.ComponentPeer#setEventMask(long)
-     */
-    public void setEventMask(long mask) {
-        // TODO Auto-generated method stub
+	///////////////////////////////////////////////////////////////////////////////////////
+	// Private
+	/**
+	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
+	 */
+	public void setEventMask(long mask) {
+		// TODO Auto-generated method stub
 
-    }
+	}
 }

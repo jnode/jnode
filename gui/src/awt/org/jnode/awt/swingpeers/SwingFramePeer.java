@@ -24,176 +24,179 @@ import javax.swing.JInternalFrame;
 
 class SwingFramePeer extends JInternalFrame implements FramePeer {
 
-    private final SwingToolkit toolkit;
-    
-    //
-    // Static operations
-    //
+	//
+	// Static operations
+	//
 
-    public static void add(Component component, Component peer) {
-        SwingFramePeer framePeer = getFramePeer(component);
-        if (framePeer != null) framePeer.getContentPane().add(peer);
-    }
+	public static void add(Component component, Component peer) {
+		SwingFramePeer framePeer = getFramePeer(component);
+		if (framePeer != null)
+			framePeer.getContentPane().add(peer);
+	}
 
-    //
-    // Construction
-    //
+	///////////////////////////////////////////////////////////////////////////////////////
+	// Private
 
-    public SwingFramePeer(SwingToolkit toolkit, JDesktopPane desktopPane, Frame frame) {
-        super();
-        this.toolkit = toolkit;
-        desktopPane.add(this);
+	private static SwingFramePeer getFramePeer(Component component) {
+		Component parent = component.getParent();
+		if (parent == null) {
+			return null;
+		} else {
+			ComponentPeer parentPeer = parent.getPeer();
+			if (parentPeer instanceof SwingFramePeer)
+				return (SwingFramePeer) parentPeer;
+			else
+				return getFramePeer(parent);
+		}
+	}
 
-        setLocation(frame.getLocation());
-        setSize(frame.getSize());
-        setResizable(frame.isResizable());
-        setIconifiable(true);
-        setMaximizable(true);
-        setClosable(true);
-        try {
-            setIcon(frame.getState() == Frame.ICONIFIED);
-        } catch (PropertyVetoException x) {
-        }
-        setState(frame.getState());
-        setTitle(frame.getTitle());
-        setIconImage(frame.getIconImage());
-        setMenuBar(frame.getMenuBar());
-    }
+	private final SwingToolkit toolkit;
 
-    //
-    // FramePeer
-    //
+	//
+	// Construction
+	//
 
-    public void setIconImage(Image im) {
-    }
+	public SwingFramePeer(SwingToolkit toolkit, JDesktopPane desktopPane,
+			Frame frame) {
+		super();
+		this.toolkit = toolkit;
+		desktopPane.add(this);
 
-    public void setMenuBar(MenuBar mb) {
-    }
+		SwingToolkit.copyAwtProperties(frame, this);
+		setLocation(frame.getLocation());
+		setSize(frame.getSize());
+		setResizable(frame.isResizable());
+		setIconifiable(true);
+		setMaximizable(true);
+		setClosable(true);
+		try {
+			setIcon(frame.getState() == Frame.ICONIFIED);
+		} catch (PropertyVetoException x) {
+		}
+		setState(frame.getState());
+		setTitle(frame.getTitle());
+		setIconImage(frame.getIconImage());
+		setMenuBar(frame.getMenuBar());
+	}
 
-    public void setState(int state) {
-        if (state == Frame.ICONIFIED) {
-        } else // state == Frame.NORMAL
-        {
-        }
-    }
+	public void beginLayout() {
+	}
 
-    public int getState() {
-        return -1;
-    }
+	//
+	// ContainerPeer
+	//
 
-    public void setMaximizedBounds(java.awt.Rectangle bounds) {
-    }
+	public void beginValidate() {
+	}
 
-    //
-    // WindowPeer
-    //
+	public boolean canDetermineObscurity() {
+		return false;
+	}
 
-    public int handleFocusTraversalEvent(KeyEvent e) {
-        return -1;
-    }
+	public void coalescePaintEvent(PaintEvent e) {
+		System.err.println(e);
+	}
 
-    //
-    // ContainerPeer
-    //
+	// Buffer
 
-    public void beginValidate() {
-    }
+	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
+	}
 
-    public void endValidate() {
-    }
+	public void destroyBuffers() {
+	}
 
-    public void beginLayout() {
-    }
+	// Misc
 
-    public void endLayout() {
-    }
+	public void dispose() {
+		toolkit.onDisposeFrame();
+	}
 
-    public boolean isPaintPending() {
-        return false;
-    }
+	public void endLayout() {
+	}
 
-    //
-    // ComponentPeer
-    //
+	public void endValidate() {
+	}
 
-    // Events
+	public void flip(BufferCapabilities.FlipContents flipContents) {
+	}
 
-    public void handleEvent(AWTEvent e) {
-        //System.err.println(e);
-    }
+	public Image getBackBuffer() {
+		return null;
+	}
 
-    public void coalescePaintEvent(PaintEvent e) {
-        System.err.println(e);
-    }
+	public int getState() {
+		return -1;
+	}
 
-    public boolean handlesWheelScrolling() {
-        return false;
-    }
+	//
+	// ComponentPeer
+	//
 
-    // Obscurity
+	// Events
 
-    public boolean isObscured() {
-        return false;
-    }
+	public void handleEvent(AWTEvent e) {
+		//System.err.println(e);
+	}
 
-    public boolean canDetermineObscurity() {
-        return false;
-    }
+	//
+	// WindowPeer
+	//
 
-    // Focus
+	public int handleFocusTraversalEvent(KeyEvent e) {
+		return -1;
+	}
 
-    public boolean requestFocus(Component lightweightChild, boolean temporary,
-            boolean focusedWindowChangeAllowed, long time) {
-        return true;
-    }
+	public boolean handlesWheelScrolling() {
+		return false;
+	}
 
-    // Buffer
+	// Obscurity
 
-    public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-    }
+	public boolean isObscured() {
+		return false;
+	}
 
-    public void destroyBuffers() {
-    }
+	public boolean isPaintPending() {
+		return false;
+	}
 
-    public void flip(BufferCapabilities.FlipContents flipContents) {
-    }
+	// Focus
 
-    public Image getBackBuffer() {
-        return null;
-    }
+	public boolean requestFocus(Component lightweightChild, boolean temporary,
+			boolean focusedWindowChangeAllowed, long time) {
+		return true;
+	}
 
-    // Cursor
+	/**
+	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
+	 */
+	public void setEventMask(long mask) {
+		// TODO Auto-generated method stub
 
-    public void updateCursorImmediately() {
-    }
+	}
 
-    // Misc
+	//
+	// FramePeer
+	//
 
-    public void dispose() {
-        toolkit.onDisposeFrame();
-    }
+	public void setIconImage(Image im) {
+	}
 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // Private
+	public void setMaximizedBounds(java.awt.Rectangle bounds) {
+	}
 
-    private static SwingFramePeer getFramePeer(Component component) {
-        Component parent = component.getParent();
-        if (parent == null) {
-            return null;
-        } else {
-            ComponentPeer parentPeer = parent.getPeer();
-            if (parentPeer instanceof SwingFramePeer)
-                return (SwingFramePeer) parentPeer;
-            else
-                return getFramePeer(parent);
-        }
-    }
+	public void setMenuBar(MenuBar mb) {
+	}
 
-    /**
-     * @see java.awt.peer.ComponentPeer#setEventMask(long)
-     */
-    public void setEventMask(long mask) {
-        // TODO Auto-generated method stub
+	public void setState(int state) {
+		if (state == Frame.ICONIFIED) {
+		} else // state == Frame.NORMAL
+		{
+		}
+	}
 
-    }
+	// Cursor
+
+	public void updateCursorImmediately() {
+	}
 }

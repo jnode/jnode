@@ -23,8 +23,13 @@ class SwingScrollbarPeer extends JScrollBar implements ScrollbarPeer {
     // Construction
     //
 
-    public SwingScrollbarPeer(Scrollbar scrollbar) {
-        super();
+    public SwingScrollbarPeer(Scrollbar sb) {
+        SwingFramePeer.add(sb, this);
+        SwingToolkit.copyAwtProperties(sb, this);
+        setOrientation(sb.getOrientation());
+        setBlockIncrement(sb.getBlockIncrement());
+        setUnitIncrement(sb.getUnitIncrement());
+        setValues(sb.getValue(), sb.getVisibleAmount(), sb.getMinimum(), sb.getMaximum());
     }
 
     //
@@ -95,16 +100,6 @@ class SwingScrollbarPeer extends JScrollBar implements ScrollbarPeer {
     // Misc
 
     public void dispose() {
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // Private
-
-    /**
-     * @see java.awt.peer.ScrollbarPeer#setValues(int, int, int, int)
-     */
-    public void setValues(int value, int visible, int min, int max) {
-        this.setValues(value, visible, min, max);
     }
 
     /**

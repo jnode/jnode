@@ -289,6 +289,7 @@ final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
      * @see java.awt.peer.ComponentPeer#getGraphics()
      */
     public Graphics getGraphics() {
+    	log.debug("getGraphics");
 		return new JNodeGraphics(this);
     }
 
@@ -409,6 +410,7 @@ final class DesktopFramePeer extends JNodeGenericPeer implements FramePeer {
      * @see java.awt.peer.ComponentPeer#repaint(long, int, int, int, int)
      */
     public void repaint(long tm, int x, int y, int width, int height) {
+    	log.info("repaint (" + tm + ", " + x + ", " + y + ", " + width + ", " + height);
         // TODO Auto-generated method stub
 
     }
