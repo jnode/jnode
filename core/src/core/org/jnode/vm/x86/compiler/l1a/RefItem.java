@@ -139,6 +139,9 @@ final class RefItem extends WordItem implements X86CompilerConstants {
                 stack.operandStack.push(res);
             }
             break;
+            
+        default:
+        	throw new IllegalArgumentException("Invalid item kind");
         }
         return res;
     }
