@@ -55,7 +55,9 @@ public class Macro {
         }
 
         for(int i = 0; i < params.length; i++){
-            exp = exp.replaceAll("%"+(i + 1), params[i]);
+            String par = params[i];
+            par = (par == null) ? "" : par.trim();
+            exp = exp.replaceAll("%"+(i + 1), par);
         }
 
         if(maxParamCount > params.length){
@@ -66,7 +68,9 @@ public class Macro {
             }else{
                 for(int i = params.length; i < maxParamCount; i++){
                     if(defaultValues.length > i - params.length){
-                        exp = exp.replaceAll("%"+(i + 1), defaultValues[i - params.length]);
+                        String def = defaultValues[i - params.length];
+                        def = (def == null) ? "" : def.trim();
+                        exp = exp.replaceAll("%"+(i + 1), def);
                     }else{
                         exp = exp.replaceAll("%"+(i + 1), "");
                     }
