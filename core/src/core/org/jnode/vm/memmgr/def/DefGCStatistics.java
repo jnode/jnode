@@ -32,6 +32,7 @@ final class DefGCStatistics extends GCStatistics {
     int lastMarkIterations;
     long lastSweepDuration;
     long lastCleanupDuration;
+    long lastVerifyDuration;
     long lastFreedBytes;
     long lastMarkedObjects;
 
@@ -41,6 +42,7 @@ final class DefGCStatistics extends GCStatistics {
                "lastMarkDuration    " + lastMarkDuration + "\n" +
                "lastSweepDuration   " + lastSweepDuration + "\n" +
                "lastCleanupDuration " + lastCleanupDuration + "\n" +
+               "lastVerifyDuration  " + lastVerifyDuration + "\n" +
                "lastMarkedObjects   " + lastMarkedObjects + "\n" +
                "lastFreedBytes      " + lastFreedBytes;
     }

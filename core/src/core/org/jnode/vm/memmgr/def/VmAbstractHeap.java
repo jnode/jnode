@@ -12,6 +12,8 @@ import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.pragma.Uninterruptible;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.ObjectReference;
+import org.vmmagic.unboxed.Offset;
 
 /**
  * An abstract heap class.
@@ -68,22 +70,6 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	}
 	
 	/**
-	 * Gets the starting address of this heap.
-	 * @return Address
-	 */
-	public final VmAddress getStart() {
-		return start;
-	}
-	
-	/**
-	 * Gets the (exclusive) ending address of this heap.
-	 * @return Address
-	 */
-	public final VmAddress getEnd() {
-		return end;
-	}
-	
-	/**
 	 * Gets the size in bytes of this heap.
 	 * @return int
 	 */
@@ -96,17 +82,20 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * @param addr
 	 * @return boolean
 	 */
-	protected boolean isObject(Address addr) {
-		long addrL = addr.toLong();
-		if ((addrL < startL) || (addrL >= endL)) {
+	protected final boolean isObject(Address addr) {
+		final Address start = Address.fromAddress(this.start);
+		final Address end = Address.fromAddress(this.end);
+		if (addr.LT(start) || addr.GE(end)) {
 			// The object if not within this heap
 			return false;
 		}
-		int offset = (int)(addrL - startL);
+
+		final int offset = addr.toWord().sub(start.toWord()).toInt();
 		int bit = offset / ObjectLayout.OBJECT_ALIGN;
-		int idx = bit / 8;
-		int mask = 1 << (bit & 7);
-		int value = helper.getByte(allocationBitmapPtr, idx);
+		final Offset idx = Offset.fromIntZeroExtend(bit / 8);
+		final int mask = 1 << (bit & 7);
+		final Address bitmapPtr = Address.fromAddress(this.allocationBitmapPtr);
+		final int value = bitmapPtr.loadByte(idx);
 		return ((value & mask) == mask);
 	}
 
@@ -116,9 +105,10 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * @param addr
 	 * @return boolean
 	 */
-	protected boolean inHeap(Address addr) {
-		long addrL = addr.toLong();
-		return ((addrL >= startL) && (addrL < endL));
+	protected final boolean inHeap(Address addr) {
+		final Address start = Address.fromAddress(this.start);
+		final Address end = Address.fromAddress(this.end);
+		return (addr.GE(start) && addr.LT(end));
 	}
 
 	/**
@@ -127,22 +117,25 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * @param on
 	 */	
 	protected final void setAllocationBit(Object object, boolean on) {
-		VmAddress addr = helper.addressOf(object);
-		long addrL = helper.addressToLong(addr);
-		if ((addrL < startL) || (addrL >= endL)) {
+		final Address addr = ObjectReference.fromObject(object).toAddress();
+		final Address start = Address.fromAddress(this.start);
+		final Address end = Address.fromAddress(this.end);
+		if (addr.LT(start) || addr.GE(end)) {
 			return;
 		}
-		int offset = (int)(addrL - startL);
-		int bit = offset / ObjectLayout.OBJECT_ALIGN;
-		int idx = bit / 8;
-		int mask = 1 << (bit & 7);
-		int value = helper.getByte(allocationBitmapPtr, idx);
+
+		final int offset = addr.toWord().sub(start.toWord()).toInt();
+		final int bit = offset / ObjectLayout.OBJECT_ALIGN;
+		final Offset idx = Offset.fromIntZeroExtend(bit / 8);
+		final int mask = 1 << (bit & 7);
+		final Address bitmapPtr = Address.fromAddress(this.allocationBitmapPtr);
+		int value = bitmapPtr.loadByte(idx);
 		if (on) {
 			value |= mask;
 		} else {
 			value &= ~mask;
 		}
-		helper.setByte(allocationBitmapPtr, idx, (byte)value);
+		bitmapPtr.store((byte)value, idx);
 	}
 	
 	/**
