@@ -6,7 +6,7 @@ package org.jnode.driver.net.ne2000;
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.net.NetworkException;
-import org.jnode.driver.net.ethernet.AbstractEthernetDriver;
+import org.jnode.driver.net.ethernet.spi.AbstractEthernetDriver;
 import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
 import org.jnode.system.ResourceNotFreeException;
@@ -38,7 +38,7 @@ public abstract class Ne2000Driver extends AbstractEthernetDriver {
 	}
 
 	/**
-	 * @see org.jnode.driver.net.AbstractNetDriver#doTransmit(SocketBuffer, HardwareAddress)
+	 * @see org.jnode.driver.net.spi.AbstractNetDriver#doTransmit(SocketBuffer, HardwareAddress)
 	 */
 	protected void doTransmitEthernet(SocketBuffer skbuf)
 		throws NetworkException {
