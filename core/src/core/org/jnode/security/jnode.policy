@@ -58,6 +58,7 @@ grant {
 	permission java.awt.AWTPermission "replaceKeyboardFocusManager";
 	
 	// JNode specific standard properties
+	permission java.util.PropertyPermission "dns.server", "read";
 
 	// Log4j specific standard properties
 	permission java.util.PropertyPermission "log4j.defaultInitOverride", "read";	
