@@ -521,14 +521,6 @@ public final class Unsafe {
 
 	protected static native void outPortDword(int portNr, int value);
 
-	public static native float intBitsToFloat(int value);
-
-	public static native int floatToRawIntBits(float value);
-
-	public static native double longBitsToDouble(long value);
-
-	public static native long doubleToRawLongBits(double value);
-
 	/**
 	 * Gets the minimum valid address in the addressspace of the current
 	 * architecture.
@@ -671,9 +663,4 @@ public final class Unsafe {
 	 * @return The required length of id.
 	 */
 	static native int getCPUID(int[] id);
-
-	/**
-	 * Force a breakpoint
-	 */
-	public static native void breakPoint();
 }

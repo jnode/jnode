@@ -670,7 +670,33 @@ final class MagicHelper extends BaseX86MagicHelper {
             os.writeRDTSC();
             vstack.push(result);
         } break;
-            
+        case mINTBITSTOFLOAT:
+        case mFLOATTORAWINTBITS: {
+            if (Vm.VerifyAssertions) Vm._assert(isstatic);
+            final WordItem v = (WordItem)vstack.pop();
+            v.load(ec);
+            final X86Register.GPR r = v.getRegister();
+            v.release(ec);
+            final int resultType = (mcode == mINTBITSTOFLOAT) ? JvmType.FLOAT : JvmType.INT;
+            vstack.push(L1AHelper.requestWordRegister(ec, resultType, r));            
+        } break;
+        case mLONGBITSTODOUBLE: 
+        case mDOUBLETORAWLONGBITS: {
+            if (Vm.VerifyAssertions) Vm._assert(isstatic);
+            final DoubleWordItem v = (DoubleWordItem)vstack.pop();
+            v.load(ec);
+            final X86Register.GPR lsb = v.getLsbRegister();
+            final X86Register.GPR msb = v.getMsbRegister();
+            v.release(ec);
+            final int resultType = (mcode == mLONGBITSTODOUBLE) ? JvmType.DOUBLE : JvmType.LONG;
+            vstack.push(L1AHelper.requestDoubleWordRegisters(ec, resultType, lsb, msb));            
+        } break;
+        case mBREAKPOINT: {
+            if (Vm.VerifyAssertions) Vm._assert(isstatic);
+            os.writeINT(3);
+        } break;
+        	
+        
         default:
             throw new InternalError("Unknown method code for method " + method);
         }

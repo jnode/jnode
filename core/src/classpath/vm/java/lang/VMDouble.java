@@ -21,7 +21,7 @@
  
 package java.lang;
 
-import org.jnode.vm.Unsafe;
+import org.jnode.vm.VmMagic;
 
 /**
  * VM specific double routines.
@@ -53,7 +53,7 @@ final class VMDouble {
         if (Double.isNaN(value)) {
             return 0x7ff8000000000000L;
         } else {
-            return Unsafe.doubleToRawLongBits(value);
+            return VmMagic.doubleToRawLongBits(value);
         }
     }
 
@@ -72,7 +72,7 @@ final class VMDouble {
      * @see #longBitsToDouble(long)
      */
     public static long doubleToRawLongBits(double value) {
-        return Unsafe.doubleToRawLongBits(value);
+        return VmMagic.doubleToRawLongBits(value);
     }
 
     /**
@@ -90,7 +90,7 @@ final class VMDouble {
      * @see #doubleToRawLongBits(double)
      */
     public static double longBitsToDouble(long bits) {
-        return Unsafe.longBitsToDouble(bits);
+        return VmMagic.longBitsToDouble(bits);
     }
 
     private int parseUnsignedInt() throws NumberFormatException {

@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.vm;
 
 import org.jnode.vm.classmgr.VmClassType;
@@ -34,71 +34,74 @@ import org.vmmagic.unboxed.Address;
  */
 public final class VmMagic {
 
-    /**
-     * Gets the VmType of the given object.
-     * @param object
-     */
-    public static VmClassType getObjectType(Object object) {
-        return null;
-    }
-    
-    /**
-     * Gets the Type Information Block of the given object.
-     * 
-     * @param object
-     * @return TIB
-     */
-    public static Object[] getTIB(Object object) {
-        return null;
-    }
+	/**
+	 * Gets the VmType of the given object.
+	 * 
+	 * @param object
+	 */
+	public static VmClassType getObjectType(Object object) {
+		return null;
+	}
 
-    /**
-     * Gets all of the flags of the given object.
-     * 
-     * @param object
-     * @return int
-     */
-    public static int getObjectFlags(Object object) {
-        return 0;
-    }
+	/**
+	 * Gets the Type Information Block of the given object.
+	 * 
+	 * @param object
+	 * @return TIB
+	 */
+	public static Object[] getTIB(Object object) {
+		return null;
+	}
 
-    /**
-     * Gets the GC color flags of the given object.
-     * 
-     * @param object
-     * @return int
-     */
-    public static int getObjectColor(Object object) {
-        return 0;
-    }
+	/**
+	 * Gets all of the flags of the given object.
+	 * 
+	 * @param object
+	 * @return int
+	 */
+	public static int getObjectFlags(Object object) {
+		return 0;
+	}
 
-    /**
-     * Sets all of the flags of the given object.
-     * 
-     * @param object
-     * @param flags
-     */
-    public static void setObjectFlags(Object object, int flags) {
-        
-    }
+	/**
+	 * Gets the GC color flags of the given object.
+	 * 
+	 * @param object
+	 * @return int
+	 */
+	public static int getObjectColor(Object object) {
+		return 0;
+	}
 
-    /**
-     * Gets the address of the first array element of the given array.
-     * @param array
-     * @return
-     */
-    public static Address getArrayData(Object array) {
-    	return null;
-    }
-    
-    /**
-     * Has the given object been finalized.
-     * @param src
-     */
-    public static boolean isFinalized(Object src) {
-        return false;
-    }
-    
+	/**
+	 * Sets all of the flags of the given object.
+	 * 
+	 * @param object
+	 * @param flags
+	 */
+	public static void setObjectFlags(Object object, int flags) {
+
+	}
+
+	/**
+	 * Gets the address of the first array element of the given array.
+	 * 
+	 * @param array
+	 * @return
+	 */
+	public static Address getArrayData(Object array) {
+		return null;
+	}
+
+	/**
+	 * Has the given object been finalized.
+	 * 
+	 * @param src
+	 */
+	public static boolean isFinalized(Object src) {
+		return false;
+	}
+
 	/**
 	 * Gets the current stackframe
 	 * 
@@ -110,14 +113,37 @@ public final class VmMagic {
 
 	/**
 	 * Gets the timestamp of the current processor.
+	 * 
 	 * @return
 	 */
 	public static long getTimeStamp() {
 		return 0;
 	}
-	
-    /**
-     * Do not instantiate this class.
-     */
-    private VmMagic() {}
+
+	public static float intBitsToFloat(int value) {
+		return 0;
+	}
+
+	public static int floatToRawIntBits(float value) {
+		return 0;
+	}
+
+	public static double longBitsToDouble(long value) {
+		return 0;
+	}
+
+	public static long doubleToRawLongBits(double value) {
+		return 0;
+	}
+
+	/**
+	 * Force a breakpoint
+	 */
+	public static void breakPoint() {}
+
+	/**
+	 * Do not instantiate this class.
+	 */
+	private VmMagic() {
+	}
 }
