@@ -101,10 +101,13 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
         unblock();
     }
 
-    private void unblock() {
-
+    final void unblock() {
         blocking = false;
         blockingThread.interrupt();
+    }
+    
+    final boolean isBlocking(){
+    	return blocking;
     }
 
     public void keyReleased(KeyboardEvent event) {
@@ -128,13 +131,13 @@ public class ThreadCommandInvoker implements CommandInvoker, KeyboardListener {
 //                System.err.println("Registering shell in new thread.");
                 ShellUtils.getShellManager().registerShell(commandShell);//workaround to ensure access to the command shell in this new thread?
                 method.invoke(null, args);
-                if (!blocking) {
+                if (!isBlocking()) {
                     //somebody already hit ctrl-c.
                 } else {
                     finished = true;
 //                    System.err.println("Finished invocation, notifying blockers.");
-                    blocking = false;//done with invoke, stop waiting for a ctrl-c
-                    blockingThread.interrupt();
+                    //done with invoke, stop waiting for a ctrl-c
+                    unblock();
                 }
             } catch (InvocationTargetException ex) {
                 Throwable tex = ex.getTargetException();
