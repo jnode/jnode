@@ -58,7 +58,8 @@ public class INode {
 		this.desc = desc;
 		this.data = new byte[INODE_LENGTH];
 		
-		long time = System.currentTimeMillis()/100;
+		long time = System.currentTimeMillis()/1000;
+		log.debug("TIME:                "+time);
 		
 		setUid(uid);
 		setGid(gid);
