@@ -24,7 +24,7 @@ public class X86CodeGenerator extends CodeGenerator {
 	private final RegisterPool registerPool;
 
 	/**
-	 * @param variableMap
+	 * Initialize this instance
 	 */
 	public X86CodeGenerator() {
 		CodeGenerator.setCodeGenerator(this);
