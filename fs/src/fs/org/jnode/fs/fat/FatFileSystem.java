@@ -9,7 +9,9 @@ import java.util.Iterator;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.block.BlockDeviceAPI;
+import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.spi.AbstractFileSystem;
 
@@ -152,5 +154,29 @@ public class FatFileSystem extends AbstractFileSystem {
 	 */
 	public FatDirectory getRootDir() {
 		return rootDir;
+	}
+
+	/**
+	 * 
+	 */
+	protected FSFile createFile(FSEntry entry) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * 
+	 */
+	protected FSDirectory createDirectory(FSEntry entry) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * 
+	 */
+	protected FSEntry createRootEntry() throws IOException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

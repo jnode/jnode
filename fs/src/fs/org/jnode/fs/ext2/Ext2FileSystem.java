@@ -10,7 +10,9 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
+import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.ReadOnlyFileSystemException;
 import org.jnode.fs.ext2.cache.Block;
@@ -730,5 +732,29 @@ public class Ext2FileSystem extends AbstractFileSystem {
 			return (checkPow(groupNr, 3)||checkPow(groupNr, 5)||checkPow(groupNr, 7));
 		else
 			return true;
+	}
+
+	/**
+	 * 
+	 */
+	protected FSFile createFile(FSEntry entry) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * 
+	 */
+	protected FSDirectory createDirectory(FSEntry entry) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * 
+	 */
+	protected FSEntry createRootEntry() throws IOException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
