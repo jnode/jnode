@@ -26,7 +26,7 @@ import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
-import org.jnode.naming.InitialNaming.DefaultNameSpace;
+import org.jnode.naming.DefaultNameSpace;
 import org.jnode.test.support.MockUtils;
 
 public class StubNameSpace extends DefaultNameSpace

@@ -23,12 +23,14 @@ package org.jnode.test.fs.driver.context;
 
 import java.io.IOException;
 
+import javax.naming.NamingException;
+
 import org.jmock.MockObjectTestCase;
 import org.jnode.driver.DeviceFinder;
-import org.jnode.driver.FSDriverUtils;
 import org.jnode.driver.floppy.FloppyControllerFinder;
 import org.jnode.driver.floppy.FloppyDeviceToDriverMapper;
 import org.jnode.driver.floppy.FloppyDriver;
+import org.jnode.driver.floppy.support.FloppyDriverUtils;
 import org.jnode.test.fs.driver.BlockDeviceAPIContext;
 import org.jnode.test.fs.driver.factories.MockFloppyDeviceFactory;
 import org.jnode.test.fs.driver.stubs.StubDeviceManager;
@@ -39,8 +41,13 @@ public class FloppyDriverContext extends BlockDeviceAPIContext
     public void init(TestConfig config, MockObjectTestCase testCase) throws IOException
     {
         // set the current testCase for our factory
-        MockFloppyDeviceFactory factory = (MockFloppyDeviceFactory) 
-                                FSDriverUtils.getFloppyDeviceFactory();
+        MockFloppyDeviceFactory factory;
+        try {
+            factory = (MockFloppyDeviceFactory) 
+                                    FloppyDriverUtils.getFloppyDeviceFactory();
+        } catch (NamingException ex) {
+            throw (IOException)new IOException().initCause(ex);
+        }
         factory.setTestCase((MockObjectTestCase) testCase);
         
         DeviceFinder deviceFinder = new FloppyControllerFinder();

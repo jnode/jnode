@@ -27,8 +27,8 @@ import javax.naming.NamingException;
 import org.jmock.MockObjectTestCase;
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
-import org.jnode.driver.FSDriverUtils;
 import org.jnode.driver.ide.IDEDevice;
+import org.jnode.driver.ide.IDEDriverUtils;
 import org.jnode.driver.ide.disk.IDEDiskDriver;
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.ResourceManager;
@@ -46,7 +46,7 @@ public class IDEDiskDriverContext extends BlockDeviceAPIContext
         
         // set the current testCase for our factory
         MockIDEDeviceFactory factory = (MockIDEDeviceFactory) 
-                                FSDriverUtils.getIDEDeviceFactory();
+                                IDEDriverUtils.getIDEDeviceFactory();
         factory.setTestCase(testCase);
         
         // create stub resource manager
