@@ -37,6 +37,16 @@ exception statement from your version. */
 
 package java.lang.reflect;
 
+import org.jnode.vm.Vm;
+import org.jnode.vm.memmgr.VmHeapManager;
+import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.classmgr.VmClassLoader;
+import org.jnode.vm.classmgr.VmArrayClass;
+import gnu.java.security.actions.InvokeAction;
+
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
 /**
  * Array holds static helper functions that allow you to create and
  * manipulate arrays by reflection. Operations know how to perform widening
@@ -620,6 +630,8 @@ public final class Array {
 		return retval;
 	}
 
+
+    //LS
 	/**
 	 * Dynamically create an array of objects.
 	 *
@@ -629,7 +641,36 @@ public final class Array {
 	 * @throws NegativeArraySizeException if dim is negative
 	 * @throws OutOfMemoryError if memory allocation fails
 	 */
-	private static Object createObjectArray(Class type, int dim) {
-		return null;
+	private static Object createObjectArray(final Class type, int dim) {
+        final VmType vmClass = (VmType) AccessController.doPrivileged(
+            new PrivilegedAction() {
+                public Object run() {
+                    return type.getVmClass();
+                }
+            });
+
+        final String arrClsName = vmClass.getArrayClassName();
+        final VmType arrCls;
+        try {
+            final VmClassLoader curLoader = vmClass.getLoader();
+            arrCls = curLoader.loadClass(arrClsName, true);
+            //Screen.debug("an cls{");
+            //Screen.debug(vmClass.getName());
+            if (arrCls == null) {
+                throw new NoClassDefFoundError(arrClsName);
+            }
+        } catch (ClassNotFoundException ex) {
+            throw new NoClassDefFoundError(arrClsName);
+        }
+
+        VmHeapManager hm = heapManager;
+        if (hm == null) {
+            heapManager = hm = Vm.getVm().getHeapManager();
+        }
+        final Object result = hm.newArray((VmArrayClass) arrCls, dim);
+
+        //Screen.debug("}");
+        return result;
 	}
+    private static VmHeapManager heapManager;
 }
