@@ -59,6 +59,7 @@ class Line {
             consoleY = console.getCursorY();
 
             setContent("");
+            console.setCursor( consoleX,consoleY);//move the cursor to the start of the line.
         }
     }
 
