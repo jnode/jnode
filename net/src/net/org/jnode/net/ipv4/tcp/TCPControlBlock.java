@@ -523,6 +523,7 @@ public class TCPControlBlock extends IPv4ControlBlock implements TCPConstants {
 	 * @param state
 	 */
 	private synchronized void setState(int state) throws SocketException {
+//    System.out.println("state = " + state);
 		if (this.curState != state) {
 			this.curState = state;
 			if (state == TCPS_CLOSED) {
@@ -544,6 +545,7 @@ public class TCPControlBlock extends IPv4ControlBlock implements TCPConstants {
 				throw new TimeoutException();
 			}
 			try {
+//				Thread.currentThread().sleep(Math.max(1, timeout - (now - start)));
 				wait(Math.max(1, timeout - (now - start)));
 			} catch (InterruptedException ex) {
 				// Ignore
@@ -636,10 +638,11 @@ public class TCPControlBlock extends IPv4ControlBlock implements TCPConstants {
 	/**
 	 * Active close the connection by the application.
 	 */
-	public synchronized void appClose() throws SocketException {
+	public /*synchronized*/ void appClose() throws SocketException {
 		if (log.isDebugEnabled()) {
 			log.debug("active close state=" + getStateName());
 		}
+
 		try {
 			switch (curState) {
 				case TCPS_SYN_RECV :
@@ -647,7 +650,10 @@ public class TCPControlBlock extends IPv4ControlBlock implements TCPConstants {
 					{
 						sendFIN();
 						setState(TCPS_FIN_WAIT_1);
-						waitUntilState(TCPS_CLOSED, 0);
+
+// this is blocking the closing of the socket/output stream  - Martin Husted Hartvig 01/03/2005
+// the waitUntilState have to rethinked
+//						waitUntilState(TCPS_CLOSED, 0);
 					}
 					break;
 				case TCPS_SYN_SENT :
