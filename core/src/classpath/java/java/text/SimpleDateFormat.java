@@ -341,14 +341,14 @@ public class SimpleDateFormat extends DateFormat
   }
 
   /**
-   * This method returns the format symbol information used for parsing
-   * and formatting dates.
+   * This method returns a copy of the format symbol information used
+   * for parsing and formatting dates.
    *
-   * @return The date format symbols.
+   * @return a copy of the date format symbols.
    */
   public DateFormatSymbols getDateFormatSymbols()
   {
-    return formatData;
+    return (DateFormatSymbols) formatData.clone();
   }
 
   /**
@@ -356,9 +356,15 @@ public class SimpleDateFormat extends DateFormat
    * and formatting dates.
    *
    * @param formatData The date format symbols.
+   * @throws NullPointerException if <code>formatData</code> is null.
    */
    public void setDateFormatSymbols(DateFormatSymbols formatData)
    {
+     if (formatData == null)
+       {
+	 throw new
+	   NullPointerException("The supplied format data was null.");
+       }
      this.formatData = formatData;
    }
 
@@ -614,6 +620,8 @@ public class SimpleDateFormat extends DateFormat
     boolean saw_timezone = false;
     int quote_start = -1;
     boolean is2DigitYear = false;
+    try
+      {
     for (; fmt_index < fmt_max; ++fmt_index)
       {
 	char ch = pattern.charAt(fmt_index);
@@ -643,10 +651,11 @@ public class SimpleDateFormat extends DateFormat
 
 	// We've arrived at a potential pattern character in the
 	// pattern.
-	int first = fmt_index;
+	    int fmt_count = 1;
 	while (++fmt_index < fmt_max && pattern.charAt(fmt_index) == ch)
-	  ;
-	int fmt_count = fmt_index - first;
+	      {
+		++fmt_count;
+	      }
 
 	// We might need to limit the number of digits to parse in
 	// some cases.  We look to the next pattern character to
@@ -699,7 +708,7 @@ public class SimpleDateFormat extends DateFormat
 	    else
 	      {
 		is_numeric = false;
-		match = (fmt_count <= 3
+		    match = (fmt_count == 3
 			 ? formatData.getShortMonths()
 			 : formatData.getMonths());
 	      }
@@ -801,7 +810,9 @@ public class SimpleDateFormat extends DateFormat
 	    int i;
 	    for (i = offset; i < match.length; ++i)
 	      {
-		if (dateStr.startsWith(match[i], index))
+		    if (match[i] != null)
+		      if (dateStr.toUpperCase().startsWith(match[i].toUpperCase(),
+							   index))
 		  break;
 	      }
 	    if (i == match.length)
@@ -837,9 +848,6 @@ public class SimpleDateFormat extends DateFormat
 	if (calendar.getTime().compareTo(defaultCenturyStart) < 0)
 	  calendar.set(Calendar.YEAR, year + 100);      
       }
-
-    try
-      {
 	if (! saw_timezone)
 	  {
 	    // Use the real rules to determine whether or not this
@@ -864,4 +872,19 @@ public class SimpleDateFormat extends DateFormat
     calendar.set(Calendar.YEAR, year - 80);
     set2DigitYearStart(calendar.getTime());
   }
+
+  /**
+   * Returns a copy of this instance of
+   * <code>SimpleDateFormat</code>.  The copy contains
+   * clones of the formatting symbols and the 2-digit
+   * year century start date.
+   */
+  public Object clone()
+  {
+    SimpleDateFormat clone = (SimpleDateFormat) super.clone();
+    clone.setDateFormatSymbols((DateFormatSymbols) formatData.clone());
+    clone.set2DigitYearStart((Date) defaultCenturyStart.clone());
+    return clone;
+  }
+
 }
