@@ -28,7 +28,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Category;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.spi.RootCategory;
 import org.jnode.test.fs.AllFSTest;
 import org.jnode.test.fs.unit.config.OsType;
 import org.jnode.test.fs.unit.config.FSTestConfig;
@@ -36,10 +40,12 @@ import org.jnode.test.fs.unit.config.FSTestConfig;
 
 public class ConfigManager
 {   
+    private static final Logger log = Logger.getLogger(ConfigManager.class);
+    
     static private ConfigManager instance; 
     static private boolean log4jInitialized = false; 
     
-    private List configs; 
+    private Map configs; 
     private Map iterators; 
     
     static public ConfigManager getInstance()
@@ -54,20 +60,29 @@ public class ConfigManager
     
     public void addConfig(TestConfig config)
     {
-        configs.add(config);
+        List cfgs = (List) configs.get(config.getClass());
+        if(cfgs == null)
+        {
+            cfgs = new ArrayList();
+            configs.put(config.getClass(), cfgs);
+        }
+        
+        cfgs.add(config);        
     }
     
-    public TestConfig getConfig(Class clazz, String testName)
+    public TestConfig getConfig(Class configClazz, Class clazz, String testName)
     {
         TestKey key = new TestKey(clazz, testName);
         Iterator it = (Iterator) iterators.get(key);
         if(it == null)
         {
-            it = configs.iterator();
+            List cfgs = (List) configs.get(configClazz);
+            it = cfgs.iterator();
             iterators.put(key, it);
         }
         
         TestConfig cfg = (TestConfig) it.next();
+        log.info(key+" got config "+cfg);
         return cfg;
     }
     
@@ -95,6 +110,8 @@ public class ConfigManager
                     PropertyConfigurator.configure(url);
                 }
                 
+                Category.getRoot().setLevel(Level.FATAL);
+                
                 log4jInitialized = true;
             }
             catch(OutOfMemoryError oome)
@@ -110,7 +127,7 @@ public class ConfigManager
     
     private ConfigManager()
     {        
-        configs = new ArrayList(); 
+        configs = new HashMap(); 
         iterators = new HashMap();
         initLog4j();
     }        
@@ -140,6 +157,11 @@ public class ConfigManager
         public int hashCode()
         {
             return testName.hashCode();
+        }
+        
+        public String toString()
+        {
+            return clazz.getName()+"."+testName; 
         }
     }
 }
