@@ -45,7 +45,6 @@ grant {
 	permission java.util.PropertyPermission "gnu.java.io.*", "read";
 	
 	// JNode specific standard properties
-	permission java.util.PropertyPermission "jnode.cmdline", "read";
 
 	// Log4j specific standard properties
 	permission java.util.PropertyPermission "log4j.defaultInitOverride", "read";	

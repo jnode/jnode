@@ -66,7 +66,7 @@ public final class VmAccessController {
                         if (!pd.implies(perm)) { 
                         //Unsafe.debug("Permission denied");
                         throw new AccessControlException("Permission \"" + perm
-                                + "\" not granted due to " + declClass.getName() + " [" + pd.getPermissions() + "]"); }
+                                + "\" not granted due to " + declClass.getName()); }
                     }
                 }
                 if (method.canThrow(PragmaPrivilegedAction.class)) { 
