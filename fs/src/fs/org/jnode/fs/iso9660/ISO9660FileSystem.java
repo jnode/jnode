@@ -6,9 +6,9 @@ package org.jnode.fs.iso9660;
 import java.io.IOException;
 
 import org.jnode.driver.Device;
-import org.jnode.fs.AbstractFileSystem;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystemException;
+import org.jnode.fs.spi.AbstractFileSystem;
 
 
 /**
