@@ -117,13 +117,11 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
 			/* Now create the processor */
 			final VmArchitecture arch = getArchitecture();
-			clsMgr = new VmClassLoader(classesURL, arch);
+			final NativeStream os = createNativeStream();
+			clsMgr = new VmClassLoader(classesURL, arch, new BuildObjectResolver(os, this));
 			blockedObjects.add(clsMgr);
 			blockedObjects.add(clsMgr.getStatics());
 			blockedObjects.add(clsMgr.getStatics().getTable());
-			
-			final NativeStream os = createNativeStream();
-			clsMgr.setResolver(new BuildObjectResolver(os, this));
 			
 			// Create the VM
 			final Vm vm = new Vm(arch, new DefaultHeapManager(clsMgr));
@@ -224,7 +222,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			final int bootHeapSize = os.getObjectRef(bootHeapEnd).getOffset() - os.getObjectRef(bootHeapStart).getOffset();
 			final int bootHeapBitmapSize = (bootHeapSize / ObjectLayout.OBJECT_ALIGN) >> 3;
 			log("Boot heap size " + (bootHeapSize >>> 10) + "K bitmap size " + (bootHeapBitmapSize >>> 10) + "K");
-			VmStatics.dumpStatistics();
+			clsMgr.getStatics().dumpStatistics();
 
 			log("Done.");
 		} catch (Throwable ex) {

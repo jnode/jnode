@@ -29,6 +29,7 @@ public class Main {
 	 * @return int
 	 */
 	public static int vmMain() {
+		//return 15;
 		try {
 			Unsafe.debug("Starting JNode\n");
 			final long start = VmSystem.currentKernelMillis();

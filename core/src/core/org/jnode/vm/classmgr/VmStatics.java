@@ -222,9 +222,10 @@ public final class VmStatics extends VmSystemObject {
 	 * @see org.jnode.vm.VmSystemObject#verifyBeforeEmit()
 	 */
 	public void verifyBeforeEmit() {
+		System.out.println("VmStatics#verifyBeforeEmit");
 		final int max = statics.length;
 		for (int i = 0; i < max; i++) {
-			Object value = objects[i];
+			final Object value = objects[i];
 			if (value != null) {
 				if (slotLength == 1) {
 					statics[i] = resolver.addressOf32(value);
@@ -238,6 +239,8 @@ public final class VmStatics extends VmSystemObject {
 						statics[i + 0] = (int) ((lvalue >>> 32) & 0xFFFFFFFFL);
 					}
 				}
+			} else if (types[i] == TYPE_METHOD) {
+				throw new RuntimeException("Method is null");
 			}
 		}
 	}
