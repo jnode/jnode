@@ -49,6 +49,7 @@
     <plugin id="org.jnode.driver.scsi"/>
     <plugin id="org.jnode.driver.scsi.cdrom"/>
     <plugin id="org.jnode.driver.serial"/>
+	<plugin id="org.jnode.driver.smbus"/>    
     <plugin id="org.jnode.driver.sound.speaker"/>
     <plugin id="org.jnode.driver.sound.speaker.pc"/>
     <plugin id="org.jnode.driver.sound.command"/>
@@ -107,4 +108,6 @@
     <plugin id="org.jnode.apps.charvabsh"/>
     <!-- plugin id="org.zaval.lw"/ -->
 
+    <plugin id="org.jnode.test.fs"/>
+    <plugin id="org.junit"/>
 </plugin-list>
