@@ -479,6 +479,9 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 		if (initialize) {
 			final JNodeFrameBufferDevice dev = (JNodeFrameBufferDevice) GraphicsEnvironment
 					.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+			if (dev == null) {
+				throw new AWTError("No framebuffer device found");
+			}
 			config = (JNodeGraphicsConfiguration) dev.getDefaultConfiguration();
 			this.api = dev.getAPI();
 			try {

@@ -25,7 +25,7 @@ class SwingChoicePeer extends JButton implements ChoicePeer {
 
 	public SwingChoicePeer(Choice choice) {
 		super();
-		SwingFramePeer.add(choice, this);
+		SwingToolkit.add(choice, this);
 		SwingToolkit.copyAwtProperties(choice, this);
 		final int cnt = choice.getItemCount();
 		for (int i = 0; i < cnt; i++) {

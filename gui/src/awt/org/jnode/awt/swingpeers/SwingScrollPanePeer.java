@@ -12,22 +12,76 @@ import java.awt.ScrollPane;
 import java.awt.event.PaintEvent;
 import java.awt.peer.ScrollPanePeer;
 
+import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
 /**
  * AWT scroll pane peer implemented as a {@link javax.swing.JScrollPane}.
  */
 
-class SwingScrollPanePeer extends JScrollPane implements ScrollPanePeer {
-
+class SwingScrollPanePeer extends JScrollPane implements ScrollPanePeer, SwingContainerPeer {
     //
     // Construction
     //
 
     public SwingScrollPanePeer(ScrollPane scrollPane) {
         super();
-        SwingFramePeer.add(scrollPane, this);
+        SwingToolkit.add(scrollPane, this);
         SwingToolkit.copyAwtProperties(scrollPane, this);
+    }
+
+	/**
+	 * @see org.jnode.awt.swingpeers.SwingContainerPeer#addAWTComponent(java.awt.Component, javax.swing.JComponent)
+	 */
+	public void addAWTComponent(Component awtComponent, JComponent peer) {
+		add(peer);
+	}
+
+    public void beginLayout() {
+    }
+
+    //
+    // ContainerPeer
+    //
+
+    public void beginValidate() {
+    }
+
+    public boolean canDetermineObscurity() {
+        return false;
+    }
+
+    public void childResized(int w, int h) {
+    }
+
+    public void coalescePaintEvent(PaintEvent e) {
+        System.err.println(e);
+    }
+
+    // Buffer
+
+    public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
+    }
+
+    public void destroyBuffers() {
+    }
+
+    // Misc
+
+    public void dispose() {
+    }
+
+    public void endLayout() {
+    }
+
+    public void endValidate() {
+    }
+
+    public void flip(BufferCapabilities.FlipContents flipContents) {
+    }
+
+    public Image getBackBuffer() {
+        return null;
     }
 
     //
@@ -42,38 +96,6 @@ class SwingScrollPanePeer extends JScrollPane implements ScrollPanePeer {
         return 0;
     }
 
-    public void setScrollPosition(int x, int y) {
-    }
-
-    public void childResized(int w, int h) {
-    }
-
-    public void setUnitIncrement(Adjustable adj, int u) {
-    }
-
-    public void setValue(Adjustable adj, int v) {
-    }
-
-    //
-    // ContainerPeer
-    //
-
-    public void beginValidate() {
-    }
-
-    public void endValidate() {
-    }
-
-    public void beginLayout() {
-    }
-
-    public void endLayout() {
-    }
-
-    public boolean isPaintPending() {
-        return false;
-    }
-
     //
     // ComponentPeer
     //
@@ -82,10 +104,6 @@ class SwingScrollPanePeer extends JScrollPane implements ScrollPanePeer {
 
     public void handleEvent(AWTEvent e) {
         //System.err.println(e);
-    }
-
-    public void coalescePaintEvent(PaintEvent e) {
-        System.err.println(e);
     }
 
     public boolean handlesWheelScrolling() {
@@ -98,7 +116,7 @@ class SwingScrollPanePeer extends JScrollPane implements ScrollPanePeer {
         return false;
     }
 
-    public boolean canDetermineObscurity() {
+    public boolean isPaintPending() {
         return false;
     }
 
@@ -109,31 +127,6 @@ class SwingScrollPanePeer extends JScrollPane implements ScrollPanePeer {
         return true;
     }
 
-    // Buffer
-
-    public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-    }
-
-    public void destroyBuffers() {
-    }
-
-    public void flip(BufferCapabilities.FlipContents flipContents) {
-    }
-
-    public Image getBackBuffer() {
-        return null;
-    }
-
-    // Cursor
-
-    public void updateCursorImmediately() {
-    }
-
-    // Misc
-
-    public void dispose() {
-    }
-
     ///////////////////////////////////////////////////////////////////////////////////////
     // Private
     /**
@@ -142,5 +135,19 @@ class SwingScrollPanePeer extends JScrollPane implements ScrollPanePeer {
     public void setEventMask(long mask) {
         // TODO Auto-generated method stub
 
+    }
+
+    public void setScrollPosition(int x, int y) {
+    }
+
+    public void setUnitIncrement(Adjustable adj, int u) {
+    }
+
+    public void setValue(Adjustable adj, int v) {
+    }
+
+    // Cursor
+
+    public void updateCursorImmediately() {
     }
 }

@@ -28,7 +28,7 @@ class SwingButtonPeer extends JButton implements ButtonPeer {
 	//
 
 	public SwingButtonPeer(Button button) {
-		SwingFramePeer.add(button, this);
+		SwingToolkit.add(button, this);
 		SwingToolkit.copyAwtProperties(button, this);
 		setText(button.getLabel());
 		addActionListener(new ActionListenerDelegate(button));

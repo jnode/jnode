@@ -26,7 +26,7 @@ class SwingTextFieldPeer extends JTextField implements TextFieldPeer {
     //
 
     public SwingTextFieldPeer(TextField textField) {
-        SwingFramePeer.add(textField, this);
+        SwingToolkit.add(textField, this);
         SwingToolkit.copyAwtProperties(textField, this);
 		setText(textField.getText());
 		setColumns(textField.getColumns());

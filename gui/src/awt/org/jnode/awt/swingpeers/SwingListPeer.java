@@ -28,7 +28,7 @@ class SwingListPeer extends JList implements ListPeer {
 
 	public SwingListPeer(final List list) {
 		super();
-		SwingFramePeer.add(list, this);
+		SwingToolkit.add(list, this);
 		SwingToolkit.copyAwtProperties(list, this);
 		final ListModel model = new AbstractListModel() {
 			public int getSize() { return list.getItemCount(); }
