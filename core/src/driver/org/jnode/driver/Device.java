@@ -72,7 +72,7 @@ public class Device implements ResourceOwner {
 	 * Gets the driver of this device.
 	 * @return My driver, can be null
 	 */
-	final Driver getDriver() {
+	public final Driver getDriver() {
 		return driver;
 	}
 
