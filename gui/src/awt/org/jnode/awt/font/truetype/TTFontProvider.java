@@ -131,7 +131,7 @@ public class TTFontProvider implements FontProvider {
 
 	private final void loadFont(String resName) {
 		try {
-			final ClassLoader cl = getClass().getClassLoader();
+			final ClassLoader cl = Thread.currentThread().getContextClassLoader();
 			final URL url = cl.getResource(resName);
 			if (url != null) {
 				final TTFFontData fontData = new TTFFontDataFile(url);
