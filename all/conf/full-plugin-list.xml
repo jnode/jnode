@@ -124,4 +124,5 @@
 
   <plugin id="crypto-security"/>
   <plugin id="com.jcraft.jsch"/>
+  <plugin id="thinlet"/>    
 </plugin-list>

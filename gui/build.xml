@@ -35,6 +35,7 @@
   	  <src path="${my-src.dir}/driver"/>
 	  <src path="${my-src.dir}/test"/>
       <src path="${my-src.dir}/textgui"/>
+      <src path="${my-src.dir}/thinlet"/>        
       <classpath refid="my-cp"/>
     </javac>
   </target>

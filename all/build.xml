@@ -20,6 +20,7 @@
   <property name="jnode-distr.jar" value="${root.dir}/distr/build/classes"/>
   <property name="jnode-fs.jar" value="${root.dir}/fs/build/classes"/>
   <property name="jnode-gui.jar" value="${root.dir}/gui/build/classes"/>
+  <property name="thinlet.jar" value="${root.dir}/gui/build/classes"/>
   <property name="jnode-textgui.jar" value="${root.dir}/gui/build/classes"/>
   <property name="jnode-distr.jar" value="${root.dir}/distr/build/classes"/>
   <property name="jnode-net.jar" value="${root.dir}/net/build/classes"/>
@@ -69,6 +70,7 @@
     <pathelement location="${jnode-shell.jar}"/>
     <pathelement location="${jnode-net.jar}"/>
     <pathelement location="${jnode-gui.jar}"/>
+    <pathelement location="${thinlet.jar}"/>      
     <pathelement location="${jnode-textgui.jar}"/>
     <pathelement location="${jnode-distr.jar}"/>
     <path refid="cp"/>
@@ -116,6 +118,7 @@
       <libalias name="jnode-distr.jar" alias="${jnode-distr.jar}"/>
       <libalias name="jnode-fs.jar" alias="${jnode-fs.jar}"/>
       <libalias name="jnode-gui.jar" alias="${jnode-gui.jar}"/>
+      <libalias name="thinlet.jar" alias="${thinlet.jar}"/>
       <libalias name="jnode-textgui.jar" alias="${jnode-textgui.jar}"/>
       <libalias name="jnode-distr.jar" alias="${jnode-distr.jar}"/>
       <libalias name="jnode-net.jar" alias="${jnode-net.jar}"/>
