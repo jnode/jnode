@@ -691,9 +691,10 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	}
 
 	public final void write16(int v16) {
-		if (!inObject) {
-			throw new IllegalArgumentException("Cannot write out of an object");
-		}
+
+		//if (!inObject) {
+		//	throw new IllegalArgumentException("Cannot write out of an object");
+		//}
 		ensureSize(2);
 		m_data[m_used++] = (byte) (v16 & 0xFF);
 		m_data[m_used++] = (byte) ((v16 >> 8) & 0xFF);
