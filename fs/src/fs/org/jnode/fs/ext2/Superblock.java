@@ -3,6 +3,10 @@
  */
 package org.jnode.fs.ext2;
 
+import java.io.IOException;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.jnode.fs.FileSystemException;
 
 /**
@@ -14,14 +18,56 @@ public class Superblock {
 	public static final int SUPERBLOCK_LENGTH = 1024;
 		
 	private byte data[];
-	
-	public Superblock(byte src[]) throws FileSystemException {
+	private boolean dirty;
+	private Ext2FileSystem fs;
+	private final Logger log = Logger.getLogger(getClass());
+
+	public Superblock(byte src[], Ext2FileSystem fs) throws FileSystemException {
 		data = new byte[src.length];
 		System.arraycopy(src, 0, data, 0, src.length);
+		
+		this.fs = fs;
+		log.setLevel(Level.DEBUG);
 			
 		//check the magic :)
 		if(getMagic() != 0xEF53)
 			throw new FileSystemException("Not ext2 superblock ("+getMagic()+": bad magic)");
+			
+		setDirty(false);
+	}
+	
+	/**
+	 * Update the superblock copies on the disk
+	 */
+	public void update() throws IOException {
+		if(isDirty()) {
+			log.debug("Updating superblock copies");
+			byte[] oldData;
+			
+			//update the main copy
+			if(getFirstDataBlock()==0) {
+				oldData=fs.getBlock(0);
+				//the block size is an integer multiply of 1024, and if getFirstDataBlock==0, it's
+				//at least 2048 bytes
+				System.arraycopy(data, 0, oldData, 1024, SUPERBLOCK_LENGTH);
+			} else {
+				oldData=fs.getBlock(getFirstDataBlock());
+				System.arraycopy(data, 0, oldData, 0, SUPERBLOCK_LENGTH);				
+			}
+			fs.writeBlock(getFirstDataBlock(), oldData, true);
+			
+			//update the other copies
+			for(int i=1; i<fs.getGroupCount(); i++) {
+				long blockNr=getFirstDataBlock() + i*getBlocksPerGroup();
+				oldData = fs.getBlock(blockNr);
+				//update the old contents with the new superblock
+				System.arraycopy(data, 0, oldData, 0, SUPERBLOCK_LENGTH);
+				fs.writeBlock(blockNr, oldData, true);
+			}
+			
+			setDirty(false);
+		}
+		
 	}
 	
 	public long getINodesCount() {
@@ -39,9 +85,17 @@ public class Superblock {
 	public long getFreeBlocksCount() {
 		return Ext2Utils.get32(data, 12);
 	}
+	public void setFreeBlocksCount(long count) {
+		Ext2Utils.set32(data, 12, count);
+		setDirty(true);
+	}
 
 	public long getFreeInodesCount() {
 		return Ext2Utils.get32(data, 16);
+	}
+	public void setFreeInodesCount(long count) {
+		Ext2Utils.set32(data, 16, count);
+		setDirty(true);
 	}
 
 	public long getFirstDataBlock() {
@@ -244,4 +298,18 @@ public class Superblock {
 	public long getLastOrphan() {
 		return Ext2Utils.get8(data, 232);
 	}
+	/**
+	 * @return
+	 */
+	public boolean isDirty() {
+		return dirty;
+	}
+
+	/**
+	 * @param b
+	 */
+	public void setDirty(boolean b) {
+		dirty = b;
+	}
+
 }

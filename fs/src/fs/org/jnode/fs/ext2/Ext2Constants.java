@@ -55,5 +55,21 @@ public class Ext2Constants {
 	//revision level values (stored in the superblock)
 	public static final int EXT2_GOOD_OLD_REV = 0;
 	public static final int EXT2_DYNAMIC_REV  = 1;
+	
+	public static final int EXT2_PREALLOC_BLOCK = 7;
+	
+	//behaviour control flags in the inode
+	public static final long EXT2_INDEX_FL		=	0x00010000;	//hash indexed directory
+	
+	//constants specific to this (JNode) implementation
+	/**
+	 * When searching for free blocks, block groups that have at least 
+	 * EXT2_BLOCK_THRESHOLD_RATIO * BlocksPerGroup free blocks are considered first
+	 *  	- if this constant is too high, it will lead to higher disk fragmentation
+	 *  	- if it is too low, then files might be scattered among multiple block groups
+	 * 		  on very full partitions (higher file fragmentation)
+	 * intervall: [0; 1)
+	 */
+	public static final double EXT2_BLOCK_THRESHOLD_RATIO = 0.05;
 
 }

@@ -1,7 +1,12 @@
-/*
+ /*
  * $Id$
  */
 package org.jnode.fs.ext2;
+
+import java.io.IOException;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /**
  * @author Andras Nagy
@@ -11,11 +16,59 @@ public class GroupDescriptor {
 	public static final int GROUPDESCRIPTOR_LENGTH = 32;
 	
 	private byte data[];
-	
-	public GroupDescriptor(byte src[]) {
-		data = new byte[src.length];
-		System.arraycopy(src, 0, data, 0, src.length);
+	private Ext2FileSystem fs;
+	private int groupNr;
+	private boolean dirty;
+	private final Logger log = Logger.getLogger(getClass());
+
+	public GroupDescriptor(int groupNr, Ext2FileSystem fs) throws IOException{
+		//read the group descriptors from the main copy in block group 0
+		byte[] blockData = fs.getBlock( fs.getSuperblock().getFirstDataBlock() + 1);
+		byte[] data = new byte[GROUPDESCRIPTOR_LENGTH];
+		System.arraycopy(blockData, 0, data, 0, GROUPDESCRIPTOR_LENGTH);
+		this.groupNr = groupNr;
+		this.fs = fs;
+		setDirty(false);
+		log.setLevel(Level.DEBUG);
 	}
+
+	//OLD VERSION
+	public GroupDescriptor(byte src[], Ext2FileSystem fs, int groupNr) {
+		data = new byte[GROUPDESCRIPTOR_LENGTH];
+		System.arraycopy(src, groupNr*GROUPDESCRIPTOR_LENGTH, data, 0, GROUPDESCRIPTOR_LENGTH);
+            
+		this.fs=fs;
+		this.groupNr=groupNr;
+		setDirty(false);
+	}
+	//OLD VERSION
+
+	/**
+	 * GroupDescriptors are duplicated in every block group: if a GroupDescriptor changes,
+	 * all copies have to be changed.
+	 * @param groupNr
+	 */
+	protected void updateGroupDescriptors() throws IOException{
+		//all the copies of the group descriptors have to be modified in sync
+		if(isDirty()) {
+			log.debug("Updating groupdescriptor copies");
+			synchronized(fs.getGroupDescriptorLock()) {
+				for(int i=0; i<fs.getGroupCount(); i++) {
+					long block  = 	fs.getSuperblock().getFirstDataBlock() + 1 +
+									fs.getSuperblock().getBlocksPerGroup() * i;
+					long pos = groupNr*GROUPDESCRIPTOR_LENGTH;
+					block      += pos / fs.getBlockSize();			
+					long offset = pos % fs.getBlockSize();
+					byte[] blockData = fs.getBlock( block );
+					//update the block with the new group descriptor
+					System.arraycopy(data, 0, blockData, (int)offset, GROUPDESCRIPTOR_LENGTH);
+					fs.writeBlock( block, blockData, true); 							
+				}
+			}
+			setDirty(false);
+		}
+	}
+
 	
 	public int size() {
 		return GROUPDESCRIPTOR_LENGTH;	
@@ -36,10 +89,36 @@ public class GroupDescriptor {
 	public int getFreeBlocksCount() {
 		return Ext2Utils.get16(data, 12);
 	}
-	public int getFreeInodesCount() {
-		return Ext2Utils.get16(data, 14);
+
+	public void setFreeBlocksCount(int count) throws IOException {
+		Ext2Utils.set16(data, 12, count);
+		setDirty(true);
 	}
+	
+	public int getFreeInodesCount() {
+		return Ext2Utils.get16(data, 14);		
+	}
+	
+	public void setFreeInodesCount(int count) throws IOException {
+		Ext2Utils.set16(data, 14, count);
+		setDirty(true);
+	}
+
 	public int getUsedDirsCount() {
 		return Ext2Utils.get16(data, 16);
 	}
+	/**
+	 * @return
+	 */
+	public boolean isDirty() {
+		return dirty;
+	}
+
+	/**
+	 * @param b
+	 */
+	public void setDirty(boolean b) {
+		dirty = b;
+	}
+
 }
