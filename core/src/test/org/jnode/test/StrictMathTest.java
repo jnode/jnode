@@ -1100,7 +1100,7 @@ public class StrictMathTest {
 
 	/**
 	 * Super precision for 2/pi in 24-bit chunks, for use in
-	 * {@link #remPiOver2()}.
+	 * {@link #remPiOver2(double, double[])}.
 	 */
 	private static final int TWO_OVER_PI[] =
 		{
@@ -1174,7 +1174,7 @@ public class StrictMathTest {
 
 	/**
 	 * Super precision for pi/2 in 24-bit chunks, for use in
-	 * {@link #remPiOver2()}.
+	 * {@link #remPiOver2(double, double[])}.
 	 */
 	private static final double PI_OVER_TWO[] = { 1.570796251296997, // Long bits 0x3ff921fb40000000L.
 		7.549789415861596e-8, // Long bits 0x3e74442d00000000L.
@@ -1187,7 +1187,7 @@ public class StrictMathTest {
 	};
 
 	/**
-	 * More constants related to pi, used in {@link #remPiOver2()} and
+	 * More constants related to pi, used in {@link #remPiOver2(double, double[])} and
 	 * elsewhere.
 	 */
 		private static final double PI_L = 1.2246467991473532e-16, // Long bits 0x3ca1a62633145c07L.
@@ -1201,7 +1201,7 @@ public class StrictMathTest {
 	/**
 	 * Natural log and square root constants, for calculation of
 	 * {@link #exp(double)}, {@link #log(double)} and
-	 * {@link #power(double, double)}. CP is 2/(3*ln(2)).
+	 * {@link #pow(double, double)}. CP is 2/(3*ln(2)).
 	 */
 		private static final double SQRT_1_5 = 1.224744871391589, // Long bits 0x3ff3988e1409212eL.
 		SQRT_2 = 1.4142135623730951, // Long bits 0x3ff6a09e667f3bcdL.

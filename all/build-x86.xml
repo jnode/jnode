@@ -149,7 +149,7 @@
     <mkdir dir="${root.dir}/docs/build/website-xml"/>
     <taskdef name="exportusage" classname="org.jnode.shell.help.ant.ExportUsageTask" classpathref="cp-x86"/>
     <exportusage destfile="${root.dir}/docs/build/website-xml/shell-commands.xml"
-             pluginList="${system-plugin-list}"
+             pluginList="${full-plugin-list}"
              pluginDir="${plugins.dir}"
              targetArch="x86">
       <classpath refid="cp-x86"/>

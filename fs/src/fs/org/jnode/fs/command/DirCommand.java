@@ -27,25 +27,32 @@ public class DirCommand {
 
 		File dir = ARG_DIR.getFile(cmdLine);
 		if (dir == null) {
-			dir = new File(".");
+			dir = new File(System.getProperty("user.dir"));
 		}
+
 		if (dir.exists() && dir.isDirectory()) {
 			final File[] list = dir.listFiles();
-			if (list != null) {
-				for (int i = 0; i < list.length; i++) {
-					File f = list[i];
-					if (f.isDirectory()) {
-						System.out.print("[" + f.getName() + "]");
-					} else {
-						System.out.print(f.getName() + " " + f.length());
-					}
-					System.out.println();
-				}
-				System.out.println();
-			}
+			printList(list);
+		} else if("/".equals(dir.getCanonicalPath())) {
+			File[] roots = File.listRoots();
+			printList(roots);
 		} else {
 			System.err.println("No such directory " + dir);
 		}
 	}
 
+	private static void printList(File[] list) {
+		if (list != null) {
+			for (int i = 0; i < list.length; i++) {
+				File f = list[i];
+				if (f.isDirectory()) {
+					System.out.print("[" + f.getName() + "]");
+				} else {
+					System.out.print(f.getName() + " " + f.length());
+				}
+				System.out.println();
+			}
+			System.out.println();
+		}
+	}
 }

@@ -6,10 +6,6 @@
         version="@VERSION@"
         provider-name="JNode.org">
         
-  <requires>
-    <import plugin="org.jnode.runtime"/>
-  </requires>
-        
   <runtime>
     <library name="jnode-core.jar">
       <export name="org.jnode.test.*"/>

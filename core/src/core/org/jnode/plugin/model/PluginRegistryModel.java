@@ -79,6 +79,7 @@ public class PluginRegistryModel extends VmSystemObject implements PluginRegistr
 		final int max = pluginUrls.length;
 
 		for (int i = 0; i < max; i++) {
+			//System.out.println(pluginUrls[i]);
 			loadPlugin(pluginUrls[i]);
 		}
 	}

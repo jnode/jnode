@@ -9,7 +9,6 @@
   <requires>
     <import plugin="org.jnode.driver"/>
     <import plugin="org.jnode.driver.character"/>
-    <import plugin="org.jnode.runtime"/>
   </requires>
         
   <runtime>

@@ -58,8 +58,8 @@ public class DefaultPluginManager extends PluginManager {
 	 */
 	public void startPlugins() throws PluginException {
 		// Resolve all plugins
-		((PluginRegistryModel)registry).resolveDescriptors();
-		
+		 ((PluginRegistryModel) registry).resolveDescriptors();
+
 		// Set the context classloader
 		Thread.currentThread().setContextClassLoader(registry.getPluginsClassLoader());
 
@@ -171,9 +171,13 @@ public class DefaultPluginManager extends PluginManager {
 
 		// Get all descriptors into a hashmap (id, descriptor).
 		final HashMap all = new HashMap();
+		final HashSet systemSet = new HashSet();
 		for (Iterator i = registry.getDescriptorIterator(); i.hasNext();) {
 			final PluginDescriptor descr = (PluginDescriptor) i.next();
 			all.put(descr.getId(), descr);
+			if (descr.isSystemPlugin()) {
+				systemSet.add(descr.getId());
+			}
 		}
 		// Remove those plugin where some prerequisites do not exist
 		for (Iterator i = all.values().iterator(); i.hasNext();) {
@@ -181,6 +185,7 @@ public class DefaultPluginManager extends PluginManager {
 			if (!prerequisitesExist(descr, all)) {
 				BootLog.info("Skipping plugin " + descr.getId());
 				all.remove(descr.getId());
+				systemSet.remove(descr.getId());
 				i = all.values().iterator();
 			}
 		}
@@ -193,10 +198,11 @@ public class DefaultPluginManager extends PluginManager {
 			int additions = 0;
 			for (Iterator i = all.values().iterator(); i.hasNext();) {
 				final PluginDescriptor descr = (PluginDescriptor) i.next();
-				if (canAdd(descr, nameSet)) {
+				if (canAdd(descr, nameSet, systemSet)) {
 					list.add(descr);
 					nameSet.add(descr.getId());
 					all.remove(descr.getId());
+					systemSet.remove(descr.getId());
 					additions++;
 					i = all.values().iterator();
 				}
@@ -216,8 +222,13 @@ public class DefaultPluginManager extends PluginManager {
 	 * @param descr
 	 * @param nameSet
 	 */
-	private boolean canAdd(PluginDescriptor descr, HashSet nameSet) {
+	private boolean canAdd(PluginDescriptor descr, HashSet nameSet, HashSet systemSet) {
 		//Syslog.debug("Testing " + descr.getId());
+		if (!descr.isSystemPlugin()) {
+			if (!systemSet.isEmpty()) {
+				return false;
+			}
+		}
 		final PluginPrerequisite[] prereq = descr.getPrerequisites();
 		for (int i = 0; i < prereq.length; i++) {
 			final PluginPrerequisite pr = prereq[i];
