@@ -1,3 +1,6 @@
+/*
+ * $Id$
+ */
 package org.jnode.driver.net.lance;
 
 import java.io.PrintStream;
