@@ -1063,6 +1063,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     		L1AHelper.releaseRegister(eContext, tmpr);
     		
     		// Call classCastFailed
+    		os.writePUSH(refr);
     		invokeJavaMethod(context.getClassCastFailedMethod());
 
     		/* Normal exit */
@@ -1099,6 +1100,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     		L1AHelper.releaseRegister(eContext, tmpr);
     		
     		// Call SoftByteCodes.systemException
+    		os.writePUSH(refr);
     		invokeJavaMethod(context.getClassCastFailedMethod());
     		
     		/* Normal exit */
