@@ -8,6 +8,8 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import org.jnode.vm.classmgr.VmByteCode;
+import org.jnode.vm.classmgr.VmConstIMethodRef;
+import org.jnode.vm.classmgr.VmConstMethodRef;
 import org.jnode.vm.classmgr.VmInterpretedExceptionHandler;
 import org.jnode.vm.classmgr.VmMethod;
 
@@ -17,17 +19,12 @@ import org.jnode.vm.classmgr.VmMethod;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Madhu Siddalingaiah
  */
-public class BasicBlockFinder extends BytecodeVisitorSupport {
-
-	public static final byte F_START_OF_BASICBLOCK = 0x0001;
-	public static final byte F_START_OF_TRYBLOCK = 0x0002;
-	public static final byte F_START_OF_TRYBLOCKEND = 0x0004;
-	public static final byte F_START_OF_EXCEPTIONHANDLER = 0x0008;
-	public static final byte F_START_OF_INSTRUCTION = 0x0010;
+public class BasicBlockFinder extends BytecodeVisitorSupport implements BytecodeFlags {
 
 	private final ArrayList blocks = new ArrayList();
 	private byte[] opcodeFlags;
 	private boolean nextIsStartOfBB;
+	private int curAddress;
 
 	/**
 	 * Create all determined basic blocks
@@ -38,7 +35,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 		// Sort the blocks on start PC
 		Collections.sort(blocks, BasicBlockComparator.INSTANCE);
 		// Create the array
-		final BasicBlock[] list = (BasicBlock[])blocks.toArray(new BasicBlock[blocks.size()]);
+		final BasicBlock[] list = (BasicBlock[]) blocks.toArray(new BasicBlock[blocks.size()]);
 		// Set the EndPC's and flags
 		final byte[] opcodeFlags = this.opcodeFlags;
 		final int len = opcodeFlags.length;
@@ -68,6 +65,15 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	}
 
 	/**
+	 * Get the per-opcode bytecode flags.
+	 * 
+	 * @return byte[]
+	 */
+	public final byte[] getOpcodeFlags() {
+		return opcodeFlags;
+	}
+
+	/**
 	 * @param method
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#startMethod(org.jnode.vm.classmgr.VmMethod)
 	 */
@@ -92,6 +98,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_ifeq(int address) {
 		addBranch(address);
+		condYieldPoint(address);
 	}
 
 	/**
@@ -100,6 +107,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_ifne(int address) {
 		addBranch(address);
+		condYieldPoint(address);
 	}
 
 	/**
@@ -108,6 +116,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_iflt(int address) {
 		addBranch(address);
+		condYieldPoint(address);
 	}
 
 	/**
@@ -116,6 +125,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_ifge(int address) {
 		addBranch(address);
+		condYieldPoint(address);
 	}
 
 	/**
@@ -124,6 +134,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_ifgt(int address) {
 		addBranch(address);
+		condYieldPoint(address);
 	}
 
 	/**
@@ -132,6 +143,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_ifle(int address) {
 		addBranch(address);
+		condYieldPoint(address);
 	}
 
 	/**
@@ -140,6 +152,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_if_icmpeq(int address) {
 		addBranch(address);
+		condYieldPoint(address);
 	}
 
 	/**
@@ -148,6 +161,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_if_icmpne(int address) {
 		addBranch(address);
+		condYieldPoint(address);
 	}
 
 	/**
@@ -156,6 +170,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_if_icmplt(int address) {
 		addBranch(address);
+		condYieldPoint(address);
 	}
 
 	/**
@@ -164,6 +179,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_if_icmpge(int address) {
 		addBranch(address);
+		condYieldPoint(address);
 	}
 
 	/**
@@ -172,6 +188,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_if_icmpgt(int address) {
 		addBranch(address);
+		condYieldPoint(address);
 	}
 
 	/**
@@ -180,6 +197,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_if_icmple(int address) {
 		addBranch(address);
+		condYieldPoint(address);
 	}
 
 	/**
@@ -188,6 +206,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_if_acmpeq(int address) {
 		addBranch(address);
+		condYieldPoint(address);
 	}
 
 	/**
@@ -196,6 +215,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_if_acmpne(int address) {
 		addBranch(address);
+		condYieldPoint(address);
 	}
 
 	/**
@@ -204,6 +224,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_goto(int address) {
 		addBranch(address);
+		condYieldPoint(address);
 	}
 
 	/**
@@ -212,6 +233,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_jsr(int address) {
 		addBranch(address);
+		condYieldPoint(address);
 	}
 
 	/**
@@ -224,8 +246,10 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	public void visit_tableswitch(int defValue, int lowValue, int highValue, int[] addresses) {
 		for (int i = 0; i < addresses.length; i++) {
 			addBranch(addresses[i]);
+			condYieldPoint(addresses[i]);
 		}
 		addBranch(defValue);
+		condYieldPoint(defValue);
 	}
 
 	/**
@@ -237,8 +261,10 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	public void visit_lookupswitch(int defValue, int[] matchValues, int[] addresses) {
 		for (int i = 0; i < addresses.length; i++) {
 			addBranch(addresses[i]);
+			condYieldPoint(addresses[i]);
 		}
 		addBranch(defValue);
+		condYieldPoint(defValue);
 	}
 
 	/**
@@ -247,6 +273,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_ifnull(int address) {
 		addBranch(address);
+		condYieldPoint(address);
 	}
 
 	/**
@@ -255,6 +282,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 */
 	public void visit_ifnonnull(int address) {
 		addBranch(address);
+		condYieldPoint(address);
 	}
 
 	/**
@@ -315,6 +343,34 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	}
 
 	/**
+	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokeinterface(org.jnode.vm.classmgr.VmConstIMethodRef, int)
+	 */
+	public void visit_invokeinterface(VmConstIMethodRef methodRef, int count) {
+		yieldPoint();
+	}
+
+	/**
+	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokespecial(org.jnode.vm.classmgr.VmConstMethodRef)
+	 */
+	public void visit_invokespecial(VmConstMethodRef methodRef) {
+		yieldPoint();
+	}
+
+	/**
+	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokestatic(org.jnode.vm.classmgr.VmConstMethodRef)
+	 */
+	public void visit_invokestatic(VmConstMethodRef methodRef) {
+		yieldPoint();
+	}
+
+	/**
+	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_invokevirtual(org.jnode.vm.classmgr.VmConstMethodRef)
+	 */
+	public void visit_invokevirtual(VmConstMethodRef methodRef) {
+		yieldPoint();
+	}
+
+	/**
 	 * Add branching information (to the given target) to the basic blocks information.
 	 * 
 	 * @param target
@@ -336,6 +392,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#startInstruction(int)
 	 */
 	public void startInstruction(int address) {
+		curAddress = address;
 		super.startInstruction(address);
 		opcodeFlags[address] |= F_START_OF_INSTRUCTION;
 		if (nextIsStartOfBB) {
@@ -395,6 +452,22 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 	}
 
 	/**
+	 * Mark a yieldpoint.
+	 */
+	private final void yieldPoint() {
+		opcodeFlags[curAddress] |= F_YIELDPOINT;
+	}
+
+	/**
+	 * Mark a conditional yieldpoint.
+	 */
+	private final void condYieldPoint(int target) {
+		if (target < curAddress) {
+			opcodeFlags[curAddress] |= F_YIELDPOINT;
+		}
+	}
+
+	/**
 	 * Compare basic blocks on their start PC.
 	 * 
 	 * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -405,7 +478,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 		 * @param o1
 		 * @param o2
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 * @return int 
+		 * @return int
 		 */
 		public int compare(Object o1, Object o2) {
 			final int sp1 = ((BasicBlock) o1).getStartPC();
@@ -413,4 +486,5 @@ public class BasicBlockFinder extends BytecodeVisitorSupport {
 			return sp1 - sp2;
 		}
 	}
+
 }

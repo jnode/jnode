@@ -21,4 +21,9 @@ public abstract class CompilerBytecodeVisitor extends BytecodeVisitor {
 	 * The started basic block has finished.
 	 */
 	public abstract void endBasicBlock();
+	
+	/**
+	 * Emit a yieldpoint.
+	 */
+	public abstract void yieldPoint();
 }

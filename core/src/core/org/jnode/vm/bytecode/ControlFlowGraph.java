@@ -16,6 +16,7 @@ import org.jnode.vm.classmgr.VmByteCode;
  */
 public class ControlFlowGraph extends VmSystemObject {
 	
+	private final byte[] opcodeFlags;
 	private final BasicBlock[] bblocks;
 
 	/**
@@ -28,7 +29,7 @@ public class ControlFlowGraph extends VmSystemObject {
 		final BasicBlockFinder bbf = new BasicBlockFinder();
 		BytecodeParser.parse(bytecode, bbf);
 		this.bblocks = bbf.createBasicBlocks();
-		
+		this.opcodeFlags = bbf.getOpcodeFlags();
 	}
 	
 	/**
@@ -53,5 +54,26 @@ public class ControlFlowGraph extends VmSystemObject {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Is a given combination of opcode flags set for a given bytecode address.
+	 * @param address
+	 * @param flags
+	 * @return boolean
+	 * @see BytecodeFlags
+	 */
+	public final boolean isOpcodeFlagSet(int address, int flags) {
+		return ((opcodeFlags[address] & flags) == flags);
+	}
+
+	/**
+	 * Get the opcode flags set for a given bytecode address.
+	 * @param address
+	 * @return int
+	 * @see BytecodeFlags
+	 */
+	public final int getOpcodeFlags(int address) {
+		return opcodeFlags[address];
 	}
 }
