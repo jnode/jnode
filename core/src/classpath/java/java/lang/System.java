@@ -6,6 +6,7 @@ package java.lang;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Properties;
+import java.util.PropertyPermission;
 
 import org.jnode.vm.VmSystem;
 
@@ -17,6 +18,8 @@ public final class System {
 
 	private static SecurityManager sm;
 	private static Properties properties;
+
+  private static final String WRITE = "write";
 
 	/**
 	 * Initialize the default properties of the system
@@ -85,6 +88,25 @@ public final class System {
 		}
 		return properties.getProperty(key);
 	}
+
+
+  public static String setProperty(String key, String value) {
+    if (sm != null)
+    {
+      sm.checkPermission(new PropertyPermission(key,WRITE));
+    }
+
+    if (properties == null) {
+      initProperties();
+    }
+
+    final String oldvalue = properties.getProperty(key);
+
+    properties.setProperty(key,value);
+
+    return oldvalue;
+  }
+
 
 	public static String getProperty(String key, String def) {
 		if (sm != null) {
