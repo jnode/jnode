@@ -18,6 +18,8 @@ import org.jnode.vm.VmSystem;
 
 public class Throwable {
 
+    private static final int MAX_ELEMENTS = 8;
+    
 	private String detailMessage;
 	private Object[] backtrace;
 	private Throwable cause;
@@ -47,13 +49,17 @@ public class Throwable {
 			final Object[] st = this.backtrace;
 			if (st != null) {
 				final int cnt = st.length;
-				for (int i = 0; i < cnt; i++) {
+				final int max = Math.min(cnt, MAX_ELEMENTS);
+				for (int i = 0; i < max; i++) {
 					final Object o = st[i];
 					if (o != null) {
 						Unsafe.debug(o.toString());
 					} else {
 						Unsafe.debug("null");
 					}
+				}
+				if (cnt > max) {
+				    Unsafe.debug("...");
 				}
 			}
 		}
@@ -65,8 +71,9 @@ public class Throwable {
 		final Throwable cause = this.cause;
 		if (st != null) {
 			final int cnt = st.length;
+			final int max = Math.min(cnt, MAX_ELEMENTS);
 			s.print("Trace(" + cnt + "): ");
-			for (int i = 0; i < cnt; i++) {
+			for (int i = 0; i < max; i++) {
 				final Object ste = st[i];
 				if ((ste != null) && (ste instanceof char[])) {
 					s.print((char[]) ste);
@@ -74,6 +81,9 @@ public class Throwable {
 					s.print(ste);
 				}
 				s.println();
+			}
+			if (cnt > max) {
+			    s.println("...");
 			}
 		} else {
 			s.print("No stacktrace!");
@@ -90,8 +100,9 @@ public class Throwable {
 		final Throwable cause = this.cause;
 		if (st != null) {
 			final int cnt = st.length;
+			final int max = Math.min(cnt, MAX_ELEMENTS);
 			s.print("Trace(" + cnt + "): ");
-			for (int i = 0; i < cnt; i++) {
+			for (int i = 0; i < max; i++) {
 				final Object ste = st[i];
 				if ((ste != null) && (ste instanceof char[])) {
 					s.print((char[]) ste);
@@ -99,6 +110,9 @@ public class Throwable {
 					s.print(ste);
 				}
 				s.println();
+				if (cnt > max) {
+				    s.println("...");
+				}
 			}
 		} else {
 			s.print("No stacktrace!");

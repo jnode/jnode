@@ -101,14 +101,15 @@ public interface Console extends FocusListener {
 	 */
 	public void close();
 
-	public String getConsoleName();
-	
 	/**
 	 * returns the registered name for this console
 	 * 
 	 * @return registered name for this console
 	 */
-	public void setAcceleratorKeyCode(int keyCode); 
+	public String getConsoleName();
+	
+	public void setAcceleratorKeyCode(int keyCode);
+	
 	public int getAcceleratorKeyCode();
 
 }

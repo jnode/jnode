@@ -140,7 +140,7 @@ public class Signature {
 	 * @return int
 	 */
 	public static final int getArgSlotCount(String signature) {
-		int ofs = 0;
+		/*int ofs = 0;
 		final int len = signature.length();
 		if (signature.charAt(ofs++) != '(')
 			return 0;
@@ -186,7 +186,8 @@ public class Signature {
 			}
 		}
 		throw new RuntimeException(
-			"Invalid signature in getArgSlotCount: " + signature);
+			"Invalid signature in getArgSlotCount: " + signature);*/
+	    return getArgSlotCount(signature.toCharArray());
 	}
 
 	private VmType[] split(char[] signature, VmClassLoader loader)

@@ -82,8 +82,8 @@ vm_athrow_notrace_pop_eip:
 	and ecx,VmStackFrame_MAGIC_MASK
 	cmp ecx, VmStackFrame_MAGIC_COMPILED
 	je vm_athrow_deliver_compiled
-	cmp ecx, VmStackFrame_MAGIC_INTERPRETED
-	je vm_athrow_deliver_interpreted
+;	cmp ecx, VmStackFrame_MAGIC_INTERPRETED
+;	je vm_athrow_deliver_interpreted
 	jmp vm_athrow_unknown_magic
 	
 vm_athrow_deliver_compiled:
@@ -92,18 +92,18 @@ vm_athrow_deliver_compiled:
 	; Jump to the compiled exception handler
 	jmp ebx
 	
-vm_athrow_deliver_interpreted:
-	cmp ebx,VmSystem_RC_HANDLER
-	je vm_athrow_deliver_handler_interpreted
-	cmp ebx,VmSystem_RC_DEFHANDLER
-	je vm_athrow_deliver_default_handler_interpreted
-	jmp vm_athrow_unknown_rc
+;vm_athrow_deliver_interpreted:
+;	cmp ebx,VmSystem_RC_HANDLER
+;	je vm_athrow_deliver_handler_interpreted
+;	cmp ebx,VmSystem_RC_DEFHANDLER
+;	je vm_athrow_deliver_default_handler_interpreted
+;	jmp vm_athrow_unknown_rc
 
-vm_athrow_deliver_handler_interpreted:
-	jmp vmi_athrow_handler
+;vm_athrow_deliver_handler_interpreted:
+;	jmp vmi_athrow_handler
 	
-vm_athrow_deliver_default_handler_interpreted:
-	jmp vmi_default_handler
+;vm_athrow_deliver_default_handler_interpreted:
+;	jmp vmi_default_handler
 	
 vm_athrow_unhandled:
 	cli

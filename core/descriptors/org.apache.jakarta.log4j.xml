@@ -11,6 +11,7 @@
   <runtime>
     <library name="log4j.jar">
       <export name="org.apache.log4j.*"/>
+      <export name="org.apache.log4j.config.*"/>
       <export name="org.apache.log4j.helpers.*"/>
       <export name="org.apache.log4j.or.*"/>
       <export name="org.apache.log4j.spi.*"/>

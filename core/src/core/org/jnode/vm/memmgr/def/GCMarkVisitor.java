@@ -66,24 +66,39 @@ public class GCMarkVisitor extends ObjectVisitor implements ObjectFlags,
     public boolean visit(Object object) {
 
         // Be very paranoia for now
-        if (!heapManager.isObject(helper.addressOf(object))) {
-            Unsafe.debug("visit got non-object");
-            Unsafe.debug(helper.addressToLong(helper.addressOf(object)));
-            Unsafe.getCurrentProcessor().getArchitecture().getStackReader()
-                    .debugStackTrace();
-            helper.die("Internal error");
-            return false;
-        }
+        /*
+         * if (!heapManager.isObject(helper.addressOf(object))) {
+         * Unsafe.debug("visit got non-object");
+         * Unsafe.debug(helper.addressToLong(helper.addressOf(object)));
+         * Unsafe.getCurrentProcessor().getArchitecture().getStackReader()
+         * .debugStackTrace(); helper.die("Internal error"); return false;
+         */
 
         //testObject(object, Unsafe.getVmClass(object));
-
         // Check the current color first, since a stackoverflow of
         // the mark stack results in another iteration of visits.
         final int gcColor = helper.getObjectColor(object);
         if (gcColor == GC_BLACK) {
             return true;
         } else if (rootSet || (gcColor == GC_GREY)) {
-            helper.atomicChangeObjectColor(object, gcColor, GC_GREY);
+            switch (gcColor) {
+            case GC_WHITE:
+                {
+                    final boolean ok;
+                    ok = helper.atomicChangeObjectColor(object, gcColor,
+                            GC_GREY);
+                    if (!ok) {
+                        Unsafe.debug("Could not change object color. ");
+                    }
+                }
+                break;
+               case GC_GREY: break;
+               default: {
+                   Unsafe.debug("color");
+                   Unsafe.debug(gcColor);
+                   helper.die("Unknown GC color on object");
+               }
+            }
             stack.push(object);
             mark();
         }

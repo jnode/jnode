@@ -17,7 +17,8 @@ vm_jumpTable:
 	dd vm_patch_NOP
 	dd vm_athrow
 	dd vm_athrow_notrace
-	dd vm_interpreter
+	dd 0
 	dd vm_invoke_abstract
+	dd vm_invoke_method_after_recompile
 	
 	

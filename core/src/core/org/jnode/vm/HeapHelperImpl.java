@@ -253,4 +253,18 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
     public final void die(String msg) {
         Unsafe.die(msg);
     }
+	
+	/**
+	 * Block any yieldpoints on this processor.
+	 */
+	public void disableReschedule() {
+	    Unsafe.getCurrentProcessor().disableReschedule();
+	}
+	
+	/**
+	 * Unblock any yieldpoints on this processor.
+	 */
+	public void enableReschedule() {
+	    Unsafe.getCurrentProcessor().enableReschedule();
+	}
 }

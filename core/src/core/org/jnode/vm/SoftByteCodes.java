@@ -75,7 +75,7 @@ public class SoftByteCodes implements Uninterruptible {
 			result = fieldRef.getResolvedVmField();
 		} else {
 			VmType vmClass = fieldRef.getConstClass().getResolvedVmClass();
-			vmClass.prepare();
+			vmClass.link();
 			VmField field = vmClass.getField(fieldRef);
 			if (field == null) {
 				throw new NoSuchFieldError();
@@ -109,7 +109,7 @@ public class SoftByteCodes implements Uninterruptible {
 			return methodRef.getResolvedVmMethod();
 		} else {
 			VmType vmClass = methodRef.getConstClass().getResolvedVmClass();
-			vmClass.prepare();
+			vmClass.link();
 
 			// NEW
 			VmClassLoader curLoader = currentMethod.getDeclaringClass().getLoader();
@@ -165,7 +165,7 @@ public class SoftByteCodes implements Uninterruptible {
 	 * @throws PragmaUninterruptible
 	 */
 	public static Object allocObject(VmType vmClass, int size) throws PragmaUninterruptible {
-		vmClass.prepare();
+		vmClass.link();
 
 		//Screen.debug("ao cls{");
 		//Screen.debug(vmClass.getName());

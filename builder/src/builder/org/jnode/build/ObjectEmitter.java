@@ -75,7 +75,6 @@ public class ObjectEmitter {
 			} else {
 				debugWriter.println(obj);
 			}
-			debugWriter.println();
 		}
 
 		if (obj instanceof VmSystemObject) {
@@ -113,6 +112,10 @@ public class ObjectEmitter {
 			emitObject(cls, obj);
 		}
 		oInfo.markEnd();
+		
+		if (debugWriter != null) {
+		    debugWriter.println();
+		}
 	}
 
 	/**
@@ -274,7 +277,13 @@ public class ObjectEmitter {
 					} else {
 						os.write32(0);
 					}
+					if (debugWriter != null) {
+					    debugWriter.println(f.getName() + " transient: 0");
+					}
 				} else if (fType.isPrimitive()) {
+					if (debugWriter != null) {
+					    debugWriter.println(f.getName() + " " + f.get(obj));
+					}
 					if (fType == byte.class) {
 						os.write32(f.getByte(obj));
 					} else if (fType == boolean.class) {

@@ -17,7 +17,9 @@
       <export name="org.jnode.vm.x86.*"/>
       <export name="org.jnode.vm.x86.compiler.*"/>
       <export name="org.jnode.vm.x86.compiler.l0.*"/>
+      <export name="org.jnode.vm.x86.compiler.l0c.*"/>
       <export name="org.jnode.vm.x86.compiler.l1.*"/>
+      <export name="org.jnode.vm.x86.compiler.l2.*"/>
     </library>
   </runtime>
         

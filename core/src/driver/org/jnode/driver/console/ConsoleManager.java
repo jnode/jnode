@@ -15,7 +15,7 @@ public interface ConsoleManager {
 
 	/**
 	 * Gets the console with the given index
-	 * @param index
+	 * @param name
 	 * @return The console
 	 */
 	public Console getConsole(String name);

@@ -250,6 +250,15 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
 	}
 
 	/**
+	 * Gets the protocol addresses for a given name, or null if not found.
+	 * @param hostname
+	 * @return
+	 */
+    public ProtocolAddress[] getHostByName(String hostname) {
+        return null;
+    }
+
+	/**
 	 * Create and transmit an ARP request
 	 * @param address
 	 * @param myAddress

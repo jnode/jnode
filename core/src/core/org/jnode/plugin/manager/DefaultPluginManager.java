@@ -86,6 +86,7 @@ public class DefaultPluginManager extends PluginManager {
 				startPlugin(descr);
 
 			} catch (Throwable ex) {
+			    BootLog.error("Cannot start " + descr.getId(), ex);
 				errors.add(new StartError(ex, descr.getId()));
 			}
 		}
@@ -94,7 +95,8 @@ public class DefaultPluginManager extends PluginManager {
 		for (Iterator i = errors.iterator(); i.hasNext();) {
 			final StartError error = (StartError) i.next();
 			BootLog.error("Error starting plugin " + error.getPluginId(), error.getException());
-			//break;
+			try { Thread.sleep(10000); } catch (InterruptedException ex) {}
+			break;
 		}
 	}
 

@@ -56,14 +56,14 @@ public class SocketChannelImpl extends SocketChannel
   boolean connected = false;
   InetSocketAddress sa;
 
-  static native int SocketCreate();
-  static native int SocketConnect(int fd, InetAddress addr, int port);
-  static native int SocketBind(int fd, InetAddress addr, int port);
-  static native int SocketListen(int fd, int backlog);
-  static native int SocketAvailable(int fd);
-  static native int SocketClose(int fd);
-  static native int SocketRead(int fd, byte b[], int off, int len);
-  static native int SocketWrite(int fd, byte b[], int off, int len);
+  static int SocketCreate() { return -1; }
+  static int SocketConnect(int fd, InetAddress addr, int port) {return -1; }
+  static int SocketBind(int fd, InetAddress addr, int port) {return -1; }
+  static int SocketListen(int fd, int backlog) {return -1; }
+  static int SocketAvailable(int fd) {return -1; }
+  static int SocketClose(int fd) {return -1; }
+  static int SocketRead(int fd, byte b[], int off, int len) {return -1; }
+  static int SocketWrite(int fd, byte b[], int off, int len) {return -1; }
 
   public SocketChannelImpl(SelectorProvider provider)		      
   {

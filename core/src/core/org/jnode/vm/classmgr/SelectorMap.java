@@ -14,7 +14,7 @@ import org.jnode.vm.VmSystemObject;
  */
 public class SelectorMap extends VmSystemObject {
 
-	private final BootableHashMap map = new BootableHashMap();
+	private final BootableHashMap map = new BootableHashMap(8192);
 	private int lastSelector = 1;
 	
 	/**
@@ -24,7 +24,7 @@ public class SelectorMap extends VmSystemObject {
 	 * @return The global unique selector
 	 */
 	public int get(String name, String signature) {
-		final String id = name + "#" + signature;
+		final String id = name + '#' + signature;
 		final Integer selector = (Integer)map.get(id);
 		if (selector != null) {
 			return selector.intValue();
@@ -45,9 +45,9 @@ public class SelectorMap extends VmSystemObject {
 		if (selector != null) {
 			return selector.intValue();
 		} else {
-			selector = new Integer(++lastSelector);
-			map.put(id, selector);
-			return selector.intValue();
+		    final int sel = ++lastSelector;
+			map.put(id, new Integer(sel));
+			return sel;
 		}
 	}
 }

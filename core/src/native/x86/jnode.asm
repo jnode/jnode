@@ -40,19 +40,69 @@ kernel_begin:
 %include "mm.asm"
 %include "console.asm"
 %include "version.asm"
-%include "vmi-main.asm"
-%include "vmi-jumptable.asm"
-%include "vmi-int.asm"
-%include "vmi-long.asm"
-%include "vmi-float.asm"
-%include "vmi-double.asm"
-%include "vmi-object.asm"
-%include "vmi-array.asm"
-%include "vmi-invoke.asm"
-%include "vmi-field.asm"
-%include "vmi-jump.asm"
-%include "vmi-convert.asm"
-%include "vmi-general.asm"
+
+%define VMI_METHOD		dword [ebp+VmX86StackReader_METHOD_OFFSET]
+%define VMI_PC			dword [ebp+VmX86StackReader_PC_OFFSET]
+%define VMI_MAGIC		dword [ebp+VmX86StackReader_MAGIC_OFFSET]
+%define VMI_PREV_FRAME	 [ebp+VmX86StackReader_PREVIOUS_OFFSET]
+%define THREADSWITCHINDICATOR	dword[fs:VmProcessor_THREADSWITCHINDICATOR_OFFSET*4]
+%define CURRENTTHREAD			dword[fs:VmProcessor_CURRENTTHREAD_OFFSET*4]
+%define NEXTTHREAD				dword[fs:VmProcessor_NEXTTHREAD_OFFSET*4]
+%define STACKEND 				dword[fs:VmProcessor_STACKEND_OFFSET*4]
+%define VMI_SAVED_REGISTERSPACE	12
+
+; UnConditional yieldpoint from an interpreted method
+; Register EBX and ECX are used and are not saved here!
+%macro VMI_YIELDPOINT 0
+	; Is a switch required?
+	mov ecx,VMI_METHOD
+	mov ebx,THREADSWITCHINDICATOR
+	; Use the mask from the current method
+	and ebx,[ecx+VmMethod_THREADSWITCHINDICATORMASK_OFFSET*4]
+	cmp ebx,VmProcessor_TSI_SWITCH_REQUESTED
+	jne %%noYieldPoint
+	int 0x30
+%%noYieldPoint:
+%endmacro
+
+; UnConditional yieldpoint 
+%macro UNCOND_YIELDPOINT 0
+	; Is a switch required?
+	cmp THREADSWITCHINDICATOR,VmProcessor_TSI_SWITCH_REQUESTED
+	jne %%noYieldPoint
+	int 0x30
+%%noYieldPoint:
+%endmacro
+
+; Conditional yieldpoint, only when given register is negative,
+; a yieldpoint is triggered.
+%macro COND_VMI_YIELDPOINT 1
+	test %1,%1
+	jns %%done
+	VMI_YIELDPOINT
+%%done:
+%endmacro
+
+	extern SoftByteCodes_allocArray
+	extern SoftByteCodes_allocMultiArray
+	extern SoftByteCodes_allocObject
+	extern SoftByteCodes_allocPrimitiveArray
+	extern SoftByteCodes_anewarray
+	extern SoftByteCodes_arrayStoreWriteBarrier
+	extern SoftByteCodes_resolveField
+	extern SoftByteCodes_putfieldWriteBarrier
+	extern SoftByteCodes_putstaticWriteBarrier
+	extern SoftByteCodes_resolveClass
+	extern SoftByteCodes_resolveMethod
+	extern SoftByteCodes_unknownOpcode
+	extern MathSupport_ldiv
+	extern MathSupport_lrem
+
+; Invoke the method in EAX
+%macro INVOKE_JAVA_METHOD 0
+	call [eax+VmMethod_NATIVECODE_OFFSET*4]
+%endmacro
+
 %include "unsafe.asm"
 %include "unsafe-binop.asm"
 %include "unsafe-setmulti.asm"
@@ -60,6 +110,7 @@ kernel_begin:
 %include "vm.asm"
 %include "vm-invoke.asm"
 %include "vm-ints.asm"
+%include "vm-compile.asm"
 %include "vm-jumptable.asm"
 
 		align 4096

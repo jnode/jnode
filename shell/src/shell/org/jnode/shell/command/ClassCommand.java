@@ -9,7 +9,6 @@ import org.jnode.shell.help.ClassNameArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
-import org.jnode.vm.VmSystem;
 import org.jnode.vm.classmgr.VmType;
 
 /**
@@ -25,7 +24,8 @@ public class ClassCommand {
 		ParsedArguments cmdLine = HELP_INFO.parse(args);
 
 		String className = ARG_CLASS.getValue(cmdLine);
-		final VmType type = VmSystem.getSystemClassLoader().loadClass(className, true);
+		final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		final VmType type = cl.loadClass(className).getVmClass();
 		showClass(type, System.out);
 	}
 	
@@ -35,5 +35,6 @@ public class ClassCommand {
 		out.println("Is array    : " + type.isArray());
 		out.println("Is primitive: " + type.isPrimitive());
 		out.println("Is compiled : " + type.isCompiled());
+		out.println("Is valid    : " + !type.isInvalid());
 	}
 }

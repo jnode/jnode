@@ -27,7 +27,7 @@ public class NetPlugin extends Plugin {
 	/** The processor for the packet queue */
 	private QueueProcessorThread packetProcessorThread;
 	/** The NetAPI implementation */ 
-	private final VMNetAPI api = new NetAPIImpl();
+	private final VMNetAPI api;
 
 	/**
 	 * Create a new instance
@@ -35,6 +35,7 @@ public class NetPlugin extends Plugin {
 	public NetPlugin(PluginDescriptor descriptor) {
 		super(descriptor);
 		ptm = new DefaultNetworkLayerManager(descriptor.getExtensionPoint("networkLayers"));
+		api = new NetAPIImpl(ptm);
 		packetProcessorThread = new QueueProcessorThread("net-packet-processor", ptm.getQueue(), ptm);
 	}
 

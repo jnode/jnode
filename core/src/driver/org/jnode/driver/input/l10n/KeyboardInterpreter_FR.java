@@ -1,13 +1,14 @@
 /*
- * Created on Mar 1, 2003
  * $Id$
  */
 
 package org.jnode.driver.input.l10n;
-import org.jnode.driver.input.KeyboardInterpreter;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import org.jnode.driver.input.UnsupportedKeyException;
+
 import org.jnode.driver.input.DeadKeyException;
+import org.jnode.driver.input.KeyboardInterpreter;
+import org.jnode.driver.input.UnsupportedKeyException;
 
 
 /**
@@ -59,7 +60,7 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 					case 'a':
 						switch(lastDeadVK) {
 							case KeyEvent.VK_DEAD_CIRCUMFLEX:
-								if(lastFlags == KeyEvent.SHIFT_DOWN_MASK) {
+								if(lastFlags == InputEvent.SHIFT_DOWN_MASK) {
 									return 'ä';
 								} else {
 									return 'â';
@@ -70,7 +71,7 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 					case 'e':
 						switch(lastDeadVK) {
 							case KeyEvent.VK_DEAD_CIRCUMFLEX:
-								if(lastFlags == KeyEvent.SHIFT_DOWN_MASK) {
+								if(lastFlags == InputEvent.SHIFT_DOWN_MASK) {
 									return 'ë';
 								} else {
 									return 'ê';
@@ -81,7 +82,7 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 					case 'i':
 						switch(lastDeadVK) {
 							case KeyEvent.VK_DEAD_CIRCUMFLEX:
-								if(lastFlags == KeyEvent.SHIFT_DOWN_MASK) {
+								if(lastFlags == InputEvent.SHIFT_DOWN_MASK) {
 									return 'ï';
 								} else {
 									return 'î';
@@ -92,7 +93,7 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 					case 'o':
 						switch(lastDeadVK) {
 							case KeyEvent.VK_DEAD_CIRCUMFLEX:
-								if(lastFlags == KeyEvent.SHIFT_DOWN_MASK) {
+								if(lastFlags == InputEvent.SHIFT_DOWN_MASK) {
 									return 'ö';
 								} else {
 									return 'ô';
@@ -103,7 +104,7 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 					case 'u':
 						switch(lastDeadVK) {
 							case KeyEvent.VK_DEAD_CIRCUMFLEX:
-								if(lastFlags == KeyEvent.SHIFT_DOWN_MASK) {
+								if(lastFlags == InputEvent.SHIFT_DOWN_MASK) {
 									return 'ü';
 								} else {
 									return 'û';
@@ -114,7 +115,7 @@ public class KeyboardInterpreter_FR extends KeyboardInterpreter {
 					case 'y':
 						switch(lastDeadVK) {
 							case KeyEvent.VK_DEAD_CIRCUMFLEX:
-								if(lastFlags == KeyEvent.SHIFT_DOWN_MASK) {
+								if(lastFlags == InputEvent.SHIFT_DOWN_MASK) {
 									return 'ÿ';
 								} else {
 									throw new UnsupportedKeyException();

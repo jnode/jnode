@@ -46,6 +46,13 @@ public class X86StreamTest {
 		os.writeSBB(Register.EDX, 5);
 		os.writeSBB(Register.EDX, 305);
 		
+		final Label jt = new Label("Jumptable");
+		os.writeSHL(Register.ECX, 2);
+		os.writeJMP(jt, Register.ECX);
+		os.setObjectRef(jt);
+		os.write32(0x1234ABCD);
+		os.write32(0xFFEEDDCC);
+		
 		FileOutputStream fos = new FileOutputStream("test.bin");
 		os.writeTo(fos);
 		fos.close();

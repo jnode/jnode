@@ -11,6 +11,7 @@ import org.jnode.vm.MemoryBlockManager;
 import org.jnode.vm.Monitor;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmArchitecture;
+import org.jnode.vm.classmgr.ObjectFlags;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmClassType;
@@ -43,6 +44,7 @@ public final class DefaultHeapManager extends VmHeapManager {
 	/** The number of allocated bytes since the last GC trigger */
 	private int allocatedSinceGcTrigger;
 	private int triggerSize = Integer.MAX_VALUE;
+	private boolean gcActive;
 
 	/**
 	 * Make this private, so we cannot be instantiated
@@ -190,6 +192,16 @@ public final class DefaultHeapManager extends VmHeapManager {
 		if (size > DEFAULT_HEAP_SIZE) {
 			throw new OutOfMemoryError("Object too large (" + size + ")");
 		}
+		if (gcActive) {
+		    Unsafe.debug("allocObject(");
+		    Unsafe.debug(vmClass.getName());
+		    Unsafe.debug(", ");
+		    Unsafe.debug(size);
+		    Unsafe.debug(");");
+            Unsafe.getCurrentProcessor().getArchitecture().getStackReader()
+            .debugStackTrace();
+		    helper.die("allocObject during GC");
+		}
 	
 		// Make sure the class is initialized
 		vmClass.initialize();
@@ -220,6 +232,7 @@ public final class DefaultHeapManager extends VmHeapManager {
 						// in this allocation, then we're in real panic.
 						if (oomCount == 0) {
 							oomCount++;
+							Unsafe.debug("<oom/>");
 							gc();
 							heap = firstHeap;
 							currentHeap = firstHeap;
@@ -248,13 +261,14 @@ public final class DefaultHeapManager extends VmHeapManager {
 			vmClass.incInstanceCount();
 			lowOnMemory = false;
 			// Allocated objects are initially black.
-			//helper.unsafeSetObjectFlags(result, ObjectFlags.GC_BLACK);
+			helper.unsafeSetObjectFlags(result, ObjectFlags.GC_DEFAULT_COLOR);
 
 			allocatedSinceGcTrigger += alignedSize;
 			if ((allocatedSinceGcTrigger > triggerSize) && (gcThread != null)) {
 			    Unsafe.debug("<alloc:GC trigger/>");
 			    allocatedSinceGcTrigger = 0;
-			    //gcThread.trigger(false);
+			    gcThread.trigger(/*false*/true);
+				currentHeap = firstHeap;
 			}
 		} finally {
 			if (m != null) {
@@ -303,4 +317,18 @@ public final class DefaultHeapManager extends VmHeapManager {
 	final VmBootHeap getBootHeap() {
 		return this.bootHeap;
 	}
+	
+    /**
+     * @param gcActive The gcActive to set.
+     */
+    final void setGcActive(boolean gcActive) {
+        this.gcActive = gcActive;
+    }
+    
+    /**
+     * Sets the currentHeap to the first heap.
+     */
+    final void resetCurrentHeap() {
+        this.currentHeap = this.firstHeap;
+    }
 }

@@ -3,6 +3,7 @@
  */
 package org.jnode.net.ipv4;
 
+import java.net.InetAddress;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -52,6 +53,14 @@ public class IPv4ProtocolAddressInfo implements ProtocolAddressInfo {
 		return addresses.containsKey(address);
 	}
 
+	/**
+	 * Is the given address one of the addresses of this object?
+	 * @param address
+	 */
+	public boolean contains(InetAddress address) {
+	    return contains(new IPv4Address(address));
+	}
+	
 	/**
 	 * Is the given address one of the addresses of this object?
 	 * @param address
