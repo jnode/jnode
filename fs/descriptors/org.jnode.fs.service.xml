@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.fs.service" 
+        name="FS Service API"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.fs.service.*"/>
+    </library>
+  </runtime>
+        
+</plugin>

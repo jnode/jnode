@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.awt" 
+        name="JNode AWT Implementation"
+        version="@VERSION@"
+        provider-name="JNode.org"
+        class="org.jnode.awt.AWTPlugin">
+        
+  <requires>
+    <import plugin="org.classpath.awt"/>
+    <!-- import plugin="org.zaval.lw"/ -->
+    <import plugin="org.jnode.driver.video"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-gui.jar">
+      <export name="org.jnode.awt.*"/>
+      <export name="org.jnode.awt.font.*"/>
+      <export name="org.jnode.awt.geom.*"/>
+      <export name="org.jnode.awt.image.*"/>
+      <export name="org.jnode.awt.peer.*"/>
+      <export name="org.jnode.awt.util.*"/>
+    </library>
+  </runtime>
+
+</plugin>

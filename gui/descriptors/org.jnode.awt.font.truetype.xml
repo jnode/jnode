@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.awt.font.truetype" 
+        name="JNode AWT TrueType Font Provider"
+        version="@VERSION@"
+        provider-name="JNode.org"
+        class="org.jnode.awt.font.truetype.TTFPlugin">
+        
+  <requires>
+    <import plugin="org.jnode.awt.font"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-gui.jar">
+      <export name="org.jnode.awt.font.truetype.*"/>
+    </library>
+    <library name="jnode-fonts.jar">
+      <export name="*"/>
+    </library>
+  </runtime>
+
+  <extension-point id="fonts" name="JNode TrueType Font URLs"/>
+
+  <extension point="org.jnode.awt.font.providers">
+    <mapper class="org.jnode.awt.font.truetype.TTFontProvider"/>
+  </extension>
+        
+</plugin>

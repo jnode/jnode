@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.net.ne2k-pci" 
+        name="JNode NE2000 PCI driver(s)"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.driver"/>
+    <import plugin="org.jnode.driver.net.ethernet"/>
+    <import plugin="org.jnode.net"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-net.jar">
+      <export name="org.jnode.driver.net.ne2000.*"/>
+      <export name="org.jnode.driver.net.ne2000.pci.*"/>
+    </library>
+  </runtime>
+  
+  <extension point="org.jnode.driver.mappers">
+    <mapper class="org.jnode.driver.net.ne2000.pci.Ne2000PCIDeviceToDriverMapper"/>
+  </extension>
+        
+</plugin>
