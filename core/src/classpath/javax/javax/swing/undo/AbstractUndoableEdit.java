@@ -1,5 +1,5 @@
-/* AbstractTableModel.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+/* AbstractUndoableEdit.java
+   Copyright (C) 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,181 +35,289 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing.undo;
 
-// Imports
 import java.io.Serializable;
+import javax.swing.UIManager;
+
 
 /**
- * AbstractUndoableEdit
- * @author Andrew Selkirk
+ * A default implementation of <code>UndoableEdit</code> that can be
+ * used as a base for implementing editing operations.
+ *
+ * @author Andrew Selkirk (aselkirk@sympatico.ca)
+ * @author Sascha Brawer (brawer@dandelis.ch)
  */
-public class AbstractUndoableEdit extends Object
+public class AbstractUndoableEdit
   implements UndoableEdit, Serializable
 {
+  /**
+   * The serialization ID.  Verified using the <code>serialver</code>
+   * tool of Apple/Sun JDK 1.3.1 on MacOS X 10.1.5, and Sun JDK
+   * 1.4.1_01 on GNU/Linux.
+   */
   static final long serialVersionUID = 580150227676302096L;
 
-	//-------------------------------------------------------------
-	// Constants --------------------------------------------------
-	//-------------------------------------------------------------
 
-	/**
-	 * String returned by getRedoPresentationName()
-	 */
-	protected static	String	RedoName	= "Redo";
-
-	/**
-	 * String returned by getUndoPresentationName()
-	 */
-	protected static	String	UndoName	= "Undo";
+  /**
+   * The constant string &#x201c;Undo&#x201d;, which was returned by
+   * {@link #getUndoPresentationName()} on early versions of the
+   * platform. However, this field has become obsolete with version
+   * 1.3.1.  That method now retrieves a localized string from the
+   * {@link javax.swing.UIManager}, using the key
+   * <code>&#x201c;AbstractUndoableEdit.undoText&#x201d;</code>.
+   */
+  protected static final String UndoName = "Undo";
 
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * TODO
-	 */
-	private 			boolean	hasBeenDone	= false;
-
-	/**
-	 * The edit is alive
-	 */
-	private				boolean	alive 		= true;
+  /**
+   * The constant string &#x201c;Redo&#x201d;, which was returned by
+   * {@link #getRedoPresentationName()} on early versions of the
+   * platform. However, this field has become obsolete with version
+   * 1.3.1.  That method now retrieves a localized string from the
+   * {@link javax.swing.UIManager}, using the key
+   * <code>&#x201c;AbstractUndoableEdit.redoText&#x201d;</code>.
+   */
+  protected static final String RedoName = "Redo";
 
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Create new AbstractUndoableEdit
-	 */
-	public AbstractUndoableEdit() {
-	} // AbstractUndoableEdit()
-
-
-	//-------------------------------------------------------------
-	// Interface: UndoableEdit ------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * addEdit
-	 * @param anEdit TODO
-	 * @returns TODO
-	 */
-	public boolean addEdit(UndoableEdit anEdit) {
-		return false;
-	} // addEdit()
-
-	/**
-	 * canRedo()
-	 * @returns true if redoable, false otherwise
-	 */
-	public boolean canRedo() {
-		if (alive == true && hasBeenDone == false) {
-			return true;
-		} // if
-		return false;
-	} // canRedo()
-
-	/**
-	 * canUndo()
-	 * @returns true if undoable, false otherwise
-	 */
-	public boolean canUndo() {
-		if (alive == true && hasBeenDone == true) {
-			return true;
-		} // if
-		return false;
-	} // canUndo()
-
-	/**
-	 * die
-	 */
-	public void die() {
-		alive = false;
-	} // die()
-
-	/**
-	 * getPresentation
-	 * @returns TODO
-	 */
-	public String getPresentationName() {
-		return "";
-	} // getPresentationName()
-
-	/**
-	 * getRedoPresentationName
-	 * @returns TODO
-	 */
-	public String getRedoPresentationName()	{
-		if (getPresentationName().equals("") == true) {
-			return RedoName;
-		} else {
-			return RedoName + " " + getPresentationName();
-		}
-	} // getRedoPresentationName()
-
-	/**
-	 * getUndoPresentationName
-	 * @returns TODO
-	 */
-	public String getUndoPresentationName()	{
-		if (getPresentationName().equals("") == true) {
-			return UndoName;
-		} else {
-			return UndoName + " " + getPresentationName();
-		}
-	} // getUndoPresentationName()
-
-	/**
-	 * isSignificant
-	 * @returns true
-	 */
-	public boolean isSignificant() {
-		return true;
-	} // isSignificant()
-
-	/**
-	 * redo
-	 * @throws CannotRedoException TODO
-	 */
-	public void redo() throws CannotRedoException {
-		if (canRedo() == false) {
-			throw new CannotRedoException();
-		}
-		hasBeenDone = true;
-	} // redo()
-
-	/**
-	 * replaceEdit
-	 * @param anEdit TODO
-	 * @returns TODO
-	 */
-	public boolean replaceEdit(UndoableEdit anEdit) {
-		return false;
-	} // replaceEdit()
-
-	/**
-	 * String representation
-	 * @returns String representation
-	 */
-	public String toString() {
-		return null; // TODO
-	} // toString()
-
-	/**
-	 * undo
-	 * @throws CannotUndoException TODO
-	 */
-	public void undo() throws CannotUndoException {
-		if (canUndo() == false) {
-			throw new CannotUndoException();
-		}
-		hasBeenDone = false;
-	} // undo()
+  /**
+   * Indicates whether this editing action has been executed.  A value
+   * of <code>true</code> means that the action was performed, or that
+   * a redo operation was successful. A value of <code>false</code>
+   * means that the action has not yet performed, or that an undo
+   * operation was successful.
+   */
+  private boolean hasBeenDone;
 
 
-} // AbstractUndoableEdit
+  /**
+   * Indicates whether this editing action is still alive. The value
+   * is set to <code>true</code> by the constructor, and to
+   * <code>false</code> by the {@link #die()} method.
+   */
+  private boolean alive;
+
+
+  /**
+   * Constructs a new <code>AbstractUndoableEdit</code>. The initial
+   * state is that the editing action is alive, and
+   * <code>hasBeenDone</code> is <code>true</code>.
+   */
+  public AbstractUndoableEdit()
+  {
+    // The API specification is not clear, but Mauve test code has
+    // determined that hasBeenDone is initially set to true.
+    alive = hasBeenDone = true;
+  }
+
+
+  /**
+   * Undoes this editing action.
+   *
+   * @throws CannotUndoException if {@link #canUndo()} returns
+   * <code>false</code>, for example because this action has already
+   * been undone.
+   *
+   * @see #canUndo()
+   * @see #redo()
+   */
+  public void undo()
+    throws CannotUndoException
+  {
+    if (!canUndo())
+      throw new CannotUndoException();
+    hasBeenDone = false;
+  }
+  
+  
+  /**
+   * Determines whether it would be possible to undo this editing
+   * action.
+   *
+   * @return <code>true</code> to indicate that this action can be
+   * undone, <code>false</code> otherwise.
+   *
+   * @see #undo()
+   * @see #canRedo()
+   */
+  public boolean canUndo()
+  {
+    return alive && hasBeenDone;
+  }
+  
+  
+  /**
+   * Redoes this editing action.
+   *
+   * @throws CannotRedoException if {@link #canRedo()} returns
+   * <code>false</code>, for example because this action has not
+   * yet been undone.
+   *
+   * @see #canRedo()
+   * @see #undo()
+   */
+  public void redo()
+    throws CannotRedoException
+  {
+    if (!canRedo())
+      throw new CannotRedoException();
+    hasBeenDone = true;
+  }
+  
+  
+  /**
+   * Determines whether it would be possible to redo this editing
+   * action.
+   *
+   * @return <code>true</code> to indicate that this action can be
+   * redone, <code>false</code> otherwise.
+   *
+   * @see #redo()
+   * @see #canUndo()
+   */
+  public boolean canRedo()
+  {
+    return alive && !hasBeenDone;
+  }
+
+
+  /**
+   * Informs this edit action that it will no longer be used. Some
+   * actions might use this information to release resources, for
+   * example open files.  Called by {@link UndoManager} before this
+   * action is removed from the edit queue.
+   */
+  public void die()
+  {
+    alive = false;
+  }
+
+
+  /**
+   * Incorporates another editing action into this one, thus forming a
+   * combined action.
+   *
+   * <p>The default implementation always returns <code>false</code>,
+   * indicating that the editing action could not be incorporated.
+   *
+   * @param edit the editing action to be incorporated.
+   */
+  public boolean addEdit(UndoableEdit edit)
+  {
+    return false;
+  }
+  
+  
+  /**
+   * Incorporates another editing action into this one, thus forming a
+   * combined action that replaces the argument action.
+   *
+   * <p>The default implementation always returns <code>false</code>,
+   * indicating that the argument action should not be replaced.
+   *
+   * @param edit the editing action to be replaced.
+   */
+  public boolean replaceEdit(UndoableEdit edit)
+  {
+    return false;
+  }
+  
+  
+  /**
+   * Determines whether this editing action is significant enough for
+   * being seperately undoable by the user. A typical significant
+   * action would be the resizing of an object. However, changing the
+   * selection in a text document would usually not be considered
+   * significant.
+   *
+   * <p>The default implementation returns <code>true</code>.
+   *
+   * @return <code>true</code> to indicate that the action is
+   * significant enough for being separately undoable, or
+   * <code>false</code> otherwise.
+   */
+  public boolean isSignificant()
+  {
+    return true;
+  }
+  
+  
+  /**
+   * Returns a human-readable, localized name that describes this
+   * editing action and can be displayed to the user.
+   *
+   * <p>The default implementation returns an empty string.
+   */
+  public String getPresentationName()
+  {
+    return "";
+  }
+
+
+  /**
+   * Calculates a localized name for presenting the undo action to the
+   * user.
+   *
+   * <p>The default implementation returns the concatenation of the
+   * string &#x201c;Undo&#x201d; and the action name, which is
+   * determined by calling {@link #getPresentationName()}.
+   *
+   * <p>The string &#x201c;Undo&#x201d; is retrieved from the {@link
+   * javax.swing.UIManager}, using the key
+   * <code>&#x201c;AbstractUndoableEdit.undoText&#x201d;</code>.  This
+   * allows the text to be localized.
+   */
+  public String getUndoPresentationName()
+  {
+    String msg, pres;
+
+    msg = UIManager.getString("AbstractUndoableEdit.undoText");
+    if (msg == null)
+      msg = UndoName;
+
+    pres = getPresentationName();
+    if ((pres == null) || (pres.length() == 0))
+      return msg;
+    else
+      return msg + ' ' + pres;
+  }
+
+
+  /**
+   * Calculates a localized name for presenting the redo action to the
+   * user.
+   *
+   * <p>The default implementation returns the concatenation of the
+   * string &#x201c;Redo&#x201d; and the action name, which is
+   * determined by calling {@link #getPresentationName()}.
+   *
+   * <p>The string &#x201c;Redo&#x201d; is retrieved from the {@link
+   * javax.swing.UIManager}, using the key
+   * <code>&#x201c;AbstractUndoableEdit.redoText&#x201d;</code>.  This
+   * allows the text to be localized.
+   */
+  public String getRedoPresentationName()
+  {
+    String msg, pres;
+
+    msg = UIManager.getString("AbstractUndoableEdit.redoText");
+    if (msg == null)
+      msg = RedoName;
+
+    pres = getPresentationName();
+    if ((pres == null) || (pres.length() == 0))
+      return msg;
+    else
+      return msg + ' ' + pres;
+  }
+
+
+  public String toString()
+  {
+    return super.toString()
+      + " hasBeenDone: " + hasBeenDone
+      + " alive: " + alive;
+  }
+}

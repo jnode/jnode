@@ -35,18 +35,27 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing.tree;
 
-// Imports
-import java.awt.*;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import javax.swing.Icon;
+import javax.swing.JLabel;
+import javax.swing.JTree;
 
 /**
  * DefaultTreeCellRenderer
  * @author Andrew Selkirk
  */
-public class DefaultTreeCellRenderer extends JLabel implements TreeCellRenderer {
-
+public class DefaultTreeCellRenderer
+  extends JLabel
+  implements TreeCellRenderer
+{
 	//-------------------------------------------------------------
 	// Variables --------------------------------------------------
 	//-------------------------------------------------------------

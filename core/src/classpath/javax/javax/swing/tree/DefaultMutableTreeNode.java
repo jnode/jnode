@@ -35,11 +35,18 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing.tree;
 
-// Imports
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Random;
+import java.util.Stack;
+import java.util.Vector;
 
 /**
  * DefaultMutableTreeNode
@@ -504,7 +511,6 @@ public class DefaultMutableTreeNode
 	public static void growTree(DefaultMutableTreeNode root) {
 
 		// Variables
-		int						size;
 		int						index;
 		DefaultMutableTreeNode	node;
 		DefaultMutableTreeNode	current;
@@ -619,7 +625,6 @@ public class DefaultMutableTreeNode
 		// Variables
 		TreeNode[]	path;
 		Object[]	object;
-		int			size;
 		int			index;
 
 		// Get Path for Tree Nodes
@@ -732,7 +737,6 @@ public class DefaultMutableTreeNode
 
 		// Variables
 		TreeNode	current;
-		int			index;
 
 		// Sanity Check
 		if (node == null) {
@@ -833,9 +837,6 @@ public class DefaultMutableTreeNode
 	 * @returns boolean
 	 */
 	public boolean isNodeSibling(TreeNode node) {
-
-		// Variables
-		int			index;
 
 		// Check for null
 		if (node == null) {
@@ -996,17 +997,17 @@ public class DefaultMutableTreeNode
 	public int getLeafCount() {
 
 		// Variables
-		Enumeration	e;
+		Enumeration	enum;
 		int			count;
 		TreeNode	current;
 
 		// Get Enumeration of all descendants
-		e = depthFirstEnumeration();
+		enum = depthFirstEnumeration();
 
 		// Process Nodes
 		count = 0;
-		while (e.hasMoreElements() == true) {
-			current = (TreeNode) e.nextElement();
+		while (enum.hasMoreElements() == true) {
+			current = (TreeNode) enum.nextElement();
 			if (current.isLeaf() == true) {
 				count++;
 			} // if
