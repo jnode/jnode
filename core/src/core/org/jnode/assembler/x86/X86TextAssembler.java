@@ -43,7 +43,7 @@ import org.jnode.vm.x86.X86CpuID;
  * Debug version of AbstractX86Stream.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
- * @author Levente Santha
+ * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public class X86TextAssembler extends X86Assembler implements X86Operation {
     class ObjectInfoImpl extends NativeStream.ObjectInfo {
