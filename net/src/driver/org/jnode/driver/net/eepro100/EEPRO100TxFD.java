@@ -54,7 +54,6 @@ public class EEPRO100TxFD {
         //this.firstFrameAddress = Address.add(memAddr, firstFrameOffset);
     }
 
-
     /**
      * Gets the address of the first DPD in this buffer.
      */
@@ -69,23 +68,44 @@ public class EEPRO100TxFD {
     final void setStatus(int value) {
         mem.setInt(0, value);
     }
-    
+
+    final int getLink() {
+        return mem.getInt(4);
+    }
+
+    final void setLink(int value) {
+        mem.setInt(4, value);
+    }
+
+    final void setDescriptorAddress(int value) {
+        mem.setInt(8, value);
+    }
+
+    final int getCount() {
+        return mem.getInt(12);
+    }
+
+    final void setCount(int value) {
+        mem.setInt(12, value);
+    }
+
     int getBufferAddress() {
-		return this.bufferAddress;
-	}
-    
+        return this.bufferAddress;
+    }
+
     void bufferAddress0(int address) {
-		mem.setInt(16, address);
-	}
+        mem.setInt(16, address);
+    }
 
+    void bufferSize0(int size) {
+        mem.setInt(20, size);
+    }
 
-	/**
-	 *  Description of the Method
-	 *
-	 *@param  size  Description of the Parameter
-	 */
-	void bufferSize0(int size) {
-		mem.setInt(20, size);
-	}
+    //  put paramater array into the cmd buffer
+    void setParams(byte[] p) {
+        for (int i = 0; i < p.length; i++) {
+           mem.setShort(i + 8, p[i]);
+        }
+    }
 
 }

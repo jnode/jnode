@@ -20,10 +20,7 @@ public interface EEPRO100Constants {
 
     /* Actual number of TX packets queued, must be <= TX_RING_SIZE-2. */
     final static int TX_QUEUE_LIMIT = 12;
-    final static int TX_QUEUE_UNFULL = 8; /*
-                                           * Hysteresis marking queue as no
-                                           * longer full.
-                                           */
+    final static int TX_QUEUE_UNFULL = 8;
 
     /* Time in jiffies before concluding the transmitter is hung. */
     final static int HZ = 1000;
@@ -40,6 +37,32 @@ public interface EEPRO100Constants {
     final static int S80C24 = 6;
     final static int I82555 = 7;
     final static int DP83840A = 10;
+
+    /*
+     * The parameters for a CmdConfigure operation. There are so many options
+     * that it would be difficult to document each bit. We mostly use the
+     * default or recommended settings.
+     */
+    final static byte i82557ConfigCmd[] = { 22, 0x08, 0, 0, 0, 0, 0x32, 0x03, 1, /*
+                                                                     * 1=Use MII
+                                                                     * 0=Use AUI
+                                                                     */
+    0, 0x2E, 0, 0x60, 0, (byte) 0xf2, 0x48, 0, 0x40, (byte) 0xf2, (byte) 0x80, /*
+                                                                                * 0x40=Force
+                                                                                * full-duplex
+                                                                                */
+    0x3f, 0x05};
+    final static byte i82558ConfigCmd[] = { 22, 0x08, 0, 1, 0, 0, (byte) 0x22, 0x03, 1, /*
+                                                                            * 1=Use
+                                                                            * MII
+                                                                            * 0=Use
+                                                                            * AUI
+                                                                            */
+    0, 0x2E, 0, 0x60, 0x8, (byte) 0x88, 0x68, 0, 0x40, (byte) 0xf2, (byte) 0x84, /*
+                                                                                  * 0xBD->0xFD=Force
+                                                                                  * full-duplex
+                                                                                  */
+    0x31, 0x05};
 
     /* EEPROM_Ctrl bits. */
     final static int EE_SHIFT_CLK = 0x01; /* EEPROM shift clock. */
@@ -113,16 +136,16 @@ public interface EEPRO100Constants {
     final static int PortSelfTest = 1;
     final static int PortPartialReset = 2;
     final static int PortDump = 3;
-    
+
     final static int RxComplete = 0x8000;
     final static int RxOK = 0x2000;
-	final static int RxErrCRC = 0x0800;
-	final static int RxErrAlign = 0x0400; 
-	final static int RxErrTooBig = 0x0200; 
-	final static int RxErrSymbol = 0x0010;
-	final static int RxEth2Type = 0x0020;
-	final static int RxNoMatch = 0x0004;
-	final static int RxNoIAMatch = 0x0002;
-    final static int TxUnderrun = 0x1000; 
+    final static int RxErrCRC = 0x0800;
+    final static int RxErrAlign = 0x0400;
+    final static int RxErrTooBig = 0x0200;
+    final static int RxErrSymbol = 0x0010;
+    final static int RxEth2Type = 0x0020;
+    final static int RxNoMatch = 0x0004;
+    final static int RxNoIAMatch = 0x0002;
+    final static int TxUnderrun = 0x1000;
     final static int StatusComplete = 0x8000;
 }

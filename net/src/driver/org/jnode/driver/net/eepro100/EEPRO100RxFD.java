@@ -81,4 +81,14 @@ public class EEPRO100RxFD {
     public int getBufferAddress() {
         return bufferAddress;
     }
+    
+    /**
+     * 
+     * @return
+     */
+    public byte[] getDataBuffer() {
+		byte[] buf = new byte[DataBufferSize];
+		mem.getBytes(bufferAddress, buf, 0, buf.length);
+		return buf;
+	}
 }
