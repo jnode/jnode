@@ -179,7 +179,6 @@ public final class ClassDecoder {
 				final int idx = cp.getInt(i);
 				final VmConstClass constClass = new VmConstClass(cp
 						.getUTF8(idx));
-				constClass.link(cp);
 				cp.setConstClass(i, constClass);
 				break;
 			}
@@ -189,7 +188,6 @@ public final class ClassDecoder {
 				final int staticsIdx = statics.allocConstantStringField(cp
 						.getUTF8(idx));
 				final VmConstString constStr = new VmConstString(staticsIdx);
-				constStr.link(cp);
 				cp.setString(i, constStr);
 				break;
 			}

@@ -42,8 +42,4 @@ public abstract class VmConstObject extends VmSystemObject implements Uninterrup
 	 * @param clc
 	 */
 	protected abstract void doResolve(VmClassLoader clc);
-	
-	void link(VmCP cp) {
-		// Override when needed
-	}
 }
