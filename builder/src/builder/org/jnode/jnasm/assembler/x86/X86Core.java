@@ -112,10 +112,17 @@ public class X86Core extends AssemblerModule {
     public static final int ADD_ISN = ADC_ISN + 1;
     public static final int AND_ISN = ADD_ISN + 1;
     public static final int CALL_ISN = AND_ISN + 1;
-    public static final int CMP_ISN = CALL_ISN + 1;
-    public static final int DEC_ISN = CMP_ISN + 1;
-    public static final int INC_ISN = DEC_ISN + 1;
-    public static final int JA_ISN = INC_ISN + 1;
+    public static final int CLD_ISN = CALL_ISN + 1;
+    public static final int CLI_ISN = CLD_ISN + 1;
+    public static final int CLTS_ISN = CLI_ISN + 1;
+    public static final int CMP_ISN = CLTS_ISN + 1;
+    public static final int CPUID_ISN = CMP_ISN + 1;
+    public static final int DEC_ISN = CPUID_ISN + 1;
+    public static final int HLT_ISN = DEC_ISN + 1;
+    public static final int INC_ISN = HLT_ISN + 1;
+    public static final int INT_ISN = INC_ISN + 1;
+    public static final int IRET_ISN = INT_ISN + 1;
+    public static final int JA_ISN = IRET_ISN + 1;
     public static final int JAE_ISN = JA_ISN + 1;
     public static final int JB_ISN = JAE_ISN + 1;
     public static final int JE_ISN = JB_ISN + 1;
@@ -133,12 +140,16 @@ public class X86Core extends AssemblerModule {
     public static final int OR_ISN = NOP_ISN + 1;
     public static final int POP_ISN = OR_ISN + 1;
     public static final int POPA_ISN = POP_ISN + 1;
-    public static final int PUSH_ISN = POPA_ISN + 1;
+    public static final int POPF_ISN = POPA_ISN + 1;
+    public static final int PUSH_ISN = POPF_ISN + 1;
     public static final int PUSHA_ISN = PUSH_ISN + 1;
-    public static final int RET_ISN = PUSHA_ISN + 1;
+    public static final int PUSHF_ISN = PUSHA_ISN + 1;
+    public static final int RET_ISN = PUSHF_ISN + 1;
     public static final int SHL_ISN = RET_ISN + 1;
     public static final int SHR_ISN = SHL_ISN + 1;
-    public static final int SUB_ISN = SHR_ISN + 1;
+    public static final int STD_ISN = SHR_ISN + 1;
+    public static final int STI_ISN = STD_ISN + 1;
+    public static final int SUB_ISN = STI_ISN + 1;
     public static final int TEST_ISN = SUB_ISN + 1;
     public static final int XCHG_ISN = TEST_ISN + 1;
     public static final int XOR_ISN = XCHG_ISN + 1;
@@ -187,14 +198,35 @@ public class X86Core extends AssemblerModule {
             case CALL_ISN:
                 emmitCALL();
                 break;
+            case CLD_ISN:
+                emmitCLD();
+                break;
+            case CLI_ISN:
+                emmitCLI();
+                break;
+            case CLTS_ISN:
+                emmitCLTS();
+                break;
             case CMP_ISN:
                 emmitCMP();
+                break;
+            case CPUID_ISN:
+                emmitCPUID();
                 break;
             case DEC_ISN:
                 emmitDEC();
                 break;
+            case HLT_ISN:
+                emmitHLT();
+                break;
             case INC_ISN:
                 emmitINC();
+                break;
+            case INT_ISN:
+                emmitINT();
+                break;
+            case IRET_ISN:
+                emmitIRET();
                 break;
             case JA_ISN:
                 emmitJCC(X86Assembler.JA);
@@ -248,11 +280,17 @@ public class X86Core extends AssemblerModule {
             case POPA_ISN:
                 emmitPOPA();
                 break;
+            case POPF_ISN:
+                emmitPOPF();
+                break;
             case PUSH_ISN:
                 emmitPUSH();
                 break;
             case PUSHA_ISN:
                 emmitPUSHA();
+                break;
+            case PUSHF_ISN:
+                emmitPUSHF();
                 break;
             case RET_ISN:
                 emmitRET();
@@ -262,6 +300,12 @@ public class X86Core extends AssemblerModule {
                 break;
             case SHR_ISN:
                 emmitSHR();
+                break;
+            case STD_ISN:
+                emmitSTD();
+                break;
+            case STI_ISN:
+                emmitSTI();
                 break;
             case SUB_ISN:
                 emmitSUB();
@@ -282,7 +326,7 @@ public class X86Core extends AssemblerModule {
         return true;
     }
 
-    private void emmitADC() {
+    private final void emmitADC() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -308,7 +352,7 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitADD() {
+    private final void emmitADD() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -334,7 +378,7 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitAND() {
+    private final void emmitAND() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -360,7 +404,7 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitCALL() {
+    private final void emmitCALL() {
         Object o1 = operands.get(0);
         if (o1 instanceof Token) {
             Token t1 = (Token) o1;
@@ -376,7 +420,19 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitCMP() {
+    private final void emmitCLD() {
+        stream.writeCLD();
+    }
+
+    private final void emmitCLI() {
+        stream.writeCLI();
+    }
+
+    private final void emmitCLTS() {
+        stream.writeCLTS();
+    }
+
+    private final void emmitCMP() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -410,7 +466,11 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitDEC() {
+    private final void emmitCPUID() {
+        stream.writeCPUID();
+    }
+
+    private final void emmitDEC() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case R_ADDR:
@@ -425,7 +485,11 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitINC() {
+    private final void emmitHLT() {
+        stream.writeHLT();
+    }
+
+    private final void emmitINC() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case R_ADDR:
@@ -440,7 +504,22 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitJMP() {
+    private final void emmitINT() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case C_ADDR:
+                stream.writeINT(getInt(0));
+                break;
+            default:
+                reportAddressingError(INT_ISN, addr);
+        }
+    }
+
+    private final void emmitIRET() {
+        stream.writeIRET();
+    }
+
+    private final void emmitJMP() {
         Object o1 = operands.get(0);
         if (o1 instanceof Token) {
             Token t1 = (Token) o1;
@@ -456,7 +535,7 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitJCC(int jumpCode) {
+    private final void emmitJCC(int jumpCode) {
         Object o1 = operands.get(0);
         if (o1 instanceof Token) {
             Token t1 = (Token) o1;
@@ -472,7 +551,7 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitLEA() {
+    private final void emmitLEA() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RE_ADDR:
@@ -484,7 +563,7 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitLOOP() {
+    private final void emmitLOOP() {
         Object o1 = operands.get(0);
         if (o1 instanceof Token) {
             Token t1 = (Token) o1;
@@ -504,7 +583,7 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitMOV() {
+    private final void emmitMOV() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -540,7 +619,7 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitNEG() {
+    private final void emmitNEG() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case R_ADDR:
@@ -555,11 +634,11 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitNOP() {
+    private final void emmitNOP() {
         stream.writeNOP();
     }
 
-    private void emmitOR() {
+    private final void emmitOR() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -585,7 +664,7 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitPOP() {
+    private final void emmitPOP() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case R_ADDR:
@@ -600,11 +679,15 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitPOPA() {
+    private final void emmitPOPA() {
         stream.writePOPA();
     }
 
-    private void emmitPUSH() {
+    private final void emmitPOPF() {
+        stream.writePOPF();
+    }
+
+    private final void emmitPUSH() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case C_ADDR:
@@ -622,11 +705,15 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitPUSHA() {
+    private final void emmitPUSHA() {
         stream.writePUSHA();
     }
 
-    private void emmitRET() {
+    private final void emmitPUSHF() {
+        stream.writePUSHF();
+    }
+
+    private final void emmitRET() {
         int addr = getAddressingMode(1);
         switch (addr) {
             case N_ADDR:
@@ -640,7 +727,7 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitSHL() {
+    private final void emmitSHL() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RC_ADDR:
@@ -655,7 +742,7 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitSHR() {
+    private final void emmitSHR() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RC_ADDR:
@@ -670,7 +757,15 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitSUB() {
+    private final void emmitSTD() {
+        stream.writeSTD();
+    }
+
+    private final void emmitSTI() {
+        stream.writeSTI();
+    }
+
+    private final void emmitSUB() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -696,7 +791,7 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitTEST() {
+    private final void emmitTEST() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -714,7 +809,7 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitXCHG() {
+    private final void emmitXCHG() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -729,7 +824,7 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void emmitXOR() {
+    private final void emmitXOR() {
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -755,7 +850,7 @@ public class X86Core extends AssemblerModule {
         }
     }
 
-    private void reportAddressingError(int instruction, int addressing){
+    private final void reportAddressingError(int instruction, int addressing){
         String err = "";
         int ad = addressing;
         do {

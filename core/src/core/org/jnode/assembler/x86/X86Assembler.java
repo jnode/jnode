@@ -720,6 +720,18 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeCDQE()
 	throws InvalidOpcodeException;
 
+    /**
+	 */
+	public abstract void writeCLD();
+
+    /**
+	 */
+	public abstract void writeCLI();
+
+    /**
+	 */
+	public abstract void writeCLTS();
+
 	/**
 	 * Create a CMOVcc dst,src
 	 * 
@@ -820,6 +832,11 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeCMPXCHG_EAX(GPR dstReg, int dstDisp, GPR srcReg,
 			boolean lock);
+
+    /**
+	 * Create a cpuid
+	 */
+	public abstract void writeCPUID();
 
 	/**
 	 * Create a dec reg32
@@ -1054,6 +1071,11 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeFXCH(X86Register fpuReg);
 
+    /**
+	 * Create a hlt
+	 */
+	public abstract void writeHLT();
+
 	/**
 	 * Create a idiv eax, srcReg
 	 * 
@@ -1129,6 +1151,12 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param vector
 	 */
 	public abstract void writeINT(int vector);
+
+    /**
+     * Create a iret
+     */
+    public abstract void writeIRET();
+
 
 	/**
 	 * Create a conditional jump to a label The opcode sequence is: 0x0f
@@ -1531,6 +1559,11 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writePOPA()
     throws InvalidOpcodeException;
 
+    /**
+	 * Create a popf.
+	 */
+	public abstract void writePOPF();
+
 	/**
 	 * Write an prefix byte
 	 * 
@@ -1590,6 +1623,11 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writePUSHA()
     throws InvalidOpcodeException;
+
+    /**
+	 * Create a pushf.
+	 */
+	public abstract void writePUSHF();
 
 	/**
 	 * Create a RDTSC (get timestamp into edx:eax
@@ -1921,6 +1959,16 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeSHRD_CL(GPR dstReg, GPR srcReg);
 
+    /**
+	 * Create a STD
+	 */
+	public abstract void writeSTD();
+
+    /**
+	 * Create a STI
+	 */
+	public abstract void writeSTI();
+
 	/**
 	 * Create a SUB dstReg, srcReg
 	 * 
@@ -1929,7 +1977,6 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeSUB(GPR dstReg, GPR srcReg);
 
-	// LS
 	/**
 	 * @param dstReg
 	 * @param srcReg
@@ -1954,7 +2001,6 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeSUB(GPR dstReg, int dstDisp, GPR srcReg);
 
-	// LS
 	/**
 	 * @param dstReg
 	 * @param dstDisp
