@@ -16,5 +16,13 @@ timeout 5
 # By default, boot the first entry.
 default 0
 
-title  JNode
+# ---------------------------
+title JNode (default)
 kernel (nd)/jnodesys.gz
+module (nd)/default.jgz
+
+# ---------------------------
+title JNode (all plugins)
+kernel (nd)/jnodesys.gz
+module (nd)/full.jgz
+

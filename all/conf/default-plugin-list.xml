@@ -98,18 +98,10 @@
     <plugin id="org.jnode.shell.command.log4j"/>
     <plugin id="org.jnode.shell.command.plugin"/>
     <plugin id="org.jnode.shell.command.system"/>
+    <plugin id="org.beanshell"/>
 
     <plugin id="org.jnode.work"/>
 
     <plugin id="charva"/>
     <plugin id="org.jnode.wt"/>
-    <plugin id="org.beanshell"/>
-
-    <plugin id="org.jnode.apps.charvabsh"/>
-    <!-- plugin id="org.zaval.lw"/ -->
-
-    <plugin id="org.junit"/>
-    <plugin id="org.jnode.test"/>
-    <plugin id="org.jnode.test.fs"/>
-    <plugin id="org.jnode.test.gui"/>
 </plugin-list>
