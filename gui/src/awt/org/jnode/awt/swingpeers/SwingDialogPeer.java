@@ -20,7 +20,7 @@ import javax.swing.JInternalFrame;
  */
 
 class SwingDialogPeer extends JInternalFrame implements DialogPeer,
-		SwingContainerPeer {
+		ISwingContainerPeer {
 
 	//
 	// Construction
@@ -33,7 +33,7 @@ class SwingDialogPeer extends JInternalFrame implements DialogPeer,
 	}
 
 	/**
-	 * @see org.jnode.awt.swingpeers.SwingContainerPeer#addAWTComponent(java.awt.Component,
+	 * @see org.jnode.awt.swingpeers.ISwingContainerPeer#addAWTComponent(java.awt.Component,
 	 *      javax.swing.JComponent)
 	 */
 	public void addAWTComponent(Component awtComponent, JComponent peer) {

@@ -41,7 +41,7 @@ import org.apache.log4j.Logger;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class SwingFramePeer implements FramePeer, SwingContainerPeer {
+final class SwingFramePeer implements FramePeer, ISwingContainerPeer {
 
 	private final Logger log = Logger.getLogger(getClass());
 
@@ -124,7 +124,7 @@ final class SwingFramePeer implements FramePeer, SwingContainerPeer {
 	}
 
 	/**
-	 * @see org.jnode.awt.swingpeers.SwingContainerPeer#addAWTComponent(java.awt.Component,
+	 * @see org.jnode.awt.swingpeers.ISwingContainerPeer#addAWTComponent(java.awt.Component,
 	 *      javax.swing.JComponent)
 	 */
 	public void addAWTComponent(Component awtComponent, JComponent peer) {

@@ -3,170 +3,102 @@
  */
 package org.jnode.awt.swingpeers;
 
-import java.awt.AWTEvent;
-import java.awt.BufferCapabilities;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Rectangle;
 import java.awt.TextArea;
-import java.awt.event.PaintEvent;
 import java.awt.peer.TextAreaPeer;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 /**
  * AWT text area peer implemented as a {@link javax.swing.JTextArea}.
  */
 
-class SwingTextAreaPeer extends JTextArea implements TextAreaPeer, SwingPeer {
-
-	private final TextArea textArea;
+final class SwingTextAreaPeer extends SwingTextComponentPeer implements
+		TextAreaPeer {
 
 	//
 	// Construction
 	//
 
-	public SwingTextAreaPeer(TextArea textArea) {
-		this.textArea = textArea;
+	public SwingTextAreaPeer(SwingToolkit toolkit, TextArea textArea) {
+		super(toolkit, textArea, new SwingTextArea(textArea));
 
 		switch (textArea.getScrollbarVisibility()) {
 		case TextArea.SCROLLBARS_BOTH:
-			SwingToolkit.add(textArea, new JScrollPane(this,
+			SwingToolkit.add(textArea, new JScrollPane(jComponent,
 					ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS));
 			break;
 		case TextArea.SCROLLBARS_HORIZONTAL_ONLY:
-			SwingToolkit.add(textArea, new JScrollPane(this,
+			SwingToolkit.add(textArea, new JScrollPane(jComponent,
 					ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS));
 			break;
 		case TextArea.SCROLLBARS_VERTICAL_ONLY:
-			SwingToolkit.add(textArea, new JScrollPane(this,
+			SwingToolkit.add(textArea, new JScrollPane(jComponent,
 					ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER));
 			break;
 		case TextArea.SCROLLBARS_NONE:
-			SwingToolkit.add(textArea, this);
+			SwingToolkit.add(textArea, jComponent);
 			break;
 		}
 
-		SwingToolkit.copyAwtProperties(textArea, this);
+		final SwingTextArea jta = (SwingTextArea)jComponent;
+		SwingToolkit.copyAwtProperties(textArea, jta);
 		setText(textArea.getText());
-		setRows(textArea.getRows());
-		setColumns(textArea.getColumns());
+		jta.setRows(textArea.getRows());
+		jta.setColumns(textArea.getColumns());
 		setEditable(textArea.isEditable());
 	}
 
-	public boolean canDetermineObscurity() {
-		return false;
-	}
-
-	public void coalescePaintEvent(PaintEvent e) {
-		System.err.println(e);
-	}
-
-	// Buffer
-
-	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-	}
-
-	public void destroyBuffers() {
-	}
-
-	// Misc
-
-	public void dispose() {
-	}
-
-	public long filterEvents(long mask) {
-		return 0;
-	}
-
-	public void flip(BufferCapabilities.FlipContents flipContents) {
+	/**
+	 * @see java.awt.peer.TextAreaPeer#getMinimumSize(int, int)
+	 */
+	public Dimension getMinimumSize(int rows, int cols) {
+		return ((JTextArea)jComponent).getMinimumSize();
 	}
 
 	/**
-	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+	 * @see java.awt.peer.TextAreaPeer#getPreferredSize(int, int)
 	 */
-	public Component getAWTComponent() {
-		return textArea;
+	public Dimension getPreferredSize(int rows, int cols) {
+		return ((JTextArea)jComponent).getPreferredSize();
 	}
 
-	public Image getBackBuffer() {
-		return null;
-	}
-
-	public Rectangle getCharacterBounds(int i) {
-		return null;
-	}
-
-	//
-	// TextComponentPeer
-	//
-
-	public int getIndexAtPoint(int x, int y) {
-		return 0;
-	}
-
-	public Dimension getMinimumSize(int rows, int columns) {
-		return null;
-	}
-
-	//
-	// TextAreaPeer
-	//
-
-	public Dimension getPreferredSize(int rows, int columns) {
-		return null;
-	}
-
-	//
-	// ComponentPeer
-	//
-
-	// Events
-
-	public void handleEvent(AWTEvent e) {
-		//System.err.println(e);
-	}
-
-	public boolean handlesWheelScrolling() {
-		return false;
-	}
-
-	///////////////////////////////////////////////////////////////////////////////////////
-	// Private
 	/**
 	 * @see java.awt.peer.TextAreaPeer#insert(java.lang.String, int)
 	 */
 	public void insert(String text, int pos) {
+		insertText(text, pos);
+	}
+
+	/**
+	 * @see java.awt.peer.TextAreaPeer#insertText(java.lang.String, int)
+	 */
+	public void insertText(String text, int pos) {
 		try {
-			super.getDocument().insertString(pos, text, null);
+			((JTextArea)jComponent).getDocument().insertString(pos, text, null);
 		} catch (BadLocationException ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
-	// Deprectated
-
-	public void insertText(String txt, int pos) {
-		insert(txt, pos);
-	}
-
-	// Obscurity
-
-	public boolean isObscured() {
-		return false;
-	}
-
+	/**
+	 * @see java.awt.peer.TextAreaPeer#minimumSize(int, int)
+	 */
 	public Dimension minimumSize(int rows, int cols) {
 		return getMinimumSize(rows, cols);
 	}
 
+	/**
+	 * @see java.awt.peer.TextAreaPeer#preferredSize(int, int)
+	 */
 	public Dimension preferredSize(int rows, int cols) {
 		return getPreferredSize(rows, cols);
 	}
@@ -175,30 +107,34 @@ class SwingTextAreaPeer extends JTextArea implements TextAreaPeer, SwingPeer {
 	 * @see java.awt.peer.TextAreaPeer#replaceRange(java.lang.String, int, int)
 	 */
 	public void replaceRange(String text, int start_pos, int end_pos) {
-		// TODO implement me
-	}
-
-	public void replaceText(String txt, int start, int end) {
-		replaceRange(txt, start, end);
-	}
-
-	// Focus
-
-	public boolean requestFocus(Component lightweightChild, boolean temporary,
-			boolean focusedWindowChangeAllowed, long time) {
-		return true;
+		replaceText(text, start_pos, end_pos);
 	}
 
 	/**
-	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
+	 * @see java.awt.peer.TextAreaPeer#replaceText(java.lang.String, int, int)
 	 */
-	public void setEventMask(long mask) {
-		// TODO Auto-generated method stub
-
+	public void replaceText(String text, int start_pos, int end_pos) {
+		try {
+			final Document doc = ((JTextArea)jComponent).getDocument();
+			doc.remove(start_pos, end_pos - start_pos);
+			doc.insertString(start_pos, text, null);
+		} catch (BadLocationException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
-	// Cursor
+	private static class SwingTextArea extends JTextArea implements ISwingPeer {
+		private final TextArea awtComponent;
 
-	public void updateCursorImmediately() {
+		public SwingTextArea(TextArea awtComponent) {
+			this.awtComponent = awtComponent;
+		}
+
+		/**
+		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+		 */
+		public Component getAWTComponent() {
+			return awtComponent;
+		}
 	}
 }

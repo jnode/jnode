@@ -25,7 +25,7 @@ class SwingCanvasPeer extends SwingComponentPeer implements CanvasPeer {
 		SwingToolkit.copyAwtProperties(canvas, jComponent);
 	}
 
-	private static class SwingCanvas extends JComponent implements SwingPeer {
+	private static class SwingCanvas extends JComponent implements ISwingPeer {
 		private final Canvas awtComponent;
 
 		public SwingCanvas(Canvas awtComponent) {
@@ -33,7 +33,7 @@ class SwingCanvasPeer extends SwingComponentPeer implements CanvasPeer {
 		}
 
 		/**
-		 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
 		 */
 		public Component getAWTComponent() {
 			return awtComponent;

@@ -38,14 +38,14 @@ class SwingButtonPeer extends SwingComponentPeer implements ButtonPeer {
         ((JButton)jComponent).setText(label);
     }
 
-    private static class SwingButton extends JButton implements SwingPeer {
+    private static class SwingButton extends JButton implements ISwingPeer {
     	private final Button awtComponent;
 
     	public SwingButton(Button awtComponent) {
     		this.awtComponent = awtComponent;
     	}
     	/**
-    	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+    	 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
     	 */
     	public Component getAWTComponent() {
     		return awtComponent;

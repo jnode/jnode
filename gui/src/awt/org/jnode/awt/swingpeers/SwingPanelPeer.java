@@ -16,7 +16,7 @@ import javax.swing.JPanel;
  */
 
 final class SwingPanelPeer extends SwingComponentPeer implements PanelPeer,
-		SwingContainerPeer {
+		ISwingContainerPeer {
 
 	//
 	// Construction
@@ -30,7 +30,7 @@ final class SwingPanelPeer extends SwingComponentPeer implements PanelPeer,
 	}
 
 	/**
-	 * @see org.jnode.awt.swingpeers.SwingContainerPeer#addAWTComponent(java.awt.Component,
+	 * @see org.jnode.awt.swingpeers.ISwingContainerPeer#addAWTComponent(java.awt.Component,
 	 *      javax.swing.JComponent)
 	 */
 	public void addAWTComponent(Component awtComponent, JComponent peer) {
@@ -65,7 +65,7 @@ final class SwingPanelPeer extends SwingComponentPeer implements PanelPeer,
 		return getInsets();
 	}
 
-	private static class SwingPanel extends JPanel implements SwingPeer {
+	private static class SwingPanel extends JPanel implements ISwingPeer {
 		private final Panel awtComponent;
 
 		public SwingPanel(Panel awtComponent) {
@@ -73,7 +73,7 @@ final class SwingPanelPeer extends SwingComponentPeer implements PanelPeer,
 		}
 
 		/**
-		 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
 		 */
 		public Component getAWTComponent() {
 			return awtComponent;

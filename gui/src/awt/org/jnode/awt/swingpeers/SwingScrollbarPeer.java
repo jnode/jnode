@@ -3,12 +3,8 @@
  */
 package org.jnode.awt.swingpeers;
 
-import java.awt.AWTEvent;
-import java.awt.BufferCapabilities;
 import java.awt.Component;
-import java.awt.Image;
 import java.awt.Scrollbar;
-import java.awt.event.PaintEvent;
 import java.awt.peer.ScrollbarPeer;
 
 import javax.swing.JScrollBar;
@@ -17,107 +13,58 @@ import javax.swing.JScrollBar;
  * AWT scrollbar peer implemented as a {@link javax.swing.JScrollBar}.
  */
 
-class SwingScrollbarPeer extends JScrollBar implements ScrollbarPeer, SwingPeer {
-
-	private final Scrollbar scrollbar;
+final class SwingScrollbarPeer extends SwingComponentPeer implements
+		ScrollbarPeer {
 
 	//
 	// Construction
 	//
 
-	public SwingScrollbarPeer(Scrollbar sb) {
-		this.scrollbar = sb;
-		SwingToolkit.add(sb, this);
-		SwingToolkit.copyAwtProperties(sb, this);
-		setOrientation(sb.getOrientation());
-		setBlockIncrement(sb.getBlockIncrement());
-		setUnitIncrement(sb.getUnitIncrement());
+	public SwingScrollbarPeer(SwingToolkit toolkit, Scrollbar sb) {
+		super(toolkit, sb, new SwingScrollbar(sb));
+		SwingToolkit.add(sb, jComponent);
+		SwingToolkit.copyAwtProperties(sb, jComponent);
+		final SwingScrollbar jsb = (SwingScrollbar)jComponent;
+		jsb.setOrientation(sb.getOrientation());
+		jsb.setBlockIncrement(sb.getBlockIncrement());
+		jsb.setUnitIncrement(sb.getUnitIncrement());
 		setValues(sb.getValue(), sb.getVisibleAmount(), sb.getMinimum(), sb
 				.getMaximum());
 	}
 
-	public boolean canDetermineObscurity() {
-		return false;
-	}
-
-	public void coalescePaintEvent(PaintEvent e) {
-		System.err.println(e);
-	}
-
-	// Buffer
-
-	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-	}
-
-	public void destroyBuffers() {
-	}
-
-	// Misc
-
-	public void dispose() {
-	}
-
-	public void flip(BufferCapabilities.FlipContents flipContents) {
+	/**
+	 * @see java.awt.peer.ScrollbarPeer#setLineIncrement(int)
+	 */
+	public void setLineIncrement(int inc) {
+		((JScrollBar)jComponent).setUnitIncrement(inc);
 	}
 
 	/**
-	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+	 * @see java.awt.peer.ScrollbarPeer#setPageIncrement(int)
 	 */
-	public Component getAWTComponent() {
-		return scrollbar;
-	}
-
-	public Image getBackBuffer() {
-		return null;
-	}
-
-	//
-	// ComponentPeer
-	//
-
-	// Events
-
-	public void handleEvent(AWTEvent e) {
-		//System.err.println(e);
-	}
-
-	public boolean handlesWheelScrolling() {
-		return false;
-	}
-
-	// Obscurity
-
-	public boolean isObscured() {
-		return false;
-	}
-
-	// Focus
-
-	public boolean requestFocus(Component lightweightChild, boolean temporary,
-			boolean focusedWindowChangeAllowed, long time) {
-		return true;
+	public void setPageIncrement(int inc) {
+		((JScrollBar)jComponent).setBlockIncrement(inc);
 	}
 
 	/**
-	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
+	 * @see java.awt.peer.ScrollbarPeer#setValues(int, int, int, int)
 	 */
-	public void setEventMask(long mask) {
-		// TODO Auto-generated method stub
-
+	public void setValues(int value, int visible, int min, int max) {
+		((JScrollBar)jComponent).setValues(value, visible, min, max);
 	}
 
-	//
-	// ScrollbarPeer
-	//
+	private static class SwingScrollbar extends JScrollBar implements ISwingPeer {
+		private final Scrollbar awtComponent;
 
-	public void setLineIncrement(int l) {
-	}
+		public SwingScrollbar(Scrollbar awtComponent) {
+			this.awtComponent = awtComponent;
+		}
 
-	public void setPageIncrement(int l) {
-	}
-
-	// Cursor
-
-	public void updateCursorImmediately() {
+		/**
+		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+		 */
+		public Component getAWTComponent() {
+			return awtComponent;
+		}
 	}
 }

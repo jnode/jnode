@@ -35,7 +35,7 @@ class SwingLabelPeer extends SwingComponentPeer implements LabelPeer {
 		//TODO implement it
 	}
 
-	private static class SwingLabel extends JLabel implements SwingPeer {
+	private static class SwingLabel extends JLabel implements ISwingPeer {
 		private final Label awtComponent;
 
 		public SwingLabel(Label awtComponent) {
@@ -43,7 +43,7 @@ class SwingLabelPeer extends SwingComponentPeer implements LabelPeer {
 		}
 
 		/**
-		 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
 		 */
 		public Component getAWTComponent() {
 			return awtComponent;

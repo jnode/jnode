@@ -98,7 +98,7 @@ class SwingListPeer extends SwingComponentPeer implements ListPeer {
     }
     
 
-	private static class SwingList extends JList implements SwingPeer {
+	private static class SwingList extends JList implements ISwingPeer {
 		private final List awtComponent;
 
 		public SwingList(List awtComponent) {
@@ -106,7 +106,7 @@ class SwingListPeer extends SwingComponentPeer implements ListPeer {
 		}
 
 		/**
-		 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
 		 */
 		public Component getAWTComponent() {
 			return awtComponent;

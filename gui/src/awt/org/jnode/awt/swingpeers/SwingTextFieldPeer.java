@@ -3,14 +3,9 @@
  */
 package org.jnode.awt.swingpeers;
 
-import java.awt.AWTEvent;
-import java.awt.BufferCapabilities;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Rectangle;
 import java.awt.TextField;
-import java.awt.event.PaintEvent;
 import java.awt.peer.TextFieldPeer;
 
 import javax.swing.JTextField;
@@ -19,142 +14,77 @@ import javax.swing.JTextField;
  * AWT text field peer implemented as a {@link javax.swing.JTextField}.
  */
 
-class SwingTextFieldPeer extends JTextField implements TextFieldPeer, SwingPeer {
-
-	private final TextField textField;
+final class SwingTextFieldPeer extends SwingTextComponentPeer implements
+		TextFieldPeer {
 
 	//
 	// Construction
 	//
 
-	public SwingTextFieldPeer(TextField textField) {
-		this.textField = textField;
-		SwingToolkit.add(textField, this);
-		SwingToolkit.copyAwtProperties(textField, this);
+	public SwingTextFieldPeer(SwingToolkit toolkit, TextField textField) {
+		super(toolkit, textField, new SwingTextField(textField));
+
+		final SwingTextField jtf = (SwingTextField) jComponent;
 		setText(textField.getText());
-		setColumns(textField.getColumns());
+		jtf.setColumns(textField.getColumns());
 		setEditable(textField.isEditable());
 	}
 
-	public boolean canDetermineObscurity() {
-		return false;
-	}
-
-	public void coalescePaintEvent(PaintEvent e) {
-		System.err.println(e);
-	}
-
-	// Buffer
-
-	public void createBuffers(int x, BufferCapabilities bufferCapabilities) {
-	}
-
-	public void destroyBuffers() {
-	}
-
-	// Misc
-
-	public void dispose() {
-	}
-
-	public long filterEvents(long mask) {
-		return 0;
-	}
-
-	public void flip(BufferCapabilities.FlipContents flipContents) {
+	/**
+	 * @see java.awt.peer.TextFieldPeer#getMinimumSize(int)
+	 */
+	public Dimension getMinimumSize(int len) {
+		return ((JTextField)jComponent).getMinimumSize();
 	}
 
 	/**
-	 * @see org.jnode.awt.swingpeers.SwingPeer#getAWTComponent()
+	 * @see java.awt.peer.TextFieldPeer#getPreferredSize(int)
 	 */
-	public Component getAWTComponent() {
-		return textField;
+	public Dimension getPreferredSize(int len) {
+		return ((JTextField)jComponent).getPreferredSize();
 	}
 
-	public Image getBackBuffer() {
-		return null;
-	}
-
-	public Rectangle getCharacterBounds(int i) {
-		return null;
-	}
-
-	//
-	// TextComponentPeer
-	//
-
-	public int getIndexAtPoint(int x, int y) {
-		return 0;
-	}
-
-	public Dimension getMinimumSize(int columns) {
-		return null;
-	}
-
-	public Dimension getPreferredSize(int columns) {
-		return null;
-	}
-
-	//
-	// ComponentPeer
-	//
-
-	// Events
-
-	public void handleEvent(AWTEvent e) {
-		//System.err.println(e);
-	}
-
-	public boolean handlesWheelScrolling() {
-		return false;
-	}
-
-	// Obscurity
-
-	public boolean isObscured() {
-		return false;
-	}
-
-	public Dimension minimumSize(int cols) {
-		return getMinimumSize(cols);
-	}
-
-	public Dimension preferredSize(int cols) {
-		return getPreferredSize(cols);
-	}
-
-	// Focus
-
-	public boolean requestFocus(Component lightweightChild, boolean temporary,
-			boolean focusedWindowChangeAllowed, long time) {
-		return true;
-	}
-
-	//
-	// TextFieldPeer
-	//
-
-	public void setEchoChar(char echoChar) {
-	}
-
-	// Deprecated
-
-	public void setEchoCharacter(char c) {
-		setEchoChar(c);
-	}
-
-	///////////////////////////////////////////////////////////////////////////////////////
-	// Private
 	/**
-	 * @see java.awt.peer.ComponentPeer#setEventMask(long)
+	 * @see java.awt.peer.TextFieldPeer#minimumSize(int)
 	 */
-	public void setEventMask(long mask) {
+	public Dimension minimumSize(int len) {
+		return getMinimumSize(len);
+	}
+
+	/**
+	 * @see java.awt.peer.TextFieldPeer#preferredSize(int)
+	 */
+	public Dimension preferredSize(int len) {
+		return getPreferredSize(len);
+	}
+
+	/**
+	 * @see java.awt.peer.TextFieldPeer#setEchoChar(char)
+	 */
+	public void setEchoChar(char echo_char) {
+		setEchoCharacter(echo_char);
+	}
+
+	/**
+	 * @see java.awt.peer.TextFieldPeer#setEchoCharacter(char)
+	 */
+	public void setEchoCharacter(char echo_char) {
 		// TODO Auto-generated method stub
 
 	}
 
-	// Cursor
+	private static class SwingTextField extends JTextField implements ISwingPeer {
+		private final TextField awtComponent;
 
-	public void updateCursorImmediately() {
+		public SwingTextField(TextField awtComponent) {
+			this.awtComponent = awtComponent;
+		}
+
+		/**
+		 * @see org.jnode.awt.swingpeers.ISwingPeer#getAWTComponent()
+		 */
+		public Component getAWTComponent() {
+			return awtComponent;
+		}
 	}
 }
