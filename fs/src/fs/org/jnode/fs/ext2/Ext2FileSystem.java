@@ -655,6 +655,15 @@ public class Ext2FileSystem extends AbstractFileSystem {
 	}
 	
 	/**
+	 * Check whether the filesystem uses the given COMPAT feature (S_FEATURE_INCOMPAT)
+	 * @param mask
+	 * @return
+	 */
+	protected boolean hasIncompatFeature(long mask){
+		return (mask & superblock.getFeatureIncompat()) != 0;				
+	}
+	
+	/**
 	 * utility function for determining if a given block group has 
 	 * superblock and group descriptor copies
 	 * @param a positive integer
