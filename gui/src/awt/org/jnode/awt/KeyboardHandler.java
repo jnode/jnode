@@ -3,18 +3,18 @@
  */
 package org.jnode.awt;
 
-import org.jnode.driver.input.KeyboardListener;
-import org.jnode.driver.input.KeyboardEvent;
-import org.jnode.driver.input.KeyboardAPI;
-import org.jnode.driver.DeviceUtils;
-import org.jnode.driver.Device;
-import org.jnode.driver.ApiNotFoundException;
-import org.jnode.awt.peer.RawJNodeToolkit;
-import org.apache.log4j.Logger;
-
-import java.util.Collection;
-import java.awt.event.KeyEvent;
 import java.awt.Component;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.util.Collection;
+
+import org.apache.log4j.Logger;
+import org.jnode.driver.ApiNotFoundException;
+import org.jnode.driver.Device;
+import org.jnode.driver.DeviceUtils;
+import org.jnode.driver.input.KeyboardAPI;
+import org.jnode.driver.input.KeyboardEvent;
+import org.jnode.driver.input.KeyboardListener;
 
 /**
  * @author Levente S?ntha
@@ -61,7 +61,7 @@ public class KeyboardHandler implements KeyboardListener {
      * @param keyChar
      */
     private void postEvent(int id, long time, int modifiers, int keyCode, char keyChar) {
-        RawJNodeToolkit tk = (RawJNodeToolkit) RawJNodeToolkit.getDefaultToolkit();
+        JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
         Component source = tk.getFocusHandler().getFocusedComponent();
         if (source == null) source = tk.getTop();
         KeyEvent me = new KeyEvent(source, id, time, modifiers, keyCode, keyChar);

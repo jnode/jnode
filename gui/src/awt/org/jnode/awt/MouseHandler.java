@@ -3,8 +3,11 @@
  */
 package org.jnode.awt;
 
-import java.awt.Dimension;
+import gnu.java.awt.EventModifier;
+
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 
@@ -16,8 +19,6 @@ import org.jnode.driver.input.PointerAPI;
 import org.jnode.driver.input.PointerEvent;
 import org.jnode.driver.input.PointerListener;
 import org.jnode.driver.video.HardwareCursorAPI;
-import org.jnode.awt.peer.RawJNodeToolkit;
-import gnu.java.awt.EventModifier;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -127,7 +128,7 @@ public class MouseHandler implements PointerListener {
     }
 
     private void postEvent(int id, int button) {
-        RawJNodeToolkit tk = (RawJNodeToolkit) RawJNodeToolkit.getDefaultToolkit();
+        JNodeToolkit tk = (JNodeToolkit) Toolkit.getDefaultToolkit();
         Component source = tk.getTop().getComponentAt(x, y);
         if( source == null) source = tk.getTop();
         //TODO full support for modifiers
