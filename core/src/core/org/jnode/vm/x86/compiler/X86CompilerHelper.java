@@ -51,6 +51,30 @@ import org.vmmagic.unboxed.Address;
  */
 public class X86CompilerHelper implements X86CompilerConstants {
 
+    /** Address size ax register (EAX/RAX) */
+    public final GPR AAX;
+    
+    /** Address size bx register (EBX/RBX) */
+    public final GPR ABX;
+    
+    /** Address size cx register (ECX/RCX) */
+    public final GPR ACX;
+    
+    /** Address size dx register (EDX/RDX) */
+    public final GPR ADX;
+    
+    /** The stack pointer (ESP/RSP) */
+    public final GPR SP;
+    
+    /** The stack frame pointer (EBP/RBP) */
+    public final GPR BP;
+    
+    /** The statics table pointer (EDI/RDI) */
+    public final GPR STATICS;
+    
+    /** The size of an address (BITS32/BITS64) */
+    public final int ADDRSIZE;
+    
 	private final X86CompilerContext context;
 
 	private VmMethod method;
@@ -84,6 +108,25 @@ public class X86CompilerHelper implements X86CompilerConstants {
 			X86CompilerContext context, boolean isBootstrap)
 			throws PrivilegedActionPragma {
 		this.os = os;
+        if (os.isCode32()) {
+            this.AAX = X86Register.EAX;
+            this.ABX = X86Register.EBX;
+            this.ACX = X86Register.ECX;
+            this.ADX = X86Register.EDX;
+            this.SP = X86Register.ESP;
+            this.BP = X86Register.EBP;
+            this.STATICS = X86CompilerConstants.STATICS32;
+            this.ADDRSIZE = X86Constants.BITS32;
+        } else {
+            this.AAX = X86Register.RAX;
+            this.ABX = X86Register.RBX;
+            this.ACX = X86Register.RCX;
+            this.ADX = X86Register.RDX;
+            this.SP = X86Register.RSP;
+            this.BP = X86Register.RBP;
+            this.STATICS = X86CompilerConstants.STATICS64;              
+            this.ADDRSIZE = X86Constants.BITS64;
+        }
 		this.context = context;
 		this.stackMgr = stackMgr;
 		this.isBootstrap = isBootstrap;
@@ -243,10 +286,10 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 */
 	public final void invokeJavaMethod(VmMethod method) {
 		if (false) {
-			os.writeMOV(context.ADDRSIZE, context.AAX, context.STATICS,
+			os.writeMOV(this.ADDRSIZE, this.AAX, this.STATICS,
 					getStaticsOffset(method));
 		} else {
-			os.writeMOV_Const(context.AAX, method);
+			os.writeMOV_Const(this.AAX, method);
 		}
 		invokeJavaMethod(method.getSignature());
 	}
@@ -286,7 +329,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 			// Only when class is not initialize
 			final VmType cls = method.getDeclaringClass();
 			if (!cls.isInitialized()) {
-				final GPR aax = context.AAX;
+				final GPR aax = this.AAX;
 				final int size = os.getMode().getSize();
 
 				// Save eax
@@ -400,9 +443,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
 						+ "$$ediok");
 				if (os.isCode32()) {
 					os.writePrefix(X86Constants.FS_PREFIX);
-					os.writeCMP_MEM(context.STATICS, offset);
+					os.writeCMP_MEM(this.STATICS, offset);
 				} else {
-					os.writeCMP(context.STATICS, PROCESSOR64, offset);
+					os.writeCMP(this.STATICS, PROCESSOR64, offset);
 				}
 				os.writeJCC(ok, X86Constants.JE);
 				os.writeINT(0x88);
@@ -410,11 +453,11 @@ public class X86CompilerHelper implements X86CompilerConstants {
 			}
 		} else {
 			if (os.isCode32()) {
-				os.writeXOR(context.STATICS, context.STATICS);
+				os.writeXOR(this.STATICS, this.STATICS);
 				os.writePrefix(X86Constants.FS_PREFIX);
-				os.writeMOV(INTSIZE, context.STATICS, context.STATICS, offset);
+				os.writeMOV(INTSIZE, this.STATICS, this.STATICS, offset);
 			} else {
-				os.writeMOV(BITS64, context.STATICS, PROCESSOR64, offset);
+				os.writeMOV(BITS64, this.STATICS, PROCESSOR64, offset);
 			}
 		}
 	}
@@ -497,8 +540,8 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	public final void writePutstaticWriteBarrier(VmStaticField field,
 			GPR valueReg, GPR scratchReg) {
         if (Vm.VerifyAssertions) {
-            Vm._assert(scratchReg.getSize() == context.ADDRSIZE, "scratchReg wrong size");
-            Vm._assert(valueReg.getSize() == context.ADDRSIZE, "valueReg wrong size");
+            Vm._assert(scratchReg.getSize() == this.ADDRSIZE, "scratchReg wrong size");
+            Vm._assert(valueReg.getSize() == this.ADDRSIZE, "valueReg wrong size");
         }
 		if (field.isObjectRef()) {
 			final VmWriteBarrier wb = context.getWriteBarrier();
@@ -534,7 +577,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
             Vm._assert(dst.getSize() == BITS32, "dst wrong size");
         }
 		writeLoadSTATICS(curInstrLabel, "gs", true);
-		os.writeMOV(INTSIZE, dst, context.STATICS, getStaticsOffset(entry));
+		os.writeMOV(INTSIZE, dst, this.STATICS, getStaticsOffset(entry));
 	}
 
 	/**
@@ -550,9 +593,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
 		writeLoadSTATICS(curInstrLabel, "gs", true);
 		final int staticsIdx = getStaticsOffset(entry);
 		if (is32bit) {
-			os.writeFLD32(context.STATICS, staticsIdx);
+			os.writeFLD32(this.STATICS, staticsIdx);
 		} else {
-			os.writeFLD64(context.STATICS, staticsIdx);
+			os.writeFLD64(this.STATICS, staticsIdx);
 		}
 	}
 
@@ -566,7 +609,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	public final void writePushStaticsEntry(Label curInstrLabel,
 			VmStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "gs", true);
-		os.writePUSH(context.STATICS, getStaticsOffset(entry));
+		os.writePUSH(this.STATICS, getStaticsOffset(entry));
 	}
 
 	/**
@@ -582,8 +625,8 @@ public class X86CompilerHelper implements X86CompilerConstants {
 			GPR msbReg, VmStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "gs64", true);
 		final int staticsOfs = getStaticsOffset(entry);
-		os.writeMOV(INTSIZE, msbReg, context.STATICS, staticsOfs + 4); // MSB
-		os.writeMOV(INTSIZE, lsbDst, context.STATICS, staticsOfs + 0); // LSB
+		os.writeMOV(INTSIZE, msbReg, this.STATICS, staticsOfs + 4); // MSB
+		os.writeMOV(INTSIZE, lsbDst, this.STATICS, staticsOfs + 0); // LSB
 	}
 
 	/**
@@ -597,7 +640,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	public final void writeGetStaticsEntry64(Label curInstrLabel, GPR64 dstReg,
 			VmStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "gs64", true);
-		os.writeMOV(BITS64, dstReg, context.STATICS, getStaticsOffset(entry));
+		os.writeMOV(BITS64, dstReg, this.STATICS, getStaticsOffset(entry));
 	}
 
 	/**
@@ -611,7 +654,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	public final void writePutStaticsEntry(Label curInstrLabel, GPR src,
 			VmStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "ps", true);
-		os.writeMOV(INTSIZE, context.STATICS, getStaticsOffset(entry), src);
+		os.writeMOV(INTSIZE, this.STATICS, getStaticsOffset(entry), src);
 	}
 
 	/**
@@ -627,8 +670,8 @@ public class X86CompilerHelper implements X86CompilerConstants {
 			GPR msbSrc, VmStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "ps64", true);
 		final int staticsOfs = getStaticsOffset(entry);
-		os.writeMOV(BITS32, context.STATICS, staticsOfs + 4, msbSrc); // MSB
-		os.writeMOV(BITS32, context.STATICS, staticsOfs + 0, lsbSrc); // LSB
+		os.writeMOV(BITS32, this.STATICS, staticsOfs + 4, msbSrc); // MSB
+		os.writeMOV(BITS32, this.STATICS, staticsOfs + 0, lsbSrc); // LSB
 	}
 
 	/**
@@ -642,15 +685,15 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	public final void writePutStaticsEntry64(Label curInstrLabel, GPR64 srcReg,
 			VmStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "ps64", true);
-		os.writeMOV(BITS64, context.STATICS, getStaticsOffset(entry), srcReg);
+		os.writeMOV(BITS64, this.STATICS, getStaticsOffset(entry), srcReg);
 	}
 
 	/**
-	 * Gets the offset from the beginning of the statics table (context.STATICS)
+	 * Gets the offset from the beginning of the statics table (this.STATICS)
 	 * to the given entry.
 	 * 
 	 * @param entry
-	 * @return The byte offset from context.STATICS to the entry.
+	 * @return The byte offset from this.STATICS to the entry.
 	 */
 	public final int getStaticsOffset(VmStaticsEntry entry) {
 		if (os.isCode32()) {

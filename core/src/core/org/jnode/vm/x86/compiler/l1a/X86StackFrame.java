@@ -139,8 +139,8 @@ class X86StackFrame implements X86CompilerConstants {
 	public void emitTrailer(int maxLocals) {
 		final int argSlotCount = method.getArgSlotCount();
 		final Label stackOverflowLabel = helper.genLabel("$$stack-overflow");
-		final GPR asp = context.SP;
-		final GPR abp = context.BP;
+		final GPR asp = helper.SP;
+		final GPR abp = helper.BP;
 		final GPR aax = os.isCode32() ? (GPR)X86Register.EAX : X86Register.RAX;
 		final int size = os.getMode().getSize();
 
@@ -319,7 +319,7 @@ class X86StackFrame implements X86CompilerConstants {
 				os.writePUSH(aax, declaringClassOffset);
 				//os.writePUSH(method.getDeclaringClass());
 			} else {
-				os.writePUSH(context.BP, getEbpOffset(0));
+				os.writePUSH(helper.BP, getEbpOffset(0));
 			}
 			helper.invokeJavaMethod(monitorMethod);
 			os.writePOP(adx);
@@ -331,14 +331,14 @@ class X86StackFrame implements X86CompilerConstants {
 	 * Push the method reference in the current stackframe onto the stack
 	 */
 	public final void writePushMethodRef() {
-		os.writePUSH(context.BP, EbpMethodRefOffset);
+		os.writePUSH(helper.BP, EbpMethodRefOffset);
 	}
 
 	/**
 	 * Write code to copy the method reference into the dst register.
 	 */
 	public final void writeGetMethodRef(GPR dst) {
-		os.writeMOV(os.getMode().getSize(), dst, context.BP, EbpMethodRefOffset);
+		os.writeMOV(os.getMode().getSize(), dst, helper.BP, EbpMethodRefOffset);
 	}
 
 	/**
