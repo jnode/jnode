@@ -20,7 +20,7 @@ import org.jnode.fs.FileSystemException;
  */
 public abstract class AbstractFileSystem implements FileSystem {
 
-    private final boolean readOnly;
+    private boolean readOnly;
 
     private final Device device;
 
@@ -70,7 +70,7 @@ public abstract class AbstractFileSystem implements FileSystem {
     /**
      * @see org.jnode.fs.FileSystem#close()
      */
-    final public void close() throws IOException {
+    public void close() throws IOException {
         closed = true;
 
         // if readOnly, nothing to do
@@ -112,5 +112,8 @@ public abstract class AbstractFileSystem implements FileSystem {
     final public boolean isReadOnly() {
         return readOnly;
     }
-
+    
+    final public void setReadOnly(boolean readOnly) {
+    	this.readOnly = readOnly;
+    }
 }
