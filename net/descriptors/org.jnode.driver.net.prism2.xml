@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.net.prism2"
+        name="JNode Prism2 driver"
+        version="@VERSION@"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.driver"/>
+    <import plugin="org.jnode.driver.pci"/>
+    <import plugin="org.jnode.driver.net.ethernet"/>
+    <import plugin="org.jnode.net"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-net.jar">
+      <export name="org.jnode.driver.net.prism2.*"/>
+    </library>
+  </runtime>
+  
+  <extension point="org.jnode.driver.mappers">
+    <mapper id="1260:3873" name="Prism 2.5" driver-class="org.jnode.driver.net.prism2.Prism2Driver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>    
+  </extension>
+        
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
+  </extension>
+        
+</plugin>
