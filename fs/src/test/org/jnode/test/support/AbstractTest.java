@@ -34,8 +34,8 @@ public abstract class AbstractTest extends /*TestCase*/ MockObjectTestCase {
 	public AbstractTest(Class configClazz)
     {
         super();
-        ContextManager.getInstance().init();
-        this.configClazz = configClazz;
+        init(configClazz, null);              
+        log = null; // should never be used
     }
 
     /**
@@ -44,10 +44,16 @@ public abstract class AbstractTest extends /*TestCase*/ MockObjectTestCase {
 	protected AbstractTest(Class configClazz, String name)
 	{
         super();
+        init(configClazz, name);
+        log = Logger.getLogger(getTestName());
+	}
+    
+    protected void init(Class configClazz, String name)
+    {       
         setName(name);
         ContextManager.getInstance().init();
         this.configClazz = configClazz;
-	}
+    }
 	
 	/**
 	 * 
@@ -119,5 +125,5 @@ public abstract class AbstractTest extends /*TestCase*/ MockObjectTestCase {
     private TestConfig testConfig;
     private Class configClazz;
 	    
-	protected final Logger log = Logger.getLogger(getTestName());	
+	protected final Logger log;	
 }
