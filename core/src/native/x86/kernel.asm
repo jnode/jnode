@@ -104,6 +104,7 @@ check_a20:
 	call Lsetup_mm
 %else
 	jmp Lsetup_mm
+	%include "mm64.asm" 
 	bits 64
 start64:		
 %endif	

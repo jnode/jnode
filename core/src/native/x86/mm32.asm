@@ -1,7 +1,7 @@
 ; -----------------------------------------------
 ; $Id$
 ;
-; Memory manager
+; Memory manager in 32-bit
 ;
 ; Author       : E.Prangsma 
 ; -----------------------------------------------
@@ -9,8 +9,6 @@
     global Lkernel_esp
     global Lsetup_mm 
 
-;extern sys_print_str
-;extern sys_print_eax
 	extern vmCurProcessor
 
 pd_paddr	equ 0x00001000	; Physical address of page dir

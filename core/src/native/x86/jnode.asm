@@ -38,7 +38,7 @@ kernel_begin:
 ; ----------------------
 
 ; Default Page flags
-PF_DEFAULT	equ iPF_PRESENT|iPF_WRITE|iPF_USER
+PF_DEFAULT		equ iPF_PRESENT|iPF_WRITE|iPF_USER
 PF_DEFAULT_RO	equ iPF_PRESENT|iPF_USER
 
 ; Segment selectors
@@ -65,14 +65,12 @@ CURPROC_FS  equ 0x33
 %include "cpu.asm"
 %ifdef BITS32
   %include "ints32.asm"
+  %include "mm32.asm"
 %else  
   %include "ints64.asm"
 %endif
-%include "ints.asm"
-%ifdef BITS32
-  %include "mm32.asm"
-%endif
 %include "console.asm"
+%include "ints.asm"
 %include "version.asm"
 %include "syscall.asm" 
 
@@ -113,6 +111,7 @@ kernel_end:
 extern Luser_esp
 
 scr_ofs:		DA 0
+hexchars: 		db '0123456789ABCDEF' 
 SPINLOCK		console_lock
 jnodeFinished:	DA 0
 

@@ -11,18 +11,26 @@
     global sys_print_char   ; Print a single character in AL
     global sys_print_str    ; Print a null-terminated (byte) character array point by EAX
 
-scr_width	equ 80
-scr_height	equ 25
-scr_addr	equ 0xb8000
-hexchars: 	db '0123456789ABCDEF' 
-CR		equ 0x0D
-LF		equ 0x0A
+scr_width		equ 80
+scr_height		equ 25
+scr_addr		equ 0xb8000
+CR				equ 0x0D
+LF				equ 0x0A
 video_prt_reg	equ 0x3d4  
 video_prt_val	equ 0x3d5
 video_mode_reg	equ 0x3d8
 
+%macro digit 1
+	mov AAX,ABX
+	shr AAX,%1
+	and AAX,0x0f
+	mov al,[hexchars+eax]
+	call sys_print_char
+%endmacro
+
+%macro CONSOLE_FUNCTIONS 0-1
 ; Set the cursor at offset [scr_ofs]
-set_cursor:
+set_cursor%1:
 	push AAX
 	push ADX
 	mov eax,14
@@ -43,7 +51,7 @@ set_cursor:
 	ret
 
 ; Hide the cursor 
-hide_cursor:
+hide_cursor%1:
 	push AAX
 	push ADX
 	mov eax,10
@@ -57,7 +65,7 @@ hide_cursor:
 	ret
 
 ; Clear the screen
-sys_clrscr:
+sys_clrscr%1:
 	SPINLOCK_ENTER console_lock
 	push AAX
 	push ACX
@@ -67,7 +75,7 @@ sys_clrscr:
 	mov eax,0x0720
 	rep stosw
 	mov WORD [scr_ofs],0
-	call hide_cursor
+	call hide_cursor%1
 	pop ADI
 	pop ACX
 	pop AAX
@@ -75,14 +83,14 @@ sys_clrscr:
 	ret
 
 ; Print a character in al
-sys_print_char:
+sys_print_char%1:
 	SPINLOCK_ENTER console_lock
 	cmp al,LF
-	je pc_nextline
+	je %%pc_nextline
 	cmp al,CR
-	jne pc_normal
-	jmp pc_ok
-pc_nextline
+	jne %%pc_normal
+	jmp %%pc_ok
+%%pc_nextline:
 	; next line
 	push AAX
 	push ABX
@@ -96,8 +104,8 @@ pc_nextline
 	pop ADX
 	pop ABX
 	pop AAX
-	jmp pc_check_eos
-pc_normal:
+	jmp %%pc_check_eos
+%%pc_normal:
 	push ADI
 	mov ADI,[scr_ofs]
 	shl ADI,1
@@ -106,9 +114,9 @@ pc_normal:
 	mov [ADI],ax
 	inc WORD [scr_ofs]
 	pop ADI
-pc_check_eos:
+%%pc_check_eos:
 	cmp WORD [scr_ofs],(scr_width*scr_height)
-	jne pc_ok
+	jne %%pc_ok
 	; Scroll up
 	push ADI
 	push ADI
@@ -129,21 +137,13 @@ pc_check_eos:
 	pop ASI
 	pop ADI
 	mov WORD [scr_ofs],(scr_width*(scr_height-1))
-pc_ok:
-	call set_cursor
+%%pc_ok:
+	call set_cursor%1
 	SPINLOCK_EXIT console_lock
 	ret
 
-%macro digit 1
-	mov AAX,ABX
-	shr AAX,%1
-	and AAX,0x0f
-	mov al,[hexchars+eax]
-	call sys_print_char
-%endmacro
-
 ; Print a value in EAX (in hex format)
-sys_print_eax:
+sys_print_eax%1:
 	push AAX
 	push ABX
 	mov ebx,eax
@@ -156,7 +156,7 @@ sys_print_eax:
 	digit 4
 	digit 0
 	mov al,' '
-	call sys_print_char
+	call sys_print_char%1
 	pop ABX
 	pop AAX
 	ret
@@ -184,36 +184,53 @@ sys_print_rax:
 	digit 4
 	digit 0
 	mov al,' '
-	call sys_print_char
+	call sys_print_char%1
 	pop ABX
 	pop AAX
 	ret
 %endif
 
 ; Print a value in AL (in hex format)
-sys_print_al:
+sys_print_al%1:
 	push AAX
 	push ABX
 	mov ebx,eax
 	digit 4
 	digit 0
 	mov al,' '
-	call sys_print_char
+	call sys_print_char%1
 	pop ABX
 	pop AAX
 	ret
 
 ; Print a null terminated string pointed to by EAX/RAX
-sys_print_str:
+sys_print_str%1:
 	push ASI
 	mov ASI,AAX
-ps_lp:
+%%ps_lp:
 	mov al,[ASI]
 	cmp al,0
-	je ps_ready
+	je %%ps_ready
 	inc ASI
-	call sys_print_char
-	jmp ps_lp
-ps_ready:
+	call sys_print_char%1
+	jmp %%ps_lp
+%%ps_ready:
 	pop ASI
 	ret
+%endmacro
+
+%ifdef BITS32
+	CONSOLE_FUNCTIONS 
+%else
+	%undef BITS64
+	%define BITS32
+	bits 32
+	%include "i386_bits.h"
+	CONSOLE_FUNCTIONS 32
+	%undef BITS32
+	%define BITS64
+	bits 64
+	%include "i386_bits.h"
+	CONSOLE_FUNCTIONS
+%endif
+	
