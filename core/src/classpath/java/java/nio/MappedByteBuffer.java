@@ -35,28 +35,55 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.nio;
 
 /**
  * @author Michael Koch
  * @since 1.4
  */
-public abstract class MappedByteBuffer extends ByteBuffer {
-	private static void sync() {
+public abstract class MappedByteBuffer extends ByteBuffer
+{
+  MappedByteBuffer (int capacity, int limit, int position, int mark)
+  {
+    super (capacity, limit, position, mark);
+  }
+  
+  void forceImpl()
+  {
 	}
 
-	public final MappedByteBuffer force() {
-		sync();
+  public final MappedByteBuffer force ()
+  {
+    forceImpl();
 		return this;
 	}
 
-	public final boolean isLoaded() {
+  boolean isLoadedImpl()
+  {
+    load();
 		return true;
 	}
 
-	public final MappedByteBuffer load() {
-		sync();
+  public final boolean isLoaded ()
+  {
+    return isLoadedImpl();
+  }
+    
+  void loadImpl()
+  {
+  }
+
+  public final MappedByteBuffer load ()
+  {
+    loadImpl();
 		return this;
 	}
 
+  void unmapImpl ()
+  {
+    forceImpl();
+  }
+
+  public void finalize () { unmapImpl(); }
 }

@@ -44,19 +44,19 @@ import java.nio.ByteBuffer;
 import java.nio.channels.spi.AbstractSelectableChannel;
 import java.nio.channels.spi.SelectorProvider;
 
+
 /**
  * @since 1.4
  */
-public abstract class DatagramChannel
-  extends AbstractSelectableChannel
+public abstract class DatagramChannel extends AbstractSelectableChannel
   implements ByteChannel, ScatteringByteChannel, GatheringByteChannel
 {
   /**
    * Initializes the channel.
    */
-  protected DatagramChannel (SelectorProvider provider)
+  protected DatagramChannel(SelectorProvider provider)
   {
-    super (provider);
+    super(provider);
   }
 
   /**
@@ -64,20 +64,20 @@ public abstract class DatagramChannel
    *
    * @exception IOException If an error occurs
    */
-  public static DatagramChannel open () throws IOException
+  public static DatagramChannel open() throws IOException
   {
-    return SelectorProvider.provider ().openDatagramChannel ();
+    return SelectorProvider.provider().openDatagramChannel();
   }
   
   /**
    * Reads data from this channel.
    */
-  public final long read (ByteBuffer[] dsts) throws IOException
+  public final long read(ByteBuffer[] dsts) throws IOException
   {
     long b = 0;
     
     for (int i = 0; i < dsts.length; i++)
-      b += read (dsts[i]);
+      b += read(dsts[i]);
     
     return b;
   }
@@ -88,12 +88,12 @@ public abstract class DatagramChannel
    * @exception IOException If an error occurs
    * @exception NotYetConnectedException The channel's socket is not connected.
    */
-  public final long write (ByteBuffer[] srcs) throws IOException
+  public final long write(ByteBuffer[] srcs) throws IOException
   {
     long b = 0;
     
-    for (int i = 0;i < srcs.length; i++)
-      b += write (srcs[i]);
+    for (int i = 0; i < srcs.length; i++)
+      b += write(srcs[i]);
     
     return b;
   }
@@ -111,7 +111,7 @@ public abstract class DatagramChannel
    * @exception SecurityException If a security manager has been installed and
    * it does not permit datagrams to be sent to the given address.
    */
-  public abstract DatagramChannel connect (SocketAddress remote)
+  public abstract DatagramChannel connect(SocketAddress remote)
     throws IOException;
 
   /**
@@ -119,7 +119,7 @@ public abstract class DatagramChannel
    *
    * @exception IOException If an error occurs
    */
-  public abstract DatagramChannel disconnect () throws IOException;
+  public abstract DatagramChannel disconnect() throws IOException;
 
   /**
    * Tells whether or not this channel's socket is connected.
@@ -127,12 +127,12 @@ public abstract class DatagramChannel
    * @exception IOException If an error occurs.
    * @exception NotYetConnectedException The channel's socket is not connected.
    */
-  public abstract boolean isConnected ();
+  public abstract boolean isConnected();
   
   /**
    * Reads data from this channel.
    */
-  public abstract int read (ByteBuffer dst) throws IOException;
+  public abstract int read(ByteBuffer dst) throws IOException;
   
   /**
    * Reads data from this channel.
@@ -140,7 +140,7 @@ public abstract class DatagramChannel
    * @exception IOException If an error occurs.
    * @exception NotYetConnectedException The channel's socket is not connected.
    */
-  public abstract long read (ByteBuffer[] dsts, int offset, int length)
+  public abstract long read(ByteBuffer[] dsts, int offset, int length)
     throws IOException;
  
   /**
@@ -156,7 +156,8 @@ public abstract class DatagramChannel
    * @exception SecurityException If a security manager has been installed and
    * it does not permit datagrams to be sent to the given address.
    */
-  public abstract SocketAddress receive (ByteBuffer dst) throws IOException;
+  public abstract SocketAddress receive(ByteBuffer dst)
+    throws IOException;
  
   /**
    * Sends a datagram via this channel.
@@ -171,12 +172,13 @@ public abstract class DatagramChannel
    * @exception SecurityException If a security manager has been installed and
    * it does not permit datagrams to be sent to the given address.
    */
-  public abstract int send (ByteBuffer src, SocketAddress target) throws IOException;
+  public abstract int send(ByteBuffer src, SocketAddress target)
+    throws IOException;
  
   /**
    * Retrieves the channel's socket.
    */
-  public abstract DatagramSocket socket ();
+  public abstract DatagramSocket socket();
   
   /**
    * Writes data to this channel.
@@ -184,7 +186,7 @@ public abstract class DatagramChannel
    * @exception IOException If an error occurs.
    * @exception NotYetConnectedException The channel's socket is not connected.
    */
-  public abstract int write (ByteBuffer src) throws IOException;
+  public abstract int write(ByteBuffer src) throws IOException;
   
   /**
    * Writes data to this channel.
@@ -192,7 +194,7 @@ public abstract class DatagramChannel
    * @exception IOException If an error occurs.
    * @exception NotYetConnectedException The channel's socket is not connected.
    */
-  public abstract long write (ByteBuffer[] srcs, int offset, int length)
+  public abstract long write(ByteBuffer[] srcs, int offset, int length)
     throws IOException;
 
   /**
@@ -201,7 +203,7 @@ public abstract class DatagramChannel
    * @exception IOException If an error occurs.
    * @exception NotYetConnectedException The channel's socket is not connected.
    */
-  public final int validOps ()
+  public final int validOps()
   {
     return SelectionKey.OP_READ | SelectionKey.OP_WRITE;
   }    

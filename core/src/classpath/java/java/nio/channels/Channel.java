@@ -39,17 +39,18 @@ package java.nio.channels;
 
 import java.io.IOException;
 
+
 public interface Channel
 {
   /**
    * Tells whether this channel is open or not
    */
-  public boolean isOpen();
+  boolean isOpen();
 
   /**
    * Closes this channel
    *
    * @exception IOException If an error occurs
    */
-  public void close() throws IOException;
+  void close() throws IOException;
 }

@@ -60,7 +60,7 @@ public class UDPProtocol implements IPv4Protocol, IPv4Constants {
             try {
                 AccessController.doPrivileged(new PrivilegedExceptionAction() {
                    public Object run() throws IOException {
-                       DatagramSocket.setSystemDatagramSocketImplFactory(dsiFactory);
+                       DatagramSocket.setDatagramSocketImplFactory(dsiFactory);
                        return null;
                    }
                 });
