@@ -387,6 +387,24 @@ public class Vm extends VmSystemObject implements Statistics {
     }
     
     /**
+     * Call the visitor for all live threads.
+     * @param visitor
+     */
+    static final VmThread getThreadById(int id) {
+        final Vm vm = getVm();
+        final SpinLock lock = vm.allThreadsLock;
+        final VmThreadQueue.AllThreadsQueue q = vm.allThreads;
+        VmThreadQueueEntry e = q.first;
+        while (e != null) {
+            if (e.thread.getId() == id) {
+                return e.thread;
+            }
+            e = e.next;
+        }
+        return null;
+    }
+    
+    /**
      * Gets the list of compiled methods.
      * @return Returns the compiledMethods.
      */
