@@ -24,6 +24,7 @@
   <property name="ant.jar" value="${root.dir}/core/lib/ant.jar"/>
   <property name="commons-net.jar" value="${root.dir}/net/lib/commons-net-1.1.0.jar"/>
   <property name="dnsjava.jar" value="${root.dir}/net/lib/dnsjava-1.5.0.jar"/>
+  <property name="jsch.jar" value="${root.dir}/net/lib/jsch-0.1.15.jar"/>
   <property name="junit.jar" value="${root.dir}/core/lib/junit.jar"/>
   <property name="june.jar" value="${root.dir}/core/lib/june.jar"/>
   <property name="dom4j.jar" value="${root.dir}/builder/lib/dom4j.jar"/>
@@ -117,6 +118,7 @@
 
       <libalias name="commons-net-1.1.0.jar" alias="${commons-net.jar}"/>
       <libalias name="dnsjava-1.5.0.jar" alias="${dnsjava.jar}"/>
+      <libalias name="jsch-0.1.15.jar" alias="${jsch.jar}"/>
       <libalias name="nanoxml.jar" alias="${nanoxml.jar}"/>
       <libalias name="gnu-crypto.jar" alias="${gnu-crypto.jar}"/>
       <libalias name="javax-crypto.jar" alias="${javax-crypto.jar}"/>
