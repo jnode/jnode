@@ -30,9 +30,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.jnode.assembler.x86.AbstractX86Stream;
-import org.jnode.assembler.x86.TextX86Stream;
-import org.jnode.assembler.x86.X86Stream;
+import org.jnode.assembler.x86.X86Assembler;
+import org.jnode.assembler.x86.X86TextAssembler;
+import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.util.BootableArrayList;
 import org.jnode.util.BootableHashMap;
 import org.jnode.vm.VmSystemClassLoader;
@@ -69,13 +69,13 @@ public class IRTest {
         }
 
         if(binary){
-            X86Stream os = new X86Stream(cpuId, 0);
+            X86BinaryAssembler os = new X86BinaryAssembler(cpuId, 0);
             generateCode(os, className);
             FileOutputStream fos = new FileOutputStream("test.bin");
             os.writeTo(fos);
             fos.close();
         }else{
-            TextX86Stream tos = new TextX86Stream(new OutputStreamWriter(System.out), cpuId);
+            X86TextAssembler tos = new X86TextAssembler(new OutputStreamWriter(System.out), cpuId);
             generateCode(tos, className);
             tos.flush();
         }
@@ -122,7 +122,7 @@ public class IRTest {
 */
 	}
 
-    private static void generateCode(AbstractX86Stream os, String className) throws MalformedURLException, ClassNotFoundException {
+    private static void generateCode(X86Assembler os, String className) throws MalformedURLException, ClassNotFoundException {
 		//VmByteCode code = loadByteCode(className, "discriminant");
 		//VmByteCode code = loadByteCode(className, "arithOptIntx");
 		//VmByteCode code = loadByteCode(className, "simpleWhile");

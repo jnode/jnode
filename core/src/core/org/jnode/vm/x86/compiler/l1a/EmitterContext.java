@@ -21,7 +21,7 @@
  
 package org.jnode.vm.x86.compiler.l1a;
 
-import org.jnode.assembler.x86.AbstractX86Stream;
+import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.vm.x86.compiler.X86CompilerHelper;
 
 /**
@@ -32,7 +32,7 @@ import org.jnode.vm.x86.compiler.X86CompilerHelper;
 final class EmitterContext {
 
     /** The output stream */
-    private final AbstractX86Stream os;
+    private final X86Assembler os;
 
     /** Helper class */
     private final X86CompilerHelper helper;
@@ -49,7 +49,7 @@ final class EmitterContext {
     /**
      * Create a new context
      */
-    EmitterContext(AbstractX86Stream os, X86CompilerHelper helper,
+    EmitterContext(X86Assembler os, X86CompilerHelper helper,
             VirtualStack vstack, X86RegisterPool pool, ItemFactory ifac) {
         this.os = os;
         this.helper = helper;
@@ -63,7 +63,7 @@ final class EmitterContext {
      * 
      * @return the current emitter's stream
      */
-    final AbstractX86Stream getStream() {
+    final X86Assembler getStream() {
         return os;
     }
 

@@ -23,10 +23,10 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream.ObjectRef;
-import org.jnode.assembler.x86.AbstractX86Stream;
+import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Constants;
-import org.jnode.assembler.x86.X86Stream;
+import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmInterpretedExceptionHandler;
 import org.jnode.vm.classmgr.VmMethod;
@@ -48,7 +48,7 @@ class X86StackFrame implements X86CompilerConstants {
 
 	private final VmMethod method;
 
-	private final AbstractX86Stream os;
+	private final X86Assembler os;
 
 	private final X86CompilerHelper helper;
 
@@ -67,7 +67,7 @@ class X86StackFrame implements X86CompilerConstants {
 	/** Label at start of actual method code */
 	private final Label startCodeLabel;
 
-	private X86Stream.ObjectInfo codeObject;
+	private X86BinaryAssembler.ObjectInfo codeObject;
 
 	private static final int EbpFrameRefOffset = 8;
 
@@ -87,7 +87,7 @@ class X86StackFrame implements X86CompilerConstants {
 	 * @param context
 	 * @param cm
 	 */
-	public X86StackFrame(AbstractX86Stream os, X86CompilerHelper helper,
+	public X86StackFrame(X86Assembler os, X86CompilerHelper helper,
 			VmMethod method, X86CompilerContext context, CompiledMethod cm) {
 		this.os = os;
 		this.helper = helper;

@@ -23,7 +23,7 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
-import org.jnode.assembler.x86.X86Stream;
+import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmMethod;
@@ -116,7 +116,7 @@ public class X86Level1ACompiler extends AbstractX86Compiler {
      */
     public NativeStream createNativeStream(ObjectResolver resolver) {
         X86CpuID cpuid = (X86CpuID) Unsafe.getCurrentProcessor().getCPUID();
-        X86Stream os = new X86Stream(cpuid, 0);
+        X86BinaryAssembler os = new X86BinaryAssembler(cpuid, 0);
         os.setResolver(resolver);
         return os;
     }

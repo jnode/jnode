@@ -21,7 +21,7 @@
  
 package org.jnode.vm.x86.compiler.l1a;
 
-import org.jnode.assembler.x86.AbstractX86Stream;
+import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.JvmType;
 
@@ -199,7 +199,7 @@ final class X86RegisterPool {
 	 * @param os
 	 *            stream for issuing warning messages
 	 */
-	public void reset(AbstractX86Stream os) {
+	public void reset(X86Assembler os) {
 		boolean inuse = false;
 		for (int i = regCount - 1; i >= 0; i--) {
 			if (!registers[i].isFree()) {

@@ -22,7 +22,7 @@
 package org.jnode.vm.x86.compiler;
 
 import org.jnode.assembler.Label;
-import org.jnode.assembler.x86.AbstractX86Stream;
+import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.vm.JvmType;
@@ -71,14 +71,14 @@ public class X86CompilerHelper implements X86CompilerConstants {
 
     private final AbstractX86StackManager stackMgr;
 
-    private final AbstractX86Stream os;
+    private final X86Assembler os;
 
     /**
      * Create a new instance
      * 
      * @param context
      */
-    public X86CompilerHelper(AbstractX86Stream os,
+    public X86CompilerHelper(X86Assembler os,
             AbstractX86StackManager stackMgr, X86CompilerContext context,
             boolean isBootstrap) throws PrivilegedActionPragma {
         this.os = os;

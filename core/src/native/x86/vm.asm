@@ -50,14 +50,6 @@ vm_athrow_notrace:
 	; Test for unhandled exception
 	test ebp,ebp
 	jz vm_athrow_unhandled	
-
-	mov ecx,VMI_MAGIC	
-	and ecx,VmStackFrame_MAGIC_MASK
-	cmp ecx, VmStackFrame_MAGIC_COMPILED
-	je vm_athrow_notrace_pop_eip
-	cmp ecx, VmStackFrame_MAGIC_INTERPRETED
-	je vm_athrow_notrace_pop_eip
-	jmp vm_athrow_unhandled
 	
 vm_athrow_notrace_pop_eip:
 	pop edx ; return address
@@ -77,33 +69,12 @@ vm_athrow_notrace_pop_eip:
 	
 	pop edx ; restore address
 	pop eax ; restore exception
-	
-	mov ecx,VMI_MAGIC	
-	and ecx,VmStackFrame_MAGIC_MASK
-	cmp ecx, VmStackFrame_MAGIC_COMPILED
-	je vm_athrow_deliver_compiled
-;	cmp ecx, VmStackFrame_MAGIC_INTERPRETED
-;	je vm_athrow_deliver_interpreted
-	jmp vm_athrow_unknown_magic
-	
+		
 vm_athrow_deliver_compiled:
 	test ebx,ebx
 	jz vm_athrow_notrace_pop_eip	
 	; Jump to the compiled exception handler
 	jmp ebx
-	
-;vm_athrow_deliver_interpreted:
-;	cmp ebx,VmSystem_RC_HANDLER
-;	je vm_athrow_deliver_handler_interpreted
-;	cmp ebx,VmSystem_RC_DEFHANDLER
-;	je vm_athrow_deliver_default_handler_interpreted
-;	jmp vm_athrow_unknown_rc
-
-;vm_athrow_deliver_handler_interpreted:
-;	jmp vmi_athrow_handler
-	
-;vm_athrow_deliver_default_handler_interpreted:
-;	jmp vmi_default_handler
 	
 vm_athrow_unhandled:
 	cli
@@ -122,96 +93,6 @@ vm_athrow_unhandled:
 	hlt
 	ret
 	
-vm_athrow_unknown_magic:
-	push eax
-	mov eax,vm_athrow_unknown_magic_msg
-	call sys_print_str
-	mov eax,VMI_MAGIC
-	call sys_print_eax
-	pop eax
-	jmp vm_athrow_unhandled
-	
-vm_athrow_unknown_rc:
-	push eax
-	mov eax,vm_athrow_unknown_rc_msg
-	call sys_print_str
-	mov eax,ebx
-	call sys_print_eax
-	pop eax
-	jmp vm_athrow_unhandled
-	
-; -----------------------------------------------
-; Patch the return location with 'mov eax,<the value that is now in eax>'
-; Input
-;   EAX the value to let EAX be
-;   [ESP+0] return address
-;   [ESP+4] Length of patch block
-; -----------------------------------------------
-vm_patch_MOV_EAX_IMM32:
-	push ebx
-	mov ebx,esp
-	push ecx
-	push edi
-	cli
-	
-	; First clear the block with NOP's
-	mov ecx,[ebx+8] ; Length of patch block
-	mov edi,[ebx+4] ; Return address
-	sub edi,ecx
-	cld
-	push eax
-	mov eax,0x90
-	rep stosb
-	pop eax
-	
-	; Now create the mov
-	mov edi,[ebx+4] ; Return address
-	sub edi,[ebx+8] ; Length of patch block
-	mov byte [edi+0], 0xb8
-	mov dword [edi+1], eax
-	mov [ebx+4],edi ; Set return address to start of patch block
-	
-	sti
-	pop edi
-	pop ecx
-	pop ebx
-	
-	ret 4
-
-; -----------------------------------------------
-; Patch the return location with all NOP's
-; Input
-;   [ESP+0] return address
-;   [ESP+4] Length of patch block
-; -----------------------------------------------
-vm_patch_NOP:
-	push ebx
-	mov ebx,esp
-	push ecx
-	push edi
-	cli
-	
-	; First clear the block with NOP's
-	mov ecx,[ebx+8] ; Length of patch block
-	mov edi,[ebx+4] ; Return address
-	sub edi,ecx
-	cld
-	push eax
-	mov eax,0x90
-	rep stosb
-	pop eax
-	
-	mov edi,[ebx+4] ; Return address
-	sub edi,[ebx+8] ; Length of patch block
-	mov [ebx+4],edi ; Set return address to start of patch block
-
-	sti
-	pop edi
-	pop ecx
-	pop ebx
-	
-	ret 4
-
 ; -----------------------------------------------
 ; Print a java.lang.String in EAX
 ; -----------------------------------------------
@@ -308,8 +189,6 @@ vm_athrow_msg1: db 'athrow of ',0
 vm_athrow_msg2: db ': ',0
 vm_athrow_msg3: db 'at ',0
 vm_athrow_msg4: db 'Unhandled exception ... halt',0
-vm_athrow_unknown_magic_msg: db 'Unknown magic: ',0
-vm_athrow_unknown_rc_msg: db 'Unknown returncode: ',0
 
 vm_print_string_msg1: db 'NULL String!',0
 vm_print_chararray_msg1: db 'NULL char array!',0

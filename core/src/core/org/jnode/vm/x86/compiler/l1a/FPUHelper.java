@@ -22,7 +22,7 @@
 package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.Label;
-import org.jnode.assembler.x86.AbstractX86Stream;
+import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.system.BootLog;
@@ -43,7 +43,7 @@ final class FPUHelper implements X86CompilerConstants {
 	 * @param vstack
 	 * @param type
 	 */
-	final static void add(AbstractX86Stream os, EmitterContext ec,
+	final static void add(X86Assembler os, EmitterContext ec,
 			VirtualStack vstack, int type) {
 	    final ItemFactory ifac = ec.getItemFactory();
 		final Item v2 = vstack.pop(type);
@@ -79,7 +79,7 @@ final class FPUHelper implements X86CompilerConstants {
 	 * @param type
 	 * @param curInstrLabel
 	 */
-	final static void compare(AbstractX86Stream os, EmitterContext ec,
+	final static void compare(X86Assembler os, EmitterContext ec,
 			VirtualStack vstack, boolean gt, int type, Label curInstrLabel) {
 		final Item v2 = vstack.pop(type);
 		final Item v1 = vstack.pop(type);
@@ -193,7 +193,7 @@ final class FPUHelper implements X86CompilerConstants {
 	 * @param vstack
 	 * @param type
 	 */
-	final static void div(AbstractX86Stream os, EmitterContext ec,
+	final static void div(X86Assembler os, EmitterContext ec,
 			VirtualStack vstack, int type) {
 	    final ItemFactory ifac = ec.getItemFactory();
 		final Item v2 = vstack.pop(type);
@@ -228,7 +228,7 @@ final class FPUHelper implements X86CompilerConstants {
 	 * @param vstack
 	 * @param items
 	 */
-	static final void ensureStackCapacity(AbstractX86Stream os,
+	static final void ensureStackCapacity(X86Assembler os,
 			EmitterContext ec, VirtualStack vstack, int items) {
 		final FPUStack fpuStack = vstack.fpuStack;
 		if (!fpuStack.hasCapacity(items)) {
@@ -248,7 +248,7 @@ final class FPUHelper implements X86CompilerConstants {
 	 * @param fpuStack
 	 * @param item
 	 */
-	static final void fxch(AbstractX86Stream os, FPUStack fpuStack, Item item) {
+	static final void fxch(X86Assembler os, FPUStack fpuStack, Item item) {
 		if (!fpuStack.isTos(item)) {
 			final X86Register fpuReg = fpuStack.getRegister(item);
 			fxch(os, fpuStack, fpuReg);
@@ -262,7 +262,7 @@ final class FPUHelper implements X86CompilerConstants {
 	 * @param fpuStack
 	 * @param fpuReg
 	 */
-	static final void fxch(AbstractX86Stream os, FPUStack fpuStack,
+	static final void fxch(X86Assembler os, FPUStack fpuStack,
 			X86Register fpuReg) {
 		if (fpuReg == X86Register.ST0) {
 			throw new StackException("Cannot fxch ST0");
@@ -278,7 +278,7 @@ final class FPUHelper implements X86CompilerConstants {
 	 * @param fpuStack
 	 * @param fpuReg
 	 */
-	private static final void fxchST1(AbstractX86Stream os, FPUStack fpuStack,
+	private static final void fxchST1(X86Assembler os, FPUStack fpuStack,
 			X86Register fpuReg) {
 		// We need reg to be ST1, if not swap
 		if (fpuReg != X86Register.ST1) {
@@ -312,7 +312,7 @@ final class FPUHelper implements X86CompilerConstants {
 	 * @param vstack
 	 * @param type
 	 */
-	final static void mul(AbstractX86Stream os, EmitterContext ec,
+	final static void mul(X86Assembler os, EmitterContext ec,
 			VirtualStack vstack, int type) {
 	    final ItemFactory ifac = ec.getItemFactory();
 		final Item v2 = vstack.pop(type);
@@ -345,7 +345,7 @@ final class FPUHelper implements X86CompilerConstants {
 	 * @param vstack
 	 * @param type
 	 */
-	final static void neg(AbstractX86Stream os, EmitterContext ec,
+	final static void neg(X86Assembler os, EmitterContext ec,
 			VirtualStack vstack, int type) {
 	    final ItemFactory ifac = ec.getItemFactory();
 		final Item v = vstack.pop(type);
@@ -368,7 +368,7 @@ final class FPUHelper implements X86CompilerConstants {
 	/**
 	 * Make sure that the given operand is on the top on the FPU stack.
 	 */
-	private final static void prepareForOperation(AbstractX86Stream os,
+	private final static void prepareForOperation(X86Assembler os,
 			EmitterContext ec, VirtualStack vstack, FPUStack fpuStack, Item left) {
 		final boolean onFpu = left.isFPUStack();
 
@@ -402,7 +402,7 @@ final class FPUHelper implements X86CompilerConstants {
 	 * @param left
 	 * @param right
 	 */
-	private final static X86Register prepareForOperation(AbstractX86Stream os,
+	private final static X86Register prepareForOperation(X86Assembler os,
 			EmitterContext ec, VirtualStack vstack, FPUStack fpuStack,
 			Item left, Item right, boolean commutative) {
 		final boolean lOnFpu = left.isFPUStack();
@@ -472,7 +472,7 @@ final class FPUHelper implements X86CompilerConstants {
 	 * @param vstack
 	 * @param type
 	 */
-	final static void rem(AbstractX86Stream os, EmitterContext ec,
+	final static void rem(X86Assembler os, EmitterContext ec,
 			VirtualStack vstack, int type) {
 	    final ItemFactory ifac = ec.getItemFactory();
 		final Item v2 = vstack.pop(type);
@@ -510,7 +510,7 @@ final class FPUHelper implements X86CompilerConstants {
 	 * @param vstack
 	 * @param type
 	 */
-	final static void sub(AbstractX86Stream os, EmitterContext ec,
+	final static void sub(X86Assembler os, EmitterContext ec,
 			VirtualStack vstack, int type) {
 	    final ItemFactory ifac = ec.getItemFactory();
 		final Item v2 = vstack.pop(type);

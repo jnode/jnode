@@ -21,7 +21,7 @@
  
 package org.jnode.vm.x86.compiler.l2;
 
-import org.jnode.assembler.x86.AbstractX86Stream;
+import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.Label;
@@ -55,7 +55,7 @@ public class X86CodeGenerator extends CodeGenerator {
     public static final int BYTESIZE = X86Constants.BITS8;
     public static final int WORDSIZE = X86Constants.BITS16;
     private Variable[] spilledVariables;
-    private AbstractX86Stream os;
+    private X86Assembler os;
     private int displacement;
     private String labelPrefix;
     private String instrLabelPrefix;
@@ -66,7 +66,7 @@ public class X86CodeGenerator extends CodeGenerator {
     /**
      * Initialize this instance
      */
-    public X86CodeGenerator(AbstractX86Stream x86Stream, int lenght) {
+    public X86CodeGenerator(X86Assembler x86Stream, int lenght) {
         CodeGenerator.setCodeGenerator(this);
         this.registerPool = new X86RegisterPool();
         this.os = x86Stream;

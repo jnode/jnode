@@ -24,8 +24,8 @@ package org.jnode.vm.x86.compiler;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
-import org.jnode.assembler.x86.AbstractX86Stream;
-import org.jnode.assembler.x86.X86Stream;
+import org.jnode.assembler.x86.X86Assembler;
+import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.classmgr.VmClassLoader;
@@ -61,7 +61,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements 
 	 * @see org.jnode.vm.compiler.NativeCodeCompiler#createNativeStream(org.jnode.assembler.ObjectResolver)
 	 */
 	public NativeStream createNativeStream(ObjectResolver resolver) {
-		final X86Stream os = new X86Stream((X86CpuID) Unsafe.getCurrentProcessor().getCPUID(), 0);
+		final X86BinaryAssembler os = new X86BinaryAssembler((X86CpuID) Unsafe.getCurrentProcessor().getCPUID(), 0);
 		os.setResolver(resolver);
 		return os;
 	}
@@ -73,7 +73,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements 
 		if (isBootstrap) {
 			//System.out.println("Abstraxct method " + method);
 			final CompiledMethod cm = new CompiledMethod(level);
-			final AbstractX86Stream os = (AbstractX86Stream) nos;
+			final X86Assembler os = (X86Assembler) nos;
 			// Create the helper
 			final X86CompilerHelper helper = new X86CompilerHelper(os, null, context, isBootstrap);
 			// Start an "object"

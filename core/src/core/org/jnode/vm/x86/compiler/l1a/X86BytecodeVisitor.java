@@ -23,7 +23,7 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
-import org.jnode.assembler.x86.AbstractX86Stream;
+import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Operation;
@@ -117,7 +117,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
     private int maxLocals;
 
     /** The output stream */
-    private final AbstractX86Stream os;
+    private final X86Assembler os;
 
     /** Should we set the current instruction label on startInstruction? */
     private boolean setCurInstrLabel;
@@ -166,7 +166,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      */
     public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
             boolean isBootstrap, X86CompilerContext context, MagicHelper magicHelper) {
-        this.os = (AbstractX86Stream) outputStream;
+        this.os = (X86Assembler) outputStream;
         this.context = context;
         this.magicHelper = magicHelper;
         this.vstack = new VirtualStack(os);

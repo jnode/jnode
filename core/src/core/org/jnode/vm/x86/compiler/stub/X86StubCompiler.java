@@ -24,8 +24,8 @@ package org.jnode.vm.x86.compiler.stub;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
-import org.jnode.assembler.x86.AbstractX86Stream;
-import org.jnode.assembler.x86.X86Stream;
+import org.jnode.assembler.x86.X86Assembler;
+import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
@@ -85,7 +85,7 @@ public class X86StubCompiler extends AbstractX86Compiler {
 			Object label = new Label(method.getMangledName());
 			cm.setCodeStart(nos.getObjectRef(label));
 		} else {
-			final AbstractX86Stream os = (AbstractX86Stream) nos;
+			final X86Assembler os = (X86Assembler) nos;
 			final X86CompilerContext context = getContext();
 			// Create the helper
 			final CCompilerHelper ih = new CCompilerHelper(os, null, context, isBootstrap);
@@ -132,7 +132,7 @@ public class X86StubCompiler extends AbstractX86Compiler {
 	 * @return NativeStream
 	 */
 	public NativeStream createNativeStream(ObjectResolver resolver) {
-		X86Stream os = new X86Stream((X86CpuID)Unsafe.getCurrentProcessor().getCPUID(), 0, 16, 64, 8);
+		X86BinaryAssembler os = new X86BinaryAssembler((X86CpuID)Unsafe.getCurrentProcessor().getCPUID(), 0, 16, 64, 8);
 		os.setResolver(resolver);
 		return os;
 	}

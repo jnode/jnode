@@ -26,7 +26,7 @@ import java.io.FileOutputStream;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Constants;
-import org.jnode.assembler.x86.X86Stream;
+import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.vm.x86.X86CpuID;
 
 /**
@@ -37,7 +37,7 @@ public class X86StreamTest {
 	public static void main(String[] args) 
 	throws Exception {
 		
-		final X86Stream os = new X86Stream(X86CpuID.createID("pentium4"), 0);
+		final X86BinaryAssembler os = new X86BinaryAssembler(X86CpuID.createID("pentium4"), 0);
 		
 		final Label label = new Label("label");
 		os.writeADD(X86Register.EDX, X86Register.EAX);

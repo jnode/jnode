@@ -21,7 +21,7 @@
  
 package org.jnode.vm.x86.compiler.l1a;
 
-import org.jnode.assembler.x86.AbstractX86Stream;
+import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
@@ -51,7 +51,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      */
     protected Item clone(EmitterContext ec) {
         final WordItem res;
-        final AbstractX86Stream os = ec.getStream();
+        final X86Assembler os = ec.getStream();
 
         switch (getKind()) {
         case Kind.REGISTER:
@@ -138,7 +138,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
     final void loadTo(EmitterContext ec, X86Register reg) {
         if (Vm.VerifyAssertions)
             Vm._assert(reg != null, "Reg != null");
-        final AbstractX86Stream os = ec.getStream();
+        final X86Assembler os = ec.getStream();
         final X86RegisterPool pool = ec.getPool();
         final VirtualStack stack = ec.getVStack();
         if (Vm.VerifyAssertions)
@@ -192,7 +192,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      * @param reg
      */
     protected abstract void loadToConstant(EmitterContext ec,
-            AbstractX86Stream os, X86Register reg);
+            X86Assembler os, X86Register reg);
 
     /**
      * Load this item to a general purpose register.
@@ -250,14 +250,14 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      * @param reg
      * @param disp
      */
-    protected abstract void popFromFPU(AbstractX86Stream os, X86Register reg,
+    protected abstract void popFromFPU(X86Assembler os, X86Register reg,
             int disp);
 
     /**
      * @see org.jnode.vm.x86.compiler.l1a.Item#push(EmitterContext)
      */
     final void push(EmitterContext ec) {
-        final AbstractX86Stream os = ec.getStream();
+        final X86Assembler os = ec.getStream();
         final VirtualStack stack = ec.getVStack();
 
         switch (getKind()) {
@@ -309,7 +309,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      * 
      * @param os
      */
-    protected abstract void pushConstant(EmitterContext ec, AbstractX86Stream os);
+    protected abstract void pushConstant(EmitterContext ec, X86Assembler os);
 
     /**
      * Push the value at the given memory location on the FPU stack.
@@ -318,14 +318,14 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
      * @param reg
      * @param disp
      */
-    protected abstract void pushToFPU(AbstractX86Stream os, X86Register reg,
+    protected abstract void pushToFPU(X86Assembler os, X86Register reg,
             int disp);
 
     /**
      * @see org.jnode.vm.x86.compiler.l1a.Item#pushToFPU(EmitterContext)
      */
     final void pushToFPU(EmitterContext ec) {
-        final AbstractX86Stream os = ec.getStream();
+        final X86Assembler os = ec.getStream();
         final VirtualStack stack = ec.getVStack();
 
         switch (getKind()) {
