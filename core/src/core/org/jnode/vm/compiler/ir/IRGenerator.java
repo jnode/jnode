@@ -16,6 +16,7 @@ import org.jnode.vm.classmgr.VmConstFieldRef;
 import org.jnode.vm.classmgr.VmConstIMethodRef;
 import org.jnode.vm.classmgr.VmConstMethodRef;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.compiler.ir.quad.*;
 
 /**
  * Intermediate Representation Generator.

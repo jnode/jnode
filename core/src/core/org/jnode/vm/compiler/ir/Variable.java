@@ -5,6 +5,9 @@
  */
 package org.jnode.vm.compiler.ir;
 
+import org.jnode.vm.compiler.ir.quad.AssignQuad;
+import org.jnode.vm.compiler.ir.quad.VariableRefAssignQuad;
+
 /**
  * @author Madhu Siddalingaiah
  *

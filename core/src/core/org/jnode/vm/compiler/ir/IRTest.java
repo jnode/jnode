@@ -18,6 +18,7 @@ import org.jnode.vm.bytecode.BytecodeViewer;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.compiler.ir.quad.*;
 import org.jnode.vm.x86.VmX86Architecture;
 import org.jnode.vm.x86.compiler.l2.X86CodeGenerator;
 
