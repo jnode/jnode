@@ -139,6 +139,7 @@
 			<class classname="org.jnode.vm.x86.VmX86Processor" />
 			<class classname="org.jnode.vm.x86.VmX86StackReader" static="on" />
 			<class classname="org.jnode.vm.x86.VmX86Thread" />
+			<class classname="org.jnode.vm.x86.VmX86Thread64" />
 			<class classname="org.jnode.vm.x86.VmX86Thread" static="on" />
 			<class classname="java.lang.Integer" />
 			<class classname="java.lang.Long" />
