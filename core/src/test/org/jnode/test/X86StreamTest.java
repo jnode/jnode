@@ -78,6 +78,10 @@ public class X86StreamTest {
 		os.writeFLD32(Register.EAX, Register.ESI, 4, 15);
 		os.writeFLD64(Register.EAX, Register.ESI, 8, 15);
 		
+		os.writeCALL(Register.EAX, Register.EDX, 1, 0);
+		os.writeCALL(Register.EAX);
+		os.writeCALL(Register.ESI);
+		
 		FileOutputStream fos = new FileOutputStream("test.bin");
 		os.writeTo(fos);
 		fos.close();

@@ -7,6 +7,7 @@ import java.nio.ByteOrder;
 
 import org.jnode.system.ResourceManager;
 import org.jnode.vm.classmgr.VmStatics;
+import org.jnode.vm.compiler.IMTCompiler;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 
 /**
@@ -51,6 +52,12 @@ public abstract class VmArchitecture extends VmSystemObject {
 	 */
 	public abstract NativeCodeCompiler[] getCompilers();
 
+	/**
+	 * Gets the compiler of IMT's.
+	 * @return
+	 */
+	public abstract IMTCompiler getIMTCompiler();
+	
 	/**
 	 * Find and start all processors in the system.
 	 * All all discovered processors to the given list.

@@ -21,10 +21,13 @@ import java.util.TreeMap;
 
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.vm.classmgr.ClassDecoder;
+import org.jnode.vm.classmgr.IMTBuilder;
 import org.jnode.vm.classmgr.SelectorMap;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.compiler.CompiledIMT;
+import org.jnode.vm.compiler.IMTCompiler;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 
 /**
@@ -498,6 +501,14 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
             cmp = cmps[ optLevel];
             cmp.compileRuntime(vmMethod, getResolver(), optLevel, null);
         }
+    }
+
+    /**
+     * Compile the given IMT.
+     */
+    public CompiledIMT compileIMT(IMTBuilder builder) {
+        final IMTCompiler cmp = arch.getIMTCompiler();
+        return cmp.compile(resolver, builder.getImt(), builder.getImtCollisions());
     }
 
     /**

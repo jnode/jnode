@@ -17,7 +17,9 @@ import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmStackReader;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.classmgr.VmStatics;
+import org.jnode.vm.compiler.IMTCompiler;
 import org.jnode.vm.compiler.NativeCodeCompiler;
+import org.jnode.vm.x86.compiler.X86IMTCompiler;
 import org.jnode.vm.x86.compiler.l1.X86Level1Compiler;
 import org.jnode.vm.x86.compiler.l1a.X86Level1ACompiler;
 import org.jnode.vm.x86.compiler.stub.X86StubCompiler;
@@ -34,6 +36,9 @@ public final class VmX86Architecture extends VmArchitecture {
 
 	/** The compilers */
 	private final NativeCodeCompiler[] compilers;
+	
+	/** The IMT compiler */
+	private final X86IMTCompiler imtCompiler;
 
 	/** The local APIC accessor, if any */
 	private LocalAPIC localAPIC;
@@ -57,6 +62,7 @@ public final class VmX86Architecture extends VmArchitecture {
 	 */
 	public VmX86Architecture(String compiler) {
 		final boolean useL1A = ((compiler != null) && compiler.equalsIgnoreCase("L1A"));
+		imtCompiler = new X86IMTCompiler();
 		compilers = new NativeCodeCompiler[2];
 		compilers[0] = new X86StubCompiler();
 		if (useL1A) {
@@ -94,6 +100,14 @@ public final class VmX86Architecture extends VmArchitecture {
 		return compilers;
 	}
 
+	/**
+	 * Gets the compiler of IMT's.
+	 * @return
+	 */
+	public final IMTCompiler getIMTCompiler() {
+		return imtCompiler;
+	}
+	
 	/**
 	 * Gets the name of this architecture.
 	 * 
