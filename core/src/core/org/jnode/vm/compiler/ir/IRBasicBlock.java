@@ -18,6 +18,10 @@ public class IRBasicBlock extends BasicBlock {
 	private BootableArrayList successors;
 	private Variable[] variables;
 	private BootableArrayList phiReferences;
+	
+	// The stack offset at the beginning of this block
+	// In some cases, e.g. terniary operators, this is important
+	private int stackOffset;
 
 	// This is useful for finding the bottom of a loop.
 	private IRBasicBlock lastPredecessor;
@@ -35,6 +39,7 @@ public class IRBasicBlock extends BasicBlock {
 		this.predecessors = new BootableArrayList();
 		this.successors = new BootableArrayList();
 		this.phiReferences = new BootableArrayList();
+		this.stackOffset = -1; // We'll check to make sure this is set
 	}
 
 	/**
@@ -128,5 +133,22 @@ public class IRBasicBlock extends BasicBlock {
 	 */
 	public IRBasicBlock getLastPredecessor() {
 		return lastPredecessor;
+	}
+
+	/**
+	 * @return
+	 */
+	public int getStackOffset() {
+		if (stackOffset < 0) {
+			throw new AssertionError("Stack offset is invalid");
+		}
+		return stackOffset;
+	}
+
+	/**
+	 * @param i
+	 */
+	public void setStackOffset(int initialOffset) {
+		stackOffset = initialOffset;
 	}
 }

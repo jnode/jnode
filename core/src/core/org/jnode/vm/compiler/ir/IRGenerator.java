@@ -108,8 +108,11 @@ public class IRGenerator extends BytecodeVisitor {
 			Iterator pi = currentBlock.getPredecessors().iterator();
 			if (!pi.hasNext()) {
 				// this must be the first block in the method
+				// We probably never get here, but just in case...
+				stackOffset = nLocals;
 				return;
 			}
+			stackOffset = currentBlock.getStackOffset();
 			while (pi.hasNext()) {
 				IRBasicBlock irb = (IRBasicBlock) pi.next();
 				if (irb.getEndPC() <= address) {
@@ -957,6 +960,7 @@ public class IRGenerator extends BytecodeVisitor {
 		quadList.add(new ConditionalBranchQuad(this.address, currentBlock,
 			s1, ConditionalBranchQuad.IFEQ, address));
 		stackOffset -= 1;
+		setSuccessorStackOffset();
 	}
 
 	/**
@@ -969,6 +973,7 @@ public class IRGenerator extends BytecodeVisitor {
 		quadList.add(new ConditionalBranchQuad(this.address, currentBlock,
 			s1, ConditionalBranchQuad.IFNE, address));
 		stackOffset -= 1;
+		setSuccessorStackOffset();
 	}
 
 	/**
@@ -981,6 +986,7 @@ public class IRGenerator extends BytecodeVisitor {
 		quadList.add(new ConditionalBranchQuad(this.address, currentBlock,
 			s1, ConditionalBranchQuad.IFLT, address));
 		stackOffset -= 1;
+		setSuccessorStackOffset();
 	}
 
 	/**
@@ -993,6 +999,7 @@ public class IRGenerator extends BytecodeVisitor {
 		quadList.add(new ConditionalBranchQuad(this.address, currentBlock,
 			s1, ConditionalBranchQuad.IFGE, address));
 		stackOffset -= 1;
+		setSuccessorStackOffset();
 	}
 
 	/**
@@ -1005,6 +1012,7 @@ public class IRGenerator extends BytecodeVisitor {
 		quadList.add(new ConditionalBranchQuad(this.address, currentBlock,
 			s1, ConditionalBranchQuad.IFGT, address));
 		stackOffset -= 1;
+		setSuccessorStackOffset();
 	}
 
 	/**
@@ -1017,6 +1025,7 @@ public class IRGenerator extends BytecodeVisitor {
 		quadList.add(new ConditionalBranchQuad(this.address, currentBlock,
 			s1, ConditionalBranchQuad.IFLE, address));
 		stackOffset -= 1;
+		setSuccessorStackOffset();
 	}
 
 	/**
@@ -1031,6 +1040,7 @@ public class IRGenerator extends BytecodeVisitor {
 		quadList.add(new ConditionalBranchQuad(this.address, currentBlock,
 			s1, ConditionalBranchQuad.IF_ICMPEQ, s2, address));
 		stackOffset -= 2;
+		setSuccessorStackOffset();
 	}
 
 	/**
@@ -1045,6 +1055,7 @@ public class IRGenerator extends BytecodeVisitor {
 		quadList.add(new ConditionalBranchQuad(this.address, currentBlock,
 			s1, ConditionalBranchQuad.IF_ICMPNE, s2, address));
 		stackOffset -= 2;
+		setSuccessorStackOffset();
 	}
 
 	/**
@@ -1059,6 +1070,7 @@ public class IRGenerator extends BytecodeVisitor {
 		quadList.add(new ConditionalBranchQuad(this.address, currentBlock,
 			s1, ConditionalBranchQuad.IF_ICMPLT, s2, address));
 		stackOffset -= 2;
+		setSuccessorStackOffset();
 	}
 
 	/**
@@ -1073,6 +1085,7 @@ public class IRGenerator extends BytecodeVisitor {
 		quadList.add(new ConditionalBranchQuad(this.address, currentBlock,
 			s1, ConditionalBranchQuad.IF_ICMPGE, s2, address));
 		stackOffset -= 2;
+		setSuccessorStackOffset();
 	}
 
 	/**
@@ -1087,6 +1100,7 @@ public class IRGenerator extends BytecodeVisitor {
 		quadList.add(new ConditionalBranchQuad(this.address, currentBlock,
 			s1, ConditionalBranchQuad.IF_ICMPGT, s2, address));
 		stackOffset -= 2;
+		setSuccessorStackOffset();
 	}
 
 	/**
@@ -1101,6 +1115,7 @@ public class IRGenerator extends BytecodeVisitor {
 		quadList.add(new ConditionalBranchQuad(this.address, currentBlock,
 			s1, ConditionalBranchQuad.IF_ICMPLE, s2, address));
 		stackOffset -= 2;
+		setSuccessorStackOffset();
 	}
 
 	/**
@@ -1115,6 +1130,7 @@ public class IRGenerator extends BytecodeVisitor {
 		quadList.add(new ConditionalBranchQuad(this.address, currentBlock,
 			s1, ConditionalBranchQuad.IF_ACMPEQ, s2, address));
 		stackOffset -= 2;
+		setSuccessorStackOffset();
 	}
 
 	/**
@@ -1129,6 +1145,7 @@ public class IRGenerator extends BytecodeVisitor {
 		quadList.add(new ConditionalBranchQuad(this.address, currentBlock,
 			s1, ConditionalBranchQuad.IF_ACMPNE, s2, address));
 		stackOffset -= 2;
+		setSuccessorStackOffset();
 	}
 
 	/**
@@ -1136,6 +1153,7 @@ public class IRGenerator extends BytecodeVisitor {
 	 */
 	public void visit_goto(int address) {
 		quadList.add(new UnconditionalBranchQuad(this.address, currentBlock, address));
+		setSuccessorStackOffset();
 	}
 
 	/**
@@ -1354,6 +1372,7 @@ public class IRGenerator extends BytecodeVisitor {
 		quadList.add(new ConditionalBranchQuad(this.address, currentBlock,
 			s1, ConditionalBranchQuad.IFNULL, address));
 		stackOffset -= 1;
+		setSuccessorStackOffset();
 	}
 
 	/**
@@ -1366,6 +1385,7 @@ public class IRGenerator extends BytecodeVisitor {
 		quadList.add(new ConditionalBranchQuad(this.address, currentBlock,
 			s1, ConditionalBranchQuad.IFNONNULL, address));
 		stackOffset -= 1;
+		setSuccessorStackOffset();
 	}
 
 	// TODO
@@ -1395,5 +1415,13 @@ public class IRGenerator extends BytecodeVisitor {
 	 */
 	public int getNoArgs() {
 		return this.nArgs;
+	}
+
+	private void setSuccessorStackOffset() {
+		Iterator it = currentBlock.getSuccessors().iterator();
+		while (it.hasNext()) {
+			IRBasicBlock sBlock = (IRBasicBlock) it.next();
+			sBlock.setStackOffset(stackOffset);
+		}
 	}
 }
