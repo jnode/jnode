@@ -3,12 +3,10 @@
  */
 package org.jnode.awt.font.truetype;
 
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
