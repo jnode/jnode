@@ -22,6 +22,7 @@ import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.system.IOResource;
 import org.jnode.system.IRQHandler;
 import org.jnode.system.IRQResource;
+import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
@@ -64,13 +65,13 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
 
     /** Enable congestion control in the DP83840. */
     final static boolean congenb = false;
-    
+
     /**
      * Create a new instance and allocate all resources
      * 
      * @throws ResourceNotFreeException
      */
-    public EEPRO100Core(EEPRO100Driver driver, ResourceOwner owner, PCIDevice device, Flags flags) throws ResourceNotFreeException, DriverException {
+public EEPRO100Core(EEPRO100Driver driver, ResourceOwner owner, PCIDevice device, Flags flags) throws ResourceNotFreeException, DriverException {
         this.driver = driver;
         this.flags = (EEPRO100Flags) flags;
 
@@ -179,65 +180,38 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
             }
         }
 
+        byte[] data = new byte[32];
+        MemoryResource selfTest = rm.asMemoryResource(data);
+        
         /* Perform a system self-test. */
-        /*
-         * log.debug("self test: " +
-         * Integer.toHexString(selfTest.getPhysicalStartAddress()));
-         * setReg32(SCBPort, selfTest.getPhysicalStartAddress() | PortSelfTest);
-         * selfTest.write16(2, 0); // rom signature selfTest.write16(0, -1); //
-         * status int boguscnt = 16000; /* Timeout for set-test.
-         *//*
-                                                           * do {
-                                                           * SystemResource.getTimer().udelay(10); //
-                                                           * int i0=100; //
-                                                           * while(i0-->0) // ; }
-                                                           * while
-                                                           * (selfTest.read16(0) ==
-                                                           * -1 && --boguscnt >=
-                                                           * 0);
-                                                           * 
-                                                           * if (boguscnt < 0) { /*
-                                                           * Test optimized out.
-                                                           *//*
-                                                       * sb.append("Self test
-                                                       * failed, status
-                                                       * ").append(Integer.toHexString(selfTest.read32(4)));
-                                                       * sb.append(" Failure to
-                                                       * initialize the
-                                                       * i82557.\n\r");
-                                                       * sb.append(" Verify that
-                                                       * the card is a
-                                                       * bus-master capable
-                                                       * slot.");
-                                                       * System.out.println(sb.toString());
-                                                       * sb.setLength(0); } else {
-                                                       * int results =
-                                                       * selfTest.read16(0);
-                                                       * sb.append(" General
-                                                       * self-test:
-                                                       * ").append((results &
-                                                       * 0x1000) == 0 ? "failed" :
-                                                       * "passed").append("\r\n");
-                                                       * sb.append(" Serial
-                                                       * sub-system self-test:
-                                                       * ").append((results &
-                                                       * 0x0020) == 0 ? "failed" :
-                                                       * "passed").append("\r\n");
-                                                       * sb.append(" Internal
-                                                       * registers self-test:
-                                                       * ").append((results &
-                                                       * 0x0008) == 0 ? "failed" :
-                                                       * "passed").append("\r\n");
-                                                       * sb.append(" ROM
-                                                       * checksum self-test:
-                                                       * ").append((results &
-                                                       * 0x0004) == 0 ? "failed" :
-                                                       * "passed"); sb.append("
-                                                       * (").append(Integer.toHexString(selfTest.read16(2))).append(')');
-                                                       * System.out.println(sb.toString());
-                                                       * sb.setLength(0); }
-                                                       */
-        /* reset */
+       log.debug("self test: " + Integer.toHexString(selfTest.getAddress().as32bit(selfTest.getAddress())));
+
+        setReg32(SCBPort, selfTest.getAddress().as32bit(selfTest.getAddress()) | PortSelfTest);
+        selfTest.setInt(2, 0);  // rom signature
+        selfTest.setInt(0, -1); //status
+        int boguscnt = 16000; // Timeout for set-test.
+        do {
+            systemDelay(10);
+            int i0=100;
+            while(i0-->0) ; 
+        }while(selfTest.getInt(0) ==-1 && --boguscnt >=0);
+        
+        StringBuffer sb = new StringBuffer();
+        
+        if (boguscnt < 0) {
+            /* Test optimized out. */
+            log.debug("Self test failed, status"+ Long.toHexString(selfTest.getLong(4))+ "Failure to initialize the i82557.");
+            log.debug("Verify that the card is a bus-master capable slot.");
+        } else { 
+            int results = selfTest.getInt(0);
+            log.debug("General self-test:"+ ((results &0x1000) == 0 ? "failed" : "passed"));
+            log.debug("Serial sub-system self-test: "+((results &0x0020) == 0 ? "failed" : "passed"));
+            log.debug("Internal registers self-test:"+((results &0x0008) == 0 ? "failed" : "passed"));
+            log.debug(" ROM checksum self-test:"+((results & 0x0004) == 0 ? "failed" : "passed") + "(" +Integer.toHexString(selfTest.getInt(2)) + ")");
+            log.debug(sb.toString());
+            sb.setLength(0); 
+        }                                                              
+        /* reset adapter to default state*/
         setReg32(SCBPort, PortReset);
         systemDelay(100);
         // 	pci_dev = pdev;
@@ -256,13 +230,11 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
         // 		rxBug = (eeprom[3] & 0x03) == 3;
         // 		if (rxBug)
         // 			System.out.println("Receiver lock-up workaround activated.");
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.jnode.driver.net.AbstractDeviceCore#getHwAddress()
-     */
+    }    /*
+          * (non-Javadoc)
+          * 
+          * @see org.jnode.driver.net.AbstractDeviceCore#getHwAddress()
+          */
     public HardwareAddress getHwAddress() {
         return hwAddress;
     }
