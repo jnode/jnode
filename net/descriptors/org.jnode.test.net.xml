@@ -6,6 +6,10 @@
   version="@VERSION@"
   provider-name="JNode.org">
 
+  <requires>
+    <import plugin="crypto-security"/>
+  </requires>
+
   <runtime>
     <library name="jnode-net.jar">
       <export name="org.jnode.test.net.*"/>
@@ -22,6 +26,7 @@
     <alias name="UDPTest" class="org.jnode.test.net.UDPTest"/>
     <alias name="UDPSendTest" class="org.jnode.test.net.UDPSendTest"/>
     <alias name="ChecksumTest" class="org.jnode.test.net.ChecksumTest"/>
+    <alias name="CvsTest" class="org.jnode.test.net.CvsTest"/>
   </extension>
 
   <extension point="org.jnode.security.permissions">
