@@ -185,7 +185,7 @@ public abstract class AbstractGraphics extends Graphics2D {
 	 * @see java.awt.Graphics#drawString(java.lang.String, int, int)
 	 */
 	public void drawString(String text, int x, int y) {
-		System.out.println("drawText():" + text);
+//		System.out.println("drawText():" + text);
 		if(this.font != null)
 			((JNodeToolkit)Toolkit.getDefaultToolkit()).getFontManager().drawText(this,text,font,x,y);
 	}

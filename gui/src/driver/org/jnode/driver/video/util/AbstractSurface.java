@@ -96,7 +96,7 @@ public abstract class AbstractSurface implements Surface {
 		if (txShape instanceof RectangularShape) {
 			if (txClip != null) {
 				bounds = bounds.createIntersection(txClip.getBounds2D()).getBounds();
-				System.out.println("Clipped bounds " + bounds);
+//				System.out.println("Clipped bounds " + bounds);
 			}
 			if ((bounds.width > 0) && (bounds.height > 0)) {
 				bounds.translate((int) tx, (int) ty);
