@@ -3,12 +3,14 @@
  */
 package org.jnode.driver.video.vmware;
 
+import org.jnode.driver.Device;
 import org.jnode.driver.DeviceException;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.pci.PCIDevice;
 import org.jnode.driver.video.AbstractFrameBufferDriver;
 import org.jnode.driver.video.AlreadyOpenException;
 import org.jnode.driver.video.FrameBufferConfiguration;
+import org.jnode.driver.video.HardwareCursorAPI;
 import org.jnode.driver.video.Surface;
 import org.jnode.driver.video.UnknownConfigurationException;
 import org.jnode.system.ResourceNotFreeException;
@@ -74,13 +76,17 @@ public class VMWareDriver extends AbstractFrameBufferDriver implements VMWareCon
 		} catch (ResourceNotFreeException ex) {
 			throw new DriverException(ex);
 		}
+		final Device dev = getDevice();
 		super.startDevice();
+		dev.registerAPI(HardwareCursorAPI.class, kernel);
 	}
 
 	/**
 	 * @see org.jnode.driver.Driver#stopDevice()
 	 */
 	protected void stopDevice() throws DriverException {
+		final Device dev = getDevice();
+		dev.unregisterAPI(HardwareCursorAPI.class);
 		if (currentConfig != null) {
 			kernel.close();
 		}
