@@ -43,6 +43,11 @@ public interface FileSystem {
 	throws IOException;
 	
 	/**
+	 * Is the filesystem mounted in readonly mode ?
+	 */
+    public boolean isReadOnly();
+	
+	/**
 	 * Close this filesystem. After a close, all invocations of method of
 	 * this filesystem or objects created by this filesystem will throw 
 	 * an IOException.

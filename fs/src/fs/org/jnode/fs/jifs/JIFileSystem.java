@@ -54,6 +54,15 @@ public class JIFileSystem implements FileSystem {
 		}
 	}
 	
+	/**
+	 * Is the filesystem mounted in readonly mode ?
+	 */
+    public boolean isReadOnly()
+	{
+		return true; // always readOnly
+	}
+	
+	
 	public void close(){
 		return;
 	}
