@@ -138,7 +138,8 @@ public class CompareTask extends Task {
     protected int runDiff(JavaFile vmFile, JavaFile cpFile, String diffFileName) throws IOException, InterruptedException {
         final String[] cmd = {
               "diff",
-              "-au",
+              "-b", // Ignore white space change
+              "-au", 
               "-I", ".*$" + "Id:.*$.*", // Avoid cvs keyword expansion in this string
               vmFile.getFileName(),
               cpFile.getFile().getAbsolutePath()
