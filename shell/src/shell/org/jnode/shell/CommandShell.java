@@ -173,8 +173,9 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
                     out.print(currentPrompt);
                     //  wait until enter is hit
                     threadSuspended = true;
-                    while (threadSuspended)
+                    while (threadSuspended) {
                         wait();
+                    }
                     if (currentLine.length() > 0) {
                         processCommand(currentLine.trim());
                     }
