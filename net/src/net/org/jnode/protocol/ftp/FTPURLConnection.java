@@ -7,7 +7,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -78,7 +77,7 @@ public class FTPURLConnection extends URLConnection {
 		final ByteArrayOutputStream os = new ByteArrayOutputStream();
 		try {
 			//Syslog.debug("Getting " + path + " from " + host);
-			boolean success = client.retrieveFile(path, os);
+			/*boolean success =*/ client.retrieveFile(path, os);
 			client.logout();
 		} finally {
 			client.disconnect();
