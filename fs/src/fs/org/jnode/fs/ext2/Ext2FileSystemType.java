@@ -20,7 +20,7 @@ public class Ext2FileSystemType implements FileSystemType {
 	public static final String NAME = "EXT2";
 
 	/**
-	 * @see org.jnode.fs.FileSystemType#create(Device)
+	 * @see org.jnode.fs.FileSystemType#create(Device, boolean)
 	 */
 	public FileSystem create(Device device, boolean readOnly) throws FileSystemException {
 		return new Ext2FileSystem(device, readOnly);
