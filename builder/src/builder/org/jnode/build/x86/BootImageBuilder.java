@@ -290,72 +290,11 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 		refJava = os.getObjectRef(vmMethodClass.getMethod("recompile", "()V"));
 		os.getObjectRef(new Label("VmMethod_recompile")).link(refJava);
 
-		/* Link VmMethod_Class */
-		refJava = os.getObjectRef(vmMethodClass);
-		os.getObjectRef(new Label("VmMethod_Class")).link(refJava);
-
 		/* Link SoftByteCodes_systemException */
 		VmType sbcClass = loadClass(SoftByteCodes.class);
 		refJava = os.getObjectRef(sbcClass.getMethod("systemException",
 				"(II)Ljava/lang/Throwable;"));
 		os.getObjectRef(sbcSystemException).link(refJava);
-
-		/* Link SoftByteCodes_resolveClass */
-		refJava = os
-				.getObjectRef(sbcClass
-						.getMethod("resolveClass",
-								"(Lorg/jnode/vm/classmgr/VmConstClass;)Lorg/jnode/vm/classmgr/VmType;"));
-		os.getObjectRef(new Label("SoftByteCodes_resolveClass")).link(refJava);
-
-		/* Link SoftByteCodes_resolveField */
-		refJava = os
-				.getObjectRef(sbcClass
-						.getMethod(
-								"resolveField",
-								"(Lorg/jnode/vm/classmgr/VmMethod;Lorg/jnode/vm/classmgr/VmConstFieldRef;Z)Lorg/jnode/vm/classmgr/VmField;"));
-		os.getObjectRef(new Label("SoftByteCodes_resolveField")).link(refJava);
-
-		/* Link SoftByteCodes_resolveMethod */
-		refJava = os
-				.getObjectRef(sbcClass
-						.getMethod(
-								"resolveMethod",
-								"(Lorg/jnode/vm/classmgr/VmMethod;Lorg/jnode/vm/classmgr/VmConstMethodRef;)Lorg/jnode/vm/classmgr/VmMethod;"));
-		os.getObjectRef(new Label("SoftByteCodes_resolveMethod")).link(refJava);
-
-		/* Link SoftByteCodes_allocArray */
-		refJava = os.getObjectRef(sbcClass.getMethod("allocArray",
-				"(Lorg/jnode/vm/classmgr/VmType;I)Ljava/lang/Object;"));
-		os.getObjectRef(new Label("SoftByteCodes_allocArray")).link(refJava);
-
-		/* Link SoftByteCodes_allocMultiArray */
-		refJava = os.getObjectRef(sbcClass.getMethod("allocMultiArray",
-				"(Lorg/jnode/vm/classmgr/VmType;[I)Ljava/lang/Object;"));
-		os.getObjectRef(new Label("SoftByteCodes_allocMultiArray")).link(
-				refJava);
-
-		/* Link SoftByteCodes_allocObject */
-		refJava = os.getObjectRef(sbcClass.getMethod("allocObject",
-				"(Lorg/jnode/vm/classmgr/VmType;I)Ljava/lang/Object;"));
-		os.getObjectRef(new Label("SoftByteCodes_allocObject")).link(refJava);
-
-		/* Link SoftByteCodes_allocPrimitiveArray */
-		refJava = os.getObjectRef(sbcClass.getMethod("allocPrimitiveArray",
-				"(II)Ljava/lang/Object;"));
-		os.getObjectRef(new Label("SoftByteCodes_allocPrimitiveArray")).link(
-				refJava);
-
-		/* Link SoftByteCodes_anewarray */
-		refJava = os
-				.getObjectRef(sbcClass
-						.getMethod(
-								"anewarray",
-								"(Lorg/jnode/vm/classmgr/VmMethod;Lorg/jnode/vm/classmgr/VmType;I)Ljava/lang/Object;"));
-		os.getObjectRef(new Label("SoftByteCodes_anewarray")).link(refJava);
-
-		/* Link SoftByteCodes_unknownOpcode */
-		refJava = os.getObjectRef(sbcClass.getMethod("unknownOpcode", "(II)V"));
-		os.getObjectRef(new Label("SoftByteCodes_unknownOpcode")).link(refJava);
 
 		final VmType vmThreadClass = loadClass(VmThread.class);
 
@@ -389,26 +328,6 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 								"(Ljava/lang/Throwable;Lorg/vmmagic/unboxed/Address;Lorg/vmmagic/unboxed/Address;)Lorg/vmmagic/unboxed/Address;"));
 		os.getObjectRef(vmFindThrowableHandler).link(refJava);
 
-		/* Link MonitorManager_monitorEnter */
-		VmType monMgrClass = loadClass(MonitorManager.class);
-		refJava = os.getObjectRef(monMgrClass.getMethod("monitorEnter",
-				"(Ljava/lang/Object;)V"));
-		os.getObjectRef(new Label("MonitorManager_monitorEnter")).link(refJava);
-
-		/* Link MonitorManager_monitorExit */
-		refJava = os.getObjectRef(monMgrClass.getMethod("monitorExit",
-				"(Ljava/lang/Object;)V"));
-		os.getObjectRef(new Label("MonitorManager_monitorExit")).link(refJava);
-
-		/* Link MathSupport_ldiv */
-		VmType mathSupportClass = loadClass(MathSupport.class);
-		refJava = os.getObjectRef(mathSupportClass.getMethod("ldiv", "(JJ)J"));
-		os.getObjectRef(new Label("MathSupport_ldiv")).link(refJava);
-
-		/* Link MathSupport_lrem */
-		refJava = os.getObjectRef(mathSupportClass.getMethod("lrem", "(JJ)J"));
-		os.getObjectRef(new Label("MathSupport_lrem")).link(refJava);
-
 		// Link Luser_esp
 		refJava = os.getObjectRef(initialStackPtr);
 		os.getObjectRef(new Label("Luser_esp")).link(refJava);
@@ -431,7 +350,6 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 				"applicationProcessorMain", "()V"));
 		os.getObjectRef(new Label("VmX86Processor_applicationProcessorMain"))
 				.link(refJava);
-
 	}
 
 	/**
