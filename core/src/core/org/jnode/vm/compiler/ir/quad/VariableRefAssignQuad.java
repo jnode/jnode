@@ -29,7 +29,6 @@ public class VariableRefAssignQuad extends AssignQuad {
 		super(address, block, lhsIndex);
 		this.rhs = getOperand(rhsIndex);
 		refs = new Operand[] { rhs };
-		doSSA();
 		setDeadCode(true);
 	}
 
@@ -39,11 +38,11 @@ public class VariableRefAssignQuad extends AssignQuad {
 	 * @param lhs
 	 * @param rhs
 	 */
-	public VariableRefAssignQuad(int address, IRBasicBlock block, Variable lhs, Variable rhs) {
-		super(address, block, lhs);
-		this.rhs = rhs;
-		refs = new Operand[] { rhs };
-	}
+//	public VariableRefAssignQuad(int address, IRBasicBlock block, Variable lhs, Variable rhs) {
+//		super(address, block, lhs);
+//		this.rhs = rhs;
+//		refs = new Operand[] { rhs };
+//	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.quad.Quad#getReferencedOps()

@@ -105,9 +105,10 @@ public class IRTest {
 	}
 
     private static void generateCode(AbstractX86Stream os, String className) throws MalformedURLException, ClassNotFoundException {
-
-
-        VmByteCode code = loadByteCode(className);
+		
+		//VmByteCode code = loadByteCode(className, "arithOptIntx");
+		VmByteCode code = loadByteCode(className, "simpleWhile");
+		//VmByteCode code = loadByteCode(className, "terniary2");
 
         X86CodeGenerator x86cg = new X86CodeGenerator(os, code.getLength());
 
@@ -123,44 +124,59 @@ public class IRTest {
         IRGenerator irg = new IRGenerator(cfg);
         BytecodeParser.parse(code, irg);
 
-        BootableArrayList quads = irg.getQuadList();
-        int n = quads.size();
-        BootableHashMap liveVariables = new BootableHashMap();
-        for (int i=0; i<n; i+=1) {
-            Quad quad = (Quad) quads.get(i);
+		cfg.constructSSA();
+        
+        Iterator it = cfg.basicBlockIterator();
+        while (it.hasNext()) {
+        	IRBasicBlock b = (IRBasicBlock) it.next();
+        	System.out.println();
+        	System.out.println(b + ", stackOffset = " + b.getStackOffset());
+        	Iterator qi = b.getQuads().iterator();
+        	while (qi.hasNext()) {
+        		System.out.println(qi.next());
+        	}
+        }
+		System.out.println();
+
+
+//        BootableArrayList quads = irg.getQuadList();
+//        int n = quads.size();
+//        BootableHashMap liveVariables = new BootableHashMap();
+//        for (int i=0; i<n; i+=1) {
+//            Quad quad = (Quad) quads.get(i);
+////            System.out.println(quad);
+//            quad.doPass2(liveVariables);
 //            System.out.println(quad);
-            quad.doPass2(liveVariables);
-            System.out.println(quad);
-        }
+//        }
 
-        Collection lv = liveVariables.values();
-        n = lv.size();
-        LiveRange[] liveRanges = new LiveRange[n];
-        Iterator it = lv.iterator();
-        for (int i=0; i<n; i+=1) {
-            Variable v = (Variable) it.next();
-            liveRanges[i] = new LiveRange(v);
-            // System.out.println("Live range: " + liveRanges[i]);
-        }
-        Arrays.sort(liveRanges);
-        System.out.println(Arrays.asList(liveRanges));
-        LinearScanAllocator lsa = new LinearScanAllocator(liveRanges);
-        lsa.allocate();
-
-        x86cg.setArgumentVariables(irg.getVariables(), irg.getNoArgs());
-        x86cg.setSpilledVariables(lsa.getSpilledVariables());
-        x86cg.emitHeader();
-
-        n = quads.size();
-        for (int i=0; i<n; i+=1) {
-            Quad quad = (Quad) quads.get(i);
-            if (!quad.isDeadCode()) {
-                quad.generateCode(x86cg);
-            }
-        }
+//        Collection lv = liveVariables.values();
+//        n = lv.size();
+//        LiveRange[] liveRanges = new LiveRange[n];
+//        Iterator it = lv.iterator();
+//        for (int i=0; i<n; i+=1) {
+//            Variable v = (Variable) it.next();
+//            liveRanges[i] = new LiveRange(v);
+//            // System.out.println("Live range: " + liveRanges[i]);
+//        }
+//        Arrays.sort(liveRanges);
+//        System.out.println(Arrays.asList(liveRanges));
+//        LinearScanAllocator lsa = new LinearScanAllocator(liveRanges);
+//        lsa.allocate();
+//
+//        x86cg.setArgumentVariables(irg.getVariables(), irg.getNoArgs());
+//        x86cg.setSpilledVariables(lsa.getSpilledVariables());
+//        x86cg.emitHeader();
+//
+//        n = quads.size();
+//        for (int i=0; i<n; i+=1) {
+//            Quad quad = (Quad) quads.get(i);
+//            if (!quad.isDeadCode()) {
+//                quad.generateCode(x86cg);
+//            }
+//        }
     }
 
-    private static VmByteCode loadByteCode(String className)
+    private static VmByteCode loadByteCode(String className, String methodName)
 		throws MalformedURLException, ClassNotFoundException {
 		VmSystemClassLoader vmc = new VmSystemClassLoader(new File(".").toURL(), new VmX86Architecture());
 		VmType type = vmc.loadClass(className, true);
@@ -168,7 +184,7 @@ public class IRTest {
 		int nMethods = type.getNoDeclaredMethods();
 		for (int i=0; i<nMethods; i+=1) {
 			VmMethod method = type.getDeclaredMethod(i);
-			if ("terniary".equals(method.getName())) {
+			if (methodName.equals(method.getName())) {
 				arithMethod = method;
 				break;
 			}

@@ -64,7 +64,6 @@ public class UnaryQuad extends AssignQuad {
 		this.operation = operation;
 		this.operand = getOperand(varIndex);
 		refs = new Operand[] { operand };
-		doSSA();
 	}
 
 	/* (non-Javadoc)

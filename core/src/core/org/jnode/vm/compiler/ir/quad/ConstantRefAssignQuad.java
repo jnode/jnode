@@ -28,7 +28,6 @@ public class ConstantRefAssignQuad extends AssignQuad {
 		Constant rhs) {
 		super(address, block, lhsIndex);
 		this.rhs = rhs;
-		doSSA();
 		setDeadCode(true); // this will change if this is a phi operand
 	}
 

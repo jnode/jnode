@@ -18,19 +18,15 @@ public class MethodArgument extends Variable {
 		super(type, index);
 	}
 
-	public MethodArgument(int type, int index, int ssaValue) {
-		super(type, index, ssaValue);
-	}
-
 	/**
 	 * @param argument
 	 */
 	public MethodArgument(MethodArgument argument) {
-		this(argument.getType(), argument.getIndex(), argument.getSSAValue());
+		this(argument.getType(), argument.getIndex());
 	}
 
 	public String toString() {
-		return "a" + getSSAValue();
+		return "a" + getIndex() + '_' + getSSAValue();
 	}
 	
 	public Object clone() {

@@ -42,7 +42,25 @@ public class PrimitiveTest {
         }
         return l0;
     }
-
+    
+	public static int ifElse(int a0) {
+		int l0;
+		if (a0 == 0) {
+			l0 = 1;
+		} else {
+			l0 = -1;
+		}
+		return l0;
+	}
+    
+	public static int simpleWhile(int a0) {
+		int l0 = 0;
+		while (l0 < a0) {
+			l0 += 1;
+		}
+		return l0;
+	}
+    
     public static int const12(int a0, int a1) {
         int l0 = 10, l1 = 0;
         while(l0 > 0){
