@@ -106,12 +106,10 @@
   <plugin id="org.jnode.work"/>
 
   <plugin id="charva"/>
-  <plugin id="org.jnode.wt"/>
   <plugin id="org.beanshell"/>
   <plugin id="org.jnode.apps.edit"/>
   <plugin id="org.jnode.apps.charvabsh"/>
   <plugin id="org.jnode.apps.debug"/>
-  <!-- plugin id="org.zaval.lw"/ -->
 
   <plugin id="org.junit"/>
   <plugin id="org.june"/>
