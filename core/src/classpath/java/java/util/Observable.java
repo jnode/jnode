@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.util;
 
 /**
@@ -51,7 +52,8 @@ package java.util;
  * @see Observer
  * @status updated to 1.4
  */
-public class Observable {
+public class Observable
+{
 	/** Tracks whether this object has changed. */
 	private boolean changed;
 
@@ -61,7 +63,8 @@ public class Observable {
 	/**
 	 * Constructs an Observable with zero Observers.
 	 */
-	public Observable() {
+  public Observable()
+  {
 		observers = new LinkedHashSet();
 	}
 
@@ -72,7 +75,8 @@ public class Observable {
 	 * @param observer Observer to add
 	 * @throws NullPointerException if observer is null
 	 */
-	public synchronized void addObserver(Observer observer) {
+  public synchronized void addObserver(Observer observer)
+  {
 		observers.add(observer);
 	}
 
@@ -82,7 +86,8 @@ public class Observable {
 	 *
 	 * @see #notifyObservers()
 	 */
-	protected synchronized void clearChanged() {
+  protected synchronized void clearChanged()
+  {
 		changed = false;
 	}
 
@@ -91,7 +96,8 @@ public class Observable {
 	 *
 	 * @return number of Observers for this
 	 */
-	public synchronized int countObservers() {
+  public synchronized int countObservers()
+  {
 		return observers.size();
 	}
 
@@ -100,14 +106,16 @@ public class Observable {
 	 *
 	 * @param victim Observer to delete
 	 */
-	public synchronized void deleteObserver(Observer victim) {
+  public synchronized void deleteObserver(Observer victim)
+  {
 		observers.remove(victim);
 	}
 
 	/**
 	 * Deletes all Observers of this Observable.
 	 */
-	public synchronized void deleteObservers() {
+  public synchronized void deleteObservers()
+  {
 		observers.clear();
 	}
 
@@ -117,7 +125,8 @@ public class Observable {
 	 *
 	 * @return whether or not this Observable has changed
 	 */
-	public synchronized boolean hasChanged() {
+  public synchronized boolean hasChanged()
+  {
 		return changed;
 	}
 
@@ -128,7 +137,8 @@ public class Observable {
 	 * @see #notifyObservers(Object)
 	 * @see Observer#update(Observable, Object)
 	 */
-	public void notifyObservers() {
+  public void notifyObservers()
+  {
 		notifyObservers(null);
 	}
 
@@ -141,27 +151,30 @@ public class Observable {
 	 * @param obj argument to Observer's update method
 	 * @see Observer#update(Observable, Object)
 	 */
-	public void notifyObservers(Object obj) {
-		if (!hasChanged())
+  public void notifyObservers(Object obj)
+  {
+    if (! hasChanged())
 			return;
 		// Create clone inside monitor, as that is relatively fast and still
 		// important to keep threadsafe, but update observers outside of the
 		// lock since update() can call arbitrary code.
 		Set s;
-		synchronized (this) {
-			s = (Set)observers.clone();
+    synchronized (this)
+      {
+        s = (Set) observers.clone();
 		}
 		int i = s.size();
 		Iterator iter = s.iterator();
 		while (--i >= 0)
-			 ((Observer)iter.next()).update(this, obj);
+      ((Observer) iter.next()).update(this, obj);
 		clearChanged();
 	}
 
 	/**
 	 * Marks this Observable as having changed.
 	 */
-	protected synchronized void setChanged() {
+  protected synchronized void setChanged()
+  {
 		changed = true;
 	}
 }

@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.util;
 
 /**
@@ -57,7 +58,8 @@ package java.util;
  * @see java.io.StreamTokenizer
  * @status updated to 1.4
  */
-public class StringTokenizer implements Enumeration {
+public class StringTokenizer implements Enumeration
+{
 	// WARNING: StringTokenizer is a CORE class in the bootstrap cycle. See the
 	// comments in vm/reference/java/lang/Runtime for implications of this fact.
 
@@ -95,7 +97,8 @@ public class StringTokenizer implements Enumeration {
 	 * @param str The string to split
 	 * @throws NullPointerException if str is null
 	 */
-	public StringTokenizer(String str) {
+  public StringTokenizer(String str)
+  {
 		this(str, " \t\n\r\f", false);
 	}
 
@@ -108,7 +111,8 @@ public class StringTokenizer implements Enumeration {
 	 * @param delim a string containing all delimiter characters
 	 * @throws NullPointerException if either argument is null
 	 */
-	public StringTokenizer(String str, String delim) {
+  public StringTokenizer(String str, String delim)
+  {
 		this(str, delim, false);
 	}
 
@@ -124,7 +128,8 @@ public class StringTokenizer implements Enumeration {
 	 * @param returnDelims tells, if you want to get the delimiters
 	 * @throws NullPointerException if str or delim is null
 	 */
-	public StringTokenizer(String str, String delim, boolean returnDelims) {
+  public StringTokenizer(String str, String delim, boolean returnDelims)
+  {
 		len = str.length();
 		this.str = str;
 		// The toString() hack causes the NullPointerException.
@@ -138,8 +143,10 @@ public class StringTokenizer implements Enumeration {
 	 *
 	 * @return true if the next call of nextToken() will succeed
 	 */
-	public boolean hasMoreTokens() {
-		if (!retDelims) {
+  public boolean hasMoreTokens()
+  {
+    if (! retDelims)
+      {
 			while (pos < len && delim.indexOf(str.charAt(pos)) >= 0)
 				pos++;
 		}
@@ -157,7 +164,8 @@ public class StringTokenizer implements Enumeration {
 	 * @throws NoSuchElementException if there are no more tokens
 	 * @throws NullPointerException if delim is null
 	 */
-	public String nextToken(String delim) throws NoSuchElementException {
+  public String nextToken(String delim) throws NoSuchElementException
+  {
 		this.delim = delim;
 		return nextToken();
 	}
@@ -168,13 +176,16 @@ public class StringTokenizer implements Enumeration {
 	 * @return the next token with respect to the current delimiter characters
 	 * @throws NoSuchElementException if there are no more tokens
 	 */
-	public String nextToken() throws NoSuchElementException {
-		if (pos < len && delim.indexOf(str.charAt(pos)) >= 0) {
+  public String nextToken() throws NoSuchElementException
+  {
+    if (pos < len && delim.indexOf(str.charAt(pos)) >= 0)
+      {
 			if (retDelims)
 				return str.substring(pos, ++pos);
 			while (++pos < len && delim.indexOf(str.charAt(pos)) >= 0);
 		}
-		if (pos < len) {
+    if (pos < len)
+      {
 			int start = pos;
 			while (++pos < len && delim.indexOf(str.charAt(pos)) < 0);
 
@@ -185,24 +196,26 @@ public class StringTokenizer implements Enumeration {
 
 	/**
 	 * This does the same as hasMoreTokens. This is the
-	 * <code>Enumeration</code interface method.
+   * <code>Enumeration</code> interface method.
 	 *
 	 * @return true, if the next call of nextElement() will succeed
 	 * @see #hasMoreTokens()
 	 */
-	public boolean hasMoreElements() {
+  public boolean hasMoreElements()
+  {
 		return hasMoreTokens();
 	}
 
 	/**
 	 * This does the same as nextTokens. This is the
-	 * <code>Enumeration</code interface method.
+   * <code>Enumeration</code> interface method.
 	 *
 	 * @return the next token with respect to the current delimiter characters
 	 * @throws NoSuchElementException if there are no more tokens
 	 * @see #nextToken()
 	 */
-	public Object nextElement() throws NoSuchElementException {
+  public Object nextElement() throws NoSuchElementException
+  {
 		return nextToken();
 	}
 
@@ -213,7 +226,8 @@ public class StringTokenizer implements Enumeration {
 	 * @return the number of times <code>nextTokens()</code> will succeed
 	 * @see #nextToken()
 	 */
-	public int countTokens() {
+  public int countTokens()
+  {
 		int count = 0;
 		int delimiterCount = 0;
 		boolean tokenFound = false; // Set when a non-delimiter is found
@@ -222,18 +236,24 @@ public class StringTokenizer implements Enumeration {
 		// Note for efficiency, we count up the delimiters rather than check
 		// retDelims every time we encounter one.  That way, we can
 		// just do the conditional once at the end of the method
-		while (tmpPos < len) {
-			if (delim.indexOf(str.charAt(tmpPos++)) >= 0) {
-				if (tokenFound) {
+    while (tmpPos < len)
+      {
+        if (delim.indexOf(str.charAt(tmpPos++)) >= 0)
+          {
+            if (tokenFound)
+              {
 					// Got to the end of a token
 					count++;
 					tokenFound = false;
 				}
 				delimiterCount++; // Increment for this delimiter
-			} else {
+          }
+        else
+          {
 				tokenFound = true;
 				// Get to the end of the token
-				while (tmpPos < len && delim.indexOf(str.charAt(tmpPos)) < 0)
+            while (tmpPos < len
+                   && delim.indexOf(str.charAt(tmpPos)) < 0)
 					++tmpPos;
 			}
 		}

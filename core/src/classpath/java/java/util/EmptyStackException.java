@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.util;
 
 /* Written using "Java Class Libraries", 2nd edition, ISBN 0-201-31002-3
@@ -52,7 +53,8 @@ package java.util;
  * @since 1.0
  * @status updated to 1.4
  */
-public class EmptyStackException extends RuntimeException {
+public class EmptyStackException extends RuntimeException
+{
 	/**
 	 * Compatible with JDK 1.0.
 	 */
@@ -61,6 +63,7 @@ public class EmptyStackException extends RuntimeException {
 	/**
 	 * Constructs an EmptyStackException with no detail message.
 	 */
-	public EmptyStackException() {
+  public EmptyStackException()
+  {
 	}
 }

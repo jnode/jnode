@@ -1,5 +1,6 @@
 /* java.util.GregorianCalendar
-   Copyright (C) 1998, 1999, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2002, 2003, 2004
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,6 +36,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.util;
 
 /**
@@ -54,7 +56,8 @@ package java.util;
  * @see Calendar
  * @see TimeZone
  */
-public class GregorianCalendar extends Calendar {
+public class GregorianCalendar extends Calendar
+{
 	/**
 	 * Constant representing the era BC (before Christ).
 	 */
@@ -76,15 +79,27 @@ public class GregorianCalendar extends Calendar {
 	static final long serialVersionUID = -8125100834729963327L;
 
 	/**
-	 * The name of the resource bundle.
+   * The name of the resource bundle. Used only by getBundle()
 	 */
 	private static final String bundleName = "gnu.java.locale.Calendar";
 
 	/**
+   * get resource bundle:
+   * The resources should be loaded via this method only. Iff an application
+   * uses this method, the resourcebundle is required. --Fridi. 
+   */
+  private static ResourceBundle getBundle(Locale locale) 
+  {
+    return ResourceBundle.getBundle(bundleName, locale,
+      ClassLoader.getSystemClassLoader());
+  }
+
+  /**
 	 * Constructs a new GregorianCalender representing the current
 	 * time, using the default time zone and the default locale.  
 	 */
-	public GregorianCalendar() {
+  public GregorianCalendar()
+  {
 		this(TimeZone.getDefault(), Locale.getDefault());
 	}
 
@@ -93,7 +108,8 @@ public class GregorianCalendar extends Calendar {
 	 * time, using the specified time zone and the default locale.  
 	 * @param zone a time zone.
 	 */
-	public GregorianCalendar(TimeZone zone) {
+  public GregorianCalendar(TimeZone zone)
+  {
 		this(zone, Locale.getDefault());
 	}
 
@@ -102,7 +118,8 @@ public class GregorianCalendar extends Calendar {
 	 * time, using the default time zone and the specified locale.  
 	 * @param locale a locale.
 	 */
-	public GregorianCalendar(Locale locale) {
+  public GregorianCalendar(Locale locale)
+  {
 		this(TimeZone.getDefault(), locale);
 	}
 
@@ -112,10 +129,11 @@ public class GregorianCalendar extends Calendar {
 	 * @param zone a time zone.  
 	 * @param locale a locale.  
 	 */
-	public GregorianCalendar(TimeZone zone, Locale locale) {
+  public GregorianCalendar(TimeZone zone, Locale locale)
+  {
 		super(zone, locale);
-		ResourceBundle rb = ResourceBundle.getBundle(bundleName, locale);
-		gregorianCutover = ((Date)rb.getObject("gregorianCutOver")).getTime();
+    ResourceBundle rb = getBundle(locale);
+    gregorianCutover = ((Date) rb.getObject("gregorianCutOver")).getTime();
 		setTimeInMillis(System.currentTimeMillis());
 	}
 
@@ -126,7 +144,8 @@ public class GregorianCalendar extends Calendar {
 	 * @param month corresponds to the MONTH time field.
 	 * @param day corresponds to the DAY time field.
 	 */
-	public GregorianCalendar(int year, int month, int day) {
+  public GregorianCalendar(int year, int month, int day)
+  {
 		super();
 		set(year, month, day);
 	}
@@ -140,7 +159,8 @@ public class GregorianCalendar extends Calendar {
 	 * @param hour corresponds to the HOUR_OF_DAY time field.
 	 * @param minute corresponds to the MINUTE time field.
 	 */
-	public GregorianCalendar(int year, int month, int day, int hour, int minute) {
+  public GregorianCalendar(int year, int month, int day, int hour, int minute)
+  {
 		super();
 		set(year, month, day, hour, minute);
 	}
@@ -155,7 +175,9 @@ public class GregorianCalendar extends Calendar {
 	 * @param minute corresponds to the MINUTE time field.
 	 * @param second corresponds to the SECOND time field.
 	 */
-	public GregorianCalendar(int year, int month, int day, int hour, int minute, int second) {
+  public GregorianCalendar(int year, int month, int day,
+			   int hour, int minute, int second)
+  {
 		super();
 		set(year, month, day, hour, minute, second);
 	}
@@ -167,7 +189,8 @@ public class GregorianCalendar extends Calendar {
 	 * calendar.
 	 * @param date the date of the change.
 	 */
-	public void setGregorianChange(Date date) {
+  public void setGregorianChange(Date date)
+  {
 		gregorianCutover = date.getTime();
 	}
 
@@ -175,7 +198,8 @@ public class GregorianCalendar extends Calendar {
 	 * Gets the date of the switch from Julian dates to Gregorian dates.
 	 * @return the date of the change.
 	 */
-	public final Date getGregorianChange() {
+  public final Date getGregorianChange()
+  {
 		return new Date(gregorianCutover);
 	}
 
@@ -191,7 +215,8 @@ public class GregorianCalendar extends Calendar {
 	 *
 	 * @param year a year use nonnegative value for BC.
 	 * @return true, if the given year is a leap year, false otherwise.  */
-	public boolean isLeapYear(int year) {
+  public boolean isLeapYear(int year)
+  {
 		if ((year & 3) != 0)
 			// Only years divisible by 4 can be leap years
 			return false;
@@ -199,7 +224,8 @@ public class GregorianCalendar extends Calendar {
 		// compute the linear day of the 29. February of that year.
 		// The 13 is the number of days, that were omitted in the Gregorian
 		// Calender until the epoch.
-		int julianDay = (((year - 1) * (365 * 4 + 1)) >> 2) + (31 + 29 - (((1970 - 1) * (365 * 4 + 1)) / 4 + 1 - 13));
+    int julianDay = (((year-1) * (365*4+1)) >> 2) + (31+29 - 
+        (((1970-1) * (365*4+1)) / 4 + 1 - 13));
 
 		// If that day is smaller than the gregorianChange the julian
 		// rule applies:  This is a leap year since it is divisible by 4.
@@ -219,15 +245,18 @@ public class GregorianCalendar extends Calendar {
 	 * @param dayOfYear the day of year of the date; 1 based.
 	 * @param millis the millisecond in that day.
 	 * @return the days since the epoch, may be negative.  */
-	private long getLinearTime(int year, int dayOfYear, int millis) {
+  private long getLinearTime(int year, int dayOfYear, int millis)
+  {
 		// The 13 is the number of days, that were omitted in the Gregorian
 		// Calender until the epoch.
 		// We shift right by 2 instead of dividing by 4, to get correct
 		// results for negative years (and this is even more efficient).
-		int julianDay = ((year * (365 * 4 + 1)) >> 2) + dayOfYear - ((1970 * (365 * 4 + 1)) / 4 + 1 - 13);
+    int julianDay = ((year * (365 * 4 + 1)) >> 2) + dayOfYear -
+      ((1970 * (365 * 4 + 1)) / 4 + 1 - 13);
 		long time = julianDay * (24 * 60 * 60 * 1000L) + millis;
 
-		if (time >= gregorianCutover) {
+    if (time >= gregorianCutover)
+      {
 			// subtract the days that are missing in gregorian calendar
 			// with respect to julian calendar.
 			//
@@ -237,16 +266,20 @@ public class GregorianCalendar extends Calendar {
 			//
 			// The additional leap year factor accounts for the fact that
 			// a leap day is not seen on Jan 1 of the leap year.
+	// And on and after the leap day, the leap day has already been
+	// included in dayOfYear. 
 			int gregOffset = (year / 400) - (year / 100) + 2;
-			if (isLeapYear(year, true) && dayOfYear < 31 + 29)
+	if (isLeapYear (year, true))
 				--gregOffset;
 			time += gregOffset * (24 * 60 * 60 * 1000L);
 		}
 		return time;
 	}
 
-	private int getWeekDay(int year, int dayOfYear) {
-		int day = (int) (getLinearTime(year, dayOfYear, 0) / (24 * 60 * 60 * 1000L));
+  private int getWeekDay(int year, int dayOfYear)
+  {
+    int day =
+      (int) (getLinearTime(year, dayOfYear, 0) / (24 * 60 * 60 * 1000L));
 
 		// The epoch was a thursday.
 		int weekday = (day + THURSDAY) % 7;
@@ -270,70 +303,93 @@ public class GregorianCalendar extends Calendar {
 	 * @return an array of two int values, the first containing a reference
 	 * day of current year, the second a relative count since this reference
 	 * day.  */
-	private int[] getDayOfYear(int year) {
-		if (isSet[MONTH]) {
+  private int[] getDayOfYear(int year)
+  {
+    if (isSet[MONTH])
+      {
 			int dayOfYear;
-			if (fields[MONTH] > FEBRUARY) {
+	if (fields[MONTH] > FEBRUARY)
+	  {
 
 				// The months after February are regular:
 				// 9 is an offset found by try and error.
 				dayOfYear = (fields[MONTH] * (31 + 30 + 31 + 30 + 31) - 9) / 5;
 				if (isLeapYear(year))
 					dayOfYear++;
-			} else
+	  }
+	else
 				dayOfYear = 31 * fields[MONTH];
 
-			if (isSet[DAY_OF_MONTH]) {
-				return new int[] { dayOfYear + fields[DAY_OF_MONTH], 0 };
+	if (isSet[DAY_OF_MONTH])
+	  {
+	    return new int[]
+	    {
+	    dayOfYear + fields[DAY_OF_MONTH], 0};
 			}
-			if (isSet[WEEK_OF_MONTH] && isSet[DAY_OF_WEEK]) {
+	if (isSet[WEEK_OF_MONTH] && isSet[DAY_OF_WEEK])
+	  {
 				// the weekday of the first day in that month is:
 				int weekday = getWeekDay(year, ++dayOfYear);
 
-				return new int[] { dayOfYear,
+	    return new int[]
+	    {
+	      dayOfYear,
 					// the day of week in the first week
 					// (weeks starting on sunday) is:
 					fields[DAY_OF_WEEK] - weekday +
 					// Now jump to the right week and correct the possible
 					// error made by assuming sunday is the first week day.
-					7 * (fields[WEEK_OF_MONTH] + (fields[DAY_OF_WEEK] < getFirstDayOfWeek() ? 0 : -1) + (weekday < getFirstDayOfWeek() ? -1 : 0))};
+	      7 * (fields[WEEK_OF_MONTH]
+		   + (fields[DAY_OF_WEEK] < getFirstDayOfWeek()? 0 : -1)
+		   + (weekday < getFirstDayOfWeek()? -1 : 0))};
 			}
-			if (isSet[DAY_OF_WEEK] && isSet[DAY_OF_WEEK_IN_MONTH]) {
+	if (isSet[DAY_OF_WEEK] && isSet[DAY_OF_WEEK_IN_MONTH])
+	  {
 				// the weekday of the first day in that month is:
 				int weekday = getWeekDay(year, ++dayOfYear);
-				return new int[] { dayOfYear, fields[DAY_OF_WEEK] - weekday + 7 * (fields[DAY_OF_WEEK_IN_MONTH] + (fields[DAY_OF_WEEK] < weekday ? 0 : -1))};
+	    return new int[] { 
+		  dayOfYear,
+		  fields[DAY_OF_WEEK] - weekday +
+		  7 * (fields[DAY_OF_WEEK_IN_MONTH]
+		       + (fields[DAY_OF_WEEK] < weekday ? 0 : -1))};
 			}
 		}
 
 		// MONTH + something did not succeed.
-		if (isSet[DAY_OF_YEAR]) {
-			return new int[] { 0, fields[DAY_OF_YEAR] };
+    if (isSet[DAY_OF_YEAR])
+      {
+	return new int[] {0, fields[DAY_OF_YEAR]};
 		}
 
-		if (isSet[DAY_OF_WEEK] && isSet[WEEK_OF_YEAR]) {
+    if (isSet[DAY_OF_WEEK] && isSet[WEEK_OF_YEAR])
+      {
 			int dayOfYear = getMinimalDaysInFirstWeek();
 			// the weekday of the day, that begins the first week 
 			// in that year is:
 			int weekday = getWeekDay(year, dayOfYear);
 
-			return new int[] { dayOfYear,
+	return new int[] { 
+	    dayOfYear,
 				// the day of week in the first week
 				// (weeks starting on sunday) is:
 				fields[DAY_OF_WEEK] - weekday
 				// Now jump to the right week and correct the possible
 				// error made by assuming sunday is the first week day.
-				+7 * (fields[WEEK_OF_YEAR] + (fields[DAY_OF_WEEK] < getFirstDayOfWeek() ? 0 : -1) + (weekday < getFirstDayOfWeek() ? -1 : 0))};
+	    + 7 * (fields[WEEK_OF_YEAR]
+		   + (fields[DAY_OF_WEEK] < getFirstDayOfWeek()? 0 : -1)
+		   + (weekday < getFirstDayOfWeek()? -1 : 0))};
 		}
 
 		// As last resort return Jan, 1st.
-		return new int[] { 1, 0 };
+    return new int[] {1, 0};
 	}
 
 	/**
 	 * Converts the time field values (<code>fields</code>) to
 	 * milliseconds since the epoch UTC (<code>time</code>). 
 	 */
-	protected synchronized void computeTime() {
+  protected synchronized void computeTime()
+  {
 		int era = isSet[ERA] ? fields[ERA] : AD;
 		int year = isSet[YEAR] ? fields[YEAR] : 1970;
 		if (era == BC)
@@ -344,10 +400,15 @@ public class GregorianCalendar extends Calendar {
 		int hour = 0;
 		if (isSet[HOUR_OF_DAY])
 			hour = fields[HOUR_OF_DAY];
-		else if (isSet[HOUR]) {
+    else if (isSet[HOUR])
+      {
 			hour = fields[HOUR];
 			if (isSet[AM_PM] && fields[AM_PM] == PM)
+	  if (hour != 12) /* not Noon */
 				hour += 12;
+	/* Fix the problem of the status of 12:00 AM (midnight). */
+	if (isSet[AM_PM] && fields[AM_PM] == AM && hour == 12)
+	  hour = 0;
 		}
 
 		int minute = isSet[MINUTE] ? fields[MINUTE] : 0;
@@ -355,13 +416,18 @@ public class GregorianCalendar extends Calendar {
 		int millis = isSet[MILLISECOND] ? fields[MILLISECOND] : 0;
 		int millisInDay;
 
-		if (isLenient()) {
+    if (isLenient())
+      {
 			// prevent overflow
-			long allMillis = (((hour * 60L) + minute) * 60L + second) * 1000L + millis;
+	long allMillis = (((hour * 60L) + minute) * 60L + second) * 1000L
+	  + millis;
 			daysOfYear[1] += allMillis / (24 * 60 * 60 * 1000L);
 			millisInDay = (int) (allMillis % (24 * 60 * 60 * 1000L));
-		} else {
-			if (hour < 0 || hour >= 24 || minute < 0 || minute > 59 || second < 0 || second > 59 || millis < 0 || millis >= 1000)
+      }
+    else
+      {
+	if (hour < 0 || hour >= 24 || minute < 0 || minute > 59
+	    || second < 0 || second > 59 || millis < 0 || millis >= 1000)
 				throw new IllegalArgumentException();
 			millisInDay = (((hour * 60) + minute) * 60 + second) * 1000 + millis;
 		}
@@ -371,17 +437,29 @@ public class GregorianCalendar extends Calendar {
 		// get right behaviour when jumping over the gregorianCutover.
 		time += daysOfYear[1] * (24 * 60 * 60 * 1000L);
 
+
 		TimeZone zone = getTimeZone();
-		int rawOffset = isSet[ZONE_OFFSET] ? fields[ZONE_OFFSET] : zone.getRawOffset();
+    int rawOffset = isSet[ZONE_OFFSET]
+      ? fields[ZONE_OFFSET] : zone.getRawOffset();
 
 		int dayOfYear = daysOfYear[0] + daysOfYear[1];
-		int month = (dayOfYear * 5 + 3) / (31 + 30 + 31 + 30 + 31);
-		int day = (6 + (dayOfYear * 5 + 3) % (31 + 30 + 31 + 30 + 31)) / 5;
+    // This formula isn't right, so check for month as a quick fix.
+    // It doesn't compensate for leap years and puts day 30 in month 1
+    // instead of month 0.
+    int month = isSet[MONTH]
+	? fields[MONTH] : (dayOfYear * 5 + 3) / (31 + 30 + 31 + 30 + 31);
+    // This formula isn't right, so check for day as a quick fix.  It
+    // doesn't compensate for leap years, either.
+    int day = isSet[DAY_OF_MONTH] ? fields[DAY_OF_MONTH]
+	: (6 + (dayOfYear * 5 + 3) % (31 + 30 + 31 + 30 + 31)) / 5;
 		int weekday = ((int) (time / (24 * 60 * 60 * 1000L)) + THURSDAY) % 7;
 		if (weekday <= 0)
 			weekday += 7;
-		int dstOffset =
-			isSet[DST_OFFSET] ? fields[DST_OFFSET] : (zone.getOffset((year < 0) ? BC : AD, (year < 0) ? 1 - year : year, month, day, weekday, millisInDay) - zone.getRawOffset());
+    int dstOffset = isSet[DST_OFFSET]
+      ? fields[DST_OFFSET] : (zone.getOffset((year < 0) ? BC : AD,
+					     (year < 0) ? 1 - year : year,
+					     month, day, weekday, millisInDay)
+			      - zone.getRawOffset());
 		time -= rawOffset + dstOffset;
 		isTimeSet = true;
 	}
@@ -396,7 +474,8 @@ public class GregorianCalendar extends Calendar {
 	 * @param year a year use nonnegative value for BC.
 	 * @param gregorian if true, use gregorian leap year rule.
 	 * @return true, if the given year is a leap year, false otherwise.  */
-	private boolean isLeapYear(int year, boolean gregorian) {
+  private boolean isLeapYear(int year, boolean gregorian)
+  {
 		if ((year & 3) != 0)
 			// Only years divisible by 4 can be leap years
 			return false;
@@ -418,14 +497,17 @@ public class GregorianCalendar extends Calendar {
 	 * @param dayOfYear the day of year of the date; 1 based.
 	 * @param gregorian True, if we should use Gregorian rules.
 	 * @return the days since the epoch, may be negative.  */
-	private int getLinearDay(int year, int dayOfYear, boolean gregorian) {
+  private int getLinearDay(int year, int dayOfYear, boolean gregorian)
+  {
 		// The 13 is the number of days, that were omitted in the Gregorian
 		// Calender until the epoch.
 		// We shift right by 2 instead of dividing by 4, to get correct
 		// results for negative years (and this is even more efficient).
-		int julianDay = ((year * (365 * 4 + 1)) >> 2) + dayOfYear - ((1970 * (365 * 4 + 1)) / 4 + 1 - 13);
+    int julianDay = ((year * (365 * 4 + 1)) >> 2) + dayOfYear -
+      ((1970 * (365 * 4 + 1)) / 4 + 1 - 13);
 
-		if (gregorian) {
+    if (gregorian)
+      {
 			// subtract the days that are missing in gregorian calendar
 			// with respect to julian calendar.
 			//
@@ -436,7 +518,7 @@ public class GregorianCalendar extends Calendar {
 			// The additional leap year factor accounts for the fact that
 			// a leap day is not seen on Jan 1 of the leap year.
 			int gregOffset = (year / 400) - (year / 100) + 2;
-			if (isLeapYear(year, true) && dayOfYear < 31 + 29)
+	if (isLeapYear (year, true) && dayOfYear < 31 + 29)
 				--gregOffset;
 			julianDay += gregOffset;
 		}
@@ -449,7 +531,8 @@ public class GregorianCalendar extends Calendar {
 	 * into the fields array.
 	 * @param day the linear day.  
 	 */
-	private void calculateDay(int day, boolean gregorian) {
+  private void calculateDay(int day, boolean gregorian)
+  {
 		// the epoch is a Thursday.
 		int weekday = (day + THURSDAY) % 7;
 		if (weekday <= 0)
@@ -458,14 +541,17 @@ public class GregorianCalendar extends Calendar {
 
 		// get a first approximation of the year.  This may be one 
 		// year to big.
-		int year = 1970 + (gregorian ? ((day - 100) * 400) / (365 * 400 + 100 - 4 + 1) : ((day - 100) * 4) / (365 * 4 + 1));
+    int year = 1970 + (gregorian
+		       ? ((day - 100) * 400) / (365 * 400 + 100 - 4 + 1)
+		       : ((day - 100) * 4) / (365 * 4 + 1));
 		if (day >= 0)
 			year++;
 
 		int firstDayOfYear = getLinearDay(year, 1, gregorian);
 
 		// Now look in which year day really lies.
-		if (day < firstDayOfYear) {
+    if (day < firstDayOfYear)
+      {
 			year--;
 			firstDayOfYear = getLinearDay(year, 1, gregorian);
 		}
@@ -473,19 +559,25 @@ public class GregorianCalendar extends Calendar {
 		day -= firstDayOfYear - 1; // day of year,  one based.
 
 		fields[DAY_OF_YEAR] = day;
-		if (year <= 0) {
+    if (year <= 0)
+      {
 			fields[ERA] = BC;
 			fields[YEAR] = 1 - year;
-		} else {
+      }
+    else
+      {
 			fields[ERA] = AD;
 			fields[YEAR] = year;
 		}
 
 		int leapday = isLeapYear(year, gregorian) ? 1 : 0;
-		if (day <= 31 + 28 + leapday) {
+    if (day <= 31 + 28 + leapday)
+      {
 			fields[MONTH] = day / 32; // 31->JANUARY, 32->FEBRUARY
 			fields[DAY_OF_MONTH] = day - 31 * fields[MONTH];
-		} else {
+      }
+    else
+      {
 			// A few more magic formulas
 			int scaledDay = (day - leapday) * 5 + 8;
 			fields[MONTH] = scaledDay / (31 + 30 + 31 + 30 + 31);
@@ -498,7 +590,8 @@ public class GregorianCalendar extends Calendar {
 	 * (<code>time</code>) to time fields
 	 * (<code>fields</code>). 
 	 */
-	protected synchronized void computeFields() {
+  protected synchronized void computeFields()
+  {
 		boolean gregorian = (time >= gregorianCutover);
 
 		TimeZone zone = getTimeZone();
@@ -507,16 +600,21 @@ public class GregorianCalendar extends Calendar {
 
 		int day = (int) (localTime / (24 * 60 * 60 * 1000L));
 		int millisInDay = (int) (localTime % (24 * 60 * 60 * 1000L));
-		if (millisInDay < 0) {
+    if (millisInDay < 0)
+      {
 			millisInDay += (24 * 60 * 60 * 1000);
 			day--;
 		}
 
 		calculateDay(day, gregorian);
-		fields[DST_OFFSET] = zone.getOffset(fields[ERA], fields[YEAR], fields[MONTH], fields[DAY_OF_MONTH], fields[DAY_OF_WEEK], millisInDay) - fields[ZONE_OFFSET];
+    fields[DST_OFFSET] =
+      zone.getOffset(fields[ERA], fields[YEAR], fields[MONTH],
+		     fields[DAY_OF_MONTH], fields[DAY_OF_WEEK],
+		     millisInDay) - fields[ZONE_OFFSET];
 
 		millisInDay += fields[DST_OFFSET];
-		if (millisInDay >= 24 * 60 * 60 * 1000) {
+    if (millisInDay >= 24 * 60 * 60 * 1000)
+      {
 			millisInDay -= 24 * 60 * 60 * 1000;
 			calculateDay(++day, gregorian);
 		}
@@ -526,17 +624,19 @@ public class GregorianCalendar extends Calendar {
 		// which day of the week are we (0..6), relative to getFirstDayOfWeek
 		int relativeWeekday = (7 + fields[DAY_OF_WEEK] - getFirstDayOfWeek()) % 7;
 
-		fields[WEEK_OF_MONTH] = (fields[DAY_OF_MONTH] - relativeWeekday + 6) / 7;
+    fields[WEEK_OF_MONTH] = (fields[DAY_OF_MONTH] - relativeWeekday + 12) / 7;
 
 		int weekOfYear = (fields[DAY_OF_YEAR] - relativeWeekday + 6) / 7;
 
 		// Do the Correction: getMinimalDaysInFirstWeek() is always in the 
 		// first week.
 		int minDays = getMinimalDaysInFirstWeek();
-		int firstWeekday = (7 + getWeekDay(fields[YEAR], minDays) - getFirstDayOfWeek()) % 7;
+    int firstWeekday =
+      (7 + getWeekDay(fields[YEAR], minDays) - getFirstDayOfWeek()) % 7;
 		if (minDays - firstWeekday < 1)
 			weekOfYear++;
 		fields[WEEK_OF_YEAR] = weekOfYear;
+
 
 		int hourOfDay = millisInDay / (60 * 60 * 1000);
 		fields[AM_PM] = (hourOfDay < 12) ? AM : PM;
@@ -549,19 +649,13 @@ public class GregorianCalendar extends Calendar {
 		fields[SECOND] = millisInDay / (1000);
 		fields[MILLISECOND] = millisInDay % 1000;
 
-		areFieldsSet =
-			isSet[ERA] =
-				isSet[YEAR] =
-					isSet[MONTH] =
-						isSet[WEEK_OF_YEAR] =
-							isSet[WEEK_OF_MONTH] =
-								isSet[DAY_OF_MONTH] =
-									isSet[DAY_OF_YEAR] =
-										isSet[DAY_OF_WEEK] =
-											isSet[DAY_OF_WEEK_IN_MONTH] =
-												isSet[AM_PM] =
-													isSet[HOUR] =
-														isSet[HOUR_OF_DAY] = isSet[MINUTE] = isSet[SECOND] = isSet[MILLISECOND] = isSet[ZONE_OFFSET] = isSet[DST_OFFSET] = true;
+
+    areFieldsSet = isSet[ERA] = isSet[YEAR] = isSet[MONTH] =
+      isSet[WEEK_OF_YEAR] = isSet[WEEK_OF_MONTH] =
+      isSet[DAY_OF_MONTH] = isSet[DAY_OF_YEAR] = isSet[DAY_OF_WEEK] =
+      isSet[DAY_OF_WEEK_IN_MONTH] = isSet[AM_PM] = isSet[HOUR] =
+      isSet[HOUR_OF_DAY] = isSet[MINUTE] = isSet[SECOND] =
+      isSet[MILLISECOND] = isSet[ZONE_OFFSET] = isSet[DST_OFFSET] = true;
 
 	}
 
@@ -572,41 +666,42 @@ public class GregorianCalendar extends Calendar {
 	 * the same time (but doesn't necessary have the same fields).
 	 * @XXX Should we check if time zones, locale, cutover etc. are equal?
 	 */
-	public boolean equals(Object o) {
+  public boolean equals(Object o)
+  {
 		if (!(o instanceof GregorianCalendar))
 			return false;
 
-		GregorianCalendar cal = (GregorianCalendar)o;
+    GregorianCalendar cal = (GregorianCalendar) o;
 		return (cal.getTimeInMillis() == getTimeInMillis());
 	}
 
-	//     /**
-	//      * Compares the given calender with this.  
-	//      * @param o the object to that we should compare.
-	//      * @return true, if the given object is a calendar, and this calendar
-	//      * represents a smaller time than the calender o.
-	//      */
-	//     public boolean before(Object o) {
-	//         if (!(o instanceof GregorianCalendar))
-	//             return false;
+//     /**
+//      * Compares the given calender with this.  
+//      * @param o the object to that we should compare.
+//      * @return true, if the given object is a calendar, and this calendar
+//      * represents a smaller time than the calender o.
+//      */
+//     public boolean before(Object o) {
+//         if (!(o instanceof GregorianCalendar))
+//             return false;
 
-	//         GregorianCalendar cal = (GregorianCalendar) o;
-	//         return (cal.getTimeInMillis() < getTimeInMillis());
-	//     }
+//         GregorianCalendar cal = (GregorianCalendar) o;
+//         return (cal.getTimeInMillis() < getTimeInMillis());
+//     }
 
-	//     /**
-	//      * Compares the given calender with this.  
-	//      * @param o the object to that we should compare.
-	//      * @return true, if the given object is a calendar, and this calendar
-	//      * represents a bigger time than the calender o.
-	//      */
-	//     public boolean after(Object o) {
-	//         if (!(o instanceof GregorianCalendar))
-	//             return false;
+//     /**
+//      * Compares the given calender with this.  
+//      * @param o the object to that we should compare.
+//      * @return true, if the given object is a calendar, and this calendar
+//      * represents a bigger time than the calender o.
+//      */
+//     public boolean after(Object o) {
+//         if (!(o instanceof GregorianCalendar))
+//             return false;
 
-	//         GregorianCalendar cal = (GregorianCalendar) o;
-	//         return (cal.getTimeInMillis() > getTimeInMillis());
-	//     }
+//         GregorianCalendar cal = (GregorianCalendar) o;
+//         return (cal.getTimeInMillis() > getTimeInMillis());
+//     }
 
 	/**
 	 * Adds the specified amount of time to the given time field.  The
@@ -615,90 +710,96 @@ public class GregorianCalendar extends Calendar {
 	 * @param field the time field. One of the time field constants.
 	 * @param amount the amount of time.
 	 */
-	public void add(int field, int amount) {
-		switch (field) {
-			case YEAR :
+  public void add(int field, int amount)
+  {
+    switch (field)
+      {
+      case YEAR:
 				complete();
 				fields[YEAR] += amount;
 				isTimeSet = false;
 				break;
-			case MONTH :
+      case MONTH:
 				complete();
 				int months = fields[MONTH] + amount;
 				fields[YEAR] += months / 12;
 				fields[MONTH] = months % 12;
-				if (fields[MONTH] < 0) {
+	if (fields[MONTH] < 0)
+	  {
 					fields[MONTH] += 12;
 					fields[YEAR]--;
 				}
 				isTimeSet = false;
 				int maxDay = getActualMaximum(DAY_OF_MONTH);
-				if (fields[DAY_OF_MONTH] > maxDay) {
+	if (fields[DAY_OF_MONTH] > maxDay)
+	  {
 					fields[DAY_OF_MONTH] = maxDay;
 					isTimeSet = false;
 				}
 				break;
-			case DAY_OF_MONTH :
-			case DAY_OF_YEAR :
-			case DAY_OF_WEEK :
+      case DAY_OF_MONTH:
+      case DAY_OF_YEAR:
+      case DAY_OF_WEEK:
 				if (!isTimeSet)
 					computeTime();
 				time += amount * (24 * 60 * 60 * 1000L);
 				areFieldsSet = false;
 				break;
-			case WEEK_OF_YEAR :
-			case WEEK_OF_MONTH :
-			case DAY_OF_WEEK_IN_MONTH :
+      case WEEK_OF_YEAR:
+      case WEEK_OF_MONTH:
+      case DAY_OF_WEEK_IN_MONTH:
 				if (!isTimeSet)
 					computeTime();
 				time += amount * (7 * 24 * 60 * 60 * 1000L);
 				areFieldsSet = false;
 				break;
-			case AM_PM :
+      case AM_PM:
 				if (!isTimeSet)
 					computeTime();
 				time += amount * (12 * 60 * 60 * 1000L);
 				areFieldsSet = false;
 				break;
-			case HOUR :
-			case HOUR_OF_DAY :
+      case HOUR:
+      case HOUR_OF_DAY:
 				if (!isTimeSet)
 					computeTime();
 				time += amount * (60 * 60 * 1000L);
 				areFieldsSet = false;
 				break;
-			case MINUTE :
+      case MINUTE:
 				if (!isTimeSet)
 					computeTime();
 				time += amount * (60 * 1000L);
 				areFieldsSet = false;
 				break;
-			case SECOND :
+      case SECOND:
 				if (!isTimeSet)
 					computeTime();
 				time += amount * (1000L);
 				areFieldsSet = false;
 				break;
-			case MILLISECOND :
+      case MILLISECOND:
 				if (!isTimeSet)
 					computeTime();
 				time += amount;
 				areFieldsSet = false;
 				break;
-			case ZONE_OFFSET :
+      case ZONE_OFFSET:
 				complete();
 				fields[ZONE_OFFSET] += amount;
 				time -= amount;
 				break;
-			case DST_OFFSET :
+      case DST_OFFSET:
 				complete();
 				fields[DST_OFFSET] += amount;
 				isTimeSet = false;
 				break;
-			default :
-				throw new IllegalArgumentException("Unknown Calendar field: " + field);
+      default:
+	throw new IllegalArgumentException
+	  ("Unknown Calendar field: " + field);
 		}
 	}
+
 
 	/**
 	 * Rolls the specified time field up or down.  This means add one
@@ -714,15 +815,18 @@ public class GregorianCalendar extends Calendar {
 	 * @param field the time field. One of the time field constants.
 	 * @param up the direction, true for up, false for down.
 	 */
-	public void roll(int field, boolean up) {
+  public void roll(int field, boolean up)
+  {
 		roll(field, up ? 1 : -1);
 	}
 
-	private void cleanUpAfterRoll(int field, int delta) {
-		switch (field) {
-			case ERA :
-			case YEAR :
-			case MONTH :
+  private void cleanUpAfterRoll(int field, int delta)
+  {
+    switch (field)
+      {
+      case ERA:
+      case YEAR:
+      case MONTH:
 				// check that day of month is still in correct range
 				if (fields[DAY_OF_MONTH] > getActualMaximum(DAY_OF_MONTH))
 					fields[DAY_OF_MONTH] = getActualMaximum(DAY_OF_MONTH);
@@ -734,7 +838,7 @@ public class GregorianCalendar extends Calendar {
 				isSet[WEEK_OF_YEAR] = false;
 				break;
 
-			case DAY_OF_MONTH :
+      case DAY_OF_MONTH:
 				isSet[WEEK_OF_MONTH] = false;
 				isSet[DAY_OF_WEEK] = false;
 				isSet[DAY_OF_WEEK_IN_MONTH] = false;
@@ -743,21 +847,21 @@ public class GregorianCalendar extends Calendar {
 				time += delta * (24 * 60 * 60 * 1000L);
 				break;
 
-			case WEEK_OF_MONTH :
+      case WEEK_OF_MONTH:
 				isSet[DAY_OF_MONTH] = false;
 				isSet[DAY_OF_WEEK_IN_MONTH] = false;
 				isSet[DAY_OF_YEAR] = false;
 				isSet[WEEK_OF_YEAR] = false;
 				time += delta * (7 * 24 * 60 * 60 * 1000L);
 				break;
-			case DAY_OF_WEEK_IN_MONTH :
+      case DAY_OF_WEEK_IN_MONTH:
 				isSet[DAY_OF_MONTH] = false;
 				isSet[WEEK_OF_MONTH] = false;
 				isSet[DAY_OF_YEAR] = false;
 				isSet[WEEK_OF_YEAR] = false;
 				time += delta * (7 * 24 * 60 * 60 * 1000L);
 				break;
-			case DAY_OF_YEAR :
+      case DAY_OF_YEAR:
 				isSet[MONTH] = false;
 				isSet[DAY_OF_MONTH] = false;
 				isSet[WEEK_OF_MONTH] = false;
@@ -766,7 +870,7 @@ public class GregorianCalendar extends Calendar {
 				isSet[WEEK_OF_YEAR] = false;
 				time += delta * (24 * 60 * 60 * 1000L);
 				break;
-			case WEEK_OF_YEAR :
+      case WEEK_OF_YEAR:
 				isSet[MONTH] = false;
 				isSet[DAY_OF_MONTH] = false;
 				isSet[WEEK_OF_MONTH] = false;
@@ -775,27 +879,27 @@ public class GregorianCalendar extends Calendar {
 				time += delta * (7 * 24 * 60 * 60 * 1000L);
 				break;
 
-			case AM_PM :
+      case AM_PM:
 				isSet[HOUR_OF_DAY] = false;
 				time += delta * (12 * 60 * 60 * 1000L);
 				break;
-			case HOUR :
+      case HOUR:
 				isSet[HOUR_OF_DAY] = false;
 				time += delta * (60 * 60 * 1000L);
 				break;
-			case HOUR_OF_DAY :
+      case HOUR_OF_DAY:
 				isSet[HOUR] = false;
 				isSet[AM_PM] = false;
 				time += delta * (60 * 60 * 1000L);
 				break;
 
-			case MINUTE :
+      case MINUTE:
 				time += delta * (60 * 1000L);
 				break;
-			case SECOND :
+      case SECOND:
 				time += delta * (1000L);
 				break;
-			case MILLISECOND :
+      case MILLISECOND:
 				time += delta;
 				break;
 		}
@@ -814,14 +918,16 @@ public class GregorianCalendar extends Calendar {
 	 * @param field the time field. One of the time field constants.
 	 * @param amount the amount by which we should roll.
 	 */
-	public void roll(int field, int amount) {
-		switch (field) {
-			case DAY_OF_WEEK :
+  public void roll(int field, int amount)
+  {
+    switch (field)
+      {
+      case DAY_OF_WEEK:
 				// day of week is special: it rolls automatically
 				add(field, amount);
 				return;
-			case ZONE_OFFSET :
-			case DST_OFFSET :
+      case ZONE_OFFSET:
+      case DST_OFFSET:
 				throw new IllegalArgumentException("Can't roll time zone");
 		}
 		complete();
@@ -835,16 +941,21 @@ public class GregorianCalendar extends Calendar {
 		cleanUpAfterRoll(field, newval - oldval);
 	}
 
-	private static final int[] minimums = { BC, 1, 0, 0, 1, 1, 1, SUNDAY, 1, AM, 1, 0, 1, 1, 1, - (12 * 60 * 60 * 1000), 0 };
+  private static final int[] minimums =
+      { BC,       1,  0,  0, 1,  1,   1,   SUNDAY, 1, 
+        AM,  1,  0,  1,  1,   1, -(12*60*60*1000),               0 };
 
-	private static final int[] maximums = { AD, 5000000, 11, 53, 5, 31, 366, SATURDAY, 5, PM, 12, 23, 59, 59, 999, + (12 * 60 * 60 * 1000), (12 * 60 * 60 * 1000)};
+  private static final int[] maximums =
+      { AD, 5000000, 11, 53, 5, 31, 366, SATURDAY, 5, 
+        PM, 12, 23, 59, 59, 999, +(12*60*60*1000), (12*60*60*1000) };
 
 	/**
 	 * Gets the smallest value that is allowed for the specified field.
 	 * @param field the time field. One of the time field constants.
 	 * @return the smallest value.
 	 */
-	public int getMinimum(int field) {
+  public int getMinimum(int field)
+  {
 		return minimums[field];
 	}
 
@@ -853,16 +964,19 @@ public class GregorianCalendar extends Calendar {
 	 * @param field the time field. One of the time field constants.
 	 * @return the biggest value.
 	 */
-	public int getMaximum(int field) {
+  public int getMaximum(int field)
+  {
 		return maximums[field];
 	}
+
 
 	/**
 	 * Gets the greatest minimum value that is allowed for the specified field.
 	 * @param field the time field. One of the time field constants.
 	 * @return the greatest minimum value.
 	 */
-	public int getGreatestMinimum(int field) {
+  public int getGreatestMinimum(int field)
+  {
 		if (field == WEEK_OF_YEAR)
 			return 1;
 		return minimums[field];
@@ -875,18 +989,20 @@ public class GregorianCalendar extends Calendar {
 	 * @return the least maximum value.  
 	 * @since jdk1.2
 	 */
-	public int getLeastMaximum(int field) {
-		switch (field) {
-			case WEEK_OF_YEAR :
+  public int getLeastMaximum(int field)
+  {
+    switch (field)
+      {
+      case WEEK_OF_YEAR:
 				return 52;
-			case DAY_OF_MONTH :
+      case DAY_OF_MONTH:
 				return 28;
-			case DAY_OF_YEAR :
+      case DAY_OF_YEAR:
 				return 365;
-			case DAY_OF_WEEK_IN_MONTH :
-			case WEEK_OF_MONTH :
+      case DAY_OF_WEEK_IN_MONTH:
+      case WEEK_OF_MONTH:
 				return 4;
-			default :
+      default:
 				return maximums[field];
 		}
 	}
@@ -900,8 +1016,10 @@ public class GregorianCalendar extends Calendar {
 	 * @return the actual minimum value.
 	 * @since jdk1.2
 	 */
-	public int getActualMinimum(int field) {
-		if (field == WEEK_OF_YEAR) {
+  public int getActualMinimum(int field)
+  {
+    if (field == WEEK_OF_YEAR)
+      {
 			int min = getMinimalDaysInFirstWeek();
 			if (min == 0)
 				return 1;
@@ -925,9 +1043,11 @@ public class GregorianCalendar extends Calendar {
 	 * @param field the time field. One of the time field constants.
 	 * @return the actual maximum value.  
 	 */
-	public int getActualMaximum(int field) {
-		switch (field) {
-			case WEEK_OF_YEAR :
+  public int getActualMaximum(int field)
+  {
+    switch (field)
+      {
+      case WEEK_OF_YEAR:
 				{
 					if (!areFieldsSet || !isSet[ERA] || !isSet[YEAR])
 						complete();
@@ -937,51 +1057,56 @@ public class GregorianCalendar extends Calendar {
 					int year = fields[ERA] == AD ? fields[YEAR] : 1 - fields[YEAR];
 					int lastDay = isLeapYear(year) ? 366 : 365;
 					int weekday = getWeekDay(year, lastDay);
-					int week = (lastDay + 6 - (7 + weekday - getFirstDayOfWeek()) % 7) / 7;
+	  int week = (lastDay + 6
+		      - (7 + weekday - getFirstDayOfWeek()) % 7) / 7;
 
 					int minimalDays = getMinimalDaysInFirstWeek();
 					int firstWeekday = getWeekDay(year, minimalDays);
 					if (minimalDays - (7 + firstWeekday - getFirstDayOfWeek()) % 7 < 1)
 						return week + 1;
 				}
-			case DAY_OF_MONTH :
+	case DAY_OF_MONTH:
 				{
 					if (!areFieldsSet || !isSet[MONTH])
 						complete();
 					int month = fields[MONTH];
 					// If you change this, you should also change 
 					// SimpleTimeZone.getDaysInMonth();
-					if (month == FEBRUARY) {
+	  if (month == FEBRUARY)
+	    {
 						if (!isSet[YEAR] || !isSet[ERA])
 							complete();
 						int year = fields[ERA] == AD ? fields[YEAR] : 1 - fields[YEAR];
 						return isLeapYear(year) ? 29 : 28;
-					} else if (month < AUGUST)
+	    }
+	  else if (month < AUGUST)
 						return 31 - (month & 1);
 					else
 						return 30 + (month & 1);
 				}
-			case DAY_OF_YEAR :
+      case DAY_OF_YEAR:
 				{
 					if (!areFieldsSet || !isSet[ERA] || !isSet[YEAR])
 						complete();
 					int year = fields[ERA] == AD ? fields[YEAR] : 1 - fields[YEAR];
 					return isLeapYear(year) ? 366 : 365;
 				}
-			case DAY_OF_WEEK_IN_MONTH :
+      case DAY_OF_WEEK_IN_MONTH:
 				{
 					// This is wrong for the month that contains the gregorian change.
 					int daysInMonth = getActualMaximum(DAY_OF_MONTH);
 					// That's black magic, I know
 					return (daysInMonth - (fields[DAY_OF_MONTH] - 1) % 7 + 6) / 7;
 				}
-			case WEEK_OF_MONTH :
+      case WEEK_OF_MONTH:
 				{
 					int daysInMonth = getActualMaximum(DAY_OF_MONTH);
-					int weekday = (daysInMonth - fields[DAY_OF_MONTH] + fields[DAY_OF_WEEK] - SUNDAY) % 7 + SUNDAY;
-					return (daysInMonth + 6 - (7 + weekday - getFirstDayOfWeek()) % 7) / 7;
+	  int weekday = (daysInMonth - fields[DAY_OF_MONTH]
+			 + fields[DAY_OF_WEEK] - SUNDAY) % 7 + SUNDAY;
+	  return (daysInMonth + 6
+		  - (7 + weekday - getFirstDayOfWeek()) % 7) / 7;
 				}
-			default :
+      default:
 				return maximums[field];
 		}
 	}
