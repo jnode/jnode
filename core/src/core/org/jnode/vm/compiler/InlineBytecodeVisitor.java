@@ -28,4 +28,12 @@ public abstract class InlineBytecodeVisitor extends CompilerBytecodeVisitor {
      */
     public abstract void visit_inlinedReturn();
     
+    /**
+     * Can inlinedMethod be inlined in the caller method.
+     * @param inlinedMethod
+     * @param caller
+     * @return
+     */
+    public abstract boolean canInline(VmMethod inlinedMethod, VmMethod caller);
+    
 }

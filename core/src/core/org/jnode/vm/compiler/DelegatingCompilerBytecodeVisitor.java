@@ -777,14 +777,8 @@ public class DelegatingCompilerBytecodeVisitor extends CompilerBytecodeVisitor {
      * @param cpIdx
      * @param value
      */
-    public void visit_ldc(int cpIdx, Object value) {
+    public void visit_ldc(int cpIdx, String value) {
         delegate.visit_ldc(cpIdx, value);
-    }
-    /**
-     * @param value
-     */
-    public void visit_ldc2(Object value) {
-        delegate.visit_ldc2(value);
     }
     /**
      * 

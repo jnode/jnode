@@ -799,14 +799,8 @@ public class CompilerBytecodeViewer extends InlineBytecodeVisitor {
      * @param cpIdx
      * @param value
      */
-    public void visit_ldc(int cpIdx, Object value) {
+    public void visit_ldc(int cpIdx, String value) {
         viewer.visit_ldc(cpIdx, value);
-    }
-    /**
-     * @param value
-     */
-    public void visit_ldc2(Object value) {
-        viewer.visit_ldc2(value);
     }
     /**
      * 
@@ -1008,5 +1002,11 @@ public class CompilerBytecodeViewer extends InlineBytecodeVisitor {
      */
     public void visit_inlinedReturn() {
         viewer.out("inlinedReturn");
+    }
+    /**
+     * @see org.jnode.vm.compiler.InlineBytecodeVisitor#canInline(org.jnode.vm.classmgr.VmMethod, org.jnode.vm.classmgr.VmMethod)
+     */
+    public boolean canInline(VmMethod inlinedMethod, VmMethod caller) {
+        return true;
     }
 }
