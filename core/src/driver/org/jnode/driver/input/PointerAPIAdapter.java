@@ -6,11 +6,16 @@ package org.jnode.driver.input;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class PointerAPIAdapter implements PointerAPI {
 
+	/** My logger */
+	private static final Logger log = Logger.getLogger(PointerAPIAdapter.class);
+	
 	/** All listeners */
 	private final ArrayList listeners = new ArrayList();
 
@@ -44,7 +49,11 @@ public class PointerAPIAdapter implements PointerAPI {
 	public synchronized void fireEvent(PointerEvent event) {
 		for (Iterator i = listeners.iterator(); i.hasNext();) {
 			PointerListener l = (PointerListener) i.next();
-			l.pointerStateChanged(event);
+			try {
+				l.pointerStateChanged(event);
+			} catch (Throwable ex) {
+				log.error("Exception in PointerListener", ex);
+			}
 			if (event.isConsumed()) {
 				break;
 			}
