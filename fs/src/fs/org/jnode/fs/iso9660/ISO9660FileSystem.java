@@ -5,6 +5,7 @@ package org.jnode.fs.iso9660;
 
 import java.io.IOException;
 
+import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystemException;
@@ -16,8 +17,6 @@ import org.jnode.fs.spi.AbstractFileSystem;
  */
 public class ISO9660FileSystem extends AbstractFileSystem {
 
-    public static int DefaultLBNSize = 2048;
-
     private final ISO9660Volume volume;
 
     /**
@@ -27,11 +26,12 @@ public class ISO9660FileSystem extends AbstractFileSystem {
             throws FileSystemException {
         super(device, readOnly);
 
-        //byte[] buff = new byte[ISO9660FileSystem.DefaultLBNSize];
         try {
-            volume = new ISO9660Volume(getApi());
+            volume = new ISO9660Volume(getFSApi());
         } catch (IOException e) {
             throw new FileSystemException(e);
+        } catch (ApiNotFoundException ex) {
+            throw new FileSystemException("Need FSBlockDeviceAPI for ISO9660 filesystem");
         }
     }
 

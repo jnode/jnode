@@ -14,11 +14,18 @@ import org.jnode.util.LittleEndian;
  */
 public class VolumeDescriptor {
 
-    public static int VolumeSetTerminator_TYPE = 255;
+    public static interface Type {
 
-    public static int PrimaryVolumeDescriptor_TYPE = 1;
+        public static final int TERMINATOR = 255;
 
-    public static int SupplementaryVolumeDescriptor_TYPE = 2;
+        public static final int BOOTRECORD = 0;
+        
+        public static final int PRIMARY_DESCRIPTOR = 1;
+
+        public static final int SUPPLEMENTARY_DESCRIPTOR = 2;
+        
+        public static final int PARTITION_DESCRIPTOR = 3;
+    }
 
     private final int type;
 
