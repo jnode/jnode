@@ -9,6 +9,7 @@ import java.security.PrivilegedExceptionAction;
 import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.DriverException;
+import org.jnode.driver.net.NetworkException;
 import org.jnode.driver.net.ethernet.spi.Flags;
 import org.jnode.driver.net.spi.AbstractDeviceCore;
 import org.jnode.driver.pci.PCIBaseAddress;
@@ -37,23 +38,38 @@ import org.jnode.vm.Address;
  */
 public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPRO100Constants, EthernetConstants {
     /** Device Driver */
-    //private final EEPRO100Driver driver;
+    private final EEPRO100Driver driver;
+
     /** Start of IO address space */
     private final int iobase;
+
     /** IO address space resource */
     private final IOResource io;
+
     /** IRQ resource */
     private final IRQResource irq;
+    
+    /** */
+    private ResourceManager rm;
+
     /** My ethernet address */
     private EthernetAddress hwAddress;
+
     /** Registers */
-    private final EEPRO100Registers regs;
+    private EEPRO100Registers regs;
+
     /** Flags for the specific device found */
-    private final EEPRO100Flags flags;
+    private EEPRO100Flags flags;
+
     /** Statistical counters */
-    private final EEPRO100Stats stats;
+    private EEPRO100Stats stats;
+
     /** RX/TX */
-    EEPRO100Buffer RxTxBuffer;
+    private EEPRO100Buffer buffers;
+    
+    /** */
+    private int phy[];
+
     /** */
     private int eeReadCmd;
 
@@ -75,7 +91,10 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
      * @throws ResourceNotFreeException
      */
     public EEPRO100Core(EEPRO100Driver driver, ResourceOwner owner, PCIDevice device, Flags flags) throws ResourceNotFreeException, DriverException {
-        //this.driver = driver;
+        
+        phy = new int[2];
+        
+        this.driver = driver;
         this.flags = (EEPRO100Flags) flags;
 
         final PCIDeviceConfig config = device.getConfig();
@@ -88,7 +107,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
         iobase = addrs[1].getIOBase();
         final int iolength = addrs[1].getSize();
         log.debug("Found Lance IOBase: 0x" + NumberUtils.hex(iobase) + ", length: " + iolength);
-        ResourceManager rm;
+        
         try {
             rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
         } catch (NameNotFoundException ex) {
@@ -106,7 +125,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
         // Initialize statistical counters.
         stats = new EEPRO100Stats(rm, regs);
         // Initialize RX/TX Buffers.
-        RxTxBuffer = new EEPRO100Buffer(rm);
+        buffers = new EEPRO100Buffer(this);
 
         int i, option = 0;
         int[] eeprom = new int[0x100];
@@ -154,11 +173,6 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
          * ').append(Integer.toHexString(mdioRead(phy[0], 3)));
          * System.out.println(sb.toString()); sb.setLength(0); // assuming we
          * are i82555 } else {
-         */
-        /*
-         * OK, this is pure kernel bloat. I don't like it when other drivers
-         * waste non-pageable kernel space to emit similar messages, but I need
-         * them for bug reports.
          */
         String connectors[] = { " RJ45", " BNC", " AUI", " MII"};
         if ((eeprom[3] & 0x03) != 0) log.info("Receiver lock-up bug exists -- enabling work-around.");
@@ -214,6 +228,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
         regs.setReg32(SCBPort, PortReset);
         systemDelay(100);
     }
+
     /*
      * (non-Javadoc)
      * 
@@ -229,20 +244,21 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
      * @see org.jnode.driver.net.AbstractDeviceCore#initialize()
      */
     public void initialize() {
-
-        //RxTxBuffer.initRxRing();
-        //RxTxBuffer.initTxRing();
+        log.debug(flags.getName() + " : Init initialize");
+        buffers.initRxRing();
+        buffers.initTxRing();
 
         /*
          * We can safely take handler calls during init. Doing this after
          * initRxRing() results in a memory leak.
          */
-        //setupInterrupt();
+        setupInterrupt();
         /* Fire up the hardware. */
-        //resume();
-        //rx_mode = -1; /* Invalid -> always reset the mode. */
-        //setRxMode();
+        buffers.resume();
+        buffers.setRxMode(-1);
+        buffers.setRxMode();
         log.debug(this.flags.getName() + ": Done open(), status ");
+        log.debug(flags.getName() + " : End initialize");
     }
 
     /*
@@ -252,7 +268,8 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
      */
     public void disable() {
         // TODO Auto-generated method stub
-
+        log.debug(flags.getName() + " : Init disable");
+        log.debug(flags.getName() + " : End disable");
     }
 
     /*
@@ -261,9 +278,9 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
      * @see org.jnode.driver.net.AbstractDeviceCore#release()
      */
     public void release() {
+        log.debug(flags.getName() + " : release");
         io.release();
         irq.release();
-
     }
 
     /*
@@ -273,91 +290,34 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
      *      long)
      */
     public void transmit(SocketBuffer buf, long timeout) throws InterruptedException, TimeoutException {
-        // TODO Auto-generated method stub
+        log.debug(flags.getName() + " : Init transmit with TIMEOUT=" + timeout);
         // Set the source address
         hwAddress.writeTo(buf, 6);
-
+        buffers.txProcess();
+        log.debug(flags.getName() + " : End transmit");
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.jnode.system.IRQHandler#handleInterrupt(int)
+     */
     public void handleInterrupt(int irq) {
-        int bogusCount = 20;
-        int status;
-
-        if ((RxTxBuffer.getCurRx() - RxTxBuffer.getDirtyRx()) > 15) {
-            log.debug("curRx > dirtyRx " + RxTxBuffer.getCurRx() + " " + RxTxBuffer.getDirtyRx());
-            //showstate();
-        }
-
-        do {
-            status = regs.getReg16(SCBStatus);
-            regs.setReg16(SCBStatus, status & IntrAllNormal);
-            if ((status & IntrAllNormal) == 0) break;
-            if ((status & (IntrRxDone | IntrRxSuspend)) != 0)
-            /* rx() */;
-
-            if ((status & (IntrCmdDone | IntrCmdIdle | IntrDrvrIntr)) != 0) {
-                int dirtyTx0;
-                dirtyTx0 = RxTxBuffer.getDirtyTx();
-                while ((RxTxBuffer.getCurTx() - dirtyTx0) > 0) {
-                    int entry = dirtyTx0 & (TX_RING_SIZE - 1);
-                    status = RxTxBuffer.txRing[entry].getStatus();
-                    if ((status & StatusComplete) == 0) {
-                        if ((RxTxBuffer.getCurTx() - dirtyTx0) > 0 && (RxTxBuffer.txRing[(dirtyTx0 + 1) & TX_RING_SIZE - 1].getStatus() & StatusComplete) != 0) {
-                            log.debug("Command unit failed to mark command." + NumberUtils.hex(status) + "as complete at " + RxTxBuffer.getDirtyTx());
-                        } else {
-                            break;
-                        }
-
-                    }
-
-                    if ((status & TxUnderrun) != 0) {
-                        if (RxTxBuffer.getTxThreshold() < 0x01e00000) {
-                            RxTxBuffer.setTxThreshold(RxTxBuffer.getTxThreshold() + 0x00040000);
-                        }
-                    }
-                    if ((status & 0x70000) == CmdNOp) {
-                        //mc_setup_busy = 0;
-                    }
-                    dirtyTx0++;
-                }
-                if (RxTxBuffer.getCurTx() - dirtyTx0 > TX_RING_SIZE) {
-                    log.debug("out-of-sync dirty pointer, " + dirtyTx0 + " vs. " + RxTxBuffer.getCurTx() + " full=" + txFull);
-                    dirtyTx0 += TX_RING_SIZE;
-                }
-
-                RxTxBuffer.setDirtyTx(dirtyTx0);
-                if (txFull && RxTxBuffer.getCurTx() - RxTxBuffer.getDirtyTx() < TX_QUEUE_UNFULL) {
-                    /*
-                     * The ring is no longer full, clear tbusy.
-                     */
-                    txFull = false;
-                    // netif_resume_tx_queue(dev);
-                }
-            }
-            if ((status & IntrRxSuspend) != 0) {
-                //interruptError(status);
-            }
-
-            if (--bogusCount < 0) {
-                /*
-                 * StringBuffer sb = new StringBuffer();
-                 * sb.append(name).append(": Too much work at interrupt,
-                 * status="); sb.append(Integer.toHexString(status));
-                 * System.out.println(sb.toString());
-                 */
-                /*
-                 * Clear all interrupt sources.
-                 */
-                regs.setReg16(SCBStatus, 0xfc00);
-                break;
-            }
-
-        } while (true);
-        return;
+        log.debug(flags.getName() + " : Init handleInterrupt with IRQ=" + irq);
+        setupInterrupt();
     }
 
     //--- PRIVATE METHODS ---
-
+    /**
+     * 
+     * 
+     * @param rm
+     * @param owner
+     * @param low
+     * @param length
+     * 
+     * @return
+     */
     private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner, final int low, final int length) throws ResourceNotFreeException, DriverException {
         try {
             return (IOResource) AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction() {
@@ -375,7 +335,6 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
     }
 
     //--- EEPROM METHODS ---
-
     /**
      * Delay between EEPROM clock transitions. The code works with no delay on
      * 33Mhz PCI.
@@ -387,6 +346,10 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
             ;
     }
 
+    /**
+     * 
+     *  
+     */
     final void sizeEeprom() {
 
         regs.setReg16(SCBeeprom, EE_CS);
@@ -428,6 +391,11 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
         regs.setReg16(SCBeeprom, 0);
     }
 
+    /**
+     * 
+     * @param cmd
+     * @return
+     */
     final int doEepromCmd(int cmd) {
         int data = 0;
 
@@ -461,6 +429,11 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
     }
 
     //--- OTHER METHODS
+    /**
+     * 
+     * 
+     * @param delay
+     */
     final void systemDelay(int delay) {
         //SystemResource.getTimer().udelay(4);
         int i = 100;
@@ -469,7 +442,12 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
     }
 
     //--- MD IO METHODS
-
+    /**
+     * 
+     * @param phy_id
+     * @param location
+     * @return
+     */
     final int mdioRead(int phy_id, int location) {
         int val, boguscnt = 64; /* <64 usec. to complete, typ 27 ticks */
         regs.setReg32(SCBCtrlMDI, 0x08000000 | (location << 16) | (phy_id << 21));
@@ -484,6 +462,13 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
         return val & 0xffff;
     }
 
+    /**
+     * 
+     * @param phy_id
+     * @param location
+     * @param value
+     * @return
+     */
     final int mdioWrite(int phy_id, int location, int value) {
         int val, boguscnt = 64; /* <64 usec. to complete, typ 27 ticks */
         regs.setReg32(SCBCtrlMDI, 0x04000000 | (location << 16) | (phy_id << 21) | value);
@@ -499,62 +484,127 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
         return val & 0xffff;
     }
 
-    /* Start the chip hardware after a full reset. */
-    final void resume() {
-        regs.setReg16(SCBCmd, SCBMaskAll);
+    
 
-        /* Start with a Tx threshold of 256 (0x..20.... 8 byte units). */
-        //tx_threshold = 0x01200000;
-        /* Set the segment registers to '0'. */
-        EEPRO100Utils.waitForCmdDone(regs);
-        regs.setReg32(SCBPointer, 0);
-        //		csr.read32(SCBPointer); /* Flush to PCI. */
-        systemDelay(10); /* Bogus, but it avoids the bug. */
-        /* Note: these next two operations can take a while. */
-        regs.setReg8(SCBCmd, RxAddrLoad);
-        EEPRO100Utils.waitForCmdDone(regs);
-        regs.setReg8(SCBCmd, CUCmdBase);
-        EEPRO100Utils.waitForCmdDone(regs);
+    
 
-        /* Load the statistics block and rx ring addresses. */
-        stats.loadBlock();
-        EEPRO100Utils.waitForCmdDone(regs);
+    /**
+     * 
+     *  
+     */
+    public void setupInterrupt() {
+        try {
 
-        int rxRingAddress = (RxTxBuffer.rxRing[RxTxBuffer.getCurRx() & RX_RING_SIZE - 1]).getBufferAddress();
-        regs.setReg32(SCBPointer, rxRingAddress);
-        regs.setReg8(SCBCmd, RxStart);
-        EEPRO100Utils.waitForCmdDone(regs);
-        regs.setReg8(SCBCmd, CUDumpStats);
-        systemDelay(30);
+            int bogusCount = 20;
+            int status;
 
-        /* Fill the first command with our physical address. */
-        //int entry = RxTxBuffer.getCurTx++ & TX_RING_SIZE-1;
-        //TxFD cur_cmd = RxTxBuffer.txRing[entry];
-        /* Avoid a bug(?!) here by marking the command already completed. */
-        /*
-         * cur_cmd.status((CmdSuspend | CmdIASetup) | 0xa000);
-         * cur_cmd.link(txRing[cur_tx & TX_RING_SIZE-1].bufferAddress);
-         * cur_cmd.params(deviceAddress); if (lastCmd != null)
-         * lastCmd.clearSuspend(); lastCmd = cur_cmd;
-         */
-        EEPRO100Utils.waitForCmdDone(regs);
+            if ((buffers.getCurRx() - buffers.getDirtyRx()) > 15) {
+                log.debug("curRx > dirtyRx " + buffers.getCurRx() + " " + buffers.getDirtyRx());
+                //showstate();
+            }
 
-        /* Start the chip's Tx process and unmask interrupts. */
-        //int txRingAddress = (RxTxBuffer.txRing[RxTxBuffer.getDirtyTx() &
-        // TX_RING_SIZE-1]).getBufferAddress();
-        //regs.setReg32(SCBPointer, txRingAddress);
-        regs.setReg16(SCBCmd, CUStart | SCBMaskEarlyRx | SCBMaskFlowCtl);
+            do {
+                status = regs.getReg16(SCBStatus);
+                regs.setReg16(SCBStatus, status & IntrAllNormal);
+                if ((status & IntrAllNormal) == 0) break;
+                if ((status & (IntrRxDone | IntrRxSuspend)) != 0) buffers.rx(driver);
+
+                if ((status & (IntrCmdDone | IntrCmdIdle | IntrDrvrIntr)) != 0) {
+                    int dirtyTx0;
+                    dirtyTx0 = buffers.getDirtyTx();
+                    while ((buffers.getCurTx() - dirtyTx0) > 0) {
+                        int entry = dirtyTx0 & (TX_RING_SIZE - 1);
+                        status = buffers.txRing[entry].getStatus();
+                        if ((status & StatusComplete) == 0) {
+                            if ((buffers.getCurTx() - dirtyTx0) > 0 && (buffers.txRing[(dirtyTx0 + 1) & TX_RING_SIZE - 1].getStatus() & StatusComplete) != 0) {
+                                log.debug("Command unit failed to mark command." + NumberUtils.hex(status) + "as complete at " + buffers.getDirtyTx());
+                            } else {
+                                break;
+                            }
+
+                        }
+
+                        if ((status & TxUnderrun) != 0) {
+                            if (buffers.getTxThreshold() < 0x01e00000) {
+                                buffers.setTxThreshold(buffers.getTxThreshold() + 0x00040000);
+                            }
+                        }
+                        if ((status & 0x70000) == CmdNOp) {
+                            //mc_setup_busy = 0;
+                        }
+                        dirtyTx0++;
+                    }
+                    if (buffers.getCurTx() - dirtyTx0 > TX_RING_SIZE) {
+                        log.debug("out-of-sync dirty pointer, " + dirtyTx0 + " vs. " + buffers.getCurTx() + " full=" + txFull);
+                        dirtyTx0 += TX_RING_SIZE;
+                    }
+
+                    buffers.setDirtyTx(dirtyTx0);
+                    if (txFull && buffers.getCurTx() - buffers.getDirtyTx() < TX_QUEUE_UNFULL) {
+                        /*
+                         * The ring is no longer full, clear tbusy.
+                         */
+                        txFull = false;
+                        // netif_resume_tx_queue(dev);
+                    }
+                }
+                if ((status & IntrRxSuspend) != 0) {
+                    //interruptError(status);
+                }
+
+                if (--bogusCount < 0) {
+                    /*
+                     * StringBuffer sb = new StringBuffer();
+                     * sb.append(name).append(": Too much work at interrupt,
+                     * status="); sb.append(Integer.toHexString(status));
+                     * System.out.println(sb.toString());
+                     */
+                    /*
+                     * Clear all interrupt sources.
+                     */
+                    regs.setReg16(SCBStatus, 0xfc00);
+                    break;
+                }
+
+            } while (true);
+            log.debug(flags.getName() + " : End handleInterrupt");
+            return;
+        } catch (NetworkException e) {
+            e.printStackTrace();
+        }
+
     }
-
-    final void waitForCmdDone() {
-        int wait = 0;
-        do {
-            if (regs.getReg8(SCBCmd) == 0) return;
-        } while (++wait <= 100);
-        do {
-            if (regs.getReg8(SCBCmd) == 0) break;
-        } while (++wait <= 10000);
-        System.out.println("Command was not immediately accepted, " + wait + " ticks!");
+    
+    //--- Accessors ---
+    
+    /**
+     * @return Returns the rm.
+     */
+    public ResourceManager getRm() {
+        return rm;
     }
-
+    /**
+     * @return Returns the buffers.
+     */
+    public EEPRO100Buffer getBuffers() {
+        return buffers;
+    }
+    /**
+     * @return Returns the flags.
+     */
+    public EEPRO100Flags getFlags() {
+        return flags;
+    }
+    /**
+     * @return Returns the regs.
+     */
+    public EEPRO100Registers getRegs() {
+        return regs;
+    }
+    /**
+     * @return Returns the stats.
+     */
+    public EEPRO100Stats getStats() {
+        return stats;
+    }
 }
