@@ -76,11 +76,17 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 				i--;
 			}
 		}
+		// TODO this is O(n^2), but it works...
 		Iterator it = branchTargets.keySet().iterator();
 		while (it.hasNext()) {
 			Integer from = (Integer) it.next();
 			Integer to = (Integer) branchTargets.get(from);
-			findBB(list, from.intValue()).addSuccessor(findBB(list, to.intValue()));
+			IRBasicBlock pred = findBB(list, from.intValue());
+			IRBasicBlock succ = findBB(list, to.intValue());
+			if (pred == null || succ == null) {
+				throw new AssertionError("unable to find BB!");
+			}
+			pred.addSuccessor(succ);
 		}
 		if (bbIndex != list.length) {
 			throw new AssertionError("bbIndex != list.length");
