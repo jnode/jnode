@@ -3,8 +3,6 @@
  */
 package org.jnode.driver.net.lance;
 
-import java.io.PrintStream;
-
 import org.apache.log4j.Logger;
 import org.jnode.net.SocketBuffer;
 import org.jnode.system.MemoryResource;
@@ -90,10 +88,10 @@ public class RxDescriptorRing extends DescriptorRing {
 		}
 	}
 
-	public void dumpData(PrintStream out) {
-		out.println("Receive Ring Descriptors - 32 bit mode");
+	public void dumpData(Logger out) {
+		out.debug("Receive Ring Descriptors - Software Style 2");
 		for (int i = 0; i < length; i++) {
-			out.println("Descriptor " + i);
+			out.debug("Descriptor " + i);
 			rxDescriptors[i].dumpData(out);
 		}
 	}

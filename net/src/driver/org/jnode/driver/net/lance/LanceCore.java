@@ -7,7 +7,6 @@ import java.security.PrivilegedExceptionAction;
 
 import javax.naming.NameNotFoundException;
 
-import org.apache.log4j.Logger;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.net.AbstractDeviceCore;
 import org.jnode.driver.net.NetworkException;
@@ -43,7 +42,7 @@ import org.jnode.util.TimeoutException;
  * - Device supports Software Style 2 (PCnet-PCI) which defines the layout of the initialaztion
  *   block and the descriptor rings.
  * 
- * Note: I should be easy to expand this driver to remove these assuptions.
+ * Note: It should be easy to expand this driver to remove these assuptions.
  * 
  * @author Chirs Cole
  */
@@ -56,8 +55,6 @@ public class LanceCore
 	private static final int RX_DESCRIPTOR_LENGTH = 4;
 	private static final int TX_DESCRIPTOR_LENGTH = 4;
 
-	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
 	/** Device Driver */
 	private final LanceDriver driver;
 	/** Start of IO address space */
@@ -121,11 +118,11 @@ public class LanceCore
 			this.irq.release();
 			throw ex;
 		}
-		
+
 		// Determine the type of IO access (Word or DWord)
 		io = getIOAccess();
 		log.debug("IO Access set to " + io.getType());
-		
+
 		// Set the flags based on the version of the device found
 		setFlags();
 
@@ -143,8 +140,8 @@ public class LanceCore
 		// Create rx & tx descriptor rings, initdata and databuffers
 		this.bufferManager =
 			new BufferManager(
-			RX_DESCRIPTOR_LENGTH,
-			TX_DESCRIPTOR_LENGTH,
+				RX_DESCRIPTOR_LENGTH,
+				TX_DESCRIPTOR_LENGTH,
 				CSR15_DRX | CSR15_DTX,
 				hwAddress,
 				0,
@@ -157,23 +154,23 @@ public class LanceCore
 			device.readConfigByte(PCIConstants.PCI_COMMAND)
 				| PCIConstants.PCI_COMMAND_MASTER);
 	}
-	
+
 	private IOAccess getIOAccess() {
 		// reset
 		ioResource.inPortWord(iobase + WIO_RESET);
 		ioResource.outPortWord(iobase + WIO_RAP, 0);
-		if(ioResource.inPortWord(iobase + WIO_RDP) == 4) {
+		if (ioResource.inPortWord(iobase + WIO_RDP) == 4) {
 			ioResource.outPortWord(iobase + WIO_RAP, 88);
-			if(ioResource.inPortWord(iobase +WIO_RAP) == 88) {
+			if (ioResource.inPortWord(iobase + WIO_RAP) == 88) {
 				return new WordIOAccess(ioResource, iobase);
 			}
 		}
-		
+
 		ioResource.inPortDword(iobase + DWIO_RESET);
 		ioResource.outPortDword(iobase + DWIO_RAP, 0);
-		if(ioResource.inPortDword(iobase + DWIO_RDP) == 4) {
+		if (ioResource.inPortDword(iobase + DWIO_RDP) == 4) {
 			ioResource.outPortDword(iobase + DWIO_RAP, 88);
-			if((ioResource.inPortDword(iobase + DWIO_RAP) & 0xFFFF) == 88) {
+			if ((ioResource.inPortDword(iobase + DWIO_RAP) & 0xFFFF) == 88) {
 				return new DWordIOAccess(ioResource, iobase);
 			}
 		}
@@ -186,7 +183,7 @@ public class LanceCore
 	public void initialize() {
 		// reset the chip
 		io.reset();
-		
+
 		// Set the Software Style to mode 2 (PCnet-PCI)
 		// Note: this may not be compatable with older lance controllers (non PCnet)
 		io.setBCR(20, 2);
@@ -210,12 +207,10 @@ public class LanceCore
 		io.setCSR(1, iaddr & 0xFFFF);
 		io.setCSR(2, (iaddr >> 16) & 0xFFFF);
 
-		//setCSR(4, 0x0914);
-		// Initialize the device with the Initialization Block
-		// and enable interrupts
+		// Initialize the device with the Initialization Block and enable interrupts
 		io.setCSR(0, CSR0_INIT | CSR0_IENA);
 	}
-	
+
 	/**
 	 * Disable this device
 	 *  
@@ -246,7 +241,8 @@ public class LanceCore
 	private final EthernetAddress loadHWAddress() {
 		final byte[] addr = new byte[ETH_ALEN];
 		for (int i = 0; i < addr.length; i++) {
-			addr[i] = (byte) ioResource.inPortByte(iobase + R_ETH_ADDR_OFFSET + i);
+			addr[i] =
+				(byte) ioResource.inPortByte(iobase + R_ETH_ADDR_OFFSET + i);
 		}
 		return new EthernetAddress(addr, 0);
 	}
@@ -254,7 +250,7 @@ public class LanceCore
 	private final void setFlags() {
 		int chipVersion = io.getCSR(88) | (io.getCSR(89) << 16);
 		chipVersion = (chipVersion >> 12) & 0xffff;
-		
+
 		flags.setForVersion(chipVersion);
 	}
 
@@ -270,10 +266,13 @@ public class LanceCore
 		// Set the source address
 		hwAddress.writeTo(buf, 6);
 
-		//log.info("Transmit packet of size = " + buf.getSize());
+		// debug dump for investigating VWWare 3 network problems
+		//dumpDebugInfo();
 
+		// ask buffer manager to send out the data
 		bufferManager.transmit(buf);
 
+		// force the device to poll current transmit descriptor for new data
 		io.setCSR(0, io.getCSR(0) | CSR0_TDMD);
 	}
 
@@ -283,7 +282,6 @@ public class LanceCore
 	public void handleInterrupt(int irq) {
 		while ((io.getCSR(0) & CSR0_INTR) != 0) {
 			final int csr0 = io.getCSR(0);
-			/*final int csr3 =*/ io.getCSR(3);
 			final int csr4 = io.getCSR(4);
 			final int csr5 = io.getCSR(5);
 
@@ -406,10 +404,38 @@ public class LanceCore
 		}
 	}
 
-	/*private void dumpDebugInfo() {
-		//bufferManager.dumpData(System.out);
+	private IOResource claimPorts(
+		final ResourceManager rm,
+		final ResourceOwner owner,
+		final int low,
+		final int length)
+		throws ResourceNotFreeException, DriverException {
+		try {
+			return (
+				IOResource) AccessControllerUtils
+					.doPrivileged(new PrivilegedExceptionAction() {
+				public Object run() throws ResourceNotFreeException {
+					return rm.claimIOResource(owner, low, length);
+				}
+			});
+		} catch (ResourceNotFreeException ex) {
+			throw ex;
+		} catch (Exception ex) {
+			throw new DriverException("Unknown exception", ex);
+		}
 
-		/*private int validVMWareLanceRegs[] =
+	}
+	
+	private void dumpDebugInfo() {
+		log.debug("Debug Dump");
+		log.debug("CSR0 = " + io.getCSR(0));
+		
+		// stop the device so we can read all registers
+		io.setCSR(0, CSR0_STOP);
+		
+		bufferManager.dumpData(log);
+
+		int validVMWareLanceRegs[] =
 			{
 				0,
 				1,
@@ -437,42 +463,31 @@ public class LanceCore
 				88,
 				89,
 				112,
-				124 };*/
+				124 };
+
+		for (int i = 0; i < validVMWareLanceRegs.length; i++) {
+			int csr_val = io.getCSR(validVMWareLanceRegs[i]);
+			log.debug(
+				"CSR"
+					+ validVMWareLanceRegs[i]
+					+ " : "
+					+ NumberUtils.hex(csr_val, 4));
+		}
+
+		// try to start again, not sure if this works?
+		io.setCSR(0, CSR0_STRT);
+		
 		/*
-		for (int j = 0; j <= 0x3F; j++) {
-			int pci_0 = device.readConfigByte(j);
-			System.out.println(
-				"PCI" + NumberUtils.hex(j) + " : " + NumberUtils.hex(pci_0));
+		for (int k = 0; k <= 22; k++) {
+			int bcr_val = io.getBCR(k);
+			log.debug("BCR" + k + " : " + NumberUtils.hex(bcr_val));
+		}
+
+				for (int j = 0; j <= 0x3F; j++) {
+			int pci_val = device.readConfigByte(j);
+			log.debug(
+				"PCI" + NumberUtils.hex(j) + " : " + NumberUtils.hex(pci_val));
 		}
 		*/
-		/*for(int i = 0; i < 128; i++) {
-			int csr_0 = getCSR(i);
-			System.out.println("CSR" + i + " : " + NumberUtils.hex(csr_0));
-		}
-				
-		for(int j = 0; j <= 0x3F; j++) {
-			int pci_0 = io.inPortByte(iobase + j);
-			System.out.println("PCI" + NumberUtils.hex(j) + " : " + NumberUtils.hex(pci_0));
-		}
-				
-		for(int k = 0; k <= 22; k++) {
-			int bcr_0 = getBCR(k);
-			System.out.println("BCR" + k + " : " + NumberUtils.hex(bcr_0));
-		}
-		
-	}*/
-
-	private IOResource claimPorts(final ResourceManager rm, final ResourceOwner owner, final int low, final int length) throws ResourceNotFreeException, DriverException {
-		try {
-            return (IOResource)AccessControllerUtils.doPrivileged(new PrivilegedExceptionAction() {
-                public Object run() throws ResourceNotFreeException {
-            		return rm.claimIOResource(owner, low, length);
-                    }});
-		} catch (ResourceNotFreeException ex) {
-		    throw ex;
-        } catch (Exception ex) {
-            throw new DriverException("Unknown exception", ex);
-        }
-	    
 	}
 }

@@ -3,8 +3,7 @@
  */
 package org.jnode.driver.net.lance;
 
-import java.io.PrintStream;
-
+import org.apache.log4j.Logger;
 import org.jnode.system.MemoryResource;
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.Address;
@@ -74,13 +73,9 @@ public class Descriptor {
 		mem.setShort(offset + STATUS, status);
 	}
 
-	//public boolean isStartOfPacket() {
-	//	return (( & mem.getShort(offset + 0x06)) == 0)
-	//}
-
-	public void dumpData(PrintStream out) {
+	public void dumpData(Logger out) {
 		for (int i = 0; i <= MESSAGE_DESCRIPTOR_SIZE - 1; i += 4) {
-			out.println(
+			out.debug(
 				"0x"
 					+ NumberUtils.hex(
 						Address.as32bit(mem.getAddress()) + offset + i)

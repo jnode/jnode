@@ -3,15 +3,13 @@
  */
 package org.jnode.driver.net.lance;
 
-import java.io.PrintStream;
-
+import org.apache.log4j.Logger;
 import org.jnode.net.SocketBuffer;
 import org.jnode.net.ethernet.EthernetAddress;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
-import org.jnode.util.NumberUtils;
 import org.jnode.vm.Address;
 
 /**
@@ -121,19 +119,9 @@ public class BufferManager {
 		return rxRing.getPacket();
 	}
 
-	public void dumpData(PrintStream out) {
+	public void dumpData(Logger out) {
 		initBlock.dumpData(out);
 		rxRing.dumpData(out);
 		txRing.dumpData(out);
-	}
-
-	public void dumpDataRaw(PrintStream out) {
-		for (int i = 0; i < size; i++) {
-			out.println(
-				"0x"
-					+ NumberUtils.hex((short) i)
-					+ " : 0x"
-					+ NumberUtils.hex(mem.getShort(i)));
-		}
 	}
 }

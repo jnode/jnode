@@ -3,8 +3,7 @@
  */
 package org.jnode.driver.net.lance;
 
-import java.io.PrintStream;
-
+import org.apache.log4j.Logger;
 import org.jnode.net.ethernet.EthernetAddress;
 import org.jnode.system.MemoryResource;
 import org.jnode.util.NumberUtils;
@@ -57,10 +56,10 @@ public class InitializationBlock32Bit {
 		return (byte) (encoded << 4);
 	}
 
-	public void dumpData(PrintStream out) {
-		out.println("Intialization Block - 32 bit mode");
+	public void dumpData(Logger out) {
+		out.debug("Intialization Block - 32 bit mode");
 		for (int i = 0; i <= INIT_BLOCK_SIZE - 1; i += 4) {
-			out.println(
+			out.debug(
 				"0x"
 					+ NumberUtils.hex(
 						Address.as32bit(mem.getAddress()) + offset + i)
