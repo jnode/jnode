@@ -421,14 +421,21 @@ public class CommandShell implements Runnable, Shell, KeyboardListener {
     		refreshCurrentLine();
     		        
             break;
-
+        
         default:
             //  if its a useful key we want to add it to our current line
         	char ch = ke.getKeyChar();
             if (!Character.isISOControl(ch)) {
-                ke.consume();
-                currentLine.appendChar(ch);
-                refreshCurrentLine();
+                if(ke.isControlDown() && ch == 'l'){
+                    this.console.clear();
+                    this.console.setCursor(this.console.getWidth() - 1 ,1);
+                    currentLine.start();
+                    refreshCurrentLine();
+                } else {
+                    ke.consume();
+                    currentLine.appendChar(ch);
+                    refreshCurrentLine();
+                }
             }
         }
     }
