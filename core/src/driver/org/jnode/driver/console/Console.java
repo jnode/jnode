@@ -109,5 +109,6 @@ public interface Console extends FocusListener {
 	 * @return registered name for this console
 	 */
 	public void setAcceleratorKeyCode(int keyCode); 
-	public int getAcceleratorKeyCode(); 
+	public int getAcceleratorKeyCode();
+
 }

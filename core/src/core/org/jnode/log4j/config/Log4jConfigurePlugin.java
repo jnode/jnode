@@ -49,6 +49,7 @@ public class Log4jConfigurePlugin extends Plugin {
 			final ConsoleManager conMgr = (ConsoleManager)InitialNaming.lookup(ConsoleManager.NAME);
 			final TextConsole console = new TextConsole(conMgr,Log4jPlugin.Log4jConsoleName);
 			conMgr.registerConsole(console);
+			
 			console.setAcceleratorKeyCode(KeyEvent.VK_F7);
 			final VirtualConsoleAppender debugApp = new VirtualConsoleAppender(console, new PatternLayout(LAYOUT));
 			debugApp.setThreshold(Level.DEBUG);
