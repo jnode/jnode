@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.io.Writer;
 
 import org.jnode.assembler.NativeStream;
 import org.jnode.vm.JvmType;
@@ -1789,6 +1790,32 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 		}
 		this.state |= VmTypeState.ST_COMPILED;
 		return compileCount;
+	}
+
+    public final synchronized int disassemble(String methodName, int optLevel, boolean enableTestCompilers, Writer writer) {
+        if (!isPrepared()) {
+            throw new IllegalStateException("VmType must have been prepared");
+        }
+        return doDisassemble(methodName, optLevel, enableTestCompilers, writer);
+    }
+
+    private final int doDisassemble(String methodName, int optLevel, boolean enableTestCompilers, Writer writer) {
+		final VmMethod[] mt = this.methodTable;
+		int disasmCount = 0;
+		if (mt != null) {
+			final int count = mt.length;
+			for (int i = 0; i < count; i++) {
+				final VmMethod method = mt[i];
+                if(methodName == null || "".equals(methodName.trim())){
+    			    loader.disassemble(method, optLevel, enableTestCompilers, writer);
+				    disasmCount++;
+                }else if(method.getName().equals(methodName)){
+                    loader.disassemble(method, optLevel, enableTestCompilers, writer);
+				    disasmCount++;
+                }
+			}
+		}
+		return disasmCount;
 	}
 
 	/**

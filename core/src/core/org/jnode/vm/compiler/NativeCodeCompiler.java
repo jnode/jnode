@@ -4,13 +4,17 @@
 package org.jnode.vm.compiler;
 
 import java.util.Iterator;
+import java.io.Writer;
 
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.UnresolvedObjectRefException;
+import org.jnode.assembler.x86.TextX86Stream;
 import org.jnode.vm.Address;
 import org.jnode.vm.VmSystemObject;
+import org.jnode.vm.Unsafe;
+import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.bytecode.BasicBlock;
 import org.jnode.vm.bytecode.ControlFlowGraph;
 import org.jnode.vm.classmgr.VmClassLoader;
@@ -184,6 +188,28 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
 
         if (os.hasUnresolvedObjectRefs()) { throw new CompileError(
                 "Unresolved labels after compile!"); }
+    }
+
+    public void disassemble(VmMethod method, ObjectResolver resolver, int level, Writer writer) {
+
+        if (method.isNative()) {
+            System.out.println(method + " is native");
+            return;
+        }
+
+        if (method.isAbstract()) {
+            System.out.println(method + " is abstract");
+            return;
+        }
+
+        TextX86Stream tos = new TextX86Stream(writer, (X86CpuID) Unsafe.getCurrentProcessor().getCPUID());
+
+        doCompile(method, tos, level, false);
+        try{
+            tos.flush();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**

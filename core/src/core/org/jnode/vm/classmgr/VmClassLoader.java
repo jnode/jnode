@@ -5,6 +5,7 @@
 package org.jnode.vm.classmgr;
 
 import java.security.ProtectionDomain;
+import java.io.Writer;
 
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmSystemObject;
@@ -60,7 +61,9 @@ public abstract class VmClassLoader extends VmSystemObject {
 	 * @param enableTestCompilers If true, test compilers at taken into account when selecting the compiler
 	 */
 	public abstract void compileRuntime(VmMethod vmMethod, int optLevel, boolean enableTestCompilers);
-	
+
+    public abstract void disassemble(VmMethod vmMethod, int optLevel, boolean enableTestCompilers, Writer writer);
+
     /**
      * Compile the given IMT.
      */
