@@ -122,8 +122,6 @@ public class ZipFile implements ZipConstants
 	 * 
 	 * The contents of the zip file will be accessible until it is closed.
 	 *
-	 * The OPEN_DELETE mode is currently unimplemented in this library
-	 * 
 	 * @since JDK1.3
 	 * @param mode Must be one of OPEN_READ or OPEN_READ | OPEN_DELETE
 	 *
@@ -133,11 +131,10 @@ public class ZipFile implements ZipConstants
 	 */
   public ZipFile(File file, int mode) throws ZipException, IOException
   {
+    if (mode != OPEN_READ && mode != (OPEN_READ | OPEN_DELETE))
+      throw new IllegalArgumentException("invalid mode");
     if ((mode & OPEN_DELETE) != 0)
-      {
-	throw new IllegalArgumentException
-	  ("OPEN_DELETE mode not supported yet in java.util.zip.ZipFile");
-		}
+      file.deleteOnExit();
     this.raf = new RandomAccessFile(file, "r");
     this.name = file.getPath();
     checkZipFile();

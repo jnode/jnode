@@ -99,7 +99,7 @@ class DomDocumentConfiguration
           }
         catch (ClassCastException e)
           {
-            throw new DomEx(DomEx.TYPE_MISMATCH_ERR,
+            throw new DomDOMException(DOMException.TYPE_MISMATCH_ERR,
                             value.getClass().getName(), null, 0);
           }
       }
@@ -140,7 +140,8 @@ class DomDocumentConfiguration
       }
     else
       {
-        throw new DomEx(DomEx.NOT_SUPPORTED_ERR, name, null, 0);
+        throw new DomDOMException(DOMException.NOT_SUPPORTED_ERR,
+                                  name, null, 0);
       }
   }
 
@@ -197,7 +198,7 @@ class DomDocumentConfiguration
             namespaceDeclarations == true &&
             comments == true) ? Boolean.TRUE : Boolean.FALSE;
       }
-    throw new DomEx(DomEx.NOT_SUPPORTED_ERR, name, null, 0);
+    throw new DomDOMException(DOMException.NOT_SUPPORTED_ERR, name, null, 0);
   }
 
   public boolean canSetParameter(String name, Object value)

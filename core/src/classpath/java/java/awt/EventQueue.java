@@ -37,15 +37,14 @@ exception statement from your version. */
 
 package java.awt;
 
-import gnu.java.awt.ClasspathToolkit;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
-import java.awt.event.InputMethodEvent;
 import java.awt.event.InvocationEvent;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.EmptyStackException;
+
+import gnu.java.awt.ClasspathToolkit;
 
 /* Written using on-line Java 2 Platform Standard Edition v1.3 API 
  * Specification, as well as "The Java Class Libraries", 2nd edition 
@@ -121,26 +120,30 @@ public class EventQueue
 	 * @exception InterruptedException If this thread is interrupted while
 	 * waiting for an event to be posted to the queue.
 	 */
-  public synchronized AWTEvent getNextEvent() throws InterruptedException {
+  public synchronized AWTEvent getNextEvent()
+    throws InterruptedException
+  {
         if (next != null)
             return next.getNextEvent();
 
         ClasspathToolkit tk = ((ClasspathToolkit) Toolkit.getDefaultToolkit());
         long curr = System.currentTimeMillis();
 
-        if (!tk.nativeQueueEmpty()
-                && (curr - lastNativeQueueAccess > humanLatencyThreshold)) {
+    if (! tk.nativeQueueEmpty() &&
+        (curr - lastNativeQueueAccess > humanLatencyThreshold))
+      {
             tk.iterateNativeQueue(this, false);
             lastNativeQueueAccess = curr;
         }
 
-        while (next_in == next_out) {
-            // Only the EventDispatchThread associated with the top of the stack
-            // is
+    while (next_in == next_out)
+      {
+        // Only the EventDispatchThread associated with the top of the stack is
             // allowed to get events from the native source; everyone else just
             // waits on the head of the queue.
 
-            if (isDispatchThread()) {
+        if (isDispatchThread())
+          {
                 // We are not allowed to return null from this method, yet it
                 // is possible that we actually have run out of native events
                 // in the enclosing while() loop, and none of the native events
@@ -155,10 +158,15 @@ public class EventQueue
 
                 tk.iterateNativeQueue(this, true);
                 lastNativeQueueAccess = System.currentTimeMillis();
-            } else {
-                try {
+          }
+        else
+          {
+            try
+              {
                     wait();
-                } catch (InterruptedException ie) {
+              }
+            catch (InterruptedException ie)
+              {
                 }
             }
         }
@@ -225,33 +233,34 @@ public class EventQueue
 	 *
 	 * @exception NullPointerException If event is null.
 	 */
-  public synchronized void postEvent(AWTEvent evt) {
+  public synchronized void postEvent(AWTEvent evt)
+  {
         if (evt == null)
             throw new NullPointerException();
 
-        if (next != null) {
+    if (next != null)
+      {
             next.postEvent(evt);
             return;
         }
 
-        /*
-         * Check for any events already on the queue with the same source and
-         * ID.
-         */
+    /* Check for any events already on the queue with the same source 
+       and ID. */	
         int i = next_out;
-        while (i != next_in) {
+    while (i != next_in)
+      {
             AWTEvent qevt = queue[i];
             Object src;
             if (qevt.id == evt.id
                     && (src = qevt.getSource()) == evt.getSource()
-                    && src instanceof Component) {
-                /*
-                 * If there are, call coalesceEvents on the source component to
-                 * see if they can be combined.
-                 */
+            && src instanceof Component)
+          {
+            /* If there are, call coalesceEvents on the source component 
+               to see if they can be combined. */
                 Component srccmp = (Component) src;
                 AWTEvent coalesced_evt = srccmp.coalesceEvents(qevt, evt);
-                if (coalesced_evt != null) {
+            if (coalesced_evt != null)
+              {
                     /* Yes. Replace the existing event with the combined event. */
                     queue[i] = coalesced_evt;
                     return;
@@ -266,7 +275,8 @@ public class EventQueue
         if (++next_in == queue.length)
             next_in = 0;
 
-        if (next_in == next_out) {
+    if (next_in == next_out)
+      {
             /* Queue is full. Extend it. */
             AWTEvent[] oldQueue = queue;
             queue = new AWTEvent[queue.length * 2];
@@ -280,9 +290,8 @@ public class EventQueue
             next_in = oldQueue.length;
         }
 
-        if (dispatchThread == null || !dispatchThread.isAlive()) {
-            System.out
-                    .println("Start new dispatchThread old=" + dispatchThread);
+    if (dispatchThread == null || !dispatchThread.isAlive())
+      {
             dispatchThread = new EventDispatchThread(this);
             dispatchThread.start();
         }
@@ -291,7 +300,8 @@ public class EventQueue
         // might cause the end of the dispatch thread's life, so we'll wake
         // it up here to give it a chance to check for shutdown.
 
-        if (!isDispatchThread() || (evt.getID() == WindowEvent.WINDOW_CLOSED)
+    if (!isDispatchThread() 
+        || (evt.getID() == WindowEvent.WINDOW_CLOSED)
                 || (evt.getID() == WindowEvent.WINDOW_CLOSING))
             ((ClasspathToolkit) Toolkit.getDefaultToolkit()).wakeNativeQueue();
 

@@ -1,5 +1,5 @@
-/* EventDispatchThread.java -
-   Copyright (C) 2000, 2002, 2004  Free Software Foundation
+/* DomLSException.java -- 
+   Copyright (C) 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,60 +35,25 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.awt;
+package gnu.xml.dom.ls;
+
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import org.w3c.dom.ls.LSException;
 
 /**
- * @author Bryce McKinlay
- * @status believed complete, but untested.
+ * A DOM LS exception incorporating a cause.
+ *
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class EventDispatchThread extends Thread
+public class DomLSException
+  extends LSException
 {
-  private static int dispatchThreadNum;
 
-	private EventQueue queue;
-
-  EventDispatchThread(EventQueue queue)
+  public DomLSException(short type, Exception cause)
   {
-		super();
-    setName("AWT-EventQueue-" + ++dispatchThreadNum);
-		this.queue = queue;
-//		setPriority(NORM_PRIORITY + 1);
-	}
+    super(type, (cause == null) ? null : cause.getMessage());
+    initCause(cause);
+  }
 
-  public void run()
-  {
-    while (true)
-      {
-        try
-	{
-                AWTEvent evt = queue.getNextEvent();
-
-                KeyboardFocusManager manager;
-          manager = KeyboardFocusManager.getCurrentKeyboardFocusManager ();
-
-                // Try to dispatch this event to the current keyboard focus
-                // manager. It will dispatch all FocusEvents, all
-                // WindowEvents related to focus, and all KeyEvents,
-                // returning true. Otherwise, it returns false and we
-                // dispatch the event normally.
-          if (!manager.dispatchEvent (evt))
-                    queue.dispatchEvent(evt);
-                }
-        catch (ThreadDeath death)
-        {
-                // If someone wants to kill us, let them.
-                return;
-        }
-	catch (InterruptedException ie)
-	{
-                // We are interrupted when we should finish executing
-                return;
-	}
-	catch (Throwable x)
-	{
-                System.err.println("Exception during event dispatch:");
-                x.printStackTrace(System.err);
-            }
-        }
-    }
 }
