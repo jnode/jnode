@@ -13,4 +13,5 @@ public abstract class HardwareSupport {
     public abstract void assemble();
     public abstract void writeTo(OutputStream out) throws IOException;
     public abstract void setPass(int pass);
+    public abstract boolean isRegister(String str);
 }

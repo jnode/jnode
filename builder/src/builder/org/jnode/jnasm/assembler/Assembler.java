@@ -98,7 +98,7 @@ public abstract class Assembler {
     }
 
     public static final boolean isIdent(Token t) {
-        return t.kind == JNAsmConstants.IDENT || t.kind == JNAsmConstants.REGISTER;
+        return t.kind == JNAsmConstants.IDENT;
     }
 
     static final boolean isNumber(Token t) {
@@ -107,6 +107,10 @@ public abstract class Assembler {
                 k == JNAsmConstants.BINNUMBER ||
                 k == JNAsmConstants.OCTNUMBER ||
                 k == JNAsmConstants.HEXNUMBER;
+    }
+
+    protected final boolean isRegister(Token t) {
+        return (t.kind == JNAsmConstants.IDENT) && hwSupport.isRegister(t.image);
     }
 
     static final int getNumber(Token t) {
