@@ -96,4 +96,12 @@ public class PhiOperand extends Operand {
 			return first;
 		}
 	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.Operand#getAddressingMode()
+	 */
+	public int getAddressingMode() {
+		Variable first = (Variable) sources.get(0);
+		return first.getAddressingMode();
+	}
 }

@@ -76,4 +76,11 @@ public abstract class Constant extends Operand {
 	public Operand simplify() {
 		return this;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.compiler.ir.Operand#getAddressingMode()
+	 */
+	public int getAddressingMode() {
+		return Operand.MODE_CONSTANT;
+	}
 }

@@ -12,6 +12,10 @@ package org.jnode.vm.compiler.ir;
  * This could be a constant, local variable, or stack entry
  */
 public abstract class Operand {
+	/**
+	 * NOTE: these values *must* be less than 16!!
+	 * @see getAddressingMode() below
+	 */
 	public static final int UNKNOWN = 0;
 	public static final int BYTE = 1;
 	public static final int SHORT = 2;
@@ -21,6 +25,13 @@ public abstract class Operand {
 	public static final int FLOAT = 6;
 	public static final int DOUBLE = 7;
 	public static final int REFERENCE = 8;
+	
+	/*
+	 * Addressing mode bits
+	 */
+	public static final int MODE_CONSTANT = 0x01;
+	public static final int MODE_REGISTER = 0x02;
+	public static final int MODE_STACK = 0x03;
 
 	private int type;	// One of the above
 	
@@ -40,4 +51,11 @@ public abstract class Operand {
 	}
 
 	public abstract Operand simplify();
+	
+	/**
+	 * One of MODE_xxx constants defined above
+	 * 
+	 * @return
+	 */
+	public abstract int getAddressingMode();
 }
