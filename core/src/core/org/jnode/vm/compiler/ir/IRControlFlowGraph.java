@@ -13,6 +13,7 @@ import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.compiler.ir.quad.AssignQuad;
 import org.jnode.vm.compiler.ir.quad.PhiAssignQuad;
 import org.jnode.vm.compiler.ir.quad.Quad;
+import org.jnode.vm.compiler.ir.quad.VariableRefAssignQuad;
 
 /**
  * @author Madhu Siddalingaiah
@@ -36,7 +37,6 @@ public class IRControlFlowGraph {
 		BytecodeParser.parse(bytecode, bbf);
 		this.bblocks = bbf.createBasicBlocks();
 		startBlock = bblocks[0];
-		renumberArray = new SSAStack[bytecode.getMaxStack() + bytecode.getNoLocals()];
 		computeDominance();
 	}
 	
@@ -209,8 +209,87 @@ public class IRControlFlowGraph {
 	 * 
 	 */
 	public void constructSSA() {
+		Variable[] vars = startBlock.getVariables();
+		int nvars = vars.length;
+		renumberArray = new SSAStack[nvars];
+		// Push method arguments on the stack since they are not assigned
+		for (int i=0; i<nvars; i+=1) {
+			Variable vi = vars[i];
+			SSAStack st = getStack(vi);
+			if (vi instanceof MethodArgument) {
+				st.getNewVariable();
+			}
+		}
 		placePhiFunctions();
 		renameVariables(startBlock);
+	}
+
+	/**
+	 * 
+	 */
+	public void optimize() {
+		for (int i=0; i<bblocks.length; i+=1) {
+			IRBasicBlock b = bblocks[i];
+			Iterator qi = b.getQuads().iterator();
+			while (qi.hasNext()) {
+				Quad q = (Quad) qi.next();
+				q.doPass2();
+			}
+		}
+	}
+
+	public void deconstrucSSA() {
+		BootableArrayList phiQuads = new BootableArrayList();
+		for (int i=0; i<bblocks.length; i+=1) {
+			IRBasicBlock b = bblocks[i];
+			Iterator it = b.getQuads().iterator();
+			while (it.hasNext()) {
+				Quad q = (Quad) it.next();
+				if (q instanceof PhiAssignQuad) {
+					phiQuads.add(q);
+				} else {
+					break;
+				}
+			}
+		}
+		int n = phiQuads.size();
+		for (int i=0; i<n; i+=1) {
+			PhiAssignQuad paq = (PhiAssignQuad) phiQuads.get(i);
+			Variable lhs = paq.getLHS();
+			IRBasicBlock firstBlock = null;
+			VariableRefAssignQuad firstPhiMove = null;
+			Iterator pit = paq.getPhiOperand().getSources().iterator();
+			while (pit.hasNext()) {
+				Variable rhs = (Variable) pit.next();
+				IRBasicBlock ab = rhs.getAssignQuad().getBasicBlock();
+				VariableRefAssignQuad phiMove;
+				phiMove = new VariableRefAssignQuad(0, ab, lhs, rhs);
+				ab.add(phiMove);
+				if (firstBlock == null || ab.getStartPC() < firstBlock.getStartPC()) {
+					firstBlock = ab;
+					firstPhiMove = phiMove;
+				}
+			}
+			lhs.setAssignQuad(firstPhiMove);
+			paq.setDeadCode(true);
+		}
+	}
+
+	public void fixupAddresses() {
+		int address = 0;
+		for (int i=0; i<bblocks.length; i+=1) {
+			IRBasicBlock b = bblocks[i];
+			b.setStartPC(address);
+			Iterator it = b.getQuads().iterator();
+			while (it.hasNext()) {
+				Quad q = (Quad) it.next();
+				q.setAddress(address);
+				if (!q.isDeadCode()) {
+					address += 1;
+				}
+			}
+			b.setEndPC(address);
+		}
 	}
 
 	private void placePhiFunctions() {

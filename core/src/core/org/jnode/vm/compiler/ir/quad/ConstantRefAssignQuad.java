@@ -5,7 +5,6 @@
  */
 package org.jnode.vm.compiler.ir.quad;
 
-import org.jnode.util.BootableHashMap;
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.Constant;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
@@ -28,7 +27,6 @@ public class ConstantRefAssignQuad extends AssignQuad {
 		Constant rhs) {
 		super(address, block, lhsIndex);
 		this.rhs = rhs;
-		setDeadCode(true); // this will change if this is a phi operand
 	}
 
 	/**
@@ -54,14 +52,14 @@ public class ConstantRefAssignQuad extends AssignQuad {
 	 * @return
 	 */
 	public Operand propagate(Variable operand) {
+		setDeadCode(true);
 		return rhs;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
 	 */
-	public void doPass2(BootableHashMap liveVariables) {
-		setDeadCode(true);
+	public void doPass2() {
 	}
 
 	/* (non-Javadoc)

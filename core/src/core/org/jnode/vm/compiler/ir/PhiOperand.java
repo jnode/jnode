@@ -6,7 +6,6 @@ package org.jnode.vm.compiler.ir;
 import java.util.List;
 
 import org.jnode.util.BootableArrayList;
-import org.jnode.vm.compiler.ir.quad.AssignQuad;
 
 /**
  * @author Madhu Siddalingaiah
@@ -76,8 +75,17 @@ public class PhiOperand extends Operand {
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.compiler.ir.Operand#simplify()
 	 */
-	// TODO complete this!
 	public Operand simplify() {
-		return null;
+		int n = sources.size();
+		for (int i=0; i<n; i+=1) {
+			Variable src = (Variable) sources.get(i);
+			Operand op = src.simplify();
+			if (op instanceof StackVariable || op instanceof LocalVariable) {
+				sources.set(i, op);
+			} else {
+				src.getAssignQuad().setDeadCode(false);
+			}
+		}
+		return this;
 	}
 }

@@ -3,15 +3,14 @@
  */
 package org.jnode.vm.compiler.ir.quad;
 
-import org.jnode.util.BootableHashMap;
 import org.jnode.vm.compiler.ir.CodeGenerator;
+import org.jnode.vm.compiler.ir.Constant;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
-import org.jnode.vm.compiler.ir.Operand;
-import org.jnode.vm.compiler.ir.Variable;
 import org.jnode.vm.compiler.ir.Location;
+import org.jnode.vm.compiler.ir.Operand;
 import org.jnode.vm.compiler.ir.RegisterLocation;
 import org.jnode.vm.compiler.ir.StackLocation;
-import org.jnode.vm.compiler.ir.Constant;
+import org.jnode.vm.compiler.ir.Variable;
 
 /**
  * @author Madhu Siddalingaiah
@@ -131,32 +130,22 @@ public class ConditionalBranchQuad extends BranchQuad {
         if (condition >= IF_ICMPEQ) {
             return getAddress() + ": if " + refs[0].toString() + " " +
                     CONDITION_MAP[condition] + " " + refs[1].toString() +
-                    " goto " + getTargetAddress();
+                    " goto " + getTargetBlock();
         } else {
             return getAddress() + ": if " + refs[0].toString() + " " +
-                    CONDITION_MAP[condition] + " goto " + getTargetAddress();
+                    CONDITION_MAP[condition] + " goto " + getTargetBlock();
         }
     }
 
     /* (non-Javadoc)
      * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
      */
-    public void doPass2(BootableHashMap liveVariables) {
-        refs[0] = refs[0].simplify();
-        if (refs[0] instanceof Variable) {
-            Variable v = (Variable) refs[0];
-            v.setLastUseAddress(this.getAddress());
-            liveVariables.put(v, v);
-        }
-        if (refs[1] != null) {
-            refs[1] = refs[1].simplify();
-            if (refs[1] instanceof Variable) {
-                Variable v = (Variable) refs[1];
-                v.setLastUseAddress(this.getAddress());
-                liveVariables.put(v, v);
-            }
-        }
-    }
+	public void doPass2() {
+		refs[0] = refs[0].simplify();
+		if (refs.length > 1 && refs[1] != null) {
+			refs[1] = refs[1].simplify();
+		}
+	}
 
     /* (non-Javadoc)
      * @see org.jnode.vm.compiler.ir.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)

@@ -54,9 +54,9 @@ public class PrimitiveTest {
 	}
     
 	public static int simpleWhile(int a0) {
-		int l0 = 0;
-		while (l0 < a0) {
-			l0 += 1;
+		int l0 = 1;
+		while (l0 < 10) {
+			l0 += 5;
 		}
 		return l0;
 	}

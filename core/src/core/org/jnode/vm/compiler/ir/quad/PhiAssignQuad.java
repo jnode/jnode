@@ -8,7 +8,6 @@
  */
 package org.jnode.vm.compiler.ir.quad;
 
-import org.jnode.util.BootableHashMap;
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
 import org.jnode.vm.compiler.ir.Operand;
@@ -48,8 +47,7 @@ public class PhiAssignQuad extends AssignQuad {
 	 * @see org.jnode.vm.compiler.ir.quad.AssignQuad#propagate(org.jnode.vm.compiler.ir.Variable)
 	 */
 	public Operand propagate(Variable operand) {
-		// TODO Auto-generated method stub
-		return null;
+		return operand;
 	}
 
 	/* (non-Javadoc)
@@ -71,9 +69,8 @@ public class PhiAssignQuad extends AssignQuad {
 	/* (non-Javadoc)
 	 * @see org.jnode.vm.compiler.ir.quad.Quad#doPass2(org.jnode.util.BootableHashMap)
 	 */
-	public void doPass2(BootableHashMap liveVariables) {
-		// TODO Auto-generated method stub
-
+	public void doPass2() {
+		phi.simplify();
 	}
 
 	/* (non-Javadoc)

@@ -5,7 +5,6 @@
  */
 package org.jnode.vm.compiler.ir.quad;
 
-import org.jnode.util.BootableHashMap;
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.Constant;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
@@ -96,7 +95,7 @@ public class UnaryQuad extends AssignQuad {
 	public Operand propagate(Variable operand) {
         Quad quad = foldConstants();
 		if (quad instanceof ConstantRefAssignQuad) {
-			setDeadCode(true);
+			//setDeadCode(true);
 			ConstantRefAssignQuad cop = (ConstantRefAssignQuad) quad;
 			return cop.getRHS();
 		}
@@ -195,13 +194,8 @@ public class UnaryQuad extends AssignQuad {
     /* (non-Javadoc)
 	 * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
 	 */
-	public void doPass2(BootableHashMap liveVariables) {
+	public void doPass2() {
 		refs[0] = refs[0].simplify();
-		if (refs[0] instanceof Variable) {
-			Variable v = (Variable) refs[0];
-			v.setLastUseAddress(this.getAddress());
-			liveVariables.put(v, v);
-		}
 	}
 
 	/* (non-Javadoc)

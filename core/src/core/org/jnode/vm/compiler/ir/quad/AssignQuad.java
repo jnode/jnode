@@ -21,8 +21,7 @@ public abstract class AssignQuad extends Quad {
 
 	public AssignQuad(int address, IRBasicBlock block, Variable lhs) {
 		super(address, block);
-		this.lhs = lhs;
-		lhs.setAssignQuad(this);
+		setLHS(lhs);
 	}
 
 	public AssignQuad(int address, IRBasicBlock block, int lhsIndex) {
@@ -79,5 +78,6 @@ public abstract class AssignQuad extends Quad {
 	 */
 	public void setLHS(Variable lhs) {
 		this.lhs = lhs;
+		lhs.setAssignQuad(this);
 	}
 }
