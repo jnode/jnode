@@ -80,6 +80,7 @@
     <plugin id="org.jnode.net.ipv4.core"/>
     <plugin id="org.jnode.plugin.command"/>
 
+    <plugin id="org.jnode.protocol.ftp"/>
     <plugin id="org.jnode.protocol.tftp"/>
 
     <plugin id="org.jnode.shell"/>
