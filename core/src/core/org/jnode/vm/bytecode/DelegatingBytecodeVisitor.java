@@ -760,6 +760,12 @@ public class DelegatingBytecodeVisitor extends BytecodeVisitor {
     public void visit_ldc(VmConstString value) {
         delegate.visit_ldc(value);
     }
+    /**
+     * @param value
+     */
+    public void visit_ldc(VmConstClass value) {
+        delegate.visit_ldc(value);
+    }
  
     /**
      * 

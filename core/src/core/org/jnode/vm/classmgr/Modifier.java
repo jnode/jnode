@@ -13,12 +13,17 @@ public class Modifier {
 	public static final int ACC_SYNCHRONIZED = 0x00000020;
 	public static final int ACC_SUPER = 0x00000020;
 	public static final int ACC_VOLATILE = 0x00000040;
+	public static final int ACC_BRIDGE = 0x00000040;
 	public static final int ACC_TRANSIENT = 0x00000080;
+	public static final int ACC_VARARGS = 0x00000080;
 	public static final int ACC_NATIVE = 0x00000100;
 	public static final int ACC_INTERFACE = 0x00000200;
 	public static final int ACC_ABSTRACT = 0x00000400;
-	public static final int ACC_STRICT = 0x00000800; // F Declared strictfp; floating-point mode is
+	public static final int ACC_STRICT      = 0x00000800; // F Declared strictfp; floating-point mode is
 													 // FP-strict
+	public static final int ACC_SYNTHETIC   = 0x00001000; // Not present in sourcecode
+	public static final int ACC_ANNOTATION  = 0x00002000; // Declared as annotation type
+	public static final int ACC_ENUM        = 0x00004000; // Declared as an enum type
 
 	/** Is a member wide (long, double) */
 	public static final int ACC_WIDE        = 0x00010000;

@@ -195,6 +195,14 @@ public class IRGenerator extends BytecodeVisitor {
 		throw new IllegalArgumentException("byte code not yet supported");
 	}
 
+    /**
+     * @param value
+     * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(VmConstClass)
+     */
+    public final void visit_ldc(VmConstClass value) {
+        throw new Error("Not implemented yet");
+    }
+
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iload(int)
 	 */

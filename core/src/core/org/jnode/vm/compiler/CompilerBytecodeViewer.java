@@ -797,6 +797,12 @@ public class CompilerBytecodeViewer extends InlineBytecodeVisitor {
         viewer.visit_ldc(value);
     }
     /**
+     * @param value
+     */
+    public void visit_ldc(VmConstClass value) {
+        viewer.visit_ldc(value);
+    }
+    /**
      * 
      */
     public void visit_ldiv() {
