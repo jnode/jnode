@@ -657,6 +657,19 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         println("\tcdq");
     }
 
+	/**
+	 * Create a cdqe.
+	 * Sign extend EAX to RAX.
+	 * Only valid in 64-bit mode.
+	 */
+	public void writeCDQE()
+	throws InvalidOpcodeException {
+		if (!code64) {
+			throw new InvalidOpcodeException();
+		}
+		println("\tcdqe");
+	}
+
     /**
      * Create a CMOVcc dst,src
      * 

@@ -437,7 +437,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	 */
 	final void spill(EmitterContext ec, X86Register reg) {
 		if (Vm.VerifyAssertions) {
-			Vm._assert(isGPR() && (this.gpr == reg), "spill1");
+			Vm._assert(isGPR() && (this.gpr.getNr() == reg.getNr()), "spill1 gpr=" + gpr + ", reg=" + reg);
 		}
 		final X86RegisterPool pool = ec.getGPRPool();
 		X86Register r = pool.request(getType());

@@ -65,6 +65,11 @@ public abstract class DoubleWordItem extends Item implements
 		this.lsb = (GPR32) lsb;
 		this.msb = (GPR32) msb;
 		this.reg = reg;
+		if (Vm.VerifyAssertions) {
+			if (isGPR()) {
+				Vm._assert(((lsb != null) && (msb != null)) || (reg != null));
+			}
+		}
 	}
 
 	/**
@@ -196,7 +201,7 @@ public abstract class DoubleWordItem extends Item implements
 		}
 		if (Vm.VerifyAssertions) {
 			Vm._assert(kind == Kind.GPR, "kind == Kind.REGISTER");
-			Vm._assert(reg != null, "reg != null");
+			Vm._assert(reg != null, "reg != null reg=" + reg + " lsb=" + lsb + " msb=" + msb);
 		}
 		return reg;
 	}
@@ -250,6 +255,9 @@ public abstract class DoubleWordItem extends Item implements
 					final VirtualStack vstack = ec.getVStack();
 					vstack.push(ec);
 					r = (GPR64) pool.request(getType(), this);
+				}
+				if (Vm.VerifyAssertions) {
+					Vm._assert(r != null, "r != null");
 				}
 				loadTo64(ec, r);
 			}
@@ -722,7 +730,7 @@ public abstract class DoubleWordItem extends Item implements
 			if (os.isCode32()) {
 				Vm._assert((this.lsb == reg) || (this.msb == reg), "spill1");
 			} else {
-				Vm._assert((this.reg == reg), "spill1");
+				Vm._assert((this.reg.getNr() == reg.getNr()), "spill1");
 			}
 		}
 		ec.getVStack().push(ec);
