@@ -10,8 +10,8 @@ import java.awt.image.BufferedImage;
  */
 public class BufferImageTest {
 
-	public static void main(String[] args) {
-		BufferedImage img = new BufferedImage(100, 50, BufferedImage.TYPE_INT_RGB);
-		System.out.println("numBands=" + img.getRaster().getSampleModel().getNumBands());
-	}
+    public static void main(String[] args) {
+        BufferedImage img = new BufferedImage(100, 50, BufferedImage.TYPE_INT_RGB);
+        System.out.println("numBands=" + img.getRaster().getSampleModel().getNumBands());
+    }
 }

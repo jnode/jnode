@@ -3,75 +3,75 @@
  */
 package org.jnode.test.gui;
 
+import org.jnode.awt.geom.PolyLine;
+import org.jnode.driver.video.util.Curves;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 
-import org.jnode.awt.geom.PolyLine;
-import org.jnode.driver.video.util.Curves;
-
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class PolyLineTest {
 
-	public static void main(String[] args) throws Exception {
-		Frame wnd = new Frame();
-		try {
-			
-			//final double[] linePoints = { 200, 50, 200, 100, 100, 100, 100, 75, 200, 50 };
-			//final double[] linePoints = { 200, 50, 200, 100, 100, 150, 100, 100, 200, 50 };
-			final double[] linePoints = new double[42];
-			Curves.calculateQuadCurve(50, 200, 100, 100, 150, 300, linePoints);
+    public static void main(String[] args) throws Exception {
+        Frame wnd = new Frame();
+        try {
 
-			wnd.setSize(600, 400);
-			wnd.add(new TestComponent(linePoints));
-			wnd.show();
+            //final double[] linePoints = { 200, 50, 200, 100, 100, 100, 100, 75, 200, 50 };
+            //final double[] linePoints = { 200, 50, 200, 100, 100, 150, 100, 100, 200, 50 };
+            final double[] linePoints = new double[42];
+            Curves.calculateQuadCurve(50, 200, 100, 100, 150, 300, linePoints);
 
-			System.in.read();
-			//Thread.sleep(5000);
+            wnd.setSize(600, 400);
+            wnd.add(new TestComponent(linePoints));
+            wnd.show();
 
-			wnd.hide();
-		} finally {
-			wnd.dispose();
-		}
-	}
+            System.in.read();
+            //Thread.sleep(5000);
 
-	static class TestComponent extends Component {
+            wnd.hide();
+        } finally {
+            wnd.dispose();
+        }
+    }
 
-		private final double[] linePoints;
+    static class TestComponent extends Component {
 
-		public TestComponent(double[] linePoints) {
-			super();
-			this.linePoints = linePoints;
-		}
+        private final double[] linePoints;
 
-		public void paint(Graphics g) {
-			System.out.println("Paint called");
-			paintComponent(g);
-		}
+        public TestComponent(double[] linePoints) {
+            super();
+            this.linePoints = linePoints;
+        }
 
-		private void paintComponent(Graphics g) {
+        public void paint(Graphics g) {
+            System.out.println("Paint called");
+            paintComponent(g);
+        }
 
-			g.setColor(Color.GREEN);
-			final Rectangle2D bounds = PolyLine.getBounds(linePoints);
-			for (int row = 0; row < bounds.getHeight(); row++) {
-				for (int col = 0; col < bounds.getWidth(); col++) {
-					final int x = (int) bounds.getX() + col;
-					final int y = (int) bounds.getY() + row;
-					if (PolyLine.contains(linePoints, x, y)) {
-						g.drawLine(x, y, x, y);
-					}
-				}
-			}
+        private void paintComponent(Graphics g) {
 
-			g.setColor(Color.RED);
-			final int cnt = linePoints.length;
-			for (int i = 0; i < cnt - 2; i += 2) {
-				g.drawLine((int) linePoints[i], (int) linePoints[i + 1], (int) linePoints[i + 2], (int) linePoints[i + 3]);
-			}
-		}
-	}
+            g.setColor(Color.GREEN);
+            final Rectangle2D bounds = PolyLine.getBounds(linePoints);
+            for (int row = 0; row < bounds.getHeight(); row++) {
+                for (int col = 0; col < bounds.getWidth(); col++) {
+                    final int x = (int) bounds.getX() + col;
+                    final int y = (int) bounds.getY() + row;
+                    if (PolyLine.contains(linePoints, x, y)) {
+                        g.drawLine(x, y, x, y);
+                    }
+                }
+            }
+
+            g.setColor(Color.RED);
+            final int cnt = linePoints.length;
+            for (int i = 0; i < cnt - 2; i += 2) {
+                g.drawLine((int) linePoints[i], (int) linePoints[i + 1], (int) linePoints[i + 2], (int) linePoints[i + 3]);
+            }
+        }
+    }
 }

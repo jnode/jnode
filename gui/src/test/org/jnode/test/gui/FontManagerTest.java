@@ -1,6 +1,7 @@
 /*
  * $Id$
- */package org.jnode.test.gui;
+ */
+package org.jnode.test.gui;
 
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
@@ -13,16 +14,14 @@ import java.awt.GraphicsEnvironment;
  */
 public class FontManagerTest {
 
-	public static void main(String[] args) 
-	{
-		Font[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
-		// foants loaded
-		
-		System.out.println("" + fonts.length);
-		
-		for(int i = 0;i< fonts.length;i++)
-		{
-			System.out.println(fonts[i].getName());
-		}
-	}
+    public static void main(String[] args) {
+        Font[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
+        // foants loaded
+
+        System.out.println("" + fonts.length);
+
+        for (int i = 0; i < fonts.length; i++) {
+            System.out.println(fonts[i].getName());
+        }
+    }
 }
