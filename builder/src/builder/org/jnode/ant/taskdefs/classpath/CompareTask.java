@@ -52,7 +52,6 @@ public class CompareTask extends Task {
         final Map vmFiles = scanJavaFiles(vmDirs);
         final Map classpathFiles = scanJavaFiles(classpathDirs);
         final TreeSet allFiles = new TreeSet();
-        final TreeMap diffPackages = new TreeMap();
         allFiles.addAll(vmFiles.keySet());
         allFiles.addAll(classpathFiles.keySet());
         
