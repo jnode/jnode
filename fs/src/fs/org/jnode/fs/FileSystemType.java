@@ -35,8 +35,9 @@ public interface FileSystemType {
 	 * Create a filesystem from a given device.
 	 * 
 	 * @param device
+	 * @param readOnly
 	 */
-	public FileSystem create(Device device) throws FileSystemException;
+	public FileSystem create(Device device, boolean readOnly) throws FileSystemException;
 
     /**
      * Format a filesystem for a given device according to its Partition table entry.
