@@ -51,11 +51,12 @@ public final class MemoryBlockManager extends VmSystemObject implements Uninterr
 			if (nr == -1L) {
 				Unsafe.debug("ret null."); Unsafe.debug(blockSize);
 				Unsafe.debug("allocated blocks"); Unsafe.debug(allocatedBlocks);
-				Unsafe.die();
+				Unsafe.debug("total blocks"); Unsafe.debug(blockCount);
+				//Unsafe.die();
 				return null;
 			}
 			// Mark all blocks as in use
-			for (long i = 0; i < reqBlockCount; i++) {
+			for (int i = 0; i < reqBlockCount; i++) {
 				setInUse(nr + i, true);
 			}
 			// Return the address of block "nr".
@@ -119,10 +120,13 @@ public final class MemoryBlockManager extends VmSystemObject implements Uninterr
 				// We found it
 				return nr;
 			} else {
+				//Unsafe.debug("nr"); Unsafe.debug(nr);
+				//Unsafe.debug("i"); Unsafe.debug(i);
 				// We came across an used block
 				nr += (i + 1);
 			}
 		}
+		//Unsafe.debug("ret -1"); Unsafe.die();
 		return -1;
 	}
 
@@ -133,11 +137,10 @@ public final class MemoryBlockManager extends VmSystemObject implements Uninterr
 	 * @return boolean
 	 */
 	private static final boolean isInUse(long blockNr) {
-		// 32-bits per int, so shift=5, mask=31
-		final long offset = blockNr >>> 5;
-		final int mask = (1 << (int) (blockNr & 31));
+		final long offset = blockNr >>> 3; // we still need a byte offset
+		final int mask = (1 << (blockNr & 7));
 		final Address ptr = Unsafe.add(bitmapPtr, Unsafe.longToAddress(offset));
-		final int v = Unsafe.getInt(ptr);
+		final int v = Unsafe.getByte(ptr) & 0xFF;
 		return ((v & mask) == mask);
 	}
 
@@ -148,24 +151,24 @@ public final class MemoryBlockManager extends VmSystemObject implements Uninterr
 	 * @return boolean
 	 */
 	private static final void setInUse(long blockNr, boolean inUse) {
-		// 32-bits per int, so shift=5, mask=31
-		final long offset = blockNr >>> 5;
-		final int mask = (1 << (int) (blockNr & 31));
+		final long offset = blockNr >>> 3; // we still need a byte offset
+		final int mask = (1 << (blockNr & 7));
+		//final int mask = (1 << blockNr);
 		final Address ptr = Unsafe.add(bitmapPtr, Unsafe.longToAddress(offset));
-		int v = Unsafe.getInt(ptr);
+		int v = Unsafe.getByte(ptr);
 		if (inUse) {
 			v |= mask;
 		} else {
 			v &= ~mask;
 		}
-		Unsafe.setInt(ptr, v);
+		Unsafe.setByte(ptr, (byte)v);
 	}
 
 	/**
 	 * Initialize this manager.
 	 */
 	private final static void initialize() {
-		Unsafe.debug("initialize.");
+		//Unsafe.debug("initialize.");
 		
 		startPtr = blockAlign(Unsafe.addressToLong(Unsafe.getMemoryStart()), true);
 		endPtr = blockAlign(Unsafe.addressToLong(Unsafe.getMemoryEnd()), false);
@@ -174,6 +177,7 @@ public final class MemoryBlockManager extends VmSystemObject implements Uninterr
 		blockCount = (size >>> BLOCK_SIZE_SHIFT);
 		// Create a lock (4 bytes) and usage bitmap at the front of the memory region
 		final long rawBitmapSize = (blockCount >>> 3);
+		//final long rawBitmapSize = blockCount;
 		final long bitmapSize = blockAlign(4 + rawBitmapSize, true);
 		lockPtr = Unsafe.longToAddress(startPtr);
 		bitmapPtr = Unsafe.longToAddress(startPtr + 4);
@@ -185,9 +189,13 @@ public final class MemoryBlockManager extends VmSystemObject implements Uninterr
 		allocatedBlocks = 0;
 		// Mark as initialized
 		initialized = true;
-	
-		Unsafe.debug("Block count ");
-		Unsafe.debug(blockCount);
+
+		//Unsafe.debug("BitmapPtr "); Unsafe.debug(Unsafe.addressToLong(bitmapPtr)); 
+		//Unsafe.debug("LockPtr "); Unsafe.debug(Unsafe.addressToLong(lockPtr)); 
+		//Unsafe.debug("StartPtr "); Unsafe.debug(startPtr); 
+		//Unsafe.debug("BitmapSize "); Unsafe.debug(bitmapSize); 
+		//Unsafe.debug("Block count "); Unsafe.debug(blockCount);
+		//Unsafe.die();
 		//Unsafe.debug("end of initialize.");
 	}
 
@@ -230,11 +238,11 @@ public final class MemoryBlockManager extends VmSystemObject implements Uninterr
 	 * @param size
 	 */
 	private static void clear(Address ptr, long size) {
-		Unsafe.debug("clear");
-		Unsafe.debug(size);
+		//Unsafe.debug("clear");
+		//Unsafe.debug(size);
 		while (size != 0) {
 			final int part = (int)Math.min(size, 0x7fffffffL);
-			Unsafe.debug(size);
+			//Unsafe.debug(size);
 			Unsafe.clear(ptr, part);
 			ptr = Unsafe.add(ptr, part);
 			size -= part;
