@@ -6,11 +6,11 @@ package org.jnode.vm.x86.compiler.l1a;
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
 import org.jnode.assembler.x86.X86Constants;
-import org.jnode.assembler.x86.X86Operation;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Vm;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.x86.compiler.BaseX86MagicHelper;
+import org.jnode.vm.x86.compiler.X86CompilerConstants;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -25,7 +25,7 @@ final class MagicHelper extends BaseX86MagicHelper {
      * @param isstatic
      */
     public void emitMagic(EmitterContext ec, VmMethod method, boolean isstatic) {
-        final int type = getClass(method);
+        //final int type = getClass(method);
         final int mcode = getMethodCode(method);
         final VirtualStack vstack = ec.getVStack();
         final AbstractX86Stream os = ec.getStream();
@@ -117,6 +117,7 @@ final class MagicHelper extends BaseX86MagicHelper {
         case mTOWORD: 
         case mTOADDRESS:
         case mTOOFFSET: 
+        case mTOOBJECTREFERENCE: 
         case mTOEXTENT: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem addr = vstack.popRef();
@@ -134,6 +135,7 @@ final class MagicHelper extends BaseX86MagicHelper {
                     false);
             final LongItem result = (LongItem) ifac.createReg(JvmType.LONG, r,
                     msb);
+            os.writeXOR(msb, msb);
             pool.transferOwnerTo(r, result);
             pool.transferOwnerTo(msb, result);
             vstack.push(result);
@@ -277,6 +279,102 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(addr);
         }
             break;
+        case mLOADBYTE: 
+        case mLOADCHAR:
+        case mLOADSHORT: {
+            if (Vm.VerifyAssertions) Vm._assert(!isstatic);
+            final RefItem addr = vstack.popRef();
+            addr.load(ec);
+            final Register r = addr.getRegister();
+            addr.release(ec);
+            if (mcode == mLOADCHAR) {
+                os.writeMOVZX(r, r, 0, methodToSize(mcode));                
+            } else {
+                os.writeMOVSX(r, r, 0, methodToSize(mcode));
+            }
+            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, r));
+        } break;
+        case mLOADINT:
+        case mLOADFLOAT: 
+        case mLOADADDRESS: 
+        case mLOADOBJECTREFERENCE:
+        case mLOADWORD: {
+            if (Vm.VerifyAssertions) Vm._assert(!isstatic);
+            final RefItem addr = vstack.popRef();
+            addr.load(ec);
+            final Register r = addr.getRegister();
+            addr.release(ec);
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, 0);
+            vstack.push(L1AHelper.requestWordRegister(ec, methodToType(mcode), r));
+        } break;
+        case mLOADLONG:
+        case mLOADDOUBLE: {
+            if (Vm.VerifyAssertions) Vm._assert(!isstatic);
+            final RefItem addr = vstack.popRef();
+            addr.load(ec);
+            final Register r = addr.getRegister();
+            final Register msb = L1AHelper.requestRegister(ec, JvmType.INT, false);
+            addr.release(ec);
+            L1AHelper.releaseRegister(ec, msb);
+            os.writeMOV(X86CompilerConstants.INTSIZE, msb, r, X86CompilerConstants.MSB);
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, X86CompilerConstants.LSB);
+            vstack.push(L1AHelper.requestDoubleWordRegisters(ec, methodToType(mcode), r, msb));
+        } break;
+        case mLOADBYTE_OFS: 
+        case mLOADCHAR_OFS:
+        case mLOADSHORT_OFS: {
+            if (Vm.VerifyAssertions) Vm._assert(!isstatic);
+            final RefItem ofs = vstack.popRef();
+            final RefItem addr = vstack.popRef();
+            ofs.load(ec);
+            addr.load(ec);
+            final Register ofsr = ofs.getRegister();
+            final Register r = addr.getRegister();
+            ofs.release(ec);
+            addr.release(ec);
+            os.writeLEA(r, r, ofsr, 1, 0);
+            if (mcode == mLOADCHAR_OFS) {
+                os.writeMOVZX(r, r, 0, methodToSize(mcode));
+            } else {
+                os.writeMOVSX(r, r, 0, methodToSize(mcode));
+            }
+            vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, r));
+        } break;
+        case mLOADINT_OFS: 
+        case mLOADFLOAT_OFS: 
+        case mLOADADDRESS_OFS: 
+        case mLOADOBJECTREFERENCE_OFS:
+        case mLOADWORD_OFS: {
+            if (Vm.VerifyAssertions) Vm._assert(!isstatic);
+            final RefItem ofs = vstack.popRef();
+            final RefItem addr = vstack.popRef();
+            ofs.load(ec);
+            addr.load(ec);
+            final Register ofsr = ofs.getRegister();
+            final Register r = addr.getRegister();
+            ofs.release(ec);
+            addr.release(ec);
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ofsr, 1, 0);
+            vstack.push(L1AHelper.requestWordRegister(ec, methodToType(mcode), r));
+        } break;
+        case mLOADLONG_OFS: 
+        case mLOADDOUBLE_OFS: {
+            if (Vm.VerifyAssertions) Vm._assert(!isstatic);
+            final RefItem ofs = vstack.popRef();
+            final RefItem addr = vstack.popRef();
+            ofs.load(ec);
+            addr.load(ec);
+            final Register ofsr = ofs.getRegister();
+            final Register r = addr.getRegister();
+            final Register msb = L1AHelper.requestRegister(ec, JvmType.INT, false);
+            os.writeMOV(X86CompilerConstants.INTSIZE, msb, r, ofsr, 1, X86CompilerConstants.MSB);
+            os.writeMOV(X86CompilerConstants.INTSIZE, r, r, ofsr, 1, X86CompilerConstants.LSB);
+            ofs.release(ec);
+            addr.release(ec);
+            L1AHelper.releaseRegister(ec, msb);
+            vstack.push(L1AHelper.requestDoubleWordRegisters(ec, methodToType(mcode), r, msb));
+        } break;
+            
 
         default:
             throw new InternalError("Unknown method code for method " + method);
