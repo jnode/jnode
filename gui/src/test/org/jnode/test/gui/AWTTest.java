@@ -12,6 +12,7 @@ import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.List;
 import java.awt.Scrollbar;
@@ -165,8 +166,10 @@ public class AWTTest {
 
     public static void main(String[] args) throws InterruptedException {
         boolean useDoubleBuffer = (args.length > 0) && args[0].equals("buffer");
+        
         final Frame wnd = new Frame();
         try {
+        	//wnd.setSize(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getSize());
             wnd.setSize(600, 400);
             wnd.setLayout(new BorderLayout());
             //wnd.setLocation(75, 50);
@@ -231,11 +234,16 @@ public class AWTTest {
 //            System.out.println(f.getName());
 //            wnd.getFontMetrics(f);
 
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 30; i++) {
             	wnd.setLocation(wnd.getX() + 5, wnd.getY() + 4);
             	if ((i % 10) == 0) {
+            		cb1.setState(!cb1.getState());
             		Thread.sleep(2500);
             	} else {
+            		if ((i % 5) == 0) {
+            			// Intended mixing of width & height, just for the fun of the test
+            			wnd.setSize(wnd.getHeight(), wnd.getWidth());
+            		}
             		Thread.sleep(100);
             	}
             }
