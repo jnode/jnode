@@ -61,9 +61,6 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
     /** The corresponding java.lang.Class of this class */
     private Class javaClass;
 
-    /** Is this class primitive? */
-    private boolean primitive;
-
     /** Have the references in the constant pool been resolved? */
     private boolean resolvedCpRefs;
 
@@ -140,7 +137,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
      */
     protected VmType(String name, String superClassName, VmClassLoader loader,
             int accessFlags) {
-        this(name, null, superClassName, loader, false, accessFlags, -1);
+        this(name, null, superClassName, loader, accessFlags, -1);
     }
 
     /**
@@ -149,12 +146,11 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
      * @param name
      * @param superClass
      * @param loader
-     * @param primitive
      * @param typeSize
      */
     VmType(String name, VmNormalClass superClass, VmClassLoader loader,
-            boolean primitive, int typeSize) {
-        this(name, superClass, superClass.getName(), loader, primitive,
+            int typeSize) {
+        this(name, superClass, superClass.getName(), loader,
                 Modifier.ACC_PUBLIC, typeSize);
     }
 
@@ -165,13 +161,12 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
      * @param superClass
      * @param superClassName
      * @param loader
-     * @param primitive
      * @param accessFlags
      * @param typeSize
      */
     private VmType(String name, VmNormalClass superClass,
-            String superClassName, VmClassLoader loader, boolean primitive,
-            int accessFlags, int typeSize) {
+            String superClassName, VmClassLoader loader, int accessFlags,
+            int typeSize) {
 
         VmStatics.typeCount++;
         if (superClassName == null) {
@@ -187,14 +182,13 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
         this.superClassName = superClassName;
         this.modifiers = accessFlags;
         this.state = VmTypeState.ST_LOADED;
-        this.primitive = primitive;
         this.loader = loader;
         if (name.charAt(0) == '[') {
             this.interfaceTable = new VmImplementedInterface[] {
                     new VmImplementedInterface(CloneableClass),
                     new VmImplementedInterface(SerializableClass)};
             this.typeSize = loader.getArchitecture().getReferenceSize();
-        } else if (primitive) {
+        } else if (typeSize >= 0) {
             this.typeSize = typeSize;
         } else {
             this.typeSize = loader.getArchitecture().getReferenceSize();
@@ -221,15 +215,16 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
         CloneableClass.link();
         SerializableClass.link();
 
-        BooleanClass = new VmNormalClass("boolean", ObjectClass, clc, true, 1);
-        ByteClass = new VmNormalClass("byte", ObjectClass, clc, true, 1);
-        CharClass = new VmNormalClass("char", ObjectClass, clc, true, 2);
-        ShortClass = new VmNormalClass("short", ObjectClass, clc, true, 2);
-        IntClass = new VmNormalClass("int", ObjectClass, clc, true, 4);
-        FloatClass = new VmNormalClass("float", ObjectClass, clc, true, 4);
-        LongClass = new VmNormalClass("long", ObjectClass, clc, true, 8);
-        DoubleClass = new VmNormalClass("double", ObjectClass, clc, true, 8);
-        VoidClass = new VmNormalClass("void", ObjectClass, clc, true, 0);
+        BooleanClass = new VmPrimitiveClass("boolean", ObjectClass, clc, 1,
+                false);
+        ByteClass = new VmPrimitiveClass("byte", ObjectClass, clc, 1, false);
+        CharClass = new VmPrimitiveClass("char", ObjectClass, clc, 2, false);
+        ShortClass = new VmPrimitiveClass("short", ObjectClass, clc, 2, false);
+        IntClass = new VmPrimitiveClass("int", ObjectClass, clc, 4, false);
+        FloatClass = new VmPrimitiveClass("float", ObjectClass, clc, 4, true);
+        LongClass = new VmPrimitiveClass("long", ObjectClass, clc, 8, false);
+        DoubleClass = new VmPrimitiveClass("double", ObjectClass, clc, 8, true);
+        VoidClass = new VmPrimitiveClass("void", ObjectClass, clc, 0, false);
 
         BooleanClass.link();
         ByteClass.link();
@@ -412,7 +407,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
             name = getArrayClassName();
         }
         final VmArrayClass arrayClass = new VmArrayClass(name,
-                this.getLoader(), false, this, -1);
+                this.getLoader(), this, -1);
         if (link) {
             arrayClass.link();
         }
@@ -1005,23 +1000,17 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
      */
     public final VmField getField(String name, String signature) {
         VmField f = getDeclaredField(name, signature);
-        if (f != null) {
-            return f;
-        }
+        if (f != null) { return f; }
         if (superClass != null) {
             f = superClass.getField(name, signature);
-            if (f != null) {
-                return f;
-            }
+            if (f != null) { return f; }
         }
         final int cnt = getNoInterfaces();
         for (int i = 0; i < cnt; i++) {
-            f = allInterfaceTable[i].getField(name, signature);
-            if (f != null) {
-                return f;
-            }
+            f = allInterfaceTable[ i].getField(name, signature);
+            if (f != null) { return f; }
         }
-        
+
         return null;
     }
 
@@ -1615,8 +1604,8 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
      *            The optimization level
      * @return The number of compiled methods
      */
-    public final synchronized int compileBootstrap(
-            NativeCodeCompiler compiler, NativeStream os, int optLevel) {
+    public final synchronized int compileBootstrap(NativeCodeCompiler compiler,
+            NativeStream os, int optLevel) {
         if (!isPrepared()) { throw new IllegalStateException(
                 "VmType must have been prepared"); }
         int rc = 0;
@@ -1759,8 +1748,8 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
      * 
      * @return boolean
      */
-    public final boolean isPrimitive() {
-        return primitive;
+    public boolean isPrimitive() {
+        return false;
     }
 
     /**
@@ -1770,7 +1759,7 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
      * @return boolean
      */
     public final boolean isReferenceType() {
-        return (!primitive || isArray());
+        return (!isPrimitive() || isArray());
     }
 
     /**

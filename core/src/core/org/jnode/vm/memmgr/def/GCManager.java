@@ -29,7 +29,7 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
 
     /** An object visitor used for sweeping */
     private final GCSweepVisitor sweepVisitor;
-    
+
     /** An object visitor used for setting objects to GC colour white */
     private final GCSetWhiteVisitor setWhiteVisitor;
 
@@ -82,18 +82,19 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
         final VmAbstractHeap firstHeap = heapManager.getFirstHeap();
         stats.lastGCTime = System.currentTimeMillis();
 
-        // Mark
+        final boolean locking = (writeBarrier != null);
         helper.stopThreadsAtSafePoint();
         heapManager.setGcActive(true);
-        final boolean locking = (writeBarrier != null);
         try {
-            Unsafe.debug("<mark/>");
-            if (writeBarrier != null) {
-                writeBarrier.setActive(true);
-            }
-            markHeap(bootHeap, firstHeap, locking);
-            if (writeBarrier != null) {
-                writeBarrier.setActive(false);
+            // Mark
+            //helper.stopThreadsAtSafePoint();
+            //heapManager.setGcActive(true);
+            try {
+                Unsafe.debug("<mark/>");
+                markHeap(bootHeap, firstHeap, locking);
+            } finally {
+                //heapManager.setGcActive(false);
+                //helper.restartThreads();
             }
 
             // Sweep
@@ -102,19 +103,19 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
 
             // Cleanup
             Unsafe.debug("<cleanup/>");
-            cleanup(bootHeap, firstHeap, locking);
+            cleanup(bootHeap, firstHeap);
 
             // Verification
             if (debug) {
                 Unsafe.debug("<verify/>");
-                verify(bootHeap, firstHeap, locking);
+                verify(bootHeap, firstHeap);
             }
         } finally {
             heapManager.setGcActive(false);
             heapManager.resetCurrentHeap();
             helper.restartThreads();
         }
-        
+
         // Start the finalization process
         heapManager.triggerFinalization();
 
@@ -133,7 +134,13 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
      * @param bootHeap
      * @param firstHeap
      */
-    private final void markHeap(VmBootHeap bootHeap, VmAbstractHeap firstHeap, boolean locking) {
+    private final void markHeap(VmBootHeap bootHeap, VmAbstractHeap firstHeap,
+            boolean locking) {
+
+        if (writeBarrier != null) {
+            writeBarrier.setActive(true);
+        }
+
         final long startTime = VmSystem.currentKernelMillis();
         long markedObjects = 0;
         boolean firstIteration = true;
@@ -171,12 +178,16 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
             markedObjects += markVisitor.getMarkedObjects();
             firstIteration = false;
             if (writeBarrier != null) {
-                wbChanged = writeBarrier.isChanged(); 
+                wbChanged = writeBarrier.isChanged();
             }
         } while (markStack.isOverflow() || wbChanged);
         final long endTime = VmSystem.currentKernelMillis();
         stats.lastMarkDuration = endTime - startTime;
         stats.lastMarkedObjects = markedObjects;
+
+        if (writeBarrier != null) {
+            writeBarrier.setActive(false);
+        }
     }
 
     /**
@@ -200,8 +211,8 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
      * @param bootHeap
      * @param firstHeap
      */
-    private void cleanup(VmBootHeap bootHeap, VmAbstractHeap firstHeap, boolean locking) {
-        bootHeap.walk(setWhiteVisitor, locking);
+    private void cleanup(VmBootHeap bootHeap, VmAbstractHeap firstHeap) {
+        bootHeap.walk(setWhiteVisitor, true);
         VmAbstractHeap heap = firstHeap;
         while (heap != null) {
             heap.defragment();
@@ -216,12 +227,12 @@ final class GCManager extends VmSystemObject implements Uninterruptible {
      * @param bootHeap
      * @param firstHeap
      */
-    private void verify(VmBootHeap bootHeap, VmAbstractHeap firstHeap, boolean locking) {
+    private void verify(VmBootHeap bootHeap, VmAbstractHeap firstHeap) {
         verifyVisitor.reset();
-        bootHeap.walk(verifyVisitor, locking);
+        bootHeap.walk(verifyVisitor, true);
         VmAbstractHeap heap = firstHeap;
         while (heap != null) {
-            heap.walk(verifyVisitor, locking);
+            heap.walk(verifyVisitor, true);
             heap = heap.getNext();
         }
         final int errorCount = verifyVisitor.getErrorCount();

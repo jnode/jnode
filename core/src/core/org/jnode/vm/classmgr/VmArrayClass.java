@@ -19,12 +19,11 @@ public final class VmArrayClass extends VmClassType {
 	/**
 	 * @param name
 	 * @param loader
-	 * @param primitive
 	 * @param componentType
 	 * @param typeSize
 	 */
-	VmArrayClass(String name, VmClassLoader loader, boolean primitive, VmType componentType, int typeSize) {
-		super(name, getObjectClass(), loader, primitive, typeSize);
+	VmArrayClass(String name, VmClassLoader loader, VmType componentType, int typeSize) {
+		super(name, getObjectClass(), loader, typeSize);
 		this.componentType = componentType;
 		testClassType();
 	}

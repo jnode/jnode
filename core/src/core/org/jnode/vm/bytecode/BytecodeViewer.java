@@ -18,6 +18,7 @@ public class BytecodeViewer extends BytecodeVisitor {
 
 	private int address;
 	private ControlFlowGraph cfg;
+	private String indent = "";
 
 	/**
 	 * @param parser
@@ -47,7 +48,7 @@ public class BytecodeViewer extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#startMethod(org.jnode.vm.classmgr.VmMethod)
 	 */
 	public void startMethod(VmMethod method) {
-		System.out.println("Method: " + method.getName());
+		System.out.println("Method: " + method.getName() + ", #locals " + method.getBytecode().getNoLocals());
 	}
 
 	/**
@@ -1174,15 +1175,23 @@ public class BytecodeViewer extends BytecodeVisitor {
 		out("ifnonnull " + address);
 	}
 
-	protected void out(String line) {
+	public void out(String line) {
+	    System.out.print(indent);
 		System.out.print(address);
 		System.out.print(":\t");
 		System.out.println(line);
+	}
+	
+	public void indent() {
+	    indent += "\t";
+	}
+	
+	public void unindent() {
+	    indent = indent.substring(0, indent.length() - 1);
 	}
 
 	protected void out(Object obj) {
 		String str = obj.toString();
 		out(str);
 	}
-
 }

@@ -100,7 +100,7 @@ public final class DefaultHeapManager extends VmHeapManager {
 	 * Start a garbage collection process
 	 */
 	public final void gc() {
-	    gcThread.trigger(true);
+	    gcThread.trigger(false);
 	}
 
 	/**
@@ -224,7 +224,6 @@ public final class DefaultHeapManager extends VmHeapManager {
 			m.enter();
 		}
 		try {
-
 			while (result == null) {
 				// The current heap is full
 				if (heap == null) {
@@ -238,7 +237,7 @@ public final class DefaultHeapManager extends VmHeapManager {
 						if (oomCount == 0) {
 							oomCount++;
 							Unsafe.debug("<oom/>");
-							gc();
+						    gcThread.trigger(true);
 							heap = firstHeap;
 							currentHeap = firstHeap;
 						} else {
@@ -270,20 +269,15 @@ public final class DefaultHeapManager extends VmHeapManager {
 
 			allocatedSinceGcTrigger += alignedSize;
 			if ((allocatedSinceGcTrigger > triggerSize) && (gcThread != null)) {
-				helper.unsafeSetObjectFlags(result, ObjectFlags.GC_BLACK);
 			    Unsafe.debug("<alloc:GC trigger/>");
 			    allocatedSinceGcTrigger = 0;
-			    gcThread.trigger(/*false*/true);
-				currentHeap = firstHeap;
-				helper.unsafeSetObjectFlags(result, ObjectFlags.GC_DEFAULT_COLOR);
+			    gcThread.trigger(false);
 			}
 		} finally {
 			if (m != null) {
 				m.exit();
 			}
 		}
-
-		//Unsafe.debug("new="); Unsafe.debug(Unsafe.addressToInt(Unsafe.addressOf(result)));
 		
 		return result;
 	}

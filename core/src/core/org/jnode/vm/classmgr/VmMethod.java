@@ -416,7 +416,7 @@ public abstract class VmMethod extends VmMember {
      * 
      * @return int
      */
-    int getArgSlotCount() {
+    public final int getArgSlotCount() {
         return this.argSlotCount;
     }
 

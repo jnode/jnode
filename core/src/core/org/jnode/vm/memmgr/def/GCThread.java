@@ -78,9 +78,17 @@ final class GCThread extends Thread {
                     }
                     gcActive = true;
                     runNeeded = false;
-                    
-                    manager.gc();
-                    gcActive = false;
+                } finally {
+                    heapMonitor.exit();
+                }
+                 
+                // Now do the actual GC
+                manager.gc();
+                
+                // Notify that we're ready
+                gcActive = false;
+                heapMonitor.enter();
+                try {
                     heapMonitor.NotifyAll();
                 } finally {
                     heapMonitor.exit();
