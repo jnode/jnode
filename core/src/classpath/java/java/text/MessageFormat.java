@@ -46,18 +46,20 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Vector;
 
-/**
+public class MessageFormat extends Format
+{
+  /**
  * @author Tom Tromey <tromey@cygnus.com>
  * @author Jorge Aliss <jaliss@hotmail.com>
  * @date March 3, 1999
  */
-/* Written using "Java Class Libraries", 2nd edition, plus online
+  /* Written using "Java Class Libraries", 2nd edition, plus online
  * API docs for JDK 1.2 from http://www.javasoft.com.
  * Status:  Believed complete and correct to 1.2, except serialization.
  *          and parsing.
  */
-final class MessageFormatElement
-{
+  private static final class MessageFormatElement
+  {
   // Argument number.
   int argNumber;
   // Formatter to be used.  This is the format set by setFormat.
@@ -143,10 +145,8 @@ final class MessageFormatElement
 	format = new ChoiceFormat (style);
       }
   }
-}
+  }
 
-public class MessageFormat extends Format
-{
   private static final long serialVersionUID = 6479157306784022952L;
 
   public static class Field extends Format.Field

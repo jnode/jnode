@@ -1,5 +1,6 @@
 /* ZipFile.java --
-   Copyright (C) 2001, 2002, 2003, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002, 2003, 2004, 2005
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,6 +38,8 @@ exception statement from your version. */
 
 
 package java.util.zip;
+
+import gnu.java.util.EmptyEnumeration;
 
 import java.io.BufferedInputStream;
 import java.io.DataInput;
@@ -94,6 +97,7 @@ public class ZipFile implements ZipConstants
   {
     this.raf = new RandomAccessFile(name, "r");
 		this.name = name;
+    checkZipFile();
 	}
 
 	/**
@@ -106,6 +110,7 @@ public class ZipFile implements ZipConstants
   {
     this.raf = new RandomAccessFile(file, "r");
     this.name = file.getPath();
+    checkZipFile();
 	}
 
 	/**
@@ -135,6 +140,28 @@ public class ZipFile implements ZipConstants
 		}
     this.raf = new RandomAccessFile(file, "r");
     this.name = file.getPath();
+    checkZipFile();
+  }
+
+  private void checkZipFile() throws IOException, ZipException
+  {
+    byte[] magicBuf = new byte[4];
+    raf.read(magicBuf);
+
+    if (readLeInt(magicBuf, 0) != LOCSIG)
+      {
+	raf.close();
+	throw new ZipException("Not a valid zip file");
+      }
+  }
+
+  /**
+   * Checks if file is closed and throws an exception.
+   */
+  private void checkClosed()
+  {
+    if (closed)
+      throw new IllegalStateException("ZipFile has closed: " + name);
 	}
 
 	/**
@@ -312,16 +339,20 @@ public class ZipFile implements ZipConstants
 
   /**
 	 * Returns an enumeration of all Zip entries in this Zip file.
+   *
+   * @exception IllegalStateException when the ZipFile has already been closed
 	 */
   public Enumeration entries()
   {
+    checkClosed();
+    
     try
       {
 			return new ZipEntryEnumeration(getEntries().values().iterator());
       }
     catch (IOException ioe)
       {
-			return null;
+	return EmptyEnumeration.getInstance();
 		}
 	}
 
@@ -335,8 +366,7 @@ public class ZipFile implements ZipConstants
   {
     synchronized(raf)
       {
-			if (closed)
-				throw new IllegalStateException("ZipFile has closed: " + name);
+	checkClosed();
 
 			if (entries == null)
 				readEntries();
@@ -351,9 +381,13 @@ public class ZipFile implements ZipConstants
 	 * @param the name. May contain directory components separated by
 	 * slashes ('/').
 	 * @return the zip entry, or null if no entry with that name exists.
+   *
+   * @exception IllegalStateException when the ZipFile has already been closed
 	 */
   public ZipEntry getEntry(String name)
   {
+    checkClosed();
+
     try
       {
 			HashMap entries = getEntries();
@@ -423,11 +457,14 @@ public class ZipFile implements ZipConstants
 	 * @param entry the entry to create an InputStream for.
    * @return the input stream, or null if the requested entry does not exist.
 	 *
+   * @exception IllegalStateException when the ZipFile has already been closed
 	 * @exception IOException if a i/o error occured.
 	 * @exception ZipException if the Zip archive is malformed.  
 	 */
   public InputStream getInputStream(ZipEntry entry) throws IOException
   {
+    checkClosed();
+
 		HashMap entries = getEntries();
 		String name = entry.getName();
 		ZipEntry zipEntry = (ZipEntry) entries.get(name);
@@ -459,9 +496,13 @@ public class ZipFile implements ZipConstants
 
 	/**
 	 * Returns the number of entries in this zip file.
+   *
+   * @exception IllegalStateException when the ZipFile has already been closed
 	 */
   public int size()
   {
+    checkClosed();
+    
     try
       {
 			return getEntries().size();

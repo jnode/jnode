@@ -46,7 +46,6 @@ import java.io.Serializable;
  * generic text information.
  *
  * @see CallbackHandler
- * @version $Revision$
  */
 public class TextInputCallback implements Callback, Serializable
 {

@@ -1,5 +1,5 @@
 /* JMenu.java --
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -59,11 +59,9 @@ import javax.swing.event.MenuListener;
 import javax.swing.plaf.MenuItemUI;
 
 /**
- * <p>
  * This class represents a menu that can be added to a menu bar or
  * can be a submenu in some other menu. When JMenu is selected it
  * displays JPopupMenu containing its menu items.
- * </p>
  *
  * <p>
  * JMenu's fires MenuEvents when this menu's selection changes. If this menu
@@ -71,14 +69,10 @@ import javax.swing.plaf.MenuItemUI;
  * deselected or cancelled, then fireMenuDeselectedEvent() or 
  * fireMenuCancelledEvent() is invoked, respectivelly.
  * </p>
- *
  */
 public class JMenu extends JMenuItem implements Accessible, MenuElement
 {
   private static final long serialVersionUID = 4227225638931828014L;
-
-  /** name for the UI delegate for this menu. */
-  private static final String uiClassID = "MenuUI";
 
   /** A Popup menu associated with this menu, which pops up when menu is selected */
   private JPopupMenu popupMenu = new JPopupMenu();
@@ -107,17 +101,18 @@ public class JMenu extends JMenuItem implements Accessible, MenuElement
   }
 
 		/**
-   * Creates a new JMenu with the spicified label
+   * Creates a new <code>JMenu</code> with the specified label.
    *
    * @param text label for this menu
 		 */
   public JMenu(String text)
   {
     super(text);
+    popupMenu.setInvoker(this);
   }
 
 		/**
-   * Creates a new JMenu object
+   * Creates a new <code>JMenu</code> object.
    *
    * @param action Action that  is used to create menu item tha will be
    * added to the menu.
@@ -126,11 +121,12 @@ public class JMenu extends JMenuItem implements Accessible, MenuElement
   {
     super(action);
     createActionChangeListener(this);
+    popupMenu.setInvoker(this);
   }
 
 		/**
-   * Creates a new JMenu with specified label and an option
-   * for this menu to be tear-off menu
+   * Creates a new <code>JMenu</code> with specified label and an option
+   * for this menu to be tear-off menu.
    *
    * @param text label for this menu
    * @param tearoff true if this menu should be tear-off and false otherwise
@@ -273,7 +269,6 @@ public class JMenu extends JMenuItem implements Accessible, MenuElement
       throw new IllegalArgumentException("index less than zero");
 
     popupMenu.insert(item, index);
-
     return item;
   }
 
@@ -312,7 +307,7 @@ public class JMenu extends JMenuItem implements Accessible, MenuElement
 	 */
   public String getUIClassID()
   {
-    return uiClassID;
+    return "MenuUI";
   }
 
 	/**
@@ -388,8 +383,8 @@ public class JMenu extends JMenuItem implements Accessible, MenuElement
 	/**
    * Checks if PopupMenu associated with this menu is visible
    *
-   * @return true if the popup associated with this menu is currently visible on the screen and
-   * false otherwise.
+   * @return true if the popup associated with this menu is currently visible
+   * on the screen and false otherwise.
 	 */
   public boolean isPopupMenuVisible()
   {
@@ -528,15 +523,15 @@ public class JMenu extends JMenuItem implements Accessible, MenuElement
   }
 
 	/**
-   * Returns number of items in the menu
+   * Returns number of items in the menu including separators.
    *
    * @return number of items in the menu
+   *
+   * @see #getMenuComponentCount()
 	 */
   public int getItemCount()
   {
-    // returns the number of items on 
-    // the menu, including separators.
-    return getComponents().length;
+    return getMenuComponentCount();
   }
 
 	/**
@@ -592,10 +587,7 @@ public class JMenu extends JMenuItem implements Accessible, MenuElement
 	 */
   public boolean isTopLevelMenu()
   {
-    if (getParent() instanceof JMenuBar)
-      return true;
-    else
-      return false;
+    return getParent() instanceof JMenuBar;
   }
 
 	/**
@@ -790,7 +782,7 @@ public class JMenu extends JMenuItem implements Accessible, MenuElement
 	 */
   protected String paramString()
   {
-    return "JMenu";
+    return super.paramString();
   }
 
   public AccessibleContext getAccessibleContext()
