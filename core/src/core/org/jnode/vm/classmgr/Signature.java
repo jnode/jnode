@@ -180,6 +180,36 @@ public class Signature {
         return getArgSlotCount(typeSizeInfo, signature.toCharArray());
     }
 
+    /**
+     * Gets the stack slot number (0..) for a given java argument number. This
+     * method takes into account the (per architecture) difference between the
+     * size of longs, double and references and the number of slots they use.
+     * 
+     * @param typeSizeInfo
+     * @param method
+     * @param javaArgIndex
+     * @return
+     */
+    public static final int getStackSlotForJavaArgNumber(
+            TypeSizeInfo typeSizeInfo, VmMethod method, int javaArgIndex) {
+        final int argCount = method.getNoArguments();
+        int stackSlot = 0;
+        for (int i = 0; i < argCount; i++) {
+            if (javaArgIndex == 0) {
+                return stackSlot;
+            }
+            final VmType argType = method.getArgumentType(i);
+            final int argJvmType = argType.getJvmType();
+            stackSlot += typeSizeInfo.getStackSlots(argJvmType);
+            if ((argJvmType == JvmType.LONG) || (argJvmType == JvmType.DOUBLE)) {
+                javaArgIndex -= 2;
+            } else {
+                javaArgIndex -= 1;
+            }
+        }
+        return stackSlot + javaArgIndex;
+    }
+
     private VmType[] split(char[] signature, VmClassLoader loader)
             throws ClassNotFoundException {
         ArrayList list = new ArrayList();

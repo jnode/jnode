@@ -28,6 +28,7 @@ import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
 import org.jnode.assembler.x86.X86Register.GPR;
+import org.jnode.vm.classmgr.TypeSizeInfo;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmInterpretedExceptionHandler;
 import org.jnode.vm.classmgr.VmMethod;
@@ -136,7 +137,7 @@ class X86StackFrame implements X86CompilerConstants {
 	/**
 	 * Emit code to end the stack frame
 	 */
-	public void emitTrailer(int maxLocals) {
+	public void emitTrailer(TypeSizeInfo typeSizeInfo, int maxLocals) {
 		final int argSlotCount = method.getArgSlotCount();
 		final Label stackOverflowLabel = helper.genLabel("$$stack-overflow");
 		final GPR asp = helper.SP;
@@ -149,7 +150,7 @@ class X86StackFrame implements X86CompilerConstants {
 		os.setObjectRef(footerLabel);
 
 		/* Go restore the previous current frame */
-		emitSynchronizationCode(context.getMonitorExitMethod());
+		emitSynchronizationCode(typeSizeInfo, context.getMonitorExitMethod());
 		os.writeLEA(asp, abp, EbpFrameRefOffset);
 		os.writePOP(abp);
 		restoreRegisters();
@@ -206,7 +207,7 @@ class X86StackFrame implements X86CompilerConstants {
 		}
 
 		/* Create the synchronization enter code */
-		emitSynchronizationCode(context.getMonitorEnterMethod());
+		emitSynchronizationCode(typeSizeInfo, context.getMonitorEnterMethod());
 		
 		// And jump back to the actual code start
 		os.writeJMP(startCodeLabel);
@@ -251,7 +252,7 @@ class X86StackFrame implements X86CompilerConstants {
 		// Now create the default exception handler
 		Label handlerLabel = helper.genLabel("$$def-ex-handler");
 		cm.setDefExceptionHandler(os.setObjectRef(handlerLabel));
-		emitSynchronizationCode(context.getMonitorExitMethod());
+		emitSynchronizationCode(typeSizeInfo, context.getMonitorExitMethod());
 		os.writeLEA(asp, abp, EbpFrameRefOffset);
 		os.writePOP(abp);
 		restoreRegisters();
@@ -280,7 +281,7 @@ class X86StackFrame implements X86CompilerConstants {
 	 * @param index
 	 * @return int
 	 */
-	public final int getEbpOffset(int index) {
+	public final int getEbpOffset(TypeSizeInfo typeSizeInfo, int index) {
 		int noArgs = method.getArgSlotCount();
 		if (index < noArgs) {
 			// Index refers to a method argument
@@ -299,11 +300,11 @@ class X86StackFrame implements X86CompilerConstants {
 	 * @param index
 	 * @return int
 	 */
-	public final int getWideEbpOffset(int index) {
-		return getEbpOffset(index + 1);
+	public final int getWideEbpOffset(TypeSizeInfo typeSizeInfo, int index) {
+		return getEbpOffset(typeSizeInfo, index + 1);
 	}
 
-	private void emitSynchronizationCode(VmMethod monitorMethod) {
+	private void emitSynchronizationCode(TypeSizeInfo typeSizeInfo, VmMethod monitorMethod) {
 		if (method.isSynchronized()) {
 			final GPR aax = os.isCode32() ? (GPR)X86Register.EAX : X86Register.RAX;
 			final GPR adx = os.isCode32() ? (GPR)X86Register.EDX : X86Register.RDX;
@@ -319,7 +320,7 @@ class X86StackFrame implements X86CompilerConstants {
 				os.writePUSH(aax, declaringClassOffset);
 				//os.writePUSH(method.getDeclaringClass());
 			} else {
-				os.writePUSH(helper.BP, getEbpOffset(0));
+				os.writePUSH(helper.BP, getEbpOffset(typeSizeInfo, 0));
 			}
 			helper.invokeJavaMethod(monitorMethod);
 			os.writePOP(adx);
