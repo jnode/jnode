@@ -5,25 +5,32 @@
 package org.jnode.driver.net.eepro100;
 
 import org.jnode.system.MemoryResource;
+import org.jnode.system.ResourceManager;
+import org.jnode.vm.Address;
 
 /**
  * @author flesire
  *  
  */
 public class EEPRO100RxFD {
+    
+    private int RxFDSize = 16;
+    private int DataBufferSize = 1536;
 
     private int bufferAddress;
+    private byte[] data;
     private MemoryResource mem;
 
     /**
      *  
      */
-    public EEPRO100RxFD(MemoryResource mem) {
-        this.mem = mem;
-        /*
-         * bufferAddress = frameAddress; packetOffset = 16;
-         */
-        mem.setInt(8, 0xffffffff);
+    public EEPRO100RxFD(ResourceManager rm) {
+        final int size = (RxFDSize + DataBufferSize) + 16;
+		this.data = new byte[size];
+		this.mem = rm.asMemoryResource(data);
+		
+		bufferAddress = Address.as32bit(mem.getAddress());
+		setRxBufferAddress(0xffffffff);
     }
 
     final int getStatus() {
