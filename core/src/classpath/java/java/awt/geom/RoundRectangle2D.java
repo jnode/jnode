@@ -1,5 +1,5 @@
 /* RoundRectangle2D.java -- represents a rectangle with rounded corners
-   Copyright (C) 2000, 2002, 2003 Free Software Foundation
+   Copyright (C) 2000, 2002, 2003, 2004 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -38,6 +38,7 @@ exception statement from your version. */
 package java.awt.geom;
 
 import java.util.NoSuchElementException;
+
 
 /** This class implements a rectangle with rounded corners.
  * @author Tom Tromey <tromey@cygnus.com>
@@ -87,8 +88,11 @@ public abstract class RoundRectangle2D extends RectangularShape
     // Now check to see if the point is in range of an arc.
     double dy = Math.min(Math.abs(my - y), Math.abs(my + mh - y));
     double dx = Math.min(Math.abs(mx - x), Math.abs(mx + mw - x));
-    double aw = getArcWidth();
-    double ah = getArcHeight();
+
+    // The arc dimensions are that of the corresponding ellipse
+    // thus a 90 degree segment is half of that.
+    double aw = getArcWidth() / 2.0;
+    double ah = getArcHeight() / 2.0;
     if (dx > aw || dy > ah)
       return true;
 
@@ -112,8 +116,8 @@ public abstract class RoundRectangle2D extends RectangularShape
   {
     // We have to check all four points here (for ordinary rectangles
     // we can just check opposing corners).
-    return (contains(x, y) && contains(x + w, h)
-            && contains(x, y + h) && contains(x + w, y + h));
+    return (contains(x, y) && contains(x, y + h) && contains(x + w, y + h)
+           && contains(x + w, y));
   }
 
   /** Return a new path iterator which iterates over this rectangle.
@@ -129,8 +133,8 @@ public abstract class RoundRectangle2D extends RectangularShape
     final double archeight = getArcHeight();
     return new PathIterator()
     {
-      /** We iterate clockwise around the rectangle, starting in the
-       * upper left.  This variable tracks our current point, which
+	/** We iterate counterclockwise around the rectangle, starting in the
+	 * upper right.  This variable tracks our current point, which
        * can be on either side of a given corner.  */
       private int current = 0;
 
@@ -160,37 +164,37 @@ public abstract class RoundRectangle2D extends RectangularShape
   {
 	  case 0:
 	  case 8:
-	    temp[0] = minx;
-	    temp[1] = miny + archeight;
-	    break;
-	  case 1:
-	    temp[0] = minx + arcwidth;
-	    temp[1] = miny;
-	    break;
-	  case 2:
-	    temp[0] = maxx - arcwidth;
-	    temp[1] = maxy;
-	    break;
-	  case 3:
 	    temp[0] = maxx;
 	    temp[1] = miny + archeight;
 	    break;
-	  case 4:
+	    case 7:
 	    temp[0] = maxx;
 	    temp[1] = maxy - archeight;
 	    break;
-	  case 5:
+	    case 6:
 	    temp[0] = maxx - arcwidth;
 	    temp[1] = maxy;
 	    break;
-	  case 6:
+	    case 5:
 	    temp[0] = minx + arcwidth;
 	    temp[1] = maxy;
 	    break;
-	  case 7:
+	    case 4:
 	    temp[0] = minx;
 	    temp[1] = maxy - archeight;
 	    break;
+	    case 3:
+	      temp[0] = minx;
+	      temp[1] = miny + archeight;
+	      break;
+	    case 2:
+	      temp[0] = minx + arcwidth;
+	      temp[1] = miny;
+	      break;
+	    case 1:
+	      temp[0] = maxx - arcwidth;
+	      temp[1] = miny;
+	      break;
 	  }
       }
 
@@ -218,8 +222,15 @@ public abstract class RoundRectangle2D extends RectangularShape
 	    double x1 = temp[0];
 	    double y1 = temp[1];
 	    getPoint(current + 1);
-	    arc.setFrameFromDiagonal(x1, y1, temp[0], temp[1]);
-	    arc.setAngles(x1, y1, temp[0], temp[1]);
+	      Rectangle2D.Double r = new Rectangle2D.Double(Math.min(x1,
+	                                                             temp[0]),
+	                                                    Math.min(y1,
+	                                                             temp[1]),
+	                                                    Math.abs(x1
+	                                                             - temp[0]),
+	                                                    Math.abs(y1
+	                                                             - temp[1]));
+	      arc.setArc(r, (current >> 1) * 90.0, 90.0, Arc2D.OPEN);
 	    corner = arc.getPathIterator(at);
 	  }
       }
@@ -286,14 +297,9 @@ public abstract class RoundRectangle2D extends RectangularShape
    */
   public boolean intersects(double x, double y, double w, double h)
   {
-    // Here we can use the same code we use for an ordinary rectangle.
-    double mx = getX();
-    double mw = getWidth();
-    if (x < mx || x >= mx + mw || x + w < mx || x + w >= mx + mw)
-      return false;
-    double my = getY();
-    double mh = getHeight();
-    return y >= my && y < my + mh && y + h >= my && y + h < my + mh;
+    // Check if any corner is within the rectangle
+    return (contains(x, y) || contains(x, y + h) || contains(x + w, y + h)
+           || contains(x + w, y));
   }
 
   /** Set the boundary of this round rectangle.
@@ -353,8 +359,8 @@ public abstract class RoundRectangle2D extends RectangularShape
      * @param arcWidth The arc width
      * @param arcHeight The arc height
      */
-    public Double(double x, double y, double w, double h,
-                   double arcWidth, double arcHeight)
+    public Double(double x, double y, double w, double h, double arcWidth,
+                  double arcHeight)
     {
       this.x = x;
       this.y = y;
@@ -451,8 +457,8 @@ public abstract class RoundRectangle2D extends RectangularShape
      * @param arcWidth The arc width
      * @param arcHeight The arc height
      */
-    public Float(float x, float y, float w, float h,
-                  float arcWidth, float arcHeight)
+    public Float(float x, float y, float w, float h, float arcWidth,
+                 float arcHeight)
     {
       this.x = x;
       this.y = y;
