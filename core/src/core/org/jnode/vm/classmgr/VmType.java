@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.jnode.assembler.NativeStream;
+import org.jnode.vm.JvmType;
 import org.jnode.vm.PragmaLoadStatics;
 import org.jnode.vm.Uninterruptible;
 import org.jnode.vm.Unsafe;
@@ -230,23 +231,23 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
         SerializableClass.link();
 
         final ProtectionDomain protectionDomain = null;
-        BooleanClass = new VmPrimitiveClass("boolean", ObjectClass, clc, 1,
+        BooleanClass = new VmPrimitiveClass("boolean", ObjectClass, clc, JvmType.BOOLEAN, 1,
                 false, protectionDomain);
-        ByteClass = new VmPrimitiveClass("byte", ObjectClass, clc, 1, false,
+        ByteClass = new VmPrimitiveClass("byte", ObjectClass, clc, JvmType.BYTE, 1, false,
                 protectionDomain);
-        CharClass = new VmPrimitiveClass("char", ObjectClass, clc, 2, false,
+        CharClass = new VmPrimitiveClass("char", ObjectClass, clc, JvmType.CHAR, 2, false,
                 protectionDomain);
-        ShortClass = new VmPrimitiveClass("short", ObjectClass, clc, 2, false,
+        ShortClass = new VmPrimitiveClass("short", ObjectClass, clc, JvmType.SHORT, 2, false,
                 protectionDomain);
-        IntClass = new VmPrimitiveClass("int", ObjectClass, clc, 4, false,
+        IntClass = new VmPrimitiveClass("int", ObjectClass, clc, JvmType.INT, 4, false,
                 protectionDomain);
-        FloatClass = new VmPrimitiveClass("float", ObjectClass, clc, 4, true,
+        FloatClass = new VmPrimitiveClass("float", ObjectClass, clc, JvmType.FLOAT, 4, true,
                 protectionDomain);
-        LongClass = new VmPrimitiveClass("long", ObjectClass, clc, 8, false,
+        LongClass = new VmPrimitiveClass("long", ObjectClass, clc, JvmType.LONG, 8, false,
                 protectionDomain);
-        DoubleClass = new VmPrimitiveClass("double", ObjectClass, clc, 8, true,
+        DoubleClass = new VmPrimitiveClass("double", ObjectClass, clc, JvmType.DOUBLE, 8, true,
                 protectionDomain);
-        VoidClass = new VmPrimitiveClass("void", ObjectClass, clc, 0, false,
+        VoidClass = new VmPrimitiveClass("void", ObjectClass, clc, JvmType.VOID, 0, false,
                 protectionDomain);
 
         BooleanClass.link();
@@ -1950,5 +1951,14 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
      */
     public final ProtectionDomain getProtectionDomain() {
         return protectionDomain;
+    }
+    
+    /**
+     * Gets the JvmType of this type.
+     * @see org.jnode.vm.JvmType
+     * @return
+     */
+    public int getJvmType() {
+    	return JvmType.REFERENCE;
     }
 }

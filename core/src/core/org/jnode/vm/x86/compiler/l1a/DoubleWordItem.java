@@ -539,4 +539,14 @@ public abstract class DoubleWordItem extends Item implements
 	final boolean uses(Register reg) {
 		return ((kind == Kind.REGISTER) && (msb.equals(reg) || lsb.equals(reg)));
 	}
+
+	/**
+	 * enquire whether the item uses a volatile register
+	 * 
+	 * @param reg
+	 * @return true, when this item uses a volatile register.
+	 */
+	final boolean usesVolatileRegister(X86RegisterPool pool) {
+		return ((kind == Kind.REGISTER) && !(pool.isCallerSaved(lsb) && pool.isCallerSaved(msb)));
+	}
 }

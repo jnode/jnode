@@ -3,6 +3,7 @@
  */
 package org.jnode.vm.x86.compiler.l1a;
 
+import org.jnode.vm.JvmType;
 import org.jnode.vm.bytecode.StackException;
 
 /**
@@ -146,15 +147,18 @@ class ItemStack {
 	}
 
 	public String toString() {
+		if (tos == 0) {
+			return "EMPTY";
+		}
 		final StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < tos; i++) {
 			if (i != 0) {
 				buf.append(',');
 			}
 			buf.append('(');
-			buf.append(stack[i].getType());
+			buf.append(JvmType.toString(stack[i].getType()));
 			buf.append(',');
-			buf.append(stack[i].getKind());
+			buf.append(Item.Kind.toString(stack[i].getKind()));
 			buf.append(')');
 		}
 		buf.append("TOS");

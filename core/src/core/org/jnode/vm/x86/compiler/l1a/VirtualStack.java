@@ -210,15 +210,17 @@ final class VirtualStack {
 			operandStack.push(item);
 		}
 	}
-	
+
 	/**
 	 * Does this stack contain the given item.
+	 * 
 	 * @param item
 	 * @return
 	 */
 	final boolean contains(Item item) {
 		for (int i = 0; i < tos; i++) {
-			if (stack[i] == item) return true;
+			if (stack[i] == item)
+				return true;
 		}
 		return false;
 	}
@@ -286,6 +288,42 @@ final class VirtualStack {
 		return cnt;
 	}
 
+	/**
+	 * Push items on the virtual stack to the actual stack until there are no
+	 * more volative registers in use on the stack.
+	 * 
+	 * @param ec
+	 */
+	//	final int pushAllVolatile(EmitterContext ec) {
+	//		int i = 0;
+	//		while ((i < tos) && stack[i].isStack()) {
+	//			i++;
+	//		}
+	//		int cnt = 0;
+	//		final int max = findTopVolatileRegisterIndex(ec.getPool());
+	//		while (i <= max) {
+	//			final Item item = stack[i];
+	//			Item.assertCondition(!item.isStack(), "!item.isStack()");
+	//			item.push(ec);
+	//			i++;
+	//			cnt++;
+	//		}
+	//		return cnt;
+	//	}
+	/**
+	 * Find the largest index that contains a volatile register.
+	 * 
+	 * @return
+	 */
+	private final int findTopVolatileRegisterIndex(X86RegisterPool pool) {
+		for (int i = tos - 1; i >= 0; i--) {
+			if (stack[i].usesVolatileRegister(pool)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
 	//    private void prependToOperandStack(Item item) {
 	//        os.log("prepend");
 	//        Item.myAssert(item.getKind() == Item.Kind.STACK);
@@ -347,19 +385,24 @@ final class VirtualStack {
 	}
 
 	public String toString() {
+		if (tos == 0) {
+			return "EMPTY";
+		}
 		final StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < tos; i++) {
 			if (i != 0) {
 				buf.append(',');
 			}
 			buf.append('(');
-			buf.append(stack[i].getType());
+			buf.append(JvmType.toString(stack[i].getType()));
 			buf.append(',');
-			buf.append(stack[i].getKind());
+			buf.append(Item.Kind.toString(stack[i].getKind()));
 			buf.append(')');
 		}
+		buf.append("TOS");
 		return buf.toString();
 	}
+
 	final void visitItems(ItemVisitor visitor) {
 		for (int i = 0; i < tos; i++) {
 			visitor.visit(stack[i]);

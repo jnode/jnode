@@ -5,7 +5,7 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.assembler.x86.Register;
-import org.jnode.vm.compiler.ir.Operand;
+import org.jnode.vm.JvmType;
 
 /**
  * @author Madhu Siddalingaiah
@@ -42,11 +42,11 @@ final class X86RegisterPool {
         // The cost of a register is lower when its index in this
         // array is higher.
         return new RegisterUsage[] {
-                new RegisterUsage(Register.EAX),
-                new RegisterUsage(Register.EDX),
-                new RegisterUsage(Register.EBX),
-                new RegisterUsage(Register.ECX),
-                new RegisterUsage(Register.ESI)
+                new RegisterUsage(Register.EAX, false),
+                new RegisterUsage(Register.EDX, false),
+                new RegisterUsage(Register.ECX, false),
+                new RegisterUsage(Register.EBX, false),
+                new RegisterUsage(Register.ESI, false)
         };
         // EDI always points to the statics, do not use
     }
@@ -61,7 +61,7 @@ final class X86RegisterPool {
      * @return the allocated register or null
      */
     public Register request(int type, Object owner) {
-        if (type == Operand.LONG || type == Operand.DOUBLE) { return null; }
+        if (type == JvmType.LONG || type == JvmType.DOUBLE) { return null; }
         
         for (int i = regCount-1; i >= 0; i--) {
             final RegisterUsage ru = registers[i];
@@ -87,6 +87,16 @@ final class X86RegisterPool {
      */
     public boolean isFree(Register register) {
         return get(register).isFree();
+    }
+
+    /**
+     * Check whether the given register is to be saved by a called method.
+     * 
+     * @param register
+     * @return true, when register is to be saved by a called method
+     */
+    public boolean isCallerSaved(Register register) {
+        return get(register).isCallerSaved();
     }
 
     /**
@@ -162,13 +172,6 @@ final class X86RegisterPool {
         }
     }
     
-    final void showRequestTrace(Register reg) {
-        RegisterUsage ru = get(reg);
-        if (!ru.isFree()) {
-            ru.getRequestTrace().printStackTrace();
-        }
-    }
-    
     /**
      * Gets the register usage for a given register.
      * @param reg
@@ -197,6 +200,10 @@ final class X86RegisterPool {
         }
     }
     
+    /**
+     * Convert to a string representation.
+     * @see java.lang.Object#toString()
+     */
     public String toString() {
         final StringBuffer buf = new StringBuffer();
         for (int i = 0; i < regCount; i++) {
@@ -205,9 +212,7 @@ final class X86RegisterPool {
         }
         return buf.toString();
     }
-
-    
-    
+   
     /**
      * Register usage information for a single register.
      * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -216,15 +221,16 @@ final class X86RegisterPool {
         final Register reg;
         private Object owner;
         private boolean inuse;
-        private Throwable requestTrace;
+        private final boolean callerSaved;
         
         /**
          * Initialize this instance.
          * @param reg
          */
-        public RegisterUsage(Register reg) {
+        public RegisterUsage(Register reg, boolean callerSaved) {
             this.reg = reg;
             this.inuse = false;
+            this.callerSaved = callerSaved;
         }
         
         /**
@@ -238,8 +244,6 @@ final class X86RegisterPool {
             } else {
                 this.owner = owner;
                 this.inuse = true;
-                this.requestTrace = new Exception("Requesttrace of " + reg);
-                //System.out.println("Request of " + reg);
                 return true;
             }
         }
@@ -248,7 +252,6 @@ final class X86RegisterPool {
          * Release the given owner from this register.
          */
         public void release() {
-            //System.out.println("Release of " + reg);
             this.owner = null;
             this.inuse = false;
         }
@@ -278,16 +281,21 @@ final class X86RegisterPool {
             }
             this.owner = owner;
         }
-        
-        public Throwable getRequestTrace() {
-            return requestTrace;
+
+        /**
+         * Is this register saved by any called method.
+         * @return
+         */
+        public boolean isCallerSaved() {
+        	return callerSaved;
         }
         
+        /**
+         * Convert to a string representation.
+         * @see java.lang.Object#toString()
+         */
         public String toString() {
             if (inuse) {
-                //StringWriter buf = new StringWriter();
-                //requestTrace.printStackTrace(new PrintWriter(buf));
-                //return reg + " used by " + owner + buf.toString();
                 return reg + " used by " + owner;
             } else {
                 return reg + " free";

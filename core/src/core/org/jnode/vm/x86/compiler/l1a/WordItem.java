@@ -194,6 +194,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 
 		case Kind.FPUSTACK:
 			// Make sure this item is on top of the FPU stack
+			FPUHelper.fxch(os, stack.fpuStack, this);
 			stack.fpuStack.pop(this);
 			// Convert & move to new space on normal stack
 			os.writeLEA(SP, SP, 4);
@@ -287,9 +288,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 		case Kind.FPUSTACK:
 			// Make sure this item is on top of the FPU stack
 			final FPUStack fpuStack = stack.fpuStack;
-			if (!fpuStack.isTos(this)) {
-				FPUHelper.fxch(os, fpuStack, fpuStack.getRegister(this));
-			}
+			FPUHelper.fxch(os, fpuStack, this);
 			stack.fpuStack.pop(this);
 			// Convert & move to new space on normal stack
 			os.writeLEA(SP, SP, 4);
@@ -363,7 +362,7 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 			stack.fpuStack.pop(this);
 			stack.fpuStack.push(this);
 			return;
-			//break;
+		//break;
 
 		case Kind.STACK:
 			if (VirtualStack.checkOperandStack) {
@@ -386,7 +385,8 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#release(EmitterContext)
 	 */
 	final void release(EmitterContext ec) {
-		//assertCondition(!ec.getVStack().contains(this), "Cannot release while on vstack");
+		//assertCondition(!ec.getVStack().contains(this), "Cannot release while
+		// on vstack");
 		final X86RegisterPool pool = ec.getPool();
 
 		switch (getKind()) {
@@ -447,4 +447,15 @@ public abstract class WordItem extends Item implements X86CompilerConstants {
 	final boolean uses(Register reg) {
 		return ((kind == Kind.REGISTER) && this.reg.equals(reg));
 	}
+
+	/**
+	 * enquire whether the item uses a volatile register
+	 * 
+	 * @param reg
+	 * @return true, when this item uses a volatile register.
+	 */
+	final boolean usesVolatileRegister(X86RegisterPool pool) {
+		return ((kind == Kind.REGISTER) && !pool.isCallerSaved(reg));
+	}
+
 }
