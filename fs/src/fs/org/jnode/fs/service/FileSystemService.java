@@ -8,6 +8,7 @@ import java.util.Collection;
 
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystem;
+import org.jnode.fs.FileSystemException;
 
 /**
  * @author epr
@@ -29,7 +30,7 @@ public interface FileSystemService {
 	 * Register a mounted filesystem
 	 * @param fs
 	 */
-	public void registerFileSystem(FileSystem fs);
+	public void registerFileSystem(FileSystem fs) throws FileSystemException;
 
 	/**
 	 * Unregister a mounted filesystem

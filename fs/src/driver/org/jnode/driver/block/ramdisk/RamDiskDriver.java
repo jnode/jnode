@@ -14,11 +14,22 @@ import org.jnode.fs.partitions.PartitionTableEntry;
  */
 public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 
+	private static final String RAMDISK_DEFAULTNAME = "ramdisk";
 	/** The device */
 	private RamDiskDevice device;
 	/** The data */
 	private byte[] data;
+	private String devName;
 
+	/**
+	 * Create a RamDisk Driver
+	 * 
+	 * @param deviceName
+	 *           null will name it ramdisk with autonumber
+	 */
+	public RamDiskDriver(String deviceName) {
+		this.devName = deviceName;
+	}
 	/**
 	 * Start the device
 	 * 
@@ -27,7 +38,12 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 	protected void startDevice() throws DriverException {
 		try {
 			this.device = (RamDiskDevice)getDevice();
-			this.device.getManager().rename(device, "ramdisk", true);
+			if (this.devName == null) {
+				this.device.getManager().rename(device, RAMDISK_DEFAULTNAME, true);
+			} else {
+				this.device.getManager().rename(device, devName, false);
+			}
+
 			if (this.data == null) {
 				this.data = new byte[device.getSize()];
 			}

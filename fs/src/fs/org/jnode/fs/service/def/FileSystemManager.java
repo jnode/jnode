@@ -31,6 +31,7 @@ public class FileSystemManager {
 	 * @param fs
 	 */
 	public void registerFileSystem(FileSystem fs) {
+		String idToMount = fs.getDevice().getId();
 		filesystems.put(fs.getDevice().getId(), fs);
 	}
 
