@@ -7,20 +7,17 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.block.BlockDeviceAPI;
+import org.jnode.fs.AbstractFileSystem;
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 
 /**
  * @author epr
  */
-public class FatFileSystem implements FileSystem {
+public class FatFileSystem extends AbstractFileSystem {
 
-	private final Device device;
-	private final BlockDeviceAPI api;
 	private BootSector bs;
 	private Fat fat;
 	private final FatDirectory rootDir;
@@ -28,14 +25,14 @@ public class FatFileSystem implements FileSystem {
 	private final HashMap files = new HashMap();
 
 	/**
-	 * Constructor for AbstractFatDriver.
+	 * Constructor for FatFileSystem in specified readOnly mode
 	 */
-	public FatFileSystem(Device device) throws FileSystemException {
-		this.device = device;
+	public FatFileSystem(Device device, boolean readOnly) throws FileSystemException {
+		super(device, readOnly); // false = read/write mode
+		
 		try {
-			api = (BlockDeviceAPI)device.getAPI(BlockDeviceAPI.class);
 			bs = new BootSector(512);
-			bs.read(api);
+			bs.read(getApi());
 			if (!bs.isaValidBootSector())
 				throw new FileSystemException("Can't mount this partition: Invalid BootSector");
 
@@ -54,7 +51,7 @@ public class FatFileSystem implements FileSystem {
 			for (int i = 0; i < fats.length; i++) {
 				Fat fat = new Fat(bitSize, bs.getMediumDescriptor(), bs.getSectorsPerFat(), bs.getBytesPerSector());
 				fats[i] = fat;
-				fat.read(api, FatUtils.getFatOffset(bs, i));
+				fat.read(getApi(), FatUtils.getFatOffset(bs, i));
 			}
 
 			for (int i = 1; i < fats.length; i++) {
@@ -63,11 +60,9 @@ public class FatFileSystem implements FileSystem {
 				}
 			}
 			fat = fats[0];
-			rootDir.read(api, FatUtils.getRootDirOffset(bs));
+			rootDir.read(getApi(), FatUtils.getRootDirOffset(bs));
 			rootEntry = new FatRootEntry(rootDir);
 			//files = new FatFile[fat.getNrEntries()];
-		} catch (ApiNotFoundException ex) {
-			throw new FileSystemException(ex);
 		} catch (IOException ex) {
 			throw new FileSystemException(ex);
 		} catch (Exception e) { // something bad happened in the FAT boot
@@ -77,31 +72,13 @@ public class FatFileSystem implements FileSystem {
 	}
 
 	/**
-	 * Gets the device this FS driver operates on.
-	 */
-	public Device getDevice() {
-		return device;
-	}
-
-	/**
-	 * Close this filesystem. After a close, all invocations of method of this
-	 * filesystem or objects created by this filesystem will throw an
-	 * IOException.
-	 * 
-	 * @throws IOException
-	 */
-	public void close() throws IOException {
-		flush();
-	}
-
-	/**
 	 * Flush all changed structures to the device.
 	 * 
 	 * @throws IOException
 	 */
 	public void flush() throws IOException {
 
-		final BlockDeviceAPI api = this.api;
+		final BlockDeviceAPI api = getApi();
 
 		if (bs.isDirty()) {
 			bs.write(api);
@@ -176,9 +153,4 @@ public class FatFileSystem implements FileSystem {
 	public FatDirectory getRootDir() {
 		return rootDir;
 	}
-
-	protected BlockDeviceAPI getBlockDeviceAPI() {
-		return api;
-	}
-
 }
