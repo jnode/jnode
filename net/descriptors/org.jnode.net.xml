@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.net" 
-        name="JNode Network System"
-        version="@VERSION@"
-        provider-name="JNode.org"
-        class="org.jnode.net.service.NetPlugin">
-        
+<plugin id="org.jnode.net"
+  name="JNode Network System"
+  version="@VERSION@"
+  provider-name="JNode.org"
+  class="org.jnode.net.service.NetPlugin">
+
   <requires>
     <import plugin="org.jnode.driver"/>
     <import plugin="org.jnode.driver.console"/>
     <import plugin="org.jnode.log4j"/>
   </requires>
-        
+
   <runtime>
     <library name="jnode-net.jar">
       <export name="org.jnode.driver.net.*"/>
@@ -23,7 +23,6 @@
       <export name="org.jnode.net.util.*"/>
     </library>
   </runtime>
-  
+
   <extension-point id="networkLayers" name="JNode Network layers"/>
-  
 </plugin>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.net.ipv4" 
-        name="JNode IPv4 Network Layer"
-        version="@VERSION@"
-        provider-name="JNode.org">
-        
+<plugin id="org.jnode.net.ipv4"
+  name="JNode IPv4 Network Layer"
+  version="@VERSION@"
+  provider-name="JNode.org">
+
   <requires>
     <import plugin="org.jnode.net"/>
     <import plugin="org.jnode.net.arp"/>
@@ -13,7 +13,7 @@
     <import plugin="org.xbill.DNS"/>
     <import plugin="org.apache.jakarta.commons.net"/>
   </requires>
-        
+
   <runtime>
     <library name="jnode-net.jar">
       <export name="org.jnode.net.ipv4.bootp.*"/>
@@ -27,17 +27,20 @@
       <export name="org.jnode.net.ipv4.util.*"/>
     </library>
   </runtime>
-  
+
   <extension point="org.jnode.security.permissions">
     <permission class="java.lang.RuntimePermission" name="setFactory"/>
     <!-- Bootp -->
     <permission class="java.net.SocketPermission" name="*:67" actions="connect,resolve"/>
     <permission class="java.net.SocketPermission" name="localhost:68" actions="listen"/>
     <permission class="org.jnode.net.NetPermission" name="*"/>
+
+    <permission class="java.util.PropertyPermission" name="dns.server" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="dns.search" actions="read"/>
   </extension>
-        
+
   <extension point="org.jnode.net.networkLayers">
     <layer class="org.jnode.net.ipv4.layer.IPv4NetworkLayer"/>
   </extension>
-  
+
 </plugin>
