@@ -5,46 +5,46 @@ timeout 5
 
 # ---------------------------
 title JNode (default)
-kernel (hd0,0)/jnodesys.gz
+kernel (hd0,0)/jnode32.gz
 module (hd0,0)/default.jgz
 
 # ---------------------------
 
 title JNode (default without MP)
-kernel (hd0,0)/jnodesys.gz mp=no
+kernel (hd0,0)/jnode32.gz mp=no
 module (hd0,0)/default.jgz
 
 # ---------------------------
 title JNode (all plugins)
-kernel (hd0,0)/jnodesys.gz
+kernel (hd0,0)/jnode32.gz
 module (hd0,0)/full.jgz
 
 # ---------------------------
 title JNode GUI (all plugins)
-kernel (hd0,0)/jnodesys.gz
+kernel (hd0,0)/jnode32.gz
 module (hd0,0)/fullgui.jgz
 
 # ---------------------------
 title JNode via dhcp (default)
 dhcp
-kernel (nd)/jnodesys.gz
+kernel (nd)/jnode32.gz
 module (nd)/default.jgz
 
 # ---------------------------
 title JNode via dhcp (all plugins)
 dhcp
-kernel (nd)/jnodesys.gz
+kernel (nd)/jnode32.gz
 module (nd)/full.jgz
 
 # ---------------------------
 title JNode GUI via dhcp (all plugins)
 dhcp
-kernel (nd)/jnodesys.gz
+kernel (nd)/jnode32.gz
 module (nd)/fullgui.jgz
 
 # ---------------------------
 title JNode Install
-kernel (hd0,0)/jnodesys.gz
+kernel (hd0,0)/jnode32.gz
 module (hd0,0)/install.jgz
 
 

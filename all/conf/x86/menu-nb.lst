@@ -4,17 +4,17 @@ timeout 2
 
 # ---------------------------
 title JNode (default)
-kernel (nd)/jnodesys.gz
+kernel (nd)/jnode32.gz
 module (nd)/default.jgz
 
 # ---------------------------
 title JNode (all plugins)
-kernel (nd)/jnodesys.gz
+kernel (nd)/jnode32.gz
 module (nd)/full.jgz
 
 # ---------------------------
 title JNode Install
-kernel (nd)/jnodesys.gz
+kernel (nd)/jnode32.gz
 module (nd)/install.jgz
 
 
