@@ -23,7 +23,6 @@ package org.jnode.vm.x86.compiler.l1a;
 
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
-import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.classmgr.VmClassLoader;
@@ -101,7 +100,7 @@ public class X86Level1ACompiler extends AbstractX86Compiler {
             CompiledMethod cm, NativeStream os, int level, boolean isBootstrap) {
         final InlineBytecodeVisitor cbv;
         cbv = new X86BytecodeVisitor(os, cm, isBootstrap, getContext(), magicHelper, getTypeSizeInfo());
-        if (inlineMethods && ((X86Assembler)os).isCode32()) {
+        if (inlineMethods /*&& ((X86Assembler)os).isCode32()*/) {
             final VmClassLoader loader = method.getDeclaringClass().getLoader();
             return new InliningBytecodeVisitor(cbv, loader);
         } else {
