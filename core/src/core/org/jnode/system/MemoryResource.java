@@ -304,7 +304,7 @@ public interface MemoryResource extends Resource {
 	 * @param value
 	 * @param count
 	 */	
-	public abstract void andInt24(int memPtr, int value, int count);
+	//public abstract void andInt24(int memPtr, int value, int count);
 
 	/**
 	 * Perform a bitwise OR of the int at the given address and the given value.
@@ -313,7 +313,7 @@ public interface MemoryResource extends Resource {
 	 * @param value
 	 * @param count
 	 */	
-	public abstract void orInt24(int memPtr, int value, int count);
+	//public abstract void orInt24(int memPtr, int value, int count);
 
 	/**
 	 * Perform a bitwise XOR of the int at the given address and the given value.

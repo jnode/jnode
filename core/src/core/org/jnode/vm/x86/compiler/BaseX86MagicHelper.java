@@ -50,11 +50,17 @@ public class BaseX86MagicHelper extends BaseMagicHelper {
         switch (mcode) {
         case mLOADBYTE:
         case mLOADBYTE_OFS:
+        case mSTOREBYTE:
+        case mSTOREBYTE_OFS:
             return X86CompilerConstants.BYTESIZE;
         case mLOADCHAR:
         case mLOADCHAR_OFS:
+        case mSTORECHAR:
+        case mSTORECHAR_OFS:
         case mLOADSHORT:
         case mLOADSHORT_OFS:
+        case mSTORESHORT:
+        case mSTORESHORT_OFS:
             return X86CompilerConstants.WORDSIZE;
         default: throw new InternalError("Unknown mcode " + mcode);                    
         }
@@ -70,6 +76,8 @@ public class BaseX86MagicHelper extends BaseMagicHelper {
         case mLOADSHORT_OFS:
         case mLOADINT:
         case mLOADINT_OFS:
+        case mPREPAREINT:
+        case mPREPAREINT_OFS:
             return JvmType.INT;
         case mLOADFLOAT:
         case mLOADFLOAT_OFS:
@@ -86,6 +94,12 @@ public class BaseX86MagicHelper extends BaseMagicHelper {
         case mLOADWORD_OFS:
         case mLOADOBJECTREFERENCE:
         case mLOADOBJECTREFERENCE_OFS:
+        case mPREPAREADDRESS:
+        case mPREPAREADDRESS_OFS:
+        case mPREPAREOBJECTREFERENCE:
+        case mPREPAREOBJECTREFERENCE_OFS:
+        case mPREPAREWORD:
+        case mPREPAREWORD_OFS:
             return JvmType.REFERENCE;
         default: throw new InternalError("Unknown mcode " + mcode);                    
         }

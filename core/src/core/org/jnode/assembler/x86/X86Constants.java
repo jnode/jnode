@@ -35,6 +35,8 @@ public interface X86Constants {
 	public static final int ASIZE_PREFIX = 0x67;
 	/** FS prefix */
 	public static final int FS_PREFIX = 0x64;
+	/** Lock prefix */
+	public static final int LOCK_PREFIX = 0xF0;
 	
 	/* Opcodes */
 	public static final int NOP   = 0x90;
