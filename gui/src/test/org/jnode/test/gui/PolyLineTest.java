@@ -9,8 +9,8 @@ import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 
-import org.jnode.awt.geom.Curves;
 import org.jnode.awt.geom.PolyLine;
+import org.jnode.driver.video.util.Curves;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

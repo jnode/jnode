@@ -11,7 +11,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 
-import org.jnode.awt.geom.Curves;
+import org.jnode.driver.video.util.Curves;
 
 /**
  * @author epr

@@ -11,7 +11,6 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.geom.RectangularShape;
 
-import org.jnode.awt.geom.Curves;
 import org.jnode.driver.video.Surface;
 
 /**
