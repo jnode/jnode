@@ -132,6 +132,7 @@ public class BytecodeParser {
 			this.wide = false;
 			handler.startInstruction(address);
 			this.opcode = getu1();
+			final int cpIdx;
 
 			switch (opcode) {
 				// -- 0 --
@@ -191,10 +192,12 @@ public class BytecodeParser {
 					handler.visit_sipush(gets2());
 					break;
 				case 0x12 :
-					handler.visit_ldc(cp.getAny(getu1()));
+					cpIdx = getu1();
+					handler.visit_ldc(cpIdx, cp.getAny(cpIdx));
 					break;
 				case 0x13 :
-					handler.visit_ldc(cp.getAny(getu2()));
+					cpIdx = getu2();
+					handler.visit_ldc(cpIdx, cp.getAny(cpIdx));
 					break;
 					// -- 20 --
 				case 0x14 :

@@ -14,10 +14,12 @@ import org.jnode.vm.VmSystemObject;
 public abstract class VmConstObject extends VmSystemObject implements Uninterruptible {
 
 	protected final VmCP cp;
+	private final int cpIdx;
 	private boolean resolved = false;
 	
-	public VmConstObject(VmCP cp) {
+	public VmConstObject(VmCP cp, int cpIdx) {
 		this.cp = cp;
+		this.cpIdx = cpIdx;
 	}
 	
 	/**
@@ -45,4 +47,12 @@ public abstract class VmConstObject extends VmSystemObject implements Uninterrup
 	 */
 	protected abstract void doResolve(AbstractVmClassLoader clc);
 	
+	/**
+	 * Gets the index of this object in the constantpool it is in.
+	 * @return Returns the cpIdx.
+	 */
+	public final int getCpIdx() {
+		return this.cpIdx;
+	}
+
 }

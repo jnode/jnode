@@ -37,6 +37,7 @@ import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmMethodCode;
+import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 
@@ -201,6 +202,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 			final int bootHeapSize = os.getObjectRef(bootHeapEnd).getOffset() - os.getObjectRef(bootHeapStart).getOffset();
 			final int bootHeapBitmapSize = (bootHeapSize / ObjectLayout.OBJECT_ALIGN) >> 3;
 			log("Boot heap size " + (bootHeapSize >>> 10) + "K bitmap size " + (bootHeapBitmapSize >>> 10) + "K");
+			VmStatics.dumpStatistics();
 
 			log("Done.");
 		} catch (Throwable ex) {

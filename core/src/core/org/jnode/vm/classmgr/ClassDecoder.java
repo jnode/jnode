@@ -117,7 +117,7 @@ public final class ClassDecoder {
 					i++;
 					break;
 				case 7 : // class
-					cp.setConstClass(i, new VmConstClass(cp, cl_readu2(data, pos)));
+					cp.setConstClass(i, new VmConstClass(cp, i, cl_readu2(data, pos)));
 					break;
 				case 8 : // String
 					cp.setInt(i, cl_readu2(data, pos));
@@ -126,21 +126,21 @@ public final class ClassDecoder {
 					{
 						final int clsIdx = cl_readu2(data, pos);
 						final int ntIdx = cl_readu2(data, pos);
-						cp.setConstFieldRef(i, new VmConstFieldRef(cp, clsIdx, ntIdx));
+						cp.setConstFieldRef(i, new VmConstFieldRef(cp, i, clsIdx, ntIdx));
 					}
 					break;
 				case 10 : // Methodref
 					{
 						final int clsIdx = cl_readu2(data, pos);
 						final int ntIdx = cl_readu2(data, pos);
-						cp.setConstMethodRef(i, new VmConstMethodRef(cp, clsIdx, ntIdx));
+						cp.setConstMethodRef(i, new VmConstMethodRef(cp, i, clsIdx, ntIdx));
 					}
 					break;
 				case 11 : // IMethodref
 					{
 						final int clsIdx = cl_readu2(data, pos);
 						final int ntIdx = cl_readu2(data, pos);
-						cp.setConstIMethodRef(i, new VmConstIMethodRef(cp, clsIdx, ntIdx));
+						cp.setConstIMethodRef(i, new VmConstIMethodRef(cp, i, clsIdx, ntIdx));
 					}
 					break;
 				case 12 : // Name and Type
