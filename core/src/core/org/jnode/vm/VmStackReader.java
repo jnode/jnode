@@ -23,6 +23,8 @@ package org.jnode.vm;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.vmmagic.pragma.UninterruptiblePragma;
+import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Offset;
 
 /**
  * Abstract class for reading information from stack frames.
@@ -36,9 +38,9 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf The stackframe to get the previous frame from.
 	 * @return The previous frame or null.
 	 */
-	final VmAddress getPrevious(VmAddress sf) {
+	final Address getPrevious(Address sf) {
 		if (isValid(sf)) {
-			return Unsafe.getAddress(sf, getPreviousOffset(sf));
+			return sf.loadAddress(getPreviousOffset(sf));
 		} else {
 			return null;
 		}
@@ -49,8 +51,8 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf Stackframe pointer
 	 * @return The method
 	 */
-	final VmMethod getMethod(VmAddress sf) {
-		final Object obj = Unsafe.getObject(sf, getMethodOffset(sf));
+	final VmMethod getMethod(Address sf) {
+		final Object obj = sf.loadObjectReference(getMethodOffset(sf)).toObject();
 		if (obj instanceof VmMethod) {
 			return (VmMethod)obj;
 		} else if (obj == null) {
@@ -68,8 +70,8 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf Stackframe pointer
 	 * @return the pc
 	 */
-	final int getPC(VmAddress sf) {
-		return Unsafe.getInt(sf, getPCOffset(sf));
+	final int getPC(Address sf) {
+		return sf.loadInt(getPCOffset(sf));
 	}
 
 	/**
@@ -77,8 +79,8 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf Stackframe pointer
 	 * @param pc
 	 */
-	final void setPC(VmAddress sf, int pc) {
-		Unsafe.setInt(sf, getPCOffset(sf), pc);
+	final void setPC(Address sf, int pc) {
+		sf.store(pc, getPCOffset(sf));
 	}
 
 	/**
@@ -86,8 +88,8 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf Stackframe pointer
 	 * @return The magic
 	 */
-	final int getMagic(VmAddress sf) {
-		return Unsafe.getInt(sf, getMagicOffset(sf));
+	final int getMagic(Address sf) {
+		return sf.loadInt(getMagicOffset(sf));
 	}
 
 	/**
@@ -95,8 +97,8 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf Stackframe pointer
 	 * @return The address
 	 */
-	final VmAddress getReturnAddress(VmAddress sf) {
-		return Unsafe.getAddress(sf, getReturnAddressOffset(sf));
+	final Address getReturnAddress(Address sf) {
+		return sf.loadAddress(getReturnAddressOffset(sf));
 	}
 
 	/**
@@ -104,7 +106,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf
 	 * @return boolean
 	 */
-	final boolean isValid(VmAddress sf) {
+	final boolean isValid(Address sf) {
 		if (sf == null) {
 			return false;
 		}
@@ -123,7 +125,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf
 	 * @return boolean
 	 */
-	final boolean isStackBottom(VmAddress sf) {
+	final boolean isStackBottom(Address sf) {
 		if (sf == null) {
 			return true;
 		}
@@ -139,10 +141,10 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param limit Maximum length of returned array.
 	 * @return VmStackFrame[]
 	 */
-	final VmStackFrame[] getVmStackTrace(VmAddress argFrame, VmAddress ip, int limit) {
+	final VmStackFrame[] getVmStackTrace(Address argFrame, Address ip, int limit) {
 
-		final VmAddress frame = argFrame;
-		VmAddress f = frame;
+		final Address frame = argFrame;
+		Address f = frame;
 		int count = 0;
 		while (isValid(f) && (count < limit)) {
 			count++;
@@ -162,7 +164,7 @@ public abstract class VmStackReader extends VmSystemObject {
 			stack[i] = new VmStackFrame(f, this, ip);
 			// Subtract 1, because the return address is directly after
 			// the location where the previous frame was executing.
-			ip = VmAddress.add(stack[i].getReturnAddress(), -1);
+			ip = stack[i].getReturnAddress().add(-1);
 			f = getPrevious(f);
 		}
 
@@ -174,7 +176,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf
 	 * @return int
 	 */
-	final int countStackFrames(VmAddress sf) {
+	final int countStackFrames(Address sf) {
 		int count = 0;
 		while (isValid(sf)) {
 			count++;
@@ -187,7 +189,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * Show the current stacktrace using Screen.debug.
 	 */	
 	public final void debugStackTrace() {
-		VmAddress f = Unsafe.getCurrentFrame();
+		Address f = Unsafe.getCurrentFrame();
 		Unsafe.debug("Debug stacktrace: ");
 		boolean first = true;
 		int max = 20;
@@ -217,7 +219,7 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * Show the stacktrace of the given thread using Screen.debug.
 	 */	
 	public final void debugStackTrace(VmThread thread) throws UninterruptiblePragma {
-		VmAddress f = thread.getStackFrame();
+		Address f = thread.getStackFrame();
 		Unsafe.debug("Debug stacktrace: ");
 		boolean first = true;
 		int max = 20;
@@ -248,33 +250,33 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @param sf The stackframe to get the previous frame from.
 	 * @return The previous frame or null.
 	 */
-	protected abstract int getPreviousOffset(VmAddress sf);
+	protected abstract Offset getPreviousOffset(Address sf);
 
 	/**
 	 * Gets the offset within the stackframe of method.
 	 * @param sf Stackframe pointer
 	 * @return The method offset
 	 */
-	protected abstract int getMethodOffset(VmAddress sf);
+	protected abstract Offset getMethodOffset(Address sf);
 
 	/**
 	 * Gets the offset within the stackframe of java program counter.
 	 * @param sf Stackframe pointer
 	 * @return The pc offset
 	 */
-	protected abstract int getPCOffset(VmAddress sf);
+	protected abstract Offset getPCOffset(Address sf);
 
 	/**
 	 * Gets the offset within the stackframe of the magic constant.
 	 * @param sf Stackframe pointer
 	 * @return The magic offset
 	 */
-	protected abstract int getMagicOffset(VmAddress sf);
+	protected abstract Offset getMagicOffset(Address sf);
 
 	/**
 	 * Gets the offset within the stackframe of the return address.
 	 * @param sf Stackframe pointer
 	 * @return The return address offset
 	 */
-	protected abstract int getReturnAddressOffset(VmAddress sf);
+	protected abstract Offset getReturnAddressOffset(Address sf);
 }

@@ -762,4 +762,44 @@ public final class Address {
      */
     public void store(short value, Offset offset) {
     }
+    
+    /**
+     * Performs an atomic add bewteen the word in the memory location pointed to by the
+     * current instance and the given word.
+     * The result is stored in the memory location pointed to by the current instance.
+     * 
+     * @param value
+     */
+    public void atomicAdd(Word value) {    	
+    }
+
+    /**
+     * Performs an atomic and bewteen the word in the memory location pointed to by the
+     * current instance and the given word.
+     * The result is stored in the memory location pointed to by the current instance.
+     * 
+     * @param value
+     */
+    public void atomicAnd(Word value) {    	
+    }
+
+    /**
+     * Performs an atomic or bewteen the word in the memory location pointed to by the
+     * current instance and the given word.
+     * The result is stored in the memory location pointed to by the current instance.
+     * 
+     * @param value
+     */
+    public void atomicOr(Word value) {    	
+    }
+
+    /**
+     * Performs an atomic or bewteen the word in the memory location pointed to by the
+     * current instance and the given word.
+     * The result is stored in the memory location pointed to by the current instance.
+     * 
+     * @param value
+     */
+    public void atomicSub(Word value) {    	
+    }
 }

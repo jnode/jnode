@@ -24,6 +24,7 @@ import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
+import org.vmmagic.unboxed.Address;
 
 /**
  * A VmFrame is the execution frame (locals & stack) for a method during
@@ -46,16 +47,16 @@ public final class VmStackFrame extends VmSystemObject {
 	/** A magic value used to detect stack errors */
 	private final int sfMagic;
 	/** A reference to the return address */
-	private final VmAddress sfReturnAddress;
+	private final Address sfReturnAddress;
 	/** A reference to instruction pointer of this frame */
-	private final VmAddress sfInstructionPointer;
+	private final Address sfInstructionPointer;
 	
 	/**
 	 * Initialize this instance.
 	 * @param src
 	 * @param reader
 	 */
-	VmStackFrame(VmAddress src, VmStackReader reader, VmAddress ip) {
+	VmStackFrame(Address src, VmStackReader reader, Address ip) {
 		this.sfMethod = reader.getMethod(src);
 		this.sfPc = reader.getPC(src);
 		this.sfMagic = reader.getMagic(src);
@@ -95,7 +96,7 @@ public final class VmStackFrame extends VmSystemObject {
 	/**
 	 * @return Returns the returnAddress.
 	 */
-	public final VmAddress getReturnAddress() {
+	public final Address getReturnAddress() {
 		return this.sfReturnAddress;
 	}
 	
@@ -114,7 +115,7 @@ public final class VmStackFrame extends VmSystemObject {
 		} else {
 			final VmCompiledCode cc = sfMethod.getCompiledCode(getMagic());
 			if ((cc != null) && (sfInstructionPointer != null)) {
-				return cc.getLocationInfo(sfMethod, sfInstructionPointer);
+				return cc.getLocationInfo(sfMethod, sfInstructionPointer.toAddress());
 			} else {
 				return "?";
 			}

@@ -623,6 +623,22 @@ final class MagicHelper extends BaseX86MagicHelper {
             obj.release(ec);
             vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, r));
         } break;
+        case mATOMICADD: 
+        case mATOMICAND: 
+        case mATOMICOR:
+        case mATOMICSUB: {
+            if (Vm.VerifyAssertions) Vm._assert(!isstatic);
+            final RefItem value = vstack.popRef();
+            final RefItem addr = vstack.popRef();
+            value.load(ec);
+            addr.load(ec);
+            final Register valuer = value.getRegister();
+            final Register r = addr.getRegister();
+            os.writePrefix(X86Constants.LOCK_PREFIX);
+            os.writeArithOp(methodCodeToOperation(mcode), r, 0, valuer);
+            value.release(ec);
+            addr.release(ec);
+        } break;
             
         default:
             throw new InternalError("Unknown method code for method " + method);

@@ -431,7 +431,7 @@ Q43org5jnode2vm6Unsafe23outPortDword2e28II29V:
 	ret 8
 
 ; VmAddress getCurrentFrame()	
-Q43org5jnode2vm6Unsafe23getCurrentFrame2e2829Lorg2fjnode2fvm2fVmAddress3b:
+Q43org5jnode2vm6Unsafe23getCurrentFrame2e2829Lorg2fvmmagic2funboxed2fAddress3b:
 	mov eax,ebp
 	ret
 	
@@ -544,27 +544,6 @@ Q43org5jnode2vm6Unsafe23atomicCompareAndSwap2e28Lorg2fjnode2fvm2fVmAddress3bII29
 cas_not_ok:
 	xor eax,eax
 	ret 12
-
-; protected static native boolean atomicAnd(VmAddress address, int value)
-Q43org5jnode2vm6Unsafe23atomicAnd2e28Lorg2fjnode2fvm2fVmAddress3bI29Z:
-	mov ecx,[esp+4] ; value
-	mov edx,[esp+8] ; address
-	lock and dword [edx], ecx
-	ret 8
-
-; protected static native boolean atomicOr(VmAddress address, int value)
-Q43org5jnode2vm6Unsafe23atomicOr2e28Lorg2fjnode2fvm2fVmAddress3bI29Z:
-	mov ecx,[esp+4] ; value
-	mov edx,[esp+8] ; address
-	lock or dword [edx], ecx
-	ret 8
-
-; protected static native boolean atomicSub(VmAddress address, int value)
-Q43org5jnode2vm6Unsafe23atomicSub2e28Lorg2fjnode2fvm2fVmAddress3bI29Z:
-	mov ecx,[esp+4] ; value
-	mov edx,[esp+8] ; address
-	lock sub dword [edx], ecx
-	ret 8
 
 ; public static native VmAddress getMaxAddress()
 Q43org5jnode2vm6Unsafe23getMaxAddress2e2829Lorg2fjnode2fvm2fVmAddress3b:

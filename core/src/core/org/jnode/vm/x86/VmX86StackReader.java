@@ -3,8 +3,9 @@
  */
 package org.jnode.vm.x86;
 
-import org.jnode.vm.VmAddress;
 import org.jnode.vm.VmStackReader;
+import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Offset;
 
 /**
  * Stack frame reader for the X86 architecture.
@@ -46,40 +47,40 @@ public class VmX86StackReader extends VmStackReader {
 	 * @param sf
 	 * @return The offset of he magic in the given stackframe
 	 */
-	protected int getMagicOffset(VmAddress sf) {
-		return MAGIC_OFFSET;
+	protected Offset getMagicOffset(Address sf) {
+		return Offset.fromIntSignExtend(MAGIC_OFFSET);
 	}
 
 	/**
 	 * @param sf
 	 * @return int
 	 */
-	protected int getMethodOffset(VmAddress sf) {
-		return METHOD_OFFSET;
+	protected Offset getMethodOffset(Address sf) {
+		return Offset.fromIntSignExtend(METHOD_OFFSET);
 	}
 
 	/**
 	 * @param sf
 	 * @return int
 	 */
-	protected final int getPCOffset(VmAddress sf) {
-		return 0xFFFFFFFF;//PC_OFFSET;
+	protected final Offset getPCOffset(Address sf) {
+		return Offset.fromIntSignExtend(0xFFFFFFFF);//PC_OFFSET;
 	}
 
 	/**
 	 * @param sf
 	 * @return int
 	 */
-	protected int getPreviousOffset(VmAddress sf) {
-		return PREVIOUS_OFFSET;
+	protected Offset getPreviousOffset(Address sf) {
+		return Offset.fromIntSignExtend(PREVIOUS_OFFSET);
 	}
 
 	/**
 	 * @param sf
 	 * @return int
 	 */
-	protected int getReturnAddressOffset(VmAddress sf) {
-		return RETURNADDRESS_OFFSET;
+	protected Offset getReturnAddressOffset(Address sf) {
+		return Offset.fromIntSignExtend(RETURNADDRESS_OFFSET);
 	}
 
 }
