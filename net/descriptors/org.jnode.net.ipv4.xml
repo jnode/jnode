@@ -17,6 +17,7 @@
   <runtime>
     <library name="jnode-net.jar">
       <export name="org.jnode.net.ipv4.bootp.*"/>
+      <export name="org.jnode.net.ipv4.dhcp.*"/>
       <export name="org.jnode.net.ipv4.icmp.*"/>
       <export name="org.jnode.net.ipv4.layer.*"/>
       <export name="org.jnode.net.ipv4.raw.*"/>
