@@ -64,7 +64,7 @@ public class MappedBlockDeviceSupport extends Device implements BlockDeviceAPI {
 			throw new IOException("Out of mapping: length < 0");
 		}
 		if (devOffset + length > this.length) {
-			throw new IOException("Out of mapping: devOffset + length > this.length");
+			throw new IOException("Out of mapping: devOffset(" + devOffset + ") + length(" + length + ") > this.length(" + this.length + ")");
 		}
 		parentApi.read(offset + devOffset, dest, destOffset, length);
 	}
@@ -85,7 +85,7 @@ public class MappedBlockDeviceSupport extends Device implements BlockDeviceAPI {
 			throw new IOException("Out of mapping: length < 0");
 		}
 		if (devOffset + length > this.length) {
-			throw new IOException("Out of mapping: devOffset + length > this.length");
+			throw new IOException("Out of mapping: devOffset(" + devOffset + ") + length(" + length + ") > this.length(" + this.length + ")");
 		}
 		parentApi.write(offset + devOffset, src, srcOffset, length);
 	}
