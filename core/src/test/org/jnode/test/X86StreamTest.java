@@ -42,6 +42,7 @@ public class X86StreamTest {
 		os.writeCMP(Register.EAX, 4, Register.ECX);
 		os.writePrefix(X86Constants.FS_PREFIX);
 		os.writeCMP_MEM(Register.ESP, 24);
+		os.writeMOV_Const(Register.ESP, 4, 24);
 		
 		FileOutputStream fos = new FileOutputStream("test.bin");
 		os.writeTo(fos);
