@@ -1007,11 +1007,22 @@ public abstract class VmType extends VmSystemObject implements Uninterruptible {
         VmField f = getDeclaredField(name, signature);
         if (f != null) {
             return f;
-        } else if (superClass != null) {
-            return superClass.getField(name, signature);
-        } else {
-            return null;
         }
+        if (superClass != null) {
+            f = superClass.getField(name, signature);
+            if (f != null) {
+                return f;
+            }
+        }
+        final int cnt = getNoInterfaces();
+        for (int i = 0; i < cnt; i++) {
+            f = allInterfaceTable[i].getField(name, signature);
+            if (f != null) {
+                return f;
+            }
+        }
+        
+        return null;
     }
 
     /**
