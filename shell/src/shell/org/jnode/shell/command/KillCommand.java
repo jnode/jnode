@@ -32,7 +32,9 @@ import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
 import org.jnode.shell.help.Parameter;
 
-
+/**
+ * @author Andreas H\u00e4nel
+ */
 public class KillCommand implements Command{
 	
 	 static IntegerArgument ARG_THREADID = new IntegerArgument("id", "the id of the thread to kill");
@@ -86,7 +88,7 @@ public class KillCommand implements Command{
 		for (int i = 0; i < gmax; i++) {
 			final ThreadGroup tg = tgs[i];
 			if (tg != null) {
-				kill(tg, id,out);
+				kill(tg, id, out);
 			}
 		}
 	
