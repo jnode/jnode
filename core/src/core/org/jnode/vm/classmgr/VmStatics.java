@@ -310,7 +310,22 @@ public final class VmStatics extends VmSystemObject {
 				}
 			}
 		} else {
-			throw new RuntimeException("SlotSize != 1 not implemented yet");
+            for (int i = 0; i < length; i++) {
+                final byte type = types[i];
+                if (type == visitType) {
+                    final Object object;
+                    final long lsb = table[i+0] & 0xFFFFFFFFL;
+                    final long msb = table[i+1] & 0xFFFFFFFFL;
+                    i++;
+                    object = Address.fromLong(lsb | (msb << 32)).toObjectReference().toObject();
+                    if (object != null) {
+                        final boolean rc = visitor.visit(object);
+                        if (!rc) {
+                            return false;
+                        }
+                    }
+                }
+            }
 		}
         return true;
 	}

@@ -29,6 +29,7 @@ import org.jnode.vm.memmgr.HeapHelper;
 import org.vmmagic.pragma.Uninterruptible;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Offset;
 import org.vmmagic.unboxed.Word;
@@ -186,7 +187,7 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * Gets the size of free memory in this heap in bytes
 	 * @return size
 	 */
-	protected abstract int getFreeSize();
+	protected abstract Extent getFreeSize();
 	
 	/**
 	 * Join all adjacent free spaces.

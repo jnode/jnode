@@ -34,6 +34,10 @@ public final class Address {
         return null;
     }
 
+    public static Address fromLong(long address) {
+        return null;
+    }
+
     public static Address fromIntSignExtend(int address) {
         return null;
     }
