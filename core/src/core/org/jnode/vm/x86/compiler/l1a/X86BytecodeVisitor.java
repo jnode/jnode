@@ -1678,7 +1678,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
             break;
         case Item.CONSTANT:
             int c2 = v2.getValue();
-            os.writeCMP(r1, c2);
+            os.writeCMP_Const(r1, c2);
             break;
         }
         v1.release(eContext);
@@ -2689,7 +2689,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         key.release(eContext);
 
         for (int i = 0; i < n; i++) {
-            os.writeCMP(r, matchValues[ i]);
+            os.writeCMP_Const(r, matchValues[ i]);
             os.writeJCC(helper.getInstrLabel(addresses[ i]), X86Constants.JE); // JE
         }
         os.writeJMP(helper.getInstrLabel(defAddress));
@@ -2758,7 +2758,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         helper.writePOP(Register.ECX); // Value 2
         helper.writePOP64(Register.EAX, Register.EDX); // Value 1
         os.writeAND(Register.ECX, 63);
-        os.writeCMP(Register.ECX, 32);
+        os.writeCMP_Const(Register.ECX, 32);
         Label gt32Label = new Label(curInstrLabel + "gt32");
         Label endLabel = new Label(curInstrLabel + "end");
         os.writeJCC(gt32Label, X86Constants.JAE); // JAE
@@ -2790,7 +2790,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         helper.writePOP(Register.ECX); // Value 2
         helper.writePOP64(Register.EAX, Register.EDX); // Value 1
         os.writeAND(Register.ECX, 63);
-        os.writeCMP(Register.ECX, 32);
+        os.writeCMP_Const(Register.ECX, 32);
         Label gt32Label = new Label(curInstrLabel + "gt32");
         Label endLabel = new Label(curInstrLabel + "end");
         os.writeJCC(gt32Label, X86Constants.JAE); // JAE
@@ -2857,7 +2857,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         helper.writePOP(Register.ECX); // Value 2
         helper.writePOP64(Register.EAX, Register.EDX); // Value 1
         os.writeAND(Register.ECX, 63);
-        os.writeCMP(Register.ECX, 32);
+        os.writeCMP_Const(Register.ECX, 32);
         Label gt32Label = new Label(curInstrLabel + "gt32");
         Label endLabel = new Label(curInstrLabel + "end");
         os.writeJCC(gt32Label, X86Constants.JAE); // JAE
@@ -3229,7 +3229,7 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
         //TODO: port optimized version of L1
         // Space wasting, but simple implementation
         for (int i = 0; i < n; i++) {
-            os.writeCMP(r, lowValue + i);
+            os.writeCMP_Const(r, lowValue + i);
             os.writeJCC(helper.getInstrLabel(addresses[ i]), X86Constants.JE); // JE
         }
         os.writeJMP(helper.getInstrLabel(defAddress));
