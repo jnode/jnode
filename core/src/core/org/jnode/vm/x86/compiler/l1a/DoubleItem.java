@@ -42,6 +42,40 @@ final class DoubleItem extends Item implements X86CompilerConstants  {
 //		notImplemented();
 //	}
 
+	/* (non-Javadoc)
+	 * @see org.jnode.vm.x86.compiler.l1a.Item#clone()
+	 */
+	Item clone(EmitterContext ec) {
+		Item res = null;
+		switch (getKind()) {
+			case REGISTER:
+				//TODO
+				notImplemented();
+				break;
+				
+			case LOCAL:
+				//TODO
+				notImplemented();
+				break;
+				
+			case CONSTANT:
+				//TODO
+				notImplemented();
+				break;
+				
+			case FREGISTER:
+				//TODO
+				notImplemented();
+				break;
+			
+			case STACK:
+				//TODO
+				notImplemented();
+				break;
+		}
+		return res;
+	}
+
 	/**
 	 * @see org.jnode.vm.x86.compiler.l1a.Item#push(EmitterContext)
 	 */

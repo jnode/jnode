@@ -74,7 +74,7 @@ final class VirtualStack {
 		Item i = stack[tos];
 		stack[tos] =null;
 		if (i.getType() != type)
-			throw new VerifyError();
+			throw new VerifyError("Expected:"+Integer.toString(type)+" Actual:"+Integer.toString(i.getType()));
 		return i;
 	}
 	

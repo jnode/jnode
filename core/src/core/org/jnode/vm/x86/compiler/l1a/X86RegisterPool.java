@@ -137,6 +137,7 @@ final class X86RegisterPool extends org.jnode.vm.compiler.ir.RegisterPool {
 	 */
 	public void release(Object register) {
 		registers.add(register);
+		allocated.remove(register);
 	}
 
 	/* (non-Javadoc)
