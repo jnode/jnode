@@ -160,6 +160,7 @@ public final class VmSystem {
     public static Properties getInitProperties() {
 
         final String arch;
+        final Vm vm = Vm.getVm();
         arch = Unsafe.getCurrentProcessor().getArchitecture().getName();
         Unsafe.debug("arch=");
         Unsafe.debug(arch);
@@ -172,7 +173,7 @@ public final class VmSystem {
         res.put("java.vm.specification.version", "1.4");
         res.put("java.vm.specification.vendor", "JNode.org");
         res.put("java.vm.specification.name", "jnode");
-        res.put("java.vm.version", "0.1.5");
+        res.put("java.vm.version", vm.getVersion());
         res.put("java.vm.vendor", "JNode.org");
         res.put("java.vm.name", "JNode");
         res.put("java.class.version", "1.1");
@@ -183,7 +184,7 @@ public final class VmSystem {
         res.put("java.ext.dirs", "");
         res.put("os.name", "JNode");
         res.put("os.arch", arch);
-        res.put("os.version", "0.1.5");
+        res.put("os.version", vm.getVersion());
         res.put("file.separator", "/");
         res.put("path.separator", ":");
         res.put("line.separator", "\n");

@@ -61,7 +61,7 @@ public abstract class AbstractAsmConstBuilder {
 		final VmArchitecture arch = getArchitecture();
 		final int slotSize = arch.getReferenceSize();
 		VmSystemClassLoader cl = new VmSystemClassLoader(classesURL, arch);
-		final Vm vm = new Vm(arch, null, cl.getStatics(), false);
+		final Vm vm = new Vm("?", arch, null, cl.getStatics(), false);
 		vm.toString(); // Just to avoid compiler warnings
 		VmType.initializeForBootImage(cl);
 		long lastModified = 0;

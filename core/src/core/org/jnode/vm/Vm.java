@@ -28,6 +28,8 @@ public class Vm extends VmSystemObject {
 	private final boolean runHotMethodManager = false;
 	/** Should this VM run in debug mode? */
 	private final boolean debugMode;
+	/** Version of the OS and VM */
+	private final String version;
 	/** The statics table */
 	private final VmStatics statics;
 
@@ -36,8 +38,9 @@ public class Vm extends VmSystemObject {
 	 * 
 	 * @param arch
 	 */
-	public Vm(VmArchitecture arch, VmHeapManager heapManager, VmStatics statics, boolean debugMode) {
+	public Vm(String version, VmArchitecture arch, VmHeapManager heapManager, VmStatics statics, boolean debugMode) {
 		instance = this;
+		this.version = version;
 		this.debugMode = debugMode;
 		this.bootstrap = true;
 		this.arch = arch;
@@ -114,5 +117,13 @@ public class Vm extends VmSystemObject {
      */
     public final VmStatics getStatics() {
         return this.statics;
+    }
+    
+    /**
+     * Gets the version of the current VM.
+     * @return Returns the version.
+     */
+    public final String getVersion() {
+        return this.version;
     }
 }
