@@ -88,7 +88,7 @@ final class ItemFactory {
      */
     final LongItem createLConst(long val) {
         final LongItem item = (LongItem) getOrCreate(JvmType.LONG);
-        item.initialize(Item.Kind.CONSTANT, 0, null, null, val);
+        item.initialize(Item.Kind.CONSTANT, 0, null, null, null, val);
         return item;
     }
 
@@ -99,7 +99,7 @@ final class ItemFactory {
      */
     final DoubleItem createDConst(double val) {
         final DoubleItem item = (DoubleItem) getOrCreate(JvmType.DOUBLE);
-        item.initialize(Item.Kind.CONSTANT, 0, null, null, val);
+        item.initialize(Item.Kind.CONSTANT, 0, null, null, null, val);
         return item;
     }
 
@@ -110,7 +110,7 @@ final class ItemFactory {
      */
     public Item createStack(int jvmType) {
         final Item item = getOrCreate(jvmType);
-        item.initialize(Item.Kind.STACK, 0);
+        item.initialize(Item.Kind.STACK, 0, null);
         return item;
     }
 
@@ -121,7 +121,7 @@ final class ItemFactory {
      */
     public Item createFPUStack(int jvmType) {
         final Item item = getOrCreate(jvmType);
-        item.initialize(Item.Kind.FPUSTACK, 0);
+        item.initialize(Item.Kind.FPUSTACK, 0, null);
         return item;
     }
 
@@ -132,7 +132,18 @@ final class ItemFactory {
      */
     public Item createLocal(int jvmType, int ebpOffset) {
         final Item item = getOrCreate(jvmType);
-        item.initialize(Item.Kind.LOCAL, ebpOffset);
+        item.initialize(Item.Kind.LOCAL, ebpOffset, null);
+        return item;
+    }
+
+    /**
+     * Create an XMM item.
+     * 
+     * @param jvmType
+     */
+    public Item createLocal(int jvmType, X86Register.XMM xmm) {
+        final Item item = getOrCreate(jvmType);
+        item.initialize(Item.Kind.XMM, 0, xmm);
         return item;
     }
 
@@ -144,7 +155,7 @@ final class ItemFactory {
      */
     public WordItem createReg(int jvmType, X86Register reg) {
         final WordItem item = (WordItem) getOrCreate(jvmType);
-        item.initialize(Item.Kind.REGISTER, reg, 0);
+        item.initialize(Item.Kind.GPR, reg, 0);
         return item;
     }
 
@@ -155,9 +166,9 @@ final class ItemFactory {
      * @param lsb
      * @param msb
      */
-    public DoubleWordItem createReg(int jvmType, X86Register lsb, X86Register msb) {
+    public DoubleWordItem createReg(int jvmType, X86Register.GPR lsb, X86Register.GPR msb) {
         final DoubleWordItem item = (DoubleWordItem) getOrCreate(jvmType);
-        item.initialize(Item.Kind.REGISTER, 0, lsb, msb);
+        item.initialize(Item.Kind.GPR, 0, lsb, msb, null);
         return item;
     }
 

@@ -35,7 +35,7 @@ import org.jnode.vm.JvmType;
  * 
  * TODO: merge with l2's version of X86RegisterPool
  */
-final class X86RegisterPool {
+abstract class X86RegisterPool {
 
 	/** All available registers and their current usage */
 	private final RegisterUsage[] registers;
@@ -53,19 +53,10 @@ final class X86RegisterPool {
 
 	/**
 	 * Initialize register pool
-	 *  
+	 * The order of this array determines the cost of using the register.
+	 * The cost of a register is lower when its index in this array is higher.
 	 */
-	private final RegisterUsage[] initialize() {
-		// The order of this array determines the cost of using the register.
-		// The cost of a register is lower when its index in this
-		// array is higher.
-		return new RegisterUsage[] { new RegisterUsage(X86Register.EAX, false),
-				new RegisterUsage(X86Register.EDX, false),
-				new RegisterUsage(X86Register.ECX, false),
-				new RegisterUsage(X86Register.EBX, false),
-				new RegisterUsage(X86Register.ESI, false) };
-		// EDI always points to the statics, do not use
-	}
+	protected abstract RegisterUsage[] initialize();
 
 	/**
 	 * require a register from the pool
@@ -256,6 +247,54 @@ final class X86RegisterPool {
 		return buf.toString();
 	}
 
+	/**
+	 * Pool of GPR registers.
+	 * @author Ewout Prangsma (epr@users.sourceforge.net)
+	 */
+	public static final class GPRs extends X86RegisterPool {
+
+		/**
+		 * Initialize register pool
+		 */
+		protected RegisterUsage[] initialize() {
+			// The order of this array determines the cost of using the register.
+			// The cost of a register is lower when its index in this
+			// array is higher.
+			return new RegisterUsage[] { new RegisterUsage(X86Register.EAX, false),
+					new RegisterUsage(X86Register.EDX, false),
+					new RegisterUsage(X86Register.ECX, false),
+					new RegisterUsage(X86Register.EBX, false),
+					new RegisterUsage(X86Register.ESI, false) };
+			// EDI always points to the statics, do not use
+		}
+		
+	}
+	
+	/**
+	 * Pool of XMM registers.
+	 * @author Ewout Prangsma (epr@users.sourceforge.net)
+	 */
+	public static final class XMMs extends X86RegisterPool {
+
+		/**
+		 * Initialize register pool
+		 */
+		protected RegisterUsage[] initialize() {
+			// The order of this array determines the cost of using the register.
+			// The cost of a register is lower when its index in this
+			// array is higher.
+			return new RegisterUsage[] { 
+					new RegisterUsage(X86Register.XMM0, false),
+					new RegisterUsage(X86Register.XMM1, false),
+					new RegisterUsage(X86Register.XMM2, false),
+					new RegisterUsage(X86Register.XMM3, false),
+					new RegisterUsage(X86Register.XMM4, false),
+					new RegisterUsage(X86Register.XMM5, false),
+					new RegisterUsage(X86Register.XMM6, false),
+					new RegisterUsage(X86Register.XMM7, false) };
+		}		
+	}
+	
 	/**
 	 * Register usage information for a single register.
 	 * 

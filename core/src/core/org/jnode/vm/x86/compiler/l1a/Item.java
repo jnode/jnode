@@ -40,32 +40,39 @@ import org.jnode.vm.Vm;
 abstract class Item {
 
 	/**
-	 * Description of the virtual stack entry kind - STACK: the item is on the
-	 * stack - REGISTER: a register contains the item - FREGISTER: a fpu
-	 * register contains the item - LOCAL: a local variable contains the item -
-	 * CONSTANT: the item is a constant
-	 * 
+	 * Description of the virtual stack entry kind;
+	 *  
 	 * An item has only one kind; flags are used for masking purposes (detect
 	 * multiple kinds in one operation)
 	 */
 	static class Kind {
 
-		static final int STACK = 0x1;
+		/** Item is on the stack */
+		static final int STACK = 0x01;
 
-		static final int REGISTER = 0x2;
+		/** Item is in a general purpose register */
+		static final int GPR = 0x02;
+		
+		/** Item is in a SSE register */
+		static final int XMM = 0x04;
 
-		static final int FPUSTACK = 0x4;
+		/** Item is on the FPU stack */
+		static final int FPUSTACK = 0x08;
 
-		static final int LOCAL = 0x8;
+		/** Item is a local variable (EBP relative) */
+		static final int LOCAL = 0x10;
 
-		static final int CONSTANT = 0x10;
+		/** Item is constant */
+		static final int CONSTANT = 0x20;
 
 		public static final String toString(int kind) {
 			switch (kind) {
 			case STACK:
 				return "STACK";
-			case REGISTER:
-				return "REG";
+			case GPR:
+				return "GPR";
+			case XMM:
+				return "XMM";
 			case FPUSTACK:
 				return "FPU";
 			case LOCAL:
@@ -83,8 +90,13 @@ abstract class Item {
 	 */
 	protected int kind; // entry kind
 
-	protected int offsetToFP; // kind == local only
+	/** Only valid for (kind == local) */
+	protected int offsetToFP; 
+	
+	/** Only valid for (kind == xmm) */
+	protected X86Register.XMM xmm;
 
+	/** The factory that created me */
 	protected final ItemFactory factory;
 	
 	/**
@@ -105,11 +117,13 @@ abstract class Item {
 	 * 
 	 * @param kind
 	 * @param offsetToFP
+	 * @param xmm
 	 */
-	protected final void initialize(int kind, int offsetToFP) {
+	protected final void initialize(int kind, int offsetToFP, X86Register.XMM xmm) {
 	    if (Vm.VerifyAssertions) Vm._assert(kind > 0, "Invalid kind");
 		this.kind = kind;
 		this.offsetToFP = offsetToFP;		
+		this.xmm = xmm;
 	}
 
 	/**
@@ -127,7 +141,7 @@ abstract class Item {
 	abstract int getType();
 
 	/**
-	 * Get the item kind (STACK, REGISTER, ....)
+	 * Get the item kind (STACK, GPR, ....)
 	 * 
 	 * @return the item kind
 	 */
@@ -135,22 +149,32 @@ abstract class Item {
 		return kind;
 	}
 
+	/** Is this item on the stack */
 	final boolean isStack() {
 		return (kind == Kind.STACK);
 	}
 
-	final boolean isRegister() {
-		return (kind == Kind.REGISTER);
+	/** Is this item in a general purpose register */
+	final boolean isGPR() {
+		return (kind == Kind.GPR);
 	}
 
+	/** Is this item in a SSE register */
+	final boolean isXMM() {
+		return (kind == Kind.XMM);
+	}
+
+	/** Is this item on the FPU stack */
 	final boolean isFPUStack() {
 		return (kind == Kind.FPUSTACK);
 	}
 
+	/** Is this item a local variable */
 	final boolean isLocal() {
 		return (kind == Kind.LOCAL);
 	}
 
+	/** Is this item a constant */
 	final boolean isConstant() {
 		return (kind == Kind.CONSTANT);
 	}
@@ -175,6 +199,16 @@ abstract class Item {
 	int getOffsetToFP() {
 	    if (Vm.VerifyAssertions) Vm._assert(kind == Kind.LOCAL, "kind == Kind.LOCAL");
 		return offsetToFP;
+	}
+	
+	/**
+	 * Gets the xmm register containing this item.
+	 * This is only valid if this item has a XMM kind.
+	 * @return
+	 */
+	final X86Register.XMM getXMM() {
+	    if (Vm.VerifyAssertions) Vm._assert(isXMM(), "kind == Kind.XMM");
+		return xmm;		
 	}
 
 	/**
@@ -204,12 +238,29 @@ abstract class Item {
 	abstract void loadToGPR(EmitterContext ec);
 
 	/**
+	 * Load this item to an XMM register.
+	 * 
+	 * @param ec
+	 */
+	abstract void loadToXMM(EmitterContext ec);
+
+	/**
 	 * Load item into a register / two registers / an FPU register depending on
 	 * its type, if its kind matches the mask
 	 */
 	final void loadIf(EmitterContext eContext, int mask) {
-		if ((kind & mask) > 0)
+		if ((kind & mask) > 0) {
 			load(eContext);
+		}
+	}
+
+	/**
+	 * Load item into an XMM register if its kind matches the mask
+	 */
+	final void loadToXMMIf(EmitterContext eContext, int mask) {
+		if ((kind & mask) > 0) {
+			loadToXMM(eContext);
+		}
 	}
 
 	/**
