@@ -31,6 +31,7 @@ import org.jnode.util.BootableArrayList;
 import org.jnode.util.Counter;
 import org.jnode.util.Statistic;
 import org.jnode.util.Statistics;
+import org.jnode.vm.classmgr.CompiledCodeList;
 import org.jnode.vm.classmgr.VmAtom;
 import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.compiler.HotMethodManager;
@@ -70,6 +71,8 @@ public class Vm extends VmSystemObject implements Statistics {
     private final SpinLock allThreadsLock;
     /** List of all threads */
     private final VmThreadQueue.AllThreadsQueue allThreads;
+    /** List of all compiled methods */
+    private final CompiledCodeList compiledMethods;
 	
 	/** Should assertions be verified? */
 	public static final boolean VerifyAssertions = true;
@@ -93,6 +96,7 @@ public class Vm extends VmSystemObject implements Statistics {
 		this.atomManager = new VmAtom.Manager();
         this.allThreadsLock = new SpinLock();
         this.allThreads = new VmThreadQueue.AllThreadsQueue("all");
+        this.compiledMethods = new CompiledCodeList();
 	}
 
 	/**
@@ -397,5 +401,13 @@ public class Vm extends VmSystemObject implements Statistics {
         } finally {
             lock.unlock();
         }
+    }
+    
+    /**
+     * Gets the list of compiled methods.
+     * @return Returns the compiledMethods.
+     */
+    public static final CompiledCodeList getCompiledMethods() {
+        return instance.compiledMethods;
     }
 }

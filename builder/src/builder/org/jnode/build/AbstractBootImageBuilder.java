@@ -68,6 +68,7 @@ import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassType;
+import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmMethodCode;
 import org.jnode.vm.classmgr.VmNormalClass;
@@ -228,6 +229,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                         Project.MSG_INFO);
             }
         } while ((oldCount != newCount) || again);
+        log("End of compileClasses", Project.MSG_VERBOSE);
     }
 
     /**
@@ -358,6 +360,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             final Vm vm = new Vm(version, arch, new DefaultHeapManager(clsMgr,
                     helper), clsMgr.getStatics(), debug);
             blockedObjects.add(vm);
+            blockedObjects.add(Vm.getCompiledMethods());
 
             final VmProcessor proc = createProcessor(clsMgr.getStatics());
             log("Building for " + proc.getCPUID());
@@ -392,6 +395,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             loadClass(Vm.getHeapManager().getClass());
             loadClass(HeapHelper.class);
             loadClass(HeapHelperImpl.class);
+            loadClass(Vm.getCompiledMethods().getClass());
+            loadClass(VmCompiledCode[].class);
 
             loadSystemClasses();
 
@@ -429,9 +434,17 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             clsMgr.setFailOnNewLoad(true);
             emitObjects(os, arch, blockedObjects, false);
 
-            // Emit the classmanager
+            // Emit the vm
             log("Emit vm", Project.MSG_VERBOSE);
             blockedObjects.remove(vm);
+            emitObjects(os, arch, blockedObjects, false);
+            // Twice, this is intended!
+            emitObjects(os, arch, blockedObjects, false);
+
+            // Emit the compiled method list
+            log("Emit compiled methods", Project.MSG_VERBOSE);
+            blockedObjects.remove(Vm.getCompiledMethods());
+            final int compiledMethods = Vm.getCompiledMethods().size();
             emitObjects(os, arch, blockedObjects, false);
             // Twice, this is intended!
             emitObjects(os, arch, blockedObjects, false);
@@ -466,7 +479,12 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             log("statics table 0x"
                     + NumberUtils.hex(os.getObjectRef(
                             clsMgr.getStatics().getTable()).getOffset()),
-                    Project.MSG_VERBOSE);
+                    Project.MSG_INFO);
+            
+            // Verify no methods have been compiled after we wrote the CompiledCodeList.
+            if (Vm.getCompiledMethods().size() != compiledMethods) {
+                throw new BuildException("Method have been compiled after CompiledCodeList was written.");
+            }
 
             /* Write static initializer code */
             emitStaticInitializerCalls(os, bootClasses, clInitCaller);
@@ -644,7 +662,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             }
             if (blockObjects == null) {
                 log("Emitted classes: " + emittedClassNames,
-                        Project.MSG_VERBOSE);
+                        Project.MSG_INFO);
             }
         } catch (ClassNotFoundException ex) {
             throw new BuildException(ex);

@@ -21,6 +21,7 @@
  
 package org.jnode.vm;
 
+import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmType;
 import org.vmmagic.pragma.UninterruptiblePragma;
@@ -53,17 +54,18 @@ public abstract class VmStackReader extends VmSystemObject {
 	 * @return The method
 	 */
 	final VmMethod getMethod(Address sf) {
-		final Object obj = sf.loadObjectReference(getMethodOffset(sf)).toObject();
-		if (obj instanceof VmMethod) {
-			return (VmMethod)obj;
-		} else if (obj == null) {
-			return null;			
-		} else {
-			Unsafe.debug("Method on stacktrace is not instanceof VmMethod but ");
-			Unsafe.debug(obj.getClass().getName());
-			Unsafe.die("Fatal stack error");
-			return null;
-		}
+        final int ccid = sf.loadInt(getMethodIdOffset(sf));
+        if (ccid == 0) {
+            return null;
+        } else {
+            final VmCompiledCode cc = Vm.getCompiledMethods().get(ccid);
+            if (cc == null) {
+                Unsafe.die("Unknown ccid found on stack");
+                return null;
+            } else {
+                return cc.getMethod();
+            }
+        }
 	}
 
 	/**
@@ -254,11 +256,11 @@ public abstract class VmStackReader extends VmSystemObject {
 	protected abstract Offset getPreviousOffset(Address sf);
 
 	/**
-	 * Gets the offset within the stackframe of method.
+	 * Gets the offset within the stackframe of compiled method id.
 	 * @param sf Stackframe pointer
-	 * @return The method offset
+	 * @return The method id offset
 	 */
-	protected abstract Offset getMethodOffset(Address sf);
+	protected abstract Offset getMethodIdOffset(Address sf);
 
 	/**
 	 * Gets the offset within the stackframe of java program counter.

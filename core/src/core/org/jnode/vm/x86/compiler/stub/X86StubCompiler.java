@@ -27,6 +27,7 @@ import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.vm.Unsafe;
+import org.jnode.vm.Vm;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.compiler.CompiledMethod;
@@ -64,7 +65,7 @@ public class X86StubCompiler extends AbstractX86Compiler {
 		} else {
 			// Only set the code address of the interpreter
 			final Address intrAddr = Unsafe.getJumpTableEntry(X86JumpTable.VM_INVOKE_METHOD_AFTER_RECOMPILE_IDX);
-			final VmCompiledCode code = new VmCompiledCode(this, null, intrAddr.toAddress(), null, 0, null, null, null);
+			final VmCompiledCode code = Vm.getCompiledMethods().createCompiledCode(null, method, this, null, intrAddr.toAddress(), null, 0, null, null, null);
 			method.addCompiledCode(code, level);
 		}
 	}
