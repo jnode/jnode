@@ -13,7 +13,6 @@ import org.jnode.assembler.x86.X86Operation;
 import org.jnode.system.BootLog;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.SoftByteCodes;
-import org.jnode.vm.Vm;
 import org.jnode.vm.bytecode.BasicBlock;
 import org.jnode.vm.bytecode.BytecodeParser;
 import org.jnode.vm.bytecode.TypeStack;
@@ -185,30 +184,31 @@ class X86BytecodeVisitor extends InlineBytecodeVisitor implements
      * @param index
      */
     private final void checkBounds(RefItem ref, IntItem index) {
-        final Label ok = new Label(curInstrLabel + "$$cbok");
-        // CMP length, index
+        final Label test = new Label(curInstrLabel + "$$cbtest");
+        final Label failed = new Label(curInstrLabel + "$$cbfailed");
+
         assertCondition(ref.isRegister(), "ref must be in a register");
         final Register refr = ref.getRegister();
+        
+        os.writeJMP(test);
+        os.setObjectRef(failed);
+    	// Call SoftByteCodes.throwArrayOutOfBounds
+    	os.writePUSH(refr);
+    	if (index.isConstant()) {
+    		os.writePUSH(index.getValue());
+    	} else {
+    		os.writePUSH(index.getRegister());
+    	}
+    	invokeJavaMethod(context.getThrowArrayOutOfBounds());
+        
+        // CMP length, index
+        os.setObjectRef(test);
         if (index.isConstant()) {
             os.writeCMP_Const(refr, arrayLengthOffset, index.getValue());
         } else {
             os.writeCMP(refr, arrayLengthOffset, index.getRegister());
         }
-        os.writeJCC(ok, X86Constants.JA);
-        // Signal ArrayIndexOutOfBounds
-        if (false) {
-        	os.writeINT(5); 
-        } else {
-        	// Call SoftByteCodes.throwArrayOutOfBounds
-        	os.writePUSH(refr);
-        	if (index.isConstant()) {
-        		os.writePUSH(index.getValue());
-        	} else {
-        		os.writePUSH(index.getRegister());
-        	}
-        	invokeJavaMethod(context.getThrowArrayOutOfBounds());
-        }
-        os.setObjectRef(ok);
+        os.writeJCC(failed, X86Constants.JNA);
     }
 
     /**
