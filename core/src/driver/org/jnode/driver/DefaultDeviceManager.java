@@ -439,18 +439,31 @@ public class DefaultDeviceManager implements DeviceManager,
     protected void findDevices() throws InterruptedException {
         waitUntilExtensionsLoaded();
         final ArrayList finders;
-        synchronized (this) {
-            finders = new ArrayList(this.finders);
+        synchronized( this ) {
+            finders = new ArrayList( this.finders );
         }
-        for (Iterator i = finders.iterator(); i.hasNext();) {
-            final DeviceFinder finder = (DeviceFinder) i.next();
-            try {
-                finder.findDevices(this, systemBus);
-            } catch (DeviceException ex) {
-                BootLog.error("Error while trying to find system devices", ex);
-            } catch (RuntimeException ex) {
-                BootLog.error("Runtime exception while trying to find system devices", ex);
+        for( Iterator i = finders.iterator(); i.hasNext(); ) {
+//            final DeviceFinder finder = (DeviceFinder) i.next();//this fails sometimes on my machine (5% of the time.)
+            //I can't find out why, the code below does a ClassCastTest.  Weird.
+            Object next = i.next();
+            if( next instanceof DeviceFinder ) {
+                try {
+                    DeviceFinder finder = (DeviceFinder)next;
+                    finder.findDevices( this, systemBus );
+                }
+                catch( DeviceException ex ) {
+                    BootLog.error( "Error while trying to find system devices", ex );
+                }
+                catch( RuntimeException ex ) {
+                    BootLog.error( "Runtime exception while trying to find system devices", ex );
+                }
             }
+            else{
+                String errorStr="Instance in DeviceFinder list of wrong type: "+next.getClass();
+                System.err.println( errorStr );
+                BootLog.error(errorStr );
+            }
+
         }
     }
 
