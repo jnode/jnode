@@ -120,6 +120,7 @@ final class MagicHelper extends BaseX86MagicHelper {
         case mTOWORD: 
         case mTOADDRESS:
         case mTOOFFSET: 
+        case mTOOBJECT: 
         case mTOOBJECTREFERENCE: 
         case mTOEXTENT: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);

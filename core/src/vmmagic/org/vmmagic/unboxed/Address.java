@@ -46,6 +46,10 @@ public final class Address {
         return null;
     }
 
+    public VmAddress toAddress() {
+        return null;
+    }
+
     public int toInt() {
         return 0;
     }

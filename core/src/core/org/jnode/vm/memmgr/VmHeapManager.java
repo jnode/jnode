@@ -257,4 +257,6 @@ public abstract class VmHeapManager extends VmSystemObject {
 	 * Print the statics on this object on out.
 	 */
 	public abstract void dumpStatistics(PrintStream out);
+    
+    public abstract GCStatistics getStatistics();
 }

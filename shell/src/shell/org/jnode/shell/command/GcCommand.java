@@ -8,6 +8,8 @@ import java.io.PrintStream;
 
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.*;
+import org.jnode.vm.Vm;
+import org.jnode.vm.memmgr.GCStatistics;
 
 /**
  * @author epr
@@ -42,11 +44,14 @@ public class GcCommand {
 		
 		long start = System.currentTimeMillis();
 		rt.gc();
+        GCStatistics stats = Vm.getHeapManager().getStatistics();
+        Thread.yield();
 		long end = System.currentTimeMillis();
 		
 		out.println("Memory size: " + rt.totalMemory());
 		out.println("Free memory: " + rt.freeMemory());
 		out.println("Time taken : " + (end-start) + "ms");
+        out.println("Stats      : " + stats.toString());
 	}
 
 }

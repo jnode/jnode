@@ -116,8 +116,8 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * @param addr
 	 * @return boolean
 	 */
-	protected boolean inHeap(VmAddress addr) {
-		long addrL = helper.addressToLong(addr);
+	protected boolean inHeap(Address addr) {
+		long addrL = addr.toLong();
 		return ((addrL >= startL) && (addrL < endL));
 	}
 
