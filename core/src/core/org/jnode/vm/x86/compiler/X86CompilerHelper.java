@@ -88,6 +88,14 @@ public class X86CompilerHelper extends X86StackManager implements
     }
 
     /**
+     */
+    public void startInlinedMethod(VmMethod inlinedMethod, Label curInstrLabel) {
+        this.labelPrefix = curInstrLabel + "_" + inlinedMethod + "_";
+        this.instrLabelPrefix = labelPrefix + "_bci_";
+        this.addressLabels = new Label[ inlinedMethod.getBytecodeSize()];
+    }
+
+    /**
      * Create a method relative label to a given bytecode address.
      * 
      * @param address

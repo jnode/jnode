@@ -19,7 +19,7 @@ public class InlineTestClass {
     public void foo3(int i) {
         try {
             int[] a = new int[ 50];
-            foo(a[ i - 1], a[ i]);
+            foo3(a[ i - 1], a[ i]);
         } finally {
             System.out.println("finally");
         }
@@ -28,9 +28,9 @@ public class InlineTestClass {
     public void foo() {
         int y = virtualFinalGetX();
         y += virtualNonFinalGetXa(this);
-        y += privateGetXai(this, 5);
-        y += staticGetXai(this, 3);
-        y += staticRecursiveGetXai(this, 3);
+        //y += privateGetXai(this, 5);
+        //y += staticGetXai(this, 3);
+        //y += staticRecursiveGetXai(this, 3);
     }
 
     public final int virtualFinalGetX() {
@@ -57,7 +57,7 @@ public class InlineTestClass {
         }
     }
 
-    public void foo(int a, int b) {
+    public void foo3(int a, int b) {
 
     }
 

@@ -31,9 +31,8 @@ public abstract class BytecodeVisitor {
 	public abstract void visit_dconst(double value);
 	public abstract void visit_bipush(byte value);
 	public abstract void visit_sipush(short value);
-	public abstract void visit_ldc(int cpIdx, Object value);
+	public abstract void visit_ldc(int cpIdx, String value);
 	// -- 20 --
-	public abstract void visit_ldc2(Object value);
 	public abstract void visit_iload(int index);
 	public abstract void visit_lload(int index);
 	public abstract void visit_fload(int index);
