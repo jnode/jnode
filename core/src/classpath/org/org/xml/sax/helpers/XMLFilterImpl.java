@@ -253,7 +253,7 @@ public class XMLFilterImpl
     /**
      * Set the DTD event handler.
      *
-     * @param resolver The new DTD handler.
+     * @param handler the new DTD handler
      */
     public void setDTDHandler (DTDHandler handler)
     {
@@ -275,7 +275,7 @@ public class XMLFilterImpl
     /**
      * Set the content event handler.
      *
-     * @param resolver The new content handler.
+     * @param handler the new content handler
      */
     public void setContentHandler (ContentHandler handler)
     {
@@ -297,7 +297,7 @@ public class XMLFilterImpl
     /**
      * Set the error event handler.
      *
-     * @param handle The new error handler.
+     * @param handler the new error handler
      */
     public void setErrorHandler (ErrorHandler handler)
     {

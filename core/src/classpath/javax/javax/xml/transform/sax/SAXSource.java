@@ -1,152 +1,197 @@
-/*
- * $Id$
- * Copyright (C) 2001 Andrew Selkirk
- * Copyright (C) 2001 David Brownell
- * 
- * This file is part of GNU JAXP, a library.
- *
- * GNU JAXP is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * GNU JAXP is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * As a special exception, if you link this library with other files to
- * produce an executable, this library does not by itself cause the
- * resulting executable to be covered by the GNU General Public License.
- * This exception does not however invalidate any other reasons why the
- * executable file might be covered by the GNU General Public License. 
- */
+/* SAXSource.java -- 
+   Copyright (C) 2004 Free Software Foundation, Inc.
+
+This file is part of GNU Classpath.
+
+GNU Classpath is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+GNU Classpath is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GNU Classpath; see the file COPYING.  If not, write to the
+Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+02111-1307 USA.
+
+Linking this library statically or dynamically with other modules is
+making a combined work based on this library.  Thus, the terms and
+conditions of the GNU General Public License cover the whole
+combination.
+
+As a special exception, the copyright holders of this library give you
+permission to link this library with independent modules to produce an
+executable, regardless of the license terms of these independent
+modules, and to copy and distribute the resulting executable under
+terms of your choice, provided that you also meet, for each linked
+independent module, the terms and conditions of the license of that
+module.  An independent module is a module which is not derived from
+or based on this library.  If you modify this library, you may extend
+this exception to your version of the library, but you are not
+obligated to do so.  If you do not wish to do so, delete this
+exception statement from your version. */
+
 package javax.xml.transform.sax;
 
-import org.xml.sax.XMLReader;
-import org.xml.sax.InputSource;
+import java.io.InputStream;
+import java.io.Reader;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 /**
- * Acts as a holder for "pull style" inputs to an XSLT transform.
- * SAX based transforms can support a second style of inputs,
- * driving by a {@link TransformerHandler} as output of some
- * other SAX processing pipeline. stage.
+ * Specifies a SAX XML source. This is a tuple of input source and SAX
+ * parser.
  *
- * @see SAXTransformerFactory#newTransformerHandler
- * 
- * @author	Andrew Selkirk, David Brownell
- * @version	1.0
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class SAXSource implements Source
+public class SAXSource
+  implements Source
 {
+
 	/**
-	 * Used with <em>TransformerFactory.getFeature()</em> to determine
-	 * whether the transformers it produces support SAXSource objects
-	 * (possibly without URIs) as inputs.
+   * Factory feature indicating that SAX sources are supported.
 	 */
 	public static final String FEATURE =
 		"http://javax.xml.transform.sax.SAXSource/feature";
 
-	private XMLReader	reader		= null;
-	private InputSource	inputSource	= null;
+  private XMLReader  xmlReader;
+  private InputSource  inputSource;
 
+  /**
+   * Default constructor.
+   */
+  public SAXSource()
+  {
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Constructor with a SAX parser and input source.
+   */
+  public SAXSource(XMLReader reader, InputSource inputSource)
+  {
+    xmlReader = reader;
+    this.inputSource = inputSource;
+  }
 
-	public SAXSource() {
-	} // SAXSource()
+  /**
+   * Constructor with an input source.
+   * The SAX parser will be instantiated by the transformer.
+   */
+  public SAXSource(InputSource inputSource)
+  {
+    this.inputSource = inputSource;
+  }
 
-	public SAXSource(XMLReader reader, InputSource source) {
-		this.reader = reader;
-		this.inputSource = source;
-	} // SAXSource()
+  /**
+   * Sets the SAX parser to be used by this source.
+   * If null, the transformer will instantiate its own parser.
+   */
+  public void setXMLReader(XMLReader reader)
+  {
+    xmlReader = reader;
+  }
 
-	public SAXSource(InputSource source) {
-		this.inputSource = source;
-	} // SAXSource()
+  /**
+   * Returns the SAX parser to be used by this source.
+   * If null, the transformer will instantiate its own parser.
+   */
+  public XMLReader getXMLReader()
+  {
+    return xmlReader;
+  }
 
+  /**
+   * Sets the input source to parse.
+   */
+  public void setInputSource(InputSource inputSource)
+  {
+    this.inputSource = inputSource;
+  }
 
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	public void setXMLReader(XMLReader reader) {
-		this.reader = reader;
-	} // setXMLReader()
-
-	public XMLReader getXMLReader() {
-		return reader;
-	} // getXMLReader()
-
-	public void setInputSource(InputSource source) {
-		this.inputSource = source;
-	} // setInputSource()
-
-	public InputSource getInputSource() {
+  /**
+   * Returns the input source to parse.
+   */
+  public InputSource getInputSource()
+  {
 		return inputSource;
-	} // inputSource()
+  }
 
-	public void setSystemId(String systemID) {
-		if (inputSource != null) {
-			inputSource.setSystemId(systemID);
+  /**
+   * Sets the system ID for this source.
+   */
+  public void setSystemId(String systemId)
+  {
+    if (inputSource != null)
+      {
+        inputSource.setSystemId(systemId);
+      }
 		}
-	} // setSystemId()
 
-	public String getSystemId() {
-		if (inputSource != null) {
+  /**
+   * Returns the system ID for this source.
+   */
+  public String getSystemId()
+  {
+    if (inputSource != null)
+      {
 			return inputSource.getSystemId();
-		} // if
+      }
 		return null;
-	} // getSystemId()
+  }
 
 	/**
-	 * Creates a SAX input source from its argument.
-	 * Understands StreamSource and System ID based input sources,
-	 * and insists on finding either a system ID (URI) or some kind
-	 * of input stream (character or byte).
-	 *
-	 * @param in TRAX style input source
-	 * @return SAX input source, or null if one could not be
-	 *	created.
+   * Converts a source into a SAX input source.
+   * This method can use a StreamSource or the system ID.
+   * @return an input source or null
 	 */
-	public static InputSource sourceToInputSource (Source in)
+  public static InputSource sourceToInputSource(Source source)
 	{
-	    InputSource	retval;
-	    boolean	ok = false;
-
-      if (in instanceof SAXSource) {
-        return ((SAXSource) in).inputSource;
+    InputSource in = null;
+    if (source instanceof SAXSource)
+      {
+        in = ((SAXSource) source).getInputSource();
       }
-      
-	    if (in.getSystemId () != null) {
-		retval = new InputSource (in.getSystemId ());
-		ok = true;
-	    } else
-		retval = new InputSource ();
-	    
-	    if (in instanceof StreamSource) {
-		StreamSource	ss = (StreamSource) in;
-
-		if (ss.getReader () != null) {
-		    retval.setCharacterStream (ss.getReader ());
-		    ok = true;
-		} else if (ss.getInputStream () != null) {
-		    retval.setByteStream (ss.getInputStream ());
-		    ok = true;
+    else if (source instanceof StreamSource)
+      {
+        StreamSource streamSource = (StreamSource) source;
+        InputStream inputStream = streamSource.getInputStream();
+        if (inputStream != null)
+          {
+            in = new InputSource(inputStream);
 		}
-		if (ss.getPublicId () != null)
-		    retval.setPublicId (ss.getPublicId ());
+        else
+          {
+            Reader reader = streamSource.getReader();
+            if (reader != null)
+              {
+                in = new InputSource(reader);
 	    }
-
-	    return ok ? retval : null;
 	}
+        String publicId = streamSource.getPublicId();
+        if (publicId != null && in != null)
+          {
+            in.setPublicId(publicId);
+          }
+      }
+    String systemId = source.getSystemId();
+    if (systemId != null)
+      {
+        if (in == null)
+          {
+            in = new InputSource(systemId);
+          }
+        else
+          {
+            in.setSystemId(systemId);
+          }
+      }
+    return in;
+  }
+
 }

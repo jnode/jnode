@@ -1,279 +1,340 @@
-/*
- * $Id$
- * Copyright (C) 2001 Andrew Selkirk
- * Copyright (C) 2001 David Brownell
- * 
- * This file is part of GNU JAXP, a library.
- *
- * GNU JAXP is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * GNU JAXP is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * As a special exception, if you link this library with other files to
- * produce an executable, this library does not by itself cause the
- * resulting executable to be covered by the GNU General Public License.
- * This exception does not however invalidate any other reasons why the
- * executable file might be covered by the GNU General Public License. 
- */
+/* SAXParser.java -- 
+   Copyright (C) 2004 Free Software Foundation, Inc.
+
+This file is part of GNU Classpath.
+
+GNU Classpath is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+GNU Classpath is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GNU Classpath; see the file COPYING.  If not, write to the
+Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+02111-1307 USA.
+
+Linking this library statically or dynamically with other modules is
+making a combined work based on this library.  Thus, the terms and
+conditions of the GNU General Public License cover the whole
+combination.
+
+As a special exception, the copyright holders of this library give you
+permission to link this library with independent modules to produce an
+executable, regardless of the license terms of these independent
+modules, and to copy and distribute the resulting executable under
+terms of your choice, provided that you also meet, for each linked
+independent module, the terms and conditions of the license of that
+module.  An independent module is a module which is not derived from
+or based on this library.  If you modify this library, you may extend
+this exception to your version of the library, but you are not
+obligated to do so.  If you do not wish to do so, delete this
+exception statement from your version. */
 
 package javax.xml.parsers;
 
-// Imports
-import java.io.*;
-import java.net.*;
-import org.w3c.dom.*;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import javax.xml.validation.Schema;
+import org.xml.sax.HandlerBase;
+import org.xml.sax.InputSource;
+import org.xml.sax.Parser;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Wraps a SAX2 (or SAX1) parser.
+ * Convenience class for using or accessing a SAX version 1 or 2 parser.
+ * Instances of this class are <em>not</em> guaranteed to be thread safe.
  *
- * <p>Note that parsing with methods on this interface requires use of one
- * of the optional SAX base classes.  It's usually preferable to use the
- * SAX parser APIs directly.  SAX gives much more flexibility about how
- * application classes are organized, and about how the document entity is
- * packaged for delivery to the parser.  And JAXP doesn't otherwise provide
- * access to the SAX2 extension handlers for lexical or declaration events.
- *
- * @author	Andrew Selkirk
- * @author	David Brownell
- * @version	1.0
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public abstract class SAXParser
 {
-	/** Only subclasses may use the constructor. */
-	protected SAXParser() { }
 
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	public abstract void setProperty (String id, Object value) 
-		throws SAXNotRecognizedException, SAXNotSupportedException;
-
-	public abstract Object getProperty (String id) 
-		throws SAXNotRecognizedException, SAXNotSupportedException;
-
-	/**
-	 * Parse using (deprecated) SAX1 style handlers,
-	 * and a byte stream (with no URI).
-	 * Avoid using this API, since relative URIs in the document need
-	 * to be resolved against the document entity's URI, and good
-	 * diagnostics also need that URI.
-   * @exception IllegalArgumentException if InputStream is null
-	 */
-	public void parse(InputStream stream, HandlerBase handler) 
-	throws SAXException, IOException
-	    { parse (new InputSource (stream), handler); }
-
-	/**
-	 * Parse using (deprecated) SAX1 style handlers,
-	 * and a byte stream with a specified URI.
-   * @exception IllegalArgumentException if InputStream is null
-	 */
-	public void parse (
-		InputStream stream,
-		HandlerBase handler,
-		String systemID
-	) throws SAXException, IOException
-	{
-    if(stream==null)
-      {
-        throw new IllegalArgumentException("InputStream is 'null'");
-      }
-		InputSource	source;
-
-		// Prepare Source
-		source = new InputSource(stream);
-		source.setSystemId(systemID);
-
-		parse(source, handler);
-
-	}
-
-	/**
-	 * Parse using SAX2 style handlers,
-	 * and a byte stream (with no URI).
-	 * Avoid using this API, since relative URIs in the document need
-	 * to be resolved against the document entity's URI, and good
-	 * diagnostics also need that URI.
-   * @exception IllegalArgumentException if InputStream is null
-	 */
-	public void parse(InputStream stream, DefaultHandler def) 
-	throws SAXException, IOException
+  protected SAXParser()
   {
-    if(stream==null)
-      {
-        throw new IllegalArgumentException("InputStream is 'null'");
-      }
-    parse (new InputSource (stream), def);
   }
 
 	/**
-	 * Parse using SAX2 style handlers,
-	 * and a byte stream with a specified URI.
-   * @exception IllegalArgumentException if InputStream is null
+   * Parse the specifed input stream, reporting SAX1 events to the given
+   * handler.
+   * Prefer the SAX2 version of this method, since the HandlerBase class is
+   * now deprecated.
+   * Also prefer the version of this method that specifies a system ID, in
+   * order to resolve external references correctly.
+   * @param is an XML input stream
+   * @param hb the SAX1 handler
+   * @exception IllegalArgumentException if the input stream is null
+   * @see #parse(java.io.InputStream,org.xml.sax.helpers.DefaultHandler)
 	 */
-	public void parse (
-		InputStream stream,
-		DefaultHandler def,
-		String systemID
-	) throws SAXException, IOException
-	{
-    if(stream==null)
-      {
-        throw new IllegalArgumentException("InputStream is 'null'");
-      }
-		InputSource	source;
-
-		// Prepare Source
-		source = new InputSource(stream);
-		source.setSystemId(systemID);
-
-		parse(source, def);
-
-	}
-
-	/**
-	 * Parse using (deprecated) SAX1 style handlers,
-	 * and a URI for the document entity.
-   * @exception IllegalArgumentException if URI is null
-	 */
-	public void parse(String uri, HandlerBase handler) 
+  public void parse(InputStream is, HandlerBase hb) 
 	throws SAXException, IOException
   {
-    if(uri==null)
+    if (is == null)
       {
-        throw new IllegalArgumentException("URI is 'null'");
+        throw new IllegalArgumentException("input stream is null");
       }
-    parse (new InputSource (uri), handler);
+    parse(new InputSource(is), hb);
   }
 
 	/**
-	 * Parse using SAX2 style handlers,
-	 * and a URI for the document entity.
-   * @exception IllegalArgumentException if URI is null
+   * Parse the specified input stream, reporting SAX1 events to the given
+   * handler.
+   * Prefer the SAX2 version of this method, since the HandlerBase class is
+   * now deprecated.
+   * @param is an XML input stream
+   * @param hb the SAX1 handler
+   * @param systemId the system ID of the XML document
+   * @exception IllegalArgumentException if the input stream is null
+   * @see #parse(java.io.InputStream,org.xml.sax.helpers.DefaultHandler,java.lang.String)
 	 */
-	public void parse(String uri, DefaultHandler def) 
+  public void parse(InputStream is, HandlerBase hb, String systemId)
+     throws SAXException, IOException
+	{
+    if (is == null)
+      {
+        throw new IllegalArgumentException("input stream is null");
+      }
+    InputSource  source = new InputSource(is);
+    source.setSystemId(systemId);
+    parse(source, hb);
+	}
+
+	/**
+   * Parse the specified input stream, reporting SAX2 events to the given
+   * handler.
+   * Prefer the version of this method that specifies a system ID, in
+   * order to resolve external references correctly.
+   * @param is an XML input stream
+   * @param dh the SAX2 handler
+   * @exception IllegalArgumentException if the input stream is null
+	 */
+  public void parse(InputStream is, DefaultHandler dh) 
 	throws SAXException, IOException
   {
-    if(uri==null)
+    if (is == null)
       {
-        throw new IllegalArgumentException("URI is 'null'");
+        throw new IllegalArgumentException("input stream is null");
       }
-    parse (new InputSource (uri), def);
+    parse(new InputSource(is), dh);
   }
 
 	/**
-	 * Parse using (deprecated) SAX1 style handlers,
-	 * turning a file name into the document URI.
-   * @exception IllegalArgumentException if file is null
+   * Parse the specified input stream, reporting SAX2 events to the given
+   * handler.
+   * @param is an XML input stream
+   * @param dh the SAX2 handler
+   * @param systemId the system ID of the XML document
+   * @exception IllegalArgumentException if the input stream is null
 	 */
-	public void parse(File file, HandlerBase handler) 
-	throws SAXException, IOException
+  public void parse (InputStream is, DefaultHandler dh, String systemId)
+     throws SAXException, IOException
 	{
-    if(file==null)
+    if (is == null)
       {
-        throw new IllegalArgumentException("The file is 'null'");
+        throw new IllegalArgumentException("input stream is null");
       }
-		InputSource	in;
-		
-		in = new InputSource (DocumentBuilder.fileToURL (file));
-		parse (in, handler);
+    InputSource  source = new InputSource(is);
+    source.setSystemId(systemId);
+    parse(source, dh);
 	}
 
 	/**
-	 * Parse using SAX2 style handlers,
-	 * turning a file name into the document URI.
-   * @exception IllegalArgumentException if file is null
+   * Parse the content of the specified URI, reporting SAX1 events to the
+   * given handler.
+   * Prefer the SAX2 version of this method, since the HandlerBase class is
+   * now deprecated.
+   * @param uri an XML system ID
+   * @param hb the SAX1 handler
+   * @exception IllegalArgumentException if the URI is null
+   * @see #parse(java.lang.String,org.xml.sax.helpers.DefaultHandler)
 	 */
-	public void parse(File file, DefaultHandler def) 
+  public void parse(String uri, HandlerBase hb) 
+	throws SAXException, IOException
+  {
+    if (uri == null)
+      {
+        throw new IllegalArgumentException("URI is null");
+      }
+    parse(new InputSource(uri), hb);
+  }
+
+	/**
+   * Parse the content of the specified URI, reporting SAX2 events to the
+   * given handler.
+   * @param uri an XML system ID
+   * @param dh the SAX2 handler
+   * @exception IllegalArgumentException if the URI is null
+	 */
+  public void parse(String uri, DefaultHandler dh) 
+	throws SAXException, IOException
+  {
+    if (uri == null)
+      {
+        throw new IllegalArgumentException("URI is null");
+      }
+    parse(new InputSource(uri), dh);
+  }
+
+	/**
+   * Parse the content of the specified file, reporting SAX1 events to the
+   * given handler.
+   * Prefer the SAX2 version of this method, since the HandlerBase class is
+   * now deprecated.
+   * @param f an XML file
+   * @param hb the SAX1 handler
+   * @exception IllegalArgumentException if the file is null
+   * @see #parse(java.io.File,org.xml.sax.helpers.DefaultHandler)
+	 */
+  public void parse(File f, HandlerBase hb) 
 	throws SAXException, IOException
 	{
-    if(file==null)
+    if (f == null)
       {
-        throw new IllegalArgumentException("The file is 'null'");
+        throw new IllegalArgumentException("file is null");
       }
-		InputSource	in;
-		
-		in = new InputSource (DocumentBuilder.fileToURL (file));
-		parse (in, def);
+    InputSource source = new InputSource(new FileInputStream(f));
+    source.setSystemId(f.toURL().toString());
+    parse(source, hb);
 	}
 
 	/**
-	 * Parse using (deprecated) SAX1 style handlers.
-   * @exception IllegalArgumentException if InputSource is null
+   * Parse the content of the specified file, reporting SAX2 events to the
+   * given handler.
+   * @param f an XML file
+   * @param dh the SAX2 handler
+   * @exception IllegalArgumentException if the file is null
 	 */
-	public void parse(InputSource source, HandlerBase handler) 
+  public void parse(File f, DefaultHandler dh) 
 	throws SAXException, IOException
 	{
-    if(source==null)
+    if (f == null)
       {
-        throw new IllegalArgumentException("The InputSource is 'null'");
+        throw new IllegalArgumentException("file is null");
       }
-		Parser	parser;
-
-		// Prepare Parser
-		parser = getParser();
-		parser.setDocumentHandler(handler);
-		parser.setDTDHandler(handler);
-		parser.setEntityResolver(handler);
-		parser.setErrorHandler(handler);
-
-		// Parse
-		parser.parse(source);
-
+    InputSource source = new InputSource(new FileInputStream(f));
+    source.setSystemId(f.toURL().toString());
+    parse(source, dh);
 	}
 
 	/**
-	 * Parse using SAX2 style handlers.
-   * @exception IllegalArgumentException if InputSource is null
+   * Parse the specified input source, reporting SAX1 events to the
+   * given handler.
+   * Prefer the SAX2 version of this method, since the HandlerBase class is
+   * now deprecated.
+   * @param is the SAX input source
+   * @param hb the SAX1 handler
+   * @exception IllegalArgumentException if the input source is null
+   * @see #parse(org.xml.sax.InputSource,org.xml.sax.helpers.DefaultHandler)
 	 */
-	public void parse(InputSource source, DefaultHandler def) 
+  public void parse(InputSource is, HandlerBase hb) 
 	throws SAXException, IOException
 	{
-    if(source==null)
+    if (is == null)
       {
-        throw new IllegalArgumentException("The InputSource is 'null'");
+        throw new IllegalArgumentException("input source is null");
       }
-		XMLReader	reader;
-
-		// Prepare XML Reader
-		reader = getXMLReader();
-		reader.setContentHandler(def);
-		reader.setDTDHandler(def);
-		reader.setEntityResolver(def);
-		reader.setErrorHandler(def);
-
-		// NOTE:  this should NOT understand the
-		// extension handlers (lexical, decl).
-
-		reader.parse(source);
+    Parser parser = getParser();
+    parser.setDocumentHandler(hb);
+    parser.setDTDHandler(hb);
+    parser.setEntityResolver(hb);
+    parser.setErrorHandler(hb);
+    parser.parse(is);
 	}
 
 	/**
-	 * Get a (deprecated) SAX1 driver for the underlying parser.
+   * Parse the specified input source, reporting SAX2 events to the
+   * given handler.
+   * @param f an XML file
+   * @param dh the SAX2 handler
+   * @exception IllegalArgumentException if the input source is null
+	 */
+  public void parse(InputSource is, DefaultHandler dh) 
+	throws SAXException, IOException
+	{
+    if (is == null)
+      {
+        throw new IllegalArgumentException("input source is null");
+      }
+    XMLReader reader = getXMLReader();
+    reader.setContentHandler(dh);
+    reader.setDTDHandler(dh);
+    reader.setEntityResolver(dh);
+    reader.setErrorHandler(dh);
+    reader.parse(is);
+	}
+
+	/**
+   * Returns the underlying SAX1 parser.
 	 */
 	public abstract Parser getParser() throws SAXException;
 
 	/**
-	 * Get a SAX2 driver for the underlying parser.
+   * Returns the underlying SAX2 parser.
    * @since 1.1
 	 */
 	public abstract XMLReader getXMLReader() throws SAXException;
 
+  /**
+   * Indicates whether this parser is XML Namespace aware.
+   */
 	public abstract boolean isNamespaceAware();
 
+  /**
+   * Indicates whether this parser will validate its input.
+   */
 	public abstract boolean isValidating();
+
+  /**
+   * Sets the specified SAX2 parser property.
+   * @param name the name of the property
+   * @param value the value of the property
+   */
+  public abstract void setProperty(String name, Object value) 
+    throws SAXNotRecognizedException, SAXNotSupportedException;
+
+  /**
+   * Returns the value of the specified SAX2 parser property.
+   * @param name the name of the property
+   */
+  public abstract Object getProperty(String name) 
+    throws SAXNotRecognizedException, SAXNotSupportedException;
+
+  // -- JAXP 1.3 methods --
+
+  /**
+   * Resets this parser to its original configuration.
+   * @since 1.3
+   */
+  public void reset()
+  {
+  }
+
+  /**
+   * Returns the schema in use by this parser.
+   * @since 1.3
+   */
+  public Schema getSchema()
+  {
+    return null;
+  }
+
+  /**
+   * Indicates whether this parser is XInclude-aware.
+   * @since 1.3
+   */
+  public boolean isXIncludeAware()
+  {
+    return false;
+  }
+  
 }

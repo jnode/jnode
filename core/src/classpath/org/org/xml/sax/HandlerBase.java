@@ -213,8 +213,7 @@ public class HandlerBase
      * each element (such as finalising a tree node or writing
      * output to a file).</p>
      *
-     * @param name The element type name.
-     * @param attributes The specified or defaulted attributes.
+     * @param name the element name
      * @exception org.xml.sax.SAXException Any SAX exception, possibly
      *            wrapping another exception.
      * @see org.xml.sax.DocumentHandler#endElement

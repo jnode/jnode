@@ -158,6 +158,7 @@ public class ParserAdapter implements XMLReader, DocumentHandler
     private final static String FEATURES = "http://xml.org/sax/features/";
     private final static String NAMESPACES = FEATURES + "namespaces";
     private final static String NAMESPACE_PREFIXES = FEATURES + "namespace-prefixes";
+    private final static String XMLNS_URIs = FEATURES + "xmlns-uris";
 
 
     /**
@@ -189,6 +190,9 @@ public class ParserAdapter implements XMLReader, DocumentHandler
 	    if (!prefixes && !namespaces) {
 		namespaces = true;
 	    }
+	} else if (name.equals(XMLNS_URIs)) {
+	    checkNotParsing("feature", name);
+	    uris = value;
 	} else {
 	    throw new SAXNotRecognizedException("Feature: " + name);
 	}
@@ -216,6 +220,8 @@ public class ParserAdapter implements XMLReader, DocumentHandler
 	    return namespaces;
 	} else if (name.equals(NAMESPACE_PREFIXES)) {
 	    return prefixes;
+	} else if (name.equals(XMLNS_URIs)) {
+	    return uris;
 	} else {
 	    throw new SAXNotRecognizedException("Feature: " + name);
 	}
@@ -289,7 +295,7 @@ public class ParserAdapter implements XMLReader, DocumentHandler
     /**
      * Set the DTD handler.
      *
-     * @param resolver The new DTD handler.
+     * @param handler the new DTD handler
      * @see org.xml.sax.XMLReader#setEntityResolver
      */
     public void setDTDHandler (DTDHandler handler)
@@ -301,7 +307,7 @@ public class ParserAdapter implements XMLReader, DocumentHandler
     /**
      * Return the current DTD handler.
      *
-     * @return The current DTD handler, or null if none was supplied.
+     * @return the current DTD handler, or null if none was supplied
      * @see org.xml.sax.XMLReader#getEntityResolver
      */
     public DTDHandler getDTDHandler ()
@@ -313,7 +319,7 @@ public class ParserAdapter implements XMLReader, DocumentHandler
     /**
      * Set the content handler.
      *
-     * @param resolver The new content handler.
+     * @param handler the new content handler
      * @see org.xml.sax.XMLReader#setEntityResolver
      */
     public void setContentHandler (ContentHandler handler)
@@ -337,7 +343,7 @@ public class ParserAdapter implements XMLReader, DocumentHandler
     /**
      * Set the error handler.
      *
-     * @param resolver The new error handler.
+     * @param handler The new error handler.
      * @see org.xml.sax.XMLReader#setEntityResolver
      */
     public void setErrorHandler (ErrorHandler handler)
@@ -467,7 +473,7 @@ public class ParserAdapter implements XMLReader, DocumentHandler
      * <p>If necessary, perform Namespace processing.</p>
      *
      * @param qName The qualified (prefixed) name.
-     * @param qAtts The XML 1.0 attribute list (with qnames).
+     * @param qAtts The XML attribute list (with qnames).
      * @exception SAXException The client may raise a
      *            processing exception.
      */
@@ -546,13 +552,21 @@ public class ParserAdapter implements XMLReader, DocumentHandler
 		    // (and similarly named) attributes ... ignore
 		    prefix = null;
 		} else {
-		    prefix = attQName.substring(n+1);
+		    prefix = attQName.substring(6);
 		}
 				// Yes, decl:  report or prune
 		if (prefix != null) {
-		    if (prefixes)
-			atts.addAttribute("", "", attQName.intern(),
-				      type, value);
+		    if (prefixes) {
+			if (uris)
+			    // note funky case:  localname can be null
+			    // when declaring the default prefix, and
+			    // yet the uri isn't null.
+			    atts.addAttribute (nsSupport.XMLNS, prefix,
+				    attQName.intern(), type, value);
+			else
+			    atts.addAttribute ("", "",
+				    attQName.intern(), type, value);
+		    }
 		    continue;
 		}
 	    } 
@@ -690,7 +704,13 @@ public class ParserAdapter implements XMLReader, DocumentHandler
      */
     private void setupParser ()
     {
+	// catch an illegal "nonsense" state.
+	if (!prefixes && !namespaces)
+	    throw new IllegalStateException ();
+
 	nsSupport.reset();
+	if (uris)
+	    nsSupport.setNamespaceDeclUris (true);
 
 	if (entityResolver != null) {
 	    parser.setEntityResolver(entityResolver);
@@ -808,6 +828,7 @@ public class ParserAdapter implements XMLReader, DocumentHandler
 				// Features
     private boolean namespaces = true;
     private boolean prefixes = false;
+    private boolean uris = false;
 
 				// Properties
 

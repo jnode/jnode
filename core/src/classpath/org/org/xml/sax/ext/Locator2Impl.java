@@ -20,7 +20,7 @@ import org.xml.sax.helpers.LocatorImpl;
  *
  * <p> This is not part of core-only SAX2 distributions.</p>
  *
- * @since SAX 2.0 (extensions 1.1 alpha)
+ * @since SAX 2.0.2
  * @author David Brownell
  * @version TBS
  */
@@ -93,7 +93,7 @@ public class Locator2Impl extends LocatorImpl implements Locator2
     /**
      * Assigns the current value of the encoding property.
      *
-     * @param version the new "encoding" value
+     * @param encoding the new "encoding" value
      * @see #getEncoding
      */
     public void setEncoding (String encoding)
