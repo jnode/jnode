@@ -385,7 +385,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
     /**
      * Do we need a write barrier
      * 
-     * @return
+     * @return True/false
      */
     public final boolean needsWriteBarrier() {
         return (context.getWriteBarrier() != null);

@@ -22,27 +22,54 @@ package org.jnode.vm.x86;
 
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.classmgr.VmStatics;
+import org.jnode.vm.compiler.IMTCompiler;
+import org.jnode.vm.x86.compiler.X86IMTCompiler32;
 
 /**
+ * Architecture description for the x86 (32-bit) architecture.
+ * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class VmX86Architecture32 extends VmX86Architecture {
+public final class VmX86Architecture32 extends VmX86Architecture {
 
     /** Size of an object reference */
     public static final int SLOT_SIZE = 4;
 
+    /** The IMT compiler */
+    private final X86IMTCompiler32 imtCompiler;
+
     /**
-     * 
+     * Initialize this instance.
      */
     public VmX86Architecture32() {
-        super();
+        this("L1A");
     }
 
     /**
+     * Initialize this instance.
      * @param compiler
      */
     public VmX86Architecture32(String compiler) {
         super(compiler);
+        this.imtCompiler = new X86IMTCompiler32();
+    }
+
+    /**
+     * Create a processor instance for this architecture.
+     * 
+     * @return The processor
+     */
+    public VmProcessor createProcessor(int id, VmStatics statics) {
+        return new VmX86Processor32(id, this, statics, null);
+    }
+
+    /**
+     * Gets the compiler of IMT's.
+     * 
+     * @return The IMT compiler
+     */
+    public final IMTCompiler getIMTCompiler() {
+        return imtCompiler;
     }
 
     /**
@@ -62,14 +89,4 @@ public class VmX86Architecture32 extends VmX86Architecture {
     public final int getReferenceSize() {
         return SLOT_SIZE;
     }
-
-    /**
-     * Create a processor instance for this architecture.
-     * 
-     * @return The processor
-     */
-    public VmProcessor createProcessor(int id, VmStatics statics) {
-        return new VmX86Processor32(id, this, statics, null);
-    }
-
 }

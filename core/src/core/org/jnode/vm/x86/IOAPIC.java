@@ -75,7 +75,7 @@ final class IOAPIC {
     
     /**
      * Gets the ID of this I/O APIC.
-     * @return
+     * @return the id
      */
     public int getId() {
         return (getReg(REG_IOAPICID) >> 24) & 0xF;
@@ -83,7 +83,7 @@ final class IOAPIC {
     
     /**
      * Gets the version of this I/O APIC.
-     * @return
+     * @return the version
      */
     public int getVersion() {
         return getReg(REG_IOAPICVER) & 0xFF;
@@ -92,7 +92,7 @@ final class IOAPIC {
     /**
      * Gets the maximum index of the redirection table.
      * The number of redirection entries equals this number + 1.
-     * @return
+     * @return the maximum index of the redirection table.
      */
     public int getMaximumRedirectionEntryIndex() {
         return (getReg(REG_IOAPICVER) >> 16) & 0xFF;        
@@ -100,7 +100,7 @@ final class IOAPIC {
     
     /**
      * Gets the arbitration ID of this I/O APIC.
-     * @return
+     * @return the arbitration id
      */
     public int getArbitrationId() {
         return (getReg(REG_IOAPICARB) >> 24) & 0xF;
@@ -108,7 +108,7 @@ final class IOAPIC {
     
     /**
      * Gets all redirection entries.
-     * @return
+     * @return the redirection entries
      */
     public List getRedirectionEntries() {
         return entries;
@@ -129,7 +129,7 @@ final class IOAPIC {
     /**
      * Read an I/O APIC register.
      * @param regNr
-     * @return
+     * @return the register value
      */
     final synchronized int getReg(int regNr) {
         mem.setInt(IOREGSEL, regNr);

@@ -47,7 +47,7 @@ final class IOAPICRedirectionEntry {
     private int high;
     
     private static final int DESTMOD = 1 << 11;
-    private static final int IRR = 1 << 14;
+    //private static final int IRR = 1 << 14;
     private static final int TRIGGERMODE = 1 << 15;
     private static final int MASK = 1 << 16;
 
@@ -65,7 +65,7 @@ final class IOAPICRedirectionEntry {
     /**
      * Gets the interrupt vector
      * 
-     * @return
+     * @return the interrupt vector
      */
     public int getVector() {
         return low & 0xFF;
@@ -83,7 +83,7 @@ final class IOAPICRedirectionEntry {
     /**
      * Gets the delivery mode.
      * 
-     * @return
+     * @return the delivery mode
      */
     public int getDeliveryMode() {
         return (low >> 8) & 0x07;
@@ -101,7 +101,7 @@ final class IOAPICRedirectionEntry {
     /**
      * Is this entry set for physical destination.
      * 
-     * @return
+     * @return True/false
      */
     public boolean isPhysicalDestination() {
         return ((low & DESTMOD) == 0);
@@ -110,7 +110,7 @@ final class IOAPICRedirectionEntry {
     /**
      * Is the type signal that triggers an interrupt level sensative.
      * 
-     * @return
+     * @return True/false
      */
     public boolean isLevelTriggerMode() {
         return ((low & TRIGGERMODE) != 0);
@@ -119,7 +119,7 @@ final class IOAPICRedirectionEntry {
     /**
      * Is the type signal that triggers an interrupt edge sensative.
      * 
-     * @return
+     * @return True/false
      */
     public boolean isEdgeTriggerMode() {
         return ((low & TRIGGERMODE) == 0);
@@ -128,7 +128,7 @@ final class IOAPICRedirectionEntry {
     /**
      * Is this interrupt signal masked.
      * 
-     * @return
+     * @return True/false
      */
     public boolean isMasked() {
         return ((low & MASK) != 0);

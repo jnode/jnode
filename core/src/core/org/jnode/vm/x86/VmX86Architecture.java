@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.vm.x86;
 
 import java.nio.ByteOrder;
@@ -35,11 +35,10 @@ import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmStackReader;
 import org.jnode.vm.VmSystem;
 import org.jnode.vm.classmgr.VmStatics;
-import org.jnode.vm.compiler.IMTCompiler;
 import org.jnode.vm.compiler.NativeCodeCompiler;
-import org.jnode.vm.x86.compiler.X86IMTCompiler;
 import org.jnode.vm.x86.compiler.l1a.X86Level1ACompiler;
 import org.jnode.vm.x86.compiler.stub.X86StubCompiler;
+
 
 /**
  * Architecture descriptor for the Intel X86 architecture.
@@ -48,186 +47,175 @@ import org.jnode.vm.x86.compiler.stub.X86StubCompiler;
  */
 public abstract class VmX86Architecture extends VmArchitecture {
 
-	/** The compilers */
-	private final NativeCodeCompiler[] compilers;
-	
-	/** The compilers under test */
-	private final NativeCodeCompiler[] testCompilers;
-	
-	/** The IMT compiler */
-	private final X86IMTCompiler imtCompiler;
+    /** The compilers */
+    private final NativeCodeCompiler[] compilers;
 
-	/** The local APIC accessor, if any */
-	private LocalAPIC localAPIC;
+    /** The compilers under test */
+    private final NativeCodeCompiler[] testCompilers;
 
-	/** The MP configuration table */
-	private MPConfigTable mpConfigTable;
+    /** The local APIC accessor, if any */
+    private LocalAPIC localAPIC;
 
-	/** The stackreader of this architecture */
-	private final VmX86StackReader stackReader;
+    /** The MP configuration table */
+    private MPConfigTable mpConfigTable;
 
-	/**
-	 * Initialize this instance using the default compiler.
-	 */
-	public VmX86Architecture() {
-		this("L1");
-	}
-	
-	/**
-	 * Initialize this instance.
-	 * @param compiler L1a to use L1A compiler, L1 compiler otherwise.
-	 */
-	public VmX86Architecture(String compiler) {
+    /** The stackreader of this architecture */
+    private final VmX86StackReader stackReader;
+
+    /**
+     * Initialize this instance using the default compiler.
+     */
+    public VmX86Architecture() {
+        this("L1A");
+    }
+
+    /**
+     * Initialize this instance.
+     * 
+     * @param compiler
+     *            L1a to use L1A compiler, L1 compiler otherwise.
+     */
+    public VmX86Architecture(String compiler) {
         this.stackReader = new VmX86StackReader(getReferenceSize());
-		this.imtCompiler = new X86IMTCompiler();
-		this.compilers = new NativeCodeCompiler[2];
-		this.compilers[0] = new X86StubCompiler();
-		this.compilers[1] = new X86Level1ACompiler(getReferenceSize());
-		this.testCompilers = null;
-	}
-	
-	/**
-	 * Gets the byte ordering of this architecture.
-	 * 
-	 * @return ByteOrder
-	 */
-	public final ByteOrder getByteOrder() {
-		return ByteOrder.LITTLE_ENDIAN;
-	}
+        this.compilers = new NativeCodeCompiler[2];
+        this.compilers[0] = new X86StubCompiler();
+        this.compilers[1] = new X86Level1ACompiler(getReferenceSize());
+        this.testCompilers = null;
+    }
 
-	/**
-	 * Gets all compilers for this architecture.
-	 * 
-	 * @return The compilers, sorted by optimization level, from least
-	 *         optimizations to most optimizations.
-	 */
-	public final NativeCodeCompiler[] getCompilers() {
-		return compilers;
-	}
+    /**
+     * Gets the byte ordering of this architecture.
+     * 
+     * @return ByteOrder
+     */
+    public final ByteOrder getByteOrder() {
+        return ByteOrder.LITTLE_ENDIAN;
+    }
 
-	/**
-	 * Gets all test compilers for this architecture.
-	 * 
-	 * @return The compilers, sorted by optimization level, from least
-	 *         optimizations to most optimizations.
-	 */
-	public final NativeCodeCompiler[] getTestCompilers() {
-		return testCompilers;
-	}
+    /**
+     * Gets all compilers for this architecture.
+     * 
+     * @return The compilers, sorted by optimization level, from least
+     *         optimizations to most optimizations.
+     */
+    public final NativeCodeCompiler[] getCompilers() {
+        return compilers;
+    }
 
-	/**
-	 * Gets the compiler of IMT's.
-	 * @return The IMT compiler
-	 */
-	public final IMTCompiler getIMTCompiler() {
-		return imtCompiler;
-	}
-	
-	/**
-	 * Gets the stackreader for this architecture.
-	 * 
-	 * @return Stack reader
-	 */
-	public final VmStackReader getStackReader() {
-		return stackReader;
-	}
+    /**
+     * Gets all test compilers for this architecture.
+     * 
+     * @return The compilers, sorted by optimization level, from least
+     *         optimizations to most optimizations.
+     */
+    public final NativeCodeCompiler[] getTestCompilers() {
+        return testCompilers;
+    }
 
-	/**
-	 * @see org.jnode.vm.VmArchitecture#initializeProcessors(ResourceManager)
-	 */
-	protected void initializeProcessors(ResourceManager rm) {
+    /**
+     * Gets the stackreader for this architecture.
+     * 
+     * @return Stack reader
+     */
+    public final VmStackReader getStackReader() {
+        return stackReader;
+    }
 
-		final String cmdLine = VmSystem.getCmdLine();
-		if (cmdLine.indexOf("mp=no") >= 0) {
-			return;
-		}
-		//
+    /**
+     * @see org.jnode.vm.VmArchitecture#initializeProcessors(ResourceManager)
+     */
+    protected final void initializeProcessors(ResourceManager rm) {
 
-		final MPFloatingPointerStructure mp = MPFloatingPointerStructure.find(
-				rm, ResourceOwner.SYSTEM);
-		if (mp == null) {
-			BootLog.info("No MP table found");
-			// No MP table found.
-			return;
-		}
-		try {
-			BootLog.info("Found " + mp);
-			this.mpConfigTable = mp.getMPConfigTable();
-		} finally {
-			mp.release();
-		}
+        final String cmdLine = VmSystem.getCmdLine();
+        if (cmdLine.indexOf("mp=no") >= 0) {
+            return;
+        }
+        //
 
-		if (mpConfigTable == null) {
-			return;
-		}
+        final MPFloatingPointerStructure mp = MPFloatingPointerStructure.find(
+                rm, ResourceOwner.SYSTEM);
+        if (mp == null) {
+            BootLog.info("No MP table found");
+            // No MP table found.
+            return;
+        }
+        try {
+            BootLog.info("Found " + mp);
+            this.mpConfigTable = mp.getMPConfigTable();
+        } finally {
+            mp.release();
+        }
 
-		mpConfigTable.dump(System.out);
-		final ResourceOwner owner = ResourceOwner.SYSTEM;
-		try {
-			// Create the local APIC accessor
-			localAPIC = new LocalAPIC(rm, owner, mpConfigTable
-					.getLocalApicAddress());
-		} catch (ResourceNotFreeException ex) {
-			BootLog.error("Cannot claim APIC region");
-			return;
-		}
+        if (mpConfigTable == null) {
+            return;
+        }
 
-		// Set the APIC reference of the current (bootstrap) processor
-		final VmX86Processor cpu = (VmX86Processor) Unsafe
-				.getCurrentProcessor();
-		cpu.setApic(localAPIC);
-		cpu.loadAndSetApicID();
+        mpConfigTable.dump(System.out);
+        final ResourceOwner owner = ResourceOwner.SYSTEM;
+        try {
+            // Create the local APIC accessor
+            localAPIC = new LocalAPIC(rm, owner, mpConfigTable
+                    .getLocalApicAddress());
+        } catch (ResourceNotFreeException ex) {
+            BootLog.error("Cannot claim APIC region");
+            return;
+        }
 
-		// Find & initialize this I/O APIC.
-		for (Iterator i = mpConfigTable.entries().iterator(); i.hasNext();) {
-			final MPEntry entry = (MPEntry) i.next();
-			if (entry instanceof MPIOAPICEntry) {
-				final MPIOAPICEntry apicEntry = (MPIOAPICEntry) entry;
-				if (apicEntry.getFlags() != 0) {
-					try {
-						// We found an enabled I/O APIC.
-						final IOAPIC apic = new IOAPIC(rm, owner, apicEntry
-								.getAddress());
-						apic.dump(System.out);
-						break;
-					} catch (ResourceNotFreeException ex) {
-						BootLog.error("Cannot claim I/O APIC region ", ex);
-					}
-				}
-			}
-		}
+        // Set the APIC reference of the current (bootstrap) processor
+        final VmX86Processor cpu = (VmX86Processor) Unsafe
+                .getCurrentProcessor();
+        cpu.setApic(localAPIC);
+        cpu.loadAndSetApicID();
 
-		try {
-			// Detect Hyper threading on current (bootstrap) processor
-			VmX86Processor.detectAndstartLogicalProcessors(rm);
-		} catch (ResourceNotFreeException ex) {
-			BootLog.error("Cannot claim region for logical processor startup",
-					ex);
-		}
+        // Find & initialize this I/O APIC.
+        for (Iterator i = mpConfigTable.entries().iterator(); i.hasNext();) {
+            final MPEntry entry = (MPEntry) i.next();
+            if (entry instanceof MPIOAPICEntry) {
+                final MPIOAPICEntry apicEntry = (MPIOAPICEntry) entry;
+                if (apicEntry.getFlags() != 0) {
+                    try {
+                        // We found an enabled I/O APIC.
+                        final IOAPIC apic = new IOAPIC(rm, owner, apicEntry
+                                .getAddress());
+                        apic.dump(System.out);
+                        break;
+                    } catch (ResourceNotFreeException ex) {
+                        BootLog.error("Cannot claim I/O APIC region ", ex);
+                    }
+                }
+            }
+        }
 
-		// Find all CPU's
-		for (Iterator i = mpConfigTable.entries().iterator(); i.hasNext();) {
-			final MPEntry e = (MPEntry) i.next();
-			if (e.getEntryType() == 0) {
-				final MPProcessorEntry cpuEntry = (MPProcessorEntry) e;
-				if (cpuEntry.isEnabled() && !cpuEntry.isBootstrap()) {
-					// New CPU
-					final VmX86Processor newCpu = (VmX86Processor) createProcessor(
-							cpuEntry.getApicID(), Vm.getVm().getStatics());
-					initX86Processor(newCpu);
-					try {
-						newCpu.startup(rm);
-					} catch (ResourceNotFreeException ex) {
-						BootLog
-								.error(
-										"Cannot claim region for processor startup",
-										ex);
-					}
-				}
-			}
-		}
-	}
+        try {
+            // Detect Hyper threading on current (bootstrap) processor
+            VmX86Processor.detectAndstartLogicalProcessors(rm);
+        } catch (ResourceNotFreeException ex) {
+            BootLog.error("Cannot claim region for logical processor startup",
+                    ex);
+        }
 
+        // Find all CPU's
+        for (Iterator i = mpConfigTable.entries().iterator(); i.hasNext();) {
+            final MPEntry e = (MPEntry) i.next();
+            if (e.getEntryType() == 0) {
+                final MPProcessorEntry cpuEntry = (MPProcessorEntry) e;
+                if (cpuEntry.isEnabled() && !cpuEntry.isBootstrap()) {
+                    // New CPU
+                    final VmX86Processor newCpu = (VmX86Processor) createProcessor(
+                            cpuEntry.getApicID(), Vm.getVm().getStatics());
+                    initX86Processor(newCpu);
+                    try {
+                        newCpu.startup(rm);
+                    } catch (ResourceNotFreeException ex) {
+                        BootLog
+                                .error(
+                                        "Cannot claim region for processor startup",
+                                        ex);
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Create a processor instance for this architecture.
@@ -237,12 +225,12 @@ public abstract class VmX86Architecture extends VmArchitecture {
     public abstract VmProcessor createProcessor(int id, VmStatics statics);
 
     /**
-	 * Initialize a processor wrt. APIC and add it to the list of processors.
-	 * 
-	 * @param cpu
-	 */
-	final void initX86Processor(VmX86Processor cpu) {
-		cpu.setApic(localAPIC);
-		super.addProcessor(cpu);
-	}
+     * Initialize a processor wrt. APIC and add it to the list of processors.
+     * 
+     * @param cpu
+     */
+    final void initX86Processor(VmX86Processor cpu) {
+        cpu.setApic(localAPIC);
+        super.addProcessor(cpu);
+    }
 }
