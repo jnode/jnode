@@ -6,12 +6,15 @@ package org.jnode.vm.compiler.ir;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.FileOutputStream;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
 import org.jnode.assembler.x86.TextX86Stream;
+import org.jnode.assembler.x86.X86Stream;
+import org.jnode.assembler.x86.AbstractX86Stream;
 import org.jnode.util.BootableArrayList;
 import org.jnode.util.BootableHashMap;
 import org.jnode.vm.VmSystemClassLoader;
@@ -30,38 +33,35 @@ import org.jnode.vm.x86.compiler.l2.X86CodeGenerator;
  */
 public class IRTest {
 	public static void main(String args[]) throws SecurityException, IOException, ClassNotFoundException {
-		X86CpuID cpuId = X86CpuID.createID("p5");
-		TextX86Stream os = new TextX86Stream(new OutputStreamWriter(System.out), cpuId);
-		X86CodeGenerator x86cg = new X86CodeGenerator(os);
-		VmByteCode code = loadByteCode(args);
+        X86CpuID cpuId = X86CpuID.createID("p5");
+        boolean binary = false;
 
-		IRControlFlowGraph cfg = new IRControlFlowGraph(code);
+        String className = "org.jnode.vm.compiler.ir.IRTest";
+        if (args.length > 0) {
+            String arg0 = args[0];
+            if("-b".equals(arg0)){
+                binary = true;
+                if(args.length > 1){
+                    className = args[1];
+                }
+            }else{
+                className = arg0;
+            }
+        }
 
-		IRGenerator irg = new IRGenerator(cfg);
-		BytecodeParser.parse(code, irg);
-		BootableArrayList quads = irg.getQuadList();
-		int n = quads.size();
-		BootableHashMap liveVariables = new BootableHashMap();
-		for (int i=0; i<n; i+=1) {
-			Quad quad = (Quad) quads.get(i);
-			quad.doPass2(liveVariables);
-		}
+        if(binary){
+            X86Stream os = new X86Stream(cpuId, 0);
+            generateCode(os, className);
+            FileOutputStream fos = new FileOutputStream("test.bin");
+            os.writeTo(fos);
+            fos.close();
+        }else{
+            TextX86Stream tos = new TextX86Stream(new OutputStreamWriter(System.out), cpuId);
+            generateCode(tos, className);
+            tos.flush();
+        }
 
-		Collection lv = liveVariables.values();
-		n = lv.size();
-		LiveRange[] liveRanges = new LiveRange[n];
-		Iterator it = lv.iterator();
-		for (int i=0; i<n; i+=1) {
-			Variable v = (Variable) it.next();
-			liveRanges[i] = new LiveRange(v);
-		}
-		Arrays.sort(liveRanges);
-		LinearScanAllocator lsa = new LinearScanAllocator(liveRanges);
-		lsa.allocate();
 
-		x86cg.setArgumentVariables(irg.getVariables(), irg.getNoArgs());
-		x86cg.setSpilledVariables(lsa.getSpilledVariables());
-		x86cg.emitHeader();
 
 /*
 		BytecodeViewer bv = new BytecodeViewer();
@@ -101,23 +101,52 @@ public class IRTest {
 			System.out.println(liveRanges[i]);
 		}
 */
-
-		n = quads.size();
-		for (int i=0; i<n; i+=1) {
-			Quad quad = (Quad) quads.get(i);
-			if (!quad.isDeadCode()) {
-				quad.generateCode(x86cg);
-			}
-		}
-		os.flush();
 	}
 
-	private static VmByteCode loadByteCode(String[] args)
+    private static void generateCode(AbstractX86Stream os, String className) throws MalformedURLException, ClassNotFoundException {
+        X86CodeGenerator x86cg = new X86CodeGenerator(os);
+
+        VmByteCode code = loadByteCode(className);
+
+        IRControlFlowGraph cfg = new IRControlFlowGraph(code);
+
+        IRGenerator irg = new IRGenerator(cfg);
+        BytecodeParser.parse(code, irg);
+        BootableArrayList quads = irg.getQuadList();
+        int n = quads.size();
+        BootableHashMap liveVariables = new BootableHashMap();
+        for (int i=0; i<n; i+=1) {
+            Quad quad = (Quad) quads.get(i);
+            quad.doPass2(liveVariables);
+        }
+
+        Collection lv = liveVariables.values();
+        n = lv.size();
+        LiveRange[] liveRanges = new LiveRange[n];
+        Iterator it = lv.iterator();
+        for (int i=0; i<n; i+=1) {
+            Variable v = (Variable) it.next();
+            liveRanges[i] = new LiveRange(v);
+        }
+        Arrays.sort(liveRanges);
+        LinearScanAllocator lsa = new LinearScanAllocator(liveRanges);
+        lsa.allocate();
+
+        x86cg.setArgumentVariables(irg.getVariables(), irg.getNoArgs());
+        x86cg.setSpilledVariables(lsa.getSpilledVariables());
+        x86cg.emitHeader();
+
+        n = quads.size();
+        for (int i=0; i<n; i+=1) {
+            Quad quad = (Quad) quads.get(i);
+            if (!quad.isDeadCode()) {
+                quad.generateCode(x86cg);
+            }
+        }
+    }
+
+    private static VmByteCode loadByteCode(String className)
 		throws MalformedURLException, ClassNotFoundException {
-		String className = "org.jnode.vm.compiler.ir.IRTest";
-		if (args.length > 0) {
-			className = args[0];
-		}
 		VmSystemClassLoader vmc = new VmSystemClassLoader(new File(".").toURL(), new VmX86Architecture());
 		VmType type = vmc.loadClass(className, true);
 		VmMethod arithMethod = null;
@@ -171,8 +200,10 @@ public class IRTest {
 		return -l0;
 	}
 
-    public static float const1(float a0, float a1) {
-        return a1 + a0;
+    public static int const1(int a0, int a1) {
+        int l1 = a1 + a0;
+        int l2 = a0 * a1;
+        return l1 * l1 + l2 * l2 + 2  * l1 * l2;
 	}
 
     public static int const3(int a0, int a1) {

@@ -10,6 +10,7 @@ import org.jnode.vm.compiler.ir.RegisterPool;
 
 /**
  * @author Madhu Siddalingaiah
+ * @author Levente Sántha
  * 
  */
 public class X86RegisterPool extends RegisterPool {
