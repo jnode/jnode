@@ -18,6 +18,9 @@ import org.jnode.plugin.PluginException;
  */
 public class AWTPlugin extends Plugin {
 
+    //private static final String TOOLKIT = "org.jnode.awt.peer.JNodeToolkit";
+    private static final String TOOLKIT = "org.jnode.awt.swingpeers.SwingToolkit";
+    
 	/**
 	 * @param descriptor
 	 */
@@ -30,7 +33,7 @@ public class AWTPlugin extends Plugin {
 	 * @throws PluginException
 	 */
 	protected void startPlugin() throws PluginException {
-	    AccessController.doPrivileged(new SetPropertyAction("awt.toolkit", "org.jnode.awt.peer.JNodeToolkit"));
+	    AccessController.doPrivileged(new SetPropertyAction("awt.toolkit", TOOLKIT));
 		VMImageUtils.setAPI(new VMImageAPIImpl(), this);
 		GraphicsEnvironment.setLocalGraphicsEnvironment(new JNodeGraphicsEnvironment());
 	}
