@@ -50,6 +50,9 @@ grant {
 	permission java.util.PropertyPermission "awt.image.incrementalDraw", "read";
 	permission java.util.PropertyPermission "awt.image.redrawrate", "read";
 	permission java.util.PropertyPermission "awt.toolkit", "read";
+	permission java.util.PropertyPermission "user.language", "read";
+	permission java.util.PropertyPermission "user.region", "read";
+	permission java.util.PropertyPermission "user.variant", "read";
 	permission java.awt.AWTPermission "accessEventQueue";
 	permission java.awt.AWTPermission "replaceKeyboardFocusManager";
 	
