@@ -23,10 +23,14 @@ public class MkdirCommand {
                 new Parameter[] { new Parameter(ARG_DIR, Parameter.MANDATORY)});
 
     public static void main(String[] args) throws Exception {
-        ParsedArguments cmdLine = HELP_INFO.parse(args);
-
-        File dir = ARG_DIR.getFile(cmdLine);
-        dir.mkdir();
+        final   ParsedArguments cmdLine = HELP_INFO.parse(args);
+        final   File dir = ARG_DIR.getFile(cmdLine);
+        boolean mkOk = false;
+        
+        mkOk=dir.mkdir();
+        if(!mkOk){
+        	System.err.println("Directory can't make");
+        }
     }
 
 }

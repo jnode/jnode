@@ -33,7 +33,7 @@ public class TouchCommand {
         final File parentFile = file.getParentFile();
 
         if (!file.exists()) {
-            if (!parentFile.exists()) {
+            if (parentFile!=null && !parentFile.exists()) {
                 if (!parentFile.mkdirs()) {
                     System.err.println("Parent dirs can't create");
                 }
