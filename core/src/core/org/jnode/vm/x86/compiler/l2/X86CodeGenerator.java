@@ -698,11 +698,55 @@ public class X86CodeGenerator extends CodeGenerator {
             case BinaryQuad.DMUL:
             case BinaryQuad.DREM:
             case BinaryQuad.DSUB:
+                throw new IllegalArgumentException("Unknown operation");
+
             case BinaryQuad.FADD:
+                os.writePUSH(iconst2.getValue());
+                os.writeFLD32(Register.ESP, 0);
+                os.writeMOV(X86Constants.BITS32, Register.ESP, 0, (Register) reg3);
+                os.writeFADD32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FDIV:
+                os.writePUSH(iconst2.getValue());
+                os.writeFLD32(Register.ESP, 0);
+                os.writeMOV(X86Constants.BITS32, Register.ESP, 0, (Register) reg3);
+                os.writeFDIV32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FMUL:
+                os.writePUSH(iconst2.getValue());
+                os.writeFLD32(Register.ESP, 0);
+                os.writeMOV(X86Constants.BITS32, Register.ESP, 0, (Register) reg3);
+                os.writeFMUL32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FREM:
+                os.writePUSH((Register)reg3);
+                os.writeFLD32(Register.ESP, 0);
+                os.writeMOV_Const(Register.ESP, 0, iconst2.getValue());
+                os.writeFLD32(Register.ESP, 0);
+                os.writeFPREM();
+                os.writeFSTP32(Register.ESP, 0);
+                os.writeFFREE(Register.ST0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FSUB:
+                os.writePUSH(iconst2.getValue());
+                os.writeFLD32(Register.ESP, 0);
+                os.writeMOV(X86Constants.BITS32, Register.ESP, 0, (Register) reg3);
+                os.writeFSUB32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.LADD:
             case BinaryQuad.LAND:
             case BinaryQuad.LDIV:
@@ -825,11 +869,50 @@ public class X86CodeGenerator extends CodeGenerator {
             case BinaryQuad.DMUL:
             case BinaryQuad.DREM:
             case BinaryQuad.DSUB:
+                throw new IllegalArgumentException("Unknown operation");
+
             case BinaryQuad.FADD:
+                os.writePUSH(iconst2.getValue());
+                os.writeFLD32(Register.ESP, 0);
+                os.writeFADD32(Register.EBP, disp3);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FDIV:
+                os.writePUSH(iconst2.getValue());
+                os.writeFLD32(Register.ESP, 0);
+                os.writeFDIV32(Register.EBP, disp3);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FMUL:
+                os.writePUSH(iconst2.getValue());
+                os.writeFLD32(Register.ESP, 0);
+                os.writeFMUL32(Register.EBP, disp3);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FREM:
+                os.writePUSH(iconst2.getValue());
+                os.writeFLD32(Register.EBP, disp3);
+                os.writeFLD32(Register.ESP, 0);
+                os.writeFPREM();
+                os.writeFSTP32(Register.ESP, 0);
+                os.writeFFREE(Register.ST0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FSUB:
+                os.writePUSH(iconst2.getValue());
+                os.writeFLD32(Register.ESP, 0);
+                os.writeFSUB32(Register.EBP, disp3);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.LADD:
             case BinaryQuad.LAND:
             case BinaryQuad.LDIV:
@@ -966,11 +1049,55 @@ public class X86CodeGenerator extends CodeGenerator {
             case BinaryQuad.DMUL:
             case BinaryQuad.DREM:
             case BinaryQuad.DSUB:
+                throw new IllegalArgumentException("Unknown operation");
+
             case BinaryQuad.FADD:
+                os.writePUSH((Register) reg2);
+                os.writeFLD32(Register.ESP, 0);
+                os.writeMOV_Const(Register.ESP, 0, iconst3.getValue());
+                os.writeFADD32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FDIV:
+                os.writePUSH((Register)reg2);
+                os.writeFLD32(Register.ESP, 0);
+                os.writeMOV_Const(Register.ESP, 0, iconst3.getValue());
+                os.writeFDIV32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FMUL:
+                os.writePUSH((Register)reg2);
+                os.writeFLD32(Register.ESP, 0);
+                os.writeMOV_Const(Register.ESP, 0, iconst3.getValue());
+                os.writeFMUL32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FREM:
+                os.writePUSH(iconst3.getValue());
+                os.writeFLD32(Register.ESP, 0);
+                os.writeMOV(X86Constants.BITS32, Register.ESP, 0, (Register) reg2);
+                os.writeFLD32(Register.ESP, 0);
+                os.writeFPREM();
+                os.writeFSTP32(Register.ESP, 0);
+                os.writeFFREE(Register.ST0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FSUB:
+                os.writePUSH((Register)reg2);
+                os.writeFLD32(Register.ESP, 0);
+                os.writeMOV_Const(Register.ESP, 0, iconst3.getValue());
+                os.writeFSUB32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.LADD:
             case BinaryQuad.LAND:
             case BinaryQuad.LDIV:
@@ -1139,11 +1266,55 @@ public class X86CodeGenerator extends CodeGenerator {
             case BinaryQuad.DMUL:
             case BinaryQuad.DREM:
             case BinaryQuad.DSUB:
+                throw new IllegalArgumentException("Unknown operation");
+
             case BinaryQuad.FADD:
+                os.writePUSH((Register) reg2);
+                os.writeFLD32(Register.ESP, 0);
+                os.writeMOV(X86Constants.BITS32, Register.ESP, 0, (Register) reg3);
+                os.writeFADD32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FDIV:
+                os.writePUSH((Register)reg2);
+                os.writeFLD32(Register.ESP, 0);
+                os.writeMOV(X86Constants.BITS32, Register.ESP, 0, (Register) reg3);
+                os.writeFDIV32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FMUL:
+                os.writePUSH((Register)reg2);
+                os.writeFLD32(Register.ESP, 0);
+                os.writeMOV(X86Constants.BITS32, Register.ESP, 0, (Register) reg3);
+                os.writeFMUL32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FREM:
+                os.writePUSH((Register)reg3);
+                os.writeFLD32(Register.ESP, 0);
+                os.writeMOV(X86Constants.BITS32, Register.ESP, 0, (Register) reg2);
+                os.writeFLD32(Register.ESP, 0);
+                os.writeFPREM();
+                os.writeFSTP32(Register.ESP, 0);
+                os.writeFFREE(Register.ST0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FSUB:
+                os.writePUSH((Register)reg2);
+                os.writeFLD32(Register.ESP, 0);
+                os.writeMOV(X86Constants.BITS32, Register.ESP, 0, (Register) reg3);
+                os.writeFSUB32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.LADD:
             case BinaryQuad.LAND:
             case BinaryQuad.LDIV:
@@ -1299,9 +1470,39 @@ public class X86CodeGenerator extends CodeGenerator {
                 break;
 
             case BinaryQuad.FDIV:
+                os.writePUSH((Register)reg2);
+                os.writeFLD32(Register.ESP, 0);
+                os.writeFDIV32(Register.EBP, disp3);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FMUL:
+                os.writePUSH((Register)reg2);
+                os.writeFLD32(Register.ESP, 0);
+                os.writeFMUL32(Register.EBP, disp3);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FREM:
+                os.writePUSH((Register)reg2);
+                os.writeFLD32(Register.EBP, disp3);
+                os.writeFLD32(Register.ESP, 0);
+                os.writeFPREM();
+                os.writeFSTP32(Register.ESP, 0);
+                os.writeFFREE(Register.ST0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FSUB:
+                os.writePUSH((Register)reg2);
+                os.writeFLD32(Register.ESP, 0);
+                os.writeFSUB32(Register.EBP, disp3);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.LADD:
             case BinaryQuad.LAND:
             case BinaryQuad.LDIV:
@@ -1418,11 +1619,50 @@ public class X86CodeGenerator extends CodeGenerator {
             case BinaryQuad.DMUL:
             case BinaryQuad.DREM:
             case BinaryQuad.DSUB:
+                            throw new IllegalArgumentException("Unknown operation");
+
             case BinaryQuad.FADD:
+                os.writePUSH(iconst3.getValue());
+                os.writeFLD32(Register.EBP, disp2);
+                os.writeFADD32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FDIV:
+                os.writePUSH(iconst3.getValue());
+                os.writeFLD32(Register.EBP, disp2);
+                os.writeFDIV32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FMUL:
+                os.writePUSH(iconst3.getValue());
+                os.writeFLD32(Register.EBP, disp2);
+                os.writeFMUL32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FREM:
+                os.writePUSH(iconst3.getValue());
+                os.writeFLD32(Register.ESP, 0);
+                os.writeFLD32(Register.EBP, disp2);
+                os.writeFPREM();
+                os.writeFSTP32(Register.ESP, 0);
+                os.writeFFREE(Register.ST0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.FSUB:
+                os.writePUSH(iconst3.getValue());
+                os.writeFLD32(Register.EBP, disp2);
+                os.writeFSUB32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
+                break;
+
             case BinaryQuad.LADD:
             case BinaryQuad.LAND:
             case BinaryQuad.LDIV:
@@ -1569,44 +1809,48 @@ public class X86CodeGenerator extends CodeGenerator {
             case BinaryQuad.DSUB:
                 throw new IllegalArgumentException("Unknown operation");
 
-                /*
             case BinaryQuad.FADD:
-                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg3);
+                os.writePUSH((Register)reg3);
                 os.writeFLD32(Register.EBP, disp2);
-                os.writeFADD32(Register.EBP, disp1);
-                os.writeFSTP32(Register.EBP, disp1);
+                os.writeFADD32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
                 break;
 
             case BinaryQuad.FDIV:
-                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg3);
+                os.writePUSH((Register)reg3);
                 os.writeFLD32(Register.EBP, disp2);
-                os.writeFDIV32(Register.EBP, disp1);
-                os.writeFSTP32(Register.EBP, disp1);
+                os.writeFDIV32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
                 break;
 
             case BinaryQuad.FMUL:
-                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg3);
+                os.writePUSH((Register)reg3);
                 os.writeFLD32(Register.EBP, disp2);
-                os.writeFMUL32(Register.EBP, disp1);
-                os.writeFSTP32(Register.EBP, disp1);
+                os.writeFMUL32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
                 break;
 
             case BinaryQuad.FREM:
-                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg3);
-                os.writeFLD32(Register.EBP, disp1);
+                os.writePUSH((Register)reg3);
+                os.writeFLD32(Register.ESP, 0);
                 os.writeFLD32(Register.EBP, disp2);
                 os.writeFPREM();
-                os.writeFSTP32(Register.EBP, disp1);
+                os.writeFSTP32(Register.ESP, 0);
                 os.writeFFREE(Register.ST0);
+                os.writePOP((Register) reg1);
                 break;
 
             case BinaryQuad.FSUB:
-                os.writeMOV(X86Constants.BITS32, Register.EBP, disp1, (Register) reg3);
+                os.writePUSH((Register)reg3);
                 os.writeFLD32(Register.EBP, disp2);
-                os.writeFSUB32(Register.EBP, disp1);
-                os.writeFSTP32(Register.EBP, disp1);
+                os.writeFSUB32(Register.ESP, 0);
+                os.writeFSTP32(Register.ESP, 0);
+                os.writePOP((Register) reg1);
                 break;
-                */
+
             case BinaryQuad.LADD:
             case BinaryQuad.LAND:
             case BinaryQuad.LDIV:

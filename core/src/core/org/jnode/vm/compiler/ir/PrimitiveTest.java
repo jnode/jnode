@@ -257,6 +257,10 @@ public class PrimitiveTest {
     }
 
     public static int terniary(int a0, int a1){
-        return (int)((float)a0 + (float) a1);
+        float f0 = a0;// + 1.3f;
+        float f1 = a1;// + 1.7f;
+//        float f2 = f0 / f1;
+//        float f3 = f0 * f1;
+        return (int)(f0 / f1);
     }
 }
