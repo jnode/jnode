@@ -65,6 +65,7 @@ CURPROC_FS  equ 0x33
 %endmacro
 
 %include "kernel.asm"
+%include "cpu.asm"
 %include "ints.asm"
 %include "mm.asm"
 %include "console.asm"

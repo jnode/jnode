@@ -290,22 +290,25 @@ stub_%1:
 	jmp inthandler
 %endmacro
 
-int_noerror int_div, 0		; Division by zero
-int_noerror int_debug, 1	; Debug
-int_noerror int_nmi, 2		; Non maskable Interrupt
-int_noerror int_bp, 3		; Breakpoint
-int_noerror int_of, 4		; Overflow
-int_noerror int_bc, 5		; Bounds check
-int_noerror int_inv_oc, 6	; Invalid opcode
-int_noerror int_copro_na, 7	; Coprocessor not available
-int_error   int_df, 8		; Double fault
-int_noerror int_copro_or, 9	; Coprocessor overrun
-int_error   int_inv_tss, 10	; Invalid TSS
-int_error   int_snp, 11		; Segment not present
-int_error   int_sf, 12		; Stack fault
-int_error   int_gpf, 13		; General protection fault
-int_error   int_pf, 14		; Page fault
+int_noerror int_div, 0			; Division by zero
+int_noerror int_debug, 1		; Debug
+int_noerror int_nmi, 2			; Non maskable Interrupt
+int_noerror int_bp, 3			; Breakpoint
+int_noerror int_of, 4			; Overflow
+int_noerror int_bc, 5			; Bounds check
+int_noerror int_inv_oc, 6		; Invalid opcode
+int_noerror int_copro_na, 7		; Coprocessor not available
+int_error   int_df, 8			; Double fault
+int_noerror int_copro_or, 9		; Coprocessor overrun
+int_error   int_inv_tss, 10		; Invalid TSS
+int_error   int_snp, 11			; Segment not present
+int_error   int_sf, 12			; Stack fault
+int_error   int_gpf, 13			; General protection fault
+int_error   int_pf, 14			; Page fault
 int_noerror int_copro_err, 16	; Coprocessor error
+int_error int_alignment, 17		; Alignment error
+int_noerror int_mce, 18			; Machine check exception
+int_noerror int_xf, 19			; SIMD floating point exception
 int_noerror int_stack_overflow,0x31	; Stack overflow trap
 
 ; IRQ handler code
@@ -382,22 +385,25 @@ Lsetup_idt:
 	or al,0x80
 	out 0x70,al
 
-	intport 0, int_div		; Division by 0
-	intport 1, int_debug    ; Debug exception
-	intport 2, int_nmi		; NMI
-	intport 3, int_bp, 3	; Breakpoint
-	intport 4, int_of		; Overflow
-	intport 5, int_bc, 3	; Bounds check
-	intport 6, int_inv_oc	; Invalid opcode
-	intport 7, int_copro_na	; Coprocessor not available
-	intport 8, int_df		; Double fault
-	intport 9, int_copro_or	; Coprocessor overrun
-	intport 10, int_inv_tss	; Invalid TSS
-	intport 11, int_snp		; Segment not present
-	intport 12, int_sf		; Stack exception
-	intport 13, int_gpf		; General protected fault
-	intport 14, int_pf		; Page fault
-	intport 16, int_copro_err; Coprocessor error
+	intport 0, int_div			; Division by 0
+	intport 1, int_debug	    ; Debug exception
+	intport 2, int_nmi			; NMI
+	intport 3, int_bp, 3		; Breakpoint
+	intport 4, int_of			; Overflow
+	intport 5, int_bc, 3		; Bounds check
+	intport 6, int_inv_oc		; Invalid opcode
+	intport 7, int_copro_na		; Coprocessor not available
+	intport 8, int_df			; Double fault
+	intport 9, int_copro_or		; Coprocessor overrun
+	intport 10, int_inv_tss		; Invalid TSS
+	intport 11, int_snp			; Segment not present
+	intport 12, int_sf			; Stack exception
+	intport 13, int_gpf			; General protected fault
+	intport 14, int_pf			; Page fault
+	intport 16, int_copro_err	; Coprocessor error
+	intport 17, int_alignment	; Alignment error
+	intport 18, int_mce			; Machine check exception
+	intport 19, int_xf			; SIMD floating point exception
 
 	intport 0x20, irq0
 	intport 0x21, irq1
@@ -673,4 +679,23 @@ int_snp:
 int_sf:
 int_copro_na:
 	jmp int_die	
+
+; ---------------------------
+; Alignment error
+; ---------------------------
+int_alignment:
+	jmp int_die
+	
+; ---------------------------
+; Machine check exception
+; ---------------------------
+int_mce:
+	jmp int_die
+	
+; ---------------------------
+; SIMD floating point exception
+; ---------------------------
+int_xf:
+	jmp int_die
+	
 	
