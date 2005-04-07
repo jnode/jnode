@@ -46,6 +46,7 @@ public class PluginList {
 
 	private final URL[] descrList;
 	private final URL[] pluginList;
+    private final String name;
 	private Manifest manifest;
 
 	public PluginList(File file, File defaultDir, String targetArch) throws PluginException, MalformedURLException {
@@ -67,6 +68,11 @@ public class PluginList {
 			throw new PluginException("plugin-list element expected");
 		}
 
+        this.name = (String)root.getAttribute("name");
+        if (name == null) {
+            throw new PluginException("name attribute is missing in " + file);
+        }        
+        
 		for (Iterator i = root.getChildren().iterator(); i.hasNext();) {
 
 			final XMLElement e = (XMLElement) i.next();
@@ -171,4 +177,11 @@ public class PluginList {
 	public final Manifest getManifest() {
 		return this.manifest;
 	}
+
+    /**
+     * @return Returns the name.
+     */
+    public final String getName() {
+        return name;
+    }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<plugin-list>
+<plugin-list name="default">
   <manifest>
     <attribute key="Main-Class" value="org.jnode.shell.CommandShell"/>
   </manifest>

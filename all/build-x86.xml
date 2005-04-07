@@ -174,7 +174,7 @@
 	</target>
 
 	<!-- Build the boot disk -->
-	<target name="boot-disk" depends="java-image">
+	<target name="boot-disk" depends="java-image" unless="no.bootdisk">
 		<taskdef name="bootdisk" classname="org.jnode.build.BootDiskBuilder" classpathref="cp-x86" />
 
 		<property name="bootdisk.dir" value="${my-build.dir}/bootdisk" />
@@ -245,7 +245,7 @@
 	</target>
 
 	<!-- Prepare for netboot -->
-	<target name="netboot" depends="java-image">
+	<target name="netboot" depends="java-image" unless="no.netboot">
 		<copy file="${jnode.kernel}" todir="${build.netboot.dir}" />
 		<copy todir="${build.netboot.dir}">
 			<fileset dir="${initjars.dir}" />
