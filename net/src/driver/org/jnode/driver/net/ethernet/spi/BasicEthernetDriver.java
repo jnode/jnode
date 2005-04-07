@@ -76,7 +76,12 @@ public abstract class BasicEthernetDriver extends AbstractEthernetDriver {
 		try {
 		    log.info("Starting " + flags.getName());
 			abstractDeviceCore = newCore(getDevice(), flags);
-			abstractDeviceCore.initialize();
+            try {
+                abstractDeviceCore.initialize();
+            } catch (DriverException ex) {
+                abstractDeviceCore.release();
+                throw ex;
+            }
 
 			super.startDevice();
 		} catch (ResourceNotFreeException ex) {
