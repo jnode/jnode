@@ -22,6 +22,7 @@
 package org.jnode.driver.net.spi;
 
 import org.apache.log4j.Logger;
+import org.jnode.driver.DriverException;
 import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
 import org.jnode.util.TimeoutException;
@@ -45,7 +46,8 @@ public abstract class AbstractDeviceCore {
 	/**
 	 * Initialize the device
 	 */
-	public abstract void initialize();
+	public abstract void initialize()
+    throws DriverException;
 	
 	/**
 	 * Disable the device
