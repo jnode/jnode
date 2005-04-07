@@ -108,9 +108,9 @@
 		<mkdir dir="${plugins.dir}" />
 		<mkdir dir="${initjars.dir}" />
 	</target>
-    
-	<!-- Assemble all subproject jar files -->
-	<target name="assemble" depends="prepare">
+
+	<!-- Call the assemble target of all subprojects -->
+	<target name="assemble-projects" depends="prepare">
 		<ant target="assemble" dir="${root.dir}/core" inheritall="on" inheritrefs="on" />
 		<ant target="assemble" dir="${root.dir}/shell" inheritall="on" inheritrefs="on" />
 		<ant target="assemble" dir="${root.dir}/fs" inheritall="on" inheritrefs="on" />
@@ -119,7 +119,10 @@
 		<ant target="assemble" dir="${root.dir}/textui" inheritall="on" inheritrefs="on" />
 		<ant target="assemble" dir="${root.dir}/builder" inheritall="on" inheritrefs="on" />
 		<ant target="assemble" dir="${root.dir}/distr" inheritall="on" inheritrefs="on" />
-
+	</target>
+	
+	<!-- Assemble all plugins -->
+	<target name="assemble-plugins" depends="assemble-projects">
 		<!-- Now assemble all plugins -->
 		<taskdef name="plugin" classname="org.jnode.build.PluginTask" classpathref="cp-jnode" />
 		<plugin todir="${plugins.dir}" tmpdir="${build.dir}/tmp/plugins" pluginDir="${descriptors.dir}">
@@ -153,21 +156,35 @@
 				<exclude name="*plugin-list.xml" />
 			</descriptors>
 		</plugin>
+	</target>
 
-		<!-- Build all initjar's -->
-		<taskdef name="initjar" classname="org.jnode.build.InitJarBuilder" classpathref="cp-jnode" />
-		<!-- Default OS related plugins, normal boot -->
-		<initjar destfile="${initjars.dir}/default.jgz" pluginList="${basedir}/conf/default-plugin-list.xml" pluginDir="${plugins.dir}">
-		</initjar>
-		<!-- All plugins, normal boot -->
-		<initjar destfile="${initjars.dir}/full.jgz" pluginList="${basedir}/conf/full-plugin-list.xml" pluginDir="${plugins.dir}">
-		</initjar>
-		<!-- All plugins, gui boot -->
-		<initjar destfile="${initjars.dir}/fullgui.jgz" pluginList="${basedir}/conf/gui-plugin-list.xml" pluginDir="${plugins.dir}">
-		</initjar>
-		<!-- Install boot -->
-		<initjar destfile="${initjars.dir}/install.jgz" pluginList="${basedir}/conf/install-plugin-list.xml" pluginDir="${plugins.dir}">
-		</initjar>
+	<!-- Assemble all default initjars -->
+	<target name="assemble-default-initjars" depends="assemble-plugins" unless="no.default.initjars">
+		<!-- Build all default initjar's -->
+		<taskdef name="initjars" classname="org.jnode.build.InitJarsBuilder" classpathref="cp-jnode" />
+		<initjars destdir="${initjars.dir}" 
+			      pluginDir="${plugins.dir}">
+			<fileset dir="${basedir}/conf">
+				<exclude name="system-plugin-list.xml"/>
+				<include name="*plugin-list.xml"/>
+			</fileset>
+		</initjars>
+	</target>
+	
+	<!-- Assemble all custom initjars -->
+	<target name="assemble-custom-initjars" depends="assemble-plugins" if="custom.plugin-list.dir">
+		<!-- Build all custom initjar's -->
+		<taskdef name="initjars" classname="org.jnode.build.InitJarsBuilder" classpathref="cp-jnode" />
+		<initjars destdir="${initjars.dir}" 
+			      pluginDir="${plugins.dir}">
+			<fileset dir="${custom.plugin-list.dir}">
+				<include name="*plugin-list.xml"/>
+			</fileset>
+		</initjars>
+	</target>
+	
+	<!-- Assemble all subprojects, plugins and initjars -->
+	<target name="assemble" depends="assemble-default-initjars, assemble-custom-initjars">
 	</target>
 
 	<!-- Give help on possible targets -->
