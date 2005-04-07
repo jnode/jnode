@@ -1,0 +1,27 @@
+# This file contain custom JNode properties used in the JNode build process.
+#
+# Copy this file to jnode.properties and edit that file as needed.
+#
+
+# -----------------------------------------------
+# Settings for initjar building
+
+# Set this directory to the directory containing custom plugin lists 
+# if you have custom initjars to build.
+# custom.plugin-list.dir = ${root.dir}/local/plugin-lists/
+
+# Uncomment this property if you do not want the default initjars to be build.
+# no.default.initjars = 1
+
+# -----------------------------------------------
+# Settings for the bootdisk image
+
+# Uncomment this property if you do not want bootdisk image to be build.
+# no.bootdisk = 1
+
+# -----------------------------------------------
+# Settings for the netboot build
+
+# Uncomment this property if you do not want netboot directory to be build.
+# no.netboot = 1
+
