@@ -12,6 +12,7 @@ import org.jnode.driver.net.WirelessNetDeviceAPI;
 import org.jnode.driver.net.ethernet.spi.BasicEthernetDriver;
 import org.jnode.driver.net.ethernet.spi.Flags;
 import org.jnode.driver.net.spi.AbstractDeviceCore;
+import org.jnode.net.wireless.AuthenticationMode;
 import org.jnode.system.ResourceNotFreeException;
 
 /**
@@ -25,10 +26,42 @@ public abstract class WirelessEthernetDriver extends BasicEthernetDriver impleme
     public static final String WLAN_DEVICE_PREFIX = "wlan";
 
     /**
+     * @see org.jnode.driver.net.WirelessNetDeviceAPI#getAuthenticationMode()
+     */
+    public AuthenticationMode getAuthenticationMode() {
+        try {
+            return getWirelessCore().getAuthenticationMode();
+        } catch (DriverException ex) {
+            log.debug("Cannot read AuthenticationMode, defaulting to OPENSYSTEM", ex);
+            return AuthenticationMode.OPENSYSTEM;
+        }
+    }
+
+    /**
      * @see org.jnode.driver.net.spi.AbstractNetDriver#getDevicePrefix()
      */
     protected final String getDevicePrefix() {
         return WLAN_DEVICE_PREFIX;
+    }
+
+    /**
+     * @see org.jnode.driver.net.WirelessNetDeviceAPI#getESSID()
+     */
+    public String getESSID() {
+        try {
+            return getWirelessCore().getESSID();
+        } catch (DriverException ex) {
+            log.debug("Cannot read ESSID", ex);
+            return null;
+        }
+    }
+
+    /**
+     * Gets the wireless device core.
+     * @return
+     */
+    protected final WirelessDeviceCore getWirelessCore() {
+        return (WirelessDeviceCore)getDeviceCore();
     }
 
     /**
@@ -42,6 +75,38 @@ public abstract class WirelessEthernetDriver extends BasicEthernetDriver impleme
      * Create a new device code instance
      */
     protected abstract WirelessDeviceCore newWirelessCore(Device device, Flags flags) throws DriverException, ResourceNotFreeException;
+    
+    /**
+     * @see org.jnode.driver.net.WirelessNetDeviceAPI#setAuthenticationMode(org.jnode.net.wireless.AuthenticationMode)
+     */
+    public void setAuthenticationMode(AuthenticationMode mode) throws NetworkException {
+        try {
+            getWirelessCore().setAuthenticationMode(mode);
+        } catch (DriverException ex) {
+            log.debug("setAuthenticationMode failed", ex);
+            throw new NetworkException(ex);
+        }
+    }
+
+    /**
+     * @see org.jnode.driver.net.WirelessNetDeviceAPI#setESSID(java.lang.String)
+     */
+    public void setESSID(String essid) throws NetworkException {
+        try {
+            getWirelessCore().setESSID(essid);
+        } catch (DriverException ex) {
+            log.debug("setESSID failed", ex);
+            throw new NetworkException(ex);
+        }
+    }
+
+    /**
+     * @see org.jnode.driver.net.spi.AbstractNetDriver#showInfo(java.io.PrintWriter)
+     */
+    public void showInfo(PrintWriter out) {
+        super.showInfo(out);
+        out.println("Current ESSID " + getESSID());
+    }
 
     /**
      * @see org.jnode.driver.net.ethernet.spi.BasicEthernetDriver#startDevice()
@@ -57,44 +122,5 @@ public abstract class WirelessEthernetDriver extends BasicEthernetDriver impleme
     protected void stopDevice() throws DriverException {
         getDevice().unregisterAPI(WirelessNetDeviceAPI.class);
         super.stopDevice();
-    }
-
-    /**
-     * Gets the wireless device core.
-     * @return
-     */
-    protected final WirelessDeviceCore getWirelessCore() {
-        return (WirelessDeviceCore)getDeviceCore();
-    }
-    
-    /**
-     * @see org.jnode.driver.net.WirelessNetDeviceAPI#getESSID()
-     */
-    public String getESSID() {
-        try {
-            return getWirelessCore().getESSID();
-        } catch (DriverException ex) {
-            log.debug("Cannot read ESSID", ex);
-            return null;
-        }
-    }
-
-    /**
-     * @see org.jnode.driver.net.WirelessNetDeviceAPI#setESSID(java.lang.String)
-     */
-    public void setESSID(String essid) throws NetworkException {
-        try {
-            getWirelessCore().setESSID(essid);
-        } catch (DriverException ex) {
-            throw new NetworkException(ex);
-        }
-    }
-
-    /**
-     * @see org.jnode.driver.net.spi.AbstractNetDriver#showInfo(java.io.PrintWriter)
-     */
-    public void showInfo(PrintWriter out) {
-        super.showInfo(out);
-        out.println("Current ESSID " + getESSID());
     }    
 }

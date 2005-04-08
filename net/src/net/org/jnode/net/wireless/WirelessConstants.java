@@ -3,13 +3,14 @@
  */
 package org.jnode.net.wireless;
 
+
 /**
  * Constants for wireless LAN protocol 802.11
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface WirelessConstants {
-
+    
     // --- Sizes -----------------------------------------------
     public static final int WLAN_ADDR_LEN = 6;
 

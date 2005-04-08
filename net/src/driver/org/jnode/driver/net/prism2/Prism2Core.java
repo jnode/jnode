@@ -15,12 +15,16 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
 import org.jnode.net.ethernet.EthernetAddress;
+import org.jnode.net.wireless.AuthenticationMode;
 import org.jnode.net.wireless.WirelessConstants;
+import org.jnode.system.IRQHandler;
+import org.jnode.system.IRQResource;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.LittleEndian;
+import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
@@ -29,7 +33,8 @@ import org.vmmagic.unboxed.MagicUtils;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class Prism2Core extends WirelessDeviceCore implements Prism2Constants, WirelessConstants {
+final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
+        WirelessConstants, IRQHandler {
 
     /** The driver I'm a part of */
     private final Prism2Driver driver;
@@ -42,6 +47,9 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants, Wi
 
     /** Low level I/O helper */
     private Prism2IO io;
+
+    /** The IRQ resource */
+    private IRQResource irq;
 
     /**
      * Initialize this instance.
@@ -90,6 +98,18 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants, Wi
             throw new DriverException("Cannot claim memory mapped I/O", ex);
         }
 
+        // Claim IRQ
+        final int irqNo = pciCfg.getInterruptLine();
+        try {
+            this.irq = rm.claimIRQ(device, irqNo, this, true);
+        } catch (ResourceNotFreeException ex) {
+            // Release IO
+            io.release();
+            io = null;
+            // re-throw exception
+            throw new DriverException("Cannot claim IRQ", ex);
+        }
+
         log.info("Found " + flags.getName() + ", regs at "
                 + MagicUtils.toString(regsAddrPtr));
     }
@@ -98,8 +118,15 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants, Wi
      * @see org.jnode.driver.net.spi.AbstractDeviceCore#disable()
      */
     public void disable() {
-        // TODO Auto-generated method stub
+        // Disable all interrupts
+        io.setReg(REG_INTEN, 0);
 
+        // Disable the mac port
+        try {
+            executeDisableCmd(0);
+        } catch (DriverException ex) {
+            log.debug("Disable failed", ex);
+        }
     }
 
     /**
@@ -123,11 +150,12 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants, Wi
             throw new DriverException("Timeout in Access command", ex);
         }
     }
-    
+
     /**
      * Enable the given mac port of the device.
+     * 
      * @param macPort
-     * @throws DriverException 
+     * @throws DriverException
      */
     private final void executeEnableCmd(int macPort) throws DriverException {
         try {
@@ -137,6 +165,23 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants, Wi
             io.resultToException(result);
         } catch (TimeoutException ex) {
             throw new DriverException("Timeout in Enable command", ex);
+        }
+    }
+
+    /**
+     * Disable the given mac port of the device.
+     * 
+     * @param macPort
+     * @throws DriverException
+     */
+    private final void executeDisableCmd(int macPort) throws DriverException {
+        try {
+            final int cmd = CMDCODE_DISABLE | ((macPort & 7) << 8);
+            final int result;
+            result = io.executeCommand(cmd, 0, 0, 0, null);
+            io.resultToException(result);
+        } catch (TimeoutException ex) {
+            throw new DriverException("Timeout in Disable command", ex);
         }
     }
 
@@ -196,7 +241,8 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants, Wi
 
     /**
      * Read the current ESSID
-     * @throws DriverException 
+     * 
+     * @throws DriverException
      * @see org.jnode.driver.net.wireless.spi.WirelessDeviceCore#getESSID()
      */
     protected String getESSID() throws DriverException {
@@ -236,19 +282,22 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants, Wi
         getConfig(RID_CNFOWNMACADDR, macAddr, 0, RID_CNFOWNMACADDR_LEN);
         this.hwAddress = new EthernetAddress(macAddr, 0);
         log.info("MAC-address for " + flags.getName() + " " + hwAddress);
-        
+
         // Set maximum data length
         setConfig16(RID_CNFMAXDATALEN, WLAN_DATA_MAXLEN);
         // Set transmit rate control
         setConfig16(RID_TXRATECNTL, 0x000f);
         // Set authentication to Open system
         setConfig16(RID_CNFAUTHENTICATION, CNFAUTHENTICATION_OPENSYSTEM);
-        
+
         // Maybe set desired ESSID here
-        
+
         // Set port type to ESS port
         setConfig16(RID_CNFPORTTYPE, 1);
-        
+
+        // Enable Rx interrupts
+        io.setReg(REG_INTEN, INTEN_RX);
+
         // Enable card
         executeEnableCmd(0);
     }
@@ -261,6 +310,12 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants, Wi
         if (io != null) {
             this.io = null;
             io.release();
+        }
+
+        final IRQResource irq = this.irq;
+        if (irq != null) {
+            this.irq = null;
+            irq.release();
         }
     }
 
@@ -340,5 +395,67 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants, Wi
             throws InterruptedException, TimeoutException {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * @see org.jnode.system.IRQHandler#handleInterrupt(int)
+     */
+    public final void handleInterrupt(int irq) {
+        final int evstat = io.getReg(REG_EVSTAT);
+        if (evstat == 0) {
+            // No event for me
+            return;
+        }
+
+        if ((evstat & EVSTAT_RX) != 0) {
+            // Received a frame
+            processReceiveEvent();
+        }
+    }
+
+    /**
+     * A frame has been received.
+     */
+    private final void processReceiveEvent() {
+        // Read the FID of the received frame
+        final int fid = io.getReg(REG_RXFID);
+        log.info("Receive, FID=0x" + NumberUtils.hex(fid, 4));
+
+        // Read the FID into my buffer.
+        // TODO
+
+        // Acknowledge the receive
+        io.setReg(REG_EVACK, EVACK_RX);
+    }
+
+    /**
+     * @see org.jnode.driver.net.wireless.spi.WirelessDeviceCore#getAuthenticationMode()
+     */
+    protected AuthenticationMode getAuthenticationMode() throws DriverException {
+        final int mode = getConfig16(RID_CNFAUTHENTICATION);
+        switch (mode) {
+        case CNFAUTHENTICATION_OPENSYSTEM:
+            return AuthenticationMode.OPENSYSTEM;
+        case CNFAUTHENTICATION_SHAREDKEY:
+            return AuthenticationMode.SHAREDKEY;
+        default:
+            throw new DriverException("Unknown authentication mode 0x" + NumberUtils.hex(mode, 4));
+        }
+    }
+
+    /**
+     * @see org.jnode.driver.net.wireless.spi.WirelessDeviceCore#setAuthenticationMode(org.jnode.net.wireless.AuthenticationMode)
+     */
+    protected void setAuthenticationMode(AuthenticationMode mode)
+            throws DriverException {
+        final int modeVal;
+        if (mode == AuthenticationMode.OPENSYSTEM) {
+            modeVal = CNFAUTHENTICATION_OPENSYSTEM;
+        } else if (mode == AuthenticationMode.SHAREDKEY) {
+            modeVal = CNFAUTHENTICATION_SHAREDKEY; 
+        } else {
+            throw new DriverException("Unknown authentication mode " + mode);
+        }
+        setConfig16(RID_CNFAUTHENTICATION, modeVal);
     }
 }
