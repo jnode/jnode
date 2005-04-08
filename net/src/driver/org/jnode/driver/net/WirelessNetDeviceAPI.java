@@ -3,6 +3,8 @@
  */
 package org.jnode.driver.net;
 
+import org.jnode.net.wireless.AuthenticationMode;
+
 /**
  * Device API for wireless network devices.
  * 
@@ -10,6 +12,19 @@ package org.jnode.driver.net;
  */
 public interface WirelessNetDeviceAPI extends NetDeviceAPI {
 
+    /**
+     * Gets the current authentication mode.
+     * @return
+     */
+    public AuthenticationMode getAuthenticationMode();
+    
+    /**
+     * Sets the current authentication mode.
+     * @param mode
+     */
+    public void setAuthenticationMode(AuthenticationMode mode)
+    throws NetworkException;
+    
     /**
      * Gets the current ESS ID.
      * @return A valid ESSID, or null if not ESSID is present.
