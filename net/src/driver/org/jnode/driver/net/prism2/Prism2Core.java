@@ -7,7 +7,7 @@ import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.DriverException;
 import org.jnode.driver.net.ethernet.spi.Flags;
-import org.jnode.driver.net.spi.AbstractDeviceCore;
+import org.jnode.driver.net.wireless.spi.WirelessDeviceCore;
 import org.jnode.driver.pci.PCIBaseAddress;
 import org.jnode.driver.pci.PCIDevice;
 import org.jnode.driver.pci.PCIDeviceConfig;
@@ -15,10 +15,12 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
 import org.jnode.net.ethernet.EthernetAddress;
+import org.jnode.net.wireless.WirelessConstants;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
+import org.jnode.util.LittleEndian;
 import org.jnode.util.TimeoutException;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
@@ -27,7 +29,7 @@ import org.vmmagic.unboxed.MagicUtils;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class Prism2Core extends AbstractDeviceCore implements Prism2Constants {
+final class Prism2Core extends WirelessDeviceCore implements Prism2Constants, WirelessConstants {
 
     /** The driver I'm a part of */
     private final Prism2Driver driver;
@@ -35,11 +37,11 @@ final class Prism2Core extends AbstractDeviceCore implements Prism2Constants {
     /** The device flags */
     private final Prism2Flags flags;
 
-    /** Low level I/O helper */
-    private Prism2IO io;
-
     /** My ethernet address */
     private EthernetAddress hwAddress = null;
+
+    /** Low level I/O helper */
+    private Prism2IO io;
 
     /**
      * Initialize this instance.
@@ -101,6 +103,109 @@ final class Prism2Core extends AbstractDeviceCore implements Prism2Constants {
     }
 
     /**
+     * Execute the Access command
+     * 
+     * @throws DriverException
+     */
+    private final void executeAccessCmd(int rid, boolean write)
+            throws DriverException {
+        try {
+            final int result;
+            final int cmd;
+            if (write) {
+                cmd = CMDCODE_ACCESS | CMD_WRITE;
+            } else {
+                cmd = CMDCODE_ACCESS;
+            }
+            result = io.executeCommand(cmd, rid, 0, 0, null);
+            io.resultToException(result);
+        } catch (TimeoutException ex) {
+            throw new DriverException("Timeout in Access command", ex);
+        }
+    }
+    
+    /**
+     * Enable the given mac port of the device.
+     * @param macPort
+     * @throws DriverException 
+     */
+    private final void executeEnableCmd(int macPort) throws DriverException {
+        try {
+            final int cmd = CMDCODE_ENABLE | ((macPort & 7) << 8);
+            final int result;
+            result = io.executeCommand(cmd, 0, 0, 0, null);
+            io.resultToException(result);
+        } catch (TimeoutException ex) {
+            throw new DriverException("Timeout in Enable command", ex);
+        }
+    }
+
+    /**
+     * Read a configuration record
+     * 
+     * @param rid
+     * @param dst
+     * @param dstOffset
+     * @param len
+     * @throws DriverException
+     */
+    private final void getConfig(int rid, byte[] dst, int dstOffset, int len)
+            throws DriverException {
+        // Request read of RID
+        executeAccessCmd(rid, false);
+
+        // Read record header
+        final byte[] hdr = new byte[Prism2Record.HDR_LENGTH];
+        io.copyFromBAP(rid, 0, hdr, 0, hdr.length);
+
+        // Validate the record length
+        if ((Prism2Record.getRecordLength(hdr, 0) - 1) * 2 != len) {
+            throw new DriverException("Mismatch in record length. " + len + "/"
+                    + Prism2Record.getRecordLength(hdr, 0));
+        }
+
+        // Copy out record data
+        io.copyFromBAP(rid, hdr.length, dst, dstOffset, len);
+    }
+
+    /**
+     * Get a 16-bit configuration value.
+     * 
+     * @param rid
+     * @return The 16-bit value.
+     * @throws DriverException
+     */
+    private final int getConfig16(int rid) throws DriverException {
+        final byte[] arr = new byte[2];
+        getConfig(rid, arr, 0, 2);
+        return LittleEndian.getInt16(arr, 0);
+    }
+
+    /**
+     * Get a 32-bit configuration value.
+     * 
+     * @param rid
+     * @return The 32-bit value.
+     * @throws DriverException
+     */
+    private final int getConfig32(int rid) throws DriverException {
+        final byte[] arr = new byte[4];
+        getConfig(rid, arr, 0, 4);
+        return LittleEndian.getInt32(arr, 0);
+    }
+
+    /**
+     * Read the current ESSID
+     * @throws DriverException 
+     * @see org.jnode.driver.net.wireless.spi.WirelessDeviceCore#getESSID()
+     */
+    protected String getESSID() throws DriverException {
+        final byte[] id = new byte[RID_CURRENTSSID_LEN];
+        getConfig(RID_CURRENTSSID, id, 0, id.length);
+        return null;
+    }
+
+    /**
      * @see org.jnode.driver.net.spi.AbstractDeviceCore#getHwAddress()
      */
     public HardwareAddress getHwAddress() {
@@ -132,6 +237,20 @@ final class Prism2Core extends AbstractDeviceCore implements Prism2Constants {
         this.hwAddress = new EthernetAddress(macAddr, 0);
         log.info("MAC-address for " + flags.getName() + " " + hwAddress);
         
+        // Set maximum data length
+        setConfig16(RID_CNFMAXDATALEN, WLAN_DATA_MAXLEN);
+        // Set transmit rate control
+        setConfig16(RID_TXRATECNTL, 0x000f);
+        // Set authentication to Open system
+        setConfig16(RID_CNFAUTHENTICATION, CNFAUTHENTICATION_OPENSYSTEM);
+        
+        // Maybe set desired ESSID here
+        
+        // Set port type to ESS port
+        setConfig16(RID_CNFPORTTYPE, 1);
+        
+        // Enable card
+        executeEnableCmd(0);
     }
 
     /**
@@ -146,6 +265,74 @@ final class Prism2Core extends AbstractDeviceCore implements Prism2Constants {
     }
 
     /**
+     * Write a configuration record
+     * 
+     * @param rid
+     * @param src
+     * @param srcOffset
+     * @param len
+     * @throws DriverException
+     */
+    private final void setConfig(int rid, byte[] src, int srcOffset, int len)
+            throws DriverException {
+        // Create and write record header
+        final byte[] hdr = new byte[Prism2Record.HDR_LENGTH];
+        Prism2Record.setRecordLength(hdr, 0, (len / 2) + 1);
+        Prism2Record.setRecordRID(hdr, 0, rid);
+        io.copyToBAP(rid, 0, hdr, 0, hdr.length);
+
+        // Copy out record data (if any)
+        if (len > 0) {
+            io.copyToBAP(rid, hdr.length, src, srcOffset, len);
+        }
+
+        // Request write of RID
+        executeAccessCmd(rid, true);
+    }
+
+    /**
+     * Set a 16-bit configuration value.
+     * 
+     * @param rid
+     * @param value
+     * @throws DriverException
+     */
+    private final void setConfig16(int rid, int value) throws DriverException {
+        final byte[] arr = new byte[2];
+        LittleEndian.setInt16(arr, 0, value);
+        setConfig(rid, arr, 0, 2);
+    }
+
+    /**
+     * Set a 32-bit configuration value.
+     * 
+     * @param rid
+     * @param value
+     * @throws DriverException
+     */
+    private final void setConfig32(int rid, int value) throws DriverException {
+        final byte[] arr = new byte[4];
+        LittleEndian.setInt32(arr, 0, value);
+        setConfig(rid, arr, 0, 4);
+    }
+
+    /**
+     * @see org.jnode.driver.net.wireless.spi.WirelessDeviceCore#setESSID(java.lang.String)
+     */
+    protected void setESSID(String essid) throws DriverException {
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     * @see org.jnode.driver.net.wireless.spi.WirelessDeviceCore#startScan()
+     */
+    public void startScan() {
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
      * @see org.jnode.driver.net.spi.AbstractDeviceCore#transmit(org.jnode.net.SocketBuffer,
      *      long)
      */
@@ -153,55 +340,5 @@ final class Prism2Core extends AbstractDeviceCore implements Prism2Constants {
             throws InterruptedException, TimeoutException {
         // TODO Auto-generated method stub
 
-    }
-
-    /**
-     * Execute the Access command
-     * 
-     * @throws DriverException
-     */
-    private final void executeAccessCmd(int rid, boolean write)
-            throws DriverException {
-        try {
-            final int result;
-            final int cmd;
-            if (write) {
-                cmd = CMDCODE_ACCESS | CMD_WRITE;
-            } else {
-                cmd = CMDCODE_ACCESS;
-            }
-            result = io.executeCommand(cmd, rid, 0, 0, null);
-            io.resultToException(result);
-        } catch (TimeoutException ex) {
-            throw new DriverException("Timeout in Access command", ex);
-        }
-    }
-
-    /**
-     * Read a configuration record
-     * 
-     * @param rid
-     * @param dst
-     * @param dstOffset
-     * @param len
-     * @throws DriverException
-     */
-    private final void getConfig(int rid, byte[] dst, int dstOffset, int len)
-            throws DriverException {
-        // Request read of RID
-        executeAccessCmd(rid, false);
-
-        // Read record header
-        final byte[] hdr = new byte[Prism2Record.HDR_LENGTH];
-        io.copyFromBAP(rid, 0, hdr, 0, hdr.length);
-
-        // Validate the record length
-        if ((Prism2Record.getRecordLength(hdr, 0) - 1) * 2 != len) {
-            throw new DriverException("Mismatch in record length. " + len + "/"
-                    + Prism2Record.getRecordLength(hdr, 0));
-        }
-
-        // Copy out record data
-        io.copyFromBAP(rid, hdr.length, dst, dstOffset, len);
     }
 }

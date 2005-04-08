@@ -207,6 +207,41 @@ final class Prism2IO implements Prism2Constants {
     }
 
     /**
+     * Copy to the BAP from the given byte buffer.
+     * 
+     * @param id
+     *            FID or RID, destined for the select register (host order)
+     * @param offset
+     *            An _even_ offset into the buffer for the given FID/RID
+     * @param src
+     *            Source buffer
+     * @param srcOffset
+     *            Offset in source buffer
+     * @param len
+     *            length of data to transfer in bytes
+     * @throws DriverException
+     */
+    final void copyToBAP(int id, int offset, byte[] src, int srcOffset,
+            int len) throws DriverException {
+        // Prepare the BAP
+        prepareBAP(id, offset);
+
+        // Write even(len) buf contents to data reg
+        final int maxlen = len & 0xFFFE;
+        for (int i = 0; i < maxlen; i += 2) {
+            final int v = LittleEndian.getInt16(src, srcOffset + i);
+            setReg(REG_DATA0, v);
+        }
+        // If len odd, handle last byte
+        if ((len % 2) != 0) {
+            int v = getReg(REG_DATA0);
+            prepareBAP(id, offset + maxlen);
+            v = (v & 0xFF00) | (src[srcOffset + len - 1] & 0xFF);
+            setReg(REG_DATA0, v);
+        }
+    }
+
+    /**
      * Prepare the BAP registers for a transfer.
      * 
      * @param id

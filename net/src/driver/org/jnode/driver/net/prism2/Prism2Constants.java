@@ -414,6 +414,92 @@ public interface Prism2Constants {
     public static final int RID_TXRATECNTL6 = 0xFCA4;
 
     /*--------------------------------------------------------------------
+     API ENHANCEMENTS (NOT ALREADY IMPLEMENTED)
+     --------------------------------------------------------------------*/
+    public static final int RID_CNFWEPDEFAULTKEYID = 0xFC23;
+
+    public static final int RID_CNFWEPDEFAULTKEY0 = 0xFC24;
+
+    public static final int RID_CNFWEPDEFAULTKEY1 = 0xFC25;
+
+    public static final int RID_CNFWEPDEFAULTKEY2 = 0xFC26;
+
+    public static final int RID_CNFWEPDEFAULTKEY3 = 0xFC27;
+
+    public static final int RID_CNFWEPFLAGS = 0xFC28;
+
+    public static final int RID_CNFWEPKEYMAPTABLE = 0xFC29;
+
+    public static final int RID_CNFAUTHENTICATION = 0xFC2A;
+
+    public static final int RID_CNFMAXASSOCSTATIONS = 0xFC2B;
+
+    public static final int RID_CNFTXCONTROL = 0xFC2C;
+
+    public static final int RID_CNFROAMINGMODE = 0xFC2D;
+
+    public static final int RID_CNFHOSTAUTH = 0xFC2E;
+
+    public static final int RID_CNFRCVCRCERROR = 0xFC30;
+
+    // public static final int RID_CNFMMLIFE =0xFC31;
+    public static final int RID_CNFALTRETRYCNT = 0xFC32;
+
+    public static final int RID_CNFAPBCNINT = 0xFC33;
+
+    public static final int RID_CNFAPPCFINFO = 0xFC34;
+
+    public static final int RID_CNFSTAPCFINFO = 0xFC35;
+
+    public static final int RID_CNFPRIORITYQUSAGE = 0xFC37;
+
+    public static final int RID_CNFTIMCTRL = 0xFC40;
+
+    public static final int RID_CNFTHIRTY2TALLY = 0xFC42;
+
+    public static final int RID_CNFENHSECURITY = 0xFC43;
+
+    public static final int RID_CNFDBMADJUST = 0xFC46; // NEW
+
+    public static final int RID_CNFSHORTPREAMBLE = 0xFCB0;
+
+    public static final int RID_CNFEXCLONGPREAMBLE = 0xFCB1;
+
+    public static final int RID_CNFAUTHRSPTIMEOUT = 0xFCB2;
+
+    public static final int RID_CNFBASICRATES = 0xFCB3;
+
+    public static final int RID_CNFSUPPRATES = 0xFCB4;
+
+    public static final int RID_CNFFALLBACKCTRL = 0xFCB5; // NEW
+
+    public static final int RID_WEPKEYDISABLE = 0xFCB6; // NEW
+
+    public static final int RID_WEPKEYMAPINDEX = 0xFCB7; // NEW AP
+
+    public static final int RID_BROADCASTKEYID = 0xFCB8; // NEW AP
+
+    public static final int RID_ENTSECFLAGEYID = 0xFCB9; // NEW AP
+
+    public static final int RID_CNFPASSIVESCANCTRL = 0xFCB9; // NEW STA
+
+    public static final int RID_SCANREQUEST = 0xFCE1;
+
+    public static final int RID_JOINREQUEST = 0xFCE2;
+
+    public static final int RID_AUTHENTICATESTA = 0xFCE3;
+
+    public static final int RID_CHANNELINFOREQUEST = 0xFCE4;
+
+    public static final int RID_HOSTSCAN = 0xFCE5; // NEW STA
+
+    public static final int RID_CNFWEPDEFAULTKEY_LEN = 6;
+
+    public static final int RID_CNFWEP128DEFAULTKEY_LEN = 14;
+
+    public static final int RID_CNFPRIOQUSAGE_LEN = 4;
+
+    /*--------------------------------------------------------------------
      Configuration RID Lengths: Network Param, Dynamic Config Entities
      This is the length of JUST the DATA part of the RID (does not 
      include the len or code fields;
@@ -710,5 +796,10 @@ public interface Prism2Constants {
     public static final int RID_CCAMODE_LEN = 0;
 
     public static final int RID_SUPPORTEDDATARATES_LEN = 10;
+
+    /*-- Configuration Record: cnfAuthentication --*/
+    public static final int CNFAUTHENTICATION_OPENSYSTEM = 0x0001;
+
+    public static final int CNFAUTHENTICATION_SHAREDKEY = 0x0002;
 
 }

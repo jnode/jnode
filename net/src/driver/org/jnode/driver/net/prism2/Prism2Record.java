@@ -23,6 +23,16 @@ final class Prism2Record {
     }
     
     /**
+     * Sets the record length from a given record.
+     * @param dst
+     * @param dstOfs
+     * @return
+     */
+    final static void setRecordLength(byte[] dst, int dstOfs, int recordLength) {
+        LittleEndian.setInt16(dst, dstOfs + 0, recordLength);
+    }
+    
+    /**
      * Gets the RID from a given record.
      * @param src
      * @param srcOfs
@@ -30,6 +40,16 @@ final class Prism2Record {
      */
     final static int getRecordRID(byte[] src, int srcOfs) {
         return LittleEndian.getInt16(src, srcOfs + 2);
+    }
+
+    /**
+     * Sets the RID from a given record.
+     * @param dst
+     * @param dstOfs
+     * @return
+     */
+    final static void setRecordRID(byte[] dst, int dstOfs, int rid) {
+        LittleEndian.setInt16(dst, dstOfs + 2, rid);
     }
 
 }

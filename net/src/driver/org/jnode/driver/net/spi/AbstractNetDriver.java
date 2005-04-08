@@ -21,13 +21,16 @@
  
 package org.jnode.driver.net.spi;
 
+import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
+import org.jnode.driver.DeviceInfoAPI;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
@@ -39,6 +42,7 @@ import org.jnode.net.LayerHeader;
 import org.jnode.net.ProtocolAddressInfo;
 import org.jnode.net.SocketBuffer;
 import org.jnode.net.util.NetUtils;
+import org.jnode.util.NumberUtils;
 import org.jnode.util.Queue;
 import org.jnode.util.QueueProcessor;
 import org.jnode.util.QueueProcessorThread;
@@ -46,7 +50,7 @@ import org.jnode.util.QueueProcessorThread;
 /**
  * @author epr
  */
-public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, QueueProcessor {
+public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, DeviceInfoAPI, QueueProcessor {
 
 	/** My logger */
 	private static final Logger log = Logger.getLogger(AbstractNetDriver.class);
@@ -83,6 +87,7 @@ public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, 
 		} catch (NameNotFoundException ex) {
 			throw new DriverException("Cannot find DeviceManager", ex);
 		}
+        device.registerAPI(DeviceInfoAPI.class, this);
 		device.registerAPI(NetDeviceAPI.class, this);
 		txThread = new QueueProcessorThread(device.getId() + "-tx", txQueue, this);
 		txThread.start();
@@ -92,9 +97,10 @@ public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, 
 	 * @see org.jnode.driver.Driver#stopDevice()
 	 */
 	protected void stopDevice() throws DriverException {
+        getDevice().unregisterAPI(NetDeviceAPI.class);
+        getDevice().unregisterAPI(DeviceInfoAPI.class);
 		txThread.stopProcessor();
 		txThread = null;
-		getDevice().unregisterAPI(NetDeviceAPI.class);
 	}
 
 	/**
@@ -188,4 +194,18 @@ public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, 
 		protocolAddresses.put(new Integer(protocolID), addressInfo);
 	}
 
+    /**
+     * @see org.jnode.driver.DeviceInfoAPI#showInfo(java.io.PrintWriter)
+     */
+    public void showInfo(PrintWriter out) {
+        if (!protocolAddresses.isEmpty()) {
+            out.println("Protocol addresses:");
+            for (Iterator i = protocolAddresses.keySet().iterator(); i
+                    .hasNext();) {
+                final int protId = ((Integer) i.next()).intValue();
+                out.println("    0x" + NumberUtils.hex(protId, 4) + " "
+                        + getProtocolAddressInfo(protId));
+            }
+        }
+    }    
 }
