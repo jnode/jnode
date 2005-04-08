@@ -21,6 +21,7 @@
       <export name="org.jnode.net.ethernet.*"/>
       <export name="org.jnode.net.service.*"/>
       <export name="org.jnode.net.util.*"/>
+      <export name="org.jnode.net.wireless.*"/>
     </library>
   </runtime>
 

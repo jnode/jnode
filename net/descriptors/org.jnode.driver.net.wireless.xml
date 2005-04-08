@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.driver.net.ethernet" 
-        name="JNode Abstract Ethernet driver classes"
+<plugin id="org.jnode.driver.net.wireless" 
+        name="JNode Abstract Wireless Ethernet driver classes"
         version="@VERSION@"
         provider-name="JNode.org">
         
   <requires>
-    <import plugin="org.jnode.driver"/>
-    <import plugin="org.jnode.net"/>
+    <import plugin="org.jnode.driver.net.ethernet"/>
   </requires>
         
   <runtime>
     <library name="jnode-net.jar">
-      <export name="org.jnode.driver.net.ethernet.spi.*"/>
+      <export name="org.jnode.driver.net.wireless.spi.*"/>
     </library>
   </runtime>
   

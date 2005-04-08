@@ -114,4 +114,11 @@ public abstract class BasicEthernetDriver extends AbstractEthernetDriver {
 	public Flags getFlags() {
 		return flags;
 	}
+
+    /**
+     * @return Returns the device core.
+     */
+    protected final AbstractDeviceCore getDeviceCore() {
+        return abstractDeviceCore;
+    }   
 }

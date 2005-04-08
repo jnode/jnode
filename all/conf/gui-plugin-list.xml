@@ -51,6 +51,7 @@
   <plugin id="org.jnode.driver.net.prism2"/>
   <plugin id="org.jnode.driver.net.rtl8139"/>
   <plugin id="org.jnode.driver.net.bcm570x"/>
+  <plugin id="org.jnode.driver.net.wireless"/>
   <plugin id="org.jnode.driver.pci"/>
   <plugin id="org.jnode.driver.pnp"/>
   <plugin id="org.jnode.driver.ps2"/>
