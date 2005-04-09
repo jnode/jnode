@@ -146,7 +146,13 @@
 			<libalias name="log4j.jar" alias="${log4j.jar}" />
 			<libalias name="beanshell.jar" alias="${beanshell.jar}" />
 			<libalias name="lw.jar" alias="${lw.jar}" />
+			
 			<libalias name="junit.jar" alias="${junit.jar}" />
+			<libalias name="jmock-1.0.1.jar" alias="${jmock.jar}" />
+			<libalias name="jmock-cglib-1.0.1.jar" alias="${jmock-cglib.jar}" />
+			<libalias name="asm.jar" alias="${asm.jar}" />
+			<libalias name="cglib.jar" alias="${cglib.jar}" />		
+			
 			<libalias name="ant.jar" alias="${ant.jar}" />
 			<libalias name="ant-commons-net.jar" alias="${ant-commons-net.jar}" />
 			<libalias name="ant-launcher.jar" alias="${ant-launcher.jar}" />
