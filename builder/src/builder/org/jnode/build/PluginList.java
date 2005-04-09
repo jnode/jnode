@@ -88,6 +88,12 @@ public class PluginList {
 				} else {
 					throw new PluginException("id attribute expected on " + e.getName());
 				}
+
+                if(pluginList.contains(pluginUrl))
+                {
+                    throw new PluginException("can't use the same id("+id+") for multiple plugins");
+                }
+                
 				descrList.add(descrUrl);
 				pluginList.add(pluginUrl);
 			} else if (e.getName().equals("manifest")) {

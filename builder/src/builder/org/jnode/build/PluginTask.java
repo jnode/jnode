@@ -24,10 +24,13 @@ package org.jnode.build;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import nanoxml.XMLElement;
 import nanoxml.XMLParseException;
@@ -79,18 +82,24 @@ public class PluginTask extends AbstractPluginTask {
 			throw new BuildException("todir must be a directory");
 		}
 
+        Map descriptors = new HashMap();
 		for (Iterator i = descriptorSets.iterator(); i.hasNext();) {
 			final FileSet fs = (FileSet) i.next();
 			final DirectoryScanner ds = fs.getDirectoryScanner(getProject());
 			final String[] files = ds.getIncludedFiles();
 			for (int j = 0; j < files.length; j++) {
-				buildPlugin(new File(ds.getBasedir(), files[j]));
+				buildPlugin(descriptors, new File(ds.getBasedir(), files[j]));
 			}
 		}
+    }
 
-	}
-
-	protected void buildPlugin(File descriptor) throws BuildException {
+    /**
+     * 
+     * @param descriptors map of fullPluginId to File descriptor 
+     * @param descriptor
+     * @throws BuildException
+     */
+	protected void buildPlugin(Map descriptors, File descriptor) throws BuildException {
 		final PluginDescriptorModel descr;
 		try {
 			final XMLElement root = new XMLElement(new Hashtable(), true, false);
@@ -113,7 +122,13 @@ public class PluginTask extends AbstractPluginTask {
 		}
 
 		final String fullId = descr.getId() + "_" + descr.getVersion();
-
+        if(descriptors.containsKey(fullId))
+        {
+            File otherDesc = (File) descriptors.get(fullId);
+            throw new BuildException("Same id("+fullId+") for 2 plugins: "+otherDesc+", "+descriptor);
+        }        
+        descriptors.put(fullId, descriptor);
+        
 		File destFile = new File(todir, fullId + ".jar");
 
 		final Jar jarTask = new Jar();
