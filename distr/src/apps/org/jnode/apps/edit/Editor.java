@@ -43,13 +43,18 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+
+import org.apache.log4j.Logger;
 
 /**
  * @author Levente S\u00e1ntha
  */
 public class Editor extends JFrame {
+    private static Logger logger = Logger.getLogger(Editor.class);
     private JTextArea textArea;
     private JFileChooser fc;
     private String directory;
@@ -200,6 +205,10 @@ public class Editor extends JFrame {
                     JOptionPane.showMessageDialog(Editor.this, "File not found: " + file);
                 } catch (IOException ioe) {
                     JOptionPane.showMessageDialog(Editor.this, "Error saving file: " + file);
+                } catch (Exception x){
+                    String msg = "Unexpected error wile saving file: " + file;
+                    logger.error(msg, x);
+                    JOptionPane.showMessageDialog(Editor.this, msg);
                 }
                 return null;
             }
