@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jmock.cglib" 
+        name="JMock classes"
+        version="1.0.1"
+        provider-name="jmock.org">
+        
+  <runtime>
+    <library name="jmock-cglib-1.0.1.jar">
+      <export name="org.jmock.cglib.*"/>
+    </library>
+  </runtime>        
+</plugin>
