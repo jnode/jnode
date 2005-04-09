@@ -27,6 +27,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.jmock.MockObjectTestCase;
+import org.jnode.driver.Bus;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.DeviceException;
@@ -35,30 +36,39 @@ import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.block.BlockDeviceAPI;
-import org.jnode.driver.block.ramdisk.RamDiskDevice;
+import org.jnode.driver.ide.IDEConstants;
 import org.jnode.test.fs.driver.context.RamDiskDriverContext;
 import org.jnode.test.fs.driver.stubs.StubDeviceManager;
 import org.jnode.test.support.Context;
+import org.jnode.test.support.MockUtils;
 import org.jnode.test.support.TestConfig;
 import org.jnode.test.support.TestUtils;
 
 abstract public class BlockDeviceAPIContext extends Context
 {
-    final public static String DEVICE_SIZE_STR = "1M"; // may use multipliers (K, M, G)
-    final public static long DEVICE_SIZE = TestUtils.getSize(DEVICE_SIZE_STR); 
-    
-    final public static String SLOW_DEVICE_SIZE_STR = "1K"; // may use multipliers (K, M, G)
-    final public static long SLOW_DEVICE_SIZE = TestUtils.getSize(SLOW_DEVICE_SIZE_STR);
-    
     protected static final Logger log = Logger.getLogger(BlockDeviceAPIContext.class);                   
     
     private BlockDeviceAPI api;
     private BlockDeviceAPIContext parentContext;
+    private Partition[] partitions;
+    private String name;
 
-    public BlockDeviceAPIContext()
+    public BlockDeviceAPIContext(String name)
     {        
+        this.name = name;    
     }
-        
+    
+    final public String getName()
+    {
+        return name;
+    }
+    
+    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception
+    {
+        BlockDeviceAPITestConfig cfg = (BlockDeviceAPITestConfig)config;
+        partitions = cfg.getPartitions();
+    }
+    
     protected void init(BlockDeviceAPIContext parentContext, BlockDeviceAPI api, Device device)
     {
         this.api = api;
@@ -217,10 +227,8 @@ abstract public class BlockDeviceAPIContext extends Context
         return new RamDiskDriverContext();
     }
 
-    protected Device createParentDevice(long size)
+    public Partition[] getPartitions()
     {
-        //StubDevice dev = new StubDevice(size);
-        //return dev;
-        return new RamDiskDevice(StubDeviceManager.INSTANCE.getSystemBus() , "ParentDev", (int) DEVICE_SIZE);
-    }    
+        return partitions;
+    }
 }

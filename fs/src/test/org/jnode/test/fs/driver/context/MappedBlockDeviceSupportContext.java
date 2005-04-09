@@ -27,14 +27,24 @@ import org.jmock.MockObjectTestCase;
 import org.jnode.driver.Device;
 import org.jnode.driver.block.MappedBlockDeviceSupport;
 import org.jnode.test.fs.driver.BlockDeviceAPIContext;
+import org.jnode.test.fs.driver.BlockDeviceAPITestConfig;
+import org.jnode.test.support.MockObjectFactory;
 import org.jnode.test.support.TestConfig;
 
 public class MappedBlockDeviceSupportContext extends BlockDeviceAPIContext
 {
-    public void init(TestConfig config, MockObjectTestCase testCase) throws IOException
+    public MappedBlockDeviceSupportContext()
     {
-        Device parent = createParentDevice(DEVICE_SIZE);
-        MappedBlockDeviceSupport api = new MappedBlockDeviceSupport(parent, 0L, DEVICE_SIZE);
+        super("MappedBlockDeviceSupport");
+    }
+            
+    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception
+    {
+        super.init(config, testCase);
+        
+        Device parent = MockObjectFactory.createParentDevice();
+        BlockDeviceAPITestConfig cfg = (BlockDeviceAPITestConfig) config;        
+        MappedBlockDeviceSupport api = new MappedBlockDeviceSupport(parent, 0L, cfg.getDeviceSize());
         init(null, api, null);
     }
 }

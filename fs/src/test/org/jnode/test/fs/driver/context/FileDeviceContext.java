@@ -37,11 +37,14 @@ public class FileDeviceContext extends BlockDeviceAPIContext
 
     public FileDeviceContext() throws IOException
     {
+        super("FileDevice");
         f = TestUtils.makeTempFile("TestFileDevice", "1M");
     }
     
-    public void init(TestConfig config, MockObjectTestCase testCase) throws FileNotFoundException, IOException
+    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception
     {
+        super.init(config, testCase);
+        
         FileDevice device = new FileDevice(f, "rw");
         init(null, device, null);
     }

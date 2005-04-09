@@ -38,8 +38,15 @@ import org.jnode.test.support.TestConfig;
 
 public class FloppyDriverContext extends BlockDeviceAPIContext
 {
-    public void init(TestConfig config, MockObjectTestCase testCase) throws IOException
+    public FloppyDriverContext()
     {
+        super("FloppyDriver");
+    }
+    
+    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception
+    {
+        super.init(config, testCase);
+        
         // set the current testCase for our factory
         MockFloppyDeviceFactory factory;
         try {

@@ -18,24 +18,37 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
-package org.jnode.test.support;
 
+package org.jnode.test.fs.driver;
 
-import org.jmock.cglib.MockObjectTestCase;
-
-/**
- * 
- * @author Fabien DUMINY
- */
-public interface TestConfig 
+public class Partition
 {
-    public Class getContextClass();
+    private final boolean extended;
+    private final long startLba;
+    private final long nbSectors;
     
-    /**
-     * 
-     */
-	public String toString();
+    public Partition(final boolean extended, final long startLba, final long nbSectors)
+    {
+        this.extended = extended;
+        this.startLba = startLba;
+        this.nbSectors = nbSectors;
+    }
+
+    public boolean isExtended()
+    {
+        return extended;
+    }
     
-    public String getName();
+
+    public long getNbSectors()
+    {
+        return nbSectors;
+    }
+    
+
+    public long getStartLba()
+    {
+        return startLba;
+    }
+    
 }

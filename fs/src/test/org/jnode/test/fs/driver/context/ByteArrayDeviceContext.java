@@ -24,13 +24,22 @@ package org.jnode.test.fs.driver.context;
 import org.jmock.MockObjectTestCase;
 import org.jnode.driver.block.ByteArrayDevice;
 import org.jnode.test.fs.driver.BlockDeviceAPIContext;
+import org.jnode.test.fs.driver.BlockDeviceAPITestConfig;
 import org.jnode.test.support.TestConfig;
 
 public class ByteArrayDeviceContext extends BlockDeviceAPIContext
 {
-    public void init(TestConfig config, MockObjectTestCase testCase)
+    public ByteArrayDeviceContext()
     {
-        ByteArrayDevice device = new ByteArrayDevice(new byte[(int)DEVICE_SIZE]);
+        super("ByteArrayDevice");
+    }
+
+    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception
+    {
+        super.init(config, testCase);
+        
+        BlockDeviceAPITestConfig cfg = (BlockDeviceAPITestConfig) config;                 
+        ByteArrayDevice device = new ByteArrayDevice(new byte[cfg.getDeviceSize()]);
         init(null, device, null);
     }                
 }

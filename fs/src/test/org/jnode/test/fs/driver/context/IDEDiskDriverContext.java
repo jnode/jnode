@@ -34,14 +34,22 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.test.fs.driver.BlockDeviceAPIContext;
+import org.jnode.test.fs.driver.BlockDeviceAPITestConfig;
 import org.jnode.test.fs.driver.factories.MockIDEDeviceFactory;
 import org.jnode.test.support.MockObjectFactory;
 import org.jnode.test.support.TestConfig;
 
 public class IDEDiskDriverContext extends BlockDeviceAPIContext
 {
-    public void init(TestConfig config, MockObjectTestCase testCase) throws NameAlreadyBoundException, NamingException, IllegalArgumentException, DriverException, ResourceNotFreeException
+    public IDEDiskDriverContext()
     {
+        super("IDEDiskDriver");
+    }
+        
+    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception
+    {
+        super.init(config, testCase);
+        
         IDEDiskDriver driver = new IDEDiskDriver();            
         
         // set the current testCase for our factory
@@ -53,8 +61,9 @@ public class IDEDiskDriverContext extends BlockDeviceAPIContext
         MockObjectFactory.createResourceManager(testCase);
 
         // create stub IDE device
-        Device parent = createParentDevice(DEVICE_SIZE);
-        IDEDevice device = MockObjectFactory.createIDEDevice(parent, testCase, true, SLOW_DEVICE_SIZE);
+        Device parent = MockObjectFactory.createParentDevice();
+        BlockDeviceAPITestConfig cfg = (BlockDeviceAPITestConfig) config;                         
+        IDEDevice device = MockObjectFactory.createIDEDevice(parent, testCase, true, cfg.getDeviceSize());
         
         init(null, driver, device);
     }

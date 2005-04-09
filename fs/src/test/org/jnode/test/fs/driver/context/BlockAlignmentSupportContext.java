@@ -29,8 +29,15 @@ import org.jnode.test.support.TestConfig;
 
 public class BlockAlignmentSupportContext extends BlockDeviceAPIContext
 {
-    public void init(TestConfig config, MockObjectTestCase testCase)
+    public BlockAlignmentSupportContext()
     {
+        super("BlockAlignmentSupport");
+    }
+
+    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception
+    {
+        super.init(config, testCase);
+        
         BlockDeviceAPIContext parentCtx = createParentBlockDeviceAPI();
         BlockDeviceAPI api = new BlockAlignmentSupport(parentCtx.getApi(), 512);
         init(parentCtx, api, null);
