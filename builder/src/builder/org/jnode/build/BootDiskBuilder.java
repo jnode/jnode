@@ -32,6 +32,7 @@ import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.block.BlockDeviceAPI;
+import org.jnode.driver.block.Geometry;
 import org.jnode.driver.block.MappedFSBlockDeviceSupport;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.fat.Fat;
@@ -39,7 +40,6 @@ import org.jnode.fs.fat.GrubBootSector;
 import org.jnode.fs.fat.GrubFatFormatter;
 import org.jnode.fs.partitions.ibm.IBMPartitionTableEntry;
 import org.jnode.fs.partitions.ibm.IBMPartitionTypes;
-import org.jnode.fs.util.Geometry;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
