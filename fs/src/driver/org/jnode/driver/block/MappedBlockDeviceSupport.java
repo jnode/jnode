@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
+import org.jnode.system.BootLog;
 
 /**
  * @author epr
@@ -55,7 +56,9 @@ public class MappedBlockDeviceSupport extends Device implements BlockDeviceAPI {
 			throw new IndexOutOfBoundsException("length < 0");
 		}
 		if (offset + length > parentApi.getLength()) {
-			throw new IndexOutOfBoundsException("offset + length > parent.length");
+			throw new IndexOutOfBoundsException(
+                        "offset("+offset+") + length("+length+
+                        ") > parent.length("+parentApi.getLength()+")");
 		}
 		registerAPI(BlockDeviceAPI.class, this);
 	}
