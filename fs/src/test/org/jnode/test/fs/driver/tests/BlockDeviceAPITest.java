@@ -24,7 +24,13 @@ package org.jnode.test.fs.driver.tests;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import junit.framework.AssertionFailedError;
+
 import org.jnode.driver.block.BlockDeviceAPI;
+import org.jnode.driver.floppy.FloppyDriver;
+import org.jnode.driver.ide.IDEConstants;
+import org.jnode.driver.ide.disk.IDEDiskDriver;
+import org.jnode.driver.ide.disk.IDEDiskPartitionDriver;
 import org.jnode.test.fs.driver.BlockDeviceAPITestConfig;
 import org.jnode.test.support.AbstractTest;
 
@@ -72,46 +78,284 @@ public class BlockDeviceAPITest extends AbstractTest
         long length = getBlockDeviceAPI().getLength();
         assertTrue("length must be > 0 (actual:"+length+")", length>0);
     }
-    
-    public void testRead() throws IOException
+
+    public void testRegularReadUnaligned() throws Exception
     {
-        ByteBuffer bb = ByteBuffer.allocate(512);
+        doRead(false, Bounds.LOWER);
+        doRead(false, Bounds.NOMINAL);
+        doRead(false, Bounds.UPPER);
+    }
+
+    public void testRegularReadAligned() throws Exception
+    {
+        doRead(true, Bounds.LOWER);
+        doRead(true, Bounds.NOMINAL);
+        doRead(true, Bounds.UPPER);
+    }
+
+    public void testOutOfBoundsRead() throws Exception
+    {
+        doRead(true, Bounds.BEFORE_LOWER);
+        doRead(true, Bounds.AROUND_LOWER);
+        doRead(true, Bounds.AROUND_UPPER);
+        doRead(true, Bounds.AFTER_UPPER);
+    }
+    
+    public void testRegularWriteUnaligned() throws Exception
+    {
+        doWrite(false, Bounds.LOWER);
+        doWrite(false, Bounds.NOMINAL);
+        doWrite(false, Bounds.UPPER);
+    }
+
+    public void testRegularWriteAligned() throws Exception
+    {
+        doWrite(true, Bounds.LOWER);
+        doWrite(true, Bounds.NOMINAL);
+        doWrite(true, Bounds.UPPER);
+    }
+
+    public void testOutOfBoundsWrite() throws Exception
+    {
+        doWrite(true, Bounds.BEFORE_LOWER);
+        doWrite(true, Bounds.AROUND_LOWER);
+        doWrite(true, Bounds.AROUND_UPPER);
+        doWrite(true, Bounds.AFTER_UPPER);
+    }
+    
+    private void doRead(boolean aligned, byte boundsType) throws Exception
+    {
+        Bounds bounds = new Bounds(true, aligned, boundsType);
+        boolean errorOccured;
         
-        int offset = 0;
+        try
+        {
+            doRead(bounds);
+            errorOccured = false;
+        }
+        //catch(IOException ioe) // probably better solution
+        catch(Throwable t)
+        {
+            if(!bounds.expectError())
+            {
+                log.error("Unexpected error occurred", t);
+            }
+            errorOccured = true;
+        }
+         
+        if(bounds.expectError())
+        {
+            assertTrue("expected an error for "+bounds, errorOccured);
+        }
+        else
+        {
+            assertFalse("error not expected for "+bounds, errorOccured);
+        }
+    }
+
+    private void doWrite(boolean aligned, byte boundsType) throws Exception
+    {
+        Bounds bounds = new Bounds(false, aligned, boundsType);
+        boolean errorOccured;
+        
+        try
+        {
+            doWrite(bounds);
+            errorOccured = false;
+        }
+        //catch(IOException ioe) // probably better solution
+        catch(Throwable t)
+        {
+            if(!bounds.expectError())
+            {
+                log.error("Unexpected error occurred", t);
+            }
+            errorOccured = true;
+        }
+         
+        if(bounds.expectError())
+        {
+            assertTrue("expected an error for "+bounds, errorOccured);
+        }
+        else
+        {
+            assertFalse("error not expected for "+bounds, errorOccured);
+        }
+    }
+    
+    private void doRead(Bounds bounds) throws IOException
+    {
+        log.info(bounds.toString());
+        ByteBuffer bb = ByteBuffer.allocate(IDEConstants.SECTOR_SIZE);
+        
+        long offset = bounds.getStart();
         int toRead;
         BlockDeviceAPI api = getBlockDeviceAPI();
-        long apiLength = api.getLength();
         
-        log.debug("apiLength="+apiLength);
-        
-        while(offset < apiLength)
+        while(offset < bounds.getEnd())
         {            
-            toRead = Math.min(bb.remaining(), (int) (apiLength-offset));
-            log.debug("reading "+toRead+" bytes at offset "+offset);
+            toRead = Math.min(bb.remaining(), (int) (bounds.getEnd()-offset));
             
             api.read(offset, bb.array(), 0, toRead);
             bb.clear();
             
             offset += toRead;
-        }
+        }        
     }
     
-    public void testWrite() throws IOException
+    private void doWrite(Bounds bounds) throws IOException
     {
-        ByteBuffer bb = ByteBuffer.allocate(512);
+        log.info(bounds.toString());
+        ByteBuffer bb = ByteBuffer.allocate(IDEConstants.SECTOR_SIZE);
         
-        int offset = 0;
+        long offset = bounds.getStart();
         int toWrite;
         BlockDeviceAPI api = getBlockDeviceAPI();
         
-        while(offset < api.getLength())
+        while(offset < bounds.getEnd())
         {            
-            toWrite = Math.min(bb.remaining(), (int) (api.getLength()-offset));
+            toWrite = Math.min(bb.remaining(), (int) (bounds.getEnd()-offset));
             
             api.write(offset, bb.array(), 0, toWrite);
             bb.clear();
             
             offset += toWrite;
+        }        
+    }
+
+    private class Bounds
+    {
+        // bounds types
+        public static final byte BEFORE_LOWER = 0; // lead to an error
+        public static final byte AROUND_LOWER = 1; // lead to an error
+        public static final byte LOWER        = 2;
+        public static final byte NOMINAL      = 3;
+        public static final byte UPPER        = 4;
+        public static final byte AROUND_UPPER = 5; // lead to an error
+        public static final byte AFTER_UPPER  = 6; // lead to an error
+
+        private static final long UNALIGNMENT_OFFSET = IDEConstants.SECTOR_SIZE / 2;
+        private static final long DELTA = IDEConstants.SECTOR_SIZE;
+        
+        private long start;
+        private long end;
+        private boolean expectError;
+        private boolean read;
+        private String toStringDesc = "";
+
+        public Bounds(boolean read, boolean aligned, byte boundsType) throws Exception
+        {
+            this.read = read;
+            
+            expectError = true;
+            toStringDesc = aligned ? "aligned " : "unaligned ";
+            long middle;
+            
+            switch(boundsType)
+            {
+            case BEFORE_LOWER:
+                toStringDesc += "BEFORE_LOWER";                
+                expectError = true; // must give an error
+                start = -DELTA;
+                end = 0;
+                break;
+            
+            case AROUND_LOWER:
+                toStringDesc += "AROUND_LOWER"; 
+                expectError = true; // must give an error
+                start = -DELTA;
+                end = +DELTA;
+                break;
+                
+            case LOWER:
+                toStringDesc += "LOWER";
+                expectError = false; // must NOT give an error
+                start = 0;
+                end = +DELTA;
+                break;
+                
+            case NOMINAL:
+                toStringDesc += "NOMINAL"; 
+                expectError = false; // must NOT give an error
+                middle = getBlockDeviceAPI().getLength() / 2;
+                start = middle - DELTA;
+                end = middle + DELTA;
+                break;
+                
+            case UPPER:
+                toStringDesc += "UPPER"; 
+                expectError = false; // must NOT give an error
+                start = getBlockDeviceAPI().getLength() - DELTA;
+                end = getBlockDeviceAPI().getLength();
+                break;
+                
+            case AROUND_UPPER:
+                toStringDesc += "AROUND_UPPER"; 
+                expectError = true; // must give an error
+                start = getBlockDeviceAPI().getLength() - DELTA;
+                end = getBlockDeviceAPI().getLength() + DELTA;
+                break;
+                
+            case AFTER_UPPER:          
+                toStringDesc += "AFTER_UPPER"; 
+                expectError = true; // must give an error
+                start = getBlockDeviceAPI().getLength();
+                end = getBlockDeviceAPI().getLength() + DELTA;
+                break;
+                    
+            default:
+                throw new Exception("unexpected boundsType: "+boundsType);
+            }
+            
+            if(!expectError) // is it a regular usage ?
+            {
+                if(!aligned)
+                {
+                    start += UNALIGNMENT_OFFSET;
+                    end += UNALIGNMENT_OFFSET;
+                }
+                
+                // adjustment for regular usage (to be in the bounds)
+                start = Math.max(0, start);
+                end = Math.min(getBlockDeviceAPI().getLength(), end);                
+            }
+           
+            boolean apiNeedAlignment = (getBlockDeviceAPI() instanceof FloppyDriver) ||
+                                    (getBlockDeviceAPI() instanceof IDEDiskDriver);
+            expectError |= !aligned && apiNeedAlignment;                        
+        }
+        
+        
+        public long getEnd()
+        {
+            return end;
+        }
+
+        public long getStart()
+        {
+            return start;
+        }        
+        
+        public boolean expectError()
+        {
+            return expectError;
+        }
+
+        public String toString()
+        {            
+            String devSize;
+            try
+            {
+                devSize = "" + getBlockDeviceAPI().getLength();
+            }
+            catch (IOException e)
+            {
+                log.error("error in toString", e);
+                devSize = "???";
+            }
+            
+            return (read ? "read " : "write ") + " " + toStringDesc + 
+                    " ["+start+", "+end+"] (devSize="+devSize+") with config " + getTestConfig().getName();
         }
     }
 }

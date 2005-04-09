@@ -22,23 +22,41 @@
 package org.jnode.test.fs.driver;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jnode.driver.block.BlockDeviceAPI;
-import org.jnode.test.fs.filesystem.FSContext;
+import org.jnode.driver.ide.IDEConstants;
 import org.jnode.test.support.ContextManager;
 import org.jnode.test.support.TestConfig;
+import org.jnode.test.support.TestUtils;
 
 /**
  * 
  * @author Fabien DUMINY
  */
 public class BlockDeviceAPITestConfig implements TestConfig {
+    final private static String DEVICE_SIZE_STR = "1M"; // may use multipliers (K, M, G)
+    final private static int DEVICE_SIZE = (int)TestUtils.getSize(DEVICE_SIZE_STR);        
+    
     private Class contextClass;
+    private List partitions = new ArrayList();
     
     public BlockDeviceAPITestConfig(Class contextClass)
     {
         this.contextClass = contextClass;
     }
-    
+
+    public void addPartition(Partition partition)
+    {
+        partitions.add(partition);
+    }
+
+    public Partition[] getPartitions()
+    {
+        return (Partition[]) partitions.toArray(new Partition[partitions.size()]);
+    }
+        
     /**
      * 
      * @return
@@ -68,4 +86,19 @@ public class BlockDeviceAPITestConfig implements TestConfig {
                getContextClass().getName()+"[NO_API]" :
                api.getClass().getName();
 	}
+
+    public int getDeviceSize()
+    {
+        return DEVICE_SIZE;
+    }
+    
+    public int getDeviceNbSectors()
+    {
+        return DEVICE_SIZE / IDEConstants.SECTOR_SIZE;
+    }
+
+    public String getName()
+    {
+        return ((BlockDeviceAPIContext) ContextManager.getInstance().getContext()).getName();
+    }    
 }

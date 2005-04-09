@@ -91,5 +91,10 @@ public class FSTestConfig implements TestConfig {
     public String toString()
     {
         return os.toString() + "," + fs + "\n"+deviceParam;
+    }
+
+    public String getName()
+    {
+        return toString();
     }    
 }

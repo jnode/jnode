@@ -90,9 +90,10 @@ public abstract class AbstractTest extends /*TestCase*/ MockObjectTestCase {
 	 */
 	public void tearDown() throws Exception
 	{
+        String testName = getTestName(); // must be called before clearContext 
         ContextManager.getInstance().clearContext();
         
-        log.info("END "+getTestName()); // marker for log4j traces
+        log.info("END "+testName); // marker for log4j traces
 	}
 
     final protected TestConfig getTestConfig()
@@ -119,6 +120,25 @@ public abstract class AbstractTest extends /*TestCase*/ MockObjectTestCase {
                       "config:"+testConfig, t);
             throw t;
         }
+    }
+    
+//    final public String getName()
+//    {
+//        String name = super.getName();
+//        if(testConfig != null)
+//        {
+//            name += "[" + testConfig.getName() + "]";
+//        }
+//        return name;
+//    }
+
+    final public void setName(String name)
+    {
+        if(testConfig != null)
+        {
+            name += "[" + testConfig.getName() + "]";
+        }
+        super.setName(name);
     }
     
     final protected String getTestName()

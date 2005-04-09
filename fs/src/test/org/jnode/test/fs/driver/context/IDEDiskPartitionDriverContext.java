@@ -28,9 +28,15 @@ import org.jnode.test.support.TestConfig;
 
 public class IDEDiskPartitionDriverContext extends BlockDeviceAPIContext
 {
-
+    public IDEDiskPartitionDriverContext()
+    {
+        super("IDEDiskPartitionDriver");
+    }
+        
     public void init(TestConfig config, MockObjectTestCase testCase) throws Exception
     {
+        super.init(config, testCase);
+        
         // TODO Auto-generated method stub
         
     }

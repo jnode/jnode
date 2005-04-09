@@ -41,13 +41,38 @@ public class BlockDeviceAPITestSuite extends AbstractTestSuite
     public List getConfigs()
     {
         List configs = new ArrayList();
+        BlockDeviceAPITestConfig cfg;
         
         addConfig(configs, RamDiskDriverContext.class);     
         addConfig(configs, ByteArrayDeviceContext.class);
+               
         addConfig(configs, FloppyDriverContext.class);
         addConfig(configs, FileDeviceContext.class);        
-        addConfig(configs, IDEDiskDriverContext.class);
+
+        // with no partition
+        cfg = addConfig(configs, IDEDiskDriverContext.class);
         
+        // with one partition
+        cfg = addConfig(configs, IDEDiskDriverContext.class);
+        cfg.addPartition(new Partition(false, 0, cfg.getDeviceNbSectors()));
+        
+        // with two partitions
+        cfg = addConfig(configs, IDEDiskDriverContext.class);
+        int nbSectors1 = cfg.getDeviceNbSectors() / 2;
+        int nbSectors2 = cfg.getDeviceNbSectors() - nbSectors1;
+        cfg.addPartition(new Partition(false, 0, nbSectors1));
+        cfg.addPartition(new Partition(false, nbSectors1, nbSectors2));
+
+        // These tests are disabled because they will succeed but they should not !!!
+        // (probably not tested, so it give no error for this bad config) :
+//        // with two overlapping partitions
+//        cfg = addConfig(configs, IDEDiskDriverContext.class);
+//        int overlapSectors = 10;
+//        nbSectors1 = cfg.getDeviceNbSectors() / 2;
+//        nbSectors2 = cfg.getDeviceNbSectors() - nbSectors1;
+//        cfg.addPartition(new Partition(false, 0, nbSectors1));
+//        cfg.addPartition(new Partition(false, nbSectors1-overlapSectors, nbSectors2));
+                
 //        addConfig(configs, IDEDiskPartitionDriverContext.class);//TODO: develop stubs ?
 //        
 //        addConfig(configs, SCSICDROMDriverContext.class); //TODO: develop stubs ?
@@ -57,10 +82,11 @@ public class BlockDeviceAPITestSuite extends AbstractTestSuite
         return configs;
     }
     
-    protected void addConfig(List configs, Class contextClass)
+    protected BlockDeviceAPITestConfig addConfig(List configs, Class contextClass)
     {
         BlockDeviceAPITestConfig cfg = new BlockDeviceAPITestConfig(contextClass);
         configs.add(cfg);            
+        return cfg;
     }
     
     public Class[] getTestSuites()

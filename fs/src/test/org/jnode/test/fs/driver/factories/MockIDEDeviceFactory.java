@@ -22,16 +22,22 @@
 package org.jnode.test.fs.driver.factories;
 
 import org.jmock.cglib.Mock;
+import org.jmock.core.Invocation;
+import org.jmock.core.Stub;
 import org.jmock.core.stub.ReturnStub;
 import org.jnode.driver.Device;
 import org.jnode.driver.ide.DefaultIDEControllerDriver;
 import org.jnode.driver.ide.IDEBus;
+import org.jnode.driver.ide.IDEConstants;
 import org.jnode.driver.ide.IDEDevice;
 import org.jnode.driver.ide.IDEDeviceFactory;
 import org.jnode.driver.ide.IDEDriveDescriptor;
 import org.jnode.driver.ide.IDEIO;
 import org.jnode.fs.partitions.ibm.IBMPartitionTable;
 import org.jnode.fs.partitions.ibm.IBMPartitionTableEntry;
+import org.jnode.test.fs.driver.BlockDeviceAPIContext;
+import org.jnode.test.fs.driver.Partition;
+import org.jnode.test.support.ContextManager;
 import org.jnode.test.support.MockInitializer;
 import org.jnode.test.support.MockUtils;
 
@@ -97,7 +103,7 @@ public class MockIDEDeviceFactory extends AbstractMockDeviceFactory
         return (IDEIO) MockUtils.createMockObject(IDEIO.class, initializer);
     }
 
-    private IBMPartitionTableEntry createEntry()
+    private IBMPartitionTableEntry createEntry(int partNum, final boolean extended, final long startLba, final long nbSectors)
     {
         MockInitializer initializer = new MockInitializer()
         {
@@ -107,24 +113,45 @@ public class MockIDEDeviceFactory extends AbstractMockDeviceFactory
                 mockEntry.expects(testCase.atLeastOnce()).method("isValid").withNoArguments().
                         will(new ReturnStub(valid));
 
-                Boolean extended = Boolean.FALSE;
+                Boolean bExtended = Boolean.valueOf(extended);
                 mockEntry.expects(testCase.atLeastOnce()).method("isExtended").withNoArguments().
-                        will(new ReturnStub(extended));
+                        will(new ReturnStub(bExtended));
                 
-                Long startLba = new Long(0);
+                Long lStartLba = new Long(0);
                 mockEntry.expects(testCase.atLeastOnce()).method("getStartLba").withNoArguments().
-                        will(new ReturnStub(startLba));
+                        will(new ReturnStub(lStartLba));
                                 
-                Long nbSectors = new Long(1024);
+                Long lNbSectors = new Long(nbSectors);
                 mockEntry.expects(testCase.atLeastOnce()).method("getNrSectors").withNoArguments().
-                        will(new ReturnStub(nbSectors));
+                        will(new ReturnStub(lNbSectors));
             }
         };
         
         Class[] argCls = new Class[]{byte[].class, int.class};
-        Object[] args = new Object[]{new byte[512], new Integer(0)};        
+        Object[] args = new Object[]{new byte[IDEConstants.SECTOR_SIZE], new Integer(partNum)};        
         
         return (IBMPartitionTableEntry) MockUtils.createMockObject(IBMPartitionTableEntry.class, initializer, argCls, args);        
+    }
+
+    public class GetEntryStub implements Stub
+    {
+        private Partition[] partitions;
+
+        public GetEntryStub(Partition[] parts) {
+            this.partitions = parts;
+        }
+
+        public StringBuffer describeTo( StringBuffer buffer ) {
+            return buffer.append("get partition entry");
+        }
+
+        public Object invoke( Invocation invocation ) throws Throwable {
+            int index = ((Integer)invocation.parameterValues.get(0)).intValue();
+            Partition part = partitions[index];
+            IBMPartitionTableEntry entry = createEntry(index, part.isExtended(), 
+                    part.getStartLba(), part.getNbSectors());            
+            return entry;
+        }
     }
     
     public IBMPartitionTable createIBMPartitionTable(byte[] bs, Device dev)
@@ -133,14 +160,16 @@ public class MockIDEDeviceFactory extends AbstractMockDeviceFactory
         {
             public void init(Mock mockTable)
             {
-                Integer nbParts = new Integer(1);
+                final BlockDeviceAPIContext context = (BlockDeviceAPIContext) ContextManager.getInstance().getContext();
+                final Partition[] parts = context.getPartitions();
+                log.debug("with "+parts.length+" partitions");
+                                
+                Integer nbParts = new Integer(parts.length);
                 mockTable.expects(testCase.atLeastOnce()).method("getLength").withNoArguments().
                         will(new ReturnStub(nbParts));
-
-                
-                IBMPartitionTableEntry entry = createEntry();
+                                
                 mockTable.expects(testCase.atLeastOnce()).method("getEntry").withAnyArguments().
-                        will(new ReturnStub(entry));
+                        will(new GetEntryStub(parts));
             }
         };
         

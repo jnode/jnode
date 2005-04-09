@@ -29,6 +29,7 @@ import junit.framework.TestCase;
 import org.jmock.cglib.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.stub.ReturnStub;
+import org.jnode.driver.Bus;
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.ide.DefaultIDEControllerDriver;
@@ -38,8 +39,10 @@ import org.jnode.driver.ide.IDEDevice;
 import org.jnode.driver.ide.IDEDriveDescriptor;
 import org.jnode.driver.ide.IDEDriverUtils;
 import org.jnode.naming.InitialNaming;
+import org.jnode.system.BootLog;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
+import org.jnode.test.fs.driver.stubs.StubDeviceManager;
 
 public class MockObjectFactory
 {
@@ -69,9 +72,9 @@ public class MockObjectFactory
         final MockObjectTestCase mockTestCase = (MockObjectTestCase) testCase;
         MockInitializer initializer = new MockInitializer()
         {
-
             public void init(Mock mockDesc)
             {
+                BootLog.debug("devSize="+deviceSize);
                 Boolean bSupp48bitsAddr = Boolean.valueOf(supp48bitsAddr); 
                 mockDesc.expects(mockTestCase.atLeastOnce()).
                         method("supports48bitAddressing").
@@ -115,5 +118,12 @@ public class MockObjectFactory
         };
         ResourceManager resMgr = (ResourceManager) MockUtils.createMockObject(ResourceManager.class, initializer);
         InitialNaming.bind(ResourceManager.NAME, resMgr);            
-    }                
+    }
+    
+    public static Device createParentDevice()
+    {
+        Class[] clsArgs = new Class[]{Bus.class, String.class};
+        Object[] args = new Object[]{StubDeviceManager.INSTANCE.getSystemBus(), "MockDevice"};
+        return (Device) MockUtils.createMockObject(Device.class, clsArgs, args);
+    }    
 }
