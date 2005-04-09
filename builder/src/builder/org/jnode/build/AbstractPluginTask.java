@@ -22,6 +22,7 @@
 package org.jnode.build;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -59,6 +60,10 @@ public abstract class AbstractPluginTask extends Task {
 		final File f;
 		if (libAlias == null) {
 			f = new File(srcDir, lib.getName());
+            if(!f.exists())
+            {
+                throw new BuildException("file not found "+f.getAbsoluteFile()+" because "+lib.getName()+" has no alias");
+            }
 		} else {
 			f = libAlias.getAlias();
 		}
