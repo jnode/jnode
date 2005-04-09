@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="net.sf.cglib" 
+        name="cglib classes"
+        version="2.1"
+        provider-name="cglib.sf.net">
+        
+  <runtime>
+    <library name="cglib.jar">
+      <export name="net.sf.cglib.*"/>
+    </library>
+  </runtime>        
+</plugin>
