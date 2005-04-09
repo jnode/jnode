@@ -63,6 +63,7 @@ public class FileDevice extends Device implements FSBlockDeviceAPI {
 	 * @throws IOException
 	 */
 	public void read(long devOffset, byte[] dest, int destOffset, int length) throws IOException {
+        BlockDeviceAPIHelper.checkBounds(this, devOffset, length);
 		raf.seek(devOffset);
 		raf.read(dest, destOffset, length);
 	}
@@ -77,6 +78,7 @@ public class FileDevice extends Device implements FSBlockDeviceAPI {
 	 */
 	public void write(long devOffset, byte[] src, int srcOffset, int length) throws IOException {
 		//		log.debug("fd.write devOffset=" + devOffset + ", length=" + length);
+        BlockDeviceAPIHelper.checkBounds(this, devOffset, length);
 		raf.seek(devOffset);
 		raf.write(src, srcOffset, length);
 	}
