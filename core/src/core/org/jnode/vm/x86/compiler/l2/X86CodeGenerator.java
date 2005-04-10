@@ -164,8 +164,18 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
      * @see org.jnode.vm.compiler.ir.CodeGenerator#generateCodeFor(org.jnode.vm.compiler.ir.quad.ConstantRefAssignQuad)
      */
     public void generateCodeFor(ConstantRefAssignQuad quad) {
-        throw new IllegalArgumentException("Unknown operation");
-
+        Variable lhs = quad.getLHS();
+        if (lhs.getAddressingMode() == Operand.MODE_REGISTER) {
+            Object reg1 = ((RegisterLocation)lhs.getLocation()).getRegister();
+            IntConstant rhs = (IntConstant) quad.getRHS();
+            os.writeMOV_Const((GPR)reg1, rhs.getValue());
+        } else if (lhs.getAddressingMode() == Operand.MODE_STACK) {
+            IntConstant rhs = (IntConstant) quad.getRHS();
+            int disp1 = ((StackLocation)lhs.getLocation()).getDisplacement();
+//TODO            os.writeMOV_Const(X86Register.EBP, disp1, rhs.getValue());
+        }else{
+            throw new IllegalArgumentException("Unknown operation");
+        }
     }
 
     private int prev_addr = 0;
@@ -199,7 +209,8 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
             Operand rhs = quad.getRHS();
             int mode = rhs.getAddressingMode();
             if (mode == Operand.MODE_CONSTANT) {
-                throw new IllegalArgumentException("Unknown operation");
+                //TODO throw new IllegalArgumentException("Unknown operation");
+                os.writeMOV_Const((GPR)reg1, ((IntConstant)rhs).getValue());
             } else if (mode == Operand.MODE_REGISTER) {
                 Object reg2 = ((RegisterLocation) ((Variable) rhs).getLocation()).getRegister();
                 os.writeMOV(X86Constants.BITS32, (GPR)reg1, (GPR) reg2);
@@ -212,7 +223,8 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
             Operand rhs = quad.getRHS();
             int mode = rhs.getAddressingMode();
             if (mode == Operand.MODE_CONSTANT) {
-                throw new IllegalArgumentException("Unknown operation");
+                //TODO throw new IllegalArgumentException("Unknown operation");
+                //todo os.writeMOV_Const(X86Register.EBP, disp1, ((IntConstant)rhs).getValue());
             } else if (mode == Operand.MODE_REGISTER) {
                 Object reg2 = ((RegisterLocation) ((Variable) rhs).getLocation()).getRegister();
                 os.writeMOV(X86Constants.BITS32, X86Register.EBP, disp1, (GPR) reg2);
@@ -221,7 +233,6 @@ public class X86CodeGenerator extends CodeGenerator implements X86Constants {
                 throw new IllegalArgumentException("Unknown operation");
             }
         }
-
     }
 
     /**
