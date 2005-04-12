@@ -296,8 +296,8 @@ public abstract class Charset implements Comparable
                 cachedEncoder = newEncoder ()
                   .onMalformedInput (CodingErrorAction.REPLACE)
                   .onUnmappableCharacter (CodingErrorAction.REPLACE);
-			}
-
+              } else
+ 	        cachedEncoder.reset();
             return cachedEncoder.encode (cb);
           }
       }
@@ -327,7 +327,8 @@ public abstract class Charset implements Comparable
                 cachedDecoder = newDecoder ()
                   .onMalformedInput (CodingErrorAction.REPLACE)
                   .onUnmappableCharacter (CodingErrorAction.REPLACE);
-              }
+              } else
+ 	        cachedDecoder.reset();
 
             return cachedDecoder.decode (bb);
           }
