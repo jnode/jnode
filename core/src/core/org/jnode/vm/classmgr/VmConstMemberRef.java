@@ -34,7 +34,7 @@ abstract class VmConstMemberRef extends VmResolvableConstObject {
 	private final String name;
 	private final String descriptor;
 	
-	public VmConstMemberRef(VmConstClass constClass, String name, String descriptor) {
+	VmConstMemberRef(VmConstClass constClass, String name, String descriptor) {
 		this.constClass = constClass;
 		this.name = name;
 		this.descriptor = descriptor;

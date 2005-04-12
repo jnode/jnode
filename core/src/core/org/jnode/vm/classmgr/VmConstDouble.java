@@ -14,7 +14,7 @@ public class VmConstDouble extends VmConstObject {
      * Initialize this instance.
      * @param value
      */
-    public VmConstDouble(double value) {
+    VmConstDouble(double value) {
         this.value = value;
     }
 

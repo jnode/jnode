@@ -38,7 +38,7 @@ public final class VmConstFieldRef extends VmConstMemberRef  {
 	 * @param classIndex
 	 * @param nameTypeIndex
 	 */
-	public VmConstFieldRef(VmConstClass constClass, String name, String descriptor) {
+	VmConstFieldRef(VmConstClass constClass, String name, String descriptor) {
 		super(constClass, name, descriptor);
 	}
 

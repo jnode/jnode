@@ -42,29 +42,9 @@ public abstract class VmConstObject extends VmSystemObject implements Uninterrup
     public static final int CONST_METHODREF = 10;
     public static final int CONST_IMETHODREF = 11;
     
-	public VmConstObject() {
-	}
-    
     /**
      * Gets the type of this object.
      * @return
      */
     public abstract int getConstType();
-	
-	/**
-	 * Resolve the references of this constant to loaded VmXxx objects.
-	 * @param clc
-	 */
-	public void resolve(VmClassLoader clc) {
-        // Not implemented here. 
-        // Implemented in VmResolvableConstObject
-	}
-	
-	/**
-	 * Returns the resolved.
-	 * @return boolean
-	 */
-	public boolean isResolved() {
-		return true;
-	}
 }
