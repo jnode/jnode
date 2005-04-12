@@ -61,7 +61,7 @@
     <option name="UPDATE_GROUP_BY_PACKAGES" value="false" />
     <option name="ADD_WATCH_INDEX" value="0" />
     <option name="REMOVE_WATCH_INDEX" value="0" />
-    <option name="UPDATE_KEYWORD_SUBSTITUTION" />
+    <option name="UPDATE_KEYWORD_SUBSTITUTION" value="NONE" />
     <option name="MAKE_NEW_FILES_READONLY" value="false" />
     <option name="SHOW_CORRUPTED_PROJECT_FILES" value="0" />
     <option name="TAG_AFTER_FILE_COMMIT" value="false" />
@@ -71,7 +71,7 @@
     <option name="PUT_FOCUS_INTO_COMMENT" value="false" />
     <option name="SHOW_CHECKIN_OPTIONS" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="" />
+    <option name="LAST_COMMIT_MESSAGE" value="IntelliJ IDEA 4.5.4 project files" />
     <option name="SAVE_LAST_COMMIT_MESSAGE" value="true" />
     <option name="CHECKIN_DIALOG_SPLITTER_PROPORTION" value="0.8" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
@@ -81,7 +81,85 @@
     <option name="FILE_HISTORY_DIALOG_COMMENTS_SPLITTER_PROPORTION" value="0.8" />
     <option name="FILE_HISTORY_DIALOG_SPLITTER_PROPORTION" value="0.5" />
   </component>
-  <component name="CvsTabbedWindow" />
+  <component name="CvsTabbedWindow">
+    <UpdateInfo EnvName="UPDATE_PROJECT" date="12-04-05 13:35">
+      <FileInformation>
+        <MODIFIED>
+          <PATH>C:\opensource\jnode\JNode.iws</PATH>
+        </MODIFIED>
+        <MERGED_WITH_CONFLICTS />
+        <MERGED />
+        <UNKNOWN>
+          <PATH>C:\opensource\jnode\.ipr.sptl</PATH>
+        </UNKNOWN>
+        <LOCALLY_ADDED />
+        <LOCALLY_REMOVED />
+        <UPDATED>
+          <PATH>C:\opensource\jnode\core\src\classpath\java\java\nio\charset\Charset.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\java\java\nio\charset\CharsetDecoder.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\java\java\nio\charset\CharsetEncoder.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\java\java\text\SimpleDateFormat.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\javax\javax\swing\UIDefaults.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\javax\javax\swing\text\DefaultEditorKit.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\javax\javax\swing\text\JTextComponent.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\Context.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\MARSHAL.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\core\org\jnode\vm\bytecode\BytecodeParser.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\core\org\jnode\vm\classmgr\VmCP.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\core\org\jnode\vm\classmgr\VmConstClass.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\core\org\jnode\vm\classmgr\VmConstFieldRef.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\core\org\jnode\vm\classmgr\VmConstIMethodRef.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\core\org\jnode\vm\classmgr\VmConstMemberRef.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\core\org\jnode\vm\classmgr\VmConstMethodRef.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\core\org\jnode\vm\classmgr\VmConstObject.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\core\org\jnode\vm\classmgr\VmConstString.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\core\org\jnode\vm\classmgr\VmType.java</PATH>
+          <PATH>C:\opensource\jnode\gui\src\awt\org\jnode\awt\JNodeGraphicsEnvironment.java</PATH>
+        </UPDATED>
+        <REMOVED_FROM_REPOSITORY />
+        <UNKNOWN_TYPE />
+        <CREATED>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\BAD_POLICY.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\BAD_POLICY_TYPE.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\BAD_POLICY_VALUE.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\CTX_RESTRICT_SCOPE.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\Environment.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\ExceptionList.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\IDLType.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\NVList.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\OMGVMCID.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\PRIVATE_MEMBER.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\PUBLIC_MEMBER.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\PrincipalHolder.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\Request.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\StructMember.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\UNSUPPORTED_POLICY.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\UNSUPPORTED_POLICY_VALUE.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\UnionMember.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\VM_ABSTRACT.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\VM_CUSTOM.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\VM_NONE.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\VM_TRUNCATABLE.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\ValueMember.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\WrongTransaction.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\DynAnyPackage\Invalid.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\DynAnyPackage\InvalidSeq.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\DynAnyPackage\InvalidValue.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\DynAnyPackage\TypeMismatch.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\classpath\org\org\omg\CORBA\DynAnyPackage\package.html</PATH>
+          <PATH>C:\opensource\jnode\core\src\core\org\jnode\vm\classmgr\VmConstDouble.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\core\org\jnode\vm\classmgr\VmConstFloat.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\core\org\jnode\vm\classmgr\VmConstInt.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\core\org\jnode\vm\classmgr\VmConstLong.java</PATH>
+          <PATH>C:\opensource\jnode\core\src\core\org\jnode\vm\classmgr\VmResolvableConstObject.java</PATH>
+        </CREATED>
+        <MOD_REMOVED_FROM_SERVER />
+        <LOCALLY_REMOVED_MODIFIED_ON_SERVER />
+        <RESTORED />
+        <CREATED_BY_SECOND_PARTY />
+      </FileInformation>
+    </UpdateInfo>
+  </component>
   <component name="DaemonCodeAnalyzer">
     <disable_hints />
   </component>
@@ -112,10 +190,10 @@
     <option name="HIDE_WARNINGS" value="false" />
   </component>
   <component name="FileEditorManager" split-orientation="vertical" split-proportion="0.5">
-    <first-group selected-file="file://$PROJECT_DIR$/core/src/core/org/jnode/system/BootLog.java">
+    <first-group selected-file="file://$PROJECT_DIR$/core/src/core/org/jnode/vm/classmgr/VmResolvableConstObject.java">
       <entry file="file://$PROJECT_DIR$/distr/src/apps/org/jnode/apps/charvabsh/CharvaBsh.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="53" column="13" selection-start="1703" selection-end="1703" vertical-scroll-proportion="0.5313352">
+          <state line="53" column="13" selection-start="1703" selection-end="1703" vertical-scroll-proportion="0.3463588">
             <folding>
               <element signature="imports" expanded="true" />
             </folding>
@@ -124,10 +202,17 @@
       </entry>
       <entry file="file://$PROJECT_DIR$/core/src/core/org/jnode/system/BootLog.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="23" column="0" selection-start="882" selection-end="882" vertical-scroll-proportion="0.18256131">
+          <state line="23" column="0" selection-start="882" selection-end="882" vertical-scroll-proportion="-0.062166963">
             <folding>
               <element signature="imports" expanded="true" />
             </folding>
+          </state>
+        </provider>
+      </entry>
+      <entry file="file://$PROJECT_DIR$/core/src/core/org/jnode/vm/classmgr/VmResolvableConstObject.java" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="15" column="15" selection-start="384" selection-end="384" vertical-scroll-proportion="0.39253998">
+            <folding />
           </state>
         </provider>
       </entry>
@@ -219,11 +304,7 @@
     <expanded_node url="org.jnode" module="net" type="package" />
     <expanded_node url="" module="net" type="module" />
   </component>
-  <component name="ProjectPane">
-    <expanded_node url="file://$PROJECT_DIR$" module="jnode" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/docs" module="jnode" type="directory" />
-    <expanded_node url="" module="jnode" type="module" />
-  </component>
+  <component name="ProjectPane" />
   <component name="ProjectView">
     <navigator currentView="ProjectPane" splitterProportion="0.5">
       <flattenPackages />
@@ -238,33 +319,61 @@
   </component>
   <component name="PropertiesComponent">
     <property name="vcs_file_view_treeWidth2" value="77" />
-    <property name="vcs_file_view_flatOrder1" value="1" />
-    <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="vcs_file_view_treeOrder4" value="4" />
-    <property name="GoToFile.includeJavaFiles" value="false" />
+    <property name="cvs_file_history_treeWidth0" value="171" />
+    <property name="cvs_file_history_treeOrder4" value="4" />
+    <property name="cvs_file_history_flatWidth2" value="171" />
+    <property name="cvs_file_history_flatOrder4" value="4" />
+    <property name="cvs_file_history_flatOrder1" value="1" />
     <property name="vcs_file_view_flatWidth2" value="47" />
+    <property name="cvs_file_history_flatWidth1" value="171" />
     <property name="vcs_file_view_flatWidth5" value="50" />
-    <property name="GoToClass.includeLibraries" value="false" />
-    <property name="MemberChooser.showClasses" value="true" />
     <property name="vcs_file_view_flatOrder3" value="3" />
+    <property name="MemberChooser.showClasses" value="true" />
+    <property name="cvs_file_history_flatOrder2" value="2" />
+    <property name="cvs_file_history_flatWidth4" value="170" />
     <property name="vcs_file_view_treeWidth0" value="77" />
-    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="vcs_file_view_treeOrder0" value="0" />
+    <property name="cvs_file_history_treeOrder5" value="5" />
     <property name="vcs_file_view_flatOrder4" value="4" />
     <property name="MemberChooser.sorted" value="false" />
-    <property name="vcs_file_view_flatOrder5" value="5" />
-    <property name="vcs_file_view_treeOrder3" value="3" />
+    <property name="cvs_file_history_flatOrder0" value="0" />
+    <property name="cvs_file_history_treeWidth4" value="170" />
+    <property name="cvs_file_history_treeOrder3" value="3" />
     <property name="vcs_file_view_flatWidth4" value="51" />
-    <property name="vcs_file_view_treeWidth1" value="78" />
+    <property name="cvs_file_history_treeWidth6" value="170" />
     <property name="vcs_file_view_flatOrder2" value="2" />
+    <property name="cvs_file_history_treeWidth3" value="171" />
     <property name="vcs_file_view_treeWidth4" value="77" />
-    <property name="vcs_file_view_treeOrder2" value="2" />
-    <property name="vcs_file_view_flatWidth3" value="47" />
+    <property name="cvs_file_history_flatOrder6" value="6" />
     <property name="vcs_file_view_treeWidth3" value="78" />
+    <property name="cvs_file_history_flatWidth3" value="171" />
     <property name="vcs_file_view_flatOrder0" value="0" />
     <property name="vcs_file_view_flatWidth0" value="147" />
-    <property name="vcs_file_view_treeOrder1" value="1" />
     <property name="vcs_file_view_flatWidth1" value="45" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="vcs_file_view_flatOrder1" value="1" />
+    <property name="cvs_file_history_treeOrder1" value="1" />
+    <property name="GoToFile.includeJavaFiles" value="false" />
+    <property name="cvs_file_history_treeWidth1" value="171" />
+    <property name="cvs_file_history_treeOrder6" value="6" />
+    <property name="GoToClass.includeLibraries" value="false" />
+    <property name="cvs_file_history_treeWidth2" value="171" />
+    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="cvs_file_history_flatOrder3" value="3" />
+    <property name="cvs_file_history_flatWidth6" value="170" />
+    <property name="vcs_file_view_flatOrder5" value="5" />
+    <property name="vcs_file_view_treeOrder3" value="3" />
+    <property name="vcs_file_view_treeWidth1" value="78" />
+    <property name="cvs_file_history_flatOrder5" value="5" />
+    <property name="cvs_file_history_flatWidth5" value="171" />
+    <property name="cvs_file_history_treeOrder2" value="2" />
+    <property name="vcs_file_view_treeOrder2" value="2" />
+    <property name="cvs_file_history_treeWidth5" value="171" />
+    <property name="vcs_file_view_flatWidth3" value="47" />
+    <property name="cvs_file_history_flatWidth0" value="171" />
+    <property name="vcs_file_view_treeOrder1" value="1" />
+    <property name="cvs_file_history_treeOrder0" value="0" />
   </component>
   <component name="RunManager">
     <activeType name="Application" />
@@ -389,13 +498,13 @@
       <window_info id="CVS File View" active="true" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.32980457" order="-1" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.4" order="4" />
       <window_info id="simpleUML" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
-      <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
+      <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.32970452" order="8" />
       <window_info id="KiwiScrap" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.16449511" order="0" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.25325733" order="0" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.25" order="1" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.4" order="6" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.32970452" order="8" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.32970452" order="8" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
       <window_info id="Gantt" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
       <window_info id="IDE talk" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
@@ -486,13 +595,6 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/gui/src/awt/org/jnode/awt/AWTPlugin.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="35" column="13" selection-start="1200" selection-end="1200" vertical-scroll-proportion="0.27567568">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/gui/src/thinlet/thinlet/Thinlet.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="58" column="13" selection-start="2012" selection-end="2012" vertical-scroll-proportion="0.24504505">
@@ -579,16 +681,23 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/distr/src/apps/org/jnode/apps/charvabsh/CharvaBsh.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="53" column="13" selection-start="1703" selection-end="1703" vertical-scroll-proportion="0.5313352">
+        <state line="53" column="13" selection-start="1703" selection-end="1703" vertical-scroll-proportion="0.3463588">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/core/org/jnode/vm/classmgr/VmResolvableConstObject.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="15" selection-start="384" selection-end="384" vertical-scroll-proportion="0.39253998">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/core/src/core/org/jnode/system/BootLog.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="0" selection-start="882" selection-end="882" vertical-scroll-proportion="0.18256131">
+        <state line="23" column="0" selection-start="882" selection-end="882" vertical-scroll-proportion="-0.062166963">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
