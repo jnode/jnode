@@ -27,7 +27,7 @@ package org.jnode.vm.classmgr;
  * 
  * @author epr
  */
-abstract class VmConstMemberRef extends VmConstObject {
+abstract class VmConstMemberRef extends VmResolvableConstObject {
 	
 	private final int cachedHashCode;
 	private final VmConstClass constClass;

@@ -46,10 +46,11 @@ public final class VmConstString extends VmConstObject implements VmStaticsEntry
     public final int getStaticsIndex() {
         return this.staticsIndex;
     }
+
     /**
-     * @see org.jnode.vm.classmgr.VmConstObject#doResolve(org.jnode.vm.classmgr.VmClassLoader)
+     * @see org.jnode.vm.classmgr.VmConstObject#getConstType()
      */
-    protected void doResolve(VmClassLoader clc) {
-        // Nothing to do
-    }
+    public final int getConstType() {
+        return CONST_STRING;
+    }   
 }

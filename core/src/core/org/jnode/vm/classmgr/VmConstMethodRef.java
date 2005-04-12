@@ -83,4 +83,10 @@ public class VmConstMethodRef extends VmConstMemberRef {
 		}
 	}
 
+    /**
+     * @see org.jnode.vm.classmgr.VmConstObject#getConstType()
+     */
+    public int getConstType() {
+        return CONST_METHODREF;
+    }   
 }

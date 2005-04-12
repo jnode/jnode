@@ -24,8 +24,13 @@ package org.jnode.vm.bytecode;
 import org.jnode.vm.classmgr.VmByteCode;
 import org.jnode.vm.classmgr.VmCP;
 import org.jnode.vm.classmgr.VmConstClass;
+import org.jnode.vm.classmgr.VmConstDouble;
 import org.jnode.vm.classmgr.VmConstFieldRef;
+import org.jnode.vm.classmgr.VmConstFloat;
 import org.jnode.vm.classmgr.VmConstIMethodRef;
+import org.jnode.vm.classmgr.VmConstInt;
+import org.jnode.vm.classmgr.VmConstLong;
+import org.jnode.vm.classmgr.VmConstObject;
 import org.jnode.vm.classmgr.VmConstString;
 import org.jnode.vm.classmgr.VmMethod;
 
@@ -237,39 +242,45 @@ public class BytecodeParser {
                 handler.visit_iconst(gets2()); // sipush
                 break;
             case 0x12:
-                {
-                    cpIdx = getu1();
-                    final Object o = cp.getAny(cpIdx);
-                    if (o instanceof Integer) {
-                        handler.visit_iconst(((Integer) o).intValue());
-                    } else if (o instanceof Float) {
-                        handler.visit_fconst(((Float) o).floatValue());
-                    } else {
-                        handler.visit_ldc((VmConstString) o);
-                    }
-                }
-                break;
             case 0x13:
                 {
-                    cpIdx = getu2();
-                    final Object o = cp.getAny(cpIdx);
-                    if (o instanceof Integer) {
-                        handler.visit_iconst(((Integer) o).intValue());
-                    } else if (o instanceof Float) {
-                        handler.visit_fconst(((Float) o).floatValue());
+                    if (opcode == 0x12) {
+                        cpIdx = getu1();
                     } else {
+                        cpIdx = getu2();
+                    }
+                    final VmConstObject o = (VmConstObject)cp.getAny(cpIdx);
+                    switch (o.getConstType()) {
+                    case VmConstObject.CONST_INT:
+                        handler.visit_iconst(((VmConstInt) o).intValue());
+                        break;
+                    case VmConstObject.CONST_FLOAT:
+                        handler.visit_fconst(((VmConstFloat) o).floatValue());
+                        break;
+                    case VmConstObject.CONST_CLASS:
+                        handler.visit_ldc((VmConstClass) o);
+                        break;
+                    case VmConstObject.CONST_STRING:
                         handler.visit_ldc((VmConstString) o);
+                        break;
+                    default:
+                        throw new ClassFormatError("Unknown constant pool type: " + o.getConstType());    
                     }
                 }
                 break;
             // -- 20 --
             case 0x14:
                 {
-                    final Object o = cp.getAny(getu2());
-                    if (o instanceof Long) {
-                        handler.visit_lconst(((Long) o).longValue());
-                    } else {
-                        handler.visit_dconst(((Double) o).doubleValue());
+                    final VmConstObject o = (VmConstObject)cp.getAny(getu2());
+                    switch (o.getConstType()) {
+                    case VmConstObject.CONST_LONG:
+                        handler.visit_lconst(((VmConstLong) o).longValue());
+                        break;
+                    case VmConstObject.CONST_DOUBLE:                        
+                        handler.visit_dconst(((VmConstDouble) o).doubleValue());
+                        break;
+                    default:
+                        throw new ClassFormatError("Unknown constant pool type: " + o.getConstType());    
                     }
                 }
                 break;
