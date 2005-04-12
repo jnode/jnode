@@ -14,7 +14,7 @@ public class VmConstFloat extends VmConstObject {
      * Initialize this instance.
      * @param value
      */
-    public VmConstFloat(float value) {
+    VmConstFloat(float value) {
         this.value = value;
     }
 

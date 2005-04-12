@@ -14,7 +14,7 @@ public final class VmConstInt extends VmConstObject {
      * Initialize this instance.
      * @param value
      */
-    public VmConstInt(int value) {
+    VmConstInt(int value) {
         this.value = value;
     }
 

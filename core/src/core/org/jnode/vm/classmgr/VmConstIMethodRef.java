@@ -37,7 +37,7 @@ public final class VmConstIMethodRef extends VmConstMethodRef {
 	 * @param classIndex
 	 * @param nameTypeIndex
 	 */
-	public VmConstIMethodRef(VmConstClass constClass, String name, String descriptor) {
+	VmConstIMethodRef(VmConstClass constClass, String name, String descriptor) {
 		super(constClass, name, descriptor);
 	}
 

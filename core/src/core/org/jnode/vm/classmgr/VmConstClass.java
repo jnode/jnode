@@ -33,7 +33,7 @@ public final class VmConstClass extends VmResolvableConstObject {
 
 	private final String name;
 
-	public VmConstClass(String name) {
+	VmConstClass(String name) {
 		this.name = name.replace('/', '.');
 	}
 

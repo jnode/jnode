@@ -14,7 +14,7 @@ public class VmConstLong extends VmConstObject {
      * Initialize this instance.
      * @param value
      */
-    public VmConstLong(long value) {
+    VmConstLong(long value) {
         this.value = value;
     }
 
