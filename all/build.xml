@@ -40,6 +40,7 @@
 	<property name="asm.jar" value="${root.dir}/core/lib/asm.jar" />	
 	
 	<property name="dom4j.jar" value="${root.dir}/builder/lib/dom4j.jar" />
+	<property name="classycle.jar" value="${root.dir}/builder/lib/classycle.jar" />	
 	<property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar" />
 	<property name="nanoxml.jar" value="${root.dir}/core/lib/nanoxml-lite-2.2.3.jar" />
 	<property name="gnu-crypto.jar" value="${root.dir}/core/lib/gnu-crypto.jar" />
@@ -82,6 +83,7 @@
 		<pathelement location="${thinlet.jar}" />
 		<pathelement location="${jnode-textui.jar}" />
 		<pathelement location="${jnode-distr.jar}" />
+		<pathelement location="${classycle.jar}" />
 		<path refid="cp" />
 	</path>
 
@@ -443,6 +445,43 @@ clean          Remove all intermediate build results.
 			<fileset dir="${root.dir}" includes="**/*.java" />
 		</n2a>
 	</target>
+	
+	<!-- check dependencies -->
+	  <taskdef name="classycleDependencyCheck" 
+	           classname="classycle.ant.DependencyCheckingTask"
+	  	       classpathref="cp-jnode"/>
+	
+	  <target name="checkDepends">
+	    <classycleDependencyCheck failOnUnwantedDependencies="true"
+	                              excludingClasses="*Test,*.All*Tests">
+	    	
+	    	<fileset dir="${root.dir}">
+				<include name="**/*.class"/>
+				<include name="**/*.jar"/>
+			</fileset>	      
+	      show allResults
+	      [util] = org.jnode.test.fs_0.1.11-dev.jar
+	      [notUtil] = org.jnode.driver.* excluding [util]
+	      check [util] independentOf [notUtil]
+	      check [notUtil] independentOf [util]
+	    </classycleDependencyCheck>
+	  </target>		 
+	<!-- check dependencies V2 -->
+	<target name="checksDependV2" depends="assemble-plugins">
+		<!-- Check all plugins -->
+		<taskdef name="checksDep" classname="org.jnode.build.DependencyChecker" 
+			classpathref="cp-jnode" />
+		<checksDep>			
+			<plugins dir="${plugins.dir}/">
+				<include name="*.jar" />
+			</plugins>
+			
+			<descriptors dir="${descriptors.dir}/">
+				<include name="*.xml" />
+				<exclude name="*plugin-list.xml" />
+			</descriptors>
+		</checksDep>
+	</target>	
 </project>
 
 
