@@ -100,26 +100,7 @@ public class PluginTask extends AbstractPluginTask {
      * @throws BuildException
      */
 	protected void buildPlugin(Map descriptors, File descriptor) throws BuildException {
-		final PluginDescriptorModel descr;
-		try {
-			final XMLElement root = new XMLElement(new Hashtable(), true, false);
-			try {
-				final FileReader r = new FileReader(descriptor);
-				try {
-					root.parseFromReader(r);
-				} finally {
-					r.close();
-				}
-			} catch (IOException ex) {
-				throw new BuildException("Building " + descriptor + " failed", ex);
-			} catch (XMLParseException ex) {
-				throw new BuildException("Building " + descriptor + " failed", ex);
-			}
-			descr = new PluginDescriptorModel(root);
-		} catch (PluginException ex) {
-			ex.printStackTrace();
-			throw new BuildException("Building " + descriptor + " failed", ex);
-		}
+		final PluginDescriptorModel descr = readDescriptor(descriptor);
 
 		final String fullId = descr.getId() + "_" + descr.getVersion();
         if(descriptors.containsKey(fullId))
