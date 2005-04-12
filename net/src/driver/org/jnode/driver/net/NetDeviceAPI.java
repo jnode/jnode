@@ -84,4 +84,16 @@ public interface NetDeviceAPI extends DeviceAPI {
 	 * @param protocolID
 	 */
 	public void setProtocolAddressInfo(int protocolID, ProtocolAddressInfo addressInfo);
+    
+    /**
+     * Add a net device listener to this device. 
+     * @param listener
+     */
+    public void addEventListener(NetDeviceListener listener);
+    
+    /**
+     * Add a net device listener to this device. 
+     * @param listener
+     */
+    public void removeEventListener(NetDeviceListener listener);    
 }

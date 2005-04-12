@@ -3,6 +3,7 @@
  */
 package org.jnode.driver.net.prism2;
 
+import org.apache.log4j.Logger;
 import org.jnode.driver.DriverException;
 import org.jnode.system.MemoryResource;
 import org.jnode.util.LittleEndian;
@@ -17,6 +18,9 @@ import org.jnode.util.TimeoutException;
  */
 final class Prism2IO implements Prism2Constants {
 
+    /** My logger */
+    private static final Logger log = Logger.getLogger(Prism2IO.class);
+    
     /** The memory mapped registers */
     private final MemoryResource regs;
 
@@ -91,6 +95,27 @@ final class Prism2IO implements Prism2Constants {
 
         // Return the result code.
         return (status & STATUS_RESULT) >> 8;
+    }
+
+    /**
+     * Wait until a given event mask is reached, or a timeout occurs.
+     * @param eventMask
+     * @param eventAck
+     * @param wait
+     * @param timeout
+     */
+    final int waitForEvent(int eventMask, int eventAck, int wait, int timeout) {
+        for (int counter = 0; counter < timeout; counter++) {
+            final int reg = getReg(REG_EVSTAT);
+            if ((reg & eventMask) != 0) {
+                // Acknowledge
+                setReg(REG_EVACK, reg & (eventMask | eventAck));
+                return reg;
+            }
+            TimeUtils.sleep(wait);
+        }
+        log.debug("Timeout in waitForEvent");
+        return 0;
     }
 
     /**

@@ -5,8 +5,10 @@ package org.jnode.driver.net.prism2;
 
 import javax.naming.NameNotFoundException;
 
+import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.net.ethernet.spi.Flags;
+import org.jnode.driver.net.event.LinkStatusEvent;
 import org.jnode.driver.net.wireless.spi.WirelessDeviceCore;
 import org.jnode.driver.pci.PCIBaseAddress;
 import org.jnode.driver.pci.PCIDevice;
@@ -51,6 +53,18 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
     /** The IRQ resource */
     private IRQResource irq;
 
+    /** Info frame used in the irq handler. To avoid numerous allocations. */
+    private final byte[] irqInfoFrame = new byte[Prism2InfoFrame.MAX_FRAME_LEN];
+
+    /** Current link status */
+    private int linkStatus = LINK_NOTCONNECTED;
+    
+    /** Address of connected BSS (only valid when link status is connected */
+    private EthernetAddress bssid = null;
+    
+    /** The device */
+    private final Device device;
+    
     /**
      * Initialize this instance.
      * 
@@ -66,6 +80,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
             throw new DriverException("Wrong flags to the Prism2 driver");
 
         this.driver = driver;
+        this.device = device;
         this.flags = (Prism2Flags) flags;
 
         final ResourceManager rm;
@@ -295,8 +310,8 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
         // Set port type to ESS port
         setConfig16(RID_CNFPORTTYPE, 1);
 
-        // Enable Rx interrupts
-        io.setReg(REG_INTEN, INTEN_RX);
+        // Enable Rx & Info interrupts
+        io.setReg(REG_INTEN, INTEN_RX | INTEN_INFO);
 
         // Enable card
         executeEnableCmd(0);
@@ -401,15 +416,28 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      * @see org.jnode.system.IRQHandler#handleInterrupt(int)
      */
     public final void handleInterrupt(int irq) {
-        final int evstat = io.getReg(REG_EVSTAT);
-        if (evstat == 0) {
-            // No event for me
-            return;
-        }
+        for (int loop = 0; loop < 10; loop++) {
+            final int evstat = io.getReg(REG_EVSTAT);
+            if (evstat == 0) {
+                // No event for me
+                return;
+            }
 
-        if ((evstat & EVSTAT_RX) != 0) {
-            // Received a frame
-            processReceiveEvent();
+            try {
+                if ((evstat & EVSTAT_RX) != 0) {
+                    // Received a frame
+                    processReceiveEvent();
+                } else if ((evstat & EVSTAT_INFO) != 0) {
+                    // Get Info frame
+                    processInfoEvent();
+                } else {
+                    log.debug("No suitable event 0x"
+                            + NumberUtils.hex(evstat, 4));
+                    return;
+                }
+            } catch (DriverException ex) {
+                log.error("Error in IRQ handler", ex);
+            }
         }
     }
 
@@ -429,6 +457,54 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
     }
 
     /**
+     * An Info frame is ready
+     * 
+     * @throws DriverException
+     */
+    private final void processInfoEvent() throws DriverException {
+        // Read the FID of the info frame
+        final int fid = io.getReg(REG_INFOFID);
+        final byte[] frame = this.irqInfoFrame;
+        log.debug("Info, FID=0x" + NumberUtils.hex(fid, 4));
+
+        // Read the frame header
+        final int hdrLen = Prism2InfoFrame.HDR_LENGTH;
+        io.copyFromBAP(fid, 0, frame, 0, hdrLen);
+        final int frameLen = Prism2InfoFrame.getFrameLength(frame, 0);
+        final int infoType = Prism2InfoFrame.getInfoType(frame, 0);
+
+        // Read the rest of the frame
+        io.copyFromBAP(fid, hdrLen, frame, hdrLen, frameLen - hdrLen);
+
+        switch (infoType) {
+        case IT_COMMTALLIES:
+            // Communication statistics. Ignore for now
+            break;
+        case IT_LINKSTATUS:
+            final int lstat = Prism2InfoFrame.getLinkStatus(frame, 0);
+            if (lstat == LINK_CONNECTED) {
+                getConfig(RID_CURRENTBSSID, frame, 0, WLAN_BSSID_LEN);
+                bssid = new EthernetAddress(frame, 0);
+                log.info("Connected to " + bssid);
+            } else if (lstat == LINK_DISCONNECTED) {
+                log.info("Disconnected");
+                bssid = null;
+            } else {
+                log.info("Link status 0x" + NumberUtils.hex(lstat, 4));                
+            }
+            this.linkStatus = lstat;
+            // Post the event
+            driver.postEvent(new LinkStatusEvent(device, lstat == LINK_CONNECTED));
+            break;
+        default:
+            log.info("Got Info frame, Type=0x" + NumberUtils.hex(infoType, 4));
+        }
+
+        // Acknowledge the info frame
+        io.setReg(REG_EVACK, EVACK_INFO);
+    }
+
+    /**
      * @see org.jnode.driver.net.wireless.spi.WirelessDeviceCore#getAuthenticationMode()
      */
     protected AuthenticationMode getAuthenticationMode() throws DriverException {
@@ -439,7 +515,8 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
         case CNFAUTHENTICATION_SHAREDKEY:
             return AuthenticationMode.SHAREDKEY;
         default:
-            throw new DriverException("Unknown authentication mode 0x" + NumberUtils.hex(mode, 4));
+            throw new DriverException("Unknown authentication mode 0x"
+                    + NumberUtils.hex(mode, 4));
         }
     }
 
@@ -452,7 +529,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
         if (mode == AuthenticationMode.OPENSYSTEM) {
             modeVal = CNFAUTHENTICATION_OPENSYSTEM;
         } else if (mode == AuthenticationMode.SHAREDKEY) {
-            modeVal = CNFAUTHENTICATION_SHAREDKEY; 
+            modeVal = CNFAUTHENTICATION_SHAREDKEY;
         } else {
             throw new DriverException("Unknown authentication mode " + mode);
         }
