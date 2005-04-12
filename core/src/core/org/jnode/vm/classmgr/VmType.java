@@ -1725,8 +1725,8 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 			VmCP cp = this.cp;
 			if (cp != null) {
 				for (int i = 0; i < cp.getLength(); i++) {
-					Object obj = cp.getAny(i);
-					if (obj instanceof VmConstObject) {
+					final Object obj = cp.getAny(i);
+					if (obj instanceof VmResolvableConstObject) {
 						((VmConstObject) obj).resolve(clc);
 					}
 				}

@@ -86,7 +86,7 @@ public final class VmCP extends VmSystemObject {
         if (index == 0)
             return 0;
         else
-            return ((Integer) get(index)).intValue();
+            return ((VmConstInt) get(index)).intValue();
     }
 
     /**
@@ -98,7 +98,7 @@ public final class VmCP extends VmSystemObject {
      *            The int to write
      */
     protected void setInt(int index, int data) {
-        set(index, new Integer(data));
+        set(index, new VmConstInt(data));
     }
 
     /**
@@ -109,7 +109,7 @@ public final class VmCP extends VmSystemObject {
      * @return long
      */
     public long getLong(int index) {
-        return ((Long) get(index)).longValue();
+        return ((VmConstLong) get(index)).longValue();
     }
 
     /**
@@ -121,7 +121,7 @@ public final class VmCP extends VmSystemObject {
      *            The long to write
      */
     protected void setLong(int index, long data) {
-        set(index, new Long(data));
+        set(index, new VmConstLong(data));
     }
 
     /**
@@ -132,7 +132,7 @@ public final class VmCP extends VmSystemObject {
      * @return float
      */
     public float getFloat(int index) {
-        return ((Float) get(index)).floatValue();
+        return ((VmConstFloat) get(index)).floatValue();
     }
 
     /**
@@ -144,7 +144,7 @@ public final class VmCP extends VmSystemObject {
      *            The float to write
      */
     protected void setFloat(int index, float data) {
-        set(index, new Float(data));
+        set(index, new VmConstFloat(data));
     }
 
     /**
@@ -155,7 +155,7 @@ public final class VmCP extends VmSystemObject {
      * @return double
      */
     public double getDouble(int index) {
-        return ((Double) get(index)).doubleValue();
+        return ((VmConstDouble) get(index)).doubleValue();
     }
 
     /**
@@ -167,7 +167,7 @@ public final class VmCP extends VmSystemObject {
      *            The double to write
      */
     protected void setDouble(int index, double data) {
-        set(index, new Double(data));
+        set(index, new VmConstDouble(data));
     }
 
     protected String getUTF8(int index) {
@@ -218,7 +218,7 @@ public final class VmCP extends VmSystemObject {
         set(index, value);
     }
 
-    public Object getAny(int index) {
+    public final Object getAny(int index) {
         return get(index);
     }
 
@@ -228,7 +228,7 @@ public final class VmCP extends VmSystemObject {
      * @param object
      * @return int
      */
-    public int indexOf(Object object) {
+    public final int indexOf(Object object) {
         for (int i = 0; i < used; i++) {
             final Object o = cp[ i];
             if ((o != null) && (o.equals(object))) { return i; }
@@ -243,13 +243,8 @@ public final class VmCP extends VmSystemObject {
      *            The index where to read
      * @return Object
      */
-    private Object get(int index) {
-        Object result = cp[ index];
-        /*
-         * if (result == null) { System.err.println("Warning: cp[" + index + "]
-         * (tag " + tags[index] + ") returns null");
-         */
-        return result;
+    private final Object get(int index) {
+        return cp[ index];
     }
 
     /**

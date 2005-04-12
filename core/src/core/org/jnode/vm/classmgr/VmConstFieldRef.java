@@ -84,4 +84,11 @@ public final class VmConstFieldRef extends VmConstMemberRef  {
 	public boolean isWide() {
 		return Modifier.isWide(getSignature());
 	}
+
+    /**
+     * @see org.jnode.vm.classmgr.VmConstObject#getConstType()
+     */
+    public final int getConstType() {
+        return CONST_FIELDREF;
+    }   
 }

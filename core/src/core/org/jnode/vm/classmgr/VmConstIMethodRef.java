@@ -66,4 +66,11 @@ public final class VmConstIMethodRef extends VmConstMethodRef {
 	public int getSelector() {
 		return selector;
 	}
+
+    /**
+     * @see org.jnode.vm.classmgr.VmConstObject#getConstType()
+     */
+    public final int getConstType() {
+        return CONST_IMETHODREF;
+    }   
 }

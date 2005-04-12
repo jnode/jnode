@@ -26,7 +26,7 @@ package org.jnode.vm.classmgr;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class VmConstClass extends VmConstObject {
+public final class VmConstClass extends VmResolvableConstObject {
 
 	/** The resolved class */
 	private VmType vmClass;
@@ -98,4 +98,11 @@ public final class VmConstClass extends VmConstObject {
 			this.vmClass = vmClass;
 		}
 	}
+
+    /**
+     * @see org.jnode.vm.classmgr.VmConstObject#getConstType()
+     */
+    public final int getConstType() {
+        return CONST_CLASS;
+    }   
 }

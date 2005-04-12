@@ -25,26 +25,39 @@ import org.jnode.vm.VmSystemObject;
 import org.vmmagic.pragma.Uninterruptible;
 
 /**
- * <description>
+ * Base class for constant pool entries.
  * 
  * @author epr
  */
 public abstract class VmConstObject extends VmSystemObject implements Uninterruptible {
 
-	private boolean resolved = false;
-	
+    public static final int CONST_UTF8 = 1;
+    public static final int CONST_INT = 3;
+    public static final int CONST_FLOAT = 4;
+    public static final int CONST_LONG = 5;
+    public static final int CONST_DOUBLE = 6;
+    public static final int CONST_CLASS = 7;
+    public static final int CONST_STRING = 8;
+    public static final int CONST_FIELDREF = 9;
+    public static final int CONST_METHODREF = 10;
+    public static final int CONST_IMETHODREF = 11;
+    
 	public VmConstObject() {
 	}
+    
+    /**
+     * Gets the type of this object.
+     * @return
+     */
+    public abstract int getConstType();
 	
 	/**
 	 * Resolve the references of this constant to loaded VmXxx objects.
 	 * @param clc
 	 */
 	public void resolve(VmClassLoader clc) {
-		if (!resolved) {
-			doResolve(clc);
-			resolved = true;
-		}
+        // Not implemented here. 
+        // Implemented in VmResolvableConstObject
 	}
 	
 	/**
@@ -52,12 +65,6 @@ public abstract class VmConstObject extends VmSystemObject implements Uninterrup
 	 * @return boolean
 	 */
 	public boolean isResolved() {
-		return resolved;
+		return true;
 	}
-
-	/**
-	 * Resolve the references of this constant to loaded VmXxx objects.
-	 * @param clc
-	 */
-	protected abstract void doResolve(VmClassLoader clc);
 }
