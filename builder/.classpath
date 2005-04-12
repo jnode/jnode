@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="lib/dom4j.jar"/>
 	<classpathentry kind="src" path="/JNode-Shell"/>
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
+	<classpathentry kind="lib" path="lib/classycle.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

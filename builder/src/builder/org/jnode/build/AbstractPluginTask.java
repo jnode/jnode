@@ -22,15 +22,23 @@
 package org.jnode.build;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import nanoxml.XMLElement;
+import nanoxml.XMLParseException;
+
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Jar;
 import org.apache.tools.ant.types.ZipFileSet;
 import org.jnode.plugin.Library;
+import org.jnode.plugin.PluginException;
+import org.jnode.plugin.model.PluginDescriptorModel;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -54,6 +62,32 @@ public abstract class AbstractPluginTask extends Task {
 		targetArch = string;
 	}
 
+    protected PluginDescriptorModel readDescriptor(File descriptor)
+    {
+        final PluginDescriptorModel descr;
+        try {
+            final XMLElement root = new XMLElement(new Hashtable(), true, false);
+            try {
+                final FileReader r = new FileReader(descriptor);
+                try {
+                    root.parseFromReader(r);
+                } finally {
+                    r.close();
+                }
+            } catch (IOException ex) {
+                throw new BuildException("Building " + descriptor + " failed", ex);
+            } catch (XMLParseException ex) {
+                throw new BuildException("Building " + descriptor + " failed", ex);
+            }
+            descr = new PluginDescriptorModel(root);
+        } catch (PluginException ex) {
+            ex.printStackTrace();
+            throw new BuildException("Building " + descriptor + " failed", ex);
+        }        
+        
+        return descr;
+    }
+    
 	protected void processLibrary(Jar jarTask, Library lib, HashMap fileSets, File srcDir) {
 
 		final LibAlias libAlias = getAlias(lib.getName());
