@@ -802,4 +802,40 @@ public interface Prism2Constants {
 
     public static final int CNFAUTHENTICATION_SHAREDKEY = 0x0002;
 
+    // ------ Information types -----------------
+    public static final int IT_HANDOVERADDR = 0xF000;
+
+    public static final int IT_COMMTALLIES = 0xF100;
+
+    public static final int IT_SCANRESULTS = 0xF101;
+
+    public static final int IT_CHINFORESULTS = 0xF102;
+
+    public static final int IT_HOSTSCANRESULTS = 0xF103;// NEW
+
+    public static final int IT_LINKSTATUS = 0xF200;
+
+    public static final int IT_ASSOCSTATUS = 0xF201;
+
+    public static final int IT_AUTHREQ = 0xF202;
+
+    public static final int IT_PSUSERCNT = 0xF203;
+
+    public static final int IT_KEYIDCHANGED = 0xF204;// NEW AP
+
+    // ------ Link status values ----------------
+    public static final int LINK_NOTCONNECTED = 0;
+
+    public static final int LINK_CONNECTED = 1;
+
+    public static final int LINK_DISCONNECTED = 2;
+
+    public static final int LINK_AP_CHANGE = 3;
+
+    public static final int LINK_AP_OUTOFRANGE = 4;
+
+    public static final int LINK_AP_INRANGE = 5;
+
+    public static final int LINK_ASSOCFAIL = 6;
+
 }

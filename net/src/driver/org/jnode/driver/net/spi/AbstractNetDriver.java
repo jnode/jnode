@@ -35,6 +35,8 @@ import org.jnode.driver.DeviceManager;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.net.NetDeviceAPI;
+import org.jnode.driver.net.NetDeviceEvent;
+import org.jnode.driver.net.NetDeviceListener;
 import org.jnode.driver.net.NetworkException;
 import org.jnode.naming.InitialNaming;
 import org.jnode.net.HardwareAddress;
@@ -69,6 +71,8 @@ public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, 
 	private final Queue txQueue = new Queue();
 	/** Thread used to transmit frames */
 	private QueueProcessorThread txThread;
+    /** Event processor */
+    private NetDeviceEventProcessor eventProcessor;
 		
 	/**
 	 * @see org.jnode.driver.Driver#startDevice()
@@ -80,7 +84,10 @@ public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, 
             if (renameToDevicePrefixOnly()) {
                 dm.rename(device, getDevicePrefix(), true);                
             } else {
-                dm.rename(device, getDevicePrefix() + "-" + device.getId(), false);
+                final String prefix = getDevicePrefix() + "-";
+                if (!device.getId().startsWith(prefix)) {
+                    dm.rename(device, getDevicePrefix() + "-" + device.getId(), false);
+                }
             }
 		} catch (DeviceAlreadyRegisteredException ex) {
 			log.error("Cannot rename device", ex);
@@ -128,6 +135,38 @@ public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, 
 	}
 
 	/**
+     * @see org.jnode.driver.net.NetDeviceAPI#addEventListener(org.jnode.driver.net.NetDeviceListener)
+     */
+    public void addEventListener(NetDeviceListener listener) {
+        NetDeviceEventProcessor proc = this.eventProcessor;
+        if (proc == null) {
+            this.eventProcessor = proc = new NetDeviceEventProcessor();
+        }
+        proc.addEventListener(listener);
+    }
+
+    /**
+     * @see org.jnode.driver.net.NetDeviceAPI#removeEventListener(org.jnode.driver.net.NetDeviceListener)
+     */
+    public void removeEventListener(NetDeviceListener listener) {
+        final NetDeviceEventProcessor proc = this.eventProcessor;
+        if (proc != null) {
+            proc.removeEventListener(listener);
+        }
+    }
+    
+    /**
+     * Post an event that will be fired (on another thread) to the listeners.
+     * @param event
+     */
+    public void postEvent(NetDeviceEvent event) {
+        final NetDeviceEventProcessor proc = this.eventProcessor;
+        if (proc != null) {
+            proc.postEvent(event);
+        }
+    }
+
+    /**
 	 * @see org.jnode.util.QueueProcessor#process(java.lang.Object)
 	 */
 	public void process(Object object) {
