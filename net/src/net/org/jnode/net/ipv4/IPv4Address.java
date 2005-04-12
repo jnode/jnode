@@ -378,6 +378,16 @@ public class IPv4Address implements ProtocolAddress, Serializable {
 		return inetAddress;
 	}
 	
+    /**
+     * Convert to a byte array.
+     * @see org.jnode.net.ProtocolAddress#toByteArray()
+     */
+    public byte[] toByteArray() {
+        final byte[] result = new byte[address.length];
+        System.arraycopy(address, 0, result, 0, address.length);
+        return result;
+    }
+    
 	/**
 	 * Gets the default subnet mask for this address 
 	 */

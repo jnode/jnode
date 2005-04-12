@@ -44,6 +44,7 @@ grant {
 	// GNU specific standard properties
 	permission java.util.PropertyPermission "gnu.classpath.version", "read";
 	permission java.util.PropertyPermission "gnu.java.io.*", "read";
+	permission java.util.PropertyPermission "gnu.java.net.*", "read";
 	
 	// Hacks to fix classpath's lack of security
 	permission java.util.PropertyPermission "java.protocol.handler.pkgs", "read";
