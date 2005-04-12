@@ -65,4 +65,10 @@ public interface ProtocolAddress {
 	 * @return This address as java.net.InetAddress
 	 */	
 	public InetAddress toInetAddress();
+
+    /**
+     * Convert to a new byte array.
+     * @return This address as byte array.
+     */ 
+    public byte[] toByteArray();
 }

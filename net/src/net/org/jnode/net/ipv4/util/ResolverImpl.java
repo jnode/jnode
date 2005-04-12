@@ -184,6 +184,13 @@ public class ResolverImpl implements Resolver {
      */
     public ProtocolAddress[] getByName(final String hostname)
             throws UnknownHostException {
+        if (hostname == null) {
+            throw new UnknownHostException("null");
+        }
+        if (resolver == null) {
+            throw new UnknownHostException(hostname);
+        }
+        
         final PrivilegedExceptionAction action = new PrivilegedExceptionAction() {
             public Object run() throws UnknownHostException {
                 ProtocolAddress[] protocolAddresses;

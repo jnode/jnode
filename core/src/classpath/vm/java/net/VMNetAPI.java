@@ -73,6 +73,21 @@ public interface VMNetAPI {
      */
     public InetAddress getLocalAddress() throws UnknownHostException;
 
-    public InetAddress[] getHostByName(String hostname)
+    /**
+     * Gets the address of a host by its name.
+     * @param hostname
+     * @return
+     * @throws UnknownHostException
+     */
+    public byte[][] getHostByName(String hostname)
+            throws UnknownHostException;
+
+    /**
+     * Gets the name of a host by its address.
+     * @param ip The host address.
+     * @return
+     * @throws UnknownHostException
+     */
+    public String getHostByAddr(byte[] ip)
             throws UnknownHostException;
 }

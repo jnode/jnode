@@ -36,6 +36,7 @@
   </extension>
 
   <extension point="org.jnode.security.permissions">
+    <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
     <permission class="java.net.SocketPermission" name="*:53" actions="resolve,listen,connect"/>
     <permission class="java.util.PropertyPermission" name="dns.server" actions="read"/>
     <permission class="java.util.PropertyPermission" name="dns.search" actions="read"/>

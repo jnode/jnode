@@ -1,5 +1,5 @@
-/* Inet4Address.java
-   Copyright (C) 2002, 2003 Free Software Foundation, Inc.
+/* Inet4Address.java --
+   Copyright (C) 2002, 2003, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,23 +35,19 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.net;
 
 import java.io.ObjectStreamException;
-import java.util.Arrays;
-
-
-/**
- * @author Michael Koch
- * @date August 3, 2002.
- */
 
 /*
  * Written using on-line Java Platform 1.4 API Specification and
  * RFC 1884 (http://www.ietf.org/rfc/rfc1884.txt),
  * RFC 1918 (http://www.ietf.org/rfc/rfc1918.txt),
  * RFC 2365 (http://www.ietf.org/rfc/rfc2365.txt)
- * Status: Believed complete and correct.
+ *
+ * @author Michael Koch
+ * @status Believed complete and correct.
  */
 public final class Inet4Address extends InetAddress
 {
@@ -65,30 +61,7 @@ public final class Inet4Address extends InetAddress
 	 */
   private Object writeReplace() throws ObjectStreamException
   {
-    return new InetAddress(addr, hostName, null);
-  }
-  
-  /**
-   * Initializes this object's addr instance variable from the passed in
-   * byte array. Note that this constructor is package-private and is called
-   * only by static methods in InetAddress.
-   * 
-   * @param addr
-   */
-  Inet4Address(byte[] addr)
-  {
-    this(addr, null, null);
-	}
-
-	/**
-	 * Creates a Inet4Address
-	 * 
-	 * @param addr The IP address
-	 * @param host The Hostname
-	 */
-  Inet4Address(byte[] addr, String host)
-  {
-    this(addr, host, null);
+    return new InetAddress(addr, hostName);
 	}
 
   /**
@@ -98,12 +71,10 @@ public final class Inet4Address extends InetAddress
    *
    * @param addr The IP number of this address as an array of bytes
    * @param hostname The hostname of this IP address.
-   * @param hostname_alias A backup hostname to use if hostname is null to
-   * prevent reverse lookup failures
    */
-  Inet4Address(byte[] addr, String hostname, String hostname_alias)
+  Inet4Address(byte[] addr, String host)
   {
-    super(addr, hostname, hostname_alias);
+    super(addr, host);
 	}
 
 	/**
@@ -113,7 +84,7 @@ public final class Inet4Address extends InetAddress
 	 */
   public boolean isMulticastAddress()
   {
-		return (addr[0] & 0xF0) == 0xE0;
+    return super.isMulticastAddress();
 	}
 
 	/**
@@ -121,7 +92,7 @@ public final class Inet4Address extends InetAddress
 	 */
   public boolean isLoopbackAddress()
   {
-		return addr[0] == 0x7F;
+    return super.isLoopbackAddress();
 	}
 
 	/**
@@ -131,9 +102,7 @@ public final class Inet4Address extends InetAddress
 	 */
   public boolean isAnyLocalAddress()
   {
-    byte[] anylocal = { 0, 0, 0, 0 };
-
-    return Arrays.equals(addr, anylocal);
+    return super.isAnyLocalAddress();
 	}
 
 	/**
@@ -143,8 +112,7 @@ public final class Inet4Address extends InetAddress
 	 */
   public boolean isLinkLocalAddress()
   {
-		// XXX: This seems to not exist with IPv4 addresses
-		return false;
+    return super.isLinkLocalAddress();
 	}
 
 	/**
@@ -154,23 +122,7 @@ public final class Inet4Address extends InetAddress
 	 */
   public boolean isSiteLocalAddress()
   {
-		// 10.0.0.0/8
-		if (addr[0] == 0x0A)
-			return true;
-
-		// XXX: Suns JDK 1.4.1 (on Linux) seems to have a bug here:
-		// it says 172.16.0.0 - 172.255.255.255 are site local addresses
-		//
-		// 172.16.0.0/12
-		if (addr[0] == 0xAC && (addr[1] & 0xF0) == 0x01)
-			return true;
-
-		// 192.168.0.0/16
-		if (addr[0] == 0xC0 && addr[1] == 0xA8)
-			return true;
-
-		// XXX: Do we need to check more addresses here ?
-		return false;
+    return super.isSiteLocalAddress();
 	}
 
 	/**
@@ -180,8 +132,7 @@ public final class Inet4Address extends InetAddress
 	 */
   public boolean isMCGlobal()
   {
-		// XXX: This seems to net exist with IPv4 addresses
-		return false;
+    return super.isMCGlobal();
 	}
 
 	/**
@@ -191,8 +142,7 @@ public final class Inet4Address extends InetAddress
 	 */
   public boolean isMCNodeLocal()
   {
-		// XXX: This seems to net exist with IPv4 addresses
-		return false;
+    return isMCNodeLocal();
 	}
 
 	/**
@@ -202,10 +152,7 @@ public final class Inet4Address extends InetAddress
 	 */
   public boolean isMCLinkLocal()
   {
-    if (! isMulticastAddress())
-			return false;
-
-		return (addr[0] == 0xE0) && (addr[1] == 0x00) && (addr[2] == 0x00);
+    return super.isMCLinkLocal();
 	}
 
 	/**
@@ -215,8 +162,7 @@ public final class Inet4Address extends InetAddress
 	 */
   public boolean isMCSiteLocal()
   {
-		// XXX: This seems to net exist with IPv4 addresses
-		return false;
+    return super.isMCSiteLocal();
 	}
 
 	/**
@@ -226,8 +172,7 @@ public final class Inet4Address extends InetAddress
 	 */
   public boolean isMCOrgLocal()
   {
-		// XXX: This seems to net exist with IPv4 addresses
-		return false;
+    return isMCOrgLocal();
 	}
 
 	/**
@@ -245,22 +190,7 @@ public final class Inet4Address extends InetAddress
 	 */
   public String getHostAddress()
   {
-		StringBuffer sbuf = new StringBuffer(40);
-		int len = addr.length;
-		int i = 0;
-
-    for (;;)
-      {
-			sbuf.append(addr[i] & 0xFF);
-			i++;
-
-			if (i == len)
-				break;
-
-			sbuf.append('.');
-		}
-
-		return sbuf.toString();
+    return super.getHostAddress();
 	}
 
 	/**
@@ -300,4 +230,4 @@ public final class Inet4Address extends InetAddress
 
 		return true;
 	}
-} // class Inet4Address
+}

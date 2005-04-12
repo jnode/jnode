@@ -166,7 +166,7 @@ public class NetAPIImpl implements VMNetAPI {
         throw new UnknownHostException("No configured address found");
     }
 
-    public InetAddress[] getHostByName(String hostname)
+    public byte[][] getHostByName(String hostname)
     throws UnknownHostException {
         
         ArrayList list = null;
@@ -181,17 +181,24 @@ public class NetAPIImpl implements VMNetAPI {
                 for (int j = 0; j < cnt; j++) {
                     final ProtocolAddress pa = addrs[j];
                     if (pa != null) {
-                        list.add(pa.toInetAddress());
+                        list.add(pa.toByteArray());
                     }
                 }
             }
         }
 
-        if (list == null) {
-            return null;
+        if ((list == null) || list.isEmpty()) {
+            throw new UnknownHostException(hostname);
         } else {
-            return (InetAddress[])list.toArray(new InetAddress[list.size()]);
+            return (byte[][])list.toArray(new byte[list.size()][]);
         }
+    }
+
+    /**
+     * @see java.net.VMNetAPI#getHostByAddr(byte[])
+     */
+    public String getHostByAddr(byte[] ip) throws UnknownHostException {
+        throw new UnknownHostException("Not implemented");
     }
 
     /**
