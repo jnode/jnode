@@ -111,15 +111,28 @@ public class JNodeGraphicsEnvironment extends GraphicsEnvironment {
 	 */
 	public GraphicsDevice getDefaultScreenDevice() {
 	    verifyCache();
-		final String devId = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.awt.device", "fb0"));
-		if ((defaultDevice == null) || !devId.equals(defaultDevice.getIDstring())){
+		final String devId = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.awt.device"));
+        boolean reload = (defaultDevice == null);
+        if ((devId != null) && (defaultDevice != null)) {
+            if (!devId.equals(defaultDevice.getIDstring())) {
+                reload = true;
+            }
+        }
+        
+		if (reload) {
 			final GraphicsDevice[] devs = getScreenDevices();
-			for (int i = 0;(defaultDevice == null) && (i < devs.length); i++) {
-				if (devs[i].getIDstring().equals(devId)) {
-					defaultDevice = devs[i];
-					log.debug("Using ScreenDevice " + defaultDevice.getIDstring());
-				}
-			}
+            if (devId != null) {
+                for (int i = 0; (defaultDevice == null) && (i < devs.length); i++) {
+                    if (devs[i].getIDstring().equals(devId)) {
+                        defaultDevice = devs[i];
+                        log.debug("Using ScreenDevice "
+                                + defaultDevice.getIDstring());
+                    }
+                }
+            }
+            if ((defaultDevice == null) && (devs.length > 0)) {
+                defaultDevice = devs[0];
+            }
 		}
 		return defaultDevice;
 	}
