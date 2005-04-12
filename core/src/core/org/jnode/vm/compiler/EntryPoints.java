@@ -91,6 +91,8 @@ public class EntryPoints extends VmSystemObject {
 
     private final VmMethod classCastFailedMethod;
 
+    private final VmMethod getClassForVmTypeMethod;
+
     private final VmMethod vmTypeInitialize;
 
     private final VmMethod throwArrayOutOfBounds;
@@ -145,10 +147,9 @@ public class EntryPoints extends VmSystemObject {
             // SoftByteCode
             this.vmSoftByteCodesClass = loader.loadClass(
                     "org.jnode.vm.SoftByteCodes", true);
-            anewarrayMethod = testMethod(vmSoftByteCodesClass
-                    .getMethod(
-                            "anewarray",
-                            "(Lorg/jnode/vm/classmgr/VmType;I)Ljava/lang/Object;"));
+            anewarrayMethod = testMethod(vmSoftByteCodesClass.getMethod(
+                    "anewarray",
+                    "(Lorg/jnode/vm/classmgr/VmType;I)Ljava/lang/Object;"));
             allocArrayMethod = testMethod(vmSoftByteCodesClass.getMethod(
                     "allocArray",
                     "(Lorg/jnode/vm/classmgr/VmType;I)Ljava/lang/Object;"));
@@ -177,6 +178,9 @@ public class EntryPoints extends VmSystemObject {
                     "classCastFailed", "(Ljava/lang/Object;)V"));
             throwArrayOutOfBounds = testMethod(vmSoftByteCodesClass.getMethod(
                     "throwArrayOutOfBounds", "(Ljava/lang/Object;I)V"));
+            getClassForVmTypeMethod = testMethod(vmSoftByteCodesClass
+                    .getMethod("getClassForVmType",
+                            "(Lorg/jnode/vm/classmgr/VmType;)Ljava/lang/Class;"));
 
             // Write barrier
             writeBarrier = (heapManager != null) ? heapManager
@@ -292,10 +296,12 @@ public class EntryPoints extends VmSystemObject {
                     "org.jnode.vm.classmgr.VmConstMethodRef", true);
             vmConstMethodResolvedMethod = (VmInstanceField) testField(constMethodClass
                     .getField("vmMethod"));
-            
+
             // VmMethod
-            final VmType vmMethodClass = loader.loadClass("org.jnode.vm.classmgr.VmMethod", true);
-            recompileMethod = testMethod(vmMethodClass.getDeclaredMethod("recompileMethod", "(II)V"));
+            final VmType vmMethodClass = loader.loadClass(
+                    "org.jnode.vm.classmgr.VmMethod", true);
+            recompileMethod = testMethod(vmMethodClass.getDeclaredMethod(
+                    "recompileMethod", "(II)V"));
 
         } catch (ClassNotFoundException ex) {
             throw new NoClassDefFoundError(ex.getMessage());
@@ -673,12 +679,20 @@ public class EntryPoints extends VmSystemObject {
     public final VmMethod getYieldPoint() {
         return yieldPoint;
     }
-    
+
     /**
      * @see VmMethod#recompileMethod(int, int)
      * @return Returns the recompileMethod.
      */
     public final VmMethod getRecompileMethod() {
         return recompileMethod;
+    }
+
+    /**
+     * @see org.jnode.vm.SoftByteCodes#getClassForVmType(VmType)
+     * @return Returns the getClassForVmTypeMethod.
+     */
+    public final VmMethod getGetClassForVmTypeMethod() {
+        return getClassForVmTypeMethod;
     }
 }

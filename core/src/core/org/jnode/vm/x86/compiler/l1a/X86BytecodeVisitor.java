@@ -2804,8 +2804,26 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param value
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldc(VmConstClass)
 	 */
-	public final void visit_ldc(VmConstClass value) {
-		throw new Error("Not implemented yet");
+	public final void visit_ldc(VmConstClass classRef) {
+        // Push all, since we're going to call other methods
+        vstack.push(eContext);
+
+        L1AHelper.requestRegister(eContext, helper.AAX);
+        final GPR classr = (GPR) L1AHelper.requestRegister(eContext,
+                JvmType.REFERENCE, false);
+
+        // Resolve the class
+        writeResolveAndLoadClassToReg(classRef, classr);
+        
+        // Call SoftByteCodes#getClassForVmType
+        os.writePUSH(classr);
+        L1AHelper.releaseRegister(eContext, helper.AAX); // So it can be used by invoke
+        
+        invokeJavaMethod(context.getGetClassForVmTypeMethod());        
+        // The resulting class is now on the stack
+
+        // Release
+        L1AHelper.releaseRegister(eContext, classr);
 	}
 
 	/**
