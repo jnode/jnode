@@ -353,6 +353,15 @@ public class SoftByteCodes implements Uninterruptible {
             throw new ClassCastException(object.getClass().getName());
         }
     }
+    
+    /**
+     * Gets the Class that corresponds to the given VmType.
+     * @param type
+     * @return
+     */
+    public static Class getClassForVmType(VmType type) {
+        return type.asClass();
+    }
 
     /**
      * Create an exception for a system-trapped situation.
