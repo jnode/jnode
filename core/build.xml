@@ -52,12 +52,14 @@
         <pathelement location="${my-src.dir}/classpath/java"/>
         <pathelement location="${my-src.dir}/classpath/javax"/>
         <pathelement location="${my-src.dir}/classpath/org"/>
+        <pathelement location="${my-src.dir}/classpath/5.0"/>
         <pathelement location="${my-src.dir}/classpath/vm"/>
       </bootclasspath>
       <src path="${my-src.dir}/classpath/gnu"/>
       <src path="${my-src.dir}/classpath/java"/>
       <src path="${my-src.dir}/classpath/javax"/>
       <src path="${my-src.dir}/classpath/org"/>
+      <src path="${my-src.dir}/classpath/5.0"/>
       <src path="${my-src.dir}/classpath/vm"/>
       <src path="${my-src.dir}/core"/>
       <src path="${my-src.dir}/vmmagic"/>
