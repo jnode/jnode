@@ -65,6 +65,7 @@ public class JIFSDirectory implements FSDirectory, FSEntry {
 		entries.add(new JIFSFuptime(this));
 		entries.add(new JIFSFmemory(this));
 		entries.add(new JIFSFversion(this));
+		entries.add(new JIFSFdevices("devices",this));
 		//directory
 		entries.add(new JIFSDthreads( this));
 		entries.add(new JIFSDplugins(this));

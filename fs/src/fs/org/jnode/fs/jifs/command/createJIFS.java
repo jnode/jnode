@@ -25,7 +25,13 @@ import javax.naming.NameNotFoundException;
 
 import org.jnode.fs.jifs.*;
 
+import java.io.InputStream;
+import java.io.PrintStream;
+
 import org.apache.log4j.Logger;
+
+import org.jnode.shell.Command;
+import org.jnode.shell.CommandLine;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
 import org.jnode.fs.FileSystem;
@@ -41,12 +47,12 @@ import org.jnode.driver.DeviceAlreadyRegisteredException;
  * 
  * @author Andreas H\u00e4nel
  */
-public class createJIFS {
+public class createJIFS implements Command{
 
     private static final Logger log = Logger.getLogger(createJIFS.class);
 
-	public static void main(String args[]){
-    	log.info("Create jifs");
+	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
+		log.info("Create jifs");
         try {
          	FileSystemService fSS = (FileSystemService) InitialNaming.lookup(FileSystemService.NAME);
          	FileSystemType type = fSS.getFileSystemTypeForNameSystemTypes(JIFileSystemType.NAME);
@@ -78,5 +84,5 @@ public class createJIFS {
         } catch (FileSystemException e){
         	log.error(e);
         }
-     }
+	}
 }

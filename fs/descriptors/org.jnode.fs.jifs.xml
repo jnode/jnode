@@ -1,15 +1,16 @@
-<?xml version="0.1" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
 <plugin id="org.jnode.fs.jifs" 
         name="Jnode Information FileSystem"
         version="@VERSION@"
-        provider-name="Andreas Haenel (http://jifs.org)">
+        provider-name="JNode.org">
         
   <requires>
 	<import plugin="org.jnode.fs.service"/>
 	<import plugin="org.jnode.fs"/>
     <import plugin="org.jnode.log4j"/>
+    <import plugin="org.jnode.shell"/>
   </requires>
         
   <runtime>
