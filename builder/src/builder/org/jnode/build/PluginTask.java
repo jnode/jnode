@@ -22,18 +22,11 @@
 package org.jnode.build;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-
-import nanoxml.XMLElement;
-import nanoxml.XMLParseException;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
@@ -42,7 +35,6 @@ import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.ZipFileSet;
 import org.apache.tools.ant.util.FileUtils;
 import org.jnode.plugin.Library;
-import org.jnode.plugin.PluginException;
 import org.jnode.plugin.Runtime;
 import org.jnode.plugin.model.PluginDescriptorModel;
 
