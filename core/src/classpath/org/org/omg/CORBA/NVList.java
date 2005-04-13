@@ -38,6 +38,9 @@ exception statement from your version. */
 
 package org.omg.CORBA;
 
+import org.omg.CORBA.Any;
+import org.omg.CORBA.Bounds;
+import org.omg.CORBA.NamedValue;
 
 /**
  * The named value list, used to define the parameters in the

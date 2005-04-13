@@ -1,5 +1,5 @@
-/* RasterOp.java --
-   Copyright (C) 2000, 2002, 2004, 2005  Free Software Foundation
+/* MetalButtonUI.java
+   Copyright (C) 2002 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -36,22 +36,57 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package java.awt.image;
+package javax.swing.plaf.metal;
 
-import java.awt.RenderingHints;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import javax.swing.AbstractButton;
+import javax.swing.JComponent;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.basic.BasicButtonUI;
 
-public interface RasterOp
+/**
+ * The Metal Look &amp; Feel implementation for
+ * {@link javax.swing.AbstractButton}s.
+ *
+ * @author Roman Kennke (roman@kennke.org)
+ */
+public class MetalButtonUI
+  extends BasicButtonUI
 {
-  WritableRaster filter(Raster src, WritableRaster dest);
 
-  Rectangle2D getBounds2D(Raster src);
+  // FIXME: probably substitute with a Map in the future in the case
+  // that this UI becomes stateful
 
-  WritableRaster createCompatibleDestRaster(Raster src);
+  /** The cached MetalButtonUI instance. */
+  private static MetalButtonUI instance = null;
 
-  Point2D getPoint2D(Point2D srcPoint, Point2D destPoint);
+  /**
+   * Creates a new instance of MetalButtonUI.
+   */
+  public MetalButtonUI()
+  {
+    super();
+  }
 
-  RenderingHints getRenderingHints();
+  /**
+   * Returns an instance of MetalButtonUI.
+   *
+   * @param component a button for which a UI instance should be returned
+   */
+  public static ComponentUI createUI(JComponent component)
+  {
+    if (instance == null)
+      instance = new MetalButtonUI();
+    return instance;
+  }
+
+  /**
+   * Install the Look &amp; Feel defaults for Buttons.
+   *
+   * @param button the button for which to install the Look &amp; Feel
+   */
+  public void installDefaults(AbstractButton button)
+  {
+    super.installDefaults(button);
+  }
+
 }
-

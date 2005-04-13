@@ -1,5 +1,5 @@
-/* RasterOp.java --
-   Copyright (C) 2000, 2002, 2004, 2005  Free Software Foundation
+/* MetalScrollPaneUI.java
+   Copyright (C) 2002 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -36,22 +36,39 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package java.awt.image;
+package javax.swing.plaf.metal;
 
-import java.awt.RenderingHints;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import javax.swing.JComponent;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.basic.BasicScrollPaneUI;
 
-public interface RasterOp
+public class MetalScrollPaneUI
+  extends BasicScrollPaneUI
 {
-  WritableRaster filter(Raster src, WritableRaster dest);
 
-  Rectangle2D getBounds2D(Raster src);
+  // FIXME: maybe replace by a Map of instances when this becomes stateful
+  /** The shared UI instance for JScrollPanes. */
+  private static MetalScrollPaneUI instance = null;
 
-  WritableRaster createCompatibleDestRaster(Raster src);
+  /**
+   * Constructs a new instance of MetalScrollPaneUI.
+   */
+  public MetalScrollPaneUI()
+  {
+    super();
+  }
 
-  Point2D getPoint2D(Point2D srcPoint, Point2D destPoint);
-
-  RenderingHints getRenderingHints();
+  /**
+   * Returns an instance of MetalScrollPaneUI.
+   *
+   * @param component the component for which we return an UI instance
+   *
+   * @return an instance of MetalScrollPaneUI
+   */
+  public static ComponentUI createUI(JComponent component)
+  {
+    if (instance == null)
+      instance = new MetalScrollPaneUI();
+    return instance;
+  }
 }
-
