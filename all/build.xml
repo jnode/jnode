@@ -307,6 +307,8 @@ clean          Remove all intermediate build results.
 				<pathelement location="${root.dir}/core/src/classpath/java" />
 				<pathelement location="${root.dir}/core/src/classpath/javax" />
 				<pathelement location="${root.dir}/core/src/classpath/org" />
+				<pathelement location="${root.dir}/core/src/classpath/5.0" />
+				<pathelement location="${root.dir}/core/src/classpath/vm" />
 				<pathelement location="${root.dir}/core/src/core" />
 				<pathelement location="${root.dir}/core/src/driver" />
 			</sourcepath>
@@ -333,6 +335,8 @@ clean          Remove all intermediate build results.
 				<pathelement location="${root.dir}/core/src/classpath/java" />
 				<pathelement location="${root.dir}/core/src/classpath/javax" />
 				<pathelement location="${root.dir}/core/src/classpath/org" />
+				<pathelement location="${root.dir}/core/src/classpath/5.0" />
+				<pathelement location="${root.dir}/core/src/classpath/vm" />
 				<pathelement location="${root.dir}/core/src/core" />
 				<pathelement location="${root.dir}/core/src/driver" />
 				<pathelement location="${root.dir}/distr/src/install" />
@@ -375,6 +379,7 @@ clean          Remove all intermediate build results.
 				<fileset dir="${root.dir}/core/src/classpath/java" includes="**/*.java" />
 				<fileset dir="${root.dir}/core/src/classpath/javax" includes="**/*.java" />
 				<fileset dir="${root.dir}/core/src/classpath/org" includes="**/*.java" />
+				<fileset dir="${root.dir}/core/src/classpath/5.0" includes="**/*.java" />
 			</vmsources>
 			<classpathsources>
 				<fileset dir="${root.dir}/../classpath" includes="**/*.java">
