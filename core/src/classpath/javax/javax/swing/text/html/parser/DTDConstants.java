@@ -38,7 +38,6 @@ exception statement from your version. */
  
 package javax.swing.text.html.parser;
 
-
 /**
  * <p>This class defines the SGML basic types, used for describing HTML 4.01
  * at {@link http://www.w3.org/TR/html4/types.html }. Not all constants,

@@ -175,7 +175,7 @@ public abstract class JComponent extends Container implements Serializable
    * @see javax.swing.OverlayLayout
    * @see javax.swing.BoxLayout
    */
-  float alignmentX = 0.0f;
+  float alignmentX = 0.5f;
 
 			/**
    * A value between 0.0 and 1.0 indicating the preferred vertical
@@ -190,7 +190,7 @@ public abstract class JComponent extends Container implements Serializable
    * @see javax.swing.OverlayLayout
    * @see javax.swing.BoxLayout
 			 */
-  float alignmentY = 0.0f;
+  float alignmentY = 0.5f;
 
 		/**
    * The border painted around this component.
