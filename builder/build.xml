@@ -17,6 +17,7 @@
     <pathelement location="${jnode-shell.jar}"/>
     <pathelement location="${dom4j.jar}"/>
     <pathelement location="${basedir}/lib/xml-apis.jar"/>
+  	<pathelement location="${classycle.jar}"/>
     <path refid="cp"/>
   </path>
 
