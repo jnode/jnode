@@ -372,6 +372,19 @@ clean          Remove all intermediate build results.
 	<target name="cp-compare" depends="assemble">
 		<taskdef name="cp-compare" classname="org.jnode.ant.taskdefs.classpath.CompareTask" classpathref="cp-jnode" />
 
+		<patternset id="cp-sources-pattern">
+			<exclude name="compat/**/*" />
+			<exclude name="examples/**/*" />
+			<exclude name="external/**/*" />
+			<exclude name="gnu/java/awt/peer/gtk/**/*" />
+			<exclude name="gnu/javax/swing/plaf/gtk/**/*" />
+			<exclude name="gnu/test/**/*" />
+			<exclude name="gnu/xml/libxmlj/**/*" />
+			<exclude name="test/**/*" />
+			<exclude name="testsuite/**/*" />
+			<exclude name="vm/reference/**/*" />
+		</patternset>
+		
 		<delete dir="${build.dir}/classpath-compare" />
 		<cp-compare destdir="${build.dir}/classpath-compare">
 			<vmsources>
@@ -379,19 +392,20 @@ clean          Remove all intermediate build results.
 				<fileset dir="${root.dir}/core/src/classpath/java" includes="**/*.java" />
 				<fileset dir="${root.dir}/core/src/classpath/javax" includes="**/*.java" />
 				<fileset dir="${root.dir}/core/src/classpath/org" includes="**/*.java" />
-				<fileset dir="${root.dir}/core/src/classpath/5.0" includes="**/*.java" />
+				<fileset dir="${root.dir}/core/src/classpath/5.0" includes="**/*.java" target="1.5"/>
 			</vmsources>
+			<vmspecificsources>
+				<fileset dir="${root.dir}/core/src/classpath/vm" includes="**/*.java" />
+			</vmspecificsources>
 			<classpathsources>
 				<fileset dir="${root.dir}/../classpath" includes="**/*.java">
-					<exclude name="compat/**/*" />
-					<exclude name="external/**/*" />
-					<exclude name="gnu/java/awt/peer/gtk/**/*" />
-					<exclude name="gnu/javax/swing/plaf/gtk/**/*" />
-					<exclude name="gnu/test/**/*" />
-					<exclude name="gnu/xml/libxmlj/**/*" />
-					<exclude name="test/**/*" />
-					<exclude name="testsuite/**/*" />
-					<exclude name="vm/reference/**/*" />
+					<patternset refid="cp-sources-pattern"/>
+				</fileset>
+				<fileset dir="${root.dir}/../classpath-5.0" 
+					     includes="**/*.java" 
+					 	 target="1.5"
+						 ignoremissing="on">
+					<patternset refid="cp-sources-pattern"/>
 				</fileset>
 				<fileset dir="${root.dir}/../classpath/external/w3c_dom" includes="**/*.java">
 				</fileset>
