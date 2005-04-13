@@ -488,9 +488,9 @@ clean          Remove all intermediate build results.
 	<!-- check dependencies V2 -->
 	<target name="checksDependV2" depends="assemble-plugins">
 		<!-- Check all plugins -->
-		<taskdef name="checksDep" classname="org.jnode.build.DependencyChecker" 
+		<taskdef name="checksDep" classname="org.jnode.build.dependencies.DependencyChecker" 
 			classpathref="cp-jnode" />
-		<checksDep>			
+		<checksDep maxPluginsToProcess="3" output="${plugins.dir}/checks.txt">			
 			<plugins dir="${plugins.dir}/">
 				<include name="*.jar" />
 			</plugins>
