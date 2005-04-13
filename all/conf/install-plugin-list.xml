@@ -60,6 +60,8 @@
   <plugin id="org.jnode.fs.partitions.ibm"/>
   <plugin id="org.jnode.fs.service"/>
   <plugin id="org.jnode.fs.initrd"/>
+  <plugin id="org.jnode.fs.jifs"/>
+  <plugin id="org.jnode.fs.jifs.def"/>  
 
   <plugin id="org.jnode.install"/>
 

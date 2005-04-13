@@ -1,29 +1,28 @@
-<?xml version="0.1" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.fs.jifs.command" 
-        name="jifs command"
+<plugin id="org.jnode.fs.jifs.def" 
+        name="Jnode Information FileSystem Def"
         version="@VERSION@"
-        provider-name="Andreas Haenel (jifs.org)">
+        provider-name="JNode.org"
+        class="org.jnode.fs.jifs.def.JIFSPlugin">
         
   <requires>
-    <import plugin="org.jnode.fs.jifs"/>
+	<import plugin="org.jnode.fs.jifs"/>
   </requires>
         
   <runtime>
     <library name="jnode-fs.jar">
-      <export name="org.jnode.fs.jifs.command.*"/>
+      <export name="org.jnode.fs.jifs.def.*"/>
     </library>
   </runtime>
-        
-  <extension point="org.jnode.shell.aliases">
-    <alias name="jifs" class="org.jnode.fs.jifs.command.createJIFS"/>
-  </extension>
   
+  <extension-point id="info" name="Information ExtensionPoint"/>
+        
   <extension point="org.jnode.security.permissions">
     <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
     <permission class="java.lang.RuntimePermission" name="getProtectionDomain"/>
     <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
-  </extension>  
-
+  </extension> 
+        
 </plugin>

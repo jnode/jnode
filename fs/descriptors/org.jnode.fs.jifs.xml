@@ -5,6 +5,7 @@
         name="Jnode Information FileSystem"
         version="@VERSION@"
         provider-name="JNode.org">
+        <!--class="org.jnode.fs.jifs.def.JIFSPlugin"-->
         
   <requires>
 	<import plugin="org.jnode.fs.service"/>
@@ -16,13 +17,18 @@
   <runtime>
     <library name="jnode-fs.jar">
       <export name="org.jnode.fs.jifs.*"/>
-      <export name="org.jnode.fs.jifs.files.*"/>
+      <export name="org.jnode.fs.jifs.command.*"/>
       <export name="org.jnode.fs.jifs.directories.*"/>
+      <export name="org.jnode.fs.jifs.files.*"/>
     </library>
   </runtime>
-        
+  
   <extension point="org.jnode.fs.types">
     <type class="org.jnode.fs.jifs.JIFileSystemType"/>
+  </extension>
+  
+  <extension point="org.jnode.shell.aliases">
+    <alias name="jifs" class="org.jnode.fs.jifs.command.createJIFS"/>
   </extension>
   
   <extension point="org.jnode.security.permissions">
