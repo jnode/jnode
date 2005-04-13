@@ -35,13 +35,14 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.security;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import gnu.classpath.SystemProperties;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
-import java.security.Provider;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -57,7 +58,7 @@ import java.util.Vector;
  * This class centralizes all security properties and common security methods.
  * One of its primary uses is to manage providers.
  * 
- * @author Mark Benvenuto <ivymccough@worldnet.att.net>
+ * @author Mark Benvenuto (ivymccough@worldnet.att.net)
  */
 public final class Security
 {
@@ -68,8 +69,8 @@ public final class Security
 
   static
     {
-      String base = System.getProperty ("gnu.classpath.home.url");
-      String vendor = System.getProperty ("gnu.classpath.vm.shortname");
+      String base = SystemProperties.getProperty("gnu.classpath.home.url");
+      String vendor = SystemProperties.getProperty("gnu.classpath.vm.shortname");
     
       // Try VM specific security file
       boolean loaded = loadProviders (base, vendor);
@@ -79,8 +80,6 @@ public final class Security
 	  && !loaded
 	  && providers.size() == 0)
         {
-          /*
-           * @vm-specific This is called too early for JNode (no filesystem yet), so don't warn about it
 	  // No providers found and both security files failed to load properly.
 	  System.err.println
 	    ("WARNING: could not properly read security provider files:");
@@ -89,7 +88,7 @@ public final class Security
 	  System.err.println
 	    ("         " + base + "/security/" + "classpath" + ".security");
 	  System.err.println
-	    ("         Falling back to standard GNU security provider");*/
+	    ("         Falling back to standard GNU security provider");
 	  providers.addElement (new gnu.java.security.provider.Gnu());
         }
     }
@@ -330,7 +329,7 @@ public final class Security
      */
   public static Provider[] getProviders()
   {
-    Provider array[] = new Provider[providers.size ()];
+    Provider[] array = new Provider[providers.size ()];
     providers.copyInto (array);
         return array;
     }
@@ -413,7 +412,7 @@ public final class Security
    * MessageDigest, Cipher, Mac, KeyStore). Returns an empty Set if there is no
    * provider that supports the specified service. For a complete list of Java
    * cryptographic services, please see the Java Cryptography Architecture API
-   * Specification & Reference. Note: the returned set is immutable.
+   * Specification &amp; Reference. Note: the returned set is immutable.
    *
    * @param serviceName the name of the Java cryptographic service (e.g.,
    * Signature, MessageDigest, Cipher, Mac, KeyStore). Note: this parameter is
@@ -468,7 +467,7 @@ public final class Security
    * formats:</p>
    *
    * <ul>
-   *    <li><p>&lt;crypto_service>.&lt;algorithm_or_type></p>
+   *    <li><p>&lt;crypto_service&gt;.&lt;algorithm_or_type&gt;</p>
    *    <p>The cryptographic service name must not contain any dots.</p>
    *    <p>A provider satisfies the specified selection criterion iff the
    *    provider implements the specified algorithm or type for the specified
@@ -477,10 +476,10 @@ public final class Security
    *    provider that supplied a CertificateFactory implementation for X.509
    *    certificates.</p></li>
    *
-   *    <li><p>&lt;crypto_service>.&lt;algorithm_or_type> &lt;attribute_name>:&lt;attribute_value></p>
+   *    <li><p>&lt;crypto_service&gt;.&lt;algorithm_or_type&gt; &lt;attribute_name&gt;:&lt;attribute_value&gt;</p>
    *    <p>The cryptographic service name must not contain any dots. There must
-   *    be one or more space charaters between the the &lt;algorithm_or_type>
-   *    and the &lt;attribute_name>.</p>
+   *    be one or more space charaters between the the &lt;algorithm_or_type&gt;
+   *    and the &lt;attribute_name&gt;.</p>
    *    <p>A provider satisfies this selection criterion iff the provider
    *    implements the specified algorithm or type for the specified
    *    cryptographic service and its implementation meets the constraint
@@ -532,17 +531,17 @@ public final class Security
   * of the following two formats:</p>
   *
   * <ul>
-  *    <li><p>&lt;crypto_service>.&lt;algorithm_or_type></p>
+  *    <li><p>&lt;crypto_service&gt;.&lt;algorithm_or_type&gt;</p>
   *    <p>The cryptographic service name must not contain any dots.</p>
   *    <p>The value associated with the key must be an empty string.</p>
   *    <p>A provider satisfies this selection criterion iff the provider
   *    implements the specified algorithm or type for the specified
   *    cryptographic service.</p></li>
   *
-  *    <li><p>&lt;crypto_service>.&lt;algorithm_or_type> &lt;attribute_name></p>
+  *    <li><p>&lt;crypto_service&gt;.&lt;algorithm_or_type&gt; &lt;attribute_name&gt;</p>
   *    <p>The cryptographic service name must not contain any dots. There must
-  *    be one or more space charaters between the &lt;algorithm_or_type> and
-  *    the &lt;attribute_name>.</p>
+  *    be one or more space charaters between the &lt;algorithm_or_type&gt; and
+  *    the &lt;attribute_name&gt;.</p>
   *    <p>The value associated with the key must be a non-empty string. A
   *    provider satisfies this selection criterion iff the provider implements
   *    the specified algorithm or type for the specified cryptographic service

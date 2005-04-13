@@ -243,9 +243,8 @@ public final class VmSystem {
         res.put("gnu.cpu.endian",
                 (arch.getByteOrder() == ByteOrder.BIG_ENDIAN) ? "big"
                         : "little");
-//        res.put("gnu.java.io.encoding_scheme_alias.US-ASCII", "ISO8859-1");
-//        res.put("gnu.java.io.encoding_scheme_alias.UTF-16LE", "UTF16LE");
-//        res.put("gnu.java.io.encoding_scheme_alias.UTF-16BE", "UTF16BE");
+        res.put("gnu.classpath.home.url", "system://");
+        res.put("gnu.classpath.vm.shortname", "jnode");
     }
 
     public static String getCmdLine() {
