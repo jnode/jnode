@@ -77,7 +77,12 @@ public class JIFSFile implements FSEntry, FSFile {
 	}
 	
 	protected void addStringln(String add){
-		addString(add+"\n");
+		addString(add);
+		addStringln();
+	}
+	
+	protected void addStringln(){
+		addString("\n");
 	}
 	
 	public void refresh(){
