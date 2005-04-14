@@ -22,9 +22,6 @@
 package org.jnode.fs.jifs.def;
 
 import org.apache.log4j.Logger;
-
-import org.jnode.fs.jifs.command.createJIFS;
-import org.jnode.shell.CommandLine;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
@@ -43,35 +40,35 @@ public class JIFSPlugin extends Plugin{
         super(descriptor);
         this.jifsExtension = new JIFSExtension(descriptor
                 .getExtensionPoint("info"));
-        log.info("JIFSPlugin created.");
+        log.debug("JIFSPlugin created.");
     }
 	
 	/**
      * Start this plugin
      */
     protected void startPlugin() throws PluginException {
-    	//create / mount JIFS
-    	try{
-    		createJIFS cJ = new createJIFS();
-    		cJ.execute(new CommandLine("start"),System.in,System.out,System.err);
-    		log.info("JIFSPlugin started.");
-    	} catch (Exception e){
-    		log.error(e);
-    	}
+//    	//create / mount JIFS
+//    	try{
+//    		createJIFS cJ = new createJIFS();
+//    		cJ.execute(new CommandLine("start"),System.in,System.out,System.err);
+//    		log.info("JIFSPlugin started.");
+//    	} catch (Exception e){
+//    		log.error(e);
+//    	}
     }
 
     /**
      * Stop this plugin
      */
     protected void stopPlugin() {
-//    	unmount / free JIFS
-    	try{
-    		createJIFS cJ = new createJIFS();
-    		cJ.execute(new CommandLine("stop"),System.in,System.out,System.err);
-    		log.info("JIFSPlugin stopped.");
-    	} catch (Exception e){
-    		log.error(e);
-    	}
+////    	unmount / free JIFS
+//    	try{
+//    		createJIFS cJ = new createJIFS();
+//    		cJ.execute(new CommandLine("stop"),System.in,System.out,System.err);
+//    		log.info("JIFSPlugin stopped.");
+//    	} catch (Exception e){
+//    		log.error(e);
+//    	}
     }
 	
 }
