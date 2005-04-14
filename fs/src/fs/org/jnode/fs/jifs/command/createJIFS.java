@@ -21,34 +21,30 @@
  
 package org.jnode.fs.jifs.command;
 
-import javax.naming.NameNotFoundException;
-
 import org.jnode.fs.jifs.*;
 
 import java.io.InputStream;
 import java.io.PrintStream;
 
+import javax.naming.NameNotFoundException;
+
 import org.apache.log4j.Logger;
 
+import org.jnode.naming.InitialNaming;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
-import org.jnode.fs.FileSystemException;
-import org.jnode.fs.FileSystemType;
-import org.jnode.fs.FileSystem;
-import org.jnode.naming.InitialNaming;
-import org.jnode.fs.service.FileSystemService;
-import org.jnode.driver.DeviceManager;
-import org.jnode.driver.DeviceUtils;
-import org.jnode.driver.DriverException;
-import org.jnode.driver.DeviceNotFoundException;
-import org.jnode.driver.DeviceAlreadyRegisteredException;
-
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.OptionArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
 import org.jnode.shell.help.SyntaxErrorException;
+import org.jnode.plugin.Plugin;
+import org.jnode.plugin.PluginManager;
+import org.jnode.plugin.PluginDescriptor;
+import org.jnode.plugin.PluginException;
+import org.jnode.plugin.PluginPrerequisite;
+
 
 /**
  * Just mounts initial JIFS on /Jifs
@@ -76,74 +72,25 @@ public class createJIFS implements Command{
     public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
 		ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
 		String Act = ACTION.getValue(cmdLine);
-		if (new String("start").equals(Act)){
-			this.startjifs();
-			}
-		if (new String("stop").equals(Act)){
-			this.stopjifs();
-			}
-		if (new String("restart").equals(Act)){
-			this.restartjifs();
-			}
+		
+		try{
+			final PluginManager mgr = (PluginManager) InitialNaming.lookup(PluginManager.NAME);
+			final Plugin p = mgr.getRegistry().getPluginDescriptor("org.jnode.fs.jifs.def").getPlugin();
+			if (new String("start").equals(Act)){
+				p.start();
+				}
+			if (new String("stop").equals(Act)){
+				p.stop();
+				}
+			if (new String("restart").equals(Act)){
+				p.stop();
+				p.start();
+				}
+		} catch (NameNotFoundException N){
+			System.err.println(N);			
+		}
+
 	}
-    
-    private void startjifs(){
-		log.info("start jifs");
-        try {
-         	FileSystemService fSS = (FileSystemService) InitialNaming.lookup(FileSystemService.NAME);
-         	FileSystemType type = fSS.getFileSystemTypeForNameSystemTypes(JIFileSystemType.NAME);
-         	try {
-         				final JIFSDevice dev = new JIFSDevice();
-            			dev.setDriver(new JIFSDriver());
-            			final DeviceManager dm = DeviceUtils.getDeviceManager();
-            			dm.register(dev);
-			            log.info(dev.getId() + " registered");
-         			    final FileSystem fs = type.create(dev, true);
-                        fSS.registerFileSystem(fs);
-                        log.info("Mounted " + type.getName() + " on "
-                                + dev.getId());
-                        return;
-         			} catch (DeviceAlreadyRegisteredException ex){
-         				log.error("jifs is currently running.");
-         				return;
-         			} catch (FileSystemException ex) {
-                        log.error("Cannot mount " + type.getName()
-                                + " filesystem ", ex);
-                        return;
-                    } catch (DriverException e){
-                    	log.debug("Got DriverException, maybe jifs is running.");
-                    	return;
-                    } 
-                    
-	    } catch (NameNotFoundException e){
-    	   	log.error("filsystemservice / filesystemtype not found");
-        } catch (FileSystemException e){
-        	log.error(e);
-        }
-	}
-	
-	private void stopjifs(){
-		log.info("stop jifs");
-		try {
-         	FileSystemService fSS = (FileSystemService) InitialNaming.lookup(FileSystemService.NAME);
-    		final DeviceManager dm = DeviceUtils.getDeviceManager();
-    		JIFSDevice dev = (JIFSDevice)dm.getDevice("jifs");
-    		fSS.unregisterFileSystem(dev);
-    		dm.unregister(dev);
-	    } catch (NameNotFoundException e){
-    	   	log.error("filsystemservice / filesystemtype not found");
-        } catch (DeviceNotFoundException ex){
-        	log.info("no jifs present");
-        } catch (DriverException ex){
-        	log.error(ex);
-        }
-	}
-	
-	private void restartjifs(){
-		log.info("restart jifs");
-		stopjifs();
-		startjifs();
-	}
-	
+     
 	
 }

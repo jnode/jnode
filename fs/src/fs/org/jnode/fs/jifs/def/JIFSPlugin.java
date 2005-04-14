@@ -22,12 +22,29 @@
 package org.jnode.fs.jifs.def;
 
 import org.apache.log4j.Logger;
+import javax.naming.NameNotFoundException;
+
+import org.jnode.fs.jifs.*;
+
+import org.jnode.driver.DeviceManager;
+import org.jnode.driver.DeviceUtils;
+import org.jnode.driver.DriverException;
+import org.jnode.driver.DeviceNotFoundException;
+import org.jnode.driver.DeviceAlreadyRegisteredException;
+
+import org.jnode.fs.FileSystemException;
+import org.jnode.fs.FileSystemType;
+import org.jnode.fs.FileSystem;
+import org.jnode.fs.service.FileSystemService;
+
+import org.jnode.naming.InitialNaming;
+
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 
 /**
- * @author Andreas Haenel
+ * @author Andreas H\u00e4nel
  */
 public class JIFSPlugin extends Plugin{
 
@@ -47,28 +64,60 @@ public class JIFSPlugin extends Plugin{
      * Start this plugin
      */
     protected void startPlugin() throws PluginException {
-//    	//create / mount JIFS
-//    	try{
-//    		createJIFS cJ = new createJIFS();
-//    		cJ.execute(new CommandLine("start"),System.in,System.out,System.err);
-//    		log.info("JIFSPlugin started.");
-//    	} catch (Exception e){
-//    		log.error(e);
-//    	}
+    	log.info("start jifs");
+        try {
+         	FileSystemService fSS = (FileSystemService) InitialNaming.lookup(FileSystemService.NAME);
+         	FileSystemType type = fSS.getFileSystemTypeForNameSystemTypes(JIFileSystemType.NAME);
+         	try {
+         				final JIFSDevice dev = new JIFSDevice();
+            			dev.setDriver(new JIFSDriver());
+            			final DeviceManager dm = DeviceUtils.getDeviceManager();
+            			dm.register(dev);
+			            log.info(dev.getId() + " registered");
+         			    final FileSystem fs = type.create(dev, true);
+                        fSS.registerFileSystem(fs);
+                        log.info("Mounted " + type.getName() + " on "
+                                + dev.getId());
+                        return;
+         			} catch (DeviceAlreadyRegisteredException ex){
+         				log.error("jifs is currently running.");
+         				return;
+         			} catch (FileSystemException ex) {
+                        log.error("Cannot mount " + type.getName()
+                                + " filesystem ", ex);
+                        return;
+                    } catch (DriverException e){
+                    	log.debug("Got DriverException, maybe jifs is running.");
+                    	return;
+                    } 
+                    
+	    } catch (NameNotFoundException e){
+    	   	log.error("filsystemservice / filesystemtype not found");
+        } catch (FileSystemException e){
+        	log.error(e);
+        }
     }
 
     /**
      * Stop this plugin
      */
     protected void stopPlugin() {
-////    	unmount / free JIFS
-//    	try{
-//    		createJIFS cJ = new createJIFS();
-//    		cJ.execute(new CommandLine("stop"),System.in,System.out,System.err);
-//    		log.info("JIFSPlugin stopped.");
-//    	} catch (Exception e){
-//    		log.error(e);
-//    	}
+    	log.info("stop jifs");
+		try {
+         	FileSystemService fSS = (FileSystemService) InitialNaming.lookup(FileSystemService.NAME);
+    		final DeviceManager dm = DeviceUtils.getDeviceManager();
+    		JIFSDevice dev = (JIFSDevice)dm.getDevice("jifs");
+    		fSS.unregisterFileSystem(dev);
+    		log.info("FIFS unmounted");
+    		dm.unregister(dev);
+    		log.info("jifs unregistered");
+	    } catch (NameNotFoundException e){
+    	   	log.error("filsystemservice / filesystemtype not found");
+        } catch (DeviceNotFoundException ex){
+        	log.info("no jifs present");
+        } catch (DriverException ex){
+        	log.error(ex);
+        }
     }
 	
 }
