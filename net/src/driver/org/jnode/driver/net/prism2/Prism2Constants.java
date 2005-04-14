@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.driver.net.prism2;
 
 /**
@@ -28,83 +28,31 @@ public interface Prism2Constants {
 
     // Register offsets
 
-    public static final int REG_CMD = 0x00;
+    public enum Register {
+        CMD(0x00), PARAM0(0x04), PARAM1(0x08), PARAM2(0x0c), STATUS(0x10), RESP0(
+                0x14), RESP1(0x18), RESP2(0x1c), INFOFID(0x20), RXFID(0x40), ALLOCFID(
+                0x44), TXCOMPLFID(0x48), SELECT0(0x30), OFFSET0(0x38), DATA0(
+                0x6c), SELECT1(0x34), REGSET1(0x3c), DATA1(0x70), EVSTAT(0x60), INTEN(
+                0x64), EVACK(0x68), CONTROL(0x28), SWSUPPORT0(0x50), SWSUPPORT1(
+                0x54), SWSUPPORT2(0x58), AUXPAGE(0x74), AUXOFFSET(0x78), AUXDATA(
+                0x7c), PCICOR(0x4c), PCIHCR(0x5c), PCI_M0_ADDRH(0x80), PCI_M0_ADDRL(
+                0x84), PCI_M0_LEN(0x88), PCI_M0_CTL(0x8c), PCI_STATUS(0x98), PCI_M1_ADDRH(
+                0xa0), PCI_M1_ADDRL(0xa4), PCI_M1_LEN(0xa8), PCI_M1_CTL(0xac);
 
-    public static final int REG_PARAM0 = 0x04;
+        private final int offset;
 
-    public static final int REG_PARAM1 = 0x08;
+        private Register(int offset) {
+            this.offset = offset;
+        }
 
-    public static final int REG_PARAM2 = 0x0c;
-
-    public static final int REG_STATUS = 0x10;
-
-    public static final int REG_RESP0 = 0x14;
-
-    public static final int REG_RESP1 = 0x18;
-
-    public static final int REG_RESP2 = 0x1c;
-
-    public static final int REG_INFOFID = 0x20;
-
-    public static final int REG_RXFID = 0x40;
-
-    public static final int REG_ALLOCFID = 0x44;
-
-    public static final int REG_TXCOMPLFID = 0x48;
-
-    public static final int REG_SELECT0 = 0x30;
-
-    public static final int REG_OFFSET0 = 0x38;
-
-    public static final int REG_DATA0 = 0x6c;
-
-    public static final int REG_SELECT1 = 0x34;
-
-    public static final int REGSET1 = 0x3c;
-
-    public static final int REG_DATA1 = 0x70;
-
-    public static final int REG_EVSTAT = 0x60;
-
-    public static final int REG_INTEN = 0x64;
-
-    public static final int REG_EVACK = 0x68;
-
-    public static final int REG_CONTROL = 0x28;
-
-    public static final int REG_SWSUPPORT0 = 0x50;
-
-    public static final int REG_SWSUPPORT1 = 0x54;
-
-    public static final int REG_SWSUPPORT2 = 0x58;
-
-    public static final int REG_AUXPAGE = 0x74;
-
-    public static final int REG_AUXOFFSET = 0x78;
-
-    public static final int REG_AUXDATA = 0x7c;
-
-    public static final int REG_PCICOR = 0x4c;
-
-    public static final int REG_PCIHCR = 0x5c;
-
-    public static final int REG_PCI_M0_ADDRH = 0x80;
-
-    public static final int REG_PCI_M0_ADDRL = 0x84;
-
-    public static final int REG_PCI_M0_LEN = 0x88;
-
-    public static final int REG_PCI_M0_CTL = 0x8c;
-
-    public static final int REG_PCI_STATUS = 0x98;
-
-    public static final int REG_PCI_M1_ADDRH = 0xa0;
-
-    public static final int REG_PCI_M1_ADDRL = 0xa4;
-
-    public static final int REG_PCI_M1_LEN = 0xa8;
-
-    public static final int REG_PCI_M1_CTL = 0xac;
+        /**
+         * Gets the offset of this register in the register space.
+         * @return Returns the offset.
+         */
+        public final int getOffset() {
+            return offset;
+        }               
+    }
 
     // Register fields
 

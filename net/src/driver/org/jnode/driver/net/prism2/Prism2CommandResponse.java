@@ -18,13 +18,18 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.driver.net.prism2;
+
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.RESP0;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.RESP1;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.RESP2;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.STATUS;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class Prism2CommandResponse implements Prism2Constants {
+final class Prism2CommandResponse {
 
     private int status;
 
@@ -40,10 +45,10 @@ final class Prism2CommandResponse implements Prism2Constants {
      * @param core
      */
     final void initialize(Prism2IO core) {
-        this.status = core.getReg(REG_STATUS);
-        this.response0 = core.getReg(REG_RESP0);
-        this.response1 = core.getReg(REG_RESP1);
-        this.response2 = core.getReg(REG_RESP2);
+        this.status = core.getReg(STATUS);
+        this.response0 = core.getReg(RESP0);
+        this.response1 = core.getReg(RESP1);
+        this.response2 = core.getReg(RESP2);
     }
 
     /**
@@ -68,19 +73,21 @@ final class Prism2CommandResponse implements Prism2Constants {
     }
 
     /**
-     * Gets the full status value 
+     * Gets the full status value
+     * 
      * @return Returns the status.
      */
     public final int getStatus() {
         return status;
     }
-    
+
     /**
      * Gets the result code.
+     * 
      * @return
      */
     public final int getResult() {
-        return (status & STATUS_RESULT) >> 8;
+        return (status & Prism2Constants.STATUS_RESULT) >> 8;
     }
 
 }

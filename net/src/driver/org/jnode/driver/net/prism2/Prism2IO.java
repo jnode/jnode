@@ -21,6 +21,17 @@
  
 package org.jnode.driver.net.prism2;
 
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.CMD;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.DATA0;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.EVACK;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.EVSTAT;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.OFFSET0;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.PARAM0;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.PARAM1;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.PARAM2;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.SELECT0;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.STATUS;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.DriverException;
 import org.jnode.system.MemoryResource;
@@ -63,8 +74,8 @@ final class Prism2IO implements Prism2Constants {
      * 
      * @param reg
      */
-    final int getReg(int reg) {
-        return regs.getShort(reg) & 0xFFFF;
+    final int getReg(Register reg) {
+        return regs.getShort(reg.getOffset()) & 0xFFFF;
     }
 
     /**
@@ -72,8 +83,8 @@ final class Prism2IO implements Prism2Constants {
      * 
      * @param reg
      */
-    final void setReg(int reg, int value) {
-        regs.setShort(reg, (short) value);
+    final void setReg(Register reg, int value) {
+        regs.setShort(reg.getOffset(), (short) value);
     }
 
     /**
@@ -91,10 +102,10 @@ final class Prism2IO implements Prism2Constants {
         waitUntilNotBusy();
 
         // Write command
-        setReg(REG_PARAM0, parm0);
-        setReg(REG_PARAM1, parm1);
-        setReg(REG_PARAM2, parm2);
-        setReg(REG_CMD, cmd);
+        setReg(PARAM0, parm0);
+        setReg(PARAM1, parm1);
+        setReg(PARAM2, parm2);
+        setReg(CMD, cmd);
 
         // Wait until command completion
         waitUntilCommandCompleted();
@@ -105,11 +116,11 @@ final class Prism2IO implements Prism2Constants {
             response.initialize(this);
             status = response.getStatus();
         } else {
-            status = getReg(REG_STATUS);
+            status = getReg(STATUS);
         }
 
         // Acknowledge
-        setReg(REG_EVACK, EVACK_CMD);
+        setReg(EVACK, EVACK_CMD);
 
         // Return the result code.
         return (status & STATUS_RESULT) >> 8;
@@ -124,10 +135,10 @@ final class Prism2IO implements Prism2Constants {
      */
     final int waitForEvent(int eventMask, int eventAck, int wait, int timeout) {
         for (int counter = 0; counter < timeout; counter++) {
-            final int reg = getReg(REG_EVSTAT);
+            final int reg = getReg(EVSTAT);
             if ((reg & eventMask) != 0) {
                 // Acknowledge
-                setReg(REG_EVACK, reg & (eventMask | eventAck));
+                setReg(EVACK, reg & (eventMask | eventAck));
                 return reg;
             }
             TimeUtils.sleep(wait);
@@ -143,7 +154,7 @@ final class Prism2IO implements Prism2Constants {
      */
     private final void waitUntilNotBusy() throws TimeoutException {
         for (int counter = 0; counter < 10; counter++) {
-            final int cmd = getReg(REG_CMD);
+            final int cmd = getReg(CMD);
             if ((cmd & CMD_BUSY) == 0) {
                 return;
             } else {
@@ -152,7 +163,7 @@ final class Prism2IO implements Prism2Constants {
         }
         ;
         throw new TimeoutException("Prism2 still busy cmd=0x"
-                + NumberUtils.hex(getReg(REG_CMD), 4));
+                + NumberUtils.hex(getReg(CMD), 4));
     }
 
     /**
@@ -162,7 +173,7 @@ final class Prism2IO implements Prism2Constants {
      */
     private final void waitUntilCommandCompleted() throws TimeoutException {
         for (int counter = 0; counter < 200; counter++) {
-            final int reg = getReg(REG_EVSTAT);
+            final int reg = getReg(EVSTAT);
             if ((reg & EVSTAT_CMD) != 0) {
                 return;
             } else {
@@ -171,7 +182,7 @@ final class Prism2IO implements Prism2Constants {
         }
         ;
         throw new TimeoutException("Prism2 still busy evstat=0x"
-                + NumberUtils.hex(getReg(REG_EVSTAT), 4));
+                + NumberUtils.hex(getReg(EVSTAT), 4));
     }
 
     /**
@@ -181,7 +192,7 @@ final class Prism2IO implements Prism2Constants {
      */
     private final void waitUntilBapNotBusy() throws TimeoutException {
         for (int counter = 0; counter < 100; counter++) {
-            final int cmd = getReg(REG_OFFSET0);
+            final int cmd = getReg(OFFSET0);
             if ((cmd & OFFSET_BUSY) == 0) {
                 return;
             } else {
@@ -190,7 +201,7 @@ final class Prism2IO implements Prism2Constants {
         }
         ;
         throw new TimeoutException("Prism2 still busy offset=0x"
-                + NumberUtils.hex(getReg(REG_OFFSET0), 4));
+                + NumberUtils.hex(getReg(OFFSET0), 4));
     }
 
     /**
@@ -239,12 +250,12 @@ final class Prism2IO implements Prism2Constants {
         // Read even(len) buf contents from data reg
         final int maxlen = len & 0xFFFE;
         for (int i = 0; i < maxlen; i += 2) {
-            final int v = getReg(REG_DATA0);
+            final int v = getReg(DATA0);
             LittleEndian.setInt16(dst, dstOffset + i, v);
         }
         // If len odd, handle last byte
         if ((len % 2) != 0) {
-            final int v = getReg(REG_DATA0);
+            final int v = getReg(DATA0);
             dst[dstOffset + len - 1] = (byte) (v & 0xFF);
         }
     }
@@ -273,14 +284,14 @@ final class Prism2IO implements Prism2Constants {
         final int maxlen = len & 0xFFFE;
         for (int i = 0; i < maxlen; i += 2) {
             final int v = LittleEndian.getInt16(src, srcOffset + i);
-            setReg(REG_DATA0, v);
+            setReg(DATA0, v);
         }
         // If len odd, handle last byte
         if ((len % 2) != 0) {
-            int v = getReg(REG_DATA0);
+            int v = getReg(DATA0);
             prepareBAP(id, offset + maxlen);
             v = (v & 0xFF00) | (src[srcOffset + len - 1] & 0xFF);
-            setReg(REG_DATA0, v);
+            setReg(DATA0, v);
         }
     }
 
@@ -300,9 +311,9 @@ final class Prism2IO implements Prism2Constants {
             throw new IllegalArgumentException("Invalid offset " + offset);
         }
         // Write fid/rid and offset
-        setReg(REG_SELECT0, id);
+        setReg(SELECT0, id);
         TimeUtils.sleep(1);
-        setReg(REG_OFFSET0, offset);
+        setReg(OFFSET0, offset);
 
         // Wait for the bap to settle.
         try {
@@ -312,7 +323,7 @@ final class Prism2IO implements Prism2Constants {
         }
 
         // Test for errors
-        if ((getReg(REG_OFFSET0) & OFFSET_ERR) != 0) {
+        if ((getReg(OFFSET0) & OFFSET_ERR) != 0) {
             throw new DriverException("Error in offset");
         }
     }
