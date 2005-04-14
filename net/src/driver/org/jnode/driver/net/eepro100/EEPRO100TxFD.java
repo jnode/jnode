@@ -85,6 +85,14 @@ public class EEPRO100TxFD {
     final void setStatus(int value) {
         mem.setInt(0, value);
     }
+	
+	final int getCommand() {
+        return mem.getInt(2);
+    }
+
+    final void setCommand(int value) {
+        mem.setInt(2, value);
+    }
 
     final int getLink() {
         return mem.getInt(4);

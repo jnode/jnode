@@ -74,8 +74,20 @@ public class EEPRO100RxFD {
         mem.setInt(8, address);
     }
 
+	public final int getCount() {
+        return mem.getInt(12);
+    }
+	
 	public final void setCount(int size) {
         mem.setInt(12, size);
+    }
+	
+	public final int getSize() {
+        return mem.getInt(14);
+    }
+	
+	public final void setSize(int size) {
+        mem.setInt(14, size);
     }
 
 	public final void flushHeader() {
@@ -89,9 +101,7 @@ public class EEPRO100RxFD {
          */
     }
 
-	public final int getCount() {
-        return mem.getInt(12);
-    }
+	
 
 	public final String print() {
         return (Integer.toHexString(bufferAddress) + ": " 

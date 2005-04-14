@@ -24,7 +24,9 @@ package org.jnode.driver.net.eepro100;
 import org.apache.log4j.Logger;
 import org.jnode.driver.net.NetworkException;
 import org.jnode.net.SocketBuffer;
+import org.jnode.net.ethernet.EthernetHeader;
 import org.jnode.system.ResourceManager;
+import org.jnode.util.NumberUtils;
 
 /**
  * @author flesire
@@ -72,7 +74,36 @@ public class EEPRO100Buffer implements EEPRO100Constants {
         this.core = core;
         this.rm = this.core.getRm();
     }
-
+	
+	public final void initSingleRxRing(){
+		EEPRO100Registers regs = this.core.getRegs();
+		log.debug("Set TX base addr.");
+		rxPackets[0] = new EEPRO100RxFD(rm);
+		rxPackets[0].setStatus(0x0001);
+		rxPackets[0].setCommand(0x0000);
+		rxPackets[0].setLink(rxPackets[0].getBufferAddress());
+		//TODO Set correct value
+		rxPackets[0].setRxBufferAddress(0);
+		//---------------------------------
+		rxPackets[0].setCount(0);
+		rxPackets[0].setSize(1528);
+		// Start the receiver.
+		regs.setReg32(SCBPointer, rxPackets[0].getBufferAddress());
+        regs.setReg16(SCBCmd, SCBMaskAll | RxStart);
+		EEPRO100Utils.waitForCmdDone(regs);
+		
+		log.debug("Started rx process.");
+		
+		rxPackets[0].setStatus(0);
+		rxPackets[0].setCommand(0xC000);
+		
+		regs.setReg32(SCBPointer, rxPackets[0].getBufferAddress());
+		regs.setReg16(SCBCmd, SCBMaskAll | RxStart);
+		EEPRO100Utils.waitForCmdDone(regs);
+		
+		
+	}
+	
     /* Initialize the Rx and Tx rings, along with various 'dev' bits. */
     public final void initRxRing() {
         EEPRO100RxFD rxf = null;
@@ -106,6 +137,13 @@ public class EEPRO100Buffer implements EEPRO100Constants {
         int rxRingSize = rxRing.length;
     }
 
+	public final void initSingleTxRing(){
+		log.debug("Set TX base addr.");
+		txRing[0] = new EEPRO100TxFD(rm);
+		txRing[0].setCommand(CmdIASetup);
+		txRing[0].setStatus(0x0000);
+	}
+	
     public final void initTxRing() {
         for (int i = 0; i < txRing.length; i++) {
             txRing[i] = new EEPRO100TxFD(rm);
@@ -323,6 +361,39 @@ public class EEPRO100Buffer implements EEPRO100Constants {
         regs.setReg16(SCBCmd, CUStart | SCBMaskEarlyRx | SCBMaskFlowCtl);
         log.debug(this.core.getFlags().getName() + " : End resume");
     }
+	
+	public void transmit(SocketBuffer buf){
+		
+		EthernetHeader hdr = (EthernetHeader)buf.getLinkLayerHeader();
+		
+		EEPRO100Registers regs = this.core.getRegs();
+		
+		int status;
+		int s1;
+		int s2;
+		
+		status = regs.getReg16(SCBStatus);
+        regs.setReg16(SCBStatus, status & IntrAllNormal);
+		
+		log.debug("Transmitting type " + NumberUtils.hex(hdr.getLengthType()) + " packet(" + NumberUtils.hex(hdr.getLength()) + " bytes). Status=" + NumberUtils.hex(status) + " cmd=" + regs.getReg16(SCBCmd));
+		
+		txRing[0].setStatus(0);
+		txRing[0].setCommand(CmdSuspend | CmdTx | CmdTxFlex);
+		txRing[0].setLink(txRing[0].getBufferAddress());
+		txRing[0].setCount(0x02208000);
+		
+		regs.setReg16(SCBPointer, txRing[0].getBufferAddress());
+		regs.setReg16(SCBCmd, SCBMaskAll | CUStart);
+		EEPRO100Utils.waitForCmdDone(regs);
+		
+		s1 = regs.getReg16(SCBStatus);
+		//TODO wait 10 ms for transmiting;
+		s2 = regs.getReg16(SCBStatus);
+		
+		log.debug("s1=" + NumberUtils.hex(s1) + " s2=" + NumberUtils.hex(s2));
+		
+	}
+	
     /**
      * 
      *  
@@ -346,7 +417,9 @@ public class EEPRO100Buffer implements EEPRO100Constants {
          * System.out.println(sb.toString()); sb.setLength(0); }
          */
         /* Todo: be a little more clever about setting the interrupt bit. */
-        txRing[txEntry].setStatus(CmdSuspend | CmdTx | CmdTxFlex);
+		txRing[txEntry].setStatus(0);
+		txRing[txEntry].setCommand(CmdSuspend | CmdTx | CmdTxFlex);
+        
         getNextTx();
         txRing[txEntry].setLink(txRing[getCurTx() & TX_RING_SIZE - 1].getBufferAddress());
         /* We may nominally release the lock here. */
