@@ -34,7 +34,7 @@ public class BlockDeviceAPIHelper
             throw new IOException("devOffset < 0");
         
         if(devOffset >= api.getLength())
-            throw new IOException("devOffset < upper bound");
+            throw new IOException("devOffset (" + devOffset +") > upper bound (" + api.getLength() + ")");
     }
     
     public static void checkBounds(BlockDeviceAPI api, long devOffset, long length) throws IOException
