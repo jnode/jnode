@@ -21,6 +21,12 @@
  
 package org.jnode.driver.net.prism2;
 
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.EVACK;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.EVSTAT;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.INFOFID;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.INTEN;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.RXFID;
+
 import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.Device;
@@ -152,7 +158,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      */
     public void disable() {
         // Disable all interrupts
-        io.setReg(REG_INTEN, 0);
+        io.setReg(INTEN, 0);
 
         // Disable the mac port
         try {
@@ -306,9 +312,9 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
         }
 
         // Disable interrupts
-        io.setReg(REG_INTEN, 0);
+        io.setReg(INTEN, 0);
         // Acknowledge any spurious events
-        io.setReg(REG_EVACK, 0xFFFF);
+        io.setReg(EVACK, 0xFFFF);
 
         // Read MAC address
         final byte[] macAddr = new byte[RID_CNFOWNMACADDR_LEN];
@@ -329,7 +335,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
         setConfig16(RID_CNFPORTTYPE, 1);
 
         // Enable Rx & Info interrupts
-        io.setReg(REG_INTEN, INTEN_RX | INTEN_INFO);
+        io.setReg(INTEN, INTEN_RX | INTEN_INFO);
 
         // Enable card
         executeEnableCmd(0);
@@ -435,7 +441,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      */
     public final void handleInterrupt(int irq) {
         for (int loop = 0; loop < 10; loop++) {
-            final int evstat = io.getReg(REG_EVSTAT);
+            final int evstat = io.getReg(EVSTAT);
             if (evstat == 0) {
                 // No event for me
                 return;
@@ -464,14 +470,14 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      */
     private final void processReceiveEvent() {
         // Read the FID of the received frame
-        final int fid = io.getReg(REG_RXFID);
+        final int fid = io.getReg(RXFID);
         log.info("Receive, FID=0x" + NumberUtils.hex(fid, 4));
 
         // Read the FID into my buffer.
         // TODO
 
         // Acknowledge the receive
-        io.setReg(REG_EVACK, EVACK_RX);
+        io.setReg(EVACK, EVACK_RX);
     }
 
     /**
@@ -481,7 +487,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      */
     private final void processInfoEvent() throws DriverException {
         // Read the FID of the info frame
-        final int fid = io.getReg(REG_INFOFID);
+        final int fid = io.getReg(INFOFID);
         final byte[] frame = this.irqInfoFrame;
         log.debug("Info, FID=0x" + NumberUtils.hex(fid, 4));
 
@@ -519,7 +525,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
         }
 
         // Acknowledge the info frame
-        io.setReg(REG_EVACK, EVACK_INFO);
+        io.setReg(EVACK, EVACK_INFO);
     }
 
     /**
