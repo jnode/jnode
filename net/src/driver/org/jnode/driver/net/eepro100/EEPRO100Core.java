@@ -261,8 +261,8 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
      */
     public void initialize() {
         log.debug(flags.getName() + " : Init initialize");
-        buffers.initRxRing();
-        buffers.initTxRing();
+        buffers.initSingleRxRing();
+        buffers.initSingleTxRing();
 
         /*
          * We can safely take handler calls during init. Doing this after
@@ -309,8 +309,8 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
         log.debug(flags.getName() + " : Init transmit with TIMEOUT=" + timeout);
         // Set the source address
         hwAddress.writeTo(buf, 6);
-        buffers.txProcess();
-        log.debug(flags.getName() + " : End transmit");
+		buffers.transmit(buf);
+		log.debug(flags.getName() + " : End transmit");
     }
 
     /*
