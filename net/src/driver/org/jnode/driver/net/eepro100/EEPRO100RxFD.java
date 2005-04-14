@@ -25,13 +25,15 @@ import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 
 /**
+ * This class provide access to Receive Descriptor.
+ * 
  * @author flesire
  *  
  */
 public class EEPRO100RxFD {
-    
+
     private int RxFDSize = 16;
-    private int DataBufferSize = 1536;
+    private int DataBufferSize = 1518;
 
     private int bufferAddress;
     private byte[] data;
@@ -44,47 +46,54 @@ public class EEPRO100RxFD {
         final int size = (RxFDSize + DataBufferSize) + 16;
 		this.data = new byte[size];
 		this.mem = rm.asMemoryResource(data);
-		
-		bufferAddress = mem.getAddress().toInt();
+		this.bufferAddress = mem.getAddress().toInt();
 		setRxBufferAddress(0xffffffff);
     }
 
-    final int getStatus() {
+    public final int getStatus() {
         return mem.getInt(0);
     }
 
-    final void setStatus(int value) {
+    public final void setStatus(int value) {
         mem.setInt(0, value);
     }
+	
+	public final int getCommand(){
+		return mem.getInt(2);
+	}
+	
+	public final void setCommand(int cmd){
+		mem.setInt(2, cmd);
+	}
 
-    final void setLink(int address) {
+	public final void setLink(int address) {
         mem.setInt(4, address);
     }
-
-    final void setRxBufferAddress(int address) {
+	
+	public final void setRxBufferAddress(int address) {
         mem.setInt(8, address);
     }
 
-    final void setCount(int size) {
+	public final void setCount(int size) {
         mem.setInt(12, size);
     }
 
-    final void flushHeader() {
+	public final void flushHeader() {
         //SPROCKET_flush64(frameAddress);
         //SPROCKET_drainWriteBuffer();
     }
 
-    final void cleanHeader() {
+	public final void cleanHeader() {
         /*
          * SPROCKET_clean64(frameAddress); SPROCKET_drainWriteBuffer();
          */
     }
 
-    final int getCount() {
+	public final int getCount() {
         return mem.getInt(12);
     }
 
-    final String print() {
+	public final String print() {
         return (Integer.toHexString(bufferAddress) + ": " 
                 + Integer.toHexString(mem.getInt(4)) + ' ' 
                 + Integer.toHexString(mem.getInt(8)) + ' ' 
