@@ -1,28 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
-<plugin id="org.jnode.fs.jifs" 
+<plugin id="org.jnode.fs.jifs.command" 
         name="Jnode Information FileSystem"
         version="@VERSION@"
         provider-name="JNode.org">
         <!--class="org.jnode.fs.jifs.def.JIFSPlugin"-->
         
   <requires>
-	<import plugin="org.jnode.fs.service"/>
-	<import plugin="org.jnode.fs"/>
-    <import plugin="org.jnode.log4j"/>
+	<import plugin="org.jnode.fs.jifs"/>
+    <import plugin="org.jnode.shell"/>
   </requires>
         
   <runtime>
     <library name="jnode-fs.jar">
-      <export name="org.jnode.fs.jifs.*"/>
-      <export name="org.jnode.fs.jifs.directories.*"/>
-      <export name="org.jnode.fs.jifs.files.*"/>
+      <export name="org.jnode.fs.jifs.command.*"/>
     </library>
   </runtime>
   
-  <extension point="org.jnode.fs.types">
-    <type class="org.jnode.fs.jifs.JIFileSystemType"/>
+  <extension point="org.jnode.shell.aliases">
+    <alias name="jifs" class="org.jnode.fs.jifs.command.createJIFS"/>
   </extension>
   
   <extension point="org.jnode.security.permissions">
