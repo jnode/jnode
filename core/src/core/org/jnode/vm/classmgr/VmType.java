@@ -805,6 +805,15 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 		return Modifier.isFinal(modifiers);
 	}
 
+    /**
+     * Is this type an enum class.
+     * 
+     * @return boolean
+     */
+    public final boolean isEnum() {
+        return Modifier.isEnum(modifiers);
+    }
+
 	/**
 	 * Is this type an interface.
 	 * 

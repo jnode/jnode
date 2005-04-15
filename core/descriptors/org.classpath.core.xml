@@ -67,6 +67,7 @@
       <export name="java.beans.beancontext.*"/>
       <export name="java.io.*"/>
       <export name="java.lang.*"/>
+      <export name="java.lang.annotation.*"/>
       <export name="java.lang.ref.*"/>
       <export name="java.lang.reflect.*"/>
       <export name="java.math.*"/>
