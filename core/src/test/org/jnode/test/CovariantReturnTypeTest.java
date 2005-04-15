@@ -19,6 +19,10 @@ public class CovariantReturnTypeTest {
         System.out.println("a.foo  = " + a.foo());
         System.out.println("b.foo  = " + b.foo());
         System.out.println("ab.foo = " + ab.foo());
+
+        final String s = b.foo();
+
+        System.out.println("s = " + s);
     }
 
     public static class A {
