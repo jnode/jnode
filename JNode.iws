@@ -132,10 +132,7 @@
   </component>
   <component name="NamedScopeManager" />
   <component name="PackagesPane" />
-  <component name="ProjectPane">
-    <expanded_node url="file://$PROJECT_DIR$" module="jnode" type="directory" />
-    <expanded_node url="" module="jnode" type="module" />
-  </component>
+  <component name="ProjectPane" />
   <component name="ProjectView">
     <navigator currentView="ProjectPane" splitterProportion="0.5">
       <flattenPackages />
@@ -208,36 +205,12 @@
   </component>
   <component name="RunManager">
     <activeType name="Application" />
-    <configuration selected="false" default="true" type="Applet" factoryName="Applet">
-      <module name="" />
+    <configuration selected="false" default="true" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
       <option name="VM_PARAMETERS" />
-    </configuration>
-    <configuration selected="false" default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
-    </configuration>
-    <configuration selected="false" default="true" type="WebLogic Instance" factoryName="Local">
-      <option name="WORKING_DIRECTORY" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="7001" />
-      <option name="LOCAL" value="true" />
-      <option name="OPEN_IN_BROWSER" value="true" />
-      <option name="OPEN_IN_BROWSER_URL" value="/" />
-      <option name="COMMON_VM_ARGUMENTS" value="" />
-      <option name="DOMAIN_PATH" value="" />
-      <option name="USER" value="weblogic" />
-      <option name="PASSWORD" value="weblogic" />
-      <option name="SERVER_NAME" value="myserver" />
-      <option name="DOMAIN_NAME" value="mydomain" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <module name="" />
     </configuration>
     <configuration selected="false" default="true" type="JUnit" factoryName="JUnit">
       <module name="" />
@@ -253,12 +226,36 @@
         <value defaultName="wholeProject" />
       </option>
     </configuration>
-    <configuration selected="false" default="true" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <configuration selected="false" default="true" type="WebLogic Instance" factoryName="Local">
+      <option name="WORKING_DIRECTORY" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="7001" />
+      <option name="LOCAL" value="true" />
+      <option name="OPEN_IN_BROWSER" value="true" />
+      <option name="OPEN_IN_BROWSER_URL" value="/" />
+      <option name="COMMON_VM_ARGUMENTS" value="" />
+      <option name="DOMAIN_PATH" value="" />
+      <option name="USER" value="weblogic" />
+      <option name="PASSWORD" value="weblogic" />
+      <option name="SERVER_NAME" value="myserver" />
+      <option name="DOMAIN_NAME" value="mydomain" />
+    </configuration>
+    <configuration selected="false" default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+    </configuration>
+    <configuration selected="false" default="true" type="Applet" factoryName="Applet">
       <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
     </configuration>
   </component>
   <component name="SQL">
@@ -316,18 +313,18 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-4" y="-4" width="1288" height="774" extended-state="6" />
+    <frame x="-4" y="-4" width="1288" height="774" extended-state="0" />
     <editor active="false" />
     <layout>
-      <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.32970452" order="8" />
+      <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.32972136" order="8" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="7" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.19140308" order="0" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.1135442" order="0" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.17752443" order="1" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.32970452" order="8" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.4" order="6" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.19626926" order="1" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.17842661" order="1" />
       <window_info id="Sequence" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.25" order="2" />
@@ -335,18 +332,10 @@
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.4" order="4" />
       <window_info id="simpleUML" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.32927817" order="3" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="sliding" type="sliding" visible="false" weight="0.4" order="0" />
-      <window_info id="SQL" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
-      <window_info id="Gold Section" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="0" />
-      <window_info id="Code Outline" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
-      <window_info id="SvgViewer" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
-      <window_info id="Hibernate Tools" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.25" order="2" />
-      <window_info id="KiwiScrap" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="0" />
       <window_info id="EJB" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.25" order="3" />
-      <window_info id="Gantt" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
       <window_info id="IDE talk" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
-      <window_info id="WebServices" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.25" order="5" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
     </layout>
@@ -427,9 +416,9 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/core/src/core/org/jnode/vm/classmgr/VmResolvableConstObject.java">
+    <entry file="file://$PROJECT_DIR$/all/build.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="25" selection-start="591" selection-end="591" vertical-scroll-proportion="0.59401">
+        <state line="196" column="2" selection-start="9398" selection-end="9398" vertical-scroll-proportion="0.3327674">
           <folding />
         </state>
       </provider>
