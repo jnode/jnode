@@ -76,7 +76,8 @@ public class PriorityQueue<E> extends AbstractQueue<E>
     if (c instanceof SortedSet)
       {
 	SortedSet<? extends E> ss = (SortedSet<? extends E>) c;
-	this.comparator = ss.comparator();
+    // @classpath-bugfix Type mismatch using sun's compiler
+	this.comparator = (Comparator<? super E>)ss.comparator();
 	// We can insert the elements directly, since they are sorted.
 	int i = 0;
 	for (E val : ss)
@@ -89,7 +90,8 @@ public class PriorityQueue<E> extends AbstractQueue<E>
     else if (c instanceof PriorityQueue)
       {
 	PriorityQueue<? extends E> pq = (PriorityQueue<? extends E>) c;
-	this.comparator = pq.comparator();
+    // @classpath-bugfix Type mismatch on sun's compiler
+	this.comparator = (Comparator<? super E>)pq.comparator();
 	// We can just copy the contents.
 	System.arraycopy(pq.storage, 0, storage, 0, pq.storage.length);
       }
@@ -111,14 +113,16 @@ public class PriorityQueue<E> extends AbstractQueue<E>
 
   public PriorityQueue(PriorityQueue<? extends E> c)
   {
-    this(Math.max(1, (int) (1.1 * c.size())), c.comparator());
+      // @classpath-bugfix Type mismatch on sun's compiler
+    this(Math.max(1, (int) (1.1 * c.size())), (Comparator<? super E>)c.comparator());
     // We can just copy the contents.
     System.arraycopy(c.storage, 0, storage, 0, c.storage.length);
   }
 
   public PriorityQueue(SortedSet<? extends E> c)
   {
-    this(Math.max(1, (int) (1.1 * c.size())), c.comparator());
+      // @classpath-bugfix Type mismatch on sun's compiler
+    this(Math.max(1, (int) (1.1 * c.size())), (Comparator<? super E>)c.comparator());
     // We can insert the elements directly, since they are sorted.
     int i = 0;
     for (E val : c)
