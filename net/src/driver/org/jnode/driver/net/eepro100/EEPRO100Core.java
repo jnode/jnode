@@ -320,7 +320,12 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
      */
     public void handleInterrupt(int irq) {
         log.debug(flags.getName() + " : Init handleInterrupt with IRQ=" + irq);
-        setupInterrupt();
+        try {
+			buffers.poll(driver);
+		} catch (NetworkException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     //--- PRIVATE METHODS ---
