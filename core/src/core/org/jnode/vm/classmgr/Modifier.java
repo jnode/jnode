@@ -123,6 +123,11 @@ public class Modifier {
 		return ((modifier & mask) == mask);
 	}
 
+    public static boolean isEnum(int modifier) {
+        int mask = ACC_ENUM;
+        return ((modifier & mask) == mask);
+    }
+
 	public static boolean isAbstract(int modifier) {
 		int mask = ACC_ABSTRACT;
 		return ((modifier & mask) == mask);

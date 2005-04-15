@@ -3,6 +3,8 @@
  */
 package org.jnode.test;
 
+import java.util.ArrayList;
+
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -26,13 +28,13 @@ public class ForEachTest {
     }
     
     private static void testCollection() {
-//        final ArrayList list = new ArrayList();
-//        list.add("Aap");
-//        list.add("Noot");
-//        list.add("Mies");
-//        
-//        for (String i : list) {
-//            System.out.println("i=" + i);
-//        }
+        final ArrayList<String> list = new ArrayList<String>();
+        list.add("Aap");
+        list.add("Noot");
+        list.add("Mies");
+        
+        for (String i : list) {
+            System.out.println("i=" + i);
+        }
     }   
 }
