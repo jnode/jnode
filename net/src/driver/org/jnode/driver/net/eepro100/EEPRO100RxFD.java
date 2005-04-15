@@ -21,6 +21,7 @@
  
 package org.jnode.driver.net.eepro100;
 
+import org.jnode.net.SocketBuffer;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceManager;
 
@@ -125,5 +126,15 @@ public class EEPRO100RxFD {
 		byte[] buf = new byte[DataBufferSize];
 		mem.getBytes(bufferAddress, buf, 0, buf.length);
 		return buf;
+	}
+	/**
+	 * 
+	 * @return
+	 */
+	public SocketBuffer getPacket() {
+		int pktLen = this.getCount() & 0x3fff;
+		final SocketBuffer skbuf = new SocketBuffer();
+		skbuf.append(data, 0, pktLen);
+		return skbuf; 
 	}
 }
