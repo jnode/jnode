@@ -72,17 +72,20 @@ public class ConfigManager
     public TestConfig getConfig(Class configClazz, Class clazz, String testName)
     {
         TestKey key = new TestKey(clazz, testName);
-        Iterator it = (Iterator) iterators.get(key);
-        if(it == null)
-        {
-            List cfgs = (List) configs.get(configClazz);
-            it = cfgs.iterator();
-            iterators.put(key, it);
-        }
         
-        TestConfig cfg = (TestConfig) it.next();
-        log.info(key+" got config "+cfg);
-        return cfg;
+        synchronized(iterators)
+        {
+            Iterator it = (Iterator) iterators.get(key);
+            if(it == null)
+            {
+                List cfgs = (List) configs.get(configClazz);
+                it = cfgs.iterator();
+                iterators.put(key, it);
+            }
+            TestConfig cfg = (TestConfig) it.next();
+            log.info(key+" got config "+cfg);
+            return cfg;
+        }        
     }
     
     private ConfigManager()
