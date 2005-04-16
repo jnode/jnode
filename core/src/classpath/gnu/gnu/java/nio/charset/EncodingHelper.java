@@ -116,6 +116,18 @@ public class EncodingHelper
 	return (oldCanonical != null)?oldCanonical : newCanonical;
     }
 
+    public static boolean isISOLatin1(String s)
+    {
+	if(s.equals("ISO-8859-1") ||
+	   s.equals("8859_1") ||
+	   s.equals("ISO_8859-1") ||
+	   s.equals("latin1") ||
+	   s.equals("ISO8859_1") || 
+	   s.equals("ISO_8859_1"))
+	    return true;
+	return false;
+    }
+
    /**
     * Gets a charset, throwing the java.io exception and not 
     * the java.nio exception if an error occurs.

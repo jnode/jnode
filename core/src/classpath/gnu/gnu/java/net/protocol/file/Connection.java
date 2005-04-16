@@ -37,31 +37,36 @@ exception statement from your version.  */
 
 package gnu.java.net.protocol.file;
 
+import gnu.classpath.SystemProperties;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilePermission;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.Permission;
-import java.util.AbstractSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.NoSuchElementException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * This subclass of java.net.URLConnection models a URLConnection via
  * the "file" protocol.
  *
- * @author Aaron M. Renn <arenn@urbanophile.com>
- * @author Nic Ferrier <nferrier@tapsellferrier.co.uk>
- * @author Warren Levy <warrenl@cygnus.com>
+ * @author Aaron M. Renn (arenn@urbanophile.com)
+ * @author Nic Ferrier (nferrier@tapsellferrier.co.uk)
+ * @author Warren Levy (warrenl@cygnus.com)
  */
 public class Connection extends URLConnection
 {
@@ -70,10 +75,29 @@ public class Connection extends URLConnection
    */
   private static final String DEFAULT_PERMISSION = "read";
 
+  private static class StaticData
+  {
+    /**
+     * HTTP-style DateFormat, used to format the last-modified header.
+     */
+    static SimpleDateFormat dateFormat
+      = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss 'GMT'",
+                             new Locale ("En", "Us", "Unix"));
+
+    static String lineSeparator =
+      SystemProperties.getProperty("line.separator");
+  }
+
+  
   /**
    * This is a File object for this connection
    */
   private File file;
+
+  /**
+   * If a directory, contains a list of files in the directory.
+   */
+  private byte[] directoryListing;
 
   /**
    * InputStream if we are reading from the file
@@ -97,10 +121,6 @@ public class Connection extends URLConnection
   {
     super (url);
     
-    // @classpath-bugfix
-	/* Set up some variables */
-	doInput = true;
-
     permission = new FilePermission(getURL().getFile(), DEFAULT_PERMISSION);
   }
   
@@ -115,13 +135,54 @@ public class Connection extends URLConnection
     
     // If not connected, then file needs to be openned.
     file = new File (getURL().getFile());
+
+    if (! file.isDirectory())
+      {
     if (doInput)
       inputStream = new BufferedInputStream(new FileInputStream(file));
     
     if (doOutput)
       outputStream = new BufferedOutputStream(new FileOutputStream(file));
+      }
+    else
+      {
+	if (doInput)
+	  {
+            inputStream = new ByteArrayInputStream(getDirectoryListing());
+	  }
+
+	if (doOutput)
+	  throw new ProtocolException
+	    ("file: protocol does not support output on directories");
+      }
     
     connected = true;
+  }
+  
+  /**
+   * Populates the <code>directoryListing</code> field with a byte array
+   * containing a representation of the directory listing.
+   */
+  byte[] getDirectoryListing()
+    throws IOException
+  {
+    if (directoryListing == null)
+      {
+        ByteArrayOutputStream sink = new ByteArrayOutputStream();
+        // NB uses default character encoding for this system
+        Writer writer = new OutputStreamWriter(sink);
+    
+        String[] files = file.list();
+    
+        for (int i = 0; i < files.length; i++)
+          {
+            writer.write(files[i]);
+            writer.write(StaticData.lineSeparator);
+          }
+
+        directoryListing = sink.toByteArray();
+      }
+    return directoryListing;  
   }
   
   /**
@@ -184,24 +245,64 @@ public class Connection extends URLConnection
   }
 
   /**
-   * Get the length of content.
-   *
-   * @return the length of the content.
+   *  Get an http-style header field. Just handle a few common ones. 
    */
-  public int getContentLength()
+  public String getHeaderField(String field)
   {
     try
       {
 	if (!connected)
 	  connect();
         
-	return (int) file.length();
-      }
-    catch (IOException e)
+	if (field.equals("content-type"))
+          return guessContentTypeFromName(file.getName());
+	else if (field.equals("content-length"))
       {
-	return -1;
-      }
+            if (file.isDirectory())
+  {
+                return Integer.toString(getContentLength());
   }
+            return Long.toString(file.length());
+  }
+	else if (field.equals("last-modified"))
+  {
+	    synchronized (StaticData.dateFormat)
+  {
+        	return StaticData.dateFormat.format(
+                        new Date(file.lastModified()));
+	}
+	      }
+		  }
+    catch (IOException e)
+		  {
+        // Fall through.
+		  }
+    return null;
+	      }
+
+  /**
+   * Get the length of content.
+   *
+   * @return the length of the content.
+   */
+  public int getContentLength()
+	      {
+		try
+		  {
+	if (!connected)
+	  connect();
+                    
+        if (file.isDirectory())
+		      {
+            return getDirectoryListing().length;
+		      }
+	return (int) file.length();
+		  }
+    catch (IOException e)
+		  {
+	return -1;
+	      }
+	}
   
   /**
    * This method returns a <code>Permission</code> object representing the
@@ -214,106 +315,5 @@ public class Connection extends URLConnection
   public Permission getPermission() throws IOException
   {
     return permission;
-  }
-
-  /**
-   * Does the resource pointed to actually exist?
-   */
-  public final boolean exists()
-  {
-    if (file == null)
-      return false;
-
-    return file.exists();
-  }
-
-  /**
-   * Is the resource pointed to a directory?
-   */
-  public final boolean isDirectory()
-  {
-    return file.isDirectory();
-  }
-  
-  /**
-   * Get a listing of the directory, if it is a directory.
-   *
-   * @return a set which can supply an iteration of the
-   * contents of the directory.
-   *
-   * @throws IllegalStateException if this is not pointing
-   * to a directory.
-   */
-  public Set getListing()
-  {
-    if (!file.isDirectory())
-      throw new IllegalStateException ("this is not a directory");
-    
-    final File[] directoryList = file.listFiles();
-    return new AbstractSet()
-      {
-	File[] dirList = directoryList;
-
-	public int size()
-	{
-	  return dirList.length;
-	}
-
-	public Iterator iterator()
-	{
-	  return new Iterator()
-	    {
-	      int index = 0;
-
-	      public boolean hasNext()
-	      {
-		return index < dirList.length;
-	      }
-
-	      public Object next()
-	      {
-		try
-		  {
-		    String value = dirList [index++].getName();
-		    return value;
-		  }
-		catch (ArrayIndexOutOfBoundsException e)
-		  {
-		    throw new NoSuchElementException ("no more content");
-		  }
-	      }
-
-	      public void remove()
-	      {
-		try
-		  {
-		    File[] newDirList = new File [dirList.length - 1];
-		    int realIndex = index - 1;
-                    
-		    if (realIndex < 1)
-		      {
-			System.arraycopy (dirList, 1, newDirList, 0,
-                                          dirList.length - 1);
-			index--;
-		      }
-		    else
-		      {
-			System.arraycopy (dirList, 0, newDirList, 0, realIndex);
-                        
-			if (index < dirList.length - 1)
-			  System.arraycopy (dirList, index,
-					    newDirList, realIndex,
-                                            dirList.length - realIndex);
-		      }
-		    dirList = newDirList;
-		  }
-		catch (ArrayIndexOutOfBoundsException e)
-		  {
-		    throw new NoSuchElementException("no more content");
-		  }
-	      }
-	    };
-	}
-      };
   }
 }
