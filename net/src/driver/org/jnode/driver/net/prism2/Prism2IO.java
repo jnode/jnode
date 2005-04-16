@@ -96,7 +96,7 @@ final class Prism2IO implements Prism2Constants {
      * @param parm2
      * @return the RESULT code.
      */
-    final int executeCommand(int cmd, int parm0, int parm1, int parm2,
+    final Result executeCommand(Command cmd, int cmdFlags, int parm0, int parm1, int parm2,
             Prism2CommandResponse response) throws TimeoutException {
         // Wait for the busy bit to clear
         waitUntilNotBusy();
@@ -105,7 +105,7 @@ final class Prism2IO implements Prism2Constants {
         setReg(PARAM0, parm0);
         setReg(PARAM1, parm1);
         setReg(PARAM2, parm2);
-        setReg(CMD, cmd);
+        setReg(CMD, cmd.getCode() | cmdFlags);
 
         // Wait until command completion
         waitUntilCommandCompleted();
@@ -123,7 +123,7 @@ final class Prism2IO implements Prism2Constants {
         setReg(EVACK, EVACK_CMD);
 
         // Return the result code.
-        return (status & STATUS_RESULT) >> 8;
+        return Result.getByCode((status & STATUS_RESULT) >> 8);
     }
 
     /**
@@ -211,19 +211,19 @@ final class Prism2IO implements Prism2Constants {
      * @param result
      * @throws DriverException
      */
-    final void resultToException(int result) throws DriverException {
+    final void resultToException(Result result) throws DriverException {
         switch (result) {
-        case RESULT_SUCCESS:
+        case SUCCESS:
             return;
-        case RESULT_CARD_FAIL:
+        case CARD_FAIL:
             throw new DriverException("Card failure");
-        case RESULT_NO_BUFF:
+        case NO_BUFF:
             throw new DriverException("No buffer");
-        case RESULT_CMD_ERR:
+        case CMD_ERR:
             throw new DriverException("Command error");
         default:
             throw new DriverException("Unknown result code 0x"
-                    + NumberUtils.hex(result, 2));
+                    + NumberUtils.hex(result.getCode(), 2));
         }
     }
 

@@ -47,11 +47,12 @@ public interface Prism2Constants {
 
         /**
          * Gets the offset of this register in the register space.
+         * 
          * @return Returns the offset.
          */
         public final int getOffset() {
             return offset;
-        }               
+        }
     }
 
     // Register fields
@@ -148,47 +149,73 @@ public interface Prism2Constants {
     public static final int CONTROL_AUXEN = 0x8000 | 0x4000;
 
     /*--- Command Code Constants --------------------------*/
-    /*--- Controller Commands --------------------------*/
-    public static final int CMDCODE_INIT = 0x00;
 
-    public static final int CMDCODE_ENABLE = 0x01;
+    public enum Command {
+        /*--- Controller Commands --------------------------*/
+        INIT(0x00), ENABLE(0x01), DISABLE(0x02), DIAG(0x03),
 
-    public static final int CMDCODE_DISABLE = 0x02;
+        /*--- Buffer Mgmt Commands --------------------------*/
+        ALLOC(0x0A), TX(0x0B), CLRPRST(0x12),
 
-    public static final int CMDCODE_DIAG = 0x03;
+        /*--- Regulate Commands --------------------------*/
+        NOTIFY(0x10), INQ(0x11),
 
-    /*--- Buffer Mgmt Commands --------------------------*/
-    public static final int CMDCODE_ALLOC = 0x0A;
+        /*--- Configure Commands --------------------------*/
+        ACCESS(0x21), DOWNLD(0x22),
 
-    public static final int CMDCODE_TX = 0x0B;
+        /*--- Debugging Commands -----------------------------*/
+        MONITOR(0x38);
 
-    public static final int CMDCODE_CLRPRST = 0x12;
+        private final int code;
 
-    /*--- Regulate Commands --------------------------*/
-    public static final int CMDCODE_NOTIFY = 0x10;
+        private Command(int code) {
+            this.code = code;
+        }
 
-    public static final int CMDCODE_INQ = 0x11;
+        /**
+         * @return Returns the code.
+         */
+        public final int getCode() {
+            return code;
+        }
+    }
 
-    /*--- Configure Commands --------------------------*/
-    public static final int CMDCODE_ACCESS = 0x21;
+    /**
+     * Result Codes
+     */
+    public enum Result {
+        SUCCESS(0x00), CARD_FAIL(0x01), NO_BUFF(0x05), CMD_ERR(0x7F);
 
-    public static final int CMDCODE_DOWNLD = 0x22;
+        private final int code;
 
-    /*--- Debugging Commands -----------------------------*/
-    public static final int CMDCODE_MONITOR = 0x38;
+        private Result(int code) {
+            this.code = code;
+        }
 
-    public static final int MONITOR_ENABLE = 0x0b;
+        /**
+         * Gets the code value.
+         * 
+         * @return
+         */
+        public final int getCode() {
+            return code;
+        }
 
-    public static final int MONITOR_DISABLE = 0x0f;
-
-    /*--- Result Codes --------------------------*/
-    public static final int RESULT_SUCCESS = 0x00;
-
-    public static final int RESULT_CARD_FAIL = 0x01;
-
-    public static final int RESULT_NO_BUFF = 0x05;
-
-    public static final int RESULT_CMD_ERR = 0x7F;
+        /**
+         * Gets the result value by its code.
+         * 
+         * @param code
+         * @return
+         */
+        public static final Result getByCode(int code) {
+            for (Result r : Result.values()) {
+                if (r.code == code) {
+                    return r;
+                }
+            }
+            throw new IllegalArgumentException("Unknown code " + code);
+        }
+    }
 
     /*------ Constants --------------------------------------------*/
     /*--- Mins & Maxs -----------------------------------*/
@@ -219,54 +246,118 @@ public interface Prism2Constants {
     public static final int DRVR_FIDSTACKLEN_MAX = 10;
 
     /*--- Record ID Constants --------------------------*/
-    /*--------------------------------------------------------------------
-     Configuration RIDs: Network Parameters, Static Configuration Entities
-     --------------------------------------------------------------------*/
-    public static final int RID_CNFPORTTYPE = 0xFC00;
 
-    public static final int RID_CNFOWNMACADDR = 0xFC01;
+    public enum RecordID {
+        /*--------------------------------------------------------------------
+         Configuration RIDs: Network Parameters, Static Configuration Entities
+         --------------------------------------------------------------------*/
+        CNFPORTTYPE(0xFC00, 2), CNFOWNMACADDR(0xFC01, 6), CNFDESIREDSSID(
+                0xFC02, 34), CNFOWNCHANNEL(0xFC03, 2), CNFOWNSSID(0xFC04, 34), CNFOWNATIMWIN(
+                0xFC05, 2), CNFSYSSCALE(0xFC06), CNFMAXDATALEN(0xFC07), CNFWDSADDR(
+                0xFC08, 6), CNFPMENABLED(0xFC09), CNFPMEPS(0xFC0A), CNFMULTICASTRX(
+                0xFC0B), CNFMAXSLEEPDUR(0xFC0C), CNFPMHOLDDUR(0xFC0D), CNFOWNNAME(
+                0xFC0E), CNFOWNDTIMPER(0xFC10), CNFWDSADDR1(0xFC11), CNFWDSADDR2(
+                0xFC12), CNFWDSADDR3(0xFC13), CNFWDSADDR4(0xFC14), CNFWDSADDR5(
+                0xFC15), CNFWDSADDR6(0xFC16), CNFMCASTPMBUFF(0xFC17),
+        /*--------------------------------------------------------------------
+         Configuration RIDs: Network Parameters, Dynamic Configuration Entities
+         --------------------------------------------------------------------*/
+        GROUPADDR(0xFC80), CREATEIBSS(0xFC81), FRAGTHRESH(0xFC82), RTSTHRESH(
+                0xFC83), TXRATECNTL(0xFC84), PROMISCMODE(0xFC85), FRAGTHRESH0(
+                0xFC90), FRAGTHRESH1(0xFC91), FRAGTHRESH2(0xFC92), FRAGTHRESH3(
+                0xFC93), FRAGTHRESH4(0xFC94), FRAGTHRESH5(0xFC95), FRAGTHRESH6(
+                0xFC96), RTSTHRESH0(0xFC97), RTSTHRESH1(0xFC98), RTSTHRESH2(
+                0xFC99), RTSTHRESH3(0xFC9A), RTSTHRESH4(0xFC9B), RTSTHRESH5(
+                0xFC9C), RTSTHRESH6(0xFC9D), TXRATECNTL0(0xFC9E), TXRATECNTL1(
+                0xFC9F), TXRATECNTL2(0xFCA0), TXRATECNTL3(0xFCA1), TXRATECNTL4(
+                0xFCA2), TXRATECNTL5(0xFCA3), TXRATECNTL6(0xFCA4),
 
-    public static final int RID_CNFDESIREDSSID = 0xFC02;
+        /*--------------------------------------------------------------------
+         API ENHANCEMENTS (NOT ALREADY IMPLEMENTED)
+         --------------------------------------------------------------------*/
+        CNFWEPDEFAULTKEYID(0xFC23), CNFWEPDEFAULTKEY0(0xFC24), CNFWEPDEFAULTKEY1(
+                0xFC25), CNFWEPDEFAULTKEY2(0xFC26), CNFWEPDEFAULTKEY3(0xFC27), CNFWEPFLAGS(
+                0xFC28), CNFWEPKEYMAPTABLE(0xFC29), CNFAUTHENTICATION(0xFC2A), CNFMAXASSOCSTATIONS(
+                0xFC2B), CNFTXCONTROL(0xFC2C), CNFROAMINGMODE(0xFC2D), CNFHOSTAUTH(
+                0xFC2E), CNFRCVCRCERROR(0xFC30), CNFMMLIFE(0xFC31), CNFALTRETRYCNT(
+                0xFC32), CNFAPBCNINT(0xFC33), CNFAPPCFINFO(0xFC34), CNFSTAPCFINFO(
+                0xFC35), CNFPRIORITYQUSAGE(0xFC37), CNFTIMCTRL(0xFC40), CNFTHIRTY2TALLY(
+                0xFC42), CNFENHSECURITY(0xFC43), CNFDBMADJUST(0xFC46), // NEW
+        CNFSHORTPREAMBLE(0xFCB0), CNFEXCLONGPREAMBLE(0xFCB1), CNFAUTHRSPTIMEOUT(
+                0xFCB2), CNFBASICRATES(0xFCB3), CNFSUPPRATES(0xFCB4), CNFFALLBACKCTRL(
+                0xFCB5), // NEW
+        WEPKEYDISABLE(0xFCB6), // NEW
+        WEPKEYMAPINDEX(0xFCB7), // NEW AP
+        BROADCASTKEYID(0xFCB8), // NEW AP
+        ENTSECFLAGEYID(0xFCB9), // NEW AP
+        CNFPASSIVESCANCTRL(0xFCB9), // NEW STA
+        SCANREQUEST(0xFCE1), JOINREQUEST(0xFCE2), AUTHENTICATESTA(0xFCE3), CHANNELINFOREQUEST(
+                0xFCE4), HOSTSCAN(0xFCE5), // NEW STA
+        /*--------------------------------------------------------------------
+         Configuration RIDs: Behavior Parameters
+         --------------------------------------------------------------------*/
+        ITICKTIME(0xFCE0),
 
-    public static final int RID_CNFOWNCHANNEL = 0xFC03;
+        /*----------------------------------------------------------------------
+         Information RIDs: NIC Information
+         --------------------------------------------------------------------*/
+        MAXLOADTIME(0xFD00), DOWNLOADBUFFER(0xFD01), PRIIDENTITY(0xFD02), PRISUPRANGE(
+                0xFD03), PRI_CFIACTRANGES(0xFD04), NICSERIALNUMBER(0xFD0A), NICIDENTITY(
+                0xFD0B), MFISUPRANGE(0xFD0C), CFISUPRANGE(0xFD0D), CHANNELLIST(
+                0xFD10), REGULATORYDOMAINS(0xFD11), TEMPTYPE(0xFD12), CIS(
+                0xFD13), STAIDENTITY(0xFD20), STASUPRANGE(0xFD21), STA_MFIACTRANGES(
+                0xFD22), STA_CFIACTRANGES(0xFD23), BUILDSEQ(0xFFFE), FWID(
+                0xFFFF),
 
-    public static final int RID_CNFOWNSSID = 0xFC04;
+        /*--------------------------------------------------------------------
+         Information RIDs:  MAC Information
+         --------------------------------------------------------------------*/
+        PORTSTATUS(0xFD40), CURRENTSSID(0xFD41), CURRENTBSSID(0xFD42), COMMSQUALITY(
+                0xFD43), CURRENTTXRATE(0xFD44), CURRENTBCNINT(0xFD45), CURRENTSCALETHRESH(
+                0xFD46), PROTOCOLRSPTIME(0xFD47), SHORTRETRYLIMIT(0xFD48), LONGRETRYLIMIT(
+                0xFD49), MAXTXLIFETIME(0xFD4A), MAXRXLIFETIME(0xFD4B), CFPOLLABLE(
+                0xFD4C), AUTHALGORITHMS(0xFD4D), PRIVACYOPTIMP(0xFD4F), DBMCOMMSQUALITY(
+                0xFD51), CURRENTTXRATE1(0xFD80), CURRENTTXRATE2(0xFD81), CURRENTTXRATE3(
+                0xFD82), CURRENTTXRATE4(0xFD83), CURRENTTXRATE5(0xFD84), CURRENTTXRATE6(
+                0xFD85), OWNMACADDRESS(0xFD86), PCFINFO(0xFD87), SCANRESULTS(
+                0xFD88), // NEW
+        HOSTSCANRESULTS(0xFD89), // NEW
+        AUTHENTICATIONUSED(0xFD8A), // NEW
 
-    public static final int RID_CNFOWNATIMWIN = 0xFC05;
+        /*--------------------------------------------------------------------
+         Information RIDs:  Modem Information
+         --------------------------------------------------------------------*/
+        PHYTYPE(0xFDC0), CURRENTCHANNEL(0xFDC1), CURRENTPOWERSTATE(0xFDC2), CCAMODE(
+                0xFDC3), SUPPORTEDDATARATES(0xFDC6), ;
 
-    public static final int RID_CNFSYSSCALE = 0xFC06;
+        private final int id;
 
-    public static final int RID_CNFMAXDATALEN = 0xFC07;
+        private final int recordLength;
 
-    public static final int RID_CNFWDSADDR = 0xFC08;
+        private RecordID(int id) {
+            this.id = id;
+            this.recordLength = 0;
+        }
 
-    public static final int RID_CNFPMENABLED = 0xFC09;
+        private RecordID(int id, int recordLength) {
+            this.id = id;
+            this.recordLength = recordLength;
+        }
 
-    public static final int RID_CNFPMEPS = 0xFC0A;
+        /**
+         * @return Returns the id.
+         */
+        public final int getId() {
+            return id;
+        }
 
-    public static final int RID_CNFMULTICASTRX = 0xFC0B;
-
-    public static final int RID_CNFMAXSLEEPDUR = 0xFC0C;
-
-    public static final int RID_CNFPMHOLDDUR = 0xFC0D;
-
-    public static final int RID_CNFOWNNAME = 0xFC0E;
-
-    public static final int RID_CNFOWNDTIMPER = 0xFC10;
-
-    public static final int RID_CNFWDSADDR1 = 0xFC11;
-
-    public static final int RID_CNFWDSADDR2 = 0xFC12;
-
-    public static final int RID_CNFWDSADDR3 = 0xFC13;
-
-    public static final int RID_CNFWDSADDR4 = 0xFC14;
-
-    public static final int RID_CNFWDSADDR5 = 0xFC15;
-
-    public static final int RID_CNFWDSADDR6 = 0xFC16;
-
-    public static final int RID_CNFMCASTPMBUFF = 0xFC17;
+        /**
+         * @return Returns the recordLength.
+         */
+        public final int getRecordLength() {
+            return recordLength;
+        }
+    }
 
     /*--------------------------------------------------------------------
      Configuration RID lengths: Network Params, Static Config Entities
@@ -274,24 +365,6 @@ public interface Prism2Constants {
      include the len or code fields;
      --------------------------------------------------------------------*/
     /* TODO: fill in the rest of these */
-    public static final int RID_CNFPORTTYPE_LEN = 2;
-
-    public static final int RID_CNFOWNMACADDR_LEN = 6;
-
-    public static final int RID_CNFDESIREDSSID_LEN = 34;
-
-    public static final int RID_CNFOWNCHANNEL_LEN = 2;
-
-    public static final int RID_CNFOWNSSID_LEN = 34;
-
-    public static final int RID_CNFOWNATIMWIN_LEN = 2;
-
-    public static final int RID_CNFSYSSCALE_LEN = 0;
-
-    public static final int RID_CNFMAXDATALEN_LEN = 0;
-
-    public static final int RID_CNFWDSADDR_LEN = 6;
-
     public static final int RID_CNFPMENABLED_LEN = 0;
 
     public static final int RID_CNFPMEPS_LEN = 0;
@@ -321,143 +394,6 @@ public interface Prism2Constants {
 
     // public static final int RID_CNFAUTHENTICATION_LEN = sizeof(UINT16;;
     // public static final int RID_CNFMAXSLEEPDUR_LEN = 0;
-
-    /*--------------------------------------------------------------------
-     Configuration RIDs: Network Parameters, Dynamic Configuration Entities
-     --------------------------------------------------------------------*/
-    public static final int RID_GROUPADDR = 0xFC80;
-
-    public static final int RID_CREATEIBSS = 0xFC81;
-
-    public static final int RID_FRAGTHRESH = 0xFC82;
-
-    public static final int RID_RTSTHRESH = 0xFC83;
-
-    public static final int RID_TXRATECNTL = 0xFC84;
-
-    public static final int RID_PROMISCMODE = 0xFC85;
-
-    public static final int RID_FRAGTHRESH0 = 0xFC90;
-
-    public static final int RID_FRAGTHRESH1 = 0xFC91;
-
-    public static final int RID_FRAGTHRESH2 = 0xFC92;
-
-    public static final int RID_FRAGTHRESH3 = 0xFC93;
-
-    public static final int RID_FRAGTHRESH4 = 0xFC94;
-
-    public static final int RID_FRAGTHRESH5 = 0xFC95;
-
-    public static final int RID_FRAGTHRESH6 = 0xFC96;
-
-    public static final int RID_RTSTHRESH0 = 0xFC97;
-
-    public static final int RID_RTSTHRESH1 = 0xFC98;
-
-    public static final int RID_RTSTHRESH2 = 0xFC99;
-
-    public static final int RID_RTSTHRESH3 = 0xFC9A;
-
-    public static final int RID_RTSTHRESH4 = 0xFC9B;
-
-    public static final int RID_RTSTHRESH5 = 0xFC9C;
-
-    public static final int RID_RTSTHRESH6 = 0xFC9D;
-
-    public static final int RID_TXRATECNTL0 = 0xFC9E;
-
-    public static final int RID_TXRATECNTL1 = 0xFC9F;
-
-    public static final int RID_TXRATECNTL2 = 0xFCA0;
-
-    public static final int RID_TXRATECNTL3 = 0xFCA1;
-
-    public static final int RID_TXRATECNTL4 = 0xFCA2;
-
-    public static final int RID_TXRATECNTL5 = 0xFCA3;
-
-    public static final int RID_TXRATECNTL6 = 0xFCA4;
-
-    /*--------------------------------------------------------------------
-     API ENHANCEMENTS (NOT ALREADY IMPLEMENTED)
-     --------------------------------------------------------------------*/
-    public static final int RID_CNFWEPDEFAULTKEYID = 0xFC23;
-
-    public static final int RID_CNFWEPDEFAULTKEY0 = 0xFC24;
-
-    public static final int RID_CNFWEPDEFAULTKEY1 = 0xFC25;
-
-    public static final int RID_CNFWEPDEFAULTKEY2 = 0xFC26;
-
-    public static final int RID_CNFWEPDEFAULTKEY3 = 0xFC27;
-
-    public static final int RID_CNFWEPFLAGS = 0xFC28;
-
-    public static final int RID_CNFWEPKEYMAPTABLE = 0xFC29;
-
-    public static final int RID_CNFAUTHENTICATION = 0xFC2A;
-
-    public static final int RID_CNFMAXASSOCSTATIONS = 0xFC2B;
-
-    public static final int RID_CNFTXCONTROL = 0xFC2C;
-
-    public static final int RID_CNFROAMINGMODE = 0xFC2D;
-
-    public static final int RID_CNFHOSTAUTH = 0xFC2E;
-
-    public static final int RID_CNFRCVCRCERROR = 0xFC30;
-
-    // public static final int RID_CNFMMLIFE =0xFC31;
-    public static final int RID_CNFALTRETRYCNT = 0xFC32;
-
-    public static final int RID_CNFAPBCNINT = 0xFC33;
-
-    public static final int RID_CNFAPPCFINFO = 0xFC34;
-
-    public static final int RID_CNFSTAPCFINFO = 0xFC35;
-
-    public static final int RID_CNFPRIORITYQUSAGE = 0xFC37;
-
-    public static final int RID_CNFTIMCTRL = 0xFC40;
-
-    public static final int RID_CNFTHIRTY2TALLY = 0xFC42;
-
-    public static final int RID_CNFENHSECURITY = 0xFC43;
-
-    public static final int RID_CNFDBMADJUST = 0xFC46; // NEW
-
-    public static final int RID_CNFSHORTPREAMBLE = 0xFCB0;
-
-    public static final int RID_CNFEXCLONGPREAMBLE = 0xFCB1;
-
-    public static final int RID_CNFAUTHRSPTIMEOUT = 0xFCB2;
-
-    public static final int RID_CNFBASICRATES = 0xFCB3;
-
-    public static final int RID_CNFSUPPRATES = 0xFCB4;
-
-    public static final int RID_CNFFALLBACKCTRL = 0xFCB5; // NEW
-
-    public static final int RID_WEPKEYDISABLE = 0xFCB6; // NEW
-
-    public static final int RID_WEPKEYMAPINDEX = 0xFCB7; // NEW AP
-
-    public static final int RID_BROADCASTKEYID = 0xFCB8; // NEW AP
-
-    public static final int RID_ENTSECFLAGEYID = 0xFCB9; // NEW AP
-
-    public static final int RID_CNFPASSIVESCANCTRL = 0xFCB9; // NEW STA
-
-    public static final int RID_SCANREQUEST = 0xFCE1;
-
-    public static final int RID_JOINREQUEST = 0xFCE2;
-
-    public static final int RID_AUTHENTICATESTA = 0xFCE3;
-
-    public static final int RID_CHANNELINFOREQUEST = 0xFCE4;
-
-    public static final int RID_HOSTSCAN = 0xFCE5; // NEW STA
 
     public static final int RID_CNFWEPDEFAULTKEY_LEN = 6;
 
@@ -525,57 +461,11 @@ public interface Prism2Constants {
     public static final int RID_TXRATECNTL6_LEN = 0;
 
     /*--------------------------------------------------------------------
-     Configuration RIDs: Behavior Parameters
-     --------------------------------------------------------------------*/
-    public static final int RID_ITICKTIME = 0xFCE0;
-
-    /*--------------------------------------------------------------------
      Configuration RID Lengths: Behavior Parameters
      This is the length of JUST the DATA part of the RID (does not 
      include the len or code fields;
      --------------------------------------------------------------------*/
     public static final int RID_ITICKTIME_LEN = 2;
-
-    /*----------------------------------------------------------------------
-     Information RIDs: NIC Information
-     --------------------------------------------------------------------*/
-    public static final int RID_MAXLOADTIME = 0xFD00;
-
-    public static final int RID_DOWNLOADBUFFER = 0xFD01;
-
-    public static final int RID_PRIIDENTITY = 0xFD02;
-
-    public static final int RID_PRISUPRANGE = 0xFD03;
-
-    public static final int RID_PRI_CFIACTRANGES = 0xFD04;
-
-    public static final int RID_NICSERIALNUMBER = 0xFD0A;
-
-    public static final int RID_NICIDENTITY = 0xFD0B;
-
-    public static final int RID_MFISUPRANGE = 0xFD0C;
-
-    public static final int RID_CFISUPRANGE = 0xFD0D;
-
-    public static final int RID_CHANNELLIST = 0xFD10;
-
-    public static final int RID_REGULATORYDOMAINS = 0xFD11;
-
-    public static final int RID_TEMPTYPE = 0xFD12;
-
-    public static final int RID_CIS = 0xFD13;
-
-    public static final int RID_STAIDENTITY = 0xFD20;
-
-    public static final int RID_STASUPRANGE = 0xFD21;
-
-    public static final int RID_STA_MFIACTRANGES = 0xFD22;
-
-    public static final int RID_STA_CFIACTRANGES = 0xFD23;
-
-    public static final int RID_BUILDSEQ = 0xFFFE;
-
-    public static final int RID_FWID = 0xFFFF;
 
     /*----------------------------------------------------------------------
      Information RID Lengths: NIC Information
@@ -618,62 +508,6 @@ public interface Prism2Constants {
 
     // public static final int RID_BUILDSEQ_LEN = sizeof(BuildSeq_t;;
     // public static final int RID_FWID_LEN = sizeof(FWID_t;;
-
-    /*--------------------------------------------------------------------
-     Information RIDs:  MAC Information
-     --------------------------------------------------------------------*/
-    public static final int RID_PORTSTATUS = 0xFD40;
-
-    public static final int RID_CURRENTSSID = 0xFD41;
-
-    public static final int RID_CURRENTBSSID = 0xFD42;
-
-    public static final int RID_COMMSQUALITY = 0xFD43;
-
-    public static final int RID_CURRENTTXRATE = 0xFD44;
-
-    public static final int RID_CURRENTBCNINT = 0xFD45;
-
-    public static final int RID_CURRENTSCALETHRESH = 0xFD46;
-
-    public static final int RID_PROTOCOLRSPTIME = 0xFD47;
-
-    public static final int RID_SHORTRETRYLIMIT = 0xFD48;
-
-    public static final int RID_LONGRETRYLIMIT = 0xFD49;
-
-    public static final int RID_MAXTXLIFETIME = 0xFD4A;
-
-    public static final int RID_MAXRXLIFETIME = 0xFD4B;
-
-    public static final int RID_CFPOLLABLE = 0xFD4C;
-
-    public static final int RID_AUTHALGORITHMS = 0xFD4D;
-
-    public static final int RID_PRIVACYOPTIMP = 0xFD4F;
-
-    public static final int RID_DBMCOMMSQUALITY = 0xFD51;
-
-    public static final int RID_CURRENTTXRATE1 = 0xFD80;
-
-    public static final int RID_CURRENTTXRATE2 = 0xFD81;
-
-    public static final int RID_CURRENTTXRATE3 = 0xFD82;
-
-    public static final int RID_CURRENTTXRATE4 = 0xFD83;
-
-    public static final int RID_CURRENTTXRATE5 = 0xFD84;
-
-    public static final int RID_CURRENTTXRATE6 = 0xFD85;
-
-    public static final int RID_OWNMACADDRESS = 0xFD86;
-
-    // public static final int RID_PCFINFO = 0xFD87;
-    public static final int RID_SCANRESULTS = 0xFD88; // NEW
-
-    public static final int RID_HOSTSCANRESULTS = 0xFD89; // NEW
-
-    public static final int RID_AUTHENTICATIONUSED = 0xFD8A; // NEW
 
     /*--------------------------------------------------------------------
      Information RID Lengths:  MAC Information
@@ -736,19 +570,6 @@ public interface Prism2Constants {
     // public static final int RID_CHANNELINFOREQUEST_LEN =
     // sizeof(ChannelInfoRequest_data_t;;
     /*--------------------------------------------------------------------
-     Information RIDs:  Modem Information
-     --------------------------------------------------------------------*/
-    public static final int RID_PHYTYPE = 0xFDC0;
-
-    public static final int RID_CURRENTCHANNEL = 0xFDC1;
-
-    public static final int RID_CURRENTPOWERSTATE = 0xFDC2;
-
-    public static final int RID_CCAMODE = 0xFDC3;
-
-    public static final int RID_SUPPORTEDDATARATES = 0xFDC6;
-
-    /*--------------------------------------------------------------------
      Information RID Lengths:  Modem Information 
      This is the length of JUST the DATA part of the RID (does not 
      include the len or code fields;
@@ -768,40 +589,77 @@ public interface Prism2Constants {
 
     public static final int CNFAUTHENTICATION_SHAREDKEY = 0x0002;
 
-    // ------ Information types -----------------
-    public static final int IT_HANDOVERADDR = 0xF000;
+    /** 
+     * Information types
+     */
+    public enum InformationType {
+        HANDOVERADDR(0xF000), COMMTALLIES(0xF100), SCANRESULTS(0xF101), CHINFORESULTS(
+                0xF102), HOSTSCANRESULTS(0xF103), LINKSTATUS(0xF200), ASSOCSTATUS(
+                0xF201), AUTHREQ(0xF202), PSUSERCNT(0xF203), KEYIDCHANGED(
+                0xF204);
 
-    public static final int IT_COMMTALLIES = 0xF100;
+        private final int value;
 
-    public static final int IT_SCANRESULTS = 0xF101;
+        private InformationType(int value) {
+            this.value = value;
+        }
 
-    public static final int IT_CHINFORESULTS = 0xF102;
+        /**
+         * @return Returns the value.
+         */
+        public final int getValue() {
+            return value;
+        }
 
-    public static final int IT_HOSTSCANRESULTS = 0xF103;// NEW
+        /**
+         * Get the enum by its value.
+         * 
+         * @param value
+         * @return
+         */
+        public static InformationType getByValue(int value) {
+            for (InformationType it : values()) {
+                if (it.value == value) {
+                    return it;
+                }
+            }
+            throw new IllegalArgumentException("Invalid value " + value);
+        }
+    }
 
-    public static final int IT_LINKSTATUS = 0xF200;
+    /** 
+     * Link status values 
+     */
+    public enum LinkStatus {
+        NOTCONNECTED(0), CONNECTED(1), DISCONNECTED(2), AP_CHANGE(3), AP_OUTOFRANGE(
+                4), AP_INRANGE(5), ASSOCFAIL(6);
 
-    public static final int IT_ASSOCSTATUS = 0xF201;
+        private final int value;
 
-    public static final int IT_AUTHREQ = 0xF202;
+        private LinkStatus(int value) {
+            this.value = value;
+        }
 
-    public static final int IT_PSUSERCNT = 0xF203;
+        /**
+         * @return Returns the value.
+         */
+        public final int getValue() {
+            return value;
+        }
 
-    public static final int IT_KEYIDCHANGED = 0xF204;// NEW AP
-
-    // ------ Link status values ----------------
-    public static final int LINK_NOTCONNECTED = 0;
-
-    public static final int LINK_CONNECTED = 1;
-
-    public static final int LINK_DISCONNECTED = 2;
-
-    public static final int LINK_AP_CHANGE = 3;
-
-    public static final int LINK_AP_OUTOFRANGE = 4;
-
-    public static final int LINK_AP_INRANGE = 5;
-
-    public static final int LINK_ASSOCFAIL = 6;
-
+        /**
+         * Get the enum by its value.
+         * 
+         * @param value
+         * @return
+         */
+        public static LinkStatus getByValue(int value) {
+            for (LinkStatus ls : values()) {
+                if (ls.value == value) {
+                    return ls;
+                }
+            }
+            throw new IllegalArgumentException("Invalid value " + value);
+        }
+    }
 }

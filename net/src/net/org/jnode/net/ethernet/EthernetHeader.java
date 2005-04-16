@@ -26,6 +26,8 @@ import org.jnode.net.LinkLayerHeader;
 import org.jnode.net.SocketBuffer;
 
 /**
+ * Wrapper class for the IEEE 802.3 header.
+ *  
  * @author epr
  */
 public class EthernetHeader implements LinkLayerHeader, EthernetConstants {

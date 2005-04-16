@@ -162,6 +162,15 @@ public class EthernetAddress implements HardwareAddress, Serializable {
 		skbuf.set(skbufOffset, address, 0, length);
 	}
 
+    /**
+     * Write this address to a given offset in the given buffer
+     * @param dst
+     * @param dstOffset
+     */
+    public void writeTo(byte[] dst, int dstOffset) {
+        System.arraycopy(address, 0, dst, dstOffset, length);
+    }
+
 	/**
 	 * Is this a broadcast address?
 	 */

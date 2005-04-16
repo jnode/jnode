@@ -273,7 +273,7 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
 	 * @throws InterruptedException
 	 * @throws TimeoutException
 	 */
-	public synchronized void transmit(SocketBuffer buf, long timeout)
+	public synchronized void transmit(SocketBuffer buf, HardwareAddress destination, long timeout)
 	throws InterruptedException, TimeoutException {
 		// Set the source address
 		hwAddress.writeTo(buf, 6);

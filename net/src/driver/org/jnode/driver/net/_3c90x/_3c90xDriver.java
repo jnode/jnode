@@ -77,7 +77,7 @@ public class _3c90xDriver extends AbstractEthernetDriver {
      * @see org.jnode.driver.net.spi.AbstractNetDriver#doTransmit(SocketBuffer,
      *      HardwareAddress)
      */
-    protected void doTransmitEthernet(SocketBuffer skbuf)
+    protected void doTransmitEthernet(SocketBuffer skbuf, HardwareAddress destination)
             throws NetworkException {
         try {
             // Pad
@@ -85,7 +85,7 @@ public class _3c90xDriver extends AbstractEthernetDriver {
                 skbuf.append(ETH_ZLEN - skbuf.getSize());
             }
 
-            dd.transmit(skbuf, 5000);
+            dd.transmit(skbuf, destination, 5000);
         } catch (InterruptedException ex) {
             throw new NetworkException("Interrupted", ex);
         } catch (TimeoutException ex) {

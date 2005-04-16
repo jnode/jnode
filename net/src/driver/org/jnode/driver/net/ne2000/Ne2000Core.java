@@ -260,7 +260,7 @@ public abstract class Ne2000Core extends AbstractDeviceCore
 	 * @throws InterruptedException
 	 * @throws TimeoutException
 	 */
-	public synchronized void transmit(SocketBuffer buf, long timeout)
+	public synchronized void transmit(SocketBuffer buf, HardwareAddress destination, long timeout)
 		throws InterruptedException, TimeoutException {
 
 		// Set the source address

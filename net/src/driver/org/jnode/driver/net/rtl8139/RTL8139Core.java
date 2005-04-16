@@ -383,7 +383,7 @@ public class RTL8139Core extends AbstractDeviceCore implements RTL8139Constants,
 	 * @throws InterruptedException
 	 * @throws TimeoutException
 	 */
-	public void transmit(SocketBuffer buf, long timeout) throws InterruptedException, TimeoutException {
+	public void transmit(SocketBuffer buf, HardwareAddress destination, long timeout) throws InterruptedException, TimeoutException {
 		// Set the source address
 		hwAddress.writeTo(buf, 6);
 		//tx_active = true;

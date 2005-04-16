@@ -66,6 +66,6 @@ public abstract class AbstractDeviceCore {
 	 * @throws InterruptedException
 	 * @throws TimeoutException
 	 */
-	public abstract void transmit(SocketBuffer buf, long timeout)
+	public abstract void transmit(SocketBuffer buf, HardwareAddress destination, long timeout)
 	throws InterruptedException, TimeoutException;
 }

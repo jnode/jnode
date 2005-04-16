@@ -305,7 +305,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
      * @see org.jnode.driver.net.AbstractDeviceCore#transmit(org.jnode.net.SocketBuffer,
      *      long)
      */
-    public void transmit(SocketBuffer buf, long timeout) throws InterruptedException, TimeoutException {
+    public void transmit(SocketBuffer buf, HardwareAddress destination, long timeout) throws InterruptedException, TimeoutException {
         log.debug(flags.getName() + " : Init transmit with TIMEOUT=" + timeout);
         // Set the source address
         hwAddress.writeTo(buf, 6);
