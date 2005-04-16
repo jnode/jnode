@@ -55,6 +55,7 @@ import org.jnode.fs.ntfs.NTFSFileSystem;
 import org.jnode.fs.ntfs.NTFSFileSystemType;
 import org.jnode.fs.util.FSUtils;
 import org.jnode.naming.InitialNaming;
+import org.jnode.util.NumberUtils;
 
 /**
  * 
@@ -73,7 +74,7 @@ public class TestUtils {
         File tempFile = File.createTempFile(filename, "");
         tempFile.deleteOnExit();
         
-        return makeFile(tempFile.getAbsolutePath(), getSize(size));
+        return makeFile(tempFile.getAbsolutePath(), NumberUtils.getSize(size));
     }
     
 	static public File makeFile(String filename, long size) throws IOException
@@ -531,34 +532,5 @@ public class TestUtils {
 		return instance;
 	}
 
-	/**
-	 * 
-     * @param size a number eventually followed by  a multiplier (K: Kilobytes, M: Megabytes, G:Gigabytes)  
-	 * @return
-	 */
-	public static long getSize(String size) {
-		if((size == null) || size.trim().equals(""))
-			return 0;
-		
-		int multiplier = 1;		
-		if(size.endsWith("G"))
-		{
-			multiplier = 1024 * 1024 * 1024;
-			size = size.substring(0, size.length() - 1);
-		}
-		else if(size.endsWith("M"))
-		{
-			multiplier = 1024 * 1024; 
-			size = size.substring(0, size.length() - 1);
-		}
-		else if(size.endsWith("K"))
-		{
-			multiplier = 1024; 			
-			size = size.substring(0, size.length() - 1);
-		}
-	
-		return Long.parseLong(size) * multiplier;
-	}
-	
 	static private final Logger log = Logger.getLogger(TestUtils.class);	
 }

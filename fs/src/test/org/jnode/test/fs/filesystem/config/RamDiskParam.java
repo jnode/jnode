@@ -21,7 +21,7 @@
  
 package org.jnode.test.fs.filesystem.config;
 
-import org.jnode.test.support.TestUtils;
+import org.jnode.util.NumberUtils;
 
 
 /**
@@ -44,7 +44,7 @@ public class RamDiskParam extends JNodeDeviceParam
 	 */
 	public void setSize(String size)
 	{
-		ramdiskSize = TestUtils.getSize(size);
+		ramdiskSize = NumberUtils.getSize(size);
 	}
 	
 	/**

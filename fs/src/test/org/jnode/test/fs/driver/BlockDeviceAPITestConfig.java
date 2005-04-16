@@ -30,6 +30,7 @@ import org.jnode.driver.ide.IDEConstants;
 import org.jnode.test.support.ContextManager;
 import org.jnode.test.support.TestConfig;
 import org.jnode.test.support.TestUtils;
+import org.jnode.util.NumberUtils;
 
 /**
  * 
@@ -37,7 +38,7 @@ import org.jnode.test.support.TestUtils;
  */
 public class BlockDeviceAPITestConfig implements TestConfig {
     final private static String DEVICE_SIZE_STR = "1M"; // may use multipliers (K, M, G)
-    final private static int DEVICE_SIZE = (int)TestUtils.getSize(DEVICE_SIZE_STR);        
+    final private static int DEVICE_SIZE = (int)NumberUtils.getSize(DEVICE_SIZE_STR);        
     
     private Class contextClass;
     private List partitions = new ArrayList();
