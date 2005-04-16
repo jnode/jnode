@@ -21,10 +21,12 @@
  
 package java.io;
 
+import java.lang.reflect.Constructor;
+
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class VMObjectInputStream {
+final class VMObjectInputStream {
 
     /**
      * This native method is used to get access to the protected method of the
@@ -39,7 +41,7 @@ public class VMObjectInputStream {
         return null;
     }
     
-    static Object allocateObject (Class clazz)
+    static Object allocateObject (Class clazzClass, Class constr_clazz, Constructor constructor)
     throws InstantiationException {
         // TODO implement me
         return null;
