@@ -237,7 +237,36 @@ public class NumberUtils {
 	    v = v >>> 10;
         return String.valueOf(v) + "G";
 	}
-	
+    
+    /**
+     * 
+     * @param size a number eventually followed by  a multiplier (K: Kilobytes, M: Megabytes, G:Gigabytes)  
+     * @return
+     */
+    public static long getSize(String size) {
+        if((size == null) || size.trim().equals(""))
+            return 0;
+        
+        int multiplier = 1;     
+        if(size.endsWith("G"))
+        {
+            multiplier = G;
+            size = size.substring(0, size.length() - 1);
+        }
+        else if(size.endsWith("M"))
+        {
+            multiplier = M; 
+            size = size.substring(0, size.length() - 1);
+        }
+        else if(size.endsWith("K"))
+        {
+            multiplier = K;          
+            size = size.substring(0, size.length() - 1);
+        }
+    
+        return Long.parseLong(size) * multiplier;
+    }
+        	
 	/**
 	 * This method avoids the use on Integer.toHexString, since this class may be used 
 	 * during the boot-fase when the Integer class in not yet initialized.
