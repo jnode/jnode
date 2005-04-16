@@ -1,4 +1,4 @@
-/* MetalLabelUI.java
+/* MetalToolTipUI.java
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -40,35 +40,35 @@ package javax.swing.plaf.metal;
 
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.basic.BasicLabelUI;
+import javax.swing.plaf.basic.BasicToolTipUI;
 
-public class MetalLabelUI
-  extends BasicLabelUI
+public class MetalToolTipUI
+  extends BasicToolTipUI
 {
 
   // FIXME: maybe replace by a Map of instances when this becomes stateful
-  /** The shared UI instance for JLabels. */
-  private static MetalLabelUI instance = null;
+  /** The shared UI instance for MetalToolTipUIs */
+  private static MetalToolTipUI instance = null;
 
   /**
-   * Constructs a new instance of MetalLabelUI.
+   * Constructs a new instance of MetalToolTipUI.
    */
-  public MetalLabelUI()
+  public MetalToolTipUI()
   {
     super();
   }
 
   /**
-   * Returns an instance of MetalLabelUI.
+   * Returns an instance of MetalToolTipUI.
    *
    * @param component the component for which we return an UI instance
    *
-   * @return an instance of MetalLabelUI
+   * @return an instance of MetalToolTipUI
    */
   public static ComponentUI createUI(JComponent component)
   {
     if (instance == null)
-      instance = new MetalLabelUI();
+      instance = new MetalToolTipUI();
     return instance;
   }
 }
