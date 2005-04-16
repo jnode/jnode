@@ -1,5 +1,5 @@
 /* MetalTabbedPaneUI.java
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package javax.swing.plaf.metal;
 
+import java.util.HashMap;
+
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
@@ -46,9 +48,8 @@ public class MetalTabbedPaneUI
   extends BasicTabbedPaneUI
 {
 
-  // FIXME: maybe replace by a Map of instances when this becomes stateful
   /** The shared UI instance for JTabbedPanes. */
-  private static MetalTabbedPaneUI instance = null;
+  private static HashMap instances = null;
 
   /**
    * Constructs a new instance of MetalTabbedPaneUI.
@@ -67,8 +68,19 @@ public class MetalTabbedPaneUI
    */
   public static ComponentUI createUI(JComponent component)
   {
-    if (instance == null)
+    if (instances == null)
+      instances = new HashMap();
+
+    Object o = instances.get(component);
+    MetalTabbedPaneUI instance;
+    if (o == null)
+      {
       instance = new MetalTabbedPaneUI();
+	instances.put(component, instance);
+      }
+    else
+      instance = (MetalTabbedPaneUI) o;
+
     return instance;
   }
 }

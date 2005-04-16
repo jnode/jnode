@@ -1,5 +1,5 @@
 /* MetalButtonUI.java
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -40,6 +40,8 @@ package javax.swing.plaf.metal;
 
 import javax.swing.AbstractButton;
 import javax.swing.JComponent;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicButtonUI;
 
@@ -87,6 +89,9 @@ public class MetalButtonUI
   public void installDefaults(AbstractButton button)
   {
     super.installDefaults(button);
+
+    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+    button.setFont(defaults.getFont("Button.font"));
   }
 
 }

@@ -1,4 +1,4 @@
-/* MetalLabelUI.java
+/* MetalInternalFrameUI.java
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -39,36 +39,37 @@ exception statement from your version. */
 package javax.swing.plaf.metal;
 
 import javax.swing.JComponent;
+import javax.swing.JInternalFrame;
 import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.basic.BasicLabelUI;
+import javax.swing.plaf.basic.BasicInternalFrameUI;
 
-public class MetalLabelUI
-  extends BasicLabelUI
+public class MetalInternalFrameUI
+  extends BasicInternalFrameUI
 {
 
   // FIXME: maybe replace by a Map of instances when this becomes stateful
-  /** The shared UI instance for JLabels. */
-  private static MetalLabelUI instance = null;
+  /** The shared UI instance for JInternalFrames */
+  private static MetalInternalFrameUI instance = null;
 
   /**
-   * Constructs a new instance of MetalLabelUI.
+   * Constructs a new instance of MetalInternalFrameUI.
    */
-  public MetalLabelUI()
+  public MetalInternalFrameUI(JInternalFrame frame)
   {
-    super();
+    super(frame);
   }
 
   /**
-   * Returns an instance of MetalLabelUI.
+   * Returns an instance of MetalInternalFrameUI.
    *
    * @param component the component for which we return an UI instance
    *
-   * @return an instance of MetalLabelUI
+   * @return an instance of MetalInternalFrameUI
    */
   public static ComponentUI createUI(JComponent component)
   {
     if (instance == null)
-      instance = new MetalLabelUI();
+      instance = new MetalInternalFrameUI((JInternalFrame) component);
     return instance;
   }
 }
