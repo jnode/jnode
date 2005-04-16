@@ -47,14 +47,14 @@ public abstract class BasicEthernetDriver extends AbstractEthernetDriver {
 	/**
 	 * @see org.jnode.driver.net.spi.AbstractNetDriver#doTransmit(SocketBuffer, HardwareAddress)
 	 */
-	protected void doTransmitEthernet(SocketBuffer skbuf) throws NetworkException {
+	protected void doTransmitEthernet(SocketBuffer skbuf, HardwareAddress destination) throws NetworkException {
 		try {
 			// Pad
 			if (skbuf.getSize() < ETH_ZLEN) {
 				skbuf.append(ETH_ZLEN - skbuf.getSize());
 			}
 
-			abstractDeviceCore.transmit(skbuf, 5000);
+			abstractDeviceCore.transmit(skbuf, destination, 5000);
 		} catch (InterruptedException ex) {
 			throw new NetworkException("Interrupted", ex);
 		} catch (TimeoutException ex) {

@@ -71,11 +71,10 @@ public abstract class AbstractEthernetDriver extends AbstractNetDriver
     protected final void doTransmit(SocketBuffer skbuf,
             HardwareAddress destination) throws NetworkException {
         skbuf.insert(ETH_HLEN);
-        if (destination != null) {
-            destination.writeTo(skbuf, 0);
-        } else {
-            EthernetAddress.BROADCAST.writeTo(skbuf, 0);
+        if (destination == null) {
+            destination = EthernetAddress.BROADCAST;
         }
+        destination.writeTo(skbuf, 0);
         getAddress().writeTo(skbuf, 6);
         skbuf.set16(12, skbuf.getProtocolID());
 
@@ -84,13 +83,13 @@ public abstract class AbstractEthernetDriver extends AbstractNetDriver
         if (getAddress().equals(destination))
             onReceive(skbuf);
         else
-            doTransmitEthernet(skbuf);
+            doTransmitEthernet(skbuf, destination);
     }
 
     /**
      * @see org.jnode.driver.net.spi.AbstractNetDriver#doTransmit(org.jnode.net.SocketBuffer,
      *      org.jnode.net.HardwareAddress)
      */
-    protected abstract void doTransmitEthernet(SocketBuffer skbuf)
+    protected abstract void doTransmitEthernet(SocketBuffer skbuf, HardwareAddress destination)
             throws NetworkException;
 }

@@ -21,6 +21,21 @@
  
 package org.jnode.driver.net.prism2;
 
+import static org.jnode.driver.net.prism2.Prism2Constants.Command.*;
+import static org.jnode.driver.net.prism2.Prism2Constants.Command.ALLOC;
+import static org.jnode.driver.net.prism2.Prism2Constants.Command.DISABLE;
+import static org.jnode.driver.net.prism2.Prism2Constants.Command.ENABLE;
+import static org.jnode.driver.net.prism2.Prism2Constants.Command.INIT;
+import static org.jnode.driver.net.prism2.Prism2Constants.LinkStatus.CONNECTED;
+import static org.jnode.driver.net.prism2.Prism2Constants.LinkStatus.NOTCONNECTED;
+import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CNFAUTHENTICATION;
+import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CNFMAXDATALEN;
+import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CNFOWNMACADDR;
+import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CNFPORTTYPE;
+import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CURRENTBSSID;
+import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.CURRENTSSID;
+import static org.jnode.driver.net.prism2.Prism2Constants.RecordID.TXRATECNTL;
+import static org.jnode.driver.net.prism2.Prism2Constants.Register.ALLOCFID;
 import static org.jnode.driver.net.prism2.Prism2Constants.Register.EVACK;
 import static org.jnode.driver.net.prism2.Prism2Constants.Register.EVSTAT;
 import static org.jnode.driver.net.prism2.Prism2Constants.Register.INFOFID;
@@ -31,6 +46,7 @@ import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
+import org.jnode.driver.net.NetworkException;
 import org.jnode.driver.net.ethernet.spi.Flags;
 import org.jnode.driver.net.event.LinkStatusEvent;
 import org.jnode.driver.net.wireless.spi.WirelessDeviceCore;
@@ -41,6 +57,7 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.net.HardwareAddress;
 import org.jnode.net.SocketBuffer;
 import org.jnode.net.ethernet.EthernetAddress;
+import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.net.wireless.AuthenticationMode;
 import org.jnode.net.wireless.WirelessConstants;
 import org.jnode.system.IRQHandler;
@@ -80,8 +97,11 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
     /** Info frame used in the irq handler. To avoid numerous allocations. */
     private final byte[] irqInfoFrame = new byte[Prism2InfoFrame.MAX_FRAME_LEN];
 
+    /** Receive frame used in the irq handler. To avoid numerous allocations. */
+    private final byte[] irqReceiveFrame = new byte[Prism2CommFrame.MAX_FRAME_LEN];
+
     /** Current link status */
-    private int linkStatus = LINK_NOTCONNECTED;
+    private LinkStatus linkStatus = NOTCONNECTED;
     
     /** Address of connected BSS (only valid when link status is connected */
     private EthernetAddress bssid = null;
@@ -173,20 +193,36 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      * 
      * @throws DriverException
      */
-    private final void executeAccessCmd(int rid, boolean write)
+    private final void executeAccessCmd(RecordID rid, boolean write)
             throws DriverException {
         try {
-            final int result;
-            final int cmd;
+            final Result result;
+            final int cmdFlags;
             if (write) {
-                cmd = CMDCODE_ACCESS | CMD_WRITE;
+                cmdFlags = CMD_WRITE;
             } else {
-                cmd = CMDCODE_ACCESS;
+                cmdFlags = 0;
             }
-            result = io.executeCommand(cmd, rid, 0, 0, null);
+            result = io.executeCommand(ACCESS, cmdFlags, rid.getId(), 0, 0, null);
             io.resultToException(result);
         } catch (TimeoutException ex) {
             throw new DriverException("Timeout in Access command", ex);
+        }
+    }
+
+    /**
+     * Execute the Alloc command
+     * 
+     * @throws DriverException
+     */
+    private final void executeAllocCmd(int bufferLength)
+            throws DriverException {
+        try {
+            final Result result;
+            result = io.executeCommand(ALLOC, 0, bufferLength, 0, 0, null);
+            io.resultToException(result);
+        } catch (TimeoutException ex) {
+            throw new DriverException("Timeout in Alloc command", ex);
         }
     }
 
@@ -198,9 +234,9 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      */
     private final void executeEnableCmd(int macPort) throws DriverException {
         try {
-            final int cmd = CMDCODE_ENABLE | ((macPort & 7) << 8);
-            final int result;
-            result = io.executeCommand(cmd, 0, 0, 0, null);
+            final int cmdFlags = ((macPort & 7) << 8);
+            final Result result;
+            result = io.executeCommand(ENABLE, cmdFlags, 0, 0, 0, null);
             io.resultToException(result);
         } catch (TimeoutException ex) {
             throw new DriverException("Timeout in Enable command", ex);
@@ -215,12 +251,28 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      */
     private final void executeDisableCmd(int macPort) throws DriverException {
         try {
-            final int cmd = CMDCODE_DISABLE | ((macPort & 7) << 8);
-            final int result;
-            result = io.executeCommand(cmd, 0, 0, 0, null);
+            final int cmdFlags = ((macPort & 7) << 8);
+            final Result result;
+            result = io.executeCommand(DISABLE, cmdFlags, 0, 0, 0, null);
             io.resultToException(result);
         } catch (TimeoutException ex) {
             throw new DriverException("Timeout in Disable command", ex);
+        }
+    }
+
+    /**
+     * Execute the Transmit command
+     * 
+     * @throws DriverException
+     */
+    private final void executeTransmitCmd(int fid)
+            throws DriverException {
+        try {
+            final Result result;
+            result = io.executeCommand(TX, 0, fid, 0, 0, null);
+            io.resultToException(result);
+        } catch (TimeoutException ex) {
+            throw new DriverException("Timeout in Tx command", ex);
         }
     }
 
@@ -233,14 +285,14 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      * @param len
      * @throws DriverException
      */
-    private final void getConfig(int rid, byte[] dst, int dstOffset, int len)
+    private final void getConfig(RecordID rid, byte[] dst, int dstOffset, int len)
             throws DriverException {
         // Request read of RID
         executeAccessCmd(rid, false);
 
         // Read record header
         final byte[] hdr = new byte[Prism2Record.HDR_LENGTH];
-        io.copyFromBAP(rid, 0, hdr, 0, hdr.length);
+        io.copyFromBAP(rid.getId(), 0, hdr, 0, hdr.length);
 
         // Validate the record length
         if ((Prism2Record.getRecordLength(hdr, 0) - 1) * 2 != len) {
@@ -249,7 +301,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
         }
 
         // Copy out record data
-        io.copyFromBAP(rid, hdr.length, dst, dstOffset, len);
+        io.copyFromBAP(rid.getId(), hdr.length, dst, dstOffset, len);
     }
 
     /**
@@ -259,7 +311,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      * @return The 16-bit value.
      * @throws DriverException
      */
-    private final int getConfig16(int rid) throws DriverException {
+    private final int getConfig16(RecordID rid) throws DriverException {
         final byte[] arr = new byte[2];
         getConfig(rid, arr, 0, 2);
         return LittleEndian.getInt16(arr, 0);
@@ -272,7 +324,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      * @return The 32-bit value.
      * @throws DriverException
      */
-    private final int getConfig32(int rid) throws DriverException {
+    private final int getConfig32(RecordID rid) throws DriverException {
         final byte[] arr = new byte[4];
         getConfig(rid, arr, 0, 4);
         return LittleEndian.getInt32(arr, 0);
@@ -286,7 +338,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      */
     protected String getESSID() throws DriverException {
         final byte[] id = new byte[RID_CURRENTSSID_LEN];
-        getConfig(RID_CURRENTSSID, id, 0, id.length);
+        getConfig(CURRENTSSID, id, 0, id.length);
         return null;
     }
 
@@ -306,7 +358,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
 
         // Initialize card
         try {
-            io.executeCommand(CMDCODE_INIT, 0, 0, 0, null);
+            io.executeCommand(INIT, 0, 0, 0, 0, null);
         } catch (TimeoutException ex) {
             throw new DriverException("Cannot initialize device in time", ex);
         }
@@ -317,22 +369,22 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
         io.setReg(EVACK, 0xFFFF);
 
         // Read MAC address
-        final byte[] macAddr = new byte[RID_CNFOWNMACADDR_LEN];
-        getConfig(RID_CNFOWNMACADDR, macAddr, 0, RID_CNFOWNMACADDR_LEN);
+        final byte[] macAddr = new byte[CNFOWNMACADDR.getRecordLength()];
+        getConfig(CNFOWNMACADDR, macAddr, 0, CNFOWNMACADDR.getRecordLength());
         this.hwAddress = new EthernetAddress(macAddr, 0);
         log.info("MAC-address for " + flags.getName() + " " + hwAddress);
 
         // Set maximum data length
-        setConfig16(RID_CNFMAXDATALEN, WLAN_DATA_MAXLEN);
+        setConfig16(CNFMAXDATALEN, WLAN_DATA_MAXLEN);
         // Set transmit rate control
-        setConfig16(RID_TXRATECNTL, 0x000f);
+        setConfig16(TXRATECNTL, 0x000f);
         // Set authentication to Open system
-        setConfig16(RID_CNFAUTHENTICATION, CNFAUTHENTICATION_OPENSYSTEM);
+        setConfig16(CNFAUTHENTICATION, CNFAUTHENTICATION_OPENSYSTEM);
 
         // Maybe set desired ESSID here
 
         // Set port type to ESS port
-        setConfig16(RID_CNFPORTTYPE, 1);
+        setConfig16(CNFPORTTYPE, 1);
 
         // Enable Rx & Info interrupts
         io.setReg(INTEN, INTEN_RX | INTEN_INFO);
@@ -367,17 +419,17 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      * @param len
      * @throws DriverException
      */
-    private final void setConfig(int rid, byte[] src, int srcOffset, int len)
+    private final void setConfig(RecordID rid, byte[] src, int srcOffset, int len)
             throws DriverException {
         // Create and write record header
         final byte[] hdr = new byte[Prism2Record.HDR_LENGTH];
         Prism2Record.setRecordLength(hdr, 0, (len / 2) + 1);
-        Prism2Record.setRecordRID(hdr, 0, rid);
-        io.copyToBAP(rid, 0, hdr, 0, hdr.length);
+        Prism2Record.setRecordRID(hdr, 0, rid.getId());
+        io.copyToBAP(rid.getId(), 0, hdr, 0, hdr.length);
 
         // Copy out record data (if any)
         if (len > 0) {
-            io.copyToBAP(rid, hdr.length, src, srcOffset, len);
+            io.copyToBAP(rid.getId(), hdr.length, src, srcOffset, len);
         }
 
         // Request write of RID
@@ -391,7 +443,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      * @param value
      * @throws DriverException
      */
-    private final void setConfig16(int rid, int value) throws DriverException {
+    private final void setConfig16(RecordID rid, int value) throws DriverException {
         final byte[] arr = new byte[2];
         LittleEndian.setInt16(arr, 0, value);
         setConfig(rid, arr, 0, 2);
@@ -404,7 +456,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      * @param value
      * @throws DriverException
      */
-    private final void setConfig32(int rid, int value) throws DriverException {
+    private final void setConfig32(RecordID rid, int value) throws DriverException {
         final byte[] arr = new byte[4];
         LittleEndian.setInt32(arr, 0, value);
         setConfig(rid, arr, 0, 4);
@@ -430,10 +482,60 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      * @see org.jnode.driver.net.spi.AbstractDeviceCore#transmit(org.jnode.net.SocketBuffer,
      *      long)
      */
-    public void transmit(SocketBuffer buf, long timeout)
+    public void transmit(SocketBuffer buf, HardwareAddress destination, long timeout)
             throws InterruptedException, TimeoutException {
-        // TODO Auto-generated method stub
+        
+        // Request buffer allocation
+        try {
+            executeAllocCmd(Prism2CommFrame.MAX_TXBUF_LEN);
+        } catch (DriverException ex) {
+            log.debug("Alloc command failed in transmit", ex);
+            return;
+        }
+        
+        // Wait for the allocation to be ready
+        final int evstat = io.waitForEvent(EVSTAT_ALLOC, EVACK_INFO, 10, 50);
+        if ((evstat & EVSTAT_ALLOC) == 0) {
+            log.debug("Allocation of transmit buffer failed");
+            return;
+        }
+        final int fid = io.getReg(ALLOCFID);
+        
+        // Build the transmit header
+        final int hdrLen = Prism2CommFrame.HDR_LENGTH;
+        final byte[] hdr = new byte[hdrLen];
+        
+//        txdesc.tx_control = host2hfa384x_16( HFA384x_TX_MACPORT_SET(0) | HFA384x_TX_STRUCTYPE_SET(1) | 
+//                   HFA384x_TX_TXEX_SET(1) | HFA384x_TX_TXOK_SET(1) );
+//txdesc.frame_control =  host2ieee16( WLAN_SET_FC_FTYPE(WLAN_FTYPE_DATA) |
+//                   WLAN_SET_FC_FSTYPE(WLAN_FSTYPE_DATAONLY) |
+//                   WLAN_SET_FC_TODS(1) );
+        Prism2CommFrame.setAddress1(hdr, 0, bssid);
+        Prism2CommFrame.setAddress2(hdr, 0, hwAddress);
+        Prism2CommFrame.setAddress3(hdr, 0, (EthernetAddress)destination);
 
+        try {
+            // Copy tx-descriptor to BAP
+            io.copyToBAP(fid, 0, hdr, 0, hdrLen);
+            // Copy 802.11 header to BAP
+            
+            // Copy data to BAP
+            
+            
+        } catch (DriverException ex) {
+            log.debug("Failed to copy data to BAP", ex);
+            return;
+        }
+        
+        // Execute Tx command
+        try {
+            executeTransmitCmd(fid);
+        } catch (DriverException ex) {
+            log.debug("Transmit command failed", ex);
+            return;
+        }
+        
+        // TODO Implement error handling
     }
 
     /**
@@ -467,15 +569,37 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
 
     /**
      * A frame has been received.
+     * @throws DriverException 
      */
-    private final void processReceiveEvent() {
+    private final void processReceiveEvent() throws DriverException {
         // Read the FID of the received frame
         final int fid = io.getReg(RXFID);
+        final byte[] frame = this.irqReceiveFrame;
         log.info("Receive, FID=0x" + NumberUtils.hex(fid, 4));
 
-        // Read the FID into my buffer.
-        // TODO
+        // Read the frame header
+        final int hdrLen = Prism2CommFrame.HDR_LENGTH;
+        io.copyFromBAP(fid, 0, frame, 0, hdrLen);
+        final int dataLength = Prism2CommFrame.getDataLength(frame, 0);
 
+        // Create the SocketBuffer 
+        final int ethHLEN = EthernetConstants.ETH_HLEN;
+        final SocketBuffer skbuf = new SocketBuffer(ethHLEN + dataLength);
+        skbuf.append(frame, Prism2CommFrame.p8023HDR_OFF, ethHLEN);
+
+        // Read the actual data
+        if (dataLength > 0) {
+            io.copyFromBAP(fid, hdrLen, frame, hdrLen, dataLength);
+            skbuf.append(frame, hdrLen, dataLength);
+        }
+        
+        // Process the received frame
+        try {
+            driver.onReceive(skbuf);
+        } catch (NetworkException ex) {
+            log.debug("Error in onReceive", ex);
+        }
+        
         // Acknowledge the receive
         io.setReg(EVACK, EVACK_RX);
     }
@@ -495,33 +619,36 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
         final int hdrLen = Prism2InfoFrame.HDR_LENGTH;
         io.copyFromBAP(fid, 0, frame, 0, hdrLen);
         final int frameLen = Prism2InfoFrame.getFrameLength(frame, 0);
-        final int infoType = Prism2InfoFrame.getInfoType(frame, 0);
+        final InformationType infoType = Prism2InfoFrame.getInfoType(frame, 0);
 
         // Read the rest of the frame
         io.copyFromBAP(fid, hdrLen, frame, hdrLen, frameLen - hdrLen);
 
         switch (infoType) {
-        case IT_COMMTALLIES:
+        case COMMTALLIES:
             // Communication statistics. Ignore for now
             break;
-        case IT_LINKSTATUS:
-            final int lstat = Prism2InfoFrame.getLinkStatus(frame, 0);
-            if (lstat == LINK_CONNECTED) {
-                getConfig(RID_CURRENTBSSID, frame, 0, WLAN_BSSID_LEN);
+        case LINKSTATUS:
+            final LinkStatus lstat = Prism2InfoFrame.getLinkStatus(frame, 0);
+            switch (lstat) {
+            case CONNECTED:
+                getConfig(CURRENTBSSID, frame, 0, WLAN_BSSID_LEN);
                 bssid = new EthernetAddress(frame, 0);
                 log.info("Connected to " + bssid);
-            } else if (lstat == LINK_DISCONNECTED) {
+                break;
+            case DISCONNECTED:
                 log.info("Disconnected");
                 bssid = null;
-            } else {
-                log.info("Link status 0x" + NumberUtils.hex(lstat, 4));                
+                break;
+            default:
+                log.info("Link status 0x" + NumberUtils.hex(lstat.getValue(), 4));                
             }
             this.linkStatus = lstat;
             // Post the event
-            driver.postEvent(new LinkStatusEvent(device, lstat == LINK_CONNECTED));
+            driver.postEvent(new LinkStatusEvent(device, lstat == CONNECTED));
             break;
         default:
-            log.info("Got Info frame, Type=0x" + NumberUtils.hex(infoType, 4));
+            log.info("Got Info frame, Type=0x" + NumberUtils.hex(infoType.getValue(), 4));
         }
 
         // Acknowledge the info frame
@@ -532,7 +659,7 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
      * @see org.jnode.driver.net.wireless.spi.WirelessDeviceCore#getAuthenticationMode()
      */
     protected AuthenticationMode getAuthenticationMode() throws DriverException {
-        final int mode = getConfig16(RID_CNFAUTHENTICATION);
+        final int mode = getConfig16(CNFAUTHENTICATION);
         switch (mode) {
         case CNFAUTHENTICATION_OPENSYSTEM:
             return AuthenticationMode.OPENSYSTEM;
@@ -550,13 +677,16 @@ final class Prism2Core extends WirelessDeviceCore implements Prism2Constants,
     protected void setAuthenticationMode(AuthenticationMode mode)
             throws DriverException {
         final int modeVal;
-        if (mode == AuthenticationMode.OPENSYSTEM) {
+        switch (mode) {
+        case OPENSYSTEM:
             modeVal = CNFAUTHENTICATION_OPENSYSTEM;
-        } else if (mode == AuthenticationMode.SHAREDKEY) {
+            break;
+        case SHAREDKEY:
             modeVal = CNFAUTHENTICATION_SHAREDKEY;
-        } else {
+            break;
+        default:
             throw new DriverException("Unknown authentication mode " + mode);
         }
-        setConfig16(RID_CNFAUTHENTICATION, modeVal);
+        setConfig16(CNFAUTHENTICATION, modeVal);
     }
 }

@@ -28,6 +28,7 @@ import org.jnode.util.LittleEndian;
  */
 final class Prism2InfoFrame implements Prism2Constants {
 
+    /** Length of the header of an Info frame. */
     final static int HDR_LENGTH = 4;
     
     /** Maximum lenght on an Info frame */
@@ -49,8 +50,8 @@ final class Prism2InfoFrame implements Prism2Constants {
      * @param srcOffset
      * @return
      */
-    public static final int getInfoType(byte[] src, int srcOffset) {
-        return LittleEndian.getInt16(src, srcOffset + 2) & 0xFFFF;
+    public static final InformationType getInfoType(byte[] src, int srcOffset) {
+        return InformationType.getByValue(LittleEndian.getInt16(src, srcOffset + 2) & 0xFFFF);
     }
     
     /**
@@ -59,7 +60,7 @@ final class Prism2InfoFrame implements Prism2Constants {
      * @param srcOffset
      * @return
      */
-    public static final int getLinkStatus(byte[] src, int srcOffset) {
-        return LittleEndian.getInt16(src, srcOffset + HDR_LENGTH) & 0xFFFF;
+    public static final LinkStatus getLinkStatus(byte[] src, int srcOffset) {
+        return LinkStatus.getByValue(LittleEndian.getInt16(src, srcOffset + HDR_LENGTH) & 0xFFFF);
     }
 }
