@@ -92,8 +92,8 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
 	public FatDirEntry(AbstractDirectory dir, String name, String ext) {
 		super(dir);
 		this.parent = dir;
-		this.name = name;
-		this.ext = ext;
+		setName(name);
+		setExt(ext);
 		this.flags = F_ARCHIVE;
 		this.lastModified = System.currentTimeMillis();
 		this._dirty = false;
@@ -120,13 +120,13 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
 		if (DosUtils.get8(src, offset) == 0x05) {
 			nameArr[0] = (char)0xe5;
 		}
-		this.name = new String(nameArr).trim();
+		setName(new String(nameArr).trim());
 
 		char[] extArr = new char[3];
 		for (int i = 0; i < extArr.length; i++) {
 			extArr[i] = (char)DosUtils.get8(src, offset + 0x08 + i);
 		}
-		this.ext = new String(extArr).trim();
+		setExt(new String(extArr).trim());
 
 		this.flags = DosUtils.get8(src, offset + 0x0b);
 		this.lastModified =
@@ -254,7 +254,8 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
 	 *           The ext to set
 	 */
 	public void setExt(String ext) {
-		this.ext = ext;
+        FatUtils.checkValidExt(ext);
+        this.ext = ext;
 		setDirty();
 	}
 
@@ -314,6 +315,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
 	 *           The name to set
 	 */
 	public void setName(String name) {
+        FatUtils.checkValidName(name);
 		this.name = name;
 		setDirty();
 	}
