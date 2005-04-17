@@ -23,7 +23,6 @@ package org.jnode.driver;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.jnode.system.BootLog;
@@ -51,9 +50,9 @@ public class Device implements ResourceOwner {
 	/** Has this device been started? */
 	private boolean started = false;
 	/** The API's implemented by this device */
-	private final HashMap apis = new HashMap();
+	private final HashMap<Class<? extends DeviceAPI>, DeviceAPI> apis = new HashMap<Class<? extends DeviceAPI>, DeviceAPI>();
 	/** My listeners */
-	private final ArrayList listeners = new ArrayList();
+	private final ArrayList<DeviceListener> listeners = new ArrayList<DeviceListener>();
 	/** The manager */
 	private AbstractDeviceManager manager;
 
@@ -193,7 +192,7 @@ public class Device implements ResourceOwner {
 	 * @param apiInterface
 	 * @param apiImplementation
 	 */
-	public final void registerAPI(Class apiInterface, DeviceAPI apiImplementation) {
+	public final <T extends DeviceAPI> void registerAPI(Class<T> apiInterface, T apiImplementation) {
 		if (!apiInterface.isInstance(apiImplementation)) {
 			throw new IllegalArgumentException("API implementation does not implement API interface");
 		}
@@ -203,11 +202,12 @@ public class Device implements ResourceOwner {
 		apis.put(apiInterface, apiImplementation);
 		final Class[] interfaces = apiInterface.getInterfaces();
 		if (interfaces != null) {
-			for (int i = 0; i < interfaces.length; i++) {
-				final Class intf = interfaces[i];
-				if (!apis.containsKey(intf)) {
-					apis.put(intf, apiImplementation);
-				}
+            for (Class intf : interfaces) {
+                if (DeviceAPI.class.isAssignableFrom(intf)) {
+                    if (!apis.containsKey(intf)) {
+                        apis.put((Class<? extends DeviceAPI>)intf, apiImplementation);
+                    }
+                }
 			}
 		}
 	}
@@ -217,7 +217,7 @@ public class Device implements ResourceOwner {
 	 * 
 	 * @param apiInterface
 	 */
-	public final void unregisterAPI(Class apiInterface) {
+	public final void unregisterAPI(Class<? extends DeviceAPI> apiInterface) {
 		apis.remove(apiInterface);
 	}
 
@@ -227,7 +227,7 @@ public class Device implements ResourceOwner {
 	 * @param apiInterface
 	 * @return boolean
 	 */
-	public final boolean implementsAPI(Class apiInterface) {
+	public final boolean implementsAPI(Class<? extends DeviceAPI> apiInterface) {
 		return apis.containsKey(apiInterface);
 	}
 
@@ -236,7 +236,7 @@ public class Device implements ResourceOwner {
 	 * 
 	 * @return A set of Class instances
 	 */
-	public final Set implementedAPIs() {
+	public final Set<Class<? extends DeviceAPI>> implementedAPIs() {
 		return apis.keySet();
 	}
 
@@ -248,8 +248,8 @@ public class Device implements ResourceOwner {
 	 * @throws ApiNotFoundException
 	 *             The given api has not been found
 	 */
-	public final DeviceAPI getAPI(Class apiInterface) throws ApiNotFoundException {
-		DeviceAPI impl = (DeviceAPI) apis.get(apiInterface);
+	public final <T extends DeviceAPI> T getAPI(Class<T> apiInterface) throws ApiNotFoundException {
+		final T impl = (T) apis.get(apiInterface);
 		if (impl == null) {
 			throw new ApiNotFoundException(apiInterface.getName());
 		}
@@ -297,8 +297,7 @@ public class Device implements ResourceOwner {
 	 */
 	protected final void fireStartedEvent() {
 		final StopWatch sw = new StopWatch();
-		for (Iterator i = listeners.iterator(); i.hasNext();) {
-			final DeviceListener l = (DeviceListener) i.next();
+        for (DeviceListener l : listeners) {
 			sw.start();
 			l.deviceStarted(this);
 			if (sw.isElapsedLongerThen(100)) {
@@ -314,8 +313,7 @@ public class Device implements ResourceOwner {
 	protected final void fireStopEvent() {
 		manager.fireStopEvent(this);
 		final StopWatch sw = new StopWatch();
-		for (Iterator i = listeners.iterator(); i.hasNext();) {
-			final DeviceListener l = (DeviceListener) i.next();
+        for (DeviceListener l : listeners) {
 			sw.start();
 			l.deviceStop(this);
 			if (sw.isElapsedLongerThen(100)) {
