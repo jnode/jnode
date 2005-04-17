@@ -50,7 +50,7 @@ public class PluginJar implements BootableObject {
     private final PluginDescriptorModel descriptor;
 
     /** The resources in the jar file */
-    private final Map resources;
+    private final Map<String, byte[]> resources;
 
     /**
      * Initialize this instance
@@ -172,8 +172,8 @@ public class PluginJar implements BootableObject {
         return this.descriptor;
     }
 
-    private Map loadResources(InputStream is) throws IOException {
-        final BootableHashMap map = new BootableHashMap();
+    private Map<String, byte[]> loadResources(InputStream is) throws IOException {
+        final BootableHashMap<String, byte[]> map = new BootableHashMap<String, byte[]>();
         final JarInputStream jis = new JarInputStream(is);
         try {
             JarEntry entry;

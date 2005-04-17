@@ -55,10 +55,10 @@ public class PluginRegistryModel extends VmSystemObject implements
         PluginRegistry {
 
     /** A map of all descriptors (id, descriptor) */
-    private final BootableHashMap descriptorMap;
+    private final BootableHashMap<String, PluginDescriptor> descriptorMap;
 
     /** A map off all extensionpoints (id, ep) */
-    private final BootableHashMap extensionPoints;
+    private final BootableHashMap<String, ExtensionPoint> extensionPoints;
 
     private transient PluginsClassLoader classLoader;
 
@@ -68,9 +68,9 @@ public class PluginRegistryModel extends VmSystemObject implements
      * @param pluginFiles
      */
     public PluginRegistryModel(URL[] pluginFiles) throws PluginException {
-        this.extensionPoints = new BootableHashMap();
-        this.descriptorMap = new BootableHashMap();
-        final List descriptors = loadDescriptors(pluginFiles);
+        this.extensionPoints = new BootableHashMap<String, ExtensionPoint>();
+        this.descriptorMap = new BootableHashMap<String, PluginDescriptor>();
+        final List<PluginDescriptorModel> descriptors = loadDescriptors(pluginFiles);
         resolveDescriptors(descriptors);
     }
 
@@ -99,7 +99,7 @@ public class PluginRegistryModel extends VmSystemObject implements
      * 
      * @return Iterator&lt;PluginDescriptor&gt;
      */
-    public Iterator getDescriptorIterator() {
+    public Iterator<PluginDescriptor> getDescriptorIterator() {
         return descriptorMap.values().iterator();
     }
 
@@ -108,9 +108,9 @@ public class PluginRegistryModel extends VmSystemObject implements
      * 
      * @param pluginUrls
      */
-    private List loadDescriptors(URL[] pluginUrls) throws PluginException {
+    private List<PluginDescriptorModel> loadDescriptors(URL[] pluginUrls) throws PluginException {
         final int max = pluginUrls.length;
-        final ArrayList descriptors = new ArrayList(max);
+        final ArrayList<PluginDescriptorModel> descriptors = new ArrayList<PluginDescriptorModel>(max);
         
         for (int i = 0; i < max; i++) {
             //System.out.println(pluginUrls[i]);
@@ -123,7 +123,7 @@ public class PluginRegistryModel extends VmSystemObject implements
      * Resolve all plugin descriptors.
      */
     public void resolveDescriptors() throws PluginException {
-        for (Iterator i = descriptorMap.values().iterator(); i.hasNext();) {
+        for (Iterator<PluginDescriptor> i = descriptorMap.values().iterator(); i.hasNext();) {
             final PluginDescriptorModel descr = (PluginDescriptorModel) i
                     .next();
             descr.resolve(this);
@@ -134,10 +134,10 @@ public class PluginRegistryModel extends VmSystemObject implements
      * Resolve all given plugin descriptors in such an order that the
      * depencencies are dealt with 
      */
-    public void resolveDescriptors(Collection descriptors) throws PluginException {
+    public void resolveDescriptors(Collection<PluginDescriptorModel> descriptors) throws PluginException {
     	while (!descriptors.isEmpty()) {
     		boolean change = false;
-    		for (Iterator i = descriptors.iterator(); i.hasNext(); ) {
+    		for (Iterator<PluginDescriptorModel> i = descriptors.iterator(); i.hasNext(); ) {
     			final PluginDescriptorModel descr = (PluginDescriptorModel)i.next();
     			if (canResolve(descr)) {
     				descr.resolve(this);
@@ -200,7 +200,7 @@ public class PluginRegistryModel extends VmSystemObject implements
      */
     protected synchronized void registerExtensionPoint(ExtensionPoint ep)
             throws PluginException {
-        final BootableHashMap epMap = this.extensionPoints;
+        final BootableHashMap<String, ExtensionPoint> epMap = this.extensionPoints;
         if (epMap.containsKey(ep.getUniqueIdentifier())) { throw new PluginException(
                 "Duplicate extension point " + ep.getUniqueIdentifier()); }
         epMap.put(ep.getUniqueIdentifier(), ep);
@@ -213,7 +213,7 @@ public class PluginRegistryModel extends VmSystemObject implements
      */
     protected synchronized void unregisterExtensionPoint(ExtensionPoint ep)
             throws PluginException {
-        final BootableHashMap epMap = this.extensionPoints;
+        final BootableHashMap<String, ExtensionPoint> epMap = this.extensionPoints;
         epMap.remove(ep.getUniqueIdentifier());
     }
 
@@ -224,7 +224,7 @@ public class PluginRegistryModel extends VmSystemObject implements
      * @return The descriptor of the loaded plugin.
      * @throws PluginException
      */
-    private PluginDescriptor loadPlugin(final URL pluginUrl, boolean resolve)
+    private PluginDescriptorModel loadPlugin(final URL pluginUrl, boolean resolve)
             throws PluginException {
         final PluginRegistryModel registry = this;
         final PluginJar pluginJar;
@@ -266,8 +266,8 @@ public class PluginRegistryModel extends VmSystemObject implements
 	        sm.checkPermission(PluginSecurityConstants.LOAD_PERM);
 	    }
 		// Load the requested plugin
-		final HashMap descriptors = new HashMap();
-		final PluginDescriptor descr = loadPlugin(loader, pluginId, pluginVersion, false);
+		final HashMap<String, PluginDescriptorModel> descriptors = new HashMap<String, PluginDescriptorModel>();
+		final PluginDescriptorModel descr = loadPlugin(loader, pluginId, pluginVersion, false);
 		descriptors.put(descr.getId(), descr);
 		// Load the dependent plugins
 		loadDependencies(loader, descr, descriptors);
@@ -277,7 +277,7 @@ public class PluginRegistryModel extends VmSystemObject implements
 		return descr;
 	}
 	
-	private final void loadDependencies(PluginLoader loader, PluginDescriptor descr, Map descriptors) throws PluginException {
+	private final void loadDependencies(PluginLoader loader, PluginDescriptor descr, Map<String, PluginDescriptorModel> descriptors) throws PluginException {
 		// Prerequisites
 		final PluginPrerequisite reqs[] = descr.getPrerequisites();
 		final int reqLength = reqs.length;
@@ -297,14 +297,14 @@ public class PluginRegistryModel extends VmSystemObject implements
 		}
 	}
 	
-	private final void loadDependency(PluginLoader loader, String id, String version, Map descriptors) throws PluginException {
+	private final void loadDependency(PluginLoader loader, String id, String version, Map<String, PluginDescriptorModel> descriptors) throws PluginException {
 		if (getPluginDescriptor(id) != null) {
 			return;
 		}
 		if (descriptors.containsKey(id)) {
 			return;
 		}
-		final PluginDescriptor descr = loadPlugin(loader, id, version, false);
+		final PluginDescriptorModel descr = loadPlugin(loader, id, version, false);
 		descriptors.put(descr.getId(), descr);
 		loadDependencies(loader, descr, descriptors);
 	}
@@ -318,7 +318,7 @@ public class PluginRegistryModel extends VmSystemObject implements
 	 * @return The descriptor of the loaded plugin.
 	 * @throws PluginException
 	 */
-	public PluginDescriptor loadPlugin(final PluginLoader loader, final String pluginId, final String pluginVersion, boolean resolve) throws PluginException {
+	public PluginDescriptorModel loadPlugin(final PluginLoader loader, final String pluginId, final String pluginVersion, boolean resolve) throws PluginException {
 	    final SecurityManager sm = System.getSecurityManager();
 	    if (sm != null) {
 	        sm.checkPermission(PluginSecurityConstants.LOAD_PERM);
@@ -370,9 +370,8 @@ public class PluginRegistryModel extends VmSystemObject implements
                     "Cannot unload a system plugin: "+pluginId); }
             
             // Unload all plugins that depend on this plugin
-            final ArrayList descriptors = new ArrayList(descriptorMap.values());
-            for (Iterator i = descriptors.iterator(); i.hasNext();) {
-                final PluginDescriptor dep = (PluginDescriptor) i.next();
+            final ArrayList<PluginDescriptor> descriptors = new ArrayList<PluginDescriptor>(descriptorMap.values());
+            for (PluginDescriptor dep : descriptors) {
                 if (dep.depends(pluginId)) {
                 	unloadPlugin(dep.getId());
                 }

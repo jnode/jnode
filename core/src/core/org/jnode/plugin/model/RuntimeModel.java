@@ -43,8 +43,8 @@ public class RuntimeModel extends PluginModelObject implements Runtime {
 	public RuntimeModel(PluginDescriptorModel plugin, XMLElement e) throws PluginException {
 		super(plugin);
 
-		final ArrayList list = new ArrayList();
-		for (Iterator i = e.getChildren().iterator(); i.hasNext();) {
+		final ArrayList<LibraryModel> list = new ArrayList<LibraryModel>();
+		for (Iterator<?> i = e.getChildren().iterator(); i.hasNext();) {
 			final XMLElement lE = (XMLElement) i.next();
 			if (lE.getName().equals("library")) {
 				list.add(new LibraryModel(plugin, lE));

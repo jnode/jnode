@@ -48,7 +48,7 @@ public interface PluginRegistry {
 	 * Returns an iterator to iterate over all PluginDescriptor's.
 	 * @return Iterator&lt;PluginDescriptor&gt;
 	 */
-	public Iterator getDescriptorIterator();
+	public Iterator<PluginDescriptor> getDescriptorIterator();
 
 	/**
 	 * Load a plugin from a given loader.

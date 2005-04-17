@@ -33,7 +33,7 @@ public class PluginUtils {
      * @param clazz
      * @return The descriptor, or null if this class is not contained in a plugin or part of a system plugin.
      */
-    public static PluginDescriptor getPluginDescriptor(Class clazz) {
+    public static PluginDescriptor getPluginDescriptor(Class<?> clazz) {
         final ClassLoader cl = clazz.getClassLoader();
         if (cl instanceof PluginClassLoader) {
             return ((PluginClassLoader)cl).getDeclaringPluginDescriptor();

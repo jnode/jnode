@@ -46,8 +46,8 @@ public class LibraryModel extends PluginModelObject implements Library {
 		name = getAttribute(e, "name", true);
 		type = getAttribute(e, "type", false);
 
-		final ArrayList list = new ArrayList();
-		for (Iterator i = e.getChildren().iterator(); i.hasNext();) {
+		final ArrayList<String> list = new ArrayList<String>();
+		for (Iterator<?> i = e.getChildren().iterator(); i.hasNext();) {
 			final XMLElement exE = (XMLElement) i.next();
 			if (exE.getName().equals("export")) {
 				list.add(getAttribute(exE, "name", true));

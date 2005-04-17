@@ -48,9 +48,9 @@ public class ConfigurationElementModel extends PluginModelObject implements Conf
 		super(plugin);
 		name = e.getName();
 		
-		final Enumeration aI = e.enumerateAttributeNames();
+		final Enumeration<?> aI = e.enumerateAttributeNames();
 		if (aI.hasMoreElements()) {
-			final ArrayList list = new ArrayList();
+			final ArrayList<AttributeModel> list = new ArrayList<AttributeModel>();
 			while (aI.hasMoreElements()) {
 				final String name = (String)aI.nextElement();
 				final String value = e.getStringAttribute(name);
@@ -65,8 +65,8 @@ public class ConfigurationElementModel extends PluginModelObject implements Conf
 			attributes = null;
 		}
 
-		final ArrayList list = new ArrayList();
-		for (Iterator i = e.getChildren().iterator(); i.hasNext(); ) {
+		final ArrayList<ConfigurationElementModel> list = new ArrayList<ConfigurationElementModel>();
+		for (Iterator<?> i = e.getChildren().iterator(); i.hasNext(); ) {
 			final XMLElement ce = (XMLElement)i.next();
 			list.add(new ConfigurationElementModel(plugin, ce));
 		}

@@ -51,8 +51,8 @@ public class ExtensionModel extends PluginModelObject implements Extension {
 		point = getAttribute(e, "point", true);
 		id = getAttribute(e, "id", false);
 
-		final ArrayList list = new ArrayList();
-		for (Iterator i = e.getChildren().iterator(); i.hasNext();) {
+		final ArrayList<ConfigurationElementModel> list = new ArrayList<ConfigurationElementModel>();
+		for (Iterator<?> i = e.getChildren().iterator(); i.hasNext();) {
 			final XMLElement ce = (XMLElement) i.next();
 			list.add(new ConfigurationElementModel(plugin, ce));
 		}

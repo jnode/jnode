@@ -18,11 +18,11 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.plugin.model;
 
-import java.util.Iterator;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import nanoxml.XMLElement;
 
@@ -43,11 +43,11 @@ public class ExtensionPointModel extends PluginModelObject implements
 
     private final String name;
 
-    private Vector listeners;
+    private List<ExtensionPointListener> listeners;
 
     private Extension[] extensionArray;
 
-    private transient Vector extensionsCache;
+    private transient List<Extension> extensionsCache;
 
     public ExtensionPointModel(PluginDescriptorModel plugin, XMLElement e)
             throws PluginException {
@@ -55,8 +55,9 @@ public class ExtensionPointModel extends PluginModelObject implements
         id = getAttribute(e, "id", true);
         name = getAttribute(e, "name", true);
         uniqueId = plugin.getId() + "." + id;
-        if (id.indexOf('.') >= 0) { throw new PluginException(
-                "id cannot contain a '.'"); }
+        if (id.indexOf('.') >= 0) {
+            throw new PluginException("id cannot contain a '.'");
+        }
     }
 
     /**
@@ -68,15 +69,16 @@ public class ExtensionPointModel extends PluginModelObject implements
         registry.registerExtensionPoint(this);
     }
 
-	/**
-	 * Remove all references to (elements of) other plugin descriptors
-	 * 
-	 * @throws PluginException
-	 */
-	protected void unresolve(PluginRegistryModel registry) throws PluginException {
+    /**
+     * Remove all references to (elements of) other plugin descriptors
+     * 
+     * @throws PluginException
+     */
+    protected void unresolve(PluginRegistryModel registry)
+            throws PluginException {
         registry.unregisterExtensionPoint(this);
-	}
-	
+    }
+
     /**
      * Returns the simple identifier of this extension point. This identifier is
      * a non-empty string containing no period characters ('.') and is
@@ -108,8 +110,8 @@ public class ExtensionPointModel extends PluginModelObject implements
      */
     public Extension[] getExtensions() {
         if (extensionArray == null) {
-            final Vector cache = getExtensionsCache();
-            extensionArray = (Extension[]) cache.toArray(new Extension[ cache
+            final List<Extension> cache = getExtensionsCache();
+            extensionArray = (Extension[]) cache.toArray(new Extension[cache
                     .size()]);
         }
         return extensionArray;
@@ -122,22 +124,23 @@ public class ExtensionPointModel extends PluginModelObject implements
      */
     public void addListener(ExtensionPointListener listener) {
         if (listeners == null) {
-            listeners = new Vector();
+            listeners = new ArrayList<ExtensionPointListener>();
         }
         listeners.add(listener);
     }
 
-	/**
-	 * Add a listener to the front of the listeners list.
-	 * @param listener
-	 */
-	public void addPriorityListener(ExtensionPointListener listener) {
+    /**
+     * Add a listener to the front of the listeners list.
+     * 
+     * @param listener
+     */
+    public void addPriorityListener(ExtensionPointListener listener) {
         if (listeners == null) {
-            listeners = new Vector();
+            listeners = new ArrayList<ExtensionPointListener>();
         }
-        listeners.add(0, listener);	    
-	}
-	
+        listeners.add(0, listener);
+    }
+
     /**
      * Remove a listener
      * 
@@ -155,7 +158,7 @@ public class ExtensionPointModel extends PluginModelObject implements
      * @param extension
      */
     protected void add(Extension extension) {
-        final Vector extensions = getExtensionsCache();
+        final List<Extension> extensions = getExtensionsCache();
         if (!extensions.contains(extension)) {
             extensions.add(extension);
             // Re-create the array
@@ -170,7 +173,7 @@ public class ExtensionPointModel extends PluginModelObject implements
      * @param extension
      */
     protected void remove(Extension extension) {
-        final Vector extensions = getExtensionsCache();
+        final List<Extension> extensions = getExtensionsCache();
         extensions.remove(extension);
         extensionArray = null;
         fireExtensionRemoved(extension);
@@ -183,9 +186,7 @@ public class ExtensionPointModel extends PluginModelObject implements
      */
     protected void fireExtensionAdded(Extension extension) {
         if (listeners != null) {
-            for (Iterator i = listeners.iterator(); i.hasNext();) {
-                final ExtensionPointListener l = (ExtensionPointListener) i
-                        .next();
+            for (ExtensionPointListener l : listeners) {
                 l.extensionAdded(this, extension);
             }
         }
@@ -198,9 +199,7 @@ public class ExtensionPointModel extends PluginModelObject implements
      */
     protected void fireExtensionRemoved(Extension extension) {
         if (listeners != null) {
-            for (Iterator i = listeners.iterator(); i.hasNext();) {
-                final ExtensionPointListener l = (ExtensionPointListener) i
-                        .next();
+            for (ExtensionPointListener l : listeners) {
                 l.extensionRemoved(this, extension);
             }
         }
@@ -210,12 +209,12 @@ public class ExtensionPointModel extends PluginModelObject implements
      * Gets the extension cache. This will re-create the cache from the
      * extensionArray if needed.
      */
-    private Vector getExtensionsCache() {
+    private List<Extension> getExtensionsCache() {
         if (extensionsCache == null) {
-            extensionsCache = new Vector();
+            extensionsCache = new ArrayList<Extension>();
             if (extensionArray != null) {
                 for (int i = 0; i < extensionArray.length; i++) {
-                    extensionsCache.add(extensionArray[ i]);
+                    extensionsCache.add(extensionArray[i]);
                 }
             }
         }
@@ -227,10 +226,10 @@ public class ExtensionPointModel extends PluginModelObject implements
      */
     public void verifyBeforeEmit() {
         super.verifyBeforeEmit();
-        //System.out.println("Cache->Array " + extensionsCache);
+        // System.out.println("Cache->Array " + extensionsCache);
         if (extensionsCache != null) {
             extensionArray = (Extension[]) extensionsCache
-                    .toArray(new Extension[ extensionsCache.size()]);
+                    .toArray(new Extension[extensionsCache.size()]);
         }
     }
 }
