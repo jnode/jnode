@@ -23,7 +23,6 @@ package org.jnode.vm.classmgr;
 
 import java.security.ProtectionDomain;
 import java.util.HashSet;
-import java.util.Iterator;
 
 /**
  * Class structure for array classes.
@@ -98,7 +97,7 @@ public final class VmArrayClass extends VmClassType {
 	 * @see org.jnode.vm.classmgr.VmType#createSuperClassesArray(java.util.HashSet)
 	 * @return Super classes
 	 */
-	protected VmType[] createSuperClassesArray(HashSet allInterfaces) {
+	protected VmType[] createSuperClassesArray(HashSet<VmInterfaceClass> allInterfaces) {
 
 		final VmType[] compSuperClasses = componentType.getSuperClassesArray();
 		final int compLength = compSuperClasses.length;
@@ -112,8 +111,7 @@ public final class VmArrayClass extends VmClassType {
 		}
 
 		int index = compLength + 2;
-		for (Iterator i = allInterfaces.iterator(); i.hasNext();) {
-			final VmInterfaceClass intfClass = (VmInterfaceClass) i.next();
+		for (VmInterfaceClass intfClass : allInterfaces) {
 			array[index++] = intfClass;
 		}
 	

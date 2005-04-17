@@ -23,7 +23,6 @@ package org.jnode.vm.bytecode;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -33,7 +32,7 @@ public class BytecodeWriter {
 
 	private byte[] code;
 	private int used;
-	private HashSet labels;
+	private HashSet<Label> labels;
 
 	public BytecodeWriter() {
 	}
@@ -41,8 +40,7 @@ public class BytecodeWriter {
 	public byte[] toByteArray() {
 		// Test all labels, they must have been resolved
 		if (labels != null) {
-			for (Iterator i = labels.iterator(); i.hasNext();) {
-				final Label l = (Label) i.next();
+			for (Label l : labels) {
 				if (!l.isResolved()) {
 					throw new RuntimeException("Unresolved label " + l);
 				}
@@ -60,7 +58,7 @@ public class BytecodeWriter {
 	public Label newLabel(String text) {
 		final Label l = new Label(text);
 		if (labels == null) {
-			labels = new HashSet();
+			labels = new HashSet<Label>();
 		}
 		labels.add(l);
 		return l;
@@ -956,7 +954,7 @@ public class BytecodeWriter {
 
 	class Label {
 		private final String text;
-		private List unresolvedLocations;
+		private List<Integer> unresolvedLocations;
 		private int address = -1;
 
 		Label(String text) {
@@ -983,9 +981,9 @@ public class BytecodeWriter {
 				throw new RuntimeException("Already resolved");
 			}
 			if (unresolvedLocations == null) {
-				unresolvedLocations = new ArrayList();
+				unresolvedLocations = new ArrayList<Integer>();
 			}
-			unresolvedLocations.add(new Integer(loc));
+			unresolvedLocations.add(loc);
 		}
 
 		public void resolve() {
@@ -994,8 +992,7 @@ public class BytecodeWriter {
 			}
 			this.address = getLength();
 			if (unresolvedLocations != null) {
-				for (Iterator i = unresolvedLocations.iterator(); i.hasNext();) {
-					final int loc = ((Integer) i.next()).intValue();
+				for (int loc : unresolvedLocations) {
 					final int distance = address - get16(getCode(), loc);
 					set16(getCode(), loc, distance);
 				}

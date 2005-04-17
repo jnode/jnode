@@ -31,8 +31,8 @@ public final class TIBBuilder implements TIBLayout {
 
     private static final int DEFAULT_SIZE = MIN_TIB_LENGTH + 16;
 
-    private final ArrayList tibAsList;
-    private final HashMap nameSignature2Index;
+    private final ArrayList<Object> tibAsList;
+    private final HashMap<String, Integer> nameSignature2Index;
 
     private Object[] tibAsArray;
 
@@ -42,12 +42,12 @@ public final class TIBBuilder implements TIBLayout {
      * @param vmClass
      */
     public TIBBuilder(VmClassType vmClass, int methodCount) {
-        tibAsList = new ArrayList(DEFAULT_SIZE);
+        tibAsList = new ArrayList<Object>(DEFAULT_SIZE);
         for (int i = 0; i < MIN_TIB_LENGTH; i++) {
             tibAsList.add(null);
         }
         tibAsList.set(VMTYPE_INDEX, vmClass);
-        nameSignature2Index = new HashMap(methodCount);
+        nameSignature2Index = new HashMap<String, Integer>(methodCount);
     }
 
     /**

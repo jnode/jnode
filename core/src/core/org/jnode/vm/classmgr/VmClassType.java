@@ -24,7 +24,6 @@ package org.jnode.vm.classmgr;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 
 import org.vmmagic.pragma.UninterruptiblePragma;
 
@@ -118,7 +117,7 @@ public abstract class VmClassType extends VmType {
 	 * @param allInterfaces
 	 * @return The tib
 	 */
-	protected Object[] prepareTIB(HashSet allInterfaces) {
+	protected Object[] prepareTIB(HashSet<VmInterfaceClass> allInterfaces) {
 		final VmNormalClass superClass = getSuperClass();
 		final TIBBuilder vmt;
 		
@@ -155,10 +154,9 @@ public abstract class VmClassType extends VmType {
 		// place in the VMT) yet.
 		// This is only needed for abstract methods, since non-abstract 
 		// methods must have implemented all methods already.
-		ArrayList syntheticAbstractMethods = null;
+		ArrayList<VmInstanceMethod> syntheticAbstractMethods = null;
 		if (isAbstract()) {
-			for (Iterator i = allInterfaces.iterator(); i.hasNext(); ) {
-				final VmInterfaceClass icls = (VmInterfaceClass)i.next();
+			for (VmInterfaceClass icls : allInterfaces) {
 				final int cnt = icls.getNoDeclaredMethods();
 				for (int j = 0; j < cnt; j++) {
 					final VmMethod mts = icls.getDeclaredMethod(j);
@@ -180,7 +178,7 @@ public abstract class VmClassType extends VmType {
 							final VmInstanceMethod clone = new VmInstanceMethod(method);
 							vmt.add(clone);
 							if (syntheticAbstractMethods == null) {
-								syntheticAbstractMethods = new ArrayList();
+								syntheticAbstractMethods = new ArrayList<VmInstanceMethod>();
 							}
 							syntheticAbstractMethods.add(clone);
 						}
@@ -205,10 +203,9 @@ public abstract class VmClassType extends VmType {
 	 * @param allInterfaces
 	 * @return The builder
 	 */
-	protected IMTBuilder prepareIMT(HashSet allInterfaces) {
+	protected IMTBuilder prepareIMT(HashSet<VmInterfaceClass> allInterfaces) {
 		final IMTBuilder imtBuilder = new IMTBuilder();
-		for (Iterator i = allInterfaces.iterator(); i.hasNext(); ) {
-			final VmType intf = (VmType)i.next();
+		for (VmType intf : allInterfaces) {
 			final int max = intf.getNoDeclaredMethods();
 			// Add all method of the current interface
 			for (int m = 0; m < max; m++) {

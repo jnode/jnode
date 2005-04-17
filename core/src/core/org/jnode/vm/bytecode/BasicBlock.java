@@ -21,8 +21,6 @@
  
 package org.jnode.vm.bytecode;
 
-import java.util.Iterator;
-
 import org.jnode.util.BootableArrayList;
 import org.jnode.vm.VmSystemObject;
 
@@ -41,7 +39,7 @@ public class BasicBlock extends VmSystemObject {
 	private int endPC;
 	private boolean startOfExceptionHandler;
 	private TypeStack startStack;
-	private BootableArrayList entryBlocks = new BootableArrayList();
+	private BootableArrayList<BasicBlock> entryBlocks = new BootableArrayList<BasicBlock>();
 	
 	/**
 	 * Create a new instance
@@ -123,15 +121,17 @@ public class BasicBlock extends VmSystemObject {
 	}
 	
 	private void addEntryBlockInfo(StringBuffer buf) {
-	    for (Iterator i = entryBlocks.iterator(); i.hasNext(); ) {
-	        final BasicBlock bb = (BasicBlock)i.next();
-	        buf.append(bb.getStartPC());
-	        buf.append('-');
-	        buf.append(bb.getEndPC());
-	        if (i.hasNext()) {
-	            buf.append(',');
-	        }
-	    }
+        boolean first = true;
+	    for (BasicBlock bb : entryBlocks) {
+            if (first) {
+                first = false;
+            } else {
+                buf.append(',');
+            }
+            buf.append(bb.getStartPC());
+            buf.append('-');
+            buf.append(bb.getEndPC());
+        }
 	}
 	
 	/**

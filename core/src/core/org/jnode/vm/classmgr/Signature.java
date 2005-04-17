@@ -212,7 +212,7 @@ public class Signature {
 
     private VmType[] split(char[] signature, VmClassLoader loader)
             throws ClassNotFoundException {
-        ArrayList list = new ArrayList();
+        ArrayList<VmType> list = new ArrayList<VmType>();
         int ofs = 0;
         final int len = signature.length;
         if (signature[ofs] == '(') {
@@ -283,7 +283,7 @@ public class Signature {
      * @param cls
      * @return String
      */
-    public static String toSignature(Class cls) {
+    public static String toSignature(Class<?> cls) {
         if (cls == null) {
             throw new NullPointerException("cls==null");
         }

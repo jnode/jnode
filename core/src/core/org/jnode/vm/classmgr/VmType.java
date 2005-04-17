@@ -23,13 +23,12 @@ package org.jnode.vm.classmgr;
 
 import gnu.java.lang.VMClassHelper;
 
+import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.security.ProtectionDomain;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.io.Writer;
 
 import org.jnode.assembler.NativeStream;
 import org.jnode.vm.JvmType;
@@ -1484,7 +1483,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 		prepareForInstantiation();
 
 		/* Build the allInterfaceTable */
-		final HashSet all = new HashSet();
+		final HashSet<VmInterfaceClass> all = new HashSet<VmInterfaceClass>();
 		getAllInterfaces(all, this);
 		this.allInterfaceTable = new VmInterfaceClass[all.size()];
 		all.toArray(allInterfaceTable);
@@ -1630,7 +1629,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 * @param allInterfaces
 	 * @return The tib
 	 */
-	protected abstract Object[] prepareTIB(HashSet allInterfaces);
+	protected abstract Object[] prepareTIB(HashSet<VmInterfaceClass> allInterfaces);
 
 	/**
 	 * Prepare the interface method table
@@ -1638,7 +1637,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 * @param allInterfaces
 	 * @return The imt builder
 	 */
-	protected abstract IMTBuilder prepareIMT(HashSet allInterfaces);
+	protected abstract IMTBuilder prepareIMT(HashSet<VmInterfaceClass> allInterfaces);
 
 	/**
 	 * Create the super classes array for this type.
@@ -1648,7 +1647,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 *            class
 	 * @return The super classes array
 	 */
-	protected VmType[] createSuperClassesArray(HashSet allInterfaces) {
+	protected VmType[] createSuperClassesArray(HashSet<VmInterfaceClass> allInterfaces) {
 
 		final int length = superClassDepth + 1 + allInterfaces.size();
 		final VmType[] array = new VmType[length];
@@ -1661,8 +1660,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 		array[superClassDepth] = this;
 
 		int index = superClassDepth + 1;
-		for (Iterator i = allInterfaces.iterator(); i.hasNext();) {
-			final VmInterfaceClass intfClass = (VmInterfaceClass) i.next();
+		for (VmInterfaceClass intfClass : allInterfaces) {
 			array[index++] = intfClass;
 		}
 		
@@ -1684,7 +1682,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 *            A HashSet of VmInterfaceClass instances.
 	 * @param C
 	 */
-	private void getAllInterfaces(HashSet all, VmType C) {
+	private void getAllInterfaces(HashSet<VmInterfaceClass> all, VmType C) {
 		while (C != null) {
 			final VmImplementedInterface[] it = C.interfaceTable;
 			if (it != null) {
@@ -2040,7 +2038,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 		return "Modifiers: " + Modifier.toString(modifiers);
 	}
 
-	public static class MethodComparator implements Comparator {
+	public static class MethodComparator implements Comparator<VmMethod> {
 
 		/**
 		 * @param o1
@@ -2048,9 +2046,9 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 * @return int
 		 */
-		public int compare(Object o1, Object o2) {
-			int m1 = ((VmMember) o1).getMemberHashCode();
-			int m2 = ((VmMember) o2).getMemberHashCode();
+		public int compare(VmMethod o1, VmMethod o2) {
+			final int m1 = o1.getMemberHashCode();
+			final int m2 = o2.getMemberHashCode();
 
 			if (m1 < m2) {
 				return -1;
