@@ -130,7 +130,7 @@ public class VmAddressMap extends VmSystemObject {
     final void lock() {
         AddressPcEntry p = list;
         int count = 0;
-        final ArrayList methods = new ArrayList();
+        final ArrayList<VmMethod> methods = new ArrayList<VmMethod>();
         while (p != null) {
             count++;
             final VmMethod m = p.method;

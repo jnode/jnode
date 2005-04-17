@@ -32,7 +32,7 @@ import org.jnode.vm.VmSystemObject;
  */
 public class SelectorMap extends VmSystemObject {
 
-	private final BootableHashMap map = new BootableHashMap(8192);
+	private final BootableHashMap<String, Integer> map = new BootableHashMap<String, Integer>(8192);
 	private int lastSelector = 1;
 	
 	/**

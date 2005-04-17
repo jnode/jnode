@@ -44,7 +44,7 @@ import org.jnode.vm.classmgr.VmMethod;
 public class BasicBlockFinder extends BytecodeVisitorSupport implements BytecodeFlags {
 
     private static final boolean debug = false;
-	private final TreeMap blocks = new TreeMap();
+	private final TreeMap<Integer, BasicBlock> blocks = new TreeMap<Integer, BasicBlock>();
 	private byte[] opcodeFlags;
 	private boolean nextIsStartOfBB;
 	private boolean nextFollowsTypeStack;
@@ -60,7 +60,7 @@ public class BasicBlockFinder extends BytecodeVisitorSupport implements Bytecode
 	 */
 	public BasicBlock[] createBasicBlocks() {
 		// Create the array		
-		final BasicBlock[] list = (BasicBlock[]) blocks.values().toArray(new BasicBlock[blocks.size()]);
+		final BasicBlock[] list = blocks.values().toArray(new BasicBlock[blocks.size()]);
 		// Set the EndPC's and flags
 		final byte[] opcodeFlags = this.opcodeFlags;
 		final int len = opcodeFlags.length;
