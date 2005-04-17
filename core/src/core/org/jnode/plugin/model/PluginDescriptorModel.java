@@ -68,7 +68,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	private boolean resolved;
 	private boolean started = false;
 	private boolean starting = false;
-	private List listeners;
+	private List<PluginDescriptorListener> listeners;
 
 	/**
 	 * Load a plugin-descriptor without a registry.
@@ -98,22 +98,22 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 //			registry.registerPlugin(this);
 		//}
 
-		final ArrayList epList = new ArrayList();
-		final ArrayList exList = new ArrayList();
-		final ArrayList reqList = new ArrayList();
+		final ArrayList<ExtensionPointModel> epList = new ArrayList<ExtensionPointModel>();
+		final ArrayList<ExtensionModel> exList = new ArrayList<ExtensionModel>();
+		final ArrayList<PluginPrerequisiteModel> reqList = new ArrayList<PluginPrerequisiteModel>();
 		RuntimeModel runtime = null;
 
-		for (Iterator ci = e.getChildren().iterator(); ci.hasNext();) {
+		for (Iterator<?> ci = e.getChildren().iterator(); ci.hasNext();) {
 			final XMLElement childE = (XMLElement) ci.next();
 			final String tag = childE.getName();
 			if (tag.equals("extension-point")) {
-				final ExtensionPoint ep = new ExtensionPointModel(this, childE);
+				final ExtensionPointModel ep = new ExtensionPointModel(this, childE);
 				epList.add(ep);
 				//if (registry != null) {
 //					registry.registerExtensionPoint(ep);
 				//}
 			} else if (tag.equals("requires")) {
-				for (Iterator i = childE.getChildren().iterator(); i.hasNext();) {
+				for (Iterator<?> i = childE.getChildren().iterator(); i.hasNext();) {
 					final XMLElement impE = (XMLElement) i.next();
 					if (impE.getName().equals("import")) {
 						reqList.add(new PluginPrerequisiteModel(this, impE));
@@ -478,7 +478,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	 */
 	public synchronized void addListener(PluginDescriptorListener listener) {
 	    if (listeners == null) {
-	        listeners = new ArrayList();
+	        listeners = new ArrayList<PluginDescriptorListener>();
 	    }
 	    listeners.add(listener);
 	}
@@ -497,16 +497,15 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	 * Fire the pluginStarted event to my listeners.
 	 */
 	public final void firePluginStarted() {
-	    final List listeners;
+	    final List<PluginDescriptorListener> listeners;
 	    synchronized (this) {
 		    if (this.listeners != null) {
-		        listeners = new ArrayList(this.listeners);
+		        listeners = new ArrayList<PluginDescriptorListener>(this.listeners);
 		    } else {
 		        return;
 		    }	        
 	    }
-	    for (Iterator i = listeners.iterator(); i.hasNext(); ) {
-	        final PluginDescriptorListener l = (PluginDescriptorListener)i.next();
+	    for (PluginDescriptorListener l : listeners) {
 	        l.pluginStarted(this);
 	    }
 	}
@@ -515,16 +514,15 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	 * Fire the pluginStop event to my listeners.
 	 */
 	public final void firePluginStop() {
-	    final List listeners;
+	    final List<PluginDescriptorListener> listeners;
 	    synchronized (this) {
 		    if (this.listeners != null) {
-		        listeners = new ArrayList(this.listeners);
+		        listeners = new ArrayList<PluginDescriptorListener>(this.listeners);
 		    } else {
 		        return;
 		    }	        
 	    }
-	    for (Iterator i = listeners.iterator(); i.hasNext(); ) {
-	        final PluginDescriptorListener l = (PluginDescriptorListener)i.next();
+	    for (PluginDescriptorListener l : listeners) {
 	        l.pluginStop(this);
 	    }
 	}

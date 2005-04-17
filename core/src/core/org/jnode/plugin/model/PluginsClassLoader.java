@@ -41,8 +41,8 @@ public class PluginsClassLoader extends ClassLoader {
 	 * @see java.lang.ClassLoader#findClass(java.lang.String)
 	 */
 	protected Class findClass(String name) throws ClassNotFoundException {
-		for (Iterator i = registry.getDescriptorIterator(); i.hasNext();) {
-			final PluginDescriptor descr = (PluginDescriptor) i.next();
+		for (Iterator<PluginDescriptor> i = registry.getDescriptorIterator(); i.hasNext();) {
+			final PluginDescriptor descr = i.next();
 			if (!descr.isSystemPlugin()) {
 				final PluginClassLoaderImpl cl = (PluginClassLoaderImpl) descr.getPluginClassLoader();
 				if (cl.containsClass(name)) {
@@ -57,8 +57,8 @@ public class PluginsClassLoader extends ClassLoader {
 	 * @see java.lang.ClassLoader#findResource(java.lang.String)
 	 */
 	protected URL findResource(String name) {
-		for (Iterator i = registry.getDescriptorIterator(); i.hasNext();) {
-			final PluginDescriptor descr = (PluginDescriptor) i.next();
+		for (Iterator<PluginDescriptor> i = registry.getDescriptorIterator(); i.hasNext();) {
+			final PluginDescriptor descr = i.next();
 			if (!descr.isSystemPlugin()) {
 				final PluginClassLoaderImpl cl = (PluginClassLoaderImpl) descr.getPluginClassLoader();
 				final URL url = cl.getResource(name);
