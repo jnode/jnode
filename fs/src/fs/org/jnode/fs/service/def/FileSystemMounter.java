@@ -22,7 +22,6 @@
 package org.jnode.fs.service.def;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import javax.naming.NameNotFoundException;
 
@@ -144,9 +143,7 @@ final class FileSystemMounter implements DeviceListener {
             final PartitionTableEntry ptEntry = api.getPartitionTableEntry();
             final byte[] bs = new byte[ api.getSectorSize()];
             api.read(0, bs, 0, bs.length);
-            for (Iterator i = fileSystemService.fileSystemTypes().iterator(); i
-                    .hasNext();) {
-                final FileSystemType fst = (FileSystemType) i.next();
+            for (FileSystemType fst : fileSystemService.fileSystemTypes()) {
                 if (fst.supports(ptEntry, bs, api)) {
                     try {
                         final FileSystem fs = fst.create(device, readOnly);

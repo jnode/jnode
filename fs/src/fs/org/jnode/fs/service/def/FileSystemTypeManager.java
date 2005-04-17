@@ -41,7 +41,7 @@ final class FileSystemTypeManager implements ExtensionPointListener {
 	/** My logger */
 	private final Logger log = Logger.getLogger(getClass());
 	/** All registered types */
-	private final HashMap types = new HashMap();
+	private final HashMap<String, FileSystemType> types = new HashMap<String, FileSystemType>();
 	/** The org.jnode.fs.types extension point */
 	private final ExtensionPoint typesEP;
 
@@ -60,7 +60,7 @@ final class FileSystemTypeManager implements ExtensionPointListener {
 	 * Gets all registered file system types.
 	 * All instances of the returned collection are instanceof FileSystemType.
 	 */
-	public Collection fileSystemTypes() {
+	public Collection<FileSystemType> fileSystemTypes() {
 		return Collections.unmodifiableCollection(types.values());
 	}
     
@@ -95,7 +95,7 @@ final class FileSystemTypeManager implements ExtensionPointListener {
 	 * @param types
 	 * @param element
 	 */
-	private void createType(Map types, ConfigurationElement element) {
+	private void createType(Map<String, FileSystemType> types, ConfigurationElement element) {
 		final String className = element.getAttribute("class");
 		if (className != null) { 
 			try {

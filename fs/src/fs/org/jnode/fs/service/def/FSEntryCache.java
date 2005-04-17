@@ -24,7 +24,6 @@ package org.jnode.fs.service.def;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.jnode.fs.FSEntry;
 
@@ -36,7 +35,7 @@ final class FSEntryCache {
 	/** My filesystem manager */
 	//private final FileSystemManager fsm;
 	/** The actual cache */
-	private final HashMap entries = new HashMap();
+	private final HashMap<File, FSEntry> entries = new HashMap<File, FSEntry>();
 	
 	/**
 	 * Create a new instance
@@ -51,7 +50,7 @@ final class FSEntryCache {
 	 * @param path
 	 */
 	public synchronized FSEntry getEntry(File path) {
-		FSEntry entry = (FSEntry)entries.get(path);
+		final FSEntry entry = entries.get(path);
 		if (entry != null) {
 			if (entry.isValid()) {
 				return entry; 
@@ -82,16 +81,14 @@ final class FSEntryCache {
 	public synchronized void removeEntries(File rootPath) {
 		entries.remove(rootPath);
 		final String rootPathStr = rootPath.getAbsolutePath();
-		final ArrayList removePathList = new ArrayList();
-		for (Iterator i = entries.keySet().iterator(); i.hasNext(); ) {
-			final File path = (File)i.next();
+		final ArrayList<File> removePathList = new ArrayList<File>();
+		for (File path : entries.keySet()) {
 			final String pathStr = path.getAbsolutePath();
 			if (pathStr.startsWith(rootPathStr)) {
 				removePathList.add(path);
 			}
 		}
-		for (Iterator i = removePathList.iterator(); i.hasNext(); ) {
-			final File path = (File)i.next();
+		for (File path : removePathList) {
 			entries.remove(path);			
 		}
 	}
