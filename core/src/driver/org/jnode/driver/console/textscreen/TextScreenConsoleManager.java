@@ -56,7 +56,7 @@ final class TextScreenConsoleManager extends AbstractConsoleManager {
         if ((options & CreateOptions.TEXT) != 0) {
             final TextScreenManager tsm;
             try {
-                tsm = (TextScreenManager)InitialNaming.lookup(TextScreenManager.NAME);
+                tsm = InitialNaming.lookup(TextScreenManager.NAME);
             } catch (NameNotFoundException ex) {
                 throw new IllegalArgumentException("TextScreenManager not found");
             }

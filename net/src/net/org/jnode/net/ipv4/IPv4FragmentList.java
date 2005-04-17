@@ -21,8 +21,8 @@
  
 package org.jnode.net.ipv4;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.jnode.net.SocketBuffer;
@@ -38,7 +38,7 @@ public class IPv4FragmentList implements IPv4Constants {
 	/** When was this object created */
 	private final long creationTime;
 	/** List of fragments */
-	private final Vector fragments;
+	private final ArrayList<SocketBuffer> fragments;
 	/** The key of this fragment list */
 	private final Object key;
 	/** Is the first fragment in the list? */
@@ -52,7 +52,7 @@ public class IPv4FragmentList implements IPv4Constants {
 	 */
 	public IPv4FragmentList(SocketBuffer firstFragment) {
 		this.creationTime = System.currentTimeMillis();
-		this.fragments = new Vector();
+		this.fragments = new ArrayList<SocketBuffer>();
 		this.haveFirstFragment = false;
 		this.haveLastFragment = false;
 		final IPv4Header hdr = (IPv4Header)firstFragment.getNetworkLayerHeader();
@@ -79,7 +79,7 @@ public class IPv4FragmentList implements IPv4Constants {
 		//log.debug("first=" + haveFirstFragment + ", last=" + haveLastFragment);
 		
 		// Insert the fragment at the correct index in the list
-		for (Iterator i = fragments.iterator(); i.hasNext(); ) {
+		for (Iterator<SocketBuffer> i = fragments.iterator(); i.hasNext(); ) {
 			final SocketBuffer f = (SocketBuffer)i.next();
 			final IPv4Header fhdr = (IPv4Header)f.getNetworkLayerHeader();
 			final int fOfs = fhdr.getFragmentOffset();
@@ -104,7 +104,7 @@ public class IPv4FragmentList implements IPv4Constants {
 				return;
 			} else if (myFrOfs < fOfs) {
 				// skbuf is before f, insert it here
-				fragments.insertElementAt(skbuf, fragments.indexOf(f));
+				fragments.add(fragments.indexOf(f), skbuf);
 				//log.debug("Inserting fragment before another " + myFrOfs + "," + mySize + "," + fOfs + "," + fSize);
 				return;
 			} else if (myFrOfs < (fOfs + fSize)) {

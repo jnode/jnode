@@ -32,7 +32,7 @@ import java.util.LinkedList;
  */
 public abstract class IPv4ControlBlockList {
 
-	private final LinkedList list = new LinkedList();
+	private final LinkedList<IPv4ControlBlock> list = new LinkedList<IPv4ControlBlock>();
 	private int lastFreePort = IPv4Constants.IPPORT_RESERVED;
 
 	/**
@@ -50,9 +50,7 @@ public abstract class IPv4ControlBlockList {
 		IPv4ControlBlock bestcb = null;
 		int bestmatch = Integer.MAX_VALUE;
 
-		for (Iterator i = list.iterator(); i.hasNext();) {
-			final IPv4ControlBlock cb = (IPv4ControlBlock) i.next();
-
+		for (IPv4ControlBlock cb : list) {
 			final int match = cb.match(fAddr, fPort, lAddr, lPort, allowWildcards);
 
 			//Syslog.debug("match:" + match + "bestmatch: " + bestmatch + " cb:" + cb);

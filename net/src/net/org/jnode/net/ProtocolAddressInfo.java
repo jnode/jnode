@@ -54,5 +54,5 @@ public interface ProtocolAddressInfo {
 	 * Gets a collection of all protocol addresses of this interface.
 	 * @return A Set of ProtocolAddress instances
 	 */
-	public Set addresses();
+	public Set<ProtocolAddress> addresses();
 }

@@ -31,7 +31,7 @@ import org.jnode.net.ipv4.IPv4Address;
 public interface IPv4ConfigurationService {
     
     /** Name used to register this service in the initial naming namespace */
-    public static final Class NAME = IPv4ConfigurationService.class;
+    public static final Class<IPv4ConfigurationService> NAME = IPv4ConfigurationService.class;
 
     /**
      * Configure the device using BOOTP.

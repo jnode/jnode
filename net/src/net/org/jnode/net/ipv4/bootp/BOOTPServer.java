@@ -48,7 +48,7 @@ public class BOOTPServer {
 	public static final int CLIENT_PORT = 68;
 
 	private DatagramSocket socket;
-	private final Map table = new HashMap();
+	private final Map<String, TableEntry> table = new HashMap<String, TableEntry>();
 
 	public static void main(String[] args) {
 		String filename = "bootptab.xml";
@@ -81,7 +81,7 @@ public class BOOTPServer {
 		try {
 			XMLElement xml = new XMLElement();
 			xml.parseFromReader(reader);
-			Vector children = xml.getChildren();
+			Vector<?> children = xml.getChildren();
 			for(int i=0; i<children.size(); i++) {
 				XMLElement child = (XMLElement) children.get(i);
 				try {

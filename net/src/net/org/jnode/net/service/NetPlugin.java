@@ -28,6 +28,7 @@ import javax.naming.NamingException;
 
 import org.jnode.naming.InitialNaming;
 import org.jnode.net.NetworkLayerManager;
+import org.jnode.net.SocketBuffer;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
@@ -43,7 +44,7 @@ public class NetPlugin extends Plugin {
 	/** The packet type manager */
 	private DefaultNetworkLayerManager ptm;
 	/** The processor for the packet queue */
-	private QueueProcessorThread packetProcessorThread;
+	private QueueProcessorThread<SocketBuffer> packetProcessorThread;
 	/** The NetAPI implementation */ 
 	private final VMNetAPI api;
 
@@ -54,7 +55,7 @@ public class NetPlugin extends Plugin {
 		super(descriptor);
 		ptm = new DefaultNetworkLayerManager(descriptor.getExtensionPoint("networkLayers"));
 		api = new NetAPIImpl(ptm);
-		packetProcessorThread = new QueueProcessorThread("net-packet-processor", ptm.getQueue(), ptm);
+		packetProcessorThread = new QueueProcessorThread<SocketBuffer>("net-packet-processor", ptm.getQueue(), ptm);
 	}
 
 	/**

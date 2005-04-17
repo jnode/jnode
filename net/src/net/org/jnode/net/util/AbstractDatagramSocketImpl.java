@@ -47,7 +47,7 @@ public abstract class AbstractDatagramSocketImpl
 	implements ExSocketOptions {
 
 	/** The receive queue of SocketBuffer instances */
-	private final Queue receiveQueue = new Queue();
+	private final Queue<SocketBuffer> receiveQueue = new Queue<SocketBuffer>();
 	/** Have I been closed? */
 	private boolean closed;
 	/** Time to live */

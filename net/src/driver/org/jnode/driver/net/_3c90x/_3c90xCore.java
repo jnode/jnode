@@ -190,7 +190,7 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
 		setReg16(regStationMask_2_3w+4, 0);
 		
 		// Determine the link type
-		final ArrayList connectors = new ArrayList();
+		final ArrayList<String> connectors = new ArrayList<String>();
 		final int linktype = determineLinkType(connectors);
 		log.debug("Found connectors " + connectors);
 
@@ -484,7 +484,7 @@ public class _3c90xCore extends AbstractDeviceCore implements _3c90xConstants, I
 	 * Determine the link type based on that.
 	 * @param connectors
 	 */
-	private final int determineLinkType(Collection connectors) {
+	private final int determineLinkType(Collection<String> connectors) {
 		/** Read the media options register, print a message and set default
 		 ** xcvr.
 		 **

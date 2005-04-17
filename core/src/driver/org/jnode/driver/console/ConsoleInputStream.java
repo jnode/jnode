@@ -33,7 +33,7 @@ import org.jnode.util.Queue;
  */
 public class ConsoleInputStream extends InputStream implements KeyboardListener {
 	
-	private final Queue queue = new Queue();
+	private final Queue<KeyboardEvent> queue = new Queue<KeyboardEvent>();
 	private boolean echo = false;
 
 	public ConsoleInputStream(Console console) {

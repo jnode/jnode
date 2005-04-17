@@ -33,7 +33,7 @@ public interface DeviceManager {
 	/**
 	 * The name used to lookup this service.
 	 */
-	public static final Class NAME = DeviceManager.class;
+	public static final Class<DeviceManager> NAME = DeviceManager.class;
 
 	/**
 	 * Returns a collection of all known devices. The collection is not modifiable, but the

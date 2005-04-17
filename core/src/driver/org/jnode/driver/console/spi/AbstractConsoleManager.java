@@ -58,7 +58,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
     protected final Logger log = Logger.getLogger(getClass());
     
     /** All registered consoles */
-    private final Map consoles = new HashMap();
+    private final Map<String, Console> consoles = new HashMap<String, Console>();
 
     /** The current console */
     private Console current;
@@ -67,7 +67,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
     private KeyboardAPI kbApi;
 
     /** The pointer devices that I'm listener on */
-    private final LinkedList pointerDevs = new LinkedList();
+    private final LinkedList<Device> pointerDevs = new LinkedList<Device>();
 
     /** The device manager i'm using */
     private final DeviceManager devMan;
@@ -111,13 +111,13 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
     }
 
     private final void openInput(DeviceManager devMan) {
-        final Collection kbs = devMan.getDevicesByAPI(KeyboardAPI.class);
+        final Collection<Device> kbs = devMan.getDevicesByAPI(KeyboardAPI.class);
         if (!kbs.isEmpty()) {
             initializeKeyboard((Device) kbs.iterator().next());
         }
-        final Collection pointers = devMan.getDevicesByAPI(PointerAPI.class);
-        for (Iterator i = pointers.iterator(); i.hasNext();) {
-            addPointerDevice((Device) i.next());
+        final Collection<Device> pointers = devMan.getDevicesByAPI(PointerAPI.class);
+        for (Device dev : pointers) {
+            addPointerDevice(dev);
         }
         devMan.addListener(new DevManListener());
     }
@@ -177,8 +177,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
     }
 
     public Console getConsoleByAccelerator(int keyCode) {
-        for (Iterator iter = consoles.values().iterator(); iter.hasNext();) {
-            final Console console = (Console) iter.next();
+        for (Console console : consoles.values()) {
             if (console.getAcceleratorKeyCode() == keyCode) {
                 return console;
             }
@@ -220,7 +219,7 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
      * Close all consoles.
      */
     public void closeAll() {
-        for (Iterator i = consoles.values().iterator(); i.hasNext();) {
+        for (Iterator<Console> i = consoles.values().iterator(); i.hasNext();) {
             Console console = (Console) i.next();
             i.remove(); // remove from iterator before closing to avoid
             // concurrent modification
@@ -263,12 +262,12 @@ public abstract class AbstractConsoleManager implements ConsoleManager {
         }
     }
 
-    public Set getConsoleNames() {
-        return new HashSet(consoles.keySet());
+    public Set<String> getConsoleNames() {
+        return new HashSet<String>(consoles.keySet());
     }
 
-    public Collection getConsoles() {
-        return new ArrayList(consoles.values());
+    public Collection<Console> getConsoles() {
+        return new ArrayList<Console>(consoles.values());
     }
 
     /**
