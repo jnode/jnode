@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.net.service;
 
 import java.net.InetAddress;
@@ -28,9 +28,7 @@ import java.net.VMNetAPI;
 import java.net.VMNetDevice;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
@@ -48,16 +46,16 @@ import org.jnode.net.ethernet.EthernetConstants;
 public class NetAPIImpl implements VMNetAPI {
 
     private final DefaultNetworkLayerManager nlm;
-    
+
     public NetAPIImpl(DefaultNetworkLayerManager nlm) {
         this.nlm = nlm;
     }
-    
+
     /**
      * @see java.net.VMNetAPI#getInetAddresses(VMNetDevice)
      */
     public List getInetAddresses(VMNetDevice netDevice) {
-        final Vector list = new Vector(1, 1);
+        final ArrayList<InetAddress> list = new ArrayList<InetAddress>();
         final SecurityManager sm = System.getSecurityManager();
         try {
             final NetDeviceImpl netDeviceImpl = (NetDeviceImpl) netDevice;
@@ -66,8 +64,7 @@ public class NetAPIImpl implements VMNetAPI {
             final ProtocolAddressInfo info = api
                     .getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
 
-            for (Iterator i = info.addresses().iterator(); i.hasNext();) {
-                final ProtocolAddress ipaddr = (ProtocolAddress) i.next();
+            for (ProtocolAddress ipaddr : info.addresses()) {
                 if (sm != null) {
                     try {
                         sm.checkConnect(ipaddr.toString(), 58000);
@@ -100,7 +97,6 @@ public class NetAPIImpl implements VMNetAPI {
      * 
      * @param addr
      *            The address of the interface to return
-     * 
      * @exception SocketException
      *                If an error occurs
      * @exception NullPointerException
@@ -109,15 +105,14 @@ public class NetAPIImpl implements VMNetAPI {
     public VMNetDevice getByInetAddress(InetAddress addr)
             throws SocketException {
 
-        for (Iterator i = DeviceUtils.getDevicesByAPI(NetDeviceAPI.class)
-                .iterator(); i.hasNext();) {
-            final Device dev = (Device) i.next();
+        for (Device dev : DeviceUtils.getDevicesByAPI(NetDeviceAPI.class)) {
             try {
-                final NetDeviceAPI api = (NetDeviceAPI) dev
-                        .getAPI(NetDeviceAPI.class);
+                final NetDeviceAPI api = dev.getAPI(NetDeviceAPI.class);
                 final ProtocolAddressInfo info = api
                         .getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
-                if (info.contains(addr)) { return new NetDeviceImpl(dev); }
+                if (info.contains(addr)) {
+                    return new NetDeviceImpl(dev);
+                }
             } catch (ApiNotFoundException ex) {
                 // Ignore
             }
@@ -132,10 +127,11 @@ public class NetAPIImpl implements VMNetAPI {
      * @return A list of Device instances.
      */
     public Collection getNetDevices() {
-        final ArrayList list = new ArrayList();
-        final Collection devs = DeviceUtils.getDevicesByAPI(NetDeviceAPI.class);
-        for (Iterator i = devs.iterator(); i.hasNext();) {
-            list.add(new NetDeviceImpl((Device) i.next()));
+        final ArrayList<VMNetDevice> list = new ArrayList<VMNetDevice>();
+        final Collection<Device> devs = DeviceUtils
+                .getDevicesByAPI(NetDeviceAPI.class);
+        for (Device dev : devs) {
+            list.add(new NetDeviceImpl(dev));
         }
         return list;
     }
@@ -146,18 +142,18 @@ public class NetAPIImpl implements VMNetAPI {
      * @return InetAddress
      */
     public InetAddress getLocalAddress() throws UnknownHostException {
-        final Collection devices = DeviceUtils
+        final Collection<Device> devices = DeviceUtils
                 .getDevicesByAPI(NetDeviceAPI.class);
-        for (Iterator i = devices.iterator(); i.hasNext();) {
-            final Device dev = (Device) i.next();
+        for (Device dev : devices) {
             try {
-                final NetDeviceAPI api = (NetDeviceAPI) dev
-                        .getAPI(NetDeviceAPI.class);
+                final NetDeviceAPI api = dev.getAPI(NetDeviceAPI.class);
                 final ProtocolAddressInfo addrInfo = api
                         .getProtocolAddressInfo(EthernetConstants.ETH_P_IP);
                 if (addrInfo != null) {
                     final ProtocolAddress addr = addrInfo.getDefaultAddress();
-                    if (addr != null) { return addr.toInetAddress(); }
+                    if (addr != null) {
+                        return addr.toInetAddress();
+                    }
                 }
             } catch (ApiNotFoundException ex) {
                 // Strange, but ignore
@@ -166,16 +162,14 @@ public class NetAPIImpl implements VMNetAPI {
         throw new UnknownHostException("No configured address found");
     }
 
-    public byte[][] getHostByName(String hostname)
-    throws UnknownHostException {
-        
-        ArrayList list = null;
-        for (Iterator i = nlm.getNetworkLayers().iterator(); i.hasNext(); ) {
-            final NetworkLayer layer = (NetworkLayer)i.next();
+    public byte[][] getHostByName(String hostname) throws UnknownHostException {
+
+        ArrayList<byte[]> list = null;
+        for (NetworkLayer layer : nlm.getNetworkLayers()) {
             final ProtocolAddress[] addrs = layer.getHostByName(hostname);
             if (addrs != null) {
                 if (list == null) {
-                    list = new ArrayList();
+                    list = new ArrayList<byte[]>();
                 }
                 final int cnt = addrs.length;
                 for (int j = 0; j < cnt; j++) {
@@ -190,7 +184,7 @@ public class NetAPIImpl implements VMNetAPI {
         if ((list == null) || list.isEmpty()) {
             throw new UnknownHostException(hostname);
         } else {
-            return (byte[][])list.toArray(new byte[list.size()][]);
+            return (byte[][]) list.toArray(new byte[list.size()][]);
         }
     }
 

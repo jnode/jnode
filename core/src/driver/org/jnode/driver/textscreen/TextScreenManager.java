@@ -30,7 +30,7 @@ package org.jnode.driver.textscreen;
 public interface TextScreenManager {
     
     /** The name used to bind this manager in the InitialNaming namespace. */
-    public static final Class NAME = TextScreenManager.class;
+    public static final Class<TextScreenManager> NAME = TextScreenManager.class;
     
     /**
      * Gets the system wide text screen.

@@ -37,8 +37,8 @@ public class ARPCache {
 
 	/** My logger */
 	private static final Logger log = Logger.getLogger(ARPCache.class);
-	private final HashMap hw2p = new HashMap();
-	private final HashMap p2hw = new HashMap();
+	private final HashMap<HardwareAddress, ARPCacheEntry> hw2p = new HashMap<HardwareAddress, ARPCacheEntry>();
+	private final HashMap<ProtocolAddress, ARPCacheEntry> p2hw = new HashMap<ProtocolAddress, ARPCacheEntry>();
 	
 	/**
 	 * Remove all cached entries
@@ -105,8 +105,8 @@ public class ARPCache {
 	/**
 	 * Return all cache-entries.
 	 */
-	public synchronized Collection entries() {
-		return new ArrayList(hw2p.values());
+	public synchronized Collection<ARPCacheEntry> entries() {
+		return new ArrayList<ARPCacheEntry>(hw2p.values());
 	}
 	
 	/**

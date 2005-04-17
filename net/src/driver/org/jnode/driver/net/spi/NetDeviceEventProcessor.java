@@ -32,19 +32,19 @@ import org.jnode.util.QueueProcessorThread;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class NetDeviceEventProcessor implements QueueProcessor {
+final class NetDeviceEventProcessor implements QueueProcessor<NetDeviceEvent> {
 
     /** Event listeners */
-    private ArrayList listeners = new ArrayList();
+    private ArrayList<NetDeviceListener> listeners = new ArrayList<NetDeviceListener>();
 
     /** Cached array of listeners */
     private NetDeviceListener[] listenerCache;
 
     /** Event queue */
-    private final Queue eventQueue = new Queue();
+    private final Queue<NetDeviceEvent> eventQueue = new Queue<NetDeviceEvent>();
 
     /** The thread that will dispatch the events to the listeners */
-    private QueueProcessorThread thread;
+    private QueueProcessorThread<NetDeviceEvent> thread;
 
     /**
      * Does this processor have any listeners.
@@ -62,7 +62,7 @@ final class NetDeviceEventProcessor implements QueueProcessor {
         listeners.add(listener);
         this.listenerCache = null;
         if (thread == null) {
-            thread = new QueueProcessorThread("NetDeviceEventProcessor",
+            thread = new QueueProcessorThread<NetDeviceEvent>("NetDeviceEventProcessor",
                     eventQueue, this);
             thread.start();
         }
@@ -94,7 +94,7 @@ final class NetDeviceEventProcessor implements QueueProcessor {
     /**
      * @see org.jnode.util.QueueProcessor#process(java.lang.Object)
      */
-    public void process(Object object) throws Exception {
+    public void process(NetDeviceEvent event) throws Exception {
         NetDeviceListener[] listeners = this.listenerCache;
         if (listeners == null) {
             synchronized (this) {
@@ -108,7 +108,6 @@ final class NetDeviceEventProcessor implements QueueProcessor {
         }
         if (listeners != null) {
             final int max = listeners.length;
-            final NetDeviceEvent event = (NetDeviceEvent) object;
             for (int i = 0; i < max; i++) {
                 listeners[i].processEvent(event);
             }

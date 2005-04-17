@@ -21,8 +21,7 @@
  
 package org.jnode.net.command;
 
-import java.util.Iterator;
-
+import org.jnode.net.arp.ARPCacheEntry;
 import org.jnode.net.arp.ARPNetworkLayer;
 import org.jnode.net.ethernet.EthernetConstants;
 import org.jnode.net.util.NetUtils;
@@ -55,8 +54,8 @@ public class ArpCommand {
 			arp.getCache().clear();
 			System.out.println("Cleared the ARP cache");
 		} else {
-			for (Iterator i = arp.getCache().entries().iterator(); i.hasNext();) {
-				System.out.println(i.next());
+			for (ARPCacheEntry entry : arp.getCache().entries()) {
+				System.out.println(entry);
 			}
 		}
 	}

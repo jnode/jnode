@@ -50,7 +50,7 @@ public class NetUtils {
 	public static NetworkLayerManager getNLM() 
 	throws NetworkException {
 		try {
-			return (NetworkLayerManager)InitialNaming.lookup(NetworkLayerManager.NAME);
+			return InitialNaming.lookup(NetworkLayerManager.NAME);
 		} catch (NameNotFoundException ex) {
 			throw new NetworkException("Cannot find NetworkLayerManager", ex);
 		}

@@ -22,7 +22,6 @@
 package org.jnode.driver.console.spi;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.jnode.driver.console.Console;
 import org.jnode.driver.console.ConsoleManager;
@@ -37,9 +36,9 @@ import org.jnode.system.event.FocusEvent;
  */
 public class AbstractConsole implements Console {
 
-    private final ArrayList keyboardListeners = new ArrayList();
+    private final ArrayList<KeyboardListener> keyboardListeners = new ArrayList<KeyboardListener>();
 
-    private final ArrayList pointerListeners = new ArrayList();
+    private final ArrayList<PointerListener> pointerListeners = new ArrayList<PointerListener>();
 
     private final String consoleName;
 
@@ -101,8 +100,7 @@ public class AbstractConsole implements Console {
             return;
         }
         synchronized (pointerListeners) {
-            for (Iterator i = pointerListeners.iterator(); i.hasNext();) {
-                final PointerListener l = (PointerListener) i.next();
+            for (PointerListener l : pointerListeners) {
                 l.pointerStateChanged(event);
                 if (event.isConsumed()) {
                     break;
@@ -178,8 +176,7 @@ public class AbstractConsole implements Console {
         }
 
         synchronized (keyboardListeners) {
-            for (Iterator i = keyboardListeners.iterator(); i.hasNext();) {
-                final KeyboardListener l = (KeyboardListener) i.next();
+            for (KeyboardListener l : keyboardListeners) {
                 if (event.isKeyPressed()) {
                     l.keyPressed(event);
                 } else if (event.isKeyReleased()) {

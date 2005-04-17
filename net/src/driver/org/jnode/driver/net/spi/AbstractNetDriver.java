@@ -23,7 +23,6 @@ package org.jnode.driver.net.spi;
 
 import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import javax.naming.NameNotFoundException;
 
@@ -52,7 +51,7 @@ import org.jnode.util.QueueProcessorThread;
 /**
  * @author epr
  */
-public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, DeviceInfoAPI, QueueProcessor {
+public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, DeviceInfoAPI, QueueProcessor<Object[]> {
 
 	/** My logger */
 	private static final Logger log = Logger.getLogger(AbstractNetDriver.class);
@@ -66,11 +65,11 @@ public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, 
 	/** Number of transmitted bytes */
 	private long tx_count;
 	/** Mapping between protocol id and protocol address */
-	private final HashMap protocolAddresses = new HashMap();
+	private final HashMap<Integer, ProtocolAddressInfo> protocolAddresses = new HashMap<Integer, ProtocolAddressInfo>();
 	/** Queue used to store frames ready for transmission */
-	private final Queue txQueue = new Queue();
+	private final Queue<Object[]> txQueue = new Queue<Object[]>();
 	/** Thread used to transmit frames */
-	private QueueProcessorThread txThread;
+	private QueueProcessorThread<Object[]> txThread;
     /** Event processor */
     private NetDeviceEventProcessor eventProcessor;
 		
@@ -80,7 +79,7 @@ public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, 
 	protected void startDevice() throws DriverException {
 		final Device device = getDevice();
 		try {
-			final DeviceManager dm = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);
+			final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
             if (renameToDevicePrefixOnly()) {
                 dm.rename(device, getDevicePrefix(), true);                
             } else {
@@ -96,7 +95,7 @@ public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, 
 		}
         device.registerAPI(DeviceInfoAPI.class, this);
 		device.registerAPI(NetDeviceAPI.class, this);
-		txThread = new QueueProcessorThread(device.getId() + "-tx", txQueue, this);
+		txThread = new QueueProcessorThread<Object[]>(device.getId() + "-tx", txQueue, this);
 		txThread.start();
 	}
 
@@ -169,7 +168,7 @@ public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, 
     /**
 	 * @see org.jnode.util.QueueProcessor#process(java.lang.Object)
 	 */
-	public void process(Object object) {
+	public void process(Object[] object) {
 		try {
 			//log.debug("<transmit dev=" + getDevice().getId() + ">");
 			final Object[] data = (Object[])object;
@@ -222,7 +221,7 @@ public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, 
 	 * @return The protocol address information, or null if not found.
 	 */
 	public ProtocolAddressInfo getProtocolAddressInfo(int protocolID) {
-		return (ProtocolAddressInfo)protocolAddresses.get(new Integer(protocolID));
+		return protocolAddresses.get(protocolID);
 	}
 
 	/**
@@ -230,7 +229,7 @@ public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, 
 	 * @param protocolID
 	 */
 	public void setProtocolAddressInfo(int protocolID, ProtocolAddressInfo addressInfo) {
-		protocolAddresses.put(new Integer(protocolID), addressInfo);
+		protocolAddresses.put(protocolID, addressInfo);
 	}
 
     /**
@@ -239,9 +238,7 @@ public abstract class AbstractNetDriver extends Driver implements NetDeviceAPI, 
     public void showInfo(PrintWriter out) {
         if (!protocolAddresses.isEmpty()) {
             out.println("Protocol addresses:");
-            for (Iterator i = protocolAddresses.keySet().iterator(); i
-                    .hasNext();) {
-                final int protId = ((Integer) i.next()).intValue();
+            for (int protId : protocolAddresses.keySet()) {
                 out.println("    0x" + NumberUtils.hex(protId, 4) + " "
                         + getProtocolAddressInfo(protId));
             }

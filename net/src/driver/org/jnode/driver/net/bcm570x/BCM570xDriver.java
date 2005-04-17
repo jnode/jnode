@@ -26,8 +26,6 @@ import org.jnode.driver.DriverException;
 import org.jnode.driver.net.ethernet.spi.BasicEthernetDriver;
 import org.jnode.driver.net.ethernet.spi.Flags;
 import org.jnode.driver.net.spi.AbstractDeviceCore;
-import org.jnode.driver.net.rtl8139.RTL8139Flags;
-import org.jnode.driver.net.rtl8139.RTL8139Core;
 import org.jnode.driver.pci.PCIDevice;
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.system.ResourceNotFreeException;

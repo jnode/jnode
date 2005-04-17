@@ -22,10 +22,8 @@
 package org.jnode.net.ipv4;
 
 import java.net.InetAddress;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.jnode.net.ProtocolAddress;
@@ -37,7 +35,7 @@ import org.jnode.net.ProtocolAddressInfo;
 public class IPv4ProtocolAddressInfo implements ProtocolAddressInfo {
 
     /** Mapping between address and address&mask */
-    private final HashMap addresses = new HashMap();
+    private final HashMap<IPv4Address, IPv4IfAddress> addresses = new HashMap<IPv4Address, IPv4IfAddress>();
 
     /** The default address */
     private IPv4IfAddress defaultAddress;
@@ -79,11 +77,7 @@ public class IPv4ProtocolAddressInfo implements ProtocolAddressInfo {
      * @param address
      */
     public boolean contains(IPv4Address address) {
-        Collection c = addresses.values();
-        IPv4IfAddress ipv4IfAddress;
-
-        for (Iterator iterator = c.iterator(); iterator.hasNext();) {
-            ipv4IfAddress = (IPv4IfAddress) iterator.next();
+        for (IPv4IfAddress ipv4IfAddress : addresses.values()) {
             if (ipv4IfAddress.matches(address)) { return true; }
         }
 
@@ -153,11 +147,13 @@ public class IPv4ProtocolAddressInfo implements ProtocolAddressInfo {
      */
     public String toString() {
         final StringBuffer b = new StringBuffer();
-        for (Iterator i = addresses.values().iterator(); i.hasNext();) {
-            b.append(i.next());
-            if (i.hasNext()) {
+        boolean first = true;
+        for (IPv4IfAddress ifa : addresses.values()) {
+            if (!first) {                
                 b.append('\n');
             }
+            b.append(ifa);
+            first = false;
         }
         return b.toString();
     }

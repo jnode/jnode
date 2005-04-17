@@ -28,7 +28,6 @@ import javax.naming.NameNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.net.NetworkException;
-import org.jnode.driver.net.rtl8139.*;
 import org.jnode.driver.net.ethernet.spi.Flags;
 import org.jnode.driver.net.spi.AbstractDeviceCore;
 import org.jnode.driver.pci.PCIBaseAddress;
@@ -46,7 +45,6 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.AccessControllerUtils;
-import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
 
 /**

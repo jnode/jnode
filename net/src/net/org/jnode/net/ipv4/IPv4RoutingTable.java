@@ -24,7 +24,6 @@ package org.jnode.net.ipv4;
 import java.net.NoRouteToHostException;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -34,7 +33,7 @@ import java.util.Vector;
 public class IPv4RoutingTable {
 	
 	/** All entries as instanceof IPv4Route */
-	private final Vector entries = new Vector();
+	private final Vector<IPv4Route> entries = new Vector<IPv4Route>();
 	
 	/**
 	 * Create a new instance
@@ -78,8 +77,8 @@ public class IPv4RoutingTable {
 	 * @see IPv4Route
 	 * @return a list of IPv4Route entries.
 	 */
-	public List entries() {
-		return new ArrayList(entries);
+	public List<IPv4Route> entries() {
+		return new ArrayList<IPv4Route>(entries);
 	}
 	
 	/**
@@ -93,8 +92,7 @@ public class IPv4RoutingTable {
 		while (true) {
 			try {
 				// First search for a matching host-address route
-				for (Iterator i = entries.iterator(); i.hasNext(); ) {
-					final IPv4Route r = (IPv4Route)i.next();
+				for (IPv4Route r : entries) {
 					if (r.isHost() && r.isUp()) {
 						if (r.getDestination().equals(destination)) {
 							return r;
@@ -102,8 +100,7 @@ public class IPv4RoutingTable {
 					}
 				}
 				// Not direct host found, search through the networks
-				for (Iterator i = entries.iterator(); i.hasNext(); ) {
-					final IPv4Route r = (IPv4Route)i.next();
+				for (IPv4Route r : entries) {
 					if (r.isNetwork() && r.isUp()) {
 						if (r.getDestination().matches(destination, r.getSubnetmask())) {
 							return r;
@@ -125,8 +122,8 @@ public class IPv4RoutingTable {
 	 */
 	public String toString() {
 		final StringBuffer b = new StringBuffer();
-		for (Iterator i = entries.iterator(); i.hasNext(); ) {
-			b.append(i.next());
+		for (IPv4Route r  : entries) {
+			b.append(r);
 			b.append('\n');
 		}
 		return b.toString();
