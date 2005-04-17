@@ -37,7 +37,7 @@ public class FileHandleManager {
 	/** My logger */
 	private final Logger log = Logger.getLogger(getClass());
 	/** A map between File and FileData */
-	public final HashMap openFiles = new HashMap();
+	public final HashMap<FSFile, FileData> openFiles = new HashMap<FSFile, FileData>();
 
 	/**
 	 * Create a filehandle for a given file entry.
@@ -97,7 +97,7 @@ public class FileHandleManager {
 		/** The actual file */
 		private final FSFile file;
 		/** Set of open filehandles */
-		private final HashSet handles = new HashSet();
+		private final HashSet<FileHandleImpl> handles = new HashSet<FileHandleImpl>();
 		/** Is any of the handles opened for write? */
 		private boolean hasWriters;
 		

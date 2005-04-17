@@ -43,7 +43,7 @@ public interface FileSystemService {
 	 * Gets all registered file system types. All instances of the returned
 	 * collection are instanceof FileSystemType.
 	 */
-	public Collection fileSystemTypes();
+	public Collection<FileSystemType> fileSystemTypes();
 
 	/**
 	 * Gets registered file system types with the gicen name.
@@ -80,7 +80,7 @@ public interface FileSystemService {
 	 * Gets all registered filesystems. All instances of the returned collection
 	 * are instanceof FileSystem.
 	 */
-	public Collection fileSystems();
+	public Collection<FileSystem> fileSystems();
 
 	/**
 	 * Gets the filesystem API.

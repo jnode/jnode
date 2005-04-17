@@ -72,7 +72,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
      * Gets all registered file system types. All instances of the returned
      * collection are instanceof FileSystemType.
      */
-    public Collection fileSystemTypes() {
+    public Collection<FileSystemType> fileSystemTypes() {
         return fsTypeManager.fileSystemTypes();
     }
 
@@ -116,7 +116,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
      * Gets all registered filesystems. All instances of the returned collection
      * are instanceof FileSystem.
      */
-    public Collection fileSystems() {
+    public Collection<FileSystem> fileSystems() {
         return fsm.fileSystems();
     }
 

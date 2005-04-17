@@ -36,7 +36,7 @@ import org.jnode.fs.FileSystem;
 final class FileSystemManager {
 
 	/** All registed filesystems (device, fs) */
-	private final HashMap filesystems = new HashMap();
+	private final HashMap<String, FileSystem> filesystems = new HashMap<String, FileSystem>();
 
 	protected String getMountPoint(Device device) {
 		return device.getId();
@@ -49,7 +49,7 @@ final class FileSystemManager {
 	 */
 	public synchronized void registerFileSystem(FileSystem fs) {
 		//String idToMount = fs.getDevice().getId();
-		String idToMount = getMountPoint(fs.getDevice());
+		final String idToMount = getMountPoint(fs.getDevice());
 		filesystems.put(idToMount, fs);
 	}
 
@@ -89,11 +89,11 @@ final class FileSystemManager {
 	 * Gets all registered filesystems. All instances of the returned collection
 	 * are instanceof FileSystem.
 	 */
-	public synchronized Collection fileSystems() {
-		return new ArrayList(filesystems.values());
+	public synchronized Collection<FileSystem> fileSystems() {
+		return new ArrayList<FileSystem>(filesystems.values());
 	}
 
-	public synchronized Set fileSystemRoots() {
-		return new TreeSet(filesystems.keySet());
+	public synchronized Set<String> fileSystemRoots() {
+		return new TreeSet<String>(filesystems.keySet());
 	}
 }

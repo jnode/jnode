@@ -205,9 +205,9 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	 * This method returns an array of filesystem roots.
 	 */
 	public File[] getRoots() {
-		final Set rootSet = fsm.fileSystemRoots();
+		final Set<String> rootSet = fsm.fileSystemRoots();
 		final File[] list = new File[rootSet.size()];
-		final Iterator i = rootSet.iterator();
+		final Iterator<String> i = rootSet.iterator();
 		for (int j = 0; j < list.length; j++) {
 			list[j] = new File((String)i.next());
 		}
@@ -238,7 +238,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 		if (!entry.isDirectory()) {
 			throw new IOException("Cannot list on non-directories " + directory);
 		}
-		final ArrayList list = new ArrayList();
+		final ArrayList<String> list = new ArrayList<String>();
 		for (FSEntryIterator i = entry.getDirectory().iterator(); i.hasNext();) {
 			final FSEntry child = i.next();
 			final String name = child.getName();
@@ -246,7 +246,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 				list.add(name);
 			}
 		}
-		return (String[])list.toArray(new String[list.size()]);
+		return list.toArray(new String[list.size()]);
 	}
 
 	/**
@@ -398,7 +398,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 		return dirEntry.getDirectory();
 	}
 	
-	class VirtualRoot implements FSEntry {
+	final class VirtualRoot implements FSEntry {
 
 		public String getName() {
 			return "/";
@@ -453,7 +453,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 
 	}
 
-	class VirtualRootDirectory implements FSDirectory {
+	final class VirtualRootDirectory implements FSDirectory {
 
 		public FSEntryIterator iterator() {
 			return new RootsIterator(fsm.fileSystemRoots().iterator());
@@ -500,16 +500,16 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 		}
 	}
 
-	class RootsIterator implements FSEntryIterator {
-		Iterator fileSystemsRoots;
-		public RootsIterator(Iterator fileSystemsRoots) {
+	final class RootsIterator implements FSEntryIterator {
+		private final Iterator<String> fileSystemsRoots;
+		public RootsIterator(Iterator<String> fileSystemsRoots) {
 			this.fileSystemsRoots = fileSystemsRoots;
 		}
 		public boolean hasNext() {
 			return fileSystemsRoots.hasNext();
 		}
 		public FSEntry next() {
-			String fs = (String)fileSystemsRoots.next();
+			final String fs = fileSystemsRoots.next();
 			return new virtualFSEntry(fs);
 		}
 	}
