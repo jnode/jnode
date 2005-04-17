@@ -27,7 +27,7 @@ import java.util.HashSet;
 /**
  * @author epr
  */
-public final class VmInterfaceClass extends VmType {
+public final class VmInterfaceClass<T> extends VmType<T> {
 
 	/**
 	 * @param name

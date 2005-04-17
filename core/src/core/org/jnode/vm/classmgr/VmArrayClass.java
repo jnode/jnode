@@ -29,10 +29,10 @@ import java.util.HashSet;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class VmArrayClass extends VmClassType {
+public final class VmArrayClass<T> extends VmClassType<T> {
 
 	/** The type of elements in an array class */
-	private final VmType componentType;
+	private final VmType<?> componentType;
 	
 	private long totalLength;
 	private int maxLength;
@@ -43,7 +43,7 @@ public final class VmArrayClass extends VmClassType {
 	 * @param componentType
 	 * @param typeSize
 	 */
-	VmArrayClass(String name, VmClassLoader loader, VmType componentType, int typeSize, ProtectionDomain protectionDomain) {
+	VmArrayClass(String name, VmClassLoader loader, VmType<?> componentType, int typeSize, ProtectionDomain protectionDomain) {
 		super(name, getObjectClass(), loader, typeSize, protectionDomain);
 		this.componentType = componentType;
 		testClassType();
@@ -97,13 +97,13 @@ public final class VmArrayClass extends VmClassType {
 	 * @see org.jnode.vm.classmgr.VmType#createSuperClassesArray(java.util.HashSet)
 	 * @return Super classes
 	 */
-	protected VmType[] createSuperClassesArray(HashSet<VmInterfaceClass> allInterfaces) {
+	protected VmType<?>[] createSuperClassesArray(HashSet<VmInterfaceClass<?>> allInterfaces) {
 
 		final VmType[] compSuperClasses = componentType.getSuperClassesArray();
 		final int compLength = compSuperClasses.length;
 
 		final int length = compLength + 2 + allInterfaces.size();
-		final VmType[] array = new VmType[length];
+		final VmType<?>[] array = new VmType[length];
 		array[0] = this;
 		array[1] = this.getSuperClass();
 		for (int i = 0; i < compLength; i++) {
