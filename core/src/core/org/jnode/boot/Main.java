@@ -23,6 +23,7 @@ package org.jnode.boot;
 
 import java.util.List;
 
+import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginManager;
 import org.jnode.plugin.manager.DefaultPluginManager;
 import org.jnode.plugin.model.PluginRegistryModel;
@@ -62,7 +63,7 @@ public class Main {
 			// Load the plugins from the initjar
 			BootLog.info("Loading initjar plugins");
 			final InitJarProcessor proc = new InitJarProcessor(VmSystem.getInitJar());
-			List descriptors = proc.loadPlugins(pluginRegistry);
+			List<PluginDescriptor> descriptors = proc.loadPlugins(pluginRegistry);
 
 			BootLog.info("Starting PluginManager");
 			final PluginManager piMgr = new DefaultPluginManager(pluginRegistry);

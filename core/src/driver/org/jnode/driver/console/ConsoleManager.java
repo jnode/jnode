@@ -32,7 +32,7 @@ import org.jnode.driver.input.PointerListener;
 public interface ConsoleManager extends KeyboardListener, PointerListener {
 
     /** The name used to bind this manager in the InitialNaming namespace. */
-    public static final Class NAME = ConsoleManager.class;
+    public static final Class<ConsoleManager> NAME = ConsoleManager.class;
 
     /**
      * Gets the console with the given index

@@ -97,7 +97,7 @@ public class InitJarBuilder extends AbstractPluginsTask {
             }
 
             final URL[] pluginList = piList.getPluginList();
-            final ArrayList pluginJars = new ArrayList(pluginList.length);
+            final ArrayList<PluginJar> pluginJars = new ArrayList<PluginJar>(pluginList.length);
             for (int i = 0; i < pluginList.length; i++) {
                 final URL url = pluginList[i];
                 final BuildPluginJar piJar = new BuildPluginJar(url);
@@ -110,9 +110,9 @@ public class InitJarBuilder extends AbstractPluginsTask {
                 }
             }
             testPluginPrerequisites(pluginJars);
-            final List sortedPluginJars = sortPlugins(pluginJars);
+            final List<PluginJar> sortedPluginJars = sortPlugins(pluginJars);
 
-            for (Iterator i = sortedPluginJars.iterator(); i.hasNext();) {
+            for (Iterator<PluginJar> i = sortedPluginJars.iterator(); i.hasNext();) {
                 final BuildPluginJar piJar = (BuildPluginJar) i.next();
                 pluginJars.add(piJar);
                 final File f = new File(piJar.getPluginUrl().getPath());
@@ -163,17 +163,15 @@ public class InitJarBuilder extends AbstractPluginsTask {
      * 
      * @throws BuildException
      */
-    protected void testPluginPrerequisites(List pluginJars)
+    protected void testPluginPrerequisites(List<PluginJar> pluginJars)
             throws BuildException {
-        final HashSet ids = new HashSet();
+        final HashSet<String> ids = new HashSet<String>();
 
-        for (Iterator i = pluginJars.iterator(); i.hasNext();) {
-            final PluginJar piJar = (PluginJar) i.next();
+        for (PluginJar piJar : pluginJars) {
             final PluginDescriptor descr = piJar.getDescriptor();
             ids.add(descr.getId());
         }
-        for (Iterator i = pluginJars.iterator(); i.hasNext();) {
-            final PluginJar piJar = (PluginJar) i.next();
+        for (PluginJar piJar : pluginJars) {
             final PluginDescriptor descr = piJar.getDescriptor();
             final PluginPrerequisite[] prereqs = descr.getPrerequisites();
             for (int j = 0; j < prereqs.length; j++) {
@@ -191,11 +189,11 @@ public class InitJarBuilder extends AbstractPluginsTask {
      * 
      * @param pluginJars
      */
-    protected List sortPlugins(List pluginJars) {
-        final ArrayList result = new ArrayList(pluginJars.size());
-        final HashSet ids = new HashSet();
+    protected List<PluginJar> sortPlugins(List<PluginJar> pluginJars) {
+        final ArrayList<PluginJar> result = new ArrayList<PluginJar>(pluginJars.size());
+        final HashSet<String> ids = new HashSet<String>();
         while (!pluginJars.isEmpty()) {
-            for (Iterator i = pluginJars.iterator(); i.hasNext();) {
+            for (Iterator<PluginJar> i = pluginJars.iterator(); i.hasNext();) {
                 final BuildPluginJar piJar = (BuildPluginJar) i.next();
                 if (piJar.hasAllPrerequisitesInSet(ids)) {
                     log(piJar.getDescriptor().getId(), Project.MSG_VERBOSE);

@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.security;
 
 import gnu.java.security.PolicyFile;
@@ -34,7 +34,6 @@ import java.security.Permissions;
 import java.security.Policy;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.jnode.plugin.ConfigurationElement;
@@ -51,7 +50,7 @@ final class JNodePolicy extends Policy {
 
     /** The permissions extension point */
     private final ExtensionPoint permissionsEp;
-    
+
     /** The configured policies */
     private final PolicyFile policyFile;
 
@@ -59,27 +58,30 @@ final class JNodePolicy extends Policy {
      * Mapping between a codesource (derived from plugin id) and a set of
      * permissions
      */
-    private final HashMap codeSource2Permissions;
+    private final HashMap<CodeSource, PermissionCollection> codeSource2Permissions;
 
     /**
      * Initialize this instance.
      */
     public JNodePolicy(ExtensionPoint permissionsEp) {
-        this.policyFile = new PolicyFile(ClassLoader.getSystemResource("/org/jnode/security/jnode.policy"));
-        this.codeSource2Permissions = new HashMap();
+        this.policyFile = new PolicyFile(ClassLoader
+                .getSystemResource("/org/jnode/security/jnode.policy"));
+        this.codeSource2Permissions = new HashMap<CodeSource, PermissionCollection>();
         this.permissionsEp = permissionsEp;
         loadExtensions();
     }
 
     /**
      * Gets the permissions for a given code source.
+     * 
      * @see java.security.Policy#getPermissions(java.security.CodeSource)
      */
-	public PermissionCollection getPermissions(CodeSource codesource) {
-		PermissionCollection coll = policyFile.getPermissions(codesource);
-		addPermissions(codesource, coll);
-		return coll;
-	}
+    public PermissionCollection getPermissions(CodeSource codesource) {
+        PermissionCollection coll = policyFile.getPermissions(codesource);
+        addPermissions(codesource, coll);
+        return coll;
+    }
+
     /**
      * Allow extended classes to add permissions before the permissions
      * collection is set to read-only.
@@ -87,16 +89,15 @@ final class JNodePolicy extends Policy {
      * @param codeSource
      * @param perms
      */
-    protected void addPermissions(CodeSource codeSource, PermissionCollection perms) {
-        for (Iterator it = codeSource2Permissions.entrySet().iterator(); it
-                .hasNext();) {
-            final Map.Entry e = (Map.Entry) it.next();
-            final CodeSource cs = (CodeSource) e.getKey();
+    protected void addPermissions(CodeSource codeSource,
+            PermissionCollection perms) {
+        for (Map.Entry<CodeSource, PermissionCollection> e : codeSource2Permissions
+                .entrySet()) {
+            final CodeSource cs = e.getKey();
             if (cs.implies(codeSource)) {
                 // BootLog.info(cs + " -> " + codeSource);
-                final PermissionCollection pc = (PermissionCollection) e
-                        .getValue();
-                for (Enumeration ee = pc.elements(); ee.hasMoreElements();) {
+                final PermissionCollection pc = e.getValue();
+                for (Enumeration<?> ee = pc.elements(); ee.hasMoreElements();) {
                     perms.add((Permission) ee.nextElement());
                 }
             }
@@ -121,15 +122,15 @@ final class JNodePolicy extends Policy {
             final Extension[] exts = permissionsEp.getExtensions();
             final int count = exts.length;
             for (int i = 0; i < count; i++) {
-                loadExtension(exts[ i]);
+                loadExtension(exts[i]);
             }
         }
     }
 
     private static final Class[] NAME_ACTIONS_ARGS = new Class[] {
-            String.class, String.class};
+            String.class, String.class };
 
-    private static final Class[] NAME_ARGS = new Class[] { String.class};
+    private static final Class[] NAME_ARGS = new Class[] { String.class };
 
     private final void loadExtension(Extension ext) {
         final String id = ext.getDeclaringPluginDescriptor().getId();
@@ -141,11 +142,11 @@ final class JNodePolicy extends Policy {
             final CodeSource cs = new CodeSource(url, null);
             final Permissions perms = new Permissions();
             codeSource2Permissions.put(cs, perms);
-            //BootLog.debug("Adding permissions for " + cs);
+            // BootLog.debug("Adding permissions for " + cs);
             final ConfigurationElement[] elems = ext.getConfigurationElements();
             final int count = elems.length;
             for (int i = 0; i < count; i++) {
-                final ConfigurationElement elem = elems[ i];
+                final ConfigurationElement elem = elems[i];
                 final String type = elem.getAttribute("class");
                 final String name = elem.getAttribute("name");
                 final String actions = elem.getAttribute("actions");
@@ -157,11 +158,12 @@ final class JNodePolicy extends Policy {
                         if ((name != null) && (actions != null)) {
                             final Constructor c = permClass
                                     .getConstructor(NAME_ACTIONS_ARGS);
-                            perm = c.newInstance(new Object[] { name, actions});
+                            perm = c
+                                    .newInstance(new Object[] { name, actions });
                         } else if (name != null) {
                             final Constructor c = permClass
                                     .getConstructor(NAME_ARGS);
-                            perm = c.newInstance(new Object[] { name});
+                            perm = c.newInstance(new Object[] { name });
                         } else {
                             perm = permClass.newInstance();
                         }

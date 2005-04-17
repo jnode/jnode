@@ -59,7 +59,7 @@ public class InitialNaming {
      * @throws NameAlreadyBoundException
      *             if the name already exists within this namespace
      */
-    public static void bind(Class name, Object service) throws NamingException,
+    public static <T, E extends T> void bind(Class<T> name, E service) throws NamingException,
             NameAlreadyBoundException {
         getNameSpace().bind(name, service);
     }
@@ -70,7 +70,7 @@ public class InitialNaming {
      * 
      * @param name
      */
-    public static void unbind(Class name) {
+    public static void unbind(Class<?> name) {
         getNameSpace().unbind(name);
     }
 
@@ -81,14 +81,14 @@ public class InitialNaming {
      * @throws NameNotFoundException
      *             if the name was not found in this namespace
      */
-    public static Object lookup(Class name) throws NameNotFoundException {
+    public static <T> T lookup(Class<T> name) throws NameNotFoundException {
         return getNameSpace().lookup(name);
     }
 
     /**
      * Gets a set containing all names (Class) of the bound services.
      */
-    public static Set nameSet() {
+    public static Set<Class<?>> nameSet() {
         return getNameSpace().nameSet();
     }
 

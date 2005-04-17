@@ -138,7 +138,7 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * 
 	 * @return Collection
 	 */
-	public abstract Collection getObjectRefs();
+	public abstract Collection<? extends ObjectRef> getObjectRefs();
 
 	/**
 	 * @return ObjectResolver

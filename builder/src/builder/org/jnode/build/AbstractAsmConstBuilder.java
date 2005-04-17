@@ -31,7 +31,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmArchitecture;
@@ -50,7 +49,7 @@ public abstract class AbstractAsmConstBuilder {
 
 	private File destFile;
 	private URL classesURL;
-	private ArrayList classes = new ArrayList();
+	private ArrayList<ClassName> classes = new ArrayList<ClassName>();
 
 	/**
 	 * Execute this task
@@ -90,14 +89,13 @@ public abstract class AbstractAsmConstBuilder {
 		out.println("; THIS file has been generated automatically on " + new Date());
 		out.println();
 
-		for (Iterator j = classes.iterator(); j.hasNext();) {
-			final ClassName cn = (ClassName) j.next();
+		for (ClassName cn : classes) {
 			final URL classUrl = cn.getURL(classesURL);
 			lastModified = Math.max(lastModified, classUrl.openConnection().getLastModified());
 			out.println("; Constants for " + cn.getClassName());
 
 			if (cn.isStatic()) {
-				Class cls = Class.forName(cn.getClassName());
+				Class<?> cls = Class.forName(cn.getClassName());
 				Field fields[] = cls.getDeclaredFields();
 				for (int i = 0; i < fields.length; i++) {
 					Field f = fields[i];

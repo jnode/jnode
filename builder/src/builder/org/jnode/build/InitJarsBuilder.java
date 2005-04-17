@@ -23,7 +23,6 @@ package org.jnode.build;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
@@ -42,14 +41,13 @@ public class InitJarsBuilder extends Task {
 
     private File pluginDir;
     private File destDir;
-    private final ArrayList fileSets = new ArrayList();
+    private final ArrayList<FileSet> fileSets = new ArrayList<FileSet>();
     
     /**
      * @see org.apache.tools.ant.Task#execute()
      */
     public void execute() throws BuildException {
-        for (Iterator i = fileSets.iterator(); i.hasNext(); ) {
-            final FileSet fs = (FileSet)i.next();
+        for (FileSet fs : fileSets) {
             final DirectoryScanner ds = fs.getDirectoryScanner(getProject());
 
             final String[] listFiles = ds.getIncludedFiles();

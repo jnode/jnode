@@ -88,7 +88,7 @@ public abstract class AbstractPluginsTask extends AbstractPluginTask {
 	protected void testPluginPrerequisites(PluginRegistry registry) 
 	throws BuildException {
 		
-		for (Iterator i = registry.getDescriptorIterator(); i.hasNext(); ) {
+		for (Iterator<PluginDescriptor> i = registry.getDescriptorIterator(); i.hasNext(); ) {
 			final PluginDescriptor descr = (PluginDescriptor)i.next();
 			if (!descr.isSystemPlugin()) {
 				log(descr.getId() +" is not a system plugin", Project.MSG_WARN);

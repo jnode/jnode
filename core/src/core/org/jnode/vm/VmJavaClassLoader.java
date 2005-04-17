@@ -44,7 +44,7 @@ public final class VmJavaClassLoader extends VmAbstractClassLoader {
     private final VmSystemClassLoader systemLoader;
 
     /** The loaded classes (nbame, VmType) */
-    private final HashMap loadedClasses = new HashMap();
+    private final HashMap<String, VmType> loadedClasses = new HashMap<String, VmType>();
 
     /**
      * Initialize this class.

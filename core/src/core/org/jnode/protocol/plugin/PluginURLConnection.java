@@ -69,7 +69,7 @@ public class PluginURLConnection extends URLConnection {
 	 */
 	public void connect() throws IOException {
 		try {
-			final PluginManager pluginMgr = (PluginManager) InitialNaming.lookup(PluginManager.NAME);
+			final PluginManager pluginMgr = InitialNaming.lookup(PluginManager.NAME);
 			final PluginDescriptor descr = pluginMgr.getRegistry().getPluginDescriptor(pluginId);
 			if (descr == null) {
 				throw new IOException("Plugin " + pluginId + " not found");

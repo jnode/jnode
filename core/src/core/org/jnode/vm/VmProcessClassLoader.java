@@ -29,7 +29,7 @@ import java.util.HashSet;
 public class VmProcessClassLoader extends ClassLoader {
 	
 	/** Sets of classname (String) to skip loading via a parent classloader */
-	private final HashSet skipClassNames;
+	private final HashSet<String> skipClassNames;
 	
 	/**
 	 * Create a new instance
@@ -37,7 +37,7 @@ public class VmProcessClassLoader extends ClassLoader {
 	 */
 	public VmProcessClassLoader(ClassLoader parent) {
 		super(parent);
-		skipClassNames = new HashSet();
+		skipClassNames = new HashSet<String>();
 		skipClassNames.add("java.lang.System");
 		skipClassNames.add("org.jnode.vm.VmProcess");
 	}

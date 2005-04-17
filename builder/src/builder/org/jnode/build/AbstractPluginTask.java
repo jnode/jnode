@@ -26,7 +26,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 import nanoxml.XMLElement;
@@ -46,7 +45,7 @@ import org.jnode.plugin.model.PluginDescriptorModel;
 public abstract class AbstractPluginTask extends Task {
 
 	protected String targetArch;
-	private final LinkedList aliases = new LinkedList();
+	private final LinkedList<LibAlias> aliases = new LinkedList<LibAlias>();
 
 	/**
 	 * @return The target architecture
@@ -88,7 +87,7 @@ public abstract class AbstractPluginTask extends Task {
         return descr;
     }
     
-	protected void processLibrary(Jar jarTask, Library lib, HashMap fileSets, File srcDir) {
+	protected void processLibrary(Jar jarTask, Library lib, HashMap<File, ZipFileSet> fileSets, File srcDir) {
 
 		final LibAlias libAlias = getAlias(lib.getName());
 		final File f;
@@ -148,8 +147,7 @@ public abstract class AbstractPluginTask extends Task {
 	}
 
 	public LibAlias getAlias(String name) {
-		for (Iterator i = aliases.iterator(); i.hasNext();) {
-			final LibAlias a = (LibAlias) i.next();
+		for (LibAlias a : aliases) {
 			if (name.equals(a.getName())) {
 				return a;
 			}

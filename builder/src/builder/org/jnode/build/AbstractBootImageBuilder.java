@@ -48,6 +48,7 @@ import org.apache.tools.ant.Project;
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.UnresolvedObjectRefException;
+import org.jnode.assembler.NativeStream.ObjectRef;
 import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginRegistry;
@@ -107,7 +108,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     private static final String zero16 = zero8 + zero8;
 
     /** Set of jbects that should not yet be emitted */
-    private final Set blockedObjects = new HashSet();
+    private final Set<Object> blockedObjects = new HashSet<Object>();
 
     private URL classesURL = null;
 
@@ -117,8 +118,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * Classname/packagename of those classes/packages that need highly
      * optimized compilation
      */
-    private final HashSet compileHighOptLevelPackages = new HashSet();
-    private final HashSet preloadPackages = new HashSet();
+    private final HashSet<String> compileHighOptLevelPackages = new HashSet<String>();
+    private final HashSet<String> preloadPackages = new HashSet<String>();
 
     protected boolean debug = false;
 
@@ -132,7 +133,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
     private File kernelFile;
 
-    private Set legalInstanceClasses;
+    private Set<String> legalInstanceClasses;
 
     private File listFile;
 
@@ -186,8 +187,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         do {
             again = false;
             oldCount = clsMgr.getLoadedClassCount();
-            for (Iterator i = clsMgr.getLoadedClasses().iterator(); i.hasNext();) {
-                final VmType vmClass = (VmType) i.next();
+            for (VmType vmClass : clsMgr.getLoadedClasses()) {
                 vmClass.link();
                 final boolean compHigh = isCompileHighOptLevel(vmClass);
                 try {
@@ -239,12 +239,12 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @param blockedObjects
      * @throws BuildException
      */
-    protected final void copyJarFile(Set blockedObjects) throws BuildException {
+    protected final void copyJarFile(Set<Object> blockedObjects) throws BuildException {
 
         try {
             final JarFile jar = new JarFile(jarFile);
-            final BootableHashMap resources = new BootableHashMap();
-            for (Enumeration e = jar.entries(); e.hasMoreElements();) {
+            final BootableHashMap<String, byte[]> resources = new BootableHashMap<String, byte[]>();
+            for (Enumeration<?> e = jar.entries(); e.hasMoreElements();) {
                 final JarEntry entry = (JarEntry) e.nextElement();
                 final byte[] data = read(jar.getInputStream(entry));
                 resources.put(entry.getName(), data);
@@ -552,10 +552,10 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @throws BuildException
      */
     private final void emitObjects(NativeStream os, VmArchitecture arch,
-            Set blockObjects, boolean skipCopyStatics) throws BuildException {
+            Set<Object> blockObjects, boolean skipCopyStatics) throws BuildException {
         log("Emitting objects", Project.MSG_DEBUG);
         PrintWriter debugOut = null;
-        final TreeSet emittedClassNames = new TreeSet();
+        final TreeSet<String> emittedClassNames = new TreeSet<String>();
         try {
             if (debug) {
                 debugOut = new PrintWriter(new FileWriter(debugFile, true));
@@ -572,13 +572,13 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 if (!skipCopyStatics) {
                     copyStaticFields(clsMgr, clsMgr.getStatics(), os, emitter);
                 }
-                final Collection objectRefs = new ArrayList(os.getObjectRefs());
+                final Collection<ObjectRef> objectRefs = new ArrayList<ObjectRef>(os.getObjectRefs());
                 int unresolvedFound = 0; // Number of unresolved references
                 // found in the following
                 // loop
                 int emitted = 0; // Number of emitted objects in the following
                 // loop
-                for (Iterator i = objectRefs.iterator(); i.hasNext();) {
+                for (Iterator<ObjectRef> i = objectRefs.iterator(); i.hasNext();) {
                     X86BinaryAssembler.ObjectRef ref = (X86BinaryAssembler.ObjectRef) i.next();
                     if (!ref.isResolved()) {
                         final Object obj = ref.getObject();
@@ -850,7 +850,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @return The loaded class
      * @throws ClassNotFoundException
      */
-    public final VmType loadClass(Class c) throws ClassNotFoundException {
+    public final VmType loadClass(Class<?> c) throws ClassNotFoundException {
         String name = c.getName();
         VmType cls = clsMgr.findLoadedClass(name);
         if (cls != null) {
@@ -1036,11 +1036,9 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             // Look for unresolved labels and put all resolved
             // label into the sorted map. This will be used later
             // to print to the listing file.
-            final Collection xrefs = os.getObjectRefs();
-            final SortedMap map = new TreeMap();
-            for (Iterator i = xrefs.iterator(); i.hasNext();) {
-                NativeStream.ObjectRef ref;
-                ref = (NativeStream.ObjectRef) i.next();
+            final Collection<? extends ObjectRef> xrefs = os.getObjectRefs();
+            final SortedMap<Integer, ObjectRef> map = new TreeMap<Integer, ObjectRef>();
+            for (ObjectRef ref : xrefs) {
                 if (!ref.isResolved()) {
                     StringBuffer buf = new StringBuffer();
                     buf.append("  $" + Integer.toHexString(ref.getOffset()));
@@ -1058,9 +1056,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             } // Print the
             // listing
             // file.
-            for (Iterator i = map.values().iterator(); i.hasNext();) {
-                final NativeStream.ObjectRef ref;
-                ref = (NativeStream.ObjectRef) i.next();
+            for (ObjectRef ref : map.values()) {
                 final Object object = ref.getObject();
                 w.print('$');
                 w.print(hex(ref.getOffset() + os.getBaseAddr()));
@@ -1231,8 +1227,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * 
      * @return Set&lt;String&gt;
      */
-    protected Set setupLegalInstanceClasses() {
-        final HashSet set = new HashSet();
+    protected Set<String> setupLegalInstanceClasses() {
+        final HashSet<String> set = new HashSet<String>();
         set.add("java.lang.Integer");
         set.add("java.lang.Long");
         set.add("java.lang.Float");
@@ -1269,8 +1265,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
     protected void copyStaticFields(VmSystemClassLoader cl, VmStatics statics, NativeStream os, ObjectEmitter emitter)
             throws ClassNotFoundException {
-        for (Iterator i = cl.getLoadedClasses().iterator(); i.hasNext();) {
-            final VmType type = (VmType) i.next();
+        for (VmType type : cl.getLoadedClasses()) {
             final String name = type.getName();
             final int cnt = type.getNoDeclaredFields();
             if ((cnt > 0) && !name.startsWith("java.")){

@@ -61,7 +61,7 @@ public class Log4jConfigurePlugin extends Plugin {
 		final Logger root = Logger.getRootLogger();
 		try {
 		    // Create the appenders
-			final ConsoleManager conMgr = (ConsoleManager)InitialNaming.lookup(ConsoleManager.NAME);
+			final ConsoleManager conMgr = InitialNaming.lookup(ConsoleManager.NAME);
 			final TextConsole console = (TextConsole)conMgr.createConsole("Log4j", ConsoleManager.CreateOptions.TEXT | ConsoleManager.CreateOptions.SCROLLABLE | ConsoleManager.CreateOptions.NO_SYSTEM_OUT_ERR_IN);
 			conMgr.registerConsole(console);
 			
@@ -78,7 +78,7 @@ public class Log4jConfigurePlugin extends Plugin {
     		root.addAppender(infoApp);
 
     		// Remove the existing appenders.
-			for (Enumeration appEnum = root.getAllAppenders(); appEnum.hasMoreElements(); ) {
+			for (Enumeration<?> appEnum = root.getAllAppenders(); appEnum.hasMoreElements(); ) {
 			    final Appender appender = (Appender)appEnum.nextElement();
 			    if ((appender != debugApp) && (appender != infoApp)) {
 			        root.removeAppender(appender);

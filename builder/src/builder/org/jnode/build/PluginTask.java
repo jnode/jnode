@@ -24,7 +24,6 @@ package org.jnode.build;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -43,7 +42,7 @@ import org.jnode.plugin.model.PluginDescriptorModel;
  */
 public class PluginTask extends AbstractPluginTask {
 
-	private LinkedList descriptorSets = new LinkedList();
+	private LinkedList<ZipFileSet> descriptorSets = new LinkedList<ZipFileSet>();
 	private File todir;
 	private File tmpDir = new File(System.getProperty("java.io.tmpdir"));
 
@@ -74,9 +73,8 @@ public class PluginTask extends AbstractPluginTask {
 			throw new BuildException("todir must be a directory");
 		}
 
-        Map descriptors = new HashMap();
-		for (Iterator i = descriptorSets.iterator(); i.hasNext();) {
-			final FileSet fs = (FileSet) i.next();
+        Map<String, File> descriptors = new HashMap<String, File>();
+		for (FileSet fs : descriptorSets) {
 			final DirectoryScanner ds = fs.getDirectoryScanner(getProject());
 			final String[] files = ds.getIncludedFiles();
 			for (int j = 0; j < files.length; j++) {
@@ -91,7 +89,7 @@ public class PluginTask extends AbstractPluginTask {
      * @param descriptor
      * @throws BuildException
      */
-	protected void buildPlugin(Map descriptors, File descriptor) throws BuildException {
+	protected void buildPlugin(Map<String, File> descriptors, File descriptor) throws BuildException {
 		final PluginDescriptorModel descr = readDescriptor(descriptor);
 
 		final String fullId = descr.getId() + "_" + descr.getVersion();
@@ -129,7 +127,7 @@ public class PluginTask extends AbstractPluginTask {
 		// Add runtime resources
 		final Runtime rt = descr.getRuntime();
 		if (rt != null) {
-			final HashMap fileSets = new HashMap();
+			final HashMap<File, ZipFileSet> fileSets = new HashMap<File, ZipFileSet>();
 			final Library[] libs = rt.getLibraries();
 			for (int l = 0; l < libs.length; l++) {
 				processLibrary(jarTask, libs[l], fileSets, getPluginDir());
