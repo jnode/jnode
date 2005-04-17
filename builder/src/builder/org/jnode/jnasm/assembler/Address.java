@@ -25,6 +25,7 @@ package org.jnode.jnasm.assembler;
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public class Address {
+    public boolean segment;
     public String reg;
     public int disp;
     public String sreg;

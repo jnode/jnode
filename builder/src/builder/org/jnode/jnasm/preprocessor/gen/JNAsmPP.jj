@@ -54,6 +54,14 @@ public class JNAsmPP extends Preprocessor {
                     nameToken.image = processString(expansion);
                     //System.err.println(" exp proc " + nameToken.image);
                 }
+            } else {
+                String white = "";
+                if(nameToken.image.length() > name.length()){
+                    white = nameToken.image.substring(name.length());
+                    nameToken.image = name;
+                }
+                singleLineMacroCall(nameToken);
+                nameToken.image = nameToken.image + white;
             }
         }
     }

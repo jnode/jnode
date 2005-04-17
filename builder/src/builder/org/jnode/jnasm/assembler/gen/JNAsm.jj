@@ -236,37 +236,50 @@ List operandList() :
 }
 
 Object operand() :
-{ Object o = UNDEFINED; Token t, dw; int disp; Address addr; int i;}
+{ Object o = UNDEFINED; Token t, dw; int disp, scale; Address addr; int i;}
 {
-    [ <NEAR> ] [ dw=<DWORD> { setSizeInfo(dw.image); }]
-    (
-    LOOKAHEAD( {isRegister(getToken(1))} )
-    t=<IDENT>  { o = new Register(t.image);}
-|   <LABEL> arithmeticExpression()
-|   i=arithmeticExpression() { o = new Integer(i); } [ <COLON> arithmeticExpression() ]
-|   "["
+(
+    <NEAR> t=<IDENT>  { o = new Identifier(t.image);}
+|
+    [ dw=<DWORD> { setSizeInfo(dw.image); }]
     (
         LOOKAHEAD( {isRegister(getToken(1))} )
-        t=<IDENT> { addr = new Address(); addr.reg = t.image; o = addr; }
-        [
-            "+" (
-                    LOOKAHEAD( {isRegister(getToken(1))} )
-                    t=<IDENT> { addr.sreg = t.image; }
-                    (
-                        "*" disp=arithmeticExpression() {addr.scale = disp;}
-                    |   "-" disp=arithmeticExpression() {addr.scale = 1; addr.disp = disp;}
+        t=<IDENT>  { o = new Register(t.image);}
+    |   <LABEL> arithmeticExpression()
+    |   i=arithmeticExpression() { o = new Integer(i); } [ <COLON> arithmeticExpression() ]
+    |   "["
+        (
+            LOOKAHEAD( {isRegister(getToken(1))} )
+            t=<IDENT> { addr = new Address(); addr.reg = t.image; o = addr; }
+            [
+                "+" (
+                        LOOKAHEAD( {isRegister(getToken(1))} )
+                        t=<IDENT> { addr.sreg = t.image; }
+                        (
+                            "*" scale=arithmeticOperand() {addr.scale = scale;}
+                            [ "+" disp=arithmeticOperand() { addr.disp = disp;} ]
+                        |   "-" disp=arithmeticExpression() {addr.scale = 1; addr.disp = -disp;}
+                        )
+                    |   disp=arithmeticExpression()     { addr.disp = disp; }
                     )
-                |   disp=arithmeticExpression()     { addr.disp = disp; }
-                )
-        |   "-" disp=arithmeticExpression() { addr.disp = -disp; }
-        |   "*" disp=arithmeticExpression() { addr.sreg = addr.reg; addr.reg = null; addr.scale = disp;}
-        ]
-    |   disp=arithmeticExpression()     { addr = new Address(); addr.disp = disp; o = addr; }
-    |   <LABEL> disp=arithmeticExpression()  { addr = new Address(); addr.disp = disp; o = addr; }
+            |   "-" disp=arithmeticExpression() { addr.disp = -disp; }
+            |   "*" scale=arithmeticOperand() "+" disp=arithmeticOperand()
+                { addr.sreg = addr.reg; addr.reg = null; addr.scale = scale; addr.disp = disp;}
+            ]
+        |   disp=arithmeticExpression()     { addr = new Address(); addr.disp = disp; o = addr; }
+        |   t=<LABEL> disp=arithmeticExpression()
+            {
+              addr = new Address();
+              addr.segment = true;
+              addr.reg = t.image.substring(0,t.image.length() - 1);
+              addr.disp = disp;
+              o = addr;
+            }
+        )
+        "]"
     )
-    "]"
 )
-        { return o;}
+    { return o;}
 }
 
 int arithmeticExpression() :
