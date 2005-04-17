@@ -10,6 +10,7 @@
 
 	<property name="root.dir" value="${basedir}/.." />
 	<property name="build.dir" value="${basedir}/build" />
+	<property name="reports.dir" value="${build.dir}/reports" />	
 	<property name="cdroms.dir" value="${build.dir}/cdroms" />
 	<property name="descriptors.dir" value="${build.dir}/descriptors" />
 	<property name="plugins.dir" value="${build.dir}/plugins" />
@@ -33,14 +34,14 @@
 	<property name="dnsjava.jar" value="${root.dir}/net/lib/dnsjava-1.5.0.jar" />
 	<property name="jsch.jar" value="${root.dir}/net/lib/jsch-0.1.15.jar" />
 	<property name="junit.jar" value="${root.dir}/core/lib/junit.jar" />
-	
+
+	<!-- libraries needed to run tests -->
 	<property name="jmock-cglib.jar" value="${root.dir}/core/lib/jmock-cglib-1.0.1.jar" />
 	<property name="jmock.jar" value="${root.dir}/core/lib/jmock-1.0.1.jar" />
 	<property name="cglib.jar" value="${root.dir}/core/lib/cglib-2.1.jar" />	
 	<property name="asm.jar" value="${root.dir}/core/lib/asm.jar" />	
 	
 	<property name="dom4j.jar" value="${root.dir}/builder/lib/dom4j.jar" />
-	<property name="classycle.jar" value="${root.dir}/builder/lib/classycle.jar" />	
 	<property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar" />
 	<property name="nanoxml.jar" value="${root.dir}/core/lib/nanoxml-lite-2.2.3.jar" />
 	<property name="gnu-crypto.jar" value="${root.dir}/core/lib/gnu-crypto.jar" />
@@ -48,6 +49,17 @@
 	<property name="javax-security.jar" value="${root.dir}/core/lib/javax-security.jar" />
 	<property name="beanshell.jar" value="${root.dir}/shell/lib/bsh-2.0b1.jar" />
 
+	<!-- libraries needed to check plugin dependencies -->
+	<property name="classycle.jar" value="${root.dir}/builder/lib/classycle.jar" />	
+	
+	<!-- libraries needed to check rules in source code -->	
+	<property name="pmd.jar" value="${root.dir}/builder/lib/pmd/pmd-3.0.jar" />		
+	<property name="jaxen.jar" value="${root.dir}/builder/lib/pmd/jaxen-core-1.0-fcs.jar" />
+	<property name="saxpath.jar" value="${root.dir}/builder/lib/pmd/saxpath-1.0-fcs.jar" />
+	<property name="xerces.jar" value="${root.dir}/builder/lib/pmd/xercesImpl-2.6.2.jar" />
+	<property name="xmlParserAPIs.jar" value="${root.dir}/builder/pmd/lib/xmlParserAPIs-2.6.2.jar" />
+
+	<!-- lists of plugins to use while booting -->
 	<property name="default-plugin-list" value="${basedir}/conf/default-plugin-list.xml" />
 	<property name="full-plugin-list" value="${basedir}/conf/full-plugin-list.xml" />
 	<property name="install-plugin-list" value="${basedir}/conf/install-plugin-list.xml" />
@@ -55,7 +67,7 @@
 	<property name="sources.dist.tar.gz" value="${build.dir}/jnodesources-${jnode-ver}.tar.gz" />
 	<property name="jnode-x86.iso" value="${cdroms.dir}/jnode-x86.iso" />
 	<property name="jnode-x86-lite.iso" value="${cdroms.dir}/jnode-x86-lite.iso" />
-
+	
 	<path id="cp">
 		<pathelement location="${ant.jar}" />
 		<pathelement location="${junit.jar}" />
@@ -105,6 +117,7 @@
 		<property file="${root.dir}/jnode.properties" />
 		<tstamp />
 		<mkdir dir="${build.dir}" />
+		<mkdir dir="${reports.dir}" />
 		<mkdir dir="${cdroms.dir}" />
 		<mkdir dir="${descriptors.dir}" />
 		<mkdir dir="${plugins.dir}" />
@@ -501,6 +514,51 @@ clean          Remove all intermediate build results.
 			</descriptors>
 		</checksDep>
 	</target>	
+
+	<!-- Define the task that check the rules -->
+    <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"
+    	classpathref="cp-jnode">
+		<classpath>
+			<pathelement location="${pmd.jar}" />
+			<pathelement location="${jaxen.jar}" />
+			<pathelement location="${saxpath.jar}" />
+			<pathelement location="${xerces.jar}" />
+			<pathelement location="${xmlParserAPIs.jar}" />
+		</classpath>
+    </taskdef>
+	
+	
+	<!-- Macro used to check that the rules are applied in the source code -->
+	<macrodef name="checkProjectRules">
+		<attribute name="projectName"/>
+		<attribute name="webSrcUrl"/>
+		<attribute name="projectSrc"/>
+		<sequential>
+			<property name="nbFailures" value="0" />
+			<echo message="Scanning @{projectName}."/>
+			<property name="tmp" value="../@{projectSrc}"/>
+		    <pmd failuresPropertyName="nbFailures">
+		        <formatter type="html" toFile="${reports.dir}/pmd_report-@{projectName}.html" />
+		    	
+		        <ruleset>rulesets/favorites.xml</ruleset>
+		        <ruleset>rulesets/basic.xml</ruleset>	    	
+
+				<fileset dir="../@{projectSrc}" includes="**/*.java" />
+		    </pmd>
+			<echo message="There was ${nbFailures} failures in @{projectName}."/>
+		</sequential>
+	</macrodef>
+	
+	<target name="checkJNodeRules" depends="prepare">
+		<parallel>
+		    <checkProjectRules projectName="distr" webSrcUrl="distr" projectSrc="distr" />
+			<checkProjectRules projectName="JNode-Builder" webSrcUrl="builder" projectSrc="builder" />
+		    <checkProjectRules projectName="JNode-Core" webSrcUrl="core" projectSrc="core" />	    	
+		    <checkProjectRules projectName="JNode-FS" webSrcUrl="fs" projectSrc="fs" />	    	
+		    <checkProjectRules projectName="JNode-GUI" webSrcUrl="gui" projectSrc="gui" />	    	
+		    <checkProjectRules projectName="JNode-Net" webSrcUrl="net" projectSrc="net" />
+		    <checkProjectRules projectName="JNode-Shell" webSrcUrl="shell" projectSrc="shell" />
+			<checkProjectRules projectName="JNode-TestUI" webSrcUrl="textui" projectSrc="textui" />		
+		</parallel>
+	</target>
 </project>
-
-
