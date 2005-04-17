@@ -23,7 +23,6 @@ package org.jnode.fs.fat;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.block.BlockDeviceAPI;
@@ -42,7 +41,7 @@ public class FatFileSystem extends AbstractFileSystem {
 	private Fat fat;
 	private final FatDirectory rootDir;
 	private final FatRootEntry rootEntry;
-	private final HashMap files = new HashMap();
+	private final HashMap<FatDirEntry, FatFile> files = new HashMap<FatDirEntry, FatFile>();
 
 	/**
 	 * Constructor for FatFileSystem in specified readOnly mode
@@ -104,8 +103,7 @@ public class FatFileSystem extends AbstractFileSystem {
 			bs.write(api);
 		}
 
-		for (Iterator i = files.values().iterator(); i.hasNext();) {
-			final FatFile f = (FatFile)i.next();
+		for (FatFile f : files.values()) {
 			f.flush();
 		}
 

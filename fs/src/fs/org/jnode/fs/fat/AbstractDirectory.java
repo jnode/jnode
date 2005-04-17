@@ -37,7 +37,7 @@ import org.jnode.fs.ReadOnlyFileSystemException;
  */
 public abstract class AbstractDirectory extends FatObject implements FSDirectory {
 
-	protected Vector entries = new Vector();
+	protected Vector<FatBasicDirEntry> entries = new Vector<FatBasicDirEntry>();
 	private boolean _dirty;
 	protected FatFile file;
 
