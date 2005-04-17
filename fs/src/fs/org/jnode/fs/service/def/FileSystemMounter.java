@@ -21,7 +21,6 @@
  
 package org.jnode.fs.service.def;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -34,7 +33,6 @@ import org.jnode.driver.DeviceListener;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.RemovableDeviceAPI;
 import org.jnode.driver.block.FSBlockDeviceAPI;
-import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
@@ -62,8 +60,6 @@ final class FileSystemMounter implements DeviceListener {
 
     /** The FileSystemService i'm using */
     private FileSystemService fileSystemService;
-    
-    private boolean tempDirectoryCreated = false;
 
     /**
      * Start the FS mounter.
@@ -157,13 +153,6 @@ final class FileSystemMounter implements DeviceListener {
                         fileSystemService.registerFileSystem(fs);
                         log.info("Mounted " + fst.getName() + " on "
                                 + device.getId());
-                        
-                        if(!readOnly && !removable && !tempDirectoryCreated)
-                        {
-                            createTempDirectory(device);
-                            tempDirectoryCreated = true;
-                        }
-                        
                         return;
                     } catch (FileSystemException ex) {
                         log.error("Cannot mount " + fst.getName()
@@ -196,39 +185,4 @@ final class FileSystemMounter implements DeviceListener {
             // Just ignore this device.
         }
     }
-    
-    protected void createTempDirectory(final Device dev)
-    {
-        //TODO Find another solution. It's very bad but it avoids dependencies with RamDiskDevice. 
-        if(!"org.jnode.driver.block.ramdisk.RamDiskDevice".equals(dev.getClass().getName())) return;
-        
-        log.info("creating temp directory");
-        
-        final FileSystem fs = fileSystemService.getFileSystem(dev);
-        FSDirectory rootDir;
-        
-        final String tempDir = System.getProperty("java.io.tmpdir");
-        final int sepIndex = tempDir.lastIndexOf(File.separatorChar); 
-        final String tempDirPath = tempDir.substring(0, sepIndex);
-        final String tempDirName = tempDir.substring(sepIndex+1);
-
-        final String fsRootPath = File.separatorChar + dev.getId();
-        
-        if(tempDirPath.equals(fsRootPath))
-        {
-            try
-            {
-                rootDir = fs.getRootEntry().getDirectory();
-                if(rootDir.getEntry(tempDirName) == null)                    
-                {
-                    // create the temp dir if it doesn't exist
-                    rootDir.addDirectory(tempDirName);
-                }
-            }
-            catch (IOException e)
-            {
-                log.error("can't create temp dir: "+tempDir);
-            }
-        }
-    }    
 }
