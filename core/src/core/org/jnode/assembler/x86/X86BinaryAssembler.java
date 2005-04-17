@@ -833,6 +833,35 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 	}
 
+    /**
+	 * Create a ADD [dstDisp], imm32
+	 *
+	 * @param operandSize
+	 * @param dstDisp
+	 * @param imm32
+	 */
+	public void writeADD(int operandSize, int dstDisp, int imm32) {
+        testOperandSize(operandSize, BITS8 | BITS16 | BITS32);
+        //TODO review
+        if(operandSize == BITS32){
+            write8(0x81);
+            write8(5);
+            write32(dstDisp);
+            write32(imm32);
+        } else if(operandSize == BITS16) {
+            write8(OSIZE_PREFIX);
+            write8(0x81);
+            write8(5);
+            write32(dstDisp);
+            write16(imm32);
+        } else if(operandSize == BITS8) {
+            write8(0x80);
+            write8(5);
+            write32(dstDisp);
+            write8(imm32);
+        }
+	}
+
 	/**
 	 * Create a ADD [dstReg+dstDisp], srcReg
 	 * 
@@ -879,16 +908,31 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param dstReg
 	 * @param imm32
 	 */
-	public final void writeAND(GPR dstReg, int imm32) {
-        testSize(dstReg, BITS32 | BITS64);
-		if (X86Utils.isByte(imm32)) {
-			write1bOpcodeModRR(0x83, dstReg.getSize(), dstReg, 4);
-			write8(imm32);
-		} else {
-			write1bOpcodeModRR(0x81, dstReg.getSize(), dstReg, 4);
-			write32(imm32);
-		}
-	}
+    public final void writeAND(GPR dstReg, int imm32) {
+        testSize(dstReg, BITS8 | BITS16 | BITS32 | BITS64);
+        int size = dstReg.getSize();
+        if ((size & (BITS32 | BITS64)) == size) {
+            if (X86Utils.isByte(imm32)) {
+                write1bOpcodeModRR(0x83, dstReg.getSize(), dstReg, 4);
+                write8(imm32);
+            } else {
+                write1bOpcodeModRR(0x81, dstReg.getSize(), dstReg, 4);
+                write32(imm32);
+            }
+        } else if (size == BITS16) {
+            write8(OSIZE_PREFIX);
+            if (X86Utils.isByte(imm32)) {
+                write1bOpcodeModRR(0x83, dstReg.getSize(), dstReg, 4);
+                write8(imm32);
+            } else {
+                write1bOpcodeModRR(0x81, dstReg.getSize(), dstReg, 4);
+                write16(imm32);
+            }
+        } else if (size == BITS8) {
+            write1bOpcodeModRR(0x80, dstReg.getSize(), dstReg, 4);
+            write8(imm32);
+        }
+    }
 
 	/**
 	 * 
@@ -907,6 +951,34 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 	}
 
+    /**
+	 *
+     * @param operandSize
+	 * @param dstDisp
+	 * @param imm32
+	 */
+	public void writeAND(int operandSize, int dstDisp, int imm32) {
+        testOperandSize(operandSize, BITS8 | BITS16 | BITS32);
+        //TODO review
+        if(operandSize == BITS32){
+            write8(0x81);
+            write8(0x25);
+            write32(dstDisp);
+            write32(imm32);
+        } else if(operandSize == BITS16) {
+            write8(OSIZE_PREFIX);
+            write8(0x81);
+            write8(0x25);
+            write32(dstDisp);
+            write16(imm32);
+        } else if(operandSize == BITS8) {
+            write8(0x80);
+            write8(0x25);
+            write32(dstDisp);
+            write8(imm32);
+        }
+	}
+
 	/**
 	 * Create a AND [dstReg+dstDisp], srcReg
 	 * 
@@ -916,9 +988,16 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 */
 	public final void writeAND(GPR dstReg, int dstDisp, GPR srcReg) {
         testSize(dstReg, mode.getSize());
-        testSize(srcReg, mode.getSize());
-		write1bOpcodeModRM(0x21, srcReg.getSize(), dstReg, dstDisp, srcReg
-				.getNr());
+        testSize(srcReg, BITS8 | BITS16 | BITS32 | BITS64);
+        int size = srcReg.getSize();
+        if ((size & (BITS32 | BITS64)) == size) {
+		    write1bOpcodeModRM(0x21, size, dstReg, dstDisp, srcReg.getNr());
+        } else if( size == BITS16){
+            write8(OSIZE_PREFIX);
+            write1bOpcodeModRM(0x21, size, dstReg, dstDisp, srcReg.getNr());
+        } else if(size == BITS8){
+            write1bOpcodeModRM(0x20, size, dstReg, dstDisp, srcReg.getNr());
+        }
 	}
 
 	/**
@@ -1189,14 +1268,29 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param imm32
 	 */
 	public final void writeCMP_Const(GPR reg, int imm32) {
-        testSize(reg, BITS32 | BITS64);
-		if (X86Utils.isByte(imm32)) {
-			write1bOpcodeModRR(0x83, reg.getSize(), reg, 7);
-			write8(imm32);
-		} else {
-			write1bOpcodeModRR(0x81, reg.getSize(), reg, 7);
-			write32(imm32);
-		}
+        testSize(reg, BITS8 | BITS16 | BITS32 | BITS64);
+        int size = reg.getSize();
+        if((size & (BITS32 | BITS64)) == size){
+            if (X86Utils.isByte(imm32)) {
+                write1bOpcodeModRR(0x83, reg.getSize(), reg, 7);
+                write8(imm32);
+            } else {
+                write1bOpcodeModRR(0x81, reg.getSize(), reg, 7);
+                write32(imm32);
+            }
+        } else if(size == BITS16) {
+            write8(OSIZE_PREFIX);
+            if (X86Utils.isByte(imm32)) {
+                write1bOpcodeModRR(0x83, reg.getSize(), reg, 7);
+                write8(imm32);
+            } else {
+                write1bOpcodeModRR(0x81, reg.getSize(), reg, 7);
+                write16(imm32);
+            }
+        } else if(size == BITS8){
+            write1bOpcodeModRR(0x80, reg.getSize(), reg, 7);
+            write8(imm32);
+        }
 	}
 
 	/**
@@ -1820,6 +1914,44 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write1bOpcodeModRM(0xFF, operandSize, dstReg, disp, 0);
 	}
 
+    /**
+	 * Create a inc size [dstReg+disp]
+	 *
+	 * @param dstReg
+	 */
+	public final void writeINC(int operandSize, GPR dstReg, GPR dstIdxReg, int scale, int disp) {
+        testSize(dstReg, mode.getSize());
+        testSize(dstIdxReg, mode.getSize());
+		testOperandSize(operandSize, BITS32 | BITS64);
+		write1bOpcodeModRMSib(0xFF, operandSize, dstReg, disp, 0, scale, dstIdxReg);
+	}
+
+    /**
+     * Create a inc size [dstReg+disp]
+     *
+     * @param operandSize
+     * @param dstDisp
+     */
+    public final void writeINC(int operandSize, int dstDisp) {
+        testOperandSize(operandSize, BITS8 | BITS16 | BITS32);
+        //TODO review
+        if(operandSize == BITS32){
+            write8(0xFF);
+            write8(5);
+            write32(dstDisp);
+        } else if(operandSize == BITS16) {
+            write8(OSIZE_PREFIX);
+            write8(0xFF);
+            write8(5);
+            write32(dstDisp);
+        } else if(operandSize == BITS8) {
+            write8(0xFE);
+            write8(5);
+            write32(dstDisp);
+        }
+    }
+
+
 	/**
 	 * Create a int vector
 	 * 
@@ -1991,6 +2123,42 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write1bOpcodeModRMSib(0x8d, dstReg.getSize(), srcReg, disp, dstReg
 				.getNr(), scale, srcIdxReg);
 	}
+
+    /**
+	 * Create a lea dstReg,[srcReg+srcIdxReg*scale+disp]
+	 *
+	 * @param dstReg
+	 * @param srcIdxReg
+	 * @param scale
+	 * @param disp
+	 */
+	public final void writeLEA(GPR dstReg, GPR srcIdxReg,int scale, int disp) {
+        testSize(dstReg, mode.getSize());
+        testSize(srcIdxReg, mode.getSize());
+        //TODO review
+        write8(0x8d);
+        write8(0x04 | dstReg.getNr() << 3);
+        write8(0x85 | srcIdxReg.getNr() << 3);
+		write32(disp);
+	}
+
+    public final void writeLGDT(int disp){
+        testOperandSize(mode.getSize(), BITS32);
+        //TODO review
+        write8(0x0f);
+        write8(0x01);
+        write8(0x15);
+        write32(disp);
+    }
+
+    public final void writeLIDT(int disp){
+        testOperandSize(mode.getSize(), BITS32);
+        //TODO review
+        write8(0x0f);
+        write8(0x01);
+        write8(0x1d);
+        write32(disp);
+    }
 
     /**
 	 * Create a lmsw srcReg
@@ -2397,8 +2565,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 */
 	public final void writeMOV(int operandSize, GPR dstReg, int dstDisp,
 			GPR srcReg) {
-        testSize(dstReg, BITS32 | BITS64);
-        testSize(srcReg, BITS32 | BITS64);
+        testSize(dstReg, BITS8 | BITS16 | BITS32 | BITS64);
+        testSize(srcReg, BITS8 | BITS16 | BITS32 | BITS64);
+        //TODO review
 		testDst(dstReg, dstDisp);
 		final int opcode;
 		switch (operandSize) {
@@ -2482,8 +2651,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param srcReg
 	 */
 	public final void writeMOV(int operandSize, GPR dstReg, GPR srcReg) {
-        testSize(dstReg, BITS32 | BITS64);
-        testSize(srcReg, BITS32 | BITS64);
+        testSize(dstReg, BITS8 | BITS16 | BITS32 | BITS64);
+        testSize(srcReg, BITS8 | BITS16 | BITS32 | BITS64);
+        //TODO review
 		final int opcode;
 		switch (operandSize) {
 		case X86Constants.BITS8:
@@ -2515,8 +2685,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 */
 	public final void writeMOV(int operandSize, GPR dstReg, GPR srcReg,
 			int srcDisp) {
-        testSize(dstReg, X86Constants.BITS32 | X86Constants.BITS64);
+        testSize(dstReg, BITS8 | BITS16 | BITS32 | BITS64);
         testSize(srcReg, mode.getSize());
+        //TODO review
 		final int opcode;
 		switch (operandSize) {
 		case X86Constants.BITS8:
@@ -2611,6 +2782,83 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 				.getNr(), scale, srcIdxReg);
 	}
 
+    /**
+     *
+     * @param dstReg
+     * @param srcDisp
+     */
+    public final void writeMOV(GPR dstReg, int srcDisp){
+        testSize(dstReg, BITS8 | BITS16 | BITS32);
+        int size = dstReg.getSize();
+        //TODO review
+        if(size == BITS32){
+            write8(0x8b);
+            write8(dstReg.getNr() << 3 | 5);
+            write32(srcDisp);
+        } else if(size == BITS16) {
+            write8(OSIZE_PREFIX);
+            write8(0x8b);
+            write8(dstReg.getNr() << 3 | 5);
+            write32(srcDisp);
+        } else if(size == BITS8) {
+            write8(0x8a);
+            write8(dstReg.getNr() << 3 | 5);
+            write32(srcDisp);
+        }
+    }
+
+    /**
+     *
+     * @param dstDisp
+     * @param srcReg
+     */
+    public final void writeMOV(int dstDisp, GPR srcReg){
+        testSize(srcReg, BITS8 | BITS16 | BITS32);
+        int size = srcReg.getSize();
+        //TODO review
+        if(size == BITS32){
+            write8(0x89);
+            write8(srcReg.getNr() << 3 | 5);
+            write32(dstDisp);
+        } else if(size == BITS16) {
+            write8(OSIZE_PREFIX);
+            write8(0x89);
+            write8(srcReg.getNr() << 3 | 5);
+            write32(dstDisp);
+        } else if(size == BITS8) {
+            write8(0x88);
+            write8(srcReg.getNr() << 3 | 5);
+            write32(dstDisp);
+        }
+    }
+
+    /**
+     * @param operandSize
+     * @param dstDisp
+     * @param imm32
+     */
+    public final void writeMOV_Const(int operandSize, int dstDisp, int imm32){
+        testOperandSize(operandSize, BITS8 | BITS16 | BITS32);
+        //TODO review
+        if(operandSize == BITS32){
+            write8(0xc7);
+            write8(5);
+            write32(dstDisp);
+            write32(imm32);
+        } else if(operandSize == BITS16) {
+            write8(OSIZE_PREFIX);
+            write8(0xc7);
+            write8(5);
+            write32(dstDisp);
+            write16(imm32);
+        } else if(operandSize == BITS8) {
+            write8(0xc6);
+            write8(5);
+            write32(dstDisp);
+            write8(imm32);
+        }
+    }
+
 	/**
 	 * Create a MOV reg,imm32 or MOV reg,imm64
 	 * 
@@ -2618,10 +2866,17 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param imm32
 	 */
 	public final void writeMOV_Const(GPR dstReg, int imm32) {
-		testSize(dstReg, BITS32 | BITS64);
+		testSize(dstReg, BITS8 | BITS16 | BITS32 | BITS64);
 		if (dstReg.getSize() == BITS32) {
             write1bOpcodeReg(0xB8, dstReg);
 			write32(imm32);
+		} else if (dstReg.getSize() == BITS16) {
+            write8(OSIZE_PREFIX);
+            write1bOpcodeReg(0xB8, dstReg);
+			write16(imm32);
+		} else if (dstReg.getSize() == BITS8) {
+            write1bOpcodeReg(0xB0, dstReg);
+			write8(imm32);
 		} else {
 			writeMOV_Const(dstReg, (long) imm32);
 		}
@@ -2967,18 +3222,62 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param imm32
 	 */
 	public void writeOR(GPR dstReg, int imm32) {
-        testSize(dstReg, BITS32 | BITS64);
-		if (X86Utils.isByte(imm32)) {
-			write1bOpcodeModRR(0x83, dstReg.getSize(), dstReg, 1);
-			write8(imm32);
-		} else {
-			write1bOpcodeModRR(0x81, dstReg.getSize(), dstReg, 1);
-			write32(imm32);
-		}
+        testSize(dstReg, BITS8 | BITS16 | BITS32 | BITS64);
+        int size = dstReg.getSize();
+        if((size & (BITS32 | BITS64)) == size){
+            if (X86Utils.isByte(imm32)) {
+			    write1bOpcodeModRR(0x83, dstReg.getSize(), dstReg, 1);
+			    write8(imm32);
+		    } else {
+			    write1bOpcodeModRR(0x81, dstReg.getSize(), dstReg, 1);
+			    write32(imm32);
+		    }
+        } else if(size == BITS16){
+            write8(OSIZE_PREFIX);
+            if (X86Utils.isByte(imm32)) {
+			    write1bOpcodeModRR(0x83, dstReg.getSize(), dstReg, 1);
+			    write8(imm32);
+		    } else {
+			    write1bOpcodeModRR(0x81, dstReg.getSize(), dstReg, 1);
+			    write16(imm32);
+		    }
+        } else if(size == BITS8){
+            write1bOpcodeModRR(0x80, dstReg.getSize(), dstReg, 1);
+		    write8(imm32);
+        }
+	}
+
+    /**
+	 *
+	 * @param operandSize
+	 * @param dstDisp
+	 * @param imm32
+	 */
+	public void writeOR(int operandSize, int dstDisp, int imm32) {
+        testOperandSize(operandSize, BITS8 | BITS16 | BITS32);
+        //TODO review
+        if(operandSize == BITS32){
+            write8(0x81);
+            write8((1 << 3) | 5);
+            write32(dstDisp);
+            write32(imm32);
+        } else if(operandSize == BITS16) {
+            write8(OSIZE_PREFIX);
+            write8(0x81);
+            write8((1 << 3) | 5);
+            write32(dstDisp);
+            write16(imm32);
+        } else if(operandSize == BITS8) {
+            write8(0x80);
+            write8((1 << 3) | 5);
+            write32(dstDisp);
+            write8(imm32);
+        }
 	}
 
 	/**
-	 * 
+	 *
+     * @param operandSize
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param imm32
@@ -3003,9 +3302,16 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 */
 	public final void writeOR(GPR dstReg, int dstDisp, GPR srcReg) {
         testSize(dstReg, mode.getSize());
-        testSize(srcReg, mode.getSize());
-		write1bOpcodeModRM(0x09, srcReg.getSize(), dstReg, dstDisp, srcReg
-				.getNr());
+        testSize(srcReg, BITS8 | BITS16 | BITS32 | BITS64);
+        int size = srcReg.getSize();
+        if ((size & (BITS32 | BITS64)) == size) {
+            write1bOpcodeModRM(0x09, size, dstReg, dstDisp, srcReg.getNr());
+        } else if( size == BITS16){
+            write8(OSIZE_PREFIX);
+            write1bOpcodeModRM(0x09, size, dstReg, dstDisp, srcReg.getNr());
+        } else if(size == BITS8){
+            write1bOpcodeModRM(0x08, size, dstReg, dstDisp, srcReg.getNr());
+        }
 	}
 
 	/**
@@ -3658,6 +3964,32 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 	}
 
+    /**
+	 * Create a SUB [dstDisp], <srcReg>
+	 *
+	 * @param dstDisp
+	 * @param srcReg
+	 */
+	public final void writeSUB(int dstDisp, GPR srcReg) {
+        testSize(srcReg, BITS8 | BITS16 | BITS32);
+        int size = srcReg.getSize();
+        //TODO review//TODO review
+        if(size == BITS32){
+            write8(0x29);
+            write8(srcReg.getNr() << 3 | 5);
+            write32(dstDisp);
+        } else if(size == BITS16) {
+            write8(OSIZE_PREFIX);
+            write8(0x29);
+            write8(srcReg.getNr() << 3 | 5);
+            write32(dstDisp);
+        } else if(size == BITS8) {
+            write8(0x28);
+            write8(srcReg.getNr() << 3 | 5);
+            write32(dstDisp);
+        }
+	}
+
 	/**
 	 * Create a SUB [dstReg+dstDisp], <srcReg>
 	 * 
@@ -3705,9 +4037,19 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param imm32
 	 */
 	public final void writeTEST(GPR reg, int imm32) {
-        testSize(reg, BITS32 | BITS64);
-		write1bOpcodeModRR(0xF7, reg.getSize(), reg, 0);
-		write32(imm32);
+        testSize(reg, BITS8 | BITS16 | BITS32 | BITS64);
+        int size = reg.getSize();
+        if((size & (BITS32 | BITS64)) == size){
+		    write1bOpcodeModRR(0xF7, reg.getSize(), reg, 0);
+		    write32(imm32);
+        } else if(size == BITS16){
+            write8(OSIZE_PREFIX);
+            write1bOpcodeModRR(0xF7, reg.getSize(), reg, 0);
+            write16(imm32);
+        } else if(size == BITS8) {
+            write1bOpcodeModRR(0xF6, reg.getSize(), reg, 0);
+            write8(imm32);
+        }
 	}
 
 	/**
@@ -3758,6 +4100,28 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write32(value);
 	}
 
+    public final void writeTEST(int operandSize, int destDisp, int imm32){
+        testOperandSize(operandSize, BITS8 | BITS16 | BITS32);
+        //TODO review
+        if(operandSize == BITS32){
+            write8(0xf7);
+            write8(5);
+            write32(destDisp);
+            write32(imm32);
+        } else if(operandSize == BITS16){
+            write8(OSIZE_PREFIX);
+            write8(0xf7);
+            write8(5);
+            write32(destDisp);
+            write16(imm32);
+        } else if(operandSize == BITS8){
+            write8(0xf6);
+            write8(5);
+            write32(destDisp);
+            write8(imm32);
+        }
+    }
+
 	/**
 	 * Write my contents to the given stream.
 	 * 
@@ -3766,6 +4130,31 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 */
 	public final void writeTo(OutputStream os) throws IOException {
 		os.write(m_data, 0, m_used);
+	}
+
+    /**
+     *
+     * @param dstDisp
+     * @param srcReg
+     */
+    public void writeXCHG(int dstDisp, GPR srcReg) {
+        testSize(srcReg, BITS8 | BITS16 | BITS32);
+        int size = srcReg.getSize();
+        //TODO review
+        if(size == BITS32){
+            write8(0x87);
+            write8(srcReg.getNr() << 3 | 5);
+            write32(dstDisp);
+        } else if(size == BITS16){
+            write8(OSIZE_PREFIX);
+            write8(0x87);
+            write8(srcReg.getNr() << 3 | 5);
+            write32(dstDisp);
+        } else if(size == BITS8){
+            write8(0x86);
+            write8(srcReg.getNr() << 3 | 5);
+            write32(dstDisp);
+        }
 	}
 
 	/**
@@ -3835,9 +4224,16 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 */
 	public final void writeXOR(GPR dstReg, int dstDisp, GPR srcReg) {
         testSize(dstReg, mode.getSize());
-        testSize(srcReg, mode.getSize());
-		write1bOpcodeModRM(0x31, srcReg.getSize(), dstReg, dstDisp, srcReg
-				.getNr());
+        testSize(srcReg, BITS8 | BITS16 | BITS32 | BITS64);
+        int size = srcReg.getSize();
+        if ((size & (BITS32 | BITS64)) == size) {
+            write1bOpcodeModRM(0x31, size, dstReg, dstDisp, srcReg.getNr());
+        } else if( size == BITS16){
+            write8(OSIZE_PREFIX);
+            write1bOpcodeModRM(0x31, size, dstReg, dstDisp, srcReg.getNr());
+        } else if(size == BITS8){
+            write1bOpcodeModRM(0x30, size, dstReg, dstDisp, srcReg.getNr());
+        }
 	}
 
 	/**
