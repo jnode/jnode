@@ -32,7 +32,7 @@ import org.vmmagic.pragma.UninterruptiblePragma;
  *  
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public abstract class VmClassType extends VmType {
+public abstract class VmClassType<T> extends VmType<T> {
 
 	/** 
 	 * The Virtual method table of this class. 
@@ -67,7 +67,7 @@ public abstract class VmClassType extends VmType {
 	 */
 	public VmClassType(
 		String name,
-		VmNormalClass superClass,
+		VmNormalClass<? super T> superClass,
 		VmClassLoader loader,
 		int typeSize, ProtectionDomain protectionDomain) {
 		super(name, superClass, loader, typeSize, protectionDomain);
@@ -117,7 +117,7 @@ public abstract class VmClassType extends VmType {
 	 * @param allInterfaces
 	 * @return The tib
 	 */
-	protected Object[] prepareTIB(HashSet<VmInterfaceClass> allInterfaces) {
+	protected Object[] prepareTIB(HashSet<VmInterfaceClass<?>> allInterfaces) {
 		final VmNormalClass superClass = getSuperClass();
 		final TIBBuilder vmt;
 		
@@ -156,7 +156,7 @@ public abstract class VmClassType extends VmType {
 		// methods must have implemented all methods already.
 		ArrayList<VmInstanceMethod> syntheticAbstractMethods = null;
 		if (isAbstract()) {
-			for (VmInterfaceClass icls : allInterfaces) {
+			for (VmInterfaceClass<?> icls : allInterfaces) {
 				final int cnt = icls.getNoDeclaredMethods();
 				for (int j = 0; j < cnt; j++) {
 					final VmMethod mts = icls.getDeclaredMethod(j);
@@ -203,9 +203,9 @@ public abstract class VmClassType extends VmType {
 	 * @param allInterfaces
 	 * @return The builder
 	 */
-	protected IMTBuilder prepareIMT(HashSet<VmInterfaceClass> allInterfaces) {
+	protected IMTBuilder prepareIMT(HashSet<VmInterfaceClass<?>> allInterfaces) {
 		final IMTBuilder imtBuilder = new IMTBuilder();
-		for (VmType intf : allInterfaces) {
+		for (VmType<?> intf : allInterfaces) {
 			final int max = intf.getNoDeclaredMethods();
 			// Add all method of the current interface
 			for (int m = 0; m < max; m++) {

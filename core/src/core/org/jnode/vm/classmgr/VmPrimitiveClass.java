@@ -27,7 +27,7 @@ import java.security.ProtectionDomain;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class VmPrimitiveClass extends VmNormalClass {
+public final class VmPrimitiveClass<T> extends VmNormalClass<T> {
 
     /** Is this a floatingpoint type? */
     private final boolean floatingPoint;
@@ -44,7 +44,7 @@ public final class VmPrimitiveClass extends VmNormalClass {
      * @param loader
      * @param typeSize
      */
-    public VmPrimitiveClass(String name, VmNormalClass superClass,
+    public VmPrimitiveClass(String name, VmNormalClass<? super T> superClass,
             VmClassLoader loader, int jvmType, int typeSize, boolean floatingPoint, ProtectionDomain protectionDomain) {
         super(name, superClass, loader, typeSize, protectionDomain);
         this.jvmType = jvmType;

@@ -23,6 +23,7 @@ package org.jnode.vm.classmgr;
 
 import gnu.java.lang.VMClassHelper;
 
+import java.io.Serializable;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.security.ProtectionDomain;
@@ -43,14 +44,14 @@ import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.vmmagic.pragma.LoadStaticsPragma;
 import org.vmmagic.pragma.Uninterruptible;
 
-public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
+public abstract class VmType<T> extends VmSystemObject implements VmStaticsEntry,
 		Uninterruptible {
 
 	/**
 	 * The parent of this class. Normally VmClass instance, during loading
 	 * String instance
 	 */
-	private VmNormalClass superClass;
+	private VmNormalClass<? super T> superClass;
 
 	/** The classname of the parent of this class. */
 	private final String superClassName;
@@ -86,7 +87,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	private final VmClassLoader loader;
 
 	/** The corresponding java.lang.Class of this class */
-	private Class javaClass;
+	private Class<T> javaClass;
 
 	/** Have the references in the constant pool been resolved? */
 	private boolean resolvedCpRefs;
@@ -98,7 +99,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	private String arrayClassName;
 
 	/** The array class with this class as component type */
-	private VmArrayClass arrayClass;
+	private VmArrayClass<T[]> arrayClass;
 
 	/** Array containing all super classes and all implemented interfaces */
 	private VmType[] superClassesArray;
@@ -118,11 +119,11 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	/** The protection domain of this class */
 	private final ProtectionDomain protectionDomain;
 
-	private static VmNormalClass ObjectClass;
+	private static VmNormalClass<Object> ObjectClass;
 
-	private static VmInterfaceClass CloneableClass;
+	private static VmInterfaceClass<Cloneable> CloneableClass;
 
-	private static VmInterfaceClass SerializableClass;
+	private static VmInterfaceClass<Serializable> SerializableClass;
 
 	private static VmNormalClass BooleanClass;
 
@@ -142,23 +143,23 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 
 	private static VmNormalClass VoidClass;
 
-	private static VmArrayClass BooleanArrayClass;
+	private static VmArrayClass<boolean[]> BooleanArrayClass;
 
-	private static VmArrayClass ByteArrayClass;
+	private static VmArrayClass<byte[]> ByteArrayClass;
 
-	private static VmArrayClass CharArrayClass;
+	private static VmArrayClass<char[]> CharArrayClass;
 
-	private static VmArrayClass ShortArrayClass;
+	private static VmArrayClass<short[]> ShortArrayClass;
 
-	private static VmArrayClass IntArrayClass;
+	private static VmArrayClass<int[]> IntArrayClass;
 
-	private static VmArrayClass FloatArrayClass;
+	private static VmArrayClass<float[]> FloatArrayClass;
 
-	private static VmArrayClass LongArrayClass;
+	private static VmArrayClass<long[]> LongArrayClass;
 
-	private static VmArrayClass DoubleArrayClass;
+	private static VmArrayClass<double[]> DoubleArrayClass;
 
-	private static VmArrayClass ObjectArrayClass;
+	private static VmArrayClass<Object[]> ObjectArrayClass;
 
 	/**
 	 * Construct a new VmClass
@@ -182,7 +183,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 * @param loader
 	 * @param typeSize
 	 */
-	VmType(String name, VmNormalClass superClass, VmClassLoader loader,
+	VmType(String name, VmNormalClass<? super T> superClass, VmClassLoader loader,
 			int typeSize, ProtectionDomain protectionDomain) {
 		this(name, superClass, superClass.getName(), loader,
 				Modifier.ACC_PUBLIC, typeSize, protectionDomain);
@@ -200,7 +201,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 * @param protectionDomain
 	 *            the protection domain of this type.
 	 */
-	private VmType(String name, VmNormalClass superClass,
+	private VmType(String name, VmNormalClass<? super T> superClass,
 			String superClassName, VmClassLoader loader, int accessFlags,
 			int typeSize, ProtectionDomain protectionDomain) {
 		if (superClassName == null) {
@@ -337,7 +338,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 		Unsafe.debug("loadFromBootClassArray");
 		final int count = bootClasses.length;
 		for (int i = 0; i < count; i++) {
-			final VmType vmClass = bootClasses[i];
+			final VmType<?> vmClass = bootClasses[i];
 			final String name = vmClass.name;
 			if (vmClass.isPrimitive()) {
 				if (name.equals("boolean")) {
@@ -425,7 +426,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 * @param arrayClassName
 	 * @return The array class
 	 */
-	final VmArrayClass getArrayClass(String arrayClassName) {
+	final VmArrayClass<T[]> getArrayClass(String arrayClassName) {
 		if (arrayClass == null) {
 			arrayClass = createArrayClass(true, arrayClassName);
 		} else {
@@ -464,7 +465,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 * @param arrayClassName
 	 * @return VmClass
 	 */
-	private final VmArrayClass createArrayClass(boolean link,
+	private final VmArrayClass<T[]> createArrayClass(boolean link,
 			String arrayClassName) {
 		final String name;
 		if (arrayClassName != null) {
@@ -472,7 +473,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 		} else {
 			name = getArrayClassName();
 		}
-		final VmArrayClass arrayClass = new VmArrayClass(name,
+		final VmArrayClass<T[]> arrayClass = new VmArrayClass<T[]>(name,
 				this.getLoader(), this, -1, protectionDomain);
 		if (link) {
 			arrayClass.link();
@@ -485,7 +486,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 * 
 	 * @return The class
 	 */
-	public final static VmNormalClass getObjectClass() {
+	public final static VmNormalClass<Object> getObjectClass() {
 		if (ObjectClass == null) {
 			Unsafe.die("ObjectClass == null");
 		}
@@ -597,7 +598,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 * 
 	 * @return The class
 	 */
-	public final Class asClass() {
+	public final Class<T> asClass() {
 		return asClass(false);
 	}
 
@@ -607,7 +608,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 * 
 	 * @return The class
 	 */
-	public final Class asClassDuringBootstrap() {
+	public final Class<T> asClassDuringBootstrap() {
 		return asClass(true);
 	}
 
@@ -618,7 +619,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 * @param isBuildEnv
 	 * @return The class
 	 */
-	private final Class asClass(boolean isBuildEnv) {
+	private final Class<T> asClass(boolean isBuildEnv) {
 		if (javaClass == null) {
 			if (isBuildEnv) {
 				try {
@@ -626,7 +627,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 				} catch (ClassNotFoundException ex) { /* ignore */
 				}
 			} else {
-				javaClass = new Class(this);
+				javaClass = new Class<T>(this);
 			}
 		}
 		return javaClass;
@@ -637,7 +638,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 * 
 	 * @return The class
 	 */
-	public final VmNormalClass getSuperClass() {
+	public final VmNormalClass<? super T> getSuperClass() {
 		if (superClass != null) {
 			return superClass;
 		} else if (superClassName == null) {
@@ -1449,7 +1450,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 		try {
 			// Step 1a: Load the super class
 			if ((superClass == null) && (superClassName != null)) {
-				setSuperClass((VmNormalClass) loader.loadClass(superClassName,
+				setSuperClass((VmNormalClass<? super T>) loader.loadClass(superClassName,
 						false));
 			}
 
@@ -1483,7 +1484,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 		prepareForInstantiation();
 
 		/* Build the allInterfaceTable */
-		final HashSet<VmInterfaceClass> all = new HashSet<VmInterfaceClass>();
+		final HashSet<VmInterfaceClass<?>> all = new HashSet<VmInterfaceClass<?>>();
 		getAllInterfaces(all, this);
 		this.allInterfaceTable = new VmInterfaceClass[all.size()];
 		all.toArray(allInterfaceTable);
@@ -1629,7 +1630,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 * @param allInterfaces
 	 * @return The tib
 	 */
-	protected abstract Object[] prepareTIB(HashSet<VmInterfaceClass> allInterfaces);
+	protected abstract Object[] prepareTIB(HashSet<VmInterfaceClass<?>> allInterfaces);
 
 	/**
 	 * Prepare the interface method table
@@ -1637,7 +1638,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 * @param allInterfaces
 	 * @return The imt builder
 	 */
-	protected abstract IMTBuilder prepareIMT(HashSet<VmInterfaceClass> allInterfaces);
+	protected abstract IMTBuilder prepareIMT(HashSet<VmInterfaceClass<?>> allInterfaces);
 
 	/**
 	 * Create the super classes array for this type.
@@ -1647,12 +1648,12 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 *            class
 	 * @return The super classes array
 	 */
-	protected VmType[] createSuperClassesArray(HashSet<VmInterfaceClass> allInterfaces) {
+	protected VmType<?>[] createSuperClassesArray(HashSet<VmInterfaceClass<?>> allInterfaces) {
 
 		final int length = superClassDepth + 1 + allInterfaces.size();
 		final VmType[] array = new VmType[length];
 //		array[0] = this;
-		VmType superPtr = superClass;
+		VmType<? super T> superPtr = superClass;
 		for (int i = 0; i < superClassDepth; i++) {
 			array[superClassDepth - i - 1] = superPtr;
 			superPtr = superPtr.getSuperClass();
@@ -1682,7 +1683,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 *            A HashSet of VmInterfaceClass instances.
 	 * @param C
 	 */
-	private void getAllInterfaces(HashSet<VmInterfaceClass> all, VmType C) {
+	private void getAllInterfaces(HashSet<VmInterfaceClass<?>> all, VmType<?> C) {
 		while (C != null) {
 			final VmImplementedInterface[] it = C.interfaceTable;
 			if (it != null) {
@@ -1859,7 +1860,7 @@ public abstract class VmType extends VmSystemObject implements VmStaticsEntry,
 	 * @param superClass
 	 *            The superClass to set
 	 */
-	protected void setSuperClass(VmNormalClass superClass) {
+	protected void setSuperClass(VmNormalClass<? super T> superClass) {
 		if (superClass == null) {
 			throw new IllegalArgumentException("superClass cannot be null");
 		}

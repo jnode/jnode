@@ -37,7 +37,7 @@ import org.jnode.vm.classmgr.VmType;
  */
 public final class Class<T> implements Serializable {
 
-    private final VmType vmClass;
+    private final VmType<T> vmClass;
 
     private Constructor[] declaredConstructors;
 
@@ -66,7 +66,7 @@ public final class Class<T> implements Serializable {
      * 
      * @param vmClass
      */
-    public Class(VmType vmClass) {
+    public Class(VmType<T> vmClass) {
         if (vmClass == null) {
             throw new IllegalArgumentException("vmClass cannot be null");
         }
@@ -709,7 +709,7 @@ public final class Class<T> implements Serializable {
      * 
      * @return the JNode internal representation of this class.
      */
-    public final VmType getVmClass() {
+    public final VmType<T> getVmClass() {
         final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(new JNodePermission("getVmClass"));
@@ -766,7 +766,7 @@ public final class Class<T> implements Serializable {
      * 
      * @return
      */
-    private final VmType getLinkedVmClass() {
+    private final VmType<T> getLinkedVmClass() {
         vmClass.link();
         return vmClass;
     }

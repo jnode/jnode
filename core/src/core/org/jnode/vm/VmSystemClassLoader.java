@@ -269,7 +269,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * @return The loaded class
      * @throws ClassNotFoundException
      */
-    public VmType loadClass(String name, boolean resolve)
+    public VmType<?> loadClass(String name, boolean resolve)
             throws ClassNotFoundException, PrivilegedActionPragma {
 
         // Also implement the java.lang.ClassLoader principals here

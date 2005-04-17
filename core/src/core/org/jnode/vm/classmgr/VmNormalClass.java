@@ -26,7 +26,7 @@ import java.security.ProtectionDomain;
 /**
  * @author epr
  */
-public class VmNormalClass extends VmClassType {
+public class VmNormalClass<T> extends VmClassType<T> {
 
 	/** The offsets of all reference variables in this class */
 	private int[] referenceOffsets;
@@ -39,7 +39,7 @@ public class VmNormalClass extends VmClassType {
 	 * @param loader
 	 * @param typeSize
 	 */
-	protected VmNormalClass(String name, VmNormalClass superClass, VmClassLoader loader, int typeSize, ProtectionDomain protectionDomain) {
+	protected VmNormalClass(String name, VmNormalClass<? super T> superClass, VmClassLoader loader, int typeSize, ProtectionDomain protectionDomain) {
 		super(name, superClass, loader, typeSize, protectionDomain);
 		testClassType();
 	}
