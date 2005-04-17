@@ -39,10 +39,10 @@ import org.jnode.vm.VmSystemObject;
  * 
  * @author epr
  */
-public class BootableArrayList extends VmSystemObject implements List, RandomAccess {
+public class BootableArrayList<T> extends VmSystemObject implements List<T>, RandomAccess {
 
-	private ArrayList listCache;
-	private Object[] array;
+	private ArrayList<T> listCache;
+	private T[] array;
 	private int hashCode;
 	private transient boolean locked;
 
@@ -58,7 +58,7 @@ public class BootableArrayList extends VmSystemObject implements List, RandomAcc
 	 * in the order they are returned by the collection's iterator.
 	 * @param c
 	 */
-	public BootableArrayList(Collection c) {
+	public BootableArrayList(Collection<? extends T> c) {
 		addAll(c);
 	}
 
@@ -67,7 +67,7 @@ public class BootableArrayList extends VmSystemObject implements List, RandomAcc
 	 * @param initialCapacity
 	 */
 	public BootableArrayList(int initialCapacity) {
-		listCache = new ArrayList(initialCapacity);
+		listCache = new ArrayList<T>(initialCapacity);
 		hashCode = listCache.hashCode();
 	}
 
@@ -75,12 +75,12 @@ public class BootableArrayList extends VmSystemObject implements List, RandomAcc
 	 * Gets (an if needed reload) the arraylist.
 	 * @return
 	 */
-	private final ArrayList getListCache() {
+	private final ArrayList<T> getListCache() {
 		if (locked) {
 			throw new RuntimeException("Cannot change a locked BootableArrayList");
 		}
 		if (listCache == null) {
-			listCache = new ArrayList();
+			listCache = new ArrayList<T>();
 			if (array != null) {
 				listCache.addAll(Arrays.asList(array));
 			}
@@ -94,7 +94,7 @@ public class BootableArrayList extends VmSystemObject implements List, RandomAcc
 	 * @param o
 	 * @see java.util.AbstractList#add(int, java.lang.Object)
 	 */
-	public void add(int index, Object o) {
+	public void add(int index, T o) {
 		getListCache().add(index, o);
 	}
 
@@ -103,7 +103,7 @@ public class BootableArrayList extends VmSystemObject implements List, RandomAcc
 	 * @see java.util.AbstractList#add(java.lang.Object)
 	 * @return boolean
 	 */
-	public boolean add(Object o) {
+	public boolean add(T o) {
 		return getListCache().add(o);
 	}
 
@@ -112,7 +112,7 @@ public class BootableArrayList extends VmSystemObject implements List, RandomAcc
 	 * @see java.util.AbstractCollection#addAll(java.util.Collection)
 	 * @return boolean
 	 */
-	public boolean addAll(Collection c) {
+	public boolean addAll(Collection<? extends T> c) {
 		return getListCache().addAll(c);
 	}
 
@@ -122,7 +122,7 @@ public class BootableArrayList extends VmSystemObject implements List, RandomAcc
 	 * @see java.util.AbstractList#addAll(int, java.util.Collection)
 	 * @return boolean
 	 */
-	public boolean addAll(int index, Collection c) {
+	public boolean addAll(int index, Collection<? extends T> c) {
 		return getListCache().addAll(index, c);
 	}
 
@@ -200,7 +200,7 @@ public class BootableArrayList extends VmSystemObject implements List, RandomAcc
 	 * @see java.util.AbstractList#iterator()
 	 * @return the iterator
 	 */
-	public Iterator iterator() {
+	public Iterator<T> iterator() {
 		return getListCache().iterator();
 	}
 
@@ -217,7 +217,7 @@ public class BootableArrayList extends VmSystemObject implements List, RandomAcc
 	 * @see java.util.AbstractList#listIterator()
 	 * @return the iterator
 	 */
-	public ListIterator listIterator() {
+	public ListIterator<T> listIterator() {
 		return getListCache().listIterator();
 	}
 
@@ -226,7 +226,7 @@ public class BootableArrayList extends VmSystemObject implements List, RandomAcc
 	 * @see java.util.AbstractList#listIterator(int)
 	 * @return the iterator
 	 */
-	public ListIterator listIterator(int index) {
+	public ListIterator<T> listIterator(int index) {
 		return getListCache().listIterator(index);
 	}
 
@@ -235,7 +235,7 @@ public class BootableArrayList extends VmSystemObject implements List, RandomAcc
 	 * @see java.util.AbstractList#remove(int)
 	 * @return object
 	 */
-	public Object remove(int index) {
+	public T remove(int index) {
 		return getListCache().remove(index);
 	}
 
@@ -253,7 +253,7 @@ public class BootableArrayList extends VmSystemObject implements List, RandomAcc
 	 * @see java.util.AbstractCollection#removeAll(java.util.Collection)
 	 * @return boolean
 	 */
-	public boolean removeAll(Collection c) {
+	public boolean removeAll(Collection<?> c) {
 		return getListCache().removeAll(c);
 	}
 
@@ -272,7 +272,7 @@ public class BootableArrayList extends VmSystemObject implements List, RandomAcc
 	 * @see java.util.AbstractList#set(int, java.lang.Object)
 	 * @return object
 	 */
-	public Object set(int index, Object o) {
+	public T set(int index, T o) {
 		return getListCache().set(index, o);
 	}
 
@@ -282,7 +282,7 @@ public class BootableArrayList extends VmSystemObject implements List, RandomAcc
 	 * @see java.util.AbstractList#subList(int, int)
 	 * @return the sub list
 	 */
-	public List subList(int fromIndex, int toIndex) {
+	public List<T> subList(int fromIndex, int toIndex) {
 		return getListCache().subList(fromIndex, toIndex);
 	}
 
@@ -299,7 +299,7 @@ public class BootableArrayList extends VmSystemObject implements List, RandomAcc
 	 * @see java.util.AbstractCollection#toArray(java.lang.Object[])
 	 * @return the array
 	 */
-	public Object[] toArray(Object[] a) {
+	public <E> E[] toArray(E[] a) {
 		return getListCache().toArray(a);
 	}
 
@@ -326,7 +326,7 @@ public class BootableArrayList extends VmSystemObject implements List, RandomAcc
 	 * @param index
 	 * @return The element at the given index
 	 */
-	public Object get(int index) {
+	public T get(int index) {
 		return getListCache().get(index);
 	}
 
@@ -343,7 +343,7 @@ public class BootableArrayList extends VmSystemObject implements List, RandomAcc
 	public void verifyBeforeEmit() {
 		super.verifyBeforeEmit();
 		if (listCache != null) {
-			array = listCache.toArray();
+			array = (T[])listCache.toArray();
 			hashCode = listCache.hashCode();
 		} else {
 			array = null;

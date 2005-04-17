@@ -23,7 +23,6 @@ package org.jnode.util;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,10 +31,10 @@ import org.jnode.vm.VmSystemObject;
 /**
  * @author epr
  */
-public class BootableHashMap extends VmSystemObject implements Map {
+public class BootableHashMap<K, V> extends VmSystemObject implements Map<K, V> {
 
-	private HashMap mapCache;
-	private Entry[] entryArray;
+	private HashMap<K, V> mapCache;
+	private Entry<K, V>[] entryArray;
 	private int hashCode;
 	private transient boolean locked;
 	
@@ -53,7 +52,7 @@ public class BootableHashMap extends VmSystemObject implements Map {
 	 * @param initialCapacity
 	 */
 	public BootableHashMap(int initialCapacity) {
-		mapCache = new HashMap(initialCapacity);
+		mapCache = new HashMap<K, V>(initialCapacity);
 		this.hashCode = mapCache.hashCode();
 	}
 	
@@ -84,14 +83,14 @@ public class BootableHashMap extends VmSystemObject implements Map {
 	/**
 	 * @return The collection of values
 	 */
-	public Collection values() {
+	public Collection<V> values() {
 		return getMapCache().values();
 	}
 
 	/**
 	 * @return The set of keys
 	 */
-	public Set keySet() {
+	public Set<K> keySet() {
 		return getMapCache().keySet();
 	}
 
@@ -99,7 +98,7 @@ public class BootableHashMap extends VmSystemObject implements Map {
 	 * @param key
 	 * @return The object for the given key, or null if the given key is not found.
 	 */
-	public Object get(Object key) {
+	public V get(Object key) {
 		return getMapCache().get(key);
 	}
 
@@ -122,21 +121,21 @@ public class BootableHashMap extends VmSystemObject implements Map {
 	 * @param value
 	 * @return Object
 	 */
-	public Object put(Object key, Object value) {
+	public V put(K key, V value) {
 		return getMapCache().put(key, value);
 	}
 
 	/**
 	 * @param m
 	 */
-	public void putAll(Map m) {
+	public void putAll(Map<? extends K, ? extends V> m) {
 		getMapCache().putAll(m);
 	}
 
 	/**
 	 * @return The set of entries
 	 */
-	public Set entrySet() {
+	public Set<Map.Entry<K, V>> entrySet() {
 		return getMapCache().entrySet();
 	}
 
@@ -168,7 +167,7 @@ public class BootableHashMap extends VmSystemObject implements Map {
 	 * @param o
 	 * @return Object
 	 */
-	public Object remove(Object o) {
+	public V remove(Object o) {
 		return getMapCache().remove(o);
 	}
 
@@ -182,11 +181,11 @@ public class BootableHashMap extends VmSystemObject implements Map {
 
 
 
-	static final class Entry extends VmSystemObject {
-		private final Object key;
-		private final Object value;
+	static final class Entry<eK, eV> extends VmSystemObject {
+		private final eK key;
+		private final eV value;
 		
-		public Entry(Map.Entry entry) {
+		public Entry(Map.Entry<eK, eV> entry) {
 			this.key = entry.getKey();
 			this.value = entry.getValue();
 		}
@@ -195,7 +194,7 @@ public class BootableHashMap extends VmSystemObject implements Map {
 		 * Gets the key
 		 * @return Object
 		 */
-		public Object getKey() {
+		public eK getKey() {
 			return key;
 		}
 
@@ -203,7 +202,7 @@ public class BootableHashMap extends VmSystemObject implements Map {
 		 * Gets the value
 		 * @return Object
 		 */
-		public Object getValue() {
+		public eV getValue() {
 			return value;
 		}
 	}
@@ -212,16 +211,16 @@ public class BootableHashMap extends VmSystemObject implements Map {
 	 * Gets the hashmap
 	 * @return
 	 */
-	private final HashMap getMapCache() {
+	private final HashMap<K, V> getMapCache() {
 		if (locked) {
 			throw new RuntimeException("Cannot change a locked BootableHashMap");
 		}
 		if (mapCache == null) {
-			mapCache = new HashMap();
+			mapCache = new HashMap<K, V>();
 			if (entryArray != null) {
 				final int max = entryArray.length;
 				for (int i = 0; i < max; i++) {
-					final Entry e = entryArray[i];
+					final Entry<K, V> e = entryArray[i];
 					mapCache.put(e.getKey(), e.getValue());
 				}
 				entryArray = null;
@@ -239,8 +238,8 @@ public class BootableHashMap extends VmSystemObject implements Map {
 		if (mapCache != null) {
 			entryArray = new Entry[mapCache.size()];
 			int index = 0;
-			for (Iterator i = mapCache.entrySet().iterator(); i.hasNext(); ) {
-				entryArray[index++] = new Entry((Map.Entry)i.next());
+			for (Map.Entry<K, V> entry : mapCache.entrySet()) {
+				entryArray[index++] = new Entry<K, V>(entry);
 			}
 			hashCode = mapCache.hashCode();
 			mapCache = null;
