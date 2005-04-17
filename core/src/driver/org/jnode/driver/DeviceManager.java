@@ -41,7 +41,7 @@ public interface DeviceManager {
 	 * 
 	 * @return A collection of Device instances.
 	 */
-	public Collection getDevices();
+	public Collection<Device> getDevices();
 
 	/**
 	 * Returns a collection of all known devices that implement the given api. The collection is
@@ -51,7 +51,7 @@ public interface DeviceManager {
 	 * @param apiClass
 	 * @return A collection of Device instances.
 	 */
-	public Collection getDevicesByAPI(Class apiClass);
+	public Collection<Device> getDevicesByAPI(Class<? extends DeviceAPI> apiClass);
 
 	/**
 	 * Gets the device with the given ID.

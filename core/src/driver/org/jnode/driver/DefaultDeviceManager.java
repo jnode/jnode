@@ -109,7 +109,7 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
      * Refresh the list of finders, based on the mappers extension-point.
      * @param finders
      */
-    protected final void refreshFinders(List finders) {
+    protected final void refreshFinders(List<DeviceFinder> finders) {
         finders.clear();
         final Extension[] extensions = findersEP.getExtensions();
         BootLog.debug("Found " + extensions.length + " device finders");
@@ -128,7 +128,7 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
      * Refresh the list of mappers, based on the mappers extension-point.
      * @param mappers
      */
-    protected final void refreshMappers(List mappers) {
+    protected final void refreshMappers(List<DeviceToDriverMapper> mappers) {
         mappers.clear();
         final Extension[] extensions = mappersEP.getExtensions();
         BootLog.debug("Found " + extensions.length + " mapper extensions");
@@ -154,7 +154,7 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
      * @param finders
      * @param element
      */
-    private void configureFinder(List finders, ConfigurationElement element) {
+    private void configureFinder(List<DeviceFinder> finders, ConfigurationElement element) {
         final String className = element.getAttribute("class");
         BootLog.debug("Configure finder: class=" + className);
         if (className != null) {
@@ -183,7 +183,7 @@ public final class DefaultDeviceManager extends AbstractDeviceManager
      * @param mappers
      * @param element
      */
-    private void configureMapper(List mappers, ConfigurationElement element) {
+    private void configureMapper(List<DeviceToDriverMapper> mappers, ConfigurationElement element) {
         final String className = element.getAttribute("class");
         BootLog.debug("Configure mapper: class=" + className);
         if (className != null) {

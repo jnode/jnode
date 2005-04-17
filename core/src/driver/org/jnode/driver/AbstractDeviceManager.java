@@ -29,11 +29,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginException;
@@ -49,19 +47,19 @@ public abstract class AbstractDeviceManager implements DeviceManager
 {
 
     /** All registered devices */
-    private final Map devices = new HashMap();
+    private final Map<String, Device> devices = new HashMap<String, Device>();
 
     /** All registered device to driver mappers */
-    private final List mappers = new ArrayList();
+    private final List<DeviceToDriverMapper> mappers = new ArrayList<DeviceToDriverMapper>();
 
     /** All registered device finders */
-    private final List finders = new ArrayList();
+    private final List<DeviceFinder> finders = new ArrayList<DeviceFinder>();
 
     /** All listeners to my events */
-    private final List listeners = new LinkedList();
+    private final List<DeviceManagerListener> listeners = new LinkedList<DeviceManagerListener>();
 
     /** All listeners to device events */
-    private final List deviceListeners = new LinkedList();
+    private final List<DeviceListener> deviceListeners = new LinkedList<DeviceListener>();
 
     /** The system bus */
     private final Bus systemBus;
@@ -92,7 +90,7 @@ public abstract class AbstractDeviceManager implements DeviceManager
      * 
      * @return All known devices.
      */
-    final public Collection getDevices() {
+    final public Collection<Device> getDevices() {
         return Collections.unmodifiableCollection(devices.values());
     }
 
@@ -104,10 +102,9 @@ public abstract class AbstractDeviceManager implements DeviceManager
      * @param apiClass
      * @return All known devices the implement the given api.
      */
-    final public Collection getDevicesByAPI(Class apiClass) {
-        final Vector result = new Vector();
-        for (Iterator i = devices.values().iterator(); i.hasNext();) {
-            final Device dev = (Device) i.next();
+    public final Collection<Device> getDevicesByAPI(Class<? extends DeviceAPI> apiClass) {
+        final ArrayList<Device> result = new ArrayList<Device>();
+        for (Device dev : devices.values()) {
             if (dev.implementsAPI(apiClass)) {
                 result.add(dev);
             }
@@ -124,8 +121,7 @@ public abstract class AbstractDeviceManager implements DeviceManager
      *             No device with the given id was found.
      */
     final public Device getDevice(String id) throws DeviceNotFoundException {
-        Device device;
-        device = (Device) devices.get(id);
+        final Device device = devices.get(id);
         if (device == null) { throw new DeviceNotFoundException(id); }
         return device;
     }
@@ -401,12 +397,11 @@ public abstract class AbstractDeviceManager implements DeviceManager
      * it.
      */
     protected final void findDeviceDrivers() {
-        final List devices;
+        final List<Device> devices;
         synchronized (this) {
-            devices = new ArrayList(this.devices.values());
+            devices = new ArrayList<Device>(this.devices.values());
         }
-        for (Iterator i = devices.iterator(); i.hasNext();) {
-            final Device dev = (Device) i.next();
+        for (Device dev : devices) {
             if (dev.getDriver() == null) {
                 final Driver drv = findDriver(dev);
                 if (drv != null) {
@@ -429,32 +424,21 @@ public abstract class AbstractDeviceManager implements DeviceManager
      */
     final protected void findDevices() throws InterruptedException {
         waitUntilExtensionsLoaded();
-        final ArrayList finders;
+        final ArrayList<DeviceFinder> finders;
         synchronized( this ) {
-            finders = new ArrayList( this.finders );
+            finders = new ArrayList<DeviceFinder>( this.finders );
         }
-        for( Iterator i = finders.iterator(); i.hasNext(); ) {
-//            final DeviceFinder finder = (DeviceFinder) i.next();//this fails sometimes on my machine (5% of the time.)
-            //I can't find out why, the code below does a ClassCastTest.  Weird.
-            Object next = i.next();
-            if( next instanceof DeviceFinder ) {
-                try {
-                    DeviceFinder finder = (DeviceFinder)next;
-                    finder.findDevices( this, systemBus );
-                }
-                catch( DeviceException ex ) {
-                    BootLog.error( "Error while trying to find system devices", ex );
-                }
-                catch( RuntimeException ex ) {
-                    BootLog.error( "Runtime exception while trying to find system devices", ex );
-                }
+        for (DeviceFinder finder : finders) {
+            try {
+                finder.findDevices(this, systemBus);
+            } catch (DeviceException ex) {
+                BootLog.error("Error while trying to find system devices", ex);
+            } catch (RuntimeException ex) {
+                BootLog
+                        .error(
+                                "Runtime exception while trying to find system devices",
+                                ex);
             }
-            else{
-                String errorStr="Instance in DeviceFinder list of wrong type: "+next.getClass();
-                System.err.println( errorStr );
-                BootLog.error(errorStr );
-            }
-
         }
     }
 
@@ -467,10 +451,8 @@ public abstract class AbstractDeviceManager implements DeviceManager
      */
     final protected Driver findDriver(Device device) {
         synchronized (mappers) {
-            for (Iterator i = mappers.iterator(); i.hasNext();) {
-                final DeviceToDriverMapper mapper;
-                mapper = (DeviceToDriverMapper) i.next();
-                Driver drv = mapper.findDriver(device);
+            for (DeviceToDriverMapper mapper : mappers) {
+                final Driver drv = mapper.findDriver(device);
                 if (drv != null) {
                 //Syslog.debug("Found driver for " + device);
                 return drv; }
@@ -517,13 +499,12 @@ public abstract class AbstractDeviceManager implements DeviceManager
      * @param device
      */
     protected final void fireRegisteredEvent(Device device) {
-        final List list;
+        final List<DeviceManagerListener> list;
         synchronized (this.listeners) {
-            list = new ArrayList(this.listeners);
+            list = new ArrayList<DeviceManagerListener>(this.listeners);
         }
         final StopWatch sw = new StopWatch();
-        for (Iterator i = list.iterator(); i.hasNext();) {
-            final DeviceManagerListener l = (DeviceManagerListener) i.next();
+        for (DeviceManagerListener l : list) {
             sw.start();
             l.deviceRegistered(device);
             if (sw.isElapsedLongerThen(100)) {
@@ -539,13 +520,12 @@ public abstract class AbstractDeviceManager implements DeviceManager
      * @param device
      */
     protected final void fireUnregisterEvent(Device device) {
-        final List list;
+        final List<DeviceManagerListener> list;
         synchronized (this.listeners) {
-            list = new ArrayList(this.listeners);
+            list = new ArrayList<DeviceManagerListener>(this.listeners);
         }
         final StopWatch sw = new StopWatch();
-        for (Iterator i = list.iterator(); i.hasNext();) {
-            final DeviceManagerListener l = (DeviceManagerListener) i.next();
+        for (DeviceManagerListener l : list) {
             sw.start();
             l.deviceUnregister(device);
             if (sw.isElapsedLongerThen(100)) {
@@ -561,13 +541,12 @@ public abstract class AbstractDeviceManager implements DeviceManager
      * @param device
      */
     final public void fireStartedEvent(Device device) {
-        final List list;
+        final List<DeviceListener> list;
         synchronized (this.deviceListeners) {
-            list = new ArrayList(this.deviceListeners);
+            list = new ArrayList<DeviceListener>(this.deviceListeners);
         }
         final StopWatch sw = new StopWatch();
-        for (Iterator i = list.iterator(); i.hasNext();) {
-            final DeviceListener l = (DeviceListener) i.next();
+        for (DeviceListener l : list) {
             sw.start();
             l.deviceStarted(device);
             if (sw.isElapsedLongerThen(100)) {
@@ -583,13 +562,12 @@ public abstract class AbstractDeviceManager implements DeviceManager
      * @param device
      */
     public final void fireStopEvent(Device device) {
-        final List list;
+        final List<DeviceListener> list;
         synchronized (this.deviceListeners) {
-            list = new ArrayList(this.deviceListeners);
+            list = new ArrayList<DeviceListener>(this.deviceListeners);
         }
         final StopWatch sw = new StopWatch();
-        for (Iterator i = list.iterator(); i.hasNext();) {
-            final DeviceListener l = (DeviceListener) i.next();
+        for (DeviceListener l : list) {
             sw.start();
             l.deviceStop(device);
             if (sw.isElapsedLongerThen(100)) {
@@ -603,13 +581,13 @@ public abstract class AbstractDeviceManager implements DeviceManager
      * Refresh the list of finders, based on the mappers extension-point.
      * @param finders
      */
-    abstract protected void refreshFinders(List finders);
+    abstract protected void refreshFinders(List<DeviceFinder> finders);
 
     /**
      * Refresh the list of mappers, based on the mappers extension-point. 
      * @param mappers
      */
-    abstract protected void refreshMappers(List mappers);
+    abstract protected void refreshMappers(List<DeviceToDriverMapper> mappers);
     
     /**
      * The root bus of every system.
@@ -625,7 +603,7 @@ public abstract class AbstractDeviceManager implements DeviceManager
      * 
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
-    protected static class MapperComparator implements Comparator {
+    protected static class MapperComparator implements Comparator<DeviceToDriverMapper> {
 
         public static final MapperComparator INSTANCE = new MapperComparator();
 
@@ -635,7 +613,7 @@ public abstract class AbstractDeviceManager implements DeviceManager
          * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
          * @return int
          */
-        public int compare(Object o1, Object o2) {
+        public int compare(DeviceToDriverMapper o1, DeviceToDriverMapper o2) {
             final DeviceToDriverMapper m1 = (DeviceToDriverMapper) o1;
             final DeviceToDriverMapper m2 = (DeviceToDriverMapper) o2;
             final int ml1 = m1.getMatchLevel();
