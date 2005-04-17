@@ -21,6 +21,8 @@
  
 package org.jnode.driver.input;
 
+import org.jnode.driver.DeviceAPI;
+
 
 /**
  * API implemented by devices that can trigger a system inspection
@@ -28,7 +30,7 @@ package org.jnode.driver.input;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public interface SystemTriggerAPI {
+public interface SystemTriggerAPI extends DeviceAPI {
 
 	/**
 	 * Add a listener
