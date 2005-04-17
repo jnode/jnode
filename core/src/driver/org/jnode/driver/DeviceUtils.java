@@ -74,7 +74,7 @@ public class DeviceUtils {
 	 * @throws DeviceNotFoundException
 	 * @throws ApiNotFoundException
 	 */
-	public static DeviceAPI getAPI(String deviceID, Class api) 
+	public static  <T extends DeviceAPI> T getAPI(String deviceID, Class<T> api) 
 	throws DeviceNotFoundException, ApiNotFoundException
 	{
 		try {
@@ -92,7 +92,7 @@ public class DeviceUtils {
 	 * @param apiClass
 	 * @return All known devices the implement the given api.
 	 */
-	public static Collection getDevicesByAPI(Class apiClass) {
+	public static Collection<Device> getDevicesByAPI(Class<? extends DeviceAPI> apiClass) {
 		try {
 			return getDeviceManager().getDevicesByAPI(apiClass);
 		} catch (NameNotFoundException ex) {
