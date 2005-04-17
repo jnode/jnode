@@ -24,14 +24,14 @@ package org.jnode.util;
 /**
  * @author epr
  */
-public interface QueueProcessor {
+public interface QueueProcessor<T> {
 
 	/**
 	 * Process the given object from the queue.
 	 * @param object
 	 * @throws Exception
 	 */
-	public abstract void process(Object object)
+	public abstract void process(T object)
 	throws Exception;
 	
 }

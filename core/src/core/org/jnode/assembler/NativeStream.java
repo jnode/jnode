@@ -86,7 +86,7 @@ public abstract class NativeStream {
 	 * Gets all references of objects as instanceof ObjectRef
 	 * @return Collection
 	 */
-	public abstract Collection getObjectRefs();
+	public abstract Collection<? extends ObjectRef> getObjectRefs();
 
 	/**
 	 * Gets all unresolved references of objects as instanceof ObjectRef

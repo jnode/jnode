@@ -23,7 +23,6 @@ package org.jnode.vm;
 
 import java.io.PrintStream;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.jnode.system.ResourceManager;
@@ -59,9 +58,9 @@ public class Vm extends VmSystemObject implements Statistics {
 	/** The statics table */
 	private final VmStatics statics;
 	/** The list of all system processors */
-	private final List processors;
+	private final List<VmProcessor> processors;
 	/** All statistics */
-	private transient HashMap statistics;
+	private transient HashMap<String, Statistic> statistics;
 	/** The atom manager */
 	private final VmAtom.Manager atomManager;
     /** Lock for accessing the all threads list */
@@ -89,7 +88,7 @@ public class Vm extends VmSystemObject implements Statistics {
 		this.arch = arch;
 		this.heapManager = heapManager;
 		this.statics = statics;
-		this.processors = new BootableArrayList();
+		this.processors = new BootableArrayList<VmProcessor>();
 		this.atomManager = new VmAtom.Manager();
         this.allThreadsLock = new SpinLock();
         this.allThreads = new VmThreadQueue.AllThreadsQueue("all");
@@ -176,8 +175,7 @@ public class Vm extends VmSystemObject implements Statistics {
 			vm.heapManager.dumpStatistics(out);
 			final SecurityManager sm = System.getSecurityManager();
 			out.println("Security manager: " + sm);
-			for (Iterator i = vm.processors.iterator(); i.hasNext(); ) {
-				final VmProcessor cpu = (VmProcessor)i.next();
+			for (VmProcessor cpu : vm.processors) {
 				out.println("Processor " + vm.processors.indexOf(cpu));
 				cpu.dumpStatistics(out);
 			}
@@ -256,7 +254,7 @@ public class Vm extends VmSystemObject implements Statistics {
     
     private void addStatistic(String name, Statistic stat) {
         if (statistics == null) {
-            statistics = new HashMap();
+            statistics = new HashMap<String, Statistic>();
         }
         statistics.put(name, stat);
     }

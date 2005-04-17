@@ -51,8 +51,8 @@ public class PluginList {
 
 	public PluginList(File file, File defaultDir, String targetArch) throws PluginException, MalformedURLException {
 
-		final ArrayList descrList = new ArrayList();
-		final ArrayList pluginList = new ArrayList();
+		final ArrayList<URL> descrList = new ArrayList<URL>();
+		final ArrayList<URL> pluginList = new ArrayList<URL>();
 		final XMLElement root = new XMLElement(new Hashtable(), true, false);
 		try {
 			final FileReader r = new FileReader(file);
@@ -73,7 +73,7 @@ public class PluginList {
             throw new PluginException("name attribute is missing in " + file);
         }        
         
-		for (Iterator i = root.getChildren().iterator(); i.hasNext();) {
+		for (Iterator<?> i = root.getChildren().iterator(); i.hasNext();) {
 
 			final XMLElement e = (XMLElement) i.next();
 			if (e.getName().equals("plugin")) {
@@ -130,7 +130,7 @@ public class PluginList {
 
 	private Manifest parseManifest(XMLElement me) throws PluginException {
 		Manifest mf = new Manifest();
-		for (Iterator i = me.getChildren().iterator(); i.hasNext();) {
+		for (Iterator<?> i = me.getChildren().iterator(); i.hasNext();) {
 			final XMLElement e = (XMLElement) i.next();
 			if (e.getName().equals("attribute")) {
 				final String k = e.getStringAttribute("key");

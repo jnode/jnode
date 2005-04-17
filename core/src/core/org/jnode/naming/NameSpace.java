@@ -35,7 +35,7 @@ public interface NameSpace {
      * @param service
      * @throws NameAlreadyBoundException if the name already exists within this namespace
      */
-    public void bind(Class name, Object service) 
+    public <T> void bind(Class<T> name, T service) 
     throws NamingException, NameAlreadyBoundException;
     
     /**
@@ -44,17 +44,17 @@ public interface NameSpace {
      * returns without an error.
      * @param name
      */
-    public void unbind(Class name);
+    public void unbind(Class<?> name);
 
     /**
      * Lookup a service with a given name.
      * @param name
      * @throws NameNotFoundException if the name was not found in this namespace
      */
-    public Object lookup(Class name) throws NameNotFoundException;
+    public <T> T lookup(Class<T> name) throws NameNotFoundException;
 
     /**
      * Gets a set containing all names (Class) of the bound services.
      */
-    public Set nameSet();
+    public Set<Class<?>> nameSet();
 }

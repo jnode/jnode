@@ -26,7 +26,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Task;
@@ -57,7 +56,7 @@ public class BootFloppyBuilder extends Task {
 
     private String stage2ResourceName;
 
-    private ArrayList fileSets = new ArrayList();
+    private ArrayList<FileSet> fileSets = new ArrayList<FileSet>();
 
     /**
      * Build the boot floppy
@@ -148,8 +147,7 @@ public class BootFloppyBuilder extends Task {
             FileSystemException {
         final FatFileSystem fs = new FatFileSystem(device, false);
 
-        for (Iterator i = fileSets.iterator(); i.hasNext();) {
-            final FileSet fset = (FileSet) i.next();
+        for (FileSet fset : fileSets) {
             processFileSet(fs, fset);
         }
 
@@ -186,8 +184,7 @@ public class BootFloppyBuilder extends Task {
      */
     protected long getLastModified() {
         long lm = 0l;
-        for (Iterator i = fileSets.iterator(); i.hasNext();) {
-            final FileSet fset = (FileSet) i.next();
+        for (FileSet fset : fileSets) {
             lm = Math.max(lm, getLastModified(fset));
         }
         return lm;        

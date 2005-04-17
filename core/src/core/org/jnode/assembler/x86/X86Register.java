@@ -34,7 +34,7 @@ public class X86Register extends VmSystemObject implements X86Constants {
 
     //Register map, it should stand ahead of any register constant !!!
 
-    private static final BootableHashMap registerMap = new BootableHashMap();
+    private static final BootableHashMap<String, X86Register> registerMap = new BootableHashMap<String, X86Register>();
 
     /* 8-bit GPR registers */
     public static final GPR8 AL = new GPR8("al", 0);

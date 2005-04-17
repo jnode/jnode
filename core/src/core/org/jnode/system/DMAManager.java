@@ -30,7 +30,7 @@ package org.jnode.system;
 public interface DMAManager {
 
 	/** Name used to bind this service into the Initial Namespace */
-	public static final Class NAME = DMAManager.class;//"system/DMAService";
+	public static final Class<DMAManager> NAME = DMAManager.class;//"system/DMAService";
 	
 	/**
 	 * Claim a DMA channel identified by the given number.

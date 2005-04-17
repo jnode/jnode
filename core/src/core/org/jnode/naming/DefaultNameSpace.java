@@ -33,7 +33,7 @@ import javax.naming.NamingException;
 public class DefaultNameSpace implements NameSpace {
 
     /** All bound names+services */
-    protected final Map namespace = new HashMap();
+    protected final Map<Class<?>, Object> namespace = new HashMap<Class<?>, Object>();
 
     /**
      * Bind a given service in the namespace under a given name.
@@ -43,7 +43,7 @@ public class DefaultNameSpace implements NameSpace {
      * @throws NameAlreadyBoundException
      *             if the name already exists within this namespace
      */
-    public void bind(Class name, Object service) throws NamingException,
+    public <T> void bind(Class<T> name, T service) throws NamingException,
             NameAlreadyBoundException {
         if (name == null) {
             throw new IllegalArgumentException("name == null");
@@ -62,7 +62,7 @@ public class DefaultNameSpace implements NameSpace {
      * 
      * @param name
      */
-    public void unbind(Class name) {
+    public void unbind(Class<?> name) {
         synchronized (namespace) {
             namespace.remove(name);
         }
@@ -75,21 +75,21 @@ public class DefaultNameSpace implements NameSpace {
      * @throws NameNotFoundException
      *             if the name was not found in this namespace
      */
-    public Object lookup(Class name) throws NameNotFoundException {
+    public <T> T lookup(Class<T> name) throws NameNotFoundException {
         final Object result = namespace.get(name);
         if (result == null) {
             throw new NameNotFoundException(name.getName());
         }
-        return result;
+        return (T)result;
     }
 
     /**
      * Gets a set containing all names (Class) of the bound services.
      */
-    public Set nameSet() {
-        final Set result;
+    public Set<Class<?>> nameSet() {
+        final Set<Class<?>> result;
         synchronized (namespace) {
-            result = new HashSet(namespace.keySet());
+            result = new HashSet<Class<?>>(namespace.keySet());
         }
         return result;
     }

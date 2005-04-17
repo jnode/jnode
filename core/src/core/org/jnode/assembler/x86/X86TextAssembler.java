@@ -276,7 +276,7 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     /**
      * @see org.jnode.assembler.NativeStream#getObjectRefs()
      */
-    public Collection getObjectRefs() {
+    public Collection<? extends ObjectRef> getObjectRefs() {
         return null;
     }
 

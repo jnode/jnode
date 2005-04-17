@@ -71,11 +71,11 @@ public class InitJarProcessor {
      * 
      * @param piRegistry
      */
-    public List loadPlugins(PluginRegistryModel piRegistry) {
+    public List<PluginDescriptor> loadPlugins(PluginRegistryModel piRegistry) {
         if (jis == null) { return null; }
 
         final InitJarPluginLoader loader = new InitJarPluginLoader();
-        final ArrayList descriptors = new ArrayList();
+        final ArrayList<PluginDescriptor> descriptors = new ArrayList<PluginDescriptor>();
         JarEntry entry;
         try {
             while ((entry = jis.getNextJarEntry()) != null) {

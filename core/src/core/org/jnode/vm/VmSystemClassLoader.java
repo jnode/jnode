@@ -31,7 +31,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -54,7 +53,7 @@ import org.vmmagic.pragma.PrivilegedActionPragma;
  */
 public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
-    private transient TreeMap classInfos;
+    private transient TreeMap<String, ClassInfo> classInfos;
 
     private VmType[] bootClasses;
 
@@ -68,7 +67,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     private transient ObjectResolver resolver;
 
-    private Map systemRtJar;
+    private Map<String, byte[]> systemRtJar;
 
     //private static JarFile systemJarFile;
 
@@ -83,7 +82,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     private final VmStatics statics;
     
-    private transient HashSet failedClassNames;
+    private transient HashSet<String> failedClassNames;
 
     /**
      * Constructor for VmClassLoader.
@@ -104,7 +103,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     public VmSystemClassLoader(URL classesURL, VmArchitecture arch,
             ObjectResolver resolver) {
         this.classesURL = classesURL;
-        this.classInfos = new TreeMap();
+        this.classInfos = new TreeMap<String, ClassInfo>();
         this.parent = null;
         this.selectorMap = new SelectorMap();
         this.arch = arch;
@@ -119,7 +118,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      */
     public VmSystemClassLoader(ClassLoader classLoader) {
         this.classLoader = classLoader;
-        this.classInfos = new TreeMap();
+        this.classInfos = new TreeMap<String, ClassInfo>();
         this.parent = classLoader.getParent();
         final VmSystemClassLoader sysCl = VmSystem.getSystemClassLoader();
         this.selectorMap = sysCl.selectorMap;
@@ -133,11 +132,10 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * 
      * @return Collection
      */
-    public Collection getLoadedClasses() {
+    public Collection<VmType> getLoadedClasses() {
         if (classInfos != null) {
-            final ArrayList list = new ArrayList();
-            for (Iterator i = classInfos.values().iterator(); i.hasNext();) {
-                final ClassInfo ci = (ClassInfo) i.next();
+            final ArrayList<VmType> list = new ArrayList<VmType>();
+            for (ClassInfo ci : classInfos.values()) {
                 if (ci.isLoaded()) {
                     try {
                         list.add(ci.getVmClass());
@@ -148,7 +146,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
             }
             return list;
         } else {
-            final ArrayList list = new ArrayList();
+            final ArrayList<VmType> list = new ArrayList<VmType>();
             final VmType[] arr = bootClasses;
             final int count = arr.length;
             for (int i = 0; i < count; i++) {
@@ -212,8 +210,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         if (this.classInfos != null) {
             final VmType[] result = new VmType[ classInfos.size()];
             int j = 0;
-            for (Iterator i = classInfos.values().iterator(); i.hasNext();) {
-                final ClassInfo ci = (ClassInfo) i.next();
+            for (ClassInfo ci : classInfos.values()) {
                 result[ j++] = ci.getVmClass();
                 if (systemRtJar != null) {
                     final String cfName = ci.getName().replace('.', '/')
@@ -333,7 +330,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     
     private final void addFailedClassName(String name) {
     	if (failedClassNames == null) {
-    		failedClassNames = new HashSet();    		
+    		failedClassNames = new HashSet<String>();    		
     	}
     	failedClassNames.add(name);
     }
@@ -586,7 +583,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      */
     protected void initialize() {
         if (classInfos == null) {
-            final TreeMap classInfos = new TreeMap();
+            final TreeMap<String, ClassInfo> classInfos = new TreeMap<String, ClassInfo>();
             final VmType[] list = bootClasses;
             final int count = list.length;
             for (int i = 0; i < count; i++) {
@@ -626,7 +623,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * @param resources
      *            The systemRtJar to set
      */
-    public void setSystemRtJar(Map resources) {
+    public void setSystemRtJar(Map<String, byte[]> resources) {
         if (this.systemRtJar == null) {
             this.systemRtJar = resources;
         } else {

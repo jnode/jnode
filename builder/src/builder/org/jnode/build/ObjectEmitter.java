@@ -46,8 +46,8 @@ public class ObjectEmitter {
 	private final NativeStream os;
 	private final BootImageNativeStream bis;
 	private final PrintWriter debugWriter;
-	private final Set legalInstanceClasses;
-	private final HashMap fieldInfos = new HashMap();
+	private final Set<String> legalInstanceClasses;
+	private final HashMap<String, FieldInfo> fieldInfos = new HashMap<String, FieldInfo>();
 
 	/**
 	 * Construct a new ObjectEmitter *
@@ -57,7 +57,7 @@ public class ObjectEmitter {
 	 * @param debug
 	 * @param legalInstanceClasses
 	 */
-	public ObjectEmitter(VmClassLoader b, NativeStream os, PrintWriter debug, Set legalInstanceClasses) {
+	public ObjectEmitter(VmClassLoader b, NativeStream os, PrintWriter debug, Set<String> legalInstanceClasses) {
 		this.loaderContext = b;
 		this.os = os;
 		this.bis = (BootImageNativeStream)os;
@@ -76,7 +76,7 @@ public class ObjectEmitter {
 			return;
 		}
 
-		final Class cls = obj.getClass();
+		final Class<?> cls = obj.getClass();
 		try {
 			testForValidEmit(obj, cls.getName());
 		} catch (JNodeClassNotFoundException ex) {
@@ -196,7 +196,7 @@ public class ObjectEmitter {
 		}
 	}
 	
-	private void emitClass(Class c) throws BuildException {
+	private void emitClass(Class<?> c) throws BuildException {
 		try {
 			if (!c.isPrimitive()) {
 				// This layout should match the order and type of fields
@@ -249,7 +249,7 @@ public class ObjectEmitter {
 		os.write64(l.longValue()); // long value
 	}
 
-	private void emitArray(Class cls, Object obj, VmArrayClass vmClass) {
+	private void emitArray(Class<?> cls, Object obj, VmArrayClass vmClass) {
 		final Class cmpType = cls.getComponentType();
 		final int len = Array.getLength(obj);
 		vmClass.incTotalLength(len);
@@ -300,8 +300,8 @@ public class ObjectEmitter {
 		}
 	}
 
-	void emitObject(Class cls, Object obj) throws BuildException, ClassNotFoundException, JNodeClassNotFoundException {
-		final Class sCls = cls.getSuperclass();
+	void emitObject(Class<?> cls, Object obj) throws BuildException, ClassNotFoundException, JNodeClassNotFoundException {
+		final Class<?> sCls = cls.getSuperclass();
 		if (sCls != null) {
 			emitObject(sCls, obj);
 		}
@@ -332,7 +332,7 @@ public class ObjectEmitter {
 					    debugWriter.println(jnodeField.getName() + " transient: 0");
 					}
 				} else if (jnodeField.isPrimitive()) {
-					final Class fType = jdkField.getType();
+					final Class<?> fType = jdkField.getType();
 					if (debugWriter != null) {
 					    debugWriter.println(jdkField.getName() + " " + jdkField.get(obj));
 					}
@@ -380,7 +380,7 @@ public class ObjectEmitter {
 	 * @param jdkType
 	 * @throws ClassNotFoundException
 	 */
-	public FieldInfo getFieldInfo(Class jdkType) throws ClassNotFoundException, JNodeClassNotFoundException {
+	public FieldInfo getFieldInfo(Class<?> jdkType) throws ClassNotFoundException, JNodeClassNotFoundException {
 	    final String cname = jdkType.getName();
 	    FieldInfo info = (FieldInfo)fieldInfos.get(cname);
 	    if (info == null) {

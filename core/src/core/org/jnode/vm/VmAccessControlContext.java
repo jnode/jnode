@@ -25,6 +25,7 @@ import java.security.AccessControlException;
 import java.security.Permission;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Representation of the current access control context.
@@ -43,7 +44,7 @@ public final class VmAccessControlContext {
      */
     public VmAccessControlContext(ProtectionDomain[] context,
             VmAccessControlContext inheritedContext) {
-        final ArrayList ctxList = new ArrayList();
+        final ArrayList<ProtectionDomain> ctxList = new ArrayList<ProtectionDomain>();
         if (context != null) {
             addUniqueToList(ctxList, context);
         }
@@ -119,7 +120,7 @@ public final class VmAccessControlContext {
         return h;
     }
 
-    private final void addUniqueToList(ArrayList ctxList,
+    private final void addUniqueToList(List<ProtectionDomain> ctxList,
             ProtectionDomain[] context) {
         final int count = context.length;
         for (int i = 0; i < count; i++) {

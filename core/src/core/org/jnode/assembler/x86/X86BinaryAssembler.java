@@ -151,7 +151,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 		private boolean isRelJump;
 
-		private LinkedList unresolvedLinks; // Array of data_offsets where
+		private LinkedList<UnresolvedOffset> unresolvedLinks; // Array of data_offsets where
 
 		public X86ObjectRef(Object object) {
 			super(object);
@@ -163,7 +163,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 		public void addUnresolvedLink(int offset, int patchSize) {
 			if (unresolvedLinks == null) {
-				unresolvedLinks = new LinkedList();
+				unresolvedLinks = new LinkedList<UnresolvedOffset>();
 			}
 			unresolvedLinks.add(new UnresolvedOffset(offset, patchSize));
 		}
@@ -180,7 +180,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			int cnt = unresolvedLinks.size();
 			int[] offsets = new int[cnt];
 			int ofs = 0;
-			for (Iterator i = unresolvedLinks.iterator(); i.hasNext(); ofs++) {
+			for (Iterator<UnresolvedOffset> i = unresolvedLinks.iterator(); i.hasNext(); ofs++) {
 				offsets[ofs] = ((UnresolvedOffset) i.next()).getOffset();
 			}
 			return offsets;
@@ -230,7 +230,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			this.dataOffset = offset;
 			if (unresolvedLinks != null) {
 				// Link all unresolved links
-				for (Iterator i = unresolvedLinks.iterator(); i.hasNext();) {
+				for (Iterator<UnresolvedOffset> i = unresolvedLinks.iterator(); i.hasNext();) {
 					final UnresolvedOffset unrOfs = (UnresolvedOffset) i.next();
 					final int addr = unrOfs.getOffset();
 					if (unrOfs.getPatchSize() == 4) {
@@ -312,7 +312,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	private int m_used;
 
-	private Map objectRefs; // Integer(labelnr),Integer(offset)
+	private Map<Key, X86ObjectRef> objectRefs; // Integer(labelnr),Integer(offset)
 
 	private ObjectResolver resolver;
 
@@ -457,10 +457,10 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			throw new NullPointerException("Key cannot be null");
 		}
 		if (objectRefs == null) {
-			objectRefs = new HashMap(initialObjectRefsCapacity);
+			objectRefs = new HashMap<Key, X86ObjectRef>(initialObjectRefsCapacity);
 		}
 		Key key = new Key(keyObj);
-		ObjectRef ref = (ObjectRef) objectRefs.get(key);
+        X86ObjectRef ref = objectRefs.get(key);
 		if (ref != null) {
 			return ref;
 		}
@@ -474,9 +474,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * 
 	 * @return Collection
 	 */
-	public final Collection getObjectRefs() {
+	public final Collection<X86ObjectRef> getObjectRefs() {
 		if (objectRefs == null) {
-			objectRefs = new HashMap(initialObjectRefsCapacity);
+			objectRefs = new HashMap<Key, X86ObjectRef>(initialObjectRefsCapacity);
 		}
 		return objectRefs.values();
 	}
@@ -501,11 +501,10 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * 
 	 * @return Collection
 	 */
-	public final Collection getUnresolvedObjectRefs() {
-		final Collection coll = getObjectRefs();
-		final LinkedList result = new LinkedList();
-		for (Iterator i = coll.iterator(); i.hasNext();) {
-			final ObjectRef ref = (ObjectRef) i.next();
+	public final Collection<ObjectRef> getUnresolvedObjectRefs() {
+		final Collection<X86ObjectRef> coll = getObjectRefs();
+		final LinkedList<ObjectRef> result = new LinkedList<ObjectRef>();
+		for (X86ObjectRef ref : coll) {
 			if (!ref.isResolved()) {
 				if (!(ref.getObject() instanceof Label)) {
 					result.add(ref);
@@ -522,9 +521,8 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @return True if there are unresolved references, false otherwise
 	 */
 	public final boolean hasUnresolvedObjectRefs() {
-		final Collection coll = getObjectRefs();
-		for (Iterator i = coll.iterator(); i.hasNext();) {
-			final ObjectRef ref = (ObjectRef) i.next();
+		final Collection<X86ObjectRef> coll = getObjectRefs();
+		for (ObjectRef ref : coll) {
 			if (!ref.isResolved()) {
 				if (!(ref.getObject() instanceof Label)) {
 					return true;

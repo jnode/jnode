@@ -26,10 +26,10 @@ import java.util.ArrayList;
 /**
  * @author epr
  */
-public class Queue {
+public class Queue<T> {
 
 	/** The actual queue */
-	private final ArrayList queue = new ArrayList();
+	private final ArrayList<T> queue = new ArrayList<T>();
 	private boolean closed = false;
 
 	/**
@@ -41,7 +41,7 @@ public class Queue {
 	 * @return Object The first object in the queue, or null if the queue has
 	 * 	been closed, a timeout occurs, or the current thread is interrupted (and ignoreInterruptions is false). 
 	 */
-	public synchronized Object get(boolean ignoreInteruptions, long timeout) {
+	public synchronized T get(boolean ignoreInteruptions, long timeout) {
 		while (queue.isEmpty()) {
 			if (closed) {
 				return null;
@@ -58,9 +58,8 @@ public class Queue {
 				return null;
 			}
 		}
-		Object result = queue.get(0);
-		queue.remove(0);
-		return result;
+		//T result = queue.get(0);
+		return queue.remove(0);
 	}
 
 	/**
@@ -70,7 +69,7 @@ public class Queue {
 	 * @return Object The first object in the queue, or null if the queue has
 	 * 	been closed, or a timeout occurs. 
 	 */
-	public Object get(long timeout) {
+	public T get(long timeout) {
 		return get(true, timeout);
 	}
 
@@ -82,7 +81,7 @@ public class Queue {
 	 * @return Object The first object in the queue, or null if the queue has
 	 * 	been closed, or the current thread is interrupted (and ignoreInterruptions is false). 
 	 */
-	public Object get(boolean ignoreInteruptions) {
+	public T get(boolean ignoreInteruptions) {
 		return get(ignoreInteruptions, 0);
 	}
 	
@@ -91,7 +90,7 @@ public class Queue {
 	 * and the returns element is remove from the queue.
 	 * @return Object
 	 */
-	public Object get() {
+	public T get() {
 		return get(true, 0);
 	}
 
@@ -100,7 +99,7 @@ public class Queue {
 	 * @param object
 	 * @throws SecurityException If the queue has been closed.
 	 */
-	public synchronized void add(Object object) 
+	public synchronized void add(T object) 
 	throws SecurityException {
 		if (closed) {
 			throw new SecurityException("Cannot add to a closed queue.");
@@ -115,7 +114,7 @@ public class Queue {
 	 * @param object
 	 * @throws SecurityException If the queue has been closed.
 	 */
-	public synchronized void remove(Object object) 
+	public synchronized void remove(T object) 
 	throws SecurityException {
 		if (closed) {
 			throw new SecurityException("Cannot remove from a closed queue.");
@@ -130,7 +129,7 @@ public class Queue {
 	 * @param object
 	 * @return boolean
 	 */
-	public boolean contains(Object object) {
+	public boolean contains(T object) {
 		return queue.contains(object);
 	}
 

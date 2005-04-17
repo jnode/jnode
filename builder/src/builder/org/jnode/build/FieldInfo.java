@@ -44,10 +44,10 @@ public final class FieldInfo {
     private final Field[] jdkStaticFields;
 
     /** All declared instance fields in the jnode type */
-    private final List jnodeInstanceFields;
+    private final List<VmField> jnodeInstanceFields;
 
     /** All declared static fields in the jnode type */
-    private final List jnodeStaticFields;
+    private final List<VmField> jnodeStaticFields;
     
     private boolean exact = true;
     
@@ -56,7 +56,7 @@ public final class FieldInfo {
      * @param jdkType
      * @param jnodeType
      */
-    public FieldInfo(Class jdkType, VmType jnodeType) {
+    public FieldInfo(Class<?> jdkType, VmType jnodeType) {
         this.jdkFields = jdkType.getDeclaredFields();
         
         this.jnodeInstanceFields = getInstanceFields(jnodeType);
@@ -111,7 +111,7 @@ public final class FieldInfo {
      * @param jdkType
      * @param jnodeFields
      */
-    private final Field[] toJdkFields(Class jdkType, List jnodeFields) {
+    private final Field[] toJdkFields(Class jdkType, List<VmField> jnodeFields) {
         final int cnt = jnodeFields.size();
         final Field[] jdkFields = new Field[cnt];
         for (int i = 0; i < cnt; i++) {
@@ -143,10 +143,10 @@ public final class FieldInfo {
      * Gets the number of static fields declared in the given type.
      * @param jnodeType
      */
-    private static List getStaticFields(VmType jnodeType) {
+    private static List<VmField> getStaticFields(VmType jnodeType) {
     	if (jnodeType != null) {
     		final int all = jnodeType.getNoDeclaredFields();
-    		final ArrayList list = new ArrayList(all);
+    		final ArrayList<VmField> list = new ArrayList<VmField>(all);
     		for (int i = 0; i < all; i++) {
     			final VmField f = jnodeType.getDeclaredField(i);
     			if (f.isStatic()) {
@@ -155,7 +155,7 @@ public final class FieldInfo {
     		}
     		return list;
     	} else {
-    		return new ArrayList(0);
+    		return new ArrayList<VmField>(0);
     	}
     }
 
@@ -163,10 +163,10 @@ public final class FieldInfo {
      * Gets the number of instance fields declared in the given type.
      * @param jnodeType
      */
-    private static List getInstanceFields(VmType jnodeType) {
+    private static List<VmField> getInstanceFields(VmType jnodeType) {
     	if (jnodeType != null) {
     		final int all = jnodeType.getNoDeclaredFields();
-    		final ArrayList list = new ArrayList(all);
+    		final ArrayList<VmField> list = new ArrayList<VmField>(all);
     		for (int i = 0; i < all; i++) {
     			final VmField f = jnodeType.getDeclaredField(i);
     			if (!f.isStatic()) {
@@ -175,7 +175,7 @@ public final class FieldInfo {
     		}
     		return list;
     	} else {
-    		return new ArrayList(0);
+    		return new ArrayList<VmField>(0);
     	}
     }
 }

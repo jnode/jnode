@@ -49,7 +49,7 @@ public class ProtocolHandlerFactoryPlugin extends Plugin implements
         URLStreamHandlerFactory, ExtensionPointListener  {
 
     private final ExtensionPoint handlersEp;
-    private final HashMap handlerClasses = new HashMap();
+    private final HashMap<String, Class<? extends URLStreamHandler>> handlerClasses = new HashMap<String, Class<? extends URLStreamHandler>>();
     
     /**
      * @param descriptor
@@ -88,7 +88,7 @@ public class ProtocolHandlerFactoryPlugin extends Plugin implements
      * @see java.net.URLStreamHandlerFactory#createURLStreamHandler(java.lang.String)
      */
     public synchronized URLStreamHandler createURLStreamHandler(String protocol) {
-        final Class cls = (Class)handlerClasses.get(protocol);
+        final Class<? extends URLStreamHandler> cls = handlerClasses.get(protocol);
         if (cls != null) {
             try {
                 return (URLStreamHandler)cls.newInstance();
@@ -145,7 +145,7 @@ public class ProtocolHandlerFactoryPlugin extends Plugin implements
                 final String className = elem.getAttribute("class");
                 if ((protocol != null) && (className != null)) {
                     try {
-                        final Class cls = cl.loadClass(className);
+                        final Class<? extends URLStreamHandler> cls = cl.loadClass(className);
                         handlerClasses.put(protocol, cls);
                     } catch (ClassNotFoundException ex) {
                         BootLog.error("Cannot load protocol handler class " + className);
