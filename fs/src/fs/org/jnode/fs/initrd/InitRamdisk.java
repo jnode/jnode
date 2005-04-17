@@ -21,6 +21,8 @@
  
 package org.jnode.fs.initrd;
 
+import java.io.IOException;
+
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
@@ -31,6 +33,7 @@ import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.block.ramdisk.RamDiskDevice;
 import org.jnode.driver.block.ramdisk.RamDiskDriver;
+import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
 import org.jnode.fs.fat.Fat;
@@ -71,11 +74,16 @@ public class InitRamdisk extends Plugin {
 
             log.info("Format initrd ramdisk");
 
-            FileSystemService fileSystemService = (FileSystemService) InitialNaming
+            final FileSystemService fileSystemService = (FileSystemService) InitialNaming
                     .lookup(FileSystemService.NAME);
-            FileSystemType type = fileSystemService
+            final FileSystemType type = fileSystemService
                     .getFileSystemTypeForNameSystemTypes(FatFileSystemType.NAME);
-            type.format(dev, new Integer(Fat.FAT16));
+            final FileSystem fs = type.format(dev, new Integer(Fat.FAT16));
+            try {
+                fs.getRootEntry().getDirectory().addDirectory("tmp");
+            } catch (IOException ex) {
+                log.error("Cannot create tmp on ramdisk");
+            }
 
             // restart the device
             log.info("Restart initrd ramdisk");
