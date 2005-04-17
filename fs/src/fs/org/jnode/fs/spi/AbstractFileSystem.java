@@ -23,7 +23,6 @@ package org.jnode.fs.spi;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
@@ -54,10 +53,10 @@ public abstract class AbstractFileSystem implements FileSystem {
     private FSEntry rootEntry;
 
     // cache of FSFile (key: FSEntry)
-    private HashMap files = new HashMap();
+    private HashMap<FSEntry, FSFile> files = new HashMap<FSEntry, FSFile>();
     
     // cache of FSDirectory (key: FSEntry)
-    private HashMap directories = new HashMap();
+    private HashMap<FSEntry, FSDirectory> directories = new HashMap<FSEntry, FSDirectory>();
 
     /**
      * Construct an AbstractFileSystem in specified readOnly mode
@@ -205,8 +204,7 @@ public abstract class AbstractFileSystem implements FileSystem {
 	final private void flushFiles() throws IOException
 	{
 		log.info("flushing files ...");
-		for (Iterator i = files.values().iterator(); i.hasNext();) {
-			final FSFile f = (FSFile)i.next();
+		for (FSFile f : files.values()) {
 			log.debug("flush: flushing file "+f);			
 			f.flush();
 		}		
@@ -244,8 +242,7 @@ public abstract class AbstractFileSystem implements FileSystem {
 	final private void flushDirectories() throws IOException
 	{
 		log.info("flushing directories ...");
-		for (Iterator i = directories.values().iterator(); i.hasNext();) {
-			final FSDirectory d = (FSDirectory)i.next();
+		for (FSDirectory d : directories.values()) {
 			log.debug("flush: flushing directory "+d);
 			
 			//TODO: uncomment this line

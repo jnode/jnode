@@ -48,7 +48,7 @@ class LfnEntry implements FSEntry {
 		fileName = longName.trim();
 	}
 
-	public LfnEntry(FatLfnDirectory parent, Vector entries, int offset, int length) {
+	public LfnEntry(FatLfnDirectory parent, Vector<?> entries, int offset, int length) {
 		this.parent = parent;
 		StringBuffer name = new StringBuffer();
 		// this is just an old plain 8.3 entry, copy it;

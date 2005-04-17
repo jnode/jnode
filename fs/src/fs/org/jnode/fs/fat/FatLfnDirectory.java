@@ -37,8 +37,8 @@ import org.jnode.fs.ReadOnlyFileSystemException;
  */
 public class FatLfnDirectory extends FatDirectory {
 
-	private HashMap shortNameIndex = new HashMap();
-	private HashMap longFileNameIndex = new HashMap();
+	private HashMap<String, LfnEntry> shortNameIndex = new HashMap<String, LfnEntry>();
+	private HashMap<String, LfnEntry> longFileNameIndex = new HashMap<String, LfnEntry>();
 
 	/**
 	 * @param fs
@@ -168,11 +168,10 @@ public class FatLfnDirectory extends FatDirectory {
 	}
 	private void updateLFN() throws IOException{
 		//System.out.println("Update LFN");
-		Iterator allEntries = shortNameIndex.values().iterator();
-		Vector destination = new Vector();
+		//Iterator allEntries = shortNameIndex.values().iterator();
+		Vector<FatBasicDirEntry> destination = new Vector<FatBasicDirEntry>();
 
-		while (allEntries.hasNext()) {
-			LfnEntry currentEntry = (LfnEntry)allEntries.next();
+        for (LfnEntry currentEntry : shortNameIndex.values()) {
 			FatBasicDirEntry[] encoded = currentEntry.compactForm();
 			for (int i = 0; i < encoded.length; i++) {
 				destination.add(encoded[i]);
@@ -216,14 +215,14 @@ public class FatLfnDirectory extends FatDirectory {
 	public FSEntryIterator iterator() {
 		return new FSEntryIterator()
 		{
-			Iterator it = shortNameIndex.values().iterator();
+			Iterator<LfnEntry> it = shortNameIndex.values().iterator();
 			
 			public boolean hasNext() {
 				return it.hasNext();
 			}
 
 			public FSEntry next() {
-				return (FSEntry) it.next();
+				return it.next();
 			}			
 		};
 	}
