@@ -50,6 +50,9 @@ public class X86Core extends AssemblerModule {
     private static final int ABS_ARG = 4;
     private static final int SCL_ARG = 5;
     private static final int ZSC_ARG = 6;
+    private static final int SEG_ARG = 7;
+
+    private static final String[] ARG_TYPES = {"noargument", "constant", "register", "relative", "absolute", "scaled", "simplescaled", "segment"};
 
     private static final int DISP = 3;
     private static final int DISP_MASK = ((2 << (DISP - 1)) - 1);
@@ -61,13 +64,17 @@ public class X86Core extends AssemblerModule {
     private static final int RC_ADDR = REG_ARG | CON_ARG << DISP;
     private static final int RE_ADDR = REG_ARG | REL_ARG << DISP;
     private static final int RA_ADDR = REG_ARG | ABS_ARG << DISP;
+    private static final int RS_ADDR = REG_ARG | SCL_ARG << DISP;
+    private static final int RZ_ADDR = REG_ARG | ZSC_ARG << DISP;
     private static final int CR_ADDR = CON_ARG | REG_ARG << DISP;
     private static final int E_ADDR = REL_ARG;
     private static final int ER_ADDR = REL_ARG | REG_ARG << DISP;
     private static final int EC_ADDR = REL_ARG | CON_ARG << DISP;
+    private static final int A_ADDR = ABS_ARG;
     private static final int AC_ADDR = ABS_ARG | CON_ARG << DISP;
-
-    private static final String[] ARG_TYPES = {"noargument", "constant", "register", "relative", "absolute", "scaled", "simplescaled"};
+    private static final int AR_ADDR = ABS_ARG | REG_ARG << DISP;
+    private static final int S_ADDR = SCL_ARG;
+    private static final int SR_ADDR = SCL_ARG | REG_ARG << DISP;
 
     private final Object[] args = new Object[3];
 
@@ -91,7 +98,9 @@ public class X86Core extends AssemblerModule {
                     ret |= REG_ARG << DISP * i;
                 } else if (o instanceof Address) {
                     Address ind = (Address) o;
-                    if (ind.reg != null && ind.sreg != null) {
+                    if (ind.segment){
+                        ret |= SEG_ARG << DISP * i;
+                    } else if (ind.reg != null && ind.sreg != null) {
                         ret |= SCL_ARG << DISP * i;
                     } else if (ind.reg != null && ind.sreg == null) {
                         ret |= REL_ARG << DISP * i;
@@ -130,7 +139,8 @@ public class X86Core extends AssemblerModule {
 
     public static final int ADC_ISN = 0;
     public static final int ADD_ISN = ADC_ISN + 1;
-    public static final int AND_ISN = ADD_ISN + 1;
+    public static final int ALIGN_ISN = ADD_ISN + 1;
+    public static final int AND_ISN = ALIGN_ISN + 1;
     public static final int CALL_ISN = AND_ISN + 1;
     public static final int CLD_ISN = CALL_ISN + 1;
     public static final int CLI_ISN = CLD_ISN + 1;
@@ -164,7 +174,9 @@ public class X86Core extends AssemblerModule {
     public static final int JECXZ_ISN = JZ_ISN + 1;
     public static final int LDMXCSR_ISN = JECXZ_ISN + 1;
     public static final int LEA_ISN = LDMXCSR_ISN + 1;
-    public static final int LMSW_ISN = LEA_ISN + 1;
+    public static final int LGDT_ISN = LEA_ISN + 1;
+    public static final int LIDT_ISN = LGDT_ISN + 1;
+    public static final int LMSW_ISN = LIDT_ISN + 1;
     public static final int LODSW_ISN = LMSW_ISN + 1;
     public static final int LOOP_ISN = LODSW_ISN + 1;
     public static final int LTR_ISN = LOOP_ISN + 1;
@@ -234,6 +246,9 @@ public class X86Core extends AssemblerModule {
                 break;
             case ADD_ISN:
                 emmitADD();
+                break;
+            case ALIGN_ISN:
+                emmitALIGN();
                 break;
             case AND_ISN:
                 emmitAND();
@@ -335,6 +350,12 @@ public class X86Core extends AssemblerModule {
                 break;
             case LEA_ISN:
                 emmitLEA();
+                break;
+            case LGDT_ISN:
+                emmitLGDT();
+                break;
+            case LIDT_ISN:
+                emmitLIDT();
                 break;
             case LMSW_ISN:
                 emmitLMSW();
@@ -486,9 +507,22 @@ public class X86Core extends AssemblerModule {
                 ind = getAddress(0);
                 stream.writeADD(operandSize, getRegister(ind.getImg()), ind.disp, getInt(1));
                 break;
+            case AC_ADDR:
+                stream.writeADD(operandSize, getAddress(0).disp, getInt(1));
+                break;
             default:
                 reportAddressingError(ADD_ISN, addr);
         }
+    }
+
+    private final void emmitALIGN() {
+        Object o1 = operands.get(0);
+        if (o1 instanceof Integer) {
+            stream.align(((Integer)o1).intValue());
+        } else {
+            throw new IllegalArgumentException("Unknown operand: " + o1);
+        }
+
     }
 
     private final void emmitAND() {
@@ -512,6 +546,9 @@ public class X86Core extends AssemblerModule {
                 ind = getAddress(0);
                 stream.writeAND(operandSize, getRegister(ind.getImg()), ind.disp, getInt(1));
                 break;
+            case AC_ADDR:
+                stream.writeAND(operandSize, getAddress(0).disp, getInt(1));
+                break;
             default:
                 reportAddressingError(AND_ISN, addr);
         }
@@ -526,6 +563,19 @@ public class X86Core extends AssemblerModule {
             Label lab = (Label) labels.get(id);
             lab = (lab == null) ? new Label(id) : lab;
             stream.writeCALL(lab);
+        } else if (o1 instanceof Address) {
+            Address ind = (Address) o1;
+            if (ind.reg != null && ind.sreg != null) {
+                throw new IllegalArgumentException("Scaled is not supported for call ");
+            } else if (ind.reg != null && ind.sreg == null) {
+                stream.writeCALL(getRegister(ind.getImg()), ind.disp);
+            } else if (ind.reg == null && ind.sreg != null) {
+                throw new IllegalArgumentException("Simple scaled is not supported for call ");
+            } else if (ind.reg == null && ind.sreg == null) {
+                throw new IllegalArgumentException("Absolute is not supported for call ");
+            } else {
+                throw new IllegalArgumentException("Unknown indirect: " + ind);
+            }
         } else {
             throw new IllegalArgumentException("Unknown operand: " + o1);
         }
@@ -733,6 +783,13 @@ public class X86Core extends AssemblerModule {
                 Address ind = getAddress(0);
                 stream.writeINC(operandSize, getRegister(ind.getImg()), ind.disp);
                 break;
+            case A_ADDR:
+                stream.writeINC(operandSize, getAddress(0).disp);
+                break;
+            case S_ADDR:
+                ind = getAddress(0);
+                stream.writeINC(operandSize, getRegister(ind.getImg()), getRegister(ind.sreg), ind.scale, ind.disp);
+                break;
             default:
                 reportAddressingError(INC_ISN, addr);
         }
@@ -810,8 +867,38 @@ public class X86Core extends AssemblerModule {
                 Address ind = getAddress(1);
                 stream.writeLEA(getReg(0), getRegister(ind.getImg()), ind.disp);
                 break;
+            case RS_ADDR:
+                ind = getAddress(1);
+                stream.writeLEA(getReg(0), getRegister(ind.getImg()), getRegister(ind.sreg), ind.scale, ind.disp);
+                break;
+            case RZ_ADDR:
+                ind = getAddress(1);
+                stream.writeLEA(getReg(0), getRegister(ind.sreg), ind.scale, ind.disp);
+                break;
             default:
                 reportAddressingError(LEA_ISN, addr);
+        }
+    }
+
+    private final void emmitLGDT() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case A_ADDR:
+                stream.writeLGDT(getAddress(0).disp);
+                break;
+            default:
+                reportAddressingError(LGDT_ISN, addr);
+        }
+    }
+
+    private final void emmitLIDT() {
+        int addr = getAddressingMode(1);
+        switch (addr) {
+            case A_ADDR:
+                stream.writeLIDT(getAddress(0).disp);
+                break;
+            default:
+                reportAddressingError(LIDT_ISN, addr);
         }
     }
 
@@ -864,7 +951,12 @@ public class X86Core extends AssemblerModule {
                 X86Register r1 = X86Register.getRegister(((Register) args[0]).name);
                 X86Register r2 = X86Register.getRegister(((Register) args[1]).name);
                 if (r1 instanceof GPR && r2 instanceof GPR) {
-                    stream.writeMOV(operandSize, (GPR) r1, (GPR) r2);
+                    int s1 = r1.getSize();
+                    int s2 = r2.getSize();
+                    if(s1 != s2){
+                        throw new IllegalArgumentException("Incompatible register pair: " + r1 + "," + r2);
+                    }
+                    stream.writeMOV(s1, (GPR) r1, (GPR) r2);
                 } else if (r1 instanceof CRX && r2 instanceof GPR) {
                     stream.writeMOV((CRX) r1, (GPR) r2);
                 } else if (r1 instanceof GPR && r2 instanceof CRX) {
@@ -881,8 +973,12 @@ public class X86Core extends AssemblerModule {
                 stream.writeMOV_Const(getReg(0), getInt(1));
                 break;
             case RE_ADDR:
+                GPR r = getReg(0);
                 Address ind = getAddress(1);
-                stream.writeMOV(operandSize, getReg(0), getRegister(ind.getImg()), ind.disp);
+                stream.writeMOV(r.getSize(), r, getRegister(ind.getImg()), ind.disp);
+                break;
+            case RA_ADDR:
+                stream.writeMOV(getReg(0), getAddress(1).disp);
                 break;
             case ER_ADDR:
                 ind = getAddress(0);
@@ -891,6 +987,17 @@ public class X86Core extends AssemblerModule {
             case EC_ADDR:
                 ind = getAddress(0);
                 stream.writeMOV_Const(operandSize, getRegister(ind.getImg()), ind.disp, getInt(1));
+                break;
+            case AR_ADDR:
+                stream.writeMOV(getAddress(0).disp, getReg(1));
+                break;
+            case AC_ADDR:
+                stream.writeMOV_Const(operandSize, getAddress(0).disp, getInt(1));
+                break;
+            case SR_ADDR:
+                ind = getAddress(0);
+                stream.writeMOV(operandSize, getRegister(ind.getImg()), getRegister(ind.sreg),
+                        ind.scale, ind.disp, getReg(1));
                 break;
             default:
                 reportAddressingError(MOV_ISN, addr);
@@ -964,6 +1071,9 @@ public class X86Core extends AssemblerModule {
             case EC_ADDR:
                 ind = getAddress(0);
                 stream.writeOR(operandSize, getRegister(ind.getImg()), ind.disp, getInt(1));
+                break;
+            case AC_ADDR:
+                stream.writeOR(operandSize, getAddress(0).disp, getInt(1));
                 break;
             default:
                 reportAddressingError(OR_ISN, addr);
@@ -1166,6 +1276,9 @@ public class X86Core extends AssemblerModule {
                 ind = getAddress(0);
                 stream.writeSUB(operandSize, getRegister(ind.getImg()), ind.disp, getInt(1));
                 break;
+            case AR_ADDR:
+                stream.writeSUB(getAddress(0).disp, getReg(1));
+                break;
             default:
                 reportAddressingError(SUB_ISN, addr);
         }
@@ -1184,6 +1297,9 @@ public class X86Core extends AssemblerModule {
                 Address ind = getAddress(0);
                 stream.writeTEST(operandSize, getRegister(ind.getImg()), ind.disp, getInt(1));
                 break;
+            case AC_ADDR:
+                stream.writeTEST(operandSize, getAddress(0).disp, getInt(1));
+                break;
             default:
                 reportAddressingError(TEST_ISN, addr);
         }
@@ -1195,9 +1311,19 @@ public class X86Core extends AssemblerModule {
             case RR_ADDR:
                 stream.writeXCHG(getReg(0), getReg(1));
                 break;
+            case RE_ADDR:
+                Address ind = getAddress(1);
+                stream.writeXCHG(getRegister(ind.getImg()), ind.disp, getReg(0));
+                break;
+            case RA_ADDR:
+                stream.writeXCHG(getAddress(1).disp, getReg(0));
+                break;
             case ER_ADDR:
-                Address ind = getAddress(0);
+                ind = getAddress(0);
                 stream.writeXCHG(getRegister(ind.getImg()), ind.disp, getReg(1));
+                break;
+            case AR_ADDR:
+                stream.writeXCHG(getAddress(0).disp, getReg(1));
                 break;
             default:
                 reportAddressingError(XCHG_ISN, addr);
