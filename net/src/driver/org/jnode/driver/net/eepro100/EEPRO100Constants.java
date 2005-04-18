@@ -84,8 +84,9 @@ public interface EEPRO100Constants {
     final static int EE_CS = 0x02; /* EEPROM chip select. */
     final static int EE_DATA_WRITE = 0x04; /* EEPROM chip data in. */
     final static int EE_DATA_READ = 0x08; /* EEPROM chip data out. */
-    final static int EE_WRITE_0 = 0x2; // 0x4802;
-    final static int EE_WRITE_1 = 0x6; // 0x4806;
+    final static int EE_WRITE_0 = 0x4802;
+    final static int EE_WRITE_1 = 0x4806;
+	final static int EE_ENB = (0x4800 | EE_CS);
     final static int EE_READ_CMD = 6;
     final static int SCBStatus = 0;
     final static int SCBCmd = 2; /* Rx/Command Unit command and status. */
