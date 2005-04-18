@@ -21,7 +21,6 @@
 
 package org.jnode.fs.jifs.files;
 
-import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.jnode.driver.Device;
@@ -45,19 +44,16 @@ public class JIFSFdevices extends JIFSFile{
 	
 	public void refresh(){
 		super.refresh();
-		final TreeMap tm = new TreeMap();
+		final TreeMap<String, Device> tm = new TreeMap<String, Device>();
 		try{
 			final DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
-
-			for (Iterator i = dm.getDevices().iterator(); i.hasNext();) {
-				final Device dev = (Device) i.next();
+			for (Device dev : dm.getDevices()) {
 				tm.put(dev.getId(), dev);
 			}
 		} catch (javax.naming.NameNotFoundException E) {
 			System.err.println("could not find DeviceManager");
 		}
-		for (Iterator i = tm.values().iterator(); i.hasNext();) {
-			final Device dev = (Device) i.next();
+		for (Device dev : tm.values()) {
 			addStringln();
 			addString(dev.getId());
 			final String drvClassName = dev.getDriverClassName();

@@ -66,7 +66,7 @@ public class JIFSPlugin extends Plugin{
     protected void startPlugin() throws PluginException {
     	log.info("start jifs");
         try {
-         	FileSystemService fSS = (FileSystemService) InitialNaming.lookup(FileSystemService.NAME);
+         	FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
          	FileSystemType type = fSS.getFileSystemTypeForNameSystemTypes(JIFileSystemType.NAME);
          	try {
          				final JIFSDevice dev = new JIFSDevice();

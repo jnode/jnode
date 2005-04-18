@@ -22,12 +22,12 @@
 package org.jnode.fs.jifs.files;
 
 import javax.naming.NameNotFoundException;
-import java.util.Iterator;
-import org.jnode.fs.jifs.*;
-import org.jnode.fs.service.FileSystemService;
-import org.jnode.naming.InitialNaming;
+
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FileSystemType;
+import org.jnode.fs.jifs.JIFSFile;
+import org.jnode.fs.service.FileSystemService;
+import org.jnode.naming.InitialNaming;
 
 public class JIFSFfilesystems extends JIFSFile{
 	
@@ -38,11 +38,9 @@ public class JIFSFfilesystems extends JIFSFile{
 	public void refresh(){
 		super.refresh();
 		try {
-         	FileSystemService fSS = (FileSystemService) InitialNaming.lookup(FileSystemService.NAME);
-         	Iterator it = fSS.fileSystemTypes().iterator();
+         	FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
          	addStringln("Registered Filesystems:");
-            while (it.hasNext()){
-            	FileSystemType current = (FileSystemType)it.next();
+            for (FileSystemType current : fSS.fileSystemTypes()) {
             	addStringln("\t"+current.getName());
             
             }

@@ -22,18 +22,13 @@
 package org.jnode.fs.ext2.cache;
 
 import java.util.Hashtable;
-/*
-import java.util.LinkedHashMap;
-import java.util.Map;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+
 import org.jnode.fs.ext2.INode;
-*/
 
 /**
  * @author Andras Nagy
  */
-public class INodeCache extends Hashtable {
+public class INodeCache extends Hashtable<Object, INode> {
 	public INodeCache(int initialCapacity, float loadFactor) {
 		super(initialCapacity, loadFactor);
 	}

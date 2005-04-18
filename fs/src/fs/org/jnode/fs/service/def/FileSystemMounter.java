@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.fs.service.def;
 
 import java.io.IOException;
@@ -69,8 +69,7 @@ final class FileSystemMounter implements DeviceListener {
         try {
             devMan = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
             devMan.addListener(this);
-            fileSystemService = (FileSystemService) InitialNaming
-                    .lookup(FileSystemService.NAME);
+            fileSystemService = InitialNaming.lookup(FileSystemService.NAME);
         } catch (NameNotFoundException ex) {
             throw new PluginException("Cannot find DeviceManager", ex);
         }
@@ -131,17 +130,17 @@ final class FileSystemMounter implements DeviceListener {
             return;
         }
 
-        //if (removable) {
-        //	log.error("Not mounting removable devices yet...");
+        // if (removable) {
+        // log.error("Not mounting removable devices yet...");
         // TODO Implement mounting of removable devices
-        //	return;
-        //}
+        // return;
+        // }
 
         log.info("Try to mount " + device.getId());
         // Read the first sector
         try {
             final PartitionTableEntry ptEntry = api.getPartitionTableEntry();
-            final byte[] bs = new byte[ api.getSectorSize()];
+            final byte[] bs = new byte[api.getSectorSize()];
             api.read(0, bs, 0, bs.length);
             for (FileSystemType fst : fileSystemService.fileSystemTypes()) {
                 if (fst.supports(ptEntry, bs, api)) {
@@ -171,7 +170,7 @@ final class FileSystemMounter implements DeviceListener {
             if (device.isStarted()) {
                 final FSBlockDeviceAPI api = (FSBlockDeviceAPI) device
                         .getAPI(FSBlockDeviceAPI.class);
-                final boolean readOnly = false; //TODO: read from config
+                final boolean readOnly = false; // TODO: read from config
                 if (device.implementsAPI(RemovableDeviceAPI.class)) {
                     tryToMount(device, api, true, readOnly);
                 } else {

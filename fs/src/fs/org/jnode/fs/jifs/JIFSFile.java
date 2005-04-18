@@ -164,7 +164,7 @@ public class JIFSFile implements FSEntry, FSFile {
 	}
 	
 	public FSEntryIterator iterator(){
-		return new JIFSDirIterator(new HashSet());
+		return new JIFSDirIterator(new HashSet<FSEntry>());
 	}
 
 }

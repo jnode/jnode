@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.fs.initrd;
 
 import java.io.IOException;
@@ -55,7 +55,6 @@ public class InitRamdisk extends Plugin {
 
     /**
      * Create a new instance
-     *  
      */
     public InitRamdisk(PluginDescriptor descriptor) {
         super(descriptor);
@@ -74,7 +73,7 @@ public class InitRamdisk extends Plugin {
 
             log.info("Format initrd ramdisk");
 
-            final FileSystemService fileSystemService = (FileSystemService) InitialNaming
+            final FileSystemService fileSystemService = InitialNaming
                     .lookup(FileSystemService.NAME);
             final FileSystemType type = fileSystemService
                     .getFileSystemTypeForNameSystemTypes(FatFileSystemType.NAME);
