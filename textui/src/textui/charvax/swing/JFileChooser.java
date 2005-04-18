@@ -760,7 +760,7 @@ public class JFileChooser
 		String matchstring = _matchbuf.toString();
 		int i;
 		for (i=0; i<listmodel.getSize(); i++) {
-		    if (matchstring.compareTo(listmodel.getElementAt(i)) <= 0) {
+		    if (matchstring.compareTo(listmodel.getElementAt(i).toString()) <= 0) {
 			break;
 		    }
 		}
