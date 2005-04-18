@@ -270,9 +270,9 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
          */
         setupInterrupt();
         /* Fire up the hardware. */
-        buffers.resume();
+        /*buffers.resume();
         buffers.setRxMode(-1);
-        buffers.setRxMode();
+        buffers.setRxMode();*/
         log.debug(this.flags.getName() + ": Done open(), status ");
         log.debug(flags.getName() + " : End initialize");
     }
