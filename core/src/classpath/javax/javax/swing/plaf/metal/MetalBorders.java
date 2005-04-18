@@ -61,12 +61,18 @@ import javax.swing.plaf.basic.BasicBorders;
 public class MetalBorders
 {
 
+  /** The shared instance for getButtonBorder(). */
+  private static Border buttonBorder;
+
+  /** The shared instance for getRolloverButtonBorder(). */
+  private static Border toolbarButtonBorder;
+
   /**
    * A MarginBorder that gets shared by multiple components.
    * Created on demand by the private helper function {@link
    * #getMarginBorder()}.
    */
-  private static BasicBorders.MarginBorder sharedMarginBorder;
+  private static BasicBorders.MarginBorder marginBorder;
 
   /**
    * The border that is drawn around Swing buttons.
@@ -75,7 +81,7 @@ public class MetalBorders
     extends AbstractBorder
   {
     /** The borders insets. */
-    protected static Insets borderInsets = new Insets(2, 2, 2, 2);
+    protected static Insets borderInsets = new Insets(3, 3, 3, 3);
 
     /**
      * Creates a new instance of ButtonBorder.
@@ -166,6 +172,8 @@ public class MetalBorders
       if (newInsets == null)
         newInsets = new Insets(0, 0, 0, 0);
 
+      AbstractButton b = (AbstractButton) c;
+      Insets margin = b.getMargin();
       newInsets.bottom = borderInsets.bottom;
       newInsets.left = borderInsets.left;
       newInsets.right = borderInsets.right;
@@ -174,6 +182,56 @@ public class MetalBorders
     }
   }
 
+  /**
+   * This border is used in Toolbar buttons as inner border.
+   */
+  static class RolloverMarginBorder extends AbstractBorder
+  {
+    /** The borders insets. */
+    protected static Insets borderInsets = new Insets(3, 3, 3, 3);
+
+    /**
+     * Creates a new instance of RolloverBorder.
+     */
+    public RolloverMarginBorder()
+    {
+    }
+    
+    /**
+     * Returns the insets of the RolloverBorder.
+     *
+     * @param c the component for which the border is used
+     *
+     * @return the insets of the RolloverBorder
+     */
+    public Insets getBorderInsets(Component c)
+    {
+      return getBorderInsets(c, null);
+    }
+
+    /**
+     * Returns the insets of the RolloverMarginBorder in the specified
+     * Insets object.
+     *
+     * @param c the component for which the border is used
+     * @param newInsets the insets object where to put the values
+     *
+     * @return the insets of the RolloverMarginBorder
+     */
+    public Insets getBorderInsets(Component c, Insets newInsets)
+    {
+      if (newInsets == null)
+        newInsets = new Insets(0, 0, 0, 0);
+
+      AbstractButton b = (AbstractButton) c;
+      Insets margin = b.getMargin();
+      newInsets.bottom = borderInsets.bottom;
+      newInsets.left = borderInsets.left;
+      newInsets.right = borderInsets.right;
+      newInsets.top = borderInsets.top;
+      return newInsets;
+    }
+  }
 
   /**
    * Returns a border for Swing buttons in the Metal Look &amp; Feel.
@@ -182,24 +240,42 @@ public class MetalBorders
    */
   public static Border getButtonBorder()
   {
+    if (buttonBorder == null)
+      {
     Border outer = new MetalButtonBorder();
     Border inner = getMarginBorder();
-
-    return new BorderUIResource.CompoundBorderUIResource(outer, inner);
+        buttonBorder = new BorderUIResource.CompoundBorderUIResource
+            (outer, inner);
+      }
+    return buttonBorder;
   }
 
   /**
-   * Returns a shared MarginBorder.
+   * Returns a border for Toolbar buttons in the Metal Look &amp; Feel.
+   *
+   * @return a border for Toolbar buttons in the Metal Look &amp; Feel
    */
-  static Border getMarginBorder()  // intentionally not public
+  static Border getToolbarButtonBorder()
   {
-    /* Swing is not designed to be thread-safe, so there is no
-     * need to synchronize the access to the global variable.
-     */
-    if (sharedMarginBorder == null)
-      sharedMarginBorder = new BasicBorders.MarginBorder();
-
-    return sharedMarginBorder;
+    if (toolbarButtonBorder == null)
+      {
+        Border outer = new MetalButtonBorder();
+        Border inner = new RolloverMarginBorder();
+        toolbarButtonBorder = new BorderUIResource.CompoundBorderUIResource
+          (outer, inner);
+      }
+    return toolbarButtonBorder;
   }
 
+  /**
+   * Returns a shared instance of {@link BasicBorders.MarginBorder}.
+   *
+   * @return a shared instance of {@link BasicBorders.MarginBorder}
+   */
+  static Border getMarginBorder()
+  {
+    if (marginBorder == null)
+      marginBorder = new BasicBorders.MarginBorder();
+    return marginBorder;
+  }
 }
