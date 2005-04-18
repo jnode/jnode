@@ -25,7 +25,6 @@ import java.io.IOException;
 
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
-import org.jnode.system.BootLog;
 
 /**
  * @author epr

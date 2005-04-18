@@ -21,19 +21,13 @@
 
 package org.jnode.test.fs.driver.factories;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.log4j.Logger;
 import org.jmock.cglib.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.stub.ReturnStub;
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.block.CHS;
 import org.jnode.driver.block.Geometry;
 import org.jnode.driver.floppy.FDC;
-import org.jnode.driver.floppy.FloppyConstants;
 import org.jnode.driver.floppy.FloppyControllerBus;
 import org.jnode.driver.floppy.FloppyDevice;
 import org.jnode.driver.floppy.FloppyDriveParameters;

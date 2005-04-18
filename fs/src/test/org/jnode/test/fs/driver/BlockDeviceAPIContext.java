@@ -27,7 +27,6 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.jmock.MockObjectTestCase;
-import org.jnode.driver.Bus;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.DeviceException;
@@ -36,13 +35,10 @@ import org.jnode.driver.DeviceNotFoundException;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.block.BlockDeviceAPI;
-import org.jnode.driver.ide.IDEConstants;
 import org.jnode.test.fs.driver.context.RamDiskDriverContext;
 import org.jnode.test.fs.driver.stubs.StubDeviceManager;
 import org.jnode.test.support.Context;
-import org.jnode.test.support.MockUtils;
 import org.jnode.test.support.TestConfig;
-import org.jnode.test.support.TestUtils;
 
 abstract public class BlockDeviceAPIContext extends Context
 {

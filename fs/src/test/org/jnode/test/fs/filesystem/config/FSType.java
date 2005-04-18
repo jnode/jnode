@@ -23,7 +23,6 @@ package org.jnode.test.fs.filesystem.config;
 
 import java.io.IOException;
 
-import org.apache.tools.ant.types.EnumeratedAttribute;
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.ext2.Ext2FileSystem;

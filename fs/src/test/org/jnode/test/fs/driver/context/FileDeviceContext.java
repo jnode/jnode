@@ -22,7 +22,6 @@
 package org.jnode.test.fs.driver.context;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.jmock.MockObjectTestCase;

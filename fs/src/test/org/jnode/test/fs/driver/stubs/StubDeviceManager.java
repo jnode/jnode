@@ -32,7 +32,6 @@ import org.jnode.driver.Device;
 import org.jnode.driver.DeviceFinder;
 import org.jnode.driver.DeviceToDriverMapper;
 import org.jnode.driver.DriverException;
-import org.jnode.plugin.PluginException;
 
 /**
  * This a (modified) copy of DefaultDeviceManager

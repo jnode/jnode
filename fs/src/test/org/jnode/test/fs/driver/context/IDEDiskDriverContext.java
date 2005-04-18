@@ -21,18 +21,13 @@
 
 package org.jnode.test.fs.driver.context;
 
-import javax.naming.NameAlreadyBoundException;
-import javax.naming.NamingException;
-
 import org.jmock.MockObjectTestCase;
 import org.jnode.driver.Device;
-import org.jnode.driver.DriverException;
 import org.jnode.driver.ide.IDEDevice;
 import org.jnode.driver.ide.IDEDriverUtils;
 import org.jnode.driver.ide.disk.IDEDiskDriver;
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.ResourceManager;
-import org.jnode.system.ResourceNotFreeException;
 import org.jnode.test.fs.driver.BlockDeviceAPIContext;
 import org.jnode.test.fs.driver.BlockDeviceAPITestConfig;
 import org.jnode.test.fs.driver.factories.MockIDEDeviceFactory;

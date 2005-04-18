@@ -23,7 +23,6 @@ package org.jnode.awt;
 
 import java.awt.EventQueue;
 import java.awt.Toolkit;
-import java.awt.Component;
 
 /**
  * @author epr

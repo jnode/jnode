@@ -24,15 +24,11 @@ package org.jnode.test.fs.driver;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jnode.test.fs.driver.context.BlockAlignmentSupportContext;
 import org.jnode.test.fs.driver.context.ByteArrayDeviceContext;
 import org.jnode.test.fs.driver.context.FileDeviceContext;
 import org.jnode.test.fs.driver.context.FloppyDriverContext;
 import org.jnode.test.fs.driver.context.IDEDiskDriverContext;
-import org.jnode.test.fs.driver.context.IDEDiskPartitionDriverContext;
-import org.jnode.test.fs.driver.context.MappedBlockDeviceSupportContext;
 import org.jnode.test.fs.driver.context.RamDiskDriverContext;
-import org.jnode.test.fs.driver.context.SCSICDROMDriverContext;
 import org.jnode.test.fs.driver.tests.BlockDeviceAPITest;
 import org.jnode.test.support.AbstractTestSuite;
 

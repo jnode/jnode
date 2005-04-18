@@ -23,7 +23,6 @@ package org.jnode.test.fs.driver.context;
 
 import org.jmock.MockObjectTestCase;
 import org.jnode.test.fs.driver.BlockDeviceAPIContext;
-import org.jnode.test.support.Context;
 import org.jnode.test.support.TestConfig;
 
 public class IDEDiskPartitionDriverContext extends BlockDeviceAPIContext

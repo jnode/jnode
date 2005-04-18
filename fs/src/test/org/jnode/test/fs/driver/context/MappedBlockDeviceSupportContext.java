@@ -21,8 +21,6 @@
 
 package org.jnode.test.fs.driver.context;
 
-import java.io.IOException;
-
 import org.jmock.MockObjectTestCase;
 import org.jnode.driver.Device;
 import org.jnode.driver.block.MappedBlockDeviceSupport;

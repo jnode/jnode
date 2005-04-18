@@ -19,16 +19,14 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
  
-	package org.jnode.fs.jifs;
+package org.jnode.fs.jifs;
 
-	import java.io.IOException;
-	
-	import java.util.Set;
-	import java.util.NoSuchElementException;
-	import java.util.Iterator;
-	import java.lang.UnsupportedOperationException;
-	import org.jnode.fs.FSEntryIterator;
-	import org.jnode.fs.FSEntry;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
+import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSEntryIterator;
 	
 	
 	public class JIFSDirIterator implements FSEntryIterator {

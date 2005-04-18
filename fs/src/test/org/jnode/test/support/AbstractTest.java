@@ -21,8 +21,6 @@
  
 package org.jnode.test.support;
 
-import junit.framework.TestCase;
-
 import org.apache.log4j.Logger;
 import org.jmock.cglib.MockObjectTestCase;
 
