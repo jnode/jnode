@@ -45,6 +45,7 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.AccessControllerUtils;
+import org.jnode.util.Counter;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
 
@@ -283,8 +284,18 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
      * @see org.jnode.driver.net.AbstractDeviceCore#disable()
      */
     public void disable() {
-        // TODO Auto-generated method stub
         log.debug(flags.getName() + " : Init disable");
+		// reset
+		regs.setReg32(SCBPort, 0);
+		// disable
+		regs.setReg32(SCBPort, 2);
+		Counter count = new Counter("chrono");
+		while(((Integer)count.getValue()).intValue() <= 20) count.inc();
+		regs.setReg16(SCBCmd, SCBMaskAll);
+		int intr_status = regs.getReg16(SCBStatus);
+		regs.setReg16(SCBStatus, intr_status);
+		regs.getReg16(SCBStatus);
+		
         log.debug(flags.getName() + " : End disable");
     }
 
@@ -491,7 +502,9 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
      * @return
      */
     final int mdioWrite(int phy_id, int location, int value) {
-        int val, boguscnt = 64; /* <64 usec. to complete, typ 27 ticks */
+        int val;
+		/* <64 usec. to complete, typ 27 ticks */
+		int boguscnt = 64; 
         regs.setReg32(SCBCtrlMDI, 0x04000000 | (location << 16) | (phy_id << 21) | value);
         do {
             systemDelay(10);

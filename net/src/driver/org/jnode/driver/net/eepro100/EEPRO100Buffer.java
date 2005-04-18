@@ -397,6 +397,8 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 
 		EthernetHeader hdr = (EthernetHeader) buf.getLinkLayerHeader();
 
+		log.debug("HDR =" + hdr);
+		
 		EEPRO100Registers regs = this.core.getRegs();
 
 		int status;
@@ -422,6 +424,9 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 
 		s1 = regs.getReg16(SCBStatus);
 		// TODO wait 10 ms for transmiting;
+		long start =  System.currentTimeMillis();
+		while((System.currentTimeMillis() <= start + 10) && (txRing[0].getStatus() != 0)){
+		}
 		s2 = regs.getReg16(SCBStatus);
 
 		log.debug("s1=" + NumberUtils.hex(s1) + " s2=" + NumberUtils.hex(s2));
