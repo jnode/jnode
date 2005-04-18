@@ -82,9 +82,6 @@ public class Label extends VmAddress implements Comparable {
 			return -1;
 		}
 
-		if (!(o instanceof String)) {
-			o = o.toString();
-		}
-		return label.compareTo(o);
+		return label.compareTo(o.toString());
 	}
 }
