@@ -21,8 +21,6 @@
 
 package org.jnode.test.fs.filesystem.config;
 
-import org.jnode.util.OsUtils;
-
 public class FSAccessMode
 {
     /**

@@ -24,13 +24,10 @@ package org.jnode.test.fs.driver.tests;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import junit.framework.AssertionFailedError;
-
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.floppy.FloppyDriver;
 import org.jnode.driver.ide.IDEConstants;
 import org.jnode.driver.ide.disk.IDEDiskDriver;
-import org.jnode.driver.ide.disk.IDEDiskPartitionDriver;
 import org.jnode.test.fs.driver.BlockDeviceAPITestConfig;
 import org.jnode.test.support.AbstractTest;
 

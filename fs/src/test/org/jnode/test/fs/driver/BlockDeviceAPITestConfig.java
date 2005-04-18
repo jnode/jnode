@@ -18,9 +18,8 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
-package org.jnode.test.fs.driver;
 
+package org.jnode.test.fs.driver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,77 +28,70 @@ import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.ide.IDEConstants;
 import org.jnode.test.support.ContextManager;
 import org.jnode.test.support.TestConfig;
-import org.jnode.test.support.TestUtils;
 import org.jnode.util.NumberUtils;
 
 /**
- * 
  * @author Fabien DUMINY
  */
 public class BlockDeviceAPITestConfig implements TestConfig {
-    final private static String DEVICE_SIZE_STR = "1M"; // may use multipliers (K, M, G)
-    final private static int DEVICE_SIZE = (int)NumberUtils.getSize(DEVICE_SIZE_STR);        
-    
+    final private static String DEVICE_SIZE_STR = "1M"; // may use multipliers
+                                                        // (K, M, G)
+
+    final private static int DEVICE_SIZE = (int) NumberUtils
+            .getSize(DEVICE_SIZE_STR);
+
     private Class contextClass;
+
     private List partitions = new ArrayList();
-    
-    public BlockDeviceAPITestConfig(Class contextClass)
-    {
+
+    public BlockDeviceAPITestConfig(Class contextClass) {
         this.contextClass = contextClass;
     }
 
-    public void addPartition(Partition partition)
-    {
+    public void addPartition(Partition partition) {
         partitions.add(partition);
     }
 
-    public Partition[] getPartitions()
-    {
-        return (Partition[]) partitions.toArray(new Partition[partitions.size()]);
+    public Partition[] getPartitions() {
+        return (Partition[]) partitions
+                .toArray(new Partition[partitions.size()]);
     }
-        
+
     /**
-     * 
      * @return
      */
-    final public BlockDeviceAPI getBlockDeviceAPI() 
-    {
-        return ((BlockDeviceAPIContext) ContextManager.getInstance().getContext()).getApi();
+    final public BlockDeviceAPI getBlockDeviceAPI() {
+        return ((BlockDeviceAPIContext) ContextManager.getInstance()
+                .getContext()).getApi();
     }
-    
-    final public Class getContextClass()
-    {
+
+    final public Class getContextClass() {
         return contextClass;
     }
-    
-	/**
-	 * 
-	 */
-	public String toString()
-	{
-        if(ContextManager.getInstance().getContext() == null)
-        {
-            return getContextClass().getName()+"[NO_CONTEXT]";
-        }
-        
-        BlockDeviceAPI api = getBlockDeviceAPI();         
-		return (api == null) ? 
-               getContextClass().getName()+"[NO_API]" :
-               api.getClass().getName();
-	}
 
-    public int getDeviceSize()
-    {
+    /**
+     * 
+     */
+    public String toString() {
+        if (ContextManager.getInstance().getContext() == null) {
+            return getContextClass().getName() + "[NO_CONTEXT]";
+        }
+
+        BlockDeviceAPI api = getBlockDeviceAPI();
+        return (api == null) ? getContextClass().getName() + "[NO_API]" : api
+                .getClass().getName();
+    }
+
+    public int getDeviceSize() {
         return DEVICE_SIZE;
     }
-    
-    public int getDeviceNbSectors()
-    {
+
+    public int getDeviceNbSectors() {
         return DEVICE_SIZE / IDEConstants.SECTOR_SIZE;
     }
 
-    public String getName()
-    {
-        return ((BlockDeviceAPIContext) ContextManager.getInstance().getContext()).getName();
-    }    
+    public String getName() {
+        return ((BlockDeviceAPIContext) ContextManager.getInstance()
+                .getContext()).getName();
+    }
 }

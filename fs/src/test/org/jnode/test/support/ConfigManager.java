@@ -21,7 +21,6 @@
 
 package org.jnode.test.support;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,12 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.jnode.naming.InitialNaming;
-import org.jnode.plugin.PluginException;
-import org.jnode.test.fs.driver.stubs.StubDeviceManager;
-import org.jnode.test.fs.driver.stubs.StubNameSpace;
-import org.jnode.test.fs.filesystem.config.OsType;
 
 
 public class ConfigManager

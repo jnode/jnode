@@ -21,20 +21,11 @@
  
 package org.jnode.test.gui;
 
-import java.awt.AWTKeyStroke;
 import java.awt.BorderLayout;
 
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
-import javax.swing.JFrame;
-import javax.swing.JTree;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)

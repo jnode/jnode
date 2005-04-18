@@ -18,83 +18,71 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.test.fs.filesystem.config;
 
-
-import org.jmock.cglib.MockObjectTestCase;
-import org.jnode.driver.Device;
 import org.jnode.test.fs.filesystem.FSContext;
 import org.jnode.test.support.TestConfig;
 
 /**
- * 
  * @author Fabien DUMINY
  */
 public class FSTestConfig implements TestConfig {
 
     final private DeviceParam deviceParam;
-    
+
     final private OsType os;
-    final private FS  fs;
-    
-	/**
-	 * 
-	 *
-	 */
-	public FSTestConfig(OsType osType, FS fs, DeviceParam deviceParam)
-	{		
+
+    final private FS fs;
+
+    /**
+     * 
+     *
+     */
+    public FSTestConfig(OsType osType, FS fs, DeviceParam deviceParam) {
         deviceParam.setInput(false);
-        this.deviceParam = deviceParam;           
+        this.deviceParam = deviceParam;
         this.os = osType;
         this.fs = fs;
-	}
+    }
 
-    final public Class getContextClass()
-    {
+    final public Class getContextClass() {
         return FSContext.class;
     }
-    
-	/**
-	 * @return Returns the fs.
-	 */
-	public FS getFileSystem() {
-		return fs;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public Class getFsClass()
-	{
-		return fs.getType().getFsClass();
-	}
 
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isReadOnly()
-	{
-		return fs.isReadOnly();
-	}
-    
-    public DeviceParam getDeviceParam()
-    {
+    /**
+     * @return Returns the fs.
+     */
+    public FS getFileSystem() {
+        return fs;
+    }
+
+    /**
+     * @return
+     */
+    public Class getFsClass() {
+        return fs.getType().getFsClass();
+    }
+
+    /**
+     * @return
+     */
+    public boolean isReadOnly() {
+        return fs.isReadOnly();
+    }
+
+    public DeviceParam getDeviceParam() {
         return deviceParam;
     }
 
     /**
      * 
      */
-    public String toString()
-    {
-        return os.toString() + "," + fs + "\n"+deviceParam;
+    public String toString() {
+        return os.toString() + "," + fs + "\n" + deviceParam;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return toString();
-    }    
+    }
 }

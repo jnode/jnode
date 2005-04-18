@@ -21,15 +21,13 @@
  
  package org.jnode.fs.jifs;
 
-import java.io.IOException;
-
+import org.apache.log4j.Logger;
+import org.jnode.driver.Device;
+import org.jnode.driver.block.FSBlockDeviceAPI;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
 import org.jnode.fs.partitions.PartitionTableEntry;
-import org.jnode.driver.block.FSBlockDeviceAPI;
-import org.jnode.driver.Device;
-import org.apache.log4j.Logger;
 
 /**
  * @author Trickkiste

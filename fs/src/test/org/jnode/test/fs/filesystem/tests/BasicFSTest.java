@@ -21,12 +21,8 @@
  
 package org.jnode.test.fs.filesystem.tests;
 
-import java.io.IOException;
-
-import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSEntryIterator;
 import org.jnode.fs.ReadOnlyFileSystemException;
 import org.jnode.fs.util.FSUtils;
 import org.jnode.test.fs.filesystem.AbstractFSTest;

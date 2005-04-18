@@ -21,20 +21,14 @@
 
 package org.jnode.fs.jifs.files;
 
-import org.jnode.fs.jifs.*;
-import org.jnode.fs.FSEntry;
-
-import org.jnode.naming.InitialNaming;
-import org.jnode.driver.Device;
-import org.jnode.driver.DeviceInfoAPI;
-import org.jnode.driver.DeviceManager;
-import org.jnode.driver.DeviceNotFoundException;
-import org.jnode.driver.DriverException;
-
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import javax.naming.NameNotFoundException;
+import org.jnode.driver.Device;
+import org.jnode.driver.DeviceManager;
+import org.jnode.fs.FSEntry;
+import org.jnode.fs.jifs.JIFSFile;
+import org.jnode.naming.InitialNaming;
 
 /**
  * File, which contains information about devices.

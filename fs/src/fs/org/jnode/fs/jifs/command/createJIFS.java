@@ -21,16 +21,15 @@
  
 package org.jnode.fs.jifs.command;
 
-import org.jnode.fs.jifs.*;
-
 import java.io.InputStream;
 import java.io.PrintStream;
 
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
-
 import org.jnode.naming.InitialNaming;
+import org.jnode.plugin.Plugin;
+import org.jnode.plugin.PluginManager;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
 import org.jnode.shell.help.Help;
@@ -38,13 +37,6 @@ import org.jnode.shell.help.OptionArgument;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.SyntaxErrorException;
-import org.jnode.plugin.Plugin;
-import org.jnode.plugin.PluginManager;
-import org.jnode.plugin.PluginDescriptor;
-import org.jnode.plugin.PluginException;
-import org.jnode.plugin.PluginPrerequisite;
-
 
 /**
  * Just mounts initial JIFS on /Jifs

@@ -21,18 +21,16 @@
  
 package org.jnode.shell.command;
 
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
-import java.io.InputStream;
-import java.io.PrintStream;
 
-import javax.naming.NameNotFoundException;
-
-import org.jnode.shell.Shell;
-import org.jnode.shell.ShellUtils;
 import org.jnode.shell.Command;
 import org.jnode.shell.CommandLine;
+import org.jnode.shell.Shell;
+import org.jnode.shell.ShellUtils;
 import org.jnode.shell.alias.AliasManager;
 import org.jnode.shell.alias.NoSuchAliasException;
 import org.jnode.shell.help.AliasArgument;
@@ -41,7 +39,6 @@ import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
 import org.jnode.shell.help.Syntax;
-import org.jnode.shell.help.SyntaxErrorException;
 
 /**
  * @author epr

@@ -23,9 +23,6 @@ package org.jnode.driver.block;
 
 import java.io.IOException;
 
-import org.jnode.driver.ide.IDEConstants;
-import org.jnode.driver.ide.disk.IDEDiskDriver;
-
 public class BlockDeviceAPIHelper
 {
     public static void checkBounds(BlockDeviceAPI api, long devOffset) throws IOException

@@ -55,8 +55,6 @@ import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.Map;
 
-import org.jnode.awt.JNodeToolkit;
-
 /**
  * @author epr
  */
