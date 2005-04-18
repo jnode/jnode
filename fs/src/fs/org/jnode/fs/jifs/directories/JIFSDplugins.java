@@ -56,16 +56,15 @@ public class JIFSDplugins extends JIFSDirectory {
 		final ArrayList rows = new ArrayList();
 		try {
 			final PluginManager mgr = (PluginManager) InitialNaming.lookup(PluginManager.NAME);
-			entries.clear();
-	        for (Iterator i = mgr.getRegistry().getDescriptorIterator(); i
+	        for (Iterator<PluginDescriptor> i = mgr.getRegistry().getDescriptorIterator(); i
 	                .hasNext();) {
-	            PluginDescriptor descr = (PluginDescriptor) i.next();
+	            final PluginDescriptor descr = i.next();
 	            rows.add(descr.getId());
 	        }
 	        Collections.sort(rows);
-	        for (Iterator i = rows.iterator(); i.hasNext(); ) {
-	        	JIFSFile F = new JIFSFplugin((String)i.next(), this);
-	            entries.add(F);
+	        for (Object row : rows) {
+	        	final JIFSFile F = new JIFSFplugin(row.toString(), this);
+	            addFSE(F);
 	        }
 		} catch (NameNotFoundException N){
 			System.err.println(N);

@@ -58,7 +58,7 @@ public class JIFSDthreads extends JIFSDirectory {
 			final Thread t = ts[i];
 			if (t != null) {
 				JIFSFile F = new JIFSFthread(t.getName(),t, this);
-	            entries.add(F);
+	            addFSE(F);
 			}
 		}
 		

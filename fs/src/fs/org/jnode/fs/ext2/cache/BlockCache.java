@@ -18,60 +18,58 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.fs.ext2.cache;
 
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
 /**
  * @author Andras Nagy
  */
-public class BlockCache extends LinkedHashMap{
-	//at most MAX_SIZE blocks fit in the cache
-	static final int MAX_SIZE = 10;
-	private final Logger log = Logger.getLogger(getClass());
-	private Vector cacheListeners;
-	
-	public BlockCache(int initialCapacity, float loadFactor) {
-		super(Math.min(MAX_SIZE, initialCapacity), loadFactor, true);
-		cacheListeners = new Vector();
-	}
-	
-	public void addCacheListener(CacheListener listener) {
-		cacheListeners.addElement(listener);
-	}
-		
-	/*private boolean containsKey(Integer key) {
-		boolean result = super.containsKey(key);
-		if(result)
-			log.debug("CACHE HIT, size:"+size());
-		else
-			log.debug("CACHE MISS");
-		return result;
-	}*/
-	
-	protected synchronized boolean removeEldestEntry(Map.Entry eldest) {
-		log.debug("BlockCache size: "+size());
-		if(size()>MAX_SIZE) {
-			try{
-				((Block)eldest.getValue()).flush();
-				//notify the listeners
-				CacheEvent event = new CacheEvent(eldest.getValue(),CacheEvent.REMOVED);
-				Iterator listeners=cacheListeners.iterator();
-				while(listeners.hasNext()) {
-					((CacheListener)listeners.next()).elementRemoved(event);
-				}
-			}catch(IOException e) {
-				log.error("Exception when flushing a block from the cache", e); 	
-			}
-			return true;
-		} else
-			return false;
-	}
+public final class BlockCache extends LinkedHashMap<Object, Block> {
+    // at most MAX_SIZE blocks fit in the cache
+    static final int MAX_SIZE = 10;
+
+    private static final Logger log = Logger.getLogger(BlockCache.class);
+
+    private ArrayList<CacheListener> cacheListeners;
+
+    public BlockCache(int initialCapacity, float loadFactor) {
+        super(Math.min(MAX_SIZE, initialCapacity), loadFactor, true);
+        cacheListeners = new ArrayList<CacheListener>();
+    }
+
+    public void addCacheListener(CacheListener listener) {
+        cacheListeners.add(listener);
+    }
+
+    /*
+     * private boolean containsKey(Integer key) { boolean result =
+     * super.containsKey(key); if(result) log.debug("CACHE HIT, size:"+size());
+     * else log.debug("CACHE MISS"); return result; }
+     */
+
+    protected synchronized boolean removeEldestEntry(Map.Entry<Object, Block> eldest) {
+        log.debug("BlockCache size: " + size());
+        if (size() > MAX_SIZE) {
+            try {
+                eldest.getValue().flush();
+                // notify the listeners
+                final CacheEvent event = new CacheEvent(eldest.getValue(),
+                        CacheEvent.REMOVED);
+                for (CacheListener l : cacheListeners) {
+                    l.elementRemoved(event);
+                }
+            } catch (IOException e) {
+                log.error("Exception when flushing a block from the cache", e);
+            }
+            return true;
+        } else
+            return false;
+    }
 }

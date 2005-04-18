@@ -37,7 +37,7 @@ public class FSEntryTableIgnoreCase extends FSEntryTable {
 	 * @param fs
 	 * @param entryList
 	 */
-	public FSEntryTableIgnoreCase(AbstractFileSystem fs, List/*<FSEntry>*/ entryList) {
+	public FSEntryTableIgnoreCase(AbstractFileSystem fs, List<FSEntry> entryList) {
 		super(fs, entryList);
 	}
 	

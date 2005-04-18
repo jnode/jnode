@@ -18,54 +18,53 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.fs.jifs;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSEntryIterator;
-	
-	
-	public class JIFSDirIterator implements FSEntryIterator {
 
-		private Iterator it;
-		private Set entries;
-		
-		public JIFSDirIterator(Set entries){
-			this.entries = entries;
-			it = entries.iterator();
-		}
+public class JIFSDirIterator implements FSEntryIterator {
 
-		/**
-		 * @see java.util.Iterator#hasNext()
-		 */
-		public boolean hasNext() {
-			if (it == null){
-				return false;
-			} else{
-				return it.hasNext();
-			}
-		}
+    private Iterator<FSEntry> it;
 
-		/**
-		 * @see java.util.Iterator#next()
-		 */
-		public FSEntry next() throws NoSuchElementException {
-			if (hasNext()) {
-				FSEntry current = (FSEntry)it.next();
-				if (current instanceof JIFSFile) ((JIFSFile)current).refresh();
-				if (current instanceof JIFSDirectory) ((JIFSDirectory)current).refresh();
-				
-				return current;
-			} else {
-				throw new NoSuchElementException("no more FSEntries to iterate..");
-			}
-		}
-		
-		public void remove(){
-			throw new UnsupportedOperationException();
-		}
-	}
+    public JIFSDirIterator(Collection<FSEntry> entries) {
+        it = entries.iterator();
+    }
+
+    /**
+     * @see java.util.Iterator#hasNext()
+     */
+    public boolean hasNext() {
+        if (it == null) {
+            return false;
+        } else {
+            return it.hasNext();
+        }
+    }
+
+    /**
+     * @see java.util.Iterator#next()
+     */
+    public FSEntry next() throws NoSuchElementException {
+        if (hasNext()) {
+            FSEntry current = (FSEntry) it.next();
+            if (current instanceof JIFSFile)
+                ((JIFSFile) current).refresh();
+            if (current instanceof JIFSDirectory)
+                ((JIFSDirectory) current).refresh();
+
+            return current;
+        } else {
+            throw new NoSuchElementException("no more FSEntries to iterate..");
+        }
+    }
+
+    public void remove() {
+        throw new UnsupportedOperationException();
+    }
+}

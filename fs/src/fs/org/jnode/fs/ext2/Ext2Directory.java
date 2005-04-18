@@ -431,10 +431,10 @@ public class Ext2Directory extends AbstractFSDirectory {
      */
     protected FSEntryTable readEntries() throws IOException {
         Ext2FSEntryIterator it = new Ext2FSEntryIterator(iNode);
-        ArrayList entries = new ArrayList();
+        ArrayList<FSEntry> entries = new ArrayList<FSEntry>();
 
         while (it.hasNext()) {
-            FSEntry entry = it.next();
+            final FSEntry entry = it.next();
             log.debug("readEntries: entry=" + FSUtils.toString(entry, false));
             entries.add(entry);
         }

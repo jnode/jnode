@@ -22,9 +22,6 @@
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
-import java.util.Iterator;
-//import java.util.Timer;
-//import java.util.TimerTask;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -263,13 +260,8 @@ public class Ext2FileSystem extends AbstractFileSystem {
         synchronized (inodeCache) {
             try {
                 log.debug("inodecache size: " + inodeCache.size());
-                Iterator iterator = inodeCache.values().iterator();
-                while (iterator.hasNext()) {
-                    INode iNode = (INode) iterator.next();
+                for (INode iNode : inodeCache.values()) {
                     iNode.flush();
-                    log
-                            .debug("flush(): inodeCache.values().iterator().hasNext() "
-                                    + iterator.hasNext());
                 }
             } catch (FileSystemException ex) {
                 final IOException ioe = new IOException();
@@ -283,9 +275,7 @@ public class Ext2FileSystem extends AbstractFileSystem {
 
         //flush the blocks
         synchronized (blockCache) {
-            Iterator iterator = blockCache.values().iterator();
-            while (iterator.hasNext()) {
-                Block block = (Block) iterator.next();
+            for (Block block : blockCache.values()) {
                 block.flush();
             }
         }
