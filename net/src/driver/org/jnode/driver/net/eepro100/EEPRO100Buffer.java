@@ -406,10 +406,10 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 		status = regs.getReg16(SCBStatus);
 		regs.setReg16(SCBStatus, status & IntrAllNormal);
 
-		log.debug("Transmitting type " + NumberUtils.hex(hdr.getLengthType())
+		/*log.debug("Transmitting type " + NumberUtils.hex(hdr.getLengthType())
 				+ " packet(" + NumberUtils.hex(hdr.getLength())
 				+ " bytes). Status=" + NumberUtils.hex(status) + " cmd="
-				+ regs.getReg16(SCBCmd));
+				+ regs.getReg16(SCBCmd));*/
 
 		txRing[0].setStatus(0);
 		txRing[0].setCommand(CmdSuspend | CmdTx | CmdTxFlex);
