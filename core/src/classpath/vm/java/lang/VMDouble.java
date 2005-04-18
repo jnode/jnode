@@ -188,6 +188,10 @@ final class VMDouble {
         return value * Math.pow(10.0, exponent);
     }
 
+    public static double parseDouble(String s) {
+        return new VMDouble(s).parse();
+    }
+    
     public double parse() throws NumberFormatException {
         if (index >= chars.length)
             throw new NumberFormatException();
