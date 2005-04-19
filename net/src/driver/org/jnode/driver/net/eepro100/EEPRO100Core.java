@@ -145,15 +145,11 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 			this.irq.release();
 			throw ex;
 		}
-		// Initialize registers.
-		regs = new EEPRO100Registers(iobase, io);
-		// Initialize statistical counters.
-		stats = new EEPRO100Stats(rm, regs);
-		// Initialize RX/TX Buffers.
-		buffers = new EEPRO100Buffer(this);
-
 		
-		int[] eeprom = new int[0x100];
+		short[] eeprom = new short[16];
+        
+		int eeSize;
+        int eeReadCmd;
 
 		if ((doEepromCmd2(EE_READ_CMD << 24, 27) & 0xffe0000) == 0xffe0000) {
 			eeSize = 0x100;
@@ -167,7 +163,8 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 		short sum = 0;
 		for (int x = 0; x < eeSize; x++) {
 			int value = doEepromCmd2(eeReadCmd | (x << 16), 27);
-			eeprom[x] = value;
+			if (x < (int)(eeprom.length))
+				eeprom[x] = new Integer(value).shortValue();
 			sum += value;
 		}
 
@@ -187,6 +184,13 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 
 		this.hwAddress = new EthernetAddress(hwAddrArr, 0);
 
+                // Initialize registers.
+		regs = new EEPRO100Registers(iobase, io);
+		// Initialize statistical counters.
+		stats = new EEPRO100Stats(rm, regs);
+		// Initialize RX/TX Buffers.
+		buffers = new EEPRO100Buffer(this);
+                
 		int  option = 0;
 		
 		/*
