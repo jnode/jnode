@@ -62,6 +62,7 @@
       <src path="${my-src.dir}/classpath/javax"/>
       <src path="${my-src.dir}/classpath/org"/>
       <src path="${my-src.dir}/classpath/5.0"/>
+      <src path="${my-src.dir}/classpath/ext"/>        
       <src path="${my-src.dir}/classpath/vm"/>
       <src path="${my-src.dir}/core"/>
       <src path="${my-src.dir}/vmmagic"/>
