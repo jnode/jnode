@@ -968,6 +968,10 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     protected final void printLabels(NativeStream os, VmType[] bootClasses,
             VmStatics statics) throws BuildException,
             UnresolvedObjectRefException {
+        if (!debug) {
+            return;
+        }
+        
         try {
             int unresolvedCount = 0;
             final PrintWriter w = new PrintWriter(new FileWriter(listFile));
