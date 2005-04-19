@@ -70,6 +70,7 @@
       <export name="java.lang.annotation.*"/>
       <export name="java.lang.ref.*"/>
       <export name="java.lang.reflect.*"/>
+      <export name="java.lang.isolate.*"/>
       <export name="java.math.*"/>
       <export name="java.net.*"/>
       <export name="java.nio.*"/>

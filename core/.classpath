@@ -20,6 +20,10 @@
 		<attributes>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" path="src/classpath/ext">
+		<attributes>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="src" path="src/classpath/vm">
 		<attributes>
 		</attributes>

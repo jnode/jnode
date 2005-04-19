@@ -321,6 +321,7 @@ clean          Remove all intermediate build results.
 				<pathelement location="${root.dir}/core/src/classpath/javax" />
 				<pathelement location="${root.dir}/core/src/classpath/org" />
 				<pathelement location="${root.dir}/core/src/classpath/5.0" />
+				<pathelement location="${root.dir}/core/src/classpath/ext" />
 				<pathelement location="${root.dir}/core/src/classpath/vm" />
 				<pathelement location="${root.dir}/core/src/core" />
 				<pathelement location="${root.dir}/core/src/driver" />
@@ -349,6 +350,7 @@ clean          Remove all intermediate build results.
 				<pathelement location="${root.dir}/core/src/classpath/javax" />
 				<pathelement location="${root.dir}/core/src/classpath/org" />
 				<pathelement location="${root.dir}/core/src/classpath/5.0" />
+				<pathelement location="${root.dir}/core/src/classpath/ext" />
 				<pathelement location="${root.dir}/core/src/classpath/vm" />
 				<pathelement location="${root.dir}/core/src/core" />
 				<pathelement location="${root.dir}/core/src/driver" />
@@ -434,6 +436,7 @@ clean          Remove all intermediate build results.
 
 		<header update="on" headerFile="${root.dir}/all/template/header.txt">
 			<fileset dir="${root.dir}/builder/src/builder" includes="**/*.java" />
+			<fileset dir="${root.dir}/core/src/classpath/ext" includes="**/*.java" />
 			<fileset dir="${root.dir}/core/src/classpath/vm" includes="**/*.java" />
 			<fileset dir="${root.dir}/core/src/core" includes="**/*.java" />
 			<fileset dir="${root.dir}/core/src/vmmagic" includes="**/*.java" />
