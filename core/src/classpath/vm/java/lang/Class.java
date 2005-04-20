@@ -214,6 +214,9 @@ public final class Class<T> implements Serializable {
             defaultConstructor = getLinkedVmClass().getDeclaredMethod("<init>",
                     "()V");
         }
+        if (defaultConstructor == null) {
+            throw new InstantiationException("No default constructor");
+        }
         try {
             return VmReflection.newInstance(defaultConstructor);
         } catch (InvocationTargetException ex) {
