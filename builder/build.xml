@@ -47,6 +47,7 @@
 	  <src path="${my-src.dir}/builder"/>
       <src path="${my-build-src.dir}"/>
       <classpath refid="my-cp"/>
+      <compilerarg value="-Xlint:unchecked"/>
     </javac>
   </target>
 
