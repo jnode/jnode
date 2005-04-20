@@ -34,7 +34,8 @@
 	  <bootclasspath path="${jnode-core.jar}"/>
 	  <src path="${my-src.dir}/apps"/>
 	  <src path="${my-src.dir}/install"/>
-      <classpath refid="my-cp"/>
+    <classpath refid="my-cp"/>
+    <compilerarg value="-Xlint:unchecked"/>
     </javac>
   </target>
 

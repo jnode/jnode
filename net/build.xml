@@ -37,6 +37,7 @@
       <src path="${my-src.dir}/driver"/>
       <src path="${my-src.dir}/test"/>
       <classpath refid="my-cp"/>
+      <compilerarg value="-Xlint:unchecked"/>
     </javac>
   </target>
 

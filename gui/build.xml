@@ -32,10 +32,11 @@
 	  <bootclasspath path="${jnode-core.jar}"/>
 	  <src path="${my-src.dir}/awt"/>
 	  <src path="${my-src.dir}/desktop"/>
-  	  <src path="${my-src.dir}/driver"/>
+    <src path="${my-src.dir}/driver"/>
 	  <src path="${my-src.dir}/test"/>
-      <src path="${my-src.dir}/thinlet"/>        
-      <classpath refid="my-cp"/>
+    <src path="${my-src.dir}/thinlet"/>        
+    <classpath refid="my-cp"/>
+    <compilerarg value="-Xlint:unchecked"/>
     </javac>
   </target>
 
