@@ -564,4 +564,18 @@ clean          Remove all intermediate build results.
 			<checkProjectRules projectName="JNode-TestUI" webSrcUrl="textui" projectSrc="textui" />		
 		</parallel>
 	</target>
+
+  <!-- Document all plugins -->
+  <target name="document-plugins" depends="assemble-plugins">
+    <taskdef name="plugindocumentation" classname="org.jnode.build.documentation.PluginDocumentationTask" classpathref="cp-jnode" />
+
+    <plugindocumentation todir="${plugins.dir}" pluginDir="${descriptors.dir}">
+      <descriptors dir="${descriptors.dir}/">
+        <include name="*.xml" />
+        <exclude name="*plugin-list.xml" />
+      </descriptors>
+    </plugindocumentation>
+
+  </target>
+
 </project>
