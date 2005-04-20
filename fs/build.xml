@@ -33,7 +33,8 @@
 	  <src path="${my-src.dir}/fs"/>
 	  <src path="${my-src.dir}/driver"/>
 	  <src path="${my-src.dir}/test"/>
-      <classpath refid="my-cp"/>
+    <classpath refid="my-cp"/>
+    <compilerarg value="-Xlint:unchecked"/>
     </javac>
 
 	<!-- copy (if exists) image of file systems (*.img.WORK files are temporary) -->

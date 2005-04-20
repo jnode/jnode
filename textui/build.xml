@@ -29,9 +29,10 @@
            compiler="modern"
 	       includeJavaRuntime="false"
     	target="${java.target}" source="${java.source}" encoding="${java.encoding}">
-	<bootclasspath path="${jnode-core.jar}"/>
-	<src path="${my-src.dir}/textui"/>
-	<classpath refid="my-cp"/>
+      <bootclasspath path="${jnode-core.jar}"/>
+      <src path="${my-src.dir}/textui"/>
+      <classpath refid="my-cp"/>
+      <compilerarg value="-Xlint:unchecked"/>
     </javac>
   </target>
 
