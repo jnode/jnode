@@ -24,6 +24,7 @@ package org.jnode.vm.x86;
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmThread;
+import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
@@ -72,8 +73,8 @@ public abstract class VmX86Thread extends VmThread {
 	/**
 	 * Initialize this instance 
 	 */
-	VmX86Thread(int slotSize) {
-        super(slotSize);
+	VmX86Thread(VmIsolatedStatics isolatedStatics, int slotSize) {
+        super(isolatedStatics, slotSize);
 		fxState = new byte[FXSTATE_SIZE];
 	}
 
@@ -81,16 +82,16 @@ public abstract class VmX86Thread extends VmThread {
      * Create a new instance. This constructor can only be called during the
      * bootstrap phase.
      */
-    VmX86Thread(byte[] stack, int slotSize) {
-        super(stack, getStackEnd(stack, stack.length, slotSize), stack.length);
+    VmX86Thread(VmIsolatedStatics isolatedStatics, byte[] stack, int slotSize) {
+        super(isolatedStatics, stack, getStackEnd(stack, stack.length, slotSize), stack.length);
 		fxState = new byte[FXSTATE_SIZE];
     }
     
 	/**
 	 * @param javaThread
 	 */
-	public VmX86Thread(Thread javaThread) {
-		super(javaThread);
+	public VmX86Thread(VmIsolatedStatics isolatedStatics, Thread javaThread) {
+		super(isolatedStatics, javaThread);
 		fxState = new byte[FXSTATE_SIZE];
 	}
 

@@ -96,10 +96,10 @@ public class DefaultWriteBarrier extends VmWriteBarrier {
     }
 
     /**
-     * @see org.jnode.vm.memmgr.VmWriteBarrier#putstaticWriteBarrier(int,
+     * @see org.jnode.vm.memmgr.VmWriteBarrier#putstaticWriteBarrier(boolean, int,
      *      java.lang.Object)
      */
-    public final void putstaticWriteBarrier(int staticsIndex, Object value)
+    public final void putstaticWriteBarrier(boolean shared, int staticsIndex, Object value)
             throws UninterruptiblePragma {
         if (active) {
             shade(value);

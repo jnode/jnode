@@ -35,6 +35,7 @@ import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmStackReader;
 import org.jnode.vm.VmSystem;
+import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.x86.compiler.l1a.X86Level1ACompiler;
@@ -237,7 +238,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
                 if (cpuEntry.isEnabled() && !cpuEntry.isBootstrap()) {
                     // New CPU
                     final VmX86Processor newCpu = (VmX86Processor) createProcessor(
-                            cpuEntry.getApicID(), Vm.getVm().getSharedStatics());
+                            cpuEntry.getApicID(), Vm.getVm().getSharedStatics(), cpu.getIsolatedStatics());
                     initX86Processor(newCpu);
                     try {
                         newCpu.startup(rm);
@@ -257,7 +258,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
      * 
      * @return The processor
      */
-    public abstract VmProcessor createProcessor(int id, VmSharedStatics statics);
+    public abstract VmProcessor createProcessor(int id, VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics);
 
     /**
      * Initialize a processor wrt. APIC and add it to the list of processors.

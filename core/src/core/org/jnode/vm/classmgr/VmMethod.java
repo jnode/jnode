@@ -30,7 +30,7 @@ import org.jnode.vm.VmAddress;
 import org.vmmagic.pragma.UninterruptiblePragma;
 import org.vmmagic.unboxed.Address;
 
-public abstract class VmMethod extends VmMember implements VmStaticsEntry {
+public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry {
 
     /** Address of native code of this method */
     private VmAddress nativeCode;
@@ -437,7 +437,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
         this.compiledCode = code;
         this.nativeCode = code.getNativeCode();
         this.compiledCode = code;
-        Vm.getVm().getSharedStatics().setMethodCode(getStaticsIndex(),
+        Vm.getVm().getSharedStatics().setMethodCode(getSharedStaticsIndex(),
                 code.getNativeCode());
         this.nativeCodeOptLevel = optLevel;
     }
@@ -486,11 +486,11 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
     }
 
     /**
-     * Gets the indexe of this field in the statics table.
+     * Gets the indexe of this field in the shared statics table.
      * 
      * @return Returns the staticsIndex.
      */
-    public final int getStaticsIndex() {
+    public final int getSharedStaticsIndex() {
         return this.staticsIndex;
     }
 

@@ -44,7 +44,7 @@ import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.vmmagic.pragma.LoadStaticsPragma;
 import org.vmmagic.pragma.Uninterruptible;
 
-public abstract class VmType<T> extends VmSystemObject implements VmStaticsEntry,
+public abstract class VmType<T> extends VmSystemObject implements VmSharedStaticsEntry,
 		Uninterruptible {
 
 	/**
@@ -795,6 +795,15 @@ public abstract class VmType<T> extends VmSystemObject implements VmStaticsEntry
 	public final boolean isStatic() {
 		return Modifier.isStatic(modifiers);
 	}
+
+    /**
+     * Does this type have shared statics.
+     * 
+     * @return boolean
+     */
+    public final boolean isSharedStatics() {
+        return Modifier.isSharedStatics(modifiers);
+    }
 
 	/**
 	 * Is this type public.
@@ -2091,11 +2100,11 @@ public abstract class VmType<T> extends VmSystemObject implements VmStaticsEntry
 	}
 
 	/**
-	 * Gets the index of this type in the statics table.
+	 * Gets the index of this type in the shared statics table.
 	 * 
 	 * @return Returns the staticsIndex.
 	 */
-	public final int getStaticsIndex() {
+	public final int getSharedStaticsIndex() {
 		return this.staticsIndex;
 	}
 

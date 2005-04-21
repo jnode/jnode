@@ -38,6 +38,7 @@ import org.jnode.assembler.ObjectResolver;
 import org.jnode.vm.classmgr.ClassDecoder;
 import org.jnode.vm.classmgr.IMTBuilder;
 import org.jnode.vm.classmgr.SelectorMap;
+import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.classmgr.VmType;
@@ -80,7 +81,9 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     private boolean requiresCompile = false;
 
-    private final VmSharedStatics statics;
+    private final VmSharedStatics sharedStatics;
+    
+    private transient VmIsolatedStatics isolatedStatics;
     
     private transient HashSet<String> failedClassNames;
 
@@ -108,7 +111,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         this.selectorMap = new SelectorMap();
         this.arch = arch;
         this.resolver = resolver;
-        this.statics = new VmSharedStatics(arch, resolver);
+        this.sharedStatics = new VmSharedStatics(arch, resolver);
+        this.isolatedStatics = new VmIsolatedStatics(arch, resolver);
     }
 
     /**
@@ -123,7 +127,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         final VmSystemClassLoader sysCl = VmSystem.getSystemClassLoader();
         this.selectorMap = sysCl.selectorMap;
         this.arch = sysCl.arch;
-        this.statics = sysCl.statics;
+        this.sharedStatics = sysCl.sharedStatics;
     }
 
     /**
@@ -759,9 +763,22 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * @return The statics table
      */
     public final VmSharedStatics getSharedStatics() {
-        return statics;
+        return sharedStatics;
     }
 
+    /**
+     * Gets the isolated statics table (of the current isolate)
+     * 
+     * @return The statics table
+     */
+    public VmIsolatedStatics getIsolatedStatics() {
+        if (isolatedStatics != null) {
+            return isolatedStatics;
+        } else {
+            return Unsafe.getCurrentProcessor().getIsolatedStatics();
+        }
+    }
+    
     /**
      * Gets the architecture used by this loader.
      * 

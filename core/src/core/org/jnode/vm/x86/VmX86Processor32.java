@@ -26,6 +26,7 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.vm.VmThread;
+import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
@@ -48,8 +49,8 @@ public final class VmX86Processor32 extends VmX86Processor {
      * @param cpuId
      */
     public VmX86Processor32(int id, VmX86Architecture32 arch,
-            VmSharedStatics statics, X86CpuID cpuId) {
-        super(id, arch, statics, cpuId);
+            VmSharedStatics statics, VmIsolatedStatics isolatedStatics, X86CpuID cpuId) {
+        super(id, arch, statics, isolatedStatics, cpuId);
     }
 
     /**
@@ -57,8 +58,8 @@ public final class VmX86Processor32 extends VmX86Processor {
      * 
      * @return The new thread
      */
-    protected VmThread createThread() {
-        return new VmX86Thread32();
+    protected VmThread createThread(VmIsolatedStatics isolatedStatics) {
+        return new VmX86Thread32(isolatedStatics);
     }
 
     /**
@@ -67,8 +68,8 @@ public final class VmX86Processor32 extends VmX86Processor {
      * @param javaThread
      * @return The new thread
      */
-    public VmThread createThread(Thread javaThread) {
-        return new VmX86Thread32(javaThread);
+    public VmThread createThread(VmIsolatedStatics isolatedStatics, Thread javaThread) {
+        return new VmX86Thread32(isolatedStatics, javaThread);
     }
 
     /**
@@ -77,8 +78,8 @@ public final class VmX86Processor32 extends VmX86Processor {
      * @param stack
      * @return The new thread
      */
-    protected VmX86Thread createThread(byte[] stack) {
-        return new VmX86Thread32(stack);
+    protected VmX86Thread createThread(VmIsolatedStatics isolatedStatics, byte[] stack) {
+        return new VmX86Thread32(isolatedStatics, stack);
     }
 
     /**

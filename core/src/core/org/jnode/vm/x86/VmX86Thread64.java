@@ -23,6 +23,7 @@ package org.jnode.vm.x86;
 
 import org.jnode.util.NumberUtils;
 import org.jnode.vm.ObjectVisitor;
+import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Word;
@@ -44,22 +45,22 @@ public final class VmX86Thread64 extends VmX86Thread {
 	/**
 	 * 
 	 */
-	public VmX86Thread64() {
-		super(VmX86Architecture64.SLOT_SIZE);
+	public VmX86Thread64(VmIsolatedStatics isolatedStatics) {
+		super(isolatedStatics, VmX86Architecture64.SLOT_SIZE);
 	}
 
 	/**
 	 * @param stack
 	 */
-	public VmX86Thread64(byte[] stack) {
-		super(stack, VmX86Architecture64.SLOT_SIZE);
+	public VmX86Thread64(VmIsolatedStatics isolatedStatics, byte[] stack) {
+		super(isolatedStatics, stack, VmX86Architecture64.SLOT_SIZE);
 	}
 
 	/**
 	 * @param javaThread
 	 */
-	public VmX86Thread64(Thread javaThread) {
-		super(javaThread);
+	public VmX86Thread64(VmIsolatedStatics isolatedStatics, Thread javaThread) {
+		super(isolatedStatics, javaThread);
 	}
 
 	protected final int getReferenceSize() {

@@ -24,6 +24,7 @@ package org.jnode.vm.x86;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.vm.VmThread;
+import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.vmmagic.unboxed.Address;
 
@@ -39,21 +40,21 @@ public final class VmX86Processor64 extends VmX86Processor {
 	 * @param cpuId
 	 */
 	public VmX86Processor64(int id, VmX86Architecture64 arch, VmSharedStatics statics,
-			X86CpuID cpuId) {
-		super(id, arch, statics, cpuId);
+            VmIsolatedStatics isolatedStatics, X86CpuID cpuId) {
+		super(id, arch, statics, isolatedStatics, cpuId);
 		// TODO Auto-generated constructor stub
 	}
 
-	protected final VmThread createThread() {
-		return new VmX86Thread64();
+	protected final VmThread createThread(VmIsolatedStatics isolatedStatics) {
+		return new VmX86Thread64(isolatedStatics);
 	}
 
-	protected final VmX86Thread createThread(byte[] stack) {
-		return new VmX86Thread64(stack);
+	protected final VmX86Thread createThread(VmIsolatedStatics isolatedStatics, byte[] stack) {
+		return new VmX86Thread64(isolatedStatics, stack);
 	}
 
-	public final VmThread createThread(Thread javaThread) {
-		return new VmX86Thread64(javaThread);
+	public final VmThread createThread(VmIsolatedStatics isolatedStatics, Thread javaThread) {
+		return new VmX86Thread64(isolatedStatics, javaThread);
 	}
 
 	protected Address setupBootCode(ResourceManager rm, GDT gdt)

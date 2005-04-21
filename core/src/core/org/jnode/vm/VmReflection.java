@@ -146,7 +146,11 @@ public class VmReflection {
 			getStaticFieldAddress(sf).store(ObjectReference.fromObject(value));
 			final VmWriteBarrier wb = Vm.getHeapManager().getWriteBarrier();
 			if (wb != null) {
-				wb.putstaticWriteBarrier(sf.getStaticsIndex(), value);
+                if (sf.isShared()) {
+                    wb.putstaticWriteBarrier(true, sf.getSharedStaticsIndex(), value);
+                } else {
+                    wb.putstaticWriteBarrier(true, sf.getIsolatedStaticsIndex(), value);                    
+                }
 			}
 		} else {
 			final VmInstanceField inf = (VmInstanceField) field;
@@ -255,8 +259,15 @@ public class VmReflection {
 	 */
 	private static final Address getStaticFieldAddress(VmStaticField sf) {
 		final VmProcessor proc = Unsafe.getCurrentProcessor();
-		final Address tablePtr = VmMagic.getArrayData(proc.getStaticsTable());
-		final int offset = sf.getStaticsIndex() << 2;
+		final Address tablePtr;
+		final int offset;
+        if (sf.isShared()) {
+            offset = sf.getSharedStaticsIndex() << 2;
+            tablePtr = VmMagic.getArrayData(proc.getSharedStaticsTable());
+        } else {
+            offset = sf.getIsolatedStaticsIndex() << 2;            
+            tablePtr = VmMagic.getArrayData(proc.getIsolatedStaticsTable());
+        }
 		return tablePtr.add(offset);
 	}
 

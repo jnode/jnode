@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.build;
 
 import java.io.ByteArrayOutputStream;
@@ -71,10 +71,12 @@ import org.jnode.vm.classmgr.VmArrayClass;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmField;
+import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmMethodCode;
 import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.classmgr.VmStaticField;
+import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.memmgr.HeapHelper;
@@ -119,6 +121,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * optimized compilation
      */
     private final HashSet<String> compileHighOptLevelPackages = new HashSet<String>();
+
     private final HashSet<String> preloadPackages = new HashSet<String>();
 
     protected boolean debug = false;
@@ -192,8 +195,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 final boolean compHigh = isCompileHighOptLevel(vmClass);
                 try {
                     if (!vmClass.isCpRefsResolved() && compHigh) {
-                        //log("Resolving CP of " + vmClass.getName(),
-                        //Project.MSG_VERBOSE);
+                        // log("Resolving CP of " + vmClass.getName(),
+                        // Project.MSG_VERBOSE);
                         vmClass.resolveCpRefs(clsMgr);
                         again = true;
                     }
@@ -239,12 +242,13 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @param blockedObjects
      * @throws BuildException
      */
-    protected final void copyJarFile(Set<Object> blockedObjects) throws BuildException {
+    protected final void copyJarFile(Set<Object> blockedObjects)
+            throws BuildException {
 
         try {
             final JarFile jar = new JarFile(jarFile);
             final BootableHashMap<String, byte[]> resources = new BootableHashMap<String, byte[]>();
-            for (Enumeration<?> e = jar.entries(); e.hasMoreElements();) {
+            for (Enumeration< ? > e = jar.entries(); e.hasMoreElements();) {
                 final JarEntry entry = (JarEntry) e.nextElement();
                 final byte[] data = read(jar.getInputStream(entry));
                 resources.put(entry.getName(), data);
@@ -293,8 +297,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @return The processor
      * @throws BuildException
      */
-    protected abstract VmProcessor createProcessor(VmSharedStatics statics)
-            throws BuildException;
+    protected abstract VmProcessor createProcessor(VmSharedStatics statics,
+            VmIsolatedStatics isolatedStatics) throws BuildException;
 
     private final void doExecute() throws BuildException {
         debug = (getProject().getProperty("jnode.debug") != null);
@@ -336,7 +340,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             // Load the plugin descriptors
             final PluginRegistry piRegistry;
             piRegistry = new PluginRegistryModel(piList.getPluginList());
-            //piRegistry = new
+            // piRegistry = new
             // PluginRegistryModel(piList.getDescriptorUrlList());
             testPluginPrerequisites(piRegistry);
 
@@ -348,6 +352,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             blockedObjects.add(clsMgr);
             blockedObjects.add(clsMgr.getSharedStatics());
             blockedObjects.add(clsMgr.getSharedStatics().getTable());
+            blockedObjects.add(clsMgr.getIsolatedStatics());
+            blockedObjects.add(clsMgr.getIsolatedStatics().getTable());
             // Initialize the statics table.
             initializeStatics(clsMgr.getSharedStatics());
 
@@ -362,7 +368,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             blockedObjects.add(vm);
             blockedObjects.add(Vm.getCompiledMethods());
 
-            final VmProcessor proc = createProcessor(clsMgr.getSharedStatics());
+            final VmProcessor proc = createProcessor(clsMgr.getSharedStatics(),
+                    clsMgr.getIsolatedStatics());
             log("Building for " + proc.getCPUID());
 
             final Label clInitCaller = new Label("$$clInitCaller");
@@ -392,6 +399,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             loadClass(VmDefaultHeap.class);
             loadClass(VmHeapManager.class);
             loadClass(VmSharedStatics.class);
+            loadClass(VmIsolatedStatics.class);
             loadClass(Vm.getHeapManager().getClass());
             loadClass(HeapHelper.class);
             loadClass(HeapHelperImpl.class);
@@ -429,7 +437,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
             // Now emit all object images to the actual image
             emitObjects(os, arch, blockedObjects, false);
-            
+
             // Disallow the loading of new classes
             clsMgr.setFailOnNewLoad(true);
             emitObjects(os, arch, blockedObjects, false);
@@ -469,6 +477,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             // Emit the statics table
             log("Emit statics", Project.MSG_VERBOSE);
             blockedObjects.remove(clsMgr.getSharedStatics());
+            blockedObjects.remove(clsMgr.getIsolatedStatics());
             emitObjects(os, arch, blockedObjects, true);
             // Twice, this is intended!
             emitObjects(os, arch, blockedObjects, true);
@@ -476,14 +485,12 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             // Emit the remaining objects
             log("Emit rest; blocked=" + blockedObjects, Project.MSG_VERBOSE);
             emitObjects(os, arch, null, true);
-            log("statics table 0x"
-                    + NumberUtils.hex(os.getObjectRef(
-                            clsMgr.getSharedStatics().getTable()).getOffset()),
-                    Project.MSG_INFO);
-            
-            // Verify no methods have been compiled after we wrote the CompiledCodeList.
+
+            // Verify no methods have been compiled after we wrote the
+            // CompiledCodeList.
             if (Vm.getCompiledMethods().size() != compiledMethods) {
-                throw new BuildException("Method have been compiled after CompiledCodeList was written.");
+                throw new BuildException(
+                        "Method have been compiled after CompiledCodeList was written.");
             }
 
             /* Write static initializer code */
@@ -518,7 +525,10 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             final int bootHeapBitmapSize = (bootHeapSize / ObjectLayout.OBJECT_ALIGN) >> 3;
             log("Boot heap size " + (bootHeapSize >>> 10) + "K bitmap size "
                     + (bootHeapBitmapSize >>> 10) + "K");
+            log("Shared statics");
             clsMgr.getSharedStatics().dumpStatistics(System.out);
+            log("Isolated statics");
+            clsMgr.getIsolatedStatics().dumpStatistics(System.out);
             vm.dumpStatistics(System.out);
 
             logStatistics(os);
@@ -552,7 +562,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @throws BuildException
      */
     private final void emitObjects(NativeStream os, VmArchitecture arch,
-            Set<Object> blockObjects, boolean skipCopyStatics) throws BuildException {
+            Set<Object> blockObjects, boolean skipCopyStatics)
+            throws BuildException {
         log("Emitting objects", Project.MSG_DEBUG);
         PrintWriter debugOut = null;
         final TreeSet<String> emittedClassNames = new TreeSet<String>();
@@ -570,16 +581,20 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 loops++;
                 compileClasses(os, arch);
                 if (!skipCopyStatics) {
-                    copyStaticFields(clsMgr, clsMgr.getSharedStatics(), os, emitter);
+                    copyStaticFields(clsMgr, clsMgr.getSharedStatics(), clsMgr
+                            .getIsolatedStatics(), os, emitter);
                 }
-                final Collection<ObjectRef> objectRefs = new ArrayList<ObjectRef>(os.getObjectRefs());
+                final Collection<ObjectRef> objectRefs = new ArrayList<ObjectRef>(
+                        os.getObjectRefs());
                 int unresolvedFound = 0; // Number of unresolved references
                 // found in the following
                 // loop
-                int emitted = 0; // Number of emitted objects in the following
+                int emitted = 0; // Number of emitted objects in the
+                // following
                 // loop
                 for (Iterator<ObjectRef> i = objectRefs.iterator(); i.hasNext();) {
-                    X86BinaryAssembler.ObjectRef ref = (X86BinaryAssembler.ObjectRef) i.next();
+                    X86BinaryAssembler.ObjectRef ref = (X86BinaryAssembler.ObjectRef) i
+                            .next();
                     if (!ref.isResolved()) {
                         final Object obj = ref.getObject();
                         if (!(obj instanceof Label)) {
@@ -610,10 +625,10 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                                 if (blockObjects == null) {
                                     emittedClassNames.add(obj.getClass()
                                             .getName());
-                                    //log("emitObject " +
+                                    // log("emitObject " +
                                     // obj.getClass().getName());
                                 }
-                                //if (obj != skipMe) {
+                                // if (obj != skipMe) {
                                 emitter.emitObject(obj);
                                 emitted++;
                                 X86BinaryAssembler.ObjectRef newRef = os
@@ -640,7 +655,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                     }
                     if (blockedObjects != null) {
                         if (unresolvedFound == (emitted + blockObjects.size())) {
-                            //log("UnresolvedFound " + unresolvedFound + ",
+                            // log("UnresolvedFound " + unresolvedFound + ",
                             // emitted " + emitted + ",blocked " +
                             // blockObjects.size());
                             break;
@@ -661,8 +676,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 debugOut = null;
             }
             if (blockObjects == null) {
-                log("Emitted classes: " + emittedClassNames,
-                        Project.MSG_INFO);
+                log("Emitted classes: " + emittedClassNames, Project.MSG_INFO);
             }
         } catch (ClassNotFoundException ex) {
             throw new BuildException(ex);
@@ -850,7 +864,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @return The loaded class
      * @throws ClassNotFoundException
      */
-    public final VmType loadClass(Class<?> c) throws ClassNotFoundException {
+    public final VmType loadClass(Class< ? > c) throws ClassNotFoundException {
         String name = c.getName();
         VmType cls = clsMgr.findLoadedClass(name);
         if (cls != null) {
@@ -917,7 +931,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 if (compileHighOptLevelPackages.contains(cName)) {
                     load = true;
                 } else if (preloadPackages.contains(cName)) {
-                	load = true;
+                    load = true;
                 }
 
                 final int lastDotIdx = cName.lastIndexOf('.');
@@ -927,7 +941,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 if (compileHighOptLevelPackages.contains(pkg)) {
                     load = true;
                 } else if (preloadPackages.contains(pkg)) {
-                	load = true;
+                    load = true;
                 }
 
                 if (load) {
@@ -971,47 +985,54 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         if (!debug) {
             return;
         }
-        
+
         try {
             int unresolvedCount = 0;
             final PrintWriter w = new PrintWriter(new FileWriter(listFile));
             // Print a list of boot classes.
             for (int i = 0; i < bootClasses.length; i++) {
-                final VmType vmClass = bootClasses[i];
+                final VmType< ? > vmClass = bootClasses[i];
                 w.print("bootclass ");
                 w.print(i);
                 w.print(": ");
                 w.print(vmClass.getName());
                 if (vmClass instanceof VmClassType) {
-                    final int cnt = ((VmClassType) vmClass).getInstanceCount();
+                    final int cnt = ((VmClassType< ? >) vmClass)
+                            .getInstanceCount();
                     if (cnt > 0) {
                         w.print(", ");
                         w.print(cnt);
                         w.print(" instances");
                         if (vmClass instanceof VmNormalClass) {
-                        	long objSize = ((VmNormalClass)vmClass).getObjectSize();
-                        	long totalSize = objSize * cnt;
+                            long objSize = ((VmNormalClass< ? >) vmClass)
+                                    .getObjectSize();
+                            long totalSize = objSize * cnt;
                             w.print(", ");
-                        	w.print(objSize);
+                            w.print(objSize);
                             w.print(" objsize ");
-                        	w.print(totalSize);
+                            w.print(totalSize);
                             w.print(" totsize");
                             if (totalSize > 200000) {
-                            	log(vmClass.getName() + " is large (" + totalSize + " , #" + cnt + ")", Project.MSG_WARN);
+                                log(vmClass.getName() + " is large ("
+                                        + totalSize + " , #" + cnt + ")",
+                                        Project.MSG_WARN);
                             }
                         }
                     }
                 }
                 if (vmClass.isArray()) {
-                    final long len = ((VmArrayClass) vmClass).getTotalLength();
+                    final long len = ((VmArrayClass< ? >) vmClass)
+                            .getTotalLength();
                     if (len > 0) {
                         w.print(", ");
                         w.print(len);
                         w.print(" total length ");
                         w.print(len
-                                / ((VmArrayClass) vmClass).getInstanceCount());
+                                / ((VmArrayClass< ? >) vmClass)
+                                        .getInstanceCount());
                         w.print(" avg length ");
-                        w.print(((VmArrayClass)vmClass).getMaximumLength());
+                        w.print(((VmArrayClass< ? >) vmClass)
+                                .getMaximumLength());
                         w.print(" max length ");
                     }
                 }
@@ -1040,7 +1061,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             // Look for unresolved labels and put all resolved
             // label into the sorted map. This will be used later
             // to print to the listing file.
-            final Collection<? extends ObjectRef> xrefs = os.getObjectRefs();
+            final Collection< ? extends ObjectRef> xrefs = os.getObjectRefs();
             final SortedMap<Integer, ObjectRef> map = new TreeMap<Integer, ObjectRef>();
             for (ObjectRef ref : xrefs) {
                 if (!ref.isResolved()) {
@@ -1205,20 +1226,20 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("org.jnode.vm.compiler.ir.quad");
         addCompileHighOptLevel("org.jnode.vm.memmgr");
         addCompileHighOptLevel("org.jnode.vm.memmgr.def");
-        
+
         if (false) {
-        	addCompileHighOptLevel("java.awt");
-        	addCompileHighOptLevel("java.awt.event");
-        	addCompileHighOptLevel("java.awt.peer");
-        	addCompileHighOptLevel("java.awt.font");
-        	addCompileHighOptLevel("java.awt.geom");
-        	
-        	addPreloadPackage("javax.swing");
-        	addPreloadPackage("javax.swing.border");
-        	addPreloadPackage("javax.swing.event");
-        	addPreloadPackage("javax.swing.plaf");
-        	addPreloadPackage("javax.swing.plaf.basic");
-        	addPreloadPackage("javax.swing.plaf.metal");
+            addCompileHighOptLevel("java.awt");
+            addCompileHighOptLevel("java.awt.event");
+            addCompileHighOptLevel("java.awt.peer");
+            addCompileHighOptLevel("java.awt.font");
+            addCompileHighOptLevel("java.awt.geom");
+
+            addPreloadPackage("javax.swing");
+            addPreloadPackage("javax.swing.border");
+            addPreloadPackage("javax.swing.event");
+            addPreloadPackage("javax.swing.plaf");
+            addPreloadPackage("javax.swing.plaf.basic");
+            addPreloadPackage("javax.swing.plaf.metal");
         }
     }
 
@@ -1267,44 +1288,60 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         }
     }
 
-    protected void copyStaticFields(VmSystemClassLoader cl, VmSharedStatics statics, NativeStream os, ObjectEmitter emitter)
+    protected void copyStaticFields(VmSystemClassLoader cl,
+            VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
+            NativeStream os, ObjectEmitter emitter)
             throws ClassNotFoundException {
         for (VmType type : cl.getLoadedClasses()) {
             final String name = type.getName();
             final int cnt = type.getNoDeclaredFields();
-            if ((cnt > 0) && !name.startsWith("java.")){
-            	final Class javaType = Class.forName(type.getName());
-            	try {
-            		final FieldInfo fieldInfo = emitter.getFieldInfo(javaType);
-            		final Field[] jdkFields = fieldInfo.getJdkStaticFields();
-            		final int max = jdkFields.length;
-            		
-            		for (int k = 0; k < max; k++) {
-            			final Field jdkField = jdkFields[k];               
-            			if (jdkField != null) {
-            				final VmField f = fieldInfo.getJNodeStaticField(k);
-            				if (!f.isTransient()) {
-            					try {
-            						copyStaticField(type, f, jdkField, statics, os, emitter);
-            					} catch (IllegalAccessException ex) {
-            						throw new BuildException(ex);
-            					}
-            				}
-            			}
-            		}
-            	} catch (JNodeClassNotFoundException ex) {
-            		log("JNode class not found" + ex.getMessage());
+            if ((cnt > 0) && !name.startsWith("java.")) {
+                final Class javaType = Class.forName(type.getName());
+                try {
+                    final FieldInfo fieldInfo = emitter.getFieldInfo(javaType);
+                    final Field[] jdkFields = fieldInfo.getJdkStaticFields();
+                    final int max = jdkFields.length;
+
+                    for (int k = 0; k < max; k++) {
+                        final Field jdkField = jdkFields[k];
+                        if (jdkField != null) {
+                            final VmField f = fieldInfo.getJNodeStaticField(k);
+                            if (!f.isTransient()) {
+                                try {
+                                    copyStaticField(type, f, jdkField,
+                                            sharedStatics, isolatedStatics, os,
+                                            emitter);
+                                } catch (IllegalAccessException ex) {
+                                    throw new BuildException(ex);
+                                }
+                            }
+                        }
+                    }
+                } catch (JNodeClassNotFoundException ex) {
+                    log("JNode class not found" + ex.getMessage());
                 }
             }
         }
     }
 
-    private void copyStaticField(VmType type, VmField f, Field jf, VmSharedStatics statics, NativeStream os, ObjectEmitter emitter)
+    private void copyStaticField(VmType type, VmField f, Field jf,
+            VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
+            NativeStream os, ObjectEmitter emitter)
             throws IllegalAccessException, JNodeClassNotFoundException {
         jf.setAccessible(true);
         final Object val = jf.get(null);
         final int fType = JvmType.SignatureToType(f.getSignature());
-        final int idx = ((VmStaticField)f).getStaticsIndex();
+        final int idx;
+        final VmStaticField sf = (VmStaticField) f;
+        final VmStatics statics;
+        if (sf.isShared()) {
+            idx = sf.getSharedStaticsIndex();
+            statics = sharedStatics;
+        } else {
+            idx = sf.getIsolatedStaticsIndex();
+            statics = isolatedStatics;
+        }
+
         if (f.isPrimitive()) {
             if (f.isWide()) {
                 final long lval;
@@ -1340,7 +1377,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                     throw new IllegalArgumentException("Unknown wide type "
                             + fType);
                 }
-                statics.setInt(idx, ival);                
+                statics.setInt(idx, ival);
             }
         } else {
             if (!Modifier.isAddressType(f.getSignature())) {
@@ -1352,11 +1389,12 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             }
         }
     }
-    
+
     /**
      * Initialize the statics table.
+     * 
      * @param statics
      */
     protected abstract void initializeStatics(VmSharedStatics statics)
-    throws BuildException;
+            throws BuildException;
 }

@@ -159,6 +159,12 @@ yieldPointHandler_fixOldStackOverflow:
 yieldPointHandler_afterStackOverflow:
 	; Set the new thread parameters
 	mov CURRENTTHREAD,ADI
+	; Set the isolatedStatics of the new thread
+	mov ABX,[ADI+VmThread_ISOLATEDSTATICS_OFS]
+	mov ISOLATEDSTATICS,ABX
+	; Set the isolatedStaticsTable of the new thread
+	mov ABX,[ABX+VmStatics_STATICS_OFS]
+	mov ISOLATEDSTATICSTABLE,ABX
 	; Reload stackend
 	mov ABX,[ADI+VmThread_STACKEND_OFS]
 	mov STACKEND,ABX

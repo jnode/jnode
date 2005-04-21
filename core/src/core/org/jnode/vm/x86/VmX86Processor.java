@@ -33,6 +33,7 @@ import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmThread;
+import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.vmmagic.pragma.LoadStaticsPragma;
 import org.vmmagic.unboxed.Address;
@@ -88,8 +89,8 @@ public abstract class VmX86Processor extends VmProcessor {
      * @param id
      */
     public VmX86Processor(int id, VmX86Architecture arch, VmSharedStatics statics,
-            X86CpuID cpuId) {
-        super(id, arch, statics);
+            VmIsolatedStatics isolatedStatics, X86CpuID cpuId) {
+        super(id, arch, statics, isolatedStatics);
         if (cpuId != null) {
             setCPUID(cpuId);
         }
@@ -195,7 +196,7 @@ public abstract class VmX86Processor extends VmProcessor {
      * @param stack
      * @return The new thread
      */
-    protected abstract VmX86Thread createThread(byte[] stack);
+    protected abstract VmX86Thread createThread(VmIsolatedStatics isolatedStatics, byte[] stack);
 
     /**
      * Setup the required CPU structures. GDT, TSS, kernel stack, user stack,
@@ -209,7 +210,7 @@ public abstract class VmX86Processor extends VmProcessor {
         // Create user stack
         final byte[] userStack = new byte[VmThread.DEFAULT_STACK_SLOTS * getArchitecture().getReferenceSize()];
         setupUserStack(userStack);
-        this.currentThread = createThread(userStack);
+        this.currentThread = createThread(getIsolatedStatics(), userStack);
 
         // gdt.dump(System.out);
     }
@@ -281,7 +282,7 @@ public abstract class VmX86Processor extends VmProcessor {
             final int logId = cpu.getId() | i;
             BootLog.info("Adding logical CPU 0x" + NumberUtils.hex(logId, 2));
             final VmX86Processor logCpu = (VmX86Processor) arch
-                    .createProcessor(logId, Vm.getVm().getSharedStatics());
+                    .createProcessor(logId, Vm.getVm().getSharedStatics(), cpu.getIsolatedStatics());
             logCpu.logical = true;
             arch.initX86Processor(logCpu);
             logCpu.startup(rm);

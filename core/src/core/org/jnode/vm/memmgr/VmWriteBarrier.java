@@ -52,10 +52,11 @@ public abstract class VmWriteBarrier extends VmSystemObject {
 	/**
 	 * This method is inlined to implement the write barrier for putstatics of references
 	 *
-	 * @param staticsIndex The offset of static field ( from VmStatics)
+     * @param shared    Is this a shared static field
+	 * @param staticsIndex The offset of static field (in VmSharedStatics or VmIsolatedStatics)
 	 * @param value        The value being stored
 	 */
-	public abstract void putstaticWriteBarrier(int staticsIndex, Object value) 
+	public abstract void putstaticWriteBarrier(boolean shared, int staticsIndex, Object value) 
 	throws UninterruptiblePragma;
 
 	/**

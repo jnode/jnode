@@ -122,6 +122,7 @@
 			<class classname="org.jnode.vm.classmgr.VmMember" />
 			<class classname="org.jnode.vm.classmgr.VmMethod" />
 			<class classname="org.jnode.vm.classmgr.VmInstanceMethod" />
+			<class classname="org.jnode.vm.classmgr.VmStatics" />
 			<class classname="org.jnode.vm.classmgr.VmType" />
 			<class classname="org.jnode.vm.VmProcessor" />
 			<class classname="org.jnode.vm.VmProcessor" static="on" />

@@ -53,6 +53,7 @@ import org.jnode.vm.classmgr.ObjectLayout;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmInstanceField;
+import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmMethodCode;
 import org.jnode.vm.classmgr.VmSharedStatics;
@@ -153,19 +154,19 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 	 * @return The processor
 	 * @throws BuildException
 	 */
-	protected VmProcessor createProcessor(VmSharedStatics statics)
+	protected VmProcessor createProcessor(VmSharedStatics statics, VmIsolatedStatics isolatedStatics)
 			throws BuildException {
 		this.sharedStatics = statics;
 		if (processor == null) {
 			switch (bits) {
 			case 32:
 				processor = new VmX86Processor32(0,
-						(VmX86Architecture32) getArchitecture(), statics,
+						(VmX86Architecture32) getArchitecture(), statics, isolatedStatics,
 						getCPUID());
 				break;
 			case 64:
 				processor = new VmX86Processor64(0,
-						(VmX86Architecture64) getArchitecture(), statics,
+						(VmX86Architecture64) getArchitecture(), statics, isolatedStatics,
 						getCPUID());
 				break;
 			default:
@@ -335,7 +336,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 		/* Set statics index of VmSystem_currentTimeMillis */
 		final VmType vmSystemClass = loadClass(VmSystem.class);
 		final int staticsIdx = ((VmStaticField) vmSystemClass
-				.getField("currentTimeMillis")).getStaticsIndex();
+				.getField("currentTimeMillis")).getSharedStaticsIndex();
 		final X86BinaryAssembler os86 = (X86BinaryAssembler) os;
 		os86.set32(os.getObjectRef(new Label("currentTimeMillisStaticsIdx"))
 				.getOffset(), staticsIdx);
@@ -489,7 +490,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 		/* Set Vm.instance */
 		os.writeMOV_Const(abx, vm);
 		final int vmOffset = (VmArray.DATA_OFFSET * slotSize)
-				+ (vmField.getStaticsIndex() << 2);
+				+ (vmField.getSharedStaticsIndex() << 2);
 		log("vmOffset " + NumberUtils.hex(vmOffset), Project.MSG_VERBOSE);
 		os.writeMOV(abx.getSize(), adi, vmOffset, abx);
 	}
@@ -519,7 +520,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 		/* Set Main.pluginRegistry */
 		os.writeMOV_Const(abx, registry);
 		final int rfOffset = (VmArray.DATA_OFFSET * slotSize)
-				+ (registryField.getStaticsIndex() << 2);
+				+ (registryField.getSharedStaticsIndex() << 2);
 		log("rfOffset " + NumberUtils.hex(rfOffset), Project.MSG_VERBOSE);
 		os.writeMOV(abx.getSize(), adi, rfOffset, abx);
 	}
