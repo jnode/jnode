@@ -37,9 +37,8 @@ import org.vmmagic.unboxed.ObjectReference;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class VmStatics extends VmSystemObject {
+abstract class VmStatics extends VmSystemObject {
 
-	private static final int SIZE = 1 << 16;
 	private static final byte TYPE_INT = 0x01;
 	private static final byte TYPE_LONG = 0x02;
 	private static final byte TYPE_OBJECT = 0x03;
@@ -62,10 +61,10 @@ public final class VmStatics extends VmSystemObject {
 	/**
 	 * Initialize this instance
 	 */
-	public VmStatics(VmArchitecture arch, ObjectResolver resolver) {
-		this.statics = new int[SIZE];
-		this.types = new byte[SIZE];
-		this.objects = new Object[SIZE];
+	public VmStatics(VmArchitecture arch, ObjectResolver resolver, int size) {
+		this.statics = new int[size];
+		this.types = new byte[size];
+		this.objects = new Object[size];
 		this.lsbFirst = (arch.getByteOrder() == ByteOrder.LITTLE_ENDIAN);
 		this.slotLength = arch.getReferenceSize() >> 2;
 		this.resolver = resolver;

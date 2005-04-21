@@ -23,7 +23,7 @@ package org.jnode.vm.x86;
 
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.classmgr.TypeSizeInfo;
-import org.jnode.vm.classmgr.VmStatics;
+import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.compiler.IMTCompiler;
 import org.jnode.vm.x86.compiler.X86IMTCompiler32;
 
@@ -66,7 +66,7 @@ public final class VmX86Architecture32 extends VmX86Architecture {
      * 
      * @return The processor
      */
-    public VmProcessor createProcessor(int id, VmStatics statics) {
+    public VmProcessor createProcessor(int id, VmSharedStatics statics) {
         return new VmX86Processor32(id, this, statics, null);
     }
 

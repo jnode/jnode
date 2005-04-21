@@ -39,7 +39,7 @@ import org.jnode.vm.classmgr.ClassDecoder;
 import org.jnode.vm.classmgr.IMTBuilder;
 import org.jnode.vm.classmgr.SelectorMap;
 import org.jnode.vm.classmgr.VmMethod;
-import org.jnode.vm.classmgr.VmStatics;
+import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.CompiledIMT;
 import org.jnode.vm.compiler.IMTCompiler;
@@ -80,7 +80,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
 
     private boolean requiresCompile = false;
 
-    private final VmStatics statics;
+    private final VmSharedStatics statics;
     
     private transient HashSet<String> failedClassNames;
 
@@ -108,7 +108,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         this.selectorMap = new SelectorMap();
         this.arch = arch;
         this.resolver = resolver;
-        this.statics = new VmStatics(arch, resolver);
+        this.statics = new VmSharedStatics(arch, resolver);
     }
 
     /**
@@ -758,7 +758,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * 
      * @return The statics table
      */
-    public final VmStatics getStatics() {
+    public final VmSharedStatics getSharedStatics() {
         return statics;
     }
 

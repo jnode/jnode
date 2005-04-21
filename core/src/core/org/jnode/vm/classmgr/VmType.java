@@ -236,7 +236,7 @@ public abstract class VmType<T> extends VmSystemObject implements VmStaticsEntry
 		this.state = VmTypeState.ST_LOADED;
 		this.loader = loader;
 		this.protectionDomain = protectionDomain;
-		this.staticsIndex = loader.getStatics().allocClass(this);
+		this.staticsIndex = loader.getSharedStatics().allocClass(this);
 		if (name.charAt(0) == '[') {
 			this.interfaceTable = new VmImplementedInterface[] {
 					new VmImplementedInterface(CloneableClass),
