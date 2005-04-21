@@ -741,7 +741,6 @@ public class X86CompilerHelper implements X86CompilerConstants {
             VmIsolatedStaticsEntry entry, GPR tmp) {
         writeLoadIsolatedStatics(curInstrLabel, "ps", tmp);
         os.writeMOV(INTSIZE, tmp, getIsolatedStaticsOffset(entry), src);
-        throw new Error("Not implemented");
     }
 
     /**

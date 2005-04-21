@@ -33,6 +33,7 @@ import java.util.HashSet;
 
 import org.jnode.assembler.NativeStream;
 import org.jnode.vm.JvmType;
+import org.jnode.vm.SharedStatics;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
 import org.jnode.vm.VmReflection;
@@ -45,7 +46,7 @@ import org.vmmagic.pragma.LoadStaticsPragma;
 import org.vmmagic.pragma.Uninterruptible;
 
 public abstract class VmType<T> extends VmSystemObject implements VmSharedStaticsEntry,
-		Uninterruptible {
+		Uninterruptible, SharedStatics {
 
 	/**
 	 * The parent of this class. Normally VmClass instance, during loading
@@ -196,13 +197,13 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
 	 * @param superClass
 	 * @param superClassName
 	 * @param loader
-	 * @param accessFlags
+	 * @param modifiers
 	 * @param typeSize
 	 * @param protectionDomain
 	 *            the protection domain of this type.
 	 */
 	private VmType(String name, VmNormalClass<? super T> superClass,
-			String superClassName, VmClassLoader loader, int accessFlags,
+			String superClassName, VmClassLoader loader, int modifiers,
 			int typeSize, ProtectionDomain protectionDomain) {
 		if (superClassName == null) {
 			if (!name.equals("java.lang.Object")) {
@@ -225,14 +226,14 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
                     cname.equals("Offset") || cname.equals("OffsetArray") ||
 		            cname.equals("Word") || cname.equals("WordArray") |
                     cname.equals("VmMagic")) {
-		        accessFlags |= Modifier.ACC_MAGIC;
+		        modifiers |= Modifier.ACC_MAGIC;
 		    }		 
 		}
 		
 		this.name = name;
 		this.superClass = superClass;
 		this.superClassName = superClassName;
-		this.modifiers = accessFlags;
+		this.modifiers = modifiers;
 		this.state = VmTypeState.ST_LOADED;
 		this.loader = loader;
 		this.protectionDomain = protectionDomain;
@@ -1918,6 +1919,15 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
 	protected void setInterfaceTable(VmImplementedInterface[] interfaceTable) {
 		if (this.interfaceTable == null) {
 			this.interfaceTable = interfaceTable;
+            
+            // Do we directly implement SharedStatics?
+            final String sharedStaticsName = SharedStatics.class.getName();
+            for (VmImplementedInterface intf : interfaceTable) {
+                if (intf.getClassName().equals(sharedStaticsName)) {
+                    modifiers |= Modifier.ACC_SHAREDSTATICS;
+                    break;
+                }
+            }
 		} else {
 			throw new IllegalArgumentException(
 					"Cannot overwrite interface table");

@@ -28,6 +28,7 @@ import org.jnode.plugin.PluginManager;
 import org.jnode.plugin.manager.DefaultPluginManager;
 import org.jnode.plugin.model.PluginRegistryModel;
 import org.jnode.system.BootLog;
+import org.jnode.vm.SharedStatics;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmSystem;
 import org.vmmagic.pragma.LoadStaticsPragma;
@@ -38,7 +39,7 @@ import org.vmmagic.pragma.UninterruptiblePragma;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class Main {
+public final class Main implements SharedStatics {
 
 	public static final String MAIN_METHOD_NAME = "vmMain";
 	public static final String MAIN_METHOD_SIGNATURE = "()I";
