@@ -5,6 +5,10 @@
         name="JMock classes"
         version="1.0.1"
         provider-name="jmock.org">
+
+  <requires>        
+	<import plugin="org.junit" version="3.8"/>
+  </requires>
         
   <runtime>
     <library name="jmock-1.0.1.jar">
