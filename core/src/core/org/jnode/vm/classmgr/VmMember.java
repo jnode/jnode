@@ -126,7 +126,7 @@ abstract class VmMember extends VmSystemObject implements Uninterruptible {
 	 * 
 	 * @return VmClass
 	 */
-	public VmType getDeclaringClass() {
+	public VmType<?> getDeclaringClass() {
 		return declaringClass;
 	}
 
