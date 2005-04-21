@@ -23,6 +23,7 @@ package org.jnode.fs.jifs.files;
 
 import org.jnode.fs.jifs.*;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSDirectory;
 
 /**
  * File, which contains information about the given Thread.
@@ -32,6 +33,11 @@ import org.jnode.fs.FSEntry;
 public class JIFSFthread extends JIFSFile{
 
 	private Thread t;
+	
+	public JIFSFthread() {
+		return;
+	}
+	
 /**
  * Creates the file, which contains information about the given Thread.
  * 
@@ -42,7 +48,7 @@ public class JIFSFthread extends JIFSFile{
  * @param parent
  *			Parent FSEntry, in this case it is an instance of JIFSDplugins.
  */
-	public JIFSFthread(String name, Thread t, FSEntry parent) {
+	public JIFSFthread(String name, Thread t, FSDirectory parent) {
 		super(name,parent);
 		this.t = t;
 		refresh();

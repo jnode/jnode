@@ -43,16 +43,21 @@ import org.jnode.fs.FSDirectory;
  */
 public class JIFSDplugins extends JIFSDirectory {
 	
-	public JIFSDplugins(FSDirectory parent)throws IOException{
-		super("plugins", parent);
+	public JIFSDplugins()throws IOException{
+		super("plugins");
 		refresh();
 	}
 	
+	public JIFSDplugins(FSDirectory parent)throws IOException{
+		this();
+		setParent(parent);
+	}
+	
 	public void refresh(){
-		super.refresh();
 		// this has to be improved
 		// just add new ones and delete old ones
 		// now it does delete all files and (re)create all ones
+		super.clear();
 		final ArrayList rows = new ArrayList();
 		try {
 			final PluginManager mgr = (PluginManager) InitialNaming.lookup(PluginManager.NAME);

@@ -5,7 +5,7 @@
         name="Jnode Information FileSystem"
         version="@VERSION@"
         provider-name="JNode.org">
-        <!--class="org.jnode.fs.jifs.def.JIFSPlugin"-->
+        
         
   <requires>
 	<import plugin="org.jnode.fs.service"/>

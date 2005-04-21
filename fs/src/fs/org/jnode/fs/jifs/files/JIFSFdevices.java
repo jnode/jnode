@@ -26,6 +26,7 @@ import java.util.TreeMap;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSDirectory;
 import org.jnode.fs.jifs.JIFSFile;
 import org.jnode.naming.InitialNaming;
 
@@ -37,9 +38,13 @@ import org.jnode.naming.InitialNaming;
 public class JIFSFdevices extends JIFSFile{
 
 	
-	public JIFSFdevices(String name, FSEntry parent) {
-		super(name,parent);
-		refresh();
+	public JIFSFdevices() {
+		super("devices");
+	}
+	
+	public JIFSFdevices(FSDirectory parent) {
+		this();
+		setParent(parent);
 	}
 	
 	public void refresh(){

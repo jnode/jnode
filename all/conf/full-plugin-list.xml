@@ -87,7 +87,8 @@
   <plugin id="org.jnode.fs.initrd"/>
   <plugin id="org.jnode.fs.jifs"/>
   <plugin id="org.jnode.fs.jifs.command"/>
-  <plugin id="org.jnode.fs.jifs.def"/>  
+  <plugin id="org.jnode.fs.jifs.def"/>
+  <plugin id="org.jnode.fs.jifs.example"/>   
 
   <plugin id="org.jnode.log4j"/>
 

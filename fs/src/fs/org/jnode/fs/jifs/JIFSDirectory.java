@@ -40,9 +40,9 @@ import org.jnode.fs.jifs.files.JIFSFuptime;
 import org.jnode.fs.jifs.files.JIFSFversion;
 
 /**
- * @author Andreas Haenel
+ * @author Andreas H\u00e4nel
  */
-public class JIFSDirectory implements FSDirectory, FSEntry {
+public class JIFSDirectory implements ExtFSEntry, FSDirectory {
 
     private boolean root = false;
 
@@ -52,9 +52,13 @@ public class JIFSDirectory implements FSDirectory, FSEntry {
 
     private final Map<String, FSEntry> entries;
 
-    public JIFSDirectory(String name) throws IOException {
-        label = name;
+    public JIFSDirectory() throws IOException {
         entries = new HashMap<String, FSEntry>();
+    }
+    
+    public JIFSDirectory(String name) throws IOException {
+    	this();
+        label = name;
     }
 
     public JIFSDirectory(String name, FSDirectory parent) throws IOException {
@@ -71,14 +75,19 @@ public class JIFSDirectory implements FSDirectory, FSEntry {
         addFSE(new JIFSFuptime(this));
         addFSE(new JIFSFmemory(this));
         addFSE(new JIFSFversion(this));
-        addFSE(new JIFSFdevices("devices", this));
+        addFSE(new JIFSFdevices(this));
         // directory
         addFSE(new JIFSDthreads(this));
         addFSE(new JIFSDplugins(this));
+        addFSE(new JIFSDirectory("extended",this));
     }
 
     public void refresh() {
-        entries.clear();
+        return;
+    }
+    
+    protected void clear() {
+    	entries.clear();
     }
 
     public void addFSE(FSEntry entry) {
@@ -89,6 +98,7 @@ public class JIFSDirectory implements FSDirectory, FSEntry {
      * Flush the contents of this directory to the persistent storage
      */
     public void flush() throws IOException {
+    	//TODO -> extended FSEntry maybe have to be flushed
     }
 
     public FSEntry addDirectory(String name) {
@@ -145,7 +155,7 @@ public class JIFSDirectory implements FSDirectory, FSEntry {
     }
 
     public void setName(String name) {
-        return;
+        this.label=name;
     }
 
     public boolean isDirectory() {
@@ -159,6 +169,10 @@ public class JIFSDirectory implements FSDirectory, FSEntry {
     public FSDirectory getParent() {
         return parent;
     }
+    
+    public void setParent(FSDirectory parent){
+		this.parent=parent;
+	}
 
     public String getName() {
         return label;

@@ -28,6 +28,9 @@ import java.util.NoSuchElementException;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSEntryIterator;
 
+/**
+ * @author Andreas H\u00e4nel
+ */
 public class JIFSDirIterator implements FSEntryIterator {
 
     private Iterator<FSEntry> it;

@@ -24,17 +24,23 @@ package org.jnode.fs.jifs.files;
 
 import org.jnode.fs.jifs.*;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSDirectory;
 
 /**
- * <description>
+ * File, which contains the version of JNode.
  * 
- * @author Trickkiste
+ * @author Andreas H\u00e4nel
  */
 public class JIFSFversion extends JIFSFile{
 
-	public JIFSFversion(FSEntry parent) {
-		super("version",parent);
+	public JIFSFversion() {
+		super("version");
 		refresh();
+	}
+	
+	public JIFSFversion(FSDirectory parent) {
+		this();
+		setParent(parent);
 	}
 	
 	public void refresh(){

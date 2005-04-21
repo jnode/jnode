@@ -30,7 +30,7 @@ import org.jnode.fs.FileSystemType;
 import org.jnode.fs.partitions.PartitionTableEntry;
 
 /**
- * @author Trickkiste
+ * @author Andreas H\u00e4nel
  */
 public class JIFileSystemType implements FileSystemType {
 

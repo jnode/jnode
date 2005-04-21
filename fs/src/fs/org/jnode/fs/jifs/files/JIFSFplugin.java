@@ -23,6 +23,7 @@ package org.jnode.fs.jifs.files;
 
 import org.jnode.fs.jifs.*;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSDirectory;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginManager;
 import org.jnode.plugin.PluginDescriptor;
@@ -37,19 +38,23 @@ import javax.naming.NameNotFoundException;
  */
 public class JIFSFplugin extends JIFSFile{
 	
+	public JIFSFplugin() {
+		return;		
+	}
+	
 	/**
 	 * Creates a file, which contains information about a Plugin.
 	 * 
 	 *@param name
-	 *			Name of this file <u>and</u> name of the plugin, whose information are stored in this file.
+	 *			Name of this file <u>and</u> name of the plugin, whose information is stored in this file.
 	 *@param parent
 	 *			Parent FSEntry, in this case it is an instance of JIFSDplugins.  
 	 */
-	public JIFSFplugin(String name, FSEntry parent) {
+	public JIFSFplugin(String name, FSDirectory parent) {
 		super(name,parent);
 		refresh();
 	}
-	
+		
 	public void refresh(){
 		super.refresh();
 		try{

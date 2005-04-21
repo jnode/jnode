@@ -31,7 +31,7 @@ import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 
 /**
- * @author Trickkiste
+ * @author Andreas H\u00e4nel
  */
 public class JIFileSystem implements FileSystem {
 	

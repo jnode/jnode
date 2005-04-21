@@ -23,17 +23,22 @@ package org.jnode.fs.jifs.files;
 
 import org.jnode.fs.jifs.*;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSDirectory;
 
 /**
- * <description>
+ * File, which contains information about memory usage.
  * 
- * @author Trickkiste
+ * @author Andreas H\u00e4nel
  */
 public class JIFSFmemory extends JIFSFile{
 
-	public JIFSFmemory(FSEntry parent) {
-		super("meminfo",parent);
-		refresh();
+	public JIFSFmemory() {
+		super("meminfo");
+	}
+	
+	public JIFSFmemory(FSDirectory parent) {
+		this();
+		setParent(parent);
 	}
 	
 	public void refresh(){

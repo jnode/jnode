@@ -35,13 +35,18 @@ import org.jnode.fs.FSDirectory;
  */
 public class JIFSDthreads extends JIFSDirectory {
 	
-	public JIFSDthreads(FSDirectory parent)throws IOException{
-		super("threads", parent);
+	public JIFSDthreads()throws IOException{
+		super("threads");
 		refresh();
 	}
 	
+	public JIFSDthreads(FSDirectory parent)throws IOException{
+		this();
+		setParent(parent);
+	}
+	
 	public void refresh(){
-		super.refresh();
+		super.clear();
 		ThreadGroup grp = Thread.currentThread().getThreadGroup();
 		while (grp.getParent() != null) {
 			grp = grp.getParent();
