@@ -41,23 +41,20 @@ abstract public class AbstractTestSuite extends TestSuite
      */
     final public void init()
     {
-        List configs = getConfigs();
+        List<TestConfig> configs = getConfigs();
         Class[] testSuites = getTestSuites();
         log.info(configs.size()+" configs, "+
                  testSuites.length+" TestSuites"); 
         
-        int nbConfigs = configs.size();
-        TestConfig cfg;
         ConfigManager cfgManager = ConfigManager.getInstance();
         
-        for(int i = 0 ; i < nbConfigs ; i++)
+        for(TestConfig cfg : configs)
         {
-            cfg = (TestConfig) configs.get(i);
             cfgManager.addConfig(cfg);
             
-            for(int j = 0 ; j < testSuites.length ; j++)
+            for(Class cls : testSuites)
             {
-                addTestSuite(testSuites[j]);
+                addTestSuite(cls);
             }
         }
     }
@@ -66,7 +63,7 @@ abstract public class AbstractTestSuite extends TestSuite
      * 
      * @return a list of TestConfig(s)
      */
-    abstract public List getConfigs();
+    abstract public List<TestConfig> getConfigs();
     
     /**
      * 
