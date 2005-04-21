@@ -37,8 +37,8 @@ public class ConfigManager
     static private ConfigManager instance; 
     static private boolean log4jInitialized = false; 
     
-    private Map configs; 
-    private Map iterators; 
+    private Map<Class, List<TestConfig>> configs; 
+    private Map<TestKey, Iterator<TestConfig>> iterators; 
     
     static public ConfigManager getInstance()
     {
@@ -52,10 +52,10 @@ public class ConfigManager
     
     public void addConfig(TestConfig config)
     {
-        List cfgs = (List) configs.get(config.getClass());
+        List<TestConfig> cfgs = configs.get(config.getClass());
         if(cfgs == null)
         {
-            cfgs = new ArrayList();
+            cfgs = new ArrayList<TestConfig>();
             configs.put(config.getClass(), cfgs);
         }
         
@@ -68,14 +68,14 @@ public class ConfigManager
         
         synchronized(iterators)
         {
-            Iterator it = (Iterator) iterators.get(key);
+            Iterator<TestConfig> it = iterators.get(key);
             if(it == null)
             {
-                List cfgs = (List) configs.get(configClazz);
+                List<TestConfig> cfgs = configs.get(configClazz);
                 it = cfgs.iterator();
                 iterators.put(key, it);
             }
-            TestConfig cfg = (TestConfig) it.next();
+            TestConfig cfg = it.next();
             log.info(key+" got config "+cfg);
             return cfg;
         }        
@@ -83,8 +83,8 @@ public class ConfigManager
     
     private ConfigManager()
     {        
-        configs = new HashMap(); 
-        iterators = new HashMap();
+        configs = new HashMap<Class, List<TestConfig>>(); 
+        iterators = new HashMap<TestKey, Iterator<TestConfig>>();
         ContextManager.getInstance().init();
     }        
     

@@ -31,12 +31,13 @@ import org.jnode.test.fs.driver.context.IDEDiskDriverContext;
 import org.jnode.test.fs.driver.context.RamDiskDriverContext;
 import org.jnode.test.fs.driver.tests.BlockDeviceAPITest;
 import org.jnode.test.support.AbstractTestSuite;
+import org.jnode.test.support.TestConfig;
 
 public class BlockDeviceAPITestSuite extends AbstractTestSuite
 {
-    public List getConfigs()
+    public List<TestConfig> getConfigs()
     {
-        List configs = new ArrayList();
+        List<TestConfig> configs = new ArrayList<TestConfig>();
         BlockDeviceAPITestConfig cfg;
         
         addConfig(configs, RamDiskDriverContext.class);     
@@ -78,7 +79,7 @@ public class BlockDeviceAPITestSuite extends AbstractTestSuite
         return configs;
     }
     
-    protected BlockDeviceAPITestConfig addConfig(List configs, Class contextClass)
+    protected BlockDeviceAPITestConfig addConfig(List<TestConfig> configs, Class contextClass)
     {
         BlockDeviceAPITestConfig cfg = new BlockDeviceAPITestConfig(contextClass);
         configs.add(cfg);            
