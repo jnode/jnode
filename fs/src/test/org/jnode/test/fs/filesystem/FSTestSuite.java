@@ -21,6 +21,7 @@
 
 package org.jnode.test.fs.filesystem;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,13 +37,15 @@ import org.jnode.test.fs.filesystem.tests.ConcurrentAccessFSTest;
 import org.jnode.test.fs.filesystem.tests.FileFSTest;
 import org.jnode.test.fs.filesystem.tests.TreeFSTest;
 import org.jnode.test.support.AbstractTestSuite;
+import org.jnode.test.support.TestConfig;
 
 public class FSTestSuite extends AbstractTestSuite
 {
-    public List getConfigs()
+    public List<TestConfig> getConfigs()
     {
-        List configs = new ArrayList();
-		final String diskFileName = "disk.img.WORK";
+        List<TestConfig> configs = new ArrayList<TestConfig>();
+        String tempDir = System.getProperty("java.io.tmpdir");
+		final String diskFileName = tempDir + File.separatorChar + "diskimg.WRK";
 		
         configs.addAll(createFileConfigs(OsType.OTHER_OS, FSType.EXT2, 
                 FSAccessMode.BOTH, "1", DO_FORMAT, diskFileName, "1M"));
@@ -92,7 +95,7 @@ public class FSTestSuite extends AbstractTestSuite
     public static final boolean DO_FORMAT = true;
     public static final boolean DO_NOT_FORMAT = false;
 
-    static private List createFileConfigs(OsType osType, FSType fsType, 
+    static private List<FSTestConfig> createFileConfigs(OsType osType, FSType fsType, 
             FSAccessMode accessMode, String options, boolean format, String fileSize, String fileName)
     {
         FileParam fp = new FileParam(fileSize, fileName);
@@ -100,10 +103,10 @@ public class FSTestSuite extends AbstractTestSuite
                 accessMode, options, format, fp);        
     }
     
-    static private List createConfigs(OsType osType, FSType fsType, 
+    static private List<FSTestConfig> createConfigs(OsType osType, FSType fsType, 
             FSAccessMode accessMode, String options, boolean format, DeviceParam device)
     {
-        List configs = new ArrayList();
+        List<FSTestConfig> configs = new ArrayList<FSTestConfig>();
         
         if(osType.isCurrentOS())
         {
