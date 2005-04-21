@@ -107,7 +107,9 @@ public class EntryPoints extends VmSystemObject {
 
     private final VmInstanceField vmProcessorStackEnd;
 
-    private final VmInstanceField vmProcessorStaticsTable;
+    private final VmInstanceField vmProcessorSharedStaticsTable;
+
+    private final VmInstanceField vmProcessorIsolatedStaticsTable;
 
     private final VmInstanceField vmConstClassResolvedClass;
 
@@ -276,8 +278,10 @@ public class EntryPoints extends VmSystemObject {
                     "org.jnode.vm.VmProcessor", true);
             vmProcessorStackEnd = (VmInstanceField) testField(processorClass
                     .getField("stackEnd"));
-            vmProcessorStaticsTable = (VmInstanceField) testField(processorClass
+            vmProcessorSharedStaticsTable = (VmInstanceField) testField(processorClass
                     .getField("staticsTable"));
+            vmProcessorIsolatedStaticsTable = (VmInstanceField) testField(processorClass
+                    .getField("isolatedStaticsTable"));
 
             // VmConstClass
             final VmType constClassClass = loader.loadClass(
@@ -612,8 +616,8 @@ public class EntryPoints extends VmSystemObject {
     /**
      * @return Returns the vmProcessorStaticsTable.
      */
-    public final VmInstanceField getVmProcessorStaticsTable() {
-        return this.vmProcessorStaticsTable;
+    public final VmInstanceField getVmProcessorSharedStaticsTable() {
+        return this.vmProcessorSharedStaticsTable;
     }
 
     /**
@@ -694,5 +698,12 @@ public class EntryPoints extends VmSystemObject {
      */
     public final VmMethod getGetClassForVmTypeMethod() {
         return getClassForVmTypeMethod;
+    }
+
+    /**
+     * @return Returns the vmProcessorIsolatedStaticsTable.
+     */
+    public final VmInstanceField getVmProcessorIsolatedStaticsTable() {
+        return vmProcessorIsolatedStaticsTable;
     }
 }

@@ -51,7 +51,9 @@ import org.jnode.vm.classmgr.VmConstString;
 import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmInstanceMethod;
+import org.jnode.vm.classmgr.VmIsolatedStaticsEntry;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.classmgr.VmSharedStaticsEntry;
 import org.jnode.vm.classmgr.VmStaticField;
 import org.jnode.vm.classmgr.VmStaticMethod;
 import org.jnode.vm.classmgr.VmType;
@@ -1741,7 +1743,15 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		// Get static field object
 		if (JvmType.isFloat(type)) {
 			final boolean is32bit = !fieldRef.isWide();
-			helper.writeGetStaticsEntryToFPU(curInstrLabel, sf, is32bit);
+            if (sf.isShared()) {
+                helper.writeGetStaticsEntryToFPU(curInstrLabel, (VmSharedStaticsEntry)sf, is32bit);
+            } else {
+                final GPR tmp = (GPR) L1AHelper.requestRegister(eContext,
+                        JvmType.REFERENCE, false);
+                helper.writeGetStaticsEntryToFPU(curInstrLabel,
+                        (VmIsolatedStaticsEntry) sf, is32bit, tmp);
+                L1AHelper.releaseRegister(eContext, tmp);
+            }
 			final Item result = ifac.createFPUStack(type);
 			vstack.fpuStack.push(result);
 			vstack.push(result);
@@ -1750,9 +1760,17 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 					type, false);
 			final GPR resultr = result.getRegister();
             if (os.isCode32() || (type != JvmType.REFERENCE)) {
-                helper.writeGetStaticsEntry(curInstrLabel, resultr, sf);
+                if (sf.isShared()) {
+                    helper.writeGetStaticsEntry(curInstrLabel, resultr, (VmSharedStaticsEntry)sf);
+                } else {
+                    helper.writeGetStaticsEntry(curInstrLabel, resultr, (VmIsolatedStaticsEntry)sf);                    
+                }
             } else {
-                helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)resultr, sf);                
+                if (sf.isShared()) {
+                    helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)resultr, (VmSharedStaticsEntry)sf);
+                } else {
+                    helper.writeGetStaticsEntry64(curInstrLabel, (GPR64)resultr, (VmIsolatedStaticsEntry)sf);                    
+                }
             }
 			vstack.push(result);
 		} else {
@@ -1761,10 +1779,18 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			if (os.isCode32()) {
 				final GPR lsb = result.getLsbRegister(eContext);
 				final GPR msb = result.getMsbRegister(eContext);
-				helper.writeGetStaticsEntry64(curInstrLabel, lsb, msb, sf);
+                if (sf.isShared()) {
+                    helper.writeGetStaticsEntry64(curInstrLabel, lsb, msb, (VmSharedStaticsEntry)sf);
+                } else {
+                    helper.writeGetStaticsEntry64(curInstrLabel, lsb, msb, (VmIsolatedStaticsEntry)sf);                    
+                }
 			} else {
 				final GPR64 reg = result.getRegister(eContext);
-				helper.writeGetStaticsEntry64(curInstrLabel, reg, sf);
+                if (sf.isShared()) {
+                    helper.writeGetStaticsEntry64(curInstrLabel, reg, (VmSharedStaticsEntry)sf);
+                } else {
+                    helper.writeGetStaticsEntry64(curInstrLabel, reg, (VmIsolatedStaticsEntry)sf);
+                }
 			}
 			vstack.push(result);
 		}
@@ -3446,11 +3472,29 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			final GPR valr = wval.getRegister();
 
             if (os.isCode32() || (wval.getType() != JvmType.REFERENCE)) {
-                helper.writePutStaticsEntry(curInstrLabel, valr, sf);
+                if (sf.isShared()) {
+                    helper.writePutStaticsEntry(curInstrLabel, valr,
+                            (VmSharedStaticsEntry) sf);
+                } else {
+                    final GPR tmp = (GPR) L1AHelper.requestRegister(eContext,
+                            JvmType.REFERENCE, false);
+                    helper.writePutStaticsEntry(curInstrLabel, valr,
+                            (VmIsolatedStaticsEntry) sf, tmp);
+                    L1AHelper.releaseRegister(eContext, tmp);
+                }
             } else {
-                helper.writePutStaticsEntry64(curInstrLabel, (GPR64)valr, sf);                
+                if (sf.isShared()) {
+                    helper.writePutStaticsEntry64(curInstrLabel, (GPR64) valr,
+                            (VmSharedStaticsEntry) sf);
+                } else {
+                    final GPR tmp = (GPR) L1AHelper.requestRegister(eContext,
+                            JvmType.REFERENCE, false);
+                    helper.writePutStaticsEntry64(curInstrLabel, (GPR64) valr,
+                            (VmIsolatedStaticsEntry) sf, tmp);
+                    L1AHelper.releaseRegister(eContext, tmp);
+                }
             }
-			if (!sf.isPrimitive() && helper.needsWriteBarrier()) {
+            if (!sf.isPrimitive() && helper.needsWriteBarrier()) {
 				final GPR tmp = (GPR) L1AHelper.requestRegister(eContext,
 						JvmType.INT, false);
 				helper.writePutstaticWriteBarrier(sf, valr, tmp);
@@ -3459,13 +3503,33 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		} else {
 			final DoubleWordItem dval = (DoubleWordItem) val;
 			if (os.isCode32()) {
-				helper.writePutStaticsEntry64(curInstrLabel, dval
-						.getLsbRegister(eContext), dval
-						.getMsbRegister(eContext), sf);
+                if (sf.isShared()) {
+                    helper.writePutStaticsEntry64(curInstrLabel, dval
+                            .getLsbRegister(eContext), dval
+                            .getMsbRegister(eContext),
+                            (VmSharedStaticsEntry) sf);
+                } else {
+                    final GPR tmp = (GPR) L1AHelper.requestRegister(eContext,
+                            JvmType.REFERENCE, false);
+                    helper.writePutStaticsEntry64(curInstrLabel, dval
+                            .getLsbRegister(eContext), dval
+                            .getMsbRegister(eContext),
+                            (VmIsolatedStaticsEntry) sf, tmp);                    
+                    L1AHelper.releaseRegister(eContext, tmp);
+                }
 			} else {
-				helper.writePutStaticsEntry64(curInstrLabel, dval
-						.getRegister(eContext), sf);
-			}
+                if (sf.isShared()) {
+                    helper.writePutStaticsEntry64(curInstrLabel, dval
+                            .getRegister(eContext), (VmSharedStaticsEntry) sf);
+                } else {
+                    final GPR tmp = (GPR) L1AHelper.requestRegister(eContext,
+                            JvmType.REFERENCE, false);
+                    helper.writePutStaticsEntry64(curInstrLabel, dval
+                            .getRegister(eContext),
+                            (VmIsolatedStaticsEntry) sf, tmp);
+                    L1AHelper.releaseRegister(eContext, tmp);
+                }
+            }
 		}
 
 		// Release
