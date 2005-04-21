@@ -94,6 +94,13 @@ public final class VmImplementedInterface extends VmSystemObject {
 	}
 
 	/**
+     * @return Returns the className.
+     */
+    final String getClassName() {
+        return className;
+    }
+
+    /**
 	 * Convert myself into a String representation
 	 * @return String
 	 */

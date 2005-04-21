@@ -107,6 +107,7 @@ public final class ClassDecoder {
 		final ClassReader reader = new ClassReader(data, offset,
 				class_image_length);
 		final VmSharedStatics sharedStatics = clc.getSharedStatics();
+        final VmIsolatedStatics isolatedStatics = clc.getIsolatedStatics();
 		final int slotSize = clc.getArchitecture().getReferenceSize();
 
 		final int magic = reader.readu4();
@@ -275,7 +276,7 @@ public final class ClassDecoder {
 		readInterfaces(reader, cls, cp);
 
 		// Field table
-		readFields(reader, cls, cp, sharedStatics, slotSize);
+		readFields(reader, cls, cp, sharedStatics, isolatedStatics, slotSize);
 
 		// Method Table
 		readMethods(reader, rejectNatives, cls, cp, sharedStatics, clc);
@@ -310,8 +311,8 @@ public final class ClassDecoder {
 	 * @param cp
 	 * @param slotSize
 	 */
-	private static void readFields(ClassReader reader, VmType cls, VmCP cp,
-			VmStatics statics, int slotSize) {
+	private static void readFields(ClassReader reader, VmType<?> cls, VmCP cp,
+			VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics, int slotSize) {
 		final int fcount = reader.readu2();
 		if (fcount > 0) {
 			final VmField[] ftable = new VmField[fcount];
@@ -334,7 +335,16 @@ public final class ClassDecoder {
 				final boolean isstatic = (modifiers & Modifier.ACC_STATIC) != 0;
 				final int staticsIdx;
 				final VmField fs;
+                final VmStatics statics;
 				if (isstatic) {
+                    // Determine if the static field should be shared.
+                    final boolean shared = cls.isSharedStatics();
+                    if (shared) {
+                        statics = sharedStatics;
+                    } else {
+                        statics = isolatedStatics;                        
+                    }
+                    
 					// If static allocate space for it.
 					switch (signature.charAt(0)) {
 					case 'B':
@@ -373,9 +383,10 @@ public final class ClassDecoder {
 						break;
 					}
 					fs = new VmStaticField(name, signature, modifiers,
-							staticsIdx, cls, slotSize);
+							staticsIdx, cls, slotSize, shared);
 				} else {
 					staticsIdx = -1;
+                    statics = null;
 					final int fieldOffset;
 					// Set the offset (keep in mind that this will be fixed
 					// by ClassResolver with respect to the objectsize of the
@@ -407,34 +418,34 @@ public final class ClassDecoder {
 							statics.setInt(staticsIdx, cp.getInt(idx));
 							break;
 						case 'C':
-							statics.setInt(staticsIdx, cp.getInt(idx));
+                            statics.setInt(staticsIdx, cp.getInt(idx));
 							break;
 						case 'D':
 							final long lval = Double.doubleToRawLongBits(cp
 									.getDouble(idx));
-							statics.setLong(staticsIdx, lval);
+                            statics.setLong(staticsIdx, lval);
 							break;
 						case 'F':
 							final int ival = Float.floatToRawIntBits(cp
 									.getFloat(idx));
-							statics.setInt(staticsIdx, ival);
+                            statics.setInt(staticsIdx, ival);
 							break;
 						case 'I':
-							statics.setInt(staticsIdx, cp.getInt(idx));
+                            statics.setInt(staticsIdx, cp.getInt(idx));
 							break;
 						case 'J':
-							statics.setLong(staticsIdx, cp.getLong(idx));
+                            statics.setLong(staticsIdx, cp.getLong(idx));
 							break;
 						case 'S':
-							statics.setInt(staticsIdx, cp.getInt(idx));
+                            statics.setInt(staticsIdx, cp.getInt(idx));
 							break;
 						case 'Z':
-							statics.setInt(staticsIdx, cp.getInt(idx));
+                            statics.setInt(staticsIdx, cp.getInt(idx));
 							break;
 						default:
 							//throw new IllegalArgumentException("signature "
 							// + signature);
-							statics.setObject(staticsIdx, cp.getString(idx));
+                            statics.setObject(staticsIdx, cp.getString(idx));
 							break;
 						}
 					} else {

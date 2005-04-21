@@ -48,13 +48,14 @@ public final class VmStaticField extends VmField implements VmSharedStaticsEntry
 		int modifiers,
 		int staticsIndex,
 		VmType declaringClass,
-		int slotSize) {
+		int slotSize,
+        boolean shared) {
 		super(name, signature, modifiers, declaringClass, slotSize);
 		if (!Modifier.isStatic(modifiers)) {
 			throw new IllegalArgumentException("Instance field in VmStaticField");
 		}
 		this.staticsIndex = staticsIndex;
-        this.shared = true; // Implement different
+        this.shared = shared;
 	}
 
 	/**

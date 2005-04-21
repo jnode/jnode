@@ -39,7 +39,7 @@ import org.vmmagic.pragma.NoInlinePragma;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class Vm extends VmSystemObject implements Statistics {
+public class Vm extends VmSystemObject implements Statistics, SharedStatics {
 
 	/** The single instance */
 	private static Vm instance;

@@ -66,7 +66,7 @@ import org.vmmagic.unboxed.Offset;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class VmSystem {
+public final class VmSystem implements SharedStatics {
 
     public static final int RC_HANDLER = 0xFFFFFFFB;
 
