@@ -51,14 +51,20 @@ public class OsType
      */
     public boolean isCurrentOS()
     {
+        boolean isCurrOS = false;
+        
         if(this == BOTH_OS)
-            return true;
+            isCurrOS = true;
         else if(OsUtils.isJNode() && (this == JNODE_OS))
-            return true;
+            isCurrOS = true;
         else if(!OsUtils.isJNode() && (this == OTHER_OS))
-            return true;
+            isCurrOS = true;
         else
-            return false;
+            isCurrOS = false;
+        
+        System.out.println(name+".isCurrentOS="+isCurrOS);
+        
+        return isCurrOS;
     }
         
     public String toString()
