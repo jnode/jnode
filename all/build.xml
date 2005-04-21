@@ -51,7 +51,10 @@
 
 	<!-- libraries needed to check plugin dependencies -->
 	<property name="classycle.jar" value="${root.dir}/builder/lib/classycle.jar" />	
-	
+
+	<!-- libraries needed for document the plugins -->
+	<property name="itext.jar" value="${root.dir}/builder/lib/itext-1.3.jar" />
+
 	<!-- libraries needed to check rules in source code -->	
 	<property name="pmd.jar" value="${root.dir}/builder/lib/pmd/pmd-3.0.jar" />		
 	<property name="jaxen.jar" value="${root.dir}/builder/lib/pmd/jaxen-core-1.0-fcs.jar" />
@@ -96,6 +99,7 @@
 		<pathelement location="${jnode-textui.jar}" />
 		<pathelement location="${jnode-distr.jar}" />
 		<pathelement location="${classycle.jar}" />
+		<pathelement location="${itext.jar}" />
 		<path refid="cp" />
 	</path>
 
@@ -569,7 +573,7 @@ clean          Remove all intermediate build results.
   <target name="document-plugins" depends="assemble-plugins">
     <taskdef name="plugindocumentation" classname="org.jnode.build.documentation.PluginDocumentationTask" classpathref="cp-jnode" />
 
-    <plugindocumentation todir="${plugins.dir}" pluginDir="${descriptors.dir}">
+    <plugindocumentation todir="${reports.dir}/plugins" pluginDir="${descriptors.dir}">
       <descriptors dir="${descriptors.dir}/">
         <include name="*.xml" />
         <exclude name="*plugin-list.xml" />
