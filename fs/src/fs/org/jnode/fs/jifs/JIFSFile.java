@@ -37,21 +37,25 @@ import java.util.HashSet;
  * JIFSFile <br> The JIFSFile holds information in a StringBuffer.
  *
  * 
- * @author Trickkiste
+ * @author Andreas H\u00e4nel
  */
-public class JIFSFile implements FSEntry, FSFile {
+public class JIFSFile implements ExtFSEntry, FSFile {
 
 	protected String name;
 	protected StringBuffer data = new StringBuffer();
 	protected boolean isvalid = true;
 	
-	private FSEntry parent = null;
+	private FSDirectory parent = null;
+	
+	public JIFSFile() {
+		refresh();
+	}
 	
 	public JIFSFile(String name) {
 		this.name = name;
 	}
 	
-	public JIFSFile(String name, FSEntry parent) {
+	public JIFSFile(String name, FSDirectory parent) {
 		this(name);
 		this.parent = parent;
 		refresh();
@@ -144,7 +148,7 @@ public class JIFSFile implements FSEntry, FSFile {
 	}
 	
 	public void setName(String name){
-		return;
+		this.name=name;
 	}
 	
 	public boolean isDirectory(){
@@ -156,7 +160,11 @@ public class JIFSFile implements FSEntry, FSFile {
 	}
 	
 	public FSDirectory getParent(){
-		return (FSDirectory)parent;
+		return parent;
+	}
+	
+	public void setParent(FSDirectory parent){
+		this.parent=parent;
 	}
 	
 	public String getName(){

@@ -22,14 +22,25 @@
 package org.jnode.fs.jifs.files;
 
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSDirectory;
 import org.jnode.fs.jifs.*;
 import org.jnode.vm.VmSystem;
 
+/**
+ * File, which contains the uptime of the system.
+ * 
+ * @author Andreas H\u00e4nel
+ */
 public class JIFSFuptime extends JIFSFile{
 	
-	public JIFSFuptime(FSEntry parent){
-		super("uptime",parent);
+	public JIFSFuptime(){
+		super("uptime");
 		refresh();
+	}
+	
+	public JIFSFuptime(FSDirectory parent){
+		this();
+		setParent(parent);
 	}
 	
 	public void refresh(){

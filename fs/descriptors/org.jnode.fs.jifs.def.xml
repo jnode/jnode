@@ -17,7 +17,7 @@
     </library>
   </runtime>
   
-  <extension-point id="info" name="Information ExtensionPoint"/>
+  <extension-point id="info" name="ExternalInformation"/>
         
   <extension point="org.jnode.security.permissions">
     <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>

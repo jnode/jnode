@@ -19,44 +19,17 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
  
-package org.jnode.fs.jifs.files;
-
-import javax.naming.NameNotFoundException;
+package org.jnode.fs.jifs;
 
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSDirectory;
-import org.jnode.fs.FileSystemType;
-import org.jnode.fs.jifs.JIFSFile;
-import org.jnode.fs.service.FileSystemService;
-import org.jnode.naming.InitialNaming;
 
 /**
- *  
  * @author Andreas H\u00e4nel
  */
-public class JIFSFfilesystems extends JIFSFile{
+
+public interface ExtFSEntry extends FSEntry {
 	
-	public JIFSFfilesystems(){
-		super("fs");
-	}
-	
-	public JIFSFfilesystems(FSDirectory parent){
-		this();
-		setParent(parent);
-	}
-	
-	public void refresh(){
-		super.refresh();
-		try {
-         	FileSystemService fSS = InitialNaming.lookup(FileSystemService.NAME);
-         	addStringln("Registered Filesystems:");
-            for (FileSystemType current : fSS.fileSystemTypes()) {
-            	addStringln("\t"+current.getName());
-            
-            }
-	    } catch (NameNotFoundException e){
-    	   	System.err.print(e);
-        } 
-	}
+	public void setParent(FSDirectory parent);
 	
 }

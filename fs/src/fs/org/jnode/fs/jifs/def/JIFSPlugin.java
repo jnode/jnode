@@ -21,8 +21,9 @@
 
 package org.jnode.fs.jifs.def;
 
-import org.apache.log4j.Logger;
 import javax.naming.NameNotFoundException;
+
+import org.apache.log4j.Logger;
 
 import org.jnode.fs.jifs.*;
 
@@ -39,9 +40,11 @@ import org.jnode.fs.service.FileSystemService;
 
 import org.jnode.naming.InitialNaming;
 
+
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
+import org.jnode.plugin.ExtensionPoint;
 
 /**
  * @author Andreas H\u00e4nel
@@ -51,12 +54,10 @@ public class JIFSPlugin extends Plugin{
 	/** My logger */
 	private final Logger log = Logger.getLogger(getClass());
 	/** Manager of Extensions */
-    private final JIFSExtension jifsExtension;
-	
+    private JIFSExtension jifsExtension;
+    	
 	public JIFSPlugin(PluginDescriptor descriptor) {
         super(descriptor);
-        this.jifsExtension = new JIFSExtension(descriptor
-                .getExtensionPoint("info"));
         log.debug("JIFSPlugin created.");
     }
 	
@@ -78,7 +79,8 @@ public class JIFSPlugin extends Plugin{
                         fSS.registerFileSystem(fs);
                         log.info("Mounted " + type.getName() + " on "
                                 + dev.getId());
-                        return;
+                        final ExtensionPoint infoEP = getDescriptor().getExtensionPoint("info");
+                        jifsExtension = new JIFSExtension(infoEP);
          			} catch (DeviceAlreadyRegisteredException ex){
          				log.error("jifs is currently running.");
          				return;
