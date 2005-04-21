@@ -25,7 +25,7 @@ import java.nio.ByteOrder;
 
 import org.jnode.system.ResourceManager;
 import org.jnode.vm.classmgr.TypeSizeInfo;
-import org.jnode.vm.classmgr.VmStatics;
+import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.compiler.IMTCompiler;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 
@@ -121,6 +121,6 @@ public abstract class VmArchitecture extends VmSystemObject {
 	 * 
 	 * @return The processor
 	 */
-	protected abstract VmProcessor createProcessor(int id, VmStatics statics);
+	protected abstract VmProcessor createProcessor(int id, VmSharedStatics statics);
 
 }

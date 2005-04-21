@@ -55,8 +55,8 @@ import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmInstanceField;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmMethodCode;
+import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.classmgr.VmStaticField;
-import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.x86.VmX86Architecture;
 import org.jnode.vm.x86.VmX86Architecture32;
@@ -86,7 +86,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 
 	private VmX86Architecture arch;
 
-	private VmStatics statics;
+	private VmSharedStatics sharedStatics;
 
 	private int bits = 32;
 
@@ -153,9 +153,9 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 	 * @return The processor
 	 * @throws BuildException
 	 */
-	protected VmProcessor createProcessor(VmStatics statics)
+	protected VmProcessor createProcessor(VmSharedStatics statics)
 			throws BuildException {
-		this.statics = statics;
+		this.sharedStatics = statics;
 		if (processor == null) {
 			switch (bits) {
 			case 32:
@@ -216,7 +216,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
         for (int i = 0; i < X86JumpTable.TABLE_LENGTH; i++) {
             final Label lbl = new Label(X86JumpTable.TABLE_ENTRY_LABELS[i]);
             final int idx = (arch.getMode().is32()) ? i : i * 2;
-            statics.setAddress(idx, lbl);
+            sharedStatics.setAddress(idx, lbl);
         }
 	}
 
@@ -484,7 +484,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 		final int slotSize = os.isCode32() ? 4 : 8;
 
 		// Setup STATICS register (EDI/RDI)
-		os.writeMOV_Const(adi, statics.getTable());
+		os.writeMOV_Const(adi, sharedStatics.getTable());
 
 		/* Set Vm.instance */
 		os.writeMOV_Const(abx, vm);
@@ -514,7 +514,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 		final int slotSize = os.isCode32() ? 4 : 8;
 
 		// Setup STATICS register (EDI/RDI)
-		os.writeMOV_Const(adi, statics.getTable());
+		os.writeMOV_Const(adi, sharedStatics.getTable());
 
 		/* Set Main.pluginRegistry */
 		os.writeMOV_Const(abx, registry);
@@ -693,7 +693,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 	protected void cleanup() {
 		super.cleanup();
 		this.processor = null;
-		this.statics = null;
+		this.sharedStatics = null;
 	}
 
 	/**
@@ -721,7 +721,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
      * Initialize the statics table.
      * @see org.jnode.build.AbstractBootImageBuilder#initializeStatics(org.jnode.vm.classmgr.VmStatics)
      */
-    protected void initializeStatics(VmStatics statics) throws BuildException {
+    protected void initializeStatics(VmSharedStatics statics) throws BuildException {
         for (int i = 0; i < X86JumpTable.TABLE_LENGTH; i++) {
             final int idx = statics.allocAddressField();
             if (getArchitecture().getReferenceSize() == 4) {

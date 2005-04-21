@@ -32,7 +32,7 @@ import org.jnode.util.Statistic;
 import org.jnode.util.Statistics;
 import org.jnode.vm.classmgr.CompiledCodeList;
 import org.jnode.vm.classmgr.VmAtom;
-import org.jnode.vm.classmgr.VmStatics;
+import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.vmmagic.pragma.NoInlinePragma;
 
@@ -56,7 +56,7 @@ public class Vm extends VmSystemObject implements Statistics {
 	/** Version of the OS and VM */
 	private final String version;
 	/** The statics table */
-	private final VmStatics statics;
+	private final VmSharedStatics statics;
 	/** The list of all system processors */
 	private final List<VmProcessor> processors;
 	/** All statistics */
@@ -80,7 +80,7 @@ public class Vm extends VmSystemObject implements Statistics {
 	 * 
 	 * @param arch
 	 */
-	public Vm(String version, VmArchitecture arch, VmHeapManager heapManager, VmStatics statics, boolean debugMode) {
+	public Vm(String version, VmArchitecture arch, VmHeapManager heapManager, VmSharedStatics statics, boolean debugMode) {
 		instance = this;
 		this.version = version;
 		this.debugMode = debugMode;
@@ -171,7 +171,7 @@ public class Vm extends VmSystemObject implements Statistics {
 			final PrintStream out = System.out;
 			out.println("JNode VM " + vm.getVersion());
 			vm.dumpStatistics(out);
-			vm.getStatics().dumpStatistics(out);
+			vm.getSharedStatics().dumpStatistics(out);
 			vm.heapManager.dumpStatistics(out);
 			final SecurityManager sm = System.getSecurityManager();
 			out.println("Security manager: " + sm);
@@ -193,7 +193,7 @@ public class Vm extends VmSystemObject implements Statistics {
     /**
      * @return Returns the statics.
      */
-    public final VmStatics getStatics() {
+    public final VmSharedStatics getSharedStatics() {
         return this.statics;
     }
     

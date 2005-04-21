@@ -95,7 +95,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
         } else {
             this.selector = cl.getSelectorMap().get(name, signature);
         }
-        this.staticsIndex = cl.getStatics().allocMethodCode();
+        this.staticsIndex = cl.getSharedStatics().allocMethodCode();
     }
     
     private static final boolean returnsObject(String signature) {
@@ -211,7 +211,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
      * @param methodIndex
      */
     static final void recompileMethod(int typeStaticsIndex, int methodIndex) {
-        final VmType type = Vm.getVm().getStatics().getTypeEntry(
+        final VmType type = Vm.getVm().getSharedStatics().getTypeEntry(
                 typeStaticsIndex);
         type.initialize();
         final VmMethod method = type.getDeclaredMethod(methodIndex);
@@ -437,7 +437,7 @@ public abstract class VmMethod extends VmMember implements VmStaticsEntry {
         this.compiledCode = code;
         this.nativeCode = code.getNativeCode();
         this.compiledCode = code;
-        Vm.getVm().getStatics().setMethodCode(getStaticsIndex(),
+        Vm.getVm().getSharedStatics().setMethodCode(getStaticsIndex(),
                 code.getNativeCode());
         this.nativeCodeOptLevel = optLevel;
     }

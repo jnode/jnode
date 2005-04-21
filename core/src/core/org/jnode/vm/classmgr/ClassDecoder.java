@@ -106,7 +106,7 @@ public final class ClassDecoder {
 		}
 		final ClassReader reader = new ClassReader(data, offset,
 				class_image_length);
-		final VmStatics statics = clc.getStatics();
+		final VmSharedStatics sharedStatics = clc.getSharedStatics();
 		final int slotSize = clc.getArchitecture().getReferenceSize();
 
 		final int magic = reader.readu4();
@@ -202,7 +202,7 @@ public final class ClassDecoder {
 			case 8: {
 				// String
 				final int idx = cp.getInt(i);
-				final int staticsIdx = statics.allocConstantStringField(cp
+				final int staticsIdx = sharedStatics.allocConstantStringField(cp
 						.getUTF8(idx));
 				final VmConstString constStr = new VmConstString(staticsIdx);
 				cp.setString(i, constStr);
@@ -275,10 +275,10 @@ public final class ClassDecoder {
 		readInterfaces(reader, cls, cp);
 
 		// Field table
-		readFields(reader, cls, cp, statics, slotSize);
+		readFields(reader, cls, cp, sharedStatics, slotSize);
 
 		// Method Table
-		readMethods(reader, rejectNatives, cls, cp, statics, clc);
+		readMethods(reader, rejectNatives, cls, cp, sharedStatics, clc);
 
 		return cls;
 	}

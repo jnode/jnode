@@ -26,7 +26,7 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.vm.VmThread;
-import org.jnode.vm.classmgr.VmStatics;
+import org.jnode.vm.classmgr.VmSharedStatics;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.ObjectReference;
 
@@ -48,7 +48,7 @@ public final class VmX86Processor32 extends VmX86Processor {
      * @param cpuId
      */
     public VmX86Processor32(int id, VmX86Architecture32 arch,
-            VmStatics statics, X86CpuID cpuId) {
+            VmSharedStatics statics, X86CpuID cpuId) {
         super(id, arch, statics, cpuId);
     }
 

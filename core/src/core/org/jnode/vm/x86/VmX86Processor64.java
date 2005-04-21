@@ -24,7 +24,7 @@ package org.jnode.vm.x86;
 import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.vm.VmThread;
-import org.jnode.vm.classmgr.VmStatics;
+import org.jnode.vm.classmgr.VmSharedStatics;
 import org.vmmagic.unboxed.Address;
 
 /**
@@ -38,7 +38,7 @@ public final class VmX86Processor64 extends VmX86Processor {
 	 * @param statics
 	 * @param cpuId
 	 */
-	public VmX86Processor64(int id, VmX86Architecture64 arch, VmStatics statics,
+	public VmX86Processor64(int id, VmX86Architecture64 arch, VmSharedStatics statics,
 			X86CpuID cpuId) {
 		super(id, arch, statics, cpuId);
 		// TODO Auto-generated constructor stub

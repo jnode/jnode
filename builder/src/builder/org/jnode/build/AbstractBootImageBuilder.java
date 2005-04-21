@@ -73,8 +73,8 @@ import org.jnode.vm.classmgr.VmCompiledCode;
 import org.jnode.vm.classmgr.VmField;
 import org.jnode.vm.classmgr.VmMethodCode;
 import org.jnode.vm.classmgr.VmNormalClass;
+import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.classmgr.VmStaticField;
-import org.jnode.vm.classmgr.VmStatics;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.memmgr.HeapHelper;
@@ -293,7 +293,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @return The processor
      * @throws BuildException
      */
-    protected abstract VmProcessor createProcessor(VmStatics statics)
+    protected abstract VmProcessor createProcessor(VmSharedStatics statics)
             throws BuildException;
 
     private final void doExecute() throws BuildException {
@@ -346,10 +346,10 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             clsMgr = new VmSystemClassLoader(classesURL, arch,
                     new BuildObjectResolver(os, this));
             blockedObjects.add(clsMgr);
-            blockedObjects.add(clsMgr.getStatics());
-            blockedObjects.add(clsMgr.getStatics().getTable());
+            blockedObjects.add(clsMgr.getSharedStatics());
+            blockedObjects.add(clsMgr.getSharedStatics().getTable());
             // Initialize the statics table.
-            initializeStatics(clsMgr.getStatics());
+            initializeStatics(clsMgr.getSharedStatics());
 
             if (debug) {
                 log("Building in DEBUG mode", Project.MSG_WARN);
@@ -358,11 +358,11 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             // Create the VM
             final HeapHelper helper = new HeapHelperImpl(arch);
             final Vm vm = new Vm(version, arch, new DefaultHeapManager(clsMgr,
-                    helper), clsMgr.getStatics(), debug);
+                    helper), clsMgr.getSharedStatics(), debug);
             blockedObjects.add(vm);
             blockedObjects.add(Vm.getCompiledMethods());
 
-            final VmProcessor proc = createProcessor(clsMgr.getStatics());
+            final VmProcessor proc = createProcessor(clsMgr.getSharedStatics());
             log("Building for " + proc.getCPUID());
 
             final Label clInitCaller = new Label("$$clInitCaller");
@@ -391,7 +391,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             loadClass(VmBootHeap.class);
             loadClass(VmDefaultHeap.class);
             loadClass(VmHeapManager.class);
-            loadClass(VmStatics.class);
+            loadClass(VmSharedStatics.class);
             loadClass(Vm.getHeapManager().getClass());
             loadClass(HeapHelper.class);
             loadClass(HeapHelperImpl.class);
@@ -468,7 +468,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
             // Emit the statics table
             log("Emit statics", Project.MSG_VERBOSE);
-            blockedObjects.remove(clsMgr.getStatics());
+            blockedObjects.remove(clsMgr.getSharedStatics());
             emitObjects(os, arch, blockedObjects, true);
             // Twice, this is intended!
             emitObjects(os, arch, blockedObjects, true);
@@ -478,7 +478,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             emitObjects(os, arch, null, true);
             log("statics table 0x"
                     + NumberUtils.hex(os.getObjectRef(
-                            clsMgr.getStatics().getTable()).getOffset()),
+                            clsMgr.getSharedStatics().getTable()).getOffset()),
                     Project.MSG_INFO);
             
             // Verify no methods have been compiled after we wrote the CompiledCodeList.
@@ -507,7 +507,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             storeImage(os);
 
             // Generate the listfile
-            printLabels(os, bootClasses, clsMgr.getStatics());
+            printLabels(os, bootClasses, clsMgr.getSharedStatics());
 
             // Generate debug info
             for (int i = 0; i < cmps.length; i++) {
@@ -518,7 +518,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             final int bootHeapBitmapSize = (bootHeapSize / ObjectLayout.OBJECT_ALIGN) >> 3;
             log("Boot heap size " + (bootHeapSize >>> 10) + "K bitmap size "
                     + (bootHeapBitmapSize >>> 10) + "K");
-            clsMgr.getStatics().dumpStatistics(System.out);
+            clsMgr.getSharedStatics().dumpStatistics(System.out);
             vm.dumpStatistics(System.out);
 
             logStatistics(os);
@@ -570,7 +570,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                 loops++;
                 compileClasses(os, arch);
                 if (!skipCopyStatics) {
-                    copyStaticFields(clsMgr, clsMgr.getStatics(), os, emitter);
+                    copyStaticFields(clsMgr, clsMgr.getSharedStatics(), os, emitter);
                 }
                 final Collection<ObjectRef> objectRefs = new ArrayList<ObjectRef>(os.getObjectRefs());
                 int unresolvedFound = 0; // Number of unresolved references
@@ -966,7 +966,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @throws UnresolvedObjectRefException
      */
     protected final void printLabels(NativeStream os, VmType[] bootClasses,
-            VmStatics statics) throws BuildException,
+            VmSharedStatics statics) throws BuildException,
             UnresolvedObjectRefException {
         if (!debug) {
             return;
@@ -1267,7 +1267,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         }
     }
 
-    protected void copyStaticFields(VmSystemClassLoader cl, VmStatics statics, NativeStream os, ObjectEmitter emitter)
+    protected void copyStaticFields(VmSystemClassLoader cl, VmSharedStatics statics, NativeStream os, ObjectEmitter emitter)
             throws ClassNotFoundException {
         for (VmType type : cl.getLoadedClasses()) {
             final String name = type.getName();
@@ -1299,7 +1299,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         }
     }
 
-    private void copyStaticField(VmType type, VmField f, Field jf, VmStatics statics, NativeStream os, ObjectEmitter emitter)
+    private void copyStaticField(VmType type, VmField f, Field jf, VmSharedStatics statics, NativeStream os, ObjectEmitter emitter)
             throws IllegalAccessException, JNodeClassNotFoundException {
         jf.setAccessible(true);
         final Object val = jf.get(null);
@@ -1357,6 +1357,6 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * Initialize the statics table.
      * @param statics
      */
-    protected abstract void initializeStatics(VmStatics statics)
+    protected abstract void initializeStatics(VmSharedStatics statics)
     throws BuildException;
 }

@@ -116,7 +116,7 @@ public abstract class VmClassLoader extends VmSystemObject {
      * 
      * @return The statics table
      */
-    public abstract VmStatics getStatics();
+    public abstract VmSharedStatics getSharedStatics();
 
     /**
      * Gets the selector map used to create unique method selectors.

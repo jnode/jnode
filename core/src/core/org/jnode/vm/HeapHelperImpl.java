@@ -176,7 +176,7 @@ public final class HeapHelperImpl extends HeapHelper implements Uninterruptible 
      * @param visitor
      */
     public void visitAllRoots(ObjectVisitor visitor, VmHeapManager heapManager) {
-        if (!Vm.getVm().getStatics().walk(visitor)) {
+        if (!Vm.getVm().getSharedStatics().walk(visitor)) {
             return;
         }
         threadRootVisitor.initialize(visitor, heapManager);
