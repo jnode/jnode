@@ -43,6 +43,7 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.Plugin;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
+import org.jnode.util.NumberUtils;
 
 /**
  * Dummy plugin that just mount an initial ramdisk on /Jnode
@@ -67,7 +68,8 @@ public class InitRamdisk extends Plugin {
         try {
             log.info("Create initrd ramdisk on /jnode");
             final DeviceManager dm = DeviceUtils.getDeviceManager();
-            final RamDiskDevice dev = new RamDiskDevice(null, "dummy", 100000);
+            int size = getPreferences().getInt("size", (int) NumberUtils.getSize("100K"));
+            final RamDiskDevice dev = new RamDiskDevice(null, "dummy", size);
             dev.setDriver(new RamDiskDriver("jnode"));
             dm.register(dev);
 
