@@ -578,7 +578,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 			GPR resultr, Label trueLabel, boolean skipNullTest) {
 
 		final int depth = type.getSuperClassDepth();
-		final int staticsOfs = helper.getStaticsOffset(type);
+		final int staticsOfs = helper.getSharedStaticsOffset(type);
 		final Label notInstanceOfLabel = new Label(this.curInstrLabel
 				+ "notInstanceOf");
 

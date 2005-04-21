@@ -37,7 +37,7 @@ import org.vmmagic.unboxed.ObjectReference;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-abstract class VmStatics extends VmSystemObject {
+public abstract class VmStatics extends VmSystemObject {
 
 	private static final byte TYPE_INT = 0x01;
 	private static final byte TYPE_LONG = 0x02;

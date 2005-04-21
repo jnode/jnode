@@ -9,17 +9,16 @@ import org.jnode.vm.VmArchitecture;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class VmSharedStatics extends VmStatics {
+public final class VmIsolatedStatics extends VmStatics {
 
     /** Size of the statics table */
-    private static final int SIZE = 1 << 16;
+    private static final int SIZE = 1 << 15;
 
     /**
      * @param arch
      * @param resolver
      */
-    public VmSharedStatics(VmArchitecture arch, ObjectResolver resolver) {
+    public VmIsolatedStatics(VmArchitecture arch, ObjectResolver resolver) {
         super(arch, resolver, SIZE);
     }
-
 }

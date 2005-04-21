@@ -68,14 +68,14 @@ public class X86StubCompiler extends AbstractX86Compiler {
 			cm.setCodeStart(os.setObjectRef(new Label(method.getMangledName() + "$$start")));
             
             // Setup call to {@link VmMethod#recompileMethod(int, int)}
-            final VmType declClass = method.getDeclaringClass();
-            os.writePUSH(declClass.getStaticsIndex());
+            final VmType<?> declClass = method.getDeclaringClass();
+            os.writePUSH(declClass.getSharedStaticsIndex());
             os.writePUSH(declClass.indexOf(method));
-            final int recompileStatOfs = ih.getStaticsOffset(context.getRecompileMethod());
+            final int recompileStatOfs = ih.getSharedStaticsOffset(context.getRecompileMethod());
             os.writeCALL(ih.STATICS, recompileStatOfs);
             
             // Emit jump to the newly compiled code.
-            final int methodStatOfs = ih.getStaticsOffset(method);
+            final int methodStatOfs = ih.getSharedStaticsOffset(method);
             os.writeJMP(ih.STATICS, methodStatOfs);
 
 			// Close the "object"

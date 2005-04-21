@@ -32,9 +32,10 @@ import org.jnode.vm.Vm;
 import org.jnode.vm.VmProcessor;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmInstanceField;
+import org.jnode.vm.classmgr.VmIsolatedStaticsEntry;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.classmgr.VmSharedStaticsEntry;
 import org.jnode.vm.classmgr.VmStaticField;
-import org.jnode.vm.classmgr.VmStaticsEntry;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.classmgr.VmTypeState;
 import org.jnode.vm.compiler.EntryPoints;
@@ -258,7 +259,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 * @param method
 	 */
 	public final void invokeJavaMethod(VmMethod method) {
-        final int offset = getStaticsOffset(method);
+        final int offset = getSharedStaticsOffset(method);
         os.writeCALL(STATICS, offset);
         pushReturnValue(method.getSignature());
 	}
@@ -305,7 +306,7 @@ public class X86CompilerHelper implements X86CompilerConstants {
 				os.writePUSH(aax);
 				// Do the is initialized test
 				// Move method.declaringClass -> EAX
-                final int typeOfs = getStaticsOffset(method.getDeclaringClass());
+                final int typeOfs = getSharedStaticsOffset(method.getDeclaringClass());
 				os.writeMOV(size, aax, STATICS, typeOfs);
 				// Test declaringClass.modifiers
 				os.writeTEST(BITS32, aax, entryPoints.getVmTypeState().getOffset(),
@@ -520,7 +521,13 @@ public class X86CompilerHelper implements X86CompilerConstants {
 			if (wb != null) {
 				os.writeMOV_Const(scratchReg, wb);
 				os.writePUSH(scratchReg);
-				os.writePUSH(field.getStaticsIndex());
+                if (field.isShared()) {
+                    os.writePUSH(1); // shared = true
+                    os.writePUSH(field.getSharedStaticsIndex());
+                } else {
+                    os.writePUSH(0); // shared = false
+                    os.writePUSH(field.getIsolatedStaticsIndex());                    
+                }
 				os.writePUSH(valueReg);
 				invokeJavaMethod(entryPoints.getPutstaticWriteBarrier());
 			}
@@ -544,12 +551,12 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 * @param entry
 	 */
 	public final void writeGetStaticsEntry(Label curInstrLabel, GPR dst,
-			VmStaticsEntry entry) {
+			VmSharedStaticsEntry entry) {
         if (Vm.VerifyAssertions) {
             Vm._assert(dst.getSize() == BITS32, "dst wrong size");
         }
 		writeLoadSTATICS(curInstrLabel, "gs", true);
-		os.writeMOV(INTSIZE, dst, this.STATICS, getStaticsOffset(entry));
+		os.writeMOV(INTSIZE, dst, this.STATICS, getSharedStaticsOffset(entry));
 	}
 
 	/**
@@ -561,9 +568,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 *            If true, a 32-bit load is performed, otherwise a 64-bit load.
 	 */
 	public final void writeGetStaticsEntryToFPU(Label curInstrLabel,
-			VmStaticsEntry entry, boolean is32bit) {
+			VmSharedStaticsEntry entry, boolean is32bit) {
 		writeLoadSTATICS(curInstrLabel, "gs", true);
-		final int staticsIdx = getStaticsOffset(entry);
+		final int staticsIdx = getSharedStaticsOffset(entry);
 		if (is32bit) {
 			os.writeFLD32(this.STATICS, staticsIdx);
 		} else {
@@ -579,9 +586,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 */
 	/* Patrik, added to push without requiring allocation of a register */
 	public final void writePushStaticsEntry(Label curInstrLabel,
-			VmStaticsEntry entry) {
+			VmSharedStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "gs", true);
-		os.writePUSH(this.STATICS, getStaticsOffset(entry));
+		os.writePUSH(this.STATICS, getSharedStaticsOffset(entry));
 	}
 
 	/**
@@ -594,9 +601,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 * @param entry
 	 */
 	public final void writeGetStaticsEntry64(Label curInstrLabel, GPR lsbDst,
-			GPR msbReg, VmStaticsEntry entry) {
+			GPR msbReg, VmSharedStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "gs64", true);
-		final int staticsOfs = getStaticsOffset(entry);
+		final int staticsOfs = getSharedStaticsOffset(entry);
 		os.writeMOV(INTSIZE, msbReg, this.STATICS, staticsOfs + 4); // MSB
 		os.writeMOV(INTSIZE, lsbDst, this.STATICS, staticsOfs + 0); // LSB
 	}
@@ -610,9 +617,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 * @param entry
 	 */
 	public final void writeGetStaticsEntry64(Label curInstrLabel, GPR64 dstReg,
-			VmStaticsEntry entry) {
+			VmSharedStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "gs64", true);
-		os.writeMOV(BITS64, dstReg, this.STATICS, getStaticsOffset(entry));
+		os.writeMOV(BITS64, dstReg, this.STATICS, getSharedStaticsOffset(entry));
 	}
 
 	/**
@@ -624,9 +631,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 * @param entry
 	 */
 	public final void writePutStaticsEntry(Label curInstrLabel, GPR src,
-			VmStaticsEntry entry) {
+			VmSharedStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "ps", true);
-		os.writeMOV(INTSIZE, this.STATICS, getStaticsOffset(entry), src);
+		os.writeMOV(INTSIZE, this.STATICS, getSharedStaticsOffset(entry), src);
 	}
 
 	/**
@@ -639,9 +646,9 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 * @param entry
 	 */
 	public final void writePutStaticsEntry64(Label curInstrLabel, GPR lsbSrc,
-			GPR msbSrc, VmStaticsEntry entry) {
+			GPR msbSrc, VmSharedStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "ps64", true);
-		final int staticsOfs = getStaticsOffset(entry);
+		final int staticsOfs = getSharedStaticsOffset(entry);
 		os.writeMOV(BITS32, this.STATICS, staticsOfs + 4, msbSrc); // MSB
 		os.writeMOV(BITS32, this.STATICS, staticsOfs + 0, lsbSrc); // LSB
 	}
@@ -655,25 +662,40 @@ public class X86CompilerHelper implements X86CompilerConstants {
 	 * @param entry
 	 */
 	public final void writePutStaticsEntry64(Label curInstrLabel, GPR64 srcReg,
-			VmStaticsEntry entry) {
+			VmSharedStaticsEntry entry) {
 		writeLoadSTATICS(curInstrLabel, "ps64", true);
-		os.writeMOV(BITS64, this.STATICS, getStaticsOffset(entry), srcReg);
+		os.writeMOV(BITS64, this.STATICS, getSharedStaticsOffset(entry), srcReg);
 	}
 
 	/**
-	 * Gets the offset from the beginning of the statics table (this.STATICS)
+	 * Gets the offset from the beginning of the shared statics table (this.STATICS)
 	 * to the given entry.
 	 * 
 	 * @param entry
 	 * @return The byte offset from this.STATICS to the entry.
 	 */
-	public final int getStaticsOffset(VmStaticsEntry entry) {
+	public final int getSharedStaticsOffset(VmSharedStaticsEntry entry) {
 		if (os.isCode32()) {
-			return (VmArray.DATA_OFFSET * 4) + (entry.getStaticsIndex() << 2);			
+			return (VmArray.DATA_OFFSET * 4) + (entry.getSharedStaticsIndex() << 2);			
 		} else {
-			return (VmArray.DATA_OFFSET * 8) + (entry.getStaticsIndex() << 2);						
+			return (VmArray.DATA_OFFSET * 8) + (entry.getSharedStaticsIndex() << 2);						
 		}
 	}
+
+    /**
+     * Gets the offset from the beginning of the isolated statics table 
+     * to the given entry.
+     * 
+     * @param entry
+     * @return The byte offset from the isolated statics table to the entry.
+     */
+    public final int getIsolatedStaticsOffset(VmIsolatedStaticsEntry entry) {
+        if (os.isCode32()) {
+            return (VmArray.DATA_OFFSET * 4) + (entry.getIsolatedStaticsIndex() << 2);            
+        } else {
+            return (VmArray.DATA_OFFSET * 8) + (entry.getIsolatedStaticsIndex() << 2);                        
+        }
+    }
 
 	public static void assertCondition(boolean condition, String msg) {
 		if (!condition) {

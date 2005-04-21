@@ -131,7 +131,7 @@ public final class X86IMTCompiler32 extends IMTCompiler implements
                         // Last entry, jump directly
                         // JMP [statics+method_statics_index]
                         extraIndex = genJmpStaticsCodeOfs(code, extraIndex,
-                                method.getStaticsIndex());
+                                method.getSharedStaticsIndex());
                     } else {
                         // Non-last entry, compare and jump of select match
 
@@ -148,7 +148,7 @@ public final class X86IMTCompiler32 extends IMTCompiler implements
 
                         // JMP [statics+method_statics_index]
                         extraIndex = genJmpStaticsCodeOfs(code, extraIndex,
-                                method.getStaticsIndex());
+                                method.getSharedStaticsIndex());
                     }
                 }
             } else if (imt[i] != null) {
@@ -156,7 +156,7 @@ public final class X86IMTCompiler32 extends IMTCompiler implements
 
                 // JMP [STATICS+staticsOfs]
                 final VmMethod method = (VmMethod) imt[i];
-                ofs = genJmpStaticsCodeOfs(code, ofs, method.getStaticsIndex());
+                ofs = genJmpStaticsCodeOfs(code, ofs, method.getSharedStaticsIndex());
             } else {
                 // Empty IMT slot
                 // INT ABSTRACT_METHOD

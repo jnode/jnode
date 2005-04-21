@@ -22,6 +22,7 @@
 package org.jnode.vm.x86;
 
 import org.jnode.util.NumberUtils;
+import org.jnode.vm.classmgr.VmIsolatedStatics;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -31,8 +32,8 @@ public final class VmX86Thread32 extends VmX86Thread {
     /**
      * Initialize this instance.
      */
-    public VmX86Thread32() {
-        super(VmX86Architecture32.SLOT_SIZE);
+    public VmX86Thread32(VmIsolatedStatics isolatedStatics) {
+        super(isolatedStatics, VmX86Architecture32.SLOT_SIZE);
     }
 
     /**
@@ -40,8 +41,8 @@ public final class VmX86Thread32 extends VmX86Thread {
      * 
      * @param stack
      */
-    public VmX86Thread32(byte[] stack) {
-        super(stack, VmX86Architecture32.SLOT_SIZE);
+    public VmX86Thread32(VmIsolatedStatics isolatedStatics, byte[] stack) {
+        super(isolatedStatics, stack, VmX86Architecture32.SLOT_SIZE);
     }
 
     /**
@@ -49,8 +50,8 @@ public final class VmX86Thread32 extends VmX86Thread {
      * 
      * @param javaThread
      */
-    public VmX86Thread32(Thread javaThread) {
-        super(javaThread);
+    public VmX86Thread32(VmIsolatedStatics isolatedStatics, Thread javaThread) {
+        super(isolatedStatics, javaThread);
     }
 
     /**

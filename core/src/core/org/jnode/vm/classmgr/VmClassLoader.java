@@ -112,11 +112,18 @@ public abstract class VmClassLoader extends VmSystemObject {
 	public abstract boolean resourceExists(String resName);
 
     /**
-     * Gets the statics table.
+     * Gets the shared statics table.
      * 
      * @return The statics table
      */
     public abstract VmSharedStatics getSharedStatics();
+
+    /**
+     * Gets the isolated statics table (of the current isolate)
+     * 
+     * @return The statics table
+     */
+    public abstract VmIsolatedStatics getIsolatedStatics();
 
     /**
      * Gets the selector map used to create unique method selectors.

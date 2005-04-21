@@ -26,6 +26,7 @@ import java.util.HashMap;
 
 import org.jnode.vm.classmgr.IMTBuilder;
 import org.jnode.vm.classmgr.SelectorMap;
+import org.jnode.vm.classmgr.VmIsolatedStatics;
 import org.jnode.vm.classmgr.VmMethod;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.classmgr.VmType;
@@ -153,6 +154,15 @@ public final class VmJavaClassLoader extends VmAbstractClassLoader {
         return systemLoader.getSharedStatics();
     }
 
+    /**
+     * Gets the isolated statics table (of the current isolate)
+     * 
+     * @return The statics table
+     */
+    public VmIsolatedStatics getIsolatedStatics() {
+        return Unsafe.getCurrentProcessor().getIsolatedStatics();
+    }
+    
     /**
      * @see org.jnode.vm.classmgr.VmClassLoader#resourceExists(java.lang.String)
      */

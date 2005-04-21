@@ -26,10 +26,13 @@ package org.jnode.vm.classmgr;
  * 
  * @author epr
  */
-public final class VmStaticField extends VmField implements VmStaticsEntry {
+public final class VmStaticField extends VmField implements VmSharedStaticsEntry, VmIsolatedStaticsEntry {
 
 	/** The index in the statics table */
 	private final int staticsIndex;
+    
+    /** Is this static field shared */
+    private final boolean shared;
 
 	/**
 	 * @param name
@@ -51,13 +54,38 @@ public final class VmStaticField extends VmField implements VmStaticsEntry {
 			throw new IllegalArgumentException("Instance field in VmStaticField");
 		}
 		this.staticsIndex = staticsIndex;
+        this.shared = true; // Implement different
 	}
 
 	/**
-	 * Gets the indexe of this field in the statics table.
+	 * Gets the index of this field in the shared statics table.
 	 * @return Returns the staticsIndex.
+     * @throws IllegalStateException If this field is not shared
 	 */
-	public final int getStaticsIndex() {
+	public final int getSharedStaticsIndex() {
+        if (!shared) {
+            throw new IllegalStateException("Static field is not shared");
+        }
 		return this.staticsIndex;
 	}
+
+    /**
+     * Gets the index of this field in the isolated statics table.
+     * @return Returns the staticsIndex.
+     * @throws IllegalStateException If this field is shared
+     */
+    public final int getIsolatedStaticsIndex() {
+        if (shared) {
+            throw new IllegalStateException("Static field is not isolated");
+        }
+        return this.staticsIndex;
+    }
+
+    /**
+     * Is this a shared static field.
+     * @return Returns the shared.
+     */
+    public final boolean isShared() {
+        return shared;
+    }       
 }

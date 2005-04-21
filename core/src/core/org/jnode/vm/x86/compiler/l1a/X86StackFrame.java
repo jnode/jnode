@@ -338,7 +338,7 @@ class X86StackFrame implements X86CompilerConstants {
 			//System.out.println("synchr. " + method);
 			if (method.isStatic()) {
 				// Get declaring class
-                final int typeOfs = helper.getStaticsOffset(method.getDeclaringClass());
+                final int typeOfs = helper.getSharedStaticsOffset(method.getDeclaringClass());
 				os.writePUSH(helper.STATICS, typeOfs);
 			} else {
 				os.writePUSH(helper.BP, getEbpOffset(typeSizeInfo, 0));

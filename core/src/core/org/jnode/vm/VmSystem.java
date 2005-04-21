@@ -928,11 +928,16 @@ public final class VmSystem {
         final VmStaticField f = (VmStaticField) clazz.getVmClass().getField(
                 fieldName);
         final Vm vm = Vm.getVm();
-        final Object staticsTable = Unsafe.getCurrentProcessor()
-                .getStaticsTable();
+        final Object staticsTable;
+        final Offset offset;
+        if (f.isShared()) {
+            staticsTable = Unsafe.getCurrentProcessor().getSharedStaticsTable();
+            offset = Offset.fromIntZeroExtend(f.getSharedStaticsIndex() << 2);
+        } else {
+            staticsTable = Unsafe.getCurrentProcessor().getIsolatedStaticsTable();
+            offset = Offset.fromIntZeroExtend(f.getIsolatedStaticsIndex() << 2);            
+        }
         final Address ptr = VmMagic.getArrayData(staticsTable);
-        final Offset offset = Offset
-                .fromIntZeroExtend(f.getStaticsIndex() << 2);
         ptr.store(ObjectReference.fromObject(value), offset);
     }
 }

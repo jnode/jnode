@@ -54,8 +54,7 @@ public class Modifier {
 	/** Is this a magic class */
 	public static final int ACC_MAGIC = 0x20000000; // C
 
-	/** gather profile information for this method */
-	public static final int ACC_PROFILE     = 0x40000000; // M
+	public static final int ACC_SHAREDSTATICS = 0x40000000; // C
 	public static final int ACC_SPECIAL     = 0x80000000;
 	
 	public static boolean isPublic(int modifier) {
@@ -199,20 +198,15 @@ public class Modifier {
 	}*/
 
 	/**
-	 * Should profile information be gathered?
+	 * Does this class have shared statics.
 	 * 
 	 * @param modifier
 	 * @return boolean
 	 */
-	public static boolean isProfile(int modifier) {
-		int mask = ACC_PROFILE;
+	public static boolean isSharedStatics(int modifier) {
+		int mask = ACC_SHAREDSTATICS;
 		return ((modifier & mask) == mask);
 	}
-
-	/*public static boolean isInvalid(int modifier) {
-		int mask = ACC_INVALID;
-		return ((modifier & mask) == mask);
-	}*/
 
 	public static boolean isWide(String signature) {
 		final int len = signature.length();
@@ -370,8 +364,8 @@ public class Modifier {
 		/*if ((modifiers & ACC_INVALID) != 0) {
 			b.append("invalid ");
 		}*/
-		if ((modifiers & ACC_PROFILE) != 0) {
-			b.append("profile ");
+		if ((modifiers & ACC_SHAREDSTATICS) != 0) {
+			b.append("sharedstatics ");
 		}
 
 		return b.toString().trim();
