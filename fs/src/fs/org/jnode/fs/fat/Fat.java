@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 
 import org.jnode.driver.block.BlockDeviceAPI;
+import org.jnode.fs.FileSystemFullException;
 
 /**
  * <description>
@@ -282,7 +283,7 @@ public class Fat {
 			}
 		}
 		if(entryIndex < 0){
-			throw new IOException("FAT Full (" + entries.length + ", " + i + ")");
+			throw new FileSystemFullException("FAT Full (" + entries.length + ", " + i + ")");
 		}
 		entries[entryIndex] = eofMarker;
 		lastFreeCluster = entryIndex+1;
