@@ -38,14 +38,18 @@ exception statement from your version. */
 
 package java.util;
 
+import java.io.Serializable;
+
 /**
  * @author Tom Tromey (tromey@redhat.com)
  * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.5
  */
-public class PriorityQueue<E> extends AbstractQueue<E>
+public class PriorityQueue<E> extends AbstractQueue<E> implements Serializable
 {
   private static final int DEFAULT_CAPACITY = 11;
+
+  private static final long serialVersionUID = -7720805057305804111L;
 
   /** Number of elements actually used in the storage array.  */
   int used;

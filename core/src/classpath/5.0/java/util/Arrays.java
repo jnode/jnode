@@ -2353,6 +2353,395 @@ public class Arrays
     return new Arrays.ArrayList(a);
   }
 
+  /** @since 1.5 */
+  public static int hashCode(long[] v)
+  {
+    if (v == null)
+      return 0;
+    int result = 1;
+    for (int i = 0; i < v.length; ++i)
+      {
+	int elt = (int) (v[i] ^ (v[i] >>> 32));
+	result = 31 * result + elt;
+      }
+    return result;
+  }
+
+  /** @since 1.5 */
+  public static int hashCode(int[] v)
+  {
+    if (v == null)
+      return 0;
+    int result = 1;
+    for (int i = 0; i < v.length; ++i)
+      result = 31 * result + v[i];
+    return result;
+  }
+
+  /** @since 1.5 */
+  public static int hashCode(short[] v)
+  {
+    if (v == null)
+      return 0;
+    int result = 1;
+    for (int i = 0; i < v.length; ++i)
+      result = 31 * result + v[i];
+    return result;
+  }
+
+  /** @since 1.5 */
+  public static int hashCode(char[] v)
+  {
+    if (v == null)
+      return 0;
+    int result = 1;
+    for (int i = 0; i < v.length; ++i)
+      result = 31 * result + v[i];
+    return result;
+  }
+
+  /** @since 1.5 */
+  public static int hashCode(byte[] v)
+  {
+    if (v == null)
+      return 0;
+    int result = 1;
+    for (int i = 0; i < v.length; ++i)
+      result = 31 * result + v[i];
+    return result;
+  }
+
+  /** @since 1.5 */
+  public static int hashCode(boolean[] v)
+  {
+    if (v == null)
+      return 0;
+    int result = 1;
+    for (int i = 0; i < v.length; ++i)
+      result = 31 * result + (v[i] ? 1231 : 1237);
+    return result;
+  }
+
+  /** @since 1.5 */
+  public static int hashCode(float[] v)
+  {
+    if (v == null)
+      return 0;
+    int result = 1;
+    for (int i = 0; i < v.length; ++i)
+      result = 31 * result + Float.floatToIntBits(v[i]);
+    return result;
+  }
+
+  /** @since 1.5 */
+  public static int hashCode(double[] v)
+  {
+    if (v == null)
+      return 0;
+    int result = 1;
+    for (int i = 0; i < v.length; ++i)
+      {
+	long l = Double.doubleToLongBits(v[i]);
+	int elt = (int) (l ^ (l >>> 32));
+	result = 31 * result + elt;
+      }
+    return result;
+  }
+
+  /** @since 1.5 */
+  public static int hashCode(Object[] v)
+  {
+    if (v == null)
+      return 0;
+    int result = 1;
+    for (int i = 0; i < v.length; ++i)
+      {
+	int elt = v[i] == null ? 0 : v[i].hashCode();
+	result = 31 * result + elt;
+      }
+    return result;
+  }
+
+  /** @since 1.5 */
+  public static int deepHashCode(Object[] v)
+  {
+    if (v == null)
+      return 0;
+    int result = 1;
+    for (int i = 0; i < v.length; ++i)
+      {
+	int elt;
+	if (v[i] == null)
+	  elt = 0;
+	else if (v[i] instanceof boolean[])
+	  elt = hashCode((boolean[]) v[i]);
+	else if (v[i] instanceof byte[])
+	  elt = hashCode((byte[]) v[i]);
+	else if (v[i] instanceof char[])
+	  elt = hashCode((char[]) v[i]);
+	else if (v[i] instanceof short[])
+	  elt = hashCode((short[]) v[i]);
+	else if (v[i] instanceof int[])
+	  elt = hashCode((int[]) v[i]);
+	else if (v[i] instanceof long[])
+	  elt = hashCode((long[]) v[i]);
+	else if (v[i] instanceof float[])
+	  elt = hashCode((float[]) v[i]);
+	else if (v[i] instanceof double[])
+	  elt = hashCode((double[]) v[i]);
+	else if (v[i] instanceof Object[])
+	  elt = hashCode((Object[]) v[i]);
+	else
+	  elt = v[i].hashCode();
+	result = 31 * result + elt;
+      }
+    return result;
+  }
+
+  /** @since 1.5 */
+  public static boolean deepEquals(Object[] v1, Object[] v2)
+  {
+    if (v1 == null)
+      return v2 == null;
+    if (v2 == null || v1.length != v2.length)
+      return false;
+
+    for (int i = 0; i < v1.length; ++i)
+      {
+	Object e1 = v1[i];
+	Object e2 = v2[i];
+
+	if (e1 == e2)
+	  continue;
+	if (e1 == null || e2 == null)
+	  return false;
+
+	boolean check;
+	if (e1 instanceof boolean[] && e2 instanceof boolean[])
+	  check = equals((boolean[]) e1, (boolean[]) e2);
+	else if (e1 instanceof byte[] && e2 instanceof byte[])
+	  check = equals((byte[]) e1, (byte[]) e2);
+	else if (e1 instanceof char[] && e2 instanceof char[])
+	  check = equals((char[]) e1, (char[]) e2);
+	else if (e1 instanceof short[] && e2 instanceof short[])
+	  check = equals((short[]) e1, (short[]) e2);
+	else if (e1 instanceof int[] && e2 instanceof int[])
+	  check = equals((int[]) e1, (int[]) e2);
+	else if (e1 instanceof long[] && e2 instanceof long[])
+	  check = equals((long[]) e1, (long[]) e2);
+	else if (e1 instanceof float[] && e2 instanceof float[])
+	  check = equals((float[]) e1, (float[]) e2);
+	else if (e1 instanceof double[] && e2 instanceof double[])
+	  check = equals((double[]) e1, (double[]) e2);
+	else if (e1 instanceof Object[] && e2 instanceof Object[])
+	  check = equals((Object[]) e1, (Object[]) e2);
+	else
+	  check = e1.equals(e2);
+	if (! check)
+	  return false;
+      }
+
+    return true;
+  }
+
+  /** @since 1.5 */
+  public static String toString(boolean[] v)
+  {
+    if (v == null)
+      return "null";
+    StringBuilder b = new StringBuilder("[");
+    for (int i = 0; i < v.length; ++i)
+      {
+	if (i > 0)
+	  b.append(", ");
+	b.append(v[i]);
+      }
+    b.append("]");
+    return b.toString();
+  }
+
+  /** @since 1.5 */
+  public static String toString(byte[] v)
+  {
+    if (v == null)
+      return "null";
+    StringBuilder b = new StringBuilder("[");
+    for (int i = 0; i < v.length; ++i)
+      {
+	if (i > 0)
+	  b.append(", ");
+	b.append(v[i]);
+      }
+    b.append("]");
+    return b.toString();
+  }
+
+  /** @since 1.5 */
+  public static String toString(char[] v)
+  {
+    if (v == null)
+      return "null";
+    StringBuilder b = new StringBuilder("[");
+    for (int i = 0; i < v.length; ++i)
+      {
+	if (i > 0)
+	  b.append(", ");
+	b.append(v[i]);
+      }
+    b.append("]");
+    return b.toString();
+  }
+
+  /** @since 1.5 */
+  public static String toString(short[] v)
+  {
+    if (v == null)
+      return "null";
+    StringBuilder b = new StringBuilder("[");
+    for (int i = 0; i < v.length; ++i)
+      {
+	if (i > 0)
+	  b.append(", ");
+	b.append(v[i]);
+      }
+    b.append("]");
+    return b.toString();
+  }
+
+  /** @since 1.5 */
+  public static String toString(int[] v)
+  {
+    if (v == null)
+      return "null";
+    StringBuilder b = new StringBuilder("[");
+    for (int i = 0; i < v.length; ++i)
+      {
+	if (i > 0)
+	  b.append(", ");
+	b.append(v[i]);
+      }
+    b.append("]");
+    return b.toString();
+  }
+
+  /** @since 1.5 */
+  public static String toString(long[] v)
+  {
+    if (v == null)
+      return "null";
+    StringBuilder b = new StringBuilder("[");
+    for (int i = 0; i < v.length; ++i)
+      {
+	if (i > 0)
+	  b.append(", ");
+	b.append(v[i]);
+      }
+    b.append("]");
+    return b.toString();
+  }
+
+  /** @since 1.5 */
+  public static String toString(float[] v)
+  {
+    if (v == null)
+      return "null";
+    StringBuilder b = new StringBuilder("[");
+    for (int i = 0; i < v.length; ++i)
+      {
+	if (i > 0)
+	  b.append(", ");
+	b.append(v[i]);
+      }
+    b.append("]");
+    return b.toString();
+  }
+
+  /** @since 1.5 */
+  public static String toString(double[] v)
+  {
+    if (v == null)
+      return "null";
+    StringBuilder b = new StringBuilder("[");
+    for (int i = 0; i < v.length; ++i)
+      {
+	if (i > 0)
+	  b.append(", ");
+	b.append(v[i]);
+      }
+    b.append("]");
+    return b.toString();
+  }
+
+  /** @since 1.5 */
+  public static String toString(Object[] v)
+  {
+    if (v == null)
+      return "null";
+    StringBuilder b = new StringBuilder("[");
+    for (int i = 0; i < v.length; ++i)
+      {
+	if (i > 0)
+	  b.append(", ");
+	b.append(v[i]);
+      }
+    b.append("]");
+    return b.toString();
+  }
+
+  private static void deepToString(Object[] v, StringBuilder b, HashSet seen)
+  {
+    b.append("[");
+    for (int i = 0; i < v.length; ++i)
+      {
+	if (i > 0)
+	  b.append(", ");
+	Object elt = v[i];
+	if (elt == null)
+	  b.append("null");
+	else if (elt instanceof boolean[])
+	  b.append(toString((boolean[]) elt));
+	else if (elt instanceof byte[])
+	  b.append(toString((byte[]) elt));
+	else if (elt instanceof char[])
+	  b.append(toString((char[]) elt));
+	else if (elt instanceof short[])
+	  b.append(toString((short[]) elt));
+	else if (elt instanceof int[])
+	  b.append(toString((int[]) elt));
+	else if (elt instanceof long[])
+	  b.append(toString((long[]) elt));
+	else if (elt instanceof float[])
+	  b.append(toString((float[]) elt));
+	else if (elt instanceof double[])
+	  b.append(toString((double[]) elt));
+	else if (elt instanceof Object[])
+	  {
+	    Object[] os = (Object[]) elt;
+	    if (seen.contains(os))
+	      b.append("[...]");
+	    else
+	      {
+		seen.add(os);
+		deepToString(os, b, seen);
+	      }
+	  }
+	else
+	  b.append(elt);
+      }
+    b.append("]");
+  }
+
+  /** @since 1.5 */
+  public static String deepToString(Object[] v)
+  {
+    if (v == null)
+      return "null";
+    HashSet seen = new HashSet();
+    StringBuilder b = new StringBuilder();
+    deepToString(v, b, seen);
+    return b.toString();
+  }
+
   /**
    * Inner class used by {@link #asList(Object[])} to provide a list interface
    * to an array. The name, though it clashes with java.util.ArrayList, is
