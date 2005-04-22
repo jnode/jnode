@@ -1,24 +1,28 @@
 package org.jnode.build.documentation;
 
-import org.apache.tools.ant.DirectoryScanner;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.types.FileSet;
 import org.jnode.build.AbstractPluginTask;
-import org.jnode.plugin.model.PluginDescriptorModel;
-import org.jnode.plugin.Library;
-import org.jnode.plugin.ExtensionPoint;
-import org.jnode.plugin.Extension;
 import org.jnode.plugin.ConfigurationElement;
+import org.jnode.plugin.Extension;
+import org.jnode.plugin.Library;
+import org.jnode.plugin.model.PluginDescriptorModel;
 
-import com.lowagie.text.*;
+import com.lowagie.text.Cell;
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Table;
 import com.lowagie.text.html.HtmlWriter;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileNotFoundException;
-import java.util.*;
-import java.util.List;
-import java.awt.*;
 
 /**
  * Created by IntelliJ IDEA.
