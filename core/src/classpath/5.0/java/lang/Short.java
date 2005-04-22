@@ -374,7 +374,7 @@ public final class Short extends Number implements Comparable<Short>
    * Reverse the bytes in val.
    * @since 1.5
    */
-  public static short reverseBytes(int val)
+  public static short reverseBytes(short val)
   {
     return (short) (((val >> 8) & 0xff) | ((val << 8) & 0xff00));
   }
