@@ -28,7 +28,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
@@ -39,7 +38,7 @@ import org.apache.tools.ant.types.FileSet;
  */
 public class HeaderTask extends Task {
 
-	private final ArrayList fileSets = new ArrayList();
+	private final ArrayList<FileSet> fileSets = new ArrayList<FileSet>();
 
 	private File headerFile;
 	
@@ -86,9 +85,7 @@ public class HeaderTask extends Task {
 		try {
 			final String[] header = readFile(headerFile);
 
-			for (Iterator i = fileSets.iterator(); i.hasNext();) {
-				final FileSet fs = (FileSet) i.next();
-
+			for (FileSet fs : fileSets) {
 				final String[] files = fs.getDirectoryScanner(getProject())
 						.getIncludedFiles();
 				final int fileCount = files.length;
@@ -153,7 +150,7 @@ public class HeaderTask extends Task {
 	private String[] readFile(File file) throws IOException {
 		final BufferedReader in = new BufferedReader(new FileReader(file));
 		try {
-			final ArrayList lines = new ArrayList();
+			final ArrayList<String> lines = new ArrayList<String>();
 			String line;
 			while ((line = in.readLine()) != null) {
 				lines.add(line);

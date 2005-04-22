@@ -4,7 +4,6 @@
 package org.jnode.ant.taskdefs.classpath;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -14,7 +13,7 @@ import org.apache.tools.ant.Project;
 
 public final class BaseDirs {
     
-    private final ArrayList fileSets = new ArrayList();
+    private final ArrayList<TargetedFileSet> fileSets = new ArrayList<TargetedFileSet>();
 
     public TargetedFileSet createFileset() {
         final TargetedFileSet fs = new TargetedFileSet();
@@ -22,11 +21,9 @@ public final class BaseDirs {
         return fs;
     }
     
-    public Map scanJavaFiles(Project project) {
-        TreeMap map = new TreeMap();
-        for (Iterator i = fileSets.iterator(); i.hasNext(); ) {
-            final TargetedFileSet fs = (TargetedFileSet)i.next();
-
+    public Map<String, JavaFile> scanJavaFiles(Project project) {
+        final TreeMap<String, JavaFile> map = new TreeMap<String, JavaFile>();
+        for (TargetedFileSet fs : fileSets) {
             final DirectoryScanner ds = fs.getDirectoryScanner(project);
             final String[] fNames = ds.getIncludedFiles();
             for (int j = 0; j < fNames.length; j++) {

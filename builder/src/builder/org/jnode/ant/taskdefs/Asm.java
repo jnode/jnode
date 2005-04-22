@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -89,7 +88,7 @@ public class Asm extends MatchingTask {
 
     private String ext = "o";
 
-    private Set includeDirs = new HashSet();
+    private Set<IncludeDir> includeDirs = new HashSet<IncludeDir>();
 
     private File listFile;
 
@@ -120,7 +119,7 @@ public class Asm extends MatchingTask {
             IOException {
 
         Execute exec = new Execute();
-        ArrayList cmdLine = new ArrayList();
+        ArrayList<String> cmdLine = new ArrayList<String>();
         if (bits == 64) {
             cmdLine.add("yasm");
         } else if (Os.isFamily("windows")) {
@@ -153,8 +152,7 @@ public class Asm extends MatchingTask {
             cmdLine.add(listFile.toString());
         }
 
-        for (Iterator i = includeDirs.iterator(); i.hasNext();) {
-            IncludeDir dir = (IncludeDir) i.next();
+        for (IncludeDir dir : includeDirs) {
             cmdLine.add("-I");
             cmdLine.add(postFixSlash(dir.getDir().toString()));
         }
@@ -218,16 +216,15 @@ public class Asm extends MatchingTask {
 
         DirectoryScanner scanner = getDirectoryScanner(getSrcdir());
         String allFiles[] = scanner.getIncludedFiles();
-        Map compileMap = new HashMap();
+        Map<File, File> compileMap = new HashMap<File, File>();
         scanDir(srcdir, destdir, allFiles, compileMap);
 
         if (compileMap.size() > 0) {
             log("Compiling " + compileMap.size() + " source files to "
                     + destdir);
 
-            for (Iterator i = compileMap.keySet().iterator(); i.hasNext();) {
-                File srcFile = (File) i.next();
-                File dstFile = (File) compileMap.get(srcFile);
+            for (File srcFile : compileMap.keySet()) {
+                File dstFile = compileMap.get(srcFile);
                 doNasm(srcFile, dstFile);
             }
         }
@@ -302,7 +299,7 @@ public class Asm extends MatchingTask {
      *             Description of the Exception
      */
     protected void scanDir(File srcDir, File destDir, String[] files,
-            Map compileMap) throws IOException {
+            Map<File, File> compileMap) throws IOException {
         long now = System.currentTimeMillis();
 
         for (int c = 0; c < files.length; c++) {

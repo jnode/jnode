@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.ant.taskdefs.classpath;
 
 import java.io.BufferedReader;
@@ -30,7 +30,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -40,44 +39,57 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 
-
 /**
- * Task used to compare the latest classpath version against the latest
- * jnode version of classpath.
+ * Task used to compare the latest classpath version against the latest jnode
+ * version of classpath.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class CompareTask extends Task {
 
     private BaseDirs vmDirs;
+
     private BaseDirs classpathDirs;
+
     private BaseDirs vmSpecificDirs;
+
     private File destDir;
+
     private String vmSpecificTag = "@vm-specific";
+
     private String classpathBugfixTag = "@classpath-bugfix";
-    
+
     private static final int NO_CHANGE = 0x01;
+
     private static final int NEEDS_MERGE = 0x02;
 
     private static final int FLAGS_MASK = 0xFF00;
+
     private static final int FLAG_NATIVE = 0x0100;
+
     private static final int FLAG_VM_SPECIFIC = 0x0200;
+
     private static final int FLAG_CLASSPATH_BUGFIX = 0x0400;
-    private static final int FLAG_JNODE = 0x0800;    
+
+    private static final int FLAG_JNODE = 0x0800;
+
     private static final int FLAG_TARGET_DIFF = 0x1000;
-    
+
     public void execute() {
         if (destDir == null) {
             throw new BuildException("The destdir attribute must be set");
         }
-        final Map vmFiles = vmDirs.scanJavaFiles(getProject());
-        final Map classpathFiles = classpathDirs.scanJavaFiles(getProject());
-        final Map vmSpecificFiles = vmSpecificDirs.scanJavaFiles(getProject());
-        final TreeSet allFiles = new TreeSet();
-        final Map packageDiffs = new TreeMap();
+        final Map<String, JavaFile> vmFiles = vmDirs
+                .scanJavaFiles(getProject());
+        final Map<String, JavaFile> classpathFiles = classpathDirs
+                .scanJavaFiles(getProject());
+        final Map<String, JavaFile> vmSpecificFiles = vmSpecificDirs
+                .scanJavaFiles(getProject());
+        final TreeSet<String> allFiles = new TreeSet<String>();
+        final Map<String, String> packageDiffs = new TreeMap<String, String>();
         allFiles.addAll(vmFiles.keySet());
         allFiles.addAll(classpathFiles.keySet());
-        
+
         try {
             destDir.mkdirs();
             final File outFile = new File(destDir, "classpath-compare.html");
@@ -91,18 +103,19 @@ public class CompareTask extends Task {
             int diffNative = 0;
             int diffJNode = 0;
             int vmSpecific = 0;
-            
-            for (Iterator i = allFiles.iterator(); i.hasNext(); ) {
-                final String name = (String)i.next();
-                JavaFile cpFile = (JavaFile)classpathFiles.get(name);
-                final JavaFile vmFile = (JavaFile)vmFiles.get(name);
-                final JavaFile vmSpecificFile = (JavaFile)vmSpecificFiles.get(name);
+
+            for (String name : allFiles) {
+                JavaFile cpFile = (JavaFile) classpathFiles.get(name);
+                final JavaFile vmFile = (JavaFile) vmFiles.get(name);
+                final JavaFile vmSpecificFile = (JavaFile) vmSpecificFiles
+                        .get(name);
 
                 if (vmSpecificFile != null) {
                     // File is found as vm specific source
-                    reportVmSpecific(out, vmSpecificFile.getClassName(), "vm-specific");
+                    reportVmSpecific(out, vmSpecificFile.getClassName(),
+                            "vm-specific");
                     vmSpecific++;
-                } else if (vmFile == null) {                    
+                } else if (vmFile == null) {
                     // file is not found as vmspecific source, nor as vm source
                     if (!cpFile.isIgnoreMissing()) {
                         reportMissing(out, cpFile.getClassName(), "classpath",
@@ -113,16 +126,18 @@ public class CompareTask extends Task {
                     // File is not found in classpath sources
                     reportMissing(out, vmFile.getClassName(), "vm", 0);
                     missingInVm++;
-                } else {                    
+                } else {
                     // We have both the classpath version and the vm version.
                     cpFile = cpFile.getBestFileForTarget(vmFile.getTarget());
-                    
+
                     final String diffFileName = vmFile.getClassName() + ".diff";
                     int rc = runDiff(vmFile, cpFile, diffFileName, packageDiffs);
                     switch (rc & ~FLAGS_MASK) {
-                    case NO_CHANGE: break;
+                    case NO_CHANGE:
+                        break;
                     case NEEDS_MERGE:
-                        reportNeedsMerge(out, vmFile.getClassName(), vmFile.getTarget(), diffFileName, rc & FLAGS_MASK);
+                        reportNeedsMerge(out, vmFile.getClassName(), vmFile
+                                .getTarget(), diffFileName, rc & FLAGS_MASK);
                         needsMerge++;
                         break;
                     default:
@@ -145,52 +160,59 @@ public class CompareTask extends Task {
             }
 
             // Package diffs
-            for (Iterator i = packageDiffs.entrySet().iterator(); i.hasNext(); ) {
-                final Map.Entry entry = (Map.Entry)i.next();
-                final String pkg = (String)entry.getKey();
-                final String diff = (String)entry.getValue();
+            for (Map.Entry<String, String> entry : packageDiffs.entrySet()) {
+                final String pkg = entry.getKey();
+                final String diff = entry.getValue();
                 final String diffFileName = pkg + ".pkgdiff";
                 processPackageDiff(diffFileName, pkg, diff);
                 reportPackageDiff(out, pkg, diffFileName, getFlags(diff));
             }
-            
+
             out.println("</table><p/>");
-            
+
             // Summary
             out.println("<a name='summary'/><h2>Summary</h2>");
             if (missingInCp > 0) {
-            	out.println("Found " + missingInCp + " files missing in classpath</br>");
-            	log("Found " + missingInCp + " files missing in classpath");
+                out.println("Found " + missingInCp
+                        + " files missing in classpath</br>");
+                log("Found " + missingInCp + " files missing in classpath");
             }
             if (missingInVm > 0) {
-            	out.println("Found " + missingInVm + " files missing in vm<br/>");
-            	log("Found " + missingInVm + " files missing in vm");
+                out.println("Found " + missingInVm
+                        + " files missing in vm<br/>");
+                log("Found " + missingInVm + " files missing in vm");
             }
             if (needsMerge > 0) {
-            	out.println("Found " + needsMerge + " files that needs merging<br/>");
-            	log("Found " + needsMerge + " files that needs merging");
-			}            
+                out.println("Found " + needsMerge
+                        + " files that needs merging<br/>");
+                log("Found " + needsMerge + " files that needs merging");
+            }
             if (diffVmSpecific > 0) {
-            	out.println("Found " + diffVmSpecific + " VM specific differences<br/>");
-            	log("Found " + diffVmSpecific + " VM specific differences");
-			}            
+                out.println("Found " + diffVmSpecific
+                        + " VM specific differences<br/>");
+                log("Found " + diffVmSpecific + " VM specific differences");
+            }
             if (vmSpecific > 0) {
                 out.println("Found " + vmSpecific + " VM specific files<br/>");
                 log("Found " + vmSpecific + " VM specific files");
-            }            
+            }
             if (diffClasspathBugfix > 0) {
-            	out.println("Found " + diffClasspathBugfix + " local classpath bugfixes<br/>");
-            	log("Found " + diffClasspathBugfix + " local classpath bugfixes");
-			}            
+                out.println("Found " + diffClasspathBugfix
+                        + " local classpath bugfixes<br/>");
+                log("Found " + diffClasspathBugfix
+                        + " local classpath bugfixes");
+            }
             if (diffNative > 0) {
-            	out.println("Found " + diffNative + " changes with native in it<br/>");
-            	log("Found " + diffNative + " changes with native in it");
-			}            
+                out.println("Found " + diffNative
+                        + " changes with native in it<br/>");
+                log("Found " + diffNative + " changes with native in it");
+            }
             if (diffJNode > 0) {
-            	out.println("Found " + diffJNode + " changes with JNode in it<br/>");
-            	log("Found " + diffJNode + " changes with JNode in it");
-			}            
-            
+                out.println("Found " + diffJNode
+                        + " changes with JNode in it<br/>");
+                log("Found " + diffJNode + " changes with JNode in it");
+            }
+
             reportFooter(out);
             out.flush();
             out.close();
@@ -200,16 +222,14 @@ public class CompareTask extends Task {
             throw new BuildException(ex);
         }
     }
-    
-    protected int runDiff(JavaFile vmFile, JavaFile cpFile, String diffFileName, Map packageDiffs) throws IOException, InterruptedException {
-        final String[] cmd = {
-              "diff",
-              "-b", // Ignore white space change
-              "-au", 
-              "-I", ".*$" + "Id:.*$.*", // Avoid cvs keyword expansion in this string
-              vmFile.getFileName(),
-              cpFile.getFile().getAbsolutePath()
-        };
+
+    protected int runDiff(JavaFile vmFile, JavaFile cpFile,
+            String diffFileName, Map<String, String> packageDiffs)
+            throws IOException, InterruptedException {
+        final String[] cmd = { "diff", "-b", // Ignore white space change
+                "-au", "-I", ".*$" + "Id:.*$.*", // Avoid cvs keyword
+                                                    // expansion in this string
+                vmFile.getFileName(), cpFile.getFile().getAbsolutePath() };
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         final ByteArrayOutputStream err = new ByteArrayOutputStream();
         final PumpStreamHandler streamHandler = new PumpStreamHandler(out, err);
@@ -224,18 +244,18 @@ public class CompareTask extends Task {
                 final byte[] diff = out.toByteArray();
                 os.write(diff);
                 os.flush();
-                
+
                 final String diffStr = new String(diff);
                 final String pkg = vmFile.getPackageName();
                 String pkgDiff;
                 if (packageDiffs.containsKey(pkg)) {
-                    pkgDiff = (String)packageDiffs.get(pkg);
-                    pkgDiff = pkgDiff + "diff\n" + diffStr; 
+                    pkgDiff = (String) packageDiffs.get(pkg);
+                    pkgDiff = pkgDiff + "diff\n" + diffStr;
                 } else {
                     pkgDiff = diffStr;
                 }
                 packageDiffs.put(pkg, pkgDiff);
-                
+
                 int flags = getFlags(diffStr);
                 if (!vmFile.getTarget().equals(cpFile.getTarget())) {
                     flags |= FLAG_TARGET_DIFF;
@@ -249,7 +269,8 @@ public class CompareTask extends Task {
         }
     }
 
-    private void processPackageDiff(String diffFileName, String pkg, String diff) throws IOException {
+    private void processPackageDiff(String diffFileName, String pkg, String diff)
+            throws IOException {
         File diffFile = new File(destDir, diffFileName);
         FileWriter os = new FileWriter(diffFile);
         try {
@@ -257,9 +278,9 @@ public class CompareTask extends Task {
             os.flush();
         } finally {
             os.close();
-        }        
+        }
     }
-    
+
     protected void reportHeader(PrintWriter out) {
         out.println("<html>");
         out.println("<title>Classpath compare</title>");
@@ -274,7 +295,7 @@ public class CompareTask extends Task {
         out.println("<body>");
         out.println("<h1>Classpath compare results</h1>");
         out.println("Created at " + new Date());
-        out.println("<table border='1' width='100%' style='border: solid 1'>");        
+        out.println("<table border='1' width='100%' style='border: solid 1'>");
         out.println("<tr>");
         out.println("<th align='left'>Class</th>");
         out.println("<th align='left'>Target</th>");
@@ -282,8 +303,9 @@ public class CompareTask extends Task {
         out.println("</tr>");
         out.flush();
     }
-    
-    protected void reportMissing(PrintWriter out, String fname, String existsIn, int flags) {
+
+    protected void reportMissing(PrintWriter out, String fname,
+            String existsIn, int flags) {
         out.println("<tr class='" + existsIn + "-only'>");
         out.println("<td>" + fname + "</td>");
         out.println("<td>&nbsp;</td>");
@@ -293,8 +315,9 @@ public class CompareTask extends Task {
         out.println("</tr>");
         out.flush();
     }
-    
-    protected void reportVmSpecific(PrintWriter out, String fname, String existsIn) {
+
+    protected void reportVmSpecific(PrintWriter out, String fname,
+            String existsIn) {
         out.println("<tr class='vm-specific-source'>");
         out.println("<td>" + fname + "</td>");
         out.println("<td>&nbsp;</td>");
@@ -303,8 +326,9 @@ public class CompareTask extends Task {
         out.println("</tr>");
         out.flush();
     }
-    
-    protected void reportNeedsMerge(PrintWriter out, String fname, String target, String diffFileName, int flags) {
+
+    protected void reportNeedsMerge(PrintWriter out, String fname,
+            String target, String diffFileName, int flags) {
         out.println("<tr class='" + flagsToStyleClass(flags) + "'>");
         out.println("<td>" + fname + "</td>");
         if (target.equals(TargetedFileSet.DEFAULT_TARGET)) {
@@ -317,8 +341,9 @@ public class CompareTask extends Task {
         out.println("</tr>");
         out.flush();
     }
-    
-    protected void reportPackageDiff(PrintWriter out, String pkg, String diffFileName, int flags) {
+
+    protected void reportPackageDiff(PrintWriter out, String pkg,
+            String diffFileName, int flags) {
         out.println("<tr class='needsmerge'>");
         out.println("<td>" + pkg + "</td>");
         out.println("<td>&nbsp;</td>");
@@ -328,12 +353,12 @@ public class CompareTask extends Task {
         out.println("</tr>");
         out.flush();
     }
-    
+
     protected void reportFooter(PrintWriter out) {
         out.println("</body></html>");
         out.flush();
     }
-    
+
     protected String flagsToStyleClass(int flags) {
         if ((flags & FLAG_VM_SPECIFIC) != 0) {
             return "vm-specific";
@@ -376,7 +401,7 @@ public class CompareTask extends Task {
             }
             b.append("jnode");
         }
-        
+
         if (b.length() > 0) {
             out.println(" <i>(");
             out.println(b.toString());
@@ -400,7 +425,7 @@ public class CompareTask extends Task {
         }
         return flags;
     }
-    
+
     protected int getFlags(JavaFile file) throws IOException {
         final FileReader fr = new FileReader(file.getFile());
         try {
@@ -416,49 +441,54 @@ public class CompareTask extends Task {
             fr.close();
         }
     }
-    
+
     public BaseDirs createVmsources() {
         if (vmDirs == null) {
             vmDirs = new BaseDirs();
         }
         return vmDirs;
     }
-    
+
     public BaseDirs createVmspecificsources() {
         if (vmSpecificDirs == null) {
             vmSpecificDirs = new BaseDirs();
         }
         return vmSpecificDirs;
     }
-    
+
     public BaseDirs createClasspathsources() {
         if (classpathDirs == null) {
             classpathDirs = new BaseDirs();
         }
         return classpathDirs;
     }
-    
+
     /**
      * @return Returns the destDir.
      */
     public final File getDestDir() {
         return this.destDir;
     }
+
     /**
-     * @param destDir The destDir to set.
+     * @param destDir
+     *            The destDir to set.
      */
     public final void setDestDir(File destDir) {
         this.destDir = destDir;
     }
-    
+
     /**
-     * @param classpathBugfixTag The classpathBugfixTag to set.
+     * @param classpathBugfixTag
+     *            The classpathBugfixTag to set.
      */
     public final void setClasspathBugfixTag(String classpathBugfixTag) {
         this.classpathBugfixTag = classpathBugfixTag;
     }
+
     /**
-     * @param vmSpecificTag The vmSpecificTag to set.
+     * @param vmSpecificTag
+     *            The vmSpecificTag to set.
      */
     public final void setVmSpecificTag(String vmSpecificTag) {
         this.vmSpecificTag = vmSpecificTag;
