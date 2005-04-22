@@ -588,14 +588,15 @@ public class X86CompilerHelper implements X86CompilerConstants {
      * @param curInstrLabel
      * @param dst
      * @param entry
+     * @param tmp A temporary REFERENCE register
      */
     public final void writeGetStaticsEntry(Label curInstrLabel, GPR dst,
-            VmIsolatedStaticsEntry entry) {
+            VmIsolatedStaticsEntry entry, GPR tmp) {
         if (Vm.VerifyAssertions) {
             Vm._assert(dst.getSize() == BITS32, "dst wrong size");
         }
-        writeLoadIsolatedStatics(curInstrLabel, "gs", dst);
-        os.writeMOV(INTSIZE, dst, dst, getIsolatedStaticsOffset(entry));
+        writeLoadIsolatedStatics(curInstrLabel, "gs", tmp);
+        os.writeMOV(INTSIZE, dst, tmp, getIsolatedStaticsOffset(entry));
     }
 
     /**

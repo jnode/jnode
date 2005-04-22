@@ -1763,7 +1763,11 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
                 if (sf.isShared()) {
                     helper.writeGetStaticsEntry(curInstrLabel, resultr, (VmSharedStaticsEntry)sf);
                 } else {
-                    helper.writeGetStaticsEntry(curInstrLabel, resultr, (VmIsolatedStaticsEntry)sf);                    
+                    final GPR tmp = (GPR) L1AHelper.requestRegister(eContext,
+                            JvmType.REFERENCE, false);
+                    helper.writeGetStaticsEntry(curInstrLabel, resultr,
+                            (VmIsolatedStaticsEntry) sf, tmp);
+                    L1AHelper.releaseRegister(eContext, tmp);
                 }
             } else {
                 if (sf.isShared()) {
