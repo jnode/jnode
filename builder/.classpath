@@ -1,14 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/builder"/>
-	<classpathentry kind="src" path="/JNode-Core"/>
-	<classpathentry kind="src" path="/JNode-FS"/>
-	<classpathentry kind="lib" path="/JNode-Core/lib/ant.jar"/>
-	<classpathentry kind="lib" path="/JNode-Core/lib/nanoxml-lite-2.2.3.jar"/>
-	<classpathentry kind="lib" path="/JNode-Core/lib/log4j-1.2.8.jar"/>
-	<classpathentry kind="lib" path="lib/dom4j.jar"/>
-	<classpathentry kind="src" path="/JNode-Shell"/>
-	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
-	<classpathentry kind="lib" path="lib/classycle.jar"/>
+	<classpathentry kind="src" path="src/builder">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="/JNode-Core">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="/JNode-FS">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/JNode-Core/lib/ant.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/JNode-Core/lib/nanoxml-lite-2.2.3.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/JNode-Core/lib/log4j-1.2.8.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/dom4j.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="/JNode-Shell">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/xml-apis.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/classycle.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/itext-1.3.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
