@@ -51,6 +51,8 @@ public class EnumSet<T extends Enum<T>>
   extends AbstractSet<T>
   implements Cloneable, Serializable
 {
+  private static final long serialVersionUID = 4782406773684236311L;
+
   BitSet store;
   int cardinality;
   Class<T> enumClass;

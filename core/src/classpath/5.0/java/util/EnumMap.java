@@ -50,6 +50,8 @@ public class EnumMap<K extends Enum<K>, V>
   extends AbstractMap<K, V>
   implements Cloneable, Serializable
 {
+  private static final long serialVersionUID = 458661240069192865L;
+
   V[] store;
   int cardinality;
   Class<K> enumClass;
