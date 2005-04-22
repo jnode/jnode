@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
@@ -38,7 +37,7 @@ import org.apache.tools.ant.types.FileSet;
  */
 public class Native2AsciiTask extends Task {
 
-    private final ArrayList fileSets = new ArrayList();
+    private final ArrayList<FileSet> fileSets = new ArrayList<FileSet>();
 
     private boolean update = false;
 
@@ -48,9 +47,7 @@ public class Native2AsciiTask extends Task {
 
     public void execute() throws BuildException {
         try {
-            for (Iterator i = fileSets.iterator(); i.hasNext();) {
-                final FileSet fs = (FileSet) i.next();
-
+            for (FileSet fs : fileSets) {
                 final String[] files = fs.getDirectoryScanner(getProject())
                         .getIncludedFiles();
                 final int fileCount = files.length;

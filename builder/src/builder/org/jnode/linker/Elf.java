@@ -46,7 +46,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Vector;
 
 import org.jnode.assembler.UnresolvedObjectRefException;
@@ -131,7 +130,7 @@ public class Elf {
 
 	short e_shstrndx;
 
-	Vector sections;
+	Vector<Section> sections;
 
 	Section symSection;
 
@@ -165,7 +164,7 @@ public class Elf {
 		e_shoff = 0;
 		e_flags = 0;
 		e_shstrndx = 0;
-		sections = new Vector();
+		sections = new Vector<Section>();
 		if (e_type != ET_NONE) {
 			// Section 0 should be NULL
 			sections.addElement(Section.newNullInstance(this));
@@ -231,16 +230,15 @@ public class Elf {
 		textSection.setBody(stream.getBytes(), 0, stream.getLength());
 
 		// Add all symbols & relocs
-		final Collection objectRefs = stream.getObjectRefs();
+		final Collection<X86ObjectRef> objectRefs = stream.getObjectRefs();
 		System.out.println("Creating " + objectRefs.size() + " symbols");
 		int cnt = 0;
-		for (Iterator i = objectRefs.iterator(); i.hasNext(); cnt++) {
+		for (X86ObjectRef ref : objectRefs) {
 			/*
 			 * if ((cnt % 1000) == 0) { long end = System.currentTimeMillis();
 			 * System.out.println("At " + cnt + ", it took " + (end-start) +
 			 * "ms"); start = end; }
 			 */
-			final X86ObjectRef ref = (X86ObjectRef) i.next();
 			final Object obj = ref.getObject();
 			final Symbol sym;
 			if (ref.isResolved()) {
@@ -267,6 +265,7 @@ public class Elf {
 				sym.setBind(Symbol.STB_LOCAL);
 			}
 			elf.addSymbol(sym);
+            cnt++;
 		}
 		return elf;
 	}
