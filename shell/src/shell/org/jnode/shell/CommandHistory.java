@@ -21,7 +21,8 @@
  
 package org.jnode.shell;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Used to keep an archive of commands.
  *  @author Matt Paine
@@ -29,7 +30,7 @@ import java.util.Vector;
 public class CommandHistory {
 
 	/** Holds the commands. **/
-	private Vector history = new Vector();
+	private final List<String> history = new ArrayList<String>();
 
 	/** Constructs a CommandHistory object. **/
 	public CommandHistory() {

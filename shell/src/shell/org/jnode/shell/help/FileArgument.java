@@ -95,7 +95,7 @@ public class FileArgument extends Argument {
             return partial;
         } else {
             final int cnt = names.length;
-            final ArrayList list = new ArrayList(cnt);
+            final ArrayList<String> list = new ArrayList<String>(cnt);
             final String prefix = (dir.length() == 0) ? "" : dir + File.separatorChar;
             for (int i = 0; i < cnt; i++) {
                 final String name = prefix + names[i];

@@ -28,9 +28,9 @@ import java.util.Map;
  */
 public class ParsedArguments {
 
-    private final Map args;
+    private final Map<CommandLineElement, String[]> args;
 
-    ParsedArguments(Map args) {
+    ParsedArguments(Map<CommandLineElement, String[]> args) {
         this.args = args;
     }
 

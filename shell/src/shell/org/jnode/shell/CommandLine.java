@@ -252,7 +252,7 @@ public class CommandLine {
 	 * @return the command line as String[]
 	 */
 	public String[] toStringArray() {
-		List res = new ArrayList();
+		final List<String> res = new ArrayList<String>();
 		CommandLine line = new CommandLine(s);
 
 		while (line.hasNext()) {

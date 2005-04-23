@@ -26,7 +26,6 @@ import gnu.java.security.action.GetPropertiesAction;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.security.AccessController;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -60,9 +59,8 @@ public class EnvCommand {
 		throws Exception {
 
 	    final Properties ps = (Properties)AccessController.doPrivileged(new GetPropertiesAction());
-	    final TreeMap sortedPs = new TreeMap(ps);
-		for (Iterator i = sortedPs.entrySet().iterator(); i.hasNext(); ) {
-			final Map.Entry entry = (Map.Entry)i.next();
+	    final TreeMap<Object, Object> sortedPs = new TreeMap<Object, Object>(ps);
+		for (Map.Entry<Object, Object> entry : sortedPs.entrySet()) {
 			final String key = entry.getKey().toString();
 			final String value = entry.getValue().toString();
 

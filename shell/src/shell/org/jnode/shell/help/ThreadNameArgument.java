@@ -38,7 +38,7 @@ public class ThreadNameArgument extends Argument {
 	}
 
 	public String complete(String partial) {
-		ArrayList names = new ArrayList();
+		final ArrayList<String> names = new ArrayList<String>();
 		ThreadGroup grp = Thread.currentThread().getThreadGroup();
 		while (grp.getParent() != null) {
 			grp = grp.getParent();
@@ -48,7 +48,7 @@ public class ThreadNameArgument extends Argument {
 		return complete(partial, names);
 	}
 
-	private void findList(ThreadGroup grp, String partial, List names) {
+	private void findList(ThreadGroup grp, String partial, List<String> names) {
 		final int cnt = grp.activeCount();
 		final Thread[] ts = new Thread[cnt];
 		grp.enumerate(ts);

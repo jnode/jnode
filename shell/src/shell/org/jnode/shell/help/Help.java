@@ -33,13 +33,13 @@ import org.jnode.shell.CommandLine;
  */
 public abstract class Help {
 
-    public static final Class NAME = Help.class;//"system/help";
+    public static final Class<Help> NAME = Help.class;
 
     public static final String INFO_FIELD_NAME = "HELP_INFO";
 
     public static Help getHelp() throws HelpException {
         try {
-            return (Help) InitialNaming.lookup(NAME);
+            return InitialNaming.lookup(NAME);
         } catch (NamingException ex) {
             throw new HelpException("Help application not found");
         }

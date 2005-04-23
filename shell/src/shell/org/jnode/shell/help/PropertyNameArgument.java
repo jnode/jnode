@@ -18,36 +18,35 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.shell.help;
 
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author qades
  */
 public class PropertyNameArgument extends Argument {
 
-	public PropertyNameArgument(String name, String description, boolean multi) {
-		super(name, description, multi);
-	}
+    public PropertyNameArgument(String name, String description, boolean multi) {
+        super(name, description, multi);
+    }
 
-	public PropertyNameArgument(String name, String description) {
-		super(name, description);
-	}
+    public PropertyNameArgument(String name, String description) {
+        super(name, description);
+    }
 
-	public String complete(String partial) {
-		List props = new ArrayList();
-		Iterator i = System.getProperties().keySet().iterator();
-		while( i.hasNext() ) {
-		String prop = (String)i.next();
-			if( prop.startsWith(partial) )
-				props.add(prop);
-		}
+    public String complete(String partial) {
+        final List<String> props = new ArrayList<String>();
+        for (Object key : System.getProperties().keySet()) {
+            final String prop = (String) key;
+            if (prop.startsWith(partial)) {
+                props.add(prop);
+            }
+        }
 
-		return complete(partial, props);
-	}
-	
+        return complete(partial, props);
+    }
+
 }

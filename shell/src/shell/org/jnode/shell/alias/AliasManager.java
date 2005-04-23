@@ -21,6 +21,7 @@
  
 package org.jnode.shell.alias;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -31,7 +32,7 @@ public interface AliasManager {
 	/**
 	 * Name of the system alias manager (in the InitialNaming namespace)
 	 */
-	public static final Class NAME = AliasManager.class;// "system/aliasmanager";
+	public static final Class<AliasManager> NAME = AliasManager.class;// "system/aliasmanager";
 
 	public static final String ALIASES_EP_NAME = "org.jnode.shell.aliases";
 
@@ -84,10 +85,14 @@ public interface AliasManager {
 	public AliasManager createAliasManager();
 
 	/**
-	 * Gets an iterator to iterate over all aliases.
-	 * 
-	 * @return An iterator the returns instances of String.
+	 * Gets a collection of all aliases.
 	 */
-	public Iterator aliasIterator();
+	public Collection<String> aliases();
 
+    /**
+     * Gets an iterator to iterate over all aliases.
+     * 
+     * @return An iterator the returns instances of String.
+     */
+    public Iterator<String> aliasIterator();
 }

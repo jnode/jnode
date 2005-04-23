@@ -54,14 +54,14 @@ public class PluginArgument extends Argument {
     }
 
     public String complete(String partial) {
-        final List ids = new ArrayList();
+        final List<String> ids = new ArrayList<String>();
         try {
             // get the plugin manager
             final PluginManager piMgr = (PluginManager) InitialNaming
                     .lookup(PluginManager.NAME);
 
             // collect matching plugin id's
-            for (Iterator i = piMgr.getRegistry().getDescriptorIterator(); i
+            for (Iterator<PluginDescriptor> i = piMgr.getRegistry().getDescriptorIterator(); i
                     .hasNext();) {
                 final PluginDescriptor descr = (PluginDescriptor) i.next();
                 final String id = descr.getId();

@@ -37,6 +37,6 @@ public class ShellUtils {
 	 */
 	public static ShellManager getShellManager()
 	throws NameNotFoundException {
-		return (ShellManager)InitialNaming.lookup(ShellManager.NAME);
+		return InitialNaming.lookup(ShellManager.NAME);
 	}
 }

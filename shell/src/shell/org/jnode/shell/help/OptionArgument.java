@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.shell.help;
 
 import java.util.ArrayList;
@@ -42,46 +42,49 @@ public class OptionArgument extends Argument {
     }
 
     public OptionArgument(String name, String description, Option o1) {
-        this(name, description, new Option[] { o1}, SINGLE);
+        this(name, description, new Option[] { o1 }, SINGLE);
     }
 
     public OptionArgument(String name, String description, Option o1, Option o2) {
-        this(name, description, new Option[] { o1, o2}, SINGLE);
+        this(name, description, new Option[] { o1, o2 }, SINGLE);
     }
 
     public OptionArgument(String name, String description, Option o1,
             Option o2, Option o3) {
-        this(name, description, new Option[] { o1, o2, o3}, SINGLE);
+        this(name, description, new Option[] { o1, o2, o3 }, SINGLE);
     }
 
     public OptionArgument(String name, String description, Option o1,
             Option o2, Option o3, Option o4) {
-        this(name, description, new Option[] { o1, o2, o3, o4}, SINGLE);
+        this(name, description, new Option[] { o1, o2, o3, o4 }, SINGLE);
     }
 
     public OptionArgument(String name, String description, Option o1,
             Option o2, Option o3, Option o4, Option o5) {
-        this(name, description, new Option[] { o1, o2, o3, o4, o5}, SINGLE);
+        this(name, description, new Option[] { o1, o2, o3, o4, o5 }, SINGLE);
     }
 
     public String format() {
-        if (options.length == 0) return "";
-        String result = options[ 0].getName();
+        if (options.length == 0)
+            return "";
+        String result = options[0].getName();
         for (int i = 1; i < options.length; i++)
-            result += "|" + options[ i].getName();
+            result += "|" + options[i].getName();
         return result;
     }
 
     public void describe(Help help) {
         for (int i = 0; i < options.length; i++)
-            options[ i].describe(help);
+            options[i].describe(help);
     }
 
     public String complete(String partial) {
-        List opts = new ArrayList();
-        for (int i = 0; i < options.length; i++) {
-            if (options[ i].getName().startsWith(partial))
-                    opts.add(options[ i].getName());
+        final List<String> opts = new ArrayList<String>();
+        for (Option option : options) {
+            final String name = option.getName();
+            if (name.startsWith(partial)) {
+                opts.add(name);
+            }
         }
 
         return complete(partial, opts);
@@ -94,14 +97,14 @@ public class OptionArgument extends Argument {
      * @return true if value, false otherwise.
      */
     protected boolean isValidValue(String value) {
-        final int length = options.length;
-        for (int i = 0; i < length; i++) {
-            if (options[ i].getName().equals(value)) { return true; }
+        for (Option option : options) {
+            if (option.getName().equals(value)) {
+                return true;
+            }
         }
         return false;
     }
-    
-    
+
     /**
      * @see java.lang.Object#toString()
      */
