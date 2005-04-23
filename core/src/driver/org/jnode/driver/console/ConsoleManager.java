@@ -53,7 +53,7 @@ public interface ConsoleManager extends KeyboardListener, PointerListener {
      * Gets the names of all registers consoles.
      * @return
      */
-    public Set/*<String>*/ getConsoleNames();
+    public Set<String> getConsoleNames();
 
     /**
      * Register a new console.

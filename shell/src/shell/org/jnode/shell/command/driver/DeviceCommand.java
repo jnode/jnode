@@ -23,13 +23,13 @@ package org.jnode.shell.command.driver;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.util.Iterator;
 import java.util.TreeMap;
 
 import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
+import org.jnode.driver.DeviceAPI;
 import org.jnode.driver.DeviceInfoAPI;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
@@ -171,8 +171,7 @@ public class DeviceCommand {
 			out.println(prefix + "driver:none");
 		}
 		out.println(prefix + "implemented API's:");
-		for (Iterator i = dev.implementedAPIs().iterator(); i.hasNext();) {
-			final Class api = (Class) i.next();
+		for (Class<? extends DeviceAPI> api : dev.implementedAPIs()) {
 			out.println(prefix + prefix + api.getName());
 		}
 		out.println();
@@ -198,15 +197,13 @@ public class DeviceCommand {
 	 */
 	protected static void showDevices(PrintStream out) throws NameNotFoundException {
 		// Create a sorted list
-		final TreeMap tm = new TreeMap();
-		final DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+		final TreeMap<String, Device> tm = new TreeMap<String, Device>();
+		final DeviceManager dm = InitialNaming.lookup(DeviceManager.NAME);
 
-		for (Iterator i = dm.getDevices().iterator(); i.hasNext();) {
-			final Device dev = (Device) i.next();
+		for (Device dev : dm.getDevices()) {
 			tm.put(dev.getId(), dev);
 		}
-		for (Iterator i = tm.values().iterator(); i.hasNext();) {
-			final Device dev = (Device) i.next();
+		for (Device dev : tm.values()) {
 			out.print(dev.getId());
 			final String drvClassName = dev.getDriverClassName();
 			if (dev.isStarted()) {

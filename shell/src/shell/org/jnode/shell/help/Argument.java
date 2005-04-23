@@ -67,7 +67,7 @@ public class Argument extends CommandLineElement {
         return partial;
     }
 
-    protected String complete(String partial, List list) {
+    protected String complete(String partial, List<String> list) {
         if (list.size() == 0) // none found
                 return partial;
 
@@ -135,12 +135,14 @@ public class Argument extends CommandLineElement {
     }
 
     protected String common(String[] items) {
-        if (items.length == 0) return "";
+        final int len = items.length;
+        if (len == 0) return "";
         String result = items[ 0];
-        for (int i = 1; i < items.length; i++) {
-            while (!items[ i].startsWith(result))
+        for (int i = 1; i < len; i++) {
+            while (!items[ i].startsWith(result)) {
                 // shorten the result until it matches
                 result = result.substring(0, result.length() - 1);
+            }
         }
         return result;
     }

@@ -172,8 +172,8 @@ public class PluginCommand {
     
     private void listPlugins(PrintStream out, PluginManager mgr)
             throws PluginException {
-        final ArrayList rows = new ArrayList();
-        for (Iterator i = mgr.getRegistry().getDescriptorIterator(); i
+        final ArrayList<String> rows = new ArrayList<String>();
+        for (Iterator<PluginDescriptor> i = mgr.getRegistry().getDescriptorIterator(); i
                 .hasNext();) {
             PluginDescriptor descr = (PluginDescriptor) i.next();
 
@@ -188,8 +188,8 @@ public class PluginCommand {
             rows.add(sb.toString());
         }
         Collections.sort(rows);
-        for (Iterator i = rows.iterator(); i.hasNext(); ) {
-            out.println((String)i.next());
+        for (String row : rows) {
+            out.println(row);
         }
     }
 

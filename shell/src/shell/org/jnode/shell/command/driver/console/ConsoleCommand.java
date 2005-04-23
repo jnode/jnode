@@ -22,7 +22,6 @@
 package org.jnode.shell.command.driver.console;
 
 import java.awt.event.KeyEvent;
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.naming.NameNotFoundException;
@@ -70,11 +69,10 @@ public class ConsoleCommand {
         
         if (args.length > 0) {
             if (args[0].equals("-l")) {
-                final Set consoleNames = conMgr.getConsoleNames();
+                final Set<String> consoleNames = conMgr.getConsoleNames();
                 System.out.println("Nr. of registered consoles: "
                         + consoleNames.size());
-                for (Iterator i = consoleNames.iterator(); i.hasNext();) {
-                    final String name = (String)i.next();
+                for (String name : consoleNames) {
                     final Console console = conMgr.getConsole(name);
                     System.out.println("      - " + name + " ACCEL:" + KeyEvent.getKeyText(console.getAcceleratorKeyCode()));
                 }

@@ -58,8 +58,8 @@ public class DisassembleCommand {
 		final boolean test = PARAM_TEST.isSet(cmdLine) ? (ARG_TEST.getInteger(cmdLine) != 0) : false;
 		
 		final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		final Class cls = cl.loadClass(className);
-		final VmType type = cls.getVmClass();
+		final Class<?> cls = cl.loadClass(className);
+		final VmType<?> type = cls.getVmClass();
 		final long start = System.currentTimeMillis();
 		final int count = type.disassemble(methodName, level, test, new OutputStreamWriter(System.out));
 		final long end = System.currentTimeMillis();

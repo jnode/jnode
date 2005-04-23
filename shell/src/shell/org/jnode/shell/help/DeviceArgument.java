@@ -22,15 +22,14 @@
 package org.jnode.shell.help;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import org.jnode.naming.InitialNaming;
 import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.DeviceNotFoundException;
+import org.jnode.naming.InitialNaming;
 
 /**
  * @author qades
@@ -57,23 +56,23 @@ public class DeviceArgument extends Argument {
 	}
 
 	public String complete(String partial) {
-		List devices = new ArrayList();
-                try {
-			// get the alias manager
-			final DeviceManager devMgr = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);
+        final List<String> devIds = new ArrayList<String>();
+        try {
+            // get the alias manager
+            final DeviceManager devMgr = InitialNaming
+                    .lookup(DeviceManager.NAME);
 
-                        // collect matching aliases
-			Iterator i = devMgr.getDevices().iterator();
-			while( i.hasNext() ) {
-				String dev = ((Device)i.next()).getId();
-				if( dev.startsWith(partial) )
-					devices.add(dev);
-			}
-			return complete(partial, devices);
-		} catch( NameNotFoundException ex ) {
-			// should not happen!
-			return partial;
-		}
-	}
-
+            // collect matching aliases
+            for (Device dev : devMgr.getDevices()) {
+                final String devId = dev.getId();
+                if (devId.startsWith(partial)) {
+                    devIds.add(devId);
+                }
+            }
+            return complete(partial, devIds);
+        } catch (NameNotFoundException ex) {
+            // should not happen!
+            return partial;
+        }
+    }
 }

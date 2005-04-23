@@ -94,7 +94,7 @@ public class Syntax {
 
     synchronized ParsedArguments parse(String[] args) throws SyntaxErrorException {
         if (params.length == 0) {
-            if (args.length == 0) { return new ParsedArguments(new HashMap()); }
+            if (args.length == 0) { return new ParsedArguments(new HashMap<CommandLineElement, String[]>()); }
             throw new SyntaxErrorException("Syntax takes no parameter");
         }
 
@@ -219,7 +219,7 @@ public class Syntax {
 
     private class ParseVisitor implements CommandLineVisitor {
 
-        Map result = new HashMap();
+        Map<CommandLineElement, String[]> result = new HashMap<CommandLineElement, String[]>();
 
         Parameter param = null;
 
@@ -236,7 +236,7 @@ public class Syntax {
             return s;
         }
 
-        Map getArgumentMap() {
+        final Map<CommandLineElement, String[]> getArgumentMap() {
             finishParameter();
             return result;
         }

@@ -24,7 +24,6 @@ package org.jnode.shell.command;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceUtils;
@@ -73,14 +72,13 @@ public class LoadkeysCommand {
      */
     protected void execute(String[] args, InputStream in, PrintStream out,
             PrintStream err) throws Exception {
-        final Collection kbDevs = DeviceUtils
+        final Collection<Device> kbDevs = DeviceUtils
                 .getDevicesByAPI(KeyboardAPI.class);
 
         ParsedArguments cmdLine = HELP_INFO.parse(args);
 
-        for (Iterator i = kbDevs.iterator(); i.hasNext();) {
-            final Device kb = (Device) i.next();
-            final KeyboardAPI api = (KeyboardAPI) kb.getAPI(KeyboardAPI.class);
+        for (Device kb : kbDevs) {
+            final KeyboardAPI api = kb.getAPI(KeyboardAPI.class);
 
             if (!PARAM_COUNTRY.isSatisfied()) {
                 out.println("layout currently loaded : "
