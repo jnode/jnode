@@ -1,3 +1,23 @@
+/*
+ * $Id$
+ *
+ * JNode.org
+ * Copyright (C) 2005 JNode.org
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 package org.jnode.build.documentation;
 
 import java.io.File;
@@ -8,6 +28,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.net.MalformedURLException;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
@@ -16,26 +37,22 @@ import org.jnode.build.AbstractPluginTask;
 import org.jnode.plugin.ConfigurationElement;
 import org.jnode.plugin.Extension;
 import org.jnode.plugin.Library;
+import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.model.PluginDescriptorModel;
 
-import com.lowagie.text.Cell;
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Table;
+import com.lowagie.text.*;
 import com.lowagie.text.html.HtmlWriter;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mh
- * Date: 20-04-2005
- * Time: 14:07:43
- * To change this template use File | Settings | File Templates.
+ * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 public class PluginDocumentationTask extends AbstractPluginTask
 {
   private LinkedList<FileSet> descriptorSets = new LinkedList<FileSet>();
   private File todir;
   private final static String DOCHEADER = "JNode plugin documentation";
+  private final String ext = ".html";
+
   public FileSet createDescriptors()
   {
     final FileSet fs = new FileSet();
@@ -110,17 +127,70 @@ public class PluginDocumentationTask extends AbstractPluginTask
       throw new BuildException("todir must be a directory");
     }
 
+    Document document = new Document();
+    Table table = null;
+
+    try
+    {
+      File file = new File(todir,"index"+ext);
+      HtmlWriter.getInstance(document, new FileOutputStream(file));
+
+      document.open();
+      Cell cell;
+
+      table = new Table(1);
+      table.setBorderWidth(1);
+      table.setPadding(0);
+      table.setSpacing(0);
+      table.setAlignment("left");
+      table.setWidth(100);
+
+      cell = new Cell(DOCHEADER);
+      cell.setHeader(true);
+      table.addCell(cell);
+      table.endHeaders();
+    }
+    catch (FileNotFoundException e)
+    {
+      throw new BuildException(e.getMessage());
+    }
+    catch (BadElementException e)
+    {
+      throw new BuildException(e.getMessage());
+    }
+    catch (DocumentException e)
+    {
+      throw new BuildException(e.getMessage());
+    }
+
     Map<String, File> descriptors = new HashMap<String, File>();
 
     File[] files = getDescriptorFiles();
 
     for (File descriptor : files)
     {
-      buildPluginDocumentation(descriptors, descriptor);
+      buildPluginDocumentation(descriptors, descriptor, table);
     }
+
+    try
+    {
+      document.add(table);
+    }
+    catch (DocumentException e)
+    {
+      throw new BuildException(e.getMessage());
+    }
+    document.close();
   }
 
-  protected void buildPluginDocumentation(Map<String, File> descriptors, File descriptor) throws BuildException
+/**
+ * Vuild the documentation for the plugin
+ * @param descriptors a map of all the descriptors
+ * @param descriptor the descriptor
+ * @param index index file
+ * @throws BuildException
+ */
+  protected void buildPluginDocumentation(Map<String, File> descriptors, File descriptor, Table index) throws BuildException
   {
     final PluginDescriptorModel pluginDescriptorModel = readDescriptor(descriptor);
 
@@ -133,7 +203,6 @@ public class PluginDocumentationTask extends AbstractPluginTask
 
     descriptors.put(fullId, descriptor);
 
-    final String ext = ".html";
     Document document = new Document();
 
     try
@@ -147,9 +216,15 @@ public class PluginDocumentationTask extends AbstractPluginTask
       Cell cell;
 
       table.setBorderWidth(1);
-//      table.setBorderColor(new Color(0, 0, 0));
       table.setPadding(0);
       table.setSpacing(0);
+      table.setAlignment("left");
+      table.setWidth(100);
+
+      Anchor anchor = new Anchor(pluginDescriptorModel.getId());
+      anchor.setName("LINK");
+      anchor.setReference(file.toURL().toString());
+      index.addCell(new Cell(anchor));
 
       cell = new Cell(DOCHEADER+" for "+pluginDescriptorModel.getId());
       cell.setHeader(true);
@@ -172,10 +247,31 @@ public class PluginDocumentationTask extends AbstractPluginTask
       cell.setColspan(2);
       table.addCell(cell);
 
+      if (pluginDescriptorModel.getPrerequisites() != null && pluginDescriptorModel.getPrerequisites().length != 0)
+      {
+        cell = new Cell("Requires");
+        cell.setRowspan(pluginDescriptorModel.getPrerequisites().length);
+        cell.setVerticalAlignment("top");
+        table.addCell(cell);
+
+        File prerequisites;
+        for (PluginPrerequisite pluginPrerequisite : pluginDescriptorModel.getPrerequisites())
+        {
+          anchor = new Anchor(pluginPrerequisite.getPluginId());
+          anchor.setName("LINK");
+          prerequisites = new File(todir, pluginPrerequisite.getPluginId()+ext);
+          anchor.setReference(prerequisites.toURL().toString());
+          cell = new Cell(anchor);
+          cell.setColspan(2);
+          table.addCell(cell);
+        }
+      }
+
       if (pluginDescriptorModel.getRuntime() != null)
       {
         final String lib ="Library";
         final String exports ="Exports packages";
+
         for (Library library : pluginDescriptorModel.getRuntime().getLibraries())
         {
           table.addCell(lib);
@@ -185,6 +281,7 @@ public class PluginDocumentationTask extends AbstractPluginTask
 
           cell = new Cell(exports);
           cell.setRowspan(library.getExports().length);
+          cell.setVerticalAlignment("top");
           table.addCell(cell);
           for (String export : library.getExports())
           {
@@ -210,17 +307,18 @@ public class PluginDocumentationTask extends AbstractPluginTask
           cell.setRowspan(extension.getConfigurationElements().length);
           cell.setColspan(1);
           table.addCell(cell);
+          String name, actions;
 
           for (ConfigurationElement configurationElement : extension.getConfigurationElements())
           {
-            cell = new Cell(configurationElement.getAttribute("class")+" name: \""+configurationElement.getAttribute("name")+"\" actions: \""+configurationElement.getAttribute("actions")+"\"");
+            name = configurationElement.getAttribute("name");
+            actions = configurationElement.getAttribute("actions");
+            cell = new Cell(configurationElement.getAttribute("class")+(name!=null?" name: \""+name+"\"":"")+(actions!=null?" actions: \""+actions+"\"":""));
             cell.setColspan(2);
             table.addCell(cell);
           }
-
         }
       }
-
 
       document.add(table);
 
@@ -231,6 +329,10 @@ public class PluginDocumentationTask extends AbstractPluginTask
       throw new BuildException(e.getMessage());
     }
     catch (DocumentException e)
+    {
+      throw new BuildException(e.getMessage());
+    }
+    catch (MalformedURLException e)
     {
       throw new BuildException(e.getMessage());
     }
