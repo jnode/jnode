@@ -22,7 +22,6 @@
 package org.jnode.net.ipv4.tcp;
 
 import java.net.SocketException;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
@@ -37,7 +36,7 @@ public class TCPInChannel {
 	/** My logger */
 	private static final Logger log = Logger.getLogger(TCPInChannel.class);
 	/** Segments that have been received, but are out of order */
-	private final LinkedList futureSegments = new LinkedList();
+	private final LinkedList<TCPInSegment> futureSegments = new LinkedList<TCPInSegment>();
 	/** The next expected sequence number */
 	private int rcv_next;
 	/** The input data buffer */
@@ -157,8 +156,7 @@ public class TCPInChannel {
 	 * @return The segment or null if not found
 	 */
 	private TCPInSegment findNextSegment() {
-		for (Iterator i = futureSegments.iterator(); i.hasNext();) {
-			final TCPInSegment seg = (TCPInSegment) i.next();
+		for (TCPInSegment seg : futureSegments) {
 			if (seg.getSeqNr() == rcv_next) {
 				return seg;
 			}

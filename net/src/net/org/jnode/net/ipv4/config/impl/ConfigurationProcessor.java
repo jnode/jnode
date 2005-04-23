@@ -18,12 +18,11 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.net.ipv4.config.impl;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
-import org.jnode.driver.net.NetworkException;
 import org.jnode.util.Queue;
 import org.jnode.util.QueueProcessor;
 import org.jnode.util.QueueProcessorThread;
@@ -31,13 +30,14 @@ import org.jnode.util.QueueProcessorThread;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class ConfigurationProcessor implements QueueProcessor {
+public class ConfigurationProcessor implements QueueProcessor<ConfigurationQueueEntry> {
 
-    private final Queue queue = new Queue();
+    private final Queue<ConfigurationQueueEntry> queue = new Queue<ConfigurationQueueEntry>();
 
-    private static final Logger log = Logger.getLogger(ConfigurationProcessor.class);
+    static final Logger log = Logger
+            .getLogger(ConfigurationProcessor.class);
 
-    private QueueProcessorThread thread;
+    private QueueProcessorThread<ConfigurationQueueEntry> thread;
 
     /**
      * Apply the configuration on the given device. This is an asynchronous
@@ -48,7 +48,7 @@ public class ConfigurationProcessor implements QueueProcessor {
      */
     public void apply(Device device, NetDeviceConfig config,
             boolean waitUntilReady) {
-        final QueueEntry entry = new QueueEntry(device, config);
+        final ConfigurationQueueEntry entry = new ConfigurationQueueEntry(device, config);
         queue.add(entry);
         if (waitUntilReady) {
             entry.waitUntilReady();
@@ -56,8 +56,8 @@ public class ConfigurationProcessor implements QueueProcessor {
     }
 
     public void start() {
-        thread = new QueueProcessorThread("Net configuration processor", queue,
-                this);
+        thread = new QueueProcessorThread<ConfigurationQueueEntry>(
+                "Net configuration processor", queue, this);
         thread.start();
     }
 
@@ -68,47 +68,7 @@ public class ConfigurationProcessor implements QueueProcessor {
     /**
      * @see org.jnode.util.QueueProcessor#process(java.lang.Object)
      */
-    public void process(Object object) {
-        final QueueEntry entry = (QueueEntry) object;
+    public void process(ConfigurationQueueEntry entry) {
         entry.apply();
-    }
-
-    private class QueueEntry {
-        private final Device device;
-
-        private final NetDeviceConfig config;
-
-        private boolean ready = false;
-
-        /**
-         * @param device
-         * @param config
-         */
-        public QueueEntry(final Device device, final NetDeviceConfig config) {
-            super();
-            this.device = device;
-            this.config = config;
-        }
-
-        public synchronized void apply() {
-            try {
-                config.apply(device);
-            } catch (NetworkException ex) {
-                log.error("Cannot configure device " + device.getId(), ex);
-            } finally {
-                ready = true;
-                this.notifyAll();
-            }
-        }
-
-        public synchronized void waitUntilReady() {
-            while (!ready) {
-                try {
-                    this.wait();
-                } catch (InterruptedException ex) {
-                    // Ignore
-                }
-            }
-        }
     }
 }

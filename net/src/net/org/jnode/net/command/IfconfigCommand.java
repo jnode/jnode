@@ -21,8 +21,6 @@
  
 package org.jnode.net.command;
 
-import java.util.Iterator;
-
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.net.NetDeviceAPI;
@@ -68,10 +66,9 @@ public class IfconfigCommand {
 		ParsedArguments cmdLine = HELP_INFO.parse(args);
 
 		if( cmdLine.size() == 0 ) {
-			DeviceManager dm = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);
-			for (Iterator i = dm.getDevicesByAPI(NetDeviceAPI.class).iterator(); i.hasNext(); ) {
-				Device dev = (Device)i.next();
-				NetDeviceAPI api = (NetDeviceAPI)dev.getAPI(NetDeviceAPI.class);
+			final DeviceManager dm = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);
+			for (Device dev : dm.getDevicesByAPI(NetDeviceAPI.class)) {
+				final NetDeviceAPI api = (NetDeviceAPI)dev.getAPI(NetDeviceAPI.class);
 				System.out.println(dev.getId() + ": MAC-Address " + api.getAddress() + " MTU " + api.getMTU());
 				System.out.println("    " + api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP));
 				System.out.println();

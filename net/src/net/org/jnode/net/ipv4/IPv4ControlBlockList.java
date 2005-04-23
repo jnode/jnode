@@ -126,7 +126,7 @@ public abstract class IPv4ControlBlockList {
 	 * Create an iterator over all entries
 	 * @return The iterator
 	 */
-	protected Iterator iterator() {
+	protected Iterator<IPv4ControlBlock> iterator() {
 		return list.iterator();
 	}
 }

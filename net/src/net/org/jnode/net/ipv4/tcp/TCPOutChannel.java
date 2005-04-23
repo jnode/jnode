@@ -38,7 +38,7 @@ public class TCPOutChannel {
 	/** The protocol */
 	private final TCPProtocol tcp;
 	/** All unacked segments */
-	private final LinkedList unackedSegments = new LinkedList();
+	private final LinkedList<TCPOutSegment> unackedSegments = new LinkedList<TCPOutSegment>();
 	/** The outgoing databuffer */
 	private final TCPDataBuffer dataBuffer;
 	/** Send unacknowledged */
@@ -94,7 +94,7 @@ public class TCPOutChannel {
 		snd_unack = ackNr;
 		// Remove data from the databuffer
 		dataBuffer.pull(diff);
-		for (Iterator i = unackedSegments.iterator(); i.hasNext(); ) {
+		for (Iterator<TCPOutSegment> i = unackedSegments.iterator(); i.hasNext(); ) {
 			final TCPOutSegment seg = (TCPOutSegment)i.next();
 			final int seqNr = seg.getSeqNr();
 			if (TCPUtils.SEQ_LT(seqNr, ackNr)) {
@@ -114,8 +114,7 @@ public class TCPOutChannel {
 	 */
 	public void timeout() 
 	throws SocketException {
-		for (Iterator i = unackedSegments.iterator(); i.hasNext(); ) {
-			final TCPOutSegment seg = (TCPOutSegment)i.next();
+		for (TCPOutSegment seg : unackedSegments) {
 			seg.timeout(tcp);
 		}
 	}

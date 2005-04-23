@@ -21,34 +21,37 @@
 
 package org.jnode.net.ipv4.util;
 
-import org.jnode.driver.net.NetworkException;
-import org.jnode.net.ProtocolAddress;
-import org.jnode.net.Resolver;
-import org.jnode.net.ipv4.IPv4Address;
-import org.xbill.DNS.*;
-
 import java.net.UnknownHostException;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.jnode.driver.net.NetworkException;
+import org.jnode.net.ProtocolAddress;
+import org.jnode.net.Resolver;
+import org.jnode.net.ipv4.IPv4Address;
+import org.xbill.DNS.ExtendedResolver;
+import org.xbill.DNS.Lookup;
+import org.xbill.DNS.Record;
+import org.xbill.DNS.SimpleResolver;
+import org.xbill.DNS.TextParseException;
 
 /**
  * @author Martin Hartvig
  */
-
 public class ResolverImpl implements Resolver {
     private static ExtendedResolver resolver;
 
-    private static Hashtable resolvers;
+    private static Map<String, org.xbill.DNS.Resolver> resolvers;
 
-    private static Hashtable hosts;
+    private static Map<String, ProtocolAddress[]> hosts;
 
     private static Resolver res = null;
 
     static {
-        hosts = new Hashtable();
+        hosts = new HashMap<String, ProtocolAddress[]>();
 
         // this will have to come from hosts file
         final String localhost = "localhost";
@@ -84,12 +87,7 @@ public class ResolverImpl implements Resolver {
             return;
         }
 
-        Iterator iterator = resolvers.keySet().iterator();
-        String dnsServer;
-
-        while (iterator.hasNext()) {
-            dnsServer = (String) iterator.next();
-
+        for (String dnsServer : resolvers.keySet()) {
             System.out.println(dnsServer);
         }
     }
@@ -105,7 +103,7 @@ public class ResolverImpl implements Resolver {
             throws NetworkException {
 
         if (resolvers == null) {
-            resolvers = new Hashtable();
+            resolvers = new HashMap<String, org.xbill.DNS.Resolver>();
         }
 
         if (resolver == null) {
@@ -190,7 +188,7 @@ public class ResolverImpl implements Resolver {
         if (resolver == null) {
             throw new UnknownHostException(hostname);
         }
-        
+
         final PrivilegedExceptionAction action = new PrivilegedExceptionAction() {
             public Object run() throws UnknownHostException {
                 ProtocolAddress[] protocolAddresses;
@@ -219,22 +217,24 @@ public class ResolverImpl implements Resolver {
 
                     for (int i = 0; i < recordCount; i++) {
                         final Record record = records[i];
-                        protocolAddresses[i] = new IPv4Address(record.rdataToString());
+                        protocolAddresses[i] = new IPv4Address(record
+                                .rdataToString());
                     }
                 } else {
                     throw new UnknownHostException(lookup.getErrorString());
                 }
 
-                return protocolAddresses;                
+                return protocolAddresses;
             }
         };
         try {
-            return (ProtocolAddress[])AccessController.doPrivileged(action);
+            return (ProtocolAddress[]) AccessController.doPrivileged(action);
         } catch (PrivilegedActionException ex) {
             if (ex.getException() instanceof UnknownHostException) {
-                throw (UnknownHostException)ex.getException();
+                throw (UnknownHostException) ex.getException();
             } else {
-                throw (UnknownHostException)new UnknownHostException().initCause(ex.getException());
+                throw (UnknownHostException) new UnknownHostException()
+                        .initCause(ex.getException());
             }
         }
     }

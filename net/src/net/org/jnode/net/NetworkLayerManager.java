@@ -45,7 +45,7 @@ public interface NetworkLayerManager {
 	 * Get all register packet types.
 	 * @return A collection of PacketType instances
 	 */
-	public Collection getNetworkLayers();
+	public Collection<NetworkLayer> getNetworkLayers();
 	
 	/**
 	 * Gets the packet type for a given protocol ID

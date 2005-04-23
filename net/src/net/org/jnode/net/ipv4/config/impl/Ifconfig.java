@@ -23,7 +23,6 @@ package org.jnode.net.ipv4.config.impl;
 
 import java.net.UnknownHostException;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
@@ -75,9 +74,8 @@ final class Ifconfig {
 	 */
 	public static IPv4Address getLocalAddress() 
 	throws UnknownHostException {
-		final Collection devices = DeviceUtils.getDevicesByAPI(NetDeviceAPI.class);
-		for (Iterator i = devices.iterator(); i.hasNext(); ) {
-			final Device dev = (Device)i.next();
+		final Collection<Device> devices = DeviceUtils.getDevicesByAPI(NetDeviceAPI.class);
+		for (Device dev : devices) {
 			try {
 				final NetDeviceAPI api = (NetDeviceAPI)dev.getAPI(NetDeviceAPI.class);
 				final IPv4ProtocolAddressInfo addrInfo = (IPv4ProtocolAddressInfo)api.getProtocolAddressInfo(EthernetConstants.ETH_P_IP);

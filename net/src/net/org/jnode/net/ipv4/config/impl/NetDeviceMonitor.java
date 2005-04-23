@@ -22,7 +22,6 @@
 package org.jnode.net.ipv4.config.impl;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
@@ -55,9 +54,8 @@ final class NetDeviceMonitor implements DeviceListener {
      * @param devMan
      */
     public void configureDevices(DeviceManager devMan) {
-        final Collection devs = devMan.getDevicesByAPI(NetDeviceAPI.class);
-        for (Iterator i = devs.iterator(); i.hasNext(); ) {
-            final Device dev = (Device)i.next();
+        final Collection<Device> devs = devMan.getDevicesByAPI(NetDeviceAPI.class);
+        for (Device dev : devs) {
             if (dev.implementsAPI(NetDeviceAPI.class)) {
                 configureDevice(dev);
             }
