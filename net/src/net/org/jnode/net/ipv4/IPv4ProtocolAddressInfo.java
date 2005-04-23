@@ -22,8 +22,8 @@
 package org.jnode.net.ipv4;
 
 import java.net.InetAddress;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.jnode.net.ProtocolAddress;
@@ -128,8 +128,8 @@ public class IPv4ProtocolAddressInfo implements ProtocolAddressInfo {
      * 
      * @return A Set of IPv4Address instances
      */
-    public Set addresses() {
-        return Collections.unmodifiableSet(addresses.keySet());
+    public Set<ProtocolAddress> addresses() {
+        return new HashSet<ProtocolAddress>(addresses.keySet());
     }
 
     /**

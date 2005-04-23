@@ -54,7 +54,7 @@ public class TCPControlBlock extends IPv4ControlBlock implements TCPConstants {
 	/** My listening parent */
 	private final TCPControlBlock parent;
 	/** List of connections that are established, but have not been "accepted" */
-	private LinkedList readyToAcceptList = new LinkedList();
+	private LinkedList<TCPControlBlock> readyToAcceptList = new LinkedList<TCPControlBlock>();
 	/** Has this connection be reset? */
 	private boolean reset;
 	/** Has this connection been refused? */

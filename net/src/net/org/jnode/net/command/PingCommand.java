@@ -21,9 +21,10 @@
  
 package org.jnode.net.command;
 
-import java.net.SocketException;
 import java.net.InetAddress;
-import java.util.Hashtable;
+import java.net.SocketException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -168,7 +169,7 @@ public class PingCommand implements ICMPListener {
 
 class Request extends TimerTask {
 
-    private static Hashtable requests = new Hashtable();
+    private static Map<Integer, Request> requests = new HashMap<Integer, Request>();
 
     private Timer timer = new Timer();
 

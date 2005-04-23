@@ -23,7 +23,6 @@ package org.jnode.net.command;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.Iterator;
 
 import org.jnode.driver.net.NetworkException;
 import org.jnode.net.NetworkLayer;
@@ -31,9 +30,9 @@ import org.jnode.net.NetworkLayerManager;
 import org.jnode.net.TransportLayer;
 import org.jnode.net.util.NetUtils;
 import org.jnode.shell.CommandLine;
+import org.jnode.shell.help.Help;
 import org.jnode.util.Statistic;
 import org.jnode.util.Statistics;
-import org.jnode.shell.help.*;
 
 /**
  * @author epr
@@ -66,8 +65,7 @@ public class NetstatCommand {
 	throws NetworkException {
 		final NetworkLayerManager nlm = NetUtils.getNLM();
 
-		for (Iterator i = nlm.getNetworkLayers().iterator(); i.hasNext(); ) {
-			final NetworkLayer nl = (NetworkLayer)i.next();
+		for (NetworkLayer nl : nlm.getNetworkLayers()) {
 			showStats(out, nl, 80);
 		}
 	}
@@ -78,8 +76,7 @@ public class NetstatCommand {
 		final String prefix = "    ";
 		out.print(prefix);
 		showStats(out, nl.getStatistics(), maxWidth - prefix.length(), prefix);
-		for (Iterator i = nl.getTransportLayers().iterator(); i.hasNext(); ) {
-			final TransportLayer tl = (TransportLayer)i.next();
+		for (TransportLayer tl : nl.getTransportLayers()) {
 			out.println(prefix + tl.getName() + ": ID " + tl.getProtocolID());
 			final String prefix2 = prefix + prefix;
 			out.print(prefix2);

@@ -80,7 +80,7 @@ public interface NetworkLayer {
 	/**
 	 * Gets all registered transport-layers
 	 */
-	public Collection getTransportLayers();
+	public Collection<TransportLayer> getTransportLayers();
 	
 	/**
 	 * Gets a registered transportlayer by its protocol ID.

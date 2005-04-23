@@ -22,8 +22,8 @@
 package org.jnode.net.arp;
 
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.ApiNotFoundException;
@@ -214,8 +214,8 @@ public class ARPNetworkLayer implements NetworkLayer, ARPConstants {
 	/**
 	 * Gets all registered transport-layers
 	 */
-	public Collection getTransportLayers() {
-		return Collections.EMPTY_LIST;
+	public Collection<TransportLayer> getTransportLayers() {
+		return new ArrayList<TransportLayer>(0);
 	}
 	
 	/**

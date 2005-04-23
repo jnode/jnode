@@ -59,7 +59,7 @@ public class UDPProtocol implements IPv4Protocol, IPv4Constants
   /**
    * Socket bindings (lport, socket)
    */
-  private final HashMap sockets = new HashMap();
+  private final HashMap<Integer, UDPDatagramSocketImpl> sockets = new HashMap<Integer, UDPDatagramSocketImpl>();
 
   /**
    * DatagramSocketImplFactor instance

@@ -21,8 +21,6 @@
  
 package org.jnode.net.ipv4.config.impl;
 
-import java.util.Iterator;
-
 import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.ApiNotFoundException;
@@ -93,8 +91,7 @@ final class Route {
 		}
 		final IPv4RoutingTable rt = ipNL.getRoutingTable();
 		
-		for (Iterator i = rt.entries().iterator(); i.hasNext(); ) {
-			final IPv4Route route = (IPv4Route)i.next();
+		for (IPv4Route route : rt.entries()) {
 			if (!route.getDestination().equals(target)) {
 				continue;
 			}
@@ -124,8 +121,7 @@ final class Route {
 	 */
 	private static Device findDevice(DeviceManager dm, IPv4Address target, IPv4Address mask) 
 	throws NetworkException {
-		for (Iterator i = dm.getDevicesByAPI(NetDeviceAPI.class).iterator(); i.hasNext(); ) {
-			final Device dev = (Device)i.next();
+		for (Device dev : dm.getDevicesByAPI(NetDeviceAPI.class)) {
 			try {
 				final NetDeviceAPI api = (NetDeviceAPI)dev.getAPI(NetDeviceAPI.class);
 				final IPv4ProtocolAddressInfo addrInfo;
