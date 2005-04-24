@@ -95,8 +95,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
                 .doPrivileged(new PrivilegedAction() {
 
                     public Object run() {
-                        api.rootRemoved(new java.io.File(fsm
-                                .getMountPoint(device)));
+                        api.rootRemoved(fsm.getMountPoint(device));
                         return fsm.unregisterFileSystem(device);
                     }
                 });
