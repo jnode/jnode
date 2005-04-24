@@ -35,7 +35,7 @@ final class FSEntryCache {
 	/** My filesystem manager */
 	//private final FileSystemManager fsm;
 	/** The actual cache */
-	private final HashMap<File, FSEntry> entries = new HashMap<File, FSEntry>();
+	private final HashMap<String, FSEntry> entries = new HashMap<String, FSEntry>();
 	
 	/**
 	 * Create a new instance
@@ -47,9 +47,9 @@ final class FSEntryCache {
 	
 	/**
 	 * Gets a cached entry for a given path.
-	 * @param path
+	 * @param path must be an absolute path
 	 */
-	public synchronized FSEntry getEntry(File path) {
+	public synchronized FSEntry getEntry(String path) {
 		final FSEntry entry = entries.get(path);
 		if (entry != null) {
 			if (entry.isValid()) {
@@ -66,29 +66,27 @@ final class FSEntryCache {
 	/**
 	 * Puts an entry in the cache. Any existing entry for the given path
 	 * will be removed.
-	 * @param path
+	 * @param path must be an absolute path
 	 * @param entry
 	 */
-	public synchronized void setEntry(File path, FSEntry entry) {
+	public synchronized void setEntry(String path, FSEntry entry) {
 		entries.put(path, entry);
 	}
 	
 	/**
 	 * Remove any entry bound to the given path or a path below the given
 	 * path.
-	 * @param rootPath
+	 * @param rootPathStr must be an absolute path
 	 */
-	public synchronized void removeEntries(File rootPath) {
-		entries.remove(rootPath);
-		final String rootPathStr = rootPath.getAbsolutePath();
-		final ArrayList<File> removePathList = new ArrayList<File>();
-		for (File path : entries.keySet()) {
-			final String pathStr = path.getAbsolutePath();
+	public synchronized void removeEntries(String rootPathStr) {
+		entries.remove(rootPathStr);
+		final ArrayList<String> removePathList = new ArrayList<String>();
+		for (String pathStr : entries.keySet()) {
 			if (pathStr.startsWith(rootPathStr)) {
-				removePathList.add(path);
+				removePathList.add(pathStr);
 			}
 		}
-		for (File path : removePathList) {
+		for (String path : removePathList) {
 			entries.remove(path);			
 		}
 	}

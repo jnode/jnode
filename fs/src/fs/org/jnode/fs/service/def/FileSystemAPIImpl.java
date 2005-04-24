@@ -68,7 +68,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	/**
 	 * Does the given file exist?
 	 */
-	public boolean fileExists(File file) {
+	public boolean fileExists(String file) {
       final FSEntry entry = getEntry(file);
       return (entry != null);
 	}
@@ -76,7 +76,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	/**
 	 * Is the given File a plain file?
 	 */
-	public boolean isFile(File file) {
+	public boolean isFile(String file) {
 		final FSEntry entry = getEntry(file);
 		return (entry != null) && (entry.isFile());
 	}
@@ -84,7 +84,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	/**
 	 * Is the given File a directory?
 	 */
-	public boolean isDirectory(File file) {
+	public boolean isDirectory(String file) {
 		final FSEntry entry = getEntry(file);
 		return (entry != null) && (entry.isDirectory());
 	}
@@ -94,7 +94,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	 * 
 	 * @param file
 	 */
-	public boolean canRead(File file) {
+	public boolean canRead(String file) {
 		// TODO implement me
 		return true;
 	}
@@ -104,7 +104,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	 * 
 	 * @param file
 	 */
-	public boolean canWrite(File file) {
+	public boolean canWrite(String file) {
 		// TODO implement me
 		return false;
 	}
@@ -115,7 +115,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	 * 
 	 * @param file
 	 */
-	public long getLength(File file) {
+	public long getLength(String file) {
 		final FSEntry entry = getEntry(file);
 		if (entry != null) {
 			if (entry.isFile()) {
@@ -130,7 +130,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 				return 0;
 			}
 		} else {
-			log.debug("File not found in getLength (" + file.getAbsolutePath() + ")");
+			log.debug("File not found in getLength (" + file + ")");
 			return 0;
 		}
 
@@ -141,7 +141,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	 * 
 	 * @param file
 	 */
-	public long getLastModified(File file) {
+	public long getLastModified(String file) {
 		final FSEntry entry = getEntry(file);
 		if (entry != null) {
 			try {
@@ -159,12 +159,12 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	 * 
 	 * @param file
 	 */
-	public void setLastModified(File file, long time) throws IOException {
+	public void setLastModified(String file, long time) throws IOException {
 		final FSEntry entry = getEntry(file);
 		if (entry != null) {
 			entry.setLastModified(time);
 		} else {
-			throw new FileNotFoundException(file.getAbsolutePath());
+			throw new FileNotFoundException(file);
 		}
 	}
 
@@ -174,7 +174,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	 * @param file
 	 * @throws IOException
 	 */
-	public void setReadOnly(File file) throws IOException {
+	public void setReadOnly(String file) throws IOException {
 		throw new IOException("Not implemented yet");
 		// TODO implement me
 	}
@@ -185,19 +185,13 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	 * @param file
 	 * @throws IOException
 	 */
-	public void delete(File file) throws IOException {
-		final File parent = file.getAbsoluteFile().getParentFile();
-		if (parent == null) {
-			throw new IOException("There is no parent of " + file);
-		}
-		final FSEntry parentEntry = getEntry(parent);
-		if (parentEntry == null) {
-			throw new IOException("Parent of " + file + " not found");
-		}
-		if (!parentEntry.isDirectory()) {
-			throw new IOException("Parent of " + file + " is not a directory");
-		}
-		parentEntry.getDirectory().remove(file.getName());
+	public void delete(String file) throws IOException {
+        final FSDirectory parentDirectory = getParentDirectoryEntry(file);
+        if (parentDirectory == null) {
+            throw new IOException("Parent of " + file + " not found");
+        }
+        
+		parentDirectory.remove(getName(file));
 		entryCache.removeEntries(file);
 	}
 
@@ -217,8 +211,10 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	/**
 	 * When the filesystem is unregistered, the entries belonging to that filesystem are removed 
 	 * from the entry cache.
+     * 
+     * @param root absolute path
 	 */
-	public void rootRemoved(File root) {
+	public void rootRemoved(String root) {
 		entryCache.removeEntries(root);
 	}
 
@@ -230,10 +226,10 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	 * @param directory
 	 * @param filter
 	 */
-	public String[] list(File directory) throws IOException {
+	public String[] list(String directory) throws IOException {
 		final FSEntry entry = getEntry(directory);
 		if (entry == null) {
-			throw new FileNotFoundException(directory.getAbsolutePath());
+			throw new FileNotFoundException(directory);
 		}
 		if (!entry.isDirectory()) {
 			throw new IOException("Cannot list on non-directories " + directory);
@@ -250,30 +246,27 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	/**
 	 * Gets the FSEntry for the given path, or null if not found.
 	 * 
-	 * @param path
+	 * @param path must be an absolute canonical path
 	 */
-	private FSEntry getEntry(File path) {
+	private FSEntry getEntry(String path) {
 		try {
-			File absoluteOne = path.getAbsoluteFile().getCanonicalFile();
-			if (absoluteOne.getPath().equals("/"))
+            if(path == null)
+            {
+                return null;
+            }
+            
+			if (File.separator.equals(path))
 				return new VirtualRoot();
 
-			FSEntry entry = entryCache.getEntry(absoluteOne);
+			FSEntry entry = entryCache.getEntry(path);
 			if (entry != null) {
 				return entry;
 			}
-			final File parent = absoluteOne.getParentFile();
-			if (parent != null) {
-				final FSEntry parentEntry = getEntry(parent);
-				if (parentEntry == null) {
-					return null;
-				}
-				if (!parentEntry.isDirectory()) {
-					return null;
-				}
+			final FSDirectory parentEntry = getParentDirectoryEntry(path);
+			if (parentEntry != null) {
 				try {
-					entry = parentEntry.getDirectory().getEntry(absoluteOne.getName());
-					entryCache.setEntry(absoluteOne, entry);
+					entry = parentEntry.getEntry(path);
+					entryCache.setEntry(path, entry);
 					return entry;
 				} catch (IOException ex) {
 					// Not found
@@ -283,13 +276,13 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 				}
 			} else {
 				// Root name
-				final FileSystem fs = fsm.getFileSystem(absoluteOne.getName());
+				final FileSystem fs = fsm.getFileSystem(path);
 				if (fs == null) {
 					return null;
 				}
 				try {
 					entry = fs.getRootEntry();
-					entryCache.setEntry(absoluteOne, entry);
+					entryCache.setEntry(path, entry);
 					return entry;
 				} catch (IOException ex) {
 					log.debug("Filesystem.getRootEntry failed", ex);
@@ -307,10 +300,10 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	/**
 	 * Open a given file
 	 * 
-	 * @param file
+	 * @param file absolute path
 	 * @throws IOException
 	 */
-	public VMFileHandle open(File file, VMOpenMode mode) throws IOException {
+	public VMFileHandle open(String file, VMOpenMode mode) throws IOException {
 		FSEntry entry = getEntry(file);
 		if ((entry != null) && !entry.isFile()) {
 			throw new IOException("Not a file " + file);
@@ -318,18 +311,16 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 		if (entry == null) {
 			if (mode.canWrite()) {
 				// Try to create the file
-				final FSEntry parent = getEntry(file.getAbsoluteFile().getParentFile());
+                FSDirectory parent = getParentDirectoryEntry(file);
 				if (parent == null) {
 					throw new IOException(
-						"Cannot create " + file.getAbsolutePath() + ", parent directory does not exist");
+						"Cannot create " + file + ", parent directory does not exist");
 				}
-				if (!parent.isDirectory()) {
-					throw new IOException("Cannot create " + file.getAbsolutePath() + ", parent is not a directory");
-				}
+                
 				// Ok, add the file
-				entry = parent.getDirectory().addFile(file.getName());
+				entry = parent.addFile(getName(file));
 			} else {
-				throw new FileNotFoundException(file.getAbsolutePath());
+				throw new FileNotFoundException(file);
 			}
 		}
 		return fhm.open(entry.getFile(), mode);
@@ -342,7 +333,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	 * @param file
 	 * @throws IOException
 	 */
-	public boolean mkDir(File file, VMOpenMode mode) throws IOException {
+	public boolean mkDir(String file, VMOpenMode mode) throws IOException {
 		FSEntry entry = getEntry(file);
 		if ((entry != null) || !mode.canWrite()) {
 		    return false;
@@ -351,7 +342,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 		if(directory == null)
 			return false;
 		// Ok, add the dir
-		entry = directory.addDirectory(file.getName());
+		entry = directory.addDirectory(getName(file));
 		return true;
 	}
 	
@@ -362,7 +353,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	 * @param file
 	 * @throws IOException
 	 */
-	public boolean mkFile(File file, VMOpenMode mode) throws IOException {
+	public boolean mkFile(String file, VMOpenMode mode) throws IOException {
 		FSEntry entry = getEntry(file);
 		if ((entry != null) || !mode.canWrite()) {
 			return false; 
@@ -371,22 +362,22 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 		if(directory == null)
 			return false;
         // Ok, make the file
-	    entry = directory.addFile(file.getName());
+	    entry = directory.addFile(getName(file));
 		return true;
 	}
 	
 	/**
 	 * Get the parent entry of a file
 	 * 
-	 * @param file
+	 * @param file absolute path
 	 * @return the directory entry, null if not exite or not a directory
 	 * @throws IOException
 	 */
-	private  FSDirectory getParentDirectoryEntry(File file) throws IOException{
+	private  FSDirectory getParentDirectoryEntry(String file) throws IOException{
 		if(file==null){
 			return null;
 		}
-		final FSEntry dirEntry = getEntry(file.getAbsoluteFile().getParentFile());
+		final FSEntry dirEntry = getEntry(getParentPath(file));
 		if (dirEntry == null) {
 			return null;
 		}
@@ -395,11 +386,43 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 		}
 		return dirEntry.getDirectory();
 	}
-	
+
+    /**
+     * 
+     * @param path
+     * @return
+     */
+    private String getName(String path)
+    {
+        if(path == null)
+        {
+            return null;
+        }
+        
+        int idx = path.lastIndexOf(File.separatorChar);
+        return (idx >= 0) ? path.substring(idx + 1) : path;
+    }
+
+    /**
+     * 
+     * @param path
+     * @return
+     */
+    private String getParentPath(String path)
+    {
+        if(path == null)
+        {
+            return null;
+        }
+        
+        int idx = path.lastIndexOf(File.separatorChar);
+        return (idx >= 0) ? path.substring(0, idx) : null;
+    }
+    
 	final class VirtualRoot implements FSEntry {
 
 		public String getName() {
-			return "/";
+			return File.separator;
 		}
 
 		public FSDirectory getParent() {

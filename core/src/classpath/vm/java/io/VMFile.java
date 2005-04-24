@@ -64,7 +64,7 @@ final class VMFile
    * modification time.  It also does the existence check to avoid the
    * overhead of a call to exists()
    */
-  static long lastModified(File path)
+  static long lastModified(String path)
   {
         try {
             return VMIOUtils.getAPI().getLastModified(path);
@@ -76,7 +76,7 @@ final class VMFile
   /*
    * This native method sets the permissions to make the file read only.
    */
-  static boolean setReadOnly(File path)
+  static boolean setReadOnly(String path)
   {
         try {
             VMIOUtils.getAPI().setReadOnly(path);
@@ -89,12 +89,12 @@ final class VMFile
   /**
    * This method is used to create a temporary file
    */
-  static boolean create(File file) throws IOException
+  static boolean create(String path) throws IOException
   {
       //moved from JNode File.createInternal(File file) v1.3 :
-      if(file.exists())
+      if(exists(path))
           return false;
-      VMFileHandle vmFileHandler=VMIOUtils.getAPI().open(file,VMOpenMode.WRITE);
+      VMFileHandle vmFileHandler=VMIOUtils.getAPI().open(path,VMOpenMode.WRITE);
       vmFileHandler.close();
       return true;      
   }
@@ -103,10 +103,10 @@ final class VMFile
    * This native function actually produces the list of file in this
    * directory
    */
-  static String[] list(File dirpath)
+  static String[] list(String path)
   {
       try {
-          return VMIOUtils.getAPI().list(dirpath);
+          return VMIOUtils.getAPI().list(path);
       } catch (IOException ex) {
           return new String[0];
       }            
@@ -125,7 +125,7 @@ final class VMFile
    * This native method actually determines the length of the file and
    * handles the existence check
    */
-  static long length(File path)
+  static long length(String path)
   {
         try {
             return VMIOUtils.getAPI().getLength(path);
@@ -137,10 +137,10 @@ final class VMFile
   /*
    * This native method does the actual checking of file existence.
    */
-  static boolean exists(File path)
+  static boolean exists(String string)
   {
     try {
-        return VMIOUtils.getAPI().fileExists(path);
+        return VMIOUtils.getAPI().fileExists(string);
     } catch (IOException ex) {
      return false;
     }      
@@ -149,7 +149,7 @@ final class VMFile
   /*
    * This native method handles the actual deleting of the file
    */
-  static boolean delete(File path)
+  static boolean delete(String path)
   {
       try {
           VMIOUtils.getAPI().delete(path);
@@ -162,7 +162,7 @@ final class VMFile
   /*
    * This method does the actual setting of the modification time.
    */
-  static boolean setLastModified(File path, long time)
+  static boolean setLastModified(String path, long time)
   {
         try {
             VMIOUtils.getAPI().setLastModified(path, time);
@@ -175,10 +175,10 @@ final class VMFile
   /*
    * This native method actually creates the directory
    */
-  static boolean mkdir(File dirpath)
+  static boolean mkdir(String path)
   {
       try{
-          return VMIOUtils.getAPI().mkDir(dirpath,VMOpenMode.WRITE);          
+          return VMIOUtils.getAPI().mkDir(path,VMOpenMode.WRITE);          
     }catch(IOException io){
       return false;
     }      
@@ -189,7 +189,7 @@ final class VMFile
    * is a plain file or not.  It also handles the existence check to
    * eliminate the overhead of a call to exists()
    */
-  static boolean isFile(File path)
+  static boolean isFile(String path)
   {
         try {
             return VMIOUtils.getAPI().isFile(path);
@@ -201,7 +201,7 @@ final class VMFile
   /**
    * This native method checks file permissions for writing
    */
-  static synchronized boolean canWrite(File path)
+  static synchronized boolean canWrite(String path)
   {
         try {
             return VMIOUtils.getAPI().canWrite(path);
@@ -230,7 +230,7 @@ final class VMFile
   /**
    * This native method checks file permissions for reading
    */
-  static synchronized boolean canRead(File path)
+  static synchronized boolean canRead(String path)
   {
         try {
             return VMIOUtils.getAPI().canRead(path);
@@ -244,10 +244,10 @@ final class VMFile
    * directory or not.  It also handle the existence check to eliminate
    * the overhead of a call to exists()
    */
-  static boolean isDirectory(File dirpath)
+  static boolean isDirectory(String string)
   {
         try {
-            return VMIOUtils.getAPI().isDirectory(dirpath);
+            return VMIOUtils.getAPI().isDirectory(string);
         } catch (IOException ex) {
             return false;
         }      

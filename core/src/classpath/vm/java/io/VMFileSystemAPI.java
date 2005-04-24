@@ -33,52 +33,52 @@ public interface VMFileSystemAPI {
 	/**
 	 * Does a given file exist?
 	 */
-	public boolean fileExists(File file);
+	public boolean fileExists(String file);
 
 	/**
 	 * Is the given File a plain file?
 	 */
-	public boolean isFile(File file);
+	public boolean isFile(String file);
 
 	/**
 	 * Is the given File a directory?
 	 */
-	public boolean isDirectory(File file);
+	public boolean isDirectory(String file);
 
 	/**
 	 * Can the given file be read?
 	 * 
 	 * @param file
 	 */
-	public boolean canRead(File file);
+	public boolean canRead(String file);
 
 	/**
 	 * Can the given file be written to?
 	 * 
 	 * @param file
 	 */
-	public boolean canWrite(File file);
+	public boolean canWrite(String file);
 
 	/**
 	 * Gets the length in bytes of the given file or 0 if the file does not exist.
 	 * 
 	 * @param file
 	 */
-	public long getLength(File file);
+	public long getLength(String file);
 
 	/**
 	 * Gets the last modification date of the given file.
 	 * 
 	 * @param file
 	 */
-	public long getLastModified(File file);
+	public long getLastModified(String file);
 
 	/**
 	 * Sets the last modification date of the given file.
 	 * 
 	 * @param file
 	 */
-	public void setLastModified(File file, long time) throws IOException;
+	public void setLastModified(String file, long time) throws IOException;
 
 	/**
 	 * Mark the given file as readonly.
@@ -86,7 +86,7 @@ public interface VMFileSystemAPI {
 	 * @param file
 	 * @throws IOException
 	 */
-	public void setReadOnly(File file) throws IOException;
+	public void setReadOnly(String file) throws IOException;
 
 	/**
 	 * Delete the given file.
@@ -94,7 +94,7 @@ public interface VMFileSystemAPI {
 	 * @param file
 	 * @throws IOException
 	 */
-	public void delete(File file) throws IOException;
+	public void delete(String file) throws IOException;
 
 	/**
 	 * This method returns an array of filesystem roots.
@@ -103,9 +103,9 @@ public interface VMFileSystemAPI {
 	
 	/**
 	 * This method is called when the filesystem is unregistered
-	 * @param root
+	 * @param root absolute path
 	 */
-	public void rootRemoved(File root);
+	public void rootRemoved(String root);
 
 	/**
 	 * Gets an array of names of all entries of the given directory. All names are relative to the
@@ -114,7 +114,7 @@ public interface VMFileSystemAPI {
 	 * @param directory
 	 * @param filter
 	 */
-	public String[] list(File directory) throws IOException;
+	public String[] list(String directory) throws IOException;
 
 	/**
 	 * Open a given file
@@ -122,7 +122,7 @@ public interface VMFileSystemAPI {
 	 * @param file
 	 * @throws IOException
 	 */
-	public VMFileHandle open(File file, VMOpenMode mode) throws IOException;
+	public VMFileHandle open(String file, VMOpenMode mode) throws IOException;
 
 	/**
 	 * Make a directory
@@ -130,7 +130,7 @@ public interface VMFileSystemAPI {
 	 * @param file
 	 * @throws IOException
 	 */
-	public boolean mkDir(File file, VMOpenMode mode) throws IOException;
+	public boolean mkDir(String file, VMOpenMode mode) throws IOException;
 	
 	/**
 	 * Make a file
@@ -138,5 +138,5 @@ public interface VMFileSystemAPI {
 	 * @param file
 	 * @throws IOException
 	 */
-	public boolean mkFile(File file, VMOpenMode mode) throws IOException;
+	public boolean mkFile(String file, VMOpenMode mode) throws IOException;
 }
