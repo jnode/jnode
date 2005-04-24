@@ -31,7 +31,6 @@ import java.awt.image.BufferedImage;
 import java.security.AccessController;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Locale;
 
 import javax.naming.NamingException;
@@ -84,9 +83,9 @@ public class JNodeGraphicsEnvironment extends GraphicsEnvironment {
 	 */
 	public String[] getAvailableFontFamilyNames() {
 		final Font[] fonts = getAllFonts();
-		final HashSet names = new HashSet();
-		for (int i = 0; i < fonts.length; i++) {
-			names.add(fonts[i].getFamily());			
+		final HashSet<String> names = new HashSet<String>();
+		for (Font f : fonts) {
+			names.add(f.getFamily());			
 		}
 		return (String[])names.toArray(new String[names.size()]);
 	}
@@ -98,9 +97,9 @@ public class JNodeGraphicsEnvironment extends GraphicsEnvironment {
 	 */
 	public String[] getAvailableFontFamilyNames(Locale l) {
 		final Font[] fonts = getAllFonts();
-		final HashSet names = new HashSet();
-		for (int i = 0; i < fonts.length; i++) {
-			names.add(fonts[i].getFamily(l));			
+		final HashSet<String> names = new HashSet<String>();
+		for (Font f : fonts) {
+			names.add(f.getFamily(l));			
 		}
 		return (String[])names.toArray(new String[names.size()]);
 	}
@@ -152,11 +151,11 @@ public class JNodeGraphicsEnvironment extends GraphicsEnvironment {
 	public GraphicsDevice[] getScreenDevices() {
 	    verifyCache();
 		if (devices == null) {
-			final Collection devs = DeviceUtils.getDevicesByAPI(FrameBufferAPI.class);
+			final Collection<Device> devs = DeviceUtils.getDevicesByAPI(FrameBufferAPI.class);
 			devices = new JNodeFrameBufferDevice[devs.size()];
 			int idx = 0;
-			for (Iterator i = devs.iterator(); i.hasNext(); idx++) {
-				devices[idx] = new JNodeFrameBufferDevice((Device) i.next());
+			for (Device dev : devs) {
+				devices[idx++] = new JNodeFrameBufferDevice(dev);
 			}
 		}
 		return devices;
@@ -168,7 +167,7 @@ public class JNodeGraphicsEnvironment extends GraphicsEnvironment {
 	 */
 	private FontManager getFontManager() {
 		try {
-			return (FontManager) InitialNaming.lookup(FontManager.NAME);
+			return InitialNaming.lookup(FontManager.NAME);
 		} catch (NamingException ex) {
 			return null;
 		}

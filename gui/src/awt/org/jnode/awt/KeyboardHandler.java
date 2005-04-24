@@ -43,7 +43,7 @@ public class KeyboardHandler implements KeyboardListener {
 
     public KeyboardHandler() {
         try {
-            final Collection keyboards = DeviceUtils.getDevicesByAPI(KeyboardAPI.class);
+            final Collection<Device> keyboards = DeviceUtils.getDevicesByAPI(KeyboardAPI.class);
             if (!keyboards.isEmpty()) {
                 Device keyboardDevice = (Device) keyboards.iterator().next();
                 keyboardAPI = (KeyboardAPI) keyboardDevice.getAPI(KeyboardAPI.class);

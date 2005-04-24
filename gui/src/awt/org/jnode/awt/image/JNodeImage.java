@@ -41,7 +41,7 @@ public class JNodeImage extends Image {
 	int width;
 	int height;
 	int availableInfo;
-	Hashtable properties = new Hashtable();
+	Hashtable<String, Object> properties = new Hashtable<String, Object>();
 	Object pixels;
 	ColorModel colorModel;
 	private boolean productionStarted;
@@ -282,7 +282,7 @@ public class JNodeImage extends Image {
 	private class ForwardingProducer implements ImageProducer {
 
 		/** All consumers */
-		private final LinkedList consumers = new LinkedList();
+		private final LinkedList<ImageConsumer> consumers = new LinkedList<ImageConsumer>();
 		/** The observer, can be null */
 		private final ImageObserver observer;
 
