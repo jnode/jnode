@@ -23,7 +23,6 @@ package org.jnode.vm.x86;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.jnode.system.MemoryResource;
@@ -41,7 +40,7 @@ import org.vmmagic.unboxed.Extent;
 final class IOAPIC {
     
     private final MemoryResource mem;
-    private final List entries;
+    private final List<IOAPICRedirectionEntry> entries;
     
     private static final int IOREGSEL = 0x00;
     private static final int IOWIN = 0x10;
@@ -60,7 +59,7 @@ final class IOAPIC {
     public IOAPIC(ResourceManager rm, ResourceOwner owner, Address ptr) throws ResourceNotFreeException {
         this.mem = rm.claimMemoryResource(owner, ptr, Extent.fromIntZeroExtend(0x20), ResourceManager.MEMMODE_NORMAL);
         final int cnt = getMaximumRedirectionEntryIndex() + 1;
-        this.entries = new ArrayList(cnt);
+        this.entries = new ArrayList<IOAPICRedirectionEntry>(cnt);
         for (int i = 0; i < cnt; i++) {
             entries.add(new IOAPICRedirectionEntry(this, 0x10 + i*2));
         }
@@ -110,7 +109,7 @@ final class IOAPIC {
      * Gets all redirection entries.
      * @return the redirection entries
      */
-    public List getRedirectionEntries() {
+    public List<IOAPICRedirectionEntry> getRedirectionEntries() {
         return entries;
     }
     
@@ -121,8 +120,8 @@ final class IOAPIC {
     public void dump(PrintStream out) {
         out.println("I/O APIC ID 0x" + NumberUtils.hex(getId(), 2) + ", version " + getVersion() + ", arb 0x" + NumberUtils.hex(getArbitrationId(), 2));
         int idx = 0;
-        for (Iterator i = getRedirectionEntries().iterator(); i.hasNext(); idx++) {
-            out.println("REDIR" + idx + " " + i.next());
+        for (IOAPICRedirectionEntry entry : getRedirectionEntries()) {
+            out.println("REDIR" + (idx++) + " " + entry);
         }
     }
     

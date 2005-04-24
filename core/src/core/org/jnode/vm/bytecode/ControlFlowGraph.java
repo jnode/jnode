@@ -53,8 +53,8 @@ public class ControlFlowGraph {
 	 * Create an iterator to iterate over all basic blocks.
 	 * @return An iterator that will return instances of BasicBlock.
 	 */
-	public Iterator basicBlockIterator() {
-		return new ObjectArrayIterator(bblocks);
+	public Iterator<BasicBlock> basicBlockIterator() {
+		return new ObjectArrayIterator<BasicBlock>(bblocks);
 	}
 	
 	/**

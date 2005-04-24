@@ -41,7 +41,7 @@ public class WorkUtils {
     public static boolean add(Work work) {
         final WorkManager wm;
         try {
-            wm = (WorkManager)InitialNaming.lookup(WorkManager.NAME);
+            wm = InitialNaming.lookup(WorkManager.NAME);
             wm.add(work);
             return true;
         } catch (NameNotFoundException ex) {

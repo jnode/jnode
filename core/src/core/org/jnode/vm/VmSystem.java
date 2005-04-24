@@ -277,7 +277,7 @@ public final class VmSystem implements SharedStatics {
      * @param obj
      * @return The class
      */
-    public static Class getClass(Object obj) {
+    public static Class<?> getClass(Object obj) {
         return getVmClass(obj).asClass();
     }
 
@@ -287,7 +287,7 @@ public final class VmSystem implements SharedStatics {
      * @param obj
      * @return VmClass
      */
-    public static VmType getVmClass(Object obj) {
+    public static VmType<?> getVmClass(Object obj) {
         if (obj == null) {
             throw new NullPointerException();
         } else {
@@ -455,11 +455,11 @@ public final class VmSystem implements SharedStatics {
             if (method == null) {
                 break;
             }
-            final VmType vmClass = method.getDeclaringClass();
+            final VmType<?> vmClass = method.getDeclaringClass();
             if (vmClass == null) {
                 break;
             }
-            final VmType sClass = vmClass.getSuperClass();
+            final VmType<?> sClass = vmClass.getSuperClass();
             if ((lastClass != null) && (sClass != lastClass)
                     && (vmClass != lastClass)) {
                 break;
@@ -593,8 +593,8 @@ public final class VmSystem implements SharedStatics {
 
     public static void arrayCopy(Object src, int srcPos, Object dst,
             int dstPos, int length) throws PrivilegedActionPragma {
-        Class src_class = src.getClass();
-        Class dst_class = dst.getClass();
+        Class<?> src_class = src.getClass();
+        Class<?> dst_class = dst.getClass();
 
         if (!src_class.isArray()) {
             Unsafe.debug('!');
@@ -923,7 +923,7 @@ public final class VmSystem implements SharedStatics {
         setStaticField(System.class, "err", err);
     }
 
-    private static void setStaticField(Class clazz, String fieldName,
+    private static void setStaticField(Class<?> clazz, String fieldName,
             Object value) {
         final VmStaticField f = (VmStaticField) clazz.getVmClass().getField(
                 fieldName);

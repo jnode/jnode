@@ -120,7 +120,7 @@ public final class VmJavaClassLoader extends VmAbstractClassLoader {
      */
     public final VmType loadClass(String className, boolean resolve)
             throws ClassNotFoundException, PrivilegedActionPragma {
-        final VmType cls;
+        final VmType<?> cls;
         if (className.charAt(0) == '[') {
             cls = loadArrayClass(className, resolve);
             addLoadedClass(className, cls);

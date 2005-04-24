@@ -27,9 +27,9 @@ import java.util.NoSuchElementException;
 /**
  * @author epr
  */
-public class ObjectArrayIterator implements Iterator {
+public class ObjectArrayIterator<T> implements Iterator<T> {
 	
-	private final Object[] array;
+	private final T[] array;
 	private final int max;
 	private int index;
 	
@@ -37,7 +37,7 @@ public class ObjectArrayIterator implements Iterator {
 	 * Initialize a new instance
 	 * @param array
 	 */
-	public ObjectArrayIterator(Object[] array) {
+	public ObjectArrayIterator(T[] array) {
 		this.array = array;
 		if (array == null) {
 			max = 0;
@@ -58,9 +58,9 @@ public class ObjectArrayIterator implements Iterator {
 	 * @see java.util.Iterator#next()
 	 * @return Object
 	 */
-	public Object next() {
+	public T next() {
 		if (index < max) {
-			final Object result = array[index];
+			final T result = array[index];
 			index++;
 			return result;
 		} else {

@@ -21,7 +21,6 @@
  
 package org.jnode.vm.compiler.ir;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.jnode.util.BootableArrayList;
@@ -51,22 +50,22 @@ public class IRBasicBlock {
 	/**
 	 * The blocks immediately dominated (down the dom tree)
 	 */
-	private List dominatedBlocks;
+	private List<IRBasicBlock> dominatedBlocks;
 	
 	/**
 	 * The blocks in the dominance frontier of this block
 	 */
-	private List dominanceFrontier;
+	private List<IRBasicBlock> dominanceFrontier;
 	
 	/**
 	 * The immediate successors of this block
 	 */
-	private List successors;
+	private List<IRBasicBlock> successors;
 	
 	/**
 	 * The immediate predecessors of this block
 	 */
-	private List predecessors;
+	private List<IRBasicBlock> predecessors;
 	
 	/**
 	 * Depth from the root (root = 0, next lower = 1 etc., unknown = -1)
@@ -76,8 +75,8 @@ public class IRBasicBlock {
 	/**
 	 * The quads in this block
 	 */
-	private List quads;
-	private BootableArrayList defList;
+	private List<Quad> quads;
+	private BootableArrayList<Operand> defList;
 	
 	// The stack offset at the beginning of this block
 	// In some cases, e.g. terniary operators, this is important
@@ -100,13 +99,13 @@ public class IRBasicBlock {
 		this.stackOffset = -1; // We'll check to make sure this is set
 
 		this.name = "B" + startPC;
-		predecessors = new BootableArrayList();
-		successors = new BootableArrayList();
-		dominatedBlocks = new BootableArrayList();
+		predecessors = new BootableArrayList<IRBasicBlock>();
+		successors = new BootableArrayList<IRBasicBlock>();
+		dominatedBlocks = new BootableArrayList<IRBasicBlock>();
 		postOrderNumber = -1;
-		dominanceFrontier = new BootableArrayList();
-		quads = new BootableArrayList();
-		defList = new BootableArrayList();
+		dominanceFrontier = new BootableArrayList<IRBasicBlock>();
+		quads = new BootableArrayList<Quad>();
+		defList = new BootableArrayList<Operand>();
 	}
 
 	/**
@@ -202,7 +201,7 @@ public class IRBasicBlock {
 	/**
 	 * @return
 	 */
-	public List getSuccessors() {
+	public List<IRBasicBlock> getSuccessors() {
 		return successors;
 	}
 
@@ -223,7 +222,7 @@ public class IRBasicBlock {
 	/**
 	 * @return
 	 */
-	public List getPredecessors() {
+	public List<IRBasicBlock> getPredecessors() {
 		return predecessors;
 	}
 
@@ -268,11 +267,9 @@ public class IRBasicBlock {
 		postOrderNumber = i;
 	}
 
-	public void computePostOrder(List list) {
+	public void computePostOrder(List<IRBasicBlock> list) {
 		setPostOrderNumber(0);
-		Iterator it = successors.iterator();
-		while (it.hasNext()) {
-			IRBasicBlock b = (IRBasicBlock) it.next();
+		for (IRBasicBlock b : successors) {
 			if (b.getPostOrderNumber() < 0) {
 				b.computePostOrder(list);
 			}
@@ -293,9 +290,7 @@ public class IRBasicBlock {
 	
 	public void printPredecessors() {
 		System.out.print(getName() + " preds:");
-		Iterator it = predecessors.iterator();
-		while (it.hasNext()) {
-			IRBasicBlock b = (IRBasicBlock) it.next();
+		for (IRBasicBlock b : predecessors) {
 			System.out.print(" " + b.getName());
 		}
 		System.out.println();

@@ -23,7 +23,6 @@ package org.jnode.vm.x86;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.jnode.system.BootLog;
@@ -40,7 +39,7 @@ public class MPConfigTable {
     
     private final MemoryResource mem;
     private static final byte[] ENTRY_LENGTH = { 20, 8, 8, 8, 8 };
-    private final List entries;
+    private final List<MPEntry> entries;
     
     private static final byte[] SIGNATURE = { 'P', 'C', 'M', 'P' };
     
@@ -124,7 +123,7 @@ public class MPConfigTable {
     /**
      * Gets a list of all MP entries in this table.
      */
-    final List entries() {
+    final List<MPEntry> entries() {
         return this.entries;
     }
 
@@ -151,15 +150,14 @@ public class MPConfigTable {
         out.println("Product        " + getProductID());
         out.println("Local APIC ptr 0x" + NumberUtils.hex(getLocalApicAddress().toInt()));
         out.println("Entries");
-        for (Iterator i = entries.iterator(); i.hasNext(); ) {
-            final MPEntry e = (MPEntry)i.next();
+        for (MPEntry e : entries) {
             out.println("  " + e);            
         }
     }
     
-    private final List parse() {
+    private final List<MPEntry> parse() {
         final int cnt = getEntryCount();
-        final ArrayList list = new ArrayList(cnt);
+        final ArrayList<MPEntry> list = new ArrayList<MPEntry>(cnt);
         int offset = 0x2C;
         final int size = mem.getSize().toInt();
         try {

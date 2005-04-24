@@ -38,7 +38,7 @@ abstract class VmMember extends VmSystemObject implements Uninterruptible {
 	/** Modifiers of this member */
 	private int modifiers;
 	/** Declaring class of this member */
-	protected final VmType declaringClass;
+	protected final VmType<?> declaringClass;
 	/** Hashcode of name+signature */
 	private final int cachedHashCode;
 

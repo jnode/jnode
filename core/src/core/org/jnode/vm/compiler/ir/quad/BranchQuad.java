@@ -21,8 +21,6 @@
  
 package org.jnode.vm.compiler.ir.quad;
 
-import java.util.Iterator;
-
 import org.jnode.vm.compiler.ir.IRBasicBlock;
 
 /**
@@ -37,9 +35,7 @@ public abstract class BranchQuad extends Quad {
 	 */
 	public BranchQuad(int address, IRBasicBlock block, int targetAddress) {
 		super(address, block);
-		Iterator it = block.getSuccessors().iterator();
-		while (it.hasNext()) {
-			IRBasicBlock succ = (IRBasicBlock) it.next();
+		for (IRBasicBlock succ : block.getSuccessors()) {
 			if (succ.getStartPC() == targetAddress) {
 				targetBlock = succ;
 				break;

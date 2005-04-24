@@ -21,8 +21,8 @@
  
 package org.jnode.work;
 
-import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.naming.NamingException;
 
@@ -46,10 +46,10 @@ public class WorkPlugin extends Plugin implements WorkManager {
     private static final Logger log = Logger.getLogger(WorkPlugin.class);
     
     /** Queue of work items */
-    private final Queue queue = new Queue();
+    private final Queue<Work> queue = new Queue<Work>();
 
     /** Queue processor threads */
-    private final LinkedList threads;
+    private final List<QueueProcessorThread<Work>> threads;
 
     /** Counter used for worker thread names */
     private int counter = 1;
@@ -68,7 +68,7 @@ public class WorkPlugin extends Plugin implements WorkManager {
      */
     public WorkPlugin(PluginDescriptor descriptor) {
         super(descriptor);
-        this.threads = new LinkedList();
+        this.threads = new LinkedList<QueueProcessorThread<Work>>();
     }
 
     /**
@@ -91,8 +91,7 @@ public class WorkPlugin extends Plugin implements WorkManager {
      */
     protected final synchronized void stopPlugin() throws PluginException {
         InitialNaming.unbind(NAME);
-        for (Iterator i = threads.iterator(); i.hasNext();) {
-            QueueProcessorThread t = (QueueProcessorThread) i.next();
+        for (QueueProcessorThread<Work> t : threads) {
             t.stopProcessor();
         }
         threads.clear();
@@ -136,7 +135,7 @@ public class WorkPlugin extends Plugin implements WorkManager {
      * Add a worker thread.
      */
     private synchronized void addWorker() {
-        final QueueProcessorThread t = new QueueProcessorThread("worker-"
+        final QueueProcessorThread<Work> t = new QueueProcessorThread<Work>("worker-"
                 + counter, queue, new WorkProcessor());
         threads.add(t);
         counter++;
@@ -161,13 +160,12 @@ public class WorkPlugin extends Plugin implements WorkManager {
         return workStartCounter - workEndCounter;
     }
 
-    class WorkProcessor implements QueueProcessor {
+    class WorkProcessor implements QueueProcessor<Work> {
 
         /**
          * @see org.jnode.util.QueueProcessor#process(java.lang.Object)
          */
-        public void process(Object object) throws Exception {
-            final Work work = (Work) object;
+        public void process(Work work) throws Exception {
             incWorkStartCounter();
             try {
                 final Logger log = Logger.getLogger(work.getClass());

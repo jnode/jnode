@@ -280,7 +280,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         // otherwise they cannot work in java.lang.ClassLoader.
         if ((parent != null) && !parent.skipParentLoader(name)) {
             try {
-                final Class cls = parent.loadClass(name);
+                final Class<?> cls = parent.loadClass(name);
                 return cls.getVmClass();
             } catch (ClassNotFoundException ex) {
                 // Don't care, try it ourselves.
@@ -663,7 +663,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         private final String name;
 
         /** The class itself */
-        private VmType vmClass;
+        private VmType<?> vmClass;
 
         /** Classloading got an error? */
         private boolean error = false;
@@ -684,7 +684,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
          * 
          * @param vmClass
          */
-        public ClassInfo(VmType vmClass) {
+        public ClassInfo(VmType<?> vmClass) {
             this.name = vmClass.getName();
             this.vmClass = vmClass;
             if (name.indexOf('/') >= 0) { throw new IllegalArgumentException(
@@ -702,7 +702,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
          * @return Type
          * @throws ClassNotFoundException
          */
-        public final synchronized VmType getVmClass()
+        public final synchronized VmType<?> getVmClass()
                 throws ClassNotFoundException {
             while (vmClass == null) {
                 if (error) { throw new ClassNotFoundException(name + "; "

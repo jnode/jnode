@@ -21,55 +21,45 @@
 
 package org.jnode.vm.memmgr.def;
 
+import java.util.TreeMap;
+
 import org.jnode.util.Counter;
 import org.jnode.vm.memmgr.HeapStatistics;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.TreeMap;
 
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
 
-final class DefHeapStatistics extends HeapStatistics
-{
-  private TreeMap countData = new TreeMap();
+final class DefHeapStatistics extends HeapStatistics {
+    
+    private TreeMap<String, Counter> countData = new TreeMap<String, Counter>();
 
-  public void add(String className)
-  {
-    Counter count = (Counter) countData.get(className);
+    public void add(String className) {
+        Counter count = (Counter) countData.get(className);
 
-    if (count == null)
-    {
-      count = new Counter(className);
+        if (count == null) {
+            count = new Counter(className);
 
-      countData.put(className, count);
+            countData.put(className, count);
+        }
+
+        count.inc();
     }
 
-    count.inc();
-  }
+    public String toString() {
+        final StringBuffer stringBuffer = new StringBuffer();
+        boolean first = true;
 
+        for (Counter c : countData.values()) {
+            if (first) {
+                first = false; 
+            } else {
+                stringBuffer.append('\n');
+            }
+            stringBuffer.append(c);
+        }
 
-  public String toString()
-  {
-    Collection counted = countData.values();
-
-    StringBuffer stringBuffer = new StringBuffer();
-    final String newline = "\n";
-
-    Object o;
-
-    for (Iterator iterator = counted.iterator(); iterator.hasNext();)
-    {
-      o = iterator.next();
-      stringBuffer.append(o);
-
-      if (iterator.hasNext())
-        stringBuffer.append(newline);
+        return stringBuffer.toString();
     }
-
-    return stringBuffer.toString();
-  }
 
 }
