@@ -84,7 +84,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
     private final Object initCloseLock = new Object();
     private EventQueue waitingNativeQueue;
     
-	private class LRUCache extends java.util.LinkedHashMap {
+	private class LRUCache<K, V> extends java.util.LinkedHashMap<K, V> {
 		int max_entries;
 
 		public LRUCache(int max) {
@@ -153,7 +153,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 
 	private final FocusHandler focusHandler;
 
-	private LRUCache fontCache = new LRUCache(50);
+	private LRUCache<Map, ClasspathFontPeer> fontCache = new LRUCache<Map, ClasspathFontPeer>(50);
 
 	private Surface graphics;
 
@@ -342,7 +342,7 @@ public abstract class JNodeToolkit extends ClasspathToolkit {
 	 */
 
 	public ClasspathFontPeer getClasspathFontPeer(String name, Map attrs) {
-		Map keyMap = new HashMap(attrs);
+		final Map<String, String> keyMap = new HashMap<String, String>(attrs);
 		// We don't know what kind of "name" the user requested (logical, face,
 		// family), and we don't actually *need* to know here. The worst case
 		// involves failure to consolidate fonts with the same backend in our

@@ -41,11 +41,11 @@ public class TTFontProvider implements FontProvider {
 	/** My logger */
 	private static final Logger log = Logger.getLogger(TTFontProvider.class);
 	/** Cache font renderers */
-	private final HashMap renderers = new HashMap();
+	private final HashMap<Font, TextRenderer> renderers = new HashMap<Font, TextRenderer>();
 	/** Cache font metrics */
-	private final HashMap metrics = new HashMap();
+	private final HashMap<Font, FontMetrics> metrics = new HashMap<Font, FontMetrics>();
 	/** All loaded fonts (name, TTFFont) */
-	private final HashMap fontsByName = new HashMap();
+	private final HashMap<String, Font> fontsByName = new HashMap<String, Font>();
 	/** Have the system fonts been loaded yet */
 	private boolean fontsLoaded = false;
 	/** All system fonts */
@@ -76,11 +76,11 @@ public class TTFontProvider implements FontProvider {
 	 * 
 	 * @return The set containing all fonts provides by this provider.
 	 */
-	public Set getAllFonts() {
+	public Set<Font> getAllFonts() {
 		if (!fontsLoaded) {
 			loadFonts();
 		}
-		return new HashSet(fontsByName.values());
+		return new HashSet<Font>(fontsByName.values());
 	}
 
 	/**

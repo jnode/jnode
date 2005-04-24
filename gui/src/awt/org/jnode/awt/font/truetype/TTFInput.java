@@ -22,7 +22,6 @@
 package org.jnode.awt.font.truetype;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -36,7 +35,7 @@ import java.util.Stack;
  */
 public abstract class TTFInput {
 
-	private Stack filePosStack = new Stack();
+	private Stack<Long> filePosStack = new Stack<Long>();
 	private int tempFlags;
 
 	public abstract TTFInput createSubInput(int offset, int length) throws IOException;
@@ -143,17 +142,16 @@ public abstract class TTFInput {
 	public abstract void readFully(byte[] b) throws IOException;
 
 	public int[] readFFFFTerminatedUShortArray() throws IOException {
-		List values = new LinkedList();
+		final List<Integer> values = new LinkedList<Integer>();
 		int ushort = -1;
 		do {
 			ushort = readUShort();
 			values.add(new Integer(ushort));
 		} while (ushort != 0xFFFF);
 		int[] shorts = new int[values.size()];
-		Iterator i = values.iterator();
 		int j = 0;
-		while (i.hasNext()) {
-			shorts[j++] = ((Integer) i.next()).intValue();
+        for (int v : values) {
+			shorts[j++] = v;
 		}
 		return shorts;
 	}

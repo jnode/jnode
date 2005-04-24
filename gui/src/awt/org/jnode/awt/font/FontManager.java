@@ -33,7 +33,7 @@ import org.jnode.driver.video.Surface;
  */
 public interface FontManager {
 
-	public static final Class NAME = FontManager.class;//"FontManager";
+	public static final Class<FontManager> NAME = FontManager.class;//"FontManager";
 
 	/**
 	 * Returns an array containing a one-point size instance of all fonts 

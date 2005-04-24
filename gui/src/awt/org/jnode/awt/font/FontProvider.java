@@ -55,7 +55,7 @@ public interface FontProvider {
 	 * 
 	 * @return All fonts this provider can provide
 	 */
-	public Set getAllFonts();
+	public Set<Font> getAllFonts();
 
 	/**
 	 * Gets a text renderer for the given font.

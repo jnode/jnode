@@ -27,7 +27,6 @@ import java.awt.FontMetrics;
 import java.awt.geom.AffineTransform;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.naming.NamingException;
@@ -51,7 +50,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
 
     private static final Logger log = Logger.getLogger(DefaultFontManager.class);
     private final ExtensionPoint providersEP;
-    private final HashMap providers = new HashMap();
+    private final HashMap<String, FontProvider> providers = new HashMap<String, FontProvider>();
 
     /**
      * Create a new instance
@@ -102,9 +101,8 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      * @return All fonts
      */
     public synchronized Font[] getAllFonts() {
-        final HashSet all = new HashSet();
-        for (Iterator i = providers.values().iterator(); i.hasNext();) {
-            final FontProvider prv = (FontProvider) i.next();
+        final HashSet<Font> all = new HashSet<Font>();
+        for (FontProvider prv : providers.values()) {
             all.addAll(prv.getAllFonts());
         }
         return (Font[]) all.toArray(new Font[all.size()]);
@@ -186,8 +184,7 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
      * @return The provider
      */
     private FontProvider getProvider(Font font) {
-        for (Iterator i = providers.values().iterator(); i.hasNext();) {
-            final FontProvider prv = (FontProvider) i.next();
+        for (FontProvider prv : providers.values()) {
             if (prv.provides(font)) {
                 return prv;
             }
@@ -217,12 +214,12 @@ public class DefaultFontManager implements FontManager, ExtensionPointListener {
         }
     }
 
-    private void configureProvider(Map providers, ConfigurationElement element) {
+    private void configureProvider(Map<String, FontProvider> providers, ConfigurationElement element) {
         final String className = element.getAttribute("class");
         log.debug("Configure provider: class=" + className);
         if ((className != null) && !providers.containsKey(className)) {
             try {
-                final Class cls = Thread.currentThread().getContextClassLoader().loadClass(className);
+                final Class<?> cls = Thread.currentThread().getContextClassLoader().loadClass(className);
                 final FontProvider provider = (FontProvider) cls.newInstance();
                 providers.put(className, provider);
             } catch (ClassNotFoundException ex) {

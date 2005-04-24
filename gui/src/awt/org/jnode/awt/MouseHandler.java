@@ -90,7 +90,7 @@ public class MouseHandler implements PointerListener
     {
       try
       {
-        final Collection pointers = DeviceUtils
+        final Collection<Device> pointers = DeviceUtils
             .getDevicesByAPI(PointerAPI.class);
         if (!pointers.isEmpty())
         {
