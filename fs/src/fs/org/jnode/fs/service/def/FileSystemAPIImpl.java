@@ -209,7 +209,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 		final File[] list = new File[rootSet.size()];
 		final Iterator<String> i = rootSet.iterator();
 		for (int j = 0; j < list.length; j++) {
-			list[j] = new File((String)i.next());
+			list[j] = new File(i.next());
 		}
 		return list;
 	}
@@ -230,7 +230,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 	 * @param directory
 	 * @param filter
 	 */
-	public String[] list(File directory, FilenameFilter filter) throws IOException {
+	public String[] list(File directory) throws IOException {
 		final FSEntry entry = getEntry(directory);
 		if (entry == null) {
 			throw new FileNotFoundException(directory.getAbsolutePath());
@@ -242,9 +242,7 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
 		for (FSEntryIterator i = entry.getDirectory().iterator(); i.hasNext();) {
 			final FSEntry child = i.next();
 			final String name = child.getName();
-			if ((filter == null) || (filter.accept(directory, name))) {
-				list.add(name);
-			}
+            list.add(name);
 		}
 		return list.toArray(new String[list.size()]);
 	}
