@@ -114,7 +114,7 @@ public interface VMFileSystemAPI {
 	 * @param directory
 	 * @param filter
 	 */
-	public String[] list(File directory, FilenameFilter filter) throws IOException;
+	public String[] list(File directory) throws IOException;
 
 	/**
 	 * Open a given file
