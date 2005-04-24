@@ -42,7 +42,7 @@ public class RadeonHardwareCursor implements RadeonConstants, HardwareCursorAPI 
     /** Radeon register accessor */
     private final RadeonVgaIO io;
 	/** Map between HardwareCursorImage and short[] */
-	private final HashMap cursorCache = new HashMap();
+	private final HashMap<HardwareCursorImage, byte[]> cursorCache = new HashMap<HardwareCursorImage, byte[]>();
 	/** Memory reserved for cursor images */
 	private final MemoryResource cursorMem;
 	

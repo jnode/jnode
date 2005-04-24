@@ -41,11 +41,11 @@ public class WindowBar extends JPanel {
 
 	private final JList list;
 
-	private final ArrayList frames;
+	private final ArrayList<JInternalFrame> frames;
 
 	public WindowBar() {
 		this.list = new JList();
-		this.frames = new ArrayList();
+		this.frames = new ArrayList<JInternalFrame>();
 		list.setModel(new WindowListModel());
 
 		add(list, BorderLayout.CENTER);
