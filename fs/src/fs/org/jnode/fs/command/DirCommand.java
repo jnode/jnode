@@ -53,14 +53,17 @@ public class DirCommand implements Command{
 	public void execute(CommandLine commandLine, InputStream in, PrintStream out, PrintStream err) throws Exception {
 		ParsedArguments cmdLine = HELP_INFO.parse(commandLine.toStringArray());
 
-    String dir_str = ARG_DIR.getValue(cmdLine);
-		
-		if (((dir_str == null)&&(System.getProperty("user.dir").equals("/")))||((dir_str != null)&&(dir_str.equals("/")))){
-			File[] roots = File.listRoots();
+        String dir_str = ARG_DIR.getValue(cmdLine);
+        
+		String userDir = System.getProperty("user.dir");
+        
+		if ( ((dir_str == null) && isRoot(userDir)) ||
+             ((dir_str != null) && isRoot(dir_str)) ){
+            File[] roots = File.listRoots();
 			this.printList(roots,out);
 		} else {
 			File dir = ARG_DIR.getFile(cmdLine);
-			if (dir==null) dir = new File(System.getProperty("user.dir"));
+			if (dir==null) dir = new File(userDir);
 			if (dir.exists() && dir.isDirectory()) {
 				final File[] list = dir.listFiles();
 				this.printList(list, out);
@@ -73,6 +76,11 @@ public class DirCommand implements Command{
 			
 	}
 
+    private boolean isRoot(String dir)
+    {
+        return (dir != null) && dir.equals(File.separator);
+    }
+    
 	private void printList(File[] list, PrintStream out) {
 		if (list != null) {
 			for (int i = 0; i < list.length; i++) {
