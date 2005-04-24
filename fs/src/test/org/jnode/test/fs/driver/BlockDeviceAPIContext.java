@@ -23,7 +23,6 @@ package org.jnode.test.fs.driver;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.jmock.MockObjectTestCase;
@@ -40,191 +39,155 @@ import org.jnode.test.fs.driver.stubs.StubDeviceManager;
 import org.jnode.test.support.Context;
 import org.jnode.test.support.TestConfig;
 
-abstract public class BlockDeviceAPIContext extends Context
-{
-    protected static final Logger log = Logger.getLogger(BlockDeviceAPIContext.class);                   
-    
+abstract public class BlockDeviceAPIContext extends Context {
+    protected static final Logger log = Logger
+            .getLogger(BlockDeviceAPIContext.class);
+
     private BlockDeviceAPI api;
+
     private BlockDeviceAPIContext parentContext;
+
     private Partition[] partitions;
+
     private String name;
 
-    public BlockDeviceAPIContext(String name)
-    {        
-        this.name = name;    
+    public BlockDeviceAPIContext(String name) {
+        this.name = name;
     }
-    
-    final public String getName()
-    {
+
+    final public String getName() {
         return name;
     }
-    
-    public void init(TestConfig config, MockObjectTestCase testCase) throws Exception
-    {
-        BlockDeviceAPITestConfig cfg = (BlockDeviceAPITestConfig)config;
+
+    public void init(TestConfig config, MockObjectTestCase testCase)
+            throws Exception {
+        BlockDeviceAPITestConfig cfg = (BlockDeviceAPITestConfig) config;
         partitions = cfg.getPartitions();
     }
-    
-    protected void init(BlockDeviceAPIContext parentContext, BlockDeviceAPI api, Device device)
-    {
+
+    protected void init(BlockDeviceAPIContext parentContext,
+            BlockDeviceAPI api, Device device) {
         this.api = api;
         this.parentContext = parentContext;
 
-        log.info("api="+api+ " device="+device);
-        if((device != null) && (api instanceof Driver))
-        {
+        log.info("api=" + api + " device=" + device);
+        if ((device != null) && (api instanceof Driver)) {
             Driver driver = (Driver) api;
-            try
-            {                    
+            try {
                 boolean registered = false;
-                
-                try
-                {
+
+                try {
                     StubDeviceManager.INSTANCE.getDevice(device.getId());
                     registered = true;
-                }
-                catch (DeviceNotFoundException e)
-                {
+                } catch (DeviceNotFoundException e) {
                     registered = false;
                 }
-                
+
                 device.setDriver(driver);
-                
-                if(!registered)
-                {
+
+                if (!registered) {
                     StubDeviceManager.INSTANCE.register(device);
-                }                    
+                }
+            } catch (DriverException e) {
+                log.error("Error while starting device " + driver.getDevice(),
+                        e);
+            } catch (DeviceAlreadyRegisteredException e) {
+                log.error("Error while starting device " + driver.getDevice(),
+                        e);
             }
-            catch (DriverException e)
-            {
-                log.error("Error while starting device "+driver.getDevice(), e);
-            }
-            catch (DeviceAlreadyRegisteredException e)
-            {
-                log.error("Error while starting device "+driver.getDevice(), e);
-            }                
-        }                        
-        
-        log.info(api.getClass().getName()+" initialized");
+        }
+
+        log.info(api.getClass().getName() + " initialized");
     }
 
-    public void destroy()
-    {
-        try
-        {
-            if(api != null)
-            {
+    public void destroy() {
+        try {
+            if (api != null) {
                 api.flush();
             }
+        } catch (IOException e) {
+            log.error("can't flush " + api.getClass().getName(), e);
         }
-        catch (IOException e)
-        {
-            log.error("can't flush "+api.getClass().getName(), e);
-        }
-        
-        if(api instanceof Driver)
-        {
+
+        if (api instanceof Driver) {
             Driver driver = (Driver) api;
             Device device = driver.getDevice();
-            
-            if(device != null)
-            {
-                try
-                {
+
+            if (device != null) {
+                try {
                     StubDeviceManager.INSTANCE.stop(device);
-                    StubDeviceManager.INSTANCE.unregister(device);                        
-                }
-                catch (DriverException e)
-                {
-                    log.error("Error while stopping device "+driver.getDevice(), e);
-                }
-                catch (DeviceNotFoundException e)
-                {
-                    log.error("Error while stopping device "+driver.getDevice(), e);
+                    StubDeviceManager.INSTANCE.unregister(device);
+                } catch (DriverException e) {
+                    log.error("Error while stopping device "
+                            + driver.getDevice(), e);
+                } catch (DeviceNotFoundException e) {
+                    log.error("Error while stopping device "
+                            + driver.getDevice(), e);
                 }
             }
         }
-        
-        if(parentContext != null)
-        {
+
+        if (parentContext != null) {
             parentContext.destroy();
         }
-        
+
         unregisterDevices();
-        
-        try
-        {
+
+        try {
             destroyImpl();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             log.error("Error while freeing BlockDeviceAPIContext", e);
         }
     }
-    
-    final public BlockDeviceAPI getApi()
-    {
+
+    final public BlockDeviceAPI getApi() {
         return api;
-    }            
-    
-    protected Driver findDriver(DeviceFinder finder, String devName)
-    {
-        try
-        {
-            finder.findDevices(StubDeviceManager.INSTANCE, StubDeviceManager.INSTANCE.getSystemBus());
-        }
-        catch (DeviceAlreadyRegisteredException e)
-        {
+    }
+
+    protected Driver findDriver(DeviceFinder finder, String devName) {
+        try {
+            finder.findDevices(StubDeviceManager.INSTANCE,
+                    StubDeviceManager.INSTANCE.getSystemBus());
+        } catch (DeviceAlreadyRegisteredException e) {
             log.warn(e);
-        }
-        catch (DeviceException e)
-        {
+        } catch (DeviceException e) {
             log.error(e);
         }
-        
-        try
-        {
+
+        try {
             Device dev = StubDeviceManager.INSTANCE.getDevice(devName);
-            log.debug("dev="+dev);
-            log.debug("driver="+(dev==null ? "null" : ""+dev.getDriver()));
+            log.debug("dev=" + dev);
+            log
+                    .debug("driver="
+                            + (dev == null ? "null" : "" + dev.getDriver()));
             return dev.getDriver();
-        }
-        catch (DeviceNotFoundException e)
-        {
-            log.fatal("can't find "+devName, e);
+        } catch (DeviceNotFoundException e) {
+            log.fatal("can't find " + devName, e);
             return null;
         }
     }
-        
-    protected void destroyImpl() throws Exception
-    {        
+
+    protected void destroyImpl() throws Exception {
     }
-    
-    private void unregisterDevices()
-    {
-        //Collection devs = StubDeviceManager.INSTANCE.getDevicesByAPI(RemovableDeviceAPI.class);
-        Collection devs = StubDeviceManager.INSTANCE.getDevices();
-        for(Iterator it = devs.iterator() ; it.hasNext() ; )
-        {
-            Device device = (Device) it.next();
-            try
-            {
+
+    private void unregisterDevices() {
+        // Collection devs =
+        // StubDeviceManager.INSTANCE.getDevicesByAPI(RemovableDeviceAPI.class);
+        Collection<Device> devs = StubDeviceManager.INSTANCE.getDevices();
+        for (Device device : devs) {
+            try {
                 StubDeviceManager.INSTANCE.unregister(device);
+            } catch (DriverException e) {
+                log.error("can't unregister " + device.getClass().getName(), e);
             }
-            catch (DriverException e)
-            {
-                log.error("can't unregister "+device.getClass().getName(), e);
-            }
-        }            
+        }
     }
-    
-    protected BlockDeviceAPIContext createParentBlockDeviceAPI()
-    {
+
+    protected BlockDeviceAPIContext createParentBlockDeviceAPI() {
         return new RamDiskDriverContext();
     }
 
-    public Partition[] getPartitions()
-    {
+    public Partition[] getPartitions() {
         return partitions;
     }
 }

@@ -23,7 +23,6 @@ package org.jnode.test.fs;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.jnode.driver.ApiNotFoundException;
@@ -44,7 +43,7 @@ public class BlockDeviceStressTest {
         if (args.length == 0) {
             System.out.println("specify device ids");
         } else {
-            final List apis = new ArrayList();
+            final List<BlockDeviceAPI> apis = new ArrayList<BlockDeviceAPI>();
             for (int i = 0; i < args.length; i++) {
                 final String id = args[ i];
                 final Device device = DeviceUtils.getDevice(id);
@@ -52,19 +51,18 @@ public class BlockDeviceStressTest {
             }
 
             final int repeatCount = 1000;
-            final List threads = new ArrayList();
+            final List<Thread> threads = new ArrayList<Thread>();
 
-            for (Iterator i = apis.iterator(); i.hasNext();) {
+            for (BlockDeviceAPI api : apis) {
                 final int threadCount = 10;
-                final BlockDeviceAPI api = (BlockDeviceAPI)i.next();
                 final long length = api.getLength();
                 for (int t = 0; t < threadCount; t++) {
                     threads.add(new TestThread(api, repeatCount, length
                             / (threadCount + 2)));
                 }
             }
-            for (Iterator i = threads.iterator(); i.hasNext(); ) {
-                ((Thread)i.next()).start();
+            for (Thread t : threads) {
+                t.start();
             }
         }
     }

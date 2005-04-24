@@ -21,6 +21,7 @@
 
 package org.jnode.test.fs.filesystem.config;
 
+import org.jnode.fs.FileSystem;
 import org.jnode.test.fs.filesystem.FSContext;
 import org.jnode.test.support.TestConfig;
 
@@ -60,7 +61,7 @@ public class FSTestConfig implements TestConfig {
     /**
      * @return
      */
-    public Class getFsClass() {
+    public Class<? extends FileSystem> getFsClass() {
         return fs.getType().getFsClass();
     }
 

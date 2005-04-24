@@ -126,8 +126,8 @@ public abstract class AbstractFSTest extends AbstractTest {
     protected void assertContainsOnly(String errorMessage, FSEntryIterator it, String[] requiredNames)
     {
         boolean ok = true;
-        List reqNames = (requiredNames == null) ? new ArrayList() : new ArrayList(Arrays.asList(requiredNames));
-        List names = TestUtils.getEntryNames(it);
+        List<String> reqNames = (requiredNames == null) ? new ArrayList<String>() : new ArrayList<String>(Arrays.asList(requiredNames));
+        List<String> names = TestUtils.getEntryNames(it);
 
         //log.debug("reqNames="+reqNames);
         //log.debug("names="+names);

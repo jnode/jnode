@@ -41,141 +41,136 @@ import org.jnode.test.support.ContextManager;
 import org.jnode.test.support.MockInitializer;
 import org.jnode.test.support.MockUtils;
 
-public class MockIDEDeviceFactory extends AbstractMockDeviceFactory 
-                    implements IDEDeviceFactory
-{
+public class MockIDEDeviceFactory extends AbstractMockDeviceFactory implements
+        IDEDeviceFactory {
     public IDEDevice createIDEDevice(IDEBus bus, boolean primary,
             boolean master, String name, IDEDriveDescriptor descriptor,
-            DefaultIDEControllerDriver controller)
-    {
-        MockInitializer initializer = new MockInitializer()
-        {
-            public void init(Mock mockIDEDevice)
-            {
-//                Boolean diskChanged = Boolean.FALSE;
-//                mockFDC.expects(testCase.atLeastOnce()).method("diskChanged").withAnyArguments().
-//                        will(new ReturnStub(diskChanged));
+            DefaultIDEControllerDriver controller) {
+        MockInitializer initializer = new MockInitializer() {
+            public void init(Mock mockIDEDevice) {
+                // Boolean diskChanged = Boolean.FALSE;
+                // mockFDC.expects(testCase.atLeastOnce()).method("diskChanged").withAnyArguments().
+                // will(new ReturnStub(diskChanged));
             }
         };
-        
-        return (IDEDevice) MockUtils.createMockObject(IDEDevice.class, initializer);
+
+        return (IDEDevice) MockUtils.createMockObject(IDEDevice.class,
+                initializer);
     }
 
-    public IDEBus createIDEBus(Device parent, boolean primary)
-    {
-        MockInitializer initializer = new MockInitializer()
-        {
-            public void init(Mock mockIDEBus)
-            {
-                mockIDEBus.expects(testCase.atLeastOnce()).
-                            method("executeAndWait").withAnyArguments();
+    public IDEBus createIDEBus(Device parent, boolean primary) {
+        MockInitializer initializer = new MockInitializer() {
+            public void init(Mock mockIDEBus) {
+                mockIDEBus.expects(testCase.atLeastOnce()).method(
+                        "executeAndWait").withAnyArguments();
             }
         };
-        
-        Class[] argCls = new Class[]{Device.class, boolean.class};
-        Object[] args = new Object[]{parent, Boolean.valueOf(primary)};        
-        
-        return (IDEBus) MockUtils.createMockObject(IDEBus.class, initializer, argCls, args);
+
+        Class[] argCls = new Class[] { Device.class, boolean.class };
+        Object[] args = new Object[] { parent, Boolean.valueOf(primary) };
+
+        return (IDEBus) MockUtils.createMockObject(IDEBus.class, initializer,
+                argCls, args);
     }
 
-    public IDEIO createIDEIO(Device parent, boolean primary)
-    {
-        MockInitializer initializer = new MockInitializer()
-        {
-            public void init(Mock mockIDEIO)
-            {
+    public IDEIO createIDEIO(Device parent, boolean primary) {
+        MockInitializer initializer = new MockInitializer() {
+            public void init(Mock mockIDEIO) {
                 Integer irq = new Integer(13);
-                mockIDEIO.expects(testCase.atLeastOnce()).method("getIrq").withNoArguments().
-                        will(new ReturnStub(irq));     
-                                
-                mockIDEIO.expects(testCase.atLeastOnce()).method("setControlReg").withAnyArguments();
-                
+                mockIDEIO.expects(testCase.atLeastOnce()).method("getIrq")
+                        .withNoArguments().will(new ReturnStub(irq));
+
+                mockIDEIO.expects(testCase.atLeastOnce()).method(
+                        "setControlReg").withAnyArguments();
+
                 Integer statusReg = new Integer(13);
-                mockIDEIO.expects(testCase.atLeastOnce()).method("getStatusReg").withNoArguments().
-                        will(new ReturnStub(statusReg));
+                mockIDEIO.expects(testCase.atLeastOnce())
+                        .method("getStatusReg").withNoArguments().will(
+                                new ReturnStub(statusReg));
             }
         };
-        
-        //Class[] argCls = new Class[]{Device.class, boolean.class};
-        //Object[] args = new Object[]{parent, Boolean.valueOf(primary)};        
-        
-        //return (IDEIO) MockUtils.createMockObject(IDEIO.class, initializer, argCls, args);
+
+        // Class[] argCls = new Class[]{Device.class, boolean.class};
+        // Object[] args = new Object[]{parent, Boolean.valueOf(primary)};
+
+        // return (IDEIO) MockUtils.createMockObject(IDEIO.class, initializer,
+        // argCls, args);
         return (IDEIO) MockUtils.createMockObject(IDEIO.class, initializer);
     }
 
-    private IBMPartitionTableEntry createEntry(int partNum, final boolean extended, final long startLba, final long nbSectors)
-    {
-        MockInitializer initializer = new MockInitializer()
-        {
-            public void init(Mock mockEntry)
-            {
+    private IBMPartitionTableEntry createEntry(int partNum,
+            final boolean extended, final long startLba, final long nbSectors) {
+        MockInitializer initializer = new MockInitializer() {
+            public void init(Mock mockEntry) {
                 Boolean valid = Boolean.TRUE;
-                mockEntry.expects(testCase.atLeastOnce()).method("isValid").withNoArguments().
-                        will(new ReturnStub(valid));
+                mockEntry.expects(testCase.atLeastOnce()).method("isValid")
+                        .withNoArguments().will(new ReturnStub(valid));
 
                 Boolean bExtended = Boolean.valueOf(extended);
-                mockEntry.expects(testCase.atLeastOnce()).method("isExtended").withNoArguments().
-                        will(new ReturnStub(bExtended));
-                
+                mockEntry.expects(testCase.atLeastOnce()).method("isExtended")
+                        .withNoArguments().will(new ReturnStub(bExtended));
+
                 Long lStartLba = new Long(0);
-                mockEntry.expects(testCase.atLeastOnce()).method("getStartLba").withNoArguments().
-                        will(new ReturnStub(lStartLba));
-                                
+                mockEntry.expects(testCase.atLeastOnce()).method("getStartLba")
+                        .withNoArguments().will(new ReturnStub(lStartLba));
+
                 Long lNbSectors = new Long(nbSectors);
-                mockEntry.expects(testCase.atLeastOnce()).method("getNrSectors").withNoArguments().
-                        will(new ReturnStub(lNbSectors));
+                mockEntry.expects(testCase.atLeastOnce())
+                        .method("getNrSectors").withNoArguments().will(
+                                new ReturnStub(lNbSectors));
             }
         };
-        
-        Class[] argCls = new Class[]{byte[].class, int.class};
-        Object[] args = new Object[]{new byte[IDEConstants.SECTOR_SIZE], new Integer(partNum)};        
-        
-        return (IBMPartitionTableEntry) MockUtils.createMockObject(IBMPartitionTableEntry.class, initializer, argCls, args);        
+
+        Class[] argCls = new Class[] { byte[].class, int.class };
+        Object[] args = new Object[] { new byte[IDEConstants.SECTOR_SIZE],
+                new Integer(partNum) };
+
+        return (IBMPartitionTableEntry) MockUtils.createMockObject(
+                IBMPartitionTableEntry.class, initializer, argCls, args);
     }
 
-    public class GetEntryStub implements Stub
-    {
+    public class GetEntryStub implements Stub {
         private Partition[] partitions;
 
         public GetEntryStub(Partition[] parts) {
             this.partitions = parts;
         }
 
-        public StringBuffer describeTo( StringBuffer buffer ) {
+        public StringBuffer describeTo(StringBuffer buffer) {
             return buffer.append("get partition entry");
         }
 
-        public Object invoke( Invocation invocation ) throws Throwable {
-            int index = ((Integer)invocation.parameterValues.get(0)).intValue();
+        public Object invoke(Invocation invocation) throws Throwable {
+            int index = ((Integer) invocation.parameterValues.get(0))
+                    .intValue();
             Partition part = partitions[index];
-            IBMPartitionTableEntry entry = createEntry(index, part.isExtended(), 
-                    part.getStartLba(), part.getNbSectors());            
+            IBMPartitionTableEntry entry = createEntry(index,
+                    part.isExtended(), part.getStartLba(), part.getNbSectors());
             return entry;
         }
     }
-    
-    public IBMPartitionTable createIBMPartitionTable(byte[] bs, Device dev)
-    {
-        MockInitializer initializer = new MockInitializer()
-        {
-            public void init(Mock mockTable)
-            {
-                final BlockDeviceAPIContext context = (BlockDeviceAPIContext) ContextManager.getInstance().getContext();
+
+    public IBMPartitionTable createIBMPartitionTable(byte[] bs, Device dev) {
+        MockInitializer initializer = new MockInitializer() {
+            public void init(Mock mockTable) {
+                final BlockDeviceAPIContext context = (BlockDeviceAPIContext) ContextManager
+                        .getInstance().getContext();
                 final Partition[] parts = context.getPartitions();
-                log.debug("with "+parts.length+" partitions");
-                                
+                log.debug("with " + parts.length + " partitions");
+
                 Integer nbParts = new Integer(parts.length);
-                mockTable.expects(testCase.atLeastOnce()).method("getLength").withNoArguments().
-                        will(new ReturnStub(nbParts));
-                                
-                mockTable.expects(testCase.atLeastOnce()).method("getEntry").withAnyArguments().
-                        will(new GetEntryStub(parts));
+                mockTable.expects(testCase.atLeastOnce()).method("getLength")
+                        .withNoArguments().will(new ReturnStub(nbParts));
+
+                mockTable.expects(testCase.atLeastOnce()).method("getEntry")
+                        .withAnyArguments().will(new GetEntryStub(parts));
             }
         };
-        
-        Class[] argCls = new Class[]{byte[].class, Device.class};
-        Object[] args = new Object[]{bs, dev};        
-        
-        return (IBMPartitionTable) MockUtils.createMockObject(IBMPartitionTable.class, initializer, argCls, args);
+
+        Class[] argCls = new Class[] { byte[].class, Device.class };
+        Object[] args = new Object[] { bs, dev };
+
+        return (IBMPartitionTable) MockUtils.createMockObject(
+                IBMPartitionTable.class, initializer, argCls, args);
     }
 }
