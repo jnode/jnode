@@ -22,7 +22,7 @@ public class DirTest {
         
         System.out.println("List entries on File(\"" + name + "\")");
         final String[] entries = f.list();
-        System.out.println("Listed " + entries.length + " entries on File(\"" + name + "\")");
+        System.out.println("Listed " + ((entries != null) ? ""+entries.length : "#null#") + " entries on File(\"" + name + "\")");
         
     }
 
