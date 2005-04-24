@@ -80,7 +80,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      * @param declaringClass
      */
     protected VmMethod(String name, String signature, int modifiers,
-            VmType declaringClass) {
+            VmType<?> declaringClass) {
         super(
                 name,
                 signature,
@@ -122,7 +122,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      * 
      * @return The declaring class
      */
-    public final VmType getDeclaringClass() {
+    public final VmType<?> getDeclaringClass() {
         return declaringClass;
     }
 
@@ -211,7 +211,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      * @param methodIndex
      */
     static final void recompileMethod(int typeStaticsIndex, int methodIndex) {
-        final VmType type = Vm.getVm().getSharedStatics().getTypeEntry(
+        final VmType<?> type = Vm.getVm().getSharedStatics().getTypeEntry(
                 typeStaticsIndex);
         type.initialize();
         final VmMethod method = type.getDeclaredMethod(methodIndex);
@@ -294,7 +294,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
         return paramTypes.length;
     }
 
-    public final VmType getArgumentType(int index) {
+    public final VmType<?> getArgumentType(int index) {
         resolveTypes();
         return paramTypes[index];
     }
@@ -322,7 +322,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     /**
      * @return VmClass
      */
-    public final VmType getReturnType() {
+    public final VmType<?> getReturnType() {
         resolveTypes();
         return returnType;
     }

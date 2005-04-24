@@ -190,7 +190,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         do {
             again = false;
             oldCount = clsMgr.getLoadedClassCount();
-            for (VmType vmClass : clsMgr.getLoadedClasses()) {
+            for (VmType<?> vmClass : clsMgr.getLoadedClasses()) {
                 vmClass.link();
                 final boolean compHigh = isCompileHighOptLevel(vmClass);
                 try {
@@ -373,7 +373,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             log("Building for " + proc.getCPUID());
 
             final Label clInitCaller = new Label("$$clInitCaller");
-            VmType systemClasses[] = VmType.initializeForBootImage(clsMgr);
+            VmType<?> systemClasses[] = VmType.initializeForBootImage(clsMgr);
             for (int i = 0; i < systemClasses.length; i++) {
                 clsMgr.addLoadedClass(systemClasses[i].getName(),
                         systemClasses[i]);
@@ -600,7 +600,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                         if (!(obj instanceof Label)) {
                             unresolvedFound++;
                             if (obj instanceof VmType) {
-                                final VmType vmtObj = (VmType) obj;
+                                final VmType<?> vmtObj = (VmType) obj;
                                 vmtObj.link();
                                 if (!vmtObj.isCompiled()) {
                                     compileClasses(os, arch);
@@ -826,7 +826,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @param vmClass
      * @return
      */
-    protected boolean isCompileHighOptLevel(VmType vmClass) {
+    protected boolean isCompileHighOptLevel(VmType<?> vmClass) {
         if (vmClass.isArray()) {
             return true;
         }
@@ -1292,7 +1292,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
             NativeStream os, ObjectEmitter emitter)
             throws ClassNotFoundException {
-        for (VmType type : cl.getLoadedClasses()) {
+        for (VmType<?> type : cl.getLoadedClasses()) {
             final String name = type.getName();
             final int cnt = type.getNoDeclaredFields();
             if ((cnt > 0) && !name.startsWith("java.")) {
@@ -1324,7 +1324,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         }
     }
 
-    private void copyStaticField(VmType type, VmField f, Field jf,
+    private void copyStaticField(VmType<?> type, VmField f, Field jf,
             VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
             NativeStream os, ObjectEmitter emitter)
             throws IllegalAccessException, JNodeClassNotFoundException {

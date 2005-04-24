@@ -22,7 +22,6 @@
 package org.jnode.vm.x86;
 
 import java.nio.ByteOrder;
-import java.util.Iterator;
 
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.system.BootLog;
@@ -204,8 +203,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
         cpu.loadAndSetApicID();
 
         // Find & initialize this I/O APIC.
-        for (Iterator i = mpConfigTable.entries().iterator(); i.hasNext();) {
-            final MPEntry entry = (MPEntry) i.next();
+        for (MPEntry entry : mpConfigTable.entries()) {
             if (entry instanceof MPIOAPICEntry) {
                 final MPIOAPICEntry apicEntry = (MPIOAPICEntry) entry;
                 if (apicEntry.getFlags() != 0) {
@@ -231,8 +229,7 @@ public abstract class VmX86Architecture extends VmArchitecture {
         }
 
         // Find all CPU's
-        for (Iterator i = mpConfigTable.entries().iterator(); i.hasNext();) {
-            final MPEntry e = (MPEntry) i.next();
+        for (MPEntry e : mpConfigTable.entries()) {
             if (e.getEntryType() == 0) {
                 final MPProcessorEntry cpuEntry = (MPProcessorEntry) e;
                 if (cpuEntry.isEnabled() && !cpuEntry.isBootstrap()) {

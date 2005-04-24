@@ -110,7 +110,7 @@ public abstract class Quad {
 		return basicBlock;
 	}
 
-	public void computeLiveness(BootableHashMap liveVariables) {
+	public void computeLiveness(BootableHashMap<Variable, Variable> liveVariables) {
 		Operand[] refs = getReferencedOps();
 		if (refs != null) {
 			int n = refs.length;

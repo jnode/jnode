@@ -106,7 +106,7 @@ public class SoftByteCodes implements Uninterruptible {
         if (fieldRef.isResolved()) {
             result = fieldRef.getResolvedVmField();
         } else {
-            VmType vmClass = fieldRef.getConstClass().getResolvedVmClass();
+            VmType<?> vmClass = fieldRef.getConstClass().getResolvedVmClass();
             vmClass.link();
             VmField field = vmClass.getField(fieldRef);
             if (field == null) {
@@ -116,7 +116,7 @@ public class SoftByteCodes implements Uninterruptible {
             fieldRef.setResolvedVmField(field);
             result = field;
         }
-        VmType declClass = result.getDeclaringClass();
+        VmType<?> declClass = result.getDeclaringClass();
         if ((isStatic) && (!declClass.isInitialized())) {
             if (!(result.isPrimitive() && result.isFinal())) {
                 declClass.initialize();
@@ -142,7 +142,7 @@ public class SoftByteCodes implements Uninterruptible {
         if (methodRef.isResolved()) {
             return methodRef.getResolvedVmMethod();
         } else {
-            VmType vmClass = methodRef.getConstClass().getResolvedVmClass();
+            VmType<?> vmClass = methodRef.getConstClass().getResolvedVmClass();
             vmClass.link();
 
             // NEW
@@ -179,8 +179,8 @@ public class SoftByteCodes implements Uninterruptible {
             VmClassLoader curLoader = VmSystem.getContextClassLoader();
             String cname = classRef.getClassName();
             try {
-                Class cls = curLoader.asClassLoader().loadClass(cname);
-                VmType vmClass = cls.getVmClass();
+                Class<?> cls = curLoader.asClassLoader().loadClass(cname);
+                VmType<?> vmClass = cls.getVmClass();
 
                 /*
                  * VmClass vmClass = curLoader.loadClass(cname, true); //VmClass
@@ -207,7 +207,7 @@ public class SoftByteCodes implements Uninterruptible {
      * @return Object The new object
      * @throws UninterruptiblePragma
      */
-    public static Object allocObject(VmType vmClass, int size)
+    public static Object allocObject(VmType<?> vmClass, int size)
             throws UninterruptiblePragma {
         vmClass.link();
 
@@ -263,7 +263,7 @@ public class SoftByteCodes implements Uninterruptible {
      * @throws UninterruptiblePragma
      */
     public static Object multinewarray_helper(int[] dims, int ind,
-            VmArrayClass a) throws OutOfMemoryError,
+            VmArrayClass<?> a) throws OutOfMemoryError,
             NegativeArraySizeException, UninterruptiblePragma {
         // Syslog.debug("multinewarray_helper "); //+ " cls=" + a);
         a.initialize();
@@ -273,7 +273,7 @@ public class SoftByteCodes implements Uninterruptible {
             return o;
         }
         final Object[] o2 = (Object[]) o;
-        final VmArrayClass a2 = (VmArrayClass) a.getComponentType();
+        final VmArrayClass<?> a2 = (VmArrayClass<?>) a.getComponentType();
         a2.initialize();
         for (int i = 0; i < length; ++i) {
             o2[i] = multinewarray_helper(dims, ind - 1, a2);
@@ -291,10 +291,10 @@ public class SoftByteCodes implements Uninterruptible {
      * @return Object The new array
      * @throws UninterruptiblePragma
      */
-    public static Object anewarray(VmType vmClass, int elements)
+    public static Object anewarray(VmType<?> vmClass, int elements)
             throws UninterruptiblePragma {
 
-        final VmArrayClass arrCls = vmClass.getArrayClass();
+        final VmArrayClass<?> arrCls = vmClass.getArrayClass();
         VmHeapManager hm = heapManager;
         if (hm == null) {
             heapManager = hm = Vm.getHeapManager();
@@ -359,7 +359,7 @@ public class SoftByteCodes implements Uninterruptible {
      * @param type
      * @return
      */
-    public static Class getClassForVmType(VmType type) {
+    public static <T> Class<T> getClassForVmType(VmType<T> type) {
         return type.asClass();
     }
 
@@ -407,6 +407,10 @@ public class SoftByteCodes implements Uninterruptible {
             return new AbstractMethodError("Abstract method at " + hexAddress
                     + state);
         case EX_STACKOVERFLOW:
+            if (false) {
+                Unsafe.debug("Stack overflow in ");
+                Unsafe.debug(current.asThread().getName());
+            }
             return new StackOverflowError();
         // case EX_CLASSCAST:
         // if (false) {

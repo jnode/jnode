@@ -259,7 +259,7 @@ public class BaseMagicHelper {
 
     private static final int mPREPARE_MAX = mPREPAREOBJECTREFERENCE_OFS;
 
-    private final BootableHashMap methodNames = new BootableHashMap();
+    private final BootableHashMap<String, Integer> methodNames = new BootableHashMap<String, Integer>();
 
     public BaseMagicHelper() {
         addMethod("add", mADD);
@@ -458,6 +458,6 @@ public class BaseMagicHelper {
     }
 
     private final void addMethod(String mname, int code) {
-        methodNames.put(mname, new Integer(code));
+        methodNames.put(mname, code);
     }
 }

@@ -31,7 +31,7 @@ public interface WorkManager {
     /**
      * Name used to bind this manager in the InitialNaming namespace.
      */
-    public static final Class NAME = WorkManager.class;
+    public static final Class<WorkManager> NAME = WorkManager.class;
     
     /**
      * Add a bit of work to the qork queue.

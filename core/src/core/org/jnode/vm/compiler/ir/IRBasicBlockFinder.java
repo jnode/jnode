@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Map;
 
 import org.jnode.vm.bytecode.BytecodeFlags;
 import org.jnode.vm.bytecode.BytecodeVisitorSupport;
@@ -37,7 +37,7 @@ import org.jnode.vm.classmgr.VmMethod;
  * @author Madhu Siddalingaiah
  * 
  */
-public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Comparator {
+public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Comparator<IRBasicBlock> {
 	private boolean nextIsStartOfBB;
 
 	private IRBasicBlock currentBlock;
@@ -45,8 +45,8 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	private byte[] opcodeFlags;
 	private byte[] branchFlags;
 
-	private final ArrayList blocks = new ArrayList();
-	private final HashMap branchTargets = new HashMap();
+	private final ArrayList<IRBasicBlock> blocks = new ArrayList<IRBasicBlock>();
+	private final HashMap<Integer, Integer> branchTargets = new HashMap<Integer, Integer>();
 	private VmByteCode byteCode;
 	private static final byte CONDITIONAL_BRANCH = 1;
 	private static final byte UNCONDITIONAL_BRANCH = 2;
@@ -95,12 +95,11 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 			}
 		}
 		// TODO this is O(n^2), but it works...
-		Iterator it = branchTargets.keySet().iterator();
-		while (it.hasNext()) {
-			Integer from = (Integer) it.next();
-			Integer to = (Integer) branchTargets.get(from);
-			IRBasicBlock pred = findBB(list, from.intValue());
-			IRBasicBlock succ = findBB(list, to.intValue());
+        for (Map.Entry<Integer, Integer> entry : branchTargets.entrySet()) {
+            final int from = entry.getKey();
+            final int to = entry.getValue();
+			IRBasicBlock pred = findBB(list, from);
+			IRBasicBlock succ = findBB(list, to);
 			if (pred == null || succ == null) {
 				throw new AssertionError("unable to find BB!");
 			}
@@ -486,7 +485,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 		return startBB(address);
 	}
 
-	public int compare(Object o1, Object o2) {
+	public int compare(IRBasicBlock o1, IRBasicBlock o2) {
 		final int sp1 = ((IRBasicBlock) o1).getStartPC();
 		final int sp2 = ((IRBasicBlock) o2).getStartPC();
 		return sp1 - sp2;

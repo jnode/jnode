@@ -320,7 +320,7 @@ public class VmReflection {
 			method.getDeclaringClass().initialize();
 		}
 		for (int i = 0; i < argCount; i++) {
-			final VmType argType = method.getArgumentType(i);
+			final VmType<?> argType = method.getArgumentType(i);
 			final Object arg = args[i];
 			if (argType.isPrimitive()) {
 				int v = 0;
@@ -379,7 +379,7 @@ public class VmReflection {
 				return Unsafe.invokeObject(method);
 			} else if (method.isReturnWide()) {
 				long rc = Unsafe.invokeLong(method);
-				final Class retType = method.getReturnType().asClass();
+				final Class<?> retType = method.getReturnType().asClass();
 				if (Long.TYPE == retType) {
 					return new Long(rc);
 				} else {
@@ -451,7 +451,7 @@ public class VmReflection {
 	 * @param sf
 	 */
 	private static final void initialize(VmStaticField sf) {
-		final VmType declClass = sf.getDeclaringClass();
+		final VmType<?> declClass = sf.getDeclaringClass();
 		if (!declClass.isInitialized()) {
 			if (!(sf.isPrimitive() && sf.isFinal())) {
 				sf.getDeclaringClass().initialize();

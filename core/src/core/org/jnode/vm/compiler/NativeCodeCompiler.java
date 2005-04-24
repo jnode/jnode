@@ -263,7 +263,7 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
             final CompilerBytecodeParser parser = new CompilerBytecodeParser(
                     bc, cfg, bcv);
             bcv.startMethod(method);
-            for (Iterator i = cfg.basicBlockIterator(); i.hasNext();) {
+            for (Iterator<BasicBlock> i = cfg.basicBlockIterator(); i.hasNext();) {
                 final BasicBlock bb = (BasicBlock) i.next();
                 bcv.startBasicBlock(bb);
                 parser.parse(bb.getStartPC(), bb.getEndPC(), false);
