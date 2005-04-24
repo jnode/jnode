@@ -102,6 +102,8 @@ public class PlatformHelper
 	 */
   public static final String toCanonicalForm(String path)
   {
+      if(isRootDirectory(path)) return path; //FDy: ClassPath bug fix for root (from JNode team)
+      
     /*??
     if(path.indexOf('.') < 0 && path.indexOf("..") < 0)
             return path;
