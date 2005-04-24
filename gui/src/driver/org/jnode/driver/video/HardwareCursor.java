@@ -30,7 +30,7 @@ import java.util.Iterator;
 public class HardwareCursor {
 
 	/** The images */
-	private final HashMap imageMap;
+	private final HashMap<String, HardwareCursorImage> imageMap;
 
 	/**
 	 * Initialize this instance.
@@ -38,7 +38,7 @@ public class HardwareCursor {
 	 * @param images
 	 */
 	public HardwareCursor(HardwareCursorImage[] images) {
-		this.imageMap = new HashMap();
+		this.imageMap = new HashMap<String, HardwareCursorImage>();
 		for (int i = 0; i < images.length; i++) {
 			final HardwareCursorImage img = images[i];
 			imageMap.put(getKey(img.getWidth(), img.getHeight()), img);

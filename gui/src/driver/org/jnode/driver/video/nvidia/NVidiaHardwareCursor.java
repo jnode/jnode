@@ -35,7 +35,7 @@ public class NVidiaHardwareCursor implements NVidiaConstants, HardwareCursorAPI 
 	private final NVidiaVgaIO vgaIO;
 	private final int architecture;
 	/** Map between HardwareCursorImage and short[] */
-	private final HashMap cursorCache = new HashMap();
+	private final HashMap<HardwareCursorImage, short[]> cursorCache = new HashMap<HardwareCursorImage, short[]>();
 	// cursor bitmap will be stored at the start of the framebuffer
 	private static final int CURSOR_ADDRESS = 0;
 
