@@ -45,13 +45,13 @@ public final class Class<T> implements Serializable {
 
     private Method[] declaredMethods;
 
-    private ArrayList fields;
+    private ArrayList<Field> fields;
 
-    private ArrayList methods;
+    private ArrayList<Method> methods;
 
-    private ArrayList interfaces;
+    private ArrayList<Class> interfaces;
 
-    private ArrayList constructors;
+    private ArrayList<Constructor> constructors;
 
     private VmMethod defaultConstructor;
 
@@ -125,7 +125,7 @@ public final class Class<T> implements Serializable {
      * @return Class
      */
     public final Class< ? super T> getSuperclass() {
-        VmType superCls = getLinkedVmClass().getSuperClass();
+        VmType<? super T> superCls = getLinkedVmClass().getSuperClass();
         if (superCls != null) {
             return superCls.asClass();
         } else {
@@ -151,8 +151,8 @@ public final class Class<T> implements Serializable {
      */
     public final Class[] getInterfaces() {
         if (interfaces == null) {
-            final ArrayList list = new ArrayList();
-            final VmType vmClass = getLinkedVmClass();
+            final ArrayList<Class> list = new ArrayList<Class>();
+            final VmType<T> vmClass = getLinkedVmClass();
             final int cnt = vmClass.getNoInterfaces();
             for (int i = 0; i < cnt; i++) {
                 list.add(vmClass.getInterface(i).asClass());
@@ -188,7 +188,7 @@ public final class Class<T> implements Serializable {
      *             if c is null
      * @since 1.1
      */
-    public boolean isAssignableFrom(Class c) {
+    public boolean isAssignableFrom(Class<?> c) {
         return getLinkedVmClass().isAssignableFrom(c.getLinkedVmClass());
     }
 
@@ -261,8 +261,8 @@ public final class Class<T> implements Serializable {
      */
     public Field[] getFields() {
         if (fields == null) {
-            ArrayList list = new ArrayList();
-            Class cls = this;
+            ArrayList<Field> list = new ArrayList<Field>();
+            Class<?> cls = this;
             while (cls != null) {
                 final Field[] dlist = cls.getDeclaredFields();
                 for (int i = 0; i < dlist.length; i++) {
@@ -300,7 +300,7 @@ public final class Class<T> implements Serializable {
      */
     public Field[] getDeclaredFields() {
         if (declaredFields == null) {
-            final VmType vmClass = getLinkedVmClass();
+            final VmType<T> vmClass = getLinkedVmClass();
             final int cnt = vmClass.getNoDeclaredFields();
             final Field[] list = new Field[cnt];
             for (int i = 0; i < cnt; i++) {
@@ -326,9 +326,9 @@ public final class Class<T> implements Serializable {
      * @return Class
      */
     public Class getComponentType() {
-        final VmType vmClass = getLinkedVmClass();
+        final VmType<T> vmClass = getLinkedVmClass();
         if (vmClass instanceof VmArrayClass) {
-            final VmType vmCompType = ((VmArrayClass) vmClass)
+            final VmType<?> vmCompType = ((VmArrayClass<T>) vmClass)
                     .getComponentType();
             if (vmCompType != null) {
                 return vmCompType.asClass();
@@ -347,9 +347,9 @@ public final class Class<T> implements Serializable {
      * @throws NoSuchMethodException
      * @throws SecurityException
      */
-    public Method getMethod(String name, Class[] argTypes)
+    public Method getMethod(String name, Class<?>[] argTypes)
             throws NoSuchMethodException, SecurityException {
-        VmType[] vmArgTypes;
+        VmType<?>[] vmArgTypes;
         if (argTypes == null) {
             vmArgTypes = null;
         } else {
@@ -374,8 +374,8 @@ public final class Class<T> implements Serializable {
      */
     public Method[] getMethods() {
         if (methods == null) {
-            ArrayList list = new ArrayList();
-            Class cls = this;
+            final ArrayList<Method> list = new ArrayList<Method>();
+            Class<?> cls = this;
             while (cls != null) {
                 final Method[] dlist = cls.getDeclaredMethods();
                 for (int i = 0; i < dlist.length; i++) {
@@ -398,9 +398,9 @@ public final class Class<T> implements Serializable {
      * @throws NoSuchMethodException
      * @throws SecurityException
      */
-    public Method getDeclaredMethod(String name, Class[] argTypes)
+    public Method getDeclaredMethod(String name, Class<?>[] argTypes)
             throws NoSuchMethodException, SecurityException {
-        VmType[] vmArgTypes;
+        VmType<?>[] vmArgTypes;
         if (argTypes == null) {
             vmArgTypes = null;
         } else {
@@ -426,7 +426,7 @@ public final class Class<T> implements Serializable {
      */
     public Method[] getDeclaredMethods() {
         if (declaredMethods == null) {
-            final VmType vmClass = getLinkedVmClass();
+            final VmType<T> vmClass = getLinkedVmClass();
             final int cnt = vmClass.getNoDeclaredMethods();
             int max = 0;
             for (int i = 0; i < cnt; i++) {
@@ -491,7 +491,7 @@ public final class Class<T> implements Serializable {
      */
     public Constructor[] getDeclaredConstructors() {
         if (declaredConstructors == null) {
-            final VmType vmClass = getLinkedVmClass();
+            final VmType<T> vmClass = getLinkedVmClass();
             int cnt = vmClass.getNoDeclaredMethods();
             int max = 0;
             for (int i = 0; i < cnt; i++) {
@@ -623,7 +623,7 @@ public final class Class<T> implements Serializable {
      */
     public Constructor[] getConstructors() {
         if (constructors == null) {
-            ArrayList list = new ArrayList();
+            ArrayList<Constructor> list = new ArrayList<Constructor>();
             final Constructor[] dlist = getDeclaredConstructors();
             for (int i = 0; i < dlist.length; i++) {
                 final Constructor c = dlist[i];
@@ -762,6 +762,22 @@ public final class Class<T> implements Serializable {
      */
     public boolean isEnum() {
         return vmClass.isEnum();
+    }
+
+    /**
+     * Return object, cast to this Class' type.
+     * 
+     * @param obj
+     *            the object to cast
+     * @throws ClassCastException
+     *             if obj is not an instance of this class
+     * @since 1.5
+     */
+    public T cast(Object obj) {
+        if ((obj != null) && !isInstance(obj)) {
+            throw new ClassCastException();
+        }
+        return (T) obj;
     }
 
     /**

@@ -1000,7 +1000,7 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
 	 * @param index
 	 * @return class
 	 */
-	public final VmInterfaceClass getInterface(int index) {
+	public final VmInterfaceClass<?> getInterface(int index) {
 		return allInterfaceTable[index];
 	}
 
