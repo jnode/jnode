@@ -40,9 +40,9 @@ public class BlockDeviceAPITestConfig implements TestConfig {
     final private static int DEVICE_SIZE = (int) NumberUtils
             .getSize(DEVICE_SIZE_STR);
 
-    private Class contextClass;
+    private Class<?> contextClass;
 
-    private List partitions = new ArrayList();
+    private final List<Partition> partitions = new ArrayList<Partition>();
 
     public BlockDeviceAPITestConfig(Class contextClass) {
         this.contextClass = contextClass;
@@ -65,7 +65,7 @@ public class BlockDeviceAPITestConfig implements TestConfig {
                 .getContext()).getApi();
     }
 
-    final public Class getContextClass() {
+    final public Class<?> getContextClass() {
         return contextClass;
     }
 

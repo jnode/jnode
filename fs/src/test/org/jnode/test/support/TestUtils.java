@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.test.support;
 
 import java.io.File;
@@ -58,479 +58,423 @@ import org.jnode.naming.InitialNaming;
 import org.jnode.util.NumberUtils;
 
 /**
- * 
  * @author Fabien DUMINY
  */
 public class TestUtils {
     /**
-     * 
      * @param filename
-     * @param size a number eventually followed by  a multiplier (K: Kilobytes, M: Megabytes, G:Gigabytes)  
+     * @param size
+     *            a number eventually followed by a multiplier (K: Kilobytes, M:
+     *            Megabytes, G:Gigabytes)
      * @return
      * @throws IOException
      */
-    static public File makeTempFile(String filename, String size) throws IOException
-    {
+    static public File makeTempFile(String filename, String size)
+            throws IOException {
         File tempFile = File.createTempFile(filename, "");
         tempFile.deleteOnExit();
-        
+
         return makeFile(tempFile.getAbsolutePath(), NumberUtils.getSize(size));
     }
-    
-	static public File makeFile(String filename, long size) throws IOException
-	{
-		byte[] buf = new byte[1024];
-		File file = new File(filename);
-		FileOutputStream output = new FileOutputStream(file);
-		
-		long nbBlocks = size / buf.length;
-		for(long i = 0 ; i < nbBlocks ; i++)
-		{
-			output.write(buf);
-		}
-		
-		int remain = (int) (size % 1024);
-		if(remain != 0)
-			output.write(buf, 0, remain);
-		
-		output.flush();
-		output.close();
-		
-		return file;
-	}
-	
-	static public FileSystem formatDevice(Device device, Class fsClass, Object formatOptions) throws FileSystemException, IOException 
-	{		
-		log.info("<<< BEGIN formatDevice >>>");
-		
-		// format the device
-		FileSystemType type = getFsType(fsClass);
-		FileSystem fs = type.format(device, formatOptions);
-		fs.close();
-		
-		log.info("<<< END formatDevice >>>");
-		
-		return fs;
-	}
 
-	static public FileSystem mountDevice(Device device, Class fsClass, boolean readOnly) 
-				throws IOException, FileSystemException, NameNotFoundException
-	{
-		log.debug("<<< BEGIN mountDevice >>>");
-		
-		// mount the device
-		FileSystemType type = getFsType(fsClass);
-		FileSystem fs = type.create(device, readOnly);
-		
-		log.debug("<<< END mountDevice >>>");
-		
-		return fs;
-	}
+    static public File makeFile(String filename, long size) throws IOException {
+        byte[] buf = new byte[1024];
+        File file = new File(filename);
+        FileOutputStream output = new FileOutputStream(file);
 
-	static public FileSystemType getFsType(Class fsClass)
-	{
-		FileSystemType fsType = null;
-		if(fsClass == FatFileSystem.class)
-			fsType = new FatFileSystemType();
-		else if(fsClass == Ext2FileSystem.class)
-			fsType = new Ext2FileSystemType();
-		else if(fsClass == ISO9660FileSystem.class)
-			fsType = new ISO9660FileSystemType();
-		else if(fsClass == NTFSFileSystem.class)
-			fsType = new NTFSFileSystemType();
-		
-		if(fsType != null)
-			return fsType;
-		
-		throw new UnsupportedOperationException(fsClass.getName()+" is unsupported");	
-	}
-	
-	static public void listEntries(FSEntryIterator iterator) throws Exception
-	{
-		log.debug("<<< BEGIN listEntries >>>");
-		int i=0;
-		log.debug("------- entries ------");		
-		while(iterator.hasNext())
-		{
-			FSEntry entry = iterator.next();
-			log.debug(i+":"+entry);
-			i++;
-		}
-		log.debug("--- End of entries ---");
-		log.debug("<<< END listEntries >>>");
-	}	
-	
-	static public List getEntryNames(FSEntryIterator it)
-	{
-		List names = new ArrayList();
-		while(it.hasNext())
-		{
-			FSEntry entry = it.next();
-			names.add((entry == null) ? null : entry.getName());
-		}		
-		return names;
-	}
-	
-	static public String toString(String filename, int offset, int length) throws IOException
-	{
-		//byte[] buf = new byte[1024];
-		File file = new File(filename);
-		FileInputStream input = new FileInputStream(file);
-		byte[] data = new byte[length];
-		int nb = input.read(data);
-		String dump = FSUtils.toString(data, 0, nb);
-		input.close();
-		return dump;
-	}
-	
-    static public String toString(String[] array)
-    {
+        long nbBlocks = size / buf.length;
+        for (long i = 0; i < nbBlocks; i++) {
+            output.write(buf);
+        }
+
+        int remain = (int) (size % 1024);
+        if (remain != 0)
+            output.write(buf, 0, remain);
+
+        output.flush();
+        output.close();
+
+        return file;
+    }
+
+    static public FileSystem formatDevice(Device device,
+            Class< ? extends FileSystem> fsClass, Object formatOptions)
+            throws FileSystemException, IOException {
+        log.info("<<< BEGIN formatDevice >>>");
+
+        // format the device
+        FileSystemType type = getFsType(fsClass);
+        FileSystem fs = type.format(device, formatOptions);
+        fs.close();
+
+        log.info("<<< END formatDevice >>>");
+
+        return fs;
+    }
+
+    static public FileSystem mountDevice(Device device,
+            Class< ? extends FileSystem> fsClass, boolean readOnly)
+            throws IOException, FileSystemException, NameNotFoundException {
+        log.debug("<<< BEGIN mountDevice >>>");
+
+        // mount the device
+        FileSystemType type = getFsType(fsClass);
+        FileSystem fs = type.create(device, readOnly);
+
+        log.debug("<<< END mountDevice >>>");
+
+        return fs;
+    }
+
+    static public FileSystemType getFsType(Class< ? extends FileSystem> fsClass) {
+        FileSystemType fsType = null;
+        if (fsClass == FatFileSystem.class)
+            fsType = new FatFileSystemType();
+        else if (fsClass == Ext2FileSystem.class)
+            fsType = new Ext2FileSystemType();
+        else if (fsClass == ISO9660FileSystem.class)
+            fsType = new ISO9660FileSystemType();
+        else if (fsClass == NTFSFileSystem.class)
+            fsType = new NTFSFileSystemType();
+
+        if (fsType != null)
+            return fsType;
+
+        throw new UnsupportedOperationException(fsClass.getName()
+                + " is unsupported");
+    }
+
+    static public void listEntries(FSEntryIterator iterator) throws Exception {
+        log.debug("<<< BEGIN listEntries >>>");
+        int i = 0;
+        log.debug("------- entries ------");
+        while (iterator.hasNext()) {
+            FSEntry entry = iterator.next();
+            log.debug(i + ":" + entry);
+            i++;
+        }
+        log.debug("--- End of entries ---");
+        log.debug("<<< END listEntries >>>");
+    }
+
+    static public List<String> getEntryNames(FSEntryIterator it) {
+        List<String> names = new ArrayList<String>();
+        while (it.hasNext()) {
+            FSEntry entry = it.next();
+            names.add((entry == null) ? null : entry.getName());
+        }
+        return names;
+    }
+
+    static public String toString(String filename, int offset, int length)
+            throws IOException {
+        // byte[] buf = new byte[1024];
+        File file = new File(filename);
+        FileInputStream input = new FileInputStream(file);
+        byte[] data = new byte[length];
+        int nb = input.read(data);
+        String dump = FSUtils.toString(data, 0, nb);
+        input.close();
+        return dump;
+    }
+
+    static public String toString(String[] array) {
         StringBuffer sb = new StringBuffer("[");
-        
-		if(array != null)
-		{
-	        for(int i = 0 ; i < array.length ; i++)
-	        {
-	            if(i > 0)
-	            {
-	                sb.append(", ");
-	            }
-	            
-	            sb.append(array[i]);
-	        }
-		}
-		
+
+        if (array != null) {
+            for (int i = 0; i < array.length; i++) {
+                if (i > 0) {
+                    sb.append(", ");
+                }
+
+                sb.append(array[i]);
+            }
+        }
+
         sb.append("]");
         return sb.toString();
     }
 
-    static public String toString(List list)
-    {
+    static public String toString(List<String> list) {
         StringBuffer sb = new StringBuffer("[");
-        
-        for(int i = 0 ; i < list.size() ; i++)
-        {
-            if(i > 0)
-            {
+
+        for (int i = 0; i < list.size(); i++) {
+            if (i > 0) {
                 sb.append(", ");
             }
-            
+
             sb.append(list.get(i));
         }
-        
+
         sb.append("]");
         return sb.toString();
     }
-    
-	static public File copyFile(String srcFile, String destFile) throws SecurityException, IOException
-	{
-		return copyInputStreamToFile(new FileInputStream(new File(srcFile)), destFile);
-	}
 
-	static public File copyInputStreamToFile(InputStream src, String destFile) throws SecurityException, IOException
-	{
-		File dest = new File(destFile);
-		
-		if(dest.exists())
-			dest.delete();
-		
-		FileOutputStream fos = null;
+    static public File copyFile(String srcFile, String destFile)
+            throws SecurityException, IOException {
+        return copyInputStreamToFile(new FileInputStream(new File(srcFile)),
+                destFile);
+    }
 
-		try {
-			fos = new FileOutputStream(dest);
+    static public File copyInputStreamToFile(InputStream src, String destFile)
+            throws SecurityException, IOException {
+        File dest = new File(destFile);
 
-			byte[] buffer = new byte[1024];
-			int read = -1;
-			do
-			{
-				read = src.read(buffer, 0, buffer.length);
-				if(read > 0)
-				{			
-					fos.write(buffer, 0, read);
-				}
-			}
-			while(read != -1);
-		} 
-		finally 
-		{
-			if(src != null)
-				src.close();
-			
-			if(fos != null)
-			{
-				fos.flush();
-				fos.close();
-			}
-		}	
-		
-		return dest;
-	}
+        if (dest.exists())
+            dest.delete();
 
-	static public File copyDeviceToFile(Device imageDevice, String destFile) throws SecurityException, IOException, ApiNotFoundException
-	{
-		File dest = new File(destFile);
-		BlockDeviceAPI imgApi = (BlockDeviceAPI) imageDevice.getAPI(BlockDeviceAPI.class);
-		
-		if(dest.exists())
-			dest.delete();
-		
-		FileOutputStream fos = null;
+        FileOutputStream fos = null;
 
-		try {
-			fos = new FileOutputStream(dest);
+        try {
+            fos = new FileOutputStream(dest);
 
-			byte[] buffer = new byte[1024];
-			int toRead = 0;
-			long devOffset = 0;
-			long remaining = imgApi.getLength();
-			while(remaining > 0);
-			{
-				toRead = (int) Math.min(buffer.length, remaining);
-				imgApi.read(devOffset, buffer, 0, toRead);
-				fos.write(buffer, 0, toRead);
-				
-				devOffset += toRead;
-				remaining -= toRead;
-			}
-		} 
-		finally 
-		{
-			if(fos != null)
-			{
-				fos.flush();
-				fos.close();
-			}
-		}	
-		
-		return dest;
-	}
+            byte[] buffer = new byte[1024];
+            int read = -1;
+            do {
+                read = src.read(buffer, 0, buffer.length);
+                if (read > 0) {
+                    fos.write(buffer, 0, read);
+                }
+            } while (read != -1);
+        } finally {
+            if (src != null)
+                src.close();
 
-/*
-	public static Device getFormattedPhysicalDevice(TestConfig config) 
-			throws SecurityException, NameNotFoundException, IOException, FileSystemException
-	{
-		Class fsClass = config.getFsClass();
-		Device device = config.getDevice();
-		
-		// create a formatted FileSystem 
-		// by using the appropriate JNode FileSystem formatter 
-		FileSystem fs = null;
+            if (fos != null) {
+                fos.flush();
+                fos.close();
+            }
+        }
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// This operation is VERY DANGEROUS !!! It format a device.
-// And it can be VERY LONG TO PROCESS (if device has a big capacity)
-// But all this is needed for JUnit test on physical devices.
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  		
-		FileSystemType type = TestUtils.getFsType(fsClass);
-		try {
-			fs = TestUtils.formatDevice(device, fsClass);
-		}
-		finally
-		{
-			if(fs != null)
-				fs.close();
-		}
-		
-		return device;
-	}
-*/
+        return dest;
+    }
 
-	public static void copyInputStreamToDevice(InputStream imageStream, Device workDevice) throws ApiNotFoundException, NameNotFoundException, IOException, FileSystemException
-	{
-		BlockDeviceAPI wrkApi = (BlockDeviceAPI) workDevice.getAPI(BlockDeviceAPI.class);
+    static public File copyDeviceToFile(Device imageDevice, String destFile)
+            throws SecurityException, IOException, ApiNotFoundException {
+        File dest = new File(destFile);
+        BlockDeviceAPI imgApi = (BlockDeviceAPI) imageDevice
+                .getAPI(BlockDeviceAPI.class);
 
-		int sectorSize = 512;
-		byte[] sector = new byte[sectorSize];
-		long nbSectors = wrkApi.getLength() / sectorSize;
-		long devOffset = 0;
-		for(int s = 0 ; s < nbSectors ; s++)
-		{
-			//log.debug("copying sector "+s);
-			int nbRead = imageStream.read(sector);
-			if(nbRead < 0)
-				break;
-			
-			wrkApi.write(devOffset, sector, 0, nbRead);
-			devOffset += nbRead;
-		}
-	}
+        if (dest.exists())
+            dest.delete();
 
-	public static void copyDevice(Device imageDevice, Device workDevice) throws ApiNotFoundException, IOException
-	{
-		BlockDeviceAPI imgApi = (BlockDeviceAPI) imageDevice.getAPI(BlockDeviceAPI.class);
-		BlockDeviceAPI wrkApi = (BlockDeviceAPI) workDevice.getAPI(BlockDeviceAPI.class);
+        FileOutputStream fos = null;
 
-		if(imgApi.getLength() != wrkApi.getLength())
-				throw new IllegalArgumentException("devices of different length");
-//		if(imgApi.getSectorSize() != wrkApi.getSectorSize())
-//			throw new IllegalArgumentException("devices of different sector size");
-		
-		//int sectorSize = imgApi.getSectorSize();
-		int sectorSize = 512;
-		byte[] sector = new byte[sectorSize];
-		long nbSectors = imgApi.getLength() / sectorSize;
-		long devOffset = 0;
-		for(int s = 0 ; s < nbSectors ; s++)
-		{
-			//log.debug("copying sector "+s);
-			imgApi.read(devOffset, sector, 0, sector.length);
-			wrkApi.write(devOffset, sector, 0, sector.length);
-			devOffset += sectorSize;
-		}
-	}
-	
-/*	static protected InputStream createImageFileDevice(TestConfig config) throws NameNotFoundException, IOException, FileSystemException
-	{
-		Class fsClass = config.getFsClass();
-		int sizeInKb = config.getSizeInKb();
-		Object formatOptions = config.getFormatOptions();
-		
-		// create an image file of a formatted FileSystem 
-		// by using the appropriate JNode FileSystem formatter
-		File origFile = TestUtils.makeFile(config.getImageFile(), sizeInKb);
-		InputStream imageFile = new FileInputStream(origFile);
-		FileDevice device = null;			
-		FileSystem fs = null;
-	
-		try {
-			device = new FileDevice(origFile, "rw");			
-			fs = TestUtils.formatDevice(device, fsClass, formatOptions);
-		}
-		finally
-		{
-			if(device != null)
-				device.close();
-			if(fs != null)
-				fs.close();
-		}
-		
-		return imageFile;
-	}
-*/	
-/*	static public void deleteFile(TestConfig config, FileDevice device)
-	{
-		new File(device.getFileName()).delete();
-	}
-*/	
-	static public String[] append(String[] a1, String[] a2)
-	{
-		if(a1 == null)
-			return a2;
-		if(a2 == null)
-			return a1;
-		
-		String[] a = new String[a1.length+a2.length];
-		System.arraycopy(a1, 0, a, 0, a1.length);
-		System.arraycopy(a2, 0, a, a1.length, a2.length);
-		
-		return a;
-	}
-	
-	static public byte[] getTestData(int lengthInWords)
-	{
-		byte[] data = new byte[lengthInWords * 2];
-		int index = 0;
-		for(int i = 0 ; i < lengthInWords ; i++)
-		{
-			data[index] = (byte) (0xFF00 & i);
-			index++;
-			
-			data[index] = (byte) (0x00FF & i);			
-			index++;
-		}
-		
-		return data;
-	}
-	
-	static public boolean equals(byte[] origData, byte[] data)
-	{
-		//return Arrays.equals(origData, data);
-        if (origData==data)
+        try {
+            fos = new FileOutputStream(dest);
+
+            byte[] buffer = new byte[1024];
+            int toRead = 0;
+            long devOffset = 0;
+            long remaining = imgApi.getLength();
+            while (remaining > 0)
+                ;
+            {
+                toRead = (int) Math.min(buffer.length, remaining);
+                imgApi.read(devOffset, buffer, 0, toRead);
+                fos.write(buffer, 0, toRead);
+
+                devOffset += toRead;
+                remaining -= toRead;
+            }
+        } finally {
+            if (fos != null) {
+                fos.flush();
+                fos.close();
+            }
+        }
+
+        return dest;
+    }
+
+    /*
+     * public static Device getFormattedPhysicalDevice(TestConfig config) throws
+     * SecurityException, NameNotFoundException, IOException,
+     * FileSystemException { Class fsClass = config.getFsClass(); Device device =
+     * config.getDevice(); // create a formatted FileSystem // by using the
+     * appropriate JNode FileSystem formatter FileSystem fs = null; //
+     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
+     * This operation is VERY DANGEROUS !!! It format a device. // And it can be
+     * VERY LONG TO PROCESS (if device has a big capacity) // But all this is
+     * needed for JUnit test on physical devices. //
+     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     * FileSystemType type = TestUtils.getFsType(fsClass); try { fs =
+     * TestUtils.formatDevice(device, fsClass); } finally { if(fs != null)
+     * fs.close(); } return device; }
+     */
+
+    public static void copyInputStreamToDevice(InputStream imageStream,
+            Device workDevice) throws ApiNotFoundException,
+            NameNotFoundException, IOException, FileSystemException {
+        BlockDeviceAPI wrkApi = (BlockDeviceAPI) workDevice
+                .getAPI(BlockDeviceAPI.class);
+
+        int sectorSize = 512;
+        byte[] sector = new byte[sectorSize];
+        long nbSectors = wrkApi.getLength() / sectorSize;
+        long devOffset = 0;
+        for (int s = 0; s < nbSectors; s++) {
+            // log.debug("copying sector "+s);
+            int nbRead = imageStream.read(sector);
+            if (nbRead < 0)
+                break;
+
+            wrkApi.write(devOffset, sector, 0, nbRead);
+            devOffset += nbRead;
+        }
+    }
+
+    public static void copyDevice(Device imageDevice, Device workDevice)
+            throws ApiNotFoundException, IOException {
+        BlockDeviceAPI imgApi = (BlockDeviceAPI) imageDevice
+                .getAPI(BlockDeviceAPI.class);
+        BlockDeviceAPI wrkApi = (BlockDeviceAPI) workDevice
+                .getAPI(BlockDeviceAPI.class);
+
+        if (imgApi.getLength() != wrkApi.getLength())
+            throw new IllegalArgumentException("devices of different length");
+        // if(imgApi.getSectorSize() != wrkApi.getSectorSize())
+        // throw new IllegalArgumentException("devices of different sector
+        // size");
+
+        // int sectorSize = imgApi.getSectorSize();
+        int sectorSize = 512;
+        byte[] sector = new byte[sectorSize];
+        long nbSectors = imgApi.getLength() / sectorSize;
+        long devOffset = 0;
+        for (int s = 0; s < nbSectors; s++) {
+            // log.debug("copying sector "+s);
+            imgApi.read(devOffset, sector, 0, sector.length);
+            wrkApi.write(devOffset, sector, 0, sector.length);
+            devOffset += sectorSize;
+        }
+    }
+
+    /*
+     * static protected InputStream createImageFileDevice(TestConfig config)
+     * throws NameNotFoundException, IOException, FileSystemException { Class
+     * fsClass = config.getFsClass(); int sizeInKb = config.getSizeInKb();
+     * Object formatOptions = config.getFormatOptions(); // create an image file
+     * of a formatted FileSystem // by using the appropriate JNode FileSystem
+     * formatter File origFile = TestUtils.makeFile(config.getImageFile(),
+     * sizeInKb); InputStream imageFile = new FileInputStream(origFile);
+     * FileDevice device = null; FileSystem fs = null; try { device = new
+     * FileDevice(origFile, "rw"); fs = TestUtils.formatDevice(device, fsClass,
+     * formatOptions); } finally { if(device != null) device.close(); if(fs !=
+     * null) fs.close(); } return imageFile; }
+     */
+    /*
+     * static public void deleteFile(TestConfig config, FileDevice device) { new
+     * File(device.getFileName()).delete(); }
+     */
+    static public String[] append(String[] a1, String[] a2) {
+        if (a1 == null)
+            return a2;
+        if (a2 == null)
+            return a1;
+
+        String[] a = new String[a1.length + a2.length];
+        System.arraycopy(a1, 0, a, 0, a1.length);
+        System.arraycopy(a2, 0, a, a1.length, a2.length);
+
+        return a;
+    }
+
+    static public byte[] getTestData(int lengthInWords) {
+        byte[] data = new byte[lengthInWords * 2];
+        int index = 0;
+        for (int i = 0; i < lengthInWords; i++) {
+            data[index] = (byte) (0xFF00 & i);
+            index++;
+
+            data[index] = (byte) (0x00FF & i);
+            index++;
+        }
+
+        return data;
+    }
+
+    static public boolean equals(byte[] origData, byte[] data) {
+        // return Arrays.equals(origData, data);
+        if (origData == data)
             return true;
-        if (origData==null || data==null)
-        {
-        	//log.debug("equals(byte[], byte[]): only one array is null");
+        if (origData == null || data == null) {
+            // log.debug("equals(byte[], byte[]): only one array is null");
             return false;
         }
 
         int length = origData.length;
-        if (data.length != length)
-        {
-        	//log.debug("equals(byte[], byte[]): array lengths are different");            
-        	return false;
+        if (data.length != length) {
+            // log.debug("equals(byte[], byte[]): array lengths are different");
+            return false;
         }
 
-        for (int i=0; i<length; i++)
-            if (origData[i] != data[i])
-            {
-            	//log.debug("equals(byte[], byte[]): array are different at index 0x"+Integer.toHexString(i));
-            	//log.debug("origData:\n"+FSUtils.toString(origData, 0, 512));
-            	//log.debug("data:\n"+FSUtils.toString(data, 0, 512));
+        for (int i = 0; i < length; i++)
+            if (origData[i] != data[i]) {
+                // log.debug("equals(byte[], byte[]): array are different at
+                // index 0x"+Integer.toHexString(i));
+                // log.debug("origData:\n"+FSUtils.toString(origData, 0, 512));
+                // log.debug("data:\n"+FSUtils.toString(data, 0, 512));
                 return false;
             }
 
-        return true;		
-	}
-	
-	static public String[] getEmptyDirNames(Class fsClass, boolean isRoot)
-	{
-		if(fsClass == Ext2FileSystem.class)
-			return new String[]{".", "..", "lost+found"};
-		else if(fsClass == ISO9660FileSystem.class)
-			return new String[]{".", ".."};
-		else if(fsClass == NTFSFileSystem.class)
-			return new String[]{"."};
-		else
-			return null;
-	}		
-	
-	static public RamDiskDevice createRamDisk(int size)
-	{
-		RamDiskDevice dev = null;
-		try {
-			final DeviceManager dm = (DeviceManager)InitialNaming.lookup(DeviceManager.NAME);
-			dev = new RamDiskDevice(null, "dummy", size);
-			dev.setDriver(new RamDiskDriver(null));
-			dm.register(dev);
-		} catch (NameNotFoundException e) {
-            log.error(e);
-		} catch (DeviceAlreadyRegisteredException e) {
-            log.error(e);
-		} catch (DriverException e) {
-            log.error(e);
-		}		
-	
-/*		
-        FileSystemService fileSystemService = (FileSystemService) InitialNaming
-        						.lookup(FileSystemService.NAME);
-		FileSystemType type = fileSystemService
-		        .getFileSystemTypeForNameSystemTypes(FatFileSystemType.NAME);
-		type.format(dev, new Integer(Fat.FAT16));
-		
-		// restart the device
-		log.info("Restart initrd ramdisk");
-		dm.stop(dev);
-		dm.start(dev);
-*/		
-		return dev;
-	}
+        return true;
+    }
 
-	/**
-	 * 
-	 * @param className
-	 * @param cls
-	 * @return
-	 * @throws Exception
-	 */
-	static public Object newInstance(String className, Class cls) throws Exception
-	{
-		Class clazz = Class.forName(className);
-		Object instance = clazz.newInstance();
-		if((instance != null) && !cls.isAssignableFrom(instance.getClass()))
-			throw new IllegalArgumentException(className+" is not an instanceof "+cls.getName());
-		
-		return instance;
-	}
+    static public String[] getEmptyDirNames(Class fsClass, boolean isRoot) {
+        if (fsClass == Ext2FileSystem.class)
+            return new String[] { ".", "..", "lost+found" };
+        else if (fsClass == ISO9660FileSystem.class)
+            return new String[] { ".", ".." };
+        else if (fsClass == NTFSFileSystem.class)
+            return new String[] { "." };
+        else
+            return null;
+    }
 
-	static private final Logger log = Logger.getLogger(TestUtils.class);	
+    static public RamDiskDevice createRamDisk(int size) {
+        RamDiskDevice dev = null;
+        try {
+            final DeviceManager dm = (DeviceManager) InitialNaming
+                    .lookup(DeviceManager.NAME);
+            dev = new RamDiskDevice(null, "dummy", size);
+            dev.setDriver(new RamDiskDriver(null));
+            dm.register(dev);
+        } catch (NameNotFoundException e) {
+            log.error(e);
+        } catch (DeviceAlreadyRegisteredException e) {
+            log.error(e);
+        } catch (DriverException e) {
+            log.error(e);
+        }
+
+        /*
+         * FileSystemService fileSystemService = (FileSystemService)
+         * InitialNaming .lookup(FileSystemService.NAME); FileSystemType type =
+         * fileSystemService
+         * .getFileSystemTypeForNameSystemTypes(FatFileSystemType.NAME);
+         * type.format(dev, new Integer(Fat.FAT16)); // restart the device
+         * log.info("Restart initrd ramdisk"); dm.stop(dev); dm.start(dev);
+         */
+        return dev;
+    }
+
+    /**
+     * @param className
+     * @param cls
+     * @return
+     * @throws Exception
+     */
+    static public Object newInstance(String className, Class< ? > cls)
+            throws Exception {
+        Class< ? > clazz = Class.forName(className);
+        Object instance = clazz.newInstance();
+        if ((instance != null) && !cls.isAssignableFrom(instance.getClass()))
+            throw new IllegalArgumentException(className
+                    + " is not an instanceof " + cls.getName());
+
+        return instance;
+    }
+
+    static private final Logger log = Logger.getLogger(TestUtils.class);
 }

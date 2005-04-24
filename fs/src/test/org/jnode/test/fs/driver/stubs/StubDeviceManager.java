@@ -18,12 +18,11 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.test.fs.driver.stubs;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -38,55 +37,45 @@ import org.jnode.driver.DriverException;
  * 
  * @author epr
  */
-public class StubDeviceManager extends AbstractDeviceManager 
-{
-    public static final Logger log = Logger.getLogger(StubDeviceManager.class);    
-    public static final StubDeviceManager INSTANCE = new StubDeviceManager(); 
-    
-    private List finders = new ArrayList();
-    private List mappers = new ArrayList();
-    
-    private StubDeviceManager()
-    {   
+public class StubDeviceManager extends AbstractDeviceManager {
+    public static final Logger log = Logger.getLogger(StubDeviceManager.class);
+
+    public static final StubDeviceManager INSTANCE = new StubDeviceManager();
+
+    private List<DeviceFinder> finders = new ArrayList<DeviceFinder>();
+
+    private List<DeviceToDriverMapper> mappers = new ArrayList<DeviceToDriverMapper>();
+
+    private StubDeviceManager() {
     }
-    
-    public void removeAll()
-    {
+
+    public void removeAll() {
         finders.clear();
         mappers.clear();
 
-        for(Iterator it = getDevices().iterator() ; it.hasNext() ; )
-        {
-            Device device = (Device) it.next();
-            try
-            {
+        for (Device device : getDevices()) {
+            try {
                 unregister(device);
-            }
-            catch (DriverException e)
-            {
-                log.error("can't unregister "+device);
+            } catch (DriverException e) {
+                log.error("can't unregister " + device);
             }
         }
     }
-    
-    public void add(DeviceFinder finder, DeviceToDriverMapper mapper)
-    {
+
+    public void add(DeviceFinder finder, DeviceToDriverMapper mapper) {
         boolean doStart = false;
-        
-        if(!finders.contains(finder))
-        {
+
+        if (!finders.contains(finder)) {
             finders.add(finder);
             doStart = true;
         }
 
-        if(!mappers.contains(mapper))
-        {
+        if (!mappers.contains(mapper)) {
             mappers.add(mapper);
             doStart = true;
         }
-                
-        if(doStart)
-        {
+
+        if (doStart) {
             start();
         }
     }
@@ -95,39 +84,37 @@ public class StubDeviceManager extends AbstractDeviceManager
      * Start this manager
      */
     final public void start() {
-//      Thread thread = new Thread()
-//      {
-//          public void run()
-//          {
-              log.debug("Loading extensions ...");                
-              loadExtensions();                
-              log.debug("Extensions loaded !");                
-//          }
-//      };
-//      thread.start();
+        // Thread thread = new Thread()
+        // {
+        // public void run()
+        // {
+        log.debug("Loading extensions ...");
+        loadExtensions();
+        log.debug("Extensions loaded !");
+        // }
+        // };
+        // thread.start();
 
-      try
-      {
-          // must be called before findDeviceDrivers
-          log.debug("findDevices ...");
-          findDevices();
-          
-          log.debug("findDeviceDrivers ...");
-          findDeviceDrivers();
-          
-          log.debug("StubDeviceManager initialized !");
-      }
-      catch (InterruptedException e)
-      {
-          log.fatal("can't find devices", e);
-      }
-    }    
-    
+        try {
+            // must be called before findDeviceDrivers
+            log.debug("findDevices ...");
+            findDevices();
+
+            log.debug("findDeviceDrivers ...");
+            findDeviceDrivers();
+
+            log.debug("StubDeviceManager initialized !");
+        } catch (InterruptedException e) {
+            log.fatal("can't find devices", e);
+        }
+    }
+
     /**
      * Refresh the list of finders, based on the mappers extension-point.
+     * 
      * @param finders
      */
-    protected final void refreshFinders(List finders) {
+    protected final void refreshFinders(List<DeviceFinder> finders) {
         log.info("refreshFinders");
         finders.clear();
         finders.addAll(this.finders);
@@ -135,13 +122,14 @@ public class StubDeviceManager extends AbstractDeviceManager
 
     /**
      * Refresh the list of mappers, based on the mappers extension-point.
+     * 
      * @param mappers
      */
-    protected final void refreshMappers(List mappers) {
+    protected final void refreshMappers(List<DeviceToDriverMapper> mappers) {
         log.info("refreshMappers");
         mappers.clear();
         mappers.addAll(this.mappers);
-        
+
         // Now sort them
         Collections.sort(mappers, MapperComparator.INSTANCE);
     }

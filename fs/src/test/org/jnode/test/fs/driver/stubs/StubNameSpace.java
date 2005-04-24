@@ -29,42 +29,34 @@ import org.apache.log4j.Logger;
 import org.jnode.naming.DefaultNameSpace;
 import org.jnode.test.support.MockUtils;
 
-public class StubNameSpace extends DefaultNameSpace
-{
-    private static final Logger log = Logger.getLogger(StubNameSpace.class);               
-    
-    public StubNameSpace()
-    {      
+public class StubNameSpace extends DefaultNameSpace {
+    private static final Logger log = Logger.getLogger(StubNameSpace.class);
+
+    public StubNameSpace() {
     }
-    
+
     /**
      * Lookup a service with a given name.
+     * 
      * @param name
-     * @throws NameNotFoundException if the name was not found in this namespace
+     * @throws NameNotFoundException
+     *             if the name was not found in this namespace
      */
-    public Object lookup(Class name) 
-    throws NameNotFoundException {
-        if(!namespace.containsKey(name))
-        {        
+    public <T> T lookup(Class<T> name) throws NameNotFoundException {
+        if (!namespace.containsKey(name)) {
             createAndBindMockService(name);
         }
-        
+
         return super.lookup(name);
     }
-    
-    protected void createAndBindMockService(Class name)
-    {
-        try
-        {
+
+    protected void createAndBindMockService(Class name) {
+        try {
             bind(name, MockUtils.createMockObject(name));
-        }
-        catch (NameAlreadyBoundException e)
-        {
+        } catch (NameAlreadyBoundException e) {
+            log.error("can't bind service", e);
+        } catch (NamingException e) {
             log.error("can't bind service", e);
         }
-        catch (NamingException e)
-        {
-            log.error("can't bind service", e);
-        }        
     }
 }
