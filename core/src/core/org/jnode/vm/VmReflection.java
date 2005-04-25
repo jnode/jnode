@@ -58,7 +58,7 @@ public class VmReflection {
 			return (getStaticFieldAddress(sf).loadInt() != 0);
 		} else {
 			final VmInstanceField inf = (VmInstanceField) field;
-			return (getInstanceFieldAddress(o, inf).loadInt() != 0);
+			return (getInstanceFieldAddress(o, inf).loadByte() != 0);
 		}
 	}
 
@@ -69,7 +69,7 @@ public class VmReflection {
 			return (byte) getStaticFieldAddress(sf).loadInt();
 		} else {
 			final VmInstanceField inf = (VmInstanceField) field;
-			return (byte)getInstanceFieldAddress(o, inf).loadInt();
+			return (byte)getInstanceFieldAddress(o, inf).loadByte();
 		}
 	}
 
@@ -80,7 +80,7 @@ public class VmReflection {
 			return (char) getStaticFieldAddress(sf).loadInt();
 		} else {
 			final VmInstanceField inf = (VmInstanceField) field;
-			return (char)getInstanceFieldAddress(o, inf).loadInt();
+			return (char)getInstanceFieldAddress(o, inf).loadChar();
 		}
 	}
 
@@ -91,7 +91,7 @@ public class VmReflection {
 			return (short) getStaticFieldAddress(sf).loadInt();
 		} else {
 			final VmInstanceField inf = (VmInstanceField) field;
-			return (short)getInstanceFieldAddress(o, inf).loadInt();
+			return (short)getInstanceFieldAddress(o, inf).loadShort();
 		}
 	}
 
@@ -170,7 +170,7 @@ public class VmReflection {
 			getStaticFieldAddress(sf).store((int)(value ? 1 : 0));
 		} else {
 			final VmInstanceField inf = (VmInstanceField) field;
-			getInstanceFieldAddress(o, inf).store((int)(value ? 1 : 0));
+			getInstanceFieldAddress(o, inf).store((byte)(value ? 1 : 0));
 		}
 	}
 
@@ -181,7 +181,7 @@ public class VmReflection {
 			getStaticFieldAddress(sf).store((int)value);
 		} else {
 			final VmInstanceField inf = (VmInstanceField) field;
-			getInstanceFieldAddress(o, inf).store((int)value);
+			getInstanceFieldAddress(o, inf).store((byte)value);
 		}
 	}
 
@@ -192,7 +192,7 @@ public class VmReflection {
 			getStaticFieldAddress(sf).store((int)value);
 		} else {
 			final VmInstanceField inf = (VmInstanceField) field;
-			getInstanceFieldAddress(o, inf).store((int)value);
+			getInstanceFieldAddress(o, inf).store((char)value);
 		}
 	}
 
@@ -203,7 +203,7 @@ public class VmReflection {
 			getStaticFieldAddress(sf).store((int)value);
 		} else {
 			final VmInstanceField inf = (VmInstanceField) field;
-			getInstanceFieldAddress(o, inf).store((int)value);
+			getInstanceFieldAddress(o, inf).store((short)value);
 		}
 	}
 
