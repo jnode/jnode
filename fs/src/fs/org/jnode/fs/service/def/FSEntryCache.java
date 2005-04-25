@@ -21,7 +21,6 @@
  
 package org.jnode.fs.service.def;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 

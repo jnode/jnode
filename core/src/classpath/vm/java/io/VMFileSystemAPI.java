@@ -24,6 +24,7 @@ package java.io;
 /**
  * The implementation of this interface is used to connect the java.io package with the JNode
  * filesystem services.
+ * The file paths given to the various methods are absolute and canonical.
  * 
  * @modif  add mkDir mkFile   Yves Galante (yves.galante@jmob.net) 01.04.2004
  * @author epr

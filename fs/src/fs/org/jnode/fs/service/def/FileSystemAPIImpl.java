@@ -18,12 +18,11 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.fs.service.def;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.VMFileHandle;
 import java.io.VMFileSystemAPI;
@@ -41,567 +40,592 @@ import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 
 /**
- * 
- * @modif  add mkDir mkFile   Yves Galante (yves.galante@jmob.net) 01.04.2004
+ * @modif add mkDir mkFile Yves Galante (yves.galante@jmob.net) 01.04.2004
  * @author epr
  */
 final class FileSystemAPIImpl implements VMFileSystemAPI {
 
-	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
-	/** My filesystem manager */
-	final FileSystemManager fsm;
-	private final FSEntryCache entryCache;
-	private final FileHandleManager fhm;
+    /** My logger */
+    private final Logger log = Logger.getLogger(getClass());
 
-	/**
-	 * Create a new instance
-	 * 
-	 * @param fsm
-	 */
-	public FileSystemAPIImpl(FileSystemManager fsm) {
-		this.fsm = fsm;
-		this.entryCache = new FSEntryCache(fsm);
-		this.fhm = new FileHandleManager();
-	}
+    /** My filesystem manager */
+    final FileSystemManager fsm;
 
-	/**
-	 * Does the given file exist?
-	 */
-	public boolean fileExists(String file) {
-      final FSEntry entry = getEntry(file);
-      return (entry != null);
-	}
+    private final FSEntryCache entryCache;
 
-	/**
-	 * Is the given File a plain file?
-	 */
-	public boolean isFile(String file) {
-		final FSEntry entry = getEntry(file);
-		return (entry != null) && (entry.isFile());
-	}
+    private final FileHandleManager fhm;
 
-	/**
-	 * Is the given File a directory?
-	 */
-	public boolean isDirectory(String file) {
-		final FSEntry entry = getEntry(file);
-		return (entry != null) && (entry.isDirectory());
-	}
+    /**
+     * Create a new instance
+     * 
+     * @param fsm
+     */
+    public FileSystemAPIImpl(FileSystemManager fsm) {
+        this.fsm = fsm;
+        this.entryCache = new FSEntryCache(fsm);
+        this.fhm = new FileHandleManager();
+    }
 
-	/**
-	 * Can the given file be read?
-	 * 
-	 * @param file
-	 */
-	public boolean canRead(String file) {
-		// TODO implement me
-		return true;
-	}
+    /**
+     * Does the given file exist?
+     */
+    public boolean fileExists(String file) {
+        final FSEntry entry = getEntry(file);
+        return (entry != null);
+    }
 
-	/**
-	 * Can the given file be written to?
-	 * 
-	 * @param file
-	 */
-	public boolean canWrite(String file) {
-		// TODO implement me
-		return false;
-	}
+    /**
+     * Is the given File a plain file?
+     */
+    public boolean isFile(String file) {
+        final FSEntry entry = getEntry(file);
+        return (entry != null) && (entry.isFile());
+    }
 
-	/**
-	 * Gets the length in bytes of the given file or 0 if the file does not
-	 * exist.
-	 * 
-	 * @param file
-	 */
-	public long getLength(String file) {
-		final FSEntry entry = getEntry(file);
-		if (entry != null) {
-			if (entry.isFile()) {
-				try {
-					return entry.getFile().getLength();
-				} catch (IOException ex) {
-					log.debug("Error in getLength", ex);
-					return 0;
-				}
-			} else {
-				log.debug("Not a file in getLength");
-				return 0;
-			}
-		} else {
-			log.debug("File not found in getLength (" + file + ")");
-			return 0;
-		}
+    /**
+     * Is the given File a directory?
+     */
+    public boolean isDirectory(String file) {
+        final FSEntry entry = getEntry(file);
+        return (entry != null) && (entry.isDirectory());
+    }
 
-	}
+    /**
+     * Can the given file be read?
+     * 
+     * @param file
+     */
+    public boolean canRead(String file) {
+        // TODO implement me
+        return true;
+    }
 
-	/**
-	 * Gets the last modification date of the given file.
-	 * 
-	 * @param file
-	 */
-	public long getLastModified(String file) {
-		final FSEntry entry = getEntry(file);
-		if (entry != null) {
-			try {
-				return entry.getLastModified();
-			} catch (IOException ex) {
-				return 0;
-			}
-		} else {
-			return 0;
-		}
-	}
+    /**
+     * Can the given file be written to?
+     * 
+     * @param file
+     */
+    public boolean canWrite(String file) {
+        // TODO implement me
+        return false;
+    }
 
-	/**
-	 * Sets the last modification date of the given file.
-	 * 
-	 * @param file
-	 */
-	public void setLastModified(String file, long time) throws IOException {
-		final FSEntry entry = getEntry(file);
-		if (entry != null) {
-			entry.setLastModified(time);
-		} else {
-			throw new FileNotFoundException(file);
-		}
-	}
+    /**
+     * Gets the length in bytes of the given file or 0 if the file does not
+     * exist.
+     * 
+     * @param file
+     */
+    public long getLength(String file) {
+        final FSEntry entry = getEntry(file);
+        if (entry != null) {
+            if (entry.isFile()) {
+                try {
+                    return entry.getFile().getLength();
+                } catch (IOException ex) {
+                    log.debug("Error in getLength", ex);
+                    return 0;
+                }
+            } else {
+                log.debug("Not a file in getLength");
+                return 0;
+            }
+        } else {
+            log.debug("File not found in getLength (" + file + ")");
+            return 0;
+        }
 
-	/**
-	 * Mark the given file as readonly.
-	 * 
-	 * @param file
-	 * @throws IOException
-	 */
-	public void setReadOnly(String file) throws IOException {
-		throw new IOException("Not implemented yet");
-		// TODO implement me
-	}
+    }
 
-	/**
-	 * Delete the given file.
-	 * 
-	 * @param file
-	 * @throws IOException
-	 */
-	public void delete(String file) throws IOException {
+    /**
+     * Gets the last modification date of the given file.
+     * 
+     * @param file
+     */
+    public long getLastModified(String file) {
+        final FSEntry entry = getEntry(file);
+        if (entry != null) {
+            try {
+                return entry.getLastModified();
+            } catch (IOException ex) {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Sets the last modification date of the given file.
+     * 
+     * @param file
+     */
+    public void setLastModified(String file, long time) throws IOException {
+        final FSEntry entry = getEntry(file);
+        if (entry != null) {
+            entry.setLastModified(time);
+        } else {
+            throw new FileNotFoundException(file);
+        }
+    }
+
+    /**
+     * Mark the given file as readonly.
+     * 
+     * @param file
+     * @throws IOException
+     */
+    public void setReadOnly(String file) throws IOException {
+        throw new IOException("Not implemented yet");
+        // TODO implement me
+    }
+
+    /**
+     * Delete the given file.
+     * 
+     * @param file
+     * @throws IOException
+     */
+    public void delete(String file) throws IOException {
         final FSDirectory parentDirectory = getParentDirectoryEntry(file);
         if (parentDirectory == null) {
             throw new IOException("Parent of " + file + " not found");
         }
-        
-		parentDirectory.remove(getName(file));
-		entryCache.removeEntries(file);
-	}
 
-	/**
-	 * This method returns an array of filesystem roots.
-	 */
-	public File[] getRoots() {
-		final Set<String> rootSet = fsm.fileSystemRoots();
-		final File[] list = new File[rootSet.size()];
-		final Iterator<String> i = rootSet.iterator();
-		for (int j = 0; j < list.length; j++) {
-			list[j] = new File(i.next());
-		}
-		return list;
-	}
-
-	/**
-	 * When the filesystem is unregistered, the entries belonging to that filesystem are removed 
-	 * from the entry cache.
-     * 
-     * @param root absolute path
-	 */
-	public void rootRemoved(String root) {
-		entryCache.removeEntries(root);
-	}
-
-	
-	/**
-	 * Gets an array of names of all entries of the given directory. All names
-	 * are relative to the given directory.
-	 * 
-	 * @param directory
-	 * @param filter
-	 */
-	public String[] list(String directory) throws IOException {
-		final FSEntry entry = getEntry(directory);
-		if (entry == null) {
-			throw new FileNotFoundException(directory);
-		}
-		if (!entry.isDirectory()) {
-			throw new IOException("Cannot list on non-directories " + directory);
-		}
-		final ArrayList<String> list = new ArrayList<String>();
-		for (FSEntryIterator i = entry.getDirectory().iterator(); i.hasNext();) {
-			final FSEntry child = i.next();
-			final String name = child.getName();
-            list.add(name);
-		}
-		return list.toArray(new String[list.size()]);
-	}
-
-	/**
-	 * Gets the FSEntry for the given path, or null if not found.
-	 * 
-	 * @param path must be an absolute canonical path
-	 */
-	private FSEntry getEntry(String path) {
-		try {
-            if(path == null)
-            {
-                return null;
-            }
-            
-			if (File.separator.equals(path))
-				return new VirtualRoot();
-
-			FSEntry entry = entryCache.getEntry(path);
-			if (entry != null) {
-				return entry;
-			}
-			final FSDirectory parentEntry = getParentDirectoryEntry(path);
-			if (parentEntry != null) {
-				try {
-					entry = parentEntry.getEntry(path);
-					entryCache.setEntry(path, entry);
-					return entry;
-				} catch (IOException ex) {
-					// Not found
-					log.debug("parent.getEntry failed", ex);
-					ex.printStackTrace();
-					return null;
-				}
-			} else {
-				// Root name
-				final FileSystem fs = fsm.getFileSystem(path);
-				if (fs == null) {
-					return null;
-				}
-				try {
-					entry = fs.getRootEntry();
-					entryCache.setEntry(path, entry);
-					return entry;
-				} catch (IOException ex) {
-					log.debug("Filesystem.getRootEntry failed", ex);
-					ex.printStackTrace();
-					return null;
-				}
-			}
-		} catch (IOException e) {
-			log.debug("Filesystem.getRootEntry failed", e);
-			return null;
-		}
-
-	}
-
-	/**
-	 * Open a given file
-	 * 
-	 * @param file absolute path
-	 * @throws IOException
-	 */
-	public VMFileHandle open(String file, VMOpenMode mode) throws IOException {
-		FSEntry entry = getEntry(file);
-		if ((entry != null) && !entry.isFile()) {
-			throw new IOException("Not a file " + file);
-		}
-		if (entry == null) {
-			if (mode.canWrite()) {
-				// Try to create the file
-                FSDirectory parent = getParentDirectoryEntry(file);
-				if (parent == null) {
-					throw new IOException(
-						"Cannot create " + file + ", parent directory does not exist");
-				}
-                
-				// Ok, add the file
-				entry = parent.addFile(getName(file));
-			} else {
-				throw new FileNotFoundException(file);
-			}
-		}
-		return fhm.open(entry.getFile(), mode);
-		// TODO open need not create the file but throw FileNotFoundException
-	}
-
-	/**
-	 * Make a directory
-	 * 
-	 * @param file
-	 * @throws IOException
-	 */
-	public boolean mkDir(String file, VMOpenMode mode) throws IOException {
-		FSEntry entry = getEntry(file);
-		if ((entry != null) || !mode.canWrite()) {
-		    return false;
-		}
-		FSDirectory directory = getParentDirectoryEntry(file);		
-		if(directory == null)
-			return false;
-		// Ok, add the dir
-		entry = directory.addDirectory(getName(file));
-		return true;
-	}
-	
-	
-	/**
-	 * Make a file
-	 * 
-	 * @param file
-	 * @throws IOException
-	 */
-	public boolean mkFile(String file, VMOpenMode mode) throws IOException {
-		FSEntry entry = getEntry(file);
-		if ((entry != null) || !mode.canWrite()) {
-			return false; 
-		}
-		FSDirectory directory = getParentDirectoryEntry(file);		
-		if(directory == null)
-			return false;
-        // Ok, make the file
-	    entry = directory.addFile(getName(file));
-		return true;
-	}
-	
-	/**
-	 * Get the parent entry of a file
-	 * 
-	 * @param file absolute path
-	 * @return the directory entry, null if not exite or not a directory
-	 * @throws IOException
-	 */
-	private  FSDirectory getParentDirectoryEntry(String file) throws IOException{
-		if(file==null){
-			return null;
-		}
-		final FSEntry dirEntry = getEntry(getParentPath(file));
-		if (dirEntry == null) {
-			return null;
-		}
-		if (!dirEntry.isDirectory()) {
-			return null;
-		}
-		return dirEntry.getDirectory();
-	}
+        parentDirectory.remove(getName(file));
+        entryCache.removeEntries(file);
+    }
 
     /**
+     * This method returns an array of filesystem roots.
+     */
+    public File[] getRoots() {
+        final Set<String> rootSet = fsm.fileSystemRoots();
+        final File[] list = new File[rootSet.size()];
+        final Iterator<String> i = rootSet.iterator();
+        for (int j = 0; j < list.length; j++) {
+            list[j] = new File(i.next());
+        }
+        return list;
+    }
+
+    /**
+     * When the filesystem is unregistered, the entries belonging to that
+     * filesystem are removed from the entry cache.
      * 
+     * @param root
+     *            absolute path
+     */
+    public void rootRemoved(String root) {
+        entryCache.removeEntries(root);
+    }
+
+    /**
+     * Gets an array of names of all entries of the given directory. All names
+     * are relative to the given directory.
+     * 
+     * @param directory
+     * @param filter
+     */
+    public String[] list(String directory) throws IOException {
+        final FSEntry entry = getEntry(directory);
+        if (entry == null) {
+            throw new FileNotFoundException(directory);
+        }
+        if (!entry.isDirectory()) {
+            throw new IOException("Cannot list on non-directories " + directory);
+        }
+        final ArrayList<String> list = new ArrayList<String>();
+        for (FSEntryIterator i = entry.getDirectory().iterator(); i.hasNext();) {
+            final FSEntry child = i.next();
+            final String name = child.getName();
+            list.add(name);
+        }
+        return list.toArray(new String[list.size()]);
+    }
+
+    /**
+     * Gets the FSEntry for the given path, or null if not found.
+     * 
+     * @param path
+     *            must be an absolute canonical path
+     */
+    private FSEntry getEntry(String path) {
+        try {
+            if (path == null) {
+                return null;
+            }
+
+            final int pathLen = path.length();
+            if (pathLen > 0) {
+                if ((path.charAt(0) == File.separatorChar)
+                        || (path.charAt(pathLen - 1) == File.separatorChar)) {
+                    throw new IllegalArgumentException("Invalid path: " + path);
+                }
+            }
+
+            if (path.length() == 0) {
+                return new VirtualRoot();
+            }
+
+            FSEntry entry = entryCache.getEntry(path);
+            if (entry != null) {
+                return entry;
+            }
+            final FSDirectory parentEntry = getParentDirectoryEntry(path);
+            if (parentEntry != null) {
+                try {
+                    entry = parentEntry.getEntry(stripParentPath(path));
+                    entryCache.setEntry(path, entry);
+                    return entry;
+                } catch (IOException ex) {
+                    // Not found
+                    log.debug("parent.getEntry failed", ex);
+                    ex.printStackTrace();
+                    return null;
+                }
+            } else {
+                // Root name
+                final FileSystem fs = fsm.getFileSystem(path);
+                if (fs == null) {
+                    return null;
+                }
+                try {
+                    entry = fs.getRootEntry();
+                    entryCache.setEntry(path, entry);
+                    return entry;
+                } catch (IOException ex) {
+                    log.debug("Filesystem.getRootEntry failed", ex);
+                    ex.printStackTrace();
+                    return null;
+                }
+            }
+        } catch (IOException e) {
+            log.debug("Filesystem.getRootEntry failed", e);
+            return null;
+        }
+
+    }
+
+    /**
+     * Open a given file
+     * 
+     * @param file
+     *            absolute path
+     * @throws IOException
+     */
+    public VMFileHandle open(String file, VMOpenMode mode) throws IOException {
+        FSEntry entry = getEntry(file);
+        if ((entry != null) && !entry.isFile()) {
+            throw new IOException("Not a file " + file);
+        }
+        if (entry == null) {
+            if (mode.canWrite()) {
+                // Try to create the file
+                FSDirectory parent = getParentDirectoryEntry(file);
+                if (parent == null) {
+                    throw new IOException("Cannot create " + file
+                            + ", parent directory does not exist");
+                }
+
+                // Ok, add the file
+                entry = parent.addFile(getName(file));
+            } else {
+                throw new FileNotFoundException(file);
+            }
+        }
+        return fhm.open(entry.getFile(), mode);
+        // TODO open need not create the file but throw FileNotFoundException
+    }
+
+    /**
+     * Make a directory
+     * 
+     * @param file
+     * @throws IOException
+     */
+    public boolean mkDir(String file, VMOpenMode mode) throws IOException {
+        FSEntry entry = getEntry(file);
+        if ((entry != null) || !mode.canWrite()) {
+            return false;
+        }
+        FSDirectory directory = getParentDirectoryEntry(file);
+        if (directory == null)
+            return false;
+        // Ok, add the dir
+        entry = directory.addDirectory(getName(file));
+        return true;
+    }
+
+    /**
+     * Make a file
+     * 
+     * @param file
+     * @throws IOException
+     */
+    public boolean mkFile(String file, VMOpenMode mode) throws IOException {
+        FSEntry entry = getEntry(file);
+        if ((entry != null) || !mode.canWrite()) {
+            return false;
+        }
+        FSDirectory directory = getParentDirectoryEntry(file);
+        if (directory == null)
+            return false;
+        // Ok, make the file
+        entry = directory.addFile(getName(file));
+        return true;
+    }
+
+    /**
+     * Get the parent entry of a file
+     * 
+     * @param file
+     *            absolute path
+     * @return the directory entry, null if not exite or not a directory
+     * @throws IOException
+     */
+    private FSDirectory getParentDirectoryEntry(String file) throws IOException {
+        if (file == null) {
+            return null;
+        }
+        final FSEntry dirEntry = getEntry(getParentPath(file));
+        if (dirEntry == null) {
+            return null;
+        }
+        if (!dirEntry.isDirectory()) {
+            return null;
+        }
+        return dirEntry.getDirectory();
+    }
+
+    /**
      * @param path
      * @return
      */
-    private String getName(String path)
-    {
-        if(path == null)
-        {
+    private String getName(String path) {
+        if (path == null) {
             return null;
         }
-        
+
         int idx = path.lastIndexOf(File.separatorChar);
         return (idx >= 0) ? path.substring(idx + 1) : path;
     }
 
     /**
+     * Gets the parent path of the given path
      * 
      * @param path
      * @return
      */
-    private String getParentPath(String path)
-    {
-        if(path == null)
-        {
+    private String getParentPath(String path) {
+        if (path == null) {
+            return null;
+        } else {
+            final int idx = path.lastIndexOf(File.separatorChar);
+            return (idx >= 0) ? path.substring(0, idx) : null;
+        }
+    }
+
+    /**
+     * Gets the given path without the parent path
+     * 
+     * @param path
+     * @return
+     */
+    private String stripParentPath(String path) {
+        if (path == null) {
+            return null;
+        } else {
+            final int idx = path.lastIndexOf(File.separatorChar);
+            return (idx >= 0) ? path.substring(idx + 1) : path;
+        }
+    }
+
+    final class VirtualRoot implements FSEntry {
+
+        public String getName() {
+            return File.separator;
+        }
+
+        public FSDirectory getParent() {
             return null;
         }
-        
-        int idx = path.lastIndexOf(File.separatorChar);
-        return (idx >= 0) ? path.substring(0, idx) : null;
+
+        public long getLastModified() {
+            return 0;
+        }
+
+        public boolean isFile() {
+            return false;
+        }
+
+        public boolean isDirectory() {
+            return true;
+        }
+
+        public void setName(String newName) throws IOException {
+            throw new IOException("You cannot rename /");
+        }
+
+        public void setLastModified(long lastModified) throws IOException {
+            throw new IOException("You cannot change /");
+        }
+
+        public FSFile getFile() throws IOException {
+            throw new IOException("This is not a file");
+        }
+
+        public FSDirectory getDirectory() {
+            return new VirtualRootDirectory();
+        }
+
+        public FSAccessRights getAccessRights() {
+            return null;
+        }
+
+        public boolean isValid() {
+            return true;
+        }
+
+        public FileSystem getFileSystem() {
+            return null;
+        }
+
+        public boolean isDirty() throws IOException {
+            return false;
+        }
+
     }
-    
-	final class VirtualRoot implements FSEntry {
 
-		public String getName() {
-			return File.separator;
-		}
+    final class VirtualRootDirectory implements FSDirectory {
 
-		public FSDirectory getParent() {
-			return null;
-		}
+        public FSEntryIterator iterator() {
+            return new RootsIterator(fsm.fileSystemRoots().iterator());
+        }
 
-		public long getLastModified() {
-			return 0;
-		}
+        public FSEntry getEntry(String name) throws IOException {
+            for (FSEntryIterator it = iterator(); it.hasNext();) {
+                FSEntry entry = it.next();
+                if (entry.getName().equals(name))
+                    return entry;
+            }
 
-		public boolean isFile() {
-			return false;
-		}
-		public boolean isDirectory() {
-			return true;
-		}
+            throw new IOException("Entry not found: " + name);
+        }
 
-		public void setName(String newName) throws IOException {
-			throw new IOException("You cannot rename /");
-		}
+        public FSEntry addFile(String name) throws IOException {
+            throw new IOException("You cannot modify /");
+        }
 
-		public void setLastModified(long lastModified) throws IOException {
-			throw new IOException("You cannot change /");
-		}
+        public FSEntry addDirectory(String name) throws IOException {
+            throw new IOException("You cannot modify /");
+        }
 
-		public FSFile getFile() throws IOException {
-			throw new IOException("This is not a file");
-		}
+        public void remove(String name) throws IOException {
+            throw new IOException("You cannot modify /");
+        }
 
-		public FSDirectory getDirectory() {
-			return new VirtualRootDirectory();
-		}
+        public boolean isValid() {
+            return true;
+        }
 
-		public FSAccessRights getAccessRights() {
-			return null;
-		}
+        public FileSystem getFileSystem() {
+            return null;
+        }
 
-		public boolean isValid() {
-			return true;
-		}
+        /**
+         * Save all dirty (unsaved) data to the device
+         * 
+         * @throws IOException
+         */
+        public void flush() throws IOException {
+            // do nothing
+        }
+    }
 
-		public FileSystem getFileSystem() {
-			return null;
-		}
+    final class RootsIterator implements FSEntryIterator {
+        private final Iterator<String> fileSystemsRoots;
 
-		public boolean isDirty() throws IOException {
-			return false;
-		}
+        public RootsIterator(Iterator<String> fileSystemsRoots) {
+            this.fileSystemsRoots = fileSystemsRoots;
+        }
 
-	}
+        public boolean hasNext() {
+            return fileSystemsRoots.hasNext();
+        }
 
-	final class VirtualRootDirectory implements FSDirectory {
+        public FSEntry next() {
+            final String fs = fileSystemsRoots.next();
+            return new virtualFSEntry(fs);
+        }
+    }
 
-		public FSEntryIterator iterator() {
-			return new RootsIterator(fsm.fileSystemRoots().iterator());
-		}
+    class virtualFSEntry implements FSEntry {
+        FSEntry underlying;
 
-		public FSEntry getEntry(String name) throws IOException {
-			for(FSEntryIterator it = iterator() ; it.hasNext() ; )
-			{
-				FSEntry entry = it.next();
-				if(entry.getName().equals(name))
-					return entry;
-			}
-			
-			throw new IOException("Entry not found: "+name);
-		}
+        String name;
 
-		public FSEntry addFile(String name) throws IOException {
-			throw new IOException("You cannot modify /");
-		}
+        public virtualFSEntry(String rootName) {
+            try {
+                underlying = fsm.getFileSystem(rootName).getRootEntry();
+                name = rootName;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
-		public FSEntry addDirectory(String name) throws IOException {
-			throw new IOException("You cannot modify /");
-		}
+        public FileSystem getFileSystem() {
+            return underlying.getFileSystem();
+        }
 
-		public void remove(String name) throws IOException {
-			throw new IOException("You cannot modify /");
-		}
+        public String getName() {
+            return name;
+        }
 
-		public boolean isValid() {
-			return true;
-		}
+        public FSDirectory getParent() {
+            return underlying.getParent();
+        }
 
-		public FileSystem getFileSystem() {
-			return null;
-		}
-		
-		/**
-		 * Save all dirty (unsaved) data to the device 
-		 * @throws IOException
-		 */
-		public void flush() throws IOException
-		{
-			//do nothing
-		}
-	}
+        public long getLastModified() throws IOException {
+            return underlying.getLastModified();
+        }
 
-	final class RootsIterator implements FSEntryIterator {
-		private final Iterator<String> fileSystemsRoots;
-		public RootsIterator(Iterator<String> fileSystemsRoots) {
-			this.fileSystemsRoots = fileSystemsRoots;
-		}
-		public boolean hasNext() {
-			return fileSystemsRoots.hasNext();
-		}
-		public FSEntry next() {
-			final String fs = fileSystemsRoots.next();
-			return new virtualFSEntry(fs);
-		}
-	}
+        public boolean isFile() {
+            return underlying.isFile();
+        }
 
-	class virtualFSEntry implements FSEntry {
-		FSEntry underlying;
-		String name;
-		public virtualFSEntry(String rootName) {
-			try {
-				underlying = fsm.getFileSystem(rootName).getRootEntry();
-				name = rootName;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+        public boolean isDirectory() {
+            return underlying.isDirectory();
+        }
 
-		public FileSystem getFileSystem() {
-			return underlying.getFileSystem();
-		}
+        public void setName(String newName) throws IOException {
+            throw new IOException("You cannot modify a root name");
+        }
 
-		public String getName() {
-			return name;
-		}
+        public void setLastModified(long lastModified) throws IOException {
+            throw new IOException("You cannot modify a root name");
+        }
 
-		public FSDirectory getParent() {
-			return underlying.getParent();
-		}
+        public FSFile getFile() throws IOException {
+            return underlying.getFile();
+        }
 
-		public long getLastModified() throws IOException {
-			return underlying.getLastModified();
-		}
+        public FSDirectory getDirectory() throws IOException {
+            return underlying.getDirectory();
+        }
 
-		public boolean isFile() {
-			return underlying.isFile();
-		}
-		public boolean isDirectory() {
-			return underlying.isDirectory();
-		}
+        public FSAccessRights getAccessRights() throws IOException {
+            return underlying.getAccessRights();
+        }
 
-		public void setName(String newName) throws IOException {
-			throw new IOException("You cannot modify a root name");
-		}
+        public boolean isValid() {
+            return underlying.isValid();
+        }
 
-		public void setLastModified(long lastModified) throws IOException {
-			throw new IOException("You cannot modify a root name");
-		}
+        public boolean isDirty() throws IOException {
+            return underlying.isDirty();
+        }
 
-		public FSFile getFile() throws IOException {
-			return underlying.getFile();
-		}
-
-		public FSDirectory getDirectory() throws IOException {
-			return underlying.getDirectory();
-		}
-
-		public FSAccessRights getAccessRights() throws IOException {
-			return underlying.getAccessRights();
-		}
-
-		public boolean isValid() {
-			return underlying.isValid();
-		}
-
-		public boolean isDirty() throws IOException {
-			return underlying.isDirty();
-		}
-
-	}
-	
-
-
-
+    }
 
 }
