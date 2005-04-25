@@ -346,9 +346,21 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     /**
+     * @see org.jnode.assembler.x86.X86Assembler#set64(int, long)
+     */
+    public void set64(int offset, long v64) {
+    }
+
+    /**
      * @see org.jnode.assembler.x86.X86Assembler#set32(int, int)
      */
     public void set32(int offset, int v32) {
+    }
+
+    /**
+     * @see org.jnode.assembler.x86.X86Assembler#set16(int, int)
+     */
+    public void set16(int offset, int v16) {
     }
 
     /**

@@ -390,6 +390,17 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			// System.out.println("Growing stream buffer to " + newLen);
 		}
 	}
+    
+    /**
+     * Allocate space and return the offset of the start of the allocated space.
+     * @see org.jnode.assembler.BootImageNativeStream#allocate(int)
+     */
+    public final int allocate(int size) {
+        ensureSize(size);
+        final int start = m_used;
+        m_used += size;
+        return start;
+    }
 
 	public final int get32(int offset) {
 		int v1 = m_data[offset++];
@@ -559,12 +570,17 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		// Do nothing
 	}
 
-	public final void set32(int offset, int v32) {
-		m_data[offset++] = (byte) (v32 & 0xFF);
-		m_data[offset++] = (byte) ((v32 >> 8) & 0xFF);
-		m_data[offset++] = (byte) ((v32 >> 16) & 0xFF);
-		m_data[offset++] = (byte) ((v32 >> 24) & 0xFF);
+	public final void set16(int offset, int v16) {
+		m_data[offset++] = (byte) (v16 & 0xFF);
+		m_data[offset++] = (byte) ((v16 >> 8) & 0xFF);
 	}
+
+    public final void set32(int offset, int v32) {
+        m_data[offset++] = (byte) (v32 & 0xFF);
+        m_data[offset++] = (byte) ((v32 >> 8) & 0xFF);
+        m_data[offset++] = (byte) ((v32 >> 16) & 0xFF);
+        m_data[offset++] = (byte) ((v32 >> 24) & 0xFF);
+    }
 
 	public final void set64(int offset, long v64) {
 		m_data[offset++] = (byte) (v64 & 0xFF);
@@ -575,14 +591,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		m_data[offset++] = (byte) ((v64 >> 40) & 0xFF);
 		m_data[offset++] = (byte) ((v64 >> 48) & 0xFF);
 		m_data[offset++] = (byte) ((v64 >> 56) & 0xFF);
-	}
-
-	public final void setWord(int offset, long word) {
-		if (mode.is32()) {
-			set32(offset, (int) word);
-		} else {
-			set64(offset, word);
-		}
 	}
 
 	public final void set8(int offset, int v8) {
@@ -3175,6 +3183,15 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		writeObjectRef(object, 0, false);
 	}
 
+    /**
+     * Create 32-bit reference to an absolute address like: dd label
+     * 
+     * @param object
+     */
+    public final void setObjectRef(int offset, Object object) {
+        setObjectRef(offset, object, 0, false);
+    }
+
 	/**
 	 * Create 32-bit reference to an absolute address like: dd label
 	 * 
@@ -3215,6 +3232,47 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			}
 		}
 	}
+
+    /**
+     * Create 32-bit reference to an absolute address like: dd label
+     * 
+     * @param object
+     * @param offset
+     * @param rawAddress
+     *            If true, object is a raw address, not a normal object.
+     */
+    private final void setObjectRef(int dataOffset, Object object, int offset,
+            boolean rawAddress) {
+        if (object == null) {
+            setWord(dataOffset, offset);
+        } else if (rawAddress) {
+            if (mode.is32()) {
+                set32(dataOffset, resolver.addressOf32(object) + offset);
+            } else {
+                set64(dataOffset, resolver.addressOf64(object) + offset);
+            }
+        } else if ((resolver != null) && (!(object instanceof Label))) {
+            if (mode.is32()) {
+                set32(dataOffset, resolver.addressOf32(object) + offset);
+            } else {
+                set64(dataOffset, resolver.addressOf64(object) + offset);
+            }
+        } else {
+            final X86ObjectRef ref = (X86ObjectRef) getObjectRef(object);
+            if (ref.isResolved()) {
+                try {
+                    //System.out.println("Resolved offset " + ref.getOffset());
+                    setWord(dataOffset, ref.getOffset() + baseAddr + offset);
+                } catch (UnresolvedObjectRefException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                //System.out.println("Unresolved");
+                ref.addUnresolvedLink(dataOffset, getWordSize());
+                setWord(dataOffset, -(baseAddr + offset));
+            }
+        }
+    }
 
 	/**
 	 * 

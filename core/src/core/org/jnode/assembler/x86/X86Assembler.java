@@ -221,11 +221,26 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void set32(int offset, int v32);
 
     /**
+     * Sets an 16-bit integer at a given offset.
+     * @param offset
+     * @param v16
+     */
+	public abstract void set16(int offset, int v16);
+
+    /**
      * Sets an 8-bit integer at a given offset.
      * @param offset
      * @param v8
      */
-	public abstract void set8(int offset, int v8);
+    public abstract void set8(int offset, int v8);
+
+    public final void setWord(int offset, long word) {
+        if (mode.is32()) {
+            set32(offset, (int) word);
+        } else {
+            set64(offset, word);
+        }
+    }
 
     /**
      * Sets the target offset of a given label to the current position.
