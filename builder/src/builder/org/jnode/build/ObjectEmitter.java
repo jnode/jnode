@@ -381,7 +381,19 @@ public class ObjectEmitter {
                     } else if (!jnodeField.isPrimitive()) {
                         os.setWord(fldOffset, 0);
                     } else {
-                        os.set32(fldOffset, 0);
+                        switch (jnodeField.getTypeSize()) {
+                        case 1:
+                            os.set8(fldOffset, 0);
+                            break;
+                        case 2:
+                            os.set16(fldOffset, 0);
+                            break;
+                        case 4:
+                            os.set32(fldOffset, 0);
+                            break;
+                        default:
+                            throw new BuildException("Invalid typesize in: " + jnodeField);    
+                        }
                     }
                     if (debugWriter != null) {
                         debugWriter.println(jnodeField.getName()
