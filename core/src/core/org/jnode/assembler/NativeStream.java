@@ -113,6 +113,36 @@ public abstract class NativeStream {
 	 */
 	//public abstract void writeObjectRef(Object object);
 
+    /**
+     * Write a 64-bit integer
+     * @param value
+     */
+    public abstract void set64(int offset, long value);
+
+    /**
+     * Write a 32-bit integer
+     * @param value
+     */
+    public abstract void set32(int offset, int value);
+
+    /**
+     * Write a 16-bit short
+     * @param value
+     */
+    public abstract void set16(int offset, int value);
+
+    /**
+     * Write a 8-bit byte
+     * @param value
+     */
+    public abstract void set8(int offset, int value);
+
+    /**
+     * Write a word with the processor specific word size.
+     * @param word
+     */
+    public abstract void setWord(int offset, long word);
+
 	/**
 	 * Write a 64-bit integer
 	 * @param value

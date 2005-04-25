@@ -35,4 +35,17 @@ public interface BootImageNativeStream {
 	 */
 	public void writeObjectRef(Object object);
 
+    /**
+     * Write a reference to the given object
+     * @param object
+     */
+    public void setObjectRef(int offset, Object object);
+    
+    /**
+     * Allocate space from the current position and return the current position.
+     * @param size
+     * @return The start of the allocated region.
+     */
+    public int allocate(int size);
+
 }
