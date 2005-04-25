@@ -153,8 +153,8 @@ yieldPointHandler_restore:
 	
 	; Fix old stack overflows
 yieldPointHandler_fixOldStackOverflow:
-	mov ecx,[ADI+VmThread_STACKOVERFLOW_OFS]
-	test ecx,ecx
+	mov cl,[ADI+VmThread_STACKOVERFLOW_S1_OFS]
+	test cl,cl
 	jnz yieldPointHandler_fixStackOverflow
 yieldPointHandler_afterStackOverflow:
 	; Set the new thread parameters
@@ -183,7 +183,7 @@ yieldPointHandler_fixStackOverflow:
 	jle yieldPointHandler_afterStackOverflow		; No still below limit
 	; Reset stackoverflow flag
 	mov [ADI+VmThread_STACKEND_OFS],ACX
-	mov dword [ADI+VmThread_STACKOVERFLOW_OFS],0
+	mov byte [ADI+VmThread_STACKOVERFLOW_S1_OFS],0
 	jmp yieldPointHandler_afterStackOverflow
 
 ; Set the fxStatePtr in the thread given in edi.
@@ -331,13 +331,13 @@ int_stack_overflow:
 	cmp GET_OLD_CS,USER_CS
 	jne doFatal_stack_overflow
 	mov AAX,CURRENTTHREAD
-	mov ecx,[AAX+VmThread_STACKOVERFLOW_OFS]
-	test ecx,ecx
+	mov cl,[AAX+VmThread_STACKOVERFLOW_S1_OFS]
+	test cl,cl
 	jz int_stack_first_overflow
 	jmp doFatal_stack_overflow
 		
 int_stack_first_overflow:
-	inc dword [AAX+VmThread_STACKOVERFLOW_OFS]
+	inc byte [AAX+VmThread_STACKOVERFLOW_S1_OFS]
 	; Remove the stackoverflow limit
 	mov ADX,[AAX+VmThread_STACKEND_OFS]
 	sub ADX,(VmThread_STACK_OVERFLOW_LIMIT_SLOTS * SLOT_SIZE)

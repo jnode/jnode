@@ -128,7 +128,11 @@ public abstract class AbstractAsmConstBuilder {
 					final VmField f = vmClass.getDeclaredField(i);
 					if (!f.isStatic()) {
 						final VmInstanceField instF = (VmInstanceField) f;
-						String name = cname + "_" + f.getName().toUpperCase() + "_OFS";
+						String name = cname + "_" + f.getName().toUpperCase();
+                        if (f.getTypeSize() < 4) {
+                            name = name + "_S" + f.getTypeSize();
+                        }
+                        name = name + "_OFS";
 						out.println(name + " equ " + instF.getOffset());
 					}
 				}
