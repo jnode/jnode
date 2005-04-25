@@ -24,14 +24,14 @@ package java.io;
 /**
  * @author epr
  */
-public final class VMOpenMode {
+public enum VMOpenMode {
 	
 	/** Open for reading only, open fails if file does not exist */
-	public static final VMOpenMode READ = new VMOpenMode("r", true, false);
+	READ ("r", true, false),
 	/** Open for writing only, file is created if file does not exist */
-	public static final VMOpenMode WRITE = new VMOpenMode("w", false, true);
+	WRITE("w", false, true),
 	/** Open for reading and writing, file is created if file does not exist */
-	public static final VMOpenMode READ_WRITE = new VMOpenMode("rw", true, true);
+	READ_WRITE("rw", true, true);
 
 	private final String mode;
 	private final boolean read;	
