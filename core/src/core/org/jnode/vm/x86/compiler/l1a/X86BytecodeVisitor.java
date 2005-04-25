@@ -576,7 +576,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 *            directly after this method Register ECX must be free and it
 	 *            destroyed.
 	 */
-	private final void instanceOfClass(GPR objectr, VmClassType type, GPR tmpr,
+	private final void instanceOfClass(GPR objectr, VmClassType<?> type, GPR tmpr,
 			GPR resultr, Label trueLabel, boolean skipNullTest) {
 
 		final int depth = type.getSuperClassDepth();
@@ -1167,7 +1167,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	public final void visit_checkcast(VmConstClass classRef) {
 		// Resolve classRef
 		classRef.resolve(loader);
-		final VmType resolvedType = classRef.getResolvedVmClass();
+		final VmType<?> resolvedType = classRef.getResolvedVmClass();
 
 		if (resolvedType.isInterface() || resolvedType.isArray()) {
 			// ClassRef is an interface or array, do the slow test
@@ -1688,10 +1688,31 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 				os.writeFLD32(refr, fieldOffset);
 				vstack.fpuStack.push(result);
 			} else {
+                final char fieldType = field.getSignature().charAt(0);
 				final WordItem iw = L1AHelper.requestWordRegister(eContext,
-						type, false);
+						type, (fieldType != 'I') && (type != JvmType.REFERENCE));
                 final GPR iwr = iw.getRegister();
-				os.writeMOV(iwr.getSize(), iwr, refr, fieldOffset);
+                switch (fieldType) {
+                case 'Z': // boolean
+                    os.writeMOVZX(iwr, refr, fieldOffset, BITS8);
+                    break;
+                case 'B': // byte
+                    os.writeMOVSX(iwr, refr, fieldOffset, BITS8);
+                    break;
+                case 'C': // char
+                    os.writeMOVZX(iwr, refr, fieldOffset, BITS16);
+                    break;
+                case 'S': // short
+                    os.writeMOVSX(iwr, refr, fieldOffset, BITS16);
+                    break;
+                case 'I': // int
+                case 'L': // Object
+                case '[': // array
+                    os.writeMOV(iwr.getSize(), iwr, refr, fieldOffset);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown fieldType " + fieldType);
+                }
 				result = iw;
 			}
 		} else {
@@ -2364,7 +2385,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 
 		// Prepare
 		final X86RegisterPool pool = eContext.getGPRPool();
-		final VmType resolvedType = classRef.getResolvedVmClass();
+		final VmType<?> resolvedType = classRef.getResolvedVmClass();
 
 		if (resolvedType.isInterface() || resolvedType.isArray()) {
 			// It is an interface, do it the hard way
@@ -3423,9 +3444,28 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		if (!wide) {
 			final WordItem wval = (WordItem) val;
 			final GPR valr = wval.getRegister();
+            final char fieldType = field.getSignature().charAt(0);
 
 			// Store field
-			os.writeMOV(valr.getSize(), refr, offset, valr);
+            switch (fieldType) {
+            case 'Z': // boolean
+            case 'B': // byte
+                wval.loadToBITS8GPR(eContext);
+                os.writeMOV(BITS8, refr, offset, wval.getRegister());
+                break;
+            case 'C': // char
+            case 'S': // short
+                os.writeMOV(BITS16, refr, offset, valr);
+                break;
+            case 'F': // float
+            case 'I': // int
+            case 'L': // Object
+            case '[': // array
+                os.writeMOV(valr.getSize(), refr, offset, valr);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown fieldType: " + fieldType);    
+            }
 			// Writebarrier
 			if (!inf.isPrimitive() && helper.needsWriteBarrier()) {
 				final GPR tmp = (GPR) L1AHelper.requestRegister(eContext,
@@ -3860,7 +3900,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		// Get fieldRef via constantpool to avoid direct object references in
 		// the native code
 
-		final VmType declClass = fieldRef.getResolvedVmField()
+		final VmType<?> declClass = fieldRef.getResolvedVmField()
 				.getDeclaringClass();
 		if (!declClass.isInitialized()) {
 
