@@ -25,8 +25,10 @@ import java.security.PrivilegedExceptionAction;
 
 import javax.naming.NameNotFoundException;
 
+import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.net.NetworkException;
+import org.jnode.driver.net._3c90x._3c90xFlags;
 import org.jnode.driver.net.ethernet.spi.Flags;
 import org.jnode.driver.net.spi.AbstractDeviceCore;
 import org.jnode.driver.pci.PCIBaseAddress;
@@ -63,7 +65,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 	/** IO address space resource */
 	private final IOResource io;
 
-	/** IRQ resource */
+	/** IRQ */
 	private final IRQResource irq;
 
 	/** */
@@ -108,36 +110,27 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 	 * @throws ResourceNotFreeException
 	 */
 	public EEPRO100Core(EEPRO100Driver driver, ResourceOwner owner,
-			PCIDevice device, Flags flags) throws ResourceNotFreeException,
+			PCIDevice device, EEPRO100Flags flags) throws ResourceNotFreeException,
 			DriverException {
 
 		phy = new int[2];
 
 		this.driver = driver;
-		this.flags = (EEPRO100Flags) flags;
-
-		final PCIDeviceConfig config = device.getConfig();
-		final int irq = config.getInterruptLine();
-		final PCIBaseAddress[] addrs = config.getBaseAddresses();
-		if (addrs.length < 1) {
-			throw new DriverException("Cannot find iobase: not base addresses");
-		}
-		if (!addrs[1].isIOSpace()) {
-			throw new DriverException(
-					"Cannot find iobase: first address is not I/O");
-		}
+		this.flags = flags;
 
 		// Get the start of the IO address space
-		iobase = addrs[1].getIOBase();
-		final int iolength = addrs[1].getSize();
-		log.debug("Found Lance IOBase: 0x" + NumberUtils.hex(iobase)
-				+ ", length: " + iolength);
+		this.iobase = getIOBase(device, flags);
+		final int iolength = getIOLength(device, flags);
+		
+		log.debug("Found EEPRO100 IOBase: 0x" + NumberUtils.hex(iobase)	+ ", length: " + iolength);
 
+		final ResourceManager rm;
 		try {
-			rm = (ResourceManager) InitialNaming.lookup(ResourceManager.NAME);
+			rm = (ResourceManager)InitialNaming.lookup(ResourceManager.NAME);
 		} catch (NameNotFoundException ex) {
 			throw new DriverException("Cannot find ResourceManager");
 		}
+		final int irq = getIRQ(device, flags);
 		this.irq = rm.claimIRQ(owner, irq, this, true);
 		try {
 			io = claimPorts(rm, owner, iobase, iolength);
@@ -145,13 +138,13 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 			this.irq.release();
 			throw ex;
 		}
-		
+				
 		short[] eeprom = new short[16];
         
 		int eeSize;
         int eeReadCmd;
 
-		if ((doEepromCmd2(EE_READ_CMD << 24, 27) & 0xffe0000) == 0xffe0000) {
+		if ((doEepromCmd(EE_READ_CMD << 24, 27) & 0xffe0000) == 0xffe0000) {
 			eeSize = 0x100;
 			eeReadCmd = EE_READ_CMD << 24;
 
@@ -162,7 +155,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 
 		short sum = 0;
 		for (int x = 0; x < eeSize; x++) {
-			int value = doEepromCmd2(eeReadCmd | (x << 16), 27);
+			int value = doEepromCmd(eeReadCmd | (x << 16), 27);
 			if (x < (int)(eeprom.length))
 				eeprom[x] = new Integer(value).shortValue();
 			sum += value;
@@ -175,14 +168,19 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 					.byteValue();
 
 		}
+		
+		this.hwAddress = new EthernetAddress(hwAddrArr, 0);
 
 		if (sum != 0xBABA) {
 			log.debug(this.flags.getName() + ": Invalid EEPROM checksum "
 					+ Integer.toHexString(sum)
 					+ ", check settings before activating this device!");
 		}
+		
+		regs.setReg32(SCBPort, PortReset);
+		systemDelay(1000);
 
-		this.hwAddress = new EthernetAddress(hwAddrArr, 0);
+		
 
                 // Initialize registers.
 		regs = new EEPRO100Registers(iobase, io);
@@ -384,6 +382,53 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Gets the first IO-Address used by the given device
+	 * @param device
+	 * @param flags
+	 */
+	protected int getIOBase(Device device, EEPRO100Flags flags) 
+	throws DriverException {
+		final PCIDeviceConfig config = ((PCIDevice)device).getConfig();
+		final PCIBaseAddress[] addrs = config.getBaseAddresses();
+		if (addrs.length < 1) {
+			throw new DriverException("Cannot find iobase: not base addresses");
+		}
+		if (!addrs[1].isIOSpace()) {
+			throw new DriverException("Cannot find iobase: first address is not I/O");
+		}
+		return addrs[1].getIOBase();
+	}
+
+	/**
+	 * Gets the number of IO-Addresses used by the given device
+	 * @param device
+	 * @param flags
+	 */
+	protected int getIOLength(Device device, EEPRO100Flags flags)
+	throws DriverException {
+		final PCIDeviceConfig config = ((PCIDevice)device).getConfig();
+		final PCIBaseAddress[] addrs = config.getBaseAddresses();
+		if (addrs.length < 1) {
+			throw new DriverException("Cannot find iobase: not base addresses");
+		}
+		if (!addrs[1].isIOSpace()) {
+			throw new DriverException("Cannot find iobase: first address is not I/O");
+		}
+		return addrs[1].getSize();
+	}
+
+	/**
+	 * Gets the IRQ used by the given device
+	 * @param device
+	 * @param flags
+	 */
+	protected int getIRQ(Device device, EEPRO100Flags flags) 
+	throws DriverException {
+		final PCIDeviceConfig config = ((PCIDevice)device).getConfig();
+		return config.getInterruptLine();
+	}
 
 	// --- PRIVATE METHODS ---
 	/**
@@ -474,46 +519,13 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 		// disable the eeprom
 		regs.setReg16(SCBeeprom, 0);
 	}
-
 	/**
+	 * 
 	 * @param cmd
+	 * @param cmdLength
 	 * @return
 	 */
-	final int doEepromCmd(int cmd) {
-		int data = 0;
-
-		regs.setReg16(SCBeeprom, EE_CS);
-		cmd |= eeReadCmd;
-
-		for (int i = eeAddress; true; i--) {
-			data = (cmd & 1 << i) == 0 ? EE_WRITE_0 : EE_WRITE_1;
-			regs.setReg16(SCBeeprom, data);
-			regs.setReg16(SCBeeprom, data | EE_SHIFT_CLK);
-			eepromDelay();
-			regs.setReg16(SCBeeprom, data);
-			eepromDelay();
-			if ((regs.getReg16(SCBeeprom) & EE_DATA_READ) == 0)
-				break;
-		}
-		data = 0;
-		// read value
-		for (int i = 0; i < 16; i++) {
-			regs.setReg16(SCBeeprom, EE_CS);
-			regs.setReg16(SCBeeprom, EE_CS | EE_SHIFT_CLK);
-			eepromDelay();
-			data <<= 1;
-			if ((regs.getReg16(SCBeeprom) & EE_DATA_READ) != 0)
-				data |= 1;
-
-			regs.setReg16(SCBeeprom, EE_CS);
-			eepromDelay();
-		}
-		// disable the eeprom
-		regs.setReg16(SCBeeprom, 0);
-		return data;
-	}
-
-	final int doEepromCmd2(int cmd, int cmdLength) {
+	final int doEepromCmd(int cmd, int cmdLength) {
 		int retVal = 0;
 
 		regs.setReg16(SCBeeprom, EE_ENB);
@@ -555,12 +567,12 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 	 * @param location
 	 * @return
 	 */
-	final int mdioRead(int phy_id, int location) {
-		int val, boguscnt = 64; /* <64 usec. to complete, typ 27 ticks */
-		regs.setReg32(SCBCtrlMDI, 0x08000000 | (location << 16)
-				| (phy_id << 21));
+	public final int mdioRead(int phy_id, int location) {
+		int val; 
+		int boguscnt = 64*4;
+		regs.setReg32(SCBCtrlMDI, 0x08000000 | (location << 16)	| (phy_id << 21));
 		do {
-			systemDelay(10);
+			systemDelay(16);
 			val = regs.getReg32(SCBCtrlMDI);
 			if (--boguscnt < 0) {
 				log.debug(this.flags.getName()
@@ -578,19 +590,16 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 	 * @param value
 	 * @return
 	 */
-	final int mdioWrite(int phy_id, int location, int value) {
+	public final int mdioWrite(int phy_id, int location, int value) {
 		int val;
-		/* <64 usec. to complete, typ 27 ticks */
-		int boguscnt = 64;
-		regs.setReg32(SCBCtrlMDI, 0x04000000 | (location << 16)
-				| (phy_id << 21) | value);
+		int boguscnt = 64*4;
+		regs.setReg32(SCBCtrlMDI, 0x04000000 | (location << 16) | (phy_id << 21) | value);
 		do {
-			systemDelay(10);
+			systemDelay(16);
 			val = regs.getReg32(SCBCtrlMDI);
 			if (--boguscnt < 0) {
 				// StringBuffer sb = new StringBuffer();
-				log.debug("eepro100: mdioWrite() timed out with val ="
-						+ Integer.toHexString(val));
+				log.debug("eepro100: mdioWrite() timed out with val =" + Integer.toHexString(val));
 				break;
 			}
 		} while ((val & 0x10000000) == 0);
