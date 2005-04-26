@@ -56,7 +56,7 @@ public class EEPRO100Driver extends BasicEthernetDriver {
      *      org.jnode.driver.net.ethernet.Flags)
      */
     protected AbstractDeviceCore newCore(Device device, Flags flags) throws DriverException, ResourceNotFreeException {
-        return new EEPRO100Core(this, device, (PCIDevice) device, flags);
+        return new EEPRO100Core(this, device, (PCIDevice) device, (EEPRO100Flags)flags);
     }
 
 }

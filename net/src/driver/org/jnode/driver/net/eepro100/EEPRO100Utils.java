@@ -48,4 +48,5 @@ public class EEPRO100Utils implements EEPRO100Constants{
         } while (++wait <= 10000);
 		log.debug("Command " + NumberUtils.hex(delayed_cmd)  + " was not immediately accepted, " + wait + " ticks!");
     }
+	
 }
