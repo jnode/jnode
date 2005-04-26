@@ -23,7 +23,6 @@ package org.jnode.plugin.manager;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.jnode.plugin.PluginLoader;
@@ -35,7 +34,7 @@ import org.jnode.plugin.PluginLoaderManager;
  */
 public class DefaultPluginLoaderManager extends PluginLoaderManager {
 
-    private final List loaders = new ArrayList();
+    private final List<PluginLoader> loaders = new ArrayList<PluginLoader>();
     
     /**
      * @see org.jnode.plugin.PluginLoaderManager#addPluginLoader(org.jnode.plugin.PluginLoader)
@@ -57,12 +56,11 @@ public class DefaultPluginLoaderManager extends PluginLoaderManager {
      * @see org.jnode.plugin.PluginLoader#getPluginStream(java.lang.String, java.lang.String)
      */
     public InputStream getPluginStream(String pluginId, String pluginVersion) {
-        final List loaders;
+        final List<PluginLoader> loaders;
         synchronized(this) {
-            loaders = new ArrayList(this.loaders);
+            loaders = new ArrayList<PluginLoader>(this.loaders);
         }
-        for (Iterator i = loaders.iterator(); i.hasNext(); ) {
-            final PluginLoader loader = (PluginLoader)i.next();
+        for (PluginLoader loader : loaders) {
             final InputStream is = loader.getPluginStream(pluginId, pluginVersion);
             if (is != null) {
                 return is;
