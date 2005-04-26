@@ -368,7 +368,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * Remove all data and references.
 	 */
 	public final void clear() {
-		this.m_data = new byte[0];
+		//this.m_data = new byte[0];
 		this.m_used = 0;
 		this.objectRefs.clear();
 	}
