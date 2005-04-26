@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -34,10 +33,10 @@ import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.assembler.UnresolvedObjectRefException;
+import org.jnode.assembler.x86.X86Register.CRX;
 import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.assembler.x86.X86Register.GPR32;
 import org.jnode.assembler.x86.X86Register.GPR64;
-import org.jnode.assembler.x86.X86Register.CRX;
 import org.jnode.assembler.x86.X86Register.SR;
 import org.jnode.assembler.x86.X86Register.XMM;
 import org.jnode.vm.classmgr.ObjectFlags;
@@ -177,11 +176,11 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 
 		public int[] getUnresolvedOffsets() {
-			int cnt = unresolvedLinks.size();
-			int[] offsets = new int[cnt];
+			final int cnt = unresolvedLinks.size();
+			final int[] offsets = new int[cnt];
 			int ofs = 0;
-			for (Iterator<UnresolvedOffset> i = unresolvedLinks.iterator(); i.hasNext(); ofs++) {
-				offsets[ofs] = ((UnresolvedOffset) i.next()).getOffset();
+			for (UnresolvedOffset unrOfs : unresolvedLinks) {
+				offsets[ofs++] = unrOfs.getOffset();
 			}
 			return offsets;
 		}
@@ -230,8 +229,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			this.dataOffset = offset;
 			if (unresolvedLinks != null) {
 				// Link all unresolved links
-				for (Iterator<UnresolvedOffset> i = unresolvedLinks.iterator(); i.hasNext();) {
-					final UnresolvedOffset unrOfs = (UnresolvedOffset) i.next();
+				for (UnresolvedOffset unrOfs : unresolvedLinks) {
 					final int addr = unrOfs.getOffset();
 					if (unrOfs.getPatchSize() == 4) {
 						resolve32(addr, offset);
@@ -648,7 +646,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		if (cls == null) {
 			throw new NullPointerException("cls==null");
 		} else {
-			final Object[] tib = ((VmClassType) cls).getTIB();
+			final Object[] tib = ((VmClassType<?>) cls).getTIB();
 			if (tib[0] == null) {
 				throw new NullPointerException("tib[0]==null");
 			}

@@ -52,9 +52,12 @@ public class Modifier {
 	public static final int ACC_FINALIZER   = 0x00100000;
 
 	/** Is this a magic class */
-	public static final int ACC_MAGIC = 0x20000000; // C
+	public static final int ACC_MAGIC = 0x10000000; // C
 
-	public static final int ACC_SHAREDSTATICS = 0x40000000; // C
+    /** Are the statics of this class shared */
+	public static final int ACC_SHAREDSTATICS = 0x20000000; // C
+    
+    /** Is this a special method (init, clinit) */
 	public static final int ACC_SPECIAL     = 0x80000000;
 	
 	public static boolean isPublic(int modifier) {
