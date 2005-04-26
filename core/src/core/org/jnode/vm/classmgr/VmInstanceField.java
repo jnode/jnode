@@ -67,4 +67,11 @@ public class VmInstanceField extends VmField {
 		offset += classOffset;
 	}
 
+    /**
+     * Override the offset of this field.
+     * @param offset
+     */
+    final void setOffset(int offset) {
+        this.offset = offset;
+    }
 }

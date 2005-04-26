@@ -140,7 +140,7 @@ public class VmNormalClass<T> extends VmClassType<T> {
 					}
 				}
 				final int off = inf.getOffset();
-				if (off + 4 > objectSize) {
+				if (off + inf.getTypeSize() > objectSize) {
 					throw new Error("Invalid offset in class " + getName() + " ofs " + off + " size " + objectSize);
 				}
 			}

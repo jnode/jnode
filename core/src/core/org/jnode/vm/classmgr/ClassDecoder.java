@@ -404,7 +404,7 @@ public final class ClassDecoder {
 							fieldOffset, cls, slotSize);
 				}
 				ftable[i] = fs;
-
+                
 				// Read field attributes
 				final int acount = reader.readu2();
 				for (int a = 0; a < acount; a++) {
@@ -453,7 +453,14 @@ public final class ClassDecoder {
 					}
 				}
 			}
-			cls.setFieldTable(ftable);
+			
+            // Align the instance fields for minimal object size.
+            if (false) {
+                final int alignedObjectSize = alignInstanceFields(ftable, slotSize);
+                objectSize = alignedObjectSize;
+            }
+
+            cls.setFieldTable(ftable);
 			if (objectSize > 0) {
 				((VmNormalClass) cls).setObjectSize(objectSize);
 			}
@@ -669,4 +676,46 @@ public final class ClassDecoder {
 
 		return new VmLineNumberMap(lnTable);
 	}
+    
+    /**
+     * Align the offsets of the fields in the class optimized for minimal
+     * object size.
+     * @param fields
+     * @return The objectsize taken by all the fields
+     */
+    private static final int alignInstanceFields(VmField[] fields, int slotSize) {
+        int objectSize = 0;
+        for (byte currentTypeSize : TYPE_SIZES) {
+            boolean aligned = false;
+            for (VmField f : fields) {
+                if (!f.isStatic() && (f.getTypeSize() == currentTypeSize)) {
+                    if (!aligned) {
+                        // Align on the current type size
+                        objectSize = align(objectSize, Math.min(currentTypeSize, slotSize));
+                        aligned = true;
+                    }
+                    final VmInstanceField fld = (VmInstanceField) f;
+                    fld.setOffset(objectSize);
+                    objectSize += currentTypeSize;
+                }
+            }
+        }
+        // Make sure the object size is 32-bit aligned
+        return align(objectSize, 4);
+    }
+    
+    /**
+     * Align the given value on the given alignment.
+     * @param value
+     * @param alignment
+     * @return
+     */
+    private static final int align(int value, int alignment) {
+        while ((value % alignment) != 0) {
+            value++;
+        }
+        return value;
+    }
+    
+    private static final byte[] TYPE_SIZES = { 1, 2, 4, 8 };
 }
