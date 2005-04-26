@@ -27,6 +27,9 @@ import org.jnode.shell.help.ClassNameArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
 import org.jnode.shell.help.ParsedArguments;
+import org.jnode.vm.classmgr.VmArrayClass;
+import org.jnode.vm.classmgr.VmClassType;
+import org.jnode.vm.classmgr.VmType;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -46,11 +49,20 @@ public class ClassCommand {
 		showClass(type, System.out);
 	}
 	
-	private static void showClass(Class type, PrintStream out) {
+	private static void showClass(Class<?> type, PrintStream out) {
 		out.println("Name             : " + type.getName());
 		//out.println("Is abstract      : " + type.isAbstract());
 		out.println("Is array         : " + type.isArray());
 		out.println("Is primitive     : " + type.isPrimitive());
 		out.println("Protection domain: " + type.getProtectionDomain());
+        
+        final VmType<?> vmType = type.getVmClass();
+        if (vmType instanceof VmClassType) {
+            out.println("#Instances       : " + ((VmClassType<?>)vmType).getInstanceCount());
+        }
+        if (vmType instanceof VmArrayClass) {
+            out.println("Total length     : " + ((VmArrayClass<?>)vmType).getTotalLength());            
+            out.println("Maximum length   : " + ((VmArrayClass<?>)vmType).getMaximumLength());            
+        }
 	}
 }
