@@ -28,8 +28,6 @@ import javax.naming.NameNotFoundException;
 import org.jnode.driver.Device;
 import org.jnode.driver.DriverException;
 import org.jnode.driver.net.NetworkException;
-import org.jnode.driver.net._3c90x._3c90xFlags;
-import org.jnode.driver.net.ethernet.spi.Flags;
 import org.jnode.driver.net.spi.AbstractDeviceCore;
 import org.jnode.driver.pci.PCIBaseAddress;
 import org.jnode.driver.pci.PCIDevice;
@@ -392,6 +390,9 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 	throws DriverException {
 		final PCIDeviceConfig config = ((PCIDevice)device).getConfig();
 		final PCIBaseAddress[] addrs = config.getBaseAddresses();
+		for(int i=0; i < addrs.length; i++){
+			log.debug("PCIBaseAddress[" + i + "]:" + addrs[i].isIOSpace());
+		}
 		if (addrs.length < 1) {
 			throw new DriverException("Cannot find iobase: not base addresses");
 		}
