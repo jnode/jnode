@@ -56,6 +56,7 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
     private X86Constants.Mode mode;
 
     private TypeSizeInfo typeSizeInfo;
+    private final ThreadLocal nativeStreamHolder = new ThreadLocal();
 
     /**
      * Initialize this compiler
@@ -75,9 +76,14 @@ public abstract class AbstractX86Compiler extends NativeCodeCompiler implements
      * @see org.jnode.vm.compiler.NativeCodeCompiler#createNativeStream(org.jnode.assembler.ObjectResolver)
      */
     public NativeStream createNativeStream(ObjectResolver resolver) {
-        final X86BinaryAssembler os = new X86BinaryAssembler((X86CpuID) Unsafe
-                .getCurrentProcessor().getCPUID(), mode, 0);
-        os.setResolver(resolver);
+        X86BinaryAssembler os;
+        os = (X86BinaryAssembler)nativeStreamHolder.get();
+        if (os == null) {
+            os = new X86BinaryAssembler((X86CpuID) Unsafe.getCurrentProcessor()
+                    .getCPUID(), mode, 0);
+            os.setResolver(resolver);
+            nativeStreamHolder.set(os);
+        }
         return os;
     }
 
