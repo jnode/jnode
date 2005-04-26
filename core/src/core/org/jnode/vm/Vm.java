@@ -31,7 +31,6 @@ import org.jnode.util.Counter;
 import org.jnode.util.Statistic;
 import org.jnode.util.Statistics;
 import org.jnode.vm.classmgr.CompiledCodeList;
-import org.jnode.vm.classmgr.VmAtom;
 import org.jnode.vm.classmgr.VmSharedStatics;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.vmmagic.pragma.NoInlinePragma;
@@ -61,8 +60,6 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
 	private final List<VmProcessor> processors;
 	/** All statistics */
 	private transient HashMap<String, Statistic> statistics;
-	/** The atom manager */
-	private final VmAtom.Manager atomManager;
     /** Lock for accessing the all threads list */
     private final SpinLock allThreadsLock;
     /** List of all threads */
@@ -89,7 +86,6 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
 		this.heapManager = heapManager;
 		this.statics = statics;
 		this.processors = new BootableArrayList<VmProcessor>();
-		this.atomManager = new VmAtom.Manager();
         this.allThreadsLock = new SpinLock();
         this.allThreads = new VmThreadQueue.AllThreadsQueue("all");
         this.compiledMethods = new CompiledCodeList();
@@ -324,13 +320,6 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
         }
         throw new AssertionError(msg);
     }
-    
-	/**
-	 * @return Returns the atomManager.
-	 */
-	public static final VmAtom.Manager getAtomManager() {
-		return instance.atomManager;
-	}
     
     /**
      * Register a thread in the list of all live threads.
