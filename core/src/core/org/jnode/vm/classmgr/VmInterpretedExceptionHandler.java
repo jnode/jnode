@@ -29,9 +29,9 @@ package org.jnode.vm.classmgr;
  */
 public final class VmInterpretedExceptionHandler extends AbstractExceptionHandler {
 	
-	private final int startPC;
-	private final int endPC;
-	private final int handlerPC;
+	private final char startPC;
+	private final char endPC;
+	private final char handlerPC;
 	
 	/**
 	 * Create a new instance
@@ -54,9 +54,9 @@ public final class VmInterpretedExceptionHandler extends AbstractExceptionHandle
 	 */
 	public VmInterpretedExceptionHandler(VmConstClass catchType, int startPC, int endPC, int handlerPC) {
 		super(catchType); 
-		this.startPC = startPC;
-		this.endPC = endPC;
-		this.handlerPC = handlerPC;
+		this.startPC = (char)startPC;
+		this.endPC = (char)endPC;
+		this.handlerPC = (char)handlerPC;
 	}
 
 	/**
