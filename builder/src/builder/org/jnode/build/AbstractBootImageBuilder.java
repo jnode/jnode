@@ -33,9 +33,12 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -190,7 +193,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         do {
             again = false;
             oldCount = clsMgr.getLoadedClassCount();
-            for (VmType<?> vmClass : clsMgr.getLoadedClasses()) {
+            for (VmType< ? > vmClass : clsMgr.getLoadedClasses()) {
                 vmClass.link();
                 final boolean compHigh = isCompileHighOptLevel(vmClass);
                 try {
@@ -373,7 +376,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             log("Building for " + proc.getCPUID());
 
             final Label clInitCaller = new Label("$$clInitCaller");
-            VmType<?> systemClasses[] = VmType.initializeForBootImage(clsMgr);
+            VmType< ? > systemClasses[] = VmType.initializeForBootImage(clsMgr);
             for (int i = 0; i < systemClasses.length; i++) {
                 clsMgr.addLoadedClass(systemClasses[i].getName(),
                         systemClasses[i]);
@@ -515,6 +518,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
             // Generate the listfile
             printLabels(os, bootClasses, clsMgr.getSharedStatics());
+            logLargeClasses(bootClasses);
 
             // Generate debug info
             for (int i = 0; i < cmps.length; i++) {
@@ -600,7 +604,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
                         if (!(obj instanceof Label)) {
                             unresolvedFound++;
                             if (obj instanceof VmType) {
-                                final VmType<?> vmtObj = (VmType) obj;
+                                final VmType< ? > vmtObj = (VmType) obj;
                                 vmtObj.link();
                                 if (!vmtObj.isCompiled()) {
                                     compileClasses(os, arch);
@@ -826,7 +830,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @param vmClass
      * @return
      */
-    protected boolean isCompileHighOptLevel(VmType<?> vmClass) {
+    protected boolean isCompileHighOptLevel(VmType< ? > vmClass) {
         if (vmClass.isArray()) {
             return true;
         }
@@ -1105,6 +1109,43 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         }
     }
 
+    /**
+     * Print any unresolved labels to the out stream and generate a list file
+     * for all public labels
+     * 
+     * @param os
+     * @param bootClasses
+     * @throws BuildException
+     * @throws UnresolvedObjectRefException
+     */
+    protected final void logLargeClasses(VmType[] bootClasses) {
+        final Comparator<Long> reverseComp = Collections.reverseOrder();
+        final TreeMap<Long, VmType< ? >> sortedTypes = new TreeMap<Long, VmType< ? >>(reverseComp);
+        for (VmType< ? > vmType : bootClasses) {
+            if (vmType instanceof VmNormalClass) {
+                final VmNormalClass< ? > nc = (VmNormalClass< ? >) vmType;
+                final long objSize = nc.getObjectSize();
+                final int cnt = nc.getInstanceCount();
+                final long totalSize = objSize * cnt;
+                sortedTypes.put(totalSize, nc);
+            } else if (vmType.isArray()) {
+                final VmArrayClass<?> ac = (VmArrayClass<?>)vmType;
+                final long len = ac.getTotalLength();
+                final int typeSize = ac.getComponentType().getTypeSize();
+                sortedTypes.put(len * typeSize, ac);                
+            }
+        }
+        
+        int cnt = 1;
+        log("Large classes:");
+        for (Map.Entry<Long, VmType<?>> entry : sortedTypes.entrySet()) {
+            log("  " + entry.getValue().getName() + " " + NumberUtils.size(entry.getKey()));
+            if (++cnt > 10) {
+                return;
+            }
+        }        
+    }
+
     private byte[] read(InputStream is) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         final byte[] buf = new byte[4096];
@@ -1292,7 +1333,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
             NativeStream os, ObjectEmitter emitter)
             throws ClassNotFoundException {
-        for (VmType<?> type : cl.getLoadedClasses()) {
+        for (VmType< ? > type : cl.getLoadedClasses()) {
             final String name = type.getName();
             final int cnt = type.getNoDeclaredFields();
             if ((cnt > 0) && !name.startsWith("java.")) {
@@ -1324,7 +1365,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         }
     }
 
-    private void copyStaticField(VmType<?> type, VmField f, Field jf,
+    private void copyStaticField(VmType< ? > type, VmField f, Field jf,
             VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
             NativeStream os, ObjectEmitter emitter)
             throws IllegalAccessException, JNodeClassNotFoundException {
