@@ -111,12 +111,6 @@ public class EntryPoints extends VmSystemObject {
 
     private final VmInstanceField vmProcessorIsolatedStaticsTable;
 
-    private final VmInstanceField vmConstClassResolvedClass;
-
-    private final VmInstanceField vmConstFieldResolvedField;
-
-    private final VmInstanceField vmConstMethodResolvedMethod;
-
     private final VmMethod arrayStoreWriteBarrier;
 
     private final VmMethod putfieldWriteBarrier;
@@ -282,24 +276,6 @@ public class EntryPoints extends VmSystemObject {
                     .getField("staticsTable"));
             vmProcessorIsolatedStaticsTable = (VmInstanceField) testField(processorClass
                     .getField("isolatedStaticsTable"));
-
-            // VmConstClass
-            final VmType constClassClass = loader.loadClass(
-                    "org.jnode.vm.classmgr.VmConstClass", true);
-            vmConstClassResolvedClass = (VmInstanceField) testField(constClassClass
-                    .getField("vmClass"));
-
-            // VmConstField
-            final VmType constFieldClass = loader.loadClass(
-                    "org.jnode.vm.classmgr.VmConstFieldRef", true);
-            vmConstFieldResolvedField = (VmInstanceField) testField(constFieldClass
-                    .getField("vmResolvedField"));
-
-            // VmConstMethod
-            final VmType constMethodClass = loader.loadClass(
-                    "org.jnode.vm.classmgr.VmConstMethodRef", true);
-            vmConstMethodResolvedMethod = (VmInstanceField) testField(constMethodClass
-                    .getField("vmMethod"));
 
             // VmMethod
             final VmType vmMethodClass = loader.loadClass(
@@ -583,27 +559,6 @@ public class EntryPoints extends VmSystemObject {
      */
     public final VmMethod getAllocPrimitiveArrayMethod() {
         return this.allocPrimitiveArrayMethod;
-    }
-
-    /**
-     * @return Returns the vmConstClassResolvedClass.
-     */
-    public final VmInstanceField getVmConstClassResolvedClass() {
-        return this.vmConstClassResolvedClass;
-    }
-
-    /**
-     * @return Returns the vmConstMethodResolvedMethod.
-     */
-    public final VmInstanceField getVmConstMethodResolvedMethod() {
-        return this.vmConstMethodResolvedMethod;
-    }
-
-    /**
-     * @return Returns the vmConstFieldResolvedField.
-     */
-    public final VmInstanceField getVmConstFieldResolvedField() {
-        return this.vmConstFieldResolvedField;
     }
 
     /**
