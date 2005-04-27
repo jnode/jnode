@@ -28,13 +28,15 @@ package org.jnode.vm.classmgr;
  */
 public final class VmConstClass extends VmResolvableConstObject {
 
-	/** The resolved class */
-	private VmType vmClass;
+	/** The classname, when not yet resolved, or the VmType when resolved */
+	private Object data;
 
-	private final String name;
-
+    /**
+     * Initialize this instance.
+     * @param name
+     */
 	VmConstClass(String name) {
-		this.name = name.replace('/', '.');
+		this.data = name.replace('/', '.');
 	}
 
 	/**
@@ -43,7 +45,12 @@ public final class VmConstClass extends VmResolvableConstObject {
 	 * @return String
 	 */
 	public String getClassName() {
-		return name;
+        final Object data = this.data;
+        if (data instanceof String) {
+            return (String)data;
+        } else {
+            return ((VmType<?>)data).getName();
+        }
 	}
 
 	/**
@@ -52,10 +59,11 @@ public final class VmConstClass extends VmResolvableConstObject {
 	 * @param clc
 	 */
 	protected void doResolve(VmClassLoader clc) {
-		if (vmClass == null) {
-			final String name = getClassName();
+        final Object data = this.data;
+        if (data instanceof String) {
+			final String name = (String)data;
 			try {
-				vmClass = clc.loadClass(name, true);
+				this.data = clc.loadClass(name, true);
 			} catch (ClassNotFoundException ex) {
 				throw (NoClassDefFoundError) new NoClassDefFoundError(name)
 						.initCause(ex);
@@ -78,11 +86,12 @@ public final class VmConstClass extends VmResolvableConstObject {
 	 * 
 	 * @return VmClass
 	 */
-	public VmType getResolvedVmClass() {
-		if (vmClass == null) {
+	public final VmType<?> getResolvedVmClass() {
+        final Object data = this.data;
+		if (data instanceof String) {
 			throw new RuntimeException("vmClass is not yet resolved");
 		} else {
-			return vmClass;
+			return (VmType<?>)data;
 		}
 	}
 
@@ -94,9 +103,9 @@ public final class VmConstClass extends VmResolvableConstObject {
 	 *            The vmClass to set
 	 */
 	public void setResolvedVmClass(VmType vmClass) {
-		if (this.vmClass == null) {
-			this.vmClass = vmClass;
-		}
+        if (data instanceof String) {
+            data = vmClass;
+        }
 	}
 
     /**
