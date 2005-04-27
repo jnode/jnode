@@ -391,7 +391,13 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 		final PCIDeviceConfig config = ((PCIDevice)device).getConfig();
 		final PCIBaseAddress[] addrs = config.getBaseAddresses();
 		for(int i=0; i < addrs.length; i++){
-			log.debug("PCIBaseAddress[" + i + "]:" + addrs[i].isIOSpace());
+			long addr;
+			if(addrs[i].isIOSpace()){
+				addr = addrs[i].getIOBase();
+			} else {
+				addr = addrs[i].getMemoryBase();
+			}
+			log.debug("PCIBaseAddress[" + i + "]: " + addrs[i].isIOSpace() + " addr: " + NumberUtils.hex(addr));
 		}
 		if (addrs.length < 1) {
 			throw new DriverException("Cannot find iobase: not base addresses");
