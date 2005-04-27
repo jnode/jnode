@@ -36,7 +36,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     private VmAddress nativeCode;
 
     /** #Slots taken by arguments of this method (including this pointer) */
-    private final int argSlotCount;
+    private final short argSlotCount;
 
     /** Resolved types for each argument of this method */
     private VmType[] paramTypes;
@@ -63,7 +63,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
     private int threadSwitchIndicatorMask = 0xFFFFFFFF;
 
     /** Optimization level of native code */
-    private int nativeCodeOptLevel = -1;
+    private short nativeCodeOptLevel = -1;
 
     /** The index in the statics table */
     private final int staticsIndex;
@@ -86,9 +86,9 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
                 signature,
                 modifiers | (returnsObject(signature) ? Modifier.ACC_OBJECTREF : 0),
                 declaringClass);
-        this.argSlotCount = Signature.getArgSlotCount(declaringClass
+        this.argSlotCount = (short)(Signature.getArgSlotCount(declaringClass
                 .getLoader().getArchitecture().getTypeSizeInfo(), signature)
-                + (isStatic() ? 0 : 1);
+                + (isStatic() ? 0 : 1));
         final VmClassLoader cl = declaringClass.getLoader();
         if (isStatic()) {
             this.selector = 0;
@@ -439,7 +439,7 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
         this.compiledCode = code;
         Vm.getVm().getSharedStatics().setMethodCode(getSharedStaticsIndex(),
                 code.getNativeCode());
-        this.nativeCodeOptLevel = optLevel;
+        this.nativeCodeOptLevel = (short)optLevel;
     }
 
     /**
