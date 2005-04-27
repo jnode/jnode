@@ -54,7 +54,7 @@ public final class VmArrayClass<T> extends VmClassType<T> {
 	 * 
 	 * @return VmClass
 	 */
-	public VmType getComponentType() {
+	public VmType<?> getComponentType() {
 		return componentType;
 	}
 
