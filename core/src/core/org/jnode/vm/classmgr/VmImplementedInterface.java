@@ -30,10 +30,8 @@ import org.jnode.vm.VmSystemObject;
  */
 public final class VmImplementedInterface extends VmSystemObject {
 	
-	/** The name of the interface class */
-	private final String className;
-	/** The resolved interface class */
-	private VmInterfaceClass resolvedClass;
+	/** The name of the interface class or the resolved class */
+	private Object data;
 
 	/**
 	 * Create a new instance
@@ -43,8 +41,7 @@ public final class VmImplementedInterface extends VmSystemObject {
 		if (className == null) {
 			throw new IllegalArgumentException("className cannot be null");
 		}
-		this.className = className;
-		this.resolvedClass = null;
+		this.data = className;
 	}
 
 	/**
@@ -56,8 +53,7 @@ public final class VmImplementedInterface extends VmSystemObject {
 			throw new IllegalArgumentException("vmClass cannot be null");
 		}
 		if (vmClass instanceof VmInterfaceClass) {
-			this.className = vmClass.getName();
-			this.resolvedClass = (VmInterfaceClass)vmClass;
+			this.data = (VmInterfaceClass)vmClass;
 		} else {
 			throw new IllegalArgumentException("vmClass must be an interface class");
 		}
@@ -67,12 +63,13 @@ public final class VmImplementedInterface extends VmSystemObject {
 	 * Gets the resolved interface class.
 	 * @return The resolved class
 	 */
-	public VmInterfaceClass getResolvedVmClass() 
+	public VmInterfaceClass<?> getResolvedVmClass() 
 	throws NotResolvedYetException {
-		if (resolvedClass == null) {
-			throw new NotResolvedYetException(className);
+        final Object data = this.data;
+		if (data instanceof String) {
+			throw new NotResolvedYetException((String)data);
 		}
-		return resolvedClass;
+		return (VmInterfaceClass<?>)data;
 	}
 
 	/**
@@ -82,14 +79,16 @@ public final class VmImplementedInterface extends VmSystemObject {
 	 */
 	protected void resolve(VmClassLoader clc)
 		throws ClassNotFoundException {
-		if (resolvedClass == null) {
-			final VmType type = clc.loadClass(className, true);
+        final Object data = this.data;
+		if (data instanceof String) {
+            final String className = (String)data;
+			final VmType<?> type = clc.loadClass(className, true);
 			if (type instanceof VmInterfaceClass) {
-				this.resolvedClass = (VmInterfaceClass)type;
+				this.data = (VmInterfaceClass)type;
 			} else {
 				throw new ClassNotFoundException("Class " + className + " is not an interface");
 			}
-			resolvedClass.link();
+			type.link();
 		}
 	}
 
@@ -97,7 +96,12 @@ public final class VmImplementedInterface extends VmSystemObject {
      * @return Returns the className.
      */
     final String getClassName() {
-        return className;
+        final Object data = this.data;
+        if (data instanceof String) {
+            return (String)data;
+        } else {
+            return ((VmInterfaceClass<?>)data).getName();
+        }
     }
 
     /**
