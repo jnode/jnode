@@ -26,11 +26,11 @@ package org.jnode.vm.classmgr;
  * 
  * @author epr
  */
-public class IMTBuilder {
+public final class IMTBuilder {
 
 	private final Object[] imt;
 	private final boolean[] imtCollisions;
-	private final int length;
+//	private final int length;
 	/** Number of elements in the IMT that have a collision */
 	private int collectionCount;
 	
@@ -38,7 +38,7 @@ public class IMTBuilder {
 	 * Initialize a new instance
 	 */
 	public IMTBuilder() {
-		this.length = ObjectLayout.IMT_LENGTH;
+		final int length = ObjectLayout.IMT_LENGTH;
 		this.imt = new Object[length];
 		this.imtCollisions = new boolean[length];
 	}
@@ -48,7 +48,7 @@ public class IMTBuilder {
 	 * @param method
 	 */
 	public void add(VmInstanceMethod method) {
-		
+		final int length = getLength();
 		final int selector = method.getSelector();
 		final int index = selector % length;
 		if (!contains(selector, index)) {
@@ -135,7 +135,7 @@ public class IMTBuilder {
 	 * Gets the length (in elements) of the IMT.
 	 * @return int
 	 */
-	public int getLength() {
-		return length;
+	public final int getLength() {
+		return imt.length;
 	}
 }
