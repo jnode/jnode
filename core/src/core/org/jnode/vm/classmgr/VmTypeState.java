@@ -27,16 +27,16 @@ package org.jnode.vm.classmgr;
  */
 public interface VmTypeState {
 
-	public static final int ST_LOADED       = 0x00000001;
-	public static final int ST_DEFINED      = 0x00000002;
-	public static final int ST_VERIFYING    = 0x00000010;
-	public static final int ST_VERIFIED     = 0x00000020;
-	public static final int ST_PREPARING    = 0x00000100;
-	public static final int ST_PREPARED     = 0x00000200;
-	public static final int ST_COMPILED     = 0x00001000;
-	public static final int ST_COMPILING    = 0x00002000;
-	public static final int ST_INITIALIZED  = 0x00010000;
-	public static final int ST_INITIALIZING = 0x00020000;
-	public static final int ST_INVALID      = 0x80000000;
+	public static final char ST_LOADED       = 0x0001;
+	public static final char ST_DEFINED      = 0x0002;
+	public static final char ST_VERIFYING    = 0x0004;
+	public static final char ST_VERIFIED     = 0x0008;
+	public static final char ST_PREPARING    = 0x0010;
+	public static final char ST_PREPARED     = 0x0020;
+	public static final char ST_COMPILED     = 0x0040;
+	public static final char ST_COMPILING    = 0x0080;
+	public static final char ST_INITIALIZED  = 0x0100;
+	public static final char ST_INITIALIZING = 0x0200;
+	public static final char ST_INVALID      = 0x8000;
 
 }

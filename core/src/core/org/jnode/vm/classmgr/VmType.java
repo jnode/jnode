@@ -73,7 +73,7 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
 	private int modifiers = -1;
 
 	/** State of this type see {@link VmTypeState}. */
-	private int state;
+	private char state;
 
 	/** The constant pool */
 	private VmCP cp;
@@ -94,7 +94,7 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
 	private boolean resolvedCpRefs;
 
 	/** Size of instances of this class in bytes (1..8) */
-	private final int typeSize;
+	private final byte typeSize;
 
 	/** Name of the array class with this class as component type */
 	private String arrayClassName;
@@ -242,11 +242,11 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
 			this.interfaceTable = new VmImplementedInterface[] {
 					new VmImplementedInterface(CloneableClass),
 					new VmImplementedInterface(SerializableClass) };
-			this.typeSize = loader.getArchitecture().getReferenceSize();
+			this.typeSize = (byte)loader.getArchitecture().getReferenceSize();
 		} else if (typeSize >= 0) {
-			this.typeSize = typeSize;
+			this.typeSize = (byte)typeSize;
 		} else {
-			this.typeSize = loader.getArchitecture().getReferenceSize();
+			this.typeSize = (byte)loader.getArchitecture().getReferenceSize();
 		}
 
 	}
