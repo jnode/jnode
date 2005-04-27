@@ -36,17 +36,15 @@ public final class VmByteCode extends AbstractCode {
 	/** The constant pool where indexes in my bytecode refer to */
 	private final VmCP cp;
 	/** #Local variables of this method */
-	private int noLocals;
+	private char noLocals;
 	/** Max. #slots taken by this method on the stack */
-	private int maxStack;
+	private char maxStack;
 	/** Bytecode of this method */
 	private byte[] bytecode;
 	/** Exception handler table */
 	private VmInterpretedExceptionHandler[] eTable;
 	/** Line number table */
 	private VmLineNumberMap lnTable;
-	/** Is this object in use bye a method? If so, no modifications are allowed. */
-	//private boolean locked;
 	/** Data used by the native code compilers */
 	private transient Object compilerData;
 	
@@ -63,8 +61,8 @@ public final class VmByteCode extends AbstractCode {
 		this.method = method;
 		this.cp = method.getDeclaringClass().getCP();
 		this.bytecode = bytecode;
-		this.noLocals = noLocals;
-		this.maxStack = maxStack;
+		this.noLocals = (char)noLocals;
+		this.maxStack = (char)maxStack;
 		this.eTable = eTable;
 		this.lnTable = lnTable;
 		//this.locked = false;
