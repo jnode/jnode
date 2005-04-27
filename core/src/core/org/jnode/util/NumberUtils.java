@@ -220,17 +220,17 @@ public class NumberUtils {
 	 */
 	public static String size(long v) {
 	    // Is < 1Kb?
-	    if ((v & (K-1)) != 0) {
+	    if (v < K) {
 	        return String.valueOf(v) + "b";
 	    }
 	    // Is < 1Mb?
 	    v = v >>> 10;
-	    if ((v & (K-1)) != 0) {
+	    if (v < K) {
 	        return String.valueOf(v) + "K";
 	    }
 	    // Is < 1Gb?
 	    v = v >>> 10;
-	    if ((v & (K-1)) != 0) {
+	    if (v < K) {
 	        return String.valueOf(v) + "M";
 	    }
 	    // Large...
