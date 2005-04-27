@@ -55,9 +55,6 @@ public final class VmCompiledCode extends AbstractCode {
     /** Next in linked list */
     private VmCompiledCode next;
 
-    /** Magic of compiler */
-    private final int magic;
-
     /** Unique id of this compiled code */
     private final int id;
     
@@ -82,7 +79,6 @@ public final class VmCompiledCode extends AbstractCode {
         this.id = id;
         this.method = method;
         this.compiler = compiler;
-        this.magic = compiler.getMagic();
         this.nativeCode = nativeCode;
         this.compiledCode1 = compiledCode;
         this.eTable = eTable;
@@ -229,7 +225,7 @@ public final class VmCompiledCode extends AbstractCode {
     final VmCompiledCode lookup(int magic) {
         VmCompiledCode c = this;
         while (c != null) {
-            if (c.magic == magic) {
+            if (c.compiler.getMagic() == magic) {
                 return c;
             }
             c = c.next;
