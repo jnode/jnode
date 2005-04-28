@@ -181,7 +181,7 @@ public class PluginJar implements BootableObject {
             final ByteArrayOutputStream bos = new ByteArrayOutputStream();
             while ((entry = jis.getNextJarEntry()) != null) {
                 FileUtils.copy(jis, bos, buf, false);
-                map.put(entry.getName(), bos.toByteArray());
+                map.put(entry.getName().intern(), bos.toByteArray());
                 bos.reset();
             }
             return map;

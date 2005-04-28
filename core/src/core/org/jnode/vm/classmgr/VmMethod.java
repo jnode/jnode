@@ -189,8 +189,8 @@ public abstract class VmMethod extends VmMember implements VmSharedStaticsEntry 
      */
     public final String getMangledName() {
         if (mangledName == null) {
-            mangledName = declaringClass.getMangledName()
-                    + mangle("#" + getName() + '.' + getSignature());
+            mangledName = (declaringClass.getMangledName()
+                    + mangle("#" + getName() + '.' + getSignature())).intern();
         }
         return mangledName;
     }

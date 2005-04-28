@@ -254,7 +254,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             for (Enumeration< ? > e = jar.entries(); e.hasMoreElements();) {
                 final JarEntry entry = (JarEntry) e.nextElement();
                 final byte[] data = read(jar.getInputStream(entry));
-                resources.put(entry.getName(), data);
+                resources.put(entry.getName().intern(), data);
             }
             blockedObjects.add(resources);
             clsMgr.setSystemRtJar(resources);

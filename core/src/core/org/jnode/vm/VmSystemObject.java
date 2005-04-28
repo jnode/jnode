@@ -43,7 +43,7 @@ public abstract class VmSystemObject implements BootableObject {
 				res.append(Integer.toHexString(ch));
 			}
 		}
-		return res.toString();
+		return res.toString().intern();
 	}
 
 	/**
@@ -63,7 +63,7 @@ public abstract class VmSystemObject implements BootableObject {
 			res.append(v.length());
 			res.append(v);
 		}
-		return res.toString();
+		return res.toString().intern();
 	}
 	
 	/**
