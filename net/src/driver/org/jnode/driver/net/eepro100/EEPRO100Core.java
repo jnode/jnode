@@ -45,6 +45,7 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.AccessControllerUtils;
+import org.jnode.util.BigEndian;
 import org.jnode.util.Counter;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
@@ -143,7 +144,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
 		// Initialize RX/TX Buffers.
 		buffers = new EEPRO100Buffer(this);
 		
-		short[] eeprom = new short[16];
+		int[] eeprom = new int[16];
         
 		int eeSize;
         int eeReadCmd;
@@ -157,25 +158,26 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
 			eeReadCmd = EE_READ_CMD << 22;
 		}
 
-		short sum = 0;
+		log.debug("EEProm size:" + NumberUtils.hex(eeSize) + " read command:" + eeReadCmd );
+		
+		int sum = 0;
 		for (int x = 0; x < eeSize; x++) {
-			int value = doEepromCmd(eeReadCmd | (x << 16), 27);
-			if (x < (int)(eeprom.length))
-				eeprom[x] = new Integer(value).shortValue();
+			int value = NumberUtils.toUnsigned(new Integer(doEepromCmd(eeReadCmd | (x << 16), 27)).shortValue());
+			if (x < (int)(eeprom.length)) eeprom[x] = value;
 			sum += value;
 		}
 
 		final byte[] hwAddrArr = new byte[ETH_ALEN];
 
 		for (int a = 0; a < ETH_ALEN; a++) {
-			hwAddrArr[a] = new Integer((eeprom[a / 2] >> (8 * (a & 1))) & 0xff).byteValue();
+			hwAddrArr[a] = (byte)(eeprom[a / 2] >> (8 * (a & 1)));
 		}
 		
 		this.hwAddress = new EthernetAddress(hwAddrArr, 0);
 
 		if (sum != 0xBABA) {
 			log.debug(this.flags.getName() + ": Invalid EEPROM checksum "
-					+ Integer.toHexString(sum)
+					+ NumberUtils.hex(sum)
 					+ ", check settings before activating this device!");
 		}
 		
@@ -481,50 +483,6 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
 			;
 	}
 
-	/**
-	 * 
-	 *  
-	 */
-	final void sizeEeprom() {
-
-		regs.setReg16(SCBeeprom, EE_CS);
-		int cmd = EE_READ_CMD << 8;
-		int addressBits = 0;
-		for (int i = 10; i >= 0; i--, addressBits++) {
-			int data = ((cmd & 1 << i) != 0) ? EE_WRITE_1 : EE_WRITE_0;
-			regs.setReg16(SCBeeprom, data);
-			regs.setReg16(SCBeeprom, data | EE_SHIFT_CLK);
-			eepromDelay();
-			regs.setReg16(SCBeeprom, data);
-			eepromDelay();
-
-			int ee = regs.getReg16(SCBeeprom);
-			if ((ee & EE_DATA_READ) == 0) {
-				if (addressBits == 8) {
-					// 64 registers
-					eeSize = 0x40;
-					eeReadCmd = EE_READ_CMD << 6;
-					eeAddress = 8;
-				} else {
-					// 256 registers
-					eeSize = 0x100;
-					eeReadCmd = EE_READ_CMD << 8;
-					eeAddress = 10;
-				}
-				break;
-			}
-		}
-		// read but discard
-		for (int i = 0; i < 16; i++) {
-			regs.setReg16(SCBeeprom, EE_CS);
-			regs.setReg16(SCBeeprom, EE_CS | EE_SHIFT_CLK);
-			eepromDelay();
-			regs.setReg16(SCBeeprom, EE_CS);
-			eepromDelay();
-		}
-		// disable the eeprom
-		regs.setReg16(SCBeeprom, 0);
-	}
 	/**
 	 * 
 	 * @param cmd
