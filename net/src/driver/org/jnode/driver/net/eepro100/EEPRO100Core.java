@@ -52,8 +52,7 @@ import org.jnode.util.TimeoutException;
 /**
  * @author flesire
  */
-public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
-		EEPRO100Constants, EthernetConstants {
+public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPRO100Constants, EthernetConstants {
 	/** Device Driver */
 	private final EEPRO100Driver driver;
 
@@ -136,7 +135,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 			this.irq.release();
 			throw ex;
 		}
-				
+		
 		short[] eeprom = new short[16];
         
 		int eeSize;
@@ -162,9 +161,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 		final byte[] hwAddrArr = new byte[ETH_ALEN];
 
 		for (int a = 0; a < ETH_ALEN; a++) {
-			hwAddrArr[a] = new Integer((eeprom[a / 2] >> (8 * (a & 1))) & 0xff)
-					.byteValue();
-
+			hwAddrArr[a] = new Integer((eeprom[a / 2] >> (8 * (a & 1))) & 0xff).byteValue();
 		}
 		
 		this.hwAddress = new EthernetAddress(hwAddrArr, 0);
@@ -492,7 +489,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 		int cmd = EE_READ_CMD << 8;
 		int addressBits = 0;
 		for (int i = 10; i >= 0; i--, addressBits++) {
-			int data = (cmd & 1 << i) == 0 ? EE_WRITE_0 : EE_WRITE_1;
+			int data = ((cmd & 1 << i) != 0) ? EE_WRITE_1 : EE_WRITE_0;
 			regs.setReg16(SCBeeprom, data);
 			regs.setReg16(SCBeeprom, data | EE_SHIFT_CLK);
 			eepromDelay();
@@ -540,19 +537,17 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler,
 		regs.setReg16(SCBeeprom, EE_ENB | EE_SHIFT_CLK);
 		eepromDelay(2);
 		do {
-			int dataVal = (cmd & (1 << cmdLength)) == 0 ? EE_WRITE_0
-					: EE_WRITE_1;
+			int dataVal = ((cmd & (1 << cmdLength)) != 0) ? EE_WRITE_1 : EE_WRITE_0;
 			regs.setReg16(SCBeeprom, dataVal);
 			eepromDelay(2);
 			regs.setReg16(SCBeeprom, dataVal | EE_SHIFT_CLK);
 			eepromDelay(2);
-			retVal = (retVal << 1)
-					| ((regs.getReg16(SCBeeprom) & EE_DATA_READ) == 0 ? 1 : 0);
+			retVal = (((retVal << 1) != 0)	|| ((regs.getReg16(SCBeeprom) & EE_DATA_READ) != 0)) ? 1 : 0;
 		} while (--cmdLength >= 0);
 		regs.setReg16(SCBeeprom, EE_ENB);
 		eepromDelay(2);
 
-		regs.setReg16(SCBeeprom, EE_ENB & ~EE_CS);
+		regs.setReg16(SCBeeprom, (EE_ENB & ~EE_CS));
 
 		return retVal;
 	}
