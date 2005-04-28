@@ -30,6 +30,11 @@ kernel /jnode32.gz
 module /fullgui.jgz
 
 # ---------------------------
+title JNode GUI (all plugins without MP)
+kernel /jnode32.gz mp=no
+module /fullgui.jgz
+
+# ---------------------------
 title JNode via dhcp (default)
 dhcp
 kernel (nd)/jnode32.gz
