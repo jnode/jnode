@@ -1976,16 +1976,27 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
     }
 
 	/**
-	 * Create a conditional jump to a label The opcode sequence is: 0x0f
-	 * <jumpOpcode><rel32>
+	 * Create a conditional jump to a label.
 	 * 
 	 * @param label
 	 * @param jumpOpcode
 	 */
 	public final void writeJCC(Label label, int jumpOpcode) {
-		write8(0x0f); // jxx rel32
-		write8(jumpOpcode);
-		writeRelativeObjectRef(label);
+        final ObjectRef ref = getObjectRef(label);
+        final int shortOffset = m_used+2;
+        if (ref.isResolved() && isByteDistance(ref, shortOffset)) {
+            try {
+                // We can do a short jump
+                write8(jumpOpcode - 0x10); // jcc imm8
+                write8(ref.getOffset() - shortOffset);
+            } catch (UnresolvedObjectRefException ex) {
+                throw new RuntimeException(ex);
+            }
+        } else {
+            write8(0x0f); // jxx rel32
+            write8(jumpOpcode);
+            writeRelativeObjectRef(label);
+        }
 	}
 
     //TODO this method does not handle the forward jumps correctly, needs further work.
