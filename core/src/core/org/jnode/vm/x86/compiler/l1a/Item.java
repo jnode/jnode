@@ -104,7 +104,7 @@ abstract class Item {
 	 */
 	protected Item(ItemFactory factory) {
 	    this.factory = factory;
-		if (true) {
+		if (false) {
 		    final Vm vm = Vm.getVm();
 		    final String name = getClass().getName();
 		    final Counter cnt = vm.getCounter(name);
