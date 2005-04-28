@@ -33,13 +33,15 @@ import org.jnode.vm.VmSystemObject;
  * 
  * @author epr
  */
-public class VmAddressMap extends VmSystemObject {
+public final class VmAddressMap extends VmSystemObject {
 
     private AddressPcEntry list;
 
     private VmMethod[] methodTable;
 
-    private int[] table;
+    private int[] offsetTable;
+    private char[] pcTable;
+    private byte[] methodIndexTable;
 
     /**
      * Create a new instance
@@ -55,7 +57,7 @@ public class VmAddressMap extends VmSystemObject {
      * @param pc
      */
     public void add(VmMethod method, int pc, int offset) {
-        if (table != null) { throw new RuntimeException(
+        if (offsetTable != null) { throw new RuntimeException(
                 "Address table is locked"); }
         final AddressPcEntry entry = new AddressPcEntry(method, pc, offset);
         if (list == null) {
@@ -83,19 +85,21 @@ public class VmAddressMap extends VmSystemObject {
      * @return The linenumber for the given pc, or -1 is not found.
      */
     public String getLocationInfo(VmMethod expectedMethod, int offset) {
-        final int[] table = this.table;
-        if (table != null) {
-            final int length = table.length;
-            int lastPC = 0;
+        final int[] offsetTable = this.offsetTable;
+        final char[] pcTable = this.pcTable;
+        final byte[] methodIndexTable = this.methodIndexTable;
+        if (offsetTable != null) {
+            final int length = offsetTable.length;
+            char lastPC = 0;
             int lastMethodIdx = 0;
-            int lastExpMethPC = 0;
-            for (int i = 0; i < length; i += 3) {
-                final int o = table[ i + 2];
+            char lastExpMethPC = 0;
+            for (int i = 0; i < length; i++) {
+                final int o = offsetTable[i];
                 if (o > offset) {
                     break;
                 } else {
-                    lastMethodIdx = table[ i + 0];
-                    lastPC = table[ i + 1];
+                    lastMethodIdx = methodIndexTable[i];
+                    lastPC = pcTable[i];
                     if (methodTable[lastMethodIdx] == expectedMethod) {
                         lastExpMethPC = lastPC;
                     }
@@ -140,31 +144,35 @@ public class VmAddressMap extends VmSystemObject {
             p = p.next;
         }
 
-        final int[] table = new int[ count * 3];
+        final int[] offsetTable = new int[ count];
+        final char[] pcTable = new char[count];
+        final byte[] methodIndexTable = new byte[count];
         this.methodTable = (VmMethod[]) methods.toArray(new VmMethod[ methods
                                                                       .size()]);
         p = list;
         int i = 0;
         int lastOffset = -1;
         while (p != null) {
-            table[ i + 0] = methods.indexOf(p.method);
-            table[ i + 1] = p.pc;
-            table[ i + 2] = p.offset;
+            methodIndexTable[i] = (byte)methods.indexOf(p.method);
+            pcTable[i] = p.pc;
+            offsetTable[i] = p.offset;
             if (p.offset < lastOffset) { throw new InternalError(
                     "unordered offset found"); }
             lastOffset = p.offset;
-            i += 3;
+            i++;
             p = p.next;
         }
-        this.table = table;
+        this.offsetTable = offsetTable;
+        this.pcTable = pcTable;
+        this.methodIndexTable = methodIndexTable;
         this.list = null;
     }
 
     public void writeTo(PrintStream out) {
-        for (int i = 0; i < table.length; i += 3) {
-            final int methodIdx = table[ i + 0];
-            final int pc = table[ i + 1];
-            final int offset = table[ i + 2];
+        for (int i = 0; i < offsetTable.length; i++) {
+            final int methodIdx = methodIndexTable[i];
+            final int pc = pcTable[i];
+            final int offset = offsetTable[i];
 
             out.println(methodTable[ methodIdx].getName() + ", pc[" + pc
                     + "]\t0x" + NumberUtils.hex(offset));
@@ -175,7 +183,7 @@ public class VmAddressMap extends VmSystemObject {
 
         final VmMethod method;
 
-        final int pc;
+        final char pc;
 
         final int offset;
 
@@ -183,7 +191,7 @@ public class VmAddressMap extends VmSystemObject {
 
         public AddressPcEntry(VmMethod method, int pc, int offset) {
             this.method = method;
-            this.pc = pc;
+            this.pc = (char)pc;
             this.offset = offset;
         }
     }
