@@ -42,7 +42,7 @@ public class SelectorMap extends VmSystemObject {
 	 * @return The global unique selector
 	 */
 	public int get(String name, String signature) {
-		final String id = name + '#' + signature;
+		final String id = (name + '#' + signature).intern();
 		final Integer selector = (Integer)map.get(id);
 		if (selector != null) {
 			return selector.intValue();

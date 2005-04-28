@@ -458,6 +458,6 @@ public class BaseMagicHelper {
     }
 
     private final void addMethod(String mname, int code) {
-        methodNames.put(mname, code);
+        methodNames.put(mname.intern(), code);
     }
 }

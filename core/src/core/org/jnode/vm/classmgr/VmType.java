@@ -230,9 +230,9 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
 		    }		 
 		}
 		
-		this.name = name;
+		this.name = name.intern();
 		this.superClass = superClass;
-		this.superClassName = superClassName;
+		this.superClassName = (superClassName == null) ? null : superClassName.intern();
 		this.modifiers = modifiers;
 		this.state = VmTypeState.ST_LOADED;
 		this.loader = loader;

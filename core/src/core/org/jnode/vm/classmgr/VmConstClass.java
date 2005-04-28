@@ -36,7 +36,7 @@ public final class VmConstClass extends VmResolvableConstObject {
      * @param name
      */
 	VmConstClass(String name) {
-		this.data = name.replace('/', '.');
+		this.data = name.replace('/', '.').intern();
 	}
 
 	/**

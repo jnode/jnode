@@ -48,7 +48,11 @@ public abstract class AbstractModelObject extends VmSystemObject {
 				throw new PluginException("Required attribute " + name + " in element " + e.getName() + " not found");
 			}
 		}
-		return v;
+        if (v != null) {
+            return v.intern();
+        } else {
+            return null;
+        }
 	}
 
 	/**
