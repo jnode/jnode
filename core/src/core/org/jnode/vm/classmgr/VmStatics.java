@@ -368,11 +368,11 @@ public abstract class VmStatics extends VmSystemObject {
 	}
 
 	public final void dumpStatistics(PrintStream out) {
-		out.println("#static int fields  " + typeCounter[TYPE_INT]);
-		out.println("#static long fields " + typeCounter[TYPE_LONG]);
-		out.println("#methods            " + typeCounter[TYPE_METHOD_CODE]);
-		out.println("#types              " + typeCounter[TYPE_CLASS]);
-		out.println("table.length        " + next);
+		out.println("  #static int fields  " + typeCounter[TYPE_INT]);
+		out.println("  #static long fields " + typeCounter[TYPE_LONG]);
+		out.println("  #methods            " + typeCounter[TYPE_METHOD_CODE]);
+		out.println("  #types              " + typeCounter[TYPE_CLASS]);
+		out.println("  table.length        " + next);
 	}
 
 	/**
