@@ -2027,9 +2027,30 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param label
 	 */
 	public final void writeJMP(Label label) {
-		write8(0xe9); // jmp rel32
-		writeRelativeObjectRef(label);
+        final ObjectRef ref = getObjectRef(label);
+        final int shortOffset = m_used+2;
+        if (ref.isResolved() && isByteDistance(ref, shortOffset)) {
+            try {
+                // We can do a short jump
+                write8(0xEB); // jmp imm8
+                write8(ref.getOffset() - shortOffset);
+            } catch (UnresolvedObjectRefException ex) {
+                throw new RuntimeException(ex);
+            }
+        } else {
+            write8(0xe9); // jmp rel32
+            writeRelativeObjectRef(label);
+        }
 	}
+    
+    private final boolean isByteDistance(ObjectRef ref, int offset) {
+        try {
+            final int distance = ref.getOffset() - offset;
+            return X86Utils.isByte(distance);
+        } catch (UnresolvedObjectRefException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
 	/**
 	 * Create a absolute jump to address stored at the given offset in the given
