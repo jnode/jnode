@@ -3505,8 +3505,13 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 */
 	public final int writePUSH(int imm32) {
 		final int rc = m_used;
-		write8(0x68); // PUSH imm32
-		write32(imm32);
+        if (X86Utils.isByte(imm32)) {
+            write8(0x6A); // PUSH imm8
+            write8(imm32);            
+        } else {
+            write8(0x68); // PUSH imm32
+            write32(imm32);
+        }
 		return rc;
 	}
 
