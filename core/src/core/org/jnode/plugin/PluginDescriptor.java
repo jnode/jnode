@@ -108,12 +108,19 @@ public interface PluginDescriptor {
 	throws PluginException;
 	
 	/**
-	 * Is this a descriptor of a system plugin.
-	 * System plugins are not reloadable.
-	 * @return boolean
+	 * Is this a descriptor of a fragment.
+	 * 
+	 * @return boolean True for a fragment, false for a plugin
 	 */
-	public boolean isSystemPlugin();
+	public boolean isFragment();
 	
+    /**
+     * Is this a descriptor of a system plugin.
+     * System plugins are not reloadable.
+     * @return boolean
+     */
+    public boolean isSystemPlugin();
+    
 	/**
 	 * Does this plugin have a custom plugin class specified?
 	 * @return

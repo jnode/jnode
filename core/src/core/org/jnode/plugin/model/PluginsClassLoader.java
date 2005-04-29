@@ -43,7 +43,7 @@ public class PluginsClassLoader extends ClassLoader {
 	protected Class findClass(String name) throws ClassNotFoundException {
 		for (Iterator<PluginDescriptor> i = registry.getDescriptorIterator(); i.hasNext();) {
 			final PluginDescriptor descr = i.next();
-			if (!descr.isSystemPlugin()) {
+			if (!descr.isSystemPlugin() && !descr.isFragment()) {
 				final PluginClassLoaderImpl cl = (PluginClassLoaderImpl) descr.getPluginClassLoader();
 				if (cl.containsClass(name)) {
 					return cl.loadClass(name);

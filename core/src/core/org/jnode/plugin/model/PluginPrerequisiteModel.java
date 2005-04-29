@@ -29,11 +29,17 @@ import org.jnode.plugin.PluginPrerequisite;
 /**
  * @author epr
  */
-public class PluginPrerequisiteModel extends PluginModelObject implements PluginPrerequisite {
+final class PluginPrerequisiteModel extends PluginModelObject implements PluginPrerequisite {
 	
 	private final String plugin;
 	private final String version;
 	
+    /**
+     * Initialize this instance.
+     * @param plugin
+     * @param e
+     * @throws PluginException
+     */
 	public PluginPrerequisiteModel(PluginDescriptorModel plugin, XMLElement e) 
 	throws PluginException {
 		super(plugin);
@@ -45,6 +51,20 @@ public class PluginPrerequisiteModel extends PluginModelObject implements Plugin
 			this.version = plugin.getVersion();
 		}
 	}
+
+    /**
+     * Initialize this instance.
+     * 
+     * @param plugin
+     * @param pluginId
+     * @param pluginVersion
+     */
+    public PluginPrerequisiteModel(PluginDescriptorModel plugin,
+            String pluginId, String pluginVersion) {
+        super(plugin);
+        this.plugin = pluginId;
+        this.version = pluginVersion;
+    }
 
 	/**
 	 * Gets the identifier of the plugin that is required
