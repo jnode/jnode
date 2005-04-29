@@ -42,6 +42,7 @@ import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.Runtime;
 import org.jnode.system.BootLog;
+import org.jnode.util.BootableArrayList;
 
 /**
  * Implementation of {@link org.jnode.plugin.PluginDescriptor}.
@@ -69,6 +70,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	private boolean started = false;
 	private boolean starting = false;
 	private List<PluginDescriptorListener> listeners;
+    private final List<FragmentDescriptorModel> fragments;
 
 	/**
 	 * Load a plugin-descriptor without a registry.
@@ -86,6 +88,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	 */
 	public PluginDescriptorModel(PluginJar jarFile, XMLElement e) throws PluginException {
 		this.jarFile = jarFile;
+        this.fragments = new BootableArrayList<FragmentDescriptorModel>();
 		id = getAttribute(e, "id", true);
 		name = getAttribute(e, "name", true);
 		providerName = getAttribute(e, "provider-name", false);
@@ -102,6 +105,8 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 		final ArrayList<ExtensionModel> exList = new ArrayList<ExtensionModel>();
 		final ArrayList<PluginPrerequisiteModel> reqList = new ArrayList<PluginPrerequisiteModel>();
 		RuntimeModel runtime = null;
+        
+        initializeRequiresList(reqList);
 
 		for (Iterator<?> ci = e.getChildren().iterator(); ci.hasNext();) {
 			final XMLElement childE = (XMLElement) ci.next();
@@ -159,7 +164,7 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	 * 
 	 * @throws PluginException
 	 */
-	public final void resolve(PluginRegistryModel registry) throws PluginException {
+	public void resolve(PluginRegistryModel registry) throws PluginException {
 	    if ((this.registry != null) && (this.registry != registry)) {
 	        throw new SecurityException("Cannot overwrite the registry");
 	    }
@@ -526,4 +531,40 @@ public class PluginDescriptorModel extends AbstractModelObject implements Plugin
 	        l.pluginStop(this);
 	    }
 	}
+    
+    /**
+     * Initialize the list of plugin requirements.
+     */
+    protected void initializeRequiresList(List<PluginPrerequisiteModel> list) {
+        // Nothing here
+    }
+    
+    /**
+     * Add a fragment to this plugin.
+     * This method is called only by {@link FragmentDescriptorModel#resolve }.
+     * 
+     * @param fragment
+     */
+    final void add(FragmentDescriptorModel fragment) {
+        fragments.add(fragment);
+    }
+    
+    /**
+     * Remove a fragment from this plugin.
+     * This method is called only by {@link FragmentDescriptorModel#unresolve(PluginRegistryModel)}.
+     * 
+     * @param fragment
+     */
+    final void remove(FragmentDescriptorModel fragment) {
+        fragments.remove(fragment);
+    }
+
+    /**
+     * Is this a descriptor of a fragment.
+     * 
+     * @return boolean True for a fragment, false for a plugin
+     */
+    public boolean isFragment() {
+        return false;
+    }    
 }

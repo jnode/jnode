@@ -44,7 +44,7 @@ import org.jnode.vm.BootableObject;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class PluginJar implements BootableObject {
+public class PluginJar implements BootableObject, ResourceLoader {
 
     /** The descriptor of this file */
     private final PluginDescriptorModel descriptor;
@@ -97,9 +97,14 @@ public class PluginJar implements BootableObject {
         } catch (IOException ex) {
             throw new PluginException("Plugin " + pluginUrl, ex);
         }
-        if (!root.getName().equals("plugin")) { throw new PluginException(
-                "plugin element expected"); }
-        this.descriptor = new PluginDescriptorModel(this, root);
+        final String rootTag = root.getName();
+        if (rootTag.equals("plugin")) {
+            this.descriptor = new PluginDescriptorModel(this, root);           
+        } else if (rootTag.equals("fragment")) {
+            this.descriptor = new FragmentDescriptorModel(this, root);            
+        } else {
+            throw new PluginException("plugin or fragment element expected");
+        }
         if (descriptor.isSystemPlugin()) {
             resources.clear();
         }
