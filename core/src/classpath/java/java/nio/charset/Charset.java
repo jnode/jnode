@@ -1,5 +1,5 @@
 /* Charset.java -- 
-   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,7 +38,10 @@ exception statement from your version. */
 
 package java.nio.charset;
 
+import gnu.classpath.SystemProperties;
+
 import gnu.java.nio.charset.Provider;
+import gnu.java.nio.charset.iconv.IconvProvider;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -126,22 +129,39 @@ public abstract class Charset implements Comparable
   public static Charset defaultCharset()
   {
     String encoding;
+    
     try 
       {
-	encoding = System.getProperty("file.encoding");
-      } catch(SecurityException e) {
+	encoding = SystemProperties.getProperty("file.encoding");
+      }
+    catch(SecurityException e)
+      {
+	// Use fallback.
 	encoding = "ISO-8859-1";
-      } catch(IllegalArgumentException e) {
+      }
+    catch(IllegalArgumentException e)
+      {
+	// Use fallback.
 	encoding = "ISO-8859-1";
       }
 
     try
       {
 	return forName(encoding);
-      } catch(UnsupportedCharsetException e) {
-      } catch(IllegalCharsetNameException e) {
-      } catch(IllegalArgumentException e) {
       }
+    catch(UnsupportedCharsetException e)
+      {
+	// Ignore.
+      }
+    catch(IllegalCharsetNameException e)
+      {
+	// Ignore.
+      }
+    catch(IllegalArgumentException e)
+      {
+	// Ignore.
+      }
+    
     throw new IllegalStateException("Can't get default charset!");
   }
 
@@ -185,7 +205,7 @@ public abstract class Charset implements Comparable
   {
     checkName (charsetName);
     Charset cs = null;
-    CharsetProvider[] providers = providers();
+    CharsetProvider[] providers = providers2();
     for (int i = 0; i < providers.length; i++)
       {
         cs = providers[i].charsetForName(charsetName);
@@ -199,7 +219,7 @@ public abstract class Charset implements Comparable
   {
     TreeMap charsets = new TreeMap(String.CASE_INSENSITIVE_ORDER);
 
-    CharsetProvider[] providers = providers();
+    CharsetProvider[] providers = providers2();
     for (int j = 0; j < providers.length; j++)
       {
         for (Iterator i = providers[j].charsets(); i.hasNext(); )
@@ -214,6 +234,12 @@ public abstract class Charset implements Comparable
 
   private static CharsetProvider provider()
       {
+    String useIconv = SystemProperties.getProperty
+      ("gnu.classpath.nio.charset.provider.iconv");
+
+    if (useIconv != null)
+      return IconvProvider.provider();
+
     return Provider.provider();
 		}
 
@@ -222,7 +248,7 @@ public abstract class Charset implements Comparable
    * java.nio.charset.spi.CharsetProvider in the resource directory
    * META-INF/services.
    */
-  private static CharsetProvider[] providers()
+  private static CharsetProvider[] providers2()
   {
     if (providers == null)
       {
