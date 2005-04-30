@@ -1,5 +1,5 @@
 /* BoxLayout.java -- A layout for swing components.
-   Copyright (C) 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -148,13 +148,14 @@ public class BoxLayout implements LayoutManager2, Serializable
       throw new AWTError("invalid parent");
     
     Insets insets = parent.getInsets();
-    int x = insets.left + insets.right;
-    int y = insets.bottom + insets.top;
+    int x = 0;
+    int y = 0;
 
     Component[] children = parent.getComponents();
 
     if (isHorizontalIn(parent))
       {        
+        x = insets.left + insets.right;
         // sum up preferred widths of components, find maximum of preferred
         // heights
         for (int index = 0; index < children.length; index++)
@@ -164,9 +165,11 @@ public class BoxLayout implements LayoutManager2, Serializable
             x += sz.width;
             y = Math.max(y, sz.height);
           }
+        y += insets.bottom + insets.top;
       } 
     else 
       {        
+        y = insets.top + insets.bottom;
         // sum up preferred heights of components, find maximum of
         //  preferred widths
         for (int index = 0; index < children.length; index++)
@@ -176,6 +179,7 @@ public class BoxLayout implements LayoutManager2, Serializable
             y += sz.height;
             x = Math.max(x, sz.width);
           }
+        x += insets.left + insets.right;
       }
     
     return new Dimension(x, y);
