@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package gnu.classpath;
 
 import java.util.Properties;
@@ -67,15 +68,16 @@ public class SystemProperties
     {
         VMSystemProperties.preInit(defaultProperties);
 
-        defaultProperties.put("gnu.classpath.home",
-            Configuration.CLASSPATH_HOME);
+    defaultProperties.put("gnu.classpath.home", Configuration.CLASSPATH_HOME);
         defaultProperties.put("gnu.classpath.version",
             Configuration.CLASSPATH_VERSION);
 
         // Set base URL if not already set.
         if (defaultProperties.get("gnu.classpath.home.url") == null)
             defaultProperties.put("gnu.classpath.home.url",
-                "file://" + Configuration.CLASSPATH_HOME + "/lib");
+			    "file://"
+			    + Configuration.CLASSPATH_HOME
+	                    + "/lib");
 
         // Set short name if not already set.
         if (defaultProperties.get("gnu.classpath.vm.shortname") == null)
@@ -90,8 +92,7 @@ public class SystemProperties
         // Network properties
         if (defaultProperties.get("http.agent") == null)
         {
-            String userAgent
-                = ("gnu-classpath/"
+	String userAgent = ("gnu-classpath/"
                 + defaultProperties.getProperty("gnu.classpath.version")
                 + " ("
                 + defaultProperties.getProperty("gnu.classpath.vm.shortname")
@@ -114,7 +115,7 @@ public class SystemProperties
 
         // Note that we use clone here and not new.  Some programs assume
         // that the system properties do not have a parent.
-        properties = (Properties)defaultProperties.clone();
+    properties = (Properties) defaultProperties.clone();
     }
 
     public static String getProperty(String name)
@@ -129,7 +130,7 @@ public class SystemProperties
 
     public static String setProperty(String name, String value)
     {
-        return (String)properties.setProperty(name, value);
+    return (String) properties.setProperty(name, value);
     }
 
     public static Properties getProperties()
