@@ -41,6 +41,7 @@ package gnu.java.nio.channels;
 import gnu.classpath.Configuration;
 import gnu.java.nio.FileLockImpl;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -101,10 +102,27 @@ public final class FileChannelImpl extends FileChannel
   }
 
   /* Open a file.  MODE is a combination of the above mode flags. */
-  public FileChannelImpl (String path, int mode) throws FileNotFoundException
+  public FileChannelImpl (File file, int mode) throws FileNotFoundException
   {
+    final String path = file.getPath();
     fd = open (path, mode);
     this.mode = mode;
+
+    // First open the file and then check if it is a a directory
+    // to avoid race condition.
+    if (file.isDirectory())
+      {
+	try 
+	  {
+	      close();
+	  }
+	catch (IOException e)
+	  {
+	      /* ignore it */
+	  }
+
+	throw new FileNotFoundException(path + " is a directory");
+      }
   }
 
   /* Used by init() (native code) */
@@ -418,7 +436,7 @@ public final class FileChannelImpl extends FileChannel
     try
       {
 	begin();
-        lock(position, size, shared, true);
+        lock(position, size, shared, false);
 	completed = true;
 	return new FileLockImpl(this, position, size, shared);
       }
@@ -450,7 +468,7 @@ public final class FileChannelImpl extends FileChannel
 
     try
       {
-	boolean lockable = lock(position, size, shared, false);
+	boolean lockable = lock(position, size, shared, true);
 	completed = true;
 	return (lockable
 		? new FileLockImpl(this, position, size, shared)
