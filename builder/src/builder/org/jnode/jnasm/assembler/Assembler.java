@@ -81,8 +81,8 @@ public abstract class Assembler {
     }
 
     protected Assembler() {
-        pseudo = new PseudoInstructions(labels);
-        hwSupport = new X86Support(this, instructions, labels);
+        pseudo = new PseudoInstructions(labels, constants);
+        hwSupport = new X86Support(this, instructions, labels, constants);
     }
 
     public PseudoInstructions getPseudo() {

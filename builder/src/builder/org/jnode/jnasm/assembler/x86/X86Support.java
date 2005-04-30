@@ -51,12 +51,12 @@ public class X86Support extends HardwareSupport {
     private final Assembler assembler;
     private X86Assembler nativeStream;
 
-    public X86Support(Assembler assembler, List instructions, Map labels) {
+    public X86Support(Assembler assembler, List instructions, Map labels, Map constants) {
         this.modules = new ArrayList();
         this.assembler = assembler;
         this.instructions = instructions;
         this.labels = labels;
-        modules.add(new X86Core(labels));
+        modules.add(new X86Core(labels, constants));
         modules.add(assembler.getPseudo());
     }
 

@@ -31,9 +31,11 @@ import java.util.List;
  */
 public abstract class AssemblerModule {
     protected final Map labels;
+    protected final Map constants;
 
-    protected AssemblerModule(final Map labels) {
+    protected AssemblerModule(final Map labels, final Map constants) {
         this.labels = labels;
+        this.constants = constants;
     }
 
     public abstract boolean emmit(String mnemonic, List operands, int oprandSize);
