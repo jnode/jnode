@@ -105,39 +105,9 @@
       <export name="javax.naming.ldap.*"/>
       <export name="javax.naming.spi.*"/>
 
-      <export name="javax.net.*"/>
-      <export name="javax.net.ssl.*"/>
-
-      <export name="javax.security.*"/>
-      <export name="javax.security.auth.*"/>
-      <export name="javax.security.auth.callback.*"/>
-      <export name="javax.security.auth.login.*"/>
-      <export name="javax.security.auth.spi.*"/>
       <export name="javax.security.auth.x500.*"/>
-      <export name="javax.security.cert.*"/>
-      <export name="javax.security.sasl.*"/>
 
-      <export name="javax.swing.*"/>
-      <export name="javax.swing.border.*"/>
-      <export name="javax.swing.colorchooser.*"/>
-      <export name="javax.swing.event.*"/>
-      <export name="javax.swing.filechooser.*"/>
-      <export name="javax.swing.plaf.*"/>
-      <export name="javax.swing.plaf.basic.*"/>
-      <export name="javax.swing.plaf.metal.*"/>
-      <export name="javax.swing.table.*"/>
-      <export name="javax.swing.text.*"/>
-      <export name="javax.swing.text.html.*"/>
-      <export name="javax.swing.text.html.parser.*"/>
-      <export name="javax.swing.tree.*"/>
-      <export name="javax.swing.undo.*"/>
-
-      <export name="javax.xml.parsers.*"/>
-
-      <export name="org.w3c.dom.*"/>
       <export name="org.xml.sax.*"/>
-      <export name="org.xml.sax.ext.*"/>
-      <export name="org.xml.sax.helpers.*"/>
     </library>
   </runtime>
 
