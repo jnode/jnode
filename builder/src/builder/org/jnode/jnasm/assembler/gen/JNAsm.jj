@@ -245,7 +245,13 @@ Object operand() :
     (
         LOOKAHEAD( {isRegister(getToken(1))} )
         t=<IDENT>  { o = new Register(t.image);}
-    |   <LABEL> arithmeticExpression()
+    |   t=<LABEL> disp=arithmeticExpression()
+        {
+	   addr = new Address();	  
+	   addr.scale = getConstant(t.image,t.beginLine);
+	   addr.disp = disp;
+	   o = addr;
+	}
     |   i=arithmeticExpression() { o = new Integer(i); } [ <COLON> arithmeticExpression() ]
     |   "["
         (
@@ -271,7 +277,7 @@ Object operand() :
             {
               addr = new Address();
               addr.segment = true;
-              addr.reg = t.image.substring(0,t.image.length() - 1);
+              addr.reg = t.image;
               addr.disp = disp;
               o = addr;
             }

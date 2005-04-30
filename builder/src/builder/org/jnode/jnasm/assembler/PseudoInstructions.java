@@ -48,8 +48,8 @@ public class PseudoInstructions extends AssemblerModule {
     private List operands;
     private NativeStream stream;
 
-    public PseudoInstructions(final Map labels) {
-        super(labels);
+    public PseudoInstructions(final Map labels, final Map constants) {
+        super(labels, constants);
     }
 
     public void setNativeStream(NativeStream stream) {
