@@ -58,9 +58,9 @@ public class KeyboardInterpreterFactory {
                 if (defaultCountry.trim().length() == 0) {
                     defaultCountry = null;
                 }
-            } catch (Exception e) {
+            } catch (Exception ex) {
                 log
-                        .warn("Cannot load default keyboard layout, loading US layout instead");
+                        .warn("Cannot load default keyboard layout, loading US layout instead", ex);
                 return getKeyboardInterpreter("US", null, null);
             }
             try {

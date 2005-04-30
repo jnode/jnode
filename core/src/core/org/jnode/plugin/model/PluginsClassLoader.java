@@ -59,7 +59,7 @@ public class PluginsClassLoader extends ClassLoader {
 	protected URL findResource(String name) {
 		for (Iterator<PluginDescriptor> i = registry.getDescriptorIterator(); i.hasNext();) {
 			final PluginDescriptor descr = i.next();
-			if (!descr.isSystemPlugin()) {
+			if (!descr.isSystemPlugin() && !descr.isFragment()) {
 				final PluginClassLoaderImpl cl = (PluginClassLoaderImpl) descr.getPluginClassLoader();
 				final URL url = cl.getResource(name);
 				if (url != null) {

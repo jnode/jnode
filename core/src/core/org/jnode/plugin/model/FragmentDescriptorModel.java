@@ -107,10 +107,13 @@ public class FragmentDescriptorModel extends PluginDescriptorModel implements
     }
 
     /**
+     * @throws PluginException 
      * @see org.jnode.plugin.model.PluginDescriptorModel#initializeRequiresList(java.util.List)
      */
-    protected void initializeRequiresList(List<PluginPrerequisiteModel> list) {
-        super.initializeRequiresList(list);
+    protected void initializeRequiresList(List<PluginPrerequisiteModel> list,
+            XMLElement e) throws PluginException {
+        final String pluginId = getAttribute(e, "plugin-id", true);
+        final String pluginVersion = getAttribute(e, "plugin-version", true);
         list.add(new PluginPrerequisiteModel(this, pluginId, pluginVersion));
     }
 

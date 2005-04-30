@@ -39,10 +39,22 @@ import org.apache.tools.ant.types.FileSet;
  */
 public class InitJarsBuilder extends Task {
 
-    private File pluginDir;
     private File destDir;
     private final ArrayList<FileSet> fileSets = new ArrayList<FileSet>();
+    private File pluginDir;
+    private File systemPluginListFile;
     
+    /**
+     * Add a fileset to this task.
+     * 
+     * @return
+     */
+    public FileSet createFileset() {
+        final FileSet fs = new FileSet();
+        fileSets.add(fs);
+        return fs;
+    }
+
     /**
      * @see org.apache.tools.ant.Task#execute()
      */
@@ -58,6 +70,7 @@ public class InitJarsBuilder extends Task {
                 builder.setProject(getProject());
                 builder.setTaskName(getTaskName());
                 builder.setPluginDir(getPluginDir());
+                builder.setSystemPluginList(systemPluginListFile);
                 builder.setPluginList(listFile);
                 builder.setDestDir(getDestDir());
                 
@@ -66,23 +79,33 @@ public class InitJarsBuilder extends Task {
             
         }
     }
-    
-    /**
-     * Add a fileset to this task.
-     * 
-     * @return
-     */
-    public FileSet createFileset() {
-        final FileSet fs = new FileSet();
-        fileSets.add(fs);
-        return fs;
-    }
 
+    /**
+     * @return Returns the destDir.
+     */
+    public final File getDestDir() {
+        return destDir;
+    }
+    
     /**
      * @return Returns the pluginDir.
      */
     public final File getPluginDir() {
         return pluginDir;
+    }
+
+    /**
+     * @return Returns the systemPluginListFile.
+     */
+    public final File getSystemPluginList() {
+        return systemPluginListFile;
+    }
+
+    /**
+     * @param destDir The destDir to set.
+     */
+    public final void setDestDir(File destDir) {
+        this.destDir = destDir;
     }
 
     /**
@@ -93,17 +116,10 @@ public class InitJarsBuilder extends Task {
     }
 
     /**
-     * @return Returns the destDir.
+     * @param systemPluginListFile The systemPluginListFile to set.
      */
-    public final File getDestDir() {
-        return destDir;
-    }
-
-    /**
-     * @param destDir The destDir to set.
-     */
-    public final void setDestDir(File destDir) {
-        this.destDir = destDir;
+    public final void setSystemPluginList(File systemPluginListFile) {
+        this.systemPluginListFile = systemPluginListFile;
     }
 
 }

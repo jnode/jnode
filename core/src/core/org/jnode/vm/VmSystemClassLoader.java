@@ -31,10 +31,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.jnode.assembler.ObjectResolver;
+import org.jnode.plugin.model.ResourceLoader;
+import org.jnode.util.BootableArrayList;
+import org.jnode.util.FileUtils;
 import org.jnode.vm.classmgr.ClassDecoder;
 import org.jnode.vm.classmgr.IMTBuilder;
 import org.jnode.vm.classmgr.SelectorMap;
@@ -86,6 +90,8 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
     private transient VmIsolatedStatics isolatedStatics;
     
     private transient HashSet<String> failedClassNames;
+    
+    private List<ResourceLoader> resourceLoaders;
 
     /**
      * Constructor for VmClassLoader.
@@ -111,6 +117,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         this.selectorMap = new SelectorMap();
         this.arch = arch;
         this.resolver = resolver;
+        this.resourceLoaders = new BootableArrayList<ResourceLoader>();
         this.sharedStatics = new VmSharedStatics(arch, resolver);
         this.isolatedStatics = new VmIsolatedStatics(arch, resolver);
     }
@@ -407,7 +414,18 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
         final String fName = clsName.replace('.', '/') + ".class";
 
         if (systemRtJar != null) {
-            final byte[] data = (byte[]) systemRtJar.get(fName);
+            byte[] data = (byte[]) systemRtJar.get(fName);
+            
+            if (data == null) {
+                for (ResourceLoader l : resourceLoaders) {
+                    final InputStream is = l.getResourceAsStream(fName);
+                    if (is != null) {
+                        data = FileUtils.load(is, true);
+                        break;
+                    }
+                }
+            }
+            
             if (data == null) { throw new ClassNotFoundException(
                     "System class " + clsName + " not found."); }
             systemRtJar.remove(fName);
@@ -437,7 +455,18 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      */
     public final boolean resourceExists(String resName) {
         try {
-            return (getResourceAsStream(resName) != null);
+            for (ResourceLoader l : resourceLoaders) {
+                if (l.containsResource(resName)) {
+                    return true;
+                }
+            }
+            final InputStream is = getResourceAsStream(resName);
+            if (is != null) {
+                is.close();
+                return true;
+            } else {
+                return false;
+            }
         } catch (IOException ex) {
             return false;
         }
@@ -470,6 +499,12 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
             if (data != null) {
                 return new ByteArrayInputStream(data);
             } else {
+                for (ResourceLoader l : resourceLoaders) {
+                    final InputStream is = l.getResourceAsStream(name);
+                    if (is != null) {
+                        return is;
+                    }
+                }
                 return null;
             }
         } else {
@@ -802,5 +837,13 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      */
     public void setCompileRequired() {
         requiresCompile = true;
+    }
+    
+    public void add(ResourceLoader loader) {
+        resourceLoaders.add(loader);
+    }
+    
+    public void remove(ResourceLoader loader) {
+        resourceLoaders.remove(loader);
     }
 }
