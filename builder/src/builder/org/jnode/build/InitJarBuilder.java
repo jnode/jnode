@@ -54,13 +54,15 @@ public class InitJarBuilder extends AbstractPluginsTask {
         final long start = System.currentTimeMillis();
 
         final PluginList piList;
+        final PluginList systemPluginList;
         final long lmPI;
         try {
             piList = getPluginList();
+            systemPluginList = getSystemPluginList();
             if ((destFile == null) && (destDir != null)) {
                 destFile = new File(destDir, piList.getName() + ".jgz");
             }
-            lmPI = piList.lastModified();
+            lmPI = Math.min(piList.lastModified(), systemPluginList.lastModified());
         } catch (PluginException ex) {
             throw new BuildException(ex);
         } catch (IOException ex) {
@@ -96,10 +98,21 @@ public class InitJarBuilder extends AbstractPluginsTask {
                 jarTask.addConfiguredManifest(mf);
             }
 
+            final URL[] systemPlugins = systemPluginList.getPluginList();
+            final ArrayList<PluginJar> pluginJars = new ArrayList<PluginJar>();
+            for (URL url : systemPlugins) {
+                final BuildPluginJar piJar = new BuildPluginJar(url);
+                if (!piJar.getDescriptor().isSystemPlugin()) {
+                    log("Non-system plugin " + piJar.getDescriptor().getId()
+                            + " in plugin-list will be ignored",
+                            Project.MSG_WARN);
+                } else {
+                    pluginJars.add(piJar);
+                }
+            }
+
             final URL[] pluginList = piList.getPluginList();
-            final ArrayList<PluginJar> pluginJars = new ArrayList<PluginJar>(pluginList.length);
-            for (int i = 0; i < pluginList.length; i++) {
-                final URL url = pluginList[i];
+            for (URL url : pluginList) {
                 final BuildPluginJar piJar = new BuildPluginJar(url);
                 if (piJar.getDescriptor().isSystemPlugin()) {
                     log("System plugin " + piJar.getDescriptor().getId()
@@ -112,14 +125,17 @@ public class InitJarBuilder extends AbstractPluginsTask {
             testPluginPrerequisites(pluginJars);
             final List<PluginJar> sortedPluginJars = sortPlugins(pluginJars);
 
-            for (Iterator<PluginJar> i = sortedPluginJars.iterator(); i.hasNext();) {
+            for (Iterator<PluginJar> i = sortedPluginJars.iterator(); i
+                    .hasNext();) {
                 final BuildPluginJar piJar = (BuildPluginJar) i.next();
-                pluginJars.add(piJar);
-                final File f = new File(piJar.getPluginUrl().getPath());
-                final FileSet fs = new FileSet();
-                fs.setDir(f.getParentFile());
-                fs.setIncludes(f.getName());
-                jarTask.addFileset(fs);
+                if (!piJar.getDescriptor().isSystemPlugin()) {
+//                    pluginJars.add(piJar);
+                    final File f = new File(piJar.getPluginUrl().getPath());
+                    final FileSet fs = new FileSet();
+                    fs.setDir(f.getParentFile());
+                    fs.setIncludes(f.getName());
+                    jarTask.addFileset(fs);
+                }
             }
 
             /*

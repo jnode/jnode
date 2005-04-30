@@ -107,13 +107,30 @@ public final class PluginClassLoaderImpl extends PluginClassLoader {
 		if (loadedCls != null) {
 			return loadedCls;
 		}
+        
+        // Look for it in the fragments
+        byte[] b = null;
+        FragmentDescriptorModel fragment = null;
+        for (FragmentDescriptorModel l : descriptor.fragments()) {
+            b = loadClassData(l, name);
+            if (b != null) {
+                fragment = l;
+                break;
+            }
+        }
+        
 		// Look for it in our own jar
-		final byte[] b = loadClassData(name);
+        if (b == null) {
+            b = loadClassData(jar, name);
+        }
 		if (b != null) {
 		    // We're are now going to use one of my classes, 
 		    // so make sure that my plugin has been started.
 		    try {
 	            startPlugin();
+                if (fragment != null) {
+                    fragment.startPlugin(registry);
+                }
 	        } catch (PluginException ex) {
 	            BootLog.error("Error starting plugin", ex);
 	        }
@@ -135,7 +152,16 @@ public final class PluginClassLoaderImpl extends PluginClassLoader {
 	 * @return boolean
 	 */
 	protected final boolean containsClass(String name) {
-		return jar.containsResource(name.replace('.', '/') + ".class");
+        final String resName = name.replace('.', '/') + ".class";
+		if (jar.containsResource(resName)) {
+            return true;
+        }
+        for (ResourceLoader l : descriptor.fragments()) {
+            if (l.containsResource(resName)) {
+                return true;
+            }
+        }
+        return false;
 	}
 
 	/**
@@ -157,12 +183,29 @@ public final class PluginClassLoaderImpl extends PluginClassLoader {
 				}
 			}
 		}
+        
+        // Try the fragments
+        URL url = null;
+        FragmentDescriptorModel fragment = null;
+        for (FragmentDescriptorModel f : descriptor.fragments()) {
+            url = f.getResource(name);
+            if (url != null) {
+                fragment = f;
+                break;
+            }
+        }
+        
 		// Not found, try my own plugin
 		//System.out.println("Try resource " + name + " on " + jar.getDescriptor().getId());
-		final URL url = jar.getResource(name);
+        if (url == null) {
+            url = jar.getResource(name);
+        }
 		if (url != null) {
 		    try {
 		        startPlugin();
+                if (fragment != null) {
+                    fragment.startPlugin(registry);
+                }
 		    } catch (PluginException ex) {
 		        BootLog.error("Cannot start plugin", ex);
 		    }
@@ -176,8 +219,8 @@ public final class PluginClassLoaderImpl extends PluginClassLoader {
 	 * @param name
 	 * @return The loaded class data or null if not found.
 	 */
-	private final byte[] loadClassData(String name) {
-		final InputStream is = jar.getResourceAsStream(name.replace('.', '/') + ".class");
+	private final byte[] loadClassData(ResourceLoader loader, String name) {
+		final InputStream is = loader.getResourceAsStream(name.replace('.', '/') + ".class");
 		if (is == null) {
 			return null;
 		}

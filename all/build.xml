@@ -188,7 +188,8 @@
 		<!-- Build all default initjar's -->
 		<taskdef name="initjars" classname="org.jnode.build.InitJarsBuilder" classpathref="cp-jnode" />
 		<initjars destdir="${initjars.dir}" 
-			      pluginDir="${plugins.dir}">
+			      pluginDir="${plugins.dir}"
+				  systemPluginList="${basedir}/conf/system-plugin-list.xml">
 			<fileset dir="${basedir}/conf">
 				<exclude name="system-plugin-list.xml"/>
 				<include name="*plugin-list.xml"/>
@@ -201,7 +202,8 @@
 		<!-- Build all custom initjar's -->
 		<taskdef name="initjars" classname="org.jnode.build.InitJarsBuilder" classpathref="cp-jnode" />
 		<initjars destdir="${initjars.dir}" 
-			      pluginDir="${plugins.dir}">
+			      pluginDir="${plugins.dir}"
+     			  systemPluginList="${basedir}/conf/system-plugin-list.xml">
 			<fileset dir="${custom.plugin-list.dir}">
 				<include name="*plugin-list.xml"/>
 			</fileset>

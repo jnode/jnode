@@ -62,6 +62,12 @@ final class PluginPrerequisiteModel extends PluginModelObject implements PluginP
     public PluginPrerequisiteModel(PluginDescriptorModel plugin,
             String pluginId, String pluginVersion) {
         super(plugin);
+        if (pluginId == null) {
+            throw new IllegalArgumentException("pluginId is null");
+        }
+        if (pluginVersion == null) {
+            throw new IllegalArgumentException("pluginVersion is null");
+        }
         this.plugin = pluginId;
         this.version = pluginVersion;
     }
