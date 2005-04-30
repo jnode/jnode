@@ -1,5 +1,5 @@
 /* DefaultTreeSelectionModel.java --
-   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -117,6 +117,7 @@ public class DefaultTreeSelectionModel
   public DefaultTreeSelectionModel()
   {
     setSelectionMode(DISCONTIGUOUS_TREE_SELECTION);
+    listenerList = new EventListenerList();
   }
 
 	/**
@@ -230,9 +231,9 @@ public class DefaultTreeSelectionModel
    *
    * @param path the path to set as selection
 	 */
-  public void setSelectionPath(TreePath value0)
+  public void setSelectionPath(TreePath path)
   {
-		// TODO
+    selection = new TreePath[] { path };
   }
 
 	/**

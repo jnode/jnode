@@ -499,7 +499,7 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
     thumbColor = defaults.getColor("ScrollBar.thumb");
     thumbHighlightColor = defaults.getColor("ScrollBar.thumbHighlight");
     thumbDarkShadowColor = defaults.getColor("ScrollBar.thumbDarkShadow");
-    thumbLightShadowColor = defaults.getColor("ScrollBar.thumbLightShadow");  
+    thumbLightShadowColor = defaults.getColor("ScrollBar.thumbShadow");
   }
 
   /**
@@ -645,8 +645,9 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
   /**
    * This method calculates the preferred size since calling
    * getPreferredSize() returns a cached value.
+   * This is package-private to avoid an accessor method.
    */
-  private void calculatePreferredSize()
+  void calculatePreferredSize()
   {
     // System.err.println(this + ".calculatePreferredSize()");
     int height;
@@ -742,7 +743,8 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
 	thumbRect.x += (value - min) * trackRect.width / (max - min);
 	thumbRect.y = trackRect.y;
 
-	thumbRect.width = extent * trackRect.width / (max - min);
+	thumbRect.width = Math.max(extent * trackRect.width / (max - min),
+                                   getMinimumThumbSize().width);
 	thumbRect.height = trackRect.height;
       }
     else
@@ -751,7 +753,8 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
 	thumbRect.y = trackRect.y + value * trackRect.height / (max - min);
 
 	thumbRect.width = trackRect.width;
-	thumbRect.height = extent * trackRect.height / (max - min);
+	thumbRect.height = Math.max(extent * trackRect.height / (max - min),
+                                    getMinimumThumbSize().height);
       }
     return thumbRect;
   }
@@ -817,6 +820,11 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
     scrollbar.setBackground(defaults.getColor("ScrollBar.background"));
     scrollbar.setBorder(defaults.getBorder("ScrollBar.border"));
     scrollbar.setOpaque(true);
+
+    thumbColor = defaults.getColor("ScrollBar.thumb");
+    thumbDarkShadowColor = defaults.getColor("ScrollBar.thumbDarkShadow");
+    thumbHighlightColor = defaults.getColor("ScrollBar.thumbHighlight");
+    thumbLightShadowColor = defaults.getColor("ScrollBar.thumbShadow");
 
     maximumThumbSize = defaults.getDimension("ScrollBar.maximumThumbSize");
     minimumThumbSize = defaults.getDimension("ScrollBar.minimumThumbSize");
@@ -1028,53 +1036,15 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
    */
   protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds)
   {
-    Color saved = g.getColor();
-    Point x;
-    Point y;
-    Point z;
-    Polygon lines;
-
-    g.setColor(thumbHighlightColor);
-    x = new Point(thumbBounds.x + 1, thumbBounds.y + 1);
-    y = new Point(x);
-    y.translate(thumbBounds.width - 2, 0);
-    z = new Point(x);
-    z.translate(0, thumbBounds.height - 2);
-
-    lines = new Polygon(new int[] { x.x, y.x, z.x },
-                        new int[] { x.y, y.y, z.y }, 3);
-
-    g.drawPolygon(lines);
-
-    g.setColor(thumbLightShadowColor);
-    x = new Point(thumbBounds.x + thumbBounds.width - 1,
-                  thumbBounds.y + thumbBounds.height - 1);
-    y = new Point(x);
-    y.translate(-(thumbBounds.width - 2), 0);
-    z = new Point(x);
-    z.translate(0, -(thumbBounds.height - 2));
-
-    lines = new Polygon(new int[] { x.x, y.x, z.x },
-                        new int[] { x.y, y.y, z.y }, 3);
-    g.drawPolygon(lines);
-
-    g.setColor(thumbDarkShadowColor);
-    x = new Point(thumbBounds.x + thumbBounds.width,
-                  thumbBounds.y + thumbBounds.height);
-    y = new Point(x);
-    y.translate(-thumbBounds.width, 0);
-    z = new Point(x);
-    z.translate(0, -thumbBounds.height);
-
-    lines = new Polygon(new int[] { x.x, y.x, z.x },
-                        new int[] { x.y, y.y, z.y }, 3);
-    g.drawPolygon(lines);
-
     g.setColor(thumbColor);
     g.fillRect(thumbBounds.x, thumbBounds.y, thumbBounds.width,
                thumbBounds.height);
 
-    g.setColor(saved);
+    BasicGraphicsUtils.drawBezel(g, thumbBounds.x, thumbBounds.y,
+                                 thumbBounds.width, thumbBounds.height,
+                                 false, false, thumbDarkShadowColor,
+                                 thumbDarkShadowColor, thumbHighlightColor,
+                                 thumbHighlightColor);
   }
 
   /**
@@ -1243,12 +1213,13 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
    * This method returns the value in the scrollbar's range given the y
    * coordinate. If the value is out of range, it will return the closest
    * legal value.
+   * This is package-private to avoid an accessor method.
    *
    * @param yPos The y coordinate to calculate a value for.
    *
    * @return The value for the y coordinate.
    */
-  private int valueForYPosition(int yPos)
+  int valueForYPosition(int yPos)
   {
     int min = scrollbar.getMinimum();
     int max = scrollbar.getMaximum();
@@ -1275,12 +1246,13 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
    * This method returns the value in the scrollbar's range given the x
    * coordinate. If the value is out of range, it will return the closest
    * legal value.
+   * This is package-private to avoid an accessor method.
    *
    * @param xPos The x coordinate to calculate a value for.
    *
    * @return The value for the x coordinate.
    */
-  private int valueForXPosition(int xPos)
+  int valueForXPosition(int xPos)
   {
     int min = scrollbar.getMinimum();
     int max = scrollbar.getMaximum();

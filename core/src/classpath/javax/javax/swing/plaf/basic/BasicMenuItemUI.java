@@ -1,5 +1,5 @@
 /* BasicMenuItemUI.java --
-   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -605,7 +605,17 @@ public class BasicMenuItemUI extends MenuItemUI
     if (text != null && ! text.equals(""))
       {
 	if (menuItem.isEnabled())
+          {
+            /* Menu item is considered to be highlighted when it is selected.
+               It is considered to be selected if menu item is inside some menu
+               and is armed or if it is both armed and pressed */
+            if (menuItem.getModel().isArmed()
+                && (menuItem.getParent() instanceof MenuElement
+                    || menuItem.getModel().isPressed()))
+              g.setColor(selectionForeground);
+            else
 	  g.setColor(menuItem.getForeground());
+          }
 	else
 	  // FIXME: should fix this to use 'disabledForeground', but its
 	  // default value in BasicLookAndFeel is null.	  
