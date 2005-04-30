@@ -31,6 +31,7 @@
       <export name="gnu.java.nio.*"/>
       <export name="gnu.java.nio.channels.*"/>
       <export name="gnu.java.nio.charset.*"/>
+      <export name="gnu.java.nio.charset.iconv.*"/>
       <export name="gnu.java.lang.*"/>
       <export name="gnu.java.lang.reflect.*"/>
       <export name="gnu.java.locale.LocaleHelper"/>
