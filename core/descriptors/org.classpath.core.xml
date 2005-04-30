@@ -18,8 +18,6 @@
       <export name="gnu.java.beans.editors.*"/>
       <export name="gnu.java.beans.info.*"/>
       <export name="gnu.java.io.*"/>
-      <export name="gnu.java.io.decode.*"/>
-      <export name="gnu.java.io.encode.*"/>
       <export name="gnu.java.math.*"/>
       <export name="gnu.java.net.*"/>
       <export name="gnu.java.net.protocol.*"/>
