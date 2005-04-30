@@ -446,6 +446,15 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeAND(GPR dstReg, int dstDisp, GPR srcReg);
 
+    /**
+     *
+     * @param operandSize
+     * @param dstReg
+     * @param dstDisp
+     * @param imm32
+     */
+    public abstract void writeAND(int operandSize, SR dstReg, int dstDisp, int imm32);
+
 	/**
 	 * @param dstReg
 	 * @param dstDisp
@@ -794,6 +803,14 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeCMP(GPR reg1, GPR reg2);
 
+    /**
+     * Create a CMP reg1, [reg2:disp] 
+     * @param reg1
+     * @param reg2
+     * @param disp
+     */
+    public abstract void writeCMP(GPR reg1, SR reg2, int disp);
+
 	/**
 	 * Create a CMP reg1, [reg2+disp]
 	 * 
@@ -828,6 +845,16 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param imm32
 	 */
 	public abstract void writeCMP_Const(int operandSize, GPR reg, int disp, int imm32);
+
+    /**
+     * Create a CMP [dstReg:dstDisp], imm32
+     *
+     * @param operandSize
+     * @param dstReg
+     * @param dstDisp
+     * @param imm32
+     */
+    public abstract void writeCMP_Const(int operandSize, SR dstReg, int dstDisp, int imm32);
 
 	/**
 	 * Create a CMP EAX, imm32 or CMP rax, imm32
@@ -1244,6 +1271,15 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeINC(GPR dstReg);
 
+    /**
+     * Create a inc size [dstReg:disp]
+     *
+     * @param operandSize
+     * @param dstReg
+     * @param disp
+     */
+    public abstract void writeINC(int operandSize, SR dstReg, int disp);
+
 	/**
 	 * Create a inc size [dstReg+disp]
 	 * 
@@ -1336,6 +1372,8 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeJMP(Object tablePtr, int offset,
 			boolean rawAddress);
+
+    public abstract void writeJMP(int operandSize, int seg, int disp);
 
     /**
 	 * Create a ldmxcsr [srcReg+disp]
@@ -1493,6 +1531,15 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	public abstract void writeMOV(int operandSize, GPR dstReg, GPR srcReg,
 			GPR srcIdxReg, int scale, int srcDisp);
 
+    /**
+	 * Create a mov dstReg, [srcReg:srcDisp]
+	 *
+	 * @param dstReg
+	 * @param srcReg
+	 * @param srcDisp
+	 */
+    public abstract void writeMOV(GPR dstReg, SR srcReg, int srcDisp);
+
 	/**
 	 * Create a mov dstReg, [srcReg+srcDisp]
 	 * 
@@ -1518,7 +1565,7 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 			int scale, int dstDisp, GPR srcReg);
 
 	/**
-	 * Create a mov [dstReg+dstDisp], <srcReg>
+	 * Create a mov [dstReg+dstDisp], srcReg
 	 * 
 	 * @param operandSize
 	 * @param dstReg
@@ -1527,6 +1574,15 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeMOV(int operandSize, GPR dstReg, int dstDisp,
 			GPR srcReg);
+
+    /**
+     * Create a mov [dstReg:dstDisp], srcReg
+     *
+     * @param dstReg
+     * @param dstDisp
+     * @param srcReg
+     */
+    public abstract void writeMOV(SR dstReg, int dstDisp, GPR srcReg);
 
     /**
      *
@@ -1568,6 +1624,15 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
      */
     public abstract void writeMOV_Const(GPR dstReg, long imm64)
     throws InvalidOpcodeException;
+
+    /**
+	 * Create a mov size [dstReg:dstDisp], imm32
+	 *
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param imm32
+	 */
+    public abstract void writeMOV_Const(int operandSize, SR dstReg, int dstDisp, int imm32);
 
 	/**
 	 * Create a mov size [destReg+destDisp], imm32
@@ -1789,6 +1854,14 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeOR(GPR dstReg, int dstDisp, GPR srcReg);
 
+    /**
+     *
+     * @param operandSize
+     * @param dstReg
+     * @param dstDisp
+     * @param imm32
+     */
+    public abstract void writeOR(int operandSize, SR dstReg, int dstDisp, int imm32);
 
     /**
      *
@@ -2321,6 +2394,15 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 */
 	public abstract void writeSUB(int operandSize, GPR dstReg, int dstDisp, int imm32);
 
+    /**
+     *
+     * @param operandSize
+     * @param reg
+     * @param disp
+     * @param imm32
+     */
+    public abstract void writeTEST(int operandSize, SR reg, int disp, int imm32);
+
 	/**
 	 * Create a TEST reg1, reg2
 	 * 
@@ -2395,6 +2477,15 @@ public abstract class X86Assembler extends NativeStream implements X86Constants 
 	 * @param srcReg
 	 */
 	public abstract void writeXCHG(GPR dstReg, int dstDisp, GPR srcReg);
+
+    /**
+     * Write XCHG [dstReg:dstDisp], srcReg
+     *
+     * @param dstReg
+     * @param dstDisp
+     * @param srcReg
+     */
+    public abstract void writeXCHG(SR dstReg, int dstDisp, GPR srcReg);
 
 	/**
 	 * Create a XOR dstReg, srcReg

@@ -20,7 +20,7 @@
  */
 
 package org.jnode.assembler.x86;
- 
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
@@ -45,9 +45,11 @@ import org.jnode.vm.classmgr.VmClassType;
 import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.x86.X86CpuID;
 
+import static org.jnode.assembler.x86.X86Register.*;
+
 /**
  * Implementation of AbstractX86Stream.
- * 
+ *
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  * @author Patrik Reali (patrik_reali@users.sourceforge.net)
@@ -113,7 +115,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
             if (isCode32()) {
                 set32(m_objptr - (3 * 4), size);
             } else {
-                set64(m_objptr - (3 * 8), size);                
+                set64(m_objptr - (3 * 8), size);
             }
 			m_objptr = -1;
 			inObject = false;
@@ -200,7 +202,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		/**
 		 * Link this objectref to the given objectref. That is, the offset of
 		 * this objectref will be set to the offset of the given objectref.
-		 * 
+		 *
 		 * @param objectRef
 		 * @throws UnresolvedObjectRefException
 		 *             The given objectref is not resolved.
@@ -243,7 +245,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 		/**
 		 * Resolve a 32-bit patch location.
-		 * 
+		 *
 		 * @param addr
 		 * @param offset
 		 */
@@ -269,7 +271,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 		/**
 		 * Resolve a 32-bit patch location.
-		 * 
+		 *
 		 * @param addr
 		 * @param offset
 		 */
@@ -316,7 +318,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Initialize this instance.
-	 * 
+	 *
 	 * @param cpuId
 	 * @param mode
 	 * @param baseAddr
@@ -327,7 +329,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Initialize this instance.
-	 * 
+	 *
 	 * @param cpuId
 	 * @param mode
 	 * @param baseAddr
@@ -349,7 +351,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Align on a given value
-	 * 
+	 *
 	 * @param value
 	 * @return The number of bytes needed to align.
 	 */
@@ -388,7 +390,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			// System.out.println("Growing stream buffer to " + newLen);
 		}
 	}
-    
+
     /**
      * Allocate space and return the offset of the start of the allocated space.
      * @see org.jnode.assembler.BootImageNativeStream#allocate(int)
@@ -430,7 +432,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Returns the base address.
-	 * 
+	 *
 	 * @return long
 	 */
 	public final long getBaseAddr() {
@@ -439,7 +441,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Return the actual bytes. This array may be longer then getLength() *
-	 * 
+	 *
 	 * @return The actual bytes
 	 */
 	public final byte[] getBytes() {
@@ -448,7 +450,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Get the length in bytes of valid data
-	 * 
+	 *
 	 * @return the length of valid data
 	 */
 	public final int getLength() {
@@ -457,7 +459,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Gets an objectref for a given object.
-	 * 
+	 *
 	 * @param keyObj
 	 * @return ObjectRef
 	 */
@@ -480,7 +482,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Gets all references of objects as instanceof ObjectRef
-	 * 
+	 *
 	 * @return Collection
 	 */
 	public final Collection<X86ObjectRef> getObjectRefs() {
@@ -507,7 +509,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Gets all unresolved references of objects as instanceof ObjectRef
-	 * 
+	 *
 	 * @return Collection
 	 */
 	public final Collection<ObjectRef> getUnresolvedObjectRefs() {
@@ -526,7 +528,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Are there unresolved references?
-	 * 
+	 *
 	 * @return True if there are unresolved references, false otherwise
 	 */
 	public final boolean hasUnresolvedObjectRefs() {
@@ -544,7 +546,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	/**
 	 * Is logging enabled. This method will only return true on on debug like
 	 * implementations.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	public boolean isLogEnabled() {
@@ -561,7 +563,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	/**
 	 * Write a log message. This method is only implemented on debug like
 	 * implementations.
-	 * 
+	 *
 	 * @param msg
 	 */
 	public void log(Object msg) {
@@ -603,7 +605,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Sets the resolver.
-	 * 
+	 *
 	 * @param resolver
 	 *            The resolver to set
 	 */
@@ -615,7 +617,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * Start a new object and write its header. An ObjectInfo object is
 	 * returned, on which the <code>markEnd</code> mehod must be called after
 	 * all data has been written into the object.
-	 * 
+	 *
 	 * @param cls
 	 * @see ObjectInfo
 	 * @return The info for the started object
@@ -664,7 +666,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	/**
 	 * Dst register must have an 8-bits part. Valid for EAX, EBX, ECX, EDX,
 	 * runtimeexception for others.
-	 * 
+	 *
 	 * @param dst
 	 */
 	private void testSuitableForBits8(X86Register dst) {
@@ -676,7 +678,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Remove count bytes from the end of the generated stream.
-	 * 
+	 *
 	 * @param count
 	 */
 	public void trim(int count) {
@@ -725,7 +727,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Write an 8-bit unsigned byte.
-	 * 
+	 *
 	 * @param v8
 	 */
 	public final void write8(int v8) {
@@ -735,7 +737,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a ADC dstReg, imm32
-	 * 
+	 *
 	 * @param dstReg
 	 * @param imm32
 	 */
@@ -766,7 +768,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a ADC [dstReg+dstDisp], <srcReg>
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param srcReg
@@ -780,7 +782,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a ADC dstReg, srcReg
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 */
@@ -792,7 +794,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a ADC dstReg, [srcReg+srcDisp]
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 * @param srcDisp
@@ -806,7 +808,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create an ADD dstReg, imm32
-	 * 
+	 *
 	 * @param dstReg
 	 * @param imm32
 	 */
@@ -823,7 +825,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a ADD [dstReg+dstDisp], imm32
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param imm32
@@ -870,7 +872,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a ADD [dstReg+dstDisp], srcReg
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param srcReg
@@ -884,7 +886,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a ADD dstReg, srcReg
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 */
@@ -896,7 +898,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a ADD dstReg, [srcReg+srcDisp]
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 * @param srcDisp
@@ -910,7 +912,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a AND dstReg, imm32
-	 * 
+	 *
 	 * @param dstReg
 	 * @param imm32
 	 */
@@ -941,7 +943,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
     }
 
 	/**
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param imm32
@@ -955,6 +957,21 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			write1bOpcodeModRM(0x81, operandSize, dstReg, dstDisp, 4);
 			write32(imm32);
 		}
+	}
+
+    /**
+	 *
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param imm32
+	 */
+	public void writeAND(int operandSize, SR dstReg, int dstDisp, int imm32) {
+        testOperandSize(operandSize, BITS32);
+		writeSegPrefix(dstReg);
+        write8(0x81);
+		write8(0x25);
+        write32(dstDisp);
+		write32(imm32);
 	}
 
     /**
@@ -987,7 +1004,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a AND [dstReg+dstDisp], srcReg
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param srcReg
@@ -1008,7 +1025,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a AND dstReg, srcReg
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 */
@@ -1019,7 +1036,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	}
 
 	/**
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 * @param srcDisp
@@ -1053,7 +1070,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Convert an SSE operation into the 3'rd opcode byte for that operation.
-	 * 
+	 *
 	 * @param operation
 	 * @return the 3'rd opcode byte.
 	 */
@@ -1081,7 +1098,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a bound lReg, [rReg+rDisp]
-	 * 
+	 *
 	 * @param lReg
 	 * @param rReg
 	 * @param rDisp
@@ -1102,7 +1119,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a relative call to a given label
-	 * 
+	 *
 	 * @param label
 	 */
 	public final void writeCALL(Label label) {
@@ -1113,7 +1130,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	/**
 	 * Create a call to address stored at the given offset in the given table
 	 * pointer.
-	 * 
+	 *
 	 * @param tablePtr
 	 * @param offset
 	 * @param rawAddress
@@ -1140,7 +1157,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a call to address stored at the given [reg+offset].
-	 * 
+	 *
 	 * @param reg
 	 * @param offset
 	 */
@@ -1201,7 +1218,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a CMOVcc dst,src
-	 * 
+	 *
 	 * @param ccOpcode
 	 * @param dst
 	 * @param src
@@ -1216,7 +1233,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a CMOVcc dst,[src+srcDisp]
-	 * 
+	 *
 	 * @param dst
 	 * @param src
 	 * @param srcDisp
@@ -1231,7 +1248,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a CMP [reg1+disp], reg2
-	 * 
+	 *
 	 * @param reg1
 	 * @param disp
 	 * @param reg2
@@ -1244,7 +1261,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a CMP reg1, reg2
-	 * 
+	 *
 	 * @param reg1
 	 * @param reg2
 	 */
@@ -1254,9 +1271,24 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write1bOpcodeModRR(0x39, reg1.getSize(), reg1, reg2.getNr());
 	}
 
+    /**
+	 * Create a CMP reg1, [reg2+disp]
+	 *
+	 * @param reg1
+	 * @param reg2
+	 * @param disp
+	 */
+	public void writeCMP(GPR reg1, SR reg2, int disp) {
+        testSize(reg1, BITS32);
+        writeSegPrefix(reg2);
+        write8(0x3b);
+		write8(0x05 | reg1.getNr() << 3);
+        write32(disp);
+	}
+
 	/**
 	 * Create a CMP reg1, [reg2+disp]
-	 * 
+	 *
 	 * @param reg1
 	 * @param reg2
 	 * @param disp
@@ -1269,7 +1301,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a CMP reg, imm32
-	 * 
+	 *
 	 * @param reg
 	 * @param imm32
 	 */
@@ -1301,7 +1333,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a CMP [reg+disp], imm32
-	 * 
+	 *
 	 * @param reg
 	 * @param disp
 	 * @param imm32
@@ -1317,13 +1349,29 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 	}
 
+    /**
+	 * Create a CMP [reg:disp], imm32
+	 *
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param imm32
+	 */
+	public void writeCMP_Const(int operandSize, SR dstReg, int dstDisp, int imm32) {
+        testOperandSize(operandSize, BITS32);
+		writeSegPrefix(dstReg);
+        write8(0x81);
+		write8(0x3d);
+        write32(dstDisp);
+		write32(imm32);
+	}
+
 	/**
 	 * Create a CMP eax,imm32 or CMP rax,imm32
-	 * 
+	 *
 	 * @param imm32
 	 */
 	public final void writeCMP_EAX(int operandSize, int imm32) {
-		testOperandSize(operandSize, BITS32 | BITS64);        
+		testOperandSize(operandSize, BITS32 | BITS64);
 		write1bOpcodeREXPrefix(operandSize, 0);
 		write8(0x3d);
 		write32(imm32);
@@ -1331,7 +1379,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a CMP [reg+regDisp], imm32
-	 * 
+	 *
 	 * @param memPtr
 	 * @param imm32
 	 */
@@ -1346,7 +1394,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a CMP reg,[memPtr]
-	 * 
+	 *
 	 * @param reg
 	 * @param memPtr
 	 */
@@ -1362,7 +1410,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a CMPXCHG dword [dstReg], srcReg
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param srcReg
@@ -1387,7 +1435,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a dec reg32
-	 * 
+	 *
 	 * @param dstReg
 	 */
 	public final void writeDEC(GPR dstReg) {
@@ -1401,7 +1449,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a dec dword [dstReg+dstDisp]
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 */
@@ -1425,7 +1473,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a fadd dword [srcReg+srcDisp]
-	 * 
+	 *
 	 * @param srcReg
 	 * @param srcDisp
 	 */
@@ -1435,7 +1483,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a fadd qword [srcReg+srcDisp]
-	 * 
+	 *
 	 * @param srcReg
 	 * @param srcDisp
 	 */
@@ -1461,7 +1509,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a fdiv dword [srcReg+srcDisp]
-	 * 
+	 *
 	 * @param srcReg
 	 * @param srcDisp
 	 */
@@ -1471,7 +1519,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a fdiv qword [srcReg+srcDisp]
-	 * 
+	 *
 	 * @param srcReg
 	 * @param srcDisp
 	 */
@@ -1489,7 +1537,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a ffree
-	 * 
+	 *
 	 * @param fReg
 	 */
 	public final void writeFFREE(X86Register fReg) {
@@ -1499,7 +1547,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a fild dword [dstReg+dstDisp]
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 */
@@ -1509,7 +1557,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a fild qword [dstReg+dstDisp]
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 */
@@ -1519,7 +1567,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a fistp dword [dstReg+dstDisp]
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 */
@@ -1529,7 +1577,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a fistp qword [dstReg+dstDisp]
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 */
@@ -1539,7 +1587,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a fld dword [srcReg+srcDisp]
-	 * 
+	 *
 	 * @param srcReg
 	 * @param srcDisp
 	 */
@@ -1549,7 +1597,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a fld dword [srcBaseReg+scrIndexReg*srcScale+srcDisp]
-	 * 
+	 *
 	 * @param srcBaseReg
 	 * @param srcIndexReg
 	 * @param srcScale
@@ -1563,7 +1611,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a fld qword [srcReg+srcDisp]
-	 * 
+	 *
 	 * @param srcReg
 	 * @param srcDisp
 	 */
@@ -1573,7 +1621,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a fld qword [srcBaseReg+scrIndexReg*srcScale+srcDisp]
-	 * 
+	 *
 	 * @param srcBaseReg
 	 * @param srcIndexReg
 	 * @param srcScale
@@ -1599,7 +1647,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a fmul dword [srcReg+srcDisp]
-	 * 
+	 *
 	 * @param srcReg
 	 * @param srcDisp
 	 */
@@ -1609,7 +1657,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a fmul qword [srcReg+srcDisp]
-	 * 
+	 *
 	 * @param srcReg
 	 * @param srcDisp
 	 */
@@ -1696,7 +1744,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a fstp dword [dstReg+dstDisp]
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 */
@@ -1706,7 +1754,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a fstp qword [dstReg+dstDisp]
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 */
@@ -1716,7 +1764,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a fsub dword [srcReg+srcDisp]
-	 * 
+	 *
 	 * @param srcReg
 	 * @param srcDisp
 	 */
@@ -1726,7 +1774,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a fsub qword [srcReg+srcDisp]
-	 * 
+	 *
 	 * @param srcReg
 	 * @param srcDisp
 	 */
@@ -1793,9 +1841,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create an idiv edx:eax, srcReg.
-	 * 
+	 *
 	 * If srcReg is 64-bit, the idiv rdx:rax, srcReg is created.
-	 * 
+	 *
 	 * @param srcReg
 	 */
 	public final void writeIDIV_EAX(GPR srcReg) {
@@ -1812,7 +1860,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	}
 
 	/**
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 */
@@ -1821,7 +1869,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	}
 
 	/**
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 * @param srcDisp
@@ -1832,7 +1880,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	}
 
 	/**
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 * @param imm32
@@ -1843,7 +1891,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	}
 
 	/**
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 * @param srcDisp
@@ -1857,9 +1905,9 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a imul eax, srcReg.
-	 * 
+	 *
 	 * If srcReg is 64-bit, an imul rax, srcReg is created.
-	 * 
+	 *
 	 * @param srcReg
 	 */
 	public final void writeIMUL_EAX(GPR srcReg) {
@@ -1897,7 +1945,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a inc reg32
-	 * 
+	 *
 	 * @param dstReg
 	 */
 	public final void writeINC(GPR dstReg) {
@@ -1909,9 +1957,23 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 	}
 
+    /**
+     * Create a inc size [dstReg:disp]
+     *
+     * @param dstReg
+     */
+    public final void writeINC(int operandSize, SR dstReg, int disp) {
+        testOperandSize(operandSize, BITS32);
+        writeSegPrefix(dstReg);
+        write8(0xff);
+        write8(0x05);
+        write32(disp);
+    }
+
+
 	/**
 	 * Create a inc size [dstReg+disp]
-	 * 
+	 *
 	 * @param dstReg
 	 */
 	public final void writeINC(int operandSize, GPR dstReg, int disp) {
@@ -1960,7 +2022,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a int vector
-	 * 
+	 *
 	 * @param vector
 	 */
 	public final void writeINT(int vector) {
@@ -1977,7 +2039,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a conditional jump to a label.
-	 * 
+	 *
 	 * @param label
 	 * @param jumpOpcode
 	 */
@@ -1999,16 +2061,56 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         }
 	}
 
+    public final void writeJECXZ(Label label) {
+        final ObjectRef ref = getObjectRef(label);
+        final int shortOffset = m_used + 2;
+        if (ref.isResolved()) {
+            if (isByteDistance(ref, shortOffset)) {
+                try {
+                    write8(0x67);
+                    write8(0xE3);
+                    write8(ref.getOffset() - shortOffset);
+                } catch (UnresolvedObjectRefException ex) {
+                    throw new RuntimeException(ex);
+                }
+            } else {
+                try {
+                    throw new IllegalArgumentException("Invalid jump distance: " + (ref.getOffset() - shortOffset));
+                } catch (UnresolvedObjectRefException rex) {
+                    throw new RuntimeException(rex);
+                }
+            }
+        } else {
+            write8(0x67);
+            write8(0xE3);
+
+            final int ofs = m_used + 4;
+            final X86ObjectRef xref = (X86ObjectRef) getObjectRef(label);
+            xref.setRelJump();
+            if (xref.isResolved()) {
+                try {
+                    write32(xref.getOffset() - ofs);
+                } catch (UnresolvedObjectRefException ex) {
+                    throw new RuntimeException(ex);
+                }
+            } else {
+                xref.addUnresolvedLink(m_used, 4);
+                write32(ofs);
+            }
+        }
+    }
+
+
     //TODO this method does not handle the forward jumps correctly, needs further work.
     //Also the general purpose version of the method writeJCC(Lable lebal, int jumpcode)
-    //for handling byte sized target for the jump would render this method unnecessary.
+    //for handling byte sized target for the jump would renders this method unnecessary.
     /**
      * Create a LOOP label instruction. The given label must have be resolved
      * before!
      *
      * @param label
      */
-    public final void writeJECXZ(Label label) {
+    public final void writeJECXZ0(Label label) {
         final ObjectRef ref = getObjectRef(label);
         write8(0x67);
         write8(0xE3);
@@ -2034,7 +2136,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a relative jump to a given label
-	 * 
+	 *
 	 * @param label
 	 */
 	public final void writeJMP(Label label) {
@@ -2053,7 +2155,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
             writeRelativeObjectRef(label);
         }
 	}
-    
+
     private final boolean isByteDistance(ObjectRef ref, int offset) {
         try {
             final int distance = ref.getOffset() - offset;
@@ -2066,7 +2168,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	/**
 	 * Create a absolute jump to address stored at the given offset in the given
 	 * table pointer.
-	 * 
+	 *
 	 * @param tablePtr
 	 * @param offset
 	 * @param rawAddress
@@ -2084,7 +2186,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	/**
 	 * Create a absolute jump to address stored at the given offset (in
 	 * register) in the given table pointer.
-	 * 
+	 *
 	 * @param tablePtr
 	 * @param offsetReg
 	 */
@@ -2096,7 +2198,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a absolute jump to address in register.
-	 * 
+	 *
 	 * @param reg
 	 */
 	public final void writeJMP(GPR reg) {
@@ -2108,7 +2210,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a absolute jump to [reg+disp]
-	 * 
+	 *
 	 * @param reg
      * @param disp
 	 */
@@ -2116,6 +2218,27 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         testSize(reg, mode.getSize());
         write2bOpcodeReg(0xFF, 0xA0, reg);
 		write32(disp);
+	}
+
+    /**
+	 * Create a absolute jump to disp1:disp2
+	 *
+	 * @param seg
+     * @param disp
+	 */
+	public final void writeJMP(int operandSize, int seg, int disp) {
+        testOperandSize(operandSize , BITS16 | BITS32);
+        testOperandSize(mode.getSize(), BITS32);
+        if(operandSize == BITS16){
+            write8(OSIZE_PREFIX);
+        }
+        write8(0xea);
+        if(operandSize == BITS16){
+            write16(disp);
+        } else {
+            write32(disp);
+        }
+        write16(seg);
 	}
 
     /**
@@ -2133,7 +2256,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a lea dstReg,[srcReg+disp]
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 * @param disp
@@ -2146,7 +2269,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a lea dstReg,[srcReg+srcIdxReg*scale+disp]
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 * @param srcIdxReg
@@ -2228,7 +2351,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	/**
 	 * Create a LOOP label instruction. The given label must have be resolved
 	 * before!
-	 * 
+	 *
 	 * @param label
 	 * @throws UnresolvedObjectRefException
 	 */
@@ -2265,7 +2388,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Write a REX prefix byte if needed for ModRM and ModRR encoded opcodes.
-	 * 
+	 *
 	 * @param operandSize
 	 * @param reg
 	 */
@@ -2281,7 +2404,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			write8(rex);
 		}
 	}
-    
+
     /**
      * Write a 1 byte opcode that has the register encoded in the single byte.
      * @param opcode1
@@ -2306,7 +2429,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Write a REX prefix byte if needed for ModRM and ModRR encoded opcodes.
-	 * 
+	 *
 	 * @param rm
 	 * @param reg
 	 */
@@ -2358,7 +2481,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	/**
 	 * Write a mod-r/m byte+offset for the following addressing scheme's [rm]
 	 * disp8[rm] disp32[rm]
-	 * 
+	 *
 	 * @param rm
 	 * @param disp
 	 * @param reg
@@ -2396,7 +2519,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	/**
 	 * Write a 1-byte instruction followed by a mod-r/m byte+offset for the
 	 * following addressing scheme's [rm] disp8[rm] disp32[rm]
-	 * 
+	 *
 	 * @param opcode
 	 * @param rm
 	 * @param disp
@@ -2412,7 +2535,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	/**
 	 * Write a 2-byte instruction followed by a mod-r/m byte+offset for the
 	 * following addressing scheme's [rm] disp8[rm] disp32[rm]
-	 * 
+	 *
 	 * @param opcode1
      * @param opcode2
      * @param operandSize
@@ -2431,7 +2554,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	/**
 	 * Write a 2-byte instruction followed by a mod-r/m byte+offset for the
 	 * following addressing scheme's [rm] disp8[rm] disp32[rm]
-	 * 
+	 *
 	 * @param opcode1
      * @param opcode2
      * @param opcode3
@@ -2453,7 +2576,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * Write a mod-r/m byte+offset+scale+index+base for the following addressing
 	 * scheme's [rm] disp8[rm] disp32[rm] To create
 	 * <code>[index*scale+disp]</code> code, set base to -1.
-	 * 
+	 *
 	 * @param base
 	 * @param disp
 	 * @param reg
@@ -2507,7 +2630,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	/**
 	 * Write a 1-byte instruction followed by a mod-r/m byte+offset for the
 	 * following addressing scheme's [rm] disp8[rm] disp32[rm]
-	 * 
+	 *
 	 * @param opcode
 	 * @param base
 	 * @param disp
@@ -2526,7 +2649,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Write a mod-r/m byte for the following addressing scheme rm
-	 * 
+	 *
 	 * @param rm
 	 * @param reg
 	 */
@@ -2541,7 +2664,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	/**
 	 * Write a 1-byte instruction followed by a mod-r/m byte for the following
 	 * addressing scheme rm
-	 * 
+	 *
 	 * @param opcode
 	 * @param operandSize
 	 *            Size of the operands ({@link X86Constants}.BITSxxx)
@@ -2558,7 +2681,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	/**
 	 * Write a 2-byte instruction followed by a mod-r/m byte for the following
 	 * addressing scheme rm
-	 * 
+	 *
 	 * @param opcode1
      * @param opcode2
      * @param operandSize
@@ -2576,7 +2699,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	/**
 	 * Write a 3-byte instruction followed by a mod-r/m byte for the following
 	 * addressing scheme rm
-	 * 
+	 *
 	 * @param opcode1
      * @param opcode2
      * @param opcode3
@@ -2593,9 +2716,24 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		writeModRR(rm.getNr() & 7, reg & 7);
 	}
 
+    /**
+     * Create a mov [dstReg:dstDisp], <srcReg>
+     *
+     * @param dstReg
+     * @param dstDisp
+     * @param srcReg
+     */
+    public final void writeMOV(SR dstReg, int dstDisp, GPR srcReg) {
+        testSize(srcReg, mode.getSize());
+        writeSegPrefix(dstReg);
+        write8(0x89);
+		write8(0x05 | srcReg.getNr() << 3);
+        write32(dstDisp);
+    }
+
 	/**
 	 * Create a mov [dstReg+dstDisp], <srcReg>
-	 * 
+	 *
 	 * @param operandSize
 	 * @param dstReg
 	 * @param dstDisp
@@ -2683,7 +2821,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a mov <dstReg>, <srcReg>
-	 * 
+	 *
 	 * @param operandSize
 	 * @param dstReg
 	 * @param srcReg
@@ -2713,9 +2851,24 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write1bOpcodeModRR(opcode, operandSize, dstReg, srcReg.getNr());
 	}
 
+    /**
+         * Create a mov dstReg, [srcReg:srcDisp]
+         *
+         * @param dstReg
+         * @param srcReg
+         * @param srcDisp
+         */
+    public final void writeMOV(GPR dstReg, SR srcReg, int srcDisp) {
+        testSize(dstReg, mode.getSize());
+        writeSegPrefix(srcReg);
+        write8(0x8b);
+		write8(0x05 | dstReg.getNr() << 3);
+        write32(srcDisp);
+    }
+
 	/**
 	 * Create a mov dstReg, [srcReg+srcDisp]
-	 * 
+	 *
 	 * @param operandSize
 	 * @param dstReg
 	 * @param srcReg
@@ -2749,7 +2902,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a mov [dstReg+dstIdxReg*scale+dstDisp], <srcReg>
-	 * 
+	 *
 	 * @param operandSize
 	 * @param dstReg
 	 * @param dstIdxReg
@@ -2785,7 +2938,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a mov dstReg, [srcReg+srcIdxReg*scale+srcDisp]
-	 * 
+	 *
 	 * @param operandSize
 	 * @param dstReg
 	 * @param srcReg
@@ -2899,7 +3052,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a MOV reg,imm32 or MOV reg,imm64
-	 * 
+	 *
 	 * @param dstReg
 	 * @param imm32
 	 */
@@ -2923,7 +3076,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	/**
 	 * Create a MOV reg,imm64 depending on the reg size. Only valid in 64-bit
 	 * mode.
-	 * 
+	 *
 	 * @param dstReg
 	 * @param imm64
 	 * @throws InvalidOpcodeException
@@ -2939,9 +3092,26 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write64(imm64);
 	}
 
+    /**
+	 * Create a mov [destReg:destDisp], imm32
+	 *
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param imm32
+	 */
+	public final void writeMOV_Const(int operandSize, SR dstReg,
+			int dstDisp, int imm32) {
+		testOperandSize(operandSize, BITS32);
+        writeSegPrefix(dstReg);
+        write8(0xC7);
+		write8(0x05);
+        write32(dstDisp);
+		write32(imm32);
+	}
+
 	/**
 	 * Create a mov [destReg+destDisp], imm32
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param imm32
@@ -2949,14 +3119,21 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	public final void writeMOV_Const(int operandSize, GPR dstReg,
 			int dstDisp, int imm32) {
         testSize(dstReg, mode.getSize());
-		testOperandSize(operandSize, BITS32 | BITS64);
+		testOperandSize(operandSize, BITS16 | BITS32 | BITS64);
+        if(operandSize == BITS16){
+            write8(OSIZE_PREFIX);
+        }
 		write1bOpcodeModRM(0xC7, operandSize, dstReg, dstDisp, 0);
-		write32(imm32);
+        if(operandSize == BITS16){
+            write16(imm32);
+        } else {
+		    write32(imm32);
+        }
 	}
 
 	/**
 	 * Create a mov reg, label
-	 * 
+	 *
 	 * @param dstReg
 	 * @param label
 	 */
@@ -2969,7 +3146,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a mov size [destReg+dstIdxReg*scale+destDisp], imm32
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param imm32
@@ -3000,7 +3177,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a movsd [dst+dstDisp],src
-	 * 
+	 *
 	 * @param dst
 	 * @param src
 	 */
@@ -3010,7 +3187,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a movsd dst,[src+srcDisp]
-	 * 
+	 *
 	 * @param dst
 	 * @param src
 	 */
@@ -3020,7 +3197,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a movsd dst,src
-	 * 
+	 *
 	 * @param dst
 	 * @param src
 	 */
@@ -3030,7 +3207,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a movss [dst+dstDisp],src
-	 * 
+	 *
 	 * @param dst
 	 * @param src
 	 */
@@ -3040,7 +3217,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a movss dst,[src+srcDisp]
-	 * 
+	 *
 	 * @param dst
 	 * @param src
 	 */
@@ -3050,7 +3227,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a movss dst,src
-	 * 
+	 *
 	 * @param dst
 	 * @param src
 	 */
@@ -3060,7 +3237,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a movsx <dstReg>, <srcReg>
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 * @param srcSize
@@ -3094,7 +3271,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	/**
 	 * Create a movsxd dstReg, srcReg. Sign extends the srcReg to dstReg. Only
 	 * valid in 64-bit mode.
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 */
@@ -3115,7 +3292,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a movzx <dstReg>, <srcReg>
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 * @param srcSize
@@ -3148,7 +3325,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a mul eax, srcReg
-	 * 
+	 *
 	 * @param srcReg
 	 */
 	public final void writeMUL_EAX(GPR srcReg) {
@@ -3157,7 +3334,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a neg dstReg
-	 * 
+	 *
 	 * @param dstReg
 	 */
 	public final void writeNEG(GPR dstReg) {
@@ -3167,7 +3344,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a neg dword [dstReg+dstDisp]
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 */
@@ -3186,7 +3363,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a not dstReg
-	 * 
+	 *
 	 * @param dstReg
 	 */
 	public final void writeNOT(GPR dstReg) {
@@ -3195,7 +3372,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a not dword [dstReg+dstDisp]
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 */
@@ -3206,7 +3383,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create 32-bit reference to an absolute address like: dd label
-	 * 
+	 *
 	 * @param object
 	 */
 	public final void writeObjectRef(Object object) {
@@ -3215,7 +3392,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
     /**
      * Create 32-bit reference to an absolute address like: dd label
-     * 
+     *
      * @param object
      */
     public final void setObjectRef(int offset, Object object) {
@@ -3224,7 +3401,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create 32-bit reference to an absolute address like: dd label
-	 * 
+	 *
 	 * @param object
 	 * @param offset
 	 * @param rawAddress
@@ -3265,7 +3442,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
     /**
      * Create 32-bit reference to an absolute address like: dd label
-     * 
+     *
      * @param object
      * @param offset
      * @param rawAddress
@@ -3305,7 +3482,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
     }
 
 	/**
-	 * 
+	 *
 	 * @param dstReg
 	 * @param imm32
 	 */
@@ -3381,9 +3558,25 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 	}
 
+    /**
+	 *
+     * @param operandSize
+	 * @param dstReg
+	 * @param dstDisp
+	 * @param imm32
+	 */
+	public void writeOR(int operandSize, SR dstReg, int dstDisp, int imm32) {
+        testOperandSize(operandSize, BITS32);
+        writeSegPrefix(dstReg);
+        write8(0x81);
+		write8(0x0D);
+        write32(dstDisp);
+		write32(imm32);
+	}
+
 	/**
 	 * Create a OR [dstReg+dstDisp], srcReg
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param srcReg
@@ -3404,7 +3597,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a OR dstReg, srcReg
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 */
@@ -3416,7 +3609,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a OR dstReg, [srcReg+srcDisp]
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 * @param srcDisp
@@ -3459,7 +3652,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a pop reg32
-	 * 
+	 *
 	 * @param dstReg
 	 */
 	public final void writePOP(GPR dstReg) {
@@ -3494,7 +3687,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a pop dword [reg32+disp]
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 */
@@ -3531,7 +3724,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a push dword imm32
-	 * 
+	 *
 	 * @param imm32
 	 * @return The ofset of the start of the instruction.
 	 */
@@ -3539,7 +3732,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		final int rc = m_used;
         if (X86Utils.isByte(imm32)) {
             write8(0x6A); // PUSH imm8
-            write8(imm32);            
+            write8(imm32);
         } else {
             write8(0x68); // PUSH imm32
             write32(imm32);
@@ -3549,7 +3742,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a push srcReg
-	 * 
+	 *
 	 * @param srcReg
 	 * @return The ofset of the start of the instruction.
 	 */
@@ -3590,7 +3783,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a push d/qword [srcReg+srcDisp]
-	 * 
+	 *
 	 * @param srcReg
 	 * @param srcDisp
 	 * @return The ofset of the start of the instruction.
@@ -3606,7 +3799,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a push d/qword [baseReg+indexReg*scale+disp]
-	 * 
+	 *
 	 * @param srcBaseReg
 	 * @param srcIndexReg
 	 * @param srcScale
@@ -3627,7 +3820,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a push dword <object>
-	 * 
+	 *
 	 * @param objRef
 	 * @return The offset of the start of the instruction.
 	 */
@@ -3665,7 +3858,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create 32-bit offset relative to the current (after this offset) offset.
-	 * 
+	 *
 	 * @param object
 	 */
 	public final void writeRelativeObjectRef(Label object) {
@@ -3697,7 +3890,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a ret imm16 near to caller
-	 * 
+	 *
 	 * @param imm16
 	 */
 	public final void writeRET(int imm16) {
@@ -3717,7 +3910,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a SAL dstReg,imm8
-	 * 
+	 *
 	 * @param dstReg
 	 * @param imm8
 	 */
@@ -3738,7 +3931,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a SAL dstReg,cl
-	 * 
+	 *
 	 * @param dstReg
 	 */
 	public final void writeSAL_CL(GPR dstReg) {
@@ -3755,7 +3948,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a SAR dstReg,imm8
-	 * 
+	 *
 	 * @param dstReg
 	 * @param imm8
 	 */
@@ -3776,7 +3969,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a SAR dstReg,cl
-	 * 
+	 *
 	 * @param dstReg
 	 */
 	public final void writeSAR_CL(GPR dstReg) {
@@ -3793,7 +3986,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a SBB dstReg, imm32
-	 * 
+	 *
 	 * @param dstReg
 	 * @param imm32
 	 */
@@ -3809,7 +4002,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a SBB dword [dstReg+dstDisp], <imm32>
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param imm32
@@ -3827,7 +4020,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a SBB [dstReg+dstDisp], srcReg
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param srcReg
@@ -3839,7 +4032,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a SBB dstReg, srcReg
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 */
@@ -3857,9 +4050,27 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 				.getNr());
 	}
 
+    private final void writeSegPrefix(SR reg){
+        if(reg.equals(DS)){
+            write8(0x3e);
+        } else if(reg.equals(ES)){
+            write8(0x26);
+        } else if(reg.equals(FS)){
+            write8(0x64);
+        } else if(reg.equals(GS)){
+            write8(0x65);
+        } else if(reg.equals(SS)){
+            write8(0x36);
+        } else if(reg.equals(CS)){
+            write8(0x2e);
+        } else {
+            throw new IllegalArgumentException("Unsopported segment register: " + reg);
+        }
+    }
+
 	/**
 	 * Create a SETcc dstReg
-	 * 
+	 *
 	 * @param dstReg
 	 * @param cc
 	 */
@@ -3871,7 +4082,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a SHL dstReg,imm8
-	 * 
+	 *
 	 * @param dstReg
 	 * @param imm8
 	 */
@@ -3892,7 +4103,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a SHL dstReg,cl
-	 * 
+	 *
 	 * @param dstReg
 	 */
 	public final void writeSHL_CL(GPR dstReg) {
@@ -3910,7 +4121,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a SHLD dstReg,srcReg,cl
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 */
@@ -3922,7 +4133,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a SHL dstReg,imm8
-	 * 
+	 *
 	 * @param dstReg
 	 * @param imm8
 	 */
@@ -3945,7 +4156,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a SHR dstReg,cl
-	 * 
+	 *
 	 * @param dstReg
 	 */
 	public final void writeSHR_CL(GPR dstReg) {
@@ -3964,7 +4175,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a SHRD dstReg,srcReg,cl
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 */
@@ -4025,7 +4236,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a SUB reg, imm32
-	 * 
+	 *
 	 * @param reg
 	 * @param imm32
 	 */
@@ -4041,7 +4252,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	}
 
 	/**
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param imm32
@@ -4085,7 +4296,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a SUB [dstReg+dstDisp], <srcReg>
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param srcReg
@@ -4099,7 +4310,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a SUB dstReg, srcReg
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 */
@@ -4111,7 +4322,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a SUB dstReg, [srcReg+srcDisp]
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 * @param srcDisp
@@ -4125,7 +4336,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a TEST reg, imm32
-	 * 
+	 *
 	 * @param reg
 	 * @param imm32
 	 */
@@ -4147,7 +4358,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a TEST [reg+disp], imm32
-	 * 
+	 *
 	 * @param reg
 	 * @param disp
 	 * @param imm32
@@ -4159,9 +4370,25 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		write32(imm32);
 	}
 
+    /**
+	 * Create a TEST [reg+disp], imm32
+	 *
+	 * @param reg
+	 * @param disp
+	 * @param imm32
+	 */
+	public void writeTEST(int operandSize, SR reg, int disp, int imm32) {
+		testOperandSize(operandSize, BITS32);
+		writeSegPrefix(reg);
+        write8(0xF7);
+		write8(0x05);
+        write32(disp);
+		write32(imm32);
+	}
+
 	/**
 	 * Create a TEST reg1, reg2
-	 * 
+	 *
 	 * @param reg1
 	 * @param reg2
 	 */
@@ -4173,7 +4400,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a TEST al, imm8
-	 * 
+	 *
 	 * @param value
 	 */
 	public final void writeTEST_AL(int value) {
@@ -4183,7 +4410,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a TEST eax,imm32 or TEST rax,imm32
-	 * 
+	 *
 	 * @param value
 	 */
 	public final void writeTEST_EAX(int operandSize, int value) {
@@ -4217,7 +4444,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Write my contents to the given stream.
-	 * 
+	 *
 	 * @param os
 	 * @throws IOException
 	 */
@@ -4250,6 +4477,17 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         }
 	}
 
+    /**
+	 * @see org.jnode.assembler.x86.X86Assembler#writeXCHG(SR, int, GPR)
+	 */
+	public void writeXCHG(SR dstReg, int dstDisp, GPR srcReg) {
+        testSize(srcReg, mode.getSize());
+        writeSegPrefix(dstReg);
+        write8(0x87);
+		write8(0x05 | srcReg.getNr() << 3);
+        write32(dstDisp);
+	}
+
 	/**
 	 * @see org.jnode.assembler.x86.X86Assembler#writeXCHG(GPR, int, GPR)
 	 */
@@ -4276,7 +4514,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	}
 
 	/**
-	 * 
+	 *
 	 * @param dstReg
 	 * @param imm32
 	 */
@@ -4292,7 +4530,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	}
 
 	/**
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param imm32
@@ -4310,7 +4548,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a XOR [dstReg+dstDisp], srcReg
-	 * 
+	 *
 	 * @param dstReg
 	 * @param dstDisp
 	 * @param srcReg
@@ -4331,7 +4569,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 
 	/**
 	 * Create a XOR dstReg, srcReg
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 */
@@ -4342,7 +4580,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	}
 
 	/**
-	 * 
+	 *
 	 * @param dstReg
 	 * @param srcReg
 	 * @param srcDisp

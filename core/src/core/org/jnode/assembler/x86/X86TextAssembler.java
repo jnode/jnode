@@ -579,6 +579,18 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     /**
+     *
+     * @param operandSize
+     * @param dstReg
+     * @param dstDisp
+     * @param imm32
+     */
+    public void writeAND(int operandSize, X86Register.SR dstReg, int dstDisp, int imm32) {
+        println("\tand " + size(operandSize) + "[" + dstReg + ":0x" + NumberUtils.hex(dstDisp)
+                + "],0x" + NumberUtils.hex(imm32));
+    }
+
+    /**
      * @see org.jnode.assembler.x86.X86Assembler#writeAND(GPR, GPR)
      */
     public void writeAND(GPR dstReg, GPR srcReg) {
@@ -767,6 +779,16 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     /**
+     * Create a CMP reg1, [reg2:disp]
+     * @param reg1
+     * @param reg2
+     * @param disp
+     */
+    public void writeCMP(GPR reg1, SR reg2, int disp) {
+        println("\tcmp " + reg1 + ",[" + reg2 + ":0x" + NumberUtils.hex(disp) + "]");
+    }
+
+    /**
      * Create a CMP reg1, [reg2+disp]
      * 
      * @param reg1
@@ -793,6 +815,18 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      */
     public void writeCMP_Const(int operandSize, GPR reg, int disp, int imm32) {
         println("\tcmp " + size(operandSize) + "[" + reg + disp(disp) + "],0x"
+                + NumberUtils.hex(imm32));
+    }
+
+    /**
+     * Create a CMP [dstReg:dstDisp], imm32
+     * @param operandSize
+     * @param dstReg
+     * @param dstDisp
+     * @param imm32
+     */
+    public void writeCMP_Const(int operandSize, X86Register.SR dstReg, int dstDisp, int imm32) {
+        println("\tcmp " + size(operandSize) + "[" + dstReg + ":0x" + NumberUtils.hex(dstDisp) + "],0x"
                 + NumberUtils.hex(imm32));
     }
 
@@ -1237,6 +1271,10 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         println("\tinc " + dstReg);
     }
 
+    public void writeINC(int operandSize, X86Register.SR dstReg, int disp) {
+        println("\tinc " + size(operandSize) + "[" + dstReg + ":0x" + NumberUtils.hex(disp) + "]");
+    }
+
     /**
      * Create a inc [reg32+disp]
      * 
@@ -1307,6 +1345,16 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         if (tablePtr == null)
             tablePtr = "null"; // workaround for a peculiar NPE in StringBuffer
         println("\tjmp [ left out in: TextX86Stream.writeJMP(Object tablePtr, int offset, boolean rawAddress)]");
+    }
+
+    /**
+     *
+     * @param operandSize
+     * @param seg
+     * @param disp
+     */
+    public void writeJMP(int operandSize, int seg, int disp) {
+        println("\tjmp " + size(operandSize) + " 0x" + NumberUtils.hex(seg) + ":0x" + NumberUtils.hex(disp));
     }
 
     /**
@@ -1419,6 +1467,16 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     /**
+     *
+     * @param dstReg
+     * @param dstDisp
+     * @param srcReg
+     */
+    public void writeMOV(X86Register.SR dstReg, int dstDisp, X86Register.GPR srcReg) {
+        println("\tmov " + "[" + dstReg + ":0x" + NumberUtils.hex(dstDisp) + "]," + srcReg);
+    }
+
+    /**
      * @see org.jnode.assembler.x86.X86Assembler#writeMOV(CRX, GPR)
      */
     public void writeMOV(CRX dstReg, GPR srcReg) {
@@ -1482,6 +1540,17 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
                 + disp(srcDisp) + "+" + srcIdxReg + "*" + scale + "]");
     }
 
+    /**
+	 * Create a mov dstReg, [srcReg:srcDisp]
+	 *
+	 * @param dstReg
+	 * @param srcReg
+	 * @param srcDisp
+	 */
+    public void writeMOV(X86Register.GPR dstReg, X86Register.SR srcReg, int srcDisp) {
+        println("\tmov " + dstReg + ",[" + srcReg + ":0x" + NumberUtils.hex(srcDisp) + "]" );
+    }
+
     public void writeMOV(GPR dstReg, int srcDisp) {
         println("\tmov " + dstReg + ",[" + disp(srcDisp) + "]" );
     }
@@ -1511,6 +1580,18 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      */
     public void writeMOV_Const(GPR dstReg, long imm64) {
         println("\tmov " + dstReg + ",0x" + NumberUtils.hex(imm64));
+    }
+
+    /**
+     * Create a mov [dstReg:dstDisp], <imm32>
+     *
+     * @param dstReg
+     * @param dstDisp
+     * @param imm32
+     */
+    public void writeMOV_Const(int operandSize, X86Register.SR dstReg, int dstDisp, int imm32) {
+        println("\tmov " + size(operandSize) + "[" + dstReg + ":0x" + NumberUtils.hex(dstDisp)
+                + "],0x" + NumberUtils.hex(imm32));
     }
 
     /**
@@ -1676,7 +1757,6 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
         println("\tor " + dstReg + ",0x" + NumberUtils.hex(imm32));
     }
 
-    // LS
     /**
      * 
      * @param dstReg
@@ -1693,6 +1773,18 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      */
     public void writeOR(GPR dstReg, int dstDisp, GPR srcReg) {
         println("\tor [" + dstReg + disp(dstDisp) + "]," + srcReg);
+    }
+
+    /**
+     *
+     * @param operandSize
+     * @param dstReg
+     * @param dstDisp
+     * @param imm32
+     */
+    public void writeOR(int operandSize, X86Register.SR dstReg, int dstDisp, int imm32) {
+        println("\tor " + size(operandSize) + "[" + dstReg + ":0x" + NumberUtils.hex(dstDisp)
+                + "],0x" + NumberUtils.hex(imm32));
     }
 
     /**
@@ -2210,6 +2302,18 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     }
 
     /**
+     *
+     * @param operandSize
+     * @param reg
+     * @param disp
+     * @param imm32
+     */
+    public void writeTEST(int operandSize, SR reg, int disp, int imm32) {
+        println("\ttest " + size(operandSize) + "[" + reg + ":0x"
+                + NumberUtils.hex(disp) + "],0x" + NumberUtils.hex(imm32));
+    }
+
+    /**
      * Create a TEST reg1, reg2
      * 
      * @param reg1
@@ -2263,6 +2367,16 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
      */
     public void writeXCHG(GPR dstReg, int dstDisp, GPR srcReg) {
         println("\txchg [" + dstReg + disp(dstDisp) + "], " + srcReg);
+    }
+
+    /**
+     *
+     * @param dstReg
+     * @param dstDisp
+     * @param srcReg
+     */
+    public void writeXCHG(X86Register.SR dstReg, int dstDisp, X86Register.GPR srcReg) {
+        println("\txchg [" + dstReg +":0x" + NumberUtils.hex(dstDisp) + "], " + srcReg);
     }
 
     /**
