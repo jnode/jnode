@@ -115,14 +115,14 @@ public final class String
    * Characters which make up the String.
    * Package access is granted for use by StringBuffer.
    */
-  public final char[] value;
+  final char[] value;
 
   /**
    * Holds the number of characters in value.  This number is generally
    * the same as value.length, but can be smaller because substrings and
    * StringBuffers can share arrays. Package visible for use by trusted code.
    */
-  public final int count;
+  final int count;
 
   /**
    * Caches the result of hashCode().  If this value is zero, the hashcode
@@ -135,7 +135,7 @@ public final class String
    * substring()'s are common, the use of offset allows the operation
    * to perform in O(1). Package access is granted for use by StringBuffer.
    */
-  public final int offset;
+  final int offset;
 
   /**
    * An implementation for {@link CASE_INSENSITIVE_ORDER}.

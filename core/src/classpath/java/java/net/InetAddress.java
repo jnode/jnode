@@ -197,12 +197,9 @@ public class InetAddress implements Serializable
    */
   InetAddress(byte[] ipaddr, String hostname)
   {
-    addr = new byte[ipaddr.length];
+    addr = (null == ipaddr) ? null : (byte[]) ipaddr.clone();
+    hostName = hostname;
 
-    for (int i = 0; i < ipaddr.length; i++)
-      addr[i] = ipaddr[i];
-
-    this.hostName = hostname;
     lookup_time = System.currentTimeMillis();
 
     family = 2; /* AF_INET */
@@ -563,8 +560,10 @@ public class InetAddress implements Serializable
   }
 
     /**
-   * If host is a valid numeric IP address, return the numeric address.
+   * If hostname is a valid numeric IP address, return the numeric address.
    * Otherwise, return null.
+   *
+   * @param hostname the name of the host
      */
   private static byte[] aton(String hostname)
   {
