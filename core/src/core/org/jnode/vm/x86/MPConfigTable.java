@@ -30,6 +30,7 @@ import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.util.NumberUtils;
 import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.MagicUtils;
 
 
 /**
@@ -144,11 +145,11 @@ public class MPConfigTable {
     
     public void dump(PrintStream out) {
         out.println("MPConfigTable");       
-        out.println("Address        0x" + NumberUtils.hex(mem.getAddress().toInt()));
-        out.println("Size           " + mem.getSize());
+        out.println("Address        0x" + MagicUtils.toString(mem.getAddress()));
+        out.println("Size           " + MagicUtils.toString(mem.getSize()));
         out.println("Manufacturer   " + getOemID());
         out.println("Product        " + getProductID());
-        out.println("Local APIC ptr 0x" + NumberUtils.hex(getLocalApicAddress().toInt()));
+        out.println("Local APIC ptr 0x" + MagicUtils.toString(getLocalApicAddress()));
         out.println("Entries");
         for (MPEntry e : entries) {
             out.println("  " + e);            
