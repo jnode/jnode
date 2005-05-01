@@ -53,7 +53,7 @@ public final class PluginList {
 
     private Manifest manifest;
 
-    private List<PluginList> includes;
+    private List<PluginList> includes = new ArrayList<PluginList>();
 
     public PluginList(File file, File defaultDir, String targetArch)
             throws PluginException, MalformedURLException {
@@ -173,6 +173,7 @@ public final class PluginList {
         }
 
         final PluginList inc = new PluginList(file, defaultDir, targetArch);
+        includes.add(inc);
         
         if (this.manifest == null) {
             this.manifest = inc.manifest;
@@ -202,6 +203,9 @@ public final class PluginList {
         for (int i = 0; i < descrList.length; i++) {
             final URLConnection conn2 = pluginList[i].openConnection();
             max = Math.max(max, conn2.getLastModified());
+        }
+        for (PluginList inc : includes) {
+            max = Math.max(max, inc.lastModified());
         }
         return max;
     }
