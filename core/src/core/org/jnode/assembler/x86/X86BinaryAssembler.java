@@ -144,6 +144,12 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		}
 	}
 
+    /**
+     * Represents an reference to an object/label.
+     * The reference does not (yet) have to be resolved.
+     * 
+     * @author Ewout Prangsma (epr@users.sourceforge.net)
+     */
 	public class X86ObjectRef extends NativeStream.ObjectRef {
 
 		private int dataOffset;
@@ -169,6 +175,12 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			unresolvedLinks.add(new UnresolvedOffset(offset, patchSize));
 		}
 
+        /**
+         * Gets the offset of the represented object/label in the 
+         * native stream.
+         * 
+         * @see org.jnode.assembler.NativeStream.ObjectRef#getOffset()
+         */
 		public int getOffset() throws UnresolvedObjectRefException {
 			if (!isResolved()) {
 				throw new UnresolvedObjectRefException("Unresolved object: "
@@ -216,6 +228,12 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 			setOffset(objectRef.getOffset());
 		}
 
+        /**
+         * Set the startoffset of referenced object/label and resolve
+         * all unresolved references to it.
+         * 
+         * @param offset
+         */
 		public void setOffset(int offset) {
 			if (this.dataOffset != -1) {
 				if ("".equals(getObject().toString())) {
@@ -233,41 +251,78 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 				// Link all unresolved links
 				for (UnresolvedOffset unrOfs : unresolvedLinks) {
 					final int addr = unrOfs.getOffset();
-					if (unrOfs.getPatchSize() == 4) {
+                    switch (unrOfs.getPatchSize()) {
+                    case 1:
+                        resolve8(addr, offset);
+                        break;
+                    case 4:
 						resolve32(addr, offset);
-					} else {
+                        break;
+                    case 8:
 						resolve64(addr, offset);
-					}
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unknown patch size " + unrOfs.getPatchSize());    
+                    }
 				}
 				unresolvedLinks = null;
 			}
 		}
 
 		/**
-		 * Resolve a 32-bit patch location.
-		 *
+		 * Resolve a 8-bit patch location.
+         * 
 		 * @param addr
 		 * @param offset
 		 */
-		private final void resolve32(int addr, int offset) {
-			final int distance = offset - get32(addr);
+		private final void resolve8(int addr, int offset) {
+			final int distance = offset - get8(addr);
+            if (!X86Utils.isByte(distance)) {
+                throw new IllegalArgumentException("Jump out of byte-range (" + distance + ")");
+            }
 			if (isRelJump() && (distance == 0)) {
 				if (get8(addr - 1) == 0xe9) // JMP
 				{
 					set8(addr - 1, 0x90); // NOP
-					set32(addr, 0x90909090); // 4 NOP's
+					set8(addr, 0x90); // 1 NOP (overrides jmp offset)
 				} else if (get8(addr - 2) == 0x0f) // Jcc
 				{
 					set8(addr - 2, 0x90);
 					set8(addr - 1, 0x90);
-					set32(addr, 0x90909090); // 4 NOP's
+					set8(addr, 0x90); // 1 NOP
 				} else {
-					set32(addr, distance);
+					set8(addr, distance);
 				}
 			} else {
-				set32(addr, distance);
+				set8(addr, distance);
 			}
 		}
+
+        /**
+         * Resolve a 32-bit patch location.
+         * 
+         * @param addr
+         * @param offset
+         */
+        private final void resolve32(int addr, int offset) {
+            final int distance = offset - get32(addr);
+            if (isRelJump() && (distance == 0)) {
+                if (get8(addr - 1) == 0xe9) // JMP
+                {
+                    set8(addr - 1, 0x90); // NOP
+                    set32(addr, 0x90909090); // 4 NOP's
+                } else if (get8(addr - 2) == 0x0f) // Jcc
+                {
+                    set8(addr - 2, 0x90);
+                    set8(addr - 1, 0x90);
+                    set32(addr, 0x90909090); // 4 NOP's
+                } else {
+                    set32(addr, distance);
+                }
+            } else {
+                set32(addr, distance);
+            }
+        }
 
 		/**
 		 * Resolve a 32-bit patch location.
