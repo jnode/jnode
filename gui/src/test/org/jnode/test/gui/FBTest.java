@@ -24,6 +24,7 @@ package org.jnode.test.gui;
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
 import org.jnode.driver.DeviceManager;
+import org.jnode.driver.DeviceUtils;
 import org.jnode.driver.video.FrameBufferAPI;
 import org.jnode.driver.video.FrameBufferConfiguration;
 import org.jnode.driver.video.Surface;
@@ -32,6 +33,7 @@ import org.jnode.shell.help.Argument;
 import org.jnode.shell.help.DeviceArgument;
 import org.jnode.shell.help.Help;
 import org.jnode.shell.help.Parameter;
+import org.jnode.awt.JNodeFrameBufferDevice;
 
 import java.awt.Color;
 import java.awt.Rectangle;
@@ -40,6 +42,7 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.QuadCurve2D;
+import java.util.Collection;
 
 
 /**
@@ -102,15 +105,27 @@ public class FBTest {
 
     public static void main(String[] args) throws Exception {
 
-        final String devId = (args.length > 0) ? args[0] : "fb0";
+        final String devId = (args.length > 0) ? args[0] : "" /*"fb0"*/;
         final int count = (args.length > 1) ? Integer.parseInt(args[1]) : 100;
         final String tests = (args.length > 2) ? args[2] : "plrREQ";
 
-
         Surface g = null;
         try {
-            final DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
-            final Device dev = dm.getDevice(devId);
+            Device dev = null;
+            if("".equals(devId)){
+                final Collection<Device> devs = DeviceUtils.getDevicesByAPI(FrameBufferAPI.class);
+                int dev_count = devs.size();
+                if(dev_count > 0){
+                    Device[] dev_a = devs.toArray(new Device[dev_count]);
+                    dev = dev_a[0];
+                }
+            }
+
+            if(dev == null){
+                final DeviceManager dm = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
+                dev = dm.getDevice(devId);
+            }
+
             log.info("Using device " + dev.getId());
             final FrameBufferAPI api = (FrameBufferAPI) dev.getAPI(FrameBufferAPI.class);
             final FrameBufferConfiguration conf = api.getConfigurations()[0];
