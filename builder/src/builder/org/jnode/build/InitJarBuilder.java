@@ -62,7 +62,7 @@ public class InitJarBuilder extends AbstractPluginsTask {
             if ((destFile == null) && (destDir != null)) {
                 destFile = new File(destDir, piList.getName() + ".jgz");
             }
-            lmPI = Math.min(piList.lastModified(), systemPluginList.lastModified());
+            lmPI = Math.max(piList.lastModified(), systemPluginList.lastModified());
         } catch (PluginException ex) {
             throw new BuildException(ex);
         } catch (IOException ex) {
