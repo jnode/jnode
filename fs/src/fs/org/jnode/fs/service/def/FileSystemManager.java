@@ -24,8 +24,7 @@ package org.jnode.fs.service.def;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Map;
 
 import org.jnode.driver.Device;
 import org.jnode.fs.FileSystem;
@@ -36,21 +35,15 @@ import org.jnode.fs.FileSystem;
 final class FileSystemManager {
 
 	/** All registed filesystems (device, fs) */
-	private final HashMap<String, FileSystem> filesystems = new HashMap<String, FileSystem>();
+	private final Map<Device, FileSystem> filesystems = new HashMap<Device, FileSystem>();
 
-	protected String getMountPoint(Device device) {
-		return device.getId();
-	}
-	
 	/**
 	 * Register a mounted filesystem
 	 * 
 	 * @param fs
 	 */
 	public synchronized void registerFileSystem(FileSystem fs) {
-		//String idToMount = fs.getDevice().getId();
-		final String idToMount = getMountPoint(fs.getDevice());
-		filesystems.put(idToMount, fs);
+		filesystems.put(fs.getDevice(), fs);
 	}
 
 	/**
@@ -59,8 +52,7 @@ final class FileSystemManager {
 	 * @param device
 	 */
 	public synchronized FileSystem unregisterFileSystem(Device device) {
-		//return (FileSystem)filesystems.remove(device.getId());
-		return (FileSystem)filesystems.remove(getMountPoint(device));
+		return filesystems.remove(device);
 
 	}
 
@@ -71,18 +63,7 @@ final class FileSystemManager {
 	 * @return null if no filesystem was found.
 	 */
 	public synchronized FileSystem getFileSystem(Device device) {
-		//return (FileSystem)filesystems.get(device.getId());
-		return (FileSystem)filesystems.get(getMountPoint(device));
-	}
-
-	/**
-	 * Gets the filesystem registered on the given name.
-	 * 
-	 * @param rootName
-	 * @return null if no filesystem was found.
-	 */
-	public synchronized FileSystem getFileSystem(String rootName) {
-		return (FileSystem)filesystems.get(rootName);
+		return filesystems.get(device);
 	}
 
 	/**
@@ -91,9 +72,5 @@ final class FileSystemManager {
 	 */
 	public synchronized Collection<FileSystem> fileSystems() {
 		return new ArrayList<FileSystem>(filesystems.values());
-	}
-
-	public synchronized Set<String> fileSystemRoots() {
-		return new TreeSet<String>(filesystems.keySet());
 	}
 }

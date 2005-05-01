@@ -223,7 +223,7 @@ public final class VmSystem implements SharedStatics {
         res.put("java.class.version", "1.1");
         res.put("java.class.path", "");
         res.put("java.library.path", "");
-        res.put("java.io.tmpdir", "/jnode/tmp");
+        res.put("java.io.tmpdir", "/devices/jnode/tmp");
         res.put("java.compiler", "Internal");
         res.put("java.ext.dirs", "");
         res.put("os.name", "JNode");

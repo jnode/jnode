@@ -32,7 +32,7 @@ import org.jnode.fs.FSFile;
 /**
  * @author epr
  */
-public class FileHandleManager {
+final class FileHandleManager {
 	
 	/** My logger */
 	private final Logger log = Logger.getLogger(getClass());

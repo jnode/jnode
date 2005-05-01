@@ -65,6 +65,10 @@ public class JIFileSystem implements FileSystem {
 	public void close(){
 		return;
 	}
+    
+    public boolean isClosed() {
+        return false;
+    }
 	
 	public Device getDevice(){
 		return device;

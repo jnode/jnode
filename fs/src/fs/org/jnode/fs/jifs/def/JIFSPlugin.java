@@ -21,6 +21,8 @@
 
 package org.jnode.fs.jifs.def;
 
+import java.io.IOException;
+
 import javax.naming.NameNotFoundException;
 
 import org.apache.log4j.Logger;
@@ -77,8 +79,11 @@ public class JIFSPlugin extends Plugin{
 			            log.info(dev.getId() + " registered");
          			    final FileSystem fs = type.create(dev, true);
                         fSS.registerFileSystem(fs);
+                        
+                        final String mountPath = "jifs";
+                        fSS.mount(mountPath, fs, null);
                         log.info("Mounted " + type.getName() + " on "
-                                + dev.getId());
+                                + mountPath);
                         final ExtensionPoint infoEP = getDescriptor().getExtensionPoint("info");
                         jifsExtension = new JIFSExtension(infoEP);
          			} catch (DeviceAlreadyRegisteredException ex){
@@ -91,6 +96,8 @@ public class JIFSPlugin extends Plugin{
                     } catch (DriverException e){
                     	log.debug("Got DriverException, maybe jifs is running.");
                     	return;
+                    } catch (IOException ex) {
+                        log.error("Cannot mount jifs", ex);
                     } 
                     
 	    } catch (NameNotFoundException e){

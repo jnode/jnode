@@ -103,12 +103,6 @@ public interface VMFileSystemAPI {
 	public File[] getRoots();
 	
 	/**
-	 * This method is called when the filesystem is unregistered
-	 * @param root absolute path
-	 */
-	public void rootRemoved(String root);
-
-	/**
 	 * Gets an array of names of all entries of the given directory. All names are relative to the
 	 * given directory.
 	 * 
@@ -131,7 +125,7 @@ public interface VMFileSystemAPI {
 	 * @param file
 	 * @throws IOException
 	 */
-	public boolean mkDir(String file, VMOpenMode mode) throws IOException;
+	public boolean mkDir(String file) throws IOException;
 	
 	/**
 	 * Make a file
