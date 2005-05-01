@@ -2033,8 +2033,15 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 */
 	public final void writeINC(int operandSize, GPR dstReg, int disp) {
         testSize(dstReg, mode.getSize());
-		testOperandSize(operandSize, BITS32 | BITS64);
-		write1bOpcodeModRM(0xFF, operandSize, dstReg, disp, 0);
+		testOperandSize(operandSize, BITS8 | BITS16 | BITS32 | BITS64);
+        if( operandSize == BITS32 || operandSize == BITS64){
+		    write1bOpcodeModRM(0xFF, operandSize, dstReg, disp, 0);
+        } else if(operandSize == BITS16){
+            write8(OSIZE_PREFIX);
+            write1bOpcodeModRM(0xFF, operandSize, dstReg, disp, 0);
+        } else if(operandSize == BITS8){
+            write1bOpcodeModRM(0xFE, operandSize, dstReg, disp, 0);
+        }
 	}
 
     /**
@@ -2122,7 +2129,6 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
         if (ref.isResolved()) {
             if (isByteDistance(ref, shortOffset)) {
                 try {
-                    write8(0x67);
                     write8(0xE3);
                     write8(ref.getOffset() - shortOffset);
                 } catch (UnresolvedObjectRefException ex) {
@@ -2136,21 +2142,20 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
                 }
             }
         } else {
-            write8(0x67);
             write8(0xE3);
 
-            final int ofs = m_used + 4;
+            final int ofs = m_used + 1;
             final X86ObjectRef xref = (X86ObjectRef) getObjectRef(label);
             xref.setRelJump();
             if (xref.isResolved()) {
                 try {
-                    write32(xref.getOffset() - ofs);
+                    write8(xref.getOffset() - ofs);
                 } catch (UnresolvedObjectRefException ex) {
                     throw new RuntimeException(ex);
                 }
             } else {
-                xref.addUnresolvedLink(m_used, 4);
-                write32(ofs);
+                xref.addUnresolvedLink(m_used, 1);
+                write8(ofs);
             }
         }
     }
@@ -3174,15 +3179,20 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	public final void writeMOV_Const(int operandSize, GPR dstReg,
 			int dstDisp, int imm32) {
         testSize(dstReg, mode.getSize());
-		testOperandSize(operandSize, BITS16 | BITS32 | BITS64);
-        if(operandSize == BITS16){
-            write8(OSIZE_PREFIX);
-        }
-		write1bOpcodeModRM(0xC7, operandSize, dstReg, dstDisp, 0);
-        if(operandSize == BITS16){
-            write16(imm32);
+		testOperandSize(operandSize, BITS8 | BITS16 | BITS32 | BITS64);
+        if(operandSize == BITS8){
+            write1bOpcodeModRM(0xC6, operandSize, dstReg, dstDisp, 0);
+            write8(imm32);
         } else {
-		    write32(imm32);
+            if(operandSize == BITS16){
+                write8(OSIZE_PREFIX);
+            }
+            write1bOpcodeModRM(0xC7, operandSize, dstReg, dstDisp, 0);
+            if(operandSize == BITS16){
+                write16(imm32);
+            } else {
+                write32(imm32);
+            }
         }
 	}
 
@@ -4448,9 +4458,20 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 	 * @param reg2
 	 */
 	public void writeTEST(GPR reg1, GPR reg2) {
-        testSize(reg1, BITS32 | BITS64);
-        testSize(reg2, BITS32 | BITS64);
-		write1bOpcodeModRR(0x85, reg1.getSize(), reg1, reg2.getNr());
+        final int size = reg1.getSize();
+        if(size != reg2.getSize()){
+            throw new IllegalArgumentException("Operand size mismatch");
+        }
+
+        testOperandSize(size, BITS8 | BITS16 | BITS32 | BITS64);
+        if(size == BITS32 || size == BITS64){
+		    write1bOpcodeModRR(0x85, reg1.getSize(), reg1, reg2.getNr());
+        } else if(size == BITS16){
+            write8(OSIZE_PREFIX);
+            write1bOpcodeModRR(0x85, reg1.getSize(), reg1, reg2.getNr());
+        } else if(size == BITS8){
+            write1bOpcodeModRR(0x84, reg1.getSize(), reg1, reg2.getNr());
+        }
 	}
 
 	/**
