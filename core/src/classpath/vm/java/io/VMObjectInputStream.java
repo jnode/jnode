@@ -36,7 +36,7 @@ final class VMObjectInputStream {
      *            SecurityManager instance which should be called.
      * @return The current class loader in the calling stack.
      */
-    static ClassLoader currentClassLoader (SecurityManager sm) {
+    static ClassLoader currentClassLoader() {
         // TODO implement me
         return null;
     }
