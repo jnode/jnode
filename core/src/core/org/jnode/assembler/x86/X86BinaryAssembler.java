@@ -276,7 +276,10 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		 * @param offset
 		 */
 		private final void resolve8(int addr, int offset) {
-			final int distance = offset - get8(addr);
+//            System.out.println("addr " + addr);
+//            System.out.println("get8(addr) " + get8(addr));
+//            System.out.println("offset " + offset);
+			final int distance = offset - addr - 1;//get8(addr);
             if (!X86Utils.isByte(distance)) {
                 throw new IllegalArgumentException("Jump out of byte-range (" + distance + ")");
             }
