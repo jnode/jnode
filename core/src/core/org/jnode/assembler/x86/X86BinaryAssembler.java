@@ -128,7 +128,7 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		private final int patchSize;
 
 		public UnresolvedOffset(int offset, int patchSize) {
-			if ((patchSize != 4) && (patchSize != 8)) {
+			if ((patchSize != 1) && (patchSize != 4) && (patchSize != 8)) {
 				throw new IllegalArgumentException("PatchSize: " + patchSize);
 			}
 			this.offset = offset;
