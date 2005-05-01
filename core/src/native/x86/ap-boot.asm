@@ -15,9 +15,9 @@
 ; ===============================================	
 	align 4
 ap_boot:
-	bits 16
-	mov ax,cs
-	mov ds,ax
+							; bits 16
+	db 0x8C,0xC8			; mov ax,cs
+	db 0x8E,0xD8			; mov ds,ax
 	
 	; Setup gdt & idt (NOTE only 24-bits are loaded since we're in 16-bit code)
 	db 0x0f,0x01,0x1e	; lidt [ap_idtbase48]
@@ -26,13 +26,15 @@ ap_boot:
 	dw ap_gdtbase48-ap_boot	;     so complicated because this code will be moved.
 	
 	; Setup protected mode
-	mov ax,1
-	lmsw ax
-	FLUSH
+	db 0xB8,0x01,0x00		; mov ax,1
+	db 0x0F,0x01,0xF0		; lmsw ax
+	db 0xE9,0x00,0x00		; FLUSH
 
 	; Jump to the normal kernel code space
 ap_boot16_jmp:	
-	jmp dword KERNEL_CS:ap_boot32	;; This address needs to be patched
+	db 0x66,0xEA			; jmp dword KERNEL_CS:ap_boot32	;; This address needs to be patched
+	dd ap_boot32
+	dw KERNEL_CS
 
 	bits 32
 	; Now we're in 32-bit protected mode
