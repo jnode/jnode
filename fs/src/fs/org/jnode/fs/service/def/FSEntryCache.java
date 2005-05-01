@@ -31,8 +31,6 @@ import org.jnode.fs.FSEntry;
  */
 final class FSEntryCache {
 
-	/** My filesystem manager */
-	//private final FileSystemManager fsm;
 	/** The actual cache */
 	private final HashMap<String, FSEntry> entries = new HashMap<String, FSEntry>();
 	
@@ -40,8 +38,7 @@ final class FSEntryCache {
 	 * Create a new instance
 	 * @param fsm
 	 */
-	public FSEntryCache(FileSystemManager fsm) {
-		//this.fsm = fsm;
+	public FSEntryCache() {
 	}
 	
 	/**

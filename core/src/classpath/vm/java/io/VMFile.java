@@ -142,7 +142,7 @@ final class VMFile {
      */
     static boolean mkdir(String path) {
         try {
-            return VMIOUtils.getAPI().mkDir(getNormalizedPath(path), VMOpenMode.WRITE);
+            return VMIOUtils.getAPI().mkDir(getNormalizedPath(path));
         } catch (IOException io) {
             return false;
         }

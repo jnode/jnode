@@ -21,6 +21,7 @@
 
 package org.jnode.fs.service.def;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.naming.NameNotFoundException;
@@ -54,11 +55,17 @@ final class FileSystemMounter implements DeviceListener {
     /** My logger */
     private static final Logger log = Logger.getLogger(FileSystemMounter.class);
 
+    private static final String MOUNT_ROOT = "devices";
+    
     /** The DeviceManager i'm listening to */
     private DeviceManager devMan;
 
     /** The FileSystemService i'm using */
-    private FileSystemService fileSystemService;
+    private final FileSystemService fileSystemService;
+    
+    public FileSystemMounter(FileSystemService fileSystemService) {
+        this.fileSystemService = fileSystemService;
+    }
 
     /**
      * Start the FS mounter.
@@ -67,11 +74,15 @@ final class FileSystemMounter implements DeviceListener {
      */
     public void start() throws PluginException {
         try {
+            // Create the /devices
+            fileSystemService.getApi().mkDir(MOUNT_ROOT);
+            
             devMan = (DeviceManager) InitialNaming.lookup(DeviceManager.NAME);
             devMan.addListener(this);
-            fileSystemService = InitialNaming.lookup(FileSystemService.NAME);
         } catch (NameNotFoundException ex) {
             throw new PluginException("Cannot find DeviceManager", ex);
+        } catch (IOException ex) {
+            throw new PluginException("Cannot create devices directory");
         }
 
     }
@@ -147,10 +158,18 @@ final class FileSystemMounter implements DeviceListener {
                     try {
                         final FileSystem fs = fst.create(device, readOnly);
                         fileSystemService.registerFileSystem(fs);
+                        
+                        final String fullPath = MOUNT_ROOT + File.separatorChar + device.getId();
+                        log.debug("Mounting " + device.getId() + " on " + fullPath);
+                        fileSystemService.mount(fullPath, fs, null);
+                        
                         log.info("Mounted " + fst.getName() + " on "
-                                + device.getId());
+                                + fullPath);
                         return;
                     } catch (FileSystemException ex) {
+                        log.error("Cannot mount " + fst.getName()
+                                + " filesystem on " + device.getId(), ex);
+                    } catch (IOException ex) {
                         log.error("Cannot mount " + fst.getName()
                                 + " filesystem on " + device.getId(), ex);
                     }

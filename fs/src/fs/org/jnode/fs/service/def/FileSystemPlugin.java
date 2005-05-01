@@ -21,15 +21,21 @@
  
 package org.jnode.fs.service.def;
 
+import java.io.IOException;
 import java.io.VMFileSystemAPI;
 import java.io.VMIOUtils;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collection;
 
+import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
+import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
+import org.jnode.driver.DeviceAlreadyRegisteredException;
+import org.jnode.driver.DeviceUtils;
+import org.jnode.driver.DriverException;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
@@ -44,6 +50,9 @@ import org.jnode.plugin.PluginException;
  */
 public class FileSystemPlugin extends Plugin implements FileSystemService {
 
+    /** My logger */
+    private static final Logger log = Logger.getLogger(FileSystemPlugin.class);
+    
     /** Manager of fs types */
     private final FileSystemTypeManager fsTypeManager;
 
@@ -51,10 +60,16 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
     private final FileSystemManager fsm;
 
     /** The FS-API implementation */
-    private final VMFileSystemAPI api;
+    private final FileSystemAPIImpl api;
 
     /** The mounter */
     private FileSystemMounter mounter;
+    
+    /** The device of the VFS filesystem */
+    private final VirtualFSDevice vfsDev;
+    
+    /** The virtual filesystem */
+    private final VirtualFS vfs;
 
     /**
      * Create a new instance
@@ -65,7 +80,9 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
         this.fsTypeManager = new FileSystemTypeManager(descriptor
                 .getExtensionPoint("types"));
         this.fsm = new FileSystemManager();
-        this.api = new FileSystemAPIImpl(fsm);
+        this.vfsDev = new VirtualFSDevice();
+        this.vfs = new VirtualFS(vfsDev);
+        this.api = new FileSystemAPIImpl(fsm, vfs);
     }
 
     /**
@@ -95,7 +112,7 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
                 .doPrivileged(new PrivilegedAction() {
 
                     public Object run() {
-                        api.rootRemoved(fsm.getMountPoint(device));
+                        api.unregisterFileSystem(device);
                         return fsm.unregisterFileSystem(device);
                     }
                 });
@@ -120,6 +137,19 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
     }
 
     /**
+     * Mount the given filesystem at the fullPath, using the fsPath as root of
+     * the to be mounted filesystem.
+     * 
+     * @param fullPath
+     * @param fs
+     * @param fsPath Null or empty to use the root of the filesystem.
+     */
+    public void mount(String fullPath, FileSystem fs, String fsPath)
+    throws IOException {
+        api.mount(fullPath, fs, fsPath);
+    }
+    
+    /**
      * Gets the filesystem API.
      */
     public VMFileSystemAPI getApi() {
@@ -131,11 +161,16 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
      */
     protected void startPlugin() throws PluginException {
         try {
+            DeviceUtils.getDeviceManager().register(vfsDev);
             VMIOUtils.setAPI(getApi(), this);
-            mounter = new FileSystemMounter();
+            mounter = new FileSystemMounter(this);
             InitialNaming.bind(NAME, this);
             mounter.start();
         } catch (NamingException ex) {
+            throw new PluginException(ex);
+        } catch (DeviceAlreadyRegisteredException ex) {
+            throw new PluginException(ex);
+        } catch (DriverException ex) {
             throw new PluginException(ex);
         }
     }
@@ -148,6 +183,13 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
         InitialNaming.unbind(NAME);
         VMIOUtils.resetAPI(this);
         mounter = null;
+        try {
+            DeviceUtils.getDeviceManager().unregister(vfsDev);
+        } catch (NameNotFoundException ex) {
+            log.error("Cannot find devicemanager", ex);
+        } catch (DriverException ex) {
+            log.error("Cannot unregister vfs device", ex);
+        }
     }
 
     /**

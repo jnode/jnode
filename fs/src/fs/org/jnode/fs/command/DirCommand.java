@@ -57,11 +57,11 @@ public class DirCommand implements Command{
         
 		String userDir = System.getProperty("user.dir");
         
-		if ( ((dir_str == null) && isRoot(userDir)) ||
-             ((dir_str != null) && isRoot(dir_str)) ){
-            File[] roots = File.listRoots();
-			this.printList(roots,out);
-		} else {
+//		if ( ((dir_str == null) && isRoot(userDir)) ||
+//             ((dir_str != null) && isRoot(dir_str)) ){
+//            File[] roots = File.listRoots();
+//			this.printList(roots,out);
+//		} else {
 			File dir = ARG_DIR.getFile(cmdLine);
 			if (dir==null) dir = new File(userDir);
 			if (dir.exists() && dir.isDirectory()) {
@@ -72,7 +72,7 @@ public class DirCommand implements Command{
 			} else {
 				err.println("No such directory " + dir);
 			}
-		}
+//		}
 			
 	}
 

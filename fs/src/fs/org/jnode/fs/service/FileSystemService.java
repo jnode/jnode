@@ -82,6 +82,17 @@ public interface FileSystemService {
 	 */
 	public Collection<FileSystem> fileSystems();
 
+    /**
+     * Mount the given filesystem at the fullPath, using the fsPath as root of
+     * the to be mounted filesystem.
+     * 
+     * @param fullPath
+     * @param fs
+     * @param fsPath Null or empty to use the root of the filesystem.
+     */
+    public void mount(String fullPath, FileSystem fs, String fsPath)
+    throws IOException;
+    
 	/**
 	 * Gets the filesystem API.
 	 */
