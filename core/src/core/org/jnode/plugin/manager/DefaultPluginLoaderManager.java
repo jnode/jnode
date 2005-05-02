@@ -21,13 +21,12 @@
  
 package org.jnode.plugin.manager;
 
-import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.jnode.plugin.PluginLoader;
 import org.jnode.plugin.PluginLoaderManager;
-
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -55,15 +54,15 @@ public class DefaultPluginLoaderManager extends PluginLoaderManager {
     /**
      * @see org.jnode.plugin.PluginLoader#getPluginStream(java.lang.String, java.lang.String)
      */
-    public InputStream getPluginStream(String pluginId, String pluginVersion) {
+    public ByteBuffer getPluginBuffer(String pluginId, String pluginVersion) {
         final List<PluginLoader> loaders;
         synchronized(this) {
             loaders = new ArrayList<PluginLoader>(this.loaders);
         }
         for (PluginLoader loader : loaders) {
-            final InputStream is = loader.getPluginStream(pluginId, pluginVersion);
-            if (is != null) {
-                return is;
+            final ByteBuffer buf = loader.getPluginBuffer(pluginId, pluginVersion);
+            if (buf != null) {
+                return buf;
             }
         }
         return null;

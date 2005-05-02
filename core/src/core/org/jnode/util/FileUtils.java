@@ -25,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 
 /**
  * <description>
@@ -83,4 +84,14 @@ public class FileUtils {
 		copy(is, os, null, close);
 		return os.toByteArray();
 	}
+
+    /**
+     * Copy the contents of is to the returned byte buffer.
+     * @param is
+     * @param close If true, is is closed after the copy.
+     * @throws IOException
+     */
+    public static final ByteBuffer loadToBuffer(InputStream is, boolean close) throws IOException {
+        return ByteBuffer.wrap(load(is, close));
+    }
 }

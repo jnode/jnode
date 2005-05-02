@@ -22,8 +22,10 @@
 package org.jnode.plugin;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
+import java.nio.ByteBuffer;
+
+import org.jnode.util.FileUtils;
 
 
 /**
@@ -44,11 +46,11 @@ public class URLPluginLoader extends PluginLoader {
     /**
      * @see org.jnode.plugin.PluginLoader#getPluginStream(java.lang.String, java.lang.String)
      */
-    public InputStream getPluginStream(String pluginId, String pluginVersion) {
+    public ByteBuffer getPluginBuffer(String pluginId, String pluginVersion) {
         try {
             final URL url = new URL(baseUrl, getPluginFileName(pluginId, pluginVersion));
             System.out.println("url=" + url);
-            return url.openStream();
+            return ByteBuffer.wrap(FileUtils.load(url.openStream(), true));
         } catch (IOException ex) {
             return null;
         }

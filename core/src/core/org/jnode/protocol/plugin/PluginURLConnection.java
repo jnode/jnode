@@ -34,6 +34,7 @@ import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginManager;
 import org.jnode.plugin.model.PluginDescriptorModel;
 import org.jnode.plugin.model.PluginJar;
+import org.jnode.util.ByteBufferInputStream;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -92,6 +93,6 @@ public class PluginURLConnection extends URLConnection {
 		if (jarFile == null) {
 			connect();
 		}
-		return jarFile.getResourceAsStream(path);
+		return new ByteBufferInputStream(jarFile.getResourceAsBuffer(path));
 	}
 }

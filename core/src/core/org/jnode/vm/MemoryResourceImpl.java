@@ -21,6 +21,9 @@
  
 package org.jnode.vm;
 
+import java.nio.ByteBuffer;
+import java.nio.VMDirectByteBuffer;
+
 import org.jnode.system.MemoryResource;
 import org.jnode.system.Resource;
 import org.jnode.system.ResourceManager;
@@ -98,6 +101,14 @@ final class MemoryResourceImpl extends Region implements MemoryResource {
 		this.slotSize = Unsafe.getCurrentProcessor().getArchitecture().getReferenceSize();
 	}
 
+    /**
+     * Create a bytebuffer that has the same content as this resource.
+     * @return
+     */
+    public ByteBuffer asByteBuffer() {
+        return VMDirectByteBuffer.wrap(this);
+    }
+    
 	/**
 	 * Claim a memory region
 	 * 
