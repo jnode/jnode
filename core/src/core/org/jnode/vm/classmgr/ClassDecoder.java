@@ -428,7 +428,7 @@ public final class ClassDecoder {
         final int maxStack = data.getChar();
         final int noLocals = data.getChar();
         final int codelength = data.getInt();
-        final byte[] code = readBytes(data, codelength);
+        final ByteBuffer code = readBytes(data, codelength);
 
         // Read the exception Table
         final int ecount = data.getChar();
@@ -764,10 +764,10 @@ public final class ClassDecoder {
         data.position(data.position() + delta);
     }
 
-    private static final byte[] readBytes(ByteBuffer data, int length) {
-        byte[] res = new byte[length];
-        data.get(res);
-        return res;
+    private static final ByteBuffer readBytes(ByteBuffer data, int length) {
+        final ByteBuffer result = (ByteBuffer)data.slice().limit(length);
+        data.position(data.position() + length);
+        return result;
     }
 
     private static final String readUTF(ByteBuffer data) {

@@ -21,10 +21,12 @@
  
 package org.jnode.vm.classmgr;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.jnode.vm.Vm;
 
 /**
  * @author epr
@@ -40,7 +42,9 @@ public final class VmByteCode extends AbstractCode {
 	/** Max. #slots taken by this method on the stack */
 	private char maxStack;
 	/** Bytecode of this method */
-	private byte[] bytecode;
+	private transient ByteBuffer bytecode;
+    /** The bytecode (only valid is created at build time) */
+    private byte[] buildBytecode;
 	/** Exception handler table */
 	private VmInterpretedExceptionHandler[] eTable;
 	/** Line number table */
@@ -57,10 +61,15 @@ public final class VmByteCode extends AbstractCode {
 	 * @param eTable
 	 * @param lnTable
 	 */
-	public VmByteCode(VmMethod method, byte[] bytecode, int noLocals, int maxStack, VmInterpretedExceptionHandler[] eTable, VmLineNumberMap lnTable) {
+	public VmByteCode(VmMethod method, ByteBuffer bytecode, int noLocals, int maxStack, VmInterpretedExceptionHandler[] eTable, VmLineNumberMap lnTable) {
 		this.method = method;
 		this.cp = method.getDeclaringClass().getCP();
 		this.bytecode = bytecode;
+        if (Vm.isWritingImage()) {
+            this.buildBytecode = new byte[bytecode.limit()];
+            bytecode.get(buildBytecode);
+            bytecode.rewind();
+        }
 		this.noLocals = (char)noLocals;
 		this.maxStack = (char)maxStack;
 		this.eTable = eTable;
@@ -73,8 +82,11 @@ public final class VmByteCode extends AbstractCode {
 	 * Do not change the contents of the given array!
 	 * @return the code
 	 */
-	public byte[] getBytecode() {
-		return bytecode;
+	public ByteBuffer getBytecode() {
+        if (bytecode == null) {
+            bytecode = ByteBuffer.wrap(buildBytecode);
+        }
+		return bytecode.duplicate();
 	}
 	
 	/**
@@ -82,7 +94,11 @@ public final class VmByteCode extends AbstractCode {
 	 * @return the length
 	 */
 	public int getLength() {
-		return bytecode.length;
+        if (bytecode != null) {
+            return bytecode.limit();
+        } else {
+            return buildBytecode.length;
+        }
 	}
 
 	/**
