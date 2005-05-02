@@ -23,9 +23,8 @@ package org.jnode.plugin.model;
 
 import gnu.java.security.action.GetPolicyAction;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.CodeSource;
 import java.security.Policy;
@@ -35,7 +34,7 @@ import org.jnode.plugin.PluginClassLoader;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.system.BootLog;
-import org.jnode.util.FileUtils;
+import org.jnode.vm.ResourceLoader;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -109,7 +108,7 @@ public final class PluginClassLoaderImpl extends PluginClassLoader {
 		}
         
         // Look for it in the fragments
-        byte[] b = null;
+        ByteBuffer b = null;
         FragmentDescriptorModel fragment = null;
         for (FragmentDescriptorModel l : descriptor.fragments()) {
             b = loadClassData(l, name);
@@ -138,7 +137,7 @@ public final class PluginClassLoaderImpl extends PluginClassLoader {
 		    final CodeSource cs = new CodeSource(sourceUrl, null);
 		    final Policy policy = (Policy)AccessController.doPrivileged(GetPolicyAction.getInstance());
 		    final ProtectionDomain pd = new ProtectionDomain(cs, policy.getPermissions(cs));
-			final Class cls = defineClass(name, b, 0, b.length, pd);
+			final Class cls = defineClass(name, b, pd);
 			resolveClass(cls);
 			return cls;
 		} else {
@@ -219,16 +218,8 @@ public final class PluginClassLoaderImpl extends PluginClassLoader {
 	 * @param name
 	 * @return The loaded class data or null if not found.
 	 */
-	private final byte[] loadClassData(ResourceLoader loader, String name) {
-		final InputStream is = loader.getResourceAsStream(name.replace('.', '/') + ".class");
-		if (is == null) {
-			return null;
-		}
-		try {
-			return FileUtils.load(is, true);
-		} catch (IOException ex) {
-			return null;
-		}
+	private final ByteBuffer loadClassData(ResourceLoader loader, String name) {
+		return loader.getResourceAsBuffer(name.replace('.', '/') + ".class");
 	}
 	
 	/**
