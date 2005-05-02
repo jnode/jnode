@@ -371,11 +371,14 @@ public class FSEntryTable extends AbstractFSObject {
      * Return a string representation of the table.
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < entryNames.size(); i++) {
-            sb.append("name:").append(entryNames.get(i));
-            sb.append("->entry:").append(entries.get(entryNames.get(i)));
-            sb.append("\n");
+        int nbEntries = entryNames.size();
+        String name;
+        StringBuilder sb = new StringBuilder(nbEntries * 16);
+        for (int i = 0; i < nbEntries ; i++) {
+            name = entryNames.get(i);
+            sb.append("name:").append(name);
+            sb.append("->entry:").append(entries.get(name));
+            sb.append('\n');
         }
 
         return sb.toString();

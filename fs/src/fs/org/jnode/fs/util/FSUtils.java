@@ -41,7 +41,7 @@ public class FSUtils {
 		if(entry == null)
 			return "<FSEntry>NULL</FSEntry>";
 		
-		StringBuffer sb = new StringBuffer(); 
+        StringBuilder sb = new StringBuilder(2048); 
 		sb.append("<FSEntry>");
 		sb.append(" name="+entry.getName());
 		try {
@@ -102,7 +102,7 @@ public class FSUtils {
 		if(file == null)
 			return "<FSEntry>NULL</FSEntry>";
 		
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder(32);
 		sb.append("<FSFile>");
 		sb.append(" isValid"+file.isValid());
 		sb.append(" length"+file.getLength());
@@ -128,8 +128,8 @@ public class FSUtils {
 	
 	static public String toString(byte[] data, int offset, int length)
 	{
-		StringBuffer sb = new StringBuffer();
-		StringBuffer chars = new StringBuffer(LINE_SIZE);
+		StringBuilder sb = new StringBuilder(1024);
+        StringBuilder chars = new StringBuilder(LINE_SIZE);
 		
 		int l = Math.min(Math.min(length - offset, data.length - offset),
 				 MAX_DUMP_SIZE);
@@ -148,7 +148,7 @@ public class FSUtils {
 			boolean end = (idx >= data.length); 
 			if(!end)
 			{
-				sb.append(lpad(Integer.toHexString(data[idx]),2)).append(" ");
+				sb.append(lpad(Integer.toHexString(data[idx]),2)).append(' ');
 				chars.append((char) data[idx]);
 			}
 			
@@ -176,8 +176,8 @@ public class FSUtils {
 	
 	static public String toStringAsChars(byte[] data, int offset, int length)
 	{
-		StringBuffer sb = new StringBuffer();
 		int l = Math.min(offset + length, data.length);
+        StringBuilder sb = new StringBuilder(l);
 		for(int i = offset ; i < l ; i++)
 		{
 			sb.append((char) data[i]);

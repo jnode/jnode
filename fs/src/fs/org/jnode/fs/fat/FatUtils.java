@@ -177,7 +177,11 @@ public class FatUtils {
 	static public void writeSubString(char[] src, int srcOffset, int ordinal, byte checkSum, 
 				boolean isLast, byte[] dest, int destOffset) 
 	{
-		log.debug("<<< BEGIN writeSubString subString="+new String(src, srcOffset, SUBNAME_SIZE)+" >>>");
+        if(log.isDebugEnabled())
+        {
+            log.debug("<<< BEGIN writeSubString subString="+new String(src, srcOffset, SUBNAME_SIZE)+" >>>");
+        }
+        
 		if (isLast) {
 			DosUtils.set8(dest, destOffset, ordinal + (1 << 6)); // set the 6th
 			// security ending
@@ -205,7 +209,10 @@ public class FatUtils {
 		DosUtils.set16(dest, destOffset + 28, src[srcOffset+11]);
 		DosUtils.set16(dest, destOffset + 30, src[srcOffset+12]);
 		
-		log.debug("<<< END writeSubString dest=\n" /* +FSUtils.toString(dest)*/ +">>>");		
+        if(log.isDebugEnabled())
+        {        
+            log.debug("<<< END writeSubString dest=\n" /* +FSUtils.toString(dest)*/ +">>>");
+        }
 	}
 
 	static public byte getOrdinal(byte[] rawData, int offset) {
@@ -224,22 +231,39 @@ public class FatUtils {
 	 * @param offset
 	 */
 	static public void appendSubstring(StringBuffer sb, byte[] rawData, int offset) {
-		log.debug("<<< BEGIN appendSubstring buffer="+sb.toString()+">>>");
+        if(log.isDebugEnabled())
+        {
+            log.debug("<<< BEGIN appendSubstring buffer="+sb.toString()+">>>");
+        }
+        
 		int index = 12;
 		char[] unicodechar = getUnicodeChars(rawData, offset);
-		log.debug("appendSubstring: unicodechar="+new String(unicodechar));
+        
+        if(log.isDebugEnabled())
+        {        
+            log.debug("appendSubstring: unicodechar="+new String(unicodechar));
+        }
+        
 		while (unicodechar[index] == 0)
 			index--;
 		
 		sb.append(unicodechar,0, index+1);
-		log.debug("<<< END appendSubstring buffer="+sb.toString()+">>>");
+        
+        if(log.isDebugEnabled())
+        {
+            log.debug("<<< END appendSubstring buffer="+sb.toString()+">>>");
+        }
 	}
 
 	/**
 	 * Return a part of a long file name read from the given byte array
      */ 
 	static public String getSubstring(byte[] rawData, int offset) {
-		log.debug("<<< BEGIN getSubString: rawData=" /*+FSUtils.toString(rawData, offset, 12)*/+" >>>");
+        if(log.isDebugEnabled())
+        {                    
+            log.debug("<<< BEGIN getSubString: rawData=" /*+FSUtils.toString(rawData, offset, 12)*/+" >>>");
+        }
+        
 		//log.debug("getSubString: rawData as chars="+FSUtils.toStringAsChars(rawData, offset, 12));
 		int index = 12;
 		char[] unicodechar = getUnicodeChars(rawData, offset);
@@ -248,7 +272,11 @@ public class FatUtils {
 						
 		//log.debug("getSubString: rawData.length="+rawData.length+" offset="+offset+" nbChars(index)="+index);						
 		String str = new String(unicodechar, 0, index);
-		log.debug("<<< END getSubString: return="+str+" >>>");
+        
+        if(log.isDebugEnabled())
+        {
+            log.debug("<<< END getSubString: return="+str+" >>>");
+        }
 		
 		return str;
 	}
