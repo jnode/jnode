@@ -73,8 +73,7 @@ public abstract class VmUTF8Convert {
      *             if the (pseudo-)utf8 byte array is not valid (pseudo-)utf8
      * @return unicode string
      */
-    public static String fromUTF8(ByteBuffer data, int length) throws UTFDataFormatException {
-        char[] result = new char[length];
+    public static String fromUTF8(ByteBuffer data, char[] result, int length) throws UTFDataFormatException {
         int result_index = 0;
         for (int i = 0, n = length; i < n;) {
             byte b = data.get(); i++;

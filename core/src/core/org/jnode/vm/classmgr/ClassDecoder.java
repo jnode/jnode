@@ -774,11 +774,29 @@ public final class ClassDecoder {
         final int utflen = data.getChar();
         final String result;
         try {
-            result = VmUTF8Convert.fromUTF8(data, utflen);
+            result = VmUTF8Convert.fromUTF8(data, getUtfConversionBuffer(utflen), utflen);
         } catch (UTFDataFormatException ex) {
             throw (ClassFormatError) new ClassFormatError(
                     "Invalid UTF sequence").initCause(ex);
         }
         return result;
+    }
+    
+    private transient static ThreadLocal utfConversionBuffer;
+    private static final char[] getUtfConversionBuffer(int utfLength) {
+        if (utfConversionBuffer == null) {
+            synchronized (ClassDecoder.class) {
+                if (utfConversionBuffer == null) {
+                    utfConversionBuffer = new ThreadLocal();
+                }
+            }
+        }
+        char[] buffer = (char[])utfConversionBuffer.get();
+        if ((buffer == null) || (buffer.length < utfLength)) {
+            buffer = new char[Math.max(64, utfLength)];
+            utfConversionBuffer.set(buffer);
+        }
+        
+        return buffer;
     }
 }
