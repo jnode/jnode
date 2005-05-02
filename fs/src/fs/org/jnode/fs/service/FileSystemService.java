@@ -93,6 +93,13 @@ public interface FileSystemService {
     public void mount(String fullPath, FileSystem fs, String fsPath)
     throws IOException;
     
+    /**
+     * Is the given directory a mount.
+     * @param fullPath
+     * @return
+     */
+    public boolean isMount(String fullPath);
+    
 	/**
 	 * Gets the filesystem API.
 	 */

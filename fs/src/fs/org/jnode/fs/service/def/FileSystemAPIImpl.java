@@ -376,6 +376,16 @@ final class FileSystemAPIImpl implements VMFileSystemAPI {
     }
     
     /**
+     * Is the given directory a mount.
+     * @param fullPath
+     * @return
+     */
+    public boolean isMount(String fullPath) {
+        final FSEntry entry = getEntry(fullPath);
+        return (entry instanceof VirtualMountEntry);        
+    }
+    
+    /**
      * The filesystem on the given device will be removed.
      * @param dev
      */

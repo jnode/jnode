@@ -22,6 +22,7 @@
 package org.jnode.fs.service.def;
 
 import java.io.IOException;
+import java.io.VMFile;
 import java.io.VMFileSystemAPI;
 import java.io.VMIOUtils;
 import java.security.AccessController;
@@ -146,7 +147,20 @@ public class FileSystemPlugin extends Plugin implements FileSystemService {
      */
     public void mount(String fullPath, FileSystem fs, String fsPath)
     throws IOException {
-        api.mount(fullPath, fs, fsPath);
+        if (fsPath != null) {
+            fsPath = VMFile.getNormalizedPath(fsPath);
+        }
+        api.mount(VMFile.getNormalizedPath(fullPath), fs, fsPath);
+    }
+    
+    
+    /**
+     * Is the given directory a mount.
+     * @param fullPath
+     * @return
+     */
+    public boolean isMount(String fullPath) {
+        return api.isMount(VMFile.getNormalizedPath(fullPath));
     }
     
     /**
