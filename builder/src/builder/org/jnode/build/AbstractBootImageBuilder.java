@@ -1232,6 +1232,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         addCompileHighOptLevel("java.lang.ref");
         addCompileHighOptLevel("java.lang.reflect");
         addCompileHighOptLevel("java.net");
+        addCompileHighOptLevel("java.nio");
         addCompileHighOptLevel("java.security");
         addCompileHighOptLevel("java.util");
         addCompileHighOptLevel("java.util.jar");

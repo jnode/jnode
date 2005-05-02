@@ -21,6 +21,7 @@
  
 package org.jnode.vm;
 
+import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 
 import org.jnode.vm.classmgr.ClassDecoder;
@@ -37,17 +38,26 @@ abstract class VmAbstractClassLoader extends VmClassLoader {
 	 * @see org.jnode.vm.classmgr.VmClassLoader#defineClass(java.lang.String, byte[], int, int, java.security.ProtectionDomain)
 	 */
 	public final VmType defineClass(String name, byte[] data, int offset, int length, ProtectionDomain protDomain) {
-		VmType vmClass = ClassDecoder.defineClass(name, data, offset, length, true, this, protDomain);
-		name = vmClass.getName();
-		if (!isSystemClassLoader()) {
-			if (name.startsWith("org.jnode.vm") || name.startsWith("java.lang")) {
-				throw new SecurityException("Only the system classloader can load this class");
-			}
-		}
-		addLoadedClass(name, vmClass);
-		return vmClass;
+        ByteBuffer buf = ByteBuffer.wrap(data, offset, length);
+        return defineClass(name, buf, protDomain);
 	}
 	
+    /**
+     * @see org.jnode.vm.classmgr.VmClassLoader#defineClass(java.lang.String, ByteBuffer, java.security.ProtectionDomain)
+     */
+    public final VmType defineClass(String name, ByteBuffer data, ProtectionDomain protDomain) {
+        final VmType<?> vmClass;
+        vmClass = ClassDecoder.defineClass(name, data, true, this, protDomain);
+        name = vmClass.getName();
+        if (!isSystemClassLoader()) {
+            if (name.startsWith("org.jnode.vm") || name.startsWith("java.lang")) {
+                throw new SecurityException("Only the system classloader can load this class");
+            }
+        }
+        addLoadedClass(name, vmClass);
+        return vmClass;
+    }
+    
 	/**
 	 * Load an array class with a given name
 	 * 
@@ -57,7 +67,7 @@ abstract class VmAbstractClassLoader extends VmClassLoader {
 	 * @throws ClassNotFoundException
 	 */
 	protected final VmType loadArrayClass(String name, boolean resolve) throws ClassNotFoundException {
-		VmType compType;
+		VmType<?> compType;
 		String compName = name.substring(1);
 		if ((compName.charAt(0) == 'L') && (compName.charAt(compName.length() - 1) == ';')) {
 			compName = compName.substring(1, compName.length() - 1);

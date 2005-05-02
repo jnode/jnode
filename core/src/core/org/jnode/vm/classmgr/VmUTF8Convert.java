@@ -22,6 +22,7 @@
 package org.jnode.vm.classmgr;
 
 import java.io.UTFDataFormatException;
+import java.nio.ByteBuffer;
 
 /**
  * VM_UTF8Convert
@@ -72,11 +73,11 @@ public abstract class VmUTF8Convert {
      *             if the (pseudo-)utf8 byte array is not valid (pseudo-)utf8
      * @return unicode string
      */
-    public static String fromUTF8(byte[] utf8_, int offset, int length) throws UTFDataFormatException {
+    public static String fromUTF8(ByteBuffer data, int length) throws UTFDataFormatException {
         char[] result = new char[length];
         int result_index = 0;
         for (int i = 0, n = length; i < n;) {
-            byte b = utf8_[ offset + i++];
+            byte b = data.get(); i++;
             if (STRICTLY_CHECK_FORMAT && !ALLOW_NORMAL_UTF8)
                     if (b == 0)
                             throw new UTFDataFormatException(
@@ -87,7 +88,7 @@ public abstract class VmUTF8Convert {
                 continue;
             }
             try {
-                byte nb = utf8_[offset+ i++];
+                byte nb = data.get(); i++;
                 if (b < -32) { // < 0xe0 unsigned
                     // '\000' or in the range '\200' to '\u07FF'
                     char c = result[ result_index++] = (char) (((b & 0x1f) << 6) | (nb & 0x3f));
@@ -107,7 +108,7 @@ public abstract class VmUTF8Convert {
                                                 + (i - 2));
                     }
                 } else {
-                    byte nnb = utf8_[offset + i++];
+                    byte nnb = data.get(); i++;
                     // in the range '\u0800' to '\uFFFF'
                     char c = result[ result_index++] = (char) (((b & 0x0f) << 12)
                             | ((nb & 0x3f) << 6) | (nnb & 0x3f));
