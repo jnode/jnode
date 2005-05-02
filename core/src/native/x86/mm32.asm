@@ -30,7 +30,7 @@ free_mem_start	dd 0	; Start address of free memory heap
 
 Lsetup_mm:
 	mov [mem_size],ebx
-	mov eax,[rmc_memstart]
+	mov eax,rmc_memstart
 	; Page align
 	add eax,0x1000
 	and eax,~0xfff

@@ -8,14 +8,12 @@
 
 configbase equ 0c000h
 
-    absolute configbase
-
-rmc_bootdevice     resb 1  ; Boot device (DL passed by the BIOS)
-                   resb 3
-rmc_basememsize    resd 1  ; Base memory size (in bytes)
-rmc_extmemsize     resd 1  ; Extended memory size (in bytes)
-rmc_classes_addr   resd 1  ; Start address of the classes file
-rmc_classes_size   resd 1  ; Size (in bytes) of the classes file
-rmc_memstart       resd 1  ; Start of free memory after the kernel & classes
-rmc_bootversion    resd 1  ; Version of the boot sector
+%define rmc_bootdevice     byte[configbase+0]	; Boot device (DL passed by the BIOS)
+;                   resb 3
+%define rmc_basememsize    dword[configbase+4]	; Base memory size (in bytes)
+%define rmc_extmemsize     dword[configbase+8]	; Extended memory size (in bytes)
+%define rmc_classes_addr   dword[configbase+12]	; Start address of the classes file
+%define rmc_classes_size   dword[configbase+16]	; Size (in bytes) of the classes file
+%define rmc_memstart       dword[configbase+20]	; Start of free memory after the kernel & classes
+%define rmc_bootversion    dword[configbase+24]	; Version of the boot sector
 
