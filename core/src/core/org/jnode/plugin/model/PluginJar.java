@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.jar.JarEntry;
@@ -40,6 +41,7 @@ import org.jnode.plugin.PluginException;
 import org.jnode.util.BootableHashMap;
 import org.jnode.util.FileUtils;
 import org.jnode.vm.BootableObject;
+import org.jnode.vm.ResourceLoader;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -122,6 +124,18 @@ public class PluginJar implements BootableObject, ResourceLoader {
             return null;
         } else {
             return new ByteArrayInputStream(data);
+        }
+    }
+
+    /**
+     * @see org.jnode.vm.ResourceLoader#getResourceAsBuffer(java.lang.String)
+     */
+    public ByteBuffer getResourceAsBuffer(String resourceName) {
+        final byte[] data = (byte[]) resources.get(resourceName);
+        if (data == null) {
+            return null;
+        } else {
+            return ByteBuffer.wrap(data);
         }
     }
 

@@ -5,6 +5,7 @@ package org.jnode.plugin.model;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 import nanoxml.XMLElement;
@@ -12,6 +13,7 @@ import nanoxml.XMLElement;
 import org.jnode.plugin.FragmentDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.system.BootLog;
+import org.jnode.vm.ResourceLoader;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
@@ -46,7 +48,7 @@ public class FragmentDescriptorModel extends PluginDescriptorModel implements
     }
 
     /**
-     * @see org.jnode.plugin.model.ResourceLoader#containsResource(java.lang.String)
+     * @see org.jnode.vm.ResourceLoader#containsResource(java.lang.String)
      */
     public boolean containsResource(String resourceName) {
         final PluginJar jar = getJarFile();
@@ -54,6 +56,18 @@ public class FragmentDescriptorModel extends PluginDescriptorModel implements
             return jar.containsResource(resourceName);
         } else {
             return false;
+        }
+    }
+
+    /**
+     * @see org.jnode.vm.ResourceLoader#getResourceAsBuffer(java.lang.String)
+     */
+    public ByteBuffer getResourceAsBuffer(String resourceName) {
+        final PluginJar jar = getJarFile();
+        if (jar != null) {
+            return jar.getResourceAsBuffer(resourceName);
+        } else {
+            return null;
         }
     }
 
@@ -72,7 +86,7 @@ public class FragmentDescriptorModel extends PluginDescriptorModel implements
     }
 
     /**
-     * @see org.jnode.plugin.model.ResourceLoader#getResource(java.lang.String)
+     * @see org.jnode.vm.ResourceLoader#getResource(java.lang.String)
      */
     public URL getResource(String resourceName) {
         final PluginJar jar = getJarFile();
@@ -95,7 +109,7 @@ public class FragmentDescriptorModel extends PluginDescriptorModel implements
     }
 
     /**
-     * @see org.jnode.plugin.model.ResourceLoader#getResourceAsStream(java.lang.String)
+     * @see org.jnode.vm.ResourceLoader#getResourceAsStream(java.lang.String)
      */
     public InputStream getResourceAsStream(String resourceName) {
         final PluginJar jar = getJarFile();

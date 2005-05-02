@@ -37,9 +37,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.jnode.assembler.ObjectResolver;
-import org.jnode.plugin.model.ResourceLoader;
 import org.jnode.util.BootableArrayList;
-import org.jnode.util.FileUtils;
 import org.jnode.vm.classmgr.ClassDecoder;
 import org.jnode.vm.classmgr.IMTBuilder;
 import org.jnode.vm.classmgr.SelectorMap;
@@ -388,7 +386,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
                 + archN.toUpperCase());
 
         // System.out.println("bvi.loadClass: " +name);
-        final ByteBuffer image = getClassStream(name);
+        final ByteBuffer image = getClassData(name);
 
         if (failOnNewLoad) {
             throw new RuntimeException(
@@ -421,7 +419,7 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    private ByteBuffer getClassStream(String clsName)
+    private ByteBuffer getClassData(String clsName)
             throws MalformedURLException, IOException, ClassNotFoundException {
 
         final String fName = clsName.replace('.', '/') + ".class";
@@ -435,9 +433,9 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
             }
 
             for (ResourceLoader l : resourceLoaders) {
-                final InputStream is = l.getResourceAsStream(fName);
-                if (is != null) {
-                    return ByteBuffer.wrap(FileUtils.load(is, true));
+                final ByteBuffer buf = l.getResourceAsBuffer(fName);
+                if (buf != null) {
+                    return buf;
                 }
             }
 
