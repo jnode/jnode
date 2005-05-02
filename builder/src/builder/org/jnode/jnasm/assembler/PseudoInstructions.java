@@ -32,7 +32,8 @@ import java.util.Map;
 public class PseudoInstructions extends AssemblerModule {
     protected static final Map INSTRUCTION_MAP;
     private static final String[] MNEMONICS;
-    public static final int DB_ISN = 0;
+    public static final int BITS_ISN = 0;
+    public static final int DB_ISN = BITS_ISN + 1;
     public static final int DW_ISN = DB_ISN + 1;
     public static final int DD_ISN = DW_ISN + 1;
     public static final int RESB_ISN = DD_ISN + 1;
@@ -64,6 +65,8 @@ public class PseudoInstructions extends AssemblerModule {
         if (key == null) return false;
 
         switch (key.intValue()) {
+            case BITS_ISN:
+                emmitBITS();
             case DB_ISN:
                 emmitDB();
                 break;
@@ -86,6 +89,9 @@ public class PseudoInstructions extends AssemblerModule {
         return true;
     }
 
+    private void emmitBITS() {
+        //do nothing for now
+    }
 
     private void emmitDB() {
         int ln = operands.size();
