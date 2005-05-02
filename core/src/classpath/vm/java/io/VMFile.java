@@ -27,7 +27,7 @@ import gnu.java.io.PlatformHelper;
 /**
  * @author Michael Koch (konqueror@gmx.de)
  */
-final class VMFile {
+public final class VMFile {
     // FIXME: We support only case sensitive filesystems currently.
     static final boolean IS_CASE_SENSITIVE = true;
 
@@ -290,7 +290,7 @@ final class VMFile {
      * @param path
      * @return
      */
-    static final String getNormalizedPath(String path) {
+    public static final String getNormalizedPath(String path) {
         if (!path.startsWith(File.separator)) {
             path = SystemProperties.getProperty("user.dir") + File.separator + path;
         }

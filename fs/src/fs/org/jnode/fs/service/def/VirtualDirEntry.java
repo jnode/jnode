@@ -232,7 +232,7 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
     final synchronized void unregisterFileSystem(Device dev) {
         // Make a clone of the entries.values, so we can remove entries
         // without a problem.
-        final Collection<FSEntry> entries = this.entries.values();
+        final Collection<FSEntry> entries = new ArrayList<FSEntry>(this.entries.values());
         for (FSEntry entry : entries) {
             if (entry instanceof VirtualMountEntry) {
                 final VirtualMountEntry vme = (VirtualMountEntry)entry;
