@@ -105,7 +105,7 @@ CONST_4KB		equ 4*1024
 
 Lsetup_mm:
 	mov [mem_size],ebx
-	mov eax,[rmc_memstart]
+	mov eax,rmc_memstart
 	; Page align
 	add eax,0x1000
 	and eax,~0xfff
