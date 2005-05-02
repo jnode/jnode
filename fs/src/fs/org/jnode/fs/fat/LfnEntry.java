@@ -50,7 +50,6 @@ class LfnEntry implements FSEntry {
 
 	public LfnEntry(FatLfnDirectory parent, Vector<?> entries, int offset, int length) {
 		this.parent = parent;
-		StringBuffer name = new StringBuffer();
 		// this is just an old plain 8.3 entry, copy it;
 		if (length == 1) {
 			realEntry = (FatDirEntry)entries.get(offset);
@@ -58,6 +57,7 @@ class LfnEntry implements FSEntry {
 			return;
 		}
 		// stored in reversed order
+        StringBuilder name = new StringBuilder(13*(length-1));
 		for (int i = length - 2; i >= 0; i--) {
 			FatLfnDirEntry entry = (FatLfnDirEntry)entries.get(i + offset);
 			name.append(entry.getSubstring());

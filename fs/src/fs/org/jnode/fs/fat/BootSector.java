@@ -85,7 +85,7 @@ public class BootSector {
 	 * @return String
 	 */
 	public String getOemName() {
-		StringBuffer b = new StringBuffer();
+		StringBuilder b = new StringBuilder(8);
 		for (int i = 0; i < 8; i++) {
 			int v = data[0x3 + i];
 			b.append((char)v);
@@ -361,50 +361,51 @@ public class BootSector {
 	}
 
 	public String toString() {
-		StringBuffer res =  new StringBuffer("Bootsector :\n"
-			+ "oemName="
-			+ getOemName()
-			+ "\n"
-			+ "medium descriptor = "
-			+ getMediumDescriptor()
-			+ "\n"
-			+ "Nr heads = "
-			+ getNrHeads()
-			+ "\n"
-			+ "Sectors per track = "
-			+ getSectorsPerTrack()
-			+ "\n"
-			+ "Sector per cluster = "
-			+ getSectorsPerCluster()
-			+ "\n"
-			+ "Sectors per fat = "
-			+ getSectorsPerFat()
-			+ "\n"
-			+ "byte per sector = "
-			+ getBytesPerSector()
-			+ "\n"
-			+ "Nr fats = "
-			+ getNrFats()
-			+ "\n"
-			+ "Nr hidden sectors = "
-			+ getNrHiddenSectors()
-			+ "\n"
-			+ "Nr logical sectors = "
-			+ getNrLogicalSectors()
-			+ "\n"
-			+ "Nr reserved sector = "
-			+ getNrReservedSectors()
-			+ "\n"
-			+ "Nr Root Dir Entries = "
-			+ getNrRootDirEntries()
-			+ "\n");
+		StringBuilder res =  new StringBuilder(1024);
+        res.append("Bootsector :\n");
+        res.append("oemName=");
+        res.append(getOemName());
+        res.append('\n');
+        res.append("medium descriptor = ");
+        res.append(getMediumDescriptor());
+        res.append('\n');
+        res.append("Nr heads = ");
+        res.append(getNrHeads());
+        res.append('\n');
+        res.append("Sectors per track = ");
+        res.append(getSectorsPerTrack());
+        res.append('\n');
+        res.append("Sector per cluster = ");
+        res.append(getSectorsPerCluster());
+        res.append('\n');
+        res.append("Sectors per fat = ");
+        res.append(getSectorsPerFat());
+        res.append('\n');
+        res.append("byte per sector = ");
+        res.append(getBytesPerSector());
+        res.append('\n');
+        res.append("Nr fats = ");
+        res.append(getNrFats());
+        res.append('\n');
+        res.append("Nr hidden sectors = ");
+        res.append(getNrHiddenSectors());
+        res.append('\n');
+        res.append("Nr logical sectors = ");
+        res.append(getNrLogicalSectors());
+        res.append('\n');
+        res.append("Nr reserved sector = ");
+        res.append(getNrReservedSectors());
+        res.append('\n');
+        res.append("Nr Root Dir Entries = ");
+        res.append(getNrRootDirEntries());
+        res.append('\n');
         
         for(int i=0; i<data.length /16 ; i++)
         {
             res.append(Integer.toHexString(i));
-            res.append("-");
+            res.append('-');
             res.append(NumberUtils.hex(data,i*16,16));
-            res.append("\n");
+            res.append('\n');
         }
         
         return res.toString();

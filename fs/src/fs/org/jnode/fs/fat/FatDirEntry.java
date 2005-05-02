@@ -450,7 +450,7 @@ public class FatDirEntry extends FatBasicDirEntry implements FSEntry {
 	}
 
 	public String toString() {
-		StringBuffer b = new StringBuffer();
+		StringBuilder b = new StringBuilder(64);
 
 		b.append(getName());
 

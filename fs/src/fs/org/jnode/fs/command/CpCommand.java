@@ -209,7 +209,7 @@ public class CpCommand {
     private boolean parseOption(String[] args) {
 
         String options;
-        StringBuffer sb = new StringBuffer(5);
+        StringBuilder sb = new StringBuilder(5);
 
         if (args.length < 2 || args.length > 10) { return false; }
 
@@ -546,7 +546,7 @@ public class CpCommand {
      */
     private static boolean overWriteQuerry(String fileName) {
 
-        final StringBuffer sbRead = new StringBuffer();
+        final StringBuilder sbRead = new StringBuilder(256);
         final InputStreamReader reader = new InputStreamReader(System.in);
 
         String reponse = null;
