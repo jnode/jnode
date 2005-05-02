@@ -21,6 +21,7 @@
  
 package org.jnode.vm.bytecode;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,14 +31,14 @@ import java.util.List;
  */
 public class BytecodeWriter {
 
-	private byte[] code;
-	private int used;
+	private final ByteBuffer code;
 	private HashSet<Label> labels;
 
-	public BytecodeWriter() {
+	public BytecodeWriter(int capacity) {
+        this.code = ByteBuffer.allocate(capacity);
 	}
 
-	public byte[] toByteArray() {
+	public ByteBuffer toByteBuffer() {
 		// Test all labels, they must have been resolved
 		if (labels != null) {
 			for (Label l : labels) {
@@ -46,10 +47,8 @@ public class BytecodeWriter {
 				}
 			}
 		}
-		if (used > 0) {
-			final byte[] result = new byte[used];
-			System.arraycopy(code, 0, result, 0, used);
-			return result;
+		if (code.limit() > 0) {
+            return (ByteBuffer)code.duplicate().rewind();
 		} else {
 			return null;
 		}
@@ -65,7 +64,7 @@ public class BytecodeWriter {
 	}
 
 	public void clear() {
-		used = 0;
+		code.rewind().limit(0);
 		if (labels != null) {
 			labels.clear();
 		}
@@ -345,7 +344,7 @@ public class BytecodeWriter {
 	}
 
 	public void goto_(Label label) {
-		final int start = used;
+		final int start = code.position();
 		write8(0xa7);
 		write16(start, label);
 	}
@@ -428,97 +427,97 @@ public class BytecodeWriter {
 	}
 
 	public void if_acmpeq(Label label) {
-		final int start = used;
+		final int start = code.position();
 		write8(0xa5);
 		write16(start, label);
 	}
 
 	public void if_acmpne(Label label) {
-		final int start = used;
+		final int start = code.position();
 		write8(0xa6);
 		write16(start, label);
 	}
 
 	public void if_icmpeq(Label label) {
-		final int start = used;
+		final int start = code.position();
 		write8(0x97);
 		write16(start, label);
 	}
 
 	public void if_icmpne(Label label) {
-		final int start = used;
+		final int start = code.position();
 		write8(0xa0);
 		write16(start, label);
 	}
 
 	public void if_icmplt(Label label) {
-		final int start = used;
+		final int start = code.position();
 		write8(0xa1);
 		write16(start, label);
 	}
 
 	public void if_icmpge(Label label) {
-		final int start = used;
+		final int start = code.position();
 		write8(0xa2);
 		write16(start, label);
 	}
 
 	public void if_icmpgt(Label label) {
-		final int start = used;
+		final int start = code.position();
 		write8(0xa3);
 		write16(start, label);
 	}
 
 	public void if_icmple(Label label) {
-		final int start = used;
+		final int start = code.position();
 		write8(0xa4);
 		write16(start, label);
 	}
 
 	public void ifeq(Label label) {
-		final int start = used;
+		final int start = code.position();
 		write8(0x99);
 		write16(start, label);
 	}
 
 	public void ifne(Label label) {
-		final int start = used;
+		final int start = code.position();
 		write8(0x9a);
 		write16(start, label);
 	}
 
 	public void iflt(Label label) {
-		final int start = used;
+		final int start = code.position();
 		write8(0x9b);
 		write16(start, label);
 	}
 
 	public void ifge(Label label) {
-		final int start = used;
+		final int start = code.position();
 		write8(0x9c);
 		write16(start, label);
 	}
 
 	public void ifgt(Label label) {
-		final int start = used;
+		final int start = code.position();
 		write8(0x9d);
 		write16(start, label);
 	}
 
 	public void ifle(Label label) {
-		final int start = used;
+		final int start = code.position();
 		write8(0x9e);
 		write16(start, label);
 	}
 
 	public void ifnonnull(Label label) {
-		final int start = used;
+		final int start = code.position();
 		write8(0xc7);
 		write16(start, label);
 	}
 
 	public void ifnull(Label label) {
-		final int start = used;
+		final int start = code.position();
 		write8(0xc6);
 		write16(start, label);
 	}
@@ -615,7 +614,7 @@ public class BytecodeWriter {
 	}
 
 	public void jsr(Label label) {
-		final int start = used;
+		final int start = code.position();
 		write8(0xa8);
 		write16(start, label);
 	}
@@ -819,15 +818,10 @@ public class BytecodeWriter {
 	}*/
 
 	private final void ensureSpace(int extra) {
-		final int size = used + extra;
-		if ((code == null) || (code.length < size)) {
-			final int newSize = (size + 128) & ~127;
-			final byte[] newCode = new byte[newSize];
-			if (code != null) {
-				System.arraycopy(code, 0, newCode, 0, code.length);
-			}
-			this.code = newCode;
-		}
+		final int size = code.position() + extra;
+        if (code.limit() < size) {
+            code.limit(size);
+        }
 	}
 
 	/**
@@ -836,8 +830,7 @@ public class BytecodeWriter {
 	 */
 	private final void write8(int v) {
 		ensureSpace(1);
-		set8(code, used, v);
-		used++;
+        code.put((byte)(v & 0xFF));
 	}
 
 	/**
@@ -846,8 +839,8 @@ public class BytecodeWriter {
 	 */
 	private final void write16(int v) {
 		ensureSpace(2);
-		set16(code, used, v);
-		used += 2;
+        code.put((byte) ((v >> 8) & 0xFF));
+        code.put((byte) (v & 0xFF));
 	}
 
 	/**
@@ -859,8 +852,8 @@ public class BytecodeWriter {
 		if (label.isResolved()) {
 			write16(label.getAddress() - insStart);
 		} else {
-			label.addUnresolvedLocation(used);
-			write16(used - insStart);
+			label.addUnresolvedLocation(code.position());
+			write16(code.position() - insStart);
 		}
 	}
 
@@ -880,8 +873,8 @@ public class BytecodeWriter {
 	 * @param ofs
 	 * @param v
 	 */
-	public static final void set8(byte[] code, int ofs, int v) {
-		code[ofs++] = (byte) (v & 0xFF);
+	public static final void set8(ByteBuffer code, int ofs, int v) {
+		code.put(ofs, (byte) (v & 0xFF));
 	}
 
 	/**
@@ -890,9 +883,9 @@ public class BytecodeWriter {
 	 * @param ofs
 	 * @param v
 	 */
-	public static final void set16(byte[] code, int ofs, int v) {
-		code[ofs++] = (byte) ((v >> 8) & 0xFF);
-		code[ofs++] = (byte) (v & 0xFF);
+	public static final void set16(ByteBuffer code, int ofs, int v) {
+		code.put(ofs++, (byte) ((v >> 8) & 0xFF));
+		code.put(ofs++, (byte) (v & 0xFF));
 	}
 
 	/**
@@ -901,11 +894,11 @@ public class BytecodeWriter {
 	 * @param ofs
 	 * @param v
 	 */
-	public static final void set32(byte[] code, int ofs, int v) {
-		code[ofs++] = (byte) ((v >> 24) & 0xFF);
-		code[ofs++] = (byte) ((v >> 16) & 0xFF);
-		code[ofs++] = (byte) ((v >> 8) & 0xFF);
-		code[ofs++] = (byte) (v & 0xFF);
+	public static final void set32(ByteBuffer code, int ofs, int v) {
+		code.put(ofs++, (byte) ((v >> 24) & 0xFF));
+		code.put(ofs++, (byte) ((v >> 16) & 0xFF));
+		code.put(ofs++, (byte) ((v >> 8) & 0xFF));
+		code.put(ofs++, (byte) (v & 0xFF));
 	}
 
 	/**
@@ -914,8 +907,8 @@ public class BytecodeWriter {
 	 * @param ofs
 	 * @return int
 	 */
-	public static final int get8(byte[] code, int ofs) {
-		return code[ofs++] & 0xFF;
+	public static final int get8(ByteBuffer code, int ofs) {
+		return code.get(ofs) & 0xFF;
 	}
 
 	/**
@@ -924,9 +917,9 @@ public class BytecodeWriter {
 	 * @param ofs
 	 * @return int
 	 */
-	public static final int get16(byte[] code, int ofs) {
-		final int v1 = code[ofs++] & 0xFF;
-		final int v2 = code[ofs] & 0xFF;
+	public static final int get16(ByteBuffer code, int ofs) {
+		final int v1 = code.get(ofs++) & 0xFF;
+		final int v2 = code.get(ofs) & 0xFF;
 		return (v1 << 8) | v2;
 	}
 
@@ -936,20 +929,20 @@ public class BytecodeWriter {
 	 * @param ofs
 	 * @return int
 	 */
-	public static final int get32(byte[] code, int ofs) {
-		final int v1 = code[ofs++] & 0xFF;
-		final int v2 = code[ofs++] & 0xFF;
-		final int v3 = code[ofs++] & 0xFF;
-		final int v4 = code[ofs] & 0xFF;
+	public static final int get32(ByteBuffer code, int ofs) {
+		final int v1 = code.get(ofs++) & 0xFF;
+		final int v2 = code.get(ofs++) & 0xFF;
+		final int v3 = code.get(ofs++) & 0xFF;
+		final int v4 = code.get(ofs) & 0xFF;
 		return (v1 << 24) | (v2 << 16) | (v3 << 8) | v4;
 	}
 
 	public final int getLength() {
-		return used;
+		return code.position();
 	}
 
-	final byte[] getCode() {
-		return code;
+	final ByteBuffer getCode() {
+		return (ByteBuffer)code.duplicate().rewind();
 	}
 
 	class Label {
