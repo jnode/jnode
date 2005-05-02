@@ -41,10 +41,8 @@ public final class VmByteCode extends AbstractCode {
 	private char noLocals;
 	/** Max. #slots taken by this method on the stack */
 	private char maxStack;
-	/** Bytecode of this method */
-	private transient ByteBuffer bytecode;
-    /** The bytecode (only valid is created at build time) */
-    private byte[] buildBytecode;
+	/** Bytecode of this method. This is a ByteBuffer or byte[] */
+	private Object bytecode;
 	/** Exception handler table */
 	private VmInterpretedExceptionHandler[] eTable;
 	/** Line number table */
@@ -64,11 +62,13 @@ public final class VmByteCode extends AbstractCode {
 	public VmByteCode(VmMethod method, ByteBuffer bytecode, int noLocals, int maxStack, VmInterpretedExceptionHandler[] eTable, VmLineNumberMap lnTable) {
 		this.method = method;
 		this.cp = method.getDeclaringClass().getCP();
-		this.bytecode = bytecode;
         if (Vm.isWritingImage()) {
-            this.buildBytecode = new byte[bytecode.limit()];
+            final byte[] buildBytecode = new byte[bytecode.limit()];
             bytecode.get(buildBytecode);
             bytecode.rewind();
+            this.bytecode = buildBytecode;
+        } else {
+            this.bytecode = bytecode;
         }
 		this.noLocals = (char)noLocals;
 		this.maxStack = (char)maxStack;
@@ -83,10 +83,16 @@ public final class VmByteCode extends AbstractCode {
 	 * @return the code
 	 */
 	public ByteBuffer getBytecode() {
-        if (bytecode == null) {
-            bytecode = ByteBuffer.wrap(buildBytecode);
+        final Object bytecode = this.bytecode;
+        if (bytecode instanceof ByteBuffer) {
+            return ((ByteBuffer)bytecode).duplicate();
+        } else {
+            final ByteBuffer buf = ByteBuffer.wrap((byte[])bytecode);
+            if (Vm.isRunningVm()) {
+                this.bytecode = buf;
+            }
+            return buf.duplicate();
         }
-		return bytecode.duplicate();
 	}
 	
 	/**
@@ -94,10 +100,11 @@ public final class VmByteCode extends AbstractCode {
 	 * @return the length
 	 */
 	public int getLength() {
-        if (bytecode != null) {
-            return bytecode.limit();
+        final Object bytecode = this.bytecode;
+        if (bytecode instanceof ByteBuffer) {
+            return ((ByteBuffer)bytecode).limit();
         } else {
-            return buildBytecode.length;
+            return ((byte[])bytecode).length;
         }
 	}
 
