@@ -22,11 +22,10 @@
 package org.jnode.boot;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
+import java.util.Map;
 import java.util.jar.Manifest;
 
 import org.jnode.plugin.PluginDescriptor;
@@ -35,13 +34,14 @@ import org.jnode.plugin.PluginLoader;
 import org.jnode.plugin.model.PluginRegistryModel;
 import org.jnode.system.BootLog;
 import org.jnode.system.MemoryResource;
+import org.jnode.util.JarBuffer;
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class InitJarProcessor {
 
-    private final JarInputStream jis;
+    private final JarBuffer jbuf;
 
     private final Manifest mf;
 
@@ -51,18 +51,17 @@ public class InitJarProcessor {
      * @param initJarRes
      */
     public InitJarProcessor(MemoryResource initJarRes) {
-        JarInputStream jis = null;
+        JarBuffer jbuf = null;
         Manifest mf = null;
         if (initJarRes != null) {
             try {
-                jis = new JarInputStream(new MemoryResourceInputStream(
-                        initJarRes));
-                mf = jis.getManifest();
+                jbuf = new JarBuffer(initJarRes.asByteBuffer());
+                mf = jbuf.getManifest();
             } catch (IOException ex) {
                 BootLog.error("Cannot instantiate initjar", ex);
             }
         }
-        this.jis = jis;
+        this.jbuf = jbuf;
         this.mf = mf;
     }
 
@@ -72,35 +71,30 @@ public class InitJarProcessor {
      * @param piRegistry
      */
     public List<PluginDescriptor> loadPlugins(PluginRegistryModel piRegistry) {
-        if (jis == null) { return null; }
+        if (jbuf == null) { return null; }
 
         final InitJarPluginLoader loader = new InitJarPluginLoader();
         final ArrayList<PluginDescriptor> descriptors = new ArrayList<PluginDescriptor>();
-        JarEntry entry;
-        try {
-            while ((entry = jis.getNextJarEntry()) != null) {
-                if (entry.getName().endsWith(".jar")) {
-                    try {
-                        // Load it
-                        loader.setIs(new NoCloseInputStream(jis));
-                        final PluginDescriptor descr = piRegistry.loadPlugin(
-                                loader, "", "", false);
-                        descriptors.add(descr);
-                    } catch (PluginException ex) {
-                        BootLog.error("Cannot load " + entry.getName(), ex);
-                    }
+        for (Map.Entry<String, ByteBuffer> entry : jbuf.entries().entrySet()) {
+            final String name = entry.getKey();
+            if (name.endsWith(".jar")) {
+                try {
+                    // Load it
+                    loader.setBuffer(entry.getValue());
+                    final PluginDescriptor descr = piRegistry.loadPlugin(
+                            loader, "", "", false);
+                    descriptors.add(descr);
+                } catch (PluginException ex) {
+                    BootLog.error("Cannot load " + name, ex);
                 }
-                jis.closeEntry();
             }
-        } catch (IOException ex) {
-            BootLog.error("Cannot load initjars", ex);
         }
         return descriptors;
     }
 
     static class InitJarPluginLoader extends PluginLoader {
 
-        private InputStream is;
+        private ByteBuffer buf;
 
         public InitJarPluginLoader() {
         }
@@ -109,16 +103,16 @@ public class InitJarProcessor {
          * @see org.jnode.plugin.PluginLoader#getPluginStream(java.lang.String,
          *      java.lang.String)
          */
-        public InputStream getPluginStream(String pluginId, String pluginVersion) {
-            return is;
+        public ByteBuffer getPluginBuffer(String pluginId, String pluginVersion) {
+            return buf;
         }
 
         /**
          * @param is
          *            The is to set.
          */
-        final void setIs(InputStream is) {
-            this.is = is;
+        final void setBuffer(ByteBuffer buf) {
+            this.buf = buf;
         }
     }
 

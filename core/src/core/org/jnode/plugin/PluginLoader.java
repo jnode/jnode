@@ -21,7 +21,7 @@
  
 package org.jnode.plugin;
 
-import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 import org.jnode.security.JNodePermission;
 
@@ -53,7 +53,7 @@ public abstract class PluginLoader {
      * @param pluginVersion
      * @return The input stream, of null if not found.
      */
-    public abstract InputStream getPluginStream(String pluginId, String pluginVersion);
+    public abstract ByteBuffer getPluginBuffer(String pluginId, String pluginVersion);
 
     /**
      * Gets the filename of a plugin with a given id and version.

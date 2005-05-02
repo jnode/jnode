@@ -21,25 +21,22 @@
  
 package org.jnode.plugin.model;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
 
 import nanoxml.XMLElement;
 
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.util.BootableHashMap;
+import org.jnode.util.ByteBufferInputStream;
 import org.jnode.util.FileUtils;
+import org.jnode.util.JarBuffer;
 import org.jnode.vm.BootableObject;
 import org.jnode.vm.ResourceLoader;
 
@@ -52,7 +49,7 @@ public class PluginJar implements BootableObject, ResourceLoader {
     private final PluginDescriptorModel descriptor;
 
     /** The resources in the jar file */
-    private final Map<String, byte[]> resources;
+    private final Map<String, ByteBuffer> resources;
 
     /**
      * Initialize this instance
@@ -62,7 +59,7 @@ public class PluginJar implements BootableObject, ResourceLoader {
      */
     public PluginJar(PluginRegistryModel registry, URL pluginUrl)
             throws PluginException, IOException {
-        this(registry, pluginUrl.openStream(), null);
+        this(registry, FileUtils.loadToBuffer(pluginUrl.openStream(), true), null);
     }
 
     /**
@@ -71,7 +68,7 @@ public class PluginJar implements BootableObject, ResourceLoader {
      * @param registry
      * @param pluginIs
      */
-    public PluginJar(PluginRegistryModel registry, InputStream pluginIs,
+    public PluginJar(PluginRegistryModel registry, ByteBuffer pluginIs,
             URL pluginUrl) throws PluginException {
 
         try {
@@ -84,13 +81,13 @@ public class PluginJar implements BootableObject, ResourceLoader {
         final XMLElement root;
         try {
             // Not find the plugin.xml
-            final InputStream pluginXmlRes = getResourceAsStream("plugin.xml");
-            if (pluginXmlRes == null) { throw new PluginException(
+            final ByteBuffer buf = getResourceAsBuffer("plugin.xml");
+            if (buf == null) { throw new PluginException(
                     "plugin.xml not found in jar file"); }
 
             // Now parse plugin.xml
             root = new XMLElement(new Hashtable(), true, false);
-            final Reader r = new InputStreamReader(pluginXmlRes);
+            final Reader r = new InputStreamReader(new ByteBufferInputStream(buf));
             try {
                 root.parseFromReader(r);
             } finally {
@@ -113,29 +110,14 @@ public class PluginJar implements BootableObject, ResourceLoader {
     }
 
     /**
-     * Does this jar-file contain the resource with the given name.
-     * 
-     * @param resourceName
-     * @return boolean
-     */
-    public final InputStream getResourceAsStream(String resourceName) {
-        final byte[] data = (byte[]) resources.get(resourceName);
-        if (data == null) {
-            return null;
-        } else {
-            return new ByteArrayInputStream(data);
-        }
-    }
-
-    /**
      * @see org.jnode.vm.ResourceLoader#getResourceAsBuffer(java.lang.String)
      */
     public ByteBuffer getResourceAsBuffer(String resourceName) {
-        final byte[] data = (byte[]) resources.get(resourceName);
+        final ByteBuffer data = resources.get(resourceName);
         if (data == null) {
             return null;
         } else {
-            return ByteBuffer.wrap(data);
+            return data.asReadOnlyBuffer();
         }
     }
 
@@ -191,21 +173,12 @@ public class PluginJar implements BootableObject, ResourceLoader {
         return this.descriptor;
     }
 
-    private Map<String, byte[]> loadResources(InputStream is) throws IOException {
-        final BootableHashMap<String, byte[]> map = new BootableHashMap<String, byte[]>();
-        final JarInputStream jis = new JarInputStream(is);
-        try {
-            JarEntry entry;
-            final byte[] buf = new byte[ 4096];
-            final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            while ((entry = jis.getNextJarEntry()) != null) {
-                FileUtils.copy(jis, bos, buf, false);
-                map.put(entry.getName().intern(), bos.toByteArray());
-                bos.reset();
-            }
-            return map;
-        } finally {
-            jis.close();
+    private Map<String, ByteBuffer> loadResources(ByteBuffer buffer) throws IOException {
+        final BootableHashMap<String, ByteBuffer> map = new BootableHashMap<String, ByteBuffer>();
+        final JarBuffer jbuf = new JarBuffer(buffer);
+        for (Map.Entry<String, ByteBuffer> entry : jbuf.entries().entrySet()) {
+            map.put(entry.getKey(), entry.getValue());
         }
+        return map;
     }
 }

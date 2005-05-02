@@ -38,6 +38,7 @@ import java.util.TreeMap;
 
 import org.jnode.assembler.ObjectResolver;
 import org.jnode.util.BootableArrayList;
+import org.jnode.util.ByteBufferInputStream;
 import org.jnode.vm.classmgr.ClassDecoder;
 import org.jnode.vm.classmgr.IMTBuilder;
 import org.jnode.vm.classmgr.SelectorMap;
@@ -511,9 +512,9 @@ public final class VmSystemClassLoader extends VmAbstractClassLoader {
                 return new ByteArrayInputStream(data);
             } else {
                 for (ResourceLoader l : resourceLoaders) {
-                    final InputStream is = l.getResourceAsStream(name);
-                    if (is != null) {
-                        return is;
+                    final ByteBuffer buf = l.getResourceAsBuffer(name);
+                    if (buf != null) {
+                        return new ByteBufferInputStream(buf);
                     }
                 }
                 return null;

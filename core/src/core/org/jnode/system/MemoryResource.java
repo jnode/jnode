@@ -21,6 +21,8 @@
  
 package org.jnode.system;
 
+import java.nio.ByteBuffer;
+
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.Offset;
@@ -33,6 +35,12 @@ import org.vmmagic.unboxed.Offset;
  */
 public interface MemoryResource extends Resource {
 	
+    /**
+     * Create a bytebuffer that has the same content as this resource.
+     * @return
+     */
+    public abstract ByteBuffer asByteBuffer();
+    
 	/**
 	 * Gets a 8-bit signed byte at the given memory address
 	 * @param memPtr

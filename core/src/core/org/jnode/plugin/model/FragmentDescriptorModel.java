@@ -109,18 +109,6 @@ public class FragmentDescriptorModel extends PluginDescriptorModel implements
     }
 
     /**
-     * @see org.jnode.vm.ResourceLoader#getResourceAsStream(java.lang.String)
-     */
-    public InputStream getResourceAsStream(String resourceName) {
-        final PluginJar jar = getJarFile();
-        if (jar != null) {
-            return jar.getResourceAsStream(resourceName);
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * @throws PluginException 
      * @see org.jnode.plugin.model.PluginDescriptorModel#initializeRequiresList(java.util.List)
      */

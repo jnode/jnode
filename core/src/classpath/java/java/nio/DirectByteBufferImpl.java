@@ -220,9 +220,11 @@ abstract class DirectByteBufferImpl extends ByteBuffer
   private ByteBuffer duplicate(boolean readOnly)
   {
     int pos = position();
-    reset();
-    int mark = position();
-    position(pos);
+    // @classpath-bugfix Changed mark detection
+//    reset();
+//    int mark = position();
+//    position(pos);
+    int mark = this.mark;
     DirectByteBufferImpl result;
     if (readOnly)
         result = new DirectByteBufferImpl.ReadOnly(owner, address, capacity(),
@@ -231,7 +233,8 @@ abstract class DirectByteBufferImpl extends ByteBuffer
         result = new DirectByteBufferImpl.ReadWrite(owner, address, capacity(),
                                                     limit(), pos);
 
-    if (mark != pos)
+    // @classpath-bugfix Added mark >= 0
+    if ((mark != pos) && (mark >= 0))
       {
 	result.position(mark);
 	result.mark();

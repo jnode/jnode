@@ -22,8 +22,8 @@
 package org.jnode.plugin.model;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
@@ -330,11 +330,11 @@ public class PluginRegistryModel extends VmSystemObject implements
                     .doPrivileged(new PrivilegedExceptionAction() {
 
                         public Object run() throws PluginException, IOException {
-                            final InputStream is = loader.getPluginStream(pluginId, pluginVersion);
-                            if (is == null) {
+                            final ByteBuffer buf = loader.getPluginBuffer(pluginId, pluginVersion);
+                            if (buf == null) {
                                 throw new PluginException("Plugin " + pluginId + ", version " + pluginVersion + " not found");
                             }
-                            return new PluginJar(registry, is, null);
+                            return new PluginJar(registry, buf, null);
                         }
                     });
         } catch (PrivilegedActionException pax) {

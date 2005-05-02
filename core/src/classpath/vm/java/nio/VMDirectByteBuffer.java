@@ -21,9 +21,9 @@
  
 package java.nio;
 
-import javax.naming.NameNotFoundException;
-
 import gnu.classpath.RawData;
+
+import javax.naming.NameNotFoundException;
 
 import org.jnode.naming.InitialNaming;
 import org.jnode.system.MemoryResource;
@@ -31,22 +31,37 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.system.SimpleResourceOwner;
+import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.Offset;
 
-final class VMDirectByteBuffer {
+public final class VMDirectByteBuffer {
 
 	static RawData allocate(int capacity) {
 		return new MemoryRawData(capacity);
 	}
+    
+    /**
+     * Wrap a bytebuffer around the given memory resource.
+     * @param resource
+     * @return
+     */
+    public static ByteBuffer wrap(MemoryResource resource) {
+        final Object owner = resource.getOwner();
+        final RawData address = new MemoryRawData(resource);
+        final int size = resource.getSize().toInt();
+        final ByteBuffer result = new DirectByteBufferImpl.ReadWrite(owner, address, size, size, 0);
+        result.mark();
+        return result;
+    }
 
 	static void free(RawData address) {
 		((MemoryRawData)address).resource.release();
 	}
 
 	static byte get(RawData address, int index) {
-		byte value = ((MemoryRawData)address).resource.getByte(index);
-		System.out.println("get from " + index + ", " + value);
+        final MemoryRawData mrd = (MemoryRawData)address;
+		final byte value = mrd.address.loadByte(Offset.fromIntZeroExtend(index));
 		return value;
 	}
 
@@ -56,7 +71,6 @@ final class VMDirectByteBuffer {
 	}
 
 	static void put(RawData address, int index, byte value) {
-		System.out.println("put at " + index + ", " + value);
 		((MemoryRawData)address).resource.setByte(index, value);
 	}
 
@@ -78,14 +92,16 @@ final class VMDirectByteBuffer {
 	private static class MemoryRawData extends RawData {
 
 		final MemoryResource resource;
+        final Address address;
 
 		public MemoryRawData(int size) {
 			try {
 				final ResourceManager rm = (ResourceManager) InitialNaming
 						.lookup(ResourceManager.NAME);
 				final ResourceOwner owner = new SimpleResourceOwner("java.nio");
-				resource = rm.claimMemoryResource(owner, null, size,
+				this.resource = rm.claimMemoryResource(owner, null, size,
 						ResourceManager.MEMMODE_NORMAL);
+                this.address = resource.getAddress();
 			} catch (NameNotFoundException ex) {
 				throw new Error("Cannot find ResourceManager", ex);
 			} catch (ResourceNotFreeException ex) {
@@ -95,6 +111,7 @@ final class VMDirectByteBuffer {
 		
 		public MemoryRawData(MemoryResource resource) {
 			this.resource = resource;
+            this.address = resource.getAddress();
 		}
 	}
 }

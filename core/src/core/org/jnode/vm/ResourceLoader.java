@@ -3,7 +3,6 @@
  */
 package org.jnode.vm;
 
-import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
 
@@ -11,14 +10,6 @@ import java.nio.ByteBuffer;
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public interface ResourceLoader {
-
-    /**
-     * Gets a resource with a given name as input stream.
-     * 
-     * @param resourceName
-     * @return null if not found
-     */
-    public InputStream getResourceAsStream(String resourceName);
 
     /**
      * Gets a resource with a given name as a byte buffer.
