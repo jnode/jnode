@@ -30,6 +30,7 @@
     <mapper id="10de:00a0" architecture="NV04A" name="Aladdin TNT2" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
     <mapper id="10de:0100" architecture="NV10A" name="GeForce 256" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
     <mapper id="10de:0101" architecture="NV10A" name="GeForce DDR" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="10de:0202" architecture="NV10A" name="GeForce 3Ti500" driver-class="org.jnode.driver.video.nvidia.NVidiaDriver" class="org.jnode.driver.pci.PCIDeviceToDriverMapper"/>
   </extension>
         
 </plugin>
