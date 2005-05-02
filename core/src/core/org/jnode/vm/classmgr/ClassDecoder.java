@@ -23,6 +23,8 @@ package org.jnode.vm.classmgr;
 
 import gnu.java.lang.VMClassHelper;
 
+import java.io.UTFDataFormatException;
+import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 
 import org.jnode.system.BootLog;
@@ -69,15 +71,16 @@ public final class ClassDecoder {
         }
         return value;
     }
-    
+
     /**
      * Is the given type of the BOOT_TYPES classes.
+     * 
      * @param type
      * @return
      */
-    private static final boolean isBootType(VmType<?> type) {
+    private static final boolean isBootType(VmType< ? > type) {
         final String typeName = type.getName();
-        for (Class<?> c : BOOT_TYPES) {
+        for (Class< ? > c : BOOT_TYPES) {
             if (c.getName().equals(typeName)) {
                 return true;
             }
@@ -140,88 +143,83 @@ public final class ClassDecoder {
      * @return The decoded class
      * @throws ClassFormatError
      */
-    private static final VmType decodeClass(byte[] data, int offset,
-            int class_image_length, boolean rejectNatives, VmClassLoader clc,
+    private static final VmType decodeClass(ByteBuffer data,
+            boolean rejectNatives, VmClassLoader clc,
             ProtectionDomain protectionDomain) throws ClassFormatError {
-        if (data == null) {
-            throw new ClassFormatError("ClassDecoder.decodeClass: data==null");
-        }
-        final ClassReader reader = new ClassReader(data, offset,
-                class_image_length);
         final VmSharedStatics sharedStatics = clc.getSharedStatics();
         final VmIsolatedStatics isolatedStatics = clc.getIsolatedStatics();
         final int slotSize = clc.getArchitecture().getReferenceSize();
 
-        final int magic = reader.readu4();
+        final int magic = data.getInt();
         if (magic != 0xCAFEBABE) {
             throw new ClassFormatError("invalid magic");
         }
-        final int min_version = reader.readu2();
-        final int maj_version = reader.readu2();
+        final int min_version = data.getChar();
+        final int maj_version = data.getChar();
 
         if (false) {
             BootLog.debug("Class file version " + maj_version + ";"
                     + min_version);
         }
 
-        final int cpcount = reader.readu2();
+        final int cpcount = data.getChar();
         // allocate enough space for the CP
         final byte[] tags = new byte[cpcount];
         final VmCP cp = new VmCP(cpcount);
         for (int i = 1; i < cpcount; i++) {
-            final int tag = reader.readu1();
+            final int tag = data.get() & 0xFF;
             tags[i] = (byte) tag;
             switch (tag) {
             case 1:
                 // Utf8
-                cp.setUTF8(i, reader.readUTF());
+                cp.setUTF8(i, readUTF(data));
                 break;
             case 3:
                 // int
-                cp.setInt(i, reader.readu4());
+                cp.setInt(i, data.getInt());
                 break;
             case 4:
                 // float
-                // cp.setInt(i, reader.readu4());
-                final int ival = reader.readu4();
+                // cp.setInt(i, data.getInt());
+                final int ival = data.getInt();
                 final float fval = Float.intBitsToFloat(ival);
                 cp.setFloat(i, fval);
                 break;
             case 5:
                 // long
-                cp.setLong(i, reader.readu8());
+                cp.setLong(i, data.getLong());
                 i++;
                 break;
             case 6:
                 // double
-                // cp.setLong(i, reader.readu8());
-                final long lval = reader.readu8();
+                // cp.setLong(i, data.getLong());
+                final long lval = data.getLong();
                 final double dval = Double.longBitsToDouble(lval);
                 cp.setDouble(i, dval);
                 i++;
                 break;
             case 7:
                 // class
-                cp.setInt(i, reader.readu2());
+                cp.setInt(i, data.getChar());
                 break;
             case 8:
                 // String
-                cp.setInt(i, reader.readu2());
+                cp.setInt(i, data.getChar());
                 break;
             case 9: // Fieldref
             case 10: // Methodref
             case 11: // IMethodref
             {
-                final int clsIdx = reader.readu2();
-                final int ntIdx = reader.readu2();
+                final int clsIdx = data.getChar();
+                final int ntIdx = data.getChar();
                 cp.setInt(i, clsIdx << 16 | ntIdx);
             }
                 break;
             case 12:
             // Name and Type
             {
-                final int nIdx = reader.readu2();
-                final int dIdx = reader.readu2();
+                final int nIdx = data.getChar();
+                final int dIdx = data.getChar();
                 cp.setInt(i, nIdx << 16 | dIdx);
             }
                 break;
@@ -293,12 +291,12 @@ public final class ClassDecoder {
             }
         }
 
-        final int classModifiers = reader.readu2();
+        final int classModifiers = data.getChar();
 
-        final VmConstClass this_class = cp.getConstClass(reader.readu2());
+        final VmConstClass this_class = cp.getConstClass(data.getChar());
         final String clsName = this_class.getClassName();
 
-        final VmConstClass super_class = cp.getConstClass(reader.readu2());
+        final VmConstClass super_class = cp.getConstClass(data.getChar());
         final String superClassName;
         if (super_class != null) {
             superClassName = super_class.getClassName();
@@ -322,16 +320,16 @@ public final class ClassDecoder {
         if (isBootType(cls)) {
             flags |= NO_FIELD_ALIGNMENT;
         }
-        
+
         // Interface table
-        flags |= readInterfaces(reader, cls, cp);
+        flags |= readInterfaces(data, cls, cp);
 
         // Field table
-        readFields(reader, cls, cp, sharedStatics, isolatedStatics, slotSize,
+        readFields(data, cls, cp, sharedStatics, isolatedStatics, slotSize,
                 flags);
 
         // Method Table
-        readMethods(reader, rejectNatives, cls, cp, sharedStatics, clc);
+        readMethods(data, rejectNatives, cls, cp, sharedStatics, clc);
 
         return cls;
     }
@@ -351,12 +349,12 @@ public final class ClassDecoder {
      * @param clc
      * @return The defined class
      */
-    public static final VmType defineClass(String className, byte[] data,
-            int offset, int class_image_length, boolean rejectNatives,
-            VmClassLoader clc, ProtectionDomain protectionDomain) {
+    public static final VmType defineClass(String className, ByteBuffer data,
+            boolean rejectNatives, VmClassLoader clc,
+            ProtectionDomain protectionDomain) {
         cl_init();
-        final VmType cls = decodeClass(data, offset, class_image_length,
-                rejectNatives, clc, protectionDomain);
+        final VmType cls = decodeClass(data, rejectNatives, clc,
+                protectionDomain);
         return cls;
     }
 
@@ -424,36 +422,36 @@ public final class ClassDecoder {
      * @param method
      * @return The read code
      */
-    private static final VmByteCode readCode(ClassReader reader, VmType cls,
+    private static final VmByteCode readCode(ByteBuffer data, VmType cls,
             VmCP cp, VmMethod method) {
 
-        final int maxStack = reader.readu2();
-        final int noLocals = reader.readu2();
-        final int codelength = reader.readu4();
-        final byte[] code = reader.readBytes(codelength);
+        final int maxStack = data.getChar();
+        final int noLocals = data.getChar();
+        final int codelength = data.getInt();
+        final byte[] code = readBytes(data, codelength);
 
         // Read the exception Table
-        final int ecount = reader.readu2();
+        final int ecount = data.getChar();
         final VmInterpretedExceptionHandler[] etable = new VmInterpretedExceptionHandler[ecount];
         for (int i = 0; i < ecount; i++) {
-            final int startPC = reader.readu2();
-            final int endPC = reader.readu2();
-            final int handlerPC = reader.readu2();
-            final int catchType = reader.readu2();
+            final int startPC = data.getChar();
+            final int endPC = data.getChar();
+            final int handlerPC = data.getChar();
+            final int catchType = data.getChar();
             etable[i] = new VmInterpretedExceptionHandler(cp, startPC, endPC,
                     handlerPC, catchType);
         }
 
         // Read the attributes
         VmLineNumberMap lnTable = null;
-        final int acount = reader.readu2();
+        final int acount = data.getChar();
         for (int i = 0; i < acount; i++) {
-            final String attrName = cp.getUTF8(reader.readu2());
-            final int len = reader.readu4();
+            final String attrName = cp.getUTF8(data.getChar());
+            final int len = data.getInt();
             if (VmArray.equals(LineNrTableAttrName, attrName)) {
-                lnTable = readLineNrTable(reader);
+                lnTable = readLineNrTable(data);
             } else {
-                reader.skip(len);
+                skip(data, len);
             }
         }
 
@@ -468,14 +466,14 @@ public final class ClassDecoder {
      * @param cp
      * @return The read exceptions
      */
-    private static final VmExceptions readExceptions(ClassReader reader,
+    private static final VmExceptions readExceptions(ByteBuffer data,
             VmType cls, VmCP cp) {
 
         // Read the exceptions
-        final int ecount = reader.readu2();
+        final int ecount = data.getChar();
         final VmConstClass[] list = new VmConstClass[ecount];
         for (int i = 0; i < ecount; i++) {
-            final int idx = reader.readu2();
+            final int idx = data.getChar();
             list[i] = cp.getConstClass(idx);
         }
 
@@ -490,19 +488,19 @@ public final class ClassDecoder {
      * @param cp
      * @param slotSize
      */
-    private static void readFields(ClassReader reader, VmType< ? > cls,
-            VmCP cp, VmSharedStatics sharedStatics,
-            VmIsolatedStatics isolatedStatics, int slotSize, int flags) {
-        final int fcount = reader.readu2();
+    private static void readFields(ByteBuffer data, VmType< ? > cls, VmCP cp,
+            VmSharedStatics sharedStatics, VmIsolatedStatics isolatedStatics,
+            int slotSize, int flags) {
+        final int fcount = data.getChar();
         if (fcount > 0) {
             final VmField[] ftable = new VmField[fcount];
 
             int objectSize = 0;
             for (int i = 0; i < fcount; i++) {
                 final boolean wide;
-                int modifiers = reader.readu2();
-                final String name = cp.getUTF8(reader.readu2());
-                final String signature = cp.getUTF8(reader.readu2());
+                int modifiers = data.getChar();
+                final String name = cp.getUTF8(data.getChar());
+                final String signature = cp.getUTF8(data.getChar());
                 switch (signature.charAt(0)) {
                 case 'J':
                 case 'D':
@@ -586,13 +584,13 @@ public final class ClassDecoder {
                 ftable[i] = fs;
 
                 // Read field attributes
-                final int acount = reader.readu2();
+                final int acount = data.getChar();
                 for (int a = 0; a < acount; a++) {
-                    final String attrName = cp.getUTF8(reader.readu2());
-                    final int length = reader.readu4();
+                    final String attrName = cp.getUTF8(data.getChar());
+                    final int length = data.getInt();
                     if (isstatic
                             && VmArray.equals(ConstantValueAttrName, attrName)) {
-                        final int idx = reader.readu2();
+                        final int idx = data.getChar();
                         switch (signature.charAt(0)) {
                         case 'B':
                             statics.setInt(staticsIdx, cp.getInt(idx));
@@ -629,7 +627,7 @@ public final class ClassDecoder {
                             break;
                         }
                     } else {
-                        reader.skip(length);
+                        skip(data, length);
                     }
                 }
             }
@@ -656,15 +654,15 @@ public final class ClassDecoder {
      * @param cp
      * @return Some flags
      */
-    private static int readInterfaces(ClassReader reader, VmType cls, VmCP cp) {
+    private static int readInterfaces(ByteBuffer data, VmType cls, VmCP cp) {
         int flags = 0;
-        final int icount = reader.readu2();
+        final int icount = data.getChar();
         if (icount > 0) {
             final String noFieldAlignmentsName = NoFieldAlignments.class
                     .getName();
             final VmImplementedInterface[] itable = new VmImplementedInterface[icount];
             for (int i = 0; i < icount; i++) {
-                final VmConstClass icls = cp.getConstClass(reader.readu2());
+                final VmConstClass icls = cp.getConstClass(data.getChar());
                 final String iclsName = icls.getClassName();
                 itable[i] = new VmImplementedInterface(iclsName);
                 if (iclsName.equals(noFieldAlignmentsName)) {
@@ -682,16 +680,14 @@ public final class ClassDecoder {
      * @param reader
      * @return The line number map
      */
-    private static final VmLineNumberMap readLineNrTable(ClassReader reader) {
-        final int len = reader.readu2();
+    private static final VmLineNumberMap readLineNrTable(ByteBuffer data) {
+        final int len = data.getChar();
         final char[] lnTable = new char[len * VmLineNumberMap.LNT_ELEMSIZE];
 
         for (int i = 0; i < len; i++) {
             final int ofs = i * VmLineNumberMap.LNT_ELEMSIZE;
-            lnTable[ofs + VmLineNumberMap.LNT_STARTPC_OFS] = (char) reader
-                    .readu2();
-            lnTable[ofs + VmLineNumberMap.LNT_LINENR_OFS] = (char) reader
-                    .readu2();
+            lnTable[ofs + VmLineNumberMap.LNT_STARTPC_OFS] = data.getChar();
+            lnTable[ofs + VmLineNumberMap.LNT_LINENR_OFS] = data.getChar();
         }
 
         return new VmLineNumberMap(lnTable);
@@ -705,16 +701,16 @@ public final class ClassDecoder {
      * @param cls
      * @param cp
      */
-    private static void readMethods(ClassReader reader, boolean rejectNatives,
+    private static void readMethods(ByteBuffer data, boolean rejectNatives,
             VmType cls, VmCP cp, VmStatics statics, VmClassLoader cl) {
-        final int mcount = reader.readu2();
+        final int mcount = data.getChar();
         if (mcount > 0) {
             final VmMethod[] mtable = new VmMethod[mcount];
 
             for (int i = 0; i < mcount; i++) {
-                final int modifiers = reader.readu2();
-                final String name = cp.getUTF8(reader.readu2());
-                final String signature = cp.getUTF8(reader.readu2());
+                final int modifiers = data.getChar();
+                final String name = cp.getUTF8(data.getChar());
+                final String signature = cp.getUTF8(data.getChar());
                 final boolean isStatic = ((modifiers & Modifier.ACC_STATIC) != 0);
 
                 final VmMethod mts;
@@ -735,16 +731,16 @@ public final class ClassDecoder {
                 mtable[i] = mts;
 
                 // Read methods attributes
-                final int acount = reader.readu2();
+                final int acount = data.getChar();
                 for (int a = 0; a < acount; a++) {
-                    String attrName = cp.getUTF8(reader.readu2());
-                    int length = reader.readu4();
+                    String attrName = cp.getUTF8(data.getChar());
+                    int length = data.getInt();
                     if (VmArray.equals(CodeAttrName, attrName)) {
-                        mts.setBytecode(readCode(reader, cls, cp, mts));
+                        mts.setBytecode(readCode(data, cls, cp, mts));
                     } else if (VmArray.equals(ExceptionsAttrName, attrName)) {
-                        mts.setExceptions(readExceptions(reader, cls, cp));
+                        mts.setExceptions(readExceptions(data, cls, cp));
                     } else {
-                        reader.skip(length);
+                        skip(data, length);
                     }
                 }
                 if ((modifiers & Modifier.ACC_NATIVE) != 0) {
@@ -762,5 +758,27 @@ public final class ClassDecoder {
             }
             cls.setMethodTable(mtable);
         }
+    }
+    
+    private static final void skip(ByteBuffer data, int delta) {
+        data.position(data.position() + delta);
+    }
+
+    private static final byte[] readBytes(ByteBuffer data, int length) {
+        byte[] res = new byte[length];
+        data.get(res);
+        return res;
+    }
+
+    private static final String readUTF(ByteBuffer data) {
+        final int utflen = data.getChar();
+        final String result;
+        try {
+            result = VmUTF8Convert.fromUTF8(data, utflen);
+        } catch (UTFDataFormatException ex) {
+            throw (ClassFormatError) new ClassFormatError(
+                    "Invalid UTF sequence").initCause(ex);
+        }
+        return result;
     }
 }

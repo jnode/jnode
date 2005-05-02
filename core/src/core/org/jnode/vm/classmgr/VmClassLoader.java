@@ -21,8 +21,9 @@
  
 package org.jnode.vm.classmgr;
 
-import java.security.ProtectionDomain;
 import java.io.Writer;
+import java.nio.ByteBuffer;
+import java.security.ProtectionDomain;
 
 import org.jnode.vm.VmArchitecture;
 import org.jnode.vm.VmSystemObject;
@@ -63,6 +64,16 @@ public abstract class VmClassLoader extends VmSystemObject {
 	 */
 	public abstract VmType defineClass(String name, byte[] data, int offset, int length, ProtectionDomain protDomain);
 	
+    /**
+     * Define a bytebuffer of class data into a loaded class.
+     * 
+     * @param name
+     * @param data
+     * @param protDomain
+     * @return VmClass
+     */
+    public abstract VmType defineClass(String name, ByteBuffer data, ProtectionDomain protDomain);
+    
 	/**
 	 * Gets the ClassLoader belonging to this loader.
 	 * 
