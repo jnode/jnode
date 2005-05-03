@@ -58,7 +58,7 @@ final class MagicHelper extends BaseX86MagicHelper {
      * @param method
      * @param isstatic
      */
-    public void emitMagic(EmitterContext ec, VmMethod method, boolean isstatic) {
+    public void emitMagic(EmitterContext ec, VmMethod method, boolean isstatic, X86BytecodeVisitor bcv) {
         //final int type = getClass(method);
         final MagicMethod mcode = MagicMethod.get(method);
         final VirtualStack vstack = ec.getVStack();
@@ -850,8 +850,25 @@ final class MagicHelper extends BaseX86MagicHelper {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             os.writeINT(3);
         } break;
-        	
-        
+         
+        // xyzArray classes
+        case ARR_CREATE: {
+            if (os.isCode32()) {
+                bcv.visit_newarray(10); // int[]
+            } else {
+                bcv.visit_newarray(11); // long[]                
+            }
+        } break;
+        case ARR_GET: {
+            bcv.waload(JvmType.REFERENCE); 
+        } break;
+        case ARR_SET: {
+            bcv.wastore(JvmType.REFERENCE); 
+        } break;
+        case ARR_LENGTH: {
+            bcv.visit_arraylength(); 
+        } break;
+        	        
         default:
             throw new InternalError("Unknown method code for method " + method);
         }

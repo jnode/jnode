@@ -2527,7 +2527,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 				.getResolvedVmMethod();
 
 		if (method.getDeclaringClass().isMagicType()) {
-			magicHelper.emitMagic(eContext, method, true);
+			magicHelper.emitMagic(eContext, method, true, this);
 		} else {
 			// Flush the stack before an invoke
 			vstack.push(eContext);
@@ -2554,7 +2554,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		}
 		final VmInstanceMethod method = (VmInstanceMethod) mts;
 		if (method.getDeclaringClass().isMagicType()) {
-			magicHelper.emitMagic(eContext, method, false);
+			magicHelper.emitMagic(eContext, method, false, this);
 		} else {
 			// TODO: port to orp-style
 			vstack.push(eContext);
@@ -3672,7 +3672,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param jvmType
 	 *            Type of the array elements
 	 */
-	private final void waload(int jvmType) {
+	final void waload(int jvmType) {
 		final IntItem idx = vstack.popInt();
 		final RefItem ref = vstack.popRef();
 
@@ -3771,7 +3771,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 	 * @param jvmType
 	 *            Type of the array elements
 	 */
-	private final void wastore(int jvmType) {
+	final void wastore(int jvmType) {
 		final boolean useBarrier = (context.getWriteBarrier() != null);
 		final int valSize;
 		final int scale;

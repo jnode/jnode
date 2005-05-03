@@ -32,20 +32,41 @@ import org.jnode.vm.classmgr.VmType;
  */
 public class BaseMagicHelper {
     
+    /**
+     * Enum of all magic classes.
+     * 
+     * @author Ewout Prangsma (epr@users.sourceforge.net)
+     */
     public enum MagicClass {
         ADDRESS("org.vmmagic.unboxed.Address"),
         EXTENT("org.vmmagic.unboxed.Extent"),
         OBJECTREFERENCE("org.vmmagic.unboxed.ObjectReference"),
         OFFSET("org.vmmagic.unboxed.Offset"),
         WORD("org.vmmagic.unboxed.Word"),       
+        ADDRESSARRAY("org.vmmagic.unboxed.AddressArray"),
+        EXTENTARRAY("org.vmmagic.unboxed.ExtentArray"),
+        OBJECTREFERENCEARRAY("org.vmmagic.unboxed.ObjectReferenceArray"),
+        OFFSETARRAY("org.vmmagic.unboxed.OffsetArray"),
+        WORDARRAY("org.vmmagic.unboxed.WordArray"),       
         VMMAGIC("org.jnode.vm.VmMagic");
         
+        /** Name of the class */
         private final String name;
+        
+        /** Lookup table */
         private static final Map<String, MagicClass> nameToClass;
+        
+        /**
+         * Initialize this instance.
+         * @param name
+         */
         private MagicClass(String name) {
             this.name = name;
         }
         
+        /**
+         * Initialize the lookup table
+         */
         static {
             nameToClass = new BootableHashMap<String, MagicClass>();
             for (MagicClass mc : values()) {
@@ -57,6 +78,7 @@ public class BaseMagicHelper {
          * Gets the MagicClass instance for the given type.
          * @param type
          * @return
+         * @throws InternalError When type is no magic type.
          */
         public static MagicClass get(VmType<?> type) {
             MagicClass mc = nameToClass.get(type.getName());
@@ -68,6 +90,11 @@ public class BaseMagicHelper {
         }                
     }
     
+    /**
+     * Enum of all methods in all magic classes.
+     * 
+     * @author Ewout Prangsma (epr@users.sourceforge.net)
+     */
     public enum MagicMethod {        
         ADD("add"),
         AND("and"),
@@ -181,7 +208,12 @@ public class BaseMagicHelper {
         FLOATTORAWINTBITS("floatToRawIntBits"),
         LONGBITSTODOUBLE("longBitsToDouble"),
         DOUBLETORAWLONGBITS("doubleToRawLongBits"),
-        BREAKPOINT("breakPoint");
+        BREAKPOINT("breakPoint"),
+        // Array classes
+        ARR_CREATE("create"),
+        ARR_GET("get"),
+        ARR_SET("set"),
+        ARR_LENGTH("length");
         
         private final String name;
         private final String signature;
