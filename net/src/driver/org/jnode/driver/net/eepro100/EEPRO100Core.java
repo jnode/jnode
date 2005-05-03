@@ -45,7 +45,6 @@ import org.jnode.system.ResourceManager;
 import org.jnode.system.ResourceNotFreeException;
 import org.jnode.system.ResourceOwner;
 import org.jnode.util.AccessControllerUtils;
-import org.jnode.util.BigEndian;
 import org.jnode.util.Counter;
 import org.jnode.util.NumberUtils;
 import org.jnode.util.TimeoutException;
@@ -144,7 +143,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
 		// Initialize RX/TX Buffers.
 		buffers = new EEPRO100Buffer(this);
 		
-		int[] eeprom = new int[16];
+		int[] eeprom = new int[100];
         
 		int eeSize;
         int eeReadCmd;
@@ -158,21 +157,21 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
 			eeReadCmd = EE_READ_CMD << 22;
 		}
 
-		log.debug("EEProm size:" + NumberUtils.hex(eeSize) + " read command:" + eeReadCmd );
+		log.debug("EEProm size: " + NumberUtils.hex(eeSize) + " read command: " + eeReadCmd );
 		
-		int sum = 0;
-		for (int x = 0; x < eeSize; x++) {
-			int value = NumberUtils.toUnsigned(new Integer(doEepromCmd(eeReadCmd | (x << 16), 27)).shortValue());
-			if (x < (int)(eeprom.length)) eeprom[x] = value;
-			sum += value;
-		}
-
+		int x,y,sum;
 		final byte[] hwAddrArr = new byte[ETH_ALEN];
-
-		for (int a = 0; a < ETH_ALEN; a++) {
-			hwAddrArr[a] = (byte)(eeprom[a / 2] >> (8 * (a & 1)));
-		}
 		
+		for (y = 0, x = 0, sum = 0; x < eeSize; x++) {
+			int value = doEepromCmd((eeReadCmd | (x << 16)), 27);
+			eeprom[x] = value;
+			sum += value;
+			if (x < 3) {
+				hwAddrArr[y++] = (byte)value;
+				hwAddrArr[y++] = (byte)(value >> 8);
+			}
+		}
+
 		this.hwAddress = new EthernetAddress(hwAddrArr, 0);
 
 		if (sum != 0xBABA) {
@@ -183,10 +182,6 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
 		
 		regs.setReg32(SCBPort, PortReset);
 		systemDelay(1000);
-
-		
-
-        
                 
 		int  option = 0;
 		
@@ -477,10 +472,8 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
 	 * 33Mhz PCI.
 	 */
 	final void eepromDelay(int ticks) {
-		// SystemResource.getTimer().udelay(4);
 		int i = ticks;
-		while (i-- > 0)
-			;
+		while (i-- > 0);
 	}
 
 	/**
@@ -497,19 +490,17 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
 		regs.setReg16(SCBeeprom, EE_ENB | EE_SHIFT_CLK);
 		eepromDelay(2);
 		do {
-			int dataVal = ((cmd & (1 << cmdLength)) != 0) ? EE_WRITE_1 : EE_WRITE_0;
+			short dataVal = new Integer(((cmd & (1 << cmdLength)) == 0) ? EE_WRITE_0 : EE_WRITE_1).shortValue();
 			regs.setReg16(SCBeeprom, dataVal);
 			eepromDelay(2);
 			regs.setReg16(SCBeeprom, dataVal | EE_SHIFT_CLK);
 			eepromDelay(2);
-			retVal = (((retVal << 1) != 0)	|| ((regs.getReg16(SCBeeprom) & EE_DATA_READ) != 0)) ? 1 : 0;
+			retVal = (retVal << 1) | (((regs.getReg16(SCBeeprom) & EE_DATA_READ) !=0) ? 1 : 0);
 		} while (--cmdLength >= 0);
 		regs.setReg16(SCBeeprom, EE_ENB);
 		eepromDelay(2);
-
 		regs.setReg16(SCBeeprom, (EE_ENB & ~EE_CS));
-
-		return retVal;
+		return NumberUtils.toUnsigned(new Integer(retVal).shortValue());
 	}
 
 	// --- OTHER METHODS
