@@ -193,7 +193,7 @@ public class IPv4Route implements IPv4Constants {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		final StringBuffer b = new StringBuffer();
+		final StringBuilder b = new StringBuilder();
 		b.append(destination);
 		b.append(" - ");
 		b.append(subnetmask);

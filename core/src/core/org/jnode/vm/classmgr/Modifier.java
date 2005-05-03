@@ -282,7 +282,7 @@ public class Modifier {
 	 * @return String
 	 */
 	public static String toString(int modifiers) {
-		final StringBuffer b = new StringBuffer();
+		final StringBuilder b = new StringBuilder();
 
 		if (isPublic(modifiers)) {
 			b.append("public ");

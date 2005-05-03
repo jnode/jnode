@@ -214,7 +214,7 @@ public class IPv4Header implements NetworkLayerHeader, IPv4Constants {
 	 * identification, protocol, srcAddress, dstAddress
 	 */
 	public Object getFragmentListKey() {
-		final StringBuffer b = new StringBuffer();
+		final StringBuilder b = new StringBuilder();
 		b.append(identification);
 		b.append('-');
 		b.append(protocol);

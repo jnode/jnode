@@ -249,7 +249,7 @@ public class TCPHeader implements TransportLayerHeader, TCPConstants {
 	}
 
 	public String getFlagsAsString() {
-		final StringBuffer b = new StringBuffer();
+		final StringBuilder b = new StringBuilder(4);
 		if (isFlagSynchronizeSet()) {
 			b.append('S');
 		}
@@ -291,7 +291,7 @@ public class TCPHeader implements TransportLayerHeader, TCPConstants {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		final StringBuffer b = new StringBuffer();
+		final StringBuilder b = new StringBuilder();
 		b.append(srcPort);
 		b.append(" > ");
 		b.append(dstPort);

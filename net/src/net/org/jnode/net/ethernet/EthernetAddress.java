@@ -35,7 +35,7 @@ import org.jnode.util.NumberUtils;
 public class EthernetAddress implements HardwareAddress, Serializable {
 	
 	private final byte[] address;
-	private final int length = EthernetConstants.ETH_ALEN;
+	private static final int length = EthernetConstants.ETH_ALEN;
 	public static final EthernetAddress BROADCAST = new EthernetAddress("FF-FF-FF-FF-FF-FF");
 	
 	/**
@@ -205,7 +205,7 @@ public class EthernetAddress implements HardwareAddress, Serializable {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		final StringBuffer b = new StringBuffer();
+		final StringBuilder b = new StringBuilder(2+3*(length-1));
 		for (int i = 0; i < length; i++) {
 			if (i > 0) {
 				b.append(':');
