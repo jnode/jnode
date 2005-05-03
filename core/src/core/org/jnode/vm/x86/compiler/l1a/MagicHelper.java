@@ -21,6 +21,13 @@
  
 package org.jnode.vm.x86.compiler.l1a;
 
+import static org.jnode.vm.compiler.BaseMagicHelper.MagicMethod.ATTEMPTINT;
+import static org.jnode.vm.compiler.BaseMagicHelper.MagicMethod.FROMINTZEROEXTEND;
+import static org.jnode.vm.compiler.BaseMagicHelper.MagicMethod.INTBITSTOFLOAT;
+import static org.jnode.vm.compiler.BaseMagicHelper.MagicMethod.LOADCHAR;
+import static org.jnode.vm.compiler.BaseMagicHelper.MagicMethod.LOADCHAR_OFS;
+import static org.jnode.vm.compiler.BaseMagicHelper.MagicMethod.LONGBITSTODOUBLE;
+
 import org.jnode.assembler.x86.X86Assembler;
 import org.jnode.assembler.x86.X86Constants;
 import org.jnode.assembler.x86.X86Register;
@@ -53,7 +60,7 @@ final class MagicHelper extends BaseX86MagicHelper {
      */
     public void emitMagic(EmitterContext ec, VmMethod method, boolean isstatic) {
         //final int type = getClass(method);
-        final int mcode = getMethodCode(method);
+        final MagicMethod mcode = MagicMethod.get(method);
         final VirtualStack vstack = ec.getVStack();
         final X86Assembler os = ec.getStream();
         final ItemFactory ifac = ec.getItemFactory();
@@ -63,7 +70,7 @@ final class MagicHelper extends BaseX86MagicHelper {
         final int slotSize = os.isCode32() ? 4 : 8;
 
         switch (mcode) {
-        case mADD: {
+        case ADD: {
             // addr + ofs
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem ofs = (WordItem) vstack.pop();
@@ -83,7 +90,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(addr);
         }
             break;
-        case mAND: {
+        case AND: {
             // addr & ofs
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem ofs = (WordItem) vstack.pop();
@@ -103,7 +110,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(addr);
         }
             break;
-        case mOR: {
+        case OR: {
             // addr | ofs
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem ofs = (WordItem) vstack.pop();
@@ -123,7 +130,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(addr);
         }
             break;
-        case mSUB: {
+        case SUB: {
             // addr - ofs
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem ofs = (WordItem) vstack.pop();
@@ -143,7 +150,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(addr);
         }
             break;
-        case mXOR: {
+        case XOR: {
             // addr ^ ofs
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem ofs = (WordItem) vstack.pop();
@@ -163,7 +170,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(addr);
         }
             break;
-        case mNOT: {
+        case NOT: {
             // !addr
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final RefItem addr = vstack.popRef();
@@ -172,7 +179,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(addr);
         }
             break;
-        case mTOINT: {
+        case TOINT: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem addr = vstack.popRef();
             addr.load(ec);
@@ -188,18 +195,18 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(result);
         }
             break;
-        case mTOWORD: 
-        case mTOADDRESS:
-        case mTOOFFSET: 
-        case mTOOBJECT: 
-        case mTOOBJECTREFERENCE: 
-        case mTOEXTENT: {
+        case TOWORD: 
+        case TOADDRESS:
+        case TOOFFSET: 
+        case TOOBJECT: 
+        case TOOBJECTREFERENCE: 
+        case TOEXTENT: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem addr = vstack.popRef();
             vstack.push(addr);
         }
             break;
-        case mTOLONG: {
+        case TOLONG: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem addr = vstack.popRef();
             addr.load(ec);
@@ -221,7 +228,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(result);
         }
             break;
-        case mMAX: {
+        case MAX: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem result = (RefItem) L1AHelper.requestWordRegister(ec,
                     JvmType.REFERENCE, false);
@@ -230,7 +237,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(result);
         }
             break;
-        case mONE: {
+        case ONE: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem result = (RefItem) L1AHelper.requestWordRegister(ec,
                     JvmType.REFERENCE, false);
@@ -239,13 +246,13 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(result);
         }
             break;
-        case mZERO: {
+        case ZERO: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem result = ifac.createAConst(ec, null);
             vstack.push(result);
         }
             break;
-        case mISMAX: {
+        case ISMAX: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem addr = vstack.popRef();
             addr.load(ec);
@@ -259,7 +266,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(result);
         }
             break;
-        case mISZERO: {
+        case ISZERO: {
             // Just convert to int
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem addr = vstack.popRef();
@@ -274,17 +281,17 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(result);
         }
             break;
-        case mEQUALS: 
-        case mEQ: 
-        case mNE: 
-        case mLT:
-        case mLE:
-        case mGE:
-        case mGT:
-        case mSLT:
-        case mSLE:
-        case mSGE:
-        case mSGT:
+        case EQUALS: 
+        case EQ: 
+        case NE: 
+        case LT:
+        case LE:
+        case GE:
+        case GT:
+        case SLT:
+        case SLE:
+        case SGE:
+        case SGT:
         {
             // addr .. other
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
@@ -302,16 +309,16 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(result);
         }
             break;
-        case mFROMINT: 
-        case mFROMINTSIGNEXTEND: 
-        case mFROMINTZEROEXTEND: {
+        case FROMINT: 
+        case FROMINTSIGNEXTEND: 
+        case FROMINTZEROEXTEND: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final WordItem addr = vstack.popInt();
             addr.load(ec);
             GPR r = addr.getRegister();
             if (os.isCode64()) {
             	final GPR64 newR = (GPR64)pool.getRegisterInSameGroup(r, JvmType.REFERENCE);
-            	if (mcode == mFROMINTZEROEXTEND) {
+            	if (mcode == FROMINTZEROEXTEND) {
             		// Moving the register to itself in 32-bit mode, will
             		// zero extend the top 32-bits.
             		os.writeMOV(BITS32, r, r);
@@ -325,15 +332,15 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, r));
         }
             break;
-        case mFROMADDRESS:
-        case mFROMOBJECT: {
+        case FROMADDRESS:
+        case FROMOBJECT: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem obj = vstack.popRef();
             // Do nothing
             vstack.push(obj);
         }
             break;
-        case mFROMLONG: {
+        case FROMLONG: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final LongItem addr = vstack.popLong();
             addr.load(ec);
@@ -347,9 +354,9 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, r));
         }
             break;
-        case mLSH:
-        case mRSHA:
-        case mRSHL:
+        case LSH:
+        case RSHA:
+        case RSHL:
         {
             // addr shift cnt
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
@@ -370,16 +377,16 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(addr);
         }
             break;
-        case mLOADBYTE: 
-        case mLOADCHAR:
-        case mLOADSHORT: {
+        case LOADBYTE: 
+        case LOADCHAR:
+        case LOADSHORT: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final RefItem addr = vstack.popRef();
             addr.loadToBITS8GPR(ec);
             final GPR r = addr.getRegister();
             final WordItem result = L1AHelper.requestWordRegister(ec, methodToType(mcode), true);
             final GPR resultr = result.getRegister();
-            if (mcode == mLOADCHAR) {
+            if (mcode == LOADCHAR) {
                 os.writeMOVZX(resultr, r, 0, methodToSize(mcode));                
             } else {
                 os.writeMOVSX(resultr, r, 0, methodToSize(mcode));
@@ -387,15 +394,15 @@ final class MagicHelper extends BaseX86MagicHelper {
             addr.release(ec);
             vstack.push(result);
         } break;
-        case mLOADINT:
-        case mLOADFLOAT: 
-        case mLOADADDRESS: 
-        case mLOADOBJECTREFERENCE:
-        case mLOADWORD:
-        case mPREPAREINT:
-        case mPREPAREADDRESS:
-        case mPREPAREOBJECTREFERENCE:
-        case mPREPAREWORD: {
+        case LOADINT:
+        case LOADFLOAT: 
+        case LOADADDRESS: 
+        case LOADOBJECTREFERENCE:
+        case LOADWORD:
+        case PREPAREINT:
+        case PREPAREADDRESS:
+        case PREPAREOBJECTREFERENCE:
+        case PREPAREWORD: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final RefItem addr = vstack.popRef();
             addr.load(ec);
@@ -406,8 +413,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             addr.release(ec);
             vstack.push(result);
         } break;
-        case mLOADLONG:
-        case mLOADDOUBLE: {
+        case LOADLONG:
+        case LOADDOUBLE: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final RefItem addr = vstack.popRef();
             addr.load(ec);
@@ -426,9 +433,9 @@ final class MagicHelper extends BaseX86MagicHelper {
             	vstack.push(result);
             }            	
         } break;
-        case mLOADBYTE_OFS: 
-        case mLOADCHAR_OFS:
-        case mLOADSHORT_OFS: {
+        case LOADBYTE_OFS: 
+        case LOADCHAR_OFS:
+        case LOADSHORT_OFS: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final RefItem ofs = vstack.popRef();
             final RefItem addr = vstack.popRef();
@@ -439,7 +446,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             os.writeLEA(r, r, ofsr, 1, 0);
             final WordItem result = L1AHelper.requestWordRegister(ec, methodToType(mcode), true);
             final GPR resultr = result.getRegister();
-            if (mcode == mLOADCHAR_OFS) {
+            if (mcode == LOADCHAR_OFS) {
                 os.writeMOVZX(resultr, r, 0, methodToSize(mcode));
             } else {
                 os.writeMOVSX(resultr, r, 0, methodToSize(mcode));
@@ -448,15 +455,15 @@ final class MagicHelper extends BaseX86MagicHelper {
             addr.release(ec);
             vstack.push(result);
         } break;
-        case mLOADINT_OFS: 
-        case mLOADFLOAT_OFS: 
-        case mLOADADDRESS_OFS: 
-        case mLOADOBJECTREFERENCE_OFS:
-        case mLOADWORD_OFS:
-        case mPREPAREINT_OFS:
-        case mPREPAREADDRESS_OFS:
-        case mPREPAREOBJECTREFERENCE_OFS:
-        case mPREPAREWORD_OFS: {
+        case LOADINT_OFS: 
+        case LOADFLOAT_OFS: 
+        case LOADADDRESS_OFS: 
+        case LOADOBJECTREFERENCE_OFS:
+        case LOADWORD_OFS:
+        case PREPAREINT_OFS:
+        case PREPAREADDRESS_OFS:
+        case PREPAREOBJECTREFERENCE_OFS:
+        case PREPAREWORD_OFS: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final RefItem ofs = vstack.popRef();
             final RefItem addr = vstack.popRef();
@@ -471,8 +478,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             addr.release(ec);
             vstack.push(result);
         } break;
-        case mLOADLONG_OFS: 
-        case mLOADDOUBLE_OFS: {
+        case LOADLONG_OFS: 
+        case LOADDOUBLE_OFS: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final RefItem ofs = vstack.popRef();
             final RefItem addr = vstack.popRef();
@@ -496,9 +503,9 @@ final class MagicHelper extends BaseX86MagicHelper {
             	vstack.push(result);
             }
         } break;
-        case mSTOREBYTE: 
-        case mSTORECHAR:
-        case mSTORESHORT: {
+        case STOREBYTE: 
+        case STORECHAR:
+        case STORESHORT: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final IntItem val = vstack.popInt();
             final RefItem addr = vstack.popRef();
@@ -510,11 +517,11 @@ final class MagicHelper extends BaseX86MagicHelper {
             val.release(ec);
             addr.release(ec);
         } break;
-        case mSTOREINT: 
-        case mSTOREFLOAT:
-        case mSTOREADDRESS:
-        case mSTOREOBJECTREFERENCE: 
-        case mSTOREWORD: {
+        case STOREINT: 
+        case STOREFLOAT:
+        case STOREADDRESS:
+        case STOREOBJECTREFERENCE: 
+        case STOREWORD: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem val = (WordItem)vstack.pop();
             final RefItem addr = vstack.popRef();
@@ -526,8 +533,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             val.release(ec);
             addr.release(ec);
         } break;
-        case mSTORELONG: 
-        case mSTOREDOUBLE: {
+        case STORELONG: 
+        case STOREDOUBLE: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final DoubleWordItem val = (DoubleWordItem)vstack.pop();
             final RefItem addr = vstack.popRef();
@@ -546,9 +553,9 @@ final class MagicHelper extends BaseX86MagicHelper {
             val.release(ec);
             addr.release(ec);
         } break;
-        case mSTOREBYTE_OFS: 
-        case mSTORECHAR_OFS:
-        case mSTORESHORT_OFS: {
+        case STOREBYTE_OFS: 
+        case STORECHAR_OFS:
+        case STORESHORT_OFS: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final RefItem ofs = vstack.popRef();
             final IntItem val = vstack.popInt();
@@ -564,11 +571,11 @@ final class MagicHelper extends BaseX86MagicHelper {
             val.release(ec);
             addr.release(ec);
         } break;
-        case mSTOREINT_OFS: 
-        case mSTOREFLOAT_OFS:
-        case mSTOREADDRESS_OFS:
-        case mSTOREOBJECTREFERENCE_OFS: 
-        case mSTOREWORD_OFS: {
+        case STOREINT_OFS: 
+        case STOREFLOAT_OFS:
+        case STOREADDRESS_OFS:
+        case STOREOBJECTREFERENCE_OFS: 
+        case STOREWORD_OFS: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final RefItem ofs = vstack.popRef();
             final WordItem val = (WordItem)vstack.pop();
@@ -584,8 +591,8 @@ final class MagicHelper extends BaseX86MagicHelper {
             val.release(ec);
             addr.release(ec);
         } break;
-        case mSTORELONG_OFS: 
-        case mSTOREDOUBLE_OFS: {
+        case STORELONG_OFS: 
+        case STOREDOUBLE_OFS: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final RefItem ofs = vstack.popRef();
             final DoubleWordItem val = (DoubleWordItem)vstack.pop();
@@ -609,16 +616,16 @@ final class MagicHelper extends BaseX86MagicHelper {
             addr.release(ec);
         } break;
         
-        case mATTEMPTINT:
-        case mATTEMPTADDRESS:
-        case mATTEMPTOBJECTREFERENCE:
-        case mATTEMPTWORD: {
+        case ATTEMPTINT:
+        case ATTEMPTADDRESS:
+        case ATTEMPTOBJECTREFERENCE:
+        case ATTEMPTWORD: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final WordItem val = (WordItem)vstack.pop();
             final WordItem old = (WordItem)vstack.pop();
             final RefItem addr = vstack.popRef();
             final X86Register.GPR aax;
-            if ((mcode == mATTEMPTINT) || os.isCode32()) {
+            if ((mcode == ATTEMPTINT) || os.isCode32()) {
             	aax = X86Register.EAX;
             } else {
             	aax = X86Register.RAX;
@@ -646,17 +653,17 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, resultr));
         } break;
 
-        case mATTEMPTINT_OFS:
-        case mATTEMPTADDRESS_OFS:
-        case mATTEMPTOBJECTREFERENCE_OFS:
-        case mATTEMPTWORD_OFS: {
+        case ATTEMPTINT_OFS:
+        case ATTEMPTADDRESS_OFS:
+        case ATTEMPTOBJECTREFERENCE_OFS:
+        case ATTEMPTWORD_OFS: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final RefItem ofs = vstack.popRef();
             final WordItem val = (WordItem)vstack.pop();
             final WordItem old = (WordItem)vstack.pop();
             final RefItem addr = vstack.popRef();
             final X86Register.GPR aax;
-            if ((mcode == mATTEMPTINT) || os.isCode32()) {
+            if ((mcode == ATTEMPTINT) || os.isCode32()) {
             	aax = X86Register.EAX;
             } else {
             	aax = X86Register.RAX;
@@ -689,7 +696,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             vstack.push(L1AHelper.requestWordRegister(ec, JvmType.INT, resultr));
         } break;
 
-        case mGETOBJECTTYPE: {
+        case GETOBJECTTYPE: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem obj = vstack.popRef();
             obj.load(ec);
@@ -703,7 +710,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             obj.release(ec);
             vstack.push(result);
         } break;
-        case mGETTIB: {
+        case GETTIB: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem obj = vstack.popRef();
             obj.load(ec);
@@ -712,7 +719,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             os.writeMOV(helper.ADDRSIZE, r, r, ObjectLayout.TIB_SLOT * slotSize);
             vstack.push(obj);
         } break;
-        case mGETOBJECTFLAGS: {
+        case GETOBJECTFLAGS: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem obj = vstack.popRef();
             obj.load(ec);
@@ -722,7 +729,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             obj.release(ec);
             vstack.push(L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, r));
         } break;
-        case mSETOBJECTFLAGS: {
+        case SETOBJECTFLAGS: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem flags = vstack.popRef();
             final RefItem obj = vstack.popRef();
@@ -735,7 +742,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             flags.release(ec);
             obj.release(ec);
         } break;
-        case mGETARRAYDATA: {
+        case GETARRAYDATA: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem obj = vstack.popRef();
             obj.load(ec);
@@ -743,7 +750,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             os.writeADD(r, VmArray.DATA_OFFSET * slotSize);
             vstack.push(obj);
         } break;
-        case mGETOBJECTCOLOR: {
+        case GETOBJECTCOLOR: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem obj = vstack.popRef();
             obj.load(ec);
@@ -756,7 +763,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             obj.release(ec);
             vstack.push(result);
         } break;
-        case mISFINALIZED: {
+        case ISFINALIZED: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final RefItem obj = vstack.popRef();
             obj.load(ec);
@@ -769,10 +776,10 @@ final class MagicHelper extends BaseX86MagicHelper {
             obj.release(ec);
             vstack.push(result);
         } break;
-        case mATOMICADD: 
-        case mATOMICAND: 
-        case mATOMICOR:
-        case mATOMICSUB: {
+        case ATOMICADD: 
+        case ATOMICAND: 
+        case ATOMICOR:
+        case ATOMICSUB: {
             if (Vm.VerifyAssertions) Vm._assert(!isstatic);
             final RefItem value = vstack.popRef();
             final RefItem addr = vstack.popRef();
@@ -785,14 +792,14 @@ final class MagicHelper extends BaseX86MagicHelper {
             value.release(ec);
             addr.release(ec);
         } break;
-        case mGETCURRENTFRAME: {
+        case GETCURRENTFRAME: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final WordItem result = L1AHelper.requestWordRegister(ec, JvmType.REFERENCE, false);
             final GPR r = result.getRegister();
             os.writeMOV(helper.ADDRSIZE, r, helper.BP);
             vstack.push(result);
         } break;
-        case mGETTIMESTAMP: {
+        case GETTIMESTAMP: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             if (os.isCode32()) {
             	final DoubleWordItem result = L1AHelper.requestDoubleWordRegisters(ec, JvmType.LONG, X86Register.EAX, X86Register.EDX);
@@ -812,22 +819,22 @@ final class MagicHelper extends BaseX86MagicHelper {
             	vstack.push(result);            	
             }
         } break;
-        case mINTBITSTOFLOAT:
-        case mFLOATTORAWINTBITS: {
+        case INTBITSTOFLOAT:
+        case FLOATTORAWINTBITS: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final WordItem v = (WordItem)vstack.pop();
             v.load(ec);
             final X86Register.GPR r = v.getRegister();
             v.release(ec);
-            final int resultType = (mcode == mINTBITSTOFLOAT) ? JvmType.FLOAT : JvmType.INT;
+            final int resultType = (mcode == INTBITSTOFLOAT) ? JvmType.FLOAT : JvmType.INT;
             vstack.push(L1AHelper.requestWordRegister(ec, resultType, r));            
         } break;
-        case mLONGBITSTODOUBLE: 
-        case mDOUBLETORAWLONGBITS: {
+        case LONGBITSTODOUBLE: 
+        case DOUBLETORAWLONGBITS: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             final DoubleWordItem v = (DoubleWordItem)vstack.pop();
             v.load(ec);
-        	final int resultType = (mcode == mLONGBITSTODOUBLE) ? JvmType.DOUBLE : JvmType.LONG;
+        	final int resultType = (mcode == LONGBITSTODOUBLE) ? JvmType.DOUBLE : JvmType.LONG;
             if (os.isCode32()) {
             	final X86Register.GPR lsb = v.getLsbRegister(ec);
             	final X86Register.GPR msb = v.getMsbRegister(ec);
@@ -839,7 +846,7 @@ final class MagicHelper extends BaseX86MagicHelper {
             	vstack.push(L1AHelper.requestDoubleWordRegister(ec, resultType, vreg));            	
             }
         } break;
-        case mBREAKPOINT: {
+        case BREAKPOINT: {
             if (Vm.VerifyAssertions) Vm._assert(isstatic);
             os.writeINT(3);
         } break;
