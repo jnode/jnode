@@ -37,15 +37,15 @@ final class ItemFactory {
 
     private static ThreadLocal itemFactory = new ThreadLocal();
 
-    private final ArrayList intItems = new ArrayList();
+    private final ArrayList<IntItem> intItems = new ArrayList<IntItem>();
 
-    private final ArrayList longItems = new ArrayList();
+    private final ArrayList<LongItem> longItems = new ArrayList<LongItem>();
 
-    private final ArrayList floatItems = new ArrayList();
+    private final ArrayList<FloatItem> floatItems = new ArrayList<FloatItem>();
 
-    private final ArrayList doubleItems = new ArrayList();
+    private final ArrayList<DoubleItem> doubleItems = new ArrayList<DoubleItem>();
 
-    private final ArrayList refItems = new ArrayList();
+    private final ArrayList<RefItem> refItems = new ArrayList<RefItem>();
 
     private int createCount = 0;
 
@@ -194,10 +194,10 @@ final class ItemFactory {
      * 
      * @param item
      */
-    final void release(Item item) {
+    final <T extends Item> void release(T item) {
         if (Vm.VerifyAssertions)
             Vm._assert(item.kind == 0, "Item is not yet released");
-        final ArrayList list = getList(item.getType());
+        final ArrayList<T> list = (ArrayList<T>)getList(item.getType());
         if (Vm.VerifyAssertions)
             Vm._assert(!list.contains(item), "Item already released");
         list.add(item);
@@ -214,7 +214,7 @@ final class ItemFactory {
      * @param jvmType
      */
     private final Item getOrCreate(int jvmType) {
-        final ArrayList list = getList(jvmType);
+        final ArrayList<? extends Item> list = getList(jvmType);
         final Item item;
         if (list.isEmpty()) {
             item = createNew(jvmType);
@@ -231,7 +231,7 @@ final class ItemFactory {
      * 
      * @param jvmType
      */
-    private final ArrayList getList(int jvmType) {
+    private final ArrayList<? extends Item> getList(int jvmType) {
         switch (jvmType) {
         case JvmType.INT:
             return intItems;

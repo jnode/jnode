@@ -3313,6 +3313,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		vstack.push(eContext);
 
 		// Create the dimensions array
+        helper.writePushStaticsEntry(curInstrLabel, helper.getMethod().getDeclaringClass()); /* currentClass */
 		os.writePUSH(10); /* type=int */
 		os.writePUSH(dimensions); /* elements */
 		invokeJavaMethod(context.getAllocPrimitiveArrayMethod());
@@ -3385,6 +3386,7 @@ public X86BytecodeVisitor(NativeStream outputStream, CompiledMethod cm,
 		vstack.push(eContext);
 
 		// Setup a call to SoftByteCodes.allocArray
+        helper.writePushStaticsEntry(curInstrLabel, helper.getMethod().getDeclaringClass()); /* currentClass */
 		os.writePUSH(type); /* type */
 		count.push(eContext); /* count */
 		count.release1(eContext); // release and remove parameter from stack

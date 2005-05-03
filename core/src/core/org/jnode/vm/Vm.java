@@ -22,8 +22,9 @@
 package org.jnode.vm;
 
 import java.io.PrintStream;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.jnode.system.ResourceManager;
 import org.jnode.util.BootableArrayList;
@@ -59,7 +60,7 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
 	/** The list of all system processors */
 	private final List<VmProcessor> processors;
 	/** All statistics */
-	private transient HashMap<String, Statistic> statistics;
+	private transient Map<String, Statistic> statistics;
     /** Lock for accessing the all threads list */
     private final SpinLock allThreadsLock;
     /** List of all threads */
@@ -250,7 +251,7 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
     
     private void addStatistic(String name, Statistic stat) {
         if (statistics == null) {
-            statistics = new HashMap<String, Statistic>();
+            statistics = new TreeMap<String, Statistic>();
         }
         statistics.put(name, stat);
     }
