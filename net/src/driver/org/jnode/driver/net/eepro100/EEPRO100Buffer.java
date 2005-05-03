@@ -110,6 +110,7 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 	 */
 	public final void initSingleRxRing() {
 		log.debug("Set RX base addr.");
+		
 		rxPacket = new EEPRO100RxFD(rm);
 		rxPacket.setStatus(0x0001);
 		rxPacket.setCommand(0x0000);
