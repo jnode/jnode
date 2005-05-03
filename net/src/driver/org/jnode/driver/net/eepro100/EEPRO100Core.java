@@ -140,9 +140,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
 		regs = new EEPRO100Registers(iobase, io);
 		// Initialize statistical counters.
 		stats = new EEPRO100Stats(rm, regs);
-		// Initialize RX/TX Buffers.
-		buffers = new EEPRO100Buffer(this);
-		
+				
 		int[] eeprom = new int[100];
         
 		int eeSize;
@@ -298,6 +296,8 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
 	 */
 	public void initialize() {
 		log.debug(flags.getName() + " : Init initialize");
+		// Initialize RX/TX Buffers.
+		buffers = new EEPRO100Buffer(this.regs, this.rm);
 		buffers.initSingleRxRing();
 		buffers.initSingleTxRing();
 

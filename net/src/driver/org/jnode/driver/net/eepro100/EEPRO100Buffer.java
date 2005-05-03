@@ -40,7 +40,17 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 	private final static int DATA_BUFFER_SIZE = 1536;
 
 	private final static int PacketReceived = 0xc000;
-
+	/** Logger */
+	protected final Logger log = Logger.getLogger(getClass());
+	/** Resource manager */
+	private ResourceManager rm;
+	/** registers */
+	private EEPRO100Registers regs;
+	
+	private EEPRO100RxFD rxPacket;
+	private EEPRO100TxFD txFD;
+	
+	
 	// --- Rx Variables
 	private int rxMode;
 
@@ -76,51 +86,63 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 	private int lastCmdTime;
 
 	// --- Others variables
-	protected final Logger log = Logger.getLogger(getClass());
+	
 
-	EEPRO100Core core;
+	
 
-	ResourceManager rm;
+	
 
 	int jiffies;
 
 	/**
 	 *  
 	 */
-	public EEPRO100Buffer(EEPRO100Core core) {
+	public EEPRO100Buffer(EEPRO100Registers regs, ResourceManager rm) {
+		this.regs = regs;
+		this.rm = rm;
 		/* Set up the Tx queue early.. */
 		curTx = 0;
 		dirtyTx = 0;
-		this.core = core;
-		this.rm = this.core.getRm();
 	}
-
+	/**
+	 * 
+	 *
+	 */
 	public final void initSingleRxRing() {
-		EEPRO100Registers regs = this.core.getRegs();
-		log.debug("Set TX base addr.");
-		rxPackets[0] = new EEPRO100RxFD(rm);
-		rxPackets[0].setStatus(0x0001);
-		rxPackets[0].setCommand(0x0000);
-		rxPackets[0].setLink(rxPackets[0].getBufferAddress());
+		log.debug("Set RX base addr.");
+		rxPacket = new EEPRO100RxFD(rm);
+		rxPacket.setStatus(0x0001);
+		rxPacket.setCommand(0x0000);
+		rxPacket.setLink(rxPacket.getBufferAddress());
 		// TODO Set correct value
-		rxPackets[0].setRxBufferAddress(0);
+		rxPacket.setRxBufferAddress(0);
 		// ---------------------------------
-		rxPackets[0].setCount(0);
-		rxPackets[0].setSize(1528);
+		rxPacket.setCount(0);
+		rxPacket.setSize(1528);
 		// Start the receiver.
-		regs.setReg32(SCBPointer, rxPackets[0].getBufferAddress());
+		regs.setReg32(SCBPointer, rxPacket.getBufferAddress());
 		regs.setReg16(SCBCmd, SCBMaskAll | RxStart);
 		EEPRO100Utils.waitForCmdDone(regs);
 
 		log.debug("Started rx process.");
 
-		rxPackets[0].setStatus(0);
-		rxPackets[0].setCommand(0xC000);
+		rxPacket.setStatus(0);
+		rxPacket.setCommand(0xC000);
 
-		regs.setReg32(SCBPointer, rxPackets[0].getBufferAddress());
+		regs.setReg32(SCBPointer, rxPacket.getBufferAddress());
 		regs.setReg16(SCBCmd, SCBMaskAll | RxStart);
 		EEPRO100Utils.waitForCmdDone(regs);
 
+	}
+	/**
+	 * 
+	 *
+	 */
+	public final void initSingleTxRing() {
+		log.debug("Set TX base addr.");
+		txFD = new EEPRO100TxFD(rm);
+		txFD.setCommand(CmdIASetup);
+		txFD.setStatus(0x0000);
 	}
 
 	/* Initialize the Rx and Tx rings, along with various 'dev' bits. */
@@ -158,12 +180,7 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 		int rxRingSize = rxRing.length;
 	}
 
-	public final void initSingleTxRing() {
-		log.debug("Set TX base addr.");
-		txRing[0] = new EEPRO100TxFD(rm);
-		txRing[0].setCommand(CmdIASetup);
-		txRing[0].setStatus(0x0000);
-	}
+	
 
 	public final void initTxRing() {
 		for (int i = 0; i < txRing.length; i++) {
@@ -310,9 +327,9 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 		}
 		txRing[entry].setParams(configData);
 		/* Trigger the command unit resume. */
-		EEPRO100Utils.waitForCmdDone(this.core.getRegs());
+		EEPRO100Utils.waitForCmdDone(regs);
 		// lastCmd0.clearSuspend();
-		this.core.getRegs().setReg8(SCBCmd, CUResume);
+		regs.setReg8(SCBCmd, CUResume);
 		// CpuControl.umaskCPUInterrupts(mask);
 		lastCmdTime = jiffies;
 		// }
@@ -339,55 +356,6 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 	 * Start the chip hardware after a full reset.
 	 */
 	final void resume() {
-
-		EEPRO100Registers regs = this.core.getRegs();
-
-		log.debug(this.core.getFlags().getName() + " : Init resume");
-		regs.setReg16(SCBCmd, SCBMaskAll);
-
-		/* Set the segment registers to '0'. */
-		EEPRO100Utils.waitForCmdDone(regs);
-		regs.setReg32(SCBPointer, 0);
-		// csr.read32(SCBPointer); /* Flush to PCI. */
-		this.core.systemDelay(10); /* Bogus, but it avoids the bug. */
-		/* Note: these next two operations can take a while. */
-		regs.setReg8(SCBCmd, RxAddrLoad);
-		EEPRO100Utils.waitForCmdDone(regs);
-		regs.setReg8(SCBCmd, CUCmdBase);
-		EEPRO100Utils.waitForCmdDone(regs);
-
-		/* Load the statistics block and rx ring addresses. */
-		this.core.getStats().loadBlock();
-		EEPRO100Utils.waitForCmdDone(regs);
-
-		int rxRingAddress = (rxRing[getCurRx() & RX_RING_SIZE - 1])
-				.getBufferAddress();
-		regs.setReg32(SCBPointer, rxRingAddress);
-		regs.setReg8(SCBCmd, RxStart);
-		EEPRO100Utils.waitForCmdDone(regs);
-		regs.setReg8(SCBCmd, CUDumpStats);
-		this.core.systemDelay(30);
-
-		/* Fill the first command with our physical address. */
-		int entry = curTx++ & TX_RING_SIZE - 1;
-		EEPRO100TxFD curCmd = txRing[entry];
-		/* Avoid a bug(?!) here by marking the command already completed. */
-		curCmd.setStatus((CmdSuspend | CmdIASetup) | 0xa000);
-		curCmd.setLink(txRing[curTx & TX_RING_SIZE - 1].getBufferAddress());
-		// curCmd.setParams(deviceAddress);
-		/*
-		 * if (lastCmd != null) getLastCmd.clearSuspend();
-		 */
-		lastCmd = curCmd;
-
-		EEPRO100Utils.waitForCmdDone(regs);
-
-		/* Start the chip's Tx process and unmask interrupts. */
-		int txRingAddress = (txRing[getDirtyTx() & TX_RING_SIZE - 1])
-				.getBufferAddress();
-		regs.setReg32(SCBPointer, txRingAddress);
-		regs.setReg16(SCBCmd, CUStart | SCBMaskEarlyRx | SCBMaskFlowCtl);
-		log.debug(this.core.getFlags().getName() + " : End resume");
 	}
 
 	/**
@@ -399,7 +367,7 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 
 		log.debug("HDR =" + hdr);
 		
-		EEPRO100Registers regs = this.core.getRegs();
+		
 
 		int status;
 		int s1;
@@ -438,20 +406,19 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 	 */
 	public void poll(EEPRO100Driver driver) throws NetworkException {
 
-		if (rxPackets[0].getStatus() != 0) {
-			EEPRO100Registers regs = this.core.getRegs();
+		if (rxPacket.getStatus() != 0) {
 			// Got a packet, restart the receiver
-			rxPackets[0].setStatus(0);
-			rxPackets[0].setCommand(0xc000);
+			rxPacket.setStatus(0);
+			rxPacket.setCommand(0xc000);
 
-			regs.setReg16(SCBPointer, rxPackets[0].getStatus());
+			regs.setReg16(SCBPointer, rxPacket.getStatus());
 			regs.setReg16(SCBCmd, SCBMaskAll | RxStart);
 			EEPRO100Utils.waitForCmdDone(regs);
 
 			log.debug("Got a packet: Len="
-					+ NumberUtils.hex(rxPackets[0].getCount()));
+					+ NumberUtils.hex(rxPacket.getCount()));
 			
-			final SocketBuffer skbuf = rxRing[0].getPacket();
+			final SocketBuffer skbuf = rxPacket.getPacket();
 			driver.onReceive(skbuf);
 		}
 	}
@@ -501,8 +468,8 @@ public class EEPRO100Buffer implements EEPRO100Constants {
 		lastCmd = txRing[txEntry];
 		// lastCmd0.clearSuspend();
 
-		EEPRO100Utils.waitForCmdDone(this.core.getRegs());
-		this.core.getRegs().setReg8(SCBCmd, CUResume);
+		EEPRO100Utils.waitForCmdDone(regs);
+		regs.setReg8(SCBCmd, CUResume);
 		// trans_start = jiffies;
 	}
 
