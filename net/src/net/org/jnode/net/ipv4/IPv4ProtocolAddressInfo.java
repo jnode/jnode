@@ -146,7 +146,7 @@ public class IPv4ProtocolAddressInfo implements ProtocolAddressInfo {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        final StringBuffer b = new StringBuffer();
+        final StringBuilder b = new StringBuilder();
         boolean first = true;
         for (IPv4IfAddress ifa : addresses.values()) {
             if (!first) {                

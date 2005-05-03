@@ -324,7 +324,7 @@ public class Signature {
      * @return String
      */
     public static String toSignature(Class returnType, Class[] argTypes) {
-        StringBuffer b = new StringBuffer();
+        StringBuilder b = new StringBuilder();
         b.append('(');
         if (argTypes != null) {
             for (int i = 0; i < argTypes.length; i++) {

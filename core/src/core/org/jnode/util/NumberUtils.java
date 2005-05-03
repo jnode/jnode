@@ -77,9 +77,9 @@ public class NumberUtils {
 	 * @return String
 	 */
 	public static String hex(int number, int length) {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder(length);
 		int2HexString(buf, number);
-		return prefixZero(buf.toString(), length);
+		return prefixZero(buf, length);
 	}
 	
 	/**
@@ -100,9 +100,9 @@ public class NumberUtils {
 	 * @return String
 	 */
 	public static String hex(long number, int length) {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder(length);
 		long2HexString(buf, number);
-		return prefixZero(buf.toString(), length);
+		return prefixZero(buf, length);
 	}
 	
 	/**
@@ -123,7 +123,7 @@ public class NumberUtils {
 	 * @return String
 	 */
 	public static String hex(byte[] data, int offset, int length) {
-		final StringBuffer buf = new StringBuffer(length*3);
+		final StringBuilder buf = new StringBuilder(length*3);
 		for (int i = 0; i < length; i++) {
 			if (i > 0) {
 				if ((i % 16) == 0) {
@@ -146,7 +146,7 @@ public class NumberUtils {
 	 * @return String
 	 */
 	public static String hex(int[] data, int offset, int length, int hexLength) {
-		final StringBuffer buf = new StringBuffer(length*(hexLength+1));
+		final StringBuilder buf = new StringBuilder(length*(hexLength+1));
 		for (int i = 0; i < length; i++) {
 			if (i > 0) {
 				if ((i % 16) == 0) {
@@ -168,7 +168,7 @@ public class NumberUtils {
 	 * @return String
      */
     public static String hex(char[] data, int offset, int length) {
-        final StringBuffer buf = new StringBuffer(length*3);
+        final StringBuilder buf = new StringBuilder(length*3);
         for (int i = 0; i < length; i++) {
             if (i > 0) {
                 if ((i % 16) == 0) {
@@ -202,14 +202,16 @@ public class NumberUtils {
 		return hex(data, 0, data.length, hexLength);
 	}
 	
-	public static String prefixZero(String v, int length) {
+	private static String prefixZero(StringBuilder v, int length) {
 		if (v.length() > length) {
+            // truncate leading chars
 			return v.substring(v.length() - length);
 		} else {
+            // insert leading '0's
 			while (v.length() < length) {
-				v = "0" + v;
+				v.insert(0, '0');
 			}
-			return v;
+			return v.toString();
 		}
 	}
 	
@@ -269,11 +271,11 @@ public class NumberUtils {
         	
 	/**
 	 * This method avoids the use on Integer.toHexString, since this class may be used 
-	 * during the boot-fase when the Integer class in not yet initialized.
+	 * during the boot-phase when the Integer class in not yet initialized.
 	 * @param buf
 	 * @param value
 	 */
-	private static void int2HexString(StringBuffer buf, int value) {	
+	private static void int2HexString(StringBuilder buf, int value) {
 		int rem = value & 0x0F;
 		int q = value >>> 4;
 		if (q != 0) {
@@ -289,11 +291,11 @@ public class NumberUtils {
 	
 	/**
 	 * This method avoids the use on Long.toHexString, since this class may be used 
-	 * during the boot-fase when the Long class in not yet initialized.
+	 * during the boot-phase when the Long class in not yet initialized.
 	 * @param buf
 	 * @param value
 	 */
-	private static void long2HexString(StringBuffer buf, long value) {	
+	private static void long2HexString(StringBuilder buf, long value) {
 //		long rem = value & 0x0F;
 		int rem = (int)(value & 0x0FL);
 		long q = value >>> 4;
