@@ -121,7 +121,6 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
 		
 		log.debug("Found EEPRO100 IOBase: 0x" + NumberUtils.hex(iobase)	+ ", length: " + iolength);
 
-		final ResourceManager rm;
 		try {
 			rm = (ResourceManager)InitialNaming.lookup(ResourceManager.NAME);
 		} catch (NameNotFoundException ex) {
@@ -163,7 +162,7 @@ public class EEPRO100Core extends AbstractDeviceCore implements IRQHandler, EEPR
 		for (y = 0, x = 0, sum = 0; x < eeSize; x++) {
 			int value = doEepromCmd((eeReadCmd | (x << 16)), 27);
 			eeprom[x] = value;
-			sum += value;
+			sum += new Integer(value).shortValue();
 			if (x < 3) {
 				hwAddrArr[y++] = (byte)value;
 				hwAddrArr[y++] = (byte)(value >> 8);
