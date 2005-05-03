@@ -158,6 +158,10 @@ public final class VmSystem implements SharedStatics {
             root.addAppender(infoApp);
         }
     }
+    
+    final static boolean isInitialized() {
+        return inited;
+    }
 
     /**
      * Gets the system output stream.

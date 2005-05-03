@@ -153,7 +153,8 @@ public class EntryPoints extends VmSystemObject {
                     "allocMultiArray",
                     "(Lorg/jnode/vm/classmgr/VmType;[I)Ljava/lang/Object;"));
             allocPrimitiveArrayMethod = testMethod(vmSoftByteCodesClass
-                    .getMethod("allocPrimitiveArray", "(II)Ljava/lang/Object;"));
+                    .getMethod("allocPrimitiveArray",
+                            "(Lorg/jnode/vm/classmgr/VmType;II)Ljava/lang/Object;"));
             resolveFieldMethod = testMethod(vmSoftByteCodesClass
                     .getMethod(
                             "resolveField",

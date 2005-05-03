@@ -314,11 +314,19 @@ public class SoftByteCodes implements Uninterruptible {
      * @return Object The new array
      * @throws UninterruptiblePragma
      */
-    public static Object allocPrimitiveArray(int atype, int elements)
+    public static Object allocPrimitiveArray(VmType<?> currentClass, int atype, int elements)
             throws UninterruptiblePragma {
         VmHeapManager hm = heapManager;
         if (hm == null) {
             heapManager = hm = Vm.getHeapManager();
+        }
+        if (false) {
+            if (atype == 5) {
+                if (VmSystem.isInitialized()) {
+                    // Trace new char[]
+                    Vm.getVm().getCounter(currentClass.getName()).add(elements);
+                }
+            }
         }
         final Object result = hm.newArray(VmType.getPrimitiveArrayClass(atype),
                 elements);
