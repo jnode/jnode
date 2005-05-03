@@ -35,7 +35,7 @@ import org.jnode.fs.FileSystem;
  */
 public class NTFSDirectory implements FSDirectory {
 
-    private final Logger log = Logger.getLogger(getClass());
+    private static final Logger log = Logger.getLogger(NTFSDirectory.class);
 
     private final NTFSIndex index;
 

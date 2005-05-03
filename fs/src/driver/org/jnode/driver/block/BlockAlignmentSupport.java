@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 public class BlockAlignmentSupport implements BlockDeviceAPI {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(BlockAlignmentSupport.class);
 	private final BlockDeviceAPI parentApi;
 	private int alignment;
 

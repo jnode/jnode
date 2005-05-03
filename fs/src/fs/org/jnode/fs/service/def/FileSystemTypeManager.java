@@ -39,7 +39,7 @@ import org.jnode.plugin.ExtensionPointListener;
 final class FileSystemTypeManager implements ExtensionPointListener {
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(FileSystemTypeManager.class);
 	/** All registered types */
 	private final HashMap<String, FileSystemType> types = new HashMap<String, FileSystemType>();
 	/** The org.jnode.fs.types extension point */

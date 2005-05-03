@@ -52,7 +52,7 @@ import org.jnode.naming.InitialNaming;
 final class JIFSExtension implements ExtensionPointListener {
 	
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(JIFSExtension.class);
 	/** The org.jnode.fs.jifs.def.info extension point */
 	private final ExtensionPoint infoEP;
 	private JIFSDirectory extdir;
