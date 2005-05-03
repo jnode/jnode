@@ -35,19 +35,19 @@ public class BaseX86MagicHelper extends BaseMagicHelper implements X86Constants 
      * Convert a method code into an X86 condition code.
      * @param mcode
      */
-    protected final int methodToCC(int mcode) {
+    protected final int methodToCC(MagicMethod mcode) {
         switch (mcode) {
-        case mEQUALS:
-        case mEQ: return X86Constants.JE;
-        case mNE: return X86Constants.JNE;
-        case mLT: return X86Constants.JB;
-        case mLE: return X86Constants.JBE;
-        case mGT: return X86Constants.JA;
-        case mGE: return X86Constants.JAE;
-        case mSLT: return X86Constants.JL;
-        case mSLE: return X86Constants.JLE;
-        case mSGT: return X86Constants.JG;
-        case mSGE: return X86Constants.JGE;
+        case EQUALS:
+        case EQ: return X86Constants.JE;
+        case NE: return X86Constants.JNE;
+        case LT: return X86Constants.JB;
+        case LE: return X86Constants.JBE;
+        case GT: return X86Constants.JA;
+        case GE: return X86Constants.JAE;
+        case SLT: return X86Constants.JL;
+        case SLE: return X86Constants.JLE;
+        case SGT: return X86Constants.JG;
+        case SGE: return X86Constants.JGE;
         default: throw new InternalError("Unknown mcode " + mcode);
         }
     }
@@ -56,83 +56,83 @@ public class BaseX86MagicHelper extends BaseMagicHelper implements X86Constants 
      * Convert a method code into an X86 condition code.
      * @param mcode
      */
-    protected final int methodToShift(int mcode) {
+    protected final int methodToShift(MagicMethod mcode) {
         switch (mcode) {
-        case mLSH: return X86Operation.SAL;
-        case mRSHA: return X86Operation.SAR;
-        case mRSHL: return X86Operation.SHR;
+        case LSH: return X86Operation.SAL;
+        case RSHA: return X86Operation.SAR;
+        case RSHL: return X86Operation.SHR;
         default: throw new InternalError("Unknown mcode " + mcode);
         }
     }
     
-    protected final int methodToSize(int mcode) {
+    protected final int methodToSize(MagicMethod mcode) {
         switch (mcode) {
-        case mLOADBYTE:
-        case mLOADBYTE_OFS:
-        case mSTOREBYTE:
-        case mSTOREBYTE_OFS:
+        case LOADBYTE:
+        case LOADBYTE_OFS:
+        case STOREBYTE:
+        case STOREBYTE_OFS:
             return X86CompilerConstants.BYTESIZE;
-        case mLOADCHAR:
-        case mLOADCHAR_OFS:
-        case mSTORECHAR:
-        case mSTORECHAR_OFS:
-        case mLOADSHORT:
-        case mLOADSHORT_OFS:
-        case mSTORESHORT:
-        case mSTORESHORT_OFS:
+        case LOADCHAR:
+        case LOADCHAR_OFS:
+        case STORECHAR:
+        case STORECHAR_OFS:
+        case LOADSHORT:
+        case LOADSHORT_OFS:
+        case STORESHORT:
+        case STORESHORT_OFS:
             return X86CompilerConstants.WORDSIZE;
         default: throw new InternalError("Unknown mcode " + mcode);                    
         }
     }
 
-    protected final int methodToType(int mcode) {
+    protected final int methodToType(MagicMethod mcode) {
         switch (mcode) {
-        case mLOADBYTE:
-        case mLOADBYTE_OFS:
-        case mLOADCHAR:
-        case mLOADCHAR_OFS:
-        case mLOADSHORT:
-        case mLOADSHORT_OFS:
-        case mLOADINT:
-        case mLOADINT_OFS:
-        case mPREPAREINT:
-        case mPREPAREINT_OFS:
+        case LOADBYTE:
+        case LOADBYTE_OFS:
+        case LOADCHAR:
+        case LOADCHAR_OFS:
+        case LOADSHORT:
+        case LOADSHORT_OFS:
+        case LOADINT:
+        case LOADINT_OFS:
+        case PREPAREINT:
+        case PREPAREINT_OFS:
             return JvmType.INT;
-        case mLOADFLOAT:
-        case mLOADFLOAT_OFS:
+        case LOADFLOAT:
+        case LOADFLOAT_OFS:
             return JvmType.FLOAT;
-        case mLOADLONG:
-        case mLOADLONG_OFS:
+        case LOADLONG:
+        case LOADLONG_OFS:
             return JvmType.LONG;
-        case mLOADDOUBLE:
-        case mLOADDOUBLE_OFS:
+        case LOADDOUBLE:
+        case LOADDOUBLE_OFS:
             return JvmType.DOUBLE;
-        case mLOADADDRESS:
-        case mLOADADDRESS_OFS:
-        case mLOADWORD:
-        case mLOADWORD_OFS:
-        case mLOADOBJECTREFERENCE:
-        case mLOADOBJECTREFERENCE_OFS:
-        case mPREPAREADDRESS:
-        case mPREPAREADDRESS_OFS:
-        case mPREPAREOBJECTREFERENCE:
-        case mPREPAREOBJECTREFERENCE_OFS:
-        case mPREPAREWORD:
-        case mPREPAREWORD_OFS:
+        case LOADADDRESS:
+        case LOADADDRESS_OFS:
+        case LOADWORD:
+        case LOADWORD_OFS:
+        case LOADOBJECTREFERENCE:
+        case LOADOBJECTREFERENCE_OFS:
+        case PREPAREADDRESS:
+        case PREPAREADDRESS_OFS:
+        case PREPAREOBJECTREFERENCE:
+        case PREPAREOBJECTREFERENCE_OFS:
+        case PREPAREWORD:
+        case PREPAREWORD_OFS:
             return JvmType.REFERENCE;
         default: throw new InternalError("Unknown mcode " + mcode);                    
         }
     }
     
-    protected static final int methodCodeToOperation(int mcode) {
+    protected static final int methodCodeToOperation(MagicMethod mcode) {
         switch (mcode) {
-        case mATOMICADD:
+        case ATOMICADD:
         	return X86Operation.ADD;
-        case mATOMICAND:
+        case ATOMICAND:
         	return X86Operation.AND;
-        case mATOMICOR:
+        case ATOMICOR:
         	return X86Operation.OR;
-        case mATOMICSUB:
+        case ATOMICSUB:
         	return X86Operation.SUB;
         default: throw new InternalError("Unknown mcode " + mcode);                    
         }    	
