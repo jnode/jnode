@@ -35,7 +35,7 @@ import org.jnode.fs.FSFile;
 final class FileHandleManager {
 	
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(FileHandleManager.class);
 	/** A map between File and FileData */
 	public final HashMap<FSFile, FileData> openFiles = new HashMap<FSFile, FileData>();
 

@@ -54,7 +54,7 @@ import org.jnode.plugin.ExtensionPoint;
 public class JIFSPlugin extends Plugin{
 
 	/** My logger */
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(JIFSPlugin.class);
 	/** Manager of Extensions */
     private JIFSExtension jifsExtension;
     	

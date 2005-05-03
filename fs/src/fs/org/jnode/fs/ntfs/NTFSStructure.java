@@ -31,7 +31,7 @@ import org.jnode.util.LittleEndian;
 abstract class NTFSStructure {
     
     /** My logger */
-    protected final Logger log = Logger.getLogger(getClass());
+    protected static final Logger log = Logger.getLogger(NTFSStructure.class);
     
     private byte[] buffer;
     private int offset;
