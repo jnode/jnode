@@ -110,8 +110,6 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     /** Set of jbects that should not yet be emitted */
     private final Set<Object> blockedObjects = new HashSet<Object>();
 
-    private URL classesURL = null;
-
     private VmSystemClassLoader clsMgr;
 
     /**
@@ -436,7 +434,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             /* Now create the processor */
             final VmArchitecture arch = getArchitecture();
             final NativeStream os = createNativeStream();
-            clsMgr = new VmSystemClassLoader(classesURL, arch,
+            clsMgr = new VmSystemClassLoader(null/*classesURL*/, arch,
                     new BuildObjectResolver(os, this));
             blockedObjects.add(clsMgr);
             blockedObjects.add(clsMgr.getSharedStatics());
@@ -801,15 +799,6 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @throws BuildException
      */
     protected abstract VmArchitecture getArchitecture() throws BuildException;
-
-    /**
-     * Returns the classesURL.
-     * 
-     * @return URL
-     */
-    public final URL getClassesURL() {
-        return classesURL;
-    }
 
     /**
      * Gets the internal class loader
@@ -1247,16 +1236,6 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         is.close();
         bos.close();
         return bos.toByteArray();
-    }
-
-    /**
-     * Sets the classesURL.
-     * 
-     * @param classesURL
-     *            The classesURL to set
-     */
-    public final void setClassesURL(URL classesURL) {
-        this.classesURL = classesURL;
     }
 
     /**
