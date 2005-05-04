@@ -45,7 +45,16 @@ public class CommandLine {
 	public static final char QUOTE_CHAR = '"';
 	public static final char SPACE_CHAR = ' ';
 	public static final char SEND_OUTPUT_TO_CHAR = '>';
-	public static final char COMMENT_CHAR = '#';
+  public static final char COMMENT_CHAR = '#';
+
+	private static final char ESCAPE_B = '\b';
+	private static final char B = 'b';
+  private static final char ESCAPE_N = '\n';
+  private static final char N = 'n';
+  private static final char ESCAPE_R = '\r';
+  private static final char R = 'r';
+  private static final char ESCAPE_T = '\t';
+  private static final char T = 't';
 
 	private String s;
 	private int pos = 0;
@@ -101,11 +110,12 @@ public class CommandLine {
 
   public CommandLine(InputStream in)
   {
-    StringBuffer stringBuffer = new StringBuffer();
-
     try
     {
-      if (in.available() > 0)
+      int avaliable = in.available();
+      StringBuilder stringBuilder = new StringBuilder(avaliable);
+
+      if (avaliable > 0)
       {
         int data = in.read();
         char ch;
@@ -113,18 +123,18 @@ public class CommandLine {
         {
           ch = (char)data;
           if (ch != linebreak)
-            stringBuffer.append(ch);
+            stringBuilder.append(ch);
 
           data = in.read();
         }
       }
+
+      setCommandLine(stringBuilder.toString());
     }
     catch (IOException e)
     {
       e.printStackTrace();
     }
-
-    setCommandLine(stringBuffer.toString());
   }
 
 	/**
@@ -163,7 +173,7 @@ public class CommandLine {
 
 		type = LITERAL;
 
-    StringBuffer token = new StringBuffer();
+    StringBuilder token = new StringBuilder(5);
     char currentChar;
 
 		boolean finished = false;
@@ -315,7 +325,7 @@ public class CommandLine {
 
 	private static final Escape[] escapes = {
 		//	plain	escaped
-		new Escape('\\', '\\'), new Escape('\b', 'b'), new Escape('\n', 'n'), new Escape('\r', 'r'), new Escape('\t', 't'), new Escape('\'', '\'')};
+		new Escape(ESCAPE_CHAR, ESCAPE_CHAR), new Escape(ESCAPE_B, B), new Escape(ESCAPE_N, N), new Escape(ESCAPE_R, R), new Escape(ESCAPE_T, T), new Escape(FULL_ESCAPE_CHAR, FULL_ESCAPE_CHAR)};
 
 	/**
 	* Escape a single command line argument for the Shell.
@@ -334,24 +344,31 @@ public class CommandLine {
 	* @return the escaped argument
 	*/
 	public static String escape(String arg, boolean forceQuote) {
-		String s = "";
+		String s = null;
+    StringBuilder stringBuilder = new StringBuilder(arg.length()>0?5:0);
 
 		// one-character escapes
 		for (int i = 0; i < arg.length(); i++) {
 			char c = arg.charAt(i);
 			for (int j = 0; j < escapes.length; j++)
 				if (escapes[j].plain == c) {
-					s += ESCAPE_CHAR;
+          stringBuilder.append(ESCAPE_CHAR);
 					c = escapes[j].escaped;
 					break;
 				}
-			s += c;
+      stringBuilder.append(c);
 		}
 
+    s = stringBuilder.toString();
+
 		if (s.indexOf(QUOTE_CHAR) != -1) { // full escape needed
-			s = FULL_ESCAPE_CHAR + s + FULL_ESCAPE_CHAR;
+      stringBuilder.insert(0,FULL_ESCAPE_CHAR);
+      stringBuilder.append(FULL_ESCAPE_CHAR);
+      s = stringBuilder.toString();
 		} else if (forceQuote || (s.indexOf(SPACE_CHAR) != -1)) { // normal quote if needed or forced
-			s = QUOTE_CHAR + s + QUOTE_CHAR;
+      stringBuilder.insert(0,QUOTE_CHAR);
+      stringBuilder.append(QUOTE_CHAR);
+      s = stringBuilder.toString();
 		}
 		// debug output do show how escapes are translated
 		//System.out.println();
@@ -365,11 +382,13 @@ public class CommandLine {
 	* @return the escaped argument
 	*/
 	public static String escape(String[] args) {
-		String s = "";
+    String s = null;
+    StringBuilder stringBuilder = new StringBuilder(args.length>0?5:0);
+
 		for (int i = 0; i < args.length; i++) {
-			s += escape(args[i]); // escape the argument
+      stringBuilder.append(escape(args[i])); // escape the argument
 			if (i != args.length - 1)
-				s += " "; // white space if needed
+        stringBuilder.append(SPACE_CHAR); // escape the argument
 		}
 		return s;
 	}
