@@ -154,10 +154,16 @@
 			<targetfileset dir="${build.native.dir}/output" />
 		</dependset>
 
-		<asm srcdir="${src.native.dir}/x86" destdir="${build.native.dir}/output" outputFormat="elf" extension="o" bits="${jnode.bits}" listfile="${build.native.dir}/jnodenative.lst">
-			<includedir dir="${src.native.dir}/x86" />
-			<includedir dir="${build.native.dir}/src" />
-			<include name="jnode.asm" />
+		<asm srcdir="${src.native.dir}/x86" 
+			destdir="${build.native.dir}/output" 
+			outputFormat="elf" 
+			extension="o" 
+			bits="${jnode.bits}" 
+			listfile="${build.native.dir}/jnodenative.lst"
+			enablejnasm="${jnode.enable.jnasm}">
+				<includedir dir="${src.native.dir}/x86" />
+				<includedir dir="${build.native.dir}/src" />
+				<include name="jnode.asm" />
 		</asm>
 	</target>
 

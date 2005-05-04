@@ -96,6 +96,8 @@ public class Asm extends MatchingTask {
 
     private File srcdir;
 
+    private boolean enableJNasm;
+    
     /**
      * Add an includedir
      * 
@@ -198,7 +200,9 @@ public class Asm extends MatchingTask {
         }
 
         try {
-            executeAsm();
+            if (!enableJNasm) {
+                executeAsm();
+            }
         } catch (IOException ex) {
             throw new BuildException(ex);
         }
@@ -407,5 +411,19 @@ public class Asm extends MatchingTask {
      */
     public void setSrcdir(File srcdir) {
         this.srcdir = srcdir;
+    }
+
+    /**
+     * @return Returns the enableJNasm.
+     */
+    public final boolean isEnableJNasm() {
+        return enableJNasm;
+    }
+
+    /**
+     * @param enableJNasm The enableJNasm to set.
+     */
+    public final void setEnableJNasm(boolean enableJNasm) {
+        this.enableJNasm = enableJNasm;
     }
 }
