@@ -176,7 +176,6 @@
 			listfile="${build.bootimage.dir}/bootimage.lst" 
 			debugfile="${build.bootimage.dir}/bootimage.debug" 
 			kernelfile="${build.native.dir}/output/jnode.o" 
-			classesURL="jar:file:///${build.bootimage.dir}/jnode-boot.jar!/" 
 			pluginList="${system-plugin-list}" 
 			pluginDir="${plugins.dir}" 
 			targetArch="x86" 
