@@ -149,14 +149,30 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
     private String version;
     
+    /** Plugin id of the memory manager plugin */
     private String memMgrPluginId;
+    
+    /** Nano-kernel source information */
+    private final AsmSourceInfo asmSourceInfo;
 
+    /** Enable the compilation of the nano-kernel source via jnasm */
+    private boolean enableJNasm = false;
+    
     /**
      * Construct a new BootImageBuilder
      */
     public AbstractBootImageBuilder() {
+        asmSourceInfo = new AsmSourceInfo();
         setupCompileHighOptLevelPackages();
         legalInstanceClasses = setupLegalInstanceClasses();
+    }
+    
+    /**
+     * Create the kernel-sources element
+     * @return
+     */
+    public AsmSourceInfo createNanokernelsources() {
+        return asmSourceInfo;
     }
 
     protected final void addCompileHighOptLevel(String name) {
@@ -268,6 +284,17 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * @throws BuildException
      */
     protected abstract void copyKernel(NativeStream os) throws BuildException;
+
+    /**
+     * Compile the kernel native code into the native stream.
+     * 
+     * @param os
+     * @throws BuildException
+     */
+    protected void compileKernel(NativeStream os, AsmSourceInfo sourceInfo) throws BuildException {
+        // TODO be implemented by Levente
+        throw new BuildException("Not implemented");
+    }
 
     /**
      * Create the initial stack space.
@@ -387,7 +414,11 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             }
 
             // First copy the native kernel file
-            copyKernel(os);
+            if (enableJNasm) {
+                compileKernel(os, asmSourceInfo); 
+            } else {
+                copyKernel(os);
+            }
             os.setObjectRef(bootHeapStart);
 
             // Setup a call to our first java method
@@ -1468,5 +1499,19 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      */
     public final void setMemMgrPluginId(String memMgrPluginId) {
         this.memMgrPluginId = memMgrPluginId;
+    }
+
+    /**
+     * @return Returns the enableJNasm.
+     */
+    public final boolean isEnableJNasm() {
+        return enableJNasm;
+    }
+
+    /**
+     * @param enableJNasm The enableJNasm to set.
+     */
+    public final void setEnableJNasm(boolean enableJNasm) {
+        this.enableJNasm = enableJNasm;
     }
 }
