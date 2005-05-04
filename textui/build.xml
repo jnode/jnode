@@ -32,7 +32,7 @@
       <bootclasspath path="${jnode-core.jar}"/>
       <src path="${my-src.dir}/textui"/>
       <classpath refid="my-cp"/>
-      <compilerarg value="-Xlint:unchecked"/>
+      <compilerarg value="${compilerarg}"/>
     </javac>
   </target>
 

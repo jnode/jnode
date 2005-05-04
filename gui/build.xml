@@ -36,7 +36,7 @@
 	  <src path="${my-src.dir}/test"/>
     <src path="${my-src.dir}/thinlet"/>        
     <classpath refid="my-cp"/>
-    <compilerarg value="-Xlint:unchecked"/>
+    <compilerarg value="${compilerarg}"/>
     </javac>
   </target>
 

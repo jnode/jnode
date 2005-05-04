@@ -72,7 +72,7 @@
       <src path="${my-src.dir}/test"/>
       <src path="${my-gen.dir}"/>
       <classpath refid="my-cp"/>
-      <compilerarg value="-Xlint:unchecked"/>
+      <compilerarg value="${compilerarg}"/>
     </javac>
     <!-- Copy all non java files to class dir -->
     <copy todir="${my-classes.dir}">
