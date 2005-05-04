@@ -67,6 +67,7 @@
       <src path="${my-src.dir}/core"/>
       <src path="${my-src.dir}/vmmagic"/>
       <src path="${my-src.dir}/mmtk"/>
+      <src path="${my-src.dir}/mmtk-vm"/>
       <src path="${my-src.dir}/driver"/>
       <src path="${my-src.dir}/test"/>
       <src path="${my-gen.dir}"/>
