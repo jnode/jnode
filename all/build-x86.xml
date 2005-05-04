@@ -189,7 +189,15 @@
 			cpu="${cpu}" 
 			version="${jnode-ver}" 
 			jnodeCompiler="${jnode.compiler}" 
-			bits="${jnode.bits}" />
+			bits="${jnode.bits}"
+			enablejnasm="${jnode.enable.jnasm}">
+
+			<nanokernelsources srcfile="${src.native.dir}/x86/jnode.asm">
+				<includedir dir="${src.native.dir}/x86" />
+				<includedir dir="${build.native.dir}/src" />
+			</nanokernelsources>
+			
+	    </bootimage>			
 
 		<gzip src="${build.bootimage.dir}/bootimage.bin" zipfile="${jnode.kernel}" />
 	</target>
