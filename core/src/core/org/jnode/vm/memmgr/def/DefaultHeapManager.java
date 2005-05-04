@@ -45,6 +45,11 @@ public final class DefaultHeapManager extends VmHeapManager
   public static float GC_TRIGGER_PERCENTAGE = 0.75f;
 
   /**
+   * The boot heap
+   */
+  private final VmBootHeap bootHeap;
+
+  /**
    * The GC thread
    */
   private GCThread gcThread;
@@ -111,6 +116,7 @@ public final class DefaultHeapManager extends VmHeapManager
   public DefaultHeapManager(VmClassLoader loader, HeapHelper helper) throws ClassNotFoundException
   {
     super(helper);
+    this.bootHeap = new VmBootHeap(helper);
     //this.writeBarrier = new DefaultWriteBarrier(helper);
     this.writeBarrier = null;
     this.firstNormalHeap = new VmDefaultHeap(this);

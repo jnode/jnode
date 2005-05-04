@@ -39,7 +39,7 @@ import org.vmmagic.unboxed.Word;
 /**
  * @author epr
  */
-public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
+final class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
 
     /** Offset within this heap of the next free memory block */
     private Address nextFreePtr;
@@ -71,7 +71,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
      * @return the heap
      */
     protected static VmAbstractHeap setupHeap(HeapHelper helper, Address start,
-            VmNormalClass heapClass, int slotSize) {
+            VmNormalClass<?> heapClass, int slotSize) {
         final int headerSize = ObjectLayout
                 .objectAlign((ObjectLayout.HEADER_SLOTS + 1) * slotSize);
         final Offset vmtOffset = Offset.fromIntSignExtend(ObjectLayout.TIB_SLOT * slotSize);
@@ -157,7 +157,7 @@ public class VmDefaultHeap extends VmAbstractHeap implements ObjectFlags {
      * @param alignedSize
      * @return Object Null if no space is left.
      */
-    protected Object alloc(VmClassType vmClass, int alignedSize) {
+    protected Object alloc(VmClassType<?> vmClass, int alignedSize) {
 
         if (nextFreePtr == null) { /* This heap is full */
         return null; }

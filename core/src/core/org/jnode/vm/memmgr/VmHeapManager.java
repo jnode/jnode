@@ -21,27 +21,25 @@
 
 package org.jnode.vm.memmgr;
 
+import java.io.PrintStream;
+
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmMagic;
 import org.jnode.vm.VmSystemObject;
-import org.jnode.vm.classmgr.*;
-import org.jnode.vm.memmgr.def.VmBootHeap;
+import org.jnode.vm.classmgr.VmArray;
+import org.jnode.vm.classmgr.VmArrayClass;
+import org.jnode.vm.classmgr.VmClassType;
+import org.jnode.vm.classmgr.VmNormalClass;
+import org.jnode.vm.classmgr.VmType;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.Extent;
 import org.vmmagic.unboxed.ObjectReference;
 import org.vmmagic.unboxed.Offset;
 
-import java.io.PrintStream;
-
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public abstract class VmHeapManager extends VmSystemObject {
-
-    /**
-     * The boot heap
-     */
-    protected final VmBootHeap bootHeap;
 
     /**
      * Has this manager been initialized yet
@@ -59,7 +57,6 @@ public abstract class VmHeapManager extends VmSystemObject {
      * Initialize this instance
      */
     public VmHeapManager(HeapHelper helper) {
-        this.bootHeap = new VmBootHeap(helper);
         this.helper = helper;
     }
 

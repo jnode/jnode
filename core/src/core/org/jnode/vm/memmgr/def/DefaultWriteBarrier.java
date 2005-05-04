@@ -30,7 +30,7 @@ import org.vmmagic.pragma.UninterruptiblePragma;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class DefaultWriteBarrier extends VmWriteBarrier {
+final class DefaultWriteBarrier extends VmWriteBarrier {
 
     /** The heap helper */
     private final HeapHelper helper;

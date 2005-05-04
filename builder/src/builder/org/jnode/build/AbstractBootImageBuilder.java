@@ -85,8 +85,6 @@ import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.jnode.vm.memmgr.def.DefaultHeapManager;
-import org.jnode.vm.memmgr.def.VmBootHeap;
-import org.jnode.vm.memmgr.def.VmDefaultHeap;
 
 /**
  * Build the boot image from an assembler compiled bootstrap (in ELF format)
@@ -398,8 +396,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             loadClass(VmSystemClassLoader.class);
             loadClass(VmType[].class);
             loadClass(Vm.class);
-            loadClass(VmBootHeap.class);
-            loadClass(VmDefaultHeap.class);
+            loadClass("org.jnode.vm.memmgr.def.VmBootHeap");
+            loadClass("org.jnode.vm.memmgr.def.VmDefaultHeap");
             loadClass(VmHeapManager.class);
             loadClass(VmSharedStatics.class);
             loadClass(VmIsolatedStatics.class);
@@ -899,6 +897,18 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         } else {
             return loadClass(name, true);
         }
+    }
+
+    /**
+     * Load a VmClass with a given name
+     * 
+     * @param name
+     * @return The loaded class
+     * @throws ClassNotFoundException
+     */
+    public final VmType loadClass(String name)
+            throws ClassNotFoundException {
+        return loadClass(name, true);
     }
 
     /**
