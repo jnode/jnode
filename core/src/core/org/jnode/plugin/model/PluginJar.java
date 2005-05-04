@@ -26,6 +26,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -104,9 +106,9 @@ public class PluginJar implements BootableObject, ResourceLoader {
         } else {
             throw new PluginException("plugin or fragment element expected");
         }
-        if (descriptor.isSystemPlugin()) {
-            resources.clear();
-        }
+//        if (descriptor.isSystemPlugin()) {
+//            resources.clear();
+//        }
     }
 
     /**
@@ -117,7 +119,7 @@ public class PluginJar implements BootableObject, ResourceLoader {
         if (data == null) {
             return null;
         } else {
-            return data.asReadOnlyBuffer();
+            return (ByteBuffer)data.asReadOnlyBuffer().rewind();
         }
     }
 
@@ -131,6 +133,21 @@ public class PluginJar implements BootableObject, ResourceLoader {
         return resources.containsKey(resourceName);
     }
 
+    /**
+     * Return the names of all resources in this plugin jar.
+     * @return
+     */
+    public Collection<String> resourceNames() {
+        return Collections.unmodifiableCollection(resources.keySet());
+    }
+    
+    /**
+     * Remove all resources.
+     */
+    public void clearResources() {
+        resources.clear();
+    }
+    
     /**
      * Does this jar-file contain the resource with the given name.
      * 
@@ -177,7 +194,9 @@ public class PluginJar implements BootableObject, ResourceLoader {
         final BootableHashMap<String, ByteBuffer> map = new BootableHashMap<String, ByteBuffer>();
         final JarBuffer jbuf = new JarBuffer(buffer);
         for (Map.Entry<String, ByteBuffer> entry : jbuf.entries().entrySet()) {
+            if (entry.getValue().limit() > 0) {
             map.put(entry.getKey(), entry.getValue());
+            }
         }
         return map;
     }

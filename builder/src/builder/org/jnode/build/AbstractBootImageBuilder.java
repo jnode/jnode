@@ -23,7 +23,6 @@ package org.jnode.build;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -31,11 +30,11 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -43,9 +42,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.jar.JarInputStream;
 
 import org.apache.tools.ant.Project;
 import org.jnode.assembler.Label;
@@ -53,8 +49,11 @@ import org.jnode.assembler.NativeStream;
 import org.jnode.assembler.UnresolvedObjectRefException;
 import org.jnode.assembler.NativeStream.ObjectRef;
 import org.jnode.assembler.x86.X86BinaryAssembler;
+import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginRegistry;
+import org.jnode.plugin.model.PluginDescriptorModel;
+import org.jnode.plugin.model.PluginJar;
 import org.jnode.plugin.model.PluginRegistryModel;
 import org.jnode.util.BootableHashMap;
 import org.jnode.util.NumberUtils;
@@ -128,8 +127,6 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     private File debugFile;
 
     private File destFile;
-
-    private File jarFile;
 
     private String jnodeCompiler;
 
@@ -257,24 +254,79 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      * image.
      * 
      * @param blockedObjects
+     * @return The loaded resource names
      * @throws BuildException
      */
-    protected final void copyJarFile(Set<Object> blockedObjects)
+    protected final Collection<String> copyJarFile(Set<Object> blockedObjects, PluginRegistryModel piRegistry)
             throws BuildException {
 
-        try {
-            final JarFile jar = new JarFile(jarFile);
-            final BootableHashMap<String, byte[]> resources = new BootableHashMap<String, byte[]>();
-            for (Enumeration< ? > e = jar.entries(); e.hasMoreElements();) {
-                final JarEntry entry = (JarEntry) e.nextElement();
-                final byte[] data = read(jar.getInputStream(entry));
-                resources.put(entry.getName().intern(), data);
+        final BootableHashMap<String, byte[]> resources = new BootableHashMap<String, byte[]>();
+//        try {
+//            final JarFile jar = new JarFile(jarFile);
+//            for (Enumeration< ? > e = jar.entries(); e.hasMoreElements();) {
+//                final JarEntry entry = (JarEntry) e.nextElement();
+//                final byte[] data = read(jar.getInputStream(entry));
+//                resources.put(entry.getName().intern(), data);
+//            }
+//        } catch (IOException ex) {
+//            throw new BuildException(ex);
+//        }
+        
+        // Load all resources of all plugins
+        for (Iterator<PluginDescriptor> i = piRegistry.getDescriptorIterator(); i.hasNext(); ) {
+            final PluginDescriptorModel descr = (PluginDescriptorModel)i.next();
+            if (!descr.isSystemPlugin()) {
+                throw new BuildException("Non system plugin found " + descr.getId());
             }
-            blockedObjects.add(resources);
-            clsMgr.setSystemRtJar(resources);
-        } catch (IOException ex) {
-            throw new BuildException(ex);
+            final PluginJar piJar = descr.getJarFile();
+            log("Plugin: " + descr.getId() + piJar.resourceNames().size());
+            for (String name : piJar.resourceNames()) {
+                final ByteBuffer buf = piJar.getResourceAsBuffer(name);
+                final byte[] data = new byte[buf.limit()];
+                buf.get(data);
+                resources.put(name.intern(), data);
+//                log("  " + name);
+            }
+            piJar.clearResources();
         }
+        
+        blockedObjects.add(resources);
+        clsMgr.setSystemRtJar(resources);
+        
+        return Collections.unmodifiableCollection(resources.keySet());
+    }
+
+    /**
+     * Copy the jnode.jar file into a byte array that is added to the java
+     * image.
+     * 
+     * @param blockedObjects
+     * @return The loaded resource names
+     * @throws BuildException
+     */
+    protected final Map<String, byte[]> loadSystemResource(PluginRegistryModel piRegistry)
+            throws BuildException {
+
+        final BootableHashMap<String, byte[]> resources = new BootableHashMap<String, byte[]>();
+
+        // Load all resources of all plugins
+        for (Iterator<PluginDescriptor> i = piRegistry.getDescriptorIterator(); i.hasNext(); ) {
+            final PluginDescriptorModel descr = (PluginDescriptorModel)i.next();
+            if (!descr.isSystemPlugin()) {
+                throw new BuildException("Non system plugin found " + descr.getId());
+            }
+            final PluginJar piJar = descr.getJarFile();
+//            log("Plugin: " + descr.getId() + piJar.resourceNames().size());
+            for (String name : piJar.resourceNames()) {
+                final ByteBuffer buf = piJar.getResourceAsBuffer(name);
+                final byte[] data = new byte[buf.limit()];
+                buf.get(data);
+                resources.put(name.intern(), data);
+//                log("  " + name);
+            }
+            piJar.clearResources();
+        }
+        return resources;
     }
 
     /**
@@ -331,7 +383,6 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     private final void doExecute() throws BuildException {
         debug = (getProject().getProperty("jnode.debug") != null);
 
-        final long lmJar = jarFile.lastModified();
         final long lmKernel = kernelFile.lastModified();
         final long lmDest = destFile.lastModified();
         final long lmPIL = getPluginListFile().lastModified();
@@ -357,8 +408,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             throw new BuildException(ex);
         }
 
-        if ((lmJar < lmDest) && (lmKernel < lmDest) && (lmPIL < lmDest)
-                && (lmPI < lmDest)) {
+        if ((lmKernel < lmDest) && (lmPIL < lmDest) && (lmPI < lmDest)) {
             // No need to do anything, skip
             return;
         }
@@ -380,6 +430,9 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             // Test the set of system plugins
             testPluginPrerequisites(piRegistry);
 
+            // Load all resources
+            final Map<String, byte[]> resources = loadSystemResource(piRegistry);
+            
             /* Now create the processor */
             final VmArchitecture arch = getArchitecture();
             final NativeStream os = createNativeStream();
@@ -390,6 +443,9 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             blockedObjects.add(clsMgr.getSharedStatics().getTable());
             blockedObjects.add(clsMgr.getIsolatedStatics());
             blockedObjects.add(clsMgr.getIsolatedStatics().getTable());
+            blockedObjects.add(resources);
+            clsMgr.setSystemRtJar(resources);
+
             // Initialize the statics table.
             initializeStatics(clsMgr.getSharedStatics());
 
@@ -443,8 +499,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             loadClass("org.jnode.vm.HeapHelperImpl");
             loadClass(Vm.getCompiledMethods().getClass());
             loadClass(VmCompiledCode[].class);
-
-            loadSystemClasses();
+            loadSystemClasses(resources.keySet());
 
             /* Now emit the processor */
             os.getObjectRef(proc);
@@ -471,7 +526,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             arch.getIMTCompiler().initialize(clsMgr);
 
             // Load the jarfile as byte-array
-            copyJarFile(blockedObjects);
+//            copyJarFile(blockedObjects, piRegistry);
 
             // Now emit all object images to the actual image
             emitObjects(os, arch, blockedObjects, false);
@@ -784,13 +839,6 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     }
 
     /**
-     * @return File
-     */
-    public final File getJarFile() {
-        return jarFile;
-    }
-
-    /**
      * @return Returns the jnodeCompiler.
      */
     public final String getJnodeCompiler() {
@@ -967,13 +1015,9 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     /**
      * Load all classes from the bootjar.
      */
-    protected void loadSystemClasses() throws IOException,
+    protected final void loadSystemClasses(Collection<String> resourceNames) throws IOException,
             ClassNotFoundException {
-        final JarInputStream jis = new JarInputStream(new FileInputStream(
-                jarFile));
-        JarEntry entry;
-        while ((entry = jis.getNextJarEntry()) != null) {
-            final String eName = entry.getName();
+        for (String eName : new ArrayList<String>(resourceNames)) {
             if (eName.endsWith(".class")) {
                 final String cName = eName.substring(0,
                         eName.length() - ".class".length()).replace('/', '.');
@@ -1233,16 +1277,6 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      */
     public final void setDestFile(File destFile) {
         this.destFile = destFile;
-    }
-
-    /**
-     * Sets the jarFile.
-     * 
-     * @param jarFile
-     *            The jarFile to set
-     */
-    public final void setJarFile(File jarFile) {
-        this.jarFile = jarFile;
     }
 
     /**
