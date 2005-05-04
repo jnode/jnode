@@ -120,7 +120,8 @@
      	<!-- Initialize all project directories -->
 		<property file="${root.dir}/jnode.properties" />
 		<!-- Set overwritable properties -->
-		<property name="jnode.memmgr.plugin.id" value="org.jnode.vm.memmgr.def"/>
+		<property name="jnode.memmgr.plugin.id" value="org.jnode.vm.memmgr.def"/>		
+		<property name="compilerarg" value="-nowarn" />
 		
 		<!-- Initialize timestamp -->
 		<tstamp />
