@@ -382,15 +382,14 @@ public class CommandLine {
 	* @return the escaped argument
 	*/
 	public static String escape(String[] args) {
-    String s = null;
-    StringBuilder stringBuilder = new StringBuilder(args.length>0?5:0);
+        StringBuilder stringBuilder = new StringBuilder(args.length>0?5:0);
 
 		for (int i = 0; i < args.length; i++) {
-      stringBuilder.append(escape(args[i])); // escape the argument
+            stringBuilder.append(escape(args[i])); // escape the argument
 			if (i != args.length - 1)
-        stringBuilder.append(SPACE_CHAR); // escape the argument
+                stringBuilder.append(SPACE_CHAR); // escape the argument
 		}
-		return s;
+		return stringBuilder.toString();
 	}
 
   public boolean sendToOutFile()
