@@ -22,17 +22,24 @@
 package org.jnode.vm;
 
 import java.io.PrintStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.jnode.plugin.Extension;
+import org.jnode.plugin.PluginDescriptor;
+import org.jnode.plugin.PluginRegistry;
 import org.jnode.system.ResourceManager;
 import org.jnode.util.BootableArrayList;
 import org.jnode.util.Counter;
 import org.jnode.util.Statistic;
 import org.jnode.util.Statistics;
 import org.jnode.vm.classmgr.CompiledCodeList;
+import org.jnode.vm.classmgr.VmClassLoader;
 import org.jnode.vm.classmgr.VmSharedStatics;
+import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
 import org.vmmagic.pragma.NoInlinePragma;
 
@@ -74,23 +81,79 @@ public class Vm extends VmSystemObject implements Statistics, SharedStatics {
 	public static final boolean NOT_REACHED = false;
 
 	/**
-	 * Initialize a new instance
-	 * 
-	 * @param arch
-	 */
-	public Vm(String version, VmArchitecture arch, VmHeapManager heapManager, VmSharedStatics statics, boolean debugMode) {
-		instance = this;
-		this.version = version;
+     * Initialize a new instance
+     * 
+     * @param arch
+     * @throws InstantiationException
+     */
+    public Vm(String version, VmArchitecture arch, VmSharedStatics statics,
+            boolean debugMode, VmClassLoader loader, PluginRegistry pluginReg) throws InstantiationException {
+        this.version = version;
 		this.debugMode = debugMode;
 		this.bootstrap = true;
 		this.arch = arch;
-		this.heapManager = heapManager;
+        this.heapManager = createHeapManager(arch, loader, pluginReg);        
+        instance = this;
 		this.statics = statics;
 		this.processors = new BootableArrayList<VmProcessor>();
         this.allThreadsLock = new SpinLock();
         this.allThreads = new VmThreadQueue.AllThreadsQueue("all");
         this.compiledMethods = new CompiledCodeList();
 	}
+    
+    /**
+     * Find and instantiate the heap manager.
+     * 
+     * @param arch
+     * @param loader
+     * @param pluginReg
+     * @return
+     * @throws InstantiationException
+     */
+    private static VmHeapManager createHeapManager(VmArchitecture arch,
+            VmClassLoader loader, PluginRegistry pluginReg)
+            throws InstantiationException {
+        if (pluginReg == null) {
+            // Use in tests and asm constant construction
+            return null;
+        }
+        
+        // Find and instantiate the heap manager.
+        PluginDescriptor core = pluginReg
+                .getPluginDescriptor("org.jnode.vm.core");
+        Extension[] memMgrs = core.getExtensionPoint("memmgr").getExtensions();
+        if (memMgrs.length != 1) {
+            throw new InstantiationException(
+                    "memmgr extension point must have 1 extension");
+        }
+        Extension memMgr = memMgrs[0];
+        if (memMgr.getConfigurationElements().length != 1) {
+            throw new InstantiationException(
+                    "Expected 1 element in memmgr extension");
+        }
+        String memMgrClassName = memMgr.getConfigurationElements()[0]
+                .getAttribute("class");
+        Class[] consArgTypes = { VmClassLoader.class, HeapHelper.class };
+        try {
+            Constructor cons = Class.forName(memMgrClassName).getConstructor(
+                    consArgTypes);
+            final HeapHelper helper = new HeapHelperImpl(arch);
+            return (VmHeapManager) cons.newInstance(new Object[] { loader,
+                    helper });
+        } catch (ClassNotFoundException ex) {
+            throw new InstantiationException(
+                    "Cannot find heap manager class " + memMgrClassName);
+        } catch (IllegalAccessException ex) {
+            throw new InstantiationException(
+                    "Cannot access heap manager class " + memMgrClassName);
+        } catch (InvocationTargetException ex) {
+            throw (InstantiationException)new InstantiationException(
+                    "Exception in creating heap manager" + ex.getMessage()).initCause(ex);
+        } catch (NoSuchMethodException ex) {
+            throw new InstantiationException(
+                    "Cannot find heap manager constructor");
+        }
+    }
 
 	/**
 	 * @return Returns the bootstrap.

@@ -34,7 +34,7 @@ import org.vmmagic.unboxed.ObjectReference;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
+final class HeapHelperImpl extends HeapHelper implements Uninterruptible {
 
     private final int flagsOffset;
     private final ThreadRootVisitor threadRootVisitor;

@@ -164,12 +164,32 @@
 	<!-- Build the java object file  -->
 	<target name="java-image" depends="asm-native">
 		<taskdef name="bootimage" classname="org.jnode.build.x86.BootImageBuilder" classpathref="cp-x86" />
-		<taskdef name="bootjar" classname="org.jnode.build.BootJarBuilder" classpathref="cp-x86" />
+		<taskdef name="bootjar" 
+			classname="org.jnode.build.BootJarBuilder" 
+			classpathref="cp-x86" />
 
-		<bootjar destfile="${build.bootimage.dir}/jnode-boot.jar" pluginList="${system-plugin-list}" pluginDir="${plugins.dir}" targetArch="x86">
+		<bootjar destfile="${build.bootimage.dir}/jnode-boot.jar" 
+			pluginList="${system-plugin-list}" 
+			pluginDir="${plugins.dir}" 
+			memMgrPluginId="${jnode.memmgr.plugin.id}" 
+			targetArch="x86">
 		</bootjar>
 
-		<bootimage destfile="${build.bootimage.dir}/bootimage.bin" listfile="${build.bootimage.dir}/bootimage.lst" debugfile="${build.bootimage.dir}/bootimage.debug" kernelfile="${build.native.dir}/output/jnode.o" jarfile="${build.bootimage.dir}/jnode-boot.jar" classesURL="jar:file:///${build.bootimage.dir}/jnode-boot.jar!/" pluginList="${system-plugin-list}" pluginDir="${plugins.dir}" targetArch="x86" cpu="${cpu}" version="${jnode-ver}" jnodeCompiler="${jnode.compiler}" bits="${jnode.bits}" />
+		<bootimage 
+			destfile="${build.bootimage.dir}/bootimage.bin" 
+			listfile="${build.bootimage.dir}/bootimage.lst" 
+			debugfile="${build.bootimage.dir}/bootimage.debug" 
+			kernelfile="${build.native.dir}/output/jnode.o" 
+			jarfile="${build.bootimage.dir}/jnode-boot.jar" 
+			classesURL="jar:file:///${build.bootimage.dir}/jnode-boot.jar!/" 
+			pluginList="${system-plugin-list}" 
+			pluginDir="${plugins.dir}" 
+			targetArch="x86" 
+			memMgrPluginId="${jnode.memmgr.plugin.id}" 
+			cpu="${cpu}" 
+			version="${jnode-ver}" 
+			jnodeCompiler="${jnode.compiler}" 
+			bits="${jnode.bits}" />
 
 		<gzip src="${build.bootimage.dir}/bootimage.bin" zipfile="${jnode.kernel}" />
 	</target>
