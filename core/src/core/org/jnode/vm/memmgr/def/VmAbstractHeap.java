@@ -42,7 +42,7 @@ import org.vmmagic.unboxed.Word;
  * 
  * @author epr
  */
-public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible {
+abstract class VmAbstractHeap extends SpinLock implements Uninterruptible {
 
 	/** Start address of this heap (inclusive) */
 	protected Address start;
@@ -181,7 +181,7 @@ public abstract class VmAbstractHeap extends SpinLock implements Uninterruptible
 	 * @param alignedSize
 	 * @return Object Null if no space is left.
 	 */
-	protected abstract Object alloc(VmClassType vmClass, int alignedSize);
+	protected abstract Object alloc(VmClassType<?> vmClass, int alignedSize);
 	
 	/**
 	 * Gets the size of free memory in this heap in bytes

@@ -35,7 +35,7 @@ import org.vmmagic.unboxed.Word;
 /**
  * @author epr
  */
-public class VmBootHeap extends VmAbstractHeap {
+final class VmBootHeap extends VmAbstractHeap {
 
     //public static final String START_FIELD_NAME = "start";
     //public static final String END_FIELD_NAME = "end";
