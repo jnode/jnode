@@ -224,7 +224,7 @@ public class PluginRegistryModel extends VmSystemObject implements
      * @return The descriptor of the loaded plugin.
      * @throws PluginException
      */
-    private PluginDescriptorModel loadPlugin(final URL pluginUrl, boolean resolve)
+    public PluginDescriptorModel loadPlugin(final URL pluginUrl, boolean resolve)
             throws PluginException {
         final PluginRegistryModel registry = this;
         final PluginJar pluginJar;

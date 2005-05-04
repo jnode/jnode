@@ -25,8 +25,9 @@
       <export name="org.jnode.vm.compiler.ir.*"/>
       <export name="org.jnode.vm.compiler.ir.quad.*"/>
       <export name="org.jnode.vm.memmgr.*"/>
-      <export name="org.jnode.vm.memmgr.def.*"/>
     </library>
   </runtime>
-        
+  
+  <extension-point id="memmgr" name="Memory manager"/>
+          
 </plugin>

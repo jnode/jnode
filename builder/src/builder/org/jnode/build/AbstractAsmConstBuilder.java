@@ -72,13 +72,14 @@ public abstract class AbstractAsmConstBuilder {
 	 * @throws ClassNotFoundException
 	 * @throws IllegalAccessException
 	 * @throws IOException
+	 * @throws InstantiationException 
 	 */
-	private void doExecute() throws BuildException, ClassNotFoundException, IllegalAccessException, IOException {
+	private void doExecute() throws BuildException, ClassNotFoundException, IllegalAccessException, IOException, InstantiationException {
 
 		final VmArchitecture arch = getArchitecture();
 		final int slotSize = arch.getReferenceSize();
 		final VmSystemClassLoader cl = new VmSystemClassLoader(classesURL, arch);
-		final Vm vm = new Vm("?", arch, null, cl.getSharedStatics(), false);
+		final Vm vm = new Vm("?", arch, cl.getSharedStatics(), false, cl, null);
 		vm.toString(); // Just to avoid compiler warnings
 		VmType.initializeForBootImage(cl);
 		long lastModified = 0;

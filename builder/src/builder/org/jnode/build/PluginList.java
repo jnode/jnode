@@ -54,10 +54,12 @@ public final class PluginList {
     private Manifest manifest;
 
     private List<PluginList> includes = new ArrayList<PluginList>();
+    
+    private final File defaultDir;
 
     public PluginList(File file, File defaultDir, String targetArch)
             throws PluginException, MalformedURLException {
-
+        this.defaultDir = defaultDir;
         final ArrayList<URL> descrList = new ArrayList<URL>();
         final ArrayList<URL> pluginList = new ArrayList<URL>();
         final XMLElement root = new XMLElement(new Hashtable(), true, false);
@@ -240,5 +242,16 @@ public final class PluginList {
      */
     public final String getName() {
         return name;
+    }
+
+    /**
+     * Create an URL to a plugin with a given id.
+     */
+    public final URL createPluginURL(String id) {
+        try {
+            return findPlugin(defaultDir, id).toURL();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

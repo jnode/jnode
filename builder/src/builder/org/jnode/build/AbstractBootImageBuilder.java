@@ -58,7 +58,6 @@ import org.jnode.plugin.PluginRegistry;
 import org.jnode.plugin.model.PluginRegistryModel;
 import org.jnode.util.BootableHashMap;
 import org.jnode.util.NumberUtils;
-import org.jnode.vm.HeapHelperImpl;
 import org.jnode.vm.JvmType;
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.Vm;
@@ -84,7 +83,6 @@ import org.jnode.vm.classmgr.VmType;
 import org.jnode.vm.compiler.NativeCodeCompiler;
 import org.jnode.vm.memmgr.HeapHelper;
 import org.jnode.vm.memmgr.VmHeapManager;
-import org.jnode.vm.memmgr.def.DefaultHeapManager;
 
 /**
  * Build the boot image from an assembler compiled bootstrap (in ELF format)
@@ -150,6 +148,8 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
     private int totalLowMethodSize;
 
     private String version;
+    
+    private String memMgrPluginId;
 
     /**
      * Construct a new BootImageBuilder
@@ -312,13 +312,18 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         if (version == null) {
             throw new BuildException("Version property must be set");
         }
+        if (memMgrPluginId == null) {
+            throw new BuildException("Memory manager plugin Id must be set");
+        }
 
         final PluginList piList;
         final long lmPI;
+        final URL memMgrPluginURL;
         try {
             log("plugin-list: " + getPluginListFile(), Project.MSG_DEBUG);
             piList = getPluginList();
-            lmPI = piList.lastModified();
+            memMgrPluginURL = piList.createPluginURL(memMgrPluginId);
+            lmPI = Math.max(piList.lastModified(), memMgrPluginURL.openConnection().getLastModified());
         } catch (PluginException ex) {
             throw new BuildException(ex);
         } catch (IOException ex) {
@@ -339,10 +344,13 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             System.getProperties().setProperty(BUILDTIME_PROPERTY, "1");
 
             // Load the plugin descriptors
-            final PluginRegistry piRegistry;
+            final PluginRegistryModel piRegistry;
             piRegistry = new PluginRegistryModel(piList.getPluginList());
-            // piRegistry = new
-            // PluginRegistryModel(piList.getDescriptorUrlList());
+            
+            // Load the memory management plugin
+            piRegistry.loadPlugin(memMgrPluginURL, true);
+
+            // Test the set of system plugins
             testPluginPrerequisites(piRegistry);
 
             /* Now create the processor */
@@ -363,9 +371,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             }
 
             // Create the VM
-            final HeapHelper helper = new HeapHelperImpl(arch);
-            final Vm vm = new Vm(version, arch, new DefaultHeapManager(clsMgr,
-                    helper), clsMgr.getSharedStatics(), debug);
+            final Vm vm = new Vm(version, arch, clsMgr.getSharedStatics(), debug, clsMgr, piRegistry);
             blockedObjects.add(vm);
             blockedObjects.add(Vm.getCompiledMethods());
 
@@ -403,7 +409,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
             loadClass(VmIsolatedStatics.class);
             loadClass(Vm.getHeapManager().getClass());
             loadClass(HeapHelper.class);
-            loadClass(HeapHelperImpl.class);
+            loadClass("org.jnode.vm.HeapHelperImpl");
             loadClass(Vm.getCompiledMethods().getClass());
             loadClass(VmCompiledCode[].class);
 
@@ -1449,4 +1455,18 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
      */
     protected abstract void initializeStatics(VmSharedStatics statics)
             throws BuildException;
+
+    /**
+     * @return Returns the memMgrPluginId.
+     */
+    public final String getMemMgrPluginId() {
+        return memMgrPluginId;
+    }
+
+    /**
+     * @param memMgrPluginId The memMgrPluginId to set.
+     */
+    public final void setMemMgrPluginId(String memMgrPluginId) {
+        this.memMgrPluginId = memMgrPluginId;
+    }
 }

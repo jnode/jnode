@@ -119,7 +119,13 @@
 	<target name="prepare">
      	<!-- Initialize all project directories -->
 		<property file="${root.dir}/jnode.properties" />
+		<!-- Set overwritable properties -->
+		<property name="jnode.memmgr.plugin.id" value="org.jnode.vm.memmgr.def"/>
+		
+		<!-- Initialize timestamp -->
 		<tstamp />
+		
+		<!-- Create basic build directories -->
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${reports.dir}" />
 		<mkdir dir="${cdroms.dir}" />
