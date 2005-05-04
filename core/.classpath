@@ -40,6 +40,10 @@
 		<attributes>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" path="src/mmtk-vm">
+		<attributes>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="src" path="src/driver">
 		<attributes>
 		</attributes>

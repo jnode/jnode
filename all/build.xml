@@ -446,6 +446,7 @@ clean          Remove all intermediate build results.
 			<fileset dir="${root.dir}/core/src/classpath/vm" includes="**/*.java" />
 			<fileset dir="${root.dir}/core/src/core" includes="**/*.java" />
 			<fileset dir="${root.dir}/core/src/vmmagic" includes="**/*.java" />
+			<fileset dir="${root.dir}/core/src/mmtk-vm" includes="**/*.java" />
 			<fileset dir="${root.dir}/core/src/driver" includes="**/*.java" />
 			<fileset dir="${root.dir}/core/src/test" includes="**/*.java" />
 			<fileset dir="${root.dir}/distr/src/install" includes="**/*.java" />
