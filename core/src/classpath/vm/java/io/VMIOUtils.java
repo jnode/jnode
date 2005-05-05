@@ -49,7 +49,7 @@ public class VMIOUtils {
 	 * 
 	 * @return
 	 */
-	protected static VMFileSystemAPI getAPI() 
+    public static VMFileSystemAPI getAPI() 
 	throws IOException {
 		return api;
 	}
