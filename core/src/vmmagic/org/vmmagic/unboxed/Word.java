@@ -18,155 +18,168 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
-package org.vmmagic.unboxed; 
- 
+
+package org.vmmagic.unboxed;
+
 /**
  * To be commented.
- *
+ * 
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Daniel Frampton
  * @see Address
  */
 public final class Word {
 
-  /**
-   * @deprecated
-   */
-  public static Word fromInt (int val) {
-    return null;
-  }
+    final long v;
+    
+    /**
+     * Constructor used during the bootimage creation.
+     * @param v
+     */
+    Word(long v) {
+        this.v = v;
+    }
 
-  public static Word fromIntSignExtend (int val) {
-    return null;
-  }
-  
-  public static Word fromIntZeroExtend (int val) {
-    return null;
-  }
+    /**
+     * @deprecated
+     */
+    public static Word fromInt(int val) {
+        return new Word(val);
+    }
 
-  public static Word zero () {
-    return null;
-  }
+    public static Word fromIntSignExtend(int val) {
+        return new Word(val);
+    }
 
-  public static Word one () {
-    return null;
-  }
+    public static Word fromIntZeroExtend(int val) {
+        return new Word(0xFFFFFFFFL & val);
+    }
 
-  public static Word max() {
-    return null;
-  }
+    public static Word zero() {
+        return new Word(0);
+    }
 
-  public int toInt () {
-    return 0;
-  }
+    public static Word one() {
+        return new Word(1);
+    }
 
-  public long toLong () {
-    return 0L;
-  }
+    public static Word max() {
+        return new Word(0xFFFFFFFFFFFFFFFFL);
+    }
 
-  public Address toAddress() {
-    return null;
-  }
+    public int toInt() {
+        return (int)v;
+    }
 
-  public Offset toOffset () {
-    return null;
-  }
+    public long toLong() {
+        return v;
+    }
 
-  public Extent toExtent () {
-    return null;
-  }
+    public Address toAddress() {
+        return new Address(v);
+    }
 
-  public Word add (int w2) {
-    return null;
-  }
+    public Offset toOffset() {
+        return new Offset(v);
+    }
 
-  public Word add (Word w2) {
-    return null;
-  }
+    public Extent toExtent() {
+        return new Extent(v);
+    }
 
-  public Word add (Offset w2) {
-    return null;
-  }
+    public Word add(int w2) {
+        return new Word(this.v + w2);
+    }
 
-  public Word add (Extent w2) {
-    return null;
-  }
+    public Word add(Word w2) {
+        return new Word(this.v + w2.v);
+    }
 
-  public Word sub (int w2) {
-    return null;
-  }
+    public Word add(Offset w2) {
+        return new Word(this.v + w2.v);
+    }
 
-  public Word sub (Word w2) {
-    return null;
-  }
+    public Word add(Extent w2) {
+        return new Word(this.v + w2.v);
+    }
 
-  public Word sub (Offset w2) {
-    return null;
-  }
+    public Word sub(int w2) {
+        return new Word(this.v - w2);
+    }
 
-  public Word sub (Extent w2) {
-    return null;
-  }
+    public Word sub(Word w2) {
+        return new Word(this.v - w2.v);
+    }
 
-  public boolean isZero() {
-    return false;
-  }
+    public Word sub(Offset w2) {
+        return new Word(this.v - w2.v);
+    }
 
-  public boolean isMax() {
-    return false;
-  }
+    public Word sub(Extent w2) {
+        return new Word(this.v - w2.v);
+    }
 
-  public boolean LT (Word addr2) {
-    return false;
-  }
+    public boolean isZero() {
+        return EQ(zero());
+    }
 
-  public boolean LE (Word w2) {
-    return false;
-  }
+    public boolean isMax() {
+        return EQ(max());
+    }
 
-  public boolean GT (Word w2) {
-    return false;
-  }
+    public boolean LT(Word w2) {
+        if (this.v >= 0 && w2.v >= 0) return (this.v < w2.v);
+        if (this.v < 0 && w2.v < 0) return (this.v < w2.v);
+        if (this.v < 0) return true;
+        return false;
+    }
 
-  public boolean GE (Word w2) {
-    return false;
-  }
+    public boolean LE(Word w2) {
+        return (this.v == w2.v) || LT(w2);
+    }
 
-  public boolean EQ (Word w2) {
-    return false;
-  }
+    public boolean GT(Word w2) {
+        return w2.LT(this);
+    }
 
-  public boolean NE (Word w2) {
-    return false;
-  }
+    public boolean GE(Word w2) {
+        return w2.LE(this);
+    }
 
-  public Word and(Word w2) {
-    return null;
-  }
+    public boolean EQ(Word w2) {
+        return (this.v == w2.v);
+    }
 
-  public Word or(Word w2) {
-    return null;
-  }
+    public boolean NE(Word w2) {
+        return !EQ(w2);
+    }
 
-  public Word not() {
-    return null;
-  }
+    public Word and(Word w2) {
+        return new Word(this.v & w2.v);
+    }
 
-  public Word xor(Word w2) {
-    return null;
-  }
+    public Word or(Word w2) {
+        return new Word(this.v | w2.v);
+    }
 
-  public Word lsh (int amt) {
-    return null;
-  }
+    public Word not() {
+        return new Word(~this.v);
+    }
 
-  public Word rshl (int amt) {
-    return null;
-  }
+    public Word xor(Word w2) {
+        return new Word(this.v ^ w2.v);
+    }
 
-  public Word rsha (int amt) {
-    return null;
-  }
+    public Word lsh(int amt) {
+        return new Word(this.v << amt);
+    }
+
+    public Word rshl(int amt) {
+        return new Word(this.v >>> amt);
+    }
+
+    public Word rsha(int amt) {
+        return new Word(this.v >> amt);
+    }
 
 }
-

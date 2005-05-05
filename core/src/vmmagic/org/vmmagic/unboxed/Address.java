@@ -29,21 +29,31 @@ import org.jnode.vm.VmAddress;
  * @author Daniel Frampton
  */
 public final class Address {
+    
+    final long v;
+    
+    /**
+     * Constructor used during the bootimage creation.
+     * @param v
+     */
+    Address(long v) {
+        this.v = v;
+    }
 
     public static Address fromInt(int address) {
-        return null;
+        return new Address(address);
     }
 
     public static Address fromLong(long address) {
-        return null;
+        return new Address(address);
     }
 
     public static Address fromIntSignExtend(int address) {
-        return null;
+        return new Address(address);
     }
 
     public static Address fromIntZeroExtend(int address) {
-        return null;
+        return new Address(0xFFFFFFFFL & address);
     }
     
     /**
@@ -56,11 +66,11 @@ public final class Address {
     }
 
     public static Address zero() {
-        return null;
+        return new Address(0);
     }
 
     public static Address max() {
-        return null;
+        return new Address(0xFFFFFFFFFFFFFFFFL);
     }
 
     public ObjectReference toObjectReference() {
@@ -72,83 +82,86 @@ public final class Address {
     }
 
     public int toInt() {
-        return 0;
+        return (int)v;
     }
 
     public long toLong() {
-        return 0;
+        return v;
     }
 
     public Word toWord() {
-        return null;
+        return new Word(v);
     }
 
     public Address add(int v) {
-        return null;
+        return new Address(this.v + v);
     }
 
     public Address add(Word offset) {
-        return null;
+        return new Address(this.v + offset.v);
     }
 
     public Address add(Offset offset) {
-        return null;
+        return new Address(this.v + offset.v);
     }
 
     public Address add(Extent extent) {
-        return null;
+        return new Address(this.v + extent.v);
     }
 
-    public Address sub(Word extent) {
-        return null;
+    public Address sub(Word offset) {
+        return new Address(this.v - offset.v);
     }
 
     public Address sub(Extent extent) {
-        return null;
+        return new Address(this.v - extent.v);
     }
 
     public Address sub(Offset offset) {
-        return null;
+        return new Address(this.v - offset.v);
     }
 
     public Address sub(int v) {
-        return null;
+        return new Address(this.v - v);
     }
 
     public Offset diff(Address addr2) {
-        return null;
+        return new Address(this.v - addr2.v).toWord().toOffset();
     }
 
     public boolean isZero() {
-        return false;
+        return EQ(zero());
     }
 
     public boolean isMax() {
-        return false;
+        return EQ(max());
     }
 
     public boolean LT(Address addr2) {
+        if (this.v >= 0 && addr2.v >= 0) return (this.v < addr2.v);
+        if (this.v < 0 && addr2.v < 0) return (this.v < addr2.v);
+        if (this.v < 0) return true;
         return false;
     }
 
     public boolean LE(Address addr2) {
-        return false;
+        return (this.v == addr2.v) || LT(addr2);
     }
 
     public boolean GT(Address addr2) {
-        return false;
+        return addr2.LT(this);
     }
 
     public boolean GE(Address addr2) {
-        return false;
+        return addr2.LE(this);
     }
 
     public boolean EQ(Address addr2) {
-        return false;
+        return (this.v == addr2.v);
     }
 
     public boolean NE(Address addr2) {
-        return false;
+        return !EQ(addr2);
     }
 
     /**

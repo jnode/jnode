@@ -18,10 +18,11 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.mmtk.vm;
 
-import org.mmtk.plan.*;
+import org.jnode.vm.Unsafe;
+import org.mmtk.plan.NoGC;
 
 /**
  * $Id$
@@ -32,7 +33,7 @@ import org.mmtk.plan.*;
  * @version $Revision$
  * @date $Date$
  */
-public class Plan extends SemiSpace {
+public class Plan extends NoGC {
 
     /***************************************************************************
      * Class variables
@@ -49,6 +50,6 @@ public class Plan extends SemiSpace {
      * @return the plan instance for the current processor
      */
     public static Plan getInstance() {
-        return null;
+        return (Plan)Unsafe.getCurrentProcessor().getHeapData();
     }
 }

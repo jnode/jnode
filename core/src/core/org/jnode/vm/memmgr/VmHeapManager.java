@@ -25,6 +25,7 @@ import java.io.PrintStream;
 
 import org.jnode.vm.Unsafe;
 import org.jnode.vm.VmMagic;
+import org.jnode.vm.VmProcessor;
 import org.jnode.vm.VmSystemObject;
 import org.jnode.vm.classmgr.VmArray;
 import org.jnode.vm.classmgr.VmArrayClass;
@@ -299,4 +300,11 @@ public abstract class VmHeapManager extends VmSystemObject {
     public abstract GCStatistics getStatistics();
 
     public abstract HeapStatistics getHeapStatistics();
+    
+    /**
+     * Create a per processor data structure for use by the heap manager.
+     * @param cpu
+     * @return
+     */
+    public abstract Object createProcessorHeapData(VmProcessor cpu);
 }
