@@ -21,6 +21,10 @@
  
 package java.io;
 
+import org.apache.log4j.Logger;
+
+import gnu.java.nio.channels.FileChannelImpl;
+
 /**
  * @author epr
  */
@@ -33,6 +37,8 @@ public enum VMOpenMode {
 	/** Open for reading and writing, file is created if file does not exist */
 	READ_WRITE("rw", true, true);
 
+    private static final Logger log = Logger.getLogger(VMOpenMode.class);
+        
 	private final String mode;
 	private final boolean read;	
 	private final boolean write;	
@@ -41,6 +47,29 @@ public enum VMOpenMode {
 		this.read = read;
 		this.write = write;
 	}
+    
+    public static VMOpenMode valueOf(int mode)
+    {
+        // These are mode values for open().
+        VMOpenMode value = null;
+        
+        switch(mode)
+        {
+        case FileChannelImpl.READ: value = READ; break;
+        case FileChannelImpl.WRITE: value = WRITE; break;
+        case FileChannelImpl.APPEND: value = READ_WRITE; break;
+        
+        //TODO: valueOf for EXCL, SYNC, DSYNC and combination of the 6 values               
+        case FileChannelImpl.EXCL:
+        case FileChannelImpl.SYNC:
+        case FileChannelImpl.DSYNC:        
+        default: value = null; break;        
+        }
+        
+        log.debug("mode="+mode+" VMOpenMode="+value);
+        
+        return value;
+    }
 	
 	public String toString() {
 		return mode;
