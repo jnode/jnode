@@ -25,3 +25,9 @@
 # Uncomment this property if you do not want netboot directory to be build.
 # no.netboot = 1
 
+# -----------------------------------------------
+# Settings for the memory manager
+
+# Uncomment to enable future MMTk based memory manager (does not work yet)
+# jnode.memmgr.plugin.id=org.mmtk
+
