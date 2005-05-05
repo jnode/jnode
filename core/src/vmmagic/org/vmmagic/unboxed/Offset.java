@@ -18,101 +18,111 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.vmmagic.unboxed;
 
 /**
  * To be commented
  *
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author Daniel Frampton
  */
 public final class Offset {
 
-  /**
-   * @deprecated
-   */
-  public static Offset fromInt(int address) {
-    return null;
-  }
-
-  public static Offset fromIntSignExtend(int address) {
-    return null;
-  }
-
-  public static Offset fromIntZeroExtend(int address) {
-    return null;
-  }
-
-  public static Offset zero () {
-    return null;
-  }
-
-  public static Offset max() {
-    return null;
-  }
-
-  public int toInt () {
-    return 0;
-  }
-
-  public long toLong () {
-    return 0L;
-  }
-
-  public Word toWord() {
-    return null;
-  }
-
-  public Offset add (int byteSize) {
-    return null;
-  }
-
-  public Offset add (Word byteSize) {
-      return null;
+    final long v;
+    
+    /**
+     * Constructor used during the bootimage creation.
+     * @param v
+     */
+    Offset(long v) {
+        this.v = v;
+    }
+    
+    /**
+     * @deprecated
+     */
+    public static Offset fromInt(int address) {
+        return new Offset(address);
     }
 
-  public Offset add (Extent byteSize) {
-    return null;
-  }
+    public static Offset fromIntSignExtend(int address) {
+        return new Offset(address);
+    }
 
-  public Offset sub (int byteSize) {
-    return null;
-  }
+    public static Offset fromIntZeroExtend(int address) {
+        return new Offset(0xFFFFFFFFL & address);
+    }
 
-  public Offset sub (Offset off2) {
-    return null;
-  }
+    public static Offset zero() {
+        return new Offset(0);
+    }
 
-  public boolean EQ (Offset off2) {
-    return false;
-  }
+    public static Offset max() {
+        return new Offset(0xFFFFFFFFFFFFFFFFL);
+    }
 
-  public boolean NE (Offset off2) {
-    return false;
-  }
+    public int toInt() {
+        return (int)v;
+    }
 
-  public boolean sLT (Offset off2) {
-    return false;
-  }
+    public long toLong() {
+        return v;
+    }
 
-  public boolean sLE (Offset off2) {
-    return false;
-  }
+    public Word toWord() {
+        return new Word(v);
+    }
 
-  public boolean sGT (Offset off2) {
-    return false;
-  }
+    public Offset add(int byteSize) {
+        return new Offset(this.v + byteSize);
+    }
 
-  public boolean sGE (Offset off2) {
-    return false;
-  }
+    public Offset add(Word byteSize) {
+        return new Offset(this.v + byteSize.v);
+    }
 
-  public boolean isZero() {
-    return false;
-  }
+    public Offset add(Extent byteSize) {
+        return new Offset(this.v + byteSize.v);
+    }
 
-  public boolean isMax() {
-    return false;
-  }
+    public Offset sub(int byteSize) {
+        return new Offset(this.v - byteSize);
+    }
+
+    public Offset sub(Offset off2) {
+        return new Offset(this.v + off2.v);
+    }
+
+    public boolean EQ(Offset off2) {
+        return (this.v == off2.v);
+    }
+
+    public boolean NE(Offset off2) {
+        return (this.v != off2.v);
+    }
+
+    public boolean sLT(Offset off2) {
+        return (this.v < off2.v);
+    }
+
+    public boolean sLE(Offset off2) {
+        return (this.v <= off2.v);
+    }
+
+    public boolean sGT(Offset off2) {
+        return (this.v > off2.v);
+    }
+
+    public boolean sGE(Offset off2) {
+        return (this.v >= off2.v);
+    }
+
+    public boolean isZero() {
+        return EQ(zero());
+    }
+
+    public boolean isMax() {
+        return EQ(max());
+    }
 }
-

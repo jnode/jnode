@@ -28,100 +28,112 @@ package org.vmmagic.unboxed;
  */
 public final class Extent {
 
+    final long v;
+    
+    /**
+     * Constructor used during the bootimage creation.
+     * @param v
+     */
+    Extent(long v) {
+        this.v = v;
+    }
+    
     /**
      * @deprecated
      */
     public static Extent fromInt(int extent) {
-        return null;
+        return new Extent(extent);
     }
 
     public static Extent fromLong(long extent) {
-        return null;
+        return new Extent(extent);
     }
 
     public static Extent fromIntSignExtend(int extent) {
-        return null;
+        return new Extent(extent);
     }
 
     public static Extent fromIntZeroExtend(int extent) {
-    	throw new Error("No magic");
-        //return null;
+        return new Extent(0xFFFFFFFFL & extent);
     }
 
     public static Extent zero() {
-        return null;
+        return new Extent(0);
     }
 
     public static Extent one() {
-        return null;
+        return new Extent(1);
     }
 
     public static Extent max() {
-        return null;
+        return new Extent(0xFFFFFFFFFFFFFFFFL);
     }
     
     public boolean isZero() {
-    	return false;
+    	return EQ(zero());
     }
 
     public int toInt() {
-        return 0;
+        return (int)v;
     }
 
     public long toLong() {
-        return 0L;
+        return v;
     }
 
     public Word toWord() {
-        return null;
+        return new Word(v);
     }
 
     public Extent add(int byteSize) {
-        return null;
+        return new Extent(this.v + byteSize);
     }
 
     public Extent sub(int byteSize) {
-        return null;
+        return new Extent(this.v - byteSize);
     }
 
     public Extent add(Extent byteSize) {
-        return null;
+        return new Extent(this.v + byteSize.v);
     }
 
     public Extent sub(Extent byteSize) {
-        return null;
+        return new Extent(this.v - byteSize.v);
     }
 
     public Extent add(Word byteSize) {
-        return null;
+        return new Extent(this.v + byteSize.v);
     }
 
     public Extent sub(Word byteSize) {
-        return null;
+        return new Extent(this.v - byteSize.v);
     }
 
     public boolean LT(Extent extent2) {
+        if (this.v >= 0 && extent2.v >= 0) return (this.v < extent2.v);
+        if (this.v < 0 && extent2.v < 0) return (this.v < extent2.v);
+        if (this.v < 0) return true;
         return false;
     }
 
     public boolean LE(Extent extent2) {
-        return false;
+        return (this.v == extent2.v) || LT(extent2);
     }
 
     public boolean GT(Extent extent2) {
-        return false;
+        return extent2.LT(this);
     }
 
     public boolean GE(Extent extent2) {
-        return false;
+        return extent2.LE(this);
     }
 
     public boolean EQ(Extent extent2) {
-        return false;
+        return (this.v == extent2.v);
     }
 
     public boolean NE(Extent extent2) {
-        return false;
+        return !EQ(extent2);
     }
 }
 

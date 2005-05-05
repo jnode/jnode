@@ -28,7 +28,7 @@ import org.jnode.vm.VmMagic;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class VMDouble {
+public final class VMDouble {
     private char[] chars;
 
     private int length;

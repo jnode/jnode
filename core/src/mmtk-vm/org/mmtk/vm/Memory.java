@@ -18,149 +18,177 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.mmtk.vm;
 
 import org.mmtk.policy.ImmortalSpace;
-
-
-import org.vmmagic.unboxed.*;
-import org.vmmagic.pragma.*;
+import org.vmmagic.pragma.InlinePragma;
+import org.vmmagic.unboxed.Address;
+import org.vmmagic.unboxed.Extent;
 
 /**
- * $Id$ 
- *
+ * Memory part of the VM interface of MMTk.
+ * 
+ * @author Ewout Prangsma (epr@users.sourceforge.net)
  * @author <a href="http://cs.anu.edu.au/~Steve.Blackburn">Steve Blackburn</a>
  * @author Perry Cheng
- *
- * @version $Revision$
- * @date $Date$
  */
 public class Memory {
 
-  public static Address HEAP_START() { return Address.zero(); }
-  public static Address HEAP_END() { return Address.zero(); }
-  public static Address AVAILABLE_START() { return Address.zero(); }
-  public static Address AVAILABLE_END() { return Address.zero(); }
+    public static Address HEAP_START() {
+        return Address.zero();
+    }
 
+    public static Address HEAP_END() {
+        return Address.zero();
+    }
 
-  /**
-   * Return the space associated with/reserved for the VM.  In the
-   * case of Jikes RVM this is the boot image space.<p>
-   *
-   * The boot image space must be mapped at the start of available
-   * virtual memory, hence we use the constructor that requests the
-   * lowest address in the address space.  The address space awarded
-   * to this space depends on the order in which the request is made.
-   * If this request is not the first request for virtual memory then
-   * the Space allocator will die with an error stating that the
-   * request could not be satisfied.  The remedy is to ensure it is
-   * initialized first.
-   *
-   * @return The space managed by the virtual machine.  In this case,
-   * the boot image space is returned.
-   */
-  public static ImmortalSpace getVMSpace() {
-    return null;
-  }
+    public static Address AVAILABLE_START() {
+        return Address.zero();
+    }
 
-  /**
-   * Global preparation for a collection.
-   */
-  public static void globalPrepareVMSpace() {}
+    public static Address AVAILABLE_END() {
+        return Address.zero();
+    }
 
-  /**
-   * Thread-local preparation for a collection.
-   */
-  public static void localPrepareVMSpace() {}
+    /**
+     * Return the space associated with/reserved for the VM. In the case of
+     * Jikes RVM this is the boot image space.
+     * <p>
+     * The boot image space must be mapped at the start of available virtual
+     * memory, hence we use the constructor that requests the lowest address in
+     * the address space. The address space awarded to this space depends on the
+     * order in which the request is made. If this request is not the first
+     * request for virtual memory then the Space allocator will die with an
+     * error stating that the request could not be satisfied. The remedy is to
+     * ensure it is initialized first.
+     * 
+     * @return The space managed by the virtual machine. In this case, the boot
+     *         image space is returned.
+     */
+    public static ImmortalSpace getVMSpace() {
+        return null;
+    }
 
-  /**
-   * Thread-local post-collection work.
-   */
-  public static void localReleaseVMSpace() {}
+    /**
+     * Global preparation for a collection.
+     */
+    public static void globalPrepareVMSpace() {
+    }
 
-  /**
-   * Global post-collection work.
-   */
-  public static void globalReleaseVMSpace() {}
+    /**
+     * Thread-local preparation for a collection.
+     */
+    public static void localPrepareVMSpace() {
+    }
 
-  /**
-   * Sets the range of addresses associated with a heap.
-   *
-   * @param id the heap identifier
-   * @param start the address of the start of the heap
-   * @param end the address of the end of the heap
-   */
-  public static void setHeapRange(int id, Address start, Address end) {}
+    /**
+     * Thread-local post-collection work.
+     */
+    public static void localReleaseVMSpace() {
+    }
 
- /**
-   * Maps an area of virtual memory.
-   *
-   * @param start the address of the start of the area to be mapped
-   * @param size the size, in bytes, of the area to be mapped
-   * @return 0 if successful, otherwise the system errno
-   */
-  public static int mmap(Address start, int size) {
-    return 0;
-  }
-  
-  /**
-   * Protects access to an area of virtual memory.
-   *
-   * @param start the address of the start of the area to be mapped
-   * @param size the size, in bytes, of the area to be mapped
-   * @return <code>true</code> if successful, otherwise
-   * <code>false</code>
-   */
-  public static boolean mprotect(Address start, int size) {
-    return false;
-  }
+    /**
+     * Global post-collection work.
+     */
+    public static void globalReleaseVMSpace() {
+    }
 
-  /**
-   * Allows access to an area of virtual memory.
-   *
-   * @param start the address of the start of the area to be mapped
-   * @param size the size, in bytes, of the area to be mapped
-   * @return <code>true</code> if successful, otherwise
-   * <code>false</code>
-   */
-  public static boolean munprotect(Address start, int size) {
-    return false;
-  }
+    /**
+     * Sets the range of addresses associated with a heap.
+     * 
+     * @param id
+     *            the heap identifier
+     * @param start
+     *            the address of the start of the heap
+     * @param end
+     *            the address of the end of the heap
+     */
+    public static void setHeapRange(int id, Address start, Address end) {
+    }
 
-  /**
-   * Zero a region of memory.
-   * @param start Start of address range (inclusive)
-   * @param len Length in bytes of range to zero
-   * Returned: nothing
-   */
-  public static void zero(Address start, Extent len) {}
+    /**
+     * Maps an area of virtual memory.
+     * 
+     * @param start
+     *            the address of the start of the area to be mapped
+     * @param size
+     *            the size, in bytes, of the area to be mapped
+     * @return 0 if successful, otherwise the system errno
+     */
+    public static int mmap(Address start, int size) {
+        return 0;
+    }
 
-  /**
-   * Zero a range of pages of memory.
-   * @param start Start of address range (must be a page address)
-   * @param len Length in bytes of range (must be multiple of page size)
-   */
-  public static void zeroPages(Address start, int len) {}
+    /**
+     * Protects access to an area of virtual memory.
+     * 
+     * @param start
+     *            the address of the start of the area to be mapped
+     * @param size
+     *            the size, in bytes, of the area to be mapped
+     * @return <code>true</code> if successful, otherwise <code>false</code>
+     */
+    public static boolean mprotect(Address start, int size) {
+        return false;
+    }
 
-  /**
-   * Logs the contents of an address and the surrounding memory to the
-   * error output.
-   *
-   * @param start the address of the memory to be dumped
-   * @param beforeBytes the number of bytes before the address to be
-   * included
-   * @param afterBytes the number of bytes after the address to be
-   * included
-   */
-  public static void dumpMemory(Address start, int beforeBytes,
-                                int afterBytes) {}
+    /**
+     * Allows access to an area of virtual memory.
+     * 
+     * @param start
+     *            the address of the start of the area to be mapped
+     * @param size
+     *            the size, in bytes, of the area to be mapped
+     * @return <code>true</code> if successful, otherwise <code>false</code>
+     */
+    public static boolean munprotect(Address start, int size) {
+        return false;
+    }
 
-  /*
-   * Utilities from the VM class
-   */
+    /**
+     * Zero a region of memory.
+     * 
+     * @param start
+     *            Start of address range (inclusive)
+     * @param len
+     *            Length in bytes of range to zero Returned: nothing
+     */
+    public static void zero(Address start, Extent len) {
+    }
 
-  public static void sync() throws InlinePragma {}
+    /**
+     * Zero a range of pages of memory.
+     * 
+     * @param start
+     *            Start of address range (must be a page address)
+     * @param len
+     *            Length in bytes of range (must be multiple of page size)
+     */
+    public static void zeroPages(Address start, int len) {
+    }
 
-  public static void isync() throws InlinePragma {}
+    /**
+     * Logs the contents of an address and the surrounding memory to the error
+     * output.
+     * 
+     * @param start
+     *            the address of the memory to be dumped
+     * @param beforeBytes
+     *            the number of bytes before the address to be included
+     * @param afterBytes
+     *            the number of bytes after the address to be included
+     */
+    public static void dumpMemory(Address start, int beforeBytes, int afterBytes) {
+    }
+
+    /*
+     * Utilities from the VM class
+     */
+
+    public static void sync() throws InlinePragma {
+    }
+
+    public static void isync() throws InlinePragma {
+    }
 }
