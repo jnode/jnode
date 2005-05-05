@@ -108,6 +108,8 @@
       <export name="javax.security.auth.x500.*"/>
 
       <export name="org.xml.sax.*"/>
+      
+      <export name="org.jnode.java.io.*"/>
     </library>
   </runtime>
 
