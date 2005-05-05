@@ -21,11 +21,12 @@
  
 package org.jnode.fs.service.def;
 
-import java.io.VMFileHandle;
 import java.io.IOException;
 import java.io.VMOpenMode;
+import java.nio.MappedByteBuffer;
 
 import org.jnode.fs.FSFile;
+import org.jnode.java.io.VMFileHandle;
 
 /**
  * @author epr
@@ -126,12 +127,21 @@ final class FileHandleImpl implements VMFileHandle {
 	 * @param len
 	 * @throws IOException
 	 */
-	public synchronized void read(byte[] dest, int off, int len) throws IOException {
+	public synchronized int read(byte[] dest, int off, int len) throws IOException {
 		if (closed) {
 			throw new IOException("File closed");
 		}
-		file.read(fileOffset, dest, off, len);
-		fileOffset += len;
+        int avail = available();
+        if(avail < 1)
+        {
+            return -1; // eof
+        }
+        
+        int nbRead = Math.min(len, avail);
+		file.read(fileOffset, dest, off, nbRead);
+		fileOffset += nbRead;
+        
+        return nbRead;
 	}
 
 	/**
@@ -201,5 +211,49 @@ final class FileHandleImpl implements VMFileHandle {
 	public boolean isReadOnly() {
 		return readOnly;
 	}
+
+    public int available()
+    {
+        long avail = Math.max(0L, file.getLength() - fileOffset);
+        return (avail > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) avail;
+    }
+
+    public void unlock(long pos, long len)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public int read() throws IOException
+    {
+        // TODO very inefficient, use ByteBuffer
+        byte[] dest = new byte[1];
+        int nbRead = -1;
+        nbRead = read(dest, 0, 1);
+        if(nbRead < 1)
+        {
+            return -1; // eof
+        }
+        
+        return dest[0];
+    }
+
+    public void write(int b) throws IOException
+    {
+        // TODO very inefficient, use ByteBuffer
+        write(new byte[]{(byte) b}, 0, 1);
+    }
+
+    public boolean lock()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public MappedByteBuffer mapImpl(char mode, long position, int size)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }
