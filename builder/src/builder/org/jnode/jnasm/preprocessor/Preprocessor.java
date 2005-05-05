@@ -23,6 +23,11 @@ package org.jnode.jnasm.preprocessor;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.io.InputStream;
@@ -95,6 +100,9 @@ public abstract class Preprocessor {
 
     public void print(Writer w){
         try{
+            StringWriter sw = new StringWriter();
+            jnasmppInput(new PrintWriter(sw));
+            ReInit(new StringReader(sw.toString()));
             jnasmppInput(new PrintWriter(w));
         } catch (Exception pe){
             pe.printStackTrace();
@@ -103,4 +111,6 @@ public abstract class Preprocessor {
     }
 
     public abstract void jnasmppInput(PrintWriter pw) throws Exception ;
+    public abstract void ReInit(InputStream stream);
+    public abstract void ReInit(Reader stream);
 }
