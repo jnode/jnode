@@ -22,6 +22,7 @@
 package org.jnode.java.io;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 
 
@@ -69,8 +70,11 @@ public interface VMFileHandle {
      * @return
 	 * @throws IOException
 	 */	
-	public int read(byte[] dest, int off, int len)
-	throws IOException;
+//	public int read(byte[] dest, int off, int len)
+//	throws IOException;
+      public int read(ByteBuffer dest)
+      throws IOException;
+    
 	
 	/**
 	 * Write <code>len</code> bytes to the given position. 
@@ -81,7 +85,8 @@ public interface VMFileHandle {
 	 * @param len
 	 * @throws IOException
 	 */	
-	public void write(byte[] src, int off, int len)
+	//public void write(byte[] src, int off, int len)
+    public void write(ByteBuffer src)
 	throws IOException;
 
 	/**

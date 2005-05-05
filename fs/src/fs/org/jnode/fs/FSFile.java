@@ -22,6 +22,7 @@
 package org.jnode.fs;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 /**
  * A FSFile is a representation of a single block of bytes on a filesystem.
@@ -59,8 +60,10 @@ public interface FSFile extends FSObject {
 	 * @param len
 	 * @throws IOException
 	 */	
-	public void read(long fileOffset, byte[] dest, int off, int len)
-	throws IOException;
+//	public void read(long fileOffset, byte[] dest, int off, int len)
+//	throws IOException;
+      public void read(long fileOffset, ByteBuffer dest)
+      throws IOException;
 	
 	/**
 	 * Write <code>len</code> bytes to the given position. 
@@ -72,7 +75,8 @@ public interface FSFile extends FSObject {
 	 * @param len
 	 * @throws IOException
 	 */	
-	public void write(long fileOffset, byte[] src, int off, int len)
+	//public void write(long fileOffset, byte[] src, int off, int len)
+    public void write(long fileOffset, ByteBuffer src)
 	throws IOException;
 	
 	/**

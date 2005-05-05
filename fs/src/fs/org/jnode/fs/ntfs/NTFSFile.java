@@ -22,6 +22,7 @@
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
@@ -64,8 +65,13 @@ public class NTFSFile implements FSFile {
      * 
      * @see org.jnode.fs.FSFile#read(long, byte[], int, int)
      */
-    public void read(long fileOffset, byte[] dest, int off, int len)
+    //public void read(long fileOffset, byte[] dest, int off, int len)
+    public void read(long fileOffset, ByteBuffer destBuf)    
             throws IOException {
+        //TODO optimize it also to use ByteBuffer at lower level
+        final int off = destBuf.position();        
+        final int len = destBuf.remaining();
+        final byte[] dest = destBuf.array();
         getFileRecord().readData(fileOffset, dest, off, len);
     }
 
@@ -74,7 +80,8 @@ public class NTFSFile implements FSFile {
      * 
      * @see org.jnode.fs.FSFile#write(long, byte[], int, int)
      */
-    public void write(long fileOffset, byte[] src, int off, int len) {
+    //public void write(long fileOffset, byte[] src, int off, int len) {
+    public void write(long fileOffset, ByteBuffer src) {
         // TODO Auto-generated method stub
 
     }

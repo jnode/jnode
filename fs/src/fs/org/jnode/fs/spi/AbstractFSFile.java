@@ -21,6 +21,7 @@
  
 package org.jnode.fs.spi;
 
+import java.nio.ByteBuffer;
 import java.io.IOException;
 
 import org.jnode.fs.FSFile;
@@ -52,13 +53,15 @@ public abstract class AbstractFSFile extends AbstractFSObject
 	/**
 	 * Read some data from the file
 	 */
-	public abstract void read(long fileOffset, byte[] dest, int off, int len)
+	//public abstract void read(long fileOffset, byte[] dest, int off, int len)
+    public abstract void read(long fileOffset, ByteBuffer dest)
 			throws IOException;
 
 	/**
 	 * Write some data to the file
 	 */
-	public abstract void write(long fileOffset, byte[] src, int off, int len)
+//  public abstract void write(long fileOffset, byte[] src, int off, int len)
+	public abstract void write(long fileOffset, ByteBuffer src)
 			throws IOException;
 
 	/**

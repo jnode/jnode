@@ -22,6 +22,7 @@
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
@@ -269,17 +270,26 @@ public class Ext2Directory extends AbstractFSDirectory {
                     log.debug("Remaining length: " + remainingLength);
                     if (remainingLength >= dr.getRecLen()) {
                         //write back the last record truncated
-                        dir.write(lastPos, rec.getData(), rec.getOffset(), rec
+                        //TODO optimize it also to use ByteBuffer at lower level
+                        ByteBuffer buf = ByteBuffer.wrap(rec.getData(), rec.getOffset(), rec
                                 .getRecLen());
+                        dir.write(lastPos, buf);
+//                        dir.write(lastPos, rec.getData(), rec.getOffset(), rec
+//                                .getRecLen());
 
                         //pad the end of the new record with zeroes
                         dr.expandRecord(lastPos + rec.getRecLen(), lastPos
                                 + rec.getRecLen() + remainingLength);
+                        
                         //append the new record at the end of the list
-                        dir.write(lastPos + rec.getRecLen(), dr.getData(), dr
+                        //TODO optimize it also to use ByteBuffer at lower level
+                        buf = ByteBuffer.wrap(dr.getData(), dr
                                 .getOffset(), dr.getRecLen());
-                        log
-                                .debug("addDirectoryRecord(): LAST   record: begins at: "
+                        dir.write(lastPos + rec.getRecLen(), buf);
+//                        dir.write(lastPos + rec.getRecLen(), dr.getData(), dr
+//                                .getOffset(), dr.getRecLen());
+                        
+                        log.debug("addDirectoryRecord(): LAST   record: begins at: "
                                         + (rec.getFileOffset() + rec
                                                 .getRecLen())
                                         + ", length: "
@@ -292,8 +302,12 @@ public class Ext2Directory extends AbstractFSDirectory {
                         dr.expandRecord(lastPos + lastLen, lastPos + lastLen
                                 + fs.getBlockSize());
 
-                        dir.write(lastPos + lastLen, dr.getData(), dr
-                                .getOffset(), dr.getRecLen());
+                        //TODO optimize it also to use ByteBuffer at lower level
+                        ByteBuffer buf = ByteBuffer.wrap(dr.getData(), 
+                                dr.getOffset(), dr.getRecLen());
+                        dir.write(lastPos + lastLen, buf);
+//                        dir.write(lastPos + lastLen, dr.getData(), dr
+//                                .getOffset(), dr.getRecLen());
                         log
                                 .debug("addDirectoryRecord(): LAST   record: begins at: "
                                         + (lastPos + lastLen)
@@ -303,7 +317,10 @@ public class Ext2Directory extends AbstractFSDirectory {
                 } else { //rec==null, ie. this is the first record in the
                          // directory
                     dr.expandRecord(0, fs.getBlockSize());
-                    dir.write(0, dr.getData(), dr.getOffset(), dr.getRecLen());
+                    //TODO optimize it also to use ByteBuffer at lower level
+                    ByteBuffer buf = ByteBuffer.wrap(dr.getData(), dr.getOffset(), dr.getRecLen());
+                    dir.write(0, buf);
+                    //dir.write(0, dr.getData(), dr.getOffset(), dr.getRecLen());
                     log
                             .debug("addDirectoryRecord(): LAST   record: begins at: 0, length: "
                                     + dr.getRecLen());
@@ -346,7 +363,7 @@ public class Ext2Directory extends AbstractFSDirectory {
     }
 
     class Ext2FSEntryIterator implements org.jnode.fs.FSEntryIterator {
-        byte data[];
+        ByteBuffer data;
 
         int index;
 
@@ -356,8 +373,12 @@ public class Ext2Directory extends AbstractFSDirectory {
             //read itself as a file
             Ext2File directoryFile = new Ext2File(iNode);
             //read the whole directory
-            data = new byte[(int) directoryFile.getLength()];
-            directoryFile.read(0, data, 0, (int) directoryFile.getLength());
+            
+            data = ByteBuffer.allocate((int) directoryFile.getLength());            
+            directoryFile.read(0, data);
+            //data = new byte[(int) directoryFile.getLength()];            
+            //directoryFile.read(0, data, 0, (int) directoryFile.getLength());
+            
             index = 0;
         }
 
@@ -369,7 +390,8 @@ public class Ext2Directory extends AbstractFSDirectory {
                     if (index >= iNode.getSize())
                         return false;
 
-                    dr = new Ext2DirectoryRecord(fs, data, index, index);
+                    //TODO optimize it also to use ByteBuffer at lower level            
+                    dr = new Ext2DirectoryRecord(fs, data.array(), index, index);
                     index += dr.getRecLen();
                 } while (dr.getINodeNr() == 0); //inode nr=0 means the entry is
                                                 // unused

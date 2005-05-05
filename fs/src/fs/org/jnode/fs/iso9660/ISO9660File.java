@@ -22,6 +22,7 @@
 package org.jnode.fs.iso9660;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
@@ -58,15 +59,21 @@ public class ISO9660File implements FSFile {
     /**
      * @see org.jnode.fs.FSFile#read(long, byte[], int, int)
      */
-    public void read(long fileOffset, byte[] dest, int off, int len)
+//    public void read(long fileOffset, byte[] dest, int off, int len)
+    public void read(long fileOffset, ByteBuffer destBuf)    
             throws IOException {
+        //TODO optimize it also to use ByteBuffer at lower level
+        final int len = destBuf.remaining();
+        final int off = destBuf.position();
+        final byte[] dest = destBuf.array();
         this.entry.getCDFSentry().readFileData(fileOffset, dest, off, len);
     }
 
     /**
      * @see org.jnode.fs.FSFile#write(long, byte[], int, int)
      */
-    public void write(long fileOffset, byte[] src, int off, int len)
+    //public void write(long fileOffset, byte[] src, int off, int len)
+    public void write(long fileOffset, ByteBuffer src)
             throws IOException {
         throw new UnsupportedOperationException("Not yet implemented");
     }

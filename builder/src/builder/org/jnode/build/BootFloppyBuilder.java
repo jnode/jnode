@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 import org.apache.tools.ant.DirectoryScanner;
@@ -251,14 +252,16 @@ public class BootFloppyBuilder extends Task {
          * 1024) + "Kb");
          */
 
-        final byte[] buf = new byte[ (int) size];
+        //final byte[] buf = new byte[ (int) size];
+        final ByteBuffer buf = ByteBuffer.allocate((int) size);
         InputStream is = new FileInputStream(src);
-        FileUtils.copy(is, buf);
+        FileUtils.copy(is, buf.array());
         is.close();
 
         final FSFile fh = dir.addFile(fname).getFile();
         fh.setLength(size);
-        fh.write(0, buf, 0, buf.length);
+        //fh.write(0, buf, 0, buf.length);
+        fh.write(0, buf);
 
         log("Added " + src + " as " + fname + " size " + (size / 1024) + "Kb");
     }

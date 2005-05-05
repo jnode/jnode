@@ -21,6 +21,8 @@
  
 package org.jnode.test.fs.filesystem.tests;
 
+import java.nio.ByteBuffer;
+
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.ReadOnlyFileSystemException;
@@ -49,7 +51,7 @@ public class FileFSTest extends AbstractFSTest {
 		
 		FSDirectory rootDir = getFs().getRootEntry().getDirectory();
 		FSFile file = null;
-		byte[] data = TestUtils.getTestData(FILE_SIZE_IN_WORDS);
+		ByteBuffer data = ByteBuffer.wrap(TestUtils.getTestData(FILE_SIZE_IN_WORDS));
 				
 		if(isReadOnly())
 		{
@@ -66,10 +68,10 @@ public class FileFSTest extends AbstractFSTest {
 		else
 		{
 			file = rootDir.addFile(fileName).getFile();			
-			file.write(0, data, 0, data.length);
+			file.write(0, data);
 			file.flush();
 			
-			assertEquals("bad file.length after write", data.length, file.getLength());			
+			assertEquals("bad file.length after write", data.capacity(), file.getLength());			
 		}
 				
 		remountFS();
@@ -79,13 +81,13 @@ public class FileFSTest extends AbstractFSTest {
 			FSDirectory rootDir2 = getFs().getRootEntry().getDirectory();
 			FSFile file2 = rootDir2.getEntry(fileName).getFile();
 			assertNotNull("file not saved", file2);
-			assertEquals("bad file.length after remount", data.length, file2.getLength());			
+			assertEquals("bad file.length after remount", data.capacity(), file2.getLength());			
 			
-			byte[] data2 = new byte[data.length];
-			log.debug(getFs().getClass().getName()+ ": buffer after alloc\n"+FSUtils.toString(data2, 0, 512));
-			file2.read(0, data2, 0, data2.length);
-			log.debug(getFs().getClass().getName()+ ": buffer after read\n"+FSUtils.toString(data2, 0, 512));
-			assertTrue("read and written data are differents", TestUtils.equals(data, data2));
+			ByteBuffer data2 = ByteBuffer.allocate(data.capacity());
+			log.debug(getFs().getClass().getName()+ ": buffer after alloc\n"+FSUtils.toString(data2.array(), 0, 512));
+			file2.read(0, data2);
+			log.debug(getFs().getClass().getName()+ ": buffer after read\n"+FSUtils.toString(data2.array(), 0, 512));
+			assertTrue("read and written data are differents", TestUtils.equals(data.array(), data2.array()));
 		}
 	}
 	
@@ -95,7 +97,7 @@ public class FileFSTest extends AbstractFSTest {
 		{
 			final String fileName = "RWTest";
 
-			byte[] data = addTestFile(fileName, FILE_SIZE_IN_WORDS);
+			 ByteBuffer data = ByteBuffer.wrap(addTestFile(fileName, FILE_SIZE_IN_WORDS));
 			
 			// re-get the entry to our test file
 			FSDirectory rootDir2 = getFs().getRootEntry().getDirectory();
@@ -104,7 +106,7 @@ public class FileFSTest extends AbstractFSTest {
 			// In readOnly mode, writing to our file must fail
 			try
 			{
-				file2.write(0, data, 0, data.length);				
+				file2.write(0, data);				
 				fail("write must throw ReadOnlyFileSystemException in readOnly mode");
 			}
 			catch(ReadOnlyFileSystemException rofse)

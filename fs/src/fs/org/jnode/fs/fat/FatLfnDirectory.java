@@ -23,6 +23,7 @@ package org.jnode.fs.fat;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
@@ -92,10 +93,16 @@ public class FatLfnDirectory extends FatDirectory {
 		realEntry.setFlags(FatConstants.F_DIRECTORY);
 		final FatFile file = realEntry.getFatFile();
 		file.setLength(clusterSize);
-		final byte[] buf = new byte[clusterSize];
+        
+        //TODO optimize it also to use ByteBuffer at lower level                
+		//final byte[] buf = new byte[clusterSize];
+        final ByteBuffer buf = ByteBuffer.allocate(clusterSize);
+        
 		// Clean the contents of this cluster to avoid reading strange data
 		// in the directory.
-		file.write(0, buf, 0, buf.length);
+		//file.write(0, buf, 0, buf.length);
+        file.write(0, buf);
+        
 		file.getDirectory().initialize(file.getStartCluster(), parentCluster);
 
 		LfnEntry entry = new LfnEntry(this, realEntry, name);

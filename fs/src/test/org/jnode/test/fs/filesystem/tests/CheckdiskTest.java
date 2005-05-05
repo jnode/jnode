@@ -22,6 +22,7 @@
 package org.jnode.test.fs.filesystem.tests;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSFile;
@@ -108,8 +109,8 @@ public class CheckdiskTest {
 	public static FSFile createFile(FSDirectory parent, String file) throws IOException
 	{
 		FSFile f = parent.addFile(file).getFile();
-		byte[] data = TestUtils.getTestData(FILE_SIZE_IN_WORDS);
-		f.write(0, data, 0, data.length);
+		ByteBuffer data = ByteBuffer.wrap(TestUtils.getTestData(FILE_SIZE_IN_WORDS));
+		f.write(0, data);
 		f.flush();
 		return f;
 	}

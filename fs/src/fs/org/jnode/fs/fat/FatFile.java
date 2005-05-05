@@ -22,6 +22,7 @@
 package org.jnode.fs.fat;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.fs.FSFile;
@@ -52,8 +53,14 @@ public class FatFile extends FatObject implements FSFile {
 		this.isDir = isDir;
 	}
 	
-	public synchronized void read(long fileOffset, byte[] dest, int destOfs, int len) throws IOException {
-		
+//	public synchronized void read(long fileOffset, byte[] dest, int destOfs, int len) throws IOException {
+    public synchronized void read(long fileOffset, ByteBuffer destBuf) throws IOException {
+        int len = destBuf.remaining();
+        int destOfs = destBuf.position();
+        
+        //TODO optimize it also to use ByteBuffer at lower level             
+        final byte[] dest = destBuf.array();
+        
 		final long max = (isDir) ? getLengthOnDisk() : getLength();
 		if (fileOffset + len > max) {
 			throw new IOException("Cannot read beyond the EOF");
@@ -80,10 +87,13 @@ public class FatFile extends FatObject implements FSFile {
 			destOfs += size;
 			chainIdx++;
 		}	
-	}
+    }
 
-	public synchronized void write(long fileOffset, byte[] src, int srcOfs, int len) throws IOException {
-
+	//public synchronized void write(long fileOffset, byte[] src, int srcOfs, int len) throws IOException {
+    public synchronized void write(long fileOffset, ByteBuffer src) throws IOException {    
+        int len = src.remaining();
+        int srcOfs = src.position();
+        
 		if(getFileSystem().isReadOnly())
 		{
 			throw new ReadOnlyFileSystemException("write in readonly filesystem");
@@ -106,7 +116,9 @@ public class FatFile extends FatObject implements FSFile {
 		if (fileOffset % clusterSize != 0) {
 			int clusOfs = (int)(fileOffset % clusterSize);
 			int size = Math.min(len, (int)(clusterSize - (fileOffset % clusterSize) - 1));
-			api.write(getDevOffset(chain[chainIdx], clusOfs), src, srcOfs, size);
+            //TODO optimize it also to use ByteBuffer at lower level
+            api.write(getDevOffset(chain[chainIdx], clusOfs), src.array(), srcOfs, size);
+//			api.write(getDevOffset(chain[chainIdx], clusOfs), src, srcOfs, size);
 			fileOffset += size;
 			len -= size;
 			srcOfs += size;
@@ -114,7 +126,9 @@ public class FatFile extends FatObject implements FSFile {
 		}
 		while (len > 0) {
 			int size = Math.min(clusterSize, len);
-			api.write(getDevOffset(chain[chainIdx], 0), src, srcOfs, size);
+            //TODO optimize it also to use ByteBuffer at lower level
+            api.write(getDevOffset(chain[chainIdx], 0), src.array(), srcOfs, size);
+//			api.write(getDevOffset(chain[chainIdx], 0), src, srcOfs, size);
 			len -= size;
 			srcOfs += size;
 			chainIdx++;
