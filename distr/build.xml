@@ -35,7 +35,7 @@
 	  <src path="${my-src.dir}/apps"/>
 	  <src path="${my-src.dir}/install"/>
     <classpath refid="my-cp"/>
-    <compilerarg value="-Xlint:unchecked"/>
+    <compilerarg value="${compilerarg}"/>
     </javac>
   </target>
 
