@@ -26,6 +26,7 @@ import java.nio.ByteBuffer;
 
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
+import org.jnode.util.ByteBufferUtils;
 
 /**
  * @author Chira
@@ -65,8 +66,10 @@ public class ISO9660File implements FSFile {
         //TODO optimize it also to use ByteBuffer at lower level
         final int len = destBuf.remaining();
         final int off = destBuf.position();
-        final byte[] dest = destBuf.array();
+        final ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
+        final byte[] dest = destBA.toArray();
         this.entry.getCDFSentry().readFileData(fileOffset, dest, off, len);
+        destBA.refreshByteBuffer();
     }
 
     /**

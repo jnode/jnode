@@ -26,6 +26,7 @@ import java.nio.ByteBuffer;
 
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
+import org.jnode.util.ByteBufferUtils;
 
 /**
  * @author vali
@@ -71,8 +72,10 @@ public class NTFSFile implements FSFile {
         //TODO optimize it also to use ByteBuffer at lower level
         final int off = destBuf.position();        
         final int len = destBuf.remaining();
-        final byte[] dest = destBuf.array();
+        final ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
+        final byte[] dest = destBA.toArray();
         getFileRecord().readData(fileOffset, dest, off, len);
+        destBA.refreshByteBuffer();
     }
 
     /*

@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.ReadOnlyFileSystemException;
 import org.jnode.fs.spi.AbstractFSFile;
+import org.jnode.util.ByteBufferUtils;
 
 /**
  * @author Andras Nagy
@@ -172,10 +173,13 @@ public class Ext2File extends AbstractFSFile {
      * @see org.jnode.fs.FSFile#read(long, byte[], int, int)
      */
     //public void read(long fileOffset, byte[] dest, int off, int len)
-    public void read(long fileOffset, ByteBuffer dest)    
+    public void read(long fileOffset, ByteBuffer destBuf)    
             throws IOException {        
-        final int len = dest.remaining();
-        final int off = dest.position();
+        final int len = destBuf.remaining();
+        final int off = destBuf.position();
+        //TODO optimize it also to use ByteBuffer at lower level 
+        final ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
+        final byte[] dest = destBA.toArray();
         
         //synchronize to the inode cache to make sure that the inode does not
         // get
@@ -215,16 +219,12 @@ public class Ext2File extends AbstractFSFile {
                     log.debug("blockNr: "+blockNr+", blockOffset: "+blockOffset+
                     		  ", copyLength: "+copyLength+", bytesRead: "+bytesRead);
 
-                    //TODO optimize it also to use ByteBuffer at lower level 
-                    dest.put(iNode.getDataBlock(blockNr), (int) blockOffset,
+                    System.arraycopy(iNode.getDataBlock(blockNr),
+                            (int) blockOffset, dest, off + (int) bytesRead,
                             (int) copyLength);
-//                    System.arraycopy(iNode.getDataBlock(blockNr),
-//                            (int) blockOffset, dest, off + (int) bytesRead,
-//                            (int) copyLength);
                     
                     bytesRead += copyLength;
                 }
-                return;
             } catch (Throwable ex) {
                 final IOException ioe = new IOException();
                 ioe.initCause(ex);
@@ -234,6 +234,8 @@ public class Ext2File extends AbstractFSFile {
                 iNode.decLocked();                
             }
         }
+        
+        destBA.refreshByteBuffer();        
     }
 
     /**
@@ -244,10 +246,12 @@ public class Ext2File extends AbstractFSFile {
      * @see org.jnode.fs.FSFile#write(long, byte[], int, int)
      */
     //public void write(long fileOffset, byte[] src, int off, int len)
-    public void write(long fileOffset, ByteBuffer src)
+    public void write(long fileOffset, ByteBuffer srcBuf)
             throws IOException {
-        final int len = src.remaining();
-        final int off = src.position();
+        final int len = srcBuf.remaining();
+        final int off = srcBuf.position();
+        //TODO optimize it also to use ByteBuffer at lower level                 
+        final byte[] src = ByteBufferUtils.toArray(srcBuf);
         
 		if(getFileSystem().isReadOnly())
 		{
@@ -284,9 +288,9 @@ public class Ext2File extends AbstractFSFile {
                             "Can't write beyond the end of the file! (fileOffset: "
                                     + fileOffset + ", getLength()"
                                     + getLength());
-//                if (off + len > src.length)
-//                    throw new IOException(
-//                            "src is shorter than what you want to write");
+                if (off + len > src.length)
+                    throw new IOException(
+                            "src is shorter than what you want to write");
 
                 log.debug("write(fileOffset=" + fileOffset + ", src, off, len="
                         + len + ")");
@@ -312,12 +316,8 @@ public class Ext2File extends AbstractFSFile {
                     else
                         dest = new byte[(int) blockSize];
 
-                    //TODO optimize it: avoid the call to position
-                    src.position((int) (off + bytesWritten));
-                    //TODO optimize it also to use ByteBuffer at lower level
-                    src.get(dest, (int) blockOffset, (int) copyLength);
-//                    System.arraycopy(src, (int) (off + bytesWritten), dest,
-//                            (int) blockOffset, (int) copyLength);
+                    System.arraycopy(src, (int) (off + bytesWritten), dest,
+                            (int) blockOffset, (int) copyLength);
 
                     //allocate a new block if needed
                     if (blockIndex >= blocksAllocated) {

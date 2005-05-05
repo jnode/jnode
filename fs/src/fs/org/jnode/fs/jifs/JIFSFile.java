@@ -31,6 +31,7 @@ import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSEntryIterator;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
+import org.jnode.util.ByteBufferUtils;
 
 
 
@@ -100,7 +101,8 @@ public class JIFSFile implements ExtFSEntry, FSFile {
         //TODO optimize it also to use ByteBuffer at lower level
         final int off = destBuf.position();        
         final int len = destBuf.remaining();
-        final byte[] dest = destBuf.array();
+        final ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
+        final byte[] dest = destBA.toArray();
         
 		refresh();
 		byte[] readdata;
@@ -111,6 +113,8 @@ public class JIFSFile implements ExtFSEntry, FSFile {
 				int foff = (int)(fileOffset+i);
 				dest[doff] = readdata[foff];
 			}
+        
+        destBA.refreshByteBuffer();        
 	}
 	
 	//public void write(long fileOffset, byte[] src, int off, int len) throws IOException{
