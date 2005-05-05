@@ -24,7 +24,6 @@ package org.jnode.fs.service.def;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.VMFileHandle;
 import java.io.VMFileSystemAPI;
 import java.io.VMOpenMode;
 import java.util.ArrayList;
@@ -35,6 +34,7 @@ import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSEntryIterator;
 import org.jnode.fs.FileSystem;
+import org.jnode.java.io.VMFileHandle;
 
 /**
  * @modif add mkDir mkFile Yves Galante (yves.galante@jmob.net) 01.04.2004
