@@ -38,12 +38,14 @@ exception statement from your version. */
 
 package gnu.java.nio.channels;
 
-import gnu.classpath.Configuration;
 import gnu.java.nio.FileLockImpl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.VMFile;
+import java.io.VMIOUtils;
+import java.io.VMOpenMode;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.ClosedChannelException;
@@ -53,6 +55,8 @@ import java.nio.channels.NonReadableChannelException;
 import java.nio.channels.NonWritableChannelException;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+
+import org.jnode.java.io.VMFileHandle;
 
 /**
  * This file is not user visible !
@@ -73,27 +77,12 @@ public final class FileChannelImpl extends FileChannel
   public static final int SYNC   = 16;
   public static final int DSYNC  = 32;
 
-  private static native void init();
-
-  static
-  {
-    if (Configuration.INIT_LOAD_LIBRARY)
-      {
-        System.loadLibrary("javanio");
-      }
-    
-    init();
-  }
-
-  /**
-   * This is the actual native file descriptor value
-   */
   // System's notion of file descriptor.  It might seem redundant to
   // initialize this given that it is reassigned in the constructors.
   // However, this is necessary because if open() throws an exception
   // we want to make sure this has the value -1.  This is the most
   // efficient way to accomplish that.
-  private int fd = -1;
+  private VMFileHandle fh;  
 
   private int mode;
 
@@ -105,7 +94,7 @@ public final class FileChannelImpl extends FileChannel
   public FileChannelImpl (File file, int mode) throws FileNotFoundException
   {
     final String path = file.getPath();
-    fd = open (path, mode);
+    fh = open (path, mode);
     this.mode = mode;
 
     // First open the file and then check if it is a a directory
@@ -125,29 +114,58 @@ public final class FileChannelImpl extends FileChannel
       }
   }
 
-  /* Used by init() (native code) */
-  FileChannelImpl (int fd, int mode)
-  {
-    this.fd = fd;
-    this.mode = mode;
-  }
-
   public static FileChannelImpl in;
   public static FileChannelImpl out;
   public static FileChannelImpl err;
 
-  private native int open (String path, int mode) throws FileNotFoundException;
+  private VMFileHandle open (String path, int mode) throws FileNotFoundException
+  {
+    try
+    {
+        return VMIOUtils.getAPI().open(VMFile.getNormalizedPath(path), VMOpenMode.valueOf(mode));
+    }
+    catch (IOException e)
+    {
+        FileNotFoundException fnf = new FileNotFoundException("can't find "+path);
+        fnf.initCause(e);
+        throw fnf;
+    }
+  }
 
-  public native int available () throws IOException;
-  private native long implPosition () throws IOException;
-  private native void seek (long newPosition) throws IOException;
-  private native void implTruncate (long size) throws IOException;
+  public int available () throws IOException
+  {
+      return fh.available();      
+  }
   
-  public native void unlock (long pos, long len) throws IOException;
+  private long implPosition () throws IOException
+  {      
+      return fh.getPosition();      
+  }
+  
+  private void seek (long newPosition) throws IOException
+  {
+      fh.setPosition(newPosition);
+  }
+  
+  private void implTruncate (long size) throws IOException
+  {
+      fh.setLength(size);      
+  }
+  
+  public void unlock (long pos, long len) throws IOException
+  {
+      fh.unlock(pos, len);
+  }
 
-  public native long size () throws IOException;
+  public long size () throws IOException
+  {
+      return fh.getLength();
+  }
     
-  protected native void implCloseChannel() throws IOException;
+  protected void implCloseChannel() throws IOException
+  {
+      fh.close();
+  }
 
   /**
    * Makes sure the Channel is properly closed.
@@ -183,11 +201,17 @@ public final class FileChannelImpl extends FileChannel
     return result;
   }
 
-  public native int read ()
-    throws IOException;
+  public int read ()
+    throws IOException
+    {
+      return fh.read();
+    }
 
-  public native int read (byte[] buffer, int offset, int length)
-    throws IOException;
+  public int read (byte[] buffer, int offset, int length)
+    throws IOException
+    {
+        return fh.read(buffer, offset, length);
+    }
 
   public long read (ByteBuffer[] dsts, int offset, int length)
     throws IOException
@@ -213,7 +237,7 @@ public final class FileChannelImpl extends FileChannel
       }
     else
       {
-	// Use a more efficient native method! FIXME!
+	// Use a more efficient method! FIXME!
 	byte[] buffer = new byte [len];
     	src.get (buffer, 0, len);
 	write (buffer, 0, len);
@@ -244,10 +268,16 @@ public final class FileChannelImpl extends FileChannel
     return result;
   }
 
-  public native void write (byte[] buffer, int offset, int length)
-    throws IOException;
+  public void write (byte[] buffer, int offset, int length)
+    throws IOException
+    {
+      fh.write(buffer, offset, length);
+    }
   
-  public native void write (int b) throws IOException;
+  public void write (int b) throws IOException
+  {      
+      fh.write(b);                  
+  }
 
   public long write(ByteBuffer[] srcs, int offset, int length)
     throws IOException
@@ -262,8 +292,11 @@ public final class FileChannelImpl extends FileChannel
     return result;
   }
 				   
-  public native MappedByteBuffer mapImpl (char mode, long position, int size)
-    throws IOException;
+  public MappedByteBuffer mapImpl (char mode, long position, int size)
+    throws IOException
+    {
+      return fh.mapImpl(mode, position, size);            
+    }
 
   public MappedByteBuffer map (FileChannel.MapMode mode,
 			       long position, long size)
@@ -451,8 +484,11 @@ public final class FileChannelImpl extends FileChannel
    * If wait as specified, block until we can get it.
    * Otherwise return false.
    */
-  private native boolean lock(long position, long size,
-			      boolean shared, boolean wait) throws IOException;
+  private boolean lock(long position, long size,
+			      boolean shared, boolean wait) throws IOException
+  {
+      return fh.lock();
+  }
   
   public FileLock lock (long position, long size, boolean shared)
     throws IOException
