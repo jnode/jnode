@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLConnection;
+import java.nio.ByteBuffer;
 
 import org.jnode.driver.block.FileDevice;
 import org.jnode.fs.FSDirectory;
@@ -130,16 +131,17 @@ public class FatTest {
 				.getClassLoader()
 				.getResource("menu.lst")
 				.openConnection();
-		byte[] buf = new byte[urlConn.getContentLength()];
-		FileUtils.copy(urlConn.getInputStream(), buf);
+		//byte[] buf = new byte[urlConn.getContentLength()];
+        ByteBuffer buf = ByteBuffer.allocate(urlConn.getContentLength()); 
+		FileUtils.copy(urlConn.getInputStream(), buf.array());
 
 		final FSFile fh1 = dir.addFile("test.lst").getFile();
 		fh1.setLength(urlConn.getContentLength());
-		fh1.write(0, buf, 0, buf.length);
+		fh1.write(0, buf);
 
 		final FSFile fh2 = bgDir.addFile("menu.lst").getFile();
 		fh2.setLength(urlConn.getContentLength());
-		fh2.write(0, buf, 0, buf.length);
+		fh2.write(0, buf);
 
 		fs.flush();
 	

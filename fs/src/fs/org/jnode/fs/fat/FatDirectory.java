@@ -21,6 +21,7 @@
  
 package org.jnode.fs.fat;
 
+import java.nio.ByteBuffer;
 import java.io.IOException;
 
 import org.jnode.driver.block.BlockDeviceAPI;
@@ -60,9 +61,13 @@ public class FatDirectory extends AbstractDirectory {
 	 */
 	protected synchronized void read() throws IOException {
 		entries.setSize((int)file.getLengthOnDisk() / 32);
-		final byte[] data = new byte[entries.size() * 32];
-		file.read(0, data, 0, data.length);
-		read(data);
+
+        //TODO optimize it also to use ByteBuffer at lower level
+        //final byte[] data = new byte[entries.size() * 32];
+        final ByteBuffer data = ByteBuffer.allocate(entries.size() * 32);
+		file.read(0, data);
+		read(data.array());
+        
 		resetDirty();
 	}
 
@@ -73,12 +78,16 @@ public class FatDirectory extends AbstractDirectory {
 	protected synchronized void write() throws IOException {
 		if (label != null)
 			applyLabel();
-		final byte[] data = new byte[entries.size() * 32];
+        //TODO optimize it also to use ByteBuffer at lower level        
+		//final byte[] data = new byte[entries.size() * 32];
+        final ByteBuffer data = ByteBuffer.allocate(entries.size() * 32);
+        
 		if (canChangeSize(entries.size())) {
-			file.setLength(data.length);
+			file.setLength(data.capacity());
 		}
-		write(data);
-		file.write(0, data, 0, data.length);
+		write(data.array());
+		//file.write(0, data, 0, data.length);
+        file.write(0, data);
 		resetDirty();
 	}
 

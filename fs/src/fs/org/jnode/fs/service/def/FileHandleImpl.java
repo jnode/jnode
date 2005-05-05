@@ -23,6 +23,7 @@ package org.jnode.fs.service.def;
 
 import java.io.IOException;
 import java.io.VMOpenMode;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 
 import org.jnode.fs.FSFile;
@@ -127,7 +128,8 @@ final class FileHandleImpl implements VMFileHandle {
 	 * @param len
 	 * @throws IOException
 	 */
-	public synchronized int read(byte[] dest, int off, int len) throws IOException {
+//	public synchronized int read(byte[] dest, int off, int len) throws IOException {
+    public synchronized int read(ByteBuffer dest) throws IOException {    
 		if (closed) {
 			throw new IOException("File closed");
 		}
@@ -137,8 +139,13 @@ final class FileHandleImpl implements VMFileHandle {
             return -1; // eof
         }
         
-        int nbRead = Math.min(len, avail);
-		file.read(fileOffset, dest, off, nbRead);
+        int nbRead = Math.min(dest.remaining(), avail);
+        dest.limit(dest.position() + nbRead);
+        
+        // TODO file.read should return the number of read bytes
+		//file.read(fileOffset, dest, off, nbRead);        
+        file.read(fileOffset, dest);
+        
 		fileOffset += nbRead;
         
         return nbRead;
@@ -154,14 +161,18 @@ final class FileHandleImpl implements VMFileHandle {
 	 * @param len
 	 * @throws IOException
 	 */
-	public synchronized void write(byte[] src, int off, int len) throws IOException {
+	//public synchronized void write(byte[] src, int off, int len) throws IOException {
+    public synchronized void write(ByteBuffer src) throws IOException {    
 		if (closed) {
 			throw new IOException("File closed");
 		}
 		if (readOnly) {
 			throw new IOException("Cannot write");
 		}
-		file.write(fileOffset, src, off, len);
+        
+        // TODO file.write should return the number of written bytes        
+        final int len = src.remaining();
+		file.write(fileOffset, src);
 		fileOffset += len;
 	}
 
@@ -226,22 +237,23 @@ final class FileHandleImpl implements VMFileHandle {
 
     public int read() throws IOException
     {
-        // TODO very inefficient, use ByteBuffer
-        byte[] dest = new byte[1];
+        // TODO very inefficient, optimize it
+        ByteBuffer dest = ByteBuffer.allocate(1);
         int nbRead = -1;
-        nbRead = read(dest, 0, 1);
+        nbRead = read(dest);
         if(nbRead < 1)
         {
             return -1; // eof
         }
         
-        return dest[0];
+        return dest.get(0);
     }
 
     public void write(int b) throws IOException
     {
-        // TODO very inefficient, use ByteBuffer
-        write(new byte[]{(byte) b}, 0, 1);
+        // TODO very inefficient, optimize it
+        ByteBuffer src = ByteBuffer.wrap(new byte[]{(byte) b});
+        write(src);
     }
 
     public boolean lock()

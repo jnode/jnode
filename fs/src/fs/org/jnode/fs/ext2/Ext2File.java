@@ -22,6 +22,7 @@
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -170,8 +171,12 @@ public class Ext2File extends AbstractFSFile {
     /**
      * @see org.jnode.fs.FSFile#read(long, byte[], int, int)
      */
-    public void read(long fileOffset, byte[] dest, int off, int len)
-            throws IOException {
+    //public void read(long fileOffset, byte[] dest, int off, int len)
+    public void read(long fileOffset, ByteBuffer dest)    
+            throws IOException {        
+        final int len = dest.remaining();
+        final int off = dest.position();
+        
         //synchronize to the inode cache to make sure that the inode does not
         // get
         //flushed between reading it and locking it
@@ -209,11 +214,14 @@ public class Ext2File extends AbstractFSFile {
 
                     log.debug("blockNr: "+blockNr+", blockOffset: "+blockOffset+
                     		  ", copyLength: "+copyLength+", bytesRead: "+bytesRead);
-                    
-                    System.arraycopy(iNode.getDataBlock(blockNr),
-                            (int) blockOffset, dest, off + (int) bytesRead,
-                            (int) copyLength);
 
+                    //TODO optimize it also to use ByteBuffer at lower level 
+                    dest.put(iNode.getDataBlock(blockNr), (int) blockOffset,
+                            (int) copyLength);
+//                    System.arraycopy(iNode.getDataBlock(blockNr),
+//                            (int) blockOffset, dest, off + (int) bytesRead,
+//                            (int) copyLength);
+                    
                     bytesRead += copyLength;
                 }
                 return;
@@ -235,9 +243,12 @@ public class Ext2File extends AbstractFSFile {
      * 
      * @see org.jnode.fs.FSFile#write(long, byte[], int, int)
      */
-    public void write(long fileOffset, byte[] src, int off, int len)
+    //public void write(long fileOffset, byte[] src, int off, int len)
+    public void write(long fileOffset, ByteBuffer src)
             throws IOException {
-		
+        final int len = src.remaining();
+        final int off = src.position();
+        
 		if(getFileSystem().isReadOnly())
 		{
 			throw new ReadOnlyFileSystemException("write in readonly filesystem");
@@ -273,9 +284,9 @@ public class Ext2File extends AbstractFSFile {
                             "Can't write beyond the end of the file! (fileOffset: "
                                     + fileOffset + ", getLength()"
                                     + getLength());
-                if (off + len > src.length)
-                    throw new IOException(
-                            "src is shorter than what you want to write");
+//                if (off + len > src.length)
+//                    throw new IOException(
+//                            "src is shorter than what you want to write");
 
                 log.debug("write(fileOffset=" + fileOffset + ", src, off, len="
                         + len + ")");
@@ -301,8 +312,12 @@ public class Ext2File extends AbstractFSFile {
                     else
                         dest = new byte[(int) blockSize];
 
-                    System.arraycopy(src, (int) (off + bytesWritten), dest,
-                            (int) blockOffset, (int) copyLength);
+                    //TODO optimize it: avoid the call to position
+                    src.position((int) (off + bytesWritten));
+                    //TODO optimize it also to use ByteBuffer at lower level
+                    src.get(dest, (int) blockOffset, (int) copyLength);
+//                    System.arraycopy(src, (int) (off + bytesWritten), dest,
+//                            (int) blockOffset, (int) copyLength);
 
                     //allocate a new block if needed
                     if (blockIndex >= blocksAllocated) {

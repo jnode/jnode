@@ -177,15 +177,16 @@ public final class FileChannelImpl extends FileChannel
 
   public int read (ByteBuffer dst) throws IOException
   {
-    int result;
-    byte[] buffer = new byte [dst.remaining ()];
-    
-    result = read (buffer, 0, buffer.length);
-
-    if (result > 0)
-      dst.put (buffer, 0, result);
-
-    return result;
+//    int result;
+//    byte[] buffer = new byte [dst.remaining ()];
+//    
+//    result = read (buffer, 0, buffer.length);
+//
+//    if (result > 0)
+//      dst.put (buffer, 0, result);
+//
+//    return result;
+      return fh.read(dst);
   }
 
   public int read (ByteBuffer dst, long position)
@@ -209,8 +210,9 @@ public final class FileChannelImpl extends FileChannel
 
   public int read (byte[] buffer, int offset, int length)
     throws IOException
-    {
-        return fh.read(buffer, offset, length);
+    {      
+      ByteBuffer buf = ByteBuffer.wrap(buffer, offset, length);
+        return fh.read(buf);
     }
 
   public long read (ByteBuffer[] dsts, int offset, int length)
@@ -271,7 +273,7 @@ public final class FileChannelImpl extends FileChannel
   public void write (byte[] buffer, int offset, int length)
     throws IOException
     {
-      fh.write(buffer, offset, length);
+      fh.write(ByteBuffer.wrap(buffer, offset, length));
     }
   
   public void write (int b) throws IOException

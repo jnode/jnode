@@ -24,6 +24,7 @@ package org.jnode.fs.fat;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.ByteBuffer;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
@@ -126,10 +127,16 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 		entry.setFlags(FatConstants.F_DIRECTORY);
 		final FatFile file = entry.getFatFile();
 		file.setLength(clusterSize);
-		final byte[] buf = new byte[clusterSize];
+        
+        //TODO optimize it also to use ByteBuffer at lower level        
+		//final byte[] buf = new byte[clusterSize];
+        final ByteBuffer buf = ByteBuffer.allocate(clusterSize);
+        
 		// Clean the contents of this cluster to avoid reading strange data
 		// in the directory.
-		file.write(0, buf, 0, buf.length);
+		//file.write(0, buf, 0, buf.length);
+        file.write(0, buf);
+        
 		file.getDirectory().initialize(file.getStartCluster(), parentCluster);
 		flush();
 		return entry;

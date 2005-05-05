@@ -22,6 +22,7 @@
 package org.jnode.test.fs.filesystem.tests;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Vector;
 
 import org.jnode.fs.FSEntry;
@@ -73,9 +74,13 @@ public class ConcurrentAccessFSTest extends AbstractFSTest {
 
     protected boolean isGoodResultFile(FSFile file) throws IOException {
         byte[] expData = TestUtils.getTestData(FILE_SIZE_IN_WORDS);
-        byte[] data = new byte[expData.length];
-        file.read(0, data, 0, data.length);
-        return TestUtils.equals(expData, data);
+        
+        ByteBuffer data = ByteBuffer.allocate(expData.length);
+        file.read(0, data);
+        //byte[] data = new byte[expData.length];
+        //file.read(0, data, 0, data.length);
+        
+        return TestUtils.equals(expData, data.array());
     }
 
     protected FSFile prepareFile() throws Exception {
@@ -164,8 +169,8 @@ class Reader extends Worker {
     }
 
     public void doRun(long offset) throws IOException {
-        byte[] dest = new byte[2];
-        file.read(offset, dest, 0, 2);
+        ByteBuffer dest = ByteBuffer.allocate(2);
+        file.read(offset, dest);
     }
 }
 
@@ -233,7 +238,7 @@ class Writer extends Worker {
         long value = offset / 2;
         byte msbValue = (byte) (value & 0xFF00);
         byte lsbValue = (byte) (value & 0x00FF);
-        byte[] src = new byte[] { msbValue, lsbValue };
-        file.write(offset, src, 0, 2);
+        ByteBuffer src = ByteBuffer.wrap(new byte[]{ msbValue, lsbValue });
+        file.write(offset, src);
     }
 }

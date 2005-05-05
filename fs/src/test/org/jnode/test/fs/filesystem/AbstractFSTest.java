@@ -22,6 +22,7 @@
 package org.jnode.test.fs.filesystem;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -200,15 +201,15 @@ public abstract class AbstractFSTest extends AbstractTest {
 		remountFS(false); // false = read/write mode
 		
 		FSDirectory rootDir = fs.getRootEntry().getDirectory();
-		byte[] data = TestUtils.getTestData(fileSizeInWords);
+		ByteBuffer data = ByteBuffer.wrap(TestUtils.getTestData(fileSizeInWords));
 		FSFile file = rootDir.addFile(fileName).getFile();			
-		file.write(0, data, 0, data.length);
+		file.write(0, data);
 		file.flush();
 
 		// remount FS in readOnly mode
 		remountFS(oldReadOnly);
 		
-		return data;
+		return data.array();
 	}
 	    
 	private FileSystem fs;	

@@ -22,14 +22,15 @@
 package org.jnode.fs.jifs;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.HashSet;
 
-import org.jnode.fs.FSEntryIterator;
+import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
+import org.jnode.fs.FSEntryIterator;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
-import org.jnode.fs.FSAccessRights;
-import java.util.HashSet;
 
 
 
@@ -94,7 +95,13 @@ public class JIFSFile implements ExtFSEntry, FSFile {
 		addString("JIFSFile\nFilename :"+name+"\n");
 	}
 	
-	public void read(long fileOffset, byte[] dest, int off, int len){
+	//public void read(long fileOffset, byte[] dest, int off, int len){
+    public void read(long fileOffset, ByteBuffer destBuf){
+        //TODO optimize it also to use ByteBuffer at lower level
+        final int off = destBuf.position();        
+        final int len = destBuf.remaining();
+        final byte[] dest = destBuf.array();
+        
 		refresh();
 		byte[] readdata;
 		readdata = data.toString().getBytes();
@@ -106,7 +113,8 @@ public class JIFSFile implements ExtFSEntry, FSFile {
 			}
 	}
 	
-	public void write(long fileOffset, byte[] src, int off, int len) throws IOException{
+	//public void write(long fileOffset, byte[] src, int off, int len) throws IOException{
+    public void write(long fileOffset, ByteBuffer src) throws IOException{
 		throw new IOException("can not write to JNIFSFile..");
 	}
 	
