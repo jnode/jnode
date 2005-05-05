@@ -27,6 +27,7 @@ import java.nio.ByteBuffer;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.ReadOnlyFileSystemException;
+import org.jnode.util.ByteBufferUtils;
 
 
 /**
@@ -57,9 +58,9 @@ public class FatFile extends FatObject implements FSFile {
     public synchronized void read(long fileOffset, ByteBuffer destBuf) throws IOException {
         int len = destBuf.remaining();
         int destOfs = destBuf.position();
-        
-        //TODO optimize it also to use ByteBuffer at lower level             
-        final byte[] dest = destBuf.array();
+        //TODO optimize it also to use ByteBuffer at lower level
+        final ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
+        final byte[] dest = destBA.toArray();
         
 		final long max = (isDir) ? getLengthOnDisk() : getLength();
 		if (fileOffset + len > max) {
@@ -87,12 +88,16 @@ public class FatFile extends FatObject implements FSFile {
 			destOfs += size;
 			chainIdx++;
 		}	
+                
+        destBA.refreshByteBuffer();        
     }
 
 	//public synchronized void write(long fileOffset, byte[] src, int srcOfs, int len) throws IOException {
-    public synchronized void write(long fileOffset, ByteBuffer src) throws IOException {    
-        int len = src.remaining();
-        int srcOfs = src.position();
+    public synchronized void write(long fileOffset, ByteBuffer srcBuf) throws IOException {    
+        int len = srcBuf.remaining();
+        int srcOfs = srcBuf.position();
+        //TODO optimize it also to use ByteBuffer at lower level                 
+        final byte[] src = ByteBufferUtils.toArray(srcBuf);
         
 		if(getFileSystem().isReadOnly())
 		{
@@ -116,9 +121,7 @@ public class FatFile extends FatObject implements FSFile {
 		if (fileOffset % clusterSize != 0) {
 			int clusOfs = (int)(fileOffset % clusterSize);
 			int size = Math.min(len, (int)(clusterSize - (fileOffset % clusterSize) - 1));
-            //TODO optimize it also to use ByteBuffer at lower level
-            api.write(getDevOffset(chain[chainIdx], clusOfs), src.array(), srcOfs, size);
-//			api.write(getDevOffset(chain[chainIdx], clusOfs), src, srcOfs, size);
+			api.write(getDevOffset(chain[chainIdx], clusOfs), src, srcOfs, size);
 			fileOffset += size;
 			len -= size;
 			srcOfs += size;
@@ -126,13 +129,11 @@ public class FatFile extends FatObject implements FSFile {
 		}
 		while (len > 0) {
 			int size = Math.min(clusterSize, len);
-            //TODO optimize it also to use ByteBuffer at lower level
-            api.write(getDevOffset(chain[chainIdx], 0), src.array(), srcOfs, size);
-//			api.write(getDevOffset(chain[chainIdx], 0), src, srcOfs, size);
+            api.write(getDevOffset(chain[chainIdx], 0), src, srcOfs, size);
 			len -= size;
 			srcOfs += size;
 			chainIdx++;
-		}	
+		}
 	}
 	
 	/**
