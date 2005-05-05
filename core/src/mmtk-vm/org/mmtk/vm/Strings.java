@@ -94,7 +94,7 @@ public final class Strings {
     public static int copyStringToChars(String src, char[] dst, int dstBegin,
             int dstEnd) {
         
-        // TODO understand and implement me
+        // TODO Understand me and implement me
 
         return 0;
     }

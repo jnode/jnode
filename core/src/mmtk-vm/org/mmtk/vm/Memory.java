@@ -35,18 +35,34 @@ import org.vmmagic.unboxed.Extent;
  */
 public class Memory {
 
+    /**
+     * TODO Understand me
+     * @return
+     */
     public static Address HEAP_START() {
         return Address.zero();
     }
 
+    /**
+     * TODO Understand me
+     * @return
+     */
     public static Address HEAP_END() {
         return Address.zero();
     }
 
+    /**
+     * TODO Understand me
+     * @return
+     */
     public static Address AVAILABLE_START() {
         return Address.zero();
     }
 
+    /**
+     * TODO Understand me
+     * @return
+     */
     public static Address AVAILABLE_END() {
         return Address.zero();
     }
@@ -105,6 +121,7 @@ public class Memory {
      *            the address of the end of the heap
      */
     public static void setHeapRange(int id, Address start, Address end) {
+        // TODO Understand me
     }
 
     /**
@@ -187,8 +204,10 @@ public class Memory {
      */
 
     public static void sync() throws InlinePragma {
+        // TODO Understand me
     }
 
     public static void isync() throws InlinePragma {
+        // TODO Understand me
     }
 }

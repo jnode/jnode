@@ -68,6 +68,7 @@ public final class Lock extends SpinLock {
     }
 
     public void check(int w) {
+        // TODO Understand me
     }
 
     // Release the lock by incrementing serving counter.
