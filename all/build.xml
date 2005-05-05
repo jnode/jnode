@@ -24,7 +24,6 @@
 	<property name="jnode-gui.jar" value="${root.dir}/gui/build/classes" />
 	<property name="thinlet.jar" value="${root.dir}/gui/build/classes" />
 	<property name="jnode-textui.jar" value="${root.dir}/textui/build/classes" />
-	<property name="jnode-distr.jar" value="${root.dir}/distr/build/classes" />
 	<property name="jnode-net.jar" value="${root.dir}/net/build/classes" />
 	<property name="jnode-shell.jar" value="${root.dir}/shell/build/classes" />
 	<property name="jnode-fonts.jar" value="${build.dir}/descriptors/jnode-fonts.jar" />
@@ -97,7 +96,6 @@
 		<pathelement location="${jnode-gui.jar}" />
 		<pathelement location="${thinlet.jar}" />
 		<pathelement location="${jnode-textui.jar}" />
-		<pathelement location="${jnode-distr.jar}" />
 		<pathelement location="${classycle.jar}" />
 		<pathelement location="${itext.jar}" />
 		<path refid="cp" />
@@ -158,7 +156,6 @@
 			<libalias name="jnode-gui.jar" alias="${jnode-gui.jar}" />
 			<libalias name="thinlet.jar" alias="${thinlet.jar}" />
 			<libalias name="jnode-textui.jar" alias="${jnode-textui.jar}" />
-			<libalias name="jnode-distr.jar" alias="${jnode-distr.jar}" />
 			<libalias name="jnode-net.jar" alias="${jnode-net.jar}" />
 			<libalias name="jnode-shell.jar" alias="${jnode-shell.jar}" />
 
