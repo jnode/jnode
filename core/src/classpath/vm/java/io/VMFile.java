@@ -21,6 +21,8 @@
  
 package java.io;
 
+import org.jnode.java.io.VMFileHandle;
+
 import gnu.classpath.SystemProperties;
 import gnu.java.io.PlatformHelper;
 
