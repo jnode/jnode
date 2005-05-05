@@ -21,6 +21,8 @@
  
 package java.io;
 
+import org.jnode.java.io.VMFileHandle;
+
 /**
  * The implementation of this interface is used to connect the java.io package with the JNode
  * filesystem services.
