@@ -22,7 +22,6 @@
 package org.jnode.driver.input;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -38,7 +37,7 @@ public class MouseInterpreter implements PointerInterpreter {
 	/** My logger */
 	private static final Logger log = Logger.getLogger(MouseInterpreter.class);
 	/** List of valid protocol handlers */
-	private static final List protocolsHandlers = new ArrayList();
+	private static final List<MouseProtocolHandler> protocolsHandlers = new ArrayList<MouseProtocolHandler>();
 
 	private byte[] data; // will be defined as 3 or 4 bytes, according to the protocol
 	private int pos = 0;
@@ -84,8 +83,7 @@ public class MouseInterpreter implements PointerInterpreter {
 			id = d.getPointerId();
 			log.debug("Actual pointerId 0x" + NumberUtils.hex(id, 2));
 			// select protocol
-			for (Iterator i = protocolsHandlers.iterator(); i.hasNext();) {
-				final MouseProtocolHandler p = (MouseProtocolHandler) i.next();
+			for (MouseProtocolHandler p : protocolsHandlers) {
 				if (p.supportsId(id)) {
 					this.protocol = p;
 					break;
