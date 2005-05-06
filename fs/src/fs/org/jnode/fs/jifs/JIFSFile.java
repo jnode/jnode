@@ -96,23 +96,9 @@ public class JIFSFile implements ExtFSEntry, FSFile {
 	
 	//public void read(long fileOffset, byte[] dest, int off, int len){
     public void read(long fileOffset, ByteBuffer destBuf){
-        //TODO optimize it also to use ByteBuffer at lower level
-        final int off = destBuf.position();        
-        final int len = destBuf.remaining();
-        final ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
-        final byte[] dest = destBA.toArray();
-        
 		refresh();
-		byte[] readdata;
-		readdata = data.toString().getBytes();
-		for (long i=0 ; i < len ; i++ )
-			{
-				int doff = (int)(off+i);
-				int foff = (int)(fileOffset+i);
-				dest[doff] = readdata[foff];
-			}
-        
-        destBA.refreshByteBuffer();        
+		byte[] readdata = data.toString().getBytes();
+        destBuf.put(readdata, (int)fileOffset, destBuf.remaining());
 	}
 	
 	//public void write(long fileOffset, byte[] src, int off, int len) throws IOException{

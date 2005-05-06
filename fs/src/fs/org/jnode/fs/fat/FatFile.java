@@ -57,10 +57,6 @@ public class FatFile extends FatObject implements FSFile {
 //	public synchronized void read(long fileOffset, byte[] dest, int destOfs, int len) throws IOException {
     public synchronized void read(long fileOffset, ByteBuffer destBuf) throws IOException {
         int len = destBuf.remaining();
-        int destOfs = destBuf.position();
-        //TODO optimize it also to use ByteBuffer at lower level
-        final ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
-        final byte[] dest = destBA.toArray();
         
 		final long max = (isDir) ? getLengthOnDisk() : getLength();
 		if (fileOffset + len > max) {
@@ -75,29 +71,24 @@ public class FatFile extends FatObject implements FSFile {
 		if (fileOffset % clusterSize != 0) {
 			int clusOfs = (int)(fileOffset % clusterSize);
 			int size = Math.min(len, (int)(clusterSize - (fileOffset % clusterSize) - 1));
-			api.read(getDevOffset(chain[chainIdx], clusOfs), dest, destOfs, size);
+            destBuf.limit(destBuf.position()+size);
+			api.read(getDevOffset(chain[chainIdx], clusOfs), destBuf);
 			fileOffset += size;
 			len -= size;
-			destOfs += size;
 			chainIdx++; 
 		}
 		while (len > 0) {
 			int size = Math.min(clusterSize, len);
-			api.read(getDevOffset(chain[chainIdx], 0), dest, destOfs, size);
+            destBuf.limit(destBuf.position()+size);
+			api.read(getDevOffset(chain[chainIdx], 0), destBuf);
 			len -= size;
-			destOfs += size;
 			chainIdx++;
 		}	
-                
-        destBA.refreshByteBuffer();        
     }
 
 	//public synchronized void write(long fileOffset, byte[] src, int srcOfs, int len) throws IOException {
     public synchronized void write(long fileOffset, ByteBuffer srcBuf) throws IOException {    
         int len = srcBuf.remaining();
-        int srcOfs = srcBuf.position();
-        //TODO optimize it also to use ByteBuffer at lower level                 
-        final byte[] src = ByteBufferUtils.toArray(srcBuf);
         
 		if(getFileSystem().isReadOnly())
 		{
@@ -121,17 +112,17 @@ public class FatFile extends FatObject implements FSFile {
 		if (fileOffset % clusterSize != 0) {
 			int clusOfs = (int)(fileOffset % clusterSize);
 			int size = Math.min(len, (int)(clusterSize - (fileOffset % clusterSize) - 1));
-			api.write(getDevOffset(chain[chainIdx], clusOfs), src, srcOfs, size);
+            srcBuf.limit(srcBuf.position()+size);
+			api.write(getDevOffset(chain[chainIdx], clusOfs), srcBuf);
 			fileOffset += size;
 			len -= size;
-			srcOfs += size;
 			chainIdx++; 
 		}
 		while (len > 0) {
 			int size = Math.min(clusterSize, len);
-            api.write(getDevOffset(chain[chainIdx], 0), src, srcOfs, size);
+            srcBuf.limit(srcBuf.position()+size);
+            api.write(getDevOffset(chain[chainIdx], 0), srcBuf);
 			len -= size;
-			srcOfs += size;
 			chainIdx++;
 		}
 	}

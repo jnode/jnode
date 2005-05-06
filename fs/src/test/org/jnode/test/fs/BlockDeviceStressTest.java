@@ -22,6 +22,7 @@
 package org.jnode.test.fs;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +72,7 @@ public class BlockDeviceStressTest {
 
         private final BlockDeviceAPI api;
 
-        private final byte[] data;
+        private final ByteBuffer data;
 
         private final int repeatCount;
 
@@ -83,13 +84,13 @@ public class BlockDeviceStressTest {
             this.repeatCount = repeatCount;
             this.offset = offset;
             this.api = api;
-            data = new byte[ 4096];
+            data = ByteBuffer.allocate(4096);
         }
 
         public void run() {
             for (int loop = 0; loop < repeatCount; loop++) {
                 try {
-                    api.read(offset, data, 0, data.length);
+                    api.read(offset, data);
                 } catch (IOException ex) {
                     errors++;
                 }

@@ -70,11 +70,9 @@ public class NTFSFile implements FSFile {
     public void read(long fileOffset, ByteBuffer destBuf)    
             throws IOException {
         //TODO optimize it also to use ByteBuffer at lower level
-        final int off = destBuf.position();        
-        final int len = destBuf.remaining();
         final ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
         final byte[] dest = destBA.toArray();
-        getFileRecord().readData(fileOffset, dest, off, len);
+        getFileRecord().readData(fileOffset, dest, 0, dest.length);
         destBA.refreshByteBuffer();
     }
 

@@ -22,6 +22,7 @@
 package org.jnode.driver.block;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.jnode.driver.ApiNotFoundException;
 import org.jnode.driver.Device;
@@ -78,17 +79,10 @@ public class MappedBlockDeviceSupport extends Device implements BlockDeviceAPI {
 	 * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
 	 * @throws IOException
 	 */
-	public void read(long devOffset, byte[] dest, int destOffset, int length) throws IOException {
-		if (devOffset < 0) {
-			throw new IOException("Out of mapping: offset < 0");
-		}
-		if (length < 0) {
-			throw new IOException("Out of mapping: length < 0");
-		}
-		if (devOffset + length > this.length) {
-			throw new IOException("Out of mapping: devOffset(" + devOffset + ") + length(" + length + ") > this.length(" + this.length + ")");
-		}
-		parentApi.read(offset + devOffset, dest, destOffset, length);
+	public void read(long devOffset, ByteBuffer dest) throws IOException {
+        checkBounds(devOffset, dest);
+		//parentApi.read(offset + devOffset, dest, destOffset, length);
+        parentApi.read(offset + devOffset, dest);
 	}
 
 	/**
@@ -99,17 +93,10 @@ public class MappedBlockDeviceSupport extends Device implements BlockDeviceAPI {
 	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
 	 * @throws IOException
 	 */
-	public void write(long devOffset, byte[] src, int srcOffset, int length) throws IOException {
-		if (devOffset < 0) {
-			throw new IOException("Out of mapping: offset < 0");
-		}
-		if (length < 0) {
-			throw new IOException("Out of mapping: length < 0");
-		}
-		if (devOffset + length > this.length) {
-			throw new IOException("Out of mapping: devOffset(" + devOffset + ") + length(" + length + ") > this.length(" + this.length + ")");
-		}
-		parentApi.write(offset + devOffset, src, srcOffset, length);
+	public void write(long devOffset, ByteBuffer src) throws IOException {
+        checkBounds(devOffset, src);
+		//parentApi.write(offset + devOffset, src, srcOffset, length);
+        parentApi.write(offset + devOffset, src);
 	}
 
 	/**
@@ -133,4 +120,19 @@ public class MappedBlockDeviceSupport extends Device implements BlockDeviceAPI {
 	public Device getParent() {
 		return parent;
 	}
+    
+    protected void checkBounds(long devOffset, ByteBuffer buf) 
+                    throws IOException
+    {
+        int remaining = buf.remaining(); 
+        if (devOffset < 0) {
+            throw new IOException("Out of mapping: offset < 0");
+        }
+        if (remaining < 0) {
+            throw new IOException("Out of mapping: remaining < 0");
+        }
+        if (devOffset + remaining > this.length) {
+            throw new IOException("Out of mapping: devOffset(" + devOffset + ") + remaining(" + remaining + ") > this.length(" + this.length + ")");
+        }        
+    }
 }

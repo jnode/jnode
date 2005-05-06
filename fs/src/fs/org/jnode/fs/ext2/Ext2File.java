@@ -176,7 +176,7 @@ public class Ext2File extends AbstractFSFile {
     public void read(long fileOffset, ByteBuffer destBuf)    
             throws IOException {        
         final int len = destBuf.remaining();
-        final int off = destBuf.position();
+        final int off = 0;
         //TODO optimize it also to use ByteBuffer at lower level 
         final ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
         final byte[] dest = destBA.toArray();
@@ -249,7 +249,7 @@ public class Ext2File extends AbstractFSFile {
     public void write(long fileOffset, ByteBuffer srcBuf)
             throws IOException {
         final int len = srcBuf.remaining();
-        final int off = srcBuf.position();
+        final int off = 0;
         //TODO optimize it also to use ByteBuffer at lower level                 
         final byte[] src = ByteBufferUtils.toArray(srcBuf);
         

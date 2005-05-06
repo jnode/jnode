@@ -23,6 +23,7 @@ package org.jnode.fs.service.def;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import javax.naming.NameNotFoundException;
 
@@ -151,10 +152,10 @@ final class FileSystemMounter implements DeviceListener {
         // Read the first sector
         try {
             final PartitionTableEntry ptEntry = api.getPartitionTableEntry();
-            final byte[] bs = new byte[api.getSectorSize()];
-            api.read(0, bs, 0, bs.length);
+            final ByteBuffer bs = ByteBuffer.allocate(api.getSectorSize());
+            api.read(0, bs);
             for (FileSystemType fst : fileSystemService.fileSystemTypes()) {
-                if (fst.supports(ptEntry, bs, api)) {
+                if (fst.supports(ptEntry, bs.array(), api)) {
                     try {
                         final FileSystem fs = fst.create(device, readOnly);
                         fileSystemService.registerFileSystem(fs);

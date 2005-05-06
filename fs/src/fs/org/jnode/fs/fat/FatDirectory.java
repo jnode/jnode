@@ -93,20 +93,20 @@ public class FatDirectory extends AbstractDirectory {
 	}
 
 	public synchronized void read(BlockDeviceAPI device, long offset) throws IOException {
-		byte[] data = new byte[entries.size() * 32];
-		device.read(offset, data, 0, data.length);
+		ByteBuffer data = ByteBuffer.allocate(entries.size() * 32);
+		device.read(offset, data);
       //System.out.println("Directory at offset :" + offset);
       //System.out.println("Length in bytes = " + entries.size() * 32);
-      read(data);
+        read(data.array());
 		resetDirty();
 	}
 
 	public synchronized void write(BlockDeviceAPI device, long offset) throws IOException {
 		if (label != null)
 			applyLabel();
-		final byte[] data = new byte[entries.size() * 32];
-		write(data);
-		device.write(offset, data, 0, data.length);
+		final ByteBuffer data = ByteBuffer.allocate(entries.size() * 32);
+		write(data.array());
+		device.write(offset, data);
 		resetDirty();
 	}
 

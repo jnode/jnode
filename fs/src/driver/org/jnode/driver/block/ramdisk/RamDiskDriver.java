@@ -21,6 +21,8 @@
  
 package org.jnode.driver.block.ramdisk;
 
+import java.nio.ByteBuffer;
+
 import org.jnode.driver.DeviceAlreadyRegisteredException;
 import org.jnode.driver.Driver;
 import org.jnode.driver.DriverException;
@@ -121,8 +123,9 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 	 * @param length
 	 * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
 	 */
-	public void read(long devOffset, byte[] dest, int destOffset, int length) {
-		System.arraycopy(this.data, (int)devOffset, dest, destOffset, length);
+	public void read(long devOffset, ByteBuffer dest) {
+		//System.arraycopy(this.data, (int)devOffset, dest, destOffset, length);
+        dest.put(this.data, (int)devOffset, dest.remaining());
 	}
 
 	/**
@@ -132,7 +135,8 @@ public class RamDiskDriver extends Driver implements FSBlockDeviceAPI {
 	 * @param length
 	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
 	 */
-	public void write(long devOffset, byte[] src, int srcOffset, int length) {
-		System.arraycopy(src, srcOffset, this.data, (int)devOffset, length);
+	public void write(long devOffset, ByteBuffer src) {
+		//System.arraycopy(src, srcOffset, this.data, (int)devOffset, length);
+        src.get(this.data, (int)devOffset, src.remaining());
 	}
 }

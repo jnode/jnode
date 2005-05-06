@@ -22,6 +22,7 @@
 package org.jnode.test.fs;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import javax.naming.NamingException;
 
@@ -54,11 +55,11 @@ public class IDETest {
 		System.out.println("48-bit support: " + descr.supports48bitAddressing());
 		System.out.println("Length        : " + api.getLength());
 		
-		final byte[] data = new byte[1024];
-		api.read(0, data, 0, data.length);
+		final ByteBuffer data = ByteBuffer.allocate(1024);
+		api.read(0, data);
 		
-		for (int i = 0; i < data.length; i++) {
-			System.out.print(NumberUtils.hex(data[i], 2) + ' ');
+		while(data.remaining() > 0) {
+			System.out.print(NumberUtils.hex(data.get(), 2) + ' ');
 		}
 		System.out.println();
 		

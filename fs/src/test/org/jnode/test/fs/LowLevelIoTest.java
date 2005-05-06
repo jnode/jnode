@@ -21,6 +21,8 @@
  
 package org.jnode.test.fs;
 
+import java.nio.ByteBuffer;
+
 import org.jnode.driver.DeviceManager;
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.ide.IDEDevice;
@@ -51,11 +53,11 @@ public class LowLevelIoTest {
 			}
 
 			System.out.println("Put it at " + offset);
-			api.write(offset, src, 0, size);
+			api.write(offset, ByteBuffer.wrap(src));
 
 			System.out.println("Retreive it back ...");
 			byte[] dest = new byte[size];
-			api.read(offset, dest, 0, size);
+			api.read(offset, ByteBuffer.wrap(dest));
 
 			System.out.println("Check consistency ...");
 			for (int i = 0; i < size; i++) {

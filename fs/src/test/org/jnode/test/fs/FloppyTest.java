@@ -22,6 +22,7 @@
 package org.jnode.test.fs;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import javax.naming.NameNotFoundException;
 
@@ -49,8 +50,8 @@ public class FloppyTest {
 			final BlockDeviceAPI api = (BlockDeviceAPI)fd0.getAPI(BlockDeviceAPI.class);
 			try {
 				
-				final byte[] buf = new byte[512];
-				api.read(0, buf, 0, buf.length);
+				final ByteBuffer buf = ByteBuffer.allocate(512);
+				api.read(0, buf);
 			} catch (IOException ex) {
 				log.error("Oops", ex);
 			}

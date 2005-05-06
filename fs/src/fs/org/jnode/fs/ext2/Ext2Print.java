@@ -21,6 +21,8 @@
  
 package org.jnode.fs.ext2;
 
+import java.nio.ByteBuffer;
+
 import org.apache.log4j.Logger;
 import org.jnode.driver.block.BlockDeviceAPI;
 
@@ -54,9 +56,9 @@ public class Ext2Print {
 	}
 			
 	public static void dumpData(BlockDeviceAPI api, int offset, int length) {
-		byte[] data = new byte[length];
+        byte[] data = new byte[length];
 		try{
-			api.read(offset, data, 0, length);
+			api.read(offset, ByteBuffer.wrap(data));
 		}catch(Exception e) {
 			return;
 		}
