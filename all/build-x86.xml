@@ -141,7 +141,8 @@
 			extension="o" 
 			bits="${jnode.bits}" 
 			listfile="${build.native.dir}/jnodenative.lst"
-			enablejnasm="${jnode.enable.jnasm}">
+			enablejnasm="${jnode.enable.jnasm}"
+			version="${jnode-ver} ${TODAY}">
 				<includedir dir="${src.native.dir}/x86" />
 				<includedir dir="${build.native.dir}/src" />
 				<include name="jnode.asm" />
