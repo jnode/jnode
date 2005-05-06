@@ -109,43 +109,24 @@
 		<taskdef name="asm" classname="org.jnode.ant.taskdefs.Asm" classpathref="cp-x86" />
 
 		<genconst destfile="${build.native.dir}/src/java.inc" bits="${jnode.bits}" classesURL="file:///${jnode-core.jar}/">
-			<class classname="org.jnode.boot.Main" static="on" />
-			<class classname="org.jnode.vm.classmgr.TIBLayout" static="on" />
-			<class classname="org.jnode.vm.classmgr.VmByteCode" />
-			<class classname="org.jnode.vm.classmgr.VmConstFieldRef" />
-			<class classname="org.jnode.vm.classmgr.VmConstMethodRef" />
-			<class classname="org.jnode.vm.classmgr.VmConstIMethodRef" />
-			<class classname="org.jnode.vm.classmgr.VmCP" />
-			<class classname="org.jnode.vm.classmgr.VmField" />
-			<class classname="org.jnode.vm.classmgr.VmInstanceField" />
-			<class classname="org.jnode.vm.classmgr.VmStaticField" />
-			<class classname="org.jnode.vm.classmgr.VmMember" />
-			<class classname="org.jnode.vm.classmgr.VmMethod" />
-			<class classname="org.jnode.vm.classmgr.VmInstanceMethod" />
-			<class classname="org.jnode.vm.classmgr.VmStatics" />
-			<class classname="org.jnode.vm.classmgr.VmType" />
+			<class classname="java.lang.Throwable" />
+			<class classname="org.jnode.build.x86.BootImageBuilder" static="on" />
+			<class classname="org.jnode.vm.SoftByteCodes" static="on" />
 			<class classname="org.jnode.vm.VmProcessor" />
 			<class classname="org.jnode.vm.VmProcessor" static="on" />
 			<class classname="org.jnode.vm.VmThread" />
-			<class classname="org.jnode.build.x86.BootImageBuilder" static="on" />
-			<class classname="org.jnode.vm.VmStackFrame" static="on" />
-			<class classname="org.jnode.vm.VmSystem" static="on" />
 			<class classname="org.jnode.vm.VmThread" static="on" />
-			<class classname="org.jnode.vm.bytecode.BytecodeParser" static="on" />
-			<class classname="org.jnode.vm.classmgr.VmCP" static="on" />
-			<class classname="org.jnode.vm.classmgr.Modifier" static="on" />
-			<class classname="org.jnode.vm.classmgr.VmArray" static="on" />
 			<class classname="org.jnode.vm.classmgr.ObjectLayout" static="on" />
-			<class classname="org.jnode.vm.SoftByteCodes" static="on" />
+			<class classname="org.jnode.vm.classmgr.TIBLayout" static="on" />
+			<class classname="org.jnode.vm.classmgr.VmArray" static="on" />
+			<class classname="org.jnode.vm.classmgr.VmMethod" />
+			<class classname="org.jnode.vm.classmgr.VmStatics" /> 
+			<class classname="org.jnode.vm.classmgr.VmType" /> 
 			<class classname="org.jnode.vm.x86.VmX86Processor" />
-			<class classname="org.jnode.vm.x86.VmX86StackReader" static="on" />
+			<class classname="org.jnode.vm.x86.VmX86StackReader" static="on" /> 
 			<class classname="org.jnode.vm.x86.VmX86Thread" />
-			<class classname="org.jnode.vm.x86.VmX86Thread64" />
 			<class classname="org.jnode.vm.x86.VmX86Thread" static="on" />
-			<class classname="java.lang.Integer" />
-			<class classname="java.lang.Long" />
-			<class classname="java.lang.String" />
-			<class classname="java.lang.Throwable" />
+			<class classname="org.jnode.vm.x86.VmX86Thread64" />
 		</genconst>
 
 		<dependset>
