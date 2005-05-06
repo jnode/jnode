@@ -98,6 +98,8 @@ public class Asm extends MatchingTask {
 
     private boolean enableJNasm;
     
+    private String version;
+    
     /**
      * Add an includedir
      * 
@@ -143,6 +145,11 @@ public class Asm extends MatchingTask {
         
 		cmdLine.add("-D");
 		cmdLine.add("BITS" + bits);
+        
+        if (version != null) {
+            cmdLine.add("-D");
+            cmdLine.add("JNODE_VERSION='" + version + "'");
+        }
 
         if (outputFormat != null) {
             cmdLine.add("-f");
@@ -170,6 +177,7 @@ public class Asm extends MatchingTask {
         int rc = exec.execute();
 
         if (rc != 0) {
+            destdir.delete();
             throw new BuildException("Asm failed on "
                     + srcFile.getAbsolutePath());
         }
@@ -425,5 +433,19 @@ public class Asm extends MatchingTask {
      */
     public final void setEnableJNasm(boolean enableJNasm) {
         this.enableJNasm = enableJNasm;
+    }
+
+    /**
+     * @return Returns the version.
+     */
+    public final String getVersion() {
+        return version;
+    }
+
+    /**
+     * @param version The version to set.
+     */
+    public final void setVersion(String version) {
+        this.version = version;
     }
 }
