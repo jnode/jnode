@@ -22,7 +22,6 @@
 package org.jnode.plugin.model;
 
 import java.net.URL;
-import java.util.Iterator;
 
 import org.jnode.plugin.PluginDescriptor;
 
@@ -41,8 +40,7 @@ public class PluginsClassLoader extends ClassLoader {
 	 * @see java.lang.ClassLoader#findClass(java.lang.String)
 	 */
 	protected Class findClass(String name) throws ClassNotFoundException {
-		for (Iterator<PluginDescriptor> i = registry.getDescriptorIterator(); i.hasNext();) {
-			final PluginDescriptor descr = i.next();
+		for (PluginDescriptor descr : registry) {
 			if (!descr.isSystemPlugin() && !descr.isFragment()) {
 				final PluginClassLoaderImpl cl = (PluginClassLoaderImpl) descr.getPluginClassLoader();
 				if (cl.containsClass(name)) {
@@ -57,8 +55,7 @@ public class PluginsClassLoader extends ClassLoader {
 	 * @see java.lang.ClassLoader#findResource(java.lang.String)
 	 */
 	protected URL findResource(String name) {
-		for (Iterator<PluginDescriptor> i = registry.getDescriptorIterator(); i.hasNext();) {
-			final PluginDescriptor descr = i.next();
+		for (PluginDescriptor descr : registry) {
 			if (!descr.isSystemPlugin() && !descr.isFragment()) {
 				final PluginClassLoaderImpl cl = (PluginClassLoaderImpl) descr.getPluginClassLoader();
 				final URL url = cl.getResource(name);

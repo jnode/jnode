@@ -99,7 +99,7 @@ public class PluginRegistryModel extends VmSystemObject implements
      * 
      * @return Iterator&lt;PluginDescriptor&gt;
      */
-    public Iterator<PluginDescriptor> getDescriptorIterator() {
+    public Iterator<PluginDescriptor> iterator() {
         return descriptorMap.values().iterator();
     }
 

@@ -28,7 +28,7 @@ import java.util.Iterator;
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public interface PluginRegistry {
+public interface PluginRegistry extends Iterable<PluginDescriptor> {
 
 	/**
 	 * Gets the descriptor of the plugin with the given id.
@@ -48,7 +48,7 @@ public interface PluginRegistry {
 	 * Returns an iterator to iterate over all PluginDescriptor's.
 	 * @return Iterator&lt;PluginDescriptor&gt;
 	 */
-	public Iterator<PluginDescriptor> getDescriptorIterator();
+	public Iterator<PluginDescriptor> iterator();
 
 	/**
 	 * Load a plugin from a given loader.

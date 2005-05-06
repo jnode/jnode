@@ -24,16 +24,17 @@ package org.jnode.fs.jifs.directories;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 
+import javax.naming.NameNotFoundException;
+
+import org.jnode.fs.FSDirectory;
+import org.jnode.fs.FSEntry;
+import org.jnode.fs.jifs.JIFSDirectory;
+import org.jnode.fs.jifs.JIFSFile;
+import org.jnode.fs.jifs.files.JIFSFplugin;
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginManager;
-import org.jnode.fs.FSEntry;
-import org.jnode.fs.jifs.*;
-import org.jnode.fs.jifs.files.*;
-import javax.naming.NameNotFoundException;
-import org.jnode.fs.FSDirectory;
 
 
 /**
@@ -58,12 +59,10 @@ public class JIFSDplugins extends JIFSDirectory {
 		// just add new ones and delete old ones
 		// now it does delete all files and (re)create all ones
 		super.clear();
-		final ArrayList rows = new ArrayList();
+		final ArrayList<String> rows = new ArrayList<String>();
 		try {
 			final PluginManager mgr = (PluginManager) InitialNaming.lookup(PluginManager.NAME);
-	        for (Iterator<PluginDescriptor> i = mgr.getRegistry().getDescriptorIterator(); i
-	                .hasNext();) {
-	            final PluginDescriptor descr = i.next();
+	        for (PluginDescriptor descr : mgr.getRegistry()) {
 	            rows.add(descr.getId());
 	        }
 	        Collections.sort(rows);

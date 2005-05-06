@@ -24,7 +24,6 @@ package org.jnode.build;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Iterator;
 
 import org.apache.tools.ant.Project;
 import org.jnode.plugin.PluginDescriptor;
@@ -134,9 +133,7 @@ public abstract class AbstractPluginsTask extends AbstractPluginTask {
     protected void testPluginPrerequisites(PluginRegistry registry)
             throws BuildException {
 
-        for (Iterator<PluginDescriptor> i = registry.getDescriptorIterator(); i
-                .hasNext();) {
-            final PluginDescriptor descr = (PluginDescriptor) i.next();
+        for (PluginDescriptor descr : registry) {
             if (!descr.isSystemPlugin()) {
                 log(descr.getId() + " is not a system plugin", Project.MSG_WARN);
             }
