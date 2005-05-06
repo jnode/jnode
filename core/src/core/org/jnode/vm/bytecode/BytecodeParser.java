@@ -43,34 +43,6 @@ import org.jnode.vm.classmgr.VmMethod;
  */
 public class BytecodeParser {
 
-    /*
-     * The following value must not be changed. The native code of interpreter
-     * jumptables depend on them.
-     */
-    public static final int QUICK_GETSTATIC = 210;
-
-    public static final int QUICK_PUTSTATIC = 211;
-
-    public static final int QUICK_GETFIELD = 212;
-
-    public static final int QUICK_PUTFIELD = 213;
-
-    public static final int QUICK_GETSTATIC_WIDE = 214;
-
-    public static final int QUICK_PUTSTATIC_WIDE = 215;
-
-    public static final int QUICK_GETFIELD_WIDE = 216;
-
-    public static final int QUICK_PUTFIELD_WIDE = 217;
-
-    public static final int QUICK_INVOKEVIRTUAL = 218;
-
-    public static final int QUICK_INVOKESPECIAL = 219;
-
-    public static final int QUICK_INVOKESTATIC = 220;
-
-    public static final int QUICK_INVOKEINTERFACE = 221;
-
     private final VmByteCode bc;
 
     private final VmCP cp;
@@ -78,8 +50,6 @@ public class BytecodeParser {
     private ByteBuffer bytecode;
 
     private final BytecodeVisitor handler;
-
-//    private int offset;
 
     private int address;
 
@@ -92,8 +62,6 @@ public class BytecodeParser {
     private int continueAt;
 
     private int endPC;
-
-    //private static int[] counters = new int[ 256];
 
     /**
      * @return The padded address
@@ -801,16 +769,12 @@ public class BytecodeParser {
             case 0xb1:
                 handler.visit_return();
                 break;
-            case QUICK_GETSTATIC:
-            case QUICK_GETSTATIC_WIDE:
             case 0xb2:
                 {
                     VmConstFieldRef field = cp.getConstFieldRef(getu2());
                     handler.visit_getstatic(field);
                 }
                 break;
-            case QUICK_PUTSTATIC:
-            case QUICK_PUTSTATIC_WIDE:
             case 0xb3:
                 {
                     VmConstFieldRef field = cp.getConstFieldRef(getu2());
@@ -818,35 +782,27 @@ public class BytecodeParser {
                 }
                 break;
             // -- 180 --
-            case QUICK_GETFIELD:
-            case QUICK_GETFIELD_WIDE:
             case 0xb4:
                 {
                     VmConstFieldRef field = cp.getConstFieldRef(getu2());
                     handler.visit_getfield(field);
                 }
                 break;
-            case QUICK_PUTFIELD:
-            case QUICK_PUTFIELD_WIDE:
             case 0xb5:
                 {
                     VmConstFieldRef field = cp.getConstFieldRef(getu2());
                     handler.visit_putfield(field);
                 }
                 break;
-            case QUICK_INVOKEVIRTUAL:
             case 0xb6:
                 handler.visit_invokevirtual(cp.getConstMethodRef(getu2()));
                 break;
-            case QUICK_INVOKESPECIAL:
             case 0xb7:
                 handler.visit_invokespecial(cp.getConstMethodRef(getu2()));
                 break;
-            case QUICK_INVOKESTATIC:
             case 0xb8:
                 handler.visit_invokestatic(cp.getConstMethodRef(getu2()));
                 break;
-            case QUICK_INVOKEINTERFACE:
             case 0xb9:
                 {
                     VmConstIMethodRef ref = cp.getConstIMethodRef(getu2());
