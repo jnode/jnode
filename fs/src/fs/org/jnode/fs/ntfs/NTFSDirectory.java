@@ -22,11 +22,11 @@
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSEntryIterator;
 import org.jnode.fs.FileSystem;
 
 /**
@@ -55,7 +55,7 @@ public class NTFSDirectory implements FSDirectory {
     /**
      * Gets an iterator to iterate over all entries of this directory.
      */
-    public FSEntryIterator iterator() {
+    public Iterator<FSEntry> iterator() {
         return new DirectoryEntryIterator(fs, index);
     }
 
@@ -64,7 +64,7 @@ public class NTFSDirectory implements FSDirectory {
      */
     public FSEntry getEntry(String name) {
         log.debug("getEntry(" + name + ")");
-        for (FSEntryIterator it = this.iterator(); it.hasNext();) {
+        for (Iterator<FSEntry> it = this.iterator(); it.hasNext();) {
             final NTFSEntry entry = (NTFSEntry) it.next();
             if (entry.getName().equals(name)) { return entry; }
         }

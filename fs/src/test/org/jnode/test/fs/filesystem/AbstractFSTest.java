@@ -25,13 +25,14 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.naming.NameNotFoundException;
 
 import org.jnode.driver.Device;
 import org.jnode.fs.FSDirectory;
-import org.jnode.fs.FSEntryIterator;
+import org.jnode.fs.FSEntry;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
@@ -124,7 +125,7 @@ public abstract class AbstractFSTest extends AbstractTest {
         return (FSContext) ContextManager.getInstance().getContext();
     }
     
-    protected void assertContainsOnly(String errorMessage, FSEntryIterator it, String[] requiredNames)
+    protected void assertContainsOnly(String errorMessage, Iterator<FSEntry> it, String[] requiredNames)
     {
         boolean ok = true;
         List<String> reqNames = (requiredNames == null) ? new ArrayList<String>() : new ArrayList<String>(Arrays.asList(requiredNames));

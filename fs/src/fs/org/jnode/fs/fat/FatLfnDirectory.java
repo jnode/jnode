@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSEntryIterator;
 import org.jnode.fs.ReadOnlyFileSystemException;
 
 
@@ -219,8 +218,8 @@ public class FatLfnDirectory extends FatDirectory {
 		super.flush();
 	}
 
-	public FSEntryIterator iterator() {
-		return new FSEntryIterator()
+	public Iterator<FSEntry> iterator() {
+		return new Iterator<FSEntry>()
 		{
 			Iterator<LfnEntry> it = shortNameIndex.values().iterator();
 			
@@ -230,7 +229,14 @@ public class FatLfnDirectory extends FatDirectory {
 
 			public FSEntry next() {
 				return it.next();
-			}			
+			}
+            
+            /**
+             * @see java.util.Iterator#remove()
+             */
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
 		};
 	}
 

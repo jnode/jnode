@@ -23,12 +23,12 @@ package org.jnode.fs.jifs;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSEntryIterator;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.ReadOnlyFileSystemException;
@@ -109,7 +109,7 @@ public class JIFSDirectory implements ExtFSEntry, FSDirectory {
         return null;
     }
 
-    public FSEntryIterator iterator() {
+    public Iterator<FSEntry> iterator() {
         return new JIFSDirIterator(entries.values());
     }
 

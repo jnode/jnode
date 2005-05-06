@@ -25,12 +25,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSEntryIterator;
 import org.jnode.fs.ReadOnlyFileSystemException;
 
 /**
@@ -64,7 +64,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 	 * 
 	 * @return Iterator
 	 */
-	public FSEntryIterator iterator() {
+	public Iterator<FSEntry> iterator() {
 		return new DirIterator();
 	}
 
@@ -250,7 +250,7 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 		out.println("Unused entries " + freeCount);
 	}
 
-	class DirIterator implements FSEntryIterator {
+	class DirIterator implements Iterator<FSEntry> {
 
 		private int offset = 0;
 
@@ -286,6 +286,13 @@ public abstract class AbstractDirectory extends FatObject implements FSDirectory
 			}
 			throw new NoSuchElementException();
 		}
+        
+        /**
+         * @see java.util.Iterator#remove()
+         */
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
 	}
 
 	/**
