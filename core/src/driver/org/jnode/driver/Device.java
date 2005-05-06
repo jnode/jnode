@@ -249,7 +249,7 @@ public class Device implements ResourceOwner {
 	 *             The given api has not been found
 	 */
 	public final <T extends DeviceAPI> T getAPI(Class<T> apiInterface) throws ApiNotFoundException {
-		final T impl = (T) apis.get(apiInterface);
+		final T impl = apiInterface.cast(apis.get(apiInterface));
 		if (impl == null) {
 			throw new ApiNotFoundException(apiInterface.getName());
 		}
