@@ -22,7 +22,6 @@
 package org.jnode.vm.compiler;
 
 import java.io.Writer;
-import java.util.Iterator;
 
 import org.jnode.assembler.Label;
 import org.jnode.assembler.NativeStream;
@@ -263,8 +262,7 @@ public abstract class NativeCodeCompiler extends VmSystemObject {
             final CompilerBytecodeParser parser = new CompilerBytecodeParser(
                     bc, cfg, bcv);
             bcv.startMethod(method);
-            for (Iterator<BasicBlock> i = cfg.basicBlockIterator(); i.hasNext();) {
-                final BasicBlock bb = (BasicBlock) i.next();
+            for (BasicBlock bb : cfg) {
                 bcv.startBasicBlock(bb);
                 parser.parse(bb.getStartPC(), bb.getEndPC(), false);
                 bcv.endBasicBlock();
