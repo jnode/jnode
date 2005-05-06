@@ -22,6 +22,7 @@
 package org.jnode.fs.fat;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.fs.partitions.ibm.IBMPartitionTableEntry;
@@ -64,7 +65,7 @@ public class BootSector {
 	 * @param device
 	 */
 	public synchronized void read(BlockDeviceAPI device) throws IOException {
-		device.read(0, data, 0, data.length);
+		device.read(0, ByteBuffer.wrap(data));
         
 		dirty = false;
 	}
@@ -75,7 +76,7 @@ public class BootSector {
 	 * @param device
 	 */
 	public synchronized void write(BlockDeviceAPI device) throws IOException {
-		device.write(0, data, 0, data.length);
+		device.write(0, ByteBuffer.wrap(data));
 		dirty = false;
 	}
 

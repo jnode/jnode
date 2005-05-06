@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -268,10 +269,9 @@ public class TestUtils {
             long devOffset = 0;
             long remaining = imgApi.getLength();
             while (remaining > 0)
-                ;
             {
                 toRead = (int) Math.min(buffer.length, remaining);
-                imgApi.read(devOffset, buffer, 0, toRead);
+                imgApi.read(devOffset, ByteBuffer.wrap(buffer, 0, toRead));
                 fos.write(buffer, 0, toRead);
 
                 devOffset += toRead;
@@ -319,7 +319,7 @@ public class TestUtils {
             if (nbRead < 0)
                 break;
 
-            wrkApi.write(devOffset, sector, 0, nbRead);
+            wrkApi.write(devOffset, ByteBuffer.wrap(sector, 0, nbRead));
             devOffset += nbRead;
         }
     }
@@ -344,8 +344,8 @@ public class TestUtils {
         long devOffset = 0;
         for (int s = 0; s < nbSectors; s++) {
             // log.debug("copying sector "+s);
-            imgApi.read(devOffset, sector, 0, sector.length);
-            wrkApi.write(devOffset, sector, 0, sector.length);
+            imgApi.read(devOffset, ByteBuffer.wrap(sector, 0, sector.length));
+            wrkApi.write(devOffset, ByteBuffer.wrap(sector, 0, sector.length));
             devOffset += sectorSize;
         }
     }

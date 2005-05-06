@@ -22,6 +22,7 @@
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.block.FSBlockDeviceAPI;
@@ -64,14 +65,14 @@ public class Ext2FileSystemType implements FileSystemType {
 				return (((IBMPartitionTableEntry)pte).getSystemIndicator() == IBMPartitionTypes.PARTTYPE_LINUXNATIVE);
 		}
 		else {	//no partition table entry (e.g. ramdisk)
-			//need to check the magic
-			byte[] magic=new byte[2];
+			//need to check the magic            
+			ByteBuffer magic = ByteBuffer.allocate(2);
 			try{
-				devApi.read(1024+56, magic, 0, 2);
+				devApi.read(1024+56, magic);
 			}catch(IOException e) {
 				return false;
 			}
-			return (Ext2Utils.get16(magic,0)==0xEF53);
+			return (Ext2Utils.get16(magic.array(),0)==0xEF53);
 		}
 		return false;
 	}

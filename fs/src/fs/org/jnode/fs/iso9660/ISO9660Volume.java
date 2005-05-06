@@ -22,6 +22,7 @@
 package org.jnode.fs.iso9660;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.FSBlockDeviceAPI;
@@ -105,7 +106,7 @@ public class ISO9660Volume implements ISO9660Constants {
      */
     final void readFromLBN(long startLBN, long offset, byte[] buffer,
             int bufferOffset, int length) throws IOException {
-        api.read((startLBN * blockSize) + offset, buffer, bufferOffset, length);
+        api.read((startLBN * blockSize) + offset, ByteBuffer.wrap(buffer, bufferOffset, length));
     }
 
     /**

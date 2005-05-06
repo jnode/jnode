@@ -193,7 +193,8 @@ public class BlockDeviceAPITest extends AbstractTest
         {            
             toRead = Math.min(bb.remaining(), (int) (bounds.getEnd()-offset));
             
-            api.read(offset, bb.array(), 0, toRead);
+            bb.position(0).limit(toRead);
+            api.read(offset, bb);
             bb.clear();
             
             offset += toRead;
@@ -213,7 +214,8 @@ public class BlockDeviceAPITest extends AbstractTest
         {            
             toWrite = Math.min(bb.remaining(), (int) (bounds.getEnd()-offset));
             
-            api.write(offset, bb.array(), 0, toWrite);
+            bb.position(0).limit(toWrite);
+            api.write(offset, bb);
             bb.clear();
             
             offset += toWrite;

@@ -25,9 +25,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 import org.jnode.driver.Device;
 import org.jnode.fs.partitions.PartitionTableEntry;
+import org.jnode.util.ByteBufferUtils;
 
 /**
  * <description>
@@ -62,10 +64,15 @@ public class FileDevice extends Device implements FSBlockDeviceAPI {
 	 * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
 	 * @throws IOException
 	 */
-	public void read(long devOffset, byte[] dest, int destOffset, int length) throws IOException {
-        BlockDeviceAPIHelper.checkBounds(this, devOffset, length);
+	public void read(long devOffset, ByteBuffer destBuf) throws IOException {
+        BlockDeviceAPIHelper.checkBounds(this, devOffset, destBuf.remaining());
 		raf.seek(devOffset);
-		raf.read(dest, destOffset, length);
+        
+        //TODO optimize it also to use ByteBuffer at lower level                 
+        ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
+        byte[] dest = destBA.toArray();
+		raf.read(dest, 0, dest.length);
+        destBA.refreshByteBuffer();
 	}
 
 	/**
@@ -76,11 +83,14 @@ public class FileDevice extends Device implements FSBlockDeviceAPI {
 	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
 	 * @throws IOException
 	 */
-	public void write(long devOffset, byte[] src, int srcOffset, int length) throws IOException {
+	public void write(long devOffset, ByteBuffer srcBuf) throws IOException {
 		//		log.debug("fd.write devOffset=" + devOffset + ", length=" + length);
-        BlockDeviceAPIHelper.checkBounds(this, devOffset, length);
+        BlockDeviceAPIHelper.checkBounds(this, devOffset, srcBuf.remaining());
 		raf.seek(devOffset);
-		raf.write(src, srcOffset, length);
+        
+        //TODO optimize it also to use ByteBuffer at lower level        
+        byte[] src = ByteBufferUtils.toArray(srcBuf);
+		raf.write(src, 0, src.length);
 	}
 	/**
 	 * @see org.jnode.driver.block.BlockDeviceAPI#flush()

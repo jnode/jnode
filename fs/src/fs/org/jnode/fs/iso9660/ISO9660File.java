@@ -64,11 +64,9 @@ public class ISO9660File implements FSFile {
     public void read(long fileOffset, ByteBuffer destBuf)    
             throws IOException {
         //TODO optimize it also to use ByteBuffer at lower level
-        final int len = destBuf.remaining();
-        final int off = destBuf.position();
         final ByteBufferUtils.ByteArray destBA = ByteBufferUtils.toByteArray(destBuf);
         final byte[] dest = destBA.toArray();
-        this.entry.getCDFSentry().readFileData(fileOffset, dest, off, len);
+        this.entry.getCDFSentry().readFileData(fileOffset, dest, 0, dest.length);
         destBA.refreshByteBuffer();
     }
 

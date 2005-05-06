@@ -21,6 +21,8 @@
  
 package org.jnode.driver.block;
 
+import java.nio.ByteBuffer;
+
 import org.jnode.driver.Device;
 import org.jnode.driver.Driver;
 import org.jnode.driver.InvalidDriverException;
@@ -53,8 +55,9 @@ public class ByteArrayDevice extends Device implements BlockDeviceAPI {
 	 * @param length
 	 * @see org.jnode.driver.block.BlockDeviceAPI#read(long, byte[], int, int)
 	 */
-	public void read(long devOffset, byte[] dest, int destOffset, int length) {
-		System.arraycopy(array, (int)devOffset, dest, destOffset, length);
+	public void read(long devOffset, ByteBuffer dest) {
+		//System.arraycopy(array, (int)devOffset, dest, destOffset, length);
+        dest.put(this.array, (int)devOffset, dest.remaining());        
 	}
 
 	/**
@@ -64,8 +67,9 @@ public class ByteArrayDevice extends Device implements BlockDeviceAPI {
 	 * @param length
 	 * @see org.jnode.driver.block.BlockDeviceAPI#write(long, byte[], int, int)
 	 */
-	public void write(long devOffset, byte[] src, int srcOffset, int length) {
-		System.arraycopy(src, srcOffset, array, (int)devOffset, length);
+	public void write(long devOffset, ByteBuffer src) {
+		//System.arraycopy(src, srcOffset, array, (int)devOffset, length);
+        src.get(this.array, (int)devOffset, src.remaining());        
 	}
 
 	/**

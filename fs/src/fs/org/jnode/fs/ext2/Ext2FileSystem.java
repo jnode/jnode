@@ -22,6 +22,7 @@
 package org.jnode.fs.ext2;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -82,17 +83,17 @@ public class Ext2FileSystem extends AbstractFileSystem {
     }
 
     public void read() throws FileSystemException {
-        byte data[];
+        ByteBuffer data;
 
         try {
-            data = new byte[Superblock.SUPERBLOCK_LENGTH];
+            data = ByteBuffer.allocate(Superblock.SUPERBLOCK_LENGTH);
 
             //skip the first 1024 bytes (bootsector) and read the superblock
             //TODO: the superblock should read itself
-            getApi().read(1024, data, 0, Superblock.SUPERBLOCK_LENGTH);
+            getApi().read(1024, data);
             //superblock = new Superblock(data, this);
             superblock = new Superblock();
-            superblock.read(data, this);
+            superblock.read(data.array(), this);
 
             //read the group descriptors
             groupCount = (int)Ext2Utils.ceilDiv(superblock.getBlocksCount(), superblock.getBlocksPerGroup());
@@ -357,16 +358,16 @@ public class Ext2FileSystem extends AbstractFileSystem {
         //      -a single block can be retrieved more than once. However,
         //		 the block will be put in the cache only once in the second
         //		 synchronized block
-        byte[] data = new byte[blockSize];
+        ByteBuffer data = ByteBuffer.allocate(blockSize);
         log.debug("Reading block " + nr + " (offset: " + nr * blockSize
                 + ") from disk");
-        getApi().read(nr * blockSize, data, 0, blockSize);
+        getApi().read(nr * blockSize, data);
 
         //synchronize again
         synchronized (blockCache) {
             //check if the block has already been retrieved
             if (!blockCache.containsKey(key)) {
-                result = new Block(this, nr, data);
+                result = new Block(this, nr, data.array());
                 blockCache.put(key, result);
                 return result.getData();
             } else {
@@ -412,7 +413,8 @@ public class Ext2FileSystem extends AbstractFileSystem {
                 block.setData(data);
                 if (forceWrite || SYNC_WRITE) {
                     //write the block to disk
-                    getApi().write(nr * blockSize, data, 0, blockSize);
+                    ByteBuffer dataBuf = ByteBuffer.wrap(data, 0, blockSize);
+                    getApi().write(nr * blockSize, dataBuf);
                     //timedWrite(nr, data);
                     block.setDirty(false);
 
@@ -423,7 +425,8 @@ public class Ext2FileSystem extends AbstractFileSystem {
                 //If the block was not in the cache, I see no reason to put it
                 //in the cache when it is written.
                 //It is simply written to disk.
-                getApi().write(nr * blockSize, data, 0, blockSize);
+                ByteBuffer dataBuf = ByteBuffer.wrap(data, 0, blockSize);
+                getApi().write(nr * blockSize, dataBuf);
                 //timedWrite(nr, data);
             }
         }

@@ -22,6 +22,7 @@
 package org.jnode.driver.block;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.jnode.driver.DeviceAPI;
 
@@ -48,7 +49,7 @@ public interface BlockDeviceAPI extends DeviceAPI {
 	 * @param length
 	 * @throws IOException
 	 */
-	public abstract void read(long devOffset, byte[] dest, int destOffset, int length)
+	public abstract void read(long devOffset, ByteBuffer dest)
 	throws IOException;
 	
 	/**
@@ -59,7 +60,7 @@ public interface BlockDeviceAPI extends DeviceAPI {
 	 * @param length
 	 * @throws IOException
 	 */
-	public abstract void write(long devOffset, byte[] src, int srcOffset, int length)
+	public abstract void write(long devOffset, ByteBuffer src)
 	throws IOException;
 
 	public abstract void flush() 

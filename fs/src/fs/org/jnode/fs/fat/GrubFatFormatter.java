@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.ByteBuffer;
 
 import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.Geometry;
@@ -169,7 +170,7 @@ public class GrubFatFormatter {
 		 */
 
 		/* Write stage2 */
-		api.write(bs.getBytesPerSector(), stage2, 0, stage2.length);
+		api.write(bs.getBytesPerSector(), ByteBuffer.wrap(stage2));
 	}
 
 	/**

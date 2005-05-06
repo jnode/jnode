@@ -22,6 +22,7 @@
 package org.jnode.fs.ntfs;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.block.BlockDeviceAPI;
@@ -58,9 +59,9 @@ public class NTFSVolume {
         this.api = api;
 
         // Read the boot sector
-        final byte[] buffer = new byte[ 512];
-        api.read(0, buffer, 0, 512);
-        this.bootRecord = new BootRecord(buffer);
+        final ByteBuffer buffer = ByteBuffer.allocate(512);
+        api.read(0, buffer);
+        this.bootRecord = new BootRecord(buffer.array());
         this.clusterSize = bootRecord.getClusterSize();
     }
 
@@ -82,7 +83,7 @@ public class NTFSVolume {
         final long clusterOffset = cluster * clusterSize;
 
         log.debug("readCluster(" + cluster + ") " + (readClusterCount++));
-        api.read(clusterOffset, dst, dstOffset, clusterSize);
+        api.read(clusterOffset, ByteBuffer.wrap(dst, dstOffset, clusterSize));
     }
 
     private int readClusterCount;
@@ -106,7 +107,7 @@ public class NTFSVolume {
         final int clusterSize = getClusterSize();
 
         final long clusterOffset = firstCluster * clusterSize;
-        api.read(clusterOffset, dst, dstOffset, nrClusters * clusterSize);
+        api.read(clusterOffset, ByteBuffer.wrap(dst, dstOffset, nrClusters * clusterSize));
     }
 
     /**
