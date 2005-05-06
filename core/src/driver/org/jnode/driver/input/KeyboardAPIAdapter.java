@@ -22,7 +22,6 @@
 package org.jnode.driver.input;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
@@ -35,7 +34,7 @@ public class KeyboardAPIAdapter implements KeyboardAPI {
 	private static final Logger log = Logger.getLogger(KeyboardAPIAdapter.class);
 	
 	/** All listeners */
-	private final ArrayList listeners = new ArrayList();
+	private final ArrayList<KeyboardListener> listeners = new ArrayList<KeyboardListener>();
 	/** The interpreter */
 	private KeyboardInterpreter interpreter = null/*new KeyboardInterpreter()*/;
 	
@@ -101,8 +100,7 @@ public class KeyboardAPIAdapter implements KeyboardAPI {
 	 */
 	public synchronized void fireEvent(KeyboardEvent event) {
 		if (event != null) {
-			for (Iterator i = listeners.iterator(); i.hasNext();) {
-				KeyboardListener l = (KeyboardListener) i.next();
+			for (KeyboardListener l : listeners) {
 				try {
 					if (event.isKeyPressed()) {
 						l.keyPressed(event);

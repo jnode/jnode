@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.jnode.driver.Device;
@@ -43,7 +42,7 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 	private ByteChannel channel;
 	private PointerInterpreter interpreter;
 	private PointerDaemon daemon;
-	private final ArrayList listeners = new ArrayList();
+	private final ArrayList<PointerListener> listeners = new ArrayList<PointerListener>();
 
 	/**
 	 * Add a pointer listener
@@ -131,8 +130,7 @@ public abstract class AbstractPointerDriver extends Driver implements PointerAPI
 	 * @param event
 	 */
 	protected void dispatchEvent(PointerEvent event) {
-		for (Iterator i = listeners.iterator(); i.hasNext();) {
-			PointerListener l = (PointerListener) i.next();
+		for (PointerListener l : listeners) {
 			l.pointerStateChanged(event);
 			if (event.isConsumed()) {
 				break;

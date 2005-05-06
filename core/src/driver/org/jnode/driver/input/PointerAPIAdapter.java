@@ -22,7 +22,6 @@
 package org.jnode.driver.input;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
@@ -35,7 +34,7 @@ public class PointerAPIAdapter implements PointerAPI {
 	private static final Logger log = Logger.getLogger(PointerAPIAdapter.class);
 	
 	/** All listeners */
-	private final ArrayList listeners = new ArrayList();
+	private final ArrayList<PointerListener> listeners = new ArrayList<PointerListener>();
 
 	/**
 	 * Add a pointer listener
@@ -65,8 +64,7 @@ public class PointerAPIAdapter implements PointerAPI {
 	 * @param event
 	 */
 	public synchronized void fireEvent(PointerEvent event) {
-		for (Iterator i = listeners.iterator(); i.hasNext();) {
-			PointerListener l = (PointerListener) i.next();
+		for (PointerListener l : listeners) {
 			try {
 				l.pointerStateChanged(event);
 			} catch (Throwable ex) {

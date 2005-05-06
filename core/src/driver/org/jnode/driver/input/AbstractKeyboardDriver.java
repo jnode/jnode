@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.jnode.driver.Device;
 import org.jnode.driver.Driver;
@@ -50,15 +49,15 @@ public abstract class AbstractKeyboardDriver extends Driver implements
 
     private KeyboardDaemon daemon;
 
-    private QueueProcessorThread eventQueueThread;
+    private QueueProcessorThread<KeyboardEvent> eventQueueThread;
 
     private InputStream kis;
 
-    private final ArrayList kbListeners = new ArrayList();
+    private final ArrayList<KeyboardListener> kbListeners = new ArrayList<KeyboardListener>();
 
-    private final ArrayList stListeners = new ArrayList();
+    private final ArrayList<SystemTriggerListener> stListeners = new ArrayList<SystemTriggerListener>();
 
-    final Queue eventQueue = new Queue();
+    final Queue<KeyboardEvent> eventQueue = new Queue<KeyboardEvent>();
 
     /**
      * Add a keyboard listener
@@ -124,7 +123,7 @@ public abstract class AbstractKeyboardDriver extends Driver implements
         final String id = dev.getId();
         this.daemon = new KeyboardDaemon(id + "-daemon");
         daemon.start();
-        this.eventQueueThread = new QueueProcessorThread(id + "-dispatcher",
+        this.eventQueueThread = new QueueProcessorThread<KeyboardEvent>(id + "-dispatcher",
                 eventQueue, new KeyboardEventDispatcher());
         eventQueueThread.start();
         dev.registerAPI(KeyboardAPI.class, this);
@@ -198,8 +197,7 @@ public abstract class AbstractKeyboardDriver extends Driver implements
      */
     protected void dispatchEvent(KeyboardEvent event) {
         //Syslog.debug("Dispatching event to " + listeners.size());
-        for (Iterator i = kbListeners.iterator(); i.hasNext();) {
-            KeyboardListener l = (KeyboardListener) i.next();
+        for (KeyboardListener l : kbListeners) {
             if (event.isKeyPressed()) {
                 l.keyPressed(event);
             } else if (event.isKeyReleased()) {
@@ -218,8 +216,7 @@ public abstract class AbstractKeyboardDriver extends Driver implements
      */
     protected void dispatchSystemTriggerEvent(KeyboardEvent event) {
         //Syslog.debug("Dispatching event to " + listeners.size());
-        for (Iterator i = stListeners.iterator(); i.hasNext();) {
-            final SystemTriggerListener l = (SystemTriggerListener) i.next();
+        for (SystemTriggerListener l : stListeners) {
             l.systemTrigger(event);
         }
     }
@@ -262,13 +259,12 @@ public abstract class AbstractKeyboardDriver extends Driver implements
         }
     }
 
-    class KeyboardEventDispatcher implements QueueProcessor {
+    class KeyboardEventDispatcher implements QueueProcessor<KeyboardEvent> {
 
         /**
          * @see org.jnode.util.QueueProcessor#process(java.lang.Object)
          */
-        public void process(Object object) throws Exception {
-            final KeyboardEvent event = (KeyboardEvent) object;
+        public void process(KeyboardEvent event) throws Exception {
             dispatchEvent(event);
         }
     }
