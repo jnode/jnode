@@ -23,20 +23,19 @@ package org.jnode.vm.compiler.ir;
 
 /**
  * @author Madhu Siddalingaiah
- * 
  */
-public class RegisterLocation extends Location {
-	private Object register;
+public class RegisterLocation<T> extends Location<T> {
+	private T register;
 	
 	/**
 	 * @param register
 	 */
-	public RegisterLocation(Object register) {
+	public RegisterLocation(T register) {
 		super(register.toString());
 		this.register = register;
 	}
 	
-	public Object getRegister() {
+	public T getRegister() {
 		return register;
 	}
 }

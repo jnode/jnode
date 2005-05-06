@@ -25,7 +25,7 @@ package org.jnode.vm.compiler.ir;
  * @author Madhu Siddalingaiah
  *
  */
-public class MethodArgument extends Variable {
+public class MethodArgument<T> extends Variable<T> {
 	/**
 	 * @param type
 	 * @param index
@@ -37,7 +37,7 @@ public class MethodArgument extends Variable {
 	/**
 	 * @param argument
 	 */
-	public MethodArgument(MethodArgument argument) {
+	public MethodArgument(MethodArgument<T> argument) {
 		this(argument.getType(), argument.getIndex());
 	}
 
@@ -46,13 +46,13 @@ public class MethodArgument extends Variable {
 	}
 	
 	public Object clone() {
-		return new MethodArgument(this);
+		return new MethodArgument<T>(this);
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.Operand#simplify()
 	 */
-	public Operand simplify() {
+	public Operand<T> simplify() {
 		// Can't do much with this...
 		return this;
 	}

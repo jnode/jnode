@@ -31,39 +31,39 @@ import org.jnode.vm.compiler.ir.Variable;
  * @author Madhu Siddalingaiah
  * 
  */
-public class PhiAssignQuad extends AssignQuad {
-	private PhiOperand phi;
+public class PhiAssignQuad<T> extends AssignQuad<T> {
+	private PhiOperand<T> phi;
 
 	/**
 	 * @param address
 	 * @param block
 	 * @param lhsIndex
 	 */
-	public PhiAssignQuad(int address, IRBasicBlock block, int lhsIndex) {
+	public PhiAssignQuad(int address, IRBasicBlock<T> block, int lhsIndex) {
 		super(address, block, lhsIndex);
-		phi = new PhiOperand();
+		phi = new PhiOperand<T>();
 	}
 
 	/**
 	 * @param dfb
 	 * @param def
 	 */
-	public PhiAssignQuad(IRBasicBlock dfb, int lhsIndex) {
+	public PhiAssignQuad(IRBasicBlock<T> dfb, int lhsIndex) {
 		this(dfb.getStartPC(), dfb, lhsIndex);
 	}
 
-	public PhiOperand getPhiOperand() {
-		return (PhiOperand) phi;
+	public PhiOperand<T> getPhiOperand() {
+		return phi;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.quad.AssignQuad#propagate(org.jnode.vm.compiler.ir.Variable)
 	 */
-	public Operand propagate(Variable operand) {
+	public Operand<T> propagate(Variable<T> operand) {
 		return operand;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.quad.AssignQuad#getLHSLiveAddress()
 	 */
 	public int getLHSLiveAddress() {
@@ -71,22 +71,22 @@ public class PhiAssignQuad extends AssignQuad {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.quad.Quad#getReferencedOps()
 	 */
-	public Operand[] getReferencedOps() {
+	public Operand<T>[] getReferencedOps() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.quad.Quad#doPass2(org.jnode.util.BootableHashMap)
 	 */
 	public void doPass2() {
 		phi.simplify();
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.quad.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
 	 */
 	public void generateCode(CodeGenerator cg) {
@@ -94,12 +94,12 @@ public class PhiAssignQuad extends AssignQuad {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
+	/**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
 	public boolean equals(Object obj) {
 		if (obj instanceof PhiAssignQuad) {
-			PhiAssignQuad paq = (PhiAssignQuad) obj;
+			PhiAssignQuad<T> paq = (PhiAssignQuad<T>) obj;
 			return getLHS().equals(paq.getLHS());
 		}
 		return false;

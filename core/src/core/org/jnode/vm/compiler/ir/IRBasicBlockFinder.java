@@ -37,7 +37,7 @@ import org.jnode.vm.classmgr.VmMethod;
  * @author Madhu Siddalingaiah
  * 
  */
-public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Comparator<IRBasicBlock> {
+public class IRBasicBlockFinder<T> extends BytecodeVisitorSupport implements Comparator<IRBasicBlock> {
 	private boolean nextIsStartOfBB;
 
 	private IRBasicBlock currentBlock;
@@ -45,7 +45,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	private byte[] opcodeFlags;
 	private byte[] branchFlags;
 
-	private final ArrayList<IRBasicBlock> blocks = new ArrayList<IRBasicBlock>();
+	private final ArrayList<IRBasicBlock<T>> blocks = new ArrayList<IRBasicBlock<T>>();
 	private final HashMap<Integer, Integer> branchTargets = new HashMap<Integer, Integer>();
 	private VmByteCode byteCode;
 	private static final byte CONDITIONAL_BRANCH = 1;
@@ -56,11 +56,11 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * 
 	 * @return
 	 */
-	public IRBasicBlock[] createBasicBlocks() {
+	public IRBasicBlock<T>[] createBasicBlocks() {
 		// Sort the blocks on start PC
 		Collections.sort(blocks, this);
 		// Create the array
-		final IRBasicBlock[] list = (IRBasicBlock[])blocks.toArray(new IRBasicBlock[blocks.size()]);
+		final IRBasicBlock<T>[] list = (IRBasicBlock<T>[])blocks.toArray(new IRBasicBlock[blocks.size()]);
 		// Set the EndPC's and flags
 		final byte[] opcodeFlags = this.opcodeFlags;
 		final byte[] branchFlags = this.branchFlags;
@@ -82,7 +82,7 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 					i++;
 				}
 				// the BB
-				final IRBasicBlock bb = list[bbIndex++];
+				final IRBasicBlock<T> bb = list[bbIndex++];
 				if (nextIsSuccessor && bbIndex < list.length) {
 					bb.addSuccessor(list[bbIndex]);
 				}
@@ -98,8 +98,8 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
         for (Map.Entry<Integer, Integer> entry : branchTargets.entrySet()) {
             final int from = entry.getKey();
             final int to = entry.getValue();
-			IRBasicBlock pred = findBB(list, from);
-			IRBasicBlock succ = findBB(list, to);
+			IRBasicBlock<T> pred = findBB(list, from);
+			IRBasicBlock<T> succ = findBB(list, to);
 			if (pred == null || succ == null) {
 				throw new AssertionError("unable to find BB!");
 			}
@@ -111,10 +111,10 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 		return list;
 	}
 
-	private IRBasicBlock findBB(IRBasicBlock[] blocks, int address) {
-		for (int i=0; i<blocks.length; i+=1) {
-			if (blocks[i].contains(address)) {
-				return blocks[i];
+	private IRBasicBlock<T> findBB(IRBasicBlock<T>[] blocks, int address) {
+		for (IRBasicBlock<T> b : blocks) {
+			if (b.contains(address)) {
+				return b;
 			}
 		}
 		return null;
@@ -406,16 +406,14 @@ public class IRBasicBlockFinder extends BytecodeVisitorSupport implements Compar
 	 * 
 	 * @param address
 	 */
-	private final IRBasicBlock startBB(int address) {
-		IRBasicBlock next = null;
+	private final IRBasicBlock<T> startBB(int address) {
+		IRBasicBlock<T> next = null;
 		if ((opcodeFlags[address] & BytecodeFlags.F_START_OF_BASICBLOCK) == 0) {
 			opcodeFlags[address] |= BytecodeFlags.F_START_OF_BASICBLOCK;
-			next = new IRBasicBlock(address);
+			next = new IRBasicBlock<T>(address);
 			blocks.add(next);
 		} else {
-			int n = blocks.size();
-			for (int i=0; i<n; i+=1) {
-				IRBasicBlock bb = (IRBasicBlock) blocks.get(i);
+			for (IRBasicBlock<T> bb : blocks) {
 				if (bb.getStartPC() == address) {
 					next = bb;
 					break;

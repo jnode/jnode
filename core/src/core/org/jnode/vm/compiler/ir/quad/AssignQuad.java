@@ -29,29 +29,29 @@ import org.jnode.vm.compiler.ir.Variable;
  * @author Madhu Siddalingaiah
  *
  */
-public abstract class AssignQuad extends Quad {
+public abstract class AssignQuad<T> extends Quad<T> {
 	/**
 	 * Left hand side of assignment
 	 */
-	private Variable lhs;
+	private Variable<T> lhs;
 
-	public AssignQuad(int address, IRBasicBlock block, Variable lhs) {
+	public AssignQuad(int address, IRBasicBlock<T> block, Variable<T> lhs) {
 		super(address, block);
 		setLHS(lhs);
 	}
 
-	public AssignQuad(int address, IRBasicBlock block, int lhsIndex) {
+	public AssignQuad(int address, IRBasicBlock<T> block, int lhsIndex) {
 		this(address, block, block.getVariables()[lhsIndex]);
 	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.quad.Quad#getDefinedOp()
 	 */
-	public Operand getDefinedOp() {
+	public Operand<T> getDefinedOp() {
 		return lhs;
 	}
 	
-	public Variable getLHS() {
+	public Variable<T> getLHS() {
 		return lhs;
 	}
 
@@ -67,7 +67,7 @@ public abstract class AssignQuad extends Quad {
 	 * @param operand
 	 * @return simplifed result of this operation, or operand
 	 */
-	public abstract Operand propagate(Variable operand);
+	public abstract Operand<T> propagate(Variable<T> operand);
 
 	/**
 	 * Returns the address where the left hand side (LHS) of this quad
@@ -92,7 +92,7 @@ public abstract class AssignQuad extends Quad {
 	/**
 	 * @param lhs
 	 */
-	public void setLHS(Variable lhs) {
+	public void setLHS(Variable<T> lhs) {
 		this.lhs = lhs;
 		lhs.setAssignQuad(this);
 	}

@@ -24,7 +24,7 @@ package org.jnode.vm.compiler.ir;
 /**
  * @author Levente S\u00e1ntha
  */
-public class DoubleConstant extends Constant {
+public class DoubleConstant<T> extends Constant<T> {
 	private double value;
 	
 	public DoubleConstant(double value) {

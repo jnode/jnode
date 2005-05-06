@@ -25,34 +25,33 @@ package org.jnode.vm.compiler.ir;
  * @author Madhu Siddalingaiah
  * 
  */
-public class LiveRange implements Comparable {
-	private Variable variable;
+public class LiveRange<T> implements Comparable<LiveRange<T>> {
+	private Variable<T> variable;
 	private int assignAddress;
 	private int lastUseAddress;
 
 	/**
 	 * 
 	 */
-	public LiveRange(Variable v) {
+	public LiveRange(Variable<T> v) {
 		this.variable = v;
 		this.assignAddress = v.getAssignAddress();
 		this.lastUseAddress = v.getLastUseAddress();
 	}
 
-	public boolean interferesWith(LiveRange other) {
+	public boolean interferesWith(LiveRange<T> other) {
 		return lastUseAddress > other.getAssignAddress() ||
 			other.lastUseAddress > assignAddress;
 	}
 
-	public Variable getVariable() {
+	public Variable<T> getVariable() {
 		return variable;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	public int compareTo(Object obj) {
-		LiveRange other = (LiveRange) obj;
+	public int compareTo(LiveRange<T> other) {
 		return assignAddress - other.getVariable().getAssignAddress();
 	}
 	
@@ -83,14 +82,14 @@ public class LiveRange implements Comparable {
 	/**
 	 * @return
 	 */
-	public Location getLocation() {
+	public Location<T> getLocation() {
 		return variable.getLocation();
 	}
 
 	/**
 	 * @param loc
 	 */
-	public void setLocation(Location loc) {
+	public void setLocation(Location<T> loc) {
 		variable.setLocation(loc);
 	}
 }

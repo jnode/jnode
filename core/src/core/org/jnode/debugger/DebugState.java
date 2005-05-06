@@ -54,7 +54,7 @@ public abstract class DebugState {
      * Fill the given map with usage information for this state.
      * @param map keychar - message
      */
-    public void fillHelp(Map map) {
+    public void fillHelp(Map<String, String> map) {
         if (parent != null) {
             parent.fillHelp(map);
         }

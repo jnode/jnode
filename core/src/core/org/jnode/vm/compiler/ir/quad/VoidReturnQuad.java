@@ -29,25 +29,25 @@ import org.jnode.vm.compiler.ir.Operand;
  * @author Madhu Siddalingaiah
  *
  */
-public class VoidReturnQuad extends Quad {
+public class VoidReturnQuad<T> extends Quad<T> {
 	/**
 	 * @param address
 	 */
-	public VoidReturnQuad(int address, IRBasicBlock block) {
+	public VoidReturnQuad(int address, IRBasicBlock<T> block) {
 		super(address, block);
 	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.quad.Quad#getDefinedOp()
 	 */
-	public Operand getDefinedOp() {
+	public Operand<T> getDefinedOp() {
 		return null;
 	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.quad.Quad#getReferencedOps()
 	 */
-	public Operand[] getReferencedOps() {
+	public Operand<T>[] getReferencedOps() {
 		return null;
 	}
 
@@ -55,16 +55,16 @@ public class VoidReturnQuad extends Quad {
 		return getAddress() + ": return";
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
 	 */
 	public void doPass2() {
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
 	 */
-	public void generateCode(CodeGenerator cg) {
+	public void generateCode(CodeGenerator<T> cg) {
 		cg.generateCodeFor(this);
 	}
 }

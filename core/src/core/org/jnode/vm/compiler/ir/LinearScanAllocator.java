@@ -21,8 +21,10 @@
  
 package org.jnode.vm.compiler.ir;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import org.jnode.util.BootableArrayList;
 
@@ -30,64 +32,64 @@ import org.jnode.util.BootableArrayList;
  * @author Madhu Siddalingaiah
  * 
  */
-public class LinearScanAllocator {
-	private LiveRange[] liveRanges;
-	private BootableArrayList active;
-	private RegisterPool registerPool;
-	private EndPointComparator endPointComparator;
-	private BootableArrayList spilledVariableList;
-	private Variable[] spilledVariables;
+public class LinearScanAllocator<T> {
+	private LiveRange<T>[] liveRanges;
+	private List<LiveRange<T>> active;
+	private RegisterPool<T> registerPool;
+	private EndPointComparator<T> endPointComparator;
+	private List<Variable<T>> spilledVariableList;
+	private Variable<T>[] spilledVariables;
 
-	public LinearScanAllocator(LiveRange[] liveRanges) {
+	public LinearScanAllocator(LiveRange<T>[] liveRanges) {
 		this.liveRanges = liveRanges;
-		this.registerPool = CodeGenerator.getInstance().getRegisterPool();
-		this.active = new BootableArrayList();
-		this.endPointComparator = new EndPointComparator();
-		this.spilledVariableList = new BootableArrayList();
+        final CodeGenerator<T> cg = CodeGenerator.getInstance();
+		this.registerPool = cg.getRegisterPool();
+		this.active = new BootableArrayList<LiveRange<T>>();
+		this.endPointComparator = new EndPointComparator<T>();
+		this.spilledVariableList = new BootableArrayList<Variable<T>>();
 	}
 	
 	public void allocate() {
 		int n = liveRanges.length;
 		for (int i=0; i<n; i+=1) {
-			LiveRange lr = liveRanges[i];
-			Variable var = lr.getVariable();
+			LiveRange<T> lr = liveRanges[i];
+			Variable<T> var = lr.getVariable();
 			if (!(var instanceof MethodArgument)) {
 				// don't allocate method arguments to registers
 				expireOldRange(lr);
-				Object reg = registerPool.request(var.getType());
+				T reg = registerPool.request(var.getType());
 				if (reg == null) {
 					spillRange(lr);
 				} else {
-					lr.setLocation(new RegisterLocation(reg));
+					lr.setLocation(new RegisterLocation<T>(reg));
 					active.add(lr);
 					Collections.sort(active, endPointComparator);
 				}
 			}
 		}
 		// This sort is probably not necessary...
-		Collections.sort(spilledVariableList, new StorageSizeComparator());
+		Collections.sort(spilledVariableList, new StorageSizeComparator<T>());
 		n = spilledVariableList.size();
 		spilledVariables = new Variable[n];
 		for (int i=0; i<n; i+=1) {
-			spilledVariables[i] = (Variable) spilledVariableList.get(i);
+			spilledVariables[i] = spilledVariableList.get(i);
 		}
 	}
 
-	public Variable[] getSpilledVariables() {
+	public Variable<T>[] getSpilledVariables() {
 		return spilledVariables;
 	}
 
 	/**
 	 * @param lr
 	 */
-	private void expireOldRange(LiveRange lr) {
-		for (int i=0; i<active.size(); i+=1) {
-			LiveRange l = (LiveRange) active.get(i);
+	private void expireOldRange(LiveRange<T> lr) {
+		for (LiveRange<T> l : new ArrayList<LiveRange>(active)) {
 			if (l.getLastUseAddress() >= lr.getAssignAddress()) {
 				return;
 			}
 			active.remove(l);
-			RegisterLocation regLoc = (RegisterLocation) l.getLocation();
+			RegisterLocation<T> regLoc = (RegisterLocation<T>) l.getLocation();
 			registerPool.release(regLoc.getRegister());
 		}
 	}
@@ -95,40 +97,36 @@ public class LinearScanAllocator {
 	/**
 	 * @param lr
 	 */
-	private void spillRange(LiveRange lr) {
-		LiveRange spill = (LiveRange) active.get(active.size() - 1);
+	private void spillRange(LiveRange<T> lr) {
+		LiveRange<T> spill = active.get(active.size() - 1);
 		if (spill.getLastUseAddress() > lr.getLastUseAddress()) {
 			lr.setLocation(spill.getLocation());
-			spill.setLocation(new StackLocation());
+			spill.setLocation(new StackLocation<T>());
 			this.spilledVariableList.add(spill.getVariable());
 			active.remove(spill);
 			active.add(lr);
 			Collections.sort(active);
 		} else {
-			lr.setLocation(new StackLocation());
+			lr.setLocation(new StackLocation<T>());
 			this.spilledVariableList.add(lr.getVariable());
 		}
 	}
 }
 
-class EndPointComparator implements Comparator {
-	/* (non-Javadoc)
+class EndPointComparator<T> implements Comparator<LiveRange<T>> {
+	/**
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 	 */
-	public int compare(Object o1, Object o2) {
-		LiveRange lr1 = (LiveRange) o1;
-		LiveRange lr2 = (LiveRange) o2;
+	public int compare(LiveRange<T> lr1, LiveRange<T> lr2) {
 		return lr1.getLastUseAddress() - lr2.getLastUseAddress();
 	}
 }
 
-class StorageSizeComparator implements Comparator {
-	/* (non-Javadoc)
+class StorageSizeComparator<T> implements Comparator<Variable<T>> {
+	/**
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 	 */
-	public int compare(Object o1, Object o2) {
-		Variable lr1 = (Variable) o1;
-		Variable lr2 = (Variable) o2;
+	public int compare(Variable<T> lr1, Variable<T> lr2) {
 		int size1 = 0;
 		int size2 = 0;
 		// These are defined in the order on the stack

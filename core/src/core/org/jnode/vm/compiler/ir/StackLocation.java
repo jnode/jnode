@@ -25,7 +25,7 @@ package org.jnode.vm.compiler.ir;
  * @author Madhu Siddalingaiah
  * 
  */
-public class StackLocation extends Location {
+public class StackLocation<T> extends Location<T> {
 	private int displacement;
 
 	/**

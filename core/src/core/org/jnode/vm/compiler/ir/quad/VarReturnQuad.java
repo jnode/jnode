@@ -29,13 +29,13 @@ import org.jnode.vm.compiler.ir.Operand;
  * @author Madhu Siddalingaiah
  *
  */
-public class VarReturnQuad extends Quad {
-	private Operand refs[];
+public class VarReturnQuad<T> extends Quad<T> {
+	private Operand<T> refs[];
 
 	/**
 	 * @param address
 	 */
-	public VarReturnQuad(int address, IRBasicBlock block, int varIndex) {
+	public VarReturnQuad(int address, IRBasicBlock<T> block, int varIndex) {
 		super(address, block);
 		refs = new Operand[] { getOperand(varIndex) };
 	}
@@ -43,18 +43,18 @@ public class VarReturnQuad extends Quad {
 	/**
 	 * @see org.jnode.vm.compiler.ir.quad.Quad#getDefinedOp()
 	 */
-	public Operand getDefinedOp() {
+	public Operand<T> getDefinedOp() {
 		return null;
 	}
 
 	/**
 	 * @see org.jnode.vm.compiler.ir.quad.Quad#getReferencedOps()
 	 */
-	public Operand[] getReferencedOps() {
+	public Operand<T>[] getReferencedOps() {
 		return refs;
 	}
 	
-	public Operand getOperand() {
+	public Operand<T> getOperand() {
 		return refs[0];
 	}
 
@@ -62,17 +62,17 @@ public class VarReturnQuad extends Quad {
 		return getAddress() + ": return " + refs[0];
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
 	 */
 	public void doPass2() {
 		refs[0] = refs[0].simplify();
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
 	 */
-	public void generateCode(CodeGenerator cg) {
+	public void generateCode(CodeGenerator<T> cg) {
 		cg.generateCodeFor(this);
 	}
 }

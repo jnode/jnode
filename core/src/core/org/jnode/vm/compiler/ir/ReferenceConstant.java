@@ -25,7 +25,7 @@ package org.jnode.vm.compiler.ir;
  * @author Madhu Siddalingaiah
  * 
  */
-public class ReferenceConstant extends Constant {
+public class ReferenceConstant<T> extends Constant<T> {
 	private Object value;
 
 	/**

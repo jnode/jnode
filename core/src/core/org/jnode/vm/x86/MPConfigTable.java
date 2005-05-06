@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.vm.x86;
 
 import java.io.PrintStream;
@@ -28,24 +28,25 @@ import java.util.List;
 import org.jnode.system.BootLog;
 import org.jnode.system.MemoryResource;
 import org.jnode.system.ResourceNotFreeException;
-import org.jnode.util.NumberUtils;
 import org.vmmagic.unboxed.Address;
 import org.vmmagic.unboxed.MagicUtils;
-
 
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
 public class MPConfigTable {
-    
+
     private final MemoryResource mem;
+
     private static final byte[] ENTRY_LENGTH = { 20, 8, 8, 8, 8 };
+
     private final List<MPEntry> entries;
-    
+
     private static final byte[] SIGNATURE = { 'P', 'C', 'M', 'P' };
-    
+
     /**
      * Initialize this instance.
+     * 
      * @param mem
      */
     MPConfigTable(MemoryResource mem) {
@@ -56,7 +57,7 @@ public class MPConfigTable {
             this.entries = null;
         }
     }
-       
+
     /**
      * Does the table in the given memory resource have a valid signature?
      */
@@ -74,7 +75,7 @@ public class MPConfigTable {
         }
         return true;
     }
-    
+
     /**
      * Gets the number of entries
      */
@@ -102,7 +103,7 @@ public class MPConfigTable {
     public Address getLocalApicAddress() {
         return Address.fromIntZeroExtend(mem.getInt(36));
     }
-    
+
     /**
      * Gets the systems manufacturer identification string.
      */
@@ -111,7 +112,7 @@ public class MPConfigTable {
         mem.getBytes(8, data, 0, data.length);
         return new String(data).trim();
     }
-    
+
     /**
      * Gets the product family identification string.
      */
@@ -134,28 +135,30 @@ public class MPConfigTable {
     final void release() {
         mem.release();
     }
-    
-    
+
     /**
      * @see java.lang.Object#toString()
      */
     public String toString() {
         return "MPConfigTable";
     }
-    
+
     public void dump(PrintStream out) {
-        out.println("MPConfigTable");       
-        out.println("Address        0x" + MagicUtils.toString(mem.getAddress()));
+        out.println("MPConfigTable");
+        out
+                .println("Address        0x"
+                        + MagicUtils.toString(mem.getAddress()));
         out.println("Size           " + MagicUtils.toString(mem.getSize()));
         out.println("Manufacturer   " + getOemID());
         out.println("Product        " + getProductID());
-        out.println("Local APIC ptr 0x" + MagicUtils.toString(getLocalApicAddress()));
+        out.println("Local APIC ptr 0x"
+                + MagicUtils.toString(getLocalApicAddress()));
         out.println("Entries");
         for (MPEntry e : entries) {
-            out.println("  " + e);            
+            out.println("  " + e);
         }
     }
-    
+
     private final List<MPEntry> parse() {
         final int cnt = getEntryCount();
         final ArrayList<MPEntry> list = new ArrayList<MPEntry>(cnt);
@@ -165,15 +168,27 @@ public class MPConfigTable {
             while (offset < size) {
                 final int type = mem.getByte(offset);
                 final int len = ENTRY_LENGTH[type];
-                final MemoryResource mem = this.mem.claimChildResource(offset, len, false);
+                final MemoryResource mem = this.mem.claimChildResource(offset,
+                        len, false);
                 final MPEntry entry;
                 switch (type) {
-                case 0: entry = new MPProcessorEntry(mem); break;
-                case 1: entry = new MPBusEntry(mem); break;
-                case 2: entry = new MPIOAPICEntry(mem); break;
-                case 3: entry = new MPIOInterruptAssignmentEntry(mem); break;
-                case 4: entry = new MPLocalInterruptAssignmentEntry(mem); break;
-                default: entry = null;
+                case 0:
+                    entry = new MPProcessorEntry(mem);
+                    break;
+                case 1:
+                    entry = new MPBusEntry(mem);
+                    break;
+                case 2:
+                    entry = new MPIOAPICEntry(mem);
+                    break;
+                case 3:
+                    entry = new MPIOInterruptAssignmentEntry(mem);
+                    break;
+                case 4:
+                    entry = new MPLocalInterruptAssignmentEntry(mem);
+                    break;
+                default:
+                    entry = null;
                 }
                 list.add(entry);
                 offset += len;

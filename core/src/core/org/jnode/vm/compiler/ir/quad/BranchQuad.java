@@ -27,15 +27,15 @@ import org.jnode.vm.compiler.ir.IRBasicBlock;
  * @author Madhu Siddalingaiah
  * 
  */
-public abstract class BranchQuad extends Quad {
-	private IRBasicBlock targetBlock;
+public abstract class BranchQuad<T> extends Quad<T> {
+	private IRBasicBlock<T> targetBlock;
 
 	/**
 	 * @param address
 	 */
-	public BranchQuad(int address, IRBasicBlock block, int targetAddress) {
+	public BranchQuad(int address, IRBasicBlock<T> block, int targetAddress) {
 		super(address, block);
-		for (IRBasicBlock succ : block.getSuccessors()) {
+		for (IRBasicBlock<T> succ : block.getSuccessors()) {
 			if (succ.getStartPC() == targetAddress) {
 				targetBlock = succ;
 				break;
@@ -56,7 +56,7 @@ public abstract class BranchQuad extends Quad {
 	/**
 	 * @return
 	 */
-	public IRBasicBlock getTargetBlock() {
+	public IRBasicBlock<T> getTargetBlock() {
 		return targetBlock;
 	}
 }
