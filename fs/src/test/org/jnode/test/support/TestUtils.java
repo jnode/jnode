@@ -27,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.naming.NameNotFoundException;
@@ -41,7 +42,6 @@ import org.jnode.driver.block.BlockDeviceAPI;
 import org.jnode.driver.block.ramdisk.RamDiskDevice;
 import org.jnode.driver.block.ramdisk.RamDiskDriver;
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSEntryIterator;
 import org.jnode.fs.FileSystem;
 import org.jnode.fs.FileSystemException;
 import org.jnode.fs.FileSystemType;
@@ -144,7 +144,7 @@ public class TestUtils {
                 + " is unsupported");
     }
 
-    static public void listEntries(FSEntryIterator iterator) throws Exception {
+    static public void listEntries(Iterator<FSEntry> iterator) throws Exception {
         log.debug("<<< BEGIN listEntries >>>");
         int i = 0;
         log.debug("------- entries ------");
@@ -157,7 +157,7 @@ public class TestUtils {
         log.debug("<<< END listEntries >>>");
     }
 
-    static public List<String> getEntryNames(FSEntryIterator it) {
+    static public List<String> getEntryNames(Iterator<FSEntry> it) {
         List<String> names = new ArrayList<String>();
         while (it.hasNext()) {
             FSEntry entry = it.next();

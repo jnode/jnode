@@ -24,11 +24,11 @@ package org.jnode.fs.spi;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSEntryIterator;
 import org.jnode.fs.ReadOnlyFileSystemException;
 
 /**
@@ -81,7 +81,7 @@ public abstract class AbstractFSDirectory extends AbstractFSObject
 	/** 
 	 * @see org.jnode.fs.FSDirectory#iterator()
 	 */
-	final public FSEntryIterator iterator() throws IOException {
+	final public Iterator<FSEntry> iterator() throws IOException {
 		checkEntriesLoaded();		
 		return entries.iterator();
 	}

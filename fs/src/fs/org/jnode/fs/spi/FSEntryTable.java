@@ -25,12 +25,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSEntryIterator;
 
 /**
  * A table containing all the entries of a directory. This class and its childs
@@ -220,8 +220,8 @@ public class FSEntryTable extends AbstractFSObject {
      * 
      * @return
      */
-    final public FSEntryIterator iterator() {
-        return new FSEntryIterator() {
+    final public Iterator<FSEntry> iterator() {
+        return new Iterator<FSEntry>() {
             private int index = 0;
 
             private List<FSEntry> usedEntries = getUsedEntries();
@@ -234,6 +234,13 @@ public class FSEntryTable extends AbstractFSObject {
                 final FSEntry entry = usedEntries.get(index);
                 index++;
                 return entry;
+            }
+            
+            /**
+             * @see java.util.Iterator#remove()
+             */
+            public void remove() {
+                throw new UnsupportedOperationException();
             }
         };
     }

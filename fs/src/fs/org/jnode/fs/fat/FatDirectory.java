@@ -21,11 +21,12 @@
  
 package org.jnode.fs.fat;
 
-import java.nio.ByteBuffer;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Iterator;
 
 import org.jnode.driver.block.BlockDeviceAPI;
-import org.jnode.fs.FSEntryIterator;
+import org.jnode.fs.FSEntry;
 
 /**
  * <description>
@@ -144,7 +145,7 @@ public class FatDirectory extends AbstractDirectory {
 
 	private void applyLabel() throws IOException {
 		FatDirEntry labelEntry = null;
-		FSEntryIterator i = iterator();
+		Iterator<FSEntry> i = iterator();
 		FatDirEntry current;
 		while (labelEntry == null && i.hasNext()) {
 			current = (FatDirEntry)i.next();

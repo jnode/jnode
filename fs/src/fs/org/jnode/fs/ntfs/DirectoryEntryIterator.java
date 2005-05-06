@@ -24,16 +24,15 @@ package org.jnode.fs.ntfs;
 import java.util.Iterator;
 
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSEntryIterator;
 
 /**
  * Iterator for FSEntry's.
  * 
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-final class DirectoryEntryIterator implements FSEntryIterator {
+final class DirectoryEntryIterator implements Iterator<FSEntry> {
 
-    private final Iterator indexIterator;
+    private final Iterator<IndexEntry> indexIterator;
 
     private final NTFSFileSystem fs;
 
@@ -69,6 +68,13 @@ final class DirectoryEntryIterator implements FSEntryIterator {
         final NTFSEntry result = nextEntry;
         readNextEntry();
         return result;
+    }
+
+    /**
+     * @see java.util.Iterator#remove()
+     */
+    public void remove() {
+        throw new UnsupportedOperationException();
     }
 
     /**

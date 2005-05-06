@@ -32,7 +32,6 @@ import org.jnode.driver.Device;
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSEntryIterator;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 
@@ -224,7 +223,7 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
     /**
      * @see org.jnode.fs.FSDirectory#iterator()
      */
-    public synchronized FSEntryIterator iterator() throws IOException {
+    public synchronized Iterator<FSEntry> iterator() throws IOException {
         return new EntryIterator(new ArrayList<FSEntry>(entries.values()));
     }
 
@@ -268,7 +267,7 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
      * 
      * @author Ewout Prangsma (epr@users.sourceforge.net)
      */
-    private static final class EntryIterator implements FSEntryIterator {
+    private static final class EntryIterator implements Iterator<FSEntry> {
         private final Iterator<FSEntry> i;
         
         public EntryIterator(Collection<FSEntry> entries) {
@@ -287,6 +286,13 @@ final class VirtualDirEntry implements FSEntry, FSDirectory {
          */
         public FSEntry next() {
             return i.next();
-        }                
+        }
+        
+        /**
+         * @see java.util.Iterator#remove()
+         */
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
     }
 }

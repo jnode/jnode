@@ -24,20 +24,18 @@ package org.jnode.fs.jifs;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import org.jnode.fs.FSAccessRights;
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSEntryIterator;
 import org.jnode.fs.FSFile;
 import org.jnode.fs.FileSystem;
 import org.jnode.util.ByteBufferUtils;
 
-
-
 /**
- * JIFSFile <br> The JIFSFile holds information in a StringBuffer.
- *
+ * JIFSFile <br>
+ * The JIFSFile holds information in a StringBuffer.
  * 
  * @author Andreas H\u00e4nel
  */
@@ -183,7 +181,7 @@ public class JIFSFile implements ExtFSEntry, FSFile {
 		return name;
 	}
 	
-	public FSEntryIterator iterator(){
+	public Iterator<FSEntry> iterator(){
 		return new JIFSDirIterator(new HashSet<FSEntry>());
 	}
 

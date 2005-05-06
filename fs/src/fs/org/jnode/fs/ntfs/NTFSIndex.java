@@ -80,12 +80,12 @@ final class NTFSIndex {
         return indexAllocationAttribute;
     }
 
-    public Iterator iterator() {
+    public Iterator<IndexEntry> iterator() {
         log.debug("iterator");
         return new FullIndexEntryIterator();
     }
 
-    class FullIndexEntryIterator implements Iterator {
+    class FullIndexEntryIterator implements Iterator<IndexEntry> {
 
         /**
          * List of those IndexEntry's that have a subnode and the subnode has
@@ -118,7 +118,7 @@ final class NTFSIndex {
         /**
          * @see java.util.Iterator#next()
          */
-        public Object next() {
+        public IndexEntry next() {
             final IndexEntry result = nextEntry;
             if (result == null) {
                 throw new NoSuchElementException();

@@ -22,6 +22,7 @@
 package org.jnode.fs;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 /**
  * @author epr
@@ -33,7 +34,7 @@ public interface FSDirectory extends FSObject {
 	 * directory.
 	 * All elements returned by the iterator must be instanceof FSEntry.
 	 */
-	public FSEntryIterator iterator()
+	public Iterator<FSEntry> iterator()
 	throws IOException;
 	
 	/**

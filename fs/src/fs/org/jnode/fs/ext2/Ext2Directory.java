@@ -24,6 +24,7 @@ package org.jnode.fs.ext2;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.apache.log4j.Level;
@@ -362,7 +363,7 @@ public class Ext2Directory extends AbstractFSDirectory {
         return iNode;
     }
 
-    class Ext2FSEntryIterator implements org.jnode.fs.FSEntryIterator {
+    class Ext2FSEntryIterator implements Iterator<FSEntry> {
         ByteBuffer data;
 
         int index;
@@ -425,6 +426,13 @@ public class Ext2Directory extends AbstractFSDirectory {
                 throw new NoSuchElementException("Root cause: "
                         + e.getMessage());
             }
+        }
+        
+        /**
+         * @see java.util.Iterator#remove()
+         */
+        public void remove() {
+            throw new UnsupportedOperationException();
         }
 
         /**

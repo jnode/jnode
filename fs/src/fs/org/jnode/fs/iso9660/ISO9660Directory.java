@@ -22,10 +22,10 @@
 package org.jnode.fs.iso9660;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.jnode.fs.FSDirectory;
 import org.jnode.fs.FSEntry;
-import org.jnode.fs.FSEntryIterator;
 import org.jnode.fs.FileSystem;
 
 /**
@@ -46,8 +46,8 @@ public final class ISO9660Directory implements FSDirectory {
     /**
      * @see org.jnode.fs.FSDirectory#iterator()
      */
-    public FSEntryIterator iterator() throws IOException {
-        return new FSEntryIterator() {
+    public Iterator<FSEntry> iterator() throws IOException {
+        return new Iterator<FSEntry>() {
 
             int offset = 0;
 
@@ -68,6 +68,13 @@ public final class ISO9660Directory implements FSDirectory {
                 return new ISO9660Entry((ISO9660FileSystem) entry
                         .getFileSystem(), fEntry);
             }
+            
+            /**
+             * @see java.util.Iterator#remove()
+             */
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
         };
     }
 
@@ -75,7 +82,7 @@ public final class ISO9660Directory implements FSDirectory {
      * @see org.jnode.fs.FSDirectory#getEntry(java.lang.String)
      */
     public FSEntry getEntry(String name) throws IOException {
-        for (FSEntryIterator it = this.iterator(); it.hasNext();) {
+        for (Iterator<FSEntry> it = this.iterator(); it.hasNext();) {
             ISO9660Entry entry = (ISO9660Entry) it.next();
             if (entry.getName().equalsIgnoreCase(name)) return entry;
         }
