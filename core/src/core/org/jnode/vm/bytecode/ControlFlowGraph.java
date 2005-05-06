@@ -31,7 +31,7 @@ import org.jnode.vm.classmgr.VmByteCode;
  * 
  * @author epr
  */
-public class ControlFlowGraph {
+public class ControlFlowGraph implements Iterable<BasicBlock> {
 	
 	private final byte[] opcodeFlags;
 	private final BasicBlock[] bblocks;
@@ -53,7 +53,7 @@ public class ControlFlowGraph {
 	 * Create an iterator to iterate over all basic blocks.
 	 * @return An iterator that will return instances of BasicBlock.
 	 */
-	public Iterator<BasicBlock> basicBlockIterator() {
+	public Iterator<BasicBlock> iterator() {
 		return new ObjectArrayIterator<BasicBlock>(bblocks);
 	}
 	
