@@ -47,7 +47,7 @@ public class RootState extends DebugState {
      * Fill the given map with usage information for this state.
      * @param map keychar - message
      */
-    public void fillHelp(Map map) {
+    public void fillHelp(Map<String, String> map) {
         super.fillHelp(map);
         map.put("t", "List all threads");
         map.put("r", "List all running threads");

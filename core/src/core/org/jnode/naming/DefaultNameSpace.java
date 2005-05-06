@@ -80,7 +80,7 @@ public class DefaultNameSpace implements NameSpace {
         if (result == null) {
             throw new NameNotFoundException(name.getName());
         }
-        return (T)result;
+        return name.cast(result);
     }
 
     /**

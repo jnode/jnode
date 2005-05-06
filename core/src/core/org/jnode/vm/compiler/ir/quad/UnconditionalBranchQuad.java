@@ -29,26 +29,26 @@ import org.jnode.vm.compiler.ir.Operand;
  * @author Madhu Siddalingaiah
  * 
  */
-public class UnconditionalBranchQuad extends BranchQuad {
+public class UnconditionalBranchQuad<T> extends BranchQuad<T> {
 	/**
 	 * @param address
 	 * @param targetAddress
 	 */
-	public UnconditionalBranchQuad(int address, IRBasicBlock block, int targetAddress) {
+	public UnconditionalBranchQuad(int address, IRBasicBlock<T> block, int targetAddress) {
 		super(address, block, targetAddress);
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.Quad#getDefinedOp()
 	 */
-	public Operand getDefinedOp() {
+	public Operand<T> getDefinedOp() {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.Quad#getReferencedOps()
 	 */
-	public Operand[] getReferencedOps() {
+	public Operand<T>[] getReferencedOps() {
 		return null;
 	}
 
@@ -56,16 +56,16 @@ public class UnconditionalBranchQuad extends BranchQuad {
 		return getAddress() + ": goto " + getTargetBlock(); 
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
 	 */
 	public void doPass2() {
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
 	 */
-	public void generateCode(CodeGenerator cg) {
+	public void generateCode(CodeGenerator<T> cg) {
 		cg.generateCodeFor(this);
 	}
 }

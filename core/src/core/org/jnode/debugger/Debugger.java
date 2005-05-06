@@ -18,14 +18,13 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.debugger;
 
 import java.io.PrintStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -131,13 +130,12 @@ public class Debugger implements SystemTriggerListener, KeyboardListener,
 
     private void help(PrintStream out) {
         out.println("Usage:");
-        final TreeMap map = new TreeMap();
+        final TreeMap<String, String> map = new TreeMap<String, String>();
         map.put(".", "Print state trace");
         map.put("p", "Print current state");
         map.put("h", "Print usage information");
         state.fillHelp(map);
-        for (Iterator i = map.entrySet().iterator(); i.hasNext();) {
-            Map.Entry entry = (Map.Entry) i.next();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
             out.println(entry.getKey() + " - " + entry.getValue());
         }
         out.println();
@@ -149,10 +147,9 @@ public class Debugger implements SystemTriggerListener, KeyboardListener,
 
             public Object run() {
                 try {
-                    final Collection devs = DeviceUtils
+                    final Collection<Device> devs = DeviceUtils
                             .getDevicesByAPI(KeyboardAPI.class);
-                    for (Iterator i = devs.iterator(); i.hasNext();) {
-                        final Device dev = (Device) i.next();
+                    for (Device dev : devs) {
                         final KeyboardAPI api = (KeyboardAPI) dev
                                 .getAPI(KeyboardAPI.class);
                         api.setPreferredListener(l);

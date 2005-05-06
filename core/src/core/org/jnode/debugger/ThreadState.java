@@ -57,7 +57,7 @@ public class ThreadState extends DebugState {
      * @param map
      *            keychar - message
      */
-    public void fillHelp(Map map) {
+    public void fillHelp(Map<String, String> map) {
         super.fillHelp(map);
         map.put("i", "Interrupt this thread");
     }

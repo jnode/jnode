@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.vm.x86.compiler.l2;
 
 import org.jnode.assembler.x86.X86Register;
@@ -29,52 +29,53 @@ import org.jnode.vm.compiler.ir.RegisterPool;
 /**
  * @author Madhu Siddalingaiah
  * @author Levente S\u00e1ntha
- * 
  */
-public class X86RegisterPool extends RegisterPool {
-	BootableArrayList registers;
+public class X86RegisterPool extends RegisterPool<X86Register> {
+    
+    private final BootableArrayList<X86Register> registers;
 
-	public X86RegisterPool() {
-		registers = new BootableArrayList();
-		registers.add(X86Register.EDX);
-		registers.add(X86Register.ECX);
-		registers.add(X86Register.EBX);
-		registers.add(X86Register.EAX);
-//        registers.add(Register.ESI);
-//        registers.add(Register.EDI);
-//		// not sure what to do with ESI and EDI just yet...
-	}
+    public X86RegisterPool() {
+        registers = new BootableArrayList<X86Register>();
+        registers.add(X86Register.EDX);
+        registers.add(X86Register.ECX);
+        registers.add(X86Register.EBX);
+        registers.add(X86Register.EAX);
+        // registers.add(Register.ESI);
+        // registers.add(Register.EDI);
+        // // not sure what to do with ESI and EDI just yet...
+    }
 
-	/* (non-Javadoc)
-	 * @see org.jnode.vm.compiler.ir.RegisterPool#request(int)
-	 */
-	public Object request(int type) {
-		if (type == Operand.LONG) {
-			return null;
-		}
-		if (/*type == Operand.FLOAT || */type == Operand.DOUBLE) {
-			//throw new IllegalArgumentException("floats and double not yet supported");
+    /**
+     * @see org.jnode.vm.compiler.ir.RegisterPool#request(int)
+     */
+    public X86Register request(int type) {
+        if (type == Operand.LONG) {
             return null;
-		}
-        int size = registers.size();
-        if(size == 0){
-            return null;
-        }else{
-		    return registers.remove(size - 1);
         }
-	}
+        if (/* type == Operand.FLOAT || */type == Operand.DOUBLE) {
+            // throw new IllegalArgumentException("floats and double not yet
+            // supported");
+            return null;
+        }
+        int size = registers.size();
+        if (size == 0) {
+            return null;
+        } else {
+            return registers.remove(size - 1);
+        }
+    }
 
-	/* (non-Javadoc)
-	 * @see org.jnode.vm.compiler.ir.RegisterPool#release(java.lang.Object)
-	 */
-	public void release(Object register) {
-		registers.add(register);
-	}
+    /**
+     * @see org.jnode.vm.compiler.ir.RegisterPool#release(java.lang.Object)
+     */
+    public void release(X86Register register) {
+        registers.add(register);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.jnode.vm.compiler.ir.RegisterPool#supports3AddrOps()
-	 */
-	public boolean supports3AddrOps() {
-		return false;
-	}
+    /**
+     * @see org.jnode.vm.compiler.ir.RegisterPool#supports3AddrOps()
+     */
+    public boolean supports3AddrOps() {
+        return false;
+    }
 }

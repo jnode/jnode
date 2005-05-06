@@ -21,6 +21,10 @@
  
 package org.jnode.vm.compiler.ir;
 
+import static org.jnode.vm.compiler.ir.quad.BranchCondition.*;
+import static org.jnode.vm.compiler.ir.quad.BinaryOperation.*;
+import static org.jnode.vm.compiler.ir.quad.UnaryOperation.*;
+
 import java.util.Iterator;
 
 import org.jnode.vm.bytecode.BytecodeParser;
@@ -32,6 +36,7 @@ import org.jnode.vm.classmgr.VmConstIMethodRef;
 import org.jnode.vm.classmgr.VmConstMethodRef;
 import org.jnode.vm.classmgr.VmConstString;
 import org.jnode.vm.classmgr.VmMethod;
+import org.jnode.vm.compiler.ir.quad.BinaryOperation;
 import org.jnode.vm.compiler.ir.quad.BinaryQuad;
 import org.jnode.vm.compiler.ir.quad.ConditionalBranchQuad;
 import org.jnode.vm.compiler.ir.quad.ConstantRefAssignQuad;
@@ -47,23 +52,23 @@ import org.jnode.vm.compiler.ir.quad.VoidReturnQuad;
  * Visits bytecodes of a given method and translates them into a
  * list of Quads.
  */
-public class IRGenerator extends BytecodeVisitor {
-	private final static Constant NULL_CONSTANT = Constant.getInstance(null);
+public class IRGenerator<T> extends BytecodeVisitor {
+	private final Constant<T> NULL_CONSTANT = Constant.getInstance(null);
 	private int nArgs;
 	private int nLocals;
 	private int maxStack;
 	private int stackOffset;
-	private Variable[] variables;
+	private Variable<T>[] variables;
 	private int address;
-	private Iterator basicBlockIterator;
-	private IRBasicBlock currentBlock;
+	private Iterator<IRBasicBlock<T>> basicBlockIterator;
+	private IRBasicBlock<T> currentBlock;
 
 	/**
 	 *
 	 */
-	public IRGenerator(IRControlFlowGraph cfg) {
-		basicBlockIterator = cfg.basicBlockIterator();
-		currentBlock = (IRBasicBlock) basicBlockIterator.next();
+	public IRGenerator(IRControlFlowGraph<T> cfg) {
+		basicBlockIterator = cfg.iterator();
+		currentBlock = basicBlockIterator.next();
 	}
 
 	/**
@@ -84,15 +89,15 @@ public class IRGenerator extends BytecodeVisitor {
 		variables = new Variable[nLocals + maxStack];
 		int index = 0;
 		for (int i=0; i<nArgs; i+=1) {
-			variables[index] = new MethodArgument(Operand.UNKNOWN, index);
+			variables[index] = new MethodArgument<T>(Operand.UNKNOWN, index);
 			index += 1;
 		}
 		for (int i=nArgs; i<nLocals; i+=1) {
-			variables[index] = new LocalVariable(Operand.UNKNOWN, index);
+			variables[index] = new LocalVariable<T>(Operand.UNKNOWN, index);
 			index += 1;
 		}
 		for (int i=0; i<maxStack; i+=1) {
-			variables[index] = new StackVariable(Operand.UNKNOWN, index);
+			variables[index] = new StackVariable<T>(Operand.UNKNOWN, index);
 			index += 1;
 		}
 		currentBlock.setVariables(variables);
@@ -110,8 +115,8 @@ public class IRGenerator extends BytecodeVisitor {
 	public void startInstruction(int address) {
 		this.address = address;
 		if (address >= currentBlock.getEndPC()) {
-			currentBlock = (IRBasicBlock) basicBlockIterator.next();
-			Iterator pi = currentBlock.getPredecessors().iterator();
+			currentBlock = basicBlockIterator.next();
+			Iterator<IRBasicBlock<T>> pi = currentBlock.getPredecessors().iterator();
 			if (!pi.hasNext()) {
 				if (currentBlock.isStartOfExceptionHandler()) {
 					stackOffset = nLocals + 1;
@@ -157,7 +162,7 @@ public class IRGenerator extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_aconst_null()
 	 */
 	public void visit_aconst_null() {
-		currentBlock.add(new ConstantRefAssignQuad(address, currentBlock, stackOffset,
+		currentBlock.add(new ConstantRefAssignQuad<T>(address, currentBlock, stackOffset,
 			NULL_CONSTANT));
 		stackOffset += 1;
 	}
@@ -166,8 +171,9 @@ public class IRGenerator extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iconst(int)
 	 */
 	public void visit_iconst(int value) {
-		Quad quad = new ConstantRefAssignQuad(address, currentBlock, stackOffset,
-					Constant.getInstance(value));
+        Constant<T> c = Constant.getInstance(value);
+		Quad<T> quad = new ConstantRefAssignQuad<T>(address, currentBlock, stackOffset,
+					c);
 		currentBlock.add(quad);
 		stackOffset += 1;
 	}
@@ -176,8 +182,9 @@ public class IRGenerator extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lconst(long)
 	 */
 	public void visit_lconst(long value) {
-		currentBlock.add(new ConstantRefAssignQuad(address, currentBlock, stackOffset,
-			Constant.getInstance(value)));
+        Constant<T> c = Constant.getInstance(value);
+		currentBlock.add(new ConstantRefAssignQuad<T>(address, currentBlock, stackOffset,
+			c));
 		stackOffset += 2;
 	}
 
@@ -185,8 +192,9 @@ public class IRGenerator extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fconst(float)
 	 */
 	public void visit_fconst(float value) {
-		currentBlock.add(new ConstantRefAssignQuad(address, currentBlock, stackOffset,
-			Constant.getInstance(value)));
+        Constant<T> c = Constant.getInstance(value);
+		currentBlock.add(new ConstantRefAssignQuad<T>(address, currentBlock, stackOffset,
+			c));
 		stackOffset += 1;
 	}
 
@@ -194,8 +202,9 @@ public class IRGenerator extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dconst(double)
 	 */
 	public void visit_dconst(double value) {
-		currentBlock.add(new ConstantRefAssignQuad(address, currentBlock, stackOffset,
-			Constant.getInstance(value)));
+        Constant<T> c = Constant.getInstance(value);
+		currentBlock.add(new ConstantRefAssignQuad<T>(address, currentBlock, stackOffset,
+			c));
 		stackOffset += 2;
 	}
 
@@ -220,7 +229,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_iload(int index) {
 		variables[index].setType(Operand.INT);
 		variables[stackOffset].setType(Operand.INT);
-		VariableRefAssignQuad assignQuad = new VariableRefAssignQuad(address, currentBlock,
+		VariableRefAssignQuad<T> assignQuad = new VariableRefAssignQuad<T>(address, currentBlock,
 			stackOffset, index);
 		currentBlock.add(assignQuad);
 		stackOffset += 1;
@@ -232,7 +241,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_lload(int index) {
 		variables[index].setType(Operand.LONG);
 		variables[stackOffset].setType(Operand.LONG);
-		currentBlock.add(new VariableRefAssignQuad(address, currentBlock,
+		currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock,
 			stackOffset, index));
 		stackOffset += 2;
 	}
@@ -243,7 +252,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_fload(int index) {
 		variables[index].setType(Operand.FLOAT);
 		variables[stackOffset].setType(Operand.FLOAT);
-		currentBlock.add(new VariableRefAssignQuad(address, currentBlock,
+		currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock,
 			stackOffset, index));
 		stackOffset += 1;
 	}
@@ -254,7 +263,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_dload(int index) {
 		variables[index].setType(Operand.DOUBLE);
 		variables[stackOffset].setType(Operand.DOUBLE);
-		currentBlock.add(new VariableRefAssignQuad(address, currentBlock,
+		currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock,
 			stackOffset, index));
 		stackOffset += 2;
 	}
@@ -265,7 +274,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_aload(int index) {
 		variables[index].setType(Operand.REFERENCE);
 		variables[stackOffset].setType(Operand.REFERENCE);
-		currentBlock.add(new VariableRefAssignQuad(address, currentBlock, stackOffset, index));
+		currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, stackOffset, index));
 		stackOffset += 1;
 	}
 
@@ -332,8 +341,7 @@ public class IRGenerator extends BytecodeVisitor {
 		stackOffset -= 1;
 		variables[index].setType(Operand.INT);
 		variables[stackOffset].setType(Operand.INT);
-		VariableRefAssignQuad assignQuad = new VariableRefAssignQuad(address, currentBlock, index, stackOffset);
-		currentBlock.add(assignQuad);
+		currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
 	}
 
 	/**
@@ -343,7 +351,7 @@ public class IRGenerator extends BytecodeVisitor {
 		stackOffset -= 2;
 		variables[index].setType(Operand.LONG);
 		variables[stackOffset].setType(Operand.LONG);
-		currentBlock.add(new VariableRefAssignQuad(address, currentBlock, index, stackOffset));
+		currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
 	}
 
 	/**
@@ -353,7 +361,7 @@ public class IRGenerator extends BytecodeVisitor {
 		stackOffset -= 1;
 		variables[index].setType(Operand.FLOAT);
 		variables[stackOffset].setType(Operand.FLOAT);
-		currentBlock.add(new VariableRefAssignQuad(address, currentBlock, index, stackOffset));
+		currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
 	}
 
 	/**
@@ -363,7 +371,7 @@ public class IRGenerator extends BytecodeVisitor {
 		stackOffset -= 2;
 		variables[index].setType(Operand.DOUBLE);
 		variables[stackOffset].setType(Operand.DOUBLE);
-		currentBlock.add(new VariableRefAssignQuad(address, currentBlock, index, stackOffset));
+		currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
 	}
 
 	/**
@@ -373,7 +381,7 @@ public class IRGenerator extends BytecodeVisitor {
 		stackOffset -= 1;
 		variables[index].setType(Operand.REFERENCE);
 		variables[stackOffset].setType(Operand.REFERENCE);
-		currentBlock.add(new VariableRefAssignQuad(address, currentBlock, index, stackOffset));
+		currentBlock.add(new VariableRefAssignQuad<T>(address, currentBlock, index, stackOffset));
 	}
 
 	/**
@@ -499,140 +507,140 @@ public class IRGenerator extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iadd()
 	 */
 	public void visit_iadd() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.IADD, Operand.INT));
+		currentBlock.add(doBinaryQuad(IADD, Operand.INT));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ladd()
 	 */
 	public void visit_ladd() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.LADD, Operand.LONG));
+		currentBlock.add(doBinaryQuad(LADD, Operand.LONG));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fadd()
 	 */
 	public void visit_fadd() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.FADD, Operand.FLOAT));
+		currentBlock.add(doBinaryQuad(FADD, Operand.FLOAT));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dadd()
 	 */
 	public void visit_dadd() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.DADD, Operand.DOUBLE));
+		currentBlock.add(doBinaryQuad(DADD, Operand.DOUBLE));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_isub()
 	 */
 	public void visit_isub() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.ISUB, Operand.INT));
+		currentBlock.add(doBinaryQuad(ISUB, Operand.INT));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lsub()
 	 */
 	public void visit_lsub() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.LSUB, Operand.LONG));
+		currentBlock.add(doBinaryQuad(LSUB, Operand.LONG));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fsub()
 	 */
 	public void visit_fsub() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.FSUB, Operand.FLOAT));
+		currentBlock.add(doBinaryQuad(FSUB, Operand.FLOAT));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dsub()
 	 */
 	public void visit_dsub() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.DSUB, Operand.DOUBLE));
+		currentBlock.add(doBinaryQuad(DSUB, Operand.DOUBLE));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_imul()
 	 */
 	public void visit_imul() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.IMUL, Operand.INT));
+		currentBlock.add(doBinaryQuad(IMUL, Operand.INT));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lmul()
 	 */
 	public void visit_lmul() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.LMUL, Operand.LONG));
+		currentBlock.add(doBinaryQuad(LMUL, Operand.LONG));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fmul()
 	 */
 	public void visit_fmul() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.FMUL, Operand.FLOAT));
+		currentBlock.add(doBinaryQuad(FMUL, Operand.FLOAT));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_dmul()
 	 */
 	public void visit_dmul() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.DMUL, Operand.DOUBLE));
+		currentBlock.add(doBinaryQuad(DMUL, Operand.DOUBLE));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_idiv()
 	 */
 	public void visit_idiv() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.IDIV, Operand.INT));
+		currentBlock.add(doBinaryQuad(IDIV, Operand.INT));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ldiv()
 	 */
 	public void visit_ldiv() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.LDIV, Operand.LONG));
+		currentBlock.add(doBinaryQuad(LDIV, Operand.LONG));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_fdiv()
 	 */
 	public void visit_fdiv() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.FDIV, Operand.FLOAT));
+		currentBlock.add(doBinaryQuad(FDIV, Operand.FLOAT));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ddiv()
 	 */
 	public void visit_ddiv() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.DDIV, Operand.DOUBLE));
+		currentBlock.add(doBinaryQuad(DDIV, Operand.DOUBLE));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_irem()
 	 */
 	public void visit_irem() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.IREM, Operand.INT));
+		currentBlock.add(doBinaryQuad(IREM, Operand.INT));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lrem()
 	 */
 	public void visit_lrem() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.LREM, Operand.LONG));
+		currentBlock.add(doBinaryQuad(LREM, Operand.LONG));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_frem()
 	 */
 	public void visit_frem() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.FREM, Operand.FLOAT));
+		currentBlock.add(doBinaryQuad(FREM, Operand.FLOAT));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_drem()
 	 */
 	public void visit_drem() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.DREM, Operand.DOUBLE));
+		currentBlock.add(doBinaryQuad(DREM, Operand.DOUBLE));
 	}
 
 	/**
@@ -641,7 +649,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_ineg() {
 		int s1 = stackOffset - 1;
 		variables[s1].setType(Operand.INT);
-		currentBlock.add(new UnaryQuad(address, currentBlock, s1, UnaryQuad.INEG, s1));
+		currentBlock.add(new UnaryQuad<T>(address, currentBlock, s1, INEG, s1));
 	}
 
 	/**
@@ -650,7 +658,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_lneg() {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.LONG);
-		currentBlock.add(new UnaryQuad(address, currentBlock, s1, UnaryQuad.LNEG, s1));
+		currentBlock.add(new UnaryQuad<T>(address, currentBlock, s1, LNEG, s1));
 	}
 
 	/**
@@ -659,7 +667,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_fneg() {
 		int s1 = stackOffset - 1;
 		variables[s1].setType(Operand.FLOAT);
-		currentBlock.add(new UnaryQuad(address, currentBlock, s1, UnaryQuad.FNEG, s1));
+		currentBlock.add(new UnaryQuad<T>(address, currentBlock, s1, FNEG, s1));
 	}
 
 	/**
@@ -668,14 +676,14 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_dneg() {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.DOUBLE);
-		currentBlock.add(new UnaryQuad(address, currentBlock, s1, UnaryQuad.DNEG, s1));
+		currentBlock.add(new UnaryQuad<T>(address, currentBlock, s1, DNEG, s1));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ishl()
 	 */
 	public void visit_ishl() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.ISHL, Operand.INT));
+		currentBlock.add(doBinaryQuad(ISHL, Operand.INT));
 	}
 
 	/**
@@ -686,14 +694,14 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.LONG);
 		variables[stackOffset].setType(Operand.INT);
-		currentBlock.add(new BinaryQuad(address, currentBlock, s1, s1, BinaryQuad.LSHL, stackOffset));
+		currentBlock.add(new BinaryQuad<T>(address, currentBlock, s1, s1, LSHL, stackOffset));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ishr()
 	 */
 	public void visit_ishr() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.ISHR, Operand.INT));
+		currentBlock.add(doBinaryQuad(ISHR, Operand.INT));
 	}
 
 	/**
@@ -704,14 +712,14 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 2;
 		variables[s1].setType(Operand.LONG);
 		variables[stackOffset].setType(Operand.INT);
-		currentBlock.add(new BinaryQuad(address, currentBlock, s1, s1, BinaryQuad.LSHR, stackOffset));
+		currentBlock.add(new BinaryQuad<T>(address, currentBlock, s1, s1, LSHR, stackOffset));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iushr()
 	 */
 	public void visit_iushr() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.IUSHR, Operand.INT));
+		currentBlock.add(doBinaryQuad(IUSHR, Operand.INT));
 	}
 
 	/**
@@ -722,49 +730,49 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		variables[s1].setType(Operand.INT);
 		variables[stackOffset].setType(Operand.LONG);
-		currentBlock.add(new BinaryQuad(address, currentBlock, s1, s1, BinaryQuad.LUSHR, stackOffset));
+		currentBlock.add(new BinaryQuad<T>(address, currentBlock, s1, s1, LUSHR, stackOffset));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_iand()
 	 */
 	public void visit_iand() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.IAND, Operand.INT));
+		currentBlock.add(doBinaryQuad(IAND, Operand.INT));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_land()
 	 */
 	public void visit_land() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.LAND, Operand.LONG));
+		currentBlock.add(doBinaryQuad(LAND, Operand.LONG));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ior()
 	 */
 	public void visit_ior() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.IOR, Operand.INT));
+		currentBlock.add(doBinaryQuad(IOR, Operand.INT));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lor()
 	 */
 	public void visit_lor() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.LOR, Operand.LONG));
+		currentBlock.add(doBinaryQuad(LOR, Operand.LONG));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_ixor()
 	 */
 	public void visit_ixor() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.IXOR, Operand.INT));
+		currentBlock.add(doBinaryQuad(IXOR, Operand.INT));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_lxor()
 	 */
 	public void visit_lxor() {
-		currentBlock.add(doBinaryQuad(BinaryQuad.LXOR, Operand.LONG));
+		currentBlock.add(doBinaryQuad(LXOR, Operand.LONG));
 	}
 
 	/**
@@ -772,7 +780,7 @@ public class IRGenerator extends BytecodeVisitor {
 	 */
 	public void visit_iinc(int index, int incValue) {
 		variables[index].setType(Operand.INT);
-		BinaryQuad binaryQuad = new BinaryQuad(address, currentBlock, index, index, BinaryQuad.IADD, new IntConstant(incValue));
+		BinaryQuad<T> binaryQuad = new BinaryQuad<T>(address, currentBlock, index, index, IADD, new IntConstant<T>(incValue));
 		currentBlock.add(binaryQuad.foldConstants());
 	}
 
@@ -782,7 +790,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_i2l() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.LONG);
-		currentBlock.add(new UnaryQuad(address, currentBlock, stackOffset, UnaryQuad.I2L, stackOffset));
+		currentBlock.add(new UnaryQuad<T>(address, currentBlock, stackOffset, I2L, stackOffset));
 		stackOffset += 2;
 	}
 
@@ -792,7 +800,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_i2f() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.FLOAT);
-		currentBlock.add(new UnaryQuad(address, currentBlock, stackOffset, UnaryQuad.I2F, stackOffset));
+		currentBlock.add(new UnaryQuad<T>(address, currentBlock, stackOffset, I2F, stackOffset));
 		stackOffset += 1;
 	}
 
@@ -802,7 +810,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_i2d() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.DOUBLE);
-		currentBlock.add(new UnaryQuad(address, currentBlock, stackOffset, UnaryQuad.I2D, stackOffset));
+		currentBlock.add(new UnaryQuad<T>(address, currentBlock, stackOffset, I2D, stackOffset));
 		stackOffset += 2;
 	}
 
@@ -812,7 +820,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_l2i() {
 		stackOffset -= 2;
 		variables[stackOffset].setType(Operand.INT);
-		currentBlock.add(new UnaryQuad(address, currentBlock, stackOffset, UnaryQuad.L2I, stackOffset));
+		currentBlock.add(new UnaryQuad<T>(address, currentBlock, stackOffset, L2I, stackOffset));
 		stackOffset += 1;
 	}
 
@@ -822,7 +830,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_l2f() {
 		stackOffset -= 2;
 		variables[stackOffset].setType(Operand.FLOAT);
-		currentBlock.add(new UnaryQuad(address, currentBlock, stackOffset, UnaryQuad.L2F, stackOffset));
+		currentBlock.add(new UnaryQuad<T>(address, currentBlock, stackOffset, L2F, stackOffset));
 		stackOffset += 1;
 	}
 
@@ -832,7 +840,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_l2d() {
 		stackOffset -= 2;
 		variables[stackOffset].setType(Operand.DOUBLE);
-		currentBlock.add(new UnaryQuad(address, currentBlock, stackOffset, UnaryQuad.L2D, stackOffset));
+		currentBlock.add(new UnaryQuad<T>(address, currentBlock, stackOffset, L2D, stackOffset));
 		stackOffset += 2;
 	}
 
@@ -842,7 +850,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_f2i() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.INT);
-		currentBlock.add(new UnaryQuad(address, currentBlock, stackOffset, UnaryQuad.F2I, stackOffset));
+		currentBlock.add(new UnaryQuad<T>(address, currentBlock, stackOffset, F2I, stackOffset));
 		stackOffset += 1;
 	}
 
@@ -852,7 +860,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_f2l() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.LONG);
-		currentBlock.add(new UnaryQuad(address, currentBlock, stackOffset, UnaryQuad.F2L, stackOffset));
+		currentBlock.add(new UnaryQuad<T>(address, currentBlock, stackOffset, F2L, stackOffset));
 		stackOffset += 2;
 	}
 
@@ -862,7 +870,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_f2d() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.DOUBLE);
-		currentBlock.add(new UnaryQuad(address, currentBlock, stackOffset, UnaryQuad.F2D, stackOffset));
+		currentBlock.add(new UnaryQuad<T>(address, currentBlock, stackOffset, F2D, stackOffset));
 		stackOffset += 2;
 	}
 
@@ -872,7 +880,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_d2i() {
 		stackOffset -= 2;
 		variables[stackOffset].setType(Operand.INT);
-		currentBlock.add(new UnaryQuad(address, currentBlock, stackOffset, UnaryQuad.D2I, stackOffset));
+		currentBlock.add(new UnaryQuad<T>(address, currentBlock, stackOffset, D2I, stackOffset));
 		stackOffset += 1;
 	}
 
@@ -882,7 +890,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_d2l() {
 		stackOffset -= 2;
 		variables[stackOffset].setType(Operand.LONG);
-		currentBlock.add(new UnaryQuad(address, currentBlock, stackOffset, UnaryQuad.D2L, stackOffset));
+		currentBlock.add(new UnaryQuad<T>(address, currentBlock, stackOffset, D2L, stackOffset));
 		stackOffset += 2;
 	}
 
@@ -899,7 +907,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_i2b() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.BYTE);
-		currentBlock.add(new UnaryQuad(address, currentBlock, stackOffset, UnaryQuad.I2B, stackOffset));
+		currentBlock.add(new UnaryQuad<T>(address, currentBlock, stackOffset, I2B, stackOffset));
 		stackOffset += 1;
 	}
 
@@ -909,7 +917,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_i2c() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.CHAR);
-		currentBlock.add(new UnaryQuad(address, currentBlock, stackOffset, UnaryQuad.I2C, stackOffset));
+		currentBlock.add(new UnaryQuad<T>(address, currentBlock, stackOffset, I2C, stackOffset));
 		stackOffset += 1;
 	}
 
@@ -919,7 +927,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_i2s() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.SHORT);
-		currentBlock.add(new UnaryQuad(address, currentBlock, stackOffset, UnaryQuad.I2S, stackOffset));
+		currentBlock.add(new UnaryQuad<T>(address, currentBlock, stackOffset, I2S, stackOffset));
 		stackOffset += 1;
 	}
 
@@ -965,8 +973,8 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		Variable[] variables = currentBlock.getVariables();
 		variables[s1].setType(Operand.INT);
-		currentBlock.add(new ConditionalBranchQuad(this.address, currentBlock,
-			s1, ConditionalBranchQuad.IFEQ, address));
+		currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
+			s1, IFEQ, address));
 		stackOffset -= 1;
 		setSuccessorStackOffset();
 	}
@@ -978,8 +986,8 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		Variable[] variables = currentBlock.getVariables();
 		variables[s1].setType(Operand.INT);
-		currentBlock.add(new ConditionalBranchQuad(this.address, currentBlock,
-			s1, ConditionalBranchQuad.IFNE, address));
+		currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
+			s1, IFNE, address));
 		stackOffset -= 1;
 		setSuccessorStackOffset();
 	}
@@ -991,8 +999,8 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		Variable[] variables = currentBlock.getVariables();
 		variables[s1].setType(Operand.INT);
-		currentBlock.add(new ConditionalBranchQuad(this.address, currentBlock,
-			s1, ConditionalBranchQuad.IFLT, address));
+		currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
+			s1, IFLT, address));
 		stackOffset -= 1;
 		setSuccessorStackOffset();
 	}
@@ -1004,8 +1012,8 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		Variable[] variables = currentBlock.getVariables();
 		variables[s1].setType(Operand.INT);
-		currentBlock.add(new ConditionalBranchQuad(this.address, currentBlock,
-			s1, ConditionalBranchQuad.IFGE, address));
+		currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
+			s1, IFGE, address));
 		stackOffset -= 1;
 		setSuccessorStackOffset();
 	}
@@ -1017,8 +1025,8 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		Variable[] variables = currentBlock.getVariables();
 		variables[s1].setType(Operand.INT);
-		currentBlock.add(new ConditionalBranchQuad(this.address, currentBlock,
-			s1, ConditionalBranchQuad.IFGT, address));
+		currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
+			s1, IFGT, address));
 		stackOffset -= 1;
 		setSuccessorStackOffset();
 	}
@@ -1030,8 +1038,8 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		Variable[] variables = currentBlock.getVariables();
 		variables[s1].setType(Operand.INT);
-		currentBlock.add(new ConditionalBranchQuad(this.address, currentBlock,
-			s1, ConditionalBranchQuad.IFLE, address));
+		currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
+			s1, IFLE, address));
 		stackOffset -= 1;
 		setSuccessorStackOffset();
 	}
@@ -1045,8 +1053,8 @@ public class IRGenerator extends BytecodeVisitor {
 		Variable[] variables = currentBlock.getVariables();
 		variables[s1].setType(Operand.INT);
 		variables[s2].setType(Operand.INT);
-		currentBlock.add(new ConditionalBranchQuad(this.address, currentBlock,
-			s1, ConditionalBranchQuad.IF_ICMPEQ, s2, address));
+		currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
+			s1, IF_ICMPEQ, s2, address));
 		stackOffset -= 2;
 		setSuccessorStackOffset();
 	}
@@ -1060,8 +1068,8 @@ public class IRGenerator extends BytecodeVisitor {
 		Variable[] variables = currentBlock.getVariables();
 		variables[s1].setType(Operand.INT);
 		variables[s2].setType(Operand.INT);
-		currentBlock.add(new ConditionalBranchQuad(this.address, currentBlock,
-			s1, ConditionalBranchQuad.IF_ICMPNE, s2, address));
+		currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
+			s1, IF_ICMPNE, s2, address));
 		stackOffset -= 2;
 		setSuccessorStackOffset();
 	}
@@ -1075,8 +1083,8 @@ public class IRGenerator extends BytecodeVisitor {
 		Variable[] variables = currentBlock.getVariables();
 		variables[s1].setType(Operand.INT);
 		variables[s2].setType(Operand.INT);
-		currentBlock.add(new ConditionalBranchQuad(this.address, currentBlock,
-			s1, ConditionalBranchQuad.IF_ICMPLT, s2, address));
+		currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
+			s1, IF_ICMPLT, s2, address));
 		stackOffset -= 2;
 		setSuccessorStackOffset();
 	}
@@ -1090,8 +1098,8 @@ public class IRGenerator extends BytecodeVisitor {
 		Variable[] variables = currentBlock.getVariables();
 		variables[s1].setType(Operand.INT);
 		variables[s2].setType(Operand.INT);
-		currentBlock.add(new ConditionalBranchQuad(this.address, currentBlock,
-			s1, ConditionalBranchQuad.IF_ICMPGE, s2, address));
+		currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
+			s1, IF_ICMPGE, s2, address));
 		stackOffset -= 2;
 		setSuccessorStackOffset();
 	}
@@ -1105,8 +1113,8 @@ public class IRGenerator extends BytecodeVisitor {
 		Variable[] variables = currentBlock.getVariables();
 		variables[s1].setType(Operand.INT);
 		variables[s2].setType(Operand.INT);
-		currentBlock.add(new ConditionalBranchQuad(this.address, currentBlock,
-			s1, ConditionalBranchQuad.IF_ICMPGT, s2, address));
+		currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
+			s1, IF_ICMPGT, s2, address));
 		stackOffset -= 2;
 		setSuccessorStackOffset();
 	}
@@ -1120,8 +1128,8 @@ public class IRGenerator extends BytecodeVisitor {
 		Variable[] variables = currentBlock.getVariables();
 		variables[s1].setType(Operand.INT);
 		variables[s2].setType(Operand.INT);
-		currentBlock.add(new ConditionalBranchQuad(this.address, currentBlock,
-			s1, ConditionalBranchQuad.IF_ICMPLE, s2, address));
+		currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
+			s1, IF_ICMPLE, s2, address));
 		stackOffset -= 2;
 		setSuccessorStackOffset();
 	}
@@ -1135,8 +1143,8 @@ public class IRGenerator extends BytecodeVisitor {
 		Variable[] variables = currentBlock.getVariables();
 		variables[s1].setType(Operand.REFERENCE);
 		variables[s2].setType(Operand.REFERENCE);
-		currentBlock.add(new ConditionalBranchQuad(this.address, currentBlock,
-			s1, ConditionalBranchQuad.IF_ACMPEQ, s2, address));
+		currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
+			s1, IF_ACMPEQ, s2, address));
 		stackOffset -= 2;
 		setSuccessorStackOffset();
 	}
@@ -1150,8 +1158,8 @@ public class IRGenerator extends BytecodeVisitor {
 		Variable[] variables = currentBlock.getVariables();
 		variables[s1].setType(Operand.REFERENCE);
 		variables[s2].setType(Operand.REFERENCE);
-		currentBlock.add(new ConditionalBranchQuad(this.address, currentBlock,
-			s1, ConditionalBranchQuad.IF_ACMPNE, s2, address));
+		currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
+			s1, IF_ACMPNE, s2, address));
 		stackOffset -= 2;
 		setSuccessorStackOffset();
 	}
@@ -1160,7 +1168,7 @@ public class IRGenerator extends BytecodeVisitor {
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_goto(int)
 	 */
 	public void visit_goto(int address) {
-		currentBlock.add(new UnconditionalBranchQuad(this.address, currentBlock, address));
+		currentBlock.add(new UnconditionalBranchQuad<T>(this.address, currentBlock, address));
 		setSuccessorStackOffset();
 	}
 
@@ -1198,7 +1206,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_ireturn() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.INT);
-		currentBlock.add(new VarReturnQuad(address, currentBlock, stackOffset));
+		currentBlock.add(new VarReturnQuad<T>(address, currentBlock, stackOffset));
 	}
 
 	/**
@@ -1207,7 +1215,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_lreturn() {
 		stackOffset -= 2;
 		variables[stackOffset].setType(Operand.LONG);
-		currentBlock.add(new VarReturnQuad(address, currentBlock, stackOffset));
+		currentBlock.add(new VarReturnQuad<T>(address, currentBlock, stackOffset));
 	}
 
 	/**
@@ -1216,7 +1224,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_freturn() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.FLOAT);
-		currentBlock.add(new VarReturnQuad(address, currentBlock, stackOffset));
+		currentBlock.add(new VarReturnQuad<T>(address, currentBlock, stackOffset));
 	}
 
 	/**
@@ -1225,7 +1233,7 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_dreturn() {
 		stackOffset -= 2;
 		variables[stackOffset].setType(Operand.DOUBLE);
-		currentBlock.add(new VarReturnQuad(address, currentBlock, stackOffset));
+		currentBlock.add(new VarReturnQuad<T>(address, currentBlock, stackOffset));
 	}
 
 	/**
@@ -1234,14 +1242,14 @@ public class IRGenerator extends BytecodeVisitor {
 	public void visit_areturn() {
 		stackOffset -= 1;
 		variables[stackOffset].setType(Operand.REFERENCE);
-		currentBlock.add(new VarReturnQuad(address, currentBlock, stackOffset));
+		currentBlock.add(new VarReturnQuad<T>(address, currentBlock, stackOffset));
 	}
 
 	/**
 	 * @see org.jnode.vm.bytecode.BytecodeVisitor#visit_return()
 	 */
 	public void visit_return() {
-		currentBlock.add(new VoidReturnQuad(address, currentBlock));
+		currentBlock.add(new VoidReturnQuad<T>(address, currentBlock));
 	}
 
 	/**
@@ -1377,8 +1385,8 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		Variable[] variables = currentBlock.getVariables();
 		variables[s1].setType(Operand.REFERENCE);
-		currentBlock.add(new ConditionalBranchQuad(this.address, currentBlock,
-			s1, ConditionalBranchQuad.IFNULL, address));
+		currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
+			s1, IFNULL, address));
 		stackOffset -= 1;
 		setSuccessorStackOffset();
 	}
@@ -1390,14 +1398,14 @@ public class IRGenerator extends BytecodeVisitor {
 		int s1 = stackOffset - 1;
 		Variable[] variables = currentBlock.getVariables();
 		variables[s1].setType(Operand.REFERENCE);
-		currentBlock.add(new ConditionalBranchQuad(this.address, currentBlock,
-			s1, ConditionalBranchQuad.IFNONNULL, address));
+		currentBlock.add(new ConditionalBranchQuad<T>(this.address, currentBlock,
+			s1, IFNONNULL, address));
 		stackOffset -= 1;
 		setSuccessorStackOffset();
 	}
 
 	// TODO
-	public Quad doBinaryQuad(int op, int type) {
+	public Quad<T> doBinaryQuad(BinaryOperation op, int type) {
 		int sCount = 1;
 		if (type == Operand.DOUBLE || type == Operand.LONG) {
 			sCount = 2;
@@ -1407,14 +1415,14 @@ public class IRGenerator extends BytecodeVisitor {
 		Variable[] variables = currentBlock.getVariables();
 		variables[s1].setType(type);
 		variables[stackOffset].setType(type);
-		BinaryQuad bop = new BinaryQuad(address, currentBlock, s1, s1, op, stackOffset);
+		BinaryQuad<T> bop = new BinaryQuad<T>(address, currentBlock, s1, s1, op, stackOffset);
 		return bop.foldConstants();
 	}
 
 	/**
 	 * @return
 	 */
-	public Variable[] getVariables() {
+	public Variable<T>[] getVariables() {
 		return variables;
 	}
 
@@ -1428,9 +1436,7 @@ public class IRGenerator extends BytecodeVisitor {
 	private void setSuccessorStackOffset() {
 		// this is needed for terniary operators, the stack is not the
 		// same as our dominator
-		Iterator it = currentBlock.getSuccessors().iterator();
-		while (it.hasNext()) {
-			IRBasicBlock b = (IRBasicBlock) it.next();
+		for (IRBasicBlock b : currentBlock.getSuccessors()) {
 			b.setStackOffset(stackOffset);
 		}
 	}

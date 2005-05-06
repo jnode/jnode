@@ -27,15 +27,15 @@ import org.jnode.vm.compiler.ir.quad.AssignQuad;
  * @author Madhu Siddalingaiah
  *
  */
-public abstract class Variable extends Operand implements Cloneable {
+public abstract class Variable<T> extends Operand<T> implements Cloneable {
 	private int index;
 	private int ssaValue;
-	private Location location;
+	private Location<T> location;
 
 	/*
 	 * The operation where this variable is assigned
 	 */
-	private AssignQuad assignQuad;
+	private AssignQuad<T> assignQuad;
 
 	/*
 	 * The address where this variable is last used
@@ -75,7 +75,7 @@ public abstract class Variable extends Operand implements Cloneable {
 	 * 
 	 * @return
 	 */
-	public AssignQuad getAssignQuad() {
+	public AssignQuad<T> getAssignQuad() {
 		return assignQuad;
 	}
 
@@ -89,7 +89,7 @@ public abstract class Variable extends Operand implements Cloneable {
 	/**
 	 * @param assignQuad
 	 */
-	public void setAssignQuad(AssignQuad assignQuad) {
+	public void setAssignQuad(AssignQuad<T> assignQuad) {
 		this.assignQuad = assignQuad;
 	}
 
@@ -111,33 +111,33 @@ public abstract class Variable extends Operand implements Cloneable {
 		}
 	}
 
-	public Operand simplify() {
-		Operand op = assignQuad.propagate(this);
+	public Operand<T> simplify() {
+		Operand<T> op = assignQuad.propagate(this);
 		return op;
 	}
 	
 	/**
 	 * @return
 	 */
-	public Location getLocation() {
+	public Location<T> getLocation() {
 		return this.location;
 	}
 
 	/**
 	 * @param loc
 	 */
-	public void setLocation(Location loc) {
+	public void setLocation(Location<T> loc) {
 		this.location = loc;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.Operand#getAddressingMode()
 	 */
-	public int getAddressingMode() {
+	public AddressingMode getAddressingMode() {
 		if (location instanceof StackLocation) {
-			return Operand.MODE_STACK;
+			return AddressingMode.STACK;
 		} else if (location instanceof RegisterLocation) {
-			return Operand.MODE_REGISTER;
+			return AddressingMode.REGISTER;
 		} else {
 			throw new IllegalArgumentException("Undefined location: " + toString());
 		}

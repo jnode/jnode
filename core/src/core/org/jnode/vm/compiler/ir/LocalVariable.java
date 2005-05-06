@@ -25,7 +25,7 @@ package org.jnode.vm.compiler.ir;
  * @author Madhu Siddalingaiah
  *
  */
-public class LocalVariable extends Variable {
+public class LocalVariable<T> extends Variable<T> {
 	/**
 	 * @param type
 	 * @param index
@@ -37,7 +37,7 @@ public class LocalVariable extends Variable {
 	/**
 	 * @param variable
 	 */
-	public LocalVariable(LocalVariable variable) {
+	public LocalVariable(LocalVariable<T> variable) {
 		this(variable.getType(), variable.getIndex());
 	}
 
@@ -46,6 +46,6 @@ public class LocalVariable extends Variable {
 	}
 	
 	public Object clone() {
-		return new LocalVariable(this);
+		return new LocalVariable<T>(this);
 	}
 }

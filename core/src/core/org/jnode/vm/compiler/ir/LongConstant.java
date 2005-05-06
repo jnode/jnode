@@ -24,7 +24,7 @@ package org.jnode.vm.compiler.ir;
 /**
  * @author Levente S\u00e1ntha
  */
-public class LongConstant extends Constant {
+public class LongConstant<T> extends Constant<T> {
 	private long value;
 	
 	public LongConstant(long value) {

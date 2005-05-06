@@ -29,8 +29,8 @@ import org.jnode.util.BootableArrayList;
  * @author Madhu Siddalingaiah
  * 
  */
-public class PhiOperand extends Operand {
-	private BootableArrayList sources;
+public class PhiOperand<T> extends Operand<T> {
+	private final List<Operand<T>> sources;
 	private int varIndex;
 
 	public PhiOperand() {
@@ -42,15 +42,15 @@ public class PhiOperand extends Operand {
 	 */
 	public PhiOperand(int type) {
 		super(type);
-		sources = new BootableArrayList(); 
+		sources = new BootableArrayList<Operand<T>>(); 
 	}
 	
-	public void addSource(Variable source) {
+	public void addSource(Variable<T> source) {
 		sources.add(source);
 		int type = getType();
 		if (type == UNKNOWN) {
 			setType(source.getType());
-			Variable v = source;
+			Variable<T> v = source;
 			varIndex = v.getIndex();
 		} else if (type != source.getType()) {
 			throw new AssertionError("phi operand source types don't match");
@@ -74,7 +74,7 @@ public class PhiOperand extends Operand {
 	/**
 	 * @return
 	 */
-	public List getSources() {
+	public List<Operand<T>> getSources() {
 		return sources;
 	}
 	
@@ -82,22 +82,22 @@ public class PhiOperand extends Operand {
 		return varIndex;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.Operand#getAddressingMode()
 	 */
-	public int getAddressingMode() {
-		Variable first = (Variable) sources.get(0);
+	public AddressingMode getAddressingMode() {
+		Variable<T> first = (Variable<T>) sources.get(0);
 		return first.getAddressingMode();
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.Operand#simplify()
 	 */
-	public Operand simplify() {
+	public Operand<T> simplify() {
 		int n = sources.size();
 		for (int i=0; i<n; i+=1) {
-			Variable src = (Variable) sources.get(i);
-			Operand op = src.simplify();
+			Variable<T> src = (Variable<T>) sources.get(i);
+			Operand<T> op = src.simplify();
 			if (op instanceof StackVariable || op instanceof LocalVariable) {
 				sources.set(i, op);
 			} else {

@@ -25,7 +25,7 @@ package org.jnode.vm.compiler.ir;
  * @author Madhu Siddalingaiah
  * 
  */
-public class IntConstant extends Constant {
+public class IntConstant<T> extends Constant<T> {
 	private int value;
 	
 	public IntConstant(int value) {

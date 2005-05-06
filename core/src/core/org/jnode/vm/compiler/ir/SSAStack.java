@@ -21,46 +21,48 @@
  
 package org.jnode.vm.compiler.ir;
 
+import java.util.List;
+
 import org.jnode.util.BootableArrayList;
 
 /**
  * @author Madhu Siddalingaiah
  * 
  */
-public class SSAStack {
-	private BootableArrayList stack;
+public class SSAStack<T> {
+	private final List<Variable<T>> stack;
 	private int count;
 	private Variable variable;
 
 	/**
 	 * 
 	 */
-	public SSAStack(Variable variable) {
+	public SSAStack(Variable<T> variable) {
 		this.variable = variable;
 		count = 0;
-		stack = new BootableArrayList();
+		stack = new BootableArrayList<Variable<T>>();
 	}
 	
-	public Variable peek() {
+	public Variable<T> peek() {
 		int n = stack.size();
 		// This deals with cases where there are excessive phis (unpruned SSA)
 		if (n <= 0) {
 			return null;
 		}
-		Variable var = (Variable) stack.get(n - 1);
+		Variable<T> var = stack.get(n - 1);
 		return var;
 	}
 	
-	public Variable getNewVariable() {
+	public Variable<T> getNewVariable() {
 		count += 1;
-		Variable var = (Variable) variable.clone();
+		Variable<T> var = (Variable<T>) variable.clone();
 		var.setSSAValue(count);
 		stack.add(var);
 		return var;
 	}
 	
-	public Variable pop() {
-		Variable var = (Variable) stack.remove(stack.size() - 1);
+	public Variable<T> pop() {
+		Variable<T> var = stack.remove(stack.size() - 1);
 		return var;
 	}
 }

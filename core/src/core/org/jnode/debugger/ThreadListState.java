@@ -42,9 +42,9 @@ public class ThreadListState extends DebugState {
     
     private static final String[] STATE_NAMES = { "threads", "running-threads", "waiting-threads" };
 
-    private final TreeMap threads;
+    private final Map<String, Thread> threads;
 
-    private Iterator threadIterator;
+    private Iterator<Thread> threadIterator;
 
     private int index;
 
@@ -58,7 +58,7 @@ public class ThreadListState extends DebugState {
     }
 
     public void print(PrintStream out) {
-        for (Iterator i = threads.values().iterator(); i.hasNext();) {
+        for (Iterator<Thread> i = threads.values().iterator(); i.hasNext();) {
             final Thread t = (Thread) i.next();
             DebuggerUtils.showThreadHeading(out, t);
             if (i.hasNext()) {
@@ -74,7 +74,7 @@ public class ThreadListState extends DebugState {
      * @param map
      *            keychar - message
      */
-    public void fillHelp(Map map) {
+    public void fillHelp(Map<String, String> map) {
         super.fillHelp(map);
         map.put("n", "Next thread");
         map.put("r", "Reset the list");
@@ -111,8 +111,8 @@ public class ThreadListState extends DebugState {
         index = 1;        
     }
     
-    private TreeMap getAllThreads(int state) {
-        final TreeMap map = new TreeMap();
+    private Map<String, Thread> getAllThreads(int state) {
+        final TreeMap<String, Thread> map = new TreeMap<String, Thread>();
         ThreadGroup grp = Thread.currentThread().getThreadGroup();
         while (grp.getParent() != null) {
             grp = grp.getParent();
@@ -121,7 +121,7 @@ public class ThreadListState extends DebugState {
         return map;
     }
 
-    private void getThreads(TreeMap map, ThreadGroup grp, int state) {
+    private void getThreads(Map<String, Thread> map, ThreadGroup grp, int state) {
         final int max = grp.activeCount() * 2;
         final Thread[] ts = new Thread[ max];
         grp.enumerate(ts);

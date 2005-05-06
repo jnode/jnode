@@ -23,7 +23,6 @@ package org.jnode.debugger;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import javax.naming.NameNotFoundException;
 
@@ -59,9 +58,9 @@ public class DebuggerPlugin extends Plugin implements DeviceListener {
         try {
             final DeviceManager dm = DeviceUtils.getDeviceManager();
             dm.addListener(this);
-            final Collection devs = new ArrayList(dm.getDevices());
-            for (Iterator i = devs.iterator(); i.hasNext();) {
-                addListeners((Device) i.next());
+            final Collection<Device> devs = new ArrayList<Device>(dm.getDevices());
+            for (Device dev : devs) {
+                addListeners(dev);
             }
         } catch (NameNotFoundException ex) {
             throw new PluginException(ex);
@@ -75,9 +74,9 @@ public class DebuggerPlugin extends Plugin implements DeviceListener {
         try {
             final DeviceManager dm = DeviceUtils.getDeviceManager();
             dm.removeListener(this);
-            final Collection devs = dm.getDevices();
-            for (Iterator i = devs.iterator(); i.hasNext();) {
-                removeListeners((Device) i.next());
+            final Collection<Device> devs = dm.getDevices();
+            for (Device dev : devs) {
+                removeListeners(dev);
             }
         } catch (NameNotFoundException ex) {
             throw new PluginException(ex);

@@ -25,7 +25,7 @@ package org.jnode.vm.compiler.ir;
  * @author Madhu Siddalingaiah
  *
  */
-public class StackVariable extends Variable {
+public class StackVariable<T> extends Variable<T> {
 	/**
 	 * @param type
 	 * @param index
@@ -37,7 +37,7 @@ public class StackVariable extends Variable {
 	/**
 	 * @param variable
 	 */
-	public StackVariable(StackVariable variable) {
+	public StackVariable(StackVariable<T> variable) {
 		this(variable.getType(), variable.getIndex());
 	}
 
@@ -46,6 +46,6 @@ public class StackVariable extends Variable {
 	}
 	
 	public Object clone() {
-		return new StackVariable(this);
+		return new StackVariable<T>(this);
 	}
 }

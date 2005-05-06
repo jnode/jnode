@@ -28,7 +28,7 @@ package org.jnode.vm.compiler.ir;
  * The register allocator defines the location of a variable, this
  * is either a RegisterLocation or a StackLocation.
  */
-public abstract class Location {
+public abstract class Location<T> {
 	private String name;
 	
 	public Location(String name) {

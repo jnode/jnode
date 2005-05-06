@@ -30,16 +30,16 @@ import org.jnode.vm.compiler.ir.Variable;
  * @author Madhu Siddalingaiah
  *
  */
-public class VariableRefAssignQuad extends AssignQuad {
+public class VariableRefAssignQuad<T> extends AssignQuad<T> {
 	/**
 	 * Right hand side of assignment
 	 */
-	private Operand refs[];
+	private Operand<T>[] refs;
 
 	/**
 	 * @param address
 	 */
-	public VariableRefAssignQuad(int address, IRBasicBlock block, int lhsIndex, int rhsIndex) {
+	public VariableRefAssignQuad(int address, IRBasicBlock<T> block, int lhsIndex, int rhsIndex) {
 		super(address, block, lhsIndex);
 		refs = new Operand[] { getOperand(rhsIndex) };
 	}
@@ -48,7 +48,7 @@ public class VariableRefAssignQuad extends AssignQuad {
 	 * @param lhs
 	 * @param rhs
 	 */
-	public VariableRefAssignQuad(int address, IRBasicBlock block, Variable lhs, Variable rhs) {
+	public VariableRefAssignQuad(int address, IRBasicBlock<T> block, Variable<T> lhs, Variable<T> rhs) {
 		super(address, block, lhs);
 		refs = new Operand[] { rhs };
 	}
@@ -56,7 +56,7 @@ public class VariableRefAssignQuad extends AssignQuad {
 	/**
 	 * @see org.jnode.vm.compiler.ir.quad.Quad#getReferencedOps()
 	 */
-	public Operand[] getReferencedOps() {
+	public Operand<T>[] getReferencedOps() {
 		return refs;
 	}
 
@@ -67,7 +67,7 @@ public class VariableRefAssignQuad extends AssignQuad {
 	/**
 	 * @return
 	 */
-	public Operand getRHS() {
+	public Operand<T> getRHS() {
 		return refs[0];
 	}
 
@@ -75,12 +75,12 @@ public class VariableRefAssignQuad extends AssignQuad {
 	 * @param operand
 	 * @return
 	 */
-	public Operand propagate(Variable operand) {
+	public Operand<T> propagate(Variable<T> operand) {
 		setDeadCode(true);
 		return refs[0];
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.Quad#doPass2(org.jnode.util.BootableHashMap)
 	 */
 	// This operation will almost always become dead code, but I wanted to play it
@@ -89,14 +89,14 @@ public class VariableRefAssignQuad extends AssignQuad {
 		refs[0] = refs[0].simplify();
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.Quad#generateCode(org.jnode.vm.compiler.ir.CodeGenerator)
 	 */
-	public void generateCode(CodeGenerator cg) {
+	public void generateCode(CodeGenerator<T> cg) {
 		cg.generateCodeFor(this);
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.jnode.vm.compiler.ir.AssignQuad#getLHSLiveAddress()
 	 */
 	public int getLHSLiveAddress() {

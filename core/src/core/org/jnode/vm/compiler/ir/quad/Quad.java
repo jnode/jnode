@@ -21,7 +21,8 @@
  
 package org.jnode.vm.compiler.ir.quad;
 
-import org.jnode.util.BootableHashMap;
+import java.util.Map;
+
 import org.jnode.vm.compiler.ir.CodeGenerator;
 import org.jnode.vm.compiler.ir.IRBasicBlock;
 import org.jnode.vm.compiler.ir.Operand;
@@ -34,18 +35,18 @@ import org.jnode.vm.compiler.ir.Variable;
  * in the literature.
  * 
  */
-public abstract class Quad {
+public abstract class Quad<T> {
 	private int address;
 	private boolean deadCode;
-	private IRBasicBlock basicBlock;
+	private IRBasicBlock<T> basicBlock;
 
-	public Quad(int address, IRBasicBlock block) {
+	public Quad(int address, IRBasicBlock<T> block) {
 		this.address = address;
 		this.basicBlock = block;
 		this.deadCode = false;
 	}
 
-	public Operand getOperand(int varIndex) {
+	public Operand<T> getOperand(int varIndex) {
 		return basicBlock.getVariables()[varIndex];
 	}
 
@@ -70,14 +71,14 @@ public abstract class Quad {
 	 * 
 	 * @return defined operand or null if none
 	 */
-	public abstract Operand getDefinedOp();
+	public abstract Operand<T> getDefinedOp();
 
 	/**
 	 * Gets all operands used by this operation (right side of assignment)
 	 * 
 	 * @return array of referenced operands or null if none
 	 */
-	public abstract Operand[] getReferencedOps();
+	public abstract Operand<T>[] getReferencedOps();
 
 	/**
 	 * Gets all operands that interfere in this operation
@@ -85,7 +86,7 @@ public abstract class Quad {
 	 * 
 	 * @return array of operands that interfere with each other or null if none
 	 */
-	public Operand[] getIFOperands() {
+	public Operand<T>[] getIFOperands() {
 		return null;
 	}
 
@@ -106,17 +107,17 @@ public abstract class Quad {
 	/**
 	 * @return
 	 */
-	public IRBasicBlock getBasicBlock() {
+	public IRBasicBlock<T> getBasicBlock() {
 		return basicBlock;
 	}
 
-	public void computeLiveness(BootableHashMap<Variable, Variable> liveVariables) {
-		Operand[] refs = getReferencedOps();
+	public void computeLiveness(Map<Variable, Variable<T>> liveVariables) {
+		Operand<T>[] refs = getReferencedOps();
 		if (refs != null) {
 			int n = refs.length;
 			for (int i=0; i<n; i+=1) {
 				if (refs[i] instanceof Variable) {
-					Variable v = (Variable) refs[i];
+					Variable<T> v = (Variable<T>) refs[i];
 					v.setLastUseAddress(getAddress());
 					liveVariables.put(v, v);
 				}
@@ -132,5 +133,5 @@ public abstract class Quad {
 	 * <code>refs[0] = refs[0].simplify();</code>
 	 */
 	public abstract void doPass2();
-	public abstract void generateCode(CodeGenerator cg);
+	public abstract void generateCode(CodeGenerator<T> cg);
 }

@@ -24,7 +24,7 @@ package org.jnode.vm.compiler.ir;
 /**
  * @author Levente S\u00e1ntha
  */
-public class FloatConstant extends Constant {
+public class FloatConstant<T> extends Constant<T> {
 	private float value;
 	
 	public FloatConstant(float value) {

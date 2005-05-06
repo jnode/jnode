@@ -29,7 +29,7 @@ import org.jnode.vm.JvmType;
  * An operand of an intermediate operation
  * This could be a constant, local variable, or stack entry
  */
-public abstract class Operand {
+public abstract class Operand<T> {
 	/**
 	 * NOTE: these values *must* be less than 16!!
 	 * @see #getAddressingMode() below
@@ -47,11 +47,7 @@ public abstract class Operand {
 	/*
 	 * Addressing mode bits
 	 */
-	public static final int MODE_CONSTANT = 0x01;
-	public static final int MODE_REGISTER = 0x02;
-	public static final int MODE_STACK = 0x03;
-
-	private int type;	// One of the above
+    private int type;	// One of the above
 	
 	public Operand(int type) {
 		this.type = type;
@@ -68,12 +64,12 @@ public abstract class Operand {
 		this.type = type;
 	}
 
-	public abstract Operand simplify();
+	public abstract Operand<T> simplify();
 	
 	/**
-	 * One of MODE_xxx constants defined above
+	 * One of AddressingMode constants defined above
 	 * 
 	 * @return
 	 */
-	public abstract int getAddressingMode();
+	public abstract AddressingMode getAddressingMode();
 }
