@@ -205,7 +205,7 @@ enable_paging:
 	mov eax,pd_paddr
 	mov cr3,eax
 	; Set PSE in CR4 to enable 4Mb extensions
-	mov eax,CR4
+	mov eax,cr4
 	or eax,CR4_PSE
 	mov cr4,eax
 	; Set PG in CR0 to enable paging
