@@ -29,7 +29,6 @@ import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 
 import org.jnode.naming.InitialNaming;
 import org.jnode.plugin.PluginDescriptor;
@@ -173,10 +172,7 @@ public class PluginCommand {
     private void listPlugins(PrintStream out, PluginManager mgr)
             throws PluginException {
         final ArrayList<String> rows = new ArrayList<String>();
-        for (Iterator<PluginDescriptor> i = mgr.getRegistry().getDescriptorIterator(); i
-                .hasNext();) {
-            PluginDescriptor descr = (PluginDescriptor) i.next();
-
+        for (PluginDescriptor descr : mgr.getRegistry()) {
             StringBuffer sb = new StringBuffer();
             sb.append(descr.getId());
             sb.append("; state ");

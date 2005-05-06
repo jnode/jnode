@@ -114,13 +114,12 @@ public final class DefaultPluginManager extends PluginManager {
         // Start the plugins
         final String cmdLine = (String)AccessController.doPrivileged(new GetPropertyAction("jnode.cmdline", ""));
         final boolean debug = (cmdLine.indexOf("debug") > 0);
-        final List descrList = createPluginDescriptorList();
+        final List<PluginDescriptor> descrList = createPluginDescriptorList();
 
         // 2 loops, first start all system plugins,
         // then start all auto-start plugins
         for (int type = 0; type < 2; type++) {            
-            for (Iterator i = descrList.iterator(); i.hasNext();) {
-                final PluginDescriptor descr = (PluginDescriptor) i.next();
+            for (PluginDescriptor descr : descrList) {
                 try {
                     final boolean start;
                     if (type == 0) {
@@ -184,10 +183,9 @@ public final class DefaultPluginManager extends PluginManager {
         }
 
         try {
-            final List descrList = createPluginDescriptorList();
+            final List<PluginDescriptor> descrList = createPluginDescriptorList();
             Collections.reverse(descrList);
-            for (Iterator i = descrList.iterator(); i.hasNext();) {
-                final PluginDescriptor descr = (PluginDescriptor) i.next();
+            for (PluginDescriptor descr : descrList) {
                 //descr.getPlugin().stop();
                 try {
                     stopPlugin(descr);
@@ -211,8 +209,7 @@ public final class DefaultPluginManager extends PluginManager {
     public final void stopPlugin(PluginDescriptor d) throws PluginException {
         final String id = d.getId();
         //BootLog.info("__Stopping " + id);
-        for (Iterator i = registry.getDescriptorIterator(); i.hasNext();) {
-            final PluginDescriptor descr = (PluginDescriptor) i.next();
+        for (PluginDescriptor descr : registry) {
             if (descr.depends(id)) {
                 stopPlugin(descr);
             }
@@ -225,20 +222,19 @@ public final class DefaultPluginManager extends PluginManager {
      * 
      * @return List&lt;PluginDescriptor&gt;
      */
-    private List createPluginDescriptorList() throws PluginException {
+    private List<PluginDescriptor> createPluginDescriptorList() throws PluginException {
 
         // Get all descriptors into a hashmap (id, descriptor).
-        final HashMap all = new HashMap();
-        final HashSet systemSet = new HashSet();
-        for (Iterator i = registry.getDescriptorIterator(); i.hasNext();) {
-            final PluginDescriptor descr = (PluginDescriptor) i.next();
+        final HashMap<String, PluginDescriptor> all = new HashMap<String, PluginDescriptor>();
+        final HashSet<String> systemSet = new HashSet<String>();
+        for (PluginDescriptor descr : registry) {
             all.put(descr.getId(), descr);
             if (descr.isSystemPlugin()) {
                 systemSet.add(descr.getId());
             }
         }
         // Remove those plugin where some prerequisites do not exist
-        for (Iterator i = all.values().iterator(); i.hasNext();) {
+        for (Iterator<PluginDescriptor> i = all.values().iterator(); i.hasNext();) {
             final PluginDescriptor descr = (PluginDescriptor) i.next();
             if (!prerequisitesExist(descr, all)) {
                 BootLog.info("Skipping plugin " + descr.getId());
@@ -249,12 +245,12 @@ public final class DefaultPluginManager extends PluginManager {
         }
 
         // Now create a sorted list
-        final ArrayList list = new ArrayList();
-        final HashSet nameSet = new HashSet();
+        final ArrayList<PluginDescriptor> list = new ArrayList<PluginDescriptor>();
+        final HashSet<String> nameSet = new HashSet<String>();
 
         while (all.size() > 0) {
             int additions = 0;
-            for (Iterator i = all.values().iterator(); i.hasNext();) {
+            for (Iterator<PluginDescriptor> i = all.values().iterator(); i.hasNext();) {
                 final PluginDescriptor descr = (PluginDescriptor) i.next();
                 if (canAdd(descr, nameSet, systemSet)) {
                     list.add(descr);
@@ -279,8 +275,8 @@ public final class DefaultPluginManager extends PluginManager {
      * @param descr
      * @param nameSet
      */
-    private boolean canAdd(PluginDescriptor descr, HashSet nameSet,
-            HashSet systemSet) {
+    private boolean canAdd(PluginDescriptor descr, HashSet<String> nameSet,
+            HashSet<String> systemSet) {
         //Syslog.debug("Testing " + descr.getId());
         if (!descr.isSystemPlugin()) {
             if (!systemSet.isEmpty()) { return false; }
@@ -316,8 +312,7 @@ public final class DefaultPluginManager extends PluginManager {
      * @return
      */
     private boolean isStartPluginsFinished() {
-        for (Iterator i = registry.getDescriptorIterator(); i.hasNext();) {
-            final PluginDescriptor descr = (PluginDescriptor) i.next();
+        for (PluginDescriptor descr : registry) {
             try {
                 final Plugin pi = descr.getPlugin();
                 if (pi.isActive()) {
@@ -334,8 +329,7 @@ public final class DefaultPluginManager extends PluginManager {
      * List of started but unfinished plugins.
      */
     private void listUnfinishedPlugins() {
-        for (Iterator i = registry.getDescriptorIterator(); i.hasNext();) {
-            final PluginDescriptor descr = (PluginDescriptor) i.next();
+        for (PluginDescriptor descr : registry) {
             try {
                 final Plugin pi = descr.getPlugin();
                 if (pi.isActive()) {

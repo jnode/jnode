@@ -22,7 +22,6 @@
 package org.jnode.shell.help;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.naming.NameNotFoundException;
@@ -61,9 +60,7 @@ public class PluginArgument extends Argument {
                     .lookup(PluginManager.NAME);
 
             // collect matching plugin id's
-            for (Iterator<PluginDescriptor> i = piMgr.getRegistry().getDescriptorIterator(); i
-                    .hasNext();) {
-                final PluginDescriptor descr = (PluginDescriptor) i.next();
+            for (PluginDescriptor descr : piMgr.getRegistry()) {
                 final String id = descr.getId();
                 if (id.startsWith(partial)) {
                     ids.add(id);

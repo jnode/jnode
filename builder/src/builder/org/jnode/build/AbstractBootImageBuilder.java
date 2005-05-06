@@ -271,12 +271,11 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 //        }
         
         // Load all resources of all plugins
-        for (Iterator<PluginDescriptor> i = piRegistry.getDescriptorIterator(); i.hasNext(); ) {
-            final PluginDescriptorModel descr = (PluginDescriptorModel)i.next();
+        for (PluginDescriptor descr : piRegistry) {
             if (!descr.isSystemPlugin()) {
                 throw new BuildException("Non system plugin found " + descr.getId());
             }
-            final PluginJar piJar = descr.getJarFile();
+            final PluginJar piJar = ((PluginDescriptorModel)descr).getJarFile();
             log("Plugin: " + descr.getId() + piJar.resourceNames().size());
             for (String name : piJar.resourceNames()) {
                 final ByteBuffer buf = piJar.getResourceAsBuffer(name);
@@ -308,12 +307,11 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
         final BootableHashMap<String, byte[]> resources = new BootableHashMap<String, byte[]>();
 
         // Load all resources of all plugins
-        for (Iterator<PluginDescriptor> i = piRegistry.getDescriptorIterator(); i.hasNext(); ) {
-            final PluginDescriptorModel descr = (PluginDescriptorModel)i.next();
+        for (PluginDescriptor descr : piRegistry) {
             if (!descr.isSystemPlugin()) {
                 throw new BuildException("Non system plugin found " + descr.getId());
             }
-            final PluginJar piJar = descr.getJarFile();
+            final PluginJar piJar = ((PluginDescriptorModel)descr).getJarFile();
 //            log("Plugin: " + descr.getId() + piJar.resourceNames().size());
             for (String name : piJar.resourceNames()) {
                 final ByteBuffer buf = piJar.getResourceAsBuffer(name);
