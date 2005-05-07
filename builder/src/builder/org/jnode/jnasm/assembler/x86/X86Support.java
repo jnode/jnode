@@ -60,10 +60,18 @@ public class X86Support extends HardwareSupport {
         modules.add(assembler.getPseudo());
     }
 
-    public void assemble() {
+    public void assemble(int baseAddress) {
         X86CpuID cpuId = X86CpuID.createID("pentium");
-        nativeStream = new X86BinaryAssembler(cpuId, X86Constants.Mode.CODE32, 0);
+        nativeStream = new X86BinaryAssembler(cpuId, X86Constants.Mode.CODE32, baseAddress);
+        doAssembly();
+    }
 
+    public void assemble(NativeStream asm) {
+        nativeStream = (X86Assembler) asm;
+        doAssembly();
+    }
+
+    private void doAssembly() {
         for (int i = 0; i < modules.size(); i++) {
             ((AssemblerModule) modules.get(i)).setNativeStream(nativeStream);
         }

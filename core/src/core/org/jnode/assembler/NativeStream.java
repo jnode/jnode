@@ -181,6 +181,12 @@ public abstract class NativeStream {
 	 */
 	public abstract void write(byte[] data, int ofs, int len);
 
+    /**
+	 * Write a reference to the given object
+	 * @param object
+	 */
+	public abstract void writeObjectRef(Object object);
+
 	/**
 	 * A wrapper for constructing objects in the native stream.
 	 */

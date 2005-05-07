@@ -187,11 +187,16 @@ List dxList() :
 Object dxOperand() :
 { Object o; Token t; int i;}
 {
+try {
 (
     LOOKAHEAD(2)
     i=arithmeticExpression() { o = new Integer(i);}
 |   t=<STRING> {o=t.image.substring(1, t.image.length() - 1);}
-)   {return o;}
+)
+} catch(UndefinedConstantException udefconste) {
+    return new Identifier(udefconste.getConstant());
+}
+{return o;}
 }
 
 Instruction instruction() :
@@ -238,6 +243,7 @@ List operandList() :
 Object operand() :
 { Object o = UNDEFINED; Token t, dw; int disp, scale; Address addr; int i;}
 {
+try {
 (
     <NEAR> t=<IDENT>  { o = new Identifier(t.image);}
 |
@@ -285,6 +291,9 @@ Object operand() :
         "]"
     )
 )
+} catch(UndefinedConstantException udefconste) {
+    return new Identifier(udefconste.getConstant());
+}
     { return o;}
 }
 

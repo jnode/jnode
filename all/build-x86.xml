@@ -166,7 +166,7 @@
 			version="${jnode-ver}" 
 			jnodeCompiler="${jnode.compiler}" 
 			bits="${jnode.bits}"
-			enablejnasm="${jnode.enable.jnasm}">
+			enableJNasm="${jnode.enable.jnasm}">
 
 			<nanokernelsources srcfile="${src.native.dir}/x86/jnode.asm">
 				<includedir dir="${src.native.dir}/x86" />

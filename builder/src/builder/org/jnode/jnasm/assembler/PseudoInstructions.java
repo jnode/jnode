@@ -22,6 +22,7 @@
 package org.jnode.jnasm.assembler;
 
 import org.jnode.assembler.NativeStream;
+import org.jnode.assembler.Label;
 
 import java.util.List;
 import java.util.Map;
@@ -106,7 +107,7 @@ public class PseudoInstructions extends AssemblerModule {
                     stream.write8(bytes[j]);
                 }
             } else {
-                System.out.println("unkown data: " + o);
+                throw new IllegalArgumentException("Unknown data: " + o);
             }
         }
     }
@@ -126,7 +127,7 @@ public class PseudoInstructions extends AssemblerModule {
                 if (bln % 2 == 1)
                     stream.write8(0);
             } else {
-                System.out.println("unkown data: " + o);
+                throw new IllegalArgumentException("Unknown data: " + o);
             }
         }
     }
@@ -147,8 +148,10 @@ public class PseudoInstructions extends AssemblerModule {
                 for (int j = 0; j < bln; j++) {
                     stream.write8(0);
                 }
+            } else if (o instanceof Identifier){
+                stream.writeObjectRef(new Label(((Identifier) o).name));
             } else {
-                System.out.println("unkown data: " + o);
+                throw new IllegalArgumentException("Unknown data: " + o);
             }
         }
     }

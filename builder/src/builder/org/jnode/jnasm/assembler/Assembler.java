@@ -22,6 +22,7 @@
 package org.jnode.jnasm.assembler;
 
 import org.jnode.jnasm.assembler.x86.X86Support;
+import org.jnode.assembler.NativeStream;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,7 @@ import java.lang.reflect.Constructor;
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public abstract class Assembler {
+    public static final int UNDEFINED_INT = 989898989;
     private static final String PARSER_CLASS = "org.jnode.jnasm.assembler.gen.JNAsm";
     public static final boolean THROW = false;
     protected static final Object UNDEFINED = new String("UNDEFIEND");
@@ -101,7 +103,7 @@ public abstract class Assembler {
         ReInit(new StringReader(data));
         setPass(1);
         jnasmInput();
-        assemble();
+        assemble(0);
 
         //2nd pass
         setPass(2);
@@ -111,8 +113,33 @@ public abstract class Assembler {
         emmit(out);
     }
 
-    public void assemble() {
-        hwSupport.assemble();
+    public void performTwoPasses(Reader reader, NativeStream asm) throws Exception{
+        StringWriter sw = new StringWriter();
+        char[] buf = new char[1024];
+        for(int count; (count = reader.read(buf)) > -1; sw.write(buf, 0, count));
+        sw.flush();
+        sw.close();
+        String data = sw.toString();
+        //1st pass
+        ReInit(new StringReader(data));
+        setPass(1);
+        jnasmInput();
+        assemble((int) asm.getBaseAddr());
+
+        //2nd pass
+        setPass(2);
+        instructions.clear();
+        ReInit(new StringReader(data));
+        jnasmInput();
+        emmit(asm);
+    }
+
+    public void assemble(int baseAddress) {
+        hwSupport.assemble(baseAddress);
+    }
+
+    public void assemble(NativeStream out) {
+        hwSupport.assemble(out);
     }
 
     public void setPass(int pass) {
@@ -125,8 +152,12 @@ public abstract class Assembler {
     public abstract void ReInit(Reader stream);
 
     public void emmit(OutputStream out) throws IOException{
-        assemble();
+        assemble(0);
         hwSupport.writeTo(out);
+    }
+
+    public void emmit(NativeStream out) throws IOException{
+        assemble(out);
     }
 
     public void putConstant(String name, int value) {
@@ -148,6 +179,7 @@ public abstract class Assembler {
                 if(pass == 2){
                     //x.printStackTrace();
                     System.out.println(x.getMessage());
+                    throw new UndefinedConstantException(name);
                 }
                 return 0;
             }
@@ -157,5 +189,17 @@ public abstract class Assembler {
 
     protected final void setSizeInfo(String size){
         crtIns.setSizeInfo(size);
+    }
+
+    public static class UndefinedConstantException extends RuntimeException {
+        private String constant;
+        public UndefinedConstantException(String constant){
+            super(constant);
+            this.constant = constant;
+        }
+
+        public String getConstant() {
+            return constant;
+        }
     }
 }

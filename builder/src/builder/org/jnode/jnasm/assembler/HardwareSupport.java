@@ -21,6 +21,8 @@
  
 package org.jnode.jnasm.assembler;
 
+import org.jnode.assembler.NativeStream;
+
 import java.io.OutputStream;
 import java.io.IOException;
 
@@ -28,7 +30,8 @@ import java.io.IOException;
  * @author Levente S\u00e1ntha (lsantha@users.sourceforge.net)
  */
 public abstract class HardwareSupport {
-    public abstract void assemble();
+    public abstract void assemble(int baseAddress);
+    public abstract void assemble(NativeStream asm);
     public abstract void writeTo(OutputStream out) throws IOException;
     public abstract void setPass(int pass);
     public abstract boolean isRegister(String str);
