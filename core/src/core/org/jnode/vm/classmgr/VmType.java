@@ -1485,7 +1485,7 @@ public abstract class VmType<T> extends VmSystemObject implements VmSharedStatic
 			state |= VmTypeState.ST_INVALID;
 			state &= ~VmTypeState.ST_PREPARING;
 			errorMsg = ex.toString();
-			throw new NoClassDefFoundError(ex.getMessage());
+			throw new NoClassDefFoundError(ex.getMessage() + " in " + getName());
 		}
 
 		// Step 3: Calculate the object size
