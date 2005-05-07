@@ -94,7 +94,14 @@ public class X86Support extends HardwareSupport {
             String mnemo = ins.getMnemonic();
             if (mnemo != null) {
                 try{
-                    emit(ins.getMnemonic(), ins.getOperands(), getOperandSize(ins));
+                    int times = ins.getTimes();
+                    if(times > 0){
+                        for(;times-- > 0;){
+                            emit(ins.getMnemonic(), ins.getOperands(), getOperandSize(ins));
+                        }
+                    } else {
+                        emit(ins.getMnemonic(), ins.getOperands(), getOperandSize(ins));
+                    }
                 }catch(IllegalArgumentException x){
                     if(Assembler.THROW){
                         throw x;

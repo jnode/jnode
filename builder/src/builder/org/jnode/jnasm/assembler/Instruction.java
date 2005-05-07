@@ -29,6 +29,7 @@ import java.util.List;
 public class Instruction {
     public static final int LOCK_PREFIX = 1;
     public static final int REP_PREFIX = 2;
+    private int times;
     private int prefix;
     private int lineNumber;
     private String sizeInfo;
@@ -100,5 +101,13 @@ public class Instruction {
 
     public void setPrefix(int prefix) {
         this.prefix = prefix;
+    }
+
+    public int getTimes() {
+        return times;
+    }
+
+    public void setTimes(int times) {
+        this.times = times;
     }
 }
