@@ -21,7 +21,6 @@ public class FileResolver {
         if (directoryList == null){
             File file = new File(fileName);
             if(file.exists()) {
-                System.out.println("Resolved: " + file);
                 return file;
             } else {
                 throw new FileNotFoundException(fileName);
@@ -31,7 +30,6 @@ public class FileResolver {
             for (File directory : directoryList) {
                 resolved = new File(directory, fileName);
                 if (resolved.exists()){
-                    System.out.println("Resolved: " + resolved);
                     return resolved;
                 }
             }

@@ -94,7 +94,7 @@ public class X86Support extends HardwareSupport {
             String mnemo = ins.getMnemonic();
             if (mnemo != null) {
                 try{
-                    emmit(ins.getMnemonic(), ins.getOperands(), getOperandSize(ins));
+                    emit(ins.getMnemonic(), ins.getOperands(), getOperandSize(ins));
                 }catch(IllegalArgumentException x){
                     if(Assembler.THROW){
                         throw x;
@@ -125,9 +125,9 @@ public class X86Support extends HardwareSupport {
         }
     }
 
-    private void emmit(String mnemonic, List operands, int operandSize) {
+    private void emit(String mnemonic, List operands, int operandSize) {
         for (int i = 0; i < modules.size(); i++) {
-            if (((AssemblerModule) modules.get(i)).emmit(mnemonic, operands, operandSize)) {
+            if (((AssemblerModule) modules.get(i)).emit(mnemonic, operands, operandSize)) {
                 return;
             }
         }

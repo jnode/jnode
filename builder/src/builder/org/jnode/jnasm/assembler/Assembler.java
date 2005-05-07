@@ -110,7 +110,7 @@ public abstract class Assembler {
         instructions.clear();
         ReInit(new StringReader(data));
         jnasmInput();
-        emmit(out);
+        emit(out);
     }
 
     public void performTwoPasses(Reader reader, NativeStream asm) throws Exception{
@@ -131,7 +131,7 @@ public abstract class Assembler {
         instructions.clear();
         ReInit(new StringReader(data));
         jnasmInput();
-        emmit(asm);
+        emit(asm);
     }
 
     public void assemble(int baseAddress) {
@@ -151,12 +151,12 @@ public abstract class Assembler {
 
     public abstract void ReInit(Reader stream);
 
-    public void emmit(OutputStream out) throws IOException{
+    public void emit(OutputStream out) throws IOException{
         assemble(0);
         hwSupport.writeTo(out);
     }
 
-    public void emmit(NativeStream out) throws IOException{
+    public void emit(NativeStream out) throws IOException{
         assemble(out);
     }
 
