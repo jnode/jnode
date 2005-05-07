@@ -58,7 +58,7 @@ public class PseudoInstructions extends AssemblerModule {
         this.stream = stream;
     }
 
-    public boolean emmit(String mnemonic, List operands, int operandSize) {
+    public boolean emit(String mnemonic, List operands, int operandSize) {
         this.operands = operands;
 
         Integer key = (Integer) INSTRUCTION_MAP.get(mnemonic);
@@ -67,21 +67,21 @@ public class PseudoInstructions extends AssemblerModule {
 
         switch (key.intValue()) {
             case BITS_ISN:
-                emmitBITS();
+                emitBITS();
             case DB_ISN:
-                emmitDB();
+                emitDB();
                 break;
             case DW_ISN:
-                emmitDW();
+                emitDW();
                 break;
             case DD_ISN:
-                emmitDD();
+                emitDD();
                 break;
             case RESB_ISN:
-                emmitRESB();
+                emitRESB();
                 break;
             case RESD_ISN:
-                emmitRESD();
+                emitRESD();
                 break;
             default:
                 throw new Error("Invalid instruction binding " + key.intValue() + " for " + mnemonic);
@@ -90,11 +90,11 @@ public class PseudoInstructions extends AssemblerModule {
         return true;
     }
 
-    private void emmitBITS() {
+    private void emitBITS() {
         //do nothing for now
     }
 
-    private void emmitDB() {
+    private void emitDB() {
         int ln = operands.size();
         for (int i = 0; i < ln; i++) {
             Object o = (Object) operands.get(i);
@@ -112,7 +112,7 @@ public class PseudoInstructions extends AssemblerModule {
         }
     }
 
-    private void emmitDW() {
+    private void emitDW() {
         int ln = operands.size();
         for (int i = 0; i < ln; i++) {
             Object o = (Object) operands.get(i);
@@ -132,7 +132,7 @@ public class PseudoInstructions extends AssemblerModule {
         }
     }
 
-    private void emmitDD() {
+    private void emitDD() {
         int ln = operands.size();
         for (int i = 0; i < ln; i++) {
             Object o = (Object) operands.get(i);
@@ -156,11 +156,11 @@ public class PseudoInstructions extends AssemblerModule {
         }
     }
 
-    private void emmitRESB() {
+    private void emitRESB() {
         for ( int i = ((Integer) operands.get(0)).intValue(); i-- > 0; stream.write8(0) );
     }
 
-    private void emmitRESD() {
+    private void emitRESD() {
         for ( int i = 4 * ((Integer) operands.get(0)).intValue(); i-- > 0; stream.write8(0) );
     }
 }

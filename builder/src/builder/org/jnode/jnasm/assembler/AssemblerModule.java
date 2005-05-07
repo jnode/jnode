@@ -38,6 +38,6 @@ public abstract class AssemblerModule {
         this.constants = constants;
     }
 
-    public abstract boolean emmit(String mnemonic, List operands, int oprandSize);
+    public abstract boolean emit(String mnemonic, List operands, int oprandSize);
     public abstract void setNativeStream(NativeStream stream);
 }
