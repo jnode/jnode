@@ -2429,4 +2429,8 @@ public class X86TextAssembler extends X86Assembler implements X86Operation {
     public void writeXOR(GPR dstReg, GPR srcReg, int srcDisp) {
         println("\txor " + dstReg + ", [" + srcReg + disp(srcDisp) + "]");
     }
+
+    public void writeObjectRef(Object object) {
+        
+    }
 }
