@@ -319,8 +319,10 @@ public class X86Core extends AssemblerModule {
                 break;
             case JA_ISN:
                 emitJCC(X86Assembler.JA);
+                break;
             case JAE_ISN:
                 emitJCC(X86Assembler.JAE);
+                break;
             case JB_ISN:
                 emitJCC(X86Assembler.JB);
                 break;
