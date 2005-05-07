@@ -130,11 +130,11 @@ void jnasmInput() :
 }
 
 void line() :
-{ Token t = null; int prefix = 0; int i = -1; Instruction ins = null; List operands; Token mnemo;}
+{ Token t = null; int prefix = 0, i = -1, times = -1; Instruction ins = null; List operands; Token mnemo;}
 {
 
 
-    ["times" arithmeticExpression() ]
+    ["times" times=arithmeticExpression() ]
     (
     LOOKAHEAD(2)
     [ t=<LABEL> ]
@@ -153,6 +153,9 @@ void line() :
         }
         if(ins != null){
             ins.setPrefix(prefix);
+            if(times > 0){
+                ins.setTimes(times);
+            }
         }
     }
 |   LOOKAHEAD(2) t=<IDENT> "equ" i=arithmeticExpression() [ <COMMENT> ] <LINE_END> { putConstant(t.image, i); }
@@ -161,6 +164,9 @@ void line() :
         {
             crtIns = ins = new Instruction(mnemo.image, operands);
             ins.setLineNumber(mnemo.beginLine);
+            if(times > 0){
+                ins.setTimes(times);
+            }
             instructions.add(ins);
             if(t != null) ins.setLabel(t.image);
         }
