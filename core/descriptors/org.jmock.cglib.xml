@@ -6,6 +6,10 @@
         version="1.0.1"
         provider-name="jmock.org">
         
+  <requires>        
+	<import plugin="org.jmock" version="1.0.1"/>
+  </requires>
+        
   <runtime>
     <library name="jmock-cglib-1.0.1.jar">
       <export name="org.jmock.cglib.*"/>
