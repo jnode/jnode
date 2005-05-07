@@ -68,6 +68,7 @@ public class PseudoInstructions extends AssemblerModule {
         switch (key.intValue()) {
             case BITS_ISN:
                 emitBITS();
+                break;
             case DB_ISN:
                 emitDB();
                 break;

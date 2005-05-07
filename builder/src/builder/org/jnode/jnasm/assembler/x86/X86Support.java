@@ -126,7 +126,7 @@ public class X86Support extends HardwareSupport {
             Label lab = new Label(label);
             labels.put(label, lab);
             NativeStream.ObjectRef ref = asm.setObjectRef(lab);
-            assembler.putConstant(label, ref.getOffset());
+            assembler.putConstant(label, ref.getOffset() + (int)asm.getBaseAddr());
         } catch (Exception e) {
             e.printStackTrace();
         }
