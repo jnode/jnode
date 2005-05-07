@@ -431,6 +431,31 @@ public class X86BinaryAssembler extends X86Assembler implements X86Constants,
 		this.objectRefs.clear();
 	}
 
+    /*
+    // a possible growth strategy
+    private final void ensureSize(int extra) {
+		if (m_used + extra >= dataLength) {
+			int newLen;
+			byte[] newArr;
+            if(growSize > dataLength){
+                newLen = growSize;
+            } else {
+                newLen = (dataLength << 1) + 3;
+            }
+			if (extra + dataLength > newLen) {
+				newLen = dataLength + extra;
+			}
+			newArr = new byte[newLen];
+			System.arraycopy(m_data, 0, newArr, 0, m_used);
+			m_data = newArr;
+			dataLength = newLen;
+			growCount++;
+			//System.out.println("Growing stream buffer to " + newLen);
+		}
+	}
+    */
+
+
 	private final void ensureSize(int extra) {
 		if (m_used + extra >= dataLength) {
 			int newLen;

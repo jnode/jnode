@@ -21,13 +21,11 @@
  
 package org.jnode.jnasm.preprocessor;
 
+import org.jnode.build.AsmSourceInfo;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.Iterator;
-import java.util.StringTokenizer;
-import java.util.regex.Pattern;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.io.InputStream;
@@ -37,6 +35,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.StringReader;
 import java.io.Reader;
+import java.io.File;
+import java.io.BufferedInputStream;
 import java.lang.reflect.Constructor;
 
 /**
@@ -44,23 +44,40 @@ import java.lang.reflect.Constructor;
  */
 public abstract class Preprocessor {
     private static final String PARSER_CLASS = "org.jnode.jnasm.preprocessor.gen.JNAsmPP";
+    private static FileResolver fileResolver;
     protected static HashMap multiMacros = new HashMap();
     protected static HashMap singleMacros = new HashMap();
     protected static HashSet localLabels = new HashSet();
     protected boolean substitute = true;
 
     public static void main(String[] argv) throws Exception{
-        newInstance(System.in).print(new OutputStreamWriter(System.out));
+        Preprocessor p = newInstance(System.in);
+        p.defineSymbol("BITS32", "");
+        p.defineSymbol("JNODE_VERSION", "1");
+        p.setFileResolver(new FileResolver(null));
+        p.print(new OutputStreamWriter(System.out));
         //System.err.println("MULTI LINE MACROS:\n" + multiMacros);
         //System.err.println("SINGLE LINE MACROS:\n" + singleMacros);
     }
 
+    public static Preprocessor newInstance(AsmSourceInfo sourceInfo, Map<String,String> symbolMappings){
+        try{
+            File mainFile = sourceInfo.getSrcFile();
+            Preprocessor preprocessor = newInstance(new BufferedInputStream(new FileInputStream(mainFile)));
+            preprocessor.setFileResolver(new FileResolver(sourceInfo.includeDirs()));
+            Preprocessor.singleMacros.putAll(symbolMappings);
+            return preprocessor;
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
     public static Preprocessor newInstance(InputStream in){
         try{
-            singleMacros.put("BITS32", "");
             Class clazz = Class.forName(PARSER_CLASS);
             Constructor cons = clazz.getConstructor(new Class[]{InputStream.class});
-            return (Preprocessor) cons.newInstance(new Object[]{in});
+            Preprocessor preprocessor = (Preprocessor) cons.newInstance(new Object[]{in});
+            return preprocessor;
         }catch(Exception e){
             throw new RuntimeException(e);
         }
@@ -68,10 +85,10 @@ public abstract class Preprocessor {
 
     public static Preprocessor newInstance(Reader reader){
         try{
-            singleMacros.put("BITS32", "");
             Class clazz = Class.forName(PARSER_CLASS);
             Constructor cons = clazz.getConstructor(new Class[]{Reader.class});
-            return (Preprocessor) cons.newInstance(new Object[]{reader});
+            Preprocessor preprocessor = (Preprocessor) cons.newInstance(new Object[]{reader});
+            return preprocessor;
         }catch(Exception e){
             throw new RuntimeException(e);
         }
@@ -81,9 +98,9 @@ public abstract class Preprocessor {
         StringWriter sw = new StringWriter();
         sw.write(";start include " + file + "\n");
         try{
-            newInstance(new FileInputStream(file)).print(sw);
+            newInstance(new FileInputStream(fileResolver.resolveFile(file))).print(sw);
         }catch(FileNotFoundException e){
-            System.err.println(e.getMessage());
+            System.err.println("File not found: " + e.getMessage());
         }
         sw.write(";end include " + file + "\n");
         sw.flush();
@@ -108,6 +125,14 @@ public abstract class Preprocessor {
             pe.printStackTrace();
             System.exit(-1);
         }
+    }
+
+    public void setFileResolver(FileResolver fileResolver) {
+        this.fileResolver = fileResolver;
+    }
+
+    public void defineSymbol(String name, String definition){
+        singleMacros.put(name, definition);
     }
 
     public abstract void jnasmppInput(PrintWriter pw) throws Exception ;

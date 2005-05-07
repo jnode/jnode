@@ -976,6 +976,13 @@ public class X86Core extends AssemblerModule {
     }
 
     private final void emmitMOV() {
+        if(operands.size() == 2 &&
+                operands.get(0) instanceof Register &&
+                operands.get(1) instanceof Identifier){
+            stream.writeMOV_Const(getRegister(((Register) operands.get(0)).name),
+                    new Label(((Identifier) operands.get(1)).name));
+            return;
+        }
         int addr = getAddressingMode(2);
         switch (addr) {
             case RR_ADDR:
@@ -1194,6 +1201,10 @@ public class X86Core extends AssemblerModule {
     }
 
     private final void emmitPUSH() {
+        if(operands.size() == 1 && operands.get(0) instanceof Identifier){
+            stream.writePUSH_Const(new Label(((Identifier) operands.get(0)).name));
+            return;
+        }
         int addr = getAddressingMode(1);
         switch (addr) {
             case C_ADDR:

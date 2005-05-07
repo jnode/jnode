@@ -36,6 +36,7 @@ import org.jnode.assembler.x86.X86Register.GPR;
 import org.jnode.boot.Main;
 import org.jnode.build.AbstractBootImageBuilder;
 import org.jnode.build.BuildException;
+import org.jnode.build.AsmSourceInfo;
 import org.jnode.linker.Elf;
 import org.jnode.linker.ElfLinker;
 import org.jnode.plugin.PluginRegistry;
@@ -68,6 +69,7 @@ import org.jnode.vm.x86.VmX86Processor64;
 import org.jnode.vm.x86.X86CpuID;
 import org.jnode.vm.x86.compiler.X86CompilerConstants;
 import org.jnode.vm.x86.compiler.X86JumpTable;
+import org.jnode.jnasm.JNAsm;
 
 /**
  * @author epr
@@ -734,6 +736,14 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
                     throw new BuildException("JumpTable entry " + i + " must be at index " + (i * 2) + " not " + idx);
                 }                
             }
+        }
+    }
+
+    protected void compileKernel(NativeStream os, AsmSourceInfo sourceInfo) throws BuildException {
+        try {
+            JNAsm.assembler(os, sourceInfo);
+        } catch(Exception e){
+            throw new BuildException(e);
         }
     }
 }
