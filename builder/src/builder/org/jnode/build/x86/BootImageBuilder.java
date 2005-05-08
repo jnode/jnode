@@ -23,6 +23,8 @@ package org.jnode.build.x86;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.tools.ant.Project;
 import org.jnode.assembler.Label;
@@ -722,7 +724,7 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
     
     /**
      * Initialize the statics table.
-     * @see org.jnode.build.AbstractBootImageBuilder#initializeStatics(org.jnode.vm.classmgr.VmStatics)
+     * @see org.jnode.build.AbstractBootImageBuilder#initializeStatics(org.jnode.vm.classmgr.VmSharedStatics)
      */
     protected void initializeStatics(VmSharedStatics statics) throws BuildException {
         for (int i = 0; i < X86JumpTable.TABLE_LENGTH; i++) {
@@ -741,7 +743,14 @@ public class BootImageBuilder extends AbstractBootImageBuilder implements
 
     protected void compileKernel(NativeStream os, AsmSourceInfo sourceInfo) throws BuildException {
         try {
-            JNAsm.assembler(os, sourceInfo);
+            final String version = getVersion();
+            final int i_bist = getBits();
+            final String bits = "BITS" + i_bist;
+            final Map<String,String> symbols = new HashMap<String, String>();
+            symbols.put(bits,"");
+            symbols.put("JNODE_VERSION", "'" + version + "'");
+            log("Compiling native kernel with JNAsm, Version " + version + ", " + i_bist + " bits");
+            JNAsm.assembler(os, sourceInfo, symbols);
         } catch(Exception e){
             throw new BuildException(e);
         }
