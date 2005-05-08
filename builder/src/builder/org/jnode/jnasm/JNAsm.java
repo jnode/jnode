@@ -53,10 +53,7 @@ public class JNAsm {
         out.close();
     }
 
-    public static void assembler(NativeStream asm, AsmSourceInfo sourceInfo) throws Exception{
-        Map<String,String> symbols = new HashMap<String, String>();
-        symbols.put("BITS32","");
-        symbols.put("JNODE_VERSION", "1");
+    public static void assembler(NativeStream asm, AsmSourceInfo sourceInfo, Map<String,String> symbols) throws Exception{
         Preprocessor preprocessor = Preprocessor.newInstance(sourceInfo, symbols);
         StringWriter sw = new StringWriter();
         preprocessor.print(sw);
