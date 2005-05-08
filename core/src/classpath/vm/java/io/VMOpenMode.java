@@ -52,21 +52,30 @@ public enum VMOpenMode {
     {
         // These are mode values for open().
         VMOpenMode value = null;
+        boolean read = ((mode & FileChannelImpl.READ) == FileChannelImpl.READ); 
+        boolean write = ((mode & FileChannelImpl.WRITE) == FileChannelImpl.WRITE);
+        boolean append = ((mode & FileChannelImpl.APPEND) == FileChannelImpl.APPEND);
         
-        switch(mode)
+        if(read)
         {
-        case FileChannelImpl.READ: value = READ; break;
-        case FileChannelImpl.WRITE: value = WRITE; break;
-        case FileChannelImpl.APPEND: value = READ_WRITE; break;
-        
-        //TODO: valueOf for EXCL, SYNC, DSYNC and combination of the 6 values               
-        case FileChannelImpl.EXCL:
-        case FileChannelImpl.SYNC:
-        case FileChannelImpl.DSYNC:        
-        default: value = null; break;        
+            value = READ;
         }
-        
-        log.debug("mode="+mode+" VMOpenMode="+value);
+        else if(write && !append)
+        {
+            value = WRITE;
+        }
+        else if(write && append)
+        {
+            value = READ_WRITE;
+        }
+        else
+        {
+            //TODO: valueOf for EXCL, SYNC, DSYNC and combination of the 6 values               
+            //FileChannelImpl.EXCL:
+            //FileChannelImpl.SYNC:
+            //FileChannelImpl.DSYNC:
+            throw new IllegalArgumentException("unknown open mode: "+mode);
+        }
         
         return value;
     }
