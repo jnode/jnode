@@ -21,4 +21,8 @@
     <alias name="log4j" class="org.jnode.shell.command.log4j.Log4jCommand"/>
   </extension>
 
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.io.FilePermission" name="<<ALL FILES>>" actions="read"/>    
+  </extension>
+
 </plugin>
