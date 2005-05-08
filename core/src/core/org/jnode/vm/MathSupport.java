@@ -27,8 +27,8 @@ package org.jnode.vm;
 public class MathSupport {
 
     public static boolean ucmp(/*unsigned*/
-            int a, /*unsigned*/
-            int b) {
+            final int a, /*unsigned*/
+            final int b) {
         if ((b < 0) && (a >= 0))
             return true;
         if ((b >= 0) && (a < 0))
@@ -37,8 +37,8 @@ public class MathSupport {
     }
 
     public static boolean ulcmp(/*unsigned*/
-            long a, /*unsigned*/
-            long b) {
+            final long a, /*unsigned*/
+            final long b) {
         if ((b < 0L) && (a >= 0L))
             return true;
         if ((b >= 0L) && (a < 0L))
@@ -48,8 +48,8 @@ public class MathSupport {
 
     public static /*unsigned*/
             int udiv(/*unsigned*/
-            int a, /*unsigned*/
-            int b) {
+            final int a, /*unsigned*/
+            final int b) {
         if (b < 0) {
             if (a < 0) {
                 if (a >= b)
@@ -68,8 +68,8 @@ public class MathSupport {
 
     public static /*unsigned*/
             int urem(/*unsigned*/
-            int a, /*unsigned*/
-            int b) {
+            final int a, /*unsigned*/
+            final int b) {
         if (b < 0) {
             if (a < 0) {
                 if (a >= b)
@@ -87,8 +87,8 @@ public class MathSupport {
 
     public static /*unsigned*/
             long umul(/*unsigned*/
-            int a, /*unsigned*/
-            int b) {
+            final int a, /*unsigned*/
+            final int b) {
         char a_1 = (char) a;
         char a_2 = (char) (a >> 16);
         char b_1 = (char) b;
@@ -221,19 +221,19 @@ public class MathSupport {
         return uq;
     }
 
-    private static int HHALFQ(long v) {
+    private static int HHALFQ(final long v) {
         return (int) (v >> 32);
     }
 
-    private static int LHALFQ(long v) {
+    private static int LHALFQ(final long v) {
         return (int) v;
     }
 
-    private static char HHALF(int v) {
+    private static char HHALF(final int v) {
         return (char) (v >> 16);
     }
 
-    private static char LHALF(int v) {
+    private static char LHALF(final int v) {
         return (char) v;
     }
 
@@ -241,18 +241,20 @@ public class MathSupport {
         return v << 16;
     }*/
     private static /*unsigned*/
-            int COMBINE(char hi, char lo) {
+            int COMBINE(final char hi, final char lo) {
         return (hi << 16) | lo;
     }
 
     private static /*unsigned*/
             long COMBINEQ(/*unsigned*/
-            int hi, /*unsigned*/
-            int lo) {
+            final int hi, /*unsigned*/
+            final int lo) {
         final long hiL = hi;
         final long loL = lo;
         return (hiL << 32) | (loL & 0xFFFFFFFFL);
     }
+
+    private static final int HALF_BITS = 16;
 
     /*
      * Multiprecision divide.  This algorithm is from Knuth vol. 2 (2nd ed),
@@ -264,11 +266,10 @@ public class MathSupport {
             long uldivrem(/*unsigned*/
             final long uq, /*unsigned*/
             final long vq, final boolean rem) {
-        final int HALF_BITS = 16;
         final int B = 1 << HALF_BITS;
 
         if (vq == 0)
-            throw new ArithmeticException();
+            throw new ArithmeticException("Divide by zero");
         if (ulcmp(uq, vq)) {
             if (rem)
                 return uq;
@@ -287,21 +288,18 @@ public class MathSupport {
          * and thus
          *	m = 4 - n <= 2
          */
-        char[] u = new char[]{
-            0,
-            HHALF(HHALFQ(uq)),
-            LHALF(HHALFQ(uq)),
-            HHALF(LHALFQ(uq)),
-            LHALF(LHALFQ(uq))
-        };
-        char[] v = new char[]{
+        char u1 = HHALF(HHALFQ(uq));
+        char u2 = LHALF(HHALFQ(uq));
+        char u3 = HHALF(LHALFQ(uq));
+        char u4 = LHALF(LHALFQ(uq));
+        final char[] v = new char[]{
             0,
             HHALF(HHALFQ(vq)),
             LHALF(HHALFQ(vq)),
             HHALF(LHALFQ(vq)),
             LHALF(LHALFQ(vq))
         };
-        int ui = 0, vi = 0;
+        int vi = 0;
         int n;
         for (n = 4; v[vi + 1] == 0; vi++) {
             if (--n == 1) {
@@ -316,14 +314,14 @@ public class MathSupport {
                  *		r = (r*B + u[j]) % v;
                  * We unroll this completely here.
                  */
-/*unsigned*/
+                /*unsigned*/
                 int t = v[vi + 2]; /* nonzero, by definition */
-                char q1 = (char) udiv(u[ui + 1], t);
-                rbj = COMBINE((char) urem(u[ui + 1], t), u[ui + 2]);
+                char q1 = (char) udiv(u1, t);
+                rbj = COMBINE((char) urem(u1, t), u2);
                 char q2 = (char) udiv(rbj, t);
-                rbj = COMBINE((char) urem(rbj, t), u[ui + 3]);
+                rbj = COMBINE((char) urem(rbj, t), u3);
                 char q3 = (char) udiv(rbj, t);
-                rbj = COMBINE((char) urem(rbj, t), u[ui + 4]);
+                rbj = COMBINE((char) urem(rbj, t), u4);
                 char q4 = (char) udiv(rbj, t);
                 if (rem)
                     return urem(rbj, t);
@@ -336,14 +334,21 @@ public class MathSupport {
          * there is a complete four-digit quotient at &qspace[1] when
          * we finally stop.
          */
+        final char[] u = new char[]{0, u1, u2, u3, u4};
+        int ui = 0;
         int m;
         for (m = 4 - n; u[ui + 1] == 0; ++ui)
             m--;
-        int qi = 0;
-        char[] q = new char[5];
-        for (int i = 4 - m; --i >= 0;)
-            q[qi + i] = 0;
-        qi += 4 - m;
+        final char[] q = new char[5];
+        /*
+         * In Java, q is already initialized to contain 0s.
+         * Therefore, the following code is unnecessary.
+         * int qi = 0;
+         * for (int i = 4 - m; --i >= 0;)
+         *     q[qi + i] = 0;
+         * qi += 4 - m;
+         */
+        int qi = 4 - m;
 
         /*
          * Here we run Program D, translated from MIX to C and acquiring
@@ -352,7 +357,7 @@ public class MathSupport {
          * D1: choose multiplier 1 << d to ensure v[1] >= B/2.
          */
         int d = 0;
-/*unsigned*/
+        /*unsigned*/
         for (int t = v[vi + 1]; ucmp(t, B / 2); t <<= 1)
             d++;
         if (d > 0) {
@@ -378,7 +383,7 @@ public class MathSupport {
             char uj1 = u[ui + j + 1]; /* for D3 only */
             char uj2 = u[ui + j + 2]; /* for D3 only */
             boolean sim_goto = false;
-/*unsigned*/
+            /*unsigned*/
             int qhat, rhat;
             if (uj0 == v1) {
                 qhat = B;
@@ -407,7 +412,7 @@ public class MathSupport {
              * and to eliminate a final special case.
              */
             int i;
-/*unsigned*/
+            /*unsigned*/
             int t;
             for (t = 0, i = n; i > 0; i--) {
                 t = u[ui + i + j] - (int) umul(v[vi + i], qhat) - t;
@@ -455,7 +460,6 @@ public class MathSupport {
 
     private static void shl(char[] p, int off, int len, int sh) {
         int i;
-        final int HALF_BITS = 16;
         for (i = 0; i < len; i++)
             p[off + i] =
                     (char) (LHALF(p[off + i] << sh)
