@@ -24,10 +24,6 @@
 		<attributes>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/dom4j.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="src" path="/JNode-Shell">
 		<attributes>
 		</attributes>
