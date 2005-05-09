@@ -43,7 +43,6 @@
 	<property name="cglib.jar" value="${root.dir}/core/lib/cglib-2.1.jar" />	
 	<property name="asm.jar" value="${root.dir}/core/lib/asm.jar" />	
 	
-	<property name="dom4j.jar" value="${root.dir}/builder/lib/dom4j.jar" />
 	<property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar" />
 	<property name="nanoxml.jar" value="${root.dir}/core/lib/nanoxml-lite-2.2.3.jar" />
 	<property name="gnu-crypto.jar" value="${root.dir}/core/lib/gnu-crypto.jar" />

@@ -3,14 +3,14 @@
   <typedef file="${basedir}/../all/lib/jnode.xml"/>
 	
   <property name="my-build.dir"   value="${basedir}/build"/>
-  <property name="my-build-src.dir"   value="${basedir}/build/src"/>
+  <property name="my-gen.dir"   value="${basedir}/build/src"/>
   <property name="my-classes.dir" value="${my-build.dir}/classes"/>
   <property name="my-src.dir"     value="${basedir}/src"/>
   <property name="my.jar"         value="${jnode-builder.jar}"/>
   <property name="javacc.dir"     value="${basedir}/lib" />
   <property name="jnasm-src.dir"  value="${my-src.dir}/builder/org/jnode/jnasm"/>
-  <property name="jnasm-preprocessor-gen.dir"  value="${my-build-src.dir}/org/jnode/jnasm/preprocessor/gen"/>
-  <property name="jnasm-assembler-gen.dir"  value="${my-build-src.dir}/org/jnode/jnasm/assembler/gen"/>
+  <property name="jnasm-preprocessor-gen.dir"  value="${my-gen.dir}/org/jnode/jnasm/preprocessor/gen"/>
+  <property name="jnasm-assembler-gen.dir"  value="${my-gen.dir}/org/jnode/jnasm/assembler/gen"/>
 
 <!-- Subproject specific classpath -->
   <path id="my-cp">
@@ -41,7 +41,7 @@
             outputdirectory="${jnasm-assembler-gen.dir}" />
     <jnode.compile>
 	  <src path="${my-src.dir}/builder"/>
-      <src path="${my-build-src.dir}"/>
+      <src path="${my-gen.dir}"/>
       <classpath refid="my-cp"/>
     </jnode.compile>
   </target>
