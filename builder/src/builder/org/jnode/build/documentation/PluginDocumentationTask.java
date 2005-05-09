@@ -321,11 +321,20 @@ public class PluginDocumentationTask extends AbstractPluginTask {
             
             addToolbar(out, "../");
             
-            addSummaryTableHdr(out, "Plugin summary");
+            final String title;
+            if (descr.isFragment()) {
+                title = "Fragment summary";
+            } else {
+                title = "Plugin summary";
+            }
+            
+            addSummaryTableHdr(out, title);
             addTableRow(out, "Id", descr.getId());
             addTableRow(out, "Name", descr.getName());
             addTableRow(out, "Version", descr.getVersion());
             addTableRow(out, "Provider", descr.getProviderName());
+            addTableRow(out, "Plugin class", descr.hasCustomPluginClass() ? descr.getCustomPluginClassName() : "-");
+            addTableRow(out, "Flags", formatFlags(descr));
             endSummaryTableHdr(out);
             
             if (descr.getPrerequisites().length > 0) {
@@ -410,9 +419,9 @@ public class PluginDocumentationTask extends AbstractPluginTask {
         for (String key : cfg.attributeNames()) {
             out.append(' ');
             out.append(key);
-            out.append("='");
+            out.append("='<i>");
             out.append(cfg.getAttribute(key));
-            out.append('\'');
+            out.append("</i>\'");
         }
         
         if (hasChildren) {
@@ -436,6 +445,24 @@ public class PluginDocumentationTask extends AbstractPluginTask {
         }
     }
 
+    private String formatFlags(PluginDescriptor descr) {
+        final StringBuilder sb = new StringBuilder();
+        if (descr.isSystemPlugin()) {
+            sb.append("system");
+        }
+        if (descr.isAutoStart()) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append("auto-start");
+        }
+        if (sb.length() > 0) {
+            return sb.toString(); 
+        } else {
+            return "-";
+        }
+    }
+    
     private void addSummaryTableHdr(PrintWriter out, String title) {
         out.println("<table class='summaryTable' border='1' cellpadding='3' cellspacing='0' width='100%'>");
         out.println("<tr><td class='summaryTableHdr' colspan='2'>");
