@@ -5,7 +5,6 @@
 	<projects>
 		<project>JNode-Core</project>
 		<project>JNode-FS</project>
-		<project>JNode-Shell</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

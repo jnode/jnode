@@ -16,8 +16,6 @@
   <path id="my-cp">
     <pathelement location="${jnode-core.jar}"/>
     <pathelement location="${jnode-fs.jar}"/>
-    <pathelement location="${jnode-shell.jar}"/>
-    <pathelement location="${dom4j.jar}"/>
     <pathelement location="${basedir}/lib/xml-apis.jar"/>
   	<pathelement location="${classycle.jar}"/>
     <pathelement location="${itext.jar}"/>
