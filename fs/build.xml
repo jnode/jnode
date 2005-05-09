@@ -1,5 +1,7 @@
 <project name="JNode-FS" default="all" basedir=".">
 
+  <typedef file="${basedir}/../all/lib/jnode.xml"/>
+			
   <property name="my-build.dir"   value="${basedir}/build"/>
   <property name="my-classes.dir" value="${my-build.dir}/classes"/>
   <property name="my-src.dir"     value="${basedir}/src"/>
@@ -15,27 +17,17 @@
 <!-- Initialize all subproject directories -->
   <target name="prepare">
     <mkdir dir="${my-classes.dir}"/>
-    <copy todir="${descriptors.dir}">
-      <fileset dir="${basedir}/descriptors"/>
-	  <filterset refid="descriptors-filter"/>
-    </copy>
+  	<jnode.copy-descriptors/>
   </target>
 
 <!-- Compile all subproject java files -->
   <target name="compile" depends="prepare">
-    <javac destdir="${my-classes.dir}"
-	       debug="on"
-	       optimize="on"
-           compiler="modern"
-	       includeJavaRuntime="false"
-    	target="${java.target}" source="${java.source}" encoding="${java.encoding}">
-	  <bootclasspath path="${jnode-core.jar}"/>
+    <jnode.compile>
 	  <src path="${my-src.dir}/fs"/>
 	  <src path="${my-src.dir}/driver"/>
 	  <src path="${my-src.dir}/test"/>
-    <classpath refid="my-cp"/>
-    <compilerarg value="${compilerarg}"/>
-    </javac>
+      <classpath refid="my-cp"/>
+    </jnode.compile>
 
 	<!-- copy (if exists) image of file systems (*.img.WORK files are temporary) -->
     <copy todir="${my-classes.dir}/org/jnode/test/fs/">
@@ -59,18 +51,14 @@
   </target>
 
 <!-- Assemble the jarfile -->
-  <target name="assemble" depends="compile">
-    <!-- jar jarfile="${my.jar}">
-      <fileset dir="${my-classes.dir}"/>
-    </jar -->
-  </target>
+  <target name="assemble" depends="compile"/>
 
 <!-- Do it all -->
   <target name="all" depends="assemble"/>
 
 <!-- Clean everything -->
   <target name="clean">
-    <delete dir="${my-build.dir}" quiet="true"/>
+  	<jnode.clean/>
   </target>
 
 <!-- tests FileSystems -->

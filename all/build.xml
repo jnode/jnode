@@ -1,5 +1,8 @@
 <project name="JNode" default="help" basedir=".">
 
+	<!-- Include antlib -->
+    <typedef file="${basedir}/lib/jnode.xml"/>
+			
 	<!-- JNode version -->
 	<property name="jnode-ver" value="0.2.1-dev" />
 
@@ -135,14 +138,7 @@
 
 	<!-- Call the assemble target of all subprojects -->
 	<target name="assemble-projects" depends="prepare">
-		<ant target="assemble" dir="${root.dir}/core" inheritall="on" inheritrefs="on" />
-		<ant target="assemble" dir="${root.dir}/shell" inheritall="on" inheritrefs="on" />
-		<ant target="assemble" dir="${root.dir}/fs" inheritall="on" inheritrefs="on" />
-		<ant target="assemble" dir="${root.dir}/gui" inheritall="on" inheritrefs="on" />
-		<ant target="assemble" dir="${root.dir}/net" inheritall="on" inheritrefs="on" />
-		<ant target="assemble" dir="${root.dir}/textui" inheritall="on" inheritrefs="on" />
-		<ant target="assemble" dir="${root.dir}/builder" inheritall="on" inheritrefs="on" />
-		<ant target="assemble" dir="${root.dir}/distr" inheritall="on" inheritrefs="on" />
+		<jnode.antall target="assemble"/>
 	</target>
 	
 	<!-- Assemble all plugins -->
@@ -309,22 +305,13 @@ clean          Remove all intermediate build results.
 
 	<!-- Clean everything files -->
 	<target name="clean">
-		<ant target="clean" dir="${root.dir}/core" inheritall="on" inheritrefs="on" />
-		<ant target="clean" dir="${root.dir}/distr" inheritall="on" inheritrefs="on" />
-		<ant target="clean" dir="${root.dir}/shell" inheritall="on" inheritrefs="on" />
-		<ant target="clean" dir="${root.dir}/fs" inheritall="on" inheritrefs="on" />
-		<ant target="clean" dir="${root.dir}/gui" inheritall="on" inheritrefs="on" />
-		<ant target="clean" dir="${root.dir}/net" inheritall="on" inheritrefs="on" />
-		<ant target="clean" dir="${root.dir}/textui" inheritall="on" inheritrefs="on" />
-		<ant target="clean" dir="${root.dir}/builder" inheritall="on" inheritrefs="on" />
+		<jnode.antall target="clean"/>
 		<delete dir="${build.dir}" quiet="on" />
 	</target>
 
 	<!-- Generate only the basic api javadoc files -->
 	<target name="javadoc-small">
-		<mkdir dir="${build.dir}/javadoc/small" />
-		<javadoc destdir="${build.dir}/javadoc/small" author="true" version="true" use="true" windowtitle="JNode Key Packages">
-
+		<jnode.javadoc destdir="${build.dir}/javadoc/small">
 			<sourcepath>
 				<pathelement location="${root.dir}/core/src/classpath/gnu" />
 				<pathelement location="${root.dir}/core/src/classpath/java" />
@@ -340,20 +327,28 @@ clean          Remove all intermediate build results.
 			<package name="org.jnode.naming" />
 			<package name="org.jnode.plugin" />
 			<package name="org.jnode.system" />
-			<classpath refid="cp" />
 			<bootclasspath refid="cp" />
+		</jnode.javadoc>
+	</target>
 
-			<group title="JNode" packages="org.jnode.*" />
-			<group title="Classpath" packages="java.*,javax.*,gnu.*" />
-			<!-- link href="http://jnode.org"/ -->
-		</javadoc>
+	<!-- Generate only the MMTk api javadoc files -->
+	<target name="javadoc-mmtk">
+		<jnode.javadoc destdir="${build.dir}/javadoc/mmtk">
+			<sourcepath>
+				<pathelement location="${root.dir}/core/src/vmmagic" />
+				<pathelement location="${root.dir}/core/src/mmtk" />
+				<pathelement location="${root.dir}/core/src/mmtk-vm" />
+			</sourcepath>
+			<package name="org.mmtk.*" />
+			<package name="org.jnode.vm.memmgr.mmtk.*" />
+			<package name="org.vmmagic.*" />
+			<classpath refid="cp" />
+		</jnode.javadoc>
 	</target>
 
 	<!-- Generate all javadoc files -->
 	<target name="javadoc">
-		<mkdir dir="${build.dir}/javadoc/full" />
-		<javadoc destdir="${build.dir}/javadoc/full" author="true" version="true" use="true" windowtitle="All JNode Packages">
-
+		<jnode.javadoc destdir="${build.dir}/javadoc/full">
 			<sourcepath>
 				<pathelement location="${root.dir}/core/src/classpath/gnu" />
 				<pathelement location="${root.dir}/core/src/classpath/java" />
@@ -364,6 +359,9 @@ clean          Remove all intermediate build results.
 				<pathelement location="${root.dir}/core/src/classpath/vm" />
 				<pathelement location="${root.dir}/core/src/core" />
 				<pathelement location="${root.dir}/core/src/driver" />
+				<pathelement location="${root.dir}/core/src/mmtk" />
+				<pathelement location="${root.dir}/core/src/mmtk-vm" />
+				<pathelement location="${root.dir}/core/src/vmmagic" />
 				<pathelement location="${root.dir}/distr/src/install" />
 				<pathelement location="${root.dir}/fs/src/fs" />
 				<pathelement location="${root.dir}/fs/src/fs" />
@@ -375,13 +373,10 @@ clean          Remove all intermediate build results.
 				<pathelement location="${root.dir}/shell/src/shell" />
 			</sourcepath>
 			<package name="org.jnode.*" />
-			<classpath refid="cp" />
+			<package name="org.mmtk.*" />
+			<package name="org.vmmagic.*" />
 			<bootclasspath refid="cp" />
-
-			<group title="JNode" packages="org.jnode.*" />
-			<group title="Classpath" packages="java.*,javax.*,gnu.*" />
-			<!-- link href="http://jnode.org"/ -->
-		</javadoc>
+		</jnode.javadoc>
 	</target>
 
 	<!-- Backup CVS files -->
