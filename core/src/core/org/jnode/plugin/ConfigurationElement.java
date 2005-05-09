@@ -21,6 +21,8 @@
  
 package org.jnode.plugin;
 
+import java.util.Set;
+
 /**
  * Extension specific configuration element.
  * 
@@ -47,6 +49,12 @@ public interface ConfigurationElement {
 	 */
 	public String getAttribute(String name);
 
+    /**
+     * Gets the names of all attributes in this element.
+     * @return
+     */
+    public Set<String> attributeNames();
+    
 	/**
 	 * Gets the descriptor of the plugin in which this element was declared.
 	 * @return The descriptor
