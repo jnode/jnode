@@ -13,9 +13,6 @@
     <library name="javax-crypto.jar">
       <export name="*"/>
     </library>
-    <library name="javax-security.jar">
-      <export name="*"/>
-    </library>
   </runtime>
 
 </plugin>

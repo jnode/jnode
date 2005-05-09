@@ -47,7 +47,7 @@
 	<property name="nanoxml.jar" value="${root.dir}/core/lib/nanoxml-lite-2.2.3.jar" />
 	<property name="gnu-crypto.jar" value="${root.dir}/core/lib/gnu-crypto.jar" />
 	<property name="javax-crypto.jar" value="${root.dir}/core/lib/javax-crypto.jar" />
-	<property name="javax-security.jar" value="${root.dir}/core/lib/javax-security.jar" />
+	<!-- property name="javax-security.jar" value="${root.dir}/core/lib/javax-security.jar" / -->
 	<property name="beanshell.jar" value="${root.dir}/shell/lib/bsh-2.0b1.jar" />
 
 	<!-- libraries needed to check plugin dependencies -->
@@ -83,7 +83,7 @@
 		<pathelement location="${nanoxml.jar}" />
 		<pathelement location="${gnu-crypto.jar}" />
 		<pathelement location="${javax-crypto.jar}" />
-		<pathelement location="${javax-security.jar}" />
+		<!-- pathelement location="${javax-security.jar}" / -->
 		<pathelement location="${basedir}/conf" />
 		<pathelement location="${beanshell.jar}" />
 	</path>
@@ -160,7 +160,6 @@
 			<libalias name="nanoxml.jar" alias="${nanoxml.jar}" />
 			<libalias name="gnu-crypto.jar" alias="${gnu-crypto.jar}" />
 			<libalias name="javax-crypto.jar" alias="${javax-crypto.jar}" />
-			<libalias name="javax-security.jar" alias="${javax-security.jar}" />
 			<libalias name="log4j.jar" alias="${log4j.jar}" />
 			<libalias name="beanshell.jar" alias="${beanshell.jar}" />
 			<libalias name="lw.jar" alias="${lw.jar}" />
