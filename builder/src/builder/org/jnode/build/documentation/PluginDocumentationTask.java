@@ -36,6 +36,10 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.types.FileSet;
 import org.jnode.build.AbstractPluginTask;
+import org.jnode.plugin.ConfigurationElement;
+import org.jnode.plugin.Extension;
+import org.jnode.plugin.ExtensionPoint;
+import org.jnode.plugin.Library;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginPrerequisite;
 
@@ -63,6 +67,10 @@ public class PluginDocumentationTask extends AbstractPluginTask {
     private static final String CSS_FILE = "index.css";
     private static final String INDEX = "index" + EXT;
 
+    private static final ToolbarEntry[] TOOLBAR_ENTRIES = {
+        new ToolbarEntry("Overview", OVERVIEW_SUMMARY_FILE),  
+    };
+    
     public FileSet createDescriptors() {
         final FileSet fs = new FileSet();
         descriptorSets.add(fs);
@@ -70,8 +78,12 @@ public class PluginDocumentationTask extends AbstractPluginTask {
         return fs;
     }
 
+    /**
+     * Get a list of all included descriptor files.
+     * @return
+     */
     protected File[] getDescriptorFiles() {
-        List<File> files = new ArrayList<File>();
+        final List<File> files = new ArrayList<File>();
         for (FileSet fs : descriptorSets) {
             final DirectoryScanner ds = fs.getDirectoryScanner(getProject());
             final String[] filesNames = ds.getIncludedFiles();
@@ -137,6 +149,9 @@ public class PluginDocumentationTask extends AbstractPluginTask {
             out.println(".frameItem { font-size:  80%; font-family: Verdana, Arial, sans-serif }");
             out.println(".summaryTable { border: 1px solid; }");
             out.println(".summaryTableHdr { background: #CCCCFF; font-size: 120%; font-weight: bold; }");
+            out.println(".toolbar { background: #EEEEFF; font-size: 110%; font-weight: bold; }");
+            out.println(".toolbarItem:link { text-decoration: none; }");
+            out.println(".toolbarItem:visited { text-decoration: none; }");
         } finally {
             out.close();
         }                              
@@ -257,16 +272,17 @@ public class PluginDocumentationTask extends AbstractPluginTask {
             out.println("<link rel='stylesheet' TYPE='text/css' href='../" + CSS_FILE + "'>");
             out.println("</head><body>");
             
+            addToolbar(out, "../");
+            
             addSummaryTableHdr(out, "Plugin summary");
             addTableRow(out, "Id", descr.getId());
             addTableRow(out, "Name", descr.getName());
             addTableRow(out, "Version", descr.getVersion());
             addTableRow(out, "Provider", descr.getProviderName());
-            addTableRow(out, "Name", descr.getName());
             endSummaryTableHdr(out);
             
             if (descr.getPrerequisites().length > 0) {
-                addSummaryTableHdr(out, "Prerequisites");
+                addSummaryTableHdr(out, "Requires");
                 for (PluginPrerequisite prereq : descr.getPrerequisites()) {
                     final String href = prereq.getPluginId() + EXT;
                     final PluginData prereqData = getPluginData(prereq.getPluginId());
@@ -286,66 +302,84 @@ public class PluginDocumentationTask extends AbstractPluginTask {
                     addTableRow(out, "<a href='" + href + "'>" + id + "</a>", name);
                 }
                 endSummaryTableHdr(out);                
+            }            
+
+            if (descr.getRuntime() != null) {
+                final String lib = "Library";
+                final String exports = "Exports packages";
+
+                addSummaryTableHdr(out, "Libraries");
+                for (Library library : descr.getRuntime().getLibraries()) {
+                    final String libName = library.getName();
+                    final StringBuilder sb = new StringBuilder();
+
+                    for (String export : library.getExports()) {
+                        sb.append(export);
+                        sb.append("<br/>");
+                    }
+                    addTableRow(out, libName, sb.toString());
+                }
+                endSummaryTableHdr(out);
             }
             
-//
-//            if (descr.getRuntime() != null) {
-//                final String lib = "Library";
-//                final String exports = "Exports packages";
-//
-//                for (Library library : descr.getRuntime().getLibraries()) {
-//                    table.addCell(lib);
-//                    cell = new Cell(library.getName());
-//                    cell.setColspan(2);
-//                    table.addCell(cell);
-//
-//                    cell = new Cell(exports);
-//                    cell.setRowspan(library.getExports().length);
-//                    cell.setVerticalAlignment("top");
-//                    table.addCell(cell);
-//                    for (String export : library.getExports()) {
-//                        cell = new Cell(export);
-//                        cell.setColspan(2);
-//                        table.addCell(cell);
-//                    }
-//                }
-//            }
+            final ExtensionPoint[] epList = descr.getExtensionPoints();
+            if ((epList != null) && (epList.length > 0)) {
+                addSummaryTableHdr(out, "Extension points");
+                for (ExtensionPoint ep : epList) {
+                    addTableRow(out, ep.getSimpleIdentifier(), ep.getName());
+                }
+                endSummaryTableHdr(out);                
+            }
 
-//            if (descr.getExtensions() != null) {
-//                final String extens = "Extension";
-//                final String premis = " ";
-//                for (Extension extension : descr.getExtensions()) {
-//                    table.addCell(extens);
-//                    cell = new Cell(extension
-//                            .getExtensionPointUniqueIdentifier());
-//                    cell.setColspan(2);
-//                    table.addCell(cell);
-//
-//                    cell = new Cell(premis);
-//                    cell
-//                            .setRowspan(extension.getConfigurationElements().length);
-//                    cell.setColspan(1);
-//                    table.addCell(cell);
-//                    String name, actions;
-//
-//                    for (ConfigurationElement configurationElement : extension
-//                            .getConfigurationElements()) {
-//                        name = configurationElement.getAttribute("name");
-//                        actions = configurationElement.getAttribute("actions");
-//                        cell = new Cell(configurationElement
-//                                .getAttribute("class")
-//                                + (name != null ? " name: \"" + name + "\""
-//                                        : "")
-//                                + (actions != null ? " actions: \"" + actions
-//                                        + "\"" : ""));
-//                        cell.setColspan(2);
-//                        table.addCell(cell);
-//                    }
-//                }
-//            }
+            final Extension[] extList = descr.getExtensions();
+            if ((extList != null) && (extList.length > 0)) {
+                addSummaryTableHdr(out, "Extensions");
+                for (Extension ext : extList) {
+                    final StringBuilder sb = new StringBuilder();
+                    
+                    for (ConfigurationElement cfg : ext
+                            .getConfigurationElements()) {
+                        format(cfg, sb, "");
+                        sb.append("<br/>");
+                    }
+                    addTableRow(out, format(ext), sb.toString());
+                }
+                endSummaryTableHdr(out);
+            }
 
         } finally {
             out.close();
+        }
+    }
+    
+    private void format(ConfigurationElement cfg, StringBuilder out, String indent) {
+        final ConfigurationElement[] children = cfg.getElements();
+        final boolean hasChildren = ((children != null) && (children.length > 0));
+        
+        out.append(indent);
+        out.append("&lt;");
+        out.append(cfg.getName());
+        
+        // TODO add attributes
+        
+        if (hasChildren) {
+            out.append("&gt;");
+            for (ConfigurationElement child : children) {
+                format(child, out, indent + "&nbs&nbsp;");
+                out.append("<br/>");
+            }
+        } else {
+            out.append("/&gt;");
+        }        
+    }
+    
+    private String format(Extension ext) {
+        final PluginData epPlugin = getPluginData(ext.getExtensionPointPluginId());
+        if (epPlugin != null) {
+            final String href = ext.getExtensionPointPluginId() + EXT;
+            return "<a href='" + href + "'>" + ext.getExtensionPointUniqueIdentifier() + "</a>";
+        } else {
+            return ext.getExtensionPointUniqueIdentifier();
         }
     }
 
@@ -356,6 +390,19 @@ public class PluginDocumentationTask extends AbstractPluginTask {
         out.println("</td></tr>");    
     }
     
+    private void addToolbar(PrintWriter out, String base) {
+        out.println("<table class='toolbar' border='0' cellpadding='3' cellspacing='0' width='100%'>");
+        out.println("<tr>");
+        for (ToolbarEntry tbe : TOOLBAR_ENTRIES) {
+            out.print("<td nowrap>");
+            out.print("<a href='" + base + tbe.getHref() + "' class='toolbarItem'>");
+            out.print(tbe.getTitle());
+            out.println("</a></td>");
+        }
+        out.println("</td></tr></table>");
+        out.println("<p/>");
+    }
+    
     private void endSummaryTableHdr(PrintWriter out) {
         out.println("</table>");    
         out.println("<p/>");
@@ -364,7 +411,7 @@ public class PluginDocumentationTask extends AbstractPluginTask {
     private void addTableRow(PrintWriter out, String... cols) {
         out.println("<tr>");
         for (String col : cols) {
-            out.println("<td>");
+            out.println("<td valign='top'>");
             out.println(col);
             out.println("</td>");
         }
