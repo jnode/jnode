@@ -32,6 +32,7 @@
 
   <extension point="org.jnode.security.permissions">
     <permission class="java.net.SocketPermission" name="*:53" actions="resolve,accept,connect,listen"/>
+    <permission class="java.net.SocketPermission" name="*:80" actions="resolve,accept,connect,listen"/>
   </extension>
 
 </plugin>
