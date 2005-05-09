@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -197,6 +198,7 @@ public class PluginDocumentationTask extends AbstractPluginTask {
                 addTableRow(out, link, data.getDescriptor().getName());
             }
             endSummaryTableHdr(out);
+            addFooter(out);
             out.println("</body></html>");           
         } finally {
             out.close();
@@ -239,6 +241,8 @@ public class PluginDocumentationTask extends AbstractPluginTask {
                 addTableRow(out, pkg.getPackageName(), link);
             }
             endSummaryTableHdr(out);
+            addFooter(out);
+
             out.println("</body></html>");           
         } finally {
             out.close();
@@ -403,6 +407,8 @@ public class PluginDocumentationTask extends AbstractPluginTask {
                 endSummaryTableHdr(out);
             }
 
+            addFooter(out);
+            out.println("</body></html>");           
         } finally {
             out.close();
         }
@@ -481,6 +487,15 @@ public class PluginDocumentationTask extends AbstractPluginTask {
         }
         out.println("</td></tr></table>");
         out.println("<p/>");
+    }
+    
+    private void addFooter(PrintWriter out) {
+        out.println("<hr>");
+        out.println("<font size='-1'>");
+        out.println("This file is generated on " + new Date());
+        out.println("<p/>");
+        out.println("For more info visit <a href='http://jnode.org' target='_top'>http://jnode.org</a>");
+        out.println("</font>");
     }
     
     private void endSummaryTableHdr(PrintWriter out) {
