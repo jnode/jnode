@@ -18,7 +18,6 @@
     <pathelement location="${jnode-fs.jar}"/>
     <pathelement location="${basedir}/lib/xml-apis.jar"/>
   	<pathelement location="${classycle.jar}"/>
-    <pathelement location="${itext.jar}"/>
     <path refid="cp"/>
   </path>
 
