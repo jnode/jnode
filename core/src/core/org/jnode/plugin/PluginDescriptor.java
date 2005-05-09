@@ -127,6 +127,12 @@ public interface PluginDescriptor {
 	 */
 	public boolean hasCustomPluginClass();
 	
+    /**
+     * Gets the name of the custom plugin class of this plugin.
+     * @return Null if no custom plugin class
+     */
+    public String getCustomPluginClassName();
+    
 	/**
 	 * Has this plugin the auto-start flag set.
 	 * If true, the plugin will be started automatically at boot/load time.

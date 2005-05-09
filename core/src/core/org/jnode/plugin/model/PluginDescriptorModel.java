@@ -368,6 +368,14 @@ public class PluginDescriptorModel extends AbstractModelObject implements
     }
 
     /**
+     * Gets the name of the custom plugin class of this plugin.
+     * @return Null if no custom plugin class
+     */
+    public String getCustomPluginClassName() {
+        return className;
+    }
+    
+    /**
      * Has this plugin the auto-start flag set. If true, the plugin will be
      * started automatically at boot/load time.
      * 
