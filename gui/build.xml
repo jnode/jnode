@@ -1,5 +1,7 @@
 <project name="JNode-GUI" default="all" basedir=".">
 
+  <typedef file="${basedir}/../all/lib/jnode.xml"/>
+				
   <property name="my-build.dir"   value="${basedir}/build"/>
   <property name="my-classes.dir" value="${my-build.dir}/classes"/>
   <property name="my-src.dir"     value="${basedir}/src"/>
@@ -15,36 +17,23 @@
 <!-- Initialize all subproject directories -->
   <target name="prepare">
     <mkdir dir="${my-classes.dir}"/>
-    <copy todir="${descriptors.dir}">
-      <fileset dir="${basedir}/descriptors"/>
-	  <filterset refid="descriptors-filter"/>
-    </copy>
+  	<jnode.copy-descriptors/>
   </target>
 
 <!-- Compile all subproject java files -->
   <target name="compile" depends="prepare">
-    <javac destdir="${my-classes.dir}"
-	       debug="on"
-	       optimize="on"
-           compiler="modern"
-	       includeJavaRuntime="false"
-    	target="${java.target}" source="${java.source}" encoding="${java.encoding}">
-	  <bootclasspath path="${jnode-core.jar}"/>
+    <jnode.compile>
 	  <src path="${my-src.dir}/awt"/>
 	  <src path="${my-src.dir}/desktop"/>
-    <src path="${my-src.dir}/driver"/>
+      <src path="${my-src.dir}/driver"/>
 	  <src path="${my-src.dir}/test"/>
-    <src path="${my-src.dir}/thinlet"/>        
-    <classpath refid="my-cp"/>
-    <compilerarg value="${compilerarg}"/>
-    </javac>
+      <src path="${my-src.dir}/thinlet"/>        
+      <classpath refid="my-cp"/>
+    </jnode.compile>
   </target>
 
 <!-- Assemble the jarfile -->
   <target name="assemble" depends="compile">
-    <!-- jar jarfile="${my.jar}">
-      <fileset dir="${my-classes.dir}"/>
-    </jar -->
     <jar jarfile="${jnode-fonts.jar}">
       <fileset dir="${basedir}/fonts">
       </fileset>
@@ -56,7 +45,7 @@
 
 <!-- Clean everything -->
   <target name="clean">
-    <delete dir="${my-build.dir}" quiet="true"/>
+  	<jnode.clean/>
   </target>
 
 </project>

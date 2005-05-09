@@ -1,5 +1,7 @@
 <project name="JNode-Builder" default="all" basedir=".">
 
+  <typedef file="${basedir}/../all/lib/jnode.xml"/>
+		
   <property name="my-build.dir" value="${basedir}/build"/>
   <property name="my-gen.dir" value="${my-build.dir}/gen"/>
   <property name="my-classes.dir" value="${my-build.dir}/classes"/>
@@ -29,11 +31,9 @@
   <target name="prepare">
     <mkdir dir="${my-classes.dir}"/>
     <mkdir dir="${my-gen.dir}"/>
-    <copy todir="${descriptors.dir}">
-      <fileset dir="${basedir}/descriptors"/>
-      <filterset refid="descriptors-filter"/>
-    </copy>
-    <copy todir="${my-classes.dir}">
+  	<jnode.copy-descriptors/>
+
+  	<copy todir="${my-classes.dir}">
       <fileset dir="${my-src.dir}/classpath/gnu" includes="**/*.properties"/>
       <fileset dir="${my-src.dir}/classpath/java" includes="**/*.properties"/>
       <fileset dir="${my-src.dir}/classpath/vm" includes="**/*.security"/>
@@ -46,8 +46,7 @@
 
   <!-- Compile all subproject java files -->
   <target name="compile" depends="prepare">
-    <javac destdir="${my-classes.dir}" debug="on" optimize="on" compiler="modern" includeJavaRuntime="false"
-      target="${java.target}" source="${java.source}" encoding="${java.encoding}">
+    <jnode.compile>
       <bootclasspath>
         <pathelement location="${my-src.dir}/classpath/gnu"/>
         <pathelement location="${my-src.dir}/classpath/java"/>
@@ -72,8 +71,7 @@
       <src path="${my-src.dir}/test"/>
       <src path="${my-gen.dir}"/>
       <classpath refid="my-cp"/>
-      <compilerarg value="${compilerarg}"/>
-    </javac>
+    </jnode.compile>
     <!-- Copy all non java files to class dir -->
     <copy todir="${my-classes.dir}">
       <fileset dir="${my-src.dir}/core" excludes="**/*.java,**/package.html"/>
@@ -83,9 +81,6 @@
 
   <!-- Assemble the jarfile -->
   <target name="assemble" depends="compile">
-    <!-- jar jarfile="${my.jar}">
-<fileset dir="${my-classes.dir}"/>
-</jar -->
   </target>
 
   <!-- Do it all -->
@@ -93,7 +88,7 @@
 
   <!-- Clean everything -->
   <target name="clean">
-    <delete dir="${my-build.dir}" quiet="true"/>
+  	<jnode.clean/>
   </target>
 
 </project>

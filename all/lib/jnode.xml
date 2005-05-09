@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!-- Ant lib for various common tasks -->
+<antlib>
+
+  <!-- Predefined way of using javac -->
+  <presetdef name="jnode.compile">
+    <javac destdir="${my-classes.dir}"
+	       debug="on"
+	       optimize="on"
+           compiler="modern"
+	       includeJavaRuntime="false"
+           target="${java.target}" 
+           source="${java.source}"
+           encoding="${java.encoding}">
+	  <bootclasspath path="${jnode-core.jar}"/>
+      <compilerarg value="${compilerarg}"/>
+    </javac>
+  </presetdef>
+
+  <!-- Predefined way of using javadoc -->
+  <macrodef name="jnode.javadoc">
+    <attribute name="destdir"/>
+    <element name="parameters" implicit="true"/>
+    
+    <sequential>
+      <mkdir dir="@{destdir}"/>
+      <javadoc 
+      	destdir="@{destdir}"
+		author="true" 
+		version="true" 
+		use="true" 
+		windowtitle="JNode"
+		maxmemory="256M">
+
+		<parameters/>
+		<classpath refid="cp" />
+		<group title="JNode" packages="org.jnode.*,org.vmmagic.*" />
+		<group title="Classpath" packages="java.*,javax.*,gnu.*" />
+		<group title="MMTk" packages="org.mmtk.*" />
+		<!-- link href="http://jnode.org"/ -->
+      </javadoc>
+    </sequential>
+  </macrodef>
+
+  <!-- Copy descriptors to the descriptors directory -->
+  <presetdef name="jnode.copy-descriptors">
+    <copy todir="${descriptors.dir}">
+      <fileset dir="${basedir}/descriptors"/>
+      <filterset refid="descriptors-filter"/>
+    </copy>
+  </presetdef>
+  
+  <!-- Perform a default clean -->
+  <presetdef name="jnode.clean">
+    <delete dir="${my-build.dir}" quiet="true"/>
+  </presetdef>
+
+  <!-- Call all subprojects with a specific target -->
+  <macrodef name="jnode.antall">
+    <attribute name="target"/>
+    <sequential>
+		<ant target="@{target}" dir="${root.dir}/core" inheritall="on" inheritrefs="on" />
+		<ant target="@{target}" dir="${root.dir}/shell" inheritall="on" inheritrefs="on" />
+		<ant target="@{target}" dir="${root.dir}/fs" inheritall="on" inheritrefs="on" />
+		<ant target="@{target}" dir="${root.dir}/builder" inheritall="on" inheritrefs="on" />
+		<ant target="@{target}" dir="${root.dir}/gui" inheritall="on" inheritrefs="on" />
+		<ant target="@{target}" dir="${root.dir}/net" inheritall="on" inheritrefs="on" />
+		<ant target="@{target}" dir="${root.dir}/textui" inheritall="on" inheritrefs="on" />
+		<ant target="@{target}" dir="${root.dir}/distr" inheritall="on" inheritrefs="on" />
+    </sequential>
+  </macrodef>
+
+</antlib>

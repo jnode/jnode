@@ -1,5 +1,7 @@
 <project name="JNode-Builder" default="all" basedir=".">
 
+  <typedef file="${basedir}/../all/lib/jnode.xml"/>
+	
   <property name="my-build.dir"   value="${basedir}/build"/>
   <property name="my-build-src.dir"   value="${basedir}/build/src"/>
   <property name="my-classes.dir" value="${my-build.dir}/classes"/>
@@ -37,19 +39,11 @@
     <javacc target="${jnasm-src.dir}/assembler/gen/JNAsm.jj"
             javacchome="${javacc.dir}"
             outputdirectory="${jnasm-assembler-gen.dir}" />
-    <javac destdir="${my-classes.dir}"
-	       debug="on"
-	       optimize="on"
-           compiler="modern"
-	       includeJavaRuntime="false"
-        	 target="${java.target}" source="${java.source}"
-    		encoding="${java.encoding}">
-	  <bootclasspath path="${jnode-core.jar}"/>
+    <jnode.compile>
 	  <src path="${my-src.dir}/builder"/>
       <src path="${my-build-src.dir}"/>
       <classpath refid="my-cp"/>
-      <compilerarg value="${compilerarg}"/>
-    </javac>
+    </jnode.compile>
   </target>
 
 <!-- Assemble the jarfile -->
