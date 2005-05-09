@@ -18,324 +18,400 @@
  * along with this library; if not, write to the Free Software Foundation, 
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
  */
- 
+
 package org.jnode.build.documentation;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.net.MalformedURLException;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.types.FileSet;
 import org.jnode.build.AbstractPluginTask;
-import org.jnode.plugin.ConfigurationElement;
-import org.jnode.plugin.Extension;
-import org.jnode.plugin.Library;
+import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginPrerequisite;
-import org.jnode.plugin.model.PluginDescriptorModel;
-
-import com.lowagie.text.*;
-import com.lowagie.text.html.HtmlWriter;
 
 /**
  * @author Martin Husted Hartvig (hagar@jnode.org)
  */
-public class PluginDocumentationTask extends AbstractPluginTask
-{
-  private LinkedList<FileSet> descriptorSets = new LinkedList<FileSet>();
-  private File todir;
-  private final static String DOCHEADER = "JNode plugin documentation";
-  private final String ext = ".html";
+public class PluginDocumentationTask extends AbstractPluginTask {
 
-  public FileSet createDescriptors()
-  {
-    final FileSet fs = new FileSet();
-    descriptorSets.add(fs);
+    private final LinkedList<FileSet> descriptorSets = new LinkedList<FileSet>();
 
-    return fs;
-  }
+    private File destdir;
+    private final SortedMap<String, PluginData> descriptors = new TreeMap<String, PluginData>();
 
-  protected File[] getDescriptorFiles()
-  {
-    List<File> files = new ArrayList<File>();
-    for (FileSet fs : descriptorSets)
-    {
-      final DirectoryScanner ds = fs.getDirectoryScanner(getProject());
-      final String[] filesNames = ds.getIncludedFiles();
+    private final static String DOCHEADER = "JNode plugin documentation";
 
-      for (String filename : filesNames)
-      {
-        files.add(new File(ds.getBasedir(), filename));
-      }
+    private final static String PLUGINS_SUBDIR = "plugins";
+    
+    private static final String EXT = ".html";
+
+    private static final String ALL_FRAME = "allFrame";
+    private static final String ALL_FILE = "all-frame" + EXT;
+    private static final String OVERVIEW_SUMMARY_FILE = "overview-summary" + EXT;
+    private static final String OVERVIEW_SUMMARY_FRAME = "overviewSummary";
+
+    private static final String CSS_FILE = "index.css";
+    private static final String INDEX = "index" + EXT;
+
+    public FileSet createDescriptors() {
+        final FileSet fs = new FileSet();
+        descriptorSets.add(fs);
+
+        return fs;
     }
 
-    return (File[]) files.toArray(new File[files.size()]);
-  }
+    protected File[] getDescriptorFiles() {
+        List<File> files = new ArrayList<File>();
+        for (FileSet fs : descriptorSets) {
+            final DirectoryScanner ds = fs.getDirectoryScanner(getProject());
+            final String[] filesNames = ds.getIncludedFiles();
 
-
-  /**
-   * @return The destination directory
-   */
-  public final File getTodir()
-  {
-    return this.todir;
-  }
-
-  /**
-   * @param todir
-   */
-  public final void setTodir(File todir)
-  {
-    this.todir = todir;
-  }
-
-  /**
-   * @throws org.apache.tools.ant.BuildException
-   *
-   * @see org.apache.tools.ant.Task#execute()
-   */
-  public void execute() throws BuildException
-  {
-    if (descriptorSets.isEmpty())
-    {
-      throw new BuildException("At at least 1 descriptorset element");
-    }
-
-    if (todir == null)
-    {
-      throw new BuildException("The todir attribute must be set");
-    }
-
-    if (getPluginDir() == null)
-    {
-      throw new BuildException("The pluginDir attribute must be set");
-    }
-
-    if (!todir.exists())
-    {
-      todir.mkdirs();
-    }
-
-    else if (!todir.isDirectory())
-    {
-      throw new BuildException("todir must be a directory");
-    }
-
-    Document document = new Document();
-    Table table = null;
-
-    try
-    {
-      File file = new File(todir,"index"+ext);
-      HtmlWriter.getInstance(document, new FileOutputStream(file));
-
-      document.open();
-      Cell cell;
-
-      table = new Table(1);
-      table.setBorderWidth(1);
-      table.setPadding(0);
-      table.setSpacing(0);
-      table.setAlignment("left");
-      table.setWidth(100);
-
-      cell = new Cell(DOCHEADER);
-      cell.setHeader(true);
-      table.addCell(cell);
-      table.endHeaders();
-    }
-    catch (FileNotFoundException e)
-    {
-      throw new BuildException(e.getMessage());
-    }
-    catch (BadElementException e)
-    {
-      throw new BuildException(e.getMessage());
-    }
-    catch (DocumentException e)
-    {
-      throw new BuildException(e.getMessage());
-    }
-
-    Map<String, File> descriptors = new HashMap<String, File>();
-
-    File[] files = getDescriptorFiles();
-
-    for (File descriptor : files)
-    {
-      buildPluginDocumentation(descriptors, descriptor, table);
-    }
-
-    try
-    {
-      document.add(table);
-    }
-    catch (DocumentException e)
-    {
-      throw new BuildException(e.getMessage());
-    }
-    document.close();
-  }
-
-/**
- * Vuild the documentation for the plugin
- * @param descriptors a map of all the descriptors
- * @param descriptor the descriptor
- * @param index index file
- * @throws BuildException
- */
-  protected void buildPluginDocumentation(Map<String, File> descriptors, File descriptor, Table index) throws BuildException
-  {
-    final PluginDescriptorModel pluginDescriptorModel = readDescriptor(descriptor);
-
-    final String fullId = pluginDescriptorModel.getId() + "_" + pluginDescriptorModel.getVersion();
-    if (descriptors.containsKey(fullId))
-    {
-      File otherDesc = descriptors.get(fullId);
-      throw new BuildException("Same id(" + fullId + ") for 2 plugins: " + otherDesc + ", " + descriptor);
-    }
-
-    descriptors.put(fullId, descriptor);
-
-    Document document = new Document();
-
-    try
-    {
-      File file = new File(todir,pluginDescriptorModel.getId()+ext);
-
-      HtmlWriter.getInstance(document, new FileOutputStream(file));
-
-      document.open();
-      Table table = new Table(3);
-      Cell cell;
-
-      table.setBorderWidth(1);
-      table.setPadding(0);
-      table.setSpacing(0);
-      table.setAlignment("left");
-      table.setWidth(100);
-
-      Anchor anchor = new Anchor(pluginDescriptorModel.getId());
-      anchor.setName("LINK");
-      anchor.setReference(file.toURL().toString());
-      index.addCell(new Cell(anchor));
-
-      cell = new Cell(DOCHEADER+" for "+pluginDescriptorModel.getId());
-      cell.setHeader(true);
-      cell.setColspan(3);
-      table.addCell(cell);
-      table.endHeaders();
-
-      table.addCell("Name");
-      cell = new Cell(pluginDescriptorModel.getName());
-      cell.setColspan(2);
-      table.addCell(cell);
-
-      table.addCell("Version");
-      cell = new Cell(pluginDescriptorModel.getVersion());
-      cell.setColspan(2);
-      table.addCell(cell);
-
-      table.addCell("Provider");
-      cell = new Cell(pluginDescriptorModel.getProviderName());
-      cell.setColspan(2);
-      table.addCell(cell);
-
-      if (pluginDescriptorModel.getPrerequisites() != null && pluginDescriptorModel.getPrerequisites().length != 0)
-      {
-        cell = new Cell("Requires");
-        cell.setRowspan(pluginDescriptorModel.getPrerequisites().length);
-        cell.setVerticalAlignment("top");
-        table.addCell(cell);
-
-        File prerequisites;
-        for (PluginPrerequisite pluginPrerequisite : pluginDescriptorModel.getPrerequisites())
-        {
-          anchor = new Anchor(pluginPrerequisite.getPluginId());
-          anchor.setName("LINK");
-          prerequisites = new File(todir, pluginPrerequisite.getPluginId()+ext);
-          anchor.setReference(prerequisites.toURL().toString());
-          cell = new Cell(anchor);
-          cell.setColspan(2);
-          table.addCell(cell);
+            for (String filename : filesNames) {
+                files.add(new File(ds.getBasedir(), filename));
+            }
         }
-      }
 
-      if (pluginDescriptorModel.getRuntime() != null)
-      {
-        final String lib ="Library";
-        final String exports ="Exports packages";
+        return files.toArray(new File[files.size()]);
+    }
 
-        for (Library library : pluginDescriptorModel.getRuntime().getLibraries())
-        {
-          table.addCell(lib);
-          cell = new Cell(library.getName());
-          cell.setColspan(2);
-          table.addCell(cell);
-
-          cell = new Cell(exports);
-          cell.setRowspan(library.getExports().length);
-          cell.setVerticalAlignment("top");
-          table.addCell(cell);
-          for (String export : library.getExports())
-          {
-            cell = new Cell(export);
-            cell.setColspan(2);
-            table.addCell(cell);
-          }
+    /**
+     * @throws org.apache.tools.ant.BuildException
+     * @see org.apache.tools.ant.Task#execute()
+     */
+    public void execute() throws BuildException {
+        descriptors.clear();
+        if (descriptorSets.isEmpty()) {
+            throw new BuildException("At at least 1 descriptorset element");
         }
-      }
 
-      if (pluginDescriptorModel.getExtensions() != null)
-      {
-        final String extens ="Extension";
-        final String premis =" ";
-        for (Extension extension : pluginDescriptorModel.getExtensions())
-        {
-          table.addCell(extens);
-          cell = new Cell(extension.getExtensionPointUniqueIdentifier());
-          cell.setColspan(2);
-          table.addCell(cell);
-
-          cell = new Cell(premis);
-          cell.setRowspan(extension.getConfigurationElements().length);
-          cell.setColspan(1);
-          table.addCell(cell);
-          String name, actions;
-
-          for (ConfigurationElement configurationElement : extension.getConfigurationElements())
-          {
-            name = configurationElement.getAttribute("name");
-            actions = configurationElement.getAttribute("actions");
-            cell = new Cell(configurationElement.getAttribute("class")+(name!=null?" name: \""+name+"\"":"")+(actions!=null?" actions: \""+actions+"\"":""));
-            cell.setColspan(2);
-            table.addCell(cell);
-          }
+        if (destdir == null) {
+            throw new BuildException("The todir attribute must be set");
         }
-      }
 
-      document.add(table);
+        if (getPluginDir() == null) {
+            throw new BuildException("The pluginDir attribute must be set");
+        }
 
-      document.close();
+        if (!destdir.exists()) {
+            destdir.mkdirs();
+        } else if (!destdir.isDirectory()) {
+            throw new BuildException("destdir must be a directory");
+        }
+        
+        try {
+            // Load the plugin data
+            for (File descrFile : getDescriptorFiles()) {
+                loadPluginData(descriptors, descrFile);
+            }
+            
+            // Write the plugin documentation
+            for (PluginData data : descriptors.values()) {
+                writePluginDocumentation(data);
+            }
+            
+            // Write the index files
+            writeCSS();
+            writeAllFrame(descriptors, DOCHEADER);
+            writeOverviewSummary(descriptors, DOCHEADER);
+            writeIndex(descriptors, DOCHEADER);
+        } catch (IOException ex) {
+            throw new BuildException(ex);
+        }
     }
-    catch (FileNotFoundException e)
-    {
-      throw new BuildException(e.getMessage());
+
+    private void writeCSS() throws IOException {
+        final File file = new File(getDestdir(), CSS_FILE);
+        final PrintWriter out = new PrintWriter(new FileWriter(file));
+        try {
+            out.println("body { background-color: #FFFFFF }");   
+            out.println(".frameItem { font-size:  80%; font-family: Verdana, Arial, sans-serif }");
+            out.println(".summaryTable { border: 1px solid; }");
+            out.println(".summaryTableHdr { background: #CCCCFF; font-size: 120%; font-weight: bold; }");
+        } finally {
+            out.close();
+        }                              
     }
-    catch (DocumentException e)
-    {
-      throw new BuildException(e.getMessage());
+    
+    private void writeIndex(Map<String, PluginData> descriptors, String title) throws IOException {
+        final File file = new File(getDestdir(), INDEX);
+        final PrintWriter out = new PrintWriter(new FileWriter(file));
+        try {
+            out.println("<html><head>");
+            out.println("<title>" + title + "</title>");
+            out.println("</head>");
+            
+            out.println("<frameset cols='20%,80%' title=''>");
+            out.println("<frame src='" + ALL_FILE + "' name='" + ALL_FRAME + "' scrolling='yes'>");
+            out.println("<frame src='" + OVERVIEW_SUMMARY_FILE + "' name='" + OVERVIEW_SUMMARY_FRAME + "' scrolling='yes'>");
+            out.println("</frameset>");
+            
+            out.println("</body></html>");           
+        } finally {
+            out.close();
+        }                      
     }
-    catch (MalformedURLException e)
-    {
-      throw new BuildException(e.getMessage());
+
+    private void writeOverviewSummary(Map<String, PluginData> descriptors, String title) throws IOException {
+        final File file = new File(getDestdir(), OVERVIEW_SUMMARY_FILE);
+        final PrintWriter out = new PrintWriter(new FileWriter(file));
+        try {
+            out.println("<html><head>");
+            out.println("<title>" + title + "</title>");
+            out.println("<link rel='stylesheet' TYPE='text/css' href='" + CSS_FILE + "'>");
+            out.println("</head><body>");
+
+            addSummaryTableHdr(out, "Plugins");
+            
+            for (PluginData data : descriptors.values()) {
+                final String link = "<a href='" + data.getHtmlFile() + "'>" + data.getDescriptor().getId() + "</a>";
+                addTableRow(out, link, data.getDescriptor().getName());
+            }
+            endSummaryTableHdr(out);
+            out.println("</body></html>");           
+        } finally {
+            out.close();
+        }                      
     }
-  }
+
+    private void writeAllFrame(Map<String, PluginData> descriptors, String title) throws IOException {
+        final File file = new File(getDestdir(), ALL_FILE);
+        final PrintWriter out = new PrintWriter(new FileWriter(file));
+        try {
+            out.println("<html><head>");
+            out.println("<title>" + title + "</title>");
+            out.println("<link rel='stylesheet' TYPE='text/css' href='" + CSS_FILE + "'>");
+            out.println("</head><body>");
+
+            out.println("<table border='0' width='100%'><tr><td nowrap>");            
+            out.println("<b>All plugins</a>");
+            out.println("</td></tr></table><p/>");
+
+            out.println("<table border='0' width='100%'><tr><td nowrap>");            
+            for (PluginData data : descriptors.values()) {
+                out.println("<a class='frameItem' href='" + data.getHtmlFile() + "' target='" + OVERVIEW_SUMMARY_FRAME + "'>");
+                out.println(data.getDescriptor().getId());
+                out.println("</a><br/>");
+            }           
+            out.println("</td></tr></table>");
+            
+            out.println("</body></html>");           
+        } finally {
+            out.close();
+        }                      
+    }
+
+    
+    private void loadPluginData(Map<String, PluginData> descriptors,
+            File descrFile) {
+        final PluginDescriptor descr = readDescriptor(descrFile);
+        final String fullId = descr.getId() + "_" + descr.getVersion();
+        
+        if (descriptors.containsKey(fullId)) {
+            final PluginData otherData = descriptors.get(fullId);
+            throw new BuildException("Same id(" + fullId + ") for 2 plugins: "
+                    + otherData.getDescriptorFile() + ", " + descrFile);
+        }
+
+        // Create & store plugin data
+        final PluginData data = new PluginData(descrFile, fullId);
+        data.setDescriptor(descr);
+        final String fname = PLUGINS_SUBDIR + "/" + descr.getId() + EXT;
+        data.setHtmlFile(fname);
+
+        descriptors.put(fullId, data);        
+    }
+    
+    /**
+     * Vuild the documentation for the plugin
+     * 
+     * @param descriptors
+     *            a map of all the descriptors
+     * @param descrFile
+     *            the descriptor
+     * @param index
+     *            index file
+     * @throws BuildException
+     * @throws IOException 
+     * @throws SecurityException 
+     */
+    protected void writePluginDocumentation(PluginData data) throws BuildException, IOException {
+        
+        final File file = new File(getDestdir(), data.getHtmlFile());
+        file.getParentFile().mkdirs();
+        final PrintWriter out = new PrintWriter(new FileWriter(file));
+        try {
+            final PluginDescriptor descr = data.getDescriptor();
+
+            out.println("<html><head>");
+            out.println("<title>" + descr.getId() + "</title>");
+            out.println("<link rel='stylesheet' TYPE='text/css' href='../" + CSS_FILE + "'>");
+            out.println("</head><body>");
+            
+            addSummaryTableHdr(out, "Plugin summary");
+            addTableRow(out, "Id", descr.getId());
+            addTableRow(out, "Name", descr.getName());
+            addTableRow(out, "Version", descr.getVersion());
+            addTableRow(out, "Provider", descr.getProviderName());
+            addTableRow(out, "Name", descr.getName());
+            endSummaryTableHdr(out);
+            
+            if (descr.getPrerequisites().length > 0) {
+                addSummaryTableHdr(out, "Prerequisites");
+                for (PluginPrerequisite prereq : descr.getPrerequisites()) {
+                    final String href = prereq.getPluginId() + EXT;
+                    final PluginData prereqData = getPluginData(prereq.getPluginId());
+                    final String name = (prereqData != null) ? prereqData.getDescriptor().getName() : "?";                    
+                    addTableRow(out, "<a href='" + href + "'>" + prereq.getPluginId() + "</a>", name);
+                }
+                endSummaryTableHdr(out);
+            }
+            
+            final List<PluginData> requiredBy = getRequiredBy(descr.getId());
+            if (!requiredBy.isEmpty()) {
+                addSummaryTableHdr(out, "Required by");
+                for (PluginData reqBy : requiredBy) {
+                    final String id = reqBy.getDescriptor().getId();
+                    final String href = id + EXT;
+                    final String name = reqBy.getDescriptor().getName();
+                    addTableRow(out, "<a href='" + href + "'>" + id + "</a>", name);
+                }
+                endSummaryTableHdr(out);                
+            }
+            
+//
+//            if (descr.getRuntime() != null) {
+//                final String lib = "Library";
+//                final String exports = "Exports packages";
+//
+//                for (Library library : descr.getRuntime().getLibraries()) {
+//                    table.addCell(lib);
+//                    cell = new Cell(library.getName());
+//                    cell.setColspan(2);
+//                    table.addCell(cell);
+//
+//                    cell = new Cell(exports);
+//                    cell.setRowspan(library.getExports().length);
+//                    cell.setVerticalAlignment("top");
+//                    table.addCell(cell);
+//                    for (String export : library.getExports()) {
+//                        cell = new Cell(export);
+//                        cell.setColspan(2);
+//                        table.addCell(cell);
+//                    }
+//                }
+//            }
+
+//            if (descr.getExtensions() != null) {
+//                final String extens = "Extension";
+//                final String premis = " ";
+//                for (Extension extension : descr.getExtensions()) {
+//                    table.addCell(extens);
+//                    cell = new Cell(extension
+//                            .getExtensionPointUniqueIdentifier());
+//                    cell.setColspan(2);
+//                    table.addCell(cell);
+//
+//                    cell = new Cell(premis);
+//                    cell
+//                            .setRowspan(extension.getConfigurationElements().length);
+//                    cell.setColspan(1);
+//                    table.addCell(cell);
+//                    String name, actions;
+//
+//                    for (ConfigurationElement configurationElement : extension
+//                            .getConfigurationElements()) {
+//                        name = configurationElement.getAttribute("name");
+//                        actions = configurationElement.getAttribute("actions");
+//                        cell = new Cell(configurationElement
+//                                .getAttribute("class")
+//                                + (name != null ? " name: \"" + name + "\""
+//                                        : "")
+//                                + (actions != null ? " actions: \"" + actions
+//                                        + "\"" : ""));
+//                        cell.setColspan(2);
+//                        table.addCell(cell);
+//                    }
+//                }
+//            }
+
+        } finally {
+            out.close();
+        }
+    }
+
+    private void addSummaryTableHdr(PrintWriter out, String title) {
+        out.println("<table class='summaryTable' border='1' cellpadding='3' cellspacing='0' width='100%'>");
+        out.println("<tr><td class='summaryTableHdr' colspan='2'>");
+        out.println(title);
+        out.println("</td></tr>");    
+    }
+    
+    private void endSummaryTableHdr(PrintWriter out) {
+        out.println("</table>");    
+        out.println("<p/>");
+    }
+    
+    private void addTableRow(PrintWriter out, String... cols) {
+        out.println("<tr>");
+        for (String col : cols) {
+            out.println("<td>");
+            out.println(col);
+            out.println("</td>");
+        }
+        out.println("</tr>");
+    }
+
+    /**
+     * @return Returns the destdir.
+     */
+    public final File getDestdir() {
+        return this.destdir;
+    }
+
+    /**
+     * @param destdir The destdir to set.
+     */
+    public final void setDestdir(File destdir) {
+        this.destdir = destdir;
+    }
+    
+    private PluginData getPluginData(String id) {
+        for (PluginData data : descriptors.values()) {
+            if (data.getDescriptor().getId().equals(id)) {
+                return data;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Gets a list of all plugins that are require the given plugin id.
+     * @param id
+     * @return
+     */
+    private List<PluginData> getRequiredBy(String id) {
+        final ArrayList<PluginData> list = new ArrayList<PluginData>();
+        for (PluginData data : descriptors.values()) {
+            final PluginPrerequisite[] reqs = data.getDescriptor().getPrerequisites();
+            if ((reqs != null) && (reqs.length > 0)) {
+                for (PluginPrerequisite req : reqs) {
+                    if (req.getPluginId().equals(id)) {
+                        list.add(data);
+                        break;
+                    }
+                }
+            }
+        }
+        return list;
+    }
 }

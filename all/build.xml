@@ -570,10 +570,12 @@ clean          Remove all intermediate build results.
 	</target>
 
   <!-- Document all plugins -->
-  <target name="document-plugins" depends="assemble-plugins">
+  <target name="document-plugins" depends="assemble-projects">
     <taskdef name="plugindocumentation" classname="org.jnode.build.documentation.PluginDocumentationTask" classpathref="cp-jnode" />
 
-    <plugindocumentation todir="${reports.dir}/plugins" pluginDir="${descriptors.dir}">
+    <plugindocumentation 
+    	destdir="${reports.dir}/plugins" 
+    	pluginDir="${descriptors.dir}">
       <descriptors dir="${descriptors.dir}/">
         <include name="*.xml" />
         <exclude name="*plugin-list.xml" />
