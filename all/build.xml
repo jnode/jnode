@@ -53,9 +53,6 @@
 	<!-- libraries needed to check plugin dependencies -->
 	<property name="classycle.jar" value="${root.dir}/builder/lib/classycle.jar" />	
 
-	<!-- libraries needed for document the plugins -->
-	<property name="itext.jar" value="${root.dir}/builder/lib/itext-1.3.jar" />
-
 	<!-- libraries needed to check rules in source code -->	
 	<property name="pmd.jar" value="${root.dir}/builder/lib/pmd/pmd-3.0.jar" />		
 	<property name="jaxen.jar" value="${root.dir}/builder/lib/pmd/jaxen-core-1.0-fcs.jar" />
@@ -83,7 +80,6 @@
 		<pathelement location="${nanoxml.jar}" />
 		<pathelement location="${gnu-crypto.jar}" />
 		<pathelement location="${javax-crypto.jar}" />
-		<!-- pathelement location="${javax-security.jar}" / -->
 		<pathelement location="${basedir}/conf" />
 		<pathelement location="${beanshell.jar}" />
 	</path>
@@ -99,7 +95,6 @@
 		<pathelement location="${thinlet.jar}" />
 		<pathelement location="${jnode-textui.jar}" />
 		<pathelement location="${classycle.jar}" />
-		<pathelement location="${itext.jar}" />
 		<path refid="cp" />
 	</path>
 

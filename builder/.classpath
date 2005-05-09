@@ -36,9 +36,5 @@
 		<attributes>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/itext-1.3.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
