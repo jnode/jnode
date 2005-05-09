@@ -407,7 +407,13 @@ public class PluginDocumentationTask extends AbstractPluginTask {
         out.append("&lt;");
         out.append(cfg.getName());
         
-        // TODO add attributes
+        for (String key : cfg.attributeNames()) {
+            out.append(' ');
+            out.append(key);
+            out.append("='");
+            out.append(cfg.getAttribute(key));
+            out.append('\'');
+        }
         
         if (hasChildren) {
             out.append("&gt;");
