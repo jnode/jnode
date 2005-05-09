@@ -6,7 +6,6 @@
   <property name="my-gen.dir" value="${my-build.dir}/gen"/>
   <property name="my-classes.dir" value="${my-build.dir}/classes"/>
   <property name="my-src.dir" value="${basedir}/src"/>
-  <property name="my.jar" value="${jnode-core.jar}"/>
 
   <!-- Subproject specific classpath -->
   <path id="my-cp">
