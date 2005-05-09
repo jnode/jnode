@@ -26,6 +26,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -63,12 +64,14 @@ public class PluginDocumentationTask extends AbstractPluginTask {
     private static final String ALL_FILE = "all-frame" + EXT;
     private static final String OVERVIEW_SUMMARY_FILE = "overview-summary" + EXT;
     private static final String OVERVIEW_SUMMARY_FRAME = "overviewSummary";
+    private static final String OVERVIEW_PACKAGE_FILE = "overview-package" + EXT;
 
     private static final String CSS_FILE = "index.css";
     private static final String INDEX = "index" + EXT;
 
     private static final ToolbarEntry[] TOOLBAR_ENTRIES = {
         new ToolbarEntry("Overview", OVERVIEW_SUMMARY_FILE),  
+        new ToolbarEntry("Java packages", OVERVIEW_PACKAGE_FILE),  
     };
     
     public FileSet createDescriptors() {
@@ -135,6 +138,7 @@ public class PluginDocumentationTask extends AbstractPluginTask {
             writeCSS();
             writeAllFrame(descriptors, DOCHEADER);
             writeOverviewSummary(descriptors, DOCHEADER);
+            writeOverviewPackage(descriptors, DOCHEADER);
             writeIndex(descriptors, DOCHEADER);
         } catch (IOException ex) {
             throw new BuildException(ex);
@@ -184,12 +188,55 @@ public class PluginDocumentationTask extends AbstractPluginTask {
             out.println("<title>" + title + "</title>");
             out.println("<link rel='stylesheet' TYPE='text/css' href='" + CSS_FILE + "'>");
             out.println("</head><body>");
-
-            addSummaryTableHdr(out, "Plugins");
             
+            addToolbar(out, "");
+
+            addSummaryTableHdr(out, "Plugins");            
             for (PluginData data : descriptors.values()) {
                 final String link = "<a href='" + data.getHtmlFile() + "'>" + data.getDescriptor().getId() + "</a>";
                 addTableRow(out, link, data.getDescriptor().getName());
+            }
+            endSummaryTableHdr(out);
+            out.println("</body></html>");           
+        } finally {
+            out.close();
+        }                      
+    }
+
+    private void writeOverviewPackage(Map<String, PluginData> descriptors, String title) throws IOException {
+        final File file = new File(getDestdir(), OVERVIEW_PACKAGE_FILE);
+        final PrintWriter out = new PrintWriter(new FileWriter(file));
+        try {
+            out.println("<html><head>");
+            out.println("<title>" + title + "</title>");
+            out.println("<link rel='stylesheet' TYPE='text/css' href='" + CSS_FILE + "'>");
+            out.println("</head><body>");
+            
+            addToolbar(out, "");
+
+            // Build the packages list'
+            final List<PackageData> pkgs = new ArrayList<PackageData>();
+            for (PluginData data : descriptors.values()) {
+                if (data.getDescriptor().getRuntime() != null) {
+                    for (Library lib : data.getDescriptor().getRuntime().getLibraries()) {
+                        for (String exp : lib.getExports()) {
+                            if (!exp.equals("*")) {
+                                if (exp.endsWith(".*")) {
+                                    exp = exp.substring(0, exp.length() - 2);
+                                }
+                                pkgs.add(new PackageData(exp, data));
+                            }
+                        }
+                    }
+                }
+            }
+            Collections.sort(pkgs);            
+            
+            addSummaryTableHdr(out, "Java packages");            
+            for (PackageData pkg : pkgs) {
+                final PluginData data = pkg.getPlugin();
+                final String link = "<a href='" + data.getHtmlFile() + "'>" + data.getDescriptor().getId() + "</a>";
+                addTableRow(out, pkg.getPackageName(), link);
             }
             endSummaryTableHdr(out);
             out.println("</body></html>");           
