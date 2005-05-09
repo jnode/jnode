@@ -23,7 +23,9 @@ package org.jnode.plugin.model;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import nanoxml.XMLElement;
 
@@ -90,7 +92,22 @@ public class ConfigurationElementModel extends PluginModelObject implements Conf
 		return null;
 	}
 
-	/**
+
+    /**
+     * Gets the names of all attributes in this element.
+     * @return
+     */
+    public Set<String> attributeNames() {
+        final HashSet<String> set = new HashSet<String>();
+        if (attributes != null) {
+            for (AttributeModel attr : attributes) {
+                set.add(attr.getName());
+            }
+        }
+        return set;
+    }
+
+    /**
 	 * Gets all child elements
 	 */
 	public ConfigurationElement[] getElements() {
