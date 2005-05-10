@@ -36,7 +36,7 @@ import org.jnode.vm.memmgr.HeapStatistics;
 public class OnHeapCommand implements Command
 {
 
-  public static Help.Info HELP_INFO = new Help.Info("onheap", "count objects on the heap");
+  public static Help.Info HELP_INFO = new Help.Info("onheap", "show the number of instances on the heap with memory usage");
 
   public static void main(String[] args)
       throws Exception
@@ -55,7 +55,7 @@ public class OnHeapCommand implements Command
   {
     HeapStatistics stats = Vm.getHeapManager().getHeapStatistics();
 
-    out.println("on heap      : " + stats.toString());
+    out.println("on heap      :\n" + stats.toString());
   }
 
 }
