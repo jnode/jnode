@@ -29,7 +29,9 @@ import org.jnode.vm.VmSystemObject;
 public abstract class HeapStatistics extends VmSystemObject
 {
 
-  public abstract void add(String classname);
+  public abstract boolean contains(String classname);
+
+  public abstract void add(String classname, int size);
 
   public abstract String toString();
 }

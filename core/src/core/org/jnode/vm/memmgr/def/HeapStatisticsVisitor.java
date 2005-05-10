@@ -23,6 +23,8 @@ package org.jnode.vm.memmgr.def;
 
 import org.jnode.vm.ObjectVisitor;
 import org.jnode.vm.classmgr.ObjectFlags;
+import org.jnode.vm.classmgr.VmType;
+import org.jnode.vm.classmgr.VmNormalClass;
 import org.jnode.vm.memmgr.HeapStatistics;
 import org.vmmagic.pragma.Uninterruptible;
 
@@ -50,7 +52,16 @@ final class HeapStatisticsVisitor extends ObjectVisitor implements ObjectFlags,
 
   public final boolean visit(Object object)
   {
-    heapStatistics.add(object.getClass().getName());
+    int size = 0;
+    if (!heapStatistics.contains(object.getClass().getName()))
+    {
+      VmType type = object.getClass().getVmClass();
+
+      size = (type instanceof VmNormalClass?((VmNormalClass)type).getObjectSize():0);
+      type = null;
+    }
+
+    heapStatistics.add(object.getClass().getName(), size);
 
     return true;
   }
