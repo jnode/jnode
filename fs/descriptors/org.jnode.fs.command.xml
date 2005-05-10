@@ -28,6 +28,7 @@
     <alias name="format" class="org.jnode.fs.command.FormatCommand"/>
     <alias name="mkdir" class="org.jnode.fs.command.MkdirCommand"/>
     <alias name="mount" class="org.jnode.fs.command.MountCommand"/>
+    <alias name="pwd" class="org.jnode.fs.command.PwdCommand"/>
     <alias name="touch" class="org.jnode.fs.command.TouchCommand"/>
   </extension>
 
