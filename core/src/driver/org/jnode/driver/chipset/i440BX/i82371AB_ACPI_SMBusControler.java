@@ -256,23 +256,26 @@ public class i82371AB_ACPI_SMBusControler extends SMBusControler {
 		// this controler is a SMBus version 1.0, so there are no dynamic discovery.
 		// use well known addresses and probe each address
 
-		//byte res = 0;
+		byte res = 0;
 
 		// probes for the DIM
 
 		for (byte i = 0; i < 8; i++) {
 			try {
-				//res = readByte((byte) (0xa0 | (i << 1)), (byte) 2);
-				//log.debug("Discovered DIMM " + i + " type :" + Integer.toHexString(
-				// (int) res));
-				DIMM dimmDevice = new DIMM(bus, "DIMM-" + i);
-				bus.addDevice(dimmDevice);
-				DIMMDriver dimmDriver = new DIMMDriver(bus, (byte) (0xa0 | (i << 1)));
-				dimmDevice.setDriver(dimmDriver);
-				DeviceUtils.getDeviceManager().register(dimmDevice);
-				log.info(dimmDevice.toString());
+				byte address = (byte) (0xa0 | (i << 1));
+				if (DIMMDriver.canExist(bus, address)) {
+					res = readByte((byte) (0xa0 | (i << 1)), (byte) 2);
+					log.debug("Discovered DIMM " + i + " type :" + Integer.toHexString(
+					    (int) res));
+					DIMM dimmDevice = new DIMM(bus, "DIMM-" + i);
+					bus.addDevice(dimmDevice);
+					DIMMDriver dimmDriver = new DIMMDriver(bus, address);
+					dimmDevice.setDriver(dimmDriver);
+					DeviceUtils.getDeviceManager().register(dimmDevice);
+					log.info(dimmDevice.toString());
+				}
 			} catch (Exception ex) {
-				// log.debug("DIMM " + i + " not present" );
+				log.debug("DIMM " + i + " not present" );
 			}
 
 		}
