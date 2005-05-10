@@ -39,7 +39,7 @@ import org.jnode.vm.ResourceLoader;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public final class PluginClassLoaderImpl extends PluginClassLoader {
+final class PluginClassLoaderImpl extends PluginClassLoader {
 
     /** The registry */
     private final PluginRegistryModel registry;

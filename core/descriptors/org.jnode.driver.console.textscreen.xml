@@ -5,6 +5,7 @@
         name="JNode TextScreen Console driver"
         version="@VERSION@"
         provider-name="JNode.org"
+        license-name="lgpl"
         class="org.jnode.driver.console.textscreen.TextScreenConsolePlugin">
         
   <requires>

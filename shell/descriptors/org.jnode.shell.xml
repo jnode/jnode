@@ -5,6 +5,7 @@
         name="JNode Command Shell"
         version="@VERSION@"
         provider-name="JNode.org"
+        license-name="lgpl"
         class="org.jnode.shell.def.ShellPlugin">
         
   <requires>

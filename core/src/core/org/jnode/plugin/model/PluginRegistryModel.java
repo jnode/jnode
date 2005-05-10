@@ -51,7 +51,7 @@ import org.xml.sax.SAXException;
 /**
  * @author epr
  */
-public class PluginRegistryModel extends VmSystemObject implements
+public final class PluginRegistryModel extends VmSystemObject implements
         PluginRegistry {
 
     /** A map of all descriptors (id, descriptor) */
@@ -67,7 +67,7 @@ public class PluginRegistryModel extends VmSystemObject implements
      * 
      * @param pluginFiles
      */
-    public PluginRegistryModel(URL[] pluginFiles) throws PluginException {
+    PluginRegistryModel(URL[] pluginFiles) throws PluginException {
         this.extensionPoints = new BootableHashMap<String, ExtensionPoint>();
         this.descriptorMap = new BootableHashMap<String, PluginDescriptor>();
         final List<PluginDescriptorModel> descriptors = loadDescriptors(pluginFiles);

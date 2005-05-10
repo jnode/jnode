@@ -4,6 +4,7 @@
 <plugin id="org.jnode.driver.net.wireless" 
         name="JNode Abstract Wireless Ethernet driver classes"
         version="@VERSION@"
+        license-name="lgpl"
         provider-name="JNode.org">
         
   <requires>

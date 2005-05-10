@@ -98,17 +98,7 @@ public class PluginJar implements BootableObject, ResourceLoader {
         } catch (IOException ex) {
             throw new PluginException("Plugin " + pluginUrl, ex);
         }
-        final String rootTag = root.getName();
-        if (rootTag.equals("plugin")) {
-            this.descriptor = new PluginDescriptorModel(this, root);           
-        } else if (rootTag.equals("fragment")) {
-            this.descriptor = new FragmentDescriptorModel(this, root);            
-        } else {
-            throw new PluginException("plugin or fragment element expected");
-        }
-//        if (descriptor.isSystemPlugin()) {
-//            resources.clear();
-//        }
+        this.descriptor = Factory.parseDescriptor(this, root);
     }
 
     /**

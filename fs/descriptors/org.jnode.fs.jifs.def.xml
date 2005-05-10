@@ -5,6 +5,7 @@
         name="Jnode Information FileSystem Def"
         version="@VERSION@"
         provider-name="JNode.org"
+        license-name="lgpl"
         class="org.jnode.fs.jifs.def.JIFSPlugin">
         
   <requires>

@@ -33,7 +33,7 @@ import org.jnode.plugin.Runtime;
 /**
  * @author epr
  */
-public class RuntimeModel extends PluginModelObject implements Runtime {
+final class RuntimeModel extends PluginModelObject implements Runtime {
 
 	private final LibraryModel[] libraries;
 

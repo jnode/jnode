@@ -6,6 +6,7 @@
         version="@VERSION@"
         system="true"
         provider-name="JNode.org"
+        license-name="lgpl"
         class="org.jnode.security.SecurityPlugin">
         
   <requires>

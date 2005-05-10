@@ -4,6 +4,7 @@
 <plugin id="org.jnode.fs.ext2" 
         name="JNode EXT2 FileSystem"
         version="@VERSION@"
+        license-name="lgpl"
         provider-name="JNode.org">
         
   <requires>

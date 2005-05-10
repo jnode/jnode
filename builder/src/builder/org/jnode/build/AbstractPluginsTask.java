@@ -30,7 +30,7 @@ import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginPrerequisite;
 import org.jnode.plugin.PluginRegistry;
-import org.jnode.plugin.model.PluginRegistryModel;
+import org.jnode.plugin.model.Factory;
 
 /**
  * @author epr
@@ -82,7 +82,7 @@ public abstract class AbstractPluginsTask extends AbstractPluginTask {
         final URL[] all = new URL[systemPlugins.length + plugins.length];
         System.arraycopy(systemPlugins, 0, all, 0, systemPlugins.length);
         System.arraycopy(plugins, 0, all, systemPlugins.length, plugins.length);        
-        piRegistry = new PluginRegistryModel(all);
+        piRegistry = Factory.createRegistry(all);
         return piRegistry;
     }
 

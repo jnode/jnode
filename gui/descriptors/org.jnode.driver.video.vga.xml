@@ -4,6 +4,7 @@
 <plugin id="org.jnode.driver.video.vga" 
         name="JNode Video Standard VGA driver"
         version="@VERSION@"
+        license-name="lgpl"
         provider-name="JNode.org">
         
   <requires>

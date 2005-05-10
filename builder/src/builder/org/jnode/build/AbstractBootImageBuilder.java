@@ -52,6 +52,7 @@ import org.jnode.assembler.x86.X86BinaryAssembler;
 import org.jnode.plugin.PluginDescriptor;
 import org.jnode.plugin.PluginException;
 import org.jnode.plugin.PluginRegistry;
+import org.jnode.plugin.model.Factory;
 import org.jnode.plugin.model.PluginDescriptorModel;
 import org.jnode.plugin.model.PluginJar;
 import org.jnode.plugin.model.PluginRegistryModel;
@@ -418,7 +419,7 @@ public abstract class AbstractBootImageBuilder extends AbstractPluginsTask {
 
             // Load the plugin descriptors
             final PluginRegistryModel piRegistry;
-            piRegistry = new PluginRegistryModel(piList.getPluginList());
+            piRegistry = Factory.createRegistry(piList.getPluginList());
             
             // Load the memory management plugin
             piRegistry.loadPlugin(memMgrPluginURL, true);

@@ -2,8 +2,9 @@
 <!DOCTYPE plugin SYSTEM "jnode.dtd">
 
 <plugin id="org.jnode.driver.ps2"
-        name="JNode PS2 Keyobard and Mouse driver interface"
+        name="JNode PS2 Keyboard and Mouse driver interface"
         version="@VERSION@"
+        license-name="lgpl"
         provider-name="JNode.org">
 
   <requires>

@@ -28,7 +28,7 @@ import org.jnode.plugin.PluginDescriptor;
 /**
  * @author Ewout Prangsma (epr@users.sourceforge.net)
  */
-public class PluginsClassLoader extends ClassLoader {
+final class PluginsClassLoader extends ClassLoader {
 
 	private final PluginRegistryModel registry;
 

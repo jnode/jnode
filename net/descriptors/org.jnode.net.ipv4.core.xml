@@ -4,6 +4,7 @@
 <plugin id="org.jnode.net.ipv4.core"
   name="JNode IPv4 Core classes"
   version="@VERSION@"
+        license-name="lgpl"
   provider-name="JNode.org">
 
   <requires>

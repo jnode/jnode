@@ -5,6 +5,7 @@
         name="JNode utility classes"
         version="@VERSION@"
         system="true"
+        license-name="lgpl"
         provider-name="JNode.org">
         
   <runtime>

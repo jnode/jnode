@@ -4,6 +4,7 @@
 <plugin id="org.jnode.driver.video.nvidia" 
         name="JNode Video NVidia SVGA driver"
         version="@VERSION@"
+        license-name="lgpl"
         provider-name="JNode.org">
         
   <requires>

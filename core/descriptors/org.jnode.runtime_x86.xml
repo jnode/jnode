@@ -6,6 +6,7 @@
         version="@VERSION@"
         provider-name="JNode.org"
         system="true"
+        license-name="lgpl"
         class="org.jnode.system.x86.DMAPlugin">
         
   <requires>

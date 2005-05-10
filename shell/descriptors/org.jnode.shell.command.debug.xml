@@ -4,6 +4,7 @@
 <plugin id="org.jnode.shell.command.debug" 
         name="JNode debugging command support"
         version="@VERSION@"
+        license-name="lgpl"
         provider-name="JNode.org">
         
   <requires>

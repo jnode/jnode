@@ -32,7 +32,7 @@ import org.jnode.plugin.PluginException;
 /**
  * @author epr
  */
-public class LibraryModel extends PluginModelObject implements Library {
+final class LibraryModel extends PluginModelObject implements Library {
 
 	private final String name;
 	private final String[] exports;

@@ -35,7 +35,7 @@ import org.jnode.plugin.PluginException;
 /**
  * @author epr
  */
-public class ConfigurationElementModel extends PluginModelObject implements ConfigurationElement {
+final class ConfigurationElementModel extends PluginModelObject implements ConfigurationElement {
 
 	private final String name;
 	private final AttributeModel[] attributes;

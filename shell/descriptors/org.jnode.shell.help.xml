@@ -5,6 +5,7 @@
         name="JNode Help System"
         version="@VERSION@"
         provider-name="JNode.org"
+        license-name="lgpl"
 		class="org.jnode.shell.help.def.SystemHelpPlugin">
 
   <requires>

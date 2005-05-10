@@ -33,7 +33,7 @@ import org.jnode.plugin.PluginException;
 /**
  * @author epr
  */
-public class ExtensionModel extends PluginModelObject implements Extension {
+final class ExtensionModel extends PluginModelObject implements Extension {
 
 	private final String id;
 	private final String uniqueId;

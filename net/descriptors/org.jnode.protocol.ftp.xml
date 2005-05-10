@@ -4,6 +4,7 @@
 <plugin id="org.jnode.protocol.ftp" 
         name="JNode FTP protocol handler"
         version="@VERSION@"
+        license-name="lgpl"
         provider-name="JNode.org">
         
   <requires>

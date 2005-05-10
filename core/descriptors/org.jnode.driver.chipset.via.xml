@@ -4,6 +4,7 @@
 <plugin id="org.jnode.driver.chipset.via"
         name="JNode Via Chipset drivers"
         version="@VERSION@"
+        license-name="lgpl"
         provider-name="jnode.org">
 
   <requires>

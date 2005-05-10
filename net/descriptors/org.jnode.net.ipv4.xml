@@ -4,6 +4,7 @@
 <plugin id="org.jnode.net.ipv4"
   name="JNode IPv4 Network Layer"
   version="@VERSION@"
+        license-name="lgpl"
   provider-name="JNode.org">
 
   <requires>

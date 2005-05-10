@@ -4,6 +4,7 @@
 <plugin id="org.jnode.driver.net.prism2"
         name="JNode Prism2 driver"
         version="@VERSION@"
+        license-name="lgpl"
         provider-name="JNode.org">
         
   <requires>

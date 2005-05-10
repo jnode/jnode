@@ -4,6 +4,7 @@
 <plugin id="org.jnode.shell.command.driver"
         name="JNode driver commands"
         version="@VERSION@"
+        license-name="lgpl"
         provider-name="JNode.org">
 
   <requires>

@@ -4,6 +4,7 @@
 <plugin id="org.jnode.driver.input" 
         name="JNode input driver"
         version="@VERSION@"
+        license-name="lgpl"
         provider-name="JNode.org">
         
   <requires>

@@ -47,6 +47,24 @@ public interface PluginDescriptor {
 	 */
 	public abstract String getProviderName();
 	
+    /**
+     * Gets the url of the provider of this plugin
+     * @return The url of the provider (can be null for no url)
+     */
+    public abstract String getProviderUrl();
+    
+    /**
+     * Gets the name of the license that this plugin is using
+     * @return The name of the license
+     */
+    public abstract String getLicenseName();
+    
+    /**
+     * Gets the url of the license that this plugin is using
+     * @return The url of the license (can be null for no url)
+     */
+    public abstract String getLicenseUrl();
+    
 	/**
 	 * Gets the version of this plugin
 	 * @return The version
